@@ -57,6 +57,9 @@ XFADE_TRANSITIONS = {
     "hblur", "fadegrays", "squeezeh", "squeezev",
 }
 
+TONE_MAP_ALGORITHMS = {"linear", "gamma", "clip", "reinhard", "hable", "mobius"}
+TONE_MAP_INPUT_TRANSFERS = {"bt2020-10", "bt2020-12", "smpte2084", "arib-std-b67"}
+
 DEFAULT_OUTPUT: dict[str, Any] = {
     "container": "mp4",
     "video": {"codec": "libx264", "preset": "medium", "crf": 18, "pixel_format": "yuv420p"},
@@ -149,6 +152,45 @@ def _num(value: Any, default: float) -> float:
         return float(value)
     except (TypeError, ValueError):
         return default
+
+
+def _tone_map_filters(settings: dict[str, Any], warnings: list[dict[str, Any]], clip_id: str, *, transparent: bool = False) -> list[str]:
+    """Build an explicit local HDR-to-SDR tonemap chain when requested.
+
+    The project color block describes the output metadata by default. HDR input
+    details are opt-in under ``input_*`` fields so SDR projects never pay the
+    zscale/float conversion cost or silently reinterpret their footage.
+    """
+    color = settings.get("color") if isinstance(settings.get("color"), dict) else {}
+    algorithm = str(color.get("tone_map", color.get("tone_mapping", "none"))).strip().lower()
+    if not algorithm or algorithm == "none":
+        return []
+    if algorithm not in TONE_MAP_ALGORITHMS:
+        warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": "hdr_tonemap", "message": f"不支持的 HDR tone map 算法: {algorithm}"})
+        return []
+    if transparent:
+        warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": "hdr_tonemap_with_alpha", "message": "当前 HDR tone map 不与透明 yuva 画布组合，已跳过"})
+        return []
+    input_transfer = str(color.get("input_transfer", "smpte2084")).strip().lower()
+    input_primaries = str(color.get("input_primaries", "bt2020")).strip().lower()
+    input_matrix = str(color.get("input_matrix", "bt2020nc")).strip().lower()
+    input_range = str(color.get("input_range", "limited")).strip().lower()
+    if input_transfer not in TONE_MAP_INPUT_TRANSFERS or input_primaries not in {"bt2020", "bt709"} or input_matrix not in {"bt2020nc", "bt2020c", "bt709"} or input_range not in {"limited", "full", "tv", "pc"}:
+        warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": "hdr_tonemap", "message": "HDR 输入色彩字段无效，已跳过 tone map"})
+        return []
+    range_name = {"limited": "tv", "full": "pc", "tv": "tv", "pc": "pc"}[input_range]
+    desat = max(0.0, _num(color.get("tone_map_desat", 2.0), 2.0))
+    peak = max(0.0, _num(color.get("tone_map_peak", 0.0), 0.0))
+    tonemap = f"tonemap=tonemap={algorithm}:desat={desat:.4f}"
+    if peak > 0:
+        tonemap += f":peak={peak:.4f}"
+    return [
+        f"zscale=rin={range_name}:pin={input_primaries}:tin={input_transfer}:min={input_matrix}:t=linear:m=bt2020nc:p=bt2020:r=tv",
+        "format=gbrpf32le",
+        tonemap,
+        "zscale=t=bt709:m=bt709:p=bt709:r=tv",
+        "format=rgba",
+    ]
 
 
 def _tick(value: Any, default: int = 0) -> int:
@@ -1979,6 +2021,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     raw_output = settings.get("output") if isinstance(settings.get("output"), dict) else {}
     raw_video_output = raw_output.get("video") if isinstance(raw_output.get("video"), dict) else {}
     transparent_canvas = str(raw_video_output.get("pixel_format", "")).lower() in ALPHA_OUTPUT_PIXEL_FORMATS
+    color_tone_map = str((settings.get("color") or {}).get("tone_map", (settings.get("color") or {}).get("tone_mapping", "none"))).lower() if isinstance(settings.get("color"), dict) else "none"
     assets = asset_map(project)
     inputs: list[str] = []
     filters: list[str] = []
@@ -2059,6 +2102,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 if bool(clip.get("reverse")):
                     chain.append("reverse")
                 chain.append(setpts)
+                if kind == "video" and color_tone_map not in {"", "none"}:
+                    chain.extend(_tone_map_filters(settings, warnings, str(clip.get("id")), transparent=transparent_canvas))
                 crop = clip.get("crop") if isinstance(clip.get("crop"), dict) else {}
                 crop_fit = str(crop.get("fit", crop.get("mode", "fit"))).lower()
                 source_probe = asset.get("probe", {}).get("video", {}) if isinstance(asset.get("probe"), dict) else {}

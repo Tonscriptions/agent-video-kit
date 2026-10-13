@@ -76,7 +76,15 @@
             "primaries": {"type": "string", "enum": ["bt709", "bt2020", "smpte170m", "smpte432"]},
             "transfer": {"type": "string", "enum": ["bt709", "bt2020-10", "smpte2084", "arib-std-b67", "iec61966-2-1", "linear"]},
             "matrix": {"type": "string", "enum": ["bt709", "bt2020nc", "bt2020c", "smpte170m", "gbr"]},
-            "range": {"type": "string", "enum": ["limited", "full", "tv", "pc"]}
+            "range": {"type": "string", "enum": ["limited", "full", "tv", "pc"]},
+            "tone_map": {"type": "string", "enum": ["none", "linear", "gamma", "clip", "reinhard", "hable", "mobius"]},
+            "tone_mapping": {"type": "string", "enum": ["none", "linear", "gamma", "clip", "reinhard", "hable", "mobius"]},
+            "input_transfer": {"type": "string", "enum": ["bt2020-10", "bt2020-12", "smpte2084", "arib-std-b67"]},
+            "input_primaries": {"type": "string", "enum": ["bt2020", "bt709"]},
+            "input_matrix": {"type": "string", "enum": ["bt2020nc", "bt2020c", "bt709"]},
+            "input_range": {"type": "string", "enum": ["limited", "full", "tv", "pc"]},
+            "tone_map_desat": {"type": "number", "minimum": 0},
+            "tone_map_peak": {"type": "number", "minimum": 0}
           }
         },
         "adjustments": {

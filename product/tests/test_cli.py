@@ -398,6 +398,7 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("lut3d_project_local", manifest["capabilities"]["effects"]["features"])
         self.assertIn("yuv420p10le", manifest["capabilities"]["output"]["pixel_formats"])
         self.assertIn("yuva420p", manifest["capabilities"]["output"]["pixel_formats"])
+        self.assertIn("hable", manifest["capabilities"]["output"]["tone_mapping"])
         self.assertEqual(manifest["policies"]["jianying_runtime_enabled"], False)
 
     def test_runtime_storage_is_local_to_product(self) -> None:
@@ -910,6 +911,40 @@ class P0CliTests(unittest.TestCase):
             probe = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream_tags=alpha_mode", "-of", "json", str(output)], capture_output=True, text=True, encoding="utf-8")
             self.assertEqual(probe.returncode, 0, probe.stderr)
             self.assertEqual(json.loads(probe.stdout)["streams"][0]["tags"].get("alpha_mode"), "1")
+
+    def test_hdr_tone_map_chain_is_local_and_renders(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-hdr-tonemap-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": ingest["data"]["asset"]["id"],
+                "source_in_tick": 0, "source_out_tick": 90000,
+            }]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            project_payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            project_payload["settings"]["color"].update({
+                "tone_map": "hable",
+                "input_transfer": "smpte2084",
+                "input_primaries": "bt2020",
+                "input_matrix": "bt2020nc",
+                "input_range": "limited",
+                "tone_map_desat": 0.5,
+            })
+            (project / "project.json").write_text(json.dumps(project_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            output = project / "renders" / "tonemapped.mp4"
+            code, planned = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180", "--dry-run")
+            self.assertEqual(code, 0, planned)
+            graph = planned["data"]["plan"]["filter_complex"]
+            self.assertIn("zscale=rin=tv:pin=bt2020:tin=smpte2084", graph)
+            self.assertIn("tonemap=tonemap=hable", graph)
+            self.assertEqual(planned["data"]["plan"]["warnings"], [])
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180")
+            self.assertEqual(code, 0, rendered)
+            self.assertTrue(output.exists())
 
     def test_reverse_speed_curve_reflects_ramp_without_approximation_warning(self) -> None:
         segments = [(0.0, 0.25, 1.0, 1.0), (0.25, 0.75, 2.0, 2.0), (0.75, 1.0, 4.0, 4.0)]

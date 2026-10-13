@@ -147,7 +147,7 @@
 
 ## 8. 输出与来源追踪
 
-`settings.output` 记录默认容器和编码策略；当前本地后端允许 `mp4`、`webm`、`mkv`，以及本机 FFmpeg 可用的视频/音频编码器。视频像素格式支持 `yuv420p`、`yuv422p`、`yuv444p` 及对应的 `10-bit` little-endian 变体；透明交付额外支持 `yuva420p`，但只允许 WebM + VP9/VP8。最终是否可编码取决于本机 FFmpeg 编码器和容器。`settings.color` 的 `primaries`、`transfer`、`matrix`、`range` 会显式传递给 FFmpeg，支持 bt709 基线及 bt2020/PQ/HLG 等 HDR 元数据值，但这不等价于已经完成 HDR 显示、代理和跨设备色彩一致性验收。`outputs[]` 记录实际容器、编码器、分辨率、帧率、像素格式、音频规格、目标平台、输出路径和质量门禁引用。`provenance` 至少记录：
+`settings.output` 记录默认容器和编码策略；当前本地后端允许 `mp4`、`webm`、`mkv`，以及本机 FFmpeg 可用的视频/音频编码器。视频像素格式支持 `yuv420p`、`yuv422p`、`yuv444p` 及对应的 `10-bit` little-endian 变体；透明交付额外支持 `yuva420p`，但只允许 WebM + VP9/VP8。最终是否可编码取决于本机 FFmpeg 编码器和容器。`settings.color` 的 `primaries`、`transfer`、`matrix`、`range` 会显式传递给 FFmpeg，支持 bt709 基线及 bt2020/PQ/HLG 等 HDR 元数据值；显式设置 `tone_map`（`linear`/`gamma`/`clip`/`reinhard`/`hable`/`mobius`）时，视频输入按 `input_transfer`、`input_primaries`、`input_matrix`、`input_range` 经过本地 `zscale + tonemap` 转到 bt709，透明画布与 tone map 组合会被拒绝为近似能力。该链路仍不等价于已经完成 HDR 显示、代理和跨设备色彩一致性验收。`outputs[]` 记录实际容器、编码器、分辨率、帧率、像素格式、音频规格、目标平台、输出路径和质量门禁引用。`provenance` 至少记录：
 
 - 工具版本、引擎版本、模型版本和运行平台；
 - 输入资产哈希、项目文件哈希、命令参数和随机种子；

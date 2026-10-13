@@ -41,6 +41,9 @@ COLOR_METADATA_VALUES: dict[str, set[str]] = {
     "range": {"limited", "full", "tv", "pc"},
 }
 
+TONE_MAP_ALGORITHMS = {"none", "linear", "gamma", "clip", "reinhard", "hable", "mobius"}
+TONE_MAP_INPUT_TRANSFERS = {"bt2020-10", "bt2020-12", "smpte2084", "arib-std-b67"}
+
 LUT_EFFECT_TYPES = {"lut", "lut3d", "cube", "look"}
 LUT_EXTENSIONS = {".cube", ".3dl", ".csp", ".dat"}
 
@@ -142,6 +145,28 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                     raw_color = color_value.get(color_field)
                     if raw_color is not None and str(raw_color).lower() not in allowed_values:
                         error("COLOR_METADATA_UNSUPPORTED", f"不支持的色彩元数据: {raw_color}", f"settings.color.{color_field}")
+                tone_map = str(color_value.get("tone_map", color_value.get("tone_mapping", "none"))).lower()
+                if tone_map not in TONE_MAP_ALGORITHMS:
+                    error("TONE_MAP_UNSUPPORTED", f"不支持的 HDR tone map 算法: {tone_map}", "settings.color.tone_map")
+                for field, allowed in {
+                    "input_transfer": TONE_MAP_INPUT_TRANSFERS,
+                    "input_primaries": {"bt2020", "bt709"},
+                    "input_matrix": {"bt2020nc", "bt2020c", "bt709"},
+                    "input_range": {"limited", "full", "tv", "pc"},
+                }.items():
+                    raw_value = color_value.get(field)
+                    if raw_value is not None and str(raw_value).lower() not in allowed:
+                        error("TONE_MAP_INPUT_UNSUPPORTED", f"不支持的 HDR 输入色彩字段: {raw_value}", f"settings.color.{field}")
+                for field in ("tone_map_desat", "tone_map_peak"):
+                    if field not in color_value:
+                        continue
+                    raw_value = color_value.get(field)
+                    try:
+                        numeric_value = float(raw_value)
+                    except (TypeError, ValueError):
+                        numeric_value = math.nan
+                    if isinstance(raw_value, bool) or not math.isfinite(numeric_value) or numeric_value < 0:
+                        error("TONE_MAP_PARAMETER_INVALID", f"{field} 必须是非负有限数字", f"settings.color.{field}")
 
         adjustments = settings_value.get("adjustments")
         if adjustments is not None:
