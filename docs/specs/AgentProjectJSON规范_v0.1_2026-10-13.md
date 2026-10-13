@@ -118,6 +118,8 @@
 
 `settings.adjustments` 是所有导出序列共用的全局调节栈。每项可以直接是效果对象，也可以是 `{id, enabled, effects[]}`；渲染器在完成所有视频轨道、转场、遮罩和混合后按数组顺序执行。效果参数关键帧的 `at_tick` 相对于当前导出序列的起点，时长必须兼容所有项目序列。当前版本只接受覆盖整个序列的调节层；带 `start_tick` 或 `duration_tick` 的区间层必须拒绝。调节层复用片段效果的参数关键帧与近似警告；`enabled=false` 跳过对应层或效果。
 
+效果 `type` 为 `lut`/`lut3d`/`cube`/`look` 时，`parameters.path`（也兼容 `file`/`lut`）必须指向项目根目录内已存在的 `.cube`、`.3dl`、`.csp` 或 `.dat` 文件；运行时只调用本地 FFmpeg `lut3d`，禁止网络 URL、项目外路径和缺失文件。`parameters.interpolation` 可选 `nearest`、`trilinear`、`tetrahedral`、`pyramid` 或 `prism`，默认 `tetrahedral`。LUT 强度混合、LUT 包索引和预览缓存仍属于后续版本。
+
 片段级 `mask` 使用归一化参数，当前支持 `rectangle`（`x/y/width/height`）、`circle`（`cx/cy/radius`）、`ellipse`（`cx/cy/rx/ry`）和 `path/polygon`；rectangle/circle/ellipse 的位置、尺寸和 `feather` 可通过 `mask.*` 关键帧驱动，动态羽化使用 alpha-only 软边表达式，`feather` 限制在 0 到 0.5；path/polygon 可以保持固定点数，点坐标可用 `mask.points.0.x`、`mask.points.0.y` 这类片段关键帧或 mask 内局部关键帧驱动，点坐标限制在 0 到 1，动态 `feather` 也可由关键帧驱动，使用固定点边缘的内侧距离近似生成 alpha 软边；静态 `segments`/`curve_segments`/`curves` 可声明 `line` 或 `cubic` 段，cubic 的 `samples` 限制在 2 到 16，总采样点限制在 3 到 32，渲染器将其采样为固定多边形。曲线段不能与 `points` 同时声明，曲线段逐点动画和 GUI 路径编辑器仍未提供。片段级 `blend` 使用 `mode` 与可选 `opacity`，`blend.opacity` 和 `transform.opacity` 可通过片段关键帧驱动；混合模式必须属于本地能力清单，未知模式在验证阶段拒绝。
 
 固定点数路径的最小关键帧形状如下；`points.N.*` 的 `N` 必须与初始 `points` 数组对应，不能在时间轴中增删点：

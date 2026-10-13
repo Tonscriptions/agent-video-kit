@@ -43,11 +43,11 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "effects": {
                 "status": "implemented",
-                "features": ["grayscale", "sepia", "blur", "boxblur", "sharpen", "brightness", "contrast", "saturation", "hue", "gamma", "color_temperature", "color_balance", "vignette", "noise", "invert", "posterize", "edgedetect", "deband", "deshake", "histeq", "gradfun", "chroma_key", "hflip", "vflip", "effect_parameter_keyframes", "sequence_adjustments"],
+                "features": ["grayscale", "sepia", "blur", "boxblur", "sharpen", "brightness", "contrast", "saturation", "hue", "gamma", "color_temperature", "color_balance", "vignette", "noise", "invert", "posterize", "edgedetect", "deband", "deshake", "histeq", "gradfun", "chroma_key", "hflip", "vflip", "effect_parameter_keyframes", "sequence_adjustments", "lut3d_project_local"],
                 "unknown_effect_policy": "RENDER_FEATURE_UNSUPPORTED",
                 "effect_keyframe_contract": "brightness_contrast_saturation_hue_gamma_vignette_use_local_eq_hue_vignette_eval_frame",
                 "adjustment_contract": "settings.adjustments_are_applied_after_track_compositing_as_a_sequence_wide_stack",
-                "limits": ["unsupported_effect_parameters_use_static_value_with_warning", "adjustment_layers_are_sequence_wide_until_interval_layers_are_added"],
+                "limits": ["unsupported_effect_parameters_use_static_value_with_warning", "adjustment_layers_are_sequence_wide_until_interval_layers_are_added", "lut_intensity_and_lut_library_management_pending"],
             },
             "compositing": {
                 "status": "implemented",

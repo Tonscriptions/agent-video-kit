@@ -1196,6 +1196,7 @@ def _effect_filters(
     warnings: list[dict[str, Any]],
     clip_id: str,
     *,
+    root: Path | None = None,
     clip: dict[str, Any] | None = None,
     clip_start: float = 0.0,
     tps: int = 90000,
@@ -1231,7 +1232,28 @@ def _effect_filters(
                     "feature": f"effect_keyframes:{effect_type}",
                     "message": "当前效果滤镜不支持逐帧参数表达式，使用静态参数值",
                 })
-        if name in {"grayscale", "black_white", "blackandwhite"}:
+        if name in {"lut", "lut3d", "cube", "look"}:
+            raw_lut_path = parameters.get("path", parameters.get("file", parameters.get("lut")))
+            if not raw_lut_path:
+                warnings.append({"code": "LUT_FILE_MISSING", "clip_id": clip_id, "feature": "lut3d", "message": "LUT 效果没有提供 path/file"})
+                continue
+            raw_lut_text = str(raw_lut_path)
+            if raw_lut_text.lower().startswith("file://"):
+                raw_lut_text = raw_lut_text[7:]
+            lut_path = Path(raw_lut_text)
+            if not lut_path.is_absolute() and root is not None:
+                lut_path = root / lut_path
+            if not lut_path.exists() or not lut_path.is_file():
+                warnings.append({"code": "LUT_FILE_MISSING", "clip_id": clip_id, "feature": "lut3d", "message": f"LUT 文件不存在: {lut_path}"})
+                continue
+            interpolation = str(parameters.get("interpolation", parameters.get("interp", "tetrahedral"))).lower()
+            if interpolation not in {"nearest", "trilinear", "tetrahedral", "pyramid", "prism"}:
+                warnings.append({"code": "LUT_INTERPOLATION_INVALID", "clip_id": clip_id, "feature": "lut3d", "message": f"LUT interpolation 无效，已回退 tetrahedral: {interpolation}"})
+                interpolation = "tetrahedral"
+            if effect_tracks:
+                warn_unsupported_tracks()
+            filters.append(f"lut3d=file='{_quoted(str(lut_path))}':interp={interpolation}")
+        elif name in {"grayscale", "black_white", "blackandwhite"}:
             filters.append("hue=s=0")
         elif name == "sepia":
             filters.append("colorchannelmixer=.393:.769:.189:0:.349:.686:.168:0:.272:.534:.131")
@@ -2192,6 +2214,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                         clip.get("effects"),
                         warnings,
                         str(clip.get("id")),
+                        root=root,
                         clip=clip,
                         clip_start=start,
                         tps=tps,
@@ -2544,6 +2567,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 effects,
                 warnings,
                 adjustment_id,
+                root=root,
                 clip=effect_clip,
                 clip_start=0.0,
                 tps=tps,

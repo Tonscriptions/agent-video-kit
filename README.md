@@ -7,7 +7,7 @@
 ## 当前状态
 
 - P0 CLI 闭环已实现：项目初始化、媒体摄取与探测、时间线变更、关键帧与运镜、字幕、音频、遮罩、转场、渲染、质量检查、权利门禁、快照/迁移和受限互操作。
-- 当前 E 盘回归：`69/69` 通过；完整证据见 [`docs/validation/回归验证记录_2026-10-13.md`](docs/validation/回归验证记录_2026-10-13.md)。
+- 当前 E 盘回归：`70/70` 通过；完整证据见 [`docs/validation/回归验证记录_2026-10-13.md`](docs/validation/回归验证记录_2026-10-13.md)。
 - 当前实现仍会明确报告近似和未支持能力，不能把 P0 底座描述成已经完全等同于剪映。对象跟踪鲁棒性、复杂路径逐点动画、GPU 效果、离线 TTS、完整外部工程映射和黄金素材集仍按路线图推进。
 - 本地 Skills 共 40 个，统一使用 `video-cut-` 前缀，可用 `$video-cut-技能名` 调用；清单见 [`video-cut-install-manifest.json`](video-cut-install-manifest.json)。
 
@@ -49,7 +49,7 @@ python -X utf8 -m ai_ad_editor render --project .\workspace\demo --output .\work
 
 ## 主要能力
 
-当前渲染器覆盖多轨时间线、裁切/滑移/涟漪编辑、静态和 cubic Bezier 关键帧、倒放与反向速度曲线段反射、任意位置视频定格、默认同点音频静音插入、常用 FFmpeg xfade 转场、字幕动画与高级 drawtext 样式、固定点数路径/多边形遮罩、动态 feather、blend、动态 crop、序列级全局调节层、效果参数逐帧关键帧、音量/声像自动化、降噪/压缩/均衡/响度/旁白闪避、多画布输出、10-bit 像素格式、色彩元数据和 JSONL 进度/取消/安全恢复。
+当前渲染器覆盖多轨时间线、裁切/滑移/涟漪编辑、静态和 cubic Bezier 关键帧、倒放与反向速度曲线段反射、任意位置视频定格、默认同点音频静音插入、常用 FFmpeg xfade 转场、字幕动画与高级 drawtext 样式、固定点数路径/多边形遮罩、动态 feather、blend、动态 crop、序列级全局调节层、项目内 LUT3D（`.cube/.3dl/.csp/.dat`）、效果参数逐帧关键帧、音量/声像自动化、降噪/压缩/均衡/响度/旁白闪避、多画布输出、10-bit 像素格式、色彩元数据和 JSONL 进度/取消/安全恢复。
 
 所有不确定能力通过 `capabilities` 清单和渲染 warning 披露。运行：
 

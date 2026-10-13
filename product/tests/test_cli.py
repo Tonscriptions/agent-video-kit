@@ -393,6 +393,7 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("target_lufs_gate", manifest["capabilities"]["quality"]["features"])
         self.assertIn("effect_parameter_keyframes", manifest["capabilities"]["effects"]["features"])
         self.assertIn("sequence_adjustments", manifest["capabilities"]["effects"]["features"])
+        self.assertIn("lut3d_project_local", manifest["capabilities"]["effects"]["features"])
         self.assertIn("yuv420p10le", manifest["capabilities"]["output"]["pixel_formats"])
         self.assertEqual(manifest["policies"]["jianying_runtime_enabled"], False)
 
@@ -753,6 +754,51 @@ class P0CliTests(unittest.TestCase):
                 return sum(completed.stdout) / len(completed.stdout)
 
             self.assertGreater(center_luma(0.85), center_luma(0.10) + 15.0)
+
+    def test_project_local_lut3d_is_validated_and_rendered(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-lut-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingest["data"]["asset"]["id"]
+            lut_path = project / "luts" / "red.cube"
+            lut_path.parent.mkdir(parents=True, exist_ok=True)
+            lut_path.write_text(
+                'TITLE "Solid Red"\nLUT_3D_SIZE 2\nDOMAIN_MIN 0.0 0.0 0.0\nDOMAIN_MAX 1.0 1.0 1.0\n'
+                + "\n".join(["1.0 0.0 0.0"] * 8) + "\n",
+                encoding="utf-8",
+            )
+            invalid_changes = workspace / "invalid-lut.json"
+            invalid_changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id,
+                "source_in_tick": 0, "source_out_tick": 90000,
+                "effects": [{"type": "lut3d", "parameters": {"path": "https://example.invalid/look.cube"}}],
+            }]}), encoding="utf-8")
+            code, rejected = invoke("timeline", "compose", "--project", str(project), "--input", str(invalid_changes))
+            self.assertEqual(code, 2, rejected)
+            self.assertIn("LUT_PATH_NETWORK", rejected["errors"][0].get("cause", ""))
+
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id,
+                "source_in_tick": 0, "source_out_tick": 90000,
+                "effects": [{"type": "lut3d", "parameters": {"path": "luts/red.cube", "interpolation": "tetrahedral"}}],
+            }]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            output = project / "renders" / "lut.mp4"
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180")
+            self.assertEqual(code, 0, rendered)
+            self.assertEqual(rendered["data"]["warnings"], [])
+            frame = subprocess.run(
+                ["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(output), "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgb24", "pipe:1"],
+                capture_output=True,
+            )
+            self.assertEqual(frame.returncode, 0, frame.stderr.decode("utf-8", errors="replace"))
+            center = (90 * 320 + 160) * 3
+            self.assertGreater(frame.stdout[center], 180)
+            self.assertLess(frame.stdout[center + 1], 90)
 
     def test_10bit_pixel_format_and_color_metadata_reach_ffmpeg_plan(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-10bit-output-") as raw:

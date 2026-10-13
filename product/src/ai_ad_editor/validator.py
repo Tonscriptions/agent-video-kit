@@ -41,6 +41,9 @@ COLOR_METADATA_VALUES: dict[str, set[str]] = {
     "range": {"limited", "full", "tv", "pc"},
 }
 
+LUT_EFFECT_TYPES = {"lut", "lut3d", "cube", "look"}
+LUT_EXTENSIONS = {".cube", ".3dl", ".csp", ".dat"}
+
 
 def _schema_path() -> Path:
     return Path(__file__).resolve().parents[3] / "docs" / "specs" / "agent-project.schema.json"
@@ -89,6 +92,35 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
     def warning(code: str, message: str, path: str) -> None:
         warnings.append({"code": code, "message": message, "path": path})
 
+    def validate_lut_resource(effect_value: dict[str, Any], effect_path: str) -> None:
+        effect_type = str(effect_value.get("type", "")).lower().replace("-", "_")
+        if effect_type not in LUT_EFFECT_TYPES:
+            return
+        parameters = effect_value.get("parameters") if isinstance(effect_value.get("parameters"), dict) else effect_value
+        raw_path = parameters.get("path", parameters.get("file", parameters.get("lut")))
+        path_field = f"{effect_path}.parameters.path"
+        if raw_path is None or not str(raw_path).strip():
+            error("LUT_PATH_MISSING", "LUT 效果必须提供 parameters.path/file", path_field)
+            return
+        raw_text = str(raw_path).strip()
+        if "://" in raw_text and not raw_text.lower().startswith("file://"):
+            error("LUT_PATH_NETWORK", "LUT 运行时路径不允许网络协议", path_field)
+            return
+        if raw_text.lower().startswith("file://"):
+            raw_text = raw_text[7:]
+        lut_path = Path(raw_text)
+        if not lut_path.is_absolute():
+            lut_path = root / lut_path
+        try:
+            lut_path.resolve().relative_to(root.resolve())
+        except ValueError:
+            error("LUT_PATH_OUTSIDE_PROJECT", "LUT 路径必须位于项目根目录内", path_field)
+            return
+        if not lut_path.exists() or not lut_path.is_file():
+            error("LUT_FILE_MISSING", f"LUT 文件不存在: {lut_path}", path_field)
+        if lut_path.suffix.lower() not in LUT_EXTENSIONS:
+            error("LUT_EXTENSION_UNSUPPORTED", "LUT 文件扩展名只支持 .cube、.3dl、.csp 或 .dat", path_field)
+
     if project.get("schema_version") != "0.1.0":
         error("SCHEMA_VERSION_UNSUPPORTED", "只支持 Agent Project schema 0.1.0", "schema_version")
     for field in ("project", "settings", "assets", "sequences", "provenance"):
@@ -134,6 +166,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                         error("EFFECT_TYPE_MISSING", "序列调节效果缺少 type", f"{effect_path}.type")
                         return
                     parameters = effect_value.get("parameters") if isinstance(effect_value.get("parameters"), dict) else effect_value
+                    validate_lut_resource(effect_value, effect_path)
                     raw_tracks = effect_value.get("keyframes")
                     if not isinstance(raw_tracks, list):
                         raw_tracks = parameters.get("keyframes") if isinstance(parameters.get("keyframes"), list) else []
@@ -415,6 +448,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                 continue
                             effect_type = str(effect_value.get("type", "")).lower().replace("-", "_")
                             parameters = effect_value.get("parameters") if isinstance(effect_value.get("parameters"), dict) else effect_value
+                            validate_lut_resource(effect_value, effect_path)
                             raw_effect_tracks = effect_value.get("keyframes")
                             if not isinstance(raw_effect_tracks, list):
                                 raw_effect_tracks = parameters.get("keyframes") if isinstance(parameters.get("keyframes"), list) else []
