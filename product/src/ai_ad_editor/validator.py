@@ -22,6 +22,18 @@ TRANSITION_TYPES = {
     "hblur", "fadegrays", "squeezeh", "squeezev",
 }
 
+EFFECT_KEYFRAME_ALIASES: dict[str, set[str]] = {
+    "brightness": {"brightness", "amount", "value"},
+    "contrast": {"contrast", "amount", "value"},
+    "saturation": {"saturation", "amount", "value"},
+    "color": {"brightness", "contrast", "saturation"},
+    "hue": {"degrees", "angle", "hue", "value"},
+    "hue_rotate": {"degrees", "angle", "hue", "value"},
+    "gamma": {"gamma", "amount", "value"},
+    "gamma_adjust": {"gamma", "amount", "value"},
+    "vignette": {"angle", "value"},
+}
+
 
 def _schema_path() -> Path:
     return Path(__file__).resolve().parents[3] / "docs" / "specs" / "agent-project.schema.json"
@@ -285,6 +297,70 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
 
                         validate_crop_keyframes(crop.get("keyframes"), f"{cp}.crop.keyframes")
                         validate_crop_keyframes(clip_crop_tracks, f"{cp}.keyframes")
+                effects = clip.get("effects")
+                if effects is not None:
+                    if not isinstance(effects, list):
+                        error("EFFECTS_INVALID", "effects 必须是数组", f"{cp}.effects")
+                    else:
+                        for effect_index, effect_value in enumerate(effects):
+                            effect_path = f"{cp}.effects[{effect_index}]"
+                            if isinstance(effect_value, str):
+                                continue
+                            if not isinstance(effect_value, dict):
+                                error("EFFECT_INVALID", "效果必须是字符串或对象", effect_path)
+                                continue
+                            effect_type = str(effect_value.get("type", "")).lower().replace("-", "_")
+                            parameters = effect_value.get("parameters") if isinstance(effect_value.get("parameters"), dict) else effect_value
+                            raw_effect_tracks = effect_value.get("keyframes")
+                            if not isinstance(raw_effect_tracks, list):
+                                raw_effect_tracks = parameters.get("keyframes") if isinstance(parameters.get("keyframes"), list) else []
+                            if not raw_effect_tracks:
+                                continue
+                            supported_properties = EFFECT_KEYFRAME_ALIASES.get(effect_type)
+                            for track_index, track_value in enumerate(raw_effect_tracks):
+                                track_path = f"{effect_path}.keyframes[{track_index}]"
+                                if not isinstance(track_value, dict):
+                                    error("EFFECT_KEYFRAMES_INVALID", "效果 keyframe track 必须是对象", track_path)
+                                    continue
+                                property_name = str(track_value.get("property", "")).strip().lower().replace("-", "_")
+                                for prefix in ("effect.", "parameters.", f"{effect_type}.") if effect_type else ("effect.", "parameters."):
+                                    if property_name.startswith(prefix):
+                                        property_name = property_name[len(prefix):]
+                                        break
+                                if not property_name:
+                                    error("EFFECT_KEYFRAME_PROPERTY_INVALID", "效果 keyframe property 不能为空", f"{track_path}.property")
+                                elif supported_properties is None or property_name not in supported_properties:
+                                    warning("EFFECT_KEYFRAME_PROPERTY_UNSUPPORTED", "该效果参数关键帧不会逐帧执行，将使用静态参数值", f"{track_path}.property")
+                                keyframes = track_value.get("keyframes")
+                                if not isinstance(keyframes, list) or not keyframes:
+                                    error("EFFECT_KEYFRAMES_INVALID", "效果 keyframe track 必须包含非空 keyframes", f"{track_path}.keyframes")
+                                    continue
+                                previous_at = -1
+                                for keyframe_index, keyframe_value in enumerate(keyframes):
+                                    keyframe_path = f"{track_path}.keyframes[{keyframe_index}]"
+                                    if not isinstance(keyframe_value, dict):
+                                        error("EFFECT_KEYFRAMES_INVALID", "效果 keyframe 必须是对象", keyframe_path)
+                                        continue
+                                    at = _int(keyframe_value.get("at_tick"), -1)
+                                    if at < 0 or at > dur or at < previous_at:
+                                        error("EFFECT_KEYFRAME_TIME_INVALID", "效果 keyframe at_tick 必须单调且位于片段内", f"{keyframe_path}.at_tick")
+                                    previous_at = at
+                                    interpolation = keyframe_value.get("interpolation")
+                                    if interpolation not in {"hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"}:
+                                        error("INTERPOLATION_INVALID", "效果关键帧插值类型无效", f"{keyframe_path}.interpolation")
+                                    if interpolation == "bezier":
+                                        controls = keyframe_value.get("control_points")
+                                        if not isinstance(controls, list) or len(controls) not in {2, 4} or any(isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) for value in controls):
+                                            error("BEZIER_CONTROL_POINTS_INVALID", "效果 Bezier 控制点必须是 2 或 4 个有限数字", f"{keyframe_path}.control_points")
+                                        elif len(controls) == 4 and not (0.0 <= controls[0] <= 1.0 and 0.0 <= controls[2] <= 1.0):
+                                            error("BEZIER_CONTROL_POINT_RANGE", "效果 Bezier 控制点 x 必须位于 0 到 1", f"{keyframe_path}.control_points")
+                                    value = keyframe_value.get("value")
+                                    try:
+                                        numeric_value = float(value)
+                                    except (TypeError, ValueError):
+                                        numeric_value = math.nan
+                                    if isinstance(value, bool) or not math.isfinite(numeric_value):
+                                        error("EFFECT_KEYFRAME_VALUE_INVALID", "效果关键帧 value 必须是有限数字", f"{keyframe_path}.value")
                 for transition_field in ("transition_in", "transition_out"):
                     transition_value = clip.get(transition_field)
                     if transition_value is None:

@@ -43,8 +43,10 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "effects": {
                 "status": "implemented",
-                "features": ["grayscale", "sepia", "blur", "boxblur", "sharpen", "brightness", "contrast", "saturation", "hue", "gamma", "color_temperature", "color_balance", "vignette", "noise", "invert", "posterize", "edgedetect", "deband", "deshake", "histeq", "gradfun", "chroma_key", "hflip", "vflip"],
+                "features": ["grayscale", "sepia", "blur", "boxblur", "sharpen", "brightness", "contrast", "saturation", "hue", "gamma", "color_temperature", "color_balance", "vignette", "noise", "invert", "posterize", "edgedetect", "deband", "deshake", "histeq", "gradfun", "chroma_key", "hflip", "vflip", "effect_parameter_keyframes"],
                 "unknown_effect_policy": "RENDER_FEATURE_UNSUPPORTED",
+                "effect_keyframe_contract": "brightness_contrast_saturation_hue_gamma_vignette_use_local_eq_hue_vignette_eval_frame",
+                "limits": ["unsupported_effect_parameters_use_static_value_with_warning"],
             },
             "compositing": {
                 "status": "implemented",

@@ -1104,17 +1104,100 @@ def _insert_audio_freeze(
     return [f"[{frozen}]anull"]
 
 
-def _effect_filters(effects: Any, warnings: list[dict[str, Any]], clip_id: str) -> list[str]:
+def _effect_keyframe_tracks(effect: dict[str, Any], parameters: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return normalized parameter keyframe tracks for one effect.
+
+    Effects keep their own keyframe namespace so an Agent can animate a
+    filter without colliding with clip transform/audio tracks.  Both the
+    explicit top-level ``effect.keyframes`` form and the convenient
+    ``parameters.keyframes`` form are accepted; aliases such as
+    ``effect.brightness`` and ``parameters.brightness`` are normalized to
+    ``brightness`` before the shared keyframe evaluator runs.
+    """
+    raw_tracks = effect.get("keyframes")
+    if not isinstance(raw_tracks, list):
+        raw_tracks = parameters.get("keyframes") if isinstance(parameters.get("keyframes"), list) else []
+    effect_name = str(effect.get("type", "")).lower().replace("-", "_")
+    prefixes = ("effect.", "parameters.", f"{effect_name}.") if effect_name else ("effect.", "parameters.")
+    tracks: list[dict[str, Any]] = []
+    for item in raw_tracks:
+        if not isinstance(item, dict):
+            continue
+        property_name = str(item.get("property", "")).strip().lower().replace("-", "_")
+        for prefix in prefixes:
+            if property_name.startswith(prefix):
+                property_name = property_name[len(prefix):]
+                break
+        if not property_name:
+            continue
+        tracks.append({**item, "property": property_name})
+    return tracks
+
+
+def _effect_has_keyframe(effect: dict[str, Any], parameters: dict[str, Any], aliases: tuple[str, ...]) -> bool:
+    names = {str(alias).lower().replace("-", "_") for alias in aliases}
+    return any(str(item.get("property", "")) in names for item in _effect_keyframe_tracks(effect, parameters))
+
+
+def _effect_keyframe_expr(
+    effect: dict[str, Any],
+    parameters: dict[str, Any],
+    aliases: tuple[str, ...],
+    default: float,
+    clip_start: float,
+    tps: int,
+) -> str:
+    tracks = _effect_keyframe_tracks(effect, parameters)
+    if not tracks:
+        return f"{default:.8f}"
+    return _keyframe_expr(
+        {"keyframes": tracks},
+        tuple(str(alias).lower().replace("-", "_") for alias in aliases),
+        default,
+        clip_start,
+        tps,
+        time_variable="t",
+    )
+
+
+def _effect_filters(
+    effects: Any,
+    warnings: list[dict[str, Any]],
+    clip_id: str,
+    *,
+    clip: dict[str, Any] | None = None,
+    clip_start: float = 0.0,
+    tps: int = 90000,
+) -> list[str]:
     filters: list[str] = []
+    clip_value = clip if isinstance(clip, dict) else {}
     for effect in effects or []:
         if isinstance(effect, str):
             effect_type, parameters = effect, {}
+            effect_value: dict[str, Any] = {"type": effect_type}
         elif isinstance(effect, dict):
             effect_type = str(effect.get("type", ""))
             parameters = effect.get("parameters") if isinstance(effect.get("parameters"), dict) else effect
+            effect_value = effect
         else:
             continue
         name = effect_type.lower().replace("-", "_")
+        effect_tracks = _effect_keyframe_tracks(effect_value, parameters)
+
+        def expression(aliases: tuple[str, ...], default: float) -> str:
+            return _effect_keyframe_expr(effect_value, parameters, aliases, default, clip_start, tps)
+
+        def has_track(aliases: tuple[str, ...]) -> bool:
+            return _effect_has_keyframe(effect_value, parameters, aliases)
+
+        def warn_unsupported_tracks() -> None:
+            if effect_tracks:
+                warnings.append({
+                    "code": "RENDER_FEATURE_APPROXIMATE",
+                    "clip_id": clip_id,
+                    "feature": f"effect_keyframes:{effect_type}",
+                    "message": "当前效果滤镜不支持逐帧参数表达式，使用静态参数值",
+                })
         if name in {"grayscale", "black_white", "blackandwhite"}:
             filters.append("hue=s=0")
         elif name == "sepia":
@@ -1131,11 +1214,51 @@ def _effect_filters(effects: Any, warnings: list[dict[str, Any]], clip_id: str) 
             brightness = _num(parameters.get("brightness", parameters.get("amount", 0)), 0)
             contrast = _num(parameters.get("contrast", 1), 1)
             saturation = _num(parameters.get("saturation", 1), 1)
-            filters.append(f"eq=brightness={brightness:.6f}:contrast={contrast:.6f}:saturation={saturation:.6f}")
+            dynamic_aliases = {
+                "brightness": ("brightness", "amount", "value"),
+                "contrast": ("contrast", "amount", "value"),
+                "saturation": ("saturation", "amount", "value"),
+            }
+            if name == "brightness":
+                brightness = expression(dynamic_aliases[name], brightness)
+            elif name == "contrast":
+                contrast = expression(dynamic_aliases[name], contrast)
+            elif name == "saturation":
+                saturation = expression(dynamic_aliases[name], saturation)
+            else:
+                brightness = expression(("brightness",), brightness)
+                contrast = expression(("contrast",), contrast)
+                saturation = expression(("saturation",), saturation)
+            if effect_tracks:
+                supported = any(has_track(aliases) for aliases in dynamic_aliases.values())
+                if supported:
+                    filters.append(
+                        f"eq=brightness={_expr_arg(str(brightness))}:contrast={_expr_arg(str(contrast))}:"
+                        f"saturation={_expr_arg(str(saturation))}:eval=frame"
+                    )
+                else:
+                    warn_unsupported_tracks()
+                    filters.append(f"eq=brightness={_num(brightness, 0):.6f}:contrast={_num(contrast, 1):.6f}:saturation={_num(saturation, 1):.6f}")
+            else:
+                filters.append(f"eq=brightness={_num(brightness, 0):.6f}:contrast={_num(contrast, 1):.6f}:saturation={_num(saturation, 1):.6f}")
         elif name in {"hue", "hue_rotate"}:
-            filters.append(f"hue=h={_num(parameters.get('degrees', parameters.get('angle', 0)), 0):.6f}")
+            hue_value = _num(parameters.get("degrees", parameters.get("angle", 0)), 0)
+            hue_aliases = ("degrees", "angle", "hue", "value")
+            if has_track(hue_aliases):
+                filters.append(f"hue=h={_expr_arg(expression(hue_aliases, hue_value))}:eval=frame")
+            else:
+                if effect_tracks:
+                    warn_unsupported_tracks()
+                filters.append(f"hue=h={hue_value:.6f}")
         elif name in {"gamma", "gamma_adjust"}:
-            filters.append(f"eq=gamma={max(0.1, min(10.0, _num(parameters.get('gamma', 1), 1))):.6f}")
+            gamma_value = max(0.1, min(10.0, _num(parameters.get("gamma", parameters.get("amount", 1)), 1)))
+            gamma_aliases = ("gamma", "amount", "value")
+            if has_track(gamma_aliases):
+                filters.append(f"eq=gamma={_expr_arg(expression(gamma_aliases, gamma_value))}:eval=frame")
+            else:
+                if effect_tracks:
+                    warn_unsupported_tracks()
+                filters.append(f"eq=gamma={gamma_value:.6f}")
         elif name in {"color_temperature", "temperature", "warmth"}:
             kelvin = max(1000.0, min(40000.0, _num(parameters.get("kelvin", 6500), 6500)))
             delta = max(-1.0, min(1.0, (kelvin - 6500.0) / 6500.0))
@@ -1146,8 +1269,17 @@ def _effect_filters(effects: Any, warnings: list[dict[str, Any]], clip_id: str) 
             blue = max(-1.0, min(1.0, _num(parameters.get("blue", parameters.get("bs", 0)), 0)))
             filters.append(f"colorbalance=rs={red:.6f}:gs={green:.6f}:bs={blue:.6f}")
         elif name == "vignette":
-            filters.append(f"vignette=angle={_num(parameters.get('angle', 0.785398), 0.785398):.6f}")
+            angle = _num(parameters.get("angle", 0.785398), 0.785398)
+            angle_aliases = ("angle", "value")
+            if has_track(angle_aliases):
+                filters.append(f"vignette=angle={_expr_arg(expression(angle_aliases, angle))}:eval=frame")
+            else:
+                if effect_tracks:
+                    warn_unsupported_tracks()
+                filters.append(f"vignette=angle={angle:.6f}")
         elif name in {"noise", "film_grain"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
             filters.append(f"noise=alls={max(1, int(_num(parameters.get('amount', 8), 8)))}:allf=t+u")
         elif name in {"invert", "negative", "negate"}:
             filters.append("negate")
@@ -1176,8 +1308,12 @@ def _effect_filters(effects: Any, warnings: list[dict[str, Any]], clip_id: str) 
             blend = max(0.0, min(1.0, _num(parameters.get("blend", 0), 0)))
             filters.append(f"colorkey={_quoted(color)}:{similarity:.6f}:{blend:.6f}")
         elif name in {"flip", "horizontal_flip", "hflip"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
             filters.append("hflip")
         elif name in {"vertical_flip", "vflip"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
             filters.append("vflip")
         else:
             warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": f"effect:{effect_type}", "message": "当前 FFmpeg 后端没有安全映射"})
@@ -1999,7 +2135,16 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 if transforms["opacity"] != "1.00000000":
                     alpha_expr = f"alpha(X,Y)*clip(({transforms['opacity']}),0,1)"
                     chain.extend(["format=gbrap", f"geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)}", "format=rgba"])
-                chain.extend(_effect_filters(clip.get("effects"), warnings, str(clip.get("id"))))
+                chain.extend(
+                    _effect_filters(
+                        clip.get("effects"),
+                        warnings,
+                        str(clip.get("id")),
+                        clip=clip,
+                        clip_start=start,
+                        tps=tps,
+                    )
+                )
                 if speed_segments and curve_duration is not None and abs(curve_duration - (src_out - src_in) / max(speed, 1e-9)) > 1e-6:
                     speed = max(0.01, (src_out - src_in) / max(1e-9, curve_duration))
                 subtitle = _subtitle_filter(root, clip.get("subtitle"), warnings, str(clip.get("id")), start, max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)))

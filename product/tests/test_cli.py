@@ -391,6 +391,7 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("snapshot", manifest["capabilities"]["project"]["features"])
         self.assertIn("relink_by_hash", manifest["capabilities"]["media"]["features"])
         self.assertIn("target_lufs_gate", manifest["capabilities"]["quality"]["features"])
+        self.assertIn("effect_parameter_keyframes", manifest["capabilities"]["effects"]["features"])
         self.assertEqual(manifest["policies"]["jianying_runtime_enabled"], False)
 
     def test_runtime_storage_is_local_to_product(self) -> None:
@@ -651,6 +652,55 @@ class P0CliTests(unittest.TestCase):
             unsupported = [item for item in result["data"]["warnings"] if item.get("code") == "RENDER_FEATURE_UNSUPPORTED"]
             self.assertEqual(unsupported, [])
             self.assertTrue(any(item.get("feature") == "audio_speed_curve_piecewise" for item in result["data"]["warnings"]))
+
+    def test_effect_parameter_keyframes_render_with_frame_evaluation(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-effect-keyframes-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke(
+                "media", "ingest", "--project", str(project), "--input", str(source),
+                "--verification-status", "verified", "--permitted-use", "commercial_ad",
+                "--source-url", "local://effect-keyframes", "--license-spdx", "CC0-1.0",
+                "--evidence", "local://effect-keyframes",
+            )
+            asset_id = ingest["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id,
+                "source_in_tick": 0, "source_out_tick": 90000,
+                "effects": [{
+                    "type": "brightness", "parameters": {"amount": 0.0},
+                    "keyframes": [{"property": "amount", "keyframes": [
+                        {"at_tick": 0, "value": 0.0, "interpolation": "linear"},
+                        {"at_tick": 90000, "value": 0.7, "interpolation": "ease_in_out"},
+                    ]}],
+                }],
+            }]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            output = project / "renders" / "effect-keyframes.mp4"
+            code, planned = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
+            self.assertEqual(code, 0, planned)
+            graph = planned["data"]["plan"]["filter_complex"]
+            self.assertIn("eq=brightness='", graph)
+            self.assertIn(":eval=frame", graph)
+            self.assertEqual(planned["data"]["plan"]["warnings"], [])
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output))
+            self.assertEqual(code, 0, rendered)
+
+            def center_luma(at_seconds: float) -> float:
+                completed = subprocess.run(
+                    [
+                        "ffmpeg", "-hide_banner", "-loglevel", "error", "-ss", str(at_seconds), "-i", str(output),
+                        "-frames:v", "1", "-vf", "crop=100:100:490:910,format=gray", "-f", "rawvideo", "-",
+                    ], capture_output=True,
+                )
+                self.assertEqual(completed.returncode, 0, completed.stderr.decode("utf-8", errors="replace"))
+                self.assertGreater(len(completed.stdout), 0)
+                return sum(completed.stdout) / len(completed.stdout)
+
+            self.assertGreater(center_luma(0.85), center_luma(0.10) + 15.0)
 
     def test_reverse_speed_curve_reflects_ramp_without_approximation_warning(self) -> None:
         segments = [(0.0, 0.25, 1.0, 1.0), (0.25, 0.75, 2.0, 2.0), (0.75, 1.0, 4.0, 4.0)]

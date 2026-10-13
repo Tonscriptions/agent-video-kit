@@ -164,7 +164,7 @@
         },
         "transform": {"type": "object"},
         "keyframes": {"type": "array", "items": {"$ref": "#/$defs/keyframeTrack"}},
-        "effects": {"type": "array", "items": {"type": "object"}},
+        "effects": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/$defs/effect"}]}},
         "transition_in": {"$ref": "#/$defs/transition"},
         "transition_out": {"$ref": "#/$defs/transition"},
         "crop": {"$ref": "#/$defs/crop"},
@@ -239,6 +239,20 @@
         "direction": {"type": "string"},
         "version": {"type": "string"},
         "parameters": {"type": "object"}
+      }
+    },
+    "effect": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["type"],
+      "properties": {
+        "type": {"type": "string", "minLength": 1},
+        "version": {"type": "string"},
+        "parameters": {"type": "object", "additionalProperties": true},
+        "scope": {"type": "string"},
+        "enabled": {"type": "boolean"},
+        "source": {"type": "object", "additionalProperties": true},
+        "keyframes": {"type": "array", "items": {"$ref": "#/$defs/keyframeTrack"}}
       }
     },
     "crop": {
