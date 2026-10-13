@@ -16,7 +16,7 @@ from PIL import Image
 from ai_ad_editor.cli import main
 from ai_ad_editor.errors import AppError
 from ai_ad_editor.media import probe_media
-from ai_ad_editor.render import _expr_arg, _flatten_sequence_tracks, _keyframe_expr, _reverse_speed_curve_segments, _transform_exprs
+from ai_ad_editor.render import _effect_filters, _expr_arg, _flatten_sequence_tracks, _keyframe_expr, _reverse_speed_curve_segments, _transform_exprs
 from ai_ad_editor.utils import run_process
 from ai_ad_editor.runtime import configure_local_runtime
 from ai_ad_editor.migration import migrate_project_payload
@@ -431,7 +431,42 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("yuva420p", manifest["capabilities"]["output"]["pixel_formats"])
         self.assertIn("hable", manifest["capabilities"]["output"]["tone_mapping"])
         self.assertIn("local_flite_tts", manifest["capabilities"]["ai"]["features"])
+        self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.2.0")
+        self.assertIn("exposure", manifest["capabilities"]["effects"]["catalog_features"])
+        self.assertIn("effect_catalog_cli", manifest["capabilities"]["effects"]["features"])
         self.assertEqual(manifest["policies"]["jianying_runtime_enabled"], False)
+
+    def test_effect_catalog_cli_is_local_and_queryable(self) -> None:
+        code, result = invoke("effects", "list", "--query", "color")
+        self.assertEqual(code, 0, result)
+        self.assertEqual(result["command"], "effects.list")
+        self.assertEqual(result["data"]["source"], "ffmpeg-local")
+        self.assertEqual(result["data"]["network"], "disabled")
+        effect_ids = {item["id"] for item in result["data"]["effects"]}
+        self.assertIn("color_levels", effect_ids)
+        self.assertIn("color_contrast", effect_ids)
+
+        code, inspected = invoke("effects", "inspect", "--name", "levels")
+        self.assertEqual(code, 0, inspected)
+        self.assertEqual(inspected["data"]["effect"]["id"], "color_levels")
+        self.assertEqual(inspected["data"]["effect"]["backend"], "ffmpeg:colorlevels")
+        self.assertIn("input_black", inspected["data"]["effect"]["parameters"])
+
+        code, rejected = invoke("effects", "inspect", "--name", "remote-effect")
+        self.assertEqual(code, 2)
+        self.assertEqual(rejected["errors"][0]["code"], "ARGUMENT_INVALID")
+
+    def test_effect_parameter_whitelists_reject_filtergraph_injection(self) -> None:
+        warnings = []
+        filters = _effect_filters([
+            {"type": "curves", "all": "0/0,format=yuv420p"},
+            {"type": "draw_box", "color": "white@0.8:format=yuv420p"},
+            {"type": "tblend", "mode": "average:format=yuv420p"},
+        ], warnings, "clip_security")
+        self.assertEqual(len(filters), 2)
+        self.assertIn("drawbox=", filters[0])
+        self.assertEqual(filters[1], "tblend=all_mode=average")
+        self.assertEqual([item["code"] for item in warnings], ["EFFECT_PARAMETER_INVALID", "EFFECT_PARAMETER_INVALID", "EFFECT_PARAMETER_INVALID"])
 
     def test_runtime_storage_is_local_to_product(self) -> None:
         paths = configure_local_runtime()
@@ -691,6 +726,48 @@ class P0CliTests(unittest.TestCase):
             unsupported = [item for item in result["data"]["warnings"] if item.get("code") == "RENDER_FEATURE_UNSUPPORTED"]
             self.assertEqual(unsupported, [])
             self.assertTrue(any(item.get("feature") == "audio_speed_curve_piecewise" for item in result["data"]["warnings"]))
+
+    def test_native_effect_catalog_filters_render_without_unsupported_warning(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-native-effects-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source), "--verification-status", "verified", "--permitted-use", "commercial_ad", "--source-url", "local://native-effects", "--license-spdx", "CC0-1.0", "--evidence", "local://native-effects")
+            asset_id = ingest["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id,
+                "source_in_tick": 0, "source_out_tick": 90000,
+                "effects": [
+                    {"type": "exposure", "amount": 0.15},
+                    {"type": "color_levels", "input_black": 0.02, "output_white": 0.96},
+                    {"type": "curves", "all": "0/0 0.5/0.45 1/1"},
+                    {"type": "hqdn3d", "luma_spatial": 2.0},
+                    {"type": "smartblur", "radius": 0.6, "strength": 0.4},
+                    {"type": "avgblur", "size_x": 1, "size_y": 1},
+                    {"type": "tmix", "frames": 2},
+                    {"type": "tblend", "mode": "average"},
+                    {"type": "lens_correction", "k1": 0.01, "k2": -0.01},
+                    {"type": "draw_box", "x": 0.1, "y": 0.1, "width": 0.8, "height": 0.8, "color": "white@0.35", "thickness": 2},
+                    {"type": "color_contrast", "red": 0.1, "preserve_luma": 0.25},
+                    {"type": "solarize", "threshold": 220},
+                    {"type": "threshold", "value": 8},
+                    {"type": "deflicker", "size": 3},
+                    {"type": "dctdnoiz", "sigma": 0.2},
+                ],
+            }]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            output = project / "renders" / "native-effects.mp4"
+            code, planned = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
+            self.assertEqual(code, 0, planned)
+            self.assertIn("exposure=", planned["data"]["plan"]["filter_complex"])
+            self.assertIn("curves=all=", planned["data"]["plan"]["filter_complex"])
+            self.assertNotIn("RENDER_FEATURE_UNSUPPORTED", {item.get("code") for item in planned["data"]["plan"]["warnings"]})
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output))
+            self.assertEqual(code, 0, rendered)
+            self.assertTrue(output.exists())
+            self.assertNotIn("RENDER_FEATURE_UNSUPPORTED", {item.get("code") for item in rendered["data"]["warnings"]})
 
     def test_effect_parameter_keyframes_render_with_frame_evaluation(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-effect-keyframes-") as raw:

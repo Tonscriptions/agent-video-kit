@@ -1279,6 +1279,15 @@ def _effect_filters(
                     "feature": f"effect_keyframes:{effect_type}",
                     "message": "当前效果滤镜不支持逐帧参数表达式，使用静态参数值",
                 })
+
+        def invalid_parameter(message: str) -> None:
+            warnings.append({
+                "code": "EFFECT_PARAMETER_INVALID",
+                "clip_id": clip_id,
+                "feature": f"effect:{effect_type}",
+                "message": message,
+            })
+
         if name in {"lut", "lut3d", "cube", "look"}:
             raw_lut_path = parameters.get("path", parameters.get("file", parameters.get("lut")))
             if not raw_lut_path:
@@ -1306,10 +1315,24 @@ def _effect_filters(
             filters.append("colorchannelmixer=.393:.769:.189:0:.349:.686:.168:0:.272:.534:.131")
         elif name in {"blur", "gaussian_blur", "gblur"}:
             filters.append(f"gblur=sigma={max(0.1, _num(parameters.get('radius', parameters.get('sigma', 4)), 4)):.4f}")
+        elif name in {"avgblur", "average_blur"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
+            size_x = max(1, min(1024, int(round(_num(parameters.get("size_x", parameters.get("sizeX", 2)), 2)))))
+            size_y = max(0, min(1024, int(round(_num(parameters.get("size_y", parameters.get("sizeY", 2)), 2)))))
+            planes = max(0, min(15, int(round(_num(parameters.get("planes", 15), 15)))))
+            filters.append(f"avgblur=sizeX={size_x}:sizeY={size_y}:planes={planes}")
         elif name in {"box_blur", "boxblur"}:
             radius = max(1.0, _num(parameters.get("radius", 4), 4))
             power = max(1.0, min(4.0, _num(parameters.get("power", 1), 1)))
             filters.append(f"boxblur=luma_radius={radius:.4f}:luma_power={power:.4f}")
+        elif name == "smartblur":
+            if effect_tracks:
+                warn_unsupported_tracks()
+            radius = max(0.1, min(5.0, _num(parameters.get("radius", parameters.get("luma_radius", 1)), 1)))
+            strength = max(-1.0, min(1.0, _num(parameters.get("strength", parameters.get("luma_strength", 1)), 1)))
+            threshold = max(-30, min(30, int(round(_num(parameters.get("threshold", parameters.get("luma_threshold", 0)), 0)))))
+            filters.append(f"smartblur=lr={radius:.4f}:ls={strength:.4f}:lt={threshold}")
         elif name in {"sharpen", "unsharp"}:
             filters.append(f"unsharp=5:5:{_num(parameters.get('amount', 1), 1):.4f}:5:5:0")
         elif name in {"brightness", "contrast", "saturation", "color"}:
@@ -1370,6 +1393,60 @@ def _effect_filters(
             green = max(-1.0, min(1.0, _num(parameters.get("green", parameters.get("gs", 0)), 0)))
             blue = max(-1.0, min(1.0, _num(parameters.get("blue", parameters.get("bs", 0)), 0)))
             filters.append(f"colorbalance=rs={red:.6f}:gs={green:.6f}:bs={blue:.6f}")
+        elif name == "exposure":
+            if effect_tracks:
+                warn_unsupported_tracks()
+            exposure = max(-3.0, min(3.0, _num(parameters.get("amount", parameters.get("exposure", 0)), 0)))
+            black = max(-1.0, min(1.0, _num(parameters.get("black", 0), 0)))
+            filters.append(f"exposure=exposure={exposure:.6f}:black={black:.6f}")
+        elif name in {"color_levels", "levels", "colorlevels"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
+            input_black = max(-1.0, min(1.0, _num(parameters.get("input_black", parameters.get("rimin", 0)), 0)))
+            input_white = max(-1.0, min(1.0, _num(parameters.get("input_white", parameters.get("rimax", 1)), 1)))
+            output_black = max(0.0, min(1.0, _num(parameters.get("output_black", parameters.get("romin", 0)), 0)))
+            output_white = max(0.0, min(1.0, _num(parameters.get("output_white", parameters.get("romax", 1)), 1)))
+            preserve = str(parameters.get("preserve", "none")).strip().lower()
+            if preserve in {"false", "0", "none", "off", ""}:
+                preserve = "none"
+            elif preserve in {"true", "1", "lum", "max", "avg", "sum", "nrm", "pwr"}:
+                preserve = "lum" if preserve in {"true", "1"} else preserve
+            else:
+                invalid_parameter(f"color_levels preserve 无效: {preserve}")
+                preserve = "none"
+            filters.append(
+                "colorlevels="
+                f"rimin={input_black:.6f}:gimin={input_black:.6f}:bimin={input_black:.6f}:"
+                f"rimax={input_white:.6f}:gimax={input_white:.6f}:bimax={input_white:.6f}:"
+                f"romin={output_black:.6f}:gomin={output_black:.6f}:bomin={output_black:.6f}:"
+                f"romax={output_white:.6f}:gomax={output_white:.6f}:bomax={output_white:.6f}:preserve={preserve}"
+            )
+        elif name in {"curves", "curve"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
+            curve_spec = str(parameters.get("all", parameters.get("master", "0/0 1/1"))).strip()
+            tokens = curve_spec.split()
+            valid = bool(tokens) and all(
+                len(token.split("/")) == 2
+                and all(0.0 <= _num(part, -1.0) <= 1.0 for part in token.split("/"))
+                and re.fullmatch(r"[0-9eE+./-]+", token) is not None
+                for token in tokens
+            )
+            if not valid:
+                invalid_parameter("curves all/master 必须是由 0..1 范围 x/y 点组成的空格分隔字符串")
+            else:
+                filters.append(f"curves=all={_expr_arg(curve_spec)}")
+        elif name in {"color_contrast", "colorcontrast"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
+            red = max(-1.0, min(1.0, _num(parameters.get("red", parameters.get("rc", 0)), 0)))
+            green = max(-1.0, min(1.0, _num(parameters.get("green", parameters.get("gm", 0)), 0)))
+            blue = max(-1.0, min(1.0, _num(parameters.get("blue", parameters.get("by", 0)), 0)))
+            red_weight = max(0.0, min(1.0, _num(parameters.get("red_weight", parameters.get("rcw", 0)), 0)))
+            green_weight = max(0.0, min(1.0, _num(parameters.get("green_weight", parameters.get("gmw", 0)), 0)))
+            blue_weight = max(0.0, min(1.0, _num(parameters.get("blue_weight", parameters.get("byw", 0)), 0)))
+            preserve = max(0.0, min(1.0, _num(parameters.get("preserve_luma", parameters.get("pl", 0)), 0)))
+            filters.append(f"colorcontrast=rc={red:.6f}:gm={green:.6f}:by={blue:.6f}:rcw={red_weight:.6f}:gmw={green_weight:.6f}:byw={blue_weight:.6f}:pl={preserve:.6f}")
         elif name == "vignette":
             angle = _num(parameters.get("angle", 0.785398), 0.785398)
             angle_aliases = ("angle", "value")
@@ -1393,6 +1470,34 @@ def _effect_filters(
             threshold = max(0.001, min(0.5, _num(parameters.get("threshold", 0.02), 0.02)))
             radius = max(1, min(64, int(_num(parameters.get("range", 16), 16))))
             filters.append(f"deband=1thr={threshold:.6f}:2thr={threshold:.6f}:3thr={threshold:.6f}:4thr={threshold:.6f}:range={radius}")
+        elif name == "deflicker":
+            if effect_tracks:
+                warn_unsupported_tracks()
+            size = max(2, min(129, int(round(_num(parameters.get("size", 5), 5)))))
+            mode = str(parameters.get("mode", "am")).strip().lower()
+            if mode not in {"am", "gm", "hm", "qm", "cm", "pm", "median"}:
+                invalid_parameter(f"deflicker mode 无效: {mode}")
+                mode = "am"
+            filters.append(f"deflicker=size={size}:mode={mode}")
+        elif name == "dctdnoiz":
+            if effect_tracks:
+                warn_unsupported_tracks()
+            sigma = max(0.0, min(999.0, _num(parameters.get("sigma", 0), 0)))
+            overlap = max(-1, min(15, int(round(_num(parameters.get("overlap", -1), -1)))))
+            block_bits = parameters.get("block_bits")
+            if block_bits is None and parameters.get("block_size") is not None:
+                block_size = max(8, min(16, int(round(_num(parameters.get("block_size"), 8)))))
+                block_bits = 4 if block_size >= 16 else 3
+            block_bits = max(3, min(4, int(round(_num(block_bits, 3)))))
+            filters.append(f"dctdnoiz=sigma={sigma:.6f}:overlap={overlap}:n={block_bits}")
+        elif name == "hqdn3d":
+            if effect_tracks:
+                warn_unsupported_tracks()
+            luma_spatial = max(0.0, min(30.0, _num(parameters.get("luma_spatial", parameters.get("ls", 4)), 4)))
+            chroma_spatial = max(0.0, min(30.0, _num(parameters.get("chroma_spatial", parameters.get("cs", 3)), 3)))
+            luma_temporal = max(0.0, min(30.0, _num(parameters.get("luma_temporal", parameters.get("lt", 6)), 6)))
+            chroma_temporal = max(0.0, min(30.0, _num(parameters.get("chroma_temporal", parameters.get("ct", 4.5)), 4.5)))
+            filters.append(f"hqdn3d={luma_spatial:.4f}:{chroma_spatial:.4f}:{luma_temporal:.4f}:{chroma_temporal:.4f}")
         elif name in {"deshake", "stabilize"}:
             radius = max(1, min(128, int(_num(parameters.get("radius", 16), 16))))
             filters.append(f"deshake=rx={radius}:ry={radius}")
@@ -1404,6 +1509,56 @@ def _effect_filters(
             levels = max(2, min(256, int(_num(parameters.get("levels", 8), 8))))
             step = max(1, round(255 / (levels - 1)))
             filters.append(f"lutrgb=r='floor(val/{step})*{step}':g='floor(val/{step})*{step}':b='floor(val/{step})*{step}'")
+        elif name == "solarize":
+            if effect_tracks:
+                warn_unsupported_tracks()
+            threshold = max(0, min(255, int(round(_num(parameters.get("threshold", 128), 128)))))
+            expression = f"if(gt(val,{threshold}),255-val,val)"
+            filters.append(f"lutrgb=r={_expr_arg(expression)}:g={_expr_arg(expression)}:b={_expr_arg(expression)}")
+        elif name == "threshold":
+            if effect_tracks:
+                warn_unsupported_tracks()
+            threshold = max(0, min(255, int(round(_num(parameters.get("value", parameters.get("threshold", 128)), 128)))))
+            expression = f"if(gte(val,{threshold}),255,0)"
+            filters.append(f"lutyuv=y={_expr_arg(expression)}")
+        elif name == "tmix":
+            if effect_tracks:
+                warn_unsupported_tracks()
+            frames = max(1, min(1024, int(round(_num(parameters.get("frames", 3), 3)))))
+            parts = [f"tmix=frames={frames}"]
+            if "scale" in parameters:
+                parts.append(f"scale={max(0.0, min(32767.0, _num(parameters.get('scale'), 0))):.6f}")
+            filters.append(":".join(parts))
+        elif name == "tblend":
+            if effect_tracks:
+                warn_unsupported_tracks()
+            mode = str(parameters.get("mode", "average")).strip().lower()
+            allowed_modes = {"normal", "addition", "addition128", "and", "average", "burn", "darken", "difference", "difference128", "divide", "dodge", "exclusion", "extremity", "freeze", "glow", "grainextract", "hardlight", "hardmix", "heat", "lighten", "linearlight", "multiply", "multiply128", "negation", "or", "overlay", "phoenix", "pinlight", "reflect", "screen", "softdifference", "softlight", "stain", "subtract", "vividlight", "xor", "geometric", "harmonic", "bleach", "interpolate", "hardoverlay"}
+            if mode not in allowed_modes:
+                invalid_parameter(f"tblend mode 无效: {mode}")
+                mode = "average"
+            filters.append(f"tblend=all_mode={mode}")
+        elif name in {"lens_correction", "lenscorrection"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
+            k1 = max(-1.0, min(1.0, _num(parameters.get("k1", 0), 0)))
+            k2 = max(-1.0, min(1.0, _num(parameters.get("k2", 0), 0)))
+            cx = max(0.0, min(1.0, _num(parameters.get("cx", 0.5), 0.5)))
+            cy = max(0.0, min(1.0, _num(parameters.get("cy", 0.5), 0.5)))
+            filters.append(f"lenscorrection=k1={k1:.6f}:k2={k2:.6f}:cx={cx:.6f}:cy={cy:.6f}")
+        elif name in {"draw_box", "drawbox", "rectangle"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
+            x = max(0.0, min(1.0, _num(parameters.get("x", 0.05), 0.05)))
+            y = max(0.0, min(1.0, _num(parameters.get("y", 0.05), 0.05)))
+            width = max(0.0, min(1.0, _num(parameters.get("width", 0.9), 0.9)))
+            height = max(0.0, min(1.0, _num(parameters.get("height", 0.9), 0.9)))
+            color = str(parameters.get("color", "white@0.8"))
+            if not re.fullmatch(r"[A-Za-z0-9#@._+\-]+", color):
+                invalid_parameter("draw_box color 只能包含 FFmpeg 颜色 token 字符")
+                color = "white@0.8"
+            thickness = max(1, min(256, int(round(_num(parameters.get("thickness", parameters.get("t", 4)), 4)))))
+            filters.append(f"drawbox=x=iw*{x:.6f}:y=ih*{y:.6f}:w=iw*{width:.6f}:h=ih*{height:.6f}:color={_quoted(color)}:t={thickness}")
         elif name in {"chroma_key", "chromakey", "green_screen"}:
             color = str(parameters.get("color", "0x00ff00"))
             similarity = max(0.0, min(1.0, _num(parameters.get("similarity", 0.1), 0.1)))

@@ -47,6 +47,7 @@ from .runtime import configure_local_runtime
 from .template import instantiate
 from .migration import SUPPORTED_SOURCE_VERSIONS, migrate_project_payload
 from .speech import flite_available, synthesize_local_tts
+from .effects import EFFECT_CATALOG_VERSION, get_effect, list_effects
 from .utils import atomic_write_json, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
 
@@ -182,6 +183,14 @@ def build_parser() -> argparse.ArgumentParser:
     tts_synthesize.add_argument("--voice", default="kal", help="FFmpeg flite voice，例如 kal、slt、rms")
     tts_synthesize.add_argument("--sample-rate", type=int, default=48_000)
     tts_synthesize.add_argument("--channels", type=int, choices=(1, 2), default=2)
+
+    effects = subs.add_parser("effects", help="查询本地 FFmpeg 效果目录")
+    effects_sub = effects.add_subparsers(dest="action", required=True)
+    effects_list = _leaf_common(effects_sub.add_parser("list", help="列出可用效果及参数契约"))
+    effects_list.add_argument("--query", default=None, help="按 ID、别名、类别或后端筛选")
+    effects_list.add_argument("--keyframable-only", action="store_true", help="只列出支持逐帧参数关键帧的效果")
+    effects_inspect = _leaf_common(effects_sub.add_parser("inspect", help="查看单个效果的详细契约"))
+    effects_inspect.add_argument("--name", required=True, help="效果 ID 或别名")
 
     timeline = subs.add_parser("timeline", help="时间线编排")
     ts = timeline.add_subparsers(dest="action", required=True)
@@ -871,6 +880,37 @@ def command_tts_synthesize(args: argparse.Namespace) -> dict[str, Any]:
     )
     save_project(root, project)
     return _envelope("tts.synthesize", args, data={**result, "source": source}, operation_id=operation_id)
+
+
+def command_effects_list(args: argparse.Namespace) -> dict[str, Any]:
+    effects = list_effects(args.query, keyframable_only=bool(args.keyframable_only))
+    return _envelope(
+        "effects.list",
+        args,
+        data={
+            "catalog_version": EFFECT_CATALOG_VERSION,
+            "source": "ffmpeg-local",
+            "network": "disabled",
+            "count": len(effects),
+            "effects": effects,
+        },
+    )
+
+
+def command_effects_inspect(args: argparse.Namespace) -> dict[str, Any]:
+    effect = get_effect(args.name)
+    if effect is None:
+        raise argument_error(f"本地效果目录中不存在: {args.name}", "name")
+    return _envelope(
+        "effects.inspect",
+        args,
+        data={
+            "catalog_version": EFFECT_CATALOG_VERSION,
+            "source": "ffmpeg-local",
+            "network": "disabled",
+            "effect": effect,
+        },
+    )
 
 
 def _clip_from_change(change: dict[str, Any], track: dict[str, Any]) -> dict[str, Any]:
@@ -1670,6 +1710,8 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("subtitle", "validate"): command_subtitle_validate,
     ("subtitle", "normalize"): command_subtitle_normalize,
     ("tts", "synthesize"): command_tts_synthesize,
+    ("effects", "list"): command_effects_list,
+    ("effects", "inspect"): command_effects_inspect,
     ("timeline", "compose"): command_timeline_compose,
     ("validate", None): command_validate,
     ("rights", "check"): command_rights_check,
