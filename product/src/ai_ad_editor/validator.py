@@ -153,7 +153,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                     default=0,
                 )
 
-                def validate_adjustment_effect(effect_value: Any, effect_path: str) -> None:
+                def validate_adjustment_effect(effect_value: Any, effect_path: str, *, keyframe_limit: int | None = None) -> None:
                     if isinstance(effect_value, str):
                         return
                     if not isinstance(effect_value, dict):
@@ -196,8 +196,9 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                 error("EFFECT_KEYFRAMES_INVALID", "序列调节 keyframe 必须是对象", keyframe_path)
                                 continue
                             at = _int(keyframe_value.get("at_tick"), -1)
-                            if at < 0 or at < previous_at or max_sequence_duration and at > max_sequence_duration:
-                                error("EFFECT_KEYFRAME_TIME_INVALID", "序列调节 keyframe at_tick 必须单调且位于序列内", f"{keyframe_path}.at_tick")
+                            limit = max_sequence_duration if keyframe_limit is None else keyframe_limit
+                            if at < 0 or at < previous_at or limit and at > limit:
+                                error("EFFECT_KEYFRAME_TIME_INVALID", "序列调节 keyframe at_tick 必须单调且位于当前调节层局部时钟范围内", f"{keyframe_path}.at_tick")
                             previous_at = at
                             interpolation = keyframe_value.get("interpolation")
                             if interpolation not in {"hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"}:
@@ -219,13 +220,26 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                         continue
                     if adjustment_value.get("enabled") is not None and not isinstance(adjustment_value.get("enabled"), bool):
                         error("ADJUSTMENT_ENABLED_INVALID", "序列调节 enabled 必须是布尔值", f"{adjustment_path}.enabled")
-                    if "start_tick" in adjustment_value or "duration_tick" in adjustment_value:
-                        error("ADJUSTMENT_TIMING_UNSUPPORTED", "当前序列调节层只支持覆盖整个序列，暂不接受 start_tick/duration_tick", adjustment_path)
+                    has_start = "start_tick" in adjustment_value
+                    has_duration = "duration_tick" in adjustment_value
+                    adjustment_duration_limit = max_sequence_duration
+                    if has_start or has_duration:
+                        start_tick = _int(adjustment_value.get("start_tick", 0), -1)
+                        duration_tick = _int(adjustment_value.get("duration_tick", max_sequence_duration - max(0, start_tick)), -1)
+                        adjustment_duration_limit = duration_tick
+                        if start_tick < 0:
+                            error("ADJUSTMENT_START_INVALID", "序列调节 start_tick 必须是非负整数", f"{adjustment_path}.start_tick")
+                        if duration_tick <= 0:
+                            error("ADJUSTMENT_DURATION_INVALID", "序列调节 duration_tick 必须大于 0", f"{adjustment_path}.duration_tick")
+                        if max_sequence_duration and start_tick >= max_sequence_duration:
+                            error("ADJUSTMENT_START_OUT_OF_RANGE", "序列调节 start_tick 必须位于序列时长内", f"{adjustment_path}.start_tick")
+                        if max_sequence_duration and start_tick >= 0 and duration_tick > 0 and start_tick + duration_tick > max_sequence_duration:
+                            error("ADJUSTMENT_END_OUT_OF_RANGE", "序列调节区间不能越过序列时长", adjustment_path)
                     if isinstance(adjustment_value.get("effects"), list):
                         for effect_index, effect_value in enumerate(adjustment_value["effects"]):
-                            validate_adjustment_effect(effect_value, f"{adjustment_path}.effects[{effect_index}]")
+                            validate_adjustment_effect(effect_value, f"{adjustment_path}.effects[{effect_index}]", keyframe_limit=adjustment_duration_limit)
                     elif adjustment_value.get("type"):
-                        validate_adjustment_effect(adjustment_value, adjustment_path)
+                        validate_adjustment_effect(adjustment_value, adjustment_path, keyframe_limit=adjustment_duration_limit)
                     else:
                         error("ADJUSTMENT_EFFECTS_MISSING", "序列调节层必须提供 effects 或 type", adjustment_path)
 

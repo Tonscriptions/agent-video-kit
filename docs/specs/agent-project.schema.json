@@ -91,6 +91,8 @@
                 "properties": {
                   "id": {"$ref": "#/$defs/id"},
                   "enabled": {"type": "boolean"},
+                  "start_tick": {"$ref": "#/$defs/nonNegativeInteger"},
+                  "duration_tick": {"$ref": "#/$defs/positiveInteger"},
                   "effects": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/$defs/effect"}]}}
                 }
               }

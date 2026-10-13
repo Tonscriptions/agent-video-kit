@@ -116,7 +116,7 @@
 
 本地 FFmpeg 转场目录通过 `crossfade`/`dissolve`、方向 `wipe`/`slide` 和 `circlecrop`、`radial`、`pixelize`、`zoomin`、`cover*`、`reveal*`、`slice`、`wind`、`blur`、`fadeblack` 等 xfade 类型执行。复杂转场必须有相邻片段的重叠句柄；缺少句柄时保留项目并返回结构化近似/不支持警告。
 
-`settings.adjustments` 是所有导出序列共用的全局调节栈。每项可以直接是效果对象，也可以是 `{id, enabled, effects[]}`；渲染器在完成所有视频轨道、转场、遮罩和混合后按数组顺序执行。效果参数关键帧的 `at_tick` 相对于当前导出序列的起点，时长必须兼容所有项目序列。当前版本只接受覆盖整个序列的调节层；带 `start_tick` 或 `duration_tick` 的区间层必须拒绝。调节层复用片段效果的参数关键帧与近似警告；`enabled=false` 跳过对应层或效果。
+`settings.adjustments` 是所有导出序列共用的调节栈。每项可以直接是效果对象，也可以是 `{id, enabled, effects[]}`；渲染器在完成所有视频轨道、转场、遮罩和混合后按数组顺序执行。效果参数关键帧的 `at_tick` 相对于当前调节层的局部时钟；省略 `start_tick`/`duration_tick` 时覆盖整个导出序列，也可以用 `start_tick` 与 `duration_tick` 声明序列时钟区间。区间层在本地视频链上执行 trim、效果和 concat，音频不被调节层修改；区间必须位于序列时长内。调节层复用片段效果的参数关键帧与近似警告；`enabled=false` 跳过对应层或效果。
 
 效果 `type` 为 `lut`/`lut3d`/`cube`/`look` 时，`parameters.path`（也兼容 `file`/`lut`）必须指向项目根目录内已存在的 `.cube`、`.3dl`、`.csp` 或 `.dat` 文件；运行时只调用本地 FFmpeg `lut3d`，禁止网络 URL、项目外路径和缺失文件。`parameters.interpolation` 可选 `nearest`、`trilinear`、`tetrahedral`、`pyramid` 或 `prism`，默认 `tetrahedral`。LUT 强度混合、LUT 包索引和预览缓存仍属于后续版本。
 

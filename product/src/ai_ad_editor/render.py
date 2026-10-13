@@ -1984,13 +1984,13 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     ducking_requested = False
     input_meta: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
-    adjustment_layers: list[tuple[str, list[Any]]] = []
+    adjustment_layers: list[tuple[str, list[Any], float, float]] = []
     raw_adjustments = settings.get("adjustments")
     if isinstance(raw_adjustments, list):
         for adjustment_index, raw_layer in enumerate(raw_adjustments):
             layer_id = f"adjustment_{adjustment_index}"
             if isinstance(raw_layer, str):
-                adjustment_layers.append((layer_id, [raw_layer]))
+                adjustment_layers.append((layer_id, [raw_layer], 0.0, duration))
                 continue
             if not isinstance(raw_layer, dict) or raw_layer.get("enabled", True) is False:
                 continue
@@ -2001,7 +2001,11 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             else:
                 effects = []
             if effects:
-                adjustment_layers.append((str(raw_layer.get("id", layer_id)), effects))
+                start_tick = max(0, _tick(raw_layer.get("start_tick"), 0))
+                duration_tick = _tick(raw_layer.get("duration_tick"), 0)
+                start = min(duration, _sec(start_tick, tps))
+                end = duration if duration_tick <= 0 else min(duration, start + _sec(duration_tick, tps))
+                adjustment_layers.append((str(raw_layer.get("id", layer_id)), effects, start, end))
     has_adjustments = bool(adjustment_layers)
     index = 0
     render_tracks = _flatten_sequence_tracks(project, sequence, warnings)
@@ -2561,7 +2565,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             filters.append(f"[{current}][{spec['label']}]overlay={spec['position']}:eof_action=pass:format=auto[{target}]")
         current = target
     if has_adjustments:
-        for adjustment_index, (adjustment_id, effects) in enumerate(adjustment_layers):
+        for adjustment_index, (adjustment_id, effects, adjustment_start, adjustment_end) in enumerate(adjustment_layers):
             effect_clip = {"id": adjustment_id, "effects": effects}
             effect_filters = _effect_filters(
                 effects,
@@ -2575,7 +2579,25 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             if not effect_filters:
                 continue
             target = f"adjusted{adjustment_index}"
-            filters.append(f"[{current}]" + ",".join(effect_filters) + f"[{target}]")
+            if adjustment_start <= 1e-9 and adjustment_end >= duration - 1e-9:
+                filters.append(f"[{current}]" + ",".join(effect_filters) + f"[{target}]")
+                current = target
+                continue
+            segment_labels: list[str] = []
+            if adjustment_start > 1e-9:
+                pre = f"adjustment{adjustment_index}pre"
+                filters.append(f"[{current}]trim=start=0:end={adjustment_start:.6f},setpts=PTS-STARTPTS,format=rgba[{pre}]")
+                segment_labels.append(pre)
+            mid_input = f"adjustment{adjustment_index}midin"
+            mid = f"adjustment{adjustment_index}mid"
+            filters.append(f"[{current}]trim=start={adjustment_start:.6f}:end={adjustment_end:.6f},setpts=PTS-STARTPTS,format=rgba[{mid_input}]")
+            filters.append(f"[{mid_input}]" + ",".join(effect_filters) + f",format=rgba[{mid}]")
+            segment_labels.append(mid)
+            if adjustment_end < duration - 1e-9:
+                post = f"adjustment{adjustment_index}post"
+                filters.append(f"[{current}]trim=start={adjustment_end:.6f}:end={duration:.6f},setpts=PTS-STARTPTS,format=rgba[{post}]")
+                segment_labels.append(post)
+            filters.append("".join(f"[{label}]" for label in segment_labels) + f"concat=n={len(segment_labels)}:v=1:a=0,format=rgba,setpts=PTS-STARTPTS[{target}]")
             current = target
         filters.append(f"[{current}]null[vout]")
     if audio_labels:

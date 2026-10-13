@@ -755,6 +755,54 @@ class P0CliTests(unittest.TestCase):
 
             self.assertGreater(center_luma(0.85), center_luma(0.10) + 15.0)
 
+    def test_interval_adjustment_layer_reassembles_sequence_clock(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-interval-adjustment-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingest["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id,
+                "source_in_tick": 0, "source_out_tick": 90000,
+            }]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            project_payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            project_payload["settings"]["adjustments"] = [{
+                "id": "mid_grade",
+                "start_tick": 36000,
+                "duration_tick": 27000,
+                "effects": [{"type": "brightness", "parameters": {"amount": 0.7}}],
+            }]
+            (project / "project.json").write_text(json.dumps(project_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            output = project / "renders" / "interval-adjustment.mp4"
+            code, planned = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180", "--dry-run")
+            self.assertEqual(code, 0, planned)
+            graph = planned["data"]["plan"]["filter_complex"]
+            self.assertIn("trim=start=0.400000:end=0.700000", graph)
+            self.assertIn("concat=n=3:v=1:a=0", graph)
+            self.assertEqual(planned["data"]["plan"]["warnings"], [])
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180")
+            self.assertEqual(code, 0, rendered)
+
+            def center_luma(at_seconds: float) -> float:
+                completed = subprocess.run(
+                    ["ffmpeg", "-hide_banner", "-loglevel", "error", "-ss", str(at_seconds), "-i", str(output),
+                     "-frames:v", "1", "-vf", "crop=100:100:110:40,format=gray", "-f", "rawvideo", "-"],
+                    capture_output=True,
+                )
+                self.assertEqual(completed.returncode, 0, completed.stderr.decode("utf-8", errors="replace"))
+                self.assertGreater(len(completed.stdout), 0)
+                return sum(completed.stdout) / len(completed.stdout)
+
+            before = center_luma(0.20)
+            during = center_luma(0.55)
+            after = center_luma(0.90)
+            self.assertGreater(during, before + 15.0)
+            self.assertLess(abs(after - before), 8.0)
+
     def test_project_local_lut3d_is_validated_and_rendered(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-lut-") as raw:
             workspace = Path(raw)
