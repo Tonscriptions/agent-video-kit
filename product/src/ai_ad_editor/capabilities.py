@@ -26,6 +26,15 @@ def build_capability_manifest() -> dict[str, Any]:
                 "tracking_contract": "local_template_matching_emits_confidence_and_transform_keyframes",
                 "limits": ["tracking_can_drift_on_occlusion_scale_change_or_scene_cut", "tracking_requires_local_pillow_and_numpy"],
             },
+            "library": {
+                "status": "implemented",
+                "features": ["local_index", "deterministic_token_search", "subtitle_sidecar_search", "media_facets", "duration_filter", "dimension_filter", "audio_presence_filter", "sha256_duplicate_groups"],
+                "catalog_version": "0.2.0",
+                "semantic_index_version": "0.1.0",
+                "search_source": "deterministic-local",
+                "vector_index": False,
+                "limits": ["no_vlm_embeddings", "no_content_understanding_without_local_model", "duplicate_detection_is_exact_hash_only", "subtitle_sidecar_requires_matching_relative_stem"],
+            },
             "project": {
                 "status": "implemented",
                 "features": ["init", "inspect", "migrate", "atomic_save", "snapshot", "restore", "before_mutation_snapshot"],

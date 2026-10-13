@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-- P0 CLI 闭环已实现：项目初始化、媒体摄取与探测、时间线变更、关键帧与运镜、字幕、音频、遮罩、转场、渲染、项目内持久化渲染队列、质量检查、权利门禁、快照/迁移和受限互操作。
+  - P0 CLI 闭环已实现：项目初始化、媒体摄取与探测、时间线变更、关键帧与运镜、字幕、音频、遮罩、转场、渲染、项目内持久化渲染队列、质量检查、权利门禁、快照/迁移、确定性素材索引/搜索/重复组和受限互操作。
 - 当前 E 盘回归：`78/78` 通过；完整证据见 [`docs/validation/回归验证记录_2026-10-13.md`](docs/validation/回归验证记录_2026-10-13.md)。
 - 当前实现仍会明确报告近似和未支持能力，不能把 P0 底座描述成已经完全等同于剪映。对象跟踪鲁棒性、复杂路径逐点动画、GPU 效果、多语言离线 TTS、完整外部工程映射和黄金素材集仍按路线图推进。
 - 本地 Skills 共 40 个，统一使用 `video-cut-` 前缀，可用 `$video-cut-技能名` 调用；清单见 [`video-cut-install-manifest.json`](video-cut-install-manifest.json)。
@@ -55,12 +55,15 @@ python -X utf8 -m ai_ad_editor queue list --project .\workspace\demo --status fa
 
 ## 主要能力
 
-当前渲染器覆盖多轨时间线、裁切/滑移/涟漪编辑、静态和 cubic Bezier 关键帧、倒放与反向速度曲线段反射、任意位置视频定格、默认同点音频静音插入、常用 FFmpeg xfade 转场、字幕动画与高级 drawtext 样式、固定点数路径/多边形遮罩、动态 feather、blend、动态 crop、序列级全局和局部区间调节层、项目内 LUT3D（`.cube/.3dl/.csp/.dat`）、效果参数逐帧关键帧、通过 `effects list/inspect` 可发现的 41 项本地 FFmpeg 效果目录（含曝光、色阶、曲线、降噪、时域混合、镜头校正、框线和去闪烁等）、音量/声像自动化、降噪/压缩/均衡/响度/旁白闪避、多画布输出、10-bit 像素格式、WebM `yuva420p` 透明画布、显式本地 HDR tone map、FFmpeg 内置 flite ASCII/英文离线 TTS、色彩元数据、项目内 JSON 渲染队列和 JSONL 进度/取消/安全恢复。
+  当前渲染器覆盖多轨时间线、裁切/滑移/涟漪编辑、静态和 cubic Bezier 关键帧、倒放与反向速度曲线段反射、任意位置视频定格、默认同点音频静音插入、常用 FFmpeg xfade 转场、字幕动画与高级 drawtext 样式、固定点数路径/多边形遮罩、动态 feather、blend、动态 crop、序列级全局和局部区间调节层、项目内 LUT3D（`.cube/.3dl/.csp/.dat`）、效果参数逐帧关键帧、通过 `effects list/inspect` 可发现的 41 项本地 FFmpeg 效果目录（含曝光、色阶、曲线、降噪、时域混合、镜头校正、框线和去闪烁等）、音量/声像自动化、降噪/压缩/均衡/响度/旁白闪避、多画布输出、10-bit 像素格式、WebM `yuva420p` 透明画布、显式本地 HDR tone map、FFmpeg 内置 flite ASCII/英文离线 TTS、色彩元数据、确定性本地素材 token/字幕侧车搜索、SHA-256 精确重复组、项目内 JSON 渲染队列和 JSONL 进度/取消/安全恢复。
 
 所有不确定能力通过 `capabilities` 清单和渲染 warning 披露。运行：
 
 ```powershell
 python -X utf8 -m ai_ad_editor capabilities
+  python -X utf8 -m ai_ad_editor library index --root .\library --output .\work\library.json
+  python -X utf8 -m ai_ad_editor library search --catalog .\work\library.json --query "product launch" --kind video --has-audio
+  python -X utf8 -m ai_ad_editor library duplicates --catalog .\work\library.json
 ```
 
 ## 验证

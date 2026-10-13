@@ -35,7 +35,7 @@ from .project import (
 )
 from .quality import check_output
 from .recommend import recommend_highlights
-from .library import index_directory, search_catalog
+from .library import duplicate_groups, index_directory, search_catalog
 from .batch import _load_variants, run_template_batch
 from .capabilities import build_capability_manifest
 from .transcribe import transcribe_local, write_srt
@@ -305,7 +305,16 @@ def build_parser() -> argparse.ArgumentParser:
     lsearch.add_argument("--query", default="")
     lsearch.add_argument("--kind", default=None)
     lsearch.add_argument("--verification-status", default=None)
+    lsearch.add_argument("--min-duration", type=float, default=None)
+    lsearch.add_argument("--max-duration", type=float, default=None)
+    lsearch.add_argument("--min-width", type=int, default=None)
+    lsearch.add_argument("--min-height", type=int, default=None)
+    lsearch.add_argument("--has-audio", action=argparse.BooleanOptionalAction, default=None, help="按是否含音频流过滤")
+    lsearch.add_argument("--duplicate-only", action="store_true", help="只返回精确内容重复组中的记录")
     lsearch.add_argument("--limit", type=int, default=50)
+    lduplicates = _leaf_common(ls.add_parser("duplicates", help="按 SHA-256 列出精确重复素材组"))
+    lduplicates.add_argument("--catalog", required=True)
+    lduplicates.add_argument("--include-unique", action="store_true", help="同时返回只有一个成员的哈希组")
 
     doctor = _leaf_common(subs.add_parser("doctor", help="检查本机依赖"))
     doctor.add_argument("--project", default=None)
@@ -1842,8 +1851,27 @@ def command_library_index(args: argparse.Namespace) -> dict[str, Any]:
 def command_library_search(args: argparse.Namespace) -> dict[str, Any]:
     catalog_path = Path(args.catalog).expanduser().resolve()
     catalog = load_json(catalog_path)
-    results = search_catalog(catalog, query=args.query, kind=args.kind, verification_status=args.verification_status, limit=args.limit)
-    return _envelope("library.search", args, data={"catalog": str(catalog_path), "count": len(results), "results": results})
+    results = search_catalog(
+        catalog,
+        query=args.query,
+        kind=args.kind,
+        verification_status=args.verification_status,
+        min_duration=args.min_duration,
+        max_duration=args.max_duration,
+        min_width=args.min_width,
+        min_height=args.min_height,
+        has_audio=args.has_audio,
+        duplicate_only=args.duplicate_only,
+        limit=args.limit,
+    )
+    return _envelope("library.search", args, data={"catalog": str(catalog_path), "count": len(results), "results": results, "search": {"source": "deterministic-local", "vector_index": False}})
+
+
+def command_library_duplicates(args: argparse.Namespace) -> dict[str, Any]:
+    catalog_path = Path(args.catalog).expanduser().resolve()
+    catalog = load_json(catalog_path)
+    groups = duplicate_groups(catalog, include_unique=args.include_unique)
+    return _envelope("library.duplicates", args, data={"catalog": str(catalog_path), "count": len(groups), "groups": groups, "method": "sha256-exact"})
 
 
 def command_doctor(args: argparse.Namespace) -> dict[str, Any]:
@@ -1921,6 +1949,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("template", "batch"): command_template_batch,
     ("library", "index"): command_library_index,
     ("library", "search"): command_library_search,
+    ("library", "duplicates"): command_library_duplicates,
     ("doctor", None): command_doctor,
     ("operation", "inspect"): command_operation_inspect,
     ("version", None): command_version,

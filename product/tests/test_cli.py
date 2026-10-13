@@ -395,15 +395,35 @@ class P0CliTests(unittest.TestCase):
             media_dir = workspace / "library"
             media_dir.mkdir()
             source = self.make_media(media_dir, "product.mp4")
-            (media_dir / "captions.srt").write_text("1\n00:00:00,000 --> 00:00:00,500\nLocal product\n", encoding="utf-8")
+            sidecar = media_dir / "product.srt"
+            sidecar.write_text("1\n00:00:00,000 --> 00:00:00,500\nLocal product launch\n", encoding="utf-8")
+            duplicate = media_dir / "product-copy.mp4"
+            duplicate.write_bytes(source.read_bytes())
             catalog = workspace / "catalog.json"
             code, result = invoke("library", "index", "--root", str(media_dir), "--output", str(catalog))
             self.assertEqual(code, 0, result)
-            self.assertEqual(result["data"]["indexed_count"], 2)
-            code, result = invoke("library", "search", "--catalog", str(catalog), "--query", "product")
+            self.assertEqual(result["data"]["indexed_count"], 3)
+            catalog_payload = json.loads(catalog.read_text(encoding="utf-8"))
+            self.assertEqual(catalog_payload["catalog_version"], "0.2.0")
+            product_record = next(item for item in catalog_payload["records"] if item["name"] == source.name)
+            self.assertEqual(product_record["semantic"]["source"], "deterministic-local")
+            self.assertIn("local", product_record["semantic"]["facets"]["subtitle_text"].casefold())
+            self.assertTrue(product_record["semantic"]["facets"]["has_audio"])
+            code, result = invoke("library", "search", "--catalog", str(catalog), "--query", "launch", "--kind", "video")
             self.assertEqual(code, 0, result)
             self.assertEqual(result["data"]["count"], 1)
             self.assertEqual(result["data"]["results"][0]["name"], source.name)
+            code, result = invoke("library", "search", "--catalog", str(catalog), "--query", "product", "--has-audio")
+            self.assertEqual(code, 0, result)
+            self.assertEqual(result["data"]["count"], 2)
+            code, result = invoke("library", "search", "--catalog", str(catalog), "--duplicate-only", "--kind", "video")
+            self.assertEqual(code, 0, result)
+            self.assertEqual({item["name"] for item in result["data"]["results"]}, {source.name, duplicate.name})
+            code, result = invoke("library", "duplicates", "--catalog", str(catalog))
+            self.assertEqual(code, 0, result)
+            self.assertEqual(result["data"]["method"], "sha256-exact")
+            self.assertEqual(result["data"]["count"], 1)
+            self.assertEqual(result["data"]["groups"][0]["count"], 2)
 
     def test_media_prepare_generates_proxy_thumbnail_and_waveform(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-prepare-") as raw:
@@ -485,6 +505,8 @@ class P0CliTests(unittest.TestCase):
         self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.2.0")
         self.assertIn("exposure", manifest["capabilities"]["effects"]["catalog_features"])
         self.assertIn("effect_catalog_cli", manifest["capabilities"]["effects"]["features"])
+        self.assertIn("deterministic_token_search", manifest["capabilities"]["library"]["features"])
+        self.assertFalse(manifest["capabilities"]["library"]["vector_index"])
         self.assertEqual(manifest["policies"]["jianying_runtime_enabled"], False)
 
     def test_effect_catalog_cli_is_local_and_queryable(self) -> None:

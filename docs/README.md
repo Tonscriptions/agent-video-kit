@@ -49,6 +49,7 @@ docs/
 | [agent-project.schema.json](./specs/agent-project.schema.json) | Agent Project JSON 的最小机器可校验 schema | 评审中 |
 | [AgentCLI契约_v0.1_2026-10-13.md](./specs/AgentCLI契约_v0.1_2026-10-13.md) | CLI 命令、JSON envelope、错误码、进度、幂等、取消和渲染队列入口 | 有效 |
 | [本地渲染队列与任务状态契约_v0.1_2026-10-14.md](./specs/本地渲染队列与任务状态契约_v0.1_2026-10-14.md) | 项目内队列文件、作业状态、失败恢复、取消和顺序执行边界 | 有效 |
+| [本地素材语义索引与重复分组契约_v0.1_2026-10-14.md](./specs/本地素材语义索引与重复分组契约_v0.1_2026-10-14.md) | 确定性本地素材搜索、字幕侧车、媒体属性过滤和 SHA-256 重复组 | 有效 |
 | [本地效果目录与参数契约_v0.1_2026-10-14.md](./specs/本地效果目录与参数契约_v0.1_2026-10-14.md) | 本地 FFmpeg 效果目录、参数范围、注入防护、关键帧和降级规则 | 有效 |
 | [RightsLedger与素材模板登记规范_v0.1_2026-10-13.md](./specs/RightsLedger与素材模板登记规范_v0.1_2026-10-13.md) | 素材、模板、字体、模型和生成结果的许可台账与发布门禁 | 评审中 |
 | [项目转换报告规范_v0.1_2026-10-13.md](./specs/项目转换报告规范_v0.1_2026-10-13.md) | Exact/Mapped/Approximate/Baked/Unsupported/Failed 转换语义 | 评审中 |

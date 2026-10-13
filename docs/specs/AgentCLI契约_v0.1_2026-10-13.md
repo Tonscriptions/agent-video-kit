@@ -87,8 +87,9 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `convert export --project PATH --output FILE --target-format FORMAT` | 本地项目 | 导出 Agent JSON、OTIO 或 Kdenlive XML，并保留转换报告 |
 | `template apply --project PATH --input TEMPLATE.json` | 本地模板和变量 | 变量校验、片段实例化、模板快照和 provenance 变更记录 |
 | `template batch --project PATH ...` | 模板、variants 和输出目录 | 隔离实例并批量渲染；写批量报告，可选择继续失败项 |
-| `library index --root DIR --output FILE` | 本地媒体/字体/字幕目录 | 生成带哈希和许可证状态的本地目录索引 |
-| `library search --catalog FILE` | 目录索引和查询条件 | 返回可审计的匹配资产 |
+| `library index --root DIR --output FILE` | 本地媒体/字体/字幕目录 | 生成 `0.2.0` 目录：哈希、probe、确定性 token、同 stem 字幕侧车和许可证状态 |
+| `library search --catalog FILE` | 目录索引、词组和媒体属性过滤 | 按确定性分数返回可审计匹配资产；支持时长、分辨率、音频流和精确重复过滤 |
+| `library duplicates --catalog FILE` | 已生成的目录 | 按 SHA-256 返回字节完全相同的素材组；不会把相似或转码文件误报为重复 |
 | `doctor` | 本机环境 | 只读取 Python、FFmpeg、FFprobe、Docker/WSL PATH；绝不启动虚拟化环境 |
 | `operation inspect --project PATH --operation-id ID` | 操作 ID | 读取可重连的操作状态、进度和产物清单 |
 | `version` / `capabilities` | 无 | 版本、引擎、网络策略和 test-backed 本地能力清单 |
@@ -140,6 +141,10 @@ python -X utf8 -m ai_ad_editor render --project .\work\demo --dry-run
 ```
 
 音频片段使用本地 FFmpeg 滤镜链，支持音量关键帧、`audio.pan`/`pan` 声像关键帧（`-1` 左至 `1` 右）、降噪、压缩、均衡、高低通、对白增强、变调、混响、响度归一化、淡入淡出和旁白 ducking。字符串 `audio.pan` 仅用于显式 raw FFmpeg pan 表达式；数值声像先将输入规范化为立体声，再以逐帧 `aeval` 平衡左右通道，单声道素材会复制到两路，立体声素材不会先被折叠为单声道。
+
+### 6.3 本地素材确定性索引
+
+`library index` 和 `library search` 的完整字段、侧车字幕规则、过滤器和重复组语义见[本地素材语义索引与重复分组契约](./本地素材语义索引与重复分组契约_v0.1_2026-10-14.md)。当前 `semantic.source` 固定为 `deterministic-local`，`vector_index=false`，不会联网、下载模型或把文件名/字幕匹配描述成视觉理解。模型级 VLM、embedding、OCR、人物/物体标签必须作为显式本地适配器接入，并写入模型版本和 provenance。
 
 ## 7. 错误码和退出码
 
