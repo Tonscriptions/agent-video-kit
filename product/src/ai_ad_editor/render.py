@@ -38,7 +38,10 @@ OUTPUT_PIXEL_FORMATS = (
     "yuv420p10le",
     "yuv422p10le",
     "yuv444p10le",
+    "yuva420p",
 )
+
+ALPHA_OUTPUT_PIXEL_FORMATS = ("yuva420p",)
 
 # Names accepted by the local FFmpeg xfade filter.  ``crossfade``/``dissolve``
 # and directional ``wipe``/``slide`` are Agent-friendly aliases; the remaining
@@ -87,6 +90,8 @@ def output_settings(settings: dict[str, Any]) -> dict[str, Any]:
     pixel_format = str(video_raw.get("pixel_format", DEFAULT_OUTPUT["video"]["pixel_format"]))
     if pixel_format not in set(OUTPUT_PIXEL_FORMATS):
         raise AppError("OUTPUT_PIXEL_FORMAT_INVALID", f"不支持的像素格式: {pixel_format}", exit_code=2, path="settings.output.video.pixel_format")
+    if pixel_format in ALPHA_OUTPUT_PIXEL_FORMATS and (container != "webm" or video_codec not in {"libvpx-vp9", "libvpx"}):
+        raise AppError("OUTPUT_ALPHA_UNSUPPORTED", "透明视频当前只支持 WebM + VP9/VP8 + yuva420p", exit_code=2, path="settings.output")
     if container == "webm" and (video_codec not in {"libvpx-vp9", "libvpx", "libaom-av1"} or audio_codec not in {"libopus", "opus"}):
         raise AppError("OUTPUT_CODEC_CONTAINER_MISMATCH", "webm 需要 VP8/VP9/AV1 视频和 Opus 音频", exit_code=2, path="settings.output")
     if container == "mp4" and audio_codec in {"libopus", "opus"}:
@@ -1971,6 +1976,9 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     fps_value = f"{fps['num']}/{fps['den']}"
     frame_duration = max(1e-6, float(fps.get("den", 1)) / max(1.0, float(fps.get("num", 30))))
     duration = max(_sec(int(sequence.get("duration_tick", 1)), tps), 1 / max(1, int(fps["num"])))
+    raw_output = settings.get("output") if isinstance(settings.get("output"), dict) else {}
+    raw_video_output = raw_output.get("video") if isinstance(raw_output.get("video"), dict) else {}
+    transparent_canvas = str(raw_video_output.get("pixel_format", "")).lower() in ALPHA_OUTPUT_PIXEL_FORMATS
     assets = asset_map(project)
     inputs: list[str] = []
     filters: list[str] = []
@@ -2448,7 +2456,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 index += 1
     if not video_labels:
         raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段", exit_code=2, path="sequences[].tracks")
-    filters.append(f"color=c=black:s={width}x{height}:r={fps_value}:d={duration:.6f}[base]")
+    base_filter = f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba" if transparent_canvas else f"color=c=black:s={width}x{height}:r={fps_value}:d={duration:.6f}"
+    filters.append(f"{base_filter}[base]")
     final_specs: list[dict[str, Any]] = []
     by_track: dict[str, list[dict[str, Any]]] = {}
     for spec in video_specs:
@@ -2599,7 +2608,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 segment_labels.append(post)
             filters.append("".join(f"[{label}]" for label in segment_labels) + f"concat=n={len(segment_labels)}:v=1:a=0,format=rgba,setpts=PTS-STARTPTS[{target}]")
             current = target
-        filters.append(f"[{current}]null[vout]")
+        filters.append(f"[{current}]" + ("format=rgba," if transparent_canvas else "") + "null[vout]")
     if audio_labels:
         mix_labels = list(audio_labels)
         if ducking_requested and voice_audio_labels and music_audio_labels:
