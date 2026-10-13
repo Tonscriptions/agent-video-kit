@@ -1,0 +1,387 @@
+#!/usr/bin/env python3
+"""
+config.py — 集中管理密钥与本机路径(避免把个人环境写死进各脚本)
+
+Ark API key 读取优先级:
+  1) 环境变量 ARK_API_KEY(推荐)
+  2) 文件 ~/.config/daihuo-fanpai/ark_key
+  3) 文件 ~/.hermes/ark_key.txt(本地遗留兼容,公开项目不依赖)
+CosyVoice 位置:环境变量 COSYVOICE_HOME,默认 ~/CosyVoice
+"""
+import os, re
+
+
+# ★火山有两条计费口子,端点【不同】,key 也【不通用】(08-22 实测 401):
+#   - 控制台按量  base = .../api/v3        key = ARK_API_KEY(ark-xxx)
+#   - Agent Plan  base = .../api/plan/v3   key = 该套餐专属 key(ARK_PLAN_KEY)
+#   套餐里【没有 seed-2-1-pro,只有 turbo】—— 切过去是 Pro→turbo 的模型降级,
+#   不只是换个计费口子。切之前先跑质量对照(见 HANDOFF「反推的钱与端点」)。
+ARK_PLAN_BASE = os.environ.get("ARK_PLAN_BASE",
+                               "https://ark.cn-beijing.volces.com/api/plan/v3")
+ARK_PLATFORM_BASE = os.environ.get("ARK_BASE_URL",
+                                   "https://ark.cn-beijing.volces.com/api/v3")
+
+
+def ark_use_plan():
+    """是否走套餐:显式 DAIHUO_ARK_PLAN=1,或配了 ARK_PLAN_KEY。
+    ★DAIHUO_ARK_PLAN=0 是【显式退回按量】的逃生口(08-25 补)。
+      原来只要 key 文件在就强制走套餐,没有退路 —— 而套餐会 429 限流,
+      翻译几个短句这种小活被卡死时,按量只要几厘钱。
+      ⚠别拿它去跑整片视频理解:那才是上百块的地方,那个必须走套餐。"""
+    v = os.environ.get("DAIHUO_ARK_PLAN", "").strip().lower()
+    if v in ("1", "true", "yes"):
+        return True
+    if v in ("0", "false", "no"):
+        return False
+    return bool(plan_key(soft=True))
+
+
+def plan_key(soft=False):
+    # ARK_PLAN_API_KEY 是 Kimi 线的叫法(它另开过一条 v1 chat 通道,10-09 收回成本地这一个出口),认它做别名
+    k = os.environ.get("ARK_PLAN_KEY") or os.environ.get("ARK_PLAN_API_KEY")
+    if k and k.strip():
+        return k.strip()
+    p = os.path.expanduser("~/.config/daihuo-fanpai/ark_plan_key")
+    if os.path.exists(p):
+        return open(p).read().strip()
+    if soft:
+        return None
+    raise RuntimeError("未找到 Agent Plan key。`export ARK_PLAN_KEY=...` 或写入 "
+                       "~/.config/daihuo-fanpai/ark_plan_key;"
+                       "取 key:arkcli auth apikey(交互) 或 arkcli plans personal "
+                       "rotate-apikey(★会立即作废旧 key,别的机器在用就别转)")
+
+
+_ROUTE_SAID = False
+
+
+def ark_endpoint():
+    """返回 (base_url, key, 走的是哪条口子) —— 反推/评委/C模式统一从这里取,别再各自硬编码。
+    ★全 skill 只有这一个大模型出口(10-09 定):Kimi 线曾另开一条 plan/v1 chat 通道,
+      两套用不同的环境变量名,结果"提示说在花钱、实际走套餐"这类口径打架。
+    ★每个进程第一次取口子时打印实际走的通道和模型 —— 走哪条要看得见,不靠猜。"""
+    global _ROUTE_SAID
+    if ark_use_plan():
+        ep = (ARK_PLAN_BASE, plan_key(), "agent-plan")
+    else:
+        ep = (ARK_PLATFORM_BASE, ark_key(), "platform(按量)")
+    if not _ROUTE_SAID:
+        import sys
+        print(f"[ark] 大模型通道 = {ep[2]} · 模型 {ARK_SEED_MODEL}"
+              + ("" if ep[2] == "agent-plan" else "  ⚠按 token 计费,花的是真钱"), file=sys.stderr)
+        _ROUTE_SAID = True
+    return ep
+
+
+def route_desc():
+    """给产物打戳用:实际通道 + 模型(别在产物里写死某个模型名)。"""
+    return {"channel": "agent-plan" if ark_use_plan() else "platform(按量)", "model": ARK_SEED_MODEL}
+
+
+def ark_key():
+    k = os.environ.get("ARK_API_KEY")
+    if k and k.strip():
+        return k.strip()
+    for p in ("~/.config/daihuo-fanpai/ark_key", "~/.hermes/ark_key.txt"):
+        p = os.path.expanduser(p)
+        if os.path.exists(p):
+            return open(p).read().strip()
+    raise RuntimeError(
+        "未找到 Ark API key。请 `export ARK_API_KEY=...` 或写入 ~/.config/daihuo-fanpai/ark_key")
+
+
+def ark_key_status():
+    """给 doctor 用:返回 (ok, 说明),不抛异常。"""
+    try:
+        k = ark_key()
+        src = "环境变量 ARK_API_KEY" if os.environ.get("ARK_API_KEY") else "配置文件"
+        return (len(k) > 30, f"就位({src},{len(k)}字节)")
+    except Exception as e:
+        return (False, str(e))
+
+
+def xyq_key():
+    """小云雀(pippit-tool-cli)access key。读取优先级同 ark_key。"""
+    k = os.environ.get("XYQ_ACCESS_KEY")
+    if k and k.strip():
+        return k.strip()
+    p = os.path.expanduser("~/.config/daihuo-fanpai/xyq_key")
+    if os.path.exists(p):
+        return open(p).read().strip()
+    raise RuntimeError(
+        "未找到小云雀 key。请 `export XYQ_ACCESS_KEY=...` 或写入 ~/.config/daihuo-fanpai/xyq_key")
+
+
+def rh_key():
+    """RunningHub(海螺h3/seedream4.5)API key,32位。读取优先级同 ark_key。
+    ⚠钱包计费(约¥0.48/秒),不是免费池——调用前确认用户已同意花钱。"""
+    k = os.environ.get("RUNNINGHUB_API_KEY")
+    if k and k.strip():
+        return k.strip()
+    p = os.path.expanduser("~/.config/daihuo-fanpai/rh_key")
+    if os.path.exists(p):
+        return open(p).read().strip()
+    raise RuntimeError(
+        "未找到 RunningHub key。请 `export RUNNINGHUB_API_KEY=...` 或写入 ~/.config/daihuo-fanpai/rh_key")
+
+
+def rh_key_status():
+    """给 doctor 用:返回 (ok, 说明),不抛异常。"""
+    try:
+        k = rh_key()
+        src = "环境变量 RUNNINGHUB_API_KEY" if os.environ.get("RUNNINGHUB_API_KEY") else "配置文件"
+        return (len(k) == 32, f"就位({src},{len(k)}字节)" if len(k) == 32
+                else f"长度异常({len(k)}字节,RH key 应为32位)")
+    except Exception as e:
+        return (False, str(e))
+
+
+def mmh3_key():
+    """MiniMax H3 官方规范后端的 key(秘塔 metaso.cn 的以 mk- 开头)。读取优先级同 ark_key。
+    ⚠钱包计费(秘塔 768P≈¥0.09/秒),不是免费池——调用前确认用户已同意花钱。"""
+    k = os.environ.get("MMH3_API_KEY") or os.environ.get("METASO_API_KEY")
+    if k and k.strip():
+        return k.strip()
+    p = os.path.expanduser("~/.config/daihuo-fanpai/mmh3_key")
+    if os.path.exists(p):
+        return open(p).read().strip()
+    raise RuntimeError(
+        "未找到 MiniMax H3 key。请 `export MMH3_API_KEY=...` 或写入 ~/.config/daihuo-fanpai/mmh3_key")
+
+
+def mmh3_key_status():
+    """给 doctor 用:返回 (ok, 说明),不抛异常。"""
+    try:
+        k = mmh3_key()
+        src = "环境变量" if (os.environ.get("MMH3_API_KEY") or os.environ.get("METASO_API_KEY")) else "配置文件"
+        return (len(k) > 20, f"就位({src},{len(k)}字节)")
+    except Exception as e:
+        return (False, str(e))
+
+
+# MiniMax H3 规范后端的 base_url。★可换渠道:官方 platform.minimaxi.com / 秘塔转售 / 自部署,
+# 只要实现同一套 v1 upload + v2 video_generation 规范即可。默认秘塔(官方价2折)。
+MMH3_BASE_URL = os.environ.get("DAIHUO_MMH3_BASE_URL", "https://metaso.cn/api/minimax")
+
+
+def kimi_key():
+    """Kimi(Moonshot)API key,K3 双反推腿用。读取优先级同 ark_key。"""
+    k = os.environ.get("KIMI_API_KEY") or os.environ.get("MOONSHOT_API_KEY")
+    if k and k.strip():
+        return k.strip()
+    p = os.path.expanduser("~/.config/daihuo-fanpai/kimi_key")
+    if os.path.exists(p):
+        return open(p).read().strip()
+    raise RuntimeError(
+        "未找到 Kimi key。请 `export KIMI_API_KEY=...` 或写入 ~/.config/daihuo-fanpai/kimi_key")
+
+
+def kimi_key_status():
+    """给 doctor 用:返回 (ok, 说明),不抛异常。"""
+    try:
+        k = kimi_key()
+        src = "环境变量" if (os.environ.get("KIMI_API_KEY") or os.environ.get("MOONSHOT_API_KEY")) else "配置文件"
+        return (len(k) > 30, f"就位({src},{len(k)}字节)")
+    except Exception as e:
+        return (False, str(e))
+
+
+# K3 反推模型与端点(国内直连不走代理)
+KIMI_BASE_URL = os.environ.get("KIMI_BASE_URL", "https://api.moonshot.cn/v1")
+KIMI_K3_MODEL = os.environ.get("KIMI_K3_MODEL", "kimi-k3")
+
+
+def xyq_key_status():
+    """给 doctor 用:返回 (ok, 说明),不抛异常。"""
+    try:
+        k = xyq_key()
+        src = "环境变量 XYQ_ACCESS_KEY" if os.environ.get("XYQ_ACCESS_KEY") else "配置文件"
+        return (len(k) > 20, f"就位({src},{len(k)}字节)")
+    except Exception as e:
+        return (False, str(e))
+
+
+# ★即梦多账号:CLI 原生不支持(只有 login/logout/relogin,单一登录态),但凭证是
+#   ~/.local/share/dreamina/byted_cli_user_token.json 这一个文件,而 CLI **认 HOME**
+#   (实测 XDG_DATA_HOME 无效、HOME 有效)→ 用独立 HOME 目录隔离账号。
+#   并发限制是按账号算的,所以【两个号 = 两条并行的即梦流水线】。
+#   用法:DAIHUO_JIMENG_HOME=~/.config/daihuo-fanpai/jimeng_accounts/b 跑第二个号;
+#        首次要在该 HOME 下单独登录一次:HOME=<该目录> dreamina login --headless
+def jimeng_env():
+    """返回跑 dreamina 时该用的环境(默认真实 HOME;设了 DAIHUO_JIMENG_HOME 则切账号)。"""
+    e = dict(os.environ)
+    h = os.environ.get("DAIHUO_JIMENG_HOME", "").strip()
+    if h:
+        h = os.path.expanduser(h)
+        os.makedirs(h, exist_ok=True)
+        e["HOME"] = h
+    return e
+
+
+COSYVOICE_HOME = os.environ.get("COSYVOICE_HOME", os.path.expanduser("~/CosyVoice"))
+
+# ── 本机工具路径:全部收在这里,按平台判断,脚本里不许再写死盘符/用户名(10-09)──
+#   Kimi 线教训:C:/Users/gao/... 和 D:/复刻测试/... 散落在 5 个文件,换台机器全炸;
+#   WSL 上 'D:/x' 还会在当前目录建一个叫 "D:" 的文件夹。
+import sys as _sys
+
+
+def _assets_lib():
+    """资产库根(人设图/场景板/产品形态/验收片库 clips/)。DAIHUO_ASSETS_LIB > 本机 E 盘(WSL/Windows 两种写法)。"""
+    env = os.environ.get("DAIHUO_ASSETS_LIB")
+    if env:
+        return env
+    for p in ("/mnt/e/jimeng/assets_lib", "E:/jimeng/assets_lib"):
+        if os.path.isdir(p):
+            return p
+    return os.path.expanduser("~/daihuo_assets_lib")
+
+
+ASSETS_LIB = _assets_lib()
+
+
+def fw_python():
+    """词级转写(faster-whisper)用的解释器。DAIHUO_FW_PYTHON > 当前解释器(装了就用) > Windows 默认。"""
+    env = os.environ.get("DAIHUO_FW_PYTHON")
+    if env:
+        return env
+    import importlib.util
+    if importlib.util.find_spec("faster_whisper"):
+        return _sys.executable
+    for win in (os.path.expanduser("~/.venvs/fw/Scripts/python.exe"),       # 本机 Windows 侧 venv
+                os.path.expanduser("~/AppData/Local/Programs/Python/Python313/python.exe")):
+        if os.path.exists(win):
+            return win
+    return _sys.executable
+
+
+def depth_python():
+    """深度参考(depth_ref.py)用的解释器:要 torch + transformers。
+    DAIHUO_DEPTH_PYTHON > ~/.venvs/depth(10-09 建,--system-site-packages 复用系统 torch)> 当前解释器。"""
+    env = os.environ.get("DAIHUO_DEPTH_PYTHON")
+    if env:
+        return env
+    for p in (os.path.expanduser("~/.venvs/depth/bin/python"),
+              os.path.expanduser("~/.venvs/depth/Scripts/python.exe")):
+        if os.path.exists(p):
+            return p
+    return _sys.executable
+
+
+def lip_python():
+    """SyncNet 口型偏移探针(qc_sync_offset / qc_talking)用的解释器:要 torch + mediapipe + python_speech_features。
+    DAIHUO_LIP_PYTHON > ~/.venvs/lip > D:/tools/venv-lip(Kimi 线 Windows 机)> 当前解释器。"""
+    env = os.environ.get("DAIHUO_LIP_PYTHON")
+    if env:
+        return env
+    for p in (os.path.expanduser("~/.venvs/lip/bin/python"),
+              os.path.expanduser("~/.venvs/lip/Scripts/python.exe"),
+              "D:/tools/venv-lip/Scripts/python.exe"):
+        if os.path.exists(p):
+            return p
+    return _sys.executable
+
+
+def syncnet_home():
+    """SyncNet 资源目录:内含 syncnet_v2.model 权重 + syncnet_python 包。
+    DAIHUO_SYNCNET_HOME > ~/.cache/daihuo/syncnet > D:/复刻测试/qc_tmp/syncnet(Kimi 线)。"""
+    env = os.environ.get("DAIHUO_SYNCNET_HOME")
+    if env:
+        return env
+    for p in (os.path.expanduser("~/.cache/daihuo/syncnet"), "D:/复刻测试/qc_tmp/syncnet"):
+        if os.path.isdir(p):
+            return p
+    return os.path.expanduser("~/.cache/daihuo/syncnet")
+
+
+# ── 项目文件夹(10-10):中间产物一律进项目文件夹,绝不进 skill 目录 ──────────────
+SKILL_DIR = os.path.dirname(os.path.realpath(__file__))
+
+
+def to_local_path(p):
+    """Windows 路径 → 本机可用路径。WSL 下 G:\\a\\b.mp4 → /mnt/g/a/b.mp4;原生 Windows/Linux 原样返回。"""
+    if not p:
+        return p
+    p = str(p)
+    m = re.match(r"^([A-Za-z]):[\\/](.*)$", p)
+    if m and os.name != "nt" and os.path.isdir("/mnt/" + m.group(1).lower()):
+        return "/mnt/" + m.group(1).lower() + "/" + m.group(2).replace("\\", "/")
+    return p
+
+
+def to_win_path(p):
+    """/mnt/g/a/b → G:\\a\\b(给人看、给 Windows 资源管理器用);非 /mnt/x 路径原样返回。"""
+    m = re.match(r"^/mnt/([a-z])/(.*)$", os.path.abspath(p))
+    return f"{m.group(1).upper()}:\\" + m.group(2).replace("/", "\\") if m else os.path.abspath(p)
+
+
+def inside_skill(p):
+    rp = os.path.realpath(os.path.abspath(to_local_path(p)))
+    return rp == SKILL_DIR or rp.startswith(SKILL_DIR + os.sep)
+
+
+_OUT_ARG = re.compile(r"(^|_)(out|outdir|out_dir|dir|clips|full|workdir|run)($|_)")
+
+
+def guard_args(ns, who=""):
+    """入口脚本 parse_args() 后调用:任何输出类参数(out/out_dir/clips/audio_dir/full…)解析后落在
+    skill 目录里就拒绝。★为什么:SKILL.md 的命令全是 run/xxx 相对路径,agent 在 skill 目录里干活时
+    中间产物会全堆进 skill 目录(另一台机器 C 盘就是这么被撑满的)。项目文件夹用 project.py init 建。"""
+    bad = [f"--{k.replace('_', '-')} {v}" for k, v in vars(ns).items()
+           if isinstance(v, str) and v and _OUT_ARG.search(k) and inside_skill(v)]
+    if bad:
+        raise SystemExit(f"[{who or 'daihuo'}] 输出路径落在 skill 目录里,拒绝:{'; '.join(bad)}\n"
+                         f"  → 先建项目文件夹:python3 {os.path.join(SKILL_DIR, 'project.py')} init <目标视频>"
+                         f"(默认建在视频旁边 <视频名>_复刻/),在那里面跑。")
+
+
+def cjk_font():
+    """PIL 拼图用的中文字体:微软雅黑(Windows 或 WSL 挂载)> 文泉驿 > 报错。"""
+    for p in (os.environ.get("DAIHUO_CJK_FONT"), "C:/Windows/Fonts/msyh.ttc",
+              "/mnt/c/Windows/Fonts/msyh.ttc", "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+              "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"):
+        if p and os.path.exists(p):
+            return p
+    raise FileNotFoundError("找不到中文字体:设 DAIHUO_CJK_FONT 指向一个 .ttc/.ttf")
+
+
+# 反推/评委用的 Seed 模型:公共模型名直调(实测可用),不再依赖私人 endpoint ID(ep-xxx)。
+# 换模型/换 endpoint 用环境变量覆盖,不改代码。
+# ★默认模型必须跟着【计费口子】走 —— 套餐里没有 pro,只有 turbo。
+#   08-22 实撞:配好 plan key 后路由自动切套餐,而默认模型还是 pro,
+#   下一次反推会直接失败。显式 ARK_SEED_MODEL 永远优先。
+ARK_MODEL_PLATFORM = "doubao-seed-2-1-pro-260628"     # 按量:Pro(贵,准)
+ARK_MODEL_PLAN = "doubao-seed-2-1-turbo-260628"       # 套餐:只有 turbo
+ARK_SEED_MODEL = (os.environ.get("ARK_SEED_MODEL")
+                  or (ARK_MODEL_PLAN if ark_use_plan() else ARK_MODEL_PLATFORM))
+
+# 成片下载代理:全管线(火山/即梦/即梦CDN)均为国内直连,默认不走代理。
+# 极少数网络环境下载 CDN 需代理时,设 DAIHUO_DOWNLOAD_PROXY=http://127.0.0.1:7896。
+DOWNLOAD_PROXY = os.environ.get("DAIHUO_DOWNLOAD_PROXY", "")
+
+# 剪映草稿交付(deliver.py --mode draft):
+#   JY_DRAFTS_DIR = 剪映草稿根目录(剪映设置里可查/可改),Windows 或 WSL 路径皆可
+#   JY_PYTHON     = 装有 pyJianYingDraft 的解释器(轻依赖,独立venv,doctor 给安装命令)
+#   读取优先级同 ark_key:环境变量 DAIHUO_JY_DRAFTS > 文件 ~/.config/daihuo-fanpai/jy_drafts
+def _jy_drafts():
+    d = os.environ.get("DAIHUO_JY_DRAFTS", "").strip()
+    if d:
+        return d
+    p = os.path.expanduser("~/.config/daihuo-fanpai/jy_drafts")
+    return open(p).read().strip() if os.path.exists(p) else ""
+
+
+JY_DRAFTS_DIR = _jy_drafts()
+JY_PYTHON = os.path.expanduser(os.environ.get("DAIHUO_JY_PYTHON", "~/.venv-jianying/bin/python"))
+
+
+def resolve_asset_refs(cfg):
+    """assets.json 入口统一解析 @host:/@cast:/@product: 引用(见 assets_lib.py)。没有 @ 时原样返回。"""
+    import assets_lib
+    return assets_lib.resolve_cfg(cfg)
+
+
+def load_assets(path):
+    """读 assets.json 的唯一入口:读 + 解析 @引用。下游拿到的全是普通绝对路径。"""
+    import json
+    return resolve_asset_refs(json.load(open(path, encoding="utf-8")))

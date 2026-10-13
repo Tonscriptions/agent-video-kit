@@ -1,0 +1,147 @@
+# Agent CLI 契约 v0.1
+
+| 项目 | 内容 |
+|---|---|
+| 文档编号 | SPEC-CLI-001 |
+| 版本 | 0.1.0 |
+| 日期 | 2026-10-13 |
+| 状态 | 有效 |
+| 运行根目录 | `E:\dev\sandbox\AI广告剪辑` |
+| 关联规范 | [Agent Project JSON](./AgentProjectJSON规范_v0.1_2026-10-13.md)、[机器 Schema](./agent-project.schema.json)、[产品实现入口](../产品实现入口与P0使用说明_v0.1_2026-10-13.md) |
+
+## 1. 目标与硬约束
+
+CLI 是面向 Agent 的唯一首版控制面。每个写操作都接收结构化参数，输出机器可解析的 JSON envelope，并把项目变更、渲染清单、验证报告和 provenance 留在项目目录内。运行时使用原生 Windows、Python 和本机 FFmpeg；默认关闭网络，不启动 Docker、WSL、容器、GUI 或剪映/Jianying 私有运行时。
+
+CLI 不会自动下载模型、素材、插件或字体。需要本地模型时必须传入已经存在的模型目录；需要外部项目时由显式 `convert import` 处理，并生成能力映射报告。
+
+## 2. 通用参数和输出 envelope
+
+所有叶子命令都支持：
+
+| 参数 | 语义 |
+|---|---|
+| `--format json\|text` | 默认 `json`；`text` 只改变 JSON 缩进，不改变字段语义 |
+| `--request-id ID` | 调用方请求 ID；省略时由 CLI 生成 |
+| `--idempotency-key KEY` | 项目写操作的幂等键；相同请求重放原 envelope，不同请求复用同键返回冲突 |
+| `--dry-run` | 执行参数、路径和校验计划，不写项目、报告、快照或最终媒体 |
+| `--no-network` | 默认启用；保留该开关用于显式表达调用策略 |
+| `--progress none\|jsonl` | 长任务可输出 JSONL 进度事件到 stderr；默认不输出事件 |
+
+成功、计划和失败都返回以下 envelope：
+
+```json
+{
+  "ok": true,
+  "command": "project.migrate",
+  "request_id": "req_...",
+  "operation_id": "op_...",
+  "status": "succeeded",
+  "data": {},
+  "artifacts": [],
+  "warnings": [],
+  "errors": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "schema_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "network": "disabled"
+  }
+}
+```
+
+`status` 使用 `succeeded`、`planned`、`partial`、`failed` 或 `cancelled`。`ok` 只在 `succeeded` 或 `planned` 时为 `true`。警告不会替代失败；近似效果必须进入 `warnings`，不允许静默声称精确等效。
+
+## 3. 命令表
+
+| 命令 | 主要输入 | 主要输出和副作用 |
+|---|---|---|
+| `project init PATH` | 项目目录、名称和可选 ID | 创建 `project.json`、`rights-ledger.json`、`project.lock.json`、`assets/`、`renders/`、`validation/`、`history/` 等目录 |
+| `project inspect --project PATH` | 项目目录 | 项目摘要、资产/序列计数、schema 和能力提示 |
+| `project snapshot --project PATH [--label LABEL]` | 当前项目 | 在 `history/` 写入自包含项目、Rights Ledger 和锁文件快照 |
+| `project restore --project PATH --snapshot ID_OR_PATH` | 已有快照 | 恢复前先创建 `before-restore` 快照；候选快照必须先通过 schema/语义校验 |
+| `project migrate --project PATH [--report NAME]` | `0.0.0` 或 `0.1.0` 项目 | 已知旧形状补默认字段、补本地资产哈希/探测、记录迁移链；写入前创建 `before-migrate` 快照并写 `validation/*.json` 报告 |
+| `media ingest --project PATH --input FILE` | 本地媒体、权利和许可证参数 | 复制到项目 `assets/`，写 probe、内容哈希、Rights Ledger 和资产 provenance |
+| `media understand --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频 | FFmpeg 场景、静音、节拍结果；`--transcribe` 只加载本地 Transformers 模型 |
+| `media prepare --project PATH (--asset-id ID\|--input FILE)` | 本地素材 | 生成项目内代理、缩略图和波形，并写入资产记录 |
+| `media highlights --project PATH (--asset-id ID\|--input FILE)` | 本地理解结果 | 本地启发式高光候选报告，不调用在线推荐服务 |
+| `media relink --project PATH --search-root DIR` | 丢失资产和本地搜索目录 | 优先内容哈希精确重链接；`--match-by-name` 仅允许唯一文件名近似匹配并生成报告 |
+| `media track --project PATH ... --roi X,Y,W,H` | 本地视频、归一化 ROI | 本地模板匹配、置信度和位置关键帧；`--clip-id` 写回前创建快照 |
+| `ad plan --project PATH --input BRIEF.json` | 本地广告 brief 和可选分析报告 | 写入钩子、卖点、证明、CTA 的节拍计划和序列标记 |
+| `subtitle validate --input FILE` | SRT/VTT/ASS/SSA | 解析、时长、顺序和重叠报告 |
+| `subtitle normalize --input FILE --output FILE` | 字幕文件 | 通过校验后规范化为 SRT；项目模式下输出必须位于项目内 |
+| `timeline compose --project PATH --input CHANGES.json` | 变更集 | 写入轨道、片段、标记、关键帧、嵌套序列、速度曲线和剪辑操作；写入前快照并再次校验 |
+| `validate --project PATH` | 项目和目标渠道 | 机器 Schema、时间/引用/权利/效果语义校验报告 |
+| `rights check --project PATH` | 项目 Rights Ledger | 检查目标渠道发布资格；严格失败退出码为 7 |
+| `render --project PATH` | 已验证项目和输出规格 | 本地 FFmpeg 渲染、manifest、操作记录和原子最终媒体 |
+| `quality check --project PATH --input FILE` | 已渲染媒体 | 画布、流、时长、音画差、可选黑帧、LUFS 和 true peak 报告 |
+| `convert import --input FILE --output DIR` | Agent JSON、OTIO JSON 或 Kdenlive XML | 新建本地项目并写 Exact/Mapped/Approximate/Baked/Unsupported/Failed 报告 |
+| `convert export --project PATH --output FILE --target-format FORMAT` | 本地项目 | 导出 Agent JSON、OTIO 或 Kdenlive XML，并保留转换报告 |
+| `template apply --project PATH --input TEMPLATE.json` | 本地模板和变量 | 变量校验、片段实例化、模板快照和 provenance 变更记录 |
+| `template batch --project PATH ...` | 模板、variants 和输出目录 | 隔离实例并批量渲染；写批量报告，可选择继续失败项 |
+| `library index --root DIR --output FILE` | 本地媒体/字体/字幕目录 | 生成带哈希和许可证状态的本地目录索引 |
+| `library search --catalog FILE` | 目录索引和查询条件 | 返回可审计的匹配资产 |
+| `doctor` | 本机环境 | 只读取 Python、FFmpeg、FFprobe、Docker/WSL PATH；绝不启动虚拟化环境 |
+| `operation inspect --project PATH --operation-id ID` | 操作 ID | 读取可重连的操作状态、进度和产物清单 |
+| `version` / `capabilities` | 无 | 版本、引擎、网络策略和 test-backed 本地能力清单 |
+
+## 4. 项目迁移、快照和路径规则
+
+`project migrate` 只接受当前项目已知的 `schema_version`：`0.0.0` 和 `0.1.0`。未知、高于当前版本或缺失版本必须返回 `SCHEMA_VERSION_UNSUPPORTED`，不得猜测字段、生成资产/序列/片段 ID 或静默覆盖原文件。
+
+迁移候选由纯函数生成；CLI 只为缺失的本地资产计算 SHA-256 和 FFprobe 元数据。相对 `--report` 路径解析到项目的 `validation/` 目录；绝对路径也必须位于该目录内。候选通过机器 Schema 与语义校验后，才创建 `before-migrate` 快照并原子保存。重复迁移应是 no-op，不重复写项目或快照。
+
+项目内报告、快照、渲染和转换产物必须位于项目根目录的受控子目录；越过项目根目录、网络 URI、缺少权利记录或未授权的外部路径必须返回结构化错误。历史文件只读，恢复和写入操作不会删除历史快照。
+
+## 5. 时间线与关键帧契约
+
+所有 `at_tick` 是片段内时间，使用项目 `settings.timebase.ticks_per_second`。关键帧必须单调递增，插值可用 `hold`、`linear`、`ease_in`、`ease_out`、`ease_in_out` 或带合法控制点的 `bezier`。
+
+`timeline compose` 变更集支持 `append_clip`、`update_clip`、`remove_clip`、`split_clip`、`ripple_insert`、`ripple_delete`、`slip_clip`、`slide_clip`、`set_clip_speed`、`set_clip_speed_curve`、`reverse_clip`、`freeze_frame`、`add_sequence`、`append_sequence_clip`、轨道增删改、标记增删和序列时长调整。任何变更保存前都会重新执行 Schema、引用、时间范围、嵌套循环和 Rights 语义校验。
+
+`freeze_frame` 的 `at_tick` 以冻结前的片段时间线为基准，在视频流中插入 `duration_tick` 的冻结帧；片段总时长同步增加，原始画面在冻结点前后保持顺序。渲染器在已经完成源范围、变速曲线、倒放和裁切映射的视频流上分支并回接，因此中间定格与尾部定格使用同一语义；音频按项目的冻结时长补齐并继续接受音量、声像和淡出链。非法冻结对象、非正冻结时长或越过冻结前片段范围的 `at_tick` 在校验阶段拒绝。
+
+`transition_in`/`transition_out` 的 `type` 可使用本机 FFmpeg xfade 目录（包括 `crossfade`、`dissolve`、方向 `wipe`/`slide`、`circlecrop`、`radial`、`pixelize`、`zoomin`、`cover*`、`reveal*`、`slice`、`wind` 和 `blur`）。需要相邻片段的重叠句柄；无法匹配时不会静默伪造转场，render manifest 会保留 warning。
+
+遮罩使用归一化参数。`rectangle/circle/ellipse` 支持几何标量、`invert`、`feather` 和 `mask.*` 关键帧；动态 feather 通过 alpha-only 软边表达式执行，范围为 `0..0.5`。`path/polygon` 可以使用固定点数 `points`，点坐标可以用 `points.0.x`、`points.0.y` 关键帧驱动；也可以使用静态 `segments`/`curve_segments`/`curves`，每段支持 `line` 或 `cubic`，cubic 的 `samples` 范围为 `2..16`，总采样点限制为 `3..32`，渲染器将曲线采样成固定多边形并以固定点边缘的内侧距离近似生成 alpha 软边。曲线段不能与 `points` 同时声明；曲线段本身暂不接受逐点动态关键帧。动态 feather 也可以用 `feather`/`mask.feather` 关键帧驱动。`transform.opacity`、正常层 `blend.opacity` 以及 RGB blend 的 `blend.opacity` 都可以用片段关键帧驱动；片段 `crop` 支持 `pixels`/`normalized` 单位和 `fit`/`fill`/`stretch` 模式，`crop.keyframes` 的 `x`/`y`/`width`/`height` 或片段级 `crop.x`/`crop.y`/`crop.width`/`crop.height` 可以逐帧移动和缩放裁切窗口；动态尺寸由 CPU `geq` 固定画布逆向采样保持输出帧尺寸稳定，宽高关键帧必须大于 0。非法点数、坐标、尺寸、时间或属性必须在写入前拒绝。静态嵌套父级 transform/effects/blend 会下推；多级父级动态 transform 关键帧按最终序列时钟合成，父级与子级多重 mask 会顺序合成 alpha，但不同坐标空间仍进入 `RENDER_FEATURE_APPROXIMATE`；reverse 下的关键帧插值同样保留近似警告。
+
+## 6. 渲染、质量和进度
+
+`render` 只接受项目内本地媒体和已验证计划。输出容器为 MP4、WebM 或 MKV；编码器由本机 FFmpeg 能力决定。渲染先写 `renders/.tmp/<operation_id>/`，成功后原子移动最终文件；失败、取消和输入哈希变化不会留下可发布的最终文件。
+
+`--progress jsonl` 的事件写到 stderr，至少包含 `event_id`、`operation_id`、`type`、`stage`、`percent`、`message` 和 `at`。`render --cancel-file FILE` 在启动前和运行中都检查取消；`render --resume OPERATION_ID` 只有在项目和所有素材指纹未变化时才允许重建计划。
+
+`quality check` 可用 `--require-audio`、`--max-av-sync-ms`、`--expensive`、`--target-lufs`、`--lufs-tolerance`、`--fail-on-black` 和 `--max-true-peak-dbfs`。质量报告失败时，发布调用必须停止；质量检查不会修改原始媒体或项目。
+
+音频片段使用本地 FFmpeg 滤镜链，支持音量关键帧、`audio.pan`/`pan` 声像关键帧（`-1` 左至 `1` 右）、降噪、压缩、均衡、高低通、对白增强、变调、混响、响度归一化、淡入淡出和旁白 ducking。字符串 `audio.pan` 仅用于显式 raw FFmpeg pan 表达式；数值声像先将输入规范化为立体声，再以逐帧 `aeval` 平衡左右通道，单声道素材会复制到两路，立体声素材不会先被折叠为单声道。
+
+## 7. 错误码和退出码
+
+| 退出码 | 类别 | 示例错误码 |
+|---:|---|---|
+| 0 | 成功或 dry-run 计划 | — |
+| 2 | 参数、Schema、项目或时间线错误 | `ARGUMENT_INVALID`、`SCHEMA_VERSION_UNSUPPORTED`、`KEYFRAME_INVALID` |
+| 3 | 本地文件、哈希或媒体输入错误 | `ASSET_FILE_MISSING`、`MIGRATION_ASSET_HASH_MISSING` |
+| 4 | 媒体流或能力缺失 | `VIDEO_TRACK_EMPTY`、`AUDIO_STREAM_MISSING` |
+| 6 | FFmpeg、模型或可重试执行失败 | `RENDER_FAILED`、`LOCAL_ASR_FAILED` |
+| 7 | Rights Ledger 发布阻断 | `RIGHTS_BLOCKED` |
+| 8 | 任务取消 | `CANCELLED` |
+| 9 | 未分类输入/内部错误 | `INTERNAL_INPUT_ERROR` |
+| 10 | 本地依赖或模型目录不可用 | `DEPENDENCY_UNAVAILABLE`、`LOCAL_ASR_MODEL_MISSING` |
+
+错误对象至少包含 `code`、`message`、`path`（若可定位）、`retryable`（若适用）和 `cause`（不含秘密）。FFmpeg 原始日志只写操作记录，不拼接为可执行 shell 字符串。
+
+## 8. Agent 调用示例
+
+```powershell
+$env:PYTHONPATH = 'E:\dev\sandbox\AI广告剪辑\product\src'
+python -m ai_ad_editor project init .\\work\\demo --name Demo
+python -m ai_ad_editor project migrate --project .\\work\\demo --dry-run --progress jsonl
+python -m ai_ad_editor timeline compose --project .\\work\\demo --input .\\changes.json --idempotency-key edit-001
+python -m ai_ad_editor validate --project .\\work\\demo --strict-rights
+python -m ai_ad_editor render --project .\\work\\demo --profile vertical --progress jsonl --output .\\work\\demo\\renders\\ad.mp4
+python -m ai_ad_editor quality check --project .\\work\\demo --input .\\work\\demo\\renders\\ad.mp4 --require-audio --expensive
+```
+
+调用方应先读取 `capabilities`，再根据限制决定 Exact、Approximate 或拒绝计划。任何近似结果都必须连同 warning、转换报告或质量报告交给 Agent 上层处理。
+

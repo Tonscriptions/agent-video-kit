@@ -1,0 +1,1155 @@
+"""Public Shotcut/MLT orchestration interface.
+
+Path policy, process supervision, and media inspection are deep modules beneath
+this seam. Keeping orchestration here preserves the stable imports used by MCP
+handlers and allows tests to replace process functions at the public interface.
+"""
+
+from __future__ import annotations
+
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+import threading
+import time
+import xml.etree.ElementTree as ET
+from pathlib import Path
+from typing import Literal, TypedDict
+
+from . import MLT_VERSION, MLT_VERSION_FAMILY, SHOTCUT_VERSION, TESTED_RUNTIME_STACKS
+from .errors import RequestCancelled, ToolError
+from .media import (
+    QualityAnalyzerCapability,
+    analyze_media_quality,
+    media_duration,
+    probe_media_raw,
+    quality_analyzer_capabilities,
+    shotcut_file_hash,
+    summarize_media,
+)
+from .path_policy import (
+    PathPolicy,
+    enforce_project_resource_policy,
+    expand_path,
+    is_network_resource,
+    parsed_project_resources,
+    path_policy,
+    project_network_resources,
+)
+from .processes import (
+    MLT_ENVIRONMENT_KEYS,
+    Executables,
+    creation_flags,
+    discover_executables,
+    require_executable,
+    run_capture,
+    runtime_identity,
+    start_render_supervisor,
+    sys_platform,
+    terminate_process,
+)
+from .protocol import cancellation_requested, report_progress
+from .storage import OutputTransaction, managed_preview_path
+
+ServiceList = TypedDict(
+    "ServiceList", {"kind": str, "count": int, "services": list[str]}
+)
+
+ExecutableStatus = TypedDict(
+    "ExecutableStatus",
+    {
+        "found": bool,
+        "path": str | None,
+        "version": str | None,
+        "version_error": str | None,
+    },
+)
+_RepositoryStatus = TypedDict(
+    "_RepositoryStatus", {"repository_ready": bool, "repository_error": str | None}
+)
+
+
+class MeltStatus(ExecutableStatus, _RepositoryStatus):
+    pass
+
+
+RuntimeStatus = TypedDict(
+    "RuntimeStatus",
+    {
+        "ready": bool,
+        "shotcut": ExecutableStatus,
+        "melt": MeltStatus,
+        "ffprobe": ExecutableStatus,
+        "ffmpeg": ExecutableStatus,
+        "environment_overrides": dict[str, str | None],
+        "path_policy": PathPolicy,
+    },
+)
+ServiceDescription = TypedDict(
+    "ServiceDescription",
+    {"kind": str, "name": str, "available": bool, "metadata": str | None},
+)
+ServiceDescriptionError = TypedDict(
+    "ServiceDescriptionError", {"available": bool, "error": str}
+)
+RepositoryCheck = TypedDict("RepositoryCheck", {"passed": bool, "error": str | None})
+_VersionFields = TypedDict("_VersionFields", {"expected": str, "detected": str | None})
+
+
+class VersionCheck(RepositoryCheck, _VersionFields):
+    pass
+
+
+RnnoiseCheck = TypedDict(
+    "RnnoiseCheck",
+    {
+        "passed": bool,
+        "preferred_service": str,
+        "services": dict[str, ServiceDescription | ServiceDescriptionError],
+        "note": str,
+    },
+)
+CompatibilityIssue = TypedDict(
+    "CompatibilityIssue",
+    {
+        "code": str,
+        "severity": Literal["warning", "error"],
+        "message": str,
+        "recommended_action": str,
+    },
+)
+CompatibilityReport = TypedDict(
+    "CompatibilityReport",
+    {
+        "compatible": bool,
+        "status": Literal["tested", "untested", "failed"],
+        "runtime_ready": bool,
+        "validated_stack": dict[str, str],
+        "tested_stacks": list[dict[str, str]],
+        "serialization": dict[str, str],
+        "issues": list[CompatibilityIssue],
+        "checks": dict[str, VersionCheck | RepositoryCheck | RnnoiseCheck],
+        "quality_analyzers": dict[str, QualityAnalyzerCapability],
+        "path_policy": PathPolicy,
+    },
+)
+
+_SERVICE_CACHE: dict[tuple[object, ...], ServiceList] = {}
+_SERVICE_LOCK = threading.Lock()
+_MELT_READY_CACHE: set[tuple[object, ...]] = set()
+_MELT_READY_LOCK = threading.Lock()
+MLT_WARMUP_ATTEMPTS = 3
+MLT_WARMUP_BASE_TIMEOUT_SECONDS = 5
+_ENCODER_CACHE: dict[tuple[object, ...], dict[str, object]] = {}
+_ENCODER_LOCK = threading.Lock()
+_VERSION_CACHE: dict[tuple[object, ...], tuple[float, str]] = {}
+_DESCRIPTION_CACHE: dict[tuple[object, ...], tuple[float, ServiceDescription]] = {}
+_DIAGNOSTIC_LOCK = threading.Lock()
+DIAGNOSTIC_CACHE_SECONDS = 60
+DIAGNOSTIC_CACHE_ENTRIES = 64
+
+__all__ = [
+    "MLT_ENVIRONMENT_KEYS",
+    "Executables",
+    "analyze_media_quality",
+    "compatibility_doctor",
+    "creation_flags",
+    "describe_service",
+    "detect_hardware_encoders",
+    "discover_executables",
+    "enforce_project_resource_policy",
+    "ensure_melt_ready",
+    "expand_path",
+    "is_network_resource",
+    "list_services",
+    "media_duration",
+    "open_in_shotcut",
+    "path_policy",
+    "probe_media_raw",
+    "project_network_resources",
+    "render_contact_sheet",
+    "render_media_contact_sheet",
+    "render_preview",
+    "render_preview_batch",
+    "require_executable",
+    "run_capture",
+    "shotcut_file_hash",
+    "start_render_supervisor",
+    "status",
+    "summarize_media",
+    "sys_platform",
+    "terminate_process",
+    "validate_project_file",
+    "version_line",
+]
+
+
+def ensure_melt_ready(
+    melt: Path,
+    *,
+    attempts: int = MLT_WARMUP_ATTEMPTS,
+    timeout: int = MLT_WARMUP_BASE_TIMEOUT_SECONDS,
+) -> None:
+    """Warm MLT's module repository and tolerate one-time cold starts.
+
+    A newly installed or extracted Windows build can spend long enough loading
+    its DLL-backed modules that an ordinary validation command times out. A
+    short terminated attempt warms the operating-system loader. Later attempts
+    receive progressively longer timeouts so initialization work that restarts
+    in each process can still complete. Cache readiness by executable identity
+    so normal operations pay no repeated startup probe.
+    """
+
+    cache_key = runtime_identity(melt)
+    with _MELT_READY_LOCK:
+        if cache_key in _MELT_READY_CACHE:
+            return
+
+        last_timeout: ToolError | None = None
+        command = [str(melt), "-query", "consumers"]
+        attempt_timeouts = [timeout * (2**index) for index in range(attempts)]
+        for attempt_timeout in attempt_timeouts:
+            try:
+                result = run_capture(command, timeout=attempt_timeout)
+            except ToolError as exc:
+                if not isinstance(exc.__cause__, subprocess.TimeoutExpired):
+                    raise
+                last_timeout = exc
+                continue
+            if result.returncode:
+                detail = (result.stderr.strip() or result.stdout.strip())[-1200:]
+                raise ToolError(
+                    f"MLT repository initialization failed: {detail or 'unknown error'}",
+                    code="mlt_repository_unavailable",
+                    recommended_action="run_compatibility_diagnostics",
+                    recommended_tool="shotcut_doctor",
+                )
+            if len(_MELT_READY_CACHE) > 16:
+                _MELT_READY_CACHE.clear()
+            _MELT_READY_CACHE.add(cache_key)
+            return
+
+        raise ToolError(
+            f"MLT repository initialization timed out after {attempts} attempts.",
+            code="mlt_repository_timeout",
+            recommended_action="run_compatibility_diagnostics",
+            recommended_tool="shotcut_doctor",
+            details={
+                "attempts": attempts,
+                "attempt_timeouts_seconds": attempt_timeouts,
+            },
+        ) from last_timeout
+
+
+def version_line(executable: Path | None, args: list[str]) -> str | None:
+    if executable is None:
+        return None
+    key = (*runtime_identity(executable), tuple(args))
+    with _DIAGNOSTIC_LOCK:
+        cached = _VERSION_CACHE.get(key)
+        if (
+            cached is not None
+            and time.monotonic() - cached[0] < DIAGNOSTIC_CACHE_SECONDS
+        ):
+            return cached[1]
+    result = run_capture([str(executable), *args], timeout=10)
+    output = "\n".join(part for part in (result.stdout, result.stderr) if part).strip()
+    version = output.splitlines()[0] if output else None
+    if result.returncode == 0 and version:
+        with _DIAGNOSTIC_LOCK:
+            if len(_VERSION_CACHE) >= DIAGNOSTIC_CACHE_ENTRIES:
+                _VERSION_CACHE.clear()
+            _VERSION_CACHE[key] = (time.monotonic(), version)
+    return version
+
+
+def _safe_version(
+    executable: Path | None, args: list[str]
+) -> tuple[str | None, str | None]:
+    try:
+        return version_line(executable, args), None
+    except ToolError as exc:
+        return None, str(exc)
+
+
+def status() -> RuntimeStatus:
+    executables = discover_executables()
+    shotcut_version, shotcut_version_error = _safe_version(
+        executables.shotcut, ["--version"]
+    )
+    melt_version, melt_version_error = _safe_version(executables.melt, ["--version"])
+    ffprobe_version, ffprobe_version_error = _safe_version(
+        executables.ffprobe, ["-version"]
+    )
+    ffmpeg_version, ffmpeg_version_error = _safe_version(
+        executables.ffmpeg, ["-version"]
+    )
+    repository_ready = False
+    repository_error = None
+    if executables.melt is not None:
+        try:
+            ensure_melt_ready(executables.melt)
+            repository_ready = True
+        except ToolError as exc:
+            repository_error = str(exc)
+    return {
+        "ready": all((executables.shotcut, executables.melt, executables.ffprobe))
+        and repository_ready,
+        "shotcut": {
+            "found": executables.shotcut is not None,
+            "path": str(executables.shotcut) if executables.shotcut else None,
+            "version": shotcut_version,
+            "version_error": shotcut_version_error,
+        },
+        "melt": {
+            "found": executables.melt is not None,
+            "path": str(executables.melt) if executables.melt else None,
+            "version": melt_version,
+            "version_error": melt_version_error,
+            "repository_ready": repository_ready,
+            "repository_error": repository_error,
+        },
+        "ffprobe": {
+            "found": executables.ffprobe is not None,
+            "path": str(executables.ffprobe) if executables.ffprobe else None,
+            "version": ffprobe_version,
+            "version_error": ffprobe_version_error,
+        },
+        "ffmpeg": {
+            "found": executables.ffmpeg is not None,
+            "path": str(executables.ffmpeg) if executables.ffmpeg else None,
+            "version": ffmpeg_version,
+            "version_error": ffmpeg_version_error,
+        },
+        "environment_overrides": {
+            key: os.environ.get(key)
+            for key in (
+                "SHOTCUT_PATH",
+                "SHOTCUT_MELT_PATH",
+                "SHOTCUT_FFPROBE_PATH",
+                "SHOTCUT_FFMPEG_PATH",
+                "SHOTCUT_MCP_ALLOWED_ROOTS",
+                "SHOTCUT_MCP_REQUIRE_ABSOLUTE_PATHS",
+                "SHOTCUT_MCP_ALLOW_UNSAFE_CONSUMER_PROPERTIES",
+                "SHOTCUT_MCP_ALLOW_NETWORK_RESOURCES",
+                "SHOTCUT_MCP_MAX_WORKERS",
+                "SHOTCUT_MCP_MAX_PENDING",
+                "SHOTCUT_MCP_MAX_MESSAGE_BYTES",
+                *MLT_ENVIRONMENT_KEYS,
+            )
+        },
+        "path_policy": path_policy(),
+    }
+
+
+def validate_project_file(project_path: Path, timeout: int = 30) -> dict[str, object]:
+    enforce_project_resource_policy(project_path)
+    melt = require_executable(discover_executables().melt, "melt", "SHOTCUT_MELT_PATH")
+    ensure_melt_ready(melt)
+    result = run_capture(
+        [
+            str(melt),
+            str(project_path),
+            "in=0",
+            "out=0",
+            "-consumer",
+            "null",
+            "real_time=-1",
+            "terminate_on_pause=1",
+            "-silent",
+        ],
+        timeout=timeout,
+    )
+    diagnostic = "\n".join(
+        part for part in (result.stdout, result.stderr) if part
+    ).strip()
+    return {
+        "valid": result.returncode == 0,
+        "return_code": result.returncode,
+        "diagnostic": diagnostic[-4000:] or None,
+    }
+
+
+def list_services(kind: object) -> ServiceList:
+    if not isinstance(kind, str) or kind not in {
+        "filter",
+        "transition",
+        "producer",
+        "consumer",
+        "link",
+    }:
+        raise ToolError("kind must be filter, transition, producer, consumer, or link.")
+    melt = require_executable(discover_executables().melt, "melt", "SHOTCUT_MELT_PATH")
+    ensure_melt_ready(melt)
+    cache_key = (*runtime_identity(melt), kind)
+    with _SERVICE_LOCK:
+        cached = _SERVICE_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+    result = run_capture([str(melt), "-query", f"{kind}s"], timeout=30)
+    if result.returncode:
+        detail = (result.stderr.strip() or result.stdout.strip())[-1200:]
+        raise ToolError(
+            f"MLT service query failed: {detail or result.returncode}",
+            code="mlt_service_query_failed",
+            recommended_action="run_compatibility_diagnostics",
+            recommended_tool="shotcut_doctor",
+            details={"kind": kind, "return_code": result.returncode},
+        )
+    names = sorted(
+        set(re.findall(r"^\s*-\s+([^\s#]+)\s*$", result.stdout, re.MULTILINE))
+    )
+    payload: ServiceList = {"kind": kind, "count": len(names), "services": names}
+    with _SERVICE_LOCK:
+        if len(_SERVICE_CACHE) > 64:
+            _SERVICE_CACHE.clear()
+        _SERVICE_CACHE[cache_key] = payload
+    return payload
+
+
+def describe_service(kind: object, name: object) -> ServiceDescription:
+    if not isinstance(kind, str) or kind not in {
+        "filter",
+        "transition",
+        "producer",
+        "consumer",
+        "link",
+    }:
+        raise ToolError("kind must be filter, transition, producer, consumer, or link.")
+    if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9_.:+-]+", name):
+        raise ToolError("Invalid MLT service name.")
+    melt = require_executable(discover_executables().melt, "melt", "SHOTCUT_MELT_PATH")
+    ensure_melt_ready(melt)
+    key = (*runtime_identity(melt), kind, name)
+    with _DIAGNOSTIC_LOCK:
+        cached = _DESCRIPTION_CACHE.get(key)
+        if (
+            cached is not None
+            and time.monotonic() - cached[0] < DIAGNOSTIC_CACHE_SECONDS
+        ):
+            return cached[1].copy()
+    result = run_capture([str(melt), "-query", f"{kind}={name}"], timeout=30)
+    text = "\n".join(part for part in (result.stdout, result.stderr) if part).strip()
+    missing = bool(re.search(r"\bNo metadata for\b", text, re.I))
+    description: ServiceDescription = {
+        "kind": kind,
+        "name": name,
+        "available": result.returncode == 0 and bool(text) and not missing,
+        "metadata": text[-20000:] or None,
+    }
+    if description["available"]:
+        with _DIAGNOSTIC_LOCK:
+            if len(_DESCRIPTION_CACHE) >= DIAGNOSTIC_CACHE_ENTRIES:
+                _DESCRIPTION_CACHE.clear()
+            _DESCRIPTION_CACHE[key] = (time.monotonic(), description.copy())
+    return description
+
+
+def _extract_version(value: str | None) -> str | None:
+    if not value:
+        return None
+    match = re.search(r"\b\d+\.\d+(?:\.\d+)*(?:[-+][\w.-]+)?\b", value)
+    return match.group(0) if match else None
+
+
+def _safe_service_description(
+    kind: str, name: str
+) -> ServiceDescription | ServiceDescriptionError:
+    try:
+        return describe_service(kind, name)
+    except ToolError as exc:
+        return {"available": False, "error": str(exc)}
+
+
+def compatibility_doctor() -> CompatibilityReport:
+    executables = discover_executables()
+    repository_error: str | None = None
+    repository_ready = False
+    if executables.melt is not None:
+        try:
+            ensure_melt_ready(executables.melt)
+            repository_ready = True
+        except ToolError as exc:
+            repository_error = str(exc)
+
+    shotcut_version, shotcut_error = _safe_version(executables.shotcut, ["--version"])
+    mlt_version, mlt_error = _safe_version(executables.melt, ["--version"])
+    detected_shotcut = _extract_version(shotcut_version)
+    detected_mlt = _extract_version(mlt_version)
+    tested = (detected_shotcut, detected_mlt) in TESTED_RUNTIME_STACKS
+    issues: list[CompatibilityIssue] = []
+    for name, executable, version, error in (
+        ("shotcut", executables.shotcut, shotcut_version, shotcut_error),
+        ("mlt", executables.melt, mlt_version, mlt_error),
+    ):
+        if executable is None or not version or error:
+            issues.append(
+                {
+                    "code": f"{name}_unavailable",
+                    "severity": "error",
+                    "message": error
+                    or f"Could not read the {name} executable version.",
+                    "recommended_action": (
+                        "Check the executable path and installation, then rerun shotcut_doctor."
+                    ),
+                }
+            )
+
+    rnnoise = {
+        kind: _safe_service_description(kind, "rnnoise") for kind in ("link", "filter")
+    }
+    rnnoise_available = any(bool(item.get("available")) for item in rnnoise.values())
+    if not repository_ready:
+        issues.append(
+            {
+                "code": "repository_unavailable",
+                "severity": "error",
+                "message": repository_error or "The MLT repository is unavailable.",
+                "recommended_action": "Check the Melt installation and MLT environment overrides.",
+            }
+        )
+    if not rnnoise_available:
+        issues.append(
+            {
+                "code": "rnnoise_unavailable",
+                "severity": "error",
+                "message": "RNNoise is unavailable as both a link and a filter.",
+                "recommended_action": "Check the Shotcut RNNoise module; inspect checks.rnnoise.services for details.",
+            }
+        )
+    runtime_ready = not issues
+    if not tested and runtime_ready:
+        issues.append(
+            {
+                "code": "untested_runtime",
+                "severity": "warning",
+                "message": "This Shotcut/MLT combination has not been validated by integration tests.",
+                "recommended_action": (
+                    "Continue with normal project validation and preview checks. "
+                    "Do not block solely on the version or claim confirmed compatibility."
+                ),
+            }
+        )
+
+    checks: dict[str, VersionCheck | RepositoryCheck | RnnoiseCheck] = {
+        "shotcut": VersionCheck(
+            {
+                "passed": detected_shotcut
+                in {shotcut for shotcut, _ in TESTED_RUNTIME_STACKS},
+                "expected": ", ".join(shotcut for shotcut, _ in TESTED_RUNTIME_STACKS),
+                "detected": shotcut_version,
+                "error": shotcut_error,
+            }
+        ),
+        "mlt": VersionCheck(
+            {
+                "passed": detected_mlt in {mlt for _, mlt in TESTED_RUNTIME_STACKS},
+                "expected": ", ".join(mlt for _, mlt in TESTED_RUNTIME_STACKS),
+                "detected": mlt_version,
+                "error": mlt_error,
+            }
+        ),
+        "repository": {
+            "passed": repository_ready,
+            "error": repository_error,
+        },
+        "rnnoise": {
+            "passed": rnnoise_available,
+            "preferred_service": "link",
+            "services": rnnoise,
+            "note": (
+                "RNNoise is checked independently because a successful consumers "
+                "preflight does not prove that the RNNoise module loaded."
+            ),
+        },
+    }
+    return {
+        "compatible": tested and runtime_ready,
+        "status": "failed" if not runtime_ready else "tested" if tested else "untested",
+        "runtime_ready": runtime_ready,
+        "validated_stack": {
+            "shotcut": SHOTCUT_VERSION,
+            "mlt": MLT_VERSION_FAMILY,
+        },
+        "tested_stacks": [
+            {"shotcut": shotcut, "mlt": mlt} for shotcut, mlt in TESTED_RUNTIME_STACKS
+        ],
+        "serialization": {"shotcut": SHOTCUT_VERSION, "mlt": MLT_VERSION},
+        "issues": issues,
+        "checks": checks,
+        "quality_analyzers": quality_analyzer_capabilities(executables.ffmpeg),
+        "path_policy": path_policy(),
+    }
+
+
+def open_in_shotcut(path: Path, fullscreen: bool = False) -> dict[str, object]:
+    if not path.exists():
+        raise ToolError(
+            f"File or directory not found: {path}",
+            code="path_not_found",
+            recommended_action="check_path_and_retry",
+            details={"path": str(path)},
+        )
+    shotcut = require_executable(
+        discover_executables().shotcut, "Shotcut", "SHOTCUT_PATH"
+    )
+    command = [str(shotcut), *(["--fullscreen"] if fullscreen else []), str(path)]
+    try:
+        process = subprocess.Popen(
+            command,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=creation_flags(),
+            start_new_session=os.name != "nt",
+        )
+    except OSError as exc:
+        raise ToolError(
+            f"Could not open Shotcut: {exc}",
+            code="shotcut_open_failed",
+            recommended_action="run_compatibility_diagnostics",
+            recommended_tool="shotcut_doctor",
+            details={"path": str(path)},
+        ) from exc
+    return {"opened": True, "path": str(path), "pid": process.pid}
+
+
+def render_preview(
+    project_path: Path, output_path: Path | None, frame: int, overwrite: bool
+) -> dict[str, object]:
+    if not project_path.is_file():
+        raise ToolError(
+            f"Project not found: {project_path}",
+            code="project_not_found",
+            recommended_action="check_project_path_and_retry",
+            details={"path": str(project_path)},
+        )
+    enforce_project_resource_policy(project_path)
+    if frame < 0:
+        raise ToolError("frame must be zero or positive.")
+    managed_output = output_path is None
+    if managed_output:
+        output_path = managed_preview_path(project_path, "preview.png")
+        overwrite = True
+    assert output_path is not None
+    output = OutputTransaction.prepare(
+        output_path, overwrite=overwrite, protected_paths=(project_path,)
+    )
+    melt = require_executable(discover_executables().melt, "melt", "SHOTCUT_MELT_PATH")
+    ensure_melt_ready(melt)
+    try:
+        # Explicit RGBA avoids codec-selected RGB conversion that shifts timeremap
+        # colors in Windows builds. Keep the processing and PNG formats aligned.
+        result = run_capture(
+            [
+                str(melt),
+                str(project_path),
+                f"in={frame}",
+                f"out={frame}",
+                "-consumer",
+                f"avformat:{output.temporary}",
+                "f=image2",
+                "vcodec=png",
+                "mlt_image_format=rgba",
+                "pix_fmt=rgba",
+                "real_time=-1",
+                "terminate_on_pause=1",
+                "-silent",
+            ],
+            timeout=120,
+        )
+        if result.returncode or not output.temporary.is_file():
+            detail = "\n".join(
+                part for part in (result.stdout, result.stderr) if part
+            ).strip()
+            raise ToolError(
+                "Failed to generate preview: "
+                + (detail[-2000:] or "output was not created"),
+                code="preview_failed",
+                recommended_action="validate_project_and_retry",
+                recommended_tool="validate_project",
+                details={"project_path": str(project_path), "frame": frame},
+            )
+        output.commit()
+    finally:
+        output.cleanup()
+    return {
+        "created": True,
+        "path": str(output_path),
+        "frame": frame,
+        "size_bytes": output_path.stat().st_size,
+        "managed_output": managed_output,
+    }
+
+
+def _render_preview_frames(
+    project_path: Path, frames: list[int], directory: Path
+) -> list[Path]:
+    """Select exact source frames through one XML producer and one Melt process."""
+    enforce_project_resource_policy(project_path)
+    root, _ = parsed_project_resources(project_path)
+    wrapper = ET.Element("mlt", {"producer": "frames"})
+    profile = root.find("profile")
+    if profile is not None:
+        wrapper.append(profile)
+    producer = ET.SubElement(wrapper, "producer", {"id": "source"})
+    ET.SubElement(producer, "property", {"name": "mlt_service"}).text = "xml"
+    ET.SubElement(producer, "property", {"name": "resource"}).text = str(
+        project_path.resolve()
+    )
+    playlist = ET.SubElement(wrapper, "playlist", {"id": "frames"})
+    for frame in frames:
+        ET.SubElement(
+            playlist,
+            "entry",
+            {"producer": "source", "in": str(frame), "out": str(frame)},
+        )
+    selection = directory / "frames.mlt"
+    ET.ElementTree(wrapper).write(selection, encoding="utf-8", xml_declaration=True)
+    melt = require_executable(discover_executables().melt, "melt", "SHOTCUT_MELT_PATH")
+    ensure_melt_ready(melt)
+    result = run_capture(
+        [
+            str(melt),
+            str(selection),
+            "-consumer",
+            f"avformat:{directory / 'frame-%06d.png'}",
+            "f=image2",
+            "vcodec=png",
+            "mlt_image_format=rgba",
+            "pix_fmt=rgba",
+            "start_number=0",
+            "an=1",
+            "real_time=-1",
+            "terminate_on_pause=1",
+            "-silent",
+        ],
+        timeout=120,
+    )
+    outputs = [directory / f"frame-{index:06d}.png" for index in range(len(frames))]
+    if result.returncode or not all(path.is_file() for path in outputs):
+        detail = (result.stderr.strip() or result.stdout.strip())[-2000:]
+        raise ToolError(
+            f"Failed to generate previews: {detail or 'missing frames'}",
+            code="preview_failed",
+            recommended_action="validate_project_and_retry",
+            recommended_tool="validate_project",
+            details={"project_path": str(project_path), "frames": frames},
+        )
+    if cancellation_requested():
+        raise RequestCancelled("Preview rendering cancelled by the MCP client.")
+    return outputs
+
+
+def render_preview_batch(
+    project_path: Path,
+    requests: list[tuple[int, Path]],
+    overwrite: bool = False,
+) -> dict[str, object]:
+    """Render a bounded deterministic set of project frames."""
+
+    if not 1 <= len(requests) <= 64:
+        raise ToolError("A preview batch must contain between 1 and 64 frames.")
+    normalized = [os.path.normcase(str(path.resolve())) for _, path in requests]
+    if len(set(normalized)) != len(normalized):
+        raise ToolError("Every preview batch output path must be unique.")
+    report_progress(0, len(requests), "Starting preview batch.")
+    results: list[dict[str, object]] = [{} for _ in requests]
+    pending: list[tuple[int, int, OutputTransaction]] = []
+    for index, (frame, output_path) in enumerate(requests):
+        results[index] = {"created": False, "path": str(output_path), "frame": frame}
+        try:
+            if isinstance(frame, bool) or frame < 0:
+                raise ToolError("frame must be zero or positive.")
+            output = OutputTransaction.prepare(
+                output_path, overwrite=overwrite, protected_paths=(project_path,)
+            )
+            pending.append((index, frame, output))
+        except (ToolError, OSError) as exc:
+            results[index]["error"] = str(exc)
+    try:
+        if pending:
+            with tempfile.TemporaryDirectory(prefix="shotcut-mcp-frames-") as directory:
+                try:
+                    rendered = _render_preview_frames(
+                        project_path,
+                        [frame for _, frame, _ in pending],
+                        Path(directory),
+                    )
+                except RequestCancelled:
+                    raise
+                except (ToolError, OSError) as exc:
+                    for index, _, _ in pending:
+                        results[index]["error"] = str(exc)
+                else:
+                    for source, (index, _frame, output) in zip(
+                        rendered, pending, strict=True
+                    ):
+                        if cancellation_requested():
+                            raise RequestCancelled(
+                                "Preview publication cancelled by the MCP client."
+                            )
+                        try:
+                            shutil.copyfile(source, output.temporary)
+                            output.commit()
+                            results[index].update(
+                                created=True,
+                                size_bytes=output.target.stat().st_size,
+                                managed_output=False,
+                            )
+                        except (ToolError, OSError) as exc:
+                            results[index]["error"] = str(exc)
+                        report_progress(
+                            index + 1,
+                            len(requests),
+                            f"Processed preview {index + 1} of {len(requests)}.",
+                        )
+        report_progress(len(requests), len(requests), "Preview batch finished.")
+    finally:
+        for _, _, output in pending:
+            output.cleanup()
+    return {
+        "requested": len(requests),
+        "created": sum(bool(item.get("created")) for item in results),
+        "partial_completion_possible": True,
+        "results": results,
+    }
+
+
+def render_contact_sheet(
+    project_path: Path,
+    output_path: Path | None,
+    frames: list[int],
+    *,
+    columns: int,
+    cell_width: int,
+    overwrite: bool,
+) -> dict[str, object]:
+    """Render exact frames privately and atomically assemble one contact sheet."""
+
+    if not 1 <= len(frames) <= 64:
+        raise ToolError("frames must contain between 1 and 64 entries.")
+    if any(isinstance(frame, bool) or frame < 0 for frame in frames):
+        raise ToolError("Every frame must be a non-negative integer.")
+    if not 1 <= columns <= 8:
+        raise ToolError("columns must be between 1 and 8.")
+    if not 64 <= cell_width <= 1920:
+        raise ToolError("cell_width must be between 64 and 1920.")
+    managed_output = output_path is None
+    if managed_output:
+        output_path = managed_preview_path(project_path, "contact-sheet.png")
+        overwrite = True
+    assert output_path is not None
+    if output_path.suffix.lower() not in {".png", ".jpg", ".jpeg"}:
+        raise ToolError("A contact sheet output must be PNG or JPEG.")
+    enforce_project_resource_policy(project_path)
+    ffmpeg = require_executable(
+        discover_executables().ffmpeg, "ffmpeg", "SHOTCUT_FFMPEG_PATH"
+    )
+    output = OutputTransaction.prepare(
+        output_path, overwrite=overwrite, protected_paths=(project_path,)
+    )
+    rows = (len(frames) + columns - 1) // columns
+    progress_total = len(frames) + 1
+    report_progress(0, progress_total, "Starting contact sheet.")
+    try:
+        with tempfile.TemporaryDirectory(prefix="shotcut-mcp-sheet-") as directory:
+            temporary_dir = Path(directory)
+            _render_preview_frames(project_path, frames, temporary_dir)
+            report_progress(
+                len(frames), progress_total, "Contact-sheet frames rendered."
+            )
+            _assemble_stills(
+                ffmpeg,
+                temporary_dir / "frame-%06d.png",
+                output,
+                frame_count=len(frames),
+                columns=columns,
+                cell_width=cell_width,
+            )
+            output.commit()
+            report_progress(progress_total, progress_total, "Contact sheet assembled.")
+    finally:
+        output.cleanup()
+    return {
+        "created": True,
+        "path": str(output_path),
+        "size_bytes": output_path.stat().st_size,
+        "columns": columns,
+        "rows": rows,
+        "managed_output": managed_output,
+        "cells": [
+            {"cell_index": index, "frame": frame} for index, frame in enumerate(frames)
+        ],
+    }
+
+
+def _assemble_stills(
+    ffmpeg: Path,
+    input_pattern: Path,
+    output: OutputTransaction,
+    *,
+    frame_count: int,
+    columns: int,
+    cell_width: int,
+) -> None:
+    rows = (frame_count + columns - 1) // columns
+    codec = "png" if output.target.suffix.lower() == ".png" else "mjpeg"
+    result = run_capture(
+        [
+            str(ffmpeg),
+            "-v",
+            "error",
+            "-y",
+            "-framerate",
+            "1",
+            "-start_number",
+            "0",
+            "-i",
+            str(input_pattern),
+            "-vf",
+            (
+                f"scale={cell_width}:-2:flags=lanczos,"
+                f"tile={columns}x{rows}:nb_frames={frame_count}:padding=4:margin=4"
+            ),
+            "-frames:v",
+            "1",
+            "-c:v",
+            codec,
+            str(output.temporary),
+        ],
+        timeout=180,
+    )
+    if result.returncode or not output.temporary.is_file():
+        detail = (result.stderr.strip() or result.stdout.strip())[-2000:]
+        raise ToolError(
+            f"Failed to assemble contact sheet: {detail or 'no output'}",
+            code="contact_sheet_failed",
+            recommended_action="run_compatibility_diagnostics",
+            recommended_tool="shotcut_doctor",
+        )
+
+
+def render_media_contact_sheet(
+    candidates: list[tuple[str, Path]],
+    output_path: Path,
+    *,
+    columns: int = 4,
+    cell_width: int = 320,
+    overwrite: bool = False,
+) -> dict[str, object]:
+    """Build a visual candidate map without trying to render a broken project."""
+
+    if not 1 <= len(candidates) <= 64:
+        raise ToolError("A media contact sheet accepts between 1 and 64 candidates.")
+    if output_path.suffix.lower() not in {".png", ".jpg", ".jpeg"}:
+        raise ToolError("A contact sheet output must be PNG or JPEG.")
+    if not 1 <= columns <= 8 or not 64 <= cell_width <= 1920:
+        raise ToolError("Invalid contact-sheet grid dimensions.")
+    ffmpeg = require_executable(
+        discover_executables().ffmpeg, "ffmpeg", "SHOTCUT_FFMPEG_PATH"
+    )
+    output = OutputTransaction.prepare(
+        output_path,
+        overwrite=overwrite,
+        protected_paths=tuple(path for _, path in candidates),
+    )
+    cells: list[dict[str, object]] = []
+    skipped: list[dict[str, str]] = []
+    try:
+        with tempfile.TemporaryDirectory(
+            prefix="shotcut-mcp-media-sheet-"
+        ) as directory:
+            temporary_dir = Path(directory)
+            for candidate_id, media_path in candidates:
+                target = temporary_dir / f"frame-{len(cells):06d}.png"
+                result = run_capture(
+                    [
+                        str(ffmpeg),
+                        "-v",
+                        "error",
+                        "-y",
+                        "-ss",
+                        "0",
+                        "-i",
+                        str(media_path),
+                        "-frames:v",
+                        "1",
+                        "-vf",
+                        f"scale={cell_width}:-2:flags=lanczos",
+                        str(target),
+                    ],
+                    timeout=30,
+                    max_output_bytes=262_144,
+                )
+                if result.returncode or not target.is_file():
+                    skipped.append(
+                        {
+                            "candidate_id": candidate_id,
+                            "reason": (result.stderr.strip() or "no video frame")[
+                                -500:
+                            ],
+                        }
+                    )
+                    target.unlink(missing_ok=True)
+                    continue
+                cells.append(
+                    {
+                        "cell_index": len(cells),
+                        "candidate_id": candidate_id,
+                        "path": str(media_path),
+                    }
+                )
+            if not cells:
+                raise ToolError(
+                    "None of the candidates produced a visual frame.",
+                    code="no_visual_frame",
+                    recommended_action="probe_candidates_or_skip_visualization",
+                    recommended_tool="probe_media",
+                    details={
+                        "candidate_count": len(candidates),
+                        "skipped": skipped[:16],
+                    },
+                )
+            _assemble_stills(
+                ffmpeg,
+                temporary_dir / "frame-%06d.png",
+                output,
+                frame_count=len(cells),
+                columns=min(columns, len(cells)),
+                cell_width=cell_width,
+            )
+            output.commit()
+    finally:
+        output.cleanup()
+    return {
+        "created": True,
+        "path": str(output_path),
+        "size_bytes": output_path.stat().st_size,
+        "cells": cells,
+        "skipped": skipped,
+    }
+
+
+def _hardware_encoder_candidates() -> dict[str, list[str]]:
+    common = {
+        "h264": ["h264_nvenc", "h264_qsv"],
+        "hevc": ["hevc_nvenc", "hevc_qsv"],
+        "av1": ["av1_nvenc", "av1_qsv"],
+    }
+    if os.name == "nt":
+        common["h264"].extend(["h264_amf", "h264_mf", "h264_d3d12va"])
+        common["hevc"].extend(["hevc_amf", "hevc_mf", "hevc_d3d12va"])
+        common["av1"].extend(["av1_amf", "av1_mf", "av1_d3d12va"])
+    elif sys_platform() == "darwin":
+        common["h264"].append("h264_videotoolbox")
+        common["hevc"].append("hevc_videotoolbox")
+    else:
+        common["h264"].append("h264_vaapi")
+        common["hevc"].append("hevc_vaapi")
+        common["av1"].append("av1_vaapi")
+    return common
+
+
+def detect_hardware_encoders(refresh: object = False) -> dict[str, object]:
+    if not isinstance(refresh, bool):
+        raise ToolError("refresh must be a boolean.")
+    """Smoke-test OS-appropriate FFmpeg encoders without exposing probe files."""
+
+    ffmpeg = require_executable(
+        discover_executables().ffmpeg, "ffmpeg", "SHOTCUT_FFMPEG_PATH"
+    )
+    cache_key = (*runtime_identity(ffmpeg), sys_platform())
+    with _ENCODER_LOCK:
+        if not refresh and cache_key in _ENCODER_CACHE:
+            return _ENCODER_CACHE[cache_key]
+    listed = run_capture([str(ffmpeg), "-hide_banner", "-encoders"], timeout=30)
+    if listed.returncode:
+        diagnostic = (
+            listed.stderr.strip() or listed.stdout.strip() or "unknown error"
+        )[-1200:]
+        raise ToolError(
+            f"FFmpeg encoder discovery failed: {diagnostic}",
+            code="ffmpeg_capability_query_failed",
+            recommended_action="run_compatibility_diagnostics",
+            recommended_tool="shotcut_doctor",
+            details={
+                "query": "encoders",
+                "ffmpeg_path": str(ffmpeg),
+                "return_code": listed.returncode,
+                "diagnostic": diagnostic,
+            },
+        )
+    advertised = set(
+        re.findall(r"^\s*[A-Z.]{6}\s+([A-Za-z0-9_]+)\s", listed.stdout, re.M)
+    )
+    candidates: list[dict[str, object]] = []
+    suggestions: dict[str, dict[str, object]] = {}
+    software = {"h264": "libx264", "hevc": "libx265", "av1": "libsvtav1"}
+    with tempfile.TemporaryDirectory(prefix="shotcut-mcp-encoder-") as directory:
+        temporary_dir = Path(directory)
+        for codec, names in _hardware_encoder_candidates().items():
+            successful: list[str] = []
+            for name in names:
+                item: dict[str, object] = {
+                    "codec": codec,
+                    "encoder": name,
+                    "state": "not_built",
+                    "diagnostic": None,
+                }
+                if name in advertised:
+                    item["state"] = "advertised"
+                    output_path = temporary_dir / f"{name}.mp4"
+                    command = [
+                        str(ffmpeg),
+                        "-v",
+                        "error",
+                        "-y",
+                        "-f",
+                        "lavfi",
+                        "-i",
+                        "color=c=black:s=128x72:d=0.1",
+                    ]
+                    if name.endswith("_vaapi"):
+                        command.extend(["-vf", "format=nv12,hwupload"])
+                    command.extend(
+                        ["-frames:v", "1", "-an", "-c:v", name, str(output_path)]
+                    )
+                    try:
+                        probe = run_capture(
+                            command, timeout=15, max_output_bytes=262_144
+                        )
+                    except ToolError as exc:
+                        item["diagnostic"] = str(exc)[-1200:]
+                    else:
+                        if probe.returncode == 0 and output_path.is_file():
+                            item["state"] = "smoke_tested"
+                            successful.append(name)
+                        else:
+                            item["diagnostic"] = (
+                                probe.stderr.strip()
+                                or probe.stdout.strip()
+                                or "probe failed"
+                            )[-1200:]
+                    finally:
+                        output_path.unlink(missing_ok=True)
+                candidates.append(item)
+            suggestions[codec] = {
+                "verified_hardware": successful,
+                "recommended": successful[0] if successful else software[codec],
+                "software_fallback": software[codec],
+            }
+    result: dict[str, object] = {
+        "ffmpeg_path": str(ffmpeg),
+        "platform": sys_platform(),
+        "candidates": candidates,
+        "suggestions": suggestions,
+        "note": "Recommendations never replace an explicitly selected encoder.",
+    }
+    with _ENCODER_LOCK:
+        if len(_ENCODER_CACHE) > 16:
+            _ENCODER_CACHE.clear()
+        _ENCODER_CACHE[cache_key] = result
+    return result

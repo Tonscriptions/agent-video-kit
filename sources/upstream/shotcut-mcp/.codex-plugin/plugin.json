@@ -1,0 +1,43 @@
+{
+  "name": "shotcut-mcp",
+  "version": "1.5.6+codex.20260802032053",
+  "description": "Full transactional editor for Shotcut projects through a local MCP server.",
+  "author": {
+    "name": "matrodrigs"
+  },
+  "homepage": "https://github.com/matrodrigs/shotcut-mcp",
+  "repository": "https://github.com/matrodrigs/shotcut-mcp",
+  "license": "MIT",
+  "keywords": [
+    "shotcut",
+    "video",
+    "mlt",
+    "mcp"
+  ],
+  "mcpServers": {
+    "shotcut": {
+      "command": "python",
+      "args": [
+        "./scripts/shotcut_mcp_server.py"
+      ],
+      "cwd": "."
+    }
+  },
+  "interface": {
+    "displayName": "Shotcut MCP",
+    "shortDescription": "Edit complete Shotcut timelines with transactional safety.",
+    "longDescription": "Local Shotcut and MLT integration for source-quality analysis, creative multitrack editing, visual review, explicitly requested export, durable progress, backups, and delivery of rendered media with the exact editable project.",
+    "developerName": "matrodrigs",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Interactive"
+    ],
+    "defaultPrompt": [
+      "Check readiness and source quality; distinguish untested-version warnings from runtime failures and missing media.",
+      "Create a well-paced edit from my media. Choose cuts and transitions that fit my brief, then show a visual review.",
+      "Export this project as H.264, monitor the render, and deliver the video and exact editable project."
+    ]
+  }
+}

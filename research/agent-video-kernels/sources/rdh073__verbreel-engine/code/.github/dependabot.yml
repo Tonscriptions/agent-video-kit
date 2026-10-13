@@ -1,0 +1,54 @@
+version: 2
+updates:
+  # GitHub Actions — version drift on actions/checkout, dtolnay/rust-toolchain, etc.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+      - "ci"
+    groups:
+      gha-minor-patch:
+        update-types:
+          - minor
+          - patch
+
+  # Cargo — Rust workspace deps, Cargo.lock at root.
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+    labels:
+      - "dependencies"
+      - "rust"
+    ignore:
+      # rsmpeg pins the FFmpeg ABI by version: 0.14.x = ffmpeg6, 0.18.x =
+      # ffmpeg.8.0. The Phase-1 spike is deliberately on FFmpeg 6.x (Ubuntu
+      # 24.04 plain apt, no PPA/source build), and codec-native selects the
+      # `ffmpeg6` feature. Bumping past 0.14.x needs a CI FFmpeg-8 upgrade +
+      # codec-native API migration — its own slice, not an auto-merge.
+      # See closed PR #471. Re-allow once FFmpeg 8 migration is tracked.
+      - dependency-name: "rsmpeg"
+        versions: [">=0.15.0"]
+    # Group routine bumps so it's not 30 PRs/week.
+    # Major bumps stay separate (one PR each, easier to review).
+    groups:
+      cargo-minor-patch:
+        update-types:
+          - minor
+          - patch
+      cargo-dev-dependencies:
+        dependency-type: development

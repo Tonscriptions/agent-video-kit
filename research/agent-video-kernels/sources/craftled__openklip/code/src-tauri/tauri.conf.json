@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "OpenKlip",
+  "version": "0.44.3",
+  "identifier": "com.craftled.openklip",
+  "build": {
+    "frontendDist": "loading"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "OpenKlip",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 900,
+        "minHeight": 600,
+        "url": "index.html"
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "icon": ["icons/icon.png"],
+    "category": "Video",
+    "externalBin": ["binaries/bun"],
+    "resources": {
+      "resources/app": "app"
+    },
+    "macOS": {
+      "minimumSystemVersion": "12.0",
+      "hardenedRuntime": true,
+      "entitlements": "entitlements.plist"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/craftled/openklip/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE2OTA1OEQ4NjE2OTNENkUKUldSdVBXbGgyRmlRRmp1blAvMDZGelJWYlpuRzJwWURPYlBRYmtZdEJuUlRkTUcxR3U0bXNtckkK"
+    }
+  }
+}

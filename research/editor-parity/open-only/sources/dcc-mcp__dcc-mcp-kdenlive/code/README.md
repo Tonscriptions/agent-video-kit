@@ -1,0 +1,152 @@
+# DCC-MCP Kdenlive
+
+Agent tools for Kdenlive project files, installed effects and transitions, media,
+subtitles, and MLT rendering. Uses the DCC-MCP Core gateway, skill discovery,
+async jobs and shared DCC-CUA editor control.
+
+An experimental [native C++ bridge](docs/native-bridge.md) adds live timeline
+readback and undoable edits for a separately built, pinned Kdenlive host.
+The source overlay and protocol tests are included; stock installations do not
+expose this endpoint, and a full host binary has not yet been validated.
+
+<!-- dcc-mcp-coverage-pointer:start -->
+<!-- Generated from dcc-mcp-catalog.yml by scripts/generate_adapter_pointer.py in dcc-mcp/dcc-mcp-core. Do not edit by hand. -->
+## Part of the DCC-MCP host matrix
+
+**dcc-mcp-kdenlive** — Kdenlive adapter with 27 typed project, media, timeline, effect,
+catalog, export, interchange, native and setup tools, plus shared DCC-CUA editor
+control.
+
+It is one of **47 host adapters** in the DCC-MCP catalog. Every adapter speaks the same
+MCP protocol and builds on the same core runtime contract; each one exposes the tools
+its own host needs on top of that.
+
+- [All host adapters and install metadata](https://dcc-mcp.github.io/ecosystem)
+- [Host matrix on the core README](https://github.com/dcc-mcp/dcc-mcp-core#readme)
+- [Showcase](https://dcc-mcp.github.io/showcase)
+
+This block is generated from the catalog entry in
+[`dcc-mcp-catalog.yml`](https://github.com/dcc-mcp/dcc-mcp-core/blob/main/dcc-mcp-catalog.yml).
+Re-run the generator after changing the catalog.
+<!-- dcc-mcp-coverage-pointer:end -->
+
+## See a product video take shape
+
+![AI-generated Kdenlive interface illustration with headphone clips, an editing timeline, narration and music tracks, and a portrait product preview](docs/images/headphones-workflow-showcase.webp)
+
+*ImageGen interface reconstruction · workflow illustration.* A headphone video
+connects source clips, timeline edits, narration and the finished preview in one
+recognisable workspace. DCC-MCP provides project-file editing, media and subtitle
+tools, and MLT rendering; Skills package reusable methods for those tools.
+The image is a generated illustration, not a live recording or export evidence.
+[Image sources, attribution and the original Kdenlive screenshot](docs/showcase/README.md).
+
+## Install and run
+
+Follow the authoritative [installation and lifecycle runbook](install.md) for
+acquisition, integrity checks, setup, verification, upgrades and removal.
+
+Install the wheel from GitHub Releases (or `pip install .` from a checkout):
+
+```sh
+python -m pip install ./dcc_mcp_kdenlive-0.1.0-py3-none-any.whl
+dcc-mcp-kdenlive doctor
+dcc-mcp-kdenlive serve
+```
+
+The default service is standalone and chooses an available loopback port. It can
+edit files independently of the editor. For the existing editor's UI, supply both
+its exact PID and native window handle:
+
+```sh
+dcc-mcp-kdenlive serve --pid 1234 --hwnd 5678 --host-version 26.08.1
+dcc-mcp-cli list
+dcc-mcp-cli load-skill kdenlive-project --instance-id INSTANCE_ID
+```
+
+GUI binding uses the exact PID and window handle without assuming a window title;
+Kdenlive's title changes with the active project and profile.
+
+Discover the instance through the gateway and use search/describe/call with its
+returned tool slugs. The CLI prints its direct MCP URL as an alternative. Configure
+an MCP client with that HTTP URL or the machine's DCC-MCP gateway URL.
+
+Configuration:
+
+| Environment variable | Meaning |
+| --- | --- |
+| `DCC_MCP_KDENLIVE_EXECUTABLE` | Installed Kdenlive executable; also locates sibling MLT/FFmpeg programs |
+| `DCC_MCP_KDENLIVE_MELT` | Explicit MLT melt executable |
+| `DCC_MCP_KDENLIVE_FFPROBE` | Explicit FFprobe executable |
+| `DCC_MCP_KDENLIVE_FFMPEG` | Explicit FFmpeg executable |
+| `DCC_MCP_KDENLIVE_DATA` | Installed Kdenlive data directory |
+| `DCC_MCP_KDENLIVE_PORT` | Optional fixed instance port |
+
+No editor, plugins or model weights are downloaded implicitly. `doctor` reports
+missing programs; install Kdenlive from its official distribution when needed.
+
+## Agent capabilities
+
+Eight progressively loaded skill packages ship in the wheel:
+
+| Skill | Tools |
+| --- | --- |
+| `kdenlive-project` | Create, inspect, validate and set guides |
+| `kdenlive-media` | Import file/color/title producers and relink media |
+| `kdenlive-timeline` | Append with gaps, split, remove and ripple |
+| `kdenlive-effects` | Add/remove effects, keyframe parameters, compositions |
+| `kdenlive-catalog` | Query **installed** MLT services and native asset definitions |
+| `kdenlive-export` | Async MP4, WebM, ProRes MOV, WAV and single-frame RGBA PNG rendering |
+| `kdenlive-interchange` | FFprobe inspection and SRT subtitle authoring |
+| `kdenlive-setup` | Host and executable readiness |
+
+The catalog is dynamic: it exposes the effects/producers/transitions installed
+with the host, including their native parameter metadata. It does not assume all
+optional MLT plugins are available. Native MLT parameter values, including
+keyframe expressions, remain strings; discover each service before configuring it.
+
+Editor-only capabilities (multi-sequence editing, grouped/mixed clips, slip/slide,
+multicam, title designer, speech recognition, tracking/rotoscoping, proxies,
+recording, layouts and settings) use the existing `ui-control` skill. These are
+**UI routes, not claimed native APIs**. They depend on available controls and host
+features. See [coverage](docs/capabilities.md) and [live acceptance](docs/acceptance.md).
+
+Every document edit creates a **new file**. Existing outputs are never replaced.
+Use the inspection result's `sha256` as `expected_sha256` to fence edits against
+stale input. Source files remain unchanged; opening the new artifact and checking
+the editor is a separate operation. Grouped and nested timeline mutations reject
+with an editor-route instruction. File operations do not participate in editor Undo.
+
+## Render and recover
+
+Load `kdenlive-export`, describe `render_project`, then supply a new output path,
+preset, and explicit inclusive `start` / `end` frames. The core returns an async
+job ID. Poll `jobs_get_status` until terminal; `jobs_cancel` cooperatively stops
+and reaps the render child. The final file is published only after FFprobe finds
+streams. The four encoding presets are portable defaults; other native export
+configurations remain available through the editor.
+
+## Development and releases
+
+```sh
+python -m pip install -e '.[test]' ruff build twine
+python -m ruff check src tests tools
+python -m ruff format --check src tests tools
+python -m pytest -q
+python -m build
+python -m twine check dist/*
+python tools/build_artifacts.py
+```
+
+CI validates Linux and Windows, Python 3.7 native compatibility and current Python,
+wheel installation, MCP HTTP calls, and real Linux MLT rendering. Release Please
+manages versions and changelogs. Release artifacts include wheel, sdist, an agent
+skill ZIP, an install manifest and SHA-256 checksums with provenance attestation.
+See [release operations](docs/releases.md) for publishing and catalog onboarding.
+
+Portable-package and AVI media evidence is indexed in
+[validation snapshots](docs/validation/README.md); those files are point-in-time
+records that pin their own versions and are not the current suite result.
+
+Kdenlive is a KDE project. This adapter is independently maintained and is not
+endorsed by KDE. It does not bundle Kdenlive or MLT binaries.

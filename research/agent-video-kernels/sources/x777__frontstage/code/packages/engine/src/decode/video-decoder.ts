@@ -1,0 +1,228 @@
+import type { DemuxedTrack } from "../demux/mp4-demuxer.js";
+
+export function buildVideoChunks(track: DemuxedTrack, fileBytes: ArrayBuffer): EncodedVideoChunk[] {
+  const view = new Uint8Array(fileBytes);
+  return track.samples.map((s) =>
+    new EncodedVideoChunk({
+      type: s.isSync ? "key" : "delta",
+      timestamp: s.cts,
+      data: view.subarray(s.byteOffset, s.byteOffset + s.size),
+    }),
+  );
+}
+
+export interface EngineDecodeError { message: string; }
+
+interface KeyframeEntry { chunkIndex: number; micros: number; }
+
+export class VideoDecodeManager {
+  private decoder!: VideoDecoder;
+  private open = 0;
+  private keyframes: KeyframeEntry[] = [];
+  private err: EngineDecodeError | null = null;
+  private collected: VideoFrame[] = [];
+  private scrubTargetUs = 0;
+
+  // pump path
+  private mode: "scrub" | "pump" = "scrub";
+  private buffer: VideoFrame[] = [];
+  private cursor = 0;
+  private static AHEAD_MICROS = 500_000;
+  private static QUEUE_LIMIT = 8;
+
+  private constructor(private track: DemuxedTrack, private chunks: EncodedVideoChunk[]) {}
+
+  static async create(track: DemuxedTrack, chunks: EncodedVideoChunk[]): Promise<VideoDecodeManager> {
+    const m = new VideoDecodeManager(track, chunks);
+    m.keyframes = chunks
+      .map((c, i) => ({ c, i }))
+      .filter(({ c }) => c.type === "key")
+      .map(({ c, i }) => ({ chunkIndex: i, micros: c.timestamp }));
+    const config: VideoDecoderConfig = {
+      codec: track.codec,
+      codedWidth: track.codedWidth,
+      codedHeight: track.codedHeight,
+      ...(track.description ? { description: track.description } : {}),
+      optimizeForLatency: true,
+    };
+    const support = await VideoDecoder.isConfigSupported(config);
+    if (!support.supported) throw new Error(`EngineUnsupported: codec ${track.codec}`);
+    m.decoder = new VideoDecoder({
+      output: (f) => {
+        m.open++;
+        if (m.mode === "pump") {
+          m.buffer.push(f);
+        } else {
+          m.collected.push(f);
+          // Release superseded frames as we decode toward the target; holding the whole GOP
+          // alive exhausts the hardware decoder's output-surface pool and stalls flush().
+          m.pruneScrub();
+        }
+      },
+      error: (e: Error) => { m.err = { message: e.message }; },
+    });
+    m.decoder.configure(config);
+    return m;
+  }
+
+  private keyframeIndexBefore(targetUs: number): number {
+    let lo = 0, hi = this.keyframes.length - 1, ans = 0;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (this.keyframes[mid]!.micros <= targetUs) { ans = this.keyframes[mid]!.chunkIndex; lo = mid + 1; }
+      else hi = mid - 1;
+    }
+    return ans;
+  }
+
+  openFrameCount(): number { return this.open; }
+  lastError(): EngineDecodeError | undefined { return this.err ?? undefined; }
+  closeFrame(frame: VideoFrame): void { frame.close(); this.open--; }
+
+  async seekTo(targetUs: number): Promise<void> {
+    this.mode = "pump";
+    // Release held frames BEFORE flush — a saturated decoder output pool makes flush() hang.
+    for (const f of this.buffer) { f.close(); this.open--; }
+    this.buffer = [];
+    for (const f of this.collected) { f.close(); this.open--; }
+    this.collected = [];
+    await this.decoder.flush();
+    // flush() drains in-flight pre-seek decodes into the buffer — drop them so we start clean at
+    // the seek point (otherwise stale look-ahead frames hide the real seek target).
+    for (const f of this.buffer) { f.close(); this.open--; }
+    this.buffer = [];
+    for (const f of this.collected) { f.close(); this.open--; }
+    this.collected = [];
+    this.cursor = this.keyframeIndexBefore(targetUs);
+  }
+
+  // Decode forward until the target frame is buffered, so playback shows it on the first tick
+  // instead of an earlier frame (the resume/seek "jump"). Releases passed frames as it marches so
+  // a long GOP can't stall pump()'s look-ahead cap.
+  async primeTo(targetUs: number): Promise<void> {
+    this.mode = "pump";
+    for (let guard = 0; guard < 1000; guard++) {
+      if (this.cursor >= this.chunks.length) return;
+      if (this.buffer.length && this.buffer[this.buffer.length - 1]!.timestamp >= targetUs) return;
+      this.pump();
+      this.frameForMicros(targetUs);
+      await new Promise<void>((r) => setTimeout(r, 0));
+    }
+  }
+
+  pump(): void {
+    if (this.decoder.state !== "configured") return;
+    const ahead = this.buffer.length
+      ? this.buffer[this.buffer.length - 1]!.timestamp - this.buffer[0]!.timestamp
+      : 0;
+    let fed = 0;
+    while (
+      this.cursor < this.chunks.length &&
+      ahead < VideoDecodeManager.AHEAD_MICROS &&
+      this.decoder.decodeQueueSize < VideoDecodeManager.QUEUE_LIMIT &&
+      fed < VideoDecodeManager.QUEUE_LIMIT
+    ) {
+      this.decoder.decode(this.chunks[this.cursor]!);
+      this.cursor++;
+      fed++;
+    }
+  }
+
+  frameForMicros(targetUs: number): VideoFrame | undefined {
+    if (this.mode !== "pump") throw new Error("seekTo must be called before frameForMicros");
+    this.buffer.sort((a, b) => a.timestamp - b.timestamp);
+    let idx = -1;
+    for (let i = 0; i < this.buffer.length; i++) {
+      if (this.buffer[i]!.timestamp <= targetUs) idx = i;
+      else break;
+    }
+    // Target is before every buffered frame (e.g. the first frame's cts offset at startup):
+    // show the earliest available frame instead of dropping to a black skip.
+    if (idx < 0) return this.buffer.length > 0 ? this.buffer[0]! : undefined;
+    for (let i = 0; i < idx; i++) { this.buffer[i]!.close(); this.open--; }
+    this.buffer = this.buffer.slice(idx);
+    return this.buffer[0];
+  }
+
+  clearPumpBuffer(): void {
+    for (const f of this.buffer) { f.close(); this.open--; }
+    this.buffer = [];
+    this.cursor = 0;
+  }
+
+  bufferedCount(): number { return this.buffer.length; }
+
+  // Keep only the latest frame <= target plus the earliest frame > target (fallback); close the rest.
+  private pruneScrub(): void {
+    let best: VideoFrame | undefined;
+    let fallback: VideoFrame | undefined;
+    for (const f of this.collected) {
+      if (f.timestamp <= this.scrubTargetUs) {
+        if (!best || f.timestamp > best.timestamp) { if (best) { best.close(); this.open--; } best = f; }
+        else { f.close(); this.open--; }
+      } else {
+        if (!fallback || f.timestamp < fallback.timestamp) { if (fallback) { fallback.close(); this.open--; } fallback = f; }
+        else { f.close(); this.open--; }
+      }
+    }
+    this.collected = [];
+    if (best) this.collected.push(best);
+    if (fallback) this.collected.push(fallback);
+  }
+
+  async frameAtMicros(targetUs: number): Promise<VideoFrame> {
+    this.mode = "scrub";
+    this.scrubTargetUs = targetUs;
+    this.err = null;
+    // drop anything buffered from a previous call — both the scrub `collected` and the pump
+    // look-ahead `buffer`; leftover pump frames hold the decoder's output pool and stall flush().
+    for (const f of this.collected) { f.close(); this.open--; }
+    this.collected = [];
+    for (const f of this.buffer) { f.close(); this.open--; }
+    this.buffer = [];
+    const startIdx = this.keyframeIndexBefore(targetUs);
+    for (let i = startIdx; i < this.chunks.length; i++) {
+      this.decoder.decode(this.chunks[i]!);
+      if (this.chunks[i]!.timestamp >= targetUs) break;
+    }
+    await this.decoder.flush();
+    const capturedErr = this.err as EngineDecodeError | null;
+    if (capturedErr !== null) {
+      for (const f of this.collected) { try { f.close(); } catch (_e) { /* ignore */ } this.open--; }
+      this.collected = [];
+      throw new Error(`EngineDecode: ${capturedErr.message}`);
+    }
+    // pick closest <= target; fall back to earliest frame past target
+    let best: VideoFrame | undefined;
+    let fallback: VideoFrame | undefined;
+    for (const f of this.collected) {
+      if (f.timestamp <= targetUs) {
+        if (!best || f.timestamp > best.timestamp) {
+          if (best) { best.close(); this.open--; }
+          best = f;
+        } else { f.close(); this.open--; }
+      } else {
+        if (!fallback || f.timestamp < fallback.timestamp) {
+          if (fallback) { fallback.close(); this.open--; }
+          fallback = f;
+        } else { f.close(); this.open--; }
+      }
+    }
+    this.collected = [];
+    if (best) {
+      if (fallback) { fallback.close(); this.open--; }
+    } else {
+      best = fallback;
+    }
+    if (!best) throw new Error("no frame decoded");
+    return best; // decoder stays alive → frame GPU-backed → directly importable
+  }
+
+  dispose(): void {
+    for (const f of this.collected) { try { f.close(); this.open--; } catch { /* already closed */ } }
+    this.collected = [];
+    for (const f of this.buffer) { try { f.close(); this.open--; } catch { /* already closed */ } }
+    this.buffer = [];
+    if (this.decoder.state !== "closed") this.decoder.close();
+  }
+}

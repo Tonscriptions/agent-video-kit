@@ -1,0 +1,46 @@
+[package]
+name = "verbreel-http"
+description = "HTTP server — axum 0.8."
+version.workspace = true
+publish.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[lib]
+name = "verbreel_http"
+path = "src/lib.rs"
+
+[[bin]]
+name = "verbreel-http"
+path = "src/main.rs"
+
+[dependencies]
+verbreel-state = { path = "../verbreel-state" }
+verbreel-storage = { path = "../verbreel-storage" }
+verbreel-runtime = { path = "../verbreel-runtime", optional = true }
+tokio.workspace = true
+axum.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+
+[features]
+default = []
+native-render = [
+    "dep:verbreel-runtime",
+    "verbreel-runtime/native-render",
+]
+
+[dev-dependencies]
+# `Router::oneshot` integration tests collect response bodies with
+# `BodyExt::collect()` — that lives in `http-body-util`, which is a
+# direct dep of axum but is not re-exported from the public surface.
+http-body-util = "0.1"
+tower.workspace = true
+tempfile.workspace = true

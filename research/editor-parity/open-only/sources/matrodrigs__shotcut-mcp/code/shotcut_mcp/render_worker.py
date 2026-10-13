@@ -1,0 +1,348 @@
+"""Out-of-process supervisor that owns one Melt render until final promotion."""
+
+from __future__ import annotations
+
+import os
+import queue
+import re
+import subprocess
+import sys
+import threading
+import time
+from collections import deque
+from contextlib import suppress
+from typing import BinaryIO
+
+from .errors import ToolError
+from .platform import creation_flags, terminate_process
+from .render_jobs import (
+    TERMINAL_STATUSES,
+    RenderJob,
+    cancel_requested,
+    clear_control_files,
+    gate_path,
+    log_path,
+    read_job,
+    render_input_snapshot,
+    validate_job_id,
+    write_job,
+)
+from .storage import OutputTransaction
+
+MAX_LOG_BYTES = 512 * 1024
+MAX_PROGRESS_SAMPLES = 32
+MAX_PROGRESS_LINE_CHARS = 16 * 1024
+
+
+class _ProgressLines:
+    """Parse bounded Melt lines, discarding an oversized line through its delimiter."""
+
+    def __init__(self) -> None:
+        self.pending = ""
+        self.discarding = False
+
+    def feed(self, text: str) -> list[str]:
+        lines: list[str] = []
+        parts = re.split(r"[\r\n]", text)
+        for index, part in enumerate(parts):
+            if not self.discarding:
+                if len(self.pending) + len(part) > MAX_PROGRESS_LINE_CHARS:
+                    self.pending = ""
+                    self.discarding = True
+                else:
+                    self.pending += part
+            if index < len(parts) - 1:
+                if self.pending and not self.discarding:
+                    lines.append(self.pending)
+                self.pending = ""
+                self.discarding = False
+        return lines
+
+
+def _stop_renderer(process: subprocess.Popen[bytes]) -> None:
+    terminate_process(process, grace_seconds=5)
+
+
+def _command(metadata: RenderJob, output: OutputTransaction) -> list[str]:
+    properties = metadata.get("consumer_properties")
+    if not isinstance(properties, dict):
+        raise ValueError("Invalid consumer properties in render metadata.")
+    frame_range = []
+    if isinstance(metadata.get("in_frame"), int) and isinstance(
+        metadata.get("out_frame"), int
+    ):
+        frame_range = [
+            f"in={metadata['in_frame']}",
+            f"out={metadata['out_frame']}",
+        ]
+    return [
+        str(metadata["melt_path"]),
+        str(metadata["render_project_path"]),
+        *frame_range,
+        "-progress2",
+        "-consumer",
+        f"avformat:{output.temporary}",
+        "real_time=-1",
+        "terminate_on_pause=1",
+        *[f"{key}={value}" for key, value in properties.items()],
+    ]
+
+
+class _BoundedLog:
+    def __init__(self, path: str) -> None:
+        descriptor = os.open(path, os.O_CREAT | os.O_TRUNC | os.O_RDWR, 0o600)
+        self.handle: BinaryIO = os.fdopen(descriptor, "w+b", buffering=0)
+
+    def append(self, text: str) -> None:
+        self.handle.write(text.encode("utf-8", errors="replace"))
+        if self.handle.tell() <= MAX_LOG_BYTES:
+            return
+        keep = MAX_LOG_BYTES // 2
+        self.handle.seek(-keep, os.SEEK_END)
+        tail = self.handle.read()
+        self.handle.seek(0)
+        self.handle.truncate()
+        self.handle.write(b"[earlier render log truncated]\n" + tail)
+
+    def close(self) -> None:
+        self.handle.close()
+
+
+def _read_chunks(stream: BinaryIO, messages: queue.Queue[bytes | None]) -> None:
+    try:
+        for chunk in iter(lambda: stream.read(8192), b""):
+            messages.put(chunk)
+    finally:
+        messages.put(None)
+
+
+def _observe_progress(metadata: RenderJob, line: str) -> bool:
+    percent_match = re.search(
+        r"(?:percentage|percent|progress)\s*[:=]\s*(\d{1,3})", line, re.I
+    )
+    frame_match = re.search(r"(?:current\s+)?frame\s*[:=]\s*(\d+)", line, re.I)
+    if not percent_match and not frame_match:
+        return False
+    changed = False
+    if percent_match:
+        percent = min(100, int(percent_match.group(1)))
+        if metadata.get("progress_percent") != percent:
+            metadata["progress_percent"] = percent
+            changed = True
+    if frame_match:
+        frame = int(frame_match.group(1))
+        if metadata.get("current_frame") != frame:
+            metadata["current_frame"] = frame
+            changed = True
+    if changed:
+        total_frames = metadata.get("total_frames")
+        progress_value = metadata.get("progress_percent")
+        if isinstance(total_frames, int) and isinstance(progress_value, int):
+            metadata["frames_completed"] = min(
+                total_frames, round(total_frames * progress_value / 100)
+            )
+        now = time.time()
+        samples = deque(
+            metadata.get("progress_samples") or [], maxlen=MAX_PROGRESS_SAMPLES
+        )
+        samples.append(
+            {
+                "at": now,
+                "percent": metadata.get("progress_percent"),
+                "frame": metadata.get("current_frame"),
+            }
+        )
+        metadata["progress_samples"] = list(samples)
+        metadata["updated_at"] = now
+    return changed
+
+
+def run_worker(job_id: str) -> int:
+    validate_job_id(job_id)
+    deadline = time.monotonic() + 5
+    while not gate_path(job_id).is_file() and time.monotonic() < deadline:
+        if cancel_requested(job_id):
+            break
+        time.sleep(0.05)
+
+    metadata = read_job(job_id)
+    output = OutputTransaction.deserialize(metadata.get("output_transaction"))
+    snapshot = render_input_snapshot(metadata)
+    snapshot.require_exact()
+    metadata.update({"worker_pid": os.getpid(), "status": "running"})
+    write_job(metadata)
+    process: subprocess.Popen[bytes] | None = None
+    try:
+        if cancel_requested(job_id):
+            metadata.update(
+                {"status": "cancelled", "return_code": None, "finished_at": time.time()}
+            )
+            output.cleanup()
+            snapshot.cleanup_if_owned()
+            write_job(metadata)
+            return 0
+
+        path = log_path(job_id)
+        log = _BoundedLog(str(path))
+        try:
+            process = subprocess.Popen(
+                _command(metadata, output),
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                creationflags=creation_flags(),
+                start_new_session=os.name != "nt",
+            )
+            metadata.update({"renderer_pid": process.pid, "status": "running"})
+            write_job(metadata)
+            messages: queue.Queue[bytes | None] = queue.Queue(maxsize=128)
+            reader = threading.Thread(
+                target=_read_chunks, args=(process.stdout, messages), daemon=True
+            )
+            reader.start()
+            reader_finished = False
+            progress_lines = _ProgressLines()
+            last_write = time.monotonic()
+            while process.poll() is None or not reader_finished:
+                if cancel_requested(job_id):
+                    _stop_renderer(process)
+                try:
+                    chunk = messages.get(timeout=0.1)
+                except queue.Empty:
+                    chunk = (
+                        None
+                        if process.poll() is not None and not reader.is_alive()
+                        else b""
+                    )
+                if chunk is None:
+                    reader_finished = True
+                elif chunk:
+                    text = chunk.decode("utf-8", errors="replace")
+                    log.append(text)
+                    for line in progress_lines.feed(text):
+                        _observe_progress(metadata, line)
+                if time.monotonic() - last_write >= 0.5:
+                    metadata["updated_at"] = time.time()
+                    write_job(metadata)
+                    last_write = time.monotonic()
+            reader.join(timeout=1)
+            for line in progress_lines.feed("\n"):
+                _observe_progress(metadata, line)
+            process.wait()
+        finally:
+            log.close()
+
+        return_code = process.returncode
+        finished_at = time.time()
+        started_at = float(metadata.get("started_at") or finished_at)
+        elapsed = max(0.0, finished_at - started_at)
+        current_frame = metadata.get("current_frame")
+        rendered_frames = metadata.get("frames_completed")
+        if metadata.get("total_frames") is not None and return_code == 0:
+            rendered_frames = metadata.get("total_frames")
+        metadata.update(
+            {
+                "return_code": return_code,
+                "finished_at": finished_at,
+                "updated_at": finished_at,
+                "elapsed_seconds": elapsed,
+                "average_fps": rendered_frames / elapsed
+                if isinstance(rendered_frames, int)
+                and rendered_frames > 0
+                and elapsed > 0
+                else current_frame / elapsed
+                if isinstance(current_frame, int) and current_frame > 0 and elapsed > 0
+                else None,
+                "frames_completed": rendered_frames,
+            }
+        )
+        if cancel_requested(job_id):
+            metadata["status"] = "cancelled"
+            output.cleanup()
+            snapshot.cleanup_if_owned()
+        elif return_code != 0 or not output.temporary.is_file():
+            metadata["status"] = "failed"
+            metadata["status_note"] = (
+                f"Melt exited with code {return_code}; no output was promoted."
+            )
+            output.cleanup()
+            snapshot.cleanup_if_owned()
+        else:
+            snapshot.require_exact()
+            try:
+                output.commit()
+            except (OSError, ToolError) as exc:
+                metadata["status"] = "promotion_failed"
+                metadata["status_note"] = (
+                    "Rendering completed, but atomic promotion failed; the temporary "
+                    f"file was retained at {output.temporary}: {exc}"
+                )
+            else:
+                metadata["status"] = "completed"
+                metadata["progress_percent"] = 100
+                metadata["output_size_bytes"] = output.target.stat().st_size
+                metadata["editable_project_size_bytes"] = snapshot.path.stat().st_size
+                metadata["editable_project_verified"] = True
+        write_job(metadata)
+        return 0 if metadata["status"] == "completed" else 1
+    except Exception as exc:
+        if process is not None:
+            _stop_renderer(process)
+        output.cleanup()
+        snapshot.cleanup_if_owned()
+        metadata.update(
+            {
+                "status": "failed",
+                "status_note": f"Render supervisor failed: {exc}",
+                "finished_at": time.time(),
+            }
+        )
+        write_job(metadata)
+        return 1
+    finally:
+        if process is not None and process.stdout is not None:
+            process.stdout.close()
+        clear_control_files(job_id)
+
+
+def _record_unhandled_failure(job_id: str, exc: Exception) -> None:
+    """Best-effort terminal state for failures before run_worker owns the job."""
+
+    try:
+        metadata = read_job(job_id)
+    except (OSError, ToolError):
+        return
+    if metadata.get("status") in TERMINAL_STATUSES:
+        return
+    with suppress(OSError, ToolError, TypeError, ValueError):
+        OutputTransaction.deserialize(metadata.get("output_transaction")).cleanup()
+    with suppress(OSError, ToolError, TypeError, ValueError):
+        render_input_snapshot(metadata).cleanup_if_owned()
+    now = time.time()
+    metadata.update(
+        {
+            "status": "failed",
+            "status_note": f"Render supervisor failed before initialization: {exc}",
+            "finished_at": now,
+            "updated_at": now,
+        }
+    )
+    with suppress(OSError, ToolError, TypeError, ValueError):
+        write_job(metadata)
+
+
+def main() -> int:
+    if len(sys.argv) != 2:
+        return 2
+    job_id = sys.argv[1]
+    try:
+        return run_worker(job_id)
+    except Exception as exc:
+        _record_unhandled_failure(job_id, exc)
+        with suppress(OSError, ToolError):
+            clear_control_files(job_id)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

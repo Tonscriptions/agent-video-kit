@@ -1,0 +1,463 @@
+import { describe, it, expect } from "vitest";
+import type { Clip } from "../clip.js";
+import type { Timeline, Track } from "../timeline.js";
+import type { MediaManifestEntry } from "../media.js";
+import { clearRegion, validateShiftsForTrack, rippleDeleteSelectedClips, rippleDeleteRangesOnTrack, rippleDeleteRanges, rippleDeleteGap, trimValues, rippleTrimDurationDelta, syncLockedLeftRoom, planRippleTrim, rippleTrimClip, rippleTrimClipCommand, rippleInsertClips, rippleInsertClipsSpecs, resolvePlacement } from "./ripple-commands.js";
+import { EditorStore } from "./editor-store.js";
+import { trimClipCommand } from "./timeline-commands.js";
+
+export function clip(id: string, startFrame: number, durationFrames: number, over: Partial<Clip> = {}): Clip {
+  return {
+    id, mediaRef: "m", mediaType: "video", sourceClipType: "video",
+    startFrame, durationFrames, trimStartFrame: 0, trimEndFrame: 0,
+    speed: 1, volume: 1, fadeInFrames: 0, fadeOutFrames: 0,
+    fadeInInterpolation: "linear", fadeOutInterpolation: "linear", opacity: 1,
+    transform: { centerX: 0.5, centerY: 0.5, width: 1, height: 1, rotation: 0, flipHorizontal: false, flipVertical: false },
+    crop: { top: 0, bottom: 0, left: 0, right: 0 }, ...over,
+  };
+}
+export function track(id: string, clips: Clip[], over: Partial<Track> = {}): Track {
+  return { id, type: "video", muted: false, hidden: false, syncLocked: false, clips, ...over };
+}
+export function timeline(tracks: Track[]): Timeline {
+  return { fps: 30, width: 1920, height: 1080, settingsConfigured: true, tracks };
+}
+
+describe("clearRegion", () => {
+  it("removes a clip fully inside the region", () => {
+    const tl = timeline([track("t", [clip("a", 10, 10)])]); // [10,20) inside [0,40)
+    const next = clearRegion(tl, 0, 0, 40);
+    expect(next.tracks[0]!.clips).toHaveLength(0);
+  });
+  it("trims a clip overlapping the region head", () => {
+    const tl = timeline([track("t", [clip("a", 0, 30)])]); // [0,30); clear [0,10)
+    const v = clearRegion(tl, 0, 0, 10).tracks[0]!.clips[0]!;
+    expect(v.startFrame).toBeGreaterThanOrEqual(10);
+  });
+});
+
+describe("validateShiftsForTrack", () => {
+  it("returns null for a valid shift and a message (with track id) for a collision", () => {
+    const t = track("vt", [clip("a", 0, 20), clip("b", 100, 10)]);
+    expect(validateShiftsForTrack(t, [{ clipId: "b", newStartFrame: 50 }])).toBeNull();
+    const err = validateShiftsForTrack(t, [{ clipId: "b", newStartFrame: 10 }]); // overlaps a
+    expect(err).toContain("vt");
+  });
+});
+
+describe("rippleDeleteSelectedClips", () => {
+  it("removes a selected clip and ripples later clips left on its track", () => {
+    const tl = timeline([track("t", [clip("a", 0, 40), clip("b", 40, 10)])]);
+    const out = rippleDeleteSelectedClips(tl, new Set(["a"]));
+    expect("timeline" in out).toBe(true);
+    const clips = (out as { timeline: Timeline }).timeline.tracks[0]!.clips;
+    expect(clips.map((c) => c.id)).toEqual(["b"]);
+    expect(clips[0]!.startFrame).toBe(0); // b shifted from 40 -> 0 (closed the 40-frame gap)
+  });
+
+  it("shifts a sync-locked follower track by the removed gap", () => {
+    const tl = timeline([
+      track("v", [clip("a", 0, 40), clip("keep", 40, 10)]),
+      track("a", [clip("x", 60, 10)], { type: "audio", syncLocked: true }),
+    ]);
+    const out = rippleDeleteSelectedClips(tl, new Set(["a"])) as { timeline: Timeline };
+    // audio clip x (start 60) is after the removed range [0,40) -> shifts left 40 -> 20
+    expect(out.timeline.tracks[1]!.clips[0]!.startFrame).toBe(20);
+  });
+
+  it("refuses when a sync-locked follower would collide", () => {
+    const tl = timeline([
+      track("v", [clip("a", 0, 40), clip("keep", 40, 10)]),
+      track("a", [clip("x", 0, 30), clip("y", 60, 10)], { type: "audio", syncLocked: true }),
+    ]);
+    // shifting y left 40 -> 20 would overlap x ([0,30)) -> refuse
+    const out = rippleDeleteSelectedClips(tl, new Set(["a"]));
+    expect("refused" in out).toBe(true);
+  });
+
+  it("no-op (same timeline) for an empty selection", () => {
+    const tl = timeline([track("t", [clip("a", 0, 10)])]);
+    expect((rippleDeleteSelectedClips(tl, new Set()) as { timeline: Timeline }).timeline).toBe(tl);
+  });
+});
+
+describe("rippleDeleteRangesOnTrack", () => {
+  it("clears a mid-clip range and ripples the tail left, returning a report", () => {
+    const tl = timeline([track("t", [clip("a", 0, 100)])]); // remove [40,60)
+    const out = rippleDeleteRangesOnTrack(tl, 0, [{ start: 40, end: 60 }]);
+    expect(out.kind).toBe("ok");
+    if (out.kind !== "ok") return;
+    expect(out.report.removedFrames).toBe(20);
+    expect(out.report.anchorTrackIndex).toBe(0);
+    // a split into [0,40) + a tail that shifted left by 20 to start at 40
+    const fragments = out.report.resultingFragments;
+    expect(fragments.length).toBe(2);
+    expect(fragments[0]!.startFrame).toBe(0);
+    expect(fragments[1]!.startFrame).toBe(40);
+  });
+
+  it("follows a linked partner onto its track and clears+shifts it too", () => {
+    const tl = timeline([
+      track("v", [clip("a", 0, 100, { linkGroupId: "g" })]),
+      track("a", [clip("b", 0, 100, { linkGroupId: "g" })], { type: "audio" }),
+    ]);
+    const out = rippleDeleteRangesOnTrack(tl, 0, [{ start: 40, end: 60 }]);
+    expect(out.kind).toBe("ok");
+    if (out.kind !== "ok") return;
+    expect(out.report.clearedTracks).toBe(2); // anchor + linked audio
+    // both tracks have a [0,40) head and a tail starting at 40
+    expect(out.timeline.tracks[1]!.clips.map((c) => c.startFrame).sort((x, y) => x - y)).toEqual([0, 40]);
+  });
+
+  it("cuts a sync-locked follower's matching span even without a shift collision", () => {
+    // Master audio spanning the same range as the anchor video gets the cut, not just a shift.
+    const tl = timeline([
+      track("v", [clip("a", 0, 100)]),
+      track("aud", [clip("x", 0, 100)], { type: "audio", syncLocked: true }),
+    ]);
+    const out = rippleDeleteRangesOnTrack(tl, 0, [{ start: 40, end: 50 }]);
+    expect(out.kind).toBe("ok");
+    if (out.kind !== "ok") return;
+    expect(out.report.clearedTracks).toBe(2);
+    const spans = (t: Timeline["tracks"][number]) =>
+      t.clips.slice().sort((a, b) => a.startFrame - b.startFrame).map((c) => [c.startFrame, c.startFrame + c.durationFrames]);
+    expect(spans(out.timeline.tracks[0]!)).toEqual([[0, 40], [40, 90]]);
+    expect(spans(out.timeline.tracks[1]!)).toEqual([[0, 40], [40, 90]]);
+  });
+
+  it("sync-locked follower is cut, avoiding the shift collision", () => {
+    const tl = timeline([
+      track("v", [clip("a", 0, 100)]),
+      track("a", [clip("x", 0, 50), clip("y", 70, 10)], { type: "audio", syncLocked: true }),
+    ]);
+    // y shifting 70 -> 30 would overlap x [0,50) — but x is now cleared by the deleted range too,
+    // trimming it to [0,30) so the shift lands adjacent instead of colliding.
+    const out = rippleDeleteRangesOnTrack(tl, 0, [{ start: 30, end: 70 }]);
+    expect(out.kind).toBe("ok");
+    if (out.kind !== "ok") return;
+    const follower = out.timeline.tracks[1]!.clips.slice().sort((a, b) => a.startFrame - b.startFrame);
+    expect(follower.map((c) => [c.startFrame, c.startFrame + c.durationFrames])).toEqual([
+      [0, 30], // x: tail inside [30,70) removed
+      [30, 40], // y: shifted left 40 to close the gap, now adjacent to x
+    ]);
+  });
+
+  it("ignoreSyncLockTrackIndices skips that track entirely", () => {
+    const tl = timeline([
+      track("v", [clip("a", 0, 100)]),
+      track("a", [clip("x", 0, 50), clip("y", 70, 10)], { type: "audio", syncLocked: true }),
+    ]);
+    const out = rippleDeleteRangesOnTrack(tl, 0, [{ start: 30, end: 70 }], new Set([1]));
+    expect(out.kind).toBe("ok"); // track 1 ignored -> no refusal, and it is not shifted
+    if (out.kind !== "ok") return;
+    expect(out.timeline.tracks[1]!.clips.map((c) => c.startFrame)).toEqual([0, 70]); // unchanged
+  });
+});
+
+describe("rippleDeleteRanges", () => {
+  it("resolves the anchor clip's track", () => {
+    const tl = timeline([track("t1", []), track("t2", [clip("a", 0, 100)])]);
+    const out = rippleDeleteRanges(tl, "a", [{ start: 40, end: 60 }]);
+    expect(out.kind).toBe("ok");
+    if (out.kind === "ok") expect(out.report.anchorTrackIndex).toBe(1);
+  });
+  it("refuses for an unknown anchor clip", () => {
+    const tl = timeline([track("t", [clip("a", 0, 100)])]);
+    expect(rippleDeleteRanges(tl, "missing", [{ start: 0, end: 10 }]).kind).toBe("refused");
+  });
+});
+
+describe("rippleDeleteGap", () => {
+  it("closes an empty gap on its track", () => {
+    // clip a [0,10), gap [10,30), clip b [30,10)
+    const tl = timeline([track("t", [clip("a", 0, 10), clip("b", 30, 10)])]);
+    const out = rippleDeleteGap(tl, { trackIndex: 0, range: { start: 10, end: 30 } });
+    expect("timeline" in out).toBe(true);
+    const clips = (out as { timeline: Timeline }).timeline.tracks[0]!.clips;
+    expect(clips.find((c) => c.id === "b")!.startFrame).toBe(10); // b 30 -> 10
+  });
+
+  it("returns { stale: true } when a clip now overlaps the gap", () => {
+    const tl = timeline([track("t", [clip("a", 0, 40)])]); // a covers [0,40)
+    const out = rippleDeleteGap(tl, { trackIndex: 0, range: { start: 10, end: 30 } });
+    expect(out).toEqual({ stale: true });
+  });
+
+  it("refuses when a sync-locked follower would collide", () => {
+    const tl = timeline([
+      track("v", [clip("a", 0, 10), clip("b", 30, 10)]),
+      track("audio", [clip("x", 0, 25), clip("y", 30, 10)], { type: "audio", syncLocked: true }),
+    ]);
+    // closing gap [10,30) shifts y (30) left 20 -> 10, overlapping x [0,25) -> refuse
+    expect("refused" in rippleDeleteGap(tl, { trackIndex: 0, range: { start: 10, end: 30 } })).toBe(true);
+  });
+});
+
+describe("trimValues", () => {
+  it("right-edge growth consumes tail source, clamped at 0 for sourced clips", () => {
+    const c = clip("a", 0, 30, { trimStartFrame: 0, trimEndFrame: 5, speed: 1 });
+    // grow right by +5 -> newEnd = 5 - 5 = 0
+    expect(trimValues(c, "right", 5)).toEqual({ trimStart: 0, trimEnd: 0 });
+    // grow right by +10 -> newEnd = 5 - 10 = -5 -> clamp 0 (no more source)
+    expect(trimValues(c, "right", 10)).toEqual({ trimStart: 0, trimEnd: 0 });
+  });
+  it("left-edge trim advances source start; image is unbounded", () => {
+    const v = clip("v", 10, 30, { trimStartFrame: 0, mediaType: "video" });
+    expect(trimValues(v, "left", 5).trimStart).toBe(5); // 0 + round(5*1)
+    const v2 = clip("v", 10, 30, { trimStartFrame: 0, mediaType: "video" });
+    expect(trimValues(v2, "left", -3).trimStart).toBe(0); // -3 clamped to 0
+    const img = clip("i", 10, 30, { trimStartFrame: 0, mediaType: "image" });
+    expect(trimValues(img, "left", -3).trimStart).toBe(-3); // unbounded
+  });
+});
+
+describe("rippleTrimDurationDelta", () => {
+  it("returns the realised timeline-duration delta after the source clamp", () => {
+    const c = clip("a", 0, 30, { trimStartFrame: 0, trimEndFrame: 5, speed: 1 });
+    expect(rippleTrimDurationDelta(c, "right", 5)).toBe(5);  // full +5 available
+    expect(rippleTrimDurationDelta(c, "right", 10)).toBe(5); // clamped to the 5 frames of tail source
+  });
+});
+
+describe("syncLockedLeftRoom", () => {
+  it("room is the gap between the previous clip end and the first clip at/after insertFrame", () => {
+    const t = track("t", [clip("a", 0, 20), clip("b", 50, 10)]);
+    expect(syncLockedLeftRoom(t, 50)).toEqual({ room: 30, obstacle: 20 }); // b at 50, prev end 20
+  });
+  it("returns null when no clip is at/after insertFrame", () => {
+    const t = track("t", [clip("a", 0, 20)]);
+    expect(syncLockedLeftRoom(t, 50)).toBeNull();
+  });
+});
+
+function entry(id: string, durationSec: number): MediaManifestEntry {
+  return { id, name: id, type: "video", source: { kind: "project", relativePath: `media/${id}.mp4` }, duration: durationSec };
+}
+
+describe("rippleInsertClips (assets)", () => {
+  it("pushes the target track right and drops the new clip into the gap", () => {
+    // existing clip at frame 0, dur 30; insert a 30-frame (1s @30fps) clip at frame 0
+    const tl = timeline([track("t", [clip("old", 0, 30)])]);
+    const out = rippleInsertClips(tl, [entry("new", 1)], 0, 0, 30, (() => { let i = 0; return () => `id${i++}`; })());
+    const clips = out.timeline.tracks[0]!.clips.slice().sort((a, b) => a.startFrame - b.startFrame);
+    // old pushed from 0 -> 30; new clip occupies [0,30)
+    expect(clips.find((c) => c.id === "old")!.startFrame).toBe(30);
+    expect(clips.some((c) => c.startFrame === 0 && c.mediaType === "video")).toBe(true);
+  });
+
+  it("pushes a sync-locked track too", () => {
+    const tl = timeline([
+      track("v", [clip("old", 0, 30)]),
+      track("audio", [clip("x", 0, 10)], { type: "audio", syncLocked: true }),
+    ]);
+    const out = rippleInsertClips(tl, [entry("new", 1)], 0, 0, 30, (() => { let i = 0; return () => `id${i++}`; })());
+    expect(out.timeline.tracks[1]!.clips.find((c) => c.id === "x")!.startFrame).toBe(30); // synced push
+  });
+
+  it("no-op for an out-of-range track index", () => {
+    const tl = timeline([track("t", [clip("a", 0, 10)])]);
+    expect(rippleInsertClips(tl, [entry("new", 1)], 9, 0, 30).timeline).toBe(tl);
+  });
+});
+
+describe("planRippleTrim + rippleTrimClip", () => {
+  it("right-trim shrinks the clip and ripples later clips left", () => {
+    // a [0,30) trimStart 0 trimEnd 10 (10 frames of tail source), b [30,10)
+    const tl = timeline([track("t", [clip("a", 0, 30, { trimEndFrame: 10 }), clip("b", 30, 10)])]);
+    const next = rippleTrimClip(tl, "a", "right", -10, false); // shrink right by 10
+    const a = next.tracks[0]!.clips.find((c) => c.id === "a")!;
+    const b = next.tracks[0]!.clips.find((c) => c.id === "b")!;
+    expect(a.durationFrames).toBe(20); // 30 - 10
+    expect(b.startFrame).toBe(20);     // rippled left by 10
+  });
+
+  it("clamps a shrink to a sync-locked follower's available room", () => {
+    // a's right edge (insertFrame) is 30; follower has x [0,10) and y [40,10).
+    const tl = timeline([
+      track("v", [clip("a", 0, 30, { trimEndFrame: 30 })]),
+      track("audio", [clip("x", 0, 10), clip("y", 40, 10)], { type: "audio", syncLocked: true }),
+    ]);
+    const plan = planRippleTrim(tl, "a", "right", -100, false); // try to shrink by 100
+    expect(plan).not.toBeNull();
+    // follower room at insertFrame 30: first clip >= 30 is y(40), prevEnd = x end 10 -> room 30
+    expect(plan!.durationDelta).toBe(-30); // clamped to -room
+    expect(plan!.blockedAtFrame).toBe(10);
+  });
+
+  it("returns the timeline unchanged for a zero delta", () => {
+    const tl = timeline([track("t", [clip("a", 0, 30)])]);
+    expect(rippleTrimClip(tl, "a", "right", 0, false)).toBe(tl);
+  });
+
+  it("left ripple keeps the start edge and grows duration to the right", () => {
+    const tl = timeline([track("t", [clip("c1", 0, 100, { trimStartFrame: 30 }), clip("c2", 100, 50)])]);
+    const next = rippleTrimClip(tl, "c1", "left", -20, false);
+    const c1 = next.tracks[0]!.clips.find((c) => c.id === "c1")!;
+    const c2 = next.tracks[0]!.clips.find((c) => c.id === "c2")!;
+    expect(c1.startFrame).toBe(0);
+    expect(c1.durationFrames).toBe(120);
+    expect(c1.trimStartFrame).toBe(10);
+    expect(c2.startFrame).toBe(120);
+  });
+
+  it("linked partner ripples in sync when propagateToLinked is true", () => {
+    const v1 = clip("v1", 0, 100, { trimEndFrame: 50, linkGroupId: "g" });
+    const a1 = clip("a1", 0, 100, { mediaType: "audio", sourceClipType: "audio", trimEndFrame: 50, linkGroupId: "g" });
+    const tl = timeline([
+      track("v", [v1, clip("v2", 100, 50)]),
+      track("a", [a1, clip("a2", 100, 50, { mediaType: "audio", sourceClipType: "audio" })], { type: "audio" }),
+    ]);
+    const next = rippleTrimClip(tl, "v1", "right", 20, true);
+    expect(next.tracks[0]!.clips.find((c) => c.id === "v1")!.durationFrames).toBe(120);
+    expect(next.tracks[1]!.clips.find((c) => c.id === "a1")!.durationFrames).toBe(120);
+    expect(next.tracks[0]!.clips.find((c) => c.id === "v2")!.startFrame).toBe(120);
+    expect(next.tracks[1]!.clips.find((c) => c.id === "a2")!.startFrame).toBe(120);
+  });
+
+  it("linked extend clamps to the most constrained partner", () => {
+    const v1 = clip("v1", 0, 100, { trimEndFrame: 50, linkGroupId: "g" });
+    const a1 = clip("a1", 0, 100, { mediaType: "audio", sourceClipType: "audio", trimEndFrame: 10, linkGroupId: "g" });
+    const tl = timeline([
+      track("v", [v1, clip("v2", 100, 50)]),
+      track("a", [a1, clip("a2", 100, 50, { mediaType: "audio" })], { type: "audio" }),
+    ]);
+    const next = rippleTrimClip(tl, "v1", "right", 20, true);
+    expect(next.tracks[0]!.clips.find((c) => c.id === "v1")!.durationFrames).toBe(110);
+    expect(next.tracks[1]!.clips.find((c) => c.id === "a1")!.durationFrames).toBe(110);
+    expect(next.tracks[0]!.clips.find((c) => c.id === "v2")!.startFrame).toBe(110);
+  });
+
+  it("shrink clamps so a clip never reaches zero duration", () => {
+    const tl = timeline([track("t", [clip("c1", 0, 10, { trimEndFrame: 50 })])]);
+    const next = rippleTrimClip(tl, "c1", "right", -100, false);
+    expect(next.tracks[0]!.clips.find((c) => c.id === "c1")!.durationFrames).toBe(1);
+  });
+});
+
+describe("rippleTrimClipCommand", () => {
+  it("applies the same outcome as rippleTrimClip, ripping downstream clips left", () => {
+    const tl = timeline([track("t", [clip("a", 0, 30, { trimEndFrame: 10 }), clip("b", 30, 10)])]);
+    const next = rippleTrimClipCommand("a", "right", -10, false).apply(tl);
+    expect(next.tracks[0]!.clips.find((c) => c.id === "b")!.startFrame).toBe(20);
+  });
+
+  it("coalesces a shift-drag sequence (per-tick incremental deltas) into one undo step", () => {
+    // Each dispatch's delta is "how much more" since the last tick — the store applies commands
+    // against its live (already-mutated) state, so a caller must pass the increment, not the
+    // absolute offset from drag-start (same convention as moveClipCommand's absolute-position args).
+    const tl = timeline([track("t", [clip("a", 0, 30, { trimEndFrame: 30 }), clip("b", 30, 10)])]);
+    const store = new EditorStore(tl);
+    store.dispatch(rippleTrimClipCommand("a", "right", 5, false, "trim-a"));
+    store.dispatch(rippleTrimClipCommand("a", "right", 5, false, "trim-a"));
+    store.dispatch(rippleTrimClipCommand("a", "right", 10, false, "trim-a"));
+    expect(store.getSnapshot().timeline.tracks[0]!.clips.find((c) => c.id === "a")!.durationFrames).toBe(50);
+    expect(store.getSnapshot().timeline.tracks[0]!.clips.find((c) => c.id === "b")!.startFrame).toBe(50); // rippled
+    expect(store.canUndo()).toBe(true);
+    store.undo();
+    expect(store.getSnapshot().timeline.tracks[0]!.clips.find((c) => c.id === "a")!.durationFrames).toBe(30); // back to pre-drag
+    expect(store.canUndo()).toBe(false);
+  });
+
+  it("ripples downstream clips where a plain trim of the same delta would overwrite them", () => {
+    const tl = timeline([track("t", [clip("a", 0, 30, { trimEndFrame: 30 }), clip("b", 30, 10)])]);
+    const plain = trimClipCommand("a", "right", 20).apply(tl);
+    const rippled = rippleTrimClipCommand("a", "right", 20, false).apply(tl);
+    expect(plain.tracks[0]!.clips.find((c) => c.id === "b")!.startFrame).toBe(30); // untouched — would overlap
+    expect(rippled.tracks[0]!.clips.find((c) => c.id === "b")!.startFrame).toBe(50); // pushed forward
+  });
+});
+
+describe("rippleInsertClipsSpecs (specs)", () => {
+  const ids = () => { let i = 0; return () => `id${i++}`; };
+
+  it("splits a straddling clip at atFrame, pushes, and places the spec clip in the gap", () => {
+    const tl = timeline([track("t", [clip("a", 0, 100)])]); // straddles atFrame=40
+    const out = rippleInsertClipsSpecs(tl, [{ entry: entry("new", 1), durationFrames: 20 }], 0, 40, 30, ids());
+    const clips = out.timeline.tracks[0]!.clips.slice().sort((a, b) => a.startFrame - b.startFrame);
+    // a split into [0,40); a 20-frame inserted clip at [40,60); the right half rides the push to [60, ...)
+    expect(clips[0]!.startFrame).toBe(0);
+    expect(clips.some((c) => c.startFrame === 40 && c.durationFrames === 20)).toBe(true);
+    expect(clips[clips.length - 1]!.startFrame).toBe(60);
+  });
+
+  it("places a video-with-audio spec as a linked A/V pair on a pinned audio track", () => {
+    const tl = timeline([track("v", [], { type: "video" })]);
+    const out = rippleInsertClipsSpecs(
+      tl,
+      [{ entry: { ...entry("clipx", 1), hasAudio: true }, durationFrames: 30 }],
+      0, 0, 30, ids(),
+    );
+    const all = out.timeline.tracks.flatMap((t) => t.clips);
+    const visual = all.find((c) => c.mediaType === "video")!;
+    const audio = all.find((c) => c.mediaType === "audio")!;
+    expect(visual.linkGroupId).toBe(audio.linkGroupId);
+    expect(audio.sourceClipType).toBe("video");
+    // audio landed on an audio-type track (pinned/created)
+    expect(out.timeline.tracks.find((t) => t.clips.some((c) => c.id === audio.id))!.type).toBe("audio");
+  });
+
+  it("no-op for empty specs or out-of-range track", () => {
+    const tl = timeline([track("t", [clip("a", 0, 10)])]);
+    expect(rippleInsertClipsSpecs(tl, [], 0, 0, 30).timeline).toBe(tl);
+    expect(rippleInsertClipsSpecs(tl, [{ entry: entry("n", 1), durationFrames: 10 }], 9, 0, 30).timeline).toBe(tl);
+  });
+});
+
+describe("resolvePlacement", () => {
+  it("explicit duration within source: derives the real remaining tail as trimEnd (extendable)", () => {
+    const out = resolvePlacement(100, 0, 40);
+    expect(out).toEqual({ trimStart: 0, duration: 40, trimEnd: 60 }); // 100 - 0 - 40
+  });
+
+  it("explicit duration with a nonzero trimStart: tail headroom accounts for the head trim too", () => {
+    const out = resolvePlacement(100, 10, 40);
+    expect(out).toEqual({ trimStart: 10, duration: 40, trimEnd: 50 }); // 100 - 10 - 40
+  });
+
+  it("duration omitted: derives duration from [trimStart, sourceLen - trimEnd]", () => {
+    const out = resolvePlacement(100, 10, undefined, 20);
+    expect(out).toEqual({ trimStart: 10, duration: 70, trimEnd: 20 }); // 100 - 10 - 20
+  });
+
+  it("duration and trimEnd both omitted: runs to the source end (trimEnd defaults to 0)", () => {
+    const out = resolvePlacement(100, 10);
+    expect(out).toEqual({ trimStart: 10, duration: 90, trimEnd: 0 });
+  });
+
+  it("rejects durationFrames AND trimEndFrame both set — they both define the clip's end", () => {
+    const out = resolvePlacement(100, 0, 40, 10);
+    expect("error" in out).toBe(true);
+  });
+
+  it("image (sourceLen 0) with an explicit duration: ok, unbounded, trimEnd 0", () => {
+    const out = resolvePlacement(0, 0, 40);
+    expect(out).toEqual({ trimStart: 0, duration: 40, trimEnd: 0 });
+  });
+
+  it("image (sourceLen 0) without a duration: durationFrames is required", () => {
+    const out = resolvePlacement(0, 0);
+    expect("error" in out).toBe(true);
+  });
+
+  it("rejects trimStart + duration exceeding the source length", () => {
+    const out = resolvePlacement(100, 70, 40); // 70 + 40 = 110 > 100
+    expect("error" in out).toBe(true);
+  });
+
+  it("rejects a derived duration below 1", () => {
+    const out = resolvePlacement(100, 60, undefined, 45); // 100 - 60 - 45 = -5
+    expect("error" in out).toBe(true);
+  });
+
+  it("rejects a negative trimStartFrame", () => {
+    expect("error" in resolvePlacement(100, -1, 40)).toBe(true);
+  });
+
+  it("rejects a negative trimEndFrame", () => {
+    expect("error" in resolvePlacement(100, 0, undefined, -1)).toBe(true);
+  });
+
+  it("rejects a durationFrames below 1", () => {
+    expect("error" in resolvePlacement(100, 0, 0)).toBe(true);
+  });
+});

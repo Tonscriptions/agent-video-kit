@@ -1,0 +1,59 @@
+[package]
+name = "verbreel-state"
+description = "Project graph, §0.13 invariants, apply()/reconstructor — the engine kernel."
+version.workspace = true
+publish.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[lib]
+name = "verbreel_state"
+
+[features]
+default = ["native"]
+# Forward the `native` feature to verbreel-events so the kernel pulls the
+# filesystem + flock backend by default. wasm32 builds opt out via
+# `default-features = false`; Phase 2 will add a `wasm` feature for the OPFS
+# backend symmetrically.
+native = ["verbreel-events/native", "dep:verbreel-storage"]
+
+[dependencies]
+verbreel-types = { path = "../verbreel-types" }
+verbreel-args = { path = "../verbreel-args" }
+verbreel-events = { path = "../verbreel-events", default-features = false }
+# Phase 2 idempotency-dedup-index slice (#53): the in-memory dedup
+# index fingerprints verb args via `sha256_hex(canonicalize(args))`.
+# verbreel-canon was previously a dev-dep only (for the project_hash
+# round-trip test); promoting it to a runtime dep so the kernel can
+# compute fingerprints at `ProjectStore::mutate` time.
+verbreel-canon = { path = "../verbreel-canon" }
+verbreel-storage = { path = "../verbreel-storage", optional = true }
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+json-patch.workspace = true
+jsonptr.workspace = true
+# Phase 2 second-slice (#21): regex-validated asset newtypes Sha256,
+# AssetPath, AssetRef. Patterns mirror `spec/project-schema.json`
+# `$defs/Sha256` / `$defs/AssetPath` / `$defs/AssetRef`.
+regex.workspace = true
+unicode-segmentation.workspace = true
+# Phase 2 events-integration (#31): ProjectStore lifecycle uses
+# `tempfile + rename + parent-dir fsync` for the atomic project.json
+# write per §2.3.
+tempfile.workspace = true
+fontdb = "0.23"
+
+# Dev-dependencies:
+#   - `jsonschema` is used by `tests/schema_validation.rs` to lock the
+#     contract that this crate's typed shape round-trips through the
+#     canonical `spec/project-schema.json`. NOT a runtime dep — production
+#     validation goes through serde struct decoding + §0.13 invariant
+#     checks at the `project.open` boundary later.
+[dev-dependencies]
+jsonschema     = { workspace = true }
+serde_json.workspace = true

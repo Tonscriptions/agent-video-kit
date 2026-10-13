@@ -1,0 +1,19 @@
+{
+  "id": "template.basic-vertical-ad",
+  "version": "0.1.0",
+  "variables": [
+    {"name": "asset_id", "required": true},
+    {"name": "duration_tick", "required": false, "default": 90000}
+  ],
+  "sequence_id": "seq_main",
+  "operations": [
+    {
+      "op": "append_clip",
+      "track_id": "track_video_1",
+      "asset_id": "{{asset_id}}",
+      "source_in_tick": 0,
+      "source_out_tick": "{{duration_tick}}",
+      "duration_tick": "{{duration_tick}}"
+    }
+  ]
+}

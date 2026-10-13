@@ -1,0 +1,680 @@
+"""Background render job management."""
+
+from __future__ import annotations
+
+import mimetypes
+import os
+import re
+import subprocess
+import threading
+import time
+import uuid
+from pathlib import Path
+from typing import Literal, TypedDict
+
+from .errors import ConflictError, RequestCancelled, ToolError
+from .platform import (
+    discover_executables,
+    enforce_project_resource_policy,
+    ensure_melt_ready,
+    require_executable,
+    start_render_supervisor,
+)
+from .project_snapshot import load_project_render_input
+from .protocol import cancellation_requested, is_object, report_progress
+from .render_jobs import (
+    TERMINAL_STATUSES,
+    RenderJob,
+    list_jobs,
+    log_path,
+    prune_jobs,
+    read_job,
+    read_progress,
+    release_gate,
+    render_input_snapshot,
+    request_cancel,
+    startup_log_path,
+    validate_job_id,
+    write_job,
+)
+from .storage import OutputTransaction, RenderInputSnapshot, process_is_alive
+
+RenderArtifact = TypedDict(
+    "RenderArtifact",
+    {
+        "kind": Literal["rendered_media", "editable_project"],
+        "path": str,
+        "uri": str,
+        "mime_type": str,
+        "size_bytes": int,
+        "revision": str,
+    },
+)
+_RenderStatusFields = TypedDict(
+    "_RenderStatusFields",
+    {
+        "output_exists": bool,
+        "log_tail": str | None,
+        "eta_seconds": float | None,
+        "eta_confidence": str | None,
+        "eta_basis": str | None,
+        "editable_project_exists": bool,
+        "artifacts": list[RenderArtifact],
+        "delivery_complete": bool,
+    },
+)
+_CancellationStatus = TypedDict(
+    "_CancellationStatus", {"cancellation_requested": Literal[True]}
+)
+
+
+class RenderStatus(RenderJob, _RenderStatusFields):
+    """Live observations added to persisted metadata, including unknown extensions."""
+
+
+class CancellationStatus(RenderStatus, _CancellationStatus):
+    """Cancellation was requested but the worker has not yet finalized the job."""
+
+
+RUNNING_JOBS: dict[str, subprocess.Popen[bytes]] = {}
+_RUNNING_JOBS_LOCK = threading.Lock()
+
+RENDER_PRESETS: dict[str, dict[str, str]] = {
+    "h264-high": {
+        "f": "mp4",
+        "vcodec": "libx264",
+        "crf": "18",
+        "preset": "medium",
+        "acodec": "aac",
+        "ab": "192k",
+        "movflags": "+faststart",
+    },
+    "h264-web": {
+        "f": "mp4",
+        "vcodec": "libx264",
+        "crf": "23",
+        "preset": "medium",
+        "acodec": "aac",
+        "ab": "160k",
+        "movflags": "+faststart",
+    },
+    "hevc": {
+        "f": "mp4",
+        "vcodec": "libx265",
+        "crf": "22",
+        "preset": "medium",
+        "acodec": "aac",
+        "ab": "192k",
+        "movflags": "+faststart",
+    },
+    "hdr-hlg-hevc": {
+        "f": "mp4",
+        "vcodec": "libx265",
+        "crf": "20",
+        "preset": "medium",
+        "pix_fmt": "yuv420p10le",
+        "color_primaries": "bt2020",
+        "color_trc": "arib-std-b67",
+        "colorspace": "bt2020nc",
+        "acodec": "aac",
+        "ab": "192k",
+        "movflags": "+faststart",
+    },
+    "hdr-pq-hevc": {
+        "f": "mp4",
+        "vcodec": "libx265",
+        "crf": "20",
+        "preset": "medium",
+        "pix_fmt": "yuv420p10le",
+        "color_primaries": "bt2020",
+        "color_trc": "smpte2084",
+        "colorspace": "bt2020nc",
+        "acodec": "aac",
+        "ab": "192k",
+        "movflags": "+faststart",
+    },
+    "av1": {
+        "f": "mp4",
+        "vcodec": "libsvtav1",
+        "crf": "28",
+        "preset": "8",
+        "acodec": "aac",
+        "ab": "192k",
+        "movflags": "+faststart",
+    },
+    "prores": {
+        "f": "mov",
+        "vcodec": "prores_ks",
+        "profile": "3",
+        "acodec": "pcm_s24le",
+    },
+    "dnxhd": {"f": "mov", "vcodec": "dnxhd", "vb": "145M", "acodec": "pcm_s24le"},
+    "audio-flac": {"f": "flac", "vn": "1", "acodec": "flac"},
+    "audio-mp3": {"f": "mp3", "vn": "1", "acodec": "libmp3lame", "ab": "192k"},
+}
+
+SAFE_CONSUMER_PROPERTIES = {
+    "ab",
+    "acodec",
+    "an",
+    "ar",
+    "aspect",
+    "bf",
+    "channels",
+    "color_primaries",
+    "color_range",
+    "color_trc",
+    "colorspace",
+    "crf",
+    "f",
+    "g",
+    "height",
+    "movflags",
+    "pix_fmt",
+    "preset",
+    "progressive",
+    "r",
+    "rescale",
+    "strict",
+    "threads",
+    "top_field_first",
+    "vb",
+    "vcodec",
+    "video_track_timescale",
+    "vn",
+    "width",
+}
+SAFE_SINGLE_FILE_FORMATS = {
+    "avi",
+    "flac",
+    "matroska",
+    "mov",
+    "mp3",
+    "mp4",
+    "mpegts",
+    "mxf",
+    "ogg",
+    "wav",
+    "webm",
+}
+
+
+def _consumer_properties(value: object) -> dict[str, str]:
+    if value is None:
+        return {}
+    if not is_object(value) or len(value) > 50:
+        raise ToolError(
+            "consumer_properties must be an object with at most 50 options."
+        )
+    result: dict[str, str] = {}
+    unsafe_allowed = os.environ.get(
+        "SHOTCUT_MCP_ALLOW_UNSAFE_CONSUMER_PROPERTIES", ""
+    ).lower() in {"1", "true", "yes"}
+    for key, raw in value.items():
+        if not isinstance(key, str) or not re.fullmatch(
+            r"[A-Za-z_][A-Za-z0-9_.:-]*", key
+        ):
+            raise ToolError(f"Invalid MLT property name: {key!r}")
+        if key in {"target", "resource"}:
+            raise ToolError(f"The {key} property is controlled by the server.")
+        if not unsafe_allowed and key not in SAFE_CONSUMER_PROPERTIES:
+            raise ToolError(
+                f"consumer_properties.{key} is not in the safe allowlist. "
+                "An administrator can opt into arbitrary MLT properties with "
+                "SHOTCUT_MCP_ALLOW_UNSAFE_CONSUMER_PROPERTIES=1."
+            )
+        if isinstance(raw, bool):
+            text = "1" if raw else "0"
+        elif isinstance(raw, (str, int, float)):
+            text = str(raw)
+        else:
+            raise ToolError(f"Invalid value for consumer_properties.{key}.")
+        if len(text) > 500:
+            raise ToolError(f"consumer_properties.{key} exceeds 500 characters.")
+        if (
+            not unsafe_allowed
+            and key == "f"
+            and text.lower() not in SAFE_SINGLE_FILE_FORMATS
+        ):
+            raise ToolError(
+                f"consumer_properties.f={text!r} may create sidecar files and is "
+                "not in the safe allowlist."
+            )
+        result[key] = text
+    return result
+
+
+def start_render(arguments: dict[str, object]) -> RenderJob:
+    from .platform import expand_path
+
+    project_path = expand_path(arguments.get("project_path", ""))
+    output_path = expand_path(arguments.get("output_path", ""))
+    if not project_path.is_file():
+        raise ToolError(
+            f"Project not found: {project_path}",
+            code="project_not_found",
+            recommended_action="check_project_path_and_retry",
+            details={"path": str(project_path)},
+        )
+    overwrite = arguments.get("overwrite", False)
+    if not isinstance(overwrite, bool):
+        raise ToolError("overwrite must be a boolean.")
+
+    preset = arguments.get("preset", "h264-high")
+    if not isinstance(preset, str) or preset not in RENDER_PRESETS:
+        raise ToolError(f"Invalid preset. Options: {', '.join(RENDER_PRESETS)}")
+    properties = dict(RENDER_PRESETS[preset])
+    properties.update(_consumer_properties(arguments.get("consumer_properties")))
+    raw_in = arguments.get("in_frame")
+    raw_out = arguments.get("out_frame")
+    marker_id = arguments.get("marker_id")
+    if marker_id is not None and not isinstance(marker_id, str):
+        raise ToolError("marker_id must be a string.")
+    if marker_id is not None and (raw_in is not None or raw_out is not None):
+        raise ToolError("marker_id cannot be combined with in_frame or out_frame.")
+    if marker_id is None and (raw_in is None) != (raw_out is None):
+        raise ToolError("in_frame and out_frame must be provided together.")
+    expected_revision = arguments.get("expected_revision")
+    if expected_revision is not None and (
+        not isinstance(expected_revision, str)
+        or re.fullmatch(r"[0-9a-f]{64}", expected_revision) is None
+    ):
+        raise ToolError("expected_revision must be a lowercase SHA-256 digest.")
+
+    render_input = load_project_render_input(project_path)
+    project_revision = render_input.revision
+    if expected_revision is not None and expected_revision != project_revision:
+        raise ConflictError(
+            f"The project changed. Expected {expected_revision}, current "
+            f"{project_revision}.",
+            expected_revision=expected_revision,
+            current_revision=project_revision,
+        )
+    in_frame: int | None = None
+    out_frame: int | None = None
+    source_duration_frames = render_input.duration_frames
+    marker_text: str | None = None
+    if source_duration_frames <= 0:
+        raise ToolError(
+            "The project has no renderable frames.",
+            code="project_has_no_renderable_frames",
+            recommended_action="inspect_project_and_add_timeline_content",
+            recommended_tool="inspect_project",
+            details={"project_path": str(project_path)},
+        )
+    if raw_in is not None or raw_out is not None or marker_id is not None:
+        if marker_id is not None:
+            markers = [
+                marker
+                for marker in render_input.markers
+                if marker.get("marker_id") == marker_id
+            ]
+            if len(markers) != 1:
+                raise ToolError(
+                    f"Marker not found uniquely: {marker_id}",
+                    code="range_marker_not_found",
+                    recommended_action="inspect_project_and_choose_range_marker",
+                    recommended_tool="inspect_project",
+                    details={"marker_id": marker_id},
+                )
+            marker = markers[0]
+            marker_text = (
+                str(marker.get("text")) if marker.get("text") is not None else None
+            )
+            marker_start = marker.get("start_frame")
+            marker_end = marker.get("end_frame")
+            if (
+                not isinstance(marker_start, int)
+                or not isinstance(marker_end, int)
+                or marker_end <= marker_start
+            ):
+                raise ToolError("marker_id must identify a non-empty range marker.")
+            raw_in = marker_start
+            raw_out = marker_end - 1
+        if raw_in is None:
+            in_frame = 0
+        elif isinstance(raw_in, bool) or not isinstance(raw_in, int):
+            raise ToolError("in_frame must be an integer.")
+        else:
+            in_frame = raw_in
+        if raw_out is None:
+            out_frame = source_duration_frames - 1
+        elif isinstance(raw_out, bool) or not isinstance(raw_out, int):
+            raise ToolError("out_frame must be an integer.")
+        else:
+            out_frame = raw_out
+        if in_frame < 0 or out_frame < in_frame:
+            raise ToolError("Render range must satisfy 0 <= in_frame <= out_frame.")
+        if out_frame >= source_duration_frames:
+            raise ToolError(
+                f"out_frame must be below the project duration ({source_duration_frames})."
+            )
+    range_duration_frames = (
+        out_frame - in_frame + 1
+        if in_frame is not None and out_frame is not None
+        else None
+    )
+    total_frames = range_duration_frames or source_duration_frames
+    report_progress(0, 4, "Preparing revision-bound render job.")
+    melt = require_executable(discover_executables().melt, "melt", "SHOTCUT_MELT_PATH")
+    ensure_melt_ready(melt)
+    report_progress(1, 4, "Render toolchain is ready.")
+    prune_jobs()
+    job_id = uuid.uuid4().hex
+    snapshot = RenderInputSnapshot.create(
+        project_path,
+        job_id,
+        render_input.source,
+        project_revision,
+    )
+    try:
+        enforce_project_resource_policy(snapshot.path)
+        output = OutputTransaction.prepare(
+            output_path,
+            overwrite=overwrite,
+            protected_paths=(project_path, snapshot.path),
+        )
+    except Exception:
+        snapshot.cleanup_if_owned()
+        raise
+    report_progress(2, 4, "Immutable project snapshot prepared.")
+    metadata: RenderJob = {
+        "job_id": job_id,
+        "pid": None,
+        "worker_pid": None,
+        "renderer_pid": None,
+        "status": "queued",
+        "return_code": None,
+        "project_path": str(project_path),
+        "source_project_path": str(project_path),
+        "render_project_path": str(snapshot.path),
+        "editable_project_path": str(snapshot.path),
+        "output_path": str(output_path),
+        "temporary_output_path": str(output.temporary),
+        "output_transaction": output.serialize(),
+        "overwrite": overwrite,
+        "preset": preset,
+        "consumer_properties": properties,
+        "in_frame": in_frame,
+        "out_frame": out_frame,
+        "total_frames": total_frames,
+        "range_duration_frames": range_duration_frames or source_duration_frames,
+        "source_duration_frames": source_duration_frames,
+        "project_revision": project_revision,
+        "rendered_project_revision": project_revision,
+        "marker_id": marker_id,
+        "marker_text": marker_text,
+        "melt_path": str(melt),
+        "log_path": str(log_path(job_id)),
+        "started_at": time.time(),
+        "updated_at": time.time(),
+        "finished_at": None,
+        "progress_percent": 0,
+        "current_frame": None,
+        "progress_samples": [],
+    }
+    try:
+        write_job(metadata)
+    except Exception:
+        output.cleanup()
+        snapshot.cleanup_if_owned()
+        raise
+    report_progress(3, 4, "Render job metadata persisted.")
+    try:
+        process = start_render_supervisor(job_id, startup_log_path(job_id))
+    except OSError as exc:
+        output.cleanup()
+        snapshot.cleanup_if_owned()
+        metadata.update(
+            {
+                "status": "failed",
+                "status_note": f"Could not start the render supervisor: {exc}",
+                "finished_at": time.time(),
+            }
+        )
+        write_job(metadata)
+        raise ToolError(
+            f"Could not start the render: {exc}",
+            code="render_start_failed",
+            recommended_action="run_compatibility_diagnostics",
+            recommended_tool="shotcut_doctor",
+            details={"job_id": job_id},
+        ) from exc
+    with _RUNNING_JOBS_LOCK:
+        RUNNING_JOBS[job_id] = process
+    threading.Thread(
+        target=_reap_supervisor, args=(job_id, process), daemon=True
+    ).start()
+    metadata.update(
+        {"pid": process.pid, "worker_pid": process.pid, "status": "running"}
+    )
+    write_job(metadata)
+    release_gate(job_id)
+    report_progress(4, 4, "Render supervisor started.")
+    return metadata
+
+
+def _reap_supervisor(job_id: str, process: subprocess.Popen[bytes]) -> None:
+    """Release local process handles even when no client polls render status."""
+
+    process.wait()
+    # Preserve the short compatibility window used by callers that inspect an
+    # immediately returned local process while still guaranteeing eventual cleanup.
+    time.sleep(1)
+    with _RUNNING_JOBS_LOCK:
+        if RUNNING_JOBS.get(job_id) is process:
+            RUNNING_JOBS.pop(job_id, None)
+
+
+def _eta(metadata: RenderJob) -> tuple[float | None, str | None, str | None]:
+    samples: list[tuple[float, float]] = []
+    for item in metadata.get("progress_samples") or []:
+        at, percent = item.get("at"), item.get("percent")
+        if isinstance(at, (int, float)) and isinstance(percent, (int, float)):
+            samples.append((float(at), float(percent)))
+    advancing = [
+        item
+        for index, item in enumerate(samples)
+        if index == 0 or item[1] > samples[index - 1][1]
+    ]
+    if len(advancing) < 2:
+        return None, None, None
+    first, last = advancing[0], advancing[-1]
+    elapsed = last[0] - first[0]
+    progress = last[1]
+    gained = progress - first[1]
+    if elapsed < 1 or gained <= 0 or progress <= 0 or progress >= 100:
+        return None, None, None
+    rate = gained / elapsed
+    eta = (100 - progress) / rate
+    confidence = "high" if progress >= 30 else "medium" if progress >= 10 else "low"
+    return max(0.0, eta), confidence, "smoothed_progress_percent"
+
+
+def _cleanup_render_input(metadata: RenderJob) -> None:
+    try:
+        render_input_snapshot(metadata).cleanup_if_owned()
+    except (OSError, ToolError, TypeError, ValueError):
+        return
+
+
+def _artifact_mime_type(path: Path, *, editable: bool = False) -> str:
+    if editable:
+        return "application/xml"
+    guessed, _ = mimetypes.guess_type(path.name)
+    return guessed or "application/octet-stream"
+
+
+def _completed_artifacts(metadata: RenderJob) -> list[RenderArtifact]:
+    if metadata.get("status") != "completed":
+        return []
+    revision = metadata.get("rendered_project_revision") or metadata.get(
+        "project_revision"
+    )
+    editable_value = metadata.get("editable_project_path")
+    output_value = metadata.get("output_path")
+    if (
+        not isinstance(revision, str)
+        or not isinstance(editable_value, str)
+        or not isinstance(output_value, str)
+        or metadata.get("editable_project_verified") is not True
+    ):
+        return []
+    editable = Path(editable_value)
+    output = Path(output_value)
+    if not output.is_file() or not editable.is_file():
+        return []
+    try:
+        snapshot = render_input_snapshot(metadata)
+        if snapshot.path != editable or not snapshot.is_exact():
+            return []
+        return [
+            {
+                "kind": "rendered_media",
+                "path": str(output),
+                "uri": output.resolve().as_uri(),
+                "mime_type": _artifact_mime_type(output),
+                "size_bytes": output.stat().st_size,
+                "revision": revision,
+            },
+            {
+                "kind": "editable_project",
+                "path": str(editable),
+                "uri": editable.resolve().as_uri(),
+                "mime_type": _artifact_mime_type(editable, editable=True),
+                "size_bytes": editable.stat().st_size,
+                "revision": revision,
+            },
+        ]
+    except OSError:
+        return []
+
+
+def render_status(job_id: object) -> RenderStatus:
+    job_id = validate_job_id(job_id)
+    metadata = read_job(job_id)
+    with _RUNNING_JOBS_LOCK:
+        process = RUNNING_JOBS.get(job_id)
+    if process is not None and process.poll() is not None:
+        with _RUNNING_JOBS_LOCK:
+            RUNNING_JOBS.pop(job_id, None)
+        metadata = read_job(job_id)
+    if metadata.get("status") not in TERMINAL_STATUSES:
+        worker_pid = metadata.get("worker_pid")
+        if isinstance(worker_pid, int) and not process_is_alive(worker_pid):
+            metadata = read_job(job_id)
+            if metadata.get("status") not in TERMINAL_STATUSES:
+                renderer_pid = metadata.get("renderer_pid")
+                renderer_alive = isinstance(renderer_pid, int) and process_is_alive(
+                    renderer_pid
+                )
+                if renderer_alive:
+                    metadata.update(
+                        {
+                            "status": "orphaned",
+                            "status_note": "The render supervisor exited while Melt was still running; "
+                            "the temporary output was retained.",
+                            "finished_at": time.time(),
+                        }
+                    )
+                else:
+                    metadata.update(
+                        {
+                            "status": "failed",
+                            "status_note": "The render supervisor exited before finalizing the job.",
+                            "finished_at": time.time(),
+                        }
+                    )
+                    OutputTransaction.deserialize(
+                        metadata.get("output_transaction")
+                    ).cleanup()
+                    _cleanup_render_input(metadata)
+                write_job(metadata)
+        elif (
+            worker_pid is None
+            and time.time() - float(metadata.get("started_at") or 0) > 10
+        ):
+            metadata.update(
+                {
+                    "status": "failed",
+                    "status_note": "The render supervisor never started.",
+                    "finished_at": time.time(),
+                }
+            )
+            OutputTransaction.deserialize(metadata.get("output_transaction")).cleanup()
+            _cleanup_render_input(metadata)
+            write_job(metadata)
+    # A typed copy keeps unknown persisted extensions in the public response.
+    result = metadata.copy()
+    output_path = Path(metadata["output_path"])
+    progress, log_tail = read_progress(Path(metadata["log_path"]))
+    result["progress_percent"] = (
+        100
+        if metadata.get("status") == "completed"
+        else progress
+        if progress is not None
+        else metadata.get("progress_percent")
+    )
+    output_exists = output_path.is_file()
+    result["output_size_bytes"] = (
+        output_path.stat().st_size if output_path.is_file() else None
+    )
+    log_tail = log_tail or read_progress(startup_log_path(job_id))[1]
+    now = float(metadata.get("finished_at") or time.time())
+    result["elapsed_seconds"] = max(0.0, now - float(metadata.get("started_at") or now))
+    eta_seconds, eta_confidence, eta_basis = (
+        (None, None, None)
+        if metadata.get("status") in TERMINAL_STATUSES
+        else _eta(metadata)
+    )
+    editable_value = metadata.get("editable_project_path")
+    editable_project_exists = (
+        isinstance(editable_value, str) and Path(editable_value).is_file()
+    )
+    result["rendered_project_revision"] = metadata.get(
+        "rendered_project_revision"
+    ) or metadata.get("project_revision")
+    artifacts = _completed_artifacts(metadata)
+    return {
+        **result,
+        "output_exists": output_exists,
+        "log_tail": log_tail,
+        "eta_seconds": eta_seconds,
+        "eta_confidence": eta_confidence,
+        "eta_basis": eta_basis,
+        "editable_project_exists": editable_project_exists,
+        "artifacts": artifacts,
+        "delivery_complete": len(artifacts) == 2,
+    }
+
+
+def list_render_jobs(arguments: dict[str, object]) -> dict[str, object]:
+    status = arguments.get("status")
+    cursor = arguments.get("cursor")
+    limit = arguments.get("limit", 20)
+    if status is not None and not isinstance(status, str):
+        raise ToolError("status must be a string.")
+    if cursor is not None and not isinstance(cursor, str):
+        raise ToolError("cursor must be a string.")
+    if isinstance(limit, bool) or not isinstance(limit, int):
+        raise ToolError("limit must be an integer.")
+    return list_jobs(status=status, cursor=cursor, limit=limit)
+
+
+def cancel_render(job_id: object) -> RenderStatus | CancellationStatus:
+    job_id = validate_job_id(job_id)
+    metadata = read_job(job_id)
+    if metadata.get("status") in TERMINAL_STATUSES:
+        return render_status(job_id)
+    request_cancel(job_id)
+    deadline = time.monotonic() + 10
+    while time.monotonic() < deadline:
+        if cancellation_requested():
+            raise RequestCancelled("Render cancellation request was itself cancelled.")
+        metadata = read_job(job_id)
+        if metadata.get("status") in TERMINAL_STATUSES:
+            return render_status(job_id)
+        time.sleep(0.05)
+    result = render_status(job_id)
+    pending: CancellationStatus = {**result, "cancellation_requested": True}
+    return pending

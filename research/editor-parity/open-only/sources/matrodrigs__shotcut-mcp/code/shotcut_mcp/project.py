@@ -1,0 +1,925 @@
+"""Transactional interface for structure-preserving Shotcut project edits.
+
+The public project workflow lives here. XML structure and edit semantics are hidden
+behind :class:`ProjectDocument` in ``project_document`` so transaction safety can
+evolve independently from the MLT domain model.
+"""
+
+from __future__ import annotations
+
+import difflib
+import os
+import re
+import uuid
+from dataclasses import dataclass
+from pathlib import Path
+from typing import TYPE_CHECKING, TypedDict
+
+from .errors import ConflictError, RequestCancelled, ToolError
+from .missing_media import MediaProbeError, diagnose_missing_resources
+from .platform import (
+    enforce_project_resource_policy,
+    expand_path,
+    list_services,
+    summarize_media,
+    validate_project_file,
+)
+from .platform import (
+    render_contact_sheet as _render_contact_sheet,
+)
+from .project_document import (
+    BACKGROUND_ID,
+    EDIT_OPERATION_CONTRACTS,
+    MAIN_BIN_IDS,
+    SEQUENCE_TAGS,
+    EditOperationContract,
+    TrackRef,
+    _boolean,
+    _int,
+    project_revision,
+)
+from .project_document import (
+    ProjectDocument as MltProjectDocument,
+)
+from .project_snapshot import (
+    ProjectSnapshot,
+    build_project_snapshot,
+    project_requirements,
+)
+from .protocol import (
+    cancellation_requested,
+    is_array,
+    is_object,
+    is_text_array,
+    report_progress,
+)
+from .storage import (
+    OutputTransaction,
+    fsync_directory,
+    is_project_backup,
+    list_project_backups,
+    project_lock,
+    publish_new_file,
+    write_project_backup,
+)
+
+if TYPE_CHECKING:
+    from .media import MediaSummary
+
+
+Chapter = TypedDict(
+    "Chapter",
+    {
+        "timecode": str,
+        "frame": int,
+        "text": str,
+        "marker_id": str | None,
+    },
+)
+
+
+SavedProject = TypedDict(
+    "SavedProject",
+    {
+        "path": str,
+        "revision": str,
+        "previous_revision": str | None,
+        "backup_path": str | None,
+        "validation": dict[str, object],
+    },
+)
+
+
+MAX_OPERATIONS = 500
+
+__all__ = [
+    "BACKGROUND_ID",
+    "EDIT_OPERATION_CONTRACTS",
+    "MAIN_BIN_IDS",
+    "MAX_OPERATIONS",
+    "SEQUENCE_TAGS",
+    "EditCandidate",
+    "EditOperationContract",
+    "ProjectDocument",
+    "TrackRef",
+    "create_project",
+    "diagnose_color_workflow",
+    "diagnose_missing_media",
+    "edit_project",
+    "export_marker_chapters",
+    "list_backups",
+    "plan_project_edit",
+    "render_project_contact_sheet",
+    "restore_backup",
+    "validate_project",
+]
+
+
+class ProjectDocument(MltProjectDocument):
+    """Public project model with the stable MCP inspection projection."""
+
+    def snapshot(self) -> ProjectSnapshot:
+        return build_project_snapshot(self)
+
+
+def validate_project(arguments: dict[str, object]) -> dict[str, object]:
+    """Validate one project and report whether its local runtime is ready for it."""
+
+    path = expand_path(arguments.get("path", ""))
+    timeout = arguments.get("timeout_seconds", 30)
+    if (
+        isinstance(timeout, bool)
+        or not isinstance(timeout, int)
+        or not 1 <= timeout <= 300
+    ):
+        raise ToolError("timeout_seconds must be an integer between 1 and 300.")
+
+    report_progress(0, 3, "Inspecting project requirements.")
+    document = ProjectDocument.load(path)
+    snapshot = document.snapshot()
+    required = project_requirements(document)
+    validation = validate_project_file(path, timeout)
+    report_progress(1, 3, "Project processed with MLT.")
+
+    missing_services: dict[str, list[str]] = {}
+    service_errors: dict[str, str] = {}
+    for kind, names in required.items():
+        if not names:
+            continue
+        try:
+            installed = set(list_services(kind)["services"])
+        except ToolError as exc:
+            service_errors[kind] = str(exc)
+            continue
+        missing = sorted(set(names) - installed)
+        if missing:
+            missing_services[kind] = missing
+    report_progress(2, 3, "Project dependencies checked.")
+
+    missing_resources = sorted(set(snapshot["missing_resources"]))
+    resource_status = "failed" if missing_resources else "passed"
+    service_status = (
+        "failed" if missing_services else "unavailable" if service_errors else "passed"
+    )
+    ready = (
+        bool(validation.get("valid"))
+        and resource_status == "passed"
+        and service_status == "passed"
+    )
+    result = {
+        "project": snapshot,
+        **validation,
+        "ready": ready,
+        "checks": {
+            "resources": {
+                "status": resource_status,
+                "checked_count": sum(
+                    resource["exists"] is not None for resource in snapshot["resources"]
+                ),
+                "missing_resources": missing_resources,
+            },
+            "mlt_services": {
+                "status": service_status,
+                "required": required,
+                "missing": missing_services,
+                "errors": service_errors,
+            },
+        },
+    }
+    report_progress(3, 3, "Project validation complete.")
+    return result
+
+
+@dataclass
+class EditCandidate:
+    """Validated in-memory edit awaiting preview or atomic commit."""
+
+    path: Path
+    document: ProjectDocument
+    original: bytes
+    original_revision: str
+    expected_revision: str | None
+    force: bool
+    timeout: int
+    operation_results: list[dict[str, object]]
+
+
+def _write_validated(
+    document: ProjectDocument,
+    *,
+    expected_revision: str | None,
+    force: bool,
+    validate: bool,
+    timeout: int,
+    create_backup: bool,
+    require_absent: bool = False,
+) -> SavedProject:
+    path = document.path
+    data = document.to_bytes()
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp{path.suffix}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with project_lock(path):
+        current = path.read_bytes() if path.is_file() else None
+        current_mode = path.stat().st_mode if current is not None else None
+        current_revision = project_revision(current) if current is not None else None
+        if require_absent and path.exists():
+            raise ConflictError(
+                "The project was created by another writer and was not replaced.",
+                code="output_exists",
+                recommended_action="choose_another_output_or_authorize_overwrite",
+                details={"project_path": str(path)},
+            )
+        if current is not None and not force:
+            if not expected_revision:
+                raise ConflictError(
+                    "expected_revision is required to edit an existing project.",
+                    current_revision=current_revision,
+                    code="expected_revision_required",
+                    recommended_action="inspect_project_and_retry",
+                    details={"project_path": str(path)},
+                )
+            if expected_revision != current_revision:
+                raise ConflictError(
+                    f"The project changed. Expected {expected_revision}, current "
+                    f"{current_revision}.",
+                    expected_revision=expected_revision,
+                    current_revision=current_revision,
+                )
+        with temporary.open("wb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        if current_mode is not None:
+            os.chmod(temporary, current_mode)
+        try:
+            validation: dict[str, object] = (
+                validate_project_file(temporary, timeout=timeout)
+                if validate
+                else {"valid": True}
+            )
+            if not validation.get("valid"):
+                raise ToolError(
+                    "MLT rejected the edit before the project was replaced: "
+                    + str(
+                        validation.get("diagnostic") or validation.get("return_code")
+                    ),
+                    code="project_validation_failed",
+                    recommended_action="run_compatibility_diagnostics_and_reconsider_edit",
+                    recommended_tool="shotcut_doctor",
+                    details={
+                        "project_path": str(path),
+                        "return_code": validation.get("return_code"),
+                    },
+                )
+            latest = path.read_bytes() if path.is_file() else None
+            latest_revision = project_revision(latest) if latest is not None else None
+            if latest_revision != current_revision:
+                raise ConflictError(
+                    "The project changed while the candidate edit was being validated. "
+                    f"Expected {current_revision}, current {latest_revision}.",
+                    expected_revision=current_revision,
+                    current_revision=latest_revision,
+                )
+            backup_path = (
+                write_project_backup(path, current)
+                if current is not None and create_backup
+                else None
+            )
+            if require_absent:
+                publish_new_file(temporary, path)
+            else:
+                os.replace(temporary, path)
+            fsync_directory(path.parent)
+        finally:
+            temporary.unlink(missing_ok=True)
+    revision = project_revision(data)
+    return {
+        "path": str(path),
+        "revision": revision,
+        "previous_revision": current_revision,
+        "backup_path": str(backup_path) if backup_path else None,
+        "validation": validation,
+    }
+
+
+def create_project(arguments: dict[str, object]) -> dict[str, object]:
+    path = expand_path(arguments.get("project_path", ""))
+    if path.suffix.lower() not in {".mlt", ".xml"}:
+        raise ToolError(
+            "The project must use the .mlt or .xml extension.",
+            code="invalid_project_path",
+            recommended_action="choose_mlt_or_xml_project_path",
+            details={"path": str(path)},
+        )
+    overwrite = _boolean(arguments.get("overwrite", False), "overwrite")
+    if path.exists() and not overwrite:
+        raise ToolError(
+            f"The project already exists: {path}",
+            code="output_exists",
+            recommended_action="choose_another_output_or_authorize_overwrite",
+            details={"path": str(path)},
+        )
+    width = _int(arguments.get("width", 1920), "width", 16)
+    height = _int(arguments.get("height", 1080), "height", 16)
+    fps_num = _int(arguments.get("fps_num", 30), "fps_num", 1)
+    fps_den = _int(arguments.get("fps_den", 1), "fps_den", 1)
+    notes = arguments.get("notes", "")
+    document = ProjectDocument.new(
+        path,
+        width=width,
+        height=height,
+        fps_num=fps_num,
+        fps_den=fps_den,
+        title=notes if isinstance(notes, str) else "",
+    )
+    tracks = arguments.get("tracks", [])
+    if not is_array(tracks):
+        raise ToolError("tracks must be a list.")
+    results: list[dict[str, object]] = []
+    for track in tracks:
+        if not is_object(track):
+            raise ToolError("Each track must be an object.")
+        results.append(document.add_track({"op": "add_track", **track}))
+    clips = arguments.get("clips", [])
+    if not is_array(clips):
+        raise ToolError("clips must be a list.")
+    for clip in clips:
+        if not is_object(clip):
+            raise ToolError("Each clip must be an object.")
+        operation = _authorize_operation_paths(
+            {"op": "add_clip", "track": "V1", **clip}
+        )
+        results.append(document.add_clip(operation))
+    document.update_main_duration()
+    saved = _write_validated(
+        document,
+        expected_revision=None,
+        force=overwrite,
+        validate=True,
+        timeout=_int(arguments.get("timeout_seconds", 60), "timeout_seconds", 1),
+        create_backup=True,
+        require_absent=not overwrite,
+    )
+    loaded = ProjectDocument.load(path)
+    return {
+        "created": True,
+        **saved,
+        "operation_results": results,
+        "project": loaded.snapshot(),
+    }
+
+
+def _authorize_operation_paths(operation: dict[str, object]) -> dict[str, object]:
+    """Canonicalize every data path before it reaches the XML domain model."""
+
+    result = dict(operation)
+    name = result.get("op")
+    field = (
+        "path"
+        if name in {"add_clip", "replace_item_media"}
+        else "to"
+        if name == "relink_media"
+        else None
+    )
+    if field is not None and field in result:
+        value = result[field]
+        if not isinstance(value, str):
+            raise ToolError(f"{field} must be a string.")
+        result[field] = str(expand_path(value))
+    return result
+
+
+def _build_edit_candidate(arguments: dict[str, object]) -> EditCandidate:
+    path = expand_path(arguments.get("project_path", ""))
+    operations = arguments.get("operations")
+    if not is_array(operations) or not operations:
+        raise ToolError("operations must be a non-empty list.")
+    if len(operations) > MAX_OPERATIONS:
+        raise ToolError(f"A transaction accepts at most {MAX_OPERATIONS} operations.")
+    force = _boolean(arguments.get("force", False), "force")
+    expected_revision = arguments.get("expected_revision")
+    if expected_revision is not None and not isinstance(expected_revision, str):
+        raise ToolError("expected_revision must be a SHA-256 string.")
+    document = ProjectDocument.load(path)
+    original = document.source
+    original_revision = document.revision
+    if not force:
+        if not expected_revision:
+            raise ConflictError(
+                "expected_revision is required to edit an existing project.",
+                current_revision=original_revision,
+                code="expected_revision_required",
+                recommended_action="inspect_project_and_retry",
+                details={"project_path": str(path)},
+            )
+        if expected_revision != original_revision:
+            raise ConflictError(
+                f"The project changed. Expected {expected_revision}, current "
+                f"{original_revision}.",
+                expected_revision=expected_revision,
+                current_revision=original_revision,
+            )
+    document.prepare_item_references()
+    document.ensure_shotcut_structure()
+    results: list[dict[str, object]] = []
+    progress_total = len(operations) + 1
+    report_progress(0, progress_total, "Preparing project edit.")
+    for index, raw_operation in enumerate(operations):
+        if cancellation_requested():
+            raise RequestCancelled("Project edit cancelled by the MCP client.")
+        try:
+            if not is_object(raw_operation):
+                raise ToolError("Each operation must be an object.")
+            operation = _authorize_operation_paths(raw_operation)
+            results.append(document.apply_operation(operation))
+            report_progress(
+                index + 1,
+                progress_total,
+                f"Applied {index + 1} of {len(operations)} operations in memory.",
+            )
+        except ToolError as exc:
+            operation_name = (
+                raw_operation.get("op") if is_object(raw_operation) else None
+            )
+            semantic_error = exc.code != "tool_error"
+            raise ToolError(
+                f"Operation {index} failed: {exc}",
+                code=exc.code if semantic_error else "edit_operation_rejected",
+                recoverable=exc.recoverable,
+                recommended_action=(
+                    exc.recommended_action
+                    if semantic_error
+                    else "inspect_operation_capabilities_and_retry"
+                ),
+                recommended_tool=(
+                    exc.recommended_tool if semantic_error else "shotcut_capabilities"
+                ),
+                details={
+                    **exc.details,
+                    "operation_index": index,
+                    "operation": operation_name,
+                },
+            ) from exc
+    document.update_main_duration()
+    return EditCandidate(
+        path=path,
+        document=document,
+        original=original,
+        original_revision=original_revision,
+        expected_revision=expected_revision,
+        force=force,
+        timeout=_int(arguments.get("timeout_seconds", 60), "timeout_seconds", 1),
+        operation_results=results,
+    )
+
+
+def _diff_range(start: int, stop: int) -> str:
+    length = stop - start
+    beginning = start + 1 if length else start
+    return str(beginning) if length == 1 else f"{beginning},{length}"
+
+
+def _bounded_project_diff(
+    original: bytes, candidate: bytes, path: Path, maximum_lines: int
+) -> tuple[str, int]:
+    before = original.decode("utf-8", errors="replace").splitlines()
+    after = candidate.decode("utf-8", errors="replace").splitlines()
+    shown: list[str] = []
+    count = 0
+
+    def header(line: str) -> None:
+        nonlocal count
+        if len(shown) < maximum_lines:
+            shown.append(line)
+        count += 1
+
+    for group in difflib.SequenceMatcher(None, before, after).get_grouped_opcodes(3):
+        if cancellation_requested():
+            raise RequestCancelled("Project diff cancelled by the MCP client.")
+        if count == 0:
+            header(f"--- {path}")
+            header(f"+++ {path} (planned)")
+        first, last = group[0], group[-1]
+        header(
+            f"@@ -{_diff_range(first[1], last[2])} +{_diff_range(first[3], last[4])} @@"
+        )
+        for tag, i1, i2, j1, j2 in group:
+            sections = []
+            if tag == "equal":
+                sections.append((" ", before, i1, i2))
+            else:
+                if tag in {"replace", "delete"}:
+                    sections.append(("-", before, i1, i2))
+                if tag in {"replace", "insert"}:
+                    sections.append(("+", after, j1, j2))
+            for prefix, lines, start, stop in sections:
+                remaining = maximum_lines - len(shown)
+                shown.extend(
+                    prefix + lines[index]
+                    for index in range(start, min(stop, start + remaining))
+                )
+                count += stop - start
+    return "\n".join(shown), count
+
+
+def plan_project_edit(arguments: dict[str, object]) -> dict[str, object]:
+    if arguments.get("force") not in (None, False):
+        raise ToolError("force is not supported by plan_project_edit.")
+    candidate = _build_edit_candidate(arguments)
+    data = candidate.document.to_bytes()
+    prospective_revision = project_revision(data)
+    temporary = candidate.path.with_name(
+        f".{candidate.path.name}.{uuid.uuid4().hex}.plan{candidate.path.suffix}"
+    )
+    with temporary.open("wb") as handle:
+        handle.write(data)
+        handle.flush()
+        os.fsync(handle.fileno())
+    try:
+        validation = validate_project_file(temporary, timeout=candidate.timeout)
+    finally:
+        temporary.unlink(missing_ok=True)
+    latest = candidate.path.read_bytes() if candidate.path.is_file() else None
+    latest_revision = project_revision(latest) if latest is not None else None
+    if latest_revision != candidate.original_revision:
+        raise ConflictError(
+            "The project changed while the planned edit was being validated.",
+            expected_revision=candidate.original_revision,
+            current_revision=latest_revision,
+        )
+
+    maximum_lines = _int(arguments.get("max_diff_lines", 2000), "max_diff_lines", 0)
+    maximum_lines = min(maximum_lines, 5000)
+    unified_diff, diff_lines = _bounded_project_diff(
+        candidate.original, data, candidate.path, maximum_lines
+    )
+    candidate.document.source = data
+    candidate.document.revision = prospective_revision
+    report_progress(
+        len(candidate.operation_results) + 1,
+        len(candidate.operation_results) + 1,
+        "Planned project edit validated.",
+    )
+    return {
+        "planned": True,
+        "changed": data != candidate.original,
+        "project_path": str(candidate.path),
+        "base_revision": candidate.original_revision,
+        "prospective_revision": prospective_revision,
+        "operation_results": candidate.operation_results,
+        "item_bindings": candidate.document.item_bindings(),
+        "validation": validation,
+        "project": candidate.document.snapshot(),
+        "unified_diff": unified_diff,
+        "diff_lines": diff_lines,
+        "diff_truncated": diff_lines > maximum_lines,
+    }
+
+
+def edit_project(arguments: dict[str, object]) -> dict[str, object]:
+    candidate = _build_edit_candidate(arguments)
+    saved = _write_validated(
+        candidate.document,
+        expected_revision=candidate.expected_revision,
+        force=candidate.force,
+        validate=True,
+        timeout=candidate.timeout,
+        create_backup=True,
+    )
+    report_progress(
+        len(candidate.operation_results) + 1,
+        len(candidate.operation_results) + 1,
+        "Project edit validated and committed.",
+    )
+    updated = ProjectDocument.load(candidate.path)
+    candidate.document.revision = saved["revision"]
+    return {
+        "edited": True,
+        **saved,
+        "operation_results": candidate.operation_results,
+        "item_bindings": candidate.document.item_bindings(),
+        "project": updated.snapshot(),
+    }
+
+
+def _chapter_timecode(frame: int, fps: float) -> str:
+    total_seconds = max(0, int(frame / fps))
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return (
+        f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        if hours
+        else f"{minutes:02d}:{seconds:02d}"
+    )
+
+
+def export_marker_chapters(arguments: dict[str, object]) -> dict[str, object]:
+    """Export Shotcut-compatible chapter text through a protected output transaction."""
+
+    project_path = expand_path(arguments.get("project_path", ""))
+    output_path = expand_path(arguments.get("output_path", ""))
+    overwrite = _boolean(arguments.get("overwrite", False), "overwrite")
+    include_ranges = _boolean(
+        arguments.get("include_range_markers", False), "include_range_markers"
+    )
+    raw_colors = arguments.get("colors")
+    if raw_colors is not None and (
+        not is_text_array(raw_colors)
+        or not 1 <= len(raw_colors) <= 16
+        or any(
+            not isinstance(item, str) or not re.fullmatch(r"#[0-9A-Fa-f]{6}", item)
+            for item in raw_colors
+        )
+    ):
+        raise ToolError("colors must contain between 1 and 16 #RRGGBB values.")
+    colors = (
+        {item.upper() for item in raw_colors} if is_text_array(raw_colors) else None
+    )
+    expected_revision = arguments.get("expected_revision")
+    if expected_revision is not None and not isinstance(expected_revision, str):
+        raise ToolError("expected_revision must be a SHA-256 string.")
+    document = ProjectDocument.load(project_path)
+    if expected_revision is not None and expected_revision != document.revision:
+        raise ConflictError(
+            "The project changed before chapters were exported.",
+            expected_revision=expected_revision,
+            current_revision=document.revision,
+        )
+    snapshot = document.snapshot()
+    selected: list[Chapter] = []
+    for marker in snapshot["markers"]:
+        start = marker.get("start_frame")
+        end = marker.get("end_frame")
+        marker_color = marker.get("color")
+        if not isinstance(start, int) or not isinstance(end, int):
+            continue
+        if not include_ranges and end != start:
+            continue
+        if colors is not None and str(marker_color).upper() not in colors:
+            continue
+        selected.append(
+            {
+                "timecode": _chapter_timecode(start, document.fps),
+                "frame": start,
+                "text": " ".join(
+                    str(marker.get("text") or "Chapter").splitlines()
+                ).strip()
+                or "Chapter",
+                "marker_id": marker["marker_id"],
+            }
+        )
+    # External MLT markers can lack a name; nullable IDs must still sort safely.
+    selected.sort(key=lambda chapter: (chapter["frame"], chapter["marker_id"] or ""))
+    chapters = list(selected)
+    if not any(chapter["frame"] == 0 for chapter in chapters):
+        chapters.insert(
+            0,
+            {"timecode": "00:00", "frame": 0, "text": "Intro", "marker_id": None},
+        )
+    data = "".join(
+        f"{chapter['timecode']} {chapter['text']}\n" for chapter in chapters
+    ).encode("utf-8")
+    output = OutputTransaction.prepare(
+        output_path, overwrite=overwrite, protected_paths=(project_path,)
+    )
+    try:
+        with output.temporary.open("wb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        with project_lock(project_path):
+            latest_revision = ProjectDocument.load(project_path).revision
+            if latest_revision != document.revision:
+                raise ConflictError(
+                    "The project changed while chapters were being exported.",
+                    expected_revision=document.revision,
+                    current_revision=latest_revision,
+                )
+            output.commit()
+    finally:
+        output.cleanup()
+    return {
+        "created": True,
+        "path": str(output_path),
+        "project_path": str(project_path),
+        "project_revision": document.revision,
+        "chapter_count": len(chapters),
+        "marker_count": len(selected),
+        "include_range_markers": include_ranges,
+        "colors": sorted(colors) if colors is not None else None,
+        "size_bytes": output_path.stat().st_size,
+        "chapters": chapters,
+    }
+
+
+def list_backups(project_path: Path) -> dict[str, object]:
+    backups = [
+        {
+            "path": str(path),
+            "size_bytes": path.stat().st_size,
+            "modified_at": path.stat().st_mtime,
+            "revision": project_revision(path.read_bytes()),
+        }
+        for path in list_project_backups(project_path)
+    ]
+    return {
+        "project_path": str(project_path),
+        "backup_count": len(backups),
+        "backups": backups,
+    }
+
+
+def diagnose_color_workflow(arguments: dict[str, object]) -> dict[str, object]:
+    """Report project/source color compatibility without changing the document."""
+
+    project_path = expand_path(arguments.get("project_path", ""))
+    enforce_project_resource_policy(project_path)
+    document = ProjectDocument.load(project_path)
+    snapshot = document.snapshot()
+    media: list[MediaSummary | MediaProbeError] = []
+    ranges: set[str] = set()
+    seen: set[str] = set()
+    for resource in snapshot["resources"]:
+        resolved = resource.get("resolved_path")
+        if not resolved or resource.get("exists") is not True or resolved in seen:
+            continue
+        seen.add(resolved)
+        if len(media) >= 128:
+            break
+        try:
+            summary = summarize_media(Path(resolved))
+            media.append(summary)
+            ranges.update(
+                dynamic_range
+                for stream in summary["streams"]
+                if stream["type"] == "video"
+                and (dynamic_range := stream.get("dynamic_range")) is not None
+                and dynamic_range != "unknown"
+            )
+        except ToolError as exc:
+            media.append({"path": resolved, "error": str(exc)})
+    color = snapshot["color_workflow"]
+    mode = color["processing_mode"]
+    issues: list[dict[str, str]] = []
+    if {"hlg", "pq"}.issubset(ranges):
+        issues.append(
+            {
+                "severity": "error",
+                "code": "mixed_hdr_transfers",
+                "message": "Shotcut 26.6 cannot combine HLG and PQ in one project.",
+            }
+        )
+    if ranges.intersection({"hlg", "pq"}) and mode == "Native8Cpu":
+        issues.append(
+            {
+                "severity": "error",
+                "code": "hdr_requires_10bit_processing",
+                "message": "HDR sources require a supported 10-bit processing mode.",
+            }
+        )
+    requested_codec = arguments.get("output_codec")
+    hdr_metadata = arguments.get("hdr10_metadata", False)
+    if hdr_metadata and not isinstance(hdr_metadata, bool):
+        raise ToolError("hdr10_metadata must be a boolean.")
+    if requested_codec is not None and not isinstance(requested_codec, str):
+        raise ToolError("output_codec must be a string.")
+    hardware_tokens = ("_nvenc", "_qsv", "_amf", "_mf", "_vaapi", "videotoolbox")
+    if (
+        hdr_metadata
+        and requested_codec
+        and any(token in requested_codec for token in hardware_tokens)
+    ):
+        issues.append(
+            {
+                "severity": "error",
+                "code": "hdr10_metadata_hardware_encoder",
+                "message": "Shotcut 26.6 supports HDR10 metadata only with libx265 or libsvtav1.",
+            }
+        )
+    if color["dynamic_range"] in {"hlg", "pq"}:
+        unverified = sorted(
+            {service for item in snapshot["filters"] if (service := item["service"])}
+        )
+        if unverified:
+            issues.append(
+                {
+                    "severity": "warning",
+                    "code": "filters_require_10bit_verification",
+                    "message": "Project filters require #10bit/#gpu verification: "
+                    + ", ".join(unverified[:20]),
+                }
+            )
+    return {
+        "project_path": str(project_path),
+        "compatible": not any(item["severity"] == "error" for item in issues),
+        "project_color_workflow": color,
+        "source_dynamic_ranges": sorted(ranges),
+        "media": media,
+        "issues": issues,
+        "media_truncated": len(seen) > len(media),
+    }
+
+
+def render_project_contact_sheet(arguments: dict[str, object]) -> dict[str, object]:
+    """Choose project frames and delegate atomic contact-sheet rendering."""
+
+    project_path = expand_path(arguments.get("project_path", ""))
+    raw_frames = arguments.get("frames")
+    if raw_frames is None:
+        sample_count = _int(arguments.get("sample_count", 12), "sample_count", 1)
+        if sample_count > 64:
+            raise ToolError("sample_count must be an integer between 1 and 64.")
+        duration = ProjectDocument.load(project_path).snapshot()["duration_frames"]
+        if duration <= 0:
+            raise ToolError(
+                "The project has no timeline frames to sample.",
+                code="no_visual_frame",
+                recommended_action="inspect_project_and_add_timeline_content",
+                recommended_tool="inspect_project",
+                details={
+                    "project_path": str(project_path),
+                    "reason": "empty_timeline",
+                },
+            )
+        frames = (
+            [0]
+            if sample_count == 1
+            else [
+                round(index * (duration - 1) / (sample_count - 1))
+                for index in range(sample_count)
+            ]
+        )
+    else:
+        if not is_array(raw_frames) or not 1 <= len(raw_frames) <= 64:
+            raise ToolError("frames must contain between 1 and 64 entries.")
+        frames = []
+        for index, frame in enumerate(raw_frames):
+            if isinstance(frame, bool) or not isinstance(frame, int) or frame < 0:
+                raise ToolError(f"frames[{index}] must be a non-negative integer.")
+            frames.append(frame)
+    columns = arguments.get("columns", 4)
+    cell_width = arguments.get("cell_width", 320)
+    overwrite = arguments.get("overwrite", False)
+    if isinstance(columns, bool) or not isinstance(columns, int):
+        raise ToolError("columns must be an integer.")
+    if isinstance(cell_width, bool) or not isinstance(cell_width, int):
+        raise ToolError("cell_width must be an integer.")
+    if not isinstance(overwrite, bool):
+        raise ToolError("overwrite must be a boolean.")
+    raw_output = arguments.get("output_path")
+    if raw_output is not None and not isinstance(raw_output, str):
+        raise ToolError("output_path must be a string when provided.")
+    return _render_contact_sheet(
+        project_path,
+        expand_path(raw_output) if isinstance(raw_output, str) else None,
+        frames,
+        columns=columns,
+        cell_width=cell_width,
+        overwrite=overwrite,
+    )
+
+
+def diagnose_missing_media(arguments: dict[str, object]) -> dict[str, object]:
+    """Search authorized roots for bounded, scored missing-media candidates."""
+
+    project_path = expand_path(arguments.get("project_path", ""))
+    snapshot = ProjectDocument.load(project_path).snapshot()
+    diagnosis = diagnose_missing_resources(snapshot["resources"], arguments)
+    return {
+        "project_path": str(project_path),
+        **diagnosis,
+        "commit_workflow": "Choose a candidate and call plan_project_edit/edit_project with relink_media and expected_revision.",
+    }
+
+
+def restore_backup(arguments: dict[str, object]) -> dict[str, object]:
+    project_path = expand_path(arguments.get("project_path", ""))
+    backup_path = expand_path(arguments.get("backup_path", ""))
+    force = _boolean(arguments.get("force", False), "force")
+    expected_revision = arguments.get("expected_revision")
+    if expected_revision is not None and not isinstance(expected_revision, str):
+        raise ToolError("expected_revision must be a SHA-256 string.")
+    if not is_project_backup(project_path, backup_path):
+        raise ToolError(
+            "backup_path is not one of this project's backups.",
+            code="backup_not_owned_by_project",
+            recommended_action="list_project_backups_and_choose_backup",
+            recommended_tool="list_project_backups",
+            details={
+                "project_path": str(project_path),
+                "backup_path": str(backup_path),
+            },
+        )
+    document = ProjectDocument.load(backup_path)
+    document.path = project_path
+    return {
+        "restored": True,
+        **_write_validated(
+            document,
+            expected_revision=expected_revision,
+            force=force,
+            validate=True,
+            timeout=60,
+            create_backup=True,
+        ),
+    }

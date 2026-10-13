@@ -1,0 +1,268 @@
+import { z } from "zod";
+import {
+  TEXT_ANIMATION_PRESETS,
+  transcriptTargets,
+  filterTranscript,
+  buildCaptionPhrases,
+  captionSpecsForClip,
+  dominantSpeechTrack,
+  placeCaptionsCommand,
+  placeSubtitleCaptionsCommand,
+  defaultTextStyle,
+  rgbaFromHex,
+  sourceFramesConsumed,
+  heuristicCaptionWidthFrac,
+  parseSubtitleFile,
+  SubtitleParseError,
+  type CaptionClipSpec,
+  type CaptionPhrase,
+  type TextStyle,
+} from "@frontstage/core";
+import type { ToolContext, ToolResult, ToolSpec } from "./types.js";
+import { ok, errorResult } from "./executor.js";
+import { confirmationResult } from "./generate-tools.js";
+import { canTranscribe, classifyRefsByCache, transcribeRefs } from "./transcription-tools.js";
+import { LOCAL_MODEL_UNAVAILABLE_MESSAGE } from "../transcription/transcription-service.js";
+
+const TEXT_CASES = ["auto", "upper", "lower"] as const;
+type TextCase = (typeof TEXT_CASES)[number];
+
+/**
+ * Fallback text-measure used when the host hasn't wired `ctx.transcription.measureText` (M11D wires
+ * a real Canvas2D-backed impl from @frontstage/ui). Returns the rendered width of `text` at
+ * `style.fontSize`, as a FRACTION of `canvasWidth` — the same unit buildCaptionPhrases' `measure`
+ * expects. Deliberately crude (no per-glyph metrics); documented deviation, not a bug. The formula
+ * itself lives in @frontstage/core (heuristicCaptionWidthFrac) so the ui-side fallback matches exactly.
+ */
+function heuristicMeasure(text: string, style: TextStyle, canvasWidth: number): number {
+  return heuristicCaptionWidthFrac(text, style.fontSize, canvasWidth);
+}
+
+function applyTextCase(phrases: CaptionPhrase[], mode: TextCase): CaptionPhrase[] {
+  if (mode === "auto") return phrases;
+  const xform = mode === "upper" ? (s: string) => s.toUpperCase() : (s: string) => s.toLowerCase();
+  return phrases.map((p) => ({ ...p, text: xform(p.text), words: p.words.map((w) => ({ ...w, text: xform(w.text) })) }));
+}
+
+export function addCaptionsTool(): ToolSpec {
+  return {
+    name: "add_captions",
+    description:
+      "Generates timed captions from the timeline's spoken-word transcript and places them as text clips " +
+      "on a new video track. Targets explicit clipIds, or auto-detects the dominant speech track. One undo step. " +
+      "Alternatively, pass subtitleMediaRef (a subtitle asset from import_media) to place that SRT/WebVTT file's " +
+      "cues as captions at their authored timecodes — no transcription; mutually exclusive with every other parameter.",
+    inputSchema: z.object({
+      clipIds: z.array(z.string()).optional(),
+      centerX: z.number().finite().optional(),
+      centerY: z.number().finite().optional(),
+      textCase: z.enum(TEXT_CASES).optional(),
+      language: z.string().optional(),
+      animation: z.object({ preset: z.enum(TEXT_ANIMATION_PRESETS) }).optional(),
+      highlightColor: z.string().optional(),
+      maxWords: z.number().int().positive().optional(),
+      fontSize: z.number().finite().min(12).max(300).optional(),
+      fontName: z.string().optional(),
+      color: z.string().optional(),
+      confirm: z.boolean().optional(),
+      subtitleMediaRef: z.string().optional(),
+    }),
+    async run(args, ctx) {
+      const a = args as {
+        clipIds?: string[];
+        centerX?: number;
+        centerY?: number;
+        textCase?: TextCase;
+        language?: string;
+        animation?: { preset: (typeof TEXT_ANIMATION_PRESETS)[number] };
+        highlightColor?: string;
+        maxWords?: number;
+        fontSize?: number;
+        fontName?: string;
+        color?: string;
+        confirm?: boolean;
+        subtitleMediaRef?: string;
+      };
+      if (a.subtitleMediaRef !== undefined) {
+        return addCaptionsFromSubtitle(a, ctx);
+      }
+      const facade = ctx.transcription;
+      if (!facade) return errorResult("transcription is not available in this context");
+
+      // Parse hex overrides up front — fail fast on bad input, before any transcription work.
+      let color: TextStyle["color"] | undefined;
+      if (a.color !== undefined) {
+        const parsed = rgbaFromHex(a.color);
+        if (!parsed) return errorResult(`invalid color: ${a.color}`);
+        color = parsed;
+      }
+      let highlightColor: TextStyle["color"] | undefined;
+      if (a.highlightColor !== undefined) {
+        const parsed = rgbaFromHex(a.highlightColor);
+        if (!parsed) return errorResult(`invalid highlightColor: ${a.highlightColor}`);
+        highlightColor = parsed;
+      }
+
+      const tl = ctx.store.getSnapshot().timeline;
+      const fps = tl.fps;
+      const entryById = new Map(ctx.getManifest().entries.map((e) => [e.id, e]));
+
+      // Explicit clipIds are filtered down to the transcribable pool (validated + hasAudio-filtered)
+      // rather than erroring per unknown/incompatible id — mirrors the "→ none → error" brief text.
+      let targets = transcriptTargets(tl).filter((t) => canTranscribe(entryById.get(t.clip.mediaRef)));
+      if (a.clipIds !== undefined) {
+        const idSet = new Set(a.clipIds);
+        targets = targets.filter((t) => idSet.has(t.clip.id));
+      }
+      if (targets.length === 0) return errorResult("no transcribable clips");
+
+      const uniqueRefs = [...new Set(targets.map((t) => t.clip.mediaRef))];
+      const { resultByRef, uncachedRefs } = await classifyRefsByCache(facade, uniqueRefs, a.language);
+
+      let skipped: { mediaRef: string; error: string }[] = [];
+      if (uncachedRefs.length > 0) {
+        // M14A: a keyless call still proceeds when the local whisper fallback is ready (no fal call,
+        // no credits) — only error when NEITHER path can transcribe.
+        const keyed = await facade.hasKey().catch(() => false);
+        const localReady = facade.localReady?.() ?? false;
+        if (!keyed && !localReady) return errorResult(LOCAL_MODEL_UNAVAILABLE_MESSAGE);
+
+        // Cost gate (M10C pattern): only the fal path spends credits — local transcription is
+        // always free, so a keyless+local call skips the confirm-threshold entirely.
+        if (keyed) {
+          const threshold = ctx.generation?.confirmThreshold ?? 50;
+          const estimate = uncachedRefs.reduce(
+            (sum, ref) => sum + facade.estimateCredits(entryById.get(ref)?.duration ?? 0),
+            0,
+          );
+          if (estimate > threshold && !a.confirm) return confirmationResult(estimate);
+        }
+
+        const fetched = await transcribeRefs(facade, uncachedRefs, a.language);
+        for (const [ref, result] of fetched.resultByRef) resultByRef.set(ref, result);
+        skipped = fetched.skipped;
+      }
+      if (resultByRef.size === 0) {
+        return errorResult(`all transcriptions failed: ${skipped.map((s) => `${s.mediaRef}: ${s.error}`).join("; ")}`);
+      }
+
+      // Auto-detect only when clipIds wasn't given; restrict to the dominant track only when
+      // detection actually finds one (Swift: no restriction on a null/no-speech result).
+      if (a.clipIds === undefined) {
+        const dominant = dominantSpeechTrack(targets, resultByRef, fps);
+        if (dominant !== null) targets = targets.filter((t) => t.trackIndex === dominant);
+      }
+
+      const style: TextStyle = {
+        ...defaultTextStyle(),
+        fontSize: a.fontSize ?? 48,
+        ...(a.fontName !== undefined ? { fontName: a.fontName } : {}),
+        ...(color !== undefined ? { color } : {}),
+      };
+      const measure = (text: string): number =>
+        facade.measureText ? facade.measureText(text, style) : heuristicMeasure(text, style, tl.width);
+      const textCase: TextCase = a.textCase ?? "auto";
+
+      const allSpecs: CaptionClipSpec[] = [];
+      for (const target of targets) {
+        const transcript = resultByRef.get(target.clip.mediaRef);
+        if (!transcript) continue;
+
+        // Window the transcript to the clip's visible SOURCE span (trim..trim+consumed), in seconds.
+        const sourceStart = target.clip.trimStartFrame / fps;
+        const sourceEnd = (target.clip.trimStartFrame + sourceFramesConsumed(target.clip)) / fps;
+        const windowed = filterTranscript(transcript, sourceStart, sourceEnd);
+
+        const phrases = applyTextCase(
+          buildCaptionPhrases(windowed.segments, windowed.words, { measure, maxWords: a.maxWords }),
+          textCase,
+        );
+        allSpecs.push(...captionSpecsForClip(target.clip, target.trackIndex, phrases, fps));
+      }
+
+      if (allSpecs.length === 0) {
+        const note = skipped.length > 0 ? ` Skipped: ${skipped.map((s) => s.mediaRef).join(", ")}.` : "";
+        return ok(`No captions were generated (no speech detected in the target clip(s)).${note}`);
+      }
+
+      const animation = a.animation
+        ? { preset: a.animation.preset, ...(highlightColor !== undefined ? { highlightColor } : {}) }
+        : undefined;
+      const captionGroupId = ctx.newId();
+      const cmd = placeCaptionsCommand({
+        specs: allSpecs,
+        style,
+        animation,
+        centerX: a.centerX,
+        centerY: a.centerY,
+        captionGroupId,
+        newId: ctx.newId,
+      });
+      ctx.store.dispatch(cmd);
+
+      const out: Record<string, unknown> = { captionsAdded: allSpecs.length, trackIndex: 0, captionGroupId };
+      if (skipped.length > 0) out.skipped = skipped;
+      return ok(JSON.stringify(out, null, 2));
+    },
+  };
+}
+
+async function addCaptionsFromSubtitle(
+  a: Record<string, unknown> & { subtitleMediaRef?: string },
+  ctx: ToolContext,
+): Promise<ToolResult> {
+  const subtitleMediaRef = a.subtitleMediaRef;
+  if (typeof subtitleMediaRef !== "string" || subtitleMediaRef.length === 0) {
+    return errorResult("add_captions: subtitleMediaRef must be a non-empty media asset id string.");
+  }
+  const combined = Object.keys(a)
+    .filter((k) => k !== "subtitleMediaRef" && a[k] !== undefined)
+    .sort();
+  if (combined.length > 0) {
+    return errorResult(
+      "add_captions: subtitleMediaRef uses the file's text, timing, and default styling as-is; " +
+        `remove ${combined.join(", ")}.`,
+    );
+  }
+
+  const entry = ctx.getManifest().entries.find((e) => e.id === subtitleMediaRef);
+  if (!entry) return errorResult(`add_captions: media asset not found: ${subtitleMediaRef}`);
+  if (entry.type !== "subtitle") {
+    return errorResult(
+      `add_captions: '${subtitleMediaRef}' is ${entry.type}, not a subtitle file. Omit subtitleMediaRef to caption spoken audio.`,
+    );
+  }
+  if (!ctx.library?.readEntryBytes) {
+    return errorResult(`add_captions: the subtitle file for '${subtitleMediaRef}' is offline.`);
+  }
+
+  let bytes: Uint8Array;
+  try {
+    bytes = await ctx.library.readEntryBytes(subtitleMediaRef);
+  } catch {
+    return errorResult(`add_captions: the subtitle file for '${subtitleMediaRef}' is offline.`);
+  }
+  if (!bytes || bytes.length === 0) {
+    return errorResult(`add_captions: the subtitle file for '${subtitleMediaRef}' is offline.`);
+  }
+
+  const filename = entry.source.kind === "project" ? entry.source.relativePath : entry.source.absolutePath;
+  let cues;
+  try {
+    cues = parseSubtitleFile(bytes, filename);
+  } catch (err) {
+    const message = err instanceof SubtitleParseError ? err.message : String(err);
+    return errorResult(`add_captions: ${message}`);
+  }
+
+  const captionGroupId = ctx.newId();
+  const cmd = placeSubtitleCaptionsCommand({
+    cues,
+    fps: ctx.store.getSnapshot().timeline.fps,
+    captionGroupId,
+    newId: ctx.newId,
+  });
+  ctx.store.dispatch(cmd);
+  const out = { captionsAdded: cues.length, trackIndex: 0, captionGroupId };
+  return ok(JSON.stringify(out, null, 2));
+}

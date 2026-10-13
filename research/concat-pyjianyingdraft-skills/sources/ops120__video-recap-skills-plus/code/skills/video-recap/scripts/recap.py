@@ -1,0 +1,1015 @@
+#!/usr/bin/env python3
+"""video-recap orchestrator.
+
+Chains the independent video-* stage skills into a full narrated recap:
+
+  video-understanding  ->  (agent writes narration.json per video-script)  ->
+  [video-cut]  ->  video-voiceover  ->  video-assemble
+
+Each stage is a self-contained sibling skill invoked as a subprocess; they communicate
+only through JSON/MP4 artifacts in the shared work_dir. Resume by rerunning the same
+command after writing narration.json; Phase B verifies a run manifest before reusing
+work_dir artifacts.
+"""
+import argparse
+import hashlib
+import json
+import math
+import os
+import shlex
+import subprocess
+import sys
+from pathlib import Path
+
+from doctor import ffmpeg_has_subtitles_filter
+import materials as material_lib
+
+BUNDLE = Path(__file__).resolve().parents[2]  # the skills/ directory
+RUN_MANIFEST = "recap_run_manifest.json"
+ASSEMBLY_MANIFEST = "assembly_manifest.json"
+PHASE_LEDGER = "recap_phase.json"
+MULTI_SOURCE_MANIFEST = "multi_source_manifest.json"
+
+
+def _entry(skill, script):
+    return BUNDLE / skill / "scripts" / script
+
+
+def _run(skill, script, *cli_args):
+    cmd = [sys.executable, str(_entry(skill, script)), *map(str, cli_args)]
+    print(f"[video-recap] ▶ {skill}/{script}", flush=True)
+    res = subprocess.run(cmd)
+    if res.returncode != 0:
+        raise SystemExit(f"{skill}/{script} 失败 (exit {res.returncode})")
+
+
+def _env_bool(name, default=False):
+    raw = os.environ.get(name)
+    if raw is None or raw == "":
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def _read_video_duration_or_raise(path):
+    """Return media duration via ffprobe, or hard-fail before downstream TTS/render."""
+    path = Path(path)
+    cmd = [
+        "ffprobe", "-v", "quiet", "-show_entries", "format=duration",
+        "-of", "csv=p=0", str(path),
+    ]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode != 0:
+        detail = (res.stderr or res.stdout or "ffprobe failed").strip()
+        raise SystemExit(f"无法读取成片时长: {path} ({detail})")
+    try:
+        duration = float(res.stdout.strip())
+    except (TypeError, ValueError):
+        raise SystemExit(f"无法读取成片时长: {path} (ffprobe 输出无效: {res.stdout!r})")
+    if not math.isfinite(duration) or duration <= 0:
+        raise SystemExit(f"无法读取成片时长: {path} (duration={duration:.3f})")
+    return duration
+
+
+def _review_narration_enabled(args):
+    if getattr(args, "review_narration", None) is not None:
+        return bool(args.review_narration)
+    return _env_bool("REVIEW_NARRATION", True)
+
+
+def _require_narration_review(args):
+    if getattr(args, "require_narration_review", False):
+        return True
+    return _env_bool("REQUIRE_NARRATION_REVIEW", False)
+
+
+def _review_result_status(work_dir):
+    data = _load_json(Path(work_dir) / "narration_review.json")
+    if not isinstance(data, dict):
+        return {"ok": False, "reason": "missing or invalid narration_review.json"}
+    findings = [f for f in (data.get("findings") or []) if isinstance(f, dict)]
+    n_err = sum(1 for f in findings if f.get("severity") == "error")
+    if data.get("parse_error"):
+        return {"ok": False, "reason": "parse_error", "review": data, "errors": n_err}
+    if n_err:
+        return {"ok": False, "reason": f"error {n_err}", "review": data, "errors": n_err}
+    # Strict mode gates ONLY on parse_error or factual `error` findings — never on the model's
+    # holistic verdict. review.py deliberately clamps craft-class severities to `warning`, so a
+    # bare REVISE/FAIL with no error finding would otherwise smuggle subjective judgment back
+    # through the gate. The verdict stays an advisory signal in narration_review.*.
+    return {"ok": True, "reason": "ok", "review": data, "errors": n_err}
+
+
+def _clear_narration_review_artifacts(work_dir):
+    """Remove prior review artifacts before a fresh pre-TTS review run.
+
+    The review is allowed to fail open in advisory mode, but completion output and
+    strict gating must never accidentally trust a stale narration_review.* from an
+    earlier run.
+    """
+    for name in ("narration_review.json", "narration_review.md"):
+        try:
+            (Path(work_dir) / name).unlink()
+        except FileNotFoundError:
+            pass
+
+
+def _run_narration_review(work_dir, args, *, timeline="source"):
+    """Run quality review before TTS.
+
+    Default mode remains advisory/fail-open. Strict mode
+    (`--require-narration-review` or REQUIRE_NARRATION_REVIEW) hard-fails before
+    TTS when review is unavailable, unparsable, or reports error findings.
+    Returns True only when review.py completed, so completion messages do not
+    point at stale review artifacts after opt-out/fail-open runs.
+    """
+    strict = _require_narration_review(args)
+    if not _review_narration_enabled(args) and not strict:
+        return False
+    try:
+        _clear_narration_review_artifacts(work_dir)
+        # Always pin the grounding timeline explicitly so the orchestrated review never falls
+        # through to review.py's auto-detect (which could flip on stale cut artifacts left in a
+        # reused full-mode work_dir).
+        rargs = ["--work-dir", work_dir, "--timeline", timeline]
+        _run("video-script", "review.py", *rargs)
+    except SystemExit as exc:
+        if strict:
+            raise SystemExit(f"严格解说评审失败，已阻止 TTS: {exc}")
+        print(f"[video-recap] ⚠️ 建议性评审失败，继续执行 TTS: {exc}", flush=True)
+        return False
+
+    status = _review_result_status(work_dir)
+    if strict and not status["ok"]:
+        raise SystemExit(f"严格解说评审未通过，已阻止 TTS: {status['reason']}")
+    if strict:
+        print("[video-recap] ✅ 严格解说评审通过，继续 TTS", flush=True)
+    return True
+
+
+def _file_fingerprint(path, chunk_size=1024 * 1024):
+    h = hashlib.sha256()
+    with Path(path).open("rb") as f:
+        for chunk in iter(lambda: f.read(chunk_size), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _analysis_settings(args):
+    return {
+        "context": args.context,
+        "scene_threshold": args.scene_threshold,
+        "style": args.style,
+        "edit_mode": args.edit_mode,
+        "target_duration": args.target_duration,
+        "skip_asr": bool(args.skip_asr),
+        "mimo_video_overview": bool(args.mimo_video_overview),
+        "consolidate": bool(args.consolidate),
+        "consolidate_asr": bool(args.consolidate_asr),
+    }
+
+
+def _material_settings_fingerprint(args):
+    return material_lib.settings_fingerprint(_analysis_settings(args))
+
+
+def _coerce_videos(video_or_videos):
+    if isinstance(video_or_videos, (list, tuple)):
+        return [Path(v).resolve() for v in video_or_videos]
+    return [Path(video_or_videos).resolve()]
+
+
+def _run_manifest_payload(video, args):
+    return {
+        "schema_version": 1,
+        "source_video": str(Path(video).resolve()),
+        "source_video_fingerprint": _file_fingerprint(video),
+        "settings": _analysis_settings(args),
+    }
+
+
+def _write_run_manifest(work_dir, video, args):
+    payload = _run_manifest_payload(video, args)
+    (work_dir / RUN_MANIFEST).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _build_multi_source_records(videos, work_dir, args):
+    records = []
+    for video in _coerce_videos(videos):
+        fp = _file_fingerprint(video)
+        records.append({
+            "source_path": str(video),
+            "source_name": video.name,
+            "source_video_fingerprint": fp,
+            "settings_fingerprint": _material_settings_fingerprint(args),
+            "material_id": material_lib.material_id_for(video, fp),
+        })
+    records = material_lib.assign_source_ids(records)
+    for record in records:
+        record["source_work_dir"] = f"sources/{record['source_id']}"
+    return records
+
+
+def _multi_run_manifest_payload(videos, args, source_records):
+    return {
+        "schema_version": 2,
+        "mode": "multi_source",
+        "sources": [
+            {
+                "source_id": s.get("source_id"),
+                "source_path": s.get("source_path"),
+                "source_video_fingerprint": s.get("source_video_fingerprint"),
+                "source_work_dir": s.get("source_work_dir"),
+                "material_id": s.get("material_id"),
+            }
+            for s in source_records
+        ],
+        "source_videos": [str(v) for v in _coerce_videos(videos)],
+        "settings": _analysis_settings(args),
+    }
+
+
+def _write_project_run_manifest(work_dir, videos, args, source_records):
+    payload = _multi_run_manifest_payload(videos, args, source_records)
+    (work_dir / RUN_MANIFEST).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _write_multi_source_manifest(work_dir, source_records):
+    path = Path(work_dir) / MULTI_SOURCE_MANIFEST
+    payload = {
+        "schema_version": 1,
+        "sources": [
+            {
+                "source_id": s["source_id"],
+                "source_path": s["source_path"],
+                "source_name": s["source_name"],
+                "source_video_fingerprint": s["source_video_fingerprint"],
+                "source_work_dir": s["source_work_dir"],
+                "material_id": s.get("material_id"),
+            }
+            for s in source_records
+        ],
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return path
+
+
+def _load_multi_source_manifest(work_dir):
+    data = _load_json(Path(work_dir) / MULTI_SOURCE_MANIFEST)
+    if isinstance(data, dict) and isinstance(data.get("sources"), list):
+        return data
+    return None
+
+
+def _load_run_manifest(work_dir):
+    path = Path(work_dir) / RUN_MANIFEST
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError):
+        return None
+
+
+def _load_json(path):
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError):
+        return None
+
+
+def _burn_subtitles_intended(args):
+    """Effective burn-subtitles state at orchestrator level. Mirrors video-assemble's
+    CONFIG default `env_bool("BURN_SUBTITLES", True)` (burn is ON by default); an explicit
+    CLI flag (--burn-subtitles / --no-burn-subtitles) overrides the env."""
+    if getattr(args, "burn_subtitles", None) is not None:
+        return bool(args.burn_subtitles)
+    raw = os.environ.get("BURN_SUBTITLES")
+    if raw is None or raw == "":
+        return True
+    return raw.strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def _ffmpeg_present_but_cannot_burn():
+    """True only when ffmpeg EXISTS but lacks the libass `subtitles` filter — the specific
+    "subtitle-burn environment unsupported" case. Returns False when ffmpeg is absent
+    entirely: that is a more fundamental problem that surfaces at the first stage (understand
+    calls ffprobe/ffmpeg) and is reported by doctor, so this guard stays narrow — and does
+    not fire in mocked, ffmpeg-less test environments."""
+    import shutil
+    if shutil.which("ffmpeg") is None:
+        return False
+    return not ffmpeg_has_subtitles_filter()
+
+
+def _preflight_burn_subtitles(args):
+    """Fail fast BEFORE any understanding/VLM/ASR/TTS spend when subtitle burn-in is on but
+    this ffmpeg can't burn it. Without it the run only dies at the final assemble
+    `-vf subtitles=` step — after the whole expensive pipeline has run."""
+    if not _burn_subtitles_intended(args):
+        return
+    if _ffmpeg_present_but_cannot_burn():
+        raise SystemExit(
+            "字幕烧录已开启，但当前 ffmpeg 不支持 subtitles/libass 滤镜，整条流程会跑到最后渲染才失败。\n"
+            "  解决其一：(1) 安装带 libass 的 ffmpeg；(2) 加 --no-burn-subtitles 关闭烧录"
+            "（仍输出 .srt 外挂字幕）。\n"
+            f"  自检：python3 {shlex.quote(str(_entry('video-recap', 'doctor.py')))}")
+
+
+def _print_narration_review_pointer(work_dir, *, review_ran=True):
+    """Surface the advisory narration review produced by this run, if any.
+
+    Review is optional/fail-open. Avoid surfacing a stale narration_review.md from an
+    older run when review was disabled or failed before producing fresh artifacts.
+    """
+    if not review_ran:
+        return
+    review_md = Path(work_dir) / "narration_review.md"
+    if not review_md.exists():
+        return
+    data = _load_json(Path(work_dir) / "narration_review.json")
+    if isinstance(data, dict):
+        findings = [f for f in (data.get("findings") or []) if isinstance(f, dict)]
+        n_err = sum(1 for f in findings if f.get("severity") == "error")
+        tag = str(data.get("verdict") or "见文件")
+        print(f"[video-recap] 📋 解说评审（建议性，不拦截）: {tag} · "
+              f"{len(findings)} 条意见（error {n_err}）→ {review_md}")
+    else:
+        print(f"[video-recap] 📋 解说评审意见 → {review_md}")
+
+
+def _settings_for_compare(settings):
+    """Settings that, if changed, invalidate reusing an existing work_dir on resume.
+
+    `consolidate`/`consolidate_asr` are EXCLUDED: they only ADD an optional understanding
+    artifact and never re-run Phase A on a Phase-B resume, so a stored manifest carrying the
+    old default (or missing the key entirely, pre-dating it) must still resume — otherwise
+    flipping `--consolidate`'s default ON would hard-fail every in-flight work_dir.
+    """
+    s = dict(settings or {})
+    s.pop("consolidate", None)
+    s.pop("consolidate_asr", None)
+    return s
+
+
+def _manifest_mismatches(work_dir, video, args):
+    expected = _run_manifest_payload(video, args)
+    actual = _load_run_manifest(work_dir)
+    if not actual:
+        return ["缺少或无法读取 recap_run_manifest.json；不能证明 work_dir 属于当前视频/参数"]
+    mismatches = []
+    for key in ("source_video", "source_video_fingerprint"):
+        if actual.get(key) != expected.get(key):
+            mismatches.append(f"{key}: expected {expected.get(key)!r}, got {actual.get(key)!r}")
+    if _settings_for_compare(actual.get("settings")) != _settings_for_compare(expected.get("settings")):
+        mismatches.append("settings: 当前 CLI/env 参数与 Phase A manifest 不匹配")
+    return mismatches
+
+
+def _multi_manifest_mismatches(work_dir, videos, args, source_records):
+    expected = _multi_run_manifest_payload(videos, args, source_records)
+    actual = _load_run_manifest(work_dir)
+    if not actual:
+        return ["缺少或无法读取 recap_run_manifest.json；不能证明 work_dir 属于当前多视频/参数"]
+    mismatches = []
+    if actual.get("mode") != "multi_source":
+        mismatches.append(f"mode: expected 'multi_source', got {actual.get('mode')!r}")
+    expected_sources = [
+        {
+            "source_id": s.get("source_id"),
+            "source_path": s.get("source_path"),
+            "source_video_fingerprint": s.get("source_video_fingerprint"),
+        }
+        for s in expected.get("sources", [])
+    ]
+    actual_sources = [
+        {
+            "source_id": s.get("source_id"),
+            "source_path": s.get("source_path"),
+            "source_video_fingerprint": s.get("source_video_fingerprint"),
+        }
+        for s in actual.get("sources", [])
+        if isinstance(s, dict)
+    ]
+    if actual_sources != expected_sources:
+        mismatches.append("sources: 当前输入视频列表/顺序/source_id/fingerprint 与 Phase A manifest 不匹配")
+    if _settings_for_compare(actual.get("settings")) != _settings_for_compare(expected.get("settings")):
+        mismatches.append("settings: 当前 CLI/env 参数与 Phase A manifest 不匹配")
+    return mismatches
+
+
+def _read_assembly_output(work_dir):
+    manifest = _load_json(Path(work_dir) / ASSEMBLY_MANIFEST)
+    if isinstance(manifest, dict) and manifest.get("final_output"):
+        return Path(manifest["final_output"])
+    return None
+
+
+def _file_md5(path):
+    path = Path(path)
+    return hashlib.md5(path.read_bytes()).hexdigest() if path.exists() else None
+
+
+def _read_phase_ledger(work_dir):
+    """Phase ledger (cut mode): which artifacts exist and the clip_plan/narration they match.
+
+    Lets resume be driven by recorded phase state rather than bare file existence — the
+    prerequisite for the cut-first/narrate-second two-pause flow, and the guard that keeps a
+    narration written for one clip_plan from silently driving a different cut into TTS.
+    """
+    ledger = _load_json(Path(work_dir) / PHASE_LEDGER)
+    return ledger if isinstance(ledger, dict) else None
+
+
+def _write_phase_ledger(work_dir, **fields):
+    ledger = _read_phase_ledger(work_dir) or {}
+    ledger.update(fields)
+    (Path(work_dir) / PHASE_LEDGER).write_text(
+        json.dumps(ledger, ensure_ascii=False, indent=2), encoding="utf-8")
+    return ledger
+
+
+def _cut_narration_is_stale(ledger, current_clip_plan_fp):
+    """Two-pass cut: the narration is authored against the rendered cut shown at the A2 pause,
+    i.e. against the clip_plan recorded in the ledger. If clip_plan changed since (a re-cut)
+    while that narration is still present, it describes the OLD cut — stale."""
+    if not ledger:
+        return False
+    recorded_cp = ledger.get("clip_plan_fingerprint")
+    return bool(recorded_cp is not None and recorded_cp != current_clip_plan_fp)
+
+
+def _continuation_command(video, work_dir, args):
+    videos = _coerce_videos(video)
+    parts = [sys.executable, str(_entry("video-recap", "recap.py")), *[str(v) for v in videos], "--work-dir", str(work_dir)]
+    if args.context:
+        parts += ["--context", args.context]
+    if args.scene_threshold is not None:
+        parts += ["--scene-threshold", str(args.scene_threshold)]
+    if args.style != "纪录片":
+        parts += ["--style", args.style]
+    if args.edit_mode != "full":
+        parts += ["--edit-mode", args.edit_mode]
+    if args.target_duration:
+        parts += ["--target-duration", args.target_duration]
+    if getattr(args, "allow_sparse_cut", False):
+        parts.append("--allow-sparse-cut")
+    if args.skip_asr:
+        parts.append("--skip-asr")
+    if args.mimo_video_overview:
+        parts.append("--mimo-video-overview")
+    if not args.consolidate:  # default is ON now; only the opt-out needs to round-trip
+        parts.append("--no-consolidate")
+    if args.consolidate_asr:
+        parts.append("--consolidate-asr")
+    if getattr(args, "mimo_tts_voice", None):
+        parts += ["--mimo-tts-voice", args.mimo_tts_voice]
+    if getattr(args, "allow_partial_tts", False):
+        parts.append("--allow-partial-tts")
+    if getattr(args, "burn_subtitles", None) is not None:
+        parts.append("--burn-subtitles" if args.burn_subtitles else "--no-burn-subtitles")
+    if getattr(args, "output_dir", None):
+        parts += ["--output-dir", args.output_dir]
+    if getattr(args, "export_jianying", False):
+        parts.append("--export-jianying")
+    if getattr(args, "jianying_bundle_media", False):
+        parts.append("--jianying-bundle-media")
+    if getattr(args, "jianying_no_bundle_media", False):
+        parts.append("--jianying-no-bundle-media")
+    if getattr(args, "review_narration", None) is not None:
+        parts.append("--review-narration" if args.review_narration else "--no-review-narration")
+    if getattr(args, "require_narration_review", False):
+        parts.append("--require-narration-review")
+    if getattr(args, "material_library_dir", None):
+        parts += ["--material-library-dir", args.material_library_dir]
+    if getattr(args, "use_materials", False):
+        parts.append("--use-materials")
+    if getattr(args, "save_materials", False):
+        parts.append("--save-materials")
+    return " ".join(shlex.quote(part) for part in parts)
+
+
+def _source_work_dir(project_work_dir, source_record):
+    return Path(project_work_dir) / source_record["source_work_dir"]
+
+
+def _understand_args_for_source(source_record, source_work_dir, args):
+    uargs = [source_record["source_path"], "--work-dir", str(source_work_dir), "--style", args.style]
+    if args.context:
+        uargs += ["--context", args.context]
+    if args.scene_threshold is not None:
+        uargs += ["--scene-threshold", str(args.scene_threshold)]
+    if args.edit_mode:
+        uargs += ["--edit-mode", args.edit_mode]
+    if args.target_duration:
+        uargs += ["--target-duration", args.target_duration]
+    if args.skip_asr:
+        uargs.append("--skip-asr")
+    if args.mimo_video_overview:
+        uargs.append("--mimo-video-overview")
+    uargs.append("--consolidate" if args.consolidate else "--no-consolidate")
+    if args.consolidate_asr:
+        uargs.append("--consolidate-asr")
+    return uargs
+
+
+def _brief_excerpt(path, limit=1200):
+    try:
+        text = Path(path).read_text(encoding="utf-8")
+    except OSError:
+        return ""
+    return text[:limit]
+
+
+def _write_multi_source_clip_brief(work_dir, source_records, args):
+    lines = [
+        "# Multi-source Clip Plan Brief",
+        "",
+        "你正在做多视频剪辑复盘。当前 MVP 只支持 `--edit-mode cut`：先写 `clip_plan.json`，下一步会剪出 `edited_source.mp4`，再对 OUTPUT 时间轴写 `narration.json`。",
+        "",
+        "## 必须写入的格式",
+        "",
+        "```json",
+        "{\"target_duration\":\"10m\",\"clips\":[{\"source_id\":\"src_xxx\",\"start\":12.0,\"end\":38.0,\"reason\":\"hook\"}]}",
+        "```",
+        "",
+        "- 每个 clip 必须带 `source_id`。",
+        "- `start`/`end` 是对应 source 原视频时间（秒）。",
+        "- 不同 `source_id` 的相同时间段不算重叠；同一 `source_id` 内不要重复/重叠，除非你明确接受稀疏/重复剪辑风险。",
+        "- 素材库是文件系统 JSON/MD/JSONL；需要找历史素材时直接 `grep -R \"关键词\" <material-library-dir>`。",
+    ]
+    if args.target_duration:
+        lines.append(f"- 目标时长：`{args.target_duration}`。")
+    lines += ["", "## Sources", ""]
+    for s in source_records:
+        swd = _source_work_dir(work_dir, s)
+        lines += [
+            f"### {s['source_id']} — {s['source_name']}",
+            f"- path: `{s['source_path']}`",
+            f"- work_dir: `{swd}`",
+            f"- fingerprint: `{s['source_video_fingerprint']}`",
+            f"- material_id: `{s.get('material_id')}`",
+        ]
+        excerpt = _brief_excerpt(swd / "agent_narration_brief.md")
+        if excerpt:
+            lines += ["", "#### per-source brief excerpt", "", excerpt, ""]
+    (Path(work_dir) / "agent_narration_brief.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+
+
+def _write_multi_source_output_brief(work_dir, source_records, validated_plan_path):
+    plan = _load_json(validated_plan_path)
+    clips = plan.get("clips", []) if isinstance(plan, dict) else []
+    source_by_id = {s["source_id"]: s for s in source_records}
+    lines = [
+        "# Multi-source Output Narration Brief",
+        "",
+        "现在 `edited_source.mp4` 已经由多个源视频剪好。请对剪后成片的 OUTPUT 时间轴写 `narration.json`。",
+        "",
+        "## narration.json 格式",
+        "",
+        "```json",
+        "[{\"start\":0.0,\"end\":4.0,\"narration\":\"...\"}]",
+        "```",
+        "",
+        "注意：`start`/`end` 是剪后成片时间，不是原视频时间。",
+        "",
+        "## Kept clips (output → source)",
+    ]
+    for c in clips:
+        sid = c.get("source_id")
+        src = source_by_id.get(sid, {})
+        lines.append(
+            f"- output {_fmt_range(c.get('output_start'), c.get('output_end'))} → "
+            f"{sid} `{src.get('source_path', c.get('source_path', ''))}` "
+            f"source {_fmt_range(c.get('source_start'), c.get('source_end'))} "
+            f"{('— ' + str(c.get('reason'))) if c.get('reason') else ''}"
+        )
+    lines += ["", "## Source work dirs"]
+    for s in source_records:
+        lines.append(f"- {s['source_id']}: `{_source_work_dir(work_dir, s)}`")
+    (Path(work_dir) / "agent_narration_brief.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+
+
+def _fmt_range(start, end):
+    try:
+        return f"{float(start):.3f}-{float(end):.3f}s"
+    except (TypeError, ValueError):
+        return f"{start}-{end}s"
+
+
+def _material_library_dir(args):
+    return args.material_library_dir or os.environ.get("VIDEO_RECAP_MATERIAL_LIBRARY_DIR") or None
+
+
+def _materials_enabled(args):
+    return bool(_material_library_dir(args) and args.use_materials)
+
+
+def _save_materials_enabled(args):
+    return bool(_material_library_dir(args) and args.save_materials)
+
+
+def _pause_for_agent(work_dir, need_text, cont, inspect_hint=None):
+    brief = Path(work_dir) / "agent_narration_brief.md"
+    print("=" * 50)
+    if brief.exists() and "Research the story FIRST" in brief.read_text(encoding="utf-8"):
+        print("[video-recap] ⚑ 理解素材偏薄：先按 brief 顶部「Research the story FIRST」调研并写 "
+              "background_research.json，再写解说，避免看图说话。")
+    print(f"[video-recap] ⏸  阅读 {brief}（按 video-script 规则）后写入 {need_text}")
+    if inspect_hint:
+        print(f"[video-recap]    先核对状态/时间轴（建议性）: {inspect_hint}")
+    print(f"[video-recap]    写完后重跑继续: {cont}")
+    print("=" * 50)
+
+
+def _run_or_restore_understanding(source_record, source_work_dir, args):
+    """Run video-understanding for one source, or restore it from the material library."""
+    source_work_dir = Path(source_work_dir)
+    source_work_dir.mkdir(parents=True, exist_ok=True)
+    source_fp = source_record["source_video_fingerprint"]
+    settings_fp = source_record.get("settings_fingerprint") or _material_settings_fingerprint(args)
+    lib_dir = _material_library_dir(args)
+    restored = False
+    if lib_dir and _materials_enabled(args):
+        result = material_lib.restore_material(
+            lib_dir,
+            source_work_dir,
+            source_fingerprint=source_fp,
+            settings_fp=settings_fp,
+        )
+        restored = bool(result.get("restored"))
+        if restored:
+            print(f"[video-recap] ♻️  复用素材库: {result.get('material_id')} → {source_work_dir}", flush=True)
+        elif result.get("reason"):
+            print(f"[video-recap] 素材库未复用 {source_record['source_name']}: {result['reason']}", flush=True)
+
+    if not restored:
+        _run("video-understanding", "understand.py", *_understand_args_for_source(source_record, source_work_dir, args))
+
+    _write_run_manifest(source_work_dir, source_record["source_path"], args)
+    if lib_dir and _save_materials_enabled(args):
+        meta = material_lib.save_material(
+            lib_dir,
+            source_work_dir,
+            source_record["source_path"],
+            source_fp,
+            settings_fp,
+            source_id=source_record.get("source_id"),
+            material_id=source_record.get("material_id"),
+        )
+        source_record["material_id"] = meta.get("material_id")
+        print(f"[video-recap] 💾 已沉淀素材: {meta.get('material_id')} → {lib_dir}", flush=True)
+    return restored
+
+
+def _rebuild_understanding_brief(source_record, source_work_dir, args):
+    """Rebuild agent_narration_brief.md from cached/restored analysis only.
+
+    Cut pass 2 needs an OUTPUT-time brief after edited_source.mp4 exists. A
+    material restore may have supplied pass-1 analysis artifacts (and even a
+    source-time brief), but it must not skip this phase-specific brief rebuild.
+    """
+    _run(
+        "video-understanding",
+        "understand.py",
+        *_understand_args_for_source(source_record, source_work_dir, args),
+        "--brief-only",
+    )
+
+
+def _reject_stale_multi_manifest(work_dir, videos, args, source_records):
+    mismatches = _multi_manifest_mismatches(work_dir, videos, args, source_records)
+    if mismatches:
+        details = "\n  - ".join(mismatches)
+        raise SystemExit(
+            "work_dir 与当前多视频 recap 输入不匹配，拒绝复用既有 narration/clip_plan；"
+            "请使用新的 --work-dir，或删除旧产物后重新运行 Phase A。\n"
+            f"  - {details}")
+
+
+def _run_multi_cut(videos, work_dir, args):
+    """Multi-video MVP: cut-first/narrate-second over a project work_dir."""
+    videos = _coerce_videos(videos)
+    work_dir = Path(work_dir)
+    work_dir.mkdir(parents=True, exist_ok=True)
+    source_records = _build_multi_source_records(videos, work_dir, args)
+    narration_json = work_dir / "narration.json"
+    clip_plan_json = work_dir / "clip_plan.json"
+    edited_source = work_dir / "edited_source.mp4"
+    inspect_py = _entry("video-recap", "recap_inspect.py")
+
+    # If a project manifest already exists, it must match before any Phase-B reuse.
+    if (work_dir / RUN_MANIFEST).exists():
+        _reject_stale_multi_manifest(work_dir, videos, args, source_records)
+    manifest_path = _write_multi_source_manifest(work_dir, source_records)
+
+    if not clip_plan_json.exists():
+        for record in source_records:
+            _run_or_restore_understanding(record, _source_work_dir(work_dir, record), args)
+        manifest_path = _write_multi_source_manifest(work_dir, source_records)
+        _write_project_run_manifest(work_dir, videos, args, source_records)
+        _write_multi_source_clip_brief(work_dir, source_records, args)
+        _pause_for_agent(
+            work_dir,
+            f"{clip_plan_json}（多视频剪辑计划；每个 clip 必须带 source_id）",
+            _continuation_command(videos, work_dir, args),
+            inspect_hint=f"python3 {inspect_py} --work-dir {work_dir} state",
+        )
+        return
+
+    _reject_stale_multi_manifest(work_dir, videos, args, source_records)
+    cp_fp = _file_md5(clip_plan_json)
+    crender = [str(videos[0]), "--work-dir", str(work_dir), "--sources-manifest", str(manifest_path), "--no-narration-map"]
+    if args.target_duration:
+        crender += ["--target-duration", args.target_duration]
+    if getattr(args, "allow_sparse_cut", False):
+        crender.append("--allow-sparse-cut")
+    _run("video-cut", "cut.py", *crender)
+    if not narration_json.exists():
+        _write_multi_source_output_brief(work_dir, source_records, work_dir / "clip_plan_validated.json")
+        _write_phase_ledger(work_dir, clip_plan_fingerprint=cp_fp, edited_source_rendered=True, multi_source=True)
+        _pause_for_agent(
+            work_dir,
+            f"{narration_json}（用成片 OUTPUT 时间轴写解说，对着 {edited_source}）",
+            _continuation_command(videos, work_dir, args),
+            inspect_hint=(f"python3 {inspect_py} --work-dir {work_dir} "
+                          "clip-map --output-start <s> --output-end <e>"),
+        )
+        return
+    if _cut_narration_is_stale(_read_phase_ledger(work_dir), cp_fp):
+        raise SystemExit(
+            "clip_plan.json 已改变，但 narration.json 仍是对旧剪辑写的，会与剪后画面对不上。"
+            "请删除 narration.json，重跑后按新成片重新写解说。")
+    _write_phase_ledger(work_dir, clip_plan_fingerprint=cp_fp,
+                        narration_fingerprint=_file_md5(narration_json), narration_written=True, multi_source=True)
+    output_duration = _read_video_duration_or_raise(edited_source)
+    _run("video-script", "validate.py", "--work-dir", work_dir, "--mode", "cut_output",
+         "--output-duration", f"{output_duration:.3f}")
+    review_ran = _run_narration_review(work_dir, args, timeline="cut_output")
+    vargs = ["--work-dir", str(work_dir), "--narration", str(narration_json)]
+    if args.mimo_tts_voice:
+        vargs += ["--mimo-voice", args.mimo_tts_voice]
+    if args.voice_ref:
+        vargs += ["--voice-ref", args.voice_ref]
+    if args.allow_partial_tts:
+        vargs.append("--allow-partial-tts")
+    _run("video-voiceover", "voiceover.py", *vargs)
+
+    recap_stem = f"multi_{videos[0].stem}"
+    aargs = [str(edited_source), "--work-dir", str(work_dir), "--recap-stem", recap_stem]
+    if args.output_dir:
+        aargs += ["--output-dir", args.output_dir]
+    if args.burn_subtitles is not None:
+        aargs.append("--burn-subtitles" if args.burn_subtitles else "--no-burn-subtitles")
+    if args.export_jianying:
+        aargs.append("--export-jianying")
+    if args.jianying_bundle_media:
+        aargs.append("--jianying-bundle-media")
+    if args.jianying_no_bundle_media:
+        aargs.append("--jianying-no-bundle-media")
+    _run("video-assemble", "assemble.py", *aargs)
+
+    final_dir = Path(args.output_dir) if args.output_dir else work_dir.parent
+    final_output = _read_assembly_output(work_dir) or (final_dir / ("recap_" + recap_stem + ".mp4"))
+    print(f"[video-recap] ✅ 完成: {final_output}")
+    _print_narration_review_pointer(work_dir, review_ran=review_ran)
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Full video recap orchestrator (video-* skill bundle).")
+    ap.add_argument("video", nargs="*")
+    ap.add_argument("--work-dir", default=None)
+    ap.add_argument("--context", default="")
+    ap.add_argument("--scene-threshold", type=float, default=None)
+    ap.add_argument("--style", default="纪录片")
+    ap.add_argument("--edit-mode", default=os.environ.get("EDIT_MODE", "full"), choices=["full", "cut", "dub"])
+    ap.add_argument("--target-duration", default=os.environ.get("TARGET_DURATION") or None)
+    ap.add_argument("--allow-sparse-cut", action="store_true",
+                    help="cut mode: accept a sparse/heavily-dropped narration mapping instead of failing the cut preflight")
+    ap.add_argument("--skip-asr", action="store_true")
+    ap.add_argument("--mimo-video-overview", action="store_true")
+    ap.add_argument("--consolidate", action=argparse.BooleanOptionalAction, default=True,
+                    help="build the understanding story index (Pass B); default ON, --no-consolidate to skip")
+    ap.add_argument("--consolidate-asr", action="store_true", help="also clean ASR (Pass A)")
+    ap.add_argument("--mimo-tts-voice", default=None, help="MiMo TTS voice")
+    ap.add_argument("--voice-ref", default=None, help="自定义音色参考音频路径（wav/mp3），使用 voiceclone 模型")
+    ap.add_argument("--allow-partial-tts", action="store_true",
+                    help="allow video-voiceover to continue when some narration segments fail TTS")
+    ap.add_argument("--burn-subtitles", action=argparse.BooleanOptionalAction, default=None,
+                    help="burn narration subtitles into the video (default on; --no-burn-subtitles to disable)")
+    ap.add_argument("--subtitle-y-top", type=int, default=None,
+                    help="自定义字幕上沿Y坐标(像素,-1=按默认alignment+margin_v)。可用 tools/measure_subtitle.py 生成")
+    ap.add_argument("--subtitle-y-bot", type=int, default=None,
+                    help="自定义字幕下沿Y坐标(像素,-1=按默认alignment+margin_v)")
+    ap.add_argument("--review-narration", action=argparse.BooleanOptionalAction, default=None,
+                    help="run advisory narration quality review before TTS (default on; fail-open)")
+    ap.add_argument("--require-narration-review", action="store_true",
+                    help="make narration review a strict pre-TTS gate (also REQUIRE_NARRATION_REVIEW=1)")
+    ap.add_argument("--output-dir", default=None)
+    ap.add_argument("--export-jianying", action="store_true",
+                    help="also export an OPTIONAL 剪映/JianYing draft (decoupled; never required)")
+    ap.add_argument("--jianying-bundle-media", action="store_true",
+                    help="copy media into the 剪映 draft (default on; portable to another machine)")
+    ap.add_argument("--jianying-no-bundle-media", action="store_true",
+                    help="reference media in place instead of copying it into the draft")
+    ap.add_argument("--material-library-dir", default=None,
+                    help="filesystem material library dir (or VIDEO_RECAP_MATERIAL_LIBRARY_DIR)")
+    ap.add_argument("--use-materials", action=argparse.BooleanOptionalAction, default=False,
+                    help="restore compatible analyzed artifacts from the material library")
+    ap.add_argument("--save-materials", action="store_true",
+                    help="save analyzed JSON/MD artifacts into the material library")
+    ap.add_argument("--doctor", action="store_true")
+    args = ap.parse_args()
+
+    if args.doctor:
+        _run("video-recap", "doctor.py")
+        return
+    if not args.video:
+        ap.error("video is required (unless --doctor)")
+
+    videos = _coerce_videos(args.video)
+    if len(videos) > 1 and args.edit_mode != "cut":
+        raise SystemExit("多视频输入当前 MVP 只支持 --edit-mode cut；full/dub 请一次输入一个视频。")
+
+    # Fail fast before any expensive understanding/VLM/ASR/TTS work if the run will burn
+    # subtitles but this ffmpeg can't (otherwise it only blows up at the final render).
+    _preflight_burn_subtitles(args)
+
+    if len(videos) > 1:
+        work_dir = (
+            Path(args.work_dir).resolve()
+            if args.work_dir
+            else videos[0].parent / f"work_dir_multi_{videos[0].stem}"
+        )
+        _run_multi_cut(videos, work_dir, args)
+        return
+
+    video = videos[0]
+    work_dir = Path(args.work_dir).resolve() if args.work_dir else video.parent / f"work_dir_{video.stem}"
+    work_dir.mkdir(parents=True, exist_ok=True)
+    cut = args.edit_mode == "cut"
+    narration_json = work_dir / "narration.json"
+    clip_plan_json = work_dir / "clip_plan.json"
+
+    edited_source = work_dir / "edited_source.mp4"
+
+    def _understand():
+        fp = _file_fingerprint(video)
+        source_record = {
+            "source_id": material_lib.source_id_from_fingerprint(fp),
+            "source_path": str(video),
+            "source_name": video.name,
+            "source_video_fingerprint": fp,
+            "settings_fingerprint": _material_settings_fingerprint(args),
+            "material_id": material_lib.material_id_for(video, fp),
+        }
+        _run_or_restore_understanding(source_record, work_dir, args)
+        return source_record
+
+    def _rebuild_output_brief():
+        fp = _file_fingerprint(video)
+        source_record = {
+            "source_id": material_lib.source_id_from_fingerprint(fp),
+            "source_path": str(video),
+            "source_name": video.name,
+            "source_video_fingerprint": fp,
+            "settings_fingerprint": _material_settings_fingerprint(args),
+            "material_id": material_lib.material_id_for(video, fp),
+        }
+        _rebuild_understanding_brief(source_record, work_dir, args)
+
+    inspect_py = _entry("video-recap", "recap_inspect.py")
+
+    def _pause(need_text, inspect_hint=None):
+        brief = work_dir / "agent_narration_brief.md"
+        cont = _continuation_command(video, work_dir, args)
+        print("=" * 50)
+        # The brief fires a research directive only when the substrate is thin/empty and no
+        # background_research.json exists yet; amplify it so the agent researches BEFORE writing.
+        if brief.exists() and "Research the story FIRST" in brief.read_text(encoding="utf-8"):
+            print("[video-recap] ⚑ 理解素材偏薄：先按 brief 顶部「Research the story FIRST」调研并写 "
+                  "background_research.json，再写解说，避免看图说话。")
+        print(f"[video-recap] ⏸  阅读 {brief}（按 video-script 规则）后写入 {need_text}")
+        if inspect_hint:
+            print(f"[video-recap]    先核对状态/时间轴（建议性）: {inspect_hint}")
+        print(f"[video-recap]    写完后重跑继续: {cont}")
+        print("=" * 50)
+
+    def _reject_stale_manifest():
+        mismatches = _manifest_mismatches(work_dir, video, args)
+        if mismatches:
+            details = "\n  - ".join(mismatches)
+            raise SystemExit(
+                "work_dir 与当前 recap 输入不匹配，拒绝复用既有 narration/clip_plan；"
+                "请使用新的 --work-dir，或删除旧产物后重新运行 Phase A。\n"
+                f"  - {details}")
+
+    if args.edit_mode == "dub":
+        # Dub mode: EN→ZH translation-dub in the original cloned voice (replaces speech, not
+        # overlay). One pause: prepare (ASR + sentence-seg + reference) -> agent writes the
+        # Chinese translation (dub_script.json) -> render (clone TTS + full-replace mux).
+        dub_script = work_dir / "dub_script.json"
+        if not dub_script.exists():
+            _run("video-voiceover", "dub.py", "--stage", "prepare",
+                 "--video", str(video), "--work-dir", str(work_dir))
+            _write_run_manifest(work_dir, video, args)
+            cont = _continuation_command(video, work_dir, args)
+            print("=" * 50)
+            print(f"[video-recap] ⏸  阅读 {work_dir / 'dub_brief.md'}，把英文原声转写切分并翻译成中文，写入 {dub_script}")
+            print('[video-recap]    格式 [{"start": 起秒, "end": 止秒, "zh": "译文"}]（按 start 升序）；逐句忠实、跟原声节奏一致、保留原音色')
+            print(f"[video-recap]    写完后重跑继续: {cont}")
+            print("=" * 50)
+            return
+        _reject_stale_manifest()
+        _run("video-voiceover", "dub.py", "--stage", "render",
+             "--video", str(video), "--work-dir", str(work_dir))
+        print(f"[video-recap] ✅ 配音完成: {work_dir / ('dub_' + video.stem + '.mp4')}")
+        return
+
+    if not cut:
+        # Full mode: a single pause (understand -> agent writes narration.json -> produce).
+        if not narration_json.exists():
+            _understand()
+            _write_run_manifest(work_dir, video, args)
+            _pause(f"{narration_json}",
+                   inspect_hint=f"python3 {inspect_py} --work-dir {work_dir} state")
+            return
+        _reject_stale_manifest()
+        _run("video-script", "validate.py", "--work-dir", work_dir, "--mode", "full")
+        narration_for_tts = narration_json
+        assemble_video_path = video
+    else:
+        # Cut mode: cut-first / narrate-second (two pauses), so narration is authored against the
+        # REAL output timeline — map_narration_to_clips is never used and cannot drop/clamp/desync.
+        if not clip_plan_json.exists():
+            # PASS 1: understand -> agent writes clip_plan.json ONLY.
+            _understand()
+            _write_run_manifest(work_dir, video, args)
+            _pause(f"{clip_plan_json}（只写剪辑计划；解说下一步对着剪好的成片写）",
+                   inspect_hint=f"python3 {inspect_py} --work-dir {work_dir} state")
+            return
+        _reject_stale_manifest()
+        cp_fp = _file_md5(clip_plan_json)
+        # Render the cut from clip_plan (no narration mapping — narration is OUTPUT-time).
+        crender = [str(video), "--work-dir", str(work_dir), "--no-narration-map"]
+        if args.target_duration:
+            crender += ["--target-duration", args.target_duration]
+        _run("video-cut", "cut.py", *crender)
+        if not narration_json.exists():
+            # PASS 2: rebuild the brief (now an OUTPUT-timeline variant) and pause for narration.
+            _rebuild_output_brief()
+            _write_phase_ledger(work_dir, clip_plan_fingerprint=cp_fp, edited_source_rendered=True)
+            _pause(f"{narration_json}（用成片 OUTPUT 时间轴写解说，对着 {edited_source}）",
+                   inspect_hint=(f"python3 {inspect_py} --work-dir {work_dir} "
+                                 "clip-map --output-start <s> --output-end <e>  # 核对输出↔原片时间轴"))
+            return
+        if _cut_narration_is_stale(_read_phase_ledger(work_dir), cp_fp):
+            raise SystemExit(
+                "clip_plan.json 已改变，但 narration.json 仍是对旧剪辑写的，会与剪后画面对不上。"
+                "请删除 narration.json，重跑后按新成片重新写解说。")
+        _write_phase_ledger(work_dir, clip_plan_fingerprint=cp_fp,
+                            narration_fingerprint=_file_md5(narration_json), narration_written=True)
+        output_duration = _read_video_duration_or_raise(edited_source)
+        _run("video-script", "validate.py", "--work-dir", work_dir, "--mode", "cut_output",
+             "--output-duration", f"{output_duration:.3f}")
+        narration_for_tts = narration_json
+        assemble_video_path = edited_source
+    review_ran = _run_narration_review(work_dir, args, timeline="cut_output" if cut else "source")
+    vargs = ["--work-dir", str(work_dir), "--narration", str(narration_for_tts)]
+    if args.mimo_tts_voice:
+        vargs += ["--mimo-voice", args.mimo_tts_voice]
+    if args.voice_ref:
+        vargs += ["--voice-ref", args.voice_ref]
+    if args.allow_partial_tts:
+        vargs.append("--allow-partial-tts")
+    _run("video-voiceover", "voiceover.py", *vargs)
+
+    aargs = [str(assemble_video_path), "--work-dir", str(work_dir), "--recap-stem", video.stem]
+    if args.output_dir:
+        aargs += ["--output-dir", args.output_dir]
+    # 透传自定义字幕位置到环境变量 (assemble.py 通过 env 读取)
+    if args.subtitle_y_top is not None:
+        os.environ["SUBTITLE_Y_TOP"] = str(args.subtitle_y_top)
+    if args.subtitle_y_bot is not None:
+        os.environ["SUBTITLE_Y_BOT"] = str(args.subtitle_y_bot)
+    if args.burn_subtitles is not None:
+        aargs.append("--burn-subtitles" if args.burn_subtitles else "--no-burn-subtitles")
+    # via the same env_bool default the preflight used, so the two agree by shared env.
+    if cut:
+        # let the timeline / 剪映 export reference the original clips, not edited_source.mp4
+        aargs += ["--source-video", str(video)]
+    if args.export_jianying:  # env EXPORT_JIANYING is honored by assemble.py itself
+        aargs.append("--export-jianying")
+    if args.jianying_bundle_media:
+        aargs.append("--jianying-bundle-media")
+    if args.jianying_no_bundle_media:
+        aargs.append("--jianying-no-bundle-media")
+    _run("video-assemble", "assemble.py", *aargs)
+
+    final_dir = Path(args.output_dir) if args.output_dir else work_dir.parent
+    final_output = _read_assembly_output(work_dir) or (final_dir / ("recap_" + video.stem + ".mp4"))
+    print(f"[video-recap] ✅ 完成: {final_output}")
+    _print_narration_review_pointer(work_dir, review_ran=review_ran)
+
+
+if __name__ == "__main__":
+    main()

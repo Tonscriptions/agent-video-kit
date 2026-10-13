@@ -1,0 +1,58 @@
+# 导入模块
+import os
+import pycapcut as cc
+from pycapcut import trange, trange_seconds, tim
+
+# 设置草稿文件夹
+draft_folder = cc.DraftFolder(r"<你的草稿文件夹>")
+
+tutorial_asset_dir = os.path.join(os.path.dirname(__file__), 'readme_assets', 'tutorial')
+assert os.path.exists(tutorial_asset_dir), f"未找到例程素材文件夹{os.path.abspath(tutorial_asset_dir)}"
+
+# 创建CapCut草稿
+script = draft_folder.create_draft("demo", 1920, 1080, allow_replace=True)  # 1920x1080分辨率
+
+# 添加音频、视频和文本轨道
+script.add_track(cc.TrackType.audio).add_track(cc.TrackType.video).add_track(cc.TrackType.text)
+
+# 创建音频片段（使用便捷构造，直接传入素材路径）
+audio_segment = cc.AudioSegment(os.path.join(tutorial_asset_dir, 'audio.mp3'),
+                                   trange_seconds(0, duration=5),  # 片段将位于轨道上的0s-5s
+                                   volume=0.6)          # 音量设置为60%(-4.4dB)
+audio_segment.add_fade("1s", "0s")                      # 增加一个1s的淡入
+
+# 创建视频片段（使用便捷构造，直接传入素材路径）
+video_segment = cc.VideoSegment(os.path.join(tutorial_asset_dir, 'video.mp4'),
+                                   trange_seconds(0, duration=4.2))  # 片段位于0s-4.2s，截取素材前4.2s内容
+video_segment.add_animation(cc.IntroType.噪点拽入)                           # 添加一个入场动画"噪点拽入"
+video_segment.add_keyframe(cc.KeyframeProperty.position_x, tim(0), -2)      # 设置初始位置恰好在屏幕左侧外面
+video_segment.add_keyframe(cc.KeyframeProperty.position_x, tim("0.5s"), 0)  # 设置0.5s后回到屏幕中央
+
+# 创建贴纸片段，由于需要读取素材长度，先创建素材实例
+gif_material = cc.VideoMaterial(os.path.join(tutorial_asset_dir, 'sticker.gif'))
+# video_segment.end 和 gif_material.duration 均为内部微秒值，直接使用 trange
+gif_segment = cc.VideoSegment(gif_material,
+                                 trange(video_segment.end, gif_material.duration))  # 紧跟上一片段，长度与gif一致
+gif_segment.add_background_filling("blur", 0.0625)  # 添加一个模糊背景填充效果, 模糊程度等同于CapCut中第一档
+
+# 为二者添加一个转场
+video_segment.add_transition(cc.TransitionType.信号故障)  # 注意转场添加在“前一个”视频片段上
+
+# 将上述片段添加到轨道中
+script.add_segment(audio_segment).add_segment(video_segment).add_segment(gif_segment)
+
+# 创建一个带气泡效果的文本片段并添加到轨道中
+text_segment = cc.TextSegment(
+    "据说pyCapCut\n效果还不错?", video_segment.target_timerange,  # 文本片段的首尾与上方视频片段一致
+    font=cc.FontType.悠然体,                                  # 设置字体为悠然体
+    style=cc.TextStyle(color=(1.0, 1.0, 0.0)),                # 字体颜色为黄色(其实不会起效, 被下方花字效果覆盖了)
+    clip_settings=cc.ClipSettings(transform_y=-0.8)           # 位置在屏幕下方
+)
+text_segment.add_animation(cc.TextOutro.故障闪动, duration=tim("1s"))    # 添加出场动画“故障闪动”, 设置时长为1s
+text_segment.add_bubble("7446997603268496646", "7446997603268496646")   # 添加文本气泡效果, 相应素材元数据的获取参见readme中"提取素材元数据"部分
+text_segment.add_effect("7336825073334078725")                          # 添加花字效果, 相应素材元数据的获取参见readme中"提取素材元数据"部分
+
+script.add_segment(text_segment)
+
+# 保存草稿
+script.save()

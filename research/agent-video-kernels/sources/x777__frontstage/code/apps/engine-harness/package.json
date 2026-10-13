@@ -1,0 +1,24 @@
+{
+  "name": "@frontstage/engine-harness",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "preview": "vite preview",
+    "e2e": "playwright test",
+    "test:headed": "playwright test",
+    "test": "echo \"engine-harness: GPU specs need a local GPU (headed Chrome) — skipped in turbo; run 'pnpm -F @frontstage/engine-harness test:headed' manually\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@frontstage/core": "workspace:*",
+    "@frontstage/engine": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@webgpu/types": "^0.1.40",
+    "typescript": "^5.5.0",
+    "vite": "^5.4.0"
+  }
+}

@@ -1,0 +1,910 @@
+"""
+Unit tests for src.utils.draft_downloader remote material download and path localization.
+"""
+import json
+import os
+import tempfile
+import time
+from unittest.mock import MagicMock, patch
+
+import pytest
+import requests
+
+import src.utils.draft_downloader as dd
+
+
+# 线上真实报错文本（阿里云 OSS 素材解析失败，素材本身可正常访问）
+DNS_ERROR_MESSAGE = (
+    "HTTPSConnectionPool(host='moushi-intelligent.oss-cn-hangzhou.aliyuncs.com', "
+    "port=443): Max retries exceeded with url: /aitrainer/a.mp3 "
+    "(Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object>: "
+    "Failed to resolve 'moushi-intelligent.oss-cn-hangzhou.aliyuncs.com' "
+    "([Errno 11001] getaddrinfo failed)\"))"
+)
+
+
+@pytest.fixture
+def no_sleep():
+    with patch.object(dd, "time") as m_time:
+        m_time.sleep = MagicMock()
+        # 下载总预算检查读 time.monotonic()；不还真实函数的话它会拿到 MagicMock，
+        # 比较时抛 TypeError 并被误分类成资源不可用。预算 300s，测试里永不触发。
+        m_time.monotonic = time.monotonic
+        yield m_time
+
+
+class TestInferExtFromContentType:
+    def test_image_png(self) -> None:
+        assert dd._infer_ext_from_content_type("image/png", ".mp4") == ".png"
+
+    def test_image_png_with_charset(self) -> None:
+        assert dd._infer_ext_from_content_type("image/png; charset=binary", ".mp4") == ".png"
+
+    def test_video_mp4(self) -> None:
+        assert dd._infer_ext_from_content_type("video/mp4", ".bin") == ".mp4"
+
+    def test_audio_mpeg(self) -> None:
+        assert dd._infer_ext_from_content_type("audio/mpeg", ".mp4") == ".mp3"
+
+    def test_missing_content_type_uses_fallback(self) -> None:
+        assert dd._infer_ext_from_content_type(None, ".mp4") == ".mp4"
+        assert dd._infer_ext_from_content_type("", ".mp3") == ".mp3"
+
+    def test_unknown_content_type_uses_fallback(self) -> None:
+        assert dd._infer_ext_from_content_type("application/octet-stream", ".mp4") == ".mp4"
+
+
+class TestDownloadRemoteMaterial:
+    BYTEIMG_PNG_URL = (
+        "https://p3-bot-workflow-sign.byteimg.com/tos-cn-i-mdko3gqilj/"
+        "fdbbff0d6626486eb67b8940f33e2b2f.png~tplv-mdko3gqilj-image.image"
+        "?rk3s=81d4c505&x-expires=1810794498&x-signature=FlZnzzCcNuzdqyBQDYj584F9Qfc%3D"
+        "&x-wf-file_name=%E5%8F%8C%E8%A1%8C.png"
+    )
+
+    def _ok_response(self, content: bytes = b"png-bytes", content_type: str = "image/png") -> MagicMock:
+        r = MagicMock()
+        r.status_code = 200
+        r.headers = {"Content-Type": content_type}
+        r.iter_content = MagicMock(return_value=[content])
+        r.close = MagicMock()
+        return r
+
+    def test_byteimg_url_saved_as_png_from_content_type(self, no_sleep) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = self._ok_response()
+                m_req.exceptions = requests.exceptions
+                local_path = dd._download_remote_material(
+                    self.BYTEIMG_PNG_URL, td, "images", "双行", ".mp4"
+                )
+            assert local_path is not None
+            assert local_path.endswith(".png")
+            assert not local_path.endswith(".image")
+            assert os.path.isfile(local_path)
+
+    def test_mp4_content_type_uses_mp4_extension(self, no_sleep) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = self._ok_response(
+                    content=b"mp4", content_type="video/mp4"
+                )
+                m_req.exceptions = requests.exceptions
+                local_path = dd._download_remote_material(
+                    "https://cdn.example.com/v?id=1", td, "videos", "clip1", ".bin"
+                )
+            assert local_path is not None
+            assert local_path.endswith(".mp4")
+
+    def test_non200_404_does_not_retry(self, no_sleep) -> None:
+        bad = MagicMock()
+        bad.status_code = 404
+        bad.close = MagicMock()
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = bad
+                m_req.exceptions = requests.exceptions
+                assert dd._download_remote_material(
+                    "https://cdn.example.com/miss.png", td, "images", "x", ".png"
+                ) is None
+                assert m_req.get.call_count == 1
+
+    def test_trailing_space_url_is_normalized_before_request(self, no_sleep) -> None:
+        oss_url = (
+            "https://moushi-intelligent.oss-cn-hangzhou.aliyuncs.com/"
+            "aitrainer/2026-06-09/dj4b8r6e34cdfzatte.mp3 "
+        )
+        clean_url = oss_url.strip()
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = self._ok_response(content=b"mp3", content_type="audio/mpeg")
+                m_req.exceptions = requests.exceptions
+                local_path = dd._download_remote_material(
+                    oss_url, td, "audios", "clip", ".mp3"
+                )
+            assert local_path is not None
+            m_req.get.assert_called_once()
+            assert m_req.get.call_args.args[0] == clean_url
+
+
+class TestRetryHelpers:
+    @pytest.mark.parametrize(
+        "status, expected",
+        [
+            (404, False),
+            (400, False),
+            (416, True),
+            (500, True),
+            (501, False),
+            (408, True),
+            (429, True),
+            (502, True),
+            (503, True),
+            (504, True),
+        ],
+    )
+    def test_is_retryable_http_status(self, status: int, expected: bool) -> None:
+        assert dd._is_retryable_http_status(status) is expected
+
+    @pytest.mark.parametrize(
+        "raw, expected",
+        [
+            (
+                "https://x.test/a.mp3 ",
+                "https://x.test/a.mp3",
+            ),
+            (
+                "https://x.test/a.mp3\n",
+                "https://x.test/a.mp3",
+            ),
+            (
+                "https://x.test/a.mp3\u200b",
+                "https://x.test/a.mp3",
+            ),
+            (
+                "  https://x.test/a.mp3  ",
+                "https://x.test/a.mp3",
+            ),
+        ],
+    )
+    def test_normalize_http_url_strips_invisible_chars(self, raw: str, expected: str) -> None:
+        assert dd._normalize_http_url(raw) == expected
+
+    def test_connection_refused_not_retryable(self) -> None:
+        exc = requests.exceptions.ConnectionError("Connection refused")
+        assert dd._is_retryable_request_exception(exc) is False
+
+    def test_read_timeout_retryable(self) -> None:
+        exc = requests.exceptions.ReadTimeout("read timed out")
+        assert dd._is_retryable_request_exception(exc) is True
+
+    def test_dns_failure_detected(self) -> None:
+        exc = requests.exceptions.ConnectionError(DNS_ERROR_MESSAGE)
+        assert dd._is_dns_resolution_failure(exc) is True
+
+    def test_dns_failure_is_no_longer_instantly_fatal(self) -> None:
+        """回归：getaddrinfo failed 曾被列为永久错误，一次解析抖动即判死整个任务。"""
+        assert "getaddrinfo failed" not in dd._NON_RETRYABLE_NETWORK_MARKERS
+        exc = requests.exceptions.ConnectionError(DNS_ERROR_MESSAGE)
+        assert dd._is_retryable_request_exception(exc) is True
+
+    def test_connection_refused_is_not_dns_failure(self) -> None:
+        exc = requests.exceptions.ConnectionError("Connection refused")
+        assert dd._is_dns_resolution_failure(exc) is False
+        assert dd._is_retryable_request_exception(exc) is False
+
+    def test_content_decoding_error_retryable(self) -> None:
+        """回归：它不是 ConnectionError 子类，曾被当作永久错误直接判死。"""
+        exc = requests.exceptions.ContentDecodingError("gzip decode failed")
+        assert dd._is_retryable_request_exception(exc) is True
+
+
+class TestDownloadRemoteFile:
+    def _ok_response(self, content: bytes = b"data") -> MagicMock:
+        r = MagicMock()
+        r.status_code = 200
+        r.iter_content = MagicMock(return_value=[content])
+        return r
+
+    def test_succeeds_first_request(self, no_sleep) -> None:
+        out = os.path.join(tempfile.gettempdir(), "t_dl_first.bin")
+        try:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = self._ok_response()
+                m_req.exceptions = requests.exceptions
+                assert dd._download_remote_file("https://x.test/a.mp4", out) is True
+                m_req.get.assert_called_once()
+            with open(out, "rb") as f:
+                assert f.read() == b"data"
+        finally:
+            if os.path.isfile(out):
+                os.remove(out)
+
+    def test_retries_then_success_on_timeout(self, no_sleep) -> None:
+        calls = []
+
+        def side_effect(*_a, **_kw):
+            calls.append(1)
+            if len(calls) < 3:
+                raise requests.exceptions.ReadTimeout("read timed out")
+            return self._ok_response()
+
+        out = os.path.join(tempfile.gettempdir(), "t_dl_retry.bin")
+        try:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.side_effect = side_effect
+                m_req.exceptions = requests.exceptions
+                assert dd._download_remote_file("https://x.test/b.mp4", out) is True
+            assert len(calls) == 3
+        finally:
+            if os.path.isfile(out):
+                os.remove(out)
+
+    def test_returns_false_immediately_on_connection_refused(self, no_sleep) -> None:
+        with patch.object(dd, "requests") as m_req:
+            m_req.get.side_effect = requests.exceptions.ConnectionError("Connection refused")
+            m_req.exceptions = requests.exceptions
+            out = os.path.join(tempfile.gettempdir(), "t_dl_fail.bin")
+            assert dd._download_remote_file("https://x.test/c.mp4", out) is False
+            assert m_req.get.call_count == 1
+
+    def test_dns_failure_retries_then_succeeds(self, no_sleep) -> None:
+        """一次解析抖动不应让下载失败。"""
+        calls = []
+
+        def side_effect(*_a, **_kw):
+            calls.append(1)
+            if len(calls) < 2:
+                raise requests.exceptions.ConnectionError(DNS_ERROR_MESSAGE)
+            return self._ok_response()
+
+        out = os.path.join(tempfile.gettempdir(), "t_dl_dns_ok.bin")
+        try:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.side_effect = side_effect
+                m_req.exceptions = requests.exceptions
+                assert dd._download_remote_file("https://x.test/dns.mp4", out) is True
+            assert len(calls) == 2
+        finally:
+            if os.path.isfile(out):
+                os.remove(out)
+
+    def test_dns_failure_exhausts_small_budget_only(self, no_sleep) -> None:
+        """解析持续失败：只花 _DNS_RETRY_BUDGET 次，不必用满 _MAX_RETRIES。"""
+        with patch.object(dd, "requests") as m_req:
+            m_req.get.side_effect = requests.exceptions.ConnectionError(DNS_ERROR_MESSAGE)
+            m_req.exceptions = requests.exceptions
+            out = os.path.join(tempfile.gettempdir(), "t_dl_dns_fail.bin")
+            assert dd._download_remote_file("https://x.test/dns2.mp4", out) is False
+            assert m_req.get.call_count == dd._DNS_RETRY_BUDGET + 1
+
+    def test_dns_failure_reports_network_kind(self, no_sleep) -> None:
+        """归类为网络失败，避免用户看到「素材不存在/URL无效」的错误指引。"""
+        with patch.object(dd, "requests") as m_req:
+            m_req.get.side_effect = requests.exceptions.ConnectionError(DNS_ERROR_MESSAGE)
+            m_req.exceptions = requests.exceptions
+            out = os.path.join(tempfile.gettempdir(), "t_dl_dns_kind.bin")
+            with pytest.raises(dd.DraftDownloadAbort) as excinfo:
+                dd._download_remote_file_raising("https://x.test/dns3.mp4", out)
+        assert excinfo.value.kind is dd.DraftDownloadFailureKind.NETWORK_RETRY_EXHAUSTED
+
+    def test_non200_404_does_not_retry(self, no_sleep) -> None:
+        bad = MagicMock()
+        bad.status_code = 404
+        bad.close = MagicMock()
+        out = os.path.join(tempfile.gettempdir(), "t_dl_404.bin")
+        with patch.object(dd, "requests") as m_req:
+            m_req.get.return_value = bad
+            m_req.exceptions = requests.exceptions
+            assert dd._download_remote_file("https://x.test/miss.mp4", out) is False
+            assert m_req.get.call_count == 1
+        # 该断言原为 assert_not_called()，即把「404 分支不归还连接」这个泄漏当成了预期行为；
+        # 补上 finally 后连接会被关闭，这里改为断言修复后的行为。
+        bad.close.assert_called_once()
+
+    def test_non200_retries_then_success(self, no_sleep) -> None:
+        bad = MagicMock()
+        bad.status_code = 503
+        good = self._ok_response()
+        out = os.path.join(tempfile.gettempdir(), "t_dl_503.bin")
+        try:
+            with patch.object(dd, "_MAX_RETRIES", 2):
+                with patch.object(dd, "requests") as m_req:
+                    m_req.get.side_effect = [bad, bad, good]
+                    m_req.exceptions = requests.exceptions
+                    assert dd._download_remote_file("https://x.test/d.mp4", out) is True
+        finally:
+            if os.path.isfile(out):
+                os.remove(out)
+
+    def test_http_500_retries_then_success(self, no_sleep) -> None:
+        """500 多为 OSS/Nginx 瞬时内部错误，应与 502/503 同等对待。"""
+        bad = MagicMock()
+        bad.status_code = 500
+        bad.headers = {}
+        bad.close = MagicMock()
+        good = self._ok_response()
+        out = os.path.join(tempfile.gettempdir(), "t_dl_500.bin")
+        try:
+            with patch.object(dd, "_MAX_RETRIES", 2):
+                with patch.object(dd, "requests") as m_req:
+                    m_req.get.side_effect = [bad, good]
+                    m_req.exceptions = requests.exceptions
+                    assert dd._download_remote_file("https://x.test/e.mp4", out) is True
+        finally:
+            if os.path.isfile(out):
+                os.remove(out)
+
+    def test_content_decoding_error_retries_then_succeeds(self, no_sleep) -> None:
+        """响应体解码失败（多为传输截断）应重试，而非直接判死。"""
+        calls = []
+
+        def side_effect(*_a, **_kw):
+            calls.append(1)
+            if len(calls) < 2:
+                raise requests.exceptions.ContentDecodingError("gzip decode failed")
+            return self._ok_response()
+
+        out = os.path.join(tempfile.gettempdir(), "t_dl_decode.bin")
+        try:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.side_effect = side_effect
+                m_req.exceptions = requests.exceptions
+                assert dd._download_remote_file("https://x.test/f.mp4", out) is True
+            assert len(calls) == 2
+        finally:
+            if os.path.isfile(out):
+                os.remove(out)
+
+
+class TestDownloadDeadline:
+    """下载阶段总预算：降级网络必须在有界时间内失败，且归类为网络重试耗尽。"""
+
+    def test_expired_deadline_aborts_before_any_request(self, no_sleep) -> None:
+        with patch.object(dd, "requests") as m_req:
+            m_req.exceptions = requests.exceptions
+            with pytest.raises(dd.DraftDownloadAbort) as excinfo:
+                dd._download_single_file(
+                    "https://x.test/a.mp4",
+                    tempfile.gettempdir(),
+                    deadline=dd._now() - 1,
+                )
+        assert excinfo.value.kind is dd.DraftDownloadFailureKind.NETWORK_RETRY_EXHAUSTED
+        assert m_req.get.call_count == 0
+
+    def test_chunk_loop_aborts_mid_transfer(self, no_sleep) -> None:
+        """慢速滴流：读写超时管不住，靠 chunk 间的总预算检查中断。"""
+        resp = MagicMock()
+        resp.status_code = 200
+        resp.headers = {"Content-Type": "audio/mpeg"}
+        resp.iter_content = MagicMock(return_value=[b"aa", b"bb"])
+        resp.close = MagicMock()
+
+        target = tempfile.mkdtemp()
+        # 第 1 次：循环开头检查（未超）；第 2 次：第 1 个 chunk（未超，写入）；第 3 次：已超
+        with patch.object(dd, "_now", side_effect=[100.0, 100.0, 400.0]):
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = resp
+                m_req.exceptions = requests.exceptions
+                with pytest.raises(dd.DraftDownloadAbort) as excinfo:
+                    dd._download_remote_material_raising(
+                        "https://x.test/slow.mp3",
+                        target,
+                        "audio",
+                        "slow",
+                        ".mp3",
+                        deadline=300.0,
+                    )
+        assert excinfo.value.kind is dd.DraftDownloadFailureKind.NETWORK_RETRY_EXHAUSTED
+        assert m_req.get.call_count == 1, "总预算中止不应再重试"
+        resp.close.assert_called()
+        written = os.path.join(target, "assets", "audio", "slow.mp3")
+        assert os.path.isfile(written), "已落盘的 chunk 不应被丢弃"
+        assert open(written, "rb").read() == b"aa"
+
+    def test_material_loop_deadline_skips_download(self, no_sleep) -> None:
+        data = {"materials": {"audios": [{"path": "https://x.test/a.mp3", "name": "n"}]}}
+        with patch.object(dd, "_download_remote_material_raising") as m_dl:
+            with pytest.raises(dd.DraftDownloadAbort) as excinfo:
+                dd._localize_remote_material_paths(
+                    data, tempfile.gettempdir(), deadline=dd._now() - 1
+                )
+        assert excinfo.value.kind is dd.DraftDownloadFailureKind.NETWORK_RETRY_EXHAUSTED
+        m_dl.assert_not_called()
+        assert data["materials"]["audios"][0]["path"] == "https://x.test/a.mp3"
+
+
+class TestLocalizeRemoteMaterialPaths:
+    def test_no_materials_returns_true(self) -> None:
+        assert dd.localize_remote_material_paths({}, "/tmp/x") is True
+
+    def test_no_urls_returns_true(self) -> None:
+        data = {"materials": {"audios": [], "videos": [{"path": "C:\\local\\x.mp4"}]}}
+        assert dd.localize_remote_material_paths(data, "/tmp/y") is True
+
+    @patch.object(dd, "_download_remote_material_raising")
+    def test_rewrites_path_on_success(self, m_dl) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            url = "https://cdn.example.com/v.mp4"
+            expected = os.path.join(td, "assets", "videos", "clip1.mp4")
+            m_dl.return_value = expected
+            data: dict = {
+                "materials": {
+                    "audios": [],
+                    "videos": [
+                        {
+                            "path": url,
+                            "material_name": "clip1",
+                        }
+                    ],
+                }
+            }
+            assert dd.localize_remote_material_paths(data, td) is True
+            m_dl.assert_called_once()
+            new_path = data["materials"]["videos"][0]["path"]
+            assert new_path == expected
+            assert new_path.startswith(td)
+            assert "assets" in new_path.replace("\\", "/")
+            assert new_path.endswith(".mp4")
+
+    @patch.object(dd, "_download_remote_material_raising")
+    def test_byteimg_png_url_saved_with_png_extension(self, m_dl) -> None:
+        url = TestDownloadRemoteMaterial.BYTEIMG_PNG_URL
+        with tempfile.TemporaryDirectory() as td:
+            expected = os.path.join(td, "assets", "images", "双行.png")
+            m_dl.return_value = expected
+            data: dict = {
+                "materials": {
+                    "audios": [],
+                    "videos": [
+                        {
+                            "path": url,
+                            "type": "photo",
+                            "material_name": "双行",
+                        }
+                    ],
+                }
+            }
+            assert dd.localize_remote_material_paths(data, td) is True
+            new_path = data["materials"]["videos"][0]["path"]
+            assert new_path == expected
+            assert new_path.endswith(".png")
+            assert not new_path.endswith(".image")
+            m_dl.assert_called_once_with(
+                url, td, "images", "双行", ".mp4", deadline=None
+            )
+
+    @patch.object(
+        dd,
+        "_download_remote_material_raising",
+        side_effect=dd.DraftDownloadAbort(dd.DraftDownloadFailureKind.RESOURCE_UNAVAILABLE),
+    )
+    def test_returns_false_when_download_fails(self, m_dl) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            url = "https://cdn.example.com/miss.mp4"
+            data: dict = {
+                "materials": {
+                    "audios": [],
+                    "videos": [{"path": url, "id": "1"}],
+                }
+            }
+            assert dd.localize_remote_material_paths(data, td) is False
+            assert data["materials"]["videos"][0]["path"] == url
+
+    @patch.object(dd, "_download_remote_material_raising")
+    def test_fail_fast_skips_remaining_urls(self, m_dl) -> None:
+        """任一远程素材失败后立即中止，不再下载后续 URL。"""
+        u1 = "https://cdn.example.com/a.mp4"
+        u2 = "https://cdn.example.com/b.mp4"
+        abort = dd.DraftDownloadAbort(
+            dd.DraftDownloadFailureKind.NETWORK_RETRY_EXHAUSTED,
+            detail="timeout",
+            url=u1,
+        )
+        m_dl.side_effect = abort
+        with tempfile.TemporaryDirectory() as td:
+            data: dict = {
+                "materials": {
+                    "audios": [],
+                    "videos": [
+                        {"path": u1, "id": "1"},
+                        {"path": u2, "id": "2"},
+                    ],
+                }
+            }
+            assert dd.localize_remote_material_paths(data, td) is False
+            assert m_dl.call_count == 1
+            assert m_dl.call_args.args[0] == u1
+            assert data["materials"]["videos"][0]["path"] == u1
+            assert data["materials"]["videos"][1]["path"] == u2
+
+    @patch.object(dd, "_download_remote_material_raising")
+    def test_same_url_shared_across_items(self, m_dl) -> None:
+        u = "https://cdn.example.com/same.mp3"
+        with tempfile.TemporaryDirectory() as td:
+            shared = os.path.join(td, "assets", "audios", "a.mp3")
+            m_dl.return_value = shared
+            data: dict = {
+                "materials": {
+                    "audios": [
+                        {"path": u, "name": "a"},
+                        {"path": u, "name": "b"},
+                    ],
+                    "videos": [],
+                }
+            }
+            assert dd.localize_remote_material_paths(data, td) is True
+            assert m_dl.call_count == 1
+            p0 = data["materials"]["audios"][0]["path"]
+            p1 = data["materials"]["audios"][1]["path"]
+            assert p0 == p1
+            assert p0.startswith(td)
+
+
+class TestUpdateJsonFilePaths:
+    def test_skips_write_when_localize_fails(self) -> None:
+        body = {
+            "materials": {"audios": [], "videos": []},
+            "duration": 1000,
+        }
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "draft_content.json")
+            original = json.dumps(body, ensure_ascii=False)
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(original)
+
+            with patch.object(
+                dd,
+                "_localize_remote_material_paths",
+                side_effect=dd.DraftDownloadAbort(
+                    dd.DraftDownloadFailureKind.RESOURCE_UNAVAILABLE
+                ),
+            ):
+                assert (
+                    dd.update_json_file_paths(path, td, "20260101120000abc")
+                    is False
+                )
+
+            with open(path, "r", encoding="utf-8") as f:
+                assert f.read() == original
+
+    @patch.object(dd, "_localize_remote_material_paths")
+    @patch.object(dd, "config")
+    def test_writes_when_localize_ok(self, m_config, m_loc) -> None:
+        m_config.DRAFT_SAVE_PATH = "D:/mock/draft"
+        base = {
+            "materials": {"audios": [], "videos": []},
+        }
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "draft_content.json")
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(base, f, ensure_ascii=False)
+            did = "20260101120000abc"
+            assert dd.update_json_file_paths(path, td, did) is True
+            m_loc.assert_called_once()
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            assert "materials" in data
+            assert isinstance(data["materials"], dict)
+
+
+class TestDownloadSingleFile:
+    """download_single_file：流式写入 + 超时与关闭行为；路径与结果应与优化前语义一致。"""
+
+    _BASE = "https://capcut.example.com"
+    _TIMEOUT = (
+        dd._REQUEST_CONNECT_TIMEOUT,
+        dd._REQUEST_READ_TIMEOUT,
+    )
+    _HEADERS = dd._REQUEST_HEADERS
+
+    def _stream_response(
+        self,
+        chunks: list,
+        status: int = 200,
+    ) -> MagicMock:
+        r = MagicMock()
+        r.status_code = status
+        r.iter_content = MagicMock(side_effect=lambda chunk_size=8192: iter(chunks))
+        r.close = MagicMock()
+        return r
+
+    def test_success_writes_concatenated_chunks_and_relative_path(self, no_sleep) -> None:
+        """URL 中带草稿 ID 时，相对路径为 draft_id 之后的路径段；内容与分块顺序一致。"""
+        file_url = (
+            f"{self._BASE}/app/output/draft/20251204214904ccb1af38/Resources/pic.png"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            resp = self._stream_response([b"hel", b"lo"])
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = resp
+                m_req.exceptions = requests.exceptions
+                assert dd.download_single_file(file_url, td) is True
+
+            expected = os.path.join(td, "Resources", "pic.png")
+            assert os.path.isfile(expected)
+            with open(expected, "rb") as f:
+                assert f.read() == b"hello"
+
+            m_req.get.assert_called_once_with(
+                file_url,
+                timeout=self._TIMEOUT,
+                stream=True,
+                headers=self._HEADERS,
+            )
+            resp.close.assert_called_once()
+
+    def test_fallback_relative_path_without_draft_segment(self, no_sleep) -> None:
+        """路径中无草稿 ID 段时，与原先一致：使用 path 第一段子路径之后部分。"""
+        file_url = f"{self._BASE}/static/assets/logo.bin"
+        with tempfile.TemporaryDirectory() as td:
+            resp = self._stream_response([b"z"])
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = resp
+                m_req.exceptions = requests.exceptions
+                assert dd.download_single_file(file_url, td) is True
+
+            expected = os.path.join(td, "static", "assets", "logo.bin")
+            assert os.path.isfile(expected)
+            with open(expected, "rb") as f:
+                assert f.read() == b"z"
+
+    def test_non200_returns_false_and_closes(self, no_sleep) -> None:
+        """非网关类 4xx/5xx 不重试，立即失败并关闭响应。"""
+        file_url = f"{self._BASE}/app/output/draft/20251204214904ccb1af38/x.bin"
+        with tempfile.TemporaryDirectory() as td:
+            resp = self._stream_response([], status=404)
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = resp
+                m_req.exceptions = requests.exceptions
+                assert dd.download_single_file(file_url, td) is False
+            resp.close.assert_called_once()
+
+    def test_gateway_503_retries_until_exhausted(self, no_sleep) -> None:
+        """503 退避重试，耗尽后与网络重试一致共 _MAX_RETRIES+1 次请求。"""
+        file_url = f"{self._BASE}/app/output/draft/20251204214904ccb1af38/x.bin"
+        with tempfile.TemporaryDirectory() as td:
+            resp = self._stream_response([], status=503)
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = resp
+                m_req.exceptions = requests.exceptions
+                assert dd.download_single_file(file_url, td) is False
+                assert m_req.get.call_count == dd._MAX_RETRIES + 1
+            assert resp.close.call_count == dd._MAX_RETRIES + 1
+
+    def test_retries_then_success_on_read_timeout(self, no_sleep) -> None:
+        calls: list = []
+
+        def side_effect(*_a, **_kw):
+            calls.append(1)
+            if len(calls) < 3:
+                raise requests.exceptions.ReadTimeout("stalled")
+            return self._stream_response([b"ok"])
+
+        file_url = (
+            f"{self._BASE}/app/output/draft/20251204214904ccb1af38/data.bin"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.side_effect = side_effect
+                m_req.exceptions = requests.exceptions
+                assert dd.download_single_file(file_url, td) is True
+            assert len(calls) == 3
+            out = os.path.join(td, "data.bin")
+            with open(out, "rb") as f:
+                assert f.read() == b"ok"
+
+    def test_connection_refused_does_not_retry(self, no_sleep) -> None:
+        file_url = (
+            f"{self._BASE}/app/output/draft/20251204214904ccb1af38/miss.bin"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.side_effect = requests.exceptions.ConnectionError(
+                    "Connection refused"
+                )
+                m_req.exceptions = requests.exceptions
+                assert dd.download_single_file(file_url, td) is False
+                assert m_req.get.call_count == 1
+
+    def test_returns_false_after_exhausting_retries(self, no_sleep) -> None:
+        file_url = (
+            f"{self._BASE}/app/output/draft/20251204214904ccb1af38/miss.bin"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.side_effect = requests.exceptions.ConnectionError("down")
+                m_req.exceptions = requests.exceptions
+                assert dd.download_single_file(file_url, td) is False
+                # retry_count 0.._MAX_RETRIES 共 _MAX_RETRIES+1 次尝试后放弃
+                assert m_req.get.call_count == dd._MAX_RETRIES + 1
+
+    @patch.object(dd, "_update_json_file_paths")
+    def test_plain_file_does_not_touch_json_paths(self, m_upd, no_sleep) -> None:
+        file_url = (
+            f"{self._BASE}/app/output/draft/20251204214904ccb1af38/only.bin"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = self._stream_response([b"\x00"])
+                m_req.exceptions = requests.exceptions
+                assert dd.download_single_file(file_url, td) is True
+            m_upd.assert_not_called()
+
+    @patch.object(dd, "_update_json_file_paths")
+    def test_json_files_invoke_path_update(self, m_upd, no_sleep) -> None:
+        file_url = (
+            f"{self._BASE}/app/output/draft/20251204214904ccb1af38/"
+            f"draft_content.json"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = self._stream_response([b"{}\n"])
+                m_req.exceptions = requests.exceptions
+                assert dd.download_single_file(file_url, td) is True
+            m_upd.assert_called_once()
+            call_kw = m_upd.call_args
+            assert call_kw[0][1] == td
+            assert call_kw[0][2] == "20251204214904ccb1af38"
+
+    @patch.object(
+        dd,
+        "_update_json_file_paths",
+        side_effect=dd.DraftDownloadAbort(dd.DraftDownloadFailureKind.RESOURCE_UNAVAILABLE),
+    )
+    def test_json_update_failure_returns_false(self, m_upd, no_sleep) -> None:
+        file_url = (
+            f"{self._BASE}/app/output/draft/20251204214904ccb1af38/"
+            f"draft_content.json"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = self._stream_response([b"{}\n"])
+                m_req.exceptions = requests.exceptions
+                assert dd.download_single_file(file_url, td) is False
+
+
+class TestDownloadAllFiles:
+    _BASE = "https://capcut.example.com"
+    _DRAFT = "20251204214904ccb1af38"
+
+    def _url(self, name: str) -> str:
+        return f"{self._BASE}/app/output/draft/{self._DRAFT}/{name}"
+
+    @patch.object(dd, "trigger_directory_scan_with_robocopy")
+    def test_skips_draft_info_and_copies_from_content(self, m_scan, no_sleep) -> None:
+        content_url = self._url("draft_content.json")
+        info_url = self._url("draft_info.json")
+        other_url = self._url("assets/x.bin")
+        meta_url = self._url("draft_meta_info.json")
+        stale_meta = json.dumps(
+            {
+                "draft_name": "035ae208-ec69-4068-b479-777cb3bab17a",
+                "draft_fold_path": "C:/old/path/035ae208-ec69-4068-b479-777cb3bab17a",
+                "draft_root_path": "C:/old/path",
+            },
+            ensure_ascii=False,
+        ).encode("utf-8")
+
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.exceptions = requests.exceptions
+
+                def fake_get(url: str, **kwargs) -> MagicMock:
+                    r = MagicMock()
+                    r.status_code = 200
+                    if url == content_url:
+                        r.iter_content = MagicMock(return_value=[b"{}\n"])
+                    elif url == meta_url:
+                        r.iter_content = MagicMock(return_value=[stale_meta])
+                    else:
+                        r.iter_content = MagicMock(return_value=[b"\x00"])
+                    r.close = MagicMock()
+                    return r
+
+                m_req.get.side_effect = fake_get
+                with patch.object(dd, "_update_json_file_paths"):
+                    with patch.object(dd, "config") as m_cfg:
+                        m_cfg.DRAFT_SAVE_PATH = td
+                        assert dd.download_all_files(
+                            [other_url, content_url, info_url, meta_url],
+                            td,
+                            self._DRAFT,
+                        ) is True
+
+            called_urls = [call.args[0] for call in m_req.get.call_args_list]
+            assert info_url not in called_urls
+            assert content_url in called_urls
+            assert meta_url in called_urls
+            info_path = os.path.join(td, "draft_info.json")
+            content_path = os.path.join(td, "draft_content.json")
+            assert os.path.isfile(info_path)
+            with open(content_path, "rb") as f1, open(info_path, "rb") as f2:
+                assert f1.read() == f2.read()
+            with open(os.path.join(td, "draft_meta_info.json"), encoding="utf-8") as f:
+                meta = json.load(f)
+            assert meta["draft_name"] == self._DRAFT
+            assert os.path.normpath(meta["draft_fold_path"]) == os.path.normpath(td)
+
+    @patch.object(dd, "trigger_directory_scan_with_robocopy")
+    @patch.object(dd, "_download_single_file")
+    def test_fails_when_draft_content_missing_for_copy(
+        self, m_dl, m_scan
+    ) -> None:
+        files = [self._url("draft_content.json"), self._url("draft_info.json")]
+        with tempfile.TemporaryDirectory() as td:
+            assert dd.download_all_files(files, td, self._DRAFT) is False
+            m_dl.assert_called_once()
+
+    @patch.object(dd, "trigger_directory_scan_with_robocopy")
+    @patch.object(dd, "_download_single_file")
+    def test_fail_fast_skips_remaining_files(self, m_dl, m_scan) -> None:
+        """任一草稿文件下载失败后立即中止，不再下载后续文件。"""
+        first = self._url("assets/a.bin")
+        second = self._url("assets/b.bin")
+        abort = dd.DraftDownloadAbort(
+            dd.DraftDownloadFailureKind.NETWORK_RETRY_EXHAUSTED,
+            detail="timeout",
+            url=first,
+        )
+        m_dl.side_effect = abort
+        with tempfile.TemporaryDirectory() as td:
+            assert dd.download_all_files([first, second], td, self._DRAFT) is False
+            assert m_dl.call_count == 1
+            assert m_dl.call_args.args[0] == first
+            m_scan.assert_not_called()
+
+
+class TestExecuteDownload:
+    """execute_download：超时 + 流式写入 + 关闭连接。"""
+
+    _TIMEOUT = (
+        dd._REQUEST_CONNECT_TIMEOUT,
+        dd._REQUEST_READ_TIMEOUT,
+    )
+    _HEADERS = dd._REQUEST_HEADERS
+
+    def test_streams_body_to_default_filename_and_closes(self, no_sleep) -> None:
+        draft_url = "https://api.example.com/get?draft_id=x"
+        did = "mydraftid001"
+        with tempfile.TemporaryDirectory() as td:
+            r = MagicMock()
+            r.status_code = 200
+            r.headers = {}
+            r.iter_content = MagicMock(
+                side_effect=lambda chunk_size=8192: iter([b"a", b"bc"])
+            )
+            r.close = MagicMock()
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = r
+                m_req.exceptions = requests.exceptions
+                assert dd.execute_download(draft_url, td, did) is True
+
+            out = os.path.join(td, f"{did}.draft")
+            with open(out, "rb") as f:
+                assert f.read() == b"abc"
+            m_req.get.assert_called_once_with(
+                draft_url,
+                timeout=self._TIMEOUT,
+                stream=True,
+                headers=self._HEADERS,
+            )
+            r.close.assert_called_once()
+
+    def test_non200_returns_false(self, no_sleep) -> None:
+        r = MagicMock()
+        r.status_code = 500
+        r.close = MagicMock()
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.return_value = r
+                m_req.exceptions = requests.exceptions
+                assert dd.execute_download("https://u", td, "d") is False
+        r.close.assert_called_once()
+
+    def test_request_exception_returns_false(self, no_sleep) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(dd, "requests") as m_req:
+                m_req.get.side_effect = requests.exceptions.ConnectTimeout("t")
+                m_req.exceptions = requests.exceptions
+                assert dd.execute_download("https://u", td, "d") is False

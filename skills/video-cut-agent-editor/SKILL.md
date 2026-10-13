@@ -1,0 +1,28 @@
+---
+name: video-cut-agent-editor
+description: "Drive the local Agent-first advertising video editor CLI for project setup, local media ingest, timeline composition, templates, validation, rights checks, conversion, and FFmpeg rendering."
+---
+
+# Video Cut Agent Editor
+
+Use this skill when the requested edit should be represented as a reproducible local Agent Project rather than a GUI project. The implementation lives in `product/` in this project.
+
+## Runtime boundary
+
+- Use native Windows Python and the installed `ffmpeg.exe`/`ffprobe.exe` only.
+- Set `PYTHONPATH` to the absolute `product/src` directory and invoke `python -m ai_ad_editor`; the repository wrapper also pins TEMP/TMP and Python/model caches to `product/.runtime/` on E drive.
+- Keep the default network policy disabled. Do not call Jianying/剪映, GUI automation, MCP HTTP services, MiMo, Fish Audio, HeyGen, or any other closed/online provider.
+- Do not start Docker, WSL, containers, or virtual machines. The `doctor` command only reports whether those executables are on PATH.
+- Every publishable asset needs a Rights Ledger record with an allowed target use and evidence. Never use a template or `--yes` to bypass this gate.
+
+## Workflow
+
+1. Run `doctor` and fail clearly if FFmpeg/FFprobe is unavailable. Then read `capabilities` and choose only features whose status and limits fit the requested plan; `degraded` and `local_adapter_only` entries must remain visible in the response.
+2. Create or inspect a project with `project init`/`project inspect`. For a known legacy Agent Project (`0.0.0`), run `project migrate` first; it hashes/probes only local assets, creates a `before-migrate` snapshot, validates the candidate, and writes a migration report. Unknown or higher schema versions must go through an explicit converter.
+3. Ingest local files with `media ingest`; retain the returned asset ID and never invent a media hash. Use `media track --asset-id <id> --roi x,y,w,h` for explainable local template tracking; inspect confidence and drift warnings, and pass `--clip-id` only when the Agent wants a `before-track-apply` snapshot plus position keyframes written back.
+4. Use `media understand` for local scene/silence/beat candidates. Add `--transcribe --model-path <existing-local-transformers-model>` only when an offline model has been registered; the command never downloads a model. Add `--srt <project-relative-path>` only when timed segments are returned. Use `media prepare` to make local proxies, thumbnails, and waveforms, and `media highlights` to write a hash-linked deterministic candidate report. Use `ad plan --input <brief.json>` to turn a local advertising brief into timed Hook/Problem/Benefit/Proof/Offer/CTA phases and marker operations before selecting assets. Use `subtitle validate`/`subtitle normalize` for SRT, VTT, ASS, and SSA before publishing captions. Use `timeline compose` for explicit clip/track/marker changes and reusable motion presets, including split/ripple/slip/slide/speed/reverse/freeze operations; speed curves, nested sequences, static path/polygon masks, basic-shape mask.* keyframes, and normalized alpha feather are available with their reported approximation limits; clip changes may include validated rectangle/circle/ellipse `mask` objects and local FFmpeg `blend` modes. Use `template apply` or `template batch` only with a versioned local template and variable snapshot. Use `library index/search` for local asset discovery. For project-bound writes, pass a stable `--idempotency-key` when the caller may retry.
+5. Run `validate`; the project validator includes the local Agent Project JSON Schema executor when `jsonschema` is installed and reports its engine. For a release or ad publish also run `rights check`, render with `--publish`, and finish with `quality check --require-audio` (add `--expensive` for black-frame/loudness scans). Render may declare `--container mp4|webm|mkv`, local video/audio codecs, CRF or bitrates; preserve the resulting encoder settings in the manifest.
+6. Use `convert import/export` only through its conversion report. Export can target `agent-json`, `otio`, or `kdenlive-xml`; treat `Approximate`, `Baked`, `Unsupported`, and `Failed` as visible outcomes that require a decision.
+7. Inspect the render manifest and probe the output before reporting success. If the renderer warns that keyframes, effects, transitions, or transforms are preserved but not executed, report that limitation. If a render is cancelled or fails, retain the returned `operation_id`; retry with `render --resume <operation_id>` only after the CLI accepts the unchanged project and asset fingerprints. This is a validated rebuild from the recorded plan, not a partial-frame checkpoint.
+
+Agent calls should consume the JSON envelope and exit code. Keep a project-relative change set in a file so the operation is reviewable and repeatable. Read [the CLI contract](../../docs/specs/AgentCLI契约_v0.1_2026-10-13.md), [the local AI adapter specification](../../docs/specs/本地AI适配器与字幕流水线规范_v0.1_2026-10-13.md), [the object tracking specification](../../docs/specs/本地对象跟踪与关键帧规范_v0.1_2026-10-13.md), and [the P0 usage guide](../../docs/产品实现入口与P0使用说明_v0.1_2026-10-13.md) when a request needs exact fields or failure handling.

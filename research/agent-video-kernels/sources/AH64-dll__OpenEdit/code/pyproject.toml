@@ -1,0 +1,109 @@
+[project]
+name = "open_edit"
+version = "1.4.0"
+description = "AI-native video editor — IR, MCP server, render (melt/ffmpeg/Remotion)"
+license = "MIT AND MPL-2.0 AND OFL-1.1"
+license-files = ["LICENSE", "open_edit/integrations/diffusion/worker/vendor/LICENSE", "open_edit/integrations/diffusion/browser/fonts/OFL.txt"]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+    "lxml>=5.0",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "mcp>=1.30,<2",
+    "python-multipart>=0.0.9",
+    "pillow>=10.0",
+    "opencv-contrib-python-headless==4.13.0.92",
+    "numpy>=2,<3",
+]
+
+[project.optional-dependencies]
+ui = []  # compatibility alias: the review UI is included in the core package
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.27",
+    "pytest-cov>=4.0",
+    "pytest-timeout>=2.0",
+    "ruff>=0.16,<0.17",
+]
+openai = ["openai>=1.30"]
+whisper = [
+    "faster-whisper>=1.0.0",
+]
+agent = ["anthropic>=0.39", "openai>=1.30"]
+serve = ["anthropic>=0.39"]  # legacy alias for built-in agent dependencies
+mcp = []  # compatibility alias: MCP is the primary interface
+
+[project.scripts]
+open_edit = "open_edit.cli:main"
+open-edit-mcp = "open_edit.mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["open_edit"]
+exclude = ["open_edit/**/node_modules/**", "open_edit/**/__pycache__/**", "open_edit/**/*.pyc"]
+
+# Lean source distribution: only the package + build essentials. Without
+# this hatchling packs the whole working tree, including node_modules and
+# local test outputs.
+[tool.hatch.build.targets.sdist]
+only-include = [
+  "open_edit",
+  "pyproject.toml",
+  "README.md",
+  "LICENSE",
+]
+exclude = [
+  "open_edit/**/node_modules/**",
+  "open_edit/**/__pycache__/**",
+  "open_edit/**/*.pyc",
+]
+
+# Ship harness skill markdown with the wheel (not Cursor-only).
+[tool.hatch.build.targets.wheel.force-include]
+"open_edit/harness_skills/README.md" = "open_edit/harness_skills/README.md"
+"open_edit/harness_skills/open-edit-mcp.md" = "open_edit/harness_skills/open-edit-mcp.md"
+"open_edit/harness_skills/open-edit-mcp-reference.md" = "open_edit/harness_skills/open-edit-mcp-reference.md"
+"open_edit/harness_skills/tool_surface.md" = "open_edit/harness_skills/tool_surface.md"
+"open_edit/harness_skills/edit-planning.md" = "open_edit/harness_skills/edit-planning.md"
+"open_edit/harness_skills/remotion_motion.md" = "open_edit/harness_skills/remotion_motion.md"
+"open_edit/harness_skills/hyperframes_native.md" = "open_edit/harness_skills/hyperframes_native.md"
+"open_edit/harness_skills/qc-standards.md" = "open_edit/harness_skills/qc-standards.md"
+"open_edit/harness_skills/freeform_and_effects.md" = "open_edit/harness_skills/freeform_and_effects.md"
+"open_edit/harness_skills/style-memory.md" = "open_edit/harness_skills/style-memory.md"
+"open_edit/harness_skills/review-notes.md" = "open_edit/harness_skills/review-notes.md"
+"open_edit/harness_skills/asset_catalog_guide.md" = "open_edit/harness_skills/asset_catalog_guide.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra -q"
+markers = [
+    "agent_ui: exercise optional built-in chat and provider routes",
+    "browser: render with HyperFrames/Chrome; may download browser dependencies",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "C4", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+exclude = ["build/", "dist/"]

@@ -1,0 +1,115 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/verbreel-types",
+    "crates/verbreel-args",
+    "crates/verbreel-canon",
+    "crates/verbreel-events",
+    "crates/verbreel-state",
+    "crates/verbreel-ir",
+    "crates/verbreel-render",
+    "crates/verbreel-codec-native",
+    "crates/verbreel-codec-web",
+    "crates/verbreel-storage",
+    "crates/verbreel-ai",
+    "crates/verbreel-runtime",
+    "crates/verbreel-cli",
+    "crates/verbreel-mcp",
+    "crates/verbreel-http",
+    "crates/verbreel-wasm",
+    "crates/verbreel-conformance",
+    "examples",
+]
+
+[workspace.package]
+version      = "1.0.0"
+edition      = "2024"
+rust-version = "1.92"
+license      = "MIT OR Apache-2.0"
+authors      = ["rdh073"]
+repository   = "https://github.com/rdh073/verbreel-engine"
+publish      = false
+
+[workspace.dependencies]
+# Async runtime
+tokio         = { version = "1", features = ["rt-multi-thread", "macros", "io-util", "sync", "process", "signal", "fs"] }
+tokio-util    = { version = "0.7", features = ["codec"] }
+tokio-stream  = { version = "0.1" }
+futures       = { version = "0.3" }
+
+# Serde + canonical JSON
+serde         = { version = "1", features = ["derive"] }
+serde_json    = { version = "1" }
+vr-jcs        = { version = "0.4" }
+
+# UUID + hashing
+# `rng-getrandom` is the explicit-forward randomness backend added in uuid 1.23,
+# replacing the implicit `js` feature behavior. Pairs with the target-cfg
+# `getrandom = { features = ["wasm_js"] }` block in every leaf crate that needs
+# UUID generation on wasm32-unknown-unknown. Pin minor 1.23 so a future
+# `cargo update` doesn't silently revert.
+uuid          = { version = "1.23", features = ["v7", "serde", "rng-getrandom"] }
+# wasm32-only: forward `wasm_js` to getrandom so uuid's RNG compiles in the
+# browser. Workspace inheritance doesn't support `target.'cfg(...)'` blocks, so
+# each leaf crate that depends on uuid repeats the target-cfg dependency. See
+# spec/research/02-engine-language.md §7.
+getrandom     = { version = "0.4", default-features = false }
+sha2          = { version = "0.11" }
+
+# Errors + observability
+thiserror     = { version = "2" }
+anyhow        = { version = "1" }
+tracing       = { version = "0.1" }
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# Storage / locking
+fs4           = { version = "1" }
+tempfile      = { version = "3" }
+parking_lot   = { version = "0.12" }
+
+# Time formatting — RFC 3339 for events.jsonl `ts` field per Appendix C.
+# `formatting` + `parsing` features cover the round-trip path.
+time          = { version = "0.3", features = ["formatting", "parsing"] }
+
+# JSON patch/pointer
+jsonptr       = { version = "0.7" }
+json-patch    = { version = "4" }
+
+# JSON Schema validation. Dev-dep only on `verbreel-state` (and any future
+# crate that wants schema-as-trust-but-verify in its tests). Production
+# validation goes through the typed `verbreel-state` shape + §0.13 invariant
+# checks, NOT the schema crate. `default-features = false` drops the
+# `resolve-http`/`resolve-file` net+fs resolvers — tests load the schema from
+# the workspace explicitly via `VERBREEL_SPEC_DIR`.
+# Last-checked: jsonschema 0.46.5 published 2026-05-13.
+jsonschema    = { version = "0.46", default-features = false }
+
+# Regex validation for content-addressed asset newtypes (Sha256, AssetPath,
+# AssetRef). Compiled once via std::sync::OnceLock at the call site —
+# matches the schema patterns in `spec/project-schema.json` `$defs/Sha256`
+# / `$defs/AssetPath` / `$defs/AssetRef`. Last-checked: regex 1.12.3.
+regex         = { version = "1" }
+unicode-segmentation = { version = "1.13" }
+
+# HTTP server
+axum          = { version = "0.8", features = ["ws", "macros"] }
+tower         = { version = "0.5" }
+tower-http    = { version = "0.6", features = ["trace", "cors"] }
+hyper         = { version = "1", features = ["server", "http2"] }
+
+# CLI
+clap          = { version = "4", features = ["derive", "env", "cargo"] }
+
+# MCP
+rmcp          = { version = "1.7", features = ["server", "transport-io", "transport-streamable-http-server"] }
+
+# Render (Research 01)
+wgpu          = { version = "29" }
+
+[profile.release]
+opt-level     = 3
+lto           = "thin"
+codegen-units = 1
+
+[profile.dev]
+opt-level     = 1

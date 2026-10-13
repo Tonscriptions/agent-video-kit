@@ -1,0 +1,802 @@
+{
+  "date": "2026-10-11",
+  "scope": "Concat + pyJianYingDraft; Stars belong to whole source repositories, not individual Skills",
+  "ranked_skills": [
+    {
+      "repository": "jub0t/concat",
+      "stars": 4777,
+      "relation": "Concat 官方配套",
+      "skill_names": "run-concat",
+      "suggested_local_names": "video-cut-run-concat",
+      "license": "AGPL-3.0-or-later",
+      "capabilities": "编译、启动、验证 Rust/Slint 桌面程序",
+      "limits": "开发与运行验证 Skill；没有视频剪辑配方、命名运镜预设或剪辑任务编排。需要 Rust/Cargo。",
+      "group": "main",
+      "url": "https://github.com/jub0t/concat",
+      "source_commit": "1ab750a339c5db249d353b21b9f3cc9ddb1a1a22",
+      "skill_files": [
+        {
+          "path": ".claude/skills/run-concat/SKILL.md",
+          "name": "run-concat",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\jub0t__concat\\code\\.claude\\skills\\run-concat\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/jub0t/concat/blob/1ab750a339c5db249d353b21b9f3cc9ddb1a1a22/.claude/skills/run-concat/SKILL.md"
+        }
+      ],
+      "runtime_tested": false,
+      "installed": false
+    },
+    {
+      "repository": "luoluoluo22/jianying-editor-skill",
+      "stars": 3897,
+      "relation": "直接适配 pyJianYingDraft",
+      "skill_names": "jianying-editor",
+      "suggested_local_names": "video-cut-jianying-editor",
+      "license": "MIT；内嵌库 Apache-2.0",
+      "capabilities": "JyWrapper、草稿、特效/字幕、缩放/平移关键帧、Bezier 缓动",
+      "limits": "已安装；1.7.0；当前上游 commit 与安装记录相同。内嵌 SDK 有修改，不能假设等同于 PyPI 0.3.0。",
+      "group": "main",
+      "url": "https://github.com/luoluoluo22/jianying-editor-skill",
+      "source_commit": "32c56928ded4f9e2c2b80e099dc7abb793d2c30b",
+      "skill_files": [
+        {
+          "path": "SKILL.md",
+          "name": "jianying-editor",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\luoluoluo22__jianying-editor-skill\\code\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/luoluoluo22/jianying-editor-skill/blob/32c56928ded4f9e2c2b80e099dc7abb793d2c30b/SKILL.md"
+        }
+      ],
+      "runtime_tested": false,
+      "installed": true
+    },
+    {
+      "repository": "sun-guannan/VectCutAPI",
+      "stars": 2292,
+      "relation": "通过 API 适配 pyJianYingDraft",
+      "skill_names": "vectcut-api / capcut-director",
+      "suggested_local_names": "video-cut-vectcut-api / video-cut-capcut-director",
+      "license": "Apache-2.0；vectcut-skill 子包 MIT",
+      "capabilities": "HTTP/MCP 编排草稿、特效、视频关键帧；另有时间线指导 Skill",
+      "limits": "公开主流程以草稿生成保存为主；云渲染/完整 Agent 应用未开源。capcut-director 有强制关闭进程/批量删除锁的示例，后续适配需改成保留用户工作与指定项目范围。",
+      "group": "main",
+      "url": "https://github.com/sun-guannan/VectCutAPI",
+      "source_commit": "cfa4779a52f1dc59a56d90cc5868778eb50c6a97",
+      "skill_files": [
+        {
+          "path": "vectcut-skill/skill/SKILL.md",
+          "name": "vectcut-api",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\sun-guannan__VectCutAPI\\code\\vectcut-skill\\skill\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/sun-guannan/VectCutAPI/blob/cfa4779a52f1dc59a56d90cc5868778eb50c6a97/vectcut-skill/skill/SKILL.md"
+        },
+        {
+          "path": ".agents/skills/capcut-director/SKILL.md",
+          "name": "capcut-director",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\sun-guannan__VectCutAPI\\code\\.agents\\skills\\capcut-director\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/sun-guannan/VectCutAPI/blob/cfa4779a52f1dc59a56d90cc5868778eb50c6a97/.agents/skills/capcut-director/SKILL.md"
+        }
+      ],
+      "runtime_tested": false,
+      "installed": false
+    },
+    {
+      "repository": "zenstory-ai/video-recap-skills",
+      "stars": 563,
+      "relation": "间接配套：草稿格式兼容",
+      "skill_names": "video-assemble / video-recap / video-cut",
+      "suggested_local_names": "video-cut-recap-assemble / video-cut-recap / video-cut-recap-cut",
+      "license": "MIT",
+      "capabilities": "解说、剪辑、混音、字幕、导出可编辑剪映草稿",
+      "limits": "export_jianying.py 用标准库直接写 JSON，参考 pyJianYingDraft 格式但不调用该 SDK。音量 ducking 关键帧与画面运镜预设不是同一种能力。",
+      "group": "main",
+      "url": "https://github.com/zenstory-ai/video-recap-skills",
+      "source_commit": "539168622918e058bd250c793b82f043eced31e0",
+      "skill_files": [
+        {
+          "path": "skills/video-assemble/SKILL.md",
+          "name": "video-assemble",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\zenstory-ai__video-recap-skills\\code\\skills\\video-assemble\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/zenstory-ai/video-recap-skills/blob/539168622918e058bd250c793b82f043eced31e0/skills/video-assemble/SKILL.md"
+        },
+        {
+          "path": "skills/video-recap/SKILL.md",
+          "name": "video-recap",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\zenstory-ai__video-recap-skills\\code\\skills\\video-recap\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/zenstory-ai/video-recap-skills/blob/539168622918e058bd250c793b82f043eced31e0/skills/video-recap/SKILL.md"
+        },
+        {
+          "path": "skills/video-cut/SKILL.md",
+          "name": "video-cut",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\zenstory-ai__video-recap-skills\\code\\skills\\video-cut\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/zenstory-ai/video-recap-skills/blob/539168622918e058bd250c793b82f043eced31e0/skills/video-cut/SKILL.md"
+        }
+      ],
+      "runtime_tested": false,
+      "installed": false
+    },
+    {
+      "repository": "isYangs/jianying-editor-skill",
+      "stars": 215,
+      "relation": "直接适配 pyJianYingDraft",
+      "skill_names": "jianying-editor",
+      "suggested_local_names": "video-cut-jianying-editor-isyangs",
+      "license": "MIT",
+      "capabilities": "JyWrapper、素材、特效、Ken Burns/缩放/位置关键帧指导",
+      "limits": "与已装 JyWrapper 属同类 Skill，215 Star；存在旧版导出与运行依赖假设，不是替换现有包的明显升级。",
+      "group": "main",
+      "url": "https://github.com/isYangs/jianying-editor-skill",
+      "source_commit": "a20c5228fcc88e27587c32d6d916f776869473b2",
+      "skill_files": [
+        {
+          "path": "SKILL.md",
+          "name": "jianying-editor",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\isYangs__jianying-editor-skill\\code\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/isYangs/jianying-editor-skill/blob/a20c5228fcc88e27587c32d6d916f776869473b2/SKILL.md"
+        }
+      ],
+      "runtime_tested": false,
+      "installed": false
+    },
+    {
+      "repository": "wangcanyu/daihuo-fanpai",
+      "stars": 59,
+      "relation": "直接调用 SDK 的广告流水线",
+      "skill_names": "daihuo-fanpai",
+      "suggested_local_names": "video-cut-daihuo-fanpai",
+      "license": "MIT",
+      "capabilities": "带货视频反推、重生成、配音、拼接、剪映草稿交付",
+      "limits": "deliver.py 实际调用 pyJianYingDraft。重点是广告生产，不提供完整命名运镜库；生成依赖即梦/Seedance 等服务。源码含 WSL 路径兼容分支，原生路径也有处理，本项目只考虑原生运行。",
+      "group": "main",
+      "url": "https://github.com/wangcanyu/daihuo-fanpai",
+      "source_commit": "b296543ca7097d002a272271886033dcd82c5b59",
+      "skill_files": [
+        {
+          "path": "SKILL.md",
+          "name": "daihuo-fanpai",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\wangcanyu__daihuo-fanpai\\code\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/wangcanyu/daihuo-fanpai/blob/b296543ca7097d002a272271886033dcd82c5b59/SKILL.md"
+        }
+      ],
+      "runtime_tested": false,
+      "installed": false
+    },
+    {
+      "repository": "ops120/video-recap-skills-plus",
+      "stars": 41,
+      "relation": "间接配套：草稿格式兼容",
+      "skill_names": "video-assemble / video-recap / video-cut",
+      "suggested_local_names": "video-cut-recap-plus-assemble / video-cut-recap-plus / video-cut-recap-plus-cut",
+      "license": "MIT",
+      "capabilities": "解说/合成与剪映草稿输出",
+      "limits": "独立 JSON 草稿导出器，未直接依赖 pyJianYingDraft；与 video-recap-skills 同类，不应当作新的 SDK 内核。",
+      "group": "main",
+      "url": "https://github.com/ops120/video-recap-skills-plus",
+      "source_commit": "edd5c1b6d341aa30af9a4cf63a89a396631d6f18",
+      "skill_files": [
+        {
+          "path": "skills/video-assemble/SKILL.md",
+          "name": "video-assemble",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\ops120__video-recap-skills-plus\\code\\skills\\video-assemble\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/ops120/video-recap-skills-plus/blob/edd5c1b6d341aa30af9a4cf63a89a396631d6f18/skills/video-assemble/SKILL.md"
+        },
+        {
+          "path": "skills/video-recap/SKILL.md",
+          "name": "video-recap",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\ops120__video-recap-skills-plus\\code\\skills\\video-recap\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/ops120/video-recap-skills-plus/blob/edd5c1b6d341aa30af9a4cf63a89a396631d6f18/skills/video-recap/SKILL.md"
+        },
+        {
+          "path": "skills/video-cut/SKILL.md",
+          "name": "video-cut",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\ops120__video-recap-skills-plus\\code\\skills\\video-cut\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/ops120/video-recap-skills-plus/blob/edd5c1b6d341aa30af9a4cf63a89a396631d6f18/skills/video-cut/SKILL.md"
+        }
+      ],
+      "runtime_tested": false,
+      "installed": false
+    },
+    {
+      "repository": "guoluhua38-max/jianying-editor-skill",
+      "stars": 31,
+      "relation": "直接适配 pyJianYingDraft",
+      "skill_names": "jianying-editor",
+      "suggested_local_names": "video-cut-jianying-editor-guoluhua",
+      "license": "MIT",
+      "capabilities": "JyWrapper/关键帧规则的另一维护副本",
+      "limits": "与最高 Star 项目结构与使用方式相近，没有核验到比已装包更强的独有运镜能力。",
+      "group": "main",
+      "url": "https://github.com/guoluhua38-max/jianying-editor-skill",
+      "source_commit": "a081fbd4aaba9f53f356045aeb0ed570b55a4b2f",
+      "skill_files": [
+        {
+          "path": "SKILL.md",
+          "name": "jianying-editor",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\guoluhua38-max__jianying-editor-skill\\code\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/guoluhua38-max/jianying-editor-skill/blob/a081fbd4aaba9f53f356045aeb0ed570b55a4b2f/SKILL.md"
+        }
+      ],
+      "runtime_tested": false,
+      "installed": false
+    },
+    {
+      "repository": "Xanthus-Sanslab/jianying-ai-mcp",
+      "stars": 11,
+      "relation": "直接适配 pyJianYingDraft",
+      "skill_names": "jianying-ai-editor",
+      "suggested_local_names": "video-cut-jianying-ai-editor",
+      "license": "未找到项目 LICENSE；依赖库另有许可",
+      "capabilities": "MCP 批量 manifest、关键帧、参考草稿、模板换料、视频观察",
+      "limits": "pyproject 固定 pyJianYingDraft 0.3.0；项目自报 Windows 剪映 10.0.5 测试。11 Star，许可未明确，作为公开源码候选单列。",
+      "group": "license_unclear",
+      "url": "https://github.com/Xanthus-Sanslab/jianying-ai-mcp",
+      "source_commit": "ae14f5356ae1499a247937077af550a34d580beb",
+      "skill_files": [
+        {
+          "path": "skills/jianying-ai-editor/SKILL.md",
+          "name": "jianying-ai-editor",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\Xanthus-Sanslab__jianying-ai-mcp\\code\\skills\\jianying-ai-editor\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/Xanthus-Sanslab/jianying-ai-mcp/blob/ae14f5356ae1499a247937077af550a34d580beb/skills/jianying-ai-editor/SKILL.md"
+        }
+      ],
+      "runtime_tested": false,
+      "installed": false
+    },
+    {
+      "repository": "jjjane233/jianying-editor-skill-11.5",
+      "stars": 2,
+      "relation": "JyWrapper 的版本专项适配",
+      "skill_names": "jianying-editor-11-5",
+      "suggested_local_names": "video-cut-jianying-editor-11-5",
+      "license": "MIT；继承内嵌库声明",
+      "capabilities": "Windows 11.5 草稿保存、增量修改、CLI、原生 DraftIO 桥",
+      "limits": "作者仅验证 11.5.0.14471；使用本机客户端组件 ABI，2 Star。保留上游关键帧接口不等于已验证全部运镜/特效，须按本版记录核验。",
+      "group": "main",
+      "url": "https://github.com/jjjane233/jianying-editor-skill-11.5",
+      "source_commit": "133399a1f9a581be394a2c043e8f649a7145650c",
+      "skill_files": [
+        {
+          "path": "skills/jianying-editor-11-5/SKILL.md",
+          "name": "jianying-editor-11-5",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\jjjane233__jianying-editor-skill-11.5\\code\\skills\\jianying-editor-11-5\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/jjjane233/jianying-editor-skill-11.5/blob/133399a1f9a581be394a2c043e8f649a7145650c/skills/jianying-editor-11-5/SKILL.md"
+        }
+      ],
+      "runtime_tested": false,
+      "installed": false
+    },
+    {
+      "repository": "DogeCoding/capcut-skill",
+      "stars": 0,
+      "relation": "直接适配 pyJianYingDraft",
+      "skill_names": "capcut-jianying",
+      "suggested_local_names": "video-cut-capcut-jianying",
+      "license": "MIT",
+      "capabilities": "草稿、SRT、效果枚举、FFmpeg 静音粗剪",
+      "limits": "macOS 为主，Windows 路径需适配；没有核验到命名运镜预设库。0 Star，适合作为最小示例参考。",
+      "group": "main",
+      "url": "https://github.com/DogeCoding/capcut-skill",
+      "source_commit": "aaa0b8f8a3c660759ef421454d488452f19c1688",
+      "skill_files": [
+        {
+          "path": "SKILL.md",
+          "name": "capcut-jianying",
+          "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\DogeCoding__capcut-skill\\code\\SKILL.md",
+          "frontmatter_verified": true,
+          "url": "https://github.com/DogeCoding/capcut-skill/blob/aaa0b8f8a3c660759ef421454d488452f19c1688/SKILL.md"
+        }
+      ],
+      "runtime_tested": false,
+      "installed": false
+    }
+  ],
+  "excluded_or_reference_only": [
+    {
+      "repository": "mcncarl/yichen-skills",
+      "stars": 4372,
+      "url": "https://github.com/mcncarl/yichen-skills",
+      "reason": "有 yichen-jianying-edit，但 LICENSE 是个人学习/非商业许可，原生剪映流程又偏 Apple Silicon Mac；不列为可用于本广告项目的开源 Skill。"
+    },
+    {
+      "repository": "mcncarl/jianying-headless",
+      "stars": 3041,
+      "url": "https://github.com/mcncarl/jianying-headless",
+      "reason": "同样为个人学习/非商业许可；有配套 Skill，主要原生链路为 macOS，Windows FFmpeg 分支与原生剪映草稿不同。"
+    },
+    {
+      "repository": "OpenDemon/Pilipili-AutoVideo",
+      "stars": 206,
+      "url": "https://github.com/OpenDemon/Pilipili-AutoVideo",
+      "reason": "skills/SKILL.md 是说明文档，缺少 name/description YAML frontmatter；也未找到项目 LICENSE。保留为流水线参考，未列为可直接注册的开源 Skill。"
+    },
+    {
+      "repository": "DreamLab-AI/agentbox",
+      "stars": 23,
+      "url": "https://github.com/DreamLab-AI/agentbox",
+      "reason": "找到 23 Star 的 Concat 实验集成 concatcontainer，交付的是 Docker/Compose 构建选项，没有独立的 Concat 命名 Skill；不符合本项目禁止 Docker/WSL 的运行约束。"
+    },
+    {
+      "repository": "YGtemple/jianying-editor-skill",
+      "stars": 1,
+      "url": "https://github.com/YGtemple/jianying-editor-skill",
+      "reason": "有 Skill 入口，但当前仓库缺少对应执行脚本/资源包，未找到项目 LICENSE；是文档/规则参考。"
+    }
+  ],
+  "evidence": [
+    {
+      "repository": "jub0t/concat",
+      "file": ".claude/skills/run-concat/SKILL.md",
+      "matches": [
+        {
+          "line": 2,
+          "text": "name: run-concat"
+        },
+        {
+          "line": 3,
+          "text": "description: Build, launch, and verify the Concat desktop app after a code change. Use this whenever the user asks to run Concat, test a change in the app, check whether something works, see the editor, or verify a fix \"in the real app\" rather than just via tests — even if they don't say \"run the app\" explicitly (e.g. \"does this look right now\", \"let's see it\"). Concat is a native Rust + Slint desktop video editor with a Cargo workspace root at src/, not the repo root, which trips up plain `cargo run`."
+        },
+        {
+          "line": 8,
+          "text": "Concat is a native Rust + Slint desktop app. The git repo root and the Cargo workspace root are **different directories** — this is the single most common way a run fails."
+        },
+        {
+          "line": 13,
+          "text": "- Cargo workspace root: `<repo>/src` — this is where `Cargo.toml` for the workspace lives. **Every `cargo` command must run from here**, not the repo root."
+        },
+        {
+          "line": 21,
+          "text": "cargo run --profile quick -p concat      # optimized build, much faster than a full release build — the default choice for iteration"
+        },
+        {
+          "line": 22,
+          "text": "cargo run -p concat                       # plain debug build if `quick` profile is unavailable for some reason"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\jub0t__concat\\code\\.claude\\skills\\run-concat\\SKILL.md",
+      "url": "https://github.com/jub0t/concat/blob/1ab750a339c5db249d353b21b9f3cc9ddb1a1a22/.claude/skills/run-concat/SKILL.md#L2"
+    },
+    {
+      "repository": "jub0t/concat",
+      "file": "src/crates/concat-cli/src/main.rs",
+      "matches": [
+        {
+          "line": 9,
+          "text": "//! first transport: JSON-RPC requests in, responses and events out, one per"
+        },
+        {
+          "line": 62,
+          "text": "Api {"
+        },
+        {
+          "line": 72,
+          "text": "Serve {"
+        },
+        {
+          "line": 134,
+          "text": "Command::Api { request } => api(request),"
+        },
+        {
+          "line": 135,
+          "text": "Command::Serve {"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\jub0t__concat\\code\\src\\crates\\concat-cli\\src\\main.rs",
+      "url": "https://github.com/jub0t/concat/blob/1ab750a339c5db249d353b21b9f3cc9ddb1a1a22/src/crates/concat-cli/src/main.rs#L9"
+    },
+    {
+      "repository": "jub0t/concat",
+      "file": "src/crates/concat-project/src/commands/properties.rs",
+      "matches": [
+        {
+          "line": 128,
+          "text": "Command::SetClipCutout { clip_id, cutout } => {"
+        },
+        {
+          "line": 157,
+          "text": "Command::SetClipKey {"
+        },
+        {
+          "line": 185,
+          "text": "clip.set_key(property, at, value, ease);"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\jub0t__concat\\code\\src\\crates\\concat-project\\src\\commands\\properties.rs",
+      "url": "https://github.com/jub0t/concat/blob/1ab750a339c5db249d353b21b9f3cc9ddb1a1a22/src/crates/concat-project/src/commands/properties.rs#L128"
+    },
+    {
+      "repository": "jub0t/concat",
+      "file": "src/crates/concat-core/src/animate.rs",
+      "matches": [
+        {
+          "line": 8,
+          "text": "//! and opacity, a list of `(at, value)` with `at` a fraction of the clip's"
+        },
+        {
+          "line": 260,
+          "text": "/// The clip's transform at `x`, a fraction of its length."
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\jub0t__concat\\code\\src\\crates\\concat-core\\src\\animate.rs",
+      "url": "https://github.com/jub0t/concat/blob/1ab750a339c5db249d353b21b9f3cc9ddb1a1a22/src/crates/concat-core/src/animate.rs#L8"
+    },
+    {
+      "repository": "GuanYixuan/pyJianYingDraft",
+      "file": "README.md",
+      "matches": [
+        {
+          "line": 22,
+          "text": "| [视频蒙版](#蒙版) | ✅ | 10.8 ❌<br>预计在`0.3.1`中修复 |"
+        },
+        {
+          "line": 77,
+          "text": "> ⚠️ 新版剪映中的 `draft_content.json` 往往不是可直接读取的明文 JSON；因此“加载模板”相关能力在新版剪映上通常需要通过 `DraftFolder(..., fallback_loader=...)` 接入额外读取器，详情请参见[此处](https://github.com/GuanYixuan/pyJianYingDraft/releases)"
+        },
+        {
+          "line": 81,
+          "text": "| [加载](#加载模板) `draft_content.json` 文件作为模板 | ✅ | 10.8 🟡<br>需 `fallback_loader` |"
+        },
+        {
+          "line": 92,
+          "text": "| 控制剪映打开指定草稿 | ✅ | 6.8（剪映6及以下）✅<br>10.8（剪映7及以上）❌ |"
+        },
+        {
+          "line": 93,
+          "text": "| [导出草稿至指定位置](#批量导出草稿) | ✅ | 6.8（剪映6及以下）✅<br>10.8（剪映7及以上）❌ |"
+        },
+        {
+          "line": 94,
+          "text": "| 调节导出分辨率和帧率 | ✅ | 6.8（剪映6及以下）✅<br>10.8（剪映7及以上）❌ |"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\GuanYixuan__pyJianYingDraft\\code\\README.md",
+      "url": "https://github.com/GuanYixuan/pyJianYingDraft/blob/6bb2d06a713f7b58e1375269daec835a03882086/README.md#L22"
+    },
+    {
+      "repository": "luoluoluo22/jianying-editor-skill",
+      "file": "scripts/jy_wrapper.py",
+      "matches": [
+        {
+          "line": 30,
+          "text": "import pyJianYingDraft as draft"
+        },
+        {
+          "line": 35,
+          "text": "class JyProject(JyProjectBase, MediaOpsMixin, TextOpsMixin, VfxOpsMixin, MockingOpsMixin):"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\luoluoluo22__jianying-editor-skill\\code\\scripts\\jy_wrapper.py",
+      "url": "https://github.com/luoluoluo22/jianying-editor-skill/blob/32c56928ded4f9e2c2b80e099dc7abb793d2c30b/scripts/jy_wrapper.py#L30"
+    },
+    {
+      "repository": "luoluoluo22/jianying-editor-skill",
+      "file": "rules/keyframes.md",
+      "matches": [
+        {
+          "line": 23,
+          "text": "2.  **Add Keyframes**: Use the `.add_keyframe(property, timestamp, value)` method on the segment."
+        },
+        {
+          "line": 36,
+          "text": "# 2. Define keyframe times (Absolute Timeline Time in microseconds)"
+        },
+        {
+          "line": 37,
+          "text": "t_start = start_time"
+        },
+        {
+          "line": 43,
+          "text": "segment.add_keyframe(KP.uniform_scale, t_start, 1.0)"
+        },
+        {
+          "line": 44,
+          "text": "segment.add_keyframe(KP.uniform_scale, t_end, 1.5)"
+        },
+        {
+          "line": 47,
+          "text": "# segment.add_keyframe(KP.alpha, t_start, 1.0) # Check actual property name support"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\luoluoluo22__jianying-editor-skill\\code\\rules\\keyframes.md",
+      "url": "https://github.com/luoluoluo22/jianying-editor-skill/blob/32c56928ded4f9e2c2b80e099dc7abb793d2c30b/rules/keyframes.md#L23"
+    },
+    {
+      "repository": "sun-guannan/VectCutAPI",
+      "file": "create_draft.py",
+      "matches": [
+        {
+          "line": 2,
+          "text": "import pyJianYingDraft as draft"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\sun-guannan__VectCutAPI\\code\\create_draft.py",
+      "url": "https://github.com/sun-guannan/VectCutAPI/blob/cfa4779a52f1dc59a56d90cc5868778eb50c6a97/create_draft.py#L2"
+    },
+    {
+      "repository": "sun-guannan/VectCutAPI",
+      "file": "vectcut-skill/skill/SKILL.md",
+      "matches": [
+        {
+          "line": 2,
+          "text": "name: vectcut-api"
+        },
+        {
+          "line": 61,
+          "text": "- add_video_keyframe: 添加关键帧动画"
+        },
+        {
+          "line": 108,
+          "text": "| `/add_video_keyframe` | POST | 添加关键帧动画 |"
+        },
+        {
+          "line": 180,
+          "text": "requests.post(\"http://localhost:9001/add_video_keyframe\", json={"
+        },
+        {
+          "line": 217,
+          "text": "| `add_video_keyframe` | 添加关键帧动画 |"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\sun-guannan__VectCutAPI\\code\\vectcut-skill\\skill\\SKILL.md",
+      "url": "https://github.com/sun-guannan/VectCutAPI/blob/cfa4779a52f1dc59a56d90cc5868778eb50c6a97/vectcut-skill/skill/SKILL.md#L2"
+    },
+    {
+      "repository": "zenstory-ai/video-recap-skills",
+      "file": "skills/video-assemble/scripts/export_jianying.py",
+      "matches": [
+        {
+          "line": 1,
+          "text": "\"\"\"Optional 剪映 / JianYing (CapCut) draft exporter — decoupled, stdlib + ffprobe only."
+        },
+        {
+          "line": 16,
+          "text": "Schema and the draft skeleton are informed by the open-source pyJianYingDraft"
+        },
+        {
+          "line": 19,
+          "text": "are implemented locally and no upstream executable code, resource package,"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\zenstory-ai__video-recap-skills\\code\\skills\\video-assemble\\scripts\\export_jianying.py",
+      "url": "https://github.com/zenstory-ai/video-recap-skills/blob/539168622918e058bd250c793b82f043eced31e0/skills/video-assemble/scripts/export_jianying.py#L1"
+    },
+    {
+      "repository": "isYangs/jianying-editor-skill",
+      "file": "scripts/jy_wrapper.py",
+      "matches": [
+        {
+          "line": 37,
+          "text": "import pyJianYingDraft as draft"
+        },
+        {
+          "line": 53,
+          "text": "class JyProject(JyProjectBase, MediaOpsMixin, TextOpsMixin, VfxOpsMixin, MockingOpsMixin):"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\isYangs__jianying-editor-skill\\code\\scripts\\jy_wrapper.py",
+      "url": "https://github.com/isYangs/jianying-editor-skill/blob/a20c5228fcc88e27587c32d6d916f776869473b2/scripts/jy_wrapper.py#L37"
+    },
+    {
+      "repository": "wangcanyu/daihuo-fanpai",
+      "file": "deliver.py",
+      "matches": [
+        {
+          "line": 14,
+          "text": "final 字幕引擎(--subs,默认 auto):plan 有 talking 段且 clips 同级 qc_talking.json"
+        },
+        {
+          "line": 27,
+          "text": "draft 模式若当前解释器缺该库,自动用 DAIHUO_JY_PYTHON(默认 ~/.venv-jianying/bin/python)重启自身。"
+        },
+        {
+          "line": 43,
+          "text": "def to_wsl(p):"
+        },
+        {
+          "line": 47,
+          "text": "Windows 原生 Python 上把 'D:/...' 转成 '/mnt/d/...' 会指向不存在的路径,"
+        },
+        {
+          "line": 134,
+          "text": "import pyJianYingDraft  # noqa: F401"
+        },
+        {
+          "line": 150,
+          "text": "import pyJianYingDraft as jy"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\wangcanyu__daihuo-fanpai\\code\\deliver.py",
+      "url": "https://github.com/wangcanyu/daihuo-fanpai/blob/b296543ca7097d002a272271886033dcd82c5b59/deliver.py#L14"
+    },
+    {
+      "repository": "ops120/video-recap-skills-plus",
+      "file": "skills/video-assemble/scripts/export_jianying.py",
+      "matches": [
+        {
+          "line": 1,
+          "text": "\"\"\"Optional 剪映 / JianYing (CapCut) draft exporter — decoupled, stdlib + ffprobe only."
+        },
+        {
+          "line": 16,
+          "text": "Schema and the draft skeleton are reimplemented from the open-source"
+        },
+        {
+          "line": 19,
+          "text": "draft JSON is built directly here so the bundle stays stdlib-only."
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\ops120__video-recap-skills-plus\\code\\skills\\video-assemble\\scripts\\export_jianying.py",
+      "url": "https://github.com/ops120/video-recap-skills-plus/blob/edd5c1b6d341aa30af9a4cf63a89a396631d6f18/skills/video-assemble/scripts/export_jianying.py#L1"
+    },
+    {
+      "repository": "Xanthus-Sanslab/jianying-ai-mcp",
+      "file": "src/jianying_ai_mcp/draft_ops.py",
+      "matches": [
+        {
+          "line": 10,
+          "text": "import pyJianYingDraft as draft"
+        },
+        {
+          "line": 178,
+          "text": "segment.add_keyframe(prop, keyframe[\"time\"], float(keyframe[\"value\"]))"
+        },
+        {
+          "line": 262,
+          "text": "segment.add_keyframe(prop, keyframe[\"time\"], float(keyframe[\"value\"]))"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\Xanthus-Sanslab__jianying-ai-mcp\\code\\src\\jianying_ai_mcp\\draft_ops.py",
+      "url": "https://github.com/Xanthus-Sanslab/jianying-ai-mcp/blob/ae14f5356ae1499a247937077af550a34d580beb/src/jianying_ai_mcp/draft_ops.py#L10"
+    },
+    {
+      "repository": "Xanthus-Sanslab/jianying-ai-mcp",
+      "file": "pyproject.toml",
+      "matches": [
+        {
+          "line": 12,
+          "text": "\"pyJianYingDraft==0.3.0\","
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\Xanthus-Sanslab__jianying-ai-mcp\\code\\pyproject.toml",
+      "url": "https://github.com/Xanthus-Sanslab/jianying-ai-mcp/blob/ae14f5356ae1499a247937077af550a34d580beb/pyproject.toml#L12"
+    },
+    {
+      "repository": "jjjane233/jianying-editor-skill-11.5",
+      "file": "skills/jianying-editor-11-5/SKILL.md",
+      "matches": [
+        {
+          "line": 3,
+          "text": "description: 为 Windows 剪映专业版 11.5.0.14471 创建、裁剪和增量修改可编辑视频草稿，使用本机原生 DraftIO 保存加密时间线并登记首页。给本地素材生成剪映工程时使用；不是实时 GUI 操作 skill，其他版本需要验证编解码 ABI。"
+        },
+        {
+          "line": 8,
+          "text": "基于 [isYangs/jianying-editor-skill](https://github.com/isYangs/jianying-editor-skill)，保留原库 API、资源和 LICENSE。只验证 Windows `11.5.0.14471`，不自动推广至未来版本或 macOS。"
+        },
+        {
+          "line": 31,
+          "text": "上游 API：将本目录 `scripts` 加到 `sys.path`，导入 `jy_wrapper.JyProject`，显式传 `drafts_root`，新建使用唯一名称并设 `overwrite=False`，调用 `add_clip()` 后 `save()`。不要用上游模板加载/重建流程覆盖用户已有加密工程；现有工程用适配后的 `jyai` 增量接口。`save()` 会经过本适配桥生成时间线、封面、原生加密内容并登记具体草稿目录。"
+        },
+        {
+          "line": 242,
+          "text": "- 内容与目录 meta 使用已安装 `videoeditor.dll` 的 DraftIO；写入后回读验证，`template.json` 保留明文工作副本。"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\jjjane233__jianying-editor-skill-11.5\\code\\skills\\jianying-editor-11-5\\SKILL.md",
+      "url": "https://github.com/jjjane233/jianying-editor-skill-11.5/blob/133399a1f9a581be394a2c043e8f649a7145650c/skills/jianying-editor-11-5/SKILL.md#L3"
+    },
+    {
+      "repository": "DogeCoding/capcut-skill",
+      "file": "SKILL.md",
+      "matches": [
+        {
+          "line": 2,
+          "text": "name: capcut-jianying"
+        },
+        {
+          "line": 3,
+          "text": "description: \"剪映专业版/CapCut 桌面：macOS 草稿路径、pyJianYingDraft 建草稿与 SRT 字幕、FFmpeg 静音粗剪；独立实现，依赖 PyPI+ffmpeg\""
+        },
+        {
+          "line": 20,
+          "text": "仅含 PyPI 包 **`pyJianYingDraft`**（生成 `draft_content.json`），**不**依赖任何指定 GitHub 技能仓库源码。"
+        },
+        {
+          "line": 27,
+          "text": "| `scripts/check_capcut_env.py` | 检查 ffmpeg、可选 `whisper`、`.venv` 内 pyJianYingDraft |"
+        },
+        {
+          "line": 51,
+          "text": "- **限制**：macOS **不能**使用 pyJianYingDraft 自带的 Windows GUI 自动导出；生成草稿后在剪映内手动导出。详见 `references/PYJIANGYING_LIMITS.md`。"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\DogeCoding__capcut-skill\\code\\SKILL.md",
+      "url": "https://github.com/DogeCoding/capcut-skill/blob/aaa0b8f8a3c660759ef421454d488452f19c1688/SKILL.md#L2"
+    },
+    {
+      "repository": "mcncarl/yichen-skills",
+      "file": "LICENSE",
+      "matches": [
+        {
+          "line": 6,
+          "text": "non-commercial personal workflow use only."
+        },
+        {
+          "line": 9,
+          "text": "personal non-commercial purposes, subject to all of the following conditions:"
+        },
+        {
+          "line": 11,
+          "text": "1. No commercial use. You may not sell, rent, sublicense, provide paid access"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\mcncarl__yichen-skills\\code\\LICENSE",
+      "url": "https://github.com/mcncarl/yichen-skills/blob/9bd78982aa75aa179258bc9009fe4dcf2f2973b9/LICENSE#L6"
+    },
+    {
+      "repository": "mcncarl/jianying-headless",
+      "file": "LICENSE",
+      "matches": [
+        {
+          "line": 6,
+          "text": "non-commercial personal workflow use only."
+        },
+        {
+          "line": 9,
+          "text": "personal non-commercial purposes, subject to all of the following conditions:"
+        },
+        {
+          "line": 11,
+          "text": "1. No commercial use. You may not sell, rent, sublicense, provide paid access"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\mcncarl__jianying-headless\\code\\LICENSE",
+      "url": "https://github.com/mcncarl/jianying-headless/blob/42b3d75b15bd9f3a9bb4c11b2f5205f7b4312252/LICENSE#L6"
+    },
+    {
+      "repository": "DreamLab-AI/agentbox",
+      "file": "concatcontainer/README.md",
+      "matches": [
+        {
+          "line": 3,
+          "text": "**Status: EXPERIMENTAL, gated off, no ADR yet.** This is the minimal build-system"
+        },
+        {
+          "line": 8,
+          "text": "AGENTBOX_ENABLE_CONCAT=1 ./agentbox.sh concat up"
+        },
+        {
+          "line": 9,
+          "text": "AGENTBOX_ENABLE_CONCAT=1 ./agentbox.sh concat api '{\"method\":\"catalogue.list\",\"kind\":\"transition\"}'"
+        },
+        {
+          "line": 10,
+          "text": "AGENTBOX_ENABLE_CONCAT=1 ./agentbox.sh concat down"
+        },
+        {
+          "line": 21,
+          "text": "This image builds **only `concat-cli`**, the headless driver. Its `api` subcommand"
+        },
+        {
+          "line": 87,
+          "text": "catalogue row, so no apply class. `AGENTBOX_ENABLE_CONCAT=1` is a stand-in,"
+        }
+      ],
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\concat-pyjianyingdraft-skills\\sources\\DreamLab-AI__agentbox\\code\\concatcontainer\\README.md",
+      "url": "https://github.com/DreamLab-AI/agentbox/blob/da800ade9d09c77a08d8642f76c30b9b94364519/concatcontainer/README.md#L3"
+    }
+  ],
+  "installed_version_matches_current_upstream": true,
+  "runtime_tested": false,
+  "no_virtualization_used": true
+}

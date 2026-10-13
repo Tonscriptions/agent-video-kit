@@ -1,0 +1,32 @@
+[package]
+name        = "verbreel-canon"
+description = "RFC 8785 JSON Canonicalization Scheme + project_hash projection (spec §0.5.2)."
+version.workspace      = true
+publish.workspace      = true
+edition.workspace      = true
+rust-version.workspace = true
+license.workspace      = true
+authors.workspace      = true
+
+[lib]
+name = "verbreel_canon"
+
+[dependencies]
+verbreel-types         = { path = "../verbreel-types" }
+serde.workspace        = true
+serde_json.workspace   = true
+sha2.workspace         = true
+vr-jcs.workspace       = true
+thiserror.workspace    = true
+# RFC 8785 §3.2.2.2 / spec §0.5.2 require NFC normalization of strings; vr-jcs
+# 0.4.1 does I-JSON noncharacter validation but does NOT NFC-normalize, so this
+# wrapper pre-walks strings through unicode-normalization. See task-08 caveat B.
+unicode-normalization  = { version = "0.1" }
+
+[dev-dependencies]
+serde_json.workspace = true
+
+# wasm32-unknown-unknown: forward `wasm_js` to getrandom (uuid pulls it via
+# verbreel-types). See workspace Cargo.toml + spec/research/02 §7.
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+getrandom = { workspace = true, features = ["wasm_js"] }

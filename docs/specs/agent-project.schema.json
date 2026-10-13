@@ -1,0 +1,330 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-ad-editor.local/schemas/agent-project/0.1.0",
+  "title": "AI广告剪辑 Agent Project",
+  "description": "Minimal executable contract for the Agent-first video project format.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "project", "settings", "assets", "sequences", "provenance"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "0.1.0"},
+    "project": {"$ref": "#/$defs/project"},
+    "settings": {"$ref": "#/$defs/settings"},
+    "assets": {"type": "array", "items": {"$ref": "#/$defs/asset"}},
+    "sequences": {"type": "array", "items": {"$ref": "#/$defs/sequence"}},
+    "templates": {"type": "array", "items": {"$ref": "#/$defs/template"}},
+    "outputs": {"type": "array", "items": {"$ref": "#/$defs/output"}},
+    "provenance": {"$ref": "#/$defs/provenance"},
+    "extensions": {"type": "object"}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "positiveInteger": {"type": "integer", "minimum": 1},
+    "nonNegativeInteger": {"type": "integer", "minimum": 0},
+    "project": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "name", "created_at", "updated_at", "creator"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "name": {"type": "string", "minLength": 1},
+        "created_at": {"type": "string", "format": "date-time"},
+        "updated_at": {"type": "string", "format": "date-time"},
+        "creator": {"type": "string", "minLength": 1},
+        "source_revision": {"type": "string"}
+      }
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["timebase", "canvas"],
+      "properties": {
+        "timebase": {
+          "type": "object",
+          "required": ["ticks_per_second", "display_fps"],
+          "properties": {
+            "ticks_per_second": {"$ref": "#/$defs/positiveInteger"},
+            "display_fps": {
+              "type": "object",
+              "required": ["num", "den"],
+              "properties": {
+                "num": {"$ref": "#/$defs/positiveInteger"},
+                "den": {"$ref": "#/$defs/positiveInteger"}
+              }
+            }
+          }
+        },
+        "canvas": {
+          "type": "object",
+          "required": ["width", "height"],
+          "properties": {
+            "width": {"$ref": "#/$defs/positiveInteger"},
+            "height": {"$ref": "#/$defs/positiveInteger"},
+            "pixel_aspect": {
+              "type": "object",
+              "required": ["num", "den"],
+              "properties": {
+                "num": {"$ref": "#/$defs/positiveInteger"},
+                "den": {"$ref": "#/$defs/positiveInteger"}
+              }
+            }
+          }
+        },
+        "color": {"type": "object"},
+        "output": {
+          "type": "object",
+          "properties": {
+            "container": {"type": "string", "enum": ["mp4", "webm", "mkv"]},
+            "video": {
+              "type": "object",
+              "properties": {
+                "codec": {"type": "string"},
+                "preset": {"type": "string"},
+                "crf": {"type": "integer", "minimum": 0, "maximum": 63},
+                "bitrate": {"type": "string"},
+                "pixel_format": {"type": "string", "enum": ["yuv420p", "yuv422p", "yuv444p"]}
+              }
+            },
+            "audio": {
+              "type": "object",
+              "properties": {"codec": {"type": "string"}, "bitrate": {"type": "string"}}
+            }
+          }
+        }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "kind", "uri", "sha256", "probe", "rights_ref"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"type": "string", "enum": ["video", "image", "audio", "font", "subtitle", "effect", "model", "generated"]},
+        "uri": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^(sha256:)?[A-Fa-f0-9]{64}$"},
+        "probe": {"type": "object"},
+        "rights_ref": {"type": "string", "minLength": 1},
+        "proxy": {"type": "object"},
+        "source": {"type": "object"}
+      }
+    },
+    "sequence": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "name", "duration_tick", "tracks"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "name": {"type": "string", "minLength": 1},
+        "duration_tick": {"$ref": "#/$defs/positiveInteger"},
+        "tracks": {"type": "array", "items": {"$ref": "#/$defs/track"}},
+        "markers": {"type": "array", "items": {"type": "object"}}
+      }
+    },
+    "track": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "kind", "order", "clips"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"type": "string", "enum": ["video", "audio", "subtitle", "data"]},
+        "order": {"type": "integer"},
+        "muted": {"type": "boolean"},
+        "locked": {"type": "boolean"},
+        "clips": {"type": "array", "items": {"$ref": "#/$defs/clip"}}
+      }
+    },
+    "clip": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "timeline_start_tick", "duration_tick", "source_in_tick", "source_out_tick"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "asset_id": {"$ref": "#/$defs/id"},
+        "sequence_id": {"$ref": "#/$defs/id"},
+        "timeline_start_tick": {"$ref": "#/$defs/nonNegativeInteger"},
+        "duration_tick": {"$ref": "#/$defs/positiveInteger"},
+        "source_in_tick": {"$ref": "#/$defs/nonNegativeInteger"},
+        "source_out_tick": {"$ref": "#/$defs/positiveInteger"},
+        "speed": {"type": "number", "exclusiveMinimum": 0},
+        "speed_curve": {
+          "oneOf": [
+            {"type": "array", "items": {"$ref": "#/$defs/speedKeyframe"}},
+            {"type": "object", "required": ["keyframes"], "properties": {"mode": {"type": "string"}, "keyframes": {"type": "array", "items": {"$ref": "#/$defs/speedKeyframe"}}, "audio_mode": {"type": "string"}}}
+          ]
+        },
+        "freeze": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["at_tick", "duration_tick"],
+          "properties": {
+            "at_tick": {"$ref": "#/$defs/nonNegativeInteger"},
+            "duration_tick": {"$ref": "#/$defs/positiveInteger"},
+            "audio_mode": {"type": "string", "enum": ["silence", "continue"]}
+          }
+        },
+        "transform": {"type": "object"},
+        "keyframes": {"type": "array", "items": {"$ref": "#/$defs/keyframeTrack"}},
+        "effects": {"type": "array", "items": {"type": "object"}},
+        "transition_in": {"$ref": "#/$defs/transition"},
+        "transition_out": {"$ref": "#/$defs/transition"},
+        "crop": {"$ref": "#/$defs/crop"},
+        "subtitle": {"type": "object"},
+        "audio": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "pan": {"oneOf": [{"type": "number", "minimum": -1, "maximum": 1}, {"type": "string", "minLength": 1}]}
+          }
+        },
+        "blend": {"type": "object"},
+        "mask": {"$ref": "#/$defs/mask"}
+      },
+      "oneOf": [{"required": ["asset_id"]}, {"required": ["sequence_id"]}]
+    },
+    "mask": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "type": {"type": "string", "enum": ["none", "rectangle", "circle", "ellipse", "path", "polygon"]},
+        "x": {"type": "number", "minimum": 0, "maximum": 1},
+        "y": {"type": "number", "minimum": 0, "maximum": 1},
+        "width": {"type": "number", "minimum": 0, "maximum": 1},
+        "height": {"type": "number", "minimum": 0, "maximum": 1},
+        "cx": {"type": "number", "minimum": 0, "maximum": 1},
+        "cy": {"type": "number", "minimum": 0, "maximum": 1},
+        "radius": {"type": "number", "minimum": 0, "maximum": 1},
+        "rx": {"type": "number", "minimum": 0, "maximum": 1},
+        "ry": {"type": "number", "minimum": 0, "maximum": 1},
+        "feather": {"type": "number", "minimum": 0, "maximum": 0.5},
+        "invert": {"type": "boolean"},
+        "segments": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {"type": "object", "additionalProperties": true}
+        },
+        "curve_segments": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {"type": "object", "additionalProperties": true}
+        },
+        "curves": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {"type": "object", "additionalProperties": true}
+        },
+        "points": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 32,
+          "items": {
+            "oneOf": [
+              {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number", "minimum": 0, "maximum": 1}},
+              {"type": "object", "required": ["x", "y"], "properties": {"x": {"type": "number", "minimum": 0, "maximum": 1}, "y": {"type": "number", "minimum": 0, "maximum": 1}}}
+            ]
+          }
+        },
+        "keyframes": {"type": "array", "items": {"$ref": "#/$defs/keyframeTrack"}}
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["type"],
+      "properties": {
+        "type": {"type": "string", "minLength": 1},
+        "duration": {"type": "number", "exclusiveMinimum": 0},
+        "direction": {"type": "string"},
+        "version": {"type": "string"},
+        "parameters": {"type": "object"}
+      }
+    },
+    "crop": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "unit": {"type": "string", "enum": ["pixels", "pixel", "normalized", "relative"]},
+        "x": {"type": "number", "minimum": 0},
+        "y": {"type": "number", "minimum": 0},
+        "width": {"type": "number", "exclusiveMinimum": 0},
+        "height": {"type": "number", "exclusiveMinimum": 0},
+        "w": {"type": "number", "exclusiveMinimum": 0},
+        "h": {"type": "number", "exclusiveMinimum": 0},
+        "fit": {"type": "string", "enum": ["fit", "fill", "stretch"]},
+        "mode": {"type": "string", "enum": ["fit", "fill", "stretch"]},
+        "keyframes": {"type": "array", "items": {"$ref": "#/$defs/keyframeTrack"}}
+      }
+    },
+    "keyframeTrack": {
+      "type": "object",
+      "required": ["property", "keyframes"],
+      "properties": {
+        "property": {"type": "string", "minLength": 1},
+        "default_value": {},
+        "keyframes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["at_tick", "value", "interpolation"],
+            "properties": {
+              "at_tick": {"$ref": "#/$defs/nonNegativeInteger"},
+              "value": {},
+              "interpolation": {"type": "string", "enum": ["hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"]},
+              "control_points": {
+                "oneOf": [
+                  {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+                  {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "number"}}
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "speedKeyframe": {
+      "type": "object",
+      "required": ["at_tick", "speed"],
+      "properties": {
+        "at_tick": {"$ref": "#/$defs/nonNegativeInteger"},
+        "speed": {"type": "number", "exclusiveMinimum": 0},
+        "interpolation": {"type": "string", "enum": ["hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"]}
+      }
+    },
+    "template": {
+      "type": "object",
+      "required": ["id", "version", "variables"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "version": {"type": "string"},
+        "variables": {"type": "array", "items": {"type": "object"}},
+        "assets": {"type": "array", "items": {"$ref": "#/$defs/id"}}
+      }
+    },
+    "output": {
+      "type": "object",
+      "required": ["id", "path", "container"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "path": {"type": "string"},
+        "container": {"type": "string", "enum": ["mp4", "webm", "mkv"]},
+        "video": {"type": "object"},
+        "audio": {"type": "object"},
+        "target_platform": {"type": "string"}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "cli_version": {"type": "string"},
+        "engine_version": {"type": "string"},
+        "model_versions": {"type": "array"},
+        "input_hashes": {"type": "array"},
+        "change_log": {"type": "array"}
+      }
+    }
+  }
+}

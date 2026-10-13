@@ -1,0 +1,113 @@
+from __future__ import annotations
+
+from typing import Any
+
+from . import ENGINE_ID, VERSION
+from .media import ffmpeg_version
+
+
+def build_capability_manifest() -> dict[str, Any]:
+    """Return the local, test-backed capability contract for Agent planning.
+
+    This manifest intentionally reports limits alongside supported features so an
+    Agent can choose an explicit degradation or reject a plan before rendering.
+    """
+    return {
+        "manifest_version": "0.1.0",
+        "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
+        "ffmpeg": {"version": ffmpeg_version()},
+        "capabilities": {
+            "media": {
+                "status": "implemented",
+                "features": ["probe", "local_ingest", "image_loop", "proxy", "thumbnail", "waveform", "scene_change", "silence", "beat_anchors", "relink_by_hash", "relink_by_unique_name", "local_template_tracking"],
+                "tracking_contract": "local_template_matching_emits_confidence_and_transform_keyframes",
+                "limits": ["tracking_can_drift_on_occlusion_scale_change_or_scene_cut", "tracking_requires_local_pillow_and_numpy"],
+            },
+            "project": {
+                "status": "implemented",
+                "features": ["init", "inspect", "migrate", "atomic_save", "snapshot", "restore", "before_mutation_snapshot"],
+                "snapshot_contract": "self_contained_project_rights_lock_json",
+                "migration_contract": "project_migrate_creates_before_migrate_snapshot_and_validates_candidate",
+                "limits": ["concurrent_write_recovery_pending", "cross_version_snapshot_migration_is_limited_to_known_legacy_shapes"],
+            },
+            "timeline": {
+                "status": "implemented",
+                "features": ["multi_track", "append", "update", "remove", "split", "ripple_insert", "ripple_delete", "slip", "slide", "speed", "speed_curve", "speed_curve_reverse_reflection", "reverse", "freeze_frame", "crop", "crop_position_keyframes", "crop_size_keyframes", "nested_sequences", "nested_reverse", "nested_reverse_parent_bezier_keyframes", "nested_parent_keyframe_layers", "markers"],
+                "limits": ["dynamic_crop_uses_fixed_canvas_inverse_sampling", "dynamic_crop_inverse_sampler_is_cpu_geq", "nested_static_transform_effects_blend_are_flattened", "nested_multiple_masks_use_sequential_alpha_with_coordinate_approximation", "nested_reverse_static_clips_preserve_temporal_order", "nested_reverse_leaf_keyframes_under_nonlinear_speed_are_piecewise_approximate", "nested_speed_curve_uses_analytic_boundary_mapping_and_leaf_average_speed", "audio_speed_curve_uses_piecewise_atempo_and_can_have_segment_boundaries"],
+            },
+            "keyframes": {
+                "status": "implemented",
+                "properties": ["transform.position.x", "transform.position.y", "transform.scale", "transform.rotation", "transform.opacity", "blend.opacity", "audio.volume", "audio.pan", "crop.x", "crop.y", "crop.width", "crop.height", "mask.x", "mask.y", "mask.width", "mask.height", "mask.cx", "mask.cy", "mask.radius", "mask.rx", "mask.ry", "mask.feather", "mask.points.<index>.x", "mask.points.<index>.y"],
+                "interpolation": ["hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"],
+                "bezier_control_points": {"forms": [["y1", "y2"], ["x1", "y1", "x2", "y2"]], "x_range": [0, 1], "execution": "normalized cubic easing sampled into a frame-evaluable FFmpeg expression"},
+            },
+            "effects": {
+                "status": "implemented",
+                "features": ["grayscale", "sepia", "blur", "boxblur", "sharpen", "brightness", "contrast", "saturation", "hue", "gamma", "color_temperature", "color_balance", "vignette", "noise", "invert", "posterize", "edgedetect", "deband", "deshake", "histeq", "gradfun", "chroma_key", "hflip", "vflip"],
+                "unknown_effect_policy": "RENDER_FEATURE_UNSUPPORTED",
+            },
+            "compositing": {
+                "status": "implemented",
+                "masks": ["rectangle", "circle", "ellipse", "path", "polygon"],
+                "blend_modes": ["normal", "multiply", "screen", "overlay", "difference", "addition", "softlight", "hardlight"],
+                "features": ["mask_invert", "dynamic_feather_simple_shapes", "dynamic_feather_path_polygon", "path_cubic_segments", "blend_opacity_keyframes", "rgb_blend_math"],
+                "limits": ["dynamic_path_uses_point_coordinate_keyframes", "path_point_count_is_fixed_per_clip", "path_cubic_segments_are_static_sampled_polygons", "path_polygon_feather_uses_inner_edge_distance_approximation", "blend_requires_same_canvas_inputs"],
+            },
+            "transitions": {
+                "status": "implemented",
+                "features": ["fade", "crossfade", "dissolve", "wipe", "slide", "circlecrop", "rectcrop", "distance", "fadeblack", "fadewhite", "radial", "smooth", "circleopen", "circleclose", "pixelize", "zoomin", "cover", "reveal", "diagonal", "slice", "wind", "blur", "fadegrays", "squeeze"],
+                "xfade_catalog": "local_ffmpeg_xfade",
+                "condition": "overlap transitions require adjacent clips with matching overlap handles; otherwise the CLI returns an explicit unsupported warning",
+            },
+            "subtitles": {
+                "status": "implemented",
+                "formats": ["srt", "vtt", "ass", "ssa"],
+                "features": ["validate", "normalize_srt", "inline_drawtext", "drawtext_line_spacing", "drawtext_border_and_shadow", "drawtext_alignment", "drawtext_text_shaping", "subtitle_width_wrap_approximation", "local_font_advance_metrics", "fade_text_animation", "slide_text_animation", "typewriter_text_animation", "pop_text_animation", "bounce_text_animation", "word_timing_highlight"],
+                "limits": ["rotate_text_is_approximated", "advanced_text_layout_exact_metrics_pending", "subtitle_width_wrap_uses_average_glyph_width", "word_timing_uses_approximate_drawtext_metrics"],
+            },
+            "audio": {
+                "status": "implemented",
+                "features": ["multi_track_mix", "volume_automation", "pan_automation", "stereo_preserving_numeric_pan", "fade", "denoise", "compressor", "equalizer", "highpass", "lowpass", "dialogue_enhance", "pitch_shift", "reverb", "loudnorm", "ducking", "pan", "beat_anchors", "freeze_audio_silence_at_timeline_position"],
+                "limits": ["freeze_audio_continue_uses_tail_padding", "audio_speed_curve_uses_piecewise_atempo"],
+            },
+            "render": {
+                "status": "implemented",
+                "features": ["ffmpeg_local", "output_profiles", "jsonl_progress", "cancel_file", "safe_resume"],
+                "resume_contract": "rebuild_from_validated_plan_when_project_and_input_hashes_match",
+                "limits": ["resume_is_not_partial_frame_checkpoint", "changed_inputs_are_rejected", "other_long_tasks_progress_pending"],
+            },
+            "quality": {
+                "status": "implemented",
+                "features": ["stream_presence", "canvas", "duration", "av_duration_delta", "blackdetect_optional", "ebur128_optional", "target_lufs_gate", "true_peak_gate", "fail_on_black"],
+                "defaults": {"max_av_sync_ms": 80.0, "lufs_tolerance": 2.0},
+                "limits": ["true_peak_gate_requires_expensive_scan_and_ffmpeg_ebur128", "golden_media_and_cross_device_thresholds_pending"],
+            },
+            "output": {
+                "status": "implemented",
+                "profiles": ["vertical", "square", "landscape", "vertical_720", "landscape_720", "custom"],
+                "containers": ["mp4", "webm", "mkv"],
+                "video_codecs": ["libx264", "libx265", "libvpx-vp9", "libvpx", "libaom-av1"],
+                "audio_codecs": ["aac", "libopus", "opus", "pcm_s16le"],
+                "defaults": {"container": "mp4", "video_codec": "libx264", "audio_codec": "aac"},
+                "limits": ["codec availability still depends on the local FFmpeg build", "webm requires VPX/AV1 video plus Opus audio"],
+            },
+            "interoperability": {
+                "status": "degraded",
+                "formats": ["agent-json", "otio", "kdenlive-xml"],
+                "report_states": ["Exact", "Mapped", "Approximate", "Baked", "Unsupported", "Failed"],
+                "limits": ["complex_effects_and_advanced_animation_require_explicit_mapping_report"],
+            },
+            "ai": {
+                "status": "local_adapter_only",
+                "features": ["offline_transformers_asr_gate", "heuristic_highlights", "local_ad_plan", "local_template_tracking"],
+                "network": "disabled",
+                "limits": ["model_weights_must_be_provided_locally", "offline_tts_pending"],
+            },
+        },
+        "policies": {
+            "closed_services_enabled": False,
+            "jianying_runtime_enabled": False,
+            "docker_or_wsl_started": False,
+            "rights_required_for_publish": True,
+        },
+    }

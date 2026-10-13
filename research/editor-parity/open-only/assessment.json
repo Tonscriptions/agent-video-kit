@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "assessment_date": "2026-10-12",
+  "timezone": "Asia/Taipei",
+  "project_directory": "E:/dev/sandbox/AI广告剪辑",
+  "constraints": {
+    "video_toolchain": "independent open-source editing, rendering and AI processing components",
+    "jianying_or_capcut_dependency_allowed": false,
+    "docker_wsl_virtualization_allowed": false,
+    "local_skill_prefix": "video-cut-"
+  },
+  "result": {
+    "recommendation": "Prioritize native Windows evaluation of Shotcut + matrodrigs/shotcut-mcp; add workflow skills, motion presets and optional open-source AI/graphics processing.",
+    "status": "research_and_source_audit_complete; production_stack_not_installed_or_validated",
+    "complete_jianying_product_parity_verified": false,
+    "professional_ad_quality": "technical foundation exists; requires representative output acceptance"
+  },
+  "preferred_agent_adapter": {
+    "repository": "matrodrigs/shotcut-mcp",
+    "commit": "f1b78d350a9992296f0b7f11a55c04819ea25730",
+    "stars_snapshot": 18,
+    "license": "MIT",
+    "standard_skill_files_found": 0,
+    "verified_source_operations": ["animate_clip", "set_clip_speed", "set_clip_speed_map", "add_filter", "render_contact_sheet", "start_render"],
+    "upstream_windows_real_render_test_configuration": {
+      "python": "3.10",
+      "runtime_pairs": [
+        {"shotcut": "26.6.25", "mlt": "7.40.0"},
+        {"shotcut": "26.8.1", "mlt": "7.41.0"}
+      ],
+      "source": "https://github.com/matrodrigs/shotcut-mcp/blob/f1b78d350a9992296f0b7f11a55c04819ea25730/.github/workflows/shotcut-integration.yml",
+      "rerun_on_this_machine": false
+    }
+  },
+  "existing_standard_skills_alternative": {
+    "repository": "dcc-mcp/dcc-mcp-kdenlive",
+    "commit": "5a83cbad7c987e32b86a5314996951ac91311c3b",
+    "stars_snapshot": 1,
+    "license": "MIT",
+    "standard_skill_files_found": 9,
+    "experimental_skill": "kdenlive-native",
+    "upstream_real_render_ci_os": "Linux",
+    "windows_end_to_end_render_verified_locally": false
+  },
+  "high_star_skill_audit": {
+    "repository": "HKUDS/CLI-Anything",
+    "commit": "34f519533bc175d2fe287ab8316b0dd99bb9cc43",
+    "whole_repository_stars_snapshot": 51905,
+    "submodule": "kdenlive/agent-harness",
+    "standard_skill_files_found_in_submodule": 1,
+    "export_cli_commands_registered": ["xml", "presets"],
+    "unwired_example_in_skill": "export render output.pdf",
+    "standalone_melt_backend_exists": true,
+    "recommended_as_complete_delivery_entrypoint": false
+  },
+  "video_recap_workflow_candidate": {
+    "repository": "zenstory-ai/video-recap-skills",
+    "commit": "539168622918e058bd250c793b82f043eced31e0",
+    "stars_snapshot": 563,
+    "license": "MIT",
+    "standard_skill_files_found": 7,
+    "production_skills": 6,
+    "reference_skills": 1,
+    "canonical_renderer": "FFmpeg",
+    "jianying_export_enabled_by_default": false,
+    "default_ai_services": "MiMo ASR/VLM/TTS; optional Fish Audio TTS",
+    "self_hosted_tts_transport_exists": "index-tts JSON-to-WAV endpoint; actual service/weights license requires separate verification",
+    "motion_preset_library_verified": false,
+    "official_concat_adapter_verified": false,
+    "strict_open_source_full_workflow_status": "conditional on AI dependency adaptation and validation",
+    "installed_or_registered": false
+  },
+  "concat_supplement_snapshot": {
+    "repository": "jub0t/concat",
+    "stars_snapshot": 4791,
+    "head_commit": "fa51932e73d30bc01a9acd3e2910d7602bba9ca0",
+    "scope_refreshed": "repository metadata, run-concat skill, release and issue status; entire latest kernel not re-audited",
+    "latest_release": "v0.2.6",
+    "windows_issue_303_state": "open",
+    "run_concat_role": "build, launch and development verification",
+    "creative_workflow_in_skill": false
+  },
+  "proposed_skills_not_created_or_registered": [
+    "video-cut-shotcut-pipeline",
+    "video-cut-motion-presets",
+    "video-cut-open-ai-effects",
+    "video-cut-render-qa"
+  ],
+  "optional_open_components": {
+    "openai/whisper": "MIT code and weights; local transcription",
+    "ZHKKKe/MODNet": "Apache-2.0 code/models/demos excluding specified GIF examples; portrait alpha matting",
+    "Blender": "open-source motion graphics and compositing asset production",
+    "Glaxnimate": "open-source vector animation asset production"
+  },
+  "excluded_or_conditional_routes": {
+    "Jianying SDKs/client render": "excluded by explicit user constraint",
+    "Remotion core": "source-available, not OSI-open-source per official FAQ",
+    "Lumen default package": "MIT main project includes restricted-license GSAP dependency; conditional on replacement and validation",
+    "HyperFrames GSAP workflow": "Apache-2.0 main project; dependency route requires separate review/replacement",
+    "Concat Windows 0.2.6": "AGPL-3.0 eligible core, but release binary problem acknowledged upstream in issue 303"
+  },
+  "execution": {
+    "candidate_editor_installed": false,
+    "new_candidate_skill_registered": false,
+    "candidate_repository_code_executed": false,
+    "video_rendered": false,
+    "virtualization_started": false,
+    "browser_automation_tabs_created": 0
+  }
+}

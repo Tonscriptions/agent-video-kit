@@ -1,0 +1,83 @@
+{
+  "manifest_version": "0.3",
+  "name": "shotcut-mcp",
+  "display_name": "Shotcut MCP",
+  "version": "1.5.6",
+  "description": "Create, edit, validate, preview, and render Shotcut projects through AI clients.",
+  "long_description": "A local Model Context Protocol server for transactional editing of Shotcut MLT projects. Analyze source quality, build multitrack timelines, apply effects and transitions, manage subtitles and markers, generate frame-accurate previews, request approval before implicit exports, monitor durable renders, and deliver both rendered media and the exact editable project revision.",
+  "author": {
+    "name": "matrodrigs",
+    "url": "https://github.com/matrodrigs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/matrodrigs/shotcut-mcp.git"
+  },
+  "homepage": "https://matrodrigs.github.io/shotcut-mcp/",
+  "documentation": "https://github.com/matrodrigs/shotcut-mcp#readme",
+  "support": "https://github.com/matrodrigs/shotcut-mcp/issues",
+  "server": {
+    "type": "python",
+    "entry_point": "scripts/shotcut_mcp_server.py",
+    "mcp_config": {
+      "command": "python3",
+      "args": [
+        "${__dirname}/scripts/shotcut_mcp_server.py"
+      ],
+      "env": {},
+      "platform_overrides": {
+        "win32": {
+          "command": "python"
+        }
+      }
+    }
+  },
+  "tools": [
+    { "name": "shotcut_status", "description": "Use for a quick readiness check. Locates Shotcut, Melt, FFprobe, and FFmpeg and reports their versions; use shotcut_doctor for compatibility diagnosis." },
+    { "name": "shotcut_doctor", "description": "Use after installation, upgrade, or a setup failure. Distinguishes tested Shotcut/MLT combinations, untested-version warnings, and runtime failures. Checks repository startup, RNNoise, FFmpeg quality-analyzer availability, and path policy. An untested version alone does not block project operations." },
+    { "name": "shotcut_capabilities", "description": "Use before an unfamiliar edit. Omit operation for the catalog, presets, compatibility, and workflow; pass operation for only its complete schema, example, and transaction guarantees enforced by plan and edit." },
+    { "name": "probe_media", "description": "Use to understand a source file before editing. Reads duration, codecs, resolution, frame rate, color, and audio with per-file caching." },
+    { "name": "analyze_media_quality", "description": "Use before proposing cleanup or delivery edits. Runs installed FFmpeg analyzers for silence, black frames, freezes, interlacing, and loudness and returns bounded structured measurements without changing the media." },
+    { "name": "inspect_project", "description": "Use first to understand a timeline or before planning, editing, or restoring. Returns structural state, SHA-256 revision, and revision-scoped item_ref selectors; use render_contact_sheet for visual review." },
+    { "name": "plan_project_edit", "description": "Use for a dry run, uncertain edit, or user review before committing. Applies operations in memory using stable item_ref selectors when supplied, validates with MLT, and returns a snapshot and diff without changing the project." },
+    { "name": "create_project", "description": "Use to create a new editable Shotcut 26.8.1 project. If dimensions or frame rate were not requested, probe representative source media before choosing the profile; do not treat defaults as user intent. Tracks and clips use the same shapes as add_track and add_clip." },
+    { "name": "edit_project", "description": "Use only after inspect_project. Applies up to 500 related operations in one validated atomic write; prefer item_ref and animate_clip for robust creative batches. Pass expected_revision and re-inspect on conflicts instead of force. Summarize committed operation results, and after visual edits show a managed contact sheet or exact preview." },
+    { "name": "list_mlt_services", "description": "Use when an edit needs an unfamiliar native MLT effect or transition. Lists services of one kind installed with Shotcut." },
+    { "name": "describe_mlt_service", "description": "Use after list_mlt_services to learn one installed service's accepted properties and local MLT metadata." },
+    { "name": "validate_project", "description": "Use when saved-project readiness is unknown or media/service dependencies changed before preview or render; edit_project already validates its candidate, so do not repeat this after every successful edit. Checks XML, local resources, required installed MLT services, and first-frame Melt processing; this is not visual-quality analysis." },
+    { "name": "render_preview", "description": "Use to show or inspect one specific moment. Renders one PNG and returns its path; omit output_path for a bounded server-managed preview." },
+    { "name": "diagnose_color_workflow", "description": "Use for washed-out colors, HDR/SDR questions, or export compatibility. Reports normalized source color facts and Shotcut 26.6 issues." },
+    { "name": "diagnose_missing_media", "description": "Use when media is missing or offline. Searches authorized roots and ranks candidates without changing the project. Apply a source mapping the user already specified; otherwise let the user choose before relinking." },
+    { "name": "render_preview_batch", "description": "Use when exact frames are needed as separate image files. Renders up to 64 requested frames; use render_contact_sheet for one overview image." },
+    { "name": "render_contact_sheet", "description": "Use for 'show me the edit', visual review, or a timeline overview. Renders exact frames or 12 evenly sampled frames into one image; omit output_path for managed output." },
+    { "name": "detect_hardware_encoders", "description": "Use when choosing or troubleshooting hardware export. Lists advertised FFmpeg encoders and smoke-tests OS-appropriate candidates." },
+    { "name": "open_in_shotcut", "description": "Use only when the user asks to open the GUI. Opens a project, media file, or folder in Shotcut; MCP edits do not require this." },
+    { "name": "start_render", "description": "Use only after the user explicitly requests export or approves a preflight summary of project, output, preset, range or duration, and overwrite behavior; never infer export from edit completion, and do not ask twice after an explicit request. Starts one revision-bound durable render and exact editable project snapshot; pass expected_revision when known and monitor job_id with render_status." },
+    { "name": "export_marker_chapters", "description": "Use to create Shotcut-compatible chapter text from point markers. Optionally includes range markers or selected marker colors and atomically protects an existing output." },
+    { "name": "render_status", "description": "Use when job_id is known; poll until a terminal state and surface meaningful status, progress, or ETA changes without narrating unchanged polls or raw logs. On completion, present both returned artifacts: rendered media and the exact editable project. Use list_render_jobs when the id is unknown." },
+    { "name": "list_render_jobs", "description": "Use for 'the latest render', render history, or when job_id is unknown. Returns bounded newest-first durable summaries." },
+    { "name": "cancel_render", "description": "Use only when the user asks to stop an active render. Requests supervised cancellation, including after an MCP restart." },
+    { "name": "list_project_backups", "description": "Use before undo or recovery. Lists only backups owned by this project, including paths, revisions, sizes, and timestamps." },
+    { "name": "restore_project_backup", "description": "Use after list_project_backups and authorization to restore the selected backup; an explicit request identifying that backup is sufficient. Validates and atomically restores it while backing up the current project; pass the current expected_revision unless force=true was explicitly authorized." }
+  ],
+  "tools_generated": false,
+  "keywords": [
+    "shotcut",
+    "video editing",
+    "model context protocol",
+    "mcp",
+    "mlt",
+    "automation"
+  ],
+  "license": "MIT",
+  "compatibility": {
+    "platforms": [
+      "win32",
+      "darwin",
+      "linux"
+    ],
+    "runtimes": {
+      "python": ">=3.10.0 <4.0.0"
+    }
+  }
+}

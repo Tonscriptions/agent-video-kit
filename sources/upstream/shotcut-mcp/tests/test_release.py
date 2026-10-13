@@ -1,0 +1,532 @@
+from __future__ import annotations
+
+import json
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+import zipfile
+from pathlib import Path
+from unittest.mock import patch
+
+from scripts.build_release import ROOT, build_release, package_members, verify_bundle
+from scripts.check_release import (
+    runtime_compatibility_contract,
+    runtime_tool_entries,
+    sync_tool_contracts,
+    validate_client_adapters,
+    validate_compatibility_contracts,
+    validate_tool_contracts,
+)
+from scripts.require_green_ci import require_green_ci
+
+
+class ReleaseBundleTests(unittest.TestCase):
+    CLIENT_ADAPTER_FILES = (
+        Path(".codex-plugin/plugin.json"),
+        Path(".claude-plugin/plugin.json"),
+        Path(".claude-plugin/marketplace.json"),
+        Path(".mcp.json"),
+        Path("manifest.json"),
+        Path("scripts/shotcut_mcp_server.py"),
+    )
+
+    def setUp(self) -> None:
+        manifest = json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))
+        self.version = manifest["version"]
+
+    def _copy_client_adapter_fixture(self, root: Path) -> None:
+        for relative in self.CLIENT_ADAPTER_FILES:
+            destination = root / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / relative, destination)
+
+    def test_release_bundle_is_reproducible_and_contains_only_runtime_files(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            first = build_release(self.version, root / "first")
+            second = build_release(self.version, root / "second")
+            first_artifact = Path(first["artifact"])
+            second_artifact = Path(second["artifact"])
+
+            self.assertEqual(first_artifact.read_bytes(), second_artifact.read_bytes())
+            self.assertEqual(first["digest"], second["digest"])
+            expected = sorted(path.as_posix() for path in package_members())
+            with zipfile.ZipFile(first_artifact) as bundle:
+                self.assertEqual(sorted(bundle.namelist()), expected)
+                self.assertNotIn("server.json", bundle.namelist())
+                self.assertNotIn("tests/test_release.py", bundle.namelist())
+                self.assertNotIn(".claude-plugin/plugin.json", bundle.namelist())
+                self.assertNotIn(".claude-plugin/marketplace.json", bundle.namelist())
+                self.assertNotIn(".codex-plugin/plugin.json", bundle.namelist())
+                extracted = root / "extracted"
+                bundle.extractall(extracted)
+            checksum = Path(first["checksum"]).read_text(encoding="ascii")
+            self.assertEqual(checksum, f"{first['digest']}  {first_artifact.name}\n")
+            self.assertTrue(Path(first["notes"]).read_text(encoding="utf-8").strip())
+
+            messages = "\n".join(
+                [
+                    json.dumps(
+                        {
+                            "jsonrpc": "2.0",
+                            "id": 1,
+                            "method": "initialize",
+                            "params": {
+                                "protocolVersion": "2025-11-25",
+                                "capabilities": {},
+                                "clientInfo": {"name": "release-test", "version": "1"},
+                            },
+                        }
+                    ),
+                    json.dumps({"jsonrpc": "2.0", "id": 2, "method": "tools/list"}),
+                    "",
+                ]
+            )
+            result = subprocess.run(
+                [sys.executable, str(extracted / "scripts/shotcut_mcp_server.py")],
+                input=messages.encode("utf-8"),
+                capture_output=True,
+                timeout=10,
+                check=False,
+            )
+            self.assertEqual(
+                result.returncode, 0, result.stderr.decode(errors="replace")
+            )
+            responses = [
+                json.loads(line) for line in result.stdout.decode("utf-8").splitlines()
+            ]
+            self.assertEqual(
+                responses[0]["result"]["serverInfo"]["version"], self.version
+            )
+            manifest = json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(
+                len(responses[1]["result"]["tools"]), len(manifest["tools"])
+            )
+
+    def test_checked_in_tool_contracts_match_the_runtime_projection(self) -> None:
+        validate_tool_contracts(ROOT, runtime_tool_entries())
+
+    def test_packaged_worker_keeps_bounded_import_failure_diagnostics(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="worker bundle space ") as directory:
+            root = Path(directory)
+            result = build_release(self.version, root / "dist")
+            extracted = root / "extension space"
+            with zipfile.ZipFile(result["artifact"]) as bundle:
+                bundle.extractall(extracted)
+            # Fail before render_worker.main can record job metadata.
+            (extracted / "shotcut_mcp/render_worker.py").write_text(
+                "raise RuntimeError('x' * 20000 + ' bootstrap failure sentinel')\n",
+                encoding="utf-8",
+            )
+            diagnostic = root / "startup.log"
+            process = subprocess.run(
+                [
+                    sys.executable,
+                    str(extracted / "scripts/shotcut_mcp_render_worker.py"),
+                    "a" * 32,
+                    str(diagnostic),
+                ],
+                cwd=root,
+                capture_output=True,
+                timeout=10,
+                check=False,
+            )
+            self.assertEqual(process.returncode, 1)
+            self.assertEqual(process.stdout, b"")
+            self.assertEqual(process.stderr, b"")
+            self.assertLessEqual(diagnostic.stat().st_size, 16384)
+            self.assertIn(
+                "bootstrap failure sentinel", diagnostic.read_text(encoding="utf-8")
+            )
+        self.assertEqual(sync_tool_contracts(ROOT, runtime_tool_entries()), ())
+
+    def test_documented_compatibility_matches_the_runtime_contract(self) -> None:
+        contract = runtime_compatibility_contract()
+        validate_compatibility_contracts(ROOT, contract)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in (
+                Path("AGENTS.md"),
+                Path("README.md"),
+                Path("docs/spec.md"),
+                Path("docs/index.html"),
+            ):
+                destination = root / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(ROOT / relative, destination)
+            readme = root / "README.md"
+            readme.write_text(
+                readme.read_text(encoding="utf-8").replace(
+                    contract["Shotcut"], "0.0.0"
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(RuntimeError, "README.md.*stale"):
+                validate_compatibility_contracts(root, contract)
+            shutil.copy2(ROOT / "README.md", readme)
+            spec = root / "docs/spec.md"
+            spec.write_text(
+                spec.read_text(encoding="utf-8").replace(
+                    contract["MLT family"], "0.0.x"
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(RuntimeError, "docs/spec.md.*MLT family"):
+                validate_compatibility_contracts(root, contract)
+
+    def test_tool_contract_sync_updates_only_mechanical_projections(self) -> None:
+        entries = [
+            {"name": "first_tool", "description": "First runtime description."},
+            {"name": "second_tool", "description": "Second runtime description."},
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "docs").mkdir()
+            (root / "manifest.json").write_text(
+                json.dumps(
+                    {
+                        "name": "fixture",
+                        "tools": list(reversed(entries)),
+                        "tools_generated": False,
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            reference = (
+                "# Fixture\n\n"
+                "## MCP tools\n\n"
+                "| Tool | Purpose |\n"
+                "| --- | --- |\n"
+                "| `first_tool` | Concise human summary |\n"
+                "| `second_tool` | Another human summary |\n"
+            )
+            reference_path = root / "docs" / "reference.md"
+            reference_path.write_text(reference, encoding="utf-8")
+            (root / "docs" / "index.html").write_text(
+                "See all 1 MCP tools\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(RuntimeError, "order_changed=True"):
+                validate_tool_contracts(root, entries)
+
+            changed = sync_tool_contracts(root, entries)
+
+            self.assertEqual(
+                changed,
+                (root / "manifest.json", root / "docs" / "index.html"),
+            )
+            manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["tools"], entries)
+            self.assertIs(manifest["tools_generated"], False)
+            self.assertEqual(reference_path.read_text(encoding="utf-8"), reference)
+            self.assertIn(
+                "See all 2 MCP tools",
+                (root / "docs" / "index.html").read_text(encoding="utf-8"),
+            )
+            validate_tool_contracts(root, entries)
+            self.assertEqual(sync_tool_contracts(root, entries), ())
+
+    def test_tool_reference_rejects_missing_extra_and_duplicate_tools(self) -> None:
+        entries = runtime_tool_entries()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "docs").mkdir()
+            for relative in ("manifest.json", "docs/index.html", "docs/reference.md"):
+                shutil.copy2(ROOT / relative, root / relative)
+            reference_path = root / "docs" / "reference.md"
+            reference = reference_path.read_text(encoding="utf-8")
+            row = next(
+                line
+                for line in reference.splitlines()
+                if line.startswith("| `shotcut_status` |")
+            )
+            cases = (
+                (reference.replace(row, ""), r"missing=\['shotcut_status'\]"),
+                (
+                    reference.replace(row, row + "\n| `unknown_tool` | Unknown |"),
+                    r"extra=\['unknown_tool'\]",
+                ),
+                (reference.replace(row, row + "\n" + row), "duplicate names"),
+            )
+            for source, message in cases:
+                with self.subTest(message=message):
+                    reference_path.write_text(source, encoding="utf-8")
+                    with self.assertRaisesRegex(RuntimeError, message):
+                        validate_tool_contracts(root, entries)
+
+    def test_client_adapters_match_runtime_release_and_entry_point(self) -> None:
+        validate_client_adapters(ROOT, self.version)
+
+    def test_client_adapter_validation_rejects_entry_point_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._copy_client_adapter_fixture(root)
+
+            config_path = root / ".codex-plugin" / "plugin.json"
+            config = json.loads(config_path.read_text(encoding="utf-8"))
+            config["mcpServers"]["shotcut"]["args"] = ["./scripts/other_server.py"]
+            config_path.write_text(json.dumps(config), encoding="utf-8")
+
+            with self.assertRaisesRegex(RuntimeError, "Codex launcher"):
+                validate_client_adapters(root, self.version)
+
+    def test_client_adapter_validation_rejects_marketplace_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._copy_client_adapter_fixture(root)
+
+            catalog_path = root / ".claude-plugin" / "marketplace.json"
+            catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+            catalog["plugins"][0]["source"] = "./other-plugin"
+            catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+
+            with self.assertRaisesRegex(RuntimeError, "marketplace catalog"):
+                validate_client_adapters(root, self.version)
+
+    def test_client_adapter_validation_rejects_mcpb_platform_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._copy_client_adapter_fixture(root)
+
+            manifest_path = root / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["server"]["mcp_config"]["platform_overrides"] = {}
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            with self.assertRaisesRegex(RuntimeError, "MCPB launcher"):
+                validate_client_adapters(root, self.version)
+
+    def test_mcpb_python_requirement_is_a_semver_range(self) -> None:
+        manifest = json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(
+            manifest["compatibility"]["runtimes"], {"python": ">=3.10.0 <4.0.0"}
+        )
+
+    def test_release_checks_reject_invalid_python_requirements(self) -> None:
+        for requirement in (">=3.10,<4.0", ">=3.9.0 <4.0.0", ">=3.10.0", None):
+            with (
+                self.subTest(requirement=requirement),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                root = Path(directory)
+                self._copy_client_adapter_fixture(root)
+                manifest_path = root / "manifest.json"
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                manifest["compatibility"]["runtimes"]["python"] = requirement
+                manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+                with self.assertRaisesRegex(RuntimeError, "Python runtime requirement"):
+                    validate_client_adapters(root, self.version)
+
+    def test_bundle_verification_rejects_invalid_python_requirement(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result = build_release(self.version, root)
+            modified = root / "invalid.mcpb"
+            with (
+                zipfile.ZipFile(result["artifact"]) as source,
+                zipfile.ZipFile(modified, "w") as target,
+            ):
+                for name in source.namelist():
+                    content = source.read(name)
+                    if name == "manifest.json":
+                        manifest = json.loads(content)
+                        manifest["compatibility"]["runtimes"]["python"] = ">=3.10,<4.0"
+                        content = json.dumps(manifest).encode("utf-8")
+                    target.writestr(name, content)
+            with self.assertRaisesRegex(RuntimeError, "Python runtime requirement"):
+                verify_bundle(modified, self.version)
+
+    def test_client_adapter_validation_bounds_codex_default_prompts(self) -> None:
+        invalid_prompts = (
+            (["one", "two", "three", "four"], "at most 3"),
+            (["x" * 129], "128 characters"),
+            (["first line\nsecond line"], "one line"),
+        )
+        for prompts, message in invalid_prompts:
+            with (
+                self.subTest(message=message),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                root = Path(directory)
+                self._copy_client_adapter_fixture(root)
+
+                config_path = root / ".codex-plugin" / "plugin.json"
+                config = json.loads(config_path.read_text(encoding="utf-8"))
+                config["interface"]["defaultPrompt"] = prompts
+                config_path.write_text(json.dumps(config), encoding="utf-8")
+
+                with self.assertRaisesRegex(RuntimeError, message):
+                    validate_client_adapters(root, self.version)
+
+    def test_release_bundle_rejects_a_version_mismatch(self) -> None:
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            self.assertRaisesRegex(RuntimeError, "does not match manifest"),
+        ):
+            build_release("0.0.0", Path(directory))
+
+    def test_release_bundle_rejects_a_non_release_version(self) -> None:
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            self.assertRaisesRegex(RuntimeError, "must be X.Y.Z"),
+        ):
+            build_release("next", Path(directory))
+
+
+class SiteAssetTests(unittest.TestCase):
+    def test_demo_toolbar_does_not_render_an_empty_file_glyph(self) -> None:
+        site_markup = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        site_styles = (ROOT / "docs" / "styles.css").read_text(encoding="utf-8")
+
+        self.assertNotIn("demo-file-icon", site_markup)
+        self.assertNotIn(".demo-file-icon", site_styles)
+
+    def test_navigation_tracks_the_visible_section(self) -> None:
+        site_markup = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        site_script = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
+
+        self.assertEqual(site_markup.count("data-section-link"), 3)
+        self.assertIn('setAttribute("aria-current", "location")', site_script)
+        self.assertIn('removeAttribute("aria-current")', site_script)
+
+    def test_pressed_controls_do_not_shrink_inside_their_layout_box(self) -> None:
+        site_styles = (ROOT / "docs" / "styles.css").read_text(encoding="utf-8")
+
+        self.assertNotRegex(
+            site_styles,
+            r":active[^{}]*\{[^{}]*transform:\s*scale\(",
+        )
+
+    def test_collapsed_codex_install_panel_does_not_reserve_empty_space(self) -> None:
+        site_styles = (ROOT / "docs" / "styles.css").read_text(encoding="utf-8")
+
+        self.assertIn(
+            "#install-panel-codex {\n  min-height: auto;\n}",
+            site_styles,
+        )
+        self.assertIn(
+            'summary::after {\n  content: "+";\n  position: absolute;\n  right: 1rem;',
+            site_styles,
+        )
+
+    def test_demo_controls_expose_a_touch_sized_fullscreen_action(self) -> None:
+        site_markup = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        site_script = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
+        site_styles = (ROOT / "docs" / "styles.css").read_text(encoding="utf-8")
+
+        self.assertIn("data-demo-fullscreen", site_markup)
+        self.assertNotIn("nofullscreen", site_markup)
+        self.assertIn("demoShell.requestFullscreen", site_script)
+        self.assertIn(
+            ".demo-control {\n  width: 44px;\n  height: 44px;",
+            site_styles,
+        )
+
+    def test_mobile_video_idle_detection_covers_touch_capable_browsers(self) -> None:
+        site_script = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
+        site_styles = (ROOT / "docs" / "styles.css").read_text(encoding="utf-8")
+
+        self.assertIn(
+            'window.matchMedia("(any-pointer: coarse)")',
+            site_script,
+        )
+        self.assertIn("navigator.maxTouchPoints > 0", site_script)
+        self.assertNotIn(
+            'window.matchMedia("(hover: none) and (pointer: coarse)")',
+            site_script,
+        )
+        self.assertIn(
+            "\n.demo-video-shell.has-custom-controls.is-playing.is-controls-idle "
+            ".demo-controls {\n",
+            site_styles,
+        )
+
+
+class CiConfigurationTests(unittest.TestCase):
+    def test_ordinary_ci_covers_macos_without_enabling_real_integration(self) -> None:
+        ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+        self.assertIn("os: [ubuntu-latest, macos-latest, windows-latest]", ci)
+        self.assertNotIn("SHOTCUT_MCP_INTEGRATION", ci)
+
+    def test_local_ci_release_and_hook_share_one_check_runner(self) -> None:
+        ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+        release = (ROOT / ".github" / "workflows" / "release.yml").read_text(
+            encoding="utf-8"
+        )
+        hook = (ROOT / ".githooks" / "pre-push").read_text(encoding="utf-8")
+        attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8")
+
+        self.assertIn("python -B scripts/check_ci.py test", ci)
+        self.assertIn("python -B scripts/check_ci.py quality", ci)
+        self.assertIn("python -B scripts/check_ci.py all", release)
+        self.assertIn("python -B scripts/check_ci.py all", hook)
+        self.assertIn("/.githooks/* text eol=lf", attributes)
+
+    def test_ci_publishes_one_stable_aggregate_gate(self) -> None:
+        ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+
+        self.assertIn("name: CI gate", ci)
+        self.assertIn("needs: [test, quality, integration]", ci)
+        self.assertIn("uses: ./.github/workflows/shotcut-integration.yml", ci)
+        self.assertIn('"$INTEGRATION_RESULT" != "success"', ci)
+        self.assertIn("if: always()", ci)
+
+
+class ReleaseCiGateTests(unittest.TestCase):
+    def test_successful_main_push_ci_allows_release(self) -> None:
+        runs = [
+            {
+                "databaseId": 1,
+                "headBranch": "feature",
+                "status": "completed",
+                "conclusion": "success",
+                "createdAt": "2026-07-22T12:00:00Z",
+            },
+            {
+                "databaseId": 2,
+                "headBranch": "main",
+                "status": "completed",
+                "conclusion": "success",
+                "createdAt": "2026-07-22T13:00:00Z",
+                "url": "https://github.example/actions/runs/2",
+            },
+        ]
+        with patch("scripts.require_green_ci._list_ci_runs", return_value=runs):
+            run = require_green_ci("owner/repository", "a" * 40, timeout_seconds=0)
+
+        self.assertEqual(run["databaseId"], 2)
+
+    def test_failed_main_push_ci_blocks_release(self) -> None:
+        runs = [
+            {
+                "databaseId": 3,
+                "headBranch": "main",
+                "status": "completed",
+                "conclusion": "failure",
+                "createdAt": "2026-07-22T13:00:00Z",
+                "url": "https://github.example/actions/runs/3",
+            }
+        ]
+        with (
+            patch("scripts.require_green_ci._list_ci_runs", return_value=runs),
+            self.assertRaisesRegex(RuntimeError, "concluded failure"),
+        ):
+            require_green_ci("owner/repository", "b" * 40, timeout_seconds=0)
+
+    def test_missing_main_push_ci_blocks_release(self) -> None:
+        with (
+            patch("scripts.require_green_ci._list_ci_runs", return_value=[]),
+            self.assertRaisesRegex(RuntimeError, "latest state: not found"),
+        ):
+            require_green_ci("owner/repository", "c" * 40, timeout_seconds=0)
+
+
+if __name__ == "__main__":
+    unittest.main()

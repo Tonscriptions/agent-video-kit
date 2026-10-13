@@ -1,0 +1,1019 @@
+{
+  "date": "2026-10-11",
+  "scope": "18 selected public repositories, not a global exhaustive ranking",
+  "findings": [
+    {
+      "repository": "browser-use/video-use",
+      "url": "https://github.com/browser-use/video-use",
+      "stars": 28604,
+      "category": "Agent 剪辑工作流",
+      "agent_interface": "Skill + Python/FFmpeg 脚本",
+      "capabilities": "转录、词级剪辑、混剪、字幕、调色、动画叠加",
+      "rendering": "脚本组合；没有统一多轨编辑器内核",
+      "windows": "可移植；README 安装偏 macOS，Windows 未实测",
+      "license_assessment": "MIT",
+      "limits": "28k Star 属于整个工作流仓库。默认转录依赖 ElevenLabs Scribe；不能按完全离线内核理解。",
+      "source_commit": "43cfc566833548093455c9d4a46bd69913b7e552",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:11.795602+00:00"
+    },
+    {
+      "repository": "jub0t/concat",
+      "url": "https://github.com/jub0t/concat",
+      "stars": 4775,
+      "category": "独立编辑器及内核",
+      "agent_interface": "CLI / JSON-RPC / gRPC；MCP 尚未合入",
+      "capabilities": "多轨剪辑、关键帧、特效、模板、本地抠像、字幕/TTS",
+      "rendering": "自身 Rust/GPU/FFmpeg 渲染",
+      "windows": "提供 Windows 发行版；API/CLI 源码可用",
+      "license_assessment": "AGPL-3.0-or-later",
+      "limits": "Beta。README 的 MCP 宣传宽于当前交付状态；官方开发文档明确 MCP 未合入，应先用 JSON-RPC。",
+      "source_commit": "1ab750a339c5db249d353b21b9f3cc9ddb1a1a22",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:10.850038+00:00"
+    },
+    {
+      "repository": "GuanYixuan/pyJianYingDraft",
+      "url": "https://github.com/GuanYixuan/pyJianYingDraft",
+      "stars": 4527,
+      "category": "剪映草稿 SDK",
+      "agent_interface": "Python API；可封装成 Agent 工具",
+      "capabilities": "多轨、素材替换、特效/滤镜/转场、字幕、关键帧",
+      "rendering": "剪映客户端渲染；另有旧版 UI 导出控制器",
+      "windows": "原生 Windows；客户端版本需匹配",
+      "license_assessment": "Apache-2.0",
+      "limits": "项目自报 10.8 支持多项草稿功能，但蒙版尚有兼容问题；模板可能需 fallback_loader。自动导出矩阵对 7+ 标记不支持。",
+      "source_commit": "6bb2d06a713f7b58e1375269daec835a03882086",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:09.806206+00:00"
+    },
+    {
+      "repository": "sun-guannan/VectCutAPI",
+      "url": "https://github.com/sun-guannan/VectCutAPI",
+      "stars": 2292,
+      "category": "剪映/CapCut 草稿服务",
+      "agent_interface": "HTTP / MCP stdio",
+      "capabilities": "11 个公开 MCP 工具；素材、字幕、特效、关键帧",
+      "rendering": "公开部分主要保存草稿，完整云渲染模块未开源",
+      "windows": "原生 Python + FFmpeg 路径可用",
+      "license_assessment": "Apache-2.0",
+      "limits": "mcp_server.py 是真实实现；完整 Agent 应用、Web 客户端、云渲染模块与它不是同一交付物。",
+      "source_commit": "cfa4779a52f1dc59a56d90cc5868778eb50c6a97",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:09.775989+00:00"
+    },
+    {
+      "repository": "Hommy-master/capcut-mate",
+      "url": "https://github.com/Hommy-master/capcut-mate",
+      "stars": 1943,
+      "category": "剪映批量编辑 API",
+      "agent_interface": "FastAPI / OpenAPI / Coze 插件",
+      "capabilities": "批量素材、特效、关键帧、蒙版关键帧、参数生成",
+      "rendering": "剪映 Windows UI/RPA 导出",
+      "windows": "README 有原生 uv 路线及 Windows extras",
+      "license_assessment": "Apache-2.0",
+      "limits": "keyframes_infos 可批量产生关键帧数据。自动导出调用桌面控制器且串行，不是独立无界面渲染。其控制器修改过，需单独实测兼容版本。",
+      "source_commit": "ec61c898da5f80a22d2c6191323081544f200772",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:09.764115+00:00"
+    },
+    {
+      "repository": "renezander030/capcut-cli",
+      "url": "https://github.com/renezander030/capcut-cli",
+      "stars": 867,
+      "category": "Agent 可用的草稿 CLI",
+      "agent_interface": "CLI / JSON 输出 / 批量编译",
+      "capabilities": "批量关键帧/缓动、模板、字幕样式预设、特效/转场、枚举采集",
+      "rendering": "客户端最终渲染 + FFmpeg 近似预览",
+      "windows": "Node 原生支持 Windows；剪映建议 5.9.x",
+      "license_assessment": "MIT",
+      "limits": "CLI 对剪映 6.0+ 草稿有写入保护；只检测加密，不负责解密。make-preset 是文字样式预设，不保存动画；关键帧走 keyframe --batch。预览忽略特效、转场、关键帧等，带 fidelity 清单。",
+      "source_commit": "bc7d4c3c366966d1af6d49c8cd19644d1f9d8110",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:10.281987+00:00"
+    },
+    {
+      "repository": "GuanYixuan/pyCapCut",
+      "url": "https://github.com/GuanYixuan/pyCapCut",
+      "stars": 700,
+      "category": "国际 CapCut 草稿 SDK",
+      "agent_interface": "Python API",
+      "capabilities": "CapCut 草稿生成及编辑",
+      "rendering": "CapCut 客户端导出",
+      "windows": "需核对国际版客户端与草稿结构",
+      "license_assessment": "未检出明确 LICENSE",
+      "limits": "GitHub API license=null，源码快照未见许可证文件；不因同作者或相似代码而推定 Apache 授权。",
+      "source_commit": "27480a1e954740af50363076e6fea94f2893ae93",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:09.805149+00:00"
+    },
+    {
+      "repository": "Monet-AI-Editor/Monet",
+      "url": "https://github.com/Monet-AI-Editor/Monet",
+      "stars": 118,
+      "category": "面向 coding agent 的编辑器",
+      "agent_interface": "editorctl CLI / HTTP / MCP",
+      "capabilities": "时间线、转录、剪辑、字幕、设计画布、导出",
+      "rendering": "应用自己的导出流程",
+      "windows": "当前 macOS-first；不作为本机 Windows 首选",
+      "license_assessment": "MIT",
+      "limits": "明确面向 Claude Code/Codex，但当前官方打包与安装路径集中于 macOS。仅选择性核查 README、包配置和许可证。",
+      "source_commit": "74fcb1646a2329dfa35acfe7b3726491544fca18",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T15:03:03.249318+00:00"
+    },
+    {
+      "repository": "AH64-dll/OpenEdit",
+      "url": "https://github.com/AH64-dll/OpenEdit",
+      "stars": 48,
+      "category": "Agent 无界面编辑内核",
+      "agent_interface": "MCP stdio / CLI / Review Studio",
+      "capabilities": "可逆编辑图、转录、28 类 IR 编辑操作、代理/最终渲染",
+      "rendering": "MLT/melt + FFmpeg，动效叠加用 HyperFrames",
+      "windows": "服务支持原生 Windows；普通视频渲染还需自行构建 MLT",
+      "license_assessment": "MIT",
+      "limits": "INSTALL.md 明确 Windows 无一键 melt 安装。用户禁用 WSL，因此只考虑原生构建；不能按开箱即用 Windows 内核推荐。",
+      "source_commit": "ff511d8346dbeed17a7cbba4d741b06d743f702d",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:10.329990+00:00"
+    },
+    {
+      "repository": "x777/frontstage",
+      "url": "https://github.com/x777/frontstage",
+      "stars": 13,
+      "category": "独立 Agent 视频编辑器",
+      "agent_interface": "桌面 HTTP MCP / 内置 Agent",
+      "capabilities": "多轨、关键帧、GPU 特效、Whisper、生成素材、互操作导出",
+      "rendering": "WebGPU/WebCodecs/FFmpeg 的应用管线",
+      "windows": "提供 Windows 桌面路线；应用需运行",
+      "license_assessment": "GPL-3.0",
+      "limits": "MCP server.mjs 与 Agent 工具目录均存在。生成依赖 fal.ai；低 Star，跨长片/重特效稳定性未实测。",
+      "source_commit": "dc80988b20ec290f92af7346517d19a8fde1f9e8",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:10.853593+00:00"
+    },
+    {
+      "repository": "Mas-inx/lumen-ai-video-editor",
+      "url": "https://github.com/Mas-inx/lumen-ai-video-editor",
+      "stars": 7,
+      "category": "独立 Agent 视频编辑器",
+      "agent_interface": "桌面 HTTP MCP / 内置 Copilot",
+      "capabilities": "运镜预设、关键帧、音乐卡点、物体跟踪、遮罩跟随、特效",
+      "rendering": "应用自己的合成/导出管线",
+      "windows": "原生 Electron Windows；应用需运行",
+      "license_assessment": "MIT",
+      "limits": "源码确认 clip_animate、detect_beats、cut_to_beats、track_motion。跟踪采用图像块模板匹配，会丢失目标；7 Star，优先做样片验证。",
+      "source_commit": "b6bb9f3ae441e41332a19980ed275189d51369eb",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:10.800687+00:00"
+    },
+    {
+      "repository": "AiPersonacademy/capcut-mcp",
+      "url": "https://github.com/AiPersonacademy/capcut-mcp",
+      "stars": 2,
+      "category": "直接编辑 CapCut 草稿的 MCP",
+      "agent_interface": "MCP stdio（项目称 24 工具）",
+      "capabilities": "分割、裁切、变换、关键帧、转场、字幕、贴纸",
+      "rendering": "CapCut 客户端 + FFmpeg 基础代理预览",
+      "windows": "Node 原生 Windows/macOS 路径处理",
+      "license_assessment": "MIT",
+      "limits": "代理预览仅合成基础视频/音频，没有实现完整文字/特效/关键帧渲染。草稿在实际客户端可读性未实测。",
+      "source_commit": "37e526dfbe427cb71abafe08b799519e42c4105a",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:10.275331+00:00"
+    },
+    {
+      "repository": "craftled/openklip",
+      "url": "https://github.com/craftled/openklip",
+      "stars": 2,
+      "category": "Agent 原生编辑器",
+      "agent_interface": "CLI / MCP（项目称 98 工具）",
+      "capabilities": "图式项目、模板、关键帧、品牌预设、AI 接口",
+      "rendering": "原生应用渲染",
+      "windows": "完整编辑/渲染管线当前 macOS-only",
+      "license_assessment": "MIT",
+      "limits": "其他平台只能使用部分 CLI 查询能力；不纳入本机优先试用列表。",
+      "source_commit": "93dd0010cf9dec2c8a76cfb35a8346fcf52ed292",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:10.804468+00:00"
+    },
+    {
+      "repository": "ishan-parihar/openscript",
+      "url": "https://github.com/ishan-parihar/openscript",
+      "stars": 2,
+      "category": "Agent 视频工作台",
+      "agent_interface": "CLI / MCP / Rust + Python",
+      "capabilities": "文档描述 43 工具及 FFmpeg/Remotion 管线",
+      "rendering": "文档描述 FFmpeg/Remotion 渲染",
+      "windows": "原生 Windows 完整链路未核实",
+      "license_assessment": "MIT",
+      "limits": "只核查公共说明与 GitHub 元数据；未下载大体积源码，不能据此确认全部工具实现。",
+      "source_commit": null,
+      "source_inspected": false,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:11.292253+00:00"
+    },
+    {
+      "repository": "MHughesDev/video-mcp",
+      "url": "https://github.com/MHughesDev/video-mcp",
+      "stars": 0,
+      "category": "无界面 MCP 剪辑内核",
+      "agent_interface": "Python MCP stdio",
+      "capabilities": "节拍分析、卡点时间线、速度变化、重构图、LUT、OTIO",
+      "rendering": "FFmpeg 渲染及 QA",
+      "windows": "可按原生 Python + FFmpeg 搭建；Windows 未实测",
+      "license_assessment": "MIT",
+      "limits": "analyze_beats 确实调用 librosa；MCP 转发到实现模块。0 Star，适合作为小型内核原型，未证明生产稳定性。",
+      "source_commit": "e71829fab2626276f740adce8a5501d29078d6dc",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:10.338626+00:00"
+    },
+    {
+      "repository": "rdh073/verbreel-engine",
+      "url": "https://github.com/rdh073/verbreel-engine",
+      "stars": 0,
+      "category": "Agent 内核架构原型",
+      "agent_interface": "Rust CLI / MCP / HTTP",
+      "capabilities": "确定性项目图、事件、GPU 渲染的架构",
+      "rendering": "native-render feature 下的 FFmpeg/wgpu",
+      "windows": "原生工具链要求较高；Windows 未实测",
+      "license_assessment": "README 称 MIT OR Apache-2.0；API 未识别",
+      "limits": "README 的当前 v1 floor 主要是 project.list 和按 feature 开启的 render.start，不能把完整架构目录当成全部编辑能力已交付。",
+      "source_commit": "4b915c80ba10df48abf52892ab744e2a8f4d5fc1",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:11.325909+00:00"
+    },
+    {
+      "repository": "PlbKin190/video-editor-mcp",
+      "url": "https://github.com/PlbKin190/video-editor-mcp",
+      "stars": 0,
+      "category": "最小 FFmpeg MCP 内核",
+      "agent_interface": "Node MCP stdio（9 工具）",
+      "capabilities": "探测、裁切、拼接、缩放、叠加、混音、JSON 顺序镜头渲染",
+      "rendering": "FFmpeg / ffprobe",
+      "windows": "默认说明使用 Docker；原生 Node 路线需另行适配",
+      "license_assessment": "Apache-2.0",
+      "limits": "本项目禁止 Docker。源码有 npm build/start，可研究原生运行，但不采用 README 的容器部署命令。",
+      "source_commit": "3192a900a41be118ffd08e928b51b7014f64a014",
+      "source_inspected": true,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:11.369429+00:00"
+    },
+    {
+      "repository": "PlbKin190/video-atelier-mcp",
+      "url": "https://github.com/PlbKin190/video-atelier-mcp",
+      "stars": 0,
+      "category": "可查看源码的编辑工作台",
+      "agent_interface": "MCP / UI",
+      "capabilities": "文档描述时间线、字幕、SAM2 屏幕替换",
+      "rendering": "FFmpeg 等",
+      "windows": "本机链路未核实",
+      "license_assessment": "PolyForm Noncommercial（非 OSI 开源）",
+      "limits": "属于 source-available，不能混入可直接做商业广告用途的开源清单。",
+      "source_commit": null,
+      "source_inspected": false,
+      "runtime_tested": false,
+      "checked_at_utc": "2026-10-11T14:55:11.350380+00:00"
+    }
+  ],
+  "evidence": [
+    {
+      "repository": "jub0t/concat",
+      "file": "src/crates/concat-cli/src/main.rs",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\jub0t__concat\\code\\src\\crates\\concat-cli\\src\\main.rs",
+      "source_commit": "1ab750a339c5db249d353b21b9f3cc9ddb1a1a22",
+      "pattern": "JSON-RPC|Api \\{|Serve \\{",
+      "matches": [
+        {
+          "line": 9,
+          "text": "//! first transport: JSON-RPC requests in, responses and events out, one per"
+        },
+        {
+          "line": 59,
+          "text": "/// Speak the Concat API: a JSON-RPC request per line on stdin, a"
+        },
+        {
+          "line": 62,
+          "text": "Api {"
+        },
+        {
+          "line": 68,
+          "text": "/// JSON-RPC lines over TCP or a Unix socket, and gRPC in a build that"
+        },
+        {
+          "line": 69,
+          "text": "/// has it. With no address given, JSON-RPC on 127.0.0.1:7420. Every"
+        },
+        {
+          "line": 72,
+          "text": "Serve {"
+        },
+        {
+          "line": 73,
+          "text": "/// The TCP address for JSON-RPC lines, e.g. 127.0.0.1:7420."
+        },
+        {
+          "line": 76,
+          "text": "/// A Unix socket path for JSON-RPC lines."
+        }
+      ],
+      "source_url": "https://github.com/jub0t/concat/blob/1ab750a339c5db249d353b21b9f3cc9ddb1a1a22/src/crates/concat-cli/src/main.rs#L9"
+    },
+    {
+      "repository": "jub0t/concat",
+      "file": "src/crates/concat-project/src/commands/properties.rs",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\jub0t__concat\\code\\src\\crates\\concat-project\\src\\commands\\properties.rs",
+      "source_commit": "1ab750a339c5db249d353b21b9f3cc9ddb1a1a22",
+      "pattern": "SetClipCutout|SetClipKey|clip.set_key",
+      "matches": [
+        {
+          "line": 128,
+          "text": "Command::SetClipCutout { clip_id, cutout } => {"
+        },
+        {
+          "line": 157,
+          "text": "Command::SetClipKey {"
+        },
+        {
+          "line": 185,
+          "text": "clip.set_key(property, at, value, ease);"
+        }
+      ],
+      "source_url": "https://github.com/jub0t/concat/blob/1ab750a339c5db249d353b21b9f3cc9ddb1a1a22/src/crates/concat-project/src/commands/properties.rs#L128"
+    },
+    {
+      "repository": "jub0t/concat",
+      "file": "src/crates/concat-api/src/message.rs",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\jub0t__concat\\code\\src\\crates\\concat-api\\src\\message.rs",
+      "source_commit": "1ab750a339c5db249d353b21b9f3cc9ddb1a1a22",
+      "pattern": "template.instantiate|export.run|cutout.progress",
+      "matches": [
+        {
+          "line": 176,
+          "text": "#[serde(rename = \"template.instantiate\")]"
+        },
+        {
+          "line": 200,
+          "text": "/// in [`Event::ExportDone`] or [`Event::ExportFailed`]. One export runs"
+        },
+        {
+          "line": 202,
+          "text": "#[serde(rename = \"export.run\")]"
+        },
+        {
+          "line": 567,
+          "text": "#[serde(rename = \"cutout.progress\")]"
+        }
+      ],
+      "source_url": "https://github.com/jub0t/concat/blob/1ab750a339c5db249d353b21b9f3cc9ddb1a1a22/src/crates/concat-api/src/message.rs#L176"
+    },
+    {
+      "repository": "GuanYixuan/pyJianYingDraft",
+      "file": "README.md",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\GuanYixuan__pyJianYingDraft\\code\\README.md",
+      "source_commit": "6bb2d06a713f7b58e1375269daec835a03882086",
+      "pattern": "10.8 ❌|fallback_loader|剪映7及以上",
+      "matches": [
+        {
+          "line": 22,
+          "text": "| [视频蒙版](#蒙版) | ✅ | 10.8 ❌<br>预计在`0.3.1`中修复 |"
+        },
+        {
+          "line": 77,
+          "text": "> ⚠️ 新版剪映中的 `draft_content.json` 往往不是可直接读取的明文 JSON；因此“加载模板”相关能力在新版剪映上通常需要通过 `DraftFolder(..., fallback_loader=...)` 接入额外读取器，详情请参见[此处](https://github.com/GuanYixuan/pyJianYingDraft/releases)"
+        },
+        {
+          "line": 81,
+          "text": "| [加载](#加载模板) `draft_content.json` 文件作为模板 | ✅ | 10.8 🟡<br>需 `fallback_loader` |"
+        },
+        {
+          "line": 92,
+          "text": "| 控制剪映打开指定草稿 | ✅ | 6.8（剪映6及以下）✅<br>10.8（剪映7及以上）❌ |"
+        },
+        {
+          "line": 93,
+          "text": "| [导出草稿至指定位置](#批量导出草稿) | ✅ | 6.8（剪映6及以下）✅<br>10.8（剪映7及以上）❌ |"
+        },
+        {
+          "line": 94,
+          "text": "| 调节导出分辨率和帧率 | ✅ | 6.8（剪映6及以下）✅<br>10.8（剪映7及以上）❌ |"
+        },
+        {
+          "line": 136,
+          "text": "> ⚠️ 默认仅支持明文模板，用户若需读取有合法访问权的非明文模板内容，可通过`DraftFolder(..., fallback_loader=...)`接入额外草稿加载器"
+        },
+        {
+          "line": 159,
+          "text": "fallback_loader=my_local_loader,"
+        }
+      ],
+      "source_url": "https://github.com/GuanYixuan/pyJianYingDraft/blob/6bb2d06a713f7b58e1375269daec835a03882086/README.md#L22"
+    },
+    {
+      "repository": "sun-guannan/VectCutAPI",
+      "file": "mcp_server.py",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\sun-guannan__VectCutAPI\\code\\mcp_server.py",
+      "source_commit": "cfa4779a52f1dc59a56d90cc5868778eb50c6a97",
+      "pattern": "add_effect_impl|add_video_keyframe_impl|def add_effect|def add_video_keyframe",
+      "matches": [
+        {
+          "line": 27,
+          "text": "from add_effect_impl import add_effect_impl"
+        },
+        {
+          "line": 29,
+          "text": "from add_video_keyframe_impl import add_video_keyframe_impl"
+        },
+        {
+          "line": 335,
+          "text": "result = add_effect_impl(**arguments)"
+        },
+        {
+          "line": 341,
+          "text": "result = add_video_keyframe_impl(**arguments)"
+        }
+      ],
+      "source_url": "https://github.com/sun-guannan/VectCutAPI/blob/cfa4779a52f1dc59a56d90cc5868778eb50c6a97/mcp_server.py#L27"
+    },
+    {
+      "repository": "sun-guannan/VectCutAPI",
+      "file": "README.md",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\sun-guannan__VectCutAPI\\code\\README.md",
+      "source_commit": "cfa4779a52f1dc59a56d90cc5868778eb50c6a97",
+      "pattern": "not been open-sourced yet|python mcp_server.py",
+      "matches": [
+        {
+          "line": 96,
+          "text": "python mcp_server.py # Start the MCP protocol service, supports stdio communication"
+        },
+        {
+          "line": 280,
+          "text": "- **Join us**: Our goal is to provide a stable and reliable video editing tool that integrates well with AI-generated images, videos, and audio. If you are interested, submit a PR and I'll see it. For more in-depth involvement, the code for the MCP Editing Agent, web-based editing client, and cloud rendering modules has not been open-sourced yet."
+        }
+      ],
+      "source_url": "https://github.com/sun-guannan/VectCutAPI/blob/cfa4779a52f1dc59a56d90cc5868778eb50c6a97/README.md#L96"
+    },
+    {
+      "repository": "Hommy-master/capcut-mate",
+      "file": "src/service/add_keyframes.py",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\Hommy-master__capcut-mate\\code\\src\\service\\add_keyframes.py",
+      "source_commit": "ec61c898da5f80a22d2c6191323081544f200772",
+      "pattern": "def add_keyframes|segment.add_keyframe",
+      "matches": [
+        {
+          "line": 16,
+          "text": "def add_keyframes("
+        },
+        {
+          "line": 124,
+          "text": "segment.add_keyframe(property_enum, time_offset, normalized_value)"
+        },
+        {
+          "line": 150,
+          "text": "async def add_keyframes_async("
+        }
+      ],
+      "source_url": "https://github.com/Hommy-master/capcut-mate/blob/ec61c898da5f80a22d2c6191323081544f200772/src/service/add_keyframes.py#L16"
+    },
+    {
+      "repository": "Hommy-master/capcut-mate",
+      "file": "src/service/add_effects.py",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\Hommy-master__capcut-mate\\code\\src\\service\\add_effects.py",
+      "source_commit": "ec61c898da5f80a22d2c6191323081544f200772",
+      "pattern": "script.add_track_ordered|add_effect_to_draft",
+      "matches": [
+        {
+          "line": 62,
+          "text": "script.add_track_ordered(track_type=TrackType.effect, track_name=track_name)"
+        },
+        {
+          "line": 72,
+          "text": "segment_id, effect_id = add_effect_to_draft("
+        },
+        {
+          "line": 161,
+          "text": "def add_effect_to_draft("
+        }
+      ],
+      "source_url": "https://github.com/Hommy-master/capcut-mate/blob/ec61c898da5f80a22d2c6191323081544f200772/src/service/add_effects.py#L62"
+    },
+    {
+      "repository": "Hommy-master/capcut-mate",
+      "file": "src/utils/video_task_manager.py",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\Hommy-master__capcut-mate\\code\\src\\utils\\video_task_manager.py",
+      "source_commit": "ec61c898da5f80a22d2c6191323081544f200772",
+      "pattern": "ctrl.export_draft|export_video_lock =",
+      "matches": [
+        {
+          "line": 122,
+          "text": "self.export_video_lock = threading.Lock()"
+        },
+        {
+          "line": 719,
+          "text": "ctrl.export_draft(task.draft_id, outfile, draft_dir=draft_dir)"
+        }
+      ],
+      "source_url": "https://github.com/Hommy-master/capcut-mate/blob/ec61c898da5f80a22d2c6191323081544f200772/src/utils/video_task_manager.py#L122"
+    },
+    {
+      "repository": "renezander030/capcut-cli",
+      "file": "docs/quickstart.zh-CN.md",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\renezander030__capcut-cli\\code\\docs\\quickstart.zh-CN.md",
+      "source_commit": "bc7d4c3c366966d1af6d49c8cd19644d1f9d8110",
+      "pattern": "5.9.x|6.0|harvest-enums|make-preset|save-template",
+      "matches": [
+        {
+          "line": 11,
+          "text": "- **剪映 5.9.x 是最后一个广泛使用的明文草稿版本**，也是配合本 CLI 的推荐版本。"
+        },
+        {
+          "line": 12,
+          "text": "- **剪映 6.0 起 `draft_content.json` 被加密。** CLI 只检测、不解密：`capcut decrypt <草稿>` 会报告加密状态并给出应对方案。明文变体虽然还能正常查看，但写入护栏会拒绝对 6.0+ 时代的草稿做任何修改（`--force-write` 可强制覆盖，后果自负）—— 因为写回的明文可能被应用忽略或提示已损坏。"
+        },
+        {
+          "line": 13,
+          "text": "- **首选做法：把剪映固定在 5.9.x 并阻止自动更新。** 注意应用的自动更新会破坏固定 —— 一台\"钉死\"在 5.9 的机器悄悄升级后，明文工具链就全部失效。逐系统的固定方法见 [version-support.md](./version-support.md) 的 \"Pinning app updates\" 一节；CLI 自带升级绊线，草稿存储的应用版本变化后，第一次写入就会在 stderr 打出 WARNING。"
+        },
+        {
+          "line": 70,
+          "text": "应用里自己用过、但内置表还不认识的商店特效，可以用 `capcut harvest-enums <草稿> --apply` 从应用生成的草稿里学习进来，之后就能按 slug 直接写入。"
+        },
+        {
+          "line": 83,
+          "text": "| 模板 | `save-template` · `apply-template` |"
+        },
+        {
+          "line": 102,
+          "text": "样式文件可以用 `capcut make-preset` 从你在应用里调好的一条字幕提取。"
+        },
+        {
+          "line": 126,
+          "text": "- 版本护栏：超出已验证范围或已知不兼容的草稿（包括剪映 6.0+ 时代）会拒绝写入，`--force-write` 是显式覆盖而不是默认恢复路径。"
+        }
+      ],
+      "source_url": "https://github.com/renezander030/capcut-cli/blob/bc7d4c3c366966d1af6d49c8cd19644d1f9d8110/docs/quickstart.zh-CN.md#L11"
+    },
+    {
+      "repository": "renezander030/capcut-cli",
+      "file": "src/render.ts",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\renezander030__capcut-cli\\code\\src\\render.ts",
+      "source_commit": "bc7d4c3c366966d1af6d49c8cd19644d1f9d8110",
+      "pattern": "video effects are not rendered|keyframed animation is not applied|fidelityCensus",
+      "matches": [
+        {
+          "line": 170,
+          "text": "/** What the draft carries that this proxy does not reproduce (see fidelityCensus). */"
+        },
+        {
+          "line": 452,
+          "text": "effects: \"video effects are not rendered\","
+        },
+        {
+          "line": 455,
+          "text": "keyframes: \"keyframed animation is not applied; segments hold their base transform/volume\","
+        },
+        {
+          "line": 504,
+          "text": "export function fidelityCensus("
+        },
+        {
+          "line": 964,
+          "text": "fidelity: fidelityCensus(draft, opts, skipped),"
+        }
+      ],
+      "source_url": "https://github.com/renezander030/capcut-cli/blob/bc7d4c3c366966d1af6d49c8cd19644d1f9d8110/src/render.ts#L170"
+    },
+    {
+      "repository": "renezander030/capcut-cli",
+      "file": "src/command-specs.ts",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\renezander030__capcut-cli\\code\\src\\command-specs.ts",
+      "source_commit": "bc7d4c3c366966d1af6d49c8cd19644d1f9d8110",
+      "pattern": "Read JSONL keyframes|Interpolation easing|capcut keyframe",
+      "matches": [
+        {
+          "line": 208,
+          "text": "keyframe: \"capcut keyframe <project> <id> <property> <time> <value> [--easing <name>] | --batch\","
+        },
+        {
+          "line": 417,
+          "text": "option(\"batch\", [\"--batch\"], \"boolean\", \"Read JSONL keyframes from stdin.\"),"
+        },
+        {
+          "line": 422,
+          "text": "\"Interpolation easing to adjacent keyframes. Needs an adjacent keyframe on the same property; a lone eased keyframe stays linear (warns). hold = step: the value is held by a helper keyframe one frame before the next keyframe on that property (needs a later keyframe; warns otherwise).\","
+        }
+      ],
+      "source_url": "https://github.com/renezander030/capcut-cli/blob/bc7d4c3c366966d1af6d49c8cd19644d1f9d8110/src/command-specs.ts#L208"
+    },
+    {
+      "repository": "renezander030/capcut-cli",
+      "file": "src/preset.ts",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\renezander030__capcut-cli\\code\\src\\preset.ts",
+      "source_commit": "bc7d4c3c366966d1af6d49c8cd19644d1f9d8110",
+      "pattern": "Text style presets|animations are excluded",
+      "matches": [
+        {
+          "line": 8,
+          "text": "// --- Text style presets (make-preset / --preset) ---"
+        },
+        {
+          "line": 13,
+          "text": "// Only properties the CLI can re-apply are captured — animations are excluded"
+        }
+      ],
+      "source_url": "https://github.com/renezander030/capcut-cli/blob/bc7d4c3c366966d1af6d49c8cd19644d1f9d8110/src/preset.ts#L8"
+    },
+    {
+      "repository": "Mas-inx/lumen-ai-video-editor",
+      "file": "electron/integrations/server.ts",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\Mas-inx__lumen-ai-video-editor\\code\\electron\\integrations\\server.ts",
+      "source_commit": "b6bb9f3ae441e41332a19980ed275189d51369eb",
+      "pattern": "47910|ListToolsRequestSchema|StreamableHTTPServerTransport",
+      "matches": [
+        {
+          "line": 5,
+          "text": "import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'"
+        },
+        {
+          "line": 6,
+          "text": "import { CallToolRequestSchema, ListToolsRequestSchema, type CallToolResult } from '@modelcontextprotocol/sdk/types.js'"
+        },
+        {
+          "line": 21,
+          "text": "const DEFAULT_PORT = 47910"
+        },
+        {
+          "line": 86,
+          "text": "mcp.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [...(await editorTools()), RESULT_TOOL_DEFINITION] }))"
+        },
+        {
+          "line": 164,
+          "text": "const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: !calling, keepAliveMs: 5000 })"
+        }
+      ],
+      "source_url": "https://github.com/Mas-inx/lumen-ai-video-editor/blob/b6bb9f3ae441e41332a19980ed275189d51369eb/electron/integrations/server.ts#L5"
+    },
+    {
+      "repository": "Mas-inx/lumen-ai-video-editor",
+      "file": "src/editor/commands.ts",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\Mas-inx__lumen-ai-video-editor\\code\\src\\editor\\commands.ts",
+      "source_commit": "b6bb9f3ae441e41332a19980ed275189d51369eb",
+      "pattern": "'clip.animate'|presetKeyframes|mergeKeyframes",
+      "matches": [
+        {
+          "line": 14,
+          "text": "import { MOTION_PRESETS, mergeKeyframes, presetKeyframes, PRESET_IDS } from './motion-presets'"
+        },
+        {
+          "line": 1157,
+          "text": "'clip.animate': command({"
+        },
+        {
+          "line": 1174,
+          "text": "const { keys, range } = presetKeyframes(snapshot, i.preset, p.settings, { at: i.at, duration: i.duration, intensity: i.intensity, easing: i.easing })"
+        },
+        {
+          "line": 1176,
+          "text": "clip.keyframes[prop] = mergeKeyframes(clip.keyframes[prop], list, range)"
+        }
+      ],
+      "source_url": "https://github.com/Mas-inx/lumen-ai-video-editor/blob/b6bb9f3ae441e41332a19980ed275189d51369eb/src/editor/commands.ts#L14"
+    },
+    {
+      "repository": "Mas-inx/lumen-ai-video-editor",
+      "file": "src/integrations/tools/beats.ts",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\Mas-inx__lumen-ai-video-editor\\code\\src\\integrations\\tools\\beats.ts",
+      "source_commit": "b6bb9f3ae441e41332a19980ed275189d51369eb",
+      "pattern": "name: 'detect_beats'|name: 'cut_to_beats'|await cutToBeats|await analyzeBeats",
+      "matches": [
+        {
+          "line": 15,
+          "text": "name: 'detect_beats',"
+        },
+        {
+          "line": 22,
+          "text": "const grid = await analyzeBeats(assetById(assetId).id)"
+        },
+        {
+          "line": 39,
+          "text": "name: 'cut_to_beats',"
+        },
+        {
+          "line": 54,
+          "text": "const res = await cutToBeats(strings(a, 'clip_ids'), {"
+        }
+      ],
+      "source_url": "https://github.com/Mas-inx/lumen-ai-video-editor/blob/b6bb9f3ae441e41332a19980ed275189d51369eb/src/integrations/tools/beats.ts#L15"
+    },
+    {
+      "repository": "Mas-inx/lumen-ai-video-editor",
+      "file": "src/integrations/tools/footage.ts",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\Mas-inx__lumen-ai-video-editor\\code\\src\\integrations\\tools\\footage.ts",
+      "source_commit": "b6bb9f3ae441e41332a19980ed275189d51369eb",
+      "pattern": "name: 'track_motion'|await trackMotion|Lost sight",
+      "matches": [
+        {
+          "line": 162,
+          "text": "name: 'track_motion',"
+        },
+        {
+          "line": 191,
+          "text": "const r = await trackMotion({"
+        },
+        {
+          "line": 201,
+          "text": "return { tracked_frames: r.frames, from_seconds: seconds(r.from), to_seconds: seconds(r.to), ...(r.lost ? { note: 'Lost sight of it before the end of the clip.' } : {}) }"
+        }
+      ],
+      "source_url": "https://github.com/Mas-inx/lumen-ai-video-editor/blob/b6bb9f3ae441e41332a19980ed275189d51369eb/src/integrations/tools/footage.ts#L162"
+    },
+    {
+      "repository": "Mas-inx/lumen-ai-video-editor",
+      "file": "src/engine/tracker.ts",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\Mas-inx__lumen-ai-video-editor\\code\\src\\engine\\tracker.ts",
+      "source_commit": "b6bb9f3ae441e41332a19980ed275189d51369eb",
+      "pattern": "template matching|normalized cross-correlation|export async function trackBox",
+      "matches": [
+        {
+          "line": 2,
+          "text": "* Motion tracking and stabilization, both from template matching on small"
+        },
+        {
+          "line": 3,
+          "text": "* grayscale frames (normalized cross-correlation, searched coarse-to-fine on a"
+        },
+        {
+          "line": 280,
+          "text": "export async function trackBox(asset: Asset, box: TrackBox, from: number, to: number, onProgress?: (p: number) => void, signal?: AbortSignal): Promise<TrackSample[]> {"
+        }
+      ],
+      "source_url": "https://github.com/Mas-inx/lumen-ai-video-editor/blob/b6bb9f3ae441e41332a19980ed275189d51369eb/src/engine/tracker.ts#L2"
+    },
+    {
+      "repository": "x777/frontstage",
+      "file": "apps/desktop/src/main/mcp/server.mjs",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\x777__frontstage\\code\\apps\\desktop\\src\\main\\mcp\\server.mjs",
+      "source_commit": "dc80988b20ec290f92af7346517d19a8fde1f9e8",
+      "pattern": "StreamableHTTPServerTransport|ListToolsRequestSchema|CallToolRequestSchema",
+      "matches": [
+        {
+          "line": 4,
+          "text": "import { StreamableHTTPServerTransport } from \"@modelcontextprotocol/sdk/server/streamableHttp.js\";"
+        },
+        {
+          "line": 5,
+          "text": "import { ListToolsRequestSchema, CallToolRequestSchema, ListResourcesRequestSchema, ReadResourceRequestSchema } from \"@modelcontextprotocol/sdk/types.js\";"
+        },
+        {
+          "line": 23,
+          "text": "mcp.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: await bridge(\"listTools\") }));"
+        },
+        {
+          "line": 24,
+          "text": "mcp.setRequestHandler(CallToolRequestSchema, async (req) => {"
+        },
+        {
+          "line": 70,
+          "text": "const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });"
+        }
+      ],
+      "source_url": "https://github.com/x777/frontstage/blob/dc80988b20ec290f92af7346517d19a8fde1f9e8/apps/desktop/src/main/mcp/server.mjs#L4"
+    },
+    {
+      "repository": "AH64-dll/OpenEdit",
+      "file": "open_edit/mcp/server.py",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\AH64-dll__OpenEdit\\code\\open_edit\\mcp\\server.py",
+      "source_commit": "ff511d8346dbeed17a7cbba4d741b06d743f702d",
+      "pattern": "server.list_tools|server.call_tool|dispatch_mcp_tool",
+      "matches": [
+        {
+          "line": 16,
+          "text": "from open_edit.mcp.adapters import dispatch_mcp_tool, mcp_tool_schemas, result_to_json"
+        },
+        {
+          "line": 92,
+          "text": "@server.list_tools()"
+        },
+        {
+          "line": 105,
+          "text": "@server.call_tool()"
+        },
+        {
+          "line": 107,
+          "text": "result = await dispatch_mcp_tool(name, arguments, project_path)"
+        }
+      ],
+      "source_url": "https://github.com/AH64-dll/OpenEdit/blob/ff511d8346dbeed17a7cbba4d741b06d743f702d/open_edit/mcp/server.py#L16"
+    },
+    {
+      "repository": "AH64-dll/OpenEdit",
+      "file": "INSTALL.md",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\AH64-dll__OpenEdit\\code\\INSTALL.md",
+      "source_commit": "ff511d8346dbeed17a7cbba4d741b06d743f702d",
+      "pattern": "no one-command melt|build MLT yourself|no packaged install",
+      "matches": [
+        {
+          "line": 62,
+          "text": "| melt (MLT) | detected; manual commands printed | no packaged install — manual/WSL (see below) | base-video timeline render | installers detect / provision |"
+        },
+        {
+          "line": 65,
+          "text": "**Windows melt note:** there is currently **no one-command melt install on"
+        },
+        {
+          "line": 70,
+          "text": "and call it from there, or build MLT yourself. Overlay/motion-graphics-only"
+        }
+      ],
+      "source_url": "https://github.com/AH64-dll/OpenEdit/blob/ff511d8346dbeed17a7cbba4d741b06d743f702d/INSTALL.md#L62"
+    },
+    {
+      "repository": "MHughesDev/video-mcp",
+      "file": "src/mcp_editor/beat_sync.py",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\MHughesDev__video-mcp\\code\\src\\mcp_editor\\beat_sync.py",
+      "source_commit": "e71829fab2626276f740adce8a5501d29078d6dc",
+      "pattern": "def analyze_beats|librosa.beat.beat_track|def plan_beat_synced_edit",
+      "matches": [
+        {
+          "line": 15,
+          "text": "def analyze_beats(music_path: str | Path) -> dict[str, object]:"
+        },
+        {
+          "line": 22,
+          "text": "tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)"
+        },
+        {
+          "line": 99,
+          "text": "def plan_beat_synced_edit_for_manifest("
+        },
+        {
+          "line": 154,
+          "text": "def plan_beat_synced_edit("
+        }
+      ],
+      "source_url": "https://github.com/MHughesDev/video-mcp/blob/e71829fab2626276f740adce8a5501d29078d6dc/src/mcp_editor/beat_sync.py#L15"
+    },
+    {
+      "repository": "MHughesDev/video-mcp",
+      "file": "src/mcp_editor/server.py",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\MHughesDev__video-mcp\\code\\src\\mcp_editor\\server.py",
+      "source_commit": "e71829fab2626276f740adce8a5501d29078d6dc",
+      "pattern": "def analyze_beats|analyze_beats_impl|apply_speed_ramp_impl",
+      "matches": [
+        {
+          "line": 8,
+          "text": "from .beat_sync import analyze_beats as analyze_beats_impl"
+        },
+        {
+          "line": 19,
+          "text": "from .effects import apply_speed_ramp as apply_speed_ramp_impl"
+        },
+        {
+          "line": 188,
+          "text": "def analyze_beats(music_path: str) -> dict[str, object]:"
+        },
+        {
+          "line": 191,
+          "text": "return analyze_beats_impl(music_path)"
+        },
+        {
+          "line": 574,
+          "text": "return apply_speed_ramp_impl("
+        }
+      ],
+      "source_url": "https://github.com/MHughesDev/video-mcp/blob/e71829fab2626276f740adce8a5501d29078d6dc/src/mcp_editor/server.py#L8"
+    },
+    {
+      "repository": "AiPersonacademy/capcut-mcp",
+      "file": "src/capcut/preview-renderer.ts",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\AiPersonacademy__capcut-mcp\\code\\src\\capcut\\preview-renderer.ts",
+      "source_commit": "37e526dfbe427cb71abafe08b799519e42c4105a",
+      "pattern": "videoTracks|audioTracks|ffmpeg|overlay|amix",
+      "matches": [
+        {
+          "line": 12,
+          "text": "* Generates a fast proxy preview video using ffmpeg from a CapCut draft."
+        },
+        {
+          "line": 107,
+          "text": "filterStr += `${mixInputs}amix=inputs=${audioSegments.length}:duration=longest[aout]`;"
+        },
+        {
+          "line": 163,
+          "text": "`${currentBase}${scaledLabel}overlay=0:0:${enableExpr}${nextBase}`"
+        },
+        {
+          "line": 186,
+          "text": "`${audioLabels.join('')}amix=inputs=${audioSegments.length}:duration=longest[aout]`"
+        },
+        {
+          "line": 212,
+          "text": "await execFileAsync('ffmpeg', args);"
+        }
+      ],
+      "source_url": "https://github.com/AiPersonacademy/capcut-mcp/blob/37e526dfbe427cb71abafe08b799519e42c4105a/src/capcut/preview-renderer.ts#L12"
+    },
+    {
+      "repository": "Monet-AI-Editor/Monet",
+      "file": "README.md",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\Monet-AI-Editor__Monet\\code\\README.md",
+      "source_commit": "74fcb1646a2329dfa35acfe7b3726491544fca18",
+      "pattern": "macOS-first|editorctl CLI|MCP server",
+      "matches": [
+        {
+          "line": 98,
+          "text": "Monet is currently macOS-first. Install with one command in your terminal — no Gatekeeper prompts:"
+        },
+        {
+          "line": 206,
+          "text": "| MCP server | MCP-aware agent hosts | Same operations exposed as Model Context Protocol tools |"
+        },
+        {
+          "line": 315,
+          "text": "- `src/mcp-server` — MCP server entrypoint"
+        }
+      ],
+      "source_url": "https://github.com/Monet-AI-Editor/Monet/blob/74fcb1646a2329dfa35acfe7b3726491544fca18/README.md#L98"
+    },
+    {
+      "repository": "rdh073/verbreel-engine",
+      "file": "README.md",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\rdh073__verbreel-engine\\code\\README.md",
+      "source_commit": "4b915c80ba10df48abf52892ab744e2a8f4d5fc1",
+      "pattern": "Current v1 floor|project.list|native-render",
+      "matches": [
+        {
+          "line": 45,
+          "text": "# Build the CLI. Add `--features native-render` when you want render.start."
+        },
+        {
+          "line": 48,
+          "text": "# Build the MCP server. Add `--features native-render` when you want render.start."
+        },
+        {
+          "line": 51,
+          "text": "# Build the HTTP server. Add `--features native-render` when you want render.start."
+        },
+        {
+          "line": 60,
+          "text": "| Surface | Binary | Current v1 floor |"
+        },
+        {
+          "line": 62,
+          "text": "| CLI | `target/release/verbreel` | `project list`; `render start` in native-render builds |"
+        },
+        {
+          "line": 63,
+          "text": "| MCP | `target/release/verbreel-mcp` | MCP `tools/list`, `project.list`; `render.start` in native-render builds |"
+        },
+        {
+          "line": 64,
+          "text": "| HTTP | `target/release/verbreel-http` | `GET /healthz`, `GET /tools`, `POST /tools/project.list`; `POST /tools/render.start` in native-render builds |"
+        },
+        {
+          "line": 69,
+          "text": "cargo run -p verbreel-cli -- project list"
+        }
+      ],
+      "source_url": "https://github.com/rdh073/verbreel-engine/blob/4b915c80ba10df48abf52892ab744e2a8f4d5fc1/README.md#L45"
+    },
+    {
+      "repository": "PlbKin190/video-editor-mcp",
+      "file": "package.json",
+      "local_path": "E:\\dev\\sandbox\\AI广告剪辑\\research\\agent-video-kernels\\sources\\PlbKin190__video-editor-mcp\\code\\package.json",
+      "source_commit": "3192a900a41be118ffd08e928b51b7014f64a014",
+      "pattern": "\"start\"|\"node\"",
+      "matches": [
+        {
+          "line": 9,
+          "text": "\"engines\": { \"node\": \">=22\" },"
+        },
+        {
+          "line": 12,
+          "text": "\"start\": \"node dist/src/index.js\","
+        }
+      ],
+      "source_url": "https://github.com/PlbKin190/video-editor-mcp/blob/3192a900a41be118ffd08e928b51b7014f64a014/package.json#L9"
+    },
+    {
+      "repository": "jub0t/concat",
+      "source_url": "https://concatenate.pages.dev/docs/transports/mcp/",
+      "observation": "Official developer documentation: MCP prototype PR #69 was closed, not merged; JSON-RPC/gRPC are shipped. Source snapshot has no MCP server transport."
+    }
+  ]
+}

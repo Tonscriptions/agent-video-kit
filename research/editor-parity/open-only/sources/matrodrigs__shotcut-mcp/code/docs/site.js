@@ -1,0 +1,491 @@
+(() => {
+  "use strict";
+
+  const header = document.querySelector("[data-site-header]");
+  const menuToggle = document.querySelector("[data-menu-toggle]");
+  const siteNav = document.querySelector("[data-site-nav]");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  const setMenuOpen = (open) => {
+    if (!header || !menuToggle) return;
+    header.classList.toggle("menu-open", open);
+    menuToggle.setAttribute("aria-expanded", String(open));
+  };
+
+  const updateHeader = () => {
+    if (!header) return;
+    header.classList.toggle("is-scrolled", window.scrollY > 20);
+  };
+
+  const sectionLinks = [...document.querySelectorAll("[data-section-link]")];
+  const sectionNavigation = sectionLinks
+    .map((link) => ({ link, section: document.querySelector(link.hash) }))
+    .filter(({ section }) => section);
+
+  const updateActiveSection = () => {
+    const activationLine = (header?.offsetHeight || 0) + Math.min(window.innerHeight * 0.22, 160);
+    let activeLink = null;
+
+    sectionNavigation.forEach(({ link, section }) => {
+      if (section.getBoundingClientRect().top <= activationLine) activeLink = link;
+    });
+
+    sectionLinks.forEach((link) => {
+      if (link === activeLink) link.setAttribute("aria-current", "location");
+      else link.removeAttribute("aria-current");
+    });
+  };
+
+  let scrollFrame = 0;
+  window.addEventListener("scroll", () => {
+    if (scrollFrame) return;
+    scrollFrame = window.requestAnimationFrame(() => {
+      updateHeader();
+      updateActiveSection();
+      scrollFrame = 0;
+    });
+  }, { passive: true });
+  updateHeader();
+  updateActiveSection();
+
+  menuToggle?.addEventListener("click", () => {
+    setMenuOpen(menuToggle.getAttribute("aria-expanded") !== "true");
+  });
+
+  siteNav?.addEventListener("click", (event) => {
+    const link = event.target.closest("a");
+    if (!link) return;
+    setMenuOpen(false);
+
+    if (link.matches("[data-section-link]")) {
+      sectionLinks.forEach((candidate) => {
+        if (candidate === link) candidate.setAttribute("aria-current", "location");
+        else candidate.removeAttribute("aria-current");
+      });
+    }
+  });
+
+  window.addEventListener("hashchange", updateActiveSection);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      setMenuOpen(false);
+      menuToggle?.focus();
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (header?.classList.contains("menu-open") && !header.contains(event.target)) {
+      setMenuOpen(false);
+    }
+  });
+
+  const desktopQuery = window.matchMedia("(min-width: 861px)");
+  desktopQuery.addEventListener?.("change", (event) => {
+    if (event.matches) setMenuOpen(false);
+  });
+
+  const initializeOneShotMotion = ({
+    targets,
+    pendingClass,
+    visibleClass,
+    threshold,
+    rootMargin,
+  }) => {
+    const elements = [...targets].filter(Boolean);
+    let observer = null;
+
+    const complete = (target) => {
+      target.classList.remove(pendingClass);
+      target.classList.add(visibleClass);
+      observer?.unobserve(target);
+    };
+
+    const completeAll = () => {
+      observer?.disconnect();
+      observer = null;
+      elements.forEach(complete);
+    };
+
+    if (!elements.length || reducedMotion.matches || !("IntersectionObserver" in window)) {
+      completeAll();
+      return completeAll;
+    }
+
+    elements.forEach((target) => target.classList.add(pendingClass));
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) complete(entry.target);
+      });
+    }, { threshold, rootMargin });
+    elements.forEach((target) => observer.observe(target));
+
+    return completeAll;
+  };
+
+  const completeWorkflowMotion = initializeOneShotMotion({
+    targets: document.querySelectorAll("[data-workflow-sequence] > li"),
+    pendingClass: "is-workflow-pending",
+    visibleClass: "is-workflow-visible",
+    threshold: 0.45,
+    rootMargin: "0px 0px -8% 0px",
+  });
+  const completeSafetyMotion = initializeOneShotMotion({
+    targets: [document.querySelector("[data-flow-sequence]")],
+    pendingClass: "is-flow-pending",
+    visibleClass: "is-flow-visible",
+    threshold: 0.35,
+    rootMargin: "0px 0px -8% 0px",
+  });
+  const completeTerminalMotion = initializeOneShotMotion({
+    targets: [document.querySelector("[data-terminal-sequence]")],
+    pendingClass: "is-terminal-pending",
+    visibleClass: "is-terminal-visible",
+    threshold: 0.35,
+    rootMargin: "0px 0px -8% 0px",
+  });
+
+  const completeScrollMotion = () => {
+    completeWorkflowMotion();
+    completeSafetyMotion();
+    completeTerminalMotion();
+  };
+
+  const writeClipboard = async (text) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  };
+
+  document.querySelectorAll("[data-copy-target]").forEach((button) => {
+    const label = button.querySelector("span:not(.sr-only)");
+    const status = button.querySelector("[data-copy-status]");
+    const defaultLabel = label?.textContent || "Copy";
+    let resetTimer = 0;
+
+    button.addEventListener("click", async () => {
+      const target = document.querySelector(button.dataset.copyTarget);
+      if (!target) return;
+
+      try {
+        await writeClipboard(target.textContent.trim());
+        button.classList.add("copied");
+        if (label) label.textContent = "Copied";
+        if (status) status.textContent = "Command copied to clipboard.";
+      } catch {
+        if (label) label.textContent = "Select text";
+        if (status) status.textContent = "Copy failed. Select the command manually.";
+        target.closest("pre")?.focus?.();
+      }
+
+      window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => {
+        button.classList.remove("copied");
+        if (label) label.textContent = defaultLabel;
+        if (status) status.textContent = "";
+      }, 1800);
+    });
+  });
+
+  const installBrowser = document.querySelector("[data-install-browser]");
+  const installTabs = [...(installBrowser?.querySelectorAll("[data-install-tab]") || [])];
+  const installPanels = [...(installBrowser?.querySelectorAll("[data-install-panel]") || [])];
+
+  const activateInstallTab = (tab, { focus = false } = {}) => {
+    const client = tab?.dataset.installTab;
+    if (!client) return;
+
+    installTabs.forEach((candidate) => {
+      const active = candidate === tab;
+      candidate.classList.toggle("is-active", active);
+      candidate.setAttribute("aria-selected", String(active));
+      candidate.tabIndex = active ? 0 : -1;
+    });
+
+    installPanels.forEach((panel) => {
+      const active = panel.dataset.installPanel === client;
+      panel.hidden = !active;
+      panel.classList.toggle("is-active", active);
+    });
+
+    if (focus) tab.focus();
+  };
+
+  installTabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => activateInstallTab(tab));
+    tab.addEventListener("keydown", (event) => {
+      let nextIndex = null;
+
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        nextIndex = (index + 1) % installTabs.length;
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        nextIndex = (index - 1 + installTabs.length) % installTabs.length;
+      } else if (event.key === "Home") {
+        nextIndex = 0;
+      } else if (event.key === "End") {
+        nextIndex = installTabs.length - 1;
+      }
+
+      if (nextIndex === null) return;
+      event.preventDefault();
+      activateInstallTab(installTabs[nextIndex], { focus: true });
+    });
+  });
+
+  const codexPlatformDetails = [...document.querySelectorAll('details[name="codex-platform"]')];
+  codexPlatformDetails.forEach((details) => {
+    details.addEventListener("toggle", () => {
+      if (!details.open) return;
+      codexPlatformDetails.forEach((candidate) => {
+        if (candidate !== details) candidate.open = false;
+      });
+    });
+  });
+
+  const demoVideo = document.querySelector("[data-demo-video]");
+  const demoStatus = document.querySelector("[data-demo-status]");
+  const demoPlay = document.querySelector("[data-demo-play]");
+  const demoPlayLabel = document.querySelector("[data-demo-play-label]");
+  const demoSound = document.querySelector("[data-demo-sound]");
+  const demoSoundLabel = document.querySelector("[data-demo-sound-label]");
+  const demoFullscreen = document.querySelector("[data-demo-fullscreen]");
+  const demoFullscreenLabel = document.querySelector("[data-demo-fullscreen-label]");
+  const demoShell = demoVideo?.closest(".demo-video-shell");
+  const demoTouchQuery = window.matchMedia("(any-pointer: coarse)");
+  const demoControlsIdleDelay = 1600;
+  let demoInView = !("IntersectionObserver" in window);
+  let demoPausedByUser = false;
+  let demoControlsIdleTimer = 0;
+  let demoTouchInteractionDetected = false;
+  let demoVideoPointerRevealOnly = false;
+
+  const hasDemoTouchInput = () =>
+    demoTouchInteractionDetected || demoTouchQuery.matches || navigator.maxTouchPoints > 0;
+
+  if (demoVideo && demoPlay && demoShell) {
+    demoVideo.controls = false;
+    demoShell.classList.add("has-custom-controls");
+  }
+
+  const canUseDemoFullscreen = Boolean(
+    demoShell?.requestFullscreen || demoVideo?.webkitEnterFullscreen,
+  );
+  if (demoFullscreen) demoFullscreen.hidden = !canUseDemoFullscreen;
+
+  const resetDemoControlsIdleTimer = () => {
+    window.clearTimeout(demoControlsIdleTimer);
+    demoControlsIdleTimer = 0;
+    demoShell?.classList.remove("is-controls-idle");
+
+    if (!demoVideo || !demoShell || !hasDemoTouchInput() || demoVideo.paused) return;
+
+    demoControlsIdleTimer = window.setTimeout(() => {
+      if (!demoVideo.paused && hasDemoTouchInput()) {
+        demoShell.classList.add("is-controls-idle");
+      }
+    }, demoControlsIdleDelay);
+  };
+
+  const updateDemoStatus = () => {
+    if (!demoVideo || !demoStatus) return;
+    const state = demoVideo.ended ? "finished" : demoVideo.paused ? "paused" : "playing";
+    demoStatus.textContent = state === "finished" ? "Finished" : state === "paused" ? "Paused" : "Playing";
+    demoStatus.closest(".demo-status")?.setAttribute("data-demo-state", state);
+    demoShell?.classList.toggle("is-playing", state === "playing");
+    resetDemoControlsIdleTimer();
+    if (demoPlay) {
+      const action = demoVideo.paused ? "Play" : "Pause";
+      demoPlay.dataset.playing = String(!demoVideo.paused);
+      demoPlay.setAttribute("aria-label", `${action} demonstration`);
+      if (demoPlayLabel) demoPlayLabel.textContent = action;
+    }
+    if (demoSound) {
+      const action = demoVideo.muted ? "Turn sound on" : "Mute";
+      demoSound.dataset.muted = String(demoVideo.muted);
+      demoSound.setAttribute("aria-label", action);
+      if (demoSoundLabel) demoSoundLabel.textContent = action;
+    }
+  };
+
+  const toggleDemoPlayback = () => {
+    if (!demoVideo) return;
+    if (demoVideo.paused) {
+      demoPausedByUser = false;
+      demoVideo.play().catch(updateDemoStatus);
+    } else {
+      demoPausedByUser = true;
+      demoVideo.pause();
+    }
+  };
+
+  const toggleDemoSound = () => {
+    if (!demoVideo) return;
+    demoVideo.muted = !demoVideo.muted;
+    updateDemoStatus();
+  };
+
+  const updateDemoFullscreen = () => {
+    if (!demoFullscreen) return;
+    const active = document.fullscreenElement === demoShell;
+    const action = active ? "Exit fullscreen" : "Enter fullscreen";
+    demoFullscreen.dataset.fullscreen = String(active);
+    demoFullscreen.setAttribute("aria-label", action);
+    if (demoFullscreenLabel) demoFullscreenLabel.textContent = action;
+  };
+
+  const toggleDemoFullscreen = async () => {
+    if (!demoVideo || !demoShell || !demoFullscreen) return;
+
+    try {
+      if (document.fullscreenElement === demoShell) {
+        await document.exitFullscreen();
+      } else if (demoShell.requestFullscreen) {
+        await demoShell.requestFullscreen();
+      } else {
+        demoVideo.webkitEnterFullscreen?.();
+      }
+    } catch {
+      demoFullscreen.hidden = true;
+    }
+  };
+
+  const handleDemoVideoClick = () => {
+    if (demoVideoPointerRevealOnly) {
+      demoVideoPointerRevealOnly = false;
+      return;
+    }
+
+    if (hasDemoTouchInput() && demoShell?.classList.contains("is-controls-idle")) {
+      resetDemoControlsIdleTimer();
+      return;
+    }
+
+    toggleDemoPlayback();
+  };
+
+  const handleDemoPointerDown = (event) => {
+    if (event.pointerType === "touch" || event.pointerType === "pen") {
+      demoTouchInteractionDetected = true;
+    }
+    if (!hasDemoTouchInput() || !demoShell) return;
+    demoVideoPointerRevealOnly =
+      event.target === demoVideo && demoShell.classList.contains("is-controls-idle");
+    resetDemoControlsIdleTimer();
+  };
+
+  const applyDemoMotionPreference = () => {
+    if (!demoVideo) return;
+    if (reducedMotion.matches || !demoInView) {
+      demoVideo.pause();
+      updateDemoStatus();
+      return;
+    }
+
+    if (!demoPausedByUser) {
+      demoVideo.play().catch(updateDemoStatus);
+    } else {
+      updateDemoStatus();
+    }
+  };
+
+  if (demoVideo && "IntersectionObserver" in window) {
+    const demoVisibilityObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        demoInView = entry.isIntersecting && entry.intersectionRatio >= 0.35;
+        applyDemoMotionPreference();
+      });
+    }, {
+      threshold: [0, 0.35, 1],
+    });
+    demoVisibilityObserver.observe(demoVideo);
+  } else {
+    applyDemoMotionPreference();
+  }
+
+  demoVideo?.addEventListener("play", updateDemoStatus);
+  demoVideo?.addEventListener("pause", updateDemoStatus);
+  demoVideo?.addEventListener("ended", updateDemoStatus);
+  demoVideo?.addEventListener("click", handleDemoVideoClick);
+  demoShell?.addEventListener("pointerdown", handleDemoPointerDown);
+  demoShell?.addEventListener("pointercancel", () => {
+    demoVideoPointerRevealOnly = false;
+  });
+  demoShell?.addEventListener("focusin", resetDemoControlsIdleTimer);
+  demoPlay?.addEventListener("click", toggleDemoPlayback);
+  demoSound?.addEventListener("click", toggleDemoSound);
+  demoFullscreen?.addEventListener("click", toggleDemoFullscreen);
+  document.addEventListener("fullscreenchange", updateDemoFullscreen);
+  updateDemoFullscreen();
+  const handleMotionPreference = () => {
+    if (reducedMotion.matches) completeScrollMotion();
+    applyDemoMotionPreference();
+  };
+
+  if (typeof reducedMotion.addEventListener === "function") {
+    reducedMotion.addEventListener("change", handleMotionPreference);
+  } else {
+    reducedMotion.addListener?.(handleMotionPreference);
+  }
+
+  if (typeof demoTouchQuery.addEventListener === "function") {
+    demoTouchQuery.addEventListener("change", resetDemoControlsIdleTimer);
+  } else {
+    demoTouchQuery.addListener?.(resetDemoControlsIdleTimer);
+  }
+
+  const revealTargets = document.querySelectorAll([
+    ".section-heading",
+    ".safety-copy",
+    ".capability-grid article",
+    ".install-browser",
+    ".faq-layout > div:first-child",
+    ".faq-list details",
+    ".final-cta-layout > div",
+  ].join(","));
+
+  initializeOneShotMotion({
+    targets: revealTargets,
+    pendingClass: "reveal-pending",
+    visibleClass: "reveal-visible",
+    threshold: 0.12,
+    rootMargin: "0px 0px -7% 0px",
+  });
+
+  const spotlightCards = document.querySelectorAll("[data-spotlight-card]");
+  const precisePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+  spotlightCards.forEach((card) => {
+    const resetSpotlight = () => {
+      card.style.setProperty("--spotlight-opacity", "0");
+      card.style.setProperty("--tilt-x", "0deg");
+      card.style.setProperty("--tilt-y", "0deg");
+    };
+
+    card.addEventListener("pointermove", (event) => {
+      if (!precisePointer.matches || reducedMotion.matches) return;
+      const bounds = card.getBoundingClientRect();
+      const x = event.clientX - bounds.left;
+      const y = event.clientY - bounds.top;
+      const horizontal = x / bounds.width - 0.5;
+      const vertical = y / bounds.height - 0.5;
+
+      card.style.setProperty("--spotlight-x", `${x}px`);
+      card.style.setProperty("--spotlight-y", `${y}px`);
+      card.style.setProperty("--spotlight-opacity", "1");
+      card.style.setProperty("--tilt-x", `${horizontal * 1.5}deg`);
+      card.style.setProperty("--tilt-y", `${vertical * -1.2}deg`);
+    });
+    card.addEventListener("pointerleave", resetSpotlight);
+  });
+})();

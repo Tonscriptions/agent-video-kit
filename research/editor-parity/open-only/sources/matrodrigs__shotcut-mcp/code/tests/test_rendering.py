@@ -1,0 +1,579 @@
+from __future__ import annotations
+
+import hashlib
+import os
+import subprocess
+import sys
+import tempfile
+import time
+import unittest
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+
+from shotcut_mcp import render as render_module
+from shotcut_mcp import render_jobs as render_jobs_module
+from shotcut_mcp import render_worker as render_worker_module
+from shotcut_mcp.errors import ToolError
+from shotcut_mcp.platform import render_preview
+from shotcut_mcp.render import cancel_render, render_status, start_render
+from shotcut_mcp.storage import OutputTransaction
+
+
+class PreviewSafetyTests(unittest.TestCase):
+    @staticmethod
+    def _platform_patches(render: object) -> tuple[object, ...]:
+        return (
+            patch(
+                "shotcut_mcp.platform.discover_executables",
+                return_value=SimpleNamespace(melt=Path("melt")),
+            ),
+            patch("shotcut_mcp.platform.require_executable", return_value=Path("melt")),
+            patch("shotcut_mcp.platform.ensure_melt_ready"),
+            patch("shotcut_mcp.platform.run_capture", side_effect=render),
+        )
+
+    def test_existing_output_reports_safe_recovery_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output_path = Path(directory) / "existing.mp4"
+            output_path.write_bytes(b"keep")
+
+            with self.assertRaisesRegex(ToolError, "already exists") as caught:
+                OutputTransaction.prepare(output_path, overwrite=False)
+
+            self.assertEqual(caught.exception.code, "output_exists")
+            self.assertEqual(
+                caught.exception.recommended_action,
+                "choose_another_output_or_authorize_overwrite",
+            )
+            self.assertEqual(caught.exception.details["path"], str(output_path))
+
+    def test_preview_rejects_the_project_as_its_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project_path = Path(directory) / "project.mlt"
+            original = b"<mlt/>\n"
+            project_path.write_bytes(original)
+
+            def render(command: list[str], **_kwargs: object) -> SimpleNamespace:
+                target = next(
+                    value.removeprefix("avformat:")
+                    for value in command
+                    if value.startswith("avformat:")
+                )
+                Path(target).write_bytes(b"PNG")
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            first, second, third, fourth = self._platform_patches(render)
+            with first, second, third, fourth, self.assertRaises(ToolError):
+                render_preview(project_path, project_path, frame=0, overwrite=True)
+
+            self.assertEqual(project_path.read_bytes(), original)
+
+    def test_failed_preview_preserves_an_existing_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project_path = Path(directory) / "project.mlt"
+            output_path = Path(directory) / "preview.png"
+            project_path.write_text("<mlt/>\n", encoding="utf-8")
+            output_path.write_bytes(b"existing")
+
+            def fail_after_partial_output(
+                command: list[str], **_kwargs: object
+            ) -> SimpleNamespace:
+                target = next(
+                    value.removeprefix("avformat:")
+                    for value in command
+                    if value.startswith("avformat:")
+                )
+                Path(target).write_bytes(b"partial")
+                return SimpleNamespace(returncode=1, stdout="", stderr="failed")
+
+            first, second, third, fourth = self._platform_patches(
+                fail_after_partial_output
+            )
+            with first, second, third, fourth, self.assertRaises(ToolError):
+                render_preview(project_path, output_path, frame=0, overwrite=True)
+
+            self.assertEqual(output_path.read_bytes(), b"existing")
+            self.assertEqual(list(Path(directory).glob("*.tmp.png")), [])
+
+    def test_managed_preview_uses_one_bounded_server_owned_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project_path = Path(directory) / "project.mlt"
+            project_path.write_text("<mlt/>\n", encoding="utf-8")
+
+            def render(command: list[str], **_kwargs: object) -> SimpleNamespace:
+                target = next(
+                    value.removeprefix("avformat:")
+                    for value in command
+                    if value.startswith("avformat:")
+                )
+                Path(target).write_bytes(b"PNG")
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            first, second, third, fourth = self._platform_patches(render)
+            with first, second, third, fourth:
+                first_result = render_preview(
+                    project_path, None, frame=0, overwrite=False
+                )
+                second_result = render_preview(
+                    project_path, None, frame=30, overwrite=False
+                )
+
+            self.assertTrue(first_result["managed_output"])
+            self.assertEqual(first_result["path"], second_result["path"])
+            self.assertEqual(Path(first_result["path"]).read_bytes(), b"PNG")
+            previews = list(
+                (Path(directory) / ".shotcut-mcp" / "previews").rglob("*.png")
+            )
+            self.assertEqual(previews, [Path(first_result["path"])])
+
+
+class RenderPropertySafetyTests(unittest.TestCase):
+    def test_sidecar_consumer_properties_are_rejected_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project_path = Path(directory) / "project.mlt"
+            output_path = Path(directory) / "output.mp4"
+            escaped_path = Path(directory) / "escaped-%03d.ts"
+            project_path.write_text("<mlt/>\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(ToolError, "safe allowlist"):
+                start_render(
+                    {
+                        "project_path": str(project_path),
+                        "output_path": str(output_path),
+                        "consumer_properties": {
+                            "f": "hls",
+                            "hls_segment_filename": str(escaped_path),
+                        },
+                    }
+                )
+
+
+class RenderJobPersistenceTests(unittest.TestCase):
+    def test_cancel_render_retries_transient_metadata_read_contention(self) -> None:
+        class SharingViolation(PermissionError):
+            pass
+
+        with tempfile.TemporaryDirectory() as directory:
+            job_directory = Path(directory) / "jobs"
+            job_id = "c" * 32
+            metadata = {
+                "job_id": job_id,
+                "status": "cancelled",
+                "output_path": str(Path(directory) / "output.mp4"),
+                "log_path": str(Path(directory) / "render.log"),
+                "started_at": time.time(),
+                "finished_at": time.time(),
+            }
+
+            with (
+                patch.object(render_jobs_module, "JOB_DIR", job_directory),
+                patch.object(render_jobs_module, "_IS_WINDOWS", True),
+            ):
+                render_jobs_module.write_job(metadata)
+                path = render_jobs_module.metadata_path(job_id)
+                path_type = type(path)
+                real_read_text = path_type.read_text
+                attempts = 0
+
+                def read_after_contention(
+                    candidate: Path, *args: object, **kwargs: object
+                ) -> str:
+                    nonlocal attempts
+                    if candidate == path:
+                        attempts += 1
+                        if attempts < 3:
+                            raise SharingViolation(
+                                13, "simulated metadata read contention"
+                            )
+                    return real_read_text(candidate, *args, **kwargs)
+
+                with patch.object(path_type, "read_text", new=read_after_contention):
+                    result = cancel_render(job_id)
+
+            self.assertEqual(result["status"], "cancelled")
+            self.assertGreaterEqual(attempts, 3)
+
+    def test_job_state_retries_a_windows_sharing_violation(self) -> None:
+        class SharingViolation(PermissionError):
+            winerror = 32
+
+        with tempfile.TemporaryDirectory() as directory:
+            job_directory = Path(directory) / "jobs"
+            job_id = "a" * 32
+            metadata = {"job_id": job_id, "status": "queued"}
+            real_replace = os.replace
+            attempts = 0
+
+            def replace_after_contention(source: object, target: object) -> None:
+                nonlocal attempts
+                attempts += 1
+                if attempts < 3:
+                    raise SharingViolation(13, "simulated sharing violation")
+                real_replace(source, target)
+
+            with (
+                patch.object(render_jobs_module, "JOB_DIR", job_directory),
+                patch.object(
+                    render_jobs_module.os,
+                    "replace",
+                    side_effect=replace_after_contention,
+                ),
+            ):
+                render_jobs_module.write_job(metadata)
+                stored = render_jobs_module.read_job(job_id)
+
+            self.assertEqual(stored, metadata)
+            self.assertEqual(attempts, 3)
+            self.assertEqual(list(job_directory.glob(".*.tmp")), [])
+
+    def test_worker_main_records_an_unhandled_initialization_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            job_directory = Path(directory) / "jobs"
+            output = OutputTransaction.prepare(
+                Path(directory) / "output.mp4", overwrite=False
+            )
+            output.temporary.write_bytes(b"partial")
+            job_id = "b" * 32
+            metadata = {
+                "job_id": job_id,
+                "status": "running",
+                "output_transaction": output.serialize(),
+            }
+
+            with patch.object(render_jobs_module, "JOB_DIR", job_directory):
+                render_jobs_module.write_job(metadata)
+                render_jobs_module.release_gate(job_id)
+                with (
+                    patch.object(
+                        render_worker_module,
+                        "run_worker",
+                        side_effect=RuntimeError("simulated startup failure"),
+                    ),
+                    patch.object(sys, "argv", ["render_worker", job_id]),
+                ):
+                    return_code = render_worker_module.main()
+                stored = render_jobs_module.read_job(job_id)
+
+                self.assertFalse(render_jobs_module.gate_path(job_id).exists())
+
+            self.assertEqual(return_code, 1)
+            self.assertEqual(stored["status"], "failed")
+            self.assertIn("simulated startup failure", stored["status_note"])
+            self.assertFalse(output.temporary.exists())
+
+
+class RenderLifecycleTests(unittest.TestCase):
+    def test_render_from_external_working_directory_preserves_relative_paths(
+        self,
+    ) -> None:
+        root = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory(prefix="render client space ") as directory:
+            client_root = Path(directory).resolve()
+            # The parent finds the package through its launcher; the real worker must
+            # bootstrap its own imports without relying on cwd or PYTHONPATH.
+            program = f"""
+import os, sys
+from pathlib import Path
+sys.path.insert(0, {str(root)!r})
+from tests.test_rendering import RenderLifecycleTests
+from shotcut_mcp.render import RUNNING_JOBS, render_status
+source = Path('renderer.py').resolve()
+source.write_text("from pathlib import Path\\nimport sys\\ntarget = next(a[9:] for a in sys.argv if a.startswith('avformat:'))\\nPath(target).write_bytes(Path('relative-input.txt').read_bytes())\\n")
+Path('relative-input.txt').write_bytes(b'rendered from client cwd')
+output = Path('output.mp4').resolve()
+job = RenderLifecycleTests._start_with_python_renderer(source, output)
+RUNNING_JOBS[job['job_id']].wait(timeout=15)
+status = render_status(job['job_id'])
+assert status['status'] == 'completed', status
+assert status['delivery_complete'], status
+assert output.read_bytes() == b'rendered from client cwd'
+assert Path(status['editable_project_path']).read_bytes() == source.read_bytes()
+assert str(Path.cwd()) == {str(client_root)!r} and 'PYTHONPATH' not in os.environ
+"""
+            environment = os.environ.copy()
+            environment.pop("PYTHONPATH", None)
+            environment.update(TEMP=directory, TMP=directory, TMPDIR=directory)
+            result = subprocess.run(
+                [sys.executable, "-B", "-c", program],
+                cwd=client_root,
+                env=environment,
+                capture_output=True,
+                text=True,
+                timeout=25,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    @staticmethod
+    def _wait_for_status(
+        job_id: str, expected: str, timeout: float = 15
+    ) -> dict[str, object]:
+        deadline = time.monotonic() + timeout
+        latest = render_status(job_id)
+        while (
+            latest["status"] != expected
+            and latest["status"] not in render_jobs_module.TERMINAL_STATUSES
+            and time.monotonic() < deadline
+        ):
+            time.sleep(0.05)
+            latest = render_status(job_id)
+        return latest
+
+    @staticmethod
+    def _start_with_python_renderer(
+        renderer_path: Path, output_path: Path, **arguments: object
+    ) -> dict[str, object]:
+        source = renderer_path.read_bytes()
+        render_input = SimpleNamespace(
+            source=source,
+            revision=hashlib.sha256(source).hexdigest(),
+            fps=30.0,
+            duration_frames=100,
+            markers=[],
+        )
+        with (
+            patch(
+                "shotcut_mcp.render.load_project_render_input",
+                return_value=render_input,
+            ),
+            patch(
+                "shotcut_mcp.render.discover_executables",
+                return_value=SimpleNamespace(melt=Path(sys.executable)),
+            ),
+            patch(
+                "shotcut_mcp.render.require_executable",
+                return_value=Path(sys.executable),
+            ),
+            patch("shotcut_mcp.render.ensure_melt_ready"),
+        ):
+            return start_render(
+                {
+                    "project_path": str(renderer_path),
+                    "output_path": str(output_path),
+                    **arguments,
+                }
+            )
+
+    def _wait_for_file(self, path: Path) -> None:
+        deadline = time.monotonic() + 15
+        while not path.is_file() and time.monotonic() < deadline:
+            time.sleep(0.02)
+        self.assertTrue(path.is_file(), f"Renderer did not produce {path.name}")
+
+    def test_completed_render_is_promoted_without_status_polling(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            renderer_path = Path(directory) / "renderer.py"
+            output_path = Path(directory) / "output.mp4"
+            renderer_path.write_text(
+                "from pathlib import Path\n"
+                "import sys\n"
+                "target = next(a[9:] for a in sys.argv if a.startswith('avformat:'))\n"
+                "Path(target).write_bytes(b'rendered')\n"
+                "print('percentage: 100', flush=True)\n",
+                encoding="utf-8",
+            )
+
+            job = self._start_with_python_renderer(renderer_path, output_path)
+            try:
+                self._wait_for_file(output_path)
+                status = self._wait_for_status(str(job["job_id"]), "completed")
+                self.assertEqual(status["status"], "completed")
+                self.assertEqual(
+                    status["rendered_project_revision"], job["project_revision"]
+                )
+                self.assertTrue(status["delivery_complete"])
+                self.assertEqual(
+                    [item["kind"] for item in status["artifacts"]],
+                    ["rendered_media", "editable_project"],
+                )
+                editable = Path(str(status["editable_project_path"]))
+                self.assertEqual(editable.read_bytes(), renderer_path.read_bytes())
+
+                editable.write_bytes(b"user-modified-project")
+                changed = render_status(str(job["job_id"]))
+                self.assertFalse(changed["delivery_complete"])
+                self.assertEqual(changed["artifacts"], [])
+            finally:
+                cancel_render(str(job["job_id"]))
+
+    def test_render_remains_managed_after_session_state_is_lost(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            renderer_path = Path(directory) / "slow_renderer.py"
+            output_path = Path(directory) / "output.mp4"
+            renderer_path.write_text(
+                "from pathlib import Path\n"
+                "import sys, time\n"
+                "time.sleep(0.5)\n"
+                "target = next(a[9:] for a in sys.argv if a.startswith('avformat:'))\n"
+                "Path(target).write_bytes(b'rendered')\n",
+                encoding="utf-8",
+            )
+            job = self._start_with_python_renderer(renderer_path, output_path)
+            worker = render_module.RUNNING_JOBS.pop(str(job["job_id"]))
+            try:
+                active = render_status(str(job["job_id"]))
+                self.assertIn(active["status"], {"queued", "running", "completed"})
+
+                status = self._wait_for_status(str(job["job_id"]), "completed")
+                self.assertTrue(output_path.is_file())
+                self.assertEqual(status["status"], "completed")
+            finally:
+                if worker.poll() is None:
+                    worker.wait(timeout=15)
+
+    def test_render_can_be_cancelled_after_session_state_is_lost(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            renderer_path = Path(directory) / "slow_renderer.py"
+            output_path = Path(directory) / "output.mp4"
+            renderer_path.write_text(
+                "import time\ntime.sleep(20)\n",
+                encoding="utf-8",
+            )
+            job = self._start_with_python_renderer(renderer_path, output_path)
+            worker = render_module.RUNNING_JOBS.pop(str(job["job_id"]))
+
+            try:
+                requested = cancel_render(str(job["job_id"]))
+                if requested["status"] != "cancelled":
+                    self.assertTrue(requested.get("cancellation_requested"))
+                cancelled = self._wait_for_status(str(job["job_id"]), "cancelled")
+
+                self.assertEqual(cancelled["status"], "cancelled")
+                self.assertFalse(output_path.exists())
+                self.assertFalse(Path(str(job["editable_project_path"])).exists())
+            finally:
+                if worker.poll() is None:
+                    worker.terminate()
+                    worker.wait(timeout=5)
+
+    def test_failed_render_removes_its_generated_project_snapshot(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            renderer_path = Path(directory) / "failed_renderer.py"
+            output_path = Path(directory) / "output.mp4"
+            renderer_path.write_text("raise SystemExit(3)\n", encoding="utf-8")
+            job = self._start_with_python_renderer(renderer_path, output_path)
+            try:
+                status = self._wait_for_status(str(job["job_id"]), "failed")
+                self.assertEqual(status["status"], "failed")
+                self.assertFalse(Path(str(job["editable_project_path"])).exists())
+                self.assertFalse(status["delivery_complete"])
+                self.assertEqual(status["artifacts"], [])
+            finally:
+                cancel_render(str(job["job_id"]))
+
+    def test_failed_overwrite_preserves_existing_output_and_removes_partial_files(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            renderer = Path(directory) / "failed_renderer.py"
+            output = Path(directory) / "output.mp4"
+            output.write_bytes(b"existing export")
+            renderer.write_text(
+                "from pathlib import Path\nimport sys\n"
+                "target = next(a[9:] for a in sys.argv if a.startswith('avformat:'))\n"
+                "Path(target).write_bytes(b'partial export')\n"
+                "raise SystemExit(3)\n",
+                encoding="utf-8",
+            )
+            original = renderer.read_bytes()
+            job = self._start_with_python_renderer(renderer, output, overwrite=True)
+            try:
+                status = self._wait_for_status(job["job_id"], "failed")
+                self.assertEqual(status["status"], "failed")
+                self.assertEqual(status["return_code"], 3)
+                self.assertEqual(output.read_bytes(), b"existing export")
+                self.assertEqual(renderer.read_bytes(), original)
+                self.assertFalse(Path(job["temporary_output_path"]).exists())
+                self.assertFalse(Path(job["editable_project_path"]).exists())
+                self.assertEqual(status["artifacts"], [])
+            finally:
+                cancel_render(job["job_id"])
+
+    def test_cancelled_overwrite_preserves_existing_output_and_removes_partial_files(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            renderer = Path(directory) / "slow_renderer.py"
+            output = Path(directory) / "output.mp4"
+            output.write_bytes(b"existing export")
+            renderer.write_text(
+                "from pathlib import Path\nimport sys, time\n"
+                "target = next(a[9:] for a in sys.argv if a.startswith('avformat:'))\n"
+                "Path(target).write_bytes(b'partial export')\n"
+                "time.sleep(20)\n",
+                encoding="utf-8",
+            )
+            job = self._start_with_python_renderer(renderer, output, overwrite=True)
+            try:
+                self._wait_for_file(Path(job["temporary_output_path"]))
+                cancel_render(job["job_id"])
+                status = self._wait_for_status(job["job_id"], "cancelled")
+                self.assertEqual(status["status"], "cancelled")
+                self.assertEqual(output.read_bytes(), b"existing export")
+                self.assertFalse(Path(job["temporary_output_path"]).exists())
+                self.assertFalse(Path(job["editable_project_path"]).exists())
+                self.assertEqual(status["artifacts"], [])
+            finally:
+                cancel_render(job["job_id"])
+
+    def test_supervisor_start_failure_preserves_output_and_cleans_snapshot(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            renderer = Path(directory) / "renderer.py"
+            output = Path(directory) / "output.mp4"
+            renderer.write_text("raise SystemExit(0)\n", encoding="utf-8")
+            output.write_bytes(b"existing export")
+            with (
+                patch(
+                    "shotcut_mcp.render.start_render_supervisor",
+                    side_effect=OSError("startup failure sentinel"),
+                ),
+                self.assertRaises(ToolError) as caught,
+            ):
+                self._start_with_python_renderer(renderer, output, overwrite=True)
+            self.assertEqual(caught.exception.code, "render_start_failed")
+            self.assertEqual(output.read_bytes(), b"existing export")
+            status = render_status(caught.exception.details["job_id"])
+            self.assertEqual(status["status"], "failed")
+            self.assertIn("startup failure sentinel", status["status_note"])
+            self.assertFalse(Path(status["temporary_output_path"]).exists())
+            self.assertFalse(Path(status["editable_project_path"]).exists())
+
+    def test_promotion_conflict_keeps_snapshot_and_existing_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            renderer_path = Path(directory) / "slow_success.py"
+            output_path = Path(directory) / "output.mp4"
+            ready = Path(directory) / "renderer-ready"
+            proceed = Path(directory) / "allow-promotion"
+            renderer_path.write_text(
+                "from pathlib import Path\n"
+                "import sys, time\n"
+                f"Path({str(ready)!r}).touch()\n"
+                "deadline = time.monotonic() + 15\n"
+                f"while not Path({str(proceed)!r}).exists():\n"
+                "    if time.monotonic() > deadline: raise RuntimeError('promotion gate timed out')\n"
+                "    time.sleep(0.02)\n"
+                "target = next(a[9:] for a in sys.argv if a.startswith('avformat:'))\n"
+                "Path(target).write_bytes(b'rendered')\n",
+                encoding="utf-8",
+            )
+            job = self._start_with_python_renderer(renderer_path, output_path)
+            try:
+                self._wait_for_file(ready)
+                output_path.write_bytes(b"concurrent-output")
+                proceed.touch()
+                status = self._wait_for_status(str(job["job_id"]), "promotion_failed")
+                self.assertEqual(status["status"], "promotion_failed")
+                self.assertEqual(output_path.read_bytes(), b"concurrent-output")
+                self.assertTrue(Path(str(job["editable_project_path"])).is_file())
+                self.assertFalse(status["delivery_complete"])
+                self.assertEqual(status["artifacts"], [])
+            finally:
+                proceed.touch()
+                cancel_render(str(job["job_id"]))
+
+
+if __name__ == "__main__":
+    unittest.main()

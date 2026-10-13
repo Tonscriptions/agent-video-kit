@@ -1,0 +1,28 @@
+[package]
+name        = "verbreel-types"
+description = "Shared serde types — no logic, no IO. Used by every other crate."
+version.workspace      = true
+publish.workspace      = true
+edition.workspace      = true
+rust-version.workspace = true
+license.workspace      = true
+authors.workspace      = true
+
+[lib]
+name = "verbreel_types"
+
+[dependencies]
+serde.workspace      = true
+serde_json.workspace = true
+uuid.workspace       = true
+thiserror.workspace  = true
+
+[dev-dependencies]
+serde_json.workspace = true
+
+# wasm32-unknown-unknown: forward `wasm_js` to getrandom so uuid's RNG works in
+# the browser. See workspace Cargo.toml comment + spec/research/02 §7 for the
+# dual-target rationale. Without this block, uuid 1.23 with `rng-getrandom`
+# refuses to compile on wasm32.
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+getrandom = { workspace = true, features = ["wasm_js"] }

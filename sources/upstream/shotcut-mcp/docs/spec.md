@@ -1,0 +1,202 @@
+# Shotcut MCP specification
+
+## Goal
+
+Provide a local MCP server that can create, inspect, edit, validate,
+preview and render saved Shotcut projects without requiring a network service.
+
+## Required behavior
+
+- Preserve unknown MLT XML elements, attributes and properties when editing.
+- Apply many edits in one parse/write transaction.
+- Guard writes with a revision hash and an MCP lock file; recheck the on-disk revision after
+  validating the temporary project and before replacement.
+- Create a timestamped backup in an isolated per-project namespace before every replacement.
+- Require explicit overwrite authorization when creating a project or generated output at an
+  existing destination.
+- Render previews and exports to protected sibling files and promote them atomically only if the
+  original target has not changed.
+- Supervise renders outside the MCP stdio process so completion and cancellation survive restart.
+- Never infer export authorization from editing, validation, preview, or visual-review intent. Treat
+  an explicit export request in the active task as approval; otherwise present project, output,
+  preset, range/duration, and overwrite behavior and wait for approval without asking twice.
+- After inspection and committed edits, guide callers to surface concise result summaries and a
+  managed contact sheet or exact preview when the changes are visual.
+- Return opaque `item_ref` values for clip and transition occurrences, scope them to the inspected
+  project revision, and resolve them against item identity throughout one sequential edit batch.
+  Preserve legacy track/index selectors and support bounded transaction-local aliases for newly
+  created or split items without writing private identity metadata into MLT XML.
+- Preserve surviving clip identities when adding or removing a recognized transition; subsequent
+  operations in the batch must continue to resolve those clips by reference or alias.
+- Support the edit operations exposed by `shotcut_capabilities`; the
+  [feature reference](reference.md#features) summarizes their scope.
+- Expose MLT service discovery so callers can use filters, transitions and links installed with
+  the user's Shotcut build instead of relying on a hard-coded catalog.
+- Return stable, structured JSON from every tool and use English for public tool descriptions,
+  server instructions and error messages.
+- Guide the model to make ordinary creative choices within the user's brief, use examples as
+  starting points, and discover installed services for unfamiliar effects. Cover new-project
+  creation as well as existing-project editing. Ask for missing inputs or choices that materially
+  change intent; reuse existing authorization for the same action.
+- Return tool execution failures with `isError`, a stable machine-readable error code,
+  recoverability, recommended action/tool, and bounded structured details while preserving the
+  legacy human-readable error fields. Publish the error alternative in every current output schema;
+  keep malformed requests and invalid arguments as JSON-RPC errors with equivalent recovery data.
+- Use distinct recovery families when the caller's next safe action changes, including project
+  restoration, render-history restart, media probing, search-root correction, compatibility
+  diagnosis, visual fallback, and reporting corrupt durable render state. Preserve successful
+  missing-media diagnosis data when only its optional visualization fails.
+- Route common user intents through concise server instructions, including visual review,
+  optimistic-conflict recovery, missing media, color diagnosis, export monitoring and backups.
+- Keep the first 512 characters of server instructions self-contained with saved-state and normal
+  edit safety. Keep the Codex interface to at most three one-line starter prompts of at most 128
+  characters; operational policy belongs in server instructions and tool contracts.
+- When the user mentions recent GUI edits or an open Shotcut session, explain that the MCP sees
+  only the project saved on disk, ask them to save first, and avoid concurrent saves.
+- When dimensions or frame rate were not requested for a new project, guide callers to probe
+  representative source media before choosing the profile instead of treating defaults as intent.
+- Validate tool arguments against the published input contracts, including every operation's
+  focused `shotcut_capabilities` schema, revision-or-explicit-force guards for edits and restores,
+  and mutually exclusive full/range/marker render modes.
+- Publish required stable result fields and typed nested collections for every tool output,
+  including the complete project-inspection shape, for structured-content protocol revisions;
+  omit output schemas for legacy clients that predate structured tool results. On current
+  revisions, keep the text content concise instead of duplicating the complete structured payload.
+- Return the full catalog, presets, compatibility, and workflow from an unfiltered
+  `shotcut_capabilities` call; when `operation` is supplied, return only that operation's complete
+  schema, example, and transaction guarantees. Enforce that same operation schema before planning
+  or applying a batch.
+- Propagate MCP cancellation notifications to subprocess-backed operations.
+- Schedule legacy batch tool calls through the same bounded, cancellable execution path as
+  individual calls, then aggregate their responses. Ignore malformed cancellation notifications
+  without replying or terminating the session. Boolean identifiers must not alias integer request IDs.
+- Apply the configured message budget to both incoming and outgoing newline-delimited JSON-RPC.
+  Reject an oversized serialized project candidate before backup or replacement, using the same
+  limit enforced while loading a project. Default to 128 MiB and allow administrators to configure
+  a value clamped between 1 MiB and 512 MiB.
+- Provide a read-only plan/diff operation before transactional edits. Materialize only the
+  requested diff lines while retaining the exact total line count and unified-diff format.
+- Render bounded preview batches and atomically promoted contact sheets at exact frames,
+  preserving requested order and duplicate frames through a single Melt process. Keep output
+  conflict checks, cancellation, and private intermediate-file cleanup in both workflows.
+- Request RGBA processing and PNG pixel format explicitly for preview frames. Codec defaults
+  must not change preview colors across platforms, including clips with timeremap links.
+- Allow single previews and contact sheets to use bounded server-owned output when the caller does
+  not need a persistent destination, and embed small review images within the MCP message budget.
+- Normalize source/project color metadata and own SDR/HLG/PQ project annotations as one semantic edit.
+- Smoke-test hardware encoders instead of trusting FFmpeg's advertised encoder list.
+- Persist bounded progress samples, elapsed time, ETA inputs, terminal metrics, and paginated history.
+- Bootstrap durable renders from the bundled package regardless of the client's working directory,
+  without changing relative-path resolution; retain bounded import-failure diagnostics in render status.
+- Guide callers to poll durable render status to a terminal state and surface only meaningful
+  status, progress, or ETA changes instead of unchanged polls or raw log spam.
+- Diagnose missing media with bounded Shotcut-hash/basename search and require an explicit relink edit.
+- Analyze media quality with independently bounded FFmpeg silence, black, freeze, interlace,
+  and EBU R128 loudness checks, returning partial structured results when a filter or stream is
+  unavailable.
+- Validate project readiness through one public operation that combines local-resource and
+  required-service checks with first-frame MLT processing. Report `valid` for successful
+  first-frame Melt processing and `ready` only when those dependency checks also pass; do not
+  direct callers to repeat it after every already-validated edit.
+- Render exactly one of the complete project, one explicit inclusive frame range, or one non-empty
+  Shotcut range marker while preserving the durable render-job lifecycle. Accept at most 50
+  scalar advanced consumer properties and keep the default safe single-file allowlist.
+- Capture exact project bytes and SHA-256 revision for every render mode, accept an optional
+  `expected_revision`, and make the worker consume only a uniquely named sibling snapshot so
+  relative resources retain their original base and live-project edits cannot change the job.
+- Retain the verified successful snapshot as the exact editable project artifact. Return it with
+  the rendered media in structured `artifacts`; add `resource_link` content only for MCP
+  `2025-06-18` and `2025-11-25`, while legacy revisions receive both paths in text content.
+- Export point markers in Shotcut's chapter text format, with opt-in range markers and marker-color
+  filtering, through the same atomic output protection used by other generated files.
+  External markers without identifiers remain exportable; at equal frames they sort before
+  named markers, and their returned `marker_id` remains null.
+- Emit strictly increasing request-scoped MCP progress notifications only when the caller provides
+  a token. Keep durable post-return render progress in `render_status`.
+
+## Compatibility boundary
+
+- Create new projects with the Shotcut 26.8.1 / MLT 7.41.0 serialization baseline
+  (7.41.x family), preserving existing project metadata during edits.
+- Generate the Windows integration matrix from `TESTED_RUNTIME_STACKS`, independently
+  of serialization. Require pinned archives and verify detected versions. New pairs and
+  baseline changes must pass the full matrix; see [current coverage](installation.md#requirements).
+- `shotcut_doctor.status` is `tested` for a tested pair with passing runtime checks,
+  `untested` for another pair with passing checks, or `failed` for executable version-query,
+  MLT repository, or RNNoise failures. Optional FFmpeg analyzers do not affect the verdict.
+- Keep `compatible` boolean and true only for `tested`; use `runtime_ready` for operational
+  checks and `issues` for recovery guidance. Unknown versions receive a warning without
+  blocking operations or relaxing project validation and safety checks.
+- Preserve the legacy `validated_stack` and capability `shotcut`/`mlt` fields as the project
+  baseline. Expose exact `serialization` and `tested_stacks` separately in doctor and
+  capabilities, with schemas and guidance explaining their distinct meanings.
+- Warm and retry cold MLT repository initialization with progressively longer 5, 10, and 20 second
+  attempts before status, validation, preview and rendering. Keep every installed service
+  available and cache readiness by executable and MLT environment identity.
+- Check RNNoise link/filter availability separately from the repository preflight. Prefer the
+  latency-safe MLT 7.40 `link` service when callers construct RNNoise processing.
+- Reuse successful executable-version and service-description queries for up to 60 seconds,
+  invalidating them when executable identity or the MLT environment changes. Bound both caches
+  to 64 entries and retry failed or unavailable queries without caching them.
+- Preserve unsupported structures, but reject an edit when a target is ambiguous or when
+  modifying it would require guessing about an unknown transition layout.
+- Preserve Shotcut's exclusive marker end convention and translate it to MLT's inclusive render
+  `out` value. Use MLT's still-image producer for durationless image streams so trims, splits and
+  source replacement preserve their timeline ranges. Reject source replacement next to transitions
+  rather than guessing at tractor rewiring.
+- Generic filters accept native MLT properties; the MCP does not promise that every third-party
+  filter is available or renderable on every machine. Structured clip opacity owns and reuses one
+  brightness filter, keeps its RGB level neutral, and animates only alpha.
+- `animate_clip` compiles normalized creative keyframes to MCP-owned MLT filters: affine
+  rectangle/rotation for transform, neutral-brightness alpha for opacity, and volume level in dB.
+  Reapplying it reuses only those owned filters and leaves user-created filters untouched.
+- Deny network resources and sidecar/path-bearing consumer properties by default. Administrators
+  may opt in through environment policy and may constrain every tool path to canonical roots.
+- Apply those policies to every recognized MLT path representation, including timewarp, proxy,
+  luma, source, filename, and filter resources.
+- Decode `file:` URIs before classifying resources so remote authorities and encoded UNC paths
+  obey the same network policy as direct UNC paths. Local file URIs remain local resources.
+- Preserve the initial expectation that a new project's destination is absent until the write
+  transaction checks it under lock. A file created during probing is not overwrite authorization.
+- Bound both render-log files and incomplete progress lines in memory. Discard an oversized line
+  through its delimiter, then resume parsing later progress messages.
+- Store source bounds separately from the mapped timeline range when creating a speed map.
+  Replacement retains the selected source interval, including after entry trims or splits, and
+  preserves a partial final source frame across repeated replacements. Duration follows MLT's
+  per-frame speed integration. Reject replacement of legacy or externally modified maps when
+  their original source interval cannot be established safely; existing projects remain readable.
+- Anchor timeremap at the link's in point while the containing chain starts at zero, so playlist
+  cuts do not apply the source offset twice. Preserve requested speed precision when serializing
+  keyframes. Reverse duration excludes positions below the selected source interval. Reject maps
+  whose negative integration lands on source frame zero: tested MLT builds can round below zero
+  and return an invalid frame. Constant timewarp reversal remains the alternative for constant speed.
+- Keep HDR display preview, mixed HLG/PQ conversion, zero-crossing speed maps, and ambiguous
+  third-party chain edits out of the verified interface. Reverse speed maps must remain entirely
+  negative and start from the selected source range's final frame.
+
+## Verification
+
+- Run strict mypy with explicit `Any` forbidden in runtime modules and development scripts.
+  Represent unknown input as `object` and narrow it through checked types before accessing
+  fields; keep JSON Schema validation authoritative for MCP requests. Use standard-library
+  `TypedDict` contracts for stable snapshots, media analyses, render metadata and tool schemas,
+  including nullable and optional fields. Do not replace validation with unchecked casts.
+  Mark guaranteed fields as required, while retaining optional fields for negotiated protocol
+  versions and legacy render metadata. Give computed status and diagnostic results explicit
+  contracts without dropping unknown persisted metadata extensions from render responses.
+- Validate known persistent render fields and FFprobe result shapes before using them;
+  preserve unknown render metadata extensions and keep path/revision/output checks in place.
+- MCP negotiation, schema-validation, batching and cancellation tests.
+- Protocol-version tests for token-scoped, monotonic progress notifications.
+- Unit tests through public project, preview and render APIs.
+- Regression tests for preservation, optimistic concurrency, backup ownership, atomic output,
+  shared producers, advanced timeline edits, speed/color annotations, assisted relinking,
+  bounded process/log output, render history/ETA, orphan cleanup and security policies.
+- Real ffmpeg/ffprobe/melt integration covering multitrack creation, stable item references,
+  semantic transform/audio animation, locked-track ripple editing,
+  forward/reverse timeremap validation, still-image trims and replacement, opacity composition,
+  preview, media-quality analysis, range rendering, and final render.
+- Manifest/version/tool-catalog validation and ordinary tests in Windows, macOS, and Linux CI.
+  Ruff, Mypy, and Vulture run on Ubuntu. Real Shotcut/MLT integration is opt-in locally and required
+  on Windows by the CI gate. The workflow files define the current Python and Shotcut matrix. Release tags
+  must point to a `main` commit whose exact SHA completed that CI successfully.

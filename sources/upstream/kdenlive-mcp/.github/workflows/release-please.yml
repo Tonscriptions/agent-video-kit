@@ -1,0 +1,61 @@
+name: Release Please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for release marker
+        id: release_marker
+        uses: actions/github-script@v9
+        with:
+          result-encoding: string
+          script: |
+            const marker = '[release]';
+            const commitMessage = context.payload.head_commit?.message ?? '';
+
+            const {data: pullRequests} = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+            });
+
+            const markedPullRequest = pullRequests.some((pullRequest) =>
+              pullRequest.merged_at &&
+              (pullRequest.title.includes(marker) || (pullRequest.body ?? '').includes(marker)),
+            );
+
+            const mergedReleasePleasePullRequest = pullRequests.some((pullRequest) =>
+              pullRequest.merged_at &&
+              pullRequest.head.ref.startsWith('release-please--'),
+            );
+
+            // Split the two Release Please phases. A normal release-marked commit
+            // may only create/update a release PR; otherwise a stale merged PR can
+            // make Release Please try to recreate an existing GitHub release.
+            if (mergedReleasePleasePullRequest) return 'release';
+            if (commitMessage.includes(marker) || markedPullRequest) return 'pr';
+            return 'skip';
+
+      - name: Create or update Release Please PR
+        if: steps.release_marker.outputs.result == 'pr'
+        uses: googleapis/release-please-action@v5
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          skip-github-release: true
+
+      - name: Publish merged Release Please PR
+        if: steps.release_marker.outputs.result == 'release'
+        uses: googleapis/release-please-action@v5
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          skip-github-pull-request: true

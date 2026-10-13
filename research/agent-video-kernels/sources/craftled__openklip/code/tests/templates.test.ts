@@ -1,0 +1,188 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { applyProjectEdits } from "../src/projectMutations.ts";
+import {
+  assertValidTemplateId,
+  defaultTemplateId,
+  listTemplates,
+  loadTemplateSkill,
+  parseSkillMeta,
+  templateSkillPath,
+} from "../src/templates.ts";
+import { makeProject } from "./helpers/projectFixture.ts";
+
+test("listTemplates finds talking-head", () => {
+  const list = listTemplates();
+  assert.ok(list.some((t) => t.id === "talking-head"));
+  const th = list.find((t) => t.id === "talking-head");
+  assert.equal(th?.label, "Talking head");
+});
+
+test("loadTemplateSkill reads skill.md", () => {
+  const skill = loadTemplateSkill("talking-head");
+  assert.match(skill, /Cut filler/i);
+  assert.equal(templateSkillPath("talking-head").endsWith("skill.md"), true);
+});
+
+test("listTemplates finds the make-draft, make-short, make-highlights, and revise-draft playbooks", () => {
+  const list = listTemplates();
+  const makeDraft = list.find((t) => t.id === "make-draft");
+  const makeShort = list.find((t) => t.id === "make-short");
+  const makeHighlights = list.find((t) => t.id === "make-highlights");
+  const reviseDraft = list.find((t) => t.id === "revise-draft");
+  assert.ok(makeDraft, "make-draft should be auto-listed from templates/");
+  assert.equal(makeDraft?.label, "Make a draft");
+  assert.ok(makeShort, "make-short should be auto-listed from templates/");
+  assert.equal(makeShort?.label, "Make a short");
+  assert.ok(
+    makeHighlights,
+    "make-highlights should be auto-listed from templates/"
+  );
+  assert.ok(reviseDraft, "revise-draft should be auto-listed from templates/");
+  assert.equal(reviseDraft?.label, "Revise a draft");
+  const motionGraphics = list.find((t) => t.id === "motion-graphics");
+  assert.ok(
+    motionGraphics,
+    "motion-graphics should be auto-listed from templates/"
+  );
+  assert.equal(motionGraphics?.label, "Motion graphics");
+  const motionShorts = list.find((t) => t.id === "motion-shorts");
+  assert.ok(
+    motionShorts,
+    "motion-shorts should be auto-listed from templates/"
+  );
+  const motionCanvas = list.find((t) => t.id === "motion-canvas");
+  assert.ok(
+    motionCanvas,
+    "motion-canvas should be auto-listed from templates/"
+  );
+  assert.equal(motionCanvas?.label, "Motion canvas");
+  const viralLaunch = list.find((t) => t.id === "viral-launch");
+  assert.ok(viralLaunch, "viral-launch should be auto-listed from templates/");
+  assert.equal(viralLaunch?.label, "Viral launch");
+});
+
+test("loadTemplateSkill reads the make-draft, make-short, make-highlights, and revise-draft playbooks", () => {
+  const makeDraft = loadTemplateSkill("make-draft");
+  assert.match(makeDraft, /task_complete/);
+  assert.match(makeDraft, /graphic-add-phrase/);
+
+  const makeShort = loadTemplateSkill("make-short");
+  assert.match(makeShort, /task_complete/);
+  assert.match(makeShort, /export-set/);
+  assert.match(makeShort, /vision-focus/);
+  assert.match(makeShort, /platform: "shorts"/);
+
+  const makeHighlights = loadTemplateSkill("make-highlights");
+  assert.match(makeHighlights, /highlights-detect/);
+  assert.match(makeHighlights, /highlights_list/);
+
+  const reviseDraft = loadTemplateSkill("revise-draft");
+  assert.match(reviseDraft, /task_complete/);
+  assert.match(reviseDraft, /revert/);
+  assert.match(reviseDraft, /project_overlays/);
+
+  const viralLaunch = loadTemplateSkill("viral-launch");
+  assert.match(viralLaunch, /Earned-attention/);
+  assert.match(viralLaunch, /--platform x/);
+  assert.match(reviseDraft, /graphic-set/);
+});
+
+test("loadTemplateSkill reads motion-graphics playbook", () => {
+  const skill = loadTemplateSkill("motion-graphics");
+  assert.match(skill, /graphic-add-phrase/);
+  assert.match(skill, /inDurFrames/);
+});
+
+test("loadTemplateSkill reads motion-shorts playbook", () => {
+  const skill = loadTemplateSkill("motion-shorts");
+  assert.match(skill, /music_bpm/);
+  assert.match(skill, /--beats/);
+});
+
+test("loadTemplateSkill reads motion-canvas playbook", () => {
+  const skill = loadTemplateSkill("motion-canvas");
+  assert.match(skill, /ingest --blank/);
+  assert.match(skill, /graphic-add-cuts/);
+});
+
+test("revise-draft skill mentions Convert to short path", () => {
+  const reviseDraft = loadTemplateSkill("revise-draft");
+  assert.match(reviseDraft, /Convert to short/);
+  assert.match(reviseDraft, /export-set/);
+  assert.match(reviseDraft, /shorts/);
+});
+
+test("assertValidTemplateId rejects traversal", () => {
+  assert.throws(() => assertValidTemplateId("../x"), /invalid template id/i);
+  assert.equal(assertValidTemplateId("talking-head"), "talking-head");
+});
+
+test("applyProjectEdits sets template on project", () => {
+  const project = makeProject();
+  applyProjectEdits(project, { template: "talking-head" });
+  assert.equal(project.template, "talking-head");
+});
+
+test("defaultTemplateId prefers talking-head", () => {
+  assert.equal(defaultTemplateId(), "talking-head");
+});
+
+test("parseSkillMeta with no frontmatter behaves as before", () => {
+  const raw = "# My Heading\n\nSome first body line.\n\nMore text.";
+  const meta = parseSkillMeta(raw, "fallback-id");
+  assert.equal(meta.label, "My Heading");
+  assert.equal(meta.description, "Some first body line.");
+});
+
+test("parseSkillMeta with frontmatter description only uses heading for label", () => {
+  const raw =
+    "---\ndescription: A frontmatter description.\n---\n# My Heading\n\nBody line.";
+  const meta = parseSkillMeta(raw, "fallback-id");
+  assert.equal(meta.label, "My Heading");
+  assert.equal(meta.description, "A frontmatter description.");
+});
+
+test("parseSkillMeta with frontmatter description and label uses both from frontmatter", () => {
+  const raw =
+    "---\ndescription: A frontmatter description.\nlabel: Frontmatter Label\n---\n# My Heading\n\nBody line.";
+  const meta = parseSkillMeta(raw, "fallback-id");
+  assert.equal(meta.label, "Frontmatter Label");
+  assert.equal(meta.description, "A frontmatter description.");
+});
+
+test("parseSkillMeta with frontmatter description and name uses name as label alias", () => {
+  const raw =
+    "---\ndescription: A frontmatter description.\nname: Frontmatter Name\n---\n# My Heading\n\nBody line.";
+  const meta = parseSkillMeta(raw, "fallback-id");
+  assert.equal(meta.label, "Frontmatter Name");
+  assert.equal(meta.description, "A frontmatter description.");
+});
+
+test("parseSkillMeta with frontmatter but no description key falls back to first body line", () => {
+  const raw =
+    "---\nlabel: Frontmatter Label\n---\n# My Heading\n\nFirst body line here.";
+  const meta = parseSkillMeta(raw, "fallback-id");
+  assert.equal(meta.label, "Frontmatter Label");
+  assert.equal(meta.description, "First body line here.");
+});
+
+test("parseSkillMeta strips matching single and double quotes from frontmatter values", () => {
+  const rawSingle =
+    "---\ndescription: 'Single quoted description.'\n---\n# Heading\n";
+  const metaSingle = parseSkillMeta(rawSingle, "fallback-id");
+  assert.equal(metaSingle.description, "Single quoted description.");
+
+  const rawDouble =
+    '---\ndescription: "Double quoted description."\n---\n# Heading\n';
+  const metaDouble = parseSkillMeta(rawDouble, "fallback-id");
+  assert.equal(metaDouble.description, "Double quoted description.");
+});
+
+test("parseSkillMeta with malformed frontmatter (no closing ---) treats whole content as body", () => {
+  const raw =
+    "---\ndescription: never closed\n# My Heading\n\nFirst real body line.";
+  const meta = parseSkillMeta(raw, "fallback-id");
+  assert.equal(meta.label, "My Heading");
+  assert.equal(meta.description, "---");
+});

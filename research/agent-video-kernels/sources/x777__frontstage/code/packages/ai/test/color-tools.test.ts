@@ -1,0 +1,484 @@
+import { describe, expect, test, vi } from "vitest";
+import {
+  EditorStore,
+  defaultTimeline,
+  defaultTransform,
+  defaultCrop,
+  findClip,
+  type Track,
+  type Timeline,
+  type MediaManifest,
+} from "@frontstage/core";
+import { applyColorTool, applyEffectTool, inspectColorTool, type ToolContext } from "../src/index.js";
+
+function makeClip(id: string, startFrame = 0) {
+  return {
+    id,
+    mediaRef: "media-1",
+    mediaType: "video" as const,
+    sourceClipType: "video" as const,
+    startFrame,
+    durationFrames: 60,
+    trimStartFrame: 0,
+    trimEndFrame: 0,
+    speed: 1,
+    volume: 1,
+    fadeInFrames: 0,
+    fadeOutFrames: 0,
+    fadeInInterpolation: "linear" as const,
+    fadeOutInterpolation: "linear" as const,
+    opacity: 1,
+    transform: defaultTransform(),
+    crop: defaultCrop(),
+  };
+}
+
+function makeTrack(id = "t1"): Track {
+  return { id, type: "video", muted: false, hidden: false, syncLocked: false, clips: [makeClip("c1")] };
+}
+
+function makeTimeline(): Timeline {
+  return { ...defaultTimeline(), tracks: [makeTrack()] };
+}
+
+function makeManifest(): MediaManifest {
+  return {
+    version: 2,
+    entries: [{ id: "media-1", name: "clip.mp4", type: "video", source: { kind: "external", absolutePath: "/tmp/clip.mp4" }, duration: 2 }],
+    folders: [],
+  };
+}
+
+let _n = 0;
+function makeCtx(store: EditorStore): ToolContext {
+  return { store, getManifest: makeManifest, newId: () => `gen-${++_n}` };
+}
+
+// ── apply_color ───────────────────────────────────────────────────────────────
+
+describe("apply_color", () => {
+  test("sets color.exposure on clip", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx = makeCtx(store);
+    const result = await applyColorTool().run({ clipIds: ["c1"], exposure: 0.3 }, ctx);
+    expect(result.isError).toBe(false);
+    const tl = store.getSnapshot().timeline;
+    const loc = findClip(tl, "c1")!;
+    const clip = tl.tracks[loc.trackIndex]!.clips[loc.clipIndex]!;
+    const expEffect = clip.effects?.find((e) => e.type === "color.exposure");
+    expect(expEffect).toBeDefined();
+    expect(expEffect?.params["ev"]?.value).toBeCloseTo(0.3);
+  });
+
+  test("is exactly ONE undo step and undo restores no effects", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx = makeCtx(store);
+    await applyColorTool().run({ clipIds: ["c1"], exposure: 0.5 }, ctx);
+    expect(store.canUndo()).toBe(true);
+    store.undo();
+    const tl = store.getSnapshot().timeline;
+    const loc = findClip(tl, "c1")!;
+    const clip = tl.tracks[loc.trackIndex]!.clips[loc.clipIndex]!;
+    expect(clip.effects).toBeUndefined();
+    expect(store.canUndo()).toBe(false);
+  });
+
+  test("unknown clipId returns isError:true, store unchanged", async () => {
+    const store = new EditorStore(makeTimeline());
+    const before = store.getSnapshot().timeline;
+    const ctx = makeCtx(store);
+    const result = await applyColorTool().run({ clipIds: ["bad"], exposure: 1 }, ctx);
+    expect(result.isError).toBe(true);
+    expect(store.getSnapshot().timeline).toBe(before);
+    expect(store.canUndo()).toBe(false);
+  });
+
+  test("neutral exposure (0) produces no effects", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx = makeCtx(store);
+    const result = await applyColorTool().run({ clipIds: ["c1"], reset: true }, ctx);
+    expect(result.isError).toBe(false);
+    // Reset with all neutral values → buildColorStack returns [] → effects = undefined
+    const tl = store.getSnapshot().timeline;
+    const loc = findClip(tl, "c1")!;
+    const clip = tl.tracks[loc.trackIndex]!.clips[loc.clipIndex]!;
+    // neutral stack = empty → stored as undefined
+    expect(clip.effects).toBeUndefined();
+  });
+
+  test("multi-clip: ONE call is ONE undo step that restores ALL clips", async () => {
+    const twoClipTimeline: Timeline = {
+      ...defaultTimeline(),
+      tracks: [
+        {
+          id: "t1",
+          type: "video",
+          muted: false,
+          hidden: false,
+          syncLocked: false,
+          clips: [makeClip("c1", 0), makeClip("c2", 60)],
+        },
+      ],
+    };
+    const store = new EditorStore(twoClipTimeline);
+    const ctx = makeCtx(store);
+    const result = await applyColorTool().run({ clipIds: ["c1", "c2"], exposure: 0.3 }, ctx);
+    expect(result.isError).toBe(false);
+
+    const tlAfter = store.getSnapshot().timeline;
+    const loc1 = findClip(tlAfter, "c1")!;
+    const loc2 = findClip(tlAfter, "c2")!;
+    const clip1After = tlAfter.tracks[loc1.trackIndex]!.clips[loc1.clipIndex]!;
+    const clip2After = tlAfter.tracks[loc2.trackIndex]!.clips[loc2.clipIndex]!;
+    expect(clip1After.effects?.find((e) => e.type === "color.exposure")).toBeDefined();
+    expect(clip2After.effects?.find((e) => e.type === "color.exposure")).toBeDefined();
+
+    store.undo();
+    expect(store.canUndo()).toBe(false);
+    const tlUndo = store.getSnapshot().timeline;
+    const loc1u = findClip(tlUndo, "c1")!;
+    const loc2u = findClip(tlUndo, "c2")!;
+    const clip1Undo = tlUndo.tracks[loc1u.trackIndex]!.clips[loc1u.clipIndex]!;
+    const clip2Undo = tlUndo.tracks[loc2u.trackIndex]!.clips[loc2u.clipIndex]!;
+    expect(clip1Undo.effects).toBeUndefined();
+    expect(clip2Undo.effects).toBeUndefined();
+  });
+
+  // ── lut.path persistence (M14C T2) ──────────────────────────────────────────
+
+  const CUBE_TEXT = `LUT_3D_SIZE 2
+0.0 0.0 0.0
+1.0 0.0 0.0
+0.0 1.0 0.0
+1.0 1.0 0.0
+0.0 0.0 1.0
+1.0 0.0 1.0
+0.0 1.0 1.0
+1.0 1.0 1.0
+`;
+
+  function makeLutCtx(store: EditorStore, opts: { readLocalFile?: (p: string) => Promise<Uint8Array>; store_?: (n: string, b: Uint8Array) => Promise<string> } = {}) {
+    const ctx = makeCtx(store);
+    return {
+      ...ctx,
+      lut: {
+        store: opts.store_ ?? (async (filename: string) => `luts/${filename}`),
+        readLocalFile: opts.readLocalFile ?? (async () => new TextEncoder().encode(CUBE_TEXT)),
+      },
+    };
+  }
+
+  test("lut.path: reads the local file, stores it into the project, and references the STORED path", async () => {
+    const store = new EditorStore(makeTimeline());
+    const storeLut = vi.fn(async (filename: string) => `luts/${filename}`);
+    const readLocalFile = vi.fn(async (p: string) => { expect(p).toBe("/Users/x/Rec709.cube"); return new TextEncoder().encode(CUBE_TEXT); });
+    const ctx = makeLutCtx(store, { readLocalFile, store_: storeLut });
+
+    const result = await applyColorTool().run({ clipIds: ["c1"], lut: { path: "/Users/x/Rec709.cube", strength: 0.8 } }, ctx);
+    expect(result.isError).toBe(false);
+    expect(readLocalFile).toHaveBeenCalledWith("/Users/x/Rec709.cube");
+    expect(storeLut).toHaveBeenCalledWith("Rec709.cube", expect.any(Uint8Array));
+
+    const tl = store.getSnapshot().timeline;
+    const loc = findClip(tl, "c1")!;
+    const clip = tl.tracks[loc.trackIndex]!.clips[loc.clipIndex]!;
+    const lutEffect = clip.effects?.find((e) => e.type === "color.lut");
+    expect(lutEffect?.params["path"]?.string).toBe("luts/Rec709.cube");
+    expect(lutEffect?.params["intensity"]?.value).toBeCloseTo(0.8);
+  });
+
+  test("lut.path: collision suffix flows through from ctx.lut.store verbatim", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx = makeLutCtx(store, { store_: async () => "luts/Rec709-2.cube" });
+    const result = await applyColorTool().run({ clipIds: ["c1"], lut: { path: "/tmp/Rec709.cube" } }, ctx);
+    expect(result.isError).toBe(false);
+    const tl = store.getSnapshot().timeline;
+    const clip = tl.tracks[0]!.clips.find((c) => c.id === "c1")!;
+    expect(clip.effects?.find((e) => e.type === "color.lut")?.params["path"]?.string).toBe("luts/Rec709-2.cube");
+  });
+
+  test("lut.path: no file at the given path -> isError, store unchanged", async () => {
+    const store = new EditorStore(makeTimeline());
+    const before = store.getSnapshot().timeline;
+    const ctx = makeLutCtx(store, { readLocalFile: async () => { throw new Error("ENOENT"); } });
+    const result = await applyColorTool().run({ clipIds: ["c1"], lut: { path: "/nope.cube" } }, ctx);
+    expect(result.isError).toBe(true);
+    const block = result.blocks[0]!;
+    expect(block.kind === "text" ? block.text : "").toContain("No file at path");
+    expect(store.getSnapshot().timeline).toBe(before);
+  });
+
+  test("lut.path: invalid .cube content -> isError, store unchanged, nothing stored", async () => {
+    const store = new EditorStore(makeTimeline());
+    const before = store.getSnapshot().timeline;
+    const storeLut = vi.fn(async (filename: string) => `luts/${filename}`);
+    const ctx = makeLutCtx(store, { readLocalFile: async () => new TextEncoder().encode("not a cube file"), store_: storeLut });
+    const result = await applyColorTool().run({ clipIds: ["c1"], lut: { path: "/tmp/bad.cube" } }, ctx);
+    expect(result.isError).toBe(true);
+    expect(result.blocks[0]!.kind === "text" ? (result.blocks[0] as { text: string }).text : "").toContain("Not a valid .cube 3D LUT");
+    expect(storeLut).not.toHaveBeenCalled();
+    expect(store.getSnapshot().timeline).toBe(before);
+  });
+
+  test("lut.path: no ctx.lut facade -> isError with a clear message", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx = makeCtx(store);
+    const result = await applyColorTool().run({ clipIds: ["c1"], lut: { path: "/tmp/x.cube" } }, ctx);
+    expect(result.isError).toBe(true);
+    expect(result.blocks[0]!.kind === "text" ? (result.blocks[0] as { text: string }).text : "").toContain("not available in this context");
+  });
+
+  test("lut.path: ctx.lut present but readLocalFile absent (web) -> isError mentioning web", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx = { ...makeCtx(store), lut: { store: async (n: string) => `luts/${n}` } };
+    const result = await applyColorTool().run({ clipIds: ["c1"], lut: { path: "/tmp/x.cube" } }, ctx);
+    expect(result.isError).toBe(true);
+    expect(result.blocks[0]!.kind === "text" ? (result.blocks[0] as { text: string }).text : "").toContain("not available on web");
+  });
+
+  // Idempotency (M14C final-review Medium #2): a path already under luts/ is already the stored,
+  // project-relative path — re-passing it (re-apply/edit-intensity) must reference it as-is, never
+  // re-read/re-store it (which ENOENTs against a relative path on desktop, or would mint a dup).
+  test("lut.path: re-applying an already-stored luts/ path is idempotent — no read/store call, path unchanged", async () => {
+    const store = new EditorStore(makeTimeline());
+    const readLocalFile = vi.fn(async () => new TextEncoder().encode(CUBE_TEXT));
+    const storeLut = vi.fn(async (filename: string) => `luts/${filename}`);
+    const ctx = makeLutCtx(store, { readLocalFile, store_: storeLut });
+
+    const result = await applyColorTool().run(
+      { clipIds: ["c1"], lut: { path: "luts/Rec709.cube", strength: 0.9 } },
+      ctx,
+    );
+
+    expect(result.isError).toBe(false);
+    expect(readLocalFile).not.toHaveBeenCalled();
+    expect(storeLut).not.toHaveBeenCalled();
+
+    const tl = store.getSnapshot().timeline;
+    const loc = findClip(tl, "c1")!;
+    const clip = tl.tracks[loc.trackIndex]!.clips[loc.clipIndex]!;
+    const lutEffect = clip.effects?.find((e) => e.type === "color.lut");
+    expect(lutEffect?.params["path"]?.string).toBe("luts/Rec709.cube");
+    expect(lutEffect?.params["intensity"]?.value).toBeCloseTo(0.9);
+  });
+
+  test("lut.path: editing intensity on an already-stored luts/ path works with no ctx.lut facade at all", async () => {
+    // Editing just the intensity re-passes the SAME stored path every time (LUTSection's slider
+    // flow); this must not require ctx.lut (no file to read/store) so it can't ENOENT.
+    const store = new EditorStore(makeTimeline());
+    const ctx = makeCtx(store); // no `lut` facade wired at all
+    const result = await applyColorTool().run(
+      { clipIds: ["c1"], lut: { path: "luts/Rec709.cube", strength: 0.25 } },
+      ctx,
+    );
+    expect(result.isError).toBe(false);
+    const tl = store.getSnapshot().timeline;
+    const clip = tl.tracks[0]!.clips.find((c) => c.id === "c1")!;
+    const lutEffect = clip.effects?.find((e) => e.type === "color.lut");
+    expect(lutEffect?.params["path"]?.string).toBe("luts/Rec709.cube");
+    expect(lutEffect?.params["intensity"]?.value).toBeCloseTo(0.25);
+  });
+});
+
+// ── apply_effect ──────────────────────────────────────────────────────────────
+
+describe("apply_effect", () => {
+  test("adds blur.gaussian effect", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx = makeCtx(store);
+    const result = await applyEffectTool().run(
+      { clipIds: ["c1"], effects: [{ type: "blur.gaussian", params: { radius: 10 } }] },
+      ctx,
+    );
+    expect(result.isError).toBe(false);
+    const tl = store.getSnapshot().timeline;
+    const loc = findClip(tl, "c1")!;
+    const clip = tl.tracks[loc.trackIndex]!.clips[loc.clipIndex]!;
+    expect(clip.effects?.some((e) => e.type === "blur.gaussian")).toBe(true);
+  });
+
+  test("removes blur.gaussian via remove field", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx = makeCtx(store);
+    // Add first
+    await applyEffectTool().run(
+      { clipIds: ["c1"], effects: [{ type: "blur.gaussian" }] },
+      ctx,
+    );
+    // Then remove
+    const result = await applyEffectTool().run({ clipIds: ["c1"], remove: ["blur.gaussian"] }, ctx);
+    expect(result.isError).toBe(false);
+    const tl = store.getSnapshot().timeline;
+    const loc = findClip(tl, "c1")!;
+    const clip = tl.tracks[loc.trackIndex]!.clips[loc.clipIndex]!;
+    expect(clip.effects).toBeUndefined();
+  });
+
+  test("rejects color.* type with isError, store unchanged", async () => {
+    const store = new EditorStore(makeTimeline());
+    const before = store.getSnapshot().timeline;
+    const ctx = makeCtx(store);
+    const result = await applyEffectTool().run(
+      { clipIds: ["c1"], effects: [{ type: "color.exposure" }] },
+      ctx,
+    );
+    expect(result.isError).toBe(true);
+    expect(store.getSnapshot().timeline).toBe(before);
+    expect(store.canUndo()).toBe(false);
+  });
+
+  test("rejects unknown effect type with isError, store unchanged", async () => {
+    const store = new EditorStore(makeTimeline());
+    const before = store.getSnapshot().timeline;
+    const ctx = makeCtx(store);
+    const result = await applyEffectTool().run(
+      { clipIds: ["c1"], effects: [{ type: "blur.gaussain" }] },
+      ctx,
+    );
+    expect(result.isError).toBe(true);
+    expect(store.getSnapshot().timeline).toBe(before);
+    expect(store.canUndo()).toBe(false);
+  });
+
+  test("is ONE undo step", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx = makeCtx(store);
+    await applyEffectTool().run(
+      { clipIds: ["c1"], effects: [{ type: "blur.gaussian" }] },
+      ctx,
+    );
+    expect(store.canUndo()).toBe(true);
+    store.undo();
+    const tl = store.getSnapshot().timeline;
+    const loc = findClip(tl, "c1")!;
+    const clip = tl.tracks[loc.trackIndex]!.clips[loc.clipIndex]!;
+    expect(clip.effects).toBeUndefined();
+    expect(store.canUndo()).toBe(false);
+  });
+
+  test("stylize.invert has no params, unknown params rejected, undo restores", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx = makeCtx(store);
+    const result = await applyEffectTool().run(
+      { clipIds: ["c1"], effects: [{ type: "stylize.invert" }] },
+      ctx,
+    );
+    expect(result.isError).toBe(false);
+    const loc = findClip(store.getSnapshot().timeline, "c1")!;
+    const clip = store.getSnapshot().timeline.tracks[loc.trackIndex]!.clips[loc.clipIndex]!;
+    const inv = clip.effects?.find((e) => e.type === "stylize.invert");
+    expect(inv).toBeDefined();
+    expect(inv!.params).toEqual({});
+
+    const invalid = await applyEffectTool().run(
+      { clipIds: ["c1"], effects: [{ type: "stylize.invert", params: { amount: 1 } }] },
+      ctx,
+    );
+    expect(invalid.isError).toBe(true);
+    const still = store.getSnapshot().timeline.tracks[loc.trackIndex]!.clips[loc.clipIndex]!;
+    expect(still.effects?.some((e) => e.type === "stylize.invert")).toBe(true);
+
+    expect(store.canUndo()).toBe(true);
+    store.undo();
+    const restored = store.getSnapshot().timeline.tracks[loc.trackIndex]!.clips[loc.clipIndex]!;
+    expect(restored.effects?.some((e) => e.type === "stylize.invert")).toBeFalsy();
+  });
+
+  test("unknown clipId returns isError:true, store unchanged", async () => {
+    const store = new EditorStore(makeTimeline());
+    const before = store.getSnapshot().timeline;
+    const ctx = makeCtx(store);
+    const result = await applyEffectTool().run(
+      { clipIds: ["nope"], effects: [{ type: "blur.gaussian" }] },
+      ctx,
+    );
+    expect(result.isError).toBe(true);
+    expect(store.getSnapshot().timeline).toBe(before);
+    expect(store.canUndo()).toBe(false);
+  });
+});
+
+// ── inspect_color ─────────────────────────────────────────────────────────────
+
+function solidRgba(value: number, count = 16): Uint8Array {
+  const buf = new Uint8Array(count * 4);
+  for (let i = 0; i < count; i++) {
+    buf[i * 4] = value;
+    buf[i * 4 + 1] = value;
+    buf[i * 4 + 2] = value;
+    buf[i * 4 + 3] = 255;
+  }
+  return buf;
+}
+
+describe("inspect_color", () => {
+  test("no renderFrame → isError with 'not available' message", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx = makeCtx(store);
+    const result = await inspectColorTool().run({}, ctx);
+    expect(result.isError).toBe(true);
+    const block = result.blocks[0];
+    expect(block?.kind === "text" && block.text).toMatch(/not available/);
+  });
+
+  test("solid grey → scopes.lumaMean ≈ 128/255", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx: ToolContext = {
+      ...makeCtx(store),
+      renderFrame: async () => ({ rgba: solidRgba(128), width: 4, height: 4 }),
+    };
+    const result = await inspectColorTool().run({}, ctx);
+    expect(result.isError).toBe(false);
+    const textBlock = result.blocks.find((b) => b.kind === "text");
+    expect(textBlock).toBeDefined();
+    const payload = JSON.parse((textBlock as { kind: "text"; text: string }).text) as {
+      scopes: { lumaMean: number };
+    };
+    expect(payload.scopes.lumaMean).toBeCloseTo(128 / 255, 2);
+  });
+
+  test("referenceFrame → payload has gap with deltas + hints array", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx: ToolContext = {
+      ...makeCtx(store),
+      renderFrame: async (f: number) => ({
+        rgba: solidRgba(f === 0 ? 128 : 200),
+        width: 4,
+        height: 4,
+      }),
+    };
+    const result = await inspectColorTool().run({ atFrame: 0, referenceFrame: 10 }, ctx);
+    expect(result.isError).toBe(false);
+    const textBlock = result.blocks.find((b) => b.kind === "text");
+    const payload = JSON.parse((textBlock as { kind: "text"; text: string }).text) as {
+      gap: { deltas: Record<string, unknown>; hints: string[] };
+    };
+    expect(payload.gap).toBeDefined();
+    expect(payload.gap.deltas).toBeDefined();
+    expect(Array.isArray(payload.gap.hints)).toBe(true);
+    // grey 128 vs 200 differs well past the luma threshold → a real, non-empty gap
+    expect((payload.gap.deltas["lumaMean"] as number)).not.toBe(0);
+    expect(payload.gap.hints.length).toBeGreaterThan(0);
+  });
+
+  test("jpegBase64 present → image block returned before text block", async () => {
+    const store = new EditorStore(makeTimeline());
+    const ctx: ToolContext = {
+      ...makeCtx(store),
+      renderFrame: async () => ({
+        rgba: solidRgba(128),
+        width: 4,
+        height: 4,
+        jpegBase64: "fakejpeg==",
+      }),
+    };
+    const result = await inspectColorTool().run({}, ctx);
+    expect(result.isError).toBe(false);
+    const imageBlock = result.blocks.find((b) => b.kind === "image");
+    expect(imageBlock).toBeDefined();
+    expect(result.blocks[0]?.kind).toBe("image"); // image precedes the text readout
+    expect(result.blocks[result.blocks.length - 1]?.kind).toBe("text");
+    expect((imageBlock as { kind: "image"; base64: string; mediaType: string }).base64).toBe("fakejpeg==");
+    expect((imageBlock as { kind: "image"; base64: string; mediaType: string }).mediaType).toBe("image/jpeg");
+  });
+});

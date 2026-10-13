@@ -1,0 +1,114 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import {
+  assertValidSlug,
+  assetStoragePath,
+  projectDir,
+  projectPaths,
+  slugFromVideo,
+  slugify,
+  takeDir,
+  takeFile,
+} from "../src/paths.ts";
+import { withDefaultProjectsRoot } from "./helpers/pathsIsolation.ts";
+
+test("slugify normalizes names for project directories", () => {
+  assert.equal(slugify("My Cool Video!!!"), "my-cool-video");
+  assert.equal(slugify("---"), "project");
+});
+
+test("slugFromVideo strips extension before slugifying", () => {
+  assert.equal(slugFromVideo("/tmp/Talking Head.MP4"), "talking-head");
+});
+
+test("projectPaths uses the layered input/working/output layout", () => {
+  withDefaultProjectsRoot(() => {
+    const p = projectPaths("demo");
+    // The edit itself stays at the project root.
+    assert.ok(p.project.endsWith("projects/demo/project.json"));
+    // Derived media + scratch live under working/.
+    assert.ok(p.proxy.endsWith("projects/demo/working/proxy.mp4"));
+    assert.ok(p.transcript.endsWith("projects/demo/working/transcript.json"));
+    assert.ok(p.audioRaw.endsWith("projects/demo/working/audio16k.f32"));
+    assert.ok(p.frames.endsWith("projects/demo/working/frames"));
+    assert.ok(p.assets.endsWith("projects/demo/assets"));
+    assert.ok(p.assetProxies.endsWith("projects/demo/working/assets"));
+    assert.ok(p.chats.endsWith("projects/demo/working/chats.json"));
+    assert.ok(p.brief.endsWith("projects/demo/brief.md"));
+    assert.ok(p.tasks.endsWith("projects/demo/working/tasks.json"));
+    assert.ok(p.historyDir.endsWith("projects/demo/working/history"));
+    assert.ok(p.working.endsWith("projects/demo/working"));
+    // Rendered output lives under output/.
+    assert.ok(p.out.endsWith("projects/demo/output/out.mp4"));
+    assert.ok(p.output.endsWith("projects/demo/output"));
+    assert.equal(projectDir("demo"), p.dir);
+  });
+});
+
+test("assetStoragePath joins a stored relative proxy onto the project dir", () => {
+  withDefaultProjectsRoot(() => {
+    assert.ok(
+      assetStoragePath("demo", "working/assets/b1.mp4").endsWith(
+        "projects/demo/working/assets/b1.mp4"
+      )
+    );
+  });
+});
+
+test("assertValidSlug accepts normal slugs and returns them", () => {
+  assert.equal(assertValidSlug("ok-sample"), "ok-sample");
+  assert.equal(assertValidSlug("My_Video.2"), "My_Video.2");
+  assert.equal(assertValidSlug("a"), "a");
+});
+
+test("assertValidSlug rejects path-traversal and separators", () => {
+  for (const bad of [
+    "..",
+    "../etc",
+    "../../etc/passwd",
+    "a/b",
+    "a\\b",
+    "/abs",
+    ".hidden",
+    "",
+    "   ",
+    "with space",
+  ]) {
+    assert.throws(() => assertValidSlug(bad), /invalid project slug/i, bad);
+  }
+});
+
+test("projectDir refuses to build a path for a traversal slug", () => {
+  assert.throws(() => projectDir("../../secret"), /invalid project slug/i);
+});
+
+test("projectPaths refuses to build paths for a traversal slug", () => {
+  assert.throws(
+    () => projectPaths("../../etc/passwd"),
+    /invalid project slug/i
+  );
+});
+
+test("projectDir still resolves a clean slug", () => {
+  withDefaultProjectsRoot(() => {
+    assert.ok(projectDir("my-video_2").endsWith("projects/my-video_2"));
+  });
+});
+
+test("takeDir and takeFile live under the project's takes/ folder", () => {
+  withDefaultProjectsRoot(() => {
+    const p = projectPaths("demo");
+    assert.ok(p.takes.endsWith("projects/demo/takes"));
+    assert.ok(takeDir("demo", "t1").endsWith("projects/demo/takes/t1"));
+    assert.ok(
+      takeFile("demo", "t1").endsWith("projects/demo/takes/t1/take.json")
+    );
+  });
+});
+
+test("takeDir and takeFile validate the take id (no traversal)", () => {
+  for (const bad of ["..", "../escape", "a/b", "/abs"]) {
+    assert.throws(() => takeDir("demo", bad), /invalid project slug/i, bad);
+    assert.throws(() => takeFile("demo", bad), /invalid project slug/i, bad);
+  }
+});
