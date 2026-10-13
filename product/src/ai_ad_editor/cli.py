@@ -46,6 +46,7 @@ from .tracking import track_media
 from .runtime import configure_local_runtime
 from .template import instantiate
 from .migration import SUPPORTED_SOURCE_VERSIONS, migrate_project_payload
+from .speech import flite_available, synthesize_local_tts
 from .utils import atomic_write_json, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
 
@@ -169,6 +170,18 @@ def build_parser() -> argparse.ArgumentParser:
     subtitle_normalize.add_argument("--output", required=True)
     subtitle_normalize.add_argument("--project", default=None)
     subtitle_normalize.add_argument("--allow-overlap", action="store_true")
+
+    tts = subs.add_parser("tts", help="本地离线文本转语音")
+    tts_sub = tts.add_subparsers(dest="action", required=True)
+    tts_synthesize = _leaf_common(tts_sub.add_parser("synthesize", help="使用 FFmpeg 内置 flite 生成本地 WAV"))
+    tts_synthesize.add_argument("--project", required=True)
+    tts_text = tts_synthesize.add_mutually_exclusive_group(required=True)
+    tts_text.add_argument("--text", default=None, help="ASCII/英文文本")
+    tts_text.add_argument("--input", default=None, help="本地 UTF-8 文本文件")
+    tts_synthesize.add_argument("--output", default=None, help="项目内 WAV 输出路径")
+    tts_synthesize.add_argument("--voice", default="kal", help="FFmpeg flite voice，例如 kal、slt、rms")
+    tts_synthesize.add_argument("--sample-rate", type=int, default=48_000)
+    tts_synthesize.add_argument("--channels", type=int, choices=(1, 2), default=2)
 
     timeline = subs.add_parser("timeline", help="时间线编排")
     ts = timeline.add_subparsers(dest="action", required=True)
@@ -797,6 +810,67 @@ def command_subtitle_normalize(args: argparse.Namespace) -> dict[str, Any]:
         return _envelope("subtitle.normalize", args, status="planned", data={"input": str(source), "output": str(output), "cue_count": len(cues)})
     write_srt_file(output, cues)
     return _envelope("subtitle.normalize", args, data={"input": str(source), "output": str(output), "cue_count": len(cues), "validation": report})
+
+
+def command_tts_synthesize(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    if args.text is not None:
+        text = str(args.text)
+        source = {"kind": "inline", "path": None}
+    else:
+        source_path = Path(str(args.input)).expanduser().resolve()
+        if not source_path.exists() or not source_path.is_file():
+            raise argument_error("TTS 文本输入不存在", str(source_path))
+        try:
+            text = source_path.read_text(encoding="utf-8-sig")
+        except UnicodeDecodeError as exc:
+            raise argument_error("TTS 文本输入必须是 UTF-8", str(source_path)) from exc
+        source = {"kind": "file", "path": str(source_path)}
+    operation_id = new_id("op")
+    output = Path(args.output).expanduser().resolve() if args.output else root / "assets" / f"tts_{operation_id}.wav"
+    ensure_inside(root, output)
+    if args.dry_run:
+        return _envelope(
+            "tts.synthesize",
+            args,
+            status="planned",
+            data={"output": str(output), "voice": args.voice, "sample_rate": args.sample_rate, "channels": args.channels, "source": source},
+            operation_id=operation_id,
+        )
+    if not flite_available():
+        raise dependency_error("当前 FFmpeg 没有 flite 音频滤镜", "安装包含 --enable-libflite 的原生 FFmpeg；不会自动下载或调用线上 TTS")
+    result = synthesize_local_tts(
+        root,
+        text,
+        output,
+        operation_id=operation_id,
+        voice=args.voice,
+        sample_rate=args.sample_rate,
+        channels=args.channels,
+    )
+    payload = {
+        "operation_id": operation_id,
+        "command": "tts.synthesize",
+        "status": "succeeded",
+        "project_id": project["project"]["id"],
+        "source": source,
+        "created_at": now_iso(),
+        **{key: value for key, value in result.items() if key != "probe"},
+        "duration_seconds": result["probe"].get("duration_seconds", 0.0),
+    }
+    _operation(root, operation_id, payload)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append(
+        {
+            "operation_id": operation_id,
+            "command": "tts.synthesize",
+            "output": str(output),
+            "engine": result["engine"],
+            "text_sha256": result["text_sha256"],
+            "at": now_iso(),
+        }
+    )
+    save_project(root, project)
+    return _envelope("tts.synthesize", args, data={**result, "source": source}, operation_id=operation_id)
 
 
 def _clip_from_change(change: dict[str, Any], track: dict[str, Any]) -> dict[str, Any]:
@@ -1546,6 +1620,7 @@ def command_doctor(args: argparse.Namespace) -> dict[str, Any]:
         checks["virtualization_commands" if name in {"docker", "wsl"} else "tools"] = checks.get("virtualization_commands" if name in {"docker", "wsl"} else "tools", {})
         checks["virtualization_commands" if name in {"docker", "wsl"} else "tools"][name] = shutil.which(name)
     checks["ffmpeg_version"] = ffmpeg_version() if checks["tools"].get("ffmpeg") else None
+    checks["local_features"] = {"flite_tts": flite_available() if checks["tools"].get("ffmpeg") else False}
     checks["policy"] = {"docker_or_wsl_started": False, "closed_services_enabled": False, "jianying_runtime_enabled": False}
     ok = bool(checks["native_windows"] and checks["tools"].get("ffmpeg") and checks["tools"].get("ffprobe"))
     return _envelope("doctor", args, data={"ok": ok, "checks": checks}, status="succeeded" if ok else "failed", errors=[] if ok else [{"code": "DEPENDENCY_UNAVAILABLE", "message": "FFmpeg/FFprobe 不完整", "retryable": False}])
@@ -1594,6 +1669,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("ad", "plan"): command_ad_plan,
     ("subtitle", "validate"): command_subtitle_validate,
     ("subtitle", "normalize"): command_subtitle_normalize,
+    ("tts", "synthesize"): command_tts_synthesize,
     ("timeline", "compose"): command_timeline_compose,
     ("validate", None): command_validate,
     ("rights", "check"): command_rights_check,

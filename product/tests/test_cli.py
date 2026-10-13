@@ -283,6 +283,37 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 10, result)
             self.assertEqual(result["errors"][0]["code"], "LOCAL_ASR_MODEL_MISSING")
 
+    def test_local_flite_tts_generates_project_wav_and_rejects_unsupported_locale(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-tts-") as raw:
+            workspace = Path(raw)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            output = project / "assets" / "voice.wav"
+            code, result = invoke(
+                "tts",
+                "synthesize",
+                "--project",
+                str(project),
+                "--text",
+                "Hello local advertising voice",
+                "--output",
+                str(output),
+            )
+            self.assertEqual(code, 0, result)
+            self.assertTrue(output.exists())
+            self.assertEqual(result["data"]["engine"], "ffmpeg-flite-local")
+            self.assertEqual(result["data"]["probe"]["audio"]["sample_rate"], 48_000)
+            self.assertGreater(result["data"]["probe"]["duration_seconds"], 0.1)
+            self.assertTrue((project / "operations" / f"{result['operation_id']}.json").exists())
+            code, rejected = invoke("tts", "synthesize", "--project", str(project), "--text", "本地广告旁白")
+            self.assertEqual(code, 2, rejected)
+            self.assertEqual(rejected["errors"][0]["code"], "TTS_LOCALE_UNSUPPORTED")
+            failed_output = project / "assets" / "failed.wav"
+            code, failed = invoke("tts", "synthesize", "--project", str(project), "--text", "Hello", "--voice", "missing_voice", "--output", str(failed_output))
+            self.assertEqual(code, 6, failed)
+            self.assertEqual(failed["errors"][0]["code"], "TTS_SYNTHESIS_FAILED")
+            self.assertFalse(failed_output.exists())
+
     def test_subtitle_formats_validate_and_normalize(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-subtitle-") as raw:
             workspace = Path(raw)
@@ -399,6 +430,7 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("yuv420p10le", manifest["capabilities"]["output"]["pixel_formats"])
         self.assertIn("yuva420p", manifest["capabilities"]["output"]["pixel_formats"])
         self.assertIn("hable", manifest["capabilities"]["output"]["tone_mapping"])
+        self.assertIn("local_flite_tts", manifest["capabilities"]["ai"]["features"])
         self.assertEqual(manifest["policies"]["jianying_runtime_enabled"], False)
 
     def test_runtime_storage_is_local_to_product(self) -> None:

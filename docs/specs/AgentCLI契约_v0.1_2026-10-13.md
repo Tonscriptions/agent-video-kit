@@ -70,6 +70,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `ad plan --project PATH --input BRIEF.json` | 本地广告 brief 和可选分析报告 | 写入钩子、卖点、证明、CTA 的节拍计划和序列标记 |
 | `subtitle validate --input FILE` | SRT/VTT/ASS/SSA | 解析、时长、顺序和重叠报告 |
 | `subtitle normalize --input FILE --output FILE` | 字幕文件 | 通过校验后规范化为 SRT；项目模式下输出必须位于项目内 |
+| `tts synthesize --project PATH (--text TEXT\|--input FILE)` | ASCII/英文文本或本地 UTF-8 文本文件 | 通过 FFmpeg 内置 flite 生成项目内 WAV；无网络、无模型下载；当前拒绝非 ASCII 文本 |
 | `timeline compose --project PATH --input CHANGES.json` | 变更集 | 写入轨道、片段、标记、关键帧、嵌套序列、速度曲线和剪辑操作；写入前快照并再次校验 |
 | `validate --project PATH` | 项目和目标渠道 | 机器 Schema、时间/引用/权利/效果语义校验报告 |
 | `rights check --project PATH` | 项目 Rights Ledger | 检查目标渠道发布资格；严格失败退出码为 7 |
@@ -120,10 +121,10 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | 退出码 | 类别 | 示例错误码 |
 |---:|---|---|
 | 0 | 成功或 dry-run 计划 | — |
-| 2 | 参数、Schema、项目或时间线错误 | `ARGUMENT_INVALID`、`SCHEMA_VERSION_UNSUPPORTED`、`KEYFRAME_INVALID` |
+| 2 | 参数、Schema、项目或时间线错误 | `ARGUMENT_INVALID`、`SCHEMA_VERSION_UNSUPPORTED`、`KEYFRAME_INVALID`、`TTS_LOCALE_UNSUPPORTED` |
 | 3 | 本地文件、哈希或媒体输入错误 | `ASSET_FILE_MISSING`、`MIGRATION_ASSET_HASH_MISSING` |
 | 4 | 媒体流或能力缺失 | `VIDEO_TRACK_EMPTY`、`AUDIO_STREAM_MISSING` |
-| 6 | FFmpeg、模型或可重试执行失败 | `RENDER_FAILED`、`LOCAL_ASR_FAILED` |
+| 6 | FFmpeg、模型或可重试执行失败 | `RENDER_FAILED`、`LOCAL_ASR_FAILED`、`TTS_SYNTHESIS_FAILED` |
 | 7 | Rights Ledger 发布阻断 | `RIGHTS_BLOCKED` |
 | 8 | 任务取消 | `CANCELLED` |
 | 9 | 未分类输入/内部错误 | `INTERNAL_INPUT_ERROR` |
@@ -138,6 +139,7 @@ $env:PYTHONPATH = 'E:\dev\sandbox\AI广告剪辑\product\src'
 python -m ai_ad_editor project init .\\work\\demo --name Demo
 python -m ai_ad_editor project migrate --project .\\work\\demo --dry-run --progress jsonl
 python -m ai_ad_editor timeline compose --project .\\work\\demo --input .\\changes.json --idempotency-key edit-001
+python -m ai_ad_editor tts synthesize --project .\\work\\demo --text "Hello local advertising voice" --output .\\work\\demo\\assets\\voice.wav
 python -m ai_ad_editor validate --project .\\work\\demo --strict-rights
 python -m ai_ad_editor render --project .\\work\\demo --profile vertical --progress jsonl --output .\\work\\demo\\renders\\ad.mp4
 python -m ai_ad_editor quality check --project .\\work\\demo --input .\\work\\demo\\renders\\ad.mp4 --require-audio --expensive

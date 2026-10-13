@@ -24,6 +24,22 @@ python -m ai_ad_editor media understand `
 
 `--model-path` 必须指向完整的本地 Transformers 模型目录。加载使用 `local_files_only=True`，进程设置 `HF_HUB_OFFLINE=1`，不接受缺失文件后自动下载。没有模型目录或模型文件不完整时，命令必须失败并输出结构化错误。
 
+## 2.1 本地基线 TTS
+
+P0 还提供一个不依赖模型下载的语音基线：`tts synthesize` 调用当前原生 FFmpeg 构建内置的 `flite` 音频滤镜，写入项目目录内的 PCM WAV，并生成操作记录、文本 SHA-256、采样率、声道数和 `ffprobe` 摘要。该路径不调用在线服务、不启动容器，也不会把文本写入网络端点。
+
+```powershell
+python -m ai_ad_editor tts synthesize `
+  --project <项目目录> `
+  --text "Hello local advertising voice" `
+  --voice kal `
+  --output assets/voice.wav
+```
+
+也可以用 `--input <本地 UTF-8 文本文件>` 替代 `--text`。输出路径必须位于项目根目录内并使用 `.wav`；可选采样率为 8000、16000、22050、24000、32000、44100 或 48000，声道为 1 或 2。当前 FFmpeg flite 声音库存和语言由本机编译决定，项目适配器在调用前拒绝非 ASCII 文本，以避免把不支持的中文/Unicode 输入送入原生滤镜；多语言、情绪和可控语速 TTS 仍需另一个显式的本地模型适配器，并且必须单独登记权重许可证和真实模型验收证据。
+
+`doctor` 的 `data.checks.local_features.flite_tts` 报告当前 FFmpeg 是否暴露 `flite` 滤镜；为 `false` 时命令返回 `DEPENDENCY_UNAVAILABLE`，不会自动安装或联网恢复。
+
 ## 2. 模型与许可证登记
 
 每个模型在进入项目或发布包前都要在 Rights Ledger 和依赖清单中登记：
