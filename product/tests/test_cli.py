@@ -140,6 +140,56 @@ class P0CliTests(unittest.TestCase):
             code, otio_import_result = invoke("convert", "import", "--input", str(otio), "--output", str(otio_imported))
             self.assertEqual(code, 0, otio_import_result)
             self.assertTrue((otio_imported / "project.json").exists())
+
+    def test_persistent_render_queue_lifecycle(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-queue-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, ingested = invoke(
+                "media", "ingest", "--project", str(project), "--input", str(source),
+                "--verification-status", "verified", "--permitted-use", "commercial_ad",
+                "--source-url", "local://fixture", "--license-spdx", "CC0-1.0",
+                "--license-url", "local://license", "--evidence", "local://evidence",
+            )
+            self.assertEqual(code, 0, ingested)
+            asset_id = ingested["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [
+                {"op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000},
+                {"op": "append_clip", "track_id": "track_audio_1", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000},
+            ]}), encoding="utf-8")
+            code, composed = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
+            self.assertEqual(code, 0, composed)
+            jobs = workspace / "queue.json"
+            jobs.write_text(json.dumps({"jobs": [
+                {"job_id": "queue-a", "sequence_id": "seq_main", "output": "renders/queue-a.mp4", "profile": "custom", "width": 320, "height": 180},
+                {"job_id": "queue-b", "sequence_id": "seq_main", "output": "renders/queue-b.mp4", "profile": "custom", "width": 320, "height": 180},
+            ]}), encoding="utf-8")
+            code, enqueued = invoke("queue", "enqueue", "--project", str(project), "--input", str(jobs))
+            self.assertEqual(code, 0, enqueued)
+            self.assertEqual(enqueued["data"]["count"], 2)
+            self.assertTrue((project / "operations" / "render-queue.json").exists())
+            code, listed = invoke("queue", "list", "--project", str(project), "--status", "pending")
+            self.assertEqual(code, 0, listed)
+            self.assertEqual(listed["data"]["counts"]["pending"], 2)
+            code, inspected = invoke("queue", "inspect", "--project", str(project), "--job-id", "queue-a")
+            self.assertEqual(code, 0, inspected)
+            self.assertEqual(inspected["data"]["job"]["status"], "pending")
+            code, rendered = invoke("queue", "run", "--project", str(project), "--job-id", "queue-a")
+            self.assertEqual(code, 0, rendered)
+            self.assertEqual(rendered["data"]["summary"]["succeeded"], 1)
+            self.assertTrue((project / "renders" / "queue-a.mp4").exists())
+            code, inspected = invoke("queue", "inspect", "--project", str(project), "--job-id", "queue-a")
+            self.assertEqual(code, 0, inspected)
+            self.assertEqual(inspected["data"]["job"]["status"], "succeeded")
+            code, cancelled = invoke("queue", "cancel", "--project", str(project), "--job-id", "queue-b")
+            self.assertEqual(code, 0, cancelled)
+            self.assertEqual(cancelled["data"]["job"]["status"], "cancelled")
+            code, inspected = invoke("queue", "inspect", "--project", str(project), "--job-id", "queue-b")
+            self.assertEqual(code, 0, inspected)
+            self.assertEqual(inspected["data"]["job"]["status"], "cancelled")
             kdenlive = workspace / "timeline.kdenlive"
             code, kdenlive_result = invoke("convert", "export", "--project", str(project), "--output", str(kdenlive), "--target-format", "kdenlive-xml")
             self.assertEqual(code, 0, kdenlive_result)
@@ -421,6 +471,7 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("bezier", manifest["capabilities"]["keyframes"]["interpolation"])
         self.assertIn("crossfade", manifest["capabilities"]["transitions"]["features"])
         self.assertIn("safe_resume", manifest["capabilities"]["render"]["features"])
+        self.assertIn("sequential_run", manifest["capabilities"]["queue"]["features"])
         self.assertIn("snapshot", manifest["capabilities"]["project"]["features"])
         self.assertIn("relink_by_hash", manifest["capabilities"]["media"]["features"])
         self.assertIn("target_lufs_gate", manifest["capabilities"]["quality"]["features"])

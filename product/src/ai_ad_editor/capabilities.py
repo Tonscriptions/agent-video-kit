@@ -86,6 +86,13 @@ def build_capability_manifest() -> dict[str, Any]:
                 "resume_contract": "rebuild_from_validated_plan_when_project_and_input_hashes_match",
                 "limits": ["resume_is_not_partial_frame_checkpoint", "changed_inputs_are_rejected", "other_long_tasks_progress_pending"],
             },
+            "queue": {
+                "status": "implemented",
+                "features": ["enqueue", "list", "inspect", "sequential_run", "explicit_retry", "cancel_pending", "cancel_running"],
+                "state_file": "operations/render-queue.json",
+                "execution": "single_process_sequential_local_ffmpeg",
+                "limits": ["distributed_workers_pending", "priority_and_fairness_pending", "cross_machine_artifacts_pending"],
+            },
             "quality": {
                 "status": "implemented",
                 "features": ["stream_presence", "canvas", "duration", "av_duration_delta", "blackdetect_optional", "ebur128_optional", "target_lufs_gate", "true_peak_gate", "fail_on_black"],

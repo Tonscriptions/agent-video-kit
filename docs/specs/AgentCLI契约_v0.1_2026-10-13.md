@@ -4,7 +4,7 @@
 |---|---|
 | 文档编号 | SPEC-CLI-001 |
 | 版本 | 0.1.0 |
-| 日期 | 2026-10-13 |
+| 日期 | 2026-10-14 |
 | 状态 | 有效 |
 | 运行根目录 | `E:\dev\sandbox\AI广告剪辑` |
 | 关联规范 | [Agent Project JSON](./AgentProjectJSON规范_v0.1_2026-10-13.md)、[机器 Schema](./agent-project.schema.json)、[产品实现入口](../产品实现入口与P0使用说明_v0.1_2026-10-13.md) |
@@ -77,6 +77,11 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `validate --project PATH` | 项目和目标渠道 | 机器 Schema、时间/引用/权利/效果语义校验报告 |
 | `rights check --project PATH` | 项目 Rights Ledger | 检查目标渠道发布资格；严格失败退出码为 7 |
 | `render --project PATH` | 已验证项目和输出规格 | 本地 FFmpeg 渲染、manifest、操作记录和原子最终媒体 |
+| `queue enqueue --project PATH --input JOBS.json` | 单个作业或 `{jobs:[...]}` | 原子写入项目 `operations/render-queue.json`，保存输出规格和初始 `pending` 状态 |
+| `queue list --project PATH [--status STATUS]` | 项目队列和可选状态 | 只读返回队列计数与作业状态 |
+| `queue inspect --project PATH --job-id ID` | 作业 ID | 只读返回作业、尝试次数、警告、错误和关联操作 |
+| `queue run --project PATH [--job-id ID]` | 待处理作业或显式重试作业 | 顺序执行本地渲染；保存 `pending/running/succeeded/failed/cancelled`，可用 `--max-jobs` 和 `--continue-on-error` 控制批次 |
+| `queue cancel --project PATH --job-id ID` | 待处理或运行中作业 | 待处理作业立即标记取消；运行中写入项目内取消标记并由渲染器确认 |
 | `quality check --project PATH --input FILE` | 已渲染媒体 | 画布、流、时长、音画差、可选黑帧、LUFS 和 true peak 报告 |
 | `convert import --input FILE --output DIR` | Agent JSON、OTIO JSON 或 Kdenlive XML | 新建本地项目并写 Exact/Mapped/Approximate/Baked/Unsupported/Failed 报告 |
 | `convert export --project PATH --output FILE --target-format FORMAT` | 本地项目 | 导出 Agent JSON、OTIO 或 Kdenlive XML，并保留转换报告 |
@@ -114,9 +119,13 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 
 `--progress jsonl` 的事件写到 stderr，至少包含 `event_id`、`operation_id`、`type`、`stage`、`percent`、`message` 和 `at`。`render --cancel-file FILE` 在启动前和运行中都检查取消；`render --resume OPERATION_ID` 只有在项目和所有素材指纹未变化时才允许重建计划。
 
+### 6.1 本地持久化渲染队列
+
+`queue` 将批量输出作业保存为项目内 `operations/render-queue.json`，由同一个本地 FFmpeg 渲染器顺序执行。作业状态、取消标记、尝试次数、错误、警告和 render 操作 ID 都可在进程退出后恢复；不引入服务、守护进程、数据库、Docker、WSL 或网络调度。无 `--job-id` 的 `queue run` 只执行 `pending`，失败或取消作业必须显式指定 ID 重试；`queue cancel` 对运行中的作业写入 `operations/queue-cancel/<job_id>.cancel`。完整字段和状态机见[本地渲染队列与任务状态契约](./本地渲染队列与任务状态契约_v0.1_2026-10-14.md)。
+
 `quality check` 可用 `--require-audio`、`--max-av-sync-ms`、`--expensive`、`--target-lufs`、`--lufs-tolerance`、`--fail-on-black` 和 `--max-true-peak-dbfs`。质量报告失败时，发布调用必须停止；质量检查不会修改原始媒体或项目。
 
-### 6.1 本地效果目录与渲染契约
+### 6.2 本地效果目录与渲染契约
 
 Agent 在生成项目 JSON 或变更集前应先调用 `effects list`，需要精确参数时调用 `effects inspect --name NAME`。当前目录版本为 `0.2.0`，记录 41 项由本机 FFmpeg 提供的效果；每项至少包含 `id`、`aliases`、`category`、`backend`、`source=ffmpeg-local`、`keyframable`、`parameters` 和 `limits`。目录不会下载滤镜包，也不会访问网络。
 
@@ -137,7 +146,7 @@ python -X utf8 -m ai_ad_editor render --project .\work\demo --dry-run
 | 退出码 | 类别 | 示例错误码 |
 |---:|---|---|
 | 0 | 成功或 dry-run 计划 | — |
-| 2 | 参数、Schema、项目或时间线错误 | `ARGUMENT_INVALID`、`SCHEMA_VERSION_UNSUPPORTED`、`KEYFRAME_INVALID`、`TTS_LOCALE_UNSUPPORTED` |
+| 2 | 参数、Schema、项目、时间线或队列状态错误 | `ARGUMENT_INVALID`、`SCHEMA_VERSION_UNSUPPORTED`、`KEYFRAME_INVALID`、`TTS_LOCALE_UNSUPPORTED`、`QUEUE_JOB_STATE_INVALID` |
 | 3 | 本地文件、哈希或媒体输入错误 | `ASSET_FILE_MISSING`、`MIGRATION_ASSET_HASH_MISSING` |
 | 4 | 媒体流或能力缺失 | `VIDEO_TRACK_EMPTY`、`AUDIO_STREAM_MISSING` |
 | 6 | FFmpeg、模型或可重试执行失败 | `RENDER_FAILED`、`LOCAL_ASR_FAILED`、`TTS_SYNTHESIS_FAILED` |
@@ -158,6 +167,9 @@ python -m ai_ad_editor timeline compose --project .\\work\\demo --input .\\chang
 python -m ai_ad_editor tts synthesize --project .\\work\\demo --text "Hello local advertising voice" --output .\\work\\demo\\assets\\voice.wav
 python -m ai_ad_editor validate --project .\\work\\demo --strict-rights
 python -m ai_ad_editor render --project .\\work\\demo --profile vertical --progress jsonl --output .\\work\\demo\\renders\\ad.mp4
+python -m ai_ad_editor queue enqueue --project .\\work\\demo --input .\\queue.json
+python -m ai_ad_editor queue run --project .\\work\\demo --continue-on-error --progress jsonl
+python -m ai_ad_editor queue list --project .\\work\\demo --status failed
 python -m ai_ad_editor quality check --project .\\work\\demo --input .\\work\\demo\\renders\\ad.mp4 --require-audio --expensive
 ```
 

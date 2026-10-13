@@ -48,7 +48,8 @@ from .template import instantiate
 from .migration import SUPPORTED_SOURCE_VERSIONS, migrate_project_payload
 from .speech import flite_available, synthesize_local_tts
 from .effects import EFFECT_CATALOG_VERSION, get_effect, list_effects
-from .utils import atomic_write_json, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
+from .render_queue import JOB_STATUSES, cancel_path, enqueue as enqueue_render_jobs, find_job, load_queue, normalize_job, queue_path, save_queue, set_status
+from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
 
 
@@ -228,6 +229,26 @@ def build_parser() -> argparse.ArgumentParser:
     render.add_argument("--video-bitrate", default=None, help="可选视频码率，例如 8M")
     render.add_argument("--audio-bitrate", default=None, help="音频码率，例如 192k")
     render.add_argument("--pixel-format", choices=OUTPUT_PIXEL_FORMATS, default=None)
+
+    queue = subs.add_parser("queue", help="项目内持久化渲染队列")
+    queue_sub = queue.add_subparsers(dest="action", required=True)
+    queue_enqueue = _leaf_common(queue_sub.add_parser("enqueue", help="写入一个或多个本地渲染作业"))
+    queue_enqueue.add_argument("--project", required=True)
+    queue_enqueue.add_argument("--input", required=True, help="作业 JSON；可为单个作业对象或 {jobs:[...]} 文件")
+    queue_list = _leaf_common(queue_sub.add_parser("list", help="列出队列作业"))
+    queue_list.add_argument("--project", required=True)
+    queue_list.add_argument("--status", choices=tuple(sorted(JOB_STATUSES)), default=None)
+    queue_inspect = _leaf_common(queue_sub.add_parser("inspect", help="检查单个队列作业"))
+    queue_inspect.add_argument("--project", required=True)
+    queue_inspect.add_argument("--job-id", required=True)
+    queue_run = _leaf_common(queue_sub.add_parser("run", help="按顺序执行本地渲染作业"))
+    queue_run.add_argument("--project", required=True)
+    queue_run.add_argument("--job-id", default=None, help="只执行指定作业；失败或取消作业可显式重试")
+    queue_run.add_argument("--max-jobs", type=int, default=None, help="本次最多执行的待处理作业数")
+    queue_run.add_argument("--continue-on-error", action="store_true", help="单个作业失败后继续执行后续作业")
+    queue_cancel = _leaf_common(queue_sub.add_parser("cancel", help="请求取消或取消尚未启动的作业"))
+    queue_cancel.add_argument("--project", required=True)
+    queue_cancel.add_argument("--job-id", required=True)
 
     quality = subs.add_parser("quality", help="输出质量检查")
     qs = quality.add_subparsers(dest="action", required=True)
@@ -1535,6 +1556,178 @@ def command_render(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("render", args, data=result, operation_id=result.get("operation_id"), warnings=report.get("warnings", []) + result.get("warnings", []))
 
 
+def _queue_counts(queue: dict[str, Any]) -> dict[str, int]:
+    counts = {status: 0 for status in sorted(JOB_STATUSES)}
+    for job in queue.get("jobs", []):
+        if isinstance(job, dict) and job.get("status") in counts:
+            counts[str(job["status"])] += 1
+    return counts
+
+
+def _queue_job_args(root: Path, job: dict[str, Any], args: argparse.Namespace) -> argparse.Namespace:
+    """Map a persisted job to the render settings contract without shell parsing."""
+    return argparse.Namespace(
+        profile=job.get("profile"),
+        width=job.get("width"),
+        height=job.get("height"),
+        container=job.get("container"),
+        video_codec=job.get("video_codec"),
+        audio_codec=job.get("audio_codec"),
+        crf=job.get("crf"),
+        video_bitrate=job.get("video_bitrate"),
+        audio_bitrate=job.get("audio_bitrate"),
+        pixel_format=job.get("pixel_format"),
+        output=str(root / str(job["output"])),
+        publish=bool(job.get("publish", False)),
+        sequence_id=job.get("sequence_id"),
+        cancel_file=str(cancel_path(root, str(job["job_id"]))),
+        resume=None,
+        dry_run=False,
+        progress=getattr(args, "progress", "none"),
+    )
+
+
+def command_queue_enqueue(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    payload = load_json(Path(args.input).expanduser().resolve())
+    if args.dry_run:
+        queue = load_queue(root, project_id=project["project"]["id"])
+        raw_jobs = payload.get("jobs") if isinstance(payload.get("jobs"), list) else [payload]
+        if not raw_jobs:
+            raise argument_error("渲染队列作业不能为空")
+        existing = {str(job.get("job_id")) for job in queue.get("jobs", []) if isinstance(job, dict)}
+        planned: list[dict[str, Any]] = []
+        for raw in raw_jobs:
+            job = normalize_job(root, raw)
+            if job["job_id"] in existing:
+                raise argument_error(f"队列作业 ID 已存在: {job['job_id']}", "job_id")
+            existing.add(job["job_id"])
+            planned.append(job)
+        return _envelope("queue.enqueue", args, status="planned", data={"queue": str(queue_path(root)), "jobs": planned, "count": len(planned)})
+    queue, added = enqueue_render_jobs(root, project["project"]["id"], payload)
+    operation_id = new_id("op")
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "queue.enqueue", "status": "succeeded", "project_id": project["project"]["id"], "queue": str(queue_path(root)), "jobs": [job["job_id"] for job in added], "created_at": now_iso()})
+    return _envelope("queue.enqueue", args, data={"queue": str(queue_path(root)), "jobs": added, "count": len(added), "counts": _queue_counts(queue)}, operation_id=operation_id)
+
+
+def command_queue_list(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    queue = load_queue(root, project_id=project["project"]["id"])
+    jobs = [job for job in queue.get("jobs", []) if isinstance(job, dict) and (args.status is None or job.get("status") == args.status)]
+    return _envelope("queue.list", args, data={"queue": str(queue_path(root)), "queue_version": queue.get("queue_version"), "project_id": project["project"]["id"], "counts": _queue_counts(queue), "jobs": jobs})
+
+
+def command_queue_inspect(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    queue = load_queue(root, project_id=project["project"]["id"])
+    job = find_job(queue, args.job_id)
+    return _envelope("queue.inspect", args, data={"queue": str(queue_path(root)), "job": job})
+
+
+def command_queue_cancel(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    queue = load_queue(root, project_id=project["project"]["id"])
+    job = find_job(queue, args.job_id)
+    status = str(job.get("status"))
+    marker = cancel_path(root, args.job_id)
+    if status == "succeeded":
+        raise AppError("QUEUE_CANCEL_INVALID", "已成功的队列作业不能取消", exit_code=2, path=args.job_id)
+    if status == "failed":
+        raise AppError("QUEUE_CANCEL_INVALID", "已失败的队列作业不能取消；可直接重试或重新入队", exit_code=2, path=args.job_id)
+    if args.dry_run:
+        return _envelope("queue.cancel", args, status="planned", data={"queue": str(queue_path(root)), "job_id": args.job_id, "status": status, "marker": str(marker)})
+    if status == "pending":
+        set_status(job, "cancelled")
+        job["cancel_requested"] = True
+    elif status == "running":
+        atomic_write_text(marker, "cancel_requested\n")
+        job["cancel_requested"] = True
+        job["updated_at"] = now_iso()
+    else:
+        # Repeating a cancellation request is idempotent for an already cancelled job.
+        job["cancel_requested"] = True
+    save_queue(root, queue)
+    operation_id = new_id("op")
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "queue.cancel", "status": "succeeded", "project_id": project["project"]["id"], "job_id": args.job_id, "job_status": job.get("status"), "cancel_marker": str(marker) if marker.exists() else None, "created_at": now_iso()})
+    return _envelope("queue.cancel", args, data={"queue": str(queue_path(root)), "job": job, "marker": str(marker) if marker.exists() else None}, operation_id=operation_id)
+
+
+def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    queue = load_queue(root, project_id=project["project"]["id"])
+    if args.job_id:
+        selected = [find_job(queue, args.job_id)]
+        if selected[0].get("status") not in {"pending", "failed", "cancelled"}:
+            raise AppError("QUEUE_JOB_STATE_INVALID", "指定作业必须处于 pending、failed 或 cancelled 状态", exit_code=2, path=args.job_id)
+    else:
+        selected = [job for job in queue.get("jobs", []) if isinstance(job, dict) and job.get("status") == "pending"]
+        if args.max_jobs is not None:
+            if args.max_jobs <= 0:
+                raise argument_error("--max-jobs 必须大于 0", "--max-jobs")
+            selected = selected[:args.max_jobs]
+    if args.dry_run:
+        return _envelope("queue.run", args, status="planned", data={"queue": str(queue_path(root)), "jobs": [job.get("job_id") for job in selected], "count": len(selected), "continue_on_error": bool(args.continue_on_error)})
+
+    queue_operation_id = new_id("op")
+    summary = {"selected": len(selected), "succeeded": 0, "failed": 0, "cancelled": 0, "skipped": 0}
+    errors: list[dict[str, Any]] = []
+    job_results: list[dict[str, Any]] = []
+    for job in selected:
+        job_id = str(job["job_id"])
+        marker = cancel_path(root, job_id)
+        if marker.exists() and job.get("status") != "failed":
+            set_status(job, "cancelled")
+            job["cancel_requested"] = True
+            summary["cancelled"] += 1
+            job_results.append({"job_id": job_id, "status": "cancelled", "reason": "cancel marker exists before start"})
+            save_queue(root, queue)
+            continue
+        marker.unlink(missing_ok=True)
+        job["attempts"] = int(job.get("attempts", 0)) + 1
+        job["cancel_requested"] = False
+        job["operation_id"] = None
+        set_status(job, "running")
+        save_queue(root, queue)
+        try:
+            sequence = find_sequence(project, job.get("sequence_id"))
+            report = validate_project(root, project, strict_rights=bool(job.get("publish", False)), target="commercial_ad")
+            if not report["ok"]:
+                raise AppError("PROJECT_INVALID", "项目验证失败，拒绝执行队列作业", exit_code=7 if job.get("publish") else 2, cause=json.dumps(report, ensure_ascii=False))
+            render_args = _queue_job_args(root, job, args)
+            render_settings, profile = _render_settings_for_args(project, render_args)
+            output = ensure_inside(root, root / str(job["output"]))
+            progress_callback = None
+            if getattr(args, "progress", "none") == "jsonl":
+                progress_callback = lambda operation_id, event_type, percent, message: _progress(args, operation_id, event_type, "queue.render", percent, message)
+            result = render_project(root, project, sequence, output, dry_run=False, render_settings=render_settings, profile=profile, cancel_file=marker, progress_callback=progress_callback)
+            encoder = render_settings.get("output", {}) if isinstance(render_settings.get("output"), dict) else {}
+            project.setdefault("outputs", []).append({"id": new_id("output"), "path": str(output), "container": encoder.get("container", job.get("container", "mp4")), "profile": profile, "canvas": render_settings.get("canvas", {}), "video": encoder.get("video", {}), "audio": encoder.get("audio", {}), "target_platform": "generic"})
+            project.setdefault("provenance", {}).setdefault("change_log", []).append({"command": "queue.run", "queue_job_id": job_id, "at": now_iso(), "output": str(output), "manifest": result.get("manifest")})
+            save_project(root, project)
+            _operation(root, result.get("operation_id", new_id("op")), {"operation_id": result.get("operation_id"), "command": "render", "queue_job_id": job_id, "status": "succeeded", "output": str(output), "manifest": result.get("manifest"), "warnings": result.get("warnings", []), "profile": profile, "settings": render_settings, "project_id": project["project"]["id"], "sequence_id": sequence["id"], "project_fingerprint": result.get("project_fingerprint"), "input_hashes": result.get("input_hashes", {}), "created_at": now_iso()})
+            queue_warnings = report.get("warnings", []) + result.get("warnings", [])
+            job["warnings"] = queue_warnings
+            set_status(job, "succeeded", operation_id=result.get("operation_id"))
+            summary["succeeded"] += 1
+            job_results.append({"job_id": job_id, "status": "succeeded", "operation_id": result.get("operation_id"), "path": str(output), "warnings": queue_warnings})
+            marker.unlink(missing_ok=True)
+        except AppError as exc:
+            error = exc.as_dict()
+            set_status(job, "cancelled" if exc.code == "CANCELLED" else "failed", error=error, operation_id=exc.operation_id)
+            summary["cancelled" if exc.code == "CANCELLED" else "failed"] += 1
+            errors.append({"job_id": job_id, **error})
+            job_results.append({"job_id": job_id, "status": job["status"], "error": error})
+            marker.unlink(missing_ok=True)
+            if exc.code != "CANCELLED" and not args.continue_on_error:
+                save_queue(root, queue)
+                break
+        save_queue(root, queue)
+
+    final_status = "succeeded" if not errors and summary["cancelled"] == 0 else "partial"
+    _operation(root, queue_operation_id, {"operation_id": queue_operation_id, "command": "queue.run", "status": final_status, "project_id": project["project"]["id"], "summary": summary, "jobs": job_results, "created_at": now_iso()})
+    return _envelope("queue.run", args, data={"queue": str(queue_path(root)), "summary": summary, "jobs": job_results, "counts": _queue_counts(queue)}, status=final_status, errors=errors, operation_id=queue_operation_id)
+
+
 def command_quality_check(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     media = Path(args.input).expanduser().resolve()
@@ -1716,6 +1909,11 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("validate", None): command_validate,
     ("rights", "check"): command_rights_check,
     ("render", None): command_render,
+    ("queue", "enqueue"): command_queue_enqueue,
+    ("queue", "list"): command_queue_list,
+    ("queue", "inspect"): command_queue_inspect,
+    ("queue", "run"): command_queue_run,
+    ("queue", "cancel"): command_queue_cancel,
     ("quality", "check"): command_quality_check,
     ("convert", "import"): command_convert_import,
     ("convert", "export"): command_convert_export,
