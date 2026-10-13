@@ -43,10 +43,11 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "effects": {
                 "status": "implemented",
-                "features": ["grayscale", "sepia", "blur", "boxblur", "sharpen", "brightness", "contrast", "saturation", "hue", "gamma", "color_temperature", "color_balance", "vignette", "noise", "invert", "posterize", "edgedetect", "deband", "deshake", "histeq", "gradfun", "chroma_key", "hflip", "vflip", "effect_parameter_keyframes"],
+                "features": ["grayscale", "sepia", "blur", "boxblur", "sharpen", "brightness", "contrast", "saturation", "hue", "gamma", "color_temperature", "color_balance", "vignette", "noise", "invert", "posterize", "edgedetect", "deband", "deshake", "histeq", "gradfun", "chroma_key", "hflip", "vflip", "effect_parameter_keyframes", "sequence_adjustments"],
                 "unknown_effect_policy": "RENDER_FEATURE_UNSUPPORTED",
                 "effect_keyframe_contract": "brightness_contrast_saturation_hue_gamma_vignette_use_local_eq_hue_vignette_eval_frame",
-                "limits": ["unsupported_effect_parameters_use_static_value_with_warning"],
+                "adjustment_contract": "settings.adjustments_are_applied_after_track_compositing_as_a_sequence_wide_stack",
+                "limits": ["unsupported_effect_parameters_use_static_value_with_warning", "adjustment_layers_are_sequence_wide_until_interval_layers_are_added"],
             },
             "compositing": {
                 "status": "implemented",
@@ -89,9 +90,11 @@ def build_capability_manifest() -> dict[str, Any]:
                 "profiles": ["vertical", "square", "landscape", "vertical_720", "landscape_720", "custom"],
                 "containers": ["mp4", "webm", "mkv"],
                 "video_codecs": ["libx264", "libx265", "libvpx-vp9", "libvpx", "libaom-av1"],
+                "pixel_formats": ["yuv420p", "yuv422p", "yuv444p", "yuv420p10le", "yuv422p10le", "yuv444p10le"],
                 "audio_codecs": ["aac", "libopus", "opus", "pcm_s16le"],
                 "defaults": {"container": "mp4", "video_codec": "libx264", "audio_codec": "aac"},
-                "limits": ["codec availability still depends on the local FFmpeg build", "webm requires VPX/AV1 video plus Opus audio"],
+                "color_metadata_contract": "settings.color_is_forwarded_as_ffmpeg_primaries_transfer_matrix_range",
+                "limits": ["codec availability still depends on the local FFmpeg build", "10_bit_requires_encoder_and_container_support", "webm requires VPX/AV1 video plus Opus audio"],
             },
             "interoperability": {
                 "status": "degraded",

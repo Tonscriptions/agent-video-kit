@@ -31,6 +31,15 @@ OUTPUT_CONTAINERS: dict[str, str] = {
     "mkv": "matroska",
 }
 
+OUTPUT_PIXEL_FORMATS = (
+    "yuv420p",
+    "yuv422p",
+    "yuv444p",
+    "yuv420p10le",
+    "yuv422p10le",
+    "yuv444p10le",
+)
+
 # Names accepted by the local FFmpeg xfade filter.  ``crossfade``/``dissolve``
 # and directional ``wipe``/``slide`` are Agent-friendly aliases; the remaining
 # names map one-to-one so a template can expose the same transition catalog as
@@ -76,7 +85,7 @@ def output_settings(settings: dict[str, Any]) -> dict[str, Any]:
     if crf < 0 or crf > max_crf:
         raise AppError("OUTPUT_CRF_INVALID", f"{video_codec} 的 CRF 必须在 0 到 {max_crf} 之间", exit_code=2, path="settings.output.video.crf")
     pixel_format = str(video_raw.get("pixel_format", DEFAULT_OUTPUT["video"]["pixel_format"]))
-    if pixel_format not in {"yuv420p", "yuv422p", "yuv444p"}:
+    if pixel_format not in set(OUTPUT_PIXEL_FORMATS):
         raise AppError("OUTPUT_PIXEL_FORMAT_INVALID", f"不支持的像素格式: {pixel_format}", exit_code=2, path="settings.output.video.pixel_format")
     if container == "webm" and (video_codec not in {"libvpx-vp9", "libvpx", "libaom-av1"} or audio_codec not in {"libopus", "opus"}):
         raise AppError("OUTPUT_CODEC_CONTAINER_MISMATCH", "webm 需要 VP8/VP9/AV1 视频和 Opus 音频", exit_code=2, path="settings.output")
@@ -98,6 +107,28 @@ def output_settings(settings: dict[str, Any]) -> dict[str, Any]:
     if normalized["video"]["preset"] not in {"ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow", "placebo"}:
         raise AppError("OUTPUT_PRESET_INVALID", "编码 preset 不在支持列表中", exit_code=2, path="settings.output.video.preset")
     return normalized
+
+
+def _output_color_args(settings: dict[str, Any]) -> list[str]:
+    """Translate project color metadata into explicit FFmpeg output flags."""
+    color = settings.get("color") if isinstance(settings.get("color"), dict) else {}
+    values = {
+        "-color_primaries": color.get("primaries"),
+        "-color_trc": color.get("transfer"),
+        "-colorspace": color.get("matrix"),
+    }
+    raw_range = str(color.get("range", "")).strip().lower()
+    if raw_range:
+        values["-color_range"] = {"limited": "tv", "full": "pc"}.get(raw_range, raw_range)
+    args: list[str] = []
+    for flag, raw_value in values.items():
+        if raw_value is None or str(raw_value).strip() == "":
+            continue
+        value = str(raw_value).strip()
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+", value):
+            raise AppError("COLOR_METADATA_INVALID", f"色彩元数据值无效: {value}", exit_code=2, path="settings.color")
+        args.extend([flag, value])
+    return args
 
 
 def _sec(tick: int, tps: int) -> float:
@@ -1172,6 +1203,8 @@ def _effect_filters(
     filters: list[str] = []
     clip_value = clip if isinstance(clip, dict) else {}
     for effect in effects or []:
+        if isinstance(effect, dict) and effect.get("enabled", True) is False:
+            continue
         if isinstance(effect, str):
             effect_type, parameters = effect, {}
             effect_value: dict[str, Any] = {"type": effect_type}
@@ -1929,6 +1962,25 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     ducking_requested = False
     input_meta: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
+    adjustment_layers: list[tuple[str, list[Any]]] = []
+    raw_adjustments = settings.get("adjustments")
+    if isinstance(raw_adjustments, list):
+        for adjustment_index, raw_layer in enumerate(raw_adjustments):
+            layer_id = f"adjustment_{adjustment_index}"
+            if isinstance(raw_layer, str):
+                adjustment_layers.append((layer_id, [raw_layer]))
+                continue
+            if not isinstance(raw_layer, dict) or raw_layer.get("enabled", True) is False:
+                continue
+            if isinstance(raw_layer.get("effects"), list):
+                effects = list(raw_layer["effects"])
+            elif raw_layer.get("type"):
+                effects = [raw_layer]
+            else:
+                effects = []
+            if effects:
+                adjustment_layers.append((str(raw_layer.get("id", layer_id)), effects))
+    has_adjustments = bool(adjustment_layers)
     index = 0
     render_tracks = _flatten_sequence_tracks(project, sequence, warnings)
     for track in sorted(render_tracks, key=lambda item: int(item.get("order", 0))):
@@ -2413,7 +2465,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             index += 1
     current = "base"
     for pos, spec in enumerate(final_specs):
-        target = "vout" if pos == len(final_specs) - 1 else f"vo{pos}"
+        target = "vout" if pos == len(final_specs) - 1 and not has_adjustments else f"vo{pos}"
         blend = spec.get("blend") if isinstance(spec.get("blend"), dict) else {}
         blend_mode = str(blend.get("mode", "normal")).lower().replace("-", "_")
         if blend_mode in {"normal", "source_over", ""}:
@@ -2485,6 +2537,23 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": spec.get("clip_id"), "feature": f"blend:{blend_mode}", "message": "当前 FFmpeg 后端不支持该混合模式，已回退 source-over"})
             filters.append(f"[{current}][{spec['label']}]overlay={spec['position']}:eof_action=pass:format=auto[{target}]")
         current = target
+    if has_adjustments:
+        for adjustment_index, (adjustment_id, effects) in enumerate(adjustment_layers):
+            effect_clip = {"id": adjustment_id, "effects": effects}
+            effect_filters = _effect_filters(
+                effects,
+                warnings,
+                adjustment_id,
+                clip=effect_clip,
+                clip_start=0.0,
+                tps=tps,
+            )
+            if not effect_filters:
+                continue
+            target = f"adjusted{adjustment_index}"
+            filters.append(f"[{current}]" + ",".join(effect_filters) + f"[{target}]")
+            current = target
+        filters.append(f"[{current}]null[vout]")
     if audio_labels:
         mix_labels = list(audio_labels)
         if ducking_requested and voice_audio_labels and music_audio_labels:
@@ -2547,7 +2616,9 @@ def render_project(
         args.extend(["-crf", str(video_encoder.get("crf", 18))])
     if str(video_encoder.get("codec")) in {"libvpx-vp9", "libvpx"} and not video_encoder.get("bitrate"):
         args.extend(["-b:v", "0"])
-    args.extend(["-pix_fmt", str(video_encoder.get("pixel_format", "yuv420p")), "-c:a", str(audio_encoder["codec"])])
+    args.extend(["-pix_fmt", str(video_encoder.get("pixel_format", "yuv420p"))])
+    args.extend(_output_color_args(effective_project["settings"]))
+    args.extend(["-c:a", str(audio_encoder["codec"])])
     if str(audio_encoder.get("codec")) not in {"pcm_s16le", "pcm_s24le", "pcm_s32le"}:
         args.extend(["-b:a", str(audio_encoder.get("bitrate", "192k"))])
     if container == "mp4":

@@ -392,6 +392,8 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("relink_by_hash", manifest["capabilities"]["media"]["features"])
         self.assertIn("target_lufs_gate", manifest["capabilities"]["quality"]["features"])
         self.assertIn("effect_parameter_keyframes", manifest["capabilities"]["effects"]["features"])
+        self.assertIn("sequence_adjustments", manifest["capabilities"]["effects"]["features"])
+        self.assertIn("yuv420p10le", manifest["capabilities"]["output"]["pixel_formats"])
         self.assertEqual(manifest["policies"]["jianying_runtime_enabled"], False)
 
     def test_runtime_storage_is_local_to_product(self) -> None:
@@ -701,6 +703,91 @@ class P0CliTests(unittest.TestCase):
                 return sum(completed.stdout) / len(completed.stdout)
 
             self.assertGreater(center_luma(0.85), center_luma(0.10) + 15.0)
+
+    def test_sequence_adjustment_stack_applies_after_track_composite(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-sequence-adjustment-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingest["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id,
+                "source_in_tick": 0, "source_out_tick": 90000,
+            }]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            project_payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            project_payload["settings"]["adjustments"] = [{
+                "id": "global_grade",
+                "effects": [{
+                    "type": "brightness",
+                    "parameters": {"amount": 0.0},
+                    "keyframes": [{"property": "amount", "keyframes": [
+                        {"at_tick": 0, "value": 0.0, "interpolation": "linear"},
+                        {"at_tick": 90000, "value": 0.7, "interpolation": "linear"},
+                    ]}],
+                }],
+            }]
+            (project / "project.json").write_text(json.dumps(project_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            output = project / "renders" / "sequence-adjustment.mp4"
+            code, planned = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180", "--dry-run")
+            self.assertEqual(code, 0, planned)
+            graph = planned["data"]["plan"]["filter_complex"]
+            self.assertIn("null[vout]", graph)
+            self.assertIn("eq=brightness='", graph)
+            self.assertEqual(planned["data"]["plan"]["warnings"], [])
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180")
+            self.assertEqual(code, 0, rendered)
+            self.assertTrue(output.exists())
+
+            def center_luma(at_seconds: float) -> float:
+                completed = subprocess.run(
+                    ["ffmpeg", "-hide_banner", "-loglevel", "error", "-ss", str(at_seconds), "-i", str(output),
+                     "-frames:v", "1", "-vf", "crop=100:100:110:40,format=gray", "-f", "rawvideo", "-"],
+                    capture_output=True,
+                )
+                self.assertEqual(completed.returncode, 0, completed.stderr.decode("utf-8", errors="replace"))
+                self.assertGreater(len(completed.stdout), 0)
+                return sum(completed.stdout) / len(completed.stdout)
+
+            self.assertGreater(center_luma(0.85), center_luma(0.10) + 15.0)
+
+    def test_10bit_pixel_format_and_color_metadata_reach_ffmpeg_plan(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-10bit-output-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": ingest["data"]["asset"]["id"],
+                "source_in_tick": 0, "source_out_tick": 90000,
+            }]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            output = project / "renders" / "10bit.mp4"
+            code, planned = invoke(
+                "render", "--project", str(project), "--output", str(output),
+                "--profile", "custom", "--width", "320", "--height", "180",
+                "--pixel-format", "yuv420p10le", "--dry-run",
+            )
+            self.assertEqual(code, 0, planned)
+            command = planned["data"]["plan"]["command"]
+            self.assertIn("yuv420p10le", command)
+            self.assertIn("-color_primaries", command)
+            self.assertIn("bt709", command)
+            self.assertIn("-color_trc", command)
+            self.assertIn("-colorspace", command)
+            self.assertIn("-color_range", command)
+            code, rendered = invoke(
+                "render", "--project", str(project), "--output", str(output),
+                "--profile", "custom", "--width", "320", "--height", "180",
+                "--pixel-format", "yuv420p10le",
+            )
+            self.assertEqual(code, 0, rendered)
+            self.assertEqual(probe_media(output)["video"]["pix_fmt"], "yuv420p10le")
 
     def test_reverse_speed_curve_reflects_ramp_without_approximation_warning(self) -> None:
         segments = [(0.0, 0.25, 1.0, 1.0), (0.25, 0.75, 2.0, 2.0), (0.75, 1.0, 4.0, 4.0)]

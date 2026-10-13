@@ -34,6 +34,13 @@ EFFECT_KEYFRAME_ALIASES: dict[str, set[str]] = {
     "vignette": {"angle", "value"},
 }
 
+COLOR_METADATA_VALUES: dict[str, set[str]] = {
+    "primaries": {"bt709", "bt2020", "smpte170m", "smpte432"},
+    "transfer": {"bt709", "bt2020-10", "smpte2084", "arib-std-b67", "iec61966-2-1", "linear"},
+    "matrix": {"bt709", "bt2020nc", "bt2020c", "smpte170m", "gbr"},
+    "range": {"limited", "full", "tv", "pc"},
+}
+
 
 def _schema_path() -> Path:
     return Path(__file__).resolve().parents[3] / "docs" / "specs" / "agent-project.schema.json"
@@ -91,6 +98,103 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
         error("TYPE_INVALID", "assets 必须是数组", "assets")
     if not isinstance(project.get("sequences", []), list):
         error("TYPE_INVALID", "sequences 必须是数组", "sequences")
+
+    settings_value = project.get("settings")
+    if isinstance(settings_value, dict):
+        color_value = settings_value.get("color")
+        if color_value is not None:
+            if not isinstance(color_value, dict):
+                error("COLOR_METADATA_INVALID", "settings.color 必须是对象", "settings.color")
+            else:
+                for color_field, allowed_values in COLOR_METADATA_VALUES.items():
+                    raw_color = color_value.get(color_field)
+                    if raw_color is not None and str(raw_color).lower() not in allowed_values:
+                        error("COLOR_METADATA_UNSUPPORTED", f"不支持的色彩元数据: {raw_color}", f"settings.color.{color_field}")
+
+        adjustments = settings_value.get("adjustments")
+        if adjustments is not None:
+            if not isinstance(adjustments, list):
+                error("ADJUSTMENTS_INVALID", "settings.adjustments 必须是数组", "settings.adjustments")
+            else:
+                max_sequence_duration = max(
+                    (_int(item.get("duration_tick"), 0) for item in project.get("sequences", []) if isinstance(item, dict)),
+                    default=0,
+                )
+
+                def validate_adjustment_effect(effect_value: Any, effect_path: str) -> None:
+                    if isinstance(effect_value, str):
+                        return
+                    if not isinstance(effect_value, dict):
+                        error("EFFECT_INVALID", "序列调节效果必须是字符串或对象", effect_path)
+                        return
+                    if effect_value.get("enabled") is not None and not isinstance(effect_value.get("enabled"), bool):
+                        error("EFFECT_ENABLED_INVALID", "序列调节效果 enabled 必须是布尔值", f"{effect_path}.enabled")
+                    effect_type = str(effect_value.get("type", "")).lower().replace("-", "_")
+                    if not effect_type:
+                        error("EFFECT_TYPE_MISSING", "序列调节效果缺少 type", f"{effect_path}.type")
+                        return
+                    parameters = effect_value.get("parameters") if isinstance(effect_value.get("parameters"), dict) else effect_value
+                    raw_tracks = effect_value.get("keyframes")
+                    if not isinstance(raw_tracks, list):
+                        raw_tracks = parameters.get("keyframes") if isinstance(parameters.get("keyframes"), list) else []
+                    supported_properties = EFFECT_KEYFRAME_ALIASES.get(effect_type)
+                    for track_index, track_value in enumerate(raw_tracks):
+                        track_path = f"{effect_path}.keyframes[{track_index}]"
+                        if not isinstance(track_value, dict):
+                            error("EFFECT_KEYFRAMES_INVALID", "序列调节 keyframe track 必须是对象", track_path)
+                            continue
+                        property_name = str(track_value.get("property", "")).strip().lower().replace("-", "_")
+                        for prefix in ("effect.", "parameters.", f"{effect_type}."):
+                            if property_name.startswith(prefix):
+                                property_name = property_name[len(prefix):]
+                                break
+                        if not property_name:
+                            error("EFFECT_KEYFRAME_PROPERTY_INVALID", "序列调节 keyframe property 不能为空", f"{track_path}.property")
+                        elif supported_properties is None or property_name not in supported_properties:
+                            warning("EFFECT_KEYFRAME_PROPERTY_UNSUPPORTED", "该序列调节参数关键帧不会逐帧执行，将使用静态参数值", f"{track_path}.property")
+                        keyframes = track_value.get("keyframes")
+                        if not isinstance(keyframes, list) or not keyframes:
+                            error("EFFECT_KEYFRAMES_INVALID", "序列调节 keyframe track 必须包含非空 keyframes", f"{track_path}.keyframes")
+                            continue
+                        previous_at = -1
+                        for keyframe_index, keyframe_value in enumerate(keyframes):
+                            keyframe_path = f"{track_path}.keyframes[{keyframe_index}]"
+                            if not isinstance(keyframe_value, dict):
+                                error("EFFECT_KEYFRAMES_INVALID", "序列调节 keyframe 必须是对象", keyframe_path)
+                                continue
+                            at = _int(keyframe_value.get("at_tick"), -1)
+                            if at < 0 or at < previous_at or max_sequence_duration and at > max_sequence_duration:
+                                error("EFFECT_KEYFRAME_TIME_INVALID", "序列调节 keyframe at_tick 必须单调且位于序列内", f"{keyframe_path}.at_tick")
+                            previous_at = at
+                            interpolation = keyframe_value.get("interpolation")
+                            if interpolation not in {"hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"}:
+                                error("INTERPOLATION_INVALID", "序列调节关键帧插值类型无效", f"{keyframe_path}.interpolation")
+                            value = keyframe_value.get("value")
+                            try:
+                                numeric_value = float(value)
+                            except (TypeError, ValueError):
+                                numeric_value = math.nan
+                            if isinstance(value, bool) or not math.isfinite(numeric_value):
+                                error("EFFECT_KEYFRAME_VALUE_INVALID", "序列调节关键帧 value 必须是有限数字", f"{keyframe_path}.value")
+
+                for adjustment_index, adjustment_value in enumerate(adjustments):
+                    adjustment_path = f"settings.adjustments[{adjustment_index}]"
+                    if isinstance(adjustment_value, str):
+                        continue
+                    if not isinstance(adjustment_value, dict):
+                        error("ADJUSTMENT_INVALID", "序列调节层必须是字符串或对象", adjustment_path)
+                        continue
+                    if adjustment_value.get("enabled") is not None and not isinstance(adjustment_value.get("enabled"), bool):
+                        error("ADJUSTMENT_ENABLED_INVALID", "序列调节 enabled 必须是布尔值", f"{adjustment_path}.enabled")
+                    if "start_tick" in adjustment_value or "duration_tick" in adjustment_value:
+                        error("ADJUSTMENT_TIMING_UNSUPPORTED", "当前序列调节层只支持覆盖整个序列，暂不接受 start_tick/duration_tick", adjustment_path)
+                    if isinstance(adjustment_value.get("effects"), list):
+                        for effect_index, effect_value in enumerate(adjustment_value["effects"]):
+                            validate_adjustment_effect(effect_value, f"{adjustment_path}.effects[{effect_index}]")
+                    elif adjustment_value.get("type"):
+                        validate_adjustment_effect(adjustment_value, adjustment_path)
+                    else:
+                        error("ADJUSTMENT_EFFECTS_MISSING", "序列调节层必须提供 effects 或 type", adjustment_path)
 
     ids: set[str] = set()
     for index, asset in enumerate(project.get("assets", [])):

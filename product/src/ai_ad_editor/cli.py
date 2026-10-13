@@ -39,7 +39,7 @@ from .library import index_directory, search_catalog
 from .batch import _load_variants, run_template_batch
 from .capabilities import build_capability_manifest
 from .transcribe import transcribe_local, write_srt
-from .render import OUTPUT_CONTAINERS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
+from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
 from .rights import add_record, check_project_rights, load_ledger, save_ledger
 from .understand import understand_media
 from .tracking import track_media
@@ -205,7 +205,7 @@ def build_parser() -> argparse.ArgumentParser:
     render.add_argument("--crf", type=int, default=None, help="视频 CRF，范围 0..63")
     render.add_argument("--video-bitrate", default=None, help="可选视频码率，例如 8M")
     render.add_argument("--audio-bitrate", default=None, help="音频码率，例如 192k")
-    render.add_argument("--pixel-format", choices=("yuv420p", "yuv422p", "yuv444p"), default=None)
+    render.add_argument("--pixel-format", choices=OUTPUT_PIXEL_FORMATS, default=None)
 
     quality = subs.add_parser("quality", help="输出质量检查")
     qs = quality.add_subparsers(dest="action", required=True)
