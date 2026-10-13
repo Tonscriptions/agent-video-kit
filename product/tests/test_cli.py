@@ -425,6 +425,22 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(result["data"]["count"], 1)
             self.assertEqual(result["data"]["groups"][0]["count"], 2)
 
+    def test_quality_scopes_generate_local_color_review_artifacts(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-scopes-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, result = invoke("quality", "scopes", "--project", str(project), "--input", str(source), "--at-seconds", "0.2")
+            self.assertEqual(code, 0, result)
+            self.assertEqual(result["command"], "quality.scopes")
+            self.assertEqual(result["data"]["engine"], "ffmpeg-local")
+            self.assertEqual({item["type"] for item in result["data"]["artifacts"]}, {"waveform", "vectorscope", "histogram"})
+            self.assertTrue(Path(result["data"]["report"]).exists())
+            for artifact in result["data"]["artifacts"]:
+                self.assertTrue(Path(artifact["path"]).exists())
+                self.assertGreater(artifact["bytes"], 0)
+
     def test_media_prepare_generates_proxy_thumbnail_and_waveform(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-prepare-") as raw:
             workspace = Path(raw)
@@ -495,6 +511,7 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("snapshot", manifest["capabilities"]["project"]["features"])
         self.assertIn("relink_by_hash", manifest["capabilities"]["media"]["features"])
         self.assertIn("target_lufs_gate", manifest["capabilities"]["quality"]["features"])
+        self.assertIn("vectorscope", manifest["capabilities"]["quality"]["features"])
         self.assertIn("effect_parameter_keyframes", manifest["capabilities"]["effects"]["features"])
         self.assertIn("sequence_adjustments", manifest["capabilities"]["effects"]["features"])
         self.assertIn("lut3d_project_local", manifest["capabilities"]["effects"]["features"])

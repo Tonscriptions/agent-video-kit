@@ -83,6 +83,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `queue run --project PATH [--job-id ID]` | 待处理作业或显式重试作业 | 顺序执行本地渲染；保存 `pending/running/succeeded/failed/cancelled`，可用 `--max-jobs` 和 `--continue-on-error` 控制批次 |
 | `queue cancel --project PATH --job-id ID` | 待处理或运行中作业 | 待处理作业立即标记取消；运行中写入项目内取消标记并由渲染器确认 |
 | `quality check --project PATH --input FILE` | 已渲染媒体 | 画布、流、时长、音画差、可选黑帧、LUFS 和 true peak 报告 |
+| `quality scopes --project PATH --input FILE` | 项目内或本地视频、抽帧时间点 | 生成本地 waveform/vectorscope/histogram PNG 和带哈希的 scope 报告；不自动判定调色正确性 |
 | `convert import --input FILE --output DIR` | Agent JSON、OTIO JSON 或 Kdenlive XML | 新建本地项目并写 Exact/Mapped/Approximate/Baked/Unsupported/Failed 报告 |
 | `convert export --project PATH --output FILE --target-format FORMAT` | 本地项目 | 导出 Agent JSON、OTIO 或 Kdenlive XML，并保留转换报告 |
 | `template apply --project PATH --input TEMPLATE.json` | 本地模板和变量 | 变量校验、片段实例化、模板快照和 provenance 变更记录 |
@@ -145,6 +146,10 @@ python -X utf8 -m ai_ad_editor render --project .\work\demo --dry-run
 ### 6.3 本地素材确定性索引
 
 `library index` 和 `library search` 的完整字段、侧车字幕规则、过滤器和重复组语义见[本地素材语义索引与重复分组契约](./本地素材语义索引与重复分组契约_v0.1_2026-10-14.md)。当前 `semantic.source` 固定为 `deterministic-local`，`vector_index=false`，不会联网、下载模型或把文件名/字幕匹配描述成视觉理解。模型级 VLM、embedding、OCR、人物/物体标签必须作为显式本地适配器接入，并写入模型版本和 provenance。
+
+### 6.4 本地色彩 Scope 审查
+
+`quality scopes` 的字段、输出目录约束和限制见[本地色彩 Scope 审查契约](./本地色彩Scope审查契约_v0.1_2026-10-14.md)。它只生成可复核的 FFmpeg waveform、vectorscope、histogram PNG 和 JSON 哈希报告；Agent 不得把 scope 图描述成自动调色结论，也不能用它替代 `quality check` 的音视频质量门禁。
 
 ## 7. 错误码和退出码
 

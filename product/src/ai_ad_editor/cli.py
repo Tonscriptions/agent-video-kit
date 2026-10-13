@@ -48,6 +48,7 @@ from .template import instantiate
 from .migration import SUPPORTED_SOURCE_VERSIONS, migrate_project_payload
 from .speech import flite_available, synthesize_local_tts
 from .effects import EFFECT_CATALOG_VERSION, get_effect, list_effects
+from .scopes import SCOPE_VERSION, generate_scopes
 from .render_queue import JOB_STATUSES, cancel_path, enqueue as enqueue_render_jobs, find_job, load_queue, normalize_job, queue_path, save_queue, set_status
 from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
@@ -267,6 +268,11 @@ def build_parser() -> argparse.ArgumentParser:
     qcheck.add_argument("--profile", choices=tuple(OUTPUT_PROFILES) + ("custom",), default=None, help="按输出画布档案检查")
     qcheck.add_argument("--width", type=int, default=None)
     qcheck.add_argument("--height", type=int, default=None)
+    qscopes = _leaf_common(qs.add_parser("scopes", help="生成本地 waveform/vectorscope/histogram 色彩审查图"))
+    qscopes.add_argument("--project", required=True)
+    qscopes.add_argument("--input", required=True)
+    qscopes.add_argument("--at-seconds", type=float, default=0.0)
+    qscopes.add_argument("--output-dir", default=None, help="项目内 scope 输出目录；默认 cache/scopes/<scope_id>")
 
     convert = subs.add_parser("convert", help="项目/交换格式互操作")
     cs = convert.add_subparsers(dest="action", required=True)
@@ -1755,6 +1761,27 @@ def command_quality_check(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("quality.check", args, data={"report": str(report_path), **result}, status=status, warnings=result.get("warnings", []), errors=result.get("errors", []))
 
 
+def command_quality_scopes(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    media = Path(args.input).expanduser().resolve()
+    if not media.exists() or not media.is_file():
+        raise argument_error("色彩 scope 输入不存在", str(media))
+    scope_id = new_id("scope")
+    output_dir = Path(args.output_dir).expanduser().resolve() if args.output_dir else root / "cache" / "scopes" / scope_id
+    try:
+        output_dir.relative_to(root)
+    except ValueError as exc:
+        raise argument_error("scope 输出目录必须位于项目目录内", str(output_dir)) from exc
+    if args.dry_run:
+        return _envelope("quality.scopes", args, status="planned", data={"input": str(media), "output_dir": str(output_dir), "at_seconds": args.at_seconds, "scope_types": ["waveform", "vectorscope", "histogram"]})
+    result = generate_scopes(media, output_dir, at_seconds=args.at_seconds)
+    report_path = root / "validation" / f"scopes_{scope_id}.json"
+    atomic_write_json(report_path, {"report_version": SCOPE_VERSION, "created_at": now_iso(), "project_id": project["project"]["id"], **result})
+    operation_id = new_id("op")
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "quality.scopes", "status": "succeeded", "report": str(report_path), "artifacts": result["artifacts"], "created_at": now_iso()})
+    return _envelope("quality.scopes", args, data={"report": str(report_path), **result}, operation_id=operation_id)
+
+
 def command_convert_import(args: argparse.Namespace) -> dict[str, Any]:
     source = Path(args.input).expanduser().resolve()
     destination = Path(args.output).expanduser().resolve()
@@ -1943,6 +1970,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("queue", "run"): command_queue_run,
     ("queue", "cancel"): command_queue_cancel,
     ("quality", "check"): command_quality_check,
+    ("quality", "scopes"): command_quality_scopes,
     ("convert", "import"): command_convert_import,
     ("convert", "export"): command_convert_export,
     ("template", "apply"): command_template_apply,

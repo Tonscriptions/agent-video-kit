@@ -104,9 +104,11 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "quality": {
                 "status": "implemented",
-                "features": ["stream_presence", "canvas", "duration", "av_duration_delta", "blackdetect_optional", "ebur128_optional", "target_lufs_gate", "true_peak_gate", "fail_on_black"],
+                "features": ["stream_presence", "canvas", "duration", "av_duration_delta", "blackdetect_optional", "ebur128_optional", "target_lufs_gate", "true_peak_gate", "fail_on_black", "waveform_scope", "vectorscope", "histogram_scope"],
+                "scope_engine": "ffmpeg-local",
+                "scope_artifacts": ["png", "json_report"],
                 "defaults": {"max_av_sync_ms": 80.0, "lufs_tolerance": 2.0},
-                "limits": ["true_peak_gate_requires_expensive_scan_and_ffmpeg_ebur128", "golden_media_and_cross_device_thresholds_pending"],
+                "limits": ["true_peak_gate_requires_expensive_scan_and_ffmpeg_ebur128", "scope_images_are_review_artifacts_not_automatic_color_judgement", "golden_media_and_cross_device_thresholds_pending"],
             },
             "output": {
                 "status": "implemented",
