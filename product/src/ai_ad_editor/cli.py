@@ -163,6 +163,12 @@ def build_parser() -> argparse.ArgumentParser:
     ad_plan.add_argument("--input", required=True, help="广告 brief JSON")
     ad_plan.add_argument("--analysis", default=None, help="可选本地素材理解/高光报告 JSON")
     ad_plan.add_argument("--output", default=None)
+    ad_apply = _leaf_common(ads.add_parser("apply", help="将本地广告计划写入序列标记和时长"))
+    ad_apply.add_argument("--project", required=True)
+    ad_apply.add_argument("--input", required=True, help="ad plan 输出 JSON 或 plan 对象")
+    ad_apply.add_argument("--sequence-id", default=None)
+    ad_apply.add_argument("--replace-markers", action="store_true", help="替换计划中同 ID 的既有标记")
+    ad_apply.add_argument("--preserve-duration", action="store_true", help="不把序列时长设置为计划时长")
 
     subtitle = subs.add_parser("subtitle", help="字幕解析、验证与规范化")
     ss = subtitle.add_subparsers(dest="action", required=True)
@@ -888,6 +894,66 @@ def command_ad_plan(args: argparse.Namespace) -> dict[str, Any]:
     save_project(root, project)
     _operation(root, operation_id, {"operation_id": operation_id, "command": "ad.plan", "status": "succeeded", "output": str(output), "created_at": now_iso()})
     return _envelope("ad.plan", args, data={"output": str(output), "plan": plan}, operation_id=operation_id)
+
+
+def command_ad_apply(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    payload = load_json(Path(args.input).expanduser().resolve())
+    plan = payload.get("plan") if isinstance(payload, dict) and isinstance(payload.get("plan"), dict) else payload
+    if not isinstance(plan, dict):
+        raise argument_error("广告计划必须是 JSON 对象", "input")
+    operations = plan.get("timeline_operations")
+    if not isinstance(operations, list) or not operations:
+        raise argument_error("广告计划缺少非空 timeline_operations", "timeline_operations")
+    sequence = find_sequence(project, args.sequence_id)
+    duration_tick = plan.get("duration_tick")
+    if duration_tick is not None:
+        try:
+            duration_tick = int(duration_tick)
+        except (TypeError, ValueError) as exc:
+            raise argument_error("广告计划 duration_tick 必须是整数", "duration_tick") from exc
+        if duration_tick <= 0:
+            raise argument_error("广告计划 duration_tick 必须大于 0", "duration_tick")
+    before_project = copy.deepcopy(project)
+    applied: list[dict[str, Any]] = []
+    existing_ids = {str(marker.get("id")) for marker in sequence.get("markers", [])}
+    for item in operations:
+        if not isinstance(item, dict) or str(item.get("op", "")) != "add_marker":
+            raise argument_error("ad apply 目前只接受 add_marker 计划操作", "timeline_operations")
+        marker_id = str(item.get("id") or "")
+        if not marker_id:
+            raise argument_error("广告计划标记缺少 id", "timeline_operations[].id")
+        try:
+            at_tick = int(item.get("at_tick", 0))
+        except (TypeError, ValueError) as exc:
+            raise argument_error("广告计划标记 at_tick 必须是整数", "timeline_operations[].at_tick") from exc
+        if at_tick < 0:
+            raise argument_error("广告计划标记 at_tick 不能为负", "timeline_operations[].at_tick")
+        if marker_id in existing_ids:
+            if not args.replace_markers:
+                raise argument_error(f"序列标记 ID 已存在: {marker_id}; 需要 --replace-markers", "timeline_operations[].id")
+            sequence["markers"] = [marker for marker in sequence.get("markers", []) if str(marker.get("id")) != marker_id]
+        marker = {"id": marker_id, "at_tick": at_tick, "label": str(item.get("label", ""))}
+        sequence.setdefault("markers", []).append(marker)
+        existing_ids.add(marker_id)
+        applied.append({"op": "add_marker", "marker": marker})
+    if duration_tick is not None and not args.preserve_duration:
+        max_end = max((int(clip.get("timeline_start_tick", 0)) + int(clip.get("duration_tick", 0)) for track in sequence.get("tracks", []) for clip in track.get("clips", [])), default=0)
+        if duration_tick < max_end:
+            raise argument_error("计划时长短于已有片段末尾", "duration_tick")
+        sequence["duration_tick"] = duration_tick
+        applied.append({"op": "set_sequence_duration", "sequence_id": sequence["id"], "duration_tick": duration_tick})
+    if args.dry_run:
+        return _envelope("ad.apply", args, status="planned", data={"sequence_id": sequence["id"], "applied": applied, "plan_version": plan.get("plan_version")})
+    validation = validate_project(root, project, strict_rights=False)
+    if not validation["ok"]:
+        raise AppError("PROJECT_INVALID", "广告计划应用会生成无效项目", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    snapshot = create_snapshot(root, before_project, label="before-ad-plan-apply")
+    operation_id = new_id("op")
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "ad.apply", "input": str(Path(args.input).expanduser().resolve()), "plan_version": plan.get("plan_version"), "applied": applied, "before_snapshot_id": snapshot["snapshot_id"], "at": now_iso()})
+    save_project(root, project)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "ad.apply", "status": "succeeded", "applied": applied, "before_snapshot_id": snapshot["snapshot_id"], "created_at": now_iso()})
+    return _envelope("ad.apply", args, data={"sequence_id": sequence["id"], "applied": applied, "validation": validation, "before_snapshot": snapshot}, operation_id=operation_id)
 
 
 def command_subtitle_validate(args: argparse.Namespace) -> dict[str, Any]:
@@ -2421,6 +2487,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "prepare"): command_media_prepare,
     ("media", "highlights"): command_media_highlights,
     ("ad", "plan"): command_ad_plan,
+    ("ad", "apply"): command_ad_apply,
     ("subtitle", "validate"): command_subtitle_validate,
     ("subtitle", "normalize"): command_subtitle_normalize,
     ("tts", "synthesize"): command_tts_synthesize,

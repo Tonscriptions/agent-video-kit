@@ -763,6 +763,29 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(len(plan["markers"]), len(plan["phases"]))
             self.assertTrue(Path(result["data"]["output"]).exists())
 
+    def test_local_ad_plan_apply_writes_markers_with_snapshot(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-plan-apply-") as raw:
+            workspace = Path(raw)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            brief = workspace / "brief.json"
+            brief.write_text(json.dumps({"product": "Local Camera", "duration_seconds": 6, "cta": "立即试用"}), encoding="utf-8")
+            code, planned = invoke("ad", "plan", "--project", str(project), "--input", str(brief))
+            self.assertEqual(code, 0, planned)
+            plan_path = planned["data"]["output"]
+            code, applied = invoke("ad", "apply", "--project", str(project), "--input", plan_path)
+            self.assertEqual(code, 0, applied)
+            self.assertTrue(applied["data"]["before_snapshot"]["snapshot_id"])
+            self.assertIn("set_sequence_duration", [item["op"] for item in applied["data"]["applied"]])
+            payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            self.assertEqual(len(payload["sequences"][0]["markers"]), 6)
+            self.assertEqual(payload["sequences"][0]["duration_tick"], 540000)
+            code, duplicate = invoke("ad", "apply", "--project", str(project), "--input", plan_path)
+            self.assertEqual(code, 2, duplicate)
+            self.assertEqual(duplicate["errors"][0]["code"], "ARGUMENT_INVALID")
+            code, replaced = invoke("ad", "apply", "--project", str(project), "--input", plan_path, "--replace-markers")
+            self.assertEqual(code, 0, replaced)
+
     def test_capabilities_manifest_is_local_and_agent_readable(self) -> None:
         code, result = invoke("capabilities")
         self.assertEqual(code, 0, result)
@@ -795,6 +818,7 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("yuva420p", manifest["capabilities"]["output"]["pixel_formats"])
         self.assertIn("hable", manifest["capabilities"]["output"]["tone_mapping"])
         self.assertIn("local_flite_tts", manifest["capabilities"]["ai"]["features"])
+        self.assertIn("local_ad_plan_apply", manifest["capabilities"]["ai"]["features"])
         self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.2.0")
         self.assertIn("exposure", manifest["capabilities"]["effects"]["catalog_features"])
         self.assertIn("effect_catalog_cli", manifest["capabilities"]["effects"]["features"])
