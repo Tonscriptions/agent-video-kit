@@ -702,6 +702,55 @@ class P0CliTests(unittest.TestCase):
             self.assertTrue(manifest["manifest_sha256"].startswith("sha256:"))
             self.assertEqual(manifest["assets"][0]["record_version"], 3)
 
+    def test_rights_template_dependencies_batch_update_and_retract_impact(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-rights-deps-") as raw:
+            workspace = Path(raw)
+            primary_source = self.make_media(workspace, "primary.mp4")
+            parent_source = self.make_media(workspace, "parent.mp4")
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            ingest_args = [
+                "--project", str(project), "--verification-status", "verified", "--source-url", "local://source",
+                "--license-spdx", "CC0-1.0", "--license-url", "local://license", "--evidence", "local://evidence",
+                "--permitted-use", "commercial_ad",
+            ]
+            _, primary = invoke("media", "ingest", "--input", str(primary_source), "--asset-id", "primary", *ingest_args)
+            _, parent = invoke("media", "ingest", "--input", str(parent_source), "--asset-id", "parent", *ingest_args)
+            primary_asset = primary["data"]["asset"]
+            project_payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            project_payload["assets"] = [primary_asset]
+            project_payload["templates"] = [{"id": "tpl-dependency", "version": "1.0.0", "assets": ["parent"]}]
+            (project / "project.json").write_text(json.dumps(project_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+            code, checked = invoke("rights", "check", "--project", str(project))
+            self.assertEqual(code, 0, checked)
+            self.assertEqual(checked["data"]["required_records"], 2)
+
+            updates = workspace / "rights-updates.json"
+            updates.write_text(json.dumps({"updates": [
+                {"asset_id": "primary", "patch": {"notes": "batch reviewed"}, "reason": "batch review"},
+                {"asset_id": "parent", "patch": {"notes": "batch reviewed"}, "reason": "batch review"},
+            ]}), encoding="utf-8")
+            code, batched = invoke("rights", "batch-update", "--project", str(project), "--input", str(updates))
+            self.assertEqual(code, 0, batched)
+            self.assertEqual(batched["data"]["count"], 2)
+
+            release = project / "exports" / "dependency-release.json"
+            code, exported = invoke("rights", "export", "--project", str(project), "--output", str(release))
+            self.assertEqual(code, 0, exported)
+            manifest = json.loads(release.read_text(encoding="utf-8"))
+            self.assertEqual([item["asset_id"] for item in manifest["rights_dependencies"]], ["parent", "primary"])
+
+            code, retracted = invoke("rights", "retract", "--project", str(project), "--asset-id", "parent", "--reason", "license notice")
+            self.assertEqual(code, 0, retracted)
+            self.assertTrue(any(item["path"] == "exports/dependency-release.json" for item in retracted["data"]["impacted_artifacts"]))
+            code, impact = invoke("rights", "impact", "--project", str(project), "--asset-id", "parent")
+            self.assertEqual(code, 0, impact)
+            self.assertGreaterEqual(impact["data"]["count"], 1)
+            code, blocked = invoke("rights", "check", "--project", str(project))
+            self.assertEqual(code, 7, blocked)
+            self.assertTrue(any(item["code"] == "RIGHTS_STATUS_BLOCKED" and item["context"] == "derived_dependency" for item in blocked["data"]["failures"]))
+
     def test_ingest_dry_run_does_not_change_project(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-dry-") as raw:
             workspace = Path(raw)

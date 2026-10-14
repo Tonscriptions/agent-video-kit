@@ -40,7 +40,7 @@ from .batch import _load_variants, run_template_batch
 from .capabilities import build_capability_manifest
 from .transcribe import transcribe_local, write_srt
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
-from .rights import VALID_STATUSES, active_records, add_record, check_project_rights, load_ledger, record_history, release_manifest, revise_record, save_ledger
+from .rights import VALID_STATUSES, active_records, add_record, check_project_rights, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
 from .understand import understand_media
 from .tracking import track_media
 from .runtime import configure_local_runtime
@@ -244,6 +244,18 @@ def build_parser() -> argparse.ArgumentParser:
     rights_export.add_argument("--project", required=True)
     rights_export.add_argument("--output", required=True, help="项目内 JSON 输出路径")
     rights_export.add_argument("--target", default="commercial_ad")
+    rights_batch = _leaf_common(rs.add_parser("batch-update", help="原子批量创建权利记录修订"))
+    rights_batch.add_argument("--project", required=True)
+    rights_batch.add_argument("--input", required=True, help="本地 JSON：{updates:[{asset_id,patch,reason,actor,reopen}]} ")
+    rights_impact = _leaf_common(rs.add_parser("impact", help="查找资产影响的本地历史产物"))
+    rights_impact.add_argument("--project", required=True)
+    rights_impact.add_argument("--asset-id", required=True)
+    rights_retract = _leaf_common(rs.add_parser("retract", help="撤下资产并生成历史影响报告"))
+    rights_retract.add_argument("--project", required=True)
+    rights_retract.add_argument("--asset-id", required=True)
+    rights_retract.add_argument("--status", choices=("takedown", "disputed", "blocked"), default="takedown")
+    rights_retract.add_argument("--reason", required=True)
+    rights_retract.add_argument("--actor", default="ai-ad-editor")
 
     render = _leaf_common(subs.add_parser("render", help="本地 FFmpeg 渲染"))
     render.add_argument("--project", required=True)
@@ -1574,6 +1586,76 @@ def command_rights_export(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("rights.export", args, data={"manifest": manifest, "output": str(output)}, status=status, errors=manifest["rights_check"].get("failures", []), warnings=manifest["rights_check"].get("warnings", []))
 
 
+def command_rights_batch_update(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    ledger = load_ledger(root)
+    input_path = Path(require_local_reference(args.input, field="--input")).expanduser().resolve()
+    payload = load_json(input_path)
+    updates = payload.get("updates")
+    if not isinstance(updates, list) or not updates:
+        raise argument_error("Rights Ledger 批量输入必须包含非空 updates 数组", "--input")
+
+    def apply_updates(target_ledger: dict[str, Any]) -> list[dict[str, Any]]:
+        planned: list[dict[str, Any]] = []
+        for index, item in enumerate(updates):
+            if not isinstance(item, dict):
+                raise argument_error(f"批量修订第 {index} 项必须是对象", "updates")
+            asset_id = str(item.get("asset_id") or "")
+            if not asset_id:
+                raise argument_error(f"批量修订第 {index} 项缺少 asset_id", "updates")
+            patch = copy.deepcopy(item.get("patch"))
+            if patch is None:
+                patch = {}
+                if item.get("status") is not None:
+                    patch["verification_status"] = item["status"]
+            if not isinstance(patch, dict):
+                raise argument_error(f"批量修订第 {index} 项 patch 必须是对象", "updates")
+            reason = str(item.get("reason") or "")
+            actor = str(item.get("actor") or "ai-ad-editor")
+            revision = revise_record(target_ledger, asset_id, patch, reason=reason, actor=actor, reopen=bool(item.get("reopen", False)))
+            planned.append({"asset_id": asset_id, "revision": revision})
+        return planned
+
+    planned_ledger = copy.deepcopy(ledger)
+    planned = apply_updates(planned_ledger)
+    if args.dry_run:
+        return _envelope("rights.batch-update", args, status="planned", data={"updates": planned, "count": len(planned), "input": str(input_path)})
+    snapshot = create_snapshot(root, project, label="rights-batch-update")
+    operation_id = new_id("op")
+    committed = apply_updates(ledger)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "rights.batch-update", "count": len(committed), "snapshot_id": snapshot["snapshot_id"], "input": str(input_path), "at": now_iso()})
+    save_ledger(root, ledger)
+    save_project(root, project)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "rights.batch-update", "status": "succeeded", "count": len(committed), "snapshot_id": snapshot["snapshot_id"], "created_at": now_iso()})
+    return _envelope("rights.batch-update", args, data={"updates": committed, "count": len(committed), "snapshot": snapshot, "ledger": str(ledger_file(root))}, operation_id=operation_id)
+
+
+def command_rights_impact(args: argparse.Namespace) -> dict[str, Any]:
+    root, _project = load_project(args.project)
+    artifacts = impacted_artifacts(root, args.asset_id)
+    return _envelope("rights.impact", args, data={"asset_id": args.asset_id, "artifacts": artifacts, "count": len(artifacts)})
+
+
+def command_rights_retract(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    ledger = load_ledger(root)
+    before = impacted_artifacts(root, args.asset_id)
+    patch = {"verification_status": args.status}
+    planned_ledger = copy.deepcopy(ledger)
+    revision = revise_record(planned_ledger, args.asset_id, patch, reason=args.reason, actor=args.actor)
+    if args.dry_run:
+        return _envelope("rights.retract", args, status="planned", data={"revision": revision, "impacted_artifacts": before})
+    snapshot = create_snapshot(root, project, label=f"rights-{args.asset_id}-retract")
+    operation_id = new_id("op")
+    committed = revise_record(ledger, args.asset_id, patch, reason=args.reason, actor=args.actor)
+    save_ledger(root, ledger)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "rights.retract", "asset_id": args.asset_id, "status": args.status, "reason": args.reason, "snapshot_id": snapshot["snapshot_id"], "at": now_iso()})
+    save_project(root, project)
+    after = impacted_artifacts(root, args.asset_id)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "rights.retract", "status": "succeeded", "asset_id": args.asset_id, "record_id": committed["record"]["record_id"], "snapshot_id": snapshot["snapshot_id"], "impacted_artifacts": after, "created_at": now_iso()})
+    return _envelope("rights.retract", args, data={"revision": committed, "snapshot": snapshot, "impacted_artifacts": after, "previous_impact": before}, operation_id=operation_id)
+
+
 def _render_settings_for_args(project: dict[str, Any], args: argparse.Namespace) -> tuple[dict[str, Any], str | None]:
     profile = getattr(args, "profile", None)
     width = getattr(args, "width", None)
@@ -2088,6 +2170,9 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("rights", "history"): command_rights_history,
     ("rights", "update"): command_rights_update,
     ("rights", "export"): command_rights_export,
+    ("rights", "batch-update"): command_rights_batch_update,
+    ("rights", "impact"): command_rights_impact,
+    ("rights", "retract"): command_rights_retract,
     ("render", None): command_render,
     ("queue", "enqueue"): command_queue_enqueue,
     ("queue", "list"): command_queue_list,

@@ -66,9 +66,14 @@ python -m ai_ad_editor rights history --project .\project --asset-id asset_001
 python -m ai_ad_editor rights update --project .\project --asset-id asset_001 --status takedown --reason "notice received" --actor reviewer
 python -m ai_ad_editor rights update --project .\project --asset-id asset_001 --status verified --reopen --reason "evidence cleared" --evidence local://rights/new-proof
 python -m ai_ad_editor rights export --project .\project --target commercial_ad --output .\project\exports\release.json
+python -m ai_ad_editor rights batch-update --project .\project --input .\rights-updates.json
+python -m ai_ad_editor rights impact --project .\project --asset-id asset_001
+python -m ai_ad_editor rights retract --project .\project --asset-id asset_001 --reason "license notice"
 ```
 
 从 `disputed`、`expired`、`takedown` 或 `blocked` 恢复到 `verified/restricted` 必须同时提供 `--reopen` 和不同于旧记录的本地证据。撤下或争议状态会自动把 `takedown_status` 置为 `notice`；恢复时若未显式指定则清除为 `clear`。
+
+模板登记中的 `assets`/`dependencies`、项目资产的 `derived_from` 父资产会递归纳入发布检查。缺失依赖返回 `RIGHTS_TEMPLATE_DEPENDENCY_MISSING`，缺失父资产返回 `RIGHTS_RECORD_MISSING`，项目资产哈希与台账快照不一致返回 `RIGHTS_HASH_MISMATCH`。`rights batch-update` 先在内存中预检全部项目，再创建单个快照并提交；`rights retract` 只阻断新发布并生成 `rights impact` 报告，不擅自删除历史成片。
 
 ## 4. 许可证策略
 
@@ -112,11 +117,12 @@ python -m ai_ad_editor rights export --project .\project --target commercial_ad 
 4. `expires_at` 缺失或尚未到期；
 5. 归属文本、字体声明、商标/肖像审批和模型声明齐全；
 6. 模板内部依赖和生成结果的父资产都通过检查；
-7. 项目、渲染清单和 Rights Ledger 使用同一资产哈希快照。
+7. 模板、`derived_from` 父资产和生成结果的全部依赖都能追溯到有效记录；
+8. 项目、渲染清单和 Rights Ledger 使用同一资产哈希快照。
 
 任何一项失败都必须返回退出码 7，并指出资产 ID、失败字段、证据路径和修复建议。`--yes` 不得绕过该门禁。
 
-`rights export` 将上述检查结果、项目资产哈希、有效记录 ID/版本、许可证、归属和允许渠道写入项目内发布清单，并附确定性 `manifest_sha256`。检查失败仍可导出清单供修复审查，但命令返回退出码 7。
+`rights export` 将上述检查结果、项目资产哈希、模板快照、全部父资产/模板依赖的有效记录 ID/版本、许可证、归属和允许渠道写入项目内发布清单，并附确定性 `manifest_sha256`。检查失败仍可导出清单供修复审查，但命令返回退出码 7。
 
 ## 7. 记录示例
 

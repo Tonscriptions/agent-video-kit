@@ -80,6 +80,9 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `rights history --project PATH --asset-id ID` | 资产 ID | 返回不可变修订链与审计事件；不存在时返回 `RIGHTS_RECORD_MISSING` |
 | `rights update --project PATH --asset-id ID --reason TEXT` | 本地 JSON patch 或字段参数 | 创建新版本并保留旧证据；写入前快照；恢复阻断状态必须 `--reopen` 与新证据 |
 | `rights export --project PATH --target CHANNEL --output FILE` | 项目 Rights Ledger 和资产哈希 | 写入项目内确定性发布清单；门禁失败仍产出清单并返回退出码 7 |
+| `rights batch-update --project PATH --input FILE` | `{updates:[{asset_id,patch,reason,actor,reopen}]}` 本地 JSON | 预检全部修订后一次快照、原子写入多个资产版本；任一项失败则不写入 |
+| `rights impact --project PATH --asset-id ID` | 本地项目 JSON/JSONL 产物 | 查找导出、渲染、操作、校验和快照中仍引用资产的历史影响清单 |
+| `rights retract --project PATH --asset-id ID --reason TEXT` | 撤下/争议/阻断状态与原因 | 创建不可变撤回版本，并返回受影响历史产物；不删除成片文件 |
 | `render --project PATH` | 已验证项目和输出规格 | 本地 FFmpeg 渲染、manifest、操作记录和原子最终媒体 |
 | `queue enqueue --project PATH --input JOBS.json` | 单个作业或 `{jobs:[...]}` | 原子写入项目 `operations/render-queue.json`，保存输出规格和初始 `pending` 状态 |
 | `queue list --project PATH [--status STATUS]` | 项目队列和可选状态 | 只读返回队列计数与作业状态 |

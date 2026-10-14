@@ -39,7 +39,7 @@ $video-cut-local-policy 对 project.json 执行 policy audit，拒绝所有远�
 $video-cut-video-understand 分析本地素材，生成字幕、镜头摘要和高光候选。
 $video-cut-timeline 将高光候选编排为 30 秒竖屏广告，加入关键帧运镜和本地转场。
 $video-cut-quality 生成 waveform、vectorscope、histogram 和哈希证据报告。
-$video-cut-rights-ledger 检查所有素材的本地许可证证据和发布门禁，并在撤下/争议后创建可审计修订和发布清单。
+$video-cut-rights-ledger 检查所有素材、模板依赖和父资产的本地许可证证据和发布门禁，并在撤下/争议后创建可审计修订、历史影响报告和发布清单。
 ```
 
 ## 生产 Skill 清单
@@ -73,7 +73,7 @@ $video-cut-rights-ledger 检查所有素材的本地许可证证据和发布门�
 4. 使用 `$video-cut-timeline`、`$video-cut-video-edit` 和 `$video-cut-ffmpeg` 生成时间线及本地渲染计划。
 5. 使用 `$video-cut-local-models` 选择已登记的离线模型；没有本地模型时输出能力缺口，不自动改走远程服务。
 6. 使用 `$video-cut-quality` 生成 Scope、编码、哈希和回归证据。
-7. 使用 `$video-cut-rights-ledger` 执行 `rights list/history/check`；发生撤下或证据修订时用 `rights update` 保留版本链，最后用 `rights export` 生成发布清单，再由 `$video-cut-agent-editor` 执行导出。
+7. 使用 `$video-cut-rights-ledger` 执行 `rights list/history/check`；发生多资产证据变更时用 `rights batch-update`，发生撤下时用 `rights retract` 和 `rights impact` 保留影响链，最后用 `rights export` 生成发布清单，再由 `$video-cut-agent-editor` 执行导出。
 
 核心命令示例：
 

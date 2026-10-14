@@ -243,42 +243,153 @@ def _expiry_failed(record: dict[str, Any]) -> dict[str, Any] | None:
     return None
 
 
+def _walk_scalar_paths(value: Any, path: str = "$") -> list[tuple[str, Any]]:
+    if isinstance(value, dict):
+        result: list[tuple[str, Any]] = []
+        for key, child in value.items():
+            result.extend(_walk_scalar_paths(child, f"{path}.{key}"))
+        return result
+    if isinstance(value, list):
+        result = []
+        for index, child in enumerate(value):
+            result.extend(_walk_scalar_paths(child, f"{path}[{index}]"))
+        return result
+    return [(path, value)]
+
+
+def impacted_artifacts(root: Path, asset_id: str) -> list[dict[str, Any]]:
+    """Find local JSON/JSONL artifacts that still reference an asset.
+
+    This is an offline impact report for retract/replace workflows.  It does
+    not delete or rewrite historical renders, so an Agent can decide whether a
+    published artifact needs human review.
+    """
+    root = root.resolve()
+    result: list[dict[str, Any]] = []
+    for path in sorted(root.rglob("*")):
+        if not path.is_file() or path.suffix.casefold() not in {".json", ".jsonl"} or path.name == "rights-ledger.json":
+            continue
+        try:
+            if path.suffix.casefold() == ".jsonl":
+                payloads = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            else:
+                payloads = [json.loads(path.read_text(encoding="utf-8"))]
+        except (OSError, UnicodeError, ValueError):
+            continue
+        matches: list[str] = []
+        for payload in payloads:
+            matches.extend(field for field, value in _walk_scalar_paths(payload) if str(value) == str(asset_id))
+        if matches:
+            try:
+                relative = path.relative_to(root).as_posix()
+            except ValueError:
+                relative = str(path)
+            parts = set(Path(relative).parts)
+            kind = next((name for name in ("exports", "renders", "operations", "validation", "history") if name in parts), "project")
+            result.append({"path": relative, "kind": kind, "fields": sorted(set(matches))})
+    return result
+
+
+def _record_dependencies(record: dict[str, Any]) -> list[str]:
+    value = record.get("derived_from", [])
+    if isinstance(value, str):
+        return [value] if value else []
+    if isinstance(value, list):
+        return [str(item) for item in value if str(item)]
+    return []
+
+
+def _required_records(project: dict[str, Any], ledger: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    records = {str(item.get("asset_id")): item for item in active_records(ledger) if item.get("asset_id")}
+    roots: list[dict[str, Any]] = []
+    for asset in project.get("assets", []):
+        roots.append({"asset_id": str(asset.get("id")), "rights_ref": str(asset.get("rights_ref", "")), "asset_hash": asset.get("sha256"), "context": "project_asset"})
+    for template in project.get("templates", []):
+        template_id = str(template.get("id", "<template>"))
+        dependencies = template.get("assets", [])
+        if isinstance(dependencies, str):
+            dependencies = [dependencies]
+        if isinstance(dependencies, list):
+            for dependency in dependencies:
+                roots.append({"asset_id": str(dependency), "rights_ref": str(dependency), "asset_hash": None, "context": f"template:{template_id}"})
+        declared = template.get("dependencies", [])
+        if isinstance(declared, list):
+            for dependency in declared:
+                if isinstance(dependency, dict):
+                    dependency_id = dependency.get("asset_id") or dependency.get("rights_ref")
+                else:
+                    dependency_id = dependency
+                if dependency_id:
+                    roots.append({"asset_id": str(dependency_id), "rights_ref": str(dependency_id), "asset_hash": None, "context": f"template:{template_id}"})
+    required: dict[str, dict[str, Any]] = {}
+    missing: list[dict[str, Any]] = []
+    hash_mismatches: list[dict[str, Any]] = []
+    queue = list(roots)
+    seen_context: set[tuple[str, str]] = set()
+    while queue:
+        item = queue.pop(0)
+        aid = str(item.get("rights_ref") or item.get("asset_id"))
+        context = str(item.get("context", "project_asset"))
+        key = (aid, context)
+        if key in seen_context:
+            continue
+        seen_context.add(key)
+        record = records.get(aid) or records.get(str(item.get("asset_id")))
+        if not record:
+            missing.append({"asset_id": aid, "context": context, "code": "RIGHTS_TEMPLATE_DEPENDENCY_MISSING" if context.startswith("template:") else "RIGHTS_RECORD_MISSING", "message": "没有对应 Rights Ledger 记录"})
+            continue
+        record_id = str(record.get("asset_id"))
+        required.setdefault(record_id, record)
+        asset_hash = item.get("asset_hash")
+        if asset_hash and record.get("sha256") and str(asset_hash) != str(record.get("sha256")):
+            hash_mismatches.append({"asset_id": str(item.get("asset_id")), "rights_ref": aid, "context": context, "code": "RIGHTS_HASH_MISMATCH", "message": "项目资产哈希与 Rights Ledger 快照不一致"})
+        for parent in _record_dependencies(record):
+            queue.append({"asset_id": parent, "rights_ref": parent, "asset_hash": None, "context": f"derived_from:{record_id}"})
+    return required, missing, hash_mismatches
+
+
+def _check_record(record: dict[str, Any], aid: str, target: str, *, strict: bool, failures: list[dict[str, Any]], warnings: list[dict[str, Any]], context: str = "project_asset") -> None:
+    def report(item: dict[str, Any]) -> None:
+        item.setdefault("asset_id", aid)
+        item.setdefault("rights_ref", str(record.get("asset_id", aid)))
+        item.setdefault("record_version", _record_version(record))
+        item.setdefault("context", context)
+        (failures if strict else warnings).append(item)
+    status = record.get("verification_status", "unverified")
+    if status in BLOCKED_STATUSES:
+        report({"status": status, "code": "RIGHTS_STATUS_BLOCKED", "message": f"状态 {status} 不允许发布"})
+    if record.get("takedown_status") in {"notice", "blocked"}:
+        report({"code": "RIGHTS_TAKEDOWN_BLOCKED", "message": f"撤下状态 {record.get('takedown_status')} 不允许发布"})
+    permitted = set(record.get("permitted_uses", []))
+    if target and target not in permitted and "all" not in permitted:
+        report({"code": "RIGHTS_USE_NOT_PERMITTED", "message": f"记录未允许目标用途: {target}"})
+    channels = set(record.get("permitted_channels", []) or [])
+    if target and channels and target not in channels and "all" not in channels:
+        report({"code": "RIGHTS_CHANNEL_NOT_PERMITTED", "message": f"记录未允许目标渠道: {target}"})
+    expiry = _expiry_failed(record)
+    if expiry:
+        report(expiry)
+    if not record.get("source_url") or not record.get("license_spdx") or not _has_evidence(record):
+        report({"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失"})
+
+
 def check_project_rights(project: dict[str, Any], ledger: dict[str, Any], target: str = "commercial_ad", *, strict: bool = True) -> dict[str, Any]:
     failures: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
-    records = {str(item.get("asset_id")): item for item in active_records(ledger)}
-    for asset in project.get("assets", []):
-        aid = str(asset.get("id"))
-        ref = str(asset.get("rights_ref", ""))
-        record = records.get(ref) or records.get(aid)
-        if not record:
-            failures.append({"asset_id": aid, "code": "RIGHTS_RECORD_MISSING", "message": "没有对应 Rights Ledger 记录"})
-            continue
-        status = record.get("verification_status", "unverified")
-        def report(item: dict[str, Any]) -> None:
-            (failures if strict else warnings).append(item)
-        if status in BLOCKED_STATUSES:
-            report({"asset_id": aid, "rights_ref": ref, "record_version": _record_version(record), "status": status, "code": "RIGHTS_STATUS_BLOCKED", "message": f"状态 {status} 不允许发布"})
-        if record.get("takedown_status") in {"notice", "blocked"}:
-            report({"asset_id": aid, "rights_ref": ref, "code": "RIGHTS_TAKEDOWN_BLOCKED", "message": f"撤下状态 {record.get('takedown_status')} 不允许发布"})
-        permitted = set(record.get("permitted_uses", []))
-        if target and target not in permitted and "all" not in permitted:
-            report({"asset_id": aid, "rights_ref": ref, "code": "RIGHTS_USE_NOT_PERMITTED", "message": f"记录未允许目标用途: {target}"})
-        channels = set(record.get("permitted_channels", []) or [])
-        if target and channels and target not in channels and "all" not in channels:
-            report({"asset_id": aid, "rights_ref": ref, "code": "RIGHTS_CHANNEL_NOT_PERMITTED", "message": f"记录未允许目标渠道: {target}"})
-        expiry = _expiry_failed(record)
-        if expiry:
-            report({"asset_id": aid, "rights_ref": ref, **expiry})
-        if not record.get("source_url") or not record.get("license_spdx") or not _has_evidence(record):
-            report({"asset_id": aid, "rights_ref": ref, "code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失"})
-    return {"ok": not failures, "target": target, "checked": len(project.get("assets", [])), "failures": failures, "warnings": warnings}
+    required, missing, hash_mismatches = _required_records(project, ledger)
+    failures.extend(missing)
+    failures.extend(hash_mismatches)
+    for record in required.values():
+        context = "derived_dependency" if record.get("asset_id") not in {str(asset.get("id")) for asset in project.get("assets", [])} else "project_asset"
+        _check_record(record, str(record.get("asset_id")), target, strict=strict, failures=failures, warnings=warnings, context=context)
+    return {"ok": not failures, "target": target, "checked": len(project.get("assets", [])), "required_records": len(required), "failures": failures, "warnings": warnings}
 
 
 def release_manifest(project: dict[str, Any], ledger: dict[str, Any], target: str = "commercial_ad") -> dict[str, Any]:
     """Build a deterministic local release manifest for downstream publishing."""
     rights_check = check_project_rights(project, ledger, target, strict=True)
     records = {str(item.get("asset_id")): item for item in active_records(ledger)}
+    required_records, _missing, _hash_mismatches = _required_records(project, ledger)
     assets: list[dict[str, Any]] = []
     for asset in project.get("assets", []):
         aid = str(asset.get("id"))
@@ -301,6 +412,20 @@ def release_manifest(project: dict[str, Any], ledger: dict[str, Any], target: st
         "target": target,
         "rights_check": rights_check,
         "assets": assets,
+        "rights_dependencies": [
+            {
+                "asset_id": str(record.get("asset_id")),
+                "record_id": record.get("record_id"),
+                "record_version": _record_version(record),
+                "sha256": record.get("sha256"),
+                "derived_from": record.get("derived_from", []),
+                "license_spdx": record.get("license_spdx"),
+                "permitted_uses": record.get("permitted_uses", []),
+                "permitted_channels": record.get("permitted_channels", []),
+            }
+            for record in sorted(required_records.values(), key=lambda item: str(item.get("asset_id")))
+        ],
+        "template_snapshots": copy.deepcopy(project.get("templates", [])),
     }
     digest = sha256_bytes(json.dumps(manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))
     return {**manifest, "manifest_sha256": f"sha256:{digest}"}
