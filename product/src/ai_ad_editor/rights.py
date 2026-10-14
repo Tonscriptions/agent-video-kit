@@ -392,6 +392,100 @@ def effective_disposition_decisions(ledger: dict[str, Any], asset_id: str | None
     return [item for item in decisions if str(item.get("decision_id")) not in superseded and (asset_id is None or str(item.get("asset_id")) == str(asset_id))]
 
 
+def _project_asset_reference_paths(project: dict[str, Any], asset_id: str) -> list[str]:
+    paths: list[str] = []
+
+    def walk(value: Any, path: str, *, in_provenance: bool = False) -> None:
+        if in_provenance:
+            return
+        if isinstance(value, dict):
+            for key, child in value.items():
+                child_path = f"{path}.{key}" if path else str(key)
+                if key in {"asset_id", "rights_ref"} and str(child) == str(asset_id):
+                    paths.append(child_path)
+                else:
+                    walk(child, child_path, in_provenance=path == "provenance" or in_provenance)
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                walk(child, f"{path}[{index}]", in_provenance=in_provenance)
+
+    walk(project, "")
+    return sorted(set(paths))
+
+
+def apply_disposition_to_project(project: dict[str, Any], ledger: dict[str, Any], decision_id: str) -> dict[str, Any]:
+    """Apply one approved replace/delete decision to the editable project graph.
+
+    This changes only current project references and leaves historical exports and
+    media files untouched.  The caller must snapshot before committing the result.
+    """
+    decision = next((item for item in effective_disposition_decisions(ledger) if str(item.get("decision_id")) == str(decision_id)), None)
+    if not decision:
+        raise AppError("RIGHTS_DISPOSITION_MISSING", f"找不到当前有效历史处置决策: {decision_id}", exit_code=3, path="decision_id")
+    if decision.get("status") != "approved":
+        raise AppError("RIGHTS_DISPOSITION_NOT_APPROVED", "只有 approved 历史处置决策可以 apply", exit_code=2, path="decision_id")
+    action = str(decision.get("action"))
+    if action not in {"replace", "delete"}:
+        raise AppError("RIGHTS_DISPOSITION_APPLY_UNSUPPORTED", "retain 决策不需要 apply；replace/delete 才能修改项目", exit_code=2, path="action")
+    old_id = str(decision.get("asset_id"))
+    replacement_id = str(decision.get("replacement_asset_id")) if decision.get("replacement_asset_id") else None
+    assets = project.get("assets", [])
+    old_asset = next((item for item in assets if str(item.get("id")) == old_id), None)
+    if not old_asset:
+        raise AppError("RIGHTS_PROJECT_ASSET_MISSING", f"项目中找不到待处置资产: {old_id}", exit_code=3, path="asset_id")
+    replacement = None
+    if action == "replace":
+        replacement = next((item for item in assets if str(item.get("id")) == replacement_id), None)
+        if not replacement:
+            raise AppError("RIGHTS_REPLACEMENT_PROJECT_ASSET_MISSING", f"替代资产没有加入当前项目: {replacement_id}", exit_code=3, path="replacement_asset_id")
+    changed_clips: list[dict[str, Any]] = []
+    removed_clips: list[dict[str, Any]] = []
+    for sequence in project.get("sequences", []):
+        for track in sequence.get("tracks", []):
+            clips = track.get("clips", [])
+            kept: list[dict[str, Any]] = []
+            for clip in clips:
+                if str(clip.get("asset_id")) != old_id:
+                    kept.append(clip)
+                    continue
+                if action == "replace":
+                    source_out = int(clip.get("source_out_tick", 0) or 0)
+                    replacement_duration = int((replacement or {}).get("probe", {}).get("duration_tick", 0) or 0)
+                    if replacement_duration and source_out > replacement_duration:
+                        raise AppError("RIGHTS_REPLACEMENT_DURATION_SHORT", "替代资产时长不足以覆盖现有片段 source_out_tick", exit_code=2, path=f"sequences[{sequence.get('id')}].tracks[{track.get('id')}].clips[{clip.get('id')}].source_out_tick")
+                    updated = copy.deepcopy(clip)
+                    updated["asset_id"] = replacement_id
+                    kept.append(updated)
+                    changed_clips.append({"sequence_id": sequence.get("id"), "track_id": track.get("id"), "clip_id": clip.get("id"), "from_asset_id": old_id, "to_asset_id": replacement_id})
+                else:
+                    removed_clips.append({"sequence_id": sequence.get("id"), "track_id": track.get("id"), "clip_id": clip.get("id"), "asset_id": old_id})
+            track["clips"] = kept
+        sequence["duration_tick"] = max(1, max((int(clip.get("timeline_start_tick", 0)) + int(clip.get("duration_tick", 0)) for track in sequence.get("tracks", []) for clip in track.get("clips", [])), default=0))
+
+    def rewrite(value: Any) -> Any:
+        if isinstance(value, dict):
+            return {key: (replacement_id if key in {"asset_id", "rights_ref"} and str(child) == old_id and action == "replace" else rewrite(child)) for key, child in value.items()}
+        if isinstance(value, list):
+            return [rewrite(child) for child in value]
+        return value
+
+    if action == "replace":
+        for key in ("templates", "outputs"):
+            if key in project:
+                project[key] = rewrite(project[key])
+    else:
+        for template in project.get("templates", []):
+            if isinstance(template.get("assets"), list):
+                template["assets"] = [item for item in template["assets"] if str(item) != old_id]
+            if isinstance(template.get("dependencies"), list):
+                template["dependencies"] = [item for item in template["dependencies"] if str(item.get("asset_id") if isinstance(item, dict) else item) != old_id]
+    project["assets"] = [item for item in assets if str(item.get("id")) != old_id]
+    remaining = _project_asset_reference_paths(project, old_id)
+    if remaining:
+        raise AppError("RIGHTS_DISPOSITION_REFERENCES_REMAIN", "项目仍有未处理的处置资产引用", exit_code=2, path="project", cause=json.dumps(remaining, ensure_ascii=False))
+    return {"decision": copy.deepcopy(decision), "action": action, "asset_id": old_id, "replacement_asset_id": replacement_id, "changed_clips": changed_clips, "removed_clips": removed_clips, "removed_project_asset": old_id, "remaining_references": []}
+
+
 def create_disposition_decision(
     ledger: dict[str, Any],
     asset_id: str,

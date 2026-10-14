@@ -40,7 +40,7 @@ from .batch import _load_variants, run_template_batch
 from .capabilities import build_capability_manifest
 from .transcribe import transcribe_local, write_srt
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
-from .rights import VALID_STATUSES, active_records, add_record, check_project_rights, create_disposition_decision, disposition_decisions, effective_disposition_decisions, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
+from .rights import VALID_STATUSES, active_records, add_record, apply_disposition_to_project, check_project_rights, create_disposition_decision, disposition_decisions, effective_disposition_decisions, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
 from .understand import understand_media
 from .tracking import track_media
 from .runtime import configure_local_runtime
@@ -266,6 +266,9 @@ def build_parser() -> argparse.ArgumentParser:
     rights_decide.add_argument("--target", default="commercial_ad")
     rights_decide.add_argument("--reason", required=True)
     rights_decide.add_argument("--actor", default="ai-ad-editor")
+    rights_apply = _leaf_common(rs.add_parser("apply", help="执行已批准历史处置并更新当前项目"))
+    rights_apply.add_argument("--project", required=True)
+    rights_apply.add_argument("--decision-id", required=True)
 
     render = _leaf_common(subs.add_parser("render", help="本地 FFmpeg 渲染"))
     render.add_argument("--project", required=True)
@@ -1701,6 +1704,32 @@ def command_rights_decide(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("rights.decide", args, data={"decision": committed, "snapshot": snapshot, "impacted_artifacts": impacted, "ledger": str(ledger_file(root))}, operation_id=operation_id)
 
 
+def command_rights_apply(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    ledger = load_ledger(root)
+    if any(event.get("event") == "disposition_applied" and event.get("decision_id") == args.decision_id for event in ledger.get("events", [])):
+        raise AppError("RIGHTS_DISPOSITION_ALREADY_APPLIED", "该历史处置决策已经 apply", exit_code=2, path="decision_id")
+    candidate = copy.deepcopy(project)
+    applied = apply_disposition_to_project(candidate, ledger, args.decision_id)
+    validation = validate_project(root, candidate, strict_rights=False, target="commercial_ad")
+    if not validation["ok"]:
+        raise AppError("RIGHTS_DISPOSITION_APPLY_INVALID", "处置后的项目未通过结构或时间线校验", exit_code=2, path="project", cause=json.dumps(validation, ensure_ascii=False))
+    rights_validation = check_project_rights(candidate, ledger, str(applied["decision"].get("target") or "commercial_ad"), strict=True)
+    if not rights_validation["ok"]:
+        raise AppError("RIGHTS_DISPOSITION_APPLY_RIGHTS_BLOCKED", "处置后的当前项目未通过最新权利门禁", exit_code=7, path="project", cause=json.dumps(rights_validation, ensure_ascii=False))
+    if args.dry_run:
+        return _envelope("rights.apply", args, status="planned", data={"applied": applied, "validation": validation, "rights_check": rights_validation, "project": str(project_file(root)), "ledger": str(ledger_file(root))})
+    snapshot = create_snapshot(root, project, label=f"before-rights-{args.decision_id}-apply")
+    operation_id = new_id("op")
+    applied["operation_id"] = operation_id
+    ledger.setdefault("events", []).append({"event_id": new_id("rightsevent"), "event": "disposition_applied", "decision_id": args.decision_id, "asset_id": applied["asset_id"], "action": applied["action"], "replacement_asset_id": applied.get("replacement_asset_id"), "operation_id": operation_id, "snapshot_id": snapshot["snapshot_id"], "changed_clips": copy.deepcopy(applied["changed_clips"]), "removed_clips": copy.deepcopy(applied["removed_clips"]), "at": now_iso()})
+    candidate.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "rights.apply", "decision_id": args.decision_id, "asset_id": applied["asset_id"], "action": applied["action"], "snapshot_id": snapshot["snapshot_id"], "at": now_iso()})
+    save_project(root, candidate)
+    save_ledger(root, ledger)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "rights.apply", "status": "succeeded", "decision_id": args.decision_id, "snapshot_id": snapshot["snapshot_id"], "applied": applied, "rights_check": rights_validation, "created_at": now_iso()})
+    return _envelope("rights.apply", args, data={"applied": applied, "snapshot": snapshot, "validation": validation, "rights_check": rights_validation, "project": str(project_file(root)), "ledger": str(ledger_file(root))}, operation_id=operation_id)
+
+
 def _render_settings_for_args(project: dict[str, Any], args: argparse.Namespace) -> tuple[dict[str, Any], str | None]:
     profile = getattr(args, "profile", None)
     width = getattr(args, "width", None)
@@ -2272,6 +2301,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("rights", "impact"): command_rights_impact,
     ("rights", "retract"): command_rights_retract,
     ("rights", "decide"): command_rights_decide,
+    ("rights", "apply"): command_rights_apply,
     ("render", None): command_render,
     ("queue", "enqueue"): command_queue_enqueue,
     ("queue", "list"): command_queue_list,

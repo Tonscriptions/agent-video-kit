@@ -73,7 +73,7 @@ $video-cut-rights-ledger 检查所有素材、模板依赖和父资产的本地�
 4. 使用 `$video-cut-timeline`、`$video-cut-video-edit` 和 `$video-cut-ffmpeg` 生成时间线及本地渲染计划。
 5. 使用 `$video-cut-local-models` 选择已登记的离线模型；没有本地模型时输出能力缺口，不自动改走远程服务。
 6. 使用 `$video-cut-quality` 先跑 `quality check` 和 Scope，再用 `quality golden --mode capture` 固定通过的本地媒体/设置哈希，交付前用 `--mode verify` 检查漂移。
-7. 使用 `$video-cut-rights-ledger` 执行 `rights list/history/check`；发生多资产证据变更时用 `rights batch-update`，发生撤下时用 `rights retract` 和 `rights impact` 保留影响链；需要历史成片替换/删除时用 `rights decide` 生成 proposed/approved 决策和影响清单，最后用 `rights export` 生成发布清单，再由 `$video-cut-agent-editor` 执行导出。
+7. 使用 `$video-cut-rights-ledger` 执行 `rights list/history/check`；发生多资产证据变更时用 `rights batch-update`，发生撤下时用 `rights retract` 和 `rights impact` 保留影响链；需要历史成片替换/删除时用 `rights decide` 生成 proposed/approved 决策和影响清单，批准后用 `rights apply` 更新当前项目时间线并保留历史文件，最后用 `rights export` 生成发布清单，再由 `$video-cut-agent-editor` 执行导出。
 
 核心命令示例：
 

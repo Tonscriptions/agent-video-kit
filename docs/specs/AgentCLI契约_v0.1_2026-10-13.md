@@ -84,6 +84,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `rights impact --project PATH --asset-id ID` | 本地项目 JSON/JSONL 产物 | 查找导出、渲染、操作、校验和快照中仍引用资产的历史影响清单 |
 | `rights retract --project PATH --asset-id ID --reason TEXT` | 撤下/争议/阻断状态与原因 | 创建不可变撤回版本，并返回受影响历史产物；不删除成片文件 |
 | `rights decide --project PATH --asset-id ID --action replace\|delete\|retain --reason TEXT [--supersedes-decision-id ID]` | 历史成片处置决策、可选替代资产和 `proposed\|approved\|cancelled` 状态 | 追加非破坏性决策与影响清单；状态变更必须指向当前决策；已批准 replace/delete 对当前项目发布返回 `RIGHTS_DISPOSITION_BLOCKED` |
+| `rights apply --project PATH --decision-id ID` | 当前项目和一个有效的已批准 replace/delete 决策 | 写入前快照，替换或移除时间线引用和项目资产，结构校验后记录 apply 事件；历史导出与媒体文件保持不变 |
 | `render --project PATH` | 已验证项目和输出规格 | 本地 FFmpeg 渲染、manifest、操作记录和原子最终媒体 |
 | `queue enqueue --project PATH --input JOBS.json` | 单个作业或 `{jobs:[...]}` | 原子写入项目 `operations/render-queue.json`，保存输出规格和初始 `pending` 状态 |
 | `queue list --project PATH [--status STATUS]` | 项目队列和可选状态 | 只读返回队列计数与作业状态 |

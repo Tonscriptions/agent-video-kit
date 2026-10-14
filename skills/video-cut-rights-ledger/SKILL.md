@@ -21,6 +21,7 @@ python -X utf8 -m ai_ad_editor rights impact --project .\work\demo --asset-id as
 python -X utf8 -m ai_ad_editor rights retract --project .\work\demo --asset-id asset_001 --reason "license notice"
 python -X utf8 -m ai_ad_editor rights decide --project .\work\demo --asset-id asset_001 --action replace --replacement-asset-id asset_002 --status proposed --reason "license replacement"
 python -X utf8 -m ai_ad_editor rights decide --project .\work\demo --asset-id asset_001 --action replace --replacement-asset-id asset_002 --status approved --supersedes-decision-id rightsdecision_... --reason "replacement approved"
+python -X utf8 -m ai_ad_editor rights apply --project .\work\demo --decision-id rightsdecision_...
 ```
 
 The policy rejects remote source/evidence URLs at ingest. A missing,
@@ -41,5 +42,10 @@ delete blocks later releases until it is explicitly cancelled or the asset is
 removed from the project dependency closure; the command never deletes or
 rewrites historical media. Approved replacements are checked against the
 replacement asset's local Rights Ledger record and dependencies first.
+`rights apply` is the explicit mutation step for an approved replace/delete:
+it snapshots the project, updates or removes current timeline references,
+removes the retired asset from the editable project graph, validates the
+result, and records an apply event. Historical export JSON and media files
+remain untouched; a failed validation leaves the project files unchanged.
 `rights export` writes a deterministic release manifest and returns exit code 7
 when the gate fails.

@@ -895,6 +895,51 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(project_json["assets"], [])
             self.assertFalse(list((project / "assets").iterdir()))
 
+    def test_rights_disposition_apply_updates_current_timeline_and_preserves_history(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-rights-apply-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace, "historical.mp4")
+            replacement_source = self.make_media(workspace, "replacement.mp4")
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            ingest_args = [
+                "--project", str(project), "--verification-status", "verified", "--source-url", "local://source",
+                "--license-spdx", "CC0-1.0", "--license-url", "local://license", "--evidence", "local://evidence",
+                "--permitted-use", "commercial_ad",
+            ]
+            historical = invoke("media", "ingest", "--input", str(source), "--asset-id", "historical", *ingest_args)[1]
+            replacement = invoke("media", "ingest", "--input", str(replacement_source), "--asset-id", "replacement", *ingest_args)[1]
+            self.assertEqual(historical["data"]["asset"]["id"], "historical")
+            self.assertEqual(replacement["data"]["asset"]["id"], "replacement")
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{"op": "append_clip", "track_id": "track_video_1", "asset_id": "historical", "source_in_tick": 0, "source_out_tick": 90000}]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            historical_artifact = project / "exports" / "historical-release.json"
+            historical_artifact.write_text(json.dumps({"asset_id": "historical", "output": "renders/old.mp4"}), encoding="utf-8")
+            historical_render = project / "renders" / "old.mp4"
+            historical_render.write_bytes(source.read_bytes())
+            original_artifact = historical_artifact.read_bytes()
+            original_render = historical_render.read_bytes()
+            code, decided = invoke("rights", "decide", "--project", str(project), "--asset-id", "historical", "--action", "replace", "--replacement-asset-id", "replacement", "--status", "approved", "--reason", "replace current project references")
+            self.assertEqual(code, 0, decided)
+            decision_id = decided["data"]["decision"]["decision_id"]
+            project_before = (project / "project.json").read_bytes()
+            code, planned = invoke("rights", "apply", "--project", str(project), "--decision-id", decision_id, "--dry-run")
+            self.assertEqual(code, 0, planned)
+            self.assertEqual(planned["status"], "planned")
+            self.assertEqual((project / "project.json").read_bytes(), project_before)
+            code, applied = invoke("rights", "apply", "--project", str(project), "--decision-id", decision_id)
+            self.assertEqual(code, 0, applied)
+            updated = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            self.assertEqual({item["id"] for item in updated["assets"]}, {"replacement"})
+            clips = [clip for sequence in updated["sequences"] for track in sequence["tracks"] for clip in track["clips"]]
+            self.assertEqual([clip["asset_id"] for clip in clips], ["replacement"])
+            self.assertEqual(invoke("rights", "check", "--project", str(project))[0], 0)
+            self.assertEqual(historical_artifact.read_bytes(), original_artifact)
+            self.assertEqual(historical_render.read_bytes(), original_render)
+            ledger = json.loads((project / "rights-ledger.json").read_text(encoding="utf-8"))
+            self.assertTrue(any(item.get("event") == "disposition_applied" and item.get("decision_id") == decision_id for item in ledger["events"]))
+
     def test_project_bound_idempotency_replays_and_rejects_conflict(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-idempotency-") as raw:
             workspace = Path(raw)

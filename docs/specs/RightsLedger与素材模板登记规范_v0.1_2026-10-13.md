@@ -71,6 +71,7 @@ python -m ai_ad_editor rights impact --project .\project --asset-id asset_001
 python -m ai_ad_editor rights retract --project .\project --asset-id asset_001 --reason "license notice"
 python -m ai_ad_editor rights decide --project .\project --asset-id asset_001 --action replace --replacement-asset-id asset_002 --status approved --reason "replace historical usage"
 python -m ai_ad_editor rights decide --project .\project --asset-id asset_001 --action replace --replacement-asset-id asset_002 --status cancelled --supersedes-decision-id rightsdecision_... --reason "replacement withdrawn"
+python -m ai_ad_editor rights apply --project .\project --decision-id rightsdecision_...
 ```
 
 从 `disputed`、`expired`、`takedown` 或 `blocked` 恢复到 `verified/restricted` 必须同时提供 `--reopen` 和不同于旧记录的本地证据。撤下或争议状态会自动把 `takedown_status` 置为 `notice`；恢复时若未显式指定则清除为 `clear`。
@@ -136,7 +137,7 @@ Ledger 顶层可选 `decisions` 数组保存历史处置决策。每项至少包
 | approved | approved、cancelled | 保持阻断或显式撤销；不能降回 proposed |
 | cancelled | 无 | 历史链终止；新的处置必须创建独立决策 |
 
-并行独立决策分别生效。撤销一条决策不会解除另一条已批准决策，也不会解除资产自身的撤下、争议、过期或许可证限制。新修订继承原 `affected_artifacts` 快照，`rights history` 的 `effective_decisions` 用于定位当前 `decision_id`。错误包括 `RIGHTS_DISPOSITION_MISSING`、`RIGHTS_DISPOSITION_STALE`、`RIGHTS_DISPOSITION_SCOPE_MISMATCH`、`RIGHTS_DISPOSITION_TRANSITION_INVALID`、`RIGHTS_DISPOSITION_PREDECESSOR_REQUIRED` 和替代资产依赖不完整的 `RIGHTS_REPLACEMENT_NOT_PUBLISHABLE`；全部在项目写入前返回。
+并行独立决策分别生效。撤销一条决策不会解除另一条已批准决策，也不会解除资产自身的撤下、争议、过期或许可证限制。新修订继承原 `affected_artifacts` 快照，`rights history` 的 `effective_decisions` 用于定位当前 `decision_id`。`rights apply` 是单独的执行步骤：只接受当前有效的 approved replace/delete，先创建快照，再更新/移除当前项目的时间线引用和资产记录，完成结构校验后追加 `disposition_applied` 事件；历史导出 JSON 和媒体文件不会被删除或覆盖。错误包括 `RIGHTS_DISPOSITION_MISSING`、`RIGHTS_DISPOSITION_STALE`、`RIGHTS_DISPOSITION_SCOPE_MISMATCH`、`RIGHTS_DISPOSITION_TRANSITION_INVALID`、`RIGHTS_DISPOSITION_PREDECESSOR_REQUIRED`、`RIGHTS_DISPOSITION_NOT_APPROVED`、`RIGHTS_DISPOSITION_REFERENCES_REMAIN` 和替代资产依赖不完整的 `RIGHTS_REPLACEMENT_NOT_PUBLISHABLE`；全部在项目写入前返回。
 
 ## 7. 记录示例
 
