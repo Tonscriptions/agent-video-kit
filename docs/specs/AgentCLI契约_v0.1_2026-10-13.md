@@ -91,6 +91,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `queue cancel --project PATH --job-id ID` | 待处理或运行中作业 | 待处理作业立即标记取消；运行中写入项目内取消标记并由渲染器确认 |
 | `quality check --project PATH --input FILE` | 已渲染媒体 | 画布、流、时长、音画差、可选黑帧、LUFS 和 true peak 报告 |
 | `quality scopes --project PATH --input FILE` | 项目内或本地视频、抽帧时间点 | 生成本地 waveform/vectorscope/histogram PNG 和带哈希的 scope 报告；不自动判定调色正确性 |
+| `quality golden --project PATH --input FILE --mode capture\|verify` | 本地媒体和项目内 golden JSON | 捕获固定输出哈希、settings 哈希、质量指标和容差；验证时返回字节、settings、质量和指标漂移，不修改媒体 |
 | `convert import --input FILE --output DIR` | Agent JSON、OTIO JSON 或 Kdenlive XML | 新建本地项目并写 Exact/Mapped/Approximate/Baked/Unsupported/Failed 报告 |
 | `convert export --project PATH --output FILE --target-format FORMAT` | 本地项目 | 导出 Agent JSON、OTIO 或 Kdenlive XML，并保留转换报告 |
 | `template apply --project PATH --input TEMPLATE.json` | 本地模板和变量 | 变量校验、片段实例化、模板快照和 provenance 变更记录 |
@@ -161,6 +162,12 @@ python -X utf8 -m ai_ad_editor render --project .\work\demo --dry-run
 
 `quality scopes` 的字段、输出目录约束和限制见[本地色彩 Scope 审查契约](./本地色彩Scope审查契约_v0.1_2026-10-14.md)。它只生成可复核的 FFmpeg waveform、vectorscope、histogram PNG 和 JSON 哈希报告；Agent 不得把 scope 图描述成自动调色结论，也不能用它替代 `quality check` 的音视频质量门禁。
 
+### 6.5 固定本地质量 golden
+
+`quality golden` 默认模式为 `verify`；`capture` 只有在 `quality check` 同等参数通过后才写入项目 `validation/golden-quality.json`。自定义 `--manifest` 必须位于项目内。清单版本为 `0.1.0`，保存媒体 SHA-256、字节数、项目/序列、画布、settings SHA-256、期望时长、质量门禁参数、指标、容差和捕获时间。
+
+验证不会覆盖清单，会检查媒体字节哈希、项目 ID、settings 哈希、期望时长与记录指标。验证时未显式提供档案或序列会沿用捕获值；质量扫描参数需与捕获命令相同，尤其 `--expensive`，否则缺失的指标会返回 `QUALITY_GOLDEN_METRIC_MISSING`。哈希或指标漂移返回退出码 2 与 `QUALITY_GOLDEN_*` 错误。它证明同一本地输入/设置的复现性，不构成跨设备视觉等价、字幕美观或剪映完整质量验收。
+
 ## 7. 错误码和退出码
 
 | 退出码 | 类别 | 示例错误码 |
@@ -191,6 +198,8 @@ python -m ai_ad_editor queue enqueue --project .\\work\\demo --input .\\queue.js
 python -m ai_ad_editor queue run --project .\\work\\demo --continue-on-error --progress jsonl
 python -m ai_ad_editor queue list --project .\\work\\demo --status failed
 python -m ai_ad_editor quality check --project .\\work\\demo --input .\\work\\demo\\renders\\ad.mp4 --require-audio --expensive
+python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\demo\\renders\\ad.mp4 --mode capture --require-audio --expensive
+python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\demo\\renders\\ad.mp4 --mode verify --require-audio --expensive
 ```
 
 调用方应先读取 `capabilities`，再根据限制决定 Exact、Approximate 或拒绝计划。任何近似结果都必须连同 warning、转换报告或质量报告交给 Agent 上层处理。

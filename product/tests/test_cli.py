@@ -463,6 +463,37 @@ class P0CliTests(unittest.TestCase):
                 self.assertTrue(Path(artifact["path"]).exists())
                 self.assertGreater(artifact["bytes"], 0)
 
+    def test_quality_golden_capture_and_verify_reports_drift(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-golden-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            capture_args = (
+                "quality", "golden", "--project", str(project), "--input", str(source),
+                "--mode", "capture", "--profile", "custom", "--width", "320", "--height", "180", "--require-audio",
+            )
+            code, captured = invoke(*capture_args)
+            self.assertEqual(code, 0, captured)
+            manifest_path = Path(captured["data"]["manifest"])
+            self.assertTrue(manifest_path.exists())
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            self.assertEqual(manifest["golden_version"], "0.1.0")
+            self.assertTrue(manifest["artifact"]["sha256"].startswith("sha256:"))
+            code, verified = invoke(
+                "quality", "golden", "--project", str(project), "--input", str(source),
+                "--mode", "verify", "--profile", "custom", "--width", "320", "--height", "180",
+            )
+            self.assertEqual(code, 0, verified)
+            self.assertEqual(verified["data"]["mismatches"], [])
+            source.write_bytes(source.read_bytes() + b"golden-drift")
+            code, drifted = invoke(
+                "quality", "golden", "--project", str(project), "--input", str(source),
+                "--mode", "verify", "--profile", "custom", "--width", "320", "--height", "180",
+            )
+            self.assertEqual(code, 2, drifted)
+            self.assertTrue(any(item["code"] == "QUALITY_GOLDEN_HASH_MISMATCH" for item in drifted["errors"]))
+
     def test_media_prepare_generates_proxy_thumbnail_and_waveform(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-prepare-") as raw:
             workspace = Path(raw)

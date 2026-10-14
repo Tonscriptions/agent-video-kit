@@ -33,7 +33,7 @@ from .project import (
     restore_snapshot,
     save_project,
 )
-from .quality import check_output
+from .quality import GOLDEN_VERSION, build_golden_manifest, check_output, compare_golden_manifest, normalize_golden_constraints, validate_golden_manifest
 from .recommend import recommend_highlights
 from .library import duplicate_groups, index_directory, search_catalog
 from .batch import _load_variants, run_template_batch
@@ -317,6 +317,22 @@ def build_parser() -> argparse.ArgumentParser:
     qscopes.add_argument("--input", required=True)
     qscopes.add_argument("--at-seconds", type=float, default=0.0)
     qscopes.add_argument("--output-dir", default=None, help="项目内 scope 输出目录；默认 cache/scopes/<scope_id>")
+    qgolden = _leaf_common(qs.add_parser("golden", help="捕获或验证固定本地质量 golden 清单"))
+    qgolden.add_argument("--project", required=True)
+    qgolden.add_argument("--input", required=True, help="待捕获或验证的本地媒体")
+    qgolden.add_argument("--mode", choices=("capture", "verify"), default="verify")
+    qgolden.add_argument("--manifest", default=None, help="项目内 golden JSON；默认 validation/golden-quality.json")
+    qgolden.add_argument("--sequence-id", default=None)
+    qgolden.add_argument("--require-audio", action=argparse.BooleanOptionalAction, default=None)
+    qgolden.add_argument("--expensive", action=argparse.BooleanOptionalAction, default=None, help="运行黑帧和响度扫描；verify 默认沿用清单")
+    qgolden.add_argument("--max-av-sync-ms", type=float, default=None)
+    qgolden.add_argument("--target-lufs", type=float, default=None)
+    qgolden.add_argument("--lufs-tolerance", type=float, default=None)
+    qgolden.add_argument("--fail-on-black", action=argparse.BooleanOptionalAction, default=None)
+    qgolden.add_argument("--max-true-peak-dbfs", type=float, default=None)
+    qgolden.add_argument("--profile", choices=tuple(OUTPUT_PROFILES) + ("custom",), default=None)
+    qgolden.add_argument("--width", type=int, default=None)
+    qgolden.add_argument("--height", type=int, default=None)
 
     convert = subs.add_parser("convert", help="项目/交换格式互操作")
     cs = convert.add_subparsers(dest="action", required=True)
@@ -1952,6 +1968,59 @@ def command_quality_check(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("quality.check", args, data={"report": str(report_path), **result}, status=status, warnings=result.get("warnings", []), errors=result.get("errors", []))
 
 
+def command_quality_golden(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    media = Path(args.input).expanduser().resolve()
+    if not media.exists() or not media.is_file():
+        raise argument_error("golden 质量输入不存在", str(media))
+    manifest_path = Path(args.manifest).expanduser().resolve() if args.manifest else root / "validation" / "golden-quality.json"
+    ensure_inside(root, manifest_path)
+    existing_manifest: dict[str, Any] | None = None
+    if args.mode == "verify":
+        if not manifest_path.exists() or not manifest_path.is_file():
+            return _envelope("quality.golden", args, status="failed", data={"manifest": str(manifest_path), "mode": args.mode}, errors=[{"code": "QUALITY_GOLDEN_MISSING", "message": f"找不到 golden 清单: {manifest_path}"}])
+        existing_manifest = load_json(manifest_path)
+        manifest_errors = validate_golden_manifest(existing_manifest)
+        if manifest_errors:
+            return _envelope("quality.golden", args, status="failed", data={"manifest": str(manifest_path), "mode": args.mode, "golden_version": existing_manifest.get("golden_version")}, errors=manifest_errors)
+        if args.sequence_id is None and existing_manifest.get("sequence_id"):
+            args.sequence_id = existing_manifest.get("sequence_id")
+        if args.profile is None and existing_manifest.get("profile"):
+            args.profile = existing_manifest.get("profile")
+            if args.profile == "custom":
+                canvas = existing_manifest.get("canvas") if isinstance(existing_manifest.get("canvas"), dict) else {}
+                args.width = canvas.get("width")
+                args.height = canvas.get("height")
+    sequence = find_sequence(project, args.sequence_id) if args.sequence_id else None
+    tps = int(project["settings"]["timebase"]["ticks_per_second"])
+    expected_duration = (int(sequence["duration_tick"]) / tps) if sequence else None
+    if args.mode == "verify" and expected_duration is None and existing_manifest is not None:
+        stored_expected = existing_manifest.get("expected_duration_seconds")
+        expected_duration = float(stored_expected) if stored_expected is not None else None
+    quality_settings, profile = _render_settings_for_args(project, args)
+    overrides = {"require_audio": args.require_audio, "expensive": args.expensive, "max_av_sync_ms": args.max_av_sync_ms, "target_lufs": args.target_lufs, "lufs_tolerance": args.lufs_tolerance, "fail_on_black": args.fail_on_black, "max_true_peak_dbfs": args.max_true_peak_dbfs}
+    constraints = normalize_golden_constraints(existing_manifest.get("constraints") if existing_manifest else None, overrides)
+    if args.dry_run:
+        return _envelope("quality.golden", args, status="planned", data={"mode": args.mode, "manifest": str(manifest_path), "input": str(media), "sequence_id": args.sequence_id, "expected_duration": expected_duration, "golden_version": GOLDEN_VERSION, "profile": profile, "settings": quality_settings, "constraints": constraints})
+    result = check_output(media, quality_settings, expected_duration, require_audio=constraints["require_audio"], run_expensive=constraints["expensive"], max_av_sync_ms=constraints["max_av_sync_ms"], target_lufs=constraints["target_lufs"], lufs_tolerance=constraints["lufs_tolerance"], fail_on_black=constraints["fail_on_black"], max_true_peak_dbfs=constraints["max_true_peak_dbfs"])
+    if args.mode == "capture":
+        if not result["ok"]:
+            return _envelope("quality.golden", args, status="failed", data={"mode": args.mode, "manifest": str(manifest_path), **result}, warnings=result.get("warnings", []), errors=result.get("errors", []))
+        manifest = build_golden_manifest(media, project_id=project["project"]["id"], sequence_id=args.sequence_id, expected_duration=expected_duration, settings=quality_settings, profile=profile, result=result, constraints=constraints)
+        manifest["created_at"] = now_iso()
+        atomic_write_json(manifest_path, manifest)
+        operation_id = new_id("op")
+        _operation(root, operation_id, {"operation_id": operation_id, "command": "quality.golden", "mode": "capture", "status": "succeeded", "manifest": str(manifest_path), "created_at": now_iso()})
+        return _envelope("quality.golden", args, data={"mode": args.mode, "manifest": str(manifest_path), "golden_version": GOLDEN_VERSION, **result}, operation_id=operation_id, warnings=result.get("warnings", []))
+    mismatches = compare_golden_manifest(existing_manifest or {}, media, project_id=project["project"]["id"], settings=quality_settings, result=result)
+    stored_expected = (existing_manifest or {}).get("expected_duration_seconds")
+    if stored_expected is not None and expected_duration is not None and abs(float(stored_expected) - float(expected_duration)) > 0.001:
+        mismatches.append({"code": "QUALITY_GOLDEN_EXPECTED_DURATION_MISMATCH", "expected": stored_expected, "actual": expected_duration, "tolerance": 0.001})
+    errors = list(result.get("errors", [])) + mismatches
+    status = "succeeded" if not errors else "failed"
+    return _envelope("quality.golden", args, data={"mode": args.mode, "manifest": str(manifest_path), "golden_version": GOLDEN_VERSION, "mismatches": mismatches, **result}, status=status, warnings=result.get("warnings", []), errors=errors)
+
+
 def command_quality_scopes(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     media = Path(args.input).expanduser().resolve()
@@ -2180,6 +2249,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("queue", "run"): command_queue_run,
     ("queue", "cancel"): command_queue_cancel,
     ("quality", "check"): command_quality_check,
+    ("quality", "golden"): command_quality_golden,
     ("quality", "scopes"): command_quality_scopes,
     ("convert", "import"): command_convert_import,
     ("convert", "export"): command_convert_export,

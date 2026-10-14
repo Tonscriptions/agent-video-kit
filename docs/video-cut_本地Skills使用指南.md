@@ -38,7 +38,7 @@ $video-cut-project-ops 初始化一个本地广告剪辑项目，并输出项目
 $video-cut-local-policy 对 project.json 执行 policy audit，拒绝所有远程或闭源服务引用。
 $video-cut-video-understand 分析本地素材，生成字幕、镜头摘要和高光候选。
 $video-cut-timeline 将高光候选编排为 30 秒竖屏广告，加入关键帧运镜和本地转场。
-$video-cut-quality 生成 waveform、vectorscope、histogram 和哈希证据报告。
+$video-cut-quality 生成 waveform、vectorscope、histogram、固定 golden 清单和哈希证据报告。
 $video-cut-rights-ledger 检查所有素材、模板依赖和父资产的本地许可证证据和发布门禁，并在撤下/争议后创建可审计修订、历史影响报告和发布清单。
 ```
 
@@ -72,7 +72,7 @@ $video-cut-rights-ledger 检查所有素材、模板依赖和父资产的本地�
 3. 使用 `$video-cut-video-understand` 读取已落盘素材；素材必须先进入项目资产库并写入 Rights Ledger。
 4. 使用 `$video-cut-timeline`、`$video-cut-video-edit` 和 `$video-cut-ffmpeg` 生成时间线及本地渲染计划。
 5. 使用 `$video-cut-local-models` 选择已登记的离线模型；没有本地模型时输出能力缺口，不自动改走远程服务。
-6. 使用 `$video-cut-quality` 生成 Scope、编码、哈希和回归证据。
+6. 使用 `$video-cut-quality` 先跑 `quality check` 和 Scope，再用 `quality golden --mode capture` 固定通过的本地媒体/设置哈希，交付前用 `--mode verify` 检查漂移。
 7. 使用 `$video-cut-rights-ledger` 执行 `rights list/history/check`；发生多资产证据变更时用 `rights batch-update`，发生撤下时用 `rights retract` 和 `rights impact` 保留影响链，最后用 `rights export` 生成发布清单，再由 `$video-cut-agent-editor` 执行导出。
 
 核心命令示例：
@@ -104,6 +104,6 @@ python -X utf8 -m ai_ad_editor doctor --project .\project
 
 ## 校验边界
 
-本指南证明生产 Skill 的目录、前缀、本地依赖和注册关系可重复检查；它不宣称已经关闭全部剪映差异。当前仍需独立证据推进的能力包括复杂本地模型跟踪、多语言高质量离线 TTS/ASR、GPU 级特效、跨字体精确排版、复杂音频空间处理、更多转场语义、跨格式工程互操作和完整黄金媒体样例。每项能力只有在产品实现、回归测试和固定证据同时具备后，才可从差异清单中关闭。
+本指南证明生产 Skill 的目录、前缀、本地依赖和注册关系可重复检查；它不宣称已经关闭全部剪映差异。当前仍需独立证据推进的能力包括复杂本地模型跟踪、多语言高质量离线 TTS/ASR、GPU 级特效、跨字体精确排版、复杂音频空间处理、更多转场语义、跨格式工程互操作、版权登记的正式黄金媒体集和跨设备视觉阈值。每项能力只有在产品实现、回归测试和固定证据同时具备后，才可从差异清单中关闭。
 
 后续制作遵循 [`AGENTS.md`](../AGENTS.md)：只使用原生 Windows 工具，禁止 Docker/WSL 等虚拟化环境；若使用浏览器，完成后关闭不再使用的 tab。
