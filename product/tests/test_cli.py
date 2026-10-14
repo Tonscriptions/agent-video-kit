@@ -708,6 +708,8 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("relink_by_hash", manifest["capabilities"]["media"]["features"])
         self.assertIn("target_lufs_gate", manifest["capabilities"]["quality"]["features"])
         self.assertIn("vectorscope", manifest["capabilities"]["quality"]["features"])
+        self.assertIn("independent_text_track", manifest["capabilities"]["subtitles"]["features"])
+        self.assertIn("independent_rotate_text_layer", manifest["capabilities"]["subtitles"]["features"])
         self.assertIn("effect_parameter_keyframes", manifest["capabilities"]["effects"]["features"])
         self.assertIn("sequence_adjustments", manifest["capabilities"]["effects"]["features"])
         self.assertIn("lut3d_project_local", manifest["capabilities"]["effects"]["features"])
@@ -1677,7 +1679,56 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 0, result)
             self.assertTrue(output.exists())
             self.assertFalse(any(item.get("code") == "RENDER_FEATURE_UNSUPPORTED" for item in result["data"]["warnings"]))
-            self.assertTrue(any(item.get("feature") == "subtitle_layout_wrap" for item in result["data"]["warnings"]))
+
+    def test_independent_subtitle_track_and_rotation_render(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-text-track-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingest["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [
+                {"op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000},
+                {"op": "add_track", "track_id": "track_titles", "kind": "subtitle", "order": 3},
+                {"op": "append_clip", "track_id": "track_titles", "id": "headline", "generator": {"type": "text"}, "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000, "subtitle": {"text": "Local title", "style": {"fontsize": 34, "box": False, "x": "(w-text_w)/2", "y": "(h-text_h)/2"}, "animation": {"type": "rotate", "from_degrees": -30, "to_degrees": 15, "duration": 0.4}}},
+            ]}), encoding="utf-8")
+            code, composed = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
+            self.assertEqual(code, 0, composed)
+            output = project / "renders" / "text-track.mp4"
+            code, planned = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
+            self.assertEqual(code, 0, planned)
+            graph = planned["data"]["plan"]["filter_complex"]
+            self.assertIn("subtitlecanvas0", graph)
+            self.assertIn("rotate=", graph)
+            self.assertIn("drawtext=text='Local title'", graph)
+            self.assertNotIn("subtitle_animation:rotate", " ".join(str(item) for item in planned.get("warnings", [])))
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output))
+            self.assertEqual(code, 0, rendered)
+            self.assertTrue(output.exists())
+
+    def test_text_only_subtitle_sequence_render(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-text-only-") as raw:
+            workspace = Path(raw)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [
+                {"op": "add_track", "track_id": "track_titles", "kind": "subtitle", "order": 3},
+                {"op": "append_clip", "track_id": "track_titles", "id": "title_card", "generator": {"type": "text"}, "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000, "subtitle": {"text": "Text only", "style": {"fontsize": 34, "box": False, "x": "(w-text_w)/2", "y": "(h-text_h)/2"}}},
+            ]}), encoding="utf-8")
+            code, composed = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
+            self.assertEqual(code, 0, composed)
+            output = project / "renders" / "text-only.mp4"
+            code, planned = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
+            self.assertEqual(code, 0, planned)
+            self.assertNotIn("VIDEO_TRACK_EMPTY", json.dumps(planned, ensure_ascii=False))
+            self.assertIn("drawtext=text=", planned["data"]["plan"]["filter_complex"])
+            self.assertIn("Text only", planned["data"]["plan"]["filter_complex"])
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output))
+            self.assertEqual(code, 0, rendered)
+            self.assertTrue(output.exists())
 
     def test_local_object_tracking_report_and_keyframe_apply(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-tracking-") as raw:

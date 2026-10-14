@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from .policy import reference_kind, resolve_local_path
 from .project import asset_map
 from .rights import check_project_rights, load_ledger
 from .utils import ID_RE
@@ -332,6 +333,14 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
             occupied: list[tuple[int, int, str]] = []
             for ci, clip in enumerate(clips):
                 cp = f"{tp}.clips[{ci}]"
+                track_kind = str(track.get("kind", ""))
+                generator = clip.get("generator")
+                text_generator = isinstance(generator, dict) and str(generator.get("type", "")).lower() == "text"
+                if generator is not None and (not isinstance(generator, dict) or str(generator.get("type", "")).lower() != "text"):
+                    error("GENERATOR_UNSUPPORTED", "当前片段 generator 只支持 type=text", f"{cp}.generator")
+                if generator is not None and track_kind != "subtitle":
+                    error("GENERATOR_TRACK_INVALID", "文字 generator 必须位于 subtitle 轨道", f"{cp}.generator")
+                inline_text_layer = track_kind == "subtitle" and text_generator and isinstance(clip.get("subtitle"), dict)
                 cid = clip.get("id")
                 if not isinstance(cid, str) or not ID_RE.fullmatch(cid):
                     error("ID_INVALID", "片段 ID 不符合规范", f"{cp}.id")
@@ -347,8 +356,14 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                     error("TIME_RANGE_INVALID", "片段时间范围无效", cp)
                 if start + dur > duration:
                     error("CLIP_OUTSIDE_SEQUENCE", "片段超出序列时长", cp)
-                if clip.get("asset_id") not in asset_map(project) and clip.get("sequence_id") not in declared_sequence_ids:
+                if not inline_text_layer and clip.get("asset_id") not in asset_map(project) and clip.get("sequence_id") not in declared_sequence_ids:
                     error("REFERENCE_MISSING", "片段引用的资产或序列不存在", cp)
+                if inline_text_layer and (clip.get("asset_id") or clip.get("sequence_id")):
+                    error("GENERATOR_REFERENCE_CONFLICT", "文字 generator 不能同时引用 asset_id 或 sequence_id", cp)
+                if track_kind == "subtitle" and clip.get("asset_id"):
+                    subtitle_asset = asset_map(project).get(clip.get("asset_id"))
+                    if subtitle_asset and subtitle_asset.get("kind") != "subtitle":
+                        error("SUBTITLE_ASSET_KIND_INVALID", "subtitle 轨道只能引用 subtitle 资产", f"{cp}.asset_id")
                 if clip.get("asset_id"):
                     asset = asset_map(project).get(clip.get("asset_id"))
                     if asset and _int(asset.get("probe", {}).get("duration_tick", 0)) and src_out > _int(asset["probe"]["duration_tick"]):
@@ -844,6 +859,19 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                         expansion_value = style.get("expansion")
                         if expansion_value is not None and str(expansion_value).lower() not in {"none", "normal", "strftime"}:
                             error("SUBTITLE_EXPANSION_UNSUPPORTED", "字幕 expansion 只支持 none、normal 或 strftime", f"{cp}.subtitle.style.expansion")
+                        font_asset_id = style.get("font_asset_id")
+                        if font_asset_id is not None:
+                            font_asset = asset_map(project).get(str(font_asset_id))
+                            if not font_asset or font_asset.get("kind") != "font":
+                                error("SUBTITLE_FONT_REFERENCE_INVALID", "font_asset_id 必须引用 font 资产", f"{cp}.subtitle.style.font_asset_id")
+                        fontfile = style.get("fontfile")
+                        if fontfile is not None:
+                            if reference_kind(fontfile) in {"remote", "provider"}:
+                                error("SUBTITLE_FONT_REMOTE", "字幕 fontfile 只允许本地路径", f"{cp}.subtitle.style.fontfile")
+                            else:
+                                font_path = resolve_local_path(root, fontfile, field=f"{cp}.subtitle.style.fontfile")
+                                if not font_path.is_file():
+                                    error("SUBTITLE_FONT_MISSING", "字幕 fontfile 不存在", f"{cp}.subtitle.style.fontfile")
                         word_timing = subtitle.get("word_timing")
                         if word_timing is not None:
                             if not isinstance(word_timing, list):
@@ -854,6 +882,9 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                     if not isinstance(word_item, dict):
                                         error("SUBTITLE_WORD_TIMING_INVALID", "word_timing 项必须是对象", f"{cp}.subtitle.word_timing[{word_index}]")
                                         continue
+                                    start_char = word_item.get("start_char")
+                                    if start_char is not None and (isinstance(start_char, bool) or not isinstance(start_char, int) or start_char < 0):
+                                        error("SUBTITLE_WORD_INDEX_INVALID", "word_timing start_char 必须是非负整数", f"{cp}.subtitle.word_timing[{word_index}].start_char")
                                     start_value = word_item.get("start", word_item.get("start_seconds"))
                                     end_value = word_item.get("end", word_item.get("end_seconds"))
                                     if start_value is None and word_item.get("start_tick") is not None:
@@ -880,6 +911,23 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                 else:
                                     if not math.isfinite(animation_duration) or animation_duration <= 0:
                                         error("SUBTITLE_ANIMATION_DURATION_INVALID", "字幕动画 duration 必须是有限正数", f"{cp}.subtitle.animation.duration")
+                            if animation_type == "rotate":
+                                for angle_key in ("from_degrees", "to_degrees", "from", "to", "angle", "degrees"):
+                                    if angle_key not in animation:
+                                        continue
+                                    try:
+                                        angle_value = float(animation[angle_key])
+                                    except (TypeError, ValueError):
+                                        angle_value = math.nan
+                                    if isinstance(animation[angle_key], bool) or not math.isfinite(angle_value) or abs(angle_value) > 3600:
+                                        error("SUBTITLE_ROTATION_INVALID", "字幕旋转角度必须是绝对值不超过 3600 的有限数字", f"{cp}.subtitle.animation.{angle_key}")
+                                if "delay" in animation:
+                                    try:
+                                        delay = float(animation["delay"])
+                                    except (TypeError, ValueError):
+                                        delay = math.nan
+                                    if isinstance(animation["delay"], bool) or not math.isfinite(delay) or delay < 0:
+                                        error("SUBTITLE_ANIMATION_DELAY_INVALID", "字幕动画 delay 必须是有限非负数字", f"{cp}.subtitle.animation.delay")
         if not sequence.get("tracks"):
             warning("SEQUENCE_EMPTY", "序列没有轨道", sp)
 

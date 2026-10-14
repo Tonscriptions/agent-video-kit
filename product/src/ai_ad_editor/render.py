@@ -12,8 +12,10 @@ from typing import Any, Callable
 
 from .errors import AppError, dependency_error
 from .media import ffmpeg_path, probe_media
+from .policy import resolve_local_path
 from .project import asset_map
 from .quality import check_output
+from .text_layout import build_text_layout, graphemes, text_width, word_ranges
 from .utils import atomic_write_json, new_id, now_iso, run_process, sha256_bytes, sha256_file
 
 
@@ -209,52 +211,35 @@ def _drawtext_arg(value: Any) -> str:
     return str(value).replace("\\", "\\\\").replace("'", "\\'").replace(":", "\\:").replace(",", "\\,").replace("%", "\\%").replace("\n", "\\n")
 
 
-def _wrap_subtitle_text(text: str, style: dict[str, Any], font_size: int, warnings: list[dict[str, Any]], clip_id: str) -> str:
-    """Apply deterministic, font-metric-free subtitle wrapping when requested.
-
-    FFmpeg's drawtext does not expose a portable automatic line-break width.
-    A local approximation keeps CJK glyphs at one em and Latin glyphs at
-    roughly 0.55 em, then leaves the actual shaping to libfreetype.  The
-    approximation is explicit in the warning/manifest so an Agent can decide
-    whether a font-specific golden render is required.
-    """
-    raw_width = style.get("max_width", style.get("wrap_width"))
-    if raw_width is None:
-        return text
-    try:
-        max_width = float(raw_width)
-    except (TypeError, ValueError):
-        return text
-    if not math.isfinite(max_width) or max_width <= 0:
-        return text
-    max_units = max_width / max(1.0, float(font_size))
-    wrapped_lines: list[str] = []
-    for paragraph in text.split("\n"):
-        if not paragraph:
-            wrapped_lines.append("")
-            continue
-        line: list[str] = []
-        units = 0.0
-        for character in paragraph:
-            # East Asian and emoji code points normally occupy a full em;
-            # ASCII/Latin glyphs use a conservative average advance width.
-            glyph_units = 1.0 if ord(character) > 0x2FF else 0.55
-            if line and units + glyph_units > max_units:
-                wrapped_lines.append("".join(line).rstrip())
-                line = []
-                units = 0.0
-            line.append(character)
-            units += glyph_units
-        wrapped_lines.append("".join(line).rstrip())
-    wrapped = "\n".join(wrapped_lines)
-    if wrapped != text:
+def _wrap_subtitle_text(text: str, style: dict[str, Any], font_size: int, warnings: list[dict[str, Any]], clip_id: str, font_metrics: Any = None) -> str:
+    """Wrap with the selected local font, disclosing the fallback explicitly."""
+    layout = build_text_layout(text, style, font_metrics, font_size)
+    if style.get("max_width", style.get("wrap_width")) is not None and font_metrics is None:
         warnings.append({
             "code": "RENDER_FEATURE_APPROXIMATE",
             "clip_id": clip_id,
             "feature": "subtitle_layout_wrap",
             "message": "字幕 max_width 使用本地平均字宽换行；精确字形度量仍由字体 golden render 校准",
         })
-    return wrapped
+    return layout.text
+
+
+def _subtitle_font_path(root: Path, style: dict[str, Any], assets: dict[str, dict[str, Any]] | None = None) -> Path | None:
+    font_id = style.get("font_asset_id")
+    if font_id:
+        font_asset = (assets or {}).get(str(font_id))
+        if not font_asset or font_asset.get("kind") != "font":
+            raise AppError("SUBTITLE_FONT_REFERENCE_INVALID", "font_asset_id 必须引用本地 font 资产", exit_code=2, path=str(font_id))
+        font_value = font_asset.get("uri")
+    else:
+        font_value = style.get("fontfile")
+    if font_value:
+        font = resolve_local_path(root, font_value, field="subtitle.style.fontfile")
+        if not font.is_file():
+            raise AppError("SUBTITLE_FONT_MISSING", "字幕字体文件不存在", exit_code=3, path=str(font))
+        return font.resolve()
+    windir = Path(os.environ.get("WINDIR", "C:/Windows"))
+    return next((candidate for candidate in (windir / "Fonts" / "arial.ttf", windir / "Fonts" / "segoeui.ttf", windir / "Fonts" / "msyh.ttc", windir / "Fonts" / "simhei.ttf") if candidate.is_file()), None)
 
 
 def _load_subtitle_font_metrics(font_path: Path | None, font_size: int) -> Any:
@@ -270,16 +255,7 @@ def _load_subtitle_font_metrics(font_path: Path | None, font_size: int) -> Any:
 
 
 def _subtitle_text_width(font_metrics: Any, text: str, font_size: int) -> float:
-    if font_metrics is not None:
-        try:
-            get_length = getattr(font_metrics, "getlength", None)
-            if callable(get_length):
-                return max(0.0, float(get_length(text)))
-            bbox = font_metrics.getbbox(text)
-            return max(0.0, float(bbox[2] - bbox[0]))
-        except Exception:
-            pass
-    return max(0.0, len(text) * max(1.0, float(font_size)) * 0.55)
+    return text_width(font_metrics, text, font_size)
 
 
 def _clamp(value: Any, low: float, high: float, default: float) -> float:
@@ -704,6 +680,7 @@ def render_fingerprints(project: dict[str, Any], sequence: dict[str, Any], setti
     project_fingerprint = sha256_bytes(json.dumps(project_payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))
     sequence_map = {str(item.get("id")): item for item in project.get("sequences", []) if item.get("id")}
     asset_ids: set[str] = set()
+    local_files: set[str] = set()
     seen_sequences: set[str] = set()
 
     def collect(sequence_value: dict[str, Any]) -> None:
@@ -715,6 +692,13 @@ def render_fingerprints(project: dict[str, Any], sequence: dict[str, Any], setti
             for clip in track.get("clips", []):
                 if clip.get("asset_id"):
                     asset_ids.add(str(clip.get("asset_id")))
+                subtitle = clip.get("subtitle") if isinstance(clip.get("subtitle"), dict) else {}
+                subtitle_style = subtitle.get("style") if isinstance(subtitle.get("style"), dict) else {}
+                if subtitle_style.get("font_asset_id"):
+                    asset_ids.add(str(subtitle_style.get("font_asset_id")))
+                for local_value in (subtitle.get("asset_uri"), subtitle_style.get("fontfile")):
+                    if local_value:
+                        local_files.add(str(local_value))
                 if clip.get("sequence_id") in sequence_map:
                     collect(sequence_map[str(clip.get("sequence_id"))])
 
@@ -732,6 +716,14 @@ def render_fingerprints(project: dict[str, Any], sequence: dict[str, Any], setti
             if source.exists() and source.is_file():
                 digest = f"sha256:{sha256_file(source)}"
         input_hashes[asset_id] = digest
+    if root is not None:
+        for local_value in sorted(local_files):
+            try:
+                source = resolve_local_path(root, local_value, field="render.input")
+            except AppError:
+                continue
+            digest = f"sha256:{sha256_file(source)}" if source.is_file() else None
+            input_hashes[f"local:{local_value}"] = digest
     return {"project_fingerprint": project_fingerprint, "input_hashes": input_hashes}
 
 
@@ -1577,13 +1569,22 @@ def _effect_filters(
     return filters
 
 
-def _subtitle_filter(root: Path, subtitle: Any, warnings: list[dict[str, Any]], clip_id: str, clip_start: float = 0.0, clip_duration: float = 0.0) -> str | None:
+def _subtitle_filter(
+    root: Path,
+    subtitle: Any,
+    warnings: list[dict[str, Any]],
+    clip_id: str,
+    clip_start: float = 0.0,
+    clip_duration: float = 0.0,
+    *,
+    timeline_window: bool = False,
+    rotation_supported: bool = False,
+    assets: dict[str, dict[str, Any]] | None = None,
+) -> str | None:
     if not isinstance(subtitle, dict):
         return None
     if subtitle.get("asset_uri"):
-        path = Path(str(subtitle["asset_uri"]))
-        if not path.is_absolute():
-            path = root / path
+        path = resolve_local_path(root, subtitle["asset_uri"], field="subtitle.asset_uri")
         if path.exists():
             if subtitle.get("animation") or isinstance(subtitle.get("style"), dict) and subtitle["style"].get("animation"):
                 warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_asset_animation", "message": "外部字幕文件的文字动画未执行"})
@@ -1593,25 +1594,17 @@ def _subtitle_filter(root: Path, subtitle: Any, warnings: list[dict[str, Any]], 
     if subtitle.get("text") is None:
         return None
     style = subtitle.get("style") if isinstance(subtitle.get("style"), dict) else {}
-    subtitle_text = str(subtitle.get("text"))
+    source_subtitle_text = str(subtitle.get("text"))
+    subtitle_text = source_subtitle_text
     font_size = max(1, int(_num(style.get("fontsize", 52), 52)))
-    subtitle_text = _wrap_subtitle_text(subtitle_text, style, font_size, warnings, clip_id)
-    parts = [f"drawtext=text='{_drawtext_arg(subtitle_text)}'", f"fontcolor={_quoted(style.get('fontcolor', 'white'))}", f"fontsize={font_size}"]
-    font_value = style.get("fontfile")
-    resolved_font_path: Path | None = None
-    if not font_value:
-        windir = Path(os.environ.get("WINDIR", "C:/Windows"))
-        font_value = next((str(candidate) for candidate in (windir / "Fonts" / "arial.ttf", windir / "Fonts" / "segoeui.ttf", windir / "Fonts" / "msyh.ttc", windir / "Fonts" / "simhei.ttf") if candidate.exists()), None)
-    if font_value:
-        font = Path(str(font_value))
-        if not font.is_absolute():
-            font = root / font
-        if font.exists():
-            resolved_font_path = font
-            parts.append(f"fontfile='{_quoted(str(font))}'")
-        else:
-            warnings.append({"code": "FONT_MISSING", "clip_id": clip_id, "message": f"字体文件不存在: {font}"})
+    resolved_font_path = _subtitle_font_path(root, style, assets)
     font_metrics = _load_subtitle_font_metrics(resolved_font_path, font_size)
+    subtitle_text = _wrap_subtitle_text(subtitle_text, style, font_size, warnings, clip_id, font_metrics)
+    parts = [f"drawtext=text='{_drawtext_arg(subtitle_text)}'", f"fontcolor={_quoted(style.get('fontcolor', 'white'))}", f"fontsize={font_size}"]
+    if timeline_window:
+        parts.append(f"enable={_expr_arg(f'between(t,{clip_start:.6f},{clip_start + max(0.001, clip_duration):.6f})')}")
+    if resolved_font_path is not None:
+        parts.append(f"fontfile='{_quoted(str(resolved_font_path))}'")
     integer_options = {
         "line_spacing": ("line_spacing", -2000, 2000),
         "borderw": ("borderw", 0, 100),
@@ -1657,7 +1650,15 @@ def _subtitle_filter(root: Path, subtitle: Any, warnings: list[dict[str, Any]], 
     if word_timing:
         entries: list[tuple[str, float, float, int]] = []
         tick_base = max(1, int(_num(subtitle.get("ticks_per_second", 90000), 90000)))
+        resolved_words: dict[int, tuple[int, int]] = {}
         if isinstance(word_timing, list):
+            try:
+                resolved_words = {
+                    id(item): (start, end)
+                    for item, start, end in word_ranges(source_subtitle_text, [item for item in word_timing if isinstance(item, dict)])
+                }
+            except ValueError as exc:
+                raise AppError("SUBTITLE_WORD_TIMING_TEXT_MISMATCH", str(exc), exit_code=2, path=f"clips[{clip_id}].subtitle.word_timing") from exc
             for word_index, item in enumerate(word_timing):
                 if not isinstance(item, dict):
                     continue
@@ -1688,18 +1689,21 @@ def _subtitle_filter(root: Path, subtitle: Any, warnings: list[dict[str, Any]], 
             word_filters = [":".join(base_parts)]
             prefix_text = ""
             highlight_color = _quoted(style.get("active_color", style.get("highlight_color", "yellow")))
-            for word, start_value, end_value, _ in entries:
+            for word, start_value, end_value, word_index in entries:
                 word_parts = [f"drawtext=text='{_drawtext_arg(word)}'", f"fontcolor={highlight_color}", f"fontsize={font_size}"]
                 if resolved_font_path is not None:
                     word_parts.append(f"fontfile='{_quoted(str(resolved_font_path))}'")
-                prefix_width = _subtitle_text_width(font_metrics, prefix_text, font_size)
+                original_item = word_timing[word_index] if isinstance(word_timing, list) and word_index < len(word_timing) else None
+                source_span = resolved_words.get(id(original_item)) if isinstance(original_item, dict) else None
+                prefix = source_subtitle_text[:source_span[0]] if source_span else prefix_text
+                prefix_width = _subtitle_text_width(font_metrics, prefix, font_size)
                 word_parts.extend([
                     f"x={_expr_arg(f'({base_x})+({prefix_width:.6f})')}",
                     f"y={base_y}",
                     f"enable={_expr_arg(f'gte(t,{clip_start + start_value:.6f})*lt(t,{clip_start + end_value:.6f})')}",
                 ])
                 word_filters.append(":".join(word_parts))
-                prefix_text += word + " "
+                prefix_text = source_subtitle_text[:source_span[1]] if source_span else prefix_text + word + " "
             return ",".join(word_filters)
     animation = subtitle.get("animation") if isinstance(subtitle.get("animation"), dict) else style.get("animation") if isinstance(style.get("animation"), dict) else {}
     animation_type = str(animation.get("type", "")).lower().replace("-", "_")
@@ -1729,7 +1733,7 @@ def _subtitle_filter(root: Path, subtitle: Any, warnings: list[dict[str, Any]], 
                 x_expr = f"({base_x})-((1-({progress}))*{distance:.4f})"
                 parts.append(f"x={_expr_arg(x_expr)}")
         elif animation_type in {"typewriter", "typing"}:
-            chars = list(subtitle_text)
+            chars = [item[2] for item in graphemes(subtitle_text) if item[2] != "\n"]
             if not chars:
                 return None
             char_step = animation_duration / max(1, len(chars))
@@ -1737,11 +1741,15 @@ def _subtitle_filter(root: Path, subtitle: Any, warnings: list[dict[str, Any]], 
             prefix_text = ""
             for index, char in enumerate(chars):
                 char_parts = [f"drawtext=text='{_drawtext_arg(char)}'", *parts[1:]]
+                char_parts = [part for part in char_parts if not part.startswith("enable=")]
                 prefix_width = _subtitle_text_width(font_metrics, prefix_text, font_size)
                 x_expr = f"({base_x})+({prefix_width:.6f})"
                 char_parts.append(f"x={_expr_arg(x_expr)}")
                 char_parts.append(f"y={base_y}")
-                char_parts.append(f"enable={_expr_arg(f'gte(t,{clip_start + delay + index * char_step:.6f})')}")
+                enable_expr = f"gte(t,{clip_start + delay + index * char_step:.6f})"
+                if timeline_window:
+                    enable_expr = f"({enable_expr})*lt(t,{clip_start + max(0.001, clip_duration):.6f})"
+                char_parts.append(f"enable={_expr_arg(enable_expr)}")
                 if style.get("box", True):
                     char_parts.extend(["box=1", f"boxcolor={_quoted(style.get('boxcolor', 'black@0.45'))}", f"boxborderw={box_border}"])
                 char_filters.append(":".join(char_parts))
@@ -1757,7 +1765,8 @@ def _subtitle_filter(root: Path, subtitle: Any, warnings: list[dict[str, Any]], 
             parts.append(f"y={_expr_arg(bounce_expr)}")
         elif animation_type == "rotate":
             parts.append(f"alpha={_expr_arg(f'if(lt(t,{start_expr}),0,{progress})')}")
-            warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_animation:rotate", "message": "当前 drawtext 后端将 rotate 文字动画近似为淡入，避免旋转整个视频画布"})
+            if not rotation_supported:
+                warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_animation:rotate", "message": "片段内字幕仍使用淡入近似；独立字幕轨道支持透明文字层旋转"})
         else:
             warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": f"subtitle_animation:{animation_type}", "message": "未知字幕动画类型"})
     if not any(part.startswith("x=") for part in parts):
@@ -2190,6 +2199,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     ducking_requested = False
     input_meta: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
+    subtitle_overlays: list[dict[str, Any]] = []
     adjustment_layers: list[tuple[str, list[Any], float, float]] = []
     raw_adjustments = settings.get("adjustments")
     if isinstance(raw_adjustments, list):
@@ -2220,6 +2230,38 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             continue
         for clip in sorted(track.get("clips", []), key=lambda item: int(item.get("timeline_start_tick", 0))):
             asset = assets.get(clip.get("asset_id"))
+            if track.get("kind") == "subtitle":
+                subtitle = clip.get("subtitle") if isinstance(clip.get("subtitle"), dict) else None
+                if subtitle is None and asset and asset.get("kind") == "subtitle":
+                    subtitle = {"asset_uri": asset.get("uri")}
+                if subtitle is None:
+                    warnings.append({"code": "SUBTITLE_TRACK_EMPTY", "clip_id": clip.get("id"), "feature": "subtitle_track", "message": "独立字幕轨道片段缺少内联 subtitle 或 subtitle 资产"})
+                    continue
+                clip_start = _sec(int(clip.get("timeline_start_tick", 0)), tps)
+                clip_duration = max(0.001, _sec(int(clip.get("duration_tick", 1)), tps))
+                subtitle_filter = _subtitle_filter(
+                    root,
+                    subtitle,
+                    warnings,
+                    str(clip.get("id")),
+                    clip_start,
+                    clip_duration,
+                    timeline_window=True,
+                    rotation_supported=True,
+                    assets=assets,
+                )
+                if subtitle_filter:
+                    animation = subtitle.get("animation") if isinstance(subtitle.get("animation"), dict) else subtitle.get("style", {}).get("animation") if isinstance(subtitle.get("style"), dict) and isinstance(subtitle.get("style", {}).get("animation"), dict) else {}
+                    animation_type = str(animation.get("type", "")).lower().replace("-", "_")
+                    subtitle_overlays.append({
+                        "clip_id": str(clip.get("id")),
+                        "filter": subtitle_filter,
+                        "start": clip_start,
+                        "duration": clip_duration,
+                        "animation_type": animation_type,
+                        "animation": animation,
+                    })
+                continue
             if not asset:
                 continue
             for keyframe_track in clip.get("keyframes", []):
@@ -2434,7 +2476,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 )
                 if speed_segments and curve_duration is not None and abs(curve_duration - (src_out - src_in) / max(speed, 1e-9)) > 1e-6:
                     speed = max(0.01, (src_out - src_in) / max(1e-9, curve_duration))
-                subtitle = _subtitle_filter(root, clip.get("subtitle"), warnings, str(clip.get("id")), start, max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)))
+                subtitle = _subtitle_filter(root, clip.get("subtitle"), warnings, str(clip.get("id")), start, max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)), assets=assets)
                 if subtitle:
                     chain.append(subtitle)
                 mask_values: list[dict[str, Any]] = []
@@ -2654,8 +2696,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     other_audio_labels.append(label)
                 input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "input": index, "kind": "audio", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
                 index += 1
-    if not video_labels:
-        raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段", exit_code=2, path="sequences[].tracks")
+    if not video_labels and not subtitle_overlays:
+        raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
     base_filter = f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba" if transparent_canvas else f"color=c=black:s={width}x{height}:r={fps_value}:d={duration:.6f}"
     filters.append(f"{base_filter}[base]")
     final_specs: list[dict[str, Any]] = []
@@ -2701,7 +2743,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             index += 1
     current = "base"
     for pos, spec in enumerate(final_specs):
-        target = "vout" if pos == len(final_specs) - 1 and not has_adjustments else f"vo{pos}"
+        target = "vout" if pos == len(final_specs) - 1 and not has_adjustments and not subtitle_overlays else f"vo{pos}"
         blend = spec.get("blend") if isinstance(spec.get("blend"), dict) else {}
         blend_mode = str(blend.get("mode", "normal")).lower().replace("-", "_")
         if blend_mode in {"normal", "source_over", ""}:
@@ -2808,7 +2850,30 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 segment_labels.append(post)
             filters.append("".join(f"[{label}]" for label in segment_labels) + f"concat=n={len(segment_labels)}:v=1:a=0,format=rgba,setpts=PTS-STARTPTS[{target}]")
             current = target
-        filters.append(f"[{current}]" + ("format=rgba," if transparent_canvas else "") + "null[vout]")
+        adjusted_output = "vout" if not subtitle_overlays else "adjusted_output"
+        filters.append(f"[{current}]" + ("format=rgba," if transparent_canvas else "") + f"null[{adjusted_output}]")
+        current = adjusted_output
+    elif subtitle_overlays and current == "base":
+        current = "base"
+
+    for subtitle_index, overlay in enumerate(subtitle_overlays):
+        target = "vout" if subtitle_index == len(subtitle_overlays) - 1 else f"subtitle{subtitle_index}"
+        animation = overlay.get("animation") if isinstance(overlay.get("animation"), dict) else {}
+        if overlay.get("animation_type") == "rotate":
+            start = float(overlay.get("start", 0.0)) + max(0.0, _num(animation.get("delay", 0.0), 0.0))
+            duration_value = max(0.001, _num(animation.get("duration", 0.3), 0.3))
+            from_degrees = _num(animation.get("from_degrees", animation.get("from", -90.0)), -90.0)
+            to_degrees = _num(animation.get("to_degrees", animation.get("to", animation.get("angle", 0.0))), 0.0)
+            progress = f"clip((t-{start:.6f})/{duration_value:.6f},0,1)"
+            angle_expression = f"(({from_degrees:.6f}+({to_degrees - from_degrees:.6f})*{progress})*PI/180)"
+            canvas_label = f"subtitlecanvas{subtitle_index}"
+            rotated_label = f"subtitlerotated{subtitle_index}"
+            filters.append(f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba[{canvas_label}]")
+            filters.append(f"[{canvas_label}]{overlay['filter']},rotate={_expr_arg(angle_expression)}:fillcolor=black@0.0:ow=iw:oh=ih,format=rgba[{rotated_label}]")
+            filters.append(f"[{current}][{rotated_label}]overlay=eof_action=pass:format=auto[{target}]")
+        else:
+            filters.append(f"[{current}]{overlay['filter']}[{target}]")
+        current = target
     if audio_labels:
         mix_labels = list(audio_labels)
         if ducking_requested and voice_audio_labels and music_audio_labels:

@@ -204,6 +204,14 @@
         "transition_in": {"$ref": "#/$defs/transition"},
         "transition_out": {"$ref": "#/$defs/transition"},
         "crop": {"$ref": "#/$defs/crop"},
+        "generator": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "type": {"type": "string", "enum": ["text"]}
+          },
+          "required": ["type"]
+        },
         "subtitle": {"type": "object"},
         "audio": {
           "type": "object",
@@ -215,7 +223,7 @@
         "blend": {"type": "object"},
         "mask": {"$ref": "#/$defs/mask"}
       },
-      "oneOf": [{"required": ["asset_id"]}, {"required": ["sequence_id"]}]
+      "oneOf": [{"required": ["asset_id"]}, {"required": ["sequence_id"]}, {"required": ["generator"]}]
     },
     "mask": {
       "type": "object",

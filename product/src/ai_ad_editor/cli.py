@@ -1044,8 +1044,10 @@ def _clip_from_change(change: dict[str, Any], track: dict[str, Any]) -> dict[str
             raise argument_error(f"append_clip 缺少字段: {field}", field)
     asset_id = change.get("asset_id")
     sequence_id = change.get("nested_sequence_id")
-    if not asset_id and not sequence_id:
-        raise argument_error("append_clip 必须提供 asset_id 或 nested_sequence_id")
+    generator = change.get("generator")
+    text_generator = isinstance(generator, dict) and str(generator.get("type", "")).lower() == "text" and isinstance(change.get("subtitle"), dict)
+    if not asset_id and not sequence_id and not text_generator:
+        raise argument_error("append_clip 必须提供 asset_id、nested_sequence_id 或有效的 text generator")
     source_in = int(change["source_in_tick"])
     source_out = int(change["source_out_tick"])
     duration = int(change.get("duration_tick", source_out - source_in))
@@ -1059,7 +1061,9 @@ def _clip_from_change(change: dict[str, Any], track: dict[str, Any]) -> dict[str
         clip["asset_id"] = asset_id
     if sequence_id:
         clip["sequence_id"] = sequence_id
-    for field in ("speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "audio", "blend", "mask"):
+    if text_generator:
+        clip["generator"] = copy.deepcopy(generator)
+    for field in ("speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "generator", "audio", "blend", "mask"):
         if field in change:
             clip[field] = change[field]
     return clip
@@ -1475,7 +1479,7 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
             patch = change.get("patch") if isinstance(change.get("patch"), dict) else change
             if "id" in patch or "clip_id" in patch:
                 raise argument_error("update_clip 不允许修改片段 ID", "patch")
-            for field in ("asset_id", "sequence_id", "timeline_start_tick", "duration_tick", "source_in_tick", "source_out_tick", "speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "audio", "blend", "mask"):
+            for field in ("asset_id", "sequence_id", "timeline_start_tick", "duration_tick", "source_in_tick", "source_out_tick", "speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "generator", "audio", "blend", "mask"):
                 if field in patch:
                     clip[field] = patch[field]
             _clamp_clip_keyframes(clip)

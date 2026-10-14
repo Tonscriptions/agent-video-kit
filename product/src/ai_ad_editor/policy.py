@@ -13,6 +13,7 @@ import re
 from pathlib import Path
 from typing import Any, Iterator
 from urllib.parse import urlsplit
+from urllib.request import url2pathname
 
 from .errors import AppError, argument_error
 
@@ -85,6 +86,22 @@ def require_local_reference(value: Any, *, field: str) -> str:
     if not text:
         raise argument_error("本地引用不能为空", field)
     return text
+
+
+def resolve_local_path(root: Path, value: Any, *, field: str) -> Path:
+    """Resolve a validated local path or file/local URI against a project root."""
+    text = require_local_reference(value, field=field)
+    parsed = urlsplit(text)
+    if parsed.scheme.casefold() == "file":
+        raw_path = url2pathname(parsed.path)
+    elif parsed.scheme.casefold() == "local":
+        raw_path = url2pathname(parsed.path or parsed.netloc)
+    else:
+        raw_path = text
+    path = Path(raw_path).expanduser()
+    if not path.is_absolute():
+        path = root / path
+    return path.resolve()
 
 
 def _walk_scalars(value: Any, path: str = "$") -> Iterator[tuple[str, Any]]:
