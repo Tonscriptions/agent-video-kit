@@ -119,8 +119,8 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "audio": {
                 "status": "implemented",
-                "features": ["multi_track_mix", "track_mute", "track_solo", "track_volume", "track_pan", "track_role", "volume_automation", "pan_automation", "stereo_preserving_numeric_pan", "fade", "denoise", "compressor", "equalizer", "highpass", "lowpass", "dialogue_enhance", "pitch_shift", "reverb", "loudnorm", "ducking", "pan", "beat_anchors", "freeze_audio_silence_at_timeline_position", "extract_audio_asset", "derived_audio_rights_inheritance", "audio_track_apply"],
-                "limits": ["extract_audio_uses_first_local_audio_stream", "extract_audio_outputs_lossless_pcm_wav", "true_vocal_background_separation_requires_a_registered_offline_model_adapter", "freeze_audio_continue_uses_tail_padding", "audio_speed_curve_uses_piecewise_atempo"],
+                "features": ["multi_track_mix", "track_mute", "track_solo", "track_volume", "track_pan", "track_role", "volume_automation", "pan_automation", "stereo_preserving_numeric_pan", "fade", "denoise", "compressor", "equalizer", "highpass", "lowpass", "dialogue_enhance", "pitch_shift", "reverb", "loudnorm", "ducking", "pan", "beat_anchors", "freeze_audio_silence_at_timeline_position", "extract_audio_asset", "derived_audio_rights_inheritance", "audio_track_apply", "mid_side_separation_approximation", "separation_asset_pair", "selected_stem_audio_track_apply"],
+                "limits": ["extract_audio_uses_first_local_audio_stream", "extract_audio_outputs_lossless_pcm_wav", "mid_side_separation_is_phase_based_and_approximate", "true_vocal_background_separation_requires_a_registered_offline_model_adapter", "freeze_audio_continue_uses_tail_padding", "audio_speed_curve_uses_piecewise_atempo"],
             },
             "render": {
                 "status": "implemented",

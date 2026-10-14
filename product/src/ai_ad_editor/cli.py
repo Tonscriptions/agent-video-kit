@@ -64,6 +64,7 @@ from .smart_cut import SMART_CUT_VERSION, build_smart_cut_plan, match_transcript
 from .beat_edit import BEAT_CUT_VERSION, build_beat_cut_plan
 from .multicam import MULTICAM_SYNC_VERSION, build_switch_segments, new_multicam_clip_id, synchronize_multicam_sources
 from .audio_tools import AUDIO_EXTRACT_VERSION, extract_audio, inspect_audio_source
+from .audio_separation import AUDIO_SEPARATION_ENGINE, AUDIO_SEPARATION_VERSION, separate_mid_side
 from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
 
@@ -249,6 +250,28 @@ def build_parser() -> argparse.ArgumentParser:
     extract.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
     extract.add_argument("--evidence", default="")
     extract.add_argument("--creator", default="unknown")
+    separate = _leaf_common(aus.add_parser("separate", help="本地 mid/side 音频源分离近似"))
+    separate.add_argument("--project", required=True)
+    separate_source = separate.add_mutually_exclusive_group(required=True)
+    separate_source.add_argument("--asset-id", default=None, help="项目内视频/音频资产 ID")
+    separate_source.add_argument("--input", default=None, help="本地视频或音频路径")
+    separate.add_argument("--center-asset-id", default=None)
+    separate.add_argument("--side-asset-id", default=None)
+    separate.add_argument("--center-output", default=None)
+    separate.add_argument("--side-output", default=None)
+    separate.add_argument("--sample-rate", type=int, default=None)
+    separate.add_argument("--sequence-id", default=None)
+    separate.add_argument("--track-id", default=None, help="--apply 时写入目标音频轨道")
+    separate.add_argument("--stem", choices=("center", "side"), default=None, help="--apply 时选择写入轨道的派生 stem")
+    separate.add_argument("--timeline-start-seconds", type=float, default=0.0)
+    separate.add_argument("--apply", action="store_true", help="创建快照并将一个 stem 写入目标音频轨道")
+    separate.add_argument("--replace-track", action="store_true", help="应用前清空目标音频轨道已有片段")
+    separate.add_argument("--license-spdx", default="LicenseRef-UNVERIFIED")
+    separate.add_argument("--license-url", default="")
+    separate.add_argument("--permitted-use", action="append", default=["internal"])
+    separate.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
+    separate.add_argument("--evidence", default="")
+    separate.add_argument("--creator", default="unknown")
     track = _leaf_common(ms.add_parser("track", help="本地对象跟踪并生成关键帧"))
     track.add_argument("--project", required=True)
     track.add_argument("--asset-id", default=None, help="项目内视频资产 ID，与 --input 二选一")
@@ -1012,6 +1035,207 @@ def command_audio_extract(args: argparse.Namespace) -> dict[str, Any]:
     save_ledger(root, ledger)
     _operation(root, operation_id, {"operation_id": operation_id, "command": "audio.extract", "status": "succeeded", "asset_id": derived_id, "source_asset_id": source_asset.get("id") if source_asset else None, "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "created_at": now_iso()})
     return _envelope("audio.extract", args, data={"asset": asset, "rights": record, "snapshot": snapshot, "report": str(report_path), "extraction": extraction, "generated_clip": generated_clip, "validation": validation}, operation_id=operation_id)
+
+
+def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    if args.timeline_start_seconds < 0:
+        raise argument_error("timeline_start_seconds 不能为负数", "timeline_start_seconds")
+    if args.apply and (not args.track_id or not args.stem):
+        raise argument_error("--apply 必须同时提供 --track-id 和 --stem", "track_id")
+    if args.replace_track and not args.apply:
+        raise argument_error("--replace-track 必须与 --apply 一起使用", "replace_track")
+    source_asset: dict[str, Any] | None = None
+    parent_rights_ref: str | None = None
+    if args.asset_id:
+        source_asset = asset_map(project).get(str(args.asset_id))
+        if not source_asset:
+            raise argument_error(f"找不到音频分离源资产: {args.asset_id}", "asset_id")
+        source = Path(str(source_asset.get("uri", "")))
+        if not source.is_absolute():
+            source = root / source
+        parent_rights_ref = str(source_asset.get("rights_ref") or source_asset.get("id"))
+    else:
+        raw_input = str(args.input or "").strip()
+        if raw_input.lower().startswith(("http://", "https://")):
+            raise argument_error("--input 只接受本地视频或音频文件", "input")
+        source = Path(raw_input).expanduser().resolve()
+    source = source.resolve()
+    input_probe = inspect_audio_source(source)
+    center_id = str(args.center_asset_id or new_id("asset_center"))
+    side_id = str(args.side_asset_id or new_id("asset_side"))
+    existing = asset_map(project)
+    if center_id == side_id:
+        raise argument_error("center 和 side 派生资产 ID 必须不同", "center_asset_id")
+    if center_id in existing or side_id in existing:
+        raise argument_error("音频分离派生资产 ID 已存在", "center_asset_id")
+    center_output = Path(args.center_output).expanduser() if args.center_output else Path("assets") / "derived" / f"{safe_filename(center_id)}.wav"
+    side_output = Path(args.side_output).expanduser() if args.side_output else Path("assets") / "derived" / f"{safe_filename(side_id)}.wav"
+    if not center_output.is_absolute():
+        center_output = root / center_output
+    if not side_output.is_absolute():
+        side_output = root / side_output
+    center_output = ensure_inside(root, center_output)
+    side_output = ensure_inside(root, side_output)
+    if center_output == side_output:
+        raise argument_error("center 和 side 输出必须是不同文件", "output")
+    if args.dry_run:
+        return _envelope(
+            "audio.separate",
+            args,
+            status="planned",
+            data={
+                "source": str(source),
+                "source_asset_id": args.asset_id,
+                "source_sha256": f"sha256:{sha256_file(source)}",
+                "input_probe": input_probe,
+                "method": "mid-side",
+                "engine": AUDIO_SEPARATION_ENGINE,
+                "center": {"asset_id": center_id, "output": str(center_output)},
+                "side": {"asset_id": side_id, "output": str(side_output)},
+                "track_id": args.track_id,
+                "stem": args.stem,
+                "timeline_start_seconds": args.timeline_start_seconds,
+                "network": "disabled",
+            },
+            warnings=[{"code": "AUDIO_SEPARATION_APPROXIMATE", "message": "mid/side 仅按声道相位生成 center/side，不能替代本地 AI 源分离模型"}],
+        )
+    before_project = copy.deepcopy(project)
+    snapshot = create_snapshot(root, before_project, label="before-audio-separate")
+    operation_id = new_id("op")
+    separation = separate_mid_side(source, center_output, side_output, sample_rate=args.sample_rate)
+    ledger = load_ledger(root)
+    parent_record = None
+    if source_asset is not None:
+        records = {str(item.get("asset_id")): item for item in active_records(ledger)}
+        parent_record = records.get(parent_rights_ref or "")
+        if parent_record is None:
+            center_output.unlink(missing_ok=True)
+            side_output.unlink(missing_ok=True)
+            raise AppError("RIGHTS_RECORD_MISSING", "源资产缺少可继承的 Rights Ledger 记录", exit_code=7, path=parent_rights_ref)
+
+    def make_rights_record(asset_id: str, stem: str, details: dict[str, Any]) -> dict[str, Any]:
+        source_url = f"local://{details['output']}"
+        if parent_record is not None:
+            return {
+                "asset_id": asset_id,
+                "kind": "audio",
+                "sha256": details["sha256"],
+                "source_url": source_url,
+                "source_version": "derived:audio-mid-side",
+                "retrieved_at": now_iso(),
+                "creator": parent_record.get("creator", "unknown"),
+                "license_spdx": parent_record.get("license_spdx", "LicenseRef-UNVERIFIED"),
+                "license_url": parent_record.get("license_url", ""),
+                "attribution": parent_record.get("attribution", ""),
+                "permitted_uses": list(parent_record.get("permitted_uses", ["internal"])),
+                "permitted_channels": list(parent_record.get("permitted_channels", [])),
+                "restrictions": list(parent_record.get("restrictions", [])),
+                "derived_from": [parent_rights_ref],
+                "evidence": parent_record.get("evidence", ""),
+                "verification_status": parent_record.get("verification_status", "unverified"),
+                "verified_by": parent_record.get("verified_by", ""),
+                "takedown_status": parent_record.get("takedown_status", "clear"),
+                "notes": f"Derived by local FFmpeg mid/side {stem} split; inherits source rights",
+            }
+        return {
+            "asset_id": asset_id,
+            "kind": "audio",
+            "sha256": details["sha256"],
+            "source_url": source_url,
+            "source_version": "derived:audio-mid-side",
+            "retrieved_at": now_iso(),
+            "creator": args.creator,
+            "license_spdx": args.license_spdx,
+            "license_url": require_local_reference(args.license_url, field="--license-url") if args.license_url else "",
+            "attribution": "",
+            "permitted_uses": list(dict.fromkeys(args.permitted_use)),
+            "permitted_channels": [],
+            "restrictions": [],
+            "derived_from": [],
+            "evidence": require_local_reference(args.evidence, field="--evidence") if args.evidence else ("" if args.verification_status == "unverified" else source_url),
+            "verification_status": args.verification_status,
+            "verified_by": "ai-ad-editor" if args.verification_status == "verified" else "",
+            "takedown_status": "clear",
+            "notes": f"Derived by local FFmpeg mid/side {stem} split",
+        }
+
+    stems = separation["stems"]
+    center_details = stems["center"]
+    side_details = stems["side"]
+    center_asset = {
+        "id": center_id,
+        "kind": "audio",
+        "uri": str(center_output.relative_to(root)).replace("\\", "/"),
+        "sha256": center_details["sha256"],
+        "probe": center_details["probe"],
+        "rights_ref": center_id,
+        "source": {"source_url": f"local://{center_output}", "retrieved_at": now_iso(), "original_name": center_output.name, "derived_from": [source_asset.get("id")] if source_asset else []},
+    }
+    side_asset = {
+        "id": side_id,
+        "kind": "audio",
+        "uri": str(side_output.relative_to(root)).replace("\\", "/"),
+        "sha256": side_details["sha256"],
+        "probe": side_details["probe"],
+        "rights_ref": side_id,
+        "source": {"source_url": f"local://{side_output}", "retrieved_at": now_iso(), "original_name": side_output.name, "derived_from": [source_asset.get("id")] if source_asset else []},
+    }
+    center_rights = make_rights_record(center_id, "center", center_details)
+    side_rights = make_rights_record(side_id, "side", side_details)
+    project.setdefault("assets", []).extend([center_asset, side_asset])
+    generated_clip = None
+    if args.apply:
+        sequence = find_sequence(project, args.sequence_id)
+        target_track = find_track(sequence, args.track_id, None)
+        if str(target_track.get("kind")) != "audio":
+            raise argument_error("音频分离应用目标必须是 audio 轨道", "track_id")
+        if args.replace_track:
+            target_track["clips"] = []
+        selected_asset = center_asset if args.stem == "center" else side_asset
+        selected_probe = selected_asset["probe"].get("audio", {})
+        duration_seconds = float(selected_probe.get("duration_seconds", 0.0) or 0.0)
+        timeline_tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND))
+        duration_tick = max(1, int(round(duration_seconds * timeline_tps)))
+        timeline_start_tick = int(round(float(args.timeline_start_seconds) * timeline_tps))
+        generated_clip = {
+            "id": new_id(f"clip_audio_{args.stem}"),
+            "asset_id": selected_asset["id"],
+            "timeline_start_tick": timeline_start_tick,
+            "duration_tick": duration_tick,
+            "source_in_tick": 0,
+            "source_out_tick": duration_tick,
+        }
+        target_track.setdefault("clips", []).append(generated_clip)
+        _recompute_sequence_duration(sequence)
+    add_record(ledger, center_rights)
+    add_record(ledger, side_rights)
+    validation = validate_project(root, project, strict_rights=False)
+    if not validation["ok"]:
+        center_output.unlink(missing_ok=True)
+        side_output.unlink(missing_ok=True)
+        raise AppError("AUDIO_SEPARATION_APPLY_INVALID", "音频分离写入后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    report_path = root / "validation" / f"audio_separate_{safe_filename(operation_id)}.json"
+    report = {
+        "report_version": AUDIO_SEPARATION_VERSION,
+        "created_at": now_iso(),
+        "operation_id": operation_id,
+        "snapshot_id": snapshot["snapshot_id"],
+        "method": "mid-side",
+        "engine": AUDIO_SEPARATION_ENGINE,
+        "source_asset_id": args.asset_id,
+        "assets": {"center": center_asset, "side": side_asset},
+        "rights": {"center": center_rights, "side": side_rights},
+        "separation": separation,
+        "generated_clip": generated_clip,
+        "validation": validation,
+    }
+    atomic_write_json(report_path, report)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "audio.separate", "method": "mid-side", "asset_ids": [center_id, side_id], "source_asset_id": args.asset_id, "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "clip_id": generated_clip.get("id") if generated_clip else None, "at": now_iso()})
+    save_project(root, project)
+    save_ledger(root, ledger)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "audio.separate", "status": "succeeded", "method": "mid-side", "asset_ids": [center_id, side_id], "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "created_at": now_iso()})
+    return _envelope("audio.separate", args, data={"assets": {"center": center_asset, "side": side_asset}, "rights": {"center": center_rights, "side": side_rights}, "snapshot": snapshot, "report": str(report_path), "separation": separation, "generated_clip": generated_clip, "validation": validation}, warnings=separation.get("warnings"), operation_id=operation_id)
 
 
 def command_media_stabilize(args: argparse.Namespace) -> dict[str, Any]:
@@ -4105,6 +4329,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "multicam"): command_media_multicam,
     ("media", "smart-cut"): command_media_smart_cut,
     ("audio", "extract"): command_audio_extract,
+    ("audio", "separate"): command_audio_separate,
     ("ad", "plan"): command_ad_plan,
     ("ad", "apply"): command_ad_apply,
     ("subtitle", "validate"): command_subtitle_validate,

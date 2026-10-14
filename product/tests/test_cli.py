@@ -930,6 +930,40 @@ class P0CliTests(unittest.TestCase):
             audio_track = next(track for track in payload["sequences"][0]["tracks"] if track["id"] == "track_audio_1")
             self.assertEqual(audio_track["clips"][0]["asset_id"], "camera_audio")
 
+    def test_local_audio_separate_writes_mid_side_stems_and_applies_selected_stem(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-audio-separate-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace, "camera.mp4")
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, ingested = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            self.assertEqual(code, 0, ingested)
+            source_id = ingested["data"]["asset"]["id"]
+            before = (project / "project.json").read_text(encoding="utf-8")
+            code, planned = invoke(
+                "audio", "separate", "--project", str(project), "--asset-id", source_id,
+                "--center-asset-id", "camera_center", "--side-asset-id", "camera_side",
+                "--track-id", "track_audio_1", "--stem", "center", "--apply", "--dry-run",
+            )
+            self.assertEqual(code, 0, planned)
+            self.assertEqual(planned["data"]["engine"], "ffmpeg-local-mid-side-v1")
+            self.assertEqual((project / "project.json").read_text(encoding="utf-8"), before)
+            code, applied = invoke(
+                "audio", "separate", "--project", str(project), "--asset-id", source_id,
+                "--center-asset-id", "camera_center", "--side-asset-id", "camera_side",
+                "--track-id", "track_audio_1", "--stem", "center", "--apply",
+            )
+            self.assertEqual(code, 0, applied)
+            self.assertEqual(applied["data"]["snapshot"]["label"], "before-audio-separate")
+            self.assertEqual(applied["data"]["separation"]["method"], "mid-side")
+            self.assertEqual(applied["warnings"][0]["code"], "AUDIO_SEPARATION_APPROXIMATE")
+            payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            self.assertEqual({item["id"] for item in payload["assets"][-2:]}, {"camera_center", "camera_side"})
+            audio_track = next(track for track in payload["sequences"][0]["tracks"] if track["id"] == "track_audio_1")
+            self.assertEqual(audio_track["clips"][0]["asset_id"], "camera_center")
+            ledger = json.loads((project / "rights-ledger.json").read_text(encoding="utf-8"))
+            self.assertEqual(len(ledger["records"]), 3)
+
 
     def test_local_highlight_recommendation_writes_auditable_report(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-highlights-") as raw:
