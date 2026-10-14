@@ -969,6 +969,50 @@ class P0CliTests(unittest.TestCase):
             self.assertTrue(output.exists())
             self.assertLess(probe_media(output)["duration_seconds"], 3.0)
 
+    def test_local_smart_cut_removes_explicit_transcript_phrase_cue(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-smart-cut-transcript-") as raw:
+            workspace = Path(raw)
+            source = workspace / "continuous-speech.mp4"
+            audio_expr = r"aevalsrc=0.8*sin(2*PI*880*t):s=48000:d=3"
+            completed = subprocess.run(
+                [
+                    "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "color=c=green:s=320x180:r=24:d=3",
+                    "-f", "lavfi", "-i", audio_expr,
+                    "-shortest", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(source),
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingested = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingested["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [
+                {"op": "append_clip", "track_id": "track_video_1", "id": "phrase_clip", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 270000},
+            ]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            transcript = project / "validation" / "captions.srt"
+            transcript.write_text("1\n00:00:01,000 --> 00:00:01,250\n嗯\n\n2\n00:00:01,250 --> 00:00:03,000\n保留内容\n", encoding="utf-8")
+            common = (
+                "media", "smart-cut", "--project", str(project), "--clip-id", "phrase_clip", "--track-id", "track_video_1",
+                "--transcript", str(transcript), "--remove-phrase", "嗯", "--min-silence-seconds", "10", "--min-segment-seconds", "0.05",
+            )
+            code, planned = invoke(*common, "--dry-run")
+            self.assertEqual(code, 0, planned)
+            plan = planned["data"]["plan"]
+            self.assertEqual(plan["semantic"]["matches"][0]["phrases"], ["嗯"])
+            self.assertEqual(plan["semantic"]["ranges"][0]["start_seconds"], 1.0)
+            self.assertGreater(plan["removed_seconds"], 0.2)
+            self.assertTrue(any(item["code"] == "SMART_CUT_SEMANTIC_CUE_GRANULARITY" for item in planned["warnings"]))
+            code, applied = invoke(*common, "--apply")
+            self.assertEqual(code, 0, applied)
+            self.assertEqual(applied["data"]["before_snapshot"]["label"], "before-smart-cut")
+            self.assertEqual(len(applied["data"]["replacements"][0]["piece_ids"]), 2)
+
     def test_local_ad_plan_writes_timed_phases_and_markers(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-plan-") as raw:
             workspace = Path(raw)

@@ -7,7 +7,7 @@ from typing import Any
 from .errors import AppError, argument_error
 
 
-SMART_CUT_VERSION = "0.1.0"
+SMART_CUT_VERSION = "0.2.0"
 
 
 def _number(value: Any, default: float = 0.0) -> float:
@@ -32,6 +32,70 @@ def _merge_ranges(ranges: list[tuple[float, float]]) -> list[tuple[float, float]
     return merged
 
 
+def _normalize_transcript_text(value: Any) -> str:
+    """Normalize a caption phrase without inventing language semantics."""
+    import re
+
+    return re.sub(r"\s+", " ", str(value or "").casefold()).strip()
+
+
+def match_transcript_phrases(
+    cues: list[dict[str, Any]],
+    phrases: list[str],
+    *,
+    duration_seconds: float,
+) -> dict[str, Any]:
+    """Find explicit phrases in local timed captions.
+
+    This is intentionally lexical and cue-granular.  It does not claim ASR
+    semantics, infer word boundaries, or download a model.  The caller can
+    use the returned ranges together with silence ranges and preserve the
+    match evidence in the smart-cut report.
+    """
+    duration = max(0.0, _number(duration_seconds))
+    normalized_phrases: list[str] = []
+    for phrase in phrases:
+        value = _normalize_transcript_text(phrase)
+        if value and value not in normalized_phrases:
+            normalized_phrases.append(value)
+    matches: list[dict[str, Any]] = []
+    ranges: list[tuple[float, float]] = []
+    for cue_index, cue in enumerate(cues, start=1):
+        if not isinstance(cue, dict):
+            continue
+        text = _normalize_transcript_text(cue.get("text"))
+        if not text:
+            continue
+        try:
+            start = max(0.0, min(duration, float(cue.get("start", 0.0))))
+            end = max(start, min(duration, float(cue.get("end", start))))
+        except (TypeError, ValueError):
+            continue
+        if end <= start:
+            continue
+        matched = [phrase for phrase in normalized_phrases if phrase in text]
+        if not matched:
+            continue
+        ranges.append((start, end))
+        matches.append({
+            "cue_index": cue.get("index", cue_index),
+            "start_seconds": round(start, 6),
+            "end_seconds": round(end, 6),
+            "text": str(cue.get("text", "")).strip(),
+            "phrases": matched,
+        })
+    found = {phrase for item in matches for phrase in item["phrases"]}
+    return {
+        "phrases": normalized_phrases,
+        "ranges": [
+            {"start_seconds": round(start, 6), "end_seconds": round(end, 6), "duration_seconds": round(end - start, 6)}
+            for start, end in _merge_ranges(ranges)
+        ],
+        "matches": matches,
+        "unmatched_phrases": [phrase for phrase in normalized_phrases if phrase not in found],
+    }
+
+
 def build_smart_cut_plan(
     analysis: dict[str, Any],
     *,
@@ -39,6 +103,8 @@ def build_smart_cut_plan(
     min_silence_seconds: float = 0.6,
     keep_padding_seconds: float = 0.12,
     min_segment_seconds: float = 0.2,
+    semantic_ranges: list[tuple[float, float]] | None = None,
+    semantic_evidence: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build a deterministic silence-removal plan from local FFmpeg evidence.
 
@@ -68,7 +134,12 @@ def build_smart_cut_plan(
         cut_end = max(0.0, end - padding)
         if cut_end - cut_start >= max(0.01, minimum_segment):
             candidates.append((cut_start, cut_end))
-    cuts = _merge_ranges(candidates)
+    lexical_ranges = [
+        (max(0.0, min(duration, _number(item[0]))), max(0.0, min(duration, _number(item[1]))))
+        for item in (semantic_ranges or [])
+        if isinstance(item, (tuple, list)) and len(item) == 2
+    ]
+    cuts = _merge_ranges(candidates + lexical_ranges)
     kept: list[tuple[float, float]] = []
     cursor = 0.0
     for start, end in cuts:
@@ -93,6 +164,18 @@ def build_smart_cut_plan(
             "code": "SMART_CUT_NO_REMOVABLE_SILENCE",
             "message": "没有满足最小时长和保留边界的静音区间，保持原片段",
         })
+    if lexical_ranges:
+        warnings.append({
+            "code": "SMART_CUT_SEMANTIC_CUE_GRANULARITY",
+            "message": "短语裁切按本地字幕 cue 粒度移除；没有逐词时间时不会猜测词边界",
+        })
+    if isinstance(semantic_evidence, dict):
+        for phrase in semantic_evidence.get("unmatched_phrases", []):
+            warnings.append({
+                "code": "SMART_CUT_PHRASE_NOT_FOUND",
+                "message": f"本地字幕中没有匹配短语: {phrase}",
+                "phrase": phrase,
+            })
     return {
         "smart_cut_version": SMART_CUT_VERSION,
         "engine": "ffmpeg-local-silencedetect-v1",
@@ -102,6 +185,12 @@ def build_smart_cut_plan(
             "min_silence_seconds": round(minimum_silence, 6),
             "keep_padding_seconds": round(padding, 6),
             "min_segment_seconds": round(minimum_segment, 6),
+        },
+        "semantic": semantic_evidence or {
+            "phrases": [],
+            "ranges": [],
+            "matches": [],
+            "unmatched_phrases": [],
         },
         "kept_ranges": [
             {"start_seconds": round(start, 6), "end_seconds": round(end, 6), "duration_seconds": round(end - start, 6)}

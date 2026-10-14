@@ -60,7 +60,7 @@ from .motion_presets import MOTION_PRESET_CATALOG_VERSION, canonical_motion_pres
 from .scopes import SCOPE_VERSION, generate_scopes
 from .policy import audit_local_tree, policy_error_from_findings, require_local_reference
 from .render_queue import JOB_STATUSES, cancel_path, enqueue as enqueue_render_jobs, find_job, load_queue, normalize_job, queue_path, save_queue, set_status
-from .smart_cut import SMART_CUT_VERSION, build_smart_cut_plan, replace_clip_with_smart_cut
+from .smart_cut import SMART_CUT_VERSION, build_smart_cut_plan, match_transcript_phrases, replace_clip_with_smart_cut
 from .beat_edit import BEAT_CUT_VERSION, build_beat_cut_plan
 from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
@@ -200,6 +200,8 @@ def build_parser() -> argparse.ArgumentParser:
     smart_cut.add_argument("--keep-padding-seconds", type=float, default=0.12)
     smart_cut.add_argument("--min-segment-seconds", type=float, default=0.2)
     smart_cut.add_argument("--silence-db", type=float, default=-35.0)
+    smart_cut.add_argument("--transcript", default=None, help="项目内 SRT/VTT/ASS/SSA/TTML 字幕，用于显式短语裁切")
+    smart_cut.add_argument("--remove-phrase", action="append", default=[], help="可重复：从本地字幕 cue 中匹配并移除该短语所在时间段")
     smart_cut.add_argument("--output", default=None, help="项目内智能剪口播报告路径")
     smart_cut.add_argument("--apply", action="store_true", help="创建快照并将计划写回目标轨道")
     relink = _leaf_common(ms.add_parser("relink", help="按内容哈希重链接丢失素材"))
@@ -1623,12 +1625,40 @@ def command_media_smart_cut(args: argparse.Namespace) -> dict[str, Any]:
     analysis = understand_media(source, silence_db=args.silence_db)
     analysis["source_sha256"] = f"sha256:{sha256_file(source)}"
     duration_seconds = int(clip.get("duration_tick", 0)) / max(1, int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90000)))
+    semantic_evidence: dict[str, Any] = {"phrases": [], "ranges": [], "matches": [], "unmatched_phrases": []}
+    semantic_ranges: list[tuple[float, float]] = []
+    transcript_path: Path | None = None
+    if args.transcript and not args.remove_phrase:
+        raise argument_error("--transcript 需要至少一个 --remove-phrase 才会参与语义裁切", "transcript")
+    if args.remove_phrase:
+        if not args.transcript:
+            raise argument_error("使用 --remove-phrase 时必须提供项目内 --transcript", "transcript")
+        transcript_path = Path(args.transcript).expanduser().resolve()
+        ensure_inside(root, transcript_path)
+        try:
+            transcript_cues = parse_caption_file(transcript_path)
+        except AppError as exc:
+            raise AppError("SMART_CUT_TRANSCRIPT_INVALID", "本地字幕无法用于语义剪口播", exit_code=2, path=str(transcript_path), cause=str(exc)) from exc
+        transcript_validation = validate_cues(transcript_cues, duration=duration_seconds)
+        if not transcript_validation["ok"]:
+            raise AppError("SMART_CUT_TRANSCRIPT_INVALID", "本地字幕时间轴不在目标片段范围内或存在重叠", exit_code=2, path=str(transcript_path), cause=json.dumps(transcript_validation, ensure_ascii=False))
+        semantic_evidence = match_transcript_phrases(transcript_cues, [str(value) for value in args.remove_phrase], duration_seconds=duration_seconds)
+        semantic_evidence["path"] = str(transcript_path)
+        semantic_evidence["sha256"] = f"sha256:{sha256_file(transcript_path)}"
+        semantic_evidence["validation"] = transcript_validation
+        semantic_ranges = [
+            (float(item["start_seconds"]), float(item["end_seconds"]))
+            for item in semantic_evidence.get("ranges", [])
+            if isinstance(item, dict)
+        ]
     plan = build_smart_cut_plan(
         analysis,
         duration_seconds=duration_seconds,
         min_silence_seconds=args.min_silence_seconds,
         keep_padding_seconds=args.keep_padding_seconds,
         min_segment_seconds=args.min_segment_seconds,
+        semantic_ranges=semantic_ranges,
+        semantic_evidence=semantic_evidence,
     )
     linked_track_ids = [str(value) for value in args.linked_track_id]
     linked_clip_ids = [str(value) for value in args.linked_clip_id]
@@ -1648,15 +1678,16 @@ def command_media_smart_cut(args: argparse.Namespace) -> dict[str, Any]:
         "linked_clips": linked_pairs,
         "source": str(source),
         "source_sha256": analysis["source_sha256"],
+        "transcript": semantic_evidence,
     })
     if args.dry_run:
-        return _envelope("media.smart-cut", args, status="planned", data={"plan": plan, "apply": bool(args.apply)})
+        return _envelope("media.smart-cut", args, status="planned", data={"plan": plan, "apply": bool(args.apply)}, warnings=plan.get("warnings"))
     output = Path(args.output).expanduser().resolve() if args.output else root / "validation" / f"smart_cut_{safe_filename(str(args.clip_id))}.json"
     ensure_inside(root, output)
     if not args.apply or not plan.get("changed"):
         payload = {"report_version": SMART_CUT_VERSION, "created_at": now_iso(), "plan": plan, "applied": False}
         atomic_write_json(output, payload)
-        return _envelope("media.smart-cut", args, status="planned", data={"report": str(output), "plan": plan, "applied": False})
+        return _envelope("media.smart-cut", args, status="planned", data={"report": str(output), "plan": plan, "applied": False}, warnings=plan.get("warnings"))
     before_project = copy.deepcopy(project)
     ticks_per_second = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90000))
     targets = [(str(args.track_id), str(args.clip_id)), *[(item["track_id"], item["clip_id"]) for item in linked_pairs if item["track_id"] != str(args.track_id)]]
@@ -1680,7 +1711,7 @@ def command_media_smart_cut(args: argparse.Namespace) -> dict[str, Any]:
     project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.smart-cut", "at": now_iso(), "report": str(output), "before_snapshot_id": snapshot["snapshot_id"], "replacements": replacements})
     save_project(root, project)
     _operation(root, operation_id, {"operation_id": operation_id, "command": "media.smart-cut", "status": "succeeded", "report": str(output), "before_snapshot_id": snapshot["snapshot_id"], "replacements": replacements, "created_at": now_iso()})
-    return _envelope("media.smart-cut", args, data={"report": str(output), "plan": plan, "replacements": replacements, "before_snapshot": snapshot, "validation": validation}, operation_id=operation_id)
+    return _envelope("media.smart-cut", args, data={"report": str(output), "plan": plan, "replacements": replacements, "before_snapshot": snapshot, "validation": validation}, warnings=plan.get("warnings"), operation_id=operation_id)
 
 
 def command_ad_plan(args: argparse.Namespace) -> dict[str, Any]:
