@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import contextlib
 import io
 import json
 import os
@@ -30,6 +31,8 @@ from .project import (
     load_snapshot,
     lock_file,
     project_file,
+    queue_cancel_lock,
+    project_write_lock,
     restore_snapshot,
     save_project,
 )
@@ -1896,10 +1899,20 @@ def command_queue_enqueue(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("queue.enqueue", args, data={"queue": str(queue_path(root)), "jobs": added, "count": len(added), "counts": _queue_counts(queue)}, operation_id=operation_id)
 
 
+def _queue_job_view(root: Path, job: dict[str, Any]) -> dict[str, Any]:
+    """Expose an atomic cancellation marker without mutating queue state."""
+    view = copy.deepcopy(job)
+    marker = cancel_path(root, str(view["job_id"]))
+    if marker.exists():
+        view["cancel_requested"] = True
+        view["cancel_marker"] = str(marker)
+    return view
+
+
 def command_queue_list(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     queue = load_queue(root, project_id=project["project"]["id"])
-    jobs = [job for job in queue.get("jobs", []) if isinstance(job, dict) and (args.status is None or job.get("status") == args.status)]
+    jobs = [_queue_job_view(root, job) for job in queue.get("jobs", []) if isinstance(job, dict) and (args.status is None or job.get("status") == args.status)]
     return _envelope("queue.list", args, data={"queue": str(queue_path(root)), "queue_version": queue.get("queue_version"), "project_id": project["project"]["id"], "counts": _queue_counts(queue), "jobs": jobs})
 
 
@@ -1907,7 +1920,7 @@ def command_queue_inspect(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     queue = load_queue(root, project_id=project["project"]["id"])
     job = find_job(queue, args.job_id)
-    return _envelope("queue.inspect", args, data={"queue": str(queue_path(root)), "job": job})
+    return _envelope("queue.inspect", args, data={"queue": str(queue_path(root)), "job": _queue_job_view(root, job)})
 
 
 def command_queue_cancel(args: argparse.Namespace) -> dict[str, Any]:
@@ -1922,20 +1935,74 @@ def command_queue_cancel(args: argparse.Namespace) -> dict[str, Any]:
         raise AppError("QUEUE_CANCEL_INVALID", "已失败的队列作业不能取消；可直接重试或重新入队", exit_code=2, path=args.job_id)
     if args.dry_run:
         return _envelope("queue.cancel", args, status="planned", data={"queue": str(queue_path(root)), "job_id": args.job_id, "status": status, "marker": str(marker)})
-    if status == "pending":
-        set_status(job, "cancelled")
-        job["cancel_requested"] = True
-    elif status == "running":
+    acknowledged = False
+    confirmed = False
+    try:
+        # This short channel lock arbitrates marker writes with queue start and
+        # finalization. It is never held during FFmpeg rendering.
+        with queue_cancel_lock(root, timeout=2.0):
+            _, project = load_project(root)
+            queue = load_queue(root, project_id=project["project"]["id"])
+            job = find_job(queue, args.job_id)
+            status = str(job.get("status"))
+            if status == "succeeded":
+                raise AppError("QUEUE_CANCEL_INVALID", "已成功的队列作业不能取消", exit_code=2, path=args.job_id)
+            if status == "failed":
+                raise AppError("QUEUE_CANCEL_INVALID", "已失败的队列作业不能取消；可直接重试或重新入队", exit_code=2, path=args.job_id)
+            if status == "pending":
+                try:
+                    with project_write_lock(root):
+                        _, latest_project = load_project(root)
+                        latest_queue = load_queue(root, project_id=latest_project["project"]["id"])
+                        job = find_job(latest_queue, args.job_id)
+                        if job.get("status") == "pending":
+                            set_status(job, "cancelled")
+                            job["cancel_requested"] = True
+                            save_queue(root, latest_queue)
+                            queue = latest_queue
+                            project = latest_project
+                            acknowledged = True
+                            confirmed = True
+                        elif job.get("status") == "running":
+                            atomic_write_text(marker, "cancel_requested\n")
+                            acknowledged = True
+                        elif job.get("status") == "cancelled":
+                            marker.unlink(missing_ok=True)
+                            acknowledged = True
+                            confirmed = True
+                        elif job.get("status") == "succeeded":
+                            raise AppError("QUEUE_CANCEL_INVALID", "已成功的队列作业不能取消", exit_code=2, path=args.job_id)
+                        elif job.get("status") == "failed":
+                            raise AppError("QUEUE_CANCEL_INVALID", "已失败的队列作业不能取消；可直接重试或重新入队", exit_code=2, path=args.job_id)
+                except AppError as exc:
+                    if exc.code != "PROJECT_WRITE_LOCKED":
+                        raise
+                    atomic_write_text(marker, "cancel_requested\n")
+                    acknowledged = True
+                    confirmed = False
+                    job["cancel_requested"] = True
+            elif status == "running":
+                atomic_write_text(marker, "cancel_requested\n")
+                acknowledged = True
+                confirmed = False
+            else:
+                # Repeating a cancellation request is idempotent for an already cancelled job.
+                marker.unlink(missing_ok=True)
+                acknowledged = True
+                confirmed = True
+    except AppError as exc:
+        if exc.code != "QUEUE_CANCEL_CHANNEL_BUSY":
+            raise
+        # The finalization window is intentionally short. If another process
+        # still owns it, preserve the request as a marker for the next state
+        # observation instead of overwriting queue JSON from a stale snapshot.
         atomic_write_text(marker, "cancel_requested\n")
+        acknowledged = True
+        confirmed = False
         job["cancel_requested"] = True
-        job["updated_at"] = now_iso()
-    else:
-        # Repeating a cancellation request is idempotent for an already cancelled job.
-        job["cancel_requested"] = True
-    save_queue(root, queue)
     operation_id = new_id("op")
-    _operation(root, operation_id, {"operation_id": operation_id, "command": "queue.cancel", "status": "succeeded", "project_id": project["project"]["id"], "job_id": args.job_id, "job_status": job.get("status"), "cancel_marker": str(marker) if marker.exists() else None, "created_at": now_iso()})
-    return _envelope("queue.cancel", args, data={"queue": str(queue_path(root)), "job": job, "marker": str(marker) if marker.exists() else None}, operation_id=operation_id)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "queue.cancel", "status": "succeeded", "project_id": project["project"]["id"], "job_id": args.job_id, "job_status": job.get("status"), "acknowledged": acknowledged, "confirmed": confirmed, "cancel_marker": str(marker) if marker.exists() else None, "created_at": now_iso()})
+    return _envelope("queue.cancel", args, data={"queue": str(queue_path(root)), "job": job, "marker": str(marker) if marker.exists() else None, "acknowledged": acknowledged, "confirmed": confirmed}, operation_id=operation_id)
 
 
 def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
@@ -1961,19 +2028,26 @@ def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
     for job in selected:
         job_id = str(job["job_id"])
         marker = cancel_path(root, job_id)
-        if marker.exists() and job.get("status") != "failed":
-            set_status(job, "cancelled")
-            job["cancel_requested"] = True
-            summary["cancelled"] += 1
-            job_results.append({"job_id": job_id, "status": "cancelled", "reason": "cancel marker exists before start"})
+        with queue_cancel_lock(root, timeout=2.0):
+            # A marker on a pending job is a new cancellation request, even
+            # when the caller names that job explicitly. A cancelled/failed job
+            # with an explicit ID is a retry authorization and clears an old
+            # marker before starting; a new marker written after this point
+            # remains effective.
+            if marker.exists() and job.get("status") == "pending":
+                set_status(job, "cancelled")
+                job["cancel_requested"] = True
+                summary["cancelled"] += 1
+                job_results.append({"job_id": job_id, "status": "cancelled", "reason": "cancel marker exists before start"})
+                marker.unlink(missing_ok=True)
+                save_queue(root, queue)
+                continue
+            marker.unlink(missing_ok=True)
+            job["attempts"] = int(job.get("attempts", 0)) + 1
+            job["cancel_requested"] = False
+            job["operation_id"] = None
+            set_status(job, "running")
             save_queue(root, queue)
-            continue
-        marker.unlink(missing_ok=True)
-        job["attempts"] = int(job.get("attempts", 0)) + 1
-        job["cancel_requested"] = False
-        job["operation_id"] = None
-        set_status(job, "running")
-        save_queue(root, queue)
         try:
             sequence = find_sequence(project, job.get("sequence_id"))
             report = validate_project(root, project, strict_rights=bool(job.get("publish", False)), target="commercial_ad")
@@ -1986,28 +2060,32 @@ def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
             if getattr(args, "progress", "none") == "jsonl":
                 progress_callback = lambda operation_id, event_type, percent, message: _progress(args, operation_id, event_type, "queue.render", percent, message)
             result = render_project(root, project, sequence, output, dry_run=False, render_settings=render_settings, profile=profile, cancel_file=marker, progress_callback=progress_callback)
-            encoder = render_settings.get("output", {}) if isinstance(render_settings.get("output"), dict) else {}
-            project.setdefault("outputs", []).append({"id": new_id("output"), "path": str(output), "container": encoder.get("container", job.get("container", "mp4")), "profile": profile, "canvas": render_settings.get("canvas", {}), "video": encoder.get("video", {}), "audio": encoder.get("audio", {}), "target_platform": "generic"})
-            project.setdefault("provenance", {}).setdefault("change_log", []).append({"command": "queue.run", "queue_job_id": job_id, "at": now_iso(), "output": str(output), "manifest": result.get("manifest")})
-            save_project(root, project)
-            _operation(root, result.get("operation_id", new_id("op")), {"operation_id": result.get("operation_id"), "command": "render", "queue_job_id": job_id, "status": "succeeded", "output": str(output), "manifest": result.get("manifest"), "warnings": result.get("warnings", []), "profile": profile, "settings": render_settings, "project_id": project["project"]["id"], "sequence_id": sequence["id"], "project_fingerprint": result.get("project_fingerprint"), "input_hashes": result.get("input_hashes", {}), "created_at": now_iso()})
-            queue_warnings = report.get("warnings", []) + result.get("warnings", [])
-            job["warnings"] = queue_warnings
-            set_status(job, "succeeded", operation_id=result.get("operation_id"))
-            summary["succeeded"] += 1
-            job_results.append({"job_id": job_id, "status": "succeeded", "operation_id": result.get("operation_id"), "path": str(output), "warnings": queue_warnings})
-            marker.unlink(missing_ok=True)
+            with queue_cancel_lock(root, timeout=2.0):
+                if marker.exists():
+                    raise AppError("CANCELLED", "队列作业在渲染完成提交前收到取消请求", exit_code=8, path=str(marker))
+                encoder = render_settings.get("output", {}) if isinstance(render_settings.get("output"), dict) else {}
+                project.setdefault("outputs", []).append({"id": new_id("output"), "path": str(output), "container": encoder.get("container", job.get("container", "mp4")), "profile": profile, "canvas": render_settings.get("canvas", {}), "video": encoder.get("video", {}), "audio": encoder.get("audio", {}), "target_platform": "generic"})
+                project.setdefault("provenance", {}).setdefault("change_log", []).append({"command": "queue.run", "queue_job_id": job_id, "at": now_iso(), "output": str(output), "manifest": result.get("manifest")})
+                save_project(root, project)
+                _operation(root, result.get("operation_id", new_id("op")), {"operation_id": result.get("operation_id"), "command": "render", "queue_job_id": job_id, "status": "succeeded", "output": str(output), "manifest": result.get("manifest"), "warnings": result.get("warnings", []), "profile": profile, "settings": render_settings, "project_id": project["project"]["id"], "sequence_id": sequence["id"], "project_fingerprint": result.get("project_fingerprint"), "input_hashes": result.get("input_hashes", {}), "created_at": now_iso()})
+                queue_warnings = report.get("warnings", []) + result.get("warnings", [])
+                job["warnings"] = queue_warnings
+                set_status(job, "succeeded", operation_id=result.get("operation_id"))
+                summary["succeeded"] += 1
+                job_results.append({"job_id": job_id, "status": "succeeded", "operation_id": result.get("operation_id"), "path": str(output), "warnings": queue_warnings})
+                marker.unlink(missing_ok=True)
+                save_queue(root, queue)
         except AppError as exc:
             error = exc.as_dict()
             set_status(job, "cancelled" if exc.code == "CANCELLED" else "failed", error=error, operation_id=exc.operation_id)
             summary["cancelled" if exc.code == "CANCELLED" else "failed"] += 1
             errors.append({"job_id": job_id, **error})
             job_results.append({"job_id": job_id, "status": job["status"], "error": error})
-            marker.unlink(missing_ok=True)
-            if exc.code != "CANCELLED" and not args.continue_on_error:
+            with queue_cancel_lock(root, timeout=2.0):
+                marker.unlink(missing_ok=True)
                 save_queue(root, queue)
+            if exc.code != "CANCELLED" and not args.continue_on_error:
                 break
-        save_queue(root, queue)
 
     final_status = "succeeded" if not errors and summary["cancelled"] == 0 else "partial"
     _operation(root, queue_operation_id, {"operation_id": queue_operation_id, "command": "queue.run", "status": final_status, "project_id": project["project"]["id"], "summary": summary, "jobs": job_results, "created_at": now_iso()})
@@ -2316,6 +2394,27 @@ def _idempotency_context(args: argparse.Namespace) -> tuple[Path, Path, str] | N
     return root, idempotency_record_path(root, command, str(key)), request_fingerprint(command, args)
 
 
+_READ_ONLY_PROJECT_COMMANDS = {
+    ("project", "inspect"),
+    ("operation", "inspect"),
+    ("queue", "list"),
+    ("queue", "inspect"),
+    ("rights", "check"),
+    ("rights", "list"),
+    ("rights", "history"),
+    ("rights", "impact"),
+}
+
+
+def _project_operation_lock(args: argparse.Namespace):
+    """Return the operation-wide lock for a mutating project command."""
+    project = getattr(args, "project", None)
+    key = (getattr(args, "domain", None), getattr(args, "action", None))
+    if not project or getattr(args, "dry_run", False) or key in _READ_ONLY_PROJECT_COMMANDS or key == ("queue", "cancel"):
+        return contextlib.nullcontext()
+    return project_write_lock(project)
+
+
 COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, Any]]] = {
     ("project", "init"): command_project_init,
     ("project", "inspect"): command_project_inspect,
@@ -2384,20 +2483,22 @@ def main(argv: list[str] | None = None) -> int:
         handler = COMMANDS[(args.domain, getattr(args, "action", None))]
         replayed = False
         idempotency = _idempotency_context(args)
-        if idempotency:
-            root, record_path, fingerprint = idempotency
-            if record_path.exists():
-                record = load_json(record_path)
-                if record.get("fingerprint") != fingerprint:
-                    raise AppError("IDEMPOTENCY_CONFLICT", "幂等键已经绑定到不同请求", exit_code=2, path=str(record_path))
-                result = json.loads(json.dumps(record.get("response", {}), ensure_ascii=False))
-                result.setdefault("warnings", []).append({"code": "IDEMPOTENT_REPLAY", "message": "已返回相同幂等键的既有结果", "operation_id": result.get("operation_id")})
-                replayed = True
+        with _project_operation_lock(args):
+            if idempotency:
+                root, record_path, fingerprint = idempotency
+                if record_path.exists():
+                    record = load_json(record_path)
+                    if record.get("fingerprint") != fingerprint:
+                        raise AppError("IDEMPOTENCY_CONFLICT", "幂等键已经绑定到不同请求", exit_code=2, path=str(record_path))
+                    result = json.loads(json.dumps(record.get("response", {}), ensure_ascii=False))
+                    result.setdefault("warnings", []).append({"code": "IDEMPOTENT_REPLAY", "message": "已返回相同幂等键的既有结果", "operation_id": result.get("operation_id")})
+                    replayed = True
+                else:
+                    result = handler(args)
+                    atomic_write_json(record_path, {"record_version": "0.1.0", "command": _command_name(args), "key": args.idempotency_key, "fingerprint": fingerprint, "response": result, "created_at": now_iso()})
             else:
                 result = handler(args)
-                atomic_write_json(record_path, {"record_version": "0.1.0", "command": _command_name(args), "key": args.idempotency_key, "fingerprint": fingerprint, "response": result, "created_at": now_iso()})
-        else:
-            result = handler(args)
+
         _print(result, args.format)
         return 0 if result.get("ok") else (7 if args.domain == "rights" or getattr(args, "publish", False) else 2)
     except AppError as exc:

@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 import unittest
 from pathlib import Path
 
@@ -209,6 +210,8 @@ class P0CliTests(unittest.TestCase):
             code, cancelled = invoke("queue", "cancel", "--project", str(project), "--job-id", "queue-b")
             self.assertEqual(code, 0, cancelled)
             self.assertEqual(cancelled["data"]["job"]["status"], "cancelled")
+            self.assertTrue(cancelled["data"]["acknowledged"])
+            self.assertTrue(cancelled["data"]["confirmed"])
             code, inspected = invoke("queue", "inspect", "--project", str(project), "--job-id", "queue-b")
             self.assertEqual(code, 0, inspected)
             self.assertEqual(inspected["data"]["job"]["status"], "cancelled")
@@ -220,6 +223,102 @@ class P0CliTests(unittest.TestCase):
             code, kdenlive_import_result = invoke("convert", "import", "--input", str(kdenlive), "--output", str(kdenlive_imported))
             self.assertEqual(code, 0, kdenlive_import_result)
             self.assertTrue((kdenlive_imported / "project.json").exists())
+
+    def test_project_write_lock_rejects_competing_mutation_and_releases(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-write-lock-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            ready = workspace / "lock-ready.txt"
+            script = (
+                "import time\n"
+                "from pathlib import Path\n"
+                "from ai_ad_editor.project import project_write_lock\n"
+                f"project = Path({str(project)!r})\n"
+                f"ready = Path({str(ready)!r})\n"
+                "with project_write_lock(project):\n"
+                "    ready.write_text('ready', encoding='utf-8')\n"
+                "    time.sleep(2.5)\n"
+            )
+            child_env = os.environ.copy()
+            child_env["PYTHONPATH"] = str(ROOT / "product" / "src")
+            child = subprocess.Popen(
+                [sys.executable, "-X", "utf8", "-c", script],
+                env=child_env,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            try:
+                deadline = time.monotonic() + 3.0
+                while not ready.exists() and time.monotonic() < deadline:
+                    time.sleep(0.05)
+                self.assertTrue(ready.exists(), "child did not acquire project lock")
+                code, rejected = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+                self.assertEqual(code, 6, rejected)
+                self.assertEqual(rejected["errors"][0]["code"], "PROJECT_WRITE_LOCKED")
+                self.assertTrue(rejected["errors"][0]["retryable"])
+            finally:
+                if child.poll() is None:
+                    child.terminate()
+                child.wait(timeout=5)
+            code, accepted = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            self.assertEqual(code, 0, accepted)
+            self.assertTrue((project / "operations" / "project-write.lock").exists())
+
+    def test_queue_cancel_acknowledges_while_project_lock_is_held(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-queue-cancel-lock-") as raw:
+            workspace = Path(raw)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            jobs = workspace / "queue.json"
+            jobs.write_text(json.dumps({"jobs": [{"job_id": "locked-job", "output": "renders/locked.mp4", "profile": "custom", "width": 320, "height": 180}]}), encoding="utf-8")
+            code, enqueued = invoke("queue", "enqueue", "--project", str(project), "--input", str(jobs))
+            self.assertEqual(code, 0, enqueued)
+            ready = workspace / "lock-ready.txt"
+            script = (
+                "import time\n"
+                "from pathlib import Path\n"
+                "from ai_ad_editor.project import project_write_lock\n"
+                f"project = Path({str(project)!r})\n"
+                f"ready = Path({str(ready)!r})\n"
+                "with project_write_lock(project):\n"
+                "    ready.write_text('ready', encoding='utf-8')\n"
+                "    time.sleep(2.5)\n"
+            )
+            child_env = os.environ.copy()
+            child_env["PYTHONPATH"] = str(ROOT / "product" / "src")
+            child = subprocess.Popen([sys.executable, "-X", "utf8", "-c", script], env=child_env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            try:
+                deadline = time.monotonic() + 3.0
+                while not ready.exists() and time.monotonic() < deadline:
+                    time.sleep(0.05)
+                self.assertTrue(ready.exists(), "child did not acquire project lock")
+                code, requested = invoke("queue", "cancel", "--project", str(project), "--job-id", "locked-job")
+                self.assertEqual(code, 0, requested)
+                self.assertTrue(requested["data"]["acknowledged"])
+                self.assertFalse(requested["data"]["confirmed"])
+                self.assertEqual(requested["data"]["job"]["status"], "pending")
+                self.assertTrue((project / "operations" / "queue-cancel" / "locked-job.cancel").exists())
+                code, inspected = invoke("queue", "inspect", "--project", str(project), "--job-id", "locked-job")
+                self.assertEqual(code, 0, inspected)
+                self.assertTrue(inspected["data"]["job"]["cancel_requested"])
+            finally:
+                if child.poll() is None:
+                    child.terminate()
+                child.wait(timeout=5)
+            code, cancelled = invoke("queue", "run", "--project", str(project), "--job-id", "locked-job")
+            self.assertEqual(code, 2, cancelled)
+            self.assertEqual(cancelled["status"], "partial")
+            self.assertEqual(cancelled["data"]["summary"]["cancelled"], 1)
+            self.assertEqual(cancelled["data"]["jobs"][0]["status"], "cancelled")
+            self.assertFalse((project / "operations" / "queue-cancel" / "locked-job.cancel").exists())
+            code, retried = invoke("queue", "run", "--project", str(project), "--job-id", "locked-job")
+            self.assertEqual(code, 2, retried)
+            self.assertEqual(retried["data"]["summary"]["selected"], 1)
+            self.assertEqual(retried["data"]["summary"]["cancelled"], 0)
+            self.assertEqual(retried["data"]["summary"]["failed"], 1)
+            self.assertEqual(retried["data"]["jobs"][0]["status"], "failed")
 
     def test_project_snapshots_restore_edit_state(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-snapshot-") as raw:
@@ -603,7 +702,9 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("crossfade", manifest["capabilities"]["transitions"]["features"])
         self.assertIn("safe_resume", manifest["capabilities"]["render"]["features"])
         self.assertIn("sequential_run", manifest["capabilities"]["queue"]["features"])
+        self.assertIn("cancel_ack_while_project_lock_held", manifest["capabilities"]["queue"]["features"])
         self.assertIn("snapshot", manifest["capabilities"]["project"]["features"])
+        self.assertIn("native_process_write_lock", manifest["capabilities"]["project"]["features"])
         self.assertIn("relink_by_hash", manifest["capabilities"]["media"]["features"])
         self.assertIn("target_lufs_gate", manifest["capabilities"]["quality"]["features"])
         self.assertIn("vectorscope", manifest["capabilities"]["quality"]["features"])

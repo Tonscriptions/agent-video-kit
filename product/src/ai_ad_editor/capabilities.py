@@ -38,10 +38,11 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "project": {
                 "status": "implemented",
-                "features": ["init", "inspect", "migrate", "atomic_save", "snapshot", "restore", "before_mutation_snapshot"],
+                "features": ["init", "inspect", "migrate", "atomic_save", "native_process_write_lock", "snapshot", "restore", "before_mutation_snapshot"],
                 "snapshot_contract": "self_contained_project_rights_lock_json",
                 "migration_contract": "project_migrate_creates_before_migrate_snapshot_and_validates_candidate",
-                "limits": ["concurrent_write_recovery_pending", "cross_version_snapshot_migration_is_limited_to_known_legacy_shapes"],
+                "write_lock_contract": "operations/project-write.lock_serializes_cooperating_cli_read_modify_write_operations_and_returns_retryable_PROJECT_WRITE_LOCKED",
+                "limits": ["cross_file_transaction_recovery_after_power_loss_pending", "direct_external_json_editors_do_not_join_cli_lock", "cross_version_snapshot_migration_is_limited_to_known_legacy_shapes"],
             },
             "timeline": {
                 "status": "implemented",
@@ -98,10 +99,11 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "queue": {
                 "status": "implemented",
-                "features": ["enqueue", "list", "inspect", "sequential_run", "explicit_retry", "cancel_pending", "cancel_running"],
+                "features": ["enqueue", "list", "inspect", "sequential_run", "explicit_retry", "cancel_pending", "cancel_running", "cancel_ack_while_project_lock_held"],
                 "state_file": "operations/render-queue.json",
                 "execution": "single_process_sequential_local_ffmpeg",
-                "limits": ["distributed_workers_pending", "priority_and_fairness_pending", "cross_machine_artifacts_pending"],
+                "cancel_contract": "pending_cancel_confirms_when_queue_lock_is_free; running_or_lock_contended_cancel_acknowledges_marker_then_queue_run_confirms_terminal_state",
+                "limits": ["distributed_workers_pending", "priority_and_fairness_pending", "cross_machine_artifacts_pending", "running_cancel_confirmation_is_eventual"],
             },
             "quality": {
                 "status": "implemented",

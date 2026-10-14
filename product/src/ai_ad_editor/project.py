@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import copy
+import os
+import time
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +25,99 @@ def ledger_file(root: Path) -> Path:
 
 def lock_file(root: Path) -> Path:
     return root / "project.lock.json"
+
+
+def write_lock_file(root: Path) -> Path:
+    """Return the native process lock used to serialize project mutations."""
+    return root / "operations" / "project-write.lock"
+
+
+@contextmanager
+def _native_byte_lock(path: Path, *, timeout: float, error_code: str, message: str):
+    """Acquire one byte of a local file with a bounded non-blocking retry."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle = path.open("a+b")
+    handle.seek(0, os.SEEK_END)
+    if handle.tell() == 0:
+        handle.write(b"0")
+        handle.flush()
+    handle.seek(0)
+    started = time.monotonic()
+    acquired = False
+    try:
+        while True:
+            try:
+                if os.name == "nt":
+                    import msvcrt
+
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+                else:
+                    import fcntl
+
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                acquired = True
+                break
+            except (OSError, BlockingIOError):
+                if timeout <= 0 or time.monotonic() - started >= timeout:
+                    raise AppError(error_code, message, exit_code=6, path=str(path), retryable=True)
+                time.sleep(min(0.05, max(0.01, timeout / 10)))
+        yield {"path": str(path), "acquired": True}
+    finally:
+        if acquired:
+            try:
+                if os.name == "nt":
+                    import msvcrt
+
+                    handle.seek(0)
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+                else:
+                    import fcntl
+
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+            finally:
+                handle.close()
+        else:
+            handle.close()
+
+
+def cancel_lock_file(root: Path) -> Path:
+    """Return the short-lived lock for cancellation marker arbitration."""
+    return root / "operations" / "queue-cancel.lock"
+
+
+@contextmanager
+def project_write_lock(root_value: str | Path, *, timeout: float = 0.0):
+    """Serialize project-bound mutations with a native file lock.
+
+    The lock is advisory at the operating-system level and is held for the
+    complete CLI operation, including its read-modify-write phase.  Windows
+    uses ``msvcrt.locking``; POSIX is supported for deterministic unit tests and
+    future portability.  A zero timeout fails immediately so an Agent can
+    retry from the structured ``PROJECT_WRITE_LOCKED`` response.
+    """
+    root = project_root(root_value)
+    if not project_file(root).exists():
+        # Let the command handler return its normal project-not-found/schema
+        # error without creating an operations directory as a side effect.
+        yield {"path": str(write_lock_file(root)), "root": str(root), "acquired": False}
+        return
+    path = write_lock_file(root)
+    with _native_byte_lock(path, timeout=timeout, error_code="PROJECT_WRITE_LOCKED", message=f"项目正在被另一个本地操作写入: {root}") as info:
+        yield {"path": info["path"], "root": str(root), "acquired": True}
+
+
+@contextmanager
+def queue_cancel_lock(root_value: str | Path, *, timeout: float = 1.0):
+    """Serialize short cancellation marker/state transitions.
+
+    This lock is deliberately separate from the project write lock so a cancel
+    request can arbitrate with queue start/finalization without waiting for the
+    render itself to finish.
+    """
+    root = project_root(root_value)
+    path = cancel_lock_file(root)
+    with _native_byte_lock(path, timeout=timeout, error_code="QUEUE_CANCEL_CHANNEL_BUSY", message=f"队列取消通道正在处理另一个请求: {root}") as info:
+        yield {"path": info["path"], "root": str(root), "acquired": True}
 
 
 def history_dir(root: Path) -> Path:
@@ -92,6 +188,7 @@ def create_project(root_value: str | Path, name: str | None = None, project_id: 
     root.mkdir(parents=True, exist_ok=True)
     for directory in ("assets", "renders", "operations", "validation", "exports", "cache", "history"):
         (root / directory).mkdir(exist_ok=True)
+    write_lock_file(root).write_bytes(b"0")
     project = initial_project(name or root.name, project_id)
     atomic_write_json(project_file(root), project)
     atomic_write_json(ledger_file(root), initial_ledger())
