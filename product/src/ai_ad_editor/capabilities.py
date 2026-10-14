@@ -49,6 +49,12 @@ def build_capability_manifest() -> dict[str, Any]:
                 "features": ["multi_track", "append", "update", "remove", "split", "ripple_insert", "ripple_delete", "slip", "slide", "speed", "speed_curve", "speed_curve_reverse_reflection", "reverse", "freeze_frame", "crop", "crop_position_keyframes", "crop_size_keyframes", "nested_sequences", "nested_reverse", "nested_reverse_parent_bezier_keyframes", "nested_parent_keyframe_layers", "markers"],
                 "limits": ["dynamic_crop_uses_fixed_canvas_inverse_sampling", "dynamic_crop_inverse_sampler_is_cpu_geq", "nested_static_transform_effects_blend_are_flattened", "nested_multiple_masks_use_sequential_alpha_with_coordinate_approximation", "nested_reverse_static_clips_preserve_temporal_order", "nested_reverse_leaf_keyframes_under_nonlinear_speed_are_piecewise_approximate", "nested_speed_curve_uses_analytic_boundary_mapping_and_leaf_average_speed", "audio_speed_curve_uses_piecewise_atempo_and_can_have_segment_boundaries"],
             },
+            "templates": {
+                "status": "implemented",
+                "features": ["local_json_template", "typed_variables", "enum_variables", "numeric_and_string_constraints", "default_values", "exact_placeholder_type_preservation", "inline_string_placeholders", "template_snapshot", "batch_variant_input"],
+                "variable_types": ["any", "string", "number", "integer", "boolean", "asset", "color", "enum"],
+                "limits": ["asset_type_only_validates_string_shape_before_project_asset_and_rights_checks", "complex_slot_graphs_and_conditional_operations_pending", "expression_evaluation_disabled"],
+            },
             "keyframes": {
                 "status": "implemented",
                 "properties": ["transform.position.x", "transform.position.y", "transform.scale", "transform.rotation", "transform.opacity", "blend.opacity", "audio.volume", "audio.pan", "crop.x", "crop.y", "crop.width", "crop.height", "mask.x", "mask.y", "mask.width", "mask.height", "mask.cx", "mask.cy", "mask.radius", "mask.rx", "mask.ry", "mask.feather", "mask.points.<index>.x", "mask.points.<index>.y"],

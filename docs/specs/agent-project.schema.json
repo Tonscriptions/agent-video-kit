@@ -357,8 +357,32 @@
       "properties": {
         "id": {"$ref": "#/$defs/id"},
         "version": {"type": "string"},
-        "variables": {"type": "array", "items": {"type": "object"}},
-        "assets": {"type": "array", "items": {"$ref": "#/$defs/id"}}
+        "variables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": {"type": "string", "pattern": "^[A-Za-z0-9_.:-]+$"},
+              "type": {"type": "string", "enum": ["any", "string", "number", "integer", "boolean", "asset", "color", "enum"]},
+              "required": {"type": "boolean"},
+              "default": {},
+              "values": {"type": "array"},
+              "choices": {"type": "array"},
+              "enum": {"type": "array"},
+              "min": {"type": "number"},
+              "max": {"type": "number"},
+              "min_length": {"type": "integer", "minimum": 0},
+              "max_length": {"type": "integer", "minimum": 0}
+            },
+            "additionalProperties": true
+          }
+        },
+        "assets": {"type": "array", "items": {"$ref": "#/$defs/id"}},
+        "sequence_id": {"$ref": "#/$defs/id"},
+        "operations": {"type": "array", "items": {"type": "object"}},
+        "changes": {"type": "array", "items": {"type": "object"}},
+        "render": {"type": "boolean"}
       }
     },
     "output": {

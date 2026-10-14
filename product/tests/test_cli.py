@@ -21,6 +21,7 @@ from ai_ad_editor.render import _effect_filters, _expr_arg, _flatten_sequence_tr
 from ai_ad_editor.utils import run_process
 from ai_ad_editor.runtime import configure_local_runtime
 from ai_ad_editor.migration import migrate_project_payload
+from ai_ad_editor.template import instantiate
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -802,6 +803,8 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("ffmpeg_average_hash_candidates", manifest["capabilities"]["library"]["features"])
         self.assertEqual(manifest["capabilities"]["library"]["catalog_version"], "0.3.0")
         self.assertFalse(manifest["capabilities"]["library"]["vector_index"])
+        self.assertIn("typed_variables", manifest["capabilities"]["templates"]["features"])
+        self.assertIn("inline_string_placeholders", manifest["capabilities"]["templates"]["features"])
         self.assertEqual(manifest["policies"]["jianying_runtime_enabled"], False)
 
     def test_effect_catalog_cli_is_local_and_queryable(self) -> None:
@@ -1278,6 +1281,29 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 0, result)
             self.assertEqual(result["data"]["template_snapshot"]["id"], "tpl.test")
             self.assertEqual(len(result["data"]["applied"]), 1)
+
+    def test_template_variables_are_typed_inline_and_non_mutating(self) -> None:
+        template = {
+            "id": "typed.test",
+            "version": "0.2.0",
+            "variables": [
+                {"name": "headline", "type": "string", "required": True, "min_length": 2},
+                {"name": "accent", "type": "color", "default": "#ffffff"},
+                {"name": "aspect", "type": "enum", "values": ["vertical", "square"]},
+                {"name": "zoom", "type": "number", "default": 1.0, "min": 0.5, "max": 2.0},
+            ],
+            "operations": [{"op": "add_marker", "label": "{{headline}} / {{aspect}}"}],
+        }
+        variables = {"headline": "Sale", "aspect": "vertical", "zoom": 1.25}
+        resolved = instantiate(template, variables)
+        self.assertEqual(variables, {"headline": "Sale", "aspect": "vertical", "zoom": 1.25})
+        self.assertEqual(resolved["operations"][0]["label"], "Sale / vertical")
+        self.assertEqual(resolved["template_snapshot"]["variables"]["accent"], "#ffffff")
+        self.assertEqual(resolved["template_snapshot"]["variables"]["zoom"], 1.25)
+        with self.assertRaises(ValueError):
+            instantiate(template, {"headline": "x", "aspect": "vertical"})
+        with self.assertRaises(ValueError):
+            instantiate(template, {"headline": "Sale", "aspect": "landscape"})
 
     def test_image_clip_renders_with_local_loop(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-image-") as raw:
