@@ -1,0 +1,307 @@
+from __future__ import annotations
+
+"""Deterministic local multi-camera audio sync and switch planning.
+
+The module deliberately stops at an auditable synchronization primitive.  It
+does not claim speaker identification, visual shot selection, or semantic
+director decisions.  Audio is decoded locally with FFmpeg, reduced to a small
+energy envelope, and aligned with a bounded normalized cross-correlation.
+"""
+
+import math
+import subprocess
+from pathlib import Path
+from typing import Any
+
+from .errors import AppError, argument_error, dependency_error
+from .media import ffmpeg_path, probe_media
+from .utils import new_id, sha256_file
+
+
+MULTICAM_SYNC_VERSION = "0.1.0"
+FEATURE_RATE_HZ = 50
+
+
+def _finite(value: Any, default: float = 0.0) -> float:
+    try:
+        if isinstance(value, bool):
+            return default
+        converted = float(value)
+    except (TypeError, ValueError):
+        return default
+    return converted if math.isfinite(converted) else default
+
+
+def _numpy() -> Any:
+    try:
+        import numpy as np
+    except ImportError as exc:  # pragma: no cover - depends on local runtime
+        raise dependency_error("多机位音频同步需要本地 numpy", "安装本地 numpy；不会自动联网安装") from exc
+    return np
+
+
+def _extract_envelope(path: Path, *, sample_rate: int, max_seconds: float) -> tuple[Any, dict[str, Any]]:
+    """Decode a bounded local audio prefix and return a normalized envelope."""
+    np = _numpy()
+    if sample_rate < 1000 or sample_rate > 96_000:
+        raise argument_error("sample_rate 必须位于 1000..96000", "sample_rate")
+    if max_seconds <= 0 or max_seconds > 600:
+        raise argument_error("analysis_seconds 必须位于 0..600", "analysis_seconds")
+    probe = probe_media(path)
+    audio = probe.get("audio") if isinstance(probe.get("audio"), dict) else {}
+    if not audio.get("codec"):
+        raise AppError("MULTICAM_AUDIO_MISSING", f"机位素材没有音频流: {path}", exit_code=2, path=str(path))
+    try:
+        completed = subprocess.run(
+            [
+                ffmpeg_path(), "-hide_banner", "-loglevel", "error", "-t", f"{max_seconds:.3f}",
+                "-i", str(path), "-vn", "-ac", "1", "-ar", str(sample_rate), "-f", "s16le", "-",
+            ],
+            capture_output=True,
+            timeout=max(60.0, max_seconds * 4.0),
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise AppError("MULTICAM_AUDIO_EXTRACT_FAILED", f"多机位音频抽取失败: {path}", exit_code=6, retryable=True, path=str(path), cause=str(exc)) from exc
+    if completed.returncode != 0 or not completed.stdout:
+        raise AppError(
+            "MULTICAM_AUDIO_EXTRACT_FAILED",
+            f"多机位音频抽取失败: {path}",
+            exit_code=6,
+            retryable=True,
+            path=str(path),
+            cause=(completed.stderr or b"")[-4000:].decode("utf-8", errors="replace"),
+        )
+    raw = completed.stdout[: len(completed.stdout) - (len(completed.stdout) % 2)]
+    samples = np.frombuffer(raw, dtype=np.int16).astype(np.float32)
+    if samples.size < max(32, sample_rate // 4):
+        raise AppError("MULTICAM_AUDIO_SIGNAL_SHORT", f"机位音频有效信号过短: {path}", exit_code=2, path=str(path))
+    samples /= 32768.0
+    hop = max(1, int(round(sample_rate / FEATURE_RATE_HZ)))
+    frame_count = samples.size // hop
+    samples = samples[: frame_count * hop]
+    envelope = np.sqrt(np.mean(samples.reshape(frame_count, hop) ** 2, axis=1))
+    # Log compression and first difference reduce gain/room-tone differences.
+    envelope = np.log1p(envelope * 100.0)
+    envelope = np.diff(envelope, prepend=envelope[:1])
+    envelope -= np.mean(envelope)
+    scale = float(np.std(envelope))
+    if not math.isfinite(scale) or scale <= 1e-7:
+        raise AppError("MULTICAM_AUDIO_SIGNAL_FLAT", f"机位音频没有足够可对齐的变化: {path}", exit_code=2, path=str(path))
+    envelope = envelope / scale
+    return envelope.astype(np.float32), {
+        "path": str(path),
+        "sha256": f"sha256:{sha256_file(path)}",
+        "duration_seconds": round(float(probe.get("duration_seconds", 0.0)), 6),
+        "sample_rate": sample_rate,
+        "feature_rate_hz": FEATURE_RATE_HZ,
+        "feature_count": int(envelope.size),
+    }
+
+
+def _overlap(ref: Any, candidate: Any, lag: int) -> tuple[Any, Any]:
+    """Return reference/candidate slices for numpy correlate's lag convention."""
+    ref_len = int(ref.size)
+    candidate_len = int(candidate.size)
+    if lag >= 0:
+        length = min(ref_len - lag, candidate_len)
+        return ref[lag : lag + max(0, length)], candidate[: max(0, length)]
+    offset = -lag
+    length = min(ref_len, candidate_len - offset)
+    return ref[: max(0, length)], candidate[offset : offset + max(0, length)]
+
+
+def estimate_audio_offset(reference: Any, candidate: Any, *, max_offset_seconds: float) -> dict[str, Any]:
+    """Estimate candidate delay relative to reference using bounded correlation."""
+    np = _numpy()
+    if reference.size == 0 or candidate.size == 0:
+        raise argument_error("多机位音频特征不能为空", "sources")
+    max_offset = max(0.0, min(float(max_offset_seconds), 300.0))
+    max_lag = int(round(max_offset * FEATURE_RATE_HZ))
+    correlation = np.correlate(reference, candidate, mode="full")
+    lags = np.arange(-int(candidate.size) + 1, int(reference.size), dtype=np.int64)
+    mask = np.abs(lags) <= max_lag
+    if not bool(np.any(mask)):
+        raise argument_error("max_offset_seconds 没有有效搜索范围", "max_offset_seconds")
+    masked_indices = np.flatnonzero(mask)
+    # Reject tiny overlaps, which can create a falsely perfect edge match.
+    valid_indices = [
+        int(index)
+        for index in masked_indices
+        if min(int(reference.size), int(candidate.size)) - abs(int(lags[index])) >= FEATURE_RATE_HZ
+    ]
+    if not valid_indices:
+        raise AppError("MULTICAM_OVERLAP_TOO_SHORT", "多机位音频重叠不足以估计偏移", exit_code=2, path="sources")
+    best_index = max(valid_indices, key=lambda index: float(correlation[index]))
+    lag = int(lags[best_index])
+    ref_slice, candidate_slice = _overlap(reference, candidate, lag)
+    overlap_count = min(int(ref_slice.size), int(candidate_slice.size))
+    if overlap_count < FEATURE_RATE_HZ:
+        raise AppError("MULTICAM_OVERLAP_TOO_SHORT", "多机位音频重叠不足以估计偏移", exit_code=2, path="sources")
+    ref_slice = ref_slice[:overlap_count]
+    candidate_slice = candidate_slice[:overlap_count]
+    denominator = math.sqrt(float(np.sum(ref_slice * ref_slice)) * float(np.sum(candidate_slice * candidate_slice)))
+    score = float(correlation[best_index] / denominator) if denominator > 1e-9 else 0.0
+    # A positive delay means the candidate's matching event occurs later than
+    # the reference.  The correction applied to a timeline is its negative.
+    delay_seconds = -lag / FEATURE_RATE_HZ
+    return {
+        "relative_delay_seconds": round(delay_seconds, 6),
+        "correction_seconds": round(-delay_seconds, 6),
+        "lag_frames": lag,
+        "score": round(max(-1.0, min(1.0, score)), 6),
+        "overlap_seconds": round(overlap_count / FEATURE_RATE_HZ, 6),
+        "status": "ok" if score >= 0.35 else "low_confidence",
+    }
+
+
+def synchronize_multicam_sources(
+    sources: list[dict[str, Any]],
+    *,
+    reference_asset_id: str | None = None,
+    sample_rate: int = 8000,
+    analysis_seconds: float = 120.0,
+    max_offset_seconds: float = 30.0,
+) -> dict[str, Any]:
+    """Analyze a set of local project assets and return auditable offsets."""
+    if len(sources) < 2:
+        raise argument_error("多机位同步至少需要两个源素材", "source_asset_id")
+    normalized: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for index, item in enumerate(sources):
+        if not isinstance(item, dict):
+            raise argument_error("多机位源素材必须是对象", f"sources[{index}]")
+        asset_id = str(item.get("asset_id", "")).strip()
+        path = Path(str(item.get("path", ""))).expanduser().resolve()
+        if not asset_id or asset_id in seen:
+            raise argument_error("多机位源素材 ID 必须唯一", f"sources[{index}].asset_id")
+        if not path.exists() or not path.is_file():
+            raise AppError("MULTICAM_SOURCE_MISSING", f"多机位源素材不存在: {path}", exit_code=3, path=str(path))
+        seen.add(asset_id)
+        normalized.append({"asset_id": asset_id, "path": path})
+    reference_id = reference_asset_id or str(normalized[0]["asset_id"])
+    if reference_id not in seen:
+        raise argument_error("reference_asset_id 必须属于 source_asset_id", "reference_asset_id")
+    reference_item = next(item for item in normalized if item["asset_id"] == reference_id)
+    reference_feature, reference_evidence = _extract_envelope(reference_item["path"], sample_rate=sample_rate, max_seconds=analysis_seconds)
+    offsets: list[dict[str, Any]] = []
+    for item in normalized:
+        if item["asset_id"] == reference_id:
+            evidence = {**reference_evidence, "asset_id": reference_id}
+            offsets.append({"asset_id": reference_id, "reference_asset_id": reference_id, "relative_delay_seconds": 0.0, "correction_seconds": 0.0, "lag_frames": 0, "score": 1.0, "overlap_seconds": round(reference_feature.size / FEATURE_RATE_HZ, 6), "status": "reference", "evidence": evidence})
+            continue
+        candidate_feature, candidate_evidence = _extract_envelope(item["path"], sample_rate=sample_rate, max_seconds=analysis_seconds)
+        alignment = estimate_audio_offset(reference_feature, candidate_feature, max_offset_seconds=max_offset_seconds)
+        offsets.append({"asset_id": item["asset_id"], "reference_asset_id": reference_id, **alignment, "evidence": {**candidate_evidence, "asset_id": item["asset_id"]}})
+    return {
+        "sync_version": MULTICAM_SYNC_VERSION,
+        "engine": "ffmpeg-local-audio-envelope-xcorr-v1",
+        "network": "disabled",
+        "reference_asset_id": reference_id,
+        "parameters": {
+            "sample_rate": int(sample_rate),
+            "feature_rate_hz": FEATURE_RATE_HZ,
+            "analysis_seconds": round(float(analysis_seconds), 6),
+            "max_offset_seconds": round(float(max_offset_seconds), 6),
+        },
+        "sources": [{"asset_id": item["asset_id"], "path": str(item["path"])} for item in normalized],
+        "offsets": offsets,
+        "warnings": [
+            {"code": "MULTICAM_LOW_CONFIDENCE", "message": f"机位 {item['asset_id']} 音频偏移相关性较低，请复核波形或拍板点", "asset_id": item["asset_id"], "score": item.get("score")}
+            for item in offsets if item.get("status") == "low_confidence"
+        ],
+    }
+
+
+def build_switch_segments(
+    sync: dict[str, Any],
+    *,
+    switch_seconds: float | None = None,
+    switch_plan: list[dict[str, Any]] | None = None,
+    start_seconds: float = 0.0,
+    end_seconds: float | None = None,
+    timeline_start_seconds: float = 0.0,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Build source-bounded angle clips from a fixed cadence or explicit plan."""
+    offsets = {str(item.get("asset_id")): item for item in sync.get("offsets", []) if isinstance(item, dict)}
+    sources = [str(item.get("asset_id")) for item in sync.get("sources", []) if isinstance(item, dict)]
+    if not sources:
+        raise argument_error("同步结果缺少源素材", "sync.sources")
+    reference_id = str(sync.get("reference_asset_id", sources[0]))
+    reference_duration = _finite(offsets.get(reference_id, {}).get("evidence", {}).get("duration_seconds"), 0.0)
+    start = _finite(start_seconds, 0.0)
+    end = reference_duration if end_seconds is None else _finite(end_seconds, reference_duration)
+    if start < 0 or end <= start:
+        raise argument_error("start_seconds/end_seconds 必须形成正的时间范围", "start_seconds")
+    warnings: list[dict[str, Any]] = []
+    if switch_plan is not None:
+        raw_segments = switch_plan
+        if not isinstance(raw_segments, list) or not raw_segments:
+            raise argument_error("switch_plan 必须是非空数组", "switch_plan")
+    elif switch_seconds is not None:
+        cadence = _finite(switch_seconds, 0.0)
+        if cadence <= 0:
+            raise argument_error("switch_seconds 必须大于 0", "switch_seconds")
+        raw_segments = []
+        cursor = start
+        index = 0
+        while cursor < end - 1e-9:
+            raw_segments.append({"start_seconds": cursor, "end_seconds": min(end, cursor + cadence), "camera_asset_id": sources[index % len(sources)]})
+            cursor += cadence
+            index += 1
+    else:
+        return [], [{"code": "MULTICAM_SWITCH_PLAN_MISSING", "message": "只执行同步分析；未提供 switch_seconds 或 switch_plan，未生成时间线切换"}]
+    segments: list[dict[str, Any]] = []
+    cursor = start
+    for index, raw in enumerate(raw_segments):
+        if not isinstance(raw, dict):
+            raise argument_error("切换段必须是对象", f"switch_plan[{index}]")
+        left = _finite(raw.get("start_seconds"), cursor)
+        right = _finite(raw.get("end_seconds"), 0.0)
+        asset_id = str(raw.get("camera_asset_id") or raw.get("asset_id") or "").strip()
+        if not asset_id and raw.get("camera_index") is not None:
+            try:
+                asset_id = sources[int(raw["camera_index"])]
+            except (IndexError, TypeError, ValueError) as exc:
+                raise argument_error("camera_index 不在 source_asset_id 范围内", f"switch_plan[{index}].camera_index") from exc
+        if asset_id not in offsets:
+            raise argument_error("切换段引用了未知 camera_asset_id", f"switch_plan[{index}].camera_asset_id")
+        if left < start - 1e-6 or right > end + 1e-6 or right <= left:
+            raise argument_error("切换段必须位于 start_seconds/end_seconds 范围内且时长为正", f"switch_plan[{index}]")
+        if segments and left < float(segments[-1]["end_seconds"]) - 1e-6:
+            raise argument_error("switch_plan 的切换段不能重叠", f"switch_plan[{index}]")
+        alignment = offsets[asset_id]
+        relative_delay = _finite(alignment.get("relative_delay_seconds"), 0.0)
+        source_duration = _finite(alignment.get("evidence", {}).get("duration_seconds"), 0.0)
+        source_start = left + relative_delay
+        if source_start < 0:
+            warnings.append({"code": "MULTICAM_SOURCE_CLAMPED", "message": f"机位 {asset_id} 的源起点早于 0，已钳制", "asset_id": asset_id, "seconds": round(source_start, 6)})
+            source_start = 0.0
+        available = max(0.0, source_duration - source_start)
+        requested = right - left
+        if available <= 0:
+            raise AppError("MULTICAM_SOURCE_RANGE_EMPTY", f"机位 {asset_id} 无法覆盖切换段", exit_code=2, path=f"switch_plan[{index}]")
+        source_span = min(requested, available)
+        speed = source_span / requested
+        if speed < 0.999999:
+            warnings.append({"code": "MULTICAM_SOURCE_SLOWED", "message": f"机位 {asset_id} 可用源范围不足，使用 speed={speed:.6f} 填满切换段", "asset_id": asset_id, "speed": round(speed, 6)})
+        segments.append({
+            "index": index,
+            "camera_asset_id": asset_id,
+            "start_seconds": round(left, 6),
+            "end_seconds": round(right, 6),
+            "timeline_start_seconds": round(timeline_start_seconds + left - start, 6),
+            "duration_seconds": round(requested, 6),
+            "source_in_seconds": round(source_start, 6),
+            "source_out_seconds": round(source_start + source_span, 6),
+            "speed": round(speed, 6),
+        })
+        cursor = right
+    if segments and float(segments[-1]["end_seconds"]) < end - 1e-6:
+        warnings.append({"code": "MULTICAM_SWITCH_GAP", "message": "切换计划没有覆盖完整分析区间", "start_seconds": segments[-1]["end_seconds"], "end_seconds": round(end, 6)})
+    return segments, warnings
+
+
+def new_multicam_clip_id(index: int) -> str:
+    return new_id(f"multicam{index}")

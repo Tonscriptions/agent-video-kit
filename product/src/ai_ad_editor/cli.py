@@ -62,6 +62,7 @@ from .policy import audit_local_tree, policy_error_from_findings, require_local_
 from .render_queue import JOB_STATUSES, cancel_path, enqueue as enqueue_render_jobs, find_job, load_queue, normalize_job, queue_path, save_queue, set_status
 from .smart_cut import SMART_CUT_VERSION, build_smart_cut_plan, match_transcript_phrases, replace_clip_with_smart_cut
 from .beat_edit import BEAT_CUT_VERSION, build_beat_cut_plan
+from .multicam import MULTICAM_SYNC_VERSION, build_switch_segments, new_multicam_clip_id, synchronize_multicam_sources
 from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
 
@@ -189,6 +190,23 @@ def build_parser() -> argparse.ArgumentParser:
     beat_cut.add_argument("--output", default=None, help="项目内卡点报告路径")
     beat_cut.add_argument("--apply", action="store_true", help="创建快照并将卡点片段写入目标视频轨道")
     beat_cut.add_argument("--replace-track", action="store_true", help="应用前清空目标视频轨道已有片段")
+    multicam = _leaf_common(ms.add_parser("multicam", help="本地多机位音频同步与切换计划"))
+    multicam.add_argument("--project", required=True)
+    multicam.add_argument("--source-asset-id", action="append", required=True, help="可重复：含视频和音频流的机位资产 ID")
+    multicam.add_argument("--reference-asset-id", default=None, help="参考机位资产 ID；默认第一个源素材")
+    multicam.add_argument("--sequence-id", default=None, help="应用切换计划时的目标序列")
+    multicam.add_argument("--track-id", default=None, help="应用切换计划时的目标视频轨道")
+    multicam.add_argument("--switch-seconds", type=float, default=None, help="按固定秒数轮换机位；与 --switch-plan 二选一")
+    multicam.add_argument("--switch-plan", default=None, help="项目内本地 JSON：数组或 {segments:[...]}，每项含 start_seconds/end_seconds/camera_asset_id")
+    multicam.add_argument("--start-seconds", type=float, default=0.0)
+    multicam.add_argument("--end-seconds", type=float, default=None)
+    multicam.add_argument("--timeline-start-seconds", type=float, default=0.0)
+    multicam.add_argument("--sample-rate", type=int, default=8000, help="本地同步 PCM 采样率")
+    multicam.add_argument("--analysis-seconds", type=float, default=120.0, help="每个机位最多分析的前缀秒数")
+    multicam.add_argument("--max-offset-seconds", type=float, default=30.0, help="互相关搜索的最大相对偏移")
+    multicam.add_argument("--output", default=None, help="项目内多机位同步报告路径")
+    multicam.add_argument("--apply", action="store_true", help="创建快照并把切换计划写入目标视频轨道")
+    multicam.add_argument("--replace-track", action="store_true", help="应用前清空目标视频轨道已有片段")
     smart_cut = _leaf_common(ms.add_parser("smart-cut", help="基于本地静音检测生成或应用智能剪口播计划"))
     smart_cut.add_argument("--project", required=True)
     smart_cut.add_argument("--sequence-id", default=None)
@@ -1606,6 +1624,141 @@ def command_media_beat_cut(args: argparse.Namespace) -> dict[str, Any]:
         warnings=plan.get("warnings"),
         operation_id=operation_id,
     )
+
+
+def command_media_multicam(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    sequence = find_sequence(project, getattr(args, "sequence_id", None))
+    if args.timeline_start_seconds < 0:
+        raise argument_error("timeline_start_seconds 不能为负数", "timeline_start_seconds")
+    if args.apply and not args.track_id:
+        raise argument_error("--apply 必须提供 --track-id", "track_id")
+    assets = asset_map(project)
+    sources: list[dict[str, Any]] = []
+    for asset_id in args.source_asset_id:
+        asset = assets.get(str(asset_id))
+        if not asset:
+            raise argument_error(f"找不到多机位源素材: {asset_id}", "source_asset_id")
+        if str(asset.get("kind", "")).lower() != "video":
+            raise argument_error(f"多机位源素材必须是 video 资产: {asset_id}", "source_asset_id")
+        source = Path(str(asset.get("uri", "")))
+        if not source.is_absolute():
+            source = root / source
+        sources.append({"asset_id": str(asset_id), "path": source.resolve()})
+    switch_plan_payload: list[dict[str, Any]] | None = None
+    if args.switch_plan:
+        switch_path = Path(args.switch_plan).expanduser().resolve()
+        ensure_inside(root, switch_path)
+        raw = load_json(switch_path)
+        if isinstance(raw, dict):
+            raw = raw.get("segments")
+        if not isinstance(raw, list):
+            raise argument_error("--switch-plan 必须是数组或包含 segments 数组的 JSON", "switch_plan")
+        switch_plan_payload = raw
+    if args.switch_seconds is not None and switch_plan_payload is not None:
+        raise argument_error("--switch-seconds 与 --switch-plan 只能提供一个", "switch_plan")
+    run_id = new_id("multicam")
+    report_path = Path(args.output).expanduser().resolve() if args.output else root / "validation" / f"multicam_{safe_filename(run_id)}.json"
+    ensure_inside(root, report_path)
+    sync = synchronize_multicam_sources(
+        sources,
+        reference_asset_id=args.reference_asset_id,
+        sample_rate=args.sample_rate,
+        analysis_seconds=args.analysis_seconds,
+        max_offset_seconds=args.max_offset_seconds,
+    )
+    segments, switch_warnings = build_switch_segments(
+        sync,
+        switch_seconds=args.switch_seconds,
+        switch_plan=switch_plan_payload,
+        start_seconds=args.start_seconds,
+        end_seconds=args.end_seconds,
+        timeline_start_seconds=args.timeline_start_seconds,
+    )
+    tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND))
+    for index, item in enumerate(segments):
+        item["id"] = new_multicam_clip_id(index)
+        item["timeline_start_tick"] = int(round(float(item["timeline_start_seconds"]) * tps))
+        item["duration_tick"] = max(1, int(round(float(item["duration_seconds"]) * tps)))
+        item["source_in_tick"] = max(0, int(round(float(item["source_in_seconds"]) * tps)))
+        item["source_out_tick"] = max(item["source_in_tick"] + 1, int(round(float(item["source_out_seconds"]) * tps)))
+    plan = {
+        "multicam_version": MULTICAM_SYNC_VERSION,
+        "project_id": project.get("project", {}).get("id"),
+        "sequence_id": sequence.get("id"),
+        "track_id": args.track_id,
+        "run_id": run_id,
+        "sync": sync,
+        "parameters": {
+            "start_seconds": round(float(args.start_seconds), 6),
+            "end_seconds": args.end_seconds,
+            "timeline_start_seconds": round(float(args.timeline_start_seconds), 6),
+            "switch_seconds": args.switch_seconds,
+            "switch_plan": str(args.switch_plan) if args.switch_plan else None,
+            "apply": bool(args.apply),
+            "replace_track": bool(args.replace_track),
+        },
+        "segments": segments,
+        "warnings": [*sync.get("warnings", []), *switch_warnings],
+        "changed": bool(segments),
+    }
+    warnings = plan["warnings"]
+    if args.dry_run:
+        return _envelope(
+            "media.multicam",
+            args,
+            status="planned",
+            data={"report": None, "plan": plan, "applied": False},
+            warnings=warnings,
+        )
+    if not args.apply:
+        atomic_write_json(report_path, {"report_version": MULTICAM_SYNC_VERSION, "created_at": now_iso(), "applied": False, "plan": plan})
+        return _envelope("media.multicam", args, status="planned", data={"report": str(report_path), "plan": plan, "applied": False}, warnings=warnings)
+    if not segments:
+        raise AppError("MULTICAM_SWITCH_PLAN_REQUIRED", "--apply 需要 switch_seconds 或非空 switch_plan", exit_code=2, path="switch_plan")
+    target_track = find_track(sequence, args.track_id, None)
+    if str(target_track.get("kind")) != "video":
+        raise argument_error("多机位切换目标轨道必须是 video 轨道", "track_id")
+    existing_clips = list(target_track.get("clips", []))
+    if not args.replace_track:
+        for generated in segments:
+            generated_start = int(generated["timeline_start_tick"])
+            generated_end = generated_start + int(generated["duration_tick"])
+            for existing in existing_clips:
+                existing_start = int(existing.get("timeline_start_tick", 0))
+                existing_end = existing_start + int(existing.get("duration_tick", 0))
+                if max(generated_start, existing_start) < min(generated_end, existing_end):
+                    raise AppError("MULTICAM_TRACK_OVERLAP", "多机位切换会覆盖目标轨道已有片段，请使用 --replace-track 或调整时间线起点", exit_code=2, path="track_id")
+    before_project = copy.deepcopy(project)
+    if args.replace_track:
+        target_track["clips"] = []
+    generated_clips: list[dict[str, Any]] = []
+    for item in segments:
+        clip = {
+            "id": item["id"],
+            "asset_id": item["camera_asset_id"],
+            "timeline_start_tick": int(item["timeline_start_tick"]),
+            "duration_tick": int(item["duration_tick"]),
+            "source_in_tick": int(item["source_in_tick"]),
+            "source_out_tick": int(item["source_out_tick"]),
+        }
+        if float(item.get("speed", 1.0)) != 1.0:
+            clip["speed"] = float(item["speed"])
+        target_track.setdefault("clips", []).append(clip)
+        generated_clips.append(clip)
+    _recompute_sequence_duration(sequence)
+    validation = validate_project(root, project, strict_rights=False)
+    if not validation["ok"]:
+        raise AppError("MULTICAM_APPLY_INVALID", "多机位切换应用后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    snapshot = create_snapshot(root, before_project, label="before-multicam")
+    operation_id = new_id("op")
+    plan["generated_clips"] = generated_clips
+    payload = {"report_version": MULTICAM_SYNC_VERSION, "created_at": now_iso(), "applied": True, "operation_id": operation_id, "before_snapshot_id": snapshot["snapshot_id"], "plan": plan, "validation": validation}
+    atomic_write_json(report_path, payload)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.multicam", "at": now_iso(), "report": str(report_path), "before_snapshot_id": snapshot["snapshot_id"], "sequence_id": sequence.get("id"), "track_id": target_track.get("id"), "clip_ids": [clip["id"] for clip in generated_clips]})
+    save_project(root, project)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.multicam", "status": "succeeded", "report": str(report_path), "before_snapshot_id": snapshot["snapshot_id"], "clip_ids": [clip["id"] for clip in generated_clips], "created_at": now_iso()})
+    return _envelope("media.multicam", args, data={"report": str(report_path), "plan": plan, "generated_clips": generated_clips, "before_snapshot": snapshot, "validation": validation}, warnings=warnings, operation_id=operation_id)
 
 
 def command_media_smart_cut(args: argparse.Namespace) -> dict[str, Any]:
@@ -3758,6 +3911,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "prepare"): command_media_prepare,
     ("media", "highlights"): command_media_highlights,
     ("media", "beat-cut"): command_media_beat_cut,
+    ("media", "multicam"): command_media_multicam,
     ("media", "smart-cut"): command_media_smart_cut,
     ("ad", "plan"): command_ad_plan,
     ("ad", "apply"): command_ad_apply,

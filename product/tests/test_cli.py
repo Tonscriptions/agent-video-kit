@@ -1013,6 +1013,62 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(applied["data"]["before_snapshot"]["label"], "before-smart-cut")
             self.assertEqual(len(applied["data"]["replacements"][0]["piece_ids"]), 2)
 
+    def test_local_multicam_audio_sync_and_cut(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-multicam-") as raw:
+            workspace = Path(raw)
+            reference = workspace / "reference.mp4"
+            candidate = workspace / "candidate.mp4"
+            expression = "0.8*sin(2*PI*(300+100*t)*t)+0.3*sin(2*PI*(700+50*t)*t)"
+            commands = [
+                [
+                    "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "color=c=green:s=320x180:r=24:d=4",
+                    "-f", "lavfi", "-i", f"aevalsrc={expression}:s=48000:d=4",
+                    "-shortest", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(reference),
+                ],
+                [
+                    "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "color=c=blue:s=320x180:r=24:d=4.5",
+                    "-f", "lavfi", "-i", f"aevalsrc={expression}:s=48000:d=4",
+                    "-filter_complex", "[1:a]adelay=500|500[a]", "-map", "0:v:0", "-map", "[a]", "-t", "4.5",
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(candidate),
+                ],
+            ]
+            for command in commands:
+                completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8")
+                self.assertEqual(completed.returncode, 0, completed.stderr)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, ref_result = invoke("media", "ingest", "--project", str(project), "--input", str(reference))
+            self.assertEqual(code, 0, ref_result)
+            code, candidate_result = invoke("media", "ingest", "--project", str(project), "--input", str(candidate))
+            self.assertEqual(code, 0, candidate_result)
+            reference_id = ref_result["data"]["asset"]["id"]
+            candidate_id = candidate_result["data"]["asset"]["id"]
+            project_before_dry_run = (project / "project.json").read_text(encoding="utf-8")
+            common = (
+                "media", "multicam", "--project", str(project),
+                "--source-asset-id", reference_id, "--source-asset-id", candidate_id,
+                "--reference-asset-id", reference_id, "--sample-rate", "4000", "--analysis-seconds", "5",
+                "--max-offset-seconds", "1", "--switch-seconds", "1", "--track-id", "track_video_1",
+            )
+            code, planned = invoke(*common, "--dry-run")
+            self.assertEqual(code, 0, planned)
+            offsets = planned["data"]["plan"]["sync"]["offsets"]
+            candidate_offset = next(item for item in offsets if item["asset_id"] == candidate_id)
+            self.assertAlmostEqual(candidate_offset["relative_delay_seconds"], 0.5, delta=0.1)
+            self.assertEqual(len(planned["data"]["plan"]["segments"]), 4)
+            self.assertIsNone(planned["data"]["report"])
+            self.assertEqual((project / "project.json").read_text(encoding="utf-8"), project_before_dry_run)
+            code, applied = invoke(*common, "--apply", "--replace-track")
+            self.assertEqual(code, 0, applied)
+            self.assertEqual(applied["data"]["before_snapshot"]["label"], "before-multicam")
+            self.assertEqual(len(applied["data"]["generated_clips"]), 4)
+            project_payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            video_track = next(track for track in project_payload["sequences"][0]["tracks"] if track["id"] == "track_video_1")
+            self.assertEqual(len(video_track["clips"]), 4)
+            self.assertEqual([clip["asset_id"] for clip in video_track["clips"]], [reference_id, candidate_id, reference_id, candidate_id])
+
     def test_local_ad_plan_writes_timed_phases_and_markers(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-plan-") as raw:
             workspace = Path(raw)
