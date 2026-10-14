@@ -2456,6 +2456,53 @@ class P0CliTests(unittest.TestCase):
             self.assertTrue(any(item.get("property") == "transform.position.x" for item in clip.get("keyframes", [])))
             self.assertEqual(invoke("validate", "--project", str(project))[0], 0)
 
+    def test_local_tracking_binds_to_independent_text_clip(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-track-bind-") as raw:
+            workspace = Path(raw)
+            source = workspace / "moving-object.mp4"
+            completed = subprocess.run(
+                [
+                    "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "color=c=black:s=320x180:r=12:d=1",
+                    "-f", "lavfi", "-i", "color=c=white:s=36x36:r=12:d=1",
+                    "-filter_complex", "overlay=x='20+80*t':y=55:eval=frame:shortest=1",
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", str(source),
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingest["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [
+                {"op": "add_track", "track_id": "track_titles", "kind": "subtitle", "order": 3},
+                {"op": "append_clip", "track_id": "track_titles", "id": "bound_title", "generator": {"type": "text"}, "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000, "subtitle": {"text": "Tracked", "style": {"fontsize": 34}}},
+            ]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            report_path = project / "validation" / "track-bind.json"
+            code, bound = invoke(
+                "media", "track-bind", "--project", str(project), "--asset-id", asset_id,
+                "--roi", "0.05,0.28,0.14,0.24", "--target-clip-id", "bound_title",
+                "--target-track-id", "track_titles", "--scale-mode", "roi", "--apply",
+                "--output", str(report_path),
+            )
+            self.assertEqual(code, 0, bound)
+            self.assertTrue(report_path.exists())
+            self.assertTrue(bound["data"]["applied"])
+            self.assertEqual(bound["data"]["before_snapshot"]["label"], "before-track-bind")
+            self.assertIn("transform.position.x", [item["property"] for item in bound["data"]["plan"]["keyframes"]])
+            self.assertIn("transform.scale", [item["property"] for item in bound["data"]["plan"]["keyframes"]])
+            saved = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            title_track = next(track for track in saved["sequences"][0]["tracks"] if track["id"] == "track_titles")
+            title_clip = title_track["clips"][0]
+            properties = {item["property"] for item in title_clip.get("keyframes", [])}
+            self.assertEqual(properties, {"transform.position.x", "transform.position.y", "transform.scale"})
+            self.assertEqual(invoke("validate", "--project", str(project))[0], 0)
+
     def test_local_auto_reframe_applies_target_aspect_crop_keyframes(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-reframe-") as raw:
             workspace = Path(raw)

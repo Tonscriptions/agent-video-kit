@@ -221,6 +221,26 @@ def build_parser() -> argparse.ArgumentParser:
     track.add_argument("--clip-id", default=None, help="可选：将位置关键帧应用到片段")
     track.add_argument("--track-id", default=None, help="与 --clip-id 联用以限定轨道")
     track.add_argument("--sequence-id", default=None, help="与 --clip-id 联用，默认主序列")
+    track_bind = _leaf_common(ms.add_parser("track-bind", help="将本地对象跟踪关键帧绑定到文字/贴纸/效果片段"))
+    track_bind.add_argument("--project", required=True)
+    track_bind.add_argument("--asset-id", default=None, help="项目内视频资产 ID，与 --input 二选一")
+    track_bind.add_argument("--input", default=None, help="本地视频路径，与 --asset-id 二选一")
+    track_bind.add_argument("--roi", required=True, help="归一化 ROI：x,y,width,height")
+    track_bind.add_argument("--target-clip-id", required=True, help="被绑定的文字/贴纸/效果片段 ID")
+    track_bind.add_argument("--target-track-id", required=True, help="被绑定片段所在轨道 ID")
+    track_bind.add_argument("--sequence-id", default=None, help="目标序列 ID，默认主序列")
+    track_bind.add_argument("--start-seconds", type=float, default=0.0)
+    track_bind.add_argument("--end-seconds", type=float, default=None)
+    track_bind.add_argument("--step-frames", type=int, default=4)
+    track_bind.add_argument("--search-radius", type=int, default=48)
+    track_bind.add_argument("--max-width", type=int, default=640)
+    track_bind.add_argument("--max-samples", type=int, default=600)
+    track_bind.add_argument("--offset-x", type=float, default=0.0, help="绑定位置的归一化 X 偏移")
+    track_bind.add_argument("--offset-y", type=float, default=0.0, help="绑定位置的归一化 Y 偏移")
+    track_bind.add_argument("--scale-mode", choices=("none", "roi"), default="none", help="是否按跟踪 ROI 宽度变化同步 transform.scale")
+    track_bind.add_argument("--scale-multiplier", type=float, default=1.0)
+    track_bind.add_argument("--output", default=None, help="项目内跟踪绑定报告 JSON 路径")
+    track_bind.add_argument("--apply", action="store_true", help="创建快照并将绑定关键帧写回目标片段")
     reframe = _leaf_common(ms.add_parser("reframe", help="将本地对象跟踪转换为目标画幅动态裁切"))
     reframe.add_argument("--project", required=True)
     reframe.add_argument("--asset-id", default=None, help="项目内视频资产 ID，与 --input 二选一")
@@ -1000,6 +1020,149 @@ def command_media_track(args: argparse.Namespace) -> dict[str, Any]:
         save_project(root, project)
     _operation(root, operation_id, {"operation_id": operation_id, "command": "media.track", "status": "succeeded", "report": str(report_path), "asset_id": asset_id, "clip_id": args.clip_id, "applied_properties": applied_properties, "before_snapshot": before_snapshot, "created_at": now_iso()})
     return _envelope("media.track", args, data={"report": str(report_path), "result": report, "applied_properties": applied_properties, "before_snapshot": before_snapshot}, warnings=[{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和关键帧"}], operation_id=operation_id)
+
+
+def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
+    """Bind local tracking output to an independent visual clip.
+
+    The target may be a text generator, sticker-like media clip, or any other
+    visual clip that accepts ordinary transform keyframes.  Source tracking is
+    sampled in its own local clock and mapped deterministically onto the target
+    clip duration, so a short overlay can follow a longer source range without
+    changing the source media or generating a hidden dependency.
+    """
+    root, project = load_project(args.project)
+    if bool(args.asset_id) == bool(args.input):
+        raise argument_error("必须且只能提供 --asset-id 或 --input")
+    if not -1.0 <= float(args.offset_x) <= 1.0 or not -1.0 <= float(args.offset_y) <= 1.0:
+        raise argument_error("offset-x/offset-y 必须位于 -1..1", "offset")
+    if float(args.scale_multiplier) <= 0 or float(args.scale_multiplier) > 20:
+        raise argument_error("scale-multiplier 必须位于 (0,20]", "scale_multiplier")
+    asset_id = args.asset_id
+    if asset_id:
+        asset = asset_map(project).get(str(asset_id))
+        if not asset:
+            raise argument_error(f"找不到跟踪源资产: {asset_id}", "asset_id")
+        source = Path(str(asset.get("uri", "")))
+        if not source.is_absolute():
+            source = root / source
+    else:
+        raw_input = str(args.input or "").strip()
+        if raw_input.lower().startswith(("http://", "https://")):
+            raise argument_error("跟踪绑定只接受本地输入", "input")
+        source = Path(raw_input).expanduser().resolve()
+    if not source.exists() or not source.is_file():
+        raise argument_error("跟踪绑定输入不存在", str(source))
+    sequence = find_sequence(project, args.sequence_id)
+    target_track, target_clip = _find_clip(sequence, str(args.target_clip_id), args.target_track_id)
+    if str(target_track.get("kind", "video")) == "audio":
+        raise AppError("TRACK_BIND_TARGET_AUDIO", "对象跟踪不能绑定到音频片段", exit_code=2, path="target_track_id")
+    if target_clip.get("sequence_id"):
+        raise AppError("TRACK_BIND_NESTED_UNSUPPORTED", "对象跟踪绑定当前不支持嵌套序列片段", exit_code=2, path="target_clip_id")
+    target_duration = max(1, int(target_clip.get("duration_tick", 1)))
+    if float(args.start_seconds) < 0:
+        raise argument_error("start-seconds 不能为负数", "start_seconds")
+    if args.end_seconds is not None and float(args.end_seconds) <= float(args.start_seconds):
+        raise argument_error("end-seconds 必须大于 start-seconds", "end_seconds")
+    report_path = Path(args.output).expanduser().resolve() if args.output else root / "validation" / f"track_bind_{safe_filename(str(args.target_clip_id))}.json"
+    ensure_inside(root, report_path)
+    if args.dry_run:
+        return _envelope(
+            "media.track-bind",
+            args,
+            status="planned",
+            data={
+                "input": str(source),
+                "asset_id": asset_id,
+                "roi": args.roi,
+                "target_clip_id": args.target_clip_id,
+                "target_track_id": args.target_track_id,
+                "sequence_id": sequence.get("id"),
+                "target_duration_tick": target_duration,
+                "scale_mode": args.scale_mode,
+                "scale_multiplier": args.scale_multiplier,
+                "offset": {"x": args.offset_x, "y": args.offset_y},
+                "apply": bool(args.apply),
+                "network": "disabled",
+            },
+        )
+    tracking = track_media(
+        source,
+        args.roi,
+        start_seconds=float(args.start_seconds),
+        end_seconds=args.end_seconds,
+        step_frames=args.step_frames,
+        search_radius=args.search_radius,
+        max_width=args.max_width,
+        max_samples=args.max_samples,
+        ticks_per_second=int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND)),
+    )
+    frames = [item for item in tracking.get("frames", []) if isinstance(item, dict)]
+    if not frames:
+        raise AppError("TRACK_BIND_EMPTY", "跟踪没有返回可绑定的帧", exit_code=6, path="frames")
+    source_span_tick = max(1, max(int(item.get("at_tick", 0)) for item in frames))
+    first_width = max(1e-6, float(frames[0].get("width", 0.0) or 0.0))
+    base_scale = float(target_clip.get("transform", {}).get("scale", 1.0) if isinstance(target_clip.get("transform"), dict) else 1.0)
+    if base_scale <= 0:
+        base_scale = 1.0
+    position_x: list[tuple[int, float, str]] = []
+    position_y: list[tuple[int, float, str]] = []
+    scale_values: list[tuple[int, float, str]] = []
+    for item in frames:
+        try:
+            local_tick = min(target_duration, max(0, int(round(int(item.get("at_tick", 0)) / source_span_tick * target_duration))))
+            x = min(1.0, max(0.0, float(item.get("x", 0.5)) + float(args.offset_x)))
+            y = min(1.0, max(0.0, float(item.get("y", 0.5)) + float(args.offset_y)))
+            width = max(1e-6, float(item.get("width", first_width) or first_width))
+        except (TypeError, ValueError):
+            continue
+        position_x.append((local_tick, x, "linear"))
+        position_y.append((local_tick, y, "linear"))
+        if args.scale_mode == "roi":
+            scale_values.append((local_tick, max(0.01, min(20.0, base_scale * float(args.scale_multiplier) * width / first_width)), "linear"))
+    if not position_x:
+        raise AppError("TRACK_BIND_EMPTY", "跟踪帧没有可用的绑定关键帧", exit_code=6, path="frames")
+    plan: dict[str, Any] = {
+        "binding_version": "0.1.0",
+        "engine": "local-template-matching",
+        "source": str(source),
+        "source_sha256": f"sha256:{sha256_file(source)}",
+        "asset_id": asset_id,
+        "sequence_id": sequence.get("id"),
+        "target_track_id": target_track.get("id"),
+        "target_clip_id": target_clip.get("id"),
+        "target_duration_tick": target_duration,
+        "roi": args.roi,
+        "scale_mode": args.scale_mode,
+        "scale_multiplier": float(args.scale_multiplier),
+        "offset": {"x": float(args.offset_x), "y": float(args.offset_y)},
+        "keyframes": [
+            {"property": "transform.position.x", "keyframes": [{"at_tick": at, "value": value, "interpolation": interpolation} for at, value, interpolation in position_x]},
+            {"property": "transform.position.y", "keyframes": [{"at_tick": at, "value": value, "interpolation": interpolation} for at, value, interpolation in position_y]},
+        ],
+        "tracking": tracking,
+        "warnings": ["template_matching_can_drift_on_occlusion_or_large_scale_change", "tracking_clock_mapped_to_target_clip_duration"],
+    }
+    if args.scale_mode == "roi":
+        plan["keyframes"].append({"property": "transform.scale", "keyframes": [{"at_tick": at, "value": value, "interpolation": interpolation} for at, value, interpolation in scale_values]})
+    if not args.apply:
+        atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "applied": False, "plan": plan})
+        return _envelope("media.track-bind", args, status="planned", data={"report": str(report_path), "plan": plan, "applied": False}, warnings=[{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配绑定可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和目标文字/贴纸边界"}])
+    before_project = copy.deepcopy(project)
+    before_snapshot = create_snapshot(root, before_project, label="before-track-bind")
+    for item in plan["keyframes"]:
+        values = [(int(point["at_tick"]), float(point["value"]), str(point.get("interpolation", "linear"))) for point in item["keyframes"]]
+        _set_keyframe_track(target_clip, str(item["property"]), values)
+    _clamp_clip_keyframes(target_clip)
+    validation = validate_project(root, project, strict_rights=False)
+    if not validation["ok"]:
+        raise AppError("TRACK_BIND_APPLY_INVALID", "对象跟踪绑定后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    operation_id = new_id("op")
+    atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "applied": True, "operation_id": operation_id, "before_snapshot_id": before_snapshot["snapshot_id"], "plan": plan, "validation": validation})
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.track-bind", "asset_id": asset_id, "target_clip_id": target_clip.get("id"), "target_track_id": target_track.get("id"), "report": str(report_path), "before_snapshot_id": before_snapshot["snapshot_id"], "at": now_iso()})
+    save_project(root, project)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.track-bind", "status": "succeeded", "report": str(report_path), "asset_id": asset_id, "target_clip_id": target_clip.get("id"), "target_track_id": target_track.get("id"), "before_snapshot_id": before_snapshot["snapshot_id"], "created_at": now_iso()})
+    return _envelope("media.track-bind", args, data={"report": str(report_path), "plan": plan, "target_clip_id": target_clip.get("id"), "target_track_id": target_track.get("id"), "before_snapshot": before_snapshot, "validation": validation, "applied": True}, warnings=[{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配绑定可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和目标文字/贴纸边界"}], operation_id=operation_id)
 
 
 def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
@@ -3558,6 +3721,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "stabilize"): command_media_stabilize,
     ("media", "relink"): command_media_relink,
     ("media", "track"): command_media_track,
+    ("media", "track-bind"): command_media_track_bind,
     ("media", "reframe"): command_media_reframe,
     ("media", "understand"): command_media_understand,
     ("media", "prepare"): command_media_prepare,
