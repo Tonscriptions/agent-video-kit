@@ -12,7 +12,7 @@ from copy import deepcopy
 from typing import Any
 
 
-EFFECT_CATALOG_VERSION = "0.2.0"
+EFFECT_CATALOG_VERSION = "0.3.0"
 
 
 def _parameter(
@@ -100,6 +100,18 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
         "preserve": _parameter("enum", "none", description="none, lum, max, avg, sum, nrm or pwr"),
     }),
     _effect("color_temperature", backend="ffmpeg:colorbalance", category="color", aliases=("temperature", "warmth"), parameters={"kelvin": _parameter("number", 6500.0, minimum=1000.0, maximum=40000.0)}),
+    _effect("color_wheel", backend="ffmpeg:colorbalance", category="color", aliases=("three_way_color", "three_way_wheel"), parameters={
+        "shadows_red": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
+        "shadows_green": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
+        "shadows_blue": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
+        "midtones_red": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
+        "midtones_green": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
+        "midtones_blue": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
+        "highlights_red": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
+        "highlights_green": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
+        "highlights_blue": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
+        "preserve_luma": _parameter("boolean", False),
+    }, limits=("maps_to_ffmpeg_colorbalance_three_way_wheel",)),
     _effect("contrast", backend="ffmpeg:eq", category="color", keyframable=True, parameters={"amount": _parameter("number", 1.0, minimum=0.0, maximum=4.0)}),
     _effect("curves", backend="ffmpeg:curves", category="color", aliases=("curve",), parameters={
         "all": _parameter("string", "0/0 1/1", description="FFmpeg curves points, for example 0/0 0.5/0.4 1/1"),
@@ -141,6 +153,11 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
         "radius": _parameter("integer", 8, minimum=1, maximum=32),
     }),
     _effect("grayscale", backend="ffmpeg:hue", category="stylize", aliases=("black_white", "blackandwhite")),
+    _effect("hsl", backend="ffmpeg:hue", category="color", aliases=("hsl_adjust",), keyframable=True, parameters={
+        "hue": _parameter("number", 0.0, minimum=-360.0, maximum=360.0, description="全局色相角度"),
+        "saturation": _parameter("number", 1.0, minimum=0.0, maximum=4.0, description="全局饱和度倍率"),
+        "lightness": _parameter("number", 0.0, minimum=-1.0, maximum=1.0, description="映射到本地 FFmpeg hue brightness 的明度偏移"),
+    }, limits=("lightness_uses_ffmpeg_hue_brightness_mapping",)),
     _effect("hqdn3d", backend="ffmpeg:hqdn3d", category="repair", parameters={
         "luma_spatial": _parameter("number", 4.0, minimum=0.0, maximum=30.0),
         "chroma_spatial": _parameter("number", 3.0, minimum=0.0, maximum=30.0),
@@ -165,6 +182,12 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
     }, limits=("path_or_registered_lut_id_must_be_project_local", "dynamic_intensity_uses_static_value", "non_cube_intensity_unsupported")),
     _effect("noise", backend="ffmpeg:noise", category="stylize", aliases=("film_grain",), parameters={"amount": _parameter("integer", 8, minimum=1, maximum=100)}),
     _effect("posterize", backend="ffmpeg:lutrgb", category="stylize", aliases=("posterization",), parameters={"levels": _parameter("integer", 8, minimum=2, maximum=256)}),
+    _effect("rgb_curves", backend="ffmpeg:curves", category="color", aliases=("rgb_curve", "channel_curves"), parameters={
+        "all": _parameter("string", "0/0 1/1", description="可选 master/all 曲线"),
+        "red": _parameter("string", "", description="红色通道曲线"),
+        "green": _parameter("string", "", description="绿色通道曲线"),
+        "blue": _parameter("string", "", description="蓝色通道曲线"),
+    }, limits=("curve_points_are_static", "each_channel_is_whitelist_validated")),
     _effect("sepia", backend="ffmpeg:colorchannelmixer", category="stylize"),
     _effect("sharpen", backend="ffmpeg:unsharp", category="detail", aliases=("unsharp",), parameters={"amount": _parameter("number", 1.0, minimum=0.0, maximum=10.0)}),
     _effect("smartblur", backend="ffmpeg:smartblur", category="blur", parameters={

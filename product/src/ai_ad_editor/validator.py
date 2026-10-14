@@ -31,6 +31,8 @@ EFFECT_KEYFRAME_ALIASES: dict[str, set[str]] = {
     "color": {"brightness", "contrast", "saturation"},
     "hue": {"degrees", "angle", "hue", "value"},
     "hue_rotate": {"degrees", "angle", "hue", "value"},
+    "hsl": {"hue", "degrees", "angle", "saturation", "lightness", "brightness", "value"},
+    "hsl_adjust": {"hue", "degrees", "angle", "saturation", "lightness", "brightness", "value"},
     "gamma": {"gamma", "amount", "value"},
     "gamma_adjust": {"gamma", "amount", "value"},
     "vignette": {"angle", "value"},

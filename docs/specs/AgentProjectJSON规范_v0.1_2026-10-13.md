@@ -114,9 +114,9 @@
 
 `at_tick` 是片段内时间，不能混用源媒体时间和序列时间。允许的插值包括 `hold`、`linear`、`ease_in`、`ease_out`、`ease_in_out` 和 `bezier`。Bezier 必须携带有限数字控制点：`[y1, y2]` 表示两个纵向控制值，或 `[x1, y1, x2, y2]` 表示归一化 cubic 控制点，其中 `x1/x2` 必须位于 `0..1`；参数错误必须在写入或渲染前拒绝。
 
-效果和转场必须含 `type`、`version`、`parameters`、`scope`、`enabled` 和 `source`。外部或社区效果需要 `package_id`、依赖版本和许可证引用；无法解析依赖时必须进入 `Unsupported` 或 `Failed`。效果对象可以额外声明 `keyframes`，每条轨道的 `property` 使用效果参数名或 `effect.<parameter>` 命名，`at_tick` 仍相对于片段局部时间。当前本地 FFmpeg 后端对 brightness/contrast/saturation、hue、gamma 和 vignette 使用 `eval=frame` 逐帧执行；其他效果参数关键帧会保留并在渲染报告中标记为静态近似，不得静默伪装成逐帧效果。
+效果和转场必须含 `type`、`version`、`parameters`、`scope`、`enabled` 和 `source`。外部或社区效果需要 `package_id`、依赖版本和许可证引用；无法解析依赖时必须进入 `Unsupported` 或 `Failed`。效果对象可以额外声明 `keyframes`，每条轨道的 `property` 使用效果参数名或 `effect.<parameter>` 命名，`at_tick` 仍相对于片段局部时间。当前本地 FFmpeg 后端对 brightness/contrast/saturation、gamma 和 vignette 使用 `eval=frame`，对 hue/HSL 使用 FFmpeg `hue` 的帧表达式逐帧执行；RGB 曲线和三向色轮参数当前保持静态并在渲染报告中标记为近似，不得静默伪装成逐帧效果。
 
-本地效果的规范 ID、别名、FFmpeg 后端和参数范围以 CLI `effects list`/`effects inspect` 的目录版本 `0.2.0` 为准。目录当前包含 41 项 `source=ffmpeg-local` 效果，新增原生滤镜包括 `exposure`、`color_levels`、`curves`、`hqdn3d`、`smartblur`、`avgblur`、`tmix`、`tblend`、`lens_correction`、`draw_box`、`color_contrast`、`solarize`、`threshold`、`deflicker` 和 `dctdnoiz`。参数必须使用目录声明的类型和范围；`curves` 的 `all/master` 只允许空格分隔的 `0..1` 范围 `x/y` 点，`draw_box.color` 只允许安全颜色 token。未知效果仍在验证或渲染阶段进入 `RENDER_FEATURE_UNSUPPORTED`，本地目录不引入网络、插件下载或闭源运行时。
+本地效果的规范 ID、别名、FFmpeg 后端和参数范围以 CLI `effects list`/`effects inspect` 的目录版本 `0.3.0` 为准。目录当前包含 44 项 `source=ffmpeg-local` 效果，新增原生滤镜包括 `hsl`、`rgb_curves`、`color_wheel`、`exposure`、`color_levels`、`curves`、`hqdn3d`、`smartblur`、`avgblur`、`tmix`、`tblend`、`lens_correction`、`draw_box`、`color_contrast`、`solarize`、`threshold`、`deflicker` 和 `dctdnoiz`。参数必须使用目录声明的类型和范围；`curves`/`rgb_curves` 的通道曲线只允许空格分隔的 `0..1` 范围 `x/y` 点，`color_wheel` 三向通道值限制为 `-1..1`，`draw_box.color` 只允许安全颜色 token。未知效果仍在验证或渲染阶段进入 `RENDER_FEATURE_UNSUPPORTED`，本地目录不引入网络、插件下载或闭源运行时。
 
 本地 FFmpeg 转场目录通过 `crossfade`/`dissolve`、方向 `wipe`/`slide` 和 `circlecrop`、`radial`、`pixelize`、`zoomin`、`cover*`、`reveal*`、`slice`、`wind`、`blur`、`fadeblack` 等 xfade 类型执行。复杂转场默认需要相邻片段的重叠句柄；若两个片段严格相邻，可在转场对象中设置 `auto_handle: true` 或 `handle_policy: "auto"`，由本地渲染器执行并保持原时长，尾部最后一帧填充会写入 `RENDER_FEATURE_APPROXIMATE`。其他缺少句柄的情况保留项目并返回结构化近似/不支持警告。
 

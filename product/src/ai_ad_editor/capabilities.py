@@ -83,15 +83,15 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "effects": {
                 "status": "implemented",
-                "features": ["grayscale", "sepia", "blur", "boxblur", "sharpen", "brightness", "contrast", "saturation", "hue", "gamma", "color_temperature", "color_balance", "vignette", "noise", "invert", "posterize", "edgedetect", "deband", "deshake", "histeq", "gradfun", "chroma_key", "hflip", "vflip", "exposure", "color_levels", "curves", "hqdn3d", "smartblur", "avgblur", "tmix", "tblend", "lens_correction", "draw_box", "color_contrast", "solarize", "threshold", "deflicker", "dctdnoiz", "effect_catalog_cli", "effect_parameter_keyframes", "sequence_adjustments", "interval_adjustments", "lut3d_project_local", "lut3d_static_intensity"],
+                "features": ["grayscale", "sepia", "blur", "boxblur", "sharpen", "brightness", "contrast", "saturation", "hue", "hsl", "gamma", "color_temperature", "color_balance", "color_wheel", "rgb_curves", "vignette", "noise", "invert", "posterize", "edgedetect", "deband", "deshake", "histeq", "gradfun", "chroma_key", "hflip", "vflip", "exposure", "color_levels", "curves", "hqdn3d", "smartblur", "avgblur", "tmix", "tblend", "lens_correction", "draw_box", "color_contrast", "solarize", "threshold", "deflicker", "dctdnoiz", "effect_catalog_cli", "effect_parameter_keyframes", "sequence_adjustments", "interval_adjustments", "lut3d_project_local", "lut3d_static_intensity"],
                 "catalog_version": EFFECT_CATALOG_VERSION,
                 "catalog_features": local_effect_ids,
                 "catalog_source": local_effects["source"],
                 "catalog_contract": "effects.list_and_effects.inspect_return_local_ffmpeg_backend_parameter_limits_and_keyframe_contract",
                 "unknown_effect_policy": "RENDER_FEATURE_UNSUPPORTED",
-                "effect_keyframe_contract": "brightness_contrast_saturation_hue_gamma_vignette_use_local_eq_hue_vignette_eval_frame",
+                "effect_keyframe_contract": "brightness_contrast_saturation_hue_hsl_gamma_vignette_use_local_eq_eval_frame_and_hue_frame_expressions",
                 "adjustment_contract": "settings.adjustments_are_applied_after_track_compositing_in_declared_order; start_tick_and_duration_tick_define_optional_sequence_clock_intervals",
-                "limits": ["unsupported_effect_parameters_use_static_value_with_warning", "new_native_filters_are_static_only_and_warn_on_parameter_keyframes", "curves_accept_one_whitelist_validated_all_master_curve", "interval_adjustments_are_video_only_and_reassembled_with_trim_concat", "lut_intensity_requires_project_local_cube_for_partial_strength"],
+                "limits": ["unsupported_effect_parameters_use_static_value_with_warning", "new_native_filters_are_static_only_and_warn_on_parameter_keyframes", "hsl_lightness_maps_to_ffmpeg_hue_brightness", "rgb_curves_are_static_and_channel_whitelist_validated", "color_wheel_maps_to_ffmpeg_colorbalance_three_way_wheel", "curves_accept_one_whitelist_validated_all_master_curve", "interval_adjustments_are_video_only_and_reassembled_with_trim_concat", "lut_intensity_requires_project_local_cube_for_partial_strength"],
             },
             "compositing": {
                 "status": "implemented",

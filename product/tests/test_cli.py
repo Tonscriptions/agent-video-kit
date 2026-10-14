@@ -857,8 +857,14 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("hable", manifest["capabilities"]["output"]["tone_mapping"])
         self.assertIn("local_flite_tts", manifest["capabilities"]["ai"]["features"])
         self.assertIn("local_ad_plan_apply", manifest["capabilities"]["ai"]["features"])
-        self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.2.0")
+        self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.3.0")
         self.assertIn("exposure", manifest["capabilities"]["effects"]["catalog_features"])
+        self.assertIn("hsl", manifest["capabilities"]["effects"]["catalog_features"])
+        self.assertIn("rgb_curves", manifest["capabilities"]["effects"]["catalog_features"])
+        self.assertIn("color_wheel", manifest["capabilities"]["effects"]["catalog_features"])
+        self.assertIn("hsl", manifest["capabilities"]["effects"]["features"])
+        self.assertIn("rgb_curves", manifest["capabilities"]["effects"]["features"])
+        self.assertIn("color_wheel", manifest["capabilities"]["effects"]["features"])
         self.assertIn("effect_catalog_cli", manifest["capabilities"]["effects"]["features"])
         self.assertIn("deterministic_token_search", manifest["capabilities"]["library"]["features"])
         self.assertIn("incremental_stat_refresh", manifest["capabilities"]["library"]["features"])
@@ -882,12 +888,25 @@ class P0CliTests(unittest.TestCase):
         effect_ids = {item["id"] for item in result["data"]["effects"]}
         self.assertIn("color_levels", effect_ids)
         self.assertIn("color_contrast", effect_ids)
+        self.assertIn("hsl", effect_ids)
+        self.assertIn("rgb_curves", effect_ids)
+        self.assertIn("color_wheel", effect_ids)
+
+        code, catalog = invoke("effects", "list")
+        self.assertEqual(code, 0, catalog)
+        self.assertEqual(catalog["data"]["catalog_version"], "0.3.0")
+        self.assertEqual(catalog["data"]["count"], 44)
 
         code, inspected = invoke("effects", "inspect", "--name", "levels")
         self.assertEqual(code, 0, inspected)
         self.assertEqual(inspected["data"]["effect"]["id"], "color_levels")
         self.assertEqual(inspected["data"]["effect"]["backend"], "ffmpeg:colorlevels")
         self.assertIn("input_black", inspected["data"]["effect"]["parameters"])
+
+        code, hsl = invoke("effects", "inspect", "--name", "hsl-adjust")
+        self.assertEqual(code, 0, hsl)
+        self.assertTrue(hsl["data"]["effect"]["keyframable"])
+        self.assertIn("lightness", hsl["data"]["effect"]["parameters"])
 
         code, rejected = invoke("effects", "inspect", "--name", "remote-effect")
         self.assertEqual(code, 2)
@@ -960,13 +979,14 @@ class P0CliTests(unittest.TestCase):
         warnings = []
         filters = _effect_filters([
             {"type": "curves", "all": "0/0,format=yuv420p"},
+            {"type": "rgb_curves", "red": "0/0,format=yuv420p"},
             {"type": "draw_box", "color": "white@0.8:format=yuv420p"},
             {"type": "tblend", "mode": "average:format=yuv420p"},
         ], warnings, "clip_security")
         self.assertEqual(len(filters), 2)
         self.assertIn("drawbox=", filters[0])
         self.assertEqual(filters[1], "tblend=all_mode=average")
-        self.assertEqual([item["code"] for item in warnings], ["EFFECT_PARAMETER_INVALID", "EFFECT_PARAMETER_INVALID", "EFFECT_PARAMETER_INVALID"])
+        self.assertEqual([item["code"] for item in warnings], ["EFFECT_PARAMETER_INVALID"] * 4)
 
     def test_project_lut_library_registers_and_resolves_lut_id(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-lut-library-") as raw:
@@ -1665,6 +1685,9 @@ class P0CliTests(unittest.TestCase):
                     {"type": "exposure", "amount": 0.15},
                     {"type": "color_levels", "input_black": 0.02, "output_white": 0.96},
                     {"type": "curves", "all": "0/0 0.5/0.45 1/1"},
+                    {"type": "hsl", "hue": 12, "saturation": 1.1, "lightness": 0.05},
+                    {"type": "rgb_curves", "all": "0/0 1/1", "red": "0/0 0.5/0.6 1/1", "green": "0/0 1/1", "blue": "0/0 0.45/0.4 1/1"},
+                    {"type": "color_wheel", "shadows_red": 0.05, "midtones_blue": -0.04, "highlights_green": 0.03, "preserve_luma": True},
                     {"type": "hqdn3d", "luma_spatial": 2.0},
                     {"type": "smartblur", "radius": 0.6, "strength": 0.4},
                     {"type": "avgblur", "size_x": 1, "size_y": 1},
@@ -1685,6 +1708,8 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 0, planned)
             self.assertIn("exposure=", planned["data"]["plan"]["filter_complex"])
             self.assertIn("curves=all=", planned["data"]["plan"]["filter_complex"])
+            self.assertIn("hue=h=", planned["data"]["plan"]["filter_complex"])
+            self.assertIn("colorbalance=rs=", planned["data"]["plan"]["filter_complex"])
             self.assertNotIn("RENDER_FEATURE_UNSUPPORTED", {item.get("code") for item in planned["data"]["plan"]["warnings"]})
             code, rendered = invoke("render", "--project", str(project), "--output", str(output))
             self.assertEqual(code, 0, rendered)
@@ -1714,6 +1739,12 @@ class P0CliTests(unittest.TestCase):
                         {"at_tick": 0, "value": 0.0, "interpolation": "linear"},
                         {"at_tick": 90000, "value": 0.7, "interpolation": "ease_in_out"},
                     ]}],
+                }, {
+                    "type": "hsl", "parameters": {"hue": 0.0, "saturation": 1.0, "lightness": 0.0},
+                    "keyframes": [{"property": "saturation", "keyframes": [
+                        {"at_tick": 0, "value": 1.0, "interpolation": "linear"},
+                        {"at_tick": 90000, "value": 1.25, "interpolation": "linear"},
+                    ]}],
                 }],
             }]}), encoding="utf-8")
             self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
@@ -1722,6 +1753,8 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 0, planned)
             graph = planned["data"]["plan"]["filter_complex"]
             self.assertIn("eq=brightness='", graph)
+            self.assertIn("hue=h=", graph)
+            self.assertIn(":s='", graph)
             self.assertIn(":eval=frame", graph)
             self.assertEqual(planned["data"]["plan"]["warnings"], [])
             code, rendered = invoke("render", "--project", str(project), "--output", str(output))

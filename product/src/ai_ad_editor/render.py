@@ -1565,11 +1565,30 @@ def _effect_filters(
             hue_value = _num(parameters.get("degrees", parameters.get("angle", 0)), 0)
             hue_aliases = ("degrees", "angle", "hue", "value")
             if has_track(hue_aliases):
-                filters.append(f"hue=h={_expr_arg(expression(hue_aliases, hue_value))}:eval=frame")
+                filters.append(f"hue=h={_expr_arg(expression(hue_aliases, hue_value))}")
             else:
                 if effect_tracks:
                     warn_unsupported_tracks()
                 filters.append(f"hue=h={hue_value:.6f}")
+        elif name in {"hsl", "hsl_adjust"}:
+            hue_value = max(-360.0, min(360.0, _num(parameters.get("hue", parameters.get("degrees", 0)), 0)))
+            saturation_value = max(0.0, min(4.0, _num(parameters.get("saturation", 1), 1)))
+            lightness_value = max(-1.0, min(1.0, _num(parameters.get("lightness", parameters.get("brightness", 0)), 0)))
+            hue_aliases = ("hue", "degrees", "angle", "value")
+            saturation_aliases = ("saturation", "value")
+            lightness_aliases = ("lightness", "brightness", "value")
+            if effect_tracks and any(has_track(aliases) for aliases in (hue_aliases, saturation_aliases, lightness_aliases)):
+                hue_expr = expression(hue_aliases, hue_value)
+                saturation_expr = expression(saturation_aliases, saturation_value)
+                lightness_expr = expression(lightness_aliases, lightness_value)
+                filters.append(
+                    f"hue=h={_expr_arg(str(hue_expr))}:s={_expr_arg(str(saturation_expr))}:"
+                    f"b={_expr_arg(str(lightness_expr))}"
+                )
+            else:
+                if effect_tracks:
+                    warn_unsupported_tracks()
+                filters.append(f"hue=h={hue_value:.6f}:s={saturation_value:.6f}:b={lightness_value:.6f}")
         elif name in {"gamma", "gamma_adjust"}:
             gamma_value = max(0.1, min(10.0, _num(parameters.get("gamma", parameters.get("amount", 1)), 1)))
             gamma_aliases = ("gamma", "amount", "value")
@@ -1588,6 +1607,23 @@ def _effect_filters(
             green = max(-1.0, min(1.0, _num(parameters.get("green", parameters.get("gs", 0)), 0)))
             blue = max(-1.0, min(1.0, _num(parameters.get("blue", parameters.get("bs", 0)), 0)))
             filters.append(f"colorbalance=rs={red:.6f}:gs={green:.6f}:bs={blue:.6f}")
+        elif name in {"color_wheel", "three_way_color", "three_way_wheel"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
+            shadows = [max(-1.0, min(1.0, _num(parameters.get(f"shadows_{channel}", 0), 0))) for channel in ("red", "green", "blue")]
+            midtones = [max(-1.0, min(1.0, _num(parameters.get(f"midtones_{channel}", 0), 0))) for channel in ("red", "green", "blue")]
+            highlights = [max(-1.0, min(1.0, _num(parameters.get(f"highlights_{channel}", 0), 0))) for channel in ("red", "green", "blue")]
+            preserve_raw = parameters.get("preserve_luma", parameters.get("pl", False))
+            if isinstance(preserve_raw, bool):
+                preserve = preserve_raw
+            else:
+                preserve = str(preserve_raw).strip().lower() in {"1", "true", "yes", "on", "lum"}
+            filters.append(
+                "colorbalance="
+                f"rs={shadows[0]:.6f}:gs={shadows[1]:.6f}:bs={shadows[2]:.6f}:"
+                f"rm={midtones[0]:.6f}:gm={midtones[1]:.6f}:bm={midtones[2]:.6f}:"
+                f"rh={highlights[0]:.6f}:gh={highlights[1]:.6f}:bh={highlights[2]:.6f}:pl={int(preserve)}"
+            )
         elif name == "exposure":
             if effect_tracks:
                 warn_unsupported_tracks()
@@ -1631,6 +1667,39 @@ def _effect_filters(
                 invalid_parameter("curves all/master 必须是由 0..1 范围 x/y 点组成的空格分隔字符串")
             else:
                 filters.append(f"curves=all={_expr_arg(curve_spec)}")
+        elif name in {"rgb_curves", "rgb_curve", "channel_curves"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
+
+            def valid_curve(value: str) -> bool:
+                tokens = value.split()
+                return bool(tokens) and all(
+                    len(token.split("/")) == 2
+                    and all(0.0 <= _num(part, -1.0) <= 1.0 for part in token.split("/"))
+                    and re.fullmatch(r"[0-9eE+./-]+", token) is not None
+                    for token in tokens
+                )
+
+            curve_specs: list[tuple[str, str]] = []
+            curve_invalid = False
+            for parameter_name, option_name in (
+                ("all", "all"),
+                ("red", "red"),
+                ("green", "green"),
+                ("blue", "blue"),
+            ):
+                if parameter_name not in parameters:
+                    continue
+                raw_curve = str(parameters.get(parameter_name, "")).strip()
+                if not raw_curve:
+                    continue
+                if not valid_curve(raw_curve):
+                    invalid_parameter(f"rgb_curves {parameter_name} 必须是由 0..1 范围 x/y 点组成的空格分隔字符串")
+                    curve_invalid = True
+                    continue
+                curve_specs.append((option_name, raw_curve))
+            if curve_specs and not curve_invalid:
+                filters.append("curves=" + ":".join(f"{option}={_expr_arg(value)}" for option, value in curve_specs))
         elif name in {"color_contrast", "colorcontrast"}:
             if effect_tracks:
                 warn_unsupported_tracks()

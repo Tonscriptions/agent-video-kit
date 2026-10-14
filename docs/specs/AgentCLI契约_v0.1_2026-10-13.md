@@ -166,9 +166,9 @@ python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --p
 
 ### 6.2 本地效果目录与渲染契约
 
-Agent 在生成项目 JSON 或变更集前应先调用 `effects list`，需要精确参数时调用 `effects inspect --name NAME`。当前目录版本为 `0.2.0`，记录 41 项由本机 FFmpeg 提供的效果；每项至少包含 `id`、`aliases`、`category`、`backend`、`source=ffmpeg-local`、`keyframable`、`parameters` 和 `limits`。目录不会下载滤镜包，也不会访问网络。
+Agent 在生成项目 JSON 或变更集前应先调用 `effects list`，需要精确参数时调用 `effects inspect --name NAME`。当前目录版本为 `0.3.0`，记录 44 项由本机 FFmpeg 提供的效果，包括 HSL、RGB 曲线和三向色轮；每项至少包含 `id`、`aliases`、`category`、`backend`、`source=ffmpeg-local`、`keyframable`、`parameters` 和 `limits`。目录不会下载滤镜包，也不会访问网络。
 
-`brightness`、`contrast`、`saturation`、`hue`、`gamma` 和 `vignette` 允许效果参数使用 `eval=frame` 关键帧。曝光、色阶、曲线、降噪、时域混合、镜头校正、框线、色彩对比、去闪烁和 DCT 降噪等新增原生滤镜当前以静态参数执行；项目可以保留这些效果的关键帧，但渲染会写入 `RENDER_FEATURE_APPROXIMATE`，不得把静态回退描述成逐帧等效。每项还返回 `license=inherit-local-ffmpeg-build`，发布时仍需按实际 FFmpeg 构建核对许可证和 notice。曲线只接受白名单校验后的 `0..1` 范围 `x/y` 点字符串，框线颜色只接受安全的 FFmpeg 颜色 token，非法值返回 `EFFECT_PARAMETER_INVALID`，对应滤镜会跳过或回退到安全默认值。
+`brightness`、`contrast`、`saturation`、`gamma` 和 `vignette` 允许效果参数使用 `eval=frame` 关键帧，`hue`/`hsl` 使用 FFmpeg `hue` 的帧表达式（该滤镜没有 `eval` 选项）。曝光、色阶、RGB 曲线、三向色轮、降噪、时域混合、镜头校正、框线、色彩对比、去闪烁和 DCT 降噪等新增原生滤镜当前以静态参数执行；项目可以保留这些效果的关键帧，但渲染会写入 `RENDER_FEATURE_APPROXIMATE`，不得把静态回退描述成逐帧等效。每项还返回 `license=inherit-local-ffmpeg-build`，发布时仍需按实际 FFmpeg 构建核对许可证和 notice。曲线只接受白名单校验后的 `0..1` 范围 `x/y` 点字符串，框线颜色只接受安全的 FFmpeg 颜色 token，非法值返回 `EFFECT_PARAMETER_INVALID`，对应滤镜会跳过或回退到安全默认值。
 
 示例：
 
