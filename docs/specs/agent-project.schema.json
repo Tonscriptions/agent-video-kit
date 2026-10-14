@@ -198,7 +198,7 @@
             "audio_mode": {"type": "string", "enum": ["silence", "continue"]}
           }
         },
-        "transform": {"type": "object"},
+        "transform": {"$ref": "#/$defs/transform"},
         "keyframes": {"type": "array", "items": {"$ref": "#/$defs/keyframeTrack"}},
         "effects": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/$defs/effect"}]}},
         "transition_in": {"$ref": "#/$defs/transition"},
@@ -315,6 +315,33 @@
         "fit": {"type": "string", "enum": ["fit", "fill", "stretch"]},
         "mode": {"type": "string", "enum": ["fit", "fill", "stretch"]},
         "keyframes": {"type": "array", "items": {"$ref": "#/$defs/keyframeTrack"}}
+      }
+    },
+    "transform": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "position": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "x": {"type": "number"},
+            "y": {"type": "number"}
+          }
+        },
+        "anchor": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "x": {"type": "number", "minimum": 0, "maximum": 1},
+            "y": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        "anchor_x": {"type": "number", "minimum": 0, "maximum": 1},
+        "anchor_y": {"type": "number", "minimum": 0, "maximum": 1},
+        "scale": {"type": "number"},
+        "rotation": {"type": "number"},
+        "opacity": {"type": "number", "minimum": 0, "maximum": 1}
       }
     },
     "keyframeTrack": {

@@ -852,12 +852,15 @@ def _reverse_keyframe_controls(keyframe: dict[str, Any]) -> None:
 def _transform_exprs(clip: dict[str, Any], start: float, tps: int) -> dict[str, str]:
     transform = clip.get("transform") if isinstance(clip.get("transform"), dict) else {}
     position = transform.get("position") if isinstance(transform.get("position"), dict) else {}
+    anchor = transform.get("anchor") if isinstance(transform.get("anchor"), dict) else {}
     child_exprs = {
         "scale": _keyframe_expr(clip, ("transform.scale", "scale"), _num(transform.get("scale", 1.0), 1.0), start, tps),
         "rotation": _keyframe_expr(clip, ("transform.rotation", "rotation"), _num(transform.get("rotation", 0.0), 0.0), start, tps),
         "opacity": _keyframe_expr(clip, ("transform.opacity", "opacity"), _num(transform.get("opacity", 1.0), 1.0), start, tps, time_variable="T"),
         "position_x": _keyframe_expr(clip, ("transform.position.x", "position.x", "position_x"), _num(position.get("x", transform.get("position_x", 0.5)), 0.5), start, tps),
         "position_y": _keyframe_expr(clip, ("transform.position.y", "position.y", "position_y"), _num(position.get("y", transform.get("position_y", 0.5)), 0.5), start, tps),
+        "anchor_x": _keyframe_expr(clip, ("transform.anchor.x", "anchor.x", "anchor_x"), _num(anchor.get("x", transform.get("anchor_x", 0.5)), 0.5), start, tps),
+        "anchor_y": _keyframe_expr(clip, ("transform.anchor.y", "anchor.y", "anchor_y"), _num(anchor.get("y", transform.get("anchor_y", 0.5)), 0.5), start, tps),
     }
     raw_layers = clip.get("_nested_parent_transforms")
     layers: list[dict[str, Any]] = []
@@ -904,6 +907,8 @@ def _transform_exprs(clip: dict[str, Any], start: float, tps: int) -> dict[str, 
             "opacity": f"clip(({parent_opacity})*({result['opacity']}),0,1)",
             "position_x": f"({parent_x})+({child_dx})*cos({angle})-({child_dy})*sin({angle})",
             "position_y": f"({parent_y})+({child_dx})*sin({angle})+({child_dy})*cos({angle})",
+            "anchor_x": result["anchor_x"],
+            "anchor_y": result["anchor_y"],
         }
     return result
 
@@ -1834,12 +1839,15 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
     def transform_values(raw: Any) -> dict[str, float]:
         value = raw if isinstance(raw, dict) else {}
         position = value.get("position") if isinstance(value.get("position"), dict) else {}
+        anchor = value.get("anchor") if isinstance(value.get("anchor"), dict) else {}
         return {
             "x": _num(position.get("x", value.get("position_x", 0.5)), 0.5),
             "y": _num(position.get("y", value.get("position_y", 0.5)), 0.5),
             "scale": _num(value.get("scale", 1.0), 1.0),
             "rotation": _num(value.get("rotation", 0.0), 0.0),
             "opacity": _num(value.get("opacity", 1.0), 1.0),
+            "anchor_x": _num(anchor.get("x", value.get("anchor_x", 0.5)), 0.5),
+            "anchor_y": _num(anchor.get("y", value.get("anchor_y", 0.5)), 0.5),
         }
 
     def combine_transforms(parent: Any, child: Any) -> dict[str, Any] | None:
@@ -1860,6 +1868,9 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
             "scale": outer["scale"] * inner["scale"],
             "rotation": outer["rotation"] + inner["rotation"],
             "opacity": max(0.0, min(1.0, outer["opacity"] * inner["opacity"])),
+            # Anchor is a leaf-layer placement reference. Parent pivot
+            # composition remains explicit in the capability limitations.
+            "anchor": {"x": inner["anchor_x"], "y": inner["anchor_y"]},
         }
 
     def transform_keyframe_tracks(clip: dict[str, Any]) -> list[dict[str, Any]]:
@@ -1867,7 +1878,8 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
             "transform.position.x", "position.x", "position_x",
             "transform.position.y", "position.y", "position_y",
             "transform.scale", "scale", "transform.rotation", "rotation",
-            "transform.opacity", "opacity",
+            "transform.opacity", "opacity", "transform.anchor.x", "anchor.x", "anchor_x",
+            "transform.anchor.y", "anchor.y", "anchor_y",
         }
         return [
             copy.deepcopy(item)
@@ -1882,6 +1894,12 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
         clip_blend = clip.get("blend") if isinstance(clip.get("blend"), dict) else None
         clip_transform_tracks = transform_keyframe_tracks(clip)
         inherited_layers = parent.get("dynamic_layers") if isinstance(parent.get("dynamic_layers"), list) else []
+        parent_transform = parent.get("transform") if isinstance(parent.get("transform"), dict) else None
+        parent_anchor = parent_transform.get("anchor") if isinstance(parent_transform, dict) and isinstance(parent_transform.get("anchor"), dict) else {}
+        parent_anchor_x = _num(parent_anchor.get("x", parent_transform.get("anchor_x", 0.5) if isinstance(parent_transform, dict) else 0.5), 0.5)
+        parent_anchor_y = _num(parent_anchor.get("y", parent_transform.get("anchor_y", 0.5) if isinstance(parent_transform, dict) else 0.5), 0.5)
+        if abs(parent_anchor_x - 0.5) > 1e-9 or abs(parent_anchor_y - 0.5) > 1e-9:
+            warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip.get("id"), "feature": "nested_sequence_parent_anchor", "message": "嵌套序列父级 anchor 目前按叶片放置参考点近似，父级枢轴不会改变子层旋转中心"})
         if not inherited_layers and parent.get("dynamic_transform") and isinstance(parent.get("transform"), dict):
             inherited_layers = [{"transform": copy.deepcopy(parent["transform"]), "tracks": copy.deepcopy(parent.get("transform_keyframes", [])), "clock": "global"}]
         has_clip_transform = isinstance(clip_transform, dict) and bool(clip_transform)
@@ -1933,7 +1951,7 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                     property_name = str(track.get("property", ""))
                     if property_name.startswith("transform."):
                         property_name = f"{prefix}.{property_name[len('transform.') :]}"
-                    elif property_name in {"position.x", "position.y", "position_x", "position_y", "scale", "rotation", "opacity"}:
+                    elif property_name in {"position.x", "position.y", "position_x", "position_y", "scale", "rotation", "opacity", "anchor.x", "anchor.y", "anchor_x", "anchor_y"}:
                         property_name = f"{prefix}.{property_name}"
                     else:
                         continue
@@ -2301,8 +2319,8 @@ def _build_subtitle_layer(
     outgoing = clip_value.get("transition_out") if isinstance(clip_value.get("transition_out"), dict) else {}
     transition_opacity = "1.00000000"
     wipe_alpha = "1.00000000"
-    position_x_expr = f"({transform['position_x']})*W-w/2"
-    position_y_expr = f"({transform['position_y']})*H-h/2"
+    position_x_expr = f"({transform['position_x']})*W-w*({transform['anchor_x']})"
+    position_y_expr = f"({transform['position_y']})*H-h*({transform['anchor_y']})"
     unsupported_transitions: list[str] = []
 
     def _spatial_transition(raw_type: str, config: dict[str, Any]) -> tuple[str, str] | None:
@@ -2744,8 +2762,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     chain.append(f"fade=t=out:st={max(0.0, clip_content_duration + freeze_extra-fade_duration):.6f}:d={fade_duration:.6f}")
                 filters.append(",".join(chain) + f"[{label}]")
                 video_labels.append(label)
-                position_x_expr = _expr_arg("(" + transforms["position_x"] + ")*W-w/2")
-                position_y_expr = _expr_arg("(" + transforms["position_y"] + ")*H-h/2")
+                position_x_expr = _expr_arg("(" + transforms["position_x"] + ")*W-w*(" + transforms["anchor_x"] + ")")
+                position_y_expr = _expr_arg("(" + transforms["position_y"] + ")*H-h*(" + transforms["anchor_y"] + ")")
                 position = f"x={position_x_expr}:y={position_y_expr}"
                 video_positions.append(position)
                 video_specs.append({

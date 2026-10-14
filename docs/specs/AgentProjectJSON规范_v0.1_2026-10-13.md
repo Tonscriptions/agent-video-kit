@@ -55,8 +55,8 @@
 1. 内部时间 MUST 使用整数 tick。推荐 `ticks_per_second = 90000`；项目可以选择其他值，但全项目只能有一个时间基准。
 2. `start_tick`、`duration_tick`、`source_in_tick` 和 `source_out_tick` MUST 为非负整数；`duration_tick` 必须大于 0，除非对象明确允许零时长标记。
 3. 显示用帧率允许分数，例如 30000/1001。帧号、时间码和浮点秒数只能作为输入输出表示，不能参与核心比较。
-4. 画布坐标使用左上角原点，归一化值范围为 0 到 1；旋转单位为角度，缩放 1.0 表示原始大小。
-5. 所有变换必须声明作用顺序。默认顺序为 anchor → scale → rotation → translation → crop → opacity。
+4. 画布坐标使用左上角原点，归一化值范围为 0 到 1；旋转单位为角度，缩放 1.0 表示原始大小。`transform.anchor.x/y` 是图层在自身边界内的归一化锚点，默认 `(0.5, 0.5)`；`(0, 0)` 表示左上角，位置关键帧会把该点放到 `transform.position`。
+5. 所有变换必须声明作用顺序。默认顺序为 anchor → scale → rotation → translation → crop → opacity。当前本地 FFmpeg 后端对叶片图层执行锚点定位，嵌套父级枢轴仍按叶片放置近似并在能力清单中声明。
 
 ## 4. 资产对象
 
@@ -87,7 +87,7 @@
 | `muted`、`locked` | 编排和渲染行为 |
 | `clips[]` | 片段、生成层或嵌套序列引用 |
 
-片段至少包含 `id`、`asset_id` 或 `sequence_id`、`timeline_start_tick`、`duration_tick`、`source_in_tick`、`source_out_tick`。可选 `crop` 使用 `pixels`/`normalized`/`relative` 单位和 `fit`/`fill`/`stretch` 模式；其坐标与尺寸必须是有限非负数，归一化值不得超过 1。`crop.keyframes` 可以驱动 `x`/`y`/`width`/`height`，或在片段级关键帧中使用 `crop.x`/`crop.y`/`crop.width`/`crop.height`；动态尺寸使用 CPU `geq` 固定画布逆向采样保持输出帧尺寸稳定，并以 `fit`/`fill`/`stretch` 规则计算窗口，宽高关键帧仍必须大于 0。必须满足：
+片段至少包含 `id`、`asset_id` 或 `sequence_id`、`timeline_start_tick`、`duration_tick`、`source_in_tick`、`source_out_tick`。可选 `transform.anchor` 使用归一化 `x/y`，也可使用 `anchor_x/anchor_y` 别名；`transform.anchor.x/y` 关键帧可以写在片段 `keyframes[]` 中。可选 `crop` 使用 `pixels`/`normalized`/`relative` 单位和 `fit`/`fill`/`stretch` 模式；其坐标与尺寸必须是有限非负数，归一化值不得超过 1。`crop.keyframes` 可以驱动 `x`/`y`/`width`/`height`，或在片段级关键帧中使用 `crop.x`/`crop.y`/`crop.width`/`crop.height`；动态尺寸使用 CPU `geq` 固定画布逆向采样保持输出帧尺寸稳定，并以 `fit`/`fill`/`stretch` 规则计算窗口，宽高关键帧仍必须大于 0。必须满足：
 
 - 源出点大于源入点，且不能超过资产可用时长；
 - 同一轨道中片段重叠必须显式声明 `overlap_policy`，不能依赖数组顺序猜测；
@@ -109,6 +109,8 @@
   "default_value": 0.5
 }
 ```
+
+锚点关键帧使用同一片段时钟，例如 `transform.anchor.x` 或 `transform.anchor.y`；值必须位于 `0..1`。锚点改变的是叠加定位参考点，旋转仍由本地 FFmpeg 在图层中心执行；需要嵌套父级枢轴的项目必须读取渲染 manifest 的近似警告。
 
 `at_tick` 是片段内时间，不能混用源媒体时间和序列时间。允许的插值包括 `hold`、`linear`、`ease_in`、`ease_out`、`ease_in_out` 和 `bezier`。Bezier 必须携带有限数字控制点：`[y1, y2]` 表示两个纵向控制值，或 `[x1, y1, x2, y2]` 表示归一化 cubic 控制点，其中 `x1/x2` 必须位于 `0..1`；参数错误必须在写入或渲染前拒绝。
 

@@ -54,8 +54,8 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "timeline": {
                 "status": "implemented",
-                "features": ["multi_track", "append", "update", "remove", "split", "ripple_insert", "ripple_delete", "slip", "slide", "speed", "speed_curve", "speed_curve_reverse_reflection", "reverse", "freeze_frame", "crop", "crop_position_keyframes", "crop_size_keyframes", "nested_sequences", "nested_reverse", "nested_reverse_parent_bezier_keyframes", "nested_parent_keyframe_layers", "markers"],
-                "limits": ["dynamic_crop_uses_fixed_canvas_inverse_sampling", "dynamic_crop_inverse_sampler_is_cpu_geq", "nested_static_transform_effects_blend_are_flattened", "nested_multiple_masks_use_sequential_alpha_with_coordinate_approximation", "nested_reverse_static_clips_preserve_temporal_order", "nested_reverse_leaf_keyframes_under_nonlinear_speed_are_piecewise_approximate", "nested_speed_curve_uses_analytic_boundary_mapping_and_leaf_average_speed", "audio_speed_curve_uses_piecewise_atempo_and_can_have_segment_boundaries"],
+                "features": ["multi_track", "append", "update", "remove", "split", "ripple_insert", "ripple_delete", "slip", "slide", "speed", "speed_curve", "speed_curve_reverse_reflection", "reverse", "freeze_frame", "crop", "crop_position_keyframes", "crop_size_keyframes", "transform_anchor", "nested_sequences", "nested_reverse", "nested_reverse_parent_bezier_keyframes", "nested_parent_keyframe_layers", "markers"],
+                "limits": ["dynamic_crop_uses_fixed_canvas_inverse_sampling", "dynamic_crop_inverse_sampler_is_cpu_geq", "nested_static_transform_effects_blend_are_flattened", "nested_multiple_masks_use_sequential_alpha_with_coordinate_approximation", "nested_reverse_static_clips_preserve_temporal_order", "nested_reverse_leaf_keyframes_under_nonlinear_speed_are_piecewise_approximate", "nested_speed_curve_uses_analytic_boundary_mapping_and_leaf_average_speed", "nested_parent_anchor_pivot_is_leaf_placement_approximation", "audio_speed_curve_uses_piecewise_atempo_and_can_have_segment_boundaries"],
             },
             "templates": {
                 "status": "implemented",
@@ -65,7 +65,7 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "keyframes": {
                 "status": "implemented",
-                "properties": ["transform.position.x", "transform.position.y", "transform.scale", "transform.rotation", "transform.opacity", "blend.opacity", "audio.volume", "audio.pan", "crop.x", "crop.y", "crop.width", "crop.height", "mask.x", "mask.y", "mask.width", "mask.height", "mask.cx", "mask.cy", "mask.radius", "mask.rx", "mask.ry", "mask.feather", "mask.points.<index>.x", "mask.points.<index>.y"],
+                "properties": ["transform.position.x", "transform.position.y", "transform.anchor.x", "transform.anchor.y", "transform.scale", "transform.rotation", "transform.opacity", "blend.opacity", "audio.volume", "audio.pan", "crop.x", "crop.y", "crop.width", "crop.height", "mask.x", "mask.y", "mask.width", "mask.height", "mask.cx", "mask.cy", "mask.radius", "mask.rx", "mask.ry", "mask.feather", "mask.points.<index>.x", "mask.points.<index>.y"],
                 "interpolation": ["hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"],
                 "bezier_control_points": {"forms": [["y1", "y2"], ["x1", "y1", "x2", "y2"]], "x_range": [0, 1], "execution": "normalized cubic easing sampled into a frame-evaluable FFmpeg expression"},
             },

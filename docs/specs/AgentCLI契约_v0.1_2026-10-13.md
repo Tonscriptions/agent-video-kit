@@ -127,6 +127,8 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 
 `transition_in`/`transition_out` 的 `type` 可使用本机 FFmpeg xfade 目录（包括 `crossfade`、`dissolve`、方向 `wipe`/`slide`、`circlecrop`、`radial`、`pixelize`、`zoomin`、`cover*`、`reveal*`、`slice`、`wind` 和 `blur`）。默认需要相邻片段的重叠句柄；对时间线上相邻、没有重叠的片段，可以显式设置 `auto_handle: true` 或 `handle_policy: "auto"`。CLI 会用本地 xfade 执行并保持原时间线长度，尾部使用最后一帧填充，同时在 render manifest 返回 `RENDER_FEATURE_APPROXIMATE`。其他无法匹配的转场不会静默伪造。
 
+图层变换支持 `transform.anchor.x/y` 或 `anchor_x/anchor_y`，取值为 `0..1`，默认 `(0.5,0.5)`；位置表达式会把该点放到 `transform.position`，同名片段关键帧可逐帧改变锚点。旋转仍在图层中心执行；嵌套父级枢轴按叶片放置近似，并在 render manifest 中保留警告。
+
 遮罩使用归一化参数。`rectangle/circle/ellipse` 支持几何标量、`invert`、`feather` 和 `mask.*` 关键帧；动态 feather 通过 alpha-only 软边表达式执行，范围为 `0..0.5`。`path/polygon` 可以使用固定点数 `points`，点坐标可以用 `points.0.x`、`points.0.y` 关键帧驱动；也可以使用静态 `segments`/`curve_segments`/`curves`，每段支持 `line` 或 `cubic`，cubic 的 `samples` 范围为 `2..16`，总采样点限制为 `3..32`，渲染器将曲线采样成固定多边形并以固定点边缘的内侧距离近似生成 alpha 软边。曲线段不能与 `points` 同时声明；曲线段本身暂不接受逐点动态关键帧。动态 feather 也可以用 `feather`/`mask.feather` 关键帧驱动。`transform.opacity`、正常层 `blend.opacity` 以及 RGB blend 的 `blend.opacity` 都可以用片段关键帧驱动；片段 `crop` 支持 `pixels`/`normalized` 单位和 `fit`/`fill`/`stretch` 模式，`crop.keyframes` 的 `x`/`y`/`width`/`height` 或片段级 `crop.x`/`crop.y`/`crop.width`/`crop.height` 可以逐帧移动和缩放裁切窗口；动态尺寸由 CPU `geq` 固定画布逆向采样保持输出帧尺寸稳定，宽高关键帧必须大于 0。非法点数、坐标、尺寸、时间或属性必须在写入前拒绝。静态嵌套父级 transform/effects/blend 会下推；多级父级动态 transform 关键帧按最终序列时钟合成，父级与子级多重 mask 会顺序合成 alpha，但不同坐标空间仍进入 `RENDER_FEATURE_APPROXIMATE`；reverse 下的关键帧插值同样保留近似警告。
 
 ## 6. 渲染、质量和进度

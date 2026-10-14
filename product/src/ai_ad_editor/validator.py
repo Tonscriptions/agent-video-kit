@@ -436,6 +436,41 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                         freeze_audio_mode = str(freeze.get("audio_mode", "silence")).lower()
                         if freeze_audio_mode not in {"silence", "continue"}:
                             error("FREEZE_AUDIO_MODE_INVALID", "freeze.audio_mode 只支持 silence 或 continue", f"{cp}.freeze.audio_mode")
+                transform = clip.get("transform")
+                if transform is not None:
+                    if not isinstance(transform, dict):
+                        error("TRANSFORM_INVALID", "transform 必须是对象", f"{cp}.transform")
+                    else:
+                        anchor = transform.get("anchor")
+                        if anchor is not None:
+                            if not isinstance(anchor, dict):
+                                error("TRANSFORM_ANCHOR_INVALID", "transform.anchor 必须是对象", f"{cp}.transform.anchor")
+                            else:
+                                for axis in ("x", "y"):
+                                    if axis not in anchor:
+                                        continue
+                                    raw_value = anchor.get(axis)
+                                    try:
+                                        value = float(raw_value)
+                                    except (TypeError, ValueError):
+                                        value = math.nan
+                                    if isinstance(raw_value, bool) or not math.isfinite(value):
+                                        error("TRANSFORM_ANCHOR_INVALID", "transform.anchor.x/y 必须是有限数字", f"{cp}.transform.anchor.{axis}")
+                                    elif not 0.0 <= value <= 1.0:
+                                        error("TRANSFORM_ANCHOR_RANGE", "transform.anchor.x/y 必须位于 0 到 1", f"{cp}.transform.anchor.{axis}")
+                        for axis in ("x", "y"):
+                            alias = f"anchor_{axis}"
+                            if alias not in transform:
+                                continue
+                            raw_value = transform.get(alias)
+                            try:
+                                value = float(raw_value)
+                            except (TypeError, ValueError):
+                                value = math.nan
+                            if isinstance(raw_value, bool) or not math.isfinite(value):
+                                error("TRANSFORM_ANCHOR_INVALID", f"transform.{alias} 必须是有限数字", f"{cp}.transform.{alias}")
+                            elif not 0.0 <= value <= 1.0:
+                                error("TRANSFORM_ANCHOR_RANGE", f"transform.{alias} 必须位于 0 到 1", f"{cp}.transform.{alias}")
                 crop = clip.get("crop")
                 clip_crop_tracks = [item for item in clip.get("keyframes", []) if isinstance(item, dict) and str(item.get("property", "")).startswith("crop.")]
                 if clip_crop_tracks and not isinstance(crop, dict):
@@ -624,6 +659,16 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                 error("PAN_KEYFRAME_INVALID", "声像关键帧 value 必须是有限数字", f"{cp}.keyframes")
                             elif not -1.0 <= pan_value <= 1.0:
                                 error("PAN_KEYFRAME_RANGE", "声像关键帧 value 必须位于 -1 到 1", f"{cp}.keyframes")
+                        if property_name in {"transform.anchor.x", "anchor.x", "anchor_x", "transform.anchor.y", "anchor.y", "anchor_y"}:
+                            value = keyframe.get("value")
+                            try:
+                                anchor_value = float(value)
+                            except (TypeError, ValueError):
+                                anchor_value = math.nan
+                            if isinstance(value, bool) or not math.isfinite(anchor_value):
+                                error("TRANSFORM_ANCHOR_KEYFRAME_INVALID", "锚点关键帧 value 必须是有限数字", f"{cp}.keyframes")
+                            elif not 0.0 <= anchor_value <= 1.0:
+                                error("TRANSFORM_ANCHOR_KEYFRAME_RANGE", "锚点关键帧 value 必须位于 0 到 1", f"{cp}.keyframes")
                         at = _int(keyframe.get("at_tick"), -1)
                         if at < previous or at > dur:
                             error("KEYFRAME_INVALID", "关键帧必须单调且位于片段内", f"{cp}.keyframes")

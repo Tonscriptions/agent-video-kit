@@ -792,6 +792,9 @@ class P0CliTests(unittest.TestCase):
         manifest = result["data"]
         self.assertEqual(manifest["engine"]["network"], "disabled")
         self.assertIn("bezier", manifest["capabilities"]["keyframes"]["interpolation"])
+        self.assertIn("transform.anchor.x", manifest["capabilities"]["keyframes"]["properties"])
+        self.assertIn("transform.anchor.y", manifest["capabilities"]["keyframes"]["properties"])
+        self.assertIn("transform_anchor", manifest["capabilities"]["timeline"]["features"])
         self.assertIn("crossfade", manifest["capabilities"]["transitions"]["features"])
         self.assertIn("safe_resume", manifest["capabilities"]["render"]["features"])
         self.assertIn("sequential_run", manifest["capabilities"]["queue"]["features"])
@@ -1350,6 +1353,46 @@ class P0CliTests(unittest.TestCase):
         self.assertAlmostEqual(samples[0], 2.0, delta=0.02)
         self.assertAlmostEqual(samples[-1], 4.0, delta=0.02)
         self.assertTrue(2.0 < samples[500] < 4.0, samples[500])
+
+    def test_transform_anchor_changes_layer_placement_and_is_keyframable(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-anchor-") as raw:
+            workspace = Path(raw)
+            source = self.make_image(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingest["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id,
+                "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000,
+                "transform": {"position": {"x": 0.5, "y": 0.5}, "scale": 0.5, "anchor": {"x": 0.0, "y": 0.0}},
+                "keyframes": [{"property": "transform.anchor.x", "keyframes": [
+                    {"at_tick": 0, "value": 0.0, "interpolation": "linear"},
+                    {"at_tick": 90000, "value": 1.0, "interpolation": "linear"},
+                ]}],
+            }]}), encoding="utf-8")
+            code, composed = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
+            self.assertEqual(code, 0, composed)
+            output = project / "renders" / "anchor.mp4"
+            code, planned = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180", "--dry-run")
+            self.assertEqual(code, 0, planned)
+            graph = planned["data"]["plan"]["filter_complex"]
+            self.assertIn("w*(if(lt", graph)
+            project_payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            self.assertEqual(project_payload["sequences"][0]["tracks"][0]["clips"][0]["transform"]["anchor"]["x"], 0.0)
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180")
+            self.assertEqual(code, 0, rendered)
+            frame = workspace / "anchor.png"
+            completed = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", "0.5", "-i", str(output), "-frames:v", "1", str(frame)], capture_output=True, text=True, encoding="utf-8")
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            with Image.open(frame) as image:
+                self.assertGreater(image.convert("RGB").getpixel((170, 100))[0], 150)
+            project_payload["sequences"][0]["tracks"][0]["clips"][0]["transform"]["anchor"]["x"] = 1.1
+            (project / "project.json").write_text(json.dumps(project_payload), encoding="utf-8")
+            code, invalid = invoke("validate", "--project", str(project))
+            self.assertNotEqual(code, 0, invalid)
+            self.assertIn("TRANSFORM_ANCHOR_RANGE", json.dumps(invalid, ensure_ascii=False))
 
     def test_template_snapshot_applies_local_change_set(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-template-") as raw:
