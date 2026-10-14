@@ -2262,14 +2262,81 @@ def _build_subtitle_layer(
     incoming = clip_value.get("transition_in") if isinstance(clip_value.get("transition_in"), dict) else {}
     outgoing = clip_value.get("transition_out") if isinstance(clip_value.get("transition_out"), dict) else {}
     transition_opacity = "1.00000000"
+    wipe_alpha = "1.00000000"
+    position_x_expr = f"({transform['position_x']})*W-w/2"
+    position_y_expr = f"({transform['position_y']})*H-h/2"
     unsupported_transitions: list[str] = []
+
+    def _spatial_transition(raw_type: str, config: dict[str, Any]) -> tuple[str, str] | None:
+        normalized = raw_type.lower().replace("-", "_")
+        aliases = {
+            "slideleft": ("slide", "left"),
+            "slideright": ("slide", "right"),
+            "slideup": ("slide", "up"),
+            "slidedown": ("slide", "down"),
+            "wipeleft": ("wipe", "left"),
+            "wiperight": ("wipe", "right"),
+            "wipeup": ("wipe", "up"),
+            "wipedown": ("wipe", "down"),
+        }
+        if normalized in aliases:
+            return aliases[normalized]
+        if normalized not in {"slide", "slide_in", "slide_out", "wipe", "wipe_in", "wipe_out"}:
+            return None
+        direction = str(config.get("direction", "left")).lower().replace("-", "_")
+        direction = {"top": "up", "bottom": "down"}.get(direction, direction)
+        if direction not in {"left", "right", "up", "down"}:
+            direction = "left"
+        return ("wipe" if normalized.startswith("wipe") else "slide", direction)
+
+    def _slide_offset(direction: str) -> str:
+        distance = "(W+w)" if direction in {"left", "right"} else "(H+h)"
+        sign = "-" if direction in {"left", "up"} else "+"
+        return f"{sign}{distance}"
+
+    def _wipe_visibility(direction: str, progress: str, *, entering: bool) -> str:
+        if direction == "left":
+            condition = f"lt(X,W*({progress}))" if entering else f"gt(X,W*(1-({progress})))"
+        elif direction == "right":
+            condition = f"gt(X,W*(1-({progress})))" if entering else f"lt(X,W*({progress}))"
+        elif direction == "up":
+            condition = f"gt(Y,H*(1-({progress})))" if entering else f"lt(Y,H*({progress}))"
+        else:
+            condition = f"lt(Y,H*({progress}))" if entering else f"gt(Y,H*(1-({progress})))"
+        return f"if({condition},1,0)"
+
+    def _apply_spatial(config: dict[str, Any], raw_type: str, *, entering: bool) -> bool:
+        nonlocal position_x_expr, position_y_expr, wipe_alpha
+        spatial = _spatial_transition(raw_type, config)
+        if spatial is None:
+            return False
+        spatial_type, direction = spatial
+        transition_duration = max(0.001, _num(config.get("duration", 0.25), 0.25))
+        time_variable = "T" if spatial_type == "wipe" else "t"
+        if entering:
+            progress = f"clip(({time_variable}-{clip_start:.6f})/{transition_duration:.6f},0,1)"
+        else:
+            transition_start = clip_start + max(0.0, clip_duration - transition_duration)
+            progress = f"clip(({time_variable}-{transition_start:.6f})/{transition_duration:.6f},0,1)"
+        if spatial_type == "slide":
+            offset = _slide_offset(direction)
+            if entering:
+                position_x_expr = f"({position_x_expr})+((1-({progress}))*({offset if direction in {'left', 'right'} else '0'}))"
+                position_y_expr = f"({position_y_expr})+((1-({progress}))*({offset if direction in {'up', 'down'} else '0'}))"
+            else:
+                position_x_expr = f"({position_x_expr})+(({progress})*({offset if direction in {'left', 'right'} else '0'}))"
+                position_y_expr = f"({position_y_expr})+(({progress})*({offset if direction in {'up', 'down'} else '0'}))"
+        else:
+            wipe_alpha = f"({wipe_alpha})*({_wipe_visibility(direction, progress, entering=entering)})"
+        return True
+
     incoming_type = str(incoming.get("type", "")).lower().replace("-", "_")
     if incoming_type:
         if incoming_type in {"fade", "fade_in", "dissolve", "crossfade"}:
             transition_duration = max(0.001, _num(incoming.get("duration", 0.25), 0.25))
             transition_expr = f"if(lt(T,{clip_start:.6f}),0,clip((T-{clip_start:.6f})/{transition_duration:.6f},0,1))"
             transition_opacity = f"({transition_opacity})*({transition_expr})"
-        else:
+        elif not _apply_spatial(incoming, incoming_type, entering=True):
             unsupported_transitions.append(f"transition_in:{incoming_type}")
     outgoing_type = str(outgoing.get("type", "")).lower().replace("-", "_")
     if outgoing_type:
@@ -2279,20 +2346,18 @@ def _build_subtitle_layer(
             fade_end = clip_start + clip_duration
             transition_expr = f"if(gt(T,{fade_start:.6f}),clip(({fade_end:.6f}-T)/{transition_duration:.6f},0,1),1)"
             transition_opacity = f"({transition_opacity})*({transition_expr})"
-        else:
+        elif not _apply_spatial(outgoing, outgoing_type, entering=False):
             unsupported_transitions.append(f"transition_out:{outgoing_type}")
-    if transition_opacity != "1.00000000":
+    if transition_opacity != "1.00000000" or wipe_alpha != "1.00000000":
         transition_label = f"subtitle_transition_opacity{subtitle_index}"
-        alpha_expr = f"alpha(X,Y)*clip(({transition_opacity}),0,1)"
+        alpha_expr = f"alpha(X,Y)*clip(({transition_opacity}),0,1)*clip(({wipe_alpha}),0,1)"
         filters.append(f"[{layer_label}]format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)},format=rgba[{transition_label}]")
         layer_label = transition_label
     if unsupported_transitions:
-        warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_transition", "message": f"独立文字层已执行 fade/dissolve alpha 转场；以下空间转场仍保留基础文字时间窗: {','.join(unsupported_transitions)}"})
-    position_x_expr = _expr_arg(f"({transform['position_x']})*W-w/2")
-    position_y_expr = _expr_arg(f"({transform['position_y']})*H-h/2")
+        warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_transition", "message": f"独立文字层已执行 fade/dissolve alpha、slide/wipe 空间转场；以下转场仍保留基础文字时间窗: {','.join(unsupported_transitions)}"})
     return {
         "label": layer_label,
-        "position": f"x={position_x_expr}:y={position_y_expr}",
+        "position": f"x={_expr_arg(position_x_expr)}:y={_expr_arg(position_y_expr)}",
         "track_id": overlay.get("track_id"),
         "track_order": int(overlay.get("track_order", 0)),
         "layer_order": subtitle_index,

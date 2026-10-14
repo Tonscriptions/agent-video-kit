@@ -20,7 +20,7 @@ approximate effects must remain visible in the response and render manifest.
 For titles and captions that must exist independently of a source video, add a
 `kind=subtitle` track and append a clip with `generator: {"type": "text"}` and
 `subtitle.text/style`. The local renderer draws this layer on a transparent
-canvas; `animation.type=rotate` rotates the text layer itself; clip transform/keyframes, masks, blend modes, and fade/dissolve alpha transitions apply to the independent layer. Slide/wipe transitions still need explicit spatial-handle support. Register local
+canvas; `animation.type=rotate` rotates the text layer itself; clip transform/keyframes, masks, blend modes, fade/dissolve alpha transitions, and basic slide/wipe spatial transitions apply to the independent layer. Complex transition handles still need explicit local support. Register local
 font assets through `style.font_asset_id` or provide an existing local
 `style.fontfile`. Use `word_timing.start_char` when repeated words need an
 unambiguous highlight anchor; source text mismatches are rejected before save.

@@ -784,6 +784,7 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("independent_text_blend", manifest["capabilities"]["subtitles"]["features"])
         self.assertIn("mixed_video_text_track_order", manifest["capabilities"]["subtitles"]["features"])
         self.assertIn("independent_text_fade_transitions", manifest["capabilities"]["subtitles"]["features"])
+        self.assertIn("independent_text_spatial_transitions", manifest["capabilities"]["subtitles"]["features"])
         self.assertIn("otio_stack_track_gap_clip", manifest["capabilities"]["interoperability"]["features"])
         self.assertIn("kdenlive_blank_gap_mapping", manifest["capabilities"]["interoperability"]["features"])
         self.assertIn("effect_parameter_keyframes", manifest["capabilities"]["effects"]["features"])
@@ -1789,6 +1790,34 @@ class P0CliTests(unittest.TestCase):
             self.assertLess(graph.index("subtitle_blendcanvas0"), graph.rindex("[v1]overlay"))
             self.assertNotIn("subtitle_animation:rotate", " ".join(str(item) for item in planned.get("warnings", [])))
             self.assertNotIn("subtitle_transition", " ".join(str(item) for item in planned.get("warnings", [])))
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output))
+            self.assertEqual(code, 0, rendered)
+            self.assertTrue(output.exists())
+
+    def test_independent_subtitle_spatial_transitions_render(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-text-spatial-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingest["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [
+                {"op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000},
+                {"op": "add_track", "track_id": "track_titles", "kind": "subtitle", "order": 3},
+                {"op": "append_clip", "track_id": "track_titles", "id": "spatial-title", "generator": {"type": "text"}, "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000, "transition_in": {"type": "slide", "direction": "left", "duration": 0.25}, "transition_out": {"type": "wipe", "direction": "right", "duration": 0.25}, "subtitle": {"text": "Spatial title", "style": {"fontsize": 34, "box": False, "x": "(w-text_w)/2", "y": "(h-text_h)/2"}}},
+            ]}), encoding="utf-8")
+            code, composed = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
+            self.assertEqual(code, 0, composed)
+            output = project / "renders" / "spatial-text.mp4"
+            code, planned = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
+            self.assertEqual(code, 0, planned)
+            graph = planned["data"]["plan"]["filter_complex"]
+            self.assertIn("subtitle_transition_opacity0", graph)
+            self.assertIn("W+w", graph)
+            self.assertIn("lt(X,W*(clip", graph)
+            self.assertFalse(any(item.get("feature") == "subtitle_transition" for item in planned.get("warnings", [])), planned)
             code, rendered = invoke("render", "--project", str(project), "--output", str(output))
             self.assertEqual(code, 0, rendered)
             self.assertTrue(output.exists())
