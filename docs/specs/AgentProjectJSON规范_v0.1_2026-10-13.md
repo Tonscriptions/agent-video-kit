@@ -141,7 +141,7 @@
 ## 7. 字幕、音频与模板
 
 - 字幕 cue 使用整数 tick，含 `text`、`language`、`style_ref`、`speaker`、`word_timing`（可选）和 `source_ref`。
-- `kind=subtitle` 轨道可以使用 `generator: {"type": "text"}` 加内联 `subtitle.text/style`，不需要占位媒体资产；它与 `asset_id`、`sequence_id` 互斥。渲染器会把文字先绘制到本地透明层，独立文字轨道的 `rotate` 动画执行实际像素旋转；序列无视频片段时使用黑/透明基础画布输出纯文字序列。已登记的 `subtitle` 资产仍可作为外部字幕文件引用。
+- `kind=subtitle` 轨道可以使用 `generator: {"type": "text"}` 加内联 `subtitle.text/style`，不需要占位媒体资产；它与 `asset_id`、`sequence_id` 互斥。渲染器会把文字先绘制到本地透明层，独立文字轨道的 `rotate` 动画执行实际像素旋转；片段 transform/keyframes、mask 和 blend 也作用于该透明层，并按 `track.order` 与视频轨道共同排序合成；序列无视频片段时使用黑/透明基础画布输出纯文字序列。已登记的 `subtitle` 资产仍可作为外部字幕文件引用。
 - 内联 `subtitle.style` 可声明 `fontsize`、`fontcolor`、`fontfile`、`line_spacing`、`borderw`/`bordercolor`、`shadowx`/`shadowy`/`shadowcolor`、`box`/`boxcolor`/`boxborderw`、`text_align`、`text_shaping`、`fix_bounds`、`expansion` 以及 `max_width`/`wrap_width`。`max_width` 优先使用本地字体 advance width 换行，没有字体度量时才使用平均字宽并写入 approximate warning；复杂排版和逐字遮罩仍需 golden render 验收。文本样式必须引用字体资产和回退链；发布前检查字体许可证与机器可用性。
 - `style.font_asset_id` 必须引用本地 `font` 资产；显式 `style.fontfile` 必须是存在的本地文件。若有本地字体度量，换行和逐字定位使用其 advance width；没有字体度量时才回退平均字宽并写入 warning。`word_timing` 可以使用 `start_char` 消除重复词歧义，源文本不匹配时拒绝保存或渲染。
 - 片段的 `freeze` 对象由 `at_tick` 和正数 `duration_tick` 组成，可选 `audio_mode` 为 `silence` 或 `continue`。`at_tick` 位于冻结前的片段时长内，保存时片段 `duration_tick` 已包含冻结增量；渲染在变速/倒放/裁切映射完成后插入冻结帧。默认 `audio_mode=silence` 会在同一局部时间点插入等长的本地静音，使音频和画面同步停顿；`continue` 保留视频冻结而让音频继续播放，并在尾部补齐冻结增量。非法定格对象、模式或越界时间必须在语义校验阶段拒绝。

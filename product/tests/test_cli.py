@@ -710,6 +710,10 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("vectorscope", manifest["capabilities"]["quality"]["features"])
         self.assertIn("independent_text_track", manifest["capabilities"]["subtitles"]["features"])
         self.assertIn("independent_rotate_text_layer", manifest["capabilities"]["subtitles"]["features"])
+        self.assertIn("independent_text_transform_keyframes", manifest["capabilities"]["subtitles"]["features"])
+        self.assertIn("independent_text_masks", manifest["capabilities"]["subtitles"]["features"])
+        self.assertIn("independent_text_blend", manifest["capabilities"]["subtitles"]["features"])
+        self.assertIn("mixed_video_text_track_order", manifest["capabilities"]["subtitles"]["features"])
         self.assertIn("effect_parameter_keyframes", manifest["capabilities"]["effects"]["features"])
         self.assertIn("sequence_adjustments", manifest["capabilities"]["effects"]["features"])
         self.assertIn("lut3d_project_local", manifest["capabilities"]["effects"]["features"])
@@ -1692,7 +1696,9 @@ class P0CliTests(unittest.TestCase):
             changes.write_text(json.dumps({"operations": [
                 {"op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000},
                 {"op": "add_track", "track_id": "track_titles", "kind": "subtitle", "order": 3},
-                {"op": "append_clip", "track_id": "track_titles", "id": "headline", "generator": {"type": "text"}, "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000, "subtitle": {"text": "Local title", "style": {"fontsize": 34, "box": False, "x": "(w-text_w)/2", "y": "(h-text_h)/2"}, "animation": {"type": "rotate", "from_degrees": -30, "to_degrees": 15, "duration": 0.4}}},
+                {"op": "append_clip", "track_id": "track_titles", "id": "headline", "generator": {"type": "text"}, "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000, "transform": {"position": {"x": 0.65, "y": 0.42}, "scale": 0.82, "rotation": 8, "opacity": 0.9}, "mask": {"type": "circle", "cx": 0.5, "cy": 0.5, "radius": 0.48}, "blend": {"mode": "screen", "opacity": 0.85}, "subtitle": {"text": "Local title", "style": {"fontsize": 34, "box": False, "x": "(w-text_w)/2", "y": "(h-text_h)/2"}, "animation": {"type": "rotate", "from_degrees": -30, "to_degrees": 15, "duration": 0.4}}},
+                {"op": "add_track", "track_id": "track_foreground", "kind": "video", "order": 5},
+                {"op": "append_clip", "track_id": "track_foreground", "id": "foreground", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000, "transform": {"position": {"x": 0.5, "y": 0.5}, "scale": 0.22}},
             ]}), encoding="utf-8")
             code, composed = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
             self.assertEqual(code, 0, composed)
@@ -1701,8 +1707,13 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 0, planned)
             graph = planned["data"]["plan"]["filter_complex"]
             self.assertIn("subtitlecanvas0", graph)
+            self.assertIn("subtitle_scaled0", graph)
+            self.assertIn("subtitle_mask0_0", graph)
+            self.assertIn("subtitle_blendcanvas0", graph)
             self.assertIn("rotate=", graph)
             self.assertIn("drawtext=text='Local title'", graph)
+            self.assertLess(graph.index("[base][v0]overlay"), graph.index("subtitle_blendcanvas0"))
+            self.assertLess(graph.index("subtitle_blendcanvas0"), graph.rindex("[v1]overlay"))
             self.assertNotIn("subtitle_animation:rotate", " ".join(str(item) for item in planned.get("warnings", [])))
             code, rendered = invoke("render", "--project", str(project), "--output", str(output))
             self.assertEqual(code, 0, rendered)

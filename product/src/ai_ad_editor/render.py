@@ -2173,6 +2173,113 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
     return list(collected.values())
 
 
+def _build_subtitle_layer(
+    root: Path,
+    overlay: dict[str, Any],
+    subtitle_index: int,
+    filters: list[str],
+    warnings: list[dict[str, Any]],
+    *,
+    width: int,
+    height: int,
+    fps_value: str,
+    duration: float,
+    tps: int,
+) -> dict[str, Any]:
+    """Compile one independent text clip into a reusable transparent layer.
+
+    The returned spec deliberately matches the video compositor's contract.
+    Keeping text and media layers in the same queue makes ``track.order`` a
+    deterministic z-order for mixed video/title timelines, while the text
+    raster remains transparent outside its authored timeline window.
+    """
+    animation = overlay.get("animation") if isinstance(overlay.get("animation"), dict) else {}
+    clip_value = overlay.get("clip") if isinstance(overlay.get("clip"), dict) else {}
+    clip_id = str(overlay.get("clip_id"))
+    clip_start = float(overlay.get("start", 0.0))
+    clip_duration = max(0.001, float(overlay.get("duration", 0.001)))
+    transform = _transform_exprs(clip_value, clip_start, tps)
+    canvas_label = f"subtitlecanvas{subtitle_index}"
+    layer_label = f"subtitlelayer{subtitle_index}"
+    filters.append(f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba[{canvas_label}]")
+    filters.append(f"[{canvas_label}]{overlay['filter']}[{layer_label}]")
+
+    if transform["scale"] != "1.00000000":
+        scale_w = _expr_arg(f"max(2,iw*({transform['scale']}))")
+        scale_h = _expr_arg(f"max(2,ih*({transform['scale']}))")
+        scaled_label = f"subtitle_scaled{subtitle_index}"
+        filters.append(f"[{layer_label}]scale=w={scale_w}:h={scale_h}:eval=frame,format=rgba[{scaled_label}]")
+        layer_label = scaled_label
+
+    rotation_expression = transform["rotation"]
+    if overlay.get("animation_type") == "rotate":
+        animation_start = clip_start + max(0.0, _num(animation.get("delay", 0.0), 0.0))
+        animation_duration = max(0.001, _num(animation.get("duration", 0.3), 0.3))
+        from_degrees = _num(animation.get("from_degrees", animation.get("from", -90.0)), -90.0)
+        to_degrees = _num(animation.get("to_degrees", animation.get("to", animation.get("angle", 0.0))), 0.0)
+        progress = f"clip((t-{animation_start:.6f})/{animation_duration:.6f},0,1)"
+        animation_angle = f"({from_degrees:.6f}+({to_degrees - from_degrees:.6f})*{progress})"
+        rotation_expression = f"({transform['rotation']})+({animation_angle})"
+    if rotation_expression != "0.00000000":
+        rotated_label = f"subtitle_rotated{subtitle_index}"
+        rotation_radians = _expr_arg(f"({rotation_expression})*PI/180")
+        filters.append(f"[{layer_label}]rotate={rotation_radians}:fillcolor=black@0.0:ow=iw:oh=ih,format=rgba[{rotated_label}]")
+        layer_label = rotated_label
+
+    effect_filters = _effect_filters(
+        clip_value.get("effects"),
+        warnings,
+        clip_id,
+        root=root,
+        clip=clip_value,
+        clip_start=clip_start,
+        tps=tps,
+    )
+    if effect_filters:
+        effect_label = f"subtitle_effects{subtitle_index}"
+        filters.append(f"[{layer_label}]" + ",".join(effect_filters) + f",format=rgba[{effect_label}]")
+        layer_label = effect_label
+
+    if transform["opacity"] != "1.00000000":
+        opacity_label = f"subtitle_opacity{subtitle_index}"
+        alpha_expr = f"alpha(X,Y)*clip(({transform['opacity']}),0,1)"
+        filters.append(f"[{layer_label}]format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)},format=rgba[{opacity_label}]")
+        layer_label = opacity_label
+
+    mask_values: list[dict[str, Any]] = []
+    inherited_masks = clip_value.get("_nested_parent_masks")
+    if isinstance(inherited_masks, list):
+        mask_values.extend(item for item in inherited_masks if isinstance(item, dict))
+    if isinstance(clip_value.get("mask"), dict):
+        mask_values.append(clip_value["mask"])
+    for mask_index, mask_value in enumerate(mask_values):
+        mask_filter = _mask_filter(mask_value, warnings, clip_id, clip=clip_value, clip_start=clip_start, tps=tps)
+        if mask_filter:
+            masked_label = f"subtitle_mask{subtitle_index}_{mask_index}"
+            filters.append(f"[{layer_label}]format=rgba,{mask_filter}[{masked_label}]")
+            layer_label = masked_label
+
+    incoming = clip_value.get("transition_in") if isinstance(clip_value.get("transition_in"), dict) else {}
+    outgoing = clip_value.get("transition_out") if isinstance(clip_value.get("transition_out"), dict) else {}
+    if incoming or outgoing:
+        warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_transition", "message": "独立文字轨道的片段 transition 尚未接入，已保留文字层和时间窗"})
+    position_x_expr = _expr_arg(f"({transform['position_x']})*W-w/2")
+    position_y_expr = _expr_arg(f"({transform['position_y']})*H-h/2")
+    return {
+        "label": layer_label,
+        "position": f"x={position_x_expr}:y={position_y_expr}",
+        "track_id": overlay.get("track_id"),
+        "track_order": int(overlay.get("track_order", 0)),
+        "layer_order": subtitle_index,
+        "clip_id": clip_id,
+        "keyframes": copy.deepcopy(clip_value.get("keyframes", [])),
+        "start": clip_start,
+        "duration": clip_duration,
+        "blend": clip_value.get("blend"),
+        "kind": "subtitle",
+    }
+
+
 def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, Any]) -> tuple[list[str], str, list[dict[str, Any]], list[dict[str, Any]]]:
     settings = project["settings"]
     tps = int(settings["timebase"]["ticks_per_second"])
@@ -2255,6 +2362,9 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     animation_type = str(animation.get("type", "")).lower().replace("-", "_")
                     subtitle_overlays.append({
                         "clip_id": str(clip.get("id")),
+                        "track_id": str(track.get("id")),
+                        "track_order": int(track.get("order", 0)),
+                        "clip": copy.deepcopy(clip),
                         "filter": subtitle_filter,
                         "start": clip_start,
                         "duration": clip_duration,
@@ -2514,6 +2624,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     "label": label,
                     "position": position,
                     "track_id": track.get("id"),
+                    "track_order": int(track.get("order", 0)),
+                    "layer_order": len(video_specs),
                     "clip_id": clip.get("id"),
                     "keyframes": copy.deepcopy(clip.get("keyframes", [])),
                     "start": start,
@@ -2700,6 +2812,21 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
     base_filter = f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba" if transparent_canvas else f"color=c=black:s={width}x{height}:r={fps_value}:d={duration:.6f}"
     filters.append(f"{base_filter}[base]")
+    subtitle_specs = [
+        _build_subtitle_layer(
+            root,
+            overlay,
+            subtitle_index,
+            filters,
+            warnings,
+            width=width,
+            height=height,
+            fps_value=fps_value,
+            duration=duration,
+            tps=tps,
+        )
+        for subtitle_index, overlay in enumerate(subtitle_overlays)
+    ]
     final_specs: list[dict[str, Any]] = []
     by_track: dict[str, list[dict[str, Any]]] = {}
     for spec in video_specs:
@@ -2733,7 +2860,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     if transition_name not in XFADE_TRANSITIONS:
                         transition_name = "fade"
                     filters.append(f"[{left_trim}][{right_trim}]xfade=transition={transition_name}:duration={transition_duration:.6f}:offset={float(current_spec['duration']) - transition_duration:.6f},setpts=PTS-STARTPTS+{float(current_spec['start']):.6f}/TB[{output_label}]")
-                    final_specs.append({"label": output_label, "position": current_spec["position"], "clip_id": f"{current_spec.get('clip_id')}+{next_spec.get('clip_id')}", "start": current_spec["start"], "duration": float(current_spec["duration"]) + float(next_spec["duration"]) - transition_duration})
+                    final_specs.append({"label": output_label, "position": current_spec["position"], "track_id": current_spec.get("track_id"), "track_order": current_spec.get("track_order", 0), "layer_order": current_spec.get("layer_order", len(final_specs)), "clip_id": f"{current_spec.get('clip_id')}+{next_spec.get('clip_id')}", "start": current_spec["start"], "duration": float(current_spec["duration"]) + float(next_spec["duration"]) - transition_duration})
                     index += 2
                     continue
                 warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": next_spec.get("clip_id"), "feature": "complex_transition", "message": "复杂转场要求相邻片段有匹配的重叠时间句柄，当前已保留但未执行"})
@@ -2741,9 +2868,13 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": current_spec.get("clip_id"), "feature": "complex_transition", "message": "没有可配对的相邻片段，复杂转场未执行"})
             final_specs.append(current_spec)
             index += 1
+    final_specs.extend(subtitle_specs)
+    # Video transitions are resolved per track above; this final ordering is
+    # the shared z-order for media and independent text layers.
+    final_specs.sort(key=lambda item: (int(item.get("track_order", 0)), float(item.get("start", 0.0)), int(item.get("layer_order", 0))))
     current = "base"
     for pos, spec in enumerate(final_specs):
-        target = "vout" if pos == len(final_specs) - 1 and not has_adjustments and not subtitle_overlays else f"vo{pos}"
+        target = "vout" if pos == len(final_specs) - 1 and not has_adjustments else f"vo{pos}"
         blend = spec.get("blend") if isinstance(spec.get("blend"), dict) else {}
         blend_mode = str(blend.get("mode", "normal")).lower().replace("-", "_")
         if blend_mode in {"normal", "source_over", ""}:
@@ -2766,15 +2897,17 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             # keeps multiply/screen/etc. consistent with source-over behavior.
             opacity = _clamp(blend.get("opacity", 1.0), 0.0, 1.0, 1.0)
             ffmpeg_mode = {"hard_mix": "hardmix", "vivid": "vividlight"}.get(blend_mode, blend_mode)
-            blend_canvas = f"blendcanvas{pos}"
-            blend_source = f"blendsource{pos}"
-            blend_layer = f"blendlayer{pos}"
-            blend_base = f"blendbase{pos}"
-            blend_under = f"blendunder{pos}"
-            blend_result = f"blendresult{pos}"
-            blend_alpha = f"blendalpha{pos}"
-            blend_color_layer = f"blendcolor{pos}"
-            blend_mask_layer = f"blendmask{pos}"
+            layer_prefix = "subtitle_" if spec.get("kind") == "subtitle" else ""
+            blend_index = int(spec.get("layer_order", pos)) if spec.get("kind") == "subtitle" else pos
+            blend_canvas = f"{layer_prefix}blendcanvas{blend_index}"
+            blend_source = f"{layer_prefix}blendsource{blend_index}"
+            blend_layer = f"{layer_prefix}blendlayer{blend_index}"
+            blend_base = f"{layer_prefix}blendbase{blend_index}"
+            blend_under = f"{layer_prefix}blendunder{blend_index}"
+            blend_result = f"{layer_prefix}blendresult{blend_index}"
+            blend_alpha = f"{layer_prefix}blendalpha{blend_index}"
+            blend_color_layer = f"{layer_prefix}blendcolor{blend_index}"
+            blend_mask_layer = f"{layer_prefix}blendmask{blend_index}"
             filters.append(f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba[{blend_canvas}]")
             filters.append(f"[{spec['label']}]format=rgba[{blend_source}]")
             filters.append(f"[{blend_canvas}][{blend_source}]overlay={spec['position']}:eof_action=pass:format=auto,format=rgba[{blend_layer}]")
@@ -2850,30 +2983,10 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 segment_labels.append(post)
             filters.append("".join(f"[{label}]" for label in segment_labels) + f"concat=n={len(segment_labels)}:v=1:a=0,format=rgba,setpts=PTS-STARTPTS[{target}]")
             current = target
-        adjusted_output = "vout" if not subtitle_overlays else "adjusted_output"
+        adjusted_output = "vout"
         filters.append(f"[{current}]" + ("format=rgba," if transparent_canvas else "") + f"null[{adjusted_output}]")
         current = adjusted_output
-    elif subtitle_overlays and current == "base":
-        current = "base"
 
-    for subtitle_index, overlay in enumerate(subtitle_overlays):
-        target = "vout" if subtitle_index == len(subtitle_overlays) - 1 else f"subtitle{subtitle_index}"
-        animation = overlay.get("animation") if isinstance(overlay.get("animation"), dict) else {}
-        if overlay.get("animation_type") == "rotate":
-            start = float(overlay.get("start", 0.0)) + max(0.0, _num(animation.get("delay", 0.0), 0.0))
-            duration_value = max(0.001, _num(animation.get("duration", 0.3), 0.3))
-            from_degrees = _num(animation.get("from_degrees", animation.get("from", -90.0)), -90.0)
-            to_degrees = _num(animation.get("to_degrees", animation.get("to", animation.get("angle", 0.0))), 0.0)
-            progress = f"clip((t-{start:.6f})/{duration_value:.6f},0,1)"
-            angle_expression = f"(({from_degrees:.6f}+({to_degrees - from_degrees:.6f})*{progress})*PI/180)"
-            canvas_label = f"subtitlecanvas{subtitle_index}"
-            rotated_label = f"subtitlerotated{subtitle_index}"
-            filters.append(f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba[{canvas_label}]")
-            filters.append(f"[{canvas_label}]{overlay['filter']},rotate={_expr_arg(angle_expression)}:fillcolor=black@0.0:ow=iw:oh=ih,format=rgba[{rotated_label}]")
-            filters.append(f"[{current}][{rotated_label}]overlay=eof_action=pass:format=auto[{target}]")
-        else:
-            filters.append(f"[{current}]{overlay['filter']}[{target}]")
-        current = target
     if audio_labels:
         mix_labels = list(audio_labels)
         if ducking_requested and voice_audio_labels and music_audio_labels:
