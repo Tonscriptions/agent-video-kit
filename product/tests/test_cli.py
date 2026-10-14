@@ -643,6 +643,65 @@ class P0CliTests(unittest.TestCase):
             self.assertFalse(result["ok"])
             self.assertTrue(result["data"]["failures"])
 
+    def test_rights_revision_takedown_history_recovery_and_release_manifest(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-rights-revision-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, ingested = invoke(
+                "media", "ingest", "--project", str(project), "--input", str(source),
+                "--verification-status", "verified", "--source-url", "local://source",
+                "--license-spdx", "CC0-1.0", "--license-url", "local://license",
+                "--evidence", "local://evidence", "--permitted-use", "commercial_ad",
+            )
+            self.assertEqual(code, 0, ingested)
+            asset_id = ingested["data"]["asset"]["id"]
+
+            code, listed = invoke("rights", "list", "--project", str(project))
+            self.assertEqual(code, 0, listed)
+            self.assertEqual(listed["data"]["count"], 1)
+            self.assertEqual(listed["data"]["records"][0]["record_version"], 1)
+
+            code, takedown = invoke("rights", "update", "--project", str(project), "--asset-id", asset_id, "--status", "takedown", "--reason", "notice received", "--actor", "reviewer")
+            self.assertEqual(code, 0, takedown)
+            self.assertTrue(takedown["data"]["snapshot"]["snapshot_id"])
+            self.assertEqual(takedown["data"]["revision"]["record"]["record_version"], 2)
+            self.assertEqual(takedown["data"]["revision"]["record"]["takedown_status"], "notice")
+
+            code, history = invoke("rights", "history", "--project", str(project), "--asset-id", asset_id)
+            self.assertEqual(code, 0, history)
+            self.assertEqual(len(history["data"]["records"]), 2)
+            self.assertTrue(history["data"]["events"])
+
+            code, blocked = invoke("rights", "check", "--project", str(project))
+            self.assertEqual(code, 7, blocked)
+            self.assertTrue(any(item["code"] == "RIGHTS_STATUS_BLOCKED" for item in blocked["data"]["failures"]))
+
+            code, reopen_required = invoke("rights", "update", "--project", str(project), "--asset-id", asset_id, "--status", "verified", "--reason", "try recovery")
+            self.assertEqual(code, 2, reopen_required)
+            self.assertEqual(reopen_required["errors"][0]["code"], "RIGHTS_REOPEN_REQUIRED")
+
+            code, recovered = invoke(
+                "rights", "update", "--project", str(project), "--asset-id", asset_id,
+                "--status", "verified", "--reopen", "--reason", "notice cleared",
+                "--evidence", "local://new-evidence",
+            )
+            self.assertEqual(code, 0, recovered)
+            self.assertEqual(recovered["data"]["revision"]["record"]["record_version"], 3)
+            self.assertEqual(recovered["data"]["revision"]["record"]["takedown_status"], "clear")
+
+            code, allowed = invoke("rights", "check", "--project", str(project))
+            self.assertEqual(code, 0, allowed)
+            release = project / "exports" / "release.json"
+            code, exported = invoke("rights", "export", "--project", str(project), "--output", str(release))
+            self.assertEqual(code, 0, exported)
+            self.assertTrue(release.exists())
+            manifest = json.loads(release.read_text(encoding="utf-8"))
+            self.assertTrue(manifest["rights_check"]["ok"])
+            self.assertTrue(manifest["manifest_sha256"].startswith("sha256:"))
+            self.assertEqual(manifest["assets"][0]["record_version"], 3)
+
     def test_ingest_dry_run_does_not_change_project(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-dry-") as raw:
             workspace = Path(raw)

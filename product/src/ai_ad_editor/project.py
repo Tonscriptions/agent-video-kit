@@ -76,9 +76,10 @@ def initial_project(name: str, project_id: str | None = None) -> dict[str, Any]:
 
 def initial_ledger() -> dict[str, Any]:
     return {
-        "schema_version": "0.1.0",
+        "schema_version": "0.2.0",
         "updated_at": now_iso(),
         "records": [],
+        "events": [],
         "policy": {"default_target": "commercial_ad", "unverified_publish": False},
     }
 

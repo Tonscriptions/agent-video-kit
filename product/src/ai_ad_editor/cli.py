@@ -40,7 +40,7 @@ from .batch import _load_variants, run_template_batch
 from .capabilities import build_capability_manifest
 from .transcribe import transcribe_local, write_srt
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
-from .rights import add_record, check_project_rights, load_ledger, save_ledger
+from .rights import VALID_STATUSES, active_records, add_record, check_project_rights, load_ledger, record_history, release_manifest, revise_record, save_ledger
 from .understand import understand_media
 from .tracking import track_media
 from .runtime import configure_local_runtime
@@ -213,6 +213,37 @@ def build_parser() -> argparse.ArgumentParser:
     check = _leaf_common(rs.add_parser("check", help="检查发布资格"))
     check.add_argument("--project", required=True)
     check.add_argument("--target", default="commercial_ad")
+    rights_list = _leaf_common(rs.add_parser("list", help="列出当前有效权利记录"))
+    rights_list.add_argument("--project", required=True)
+    rights_list.add_argument("--status", choices=tuple(sorted(VALID_STATUSES)), default=None)
+    rights_history = _leaf_common(rs.add_parser("history", help="查看资产权利修订和审计历史"))
+    rights_history.add_argument("--project", required=True)
+    rights_history.add_argument("--asset-id", required=True)
+    rights_update = _leaf_common(rs.add_parser("update", help="创建权利记录不可变修订"))
+    rights_update.add_argument("--project", required=True)
+    rights_update.add_argument("--asset-id", required=True)
+    rights_update.add_argument("--status", choices=tuple(sorted(VALID_STATUSES)), default=None)
+    rights_update.add_argument("--patch", default=None, help="本地 JSON 修订对象")
+    rights_update.add_argument("--reason", required=True)
+    rights_update.add_argument("--actor", default="ai-ad-editor")
+    rights_update.add_argument("--reopen", action="store_true", help="恢复争议/过期/撤下/阻断记录")
+    rights_update.add_argument("--source-url", default=None)
+    rights_update.add_argument("--source-version", default=None)
+    rights_update.add_argument("--retrieved-at", default=None)
+    rights_update.add_argument("--creator", default=None)
+    rights_update.add_argument("--license-spdx", default=None)
+    rights_update.add_argument("--license-url", default=None)
+    rights_update.add_argument("--attribution", default=None)
+    rights_update.add_argument("--evidence", action="append", default=None)
+    rights_update.add_argument("--expires-at", default=None)
+    rights_update.add_argument("--takedown-status", choices=("clear", "notice", "blocked"), default=None)
+    rights_update.add_argument("--permitted-use", action="append", default=None)
+    rights_update.add_argument("--permitted-channel", action="append", default=None)
+    rights_update.add_argument("--restriction", action="append", default=None)
+    rights_export = _leaf_common(rs.add_parser("export", help="生成本地发布权利清单"))
+    rights_export.add_argument("--project", required=True)
+    rights_export.add_argument("--output", required=True, help="项目内 JSON 输出路径")
+    rights_export.add_argument("--target", default="commercial_ad")
 
     render = _leaf_common(subs.add_parser("render", help="本地 FFmpeg 渲染"))
     render.add_argument("--project", required=True)
@@ -1473,6 +1504,76 @@ def command_rights_check(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("rights.check", args, data=result, status=status, errors=result.get("failures", []), warnings=result.get("warnings", []))
 
 
+def command_rights_list(args: argparse.Namespace) -> dict[str, Any]:
+    root, _project = load_project(args.project)
+    records = active_records(load_ledger(root))
+    if args.status:
+        records = [record for record in records if record.get("verification_status") == args.status]
+    return _envelope("rights.list", args, data={"records": records, "count": len(records)})
+
+
+def command_rights_history(args: argparse.Namespace) -> dict[str, Any]:
+    root, _project = load_project(args.project)
+    ledger = load_ledger(root)
+    history = record_history(ledger, args.asset_id)
+    events = [event for event in ledger.get("events", []) if str(event.get("asset_id")) == str(args.asset_id)]
+    if not history:
+        raise AppError("RIGHTS_RECORD_MISSING", f"找不到 Rights Ledger 记录: {args.asset_id}", exit_code=3, path="asset_id")
+    return _envelope("rights.history", args, data={"asset_id": args.asset_id, "records": history, "events": events, "count": len(history)})
+
+
+def command_rights_update(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    ledger = load_ledger(root)
+    patch: dict[str, Any] = {}
+    if args.patch:
+        patch_path = Path(require_local_reference(args.patch, field="--patch")).expanduser().resolve()
+        patch_payload = load_json(patch_path)
+        if not isinstance(patch_payload, dict):
+            raise argument_error("--patch 顶层必须是 JSON 对象", "--patch")
+        patch.update(patch_payload)
+    flags = {
+        "verification_status": args.status,
+        "source_url": args.source_url,
+        "source_version": args.source_version,
+        "retrieved_at": args.retrieved_at,
+        "creator": args.creator,
+        "license_spdx": args.license_spdx,
+        "license_url": args.license_url,
+        "attribution": args.attribution,
+        "evidence": args.evidence,
+        "expires_at": args.expires_at,
+        "takedown_status": args.takedown_status,
+        "permitted_uses": args.permitted_use,
+        "permitted_channels": args.permitted_channel,
+        "restrictions": args.restriction,
+    }
+    patch.update({key: value for key, value in flags.items() if value is not None})
+    planned_ledger = copy.deepcopy(ledger)
+    result = revise_record(planned_ledger, args.asset_id, patch, reason=args.reason, actor=args.actor, reopen=args.reopen)
+    if args.dry_run:
+        return _envelope("rights.update", args, status="planned", data={"revision": result, "ledger": str(ledger_file(root))})
+    snapshot = create_snapshot(root, project, label=f"rights-{args.asset_id}-revision")
+    operation_id = new_id("op")
+    committed = revise_record(ledger, args.asset_id, patch, reason=args.reason, actor=args.actor, reopen=args.reopen)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "rights.update", "asset_id": args.asset_id, "record_id": committed["record"]["record_id"], "record_version": committed["record"]["record_version"], "reason": args.reason, "snapshot_id": snapshot["snapshot_id"], "at": now_iso()})
+    save_ledger(root, ledger)
+    save_project(root, project)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "rights.update", "status": "succeeded", "asset_id": args.asset_id, "record_id": committed["record"]["record_id"], "record_version": committed["record"]["record_version"], "snapshot_id": snapshot["snapshot_id"], "created_at": now_iso()})
+    return _envelope("rights.update", args, data={"revision": committed, "snapshot": snapshot, "ledger": str(ledger_file(root))}, operation_id=operation_id)
+
+
+def command_rights_export(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    output = ensure_inside(root, Path(args.output))
+    manifest = release_manifest(project, load_ledger(root), args.target)
+    if args.dry_run:
+        return _envelope("rights.export", args, status="planned", data={"manifest": manifest, "output": str(output)})
+    atomic_write_json(output, manifest)
+    status = "succeeded" if manifest["rights_check"]["ok"] else "failed"
+    return _envelope("rights.export", args, data={"manifest": manifest, "output": str(output)}, status=status, errors=manifest["rights_check"].get("failures", []), warnings=manifest["rights_check"].get("warnings", []))
+
+
 def _render_settings_for_args(project: dict[str, Any], args: argparse.Namespace) -> tuple[dict[str, Any], str | None]:
     profile = getattr(args, "profile", None)
     width = getattr(args, "width", None)
@@ -1983,6 +2084,10 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("timeline", "compose"): command_timeline_compose,
     ("validate", None): command_validate,
     ("rights", "check"): command_rights_check,
+    ("rights", "list"): command_rights_list,
+    ("rights", "history"): command_rights_history,
+    ("rights", "update"): command_rights_update,
+    ("rights", "export"): command_rights_export,
     ("render", None): command_render,
     ("queue", "enqueue"): command_queue_enqueue,
     ("queue", "list"): command_queue_list,

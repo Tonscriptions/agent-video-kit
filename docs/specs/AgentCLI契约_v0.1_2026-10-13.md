@@ -76,6 +76,10 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `timeline compose --project PATH --input CHANGES.json` | 变更集 | 写入轨道、片段、标记、关键帧、嵌套序列、速度曲线和剪辑操作；写入前快照并再次校验 |
 | `validate --project PATH` | 项目和目标渠道 | 机器 Schema、时间/引用/权利/效果语义校验报告 |
 | `rights check --project PATH` | 项目 Rights Ledger | 检查目标渠道发布资格；严格失败退出码为 7 |
+| `rights list --project PATH [--status STATUS]` | 当前项目 Rights Ledger | 列出每个资产的有效记录、版本、状态和许可字段 |
+| `rights history --project PATH --asset-id ID` | 资产 ID | 返回不可变修订链与审计事件；不存在时返回 `RIGHTS_RECORD_MISSING` |
+| `rights update --project PATH --asset-id ID --reason TEXT` | 本地 JSON patch 或字段参数 | 创建新版本并保留旧证据；写入前快照；恢复阻断状态必须 `--reopen` 与新证据 |
+| `rights export --project PATH --target CHANNEL --output FILE` | 项目 Rights Ledger 和资产哈希 | 写入项目内确定性发布清单；门禁失败仍产出清单并返回退出码 7 |
 | `render --project PATH` | 已验证项目和输出规格 | 本地 FFmpeg 渲染、manifest、操作记录和原子最终媒体 |
 | `queue enqueue --project PATH --input JOBS.json` | 单个作业或 `{jobs:[...]}` | 原子写入项目 `operations/render-queue.json`，保存输出规格和初始 `pending` 状态 |
 | `queue list --project PATH [--status STATUS]` | 项目队列和可选状态 | 只读返回队列计数与作业状态 |
