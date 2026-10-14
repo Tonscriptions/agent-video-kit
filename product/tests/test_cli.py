@@ -426,7 +426,7 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 0, result)
             self.assertEqual(result["data"]["indexed_count"], 3)
             catalog_payload = json.loads(catalog.read_text(encoding="utf-8"))
-            self.assertEqual(catalog_payload["catalog_version"], "0.2.0")
+            self.assertEqual(catalog_payload["catalog_version"], "0.3.0")
             product_record = next(item for item in catalog_payload["records"] if item["name"] == source.name)
             self.assertEqual(product_record["semantic"]["source"], "deterministic-local")
             self.assertIn("local", product_record["semantic"]["facets"]["subtitle_text"].casefold())
@@ -446,6 +446,48 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(result["data"]["method"], "sha256-exact")
             self.assertEqual(result["data"]["count"], 1)
             self.assertEqual(result["data"]["groups"][0]["count"], 2)
+
+            code, result = invoke(
+                "library", "index", "--root", str(media_dir), "--output", str(catalog),
+                "--previous", str(catalog), "--incremental",
+            )
+            self.assertEqual(code, 0, result)
+            self.assertEqual(result["data"]["index_refresh"]["mode"], "incremental")
+            self.assertEqual(result["data"]["index_refresh"]["reused_count"], 3)
+            self.assertEqual(result["data"]["index_refresh"]["reindexed_count"], 0)
+
+            sidecar.write_text("1\n00:00:00,000 --> 00:00:00,500\nLocal product launch v2\n", encoding="utf-8")
+            changed_catalog = workspace / "changed-catalog.json"
+            code, result = invoke(
+                "library", "index", "--root", str(media_dir), "--output", str(changed_catalog),
+                "--previous", str(catalog), "--incremental",
+            )
+            self.assertEqual(code, 0, result)
+            self.assertEqual(result["data"]["index_refresh"]["reused_count"], 1)
+            self.assertEqual(result["data"]["index_refresh"]["reindexed_count"], 2)
+
+            visual_catalog = workspace / "visual-catalog.json"
+            code, result = invoke("library", "index", "--root", str(media_dir), "--output", str(visual_catalog), "--visual-hash")
+            self.assertEqual(code, 0, result)
+            visual_payload = json.loads(visual_catalog.read_text(encoding="utf-8"))
+            self.assertEqual(visual_payload["index_refresh"]["visual_hash_count"], 2)
+            code, result = invoke("library", "similar", "--catalog", str(visual_catalog), "--max-distance", "0")
+            self.assertEqual(code, 0, result)
+            self.assertEqual(result["data"]["method"], "ahash-v1")
+            self.assertGreaterEqual(result["data"]["count"], 1)
+
+            duplicate.unlink()
+            removed_catalog = workspace / "removed-catalog.json"
+            code, result = invoke(
+                "library", "index", "--root", str(media_dir), "--output", str(removed_catalog),
+                "--previous", str(visual_catalog), "--incremental",
+            )
+            self.assertEqual(code, 0, result)
+            self.assertEqual(result["data"]["index_refresh"]["removed_count"], 1)
+
+            code, result = invoke("library", "index", "--root", str(media_dir), "--output", str(workspace / "invalid.json"), "--incremental")
+            self.assertEqual(code, 2, result)
+            self.assertEqual(result["errors"][0]["code"], "ARGUMENT_INVALID")
 
     def test_quality_scopes_generate_local_color_review_artifacts(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-scopes-") as raw:
@@ -576,6 +618,9 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("exposure", manifest["capabilities"]["effects"]["catalog_features"])
         self.assertIn("effect_catalog_cli", manifest["capabilities"]["effects"]["features"])
         self.assertIn("deterministic_token_search", manifest["capabilities"]["library"]["features"])
+        self.assertIn("incremental_stat_refresh", manifest["capabilities"]["library"]["features"])
+        self.assertIn("ffmpeg_average_hash_candidates", manifest["capabilities"]["library"]["features"])
+        self.assertEqual(manifest["capabilities"]["library"]["catalog_version"], "0.3.0")
         self.assertFalse(manifest["capabilities"]["library"]["vector_index"])
         self.assertEqual(manifest["policies"]["jianying_runtime_enabled"], False)
 

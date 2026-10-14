@@ -28,12 +28,13 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "library": {
                 "status": "implemented",
-                "features": ["local_index", "deterministic_token_search", "subtitle_sidecar_search", "media_facets", "duration_filter", "dimension_filter", "audio_presence_filter", "sha256_duplicate_groups"],
-                "catalog_version": "0.2.0",
-                "semantic_index_version": "0.1.0",
+                "features": ["local_index", "deterministic_token_search", "subtitle_sidecar_search", "media_facets", "duration_filter", "dimension_filter", "audio_presence_filter", "sha256_duplicate_groups", "incremental_stat_refresh", "ffmpeg_average_hash_candidates"],
+                "catalog_version": "0.3.0",
+                "semantic_index_version": "0.2.0",
                 "search_source": "deterministic-local",
                 "vector_index": False,
-                "limits": ["no_vlm_embeddings", "no_content_understanding_without_local_model", "duplicate_detection_is_exact_hash_only", "subtitle_sidecar_requires_matching_relative_stem"],
+                "visual_similarity_contract": "optional_ffmpeg_ahash_v1_samples_with_hamming_distance_candidate_groups",
+                "limits": ["no_vlm_embeddings", "no_content_understanding_without_local_model", "duplicate_detection_is_exact_hash_only", "visual_similarity_is_a_review_candidate_not_content_understanding", "incremental_refresh_trusts_file_stat_and_sidecar_signatures", "subtitle_sidecar_requires_matching_relative_stem"],
             },
             "project": {
                 "status": "implemented",

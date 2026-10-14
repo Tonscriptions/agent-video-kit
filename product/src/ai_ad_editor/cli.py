@@ -35,7 +35,7 @@ from .project import (
 )
 from .quality import GOLDEN_VERSION, build_golden_manifest, check_output, compare_golden_manifest, normalize_golden_constraints, validate_golden_manifest
 from .recommend import recommend_highlights
-from .library import duplicate_groups, index_directory, search_catalog
+from .library import duplicate_groups, index_directory, search_catalog, visual_similarity_groups
 from .batch import _load_variants, run_template_batch
 from .capabilities import build_capability_manifest
 from .transcribe import transcribe_local, write_srt
@@ -379,6 +379,9 @@ def build_parser() -> argparse.ArgumentParser:
     lindex.add_argument("--max-files", type=int, default=5000)
     lindex.add_argument("--license-spdx", default="LicenseRef-UNVERIFIED")
     lindex.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
+    lindex.add_argument("--previous", default=None, help="上一版本地目录 JSON，用于增量刷新")
+    lindex.add_argument("--incremental", action="store_true", help="按文件 stat 与字幕侧车签名复用未变化记录")
+    lindex.add_argument("--visual-hash", action="store_true", help="通过本地 FFmpeg 生成候选感知哈希样本")
     lsearch = _leaf_common(ls.add_parser("search", help="查询本地资产索引"))
     lsearch.add_argument("--catalog", required=True)
     lsearch.add_argument("--query", default="")
@@ -394,6 +397,9 @@ def build_parser() -> argparse.ArgumentParser:
     lduplicates = _leaf_common(ls.add_parser("duplicates", help="按 SHA-256 列出精确重复素材组"))
     lduplicates.add_argument("--catalog", required=True)
     lduplicates.add_argument("--include-unique", action="store_true", help="同时返回只有一个成员的哈希组")
+    lsimilar = _leaf_common(ls.add_parser("similar", help="按可选 FFmpeg 感知哈希列出相似画面候选组"))
+    lsimilar.add_argument("--catalog", required=True)
+    lsimilar.add_argument("--max-distance", type=int, default=12, help="平均哈希汉明距离上限")
 
     doctor = _leaf_common(subs.add_parser("doctor", help="检查本机依赖"))
     doctor.add_argument("--project", default=None)
@@ -2187,10 +2193,29 @@ def command_library_index(args: argparse.Namespace) -> dict[str, Any]:
     output = Path(args.output).expanduser().resolve()
     if not source_root.exists() or not source_root.is_dir():
         raise argument_error("素材库根目录不存在", str(source_root))
+    if args.incremental and not args.previous:
+        raise argument_error("--incremental 必须同时提供 --previous 上一版目录", "--previous")
+    previous_catalog = None
+    if args.previous:
+        previous_path = Path(args.previous).expanduser().resolve()
+        previous_catalog = load_json(previous_path)
+        previous_root = Path(str(previous_catalog.get("root", ""))).expanduser().resolve()
+        if previous_root != source_root:
+            raise argument_error("增量目录的 root 必须与 --root 相同", str(previous_path))
+    incremental = bool(args.incremental or args.previous)
     if args.dry_run:
-        return _envelope("library.index", args, status="planned", data={"root": str(source_root), "output": str(output), "max_files": args.max_files})
-    catalog = index_directory(source_root, output, max_files=args.max_files, license_spdx=args.license_spdx, verification_status=args.verification_status)
-    return _envelope("library.index", args, data={"catalog": str(output), "indexed_count": catalog["indexed_count"], "error_count": len(catalog["errors"])})
+        return _envelope("library.index", args, status="planned", data={"root": str(source_root), "output": str(output), "max_files": args.max_files, "incremental": incremental, "previous": str(Path(args.previous).expanduser().resolve()) if args.previous else None, "visual_hash": bool(args.visual_hash)})
+    catalog = index_directory(
+        source_root,
+        output,
+        max_files=args.max_files,
+        license_spdx=args.license_spdx,
+        verification_status=args.verification_status,
+        previous_catalog=previous_catalog,
+        incremental=incremental,
+        include_visual_hash=bool(args.visual_hash),
+    )
+    return _envelope("library.index", args, data={"catalog": str(output), "indexed_count": catalog["indexed_count"], "error_count": len(catalog["errors"]), "warning_count": len(catalog.get("warnings", [])), "index_refresh": catalog.get("index_refresh", {})})
 
 
 def command_library_search(args: argparse.Namespace) -> dict[str, Any]:
@@ -2217,6 +2242,25 @@ def command_library_duplicates(args: argparse.Namespace) -> dict[str, Any]:
     catalog = load_json(catalog_path)
     groups = duplicate_groups(catalog, include_unique=args.include_unique)
     return _envelope("library.duplicates", args, data={"catalog": str(catalog_path), "count": len(groups), "groups": groups, "method": "sha256-exact"})
+
+
+def command_library_similar(args: argparse.Namespace) -> dict[str, Any]:
+    catalog_path = Path(args.catalog).expanduser().resolve()
+    catalog = load_json(catalog_path)
+    groups = visual_similarity_groups(catalog, max_distance=args.max_distance)
+    visual_count = sum(
+        1
+        for record in catalog.get("records", [])
+        if isinstance(record, dict)
+        and isinstance(record.get("semantic"), dict)
+        and isinstance(record["semantic"].get("visual_hash"), dict)
+    )
+    return _envelope(
+        "library.similar",
+        args,
+        data={"catalog": str(catalog_path), "count": len(groups), "groups": groups, "method": "ahash-v1", "visual_hash_records": visual_count, "max_distance": max(0, int(args.max_distance))},
+        warnings=[] if visual_count else [{"code": "VISUAL_HASH_UNAVAILABLE", "message": "目录未包含视觉哈希；请重新执行 library index --visual-hash"}],
+    )
 
 
 def command_doctor(args: argparse.Namespace) -> dict[str, Any]:
@@ -2318,6 +2362,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("library", "index"): command_library_index,
     ("library", "search"): command_library_search,
     ("library", "duplicates"): command_library_duplicates,
+    ("library", "similar"): command_library_similar,
     ("doctor", None): command_doctor,
     ("operation", "inspect"): command_operation_inspect,
     ("version", None): command_version,

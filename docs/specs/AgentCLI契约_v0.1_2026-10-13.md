@@ -98,9 +98,10 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `convert export --project PATH --output FILE --target-format FORMAT` | 本地项目 | 导出 Agent JSON、OTIO 或 Kdenlive XML，并保留转换报告 |
 | `template apply --project PATH --input TEMPLATE.json` | 本地模板和变量 | 变量校验、片段实例化、模板快照和 provenance 变更记录 |
 | `template batch --project PATH ...` | 模板、variants 和输出目录 | 隔离实例并批量渲染；写批量报告，可选择继续失败项 |
-| `library index --root DIR --output FILE` | 本地媒体/字体/字幕目录 | 生成 `0.2.0` 目录：哈希、probe、确定性 token、同 stem 字幕侧车和许可证状态 |
+| `library index --root DIR --output FILE [--previous FILE --incremental] [--visual-hash]` | 本地媒体/字体/字幕目录 | 生成 `0.3.0` 目录：哈希、probe、确定性 token、同 stem 字幕侧车、许可证状态；可按 stat 签名增量刷新或生成 FFmpeg 平均哈希样本 |
 | `library search --catalog FILE` | 目录索引、词组和媒体属性过滤 | 按确定性分数返回可审计匹配资产；支持时长、分辨率、音频流和精确重复过滤 |
 | `library duplicates --catalog FILE` | 已生成的目录 | 按 SHA-256 返回字节完全相同的素材组；不会把相似或转码文件误报为重复 |
+| `library similar --catalog FILE [--max-distance N]` | 含 `--visual-hash` 样本的目录 | 按 `ahash-v1` 汉明距离返回画面相似候选组；没有样本时返回结构化警告，不将空结果解释为无相似素材 |
 | `policy audit --project PATH` | 项目 JSON/JSONL 产物 | 只读审计远程/闭源服务引用；违规返回 `POLICY_REMOTE_REFERENCE` |
 | `doctor` | 本机环境 | 只读取 Python、FFmpeg、FFprobe、Docker/WSL PATH；绝不启动虚拟化环境 |
 | `operation inspect --project PATH --operation-id ID` | 操作 ID | 读取可重连的操作状态、进度和产物清单 |
@@ -158,7 +159,7 @@ python -X utf8 -m ai_ad_editor render --project .\work\demo --dry-run
 
 ### 6.3 本地素材确定性索引
 
-`library index` 和 `library search` 的完整字段、侧车字幕规则、过滤器和重复组语义见[本地素材语义索引与重复分组契约](./本地素材语义索引与重复分组契约_v0.1_2026-10-14.md)。当前 `semantic.source` 固定为 `deterministic-local`，`vector_index=false`，不会联网、下载模型或把文件名/字幕匹配描述成视觉理解。模型级 VLM、embedding、OCR、人物/物体标签必须作为显式本地适配器接入，并写入模型版本和 provenance。
+`library index`、`library search` 和 `library duplicates` 的字段、侧车字幕规则、过滤器和精确重复语义见[本地素材语义索引与重复分组契约](./本地素材语义索引与重复分组契约_v0.1_2026-10-14.md)；增量刷新、`--visual-hash` 和 `library similar` 见[本地素材库增量刷新与感知候选契约](./本地素材库增量刷新与感知候选契约_v0.1_2026-10-14.md)。当前 `semantic.source` 固定为 `deterministic-local`，`vector_index=false`，不会联网、下载模型或把文件名/字幕匹配描述成视觉理解。模型级 VLM、embedding、OCR、人物/物体标签必须作为显式本地适配器接入，并写入模型版本和 provenance。
 
 ### 6.4 本地色彩 Scope 审查
 
