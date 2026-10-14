@@ -49,7 +49,7 @@ from .transcribe import transcribe_local, write_srt
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
 from .rights import VALID_STATUSES, active_records, add_record, apply_disposition_to_project, check_project_rights, create_disposition_decision, disposition_decisions, effective_disposition_decisions, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
 from .understand import understand_media
-from .tracking import track_media
+from .tracking import build_reframe_plan, track_media
 from .runtime import configure_local_runtime
 from .template import apply_template_operations, instantiate
 from .migration import SUPPORTED_SOURCE_VERSIONS, migrate_project_payload
@@ -176,6 +176,27 @@ def build_parser() -> argparse.ArgumentParser:
     track.add_argument("--clip-id", default=None, help="可选：将位置关键帧应用到片段")
     track.add_argument("--track-id", default=None, help="与 --clip-id 联用以限定轨道")
     track.add_argument("--sequence-id", default=None, help="与 --clip-id 联用，默认主序列")
+    reframe = _leaf_common(ms.add_parser("reframe", help="将本地对象跟踪转换为目标画幅动态裁切"))
+    reframe.add_argument("--project", required=True)
+    reframe.add_argument("--asset-id", default=None, help="项目内视频资产 ID，与 --input 二选一")
+    reframe.add_argument("--input", default=None, help="本地视频路径，与 --asset-id 二选一")
+    reframe.add_argument("--roi", required=True, help="归一化 ROI：x,y,width,height")
+    reframe.add_argument("--clip-id", required=True, help="要写入动态裁切的直接媒体片段 ID")
+    reframe.add_argument("--track-id", required=True, help="目标视频轨道 ID")
+    reframe.add_argument("--sequence-id", default=None, help="目标序列 ID，默认主序列")
+    reframe.add_argument("--target-width", type=int, default=None, help="目标画布宽度；省略时读取项目画布")
+    reframe.add_argument("--target-height", type=int, default=None, help="目标画布高度；省略时读取项目画布")
+    reframe.add_argument("--target-aspect", type=float, default=None, help="目标宽高比；省略时由目标画布计算")
+    reframe.add_argument("--margin", type=float, default=0.12, help="跟踪主体安全边距，范围 0..0.75")
+    reframe.add_argument("--fit", choices=("fit", "fill", "stretch"), default="fill")
+    reframe.add_argument("--start-seconds", type=float, default=None)
+    reframe.add_argument("--end-seconds", type=float, default=None)
+    reframe.add_argument("--step-frames", type=int, default=4)
+    reframe.add_argument("--search-radius", type=int, default=48)
+    reframe.add_argument("--max-width", type=int, default=640)
+    reframe.add_argument("--max-samples", type=int, default=600)
+    reframe.add_argument("--output", default=None, help="项目内自动重构图报告 JSON 路径")
+    reframe.add_argument("--apply", action="store_true", help="创建快照并将动态裁切写回片段")
 
     ad = subs.add_parser("ad", help="本地广告结构规划")
     ads = ad.add_subparsers(dest="action", required=True)
@@ -811,6 +832,97 @@ def command_media_track(args: argparse.Namespace) -> dict[str, Any]:
         save_project(root, project)
     _operation(root, operation_id, {"operation_id": operation_id, "command": "media.track", "status": "succeeded", "report": str(report_path), "asset_id": asset_id, "clip_id": args.clip_id, "applied_properties": applied_properties, "before_snapshot": before_snapshot, "created_at": now_iso()})
     return _envelope("media.track", args, data={"report": str(report_path), "result": report, "applied_properties": applied_properties, "before_snapshot": before_snapshot}, warnings=[{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和关键帧"}], operation_id=operation_id)
+
+
+def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    if bool(args.asset_id) == bool(args.input):
+        raise argument_error("必须且只能提供 --asset-id 或 --input")
+    sequence = find_sequence(project, args.sequence_id)
+    _, clip = _find_clip(sequence, str(args.clip_id), args.track_id)
+    if clip.get("sequence_id"):
+        raise AppError("REFRAME_NESTED_UNSUPPORTED", "自动重构图当前只支持直接媒体片段", exit_code=2, path="clip_id")
+    try:
+        speed = float(clip.get("speed", 1.0))
+    except (TypeError, ValueError) as exc:
+        raise AppError("REFRAME_SPEED_UNSUPPORTED", "自动重构图无法解析片段 speed", exit_code=2, path="clip.speed") from exc
+    if abs(speed - 1.0) > 1e-6 or bool(clip.get("reverse")) or clip.get("speed_curve") is not None:
+        raise AppError("REFRAME_TIME_MAPPING_UNSUPPORTED", "自动重构图当前要求常速正向片段，请先烘焙变速或倒放", exit_code=2, path="clip.speed")
+    asset_id = args.asset_id
+    if asset_id:
+        asset = asset_map(project).get(str(asset_id))
+        if not asset:
+            raise argument_error(f"找不到资产: {asset_id}", "--asset-id")
+        source = Path(str(asset.get("uri", "")))
+        if not source.is_absolute():
+            source = root / source
+    else:
+        source = Path(str(args.input)).expanduser().resolve()
+        asset = None
+    if not source.exists() or not source.is_file():
+        raise argument_error("自动重构图输入不存在", str(source))
+    tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90_000))
+    clip_source_in = int(clip.get("source_in_tick", 0))
+    clip_source_out = int(clip.get("source_out_tick", clip_source_in + int(clip.get("duration_tick", 1))))
+    start_seconds = clip_source_in / max(1, tps) if args.start_seconds is None else max(0.0, float(args.start_seconds))
+    end_seconds = clip_source_out / max(1, tps) if args.end_seconds is None else args.end_seconds
+    if end_seconds is not None and end_seconds <= start_seconds:
+        raise argument_error("自动重构图 end_seconds 必须大于 start_seconds", "--end-seconds")
+    probe = probe_media(source)
+    video = probe.get("video") if isinstance(probe.get("video"), dict) else {}
+    source_width = int(video.get("width", 0) or 0)
+    source_height = int(video.get("height", 0) or 0)
+    if source_width <= 0 or source_height <= 0:
+        raise AppError("REFRAME_VIDEO_MISSING", "自动重构图需要视频流", exit_code=4, path="input")
+    canvas = project.get("settings", {}).get("canvas") if isinstance(project.get("settings", {}).get("canvas"), dict) else {}
+    target_width = int(args.target_width or canvas.get("width", 1080))
+    target_height = int(args.target_height or canvas.get("height", 1920))
+    target_aspect = float(args.target_aspect or (target_width / max(1, target_height)))
+    if target_width <= 0 or target_height <= 0:
+        raise argument_error("目标画布尺寸必须大于 0", "target_width")
+    if args.dry_run:
+        return _envelope("media.reframe", args, status="planned", data={"input": str(source), "asset_id": asset_id, "clip_id": args.clip_id, "track_id": args.track_id, "sequence_id": sequence.get("id"), "target_width": target_width, "target_height": target_height, "target_aspect": target_aspect, "margin": args.margin, "fit": args.fit, "start_seconds": start_seconds, "end_seconds": end_seconds})
+    tracking = track_media(
+        source,
+        args.roi,
+        start_seconds=start_seconds,
+        end_seconds=end_seconds,
+        step_frames=args.step_frames,
+        search_radius=args.search_radius,
+        max_width=args.max_width,
+        max_samples=args.max_samples,
+        ticks_per_second=tps,
+    )
+    plan = build_reframe_plan(
+        tracking.get("frames", []),
+        source_aspect=source_width / source_height,
+        target_aspect=target_aspect,
+        margin=args.margin,
+        fit=args.fit,
+    )
+    plan.update({"project_id": project.get("project", {}).get("id"), "sequence_id": sequence.get("id"), "asset_id": asset_id, "clip_id": args.clip_id, "track_id": args.track_id, "source": str(source), "source_sha256": f"sha256:{sha256_file(source)}", "source_range": {"start_seconds": start_seconds, "end_seconds": end_seconds}, "tracking": tracking})
+    report_path = Path(args.output).expanduser().resolve() if args.output else root / "validation" / f"reframe_{safe_filename(str(args.clip_id))}.json"
+    ensure_inside(root, report_path)
+    if not args.apply:
+        atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "applied": False, "plan": plan})
+        return _envelope("media.reframe", args, status="planned", data={"report": str(report_path), "plan": plan, "applied": False}, warnings=[{"code": "REFRAME_APPROXIMATE", "message": "自动重构图使用本地模板跟踪；请检查 confidence 和裁切范围"}],)
+    before_project = copy.deepcopy(project)
+    before_snapshot = create_snapshot(root, before_project, label="before-reframe")
+    clip["crop"] = copy.deepcopy(plan["crop"])
+    for track in plan["keyframes"]:
+        values = [(int(item["at_tick"]), float(item["value"]), str(item.get("interpolation", "linear"))) for item in track["keyframes"]]
+        _set_keyframe_track(clip, str(track["property"]), values)
+    _clamp_clip_keyframes(clip)
+    validation = validate_project(root, project, strict_rights=False)
+    if not validation["ok"]:
+        raise AppError("REFRAME_APPLY_INVALID", "自动重构图应用后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    operation_id = new_id("op")
+    plan["applied_properties"] = [str(item["property"]) for item in plan["keyframes"]]
+    atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "applied": True, "operation_id": operation_id, "before_snapshot_id": before_snapshot["snapshot_id"], "plan": plan, "validation": validation})
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.reframe", "clip_id": args.clip_id, "track_id": args.track_id, "report": str(report_path), "before_snapshot_id": before_snapshot["snapshot_id"], "at": now_iso()})
+    save_project(root, project)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.reframe", "status": "succeeded", "clip_id": args.clip_id, "track_id": args.track_id, "report": str(report_path), "before_snapshot_id": before_snapshot["snapshot_id"], "created_at": now_iso()})
+    return _envelope("media.reframe", args, data={"report": str(report_path), "plan": plan, "before_snapshot": before_snapshot, "validation": validation}, warnings=[{"code": "REFRAME_APPROXIMATE", "message": "自动重构图使用本地模板跟踪；请检查 confidence、主体边界和裁切警告"}], operation_id=operation_id)
 
 
 def command_media_understand(args: argparse.Namespace) -> dict[str, Any]:
@@ -2843,6 +2955,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "ingest"): command_media_ingest,
     ("media", "relink"): command_media_relink,
     ("media", "track"): command_media_track,
+    ("media", "reframe"): command_media_reframe,
     ("media", "understand"): command_media_understand,
     ("media", "prepare"): command_media_prepare,
     ("media", "highlights"): command_media_highlights,

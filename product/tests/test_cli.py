@@ -892,6 +892,7 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("snapshot", manifest["capabilities"]["project"]["features"])
         self.assertIn("native_process_write_lock", manifest["capabilities"]["project"]["features"])
         self.assertIn("relink_by_hash", manifest["capabilities"]["media"]["features"])
+        self.assertIn("local_auto_reframe", manifest["capabilities"]["media"]["features"])
         self.assertIn("target_lufs_gate", manifest["capabilities"]["quality"]["features"])
         self.assertIn("vectorscope", manifest["capabilities"]["quality"]["features"])
         self.assertIn("independent_text_track", manifest["capabilities"]["subtitles"]["features"])
@@ -2305,6 +2306,52 @@ class P0CliTests(unittest.TestCase):
             clip = project_json["sequences"][0]["tracks"][0]["clips"][0]
             self.assertTrue(any(item.get("property") == "transform.position.x" for item in clip.get("keyframes", [])))
             self.assertEqual(invoke("validate", "--project", str(project))[0], 0)
+
+    def test_local_auto_reframe_applies_target_aspect_crop_keyframes(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-reframe-") as raw:
+            workspace = Path(raw)
+            source = workspace / "moving-object.mp4"
+            completed = subprocess.run(
+                [
+                    "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "color=c=black:s=320x180:r=12:d=1",
+                    "-f", "lavfi", "-i", "color=c=white:s=36x36:r=12:d=1",
+                    "-filter_complex", "overlay=x='20+80*t':y=55:eval=frame:shortest=1",
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", str(source),
+                ], capture_output=True, text=True, encoding="utf-8",
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingest["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "id": "reframe_clip", "track_id": "track_video_1", "asset_id": asset_id,
+                "source_in_tick": 0, "source_out_tick": 90000,
+            }]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            report_path = project / "validation" / "reframe.json"
+            code, applied = invoke(
+                "media", "reframe", "--project", str(project), "--asset-id", asset_id,
+                "--roi", "0.05,0.28,0.14,0.24", "--clip-id", "reframe_clip", "--track-id", "track_video_1",
+                "--output", str(report_path), "--apply",
+            )
+            self.assertEqual(code, 0, applied)
+            self.assertTrue(applied["data"]["before_snapshot"]["snapshot_id"])
+            self.assertEqual(applied["data"]["plan"]["fit"], "fill")
+            self.assertGreaterEqual(applied["data"]["plan"]["frames"], 2)
+            project_json = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            clip = project_json["sequences"][0]["tracks"][0]["clips"][0]
+            self.assertEqual(clip["crop"]["unit"], "normalized")
+            crop_tracks = {item["property"]: item["keyframes"] for item in clip["keyframes"] if str(item.get("property", "")).startswith("crop.")}
+            self.assertEqual(set(crop_tracks), {"crop.x", "crop.y", "crop.width", "crop.height"})
+            self.assertGreater(crop_tracks["crop.x"][-1]["value"], crop_tracks["crop.x"][0]["value"])
+            self.assertEqual(invoke("validate", "--project", str(project))[0], 0)
+            output = project / "renders" / "reframe.mp4"
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output))
+            self.assertEqual(code, 0, rendered)
+            self.assertTrue(output.exists())
 
     def test_nested_sequence_render_and_cycle_rejection(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-nested-sequence-") as raw:

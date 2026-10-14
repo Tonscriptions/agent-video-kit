@@ -37,6 +37,7 @@
 $video-cut-project-ops 初始化一个本地广告剪辑项目，并输出项目状态。
 $video-cut-local-policy 对 project.json 执行 policy audit，拒绝所有远程或闭源服务引用。
 $video-cut-video-understand 分析本地素材，生成字幕、镜头摘要和高光候选。
+$video-cut-agent-editor 对口播素材执行 media reframe，先检查目标画幅、主体越界和置信度，再应用 crop.* 动态关键帧。
 $video-cut-timeline 将高光候选编排为 30 秒竖屏广告，加入关键帧运镜和本地转场。
 $video-cut-quality 生成 waveform、vectorscope、histogram、固定 golden 清单和哈希证据报告。
 $video-cut-rights-ledger 检查所有素材、模板依赖和父资产的本地许可证证据和发布门禁，并在撤下/争议后创建可审计修订、历史影响报告和发布清单。
@@ -70,7 +71,7 @@ $video-cut-rights-ledger 检查所有素材、模板依赖和父资产的本地�
 1. 使用 `$video-cut-project-ops` 初始化或检查项目目录。
 2. 使用 `$video-cut-local-policy` 执行 `policy audit --project <project>`；发现 URL、云存储、流媒体、服务商标记时立即停止。
 3. 使用 `$video-cut-video-understand` 读取已落盘素材；素材必须先进入项目资产库并写入 Rights Ledger。
-4. 使用 `$video-cut-timeline`、`$video-cut-video-edit` 和 `$video-cut-ffmpeg` 生成时间线及本地渲染计划。
+4. 使用 `$video-cut-timeline`、`$video-cut-video-edit` 和 `$video-cut-ffmpeg` 生成时间线及本地渲染计划；需要横竖屏重构时，由 `$video-cut-agent-editor` 先执行 `media reframe --dry-run`，检查主体边界后再应用。
 5. 使用 `$video-cut-local-models` 选择已登记的离线模型；没有本地模型时输出能力缺口，不自动改走远程服务。
 6. 使用 `$video-cut-quality` 先跑 `quality check` 和 Scope，再用 `quality golden --mode capture` 固定通过的本地媒体/设置哈希，交付前用 `--mode verify` 检查漂移。
 7. 使用 `$video-cut-rights-ledger` 执行 `rights list/history/check`；发生多资产证据变更时用 `rights batch-update`，发生撤下时用 `rights retract` 和 `rights impact` 保留影响链；需要历史成片替换/删除时用 `rights decide` 生成 proposed/approved 决策和影响清单，批准后用 `rights apply` 更新当前项目时间线并保留历史文件，最后用 `rights export` 生成发布清单，再由 `$video-cut-agent-editor` 执行导出。
