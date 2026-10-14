@@ -71,7 +71,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `media track --project PATH ... --roi X,Y,W,H` | 本地视频、归一化 ROI | 本地模板匹配、置信度和位置关键帧；`--clip-id` 写回前创建快照 |
 | `media reframe --project PATH --asset-id ID --roi X,Y,W,H --clip-id ID --track-id ID` | 本地视频、目标画幅和直接媒体片段 | 将本地跟踪转换为归一化 `crop.*` 动态关键帧；`--apply` 在 `before-reframe` 快照后写回，变速/倒放/嵌套片段结构化拒绝 |
 | `ad plan --project PATH --input BRIEF.json` | 本地广告 brief 和可选分析报告 | 写入钩子、卖点、证明、CTA 的节拍计划和序列标记 |
-| `subtitle validate --input FILE` | SRT/VTT/ASS/SSA | 解析、时长、顺序和重叠报告 |
+| `subtitle validate --input FILE` | SRT/VTT/ASS/SSA/TTML | 解析、时长、顺序和重叠报告；TTML 只接受本地时钟/offset 语法并拒绝外部实体 |
 | `subtitle normalize --input FILE --output FILE` | 字幕文件 | 通过校验后规范化为 SRT；项目模式下输出必须位于项目内 |
 | `tts synthesize --project PATH (--text TEXT\|--input FILE)` | ASCII/英文文本或本地 UTF-8 文本文件 | 通过 FFmpeg 内置 flite 生成项目内 WAV；无网络、无模型下载；当前拒绝非 ASCII 文本 |
 | `effects list [--query TEXT] [--keyframable-only]` | 可选效果 ID、别名、类别或后端筛选 | 返回本地 FFmpeg 效果目录、参数范围、关键帧能力、限制和目录版本；只读、无网络 |

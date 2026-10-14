@@ -214,7 +214,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     subtitle = subs.add_parser("subtitle", help="字幕解析、验证与规范化")
     ss = subtitle.add_subparsers(dest="action", required=True)
-    subtitle_validate = _leaf_common(ss.add_parser("validate", help="验证 SRT/VTT/ASS 字幕"))
+    subtitle_validate = _leaf_common(ss.add_parser("validate", help="验证 SRT/VTT/ASS/SSA/TTML 字幕"))
     subtitle_validate.add_argument("--input", required=True)
     subtitle_validate.add_argument("--project", default=None)
     subtitle_validate.add_argument("--duration", type=float, default=None)

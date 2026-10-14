@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -143,12 +144,119 @@ def parse_ass(text: str) -> list[dict[str, Any]]:
     return cues
 
 
+def _ttml_local_name(value: str) -> str:
+    return str(value).rsplit("}", 1)[-1].split(":", 1)[-1].lower()
+
+
+def _ttml_attribute(element: ET.Element, name: str, default: str | None = None) -> str | None:
+    for key, value in element.attrib.items():
+        if _ttml_local_name(key) == name.lower():
+            return str(value)
+    return default
+
+
+def _parse_ttml_time(value: str, *, frame_rate: float, tick_rate: float) -> float:
+    raw = str(value).strip()
+    if not raw:
+        raise ValueError("TTML 时间不能为空")
+    # TTML clock time: hh:mm:ss[.fraction], mm:ss[.fraction], or ss[.fraction].
+    if ":" in raw:
+        return parse_timestamp(raw)
+    match = re.fullmatch(r"([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*(h|m|s|ms|f|t)?", raw, flags=re.IGNORECASE)
+    if not match:
+        raise ValueError(f"不支持的 TTML 时间: {value}")
+    number = float(match.group(1))
+    unit = (match.group(2) or "s").lower()
+    if number < 0:
+        raise ValueError(f"TTML 时间不能为负数: {value}")
+    if unit == "h":
+        return number * 3600.0
+    if unit == "m":
+        return number * 60.0
+    if unit == "ms":
+        return number / 1000.0
+    if unit == "f":
+        return number / max(frame_rate, 1e-9)
+    if unit == "t":
+        return number / max(tick_rate, 1e-9)
+    return number
+
+
+def _ttml_text(element: ET.Element) -> str:
+    chunks: list[str] = []
+    if element.text:
+        chunks.append(element.text)
+    for child in list(element):
+        if _ttml_local_name(child.tag) == "br":
+            chunks.append("\n")
+        else:
+            chunks.append(_ttml_text(child))
+        if child.tail:
+            chunks.append(child.tail)
+    return "".join(chunks)
+
+
+def parse_ttml(text: str) -> list[dict[str, Any]]:
+    """Parse common TTML/DFXP cues into the shared caption contract.
+
+    The parser intentionally accepts clock and offset time expressions only.
+    It rejects external entity declarations and unsupported timing syntax so a
+    local Agent cannot silently invent cue boundaries.
+    """
+    if re.search(r"<!DOCTYPE|<!ENTITY|SYSTEM\s+['\"]", text, flags=re.IGNORECASE):
+        raise argument_error("TTML 不允许外部实体或 DTD", "input")
+    try:
+        root = ET.fromstring(text)
+    except ET.ParseError as exc:
+        raise argument_error(f"TTML XML 无效: {exc}", "input") from exc
+    if _ttml_local_name(root.tag) not in {"tt", "ttml"}:
+        raise argument_error("XML 不是 TTML/DFXP 文档", "input")
+    try:
+        frame_rate = float(_ttml_attribute(root, "frameRate", "30") or 30.0)
+        multiplier = (_ttml_attribute(root, "frameRateMultiplier", "1 1") or "1 1").split()
+        if len(multiplier) == 2:
+            frame_rate *= float(multiplier[0]) / max(float(multiplier[1]), 1e-9)
+        tick_rate = float(_ttml_attribute(root, "tickRate", "1") or 1.0)
+    except (TypeError, ValueError) as exc:
+        raise argument_error("TTML frameRate/frameRateMultiplier/tickRate 无效", "input") from exc
+    if frame_rate <= 0 or tick_rate <= 0:
+        raise argument_error("TTML frameRate 和 tickRate 必须大于 0", "input")
+    cues: list[dict[str, Any]] = []
+
+    def walk(element: ET.Element, parent_begin: float = 0.0, parent_end: float | None = None) -> None:
+        begin_raw = _ttml_attribute(element, "begin")
+        end_raw = _ttml_attribute(element, "end")
+        dur_raw = _ttml_attribute(element, "dur")
+        try:
+            begin = parent_begin + (_parse_ttml_time(begin_raw, frame_rate=frame_rate, tick_rate=tick_rate) if begin_raw else 0.0)
+            end = parent_end
+            if end_raw:
+                end = parent_begin + _parse_ttml_time(end_raw, frame_rate=frame_rate, tick_rate=tick_rate)
+            elif dur_raw:
+                end = begin + _parse_ttml_time(dur_raw, frame_rate=frame_rate, tick_rate=tick_rate)
+        except ValueError as exc:
+            raise argument_error(str(exc), "input") from exc
+        if _ttml_local_name(element.tag) == "p":
+            if end is None:
+                raise argument_error("TTML cue 缺少 end 或 dur", "input")
+            body = _ttml_text(element).strip()
+            if body:
+                cues.append(_cue(begin, end, body, index=len(cues) + 1, source_format="ttml"))
+        for child in list(element):
+            walk(child, begin, end)
+
+    walk(root)
+    return sorted(cues, key=lambda item: (float(item["start"]), float(item["end"])))
+
+
 def parse_caption_text(text: str, suffix: str = ".srt") -> list[dict[str, Any]]:
     suffix = suffix.lower()
     if suffix == ".vtt":
         return parse_vtt(text)
     if suffix in {".ass", ".ssa"}:
         return parse_ass(text)
+    if suffix in {".ttml", ".dfxp", ".xml"}:
+        return parse_ttml(text)
     return parse_srt(text)
 
 

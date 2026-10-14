@@ -612,6 +612,26 @@ class P0CliTests(unittest.TestCase):
             code, result = invoke("subtitle", "validate", "--input", str(ass))
             self.assertEqual(code, 0, result)
             self.assertEqual(result["data"]["count"], 1)
+            ttml = workspace / "captions.ttml"
+            ttml.write_text(
+                '<tt xmlns="http://www.w3.org/ns/ttml" ttp:frameRate="25" xmlns:ttp="http://www.w3.org/ns/ttml#parameter">'
+                '<body begin="0s"><div><p begin="1s" dur="750ms">TTML <span>cue</span><br/>第二行</p></div></body></tt>',
+                encoding="utf-8",
+            )
+            code, result = invoke("subtitle", "validate", "--input", str(ttml))
+            self.assertEqual(code, 0, result)
+            self.assertEqual(result["data"]["count"], 1)
+            self.assertEqual(result["data"]["cues"][0]["source_format"], "ttml")
+            self.assertIn("第二行", result["data"]["cues"][0]["text"])
+            ttml_normalized = project / "validation" / "ttml-normalized.srt"
+            code, result = invoke("subtitle", "normalize", "--project", str(project), "--input", str(ttml), "--output", str(ttml_normalized))
+            self.assertEqual(code, 0, result)
+            self.assertIn("TTML cue", ttml_normalized.read_text(encoding="utf-8"))
+            unsafe_ttml = workspace / "unsafe.ttml"
+            unsafe_ttml.write_text('<!DOCTYPE tt SYSTEM "https://example.invalid/ttml.dtd"><tt/>', encoding="utf-8")
+            code, rejected = invoke("subtitle", "validate", "--input", str(unsafe_ttml))
+            self.assertEqual(code, 2, rejected)
+            self.assertEqual(rejected["errors"][0]["code"], "ARGUMENT_INVALID")
             _, ingested = invoke("media", "ingest", "--project", str(project), "--input", str(srt))
             self.assertEqual(ingested["data"]["asset"]["kind"], "subtitle")
 
