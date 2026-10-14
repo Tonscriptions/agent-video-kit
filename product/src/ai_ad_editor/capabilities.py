@@ -51,7 +51,7 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "templates": {
                 "status": "implemented",
-                "features": ["local_json_template", "typed_variables", "enum_variables", "numeric_and_string_constraints", "default_values", "exact_placeholder_type_preservation", "inline_string_placeholders", "template_snapshot", "batch_variant_input"],
+                "features": ["local_json_template", "typed_variables", "enum_variables", "numeric_and_string_constraints", "default_values", "exact_placeholder_type_preservation", "inline_string_placeholders", "template_snapshot", "batch_variant_input", "append_clip", "update_clip", "replace_clip", "remove_clip", "add_track", "update_track", "remove_track", "add_marker", "remove_marker"],
                 "variable_types": ["any", "string", "number", "integer", "boolean", "asset", "color", "enum"],
                 "limits": ["asset_type_only_validates_string_shape_before_project_asset_and_rights_checks", "complex_slot_graphs_and_conditional_operations_pending", "expression_evaluation_disabled"],
             },

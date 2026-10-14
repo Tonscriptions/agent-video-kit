@@ -2,8 +2,8 @@
   "id": "template.basic-vertical-ad",
   "version": "0.1.0",
   "variables": [
-    {"name": "asset_id", "required": true},
-    {"name": "duration_tick", "required": false, "default": 90000}
+    {"name": "asset_id", "type": "asset", "required": true},
+    {"name": "duration_tick", "type": "integer", "required": false, "default": 90000, "min": 1}
   ],
   "sequence_id": "seq_main",
   "operations": [

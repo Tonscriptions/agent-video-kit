@@ -1305,6 +1305,43 @@ class P0CliTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             instantiate(template, {"headline": "Sale", "aspect": "landscape"})
 
+    def test_template_operations_replace_slots_and_add_markers(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-template-ops-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingested = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingested["data"]["asset"]["id"]
+            template = workspace / "template.json"
+            template.write_text(json.dumps({
+                "id": "slot-ops.test",
+                "version": "0.2.0",
+                "variables": [
+                    {"name": "asset_id", "type": "asset", "required": True},
+                    {"name": "headline", "type": "string", "required": True},
+                    {"name": "marker_tick", "type": "integer", "default": 45000},
+                ],
+                "operations": [
+                    {"op": "append_clip", "id": "slot", "track_id": "track_video_1", "asset_id": "{{asset_id}}", "source_in_tick": 0, "source_out_tick": 90000},
+                    {"op": "update_clip", "clip_id": "slot", "patch": {"subtitle": {"text": "{{headline}}"}, "transform": {"scale": 0.8}}},
+                    {"op": "replace_clip", "clip_id": "slot", "asset_id": "{{asset_id}}"},
+                    {"op": "add_marker", "id": "hook", "at_tick": "{{marker_tick}}", "label": "{{headline}}"},
+                ],
+            }), encoding="utf-8")
+            variables = workspace / "variables.json"
+            variables.write_text(json.dumps({"asset_id": asset_id, "headline": "Local sale"}), encoding="utf-8")
+            code, result = invoke("template", "apply", "--project", str(project), "--input", str(template), "--variables", str(variables))
+            self.assertEqual(code, 0, result)
+            self.assertEqual([item["op"] for item in result["data"]["applied"]], ["append_clip", "update_clip", "replace_clip", "add_marker"])
+            project_payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            clip = project_payload["sequences"][0]["tracks"][0]["clips"][0]
+            self.assertEqual(clip["subtitle"]["text"], "Local sale")
+            self.assertEqual(clip["transform"]["scale"], 0.8)
+            self.assertEqual(project_payload["sequences"][0]["markers"][0]["at_tick"], 45000)
+            template_variables = {item["name"]: item["value"] for item in project_payload["templates"][0]["variables"]}
+            self.assertEqual(template_variables["marker_tick"], 45000)
+
     def test_image_clip_renders_with_local_loop(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-image-") as raw:
             workspace = Path(raw)

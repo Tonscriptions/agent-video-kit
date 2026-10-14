@@ -47,7 +47,7 @@ from .rights import VALID_STATUSES, active_records, add_record, apply_dispositio
 from .understand import understand_media
 from .tracking import track_media
 from .runtime import configure_local_runtime
-from .template import instantiate
+from .template import apply_template_operations, instantiate
 from .migration import SUPPORTED_SOURCE_VERSIONS, migrate_project_payload
 from .speech import flite_available, synthesize_local_tts
 from .effects import EFFECT_CATALOG_VERSION, get_effect, list_effects
@@ -2233,21 +2233,10 @@ def command_template_apply(args: argparse.Namespace) -> dict[str, Any]:
         raise argument_error("模板 operations/changes 必须是数组")
     if args.dry_run:
         return _envelope("template.apply", args, status="planned", data={"template_id": template.get("id"), "version": template.get("version"), "operations": operations, "variables": variables})
-    sequence = find_sequence(project, resolved.get("sequence_id"))
-    applied: list[dict[str, Any]] = []
-    for change in operations:
-        if change.get("op", "append_clip") != "append_clip":
-            raise argument_error(f"模板暂不支持操作: {change.get('op')}")
-        target_sequence = find_sequence(project, change.get("sequence_id") or sequence["id"])
-        track = find_track(target_sequence, change.get("track_id"), change.get("track_kind", "video"))
-        clip = _clip_from_change(change, track)
-        if clip["asset_id"] not in asset_map(project):
-            raise argument_error(f"模板引用的资产不存在: {clip['asset_id']}", "asset_id")
-        track.setdefault("clips", []).append(clip)
-        target_sequence["duration_tick"] = max(int(target_sequence.get("duration_tick", 1)), clip["timeline_start_tick"] + clip["duration_tick"])
-        applied.append({"op": "append_clip", "track_id": track["id"], "clip": clip})
+    applied = apply_template_operations(project, operations, resolved.get("sequence_id"))
     snapshot = resolved.get("template_snapshot", {"id": template.get("id"), "version": template.get("version"), "variables": variables})
-    project.setdefault("templates", []).append({"id": template.get("id") or new_id("template"), "version": template.get("version", "0.0.0"), "variables": [{"name": key, "value": value} for key, value in variables.items()], "assets": sorted({item["clip"].get("asset_id") for item in applied})})
+    snapshot_variables = resolved.get("template_snapshot", {}).get("variables", variables)
+    project.setdefault("templates", []).append({"id": template.get("id") or new_id("template"), "version": template.get("version", "0.0.0"), "variables": [{"name": key, "value": value} for key, value in snapshot_variables.items()], "assets": sorted({item.get("clip", {}).get("asset_id") for item in applied if isinstance(item.get("clip"), dict) and item.get("clip", {}).get("asset_id")})})
     operation_id = new_id("op")
     project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "template.apply", "template_snapshot": snapshot, "applied": applied, "at": now_iso()})
     save_project(root, project)

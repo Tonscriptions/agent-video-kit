@@ -1,36 +1,16 @@
 from __future__ import annotations
 
-import copy
 import json
 import shutil
 from pathlib import Path
 from typing import Any
 
 from .errors import AppError, argument_error
-from .project import asset_map, find_sequence, find_track, load_project, save_project
+from .project import find_sequence, load_project, save_project
 from .render import render_project
-from .template import instantiate
+from .template import apply_template_operations, instantiate
 from .utils import atomic_write_json, new_id, now_iso, safe_filename
 from .validator import validate_project
-
-
-def _append_clip(change: dict[str, Any], track: dict[str, Any]) -> dict[str, Any]:
-    for field in ("asset_id", "source_in_tick", "source_out_tick"):
-        if field not in change:
-            raise argument_error(f"批量模板 append_clip 缺少字段: {field}", field)
-    source_in = int(change["source_in_tick"])
-    source_out = int(change["source_out_tick"])
-    duration = int(change.get("duration_tick", source_out - source_in))
-    if source_out <= source_in or duration <= 0:
-        raise argument_error("批量模板片段时间范围无效")
-    start = change.get("timeline_start_tick")
-    if start is None:
-        start = max((int(item.get("timeline_start_tick", 0)) + int(item.get("duration_tick", 0)) for item in track.get("clips", [])), default=0)
-    clip = {"id": change.get("id") or new_id("clip"), "asset_id": change["asset_id"], "timeline_start_tick": int(start), "duration_tick": duration, "source_in_tick": source_in, "source_out_tick": source_out}
-    for field in ("transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "audio", "speed", "speed_curve"):
-        if field in change:
-            clip[field] = copy.deepcopy(change[field])
-    return clip
 
 
 def _apply_template(root: Path, project: dict[str, Any], template: dict[str, Any], variables: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
@@ -38,22 +18,9 @@ def _apply_template(root: Path, project: dict[str, Any], template: dict[str, Any
     operations = resolved.get("operations") or resolved.get("changes") or []
     if not isinstance(operations, list):
         raise argument_error("模板 operations/changes 必须是数组")
-    sequence = find_sequence(project, resolved.get("sequence_id"))
-    applied: list[dict[str, Any]] = []
-    for change in operations:
-        if change.get("op", "append_clip") != "append_clip":
-            raise argument_error(f"批量模板暂不支持操作: {change.get('op')}")
-        target_sequence = find_sequence(project, change.get("sequence_id") or sequence["id"])
-        track = find_track(target_sequence, change.get("track_id"), change.get("track_kind", "video"))
-        clip = _append_clip(change, track)
-        if clip["asset_id"] not in asset_map(project):
-            raise argument_error(f"模板引用的资产不存在: {clip['asset_id']}", "asset_id")
-        if any(item.get("id") == clip["id"] for item in track.get("clips", [])):
-            raise argument_error(f"模板片段 ID 已存在: {clip['id']}", "id")
-        track.setdefault("clips", []).append(clip)
-        target_sequence["duration_tick"] = max(int(target_sequence.get("duration_tick", 1)), clip["timeline_start_tick"] + clip["duration_tick"])
-        applied.append({"op": "append_clip", "track_id": track["id"], "clip": clip})
-    project.setdefault("templates", []).append({"id": template.get("id") or new_id("template"), "version": template.get("version", "0.0.0"), "variables": [{"name": key, "value": value} for key, value in variables.items()], "assets": sorted({item["clip"].get("asset_id") for item in applied})})
+    applied = apply_template_operations(project, operations, resolved.get("sequence_id"))
+    snapshot_variables = resolved.get("template_snapshot", {}).get("variables", variables)
+    project.setdefault("templates", []).append({"id": template.get("id") or new_id("template"), "version": template.get("version", "0.0.0"), "variables": [{"name": key, "value": value} for key, value in snapshot_variables.items()], "assets": sorted({item.get("clip", {}).get("asset_id") for item in applied if isinstance(item.get("clip"), dict) and item.get("clip", {}).get("asset_id")})})
     return resolved, applied
 
 
