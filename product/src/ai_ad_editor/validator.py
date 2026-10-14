@@ -357,6 +357,32 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                 ids.add(tid)
             if track.get("kind") not in {"video", "audio", "subtitle", "data"}:
                 error("TRACK_KIND_INVALID", "轨道 kind 无效", f"{tp}.kind")
+            track_audio = track.get("audio")
+            if track_audio is not None:
+                if not isinstance(track_audio, dict):
+                    error("TRACK_AUDIO_INVALID", "轨道 audio 必须是对象", f"{tp}.audio")
+                else:
+                    for boolean_field in ("mute", "muted", "solo", "duck_under_voice"):
+                        if boolean_field in track_audio and not isinstance(track_audio[boolean_field], bool):
+                            error("TRACK_AUDIO_BOOLEAN_INVALID", f"轨道 audio.{boolean_field} 必须是布尔值", f"{tp}.audio.{boolean_field}")
+                    if "volume" in track_audio:
+                        raw_volume = track_audio.get("volume")
+                        try:
+                            volume = float(raw_volume)
+                        except (TypeError, ValueError):
+                            volume = math.nan
+                        if isinstance(raw_volume, bool) or not math.isfinite(volume) or not 0.0 <= volume <= 4.0:
+                            error("TRACK_AUDIO_VOLUME_INVALID", "轨道 audio.volume 必须是 0..4 的有限数字", f"{tp}.audio.volume")
+                    if "pan" in track_audio:
+                        raw_pan = track_audio.get("pan")
+                        try:
+                            pan = float(raw_pan)
+                        except (TypeError, ValueError):
+                            pan = math.nan
+                        if isinstance(raw_pan, bool) or not math.isfinite(pan) or not -1.0 <= pan <= 1.0:
+                            error("TRACK_AUDIO_PAN_INVALID", "轨道 audio.pan 必须是 -1..1 的有限数字", f"{tp}.audio.pan")
+                    if "role" in track_audio and (not isinstance(track_audio.get("role"), str) or not str(track_audio.get("role")).strip()):
+                        error("TRACK_AUDIO_ROLE_INVALID", "轨道 audio.role 必须是非空字符串", f"{tp}.audio.role")
             clips = track.get("clips", [])
             occupied: list[tuple[int, int, str]] = []
             for ci, clip in enumerate(clips):

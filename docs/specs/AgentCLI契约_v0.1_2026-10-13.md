@@ -178,7 +178,7 @@ python -X utf8 -m ai_ad_editor effects inspect --name curves
 python -X utf8 -m ai_ad_editor render --project .\work\demo --dry-run
 ```
 
-音频片段使用本地 FFmpeg 滤镜链，支持音量关键帧、`audio.pan`/`pan` 声像关键帧（`-1` 左至 `1` 右）、降噪、压缩、均衡、高低通、对白增强、变调、混响、响度归一化、淡入淡出和旁白 ducking。字符串 `audio.pan` 仅用于显式 raw FFmpeg pan 表达式；数值声像先将输入规范化为立体声，再以逐帧 `aeval` 平衡左右通道，单声道素材会复制到两路，立体声素材不会先被折叠为单声道。
+音频片段使用本地 FFmpeg 滤镜链，支持音量关键帧、`audio.pan`/`pan` 声像关键帧（`-1` 左至 `1` 右）、降噪、压缩、均衡、高低通、对白增强、变调、混响、响度归一化、淡入淡出和旁白 ducking。音频轨道可在 `track.audio` 声明 `mute`/`muted`、`solo`、`volume`、`pan`、`role` 和 `duck_under_voice`；solo 会形成项目内音频轨道选择门，轨道静态音量/声像在片段链之后执行。字符串 `audio.pan` 仅用于显式 raw FFmpeg pan 表达式；数值声像先将输入规范化为立体声，再以逐帧 `aeval` 平衡左右通道，单声道素材会复制到两路，立体声素材不会先被折叠为单声道。
 
 ### 6.3 本地素材确定性索引
 

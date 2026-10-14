@@ -2248,7 +2248,21 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
             kind = str(track.get("kind", "video"))
             virtual_id = f"{prefix}{track.get('id', 'track')}"
             key = (kind, virtual_id)
-            output_track = collected.setdefault(key, {"id": virtual_id, "kind": kind, "order": int(track.get("order", 0)), "muted": False, "locked": False, "clips": []})
+            output_track = collected.setdefault(
+                key,
+                {
+                    "id": virtual_id,
+                    "kind": kind,
+                    "order": int(track.get("order", 0)),
+                    "muted": False,
+                    "locked": False,
+                    "overlap_policy": track.get("overlap_policy"),
+                    "role": track.get("role"),
+                    "duck_under_voice": track.get("duck_under_voice"),
+                    "audio": copy.deepcopy(track.get("audio")) if isinstance(track.get("audio"), dict) else {},
+                    "clips": [],
+                },
+            )
             for clip in sorted(track.get("clips", []), key=lambda item: int(item.get("timeline_start_tick", 0))):
                 clip_start = int(clip.get("timeline_start_tick", 0))
                 clip_end = clip_start + int(clip.get("duration_tick", 0))
@@ -2707,8 +2721,22 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     has_adjustments = bool(adjustment_layers)
     index = 0
     render_tracks = _flatten_sequence_tracks(project, sequence, warnings)
+    audio_track_controls = {
+        str(track.get("id")): track.get("audio") if isinstance(track.get("audio"), dict) else {}
+        for track in render_tracks
+        if track.get("kind") == "audio"
+    }
+    solo_audio_tracks = {
+        track_id
+        for track_id, controls in audio_track_controls.items()
+        if bool(controls.get("solo", False))
+    }
     for track in sorted(render_tracks, key=lambda item: int(item.get("order", 0))):
-        if track.get("muted"):
+        track_audio = track.get("audio") if isinstance(track.get("audio"), dict) else {}
+        track_id = str(track.get("id"))
+        if track.get("kind") == "audio" and solo_audio_tracks and track_id not in solo_audio_tracks:
+            continue
+        if track.get("muted") or bool(track_audio.get("muted", False) or track_audio.get("mute", False)):
             continue
         for clip in sorted(track.get("clips", []), key=lambda item: int(item.get("timeline_start_tick", 0))):
             asset = assets.get(clip.get("asset_id"))
@@ -3162,6 +3190,28 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                             f"aeval=exprs={_expr_arg(left_expr + '|' + right_expr)}:c=stereo",
                             "aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo",
                         ])
+                track_volume_raw = track_audio.get("volume")
+                if track_volume_raw is not None:
+                    track_volume = max(0.0, min(4.0, _num(track_volume_raw, 1.0)))
+                    if abs(track_volume - 1.0) > 1e-9:
+                        audio_chain.append(f"volume=volume={track_volume:.6f}")
+                track_pan_raw = track_audio.get("pan")
+                if track_pan_raw is not None:
+                    try:
+                        track_pan_value = float(track_pan_raw)
+                    except (TypeError, ValueError):
+                        track_pan_value = math.nan
+                    if isinstance(track_pan_raw, bool) or not math.isfinite(track_pan_value) or not -1.0 <= track_pan_value <= 1.0:
+                        warnings.append({"code": "AUDIO_TRACK_PAN_INVALID", "clip_id": clip.get("id"), "track_id": track_id, "feature": "track_audio.pan", "message": "音频轨道 pan 必须是 -1..1 的有限数字，已忽略"})
+                    elif abs(track_pan_value) > 1e-9:
+                        track_pan_expr = f"clip({track_pan_value:.8f},-1,1)"
+                        left_expr = f"val(0)*(1-max(({track_pan_expr}),0))"
+                        right_expr = f"val(1)*(1+min(({track_pan_expr}),0))"
+                        audio_chain.extend([
+                            "aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo",
+                            f"aeval=exprs={_expr_arg(left_expr + '|' + right_expr)}:c=stereo",
+                            "aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo",
+                        ])
                 fade_in = audio_settings.get("fade_in")
                 if fade_in:
                     audio_chain.append(f"afade=t=in:st=0:d={max(0.001, _num(fade_in, 0.25)):.6f}")
@@ -3173,16 +3223,16 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 audio_chain.append(f"adelay={start_ms}|{start_ms}")
                 filters.append(",".join(audio_chain) + f"[{label}]")
                 audio_labels.append(label)
-                role = str(audio_settings.get("role", track.get("role", "other"))).lower()
+                role = str(audio_settings.get("role", track_audio.get("role", track.get("role", "other")))).lower()
                 if role in {"voice", "dialogue", "narration", "speech"}:
                     voice_audio_labels.append(label)
                 elif role in {"music", "bgm", "background"}:
                     music_audio_labels.append(label)
-                    if audio_settings.get("duck_under_voice") or isinstance(audio_settings.get("ducking"), dict) or track.get("duck_under_voice"):
+                    if audio_settings.get("duck_under_voice") or isinstance(audio_settings.get("ducking"), dict) or track_audio.get("duck_under_voice") or track.get("duck_under_voice"):
                         ducking_requested = True
                 else:
                     other_audio_labels.append(label)
-                input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "input": index, "kind": "audio", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
+                input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "track_id": track_id, "input": index, "kind": "audio", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
                 index += 1
     if not video_labels and not subtitle_overlays:
         raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")

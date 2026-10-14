@@ -166,6 +166,7 @@
         "order": {"type": "integer"},
         "muted": {"type": "boolean"},
         "locked": {"type": "boolean"},
+        "audio": {"type": "object", "additionalProperties": true},
         "clips": {"type": "array", "items": {"$ref": "#/$defs/clip"}}
       }
     },

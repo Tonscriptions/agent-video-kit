@@ -1265,6 +1265,8 @@ def _add_track(sequence: dict[str, Any], change: dict[str, Any]) -> dict[str, An
     }
     if "overlap_policy" in change:
         track["overlap_policy"] = change["overlap_policy"]
+    if isinstance(change.get("audio"), dict):
+        track["audio"] = copy.deepcopy(change["audio"])
     sequence.setdefault("tracks", []).append(track)
     return track
 
@@ -1732,9 +1734,9 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track = find_track(target_sequence, change.get("track_id"), None)
             patch = change.get("patch") if isinstance(change.get("patch"), dict) else change
-            for field in ("muted", "locked", "order", "overlap_policy"):
+            for field in ("muted", "locked", "order", "overlap_policy", "audio"):
                 if field in patch:
-                    track[field] = patch[field]
+                    track[field] = copy.deepcopy(patch[field]) if field == "audio" else patch[field]
             applied.append({"op": operation, "track_id": track["id"], "track": track})
         elif operation == "remove_clip":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])

@@ -114,7 +114,7 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "audio": {
                 "status": "implemented",
-                "features": ["multi_track_mix", "volume_automation", "pan_automation", "stereo_preserving_numeric_pan", "fade", "denoise", "compressor", "equalizer", "highpass", "lowpass", "dialogue_enhance", "pitch_shift", "reverb", "loudnorm", "ducking", "pan", "beat_anchors", "freeze_audio_silence_at_timeline_position"],
+                "features": ["multi_track_mix", "track_mute", "track_solo", "track_volume", "track_pan", "track_role", "volume_automation", "pan_automation", "stereo_preserving_numeric_pan", "fade", "denoise", "compressor", "equalizer", "highpass", "lowpass", "dialogue_enhance", "pitch_shift", "reverb", "loudnorm", "ducking", "pan", "beat_anchors", "freeze_audio_silence_at_timeline_position"],
                 "limits": ["freeze_audio_continue_uses_tail_padding", "audio_speed_curve_uses_piecewise_atempo"],
             },
             "render": {

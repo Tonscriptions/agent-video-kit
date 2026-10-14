@@ -85,6 +85,7 @@
 | `kind` | `video`、`audio`、`subtitle`、`data` |
 | `order` | 从后向前的合成顺序；值越大越靠前 |
 | `muted`、`locked` | 编排和渲染行为 |
+| `audio` | 仅音频轨道的本地控制对象：`mute`/`muted`、`solo`、`volume`（`0..4`）、`pan`（`-1..1`）、`role` 和 `duck_under_voice` |
 | `clips[]` | 片段、生成层或嵌套序列引用 |
 
 片段至少包含 `id`、`asset_id` 或 `sequence_id`、`timeline_start_tick`、`duration_tick`、`source_in_tick`、`source_out_tick`。可选 `transform.anchor` 使用归一化 `x/y`，也可使用 `anchor_x/anchor_y` 别名；`transform.anchor.x/y` 关键帧可以写在片段 `keyframes[]` 中。可选 `crop` 使用 `pixels`/`normalized`/`relative` 单位和 `fit`/`fill`/`stretch` 模式；其坐标与尺寸必须是有限非负数，归一化值不得超过 1。`crop.keyframes` 可以驱动 `x`/`y`/`width`/`height`，或在片段级关键帧中使用 `crop.x`/`crop.y`/`crop.width`/`crop.height`；动态尺寸使用 CPU `geq` 固定画布逆向采样保持输出帧尺寸稳定，并以 `fit`/`fill`/`stretch` 规则计算窗口，宽高关键帧仍必须大于 0。必须满足：
@@ -92,7 +93,7 @@
 - 源出点大于源入点，且不能超过资产可用时长；
 - 同一轨道中片段重叠必须显式声明 `overlap_policy`，不能依赖数组顺序猜测；
 - 视频片段的画布、变换和效果继承关系必须可计算；
-- 音频片段必须声明声道、采样率或让探测器补齐，并记录静音/ducking 包络；
+- 音频片段必须声明声道、采样率或让探测器补齐，并记录静音/ducking 包络；音频轨道的 `audio.solo` 启用时，只混合被 solo 的音频轨道，轨道 `audio.volume/pan` 在片段音频链之后执行；
 - 嵌套序列必须声明父子关系和循环检测结果，禁止递归环。
 
 ## 6. 关键帧、效果与转场

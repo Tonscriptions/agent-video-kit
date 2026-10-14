@@ -857,6 +857,9 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("hable", manifest["capabilities"]["output"]["tone_mapping"])
         self.assertIn("local_flite_tts", manifest["capabilities"]["ai"]["features"])
         self.assertIn("local_ad_plan_apply", manifest["capabilities"]["ai"]["features"])
+        self.assertIn("track_mute", manifest["capabilities"]["audio"]["features"])
+        self.assertIn("track_solo", manifest["capabilities"]["audio"]["features"])
+        self.assertIn("track_volume", manifest["capabilities"]["audio"]["features"])
         self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.3.0")
         self.assertIn("exposure", manifest["capabilities"]["effects"]["catalog_features"])
         self.assertIn("hsl", manifest["capabilities"]["effects"]["catalog_features"])
@@ -2918,17 +2921,46 @@ class P0CliTests(unittest.TestCase):
             asset_id = ingest_result["data"]["asset"]["id"]
             changes = workspace / "changes.json"
             changes.write_text(json.dumps({"operations": [
-                {"op": "update_track", "track_id": "track_audio_1", "overlap_policy": "allow"},
+                {"op": "update_track", "track_id": "track_audio_1", "patch": {"overlap_policy": "allow", "audio": {"volume": 0.8, "pan": -0.1}}},
                 {"op": "append_clip", "track_id": "track_video_1", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000},
                 {"op": "append_clip", "track_id": "track_audio_1", "id": "voice", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000, "audio": {"role": "voice", "volume": 1.0}},
                 {"op": "append_clip", "track_id": "track_audio_1", "id": "music", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000, "audio": {"role": "music", "duck_under_voice": True, "volume": 0.4}, "timeline_start_tick": 0},
             ]}), encoding="utf-8")
             self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
             output = project / "renders" / "ducking.mp4"
+            code, planned = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
+            self.assertEqual(code, 0, planned)
+            self.assertIn("volume=volume=0.800000", planned["data"]["plan"]["filter_complex"])
+            self.assertIn("aeval=exprs=", planned["data"]["plan"]["filter_complex"])
             code, result = invoke("render", "--project", str(project), "--output", str(output))
             self.assertEqual(code, 0, result)
             self.assertTrue(output.exists())
             self.assertTrue(any(item.get("code") == "AUDIO_DUCKING_APPLIED" for item in result["warnings"]))
+
+            mute_changes = workspace / "mute-track.json"
+            mute_changes.write_text(json.dumps({"operations": [
+                {"op": "update_track", "track_id": "track_audio_1", "patch": {"audio": {"muted": True}}},
+            ]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(mute_changes))[0], 0)
+            code, muted_plan = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
+            self.assertEqual(code, 0, muted_plan)
+            self.assertNotIn("[1:a]", muted_plan["data"]["plan"]["filter_complex"])
+            self.assertNotIn("[2:a]", muted_plan["data"]["plan"]["filter_complex"])
+
+            restore_changes = workspace / "restore-track.json"
+            restore_changes.write_text(json.dumps({"operations": [
+                {"op": "update_track", "track_id": "track_audio_1", "patch": {"audio": {"volume": 0.8, "pan": -0.1}}},
+            ]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(restore_changes))[0], 0)
+            solo_changes = workspace / "solo-track.json"
+            solo_changes.write_text(json.dumps({"operations": [
+                {"op": "add_track", "id": "track_audio_solo", "kind": "audio", "order": 2, "audio": {"solo": True}},
+            ]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(solo_changes))[0], 0)
+            code, solo_plan = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
+            self.assertEqual(code, 0, solo_plan)
+            self.assertNotIn("[1:a]", solo_plan["data"]["plan"]["filter_complex"])
+            self.assertNotIn("[2:a]", solo_plan["data"]["plan"]["filter_complex"])
 
     def test_audio_pan_keyframes_render(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-pan-") as raw:
