@@ -1388,6 +1388,13 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(completed.returncode, 0, completed.stderr)
             with Image.open(frame) as image:
                 self.assertGreater(image.convert("RGB").getpixel((170, 100))[0], 150)
+            project_payload["sequences"][0]["tracks"][0]["clips"][0]["transform"]["rotation"] = 45.0
+            (project / "project.json").write_text(json.dumps(project_payload), encoding="utf-8")
+            code, rotated_plan = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180", "--dry-run")
+            self.assertEqual(code, 0, rotated_plan)
+            self.assertIn("abs(", rotated_plan["data"]["plan"]["filter_complex"])
+            code, rotated_render = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180")
+            self.assertEqual(code, 0, rotated_render)
             project_payload["sequences"][0]["tracks"][0]["clips"][0]["transform"]["anchor"]["x"] = 1.1
             (project / "project.json").write_text(json.dumps(project_payload), encoding="utf-8")
             code, invalid = invoke("validate", "--project", str(project))

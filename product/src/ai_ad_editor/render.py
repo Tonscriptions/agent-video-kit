@@ -913,6 +913,39 @@ def _transform_exprs(clip: dict[str, Any], start: float, tps: int) -> dict[str, 
     return result
 
 
+def _video_overlay_position(transform: dict[str, str], width: int, height: int) -> tuple[str, str]:
+    """Return overlay coordinates that keep the authored anchor on position.
+
+    Video layers are normalized to the output canvas before the transform
+    chain. That makes the pre-rotation dimensions deterministic and lets the
+    overlay expression compensate for FFmpeg's rotate filter expanding its
+    bounding box. The subtitle compositor intentionally keeps its existing
+    full-canvas rotation contract.
+    """
+    position_x = transform["position_x"]
+    position_y = transform["position_y"]
+    anchor_x = transform["anchor_x"]
+    anchor_y = transform["anchor_y"]
+    if transform["rotation"] == "0.00000000":
+        return (
+            f"({position_x})*W-w*({anchor_x})",
+            f"({position_y})*H-h*({anchor_y})",
+        )
+    angle = f"(({transform['rotation']})*PI/180)"
+    scaled_width = f"max(2,{width}*({transform['scale']}))"
+    scaled_height = f"max(2,{height}*({transform['scale']}))"
+    rotated_width = f"(abs(({scaled_width})*cos({angle}))+abs(({scaled_height})*sin({angle})))"
+    rotated_height = f"(abs(({scaled_width})*sin({angle}))+abs(({scaled_height})*cos({angle})))"
+    delta_x = f"(({anchor_x})-0.5)*({scaled_width})"
+    delta_y = f"(({anchor_y})-0.5)*({scaled_height})"
+    anchor_output_x = f"(({rotated_width})/2+({delta_x})*cos({angle})-({delta_y})*sin({angle}))"
+    anchor_output_y = f"(({rotated_height})/2+({delta_x})*sin({angle})+({delta_y})*cos({angle}))"
+    return (
+        f"({position_x})*W-({anchor_output_x})",
+        f"({position_y})*H-({anchor_output_y})",
+    )
+
+
 def _speed_curve_segments(clip: dict[str, Any], source_span_tick: int, tps: int) -> list[tuple[float, float, float, float]]:
     """Normalize a source-relative speed curve into time/remap segments.
 
@@ -2762,8 +2795,9 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     chain.append(f"fade=t=out:st={max(0.0, clip_content_duration + freeze_extra-fade_duration):.6f}:d={fade_duration:.6f}")
                 filters.append(",".join(chain) + f"[{label}]")
                 video_labels.append(label)
-                position_x_expr = _expr_arg("(" + transforms["position_x"] + ")*W-w*(" + transforms["anchor_x"] + ")")
-                position_y_expr = _expr_arg("(" + transforms["position_y"] + ")*H-h*(" + transforms["anchor_y"] + ")")
+                overlay_x, overlay_y = _video_overlay_position(transforms, width, height)
+                position_x_expr = _expr_arg(overlay_x)
+                position_y_expr = _expr_arg(overlay_y)
                 position = f"x={position_x_expr}:y={position_y_expr}"
                 video_positions.append(position)
                 video_specs.append({

@@ -110,7 +110,7 @@
 }
 ```
 
-锚点关键帧使用同一片段时钟，例如 `transform.anchor.x` 或 `transform.anchor.y`；值必须位于 `0..1`。锚点改变的是叠加定位参考点，旋转仍由本地 FFmpeg 在图层中心执行；需要嵌套父级枢轴的项目必须读取渲染 manifest 的近似警告。
+锚点关键帧使用同一片段时钟，例如 `transform.anchor.x` 或 `transform.anchor.y`；值必须位于 `0..1`。锚点改变的是叠加定位参考点，视频叶片的旋转会补偿 FFmpeg 扩展边界以保持锚点，独立文字透明画布仍绕其画布中心；需要嵌套父级枢轴的项目必须读取渲染 manifest 的近似警告。
 
 `at_tick` 是片段内时间，不能混用源媒体时间和序列时间。允许的插值包括 `hold`、`linear`、`ease_in`、`ease_out`、`ease_in_out` 和 `bezier`。Bezier 必须携带有限数字控制点：`[y1, y2]` 表示两个纵向控制值，或 `[x1, y1, x2, y2]` 表示归一化 cubic 控制点，其中 `x1/x2` 必须位于 `0..1`；参数错误必须在写入或渲染前拒绝。
 
