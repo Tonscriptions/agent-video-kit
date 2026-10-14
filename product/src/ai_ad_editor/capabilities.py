@@ -5,6 +5,7 @@ from typing import Any
 from . import ENGINE_ID, VERSION
 from .effects import EFFECT_CATALOG_VERSION, effect_catalog
 from .media import ffmpeg_version
+from .motion_presets import MOTION_PRESET_CATALOG_VERSION, motion_preset_catalog
 
 
 def build_capability_manifest() -> dict[str, Any]:
@@ -56,8 +57,17 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "timeline": {
                 "status": "implemented",
-                "features": ["multi_track", "append", "update", "remove", "split", "ripple_insert", "ripple_delete", "slip", "slide", "speed", "speed_curve", "speed_curve_reverse_reflection", "reverse", "freeze_frame", "crop", "crop_position_keyframes", "crop_size_keyframes", "transform_anchor", "nested_sequences", "nested_reverse", "nested_reverse_parent_bezier_keyframes", "nested_parent_keyframe_layers", "markers"],
+                "features": ["multi_track", "append", "update", "remove", "split", "ripple_insert", "ripple_delete", "slip", "slide", "speed", "speed_curve", "speed_curve_reverse_reflection", "reverse", "freeze_frame", "crop", "crop_position_keyframes", "crop_size_keyframes", "transform_anchor", "motion_preset_keyframes", "motion_preset_apply", "nested_sequences", "nested_reverse", "nested_reverse_parent_bezier_keyframes", "nested_parent_keyframe_layers", "markers"],
                 "limits": ["dynamic_crop_uses_fixed_canvas_inverse_sampling", "dynamic_crop_inverse_sampler_is_cpu_geq", "nested_static_transform_effects_blend_are_flattened", "nested_multiple_masks_use_sequential_alpha_with_coordinate_approximation", "nested_reverse_static_clips_preserve_temporal_order", "nested_reverse_leaf_keyframes_under_nonlinear_speed_are_piecewise_approximate", "nested_speed_curve_uses_analytic_boundary_mapping_and_leaf_average_speed", "nested_parent_anchor_pivot_is_leaf_placement_approximation", "audio_speed_curve_uses_piecewise_atempo_and_can_have_segment_boundaries"],
+            },
+            "motion": {
+                "status": "implemented",
+                "catalog_version": MOTION_PRESET_CATALOG_VERSION,
+                "source": "local-catalog",
+                "engine": "timeline-keyframes",
+                "features": ["list", "inspect", "apply", "aliases", "bounded_parameters", "partial_clip_range", "snapshot_before_apply", "operation_record"],
+                "presets": motion_preset_catalog()["presets"],
+                "limits": ["presets_write_transform_keyframes_and_do_not_generate_new_media", "fixed_catalog_does_not_claim_gui_motion_template_equivalence", "keyframe_motion_is_rendered_by_local_ffmpeg_backend"],
             },
             "templates": {
                 "status": "implemented",

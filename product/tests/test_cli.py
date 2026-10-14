@@ -867,6 +867,10 @@ class P0CliTests(unittest.TestCase):
         self.assertFalse(manifest["capabilities"]["library"]["vector_index"])
         self.assertIn("typed_variables", manifest["capabilities"]["templates"]["features"])
         self.assertIn("inline_string_placeholders", manifest["capabilities"]["templates"]["features"])
+        self.assertIn("motion_preset_apply", manifest["capabilities"]["timeline"]["features"])
+        self.assertEqual(manifest["capabilities"]["motion"]["catalog_version"], "0.1.0")
+        self.assertIn("apply", manifest["capabilities"]["motion"]["features"])
+        self.assertEqual(manifest["capabilities"]["motion"]["source"], "local-catalog")
         self.assertEqual(manifest["policies"]["jianying_runtime_enabled"], False)
 
     def test_effect_catalog_cli_is_local_and_queryable(self) -> None:
@@ -888,6 +892,69 @@ class P0CliTests(unittest.TestCase):
         code, rejected = invoke("effects", "inspect", "--name", "remote-effect")
         self.assertEqual(code, 2)
         self.assertEqual(rejected["errors"][0]["code"], "ARGUMENT_INVALID")
+
+    def test_motion_catalog_is_local_and_aliases_are_queryable(self) -> None:
+        code, result = invoke("motion", "list", "--query", "zoom")
+        self.assertEqual(code, 0, result)
+        self.assertEqual(result["command"], "motion.list")
+        self.assertEqual(result["data"]["source"], "local-catalog")
+        self.assertEqual(result["data"]["network"], "disabled")
+        self.assertEqual({item["id"] for item in result["data"]["presets"]}, {"zoom_in", "zoom_out"})
+
+        code, inspected = invoke("motion", "inspect", "--name", "push-in")
+        self.assertEqual(code, 0, inspected)
+        self.assertEqual(inspected["data"]["preset"]["id"], "zoom_in")
+        self.assertEqual(inspected["data"]["preset"]["engine"], "timeline-keyframes")
+        self.assertIn("transform.scale", inspected["data"]["preset"]["properties"])
+
+        code, rejected = invoke("motion", "inspect", "--name", "remote-motion")
+        self.assertEqual(code, 2)
+        self.assertEqual(rejected["errors"][0]["code"], "ARGUMENT_INVALID")
+
+    def test_motion_apply_writes_keyframes_snapshot_and_operation(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-motion-apply-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, ingested = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            self.assertEqual(code, 0, ingested)
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "id": "motion_clip",
+                "asset_id": ingested["data"]["asset"]["id"], "source_in_tick": 0, "source_out_tick": 90000,
+            }]}), encoding="utf-8")
+            code, composed = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
+            self.assertEqual(code, 0, composed)
+
+            code, applied = invoke(
+                "motion", "apply", "--project", str(project), "--clip-id", "motion_clip",
+                "--preset", "push-in", "--amount", "0.2", "--start-tick", "1000", "--end-tick", "80000",
+            )
+            self.assertEqual(code, 0, applied)
+            self.assertEqual(applied["data"]["motion"]["preset"], "zoom_in")
+            self.assertEqual(applied["data"]["motion"]["requested_preset"], "push-in")
+            self.assertTrue(applied["data"]["before_snapshot"]["snapshot_id"])
+            self.assertEqual(applied["data"]["validation"]["ok"], True)
+            operation = json.loads((project / "operations" / f'{applied["operation_id"]}.json').read_text(encoding="utf-8"))
+            self.assertEqual(operation["command"], "motion.apply")
+            self.assertEqual(operation["motion"]["catalog_version"], "0.1.0")
+            payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            clip = payload["sequences"][0]["tracks"][0]["clips"][0]
+            scale_track = next(item for item in clip["keyframes"] if item["property"] == "transform.scale")
+            self.assertEqual([item["at_tick"] for item in scale_track["keyframes"]], [1000, 80000])
+
+            code, dry_run = invoke("motion", "apply", "--project", str(project), "--clip-id", "motion_clip", "--preset", "shake", "--dry-run")
+            self.assertEqual(code, 0, dry_run)
+            self.assertEqual(dry_run["status"], "planned")
+            self.assertNotIn("transform.position.x", [item["property"] for item in clip["keyframes"]])
+
+            code, invalid = invoke("motion", "apply", "--project", str(project), "--clip-id", "motion_clip", "--preset", "zoom-in", "--amount", "2")
+            self.assertEqual(code, 2)
+            self.assertEqual(invalid["errors"][0]["code"], "ARGUMENT_INVALID")
+            code, invalid_points = invoke("motion", "apply", "--project", str(project), "--clip-id", "motion_clip", "--preset", "shake", "--points", "1")
+            self.assertEqual(code, 2)
+            self.assertEqual(invalid_points["errors"][0]["code"], "ARGUMENT_INVALID")
 
     def test_effect_parameter_whitelists_reject_filtergraph_injection(self) -> None:
         warnings = []

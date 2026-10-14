@@ -5,6 +5,7 @@ import copy
 import contextlib
 import io
 import json
+import math
 import os
 import platform
 import shutil
@@ -54,6 +55,7 @@ from .template import apply_template_operations, instantiate
 from .migration import SUPPORTED_SOURCE_VERSIONS, migrate_project_payload
 from .speech import flite_available, synthesize_local_tts
 from .effects import EFFECT_CATALOG_VERSION, get_effect, list_effects
+from .motion_presets import MOTION_PRESET_CATALOG_VERSION, canonical_motion_preset, get_motion_preset, list_motion_presets
 from .scopes import SCOPE_VERSION, generate_scopes
 from .policy import audit_local_tree, policy_error_from_findings, require_local_reference
 from .render_queue import JOB_STATUSES, cancel_path, enqueue as enqueue_render_jobs, find_job, load_queue, normalize_job, queue_path, save_queue, set_status
@@ -208,6 +210,24 @@ def build_parser() -> argparse.ArgumentParser:
     effects_list.add_argument("--keyframable-only", action="store_true", help="只列出支持逐帧参数关键帧的效果")
     effects_inspect = _leaf_common(effects_sub.add_parser("inspect", help="查看单个效果的详细契约"))
     effects_inspect.add_argument("--name", required=True, help="效果 ID 或别名")
+
+    motion = subs.add_parser("motion", help="查询和应用本地关键帧运镜预设")
+    motion_sub = motion.add_subparsers(dest="action", required=True)
+    motion_list = _leaf_common(motion_sub.add_parser("list", help="列出可用运镜预设及参数契约"))
+    motion_list.add_argument("--query", default=None, help="按 ID、别名、类别或说明筛选")
+    motion_inspect = _leaf_common(motion_sub.add_parser("inspect", help="查看单个运镜预设的详细契约"))
+    motion_inspect.add_argument("--name", required=True, help="预设 ID 或别名")
+    motion_apply = _leaf_common(motion_sub.add_parser("apply", help="将运镜预设应用到已有片段"))
+    motion_apply.add_argument("--project", required=True)
+    motion_apply.add_argument("--clip-id", required=True)
+    motion_apply.add_argument("--track-id", default=None, help="可选轨道 ID，用于消除重复片段 ID")
+    motion_apply.add_argument("--sequence-id", default=None, help="默认主序列")
+    motion_apply.add_argument("--preset", required=True, help="预设 ID 或别名")
+    motion_apply.add_argument("--amount", type=float, default=None, help="缩放/位移/抖动强度；默认使用目录值")
+    motion_apply.add_argument("--degrees", type=float, default=None, help="旋转角度；默认使用目录值")
+    motion_apply.add_argument("--points", type=int, default=None, help="shake 关键帧点数；默认使用目录值")
+    motion_apply.add_argument("--start-tick", type=int, default=None, help="片段内起始 tick；默认 0")
+    motion_apply.add_argument("--end-tick", type=int, default=None, help="片段内结束 tick；默认片段时长")
 
     timeline = subs.add_parser("timeline", help="时间线编排")
     ts = timeline.add_subparsers(dest="action", required=True)
@@ -1140,6 +1160,39 @@ def command_effects_inspect(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def command_motion_list(args: argparse.Namespace) -> dict[str, Any]:
+    presets = list_motion_presets(args.query)
+    return _envelope(
+        "motion.list",
+        args,
+        data={
+            "catalog_version": MOTION_PRESET_CATALOG_VERSION,
+            "source": "local-catalog",
+            "engine": "timeline-keyframes",
+            "network": "disabled",
+            "count": len(presets),
+            "presets": presets,
+        },
+    )
+
+
+def command_motion_inspect(args: argparse.Namespace) -> dict[str, Any]:
+    preset = get_motion_preset(args.name)
+    if preset is None:
+        raise argument_error(f"本地运镜目录中不存在: {args.name}", "name")
+    return _envelope(
+        "motion.inspect",
+        args,
+        data={
+            "catalog_version": MOTION_PRESET_CATALOG_VERSION,
+            "source": "local-catalog",
+            "engine": "timeline-keyframes",
+            "network": "disabled",
+            "preset": preset,
+        },
+    )
+
+
 def _clip_from_change(change: dict[str, Any], track: dict[str, Any]) -> dict[str, Any]:
     for field in ("source_in_tick", "source_out_tick"):
         if field not in change:
@@ -1254,58 +1307,172 @@ def _clamp_clip_keyframes(clip: dict[str, Any]) -> None:
 
 
 def _apply_motion_preset(clip: dict[str, Any], change: dict[str, Any]) -> dict[str, Any]:
-    preset = str(change.get("preset") or change.get("motion_preset") or "").lower().replace("-", "_")
-    if not preset:
+    requested = str(change.get("preset") or change.get("motion_preset") or "")
+    preset = canonical_motion_preset(requested)
+    if not requested:
         raise argument_error("apply_motion_preset 缺少 preset", "preset")
+    definition = get_motion_preset(preset or requested)
+    if definition is None or preset is None:
+        raise argument_error(f"不支持的运动预设: {requested}", "preset")
     duration = max(1, int(clip.get("duration_tick", 1)))
     start_tick = max(0, int(change.get("start_tick", 0)))
     end_tick = min(duration, int(change.get("end_tick", duration)))
     if end_tick <= start_tick:
         raise argument_error("运动预设的时间范围无效", "start_tick/end_tick")
-    amount = abs(float(change.get("amount", 0.15)))
+    parameter_values = definition.get("parameters", {})
+
+    def _number(name: str, *, absolute: bool = False) -> float:
+        default = parameter_values.get(name, {}).get("default", 0.0)
+        raw = change.get(name, default)
+        if isinstance(raw, bool):
+            raise argument_error(f"运动预设参数 {name} 必须是数字", name)
+        try:
+            value = float(raw)
+        except (TypeError, ValueError) as exc:
+            raise argument_error(f"运动预设参数 {name} 必须是数字", name) from exc
+        if not math.isfinite(value):
+            raise argument_error(f"运动预设参数 {name} 必须是有限数字", name)
+        if absolute:
+            value = abs(value)
+        spec = parameter_values.get(name, {})
+        minimum = spec.get("minimum")
+        maximum = spec.get("maximum")
+        if (minimum is not None and value < float(minimum)) or (maximum is not None and value > float(maximum)):
+            raise argument_error(f"运动预设参数 {name} 超出范围", name)
+        return value
+
+    def _integer(name: str) -> int:
+        default = parameter_values.get(name, {}).get("default", 0)
+        raw = change.get(name, default)
+        if isinstance(raw, bool):
+            raise argument_error(f"运动预设参数 {name} 必须是整数", name)
+        if isinstance(raw, float) and not raw.is_integer():
+            raise argument_error(f"运动预设参数 {name} 必须是整数", name)
+        try:
+            value = int(raw)
+        except (TypeError, ValueError) as exc:
+            raise argument_error(f"运动预设参数 {name} 必须是整数", name) from exc
+        spec = parameter_values.get(name, {})
+        minimum = spec.get("minimum")
+        maximum = spec.get("maximum")
+        if (minimum is not None and value < int(minimum)) or (maximum is not None and value > int(maximum)):
+            raise argument_error(f"运动预设参数 {name} 超出范围", name)
+        return value
+
+    amount = _number("amount", absolute=True) if "amount" in parameter_values else 0.0
     transform = clip.get("transform") if isinstance(clip.get("transform"), dict) else {}
     position = transform.get("position") if isinstance(transform.get("position"), dict) else {}
     scale = float(transform.get("scale", 1.0))
     x = float(position.get("x", transform.get("position_x", 0.5)))
     y = float(position.get("y", transform.get("position_y", 0.5)))
     ease = "ease_in_out"
-    if preset in {"zoom_in", "push_in"}:
+    if preset == "zoom_in":
         _set_keyframe_track(clip, "transform.scale", [(start_tick, scale, ease), (end_tick, scale * (1 + amount), ease)])
-    elif preset in {"zoom_out", "pull_out"}:
+    elif preset == "zoom_out":
         _set_keyframe_track(clip, "transform.scale", [(start_tick, scale * (1 + amount), ease), (end_tick, scale, ease)])
-    elif preset in {"pan_left", "slide_left"}:
+    elif preset == "pan_left":
         _set_keyframe_track(clip, "transform.position.x", [(start_tick, x + amount / 2, ease), (end_tick, x - amount / 2, ease)])
-    elif preset in {"pan_right", "slide_right"}:
+    elif preset == "pan_right":
         _set_keyframe_track(clip, "transform.position.x", [(start_tick, x - amount / 2, ease), (end_tick, x + amount / 2, ease)])
-    elif preset in {"pan_up", "slide_up"}:
+    elif preset == "pan_up":
         _set_keyframe_track(clip, "transform.position.y", [(start_tick, y + amount / 2, ease), (end_tick, y - amount / 2, ease)])
-    elif preset in {"pan_down", "slide_down"}:
+    elif preset == "pan_down":
         _set_keyframe_track(clip, "transform.position.y", [(start_tick, y - amount / 2, ease), (end_tick, y + amount / 2, ease)])
-    elif preset in {"ken_burns", "kenburns"}:
+    elif preset == "ken_burns":
         _set_keyframe_track(clip, "transform.scale", [(start_tick, scale, ease), (end_tick, scale * (1 + amount), ease)])
         _set_keyframe_track(clip, "transform.position.x", [(start_tick, x - amount / 3, ease), (end_tick, x + amount / 3, ease)])
         _set_keyframe_track(clip, "transform.position.y", [(start_tick, y + amount / 3, ease), (end_tick, y - amount / 3, ease)])
-    elif preset in {"rotate_in", "rotate_left"}:
-        degrees = float(change.get("degrees", 8.0))
+    elif preset == "rotate_in":
+        degrees = _number("degrees")
         _set_keyframe_track(clip, "transform.rotation", [(start_tick, degrees, ease), (end_tick, 0.0, ease)])
-    elif preset in {"rotate_out", "rotate_right"}:
-        degrees = float(change.get("degrees", 8.0))
+    elif preset == "rotate_out":
+        degrees = _number("degrees")
         _set_keyframe_track(clip, "transform.rotation", [(start_tick, 0.0, ease), (end_tick, degrees, ease)])
-    elif preset in {"fade_in", "opacity_in"}:
+    elif preset == "fade_in":
         _set_keyframe_track(clip, "transform.opacity", [(start_tick, 0.0, "linear"), (end_tick, 1.0, ease)])
-    elif preset in {"fade_out", "opacity_out"}:
+    elif preset == "fade_out":
         _set_keyframe_track(clip, "transform.opacity", [(start_tick, 1.0, ease), (end_tick, 0.0, "linear")])
     elif preset == "shake":
-        points = max(2, int(change.get("points", 8)))
+        points = _integer("points")
         values = []
         for index in range(points):
             progress = index / (points - 1)
             sign = -1 if index % 2 else 1
             values.append((round(start_tick + (end_tick - start_tick) * progress), x + sign * amount / 3, "linear"))
         _set_keyframe_track(clip, "transform.position.x", values)
-    else:
-        raise argument_error(f"不支持的运动预设: {preset}", "preset")
-    return {"preset": preset, "start_tick": start_tick, "end_tick": end_tick, "amount": amount}
+    return {
+        "preset": preset,
+        "requested_preset": requested,
+        "catalog_version": MOTION_PRESET_CATALOG_VERSION,
+        "properties": definition["properties"],
+        "start_tick": start_tick,
+        "end_tick": end_tick,
+        "amount": amount,
+        **({"degrees": _number("degrees")} if "degrees" in parameter_values else {}),
+        **({"points": _integer("points")} if "points" in parameter_values else {}),
+    }
+
+
+def command_motion_apply(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    sequence = find_sequence(project, args.sequence_id)
+    before_project = copy.deepcopy(project)
+    working = copy.deepcopy(project) if args.dry_run else project
+    target_sequence = find_sequence(working, sequence["id"])
+    track, clip = _find_clip(target_sequence, args.clip_id, args.track_id)
+    change: dict[str, Any] = {"preset": args.preset}
+    for field in ("amount", "degrees", "points", "start_tick", "end_tick"):
+        value = getattr(args, field, None)
+        if value is not None:
+            change[field] = value
+    motion = _apply_motion_preset(clip, change)
+    validation = validate_project(root, working, strict_rights=False)
+    if not validation["ok"]:
+        raise AppError("PROJECT_INVALID", "运动预设会生成无效项目", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    if args.dry_run:
+        return _envelope(
+            "motion.apply",
+            args,
+            status="planned",
+            data={"sequence_id": target_sequence["id"], "track_id": track["id"], "clip_id": clip["id"], "motion": motion, "clip": clip, "validation": validation},
+        )
+    snapshot = create_snapshot(root, before_project, label="before-motion-apply")
+    operation_id = new_id("op")
+    working.setdefault("provenance", {}).setdefault("change_log", []).append(
+        {
+            "operation_id": operation_id,
+            "command": "motion.apply",
+            "at": now_iso(),
+            "sequence_id": target_sequence["id"],
+            "track_id": track["id"],
+            "clip_id": clip["id"],
+            "motion": motion,
+            "before_snapshot_id": snapshot["snapshot_id"],
+        }
+    )
+    save_project(root, working)
+    _operation(
+        root,
+        operation_id,
+        {
+            "operation_id": operation_id,
+            "command": "motion.apply",
+            "status": "succeeded",
+            "project_id": working["project"]["id"],
+            "sequence_id": target_sequence["id"],
+            "track_id": track["id"],
+            "clip_id": clip["id"],
+            "motion": motion,
+            "before_snapshot_id": snapshot["snapshot_id"],
+            "created_at": now_iso(),
+        },
+    )
+    return _envelope(
+        "motion.apply",
+        args,
+        data={"sequence_id": target_sequence["id"], "track_id": track["id"], "clip_id": clip["id"], "motion": motion, "clip": clip, "validation": validation, "before_snapshot": snapshot},
+        operation_id=operation_id,
+    )
 
 
 def _split_clip_keyframes(clip: dict[str, Any], split_tick: int) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
@@ -2559,6 +2726,8 @@ _READ_ONLY_PROJECT_COMMANDS = {
     ("validate", None),
     ("policy", "audit"),
     ("quality", "check"),
+    ("motion", "list"),
+    ("motion", "inspect"),
 }
 
 
@@ -2591,6 +2760,9 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("tts", "synthesize"): command_tts_synthesize,
     ("effects", "list"): command_effects_list,
     ("effects", "inspect"): command_effects_inspect,
+    ("motion", "list"): command_motion_list,
+    ("motion", "inspect"): command_motion_inspect,
+    ("motion", "apply"): command_motion_apply,
     ("timeline", "compose"): command_timeline_compose,
     ("validate", None): command_validate,
     ("rights", "check"): command_rights_check,

@@ -74,6 +74,9 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `tts synthesize --project PATH (--text TEXT\|--input FILE)` | ASCII/英文文本或本地 UTF-8 文本文件 | 通过 FFmpeg 内置 flite 生成项目内 WAV；无网络、无模型下载；当前拒绝非 ASCII 文本 |
 | `effects list [--query TEXT] [--keyframable-only]` | 可选效果 ID、别名、类别或后端筛选 | 返回本地 FFmpeg 效果目录、参数范围、关键帧能力、限制和目录版本；只读、无网络 |
 | `effects inspect --name NAME` | 效果 ID 或别名 | 返回单个效果的规范 ID、FFmpeg 后端、参数契约和限制；未知名称返回 `ARGUMENT_INVALID` |
+| `motion list [--query TEXT]` | 可选预设 ID、别名、类别或说明筛选 | 返回本地关键帧运镜预设目录、受控参数、目标属性、限制和目录版本；只读、无网络 |
+| `motion inspect --name NAME` | 预设 ID 或别名 | 返回单个预设的规范 ID、关键帧属性、参数上下界和限制；未知名称返回 `ARGUMENT_INVALID` |
+| `motion apply --project PATH --clip-id ID --preset NAME` | 已有片段、可选轨道/序列、局部 tick 区间和预设参数 | 在变更前创建快照，将预设写成普通项目关键帧，执行 Schema/语义校验并记录 `motion.apply` 操作；`--dry-run` 只返回计划 |
 | `timeline compose --project PATH --input CHANGES.json` | 变更集 | 写入轨道、片段、标记、关键帧、嵌套序列、速度曲线和剪辑操作；写入前快照并再次校验 |
 | `validate --project PATH` | 项目和目标渠道 | 机器 Schema、时间/引用/权利/效果语义校验报告 |
 | `rights check --project PATH` | 项目 Rights Ledger | 检查目标渠道发布资格；严格失败退出码为 7 |
@@ -123,6 +126,23 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 所有 `at_tick` 是片段内时间，使用项目 `settings.timebase.ticks_per_second`。关键帧必须单调递增，插值可用 `hold`、`linear`、`ease_in`、`ease_out`、`ease_in_out` 或带合法控制点的 `bezier`。
 
 `timeline compose` 变更集支持 `append_clip`、`update_clip`、`remove_clip`、`split_clip`、`ripple_insert`、`ripple_delete`、`slip_clip`、`slide_clip`、`set_clip_speed`、`set_clip_speed_curve`、`reverse_clip`、`freeze_frame`、`add_sequence`、`append_sequence_clip`、轨道增删改、标记增删和序列时长调整。任何变更保存前都会重新执行 Schema、引用、时间范围、嵌套循环和 Rights 语义校验。
+
+### 5.1 关键帧运镜预设
+
+`motion` 是对 `timeline compose` 内部 `apply_motion_preset` 操作的 Agent 可发现封装。目录版本当前为 `0.1.0`，来源固定为 `local-catalog`，引擎固定为 `timeline-keyframes`，不下载模板或素材。当前目录包含 `zoom_in`、`zoom_out`、`pan_left/right/up/down`、`ken_burns`、`rotate_in/out`、`fade_in/out` 和 `shake` 共 12 个规范预设；旧式 `push_in`、`pull_out`、`slide_*`、`rotate_left/right`、`opacity_in/out` 为只读别名，写入操作返回规范 ID。
+
+每个目录项至少包含 `id`、`aliases`、`category`、`engine`、`source`、`properties`、`parameters` 和 `limits`。`amount` 的范围为 `0..1`，`degrees` 的范围为 `-360..360`，`shake.points` 的范围为 `2..64`；缺省参数从目录默认值填充，非有限数字、越界值和未知预设在写入前返回 `ARGUMENT_INVALID`。`start_tick`/`end_tick` 始终是片段内时间，缺省覆盖整个片段，实际写入的关键帧会被限制在片段有效范围内。
+
+典型调用：
+
+```powershell
+python -m ai_ad_editor motion list --query position
+python -m ai_ad_editor motion inspect --name push-in
+python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --preset ken_burns --amount 0.2 --start-tick 0 --end-tick 90000
+python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --preset shake --points 12 --dry-run
+```
+
+`motion apply` 只生成 `transform.scale`、`transform.position.x/y`、`transform.rotation` 或 `transform.opacity` 关键帧，不生成媒体文件；成功写入会创建 `before-motion-apply` 快照、项目 `provenance.change_log` 项和 `operations/<operation_id>.json`。它提供可复现的 Agent 运镜基线，不等同于剪映的 GUI 运镜模板、自动构图、光流补帧或 GPU 特效。
 
 `freeze_frame` 的 `at_tick` 以冻结前的片段时间线为基准，在视频流中插入 `duration_tick` 的冻结帧；片段总时长同步增加，原始画面在冻结点前后保持顺序。渲染器在已经完成源范围、变速曲线、倒放和裁切映射的视频流上分支并回接，因此中间定格与尾部定格使用同一语义；音频按项目的冻结时长补齐并继续接受音量、声像和淡出链。非法冻结对象、非正冻结时长或越过冻结前片段范围的 `at_tick` 在校验阶段拒绝。
 
