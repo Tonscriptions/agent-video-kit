@@ -938,7 +938,7 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("track_mute", manifest["capabilities"]["audio"]["features"])
         self.assertIn("track_solo", manifest["capabilities"]["audio"]["features"])
         self.assertIn("track_volume", manifest["capabilities"]["audio"]["features"])
-        self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.3.0")
+        self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.4.0")
         self.assertIn("exposure", manifest["capabilities"]["effects"]["catalog_features"])
         self.assertIn("hsl", manifest["capabilities"]["effects"]["catalog_features"])
         self.assertIn("rgb_curves", manifest["capabilities"]["effects"]["catalog_features"])
@@ -975,8 +975,11 @@ class P0CliTests(unittest.TestCase):
 
         code, catalog = invoke("effects", "list")
         self.assertEqual(code, 0, catalog)
-        self.assertEqual(catalog["data"]["catalog_version"], "0.3.0")
-        self.assertEqual(catalog["data"]["count"], 44)
+        self.assertEqual(catalog["data"]["catalog_version"], "0.4.0")
+        self.assertEqual(catalog["data"]["count"], 45)
+        frame_interpolation = next(item for item in catalog["data"]["effects"] if item["id"] == "frame_interpolation")
+        self.assertEqual(frame_interpolation["backend"], "ffmpeg:minterpolate")
+        self.assertIn("fps", frame_interpolation["parameters"])
 
         code, inspected = invoke("effects", "inspect", "--name", "levels")
         self.assertEqual(code, 0, inspected)
@@ -1781,6 +1784,7 @@ class P0CliTests(unittest.TestCase):
                     {"type": "threshold", "value": 8},
                     {"type": "deflicker", "size": 3},
                     {"type": "dctdnoiz", "sigma": 0.2},
+                    {"type": "frame_interpolation", "fps": 48, "mi_mode": "blend", "scd": "fdiff"},
                 ],
             }]}), encoding="utf-8")
             self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
@@ -1791,6 +1795,7 @@ class P0CliTests(unittest.TestCase):
             self.assertIn("curves=all=", planned["data"]["plan"]["filter_complex"])
             self.assertIn("hue=h=", planned["data"]["plan"]["filter_complex"])
             self.assertIn("colorbalance=rs=", planned["data"]["plan"]["filter_complex"])
+            self.assertIn("minterpolate=fps=48.000000:mi_mode=blend", planned["data"]["plan"]["filter_complex"])
             self.assertNotIn("RENDER_FEATURE_UNSUPPORTED", {item.get("code") for item in planned["data"]["plan"]["warnings"]})
             code, rendered = invoke("render", "--project", str(project), "--output", str(output))
             self.assertEqual(code, 0, rendered)

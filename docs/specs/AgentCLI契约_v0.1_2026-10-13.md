@@ -144,7 +144,7 @@ python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --p
 python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --preset shake --points 12 --dry-run
 ```
 
-`motion apply` 只生成 `transform.scale`、`transform.position.x/y`、`transform.rotation` 或 `transform.opacity` 关键帧，不生成媒体文件；成功写入会创建 `before-motion-apply` 快照、项目 `provenance.change_log` 项和 `operations/<operation_id>.json`。它提供可复现的 Agent 运镜基线，不等同于剪映的 GUI 运镜模板、自动构图、光流补帧或 GPU 特效。
+`motion apply` 只生成 `transform.scale`、`transform.position.x/y`、`transform.rotation` 或 `transform.opacity` 关键帧，不生成媒体文件；成功写入会创建 `before-motion-apply` 快照、项目 `provenance.change_log` 项和 `operations/<operation_id>.json`。它提供可复现的 Agent 运镜基线，不等同于剪映的 GUI 运镜模板、自动构图或 GPU 特效；光流补帧由效果目录中的 `frame_interpolation` 独立声明。
 
 `freeze_frame` 的 `at_tick` 以冻结前的片段时间线为基准，在视频流中插入 `duration_tick` 的冻结帧；片段总时长同步增加，原始画面在冻结点前后保持顺序。渲染器在已经完成源范围、变速曲线、倒放和裁切映射的视频流上分支并回接，因此中间定格与尾部定格使用同一语义；音频按项目的冻结时长补齐并继续接受音量、声像和淡出链。非法冻结对象、非正冻结时长或越过冻结前片段范围的 `at_tick` 在校验阶段拒绝。
 
@@ -168,9 +168,9 @@ python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --p
 
 ### 6.2 本地效果目录与渲染契约
 
-Agent 在生成项目 JSON 或变更集前应先调用 `effects list`，需要精确参数时调用 `effects inspect --name NAME`。当前目录版本为 `0.3.0`，记录 44 项由本机 FFmpeg 提供的效果，包括 HSL、RGB 曲线和三向色轮；每项至少包含 `id`、`aliases`、`category`、`backend`、`source=ffmpeg-local`、`keyframable`、`parameters` 和 `limits`。目录不会下载滤镜包，也不会访问网络。
+Agent 在生成项目 JSON 或变更集前应先调用 `effects list`，需要精确参数时调用 `effects inspect --name NAME`。当前目录版本为 `0.4.0`，记录 45 项由本机 FFmpeg 提供的效果，包括 HSL、RGB 曲线、三向色轮和 `frame_interpolation` 光流补帧；每项至少包含 `id`、`aliases`、`category`、`backend`、`source=ffmpeg-local`、`keyframable`、`parameters` 和 `limits`。目录不会下载滤镜包，也不会访问网络。
 
-`brightness`、`contrast`、`saturation`、`gamma` 和 `vignette` 允许效果参数使用 `eval=frame` 关键帧，`hue`/`hsl` 使用 FFmpeg `hue` 的帧表达式（该滤镜没有 `eval` 选项）。曝光、色阶、RGB 曲线、三向色轮、降噪、时域混合、镜头校正、框线、色彩对比、去闪烁和 DCT 降噪等新增原生滤镜当前以静态参数执行；项目可以保留这些效果的关键帧，但渲染会写入 `RENDER_FEATURE_APPROXIMATE`，不得把静态回退描述成逐帧等效。每项还返回 `license=inherit-local-ffmpeg-build`，发布时仍需按实际 FFmpeg 构建核对许可证和 notice。曲线只接受白名单校验后的 `0..1` 范围 `x/y` 点字符串，框线颜色只接受安全的 FFmpeg 颜色 token，非法值返回 `EFFECT_PARAMETER_INVALID`，对应滤镜会跳过或回退到安全默认值。
+`brightness`、`contrast`、`saturation`、`gamma` 和 `vignette` 允许效果参数使用 `eval=frame` 关键帧，`hue`/`hsl` 使用 FFmpeg `hue` 的帧表达式（该滤镜没有 `eval` 选项）。曝光、色阶、RGB 曲线、三向色轮、降噪、时域混合、镜头校正、框线、色彩对比、去闪烁和 DCT 降噪等新增原生滤镜当前以静态参数执行；项目可以保留这些效果的关键帧，但渲染会写入 `RENDER_FEATURE_APPROXIMATE`，不得把静态回退描述成逐帧等效。`frame_interpolation` 使用本地 `minterpolate` 生成目标帧率，运动补偿参数受目录白名单约束但可能消耗较多 CPU，场景切换和遮挡伪影必须进入质量复核。每项还返回 `license=inherit-local-ffmpeg-build`，发布时仍需按实际 FFmpeg 构建核对许可证和 notice。曲线只接受白名单校验后的 `0..1` 范围 `x/y` 点字符串，框线颜色只接受安全的 FFmpeg 颜色 token，非法值返回 `EFFECT_PARAMETER_INVALID`，对应滤镜会跳过或回退到安全默认值。
 
 示例：
 

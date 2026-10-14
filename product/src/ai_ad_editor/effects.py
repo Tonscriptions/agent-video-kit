@@ -12,7 +12,7 @@ from copy import deepcopy
 from typing import Any
 
 
-EFFECT_CATALOG_VERSION = "0.3.0"
+EFFECT_CATALOG_VERSION = "0.4.0"
 
 
 def _parameter(
@@ -147,6 +147,18 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
         "amount": _parameter("number", 0.0, minimum=-3.0, maximum=3.0),
         "black": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
     }),
+    _effect("frame_interpolation", backend="ffmpeg:minterpolate", category="motion", aliases=("minterpolate", "optical_flow", "smooth_slow_motion", "slow_motion"), parameters={
+        "fps": _parameter("number", 60.0, minimum=1.0, maximum=240.0, description="目标输出帧率"),
+        "mi_mode": _parameter("enum", "mci", description="dup、blend 或 mci"),
+        "mc_mode": _parameter("enum", "obmc", description="obmc 或 aobmc"),
+        "me_mode": _parameter("enum", "bilat", description="bidir 或 bilat"),
+        "me": _parameter("enum", "epzs", description="esa、tss、tdls、ntss、fss、ds、hexbs、epzs 或 umh"),
+        "mb_size": _parameter("integer", 16, minimum=4, maximum=16),
+        "search_param": _parameter("integer", 32, minimum=4, maximum=512),
+        "vsbmc": _parameter("boolean", False),
+        "scd": _parameter("enum", "fdiff", description="none 或 fdiff"),
+        "scd_threshold": _parameter("number", 10.0, minimum=0.0, maximum=100.0),
+    }, limits=("uses_local_ffmpeg_minterpolate", "motion_compensation_can_be_cpu_expensive", "scene_change_detection_is_filter_heuristic")),
     _effect("gamma", backend="ffmpeg:eq", category="color", aliases=("gamma_adjust",), keyframable=True, parameters={"amount": _parameter("number", 1.0, minimum=0.1, maximum=10.0)}),
     _effect("gradfun", backend="ffmpeg:gradfun", category="repair", aliases=("gradient_smooth",), parameters={
         "threshold": _parameter("number", 1.2, minimum=0.1, maximum=64.0),

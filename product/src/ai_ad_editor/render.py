@@ -1754,6 +1754,39 @@ def _effect_filters(
                 block_bits = 4 if block_size >= 16 else 3
             block_bits = max(3, min(4, int(round(_num(block_bits, 3)))))
             filters.append(f"dctdnoiz=sigma={sigma:.6f}:overlap={overlap}:n={block_bits}")
+        elif name in {"frame_interpolation", "minterpolate", "optical_flow", "smooth_slow_motion", "slow_motion"}:
+            if effect_tracks:
+                warn_unsupported_tracks()
+            fps = max(1.0, min(240.0, _num(parameters.get("fps", 60.0), 60.0)))
+            mi_mode = str(parameters.get("mi_mode", "mci")).strip().lower()
+            if mi_mode not in {"dup", "blend", "mci"}:
+                invalid_parameter(f"frame_interpolation mi_mode 无效: {mi_mode}")
+                mi_mode = "mci"
+            mc_mode = str(parameters.get("mc_mode", "obmc")).strip().lower()
+            if mc_mode not in {"obmc", "aobmc"}:
+                invalid_parameter(f"frame_interpolation mc_mode 无效: {mc_mode}")
+                mc_mode = "obmc"
+            me_mode = str(parameters.get("me_mode", "bilat")).strip().lower()
+            if me_mode not in {"bidir", "bilat"}:
+                invalid_parameter(f"frame_interpolation me_mode 无效: {me_mode}")
+                me_mode = "bilat"
+            me = str(parameters.get("me", parameters.get("me_method", "epzs"))).strip().lower()
+            if me not in {"esa", "tss", "tdls", "ntss", "fss", "ds", "hexbs", "epzs", "umh"}:
+                invalid_parameter(f"frame_interpolation me 无效: {me}")
+                me = "epzs"
+            mb_size = max(4, min(16, int(round(_num(parameters.get("mb_size", 16), 16)))))
+            search_param = max(4, min(512, int(round(_num(parameters.get("search_param", 32), 32)))))
+            vsbmc_raw = parameters.get("vsbmc", False)
+            vsbmc = int(vsbmc_raw) if isinstance(vsbmc_raw, bool) else int(_num(vsbmc_raw, 0) >= 0.5)
+            scd = str(parameters.get("scd", "fdiff")).strip().lower()
+            if scd not in {"none", "fdiff"}:
+                invalid_parameter(f"frame_interpolation scd 无效: {scd}")
+                scd = "fdiff"
+            scd_threshold = max(0.0, min(100.0, _num(parameters.get("scd_threshold", 10.0), 10.0)))
+            filters.append(
+                f"minterpolate=fps={fps:.6f}:mi_mode={mi_mode}:mc_mode={mc_mode}:me_mode={me_mode}:"
+                f"me={me}:mb_size={mb_size}:search_param={search_param}:vsbmc={vsbmc}:scd={scd}:scd_threshold={scd_threshold:.6f}"
+            )
         elif name == "hqdn3d":
             if effect_tracks:
                 warn_unsupported_tracks()
