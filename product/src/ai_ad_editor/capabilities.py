@@ -23,9 +23,10 @@ def build_capability_manifest() -> dict[str, Any]:
         "capabilities": {
             "media": {
                 "status": "implemented",
-                "features": ["probe", "local_ingest", "image_loop", "proxy", "thumbnail", "waveform", "scene_change", "silence", "beat_anchors", "relink_by_hash", "relink_by_unique_name", "local_template_tracking"],
+                "features": ["probe", "local_ingest", "image_loop", "proxy", "thumbnail", "waveform", "scene_change", "silence", "beat_anchors", "relink_by_hash", "relink_by_unique_name", "local_template_tracking", "smart_cut_silence", "smart_cut_linked_audio"],
                 "tracking_contract": "local_template_matching_emits_confidence_and_transform_keyframes",
-                "limits": ["tracking_can_drift_on_occlusion_scale_change_or_scene_cut", "tracking_requires_local_pillow_and_numpy"],
+                "smart_cut_contract": "ffmpeg_local_silencedetect_generates_source_clock_ranges_and_can_apply_to_direct_video_and_linked_audio_clips",
+                "limits": ["tracking_can_drift_on_occlusion_scale_change_or_scene_cut", "tracking_requires_local_pillow_and_numpy", "smart_cut_rejects_nested_speed_curve_and_freeze_clips", "smart_cut_removes_silence_only_and_does_not_claim_language_or_filler_word_understanding"],
             },
             "library": {
                 "status": "implemented",

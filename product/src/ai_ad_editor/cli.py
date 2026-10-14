@@ -59,6 +59,7 @@ from .motion_presets import MOTION_PRESET_CATALOG_VERSION, canonical_motion_pres
 from .scopes import SCOPE_VERSION, generate_scopes
 from .policy import audit_local_tree, policy_error_from_findings, require_local_reference
 from .render_queue import JOB_STATUSES, cancel_path, enqueue as enqueue_render_jobs, find_job, load_queue, normalize_job, queue_path, save_queue, set_status
+from .smart_cut import SMART_CUT_VERSION, build_smart_cut_plan, replace_clip_with_smart_cut
 from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
 
@@ -143,6 +144,19 @@ def build_parser() -> argparse.ArgumentParser:
     highlights.add_argument("--max-duration", type=float, default=8.0)
     highlights.add_argument("--beats", action="store_true")
     highlights.add_argument("--output", default=None)
+    smart_cut = _leaf_common(ms.add_parser("smart-cut", help="基于本地静音检测生成或应用智能剪口播计划"))
+    smart_cut.add_argument("--project", required=True)
+    smart_cut.add_argument("--sequence-id", default=None)
+    smart_cut.add_argument("--clip-id", required=True, help="目标视频片段 ID")
+    smart_cut.add_argument("--track-id", required=True, help="目标视频轨道 ID")
+    smart_cut.add_argument("--linked-track-id", action="append", default=[], help="可重复：按同一 clip-id 联动裁切音频轨道")
+    smart_cut.add_argument("--linked-clip-id", action="append", default=[], help="可重复：与 --linked-track-id 一一对应的音频片段 ID；省略时复用目标 clip-id")
+    smart_cut.add_argument("--min-silence-seconds", type=float, default=0.6)
+    smart_cut.add_argument("--keep-padding-seconds", type=float, default=0.12)
+    smart_cut.add_argument("--min-segment-seconds", type=float, default=0.2)
+    smart_cut.add_argument("--silence-db", type=float, default=-35.0)
+    smart_cut.add_argument("--output", default=None, help="项目内智能剪口播报告路径")
+    smart_cut.add_argument("--apply", action="store_true", help="创建快照并将计划写回目标轨道")
     relink = _leaf_common(ms.add_parser("relink", help="按内容哈希重链接丢失素材"))
     relink.add_argument("--project", required=True)
     relink.add_argument("--search-root", required=True, help="本地素材搜索目录")
@@ -930,6 +944,83 @@ def command_media_highlights(args: argparse.Namespace) -> dict[str, Any]:
         output = root / "validation" / f"highlights_{asset_id or new_id('asset')}.json"
     atomic_write_json(output, recommendation)
     return _envelope("media.highlights", args, data={"report": str(output), "recommendation": recommendation})
+
+
+def command_media_smart_cut(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    sequence = find_sequence(project, getattr(args, "sequence_id", None))
+    target_track, clip = _find_clip(sequence, args.clip_id, args.track_id)
+    asset = asset_map(project).get(str(clip.get("asset_id")))
+    if not asset:
+        raise argument_error("智能剪口播目标必须引用项目内媒体资产", "clip_id")
+    source = Path(str(asset.get("uri", "")))
+    if not source.is_absolute():
+        source = root / source
+    if not source.exists() or not source.is_file():
+        raise argument_error("智能剪口播输入素材不存在", str(source))
+    if str(clip.get("sequence_id", "")):
+        raise argument_error("智能剪口播当前只支持直接媒体片段", "clip_id")
+    analysis = understand_media(source, silence_db=args.silence_db)
+    analysis["source_sha256"] = f"sha256:{sha256_file(source)}"
+    duration_seconds = int(clip.get("duration_tick", 0)) / max(1, int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90000)))
+    plan = build_smart_cut_plan(
+        analysis,
+        duration_seconds=duration_seconds,
+        min_silence_seconds=args.min_silence_seconds,
+        keep_padding_seconds=args.keep_padding_seconds,
+        min_segment_seconds=args.min_segment_seconds,
+    )
+    linked_track_ids = [str(value) for value in args.linked_track_id]
+    linked_clip_ids = [str(value) for value in args.linked_clip_id]
+    if linked_clip_ids and len(linked_clip_ids) not in {1, len(linked_track_ids)}:
+        raise argument_error("--linked-clip-id 必须提供一个值或与 --linked-track-id 数量相同", "linked_clip_id")
+    linked_pairs = [
+        {"track_id": track_id, "clip_id": linked_clip_ids[0] if len(linked_clip_ids) == 1 else linked_clip_ids[index] if linked_clip_ids else str(args.clip_id)}
+        for index, track_id in enumerate(linked_track_ids)
+    ]
+    plan.update({
+        "project_id": project.get("project", {}).get("id"),
+        "sequence_id": sequence.get("id"),
+        "asset_id": asset.get("id"),
+        "clip_id": clip.get("id"),
+        "track_id": target_track.get("id"),
+        "linked_track_ids": linked_track_ids,
+        "linked_clips": linked_pairs,
+        "source": str(source),
+        "source_sha256": analysis["source_sha256"],
+    })
+    if args.dry_run:
+        return _envelope("media.smart-cut", args, status="planned", data={"plan": plan, "apply": bool(args.apply)})
+    output = Path(args.output).expanduser().resolve() if args.output else root / "validation" / f"smart_cut_{safe_filename(str(args.clip_id))}.json"
+    ensure_inside(root, output)
+    if not args.apply or not plan.get("changed"):
+        payload = {"report_version": SMART_CUT_VERSION, "created_at": now_iso(), "plan": plan, "applied": False}
+        atomic_write_json(output, payload)
+        return _envelope("media.smart-cut", args, status="planned", data={"report": str(output), "plan": plan, "applied": False})
+    before_project = copy.deepcopy(project)
+    ticks_per_second = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90000))
+    targets = [(str(args.track_id), str(args.clip_id)), *[(item["track_id"], item["clip_id"]) for item in linked_pairs if item["track_id"] != str(args.track_id)]]
+    replacements: list[dict[str, Any]] = []
+    try:
+        for track_id, clip_id in targets:
+            track = find_track(sequence, track_id, None)
+            pieces = replace_clip_with_smart_cut(track, clip_id, plan, ticks_per_second=ticks_per_second)
+            replacements.append({"track_id": track_id, "clip_id": clip_id, "piece_ids": [item["id"] for item in pieces], "duration_tick": sum(int(item["duration_tick"]) for item in pieces)})
+    except AppError:
+        raise
+    _recompute_sequence_duration(sequence)
+    validation = validate_project(root, project, strict_rights=False)
+    if not validation["ok"]:
+        raise AppError("PROJECT_INVALID", "智能剪口播生成的项目未通过校验", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    snapshot = create_snapshot(root, before_project, label="before-smart-cut")
+    operation_id = new_id("op")
+    plan["replacements"] = replacements
+    payload = {"report_version": SMART_CUT_VERSION, "created_at": now_iso(), "plan": plan, "applied": True, "operation_id": operation_id, "before_snapshot_id": snapshot["snapshot_id"], "validation": validation}
+    atomic_write_json(output, payload)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.smart-cut", "at": now_iso(), "report": str(output), "before_snapshot_id": snapshot["snapshot_id"], "replacements": replacements})
+    save_project(root, project)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.smart-cut", "status": "succeeded", "report": str(output), "before_snapshot_id": snapshot["snapshot_id"], "replacements": replacements, "created_at": now_iso()})
+    return _envelope("media.smart-cut", args, data={"report": str(output), "plan": plan, "replacements": replacements, "before_snapshot": snapshot, "validation": validation}, operation_id=operation_id)
 
 
 def command_ad_plan(args: argparse.Namespace) -> dict[str, Any]:
@@ -2755,6 +2846,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "understand"): command_media_understand,
     ("media", "prepare"): command_media_prepare,
     ("media", "highlights"): command_media_highlights,
+    ("media", "smart-cut"): command_media_smart_cut,
     ("ad", "plan"): command_ad_plan,
     ("ad", "apply"): command_ad_apply,
     ("subtitle", "validate"): command_subtitle_validate,

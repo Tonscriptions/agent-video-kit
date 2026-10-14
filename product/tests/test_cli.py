@@ -774,6 +774,61 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(recommendation["network"], "disabled")
             self.assertLessEqual(len(recommendation["candidates"]), 3)
 
+    def test_local_smart_cut_plan_and_apply_links_audio(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-smart-cut-") as raw:
+            workspace = Path(raw)
+            source = workspace / "speech-pauses.mp4"
+            audio_expr = r"aevalsrc=if(between(t\,0\,0.8)+between(t\,1.8\,3)\,0.8*sin(2*PI*880*t)\,0):s=48000:d=3"
+            completed = subprocess.run(
+                [
+                    "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "color=c=blue:s=320x180:r=24:d=3",
+                    "-f", "lavfi", "-i", audio_expr,
+                    "-shortest", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(source),
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingested = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingested["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [
+                {"op": "append_clip", "track_id": "track_video_1", "id": "speech_clip", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 270000},
+                {"op": "append_clip", "track_id": "track_audio_1", "id": "speech_audio", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 270000},
+            ]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            code, planned = invoke(
+                "media", "smart-cut", "--project", str(project), "--clip-id", "speech_clip", "--track-id", "track_video_1",
+                "--linked-track-id", "track_audio_1", "--linked-clip-id", "speech_audio", "--min-silence-seconds", "0.5", "--dry-run",
+            )
+            self.assertEqual(code, 0, planned)
+            self.assertTrue(planned["data"]["plan"]["changed"])
+            self.assertGreater(planned["data"]["plan"]["removed_seconds"], 0.2)
+            code, applied = invoke(
+                "media", "smart-cut", "--project", str(project), "--clip-id", "speech_clip", "--track-id", "track_video_1",
+                "--linked-track-id", "track_audio_1", "--linked-clip-id", "speech_audio", "--min-silence-seconds", "0.5", "--apply",
+            )
+            self.assertEqual(code, 0, applied)
+            self.assertTrue(applied["data"]["plan"]["changed"])
+            self.assertTrue(applied["data"]["before_snapshot"]["snapshot_id"])
+            project_json = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            sequence = project_json["sequences"][0]
+            for track_id in ("track_video_1", "track_audio_1"):
+                track = next(item for item in sequence["tracks"] if item["id"] == track_id)
+                self.assertEqual(len(track["clips"]), len(applied["data"]["plan"]["kept_ranges"]))
+                prefix = "speech_clip.smart" if track_id == "track_video_1" else "speech_audio.smart"
+                self.assertTrue(all(item["id"].startswith(prefix) for item in track["clips"]))
+            self.assertLess(sequence["duration_tick"], 270000)
+            output = project / "renders" / "smart-cut.mp4"
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output))
+            self.assertEqual(code, 0, rendered)
+            self.assertTrue(output.exists())
+            self.assertLess(probe_media(output)["duration_seconds"], 3.0)
+
     def test_local_ad_plan_writes_timed_phases_and_markers(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-plan-") as raw:
             workspace = Path(raw)
@@ -857,6 +912,8 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("hable", manifest["capabilities"]["output"]["tone_mapping"])
         self.assertIn("local_flite_tts", manifest["capabilities"]["ai"]["features"])
         self.assertIn("local_ad_plan_apply", manifest["capabilities"]["ai"]["features"])
+        self.assertIn("smart_cut_silence", manifest["capabilities"]["media"]["features"])
+        self.assertIn("smart_cut_linked_audio", manifest["capabilities"]["media"]["features"])
         self.assertIn("track_mute", manifest["capabilities"]["audio"]["features"])
         self.assertIn("track_solo", manifest["capabilities"]["audio"]["features"])
         self.assertIn("track_volume", manifest["capabilities"]["audio"]["features"])

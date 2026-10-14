@@ -66,6 +66,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `media understand --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频 | FFmpeg 场景、静音、节拍结果；`--transcribe` 只加载本地 Transformers 模型 |
 | `media prepare --project PATH (--asset-id ID\|--input FILE)` | 本地素材 | 生成项目内代理、缩略图和波形，并写入资产记录 |
 | `media highlights --project PATH (--asset-id ID\|--input FILE)` | 本地理解结果 | 本地启发式高光候选报告，不调用在线推荐服务 |
+| `media smart-cut --project PATH --track-id ID --clip-id ID` | 直接媒体片段、FFmpeg 静音检测参数和可选联动轨道 | 生成本地静音裁切计划；`--apply` 在 `before-smart-cut` 快照后切片视频/音频片段、关键帧和时间线；默认不写回 |
 | `media relink --project PATH --search-root DIR` | 丢失资产和本地搜索目录 | 优先内容哈希精确重链接；`--match-by-name` 仅允许唯一文件名近似匹配并生成报告 |
 | `media track --project PATH ... --roi X,Y,W,H` | 本地视频、归一化 ROI | 本地模板匹配、置信度和位置关键帧；`--clip-id` 写回前创建快照 |
 | `ad plan --project PATH --input BRIEF.json` | 本地广告 brief 和可选分析报告 | 写入钩子、卖点、证明、CTA 的节拍计划和序列标记 |
