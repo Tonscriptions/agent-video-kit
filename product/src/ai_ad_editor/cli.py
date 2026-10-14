@@ -63,6 +63,7 @@ from .render_queue import JOB_STATUSES, cancel_path, enqueue as enqueue_render_j
 from .smart_cut import SMART_CUT_VERSION, build_smart_cut_plan, match_transcript_phrases, replace_clip_with_smart_cut
 from .beat_edit import BEAT_CUT_VERSION, build_beat_cut_plan
 from .multicam import MULTICAM_SYNC_VERSION, build_switch_segments, new_multicam_clip_id, synchronize_multicam_sources
+from .audio_tools import AUDIO_EXTRACT_VERSION, extract_audio, inspect_audio_source
 from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
 
@@ -226,6 +227,28 @@ def build_parser() -> argparse.ArgumentParser:
     relink.add_argument("--project", required=True)
     relink.add_argument("--search-root", required=True, help="本地素材搜索目录")
     relink.add_argument("--match-by-name", action="store_true", help="哈希无匹配时允许唯一文件名近似匹配")
+    audio = subs.add_parser("audio", help="本地音频处理")
+    aus = audio.add_subparsers(dest="action", required=True)
+    extract = _leaf_common(aus.add_parser("extract", help="从本地视频或音频资产提取无损 WAV"))
+    extract.add_argument("--project", required=True)
+    extract_source = extract.add_mutually_exclusive_group(required=True)
+    extract_source.add_argument("--asset-id", default=None, help="项目内视频/音频资产 ID")
+    extract_source.add_argument("--input", default=None, help="本地视频或音频路径")
+    extract.add_argument("--derived-asset-id", default=None, help="生成的派生音频资产 ID")
+    extract.add_argument("--output", default=None, help="项目内 WAV 输出路径")
+    extract.add_argument("--sample-rate", type=int, default=None)
+    extract.add_argument("--channels", type=int, choices=(1, 2), default=None)
+    extract.add_argument("--sequence-id", default=None)
+    extract.add_argument("--track-id", default=None, help="可选：将提取的音频片段写入目标音频轨道")
+    extract.add_argument("--timeline-start-seconds", type=float, default=0.0)
+    extract.add_argument("--apply", action="store_true", help="创建快照并将提取音频片段写入目标音频轨道")
+    extract.add_argument("--replace-track", action="store_true", help="应用前清空目标音频轨道已有片段")
+    extract.add_argument("--license-spdx", default="LicenseRef-UNVERIFIED")
+    extract.add_argument("--license-url", default="")
+    extract.add_argument("--permitted-use", action="append", default=["internal"])
+    extract.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
+    extract.add_argument("--evidence", default="")
+    extract.add_argument("--creator", default="unknown")
     track = _leaf_common(ms.add_parser("track", help="本地对象跟踪并生成关键帧"))
     track.add_argument("--project", required=True)
     track.add_argument("--asset-id", default=None, help="项目内视频资产 ID，与 --input 二选一")
@@ -821,6 +844,174 @@ def command_media_ingest(args: argparse.Namespace) -> dict[str, Any]:
     _operation(root, operation_id, {"operation_id": operation_id, "command": "media.ingest", "status": "succeeded", "asset_id": asset_id, "sha256": digest, "created_at": now_iso()})
     _progress(args, operation_id, "completed", "media.ingest", 100, "素材导入完成")
     return _envelope("media.ingest", args, data={"asset": asset, "rights": record, "path": str(destination)}, operation_id=operation_id)
+
+
+def command_audio_extract(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    if args.timeline_start_seconds < 0:
+        raise argument_error("timeline_start_seconds 不能为负数", "timeline_start_seconds")
+    if args.apply and not args.track_id:
+        raise argument_error("--apply 必须提供 --track-id", "track_id")
+    if args.replace_track and not args.apply:
+        raise argument_error("--replace-track 必须与 --apply 一起使用", "replace_track")
+    source_asset: dict[str, Any] | None = None
+    parent_rights_ref: str | None = None
+    if args.asset_id:
+        source_asset = asset_map(project).get(str(args.asset_id))
+        if not source_asset:
+            raise argument_error(f"找不到音频提取源资产: {args.asset_id}", "asset_id")
+        source = Path(str(source_asset.get("uri", "")))
+        if not source.is_absolute():
+            source = root / source
+        parent_rights_ref = str(source_asset.get("rights_ref") or source_asset.get("id"))
+    else:
+        raw_input = str(args.input or "").strip()
+        if raw_input.lower().startswith(("http://", "https://")):
+            raise argument_error("--input 只接受本地视频或音频文件", "input")
+        source = Path(raw_input).expanduser().resolve()
+    source = source.resolve()
+    input_probe = inspect_audio_source(source)
+    derived_id = str(args.derived_asset_id or new_id("asset_audio"))
+    if derived_id in asset_map(project):
+        raise argument_error(f"派生音频资产 ID 已存在: {derived_id}", "derived_asset_id")
+    output = Path(args.output).expanduser() if args.output else Path("assets") / "derived" / f"audio_{safe_filename(derived_id)}.wav"
+    if not output.is_absolute():
+        output = root / output
+    output = output.resolve()
+    ensure_inside(root, output)
+    if output.exists():
+        raise argument_error("音频提取输出已存在，为避免覆盖请指定新的 --output", str(output))
+    if args.dry_run:
+        return _envelope(
+            "audio.extract",
+            args,
+            status="planned",
+            data={
+                "source": str(source),
+                "source_asset_id": args.asset_id,
+                "source_sha256": f"sha256:{sha256_file(source)}",
+                "input_probe": input_probe,
+                "derived_asset_id": derived_id,
+                "output": str(output),
+                "sample_rate": args.sample_rate,
+                "channels": args.channels,
+                "track_id": args.track_id,
+                "timeline_start_seconds": args.timeline_start_seconds,
+                "engine": "ffmpeg-local-audio-extract-v1",
+                "network": "disabled",
+            },
+        )
+    before_project = copy.deepcopy(project)
+    snapshot = create_snapshot(root, before_project, label="before-audio-extract")
+    operation_id = new_id("op")
+    extraction = extract_audio(source, output, sample_rate=args.sample_rate, channels=args.channels)
+    output_probe = extraction["output_probe"]
+    timeline_tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND))
+    duration_tick = max(1, int(round(float(extraction["duration_seconds"]) * timeline_tps)))
+    if source_asset is not None:
+        ledger = load_ledger(root)
+        records = {str(item.get("asset_id")): item for item in active_records(ledger)}
+        parent_record = records.get(parent_rights_ref or "")
+        if parent_record is None:
+            raise AppError("RIGHTS_RECORD_MISSING", "源资产缺少可继承的 Rights Ledger 记录", exit_code=7, path=parent_rights_ref)
+        rights_source_url = f"local://{output}"
+        record = {
+            "asset_id": derived_id,
+            "kind": "audio",
+            "sha256": extraction["output_sha256"],
+            "source_url": rights_source_url,
+            "source_version": "derived:audio-extract",
+            "retrieved_at": now_iso(),
+            "creator": parent_record.get("creator", "unknown"),
+            "license_spdx": parent_record.get("license_spdx", "LicenseRef-UNVERIFIED"),
+            "license_url": parent_record.get("license_url", ""),
+            "attribution": parent_record.get("attribution", ""),
+            "permitted_uses": list(parent_record.get("permitted_uses", ["internal"])),
+            "permitted_channels": list(parent_record.get("permitted_channels", [])),
+            "restrictions": list(parent_record.get("restrictions", [])),
+            "derived_from": [parent_rights_ref],
+            "evidence": parent_record.get("evidence", ""),
+            "verification_status": parent_record.get("verification_status", "unverified"),
+            "verified_by": parent_record.get("verified_by", ""),
+            "takedown_status": parent_record.get("takedown_status", "clear"),
+            "notes": "Derived by local FFmpeg audio extraction; inherits source rights",
+        }
+    else:
+        rights_source_url = f"local://{source}"
+        record = {
+            "asset_id": derived_id,
+            "kind": "audio",
+            "sha256": extraction["output_sha256"],
+            "source_url": rights_source_url,
+            "source_version": "derived:audio-extract",
+            "retrieved_at": now_iso(),
+            "creator": args.creator,
+            "license_spdx": args.license_spdx,
+            "license_url": require_local_reference(args.license_url, field="--license-url") if args.license_url else "",
+            "attribution": "",
+            "permitted_uses": list(dict.fromkeys(args.permitted_use)),
+            "permitted_channels": [],
+            "restrictions": [],
+            "derived_from": [],
+            "evidence": require_local_reference(args.evidence, field="--evidence") if args.evidence else ("" if args.verification_status == "unverified" else rights_source_url),
+            "verification_status": args.verification_status,
+            "verified_by": "ai-ad-editor" if args.verification_status == "verified" else "",
+            "takedown_status": "clear",
+            "notes": "Derived by local FFmpeg audio extraction",
+        }
+    asset = {
+        "id": derived_id,
+        "kind": "audio",
+        "uri": str(output.relative_to(root)).replace("\\", "/"),
+        "sha256": extraction["output_sha256"],
+        "probe": output_probe,
+        "rights_ref": derived_id,
+        "source": {"source_url": rights_source_url, "retrieved_at": now_iso(), "original_name": output.name, "derived_from": [source_asset.get("id")] if source_asset else []},
+    }
+    project.setdefault("assets", []).append(asset)
+    sequence = None
+    generated_clip = None
+    if args.apply:
+        sequence = find_sequence(project, args.sequence_id)
+        target_track = find_track(sequence, args.track_id, None)
+        if str(target_track.get("kind")) != "audio":
+            raise argument_error("音频提取应用目标必须是 audio 轨道", "track_id")
+        if args.replace_track:
+            target_track["clips"] = []
+        timeline_start_tick = int(round(float(args.timeline_start_seconds) * timeline_tps))
+        generated_clip = {
+            "id": new_id("clip_audio_extract"),
+            "asset_id": derived_id,
+            "timeline_start_tick": timeline_start_tick,
+            "duration_tick": duration_tick,
+            "source_in_tick": 0,
+            "source_out_tick": duration_tick,
+        }
+        target_track.setdefault("clips", []).append(generated_clip)
+        _recompute_sequence_duration(sequence)
+    ledger = load_ledger(root)
+    add_record(ledger, record)
+    validation = validate_project(root, project, strict_rights=False)
+    if not validation["ok"]:
+        raise AppError("AUDIO_EXTRACT_APPLY_INVALID", "音频提取写入后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    report_path = root / "validation" / f"audio_extract_{safe_filename(operation_id)}.json"
+    report = {
+        "report_version": AUDIO_EXTRACT_VERSION,
+        "created_at": now_iso(),
+        "operation_id": operation_id,
+        "snapshot_id": snapshot["snapshot_id"],
+        "asset": asset,
+        "rights": record,
+        "extraction": extraction,
+        "generated_clip": generated_clip,
+        "validation": validation,
+    }
+    atomic_write_json(report_path, report)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "audio.extract", "asset_id": derived_id, "source_asset_id": source_asset.get("id") if source_asset else None, "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "clip_id": generated_clip.get("id") if generated_clip else None, "at": now_iso()})
+    save_project(root, project)
+    save_ledger(root, ledger)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "audio.extract", "status": "succeeded", "asset_id": derived_id, "source_asset_id": source_asset.get("id") if source_asset else None, "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "created_at": now_iso()})
+    return _envelope("audio.extract", args, data={"asset": asset, "rights": record, "snapshot": snapshot, "report": str(report_path), "extraction": extraction, "generated_clip": generated_clip, "validation": validation}, operation_id=operation_id)
 
 
 def command_media_stabilize(args: argparse.Namespace) -> dict[str, Any]:
@@ -3913,6 +4104,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "beat-cut"): command_media_beat_cut,
     ("media", "multicam"): command_media_multicam,
     ("media", "smart-cut"): command_media_smart_cut,
+    ("audio", "extract"): command_audio_extract,
     ("ad", "plan"): command_ad_plan,
     ("ad", "apply"): command_ad_apply,
     ("subtitle", "validate"): command_subtitle_validate,
