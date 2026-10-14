@@ -19,6 +19,8 @@ python -X utf8 -m ai_ad_editor rights export --project .\work\demo --target comm
 python -X utf8 -m ai_ad_editor rights batch-update --project .\work\demo --input .\work\rights-updates.json
 python -X utf8 -m ai_ad_editor rights impact --project .\work\demo --asset-id asset_001
 python -X utf8 -m ai_ad_editor rights retract --project .\work\demo --asset-id asset_001 --reason "license notice"
+python -X utf8 -m ai_ad_editor rights decide --project .\work\demo --asset-id asset_001 --action replace --replacement-asset-id asset_002 --status proposed --reason "license replacement"
+python -X utf8 -m ai_ad_editor rights decide --project .\work\demo --asset-id asset_001 --action replace --replacement-asset-id asset_002 --status approved --supersedes-decision-id rightsdecision_... --reason "replacement approved"
 ```
 
 The policy rejects remote source/evidence URLs at ingest. A missing,
@@ -31,5 +33,13 @@ batch updates preflight all changes before one snapshot is committed.
 Recovering a disputed, expired, takedown or blocked record requires `--reopen`
 and new local evidence. `rights retract` blocks new publishing and
 `rights impact` reports historical artifacts without deleting them.
+`rights decide` appends a non-destructive historical `replace`, `delete` or
+`retain` decision with its affected artifacts. Use `proposed` while an Agent
+is preparing the change, then supersede the current decision with `approved`
+or `cancelled` by passing `--supersedes-decision-id`. An approved replace or
+delete blocks later releases until it is explicitly cancelled or the asset is
+removed from the project dependency closure; the command never deletes or
+rewrites historical media. Approved replacements are checked against the
+replacement asset's local Rights Ledger record and dependencies first.
 `rights export` writes a deterministic release manifest and returns exit code 7
 when the gate fails.

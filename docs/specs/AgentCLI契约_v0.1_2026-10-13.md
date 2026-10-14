@@ -77,12 +77,13 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `validate --project PATH` | 项目和目标渠道 | 机器 Schema、时间/引用/权利/效果语义校验报告 |
 | `rights check --project PATH` | 项目 Rights Ledger | 检查目标渠道发布资格；严格失败退出码为 7 |
 | `rights list --project PATH [--status STATUS]` | 当前项目 Rights Ledger | 列出每个资产的有效记录、版本、状态和许可字段 |
-| `rights history --project PATH --asset-id ID` | 资产 ID | 返回不可变修订链与审计事件；不存在时返回 `RIGHTS_RECORD_MISSING` |
+| `rights history --project PATH --asset-id ID` | 资产 ID | 返回不可变修订链、审计事件、全部历史处置决策和当前有效决策；不存在时返回 `RIGHTS_RECORD_MISSING` |
 | `rights update --project PATH --asset-id ID --reason TEXT` | 本地 JSON patch 或字段参数 | 创建新版本并保留旧证据；写入前快照；恢复阻断状态必须 `--reopen` 与新证据 |
 | `rights export --project PATH --target CHANNEL --output FILE` | 项目 Rights Ledger 和资产哈希 | 写入项目内确定性发布清单；门禁失败仍产出清单并返回退出码 7 |
 | `rights batch-update --project PATH --input FILE` | `{updates:[{asset_id,patch,reason,actor,reopen}]}` 本地 JSON | 预检全部修订后一次快照、原子写入多个资产版本；任一项失败则不写入 |
 | `rights impact --project PATH --asset-id ID` | 本地项目 JSON/JSONL 产物 | 查找导出、渲染、操作、校验和快照中仍引用资产的历史影响清单 |
 | `rights retract --project PATH --asset-id ID --reason TEXT` | 撤下/争议/阻断状态与原因 | 创建不可变撤回版本，并返回受影响历史产物；不删除成片文件 |
+| `rights decide --project PATH --asset-id ID --action replace\|delete\|retain --reason TEXT [--supersedes-decision-id ID]` | 历史成片处置决策、可选替代资产和 `proposed\|approved\|cancelled` 状态 | 追加非破坏性决策与影响清单；状态变更必须指向当前决策；已批准 replace/delete 对当前项目发布返回 `RIGHTS_DISPOSITION_BLOCKED` |
 | `render --project PATH` | 已验证项目和输出规格 | 本地 FFmpeg 渲染、manifest、操作记录和原子最终媒体 |
 | `queue enqueue --project PATH --input JOBS.json` | 单个作业或 `{jobs:[...]}` | 原子写入项目 `operations/render-queue.json`，保存输出规格和初始 `pending` 状态 |
 | `queue list --project PATH [--status STATUS]` | 项目队列和可选状态 | 只读返回队列计数与作业状态 |

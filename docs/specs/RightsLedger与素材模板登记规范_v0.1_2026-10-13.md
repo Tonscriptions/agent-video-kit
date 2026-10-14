@@ -69,11 +69,13 @@ python -m ai_ad_editor rights export --project .\project --target commercial_ad 
 python -m ai_ad_editor rights batch-update --project .\project --input .\rights-updates.json
 python -m ai_ad_editor rights impact --project .\project --asset-id asset_001
 python -m ai_ad_editor rights retract --project .\project --asset-id asset_001 --reason "license notice"
+python -m ai_ad_editor rights decide --project .\project --asset-id asset_001 --action replace --replacement-asset-id asset_002 --status approved --reason "replace historical usage"
+python -m ai_ad_editor rights decide --project .\project --asset-id asset_001 --action replace --replacement-asset-id asset_002 --status cancelled --supersedes-decision-id rightsdecision_... --reason "replacement withdrawn"
 ```
 
 从 `disputed`、`expired`、`takedown` 或 `blocked` 恢复到 `verified/restricted` 必须同时提供 `--reopen` 和不同于旧记录的本地证据。撤下或争议状态会自动把 `takedown_status` 置为 `notice`；恢复时若未显式指定则清除为 `clear`。
 
-模板登记中的 `assets`/`dependencies`、项目资产的 `derived_from` 父资产会递归纳入发布检查。缺失依赖返回 `RIGHTS_TEMPLATE_DEPENDENCY_MISSING`，缺失父资产返回 `RIGHTS_RECORD_MISSING`，项目资产哈希与台账快照不一致返回 `RIGHTS_HASH_MISMATCH`。`rights batch-update` 先在内存中预检全部项目，再创建单个快照并提交；`rights retract` 只阻断新发布并生成 `rights impact` 报告，不擅自删除历史成片。
+模板登记中的 `assets`/`dependencies`、项目资产的 `derived_from` 父资产会递归纳入发布检查。缺失依赖返回 `RIGHTS_TEMPLATE_DEPENDENCY_MISSING`，缺失父资产返回 `RIGHTS_RECORD_MISSING`，项目资产哈希与台账快照不一致返回 `RIGHTS_HASH_MISMATCH`。`rights batch-update` 先在内存中预检全部项目，再创建单个快照并提交；`rights retract` 只阻断新发布并生成 `rights impact` 报告，不擅自删除历史成片。`rights decide` 将历史成片的 `replace`、`delete` 或 `retain` 决策追加到 Ledger，保存受影响产物、替代资产、目标渠道、原因和操作者；`approved` 的 replace/delete 决策会以 `RIGHTS_DISPOSITION_BLOCKED` 阻断后续发布，命令不会删除或改写历史媒体，替换/删除动作由 Agent 根据影响清单执行并再次验证。
 
 ## 4. 许可证策略
 
@@ -119,10 +121,22 @@ python -m ai_ad_editor rights retract --project .\project --asset-id asset_001 -
 6. 模板内部依赖和生成结果的父资产都通过检查；
 7. 模板、`derived_from` 父资产和生成结果的全部依赖都能追溯到有效记录；
 8. 项目、渲染清单和 Rights Ledger 使用同一资产哈希快照。
+9. 当前有效历史处置决策中，没有对目标渠道和依赖资产生效的已批准 replace/delete。
 
 任何一项失败都必须返回退出码 7，并指出资产 ID、失败字段、证据路径和修复建议。`--yes` 不得绕过该门禁。
 
 `rights export` 将上述检查结果、项目资产哈希、模板快照、全部父资产/模板依赖的有效记录 ID/版本、许可证、归属和允许渠道写入项目内发布清单，并附确定性 `manifest_sha256`。检查失败仍可导出清单供修复审查，但命令返回退出码 7。
+
+Ledger 顶层可选 `decisions` 数组保存历史处置决策。每项至少包含 `decision_id`、`asset_id`、`action`、`status`、`replacement_asset_id`、`target`、`reason`、`actor`、`affected_artifacts` 和 `created_at`，状态修订还要包含 `supersedes`。`proposed` 只产生警告，`approved` 对当前项目引用生效，`cancelled` 保留历史但不参与阻断。状态变更必须追加新决策，并用 `supersedes` 指向当前有效的 `decision_id`；不能跳过当前决策、回退已取消决策或改变原资产/动作/目标/替代资产范围。批准替换前会再次检查替代资产和其依赖的 Rights Ledger 门禁。决策本身是追加式证据，不是文件删除授权；任何外部删除、替换或重新渲染必须形成新的项目变更、快照和质量/权利报告。
+
+| 当前状态 | 可追加的状态 | 门禁行为 |
+|---|---|---|
+| 无前序决策 | proposed、approved | 新建独立处置范围 |
+| proposed | proposed、approved、cancelled | 最新有效记录替代原警告；批准后阻断 |
+| approved | approved、cancelled | 保持阻断或显式撤销；不能降回 proposed |
+| cancelled | 无 | 历史链终止；新的处置必须创建独立决策 |
+
+并行独立决策分别生效。撤销一条决策不会解除另一条已批准决策，也不会解除资产自身的撤下、争议、过期或许可证限制。新修订继承原 `affected_artifacts` 快照，`rights history` 的 `effective_decisions` 用于定位当前 `decision_id`。错误包括 `RIGHTS_DISPOSITION_MISSING`、`RIGHTS_DISPOSITION_STALE`、`RIGHTS_DISPOSITION_SCOPE_MISMATCH`、`RIGHTS_DISPOSITION_TRANSITION_INVALID`、`RIGHTS_DISPOSITION_PREDECESSOR_REQUIRED` 和替代资产依赖不完整的 `RIGHTS_REPLACEMENT_NOT_PUBLISHABLE`；全部在项目写入前返回。
 
 ## 7. 记录示例
 

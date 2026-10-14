@@ -782,6 +782,106 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 7, blocked)
             self.assertTrue(any(item["code"] == "RIGHTS_STATUS_BLOCKED" and item["context"] == "derived_dependency" for item in blocked["data"]["failures"]))
 
+    def test_rights_disposition_decision_blocks_release_and_preserves_history(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-rights-disposition-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace, "historical.mp4")
+            replacement_source = self.make_media(workspace, "replacement.mp4")
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            ingest_args = [
+                "--project", str(project), "--verification-status", "verified", "--source-url", "local://source",
+                "--license-spdx", "CC0-1.0", "--license-url", "local://license", "--evidence", "local://evidence",
+                "--permitted-use", "commercial_ad",
+            ]
+            _, historical = invoke("media", "ingest", "--input", str(source), "--asset-id", "historical", *ingest_args)
+            _, replacement = invoke("media", "ingest", "--input", str(replacement_source), "--asset-id", "replacement", *ingest_args)
+            self.assertEqual(historical["data"]["asset"]["id"], "historical")
+            self.assertEqual(replacement["data"]["asset"]["id"], "replacement")
+            historical_artifact = project / "exports" / "historical-release.json"
+            historical_artifact.write_text(json.dumps({"asset_id": "historical", "output": "renders/old.mp4"}), encoding="utf-8")
+            historical_render = project / "renders" / "old.mp4"
+            historical_render.write_bytes(source.read_bytes())
+            original_artifact = historical_artifact.read_bytes()
+            original_render = historical_render.read_bytes()
+            decision_args = ("rights", "decide", "--project", str(project), "--asset-id", "historical", "--action", "replace", "--replacement-asset-id", "replacement", "--reason", "license replacement", "--actor", "reviewer")
+
+            code, planned = invoke(*decision_args, "--status", "approved", "--dry-run")
+            self.assertEqual(code, 0, planned)
+            self.assertEqual(planned["status"], "planned")
+            self.assertEqual(json.loads((project / "rights-ledger.json").read_text(encoding="utf-8"))["decisions"], [])
+
+            code, orphan = invoke(*decision_args, "--status", "cancelled")
+            self.assertEqual(code, 2, orphan)
+            self.assertEqual(orphan["errors"][0]["code"], "RIGHTS_DISPOSITION_PREDECESSOR_REQUIRED")
+            code, proposed = invoke(*decision_args)
+            self.assertEqual(code, 0, proposed)
+            proposed_id = proposed["data"]["decision"]["decision_id"]
+            code, pending = invoke("rights", "check", "--project", str(project))
+            self.assertEqual(code, 0, pending)
+            self.assertTrue(any(item["code"] == "RIGHTS_DISPOSITION_PROPOSED" for item in pending["data"]["warnings"]))
+
+            dependency_patch = workspace / "dependency-patch.json"
+            dependency_patch.write_text(json.dumps({"derived_from": ["missing-parent"]}), encoding="utf-8")
+            code, updated = invoke("rights", "update", "--project", str(project), "--asset-id", "replacement", "--patch", str(dependency_patch), "--reason", "dependency registration")
+            self.assertEqual(code, 0, updated)
+            ledger_before = (project / "rights-ledger.json").read_bytes()
+            code, rejected = invoke(*decision_args, "--status", "approved", "--supersedes-decision-id", proposed_id)
+            self.assertEqual(code, 7, rejected)
+            self.assertEqual(rejected["errors"][0]["code"], "RIGHTS_REPLACEMENT_NOT_PUBLISHABLE")
+            self.assertIn("missing-parent", rejected["errors"][0]["cause"])
+            self.assertEqual((project / "rights-ledger.json").read_bytes(), ledger_before)
+            dependency_patch.write_text(json.dumps({"derived_from": []}), encoding="utf-8")
+            self.assertEqual(invoke("rights", "update", "--project", str(project), "--asset-id", "replacement", "--patch", str(dependency_patch), "--reason", "dependency corrected")[0], 0)
+
+            code, decided = invoke(*decision_args, "--status", "approved", "--supersedes-decision-id", proposed_id)
+            self.assertEqual(code, 0, decided)
+            decision = decided["data"]["decision"]
+            self.assertEqual(decision["action"], "replace")
+            self.assertEqual(decision["status"], "approved")
+            self.assertEqual(decision["supersedes"], proposed_id)
+            self.assertEqual(decision["affected_artifacts"], proposed["data"]["decision"]["affected_artifacts"])
+            self.assertTrue(any(item["path"] == "exports/historical-release.json" for item in decision["affected_artifacts"]))
+
+            code, history = invoke("rights", "history", "--project", str(project), "--asset-id", "historical")
+            self.assertEqual(code, 0, history)
+            self.assertEqual(len(history["data"]["decisions"]), 2)
+            self.assertEqual(history["data"]["effective_decisions"][0]["decision_id"], decision["decision_id"])
+            code, blocked = invoke("rights", "check", "--project", str(project))
+            self.assertEqual(code, 7, blocked)
+            self.assertTrue(any(item["code"] == "RIGHTS_DISPOSITION_BLOCKED" for item in blocked["data"]["failures"]))
+            release = project / "exports" / "disposition-release.json"
+            code, exported = invoke("rights", "export", "--project", str(project), "--output", str(release))
+            self.assertEqual(code, 7, exported)
+            manifest = json.loads(release.read_text(encoding="utf-8"))
+            self.assertEqual(manifest["rights_check"]["effective_disposition_decisions"][0]["decision_id"], decision["decision_id"])
+
+            code, stale = invoke(*decision_args, "--status", "cancelled", "--supersedes-decision-id", proposed_id)
+            self.assertEqual(code, 2, stale)
+            self.assertEqual(stale["errors"][0]["code"], "RIGHTS_DISPOSITION_STALE")
+            code, mismatch = invoke(*decision_args, "--status", "cancelled", "--supersedes-decision-id", decision["decision_id"], "--target", "all")
+            self.assertEqual(code, 2, mismatch)
+            self.assertEqual(mismatch["errors"][0]["code"], "RIGHTS_DISPOSITION_SCOPE_MISMATCH")
+            code, downgrade = invoke(*decision_args, "--status", "proposed", "--supersedes-decision-id", decision["decision_id"])
+            self.assertEqual(code, 2, downgrade)
+            self.assertEqual(downgrade["errors"][0]["code"], "RIGHTS_DISPOSITION_TRANSITION_INVALID")
+            code, cancelled = invoke(*decision_args, "--status", "cancelled", "--supersedes-decision-id", decision["decision_id"])
+            self.assertEqual(code, 0, cancelled)
+            code, cleared = invoke("rights", "check", "--project", str(project))
+            self.assertEqual(code, 0, cleared)
+            self.assertEqual(cleared["data"]["warnings"], [])
+            code, history = invoke("rights", "history", "--project", str(project), "--asset-id", "historical")
+            self.assertEqual(code, 0, history)
+            self.assertEqual(len(history["data"]["decisions"]), 3)
+            self.assertEqual(history["data"]["effective_decisions"][0]["status"], "cancelled")
+            self.assertEqual(historical_artifact.read_bytes(), original_artifact)
+            self.assertEqual(historical_render.read_bytes(), original_render)
+
+            code, deleted = invoke("rights", "decide", "--project", str(project), "--asset-id", "historical", "--action", "delete", "--status", "approved", "--reason", "historical deletion plan")
+            self.assertEqual(code, 0, deleted)
+            self.assertEqual(invoke("rights", "check", "--project", str(project))[0], 7)
+            self.assertEqual(historical_render.read_bytes(), original_render)
+
     def test_ingest_dry_run_does_not_change_project(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-dry-") as raw:
             workspace = Path(raw)

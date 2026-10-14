@@ -7,3 +7,4 @@
 - 本项目下载并注册的本地 Skills 统一使用 `video-cut-` 前缀，调用形式为 `$video-cut-技能名`。
 - 可编辑技能正文、脚本与资源保存在 `skills/`；`C:/Users/carzy/.codex/skills/` 中的对应项是 Windows 目录联接，供 Codex 发现技能。
 - 原始仓库快照与 ZIP 保存在 `sources/`，版本、来源与安装映射见 `video-cut-install-manifest.json`。
+- Git 主分支使用 `main`，`origin` 固定为 `git@github.com:Tonscriptions/agent-video-kit.git`。每轮产品更新同时维护根目录 `README.md` 和相关 `docs/` 文档，通过验证后提交并自动推送；首轮初始化已按用户要求 force push，后续使用普通推送。

@@ -40,7 +40,7 @@ from .batch import _load_variants, run_template_batch
 from .capabilities import build_capability_manifest
 from .transcribe import transcribe_local, write_srt
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
-from .rights import VALID_STATUSES, active_records, add_record, check_project_rights, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
+from .rights import VALID_STATUSES, active_records, add_record, check_project_rights, create_disposition_decision, disposition_decisions, effective_disposition_decisions, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
 from .understand import understand_media
 from .tracking import track_media
 from .runtime import configure_local_runtime
@@ -256,6 +256,16 @@ def build_parser() -> argparse.ArgumentParser:
     rights_retract.add_argument("--status", choices=("takedown", "disputed", "blocked"), default="takedown")
     rights_retract.add_argument("--reason", required=True)
     rights_retract.add_argument("--actor", default="ai-ad-editor")
+    rights_decide = _leaf_common(rs.add_parser("decide", help="记录历史成片替换/删除/保留决策"))
+    rights_decide.add_argument("--project", required=True)
+    rights_decide.add_argument("--asset-id", required=True)
+    rights_decide.add_argument("--action", dest="disposition_action", choices=("replace", "delete", "retain"), required=True)
+    rights_decide.add_argument("--status", choices=("proposed", "approved", "cancelled"), default="proposed")
+    rights_decide.add_argument("--replacement-asset-id", default=None)
+    rights_decide.add_argument("--supersedes-decision-id", default=None)
+    rights_decide.add_argument("--target", default="commercial_ad")
+    rights_decide.add_argument("--reason", required=True)
+    rights_decide.add_argument("--actor", default="ai-ad-editor")
 
     render = _leaf_common(subs.add_parser("render", help="本地 FFmpeg 渲染"))
     render.add_argument("--project", required=True)
@@ -1547,7 +1557,7 @@ def command_rights_history(args: argparse.Namespace) -> dict[str, Any]:
     events = [event for event in ledger.get("events", []) if str(event.get("asset_id")) == str(args.asset_id)]
     if not history:
         raise AppError("RIGHTS_RECORD_MISSING", f"找不到 Rights Ledger 记录: {args.asset_id}", exit_code=3, path="asset_id")
-    return _envelope("rights.history", args, data={"asset_id": args.asset_id, "records": history, "events": events, "count": len(history)})
+    return _envelope("rights.history", args, data={"asset_id": args.asset_id, "records": history, "events": events, "decisions": disposition_decisions(ledger, args.asset_id), "effective_decisions": effective_disposition_decisions(ledger, args.asset_id), "count": len(history)})
 
 
 def command_rights_update(args: argparse.Namespace) -> dict[str, Any]:
@@ -1670,6 +1680,25 @@ def command_rights_retract(args: argparse.Namespace) -> dict[str, Any]:
     after = impacted_artifacts(root, args.asset_id)
     _operation(root, operation_id, {"operation_id": operation_id, "command": "rights.retract", "status": "succeeded", "asset_id": args.asset_id, "record_id": committed["record"]["record_id"], "snapshot_id": snapshot["snapshot_id"], "impacted_artifacts": after, "created_at": now_iso()})
     return _envelope("rights.retract", args, data={"revision": committed, "snapshot": snapshot, "impacted_artifacts": after, "previous_impact": before}, operation_id=operation_id)
+
+
+def command_rights_decide(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    ledger = load_ledger(root)
+    impacted = impacted_artifacts(root, args.asset_id)
+    planned_ledger = copy.deepcopy(ledger)
+    decision = create_disposition_decision(planned_ledger, args.asset_id, action=args.disposition_action, status=args.status, reason=args.reason, actor=args.actor, target=args.target, replacement_asset_id=args.replacement_asset_id, impacted=impacted, supersedes_decision_id=args.supersedes_decision_id, project=project)
+    impacted = decision["affected_artifacts"]
+    if args.dry_run:
+        return _envelope("rights.decide", args, status="planned", data={"decision": decision, "impacted_artifacts": impacted, "ledger": str(ledger_file(root))})
+    snapshot = create_snapshot(root, project, label=f"rights-{args.asset_id}-disposition")
+    operation_id = new_id("op")
+    committed = create_disposition_decision(ledger, args.asset_id, action=args.disposition_action, status=args.status, reason=args.reason, actor=args.actor, target=args.target, replacement_asset_id=args.replacement_asset_id, impacted=impacted, supersedes_decision_id=args.supersedes_decision_id, project=project)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "rights.decide", "asset_id": args.asset_id, "action": args.disposition_action, "status": args.status, "decision_id": committed["decision_id"], "snapshot_id": snapshot["snapshot_id"], "at": now_iso()})
+    save_ledger(root, ledger)
+    save_project(root, project)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "rights.decide", "status": "succeeded", "asset_id": args.asset_id, "action": args.disposition_action, "decision_status": args.status, "decision_id": committed["decision_id"], "snapshot_id": snapshot["snapshot_id"], "impacted_artifacts": impacted, "created_at": now_iso()})
+    return _envelope("rights.decide", args, data={"decision": committed, "snapshot": snapshot, "impacted_artifacts": impacted, "ledger": str(ledger_file(root))}, operation_id=operation_id)
 
 
 def _render_settings_for_args(project: dict[str, Any], args: argparse.Namespace) -> tuple[dict[str, Any], str | None]:
@@ -2242,6 +2271,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("rights", "batch-update"): command_rights_batch_update,
     ("rights", "impact"): command_rights_impact,
     ("rights", "retract"): command_rights_retract,
+    ("rights", "decide"): command_rights_decide,
     ("render", None): command_render,
     ("queue", "enqueue"): command_queue_enqueue,
     ("queue", "list"): command_queue_list,

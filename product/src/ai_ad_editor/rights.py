@@ -25,6 +25,13 @@ VALID_STATUSES = {"unverified", "verified", "restricted", "disputed", "expired",
 BLOCKED_STATUSES = {"unverified", "disputed", "expired", "takedown", "blocked"}
 RECOVERABLE_STATUSES = {"disputed", "expired", "takedown", "blocked"}
 VALID_TAKEDOWN_STATUSES = {"clear", "notice", "blocked"}
+DISPOSITION_ACTIONS = {"replace", "delete", "retain"}
+DISPOSITION_STATUSES = {"proposed", "approved", "cancelled"}
+_DISPOSITION_TRANSITIONS = {
+    "proposed": {"proposed", "approved", "cancelled"},
+    "approved": {"approved", "cancelled"},
+    "cancelled": set(),
+}
 
 _ALLOWED_TRANSITIONS: dict[str, set[str]] = {
     "unverified": {"unverified", "verified", "restricted", "disputed", "blocked"},
@@ -61,6 +68,7 @@ _PATCHABLE_FIELDS = {
 def _normalize_ledger(ledger: dict[str, Any]) -> dict[str, Any]:
     ledger.setdefault("records", [])
     ledger.setdefault("events", [])
+    ledger.setdefault("decisions", [])
     ledger.setdefault("policy", {})
     ledger["schema_version"] = LEDGER_VERSION
     return ledger
@@ -373,6 +381,96 @@ def _check_record(record: dict[str, Any], aid: str, target: str, *, strict: bool
         report({"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失"})
 
 
+def disposition_decisions(ledger: dict[str, Any], asset_id: str | None = None) -> list[dict[str, Any]]:
+    decisions = [item for item in ledger.get("decisions", []) if isinstance(item, dict) and (asset_id is None or str(item.get("asset_id")) == str(asset_id))]
+    return sorted(decisions, key=lambda item: (str(item.get("created_at", "")), str(item.get("decision_id", ""))))
+
+
+def effective_disposition_decisions(ledger: dict[str, Any], asset_id: str | None = None) -> list[dict[str, Any]]:
+    decisions = disposition_decisions(ledger)
+    superseded = {str(item["supersedes"]) for item in decisions if item.get("supersedes")}
+    return [item for item in decisions if str(item.get("decision_id")) not in superseded and (asset_id is None or str(item.get("asset_id")) == str(asset_id))]
+
+
+def create_disposition_decision(
+    ledger: dict[str, Any],
+    asset_id: str,
+    *,
+    action: str,
+    status: str,
+    reason: str,
+    actor: str = "ai-ad-editor",
+    target: str = "commercial_ad",
+    replacement_asset_id: str | None = None,
+    impacted: list[dict[str, Any]] | None = None,
+    supersedes_decision_id: str | None = None,
+    project: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Append a non-destructive historical replace/delete decision.
+
+    The decision never removes media or rewrites historical manifests.  An
+    approved replace/delete decision blocks new release use of the affected
+    asset until that decision is explicitly cancelled or the asset is removed
+    from the project's rights dependency closure.
+    """
+    _normalize_ledger(ledger)
+    if action not in DISPOSITION_ACTIONS:
+        raise AppError("RIGHTS_DISPOSITION_ACTION_INVALID", f"不支持的历史处置动作: {action}", exit_code=2, path="action")
+    if status not in DISPOSITION_STATUSES:
+        raise AppError("RIGHTS_DISPOSITION_STATUS_INVALID", f"不支持的历史处置状态: {status}", exit_code=2, path="status")
+    if not str(reason).strip():
+        raise AppError("RIGHTS_REASON_REQUIRED", "历史处置决策必须提供 reason", exit_code=2, path="reason")
+    current = record_for(ledger, str(asset_id))
+    if not current:
+        raise AppError("RIGHTS_RECORD_MISSING", f"找不到 Rights Ledger 记录: {asset_id}", exit_code=3, path="asset_id")
+    previous = None
+    if supersedes_decision_id:
+        previous = next((item for item in disposition_decisions(ledger) if item.get("decision_id") == supersedes_decision_id), None)
+        if not previous:
+            raise AppError("RIGHTS_DISPOSITION_MISSING", f"找不到历史处置决策: {supersedes_decision_id}", exit_code=3, path="supersedes_decision_id")
+        if not any(item.get("decision_id") == supersedes_decision_id for item in effective_disposition_decisions(ledger)):
+            raise AppError("RIGHTS_DISPOSITION_STALE", "历史处置决策已有后续修订，请使用当前有效 decision_id", exit_code=2, path="supersedes_decision_id")
+        expected = (str(asset_id), action, target, str(replacement_asset_id) if replacement_asset_id else None)
+        actual = (str(previous.get("asset_id")), previous.get("action"), previous.get("target"), previous.get("replacement_asset_id"))
+        if actual != expected:
+            raise AppError("RIGHTS_DISPOSITION_SCOPE_MISMATCH", "决策修订必须保留原资产、动作、目标渠道和替代资产", exit_code=2, path="supersedes_decision_id")
+        if status not in _DISPOSITION_TRANSITIONS.get(str(previous.get("status")), set()):
+            raise AppError("RIGHTS_DISPOSITION_TRANSITION_INVALID", f"不允许的决策状态转换: {previous.get('status')} -> {status}", exit_code=2, path="status")
+    elif status == "cancelled":
+        raise AppError("RIGHTS_DISPOSITION_PREDECESSOR_REQUIRED", "撤销必须通过 supersedes_decision_id 指定当前有效决策", exit_code=2, path="supersedes_decision_id")
+    if action == "replace":
+        if not replacement_asset_id:
+            raise AppError("RIGHTS_REPLACEMENT_REQUIRED", "replace 决策必须提供 replacement_asset_id", exit_code=2, path="replacement_asset_id")
+        if str(replacement_asset_id) == str(asset_id):
+            raise AppError("RIGHTS_REPLACEMENT_SAME_ASSET", "replacement_asset_id 不能与原资产相同", exit_code=2, path="replacement_asset_id")
+        replacement = record_for(ledger, str(replacement_asset_id))
+        if not replacement:
+            raise AppError("RIGHTS_REPLACEMENT_RECORD_MISSING", f"找不到替代资产 Rights Ledger 记录: {replacement_asset_id}", exit_code=3, path="replacement_asset_id")
+        if status == "approved":
+            replacement_asset = next((item for item in (project or {}).get("assets", []) if str(item.get("id")) == str(replacement_asset_id)), {"id": str(replacement_asset_id)})
+            replacement_check = check_project_rights({"assets": [replacement_asset]}, ledger, target, strict=True)
+            if not replacement_check["ok"]:
+                raise AppError("RIGHTS_REPLACEMENT_NOT_PUBLISHABLE", "替代资产或其依赖未通过目标渠道权利门禁", exit_code=7, path="replacement_asset_id", cause=json.dumps(replacement_check["failures"], ensure_ascii=False))
+    elif replacement_asset_id:
+        raise AppError("RIGHTS_REPLACEMENT_UNEXPECTED", "delete/retain 决策不能提供 replacement_asset_id", exit_code=2, path="replacement_asset_id")
+    decision = {
+        "decision_id": new_id("rightsdecision"),
+        "supersedes": supersedes_decision_id,
+        "asset_id": str(asset_id),
+        "action": action,
+        "status": status,
+        "replacement_asset_id": str(replacement_asset_id) if replacement_asset_id else None,
+        "target": target,
+        "reason": str(reason),
+        "actor": actor,
+        "affected_artifacts": copy.deepcopy(previous.get("affected_artifacts", []) if previous else impacted or []),
+        "created_at": now_iso(),
+    }
+    ledger["decisions"].append(decision)
+    ledger["events"].append({"event_id": new_id("rightsevent"), "event": "disposition_decision", "asset_id": str(asset_id), "decision_id": decision["decision_id"], "supersedes": supersedes_decision_id, "action": action, "status": status, "replacement_asset_id": decision["replacement_asset_id"], "reason": str(reason), "actor": actor, "at": decision["created_at"]})
+    return decision
+
+
 def check_project_rights(project: dict[str, Any], ledger: dict[str, Any], target: str = "commercial_ad", *, strict: bool = True) -> dict[str, Any]:
     failures: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
@@ -382,7 +480,15 @@ def check_project_rights(project: dict[str, Any], ledger: dict[str, Any], target
     for record in required.values():
         context = "derived_dependency" if record.get("asset_id") not in {str(asset.get("id")) for asset in project.get("assets", [])} else "project_asset"
         _check_record(record, str(record.get("asset_id")), target, strict=strict, failures=failures, warnings=warnings, context=context)
-    return {"ok": not failures, "target": target, "checked": len(project.get("assets", [])), "required_records": len(required), "failures": failures, "warnings": warnings}
+    required_ids = {str(item) for item in required}
+    for decision in effective_disposition_decisions(ledger):
+        if str(decision.get("asset_id")) not in required_ids or decision.get("target") not in {None, "", target, "all"}:
+            continue
+        if decision.get("status") == "approved" and decision.get("action") in {"replace", "delete"}:
+            failures.append({"code": "RIGHTS_DISPOSITION_BLOCKED", "message": f"资产已有已批准的历史处置决策: {decision.get('action')}", "asset_id": str(decision.get("asset_id")), "decision_id": decision.get("decision_id"), "replacement_asset_id": decision.get("replacement_asset_id"), "context": "historical_disposition"})
+        elif decision.get("status") == "proposed" and decision.get("action") in {"replace", "delete"}:
+            warnings.append({"code": "RIGHTS_DISPOSITION_PROPOSED", "message": f"资产存在待处理历史处置决策: {decision.get('action')}", "asset_id": str(decision.get("asset_id")), "decision_id": decision.get("decision_id"), "replacement_asset_id": decision.get("replacement_asset_id"), "context": "historical_disposition"})
+    return {"ok": not failures, "target": target, "checked": len(project.get("assets", [])), "required_records": len(required), "failures": failures, "warnings": warnings, "disposition_decisions": disposition_decisions(ledger), "effective_disposition_decisions": effective_disposition_decisions(ledger)}
 
 
 def release_manifest(project: dict[str, Any], ledger: dict[str, Any], target: str = "commercial_ad") -> dict[str, Any]:
@@ -426,6 +532,7 @@ def release_manifest(project: dict[str, Any], ledger: dict[str, Any], target: st
             for record in sorted(required_records.values(), key=lambda item: str(item.get("asset_id")))
         ],
         "template_snapshots": copy.deepcopy(project.get("templates", [])),
+        "disposition_decisions": copy.deepcopy(disposition_decisions(ledger)),
     }
     digest = sha256_bytes(json.dumps(manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))
     return {**manifest, "manifest_sha256": f"sha256:{digest}"}

@@ -80,6 +80,7 @@ def initial_ledger() -> dict[str, Any]:
         "updated_at": now_iso(),
         "records": [],
         "events": [],
+        "decisions": [],
         "policy": {"default_target": "commercial_ad", "unverified_publish": False},
     }
 

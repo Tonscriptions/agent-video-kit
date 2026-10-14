@@ -139,9 +139,9 @@ def build_capability_manifest() -> dict[str, Any]:
             "rights": {
                 "status": "implemented",
                 "schema_version": "0.2.0",
-                "features": ["local_ledger", "immutable_revisions", "status_transitions", "takedown_and_dispute_gate", "channel_gate", "expiry_gate", "audit_history", "template_dependency_closure", "derived_asset_closure", "hash_snapshot_gate", "atomic_batch_update", "release_manifest", "historical_impact_report"],
-                "commands": ["rights.check", "rights.list", "rights.history", "rights.update", "rights.batch-update", "rights.impact", "rights.retract", "rights.export"],
-                "limits": ["retract_reports_impact_without_deleting_or_replacing_historical_media", "license_policy_is_field_and_status_based_without_external_network_verification"],
+                "features": ["local_ledger", "immutable_revisions", "status_transitions", "takedown_and_dispute_gate", "channel_gate", "expiry_gate", "audit_history", "template_dependency_closure", "derived_asset_closure", "hash_snapshot_gate", "atomic_batch_update", "release_manifest", "historical_impact_report", "historical_disposition_decisions", "disposition_approval_and_cancellation_chain", "replacement_dependency_gate", "approved_replace_delete_release_block"],
+                "commands": ["rights.check", "rights.list", "rights.history", "rights.update", "rights.batch-update", "rights.impact", "rights.retract", "rights.decide", "rights.export"],
+                "limits": ["disposition_decisions_generate_non_destructive_manual_actions_without_deleting_historical_media", "license_policy_is_field_and_status_based_without_external_network_verification"],
             },
             "policy": {
                 "status": "implemented",
