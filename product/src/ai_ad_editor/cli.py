@@ -48,7 +48,7 @@ from .capabilities import build_capability_manifest
 from .transcribe import transcribe_local, write_srt
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
 from .rights import VALID_STATUSES, active_records, add_record, apply_disposition_to_project, check_project_rights, create_disposition_decision, disposition_decisions, effective_disposition_decisions, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
-from .understand import understand_media
+from .understand import detect_beats, understand_media
 from .tracking import build_reframe_plan, track_media
 from .runtime import configure_local_runtime
 from .template import apply_template_operations, instantiate
@@ -60,6 +60,7 @@ from .scopes import SCOPE_VERSION, generate_scopes
 from .policy import audit_local_tree, policy_error_from_findings, require_local_reference
 from .render_queue import JOB_STATUSES, cancel_path, enqueue as enqueue_render_jobs, find_job, load_queue, normalize_job, queue_path, save_queue, set_status
 from .smart_cut import SMART_CUT_VERSION, build_smart_cut_plan, replace_clip_with_smart_cut
+from .beat_edit import BEAT_CUT_VERSION, build_beat_cut_plan
 from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
 
@@ -168,6 +169,23 @@ def build_parser() -> argparse.ArgumentParser:
     highlights.add_argument("--max-duration", type=float, default=8.0)
     highlights.add_argument("--beats", action="store_true")
     highlights.add_argument("--output", default=None)
+    beat_cut = _leaf_common(ms.add_parser("beat-cut", help="按本地音频节拍生成并应用卡点剪辑计划"))
+    beat_cut.add_argument("--project", required=True)
+    beat_audio = beat_cut.add_mutually_exclusive_group(required=True)
+    beat_audio.add_argument("--audio-asset-id", default=None, help="项目内含音频流的资产 ID")
+    beat_audio.add_argument("--input", default=None, help="本地音频/视频路径；仅用于节拍分析")
+    beat_cut.add_argument("--source-asset-id", action="append", required=True, help="可重复：项目内视频素材 ID")
+    beat_cut.add_argument("--track-id", required=True, help="目标视频轨道 ID")
+    beat_cut.add_argument("--sequence-id", default=None, help="目标序列 ID，默认主序列")
+    beat_cut.add_argument("--start-seconds", type=float, default=0.0, help="音频分析起点")
+    beat_cut.add_argument("--end-seconds", type=float, default=None, help="音频分析终点；默认音频结束")
+    beat_cut.add_argument("--timeline-start-seconds", type=float, default=0.0, help="写入时间线的起点")
+    beat_cut.add_argument("--min-segment-seconds", type=float, default=0.2)
+    beat_cut.add_argument("--max-clips", type=int, default=128)
+    beat_cut.add_argument("--source-mode", choices=("cycle", "ordered"), default="cycle", help="源素材选择：循环或按顺序用完后复用最后一个")
+    beat_cut.add_argument("--output", default=None, help="项目内卡点报告路径")
+    beat_cut.add_argument("--apply", action="store_true", help="创建快照并将卡点片段写入目标视频轨道")
+    beat_cut.add_argument("--replace-track", action="store_true", help="应用前清空目标视频轨道已有片段")
     smart_cut = _leaf_common(ms.add_parser("smart-cut", help="基于本地静音检测生成或应用智能剪口播计划"))
     smart_cut.add_argument("--project", required=True)
     smart_cut.add_argument("--sequence-id", default=None)
@@ -1187,6 +1205,189 @@ def command_media_highlights(args: argparse.Namespace) -> dict[str, Any]:
         output = root / "validation" / f"highlights_{asset_id or new_id('asset')}.json"
     atomic_write_json(output, recommendation)
     return _envelope("media.highlights", args, data={"report": str(output), "recommendation": recommendation})
+
+
+def command_media_beat_cut(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    sequence = find_sequence(project, getattr(args, "sequence_id", None))
+    target_track = find_track(sequence, args.track_id, None)
+    if str(target_track.get("kind")) != "video":
+        raise argument_error("按节拍剪辑目标轨道必须是 video 轨道", "track_id")
+    if args.timeline_start_seconds < 0:
+        raise argument_error("timeline_start_seconds 不能为负数", "timeline_start_seconds")
+    assets = asset_map(project)
+    source_assets: list[dict[str, Any]] = []
+    for asset_id in args.source_asset_id:
+        asset = assets.get(str(asset_id))
+        if not asset:
+            raise argument_error(f"找不到源视频资产: {asset_id}", "source_asset_id")
+        if str(asset.get("kind", "")).lower() != "video":
+            raise argument_error(f"按节拍剪辑源素材必须是 video 资产: {asset_id}", "source_asset_id")
+        source_assets.append(asset)
+
+    audio_asset_id = args.audio_asset_id
+    if audio_asset_id:
+        audio_asset = assets.get(str(audio_asset_id))
+        if not audio_asset:
+            raise argument_error(f"找不到节拍分析资产: {audio_asset_id}", "audio_asset_id")
+        source = Path(str(audio_asset.get("uri", "")))
+        if not source.is_absolute():
+            source = root / source
+    else:
+        raw_input = str(args.input or "").strip()
+        if raw_input.lower().startswith(("http://", "https://")):
+            raise argument_error("--input 只接受本地音频或视频文件", "input")
+        source = Path(raw_input).expanduser().resolve()
+        audio_asset = None
+    if not source.exists() or not source.is_file():
+        raise argument_error("节拍分析输入不存在", str(source))
+
+    timeline_tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90_000))
+    run_id = new_id("beatcut")
+    report_path = Path(args.output).expanduser().resolve() if args.output else root / "validation" / f"beat_cut_{safe_filename(run_id)}.json"
+    ensure_inside(root, report_path)
+    if args.dry_run:
+        return _envelope(
+            "media.beat-cut",
+            args,
+            status="planned",
+            data={
+                "input": str(source),
+                "audio_asset_id": audio_asset_id,
+                "source_asset_ids": [str(asset["id"]) for asset in source_assets],
+                "sequence_id": sequence.get("id"),
+                "track_id": target_track.get("id"),
+                "parameters": {
+                    "start_seconds": args.start_seconds,
+                    "end_seconds": args.end_seconds,
+                    "timeline_start_seconds": args.timeline_start_seconds,
+                    "min_segment_seconds": args.min_segment_seconds,
+                    "max_clips": args.max_clips,
+                    "source_mode": args.source_mode,
+                    "apply": bool(args.apply),
+                    "replace_track": bool(args.replace_track),
+                },
+                "engine": "ffmpeg-local-energy-beat-v1",
+            },
+        )
+
+    probe = probe_media(source)
+    beat_anchors = detect_beats(source)
+    analysis = {
+        "analysis_version": "0.1.0",
+        "source": str(source),
+        "source_sha256": f"sha256:{sha256_file(source)}",
+        "probe": probe,
+        "beat_anchors": beat_anchors,
+        "network": "disabled",
+    }
+    plan = build_beat_cut_plan(
+        analysis,
+        source_assets,
+        ticks_per_second=timeline_tps,
+        start_seconds=args.start_seconds,
+        end_seconds=args.end_seconds,
+        min_segment_seconds=args.min_segment_seconds,
+        max_clips=args.max_clips,
+        source_mode=args.source_mode,
+    )
+    timeline_offset = int(round(float(args.timeline_start_seconds) * timeline_tps))
+    for clip in plan["clips"]:
+        clip["id"] = f"{run_id}_{int(clip['index']):03d}"
+        clip["timeline_start_tick"] = int(clip["timeline_start_tick"]) + timeline_offset
+    plan.update(
+        {
+            "project_id": project.get("project", {}).get("id"),
+            "sequence_id": sequence.get("id"),
+            "track_id": target_track.get("id"),
+            "audio_asset_id": audio_asset_id,
+            "source": str(source),
+            "source_sha256": analysis["source_sha256"],
+            "timeline_start_seconds": round(float(args.timeline_start_seconds), 6),
+            "replace_track": bool(args.replace_track),
+        }
+    )
+    if not args.apply:
+        atomic_write_json(report_path, {"report_version": BEAT_CUT_VERSION, "created_at": now_iso(), "applied": False, "plan": plan})
+        return _envelope("media.beat-cut", args, status="planned", data={"report": str(report_path), "plan": plan, "applied": False}, warnings=plan.get("warnings"))
+
+    existing_clips = list(target_track.get("clips", []))
+    if not args.replace_track:
+        for generated in plan["clips"]:
+            generated_start = int(generated["timeline_start_tick"])
+            generated_end = generated_start + int(generated["duration_tick"])
+            for existing in existing_clips:
+                existing_start = int(existing.get("timeline_start_tick", 0))
+                existing_end = existing_start + int(existing.get("duration_tick", 0))
+                if max(generated_start, existing_start) < min(generated_end, existing_end):
+                    raise AppError("BEAT_CUT_TRACK_OVERLAP", "按节拍剪辑会覆盖目标轨道已有片段，请使用 --replace-track 或调整时间线起点", exit_code=2, path="track_id")
+    before_project = copy.deepcopy(project)
+    if args.replace_track:
+        target_track["clips"] = []
+    generated_clips: list[dict[str, Any]] = []
+    for item in plan["clips"]:
+        clip = {
+            "id": item["id"],
+            "asset_id": item["asset_id"],
+            "timeline_start_tick": int(item["timeline_start_tick"]),
+            "duration_tick": int(item["duration_tick"]),
+            "source_in_tick": int(item["source_in_tick"]),
+            "source_out_tick": int(item["source_out_tick"]),
+        }
+        if float(item.get("speed", 1.0)) != 1.0:
+            clip["speed"] = float(item["speed"])
+        target_track.setdefault("clips", []).append(clip)
+        generated_clips.append(clip)
+    _recompute_sequence_duration(sequence)
+    validation = validate_project(root, project, strict_rights=False)
+    if not validation["ok"]:
+        raise AppError("BEAT_CUT_APPLY_INVALID", "按节拍剪辑应用后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    snapshot = create_snapshot(root, before_project, label="before-beat-cut")
+    operation_id = new_id("op")
+    plan["generated_clips"] = generated_clips
+    payload = {
+        "report_version": BEAT_CUT_VERSION,
+        "created_at": now_iso(),
+        "applied": True,
+        "operation_id": operation_id,
+        "before_snapshot_id": snapshot["snapshot_id"],
+        "plan": plan,
+        "validation": validation,
+    }
+    atomic_write_json(report_path, payload)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append(
+        {
+            "operation_id": operation_id,
+            "command": "media.beat-cut",
+            "at": now_iso(),
+            "report": str(report_path),
+            "before_snapshot_id": snapshot["snapshot_id"],
+            "sequence_id": sequence.get("id"),
+            "track_id": target_track.get("id"),
+            "clip_ids": [clip["id"] for clip in generated_clips],
+        }
+    )
+    save_project(root, project)
+    _operation(
+        root,
+        operation_id,
+        {
+            "operation_id": operation_id,
+            "command": "media.beat-cut",
+            "status": "succeeded",
+            "report": str(report_path),
+            "before_snapshot_id": snapshot["snapshot_id"],
+            "clip_ids": [clip["id"] for clip in generated_clips],
+            "created_at": now_iso(),
+        },
+    )
+    return _envelope(
+        "media.beat-cut",
+        args,
+        data={"report": str(report_path), "plan": plan, "generated_clips": generated_clips, "before_snapshot": snapshot, "validation": validation},
+        warnings=plan.get("warnings"),
+        operation_id=operation_id,
+    )
 
 
 def command_media_smart_cut(args: argparse.Namespace) -> dict[str, Any]:
@@ -3091,6 +3292,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "understand"): command_media_understand,
     ("media", "prepare"): command_media_prepare,
     ("media", "highlights"): command_media_highlights,
+    ("media", "beat-cut"): command_media_beat_cut,
     ("media", "smart-cut"): command_media_smart_cut,
     ("ad", "plan"): command_ad_plan,
     ("ad", "apply"): command_ad_apply,

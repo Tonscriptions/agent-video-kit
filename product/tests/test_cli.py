@@ -545,6 +545,42 @@ class P0CliTests(unittest.TestCase):
             self.assertIn(beats["status"], {"ok", "no_peaks", "insufficient_signal", "no_audio"})
             self.assertNotEqual(beats["status"], "failed")
 
+    def test_local_beat_cut_plan_and_apply_writes_timeline_with_evidence(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-beat-cut-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            pulse = self.make_pulse_audio(workspace)
+            project = workspace / "project"
+            code, _ = invoke("project", "init", str(project), "--name", "Beat cut")
+            self.assertEqual(code, 0)
+            code, ingested = invoke(
+                "media", "ingest", "--project", str(project), "--input", str(source),
+                "--verification-status", "verified", "--permitted-use", "commercial_ad",
+                "--source-url", "local://beat-source", "--license-spdx", "CC0-1.0",
+                "--license-url", "local://license", "--evidence", "local://evidence",
+            )
+            self.assertEqual(code, 0, ingested)
+            asset_id = ingested["data"]["asset"]["id"]
+            code, result = invoke(
+                "media", "beat-cut", "--project", str(project), "--input", str(pulse),
+                "--source-asset-id", asset_id, "--track-id", "track_video_1",
+                "--apply", "--replace-track", "--max-clips", "16",
+            )
+            self.assertEqual(code, 0, result)
+            plan = result["data"]["plan"]
+            self.assertTrue(plan["clips"])
+            self.assertEqual(plan["engine"], "ffmpeg-local-energy-beat-v1")
+            self.assertTrue(Path(result["data"]["report"]).exists())
+            self.assertEqual(result["data"]["before_snapshot"]["label"], "before-beat-cut")
+            payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            clips = payload["sequences"][0]["tracks"][0]["clips"]
+            self.assertEqual(len(clips), len(plan["clips"]))
+            self.assertTrue(all(item["asset_id"] == asset_id for item in clips))
+            self.assertTrue(all(item["source_out_tick"] <= 90000 for item in clips))
+            code, validation = invoke("validate", "--project", str(project), "--strict-rights")
+            self.assertEqual(code, 0, validation)
+            self.assertTrue(validation["data"]["ok"])
+
     def test_local_asr_requires_explicit_offline_model(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-asr-") as raw:
             workspace = Path(raw)
@@ -979,6 +1015,8 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("local_ad_plan_apply", manifest["capabilities"]["ai"]["features"])
         self.assertIn("smart_cut_silence", manifest["capabilities"]["media"]["features"])
         self.assertIn("smart_cut_linked_audio", manifest["capabilities"]["media"]["features"])
+        self.assertIn("beat_cut_timeline", manifest["capabilities"]["media"]["features"])
+        self.assertIn("media_beat_cut", manifest["capabilities"]["media"]["beat_cut_contract"])
         self.assertIn("stabilize_vidstab_two_pass", manifest["capabilities"]["media"]["features"])
         self.assertIn("media_stabilize", manifest["capabilities"]["media"]["stabilize_contract"])
         self.assertIn("track_mute", manifest["capabilities"]["audio"]["features"])
