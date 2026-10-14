@@ -102,6 +102,14 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
         if effect_type not in LUT_EFFECT_TYPES:
             return
         parameters = effect_value.get("parameters") if isinstance(effect_value.get("parameters"), dict) else effect_value
+        if "intensity" in parameters:
+            raw_intensity = parameters.get("intensity")
+            try:
+                intensity = float(raw_intensity)
+            except (TypeError, ValueError):
+                intensity = math.nan
+            if isinstance(raw_intensity, bool) or not math.isfinite(intensity) or not 0.0 <= intensity <= 1.0:
+                error("LUT_INTENSITY_INVALID", "LUT intensity 必须是 0..1 的有限数字", f"{effect_path}.parameters.intensity")
         lut_id = parameters.get("lut_id")
         raw_path = parameters.get("path", parameters.get("file", parameters.get("lut")))
         path_field = f"{effect_path}.parameters.path"

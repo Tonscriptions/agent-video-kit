@@ -1731,6 +1731,31 @@ class P0CliTests(unittest.TestCase):
             self.assertGreater(frame.stdout[center], 180)
             self.assertLess(frame.stdout[center + 1], 90)
 
+            # Static partial strength is materialized as a deterministic
+            # project-local identity-mixed CUBE and remains renderable through
+            # the same single-input FFmpeg lut3d chain.
+            project_payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            project_payload["sequences"][0]["tracks"][0]["clips"][0]["effects"][0]["parameters"]["intensity"] = 0.5
+            (project / "project.json").write_text(json.dumps(project_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            half_output = project / "renders" / "lut-half.mp4"
+            code, half_rendered = invoke("render", "--project", str(project), "--output", str(half_output), "--profile", "custom", "--width", "320", "--height", "180")
+            self.assertEqual(code, 0, half_rendered)
+            self.assertTrue(any(item.get("feature") == "lut_intensity" for item in half_rendered["data"]["warnings"]))
+            self.assertTrue((project / "cache" / "luts").exists())
+            half_frame = subprocess.run(
+                ["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(half_output), "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgb24", "pipe:1"],
+                capture_output=True,
+            )
+            self.assertEqual(half_frame.returncode, 0, half_frame.stderr.decode("utf-8", errors="replace"))
+            self.assertGreater(half_frame.stdout[center], 70)
+            self.assertGreater(half_frame.stdout[center + 1], 50)
+
+            project_payload["sequences"][0]["tracks"][0]["clips"][0]["effects"][0]["parameters"]["intensity"] = 1.1
+            (project / "project.json").write_text(json.dumps(project_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            code, invalid = invoke("validate", "--project", str(project))
+            self.assertEqual(code, 2, invalid)
+            self.assertTrue(any(item.get("code") == "LUT_INTENSITY_INVALID" for item in invalid["errors"]))
+
     def test_10bit_pixel_format_and_color_metadata_reach_ffmpeg_plan(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-10bit-output-") as raw:
             workspace = Path(raw)

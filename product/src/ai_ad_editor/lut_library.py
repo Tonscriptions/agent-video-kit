@@ -12,12 +12,13 @@ their content hash and extension without guessing metadata.
 """
 
 import re
+import math
 import shutil
 from pathlib import Path
 from typing import Any
 
 from .errors import AppError, argument_error
-from .utils import ID_RE, atomic_write_json, load_json, now_iso, sha256_file
+from .utils import ID_RE, atomic_write_json, atomic_write_text, load_json, now_iso, sha256_bytes, sha256_file
 
 
 LUT_LIBRARY_VERSION = "0.1.0"
@@ -230,4 +231,114 @@ def inspect_lut(root: Path, lut_id: str) -> dict[str, Any]:
         report["current_sha256"] = f"sha256:{sha256_file(path)}"
         report["hash_matches"] = report["current_sha256"] == record.get("sha256")
     return report
+
+
+def _cube_samples(path: Path) -> tuple[list[str], int, tuple[float, float, float], tuple[float, float, float], list[tuple[float, float, float]]]:
+    """Read the safe, line-oriented subset needed for static intensity mixing.
+
+    The parser deliberately accepts only a complete 3D cube.  It does not try
+    to infer 1D shaper LUTs or vendor-specific extensions, because guessing a
+    color transform is worse than returning a structured render warning.
+    """
+    title: str | None = None
+    size: int | None = None
+    domain_min = (0.0, 0.0, 0.0)
+    domain_max = (1.0, 1.0, 1.0)
+    samples: list[tuple[float, float, float]] = []
+    try:
+        with path.open("r", encoding="utf-8-sig", errors="strict") as handle:
+            for raw_line in handle:
+                line = raw_line.split("#", 1)[0].strip()
+                if not line:
+                    continue
+                parts = line.split()
+                key = parts[0].upper()
+                if key == "TITLE" and len(parts) >= 2:
+                    title = " ".join(parts[1:]).strip().strip('"')[:256]
+                    continue
+                if key == "LUT_3D_SIZE" and len(parts) == 2:
+                    try:
+                        size = int(parts[1])
+                    except ValueError:
+                        size = None
+                    continue
+                if key in {"DOMAIN_MIN", "DOMAIN_MAX"} and len(parts) == 4:
+                    values = [_parse_number(item) for item in parts[1:]]
+                    if not all(value is not None and math.isfinite(float(value)) for value in values):
+                        raise AppError("LUT_CUBE_INVALID", f"CUBE {key} 必须包含有限数字", exit_code=2, path=str(path))
+                    vector = tuple(float(value) for value in values)  # type: ignore[arg-type]
+                    if key == "DOMAIN_MIN":
+                        domain_min = vector
+                    else:
+                        domain_max = vector
+                    continue
+                if len(parts) == 3:
+                    values = [_parse_number(item) for item in parts]
+                    if not all(value is not None and math.isfinite(float(value)) for value in values):
+                        raise AppError("LUT_CUBE_INVALID", "CUBE 样本必须包含有限数字", exit_code=2, path=str(path))
+                    samples.append(tuple(float(value) for value in values))  # type: ignore[arg-type]
+                    continue
+                raise AppError("LUT_CUBE_INVALID", f"无法解析 CUBE 行: {raw_line.strip()[:120]}", exit_code=2, path=str(path))
+    except UnicodeError as exc:
+        raise AppError("LUT_CUBE_INVALID", "CUBE 文件不是有效 UTF-8 文本", exit_code=2, path=str(path), cause=str(exc)) from exc
+    if size is None or not 2 <= size <= 256:
+        raise AppError("LUT_CUBE_INVALID", "CUBE 必须声明 2..256 的 LUT_3D_SIZE", exit_code=2, path=str(path))
+    if any(high <= low for low, high in zip(domain_min, domain_max)):
+        raise AppError("LUT_CUBE_INVALID", "CUBE DOMAIN_MAX 必须大于 DOMAIN_MIN", exit_code=2, path=str(path))
+    expected = size ** 3
+    if len(samples) != expected:
+        raise AppError("LUT_CUBE_INVALID", f"CUBE 样本数 {len(samples)} 与 LUT_3D_SIZE {size}^3 不一致", exit_code=2, path=str(path))
+    header: list[str] = []
+    if title:
+        header.append(f'TITLE "{title} (ai-ad-editor intensity)"')
+    header.append(f"LUT_3D_SIZE {size}")
+    header.append("DOMAIN_MIN " + " ".join(f"{value:.10g}" for value in domain_min))
+    header.append("DOMAIN_MAX " + " ".join(f"{value:.10g}" for value in domain_max))
+    return header, size, domain_min, domain_max, samples
+
+
+def prepare_lut_intensity(root: Path, source: Path, intensity: float) -> Path:
+    """Return a project-local derived CUBE for a static 0..1 LUT intensity.
+
+    A derived table blends each LUT sample with the identity sample.  The
+    source SHA-256 and normalized intensity form the cache key, so modifying a
+    source file can never reuse an old derived transform.  The cache is a
+    reproducible render artifact under ``cache/luts`` and never a network or
+    external service dependency.
+    """
+    source = source.expanduser().resolve()
+    if source.suffix.lower() != ".cube":
+        raise AppError("LUT_INTENSITY_FORMAT_UNSUPPORTED", "静态 LUT 强度混合目前只支持 .cube", exit_code=2, path=str(source))
+    try:
+        numeric_intensity = float(intensity)
+    except (TypeError, ValueError) as exc:
+        raise AppError("LUT_INTENSITY_INVALID", "LUT intensity 必须是 0..1 的有限数字", exit_code=2, path="intensity") from exc
+    if not math.isfinite(numeric_intensity) or not 0.0 <= numeric_intensity <= 1.0:
+        raise AppError("LUT_INTENSITY_INVALID", "LUT intensity 必须位于 0..1", exit_code=2, path="intensity")
+    if numeric_intensity <= 0.0:
+        # No effect is represented by the caller as an omitted filter.  Keep a
+        # valid path here for callers that want to inspect the normalized key.
+        return source
+    if numeric_intensity >= 1.0:
+        return source
+    source_digest = sha256_file(source)
+    key = sha256_bytes(f"{source_digest}\n{numeric_intensity:.9f}".encode("utf-8"))
+    destination = root / "cache" / "luts" / f"{key}.cube"
+    if destination.is_file():
+        return destination
+    header, size, domain_min, domain_max, samples = _cube_samples(source)
+    lines = ["# Generated by ai-ad-editor from a project-local LUT", f"# source_sha256: sha256:{source_digest}", f"# intensity: {numeric_intensity:.9f}", *header]
+    for index, sample in enumerate(samples):
+        red_index = index // (size * size)
+        green_index = (index // size) % size
+        blue_index = index % size
+        identity = (
+            domain_min[0] + red_index / float(size - 1) * (domain_max[0] - domain_min[0]),
+            domain_min[1] + green_index / float(size - 1) * (domain_max[1] - domain_min[1]),
+            domain_min[2] + blue_index / float(size - 1) * (domain_max[2] - domain_min[2]),
+        )
+        mixed = tuple(identity[channel] + (sample[channel] - identity[channel]) * numeric_intensity for channel in range(3))
+        lines.append(" ".join(f"{max(-64.0, min(64.0, value)):.10f}" for value in mixed))
+    atomic_write_text(destination, "\n".join(lines) + "\n")
+    return destination
 

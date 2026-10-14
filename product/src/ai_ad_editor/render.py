@@ -1306,6 +1306,32 @@ def _effect_filters(
             if not lut_path.exists() or not lut_path.is_file():
                 warnings.append({"code": "LUT_FILE_MISSING", "clip_id": clip_id, "feature": "lut3d", "message": f"LUT 文件不存在: {lut_path}"})
                 continue
+            intensity = _num(parameters.get("intensity", 1.0), 1.0)
+            if not math.isfinite(intensity) or intensity < 0.0 or intensity > 1.0:
+                warnings.append({"code": "EFFECT_PARAMETER_INVALID", "clip_id": clip_id, "feature": "lut3d", "message": "LUT intensity 必须位于 0..1，已跳过该效果"})
+                continue
+            # A zero-strength LUT is an exact no-op.  Static intermediate
+            # strengths are materialized as a deterministic project-local CUBE
+            # so the regular FFmpeg lut3d filter remains single-input and can
+            # still be used by subtitle, adjustment, and nested clip chains.
+            if intensity <= 1e-9:
+                if effect_tracks:
+                    warn_unsupported_tracks()
+                continue
+            if intensity < 1.0 - 1e-9:
+                if effect_tracks:
+                    warn_unsupported_tracks()
+                if root is None:
+                    warnings.append({"code": "LUT_INTENSITY_CONTEXT_MISSING", "clip_id": clip_id, "feature": "lut3d", "message": "LUT intensity 派生缓存需要项目根目录上下文，已跳过该效果"})
+                    continue
+                try:
+                    from .lut_library import prepare_lut_intensity
+
+                    lut_path = prepare_lut_intensity(root, lut_path, intensity)
+                except AppError as exc:
+                    warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": "lut_intensity", "message": str(exc)})
+                    continue
+                warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "lut_intensity", "message": "已由本地 .cube identity 混合表执行静态 LUT 强度；逐帧强度仍使用静态值"})
             interpolation = str(parameters.get("interpolation", parameters.get("interp", "tetrahedral"))).lower()
             if interpolation not in {"nearest", "trilinear", "tetrahedral", "pyramid", "prism"}:
                 warnings.append({"code": "LUT_INTERPOLATION_INVALID", "clip_id": clip_id, "feature": "lut3d", "message": f"LUT interpolation 无效，已回退 tetrahedral: {interpolation}"})

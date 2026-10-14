@@ -38,11 +38,11 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "lut_library": {
                 "status": "implemented",
-                "features": ["project_local_registration", "sha256_identity", "cube_metadata", "list", "inspect", "rights_ledger_registration", "lut_id_effect_reference", "hash_mismatch_gate"],
+                "features": ["project_local_registration", "sha256_identity", "cube_metadata", "list", "inspect", "rights_ledger_registration", "lut_id_effect_reference", "hash_mismatch_gate", "cube_static_intensity_blend", "deterministic_intensity_cache"],
                 "library_version": "0.1.0",
                 "path": "assets/lut-library.json",
                 "extensions": [".cube", ".3dl", ".csp", ".dat"],
-                "limits": ["non_cube_metadata_is_extension_only", "lut_intensity_pending", "snapshot_restore_does_not_delete_newly_copied_asset_files"],
+                "limits": ["non_cube_metadata_is_extension_only", "non_cube_intensity_unsupported", "dynamic_intensity_uses_static_value", "snapshot_restore_does_not_delete_newly_copied_asset_files"],
             },
             "project": {
                 "status": "implemented",
@@ -71,7 +71,7 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "effects": {
                 "status": "implemented",
-                "features": ["grayscale", "sepia", "blur", "boxblur", "sharpen", "brightness", "contrast", "saturation", "hue", "gamma", "color_temperature", "color_balance", "vignette", "noise", "invert", "posterize", "edgedetect", "deband", "deshake", "histeq", "gradfun", "chroma_key", "hflip", "vflip", "exposure", "color_levels", "curves", "hqdn3d", "smartblur", "avgblur", "tmix", "tblend", "lens_correction", "draw_box", "color_contrast", "solarize", "threshold", "deflicker", "dctdnoiz", "effect_catalog_cli", "effect_parameter_keyframes", "sequence_adjustments", "interval_adjustments", "lut3d_project_local"],
+                "features": ["grayscale", "sepia", "blur", "boxblur", "sharpen", "brightness", "contrast", "saturation", "hue", "gamma", "color_temperature", "color_balance", "vignette", "noise", "invert", "posterize", "edgedetect", "deband", "deshake", "histeq", "gradfun", "chroma_key", "hflip", "vflip", "exposure", "color_levels", "curves", "hqdn3d", "smartblur", "avgblur", "tmix", "tblend", "lens_correction", "draw_box", "color_contrast", "solarize", "threshold", "deflicker", "dctdnoiz", "effect_catalog_cli", "effect_parameter_keyframes", "sequence_adjustments", "interval_adjustments", "lut3d_project_local", "lut3d_static_intensity"],
                 "catalog_version": EFFECT_CATALOG_VERSION,
                 "catalog_features": local_effect_ids,
                 "catalog_source": local_effects["source"],
@@ -79,7 +79,7 @@ def build_capability_manifest() -> dict[str, Any]:
                 "unknown_effect_policy": "RENDER_FEATURE_UNSUPPORTED",
                 "effect_keyframe_contract": "brightness_contrast_saturation_hue_gamma_vignette_use_local_eq_hue_vignette_eval_frame",
                 "adjustment_contract": "settings.adjustments_are_applied_after_track_compositing_in_declared_order; start_tick_and_duration_tick_define_optional_sequence_clock_intervals",
-                "limits": ["unsupported_effect_parameters_use_static_value_with_warning", "new_native_filters_are_static_only_and_warn_on_parameter_keyframes", "curves_accept_one_whitelist_validated_all_master_curve", "interval_adjustments_are_video_only_and_reassembled_with_trim_concat", "lut_intensity_pending"],
+                "limits": ["unsupported_effect_parameters_use_static_value_with_warning", "new_native_filters_are_static_only_and_warn_on_parameter_keyframes", "curves_accept_one_whitelist_validated_all_master_curve", "interval_adjustments_are_video_only_and_reassembled_with_trim_concat", "lut_intensity_requires_project_local_cube_for_partial_strength"],
             },
             "compositing": {
                 "status": "implemented",
