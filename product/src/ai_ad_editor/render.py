@@ -534,6 +534,127 @@ def _sample_mask_path(mask: dict[str, Any], warnings: list[dict[str, Any]], clip
     return points[:32]
 
 
+def _mask_has_segment_keyframe(clip: dict[str, Any], mask: dict[str, Any]) -> bool:
+    pattern = re.compile(r"(?:mask\.)?(?:segments|curve_segments|curves)\.\d+\.(?:from|p0|start|control1|p1|c1|control2|p2|c2|to|p3|end)\.(?:x|y)")
+    tracks: list[Any] = []
+    if isinstance(clip.get("keyframes"), list):
+        tracks.extend(clip["keyframes"])
+    if isinstance(mask.get("keyframes"), list):
+        tracks.extend(mask["keyframes"])
+    return any(isinstance(track, dict) and pattern.fullmatch(str(track.get("property", ""))) for track in tracks)
+
+
+def _sample_mask_path_expressions(
+    mask: dict[str, Any],
+    clip: dict[str, Any],
+    clip_start: float,
+    tps: int,
+    warnings: list[dict[str, Any]],
+    clip_id: str,
+) -> tuple[list[tuple[str, str, float, float]], str]:
+    """Sample curve segments while calculating each animated control point once."""
+    raw_field = next((field for field in ("segments", "curve_segments", "curves") if isinstance(mask.get(field), list)), None)
+    raw_segments = mask.get(raw_field) if raw_field else None
+    if not isinstance(raw_segments, list) or not raw_segments:
+        return [], ""
+
+    registers: dict[tuple[int, str, str], int] = {}
+    setup: list[str] = []
+    register_limit_warning = False
+    clip_tracks = clip.get("keyframes") if isinstance(clip.get("keyframes"), list) else []
+    mask_tracks = mask.get("keyframes") if isinstance(mask.get("keyframes"), list) else []
+
+    def has_component_keyframe(segment_index: int, aliases: tuple[str, ...], axis: str) -> bool:
+        names = {
+            f"{field}.{segment_index}.{alias}.{axis}"
+            for field in ("segments", "curve_segments", "curves")
+            for alias in aliases
+        }
+        for track in (*clip_tracks, *mask_tracks):
+            if not isinstance(track, dict):
+                continue
+            property_name = str(track.get("property", ""))
+            if property_name.removeprefix("mask.") in names:
+                return True
+        return False
+
+    def raw_point(segment: dict[str, Any], aliases: tuple[str, ...]) -> tuple[float, float] | None:
+        return _mask_point(next((segment[name] for name in aliases if name in segment), None))
+
+    def component_expression(segment_index: int, aliases: tuple[str, ...], axis: str, default: float) -> str:
+        nonlocal register_limit_warning
+        key = (segment_index, aliases[0], axis)
+        properties = tuple(
+            f"mask.{field}.{segment_index}.{alias}.{axis}"
+            for field in (raw_field, "segments", "curve_segments", "curves")
+            for alias in aliases
+        )
+        if not has_component_keyframe(segment_index, aliases, axis):
+            return f"{default:.8f}"
+        if key not in registers:
+            if len(registers) >= 10:
+                register_limit_warning = True
+                return _mask_keyframe_expr(clip, mask, properties, default, clip_start, tps)
+            register = len(registers)
+            registers[key] = register
+            expression = _mask_keyframe_expr(clip, mask, properties, default, clip_start, tps)
+            setup.append(f"st({register},({expression}))")
+        return f"ld({registers[key]})"
+
+    sampled: list[tuple[str, str, float, float]] = []
+    invalid = False
+    for segment_index, segment in enumerate(raw_segments[:8]):
+        if not isinstance(segment, dict):
+            invalid = True
+            continue
+        segment_type = str(segment.get("type", "cubic")).lower().replace("-", "_")
+        if segment_type in {"line", "linear"}:
+            point_aliases = (("from", "p0", "start"), ("to", "p1", "end"))
+            defaults = [raw_point(segment, names) for names in point_aliases]
+            if any(point is None for point in defaults):
+                invalid = True
+                continue
+            candidates = [(0.0, point_aliases[0], defaults[0]), (1.0, point_aliases[1], defaults[1])]
+        elif segment_type in {"cubic", "bezier", "cubic_bezier"}:
+            point_aliases = (("from", "p0", "start"), ("control1", "p1", "c1"), ("control2", "p2", "c2"), ("to", "p3", "end"))
+            defaults = [raw_point(segment, names) for names in point_aliases]
+            if any(point is None for point in defaults):
+                invalid = True
+                continue
+            sample_count = max(2, min(16, int(_num(segment.get("samples", 8), 8))))
+            candidates = [(sample_index / sample_count, None, None) for sample_index in range(sample_count + 1)]
+        else:
+            invalid = True
+            continue
+        for progress, endpoint_aliases, static_value in candidates:
+            if segment_type in {"line", "linear"}:
+                assert static_value is not None
+                x_default, y_default = static_value
+                point_aliases_for_expression = endpoint_aliases if endpoint_aliases is not None else point_aliases[0]
+                x_expression = component_expression(segment_index, point_aliases_for_expression, "x", x_default)
+                y_expression = component_expression(segment_index, point_aliases_for_expression, "y", y_default)
+            else:
+                u = progress
+                inv = 1.0 - u
+                weights = (inv * inv * inv, 3.0 * inv * inv * u, 3.0 * inv * u * u, u * u * u)
+                x_default = sum(weights[index] * defaults[index][0] for index in range(4) if defaults[index] is not None)
+                y_default = sum(weights[index] * defaults[index][1] for index in range(4) if defaults[index] is not None)
+                x_expression = "+".join(f"{weights[index]:.8f}*({component_expression(segment_index, point_aliases[index], 'x', defaults[index][0])})" for index in range(4) if defaults[index] is not None)
+                y_expression = "+".join(f"{weights[index]:.8f}*({component_expression(segment_index, point_aliases[index], 'y', defaults[index][1])})" for index in range(4) if defaults[index] is not None)
+            if sampled and abs(sampled[-1][2] - x_default) < 1e-9 and abs(sampled[-1][3] - y_default) < 1e-9:
+                continue
+            sampled.append((x_expression, y_expression, x_default, y_default))
+            if len(sampled) >= 32:
+                break
+        if len(sampled) >= 32:
+            break
+    if invalid:
+        warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "mask:path_curve", "message": "路径曲线包含无效或未知段，已跳过无效段并使用剩余采样点"})
+    if register_limit_warning:
+        warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "mask:path_curve_register_limit", "message": "路径动画控制点超过 FFmpeg 表达式寄存器上限，超出的关键帧直接展开表达式"})
+    return sampled[:32], ";".join(setup)
+
+
 def _mask_filter(
     mask: Any,
     warnings: list[dict[str, Any]],
@@ -556,6 +677,7 @@ def _mask_filter(
     if mask_type in {"none", "off"}:
         return None
     soft_edge: str | None = None
+    dynamic_segment_setup = ""
     if mask_type == "rectangle":
         x = _mask_keyframe_expr(clip_value, mask, ("mask.x", "mask.position.x", "x"), _clamp(mask.get("x", 0.0), 0.0, 1.0, 0.0), clip_start, tps)
         y = _mask_keyframe_expr(clip_value, mask, ("mask.y", "mask.position.y", "y"), _clamp(mask.get("y", 0.0), 0.0, 1.0, 0.0), clip_start, tps)
@@ -588,11 +710,14 @@ def _mask_filter(
         distance = f"sqrt(({norm_x})*({norm_x})+({norm_y})*({norm_y}))"
         soft_edge = f"((1-({distance}))*min(W*({rx}),H*({ry})))"
     elif mask_type in {"path", "polygon"}:
-        points = _sample_mask_path(mask, warnings, clip_id)
+        dynamic_segment_points, dynamic_segment_setup = _sample_mask_path_expressions(mask, clip_value, clip_start, tps, warnings, clip_id) if _mask_has_segment_keyframe(clip_value, mask) else ([], "")
+        points = [(item[2], item[3]) for item in dynamic_segment_points] if dynamic_segment_points else _sample_mask_path(mask, warnings, clip_id)
         if len(points) < 3:
             warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": f"mask:{mask_type}", "message": "path/polygon 遮罩至少需要三个合法点或有效曲线采样"})
             return None
         def point_expr(index: int, axis: str, default: float) -> str:
+            if dynamic_segment_points:
+                return dynamic_segment_points[index][0 if axis == "x" else 1]
             return _mask_keyframe_expr(
                 clip_value,
                 mask,
@@ -665,6 +790,8 @@ def _mask_filter(
     # Multiply by the existing alpha so transparent inputs and clip opacity
     # survive masking instead of becoming opaque inside the shape.
     alpha_expr = f"alpha(X,Y)*({expression})/255"
+    if dynamic_segment_setup:
+        alpha_expr = f"{dynamic_segment_setup};{alpha_expr}"
     alpha_filter = f"geq=lum='lum(X,Y)':cb='cb(X,Y)':cr='cr(X,Y)':a={_expr_arg(alpha_expr)}"
     if feather > 0 and not dynamic_feather:
         # Feather is normalized against the shortest output dimension. FFmpeg

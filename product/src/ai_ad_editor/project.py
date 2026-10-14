@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import copy
+import hashlib
+import json
 import os
+import shutil
+import tempfile
 import time
 from contextlib import contextmanager
 from pathlib import Path
@@ -30,6 +34,249 @@ def lock_file(root: Path) -> Path:
 def write_lock_file(root: Path) -> Path:
     """Return the native process lock used to serialize project mutations."""
     return root / "operations" / "project-write.lock"
+
+
+def transaction_journal_file(root: Path) -> Path:
+    """Return the durable journal used for cross-file project metadata writes."""
+    return root / "operations" / "project-transaction.json"
+
+
+def transaction_backup_dir(root: Path, transaction_id: str) -> Path:
+    return root / "operations" / "project-transaction-backups" / transaction_id
+
+
+def _transaction_relative(path: Path, root: Path) -> str:
+    return path.resolve().relative_to(root.resolve()).as_posix()
+
+
+def _transaction_excluded(relative: str) -> bool:
+    normalized = relative.replace("\\", "/")
+    name = normalized.rsplit("/", 1)[-1]
+    return (
+        name in {"project-write.lock", "queue-cancel.lock"}
+        or normalized == "operations/project-transaction.json"
+        or normalized.startswith("operations/project-transaction-backups/")
+        or name.endswith(".tmp")
+    )
+
+
+def _transaction_metadata_files(root: Path) -> list[Path]:
+    """List small project records covered by the crash-recovery journal.
+
+    Media under ``assets/`` and render outputs are deliberately excluded.  A
+    recovery report can therefore identify those side effects without copying
+    or deleting large user files.
+    """
+    candidates: list[Path] = []
+    for fixed in (project_file(root), ledger_file(root), lock_file(root)):
+        if fixed.is_file():
+            candidates.append(fixed)
+    for directory_name in ("operations", "history", "validation", "exports"):
+        directory = root / directory_name
+        if not directory.is_dir():
+            continue
+        for path in directory.rglob("*"):
+            if path.is_file():
+                relative = _transaction_relative(path, root)
+                if not _transaction_excluded(relative):
+                    candidates.append(path)
+    return sorted(set(candidates), key=lambda value: _transaction_relative(value, root))
+
+
+def _atomic_write_bytes(path: Path, data: bytes) -> None:
+    """Restore bytes through an fsynced same-directory replacement."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, raw = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".restore.tmp", dir=str(path.parent))
+    temporary = Path(raw)
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+
+
+def _remove_transaction_tree(root: Path, transaction_id: str) -> None:
+    backup_root = transaction_backup_dir(root, transaction_id)
+    try:
+        backup_root.resolve().relative_to((root / "operations" / "project-transaction-backups").resolve())
+    except ValueError as exc:
+        raise AppError("PROJECT_TRANSACTION_PATH_INVALID", "事务备份目录越出项目范围", exit_code=6, path=str(backup_root)) from exc
+    if backup_root.exists():
+        shutil.rmtree(backup_root)
+    parent = backup_root.parent
+    if parent.exists() and not any(parent.iterdir()):
+        parent.rmdir()
+
+
+def prepare_project_transaction(root_value: str | Path, *, command: str) -> dict[str, Any]:
+    """Persist a prepared metadata transaction before a project mutation.
+
+    The journal is intentionally JSON and local so an Agent can inspect it
+    after a process or machine interruption.  Callers must hold
+    :func:`project_write_lock` while using this API.
+    """
+    root = project_root(root_value)
+    journal_path = transaction_journal_file(root)
+    if journal_path.exists():
+        pending = recover_pending_transaction(root)
+        if pending.get("status") not in {"clean", "recovered", "committed_cleaned"}:
+            raise AppError("PROJECT_TRANSACTION_PENDING", "项目仍有未恢复的事务", exit_code=6, retryable=True, path=str(journal_path))
+    transaction_id = new_id("txn")
+    backup_root = transaction_backup_dir(root, transaction_id)
+    backup_root.mkdir(parents=True, exist_ok=False)
+    files: list[dict[str, Any]] = []
+    try:
+        for source in _transaction_metadata_files(root):
+            relative = _transaction_relative(source, root)
+            data = source.read_bytes()
+            backup_name = f"{len(files):04d}.bin"
+            destination = backup_root / backup_name
+            with destination.open("wb") as handle:
+                handle.write(data)
+                handle.flush()
+                os.fsync(handle.fileno())
+            files.append({"path": relative, "backup": f"operations/project-transaction-backups/{transaction_id}/{backup_name}", "size": len(data), "sha256": hashlib.sha256(data).hexdigest()})
+        journal = {
+            "transaction_version": "0.1.0",
+            "transaction_id": transaction_id,
+            "status": "prepared",
+            "command": command,
+            "scope": "project-metadata-v1",
+            "started_at": now_iso(),
+            "files": files,
+        }
+        atomic_write_json(journal_path, journal)
+        return journal
+    except BaseException:
+        if backup_root.exists():
+            shutil.rmtree(backup_root)
+        raise
+
+
+def _validate_transaction_path(root: Path, relative: str, *, allow_backup: bool = False) -> Path:
+    candidate = (root / relative).resolve()
+    try:
+        candidate.relative_to(root.resolve())
+    except ValueError as exc:
+        raise AppError("PROJECT_TRANSACTION_PATH_INVALID", "事务路径越出项目范围", exit_code=6, path=relative) from exc
+    if not allow_backup and _transaction_excluded(relative) and relative != "operations/project-transaction.json":
+        raise AppError("PROJECT_TRANSACTION_PATH_INVALID", "事务不能覆盖锁文件或备份目录", exit_code=6, path=relative)
+    return candidate
+
+
+def recover_pending_transaction(root_value: str | Path) -> dict[str, Any]:
+    """Recover one prepared transaction, or clean a committed journal.
+
+    Recovery is idempotent and only touches the metadata scope recorded in the
+    journal.  New media/render files are reported as side effects and remain
+    available for manual audit or a later cleanup policy.
+    """
+    root = project_root(root_value)
+    journal_path = transaction_journal_file(root)
+    if not journal_path.exists():
+        return {"status": "clean", "recovered": False, "journal": str(journal_path)}
+    journal = load_json(journal_path)
+    transaction_id = str(journal.get("transaction_id", ""))
+    if not transaction_id or not isinstance(journal.get("files"), list):
+        raise AppError("PROJECT_TRANSACTION_INVALID", "事务日志缺少 transaction_id 或 files", exit_code=6, path=str(journal_path))
+    status = str(journal.get("status", "prepared"))
+    if status == "committed":
+        _remove_transaction_tree(root, transaction_id)
+        journal_path.unlink(missing_ok=True)
+        return {"status": "committed_cleaned", "recovered": False, "transaction_id": transaction_id, "journal": str(journal_path)}
+    if status != "prepared":
+        raise AppError("PROJECT_TRANSACTION_INVALID", f"未知事务状态: {status}", exit_code=6, path=str(journal_path))
+    baseline: set[str] = set()
+    restored: list[str] = []
+    for item in journal["files"]:
+        if not isinstance(item, dict) or not isinstance(item.get("path"), str) or not isinstance(item.get("backup"), str):
+            raise AppError("PROJECT_TRANSACTION_INVALID", "事务文件项无效", exit_code=6, path=str(journal_path))
+        relative = item["path"].replace("\\", "/")
+        destination = _validate_transaction_path(root, relative)
+        backup_relative = item["backup"].replace("\\", "/")
+        backup = _validate_transaction_path(root, backup_relative, allow_backup=True)
+        if not backup.is_file():
+            raise AppError("PROJECT_TRANSACTION_BACKUP_MISSING", "事务备份文件缺失，拒绝猜测恢复内容", exit_code=6, path=str(backup))
+        _atomic_write_bytes(destination, backup.read_bytes())
+        baseline.add(relative)
+        restored.append(relative)
+    removed: list[str] = []
+    for path in _transaction_metadata_files(root):
+        relative = _transaction_relative(path, root)
+        if relative not in baseline:
+            path.unlink()
+            removed.append(relative)
+    _remove_transaction_tree(root, transaction_id)
+    journal_path.unlink(missing_ok=True)
+    return {
+        "status": "recovered",
+        "recovered": True,
+        "transaction_id": transaction_id,
+        "command": journal.get("command"),
+        "restored": restored,
+        "removed_metadata": removed,
+        "side_effect_scope": ["assets", "renders", "cache"],
+        "journal": str(journal_path),
+    }
+
+
+def _capture_failed_operation_records(root: Path) -> list[tuple[Path, bytes]]:
+    """Keep explicit failed/cancelled operation facts across a rollback."""
+    operations = root / "operations"
+    if not operations.is_dir():
+        return []
+    captured: list[tuple[Path, bytes]] = []
+    for path in operations.glob("*.json"):
+        if path.name == transaction_journal_file(root).name or not path.is_file():
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8-sig"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            continue
+        if isinstance(payload, dict) and payload.get("status") in {"failed", "cancelled", "partial"}:
+            captured.append((path, path.read_bytes()))
+    return captured
+
+
+def commit_project_transaction(root_value: str | Path, transaction_id: str) -> dict[str, Any]:
+    """Mark a prepared transaction committed and remove its recovery files."""
+    root = project_root(root_value)
+    journal_path = transaction_journal_file(root)
+    journal = load_json(journal_path)
+    if journal.get("transaction_id") != transaction_id or journal.get("status") != "prepared":
+        raise AppError("PROJECT_TRANSACTION_INVALID", "只能提交当前 prepared 事务", exit_code=6, path=str(journal_path))
+    journal["status"] = "committed"
+    journal["committed_at"] = now_iso()
+    atomic_write_json(journal_path, journal)
+    _remove_transaction_tree(root, transaction_id)
+    journal_path.unlink(missing_ok=True)
+    return {"status": "committed", "transaction_id": transaction_id}
+
+
+@contextmanager
+def project_transaction(root_value: str | Path, *, command: str):
+    """Wrap one cooperating CLI mutation in a recoverable metadata transaction."""
+    root = project_root(root_value)
+    if not project_file(root).exists():
+        yield {"active": False, "recovered": False}
+        return
+    recovered = recover_pending_transaction(root)
+    journal = prepare_project_transaction(root, command=command)
+    info = {"active": True, "transaction_id": journal["transaction_id"], "recovered": bool(recovered.get("recovered")), "recovery": recovered}
+    try:
+        yield info
+    except BaseException:
+        failure_records = _capture_failed_operation_records(root)
+        recover_pending_transaction(root)
+        for path, data in failure_records:
+            _atomic_write_bytes(path, data)
+        raise
+    else:
+        commit_project_transaction(root, journal["transaction_id"])
 
 
 @contextmanager

@@ -21,6 +21,7 @@ from ai_ad_editor.render import _effect_filters, _expr_arg, _flatten_sequence_tr
 from ai_ad_editor.utils import run_process
 from ai_ad_editor.runtime import configure_local_runtime
 from ai_ad_editor.migration import migrate_project_payload
+from ai_ad_editor.project import prepare_project_transaction, recover_pending_transaction
 from ai_ad_editor.template import instantiate
 
 
@@ -411,6 +412,40 @@ class P0CliTests(unittest.TestCase):
             restored_project = json.loads((project / "project.json").read_text(encoding="utf-8"))
             self.assertEqual(restored_project["sequences"][0]["markers"], [])
             self.assertTrue(restored["data"]["backup"]["snapshot_id"])
+
+    def test_project_transaction_recovery_restores_metadata_and_removes_new_records(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-transaction-recovery-") as raw:
+            project = Path(raw) / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            project_before = (project / "project.json").read_bytes()
+            ledger_before = (project / "rights-ledger.json").read_bytes()
+            journal = prepare_project_transaction(project, command="test.interrupted")
+            self.assertEqual(journal["status"], "prepared")
+            changed = json.loads(project_before.decode("utf-8"))
+            changed["project"]["name"] = "partially-written"
+            (project / "project.json").write_text(json.dumps(changed), encoding="utf-8")
+            (project / "rights-ledger.json").write_text(json.dumps({"partial": True}), encoding="utf-8")
+            (project / "operations" / "partial-operation.json").write_text(json.dumps({"partial": True}), encoding="utf-8")
+            recovered = recover_pending_transaction(project)
+            self.assertEqual(recovered["status"], "recovered")
+            self.assertTrue(recovered["recovered"])
+            self.assertEqual((project / "project.json").read_bytes(), project_before)
+            self.assertEqual((project / "rights-ledger.json").read_bytes(), ledger_before)
+            self.assertFalse((project / "operations" / "partial-operation.json").exists())
+            self.assertFalse((project / "operations" / "project-transaction.json").exists())
+
+    def test_project_recover_cli_reports_noop_and_dry_run_without_writing(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-project-recover-") as raw:
+            project = Path(raw) / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            before = sorted(path.relative_to(project).as_posix() for path in project.rglob("*"))
+            code, planned = invoke("project", "recover", "--project", str(project), "--dry-run")
+            self.assertEqual(code, 0, planned)
+            self.assertTrue(planned["data"]["pending"] is False)
+            self.assertEqual(sorted(path.relative_to(project).as_posix() for path in project.rglob("*")), before)
+            code, result = invoke("project", "recover", "--project", str(project))
+            self.assertEqual(code, 0, result)
+            self.assertEqual(result["data"]["recovery"]["status"], "clean")
 
     def test_project_migrate_legacy_defaults_and_backup(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-migrate-") as raw:
@@ -2564,6 +2599,86 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 0, rendered)
             self.assertTrue(output.exists())
             self.assertFalse(any(item.get("feature") == "mask:path" for item in rendered["data"]["warnings"]), rendered)
+
+    def test_cubic_path_control_point_keyframes_change_pixels(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-animated-cubic-mask-") as raw:
+            workspace = Path(raw)
+            source = self.make_image(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": ingest["data"]["asset"]["id"],
+                "source_in_tick": 0, "source_out_tick": 90000,
+                "mask": {"type": "path", "segments": [
+                    {"type": "line", "from": [0.1, 0.2], "to": [0.5, 0.2]},
+                    {"type": "cubic", "from": [0.5, 0.2], "control1": [0.7, 0.2], "control2": [0.7, 0.8], "to": [0.1, 0.8], "samples": 10},
+                    {"type": "line", "from": [0.1, 0.8], "to": [0.1, 0.2]},
+                ], "keyframes": [
+                    {"property": "segments.1.control1.x", "keyframes": [{"at_tick": 0, "value": 0.7, "interpolation": "linear"}, {"at_tick": 90000, "value": 0.98, "interpolation": "linear"}]},
+                    {"property": "mask.segments.1.control2.x", "keyframes": [{"at_tick": 0, "value": 0.7, "interpolation": "linear"}, {"at_tick": 90000, "value": 0.98, "interpolation": "linear"}]},
+                ]},
+            }]}), encoding="utf-8")
+            code, composed = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
+            self.assertEqual(code, 0, composed)
+            code, validated = invoke("validate", "--project", str(project))
+            self.assertEqual(code, 0, validated)
+            output = project / "renders" / "animated-cubic-mask.mp4"
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180")
+            self.assertEqual(code, 0, rendered)
+
+            def centroid(at: float) -> float:
+                result = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-ss", str(at), "-i", str(output), "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgb24", "pipe:1"], capture_output=True)
+                self.assertEqual(result.returncode, 0, result.stderr.decode("utf-8", "replace"))
+                red = result.stdout[0::3]
+                total = sum(red)
+                self.assertGreater(total, 0)
+                return sum((index % 320) * value for index, value in enumerate(red)) / total
+
+            self.assertGreater(centroid(0.85) - centroid(0.15), 8.0)
+
+    def test_line_path_endpoint_keyframe_changes_pixels(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-animated-line-mask-") as raw:
+            workspace = Path(raw)
+            source = self.make_image(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": ingest["data"]["asset"]["id"],
+                "source_in_tick": 0, "source_out_tick": 90000,
+                "mask": {"type": "path", "segments": [
+                    {"type": "line", "from": [0.1, 0.2], "to": [0.5, 0.2]},
+                    {"type": "line", "from": [0.5, 0.2], "to": [0.5, 0.8]},
+                    {"type": "line", "from": [0.5, 0.8], "to": [0.1, 0.8]},
+                    {"type": "line", "from": [0.1, 0.8], "to": [0.1, 0.2]},
+                ], "keyframes": [{
+                    "property": "segments.0.to.x",
+                    "keyframes": [
+                        {"at_tick": 0, "value": 0.5, "interpolation": "linear"},
+                        {"at_tick": 90000, "value": 0.95, "interpolation": "linear"},
+                    ],
+                }]},
+            }]}), encoding="utf-8")
+            code, composed = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
+            self.assertEqual(code, 0, composed)
+            code, validated = invoke("validate", "--project", str(project))
+            self.assertEqual(code, 0, validated)
+            output = project / "renders" / "animated-line-mask.mp4"
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output), "--profile", "custom", "--width", "320", "--height", "180")
+            self.assertEqual(code, 0, rendered)
+
+            def centroid(at: float) -> float:
+                result = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-ss", str(at), "-i", str(output), "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgb24", "pipe:1"], capture_output=True)
+                self.assertEqual(result.returncode, 0, result.stderr.decode("utf-8", "replace"))
+                red = result.stdout[0::3]
+                total = sum(red)
+                self.assertGreater(total, 0)
+                return sum((index % 320) * value for index, value in enumerate(red)) / total
+
+            self.assertGreater(centroid(0.85) - centroid(0.15), 25.0)
 
     def test_dynamic_simple_mask_feather_renders_soft_edge(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-dynamic-feather-") as raw:

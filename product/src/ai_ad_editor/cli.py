@@ -31,8 +31,10 @@ from .project import (
     load_snapshot,
     lock_file,
     project_file,
+    project_transaction,
     queue_cancel_lock,
     project_write_lock,
+    recover_pending_transaction,
     restore_snapshot,
     save_project,
 )
@@ -96,6 +98,8 @@ def build_parser() -> argparse.ArgumentParser:
     migrate = _leaf_common(ps.add_parser("migrate", help="将旧项目迁移到当前 Agent Project schema"))
     migrate.add_argument("--project", required=True)
     migrate.add_argument("--report", default=None, help="可选项目内迁移报告路径")
+    recover = _leaf_common(ps.add_parser("recover", help="恢复上次中断的项目元数据事务"))
+    recover.add_argument("--project", required=True)
 
     media = subs.add_parser("media", help="素材管理")
     ms = media.add_subparsers(dest="action", required=True)
@@ -615,6 +619,17 @@ def command_project_migrate(args: argparse.Namespace) -> dict[str, Any]:
     status = "succeeded"
     _operation(root, operation_id, {"operation_id": operation_id, "command": "project.migrate", "status": status, "changed": migration["changed"], "report": str(report_path), "backup_snapshot_id": report_payload["backup_snapshot_id"], "created_at": now_iso()})
     return _envelope("project.migrate", args, data={"migration": migration, "report": str(report_path), "backup": backup, "validation": validation}, operation_id=operation_id)
+
+
+def command_project_recover(args: argparse.Namespace) -> dict[str, Any]:
+    root, _ = load_project(args.project)
+    journal = root / "operations" / "project-transaction.json"
+    if args.dry_run:
+        return _envelope("project.recover", args, status="planned", data={"project": str(root), "journal": str(journal), "pending": journal.exists()})
+    recovery = recover_pending_transaction(root)
+    operation_id = new_id("op")
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "project.recover", "status": "succeeded", "recovery": recovery, "created_at": now_iso()})
+    return _envelope("project.recover", args, data={"project": str(root), "recovery": recovery}, operation_id=operation_id)
 
 
 def command_media_ingest(args: argparse.Namespace) -> dict[str, Any]:
@@ -2541,6 +2556,9 @@ _READ_ONLY_PROJECT_COMMANDS = {
     ("rights", "list"),
     ("rights", "history"),
     ("rights", "impact"),
+    ("validate", None),
+    ("policy", "audit"),
+    ("quality", "check"),
 }
 
 
@@ -2559,6 +2577,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("project", "snapshot"): command_project_snapshot,
     ("project", "restore"): command_project_restore,
     ("project", "migrate"): command_project_migrate,
+    ("project", "recover"): command_project_recover,
     ("media", "ingest"): command_media_ingest,
     ("media", "relink"): command_media_relink,
     ("media", "track"): command_media_track,
@@ -2626,20 +2645,26 @@ def main(argv: list[str] | None = None) -> int:
         replayed = False
         idempotency = _idempotency_context(args)
         with _project_operation_lock(args):
-            if idempotency:
-                root, record_path, fingerprint = idempotency
-                if record_path.exists():
-                    record = load_json(record_path)
-                    if record.get("fingerprint") != fingerprint:
-                        raise AppError("IDEMPOTENCY_CONFLICT", "幂等键已经绑定到不同请求", exit_code=2, path=str(record_path))
-                    result = json.loads(json.dumps(record.get("response", {}), ensure_ascii=False))
-                    result.setdefault("warnings", []).append({"code": "IDEMPOTENT_REPLAY", "message": "已返回相同幂等键的既有结果", "operation_id": result.get("operation_id")})
-                    replayed = True
+            transaction_root = getattr(args, "project", None)
+            command_key = (args.domain, getattr(args, "action", None))
+            transaction_enabled = bool(transaction_root) and not getattr(args, "dry_run", False) and command_key not in _READ_ONLY_PROJECT_COMMANDS and command_key not in {("project", "recover"), ("queue", "cancel")}
+            with (project_transaction(transaction_root, command=_command_name(args)) if transaction_enabled else contextlib.nullcontext({"active": False, "recovered": False})) as transaction:
+                if idempotency:
+                    root, record_path, fingerprint = idempotency
+                    if record_path.exists():
+                        record = load_json(record_path)
+                        if record.get("fingerprint") != fingerprint:
+                            raise AppError("IDEMPOTENCY_CONFLICT", "幂等键已经绑定到不同请求", exit_code=2, path=str(record_path))
+                        result = json.loads(json.dumps(record.get("response", {}), ensure_ascii=False))
+                        result.setdefault("warnings", []).append({"code": "IDEMPOTENT_REPLAY", "message": "已返回相同幂等键的既有结果", "operation_id": result.get("operation_id")})
+                        replayed = True
+                    else:
+                        result = handler(args)
+                        atomic_write_json(record_path, {"record_version": "0.1.0", "command": _command_name(args), "key": args.idempotency_key, "fingerprint": fingerprint, "response": result, "created_at": now_iso()})
                 else:
                     result = handler(args)
-                    atomic_write_json(record_path, {"record_version": "0.1.0", "command": _command_name(args), "key": args.idempotency_key, "fingerprint": fingerprint, "response": result, "created_at": now_iso()})
-            else:
-                result = handler(args)
+            if transaction.get("recovered"):
+                result.setdefault("warnings", []).append({"code": "PROJECT_TRANSACTION_RECOVERED", "message": "执行本次命令前已恢复上次中断的项目元数据事务", "transaction_id": transaction.get("recovery", {}).get("transaction_id"), "command": transaction.get("recovery", {}).get("command")})
 
         _print(result, args.format)
         return 0 if result.get("ok") else (7 if args.domain == "rights" or getattr(args, "publish", False) else 2)

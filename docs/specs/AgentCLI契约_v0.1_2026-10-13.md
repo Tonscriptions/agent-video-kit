@@ -61,6 +61,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `project snapshot --project PATH [--label LABEL]` | 当前项目 | 在 `history/` 写入自包含项目、Rights Ledger 和锁文件快照 |
 | `project restore --project PATH --snapshot ID_OR_PATH` | 已有快照 | 恢复前先创建 `before-restore` 快照；候选快照必须先通过 schema/语义校验 |
 | `project migrate --project PATH [--report NAME]` | `0.0.0` 或 `0.1.0` 项目 | 已知旧形状补默认字段、补本地资产哈希/探测、记录迁移链；写入前创建 `before-migrate` 快照并写 `validation/*.json` 报告 |
+| `project recover --project PATH` | 项目内 `operations/project-transaction.json` | 恢复上次中断的项目元数据事务；`prepared` 回滚、`committed` 清理、无日志返回 `clean`；`--dry-run` 只报告 |
 | `media ingest --project PATH --input FILE` | 本地媒体、权利和许可证参数 | 复制到项目 `assets/`，写 probe、内容哈希、Rights Ledger 和资产 provenance |
 | `media understand --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频 | FFmpeg 场景、静音、节拍结果；`--transcribe` 只加载本地 Transformers 模型 |
 | `media prepare --project PATH (--asset-id ID\|--input FILE)` | 本地素材 | 生成项目内代理、缩略图和波形，并写入资产记录 |
@@ -113,7 +114,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 
 迁移候选由纯函数生成；CLI 只为缺失的本地资产计算 SHA-256 和 FFprobe 元数据。相对 `--report` 路径解析到项目的 `validation/` 目录；绝对路径也必须位于该目录内。候选通过机器 Schema 与语义校验后，才创建 `before-migrate` 快照并原子保存。重复迁移应是 no-op，不重复写项目或快照。
 
-项目内报告、快照、渲染和转换产物必须位于项目根目录的受控子目录；越过项目根目录、网络 URI、缺少权利记录或未授权的外部路径必须返回结构化错误。历史文件只读，恢复和写入操作不会删除历史快照。
+项目内报告、快照、渲染和转换产物必须位于项目根目录的受控子目录；越过项目根目录、网络 URI、缺少权利记录或未授权的外部路径必须返回结构化错误。历史文件只读，恢复和写入操作不会删除历史快照。合作式写入使用 `operations/project-transaction.json` 记录跨文件元数据事务；事务范围、状态机、恢复和大文件副作用边界见[跨文件项目事务恢复契约](./跨文件项目事务恢复契约_v0.1_2026-10-15.md)。
 
 `policy audit` 和所有媒体/转换入口遵循[本地运行策略与远程引用审计契约](./本地运行策略与远程引用审计契约_v0.1_2026-10-14.md)。运行时只接受本地路径、`local://` 或 `file://`；研究文档中的公开 URL 不会被作为运行输入。
 
@@ -129,7 +130,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 
 图层变换支持 `transform.anchor.x/y` 或 `anchor_x/anchor_y`，取值为 `0..1`，默认 `(0.5,0.5)`；位置表达式会把该点放到 `transform.position`，同名片段关键帧可逐帧改变锚点。视频叶片旋转会补偿扩展边界以保持锚点，独立文字透明画布仍绕其画布中心；嵌套父级枢轴按叶片放置近似，并在 render manifest 中保留警告。
 
-遮罩使用归一化参数。`rectangle/circle/ellipse` 支持几何标量、`invert`、`feather` 和 `mask.*` 关键帧；动态 feather 通过 alpha-only 软边表达式执行，范围为 `0..0.5`。`path/polygon` 可以使用固定点数 `points`，点坐标可以用 `points.0.x`、`points.0.y` 关键帧驱动；也可以使用静态 `segments`/`curve_segments`/`curves`，每段支持 `line` 或 `cubic`，cubic 的 `samples` 范围为 `2..16`，总采样点限制为 `3..32`，渲染器将曲线采样成固定多边形并以固定点边缘的内侧距离近似生成 alpha 软边。曲线段不能与 `points` 同时声明；曲线段本身暂不接受逐点动态关键帧。动态 feather 也可以用 `feather`/`mask.feather` 关键帧驱动。`transform.opacity`、正常层 `blend.opacity` 以及 RGB blend 的 `blend.opacity` 都可以用片段关键帧驱动；片段 `crop` 支持 `pixels`/`normalized` 单位和 `fit`/`fill`/`stretch` 模式，`crop.keyframes` 的 `x`/`y`/`width`/`height` 或片段级 `crop.x`/`crop.y`/`crop.width`/`crop.height` 可以逐帧移动和缩放裁切窗口；动态尺寸由 CPU `geq` 固定画布逆向采样保持输出帧尺寸稳定，宽高关键帧必须大于 0。非法点数、坐标、尺寸、时间或属性必须在写入前拒绝。静态嵌套父级 transform/effects/blend 会下推；多级父级动态 transform 关键帧按最终序列时钟合成，父级与子级多重 mask 会顺序合成 alpha，但不同坐标空间仍进入 `RENDER_FEATURE_APPROXIMATE`；reverse 下的关键帧插值同样保留近似警告。
+遮罩使用归一化参数。`rectangle/circle/ellipse` 支持几何标量、`invert`、`feather` 和 `mask.*` 关键帧；动态 feather 通过 alpha-only 软边表达式执行，范围为 `0..0.5`。`path/polygon` 可以使用固定点数 `points`，点坐标可以用 `points.0.x`、`points.0.y` 关键帧驱动；也可以使用 `segments`/`curve_segments`/`curves`，每段支持 `line` 或 `cubic`，cubic 的 `samples` 范围为 `2..16`，总采样点限制为 `3..32`，渲染器将曲线采样成固定多边形并以固定点边缘的内侧距离近似生成 alpha 软边。曲线段不能与 `points` 同时声明；曲线控制点可以使用片段或 mask 内局部关键帧，例如 `mask.segments.1.control1.x`、`mask.segments.1.control2.y`，渲染器在 FFmpeg `geq` 中先缓存控制点表达式再逐帧生成固定采样点。动态 feather 也可以用 `feather`/`mask.feather` 关键帧驱动。`transform.opacity`、正常层 `blend.opacity` 以及 RGB blend 的 `blend.opacity` 都可以用片段关键帧驱动；片段 `crop` 支持 `pixels`/`normalized` 单位和 `fit`/`fill`/`stretch` 模式，`crop.keyframes` 的 `x`/`y`/`width`/`height` 或片段级 `crop.x`/`crop.y`/`crop.width`/`crop.height` 可以逐帧移动和缩放裁切窗口；动态尺寸由 CPU `geq` 固定画布逆向采样保持输出帧尺寸稳定，宽高关键帧必须大于 0。非法点数、坐标、尺寸、时间或属性必须在写入前拒绝。静态嵌套父级 transform/effects/blend 会下推；多级父级动态 transform 关键帧按最终序列时钟合成，父级与子级多重 mask 会顺序合成 alpha，但不同坐标空间仍进入 `RENDER_FEATURE_APPROXIMATE`；reverse 下的关键帧插值同样保留近似警告。
 
 ## 6. 渲染、质量和进度
 

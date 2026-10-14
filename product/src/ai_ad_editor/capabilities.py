@@ -46,11 +46,13 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "project": {
                 "status": "implemented",
-                "features": ["init", "inspect", "migrate", "atomic_save", "native_process_write_lock", "snapshot", "restore", "before_mutation_snapshot"],
+                "features": ["init", "inspect", "migrate", "recover", "atomic_save", "native_process_write_lock", "snapshot", "restore", "before_mutation_snapshot", "metadata_transaction_journal", "automatic_preflight_recovery"],
                 "snapshot_contract": "self_contained_project_rights_lock_json",
                 "migration_contract": "project_migrate_creates_before_migrate_snapshot_and_validates_candidate",
                 "write_lock_contract": "operations/project-write.lock_serializes_cooperating_cli_read_modify_write_operations_and_returns_retryable_PROJECT_WRITE_LOCKED",
-                "limits": ["cross_file_transaction_recovery_after_power_loss_pending", "direct_external_json_editors_do_not_join_cli_lock", "cross_version_snapshot_migration_is_limited_to_known_legacy_shapes"],
+                "transaction_contract": "operations/project-transaction.json_journals_project_rights_lock_and_metadata_records_before_cooperating_cli_mutations;_prepared_journal_is_rolled_back_on_next_start_or_project_recover",
+                "transaction_scope": ["project.json", "rights-ledger.json", "project.lock.json", "operations_metadata", "history_metadata", "validation_metadata", "exports_metadata"],
+                "limits": ["media_and_render_side_effect_files_are_reported_but_not_copied_or_deleted_by_recovery", "direct_external_json_editors_do_not_join_cli_lock_or_transaction", "cross_version_snapshot_migration_is_limited_to_known_legacy_shapes"],
             },
             "timeline": {
                 "status": "implemented",
@@ -65,7 +67,7 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "keyframes": {
                 "status": "implemented",
-                "properties": ["transform.position.x", "transform.position.y", "transform.anchor.x", "transform.anchor.y", "transform.scale", "transform.rotation", "transform.opacity", "blend.opacity", "audio.volume", "audio.pan", "crop.x", "crop.y", "crop.width", "crop.height", "mask.x", "mask.y", "mask.width", "mask.height", "mask.cx", "mask.cy", "mask.radius", "mask.rx", "mask.ry", "mask.feather", "mask.points.<index>.x", "mask.points.<index>.y"],
+                "properties": ["transform.position.x", "transform.position.y", "transform.anchor.x", "transform.anchor.y", "transform.scale", "transform.rotation", "transform.opacity", "blend.opacity", "audio.volume", "audio.pan", "crop.x", "crop.y", "crop.width", "crop.height", "mask.x", "mask.y", "mask.width", "mask.height", "mask.cx", "mask.cy", "mask.radius", "mask.rx", "mask.ry", "mask.feather", "mask.points.<index>.x", "mask.points.<index>.y", "mask.segments.<index>.<from|control1|control2|to>.x", "mask.segments.<index>.<from|control1|control2|to>.y"],
                 "interpolation": ["hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"],
                 "bezier_control_points": {"forms": [["y1", "y2"], ["x1", "y1", "x2", "y2"]], "x_range": [0, 1], "execution": "normalized cubic easing sampled into a frame-evaluable FFmpeg expression"},
             },
@@ -85,8 +87,8 @@ def build_capability_manifest() -> dict[str, Any]:
                 "status": "implemented",
                 "masks": ["rectangle", "circle", "ellipse", "path", "polygon"],
                 "blend_modes": ["normal", "multiply", "screen", "overlay", "difference", "addition", "softlight", "hardlight"],
-                "features": ["mask_invert", "dynamic_feather_simple_shapes", "dynamic_feather_path_polygon", "path_cubic_segments", "blend_opacity_keyframes", "rgb_blend_math"],
-                "limits": ["dynamic_path_uses_point_coordinate_keyframes", "path_point_count_is_fixed_per_clip", "path_cubic_segments_are_static_sampled_polygons", "path_polygon_feather_uses_inner_edge_distance_approximation", "blend_requires_same_canvas_inputs"],
+                "features": ["mask_invert", "dynamic_feather_simple_shapes", "dynamic_feather_path_polygon", "path_cubic_segments", "path_curve_control_point_keyframes", "blend_opacity_keyframes", "rgb_blend_math"],
+                "limits": ["dynamic_path_uses_fixed_sample_count", "path_point_count_is_fixed_per_clip", "path_cubic_segments_are_sampled_polygons", "path_polygon_feather_uses_inner_edge_distance_approximation", "ffmpeg_expression_register_limit_falls_back_to_expanded_expression_with_warning", "blend_requires_same_canvas_inputs"],
             },
             "transitions": {
                 "status": "implemented",

@@ -807,7 +807,9 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                 property_name = str(track_value.get("property", ""))
                                 point_match = re.fullmatch(r"(?:mask\.)?(?:points|point)(?:\.(\d+)|\[(\d+)\])\.(?:x|y)", property_name)
                                 dynamic_point_property = point_match is not None
-                                if property_name not in mask_keyframe_aliases and not dynamic_point_property:
+                                segment_match = re.fullmatch(r"(?:mask\.)?(?:segments|curve_segments|curves)\.(\d+)\.(from|p0|start|control1|p1|c1|control2|p2|c2|to|p3|end)\.(x|y)", property_name)
+                                dynamic_segment_property = segment_match is not None
+                                if property_name not in mask_keyframe_aliases and not dynamic_point_property and not dynamic_segment_property:
                                     error("MASK_KEYFRAME_PROPERTY_UNSUPPORTED", "mask keyframe property 不是受支持的几何或羽化属性", f"{track_path}.property")
                                 normalized_property_name = property_name.removeprefix("mask.")
                                 if normalized_property_name == "feather" and mask_type not in {"rectangle", "circle", "ellipse", "path", "polygon"}:
@@ -816,6 +818,17 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                     point_count = len(mask.get("points", [])) if isinstance(mask.get("points"), list) else 0
                                     if mask_type not in {"path", "polygon"} or int(point_match.group(1) or point_match.group(2)) >= point_count:
                                         error("MASK_KEYFRAME_POINT_INVALID", "mask 点坐标关键帧必须引用已有 path/polygon 顶点", f"{track_path}.property")
+                                if segment_match:
+                                    segment_values = mask.get("segments", mask.get("curve_segments", mask.get("curves")))
+                                    segment_index = int(segment_match.group(1))
+                                    point_name = segment_match.group(2)
+                                    if mask_type not in {"path", "polygon"} or not isinstance(segment_values, list) or segment_index >= len(segment_values):
+                                        error("MASK_KEYFRAME_SEGMENT_INVALID", "mask 曲线关键帧必须引用已有 path/polygon 曲线段", f"{track_path}.property")
+                                    elif isinstance(segment_values[segment_index], dict):
+                                        segment_type = str(segment_values[segment_index].get("type", "cubic")).lower().replace("-", "_")
+                                        allowed_points = {"from", "p0", "start", "to", "p1", "end"} if segment_type in {"line", "linear"} else {"from", "p0", "start", "control1", "p1", "c1", "control2", "p2", "c2", "to", "p3", "end"}
+                                        if point_name not in allowed_points:
+                                            error("MASK_KEYFRAME_SEGMENT_POINT_INVALID", "曲线段关键帧引用的控制点与段类型不匹配", f"{track_path}.property")
                                 keyframes = track_value.get("keyframes")
                                 if not isinstance(keyframes, list) or not keyframes:
                                     error("MASK_KEYFRAMES_INVALID", "mask keyframe track 必须包含非空 keyframes", f"{track_path}.keyframes")
@@ -858,6 +871,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                 str(item.get("property", "")).startswith("mask.")
                                         or str(item.get("property", "")) in mask_keyframe_aliases | {"feather"}
                                 or re.fullmatch(r"(?:points|point)(?:\.\d+|\[\d+\])\.(?:x|y)", str(item.get("property", "")))
+                                or re.fullmatch(r"(?:segments|curve_segments|curves)\.\d+\.(?:from|p0|start|control1|p1|c1|control2|p2|c2|to|p3|end)\.(?:x|y)", str(item.get("property", "")))
                             )
                         ]
                         validate_mask_keyframes(clip_mask_tracks, f"{cp}.keyframes")
