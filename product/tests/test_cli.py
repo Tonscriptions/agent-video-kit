@@ -11,6 +11,8 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from typing import Any
+from unittest.mock import patch
 
 from PIL import Image
 
@@ -748,6 +750,44 @@ class P0CliTests(unittest.TestCase):
             code, result = invoke("library", "index", "--root", str(media_dir), "--output", str(workspace / "invalid.json"), "--incremental")
             self.assertEqual(code, 2, result)
             self.assertEqual(result["errors"][0]["code"], "ARGUMENT_INVALID")
+
+    def test_local_asr_transcribe_applies_timestamped_subtitle_track(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-auto-subtitle-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project), "--name", "Auto captions")[0], 0)
+            code, ingested = invoke(
+                "media", "ingest", "--project", str(project), "--input", str(source),
+                "--verification-status", "verified", "--permitted-use", "commercial_ad",
+                "--source-url", "local://fixture", "--license-spdx", "CC0-1.0",
+                "--license-url", "local://license", "--evidence", "local://evidence",
+            )
+            self.assertEqual(code, 0, ingested)
+            source_asset_id = ingested["data"]["asset"]["id"]
+            changes = workspace / "subtitle-track.json"
+            changes.write_text(json.dumps({"operations": [{"op": "add_track", "track_id": "track_titles", "kind": "subtitle", "order": 3}]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+
+            def fake_transcribe(root: Path, source_path: Path, *, engine: str, model_path: str | Path | None, language: str | None, output_srt: Path, use_gpu: bool = False) -> dict[str, Any]:
+                output_srt.parent.mkdir(parents=True, exist_ok=True)
+                output_srt.write_text("1\n00:00:00,000 --> 00:00:00,500\nLocal caption\n\n2\n00:00:00,500 --> 00:00:01,000\nSecond caption\n", encoding="utf-8")
+                return {"status": "ok", "provider": "test-local-asr", "engine": engine, "model_path": str(model_path), "language": language, "text": "Local caption Second caption", "segments": [{"start": 0.0, "end": 0.5, "text": "Local caption"}, {"start": 0.5, "end": 1.0, "text": "Second caption"}], "timed": True, "srt": str(output_srt), "network": "disabled", "use_gpu": use_gpu}
+
+            with patch("ai_ad_editor.cli._transcribe_with_local_engine", side_effect=fake_transcribe):
+                code, result = invoke(
+                    "subtitle", "transcribe", "--project", str(project), "--asset-id", source_asset_id,
+                    "--model-path", str(workspace / "model"), "--track-id", "track_titles", "--apply",
+                )
+            self.assertEqual(code, 0, result)
+            self.assertTrue(result["data"]["applied"])
+            self.assertTrue(Path(result["data"]["output"]).exists())
+            self.assertTrue(Path(result["data"]["report"]).exists())
+            self.assertTrue((project / "history" / f"{result['data']['before_snapshot']['snapshot_id']}.json").exists())
+            saved = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            subtitle_track = next(track for track in saved["sequences"][0]["tracks"] if track["id"] == "track_titles")
+            self.assertEqual([clip["subtitle"]["text"] for clip in subtitle_track["clips"]], ["Local caption", "Second caption"])
+            self.assertEqual(invoke("validate", "--project", str(project), "--strict-rights")[0], 0)
 
     def test_quality_scopes_generate_local_color_review_artifacts(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-scopes-") as raw:

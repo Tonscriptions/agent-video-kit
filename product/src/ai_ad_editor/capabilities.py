@@ -113,8 +113,8 @@ def build_capability_manifest() -> dict[str, Any]:
             "subtitles": {
                 "status": "implemented",
                 "formats": ["srt", "vtt", "ass", "ssa", "ttml"],
-                "features": ["validate", "normalize_srt", "ttml_clock_parser", "inline_drawtext", "independent_text_track", "drawtext_line_spacing", "drawtext_border_and_shadow", "drawtext_alignment", "drawtext_text_shaping", "subtitle_width_wrap_font_metrics", "local_font_advance_metrics", "fade_text_animation", "slide_text_animation", "typewriter_text_animation", "pop_text_animation", "bounce_text_animation", "independent_rotate_text_layer", "independent_text_transform_keyframes", "independent_text_masks", "independent_text_blend", "mixed_video_text_track_order", "independent_text_fade_transitions", "independent_text_spatial_transitions", "word_timing_highlight", "word_timing_source_matching"],
-                "limits": ["embedded_rotate_text_is_approximated", "independent_text_complex_transition_handles_pending", "advanced_text_layout_exact_metrics_pending", "subtitle_width_wrap_falls_back_to_average_glyph_width_without_local_font", "word_timing_multiline_line_mapping_pending", "complex_bidi_layout_pending"],
+                "features": ["validate", "normalize_srt", "ttml_clock_parser", "inline_drawtext", "independent_text_track", "drawtext_line_spacing", "drawtext_border_and_shadow", "drawtext_alignment", "drawtext_text_shaping", "subtitle_width_wrap_font_metrics", "local_font_advance_metrics", "fade_text_animation", "slide_text_animation", "typewriter_text_animation", "pop_text_animation", "bounce_text_animation", "independent_rotate_text_layer", "independent_text_transform_keyframes", "independent_text_masks", "independent_text_blend", "mixed_video_text_track_order", "independent_text_fade_transitions", "independent_text_spatial_transitions", "word_timing_highlight", "word_timing_source_matching", "local_asr_to_srt", "ffmpeg_whisper_cpp_asr", "subtitle_asset_registration", "subtitle_track_apply_with_snapshot"],
+                "limits": ["embedded_rotate_text_is_approximated", "independent_text_complex_transition_handles_pending", "advanced_text_layout_exact_metrics_pending", "subtitle_width_wrap_falls_back_to_average_glyph_width_without_local_font", "word_timing_multiline_line_mapping_pending", "complex_bidi_layout_pending", "ffmpeg_whisper_requires_an_explicit_local_model_file_and_whisper_enabled_ffmpeg_build", "automatic_subtitle_apply_requires_a_registered_source_asset_for_rights_inheritance"],
             },
             "audio": {
                 "status": "implemented",
@@ -165,10 +165,11 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "ai": {
                 "status": "local_adapter_only",
-                "features": ["offline_transformers_asr_gate", "local_flite_tts", "heuristic_highlights", "local_ad_plan", "local_ad_plan_apply", "local_template_tracking"],
+                "features": ["offline_transformers_asr_gate", "ffmpeg_whisper_cpp_asr", "local_asr_subtitle_generation", "local_flite_tts", "heuristic_highlights", "local_ad_plan", "local_ad_plan_apply", "local_template_tracking"],
                 "network": "disabled",
+                "asr_contract": "subtitle.transcribe_or_media.understand_uses_an_explicit_local_transformers_directory_or_ffmpeg_whisper_model_and_writes_timestamped_srt_without_network",
                 "tts_contract": "tts.synthesize_uses_ffmpeg_flite_and_writes_project_local_wav_without_network_or_model_download",
-                "limits": ["model_weights_must_be_provided_locally", "flite_voice_inventory_depends_on_local_ffmpeg_build", "flite_adapter_is_ascii_english_only", "multilingual_model_tts_adapter_pending"],
+                "limits": ["model_weights_must_be_provided_locally", "ffmpeg_whisper_requires_whisper_enabled_local_ffmpeg", "flite_voice_inventory_depends_on_local_ffmpeg_build", "flite_adapter_is_ascii_english_only", "multilingual_model_tts_adapter_pending"],
             },
             "rights": {
                 "status": "implemented",

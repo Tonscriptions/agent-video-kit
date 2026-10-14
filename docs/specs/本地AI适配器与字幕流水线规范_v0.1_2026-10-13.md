@@ -11,7 +11,7 @@
 
 ## 1. 目标与边界
 
-本规范定义 Agent 调用本地 AI 能力时的可复现边界，首个适配器是基于 Transformers 的离线 ASR。它负责把本地音视频解码为转写文本和可选时间段，供字幕、镜头检索和编辑计划消费；它不负责下载模型、调用云端 API、生成广告文案或替代时间线渲染器。字幕入口同时支持 SRT、VTT、ASS/SSA 和本地 TTML/DFXP 时码解析，TTML 不允许外部实体或网络引用。
+本规范定义 Agent 调用本地 AI 能力时的可复现边界。当前 ASR 适配器包括：需要 Python 模型目录的 Transformers 离线路径，以及使用本地 FFmpeg `whisper.cpp` 滤镜和显式模型文件的原生路径。它们负责把本地音视频解码为转写文本和时间段，供字幕、镜头检索和编辑计划消费；它们不负责下载模型、调用云端 API、生成广告文案或替代时间线渲染器。字幕入口同时支持 SRT、VTT、ASS/SSA 和本地 TTML/DFXP 时码解析，TTML 不允许外部实体或网络引用。
 
 当前实现入口为：
 
@@ -20,9 +20,22 @@ python -m ai_ad_editor media understand `
   --project <项目目录> --input <本地音视频> `
   --transcribe --model-path <本地模型目录> `
   [--language zh] [--srt validation/captions.srt]
+
+python -m ai_ad_editor media understand `
+  --project <项目目录> --input <本地音视频> `
+  --transcribe --transcribe-engine ffmpeg-whisper `
+  --model-path <本地-whisper.cpp-模型文件> --language zh `
+  --srt validation/captions.srt
+
+python -m ai_ad_editor subtitle transcribe `
+  --project <项目目录> --asset-id <已登记音视频资产> `
+  --transcribe-engine ffmpeg-whisper --model-path <本地模型文件> `
+  --track-id <subtitle轨道> --apply
 ```
 
-`--model-path` 必须指向完整的本地 Transformers 模型目录。加载使用 `local_files_only=True`，进程设置 `HF_HUB_OFFLINE=1`，不接受缺失文件后自动下载。没有模型目录或模型文件不完整时，命令必须失败并输出结构化错误。
+`--transcribe-engine=transformers` 时，`--model-path` 必须指向完整的本地 Transformers 模型目录；加载使用 `local_files_only=True`，进程设置 `HF_HUB_OFFLINE=1`。`--transcribe-engine=ffmpeg-whisper` 时，`--model-path` 必须是非空的本地 whisper.cpp 模型文件，且本机 FFmpeg 必须暴露 `whisper` 滤镜；模型不会转换、下载或从网络读取。两条路径都在缺少模型、依赖或时间戳时返回结构化错误。
+
+FFmpeg Whisper 路径使用 `destination=<项目内 SRT>` 写出字幕，音频输出丢弃；默认 `use_gpu=false`，只有显式 `--use-gpu` 才允许本机 FFmpeg 使用 GPU。`doctor.data.checks.local_features.ffmpeg_whisper_asr` 只报告当前 FFmpeg 是否包含滤镜，不代表模型已登记或质量已验证。
 
 ## 2.1 本地基线 TTS
 
@@ -66,7 +79,9 @@ python -m ai_ad_editor tts synthesize `
 {
   "status": "ok",
   "provider": "transformers-local",
+  "engine": "transformers-local",
   "model_path": "E:/models/whisper-small",
+  "model_sha256": "sha256:...",
   "language": "zh",
   "text": "完整转写文本",
   "segments": [
@@ -76,6 +91,8 @@ python -m ai_ad_editor tts synthesize `
   "network": "disabled"
 }
 ```
+
+FFmpeg Whisper 返回相同的 `segments`/`timed` 形状，`provider` 和 `engine` 为 `ffmpeg-whisper-local`，并额外记录 `use_gpu`、模型文件 SHA-256 和生成的 `srt` 路径。`subtitle transcribe` 在需要 `--apply` 时把这些 cue 转成 `generator.type=text` 的独立字幕轨道片段；它同时登记 `kind=subtitle` 的派生资产，引用源资产的 Rights Ledger 依赖，并写入 `before-subtitle-transcribe` 快照、验证报告和操作记录。未提供已登记源资产时可以生成 standalone SRT，但拒绝 `--apply`，防止绕过权利门禁。
 
 `segments` 的时间单位为秒，起点小于终点，按时间升序排列；`text` 是去除模型特殊标记后的文本。模型不能稳定返回时间戳时仍可返回整段 `text`，但 `timed` 必须为 `false`，不得伪造字幕时间。
 
@@ -91,7 +108,12 @@ python -m ai_ad_editor tts synthesize `
 | `LOCAL_ASR_MODEL_LOAD_FAILED` | 10 | 模型文件、配置或词表不完整 | 修复模型快照/版本 |
 | `LOCAL_ASR_AUDIO_FAILED` | 3/6 | FFmpeg 无法解码或超时 | 检查媒体；超时可重试 |
 | `LOCAL_ASR_FAILED` | 6 | 本地推理失败 | 按 `retryable` 决定重试 |
+| `LOCAL_ASR_WHISPER_UNAVAILABLE` | 10 | FFmpeg 没有 `whisper` 滤镜 | 改用已登记 Transformers 本地模型或准备支持 whisper.cpp 的本地 FFmpeg |
+| `LOCAL_ASR_WHISPER_FAILED` | 6 | whisper.cpp 模型加载、推理或 SRT 写出失败 | 检查本地模型格式、音频流和 FFmpeg 构建；不会联网恢复 |
+| `LOCAL_ASR_TIMESTAMPS_INVALID` | 6 | 生成 SRT 的 cue 时间范围或排序无效 | 保留错误证据，修复模型/输入后重试 |
 | `LOCAL_ASR_TIMESTAMPS_MISSING` | 4 | 请求 SRT 但模型未返回可用时间段 | 改用时间戳模型或导入已有字幕 |
+| `SUBTITLE_APPLY_SOURCE_ASSET_REQUIRED` | 7 | 自动字幕应用没有已登记源资产 | 先 `media ingest` 并补齐 Rights Ledger，再应用 |
+| `SUBTITLE_TRANSCRIBE_TRACK_OVERLAP` | 2 | 目标字幕轨道已有重叠片段 | 审阅后使用 `--replace-track` 或调整起点 |
 
 错误响应仍遵循 [Agent CLI 契约](./AgentCLI契约_v0.1_2026-10-13.md) 的 JSON envelope，不输出模型内部路径以外的敏感日志，不尝试联网恢复。
 
@@ -102,7 +124,7 @@ ASR 结果进入字幕轨道前必须经过以下步骤：
 1. 检查音频采样率、媒体哈希和模型 provenance；
 2. 删除空段、修正同一序列内的边界重叠，并保留原始转写 JSON；
 3. 对 CJK 字体、换行、安全区和每行最大字符数执行项目校验；
-4. 由模板或时间线变更集显式引用字幕文件，不把模型输出隐式写进渲染器；
+4. 使用 `subtitle transcribe` 时先 dry-run，再由 `--apply` 显式写入独立字幕轨道；模型输出不得隐式写进渲染器；
 5. 渲染后用 `quality check` 和人工抽样核对文字、时间码、字形及音画同步。
 
 字幕文件在接入时间线前使用 `subtitle validate` 检查；TTML/DFXP 的 `begin`、`end`、`dur` 支持常用 clock time、`ms/s/m/h`、帧和 tick offset，规范化输出统一为项目内 SRT。外部实体、DTD、负时码和没有结束时间的 cue 必须结构化拒绝。ASR 文本可以帮助检索和广告编辑计划，但不等于完成语义镜头理解、对象跟踪、口型校正或逐字动画。此类能力必须以独立适配器和独立验收项登记。

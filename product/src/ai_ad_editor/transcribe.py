@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -8,6 +9,7 @@ from typing import Any
 from .errors import AppError, argument_error, dependency_error
 from .media import ffmpeg_path
 from .captions import write_srt_file
+from .utils import run_process, sha256_file
 
 
 def _decode_audio(path: Path, sample_rate: int = 16_000) -> Any:
@@ -141,6 +143,140 @@ def transcribe_local(path: Path, *, model_path: str | Path | None, language: str
         "segments": segments,
         "timed": bool(segments),
         "network": "disabled",
+    }
+
+
+_WHISPER_LANGUAGE_RE = re.compile(r"^(?:auto|[A-Za-z]{2,8}(?:-[A-Za-z]{2,8})?)$")
+
+
+def _escape_ffmpeg_filter_value(value: str) -> str:
+    """Escape a local path for an FFmpeg filter option.
+
+    FFmpeg filter arguments use ``:`` as a separator, which is also present
+    in Windows drive letters.  Keeping this escaping in one small function
+    prevents model and destination paths from being interpolated unsafely into
+    the filter graph.
+    """
+    escaped = str(value).replace("\\", "/")
+    for character in ("\\", ":", ",", "[", "]", "'", "="):
+        escaped = escaped.replace(character, f"\\{character}")
+    return escaped
+
+
+def ffmpeg_whisper_available() -> bool:
+    """Return whether the configured local FFmpeg exposes ``whisper``."""
+    try:
+        result = run_process([ffmpeg_path(), "-hide_banner", "-filters"], timeout=30)
+    except AppError:
+        return False
+    if result.returncode != 0:
+        return False
+    return any(re.search(r"\bwhisper\b", line) for line in (result.stdout + "\n" + result.stderr).splitlines())
+
+
+def transcribe_local_ffmpeg_whisper(
+    path: Path,
+    *,
+    model_path: str | Path | None,
+    output_srt: Path,
+    language: str | None = None,
+    use_gpu: bool = False,
+) -> dict[str, Any]:
+    """Run FFmpeg's bundled whisper.cpp filter against an explicit local model.
+
+    The model is never downloaded.  FFmpeg writes an SRT sidecar through the
+    filter's ``destination`` option, while its audio output is discarded.  A
+    native FFmpeg whisper build therefore works without Python ML packages and
+    still produces the same timestamped segment shape as the Transformers
+    adapter.
+    """
+    raw_source = str(path).strip()
+    if raw_source.lower().startswith(("http://", "https://")):
+        raise argument_error("本地 FFmpeg Whisper 不接受远程输入", "input")
+    source = Path(raw_source).expanduser().resolve()
+    if not source.exists() or not source.is_file():
+        raise AppError("LOCAL_ASR_AUDIO_MISSING", f"本地 ASR 输入不存在: {source}", exit_code=3, path=str(source))
+    if not model_path:
+        raise argument_error("ffmpeg-whisper 引擎必须提供本地模型文件", "model_path")
+    model = Path(model_path).expanduser().resolve()
+    if not model.exists() or not model.is_file() or model.stat().st_size <= 0:
+        raise AppError("LOCAL_ASR_MODEL_MISSING", f"本地 Whisper 模型文件不存在或为空: {model}", exit_code=10, path=str(model), hint="准备离线 whisper.cpp 模型文件；运行时不会联网下载")
+    if not ffmpeg_whisper_available():
+        raise AppError("LOCAL_ASR_WHISPER_UNAVAILABLE", "当前本地 FFmpeg 未提供 whisper 滤镜", exit_code=10, hint="运行 ffmpeg -filters 检查 whisper；或改用 transformers 本地模型适配器")
+    language_value = str(language or "auto").strip()
+    if not _WHISPER_LANGUAGE_RE.fullmatch(language_value):
+        raise argument_error("language 只能是 auto 或 ASCII 语言代码", "language")
+    destination = Path(output_srt).expanduser().resolve()
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.unlink(missing_ok=True)
+    model_value = _escape_ffmpeg_filter_value(str(model))
+    destination_value = _escape_ffmpeg_filter_value(str(destination))
+    filter_spec = (
+        f"whisper=model={model_value}:language={language_value}:"
+        f"use_gpu={'true' if use_gpu else 'false'}:destination={destination_value}:format=srt"
+    )
+    try:
+        result = run_process(
+            [
+                ffmpeg_path(),
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-y",
+                "-i",
+                str(source),
+                "-af",
+                filter_spec,
+                "-f",
+                "null",
+                "-",
+            ],
+            timeout=3600,
+        )
+    except AppError:
+        destination.unlink(missing_ok=True)
+        raise
+    if result.returncode != 0 or not destination.exists() or destination.stat().st_size == 0:
+        destination.unlink(missing_ok=True)
+        raise AppError(
+            "LOCAL_ASR_WHISPER_FAILED",
+            "FFmpeg whisper 本地转写失败",
+            exit_code=6,
+            retryable=True,
+            path=str(destination),
+            cause=(result.stderr or result.stdout)[-4000:],
+            hint="检查 whisper.cpp 模型格式、音频流和 FFmpeg 构建；不会自动下载模型",
+        )
+    try:
+        from .captions import parse_caption_file, validate_cues
+
+        cues = parse_caption_file(destination)
+    except AppError as exc:
+        destination.unlink(missing_ok=True)
+        raise AppError(
+            "LOCAL_ASR_TIMESTAMPS_INVALID",
+            "FFmpeg whisper 生成的 SRT 无法解析",
+            exit_code=6,
+            path=str(destination),
+            cause=str(exc),
+        ) from exc
+    validation = validate_cues(cues)
+    if not validation["ok"]:
+        destination.unlink(missing_ok=True)
+        raise AppError("LOCAL_ASR_TIMESTAMPS_INVALID", "FFmpeg whisper 生成的 SRT 时间轴无效", exit_code=6, path=str(destination), cause=str(validation["errors"]))
+    return {
+        "status": "ok" if cues else "empty",
+        "provider": "ffmpeg-whisper-local",
+        "engine": "ffmpeg-whisper-local",
+        "model_path": str(model),
+        "model_sha256": f"sha256:{sha256_file(model)}",
+        "language": language_value,
+        "text": " ".join(str(item.get("text", "")).strip() for item in cues).strip(),
+        "segments": cues,
+        "timed": bool(cues),
+        "srt": str(destination),
+        "network": "disabled",
+        "use_gpu": bool(use_gpu),
     }
 
 

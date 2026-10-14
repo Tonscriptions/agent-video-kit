@@ -64,7 +64,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `project recover --project PATH` | 项目内 `operations/project-transaction.json` | 恢复上次中断的项目元数据事务；`prepared` 回滚、`committed` 清理、无日志返回 `clean`；`--dry-run` 只报告 |
 | `media ingest --project PATH --input FILE` | 本地媒体、权利和许可证参数 | 复制到项目 `assets/`，写 probe、内容哈希、Rights Ledger 和资产 provenance |
 | `media stabilize --project PATH (--asset-id ID\|--input FILE)` | 本地视频和受控 `vidstab` 参数 | 先 dry-run 检查两遍 FFmpeg 计划；正式执行创建 `before-stabilize` 快照、生成项目内防抖派生视频、继承或登记 Rights Ledger、写验证报告和操作记录；不自动改写时间线 |
-| `media understand --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频 | FFmpeg 场景、静音、节拍结果；`--transcribe` 只加载本地 Transformers 模型 |
+| `media understand --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频 | FFmpeg 场景、静音、节拍结果；`--transcribe` 可选择本地 Transformers 模型或 FFmpeg `whisper.cpp` 模型，模型不会自动下载；可选写入项目内 SRT |
 | `media prepare --project PATH (--asset-id ID\|--input FILE)` | 本地素材 | 生成项目内代理、缩略图和波形，并写入资产记录 |
 | `media highlights --project PATH (--asset-id ID\|--input FILE)` | 本地理解结果 | 本地启发式高光候选报告，不调用在线推荐服务 |
 | `media beat-cut --project PATH (--audio-asset-id ID\|--input FILE) --source-asset-id ID --track-id ID` | 本地音频节拍证据、一个或多个已登记视频资产、节拍区间和源选择策略 | 使用本地 FFmpeg 能量峰值生成卡点计划；默认只写 `validation/beat_cut_*.json`，`--apply` 在 `before-beat-cut` 快照、重叠检查和项目校验后写入视频轨道并记录操作；`--replace-track` 才允许清空目标轨道，能量峰值和慢放复用必须保留警告 |
@@ -75,6 +75,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `ad plan --project PATH --input BRIEF.json` | 本地广告 brief 和可选分析报告 | 写入钩子、卖点、证明、CTA 的节拍计划和序列标记 |
 | `subtitle validate --input FILE` | SRT/VTT/ASS/SSA/TTML | 解析、时长、顺序和重叠报告；TTML 只接受本地时钟/offset 语法并拒绝外部实体 |
 | `subtitle normalize --input FILE --output FILE` | 字幕文件 | 通过校验后规范化为 SRT；项目模式下输出必须位于项目内 |
+| `subtitle transcribe --project PATH (--asset-id ID\|--input FILE) --model-path PATH` | 本地音视频、显式离线 ASR 模型、可选字幕轨道 | 使用 Transformers 或 FFmpeg `whisper.cpp` 生成时间戳 SRT；`--apply` 继承已登记源素材权利，创建字幕资产、独立字幕片段、快照、校验和操作记录；无源资产权利时拒绝应用 |
 | `tts synthesize --project PATH (--text TEXT\|--input FILE)` | ASCII/英文文本或本地 UTF-8 文本文件 | 通过 FFmpeg 内置 flite 生成项目内 WAV；无网络、无模型下载；当前拒绝非 ASCII 文本 |
 | `effects list [--query TEXT] [--keyframable-only]` | 可选效果 ID、别名、类别或后端筛选 | 返回本地 FFmpeg 效果目录、参数范围、关键帧能力、限制和目录版本；只读、无网络 |
 | `effects inspect --name NAME` | 效果 ID 或别名 | 返回单个效果的规范 ID、FFmpeg 后端、参数契约和限制；未知名称返回 `ARGUMENT_INVALID` |

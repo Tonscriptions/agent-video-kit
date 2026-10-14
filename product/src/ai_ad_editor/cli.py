@@ -38,6 +38,7 @@ from .project import (
     recover_pending_transaction,
     restore_snapshot,
     save_project,
+    TICKS_PER_SECOND,
 )
 from .quality import GOLDEN_VERSION, build_golden_manifest, check_output, compare_golden_manifest, normalize_golden_constraints, validate_golden_manifest
 from .recommend import recommend_highlights
@@ -45,7 +46,7 @@ from .library import duplicate_groups, index_directory, search_catalog, visual_s
 from .lut_library import inspect_lut, list_luts, prepare_lut_registration, register_lut
 from .batch import _load_variants, run_template_batch
 from .capabilities import build_capability_manifest
-from .transcribe import transcribe_local, write_srt
+from .transcribe import ffmpeg_whisper_available, transcribe_local, transcribe_local_ffmpeg_whisper, write_srt
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
 from .rights import VALID_STATUSES, active_records, add_record, apply_disposition_to_project, check_project_rights, create_disposition_decision, disposition_decisions, effective_disposition_decisions, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
 from .understand import detect_beats, understand_media
@@ -149,8 +150,10 @@ def build_parser() -> argparse.ArgumentParser:
     understand.add_argument("--scene-threshold", type=float, default=0.4)
     understand.add_argument("--beats", action="store_true", help="估计本地音频节拍锚点")
     understand.add_argument("--transcribe", action="store_true", help="使用已存在的本地 ASR 模型")
-    understand.add_argument("--model-path", default=None, help="离线 ASR 模型目录；不会自动下载")
+    understand.add_argument("--transcribe-engine", choices=("transformers", "ffmpeg-whisper"), default="transformers", help="本地 ASR 引擎；ffmpeg-whisper 使用 FFmpeg 内置 whisper.cpp 滤镜")
+    understand.add_argument("--model-path", default=None, help="离线 ASR 模型目录或 ffmpeg-whisper 模型文件；不会自动下载")
     understand.add_argument("--language", default=None)
+    understand.add_argument("--use-gpu", action="store_true", help="ffmpeg-whisper 允许使用本地 GPU；默认 CPU")
     understand.add_argument("--srt", default=None, help="可选项目内 SRT 输出路径")
     prepare = _leaf_common(ms.add_parser("prepare", help="生成本地代理、缩略图和波形"))
     prepare.add_argument("--project", required=True)
@@ -267,6 +270,22 @@ def build_parser() -> argparse.ArgumentParser:
     subtitle_normalize.add_argument("--output", required=True)
     subtitle_normalize.add_argument("--project", default=None)
     subtitle_normalize.add_argument("--allow-overlap", action="store_true")
+    subtitle_transcribe = _leaf_common(ss.add_parser("transcribe", help="使用本地 ASR 生成带时间戳字幕，并可应用到字幕轨道"))
+    subtitle_transcribe.add_argument("--project", required=True)
+    subtitle_source = subtitle_transcribe.add_mutually_exclusive_group(required=True)
+    subtitle_source.add_argument("--asset-id", default=None, help="项目内本地音频/视频资产；应用时用于继承权利")
+    subtitle_source.add_argument("--input", default=None, help="本地音频/视频路径")
+    subtitle_transcribe.add_argument("--model-path", required=True, help="本地 Transformers 模型目录或 whisper.cpp 模型文件")
+    subtitle_transcribe.add_argument("--transcribe-engine", choices=("transformers", "ffmpeg-whisper"), default="transformers")
+    subtitle_transcribe.add_argument("--language", default=None)
+    subtitle_transcribe.add_argument("--use-gpu", action="store_true", help="ffmpeg-whisper 允许使用本地 GPU；默认 CPU")
+    subtitle_transcribe.add_argument("--output", default=None, help="项目内 SRT 输出路径")
+    subtitle_transcribe.add_argument("--sequence-id", default=None)
+    subtitle_transcribe.add_argument("--track-id", default=None, help="应用时目标 subtitle 轨道 ID")
+    subtitle_transcribe.add_argument("--timeline-start-seconds", type=float, default=0.0)
+    subtitle_transcribe.add_argument("--apply", action="store_true", help="写入字幕轨道并登记生成的字幕资产")
+    subtitle_transcribe.add_argument("--replace-track", action="store_true", help="应用前清空目标字幕轨道")
+    subtitle_transcribe.add_argument("--font-asset-id", default=None, help="可选本地字体资产 ID，写入字幕样式")
 
     tts = subs.add_parser("tts", help="本地离线文本转语音")
     tts_sub = tts.add_subparsers(dest="action", required=True)
@@ -1074,6 +1093,32 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("media.reframe", args, data={"report": str(report_path), "plan": plan, "before_snapshot": before_snapshot, "validation": validation}, warnings=[{"code": "REFRAME_APPROXIMATE", "message": "自动重构图使用本地模板跟踪；请检查 confidence、主体边界和裁切警告"}], operation_id=operation_id)
 
 
+def _transcribe_with_local_engine(
+    root: Path,
+    source: Path,
+    *,
+    engine: str,
+    model_path: str | Path | None,
+    language: str | None,
+    output_srt: Path,
+    use_gpu: bool = False,
+) -> dict[str, Any]:
+    """Run one of the explicitly local ASR adapters and persist SRT evidence."""
+    output_srt = ensure_inside(root, output_srt)
+    if engine == "ffmpeg-whisper":
+        return transcribe_local_ffmpeg_whisper(
+            source,
+            model_path=model_path,
+            output_srt=output_srt,
+            language=language,
+            use_gpu=use_gpu,
+        )
+    transcription = transcribe_local(source, model_path=model_path, language=language)
+    write_srt(transcription, output_srt)
+    transcription["srt"] = str(output_srt)
+    return transcription
+
+
 def command_media_understand(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     source: Path | None = None
@@ -1096,18 +1141,26 @@ def command_media_understand(args: argparse.Namespace) -> dict[str, Any]:
         return _envelope("media.understand", args, status="planned", data={"input": str(source), "scene_threshold": args.scene_threshold})
     analysis = understand_media(source, scene_threshold=args.scene_threshold, include_beats=args.beats)
     if args.transcribe:
-        analysis["transcription"] = transcribe_local(source, model_path=args.model_path, language=args.language)
-        if args.srt:
-            srt_path = Path(args.srt).expanduser()
+        if args.transcribe_engine == "ffmpeg-whisper" or args.srt:
+            srt_path = Path(args.srt).expanduser() if args.srt else root / "cache" / f"understand_{new_id('asr')}.srt"
             if not srt_path.is_absolute():
                 srt_path = root / srt_path
             srt_path = srt_path.resolve()
-            try:
-                srt_path.relative_to(root)
-            except ValueError as exc:
-                raise argument_error("SRT 输出必须位于项目目录内", str(srt_path)) from exc
-            write_srt(analysis["transcription"], srt_path)
-            analysis["transcription"]["srt"] = str(srt_path)
+            ensure_inside(root, srt_path)
+            analysis["transcription"] = _transcribe_with_local_engine(
+                root,
+                source,
+                engine=args.transcribe_engine,
+                model_path=args.model_path,
+                language=args.language,
+                output_srt=srt_path,
+                use_gpu=bool(args.use_gpu),
+            )
+            if not args.srt:
+                srt_path.unlink(missing_ok=True)
+                analysis["transcription"].pop("srt", None)
+        else:
+            analysis["transcription"] = transcribe_local(source, model_path=args.model_path, language=args.language)
     analysis["source_sha256"] = f"sha256:{sha256_file(source)}"
     analysis["asset_id"] = asset_id
     path = root / "validation" / f"understand_{asset_id or new_id('asset')}.json"
@@ -1601,6 +1654,220 @@ def command_subtitle_normalize(args: argparse.Namespace) -> dict[str, Any]:
         return _envelope("subtitle.normalize", args, status="planned", data={"input": str(source), "output": str(output), "cue_count": len(cues)})
     write_srt_file(output, cues)
     return _envelope("subtitle.normalize", args, data={"input": str(source), "output": str(output), "cue_count": len(cues), "validation": report})
+
+
+def command_subtitle_transcribe(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    source_asset: dict[str, Any] | None = None
+    if args.asset_id:
+        source_asset = asset_map(project).get(str(args.asset_id))
+        if not source_asset:
+            raise argument_error(f"找不到 ASR 源资产: {args.asset_id}", "asset_id")
+        source = Path(str(source_asset.get("uri", "")))
+        if not source.is_absolute():
+            source = root / source
+    else:
+        raw_input = str(args.input or "").strip()
+        if raw_input.lower().startswith(("http://", "https://")):
+            raise argument_error("字幕转写只接受本地音频或视频路径", "input")
+        source = Path(raw_input).expanduser().resolve()
+    if not source.exists() or not source.is_file():
+        raise argument_error("字幕转写输入不存在", str(source))
+    if args.timeline_start_seconds < 0:
+        raise argument_error("timeline-start-seconds 不能为负数", "timeline_start_seconds")
+    if args.apply and not args.asset_id:
+        raise AppError("SUBTITLE_APPLY_SOURCE_ASSET_REQUIRED", "应用自动字幕前必须使用 --asset-id，以便继承源素材的 Rights Ledger 记录", exit_code=7, path="asset_id")
+    run_id = new_id("subtitle")
+    output = Path(args.output).expanduser().resolve() if args.output else root / "assets" / "subtitles" / f"{run_id}.srt"
+    ensure_inside(root, output)
+    sequence = find_sequence(project, args.sequence_id) if args.apply else None
+    target_track = None
+    if args.apply:
+        if not args.track_id:
+            raise argument_error("--apply 必须提供 --track-id", "track_id")
+        target_track = find_track(sequence, args.track_id, None)
+        if str(target_track.get("kind")) != "subtitle":
+            raise argument_error("自动字幕只能应用到 subtitle 轨道", "track_id")
+        if args.font_asset_id:
+            font_asset = asset_map(project).get(str(args.font_asset_id))
+            if not font_asset or str(font_asset.get("kind", "")).lower() != "font":
+                raise argument_error("font-asset-id 必须引用项目内 font 资产", "font_asset_id")
+    if args.dry_run:
+        return _envelope(
+            "subtitle.transcribe",
+            args,
+            status="planned",
+            data={
+                "input": str(source),
+                "asset_id": args.asset_id,
+                "output": str(output),
+                "engine": args.transcribe_engine,
+                "model_path": str(Path(args.model_path).expanduser().resolve()),
+                "language": args.language,
+                "apply": bool(args.apply),
+                "sequence_id": sequence.get("id") if sequence else None,
+                "track_id": target_track.get("id") if target_track else None,
+                "timeline_start_seconds": args.timeline_start_seconds,
+                "network": "disabled",
+            },
+        )
+
+    if output.exists():
+        raise argument_error("字幕输出已存在，为避免覆盖请指定新的 --output", str(output))
+    transcription = _transcribe_with_local_engine(
+        root,
+        source,
+        engine=args.transcribe_engine,
+        model_path=args.model_path,
+        language=args.language,
+        output_srt=output,
+        use_gpu=bool(args.use_gpu),
+    )
+    cues = list(transcription.get("segments") or [])
+    source_duration = 0.0
+    try:
+        source_probe = probe_media(source)
+        source_duration = float(source_probe.get("duration_seconds", 0.0) or 0.0)
+    except AppError:
+        source_probe = {}
+    cue_validation = validate_cues(cues, duration=source_duration if source_duration > 0 else None)
+    if not cue_validation["ok"]:
+        output.unlink(missing_ok=True)
+        raise AppError("SUBTITLE_TRANSCRIPTION_INVALID", "本地 ASR 返回的字幕时间轴未通过校验", exit_code=6, path=str(output), cause=json.dumps(cue_validation["errors"], ensure_ascii=False))
+    report_path = root / "validation" / f"subtitle_transcribe_{safe_filename(run_id)}.json"
+    base_report: dict[str, Any] = {
+        "report_version": "0.1.0",
+        "created_at": now_iso(),
+        "operation_id": None,
+        "applied": False,
+        "project_id": project.get("project", {}).get("id"),
+        "source": str(source),
+        "source_asset_id": args.asset_id,
+        "source_sha256": f"sha256:{sha256_file(source)}",
+        "engine": args.transcribe_engine,
+        "transcription": transcription,
+        "cue_validation": cue_validation,
+        "output": str(output),
+        "network": "disabled",
+    }
+    if not args.apply:
+        atomic_write_json(report_path, base_report)
+        return _envelope("subtitle.transcribe", args, data={"report": str(report_path), "output": str(output), "transcription": transcription, "cue_validation": cue_validation, "applied": False})
+
+    assert sequence is not None and target_track is not None and source_asset is not None
+    timeline_tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND))
+    timeline_offset = int(round(float(args.timeline_start_seconds) * timeline_tps))
+    generated_clips: list[dict[str, Any]] = []
+    style: dict[str, Any] = {
+        "fontsize": 52,
+        "fontcolor": "white",
+        "borderw": 4,
+        "bordercolor": "black",
+        "shadowx": 2,
+        "shadowy": 2,
+        "shadowcolor": "black@0.7",
+        "box": False,
+        "x": "(w-text_w)/2",
+        "y": "h-text_h-120",
+    }
+    if args.font_asset_id:
+        style["font_asset_id"] = str(args.font_asset_id)
+    for index, cue in enumerate(cues):
+        start_tick = timeline_offset + int(round(float(cue.get("start", 0.0)) * timeline_tps))
+        end_tick = timeline_offset + int(round(float(cue.get("end", 0.0)) * timeline_tps))
+        duration_tick = max(1, end_tick - start_tick)
+        generated_clips.append(
+            {
+                "id": f"{run_id}_{index:03d}",
+                "timeline_start_tick": start_tick,
+                "duration_tick": duration_tick,
+                "source_in_tick": 0,
+                "source_out_tick": duration_tick,
+                "generator": {"type": "text"},
+                "subtitle": {"text": str(cue.get("text", "")).strip(), "style": copy.deepcopy(style)},
+            }
+        )
+    existing_clips = list(target_track.get("clips", []))
+    if not args.replace_track:
+        for generated in generated_clips:
+            generated_start = int(generated["timeline_start_tick"])
+            generated_end = generated_start + int(generated["duration_tick"])
+            for existing in existing_clips:
+                existing_start = int(existing.get("timeline_start_tick", 0))
+                existing_end = existing_start + int(existing.get("duration_tick", 0))
+                if max(generated_start, existing_start) < min(generated_end, existing_end):
+                    output.unlink(missing_ok=True)
+                    raise AppError("SUBTITLE_TRANSCRIBE_TRACK_OVERLAP", "自动字幕会覆盖目标字幕轨道已有片段，请使用 --replace-track 或调整时间线起点", exit_code=2, path="track_id")
+    before_project = copy.deepcopy(project)
+    snapshot = create_snapshot(root, before_project, label="before-subtitle-transcribe")
+    operation_id = new_id("op")
+    subtitle_asset_id = new_id("subtitle_asset")
+    source_rights_ref = str(source_asset.get("rights_ref") or source_asset.get("id"))
+    ledger = load_ledger(root)
+    parent_record = next((record for record in active_records(ledger) if str(record.get("asset_id")) == source_rights_ref), None)
+    if parent_record is None:
+        output.unlink(missing_ok=True)
+        raise AppError("RIGHTS_RECORD_MISSING", "ASR 源资产缺少可继承的 Rights Ledger 记录", exit_code=7, path=source_rights_ref)
+    output_digest = sha256_file(output)
+    subtitle_asset = {
+        "id": subtitle_asset_id,
+        "kind": "subtitle",
+        "uri": str(output.relative_to(root)).replace("\\", "/"),
+        "sha256": f"sha256:{output_digest}",
+        "probe": {"duration_seconds": source_duration, "duration_tick": int(round(source_duration * timeline_tps)) if source_duration > 0 else max((int(item["timeline_start_tick"]) + int(item["duration_tick"]) for item in generated_clips), default=1), "subtitle_cues": len(cues)},
+        "rights_ref": subtitle_asset_id,
+        "source": {"source_url": f"local://{output}", "retrieved_at": now_iso(), "original_name": output.name, "derived_from": [source_asset.get("id")]},
+    }
+    subtitle_record = {
+        "asset_id": subtitle_asset_id,
+        "kind": "subtitle",
+        "sha256": f"sha256:{output_digest}",
+        "source_url": f"local://{output}",
+        "source_version": f"derived:{args.transcribe_engine}",
+        "retrieved_at": now_iso(),
+        "creator": parent_record.get("creator", "unknown"),
+        "license_spdx": parent_record.get("license_spdx", "LicenseRef-UNVERIFIED"),
+        "license_url": parent_record.get("license_url", ""),
+        "attribution": parent_record.get("attribution", ""),
+        "permitted_uses": list(parent_record.get("permitted_uses", ["internal"])),
+        "permitted_channels": list(parent_record.get("permitted_channels", [])),
+        "restrictions": list(parent_record.get("restrictions", [])),
+        "derived_from": [source_rights_ref],
+        "evidence": parent_record.get("evidence", ""),
+        "verification_status": parent_record.get("verification_status", "unverified"),
+        "verified_by": parent_record.get("verified_by", ""),
+        "takedown_status": parent_record.get("takedown_status", "clear"),
+        "notes": "Generated by local offline ASR; inherits source rights",
+    }
+    if args.replace_track:
+        target_track["clips"] = []
+    target_track.setdefault("clips", []).extend(generated_clips)
+    project.setdefault("assets", []).append(subtitle_asset)
+    add_record(ledger, subtitle_record)
+    _recompute_sequence_duration(sequence)
+    validation = validate_project(root, project, strict_rights=False)
+    if not validation["ok"]:
+        output.unlink(missing_ok=True)
+        raise AppError("SUBTITLE_TRANSCRIBE_APPLY_INVALID", "自动字幕应用后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    base_report.update({
+        "applied": True,
+        "operation_id": operation_id,
+        "before_snapshot_id": snapshot["snapshot_id"],
+        "sequence_id": sequence.get("id"),
+        "track_id": target_track.get("id"),
+        "subtitle_asset": subtitle_asset,
+        "rights": subtitle_record,
+        "generated_clips": generated_clips,
+        "timeline_start_seconds": round(float(args.timeline_start_seconds), 6),
+        "replace_track": bool(args.replace_track),
+        "validation": validation,
+    })
+    atomic_write_json(report_path, base_report)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "subtitle.transcribe", "asset_id": subtitle_asset_id, "source_asset_id": source_asset.get("id"), "sequence_id": sequence.get("id"), "track_id": target_track.get("id"), "report": str(report_path), "before_snapshot_id": snapshot["snapshot_id"], "at": now_iso()})
+    save_project(root, project)
+    save_ledger(root, ledger)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "subtitle.transcribe", "status": "succeeded", "asset_id": subtitle_asset_id, "source_asset_id": source_asset.get("id"), "report": str(report_path), "before_snapshot_id": snapshot["snapshot_id"], "clip_ids": [clip["id"] for clip in generated_clips], "created_at": now_iso()})
+    return _envelope("subtitle.transcribe", args, data={"report": str(report_path), "output": str(output), "transcription": transcription, "subtitle_asset": subtitle_asset, "rights": subtitle_record, "generated_clips": generated_clips, "before_snapshot": snapshot, "validation": validation, "applied": True}, operation_id=operation_id)
 
 
 def command_tts_synthesize(args: argparse.Namespace) -> dict[str, Any]:
@@ -3203,7 +3470,10 @@ def command_doctor(args: argparse.Namespace) -> dict[str, Any]:
         checks["virtualization_commands" if name in {"docker", "wsl"} else "tools"] = checks.get("virtualization_commands" if name in {"docker", "wsl"} else "tools", {})
         checks["virtualization_commands" if name in {"docker", "wsl"} else "tools"][name] = shutil.which(name)
     checks["ffmpeg_version"] = ffmpeg_version() if checks["tools"].get("ffmpeg") else None
-    checks["local_features"] = {"flite_tts": flite_available() if checks["tools"].get("ffmpeg") else False}
+    checks["local_features"] = {
+        "flite_tts": flite_available() if checks["tools"].get("ffmpeg") else False,
+        "ffmpeg_whisper_asr": ffmpeg_whisper_available() if checks["tools"].get("ffmpeg") else False,
+    }
     checks["policy"] = {"docker_or_wsl_started": False, "closed_services_enabled": False, "jianying_runtime_enabled": False}
     if args.project:
         policy_report = audit_local_tree(Path(args.project))
@@ -3298,6 +3568,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("ad", "apply"): command_ad_apply,
     ("subtitle", "validate"): command_subtitle_validate,
     ("subtitle", "normalize"): command_subtitle_normalize,
+    ("subtitle", "transcribe"): command_subtitle_transcribe,
     ("tts", "synthesize"): command_tts_synthesize,
     ("effects", "list"): command_effects_list,
     ("effects", "inspect"): command_effects_inspect,
