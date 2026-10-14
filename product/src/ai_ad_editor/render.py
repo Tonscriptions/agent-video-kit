@@ -2261,8 +2261,33 @@ def _build_subtitle_layer(
 
     incoming = clip_value.get("transition_in") if isinstance(clip_value.get("transition_in"), dict) else {}
     outgoing = clip_value.get("transition_out") if isinstance(clip_value.get("transition_out"), dict) else {}
-    if incoming or outgoing:
-        warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_transition", "message": "独立文字轨道的片段 transition 尚未接入，已保留文字层和时间窗"})
+    transition_opacity = "1.00000000"
+    unsupported_transitions: list[str] = []
+    incoming_type = str(incoming.get("type", "")).lower().replace("-", "_")
+    if incoming_type:
+        if incoming_type in {"fade", "fade_in", "dissolve", "crossfade"}:
+            transition_duration = max(0.001, _num(incoming.get("duration", 0.25), 0.25))
+            transition_expr = f"if(lt(T,{clip_start:.6f}),0,clip((T-{clip_start:.6f})/{transition_duration:.6f},0,1))"
+            transition_opacity = f"({transition_opacity})*({transition_expr})"
+        else:
+            unsupported_transitions.append(f"transition_in:{incoming_type}")
+    outgoing_type = str(outgoing.get("type", "")).lower().replace("-", "_")
+    if outgoing_type:
+        if outgoing_type in {"fade", "fade_out", "dissolve", "crossfade"}:
+            transition_duration = max(0.001, _num(outgoing.get("duration", 0.25), 0.25))
+            fade_start = clip_start + max(0.0, clip_duration - transition_duration)
+            fade_end = clip_start + clip_duration
+            transition_expr = f"if(gt(T,{fade_start:.6f}),clip(({fade_end:.6f}-T)/{transition_duration:.6f},0,1),1)"
+            transition_opacity = f"({transition_opacity})*({transition_expr})"
+        else:
+            unsupported_transitions.append(f"transition_out:{outgoing_type}")
+    if transition_opacity != "1.00000000":
+        transition_label = f"subtitle_transition_opacity{subtitle_index}"
+        alpha_expr = f"alpha(X,Y)*clip(({transition_opacity}),0,1)"
+        filters.append(f"[{layer_label}]format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)},format=rgba[{transition_label}]")
+        layer_label = transition_label
+    if unsupported_transitions:
+        warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_transition", "message": f"独立文字层已执行 fade/dissolve alpha 转场；以下空间转场仍保留基础文字时间窗: {','.join(unsupported_transitions)}"})
     position_x_expr = _expr_arg(f"({transform['position_x']})*W-w/2")
     position_y_expr = _expr_arg(f"({transform['position_y']})*H-h/2")
     return {

@@ -83,8 +83,8 @@ def build_capability_manifest() -> dict[str, Any]:
             "subtitles": {
                 "status": "implemented",
                 "formats": ["srt", "vtt", "ass", "ssa"],
-                "features": ["validate", "normalize_srt", "inline_drawtext", "independent_text_track", "drawtext_line_spacing", "drawtext_border_and_shadow", "drawtext_alignment", "drawtext_text_shaping", "subtitle_width_wrap_font_metrics", "local_font_advance_metrics", "fade_text_animation", "slide_text_animation", "typewriter_text_animation", "pop_text_animation", "bounce_text_animation", "independent_rotate_text_layer", "independent_text_transform_keyframes", "independent_text_masks", "independent_text_blend", "mixed_video_text_track_order", "word_timing_highlight", "word_timing_source_matching"],
-                "limits": ["embedded_rotate_text_is_approximated", "independent_text_transition_pending", "advanced_text_layout_exact_metrics_pending", "subtitle_width_wrap_falls_back_to_average_glyph_width_without_local_font", "word_timing_multiline_line_mapping_pending", "complex_bidi_layout_pending"],
+                "features": ["validate", "normalize_srt", "inline_drawtext", "independent_text_track", "drawtext_line_spacing", "drawtext_border_and_shadow", "drawtext_alignment", "drawtext_text_shaping", "subtitle_width_wrap_font_metrics", "local_font_advance_metrics", "fade_text_animation", "slide_text_animation", "typewriter_text_animation", "pop_text_animation", "bounce_text_animation", "independent_rotate_text_layer", "independent_text_transform_keyframes", "independent_text_masks", "independent_text_blend", "mixed_video_text_track_order", "independent_text_fade_transitions", "word_timing_highlight", "word_timing_source_matching"],
+                "limits": ["embedded_rotate_text_is_approximated", "independent_text_spatial_transition_pending", "advanced_text_layout_exact_metrics_pending", "subtitle_width_wrap_falls_back_to_average_glyph_width_without_local_font", "word_timing_multiline_line_mapping_pending", "complex_bidi_layout_pending"],
             },
             "audio": {
                 "status": "implemented",
