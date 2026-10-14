@@ -1,111 +1,109 @@
 # video-cut 本地技能使用指南
 
-
 | 文档编号 | OPS-2026-10-001 |
 |---|---|
 | 状态 | 有效 |
-| 本次审计复核 | 2026-10-13 |
-| 证据性质 | Skill 安装登记与禁用项；不等于生产验收 |
-> **项目约束更新（2026-10-12）：只使用独立开源视频制作方案，不得使用剪映。** 下述安装记录表示 Skill 已注册，不表示其依赖符合当前选型。剪映及依赖其渲染的 Skill 在本项目禁用；Remotion 内核不纳入严格开源方案；HyperFrames/生成服务等需按实际依赖核查后选用。当前依据见 [纯开源程序与 Skill 评估](E:/dev/sandbox/AI广告剪辑/docs/纯开源_程序与Skill_剪映水准评估_2026-10-12.md)。
+| 本次审计复核 | 2026-10-14 |
+| 证据性质 | 本地 Skill 注册、目录校验与运行策略；不等于完整剪映功能验收 |
 
-已下载原榜单第 **2 / 8 / 10 / 12** 项的完整源码，并注册 **40 个相关 Skills**。所有新注册技能的目录名、SKILL.md 中的 name，以及界面调用名均以 `video-cut-` 开头。
+> **运行策略（2026-10-14）：** 生产 Skill 只允许调用本地项目、系统 FFmpeg、本地模型和本地文件。禁止剪映、闭源 SaaS、远程 API、在线素材下载、远程渲染和需要联网才能完成的工作流。`sources/` 仍保留公开仓库快照用于许可证、来源和差异审计，但不作为生产 Skill 的可调用依赖。
 
-`$` 是调用标记，不属于目录名。例如 `$video-cut-ad-creative` 对应 `skills/video-cut-ad-creative/`。下一轮对话可使用这些调用名。
+当前登记 **14 个生产 Skill**。目录名、`SKILL.md` 中的 name、调用名均以 `video-cut-` 开头，且所有生产 Skill 已通过 `quick_validate.py`。发现目录通过 Windows 目录联接指向本项目的 `skills/`，因此 Skill 内容与产品代码随 Git 一起审计。
+
+`$` 是调用标记，不属于目录名。例如 `$video-cut-video-edit` 对应 `skills/video-cut-video-edit/`。
 
 ## 常用入口
 
 | 需求 | 调用 |
 |---|---|
-| 现有素材剪辑、拼接 | `$video-cut-video-edit` |
-| BGM 卡点与素材混剪 | 原 `$video-cut-music-to-video` 依赖路径待核查；纯开源主路线需补卡点配方 |
-| 广告创意与文案建议 | `$video-cut-ad-creative` |
-| 视频脚本与短视频规划 | `$video-cut-video-content-strategist` |
-| 素材预处理 | `$video-cut-ffmpeg` |
-| Remotion 视频合成 | 当前项目不采用该内核；已有 Skills 保留为安装记录 |
-| 剪映工程与成片交付 | 当前项目禁用 `$video-cut-jianying-editor` |
+| 本地 Agent 编辑器编排 | `$video-cut-agent-editor` |
+| 时间线、关键帧、遮罩、嵌套序列 | `$video-cut-timeline` |
+| 素材裁切、拼接、转码和导出 | `$video-cut-video-edit` |
+| FFmpeg 滤镜、音视频质量和编码参数 | `$video-cut-ffmpeg` |
+| 素材理解、抽帧、字幕和高光候选 | `$video-cut-video-understand` |
+| 本地模型、离线 ASR/TTS 和模型门禁 | `$video-cut-local-models` |
+| 远程引用审计与本地路径策略 | `$video-cut-local-policy` |
+| 模板、变体、参数和批量生产 | `$video-cut-template-library` |
+| 权利、许可证、证据和发布门禁 | `$video-cut-rights-ledger` |
+| Scope、音视频质量和验收报告 | `$video-cut-quality` |
+| 项目初始化、状态、队列和清理 | `$video-cut-project-ops` |
+| 广告创意、Hook、文案变体 | `$video-cut-ad-creative` |
+| 视频脚本与内容规划 | `$video-cut-video-content-strategist` |
+| 活动归因、漏斗和 ROI 分析 | `$video-cut-campaign-analytics` |
 
 可复制的调用示例：
 
 ```text
-$video-cut-ad-creative 为这款产品设计 5 个短视频广告开头和创意角度。
-$video-cut-video-edit 将我提供的素材剪成 30 秒竖屏广告。
-$video-cut-ffmpeg 检查这些素材并为 1080×1920 的开源剪辑工程准备媒体文件。
+$video-cut-project-ops 初始化一个本地广告剪辑项目，并输出项目状态。
+$video-cut-local-policy 对 project.json 执行 policy audit，拒绝所有远程或闭源服务引用。
+$video-cut-video-understand 分析本地素材，生成字幕、镜头摘要和高光候选。
+$video-cut-timeline 将高光候选编排为 30 秒竖屏广告，加入关键帧运镜和本地转场。
+$video-cut-quality 生成 waveform、vectorscope、histogram 和哈希证据报告。
+$video-cut-rights-ledger 检查所有素材的本地许可证证据和发布门禁。
 ```
 
-## 来源与范围
+## 生产 Skill 清单
 
-| 原排名 | 仓库 | 已注册 Skills | 源码提交 |
-|---:|---|---:|---|
-| 2 | [calesthio/OpenMontage](https://github.com/calesthio/OpenMontage) | 20 | [`9327439db690`](https://github.com/calesthio/OpenMontage/tree/9327439db69021ab4b0e2776729bf3b58fdb5a87) |
-| 8 | [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) | 6 | [`19392f7a0826`](https://github.com/alirezarezvani/claude-skills/tree/19392f7a08264ed00486a251f5b2098321771f94) |
-| 10 | [remotion-dev/skills](https://github.com/remotion-dev/skills) | 12 | [`32b241b97f4e`](https://github.com/remotion-dev/skills/tree/32b241b97f4e0e4ab61fe9a41b05e6e64503f8c5) |
-| 12 | [luoluoluo22/jianying-editor-skill](https://github.com/luoluoluo22/jianying-editor-skill) | 1 | [`32c56928ded4`](https://github.com/luoluoluo22/jianying-editor-skill/tree/32c56928ded4f9e2c2b80e099dc7abb793d2c30b) |
+| # | 调用名 | 生产职责 | 依赖边界 |
+|---:|---|---|---|
+| 1 | `$video-cut-ad-creative` | 广告 Hook、标题、文案和创意变体 | 本地规则与项目数据 |
+| 2 | `$video-cut-agent-editor` | Agent Project、时间线、模板、权利和转换 CLI 编排 | 本项目 `product` CLI |
+| 3 | `$video-cut-campaign-analytics` | 归因、漏斗、ROI 和投放效果分析 | 本地 CSV/JSON 数据 |
+| 4 | `$video-cut-ffmpeg` | FFmpeg 转码、滤镜、裁切、混音和编码质量 | 系统 FFmpeg 与本地文件 |
+| 5 | `$video-cut-local-models` | 本地模型登记、能力探测、离线 ASR/TTS 门禁 | 本地模型目录 |
+| 6 | `$video-cut-local-policy` | 本地引用校验、远程引用审计和 provider marker 检查 | `policy audit` CLI |
+| 7 | `$video-cut-project-ops` | 项目初始化、状态查询、队列、清理和可复现运行 | `project` CLI |
+| 8 | `$video-cut-quality` | Scope、编码元数据、哈希、回归和发布前质量门禁 | 本地 FFmpeg 输出 |
+| 9 | `$video-cut-rights-ledger` | 素材许可证、来源证据、用途和发布审批记录 | 项目内 Rights Ledger |
+| 10 | `$video-cut-template-library` | 模板 schema、参数、变体、版本和批量渲染 | 本地模板目录 |
+| 11 | `$video-cut-timeline` | 时间线、关键帧、曲线、遮罩、转场和嵌套序列 | Agent Project schema |
+| 12 | `$video-cut-video-content-strategist` | 视频脚本、短视频结构和内容规划 | 本地 brief/项目数据 |
+| 13 | `$video-cut-video-edit` | 已有素材裁切、拼接、叠加、变速和成片加工 | 本地 FFmpeg |
+| 14 | `$video-cut-video-understand` | 抽帧、转写、内容摘要、镜头和高光分析 | 本地 FFmpeg 与已登记模型 |
 
-OpenMontage 加载视频、媒体和 HyperFrames 相关条目；claude-skills 加载六个广告与视频策划条目；Remotion 加载完整十二个官方 Skills；剪映加载完整包。OpenMontage 内重复的 Remotion 条目由官方版本承担。
+### 旧 Skill 的处理
 
-## 本地文件位置
+曾经加载的生成服务、网页捕获、在线视频下载、Remotion/HyperFrames、剪映适配、远程素材库和云端营销 Skill 已从生产 `skills/` 目录删除，并从 Codex 发现目录解除联接。删除只影响生产入口；原始公开仓库快照仍可在 `sources/` 中追溯，不能直接被本地 Agent 调用。安装清单中的 `source_repositories` 只承担来源审计职责。
 
-- 项目根目录：`E:\dev\sandbox\AI广告剪辑`
-- 可编辑技能库：`E:\dev\sandbox\AI广告剪辑\skills`
-- Codex 发现目录：`C:\Users\carzy\.codex\skills`，通过 Windows 目录联接指向项目内技能库。
-- 原始仓库与 ZIP：[sources](../sources/)。
-- 来源、版本、目录映射与修改清单：[安装清单](../video-cut-install-manifest.json)。
-- 本地校验结果：[校验记录](../research/video-cut-validation.json)。
-- 注册脚本：[register-video-cut-skills.ps1](../register-video-cut-skills.ps1)。
+## 本地运行流程
 
-目录联接依赖项目当前路径；移动或删除技能库后需重新注册。更新源码时需重新应用前缀和本地路径适配。
+1. 使用 `$video-cut-project-ops` 初始化或检查项目目录。
+2. 使用 `$video-cut-local-policy` 执行 `policy audit --project <project>`；发现 URL、云存储、流媒体、服务商标记时立即停止。
+3. 使用 `$video-cut-video-understand` 读取已落盘素材；素材必须先进入项目资产库并写入 Rights Ledger。
+4. 使用 `$video-cut-timeline`、`$video-cut-video-edit` 和 `$video-cut-ffmpeg` 生成时间线及本地渲染计划。
+5. 使用 `$video-cut-local-models` 选择已登记的离线模型；没有本地模型时输出能力缺口，不自动改走远程服务。
+6. 使用 `$video-cut-quality` 生成 Scope、编码、哈希和回归证据。
+7. 使用 `$video-cut-rights-ledger` 完成许可证和发布门禁，再由 `$video-cut-agent-editor` 执行导出。
 
-## 环境与已完成校验
+核心命令示例：
 
-本次安装包含技能说明、脚本、模板、参考资料与上游许可文件。已验证 40 个技能的格式、名称与调用元数据；已核验全部注册入口指向相同的项目文件；技能文档中的本地链接无缺失；剪映两个 Python 引导器能从项目外路径找到新技能目录（剪映运行时本项目禁用）。
+```powershell
+$env:PYTHONPATH = (Resolve-Path .\product\src).Path
+python -X utf8 -m ai_ad_editor capabilities
+python -X utf8 -m ai_ad_editor policy audit --project .\project
+python -X utf8 -m ai_ad_editor doctor --project .\project
+```
 
-执行具体制作流程仍需相应运行环境：基础剪辑需 FFmpeg，素材下载需 yt-dlp，本地转写需 Whisper，Remotion/HyperFrames 需对应 Node.js 工程，剪映需客户端与 Python 依赖，HeyGen 等生成/翻译分支需对应服务配置。本次尚未执行媒体生成、剪辑或渲染。
+`policy audit` 是生产前硬门禁。它只读取项目内 JSON/JSONL 和本地文件元数据，不发起网络请求；发现远程协议、URL 或已知服务商标记时返回失败信封 `POLICY_REMOTE_REFERENCE`。媒体导入和格式转换也会在写入前拒绝远程引用。
 
-`video-cut-video-toolkit` 上游声明 macOS/Linux 支持，且依赖单独的制作工具仓库；目前作为流程参考注册。OpenMontage 的 HyperFrames 路由中，未随该仓库打包的工作流已在本地说明中标注，并提供可用入口。
+## 来源、版本与目录
 
-后续制作遵循 [项目约定](../AGENTS.md)：所有内容在本项目路径下构建，严格禁止本地 Docker/WSL 等虚拟化环境，浏览器调用结束后关闭所有不用的 tab。
+| 项目 | 位置 |
+|---|---|
+| 项目根目录 | `E:\dev\sandbox\AI广告剪辑` |
+| 可编辑生产 Skill | `E:\dev\sandbox\AI广告剪辑\skills` |
+| Codex 发现目录 | `C:\Users\carzy\.codex\skills`（Windows 目录联接） |
+| 原始仓库与 ZIP 快照 | [`sources/`](../sources/) |
+| 来源、版本、目录映射与哈希 | [`video-cut-install-manifest.json`](../video-cut-install-manifest.json) |
+| 本地校验结果 | [`research/video-cut-validation.json`](../research/video-cut-validation.json) |
+| 注册脚本 | [`register-video-cut-skills.ps1`](../register-video-cut-skills.ps1) |
+| 本地运行策略契约 | [`本地运行策略与远程引用审计契约_v0.1_2026-10-14.md`](./specs/本地运行策略与远程引用审计契约_v0.1_2026-10-14.md) |
+| Agent CLI 契约 | [`AgentCLI契约_v0.1_2026-10-13.md`](./specs/AgentCLI契约_v0.1_2026-10-13.md) |
 
-## 完整调用清单
+移动项目目录或变更 Skill 后，重新运行注册脚本并刷新安装清单哈希。所有新需求、规范、ADR、计划和验证记录继续写入 `docs/`。
 
-| 来源 | 调用名 | 用途 |
-|---|---|---|
-| calesthio/OpenMontage | `$video-cut-ai-video-gen` | 文生视频、图生视频与生成服务路由 |
-| calesthio/OpenMontage | `$video-cut-avatar-video` | 数字人口播、多场景讲解视频 |
-| calesthio/OpenMontage | `$video-cut-create-video` | 通过 HeyGen Video Agent 从描述生成视频 |
-| calesthio/OpenMontage | `$video-cut-ffmpeg` | 转码、裁切、缩放、压缩与音频加工 |
-| calesthio/OpenMontage | `$video-cut-hyperframes-animation` | 动效、镜头衔接、场景转场与运行时适配 |
-| calesthio/OpenMontage | `$video-cut-hyperframes-cli` | HyperFrames 项目、预览、检查与渲染命令 |
-| calesthio/OpenMontage | `$video-cut-hyperframes-core` | HTML 视频合成结构、时间线与确定性规则 |
-| calesthio/OpenMontage | `$video-cut-hyperframes-creative` | 视觉方向、字体、配色与品牌表现 |
-| calesthio/OpenMontage | `$video-cut-hyperframes-media` | 旁白、配乐、音效、转写与字幕资源 |
-| calesthio/OpenMontage | `$video-cut-hyperframes-registry` | 视频组件与动画区块安装、接线规则 |
-| calesthio/OpenMontage | `$video-cut-hyperframes` | HTML 视频工作流入口与本地能力路由 |
-| calesthio/OpenMontage | `$video-cut-media-use` | 音乐、音效、图片和图标素材检索与登记 |
-| calesthio/OpenMontage | `$video-cut-music-to-video` | 以音乐节拍驱动的卡点与素材混剪 |
-| calesthio/OpenMontage | `$video-cut-remotion-to-hyperframes` | 已有 Remotion 项目迁移到 HyperFrames |
-| calesthio/OpenMontage | `$video-cut-video-download` | 通过 yt-dlp 获取视频、音频、字幕与元信息 |
-| calesthio/OpenMontage | `$video-cut-video-edit` | 已有素材裁切、拼接、叠加、变速与成片加工 |
-| calesthio/OpenMontage | `$video-cut-video-toolkit` | 综合制作流程参考；独立运行时尚未配置 |
-| calesthio/OpenMontage | `$video-cut-video-translate` | 视频翻译、配音与多语言版本 |
-| calesthio/OpenMontage | `$video-cut-video-understand` | 抽帧、转写、内容理解与素材分析 |
-| calesthio/OpenMontage | `$video-cut-website-to-video` | 网页捕获与网站展示视频 |
-| alirezarezvani/claude-skills | `$video-cut-demo-video` | 产品演示、功能展示、广告叙事与场景设计 |
-| alirezarezvani/claude-skills | `$video-cut-ad-creative` | 广告 Hook、标题、文案与创意变体 |
-| alirezarezvani/claude-skills | `$video-cut-campaign-analytics` | 归因、漏斗、ROI 与投放效果分析 |
-| alirezarezvani/claude-skills | `$video-cut-marketing-demand-acquisition` | 获客、预算、渠道与需求增长规划 |
-| alirezarezvani/claude-skills | `$video-cut-paid-ads` | 广告策略、受众、投放结构与效果优化 |
-| alirezarezvani/claude-skills | `$video-cut-video-content-strategist` | 视频脚本、短视频策略与长内容再利用 |
-| remotion-dev/skills | `$video-cut-remotion-best-practices` | Remotion 官方总入口，按需求读取完整规则 |
-| remotion-dev/skills | `$video-cut-remotion-captions` | 转写、字幕呈现与字幕动画 |
-| remotion-dev/skills | `$video-cut-remotion-create` | 创建 Remotion 项目与新视频 |
-| remotion-dev/skills | `$video-cut-remotion-docs` | Remotion 官方 API 文档查询 |
-| remotion-dev/skills | `$video-cut-remotion-interactivity` | 可编辑参数与交互式预览结构 |
-| remotion-dev/skills | `$video-cut-remotion-maps` | 地图、地理线路与地理动画 |
-| remotion-dev/skills | `$video-cut-remotion-markup` | React 视频结构、动画、布局、字体与媒体 |
-| remotion-dev/skills | `$video-cut-remotion-multimedia` | 浏览器媒体处理与 Mediabunny |
-| remotion-dev/skills | `$video-cut-remotion-render` | 导出视频与静态帧 |
-| remotion-dev/skills | `$video-cut-remotion-saas` | 基于 Remotion 的应用与视频自动化架构 |
-| remotion-dev/skills | `$video-cut-remotion-studio` | 启动和使用交互式预览 |
-| remotion-dev/skills | `$video-cut-remotion-upgrade` | 升级框架及相关包的规则 |
-| luoluoluo22/jianying-editor-skill | `$video-cut-jianying-editor` | 剪映工程、素材导入、字幕、动效、录屏与导出 |
-| AI广告剪辑/product | `$video-cut-agent-editor` | 本地 Agent Project、FFmpeg、时间线、模板、权利和转换 CLI 编排 |
+## 校验边界
+
+本指南证明生产 Skill 的目录、前缀、本地依赖和注册关系可重复检查；它不宣称已经关闭全部剪映差异。当前仍需独立证据推进的能力包括复杂本地模型跟踪、多语言高质量离线 TTS/ASR、GPU 级特效、跨字体精确排版、复杂音频空间处理、更多转场语义、跨格式工程互操作和完整黄金媒体样例。每项能力只有在产品实现、回归测试和固定证据同时具备后，才可从差异清单中关闭。
+
+后续制作遵循 [`AGENTS.md`](../AGENTS.md)：只使用原生 Windows 工具，禁止 Docker/WSL 等虚拟化环境；若使用浏览器，完成后关闭不再使用的 tab。

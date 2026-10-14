@@ -164,9 +164,9 @@ ffmpeg -i left.mp4 -i right.mp4 \
   -map "[v]" -c:v libx264 output.mp4
 ```
 
-## Remotion Integration Notes
+## Agent Project Integration Notes
 
-- Remotion uses `<OffthreadVideo>` which handles most formats
+- Agent Project uses `<OffthreadVideo>` which handles most formats
 - Prefer H.264 (libx264) in MP4 container
 - Always use `-movflags faststart` for web playback
 - Match fps to composition (usually 30fps)

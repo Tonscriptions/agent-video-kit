@@ -19,7 +19,7 @@ metadata:
     original_name: campaign-analytics
 ---
 
-Read [local installation rules](references/local-installation.md) before running the upstream workflow.
+Read the [local project policy](../../docs/specs/本地运行策略与远程引用审计契约_v0.1_2026-10-14.md) before running this local workflow.
 
 # Campaign Analytics
 

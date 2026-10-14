@@ -91,6 +91,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `library index --root DIR --output FILE` | 本地媒体/字体/字幕目录 | 生成 `0.2.0` 目录：哈希、probe、确定性 token、同 stem 字幕侧车和许可证状态 |
 | `library search --catalog FILE` | 目录索引、词组和媒体属性过滤 | 按确定性分数返回可审计匹配资产；支持时长、分辨率、音频流和精确重复过滤 |
 | `library duplicates --catalog FILE` | 已生成的目录 | 按 SHA-256 返回字节完全相同的素材组；不会把相似或转码文件误报为重复 |
+| `policy audit --project PATH` | 项目 JSON/JSONL 产物 | 只读审计远程/闭源服务引用；违规返回 `POLICY_REMOTE_REFERENCE` |
 | `doctor` | 本机环境 | 只读取 Python、FFmpeg、FFprobe、Docker/WSL PATH；绝不启动虚拟化环境 |
 | `operation inspect --project PATH --operation-id ID` | 操作 ID | 读取可重连的操作状态、进度和产物清单 |
 | `version` / `capabilities` | 无 | 版本、引擎、网络策略和 test-backed 本地能力清单 |
@@ -102,6 +103,8 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 迁移候选由纯函数生成；CLI 只为缺失的本地资产计算 SHA-256 和 FFprobe 元数据。相对 `--report` 路径解析到项目的 `validation/` 目录；绝对路径也必须位于该目录内。候选通过机器 Schema 与语义校验后，才创建 `before-migrate` 快照并原子保存。重复迁移应是 no-op，不重复写项目或快照。
 
 项目内报告、快照、渲染和转换产物必须位于项目根目录的受控子目录；越过项目根目录、网络 URI、缺少权利记录或未授权的外部路径必须返回结构化错误。历史文件只读，恢复和写入操作不会删除历史快照。
+
+`policy audit` 和所有媒体/转换入口遵循[本地运行策略与远程引用审计契约](./本地运行策略与远程引用审计契约_v0.1_2026-10-14.md)。运行时只接受本地路径、`local://` 或 `file://`；研究文档中的公开 URL 不会被作为运行输入。
 
 ## 5. 时间线与关键帧契约
 

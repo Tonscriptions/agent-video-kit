@@ -127,4 +127,4 @@
 
 ---
 
-*Template from campaign-analytics skill. Statistical significance calculations require external tools (e.g., online calculators or scipy).*
+*Template from campaign-analytics skill. Statistical significance calculations require the local standard-library calculator in this repository.*

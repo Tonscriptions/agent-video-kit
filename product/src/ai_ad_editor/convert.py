@@ -6,8 +6,7 @@ import xml.etree.ElementTree as ET
 import copy
 from pathlib import Path
 from typing import Any
-from urllib.parse import unquote, urlparse
-from urllib.request import url2pathname
+from .policy import assert_local_project_reference
 
 from .media import classify_path, probe_media
 from .project import TICKS_PER_SECOND, create_project, save_project
@@ -20,13 +19,7 @@ def report_item(capability: str, status: str, source: str, target: str | None = 
 
 
 def _path_from_uri(value: str) -> Path:
-    parsed = urlparse(value)
-    if parsed.scheme.lower() == "file":
-        path = url2pathname(unquote(parsed.path))
-        if parsed.netloc:
-            path = f"\\\\{parsed.netloc}{path}"
-        return Path(path)
-    return Path(value.replace("file://", ""))
+    return assert_local_project_reference(value, field="media_reference.target_url")
 
 
 def export_agent_project(root: Path, project: dict[str, Any], output: Path) -> dict[str, Any]:

@@ -94,4 +94,4 @@ The directory name is `{video_stem}_frames`. All frame paths in the JSON output 
 
 ## Using with Claude
 
-To visually inspect the video content, use the Read tool on the frame paths returned in the `frames` array. Claude can view JPEG images directly and describe their contents. Combined with the transcript, this provides full video understanding without any cloud APIs.
+To visually inspect the video content, use the Read tool on the frame paths returned in the `frames` array. An Agent can inspect local JPEG images directly and describe their contents. Combined with the transcript, this provides full video understanding without any network services.

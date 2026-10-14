@@ -8,7 +8,6 @@ import json
 import os
 from pathlib import Path
 import re
-import runpy
 import sys
 from urllib.parse import unquote
 
@@ -36,13 +35,18 @@ for entry in manifest["skills"]:
     registered = registration.is_dir() and os.path.samefile(md, registration / "SKILL.md")
     if manifest["status"] == "registered" and not registered:
         failures.append({"name": root.name, "check": "junction_registration"})
-    ui = yaml.safe_load((root / "agents" / "openai.yaml").read_text(encoding="utf-8"))
-    interface = ui.get("interface", {}) if isinstance(ui, dict) else {}
-    invocation = entry.get("invocation", f"${entry['name']}")
-    if not interface.get("display_name"):
-        failures.append({"name": root.name, "check": "invocation_metadata"})
-    if invocation not in str(interface.get("default_prompt", "")):
-        failures.append({"name": root.name, "check": "invocation_metadata"})
+    ui_path = root / "agents" / "openai.yaml"
+    interface = {}
+    if ui_path.exists():
+        ui = yaml.safe_load(ui_path.read_text(encoding="utf-8"))
+        interface = ui.get("interface", {}) if isinstance(ui, dict) else {}
+        invocation = entry.get("invocation", f"${entry['name']}")
+        if not interface.get("display_name"):
+            failures.append({"name": root.name, "check": "invocation_metadata"})
+        if invocation not in str(interface.get("default_prompt", "")):
+            failures.append({"name": root.name, "check": "invocation_metadata"})
+    elif entry.get("source_kind") not in {"local-only-skill", "local-product-skill"}:
+        failures.append({"name": root.name, "check": "invocation_metadata_missing"})
     # Check all Markdown resources, including the router's bundled references.
     for resource in root.rglob("*.md"):
         text = resource.read_text(encoding="utf-8")
@@ -73,25 +77,13 @@ for entry in manifest["skills"]:
     entry["skill_md_sha256"] = hashlib.sha256(md.read_bytes()).hexdigest()
     verified.append({"name": root.name, "skill_valid": valid, "registration_same_file": registered})
 
-jianying = PROJECT / "skills" / "video-cut-jianying-editor"
-bootstrap_results = []
-for relative in ["scripts/utils/skill_path.py", "examples/_bootstrap.py"]:
-    # These two upstream modules only define resolver helpers and import os/sys/typing.
-    module = runpy.run_path(str(jianying / relative))
-    result = module["resolve_skill_root"](str(PROJECT / "projects" / "bootstrap-check"))
-    candidate = result[0] if isinstance(result, tuple) else result
-    correct = bool(candidate) and os.path.samefile(candidate, jianying)
-    bootstrap_results.append({"module": relative, "resolved_root": candidate, "correct": correct})
-    if not correct:
-        failures.append({"name": jianying.name, "check": "python_bootstrap", "module": relative})
-
 report = {
     "checked_at_utc": datetime.now(timezone.utc).isoformat(), "skill_count": len(verified),
     "failures": failures, "unresolved_markdown_links": unresolved, "skills": verified,
-    "adapted_python_files_compiled": len(adapted_python), "jianying_bootstrap": bootstrap_results,
-    "scope": "Local file/metadata/registration checks; no rendering, model/API calls, browser, Docker or WSL execution.",
+    "adapted_python_files_compiled": len(adapted_python),
+    "scope": "Local file/metadata/registration checks; local-only production Skills; no rendering, model/API calls, browser, Docker or WSL execution.",
 }
 (PROJECT / "research" / "video-cut-validation.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-print(json.dumps({"skills": len(verified), "failures": failures, "unresolved_links": unresolved, "adapted_python_files_compiled": len(adapted_python), "jianying_bootstrap": bootstrap_results}, ensure_ascii=False, indent=2))
+print(json.dumps({"skills": len(verified), "failures": failures, "unresolved_links": unresolved, "adapted_python_files_compiled": len(adapted_python)}, ensure_ascii=False, indent=2))
 sys.exit(1 if failures else 0)

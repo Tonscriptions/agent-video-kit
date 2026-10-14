@@ -49,6 +49,7 @@ from .migration import SUPPORTED_SOURCE_VERSIONS, migrate_project_payload
 from .speech import flite_available, synthesize_local_tts
 from .effects import EFFECT_CATALOG_VERSION, get_effect, list_effects
 from .scopes import SCOPE_VERSION, generate_scopes
+from .policy import audit_local_tree, policy_error_from_findings, require_local_reference
 from .render_queue import JOB_STATUSES, cancel_path, enqueue as enqueue_render_jobs, find_job, load_queue, normalize_job, queue_path, save_queue, set_status
 from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
@@ -331,6 +332,10 @@ def build_parser() -> argparse.ArgumentParser:
     opinspect.add_argument("--operation-id", required=True)
     _leaf_common(subs.add_parser("version", help="版本信息"))
     _leaf_common(subs.add_parser("capabilities", help="输出本地 Agent 能力清单"))
+    policy = subs.add_parser("policy", help="本地运行策略")
+    policy_sub = policy.add_subparsers(dest="action", required=True)
+    policy_audit = _leaf_common(policy_sub.add_parser("audit", help="审计项目产物中的远程/闭源引用"))
+    policy_audit.add_argument("--project", required=True)
     return parser
 
 
@@ -519,8 +524,11 @@ def command_media_ingest(args: argparse.Namespace) -> dict[str, Any]:
         shutil.copy2(source, destination)
     digest = sha256_file(source)
     uri = str(destination.relative_to(root)).replace("\\", "/")
-    asset = {"id": asset_id, "kind": kind, "uri": uri, "sha256": f"sha256:{digest}", "probe": probe, "rights_ref": asset_id, "source": {"source_url": args.source_url or f"local://{source}", "retrieved_at": now_iso(), "original_name": source.name}}
-    record = {"asset_id": asset_id, "kind": kind, "sha256": f"sha256:{digest}", "source_url": args.source_url or f"local://{source}", "source_version": "local", "retrieved_at": now_iso(), "creator": args.creator, "license_spdx": args.license_spdx, "license_url": args.license_url, "attribution": "", "permitted_uses": list(dict.fromkeys(args.permitted_use)), "restrictions": [], "evidence": args.evidence or ("" if args.verification_status == "unverified" else f"local://{source}"), "verification_status": args.verification_status, "verified_by": "ai-ad-editor" if args.verification_status == "verified" else "", "takedown_status": "clear", "notes": "Imported by local CLI"}
+    source_reference = require_local_reference(args.source_url or f"local://{source}", field="--source-url")
+    license_reference = require_local_reference(args.license_url, field="--license-url") if args.license_url else ""
+    evidence_reference = require_local_reference(args.evidence, field="--evidence") if args.evidence else ("" if args.verification_status == "unverified" else f"local://{source}")
+    asset = {"id": asset_id, "kind": kind, "uri": uri, "sha256": f"sha256:{digest}", "probe": probe, "rights_ref": asset_id, "source": {"source_url": source_reference, "retrieved_at": now_iso(), "original_name": source.name}}
+    record = {"asset_id": asset_id, "kind": kind, "sha256": f"sha256:{digest}", "source_url": source_reference, "source_version": "local", "retrieved_at": now_iso(), "creator": args.creator, "license_spdx": args.license_spdx, "license_url": license_reference, "attribution": "", "permitted_uses": list(dict.fromkeys(args.permitted_use)), "restrictions": [], "evidence": evidence_reference, "verification_status": args.verification_status, "verified_by": "ai-ad-editor" if args.verification_status == "verified" else "", "takedown_status": "clear", "notes": "Imported by local CLI"}
     if args.dry_run:
         return _envelope("media.ingest", args, status="planned", data={"asset": asset, "rights_record": record})
     project.setdefault("assets", []).append(asset)
@@ -1910,6 +1918,9 @@ def command_doctor(args: argparse.Namespace) -> dict[str, Any]:
     checks["ffmpeg_version"] = ffmpeg_version() if checks["tools"].get("ffmpeg") else None
     checks["local_features"] = {"flite_tts": flite_available() if checks["tools"].get("ffmpeg") else False}
     checks["policy"] = {"docker_or_wsl_started": False, "closed_services_enabled": False, "jianying_runtime_enabled": False}
+    if args.project:
+        policy_report = audit_local_tree(Path(args.project))
+        checks["project_policy"] = policy_report
     ok = bool(checks["native_windows"] and checks["tools"].get("ffmpeg") and checks["tools"].get("ffprobe"))
     return _envelope("doctor", args, data={"ok": ok, "checks": checks}, status="succeeded" if ok else "failed", errors=[] if ok else [{"code": "DEPENDENCY_UNAVAILABLE", "message": "FFmpeg/FFprobe 不完整", "retryable": False}])
 
@@ -1928,6 +1939,15 @@ def command_version(args: argparse.Namespace) -> dict[str, Any]:
 
 def command_capabilities(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("capabilities", args, data=build_capability_manifest())
+
+
+def command_policy_audit(args: argparse.Namespace) -> dict[str, Any]:
+    root = Path(args.project).expanduser().resolve()
+    report = audit_local_tree(root)
+    error = policy_error_from_findings(report)
+    if error:
+        return _envelope("policy.audit", args, data=report, status="failed", errors=[error.as_dict()])
+    return _envelope("policy.audit", args, data=report)
 
 
 def _idempotency_context(args: argparse.Namespace) -> tuple[Path, Path, str] | None:
@@ -1982,6 +2002,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("operation", "inspect"): command_operation_inspect,
     ("version", None): command_version,
     ("capabilities", None): command_capabilities,
+    ("policy", "audit"): command_policy_audit,
 }
 
 

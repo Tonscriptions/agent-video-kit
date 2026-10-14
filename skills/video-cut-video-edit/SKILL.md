@@ -15,8 +15,6 @@ metadata:
     original_name: video-edit
 ---
 
-Read [local installation rules](references/local-installation.md) before running the upstream workflow.
-
 # Video Edit
 
 Edit videos locally by running ffmpeg/ffprobe directly. No wrapper scripts needed.
@@ -26,13 +24,7 @@ Edit videos locally by running ffmpeg/ffprobe directly. No wrapper scripts neede
 Install ffmpeg (includes ffprobe):
 
 ```bash
-# macOS
-brew install ffmpeg
-
-# Ubuntu/Debian
-sudo apt update && sudo apt install -y ffmpeg
-
-# Verify
+# Verify the native Windows tools already installed for this workspace
 ffmpeg -version && ffprobe -version
 ```
 
@@ -115,7 +107,7 @@ ffmpeg -y -i video.mp4 -i logo.png \
 | Platform   | Resolution  | Scale + pad filter                                                                                    |
 |------------|-------------|-------------------------------------------------------------------------------------------------------|
 | TikTok     | 1080 x 1920 | `scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black`       |
-| YouTube    | 1920 x 1080 | `scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black`       |
+| Landscape  | 1920 x 1080 | `scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black`       |
 | Instagram  | 1080 x 1350 | `scale=1080:1350:force_original_aspect_ratio=decrease,pad=1080:1350:(ow-iw)/2:(oh-ih)/2:black`       |
 | Square     | 1080 x 1080 | `scale=1080:1080:force_original_aspect_ratio=decrease,pad=1080:1080:(ow-iw)/2:(oh-ih)/2:black`       |
 | Twitter/X  | 1920 x 1080 | `scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black`       |

@@ -141,6 +141,28 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 0, otio_import_result)
             self.assertTrue((otio_imported / "project.json").exists())
 
+    def test_local_policy_rejects_remote_ingest_metadata_and_audits_project(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-policy-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, rejected = invoke(
+                "media", "ingest", "--project", str(project), "--input", str(source),
+                "--source-url", "https://closed.example/media.mp4",
+            )
+            self.assertEqual(code, 2, rejected)
+            self.assertEqual(rejected["errors"][0]["code"], "ARGUMENT_INVALID")
+            self.assertEqual(json.loads((project / "project.json").read_text(encoding="utf-8"))["assets"], [])
+
+            remote_operation = project / "operations" / "remote.json"
+            remote_operation.write_text(json.dumps({"provider": "https://api.example.invalid/render"}), encoding="utf-8")
+            code, audit = invoke("policy", "audit", "--project", str(project))
+            self.assertEqual(code, 2, audit)
+            self.assertEqual(audit["status"], "failed")
+            self.assertEqual(audit["errors"][0]["code"], "POLICY_REMOTE_REFERENCE")
+            self.assertFalse(audit["data"]["ok"])
+
     def test_persistent_render_queue_lifecycle(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-queue-") as raw:
             workspace = Path(raw)

@@ -136,6 +136,12 @@ def build_capability_manifest() -> dict[str, Any]:
                 "tts_contract": "tts.synthesize_uses_ffmpeg_flite_and_writes_project_local_wav_without_network_or_model_download",
                 "limits": ["model_weights_must_be_provided_locally", "flite_voice_inventory_depends_on_local_ffmpeg_build", "flite_adapter_is_ascii_english_only", "multilingual_model_tts_adapter_pending"],
             },
+            "policy": {
+                "status": "implemented",
+                "network": "disabled",
+                "features": ["local_reference_validation", "project_json_remote_reference_audit", "provider_marker_detection", "remote_media_rejection"],
+                "limits": ["research_and_documentation_urls_are_not_runtime_inputs", "local_models_must_be_registered_by_path_and_hash"],
+            },
         },
         "policies": {
             "closed_services_enabled": False,

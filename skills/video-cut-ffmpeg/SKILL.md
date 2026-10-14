@@ -1,7 +1,7 @@
 ---
 name: video-cut-ffmpeg
-description: Video and audio processing with FFmpeg. Use for format conversion, resizing, compression, audio extraction,
-  and preparing assets for Remotion. Triggers include converting GIF to MP4, resizing video, extracting audio, compressing
+description: Video and audio processing with local FFmpeg. Use for format conversion, resizing, compression, audio extraction,
+  and preparing assets for the Agent Project renderer. Triggers include converting GIF to MP4, resizing video, extracting audio, compressing
   files, or any media transformation task.
 metadata:
   video_cut_source:
@@ -11,15 +11,13 @@ metadata:
     original_name: ffmpeg
 ---
 
-Read [local installation rules](references/local-installation.md) before running the upstream workflow.
+# FFmpeg for Local Video Production
 
-# FFmpeg for Video Production
-
-FFmpeg is the essential tool for video/audio processing. This skill covers common operations for Remotion video projects.
+FFmpeg is the local codec and filter backend. This skill covers common operations for Agent Project assets and render fixtures.
 
 ## Quick Reference
 
-### GIF to MP4 (Remotion-compatible)
+### GIF to MP4
 
 ```bash
 ffmpeg -i input.gif -movflags faststart -pix_fmt yuv420p \
@@ -73,7 +71,7 @@ ffmpeg -i input.mp4 -vn output.wav
 ### Convert Audio Formats
 
 ```bash
-# M4A to MP3 (for ElevenLabs voice samples)
+# M4A to MP3 (for a local voice sample)
 ffmpeg -i input.m4a -codec:a libmp3lame -qscale:a 2 output.mp3
 
 # WAV to MP3
@@ -147,13 +145,13 @@ ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:no
 ffprobe -v quiet -print_format json -show_format -show_streams input.mp4
 ```
 
-## Remotion-Specific Patterns
+## Agent Project-Specific Patterns
 
-### Video Speed Adjustment for Remotion
+### Video Speed Adjustment for Agent Project
 
-**When to use FFmpeg vs Remotion `playbackRate`:**
+**When to use FFmpeg vs Agent Project `playbackRate`:**
 
-| Scenario | Use FFmpeg | Use Remotion |
+| Scenario | Use FFmpeg | Use Agent Project |
 |----------|------------|--------------|
 | Constant speed (1.5x, 2x) | Either works | ✅ Simpler |
 | Extreme speeds (>4x or <0.25x) | ✅ More reliable | May have issues |
@@ -161,7 +159,7 @@ ffprobe -v quiet -print_format json -show_format -show_streams input.mp4
 | Need perfect audio sync | ✅ Guaranteed | Usually fine |
 | Demo needs to fit voiceover timing | ✅ Pre-calculate | Runtime adjustment |
 
-**Remotion limitation:** `playbackRate` must be constant. Dynamic interpolation like `playbackRate={interpolate(frame, [0, 100], [1, 5])}` won't work correctly because Remotion evaluates frames independently.
+**Agent Project limitation:** `playbackRate` must be constant. Dynamic interpolation like `playbackRate={interpolate(frame, [0, 100], [1, 5])}` won't work correctly because Agent Project evaluates frames independently.
 
 ```bash
 # Speed up demo to fit a scene (e.g., 60s demo into 20s = 3x speed)
@@ -197,10 +195,10 @@ ffmpeg -i long-demo.mp4 -filter:v "setpts=0.1*PTS" -an public/demos/timelapse.mp
 -filter_complex "[0:a]atempo=2.0,atempo=2.0,atempo=2.0[a]"
 ```
 
-### Prepare Demo Recording for Remotion
+### Prepare Demo Recording for Agent Project
 
 ```bash
-# Standard 1080p, 30fps, Remotion-ready
+# Standard 1080p, 30fps, Agent Project-ready
 ffmpeg -i raw-recording.mp4 \
   -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=30" \
   -c:v libx264 -crf 18 -preset slow \
@@ -209,7 +207,7 @@ ffmpeg -i raw-recording.mp4 \
   public/demos/demo.mp4
 ```
 
-### Screen Recording to Remotion Asset
+### Screen Recording to Agent Project Asset
 
 ```bash
 # From iPhone/iPad recording (usually 60fps, variable resolution)
@@ -255,25 +253,25 @@ Increase CRF (23→28) or reduce resolution
 
 ## Platform-Specific Output Optimization
 
-After Remotion renders your video (typically to `out/video.mp4`), use FFmpeg to optimize for each distribution platform.
+After Agent Project renders your video (typically to `out/video.mp4`), use FFmpeg to optimize for each distribution platform.
 
 ### Workflow Integration
 
 ```
-Remotion render (master)     FFmpeg optimization      Platform upload
+Agent Project render (master)     FFmpeg optimization      Platform upload
        ↓                            ↓                       ↓
-   out/video.mp4  ────────→  out/video-youtube.mp4  ───→  YouTube
+   out/video.mp4  ────────→  out/video-youtube.mp4  ───→  distribution target
                   ────────→  out/video-twitter.mp4  ───→  Twitter/X
                   ────────→  out/video-linkedin.mp4 ───→  LinkedIn
                   ────────→  out/video-web.mp4      ───→  Website embed
 ```
 
-### YouTube (Recommended Settings)
+### distribution target (Recommended Settings)
 
-YouTube re-encodes everything, so upload high quality:
+distribution target re-encodes everything, so upload high quality:
 
 ```bash
-# YouTube optimized (1080p)
+# distribution target optimized (1080p)
 ffmpeg -i out/video.mp4 \
   -c:v libx264 -preset slow -crf 18 \
   -profile:v high -level 4.0 \
@@ -282,7 +280,7 @@ ffmpeg -i out/video.mp4 \
   -movflags +faststart \
   out/video-youtube.mp4
 
-# YouTube Shorts (vertical 1080x1920)
+# distribution target Shorts (vertical 1080x1920)
 ffmpeg -i out/video.mp4 \
   -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2" \
   -c:v libx264 -crf 18 -c:a aac -b:a 192k \
@@ -362,7 +360,7 @@ ffmpeg -i out/video.mp4 -t 3 \
 
 | Platform | Max Resolution | Max Size | Max Duration | Audio |
 |----------|---------------|----------|--------------|-------|
-| YouTube | 8K | 256GB | 12 hours | AAC 48kHz |
+| distribution target | 8K | 256GB | 12 hours | AAC 48kHz |
 | Twitter/X | 1920x1200 | 512MB | 140s | AAC 44.1kHz |
 | LinkedIn | 4096x2304 | 5GB | 10 min | AAC 48kHz |
 | Instagram Feed | 1080x1350 | 4GB | 60s | AAC 48kHz |
@@ -376,7 +374,7 @@ ffmpeg -i out/video.mp4 -t 3 \
 # save as: export-all-platforms.sh
 INPUT="out/video.mp4"
 
-# YouTube (high quality)
+# distribution target (high quality)
 ffmpeg -i "$INPUT" -c:v libx264 -preset slow -crf 18 \
   -c:a aac -b:a 192k -movflags +faststart \
   out/video-youtube.mp4
