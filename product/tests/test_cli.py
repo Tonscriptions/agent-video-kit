@@ -863,6 +863,68 @@ class P0CliTests(unittest.TestCase):
         self.assertEqual(filters[1], "tblend=all_mode=average")
         self.assertEqual([item["code"] for item in warnings], ["EFFECT_PARAMETER_INVALID", "EFFECT_PARAMETER_INVALID", "EFFECT_PARAMETER_INVALID"])
 
+    def test_project_lut_library_registers_and_resolves_lut_id(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-lut-library-") as raw:
+            workspace = Path(raw)
+            project = workspace / "project"
+            source = workspace / "neutral.cube"
+            source.write_text(
+                '\n'.join([
+                    'TITLE "Neutral"',
+                    "LUT_3D_SIZE 2",
+                    "DOMAIN_MIN 0 0 0",
+                    "DOMAIN_MAX 1 1 1",
+                    "0 0 0", "0 0 1", "0 1 0", "0 1 1",
+                    "1 0 0", "1 0 1", "1 1 0", "1 1 1",
+                    "",
+                ]),
+                encoding="utf-8",
+            )
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, registered = invoke(
+                "lut", "register", "--project", str(project), "--input", str(source),
+                "--lut-id", "lut_neutral", "--license-spdx", "CC0-1.0",
+                "--verification-status", "verified",
+            )
+            self.assertEqual(code, 0, registered)
+            self.assertEqual(registered["data"]["lut"]["id"], "lut_neutral")
+            self.assertEqual(registered["data"]["lut"]["metadata"]["lut_3d_size"], 2)
+            registered_path = project / "assets" / "luts" / "lut_neutral.cube"
+            self.assertTrue(registered_path.exists())
+            self.assertTrue((project / "assets" / "lut-library.json").exists())
+            code, listed = invoke("lut", "list", "--project", str(project), "--query", "neutral")
+            self.assertEqual(code, 0, listed)
+            self.assertEqual(listed["data"]["count"], 1)
+            code, inspected = invoke("lut", "inspect", "--project", str(project), "--lut-id", "lut_neutral")
+            self.assertEqual(code, 0, inspected)
+            self.assertTrue(inspected["data"]["exists"])
+            self.assertTrue(inspected["data"]["hash_matches"])
+            warnings: list[dict] = []
+            filters = _effect_filters(
+                [{"type": "lut3d", "parameters": {"lut_id": "lut_neutral"}}],
+                warnings,
+                "lut_clip",
+                root=project,
+            )
+            self.assertEqual(warnings, [])
+            self.assertEqual(len(filters), 1)
+            self.assertIn("lut3d=file=", filters[0])
+            self.assertIn("lut_neutral.cube", filters[0])
+            _, ingest_result = invoke("media", "ingest", "--project", str(project), "--input", str(self.make_media(workspace)))
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": ingest_result["data"]["asset"]["id"],
+                "source_in_tick": 0, "source_out_tick": 90000,
+                "effects": [{"type": "lut3d", "parameters": {"lut_id": "lut_neutral"}}],
+            }]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            code, validated = invoke("validate", "--project", str(project))
+            self.assertEqual(code, 0, validated)
+            registered_path.write_text(registered_path.read_text(encoding="utf-8") + "\n# changed after registration\n", encoding="utf-8")
+            code, rejected = invoke("validate", "--project", str(project))
+            self.assertEqual(code, 2, rejected)
+            self.assertTrue(any(item.get("code") == "LUT_HASH_MISMATCH" for item in rejected["errors"]), rejected)
+
     def test_runtime_storage_is_local_to_product(self) -> None:
         paths = configure_local_runtime()
         self.assertEqual(Path(paths["root"]).resolve(), (ROOT / "product" / ".runtime").resolve())
@@ -2698,6 +2760,29 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 0, rendered)
             self.assertTrue(output.exists())
             self.assertFalse(any(item.get("code") == "RENDER_FEATURE_UNSUPPORTED" for item in rendered["warnings"]))
+
+    def test_crossfade_transition_auto_handles_contiguous_clips(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-transition-auto-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest_result = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingest_result["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [
+                {"op": "append_clip", "track_id": "track_video_1", "id": "auto_a", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000, "timeline_start_tick": 0, "duration_tick": 90000},
+                {"op": "append_clip", "track_id": "track_video_1", "id": "auto_b", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000, "timeline_start_tick": 90000, "duration_tick": 90000, "transition_in": {"type": "crossfade", "duration": 0.1, "auto_handle": True}},
+            ]}), encoding="utf-8")
+            code, result = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
+            self.assertEqual(code, 0, result)
+            output = project / "renders" / "crossfade-auto.mp4"
+            code, rendered = invoke("render", "--project", str(project), "--output", str(output))
+            self.assertEqual(code, 0, rendered)
+            self.assertTrue(output.exists())
+            self.assertFalse(any(item.get("code") == "RENDER_FEATURE_UNSUPPORTED" for item in rendered["warnings"]), rendered)
+            self.assertTrue(any(item.get("feature") == "complex_transition_auto_handle" for item in rendered["warnings"]), rendered)
+            self.assertGreater(probe_media(output)["duration_seconds"], 1.8)
 
     def test_extended_xfade_catalog_transition_renders(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-xfade-catalog-") as raw:

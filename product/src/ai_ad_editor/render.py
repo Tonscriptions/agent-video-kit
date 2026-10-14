@@ -1282,6 +1282,18 @@ def _effect_filters(
 
         if name in {"lut", "lut3d", "cube", "look"}:
             raw_lut_path = parameters.get("path", parameters.get("file", parameters.get("lut")))
+            lut_id = parameters.get("lut_id")
+            if lut_id is not None and str(lut_id).strip():
+                if root is None:
+                    warnings.append({"code": "LUT_ID_CONTEXT_MISSING", "clip_id": clip_id, "feature": "lut3d", "message": "lut_id 引用需要项目根目录上下文"})
+                    continue
+                from .lut_library import resolve_lut_path
+
+                resolved_lut = resolve_lut_path(root, str(lut_id).strip())
+                if resolved_lut is None:
+                    warnings.append({"code": "LUT_ID_MISSING", "clip_id": clip_id, "feature": "lut3d", "message": f"LUT 库中不存在: {lut_id}"})
+                    continue
+                raw_lut_path = resolved_lut[0]
             if not raw_lut_path:
                 warnings.append({"code": "LUT_FILE_MISSING", "clip_id": clip_id, "feature": "lut3d", "message": "LUT 效果没有提供 path/file"})
                 continue
@@ -2935,7 +2947,11 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             if next_spec and transition_type in complex_types:
                 transition_duration = max(0.001, _num(transition.get("duration", 0.25), 0.25))
                 expected_start = float(current_spec["start"]) + float(current_spec["duration"]) - transition_duration
-                if transition_duration < float(current_spec["duration"]) and transition_duration < float(next_spec["duration"]) and abs(float(next_spec["start"]) - expected_start) <= max(1.0 / max(1, int(fps["num"])), 0.01):
+                frame_tolerance = max(1.0 / max(1, int(fps["num"])), 0.01)
+                overlap_handles = abs(float(next_spec["start"]) - expected_start) <= frame_tolerance
+                contiguous = abs(float(next_spec["start"]) - (float(current_spec["start"]) + float(current_spec["duration"]))) <= frame_tolerance
+                auto_handle = bool(transition.get("auto_handle", False)) or str(transition.get("handle_policy", "")).lower() == "auto"
+                if transition_duration < float(current_spec["duration"]) and transition_duration < float(next_spec["duration"]) and (overlap_handles or (auto_handle and contiguous)):
                     left_trim = f"tr{len(final_specs)}a"
                     right_trim = f"tr{len(final_specs)}b"
                     output_label = f"transition{len(final_specs)}"
@@ -2949,8 +2965,12 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                         transition_name = {"left": "slideleft", "right": "slideright", "up": "slideup", "down": "slidedown"}.get(direction, "slideright")
                     if transition_name not in XFADE_TRANSITIONS:
                         transition_name = "fade"
-                    filters.append(f"[{left_trim}][{right_trim}]xfade=transition={transition_name}:duration={transition_duration:.6f}:offset={float(current_spec['duration']) - transition_duration:.6f},setpts=PTS-STARTPTS+{float(current_spec['start']):.6f}/TB[{output_label}]")
-                    final_specs.append({"label": output_label, "position": current_spec["position"], "track_id": current_spec.get("track_id"), "track_order": current_spec.get("track_order", 0), "layer_order": current_spec.get("layer_order", len(final_specs)), "clip_id": f"{current_spec.get('clip_id')}+{next_spec.get('clip_id')}", "start": current_spec["start"], "duration": float(current_spec["duration"]) + float(next_spec["duration"]) - transition_duration})
+                    preserve_contiguous_duration = auto_handle and contiguous and not overlap_handles
+                    tail_padding = f",tpad=stop_mode=clone:stop_duration={transition_duration:.6f}" if preserve_contiguous_duration else ""
+                    filters.append(f"[{left_trim}][{right_trim}]xfade=transition={transition_name}:duration={transition_duration:.6f}:offset={float(current_spec['duration']) - transition_duration:.6f}{tail_padding},setpts=PTS-STARTPTS+{float(current_spec['start']):.6f}/TB[{output_label}]")
+                    if preserve_contiguous_duration:
+                        warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": next_spec.get("clip_id"), "feature": "complex_transition_auto_handle", "message": "相邻片段没有重叠句柄，已用本地 xfade 并保持原时间线长度；转场尾部使用最后一帧填充"})
+                    final_specs.append({"label": output_label, "position": current_spec["position"], "track_id": current_spec.get("track_id"), "track_order": current_spec.get("track_order", 0), "layer_order": current_spec.get("layer_order", len(final_specs)), "clip_id": f"{current_spec.get('clip_id')}+{next_spec.get('clip_id')}", "start": current_spec["start"], "duration": float(current_spec["duration"]) + float(next_spec["duration"]) if preserve_contiguous_duration else float(current_spec["duration"]) + float(next_spec["duration"]) - transition_duration})
                     index += 2
                     continue
                 warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": next_spec.get("clip_id"), "feature": "complex_transition", "message": "复杂转场要求相邻片段有匹配的重叠时间句柄，当前已保留但未执行"})

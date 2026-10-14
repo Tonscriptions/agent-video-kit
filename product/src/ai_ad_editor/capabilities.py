@@ -36,6 +36,14 @@ def build_capability_manifest() -> dict[str, Any]:
                 "visual_similarity_contract": "optional_ffmpeg_ahash_v1_samples_with_hamming_distance_candidate_groups",
                 "limits": ["no_vlm_embeddings", "no_content_understanding_without_local_model", "duplicate_detection_is_exact_hash_only", "visual_similarity_is_a_review_candidate_not_content_understanding", "incremental_refresh_trusts_file_stat_and_sidecar_signatures", "subtitle_sidecar_requires_matching_relative_stem"],
             },
+            "lut_library": {
+                "status": "implemented",
+                "features": ["project_local_registration", "sha256_identity", "cube_metadata", "list", "inspect", "rights_ledger_registration", "lut_id_effect_reference", "hash_mismatch_gate"],
+                "library_version": "0.1.0",
+                "path": "assets/lut-library.json",
+                "extensions": [".cube", ".3dl", ".csp", ".dat"],
+                "limits": ["non_cube_metadata_is_extension_only", "lut_intensity_pending", "snapshot_restore_does_not_delete_newly_copied_asset_files"],
+            },
             "project": {
                 "status": "implemented",
                 "features": ["init", "inspect", "migrate", "atomic_save", "native_process_write_lock", "snapshot", "restore", "before_mutation_snapshot"],
@@ -71,7 +79,7 @@ def build_capability_manifest() -> dict[str, Any]:
                 "unknown_effect_policy": "RENDER_FEATURE_UNSUPPORTED",
                 "effect_keyframe_contract": "brightness_contrast_saturation_hue_gamma_vignette_use_local_eq_hue_vignette_eval_frame",
                 "adjustment_contract": "settings.adjustments_are_applied_after_track_compositing_in_declared_order; start_tick_and_duration_tick_define_optional_sequence_clock_intervals",
-                "limits": ["unsupported_effect_parameters_use_static_value_with_warning", "new_native_filters_are_static_only_and_warn_on_parameter_keyframes", "curves_accept_one_whitelist_validated_all_master_curve", "interval_adjustments_are_video_only_and_reassembled_with_trim_concat", "lut_intensity_and_lut_library_management_pending"],
+                "limits": ["unsupported_effect_parameters_use_static_value_with_warning", "new_native_filters_are_static_only_and_warn_on_parameter_keyframes", "curves_accept_one_whitelist_validated_all_master_curve", "interval_adjustments_are_video_only_and_reassembled_with_trim_concat", "lut_intensity_pending"],
             },
             "compositing": {
                 "status": "implemented",
@@ -82,9 +90,9 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "transitions": {
                 "status": "implemented",
-                "features": ["fade", "crossfade", "dissolve", "wipe", "slide", "circlecrop", "rectcrop", "distance", "fadeblack", "fadewhite", "radial", "smooth", "circleopen", "circleclose", "pixelize", "zoomin", "cover", "reveal", "diagonal", "slice", "wind", "blur", "fadegrays", "squeeze"],
+                "features": ["fade", "crossfade", "dissolve", "wipe", "slide", "circlecrop", "rectcrop", "distance", "fadeblack", "fadewhite", "radial", "smooth", "circleopen", "circleclose", "pixelize", "zoomin", "cover", "reveal", "diagonal", "slice", "wind", "blur", "fadegrays", "squeeze", "auto_handle_contiguous_clips"],
                 "xfade_catalog": "local_ffmpeg_xfade",
-                "condition": "overlap transitions require adjacent clips with matching overlap handles; otherwise the CLI returns an explicit unsupported warning",
+                "condition": "manual transitions require adjacent clips with matching overlap handles; auto_handle=true or handle_policy=auto enables contiguous clips and preserves their authored timeline length with an explicit tail-padding approximation warning",
             },
             "subtitles": {
                 "status": "implemented",

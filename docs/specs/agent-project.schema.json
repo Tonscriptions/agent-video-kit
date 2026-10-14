@@ -281,6 +281,8 @@
         "type": {"type": "string", "minLength": 1},
         "duration": {"type": "number", "exclusiveMinimum": 0},
         "direction": {"type": "string"},
+        "auto_handle": {"type": "boolean"},
+        "handle_policy": {"type": "string", "enum": ["manual", "auto"]},
         "version": {"type": "string"},
         "parameters": {"type": "object"}
       }

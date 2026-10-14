@@ -159,8 +159,9 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
     }),
     _effect("lut3d", backend="ffmpeg:lut3d", category="color", aliases=("lut", "cube", "look"), parameters={
         "path": _parameter("path", ""),
+        "lut_id": _parameter("string", "", description="项目内 lut register 生成的稳定资源 ID"),
         "interpolation": _parameter("enum", "tetrahedral", description="nearest, trilinear, tetrahedral, pyramid or prism"),
-    }, limits=("path_must_be_project_local",)),
+    }, limits=("path_or_registered_lut_id_must_be_project_local", "intensity_pending")),
     _effect("noise", backend="ffmpeg:noise", category="stylize", aliases=("film_grain",), parameters={"amount": _parameter("integer", 8, minimum=1, maximum=100)}),
     _effect("posterize", backend="ffmpeg:lutrgb", category="stylize", aliases=("posterization",), parameters={"levels": _parameter("integer", 8, minimum=2, maximum=256)}),
     _effect("sepia", backend="ffmpeg:colorchannelmixer", category="stylize"),

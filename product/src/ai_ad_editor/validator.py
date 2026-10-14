@@ -9,7 +9,8 @@ from typing import Any
 from .policy import reference_kind, resolve_local_path
 from .project import asset_map
 from .rights import check_project_rights, load_ledger
-from .utils import ID_RE
+from .lut_library import find_lut
+from .utils import ID_RE, sha256_file
 
 
 TRANSITION_TYPES = {
@@ -101,8 +102,17 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
         if effect_type not in LUT_EFFECT_TYPES:
             return
         parameters = effect_value.get("parameters") if isinstance(effect_value.get("parameters"), dict) else effect_value
+        lut_id = parameters.get("lut_id")
         raw_path = parameters.get("path", parameters.get("file", parameters.get("lut")))
         path_field = f"{effect_path}.parameters.path"
+        registered_record = None
+        if lut_id is not None and str(lut_id).strip():
+            path_field = f"{effect_path}.parameters.lut_id"
+            registered_record = find_lut(root, str(lut_id).strip())
+            if registered_record is None:
+                error("LUT_ID_MISSING", f"LUT 库中不存在: {lut_id}", path_field)
+                return
+            raw_path = registered_record.get("uri")
         if raw_path is None or not str(raw_path).strip():
             error("LUT_PATH_MISSING", "LUT 效果必须提供 parameters.path/file", path_field)
             return
@@ -124,6 +134,14 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
             error("LUT_FILE_MISSING", f"LUT 文件不存在: {lut_path}", path_field)
         if lut_path.suffix.lower() not in LUT_EXTENSIONS:
             error("LUT_EXTENSION_UNSUPPORTED", "LUT 文件扩展名只支持 .cube、.3dl、.csp 或 .dat", path_field)
+        if registered_record is not None and lut_path.exists() and lut_path.is_file():
+            try:
+                actual_hash = f"sha256:{sha256_file(lut_path)}"
+            except OSError as exc:
+                error("LUT_HASH_READ_FAILED", f"读取登记 LUT 哈希失败: {exc}", path_field)
+            else:
+                if actual_hash != registered_record.get("sha256"):
+                    error("LUT_HASH_MISMATCH", "登记 LUT 的 SHA-256 与项目文件不一致", path_field)
 
     if project.get("schema_version") != "0.1.0":
         error("SCHEMA_VERSION_UNSUPPORTED", "只支持 Agent Project schema 0.1.0", "schema_version")
@@ -569,6 +587,11 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                         transition_duration = math.nan
                     if not math.isfinite(transition_duration) or transition_duration <= 0:
                         error("TRANSITION_DURATION_INVALID", "转场 duration 必须是有限正数", f"{cp}.{transition_field}.duration")
+                    if "auto_handle" in transition_value and not isinstance(transition_value.get("auto_handle"), bool):
+                        error("TRANSITION_AUTO_HANDLE_INVALID", "转场 auto_handle 必须是布尔值", f"{cp}.{transition_field}.auto_handle")
+                    handle_policy = transition_value.get("handle_policy")
+                    if handle_policy is not None and str(handle_policy).lower() not in {"manual", "auto"}:
+                        error("TRANSITION_HANDLE_POLICY_INVALID", "转场 handle_policy 只能是 manual 或 auto", f"{cp}.{transition_field}.handle_policy")
                 occupied.append((start, start + dur, str(cid)))
                 for old_start, old_end, old_id in occupied[:-1]:
                     if start < old_end and old_start < start + dur and track.get("overlap_policy") != "allow":

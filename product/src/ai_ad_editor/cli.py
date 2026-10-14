@@ -39,6 +39,7 @@ from .project import (
 from .quality import GOLDEN_VERSION, build_golden_manifest, check_output, compare_golden_manifest, normalize_golden_constraints, validate_golden_manifest
 from .recommend import recommend_highlights
 from .library import duplicate_groups, index_directory, search_catalog, visual_similarity_groups
+from .lut_library import inspect_lut, list_luts, prepare_lut_registration, register_lut
 from .batch import _load_variants, run_template_batch
 from .capabilities import build_capability_manifest
 from .transcribe import transcribe_local, write_srt
@@ -409,6 +410,26 @@ def build_parser() -> argparse.ArgumentParser:
     lsimilar = _leaf_common(ls.add_parser("similar", help="按可选 FFmpeg 感知哈希列出相似画面候选组"))
     lsimilar.add_argument("--catalog", required=True)
     lsimilar.add_argument("--max-distance", type=int, default=12, help="平均哈希汉明距离上限")
+
+    lut = subs.add_parser("lut", help="项目内本地 LUT 资产库")
+    luts = lut.add_subparsers(dest="action", required=True)
+    lut_register = _leaf_common(luts.add_parser("register", help="登记并复制本地 LUT 到项目资产库"))
+    lut_register.add_argument("--project", required=True)
+    lut_register.add_argument("--input", required=True, help="本地 .cube/.3dl/.csp/.dat 文件")
+    lut_register.add_argument("--lut-id", default=None, help="稳定 LUT ID；默认由 SHA-256 派生")
+    lut_register.add_argument("--name", default=None)
+    lut_register.add_argument("--license-spdx", default="LicenseRef-UNVERIFIED")
+    lut_register.add_argument("--license-url", default="")
+    lut_register.add_argument("--permitted-use", action="append", default=["internal"])
+    lut_register.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
+    lut_register.add_argument("--evidence", default="")
+    lut_register.add_argument("--creator", default="unknown")
+    lut_list = _leaf_common(luts.add_parser("list", help="列出项目内已登记 LUT"))
+    lut_list.add_argument("--project", required=True)
+    lut_list.add_argument("--query", default=None)
+    lut_inspect = _leaf_common(luts.add_parser("inspect", help="检查 LUT 文件、哈希和元数据"))
+    lut_inspect.add_argument("--project", required=True)
+    lut_inspect.add_argument("--lut-id", required=True)
 
     doctor = _leaf_common(subs.add_parser("doctor", help="检查本机依赖"))
     doctor.add_argument("--project", default=None)
@@ -2400,6 +2421,62 @@ def command_library_similar(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def command_lut_register(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    source = Path(args.input).expanduser().resolve()
+    registration = prepare_lut_registration(root, source, lut_id=args.lut_id, name=args.name)
+    preview = {key: value for key, value in registration.items() if key != "_source_path"}
+    rights_record = {
+        "asset_id": registration["id"],
+        "kind": "lut",
+        "sha256": registration["sha256"],
+        "source_url": registration["source"]["source_url"],
+        "source_version": "local",
+        "retrieved_at": registration["registered_at"],
+        "creator": args.creator,
+        "license_spdx": args.license_spdx,
+        "license_url": require_local_reference(args.license_url, field="--license-url") if args.license_url else "",
+        "attribution": "",
+        "permitted_uses": list(dict.fromkeys(args.permitted_use)),
+        "restrictions": [],
+        "evidence": require_local_reference(args.evidence, field="--evidence") if args.evidence else ("" if args.verification_status == "unverified" else registration["source"]["source_url"]),
+        "verification_status": args.verification_status,
+        "verified_by": "ai-ad-editor" if args.verification_status == "verified" else "",
+        "takedown_status": "clear",
+        "notes": "Registered by local LUT library CLI",
+    }
+    if args.dry_run:
+        return _envelope("lut.register", args, status="planned", data={"lut": preview, "rights_record": rights_record})
+    snapshot = create_snapshot(root, project, label="before-lut-register")
+    registered = register_lut(root, registration)
+    ledger = load_ledger(root)
+    add_record(ledger, rights_record)
+    operation_id = new_id("op")
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({
+        "operation_id": operation_id,
+        "command": "lut.register",
+        "lut_id": registered["id"],
+        "sha256": registered["sha256"],
+        "before_snapshot_id": snapshot["snapshot_id"],
+        "at": now_iso(),
+    })
+    save_project(root, project)
+    save_ledger(root, ledger)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "lut.register", "status": "succeeded", "lut_id": registered["id"], "snapshot_id": snapshot["snapshot_id"], "created_at": now_iso()})
+    return _envelope("lut.register", args, data={"lut": registered, "rights": rights_record, "snapshot": snapshot, "library": str(root / "assets" / "lut-library.json")}, operation_id=operation_id)
+
+
+def command_lut_list(args: argparse.Namespace) -> dict[str, Any]:
+    root, _ = load_project(args.project)
+    records = list_luts(root, query=args.query)
+    return _envelope("lut.list", args, data={"library": str(root / "assets" / "lut-library.json"), "library_version": "0.1.0", "count": len(records), "luts": records, "network": "disabled"})
+
+
+def command_lut_inspect(args: argparse.Namespace) -> dict[str, Any]:
+    root, _ = load_project(args.project)
+    return _envelope("lut.inspect", args, data=inspect_lut(root, args.lut_id))
+
+
 def command_doctor(args: argparse.Namespace) -> dict[str, Any]:
     checks: dict[str, Any] = {"platform": platform.platform(), "python": sys.version.split()[0], "native_windows": os.name == "nt", "network_default": "disabled", "virtualization_commands": {}}
     checks["runtime_storage"] = configure_local_runtime()
@@ -2458,6 +2535,8 @@ _READ_ONLY_PROJECT_COMMANDS = {
     ("operation", "inspect"),
     ("queue", "list"),
     ("queue", "inspect"),
+    ("lut", "list"),
+    ("lut", "inspect"),
     ("rights", "check"),
     ("rights", "list"),
     ("rights", "history"),
@@ -2522,6 +2601,9 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("library", "search"): command_library_search,
     ("library", "duplicates"): command_library_duplicates,
     ("library", "similar"): command_library_similar,
+    ("lut", "register"): command_lut_register,
+    ("lut", "list"): command_lut_list,
+    ("lut", "inspect"): command_lut_inspect,
     ("doctor", None): command_doctor,
     ("operation", "inspect"): command_operation_inspect,
     ("version", None): command_version,
