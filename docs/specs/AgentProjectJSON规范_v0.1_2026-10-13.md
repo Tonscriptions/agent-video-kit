@@ -71,9 +71,11 @@
 | `probe` | 是 | 时长、编码、流、分辨率、帧率、色彩和音频采样信息 |
 | `rights_ref` | 是 | 指向 Rights Ledger 的记录 ID；测试素材也必须有记录 |
 | `proxy` | 否 | 代理关系、生成参数和可替换状态 |
-| `source` | 否 | 来源 URL、下载日期、原始文件名和归档位置 |
+| `source` | 否 | 来源 URL、下载日期、原始文件名、归档位置和可选 `derived_from` 父资产 ID 列表 |
 
 导入阶段可以暂时使用 `rights_ref = pending:<id>`，但 `render --publish` 和 `convert --publish` MUST 拒绝未验证记录。
+
+本地处理生成的派生媒体必须保留父资产关系和新的内容哈希。当前 `media stabilize` 使用 `source.derived_from`、新的 `rights_ref` 和 Rights Ledger `derived_from` 记录父权利闭包；它生成项目内视频资产，不自动加入任何轨道。具体两遍 FFmpeg、快照、报告和质量边界见[本地视频防抖与稳定化派生素材契约](./本地视频防抖与稳定化派生素材契约_v0.1_2026-10-15.md)。
 
 ## 5. 序列、轨道与片段
 

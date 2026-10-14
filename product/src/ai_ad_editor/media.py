@@ -15,7 +15,7 @@ from .utils import executable, run_process, safe_filename, sha256_file
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".mkv", ".webm", ".avi", ".mxf", ".ts", ".m4v"}
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif"}
 AUDIO_EXTENSIONS = {".wav", ".mp3", ".aac", ".flac", ".m4a", ".ogg", ".opus"}
-SUBTITLE_EXTENSIONS = {".srt", ".vtt", ".ass", ".ssa"}
+SUBTITLE_EXTENSIONS = {".srt", ".vtt", ".ass", ".ssa", ".ttml", ".dfxp", ".xml"}
 MAX_INPUT_BYTES = 2 * 1024 * 1024 * 1024
 MAX_DURATION_SECONDS = 2 * 60 * 60
 MAX_DIMENSION = 8192
@@ -201,6 +201,113 @@ def generate_waveform(source: Path, output: Path, *, width: int = 1600, height: 
         operation="waveform",
     )
     return output
+
+
+def _stabilization_filter_path(path: Path) -> str:
+    """Encode a local Windows path for an FFmpeg filter option."""
+    # The transform pass runs with its working directory set to the cache
+    # folder, so callers normally pass a short relative path.  Keep this
+    # helper strict for the rare absolute path case and never accept a URL.
+    value = str(path).replace("\\", "/").replace("'", "\\'")
+    return value.replace(":", r"\\:")
+
+
+def stabilize_media(
+    source: Path,
+    output: Path,
+    transform_dir: Path,
+    *,
+    shakiness: int = 5,
+    accuracy: int = 15,
+    stepsize: int = 6,
+    mincontrast: float = 0.25,
+    smoothing: int = 15,
+    maxshift: int = -1,
+    maxangle: float = -1.0,
+    crop: str = "keep",
+    optzoom: int = 1,
+    zoom: float = 0.0,
+    interpol: str = "bilinear",
+) -> dict[str, Any]:
+    """Run the local two-pass vidstab pipeline and return auditable evidence."""
+    probe = probe_media(source)
+    if not probe.get("video", {}).get("codec"):
+        raise AppError("STABILIZE_VIDEO_MISSING", "只有包含视频流的素材可以防抖", exit_code=4, path=str(source))
+    filters = run_process([ffmpeg_path(), "-hide_banner", "-filters"], timeout=30)
+    filter_text = f"{filters.stdout}\n{filters.stderr}"
+    if "vidstabdetect" not in filter_text or "vidstabtransform" not in filter_text:
+        raise dependency_error("当前 FFmpeg 未编译 vidstabdetect/vidstabtransform", "更换带 libvidstab 的本地 FFmpeg 构建")
+    if not 1 <= int(shakiness) <= 10:
+        raise AppError("STABILIZE_PARAMETER_INVALID", "shakiness 必须位于 1..10", exit_code=2, path="shakiness")
+    if not 1 <= int(accuracy) <= 15 or int(accuracy) < int(shakiness):
+        raise AppError("STABILIZE_PARAMETER_INVALID", "accuracy 必须位于 shakiness..15", exit_code=2, path="accuracy")
+    if not 1 <= int(stepsize) <= 32:
+        raise AppError("STABILIZE_PARAMETER_INVALID", "stepsize 必须位于 1..32", exit_code=2, path="stepsize")
+    if not 0.0 <= float(mincontrast) <= 1.0:
+        raise AppError("STABILIZE_PARAMETER_INVALID", "mincontrast 必须位于 0..1", exit_code=2, path="mincontrast")
+    if not 0 <= int(smoothing) <= 1000:
+        raise AppError("STABILIZE_PARAMETER_INVALID", "smoothing 必须位于 0..1000", exit_code=2, path="smoothing")
+    if not -1 <= int(maxshift) <= 500:
+        raise AppError("STABILIZE_PARAMETER_INVALID", "maxshift 必须位于 -1..500", exit_code=2, path="maxshift")
+    if not -1.0 <= float(maxangle) <= 3.14:
+        raise AppError("STABILIZE_PARAMETER_INVALID", "maxangle 必须位于 -1..3.14", exit_code=2, path="maxangle")
+    if crop not in {"keep", "black"}:
+        raise AppError("STABILIZE_PARAMETER_INVALID", "crop 只能是 keep 或 black", exit_code=2, path="crop")
+    if not 0 <= int(optzoom) <= 2:
+        raise AppError("STABILIZE_PARAMETER_INVALID", "optzoom 必须位于 0..2", exit_code=2, path="optzoom")
+    if not -100.0 <= float(zoom) <= 100.0:
+        raise AppError("STABILIZE_PARAMETER_INVALID", "zoom 必须位于 -100..100", exit_code=2, path="zoom")
+    if interpol not in {"no", "linear", "bilinear", "bicubic"}:
+        raise AppError("STABILIZE_PARAMETER_INVALID", "interpol 不是本地 vidstabtransform 支持的值", exit_code=2, path="interpol")
+    transform_dir.mkdir(parents=True, exist_ok=True)
+    transform_file = transform_dir / "transforms.trf"
+    if transform_file.exists():
+        transform_file.unlink()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    detect_filter = (
+        "vidstabdetect=result=transforms.trf:"
+        f"shakiness={int(shakiness)}:accuracy={int(accuracy)}:stepsize={int(stepsize)}:"
+        f"mincontrast={float(mincontrast):.6f}:fileformat=2"
+    )
+    detected = run_process(
+        [ffmpeg_path(), "-hide_banner", "-loglevel", "error", "-y", "-i", str(source), "-vf", detect_filter, "-an", "-f", "null", "-"],
+        timeout=1800,
+        cwd=transform_dir,
+    )
+    if detected.returncode != 0 or not transform_file.exists() or transform_file.stat().st_size == 0:
+        raise AppError("STABILIZE_DETECT_FAILED", "vidstabdetect 分析失败", exit_code=6, retryable=True, path=str(source), cause=(detected.stderr or detected.stdout)[-4000:])
+    transform_filter = (
+        f"vidstabtransform=input={_stabilization_filter_path(transform_file.name)}:smoothing={int(smoothing)}:"
+        f"maxshift={int(maxshift)}:maxangle={float(maxangle):.6f}:crop={'0' if crop == 'keep' else '1'}:"
+        f"optzoom={int(optzoom)}:zoom={float(zoom):.6f}:interpol={interpol}"
+    )
+    transformed = run_process(
+        [
+            ffmpeg_path(), "-hide_banner", "-loglevel", "error", "-y", "-i", str(source),
+            "-vf", transform_filter, "-map", "0:v:0", "-map", "0:a?",
+            "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p",
+            "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(output),
+        ],
+        timeout=1800,
+        cwd=transform_dir,
+    )
+    if transformed.returncode != 0 or not output.exists() or output.stat().st_size == 0:
+        raise AppError("STABILIZE_TRANSFORM_FAILED", "vidstabtransform 输出失败", exit_code=6, retryable=True, path=str(output), cause=(transformed.stderr or transformed.stdout)[-4000:])
+    return {
+        "source": str(source),
+        "output": str(output),
+        "transform_file": str(transform_file),
+        "source_sha256": f"sha256:{sha256_file(source)}",
+        "transform_sha256": f"sha256:{sha256_file(transform_file)}",
+        "output_sha256": f"sha256:{sha256_file(output)}",
+        "parameters": {
+            "shakiness": int(shakiness), "accuracy": int(accuracy), "stepsize": int(stepsize),
+            "mincontrast": float(mincontrast), "smoothing": int(smoothing), "maxshift": int(maxshift),
+            "maxangle": float(maxangle), "crop": crop, "optzoom": int(optzoom), "zoom": float(zoom), "interpol": interpol,
+        },
+        "probe": probe_media(output),
+        "engine": "ffmpeg-local:vidstabdetect+vidstabtransform",
+    }
 
 
 def relink_missing_assets(root: Path, project: dict[str, Any], search_root: Path, *, match_by_name: bool = False) -> dict[str, Any]:

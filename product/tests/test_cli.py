@@ -779,6 +779,50 @@ class P0CliTests(unittest.TestCase):
             self.assertIn("thumbnail", asset)
             self.assertIn("waveform", asset)
 
+    def test_media_stabilize_creates_derived_asset_with_inherited_rights(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-stabilize-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingested = invoke(
+                "media", "ingest", "--project", str(project), "--input", str(source),
+                "--asset-id", "source-video", "--verification-status", "verified",
+                "--permitted-use", "commercial_ad", "--source-url", "local://stabilize-source",
+                "--license-spdx", "CC0-1.0", "--evidence", "local://stabilize-source",
+            )
+            source_id = ingested["data"]["asset"]["id"]
+            code, planned = invoke(
+                "media", "stabilize", "--project", str(project), "--asset-id", source_id,
+                "--derived-asset-id", "stabilized-dry-run", "--smoothing", "3", "--dry-run",
+            )
+            self.assertEqual(code, 0, planned)
+            self.assertEqual(planned["status"], "planned")
+            self.assertEqual(planned["data"]["engine"], "ffmpeg-local:vidstabdetect+vidstabtransform")
+            self.assertFalse((project / "assets" / "derived" / "stabilized_stabilized-dry-run.mp4").exists())
+            output = project / "assets" / "derived" / "stabilized-source-video.mp4"
+            code, applied = invoke(
+                "media", "stabilize", "--project", str(project), "--asset-id", source_id,
+                "--derived-asset-id", "stabilized-source-video", "--output", str(output),
+                "--shakiness", "4", "--accuracy", "8", "--smoothing", "3",
+            )
+            self.assertEqual(code, 0, applied)
+            self.assertTrue(output.exists())
+            self.assertGreater(probe_media(output)["duration_seconds"], 0.5)
+            self.assertEqual(applied["data"]["snapshot"]["label"], "before-stabilize")
+            report = Path(applied["data"]["report"])
+            self.assertTrue(report.exists())
+            report_payload = json.loads(report.read_text(encoding="utf-8"))
+            self.assertEqual(report_payload["stabilization"]["engine"], "ffmpeg-local:vidstabdetect+vidstabtransform")
+            self.assertEqual(report_payload["stabilization"]["parameters"]["smoothing"], 3)
+            rights = applied["data"]["rights"]
+            self.assertEqual(rights["derived_from"], [source_id])
+            self.assertEqual(rights["verification_status"], "verified")
+            self.assertEqual(rights["license_spdx"], "CC0-1.0")
+            code, validated = invoke("validate", "--project", str(project), "--strict-rights")
+            self.assertEqual(code, 0, validated)
+
+
     def test_local_highlight_recommendation_writes_auditable_report(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-highlights-") as raw:
             workspace = Path(raw)
@@ -935,6 +979,8 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("local_ad_plan_apply", manifest["capabilities"]["ai"]["features"])
         self.assertIn("smart_cut_silence", manifest["capabilities"]["media"]["features"])
         self.assertIn("smart_cut_linked_audio", manifest["capabilities"]["media"]["features"])
+        self.assertIn("stabilize_vidstab_two_pass", manifest["capabilities"]["media"]["features"])
+        self.assertIn("media_stabilize", manifest["capabilities"]["media"]["stabilize_contract"])
         self.assertIn("track_mute", manifest["capabilities"]["audio"]["features"])
         self.assertIn("track_solo", manifest["capabilities"]["audio"]["features"])
         self.assertIn("track_volume", manifest["capabilities"]["audio"]["features"])

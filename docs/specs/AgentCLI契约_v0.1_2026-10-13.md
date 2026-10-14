@@ -63,6 +63,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `project migrate --project PATH [--report NAME]` | `0.0.0` 或 `0.1.0` 项目 | 已知旧形状补默认字段、补本地资产哈希/探测、记录迁移链；写入前创建 `before-migrate` 快照并写 `validation/*.json` 报告 |
 | `project recover --project PATH` | 项目内 `operations/project-transaction.json` | 恢复上次中断的项目元数据事务；`prepared` 回滚、`committed` 清理、无日志返回 `clean`；`--dry-run` 只报告 |
 | `media ingest --project PATH --input FILE` | 本地媒体、权利和许可证参数 | 复制到项目 `assets/`，写 probe、内容哈希、Rights Ledger 和资产 provenance |
+| `media stabilize --project PATH (--asset-id ID\|--input FILE)` | 本地视频和受控 `vidstab` 参数 | 先 dry-run 检查两遍 FFmpeg 计划；正式执行创建 `before-stabilize` 快照、生成项目内防抖派生视频、继承或登记 Rights Ledger、写验证报告和操作记录；不自动改写时间线 |
 | `media understand --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频 | FFmpeg 场景、静音、节拍结果；`--transcribe` 只加载本地 Transformers 模型 |
 | `media prepare --project PATH (--asset-id ID\|--input FILE)` | 本地素材 | 生成项目内代理、缩略图和波形，并写入资产记录 |
 | `media highlights --project PATH (--asset-id ID\|--input FILE)` | 本地理解结果 | 本地启发式高光候选报告，不调用在线推荐服务 |
@@ -145,6 +146,8 @@ python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --p
 ```
 
 `motion apply` 只生成 `transform.scale`、`transform.position.x/y`、`transform.rotation` 或 `transform.opacity` 关键帧，不生成媒体文件；成功写入会创建 `before-motion-apply` 快照、项目 `provenance.change_log` 项和 `operations/<operation_id>.json`。它提供可复现的 Agent 运镜基线，不等同于剪映的 GUI 运镜模板、自动构图或 GPU 特效；光流补帧由效果目录中的 `frame_interpolation` 独立声明。
+
+`media stabilize` 运行本机 FFmpeg 的 `vidstabdetect` → `vidstabtransform` 两遍流程，输出 `assets/derived/` 下的新视频资产和 `validation/stabilization_<operation_id>.json` 报告。项目资产输入会继承当前有效父权利记录的许可证、允许用途、证据、渠道和撤下状态；外部本地输入必须显式提供同样的来源和许可证字段。稳定化结果不会自动插入时间线，质量检查必须关注裁切、黑边、残余抖动、场景切换和编码器差异；缺少 `libvidstab` 时返回结构化依赖错误。
 
 `freeze_frame` 的 `at_tick` 以冻结前的片段时间线为基准，在视频流中插入 `duration_tick` 的冻结帧；片段总时长同步增加，原始画面在冻结点前后保持顺序。渲染器在已经完成源范围、变速曲线、倒放和裁切映射的视频流上分支并回接，因此中间定格与尾部定格使用同一语义；音频按项目的冻结时长补齐并继续接受音量、声像和淡出链。非法冻结对象、非正冻结时长或越过冻结前片段范围的 `at_tick` 在校验阶段拒绝。
 

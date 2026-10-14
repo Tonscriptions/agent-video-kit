@@ -19,7 +19,7 @@ from .ad_plan import build_ad_plan
 from .captions import parse_caption_file, validate_cues, write_srt_file
 from .convert import export_external, import_external
 from .errors import AppError, argument_error, dependency_error
-from .media import classify_path, ffmpeg_version, generate_proxy, generate_thumbnail, generate_waveform, probe_media, relink_missing_assets
+from .media import classify_path, ffmpeg_version, generate_proxy, generate_thumbnail, generate_waveform, probe_media, relink_missing_assets, stabilize_media
 from .project import (
     asset_map,
     create_project,
@@ -117,6 +117,30 @@ def build_parser() -> argparse.ArgumentParser:
     ingest.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
     ingest.add_argument("--evidence", default="")
     ingest.add_argument("--creator", default="unknown")
+    stabilize = _leaf_common(ms.add_parser("stabilize", help="使用本地 FFmpeg vidstab 两遍分析生成防抖派生素材"))
+    stabilize.add_argument("--project", required=True)
+    stabilize.add_argument("--asset-id", default=None, help="项目内视频资产 ID，与 --input 二选一")
+    stabilize.add_argument("--input", default=None, help="本地视频路径，与 --asset-id 二选一")
+    stabilize.add_argument("--derived-asset-id", default=None, help="生成的派生资产 ID；默认自动生成")
+    stabilize.add_argument("--output", default=None, help="项目内输出视频路径；默认 assets/derived/stabilized_<id>.mp4")
+    stabilize.add_argument("--shakiness", type=int, default=5)
+    stabilize.add_argument("--accuracy", type=int, default=15)
+    stabilize.add_argument("--stepsize", type=int, default=6)
+    stabilize.add_argument("--mincontrast", type=float, default=0.25)
+    stabilize.add_argument("--smoothing", type=int, default=15)
+    stabilize.add_argument("--maxshift", type=int, default=-1)
+    stabilize.add_argument("--maxangle", type=float, default=-1.0)
+    stabilize.add_argument("--crop", choices=("keep", "black"), default="keep")
+    stabilize.add_argument("--optzoom", type=int, choices=(0, 1, 2), default=1)
+    stabilize.add_argument("--zoom", type=float, default=0.0)
+    stabilize.add_argument("--interpol", choices=("no", "linear", "bilinear", "bicubic"), default="bilinear")
+    stabilize.add_argument("--source-url", default=None)
+    stabilize.add_argument("--license-spdx", default="LicenseRef-UNVERIFIED")
+    stabilize.add_argument("--license-url", default="")
+    stabilize.add_argument("--permitted-use", action="append", default=["internal"])
+    stabilize.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
+    stabilize.add_argument("--evidence", default="")
+    stabilize.add_argument("--creator", default="unknown")
     understand = _leaf_common(ms.add_parser("understand", help="本地镜头/静音分析"))
     understand.add_argument("--project", required=True)
     understand.add_argument("--asset-id", default=None)
@@ -720,6 +744,113 @@ def command_media_ingest(args: argparse.Namespace) -> dict[str, Any]:
     _operation(root, operation_id, {"operation_id": operation_id, "command": "media.ingest", "status": "succeeded", "asset_id": asset_id, "sha256": digest, "created_at": now_iso()})
     _progress(args, operation_id, "completed", "media.ingest", 100, "素材导入完成")
     return _envelope("media.ingest", args, data={"asset": asset, "rights": record, "path": str(destination)}, operation_id=operation_id)
+
+
+def command_media_stabilize(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    if bool(args.asset_id) == bool(args.input):
+        raise argument_error("必须且只能提供 --asset-id 或 --input")
+    source_asset: dict[str, Any] | None = None
+    parent_rights_ref: str | None = None
+    if args.asset_id:
+        source_asset = asset_map(project).get(str(args.asset_id))
+        if not source_asset:
+            raise argument_error(f"找不到资产: {args.asset_id}", "--asset-id")
+        source = Path(str(source_asset.get("uri", "")))
+        if not source.is_absolute():
+            source = root / source
+        parent_rights_ref = str(source_asset.get("rights_ref") or source_asset.get("id"))
+    else:
+        raw_input = str(args.input or "").strip()
+        if raw_input.lower().startswith(("http://", "https://")):
+            raise argument_error("--input 只接受本地视频文件", "--input")
+        source = Path(raw_input).expanduser().resolve()
+    if not source.exists() or not source.is_file():
+        raise argument_error("防抖输入不存在", str(source))
+    derived_id = str(args.derived_asset_id or new_id("asset_stabilized"))
+    if derived_id in asset_map(project):
+        raise argument_error(f"派生资产 ID 已存在: {derived_id}", "--derived-asset-id")
+    output = Path(args.output).expanduser() if args.output else Path("assets") / "derived" / f"stabilized_{safe_filename(derived_id)}.mp4"
+    if not output.is_absolute():
+        output = root / output
+    output = output.resolve()
+    ensure_inside(root, output)
+    if output.exists():
+        raise argument_error("防抖输出已存在，为避免覆盖请指定新的 --output", str(output))
+    parameters = {
+        "shakiness": args.shakiness, "accuracy": args.accuracy, "stepsize": args.stepsize,
+        "mincontrast": args.mincontrast, "smoothing": args.smoothing, "maxshift": args.maxshift,
+        "maxangle": args.maxangle, "crop": args.crop, "optzoom": args.optzoom,
+        "zoom": args.zoom, "interpol": args.interpol,
+    }
+    transform_dir = root / "cache" / "stabilization" / safe_filename(derived_id)
+    if args.dry_run:
+        return _envelope(
+            "media.stabilize",
+            args,
+            status="planned",
+            data={"input": str(source), "asset_id": args.asset_id, "derived_asset_id": derived_id, "output": str(output), "transform_dir": str(transform_dir), "parameters": parameters, "engine": "ffmpeg-local:vidstabdetect+vidstabtransform"},
+        )
+    snapshot = create_snapshot(root, project, label="before-stabilize")
+    operation_id = new_id("op")
+    _progress(args, operation_id, "started", "media.stabilize.detect", 0, "开始本地 vidstabdetect 分析")
+    try:
+        stabilization = stabilize_media(source, output, transform_dir, **parameters)
+        _progress(args, operation_id, "progress", "media.stabilize.transform", 70, "完成运动轨迹分析，开始 vidstabtransform 输出")
+        digest = str(stabilization["output_sha256"])
+        if source_asset is not None:
+            ledger = load_ledger(root)
+            parent_records = {str(item.get("asset_id")): item for item in active_records(ledger)}
+            parent_record = parent_records.get(parent_rights_ref or "")
+            if parent_record is None:
+                raise AppError("RIGHTS_RECORD_MISSING", "源资产缺少可继承的 Rights Ledger 记录", exit_code=7, path=parent_rights_ref)
+            rights_source_url = f"local://{output}"
+            record = {
+                "asset_id": derived_id, "kind": "video", "sha256": digest, "source_url": rights_source_url,
+                "source_version": "derived:vidstab", "retrieved_at": now_iso(), "creator": parent_record.get("creator", "unknown"),
+                "license_spdx": parent_record.get("license_spdx", "LicenseRef-UNVERIFIED"), "license_url": parent_record.get("license_url", ""),
+                "attribution": parent_record.get("attribution", ""), "permitted_uses": list(parent_record.get("permitted_uses", ["internal"])),
+                "permitted_channels": list(parent_record.get("permitted_channels", [])), "restrictions": list(parent_record.get("restrictions", [])),
+                "derived_from": [parent_rights_ref], "evidence": parent_record.get("evidence", ""),
+                "verification_status": parent_record.get("verification_status", "unverified"), "verified_by": parent_record.get("verified_by", ""),
+                "takedown_status": parent_record.get("takedown_status", "clear"), "notes": "Derived by local FFmpeg vidstab; inherits source rights",
+            }
+        else:
+            rights_source_url = require_local_reference(args.source_url or f"local://{source}", field="--source-url")
+            evidence_reference = require_local_reference(args.evidence, field="--evidence") if args.evidence else ("" if args.verification_status == "unverified" else f"local://{output}")
+            record = {
+                "asset_id": derived_id, "kind": "video", "sha256": digest, "source_url": rights_source_url,
+                "source_version": "derived:vidstab", "retrieved_at": now_iso(), "creator": args.creator,
+                "license_spdx": args.license_spdx, "license_url": require_local_reference(args.license_url, field="--license-url") if args.license_url else "",
+                "attribution": "", "permitted_uses": list(dict.fromkeys(args.permitted_use)), "permitted_channels": [],
+                "restrictions": [], "derived_from": [], "evidence": evidence_reference, "verification_status": args.verification_status,
+                "verified_by": "ai-ad-editor" if args.verification_status == "verified" else "", "takedown_status": "clear",
+                "notes": "Derived by local FFmpeg vidstab",
+            }
+        asset = {
+            "id": derived_id, "kind": "video", "uri": str(output.relative_to(root)).replace("\\", "/"),
+            "sha256": digest, "probe": stabilization["probe"], "rights_ref": derived_id,
+            "source": {"source_url": rights_source_url, "retrieved_at": now_iso(), "original_name": output.name, "derived_from": [source_asset.get("id")] if source_asset else []},
+        }
+        report_path = root / "validation" / f"stabilization_{safe_filename(operation_id)}.json"
+        report = {"report_version": "0.1.0", "created_at": now_iso(), "project_id": project["project"]["id"], "operation_id": operation_id, "snapshot_id": snapshot["snapshot_id"], "asset_id": derived_id, "parent_asset_id": source_asset.get("id") if source_asset else None, "stabilization": stabilization, "rights_dependency": parent_rights_ref}
+        atomic_write_json(report_path, report)
+        project.setdefault("assets", []).append(asset)
+        ledger = load_ledger(root)
+        add_record(ledger, record)
+        project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.stabilize", "asset_id": derived_id, "source_asset_id": source_asset.get("id") if source_asset else None, "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "at": now_iso()})
+        save_project(root, project)
+        save_ledger(root, ledger)
+        _operation(root, operation_id, {"operation_id": operation_id, "command": "media.stabilize", "status": "succeeded", "asset_id": derived_id, "source_asset_id": source_asset.get("id") if source_asset else None, "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "created_at": now_iso()})
+        _progress(args, operation_id, "completed", "media.stabilize", 100, "本地防抖派生素材完成")
+        return _envelope("media.stabilize", args, data={"asset": asset, "rights": record, "snapshot": snapshot, "report": str(report_path), "stabilization": stabilization}, operation_id=operation_id)
+    except Exception:
+        if output.exists():
+            try:
+                output.unlink()
+            except OSError:
+                pass
+        raise
 
 
 def command_media_relink(args: argparse.Namespace) -> dict[str, Any]:
@@ -2953,6 +3084,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("project", "migrate"): command_project_migrate,
     ("project", "recover"): command_project_recover,
     ("media", "ingest"): command_media_ingest,
+    ("media", "stabilize"): command_media_stabilize,
     ("media", "relink"): command_media_relink,
     ("media", "track"): command_media_track,
     ("media", "reframe"): command_media_reframe,
