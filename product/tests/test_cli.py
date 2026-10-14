@@ -164,6 +164,75 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(audit["errors"][0]["code"], "POLICY_REMOTE_REFERENCE")
             self.assertFalse(audit["data"]["ok"])
 
+    def test_otio_canonical_stack_gap_and_metadata_roundtrip(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-otio-canonical-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, ingested = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            self.assertEqual(code, 0, ingested)
+            asset_id = ingested["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "id": "otio_gap_clip", "asset_id": asset_id,
+                "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000, "timeline_start_tick": 45000,
+                "transform": {"position": {"x": 0.63, "y": 0.38}}, "effects": [{"type": "grayscale"}],
+            }]}), encoding="utf-8")
+            code, composed = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
+            self.assertEqual(code, 0, composed)
+            otio = workspace / "canonical.otio"
+            code, exported = invoke("convert", "export", "--project", str(project), "--output", str(otio), "--target-format", "otio")
+            self.assertEqual(code, 0, exported)
+            payload = json.loads(otio.read_text(encoding="utf-8"))
+            self.assertEqual(payload["tracks"]["OTIO_SCHEMA"], "Stack.1")
+            video_track = next(item for item in payload["tracks"]["children"] if item["name"] == "track_video_1")
+            self.assertEqual(video_track["children"][0]["OTIO_SCHEMA"], "Gap.1")
+            exported_clip = next(item for item in video_track["children"] if item["OTIO_SCHEMA"] == "Clip.2")
+            self.assertEqual(exported_clip["source_range"]["duration"]["rate"], 90000)
+            self.assertEqual(exported_clip["metadata"]["ai_ad_editor"]["clip"]["id"], "otio_gap_clip")
+            imported = workspace / "imported"
+            code, result = invoke("convert", "import", "--input", str(otio), "--output", str(imported))
+            self.assertEqual(code, 0, result)
+            imported_project = json.loads((imported / "project.json").read_text(encoding="utf-8"))
+            imported_clip = next(clip for track in imported_project["sequences"][0]["tracks"] for clip in track["clips"] if clip["id"] == "otio_gap_clip")
+            self.assertEqual(imported_clip["timeline_start_tick"], 45000)
+            self.assertEqual(imported_clip["transform"]["position"]["x"], 0.63)
+            self.assertEqual(imported_clip["effects"][0]["type"], "grayscale")
+
+    def test_kdenlive_profile_blank_and_metadata_roundtrip(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-kdenlive-timing-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, ingested = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            self.assertEqual(code, 0, ingested)
+            asset_id = ingested["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "id": "mlt_gap_clip", "asset_id": asset_id,
+                "source_in_tick": 0, "source_out_tick": 90000, "duration_tick": 90000, "timeline_start_tick": 45000,
+                "transform": {"scale": 0.74}, "transition_in": {"type": "fade", "duration": 0.2},
+            }]}), encoding="utf-8")
+            code, composed = invoke("timeline", "compose", "--project", str(project), "--input", str(changes))
+            self.assertEqual(code, 0, composed)
+            xml_path = workspace / "timeline.kdenlive"
+            code, exported = invoke("convert", "export", "--project", str(project), "--output", str(xml_path), "--target-format", "kdenlive-xml")
+            self.assertEqual(code, 0, exported)
+            xml_text = xml_path.read_text(encoding="utf-8")
+            self.assertIn('frame_rate_num="30"', xml_text)
+            self.assertIn('<blank length="15"', xml_text)
+            self.assertIn("ai_ad_editor_clip_json", xml_text)
+            imported = workspace / "imported"
+            code, result = invoke("convert", "import", "--input", str(xml_path), "--output", str(imported))
+            self.assertEqual(code, 0, result)
+            imported_project = json.loads((imported / "project.json").read_text(encoding="utf-8"))
+            imported_clip = next(clip for track in imported_project["sequences"][0]["tracks"] for clip in track["clips"] if clip["id"] == "mlt_gap_clip")
+            self.assertEqual(imported_clip["timeline_start_tick"], 45000)
+            self.assertEqual(imported_clip["transform"]["scale"], 0.74)
+            self.assertEqual(imported_clip["transition_in"]["type"], "fade")
+
     def test_persistent_render_queue_lifecycle(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-queue-") as raw:
             workspace = Path(raw)
@@ -714,6 +783,8 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("independent_text_masks", manifest["capabilities"]["subtitles"]["features"])
         self.assertIn("independent_text_blend", manifest["capabilities"]["subtitles"]["features"])
         self.assertIn("mixed_video_text_track_order", manifest["capabilities"]["subtitles"]["features"])
+        self.assertIn("otio_stack_track_gap_clip", manifest["capabilities"]["interoperability"]["features"])
+        self.assertIn("kdenlive_blank_gap_mapping", manifest["capabilities"]["interoperability"]["features"])
         self.assertIn("effect_parameter_keyframes", manifest["capabilities"]["effects"]["features"])
         self.assertIn("sequence_adjustments", manifest["capabilities"]["effects"]["features"])
         self.assertIn("lut3d_project_local", manifest["capabilities"]["effects"]["features"])

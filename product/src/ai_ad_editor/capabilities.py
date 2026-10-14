@@ -129,8 +129,9 @@ def build_capability_manifest() -> dict[str, Any]:
             "interoperability": {
                 "status": "degraded",
                 "formats": ["agent-json", "otio", "kdenlive-xml"],
+                "features": ["agent_json_exact_roundtrip", "otio_stack_track_gap_clip", "otio_tick_rational_time", "otio_metadata_clip_recovery", "kdenlive_profile_frame_rate", "kdenlive_blank_gap_mapping", "kdenlive_entry_frame_mapping", "local_reference_only"],
                 "report_states": ["Exact", "Mapped", "Approximate", "Baked", "Unsupported", "Failed"],
-                "limits": ["complex_effects_and_advanced_animation_require_explicit_mapping_report"],
+                "limits": ["complex_effects_and_advanced_animation_require_explicit_mapping_report", "otio_sequential_track_cannot_represent_overlapping_clips_without_metadata", "kdenlive_effect_filters_and_text_generators_require_explicit_mapping_or_bake", "foreign_relative_references_are_resolved_against_interchange_file"],
             },
             "ai": {
                 "status": "local_adapter_only",
