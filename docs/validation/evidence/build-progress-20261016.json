@@ -1,0 +1,144 @@
+{
+  "checked_at_utc": "2026-10-15T16:12:37.756479+00:00",
+  "timezone": "Asia/Taipei",
+  "scope": "status documentation; no new product or model test was run in this status update",
+  "module_count": 25,
+  "delivered_code_base": "cdd0f0e827030108c06186d386b098694b605809",
+  "origin_main_at_check": "cdd0f0e827030108c06186d386b098694b605809",
+  "remote_main_verified_before_document_update": "cdd0f0e827030108c06186d386b098694b605809",
+  "last_full_regression": {
+    "tests": 211,
+    "seconds": 346.832,
+    "status": "passed",
+    "covers_uncommitted_audio_increment": false,
+    "log": "product/.runtime/tracking-geometry-full-final-20261015.log",
+    "log_sha256": "sha256:a2efea48eeccfb6830a56eaafaca387f88cee124332df036f3a9935c00a636df"
+  },
+  "last_skill_audit": {
+    "checked_at_utc": "2026-10-15T15:43:59.531333+00:00",
+    "skill_count": 14,
+    "failures": [],
+    "unresolved_markdown_links": [],
+    "rerun_for_this_status_update": false,
+    "evidence_sha256": "sha256:bee9b99dcbd97a5da2d136d374f26ad64b64deb252fb1b7fdbe6919d69977cce"
+  },
+  "uncommitted_audio_increment": {
+    "status": "in_development_not_delivered",
+    "files": {
+      ".gitignore": "sha256:1b3824d04124d3804e841ec9b92e2c54b70fd599e9dcab3c145d5a589433cda9",
+      "product/src/ai_ad_editor/cli.py": "sha256:e6480f3c857ec1edc962f094232b568decb3929ea55c5c54f5869b2c51e84be0",
+      "product/src/ai_ad_editor/model_registry.py": "sha256:36c87d713628245b0cf31eeb50741e94a11a71c657c6b86a021b66ff7ef6f18a",
+      "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+      "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+      "product/src/ai_ad_editor/separation_dsp.py": "sha256:fdd1b5afbbd3aa935220b5b14782337c22dd684e6d907b2e785dd431704aa19e",
+      "scripts/smoke_audio_separation.py": "sha256:30e653ec560a71e19b2d39a4133829d74647a68bc7fe51b2d7626efc0f21a69e"
+    },
+    "experimental_log": "product/.runtime/separation-native-model-20261016-a.log",
+    "experimental_log_sha256": "sha256:3e194183061f1e8c265a883654e2f7a2665fad69499e993f9906151a499ccfbc",
+    "observations": [
+      {
+        "command": "project.init",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "command": "media.ingest",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "command": "audio.adapter.register",
+        "status": "planned",
+        "exit_code": 0
+      },
+      {
+        "command": "audio.adapter.register",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "command": "audio.adapter.inspect",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "command": "audio.separate",
+        "status": "planned",
+        "exit_code": 0
+      },
+      {
+        "command": "audio.separate",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "device": "cpu",
+        "improvement_db": 12.663942050782119,
+        "mixture_error": 1.4901161193847656e-08
+      },
+      {
+        "command": "audio.adapter.register",
+        "status": "planned",
+        "exit_code": 0
+      },
+      {
+        "command": "audio.adapter.register",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "command": "audio.adapter.inspect",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "command": "audio.separate",
+        "status": "planned",
+        "exit_code": 0
+      },
+      {
+        "command": "audio.separate",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "device": "cuda",
+        "improvement_db": 12.664031864395342,
+        "mixture_error": 1.4901161193847656e-08
+      },
+      {
+        "command": "timeline.compose",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "command": "render",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "command": "quality.check",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "command": "validate",
+        "status": "succeeded",
+        "exit_code": 0
+      },
+      {
+        "command": "policy.audit",
+        "status": "failed",
+        "exit_code": 2
+      }
+    ],
+    "experiment_overall_status": "failed",
+    "failure_command": "policy.audit",
+    "failure_code": "POLICY_REMOTE_REFERENCE",
+    "failure_field": "derived audio source_version metadata",
+    "subsequent_rights_check_executed": false,
+    "model_and_source_rights_verified": false,
+    "broad_natural_music_or_advertising_quality_accepted": false
+  },
+  "full_jianying_functional_and_visual_parity_accepted": false
+}
