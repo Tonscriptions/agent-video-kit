@@ -12,6 +12,8 @@
 
 最新验证见[SAM2 机器证据](./validation/evidence/sam2-smoke-20261016.json)和[文档审计](./validation/evidence/docs-audit-sam2-20261016.json)。此前[在建状态快照](./validation/evidence/build-progress-checked-sam2-20261016.json)为历史记录。RVM [人物抠像契约](./specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md)和[透明成片实测](./validation/RVM本地人物抠像与透明成片实测_2026-10-16.md)继续有效，RVM 轮完整回归为 257/257。
 
+本次进度核对的已提交代码基线为 `bfc4a9b7`，68 个实现/测试/烟测摘要全部匹配。[LaMa 区域修复契约](./specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md)仍在评审中，模型准备和基础代码不等于 CLI/视频功能完成。具体在建缺口及既有证据复核见[当前构建状态快照](./validation/evidence/build-progress-checked-lama-20261016.json)；本次未重跑完整回归。
+
 上一轮[HDemucs 契约](./specs/本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md)和[CPU/CUDA 实测](./validation/HDemucs本地人声伴奏分离实测_2026-10-16.md)记录分离、入轨、成片及权利阻断，当轮完整回归为 233/233。RVM 轮[机器证据](./validation/evidence/rvm-smoke-20261016.json)和[文档审计](./validation/evidence/docs-audit-rvm-20261016.json)为已提交基线的验证入口；此前[仅准备模型的状态核对](./validation/evidence/build-progress-checked-20261016.json)是历史记录。
 
 上一轮新增[原生 YOLO 检测/跟踪契约](./specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md)、[真实模型与成片实测](./validation/YOLO本地多目标跟踪与重构图实测_2026-10-15.md)及[Windows 长滤镜图契约](./specs/本地长滤镜图与Windows命令长度契约_v0.1_2026-10-15.md)。两个受控对象、文字绑定、竖屏裁切、模型权利和本地编码闭环通过，该轮完整产品 194/194 回归通过；25 模块进度总表同步维护，完整剪映等价仍未完成。
