@@ -189,6 +189,11 @@ def build_parser() -> argparse.ArgumentParser:
     highlights.add_argument("--min-duration", type=float, default=1.0)
     highlights.add_argument("--max-duration", type=float, default=8.0)
     highlights.add_argument("--beats", action="store_true")
+    highlights.add_argument("--sequence-id", default=None, help="应用时的目标序列 ID，默认主序列")
+    highlights.add_argument("--track-id", default=None, help="应用时的目标视频轨道 ID")
+    highlights.add_argument("--timeline-start-seconds", type=float, default=0.0, help="应用时的时间线起点")
+    highlights.add_argument("--apply", action="store_true", help="创建快照并将高光片段写入目标视频轨道")
+    highlights.add_argument("--replace-track", action="store_true", help="应用前清空目标视频轨道已有片段")
     highlights.add_argument("--output", default=None)
     beat_cut = _leaf_common(ms.add_parser("beat-cut", help="按本地音频节拍生成并应用卡点剪辑计划"))
     beat_cut.add_argument("--project", required=True)
@@ -2151,11 +2156,56 @@ def command_media_highlights(args: argparse.Namespace) -> dict[str, Any]:
         raise argument_error("必须提供 --asset-id 或 --input")
     if not source.exists() or not source.is_file():
         raise argument_error("高光分析输入不存在", str(source))
+
+    sequence = None
+    target_track = None
+    if args.apply:
+        if not asset_id:
+            raise argument_error("--apply 必须提供项目内 --asset-id，不能把未登记输入直接写入时间线", "asset_id")
+        if not args.track_id:
+            raise argument_error("--apply 必须提供 --track-id", "track_id")
+        if args.timeline_start_seconds < 0:
+            raise argument_error("timeline_start_seconds 不能为负数", "timeline_start_seconds")
+        sequence = find_sequence(project, args.sequence_id)
+        target_track = find_track(sequence, args.track_id, None)
+        if str(target_track.get("kind", "video")) != "video":
+            raise argument_error("高光粗剪应用目标必须是 video 轨道", "track_id")
+        if target_track.get("locked"):
+            raise AppError("TRACK_LOCKED", "高光粗剪目标轨道已锁定", exit_code=2, path="track_id")
+
     if args.dry_run:
-        return _envelope("media.highlights", args, status="planned", data={"input": str(source), "top_k": args.top_k, "min_duration": args.min_duration, "max_duration": args.max_duration, "beats": bool(args.beats)})
+        return _envelope(
+            "media.highlights",
+            args,
+            status="planned",
+            data={
+                "input": str(source),
+                "asset_id": asset_id,
+                "top_k": args.top_k,
+                "min_duration": args.min_duration,
+                "max_duration": args.max_duration,
+                "beats": bool(args.beats),
+                "apply": bool(args.apply),
+                "replace_track": bool(args.replace_track),
+                "sequence_id": sequence.get("id") if sequence else args.sequence_id,
+                "track_id": target_track.get("id") if target_track else args.track_id,
+                "timeline_start_seconds": args.timeline_start_seconds,
+                "engine": "ffmpeg-local-highlight-heuristic-v1",
+            },
+        )
+
     analysis = understand_media(source, include_beats=args.beats)
     recommendation = recommend_highlights(analysis, top_k=args.top_k, min_duration=args.min_duration, max_duration=args.max_duration)
-    recommendation.update({"asset_id": asset_id, "source": str(source), "source_sha256": f"sha256:{sha256_file(source)}", "analysis": analysis})
+    recommendation.update({
+        "asset_id": asset_id,
+        "source": str(source),
+        "source_sha256": f"sha256:{sha256_file(source)}",
+        "analysis": analysis,
+        "pipeline_engine": "ffmpeg-local-highlight-heuristic-v1",
+        "apply": bool(args.apply),
+        "replace_track": bool(args.replace_track),
+        "network": "disabled",
+    })
     output: Path
     if args.output:
         output = Path(args.output).expanduser().resolve()
@@ -2165,9 +2215,121 @@ def command_media_highlights(args: argparse.Namespace) -> dict[str, Any]:
             raise argument_error("高光报告必须位于项目目录内", str(output)) from exc
     else:
         output = root / "validation" / f"highlights_{asset_id or new_id('asset')}.json"
-    atomic_write_json(output, recommendation)
-    return _envelope("media.highlights", args, data={"report": str(output), "recommendation": recommendation})
 
+    warnings = [{
+        "code": "HIGHLIGHTS_HEURISTIC",
+        "message": "高光排序只使用本地镜头、静音和可选节拍证据；不等同语义理解或剪映智能导演。",
+    }]
+    if not args.apply:
+        atomic_write_json(output, recommendation)
+        return _envelope("media.highlights", args, data={"report": str(output), "recommendation": recommendation}, warnings=warnings)
+
+    assert sequence is not None and target_track is not None
+    timeline_tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND))
+    timeline_cursor = int(round(float(args.timeline_start_seconds) * timeline_tps))
+    run_id = new_id("highlights")
+    selected = sorted(
+        [item for item in recommendation.get("candidates", []) if isinstance(item, dict)],
+        key=lambda item: (float(item.get("start_seconds", 0.0)), str(item.get("id", ""))),
+    )
+    generated_plan: list[dict[str, Any]] = []
+    for index, item in enumerate(selected, start=1):
+        try:
+            source_in = max(0, int(round(float(item["start_seconds"]) * timeline_tps)))
+            source_out = max(source_in + 1, int(round(float(item["end_seconds"]) * timeline_tps)))
+        except (KeyError, TypeError, ValueError) as exc:
+            raise AppError("HIGHLIGHTS_PLAN_INVALID", "高光候选缺少合法的源时间范围", exit_code=6, path="candidates") from exc
+        duration_tick = source_out - source_in
+        generated_plan.append({
+            "id": f"{run_id}_{index:03d}",
+            "asset_id": str(asset_id),
+            "timeline_start_tick": timeline_cursor,
+            "duration_tick": duration_tick,
+            "source_in_tick": source_in,
+            "source_out_tick": source_out,
+            "source_start_seconds": round(source_in / timeline_tps, 6),
+            "source_end_seconds": round(source_out / timeline_tps, 6),
+            "score": item.get("score"),
+            "candidate_id": item.get("id"),
+        })
+        timeline_cursor += duration_tick
+    if not generated_plan:
+        raise AppError("HIGHLIGHTS_EMPTY", "本地高光分析没有生成可应用的候选片段", exit_code=6, path="candidates")
+
+    recommendation.update({
+        "project_id": project.get("project", {}).get("id"),
+        "sequence_id": sequence.get("id"),
+        "track_id": target_track.get("id"),
+        "timeline_start_seconds": round(float(args.timeline_start_seconds), 6),
+        "generated_plan": generated_plan,
+    })
+    existing_clips = list(target_track.get("clips", []))
+    if not args.replace_track:
+        for generated in generated_plan:
+            generated_start = int(generated["timeline_start_tick"])
+            generated_end = generated_start + int(generated["duration_tick"])
+            for existing in existing_clips:
+                existing_start = int(existing.get("timeline_start_tick", 0))
+                existing_end = existing_start + int(existing.get("duration_tick", 0))
+                if max(generated_start, existing_start) < min(generated_end, existing_end):
+                    raise AppError("HIGHLIGHTS_TRACK_OVERLAP", "高光粗剪会覆盖目标轨道已有片段，请使用 --replace-track 或调整时间线起点", exit_code=2, path="track_id")
+    before_project = copy.deepcopy(project)
+    if args.replace_track:
+        target_track["clips"] = []
+    generated_clips: list[dict[str, Any]] = []
+    for item in generated_plan:
+        clip = {key: item[key] for key in ("id", "asset_id", "timeline_start_tick", "duration_tick", "source_in_tick", "source_out_tick")}
+        target_track.setdefault("clips", []).append(clip)
+        generated_clips.append(clip)
+    _recompute_sequence_duration(sequence)
+    validation = validate_project(root, project, strict_rights=False)
+    if not validation["ok"]:
+        raise AppError("HIGHLIGHTS_APPLY_INVALID", "高光粗剪应用后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    snapshot = create_snapshot(root, before_project, label="before-highlights")
+    operation_id = new_id("op")
+    recommendation["generated_clips"] = generated_clips
+    report_payload = {
+        "report_version": "0.2.0",
+        "created_at": now_iso(),
+        "applied": True,
+        "operation_id": operation_id,
+        "before_snapshot_id": snapshot["snapshot_id"],
+        "recommendation": recommendation,
+        "validation": validation,
+    }
+    atomic_write_json(output, report_payload)
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({
+        "operation_id": operation_id,
+        "command": "media.highlights",
+        "asset_id": asset_id,
+        "sequence_id": sequence.get("id"),
+        "track_id": target_track.get("id"),
+        "clip_ids": [clip["id"] for clip in generated_clips],
+        "report": str(output),
+        "before_snapshot_id": snapshot["snapshot_id"],
+        "at": now_iso(),
+    })
+    save_project(root, project)
+    _operation(root, operation_id, {
+        "operation_id": operation_id,
+        "command": "media.highlights",
+        "status": "succeeded",
+        "asset_id": asset_id,
+        "sequence_id": sequence.get("id"),
+        "track_id": target_track.get("id"),
+        "clip_ids": [clip["id"] for clip in generated_clips],
+        "report": str(output),
+        "before_snapshot_id": snapshot["snapshot_id"],
+        "created_at": now_iso(),
+    })
+    warnings.append({"code": "HIGHLIGHTS_REVIEW_REQUIRED", "message": "高光候选已写入时间线；发布前必须检查镜头语义、连续性、音画同步和转场。"})
+    return _envelope(
+        "media.highlights",
+        args,
+        data={"report": str(output), "recommendation": recommendation, "generated_clips": generated_clips, "before_snapshot": snapshot, "validation": validation},
+        warnings=warnings,
+        operation_id=operation_id,
+    )
 
 def command_media_beat_cut(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)

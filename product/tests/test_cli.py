@@ -1105,6 +1105,32 @@ print(json.dumps({
             self.assertEqual(recommendation["network"], "disabled")
             self.assertLessEqual(len(recommendation["candidates"]), 3)
 
+    def test_local_highlights_apply_writes_timeline_with_snapshot_and_review_warning(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-highlights-apply-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, ingested = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            self.assertEqual(code, 0, ingested)
+            asset_id = ingested["data"]["asset"]["id"]
+            report = project / "validation" / "highlights-apply.json"
+            code, applied = invoke(
+                "media", "highlights", "--project", str(project), "--asset-id", asset_id,
+                "--track-id", "track_video_1", "--top-k", "3", "--replace-track", "--apply",
+                "--output", str(report),
+            )
+            self.assertEqual(code, 0, applied)
+            self.assertTrue(report.exists())
+            self.assertTrue(any(item["code"] == "HIGHLIGHTS_HEURISTIC" for item in applied["warnings"]))
+            self.assertTrue(any(item["code"] == "HIGHLIGHTS_REVIEW_REQUIRED" for item in applied["warnings"]))
+            self.assertEqual(applied["data"]["before_snapshot"]["label"], "before-highlights")
+            self.assertGreaterEqual(len(applied["data"]["generated_clips"]), 1)
+            payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            video_track = next(track for track in payload["sequences"][0]["tracks"] if track["id"] == "track_video_1")
+            self.assertEqual(len(video_track["clips"]), len(applied["data"]["generated_clips"]))
+            self.assertEqual(invoke("validate", "--project", str(project))[0], 0)
+
     def test_local_smart_cut_plan_and_apply_links_audio(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-smart-cut-") as raw:
             workspace = Path(raw)
@@ -1348,6 +1374,10 @@ print(json.dumps({
         self.assertIn("smart_cut_linked_audio", manifest["capabilities"]["media"]["features"])
         self.assertIn("beat_cut_timeline", manifest["capabilities"]["media"]["features"])
         self.assertIn("media_beat_cut", manifest["capabilities"]["media"]["beat_cut_contract"])
+        self.assertIn("heuristic_highlights", manifest["capabilities"]["media"]["features"])
+        self.assertIn("highlight_rough_cut_apply", manifest["capabilities"]["media"]["features"])
+        self.assertIn("media_highlights", manifest["capabilities"]["media"]["highlights_contract"])
+        self.assertIn("heuristic_highlights", manifest["capabilities"]["ai"]["features"])
         self.assertIn("stabilize_vidstab_two_pass", manifest["capabilities"]["media"]["features"])
         self.assertIn("media_stabilize", manifest["capabilities"]["media"]["stabilize_contract"])
         self.assertIn("track_mute", manifest["capabilities"]["audio"]["features"])

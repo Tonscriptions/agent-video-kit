@@ -66,7 +66,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `media stabilize --project PATH (--asset-id ID\|--input FILE)` | 本地视频和受控 `vidstab` 参数 | 先 dry-run 检查两遍 FFmpeg 计划；正式执行创建 `before-stabilize` 快照、生成项目内防抖派生视频、继承或登记 Rights Ledger、写验证报告和操作记录；不自动改写时间线 |
 | `media understand --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频 | FFmpeg 场景、静音、节拍结果；`--transcribe` 可选择本地 Transformers 模型或 FFmpeg `whisper.cpp` 模型，模型不会自动下载；可选写入项目内 SRT |
 | `media prepare --project PATH (--asset-id ID\|--input FILE)` | 本地素材 | 生成项目内代理、缩略图和波形，并写入资产记录 |
-| `media highlights --project PATH (--asset-id ID\|--input FILE)` | 本地理解结果 | 本地启发式高光候选报告，不调用在线推荐服务 |
+| `media highlights --project PATH (--asset-id ID\|--input FILE)` | 本地理解结果；可选 `--beats`、`--top-k`、`--min-duration`、`--max-duration` | 本地启发式高光候选报告，不调用在线推荐服务；加 `--apply --asset-id ID --track-id ID` 时按源时间顺序写入已登记视频轨道，应用前创建 `before-highlights` 快照、执行交叠门禁和项目校验；`--replace-track` 才允许清空目标轨道 |
 | `media beat-cut --project PATH (--audio-asset-id ID\|--input FILE) --source-asset-id ID --track-id ID` | 本地音频节拍证据、一个或多个已登记视频资产、节拍区间和源选择策略 | 使用本地 FFmpeg 能量峰值生成卡点计划；默认只写 `validation/beat_cut_*.json`，`--apply` 在 `before-beat-cut` 快照、重叠检查和项目校验后写入视频轨道并记录操作；`--replace-track` 才允许清空目标轨道，能量峰值和慢放复用必须保留警告 |
 | `media multicam --project PATH --source-asset-id ID --source-asset-id ID` | 两个或以上含视频/音频流的本地机位资产、参考机位、互相关参数和可选切换计划 | 用本地 FFmpeg PCM + NumPy 能量特征估计各机位相对偏移；`--switch-seconds` 或本地 `--switch-plan` 生成可审计直接媒体片段；`--apply` 在 `before-multicam` 快照、轨道重叠检查和项目校验后写入；不宣称视觉自动导演 |
 | `audio extract --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频、可选 WAV 参数和目标 audio 轨道 | 用本地 FFmpeg 提取第一条音频流为项目内 PCM WAV 派生资产；正式执行创建 `before-audio-extract` 快照、继承/登记 Rights Ledger，并可用 `--apply --track-id` 写入音频轨道；dry-run 不写入；不宣称人声/背景声 AI 分离 |
@@ -127,6 +127,12 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 audio adapter register 只接受已存在的本地模型/执行器路径；它不会下载、复制或在登记阶段执行模型。目录按相对路径、大小和文件 SHA-256 形成稳定哈希，正式登记写入 models/audio-adapters.json、Rights Ledger 和 before-audio-adapter-register 快照。audio adapter list/inspect 只读检查路径与哈希。ffmpeg-local-mid-side-v1 与 `command-json-v1` 是当前可执行 runner；后者通过 `agent-video-audio-separation-v1` 的 stdin/stdout JSON 协议生成约定的 center/side WAV，并拒绝 `.cmd/.bat` shell wrapper。Demucs、UVR、Open-Unmix 和 ONNX 专用 engine 仍只能登记，尚无对应 runner 时 audio separate --adapter-id 返回 AUDIO_SEPARATION_ADAPTER_UNAVAILABLE（退出码 10），禁止隐式回退或网络调用。command-json runner 的输出仍需质量 golden 和 Rights Ledger 复核。详细字段见本地模型适配器注册与音频分离门禁契约。
 
 media adapter register 使用同样的本地路径、许可证、哈希和 Rights Ledger 规则，但写入 `models/visual-adapters.json`。当前 `command-json-tracking-v1` 通过 `agent-video-object-tracking-v1` 的单个 stdin/stdout JSON 请求返回归一化框和 confidence；CLI 拒绝 shell wrapper、协议不匹配、超时、过大 stdout、越界/非单调帧和哈希变化，并在 `media track`、`track-bind`、`reframe` 中保留 `TRACKING_EXTERNAL_REVIEW`。模型质量、遮挡恢复、旋转框、多目标和视觉 golden 不由 registry 自动证明。详细字段见[本地视觉模型适配器与对象跟踪协议契约](./本地视觉模型适配器与对象跟踪协议契约_v0.1_2026-10-15.md)。
+
+### 3.2 本地高光候选与自动粗剪
+
+`media highlights` 先调用本地 `understand_media`，再由 `recommend_highlights` 按镜头、静音和可选节拍证据生成候选。默认模式只写项目内 JSON 报告；报告保留 `source_sha256`、`analysis`、`engine=local-heuristic`、`pipeline_engine=ffmpeg-local-highlight-heuristic-v1`、`network=disabled` 和候选源范围。
+
+只有显式 `--apply` 才会修改时间线，并且必须同时提供项目内已登记 `--asset-id`、目标视频 `--track-id` 和非负 `--timeline-start-seconds`。候选按源时间顺序连续生成项目时基片段；已有轨道交叠返回 `HIGHLIGHTS_TRACK_OVERLAP`，只有 `--replace-track` 才能先清空轨道。应用前保存 `before-highlights` 快照，成功后写入报告、`provenance.change_log`、操作文件并重新校验项目。所有成功应用结果都带 `HIGHLIGHTS_HEURISTIC` 与 `HIGHLIGHTS_REVIEW_REQUIRED`，不能解释为语义高光、人物/物体理解或剪映智能导演。完整字段、报告版本、错误码和验收证据见[本地高光候选与自动粗剪时间线契约](./本地高光候选与自动粗剪时间线契约_v0.1_2026-10-15.md)。
 
 ## 4. 项目迁移、快照和路径规则
 
