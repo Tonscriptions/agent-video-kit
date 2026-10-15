@@ -7,6 +7,7 @@
 ## 当前状态
 
 - 当前分模块进度与待验收项见 [构建进度总表（2026-10-16）](docs/构建进度总表_2026-10-16.md)：本地 CLI 主链路已实现，广告生产能力部分落地；原生离线人声/伴奏分离已接入并完成受控 CPU/CUDA 实测。真实模型广泛质量、内容库、完整草稿映射和产品验收仍待完成，233 项回归通过不等于剪映功能完成率。
+- 最新状态复核以已交付代码 `164ed647` 为依据，已核对本地/远端 main、55 个源码文件及完整回归日志摘要。人物视频抠像目前仅准备了 RVM 本地模型，尚未接入产品；本次状态更新未新增功能或重跑产品回归，见[核对证据](docs/validation/evidence/build-progress-checked-20261016.json)。
 - P0 CLI 闭环已实现：项目初始化、媒体摄取与探测、时间线变更、关键帧与运镜、字幕、音频、遮罩、转场、渲染、项目内持久化渲染队列、质量检查、权利门禁、快照/迁移/跨文件事务恢复、确定性素材索引/搜索/重复组、增量刷新、FFmpeg 感知候选和受限互操作（OTIO canonical Stack/Gap 与 MLT 帧时间映射）；队列默认顺序执行，也支持显式 `queue run --workers N --continue-on-error` 的有界本地 FFmpeg 并发，项目写入由原生 Windows 文件锁串行化，元数据事务由 `operations/project-transaction.json` 保护，队列取消在渲染持锁时仍可递交并异步确认。
 - 本地项目包：`convert export --target-format package` 会把 Agent Project、Rights Ledger、项目内支持文件和引用素材写成可移植 `.aevpkg.zip`，重写资产 URI 并生成逐文件 SHA-256 manifest；`convert import` 会在落盘前拒绝路径穿越、符号链接、未登记成员和哈希篡改。项目包不含 renders/cache/operations/history，不调用网络或剪映运行时，契约见 [`docs/specs/本地项目包与交换清单契约_v0.1_2026-10-15.md`](docs/specs/本地项目包与交换清单契约_v0.1_2026-10-15.md)。
 - 本地明文草稿支持 `convert import` 自动识别，并提供 `convert export --target-format jianying-draft-json`：支持基础媒体/轨道/源目标时钟、变换/裁切/线性关键帧、文字/本地字体和显式视频原声；`--strict` 在近似、不支持或失败项出现时拒绝写入，私有资源仅脱敏保留。已通过本地音画往返渲染，尚未验证商业版本兼容性、复杂效果与视觉等效，见[适配器契约](docs/specs/本地明文草稿双向适配器契约_v0.1_2026-10-15.md)。同时修复音频尾部补齐和 Windows 中文目录下本地字体渲染。
