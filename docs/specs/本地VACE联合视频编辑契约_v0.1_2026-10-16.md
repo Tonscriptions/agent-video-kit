@@ -46,3 +46,13 @@ VACE 要求显式非空 `--prompt`，支持 `--negative-prompt`、`--seed`、`--
 父进程以允许替换的只读句柄读取最多 64 KiB 进度快照，避免自己阻止 worker 原子替换进度文件；读取失败、畸形或超范围进度只影响显示。共享 JSON/文本原子写入遇到 Windows 短暂共享冲突时最多尝试 6 次、累计退避 1.55 秒；持续失败保留原目标内容并报错，临时文件按原契约清理。权利/项目/最终 worker 报告继续使用正式错误门禁。
 
 `os.replace` 遇到 Windows 共享/访问冲突时，尝试原生 `SetFileInformationByHandle(FileRenameInfoEx)`，使用 `REPLACE_IF_EXISTS | POSIX_SEMANTICS`。允许删除共享的旧读取句柄继续看到旧快照，新打开的路径看到完整新文件；禁止删除共享的模型锁仍须拒绝覆盖。未支持该调用的系统回到有界重试，不提前删除目标文件，也不忽略只读属性。语义依据见 [Microsoft 文件重命名协议](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/4217551b-d2c0-42cb-9dc1-69a716cf6d0c)和[原生 API](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfileinformationbyhandle)。原生测试覆盖同进程与跨进程旧快照、连续发布、短暂/持续占用、暂存文件清理，以及模型锁拒绝原子覆盖。
+
+## 5. 采样与模型输入尺度扩展（候选实现，尚未启用）
+
+拟为 `media inpaint` 增加两个 VACE 专属参数，默认保留 flow_shift 3.0 和输入倍率 1：`--flow-shift` 接受 0.1..32 的有限数值，`--model-input-scale` 接受整数 1/2/4。LaMa 须拒绝这两个参数，不能静默忽略。它们进入 canonical generation、请求摘要及幂等输入，不能由 worker 自行改写。
+
+`--model-max-edge` 约束现有 ROI 基础栅格；显式倍率作用于该栅格经 16 倍数/最小 64 边缘补齐之后的模型输入。RGB 双线性、蒙版最近邻放大，并在放大后再次将选区置为 127。模型结果以浮点缩回基础栅格，再进行既有 ROI 投影、重叠混合和一次量化，最终输出画布及选区不变。预算必须按实际放大后面积计入自有数组，超预算要在解码/模型加载之前拒绝。
+
+固定的本地 scheduler 配置仍需完整性验证；显式 flow_shift 通过固定 UniPC 类的配置覆盖使用，不修改权重/配置文件。worker 须报告实际 scheduler flow_shift、倍率和逐窗口实际输入 `[frames,height,width]`；父进程验证请求一致性、类型、窗口数量、尺寸/16 倍数与峰值模型像素，不能把倍率仅写入元数据而保持原尺寸推理。
+
+验证需覆盖：1/2/4 倍条件栅格与原始像素映射、选区原色隔离、alpha/选区外精确保留、放大预算前置拒绝、NaN/无效倍率、CLI dry-run 与 LaMa 参数拒绝、篡改采样/倍率/尺寸报告的回滚，以及真实本地模型/成片。开发侧五组对照只用于选择后续正式实测参数，不代替上述交付验收或广泛画质结论。
