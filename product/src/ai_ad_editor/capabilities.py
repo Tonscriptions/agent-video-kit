@@ -169,11 +169,11 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "ai": {
                 "status": "local_adapter_only",
-                "features": ["offline_transformers_asr_gate", "ffmpeg_whisper_cpp_asr", "local_asr_subtitle_generation", "local_flite_tts", "heuristic_highlights", "highlight_rough_cut_apply", "local_ad_plan", "local_ad_plan_apply", "local_template_tracking", "offline_model_registry"],
+                "features": ["offline_transformers_asr_gate", "ffmpeg_whisper_cpp_asr", "local_asr_subtitle_generation", "local_flite_tts", "registered_soulx_chinese_tts", "tts_voice_transcript_registry", "tts_generated_audio_asset_and_track_apply", "tts_model_voice_rights_dependencies", "heuristic_highlights", "highlight_rough_cut_apply", "local_ad_plan", "local_ad_plan_apply", "local_template_tracking", "offline_model_registry"],
                 "network": "disabled",
                 "asr_contract": "subtitle.transcribe_or_media.understand_uses_an_explicit_local_transformers_directory_or_ffmpeg_whisper_model_and_writes_timestamped_srt_without_network",
-                "tts_contract": "tts.synthesize_uses_ffmpeg_flite_and_writes_project_local_wav_without_network_or_model_download",
-                "limits": ["model_weights_must_be_provided_locally", "ffmpeg_whisper_requires_whisper_enabled_local_ffmpeg", "flite_voice_inventory_depends_on_local_ffmpeg_build", "flite_adapter_is_ascii_english_only", "heuristic_highlights_do_not_claim_semantic_or_visual_director_understanding", "multilingual_model_tts_adapter_pending"],
+                "tts_contract": "tts.adapter_and_voice_register_explicit_local_soulx_artifacts_and_exact_transcript_then_tts.synthesize_hash_verifies_and_runs_isolated_native_python_without_network_or_downloads_and_registers_generated_wav_with_optional_audio_track_apply",
+                "limits": ["model_weights_must_be_provided_locally", "ffmpeg_whisper_requires_whisper_enabled_local_ffmpeg", "flite_voice_inventory_depends_on_local_ffmpeg_build", "flite_adapter_is_ascii_english_only", "soulx_hf_full_bf16_weights_and_cuda_required", "soulx_single_voice_per_synthesis_and_max_2000_text_characters", "soulx_model_reference_text_and_output_rights_need_explicit_review", "soulx_emotion_dialect_multispeaker_and_broad_quality_acceptance_pending", "heuristic_highlights_do_not_claim_semantic_or_visual_director_understanding"],
             },
             "rights": {
                 "status": "implemented",

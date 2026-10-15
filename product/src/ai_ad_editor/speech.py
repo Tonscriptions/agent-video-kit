@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import os
 from pathlib import Path
 from typing import Any
 
@@ -79,6 +80,9 @@ def synthesize_local_tts(
         raise argument_error("TTS channels 只支持 1 或 2", "channels")
     if output.suffix.lower() != ".wav":
         raise argument_error("本地 flite TTS 输出必须使用 .wav", str(output))
+    if output.exists():
+        raise argument_error("TTS 输出已存在，拒绝覆盖", str(output))
+    staging = output.with_name(f".{output.stem}.{operation_id}.wav")
 
     text_file = root / "cache" / "tts" / f"{operation_id}.txt"
     atomic_write_text(text_file, text + "\n")
@@ -103,19 +107,22 @@ def synthesize_local_tts(
                 str(channels),
                 "-c:a",
                 "pcm_s16le",
-                str(output),
+                str(staging),
             ],
             cwd=root,
             timeout=600,
         )
+    except BaseException:
+        staging.unlink(missing_ok=True)
+        raise
     finally:
         try:
             text_file.unlink()
         except FileNotFoundError:
             pass
-    if result.returncode != 0 or not output.exists() or output.stat().st_size == 0:
+    if result.returncode != 0 or not staging.exists() or staging.stat().st_size == 0:
         try:
-            output.unlink()
+            staging.unlink()
         except FileNotFoundError:
             pass
         raise AppError(
@@ -127,13 +134,24 @@ def synthesize_local_tts(
             cause=(result.stderr or result.stdout)[-4000:],
             hint="运行 ffmpeg -filters 检查是否包含 flite，并使用本地支持的 voice",
         )
-    probe = probe_media(output)
+    try:
+        probe = probe_media(staging)
+    except BaseException:
+        staging.unlink(missing_ok=True)
+        raise
     if not probe.get("audio", {}).get("codec"):
         try:
-            output.unlink()
+            staging.unlink()
         except FileNotFoundError:
             pass
         raise AppError("TTS_OUTPUT_INVALID", "TTS 输出没有可读音频流", exit_code=6, path=str(output))
+    if output.exists():
+        staging.unlink(missing_ok=True)
+        raise argument_error("TTS 输出在生成期间出现，拒绝覆盖", str(output))
+    try:
+        os.replace(staging, output)
+    finally:
+        staging.unlink(missing_ok=True)
     return {
         "engine": "ffmpeg-flite-local",
         "voice": voice,

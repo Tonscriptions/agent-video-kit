@@ -46,10 +46,10 @@ python -m ai_ad_editor tts synthesize `
   --project <项目目录> `
   --text "Hello local advertising voice" `
   --voice kal `
-  --output assets/voice.wav
+  --output assets\tts\voice.wav
 ```
 
-也可以用 `--input <本地 UTF-8 文本文件>` 替代 `--text`。输出路径必须位于项目根目录内并使用 `.wav`；可选采样率为 8000、16000、22050、24000、32000、44100 或 48000，声道为 1 或 2。当前 FFmpeg flite 声音库存和语言由本机编译决定，项目适配器在调用前拒绝非 ASCII 文本，以避免把不支持的中文/Unicode 输入送入原生滤镜；多语言、情绪和可控语速 TTS 仍需另一个显式的本地模型适配器，并且必须单独登记权重许可证和真实模型验收证据。
+也可以用 `--input <本地 UTF-8 文本文件>` 替代 `--text`。输出路径必须位于项目 `assets/` 内且为新 `.wav`；相对路径以项目根为基准。支持 8000/16000/22050/24000/32000/44100/48000 Hz、1/2 声道。默认 flite 在调用前拒绝非 ASCII 输入。中文通过显式登记的 SoulX 适配器运行，见下方增量契约。
 
 `doctor` 的 `data.checks.local_features.flite_tts` 报告当前 FFmpeg 是否暴露 `flite` 滤镜；为 `false` 时命令返回 `DEPENDENCY_UNAVAILABLE`，不会自动安装或联网恢复。
 
@@ -140,3 +140,7 @@ ASR 结果进入字幕轨道前必须经过以下步骤：
 - 失败后项目、验证目录和渲染目录没有可被误发布的半成品。
 
 没有真实的本地模型快照、固定音频、输出哈希和质量报告前，本适配器只能标记为 `implemented`，不能在能力矩阵中标记为 `verified`。
+
+## 本地 SoulX 中文模型执行
+
+现有 `tts adapter/voice register/list/inspect` 与 `tts synthesize --adapter-id --voice-id` 已形成专用本地 runner，支持原样参考逐字稿、完整 safetensors/语音 tokenizer 与源码哈希、隔离 Python、网络调用阻断、自然 WAV 时长、资产/音轨和模型/声源权利依赖。契约见[本地 SoulX 中文配音](./本地SoulX中文配音与声线登记契约_v0.1_2026-10-15.md)；真实中文音频、实际渲染和未核验发布阻断见[实测记录](../validation/SoulX中文离线配音实测_2026-10-15.md)。CPU/GGUF、情绪/多声线/语速和广泛中文质量仍待扩展。

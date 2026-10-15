@@ -1,0 +1,288 @@
+{
+  "schema_version": "0.1.0",
+  "captured_at": "2026-10-15T10:27:56.571789+00:00",
+  "scope": "single Mandarin local SoulX pipeline smoke; not broad perceptual acceptance",
+  "project_relative_path": "workspace/soulx-smoke-20261015-d",
+  "checks": [
+    {
+      "command": "project.init",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.ingest",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "tts.adapter.register",
+      "exit_code": 0,
+      "status": "planned"
+    },
+    {
+      "command": "tts.adapter.register",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "tts.voice.register",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "tts.synthesize",
+      "exit_code": 0,
+      "status": "planned"
+    },
+    {
+      "command": "tts.synthesize",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.ingest",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "timeline.compose",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "render",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "quality.check",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "validate",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "policy.audit",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "rights.check",
+      "exit_code": 7,
+      "status": "failed"
+    }
+  ],
+  "text": "让每一次创作，都变得更加简单。",
+  "seed": 20261015,
+  "model_manifest_sha256": "sha256:aa8db780414f3df9cbfce40e858426b1930b254135f1db13d963c6599c0b4d59",
+  "model_manifest_files": 46,
+  "worker_sha256": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+  "reference": {
+    "file_name": "speaker_4_cv_tw_female_52d6.wav",
+    "source_ledger_license_label": "CC0-1.0",
+    "rights_verification_status": "unverified",
+    "sha256": "sha256:2b40301cfbd9f038f981140d73a04f558518bd5dc54a65d8ab2e7aab431c8bfe",
+    "transcript_sha256": "sha256:e04269bb7ad276a1c5872bdd1b866590d3eded24b6b70c2728e2313ff4af04a7",
+    "evidence_sha256": "sha256:998ad6faf0b438f23ff30e7d5d6d77442e4144dcfd0f2aeddb87beb38365158f"
+  },
+  "raw_audio": {
+    "raw_sha256": "sha256:69c20bf86d75ea585f025e15a6bd916b6326d44af9175d55011d36873a54758d",
+    "sample_rate": 24000,
+    "channels": 1,
+    "samples": 82560,
+    "duration_seconds": 3.44,
+    "peak": 0.42030826210975647,
+    "rms_dbfs": -27.18502942600363
+  },
+  "output_audio": {
+    "relative_path": "workspace/soulx-smoke-20261015-d/assets/tts/soulx_chinese_voice.wav",
+    "sha256": "sha256:dedb7d6e05ee63a682a1683d71df9b784f424a8da993fafc87ffa62c106b2951",
+    "sample_rate": 48000,
+    "channels": 1,
+    "duration_seconds": 3.44
+  },
+  "runtime": {
+    "elapsed_seconds": 36.56,
+    "device": "NVIDIA GeForce RTX 3060",
+    "peak_cuda_bytes": 4959962112,
+    "versions": {
+      "python": "3.13.14",
+      "torch": "2.13.0+cu130",
+      "transformers": "5.14.1",
+      "onnxruntime": "1.28.0"
+    },
+    "blocked_network_events": [],
+    "network": "disabled",
+    "precision": "llm-bf16-flow-fp16",
+    "llm_engine": "hf"
+  },
+  "quality": {
+    "ok": true,
+    "errors": [],
+    "metrics": {
+      "duration_seconds": 3.44,
+      "width": 320,
+      "height": 180,
+      "audio_codec": "aac",
+      "video_duration_seconds": 3.433333,
+      "audio_duration_seconds": 3.44,
+      "av_duration_delta_seconds": 0.0066669999999997565,
+      "probe": {
+        "duration_seconds": 3.44,
+        "duration_tick": 309600,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.64000d",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 180,
+            "has_b_frames": 2,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p",
+            "level": 13,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "30/1",
+            "avg_frame_rate": "30/1",
+            "time_base": "1/15360",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 52736,
+            "duration": "3.433333",
+            "bit_rate": "5615",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "103",
+            "extradata_size": 49,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_long_name": "AAC (Advanced Audio Coding)",
+            "profile": "LC",
+            "codec_type": "audio",
+            "codec_tag_string": "mp4a",
+            "codec_tag": "0x6134706d",
+            "mime_codec_string": "mp4a.40.2",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 1,
+            "channel_layout": "mono",
+            "bits_per_sample": 0,
+            "initial_padding": 0,
+            "id": "0x2",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 165120,
+            "duration": "3.440000",
+            "bit_rate": "167054",
+            "nb_frames": "163",
+            "extradata_size": 5,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "SoundHandler"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 320,
+          "height": 180,
+          "pix_fmt": "yuv420p",
+          "fps": "30/1",
+          "color_space": "bt709",
+          "duration_seconds": 3.433333,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "aac",
+          "sample_rate": 48000,
+          "channels": 1,
+          "duration_seconds": 3.44,
+          "start_time_seconds": 0.0
+        }
+      }
+    }
+  },
+  "limits": [
+    "No listening/CER or broad Mandarin corpus acceptance performed",
+    "Weights/reference/output remain unverified/internal; publication is blocked",
+    "Python audit guard is not an OS network sandbox",
+    "Timing includes worker imports/hash verification/model loading; not a performance SLA"
+  ],
+  "product_regression": {
+    "tests": 148,
+    "elapsed_seconds": 188.135,
+    "status": "OK",
+    "log_relative_path": "product/.runtime/tts-final-ledger-regression-20261015.log",
+    "log_sha256": "sha256:ebe6b5df8280e25565f48bc6c82da29de82dce4ed9ed4614e4963357ed253a79"
+  }
+}

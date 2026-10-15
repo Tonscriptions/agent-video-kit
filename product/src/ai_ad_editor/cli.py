@@ -62,7 +62,15 @@ from .tracking import (
 from .runtime import configure_local_runtime
 from .template import apply_template_operations, instantiate
 from .migration import SUPPORTED_SOURCE_VERSIONS, migrate_project_payload
-from .speech import flite_available, synthesize_local_tts
+from .speech import _validate_text as validate_flite_text, _validate_voice as validate_flite_voice, flite_available, synthesize_local_tts
+from .local_tts import (
+    SOULX_ENGINE, add_registration as add_tts_registration, local_path as tts_local_path,
+    prepare_adapter as prepare_tts_adapter, prepare_voice as prepare_tts_voice,
+    registry_item as tts_registry_item, require_verified_inputs as verify_tts_inputs,
+    synthesize_soulx, tts_registry, validate_output as validate_tts_output,
+    validate_text as validate_tts_text, verify_adapter as verify_tts_adapter,
+    verify_voice as verify_tts_voice,
+)
 from .effects import EFFECT_CATALOG_VERSION, get_effect, list_effects
 from .motion_presets import MOTION_PRESET_CATALOG_VERSION, canonical_motion_preset, get_motion_preset, list_motion_presets
 from .scopes import SCOPE_VERSION, generate_scopes
@@ -88,7 +96,7 @@ from .model_registry import (
     visual_adapter_for,
     visual_registry_path,
 )
-from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
+from .utils import atomic_write_json, atomic_write_text, assert_id, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
 
 
@@ -449,15 +457,49 @@ def build_parser() -> argparse.ArgumentParser:
 
     tts = subs.add_parser("tts", help="本地离线文本转语音")
     tts_sub = tts.add_subparsers(dest="action", required=True)
-    tts_synthesize = _leaf_common(tts_sub.add_parser("synthesize", help="使用 FFmpeg 内置 flite 生成本地 WAV"))
+    tts_synthesize = _leaf_common(tts_sub.add_parser("synthesize", help="使用本地 flite 或显式登记的 SoulX 生成 WAV"))
     tts_synthesize.add_argument("--project", required=True)
     tts_text = tts_synthesize.add_mutually_exclusive_group(required=True)
-    tts_text.add_argument("--text", default=None, help="ASCII/英文文本")
+    tts_text.add_argument("--text", default=None, help="配音文本；默认 flite 只接受 ASCII/英文")
     tts_text.add_argument("--input", default=None, help="本地 UTF-8 文本文件")
     tts_synthesize.add_argument("--output", default=None, help="项目内 WAV 输出路径")
     tts_synthesize.add_argument("--voice", default="kal", help="FFmpeg flite voice，例如 kal、slt、rms")
     tts_synthesize.add_argument("--sample-rate", type=int, default=48_000)
     tts_synthesize.add_argument("--channels", type=int, choices=(1, 2), default=2)
+    tts_synthesize.add_argument("--adapter-id", default=None, help="已登记的本地 SoulX 模型")
+    tts_synthesize.add_argument("--voice-id", default=None, help="已登记的参考声；与 adapter-id 一起使用")
+    tts_synthesize.add_argument("--seed", type=int, default=20261015)
+    tts_synthesize.add_argument("--asset-id", default=None, help="生成音频资产 ID")
+    tts_synthesize.add_argument("--apply", action="store_true", help="将生成音频加入音频轨道")
+    tts_synthesize.add_argument("--sequence-id", default=None)
+    tts_synthesize.add_argument("--track-id", default=None)
+    tts_synthesize.add_argument("--timeline-start-seconds", type=float, default=0.0)
+    for registration_kind in ("adapter", "voice"):
+        group = tts_sub.add_parser(registration_kind, help="登记/检查显式本地模型或参考声")
+        actions = group.add_subparsers(dest="registration_action", required=True)
+        for registration_action in ("register", "list", "inspect"):
+            leaf = _leaf_common(actions.add_parser(registration_action))
+            leaf.add_argument("--project", required=True)
+            if registration_action != "list":
+                leaf.add_argument(f"--{registration_kind}-id", required=True)
+            if registration_action != "register":
+                continue
+            leaf.add_argument("--evidence", required=True, help="本地模型许可或参考声来源/授权证据文件")
+            leaf.add_argument("--license-spdx", default="LicenseRef-UNVERIFIED")
+            leaf.add_argument("--creator", default="unknown")
+            leaf.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
+            leaf.add_argument("--permitted-use", action="append", default=None)
+            if registration_kind == "adapter":
+                leaf.add_argument("--python-executable", required=True)
+                leaf.add_argument("--source-root", required=True)
+                leaf.add_argument("--package-root", required=True)
+                leaf.add_argument("--model-path", required=True)
+                leaf.add_argument("--tokenizer-path", required=True)
+            else:
+                leaf.add_argument("--asset-id", required=True, help="已导入的单人参考声音频资产")
+                transcript = leaf.add_mutually_exclusive_group(required=True)
+                transcript.add_argument("--prompt-text", default=None, help="参考音频原样逐字稿")
+                transcript.add_argument("--prompt-input", default=None, help="本地 UTF-8 逐字稿文件")
 
     effects = subs.add_parser("effects", help="查询本地 FFmpeg 效果目录")
     effects_sub = effects.add_subparsers(dest="action", required=True)
@@ -3205,65 +3247,139 @@ def command_subtitle_transcribe(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("subtitle.transcribe", args, data={"report": str(report_path), "output": str(output), "transcription": transcription, "subtitle_asset": subtitle_asset, "rights": subtitle_record, "generated_clips": generated_clips, "before_snapshot": snapshot, "validation": validation, "applied": True}, operation_id=operation_id)
 
 
+def _tts_text_file(root: Path, value: str) -> tuple[str, dict[str, Any]]:
+    path = tts_local_path(root, value, "input")
+    try:
+        text = path.read_text(encoding="utf-8-sig")
+    except UnicodeDecodeError as exc:
+        raise argument_error("配音文本/逐字稿必须是 UTF-8", str(path)) from exc
+    return text, {"kind": "file", "path": str(path), "sha256": f"sha256:{sha256_file(path)}"}
+
+
+def command_tts_registration(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    kind = "adapters" if args.action == "adapter" else "voices"
+    command = f"tts.{args.action}.{args.registration_action}"
+    if args.registration_action in {"list", "inspect"}:
+        items = tts_registry(project).get(kind, []) if args.registration_action == "list" else [tts_registry_item(project, kind, getattr(args, f"{args.action}_id"))]
+        checked = [{args.action: item, "verification": verify_tts_adapter(item) if kind == "adapters" else verify_tts_voice(root, project, item)} for item in items]
+        data = {"count": len(checked), "items": checked, "network": "disabled"}
+        if args.registration_action == "inspect":
+            data.update(checked[0])
+        return _envelope(command, args, data=data)
+    item_id = getattr(args, f"{args.action}_id")
+    if any(item.get(f"{args.action}_id") == item_id for item in tts_registry(project).get(kind, [])):
+        raise AppError("TTS_REGISTRATION_EXISTS", f"TTS 登记已存在: {item_id}", exit_code=2)
+    common = {"evidence": args.evidence, "license_spdx": args.license_spdx, "creator": args.creator, "status": args.verification_status, "uses": args.permitted_use or ["internal"]}
+    if kind == "adapters":
+        record, rights = prepare_tts_adapter(root, adapter_id=args.adapter_id, python_executable=args.python_executable, source_root=args.source_root, package_root=args.package_root, model_path=args.model_path, tokenizer_path=args.tokenizer_path, **common)
+    else:
+        prompt = args.prompt_text if args.prompt_text is not None else _tts_text_file(root, args.prompt_input)[0]
+        record, rights = prepare_tts_voice(root, project, voice_id=args.voice_id, asset_id=args.asset_id, prompt_text=prompt, **common)
+        if not any(item.get("asset_id") == rights["derived_from"][0] for item in active_records(load_ledger(root))):
+            raise AppError("RIGHTS_RECORD_MISSING", "参考声缺少源权利记录", exit_code=7)
+    if args.dry_run:
+        return _envelope(command, args, status="planned", data={args.action: record, "rights": rights, "network": "disabled"})
+    snapshot = create_snapshot(root, project, label=f"before-tts-{args.action}-register")
+    ledger, operation_id = load_ledger(root), new_id("op")
+    add_tts_registration(project, kind, record)
+    add_record(ledger, rights)
+    change = {"operation_id": operation_id, "command": command, f"{args.action}_id": item_id, "snapshot_id": snapshot["snapshot_id"], "sha256": record["sha256"], "at": now_iso()}
+    project.setdefault("provenance", {}).setdefault("change_log", []).append(change)
+    save_project(root, project)
+    save_ledger(root, ledger)
+    _operation(root, operation_id, {**change, "status": "succeeded"})
+    return _envelope(command, args, data={args.action: record, "rights": rights, "snapshot": snapshot, "network": "disabled"}, operation_id=operation_id)
+
+
 def command_tts_synthesize(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
-    if args.text is not None:
-        text = str(args.text)
-        source = {"kind": "inline", "path": None}
+    text, source = (str(args.text), {"kind": "inline", "path": None}) if args.text is not None else _tts_text_file(root, args.input)
+    if bool(args.adapter_id) != bool(args.voice_id):
+        raise argument_error("--adapter-id 与 --voice-id 必须一起提供", "adapter_id/voice_id")
+    if not math.isfinite(args.timeline_start_seconds) or args.timeline_start_seconds < 0:
+        raise argument_error("时间线起点必须为非负有限秒数", "timeline_start_seconds")
+    if not 0 <= args.seed < 2 ** 32:
+        raise argument_error("seed 必须在 0–4294967295 之间", "seed")
+    if args.apply and not args.track_id:
+        raise argument_error("--apply 必须提供 --track-id", "track_id")
+    sequence = find_sequence(project, args.sequence_id) if args.apply else None
+    track = find_track(sequence, args.track_id, None) if sequence else None
+    if track is not None and track.get("kind") != "audio":
+        raise argument_error("配音应用目标必须为 audio 轨道", "track_id")
+    operation_id, asset_id = new_id("op"), args.asset_id or new_id("asset_tts")
+    assert_id(asset_id, "asset_id")
+    if asset_id in asset_map(project):
+        raise argument_error("生成音频资产 ID 已存在", "asset_id")
+    output = Path(args.output).expanduser() if args.output else Path("assets") / "tts" / f"{asset_id}.wav"
+    output = ensure_inside(root, output if output.is_absolute() else root / output)
+    ensure_inside(root / "assets", output)
+    validate_tts_output(args.sample_rate, args.channels, output)
+    adapter = voice = None
+    checks = None
+    parents: list[str] = []
+    if args.adapter_id:
+        text = validate_tts_text(text)
+        adapter = tts_registry_item(project, "adapters", args.adapter_id)
+        voice = tts_registry_item(project, "voices", args.voice_id)
+        checks = verify_tts_inputs(root, project, adapter, voice)
+        parents = [adapter["rights_ref"], voice["rights_ref"]]
+        records = {item["asset_id"]: item for item in active_records(load_ledger(root))}
+        if any(parent not in records for parent in parents):
+            raise AppError("RIGHTS_RECORD_MISSING", "配音模型或声线缺少权利记录", exit_code=7)
+        if any(records[parent].get("sha256") != item["sha256"] for parent, item in zip(parents, [adapter, voice])):
+            raise AppError("TTS_RIGHTS_HASH_MISMATCH", "模型或声线登记与权利记录不一致", exit_code=7)
     else:
-        source_path = Path(str(args.input)).expanduser().resolve()
-        if not source_path.exists() or not source_path.is_file():
-            raise argument_error("TTS 文本输入不存在", str(source_path))
-        try:
-            text = source_path.read_text(encoding="utf-8-sig")
-        except UnicodeDecodeError as exc:
-            raise argument_error("TTS 文本输入必须是 UTF-8", str(source_path)) from exc
-        source = {"kind": "file", "path": str(source_path)}
-    operation_id = new_id("op")
-    output = Path(args.output).expanduser().resolve() if args.output else root / "assets" / f"tts_{operation_id}.wav"
-    ensure_inside(root, output)
+        text = validate_flite_text(text)
+        validate_flite_voice(args.voice)
     if args.dry_run:
-        return _envelope(
-            "tts.synthesize",
-            args,
-            status="planned",
-            data={"output": str(output), "voice": args.voice, "sample_rate": args.sample_rate, "channels": args.channels, "source": source},
-            operation_id=operation_id,
-        )
-    if not flite_available():
-        raise dependency_error("当前 FFmpeg 没有 flite 音频滤镜", "安装包含 --enable-libflite 的原生 FFmpeg；不会自动下载或调用线上 TTS")
-    result = synthesize_local_tts(
-        root,
-        text,
-        output,
-        operation_id=operation_id,
-        voice=args.voice,
-        sample_rate=args.sample_rate,
-        channels=args.channels,
-    )
-    payload = {
-        "operation_id": operation_id,
-        "command": "tts.synthesize",
-        "status": "succeeded",
-        "project_id": project["project"]["id"],
-        "source": source,
-        "created_at": now_iso(),
-        **{key: value for key, value in result.items() if key != "probe"},
-        "duration_seconds": result["probe"].get("duration_seconds", 0.0),
-    }
-    _operation(root, operation_id, payload)
-    project.setdefault("provenance", {}).setdefault("change_log", []).append(
-        {
-            "operation_id": operation_id,
-            "command": "tts.synthesize",
-            "output": str(output),
-            "engine": result["engine"],
-            "text_sha256": result["text_sha256"],
-            "at": now_iso(),
-        }
-    )
-    save_project(root, project)
-    return _envelope("tts.synthesize", args, data={**result, "source": source}, operation_id=operation_id)
+        return _envelope("tts.synthesize", args, status="planned", data={"output": str(output), "asset_id": asset_id, "voice": args.voice, "adapter_id": args.adapter_id, "voice_id": args.voice_id, "engine": SOULX_ENGINE if adapter else "ffmpeg-flite-local", "sample_rate": args.sample_rate, "channels": args.channels, "source": source, "checks": checks, "apply": args.apply, "track_id": args.track_id, "timeline_start_seconds": args.timeline_start_seconds, "network": "disabled"}, operation_id=operation_id)
+    if adapter is None and not flite_available():
+        raise dependency_error("当前 FFmpeg 没有 flite 音频滤镜", "安装原生 FFmpeg；不会自动下载或调用线上 TTS")
+    snapshot = create_snapshot(root, project, label="before-tts-synthesize")
+    created_output = False
+    try:
+        if adapter and voice:
+            result = synthesize_soulx(root, text, output, adapter=adapter, voice=voice, audio=Path(checks[1]["audio"]), operation_id=operation_id, sample_rate=args.sample_rate, channels=args.channels, seed=args.seed)
+        else:
+            result = synthesize_local_tts(root, text, output, operation_id=operation_id, voice=args.voice, sample_rate=args.sample_rate, channels=args.channels)
+        created_output = True
+        tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND))
+        duration = float(result["probe"].get("duration_seconds") or 0)
+        if not math.isfinite(duration) or duration <= 0:
+            raise AppError("TTS_OUTPUT_INVALID", "配音时长必须为正数", exit_code=6)
+        digest = f"sha256:{sha256_file(output)}"
+        asset = {"id": asset_id, "kind": "audio", "uri": output.relative_to(root).as_posix(), "sha256": digest, "duration_tick": max(1, round(duration * tps)), "timebase": {"ticks_per_second": tps}, "probe": result["probe"], "rights_ref": asset_id, "source": {"source_url": f"local://tts/{operation_id}", "retrieved_at": now_iso(), "original_name": output.name, "derived_from": parents, "generation": {"engine": result["engine"], "text": text, "text_sha256": result["text_sha256"], "adapter_id": args.adapter_id, "voice_id": args.voice_id, "seed": args.seed if adapter else None}}}
+        project.setdefault("assets", []).append(asset)
+        generated_clip = None
+        if track is not None:
+            generated_clip = {"id": new_id("clip_tts"), "asset_id": asset_id, "timeline_start_tick": round(args.timeline_start_seconds * tps), "source_in_tick": 0, "source_out_tick": asset["duration_tick"], "duration_tick": asset["duration_tick"], "enabled": True}
+            track.setdefault("clips", []).append(generated_clip)
+            _recompute_sequence_duration(sequence)
+        report_path = root / "validation" / f"tts_{operation_id}.json"
+        rights = {"asset_id": asset_id, "kind": "audio", "sha256": digest, "source_url": f"local://tts/{operation_id}", "source_version": result["engine"], "retrieved_at": now_iso(), "creator": "local-tts", "license_spdx": "LicenseRef-UNVERIFIED", "license_url": "", "attribution": "", "permitted_uses": ["internal"], "permitted_channels": [], "restrictions": [], "derived_from": parents, "evidence": str(report_path), "verification_status": "unverified", "verified_by": "", "takedown_status": "clear", "notes": "Generated speech needs output, model, reference voice and text rights review before publication"}
+        ledger = load_ledger(root)
+        add_record(ledger, rights)
+        # validate_project reads the on-disk ledger. The enclosing metadata
+        # transaction rolls this candidate back if validation or commit fails.
+        save_ledger(root, ledger)
+        validation = validate_project(root, project, strict_rights=False)
+        if not validation["ok"]:
+            raise AppError("TTS_APPLY_INVALID", "配音资产或音频轨道校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+        atomic_write_json(report_path, {"report_version": "0.1.0", "operation_id": operation_id, "source": source, "synthesis": result, "asset": asset, "rights": rights, "generated_clip": generated_clip, "snapshot_id": snapshot["snapshot_id"], "validation": validation})
+        change = {"operation_id": operation_id, "command": "tts.synthesize", "asset_id": asset_id, "output": str(output), "engine": result["engine"], "text_sha256": result["text_sha256"], "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "at": now_iso()}
+        project.setdefault("provenance", {}).setdefault("change_log", []).append(change)
+        save_project(root, project)
+        save_ledger(root, ledger)
+        _operation(root, operation_id, {**change, "status": "succeeded", "duration_seconds": duration})
+        envelope = _envelope("tts.synthesize", args, data={**result, "source": source, "asset": asset, "rights": rights, "snapshot": snapshot, "generated_clip": generated_clip, "report": str(report_path), "validation": validation}, operation_id=operation_id)
+        envelope.setdefault("warnings", []).append({"code": "TTS_REVIEW_REQUIRED", "message": "配音保留自然时长；发布前需复核错读、断尾、声线与模型/声源/文本权利"})
+        return envelope
+    except BaseException:
+        if created_output:
+            output.unlink(missing_ok=True)
+        _operation(root, operation_id, {"operation_id": operation_id, "command": "tts.synthesize", "status": "failed", "created_at": now_iso(), "output": str(output)})
+        raise
 
 
 def command_effects_list(args: argparse.Namespace) -> dict[str, Any]:
@@ -5044,7 +5160,7 @@ def _project_operation_lock(args: argparse.Namespace):
     """Return the operation-wide lock for a mutating project command."""
     project = getattr(args, "project", None)
     key = (getattr(args, "domain", None), getattr(args, "action", None))
-    adapter_read_only = key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}
+    adapter_read_only = (key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (key in {("tts", "adapter"), ("tts", "voice")} and getattr(args, "registration_action", None) in {"list", "inspect"})
     if not project or getattr(args, "dry_run", False) or key in _READ_ONLY_PROJECT_COMMANDS or adapter_read_only or key == ("queue", "cancel"):
         return contextlib.nullcontext()
     return project_write_lock(project)
@@ -5079,6 +5195,8 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("subtitle", "normalize"): command_subtitle_normalize,
     ("subtitle", "transcribe"): command_subtitle_transcribe,
     ("tts", "synthesize"): command_tts_synthesize,
+    ("tts", "adapter"): command_tts_registration,
+    ("tts", "voice"): command_tts_registration,
     ("effects", "list"): command_effects_list,
     ("effects", "inspect"): command_effects_inspect,
     ("motion", "list"): command_motion_list,
@@ -5140,7 +5258,7 @@ def main(argv: list[str] | None = None) -> int:
         with _project_operation_lock(args):
             transaction_root = getattr(args, "project", None)
             command_key = (args.domain, getattr(args, "action", None))
-            adapter_read_only = command_key == ("audio", "adapter") and getattr(args, "adapter_action", None) in {"list", "inspect"}
+            adapter_read_only = (command_key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (command_key in {("tts", "adapter"), ("tts", "voice")} and getattr(args, "registration_action", None) in {"list", "inspect"})
             transaction_enabled = bool(transaction_root) and not getattr(args, "dry_run", False) and command_key not in _READ_ONLY_PROJECT_COMMANDS and not adapter_read_only and command_key not in {("project", "recover"), ("queue", "cancel")}
             with (project_transaction(transaction_root, command=_command_name(args)) if transaction_enabled else contextlib.nullcontext({"active": False, "recovered": False})) as transaction:
                 if idempotency:

@@ -7,6 +7,18 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 Use this skill when the requested edit should be represented as a reproducible local Agent Project rather than a GUI project. The implementation lives in `product/` in this project.
 
+For Chinese voiceovers, read the [local SoulX contract](../../docs/specs/本地SoulX中文配音与声线登记契约_v0.1_2026-10-15.md).
+Register explicit existing Python/source/package/model/tokenizer paths with
+`tts adapter register`; ingest the authorized single-speaker reference and use
+`tts voice register` with its exact transcript and local evidence. Inspect both
+registrations, then run `tts synthesize --adapter-id <id> --voice-id <id> --text
+<Chinese-text> --asset-id <new-id> --output assets/tts/<new-name>.wav --dry-run`.
+Run formally after reviewing the plan. Optional `--apply --track-id <audio-track>`
+uses the actual WAV duration. Generated WAVs are registered assets with rights
+dependencies and remain unverified until reviewed. Preserve `TTS_REVIEW_REQUIRED`;
+this is a CUDA/HF/BF16 single-voice path, with no downloads, CPU/GGUF fallback or
+online service. No adapter keeps the English/ASCII flite behavior described below.
+
 ## Runtime boundary
 
 - Use native Windows Python and the installed `ffmpeg.exe`/`ffprobe.exe` only.

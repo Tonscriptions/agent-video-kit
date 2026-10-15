@@ -82,7 +82,9 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `subtitle validate --input FILE` | SRT/VTT/ASS/SSA/TTML | 解析、时长、顺序和重叠报告；TTML 只接受本地时钟/offset 语法并拒绝外部实体 |
 | `subtitle normalize --input FILE --output FILE` | 字幕文件 | 通过校验后规范化为 SRT；项目模式下输出必须位于项目内 |
 | `subtitle transcribe --project PATH (--asset-id ID\|--input FILE) --model-path PATH` | 本地音视频、显式离线 ASR 模型、可选字幕轨道 | 使用 Transformers 或 FFmpeg `whisper.cpp` 生成时间戳 SRT；`--apply` 继承已登记源素材权利，创建字幕资产、独立字幕片段、快照、校验和操作记录；无源资产权利时拒绝应用 |
-| `tts synthesize --project PATH (--text TEXT\|--input FILE)` | ASCII/英文文本或本地 UTF-8 文本文件 | 通过 FFmpeg 内置 flite 生成项目内 WAV；无网络、无模型下载；当前拒绝非 ASCII 文本 |
+| `tts synthesize --project PATH (--text TEXT\|--input FILE)` | 默认 flite 英文，或 `--adapter-id` + `--voice-id` 选择本地 SoulX 中文 | 生成项目 assets 内 WAV 并登记音频资产；可用 `--apply --track-id` 入轨；支持 dry-run、哈希、快照、事务、幂等与权利依赖 |
+| `tts adapter register/list/inspect` | 显式 Python、源码、依赖、完整模型、tokenizer 和证据 | 项目内模型登记/完整性核验；CUDA + HF/BF16，无下载或在线回退 |
+| `tts voice register/list/inspect` | 已登记参考音频、原样 UTF-8 逐字稿和本地授权/来源证据 | 声线登记、哈希核验、源权利依赖；默认未核验 |
 | `effects list [--query TEXT] [--keyframable-only]` | 可选效果 ID、别名、类别或后端筛选 | 返回本地 FFmpeg 效果目录、参数范围、关键帧能力、限制和目录版本；只读、无网络 |
 | `effects inspect --name NAME` | 效果 ID 或别名 | 返回单个效果的规范 ID、FFmpeg 后端、参数契约和限制；未知名称返回 `ARGUMENT_INVALID` |
 | `motion list [--query TEXT]` | 可选预设 ID、别名、类别或说明筛选 | 返回本地关键帧运镜预设目录、受控参数、目标属性、限制和目录版本；只读、无网络 |
@@ -250,7 +252,7 @@ $env:PYTHONPATH = 'E:\dev\sandbox\AI广告剪辑\product\src'
 python -m ai_ad_editor project init .\\work\\demo --name Demo
 python -m ai_ad_editor project migrate --project .\\work\\demo --dry-run --progress jsonl
 python -m ai_ad_editor timeline compose --project .\\work\\demo --input .\\changes.json --idempotency-key edit-001
-python -m ai_ad_editor tts synthesize --project .\\work\\demo --text "Hello local advertising voice" --output .\\work\\demo\\assets\\voice.wav
+python -m ai_ad_editor tts synthesize --project .\\work\\demo --text "Hello local advertising voice" --output assets\tts\voice.wav
 python -m ai_ad_editor validate --project .\\work\\demo --strict-rights
 python -m ai_ad_editor render --project .\\work\\demo --profile vertical --progress jsonl --output .\\work\\demo\\renders\\ad.mp4
 python -m ai_ad_editor queue enqueue --project .\\work\\demo --input .\\queue.json
@@ -263,3 +265,6 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 
 调用方应先读取 `capabilities`，再根据限制决定 Exact、Approximate 或拒绝计划。任何近似结果都必须连同 warning、转换报告或质量报告交给 Agent 上层处理。
 
+## 本地中文配音增量
+
+详细参数、worker 协议、网络阻断、输入/输出哈希、自然时长、错误码和权利依赖见[本地 SoulX 契约](./本地SoulX中文配音与声线登记契约_v0.1_2026-10-15.md)。未指定适配器时 flite 的非 ASCII 拒绝行为保持有效；模型路径、参考声或证据变化时拒绝执行，禁止自动回退在线服务。
