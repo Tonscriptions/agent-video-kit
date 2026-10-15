@@ -384,6 +384,9 @@ def build_parser() -> argparse.ArgumentParser:
     track_bind.add_argument("--target-clip-id", required=True, help="被绑定的文字/贴纸/效果片段 ID")
     track_bind.add_argument("--target-track-id", required=True, help="被绑定片段所在轨道 ID")
     track_bind.add_argument("--sequence-id", default=None, help="目标序列 ID，默认主序列")
+    track_bind.add_argument("--source-clip-id", default=None, help="将源视频片段的裁切、变换和源时钟映射到目标画布")
+    track_bind.add_argument("--source-track-id", default=None, help="与 --source-clip-id 配套的源轨道")
+    track_bind.add_argument("--rotation-mode", choices=("none", "source"), default="none", help="画布绑定时可跟随源层相对旋转")
     track_bind.add_argument("--start-seconds", type=float, default=0.0)
     track_bind.add_argument("--end-seconds", type=float, default=None)
     track_bind.add_argument("--step-frames", type=int, default=4)
@@ -1938,6 +1941,19 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
         raise AppError("TRACK_BIND_TARGET_AUDIO", "对象跟踪不能绑定到音频片段", exit_code=2, path="target_track_id")
     if target_clip.get("sequence_id"):
         raise AppError("TRACK_BIND_NESTED_UNSUPPORTED", "对象跟踪绑定当前不支持嵌套序列片段", exit_code=2, path="target_clip_id")
+    source_track = source_clip = None
+    if bool(args.source_clip_id) != bool(args.source_track_id):
+        raise argument_error('source-clip-id 与 source-track-id 必须同时提供', 'source_clip_id')
+    if args.source_clip_id:
+        if not asset_id:
+            raise argument_error('画布绑定需要已摄取的 --asset-id', 'asset_id')
+        source_track,source_clip = _find_clip(sequence,args.source_clip_id,args.source_track_id)
+        if source_clip.get('asset_id') != asset_id or source_clip.get('sequence_id') or source_clip.get('id') == target_clip.get('id') or source_track.get('kind') not in {'video','overlay'}:
+            raise argument_error('画布绑定源必须是相同 asset-id 的独立直接视频片段', 'source_clip_id')
+        if asset_map(project)[asset_id].get('sha256') != 'sha256:'+sha256_file(source):
+            raise AppError('TRACK_BIND_SOURCE_CHANGED', '源媒体已偏离摄取摘要，请重新摄取后跟踪', exit_code=6)
+    elif args.rotation_mode != 'none':
+        raise argument_error('rotation-mode=source 需要明确源片段', 'source_clip_id')
     target_duration = max(1, int(target_clip.get("duration_tick", 1)))
     if float(args.start_seconds) < 0:
         raise argument_error("start-seconds 不能为负数", "start_seconds")
@@ -1959,6 +1975,10 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
                 "target_track_id": args.target_track_id,
                 "sequence_id": sequence.get("id"),
                 "target_duration_tick": target_duration,
+                "coordinate_space": "timeline-canvas-v1" if source_clip else "source-normalized",
+                "source_clip_id": args.source_clip_id,
+                "source_track_id": args.source_track_id,
+                "rotation_mode": args.rotation_mode,
                 "scale_mode": args.scale_mode,
                 "scale_multiplier": args.scale_multiplier,
                 "offset": {"x": args.offset_x, "y": args.offset_y},
@@ -2070,12 +2090,28 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
     }
     if args.scale_mode == "roi":
         plan["keyframes"].append({"property": "transform.scale", "keyframes": [{"at_tick": at, "value": value, "interpolation": interpolation} for at, value, interpolation in scale_values]})
+    if source_clip is not None:
+        from .bindings import make_binding,compile_binding
+        tracking['source_sha256'] = plan['source_sha256']
+        if tracking['range'].get('end_seconds') is None:
+            tracking['range']['end_seconds'] = float(asset_map(project)[asset_id]['probe']['duration_seconds'])
+        binding = make_binding(project,sequence,source_track,source_clip,target_track,target_clip,tracking,offset_x=float(args.offset_x),offset_y=float(args.offset_y),scale_mode=args.scale_mode,scale_multiplier=float(args.scale_multiplier),rotation_mode=args.rotation_mode)
+        geometry = compile_binding(project,sequence,target_track,{**target_clip,'tracking_binding':binding})
+        model_warnings = [w for w in plan['warnings'] if w != 'tracking_clock_mapped_to_target_clip_duration']
+        plan.update({'binding_version':'0.2.0','tracking_binding':binding,**geometry})
+        plan['warnings'] = model_warnings+plan['warnings']
     if not args.apply:
         atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "applied": False, "plan": plan})
         warnings = ([{"code": "TRACKING_MULTI_OBJECT_REVIEW", "message": "多目标 runner 输出已通过协议校验，但仍需检查对象身份连续性、目标文字/贴纸边界和轨迹稳定性"}] if visual_adapter and visual_adapter.get("engine") in MULTI_OBJECT_TRACKING_ENGINES else [{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查目标文字/贴纸边界和轨迹稳定性"}] if visual_adapter else [{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配绑定可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和目标文字/贴纸边界"}])
         return _envelope("media.track-bind", args, status="planned", data={"report": str(report_path), "plan": plan, "adapter": visual_adapter, "adapter_verification": adapter_verification, "applied": False}, warnings=warnings)
     before_project = copy.deepcopy(project)
     before_snapshot = create_snapshot(root, before_project, label="before-track-bind")
+    if source_clip is not None:
+        from .bindings import apply_compiled_binding
+        target_clip['tracking_binding'] = copy.deepcopy(plan['tracking_binding'])
+        apply_compiled_binding(target_clip,plan)
+    else:
+        target_clip.pop('tracking_binding',None)
     for item in plan["keyframes"]:
         values = [(int(point["at_tick"]), float(point["value"]), str(point.get("interpolation", "linear"))) for point in item["keyframes"]]
         _set_keyframe_track(target_clip, str(item["property"]), values)
@@ -3653,7 +3689,7 @@ def _clip_from_change(change: dict[str, Any], track: dict[str, Any]) -> dict[str
         clip["sequence_id"] = sequence_id
     if text_generator:
         clip["generator"] = copy.deepcopy(generator)
-    for field in ("speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "generator", "audio", "blend", "mask"):
+    for field in ("speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "generator", "audio", "blend", "mask", "tracking_binding"):
         if field in change:
             clip[field] = change[field]
     return clip
@@ -4185,7 +4221,7 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
             patch = change.get("patch") if isinstance(change.get("patch"), dict) else change
             if "id" in patch or "clip_id" in patch:
                 raise argument_error("update_clip 不允许修改片段 ID", "patch")
-            for field in ("asset_id", "sequence_id", "timeline_start_tick", "duration_tick", "source_in_tick", "source_out_tick", "speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "generator", "audio", "blend", "mask"):
+            for field in ("asset_id", "sequence_id", "timeline_start_tick", "duration_tick", "source_in_tick", "source_out_tick", "speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "generator", "audio", "blend", "mask", "tracking_binding"):
                 if field in patch:
                     clip[field] = patch[field]
             _clamp_clip_keyframes(clip)

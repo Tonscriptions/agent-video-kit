@@ -9,8 +9,14 @@ Native model tracking is described in the [YOLO contract](../../docs/specs/本�
 Review `media track --all-objects` before binding an ID to text or reframing a
 direct clip. Preserve the applied clip's `rights_dependencies` entries with
 model registration SHA-256; they participate in publish gates. Label binding
-uses the full requested time range and normalized source coordinates; cropped,
-rotated or nested source layers still require coordinate review. Do not delete
+without source references uses normalized source coordinates. For current
+crop/fit/fill/stretch, transform, mirror and source-time mapping, supply both
+`--source-track-id` and `--source-clip-id`; see the [canvas binding contract](../../docs/specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md).
+This saves source-clock observations and recompiles them for the render canvas.
+Optional `--rotation-mode source` follows layer rotation, not object pose.
+Live bindings own their generated transform keys; set `tracking_binding` to null
+with update_clip to detach while retaining saved preview keys. Nested parents,
+mask/occlusion visibility, VFR and nonlinear warps remain review boundaries. Do not delete
 dependencies or warnings to make a project pass a release gate.
 
 Write a project-relative JSON change set and apply it with:

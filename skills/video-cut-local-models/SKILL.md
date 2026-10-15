@@ -18,6 +18,12 @@ missing-observation, resampled-clock and identity-review warnings. Applying
 requires `--asset-id` and retains model rights on the target clip. Registration
 metadata is restored/packaged; external weights and Python remain explicit inputs.
 
+For labels on an edited source clip, pass `--source-track-id` and
+`--source-clip-id` to `media track-bind`. The saved source-clock observations
+are projected through crop, layer transforms, mirror and source-time changes
+again at render time; inference is not rerun. Read the [canvas binding contract](../../docs/specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md).
+Plaintext/OTIO/MLT export bakes this relationship and must report the loss.
+
 Models are inputs, never dependencies that the CLI fetches. Put a model in a
 project or approved local model directory, record its version, SHA-256 and
 license in the project provenance/Rights Ledger, then pass the absolute path.

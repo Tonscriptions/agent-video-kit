@@ -11,6 +11,8 @@ import time
 from pathlib import Path
 from typing import Any, Callable
 
+from .animation import bezier_samples
+
 from .errors import AppError, dependency_error
 from .media import ffmpeg_path, probe_media
 from .policy import resolve_local_path
@@ -875,40 +877,10 @@ def _bezier_progress_expr(progress: str, controls: Any) -> str:
     This keeps the result frame-evaluable while preserving the intended value
     range exactly at both endpoints.
     """
-    values: list[float] = []
-    if isinstance(controls, (list, tuple)):
-        for value in controls:
-            if isinstance(value, dict):
-                value = value.get("y", value.get("value"))
-            try:
-                number = float(value)
-            except (TypeError, ValueError):
-                continue
-            if math.isfinite(number):
-                values.append(number)
-    if len(values) >= 4:
-        x1, y1, x2, y2 = values[:4]
-    elif len(values) >= 2:
-        x1, y1, x2, y2 = 1.0 / 3.0, values[0], 2.0 / 3.0, values[1]
-    else:
+    samples = bezier_samples(controls)
+    if samples is None:
         return progress
-
-    def cubic(a: float, b: float, u: float) -> float:
-        inv = 1.0 - u
-        return 3.0 * inv * inv * u * a + 3.0 * inv * u * u * b + u * u * u
-
-    def y_at(x_target: float) -> float:
-        low, high = 0.0, 1.0
-        for _ in range(20):
-            middle = (low + high) / 2.0
-            if cubic(x1, x2, middle) < x_target:
-                low = middle
-            else:
-                high = middle
-        return cubic(y1, y2, (low + high) / 2.0)
-
-    sample_count = 32
-    samples = [y_at(index / sample_count) for index in range(sample_count + 1)]
+    sample_count = len(samples)-1
     expression = f"{samples[-1]:.8f}"
     for index in range(sample_count - 1, -1, -1):
         start = index / sample_count
@@ -947,8 +919,8 @@ def _keyframe_expr(
     local = f"({time_variable}-{clip_start:.8f})"
     if len(pairs) == 1:
         return f"{pairs[0][1]:.8f}"
-    expression = f"{pairs[-1][1]:.8f}"
-    for index in range(len(pairs) - 2, -1, -1):
+    segments: list[str] = []
+    for index in range(len(pairs)-1):
         left_t, left_v, interpolation, controls = pairs[index]
         right_t, right_v, _, _ = pairs[index + 1]
         span = max(right_t - left_t, 1e-9)
@@ -966,7 +938,17 @@ def _keyframe_expr(
         else:
             eased = progress
         interpolated = f"({left_v:.8f}+({right_v-left_v:.8f})*({eased}))"
-        expression = f"if(lt({local},{right_t:.8f}),{interpolated},{expression})"
+        segments.append(interpolated)
+    segments.append(f"{pairs[-1][1]:.8f}")
+    # A balanced decision tree keeps long frame-sampled bindings below the
+    # expression parser's recursion limit. Segment endpoint semantics remain
+    # identical to the original right-recursive expression.
+    def branch(low: int, high: int) -> str:
+        if low == high:
+            return segments[low]
+        middle = (low+high+1)//2
+        return f"if(lt({local},{pairs[middle][0]:.8f}),{branch(low,middle-1)},{branch(middle,high)})"
+    expression = branch(0,len(segments)-1)
     return f"if(lt({local},{pairs[0][0]:.8f}),{pairs[0][1]:.8f},{expression})"
 
 
@@ -1082,6 +1064,30 @@ def _video_overlay_position(transform: dict[str, str], width: int, height: int) 
         f"({position_x})*W-({anchor_output_x})",
         f"({position_y})*H-({anchor_output_y})",
     )
+
+
+def _affine_video_filters(transform: dict[str, str]) -> list[str]:
+    """Sample a rotated layer onto its fixed output canvas around its anchor.
+
+    The old rotate filter retained the input rectangle while its overlay
+    position assumed an expanded rectangle. Inverse sampling keeps rotation,
+    scale and placement in one pixel coordinate system, without allocating a
+    scale-dependent intermediate image or clipping at the input rectangle.
+    """
+    values = {k: re.sub(r'\bt\b', 'T', v) for k,v in transform.items()}
+    angle = f"({values['rotation']})*PI/180"
+    setup = (
+        f"st(0,cos({angle}));st(1,sin({angle}));"
+        f"st(2,X+0.5-({values['position_x']})*W);"
+        f"st(3,Y+0.5-({values['position_y']})*H);"
+        f"st(4,max(0.00000001,abs({values['scale']})));"
+        f"st(5,({values['anchor_x']})*W+(ld(2)*ld(0)+ld(3)*ld(1))/ld(4)-0.5);"
+        f"st(6,({values['anchor_y']})*H+(-ld(2)*ld(1)+ld(3)*ld(0))/ld(4)-0.5);"
+        "st(7,gte(ld(5),-0.5)*lt(ld(5),W-0.5)*gte(ld(6),-0.5)*lt(ld(6),H-0.5));"
+    )
+    def plane(name: str) -> str:
+        return _expr_arg(setup+f"if(ld(7),{name}(clip(ld(5),0,W-1),clip(ld(6),0,H-1)),0)")
+    return ['format=gbrap', f"geq=r={plane('r')}:g={plane('g')}:b={plane('b')}:a={plane('alpha')}:interpolation=bilinear", 'format=rgba']
 
 
 def _speed_curve_segments(clip: dict[str, Any], source_span_tick: int, tps: int) -> list[tuple[float, float, float, float]]:
@@ -2547,13 +2553,6 @@ def _build_subtitle_layer(
     filters.append(f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba[{canvas_label}]")
     filters.append(f"[{canvas_label}]{overlay['filter']}[{layer_label}]")
 
-    if transform["scale"] != "1.00000000":
-        scale_w = _expr_arg(f"max(2,iw*({transform['scale']}))")
-        scale_h = _expr_arg(f"max(2,ih*({transform['scale']}))")
-        scaled_label = f"subtitle_scaled{subtitle_index}"
-        filters.append(f"[{layer_label}]scale=w={scale_w}:h={scale_h}:eval=frame,format=rgba[{scaled_label}]")
-        layer_label = scaled_label
-
     rotation_expression = transform["rotation"]
     if overlay.get("animation_type") == "rotate":
         animation_start = clip_start + max(0.0, _num(animation.get("delay", 0.0), 0.0))
@@ -2563,11 +2562,19 @@ def _build_subtitle_layer(
         progress = f"clip((t-{animation_start:.6f})/{animation_duration:.6f},0,1)"
         animation_angle = f"({from_degrees:.6f}+({to_degrees - from_degrees:.6f})*{progress})"
         rotation_expression = f"({transform['rotation']})+({animation_angle})"
-    if rotation_expression != "0.00000000":
-        rotated_label = f"subtitle_rotated{subtitle_index}"
-        rotation_radians = _expr_arg(f"({rotation_expression})*PI/180")
-        filters.append(f"[{layer_label}]rotate={rotation_radians}:fillcolor=black@0.0:ow=iw:oh=ih,format=rgba[{rotated_label}]")
-        layer_label = rotated_label
+    affine_text = rotation_expression != '0.00000000' or bool(clip_value.get('tracking_binding'))
+    if affine_text:
+        affine_label = f'subtitle_affine{subtitle_index}'
+        filters.append(f'[{layer_label}]'+','.join(_affine_video_filters({**transform,'rotation':rotation_expression}))+f'[{affine_label}]')
+        layer_label = affine_label
+    else:
+        if transform["scale"] != "1.00000000":
+            scale_w = _expr_arg(f"max(2,iw*({transform['scale']}))")
+            scale_h = _expr_arg(f"max(2,ih*({transform['scale']}))")
+            scaled_label = f"subtitle_scaled{subtitle_index}"
+            filters.append(f"[{layer_label}]scale=w={scale_w}:h={scale_h}:eval=frame,format=rgba[{scaled_label}]")
+            layer_label = scaled_label
+
 
     effect_filters = _effect_filters(
         clip_value.get("effects"),
@@ -2606,8 +2613,8 @@ def _build_subtitle_layer(
     outgoing = clip_value.get("transition_out") if isinstance(clip_value.get("transition_out"), dict) else {}
     transition_opacity = "1.00000000"
     wipe_alpha = "1.00000000"
-    position_x_expr = f"({transform['position_x']})*W-w*({transform['anchor_x']})"
-    position_y_expr = f"({transform['position_y']})*H-h*({transform['anchor_y']})"
+    position_x_expr = "0" if affine_text else f"({transform['position_x']})*W-w*({transform['anchor_x']})"
+    position_y_expr = "0" if affine_text else f"({transform['position_y']})*H-h*({transform['anchor_y']})"
     unsupported_transitions: list[str] = []
 
     def _spatial_transition(raw_type: str, config: dict[str, Any]) -> tuple[str, str] | None:
@@ -2714,6 +2721,13 @@ def _build_subtitle_layer(
 
 
 def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, Any]) -> tuple[list[str], str, list[dict[str, Any]], list[dict[str, Any]]]:
+    if any(c.get('tracking_binding') for s in project.get('sequences',[]) for t in s.get('tracks',[]) for c in t.get('clips',[])):
+        from .bindings import compile_project_bindings,validate_project_bindings
+        findings = validate_project_bindings(project,root)
+        if findings:
+            raise AppError('TRACK_BIND_GEOMETRY_INVALID','绑定引用或源文件完整性检查失败',exit_code=2,cause=json.dumps(findings,ensure_ascii=False))
+        project = compile_project_bindings(project)
+        sequence = next(s for s in project['sequences'] if s['id'] == sequence['id'])
     settings = project["settings"]
     tps = int(settings["timebase"]["ticks_per_second"])
     width = int(settings["canvas"]["width"])
@@ -2783,6 +2797,12 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         if track.get("muted") or bool(track_audio.get("muted", False) or track_audio.get("mute", False)):
             continue
         for clip in sorted(track.get("clips", []), key=lambda item: int(item.get("timeline_start_tick", 0))):
+            if clip.get('_tracking_binding_plan'):
+                binding_plan = clip['_tracking_binding_plan']
+                input_meta.append({'kind':'tracking-binding','clip_id':clip['id'],**binding_plan})
+                warnings.extend({'code':'TRACK_BIND_REVIEW_REQUIRED','clip_id':clip['id'],'message':message} for message in binding_plan['warnings'])
+                if clip.get('_nested_parent_transforms') or clip.get('_nested_parent_transform'):
+                    warnings.append({'code':'TRACK_BIND_NESTED_COORDINATES_APPROXIMATE','clip_id':clip['id'],'message':'绑定随嵌套父层展开；父枢轴与不同坐标空间仍需视觉验收'})
             asset = assets.get(clip.get("asset_id"))
             if track.get("kind") == "subtitle":
                 subtitle = clip.get("subtitle") if isinstance(clip.get("subtitle"), dict) else None
@@ -2856,6 +2876,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 if bool(clip.get("reverse")):
                     chain.append("reverse")
                 chain.append(setpts)
+                chain.append(f"fps={fps_value}:start_time={start:.8f}:round=up:eof_action=pass")
                 if kind == "video" and color_tone_map not in {"", "none"}:
                     chain.extend(_tone_map_filters(settings, warnings, str(clip.get("id")), transparent=transparent_canvas))
                 crop = clip.get("crop") if isinstance(clip.get("crop"), dict) else {}
@@ -2912,9 +2933,9 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                             # animated origin so every frame remains in bounds.
                             x_expression = f"max(0,min(iw-out_w,({x_expression})))"
                             y_expression = f"max(0,min(ih-out_h,({y_expression})))"
-                            chain.append(f"crop={crop_width}:{crop_height}:x={_expr_arg(x_expression)}:y={_expr_arg(y_expression)}")
+                            chain.append(f"crop={crop_width}:{crop_height}:x={_expr_arg(x_expression)}:y={_expr_arg(y_expression)}:exact=1")
                         else:
-                            chain.append(f"crop={crop_width}:{crop_height}:{crop_x}:{crop_y}")
+                            chain.append(f"crop={crop_width}:{crop_height}:{crop_x}:{crop_y}:exact=1")
                 if not dynamic_crop_rendered:
                     if crop_fit == "fill":
                         chain.extend([f"scale={width}:{height}:force_original_aspect_ratio=increase", f"crop={width}:{height}:(iw-ow)/2:(ih-oh)/2", "setsar=1"])
@@ -2931,92 +2952,28 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 if freeze:
                     freeze_extra = max(0.0, _sec(int(freeze.get("duration_tick", 0)), tps))
                     if freeze_extra > 0:
-                        # A freeze is an insertion in the already time-mapped
-                        # video stream.  Split after trim/speed/crop so the
-                        # requested `at_tick` refers to the clip timeline,
-                        # including speed curves and reverse playback.  The
-                        # hold branch keeps one decoded frame and tpad clones
-                        # it for the requested duration; the other branches
-                        # retain their original order and are concatenated
-                        # back onto the clip's absolute timeline.
-                        requested_at = _sec(int(freeze.get("at_tick", int(round(clip_content_duration * tps)))), tps)
-                        freeze_at = max(0.0, min(clip_content_duration, requested_at))
-                        base_start = start
-                        base_end = start + clip_content_duration
-                        hold_start = max(base_start, base_start + freeze_at - frame_duration)
-                        hold_end = min(base_end, hold_start + (frame_duration * 2.0))
-                        freeze_prefix = f"freeze{index}"
-                        hold_input = f"{freeze_prefix}holdin"
-                        hold_output = f"{freeze_prefix}hold"
-                        post_input = f"{freeze_prefix}postin"
-                        post_output = f"{freeze_prefix}post"
-                        pre_input = f"{freeze_prefix}prein"
-                        pre_output = f"{freeze_prefix}pre"
-                        # Keep a pre/post branch only when it contains at
-                        # least one frame.  This also handles freeze-at-zero,
-                        # freeze-at-end, and clips shorter than two frames.
-                        if freeze_at <= frame_duration or clip_content_duration <= (2.0 * frame_duration):
-                            filters.append(
-                                ",".join(chain)
-                                + f",split=2[{hold_input}][{post_input}]"
-                            )
-                            filters.append(
-                                f"[{hold_input}]trim=start={base_start:.6f}:end={hold_end:.6f},"
-                                f"select='eq(n,0)',setpts=PTS-STARTPTS,tpad=stop_mode=clone:stop_duration={freeze_extra:.6f}[{hold_output}]"
-                            )
-                            filters.append(
-                                f"[{post_input}]trim=start={base_start + freeze_at:.6f}:end={base_end:.6f},"
-                                f"setpts=PTS-STARTPTS[{post_output}]"
-                            )
-                            chain = [
-                                f"[{hold_output}][{post_output}]concat=n=2:v=1:a=0,"
-                                f"setpts=PTS-STARTPTS+{start:.6f}/TB"
-                            ]
-                        elif freeze_at >= clip_content_duration - frame_duration:
-                            filters.append(
-                                ",".join(chain)
-                                + f",split=2[{pre_input}][{hold_input}]"
-                            )
-                            filters.append(
-                                f"[{pre_input}]trim=start={base_start:.6f}:end={base_start + freeze_at:.6f},"
-                                f"setpts=PTS-STARTPTS[{pre_output}]"
-                            )
-                            filters.append(
-                                f"[{hold_input}]trim=start={hold_start:.6f}:end={base_end:.6f},"
-                                f"select='eq(n,0)',setpts=PTS-STARTPTS,tpad=stop_mode=clone:stop_duration={freeze_extra:.6f}[{hold_output}]"
-                            )
-                            chain = [
-                                f"[{pre_output}][{hold_output}]concat=n=2:v=1:a=0,"
-                                f"setpts=PTS-STARTPTS+{start:.6f}/TB"
-                            ]
-                        else:
-                            filters.append(
-                                ",".join(chain)
-                                + f",split=3[{pre_input}][{hold_input}][{post_input}]"
-                            )
-                            filters.append(
-                                f"[{pre_input}]trim=start={base_start:.6f}:end={base_start + freeze_at:.6f},"
-                                f"setpts=PTS-STARTPTS[{pre_output}]"
-                            )
-                            filters.append(
-                                f"[{hold_input}]trim=start={hold_start:.6f}:end={hold_end:.6f},"
-                                f"select='eq(n,0)',setpts=PTS-STARTPTS,tpad=stop_mode=clone:stop_duration={freeze_extra:.6f}[{hold_output}]"
-                            )
-                            filters.append(
-                                f"[{post_input}]trim=start={base_start + freeze_at:.6f}:end={base_end:.6f},"
-                                f"setpts=PTS-STARTPTS[{post_output}]"
-                            )
-                            chain = [
-                                f"[{pre_output}][{hold_output}][{post_output}]concat=n=3:v=1:a=0,"
-                                f"setpts=PTS-STARTPTS+{start:.6f}/TB"
-                            ]
-                if transforms["scale"] != "1.00000000":
+                        # The stream is already sampled on the display grid.
+                        # Repeat one frame in place, then rebuild its CFR clock;
+                        # split/tpad/concat counted the held frame twice and
+                        # shifted every later frame away from audio/labels.
+                        requested_at = _sec(int(freeze.get("at_tick", int(round(clip_content_duration*tps)))), tps)
+                        freeze_at = max(0.0,min(clip_content_duration,requested_at))
+                        hold_frames = max(1,int(round(freeze_extra/frame_duration)))
+                        # FFmpeg loop starts capturing when its consumed-frame
+                        # count reaches start (start=4 holds source index 3).
+                        start_frame = max(0,int(math.ceil(freeze_at/frame_duration-1e-8)))
+                        first_clock = math.ceil(start/frame_duration-1e-8)*frame_duration
+                        chain.append(f"loop=loop={hold_frames}:size=1:start={start_frame}")
+                        chain.append(f"setpts=N*{frame_duration:.12f}/TB+{first_clock:.8f}/TB")
+                        if abs(hold_frames*frame_duration-freeze_extra) > 1e-6:
+                            warnings.append({"code":"FREEZE_FRAME_QUANTIZED","clip_id":clip.get("id"),"message":"定格时长已量化到显示帧率","requested_seconds":freeze_extra,"actual_seconds":hold_frames*frame_duration})
+                affine_canvas = transforms['rotation'] != '0.00000000' or bool(clip.get('_tracking_binding_source'))
+                if affine_canvas:
+                    chain.extend(_affine_video_filters(transforms))
+                elif transforms["scale"] != "1.00000000":
                     scale_expr = _expr_arg(f"max(2,iw*({transforms['scale']}))")
                     height_expr = _expr_arg(f"max(2,ih*({transforms['scale']}))")
                     chain.append(f"scale=w={scale_expr}:h={height_expr}:eval=frame")
-                if transforms["rotation"] != "0.00000000":
-                    rotation_expr = _expr_arg("(" + transforms["rotation"] + ")*PI/180")
-                    chain.append(f"rotate={rotation_expr}:fillcolor=black@0")
                 if transforms["opacity"] != "1.00000000":
                     alpha_expr = f"alpha(X,Y)*clip(({transforms['opacity']}),0,1)"
                     chain.extend(["format=gbrap", f"geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)}", "format=rgba"])
@@ -3063,7 +3020,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     chain.append(f"fade=t=out:st={max(0.0, clip_content_duration + freeze_extra-fade_duration):.6f}:d={fade_duration:.6f}")
                 filters.append(",".join(chain) + f"[{label}]")
                 video_labels.append(label)
-                overlay_x, overlay_y = _video_overlay_position(transforms, width, height)
+                overlay_x, overlay_y = ('0','0') if affine_canvas else _video_overlay_position(transforms, width, height)
                 position_x_expr = _expr_arg(overlay_x)
                 position_y_expr = _expr_arg(overlay_y)
                 position = f"x={position_x_expr}:y={position_y_expr}"

@@ -248,10 +248,13 @@ def _asset_uri(root: Path, asset: dict[str, Any]) -> Path:
 
 
 def _export_otio(root: Path, project: dict[str, Any], output: Path) -> dict[str, Any]:
+    from .bindings import bake_interchange_bindings
+    project,bound_clips = bake_interchange_bindings(project)
     tps = int(project["settings"]["timebase"]["ticks_per_second"])
     assets = {str(asset.get("id")): asset for asset in project.get("assets", [])}
     tracks: list[dict[str, Any]] = []
     items: list[dict[str, Any]] = [report_item("project-model", "Mapped", "Agent Project JSON", "OpenTimelineIO JSON", "使用标准 Stack/Track/Gap/Clip 节点；完整本地片段保存在 ai_ad_editor metadata")]
+    items.extend(report_item('tracking-binding', 'Approximate', clip_id, detail='活动绑定按当前画布重算为关键帧；外部格式不保留绑定引用，视觉能力按格式报告复核') for clip_id in bound_clips)
     sequence = project.get("sequences", [{}])[0]
     for track in sorted(sequence.get("tracks", []), key=lambda item: int(item.get("order", 0))):
         kind = "Audio" if track.get("kind") == "audio" else "Video"
@@ -329,6 +332,8 @@ def _export_otio(root: Path, project: dict[str, Any], output: Path) -> dict[str,
 
 
 def _export_kdenlive_xml(root: Path, project: dict[str, Any], output: Path) -> dict[str, Any]:
+    from .bindings import bake_interchange_bindings
+    project,bound_clips = bake_interchange_bindings(project)
     tps = int(project["settings"]["timebase"]["ticks_per_second"])
     fps = project["settings"]["timebase"].get("display_fps", {"num": 30, "den": 1})
     fps_num = max(1, int(fps.get("num", 30)))
@@ -345,6 +350,7 @@ def _export_kdenlive_xml(root: Path, project: dict[str, Any], output: Path) -> d
     })
     producers: list[tuple[str, dict[str, Any]]] = []
     items: list[dict[str, Any]] = [report_item("project-model", "Approximate", "Agent Project JSON", "Kdenlive MLT XML", "导出本地 producer 与顺序 playlist；复杂效果需在转换报告中复核")]
+    items.extend(report_item('tracking-binding', 'Approximate', clip_id, detail='活动绑定按当前画布重算为关键帧；外部格式不保留绑定引用，视觉能力按格式报告复核') for clip_id in bound_clips)
     sequence = project.get("sequences", [{}])[0]
     playlists: list[str] = []
     producer_index = 0

@@ -2776,11 +2776,11 @@ print(json.dumps({
             self.assertEqual(code, 0, planned)
             graph = planned["data"]["plan"]["filter_complex"]
             self.assertIn("subtitlecanvas0", graph)
-            self.assertIn("subtitle_scaled0", graph)
+            self.assertIn("subtitle_affine0", graph)
             self.assertIn("subtitle_mask0_0", graph)
             self.assertIn("subtitle_blendcanvas0", graph)
             self.assertIn("subtitle_transition_opacity0", graph)
-            self.assertIn("rotate=", graph)
+            self.assertIn("st(0,cos(", graph)
             self.assertIn("drawtext=text='Local title'", graph)
             self.assertLess(graph.index("[base][v0]overlay"), graph.index("subtitle_blendcanvas0"))
             self.assertLess(graph.index("subtitle_blendcanvas0"), graph.rindex("[v1]overlay"))
@@ -4325,7 +4325,7 @@ print(json.dumps({
             code, planned = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
             self.assertEqual(code, 0, planned)
             filter_graph = planned["data"]["plan"]["filter_complex"]
-            self.assertIn("split=3[freeze0prein][freeze0holdin][freeze0postin]", filter_graph)
+            self.assertIn("loop=loop=6:size=1:start=15", filter_graph)
             self.assertFalse(any(item.get("feature") == "freeze_frame" for item in planned["data"]["plan"]["warnings"]))
             code, rendered = invoke("render", "--project", str(project), "--output", str(output))
             self.assertEqual(code, 0, rendered)

@@ -1,0 +1,235 @@
+{
+  "checked_at_utc": "2026-10-15T15:46:31.382751+00:00",
+  "implementation_base": "b8cb8f76ac5ba902b73d4dd7937748e28b29ec6d",
+  "scope": "controlled source-clock/crop/affine tracking geometry; broad Jianying parity and natural occlusion are not accepted",
+  "checks": [
+    {
+      "command": "convert.export",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "convert.import",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "timeline.compose",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "media.adapter.inspect",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "media.track-bind",
+      "status": "planned",
+      "exit_code": 0
+    },
+    {
+      "command": "media.track-bind",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "render",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "quality.check",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "timeline.compose",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "render",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "quality.check",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "validate",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "policy.audit",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "rights.check",
+      "status": "failed",
+      "exit_code": 7
+    }
+  ],
+  "tracking_engine": "yolov10-onnx-cpu-tracking-v1",
+  "object_id": "obj_0001",
+  "observation_count": 29,
+  "binding_version": "0.2.0",
+  "rendered": [
+    {
+      "file": "portrait.mp4",
+      "sha256": "sha256:a05b17543f4fcd11446c35c6d1425af54f5487462f76b20f7b7364559b9f1e2d",
+      "width": 360,
+      "height": 640,
+      "quality_ok": true,
+      "binding": {
+        "kind": "tracking-binding",
+        "clip_id": "geometry_label",
+        "coordinate_space": "timeline-canvas-v1",
+        "source_clip_id": "video",
+        "source_track_id": "track_video_1",
+        "canvas": {
+          "width": 360,
+          "height": 640
+        },
+        "sampled_frames": 33,
+        "hidden_frames": 1,
+        "warnings": [
+          "tracking_observations_interpolated_in_source_clock",
+          "binding_is_sampled_at_project_display_fps",
+          "source_masks_and_occlusion_visibility_require_review"
+        ]
+      },
+      "filter_graph_transport": {
+        "mode": "local-file",
+        "sha256": "sha256:3d6a6ba5b075c8d771fc9d7cceda3c29b5f8ff6259cd56dc05859ac12df7fe00",
+        "utf8_bytes": 104589,
+        "logical_command_utf16_units": 105437,
+        "execution_command_utf16_units": 1020
+      }
+    },
+    {
+      "file": "landscape-after-edit.mp4",
+      "sha256": "sha256:86cac1b05e4ea8c31a628bf0a2ab69b82b9480c98f9f4feae4daf154dea2dd40",
+      "width": 640,
+      "height": 360,
+      "quality_ok": true,
+      "binding": {
+        "kind": "tracking-binding",
+        "clip_id": "geometry_label",
+        "coordinate_space": "timeline-canvas-v1",
+        "source_clip_id": "video",
+        "source_track_id": "track_video_1",
+        "canvas": {
+          "width": 640,
+          "height": 360
+        },
+        "sampled_frames": 33,
+        "hidden_frames": 1,
+        "warnings": [
+          "tracking_observations_interpolated_in_source_clock",
+          "binding_is_sampled_at_project_display_fps",
+          "source_masks_and_occlusion_visibility_require_review"
+        ]
+      },
+      "filter_graph_transport": {
+        "mode": "local-file",
+        "sha256": "sha256:ed7a0c3a266b37530c4c70a7db2cca1acb01a722ef8c4e01d1e1f16144f30c8c",
+        "utf8_bytes": 105175,
+        "logical_command_utf16_units": 106035,
+        "execution_command_utf16_units": 1032
+      }
+    }
+  ],
+  "source_fixture_sha256": "sha256:af1286a9eba95a92a69cb6997f4288d38030dd8ef9f571c97e7e5913a7950e00",
+  "model_executed_by_registered_native_worker": true,
+  "network": "disabled",
+  "docker_or_wsl_started": false,
+  "browser_started": false,
+  "downloads": false,
+  "full_regression": {
+    "tests": 211,
+    "seconds": 346.832,
+    "passed": true,
+    "log": "product/.runtime/tracking-geometry-full-final-20261015.log",
+    "sha256": "sha256:a2efea48eeccfb6830a56eaafaca387f88cee124332df036f3a9935c00a636df"
+  },
+  "targeted_regression": {
+    "tests": 17,
+    "seconds": 56.026,
+    "passed": true,
+    "sha256": "sha256:ba5f43230f3abe1fc937f803bb417563b06759aa4c26e002f52b752691831af6"
+  },
+  "implementation_sha256": {
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:fd9470e2597c75344d00ee0d5b5c78ccc10d27815dab20d82cf4c5d2dc4a594f",
+    "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+    "product/src/ai_ad_editor/cli.py": "sha256:b9e5154848d0c731c269569c3f75a0ed0a64cb214561d2137b481bc5d7740a38",
+    "product/src/ai_ad_editor/convert.py": "sha256:9cbdcbde37e01e4c97be36cc5e741f1962a269451828a4ec32577464bfbb44ed",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+    "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:a4bb74dd881ffad8e6340e3ccf16a33362ce80b90721f141bb5c86a7c34153b8",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+    "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+    "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:ae9626cc7a1037979a5bfa81a03e9d1ed28a8fbf44921c892810f2d0f9424080",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:1b22761b1bbf6bae4b90204df5ff33d7196acbb39205461e35e524890ffa2de5",
+    "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "docs/specs/agent-project.schema.json": "sha256:c47732d975da725c846eac6de52e20c5b36eee91bae0caaeef2137204cd3e20e",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "scripts/smoke_tracking_geometry.py": "sha256:07c6889a0c5eb74ac243115da3bc2854edc81b23291779811e2cbe18df0a3586"
+  },
+  "frames": {
+    "landscape-after-edit-0.5.png": "sha256:e3fbc2e037777cd92c552ef33c3ceb436bc41a389d0fbb92c70dce60fcb6f62a",
+    "landscape-after-edit-3.5.png": "sha256:97c7b99300f8644058bbc646bfb5225eae65e13c3f7fc2cdac0b9d0a330947a0",
+    "portrait-0.5.png": "sha256:0196b9188c01fc7ccf459f2efdd502dc8bbd0034cd7d9c3386c03cd33638bc5f",
+    "portrait-3.5.png": "sha256:288509bf1b692104f85e0197816d2271846b828d446c8f659ac3d402b67910d5"
+  },
+  "visual_review": {
+    "frames": 4,
+    "time_seconds": [
+      0.5,
+      3.5
+    ],
+    "observed": "label follows the controlled subject and remains readable after canvas/fit/mirror edits; fixture background and large margins remain",
+    "quality_scope": "controlled fixture only; no advertising aesthetic or natural occlusion acceptance"
+  }
+}

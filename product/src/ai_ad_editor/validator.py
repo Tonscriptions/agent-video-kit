@@ -1077,6 +1077,8 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
     for sequence_id in sequence_map:
         visit_sequence(sequence_id, f"sequences[{sequence_id}]")
 
+    from .bindings import validate_project_bindings
+    errors.extend(validate_project_bindings(project,root))
     rights = check_project_rights(project, load_ledger(root), target, strict=strict_rights)
     if strict_rights:
         errors.extend({**item, "path": f"rights[{item.get('asset_id')}]"} for item in rights.get("failures", []))

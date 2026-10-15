@@ -622,6 +622,7 @@ def _export_crop(clip: dict[str, Any], material: dict[str, Any], items: list[dic
 
 
 def export_draft(root: Path, project: dict[str, Any], output: Path, *, strict: bool = False) -> dict[str, Any]:
+    original_project = project
     items: list[dict[str, Any]] = []
     protected = {(root/name).resolve() for name in ("project.json","rights-ledger.json","project.lock.json")}
     for asset in project.get("assets", []):
@@ -631,6 +632,10 @@ def export_draft(root: Path, project: dict[str, Any], output: Path, *, strict: b
     validation = validate_project(root, project)
     if not validation["ok"]:
         raise AppError("CONVERSION_PROJECT_INVALID", "源项目校验失败，拒绝生成草稿", exit_code=2, cause=json.dumps(validation["errors"], ensure_ascii=False))
+    from .bindings import bake_interchange_bindings
+    project,bound_clips = bake_interchange_bindings(project)
+    for clip_id in bound_clips:
+        _item(items,'tracking-binding','Baked',clip_id,detail='按当前画布和源片段重算为普通关键帧；外部工程不保留活动绑定，完整源保存在旁车')
     tps = int(project["settings"]["timebase"]["ticks_per_second"])
     fps = project["settings"]["timebase"]["display_fps"]
     canvas = project["settings"]["canvas"]
@@ -751,7 +756,7 @@ def export_draft(root: Path, project: dict[str, Any], output: Path, *, strict: b
     sidecar = output.with_suffix(output.suffix+".source-agent.json")
     report["preserved_source"] = sidecar.name
     # Build and check the full payload before publishing any output files.
-    atomic_write_json(sidecar,_preserve(project))
+    atomic_write_json(sidecar,_preserve(original_project))
     atomic_write_json(report_path,report)
     atomic_write_json(output,payload)
     return {"output":str(output),"report":str(report_path),"report_data":report,"source_sidecar":str(sidecar)}

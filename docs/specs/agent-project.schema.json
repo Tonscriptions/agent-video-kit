@@ -170,6 +170,25 @@
         "clips": {"type": "array", "items": {"$ref": "#/$defs/clip"}}
       }
     },
+    "trackingBinding": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["version", "source_track_id", "source_clip_id", "asset_id", "source_sha256", "range", "observations", "offset", "scale_mode", "scale_multiplier", "rotation_mode", "base"],
+      "properties": {
+        "version": {"const": "timeline-canvas-v1"},
+        "source_track_id": {"$ref": "#/$defs/id"},
+        "source_clip_id": {"$ref": "#/$defs/id"},
+        "asset_id": {"$ref": "#/$defs/id"},
+        "source_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "range": {"type": "object", "additionalProperties": false, "required": ["start_seconds", "end_seconds"], "properties": {"start_seconds": {"type": "number", "minimum": 0}, "end_seconds": {"type": "number", "exclusiveMinimum": 0}}},
+        "observations": {"type": "array", "minItems": 1, "maxItems": 4000, "items": {"type": "object", "additionalProperties": false, "required": ["at_seconds", "x", "y", "width", "height", "confidence"], "properties": {"at_seconds": {"type": "number", "minimum": 0}, "x": {"type": "number", "minimum": 0, "maximum": 1}, "y": {"type": "number", "minimum": 0, "maximum": 1}, "width": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}, "height": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}, "confidence": {"type": "number", "minimum": 0, "maximum": 1}}}},
+        "offset": {"type": "object", "additionalProperties": false, "required": ["x", "y"], "properties": {"x": {"type": "number", "minimum": -1, "maximum": 1}, "y": {"type": "number", "minimum": -1, "maximum": 1}}},
+        "scale_mode": {"enum": ["none", "roi"]},
+        "scale_multiplier": {"type": "number", "exclusiveMinimum": 0, "maximum": 20},
+        "rotation_mode": {"enum": ["none", "source"]},
+        "base": {"type": "object", "additionalProperties": false, "required": ["scale", "rotation", "opacity", "opacity_keyframes"], "properties": {"scale": {"type": "number", "exclusiveMinimum": 0, "maximum": 20}, "rotation": {"type": "number", "minimum": -3600, "maximum": 3600}, "opacity": {"type": "number", "minimum": 0, "maximum": 1}, "opacity_keyframes": {"type": "array", "items": {"type": "object"}}}}
+      }
+    },
     "clip": {
       "type": "object",
       "additionalProperties": true,
@@ -178,6 +197,7 @@
         "id": {"$ref": "#/$defs/id"},
         "asset_id": {"$ref": "#/$defs/id"},
         "sequence_id": {"$ref": "#/$defs/id"},
+        "tracking_binding": {"$ref": "#/$defs/trackingBinding"},
         "rights_dependencies": {
           "type": "array",
           "items": {"type": "object", "required": ["rights_ref", "sha256"], "properties": {"rights_ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}}, "additionalProperties": false}

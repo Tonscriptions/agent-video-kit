@@ -27,7 +27,11 @@ existing `.onnx`, `--executable <native-Python.exe>` and local evidence.
 Inspect registration and review `media track --all-objects` before selecting
 an object for `media track-bind` or `media reframe`. Use ingested assets for
 application. Motion-only IDs, source-clock resampling and missing observations
-require review; source layer crop/rotation is not fully mapped into label space.
+require review. Add `--source-track-id` and `--source-clip-id` for a persistent
+[canvas binding](../../docs/specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md): current source crop, transform, mirror and source clock are compiled again
+for the output canvas. Optional `--rotation-mode source` follows layer rotation.
+Keep source hash, observations and model rights. Nested parents, mask/occlusion,
+VFR, nonlinear warps and broad visual quality still require further work.
 Dense crop graphs are passed through hash-checked local files when Windows
 command length requires it. Never lower trajectory sampling to hide a render error.
 
