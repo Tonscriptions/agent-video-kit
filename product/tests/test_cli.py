@@ -10,6 +10,7 @@ import tempfile
 import threading
 import time
 import unittest
+import zipfile
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
@@ -167,6 +168,60 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(audit["status"], "failed")
             self.assertEqual(audit["errors"][0]["code"], "POLICY_REMOTE_REFERENCE")
             self.assertFalse(audit["data"]["ok"])
+
+    def test_local_project_package_roundtrip_and_tamper_gate(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-package-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace, "素材 包.mp4")
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project), "--name", "包测试")[0], 0)
+            code, ingested = invoke(
+                "media", "ingest", "--project", str(project), "--input", str(source),
+                "--verification-status", "verified", "--permitted-use", "commercial_ad",
+                "--source-url", "local://package-fixture", "--license-spdx", "CC0-1.0",
+                "--license-url", "local://license", "--evidence", "local://evidence",
+            )
+            self.assertEqual(code, 0, ingested)
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [{
+                "op": "append_clip", "track_id": "track_video_1", "asset_id": ingested["data"]["asset"]["id"],
+                "source_in_tick": 0, "source_out_tick": 90000,
+            }]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            package = workspace / "project.aevpkg.zip"
+            code, exported = invoke("convert", "export", "--project", str(project), "--output", str(package), "--target-format", "package")
+            self.assertEqual(code, 0, exported)
+            self.assertTrue(package.is_file())
+            with zipfile.ZipFile(package) as archive:
+                names = set(archive.namelist())
+                self.assertIn("package-manifest.json", names)
+                self.assertIn("project.json", names)
+                self.assertIn("rights-ledger.json", names)
+                self.assertTrue(any(name.startswith("assets/") for name in names))
+                packaged = json.loads(archive.read("project.json"))
+                self.assertFalse(Path(packaged["assets"][0]["uri"]).is_absolute())
+                self.assertNotIn("renders/", "".join(names))
+            imported = workspace / "imported"
+            code, result = invoke("convert", "import", "--input", str(package), "--output", str(imported))
+            self.assertEqual(code, 0, result)
+            imported_project = json.loads((imported / "project.json").read_text(encoding="utf-8"))
+            imported_asset = imported / imported_project["assets"][0]["uri"]
+            self.assertTrue(imported_asset.is_file())
+            self.assertEqual(imported_project["sequences"][0]["tracks"][0]["clips"][0]["asset_id"], imported_project["assets"][0]["id"])
+            self.assertEqual(result["data"]["report_data"]["failures"], [])
+
+            tampered = workspace / "tampered.zip"
+            with zipfile.ZipFile(package, "r") as source_archive, zipfile.ZipFile(tampered, "w") as target_archive:
+                for info in source_archive.infolist():
+                    data = source_archive.read(info.filename)
+                    if info.filename.startswith("assets/"):
+                        data = data + b"tamper"
+                    target_archive.writestr(info, data)
+            rejected = workspace / "tampered-import"
+            code, rejected_result = invoke("convert", "import", "--input", str(tampered), "--output", str(rejected))
+            self.assertEqual(code, 2, rejected_result)
+            self.assertEqual(rejected_result["errors"][0]["code"], "ARGUMENT_INVALID")
+            self.assertFalse((rejected / "project.json").exists())
 
     def test_otio_canonical_stack_gap_and_metadata_roundtrip(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-otio-canonical-") as raw:
@@ -1406,6 +1461,8 @@ print(json.dumps({
         self.assertIn("independent_text_fade_transitions", manifest["capabilities"]["subtitles"]["features"])
         self.assertIn("independent_text_spatial_transitions", manifest["capabilities"]["subtitles"]["features"])
         self.assertIn("otio_stack_track_gap_clip", manifest["capabilities"]["interoperability"]["features"])
+        self.assertIn("portable_agent_project_package", manifest["capabilities"]["interoperability"]["features"])
+        self.assertIn("package_sha256_manifest", manifest["capabilities"]["interoperability"]["features"])
         self.assertIn("kdenlive_blank_gap_mapping", manifest["capabilities"]["interoperability"]["features"])
         self.assertIn("effect_parameter_keyframes", manifest["capabilities"]["effects"]["features"])
         self.assertIn("sequence_adjustments", manifest["capabilities"]["effects"]["features"])

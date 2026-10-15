@@ -109,8 +109,8 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `quality check --project PATH --input FILE` | 已渲染媒体 | 画布、流、时长、音画差、可选黑帧、LUFS 和 true peak 报告 |
 | `quality scopes --project PATH --input FILE` | 项目内或本地视频、抽帧时间点 | 生成本地 waveform/vectorscope/histogram PNG 和带哈希的 scope 报告；不自动判定调色正确性 |
 | `quality golden --project PATH --input FILE --mode capture\|verify` | 本地媒体和项目内 golden JSON | 捕获固定输出哈希、settings 哈希、质量指标和容差；验证时返回字节、settings、质量和指标漂移，不修改媒体 |
-| `convert import --input FILE --output DIR` | Agent JSON、OTIO JSON 或 Kdenlive XML | 新建本地项目并写 Exact/Mapped/Approximate/Baked/Unsupported/Failed 报告 |
-| `convert export --project PATH --output FILE --target-format FORMAT` | 本地项目 | 导出 Agent JSON、OTIO 或 Kdenlive XML，并保留转换报告 |
+| `convert import --input FILE --output DIR` | Agent JSON、项目包 ZIP、OTIO JSON 或 Kdenlive XML | 新建本地项目并写 Exact/Mapped/Approximate/Baked/Unsupported/Failed 报告；项目包先验证 manifest、路径和每个文件的 SHA-256 |
+| `convert export --project PATH --output FILE --target-format FORMAT` | 本地项目 | 导出 Agent JSON、项目包 `package`、OTIO 或 Kdenlive XML，并保留转换报告；项目包重写资产 URI 并排除 renders/cache/operations/history |
 | `template apply --project PATH --input TEMPLATE.json` | 本地模板和变量 | 变量校验、片段实例化、模板快照和 provenance 变更记录 |
 | `template batch --project PATH ...` | 模板、variants 和输出目录 | 隔离实例并批量渲染；写批量报告，可选择继续失败项 |
 | `library index --root DIR --output FILE [--previous FILE --incremental] [--visual-hash]` | 本地媒体/字体/字幕目录 | 生成 `0.3.0` 目录：哈希、probe、确定性 token、同 stem 字幕侧车、许可证状态；可按 stat 签名增量刷新或生成 FFmpeg 平均哈希样本 |

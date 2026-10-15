@@ -640,13 +640,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     convert = subs.add_parser("convert", help="项目/交换格式互操作")
     cs = convert.add_subparsers(dest="action", required=True)
-    cimport = _leaf_common(cs.add_parser("import", help="导入 Agent JSON、OTIO 或 Kdenlive XML"))
+    cimport = _leaf_common(cs.add_parser("import", help="导入 Agent JSON、项目包 ZIP、OTIO 或 Kdenlive XML"))
     cimport.add_argument("--input", required=True)
     cimport.add_argument("--output", required=True, help="新项目目录")
-    cexport = _leaf_common(cs.add_parser("export", help="导出 Agent Project JSON"))
+    cexport = _leaf_common(cs.add_parser("export", help="导出 Agent Project JSON 或本地项目包"))
     cexport.add_argument("--project", required=True)
     cexport.add_argument("--output", required=True)
-    cexport.add_argument("--target-format", choices=("agent-json", "otio", "kdenlive-xml"), default="agent-json")
+    cexport.add_argument("--target-format", choices=("agent-json", "package", "otio", "kdenlive-xml"), default="agent-json")
 
     template = subs.add_parser("template", help="模板实例化")
     ts2 = template.add_subparsers(dest="action", required=True)

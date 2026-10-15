@@ -4,6 +4,8 @@ import json
 import shutil
 import xml.etree.ElementTree as ET
 import copy
+import stat
+import zipfile
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
@@ -13,6 +15,17 @@ from .media import classify_path, probe_media
 from .project import TICKS_PER_SECOND, create_project, save_project
 from .rights import add_record, load_ledger, save_ledger
 from .utils import atomic_write_json, new_id, now_iso, safe_filename, sha256_file
+
+
+PROJECT_PACKAGE_VERSION = "0.1.0"
+PROJECT_PACKAGE_MANIFEST = "package-manifest.json"
+PROJECT_PACKAGE_REPORT = "conversion-report.json"
+PROJECT_PACKAGE_ROOT_FILES = ("project.json", "rights-ledger.json", "project.lock.json")
+# Assets are handled explicitly from project metadata so their URIs can be
+# rewritten into the portable package namespace.  The remaining directories
+# are small project-owned support payloads; render/cache/operation/history
+# trees stay machine-local and are excluded.
+PROJECT_PACKAGE_DIRECTORIES = ("fonts", "templates", "validation")
 
 
 def report_item(capability: str, status: str, source: str, target: str | None = None, detail: str = "") -> dict[str, Any]:
@@ -83,6 +96,150 @@ def export_agent_project(root: Path, project: dict[str, Any], output: Path) -> d
     report_path = output.with_suffix(output.suffix + ".conversion-report.json")
     atomic_write_json(report_path, report)
     return {"output": str(output), "report": str(report_path), "report_data": report}
+
+
+def _package_relative(path: Path) -> str:
+    """Return a portable forward-slash package path."""
+    return path.as_posix().lstrip("/")
+
+
+def _package_files(root: Path) -> list[Path]:
+    """Return the bounded project payload eligible for a portable package.
+
+    Render outputs, caches, operation journals and history snapshots are
+    intentionally excluded: they are machine-local or ephemeral and should
+    never be mistaken for the editable project source of truth.
+    """
+    files: list[Path] = []
+    for name in PROJECT_PACKAGE_ROOT_FILES:
+        path = root / name
+        if path.is_file():
+            files.append(path)
+    for directory_name in PROJECT_PACKAGE_DIRECTORIES:
+        directory = root / directory_name
+        if not directory.is_dir():
+            continue
+        files.extend(path for path in directory.rglob("*") if path.is_file())
+    return sorted(files, key=lambda path: _package_relative(path.relative_to(root)))
+
+
+def _package_json_bytes(value: Any) -> bytes:
+    return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
+
+
+def _package_asset_map(root: Path, project: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Path], list[dict[str, Any]]]:
+    """Copy referenced asset metadata into a portable namespace in memory.
+
+    Asset URIs are rewritten in the packaged project, so an imported package
+    never depends on the source machine's absolute path.  Missing assets are a
+    hard export failure because a package claiming portability must be complete.
+    """
+    packaged = json.loads(json.dumps(project, ensure_ascii=False))
+    files: dict[str, Path] = {}
+    failures: list[dict[str, Any]] = []
+    assets = packaged.get("assets", [])
+    if not isinstance(assets, list):
+        raise ValueError("项目 assets 必须是数组，无法创建项目包")
+    for index, asset in enumerate(assets):
+        if not isinstance(asset, dict):
+            failures.append(report_item("asset", "Failed", f"assets[{index}]", None, "资产项必须是对象"))
+            continue
+        asset_id = safe_filename(str(asset.get("id") or f"asset_{index + 1}"))
+        raw_uri = str(asset.get("uri", ""))
+        source = Path(raw_uri).expanduser()
+        if not source.is_absolute():
+            source = root / source
+        source = source.resolve()
+        if not source.is_file():
+            failures.append(report_item("asset", "Failed", str(source), str(asset.get("id", "")), "资产文件不存在，项目包拒绝生成"))
+            continue
+        target_name = safe_filename(source.name)
+        package_path = f"assets/{asset_id}_{target_name}"
+        # IDs are normally unique, but avoid silently overwriting a duplicate.
+        if package_path in files:
+            package_path = f"assets/{asset_id}_{index + 1}_{target_name}"
+        files[package_path] = source
+        asset["uri"] = package_path
+    return packaged, files, failures
+
+
+def _zip_write_bytes(archive: zipfile.ZipFile, name: str, data: bytes) -> None:
+    """Write deterministic UTF-8 bytes without host filesystem timestamps."""
+    info = zipfile.ZipInfo(name)
+    info.date_time = (1980, 1, 1, 0, 0, 0)
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.create_system = 0
+    info.external_attr = 0o600 << 16
+    archive.writestr(info, data)
+
+
+def _export_project_package(root: Path, project: dict[str, Any], output: Path) -> dict[str, Any]:
+    """Export a self-contained, local-only Agent Project package."""
+    packaged_project, asset_files, failures = _package_asset_map(root, project)
+    if failures:
+        raise ValueError("项目包含缺失素材，无法生成可移植项目包")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    if output.exists() and output.is_dir():
+        raise ValueError(f"项目包输出必须是文件: {output}")
+    source_files: dict[str, bytes] = {}
+    source_files["project.json"] = _package_json_bytes(packaged_project)
+    ledger_path = root / "rights-ledger.json"
+    if ledger_path.is_file():
+        source_files["rights-ledger.json"] = ledger_path.read_bytes()
+    else:
+        source_files["rights-ledger.json"] = _package_json_bytes({"schema_version": "0.2.0", "records": []})
+    lock_path = root / "project.lock.json"
+    if lock_path.is_file():
+        source_files["project.lock.json"] = lock_path.read_bytes()
+    for path in _package_files(root):
+        relative = _package_relative(path.relative_to(root))
+        if relative in PROJECT_PACKAGE_ROOT_FILES:
+            continue
+        source_files.setdefault(relative, path.read_bytes())
+    for package_path, source in asset_files.items():
+        source_files[package_path] = source.read_bytes()
+    entries = [
+        {"path": name, "size": len(data), "sha256": sha256_file_bytes(data)}
+        for name, data in sorted(source_files.items())
+    ]
+    manifest = {
+        "package_format": "agent-project-package",
+        "package_version": PROJECT_PACKAGE_VERSION,
+        "created_at": now_iso(),
+        "project_id": packaged_project.get("project", {}).get("id"),
+        "project_schema_version": packaged_project.get("schema_version"),
+        "files": entries,
+        "excluded": ["renders/", "cache/", "operations/", "history/"],
+        "network": "disabled",
+        "upstream_runtime": "none",
+    }
+    manifest_bytes = _package_json_bytes(manifest)
+    report = {
+        "report_version": "0.1.0",
+        "direction": "export",
+        "source_format": "agent-project/0.1.0",
+        "target_format": f"agent-project-package/{PROJECT_PACKAGE_VERSION}",
+        "created_at": now_iso(),
+        "items": [report_item("project-package", "Exact", str(root), str(output), "项目、登记权利和本地素材已写入自包含 ZIP")],
+        "warnings": [report_item("package-excluded-runtime", "Approximate", "project runtime", str(output), "renders/cache/operations/history 未打包")],
+        "failures": [],
+    }
+    report_bytes = _package_json_bytes(report)
+    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, allowZip64=True) as archive:
+        _zip_write_bytes(archive, PROJECT_PACKAGE_MANIFEST, manifest_bytes)
+        for name, data in sorted(source_files.items()):
+            _zip_write_bytes(archive, name, data)
+        _zip_write_bytes(archive, PROJECT_PACKAGE_REPORT, report_bytes)
+    report_path = output.with_suffix(output.suffix + ".conversion-report.json")
+    atomic_write_json(report_path, report)
+    return {"output": str(output), "report": str(report_path), "report_data": report, "manifest": manifest}
+
+
+def sha256_file_bytes(data: bytes) -> str:
+    """Hash package bytes without writing temporary files."""
+    import hashlib
+
+    return hashlib.sha256(data).hexdigest()
 
 
 def _asset_uri(root: Path, asset: dict[str, Any]) -> Path:
@@ -243,6 +400,8 @@ def _export_kdenlive_xml(root: Path, project: dict[str, Any], output: Path) -> d
 def export_external(root: Path, project: dict[str, Any], output: Path, target_format: str) -> dict[str, Any]:
     if target_format == "agent-json":
         return export_agent_project(root, project, output)
+    if target_format == "package":
+        return _export_project_package(root, project, output)
     if target_format == "otio":
         return _export_otio(root, project, output)
     if target_format == "kdenlive-xml":
@@ -492,7 +651,92 @@ def _import_kdenlive_xml(source: Path, destination: Path) -> tuple[dict[str, Any
     return root, project, report_items
 
 
+def _zip_member_path(name: str) -> Path:
+    """Validate one ZIP member as a relative project path."""
+    normalized = str(name).replace("\\", "/")
+    candidate = Path(normalized)
+    if not normalized or candidate.is_absolute() or normalized.startswith("/"):
+        raise ValueError(f"项目包包含绝对路径成员: {name}")
+    parts = [part for part in normalized.split("/") if part not in {""}]
+    if any(part in {".", ".."} for part in parts):
+        raise ValueError(f"项目包包含路径穿越成员: {name}")
+    if any("\x00" in part for part in parts):
+        raise ValueError(f"项目包包含非法路径成员: {name}")
+    return Path(*parts)
+
+
+def _import_project_package(source: Path, destination: Path) -> tuple[Path, dict[str, Any], list[dict[str, Any]]]:
+    """Import and verify a self-contained local Agent Project ZIP."""
+    if destination.exists() and any(destination.iterdir()):
+        raise ValueError(f"转换输出目录必须不存在或为空: {destination}")
+    destination.mkdir(parents=True, exist_ok=True)
+    report_items: list[dict[str, Any]] = []
+    try:
+        with zipfile.ZipFile(source, "r") as archive:
+            raw_infos = [info for info in archive.infolist() if not info.is_dir()]
+            if len({info.filename for info in raw_infos}) != len(raw_infos):
+                raise ValueError("项目包包含重复 ZIP 成员")
+            infos = {info.filename: info for info in raw_infos}
+            if PROJECT_PACKAGE_MANIFEST not in infos:
+                raise ValueError("项目包缺少 package-manifest.json")
+            manifest = json.loads(archive.read(PROJECT_PACKAGE_MANIFEST).decode("utf-8-sig"))
+            if manifest.get("package_format") != "agent-project-package" or manifest.get("package_version") != PROJECT_PACKAGE_VERSION:
+                raise ValueError("项目包格式或版本不受支持")
+            entries = manifest.get("files")
+            if not isinstance(entries, list):
+                raise ValueError("项目包 manifest.files 必须是数组")
+            expected: dict[str, dict[str, Any]] = {}
+            for entry in entries:
+                if not isinstance(entry, dict) or not isinstance(entry.get("path"), str):
+                    raise ValueError("项目包 manifest.files 含有无效项")
+                relative = _zip_member_path(entry["path"]).as_posix()
+                if relative in expected:
+                    raise ValueError(f"项目包 manifest 存在重复路径: {relative}")
+                expected[relative] = entry
+            for required in PROJECT_PACKAGE_ROOT_FILES[:2]:
+                if required not in expected or required not in infos:
+                    raise ValueError(f"项目包缺少必需文件: {required}")
+            missing_members = sorted(name for name in expected if name not in infos)
+            if missing_members:
+                raise ValueError(f"项目包缺少 manifest 登记成员: {','.join(missing_members)}")
+            validated_data: dict[str, bytes] = {}
+            for name in infos:
+                if name in {PROJECT_PACKAGE_MANIFEST, PROJECT_PACKAGE_REPORT}:
+                    continue
+                relative = _zip_member_path(name).as_posix()
+                if relative not in expected:
+                    raise ValueError(f"项目包含有未登记成员: {name}")
+                info = infos[name]
+                mode = (info.external_attr >> 16) & 0o170000
+                if mode == stat.S_IFLNK:
+                    raise ValueError(f"项目包禁止符号链接成员: {name}")
+                data = archive.read(info)
+                entry = expected[relative]
+                if int(entry.get("size", -1)) != len(data) or str(entry.get("sha256", "")).lower() != sha256_file_bytes(data):
+                    raise ValueError(f"项目包哈希或大小校验失败: {relative}")
+                validated_data[relative] = data
+            project_payload = json.loads(validated_data["project.json"].decode("utf-8-sig"))
+            if not isinstance(project_payload, dict) or project_payload.get("schema_version") != "0.1.0":
+                raise ValueError("项目包 project.json 不是受支持的 Agent Project 版本")
+            for relative, data in validated_data.items():
+                destination_path = destination / Path(relative)
+                destination_path.parent.mkdir(parents=True, exist_ok=True)
+                destination_path.write_bytes(data)
+            report_items.append(report_item("project-package", "Exact", str(source), str(destination), "manifest、文件哈希和本地路径安全检查通过"))
+            report_items.append(report_item("project-model", "Exact", "agent-project-package/0.1.0", "Agent Project JSON"))
+            report_items.append(report_item("rights-ledger", "Exact", "rights-ledger.json", "项目 Rights Ledger"))
+            return destination, project_payload, report_items
+    except (OSError, zipfile.BadZipFile, json.JSONDecodeError) as exc:
+        raise ValueError(f"项目包无法读取或解析: {exc}") from exc
+
+
 def import_external(source: Path, destination: Path) -> dict[str, Any]:
+    if source.suffix.lower() in {".zip", ".aevpkg"}:
+        root, project, items = _import_project_package(source, destination)
+        report = {"report_version": "0.1.0", "direction": "import", "source_format": f"agent-project-package/{PROJECT_PACKAGE_VERSION}", "target_format": "agent-project/0.1.0", "created_at": now_iso(), "items": items, "warnings": [], "failures": []}
+        report_path = root / "validation" / f"conversion_{new_id('report')}.json"
+        atomic_write_json(report_path, report)
+        return {"root": str(root), "project": str(root / "project.json"), "report": str(report_path), "report_data": report}
     payload: dict[str, Any] | None = None
     if source.suffix.lower() in {".json", ".otio"}:
         payload = json.loads(source.read_text(encoding="utf-8-sig"))
