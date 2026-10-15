@@ -640,13 +640,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     convert = subs.add_parser("convert", help="项目/交换格式互操作")
     cs = convert.add_subparsers(dest="action", required=True)
-    cimport = _leaf_common(cs.add_parser("import", help="导入 Agent JSON、项目包 ZIP、OTIO 或 Kdenlive XML"))
+    cimport = _leaf_common(cs.add_parser("import", help="导入 Agent JSON、项目包、OTIO、MLT 或本地明文草稿 JSON"))
     cimport.add_argument("--input", required=True)
     cimport.add_argument("--output", required=True, help="新项目目录")
-    cexport = _leaf_common(cs.add_parser("export", help="导出 Agent Project JSON 或本地项目包"))
+    cimport.add_argument("--strict", action="store_true", help="明文草稿适配器遇到近似/不支持/失败时拒绝写入")
+    cexport = _leaf_common(cs.add_parser("export", help="导出 Agent Project、项目包或本地交换格式"))
     cexport.add_argument("--project", required=True)
     cexport.add_argument("--output", required=True)
-    cexport.add_argument("--target-format", choices=("agent-json", "package", "otio", "kdenlive-xml"), default="agent-json")
+    cexport.add_argument("--target-format", choices=("agent-json", "package", "otio", "kdenlive-xml", "jianying-draft-json"), default="agent-json")
+    cexport.add_argument("--strict", action="store_true", help="明文草稿适配器遇到近似/不支持/失败时拒绝写入")
 
     template = subs.add_parser("template", help="模板实例化")
     ts2 = template.add_subparsers(dest="action", required=True)
@@ -4770,7 +4772,7 @@ def command_convert_import(args: argparse.Namespace) -> dict[str, Any]:
     if args.dry_run:
         return _envelope("convert.import", args, status="planned", data={"input": str(source), "output": str(destination), "format": source.suffix.lower()})
     try:
-        result = import_external(source, destination)
+        result = import_external(source, destination, strict=args.strict)
     except ValueError as exc:
         raise argument_error(str(exc), str(source)) from exc
     report = result["report_data"]
@@ -4784,10 +4786,11 @@ def command_convert_export(args: argparse.Namespace) -> dict[str, Any]:
     if args.dry_run:
         return _envelope("convert.export", args, status="planned", data={"project": str(root), "output": str(output), "format": args.target_format})
     try:
-        result = export_external(root, project, output, args.target_format)
+        result = export_external(root, project, output, args.target_format, strict=args.strict)
     except ValueError as exc:
         raise argument_error(str(exc), "--target-format") from exc
-    return _envelope("convert.export", args, data=result)
+    report = result["report_data"]
+    return _envelope("convert.export", args, data=result, status="failed" if report.get("failures") else "succeeded", warnings=report.get("warnings", []), errors=report.get("failures", []))
 
 
 def command_template_apply(args: argparse.Namespace) -> dict[str, Any]:

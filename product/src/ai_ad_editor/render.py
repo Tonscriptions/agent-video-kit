@@ -149,6 +149,16 @@ def _quoted(value: str) -> str:
     return value.replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'")
 
 
+def _filter_file_path(root: Path, path: Path) -> str:
+    # FFmpeg runs from the project root. Relative, forward-slash font paths
+    # avoid Windows drive/backslash parsing and FreeType failures when the
+    # absolute project directory contains non-ASCII characters.
+    try:
+        return path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        return path.resolve().as_posix()
+
+
 def _num(value: Any, default: float) -> float:
     try:
         return float(value)
@@ -1909,7 +1919,7 @@ def _subtitle_filter(
     if timeline_window:
         parts.append(f"enable={_expr_arg(f'between(t,{clip_start:.6f},{clip_start + max(0.001, clip_duration):.6f})')}")
     if resolved_font_path is not None:
-        parts.append(f"fontfile='{_quoted(str(resolved_font_path))}'")
+        parts.append(f"fontfile='{_quoted(_filter_file_path(root, resolved_font_path))}'")
     integer_options = {
         "line_spacing": ("line_spacing", -2000, 2000),
         "borderw": ("borderw", 0, 100),
@@ -1997,7 +2007,7 @@ def _subtitle_filter(
             for word, start_value, end_value, word_index in entries:
                 word_parts = [f"drawtext=text='{_drawtext_arg(word)}'", f"fontcolor={highlight_color}", f"fontsize={font_size}"]
                 if resolved_font_path is not None:
-                    word_parts.append(f"fontfile='{_quoted(str(resolved_font_path))}'")
+                    word_parts.append(f"fontfile='{_quoted(_filter_file_path(root, resolved_font_path))}'")
                 original_item = word_timing[word_index] if isinstance(word_timing, list) and word_index < len(word_timing) else None
                 source_span = resolved_words.get(id(original_item)) if isinstance(original_item, dict) else None
                 prefix = source_subtitle_text[:source_span[0]] if source_span else prefix_text
@@ -3466,7 +3476,20 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 ducked_labels.append(ducked)
             mix_labels = voice_audio_labels + ducked_labels + other_audio_labels
             warnings.append({"code": "AUDIO_DUCKING_APPLIED", "message": "已使用本地 FFmpeg sidechaincompress 对背景音乐做旁白闪避"})
-        filters.append(f"{''.join(f'[{item}]' for item in mix_labels)}amix=inputs={len(mix_labels)}:duration=longest:dropout_transition=0,aresample=48000[aout]")
+        # The authored sequence duration is the audio bus contract.  `amix`
+        # with `duration=longest` ends at the last contributing clip, which
+        # drops trailing silence whenever the visual timeline extends beyond
+        # its final audio segment.  Pad and trim after resampling so every
+        # project has a deterministic number of output samples and the
+        # quality gate can distinguish real drift from an intentionally quiet
+        # tail.
+        audio_target_samples = max(1, int(round(duration * 48000)))
+        filters.append(
+            f"{''.join(f'[{item}]' for item in mix_labels)}"
+            f"amix=inputs={len(mix_labels)}:duration=longest:dropout_transition=0,"
+            f"aresample=48000,apad=whole_len={audio_target_samples},"
+            f"atrim=end_sample={audio_target_samples},asetpts=N/SR/TB[aout]"
+        )
     else:
         filters.append(f"anullsrc=r=48000:cl=stereo,atrim=duration={duration:.6f}[aout]")
     return inputs, ";".join(filters), input_meta, warnings

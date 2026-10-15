@@ -397,7 +397,13 @@ def _export_kdenlive_xml(root: Path, project: dict[str, Any], output: Path) -> d
     return {"output": str(output), "report": str(report_path), "report_data": report}
 
 
-def export_external(root: Path, project: dict[str, Any], output: Path, target_format: str) -> dict[str, Any]:
+def export_external(root: Path, project: dict[str, Any], output: Path, target_format: str, *, strict: bool = False) -> dict[str, Any]:
+    if target_format == "jianying-draft-json":
+        from .draft_adapter import export_draft
+
+        return export_draft(root, project, output, strict=strict)
+    if strict:
+        raise ValueError("--strict 当前适用于 jianying-draft-json 草稿适配器")
     if target_format == "agent-json":
         return export_agent_project(root, project, output)
     if target_format == "package":
@@ -730,7 +736,22 @@ def _import_project_package(source: Path, destination: Path) -> tuple[Path, dict
         raise ValueError(f"项目包无法读取或解析: {exc}") from exc
 
 
-def import_external(source: Path, destination: Path) -> dict[str, Any]:
+def import_external(source: Path, destination: Path, *, strict: bool = False) -> dict[str, Any]:
+    if source.suffix.lower() in {".json", ".otio"}:
+        try:
+            payload = json.loads(source.read_text(encoding="utf-8-sig"))
+        except (UnicodeError, json.JSONDecodeError) as exc:
+            raise ValueError("只支持 UTF-8 明文交换 JSON；不解密或修复加密草稿") from exc
+        if not isinstance(payload, dict):
+            raise ValueError("交换 JSON 顶层必须是对象；只支持明文草稿")
+        from .draft_adapter import import_draft, is_draft
+
+        if is_draft(payload):
+            return import_draft(source, destination, payload, _asset_from_local, strict=strict)
+        if "canvas_config" in payload or "materials" in payload:
+            raise ValueError("草稿 materials/tracks/canvas_config 结构无效；只支持明文 JSON")
+    if strict:
+        raise ValueError("--strict 当前适用于 jianying-draft-json 草稿适配器")
     if source.suffix.lower() in {".zip", ".aevpkg"}:
         root, project, items = _import_project_package(source, destination)
         report = {"report_version": "0.1.0", "direction": "import", "source_format": f"agent-project-package/{PROJECT_PACKAGE_VERSION}", "target_format": "agent-project/0.1.0", "created_at": now_iso(), "items": items, "warnings": [], "failures": []}

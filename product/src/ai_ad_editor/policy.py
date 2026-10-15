@@ -57,6 +57,10 @@ def reference_kind(value: Any) -> str | None:
     text = value.strip()
     if not text:
         return None
+    # Content identities are metadata, not a network URI. Audit must accept
+    # the hashes emitted by every media ingest and conversion command.
+    if re.fullmatch(r"sha256:[0-9a-fA-F]{64}", text):
+        return None
     lower = text.casefold()
     if any(marker in lower for marker in REMOTE_MARKERS):
         return "provider"

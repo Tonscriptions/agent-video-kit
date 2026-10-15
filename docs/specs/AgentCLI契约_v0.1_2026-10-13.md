@@ -109,8 +109,8 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `quality check --project PATH --input FILE` | 已渲染媒体 | 画布、流、时长、音画差、可选黑帧、LUFS 和 true peak 报告 |
 | `quality scopes --project PATH --input FILE` | 项目内或本地视频、抽帧时间点 | 生成本地 waveform/vectorscope/histogram PNG 和带哈希的 scope 报告；不自动判定调色正确性 |
 | `quality golden --project PATH --input FILE --mode capture\|verify` | 本地媒体和项目内 golden JSON | 捕获固定输出哈希、settings 哈希、质量指标和容差；验证时返回字节、settings、质量和指标漂移，不修改媒体 |
-| `convert import --input FILE --output DIR` | Agent JSON、项目包 ZIP、OTIO JSON 或 Kdenlive XML | 新建本地项目并写 Exact/Mapped/Approximate/Baked/Unsupported/Failed 报告；项目包先验证 manifest、路径和每个文件的 SHA-256 |
-| `convert export --project PATH --output FILE --target-format FORMAT` | 本地项目 | 导出 Agent JSON、项目包 `package`、OTIO 或 Kdenlive XML，并保留转换报告；项目包重写资产 URI 并排除 renders/cache/operations/history |
+| `convert import --input FILE --output DIR [--strict]` | Agent JSON、项目包 ZIP、OTIO JSON、Kdenlive XML 或明文草稿 JSON | 新建本地项目与转换报告；项目包验证 manifest/路径/SHA-256；草稿候选通过校验后发布，`--strict` 仅用于草稿损失拒绝 |
+| `convert export --project PATH --output FILE --target-format FORMAT [--strict]` | 本地项目 | 导出 `agent-json/package/otio/kdenlive-xml/jianying-draft-json`；草稿附带报告和源项目旁车，严格门禁失败不覆盖已有输出；项目包排除 renders/cache/operations/history |
 | `template apply --project PATH --input TEMPLATE.json` | 本地模板和变量 | 变量校验、片段实例化、模板快照和 provenance 变更记录 |
 | `template batch --project PATH ...` | 模板、variants 和输出目录 | 隔离实例并批量渲染；写批量报告，可选择继续失败项 |
 | `library index --root DIR --output FILE [--previous FILE --incremental] [--visual-hash]` | 本地媒体/字体/字幕目录 | 生成 `0.3.0` 目录：哈希、probe、确定性 token、同 stem 字幕侧车、许可证状态；可按 stat 签名增量刷新或生成 FFmpeg 平均哈希样本 |
@@ -137,6 +137,10 @@ v2 适配器执行 `media track` 时必须显式选择 `--object-id ID` 或 `--a
 `media highlights` 先调用本地 `understand_media`，再由 `recommend_highlights` 按镜头、静音和可选节拍证据生成候选。默认模式只写项目内 JSON 报告；报告保留 `source_sha256`、`analysis`、`engine=local-heuristic`、`pipeline_engine=ffmpeg-local-highlight-heuristic-v1`、`network=disabled` 和候选源范围。
 
 只有显式 `--apply` 才会修改时间线，并且必须同时提供项目内已登记 `--asset-id`、目标视频 `--track-id` 和非负 `--timeline-start-seconds`。候选按源时间顺序连续生成项目时基片段；已有轨道交叠返回 `HIGHLIGHTS_TRACK_OVERLAP`，只有 `--replace-track` 才能先清空轨道。应用前保存 `before-highlights` 快照，成功后写入报告、`provenance.change_log`、操作文件并重新校验项目。所有成功应用结果都带 `HIGHLIGHTS_HEURISTIC` 与 `HIGHLIGHTS_REVIEW_REQUIRED`，不能解释为语义高光、人物/物体理解或剪映智能导演。完整字段、报告版本、错误码和验收证据见[本地高光候选与自动粗剪时间线契约](./本地高光候选与自动粗剪时间线契约_v0.1_2026-10-15.md)。
+
+### 3.3 本地明文草稿互操作
+
+`convert import` 自动识别本地 `materials/tracks/canvas_config` 明文草稿。`convert export --target-format jianying-draft-json` 生成 `jianying-plaintext-v1` 文件轮廓；全程不调用剪映运行时、解密或在线资源。导入媒体和字体默认未核验权利，视频原声展开为显式关联音轨；未修改关联音轨导出合回视频，独立调音量或静音则保留独立音轨并关闭视频隐式原声。`--strict` 遇到 `Approximate/Baked/Unsupported/Failed` 返回 `CONVERSION_STRICT_REJECTED`、退出码 2；其他格式暂不支持该开关。best-effort 若有 `Failed`，即使保留了部分项目，也返回 `ok=false` 和退出码 2。字段、版本和产物边界见[明文草稿适配器契约](./本地明文草稿双向适配器契约_v0.1_2026-10-15.md)。
 
 ## 4. 项目迁移、快照和路径规则
 
