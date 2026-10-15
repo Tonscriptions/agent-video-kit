@@ -50,7 +50,14 @@ from .transcribe import ffmpeg_whisper_available, transcribe_local, transcribe_l
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
 from .rights import VALID_STATUSES, active_records, add_record, apply_disposition_to_project, check_project_rights, create_disposition_decision, disposition_decisions, effective_disposition_decisions, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
 from .understand import detect_beats, understand_media
-from .tracking import OBJECT_TRACKING_ENGINE, build_reframe_plan, track_command_json, track_media
+from .tracking import (
+    MULTI_OBJECT_TRACKING_ENGINE,
+    OBJECT_TRACKING_ENGINE,
+    build_reframe_plan,
+    track_command_json,
+    track_command_json_multi,
+    track_media,
+)
 from .runtime import configure_local_runtime
 from .template import apply_template_operations, instantiate
 from .migration import SUPPORTED_SOURCE_VERSIONS, migrate_project_payload
@@ -343,6 +350,8 @@ def build_parser() -> argparse.ArgumentParser:
     track.add_argument("--max-width", type=int, default=640)
     track.add_argument("--max-samples", type=int, default=600, help="最大采样帧数，超过预算时降低采样频率并写入报告")
     track.add_argument("--adapter-id", default=None, help="可选：项目内已注册的离线视觉跟踪适配器")
+    track.add_argument("--object-id", default=None, help="多目标视觉 runner 中选择要应用的 object_id")
+    track.add_argument("--all-objects", action="store_true", help="多目标视觉 runner 返回所有对象；仅用于报告，不可与 --clip-id 联用")
     track.add_argument("--output", default=None, help="项目内跟踪报告 JSON 路径")
     track.add_argument("--clip-id", default=None, help="可选：将位置关键帧应用到片段")
     track.add_argument("--track-id", default=None, help="与 --clip-id 联用以限定轨道")
@@ -362,6 +371,7 @@ def build_parser() -> argparse.ArgumentParser:
     track_bind.add_argument("--max-width", type=int, default=640)
     track_bind.add_argument("--max-samples", type=int, default=600)
     track_bind.add_argument("--adapter-id", default=None, help="可选：项目内已注册的离线视觉跟踪适配器")
+    track_bind.add_argument("--object-id", default=None, help="多目标视觉 runner 中要绑定的 object_id")
     track_bind.add_argument("--offset-x", type=float, default=0.0, help="绑定位置的归一化 X 偏移")
     track_bind.add_argument("--offset-y", type=float, default=0.0, help="绑定位置的归一化 Y 偏移")
     track_bind.add_argument("--scale-mode", choices=("none", "roi"), default="none", help="是否按跟踪 ROI 宽度变化同步 transform.scale")
@@ -388,6 +398,7 @@ def build_parser() -> argparse.ArgumentParser:
     reframe.add_argument("--max-width", type=int, default=640)
     reframe.add_argument("--max-samples", type=int, default=600)
     reframe.add_argument("--adapter-id", default=None, help="可选：项目内已注册的离线视觉跟踪适配器")
+    reframe.add_argument("--object-id", default=None, help="多目标视觉 runner 中要重构图的 object_id")
     reframe.add_argument("--output", default=None, help="项目内自动重构图报告 JSON 路径")
     reframe.add_argument("--apply", action="store_true", help="创建快照并将动态裁切写回片段")
 
@@ -1610,8 +1621,14 @@ def _resolve_visual_tracking_adapter(root: Path, adapter_id: str | None) -> tupl
     verification = verify_visual_adapter(adapter)
     if not verification["ok"]:
         raise AppError("MODEL_ADAPTER_HASH_INVALID", "本地视觉适配器路径或哈希校验失败", exit_code=10, path=str(visual_registry_path(root)), cause=json.dumps(verification, ensure_ascii=False))
-    if adapter.get("engine") != OBJECT_TRACKING_ENGINE:
-        raise AppError("TRACKING_ADAPTER_UNAVAILABLE", f"适配器已登记但当前没有对应本地 runner: {adapter.get('engine')}", exit_code=10, path=str(adapter_id), hint=f"当前可执行视觉 runner 只有 {OBJECT_TRACKING_ENGINE}；未知模型不会被隐式 fallback")
+    if adapter.get("engine") not in {OBJECT_TRACKING_ENGINE, MULTI_OBJECT_TRACKING_ENGINE}:
+        raise AppError(
+            "TRACKING_ADAPTER_UNAVAILABLE",
+            f"适配器已登记但当前没有对应本地 runner: {adapter.get('engine')}",
+            exit_code=10,
+            path=str(adapter_id),
+            hint=f"当前可执行视觉 runner 只有 {OBJECT_TRACKING_ENGINE} 和 {MULTI_OBJECT_TRACKING_ENGINE}；未知模型不会被隐式 fallback",
+        )
     return adapter, verification
 
 
@@ -1633,6 +1650,15 @@ def command_media_track(args: argparse.Namespace) -> dict[str, Any]:
     if not source.exists() or not source.is_file():
         raise argument_error("跟踪输入不存在", str(source))
     visual_adapter, adapter_verification = _resolve_visual_tracking_adapter(root, args.adapter_id)
+    if args.object_id and args.all_objects:
+        raise argument_error("--object-id 与 --all-objects 不能同时使用", "object_id")
+    if args.all_objects and args.clip_id:
+        raise AppError("TRACK_MULTI_APPLY_SELECTION_REQUIRED", "--all-objects 只生成多目标报告，不能与 --clip-id 联用", exit_code=2, path="clip_id")
+    if args.object_id or args.all_objects:
+        if not visual_adapter or visual_adapter.get("engine") != MULTI_OBJECT_TRACKING_ENGINE:
+            raise AppError("TRACK_OBJECT_SELECTION_UNSUPPORTED", "object_id/all_objects 只适用于 command-json-tracking-multi-v1 适配器", exit_code=2, path="adapter_id")
+    if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE and not (args.object_id or args.all_objects):
+        raise AppError("TRACK_OBJECT_SELECTION_REQUIRED", "多目标视觉 runner 需要 --object-id 或 --all-objects", exit_code=2, path="object_id")
     sequence_id = args.sequence_id
     if args.clip_id:
         sequence = find_sequence(project, sequence_id)
@@ -1650,12 +1676,31 @@ def command_media_track(args: argparse.Namespace) -> dict[str, Any]:
                 "sequence_id": sequence_id,
                 "step_frames": args.step_frames,
                 "adapter_id": args.adapter_id,
+                "object_id": args.object_id,
+                "all_objects": bool(args.all_objects),
                 "adapter": visual_adapter,
                 "adapter_verification": adapter_verification,
                 "engine": visual_adapter.get("engine") if visual_adapter else "local-template-matching",
             },
         )
-    if visual_adapter:
+    if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE:
+        report = track_command_json_multi(
+            source,
+            args.roi,
+            adapter_id=str(visual_adapter["adapter_id"]),
+            model_path=str(visual_adapter["model_path"]),
+            executable=str(visual_adapter["executable"]),
+            model_sha256=str(visual_adapter.get("model_sha256") or ""),
+            executable_sha256=str(visual_adapter.get("executable_sha256") or ""),
+            object_id=args.object_id,
+            start_seconds=args.start_seconds,
+            end_seconds=args.end_seconds,
+            step_frames=args.step_frames,
+            max_width=args.max_width,
+            max_samples=args.max_samples,
+            ticks_per_second=int(project["settings"]["timebase"]["ticks_per_second"]),
+        )
+    elif visual_adapter:
         report = track_command_json(
             source,
             args.roi,
@@ -1688,6 +1733,8 @@ def command_media_track(args: argparse.Namespace) -> dict[str, Any]:
     report["clip_id"] = args.clip_id
     report["sequence_id"] = sequence_id
     report["adapter_id"] = args.adapter_id
+    report["object_id"] = args.object_id
+    report["all_objects"] = bool(args.all_objects)
     report_path = Path(args.output).expanduser().resolve() if args.output else root / "validation" / f"tracking_{new_id('run')}.json"
     try:
         report_path.relative_to(root)
@@ -1722,8 +1769,13 @@ def command_media_track(args: argparse.Namespace) -> dict[str, Any]:
     atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "project_id": project["project"]["id"], **report})
     if args.clip_id:
         save_project(root, project)
-    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.track", "status": "succeeded", "report": str(report_path), "asset_id": asset_id, "clip_id": args.clip_id, "engine": report.get("engine"), "adapter_id": args.adapter_id, "applied_properties": applied_properties, "before_snapshot": before_snapshot, "created_at": now_iso()})
-    warnings = ([{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需用质量报告检查遮挡、镜头切换和轨迹稳定性"}] if visual_adapter else [{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和关键帧"}])
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.track", "status": "succeeded", "report": str(report_path), "asset_id": asset_id, "clip_id": args.clip_id, "engine": report.get("engine"), "adapter_id": args.adapter_id, "object_id": args.object_id, "all_objects": bool(args.all_objects), "applied_properties": applied_properties, "before_snapshot": before_snapshot, "created_at": now_iso()})
+    if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE:
+        warnings = [{"code": "TRACKING_MULTI_OBJECT_REVIEW", "message": "多目标 runner 输出已通过协议校验，但仍需检查对象身份连续性、遮挡、镜头切换和轨迹稳定性"}]
+    elif visual_adapter:
+        warnings = [{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需用质量报告检查遮挡、镜头切换和轨迹稳定性"}]
+    else:
+        warnings = [{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和关键帧"}]
     return _envelope("media.track", args, data={"report": str(report_path), "result": report, "adapter": visual_adapter, "adapter_verification": adapter_verification, "applied_properties": applied_properties, "before_snapshot": before_snapshot}, warnings=warnings, operation_id=operation_id)
 
 
@@ -1759,6 +1811,10 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
     if not source.exists() or not source.is_file():
         raise argument_error("跟踪绑定输入不存在", str(source))
     visual_adapter, adapter_verification = _resolve_visual_tracking_adapter(root, args.adapter_id)
+    if args.object_id and (not visual_adapter or visual_adapter.get("engine") != MULTI_OBJECT_TRACKING_ENGINE):
+        raise AppError("TRACK_OBJECT_SELECTION_UNSUPPORTED", "object_id 只适用于 command-json-tracking-multi-v1 适配器", exit_code=2, path="adapter_id")
+    if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE and not args.object_id:
+        raise AppError("TRACK_OBJECT_SELECTION_REQUIRED", "多目标视觉 runner 需要 --object-id 才能绑定到目标片段", exit_code=2, path="object_id")
     sequence = find_sequence(project, args.sequence_id)
     target_track, target_clip = _find_clip(sequence, str(args.target_clip_id), args.target_track_id)
     if str(target_track.get("kind", "video")) == "audio":
@@ -1790,13 +1846,31 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
                 "offset": {"x": args.offset_x, "y": args.offset_y},
                 "apply": bool(args.apply),
                 "adapter_id": args.adapter_id,
+                "object_id": args.object_id,
                 "adapter": visual_adapter,
                 "adapter_verification": adapter_verification,
                 "engine": visual_adapter.get("engine") if visual_adapter else "local-template-matching",
                 "network": "disabled",
             },
         )
-    if visual_adapter:
+    if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE:
+        tracking = track_command_json_multi(
+            source,
+            args.roi,
+            adapter_id=str(visual_adapter["adapter_id"]),
+            model_path=str(visual_adapter["model_path"]),
+            executable=str(visual_adapter["executable"]),
+            model_sha256=str(visual_adapter.get("model_sha256") or ""),
+            executable_sha256=str(visual_adapter.get("executable_sha256") or ""),
+            object_id=args.object_id,
+            start_seconds=float(args.start_seconds),
+            end_seconds=args.end_seconds,
+            step_frames=args.step_frames,
+            max_width=args.max_width,
+            max_samples=args.max_samples,
+            ticks_per_second=int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND)),
+        )
+    elif visual_adapter:
         tracking = track_command_json(
             source,
             args.roi,
@@ -1854,6 +1928,7 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
         "engine": tracking.get("engine", "local-template-matching"),
         "method": tracking.get("method", "template-matching"),
         "adapter_id": args.adapter_id,
+        "object_id": args.object_id,
         "source": str(source),
         "source_sha256": f"sha256:{sha256_file(source)}",
         "asset_id": asset_id,
@@ -1870,13 +1945,13 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
             {"property": "transform.position.y", "keyframes": [{"at_tick": at, "value": value, "interpolation": interpolation} for at, value, interpolation in position_y]},
         ],
         "tracking": tracking,
-        "warnings": (["external_local_runner_requires_quality_review", "tracking_clock_mapped_to_target_clip_duration"] if visual_adapter else ["template_matching_can_drift_on_occlusion_or_large_scale_change", "tracking_clock_mapped_to_target_clip_duration"]),
+        "warnings": (["multi_object_identity_requires_quality_review", "tracking_clock_mapped_to_target_clip_duration"] if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE else ["external_local_runner_requires_quality_review", "tracking_clock_mapped_to_target_clip_duration"] if visual_adapter else ["template_matching_can_drift_on_occlusion_or_large_scale_change", "tracking_clock_mapped_to_target_clip_duration"]),
     }
     if args.scale_mode == "roi":
         plan["keyframes"].append({"property": "transform.scale", "keyframes": [{"at_tick": at, "value": value, "interpolation": interpolation} for at, value, interpolation in scale_values]})
     if not args.apply:
         atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "applied": False, "plan": plan})
-        warnings = ([{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查目标文字/贴纸边界和轨迹稳定性"}] if visual_adapter else [{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配绑定可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和目标文字/贴纸边界"}])
+        warnings = ([{"code": "TRACKING_MULTI_OBJECT_REVIEW", "message": "多目标 runner 输出已通过协议校验，但仍需检查对象身份连续性、目标文字/贴纸边界和轨迹稳定性"}] if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE else [{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查目标文字/贴纸边界和轨迹稳定性"}] if visual_adapter else [{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配绑定可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和目标文字/贴纸边界"}])
         return _envelope("media.track-bind", args, status="planned", data={"report": str(report_path), "plan": plan, "adapter": visual_adapter, "adapter_verification": adapter_verification, "applied": False}, warnings=warnings)
     before_project = copy.deepcopy(project)
     before_snapshot = create_snapshot(root, before_project, label="before-track-bind")
@@ -1891,8 +1966,8 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
     atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "applied": True, "operation_id": operation_id, "before_snapshot_id": before_snapshot["snapshot_id"], "plan": plan, "validation": validation})
     project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.track-bind", "asset_id": asset_id, "target_clip_id": target_clip.get("id"), "target_track_id": target_track.get("id"), "report": str(report_path), "before_snapshot_id": before_snapshot["snapshot_id"], "at": now_iso()})
     save_project(root, project)
-    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.track-bind", "status": "succeeded", "report": str(report_path), "asset_id": asset_id, "target_clip_id": target_clip.get("id"), "target_track_id": target_track.get("id"), "before_snapshot_id": before_snapshot["snapshot_id"], "created_at": now_iso()})
-    warnings = ([{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查目标文字/贴纸边界和轨迹稳定性"}] if visual_adapter else [{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配绑定可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和目标文字/贴纸边界"}])
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.track-bind", "status": "succeeded", "report": str(report_path), "asset_id": asset_id, "object_id": args.object_id, "target_clip_id": target_clip.get("id"), "target_track_id": target_track.get("id"), "before_snapshot_id": before_snapshot["snapshot_id"], "created_at": now_iso()})
+    warnings = ([{"code": "TRACKING_MULTI_OBJECT_REVIEW", "message": "多目标 runner 输出已通过协议校验，但仍需检查对象身份连续性、目标文字/贴纸边界和轨迹稳定性"}] if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE else [{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查目标文字/贴纸边界和轨迹稳定性"}] if visual_adapter else [{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配绑定可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和目标文字/贴纸边界"}])
     return _envelope("media.track-bind", args, data={"report": str(report_path), "plan": plan, "adapter": visual_adapter, "adapter_verification": adapter_verification, "target_clip_id": target_clip.get("id"), "target_track_id": target_track.get("id"), "before_snapshot": before_snapshot, "validation": validation, "applied": True}, warnings=warnings, operation_id=operation_id)
 
 
@@ -1924,6 +1999,10 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
     if not source.exists() or not source.is_file():
         raise argument_error("自动重构图输入不存在", str(source))
     visual_adapter, adapter_verification = _resolve_visual_tracking_adapter(root, args.adapter_id)
+    if args.object_id and (not visual_adapter or visual_adapter.get("engine") != MULTI_OBJECT_TRACKING_ENGINE):
+        raise AppError("TRACK_OBJECT_SELECTION_UNSUPPORTED", "object_id 只适用于 command-json-tracking-multi-v1 适配器", exit_code=2, path="adapter_id")
+    if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE and not args.object_id:
+        raise AppError("TRACK_OBJECT_SELECTION_REQUIRED", "多目标视觉 runner 需要 --object-id 才能生成自动重构图", exit_code=2, path="object_id")
     tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90_000))
     clip_source_in = int(clip.get("source_in_tick", 0))
     clip_source_out = int(clip.get("source_out_tick", clip_source_in + int(clip.get("duration_tick", 1))))
@@ -1944,8 +2023,25 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
     if target_width <= 0 or target_height <= 0:
         raise argument_error("目标画布尺寸必须大于 0", "target_width")
     if args.dry_run:
-        return _envelope("media.reframe", args, status="planned", data={"input": str(source), "asset_id": asset_id, "clip_id": args.clip_id, "track_id": args.track_id, "sequence_id": sequence.get("id"), "target_width": target_width, "target_height": target_height, "target_aspect": target_aspect, "margin": args.margin, "fit": args.fit, "start_seconds": start_seconds, "end_seconds": end_seconds, "adapter_id": args.adapter_id, "adapter": visual_adapter, "adapter_verification": adapter_verification, "engine": visual_adapter.get("engine") if visual_adapter else "local-template-matching"})
-    if visual_adapter:
+        return _envelope("media.reframe", args, status="planned", data={"input": str(source), "asset_id": asset_id, "clip_id": args.clip_id, "track_id": args.track_id, "sequence_id": sequence.get("id"), "target_width": target_width, "target_height": target_height, "target_aspect": target_aspect, "margin": args.margin, "fit": args.fit, "start_seconds": start_seconds, "end_seconds": end_seconds, "adapter_id": args.adapter_id, "object_id": args.object_id, "adapter": visual_adapter, "adapter_verification": adapter_verification, "engine": visual_adapter.get("engine") if visual_adapter else "local-template-matching"})
+    if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE:
+        tracking = track_command_json_multi(
+            source,
+            args.roi,
+            adapter_id=str(visual_adapter["adapter_id"]),
+            model_path=str(visual_adapter["model_path"]),
+            executable=str(visual_adapter["executable"]),
+            model_sha256=str(visual_adapter.get("model_sha256") or ""),
+            executable_sha256=str(visual_adapter.get("executable_sha256") or ""),
+            object_id=args.object_id,
+            start_seconds=start_seconds,
+            end_seconds=end_seconds,
+            step_frames=args.step_frames,
+            max_width=args.max_width,
+            max_samples=args.max_samples,
+            ticks_per_second=tps,
+        )
+    elif visual_adapter:
         tracking = track_command_json(
             source,
             args.roi,
@@ -1980,12 +2076,12 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
         margin=args.margin,
         fit=args.fit,
     )
-    plan.update({"project_id": project.get("project", {}).get("id"), "sequence_id": sequence.get("id"), "asset_id": asset_id, "clip_id": args.clip_id, "track_id": args.track_id, "source": str(source), "source_sha256": f"sha256:{sha256_file(source)}", "source_range": {"start_seconds": start_seconds, "end_seconds": end_seconds}, "adapter_id": args.adapter_id, "tracking": tracking})
+    plan.update({"project_id": project.get("project", {}).get("id"), "sequence_id": sequence.get("id"), "asset_id": asset_id, "clip_id": args.clip_id, "track_id": args.track_id, "source": str(source), "source_sha256": f"sha256:{sha256_file(source)}", "source_range": {"start_seconds": start_seconds, "end_seconds": end_seconds}, "adapter_id": args.adapter_id, "object_id": args.object_id, "tracking": tracking})
     report_path = Path(args.output).expanduser().resolve() if args.output else root / "validation" / f"reframe_{safe_filename(str(args.clip_id))}.json"
     ensure_inside(root, report_path)
     if not args.apply:
         atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "applied": False, "plan": plan})
-        warnings = ([{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查主体边界和动态裁切稳定性"}] if visual_adapter else [{"code": "REFRAME_APPROXIMATE", "message": "自动重构图使用本地模板跟踪；请检查 confidence 和裁切范围"}])
+        warnings = ([{"code": "TRACKING_MULTI_OBJECT_REVIEW", "message": "多目标 runner 输出已通过协议校验，但仍需检查对象身份连续性、主体边界和动态裁切稳定性"}] if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE else [{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查主体边界和动态裁切稳定性"}] if visual_adapter else [{"code": "REFRAME_APPROXIMATE", "message": "自动重构图使用本地模板跟踪；请检查 confidence 和裁切范围"}])
         return _envelope("media.reframe", args, status="planned", data={"report": str(report_path), "plan": plan, "adapter": visual_adapter, "adapter_verification": adapter_verification, "applied": False}, warnings=warnings)
     before_project = copy.deepcopy(project)
     before_snapshot = create_snapshot(root, before_project, label="before-reframe")
@@ -2002,8 +2098,8 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
     atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "applied": True, "operation_id": operation_id, "before_snapshot_id": before_snapshot["snapshot_id"], "plan": plan, "validation": validation})
     project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.reframe", "clip_id": args.clip_id, "track_id": args.track_id, "report": str(report_path), "before_snapshot_id": before_snapshot["snapshot_id"], "at": now_iso()})
     save_project(root, project)
-    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.reframe", "status": "succeeded", "clip_id": args.clip_id, "track_id": args.track_id, "report": str(report_path), "before_snapshot_id": before_snapshot["snapshot_id"], "created_at": now_iso()})
-    warnings = ([{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查主体边界和动态裁切稳定性"}] if visual_adapter else [{"code": "REFRAME_APPROXIMATE", "message": "自动重构图使用本地模板跟踪；请检查 confidence、主体边界和裁切警告"}])
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.reframe", "status": "succeeded", "clip_id": args.clip_id, "track_id": args.track_id, "object_id": args.object_id, "report": str(report_path), "before_snapshot_id": before_snapshot["snapshot_id"], "created_at": now_iso()})
+    warnings = ([{"code": "TRACKING_MULTI_OBJECT_REVIEW", "message": "多目标 runner 输出已通过协议校验，但仍需检查对象身份连续性、主体边界和动态裁切稳定性"}] if visual_adapter and visual_adapter.get("engine") == MULTI_OBJECT_TRACKING_ENGINE else [{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查主体边界和动态裁切稳定性"}] if visual_adapter else [{"code": "REFRAME_APPROXIMATE", "message": "自动重构图使用本地模板跟踪；请检查 confidence、主体边界和裁切警告"}])
     return _envelope("media.reframe", args, data={"report": str(report_path), "plan": plan, "adapter": visual_adapter, "adapter_verification": adapter_verification, "before_snapshot": before_snapshot, "validation": validation}, warnings=warnings, operation_id=operation_id)
 
 

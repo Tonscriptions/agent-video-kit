@@ -16,6 +16,9 @@ from .utils import run_process, sha256_file
 OBJECT_TRACKING_PROTOCOL = "agent-video-object-tracking-v1"
 OBJECT_TRACKING_ENGINE = "command-json-tracking-v1"
 OBJECT_TRACKING_OUTPUT_CONTRACT = "tracking_frames_v1"
+MULTI_OBJECT_TRACKING_PROTOCOL = "agent-video-object-tracking-v2"
+MULTI_OBJECT_TRACKING_ENGINE = "command-json-tracking-multi-v1"
+MULTI_OBJECT_TRACKING_OUTPUT_CONTRACT = "tracking_objects_v1"
 
 
 def _fraction(value: Any, default: float) -> float:
@@ -69,6 +72,239 @@ def _tracking_runner_command(executable: Path) -> list[str]:
 
 def _tracking_frame_error(message: str, *, index: int, path: str) -> AppError:
     return AppError("TRACKING_RUNNER_OUTPUT_INVALID", f"第 {index} 个跟踪帧无效: {message}", exit_code=6, path=path)
+
+
+def _validate_tracking_frames(
+    raw_frames: Any,
+    *,
+    start_seconds: float,
+    end_seconds: float | None,
+    ticks_per_second: int,
+    max_samples: int,
+    path_prefix: str = "frames",
+) -> list[dict[str, Any]]:
+    """Validate one normalized object trajectory returned by a local runner."""
+    if not isinstance(raw_frames, list) or not raw_frames:
+        raise AppError("TRACKING_RUNNER_OUTPUT_INVALID", "本地视觉 runner 必须返回非空 frames 数组", exit_code=6, path=path_prefix)
+    if len(raw_frames) > max_samples:
+        raise AppError("TRACKING_RUNNER_OUTPUT_INVALID", "本地视觉 runner 返回帧数超过 max_samples", exit_code=6, path=path_prefix)
+    positions: list[dict[str, Any]] = []
+    previous_tick = -1
+    for index, raw in enumerate(raw_frames):
+        frame_path = f"{path_prefix}[{index}]"
+        if not isinstance(raw, dict):
+            raise _tracking_frame_error("必须是对象", index=index, path=frame_path)
+        try:
+            at_seconds = float(raw.get("at_seconds"))
+            if not math.isfinite(at_seconds):
+                raise ValueError("at_seconds")
+            raw_tick = raw.get("at_tick")
+            at_tick = int(round((at_seconds - start_seconds) * ticks_per_second)) if raw_tick is None else int(raw_tick)
+            values = [float(raw.get(key)) for key in ("x", "y", "width", "height", "confidence")]
+            if not all(math.isfinite(value) for value in values):
+                raise ValueError("non-finite")
+            x, y, width, height, confidence = values
+        except (TypeError, ValueError) as exc:
+            raise _tracking_frame_error("坐标、时间和 confidence 必须是有限数字", index=index, path=frame_path) from exc
+        if at_seconds < start_seconds - 1e-6 or (end_seconds is not None and at_seconds > end_seconds + 1e-6):
+            raise _tracking_frame_error("at_seconds 超出请求范围", index=index, path=f"{frame_path}.at_seconds")
+        if at_tick < 0 or at_tick < previous_tick:
+            raise _tracking_frame_error("at_tick 必须非负且单调递增", index=index, path=f"{frame_path}.at_tick")
+        if not 0.0 <= x <= 1.0 or not 0.0 <= y <= 1.0 or not 0.0 < width <= 1.0 or not 0.0 < height <= 1.0:
+            raise _tracking_frame_error("x/y/width/height 必须位于归一化范围", index=index, path=frame_path)
+        if not 0.0 <= confidence <= 1.0:
+            raise _tracking_frame_error("confidence 必须位于 0..1", index=index, path=f"{frame_path}.confidence")
+        rotation = raw.get("rotation_degrees", 0.0)
+        try:
+            rotation = float(rotation)
+        except (TypeError, ValueError) as exc:
+            raise _tracking_frame_error("rotation_degrees 必须是有限数字", index=index, path=f"{frame_path}.rotation_degrees") from exc
+        if not math.isfinite(rotation) or rotation < -180.0 or rotation > 180.0:
+            raise _tracking_frame_error("rotation_degrees 必须位于 -180..180", index=index, path=f"{frame_path}.rotation_degrees")
+        previous_tick = at_tick
+        positions.append({
+            "at_seconds": round(at_seconds, 6),
+            "at_tick": at_tick,
+            "x": round(x, 6),
+            "y": round(y, 6),
+            "width": round(width, 6),
+            "height": round(height, 6),
+            "confidence": round(confidence, 6),
+            "rotation_degrees": round(rotation, 6),
+        })
+    return positions
+
+
+def track_command_json_multi(
+    source: Path,
+    roi: str | dict[str, Any] | list[float] | tuple[float, ...],
+    *,
+    adapter_id: str,
+    model_path: str | Path,
+    executable: str | Path,
+    model_sha256: str | None = None,
+    executable_sha256: str | None = None,
+    object_id: str | None = None,
+    start_seconds: float = 0.0,
+    end_seconds: float | None = None,
+    step_frames: int = 4,
+    max_width: int = 640,
+    max_samples: int = 600,
+    max_objects: int = 64,
+    ticks_per_second: int = 90_000,
+    timeout: int = 1800,
+) -> dict[str, Any]:
+    """Run a local multi-object tracker and validate stable object identities.
+
+    The v2 protocol keeps the same argv-only, one-request/one-response boundary
+    as v1 but returns independent trajectories under ``objects``.  A caller may
+    select one object for keyframe application or request all objects for a
+    review-only report.  The CLI never invents identities or falls back to a
+    cloud detector.
+    """
+    if not source.exists() or not source.is_file():
+        raise AppError("TRACK_SOURCE_MISSING", f"跟踪输入不存在: {source}", exit_code=3, path=str(source))
+    model = Path(model_path).expanduser().resolve()
+    runner = Path(executable).expanduser().resolve()
+    if not model.exists():
+        raise AppError("MODEL_PATH_MISSING", f"本地视觉模型不存在: {model}", exit_code=10, path=str(model))
+    if not runner.exists() or not runner.is_file():
+        raise AppError("MODEL_EXECUTABLE_MISSING", f"本地视觉适配器 executable 不存在: {runner}", exit_code=10, path=str(runner))
+    roi_values = _parse_roi(roi)
+    try:
+        start_seconds = float(start_seconds)
+        end_seconds = None if end_seconds is None else float(end_seconds)
+    except (TypeError, ValueError) as exc:
+        raise AppError("TRACK_RANGE_INVALID", "跟踪时间范围必须是数字", exit_code=2, path="range") from exc
+    if not math.isfinite(start_seconds) or start_seconds < 0:
+        raise AppError("TRACK_RANGE_INVALID", "start_seconds 必须是非负有限数字", exit_code=2, path="start_seconds")
+    if end_seconds is not None and (not math.isfinite(end_seconds) or end_seconds <= start_seconds):
+        raise AppError("TRACK_RANGE_INVALID", "end_seconds 必须大于 start_seconds", exit_code=2, path="end_seconds")
+    if object_id is not None and (not str(object_id).strip() or len(str(object_id)) > 128):
+        raise AppError("TRACK_OBJECT_ID_INVALID", "object_id 必须是 1..128 个字符", exit_code=2, path="object_id")
+    step_frames = max(1, int(step_frames))
+    max_width = max(160, min(4096, int(max_width)))
+    max_samples = max(1, min(20_000, int(max_samples)))
+    max_objects = max(1, min(256, int(max_objects)))
+    ticks_per_second = max(1, int(ticks_per_second))
+    source_sha256 = f"sha256:{sha256_file(source)}"
+    if not model_sha256:
+        if model.is_file():
+            model_sha256 = f"sha256:{sha256_file(model)}"
+        else:
+            raise AppError("MODEL_HASH_REQUIRED", "视觉 runner 需要已登记的模型目录哈希", exit_code=10, path=str(model))
+    if not executable_sha256:
+        executable_sha256 = f"sha256:{sha256_file(runner)}"
+    request = {
+        "protocol": MULTI_OBJECT_TRACKING_PROTOCOL,
+        "status": "request",
+        "adapter_id": str(adapter_id),
+        "engine": MULTI_OBJECT_TRACKING_ENGINE,
+        "network": "disabled",
+        "source": {"path": str(source), "sha256": source_sha256},
+        "model": {"path": str(model), "sha256": model_sha256},
+        "runner": {"path": str(runner), "sha256": executable_sha256},
+        "roi": {"x": roi_values[0], "y": roi_values[1], "width": roi_values[2], "height": roi_values[3]},
+        "selection": {"object_id": object_id, "all_objects": object_id is None},
+        "range": {"start_seconds": start_seconds, "end_seconds": end_seconds, "step_frames": step_frames},
+        "limits": {"max_width": max_width, "max_samples": max_samples, "max_objects": max_objects},
+        "ticks_per_second": ticks_per_second,
+        "output_contract": MULTI_OBJECT_TRACKING_OUTPUT_CONTRACT,
+    }
+    try:
+        completed = subprocess.run(
+            _tracking_runner_command(runner),
+            input=json.dumps(request, ensure_ascii=False) + "\n",
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            capture_output=True,
+            timeout=max(1, int(timeout)),
+            check=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise AppError("TRACKING_RUNNER_TIMEOUT", "本地多目标视觉 runner 超时", exit_code=6, retryable=True, path=str(runner), cause=str(exc)) from exc
+    except OSError as exc:
+        raise AppError("TRACKING_RUNNER_START_FAILED", f"无法启动本地多目标视觉 runner: {runner}", exit_code=10, path=str(runner), cause=str(exc)) from exc
+    if completed.returncode != 0:
+        raise AppError("TRACKING_RUNNER_FAILED", "本地多目标视觉 runner 返回失败", exit_code=6, path=str(runner), cause=completed.stderr[-3000:])
+    stdout = completed.stdout or ""
+    if len(stdout.encode("utf-8", errors="replace")) > 10 * 1024 * 1024:
+        raise AppError("TRACKING_RUNNER_OUTPUT_TOO_LARGE", "本地多目标视觉 runner 输出超过 10 MiB 限制", exit_code=6, path=str(runner))
+    try:
+        response = json.loads(stdout)
+    except json.JSONDecodeError as exc:
+        raise AppError("TRACKING_RUNNER_OUTPUT_INVALID", "本地多目标视觉 runner stdout 不是有效 JSON", exit_code=6, path=str(runner), cause=str(exc)) from exc
+    if not isinstance(response, dict):
+        raise AppError("TRACKING_RUNNER_OUTPUT_INVALID", "本地多目标视觉 runner 响应必须是对象", exit_code=6, path=str(runner))
+    if response.get("protocol") != MULTI_OBJECT_TRACKING_PROTOCOL:
+        raise AppError("TRACKING_RUNNER_PROTOCOL_MISMATCH", "本地多目标视觉 runner protocol 不匹配", exit_code=6, path="protocol")
+    if response.get("status") != "ok":
+        raise AppError("TRACKING_RUNNER_FAILED", "本地多目标视觉 runner 未返回 status=ok", exit_code=6, path="status", cause=json.dumps(response, ensure_ascii=False)[:3000])
+    raw_objects = response.get("objects")
+    if not isinstance(raw_objects, list) or not raw_objects:
+        raise AppError("TRACKING_RUNNER_OUTPUT_INVALID", "本地多目标视觉 runner 必须返回非空 objects 数组", exit_code=6, path="objects")
+    if len(raw_objects) > max_objects:
+        raise AppError("TRACKING_RUNNER_OUTPUT_INVALID", "本地多目标视觉 runner 返回对象数超过 max_objects", exit_code=6, path="objects")
+    objects: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    for index, raw_object in enumerate(raw_objects):
+        if not isinstance(raw_object, dict):
+            raise AppError("TRACKING_RUNNER_OUTPUT_INVALID", f"第 {index} 个对象必须是对象", exit_code=6, path=f"objects[{index}]")
+        raw_id = raw_object.get("object_id", raw_object.get("id"))
+        object_key = str(raw_id or "").strip()
+        if not object_key or len(object_key) > 128 or object_key in seen_ids:
+            raise AppError("TRACKING_RUNNER_OUTPUT_INVALID", "object_id 必须唯一且为 1..128 个字符", exit_code=6, path=f"objects[{index}].object_id")
+        seen_ids.add(object_key)
+        frames = _validate_tracking_frames(
+            raw_object.get("frames"),
+            start_seconds=start_seconds,
+            end_seconds=end_seconds,
+            ticks_per_second=ticks_per_second,
+            max_samples=max_samples,
+            path_prefix=f"objects[{index}].frames",
+        )
+        object_result = {
+            "object_id": object_key,
+            "label": str(raw_object.get("label", "unknown"))[:128],
+            "frames": frames,
+            "keyframes": [
+                {"property": "transform.position.x", "keyframes": [{"at_tick": item["at_tick"], "value": item["x"], "interpolation": "linear"} for item in frames]},
+                {"property": "transform.position.y", "keyframes": [{"at_tick": item["at_tick"], "value": item["y"], "interpolation": "linear"} for item in frames]},
+                {"property": "transform.rotation", "keyframes": [{"at_tick": item["at_tick"], "value": item["rotation_degrees"], "interpolation": "linear"} for item in frames if abs(float(item.get("rotation_degrees", 0.0))) > 1e-9]},
+            ],
+            "metadata": raw_object.get("metadata", {}) if isinstance(raw_object.get("metadata"), dict) else {},
+        }
+        object_result["confidence_mean"] = round(sum(float(item["confidence"]) for item in frames) / len(frames), 6)
+        objects.append(object_result)
+    if object_id is not None and object_id not in seen_ids:
+        raise AppError("TRACK_OBJECT_NOT_FOUND", f"runner 没有返回请求的 object_id: {object_id}", exit_code=6, path="object_id")
+    selected = next((item for item in objects if item["object_id"] == object_id), None) if object_id else None
+    result: dict[str, Any] = {
+        "engine": MULTI_OBJECT_TRACKING_ENGINE,
+        "method": "command-json-multi-object",
+        "protocol": MULTI_OBJECT_TRACKING_PROTOCOL,
+        "output_contract": MULTI_OBJECT_TRACKING_OUTPUT_CONTRACT,
+        "adapter_id": str(adapter_id),
+        "model_path": str(model),
+        "model_sha256": model_sha256,
+        "executable": str(runner),
+        "executable_sha256": executable_sha256,
+        "source": str(source),
+        "source_sha256": source_sha256,
+        "object_id": object_id,
+        "object_count": len(objects),
+        "objects": objects,
+        "range": {"start_seconds": start_seconds, "end_seconds": end_seconds, "step_frames": step_frames, "max_samples": max_samples, "max_objects": max_objects, "runner": response.get("range", {}) if isinstance(response.get("range"), dict) else {}},
+        "ticks_per_second": ticks_per_second,
+        "roi": {"x": roi_values[0], "y": roi_values[1], "width": roi_values[2], "height": roi_values[3]},
+        "runner": {"status": response.get("status"), "engine": response.get("engine"), "metadata": response.get("metadata", {}) if isinstance(response.get("metadata"), dict) else {}},
+        "warnings": ["multi_object_identity_requires_quality_review", "external_local_runner_requires_quality_review", "runner_output_validated_by_agent"],
+    }
+    if selected is not None:
+        result["frames"] = selected["frames"]
+        result["keyframes"] = selected["keyframes"]
+    return result
 
 
 def track_command_json(

@@ -1350,6 +1350,8 @@ print(json.dumps({
         self.assertIn("native_process_write_lock", manifest["capabilities"]["project"]["features"])
         self.assertIn("relink_by_hash", manifest["capabilities"]["media"]["features"])
         self.assertIn("local_auto_reframe", manifest["capabilities"]["media"]["features"])
+        self.assertIn("local_multi_object_tracking", manifest["capabilities"]["media"]["features"])
+        self.assertIn("multi_object_tracking_apply_requires_explicit_object_selection", manifest["capabilities"]["media"]["limits"])
         self.assertIn("target_lufs_gate", manifest["capabilities"]["quality"]["features"])
         self.assertIn("vectorscope", manifest["capabilities"]["quality"]["features"])
         self.assertIn("independent_text_track", manifest["capabilities"]["subtitles"]["features"])
@@ -2833,6 +2835,98 @@ print(json.dumps({
             self.assertEqual(tracked["warnings"][0]["code"], "TRACKING_EXTERNAL_REVIEW")
             self.assertEqual(len(tracked["data"]["result"]["keyframes"]), 2)
             self.assertTrue(report_path.exists())
+
+    def test_command_json_multi_object_tracking_supports_selection_and_apply_paths(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-command-json-multi-tracking-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            model = workspace / "multi-tracking-model.bin"
+            model.write_bytes(b"local multi object tracking model fixture v1")
+            runner = workspace / "multi-tracking-runner.py"
+            runner.write_text(
+                """import json
+import sys
+
+request = json.loads(sys.stdin.read())
+assert request["protocol"] == "agent-video-object-tracking-v2"
+assert request["engine"] == "command-json-tracking-multi-v1"
+assert request["network"] == "disabled"
+selected = request["selection"]["object_id"]
+assert request["selection"]["all_objects"] == (selected is None)
+print(json.dumps({
+    "protocol": "agent-video-object-tracking-v2",
+    "status": "ok",
+    "engine": "fixture-local-multi-tracker",
+    "objects": [
+        {"object_id": "person_1", "label": "person", "frames": [
+            {"at_seconds": 0.0, "x": 0.20, "y": 0.40, "width": 0.20, "height": 0.30, "confidence": 0.97, "rotation_degrees": 0.0},
+            {"at_seconds": 0.5, "x": 0.30, "y": 0.40, "width": 0.20, "height": 0.30, "confidence": 0.93, "rotation_degrees": 4.0}
+        ], "metadata": {"fixture": "person-1"}},
+        {"object_id": "person_2", "label": "person", "frames": [
+            {"at_seconds": 0.0, "x": 0.60, "y": 0.40, "width": 0.18, "height": 0.28, "confidence": 0.94},
+            {"at_seconds": 0.5, "x": 0.55, "y": 0.40, "width": 0.18, "height": 0.28, "confidence": 0.90}
+        ], "metadata": {"fixture": "person-2"}}
+    ],
+    "metadata": {"fixture": True}
+}))
+""",
+                encoding="utf-8",
+            )
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingest["data"]["asset"]["id"]
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [
+                {"op": "add_track", "track_id": "track_titles", "kind": "subtitle", "order": 3},
+                {"op": "append_clip", "track_id": "track_video_1", "id": "multi_video", "asset_id": asset_id, "source_in_tick": 0, "source_out_tick": 90000},
+                {"op": "append_clip", "track_id": "track_titles", "id": "multi_title", "generator": {"type": "text"}, "source_in_tick": 0, "source_out_tick": 90000, "subtitle": {"text": "Multi", "style": {"fontsize": 30}}},
+            ]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            code, registered = invoke(
+                "media", "adapter", "register", "--project", str(project), "--adapter-id", "fixture_multi_tracker",
+                "--engine", "command-json-tracking-multi-v1", "--model-path", str(model), "--executable", str(runner),
+                "--license-spdx", "CC0-1.0", "--verification-status", "verified", "--evidence", "local://fixture-multi-tracker",
+            )
+            self.assertEqual(code, 0, registered)
+            self.assertEqual(registered["data"]["adapter"]["output_contract"], "tracking_objects_v1")
+            self.assertEqual(registered["data"]["adapter"]["protocol"], "agent-video-object-tracking-v2")
+            report_path = project / "validation" / "multi-tracking.json"
+            code, tracked = invoke(
+                "media", "track", "--project", str(project), "--asset-id", asset_id,
+                "--adapter-id", "fixture_multi_tracker", "--roi", "0.1,0.3,0.2,0.3", "--object-id", "person_2",
+                "--clip-id", "multi_video", "--track-id", "track_video_1", "--output", str(report_path),
+            )
+            self.assertEqual(code, 0, tracked)
+            result = tracked["data"]["result"]
+            self.assertEqual(result["protocol"], "agent-video-object-tracking-v2")
+            self.assertEqual(result["object_count"], 2)
+            self.assertEqual(result["object_id"], "person_2")
+            self.assertEqual(len(result["frames"]), 2)
+            self.assertEqual(tracked["warnings"][0]["code"], "TRACKING_MULTI_OBJECT_REVIEW")
+            self.assertTrue(report_path.exists())
+            code, all_objects = invoke(
+                "media", "track", "--project", str(project), "--asset-id", asset_id,
+                "--adapter-id", "fixture_multi_tracker", "--roi", "0.1,0.3,0.2,0.3", "--all-objects",
+            )
+            self.assertEqual(code, 0, all_objects)
+            self.assertEqual(len(all_objects["data"]["result"]["objects"]), 2)
+            self.assertIsNone(all_objects["data"]["result"]["object_id"])
+            code, bound = invoke(
+                "media", "track-bind", "--project", str(project), "--asset-id", asset_id,
+                "--adapter-id", "fixture_multi_tracker", "--object-id", "person_1", "--roi", "0.1,0.3,0.2,0.3",
+                "--target-clip-id", "multi_title", "--target-track-id", "track_titles", "--apply",
+            )
+            self.assertEqual(code, 0, bound)
+            self.assertEqual(bound["data"]["plan"]["object_id"], "person_1")
+            code, reframed = invoke(
+                "media", "reframe", "--project", str(project), "--asset-id", asset_id,
+                "--adapter-id", "fixture_multi_tracker", "--object-id", "person_1", "--roi", "0.1,0.3,0.2,0.3",
+                "--clip-id", "multi_video", "--track-id", "track_video_1", "--apply",
+            )
+            self.assertEqual(code, 0, reframed)
+            self.assertEqual(reframed["data"]["plan"]["object_id"], "person_1")
+            self.assertEqual(invoke("validate", "--project", str(project))[0], 0)
 
     def test_local_tracking_binds_to_independent_text_clip(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-track-bind-") as raw:

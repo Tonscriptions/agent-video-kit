@@ -13,6 +13,14 @@ from typing import Any
 
 from .errors import AppError, argument_error
 from .policy import require_local_reference
+from .tracking import (
+    MULTI_OBJECT_TRACKING_ENGINE,
+    MULTI_OBJECT_TRACKING_OUTPUT_CONTRACT,
+    MULTI_OBJECT_TRACKING_PROTOCOL,
+    OBJECT_TRACKING_ENGINE,
+    OBJECT_TRACKING_OUTPUT_CONTRACT,
+    OBJECT_TRACKING_PROTOCOL,
+)
 from .utils import atomic_write_json, assert_id, load_json, now_iso, sha256_bytes, sha256_file
 
 
@@ -28,7 +36,8 @@ VALID_AUDIO_ADAPTER_ENGINES = {
     "uvr-local-v1",
 }
 VALID_VISUAL_ADAPTER_ENGINES = {
-    "command-json-tracking-v1",
+    OBJECT_TRACKING_ENGINE,
+    MULTI_OBJECT_TRACKING_ENGINE,
 }
 
 
@@ -266,6 +275,7 @@ def prepare_visual_adapter(
         raise AppError("MODEL_EXECUTABLE_UNSAFE", "本地视觉 command-json runner 不允许 shell/script wrapper", exit_code=10, path=str(runner))
     runner_hash = f"sha256:{sha256_file(runner)}"
     stamp = now_iso()
+    is_multi_object = engine == MULTI_OBJECT_TRACKING_ENGINE
     registry_record = {
         "adapter_id": str(adapter_id),
         "kind": "object-tracking",
@@ -276,8 +286,9 @@ def prepare_visual_adapter(
         "model_file_count": model_file_count,
         "executable": str(runner),
         "executable_sha256": runner_hash,
-        "output_contract": "tracking_frames_v1",
-        "protocol": "agent-video-object-tracking-v1",
+        "output_contract": MULTI_OBJECT_TRACKING_OUTPUT_CONTRACT if is_multi_object else OBJECT_TRACKING_OUTPUT_CONTRACT,
+        "protocol": MULTI_OBJECT_TRACKING_PROTOCOL if is_multi_object else OBJECT_TRACKING_PROTOCOL,
+        "capabilities": ["multi_object_bbox"] if is_multi_object else ["single_object_bbox"],
         "network": "disabled",
         "registered_at": stamp,
         "verification_status": verification_status,
