@@ -86,6 +86,7 @@ from .audio_tools import AUDIO_EXTRACT_VERSION, extract_audio, inspect_audio_sou
 from .audio_separation import AUDIO_SEPARATION_ENGINE, AUDIO_SEPARATION_VERSION, separate_command_json, separate_mid_side
 from .local_separation import DEMUCS_ENGINE, separate_native
 from .local_matting import MATTING_ENGINE, prepare_plan as prepare_matting_plan, matte_native
+from .local_segmentation import SEGMENTATION_ENGINE, load_prompts as load_segmentation_prompts
 from .model_registry import (
     MODEL_REGISTRY_VERSION,
     adapter_for,
@@ -280,6 +281,7 @@ def build_parser() -> argparse.ArgumentParser:
     visual_adapter_register.add_argument("--model-path", required=True)
     visual_adapter_register.add_argument("--executable", required=True, help="command-json-tracking-v1 的本地执行器")
     visual_adapter_register.add_argument("--threads", type=int, default=4, help="原生 ONNX CPU 线程数")
+    visual_adapter_register.add_argument("--device", choices=['cpu', 'cuda'], default='cpu', help="SAM2 显式设备，无自动回退")
     visual_adapter_register.add_argument("--downsample-ratio", type=float, default=None, help="RVM 内部降采样比例；默认输出长边缩至 512")
     visual_adapter_register.add_argument("--confidence", type=float, default=0.35)
     visual_adapter_register.add_argument("--low-confidence", type=float, default=0.10)
@@ -297,11 +299,15 @@ def build_parser() -> argparse.ArgumentParser:
     visual_adapter_inspect = _leaf_common(vas.add_parser("inspect", help="检查视觉适配器路径与哈希"))
     visual_adapter_inspect.add_argument("--project", required=True)
     visual_adapter_inspect.add_argument("--adapter-id", required=True)
-    matting = _leaf_common(ms.add_parser("matting", help="本地 RVM 人物抠像与透明视频派生资产"))
+    matting = _leaf_common(ms.add_parser("matting", help="本地人物抠像或提示式对象分割与透明视频"))
     matting.add_argument("--project", required=True)
     matting.add_argument("--asset-id", required=True)
     matting.add_argument("--adapter-id", required=True)
     matting.add_argument("--derived-asset-id", required=True)
+    matting.add_argument("--prompts", default=None, help="SAM2 本地提示 JSON，归一化输出坐标及输出帧号")
+    matting.add_argument("--object-id", type=int, action='append', default=None, help="SAM2 对象 ID，可重复；默认联合全部对象")
+    matting.add_argument("--mask-mode", choices=['binary', 'probability'], default='binary')
+    matting.add_argument("--logit-threshold", type=float, default=0.)
     matting.add_argument("--output", default=None)
     matting.add_argument("--start-seconds", type=float, default=0.)
     matting.add_argument("--end-seconds", type=float, default=None)
@@ -1560,6 +1566,8 @@ def command_audio_adapter(args: argparse.Namespace) -> dict[str, Any]:
 
 def command_media_adapter_register(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
+    if args.engine != SEGMENTATION_ENGINE and args.device != 'cpu' or args.engine == SEGMENTATION_ENGINE and args.downsample_ratio is not None:
+        raise argument_error('device=cuda 只适用于 SAM2；downsample-ratio 只适用于 RVM', 'device/downsample_ratio')
     license_url = require_local_reference(args.license_url, field="--license-url") if args.license_url else ""
     evidence = require_local_reference(args.evidence, field="--evidence") if args.evidence else ""
     registry = load_visual_model_registry(root)
@@ -1577,7 +1585,7 @@ def command_media_adapter_register(args: argparse.Namespace) -> dict[str, Any]:
         verification_status=args.verification_status,
         evidence=evidence,
         root=root,
-        native_options=({'threads': args.threads, 'downsample_ratio': args.downsample_ratio} if args.engine == MATTING_ENGINE else {'threads':args.threads, 'confidence':args.confidence, 'low_confidence':args.low_confidence, 'match_iou':args.match_iou, 'max_gap_seconds':args.max_gap_seconds, 'class_ids':args.class_id}),
+        native_options=({'threads': args.threads, 'device': args.device} if args.engine == SEGMENTATION_ENGINE else {'threads': args.threads, 'downsample_ratio': args.downsample_ratio} if args.engine == MATTING_ENGINE else {'threads':args.threads, 'confidence':args.confidence, 'low_confidence':args.low_confidence, 'match_iou':args.match_iou, 'max_gap_seconds':args.max_gap_seconds, 'class_ids':args.class_id}),
     )
     if args.dry_run:
         return _envelope("media.adapter.register", args, status="planned", data={"registry": str(visual_registry_path(root)), "adapter": adapter_record, "rights": rights_record})
@@ -1645,8 +1653,13 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
     if 'sha256:' + sha256_file(source) != source_asset.get('sha256'):
         raise AppError('MATTING_SOURCE_HASH_MISMATCH', '抠像源与已登记摘要不符', exit_code=10)
     adapter = visual_adapter_for(load_visual_model_registry(root), args.adapter_id)
-    if adapter is None or adapter.get('engine') != MATTING_ENGINE:
-        raise AppError('MATTING_ADAPTER_UNAVAILABLE', '抠像要求已登记的 rvm-onnx-cpu-matting-v1', exit_code=10)
+    if adapter is None or adapter.get('engine') not in {MATTING_ENGINE, SEGMENTATION_ENGINE}:
+        raise AppError('MATTING_ADAPTER_UNAVAILABLE', '要求已登记的本地 RVM 或 SAM2 适配器', exit_code=10)
+    segmentation = adapter['engine'] == SEGMENTATION_ENGINE
+    if segmentation and not args.prompts:
+        raise argument_error('SAM2 要求显式本地 --prompts JSON', 'prompts')
+    if not segmentation and (args.prompts or args.object_id is not None or args.mask_mode != 'binary' or args.logit_threshold != 0):
+        raise argument_error('RVM 不接受 SAM2 提示或掩模参数', 'prompts/object_id/mask_mode')
     ledger = load_ledger(root)
     records = {r['asset_id']: r for r in active_records(ledger)}
     parent_ref = source_asset.get('rights_ref') or args.asset_id
@@ -1664,6 +1677,9 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
     cancel_file = resolve_local_path(root, args.cancel_file, field='cancel_file') if args.cancel_file else None
     plan = prepare_matting_plan(source, adapter, start_seconds=args.start_seconds, end_seconds=args.end_seconds, fps=args.fps,
                                 max_edge=args.max_edge, max_frames=args.max_frames, preserve_audio=not args.no_audio)
+    if segmentation:
+        plan['prompt_plan'], plan['prompt_source'] = load_segmentation_prompts(root, args.prompts, frames=plan['video']['frames'], object_ids=args.object_id, mask_mode=args.mask_mode, threshold=args.logit_threshold)
+        plan['video'].pop('downsample_ratio', None)
     tps = int(project.get('settings', {}).get('timebase', {}).get('ticks_per_second', TICKS_PER_SECOND))
     start_tick = round(args.timeline_start_seconds * tps)
     duration_tick = max(1, round(plan['video']['duration_seconds'] * tps))
@@ -1689,17 +1705,17 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
     report_path = root / 'validation' / f'matting_{safe_filename(operation_id)}.json'
     published = False
     try:
-        _progress(args, operation_id, 'started', 'media.matting', 0, '开始本地 RVM 时序抠像')
+        _progress(args, operation_id, 'started', 'media.matting', 0, '开始本地对象分割' if segmentation else '开始本地 RVM 时序抠像')
         def progress(frame, total):
-            _progress(args, operation_id, 'progress', 'media.matting.inference', round(90 * frame / total), f'人物抠像 {frame}/{total} 帧')
+            _progress(args, operation_id, 'progress', 'media.matting.inference', round(90 * frame / total), f'{"对象分割" if segmentation else "人物抠像"} {frame}/{total} 帧')
         result = matte_native(root, output, adapter=adapter, plan=plan, timeout=args.timeout_seconds, cancel_file=cancel_file, progress=progress)
         published = True
         asset = {'id': derived_id, 'kind': 'video', 'uri': output.relative_to(root).as_posix(), 'sha256': result['sha256'], 'probe': result['probe'], 'rights_ref': derived_id,
                  'source': {'source_url': f'local://{output}', 'retrieved_at': now_iso(), 'original_name': output.name, 'derived_from': [args.asset_id]}}
         rights = {key: copy.deepcopy(parent.get(key, default)) for key, default in [('creator', 'unknown'), ('license_spdx', 'LicenseRef-UNVERIFIED'), ('license_url', ''),
                   ('attribution', ''), ('permitted_uses', ['internal']), ('permitted_channels', []), ('restrictions', []), ('evidence', ''), ('verification_status', 'unverified'), ('verified_by', ''), ('takedown_status', 'clear')]}
-        rights.update(asset_id=derived_id, kind='video', sha256=result['sha256'], source_url=f'local://{output}', source_version='derived-video-rvm-matting', retrieved_at=now_iso(),
-                      derived_from=[parent_ref, model_ref], notes='Local recurrent human matting; source and model rights both required')
+        rights.update(asset_id=derived_id, kind='video', sha256=result['sha256'], source_url=f'local://{output}', source_version='derived-video-sam2-segmentation' if segmentation else 'derived-video-rvm-matting', retrieved_at=now_iso(),
+                      derived_from=[parent_ref, model_ref], notes='Local prompted object segmentation; source and model rights both required' if segmentation else 'Local recurrent human matting; source and model rights both required')
         project.setdefault('assets', []).append(asset)
         add_record(ledger, rights)
         clip = audio_clip = None
@@ -1721,7 +1737,7 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         report = {'version': '0.1.0', 'created_at': now_iso(), 'operation_id': operation_id, 'snapshot_id': snapshot['snapshot_id'], 'source_asset_id': args.asset_id,
                   'asset': asset, 'rights': rights, 'generated_clip': clip, 'generated_audio_clip': audio_clip, 'matting': result, 'validation': validation}
         atomic_write_json(report_path, report)
-        project.setdefault('provenance', {}).setdefault('change_log', []).append({'operation_id': operation_id, 'command': 'media.matting', 'engine': MATTING_ENGINE,
+        project.setdefault('provenance', {}).setdefault('change_log', []).append({'operation_id': operation_id, 'command': 'media.matting', 'engine': adapter['engine'],
             'asset_id': derived_id, 'source_asset_id': args.asset_id, 'snapshot_id': snapshot['snapshot_id'], 'report': str(report_path), 'at': now_iso()})
         save_project(root, project)
         _operation(root, operation_id, {'operation_id': operation_id, 'command': 'media.matting', 'status': 'succeeded', 'asset_id': derived_id,

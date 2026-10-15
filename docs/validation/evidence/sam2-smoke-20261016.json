@@ -1,0 +1,4554 @@
+{
+  "checked_at_utc": "2026-10-15T18:24:44.531058+00:00",
+  "implementation_base": "d5fde0c7fd039817a332af63aa226e5d4a7fcc61",
+  "scope": "Native offline prompted SAM2 segmentation, CPU/CUDA functional evidence, selected-object probability masks, bounded streaming, transparent composition and product regression; broad Jianying parity unaccepted",
+  "model_provenance": {
+    "retrieved_at_utc": "2026-10-15T17:36:58.165827+00:00",
+    "official_repository": "https://huggingface.co/facebook/sam2.1-hiera-tiny",
+    "official_file_metadata": "https://huggingface.co/facebook/sam2.1-hiera-tiny/blob/de431c4043854a71d8101e17995dfe596bf101a5/model.safetensors",
+    "revision": "de431c4043854a71d8101e17995dfe596bf101a5",
+    "retrieval_mirror": "https://hf-mirror.com/facebook/sam2.1-hiera-tiny/resolve/de431c4043854a71d8101e17995dfe596bf101a5/model.safetensors",
+    "model_sha256": "sha256:48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7",
+    "bytes": 155908064,
+    "official_sha256_verified": true,
+    "declared_license": "Apache-2.0",
+    "license_verification": "unverified",
+    "usage": "Explicit developer retrieval; product accepts existing local files and performs no download"
+  },
+  "natural_video_provenance": {
+    "official_example_reference": "https://huggingface.co/docs/transformers/en/model_doc/sam2_video",
+    "source_repository": "https://huggingface.co/datasets/hf-internal-testing/sam2-fixtures",
+    "revision": "ee201e1a2ba9f944f26ab4b3219a32cf6dd27252",
+    "retrieval_url": "https://hf-mirror.com/datasets/hf-internal-testing/sam2-fixtures/resolve/ee201e1a2ba9f944f26ab4b3219a32cf6dd27252/bedroom.mp4",
+    "sha256": "sha256:1be76d5d19b066e8ad7c565d88a98e11a8f8d456a707508a7aa35390def70e30",
+    "bytes": 2380401,
+    "checksum_source": "mirror LFS pointer; primary docs reference this dataset path",
+    "license_verification": "unverified",
+    "usage": "local development evaluation; no publication or commercial release"
+  },
+  "model_artifacts": [
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\segmentation\\sam2.1-hiera-tiny\\config.json",
+      "role": "model",
+      "bytes": 5695,
+      "sha256": "sha256:860aff9751b139d83a4ad7df1e5535416fded533e0ead02625edbefcb9953cce"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\segmentation\\sam2.1-hiera-tiny\\model.safetensors",
+      "role": "model",
+      "bytes": 155908064,
+      "sha256": "sha256:48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\segmentation\\sam2.1-hiera-tiny\\preprocessor_config.json",
+      "role": "model",
+      "bytes": 683,
+      "sha256": "sha256:6ebf229ee259368ce4a8d4f2fe893a72b053023710853e257253939e601f583d"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\segmentation\\sam2.1-hiera-tiny\\processor_config.json",
+      "role": "model",
+      "bytes": 95,
+      "sha256": "sha256:f8a68e865cfad115c1c2763f3d93eca7b1c622da06da2a9273eb437fb2389b6d"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\segmentation\\sam2.1-hiera-tiny\\video_preprocessor_config.json",
+      "role": "model",
+      "bytes": 705,
+      "sha256": "sha256:9fccfe5f464ec38c2f236d0e6a68e95511c80c22132fc2fa4b9f7b65f24fad95"
+    },
+    {
+      "path": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+      "role": "python",
+      "bytes": 105696,
+      "sha256": "sha256:ef8f51028ac5329641985112f8efb1c2d4c47c86b8011ddf7e6fae21e2b4e5a1"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\segmentation\\sam2-evidence.json",
+      "role": "evidence",
+      "bytes": 829,
+      "sha256": "sha256:6381f62c8c7faf75180085f7269977998ee72a6bc4dcb92e179f74bcdffab196"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\sam2_worker.py",
+      "role": "worker",
+      "bytes": 9043,
+      "sha256": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\segmentation_frames.py",
+      "role": "frames",
+      "bytes": 3162,
+      "sha256": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\local_segmentation.py",
+      "role": "controller",
+      "bytes": 13774,
+      "sha256": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\local_matting.py",
+      "role": "pipeline",
+      "bytes": 29413,
+      "sha256": "sha256:bf9cceb9c44ce51d54f5ab6609b597dd51a1f3858f656d21d68a02872238505a"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\matting_frames.py",
+      "role": "rgba",
+      "bytes": 4054,
+      "sha256": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\rvm_worker.py",
+      "role": "guard",
+      "bytes": 5298,
+      "sha256": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1"
+    }
+  ],
+  "regression": {
+    "status": "passed",
+    "test_count": 278,
+    "seconds": 469.911,
+    "log": "product/.runtime/segmentation-full-regression-20261016.log",
+    "log_sha256": "sha256:357942dd8d92d5ef24b970f9adaed9e225a183656e082f33006d1da544e11cc3"
+  },
+  "targeted": {
+    "status": "passed",
+    "test_count": 21,
+    "seconds": 27.975,
+    "log": "product/.runtime/segmentation-targeted-20261016-c.log",
+    "log_sha256": "sha256:1d9eadb1171f1562eda0aa1d6bcb1fde6e5bab4236c784b1a454a2888708d226"
+  },
+  "rvm_compatibility": {
+    "status": "passed",
+    "test_count": 24,
+    "seconds": 53.664,
+    "log": "product/.runtime/segmentation-rvm-regression-20261016.log",
+    "log_sha256": "sha256:10e96e7463fb819ae418b4c200beb05560157edc23d7734a86492b8c2c1a7a0e"
+  },
+  "doctor": {
+    "ok": true,
+    "path": "product/.runtime/segmentation-doctor-20261016.json",
+    "sha256": "sha256:f9c7fc97a26ff58cd91b1d8b9d1976efd77d993f8e31098c42812910b3426388"
+  },
+  "capabilities": {
+    "status": "passed",
+    "path": "product/.runtime/segmentation-capabilities-20261016.json",
+    "sha256": "sha256:1df104afd4ff54c79545909d018d31e32b480ab7f8d86f6757d51c7d98733a09"
+  },
+  "compileall": {
+    "status": "passed",
+    "scope": "product source/tests and smoke script; smoke script recompiled after probability fixture gate correction"
+  },
+  "skill_audit": {
+    "path": "research/video-cut-validation.json",
+    "sha256": "sha256:f51adea6f3fb3f401f8cef6b5d9762c8f616cda328270df92a4b87026d63c424",
+    "skill_count": 14,
+    "failures": 0,
+    "unresolved_links": 0,
+    "checked_at_utc": "2026-10-15T18:21:52.881184+00:00"
+  },
+  "cases": [
+    {
+      "case": "b",
+      "raw_smoke": "workspace/sam2-smoke-20261016-b/summary.json",
+      "raw_smoke_sha256": "sha256:345ce169eb7d16f8bed5b6590788b419893dfce342c4bc0f4481d5d5535226f5",
+      "source_sha256": "sha256:3f4d95a46d1ab39c454d89b67dfc2783320b016cf02472d828136345c0baba99",
+      "adapter_sha256": "sha256:3a964e269a9ece2e4e2040ca2609062f65ceb05b15414f58e0b5c7b0ff167ac1",
+      "adapter_current_integrity": {
+        "adapter_id": "sam2_local",
+        "engine": "transformers-sam2-video-local-v1",
+        "ok": true,
+        "network": "disabled",
+        "findings": []
+      },
+      "model_sha256": "sha256:2eb74cc054edee9c76daa4166b9907884da66a36d9d9cdf7e80e8e0cd4937a3e",
+      "settings": {
+        "device": "cuda",
+        "threads": 4,
+        "precision": "float32",
+        "state_budget_bytes": 536870912
+      },
+      "prompt_plan": {
+        "version": "1.0.0",
+        "coordinate_space": "normalized-output",
+        "frames": [
+          {
+            "frame": 0,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.33,
+                    "label": 1
+                  }
+                ],
+                "box": null
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          },
+          {
+            "frame": 12,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 2,
+                "points": [
+                  {
+                    "x": 0.7,
+                    "y": 0.8,
+                    "label": 1
+                  }
+                ],
+                "box": null
+              }
+            ]
+          },
+          {
+            "frame": 24,
+            "reset": true,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.33,
+                    "label": 1
+                  }
+                ],
+                "box": null
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          }
+        ],
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "logit_threshold": 0.0,
+        "sha256": "sha256:bcc37f234ffa1f6f1591656710aba76fa7861330273cd9b38398321908b77c16"
+      },
+      "prompt_source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\fixtures\\sam2-20261016\\prompts.json",
+        "sha256": "sha256:19ecc4bfc7c5ea44c70961a9559dfa7f39aa387401681f6cddf40d8d27288ed1"
+      },
+      "source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-b\\project\\assets\\asset_20261015175607_35c6e754_portrait-motion.mov",
+        "sha256": "sha256:3f4d95a46d1ab39c454d89b67dfc2783320b016cf02472d828136345c0baba99"
+      },
+      "video": {
+        "width": 512,
+        "height": 512,
+        "fps": "12",
+        "frames": 36,
+        "duration_seconds": 3.0,
+        "source_stream_index": 0,
+        "source_width": 512,
+        "source_height": 512,
+        "source_sar": "1",
+        "source_rotation": 0.0,
+        "clock": "ffmpeg-fps-resampled-source-seconds",
+        "alpha_mode": "straight",
+        "codec": "qtrle",
+        "pix_fmt": "argb"
+      },
+      "audio": {
+        "preserve": true,
+        "source_offset_seconds": 0.0,
+        "codec": "pcm_s24le"
+      },
+      "worker": {
+        "protocol": "agent-video-sam2-segmentation-v1",
+        "engine": "transformers-sam2-video-local-v1",
+        "network": "disabled",
+        "blocked_network_events": [],
+        "request_sha256": "sha256:7479ff4b033db9ee4652b2c1f047bb7a25efbddbd0b035cfb4594201c755b300",
+        "adapter_sha256": "sha256:3a964e269a9ece2e4e2040ca2609062f65ceb05b15414f58e0b5c7b0ff167ac1",
+        "source_sha256": "sha256:3f4d95a46d1ab39c454d89b67dfc2783320b016cf02472d828136345c0baba99",
+        "status": "succeeded",
+        "metrics": {
+          "frames": 36,
+          "width": 512,
+          "height": 512,
+          "rgba_sha256": "sha256:f0154e5b71060e4c8ca8c88229089f2b275b8d5d301a8bde2374e006cf084d7d",
+          "rgba_bytes": 37748736,
+          "state_updates": 36,
+          "state_peak_bytes": 288917720,
+          "alpha_min": 0,
+          "alpha_max": 255,
+          "alpha_mean": 0.15811761220296225,
+          "transparent_pixels": 7944999,
+          "opaque_pixels": 1492185,
+          "soft_alpha_pixels": 0,
+          "alpha_mode": "straight",
+          "input_alpha": "multiply",
+          "state_reset": "per-job-and-explicit-frames",
+          "prompt_events": 3,
+          "explicit_resets": 1
+        },
+        "prompt_sha256": "sha256:bcc37f234ffa1f6f1591656710aba76fa7861330273cd9b38398321908b77c16",
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "providers": [
+          "torch-cuda"
+        ],
+        "versions": {
+          "python": "3.13.14",
+          "torch": "2.13.0+cu130",
+          "transformers": "5.14.1",
+          "numpy": "2.4.6"
+        },
+        "memory_window_frames": 16,
+        "cached_rasters": 1,
+        "cuda_peak_allocated_bytes": 672631808,
+        "elapsed_seconds": 29.639638900000136
+      },
+      "rgba_roundtrip_verified": true,
+      "derived_media_sha256": "sha256:1c1ffc10041cb11474f47feabb9cc9e01790638a041ccc001e59ad5218701301",
+      "pipeline_seconds": 32.27438719999918,
+      "checks": [
+        {
+          "command": "project.init",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.inspect",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "validate",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "policy.audit",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "rights.check",
+          "status": "failed",
+          "exit_code": 7
+        }
+      ],
+      "renders": [
+        {
+          "background": "green",
+          "sha256": "sha256:77dd4e1d9717923312a5c3c9d171d2d8b665fa12e0e06e22a4f403e0cc7d93aa",
+          "manifest_sha256": "sha256:23312a51cc04def7b398ca643baddb2ce270422eff34b240c8b2dc83748893c9",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 0.6197738647460938,
+              "p99_abs_rgb_error": 5.0
+            },
+            {
+              "frame": 18,
+              "mean_abs_rgb_error": 0.6106173396110535,
+              "p99_abs_rgb_error": 5.0
+            },
+            {
+              "frame": 35,
+              "mean_abs_rgb_error": 0.6252911686897278,
+              "p99_abs_rgb_error": 5.0
+            }
+          ]
+        },
+        {
+          "background": "purple",
+          "sha256": "sha256:5a36b9f67ba36c3865208ad8cf9cd35c979cc6a395925c125766723e43a3eba9",
+          "manifest_sha256": "sha256:1839936fd34b0a8d49ffa05065ebe94a8c5b6548c9f2d01f1b1fb20efc81ffce",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 1.4058456420898438,
+              "p99_abs_rgb_error": 5.0
+            },
+            {
+              "frame": 18,
+              "mean_abs_rgb_error": 1.4062347412109375,
+              "p99_abs_rgb_error": 5.0
+            },
+            {
+              "frame": 35,
+              "mean_abs_rgb_error": 1.4259071350097656,
+              "p99_abs_rgb_error": 5.0
+            }
+          ]
+        }
+      ],
+      "transparent_delivery": {
+        "sha256": "sha256:ab4b7d298361fc2b9a1d8a68eb90be60b3995cd39eca77540007ff4f0019409c",
+        "manifest_sha256": "sha256:ec6296ac96af32578da2d6b41ec951fcb9d9f1a403583e5c4ccb881af743a95d",
+        "verification_decoder": "libvpx-vp9",
+        "alpha_comparison": [
+          {
+            "frame": 0,
+            "mean_abs_alpha_error": 0.00331878662109375,
+            "p99_abs_alpha_error": 0.0
+          },
+          {
+            "frame": 18,
+            "mean_abs_alpha_error": 0.003200531005859375,
+            "p99_abs_alpha_error": 0.0
+          },
+          {
+            "frame": 35,
+            "mean_abs_alpha_error": 0.0027313232421875,
+            "p99_abs_alpha_error": 0.0
+          }
+        ]
+      },
+      "rights_expected_exit": 7,
+      "rights_check": {
+        "ok": false,
+        "target": "commercial_ad",
+        "checked": 4,
+        "required_records": 5,
+        "failures": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015175607_35c6e754",
+            "rights_ref": "asset_20261015175607_35c6e754",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015175607_35c6e754",
+            "rights_ref": "asset_20261015175607_35c6e754",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015175607_35c6e754",
+            "rights_ref": "asset_20261015175607_35c6e754",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015175645_718c924e",
+            "rights_ref": "asset_20261015175645_718c924e",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015175645_718c924e",
+            "rights_ref": "asset_20261015175645_718c924e",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015175645_718c924e",
+            "rights_ref": "asset_20261015175645_718c924e",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015175646_7e70be43",
+            "rights_ref": "asset_20261015175646_7e70be43",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015175646_7e70be43",
+            "rights_ref": "asset_20261015175646_7e70be43",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015175646_7e70be43",
+            "rights_ref": "asset_20261015175646_7e70be43",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          }
+        ],
+        "warnings": [],
+        "disposition_decisions": [],
+        "effective_disposition_decisions": []
+      },
+      "visual_review": {
+        "review_completed": true,
+        "finding": "Face-only point selected face plus separately boxed helmet; full person absent.",
+        "contact_sheet": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-b\\contact-sheet.png",
+        "contact_sheet_sha256": "sha256:927a3b1e945149d4df14bb7b5ad2c954e4798bd0fefe39483c05e46389cee651"
+      },
+      "broad_quality_accepted": false
+    },
+    {
+      "case": "person-final",
+      "raw_smoke": "workspace/sam2-smoke-20261016-person-final/summary.json",
+      "raw_smoke_sha256": "sha256:ace5c8a845e4060bbf2a64262ca55e4ea0689468d33a1d52846d637980812e5a",
+      "source_sha256": "sha256:3f4d95a46d1ab39c454d89b67dfc2783320b016cf02472d828136345c0baba99",
+      "adapter_sha256": "sha256:3a964e269a9ece2e4e2040ca2609062f65ceb05b15414f58e0b5c7b0ff167ac1",
+      "adapter_current_integrity": {
+        "adapter_id": "sam2_local",
+        "engine": "transformers-sam2-video-local-v1",
+        "ok": true,
+        "network": "disabled",
+        "findings": []
+      },
+      "model_sha256": "sha256:2eb74cc054edee9c76daa4166b9907884da66a36d9d9cdf7e80e8e0cd4937a3e",
+      "settings": {
+        "device": "cuda",
+        "threads": 4,
+        "precision": "float32",
+        "state_budget_bytes": 536870912
+      },
+      "prompt_plan": {
+        "version": "1.0.0",
+        "coordinate_space": "normalized-output",
+        "frames": [
+          {
+            "frame": 0,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": null
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          },
+          {
+            "frame": 12,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 2,
+                "points": [
+                  {
+                    "x": 0.7,
+                    "y": 0.8,
+                    "label": 1
+                  }
+                ],
+                "box": null
+              }
+            ]
+          },
+          {
+            "frame": 24,
+            "reset": true,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": null
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          }
+        ],
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "logit_threshold": 0.0,
+        "sha256": "sha256:e31956a3ea978c130c1e74fe434b77a454d7cc51631598a77dc44b207a9c5938"
+      },
+      "prompt_source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\fixtures\\sam2-20261016\\prompts-person-and-helmet.json",
+        "sha256": "sha256:98f77436b42385a1c8049dfbb5493e23d336458150394fa381f5829d555b13db"
+      },
+      "source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-person-final\\project\\assets\\asset_20261015181029_ee58bd6d_portrait-motion.mov",
+        "sha256": "sha256:3f4d95a46d1ab39c454d89b67dfc2783320b016cf02472d828136345c0baba99"
+      },
+      "video": {
+        "width": 512,
+        "height": 512,
+        "fps": "12",
+        "frames": 36,
+        "duration_seconds": 3.0,
+        "source_stream_index": 0,
+        "source_width": 512,
+        "source_height": 512,
+        "source_sar": "1",
+        "source_rotation": 0.0,
+        "clock": "ffmpeg-fps-resampled-source-seconds",
+        "alpha_mode": "straight",
+        "codec": "qtrle",
+        "pix_fmt": "argb"
+      },
+      "audio": {
+        "preserve": true,
+        "source_offset_seconds": 0.0,
+        "codec": "pcm_s24le"
+      },
+      "worker": {
+        "protocol": "agent-video-sam2-segmentation-v1",
+        "engine": "transformers-sam2-video-local-v1",
+        "network": "disabled",
+        "blocked_network_events": [],
+        "request_sha256": "sha256:3a6deab8d5adb096e9f7e3c1fd341ab9ddea84e4315286997128e11271530080",
+        "adapter_sha256": "sha256:3a964e269a9ece2e4e2040ca2609062f65ceb05b15414f58e0b5c7b0ff167ac1",
+        "source_sha256": "sha256:3f4d95a46d1ab39c454d89b67dfc2783320b016cf02472d828136345c0baba99",
+        "status": "succeeded",
+        "metrics": {
+          "frames": 36,
+          "width": 512,
+          "height": 512,
+          "rgba_sha256": "sha256:c5eb84ac8cdcf1a66b1229343b470d6b4f35dcd140a680de20dd3347f94ae5ad",
+          "rgba_bytes": 37748736,
+          "state_updates": 36,
+          "state_peak_bytes": 288917848,
+          "alpha_min": 0,
+          "alpha_max": 255,
+          "alpha_mean": 0.5442860921223959,
+          "transparent_pixels": 4300656,
+          "opaque_pixels": 5136528,
+          "soft_alpha_pixels": 0,
+          "alpha_mode": "straight",
+          "input_alpha": "multiply",
+          "state_reset": "per-job-and-explicit-frames",
+          "prompt_events": 3,
+          "explicit_resets": 1
+        },
+        "prompt_sha256": "sha256:e31956a3ea978c130c1e74fe434b77a454d7cc51631598a77dc44b207a9c5938",
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "providers": [
+          "torch-cuda"
+        ],
+        "versions": {
+          "python": "3.13.14",
+          "torch": "2.13.0+cu130",
+          "transformers": "5.14.1",
+          "numpy": "2.4.6"
+        },
+        "memory_window_frames": 16,
+        "cached_rasters": 1,
+        "cuda_peak_allocated_bytes": 672631808,
+        "elapsed_seconds": 33.82571099999768
+      },
+      "rgba_roundtrip_verified": true,
+      "derived_media_sha256": "sha256:d0d2bd93bb0635e9333eb9408c1df4e2839c40e33a9ebe8b1f4dabfd84c643b4",
+      "pipeline_seconds": 38.31206199999724,
+      "checks": [
+        {
+          "command": "project.init",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.inspect",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "validate",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "policy.audit",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "rights.check",
+          "status": "failed",
+          "exit_code": 7
+        }
+      ],
+      "renders": [
+        {
+          "background": "green",
+          "sha256": "sha256:b80aab6da51114bd1bd356952a4441957d648e041c8799b07ab16ae47d8d0807",
+          "manifest_sha256": "sha256:9507710fb45f6fea79633c826dafd35817d3b1fbcbb92ff191c9ad95ada19082",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 1.9681497812271118,
+              "p99_abs_rgb_error": 26.0
+            },
+            {
+              "frame": 18,
+              "mean_abs_rgb_error": 1.6659036874771118,
+              "p99_abs_rgb_error": 18.0
+            },
+            {
+              "frame": 35,
+              "mean_abs_rgb_error": 1.693541169166565,
+              "p99_abs_rgb_error": 17.0
+            }
+          ]
+        },
+        {
+          "background": "purple",
+          "sha256": "sha256:9e68fb9e2372f81f0eefea346a147433797fe1a9c54a63b06ca0127bb1429473",
+          "manifest_sha256": "sha256:bf5fa913a72be96dce841c6fcb11c9a4743bfde059f37231565a758a65589353",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 2.1616604328155518,
+              "p99_abs_rgb_error": 19.0
+            },
+            {
+              "frame": 18,
+              "mean_abs_rgb_error": 1.9816703796386719,
+              "p99_abs_rgb_error": 15.0
+            },
+            {
+              "frame": 35,
+              "mean_abs_rgb_error": 2.0357449054718018,
+              "p99_abs_rgb_error": 15.0
+            }
+          ]
+        }
+      ],
+      "transparent_delivery": {
+        "sha256": "sha256:4defcc59fcfebea8d979fa6d6f3334e50b2edcc2045ca3177d03b03766f59d52",
+        "manifest_sha256": "sha256:b7a4c47b162811cd28941d6655f03ebdcd968f48d18bf316f77641a9ef119f21",
+        "verification_decoder": "libvpx-vp9",
+        "alpha_comparison": [
+          {
+            "frame": 0,
+            "mean_abs_alpha_error": 0.01605987548828125,
+            "p99_abs_alpha_error": 1.0
+          },
+          {
+            "frame": 18,
+            "mean_abs_alpha_error": 0.01221466064453125,
+            "p99_abs_alpha_error": 0.0
+          },
+          {
+            "frame": 35,
+            "mean_abs_alpha_error": 0.01161956787109375,
+            "p99_abs_alpha_error": 0.0
+          }
+        ]
+      },
+      "rights_expected_exit": 7,
+      "rights_check": {
+        "ok": false,
+        "target": "commercial_ad",
+        "checked": 4,
+        "required_records": 5,
+        "failures": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181029_ee58bd6d",
+            "rights_ref": "asset_20261015181029_ee58bd6d",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181029_ee58bd6d",
+            "rights_ref": "asset_20261015181029_ee58bd6d",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181029_ee58bd6d",
+            "rights_ref": "asset_20261015181029_ee58bd6d",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181114_7e360bd0",
+            "rights_ref": "asset_20261015181114_7e360bd0",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181114_7e360bd0",
+            "rights_ref": "asset_20261015181114_7e360bd0",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181114_7e360bd0",
+            "rights_ref": "asset_20261015181114_7e360bd0",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181117_6f948f41",
+            "rights_ref": "asset_20261015181117_6f948f41",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181117_6f948f41",
+            "rights_ref": "asset_20261015181117_6f948f41",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181117_6f948f41",
+            "rights_ref": "asset_20261015181117_6f948f41",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          }
+        ],
+        "warnings": [],
+        "disposition_decisions": [],
+        "effective_disposition_decisions": []
+      },
+      "visual_review": {
+        "review_completed": true,
+        "finding": "Multiple points retain major person and helmet; visible holes at collar, zipper and hand; no ground-truth alpha.",
+        "contact_sheet": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-person-final\\contact-sheet.png",
+        "contact_sheet_sha256": "sha256:1e353ff190b70638d7a1cd22985468769982a138f32c903a60e55d95c09b9951"
+      },
+      "broad_quality_accepted": false
+    },
+    {
+      "case": "cpu-final",
+      "raw_smoke": "workspace/sam2-smoke-20261016-cpu-final/summary.json",
+      "raw_smoke_sha256": "sha256:118163ab474c5409d24e171cbec1f1f0b29202085f5273d65f34ba5a18b84211",
+      "source_sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48",
+      "adapter_sha256": "sha256:411fbcae05bcf56d07e7452cf5c0a0e4dc79416b16027a671cbb3d211409615a",
+      "adapter_current_integrity": {
+        "adapter_id": "sam2_local",
+        "engine": "transformers-sam2-video-local-v1",
+        "ok": true,
+        "network": "disabled",
+        "findings": []
+      },
+      "model_sha256": "sha256:2eb74cc054edee9c76daa4166b9907884da66a36d9d9cdf7e80e8e0cd4937a3e",
+      "settings": {
+        "device": "cpu",
+        "threads": 4,
+        "precision": "float32",
+        "state_budget_bytes": 536870912
+      },
+      "prompt_plan": {
+        "version": "1.0.0",
+        "coordinate_space": "normalized-output",
+        "frames": [
+          {
+            "frame": 0,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": null
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          },
+          {
+            "frame": 2,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 2,
+                "points": [
+                  {
+                    "x": 0.7,
+                    "y": 0.8,
+                    "label": 1
+                  }
+                ],
+                "box": null
+              }
+            ]
+          },
+          {
+            "frame": 4,
+            "reset": true,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": null
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          }
+        ],
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "logit_threshold": 0.0,
+        "sha256": "sha256:fc8e07ec6211b96814eda730a633f88e98bd7d274dcc573c529d191e152e1108"
+      },
+      "prompt_source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\fixtures\\sam2-20261016\\prompts-cpu.json",
+        "sha256": "sha256:5e8ee2ab9b662a8bf71861161a02a29563f0c96f6431c7a278643b6b49abd98e"
+      },
+      "source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-cpu-final\\project\\assets\\asset_20261015181029_43a920b1_portrait-short.mov",
+        "sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48"
+      },
+      "video": {
+        "width": 512,
+        "height": 512,
+        "fps": "12",
+        "frames": 6,
+        "duration_seconds": 0.5,
+        "source_stream_index": 0,
+        "source_width": 512,
+        "source_height": 512,
+        "source_sar": "1",
+        "source_rotation": 0.0,
+        "clock": "ffmpeg-fps-resampled-source-seconds",
+        "alpha_mode": "straight",
+        "codec": "qtrle",
+        "pix_fmt": "argb"
+      },
+      "audio": {
+        "preserve": true,
+        "source_offset_seconds": 0.0,
+        "codec": "pcm_s24le"
+      },
+      "worker": {
+        "protocol": "agent-video-sam2-segmentation-v1",
+        "engine": "transformers-sam2-video-local-v1",
+        "network": "disabled",
+        "blocked_network_events": [],
+        "request_sha256": "sha256:563ea8e970969d1b0227e4792578a7f7a385467af52ec9c63a04e9467fc2189d",
+        "adapter_sha256": "sha256:411fbcae05bcf56d07e7452cf5c0a0e4dc79416b16027a671cbb3d211409615a",
+        "source_sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48",
+        "status": "succeeded",
+        "metrics": {
+          "frames": 6,
+          "width": 512,
+          "height": 512,
+          "rgba_sha256": "sha256:1897241de9ba42a83c69c8d14cd3499aa3ef4302dadcdeeb2c0df6e53b42a75b",
+          "rgba_bytes": 6291456,
+          "state_updates": 6,
+          "state_peak_bytes": 159391984,
+          "alpha_min": 0,
+          "alpha_max": 255,
+          "alpha_mean": 0.4291807810465495,
+          "transparent_pixels": 897821,
+          "opaque_pixels": 675043,
+          "soft_alpha_pixels": 0,
+          "alpha_mode": "straight",
+          "input_alpha": "multiply",
+          "state_reset": "per-job-and-explicit-frames",
+          "prompt_events": 3,
+          "explicit_resets": 1
+        },
+        "prompt_sha256": "sha256:fc8e07ec6211b96814eda730a633f88e98bd7d274dcc573c529d191e152e1108",
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "providers": [
+          "torch-cpu"
+        ],
+        "versions": {
+          "python": "3.13.14",
+          "torch": "2.13.0+cu130",
+          "transformers": "5.14.1",
+          "numpy": "2.4.6"
+        },
+        "memory_window_frames": 16,
+        "cached_rasters": 1,
+        "cuda_peak_allocated_bytes": null,
+        "elapsed_seconds": 43.25645810000424
+      },
+      "rgba_roundtrip_verified": true,
+      "derived_media_sha256": "sha256:d749feecda4ac9ffd93c8a8a2e39ff75c60887acb6ef9c35a2930c0dbe41f90d",
+      "pipeline_seconds": 46.058981700000004,
+      "checks": [
+        {
+          "command": "project.init",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.inspect",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "validate",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "policy.audit",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "rights.check",
+          "status": "failed",
+          "exit_code": 7
+        }
+      ],
+      "renders": [
+        {
+          "background": "green",
+          "sha256": "sha256:792c00dc6f956f10fa511efd4ab5f2ec7057c6c5c05fcbc426616a9463a32359",
+          "manifest_sha256": "sha256:2e37fe844a56c4f8247d00d02f7518123fbd7d1e957cea5092ddac810574b540",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 2.0800998210906982,
+              "p99_abs_rgb_error": 26.0
+            },
+            {
+              "frame": 3,
+              "mean_abs_rgb_error": 1.878644347190857,
+              "p99_abs_rgb_error": 20.0
+            },
+            {
+              "frame": 5,
+              "mean_abs_rgb_error": 0.6524798274040222,
+              "p99_abs_rgb_error": 6.0
+            }
+          ]
+        },
+        {
+          "background": "purple",
+          "sha256": "sha256:8a173168ddae529353cd9b8e33c782a164f5ad5bcd563b9fdcb66806726c98f6",
+          "manifest_sha256": "sha256:fdd35b0eb14cc7a39555c55eb7543eb1d5eac21116ab7f666c833810b965479a",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 2.268535614013672,
+              "p99_abs_rgb_error": 20.0
+            },
+            {
+              "frame": 3,
+              "mean_abs_rgb_error": 2.152188539505005,
+              "p99_abs_rgb_error": 16.0
+            },
+            {
+              "frame": 5,
+              "mean_abs_rgb_error": 1.4336191415786743,
+              "p99_abs_rgb_error": 6.0
+            }
+          ]
+        }
+      ],
+      "transparent_delivery": {
+        "sha256": "sha256:8a4d626d122b2fb6cd6101e8c156ceea724d104956668d07fc4df601ea72465b",
+        "manifest_sha256": "sha256:9b57fb913f39f3697322e7e94d51f1712e795ca59787cd1e19330e45de39b035",
+        "verification_decoder": "libvpx-vp9",
+        "alpha_comparison": [
+          {
+            "frame": 0,
+            "mean_abs_alpha_error": 0.01605987548828125,
+            "p99_abs_alpha_error": 1.0
+          },
+          {
+            "frame": 3,
+            "mean_abs_alpha_error": 0.016468048095703125,
+            "p99_abs_alpha_error": 0.0
+          },
+          {
+            "frame": 5,
+            "mean_abs_alpha_error": 0.005443572998046875,
+            "p99_abs_alpha_error": 0.0
+          }
+        ]
+      },
+      "rights_expected_exit": 7,
+      "rights_check": {
+        "ok": false,
+        "target": "commercial_ad",
+        "checked": 4,
+        "required_records": 5,
+        "failures": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181029_43a920b1",
+            "rights_ref": "asset_20261015181029_43a920b1",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181029_43a920b1",
+            "rights_ref": "asset_20261015181029_43a920b1",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181029_43a920b1",
+            "rights_ref": "asset_20261015181029_43a920b1",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181121_742be631",
+            "rights_ref": "asset_20261015181121_742be631",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181121_742be631",
+            "rights_ref": "asset_20261015181121_742be631",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181121_742be631",
+            "rights_ref": "asset_20261015181121_742be631",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181123_896e843e",
+            "rights_ref": "asset_20261015181123_896e843e",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181123_896e843e",
+            "rights_ref": "asset_20261015181123_896e843e",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181123_896e843e",
+            "rights_ref": "asset_20261015181123_896e843e",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          }
+        ],
+        "warnings": [],
+        "disposition_decisions": [],
+        "effective_disposition_decisions": []
+      },
+      "visual_review": {
+        "review_completed": true,
+        "finding": "First/middle masks retain major person; after reset at frame 4 mask narrows to face plus helmet despite unchanged points.",
+        "contact_sheet": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-cpu-final\\contact-sheet.png",
+        "contact_sheet_sha256": "sha256:6eff8ece7f652d28e32934a03865e8b89589efc866c00dda01cac4fcc6418f9d"
+      },
+      "broad_quality_accepted": false
+    },
+    {
+      "case": "cpu-person-final",
+      "raw_smoke": "workspace/sam2-smoke-20261016-cpu-person-final/summary.json",
+      "raw_smoke_sha256": "sha256:c602b4371351164274cbc84a6b501587abb4e0c8e34d7a53aff02bae5c006269",
+      "source_sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48",
+      "adapter_sha256": "sha256:411fbcae05bcf56d07e7452cf5c0a0e4dc79416b16027a671cbb3d211409615a",
+      "adapter_current_integrity": {
+        "adapter_id": "sam2_local",
+        "engine": "transformers-sam2-video-local-v1",
+        "ok": true,
+        "network": "disabled",
+        "findings": []
+      },
+      "model_sha256": "sha256:2eb74cc054edee9c76daa4166b9907884da66a36d9d9cdf7e80e8e0cd4937a3e",
+      "settings": {
+        "device": "cpu",
+        "threads": 4,
+        "precision": "float32",
+        "state_budget_bytes": 536870912
+      },
+      "prompt_plan": {
+        "version": "1.0.0",
+        "coordinate_space": "normalized-output",
+        "frames": [
+          {
+            "frame": 0,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": null
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          },
+          {
+            "frame": 2,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 2,
+                "points": [
+                  {
+                    "x": 0.7,
+                    "y": 0.8,
+                    "label": 1
+                  }
+                ],
+                "box": null
+              }
+            ]
+          },
+          {
+            "frame": 4,
+            "reset": true,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": null
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          }
+        ],
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "logit_threshold": 0.0,
+        "sha256": "sha256:fc8e07ec6211b96814eda730a633f88e98bd7d274dcc573c529d191e152e1108"
+      },
+      "prompt_source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\fixtures\\sam2-20261016\\prompts-cpu-person.json",
+        "sha256": "sha256:57ac86054a9ab0cdd5fab730d8813d7b18e0d0b74047b6f1924ddb3d75687ae6"
+      },
+      "source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-cpu-person-final\\project\\assets\\asset_20261015181329_47dbef85_portrait-short.mov",
+        "sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48"
+      },
+      "video": {
+        "width": 512,
+        "height": 512,
+        "fps": "12",
+        "frames": 6,
+        "duration_seconds": 0.5,
+        "source_stream_index": 0,
+        "source_width": 512,
+        "source_height": 512,
+        "source_sar": "1",
+        "source_rotation": 0.0,
+        "clock": "ffmpeg-fps-resampled-source-seconds",
+        "alpha_mode": "straight",
+        "codec": "qtrle",
+        "pix_fmt": "argb"
+      },
+      "audio": {
+        "preserve": true,
+        "source_offset_seconds": 0.0,
+        "codec": "pcm_s24le"
+      },
+      "worker": {
+        "protocol": "agent-video-sam2-segmentation-v1",
+        "engine": "transformers-sam2-video-local-v1",
+        "network": "disabled",
+        "blocked_network_events": [],
+        "request_sha256": "sha256:f84abcdffebe6c3881d184b7cf65d378b2603ba96b64bcaff76b3c21337d2309",
+        "adapter_sha256": "sha256:411fbcae05bcf56d07e7452cf5c0a0e4dc79416b16027a671cbb3d211409615a",
+        "source_sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48",
+        "status": "succeeded",
+        "metrics": {
+          "frames": 6,
+          "width": 512,
+          "height": 512,
+          "rgba_sha256": "sha256:1897241de9ba42a83c69c8d14cd3499aa3ef4302dadcdeeb2c0df6e53b42a75b",
+          "rgba_bytes": 6291456,
+          "state_updates": 6,
+          "state_peak_bytes": 159391984,
+          "alpha_min": 0,
+          "alpha_max": 255,
+          "alpha_mean": 0.4291807810465495,
+          "transparent_pixels": 897821,
+          "opaque_pixels": 675043,
+          "soft_alpha_pixels": 0,
+          "alpha_mode": "straight",
+          "input_alpha": "multiply",
+          "state_reset": "per-job-and-explicit-frames",
+          "prompt_events": 3,
+          "explicit_resets": 1
+        },
+        "prompt_sha256": "sha256:fc8e07ec6211b96814eda730a633f88e98bd7d274dcc573c529d191e152e1108",
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "providers": [
+          "torch-cpu"
+        ],
+        "versions": {
+          "python": "3.13.14",
+          "torch": "2.13.0+cu130",
+          "transformers": "5.14.1",
+          "numpy": "2.4.6"
+        },
+        "memory_window_frames": 16,
+        "cached_rasters": 1,
+        "cuda_peak_allocated_bytes": null,
+        "elapsed_seconds": 61.94380120000278
+      },
+      "rgba_roundtrip_verified": true,
+      "derived_media_sha256": "sha256:d749feecda4ac9ffd93c8a8a2e39ff75c60887acb6ef9c35a2930c0dbe41f90d",
+      "pipeline_seconds": 64.0572242999915,
+      "checks": [
+        {
+          "command": "project.init",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.inspect",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "validate",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "policy.audit",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "rights.check",
+          "status": "failed",
+          "exit_code": 7
+        }
+      ],
+      "renders": [
+        {
+          "background": "green",
+          "sha256": "sha256:792c00dc6f956f10fa511efd4ab5f2ec7057c6c5c05fcbc426616a9463a32359",
+          "manifest_sha256": "sha256:947253aedb35d8f098d4db63bc7bfedb3da185d21602fa7b3a7f95ca903283fb",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 2.0800998210906982,
+              "p99_abs_rgb_error": 26.0
+            },
+            {
+              "frame": 3,
+              "mean_abs_rgb_error": 1.878644347190857,
+              "p99_abs_rgb_error": 20.0
+            },
+            {
+              "frame": 5,
+              "mean_abs_rgb_error": 0.6524798274040222,
+              "p99_abs_rgb_error": 6.0
+            }
+          ]
+        },
+        {
+          "background": "purple",
+          "sha256": "sha256:8a173168ddae529353cd9b8e33c782a164f5ad5bcd563b9fdcb66806726c98f6",
+          "manifest_sha256": "sha256:06cf675198192d9bbf4dce37504cfe9ed3019cbb93581438a239c8e60b2fe554",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 2.268535614013672,
+              "p99_abs_rgb_error": 20.0
+            },
+            {
+              "frame": 3,
+              "mean_abs_rgb_error": 2.152188539505005,
+              "p99_abs_rgb_error": 16.0
+            },
+            {
+              "frame": 5,
+              "mean_abs_rgb_error": 1.4336191415786743,
+              "p99_abs_rgb_error": 6.0
+            }
+          ]
+        }
+      ],
+      "transparent_delivery": {
+        "sha256": "sha256:429253d301057d7642dc1534d99ac53b0539dfcc7427e7e6b1475898a8aaa1b9",
+        "manifest_sha256": "sha256:0b44b608bece7824fa3af498c904e915ec432fb848591b5473b62289a50d4974",
+        "verification_decoder": "libvpx-vp9",
+        "alpha_comparison": [
+          {
+            "frame": 0,
+            "mean_abs_alpha_error": 0.01605987548828125,
+            "p99_abs_alpha_error": 1.0
+          },
+          {
+            "frame": 3,
+            "mean_abs_alpha_error": 0.016468048095703125,
+            "p99_abs_alpha_error": 0.0
+          },
+          {
+            "frame": 5,
+            "mean_abs_alpha_error": 0.005443572998046875,
+            "p99_abs_alpha_error": 0.0
+          }
+        ]
+      },
+      "rights_expected_exit": 7,
+      "rights_check": {
+        "ok": false,
+        "target": "commercial_ad",
+        "checked": 4,
+        "required_records": 5,
+        "failures": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181329_47dbef85",
+            "rights_ref": "asset_20261015181329_47dbef85",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181329_47dbef85",
+            "rights_ref": "asset_20261015181329_47dbef85",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181329_47dbef85",
+            "rights_ref": "asset_20261015181329_47dbef85",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181441_cbabd5e9",
+            "rights_ref": "asset_20261015181441_cbabd5e9",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181441_cbabd5e9",
+            "rights_ref": "asset_20261015181441_cbabd5e9",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181441_cbabd5e9",
+            "rights_ref": "asset_20261015181441_cbabd5e9",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181442_f23bb51f",
+            "rights_ref": "asset_20261015181442_f23bb51f",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181442_f23bb51f",
+            "rights_ref": "asset_20261015181442_f23bb51f",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181442_f23bb51f",
+            "rights_ref": "asset_20261015181442_f23bb51f",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          }
+        ],
+        "warnings": [],
+        "disposition_decisions": [],
+        "effective_disposition_decisions": []
+      },
+      "visual_review": {
+        "review_completed": true,
+        "finding": "Repeated identical CPU fixture reproduces exact RGBA hash and reset narrowing; duplicate does not expand scene coverage.",
+        "contact_sheet": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-cpu-person-final\\contact-sheet.png",
+        "contact_sheet_sha256": "sha256:6eff8ece7f652d28e32934a03865e8b89589efc866c00dda01cac4fcc6418f9d"
+      },
+      "broad_quality_accepted": false
+    },
+    {
+      "case": "cuda-short-final",
+      "raw_smoke": "workspace/sam2-smoke-20261016-cuda-short-final/summary.json",
+      "raw_smoke_sha256": "sha256:1009b16609eba87f7c007d46d18c7d97d73c56a962c4e650e20495b7e1ee194f",
+      "source_sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48",
+      "adapter_sha256": "sha256:3a964e269a9ece2e4e2040ca2609062f65ceb05b15414f58e0b5c7b0ff167ac1",
+      "adapter_current_integrity": {
+        "adapter_id": "sam2_local",
+        "engine": "transformers-sam2-video-local-v1",
+        "ok": true,
+        "network": "disabled",
+        "findings": []
+      },
+      "model_sha256": "sha256:2eb74cc054edee9c76daa4166b9907884da66a36d9d9cdf7e80e8e0cd4937a3e",
+      "settings": {
+        "device": "cuda",
+        "threads": 4,
+        "precision": "float32",
+        "state_budget_bytes": 536870912
+      },
+      "prompt_plan": {
+        "version": "1.0.0",
+        "coordinate_space": "normalized-output",
+        "frames": [
+          {
+            "frame": 0,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": null
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          },
+          {
+            "frame": 2,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 2,
+                "points": [
+                  {
+                    "x": 0.7,
+                    "y": 0.8,
+                    "label": 1
+                  }
+                ],
+                "box": null
+              }
+            ]
+          },
+          {
+            "frame": 4,
+            "reset": true,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": null
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          }
+        ],
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "logit_threshold": 0.0,
+        "sha256": "sha256:fc8e07ec6211b96814eda730a633f88e98bd7d274dcc573c529d191e152e1108"
+      },
+      "prompt_source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\fixtures\\sam2-20261016\\prompts-cpu-person.json",
+        "sha256": "sha256:57ac86054a9ab0cdd5fab730d8813d7b18e0d0b74047b6f1924ddb3d75687ae6"
+      },
+      "source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-cuda-short-final\\project\\assets\\asset_20261015181455_96dde3f5_portrait-short.mov",
+        "sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48"
+      },
+      "video": {
+        "width": 512,
+        "height": 512,
+        "fps": "12",
+        "frames": 6,
+        "duration_seconds": 0.5,
+        "source_stream_index": 0,
+        "source_width": 512,
+        "source_height": 512,
+        "source_sar": "1",
+        "source_rotation": 0.0,
+        "clock": "ffmpeg-fps-resampled-source-seconds",
+        "alpha_mode": "straight",
+        "codec": "qtrle",
+        "pix_fmt": "argb"
+      },
+      "audio": {
+        "preserve": true,
+        "source_offset_seconds": 0.0,
+        "codec": "pcm_s24le"
+      },
+      "worker": {
+        "protocol": "agent-video-sam2-segmentation-v1",
+        "engine": "transformers-sam2-video-local-v1",
+        "network": "disabled",
+        "blocked_network_events": [],
+        "request_sha256": "sha256:990d0aa3caa08e7bd79e20c25a1af114b13a3edbcc166324ebdb7c69f5f3fba9",
+        "adapter_sha256": "sha256:3a964e269a9ece2e4e2040ca2609062f65ceb05b15414f58e0b5c7b0ff167ac1",
+        "source_sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48",
+        "status": "succeeded",
+        "metrics": {
+          "frames": 6,
+          "width": 512,
+          "height": 512,
+          "rgba_sha256": "sha256:1897241de9ba42a83c69c8d14cd3499aa3ef4302dadcdeeb2c0df6e53b42a75b",
+          "rgba_bytes": 6291456,
+          "state_updates": 6,
+          "state_peak_bytes": 159391984,
+          "alpha_min": 0,
+          "alpha_max": 255,
+          "alpha_mean": 0.4291807810465495,
+          "transparent_pixels": 897821,
+          "opaque_pixels": 675043,
+          "soft_alpha_pixels": 0,
+          "alpha_mode": "straight",
+          "input_alpha": "multiply",
+          "state_reset": "per-job-and-explicit-frames",
+          "prompt_events": 3,
+          "explicit_resets": 1
+        },
+        "prompt_sha256": "sha256:fc8e07ec6211b96814eda730a633f88e98bd7d274dcc573c529d191e152e1108",
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "providers": [
+          "torch-cuda"
+        ],
+        "versions": {
+          "python": "3.13.14",
+          "torch": "2.13.0+cu130",
+          "transformers": "5.14.1",
+          "numpy": "2.4.6"
+        },
+        "memory_window_frames": 16,
+        "cached_rasters": 1,
+        "cuda_peak_allocated_bytes": 574594560,
+        "elapsed_seconds": 12.356788000004599
+      },
+      "rgba_roundtrip_verified": true,
+      "derived_media_sha256": "sha256:d749feecda4ac9ffd93c8a8a2e39ff75c60887acb6ef9c35a2930c0dbe41f90d",
+      "pipeline_seconds": 14.744798400002765,
+      "checks": [
+        {
+          "command": "project.init",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.inspect",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "validate",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "policy.audit",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "rights.check",
+          "status": "failed",
+          "exit_code": 7
+        }
+      ],
+      "renders": [
+        {
+          "background": "green",
+          "sha256": "sha256:792c00dc6f956f10fa511efd4ab5f2ec7057c6c5c05fcbc426616a9463a32359",
+          "manifest_sha256": "sha256:f525d1435dbb9dfdf56334a6acaf2d770765e38afb69f413364d7f7b94e062fc",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 2.0800998210906982,
+              "p99_abs_rgb_error": 26.0
+            },
+            {
+              "frame": 3,
+              "mean_abs_rgb_error": 1.878644347190857,
+              "p99_abs_rgb_error": 20.0
+            },
+            {
+              "frame": 5,
+              "mean_abs_rgb_error": 0.6524798274040222,
+              "p99_abs_rgb_error": 6.0
+            }
+          ]
+        },
+        {
+          "background": "purple",
+          "sha256": "sha256:8a173168ddae529353cd9b8e33c782a164f5ad5bcd563b9fdcb66806726c98f6",
+          "manifest_sha256": "sha256:857eb6e24dd3fd6859ab4b3f60420a81a21d1a26fa546e4c50da7a1e67492102",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 2.268535614013672,
+              "p99_abs_rgb_error": 20.0
+            },
+            {
+              "frame": 3,
+              "mean_abs_rgb_error": 2.152188539505005,
+              "p99_abs_rgb_error": 16.0
+            },
+            {
+              "frame": 5,
+              "mean_abs_rgb_error": 1.4336191415786743,
+              "p99_abs_rgb_error": 6.0
+            }
+          ]
+        }
+      ],
+      "transparent_delivery": {
+        "sha256": "sha256:c92bdd69d2afea6baec9342f877260653cd14d782ae24cdfafeb919d8163a6e2",
+        "manifest_sha256": "sha256:4bc0c12985e066b30b66ab1b18f4386805d0743c186113f8a0447a06e5e36ddd",
+        "verification_decoder": "libvpx-vp9",
+        "alpha_comparison": [
+          {
+            "frame": 0,
+            "mean_abs_alpha_error": 0.01605987548828125,
+            "p99_abs_alpha_error": 1.0
+          },
+          {
+            "frame": 3,
+            "mean_abs_alpha_error": 0.016468048095703125,
+            "p99_abs_alpha_error": 0.0
+          },
+          {
+            "frame": 5,
+            "mean_abs_alpha_error": 0.005443572998046875,
+            "p99_abs_alpha_error": 0.0
+          }
+        ]
+      },
+      "rights_expected_exit": 7,
+      "rights_check": {
+        "ok": false,
+        "target": "commercial_ad",
+        "checked": 4,
+        "required_records": 5,
+        "failures": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181455_96dde3f5",
+            "rights_ref": "asset_20261015181455_96dde3f5",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181455_96dde3f5",
+            "rights_ref": "asset_20261015181455_96dde3f5",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181455_96dde3f5",
+            "rights_ref": "asset_20261015181455_96dde3f5",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181514_a75aeff1",
+            "rights_ref": "asset_20261015181514_a75aeff1",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181514_a75aeff1",
+            "rights_ref": "asset_20261015181514_a75aeff1",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181514_a75aeff1",
+            "rights_ref": "asset_20261015181514_a75aeff1",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181516_c28d4c93",
+            "rights_ref": "asset_20261015181516_c28d4c93",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181516_c28d4c93",
+            "rights_ref": "asset_20261015181516_c28d4c93",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181516_c28d4c93",
+            "rights_ref": "asset_20261015181516_c28d4c93",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          }
+        ],
+        "warnings": [],
+        "disposition_decisions": [],
+        "effective_disposition_decisions": []
+      },
+      "visual_review": {
+        "review_completed": true,
+        "finding": "Same six-frame input/prompts match CPU full RGBA hash; same reset narrowing. Not a cross-device general guarantee.",
+        "contact_sheet": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-cuda-short-final\\contact-sheet.png",
+        "contact_sheet_sha256": "sha256:6eff8ece7f652d28e32934a03865e8b89589efc866c00dda01cac4fcc6418f9d"
+      },
+      "broad_quality_accepted": false
+    },
+    {
+      "case": "natural-final",
+      "raw_smoke": "workspace/sam2-smoke-20261016-natural-final/summary.json",
+      "raw_smoke_sha256": "sha256:6f501850997b07bc9a22b51e3287a737af58c046020fea31b0d307e9cc7de1d2",
+      "source_sha256": "sha256:813bc758f73cdb49f2ec206dc5946497279a92f5f900efb042a733249d60c207",
+      "adapter_sha256": "sha256:3a964e269a9ece2e4e2040ca2609062f65ceb05b15414f58e0b5c7b0ff167ac1",
+      "adapter_current_integrity": {
+        "adapter_id": "sam2_local",
+        "engine": "transformers-sam2-video-local-v1",
+        "ok": true,
+        "network": "disabled",
+        "findings": []
+      },
+      "model_sha256": "sha256:2eb74cc054edee9c76daa4166b9907884da66a36d9d9cdf7e80e8e0cd4937a3e",
+      "settings": {
+        "device": "cuda",
+        "threads": 4,
+        "precision": "float32",
+        "state_budget_bytes": 536870912
+      },
+      "prompt_plan": {
+        "version": "1.0.0",
+        "coordinate_space": "normalized-output",
+        "frames": [
+          {
+            "frame": 0,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.42,
+                    "y": 0.38,
+                    "label": 1
+                  }
+                ],
+                "box": [
+                  0.3,
+                  0,
+                  0.55,
+                  0.76
+                ]
+              },
+              {
+                "object_id": 2,
+                "points": [
+                  {
+                    "x": 0.24,
+                    "y": 0.52,
+                    "label": 1
+                  }
+                ],
+                "box": [
+                  0.14,
+                  0.23,
+                  0.36,
+                  0.78
+                ]
+              }
+            ]
+          }
+        ],
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "logit_threshold": 0.0,
+        "sha256": "sha256:988363571bb602c17c1634c19e05b6638b48a7355b9732e51ab423b3404553b0"
+      },
+      "prompt_source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\fixtures\\sam2-20261016\\prompts-natural.json",
+        "sha256": "sha256:01cc3f1d3006c34f37c20a65b8a7321329822be0f2bd6819f5555dc66a241d27"
+      },
+      "source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-natural-final\\project\\assets\\asset_20261015181223_ea22c9fe_natural-motion.mov",
+        "sha256": "sha256:813bc758f73cdb49f2ec206dc5946497279a92f5f900efb042a733249d60c207"
+      },
+      "video": {
+        "width": 512,
+        "height": 288,
+        "fps": "8",
+        "frames": 32,
+        "duration_seconds": 4.0,
+        "source_stream_index": 0,
+        "source_width": 512,
+        "source_height": 288,
+        "source_sar": "1",
+        "source_rotation": 0.0,
+        "clock": "ffmpeg-fps-resampled-source-seconds",
+        "alpha_mode": "straight",
+        "codec": "qtrle",
+        "pix_fmt": "argb"
+      },
+      "audio": {
+        "preserve": true,
+        "source_offset_seconds": 0.0,
+        "codec": "pcm_s24le"
+      },
+      "worker": {
+        "protocol": "agent-video-sam2-segmentation-v1",
+        "engine": "transformers-sam2-video-local-v1",
+        "network": "disabled",
+        "blocked_network_events": [],
+        "request_sha256": "sha256:717553961e7ae485bc3b83fe809ccb40e467e1342e0f056ff4de1ec886b97e81",
+        "adapter_sha256": "sha256:3a964e269a9ece2e4e2040ca2609062f65ceb05b15414f58e0b5c7b0ff167ac1",
+        "source_sha256": "sha256:813bc758f73cdb49f2ec206dc5946497279a92f5f900efb042a733249d60c207",
+        "status": "succeeded",
+        "metrics": {
+          "frames": 32,
+          "width": 512,
+          "height": 288,
+          "rgba_sha256": "sha256:7d785a04d5755916664e06e829a8f1eb337cbe57cb835d0896a11949faefd623",
+          "rgba_bytes": 18874368,
+          "state_updates": 32,
+          "state_peak_bytes": 288917736,
+          "alpha_min": 0,
+          "alpha_max": 255,
+          "alpha_mean": 0.083606931898329,
+          "transparent_pixels": 4324085,
+          "opaque_pixels": 394507,
+          "soft_alpha_pixels": 0,
+          "alpha_mode": "straight",
+          "input_alpha": "multiply",
+          "state_reset": "per-job-and-explicit-frames",
+          "prompt_events": 1,
+          "explicit_resets": 0
+        },
+        "prompt_sha256": "sha256:988363571bb602c17c1634c19e05b6638b48a7355b9732e51ab423b3404553b0",
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "providers": [
+          "torch-cuda"
+        ],
+        "versions": {
+          "python": "3.13.14",
+          "torch": "2.13.0+cu130",
+          "transformers": "5.14.1",
+          "numpy": "2.4.6"
+        },
+        "memory_window_frames": 16,
+        "cached_rasters": 1,
+        "cuda_peak_allocated_bytes": 640108544,
+        "elapsed_seconds": 37.07561359999818
+      },
+      "rgba_roundtrip_verified": true,
+      "derived_media_sha256": "sha256:5d1424a4960e5273e73b2f8a605366add6b279d55dbd4b6a76b5da269dc52d4f",
+      "pipeline_seconds": 40.14278809999814,
+      "checks": [
+        {
+          "command": "project.init",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.inspect",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "validate",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "policy.audit",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "rights.check",
+          "status": "failed",
+          "exit_code": 7
+        }
+      ],
+      "renders": [
+        {
+          "background": "green",
+          "sha256": "sha256:230df747d37fbe88b9179596d819205bc6c2dc0d8332594ff31cc91f1c32786a",
+          "manifest_sha256": "sha256:ab1fb0b3b14d08eeed231dae2ded1d60a0009672eb0c3d4d930ff52e4b210fee",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 0.9106739163398743,
+              "p99_abs_rgb_error": 12.0
+            },
+            {
+              "frame": 16,
+              "mean_abs_rgb_error": 0.8015249967575073,
+              "p99_abs_rgb_error": 9.0
+            },
+            {
+              "frame": 31,
+              "mean_abs_rgb_error": 0.9863123297691345,
+              "p99_abs_rgb_error": 16.0
+            }
+          ]
+        },
+        {
+          "background": "purple",
+          "sha256": "sha256:dc73b9da04e3df9703e4e36d55888fffa3c1653abfc5c3f020d235aacf742f99",
+          "manifest_sha256": "sha256:b88389652b10790188abd8879f4d740126be0352d601f54b3da908fc1d9dffeb",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 1.634611964225769,
+              "p99_abs_rgb_error": 7.0
+            },
+            {
+              "frame": 16,
+              "mean_abs_rgb_error": 1.5777429342269897,
+              "p99_abs_rgb_error": 6.0
+            },
+            {
+              "frame": 31,
+              "mean_abs_rgb_error": 1.688725233078003,
+              "p99_abs_rgb_error": 8.0
+            }
+          ]
+        }
+      ],
+      "transparent_delivery": {
+        "sha256": "sha256:e3f7f5fd1f3051284bc90b8b076b2adf5729274b3d7b49eef9c69d82ceecbea2",
+        "manifest_sha256": "sha256:e2e771e04f33102d75d1b42dabbc47056be86369578d325edf7dad5413e3b366",
+        "verification_decoder": "libvpx-vp9",
+        "alpha_comparison": [
+          {
+            "frame": 0,
+            "mean_abs_alpha_error": 0.008578830398619175,
+            "p99_abs_alpha_error": 0.0
+          },
+          {
+            "frame": 16,
+            "mean_abs_alpha_error": 0.01019287109375,
+            "p99_abs_alpha_error": 0.0
+          },
+          {
+            "frame": 31,
+            "mean_abs_alpha_error": 0.02728949673473835,
+            "p99_abs_alpha_error": 1.0
+          }
+        ]
+      },
+      "rights_expected_exit": 7,
+      "rights_check": {
+        "ok": false,
+        "target": "commercial_ad",
+        "checked": 4,
+        "required_records": 5,
+        "failures": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181223_ea22c9fe",
+            "rights_ref": "asset_20261015181223_ea22c9fe",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181223_ea22c9fe",
+            "rights_ref": "asset_20261015181223_ea22c9fe",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181223_ea22c9fe",
+            "rights_ref": "asset_20261015181223_ea22c9fe",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181309_8a112e24",
+            "rights_ref": "asset_20261015181309_8a112e24",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181309_8a112e24",
+            "rights_ref": "asset_20261015181309_8a112e24",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181309_8a112e24",
+            "rights_ref": "asset_20261015181309_8a112e24",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181311_5aa45e74",
+            "rights_ref": "asset_20261015181311_5aa45e74",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181311_5aa45e74",
+            "rights_ref": "asset_20261015181311_5aa45e74",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181311_5aa45e74",
+            "rights_ref": "asset_20261015181311_5aa45e74",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          }
+        ],
+        "warnings": [],
+        "disposition_decisions": [],
+        "effective_disposition_decisions": []
+      },
+      "visual_review": {
+        "review_completed": true,
+        "finding": "Two moving children isolated at sampled start/end; one child obscured at middle. Union does not prove identity or occlusion recovery.",
+        "contact_sheet": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-natural-final\\contact-sheet.png",
+        "contact_sheet_sha256": "sha256:a862c7a0ccecd4718d1a399b69f8da99be7f7084243d5bc6f8d3fcb9f007d6ec"
+      },
+      "broad_quality_accepted": false
+    },
+    {
+      "case": "cpu-box-final",
+      "raw_smoke": "workspace/sam2-smoke-20261016-cpu-box-final/summary.json",
+      "raw_smoke_sha256": "sha256:cf7c52da856968b1ad7218edaf05c1229c57ce8ddb944708fe09c4d49d24dde6",
+      "source_sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48",
+      "adapter_sha256": "sha256:411fbcae05bcf56d07e7452cf5c0a0e4dc79416b16027a671cbb3d211409615a",
+      "adapter_current_integrity": {
+        "adapter_id": "sam2_local",
+        "engine": "transformers-sam2-video-local-v1",
+        "ok": true,
+        "network": "disabled",
+        "findings": []
+      },
+      "model_sha256": "sha256:2eb74cc054edee9c76daa4166b9907884da66a36d9d9cdf7e80e8e0cd4937a3e",
+      "settings": {
+        "device": "cpu",
+        "threads": 4,
+        "precision": "float32",
+        "state_budget_bytes": 536870912
+      },
+      "prompt_plan": {
+        "version": "1.0.0",
+        "coordinate_space": "normalized-output",
+        "frames": [
+          {
+            "frame": 0,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": [
+                  0,
+                  0,
+                  0.8,
+                  0.999
+                ]
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          },
+          {
+            "frame": 2,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 2,
+                "points": [
+                  {
+                    "x": 0.7,
+                    "y": 0.8,
+                    "label": 1
+                  }
+                ],
+                "box": null
+              }
+            ]
+          },
+          {
+            "frame": 4,
+            "reset": true,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": [
+                  0,
+                  0,
+                  0.8,
+                  0.999
+                ]
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          }
+        ],
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "logit_threshold": 0.0,
+        "sha256": "sha256:bc022409a6299ffbe903f457211ded76b6a8d722763c4b08f771b9eadf472c93"
+      },
+      "prompt_source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\fixtures\\sam2-20261016\\prompts-box-person.json",
+        "sha256": "sha256:22c3585da440d44c87d8f1d788dcce700e8f67295368b230fc788dc766feb1ab"
+      },
+      "source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-cpu-box-final\\project\\assets\\asset_20261015181750_160f64b3_portrait-short.mov",
+        "sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48"
+      },
+      "video": {
+        "width": 512,
+        "height": 512,
+        "fps": "12",
+        "frames": 6,
+        "duration_seconds": 0.5,
+        "source_stream_index": 0,
+        "source_width": 512,
+        "source_height": 512,
+        "source_sar": "1",
+        "source_rotation": 0.0,
+        "clock": "ffmpeg-fps-resampled-source-seconds",
+        "alpha_mode": "straight",
+        "codec": "qtrle",
+        "pix_fmt": "argb"
+      },
+      "audio": {
+        "preserve": true,
+        "source_offset_seconds": 0.0,
+        "codec": "pcm_s24le"
+      },
+      "worker": {
+        "protocol": "agent-video-sam2-segmentation-v1",
+        "engine": "transformers-sam2-video-local-v1",
+        "network": "disabled",
+        "blocked_network_events": [],
+        "request_sha256": "sha256:717220decade4186c2ebb406bf8118b58eec495101b35cd264f1e6db470a0114",
+        "adapter_sha256": "sha256:411fbcae05bcf56d07e7452cf5c0a0e4dc79416b16027a671cbb3d211409615a",
+        "source_sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48",
+        "status": "succeeded",
+        "metrics": {
+          "frames": 6,
+          "width": 512,
+          "height": 512,
+          "rgba_sha256": "sha256:5b7d80f902a10dff8aef51575cb76a44d38150fb59f2f39e3c7bf4228220a0c5",
+          "rgba_bytes": 6291456,
+          "state_updates": 6,
+          "state_peak_bytes": 159392048,
+          "alpha_min": 0,
+          "alpha_max": 255,
+          "alpha_mean": 0.5742346445719401,
+          "transparent_pixels": 669671,
+          "opaque_pixels": 903193,
+          "soft_alpha_pixels": 0,
+          "alpha_mode": "straight",
+          "input_alpha": "multiply",
+          "state_reset": "per-job-and-explicit-frames",
+          "prompt_events": 3,
+          "explicit_resets": 1
+        },
+        "prompt_sha256": "sha256:bc022409a6299ffbe903f457211ded76b6a8d722763c4b08f771b9eadf472c93",
+        "object_ids": [
+          1,
+          2
+        ],
+        "mask_mode": "binary",
+        "providers": [
+          "torch-cpu"
+        ],
+        "versions": {
+          "python": "3.13.14",
+          "torch": "2.13.0+cu130",
+          "transformers": "5.14.1",
+          "numpy": "2.4.6"
+        },
+        "memory_window_frames": 16,
+        "cached_rasters": 1,
+        "cuda_peak_allocated_bytes": null,
+        "elapsed_seconds": 38.14581659999385
+      },
+      "rgba_roundtrip_verified": true,
+      "derived_media_sha256": "sha256:edfb2076575245210cc90329677701960666d45609fc8c6f9915c52398ec9d20",
+      "pipeline_seconds": 40.09640809999837,
+      "checks": [
+        {
+          "command": "project.init",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.inspect",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "validate",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "policy.audit",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "rights.check",
+          "status": "failed",
+          "exit_code": 7
+        }
+      ],
+      "renders": [
+        {
+          "background": "green",
+          "sha256": "sha256:f1a8943655f44f8cf72918995728e6a273d6e8b8cfd09b6a48393d6f19192f5f",
+          "manifest_sha256": "sha256:64aad1c2f6b17b76d0860cff0f5587be60c7b903cc4aadc314280f2a3b8a3619",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 1.7908681631088257,
+              "p99_abs_rgb_error": 19.0
+            },
+            {
+              "frame": 3,
+              "mean_abs_rgb_error": 1.7455240488052368,
+              "p99_abs_rgb_error": 17.0
+            },
+            {
+              "frame": 5,
+              "mean_abs_rgb_error": 1.7312062978744507,
+              "p99_abs_rgb_error": 17.0
+            }
+          ]
+        },
+        {
+          "background": "purple",
+          "sha256": "sha256:17319bc7a5fb8ee2620cff5113289a7616572c14ebbce3d1ed291f5d5ba005cf",
+          "manifest_sha256": "sha256:e063e226db63e96fc4b2453540ecde94a10b13c8efc6ee4ceb9800043000e3e5",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 2.0807712078094482,
+              "p99_abs_rgb_error": 15.0
+            },
+            {
+              "frame": 3,
+              "mean_abs_rgb_error": 2.06415057182312,
+              "p99_abs_rgb_error": 15.0
+            },
+            {
+              "frame": 5,
+              "mean_abs_rgb_error": 2.0486247539520264,
+              "p99_abs_rgb_error": 15.0
+            }
+          ]
+        }
+      ],
+      "transparent_delivery": {
+        "sha256": "sha256:2b3a3fb6ef3cbcd7c2cd76cd271232b10d4bccb1444f0b6d84dbaf86307236df",
+        "manifest_sha256": "sha256:d212f78ebfb5dcd06a8ca9b585581e2d5d93868a51437f35bab10e1f1803ba5a",
+        "verification_decoder": "libvpx-vp9",
+        "alpha_comparison": [
+          {
+            "frame": 0,
+            "mean_abs_alpha_error": 0.008281707763671875,
+            "p99_abs_alpha_error": 0.0
+          },
+          {
+            "frame": 3,
+            "mean_abs_alpha_error": 0.009197235107421875,
+            "p99_abs_alpha_error": 0.0
+          },
+          {
+            "frame": 5,
+            "mean_abs_alpha_error": 0.00909423828125,
+            "p99_abs_alpha_error": 0.0
+          }
+        ]
+      },
+      "rights_expected_exit": 7,
+      "rights_check": {
+        "ok": false,
+        "target": "commercial_ad",
+        "checked": 4,
+        "required_records": 5,
+        "failures": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181750_160f64b3",
+            "rights_ref": "asset_20261015181750_160f64b3",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181750_160f64b3",
+            "rights_ref": "asset_20261015181750_160f64b3",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181750_160f64b3",
+            "rights_ref": "asset_20261015181750_160f64b3",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181836_69755527",
+            "rights_ref": "asset_20261015181836_69755527",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181836_69755527",
+            "rights_ref": "asset_20261015181836_69755527",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181836_69755527",
+            "rights_ref": "asset_20261015181836_69755527",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015181837_848823a1",
+            "rights_ref": "asset_20261015181837_848823a1",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015181837_848823a1",
+            "rights_ref": "asset_20261015181837_848823a1",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015181837_848823a1",
+            "rights_ref": "asset_20261015181837_848823a1",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          }
+        ],
+        "warnings": [],
+        "disposition_decisions": [],
+        "effective_disposition_decisions": []
+      },
+      "visual_review": {
+        "review_completed": true,
+        "finding": "Added person box plus same points retains major person and helmet through reset; small edge/interior holes remain.",
+        "contact_sheet": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-cpu-box-final\\contact-sheet.png",
+        "contact_sheet_sha256": "sha256:2b2875c1b35c7dcfffe5c64c70b25fd29d1aac46dc5649fdcf989044e4f4b26e"
+      },
+      "broad_quality_accepted": false
+    },
+    {
+      "case": "helmet-probability-verified",
+      "raw_smoke": "workspace/sam2-smoke-20261016-helmet-probability-verified/summary.json",
+      "raw_smoke_sha256": "sha256:92748952c252252f2a980b6ce3776f226e55cdad37110413ef1f71fbdcf02fb8",
+      "source_sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48",
+      "adapter_sha256": "sha256:3a964e269a9ece2e4e2040ca2609062f65ceb05b15414f58e0b5c7b0ff167ac1",
+      "adapter_current_integrity": {
+        "adapter_id": "sam2_local",
+        "engine": "transformers-sam2-video-local-v1",
+        "ok": true,
+        "network": "disabled",
+        "findings": []
+      },
+      "model_sha256": "sha256:2eb74cc054edee9c76daa4166b9907884da66a36d9d9cdf7e80e8e0cd4937a3e",
+      "settings": {
+        "device": "cuda",
+        "threads": 4,
+        "precision": "float32",
+        "state_budget_bytes": 536870912
+      },
+      "prompt_plan": {
+        "version": "1.0.0",
+        "coordinate_space": "normalized-output",
+        "frames": [
+          {
+            "frame": 0,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": [
+                  0,
+                  0,
+                  0.8,
+                  0.999
+                ]
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          },
+          {
+            "frame": 2,
+            "reset": false,
+            "objects": [
+              {
+                "object_id": 2,
+                "points": [
+                  {
+                    "x": 0.7,
+                    "y": 0.8,
+                    "label": 1
+                  }
+                ],
+                "box": null
+              }
+            ]
+          },
+          {
+            "frame": 4,
+            "reset": true,
+            "objects": [
+              {
+                "object_id": 1,
+                "points": [
+                  {
+                    "x": 0.43,
+                    "y": 0.32,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.43,
+                    "y": 0.13,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 0.58,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.45,
+                    "y": 0.65,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.28,
+                    "y": 0.9,
+                    "label": 1
+                  },
+                  {
+                    "x": 0.8,
+                    "y": 0.25,
+                    "label": 0
+                  }
+                ],
+                "box": [
+                  0,
+                  0,
+                  0.8,
+                  0.999
+                ]
+              },
+              {
+                "object_id": 2,
+                "points": [],
+                "box": [
+                  0.53,
+                  0.59,
+                  0.99,
+                  0.999
+                ]
+              }
+            ]
+          }
+        ],
+        "object_ids": [
+          2
+        ],
+        "mask_mode": "probability",
+        "logit_threshold": 0.0,
+        "sha256": "sha256:422742a64ea12142213d808af003e89ed58568c5e758d8c05dc0fde6bc38fba4"
+      },
+      "prompt_source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\fixtures\\sam2-20261016\\prompts-box-person.json",
+        "sha256": "sha256:22c3585da440d44c87d8f1d788dcce700e8f67295368b230fc788dc766feb1ab"
+      },
+      "source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-helmet-probability-verified\\project\\assets\\asset_20261015182152_cef392ce_portrait-short.mov",
+        "sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48"
+      },
+      "video": {
+        "width": 512,
+        "height": 512,
+        "fps": "12",
+        "frames": 6,
+        "duration_seconds": 0.5,
+        "source_stream_index": 0,
+        "source_width": 512,
+        "source_height": 512,
+        "source_sar": "1",
+        "source_rotation": 0.0,
+        "clock": "ffmpeg-fps-resampled-source-seconds",
+        "alpha_mode": "straight",
+        "codec": "qtrle",
+        "pix_fmt": "argb"
+      },
+      "audio": {
+        "preserve": true,
+        "source_offset_seconds": 0.0,
+        "codec": "pcm_s24le"
+      },
+      "worker": {
+        "protocol": "agent-video-sam2-segmentation-v1",
+        "engine": "transformers-sam2-video-local-v1",
+        "network": "disabled",
+        "blocked_network_events": [],
+        "request_sha256": "sha256:2c156279eb102cfb412984a5914a468197649c8ebbefacd73a236a94325d3466",
+        "adapter_sha256": "sha256:3a964e269a9ece2e4e2040ca2609062f65ceb05b15414f58e0b5c7b0ff167ac1",
+        "source_sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48",
+        "status": "succeeded",
+        "metrics": {
+          "frames": 6,
+          "width": 512,
+          "height": 512,
+          "rgba_sha256": "sha256:41e2f1a15daca58f5859c0bd967f60083130c827037cd964df116f56245af74b",
+          "rgba_bytes": 6291456,
+          "state_updates": 6,
+          "state_peak_bytes": 159392048,
+          "alpha_min": 0,
+          "alpha_max": 255,
+          "alpha_mean": 0.12745929792815563,
+          "transparent_pixels": 1244823,
+          "opaque_pixels": 102155,
+          "soft_alpha_pixels": 225886,
+          "alpha_mode": "straight",
+          "input_alpha": "multiply",
+          "state_reset": "per-job-and-explicit-frames",
+          "prompt_events": 3,
+          "explicit_resets": 1
+        },
+        "prompt_sha256": "sha256:422742a64ea12142213d808af003e89ed58568c5e758d8c05dc0fde6bc38fba4",
+        "object_ids": [
+          2
+        ],
+        "mask_mode": "probability",
+        "providers": [
+          "torch-cuda"
+        ],
+        "versions": {
+          "python": "3.13.14",
+          "torch": "2.13.0+cu130",
+          "transformers": "5.14.1",
+          "numpy": "2.4.6"
+        },
+        "memory_window_frames": 16,
+        "cached_rasters": 1,
+        "cuda_peak_allocated_bytes": 574594560,
+        "elapsed_seconds": 11.834462299986626
+      },
+      "rgba_roundtrip_verified": true,
+      "derived_media_sha256": "sha256:9b9109411cbf69cc6bdf2fc2b65fed2b8370c9a7dc3ccb4d7d2c76d113ac8c30",
+      "pipeline_seconds": 14.400775100002647,
+      "checks": [
+        {
+          "command": "project.init",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.inspect",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "validate",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "policy.audit",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "rights.check",
+          "status": "failed",
+          "exit_code": 7
+        }
+      ],
+      "renders": [
+        {
+          "background": "green",
+          "sha256": "sha256:c8f81c41127a07c293f107aebd3f5c68aef7799f032c94dfd9314d952dfc0985",
+          "manifest_sha256": "sha256:521f868d5363cb893ce99aa4b621cdc92f1c0fc580dc2b1f6e18a2a053a6938d",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 0.7276384234428406,
+              "p99_abs_rgb_error": 5.325492858886719
+            },
+            {
+              "frame": 3,
+              "mean_abs_rgb_error": 0.5098457932472229,
+              "p99_abs_rgb_error": 5.0
+            },
+            {
+              "frame": 5,
+              "mean_abs_rgb_error": 0.5156391859054565,
+              "p99_abs_rgb_error": 5.0
+            }
+          ]
+        },
+        {
+          "background": "purple",
+          "sha256": "sha256:21afe4c90264c83e6d9b20b7488330ed1ff62862234a953d5fd9729e946330a6",
+          "manifest_sha256": "sha256:98bc8577bddd2a5e400858e16a950197845f92b0034a4c3fe28d8d9a9d4b7c9c",
+          "pixel_comparison": [
+            {
+              "frame": 0,
+              "mean_abs_rgb_error": 1.4486470222473145,
+              "p99_abs_rgb_error": 4.9803924560546875
+            },
+            {
+              "frame": 3,
+              "mean_abs_rgb_error": 1.3504422903060913,
+              "p99_abs_rgb_error": 5.0
+            },
+            {
+              "frame": 5,
+              "mean_abs_rgb_error": 1.357336163520813,
+              "p99_abs_rgb_error": 5.0
+            }
+          ]
+        }
+      ],
+      "transparent_delivery": {
+        "sha256": "sha256:f3e94b715fee5ad7b12a51e29d66271b50bf83b60d5416bd9ef63c5bf830c519",
+        "manifest_sha256": "sha256:cb61210b22e06be5ae595fbad4ab096f08029d050b26f714a9e66b4d1e631383",
+        "verification_decoder": "libvpx-vp9",
+        "alpha_comparison": [
+          {
+            "frame": 0,
+            "mean_abs_alpha_error": 0.19856643676757812,
+            "p99_abs_alpha_error": 2.0
+          },
+          {
+            "frame": 3,
+            "mean_abs_alpha_error": 0.04109954833984375,
+            "p99_abs_alpha_error": 1.0
+          },
+          {
+            "frame": 5,
+            "mean_abs_alpha_error": 0.031795501708984375,
+            "p99_abs_alpha_error": 1.0
+          }
+        ]
+      },
+      "rights_expected_exit": 7,
+      "rights_check": {
+        "ok": false,
+        "target": "commercial_ad",
+        "checked": 4,
+        "required_records": 5,
+        "failures": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015182152_cef392ce",
+            "rights_ref": "asset_20261015182152_cef392ce",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015182152_cef392ce",
+            "rights_ref": "asset_20261015182152_cef392ce",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015182152_cef392ce",
+            "rights_ref": "asset_20261015182152_cef392ce",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "person_alpha",
+            "rights_ref": "person_alpha",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015182211_b01f5b9a",
+            "rights_ref": "asset_20261015182211_b01f5b9a",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015182211_b01f5b9a",
+            "rights_ref": "asset_20261015182211_b01f5b9a",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015182211_b01f5b9a",
+            "rights_ref": "asset_20261015182211_b01f5b9a",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "asset_20261015182213_c1eae912",
+            "rights_ref": "asset_20261015182213_c1eae912",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "asset_20261015182213_c1eae912",
+            "rights_ref": "asset_20261015182213_c1eae912",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "asset_20261015182213_c1eae912",
+            "rights_ref": "asset_20261015182213_c1eae912",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          }
+        ],
+        "warnings": [],
+        "disposition_decisions": [],
+        "effective_disposition_decisions": []
+      },
+      "visual_review": {
+        "review_completed": true,
+        "finding": "Selected only object 2 (helmet); probability alpha visible, including weak first-frame ghosting outside helmet; not physical transparency.",
+        "contact_sheet": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-helmet-probability-verified\\contact-sheet.png",
+        "contact_sheet_sha256": "sha256:7a2f815776d023bb51a1a94a80b8c3e974cb85e81f0c7d0910be24147f6fdc7c"
+      },
+      "broad_quality_accepted": false
+    }
+  ],
+  "same_six_frame_cpu_cuda_rgba_match": {
+    "source_sha256": "sha256:1424d39cc2b17e4b3cebf66da9b5b2f697e6454ef527da504946de230a0eaf48",
+    "prompt_sha256": "sha256:fc8e07ec6211b96814eda730a633f88e98bd7d274dcc573c529d191e152e1108",
+    "rgba_sha256": "sha256:1897241de9ba42a83c69c8d14cd3499aa3ef4302dadcdeeb2c0df6e53b42a75b",
+    "accepted_scope": "this exact fixture only"
+  },
+  "smoke_harness_correction": {
+    "earlier_probability_run": "product/.runtime/segmentation-helmet-probability-final-20261016.log",
+    "earlier_log_sha256": "sha256:5aa6663b36d213eb0a709bfba3013911b819693c9736889fceefa4a8e46853a4",
+    "cause": "Harness required one full frame worth of fully opaque pixels even for a selected small object/probability alpha; product inference completed.",
+    "change": "SAM2 checks nonempty foreground/background; probability delivery checks alpha extrema relative to source and existing mean-error gate. Independent RGB composite and RGBA hash gates preserved."
+  },
+  "runtime_network": "disabled",
+  "runtime_downloads": false,
+  "docker_or_wsl_started": false,
+  "browser_started": false,
+  "network_guard_boundary": "Python socket/DNS/HTTP guard and explicit local loading; not an OS firewall or proof about all native DLL activity.",
+  "commercial_model_license_accepted": false,
+  "broad_ad_video_quality_accepted": false,
+  "full_jianying_parity_accepted": false,
+  "remaining": [
+    "first-frame and reset prompt scope sensitivity",
+    "hair, collar, zipper and hand edges/interior holes",
+    "probability ghosting and lack of physical alpha truth",
+    "natural occlusion identity and scene changes",
+    "long-run resource/performance and more models",
+    "model/source commercial rights",
+    "object removal, inpainting, beauty and generative image/video are still missing"
+  ],
+  "source_hashes": {
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:e2f0d63eb19ae5213d9d3e7bdaeecffe7cf800d2223549d95b57f77047eed4d2",
+    "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+    "product/src/ai_ad_editor/cli.py": "sha256:5bb62e8aaa6f124d9db002c42f8b24c71448d37f9b1d2c20e6e2a49f9644862d",
+    "product/src/ai_ad_editor/convert.py": "sha256:9cbdcbde37e01e4c97be36cc5e741f1962a269451828a4ec32577464bfbb44ed",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+    "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:bf9cceb9c44ce51d54f5ab6609b597dd51a1f3858f656d21d68a02872238505a",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:901872d852ee99280b7a7f112b2416db99af3d516b6dcacfe0510b55ef04bc75",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+    "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+    "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:ae9626cc7a1037979a5bfa81a03e9d1ed28a8fbf44921c892810f2d0f9424080",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:1b22761b1bbf6bae4b90204df5ff33d7196acbb39205461e35e524890ffa2de5",
+    "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_cli.py": "sha256:845fcfe25d3413f83ee572d89b1b96e500f2ee73ebdf71623ae3955300e5266f",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "scripts/smoke_rvm_local.py": "sha256:963faf3c7012ff6785e64559201275be3792ed7ef9c65876a7c8331921595df1"
+  }
+}

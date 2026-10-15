@@ -1,4 +1,4 @@
-"""Exercise existing local RVM weights through CLI, alpha composition and gates."""
+"""Exercise existing local RVM or SAM2 weights through CLI, alpha composition and gates."""
 from __future__ import annotations
 
 import argparse
@@ -22,11 +22,20 @@ def main() -> int:
     for name in ('source', 'model', 'python', 'evidence', 'output-root'):
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--max-edge', type=int, default=512)
+    parser.add_argument('--engine', choices=['rvm-onnx-cpu-matting-v1', 'transformers-sam2-video-local-v1'], default='rvm-onnx-cpu-matting-v1')
+    parser.add_argument('--device', choices=['cpu', 'cuda'], default='cpu')
+    parser.add_argument('--prompts', default=None)
+    parser.add_argument('--object-id', type=int, action='append', default=None)
+    parser.add_argument('--mask-mode', choices=['binary', 'probability'], default='binary')
     args = parser.parse_args()
     configure_local_runtime()
+    segmentation = args.engine == 'transformers-sam2-video-local-v1'
     for name in ('source', 'model', 'python', 'evidence'):
-        if not Path(getattr(args, name)).is_file():
+        path = Path(getattr(args, name))
+        if not (path.is_dir() if name == 'model' and segmentation else path.is_file()):
             parser.error('All input paths must already exist locally: ' + name)
+    if segmentation and (not args.prompts or not Path(args.prompts).is_file()):
+        parser.error('SAM2 requires an existing local --prompts JSON')
     root = Path(args.output_root).resolve()
     if root.exists():
         parser.error('Use a new output root')
@@ -45,17 +54,24 @@ def main() -> int:
     project = root / 'project'
     invoke('project', 'init', str(project))
     source = invoke('media', 'ingest', '--project', str(project), '--input', str(Path(args.source).resolve()))['data']['asset']
-    registration = ['media', 'adapter', 'register', '--project', str(project), '--adapter-id', 'rvm_local', '--engine', 'rvm-onnx-cpu-matting-v1',
+    adapter_id = 'sam2_local' if segmentation else 'rvm_local'
+    registration = ['media', 'adapter', 'register', '--project', str(project), '--adapter-id', adapter_id, '--engine', args.engine,
                     '--model-path', str(Path(args.model).resolve()), '--executable', str(Path(args.python).resolve()), '--evidence', str(Path(args.evidence).resolve())]
+    if segmentation:
+        registration += ['--device', args.device]
     invoke(*registration, '--dry-run')
     adapter = invoke(*registration)['data']['adapter']
-    inspected = invoke('media', 'adapter', 'inspect', '--project', str(project), '--adapter-id', 'rvm_local')
+    inspected = invoke('media', 'adapter', 'inspect', '--project', str(project), '--adapter-id', adapter_id)
     assert inspected['data']['verification']['ok']
     changes = project / 'cache' / 'setup.json'
     atomic_write_json(changes, {'operations': [{'op': 'add_track', 'track_id': 'cutout', 'kind': 'video', 'order': 2}]})
     invoke('timeline', 'compose', '--project', str(project), '--input', str(changes))
-    matting = ['media', 'matting', '--project', str(project), '--asset-id', source['id'], '--adapter-id', 'rvm_local', '--derived-asset-id', 'person_alpha',
+    matting = ['media', 'matting', '--project', str(project), '--asset-id', source['id'], '--adapter-id', adapter_id, '--derived-asset-id', 'person_alpha',
                '--max-edge', str(args.max_edge), '--apply', '--track-id', 'cutout', '--audio-track-id', 'track_audio_1']
+    if segmentation:
+        matting += ['--prompts', str(Path(args.prompts).resolve()), '--mask-mode', args.mask_mode]
+        for oid in args.object_id or []:
+            matting += ['--object-id', str(oid)]
     planned = invoke(*matting, '--dry-run')
     generated = invoke(*matting)['data']
     result = generated['matting']
@@ -72,7 +88,12 @@ def main() -> int:
     alpha_path = project / generated['asset']['uri']
     rgba_frames = [decode(alpha_path, i, rgba=True) for i in indices]
     metrics = result['worker']['metrics']
-    if metrics['opaque_pixels'] < width * height or metrics['transparent_pixels'] < width * height or metrics['soft_alpha_pixels'] < 1:
+    if segmentation:
+        # Selected small objects and probability masks need not contain one
+        # full frame's worth of completely opaque pixels. Check actual alpha.
+        if metrics['alpha_max'] <= 0 or metrics['transparent_pixels'] < 1:
+            raise RuntimeError('Selected object mask must contain foreground and transparent background')
+    elif metrics['opaque_pixels'] < width * height or metrics['transparent_pixels'] < width * height or metrics['soft_alpha_pixels'] < 1:
         raise RuntimeError('Controlled portrait must demonstrate opaque, transparent and soft alpha')
     payload = json.loads((project / 'project.json').read_text(encoding='utf-8'))
     payload['settings']['canvas'].update(width=width, height=height)
@@ -118,7 +139,11 @@ def main() -> int:
         decoded = decode(transparent, index, rgba=True)
         error = np.abs(decoded[:, :, 3].astype(np.float32) - reference[:, :, 3].astype(np.float32))
         item = {'frame': index, 'mean_abs_alpha_error': float(error.mean()), 'p99_abs_alpha_error': float(np.quantile(error, .99))}
-        if item['mean_abs_alpha_error'] > 1 or decoded[:, :, 3].min() != 0 or decoded[:, :, 3].max() != 255:
+        if segmentation and args.mask_mode == 'probability':
+            range_bad = max(abs(int(decoded[:, :, 3].min()) - int(reference[:, :, 3].min())), abs(int(decoded[:, :, 3].max()) - int(reference[:, :, 3].max()))) > 2
+        else:
+            range_bad = decoded[:, :, 3].min() != 0 or decoded[:, :, 3].max() != 255
+        if item['mean_abs_alpha_error'] > 1 or range_bad:
             raise RuntimeError('Transparent delivery lost alpha: ' + str(item))
         alpha_errors.append(item)
     transparent_summary = {'sha256': 'sha256:' + sha256_file(transparent), 'manifest_sha256': 'sha256:' + sha256_file(Path(transparent_render['data']['manifest'])),

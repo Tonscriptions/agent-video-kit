@@ -21,6 +21,14 @@ online service. No adapter keeps the English/ASCII flite behavior described belo
 
 ## Runtime boundary
 
+For selected objects or a person with a held product, use the
+[local SAM2 contract](../../docs/specs/本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md).
+Register existing video safetensors/Python/evidence with explicit CPU or CUDA,
+then pass a local `--prompts` JSON to `media matting`. Review output-frame
+coordinates, positive/negative points, boxes, selected IDs and explicit resets.
+A face click can select only a face; inspect before accepting a whole-person
+cutout. Binary/probability segmentation does not establish hair or matte quality.
+
 For transparent human cutouts use the [local RVM contract](../../docs/specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md).
 Register existing FP32 ONNX, native Python and evidence with `media adapter
 register --engine rvm-onnx-cpu-matting-v1`; inspect, then run `media matting

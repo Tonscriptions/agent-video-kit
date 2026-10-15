@@ -1,9 +1,30 @@
 ---
 name: video-cut-local-models
-description: Run registered offline Whisper transcription, SoulX speech, HDemucs vocal separation, YOLO tracking and RVM human video matting with existing local models and native Python.
+description: Run registered offline speech, transcription, source separation, tracking, human matting and prompted SAM2 object segmentation with existing local models and native Python.
 ---
 
 # Local Models
+
+For a person plus held product, or other selected video objects, read the
+[SAM2 prompt contract](../../docs/specs/本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md).
+Register `media adapter register --engine transformers-sam2-video-local-v1`
+with an existing complete video safetensors directory, native Python, evidence
+and explicit `--device cpu|cuda`. Inspect before execution. Run `media matting
+--asset-id <video> --adapter-id <id> --derived-asset-id <new-id> --prompts
+<local-json> --dry-run`; points/boxes use normalized output coordinates and
+zero-based frames after range/CFR conversion. Choose multiple positive points
+or a box when a face click selects only the face. Negative points exclude areas.
+
+Optional repeated `--object-id` selects objects for union. Later-frame prompts
+correct future output; `reset` starts a new scene and requires fresh prompts
+for active objects. Inspect the canonical prompt hash, device and reset count. Review object extent
+at prompt/reset boundaries: the same points can select a smaller part on another
+frame. Add a bounding box when scope is ambiguous and inspect the new result.
+Default binary masks differ from `--mask-mode probability`: sigmoid logits
+are segmentation confidence, not physical transparency or reconstructed hair.
+Both modes keep source RGB and multiply existing alpha. The 512 MiB session
+tensor limit excludes model/process memory. No runtime download or device fallback.
+MOV, audio application, rights and transparent delivery follow the RVM pipeline.
 
 For human video cutouts, read the [native RVM contract](../../docs/specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md).
 Register `media adapter register --engine rvm-onnx-cpu-matting-v1` with

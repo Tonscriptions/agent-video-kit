@@ -5,6 +5,14 @@ description: Compose an Agent Project timeline with local clips, tracks, transit
 
 # Timeline Composition
 
+Use a registered SAM2 adapter with local `--prompts` for multiple selected
+objects, boxes, positive/negative points and future-frame corrections; read
+the [SAM2 contract](../../docs/specs/本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md).
+Prompt frame numbers and normalized coordinates refer to the processed output,
+including range trim and CFR resampling. Explicit scene reset requires fresh
+prompts. Its MOV layers and explicit audio application use the same timeline
+semantics below. Review object scope and motion; probabilities are not a matte.
+
 Use `media matting` with a registered RVM adapter to create a local soft-alpha
 human cutout; read the [matting contract](../../docs/specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md).
 Its QTRLE/ARGB MOV is an ordinary video asset. Apply it to a video track with

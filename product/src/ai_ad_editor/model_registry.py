@@ -25,6 +25,7 @@ from .utils import atomic_write_json, assert_id, load_json, now_iso, sha256_byte
 from .local_vision import YOLO_ENGINE, prepare_adapter as prepare_native_vision, verify_adapter as verify_native_vision
 from .local_separation import DEMUCS_ENGINE, prepare_adapter as prepare_native_separation, verify_adapter as verify_native_separation
 from .local_matting import MATTING_ENGINE, prepare_adapter as prepare_native_matting, verify_adapter as verify_native_matting
+from .local_segmentation import SEGMENTATION_ENGINE, prepare_adapter as prepare_native_segmentation, verify_adapter as verify_native_segmentation
 
 
 MODEL_REGISTRY_VERSION = "0.1.0"
@@ -40,6 +41,7 @@ VALID_AUDIO_ADAPTER_ENGINES = {
     "uvr-local-v1",
 }
 VALID_VISUAL_ADAPTER_ENGINES = {
+    SEGMENTATION_ENGINE,
     MATTING_ENGINE,
     OBJECT_TRACKING_ENGINE,
     MULTI_OBJECT_TRACKING_ENGINE,
@@ -270,6 +272,8 @@ def prepare_visual_adapter(
     """Validate and register an explicitly supplied offline visual runner."""
     assert_id(str(adapter_id), "adapter_id")
     engine = str(engine or "").strip()
+    if engine == SEGMENTATION_ENGINE:
+        return prepare_native_segmentation(root or Path.cwd(), adapter_id=adapter_id, model_path=str(model_path or ''), executable=str(executable or ''), evidence=evidence, creator=creator, license_spdx=license_spdx, license_url=license_url, permitted_uses=permitted_uses, verification_status=verification_status, options=native_options or {})
     if engine == MATTING_ENGINE:
         return prepare_native_matting(root or Path.cwd(), adapter_id=adapter_id, model_path=str(model_path or ''), executable=str(executable or ''), evidence=evidence, creator=creator, license_spdx=license_spdx, license_url=license_url, permitted_uses=permitted_uses, verification_status=verification_status, options=native_options or {})
     if engine == YOLO_ENGINE:
@@ -338,6 +342,8 @@ def prepare_visual_adapter(
 
 def verify_visual_adapter(adapter: dict[str, Any]) -> dict[str, Any]:
     """Verify registered visual model and runner paths without executing them."""
+    if adapter.get('engine') == SEGMENTATION_ENGINE:
+        return verify_native_segmentation(adapter)
     if adapter.get('engine') == MATTING_ENGINE:
         return verify_native_matting(adapter)
     if adapter.get('engine') == YOLO_ENGINE:

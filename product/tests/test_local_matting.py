@@ -168,7 +168,7 @@ class NativeMattingTests(unittest.TestCase):
 
     def assert_no_outputs(self):
         self.assertFalse(self.output.exists())
-        self.assertFalse(list((self.root / 'cache/matting').glob('rvm-*')))
+        self.assertFalse(list((self.root / 'cache/matting').glob('*')))
         self.assertFalse((self.root / 'operations/project-transaction.json').exists())
 
     def test_registration_dry_run_and_inspection_do_not_infer(self):
@@ -246,7 +246,7 @@ class NativeMattingTests(unittest.TestCase):
         self.assertEqual(invoke('policy', 'audit', '--project', str(self.root))[0], 0)
         code, rights = invoke('rights', 'check', '--project', str(self.root))
         self.assertEqual(code, 7, rights)
-        self.assertFalse(list((self.root / 'cache/matting').glob('rvm-*')))
+        self.assertFalse(list((self.root / 'cache/matting').glob('*')))
 
     def test_selected_range_fractional_clock_resampling_and_no_audio(self):
         self.register()

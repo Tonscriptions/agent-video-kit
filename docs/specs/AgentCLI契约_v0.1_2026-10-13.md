@@ -288,3 +288,11 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 `media adapter register --engine rvm-onnx-cpu-matting-v1` 接受现有 FP32 ONNX、原生 Python `.exe`、本地证据、`--threads 1..32` 和可选 `--downsample-ratio`。登记、检查不执行推理，六项文件哈希和固定 CPU provider 进入 manifest；抠像适配器不能作为跟踪适配器使用。
 
 `media matting --project <项目> --asset-id <已摄取视频> --adapter-id <ID> --derived-asset-id <新ID>` 生成项目内无损 QTRLE/ARGB `.mov`，支持范围、分数帧率、画幅/帧数预算、timeout/cancel、dry-run 和幂等。`--apply --track-id <video>` 应用透明视频，`--audio-track-id <audio>` 显式同步原声，`--replace-track` 才可清空本次指定的目标轨道。发布输出前完整验证 RGBA 编码往返哈希，保留源及模型权利依赖；失败清理输出并由项目事务恢复元数据。SDR、CFR、部分片尾延伸和人物模型质量边界见[专用契约](./本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md)。
+
+## 2026-10-16 SAM2 对象分割增量
+
+`media adapter register --engine transformers-sam2-video-local-v1 --model-path <已有完整视频safetensors目录> --executable <原生Python.exe> --evidence <本地文件> --device cpu|cuda --threads 4` 登记 SAM2；默认 cpu，FP32、1..32 线程、512 MiB 会话张量预算。register/list/inspect 使用既有许可、dry-run、幂等、registry/快照/事务/项目包门禁。仅登记本地配置/权重及执行实现，不安装依赖或下载权重。
+
+`media matting` 在选定 SAM2 adapter 时必须提供 `--prompts <JSON>`；可重复 `--object-id <整数>`、选择 `--mask-mode binary|probability`（默认 binary）、`--logit-threshold -20..20`（默认 0）。提示为归一化输出坐标和范围/显示归一化/CFR 后的零基帧；第 0 帧至少有一个选中对象，后续修正只影响未来帧。显式 reset 清除镜头状态，须重新提供所有已激活对象的提示。RVM 不接受这些 SAM2 专用参数，SAM2 不接受 RVM downsample-ratio。
+
+输出与音频、应用、取消/超时和事务沿用 RGBA MOV 契约，报告增加提示摘要、选中对象、模式、修正/重置、设备与状态预算。概率不是物理透明度；重置可能改变对象范围，保留质量警告。详细格式见[SAM2 契约](./本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md)，真实边界见[实测](../validation/SAM2本地对象分割与提示修正实测_2026-10-16.md)。

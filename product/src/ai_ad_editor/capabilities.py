@@ -175,6 +175,14 @@ def build_capability_manifest() -> dict[str, Any]:
                 "report_states": ["Exact", "Mapped", "Approximate", "Baked", "Unsupported", "Failed"],
                 "limits": ["package_excludes_renders_cache_operations_and_history", "package_requires_all_referenced_assets_to_exist_locally", "complex_effects_and_advanced_animation_require_explicit_mapping_report", "otio_sequential_track_cannot_represent_overlapping_clips_without_metadata", "kdenlive_effect_filters_and_text_generators_require_explicit_mapping_or_bake", "foreign_relative_references_are_resolved_against_interchange_file", "draft_profile_jianying_plaintext_v1_uses_version_360000_and_new_version_110_0_0_without_runtime_compatibility_claim", "draft_encrypted_files_are_rejected_without_decryption", "draft_private_resources_are_preserved_redacted_and_never_downloaded", "draft_text_layout_and_bezier_are_approximate", "draft_imported_media_and_fonts_have_unverified_rights", "draft_strict_mode_rejects_approximate_baked_unsupported_or_failed_before_target_write", "draft_export_uses_first_sequence_and_preserves_unmapped_parameters_in_sidecar"],
             },
+            "segmentation": {
+                "status": "local_adapter_only",
+                "engine": "transformers-sam2-video-local-v1",
+                "protocol": "agent-video-sam2-segmentation-v1",
+                "commands": ["media.adapter.register", "media.adapter.inspect", "media.matting"],
+                "features": ["native_torch_cpu_or_cuda", "explicit_safetensors_only", "positive_negative_points_and_boxes", "multi_object_union_or_selection", "future_frame_corrections", "explicit_scene_reset", "streamed_frames_and_pruned_memory", "binary_or_probability_alpha", "lossless_rgba_audio_and_rights_pipeline"],
+                "limits": ["local_prompt_json_required", "normalized_output_coordinates_and_cfr_frame_indices", "max_8_objects_256_events_32_points_per_object_event", "512_mib_session_tensor_budget_excludes_model_and_process_memory", "no_device_fallback_or_runtime_downloads", "forward_corrections_do_not_rewrite_prior_frames", "explicit_reset_requires_new_prompts", "segmentation_probability_is_not_physical_matte", "broad_advertising_quality_and_commercial_rights_acceptance_pending"],
+            },
             "matting": {
                 "status": "local_adapter_only",
                 "engine": "rvm-onnx-cpu-matting-v1",

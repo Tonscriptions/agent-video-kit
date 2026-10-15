@@ -21,6 +21,20 @@ MATTING_ENGINE = 'rvm-onnx-cpu-matting-v1'
 MATTING_PROTOCOL = 'agent-video-rvm-matting-v1'
 
 
+def _verify_pipeline_adapter(adapter: dict) -> dict:
+    if adapter.get('engine') == MATTING_ENGINE:
+        return verify_adapter(adapter)
+    from .local_segmentation import verify_adapter as verify_segmentation
+    return verify_segmentation(adapter)
+
+
+def _prompt_unchanged(plan: dict) -> bool:
+    if plan.get('engine') == MATTING_ENGINE:
+        return True
+    from .local_segmentation import verify_prompt_source
+    return verify_prompt_source(plan)
+
+
 def settings(*, threads: int = 4, downsample_ratio: float | None = None) -> dict:
     if type(threads) is not int or not 1 <= threads <= 32:
         raise argument_error('RVM threads 必须是 1..32 的整数', 'threads')
@@ -93,7 +107,7 @@ def verify_adapter(record: dict) -> dict:
 
 def prepare_plan(source: Path, adapter: dict, *, start_seconds: float = 0, end_seconds: float | None = None,
                  fps: str | None = None, max_edge: int = 0, max_frames: int = 18000, preserve_audio: bool = True) -> dict:
-    if not verify_adapter(adapter)['ok']:
+    if not _verify_pipeline_adapter(adapter)['ok']:
         raise AppError('MODEL_ADAPTER_HASH_INVALID', 'RVM 登记完整性检查失败', exit_code=10)
     probe = probe_media(source)
     stream = next((s for s in probe.get('streams', []) if s.get('codec_type') == 'video' and not s.get('disposition', {}).get('attached_pic')), {})
@@ -126,12 +140,14 @@ def prepare_plan(source: Path, adapter: dict, *, start_seconds: float = 0, end_s
     audio_offset = float(audio.get('start_time') or 0) - float(stream.get('start_time') or 0) if audio else 0.
     if not math.isfinite(audio_offset):
         raise argument_error('音视频起点不是有限时间戳', 'source')
-    ratio = adapter['settings']['downsample_ratio'] or min(1., 512 / max(dw, dh))
+    ratio = adapter['settings'].get('downsample_ratio') or min(1., 512 / max(dw, dh))
     if min(dw, dh) * ratio < 16:
         raise argument_error('模型内部短边须至少 16 像素；调整 downsample-ratio 或输入尺寸', 'downsample_ratio')
     warnings = [{'code': 'MATTING_MODEL_REVIEW_REQUIRED', 'message': '人物模型需复核头发、运动、遮挡、镜头切换和许可；未证明通用物体或广告广泛质量'},
                 {'code': 'MATTING_CFR_CLOCK', 'message': '输出使用显式 CFR，尾部不足一帧按末帧补齐，源时钟与输出时长见报告'}]
-    return {'engine': MATTING_ENGINE, 'protocol': MATTING_PROTOCOL, 'network': 'disabled',
+    if adapter['engine'] != MATTING_ENGINE:
+        warnings[0] = {'code': 'SEGMENTATION_MODEL_REVIEW_REQUIRED', 'message': '对象分割须复核提示、遮挡、边缘、商品与镜头切换；概率不等于物理 alpha'}
+    return {'engine': adapter['engine'], 'protocol': adapter['protocol'], 'network': 'disabled',
             'source': {'path': str(source.resolve()), 'sha256': 'sha256:' + sha256_file(source)}, 'input_probe': probe,
             'range': {'start_seconds': start, 'end_seconds': end},
             'video': {'width': dw, 'height': dh, 'fps': str(rate), 'frames': frames, 'duration_seconds': frames / float(rate),
@@ -183,28 +199,37 @@ def _windows_job():
 
 
 def _worker_command(adapter: dict, request_path: Path) -> list[str]:
-    return [adapter['executable'], '-I', '-B', '-X', 'utf8', str(Path(__file__).with_name('rvm_worker.py')), str(request_path)]
+    name = 'rvm_worker.py' if adapter['engine'] == MATTING_ENGINE else 'sam2_worker.py'
+    return [adapter['executable'], '-I', '-B', '-X', 'utf8', str(Path(__file__).with_name(name)), str(request_path)]
 
 
 def validate_response(response: dict, request: dict) -> None:
-    expected = {'status': 'succeeded', 'protocol': MATTING_PROTOCOL, 'engine': MATTING_ENGINE, 'network': 'disabled', 'blocked_network_events': [],
-                'request_sha256': request['request_sha256'], 'adapter_sha256': request['adapter']['sha256'], 'source_sha256': request['source']['sha256'], 'providers': ['CPUExecutionProvider']}
+    segmentation = request['engine'] != MATTING_ENGINE
+    providers = ['torch-' + request['adapter']['settings']['device']] if segmentation else ['CPUExecutionProvider']
+    expected = {'status': 'succeeded', 'protocol': request['protocol'], 'engine': request['engine'], 'network': 'disabled', 'blocked_network_events': [],
+                'request_sha256': request['request_sha256'], 'adapter_sha256': request['adapter']['sha256'], 'source_sha256': request['source']['sha256'], 'providers': providers}
+    if segmentation:
+        expected.update(prompt_sha256=request['prompt_plan']['sha256'], object_ids=request['prompt_plan']['object_ids'], mask_mode=request['prompt_plan']['mask_mode'])
     if any(response.get(key) != value for key, value in expected.items()):
         raise AppError('MATTING_WORKER_INTEGRITY_INVALID', '抠像 worker 协议或输入/模型/网络/设备不符', exit_code=6)
     info, metrics = request['video'], response.get('metrics')
-    if not isinstance(metrics, dict) or any(type(metrics.get(k)) is not int or metrics[k] != info[k] for k in ('frames', 'width', 'height')) or metrics.get('state_updates') != info['frames'] or metrics.get('rgba_bytes') != info['frames'] * info['width'] * info['height'] * 4 or metrics.get('alpha_mode') != 'straight' or metrics.get('input_alpha') != 'multiply' or metrics.get('state_reset') != 'per-job':
+    state_reset = 'per-job-and-explicit-frames' if segmentation else 'per-job'
+    if not isinstance(metrics, dict) or any(type(metrics.get(k)) is not int or metrics[k] != info[k] for k in ('frames', 'width', 'height')) or metrics.get('state_updates') != info['frames'] or metrics.get('rgba_bytes') != info['frames'] * info['width'] * info['height'] * 4 or metrics.get('alpha_mode') != 'straight' or metrics.get('input_alpha') != 'multiply' or metrics.get('state_reset') != state_reset:
         raise AppError('MATTING_WORKER_OUTPUT_INVALID', '抠像帧数、画幅、字节数或状态传递无效', exit_code=6)
     digest = metrics.get('rgba_sha256', '')
     if not isinstance(digest, str) or len(digest) != 71 or not digest.startswith('sha256:') or any(c not in '0123456789abcdef' for c in digest[7:]):
         raise AppError('MATTING_WORKER_OUTPUT_INVALID', '抠像原始 RGBA 摘要无效', exit_code=6)
     pixels = info['width'] * info['height'] * info['frames']
     try:
-        if type(metrics['state_updates']) is not int or type(metrics['state_peak_bytes']) is not int or not 0 < metrics['state_peak_bytes'] <= 256 * 1024 * 1024:
+        budget = request['adapter']['settings']['state_budget_bytes'] if segmentation else 256 * 1024 * 1024
+        if type(metrics['state_updates']) is not int or type(metrics['state_peak_bytes']) is not int or not 0 < metrics['state_peak_bytes'] <= budget:
             raise ValueError('state budget')
         if any(type(metrics[k]) is not int or not 0 <= metrics[k] <= pixels for k in ('transparent_pixels', 'opaque_pixels', 'soft_alpha_pixels')) or sum(metrics[k] for k in ('transparent_pixels', 'opaque_pixels', 'soft_alpha_pixels')) != pixels:
             raise ValueError('alpha counts')
         if any(type(metrics[k]) is not int or not 0 <= metrics[k] <= 255 for k in ('alpha_min', 'alpha_max')) or metrics['alpha_min'] > metrics['alpha_max'] or not math.isfinite(metrics['alpha_mean']) or not 0 <= metrics['alpha_mean'] <= 1:
             raise ValueError('alpha range')
+        if segmentation and (type(metrics.get('prompt_events')) is not int or metrics['prompt_events'] != len(request['prompt_plan']['frames']) or type(metrics.get('explicit_resets')) is not int or metrics['explicit_resets'] != sum(e['reset'] for e in request['prompt_plan']['frames'])):
+            raise ValueError('prompt event counters')
     except (KeyError, TypeError, ValueError) as exc:
         raise AppError('MATTING_WORKER_OUTPUT_INVALID', '抠像循环状态或 alpha 统计不合法', exit_code=6) from exc
 
@@ -218,7 +243,7 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
     if cancel_file and cancel_file.exists():
         raise AppError('CANCELLED', '抠像在启动前取消', exit_code=8)
     source = Path(plan['source']['path'])
-    if not verify_adapter(adapter)['ok'] or 'sha256:' + sha256_file(source) != plan['source']['sha256']:
+    if plan.get('engine') != adapter.get('engine') or plan.get('protocol') != adapter.get('protocol') or not _verify_pipeline_adapter(adapter)['ok'] or not _prompt_unchanged(plan) or 'sha256:' + sha256_file(source) != plan['source']['sha256']:
         raise AppError('MATTING_INTEGRITY_FAILED', '源或模型在计划之后变化', exit_code=10)
     from .runtime import configure_local_runtime
     runtime = configure_local_runtime()['root']
@@ -230,7 +255,7 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
     started = time.monotonic()
     published = False
     try:
-        with tempfile.TemporaryDirectory(prefix='rvm-', dir=cache) as temporary:
+        with tempfile.TemporaryDirectory(prefix='rgba-', dir=cache) as temporary:
             work = Path(temporary)
             staged = work / 'foreground.mov'
             request = {**plan, 'adapter': adapter, 'runtime_root': runtime, 'response': str(work / 'response.json'), 'progress': str(work / 'progress.json'),
@@ -323,7 +348,7 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
             expected_hash = response['metrics']['rgba_sha256']
             if checked.returncode or checked.stdout.strip().lower() != 'sha256=' + expected_hash[7:]:
                 raise AppError('MATTING_ALPHA_ROUNDTRIP_FAILED', '编码后的 RGBA 与推理原始字节不一致', exit_code=6)
-            if not verify_adapter(adapter)['ok'] or 'sha256:' + sha256_file(source) != plan['source']['sha256'] or 'sha256:' + sha256_file(ffmpeg) != ffmpeg_hash:
+            if not _verify_pipeline_adapter(adapter)['ok'] or not _prompt_unchanged(plan) or 'sha256:' + sha256_file(source) != plan['source']['sha256'] or 'sha256:' + sha256_file(ffmpeg) != ffmpeg_hash:
                 raise AppError('MATTING_INTEGRITY_FAILED', '抠像过程中源、模型或 FFmpeg 发生变化', exit_code=10)
             output_hash = 'sha256:' + sha256_file(staged)
             if cancel_file and cancel_file.exists():
