@@ -21,6 +21,16 @@ online service. No adapter keeps the English/ASCII flite behavior described belo
 
 ## Runtime boundary
 
+For removing a selected object, use the [local LaMa contract](../../docs/specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md).
+Register existing TorchScript/Python/evidence with explicit CPU/CUDA and inspect.
+Ingest an alpha or black/white mask, or derive a binary alpha mask using SAM2.
+Run `media inpaint --asset-id <video> --mask-asset-id <mask> --adapter-id <id>
+--derived-asset-id <new-id> --dry-run`; review mask clock, geometry, growth,
+feather and ROI limits. Opaque masks need `--mask-channel luma`. Formal execution
+can use `--apply --track-id <video-track> --audio-track-id <audio-track>`.
+Source, mask and model rights gate the result. Review texture and temporal
+flicker; this is framewise repair and does not prove full video/generative parity.
+
 For selected objects or a person with a held product, use the
 [local SAM2 contract](../../docs/specs/本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md).
 Register existing video safetensors/Python/evidence with explicit CPU or CUDA,

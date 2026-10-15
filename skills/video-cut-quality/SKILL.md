@@ -5,6 +5,16 @@ description: Produce local quality reports, color scopes, render manifests, and 
 
 # Local Quality
 
+For masked video repair, review the [LaMa contract](../../docs/specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md).
+Check `outside_mask_changed_pixels=0`, matching input/output alpha hashes and
+exact decoded MOV RGBA. Independently compare source/output pixels using the
+same display/range/CFR clock and expanded mask. Empty-mask frames must pass
+unchanged. These checks prove preservation, not repaired-background accuracy.
+When a known unoccluded reference exists, measure masked reconstruction error
+and consecutive error changes; retain the fixture scope. Review texture seams,
+remaining object edges, movement, occlusion and flicker in natural footage.
+Keep model/source/mask rights gating separate from render-quality success.
+
 Run structural and media gates after rendering:
 
 ```powershell

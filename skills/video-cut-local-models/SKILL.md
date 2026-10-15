@@ -1,9 +1,32 @@
 ---
 name: video-cut-local-models
-description: Run registered offline speech, transcription, source separation, tracking, human matting and prompted SAM2 object segmentation with existing local models and native Python.
+description: Run registered offline speech, transcription, separation, tracking, matting, prompted segmentation and masked video repair with existing local models and native Python.
 ---
 
 # Local Models
+
+For object removal or local region repair, read the
+[LaMa contract](../../docs/specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md).
+Register `media adapter register --engine torchscript-lama-local-v1` using an
+existing TorchScript `.pt`, native Python, local evidence and explicit CPU/CUDA.
+Inspect before `media inpaint --asset-id <source-video> --mask-asset-id
+<registered-image-or-video> --adapter-id <id> --derived-asset-id <new-id>
+--dry-run`. White/high alpha selects repair; use `--mask-channel luma` for
+an opaque black/white mask. SAM2 binary MOV outputs can supply the alpha mask.
+
+Mask time starts at its own display origin plus `--mask-start-seconds`; it
+must cover the rounded output duration. Default geometry mismatch is rejected;
+`--mask-resize nearest` allows explicit matching-aspect scaling. Review this
+clock when source range, frame rate, crop or size has changed. `--mask-grow`,
+`--mask-feather`, `--context-pixels` and `--model-max-edge` control region and
+context. Empty frames bypass the model. Repair preserves original alpha and
+RGB outside the expanded region. ROI resizing and padding are reported.
+
+Formal execution produces a lossless MOV with audio, hashes and source/mask/model
+rights dependencies. Apply with video and explicit audio tracks as below.
+Preserve `INPAINT_MODEL_REVIEW_REQUIRED`: LaMa runs framewise and can invent
+texture, leave traces or flicker. It does not establish temporal reconstruction
+or text-prompt generative fill. Compare against independent truth where available.
 
 For a person plus held product, or other selected video objects, read the
 [SAM2 prompt contract](../../docs/specs/本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md).

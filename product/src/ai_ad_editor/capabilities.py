@@ -183,6 +183,14 @@ def build_capability_manifest() -> dict[str, Any]:
                 "features": ["native_torch_cpu_or_cuda", "explicit_safetensors_only", "positive_negative_points_and_boxes", "multi_object_union_or_selection", "future_frame_corrections", "explicit_scene_reset", "streamed_frames_and_pruned_memory", "binary_or_probability_alpha", "lossless_rgba_audio_and_rights_pipeline"],
                 "limits": ["local_prompt_json_required", "normalized_output_coordinates_and_cfr_frame_indices", "max_8_objects_256_events_32_points_per_object_event", "512_mib_session_tensor_budget_excludes_model_and_process_memory", "no_device_fallback_or_runtime_downloads", "forward_corrections_do_not_rewrite_prior_frames", "explicit_reset_requires_new_prompts", "segmentation_probability_is_not_physical_matte", "broad_advertising_quality_and_commercial_rights_acceptance_pending"],
             },
+            "inpainting": {
+                "status": "local_adapter_only",
+                "engine": "torchscript-lama-local-v1",
+                "protocol": "agent-video-lama-inpainting-v1",
+                "commands": ["media.adapter.register", "media.adapter.inspect", "media.inpaint"],
+                "features": ["native_torch_cpu_or_cuda", "explicit_local_torchscript", "alpha_or_luma_asset_mask", "mask_clock_and_geometry_validation", "bounded_roi_inference", "outside_rgb_and_source_alpha_preserved", "qtrle_rgba_decode_hash", "audio_timeline_and_rights_dependencies", "cancel_timeout_and_rollback"],
+                "limitations": ["framewise_image_inpainting_not_joint_temporal_video_model", "texture_flicker_and_occlusion_require_review", "no_text_prompt_generative_fill", "external_model_license_and_broad_quality_not_accepted"],
+            },
             "matting": {
                 "status": "local_adapter_only",
                 "engine": "rvm-onnx-cpu-matting-v1",

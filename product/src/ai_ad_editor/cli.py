@@ -87,6 +87,7 @@ from .audio_separation import AUDIO_SEPARATION_ENGINE, AUDIO_SEPARATION_VERSION,
 from .local_separation import DEMUCS_ENGINE, separate_native
 from .local_matting import MATTING_ENGINE, prepare_plan as prepare_matting_plan, matte_native
 from .local_segmentation import SEGMENTATION_ENGINE, load_prompts as load_segmentation_prompts
+from .local_inpainting import INPAINT_ENGINE, prepare_mask as prepare_inpaint_mask, normalize_options as inpaint_options
 from .model_registry import (
     MODEL_REGISTRY_VERSION,
     adapter_for,
@@ -323,6 +324,35 @@ def build_parser() -> argparse.ArgumentParser:
     matting.add_argument("--timeline-start-seconds", type=float, default=0.)
     matting.add_argument("--apply", action="store_true")
     matting.add_argument("--replace-track", action="store_true")
+    inpaint = _leaf_common(ms.add_parser('inpaint', help='使用显式本地 LaMa 和蒙版修复视频区域'))
+    inpaint.add_argument('--project', required=True)
+    inpaint.add_argument('--asset-id', required=True)
+    inpaint.add_argument('--mask-asset-id', required=True)
+    inpaint.add_argument('--adapter-id', required=True)
+    inpaint.add_argument('--derived-asset-id', required=True)
+    inpaint.add_argument('--mask-channel', choices=['alpha', 'luma'], default='alpha')
+    inpaint.add_argument('--mask-start-seconds', type=float, default=0.)
+    inpaint.add_argument('--mask-resize', choices=['reject', 'nearest'], default='reject')
+    inpaint.add_argument('--mask-threshold', type=float, default=.5)
+    inpaint.add_argument('--mask-grow', type=int, default=4)
+    inpaint.add_argument('--mask-feather', type=float, default=0.)
+    inpaint.add_argument('--context-pixels', type=int, default=64)
+    inpaint.add_argument('--model-max-edge', type=int, default=1024)
+    inpaint.add_argument('--output', default=None)
+    inpaint.add_argument('--start-seconds', type=float, default=0.)
+    inpaint.add_argument('--end-seconds', type=float, default=None)
+    inpaint.add_argument('--fps', default=None)
+    inpaint.add_argument('--max-edge', type=int, default=0)
+    inpaint.add_argument('--max-frames', type=int, default=18000)
+    inpaint.add_argument('--timeout-seconds', type=float, default=3600.)
+    inpaint.add_argument('--cancel-file', default=None)
+    inpaint.add_argument('--no-audio', action='store_true')
+    inpaint.add_argument('--sequence-id', default=None)
+    inpaint.add_argument('--track-id', default=None)
+    inpaint.add_argument('--audio-track-id', default=None)
+    inpaint.add_argument('--timeline-start-seconds', type=float, default=0.)
+    inpaint.add_argument('--apply', action='store_true')
+    inpaint.add_argument('--replace-track', action='store_true')
     audio = subs.add_parser("audio", help="本地音频处理")
     aus = audio.add_subparsers(dest="action", required=True)
     extract = _leaf_common(aus.add_parser("extract", help="从本地视频或音频资产提取无损 WAV"))
@@ -1566,8 +1596,8 @@ def command_audio_adapter(args: argparse.Namespace) -> dict[str, Any]:
 
 def command_media_adapter_register(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
-    if args.engine != SEGMENTATION_ENGINE and args.device != 'cpu' or args.engine == SEGMENTATION_ENGINE and args.downsample_ratio is not None:
-        raise argument_error('device=cuda 只适用于 SAM2；downsample-ratio 只适用于 RVM', 'device/downsample_ratio')
+    if args.engine not in {SEGMENTATION_ENGINE, INPAINT_ENGINE} and args.device != 'cpu' or args.engine != MATTING_ENGINE and args.downsample_ratio is not None:
+        raise argument_error('device=cuda 只适用于 SAM2/LaMa；downsample-ratio 只适用于 RVM', 'device/downsample_ratio')
     license_url = require_local_reference(args.license_url, field="--license-url") if args.license_url else ""
     evidence = require_local_reference(args.evidence, field="--evidence") if args.evidence else ""
     registry = load_visual_model_registry(root)
@@ -1585,7 +1615,7 @@ def command_media_adapter_register(args: argparse.Namespace) -> dict[str, Any]:
         verification_status=args.verification_status,
         evidence=evidence,
         root=root,
-        native_options=({'threads': args.threads, 'device': args.device} if args.engine == SEGMENTATION_ENGINE else {'threads': args.threads, 'downsample_ratio': args.downsample_ratio} if args.engine == MATTING_ENGINE else {'threads':args.threads, 'confidence':args.confidence, 'low_confidence':args.low_confidence, 'match_iou':args.match_iou, 'max_gap_seconds':args.max_gap_seconds, 'class_ids':args.class_id}),
+        native_options=({'threads': args.threads, 'device': args.device} if args.engine in {SEGMENTATION_ENGINE, INPAINT_ENGINE} else {'threads': args.threads, 'downsample_ratio': args.downsample_ratio} if args.engine == MATTING_ENGINE else {'threads':args.threads, 'confidence':args.confidence, 'low_confidence':args.low_confidence, 'match_iou':args.match_iou, 'max_gap_seconds':args.max_gap_seconds, 'class_ids':args.class_id}),
     )
     if args.dry_run:
         return _envelope("media.adapter.register", args, status="planned", data={"registry": str(visual_registry_path(root)), "adapter": adapter_record, "rights": rights_record})
@@ -1639,6 +1669,9 @@ def command_media_adapter(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
+    inpainting = args.action == 'inpaint'
+    command = 'media.inpaint' if inpainting else 'media.matting'
+    result_key = 'inpainting' if inpainting else 'matting'
     root, project = load_project(args.project)
     if not math.isfinite(args.timeline_start_seconds) or args.timeline_start_seconds < 0 or not math.isfinite(args.timeout_seconds) or not 0 < args.timeout_seconds <= 604800:
         raise argument_error('需要非负有限时间线起点及 0..604800 的超时预算', 'timeline_start_seconds/timeout_seconds')
@@ -1653,12 +1686,12 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
     if 'sha256:' + sha256_file(source) != source_asset.get('sha256'):
         raise AppError('MATTING_SOURCE_HASH_MISMATCH', '抠像源与已登记摘要不符', exit_code=10)
     adapter = visual_adapter_for(load_visual_model_registry(root), args.adapter_id)
-    if adapter is None or adapter.get('engine') not in {MATTING_ENGINE, SEGMENTATION_ENGINE}:
-        raise AppError('MATTING_ADAPTER_UNAVAILABLE', '要求已登记的本地 RVM 或 SAM2 适配器', exit_code=10)
+    if adapter is None or adapter.get('engine') not in ({INPAINT_ENGINE} if inpainting else {MATTING_ENGINE, SEGMENTATION_ENGINE}):
+        raise AppError('MATTING_ADAPTER_UNAVAILABLE', '要求已登记且用途匹配的本地 LaMa 修复或 RVM/SAM2 抠像适配器', exit_code=10)
     segmentation = adapter['engine'] == SEGMENTATION_ENGINE
     if segmentation and not args.prompts:
         raise argument_error('SAM2 要求显式本地 --prompts JSON', 'prompts')
-    if not segmentation and (args.prompts or args.object_id is not None or args.mask_mode != 'binary' or args.logit_threshold != 0):
+    if not segmentation and not inpainting and (args.prompts or args.object_id is not None or args.mask_mode != 'binary' or args.logit_threshold != 0):
         raise argument_error('RVM 不接受 SAM2 提示或掩模参数', 'prompts/object_id/mask_mode')
     ledger = load_ledger(root)
     records = {r['asset_id']: r for r in active_records(ledger)}
@@ -1667,6 +1700,18 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
     parent = records.get(parent_ref)
     if parent is None or model_ref not in records or records[model_ref].get('sha256') != adapter['sha256']:
         raise AppError('MATTING_RIGHTS_DEPENDENCY_MISSING', '源素材或模型缺少匹配的权利记录', exit_code=7)
+    rights_dependencies = [parent_ref, model_ref]
+    derived_from_assets = [args.asset_id]
+    mask_asset = None
+    if inpainting:
+        mask_asset = asset_map(project).get(args.mask_asset_id)
+        if mask_asset is None or mask_asset.get('kind') not in {'image', 'video'}:
+            raise argument_error('区域修复需要已摄取的 image/video 蒙版资产', 'mask_asset_id')
+        mask_ref = mask_asset.get('rights_ref') or args.mask_asset_id
+        if records.get(mask_ref, {}).get('sha256') != mask_asset.get('sha256') or parent.get('sha256') != source_asset.get('sha256'):
+            raise AppError('INPAINT_RIGHTS_DEPENDENCY_MISSING', '源或蒙版缺少匹配的权利记录', exit_code=7)
+        rights_dependencies = list(dict.fromkeys([parent_ref, mask_ref, model_ref]))
+        derived_from_assets = list(dict.fromkeys([args.asset_id, args.mask_asset_id]))
     derived_id = str(args.derived_asset_id)
     assert_id(derived_id, 'derived_asset_id')
     if derived_id in asset_map(project) or derived_id in records:
@@ -1680,6 +1725,13 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
     if segmentation:
         plan['prompt_plan'], plan['prompt_source'] = load_segmentation_prompts(root, args.prompts, frames=plan['video']['frames'], object_ids=args.object_id, mask_mode=args.mask_mode, threshold=args.logit_threshold)
         plan['video'].pop('downsample_ratio', None)
+    if inpainting:
+        plan['mask'] = prepare_inpaint_mask(root, mask_asset['uri'], kind=mask_asset['kind'], video=plan['video'], channel=args.mask_channel, start_seconds=args.mask_start_seconds, resize=args.mask_resize)
+        if plan['mask']['sha256'] != mask_asset.get('sha256'):
+            raise AppError('INPAINT_MASK_HASH_MISMATCH', '蒙版文件与已登记摘要不符', exit_code=10)
+        plan['inpainting'] = inpaint_options(threshold=args.mask_threshold, grow=args.mask_grow, feather=args.mask_feather, context=args.context_pixels, model_max_edge=args.model_max_edge)
+        plan['video'].pop('downsample_ratio', None)
+        plan['warnings'].append({'code': 'INPAINT_MASK_CLOCK', 'message': '蒙版按自身显示起点加 mask-start-seconds 取样；缩放及 CFR 取样见计划，不推断源时钟或裁切关系'})
     tps = int(project.get('settings', {}).get('timebase', {}).get('ticks_per_second', TICKS_PER_SECOND))
     start_tick = round(args.timeline_start_seconds * tps)
     duration_tick = max(1, round(plan['video']['duration_seconds'] * tps))
@@ -1698,24 +1750,24 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
             if not args.replace_track and any(int(c.get('timeline_start_tick', 0)) < start_tick + duration_tick and int(c.get('timeline_start_tick', 0)) + int(c.get('duration_tick', 0)) > start_tick for c in audio_track.get('clips', [])):
                 raise argument_error('原声目标范围已有片段；指定新轨道或显式 --replace-track', 'audio_track_id')
     if args.dry_run:
-        return _envelope('media.matting', args, status='planned', data={'plan': plan, 'adapter': adapter, 'derived_asset_id': derived_id, 'output': str(output),
-                         'source_asset_id': args.asset_id, 'track_id': args.track_id, 'audio_track_id': args.audio_track_id, 'rights_dependencies': [parent_ref, model_ref]}, warnings=plan['warnings'])
-    snapshot = create_snapshot(root, copy.deepcopy(project), label='before-media-matting')
+        return _envelope(command, args, status='planned', data={'plan': plan, 'adapter': adapter, 'derived_asset_id': derived_id, 'output': str(output),
+                         'source_asset_id': args.asset_id, 'track_id': args.track_id, 'audio_track_id': args.audio_track_id, 'rights_dependencies': rights_dependencies}, warnings=plan['warnings'])
+    snapshot = create_snapshot(root, copy.deepcopy(project), label='before-media-' + args.action)
     operation_id = new_id('op')
-    report_path = root / 'validation' / f'matting_{safe_filename(operation_id)}.json'
+    report_path = root / 'validation' / f'{result_key}_{safe_filename(operation_id)}.json'
     published = False
     try:
-        _progress(args, operation_id, 'started', 'media.matting', 0, '开始本地对象分割' if segmentation else '开始本地 RVM 时序抠像')
+        _progress(args, operation_id, 'started', command, 0, '开始本地 LaMa 区域修复' if inpainting else '开始本地对象分割' if segmentation else '开始本地 RVM 时序抠像')
         def progress(frame, total):
-            _progress(args, operation_id, 'progress', 'media.matting.inference', round(90 * frame / total), f'{"对象分割" if segmentation else "人物抠像"} {frame}/{total} 帧')
+            _progress(args, operation_id, 'progress', command + '.inference', round(90 * frame / total), f'{"区域修复" if inpainting else "对象分割" if segmentation else "人物抠像"} {frame}/{total} 帧')
         result = matte_native(root, output, adapter=adapter, plan=plan, timeout=args.timeout_seconds, cancel_file=cancel_file, progress=progress)
         published = True
         asset = {'id': derived_id, 'kind': 'video', 'uri': output.relative_to(root).as_posix(), 'sha256': result['sha256'], 'probe': result['probe'], 'rights_ref': derived_id,
-                 'source': {'source_url': f'local://{output}', 'retrieved_at': now_iso(), 'original_name': output.name, 'derived_from': [args.asset_id]}}
+                 'source': {'source_url': f'local://{output}', 'retrieved_at': now_iso(), 'original_name': output.name, 'derived_from': derived_from_assets}}
         rights = {key: copy.deepcopy(parent.get(key, default)) for key, default in [('creator', 'unknown'), ('license_spdx', 'LicenseRef-UNVERIFIED'), ('license_url', ''),
                   ('attribution', ''), ('permitted_uses', ['internal']), ('permitted_channels', []), ('restrictions', []), ('evidence', ''), ('verification_status', 'unverified'), ('verified_by', ''), ('takedown_status', 'clear')]}
-        rights.update(asset_id=derived_id, kind='video', sha256=result['sha256'], source_url=f'local://{output}', source_version='derived-video-sam2-segmentation' if segmentation else 'derived-video-rvm-matting', retrieved_at=now_iso(),
-                      derived_from=[parent_ref, model_ref], notes='Local prompted object segmentation; source and model rights both required' if segmentation else 'Local recurrent human matting; source and model rights both required')
+        rights.update(asset_id=derived_id, kind='video', sha256=result['sha256'], source_url=f'local://{output}', source_version='derived-video-lama-inpainting' if inpainting else 'derived-video-sam2-segmentation' if segmentation else 'derived-video-rvm-matting', retrieved_at=now_iso(),
+                      derived_from=rights_dependencies, notes='Local framewise masked repair; source, mask and model rights required' if inpainting else 'Local prompted object segmentation; source and model rights both required' if segmentation else 'Local recurrent human matting; source and model rights both required')
         project.setdefault('assets', []).append(asset)
         add_record(ledger, rights)
         clip = audio_clip = None
@@ -1735,15 +1787,16 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         if not validation['ok']:
             raise AppError('MATTING_APPLY_INVALID', '抠像项目校验失败', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
         report = {'version': '0.1.0', 'created_at': now_iso(), 'operation_id': operation_id, 'snapshot_id': snapshot['snapshot_id'], 'source_asset_id': args.asset_id,
-                  'asset': asset, 'rights': rights, 'generated_clip': clip, 'generated_audio_clip': audio_clip, 'matting': result, 'validation': validation}
+                  'asset': asset, 'rights': rights, 'generated_clip': clip, 'generated_audio_clip': audio_clip, result_key: result, 'validation': validation}
+        if inpainting: report['mask_asset_id'] = args.mask_asset_id
         atomic_write_json(report_path, report)
-        project.setdefault('provenance', {}).setdefault('change_log', []).append({'operation_id': operation_id, 'command': 'media.matting', 'engine': adapter['engine'],
+        project.setdefault('provenance', {}).setdefault('change_log', []).append({'operation_id': operation_id, 'command': command, 'engine': adapter['engine'],
             'asset_id': derived_id, 'source_asset_id': args.asset_id, 'snapshot_id': snapshot['snapshot_id'], 'report': str(report_path), 'at': now_iso()})
         save_project(root, project)
-        _operation(root, operation_id, {'operation_id': operation_id, 'command': 'media.matting', 'status': 'succeeded', 'asset_id': derived_id,
+        _operation(root, operation_id, {'operation_id': operation_id, 'command': command, 'status': 'succeeded', 'asset_id': derived_id,
                    'snapshot_id': snapshot['snapshot_id'], 'report': str(report_path), 'created_at': now_iso()})
-        _progress(args, operation_id, 'completed', 'media.matting', 100, '透明素材及 RGBA 编码往返校验完成')
-        return _envelope('media.matting', args, data=report, warnings=result['warnings'], operation_id=operation_id)
+        _progress(args, operation_id, 'completed', command, 100, '派生素材及 RGBA 编码往返校验完成')
+        return _envelope(command, args, data=report, warnings=result['warnings'], operation_id=operation_id)
     except BaseException as exc:
         if published:
             output.unlink(missing_ok=True)
@@ -5573,6 +5626,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "ingest"): command_media_ingest,
     ("media", "stabilize"): command_media_stabilize,
     ("media", "matting"): command_media_matting,
+    ("media", "inpaint"): command_media_matting,
     ("media", "relink"): command_media_relink,
     ("media", "adapter"): command_media_adapter,
     ("media", "track"): command_media_track,

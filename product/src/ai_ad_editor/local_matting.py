@@ -24,6 +24,9 @@ MATTING_PROTOCOL = 'agent-video-rvm-matting-v1'
 def _verify_pipeline_adapter(adapter: dict) -> dict:
     if adapter.get('engine') == MATTING_ENGINE:
         return verify_adapter(adapter)
+    if adapter.get('engine') == 'torchscript-lama-local-v1':
+        from .local_inpainting import verify_adapter as verify_inpainting
+        return verify_inpainting(adapter)
     from .local_segmentation import verify_adapter as verify_segmentation
     return verify_segmentation(adapter)
 
@@ -31,6 +34,9 @@ def _verify_pipeline_adapter(adapter: dict) -> dict:
 def _prompt_unchanged(plan: dict) -> bool:
     if plan.get('engine') == MATTING_ENGINE:
         return True
+    if plan.get('engine') == 'torchscript-lama-local-v1':
+        from .local_inpainting import mask_unchanged
+        return mask_unchanged(plan)
     from .local_segmentation import verify_prompt_source
     return verify_prompt_source(plan)
 
@@ -141,12 +147,14 @@ def prepare_plan(source: Path, adapter: dict, *, start_seconds: float = 0, end_s
     if not math.isfinite(audio_offset):
         raise argument_error('音视频起点不是有限时间戳', 'source')
     ratio = adapter['settings'].get('downsample_ratio') or min(1., 512 / max(dw, dh))
-    if min(dw, dh) * ratio < 16:
+    if adapter['engine'] == MATTING_ENGINE and min(dw, dh) * ratio < 16:
         raise argument_error('模型内部短边须至少 16 像素；调整 downsample-ratio 或输入尺寸', 'downsample_ratio')
     warnings = [{'code': 'MATTING_MODEL_REVIEW_REQUIRED', 'message': '人物模型需复核头发、运动、遮挡、镜头切换和许可；未证明通用物体或广告广泛质量'},
                 {'code': 'MATTING_CFR_CLOCK', 'message': '输出使用显式 CFR，尾部不足一帧按末帧补齐，源时钟与输出时长见报告'}]
     if adapter['engine'] != MATTING_ENGINE:
         warnings[0] = {'code': 'SEGMENTATION_MODEL_REVIEW_REQUIRED', 'message': '对象分割须复核提示、遮挡、边缘、商品与镜头切换；概率不等于物理 alpha'}
+    if adapter['engine'] == 'torchscript-lama-local-v1':
+        warnings[0] = {'code': 'INPAINT_MODEL_REVIEW_REQUIRED', 'message': '逐帧 LaMa 补全须复核纹理、物体残留、闪烁与许可；没有跨帧联合修复或生成填充保证'}
     return {'engine': adapter['engine'], 'protocol': adapter['protocol'], 'network': 'disabled',
             'source': {'path': str(source.resolve()), 'sha256': 'sha256:' + sha256_file(source)}, 'input_probe': probe,
             'range': {'start_seconds': start, 'end_seconds': end},
@@ -199,29 +207,32 @@ def _windows_job():
 
 
 def _worker_command(adapter: dict, request_path: Path) -> list[str]:
-    name = 'rvm_worker.py' if adapter['engine'] == MATTING_ENGINE else 'sam2_worker.py'
+    name = 'rvm_worker.py' if adapter['engine'] == MATTING_ENGINE else 'lama_worker.py' if adapter['engine'] == 'torchscript-lama-local-v1' else 'sam2_worker.py'
     return [adapter['executable'], '-I', '-B', '-X', 'utf8', str(Path(__file__).with_name(name)), str(request_path)]
 
 
 def validate_response(response: dict, request: dict) -> None:
-    segmentation = request['engine'] != MATTING_ENGINE
-    providers = ['torch-' + request['adapter']['settings']['device']] if segmentation else ['CPUExecutionProvider']
+    inpainting = request['engine'] == 'torchscript-lama-local-v1'
+    segmentation = request['engine'] == 'transformers-sam2-video-local-v1'
+    providers = ['torch-' + request['adapter']['settings']['device']] if segmentation or inpainting else ['CPUExecutionProvider']
     expected = {'status': 'succeeded', 'protocol': request['protocol'], 'engine': request['engine'], 'network': 'disabled', 'blocked_network_events': [],
                 'request_sha256': request['request_sha256'], 'adapter_sha256': request['adapter']['sha256'], 'source_sha256': request['source']['sha256'], 'providers': providers}
     if segmentation:
         expected.update(prompt_sha256=request['prompt_plan']['sha256'], object_ids=request['prompt_plan']['object_ids'], mask_mode=request['prompt_plan']['mask_mode'])
+    if inpainting:
+        expected.update(mask_sha256=request['mask']['sha256'], mask_plan_sha256=request['mask']['plan_sha256'], inpainting=request['inpainting'])
     if any(response.get(key) != value for key, value in expected.items()):
         raise AppError('MATTING_WORKER_INTEGRITY_INVALID', '抠像 worker 协议或输入/模型/网络/设备不符', exit_code=6)
     info, metrics = request['video'], response.get('metrics')
-    state_reset = 'per-job-and-explicit-frames' if segmentation else 'per-job'
-    if not isinstance(metrics, dict) or any(type(metrics.get(k)) is not int or metrics[k] != info[k] for k in ('frames', 'width', 'height')) or metrics.get('state_updates') != info['frames'] or metrics.get('rgba_bytes') != info['frames'] * info['width'] * info['height'] * 4 or metrics.get('alpha_mode') != 'straight' or metrics.get('input_alpha') != 'multiply' or metrics.get('state_reset') != state_reset:
+    state_reset = 'per-frame' if inpainting else 'per-job-and-explicit-frames' if segmentation else 'per-job'
+    if not isinstance(metrics, dict) or any(type(metrics.get(k)) is not int or metrics[k] != info[k] for k in ('frames', 'width', 'height')) or metrics.get('state_updates') != info['frames'] or metrics.get('rgba_bytes') != info['frames'] * info['width'] * info['height'] * 4 or metrics.get('alpha_mode') != 'straight' or metrics.get('input_alpha') != ('preserve' if inpainting else 'multiply') or metrics.get('state_reset') != state_reset:
         raise AppError('MATTING_WORKER_OUTPUT_INVALID', '抠像帧数、画幅、字节数或状态传递无效', exit_code=6)
     digest = metrics.get('rgba_sha256', '')
     if not isinstance(digest, str) or len(digest) != 71 or not digest.startswith('sha256:') or any(c not in '0123456789abcdef' for c in digest[7:]):
         raise AppError('MATTING_WORKER_OUTPUT_INVALID', '抠像原始 RGBA 摘要无效', exit_code=6)
     pixels = info['width'] * info['height'] * info['frames']
     try:
-        budget = request['adapter']['settings']['state_budget_bytes'] if segmentation else 256 * 1024 * 1024
+        budget = request['adapter']['settings']['state_budget_bytes'] if segmentation or inpainting else 256 * 1024 * 1024
         if type(metrics['state_updates']) is not int or type(metrics['state_peak_bytes']) is not int or not 0 < metrics['state_peak_bytes'] <= budget:
             raise ValueError('state budget')
         if any(type(metrics[k]) is not int or not 0 <= metrics[k] <= pixels for k in ('transparent_pixels', 'opaque_pixels', 'soft_alpha_pixels')) or sum(metrics[k] for k in ('transparent_pixels', 'opaque_pixels', 'soft_alpha_pixels')) != pixels:
@@ -230,6 +241,20 @@ def validate_response(response: dict, request: dict) -> None:
             raise ValueError('alpha range')
         if segmentation and (type(metrics.get('prompt_events')) is not int or metrics['prompt_events'] != len(request['prompt_plan']['frames']) or type(metrics.get('explicit_resets')) is not int or metrics['explicit_resets'] != sum(e['reset'] for e in request['prompt_plan']['frames'])):
             raise ValueError('prompt event counters')
+        if inpainting:
+            for name in ('model_calls', 'empty_mask_frames', 'resized_model_frames'):
+                if type(metrics.get(name)) is not int or not 0 <= metrics[name] <= info['frames']:
+                    raise ValueError('inpainting frame counters')
+            if metrics['model_calls'] + metrics['empty_mask_frames'] != info['frames'] or metrics['resized_model_frames'] > metrics['model_calls'] or type(metrics.get('mask_pixels')) is not int or not 0 <= metrics['mask_pixels'] <= pixels or metrics.get('outside_mask_changed_pixels') != 0:
+                raise ValueError('inpainting mask counters')
+            if metrics.get('input_alpha_sha256') != metrics.get('output_alpha_sha256'):
+                raise ValueError('source alpha changed')
+            for name in ('input_alpha_sha256', 'output_alpha_sha256', 'source_rgba_sha256', 'decoded_mask_rgba_sha256'):
+                value = metrics.get(name, '')
+                if not isinstance(value, str) or len(value) != 71 or not value.startswith('sha256:') or any(c not in '0123456789abcdef' for c in value[7:]):
+                    raise ValueError('inpainting input digests')
+            if type(metrics.get('model_peak_pixels')) is not int or not 0 <= metrics['model_peak_pixels'] <= ((request['inpainting']['model_max_edge'] + 7) // 8 * 8)**2:
+                raise ValueError('inpainting model raster budget')
     except (KeyError, TypeError, ValueError) as exc:
         raise AppError('MATTING_WORKER_OUTPUT_INVALID', '抠像循环状态或 alpha 统计不合法', exit_code=6) from exc
 
@@ -247,7 +272,7 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
         raise AppError('MATTING_INTEGRITY_FAILED', '源或模型在计划之后变化', exit_code=10)
     from .runtime import configure_local_runtime
     runtime = configure_local_runtime()['root']
-    cache = root / 'cache' / 'matting'
+    cache = root / 'cache' / ('inpainting' if adapter['engine'] == 'torchscript-lama-local-v1' else 'matting')
     cache.mkdir(parents=True, exist_ok=True)
     output.parent.mkdir(parents=True, exist_ok=True)
     ffmpeg = Path(ffmpeg_path()).resolve()
@@ -269,6 +294,9 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
             base = [str(ffmpeg), '-nostdin', '-hide_banner', '-loglevel', 'error', '-protocol_whitelist', 'file,pipe']
             vf = f"setpts=PTS-STARTPTS,trim=start={start:.12f}:end={end:.12f},setpts=PTS-STARTPTS,scale={info['width']}:{info['height']}:flags=lanczos,setsar=1,fps=fps={info['fps']}:start_time=0:round=near,tpad=stop_mode=clone:stop_duration={1 / float(Fraction(info['fps'])):.12f},format=rgba"
             decoder = [*base, '-i', str(source), '-map', f"0:{info['source_stream_index']}", '-an', '-sn', '-dn', '-vf', vf, '-frames:v', str(info['frames']), '-f', 'rawvideo', '-pix_fmt', 'rgba', 'pipe:1']
+            if adapter['engine'] == 'torchscript-lama-local-v1':
+                from .local_inpainting import decoder_command
+                decoder = decoder_command(base, source, plan, vf)
             encoder = [*base, '-n', '-f', 'rawvideo', '-pixel_format', 'rgba', '-video_size', f"{info['width']}x{info['height']}", '-framerate', info['fps'], '-i', 'pipe:0']
             if plan['audio']['preserve']:
                 offset = plan['audio']['source_offset_seconds']
