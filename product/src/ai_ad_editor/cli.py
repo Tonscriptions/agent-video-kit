@@ -50,7 +50,7 @@ from .transcribe import ffmpeg_whisper_available, transcribe_local, transcribe_l
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
 from .rights import VALID_STATUSES, active_records, add_record, apply_disposition_to_project, check_project_rights, create_disposition_decision, disposition_decisions, effective_disposition_decisions, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
 from .understand import detect_beats, understand_media
-from .tracking import build_reframe_plan, track_media
+from .tracking import OBJECT_TRACKING_ENGINE, build_reframe_plan, track_command_json, track_media
 from .runtime import configure_local_runtime
 from .template import apply_template_operations, instantiate
 from .migration import SUPPORTED_SOURCE_VERSIONS, migrate_project_payload
@@ -69,10 +69,16 @@ from .model_registry import (
     MODEL_REGISTRY_VERSION,
     adapter_for,
     load_model_registry,
+    load_visual_model_registry,
     prepare_audio_adapter,
+    prepare_visual_adapter,
     registry_path,
     save_model_registry,
+    save_visual_model_registry,
     verify_audio_adapter,
+    verify_visual_adapter,
+    visual_adapter_for,
+    visual_registry_path,
 )
 from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
@@ -237,6 +243,25 @@ def build_parser() -> argparse.ArgumentParser:
     relink.add_argument("--project", required=True)
     relink.add_argument("--search-root", required=True, help="本地素材搜索目录")
     relink.add_argument("--match-by-name", action="store_true", help="哈希无匹配时允许唯一文件名近似匹配")
+    visual_adapter = _leaf_common(ms.add_parser("adapter", help="注册或检查本地视觉模型适配器"))
+    vas = visual_adapter.add_subparsers(dest="adapter_action", required=True)
+    visual_adapter_register = _leaf_common(vas.add_parser("register", help="登记本地视觉模型/执行器路径与哈希"))
+    visual_adapter_register.add_argument("--project", required=True)
+    visual_adapter_register.add_argument("--adapter-id", required=True)
+    visual_adapter_register.add_argument("--engine", required=True, help="本地视觉适配器 engine")
+    visual_adapter_register.add_argument("--model-path", required=True)
+    visual_adapter_register.add_argument("--executable", required=True, help="command-json-tracking-v1 的本地执行器")
+    visual_adapter_register.add_argument("--license-spdx", default="LicenseRef-UNVERIFIED")
+    visual_adapter_register.add_argument("--license-url", default="")
+    visual_adapter_register.add_argument("--permitted-use", action="append", default=["internal"])
+    visual_adapter_register.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
+    visual_adapter_register.add_argument("--evidence", default="")
+    visual_adapter_register.add_argument("--creator", default="unknown")
+    visual_adapter_list = _leaf_common(vas.add_parser("list", help="列出项目内已登记视觉适配器"))
+    visual_adapter_list.add_argument("--project", required=True)
+    visual_adapter_inspect = _leaf_common(vas.add_parser("inspect", help="检查视觉适配器路径与哈希"))
+    visual_adapter_inspect.add_argument("--project", required=True)
+    visual_adapter_inspect.add_argument("--adapter-id", required=True)
     audio = subs.add_parser("audio", help="本地音频处理")
     aus = audio.add_subparsers(dest="action", required=True)
     extract = _leaf_common(aus.add_parser("extract", help="从本地视频或音频资产提取无损 WAV"))
@@ -312,6 +337,7 @@ def build_parser() -> argparse.ArgumentParser:
     track.add_argument("--search-radius", type=int, default=48)
     track.add_argument("--max-width", type=int, default=640)
     track.add_argument("--max-samples", type=int, default=600, help="最大采样帧数，超过预算时降低采样频率并写入报告")
+    track.add_argument("--adapter-id", default=None, help="可选：项目内已注册的离线视觉跟踪适配器")
     track.add_argument("--output", default=None, help="项目内跟踪报告 JSON 路径")
     track.add_argument("--clip-id", default=None, help="可选：将位置关键帧应用到片段")
     track.add_argument("--track-id", default=None, help="与 --clip-id 联用以限定轨道")
@@ -330,6 +356,7 @@ def build_parser() -> argparse.ArgumentParser:
     track_bind.add_argument("--search-radius", type=int, default=48)
     track_bind.add_argument("--max-width", type=int, default=640)
     track_bind.add_argument("--max-samples", type=int, default=600)
+    track_bind.add_argument("--adapter-id", default=None, help="可选：项目内已注册的离线视觉跟踪适配器")
     track_bind.add_argument("--offset-x", type=float, default=0.0, help="绑定位置的归一化 X 偏移")
     track_bind.add_argument("--offset-y", type=float, default=0.0, help="绑定位置的归一化 Y 偏移")
     track_bind.add_argument("--scale-mode", choices=("none", "roi"), default="none", help="是否按跟踪 ROI 宽度变化同步 transform.scale")
@@ -355,6 +382,7 @@ def build_parser() -> argparse.ArgumentParser:
     reframe.add_argument("--search-radius", type=int, default=48)
     reframe.add_argument("--max-width", type=int, default=640)
     reframe.add_argument("--max-samples", type=int, default=600)
+    reframe.add_argument("--adapter-id", default=None, help="可选：项目内已注册的离线视觉跟踪适配器")
     reframe.add_argument("--output", default=None, help="项目内自动重构图报告 JSON 路径")
     reframe.add_argument("--apply", action="store_true", help="创建快照并将动态裁切写回片段")
 
@@ -1369,6 +1397,73 @@ def command_audio_adapter(args: argparse.Namespace) -> dict[str, Any]:
         raise argument_error(f"不支持的 audio adapter 操作: {args.adapter_action}", "adapter_action") from exc
 
 
+def command_media_adapter_register(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    license_url = require_local_reference(args.license_url, field="--license-url") if args.license_url else ""
+    evidence = require_local_reference(args.evidence, field="--evidence") if args.evidence else ""
+    registry = load_visual_model_registry(root)
+    if visual_adapter_for(registry, args.adapter_id) is not None:
+        raise AppError("VISUAL_MODEL_ADAPTER_EXISTS", f"本地视觉适配器已存在: {args.adapter_id}", exit_code=2, path=str(visual_registry_path(root)))
+    adapter_record, rights_record = prepare_visual_adapter(
+        adapter_id=args.adapter_id,
+        engine=args.engine,
+        model_path=args.model_path,
+        executable=args.executable,
+        creator=args.creator,
+        license_spdx=args.license_spdx,
+        license_url=license_url,
+        permitted_uses=list(dict.fromkeys(args.permitted_use)),
+        verification_status=args.verification_status,
+        evidence=evidence,
+    )
+    if args.dry_run:
+        return _envelope("media.adapter.register", args, status="planned", data={"registry": str(visual_registry_path(root)), "adapter": adapter_record, "rights": rights_record})
+    ledger = load_ledger(root)
+    before_project = copy.deepcopy(project)
+    snapshot = create_snapshot(root, before_project, label="before-media-adapter-register")
+    registry.setdefault("adapters", []).append(adapter_record)
+    add_record(ledger, rights_record)
+    operation_id = new_id("op")
+    project.setdefault("provenance", {}).setdefault("local_adapters", []).append({"adapter_id": args.adapter_id, "kind": "object-tracking", "engine": args.engine, "model_sha256": adapter_record.get("model_sha256"), "registered_at": adapter_record["registered_at"]})
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.adapter.register", "adapter_id": args.adapter_id, "engine": args.engine, "snapshot_id": snapshot["snapshot_id"], "registry": str(visual_registry_path(root)), "at": now_iso()})
+    save_visual_model_registry(root, registry)
+    save_project(root, project)
+    save_ledger(root, ledger)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.adapter.register", "status": "succeeded", "adapter_id": args.adapter_id, "engine": args.engine, "snapshot_id": snapshot["snapshot_id"], "registry": str(visual_registry_path(root)), "created_at": now_iso()})
+    return _envelope("media.adapter.register", args, data={"registry": str(visual_registry_path(root)), "adapter": adapter_record, "rights": rights_record, "snapshot": snapshot}, operation_id=operation_id)
+
+
+def command_media_adapter_list(args: argparse.Namespace) -> dict[str, Any]:
+    root, _ = load_project(args.project)
+    registry = load_visual_model_registry(root)
+    adapters = []
+    for adapter in registry.get("adapters", []):
+        if isinstance(adapter, dict):
+            adapters.append({"adapter": adapter, "verification": verify_visual_adapter(adapter)})
+    return _envelope("media.adapter.list", args, data={"registry": str(visual_registry_path(root)), "schema_version": MODEL_REGISTRY_VERSION, "count": len(adapters), "adapters": adapters, "network": "disabled"})
+
+
+def command_media_adapter_inspect(args: argparse.Namespace) -> dict[str, Any]:
+    root, _ = load_project(args.project)
+    registry = load_visual_model_registry(root)
+    adapter = visual_adapter_for(registry, args.adapter_id)
+    if adapter is None:
+        raise AppError("VISUAL_MODEL_ADAPTER_NOT_FOUND", f"找不到已注册视觉适配器: {args.adapter_id}", exit_code=3, path=str(visual_registry_path(root)))
+    return _envelope("media.adapter.inspect", args, data={"registry": str(visual_registry_path(root)), "adapter": adapter, "verification": verify_visual_adapter(adapter), "network": "disabled"})
+
+
+def command_media_adapter(args: argparse.Namespace) -> dict[str, Any]:
+    handlers = {
+        "register": command_media_adapter_register,
+        "list": command_media_adapter_list,
+        "inspect": command_media_adapter_inspect,
+    }
+    try:
+        return handlers[args.adapter_action](args)
+    except KeyError as exc:
+        raise argument_error(f"不支持的 media adapter 操作: {args.adapter_action}", "adapter_action") from exc
+
+
 def command_media_stabilize(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     if bool(args.asset_id) == bool(args.input):
@@ -1500,6 +1595,21 @@ def command_media_relink(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("media.relink", args, data={**result, "report": str(report_path)}, status=status, errors=[item for item in result["entries"] if item.get("status") == "Failed"], operation_id=operation_id)
 
 
+def _resolve_visual_tracking_adapter(root: Path, adapter_id: str | None) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+    if not adapter_id:
+        return None, None
+    registry = load_visual_model_registry(root)
+    adapter = visual_adapter_for(registry, adapter_id)
+    if adapter is None:
+        raise AppError("VISUAL_MODEL_ADAPTER_NOT_FOUND", f"找不到已注册视觉适配器: {adapter_id}", exit_code=3, path=str(visual_registry_path(root)))
+    verification = verify_visual_adapter(adapter)
+    if not verification["ok"]:
+        raise AppError("MODEL_ADAPTER_HASH_INVALID", "本地视觉适配器路径或哈希校验失败", exit_code=10, path=str(visual_registry_path(root)), cause=json.dumps(verification, ensure_ascii=False))
+    if adapter.get("engine") != OBJECT_TRACKING_ENGINE:
+        raise AppError("TRACKING_ADAPTER_UNAVAILABLE", f"适配器已登记但当前没有对应本地 runner: {adapter.get('engine')}", exit_code=10, path=str(adapter_id), hint=f"当前可执行视觉 runner 只有 {OBJECT_TRACKING_ENGINE}；未知模型不会被隐式 fallback")
+    return adapter, verification
+
+
 def command_media_track(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     if bool(args.asset_id) == bool(args.input):
@@ -1517,6 +1627,7 @@ def command_media_track(args: argparse.Namespace) -> dict[str, Any]:
         source = Path(str(args.input)).expanduser().resolve()
     if not source.exists() or not source.is_file():
         raise argument_error("跟踪输入不存在", str(source))
+    visual_adapter, adapter_verification = _resolve_visual_tracking_adapter(root, args.adapter_id)
     sequence_id = args.sequence_id
     if args.clip_id:
         sequence = find_sequence(project, sequence_id)
@@ -1533,23 +1644,45 @@ def command_media_track(args: argparse.Namespace) -> dict[str, Any]:
                 "clip_id": args.clip_id,
                 "sequence_id": sequence_id,
                 "step_frames": args.step_frames,
+                "adapter_id": args.adapter_id,
+                "adapter": visual_adapter,
+                "adapter_verification": adapter_verification,
+                "engine": visual_adapter.get("engine") if visual_adapter else "local-template-matching",
             },
         )
-    report = track_media(
-        source,
-        args.roi,
-        start_seconds=args.start_seconds,
-        end_seconds=args.end_seconds,
-        step_frames=args.step_frames,
-        search_radius=args.search_radius,
-        max_width=args.max_width,
-        max_samples=args.max_samples,
-        ticks_per_second=int(project["settings"]["timebase"]["ticks_per_second"]),
-    )
+    if visual_adapter:
+        report = track_command_json(
+            source,
+            args.roi,
+            adapter_id=str(visual_adapter["adapter_id"]),
+            model_path=str(visual_adapter["model_path"]),
+            executable=str(visual_adapter["executable"]),
+            model_sha256=str(visual_adapter.get("model_sha256") or ""),
+            executable_sha256=str(visual_adapter.get("executable_sha256") or ""),
+            start_seconds=args.start_seconds,
+            end_seconds=args.end_seconds,
+            step_frames=args.step_frames,
+            max_width=args.max_width,
+            max_samples=args.max_samples,
+            ticks_per_second=int(project["settings"]["timebase"]["ticks_per_second"]),
+        )
+    else:
+        report = track_media(
+            source,
+            args.roi,
+            start_seconds=args.start_seconds,
+            end_seconds=args.end_seconds,
+            step_frames=args.step_frames,
+            search_radius=args.search_radius,
+            max_width=args.max_width,
+            max_samples=args.max_samples,
+            ticks_per_second=int(project["settings"]["timebase"]["ticks_per_second"]),
+        )
     report["source_sha256"] = f"sha256:{sha256_file(source)}"
     report["asset_id"] = asset_id
     report["clip_id"] = args.clip_id
     report["sequence_id"] = sequence_id
+    report["adapter_id"] = args.adapter_id
     report_path = Path(args.output).expanduser().resolve() if args.output else root / "validation" / f"tracking_{new_id('run')}.json"
     try:
         report_path.relative_to(root)
@@ -1584,8 +1717,9 @@ def command_media_track(args: argparse.Namespace) -> dict[str, Any]:
     atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "project_id": project["project"]["id"], **report})
     if args.clip_id:
         save_project(root, project)
-    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.track", "status": "succeeded", "report": str(report_path), "asset_id": asset_id, "clip_id": args.clip_id, "applied_properties": applied_properties, "before_snapshot": before_snapshot, "created_at": now_iso()})
-    return _envelope("media.track", args, data={"report": str(report_path), "result": report, "applied_properties": applied_properties, "before_snapshot": before_snapshot}, warnings=[{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和关键帧"}], operation_id=operation_id)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "media.track", "status": "succeeded", "report": str(report_path), "asset_id": asset_id, "clip_id": args.clip_id, "engine": report.get("engine"), "adapter_id": args.adapter_id, "applied_properties": applied_properties, "before_snapshot": before_snapshot, "created_at": now_iso()})
+    warnings = ([{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需用质量报告检查遮挡、镜头切换和轨迹稳定性"}] if visual_adapter else [{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和关键帧"}])
+    return _envelope("media.track", args, data={"report": str(report_path), "result": report, "adapter": visual_adapter, "adapter_verification": adapter_verification, "applied_properties": applied_properties, "before_snapshot": before_snapshot}, warnings=warnings, operation_id=operation_id)
 
 
 def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
@@ -1619,6 +1753,7 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
         source = Path(raw_input).expanduser().resolve()
     if not source.exists() or not source.is_file():
         raise argument_error("跟踪绑定输入不存在", str(source))
+    visual_adapter, adapter_verification = _resolve_visual_tracking_adapter(root, args.adapter_id)
     sequence = find_sequence(project, args.sequence_id)
     target_track, target_clip = _find_clip(sequence, str(args.target_clip_id), args.target_track_id)
     if str(target_track.get("kind", "video")) == "audio":
@@ -1649,20 +1784,41 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
                 "scale_multiplier": args.scale_multiplier,
                 "offset": {"x": args.offset_x, "y": args.offset_y},
                 "apply": bool(args.apply),
+                "adapter_id": args.adapter_id,
+                "adapter": visual_adapter,
+                "adapter_verification": adapter_verification,
+                "engine": visual_adapter.get("engine") if visual_adapter else "local-template-matching",
                 "network": "disabled",
             },
         )
-    tracking = track_media(
-        source,
-        args.roi,
-        start_seconds=float(args.start_seconds),
-        end_seconds=args.end_seconds,
-        step_frames=args.step_frames,
-        search_radius=args.search_radius,
-        max_width=args.max_width,
-        max_samples=args.max_samples,
-        ticks_per_second=int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND)),
-    )
+    if visual_adapter:
+        tracking = track_command_json(
+            source,
+            args.roi,
+            adapter_id=str(visual_adapter["adapter_id"]),
+            model_path=str(visual_adapter["model_path"]),
+            executable=str(visual_adapter["executable"]),
+            model_sha256=str(visual_adapter.get("model_sha256") or ""),
+            executable_sha256=str(visual_adapter.get("executable_sha256") or ""),
+            start_seconds=float(args.start_seconds),
+            end_seconds=args.end_seconds,
+            step_frames=args.step_frames,
+            max_width=args.max_width,
+            max_samples=args.max_samples,
+            ticks_per_second=int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND)),
+        )
+    else:
+        tracking = track_media(
+            source,
+            args.roi,
+            start_seconds=float(args.start_seconds),
+            end_seconds=args.end_seconds,
+            step_frames=args.step_frames,
+            search_radius=args.search_radius,
+            max_width=args.max_width,
+            max_samples=args.max_samples,
+            ticks_per_second=int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND)),
+        )
     frames = [item for item in tracking.get("frames", []) if isinstance(item, dict)]
     if not frames:
         raise AppError("TRACK_BIND_EMPTY", "跟踪没有返回可绑定的帧", exit_code=6, path="frames")
@@ -1690,7 +1846,9 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
         raise AppError("TRACK_BIND_EMPTY", "跟踪帧没有可用的绑定关键帧", exit_code=6, path="frames")
     plan: dict[str, Any] = {
         "binding_version": "0.1.0",
-        "engine": "local-template-matching",
+        "engine": tracking.get("engine", "local-template-matching"),
+        "method": tracking.get("method", "template-matching"),
+        "adapter_id": args.adapter_id,
         "source": str(source),
         "source_sha256": f"sha256:{sha256_file(source)}",
         "asset_id": asset_id,
@@ -1707,13 +1865,14 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
             {"property": "transform.position.y", "keyframes": [{"at_tick": at, "value": value, "interpolation": interpolation} for at, value, interpolation in position_y]},
         ],
         "tracking": tracking,
-        "warnings": ["template_matching_can_drift_on_occlusion_or_large_scale_change", "tracking_clock_mapped_to_target_clip_duration"],
+        "warnings": (["external_local_runner_requires_quality_review", "tracking_clock_mapped_to_target_clip_duration"] if visual_adapter else ["template_matching_can_drift_on_occlusion_or_large_scale_change", "tracking_clock_mapped_to_target_clip_duration"]),
     }
     if args.scale_mode == "roi":
         plan["keyframes"].append({"property": "transform.scale", "keyframes": [{"at_tick": at, "value": value, "interpolation": interpolation} for at, value, interpolation in scale_values]})
     if not args.apply:
         atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "applied": False, "plan": plan})
-        return _envelope("media.track-bind", args, status="planned", data={"report": str(report_path), "plan": plan, "applied": False}, warnings=[{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配绑定可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和目标文字/贴纸边界"}])
+        warnings = ([{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查目标文字/贴纸边界和轨迹稳定性"}] if visual_adapter else [{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配绑定可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和目标文字/贴纸边界"}])
+        return _envelope("media.track-bind", args, status="planned", data={"report": str(report_path), "plan": plan, "adapter": visual_adapter, "adapter_verification": adapter_verification, "applied": False}, warnings=warnings)
     before_project = copy.deepcopy(project)
     before_snapshot = create_snapshot(root, before_project, label="before-track-bind")
     for item in plan["keyframes"]:
@@ -1728,7 +1887,8 @@ def command_media_track_bind(args: argparse.Namespace) -> dict[str, Any]:
     project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.track-bind", "asset_id": asset_id, "target_clip_id": target_clip.get("id"), "target_track_id": target_track.get("id"), "report": str(report_path), "before_snapshot_id": before_snapshot["snapshot_id"], "at": now_iso()})
     save_project(root, project)
     _operation(root, operation_id, {"operation_id": operation_id, "command": "media.track-bind", "status": "succeeded", "report": str(report_path), "asset_id": asset_id, "target_clip_id": target_clip.get("id"), "target_track_id": target_track.get("id"), "before_snapshot_id": before_snapshot["snapshot_id"], "created_at": now_iso()})
-    return _envelope("media.track-bind", args, data={"report": str(report_path), "plan": plan, "target_clip_id": target_clip.get("id"), "target_track_id": target_track.get("id"), "before_snapshot": before_snapshot, "validation": validation, "applied": True}, warnings=[{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配绑定可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和目标文字/贴纸边界"}], operation_id=operation_id)
+    warnings = ([{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查目标文字/贴纸边界和轨迹稳定性"}] if visual_adapter else [{"code": "TRACKING_APPROXIMATE", "message": "本地模板匹配绑定可能在遮挡、缩放或镜头切换时漂移；请检查 confidence 和目标文字/贴纸边界"}])
+    return _envelope("media.track-bind", args, data={"report": str(report_path), "plan": plan, "adapter": visual_adapter, "adapter_verification": adapter_verification, "target_clip_id": target_clip.get("id"), "target_track_id": target_track.get("id"), "before_snapshot": before_snapshot, "validation": validation, "applied": True}, warnings=warnings, operation_id=operation_id)
 
 
 def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
@@ -1758,6 +1918,7 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
         asset = None
     if not source.exists() or not source.is_file():
         raise argument_error("自动重构图输入不存在", str(source))
+    visual_adapter, adapter_verification = _resolve_visual_tracking_adapter(root, args.adapter_id)
     tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90_000))
     clip_source_in = int(clip.get("source_in_tick", 0))
     clip_source_out = int(clip.get("source_out_tick", clip_source_in + int(clip.get("duration_tick", 1))))
@@ -1778,18 +1939,35 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
     if target_width <= 0 or target_height <= 0:
         raise argument_error("目标画布尺寸必须大于 0", "target_width")
     if args.dry_run:
-        return _envelope("media.reframe", args, status="planned", data={"input": str(source), "asset_id": asset_id, "clip_id": args.clip_id, "track_id": args.track_id, "sequence_id": sequence.get("id"), "target_width": target_width, "target_height": target_height, "target_aspect": target_aspect, "margin": args.margin, "fit": args.fit, "start_seconds": start_seconds, "end_seconds": end_seconds})
-    tracking = track_media(
-        source,
-        args.roi,
-        start_seconds=start_seconds,
-        end_seconds=end_seconds,
-        step_frames=args.step_frames,
-        search_radius=args.search_radius,
-        max_width=args.max_width,
-        max_samples=args.max_samples,
-        ticks_per_second=tps,
-    )
+        return _envelope("media.reframe", args, status="planned", data={"input": str(source), "asset_id": asset_id, "clip_id": args.clip_id, "track_id": args.track_id, "sequence_id": sequence.get("id"), "target_width": target_width, "target_height": target_height, "target_aspect": target_aspect, "margin": args.margin, "fit": args.fit, "start_seconds": start_seconds, "end_seconds": end_seconds, "adapter_id": args.adapter_id, "adapter": visual_adapter, "adapter_verification": adapter_verification, "engine": visual_adapter.get("engine") if visual_adapter else "local-template-matching"})
+    if visual_adapter:
+        tracking = track_command_json(
+            source,
+            args.roi,
+            adapter_id=str(visual_adapter["adapter_id"]),
+            model_path=str(visual_adapter["model_path"]),
+            executable=str(visual_adapter["executable"]),
+            model_sha256=str(visual_adapter.get("model_sha256") or ""),
+            executable_sha256=str(visual_adapter.get("executable_sha256") or ""),
+            start_seconds=start_seconds,
+            end_seconds=end_seconds,
+            step_frames=args.step_frames,
+            max_width=args.max_width,
+            max_samples=args.max_samples,
+            ticks_per_second=tps,
+        )
+    else:
+        tracking = track_media(
+            source,
+            args.roi,
+            start_seconds=start_seconds,
+            end_seconds=end_seconds,
+            step_frames=args.step_frames,
+            search_radius=args.search_radius,
+            max_width=args.max_width,
+            max_samples=args.max_samples,
+            ticks_per_second=tps,
+        )
     plan = build_reframe_plan(
         tracking.get("frames", []),
         source_aspect=source_width / source_height,
@@ -1797,12 +1975,13 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
         margin=args.margin,
         fit=args.fit,
     )
-    plan.update({"project_id": project.get("project", {}).get("id"), "sequence_id": sequence.get("id"), "asset_id": asset_id, "clip_id": args.clip_id, "track_id": args.track_id, "source": str(source), "source_sha256": f"sha256:{sha256_file(source)}", "source_range": {"start_seconds": start_seconds, "end_seconds": end_seconds}, "tracking": tracking})
+    plan.update({"project_id": project.get("project", {}).get("id"), "sequence_id": sequence.get("id"), "asset_id": asset_id, "clip_id": args.clip_id, "track_id": args.track_id, "source": str(source), "source_sha256": f"sha256:{sha256_file(source)}", "source_range": {"start_seconds": start_seconds, "end_seconds": end_seconds}, "adapter_id": args.adapter_id, "tracking": tracking})
     report_path = Path(args.output).expanduser().resolve() if args.output else root / "validation" / f"reframe_{safe_filename(str(args.clip_id))}.json"
     ensure_inside(root, report_path)
     if not args.apply:
         atomic_write_json(report_path, {"report_version": "0.1.0", "created_at": now_iso(), "applied": False, "plan": plan})
-        return _envelope("media.reframe", args, status="planned", data={"report": str(report_path), "plan": plan, "applied": False}, warnings=[{"code": "REFRAME_APPROXIMATE", "message": "自动重构图使用本地模板跟踪；请检查 confidence 和裁切范围"}],)
+        warnings = ([{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查主体边界和动态裁切稳定性"}] if visual_adapter else [{"code": "REFRAME_APPROXIMATE", "message": "自动重构图使用本地模板跟踪；请检查 confidence 和裁切范围"}])
+        return _envelope("media.reframe", args, status="planned", data={"report": str(report_path), "plan": plan, "adapter": visual_adapter, "adapter_verification": adapter_verification, "applied": False}, warnings=warnings)
     before_project = copy.deepcopy(project)
     before_snapshot = create_snapshot(root, before_project, label="before-reframe")
     clip["crop"] = copy.deepcopy(plan["crop"])
@@ -1819,7 +1998,8 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
     project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.reframe", "clip_id": args.clip_id, "track_id": args.track_id, "report": str(report_path), "before_snapshot_id": before_snapshot["snapshot_id"], "at": now_iso()})
     save_project(root, project)
     _operation(root, operation_id, {"operation_id": operation_id, "command": "media.reframe", "status": "succeeded", "clip_id": args.clip_id, "track_id": args.track_id, "report": str(report_path), "before_snapshot_id": before_snapshot["snapshot_id"], "created_at": now_iso()})
-    return _envelope("media.reframe", args, data={"report": str(report_path), "plan": plan, "before_snapshot": before_snapshot, "validation": validation}, warnings=[{"code": "REFRAME_APPROXIMATE", "message": "自动重构图使用本地模板跟踪；请检查 confidence、主体边界和裁切警告"}], operation_id=operation_id)
+    warnings = ([{"code": "TRACKING_EXTERNAL_REVIEW", "message": "本地视觉 runner 输出已通过协议校验，但仍需检查主体边界和动态裁切稳定性"}] if visual_adapter else [{"code": "REFRAME_APPROXIMATE", "message": "自动重构图使用本地模板跟踪；请检查 confidence、主体边界和裁切警告"}])
+    return _envelope("media.reframe", args, data={"report": str(report_path), "plan": plan, "adapter": visual_adapter, "adapter_verification": adapter_verification, "before_snapshot": before_snapshot, "validation": validation}, warnings=warnings, operation_id=operation_id)
 
 
 def _transcribe_with_local_engine(
@@ -4435,7 +4615,7 @@ def _project_operation_lock(args: argparse.Namespace):
     """Return the operation-wide lock for a mutating project command."""
     project = getattr(args, "project", None)
     key = (getattr(args, "domain", None), getattr(args, "action", None))
-    adapter_read_only = key == ("audio", "adapter") and getattr(args, "adapter_action", None) in {"list", "inspect"}
+    adapter_read_only = key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}
     if not project or getattr(args, "dry_run", False) or key in _READ_ONLY_PROJECT_COMMANDS or adapter_read_only or key == ("queue", "cancel"):
         return contextlib.nullcontext()
     return project_write_lock(project)
@@ -4451,6 +4631,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "ingest"): command_media_ingest,
     ("media", "stabilize"): command_media_stabilize,
     ("media", "relink"): command_media_relink,
+    ("media", "adapter"): command_media_adapter,
     ("media", "track"): command_media_track,
     ("media", "track-bind"): command_media_track_bind,
     ("media", "reframe"): command_media_reframe,

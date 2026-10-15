@@ -18,6 +18,7 @@ from .utils import atomic_write_json, assert_id, load_json, now_iso, sha256_byte
 
 MODEL_REGISTRY_VERSION = "0.1.0"
 MODEL_REGISTRY_RELATIVE = Path("models") / "audio-adapters.json"
+VISUAL_MODEL_REGISTRY_RELATIVE = Path("models") / "visual-adapters.json"
 VALID_AUDIO_ADAPTER_ENGINES = {
     "ffmpeg-local-mid-side-v1",
     "command-json-v1",
@@ -26,10 +27,17 @@ VALID_AUDIO_ADAPTER_ENGINES = {
     "open-unmix-local-v1",
     "uvr-local-v1",
 }
+VALID_VISUAL_ADAPTER_ENGINES = {
+    "command-json-tracking-v1",
+}
 
 
 def registry_path(root: Path) -> Path:
     return root / MODEL_REGISTRY_RELATIVE
+
+
+def visual_registry_path(root: Path) -> Path:
+    return root / VISUAL_MODEL_REGISTRY_RELATIVE
 
 
 def _hash_path(path: Path) -> tuple[str, str, int]:
@@ -186,6 +194,141 @@ def verify_audio_adapter(adapter: dict[str, Any]) -> dict[str, Any]:
                     findings.append({"code": "MODEL_HASH_MISMATCH", "path": str(path), "expected": adapter.get("model_sha256"), "actual": actual})
     executable = adapter.get("executable")
     if executable:
+        path = Path(str(executable))
+        if not path.exists() or not path.is_file():
+            findings.append({"code": "MODEL_EXECUTABLE_MISSING", "path": str(path)})
+        else:
+            actual = f"sha256:{sha256_file(path)}"
+            if actual != adapter.get("executable_sha256"):
+                findings.append({"code": "MODEL_EXECUTABLE_HASH_MISMATCH", "path": str(path), "expected": adapter.get("executable_sha256"), "actual": actual})
+    return {"adapter_id": adapter.get("adapter_id"), "engine": adapter.get("engine"), "network": adapter.get("network"), "ok": not findings, "findings": findings}
+
+
+def load_visual_model_registry(root: Path) -> dict[str, Any]:
+    path = visual_registry_path(root)
+    if not path.exists():
+        return {"schema_version": MODEL_REGISTRY_VERSION, "updated_at": now_iso(), "adapters": []}
+    value = load_json(path)
+    if not isinstance(value, dict):
+        raise AppError("VISUAL_MODEL_REGISTRY_INVALID", "本地视觉适配器 registry 必须是对象", exit_code=2, path=str(path))
+    value.setdefault("schema_version", MODEL_REGISTRY_VERSION)
+    value.setdefault("adapters", [])
+    if not isinstance(value["adapters"], list):
+        raise AppError("VISUAL_MODEL_REGISTRY_INVALID", "本地视觉适配器 registry 的 adapters 必须是数组", exit_code=2, path=str(path))
+    return value
+
+
+def save_visual_model_registry(root: Path, registry: dict[str, Any]) -> None:
+    registry["schema_version"] = MODEL_REGISTRY_VERSION
+    registry["updated_at"] = now_iso()
+    atomic_write_json(visual_registry_path(root), registry)
+
+
+def visual_adapter_for(registry: dict[str, Any], adapter_id: str) -> dict[str, Any] | None:
+    for item in registry.get("adapters", []):
+        if isinstance(item, dict) and str(item.get("adapter_id")) == str(adapter_id):
+            return item
+    return None
+
+
+def prepare_visual_adapter(
+    *,
+    adapter_id: str,
+    engine: str,
+    model_path: str | Path | None,
+    executable: str | Path | None,
+    creator: str,
+    license_spdx: str,
+    license_url: str,
+    permitted_uses: list[str],
+    verification_status: str,
+    evidence: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Validate and register an explicitly supplied offline visual runner."""
+    assert_id(str(adapter_id), "adapter_id")
+    engine = str(engine or "").strip()
+    if engine not in VALID_VISUAL_ADAPTER_ENGINES:
+        raise argument_error(f"不支持的本地视觉适配器 engine: {engine}", "engine")
+    if verification_status not in {"unverified", "verified", "restricted"}:
+        raise argument_error("verification_status 不在允许范围内", "verification_status")
+    if not model_path:
+        raise argument_error("视觉模型适配器必须提供 --model-path", "model_path")
+    if not executable:
+        raise argument_error("视觉模型适配器必须提供 --executable", "executable")
+    model_text = require_local_reference(model_path, field="--model-path")
+    model = Path(model_text).expanduser().resolve()
+    model_hash, model_kind, model_file_count = _hash_path(model)
+    runner_text = require_local_reference(executable, field="--executable")
+    runner = Path(runner_text).expanduser().resolve()
+    if not runner.exists() or not runner.is_file():
+        raise AppError("MODEL_EXECUTABLE_MISSING", f"本地视觉适配器 executable 不存在: {runner}", exit_code=10, path=str(runner))
+    if runner.suffix.lower() in {".cmd", ".bat", ".ps1", ".psm1", ".vbs", ".wsf", ".sh", ".bash", ".zsh"}:
+        raise AppError("MODEL_EXECUTABLE_UNSAFE", "本地视觉 command-json runner 不允许 shell/script wrapper", exit_code=10, path=str(runner))
+    runner_hash = f"sha256:{sha256_file(runner)}"
+    stamp = now_iso()
+    registry_record = {
+        "adapter_id": str(adapter_id),
+        "kind": "object-tracking",
+        "engine": engine,
+        "model_path": str(model),
+        "model_sha256": model_hash,
+        "model_kind": model_kind,
+        "model_file_count": model_file_count,
+        "executable": str(runner),
+        "executable_sha256": runner_hash,
+        "output_contract": "tracking_frames_v1",
+        "protocol": "agent-video-object-tracking-v1",
+        "network": "disabled",
+        "registered_at": stamp,
+        "verification_status": verification_status,
+    }
+    rights_id = f"adapter:{adapter_id}"
+    rights_record = {
+        "asset_id": rights_id,
+        "kind": "model-adapter",
+        "sha256": model_hash,
+        "source_url": f"local://adapter/{adapter_id}",
+        "source_version": engine,
+        "retrieved_at": stamp,
+        "creator": creator,
+        "license_spdx": license_spdx,
+        "license_url": license_url,
+        "attribution": "",
+        "permitted_uses": list(dict.fromkeys(permitted_uses)),
+        "permitted_channels": [],
+        "restrictions": [],
+        "derived_from": [],
+        "evidence": evidence,
+        "verification_status": verification_status,
+        "verified_by": "ai-ad-editor" if verification_status == "verified" else "",
+        "takedown_status": "clear",
+        "notes": "Explicitly registered local object-tracking adapter; network disabled",
+    }
+    return registry_record, rights_record
+
+
+def verify_visual_adapter(adapter: dict[str, Any]) -> dict[str, Any]:
+    """Verify registered visual model and runner paths without executing them."""
+    findings: list[dict[str, Any]] = []
+    model_path = adapter.get("model_path")
+    if not model_path:
+        findings.append({"code": "MODEL_PATH_MISSING"})
+    else:
+        path = Path(str(model_path))
+        if not path.exists():
+            findings.append({"code": "MODEL_PATH_MISSING", "path": str(path)})
+        else:
+            try:
+                actual, _, _ = _hash_path(path)
+            except AppError as exc:
+                findings.append({"code": exc.code, "path": str(path), "message": exc.message})
+            else:
+                if actual != adapter.get("model_sha256"):
+                    findings.append({"code": "MODEL_HASH_MISMATCH", "path": str(path), "expected": adapter.get("model_sha256"), "actual": actual})
+    executable = adapter.get("executable")
+    if not executable:
+        findings.append({"code": "MODEL_EXECUTABLE_MISSING"})
+    else:
         path = Path(str(executable))
         if not path.exists() or not path.is_file():
             findings.append({"code": "MODEL_EXECUTABLE_MISSING", "path": str(path)})

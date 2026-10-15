@@ -2749,6 +2749,61 @@ print(json.dumps({
             self.assertTrue(any(item.get("property") == "transform.position.x" for item in clip.get("keyframes", [])))
             self.assertEqual(invoke("validate", "--project", str(project))[0], 0)
 
+    def test_command_json_visual_tracking_adapter_runs_local_protocol(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-command-json-tracking-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            model = workspace / "tracking-model.bin"
+            model.write_bytes(b"local tracking model fixture v1")
+            runner = workspace / "tracking-runner.py"
+            runner.write_text(
+                """import json
+import sys
+
+request = json.loads(sys.stdin.read())
+assert request[\"protocol\"] == \"agent-video-object-tracking-v1\"
+assert request[\"network\"] == \"disabled\"
+print(json.dumps({
+    \"protocol\": \"agent-video-object-tracking-v1\",
+    \"status\": \"ok\",
+    \"engine\": \"fixture-local-tracker\",
+    \"frames\": [
+        {\"at_seconds\": 0.0, \"x\": 0.25, \"y\": 0.5, \"width\": 0.2, \"height\": 0.3, \"confidence\": 0.97},
+        {\"at_seconds\": 0.5, \"x\": 0.42, \"y\": 0.5, \"width\": 0.2, \"height\": 0.3, \"confidence\": 0.91}
+    ],
+    \"metadata\": {\"fixture\": True}
+}))
+""",
+                encoding="utf-8",
+            )
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingest = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            asset_id = ingest["data"]["asset"]["id"]
+            code, registered = invoke(
+                "media", "adapter", "register", "--project", str(project), "--adapter-id", "fixture_tracker",
+                "--engine", "command-json-tracking-v1", "--model-path", str(model), "--executable", str(runner),
+                "--license-spdx", "CC0-1.0", "--verification-status", "verified", "--evidence", "local://fixture-tracker",
+            )
+            self.assertEqual(code, 0, registered)
+            self.assertEqual(registered["data"]["adapter"]["output_contract"], "tracking_frames_v1")
+            code, listed = invoke("media", "adapter", "list", "--project", str(project))
+            self.assertEqual(code, 0, listed)
+            self.assertTrue(listed["data"]["adapters"][0]["verification"]["ok"])
+            report_path = project / "validation" / "command-json-tracking.json"
+            code, tracked = invoke(
+                "media", "track", "--project", str(project), "--asset-id", asset_id,
+                "--adapter-id", "fixture_tracker", "--roi", "0.1,0.3,0.2,0.3", "--end-seconds", "0.8",
+                "--output", str(report_path),
+            )
+            self.assertEqual(code, 0, tracked)
+            self.assertEqual(tracked["data"]["result"]["engine"], "command-json-tracking-v1")
+            self.assertEqual(tracked["data"]["result"]["protocol"], "agent-video-object-tracking-v1")
+            self.assertEqual(tracked["data"]["result"]["runner"]["metadata"]["fixture"], True)
+            self.assertEqual(tracked["warnings"][0]["code"], "TRACKING_EXTERNAL_REVIEW")
+            self.assertEqual(len(tracked["data"]["result"]["keyframes"]), 2)
+            self.assertTrue(report_path.exists())
+
     def test_local_tracking_binds_to_independent_text_clip(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-track-bind-") as raw:
             workspace = Path(raw)

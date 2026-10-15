@@ -72,11 +72,12 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `audio extract --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频、可选 WAV 参数和目标 audio 轨道 | 用本地 FFmpeg 提取第一条音频流为项目内 PCM WAV 派生资产；正式执行创建 `before-audio-extract` 快照、继承/登记 Rights Ledger，并可用 `--apply --track-id` 写入音频轨道；dry-run 不写入；不宣称人声/背景声 AI 分离 |
 | `audio separate --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频、center/side 两个输出资产、可选采样率和目标 audio 轨道/stem | 用本地 FFmpeg `pan` 做 mid/side 声道相位近似，生成 center mono 与 side stereo WAV；正式执行创建 `before-audio-separate` 快照、两个派生 Rights Ledger 记录并可用 `--apply --track-id --stem` 写入一个 stem；dry-run 不写入；不宣称模型级源分离 |
 | audio adapter register/list/inspect --project PATH | 已存在的本地模型文件/目录、可选执行器、许可证和证据 | 登记或检查 models/audio-adapters.json；保存确定性模型/执行器哈希、Rights Ledger model-adapter 记录、network=disabled 和 before-audio-adapter-register 快照；未知 runner 只登记 metadata，audio separate --adapter-id 会结构化拒绝，不静默 fallback |
+| media adapter register/list/inspect --project PATH | 已存在的本地视觉模型文件/目录、argv-only 执行器、许可证和证据 | 登记或检查 models/visual-adapters.json；保存确定性模型/执行器哈希、Rights Ledger model-adapter 记录、network=disabled 和 before-media-adapter-register 快照；当前只有 command-json-tracking-v1 runner，未知 engine 不执行 |
 | `media smart-cut --project PATH --track-id ID --clip-id ID` | 直接媒体片段、FFmpeg 静音检测参数、可选项目内字幕和显式 `--remove-phrase`、联动轨道 | 合并本地 `silencedetect` 与字幕 cue 粒度的短语删除区间生成计划；`--apply` 在 `before-smart-cut` 快照后切片视频/音频片段、关键帧和时间线；默认不写回；短语匹配不宣称语义理解 |
 | `media relink --project PATH --search-root DIR` | 丢失资产和本地搜索目录 | 优先内容哈希精确重链接；`--match-by-name` 仅允许唯一文件名近似匹配并生成报告 |
-| `media track --project PATH ... --roi X,Y,W,H` | 本地视频、归一化 ROI | 本地模板匹配、置信度和位置关键帧；`--clip-id` 写回前创建快照 |
-| `media track-bind --project PATH (--asset-id ID\|--input PATH) --roi X,Y,W,H --target-clip-id ID --target-track-id ID` | 本地跟踪源、归一化 ROI、独立视觉目标片段 | 将本地位置关键帧映射到独立文字/贴纸/效果片段，可选 ROI 相对缩放；`--apply` 在 `before-track-bind` 快照后写回，音频和嵌套序列目标结构化拒绝 |
-| `media reframe --project PATH --asset-id ID --roi X,Y,W,H --clip-id ID --track-id ID` | 本地视频、目标画幅和直接媒体片段 | 将本地跟踪转换为归一化 `crop.*` 动态关键帧；`--apply` 在 `before-reframe` 快照后写回，变速/倒放/嵌套片段结构化拒绝 |
+| `media track --project PATH ... --roi X,Y,W,H [--adapter-id ID]` | 本地视频、归一化 ROI、可选已登记视觉适配器 | 默认本地模板匹配；提供 `--adapter-id` 时执行已登记 `command-json-tracking-v1`，校验协议/范围/框/confidence 后输出位置关键帧；`--clip-id` 写回前创建快照 |
+| `media track-bind --project PATH (--asset-id ID\|--input PATH) --roi X,Y,W,H --target-clip-id ID --target-track-id ID [--adapter-id ID]` | 本地跟踪源、归一化 ROI、独立视觉目标片段、可选视觉适配器 | 将模板或本地 runner 位置关键帧映射到独立文字/贴纸/效果片段，可选 ROI 相对缩放；`--apply` 在 `before-track-bind` 快照后写回，音频和嵌套序列目标结构化拒绝 |
+| `media reframe --project PATH --asset-id ID --roi X,Y,W,H --clip-id ID --track-id ID [--adapter-id ID]` | 本地视频、目标画幅和直接媒体片段、可选视觉适配器 | 将模板或本地 runner 跟踪转换为归一化 `crop.*` 动态关键帧；`--apply` 在 `before-reframe` 快照后写回，变速/倒放/嵌套片段结构化拒绝 |
 | `ad plan --project PATH --input BRIEF.json` | 本地广告 brief 和可选分析报告 | 写入钩子、卖点、证明、CTA 的节拍计划和序列标记 |
 | `subtitle validate --input FILE` | SRT/VTT/ASS/SSA/TTML | 解析、时长、顺序和重叠报告；TTML 只接受本地时钟/offset 语法并拒绝外部实体 |
 | `subtitle normalize --input FILE --output FILE` | 字幕文件 | 通过校验后规范化为 SRT；项目模式下输出必须位于项目内 |
@@ -124,6 +125,8 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 ## 3.1 本地模型适配器登记与执行门禁
 
 audio adapter register 只接受已存在的本地模型/执行器路径；它不会下载、复制或在登记阶段执行模型。目录按相对路径、大小和文件 SHA-256 形成稳定哈希，正式登记写入 models/audio-adapters.json、Rights Ledger 和 before-audio-adapter-register 快照。audio adapter list/inspect 只读检查路径与哈希。ffmpeg-local-mid-side-v1 与 `command-json-v1` 是当前可执行 runner；后者通过 `agent-video-audio-separation-v1` 的 stdin/stdout JSON 协议生成约定的 center/side WAV，并拒绝 `.cmd/.bat` shell wrapper。Demucs、UVR、Open-Unmix 和 ONNX 专用 engine 仍只能登记，尚无对应 runner 时 audio separate --adapter-id 返回 AUDIO_SEPARATION_ADAPTER_UNAVAILABLE（退出码 10），禁止隐式回退或网络调用。command-json runner 的输出仍需质量 golden 和 Rights Ledger 复核。详细字段见本地模型适配器注册与音频分离门禁契约。
+
+media adapter register 使用同样的本地路径、许可证、哈希和 Rights Ledger 规则，但写入 `models/visual-adapters.json`。当前 `command-json-tracking-v1` 通过 `agent-video-object-tracking-v1` 的单个 stdin/stdout JSON 请求返回归一化框和 confidence；CLI 拒绝 shell wrapper、协议不匹配、超时、过大 stdout、越界/非单调帧和哈希变化，并在 `media track`、`track-bind`、`reframe` 中保留 `TRACKING_EXTERNAL_REVIEW`。模型质量、遮挡恢复、旋转框、多目标和视觉 golden 不由 registry 自动证明。详细字段见[本地视觉模型适配器与对象跟踪协议契约](./本地视觉模型适配器与对象跟踪协议契约_v0.1_2026-10-15.md)。
 
 ## 4. 项目迁移、快照和路径规则
 
