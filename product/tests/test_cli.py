@@ -1443,6 +1443,8 @@ print(json.dumps({
         self.assertIn("crossfade", manifest["capabilities"]["transitions"]["features"])
         self.assertIn("safe_resume", manifest["capabilities"]["render"]["features"])
         self.assertIn("sequential_run", manifest["capabilities"]["queue"]["features"])
+        self.assertIn("bounded_local_workers", manifest["capabilities"]["queue"]["features"])
+        self.assertIn("serial_metadata_commit", manifest["capabilities"]["queue"]["features"])
         self.assertIn("cancel_ack_while_project_lock_held", manifest["capabilities"]["queue"]["features"])
         self.assertIn("snapshot", manifest["capabilities"]["project"]["features"])
         self.assertIn("native_process_write_lock", manifest["capabilities"]["project"]["features"])
