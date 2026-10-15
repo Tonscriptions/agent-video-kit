@@ -48,6 +48,8 @@ from .lut_library import inspect_lut, list_luts, prepare_lut_registration, regis
 from .batch import _load_variants, run_template_batch
 from .capabilities import build_capability_manifest
 from .transcribe import ffmpeg_whisper_available, transcribe_local, transcribe_local_ffmpeg_whisper, write_srt
+from .local_asr import ASR_ENGINE, asr_registry, registry_item as asr_registry_item, prepare_adapter as prepare_asr_adapter, verify_adapter as verify_asr_adapter, transcribe_registered
+from .asr_quality import evaluate_transcripts
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
 from .rights import VALID_STATUSES, active_records, add_record, apply_disposition_to_project, check_project_rights, create_disposition_decision, disposition_decisions, effective_disposition_decisions, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
 from .understand import detect_beats, understand_media
@@ -74,7 +76,7 @@ from .local_tts import (
 from .effects import EFFECT_CATALOG_VERSION, get_effect, list_effects
 from .motion_presets import MOTION_PRESET_CATALOG_VERSION, canonical_motion_preset, get_motion_preset, list_motion_presets
 from .scopes import SCOPE_VERSION, generate_scopes
-from .policy import audit_local_tree, policy_error_from_findings, require_local_reference
+from .policy import audit_local_tree, policy_error_from_findings, require_local_reference, resolve_local_path
 from .render_queue import JOB_STATUSES, cancel_path, enqueue as enqueue_render_jobs, find_job, load_queue, normalize_job, queue_path, save_queue, set_status
 from .smart_cut import SMART_CUT_VERSION, build_smart_cut_plan, match_transcript_phrases, replace_clip_with_smart_cut
 from .beat_edit import BEAT_CUT_VERSION, build_beat_cut_plan
@@ -185,7 +187,9 @@ def build_parser() -> argparse.ArgumentParser:
     understand.add_argument("--beats", action="store_true", help="估计本地音频节拍锚点")
     understand.add_argument("--transcribe", action="store_true", help="使用已存在的本地 ASR 模型")
     understand.add_argument("--transcribe-engine", choices=("transformers", "ffmpeg-whisper"), default="transformers", help="本地 ASR 引擎；ffmpeg-whisper 使用 FFmpeg 内置 whisper.cpp 滤镜")
-    understand.add_argument("--model-path", default=None, help="离线 ASR 模型目录或 ffmpeg-whisper 模型文件；不会自动下载")
+    understand_model = understand.add_mutually_exclusive_group()
+    understand_model.add_argument("--model-path", default=None, help="离线 ASR 模型目录或 ffmpeg-whisper 模型文件；不会自动下载")
+    understand_model.add_argument("--adapter-id", default=None, help="已登记并核验完整性的本地 Whisper 模型")
     understand.add_argument("--language", default=None)
     understand.add_argument("--use-gpu", action="store_true", help="ffmpeg-whisper 允许使用本地 GPU；默认 CPU")
     understand.add_argument("--srt", default=None, help="可选项目内 SRT 输出路径")
@@ -443,7 +447,9 @@ def build_parser() -> argparse.ArgumentParser:
     subtitle_source = subtitle_transcribe.add_mutually_exclusive_group(required=True)
     subtitle_source.add_argument("--asset-id", default=None, help="项目内本地音频/视频资产；应用时用于继承权利")
     subtitle_source.add_argument("--input", default=None, help="本地音频/视频路径")
-    subtitle_transcribe.add_argument("--model-path", required=True, help="本地 Transformers 模型目录或 whisper.cpp 模型文件")
+    subtitle_model = subtitle_transcribe.add_mutually_exclusive_group(required=True)
+    subtitle_model.add_argument("--model-path", default=None, help="本地 Transformers 模型目录或 whisper.cpp 模型文件")
+    subtitle_model.add_argument("--adapter-id", default=None, help="已登记的本地 Whisper 模型")
     subtitle_transcribe.add_argument("--transcribe-engine", choices=("transformers", "ffmpeg-whisper"), default="transformers")
     subtitle_transcribe.add_argument("--language", default=None)
     subtitle_transcribe.add_argument("--use-gpu", action="store_true", help="ffmpeg-whisper 允许使用本地 GPU；默认 CPU")
@@ -454,6 +460,34 @@ def build_parser() -> argparse.ArgumentParser:
     subtitle_transcribe.add_argument("--apply", action="store_true", help="写入字幕轨道并登记生成的字幕资产")
     subtitle_transcribe.add_argument("--replace-track", action="store_true", help="应用前清空目标字幕轨道")
     subtitle_transcribe.add_argument("--font-asset-id", default=None, help="可选本地字体资产 ID，写入字幕样式")
+
+    subtitle_evaluate = _leaf_common(ss.add_parser("evaluate", help="比较本地逐字稿或字幕，生成字符错误率 CER 报告"))
+    subtitle_evaluate.add_argument("--project", default=None)
+    subtitle_evaluate.add_argument("--input", required=True)
+    subtitle_evaluate.add_argument("--reference", required=True)
+    subtitle_evaluate.add_argument("--normalization", choices=("raw", "nfkc-text"), default="nfkc-text")
+    subtitle_evaluate.add_argument("--max-cer", type=float, default=None)
+    subtitle_evaluate.add_argument("--report", default=None)
+
+    asr = subs.add_parser("asr", help="登记与核验显式本地 Whisper 模型")
+    asr_sub = asr.add_subparsers(dest="action", required=True)
+    asr_adapter = asr_sub.add_parser("adapter")
+    asr_actions = asr_adapter.add_subparsers(dest="registration_action", required=True)
+    for action in ("register", "list", "inspect"):
+        leaf = _leaf_common(asr_actions.add_parser(action))
+        leaf.add_argument("--project", required=True)
+        if action != "list":
+            leaf.add_argument("--adapter-id", required=True)
+        if action == "register":
+            leaf.add_argument("--python-executable", required=True)
+            leaf.add_argument("--model-path", required=True)
+            leaf.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
+            leaf.add_argument("--threads", type=int, default=4)
+            leaf.add_argument("--evidence", required=True)
+            leaf.add_argument("--license-spdx", default="LicenseRef-UNVERIFIED")
+            leaf.add_argument("--creator", default="unknown")
+            leaf.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
+            leaf.add_argument("--permitted-use", action="append", default=None)
 
     tts = subs.add_parser("tts", help="本地离线文本转语音")
     tts_sub = tts.add_subparsers(dest="action", required=True)
@@ -2149,6 +2183,75 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("media.reframe", args, data={"report": str(report_path), "plan": plan, "adapter": visual_adapter, "adapter_verification": adapter_verification, "before_snapshot": before_snapshot, "validation": validation}, warnings=warnings, operation_id=operation_id)
 
 
+def command_asr_adapter(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    command = f"asr.adapter.{args.registration_action}"
+    if args.registration_action in {"list", "inspect"}:
+        values = asr_registry(project).get("adapters", []) if args.registration_action == "list" else [asr_registry_item(project, args.adapter_id)]
+        checked = [{"adapter": item, "verification": verify_asr_adapter(item)} for item in values]
+        data: dict[str, Any] = {"adapters": checked, "network": "disabled"}
+        if args.registration_action == "inspect":
+            data.update(checked[0])
+        return _envelope(command, args, data=data)
+    if any(item.get("adapter_id") == args.adapter_id for item in asr_registry(project).get("adapters", [])):
+        raise AppError("ASR_REGISTRATION_EXISTS", "ASR 模型登记已存在，请使用新的 ID", exit_code=2)
+    record, rights = prepare_asr_adapter(root, adapter_id=args.adapter_id, python_executable=args.python_executable, model_path=args.model_path, device=args.device, threads=args.threads, evidence=args.evidence, license_spdx=args.license_spdx, creator=args.creator, status=args.verification_status, uses=args.permitted_use or ["internal"])
+    if args.dry_run:
+        return _envelope(command, args, status="planned", data={"adapter": record, "rights": rights, "network": "disabled"})
+    snapshot = create_snapshot(root, project, label="before-asr-adapter-register")
+    registry = project.setdefault("extensions", {}).setdefault("local_asr", {"schema_version": "0.1.0", "adapters": []})
+    registry["adapters"].append(record)
+    registry["updated_at"] = now_iso()
+    ledger, operation_id = load_ledger(root), new_id("op")
+    add_record(ledger, rights)
+    change = {"operation_id": operation_id, "command": command, "adapter_id": args.adapter_id, "sha256": record["sha256"], "snapshot_id": snapshot["snapshot_id"], "at": now_iso()}
+    project.setdefault("provenance", {}).setdefault("change_log", []).append(change)
+    save_project(root, project)
+    save_ledger(root, ledger)
+    _operation(root, operation_id, {**change, "status": "succeeded"})
+    return _envelope(command, args, data={"adapter": record, "rights": rights, "snapshot": snapshot, "network": "disabled"}, operation_id=operation_id)
+
+
+def _selected_asr_adapter(root: Path, project: dict[str, Any], args: argparse.Namespace) -> dict[str, Any] | None:
+    if not args.adapter_id:
+        return None
+    if args.transcribe_engine != "transformers" or args.use_gpu:
+        raise argument_error("登记模型的引擎与设备由登记项确定，不能混用 --transcribe-engine ffmpeg-whisper 或 --use-gpu", "adapter_id")
+    adapter = asr_registry_item(project, args.adapter_id)
+    verification = verify_asr_adapter(adapter)
+    if not verification["ok"]:
+        raise AppError("ASR_INTEGRITY_FAILED", "ASR 模型完整性核验失败", exit_code=10, cause=json.dumps(verification, ensure_ascii=False))
+    record = next((item for item in active_records(load_ledger(root)) if item.get("asset_id") == adapter["rights_ref"]), None)
+    if not record or record.get("sha256") != adapter["sha256"]:
+        raise AppError("RIGHTS_RECORD_MISSING", "ASR 模型缺少匹配的权利记录", exit_code=7)
+    return adapter
+
+
+def command_subtitle_evaluate(args: argparse.Namespace) -> dict[str, Any]:
+    root = load_project(args.project)[0] if args.project else Path.cwd().resolve()
+    source = resolve_local_path(root, args.input, field="input")
+    reference = resolve_local_path(root, args.reference, field="reference")
+    if not source.is_file() or not reference.is_file():
+        raise argument_error("转写和参考逐字稿必须为现有本地文件", "input/reference")
+    if args.max_cer is not None and (not math.isfinite(args.max_cer) or args.max_cer < 0):
+        raise argument_error("max-cer 必须为非负有限数", "max_cer")
+    output = resolve_local_path(root, args.report, field="report") if args.report else (root / "validation" / f"asr_evaluation_{new_id('cer')}.json" if args.project else None)
+    if output:
+        if args.project:
+            ensure_inside(root, output)
+        if output.exists():
+            raise argument_error("CER 报告已存在，请使用新路径", "report")
+    if args.dry_run:
+        return _envelope("subtitle.evaluate", args, status="planned", data={"input": str(source), "reference": str(reference), "report": str(output) if output else None})
+    report = evaluate_transcripts(reference, source, normalization=args.normalization)
+    report.update({"created_at": now_iso(), "max_cer": args.max_cer, "ok": args.max_cer is None or report["cer"] <= args.max_cer, "network": "disabled"})
+    if output:
+        atomic_write_json(output, report)
+    if not report["ok"]:
+        raise AppError("ASR_CER_THRESHOLD_EXCEEDED", "字符错误率超过指定门禁", exit_code=6, path=str(output) if output else None, cause=json.dumps({"cer": report["cer"], "max_cer": args.max_cer, "report": str(output) if output else None}, ensure_ascii=False))
+    return _envelope("subtitle.evaluate", args, data={"report": str(output) if output else None, "result": report})
+
+
 def _transcribe_with_local_engine(
     root: Path,
     source: Path,
@@ -2158,9 +2261,17 @@ def _transcribe_with_local_engine(
     language: str | None,
     output_srt: Path,
     use_gpu: bool = False,
+    adapter: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run one of the explicitly local ASR adapters and persist SRT evidence."""
     output_srt = ensure_inside(root, output_srt)
+    if output_srt.exists():
+        raise argument_error("字幕输出已存在，请使用新路径", "output")
+    if adapter:
+        transcription = transcribe_registered(root, source, adapter=adapter, language=language)
+        write_srt(transcription, output_srt)
+        transcription["srt"] = str(output_srt)
+        return transcription
     if engine == "ffmpeg-whisper":
         return transcribe_local_ffmpeg_whisper(
             source,
@@ -2177,6 +2288,9 @@ def _transcribe_with_local_engine(
 
 def command_media_understand(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
+    if args.adapter_id and not args.transcribe:
+        raise argument_error("ASR --adapter-id 必须与 --transcribe 一起使用", "adapter_id")
+    adapter = _selected_asr_adapter(root, project, args)
     source: Path | None = None
     asset_id = args.asset_id
     if asset_id:
@@ -2197,7 +2311,7 @@ def command_media_understand(args: argparse.Namespace) -> dict[str, Any]:
         return _envelope("media.understand", args, status="planned", data={"input": str(source), "scene_threshold": args.scene_threshold})
     analysis = understand_media(source, scene_threshold=args.scene_threshold, include_beats=args.beats)
     if args.transcribe:
-        if args.transcribe_engine == "ffmpeg-whisper" or args.srt:
+        if adapter or args.transcribe_engine == "ffmpeg-whisper" or args.srt:
             srt_path = Path(args.srt).expanduser() if args.srt else root / "cache" / f"understand_{new_id('asr')}.srt"
             if not srt_path.is_absolute():
                 srt_path = root / srt_path
@@ -2211,6 +2325,7 @@ def command_media_understand(args: argparse.Namespace) -> dict[str, Any]:
                 language=args.language,
                 output_srt=srt_path,
                 use_gpu=bool(args.use_gpu),
+                **({"adapter": adapter} if adapter else {}),
             )
             if not args.srt:
                 srt_path.unlink(missing_ok=True)
@@ -3035,28 +3150,33 @@ def command_subtitle_normalize(args: argparse.Namespace) -> dict[str, Any]:
 
 def command_subtitle_transcribe(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
+    adapter = _selected_asr_adapter(root, project, args)
     source_asset: dict[str, Any] | None = None
     if args.asset_id:
         source_asset = asset_map(project).get(str(args.asset_id))
         if not source_asset:
             raise argument_error(f"找不到 ASR 源资产: {args.asset_id}", "asset_id")
-        source = Path(str(source_asset.get("uri", "")))
-        if not source.is_absolute():
-            source = root / source
+        source = resolve_local_path(root, source_asset.get("uri", ""), field="asset_id")
     else:
         raw_input = str(args.input or "").strip()
         if raw_input.lower().startswith(("http://", "https://")):
             raise argument_error("字幕转写只接受本地音频或视频路径", "input")
-        source = Path(raw_input).expanduser().resolve()
+        source = resolve_local_path(root, raw_input, field="input")
     if not source.exists() or not source.is_file():
         raise argument_error("字幕转写输入不存在", str(source))
-    if args.timeline_start_seconds < 0:
+    if not math.isfinite(args.timeline_start_seconds) or args.timeline_start_seconds < 0:
         raise argument_error("timeline-start-seconds 不能为负数", "timeline_start_seconds")
     if args.apply and not args.asset_id:
         raise AppError("SUBTITLE_APPLY_SOURCE_ASSET_REQUIRED", "应用自动字幕前必须使用 --asset-id，以便继承源素材的 Rights Ledger 记录", exit_code=7, path="asset_id")
     run_id = new_id("subtitle")
-    output = Path(args.output).expanduser().resolve() if args.output else root / "assets" / "subtitles" / f"{run_id}.srt"
+    output = resolve_local_path(root, args.output, field="output") if args.output else root / "assets" / "subtitles" / f"{run_id}.srt"
     ensure_inside(root, output)
+    if output.suffix.lower() != ".srt":
+        raise argument_error("转写输出必须为新的 SRT 文件", "output")
+    if source_asset and source_asset.get("sha256") != "sha256:" + sha256_file(source):
+        raise AppError("ASR_SOURCE_HASH_MISMATCH", "ASR 源资产已变化，请重新登记", exit_code=10)
+    if args.apply and not any(record.get("asset_id") == str(source_asset.get("rights_ref") or source_asset.get("id")) for record in active_records(load_ledger(root))):
+        raise AppError("RIGHTS_RECORD_MISSING", "ASR 源资产缺少权利记录", exit_code=7)
     sequence = find_sequence(project, args.sequence_id) if args.apply else None
     target_track = None
     if args.apply:
@@ -3078,8 +3198,10 @@ def command_subtitle_transcribe(args: argparse.Namespace) -> dict[str, Any]:
                 "input": str(source),
                 "asset_id": args.asset_id,
                 "output": str(output),
-                "engine": args.transcribe_engine,
-                "model_path": str(Path(args.model_path).expanduser().resolve()),
+                "engine": ASR_ENGINE if adapter else args.transcribe_engine,
+                "model_path": adapter["model_path"] if adapter else str(Path(args.model_path).expanduser().resolve()),
+                "adapter_id": args.adapter_id,
+                "model_sha256": adapter["sha256"] if adapter else None,
                 "language": args.language,
                 "apply": bool(args.apply),
                 "sequence_id": sequence.get("id") if sequence else None,
@@ -3091,160 +3213,174 @@ def command_subtitle_transcribe(args: argparse.Namespace) -> dict[str, Any]:
 
     if output.exists():
         raise argument_error("字幕输出已存在，为避免覆盖请指定新的 --output", str(output))
-    transcription = _transcribe_with_local_engine(
-        root,
-        source,
-        engine=args.transcribe_engine,
-        model_path=args.model_path,
-        language=args.language,
-        output_srt=output,
-        use_gpu=bool(args.use_gpu),
-    )
-    cues = list(transcription.get("segments") or [])
-    source_duration = 0.0
+    report_path = None
     try:
-        source_probe = probe_media(source)
-        source_duration = float(source_probe.get("duration_seconds", 0.0) or 0.0)
-    except AppError:
-        source_probe = {}
-    cue_validation = validate_cues(cues, duration=source_duration if source_duration > 0 else None)
-    if not cue_validation["ok"]:
-        output.unlink(missing_ok=True)
-        raise AppError("SUBTITLE_TRANSCRIPTION_INVALID", "本地 ASR 返回的字幕时间轴未通过校验", exit_code=6, path=str(output), cause=json.dumps(cue_validation["errors"], ensure_ascii=False))
-    report_path = root / "validation" / f"subtitle_transcribe_{safe_filename(run_id)}.json"
-    base_report: dict[str, Any] = {
-        "report_version": "0.1.0",
-        "created_at": now_iso(),
-        "operation_id": None,
-        "applied": False,
-        "project_id": project.get("project", {}).get("id"),
-        "source": str(source),
-        "source_asset_id": args.asset_id,
-        "source_sha256": f"sha256:{sha256_file(source)}",
-        "engine": args.transcribe_engine,
-        "transcription": transcription,
-        "cue_validation": cue_validation,
-        "output": str(output),
-        "network": "disabled",
-    }
-    if not args.apply:
-        atomic_write_json(report_path, base_report)
-        return _envelope("subtitle.transcribe", args, data={"report": str(report_path), "output": str(output), "transcription": transcription, "cue_validation": cue_validation, "applied": False})
-
-    assert sequence is not None and target_track is not None and source_asset is not None
-    timeline_tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND))
-    timeline_offset = int(round(float(args.timeline_start_seconds) * timeline_tps))
-    generated_clips: list[dict[str, Any]] = []
-    style: dict[str, Any] = {
-        "fontsize": 52,
-        "fontcolor": "white",
-        "borderw": 4,
-        "bordercolor": "black",
-        "shadowx": 2,
-        "shadowy": 2,
-        "shadowcolor": "black@0.7",
-        "box": False,
-        "x": "(w-text_w)/2",
-        "y": "h-text_h-120",
-    }
-    if args.font_asset_id:
-        style["font_asset_id"] = str(args.font_asset_id)
-    for index, cue in enumerate(cues):
-        start_tick = timeline_offset + int(round(float(cue.get("start", 0.0)) * timeline_tps))
-        end_tick = timeline_offset + int(round(float(cue.get("end", 0.0)) * timeline_tps))
-        duration_tick = max(1, end_tick - start_tick)
-        generated_clips.append(
-            {
-                "id": f"{run_id}_{index:03d}",
-                "timeline_start_tick": start_tick,
-                "duration_tick": duration_tick,
-                "source_in_tick": 0,
-                "source_out_tick": duration_tick,
-                "generator": {"type": "text"},
-                "subtitle": {"text": str(cue.get("text", "")).strip(), "style": copy.deepcopy(style)},
-            }
+        transcription = _transcribe_with_local_engine(
+            root,
+            source,
+            engine=args.transcribe_engine,
+            model_path=args.model_path,
+            language=args.language,
+            output_srt=output,
+            use_gpu=bool(args.use_gpu),
+            **({"adapter": adapter} if adapter else {}),
         )
-    existing_clips = list(target_track.get("clips", []))
-    if not args.replace_track:
-        for generated in generated_clips:
-            generated_start = int(generated["timeline_start_tick"])
-            generated_end = generated_start + int(generated["duration_tick"])
-            for existing in existing_clips:
-                existing_start = int(existing.get("timeline_start_tick", 0))
-                existing_end = existing_start + int(existing.get("duration_tick", 0))
-                if max(generated_start, existing_start) < min(generated_end, existing_end):
-                    output.unlink(missing_ok=True)
-                    raise AppError("SUBTITLE_TRANSCRIBE_TRACK_OVERLAP", "自动字幕会覆盖目标字幕轨道已有片段，请使用 --replace-track 或调整时间线起点", exit_code=2, path="track_id")
-    before_project = copy.deepcopy(project)
-    snapshot = create_snapshot(root, before_project, label="before-subtitle-transcribe")
-    operation_id = new_id("op")
-    subtitle_asset_id = new_id("subtitle_asset")
-    source_rights_ref = str(source_asset.get("rights_ref") or source_asset.get("id"))
-    ledger = load_ledger(root)
-    parent_record = next((record for record in active_records(ledger) if str(record.get("asset_id")) == source_rights_ref), None)
-    if parent_record is None:
+        cues = list(transcription.get("segments") or [])
+        source_duration = 0.0
+        try:
+            source_probe = probe_media(source)
+            source_duration = float(source_probe.get("duration_seconds", 0.0) or 0.0)
+        except AppError:
+            source_probe = {}
+        cue_validation = validate_cues(cues, duration=source_duration if source_duration > 0 else None)
+        if not cue_validation["ok"]:
+            output.unlink(missing_ok=True)
+            raise AppError("SUBTITLE_TRANSCRIPTION_INVALID", "本地 ASR 返回的字幕时间轴未通过校验", exit_code=6, path=str(output), cause=json.dumps(cue_validation["errors"], ensure_ascii=False))
+        report_path = root / "validation" / f"subtitle_transcribe_{safe_filename(run_id)}.json"
+        base_report: dict[str, Any] = {
+            "report_version": "0.1.0",
+            "created_at": now_iso(),
+            "operation_id": None,
+            "applied": False,
+            "project_id": project.get("project", {}).get("id"),
+            "source": str(source),
+            "source_asset_id": args.asset_id,
+            "source_sha256": f"sha256:{sha256_file(source)}",
+            "engine": ASR_ENGINE if adapter else args.transcribe_engine,
+            "transcription": transcription,
+            "cue_validation": cue_validation,
+            "output": str(output),
+            "network": "disabled",
+        }
+        if not args.apply:
+            atomic_write_json(report_path, base_report)
+            return _envelope("subtitle.transcribe", args, data={"report": str(report_path), "output": str(output), "transcription": transcription, "cue_validation": cue_validation, "applied": False})
+
+        assert sequence is not None and target_track is not None and source_asset is not None
+        timeline_tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND))
+        timeline_offset = int(round(float(args.timeline_start_seconds) * timeline_tps))
+        generated_clips: list[dict[str, Any]] = []
+        style: dict[str, Any] = {
+            "fontsize": 52,
+            "fontcolor": "white",
+            "borderw": 4,
+            "bordercolor": "black",
+            "shadowx": 2,
+            "shadowy": 2,
+            "shadowcolor": "black@0.7",
+            "box": False,
+            "x": "(w-text_w)/2",
+            "y": "h-text_h-120",
+        }
+        if args.font_asset_id:
+            style["font_asset_id"] = str(args.font_asset_id)
+        for index, cue in enumerate(cues):
+            start_tick = timeline_offset + int(round(float(cue.get("start", 0.0)) * timeline_tps))
+            end_tick = timeline_offset + int(round(float(cue.get("end", 0.0)) * timeline_tps))
+            duration_tick = max(1, end_tick - start_tick)
+            generated_clips.append(
+                {
+                    "id": f"{run_id}_{index:03d}",
+                    "timeline_start_tick": start_tick,
+                    "duration_tick": duration_tick,
+                    "source_in_tick": 0,
+                    "source_out_tick": duration_tick,
+                    "generator": {"type": "text"},
+                    "subtitle": {"text": str(cue.get("text", "")).strip(), "style": copy.deepcopy(style)},
+                }
+            )
+        existing_clips = list(target_track.get("clips", []))
+        if not args.replace_track:
+            for generated in generated_clips:
+                generated_start = int(generated["timeline_start_tick"])
+                generated_end = generated_start + int(generated["duration_tick"])
+                for existing in existing_clips:
+                    existing_start = int(existing.get("timeline_start_tick", 0))
+                    existing_end = existing_start + int(existing.get("duration_tick", 0))
+                    if max(generated_start, existing_start) < min(generated_end, existing_end):
+                        output.unlink(missing_ok=True)
+                        raise AppError("SUBTITLE_TRANSCRIBE_TRACK_OVERLAP", "自动字幕会覆盖目标字幕轨道已有片段，请使用 --replace-track 或调整时间线起点", exit_code=2, path="track_id")
+        before_project = copy.deepcopy(project)
+        snapshot = create_snapshot(root, before_project, label="before-subtitle-transcribe")
+        operation_id = new_id("op")
+        subtitle_asset_id = new_id("subtitle_asset")
+        source_rights_ref = str(source_asset.get("rights_ref") or source_asset.get("id"))
+        ledger = load_ledger(root)
+        parent_record = next((record for record in active_records(ledger) if str(record.get("asset_id")) == source_rights_ref), None)
+        if parent_record is None:
+            output.unlink(missing_ok=True)
+            raise AppError("RIGHTS_RECORD_MISSING", "ASR 源资产缺少可继承的 Rights Ledger 记录", exit_code=7, path=source_rights_ref)
+        output_digest = sha256_file(output)
+        subtitle_asset = {
+            "id": subtitle_asset_id,
+            "kind": "subtitle",
+            "uri": str(output.relative_to(root)).replace("\\", "/"),
+            "sha256": f"sha256:{output_digest}",
+            "probe": {"duration_seconds": source_duration, "duration_tick": int(round(source_duration * timeline_tps)) if source_duration > 0 else max((int(item["timeline_start_tick"]) + int(item["duration_tick"]) for item in generated_clips), default=1), "subtitle_cues": len(cues)},
+            "rights_ref": subtitle_asset_id,
+            "source": {"source_url": f"local://{output}", "retrieved_at": now_iso(), "original_name": output.name, "derived_from": [source_asset.get("id")]},
+        }
+        subtitle_record = {
+            "asset_id": subtitle_asset_id,
+            "kind": "subtitle",
+            "sha256": f"sha256:{output_digest}",
+            "source_url": f"local://{output}",
+            "source_version": f"derived-{ASR_ENGINE if adapter else args.transcribe_engine}",
+            "retrieved_at": now_iso(),
+            "creator": parent_record.get("creator", "unknown"),
+            "license_spdx": parent_record.get("license_spdx", "LicenseRef-UNVERIFIED"),
+            "license_url": parent_record.get("license_url", ""),
+            "attribution": parent_record.get("attribution", ""),
+            "permitted_uses": list(parent_record.get("permitted_uses", ["internal"])),
+            "permitted_channels": list(parent_record.get("permitted_channels", [])),
+            "restrictions": list(parent_record.get("restrictions", [])),
+            "derived_from": list(dict.fromkeys([source_rights_ref] + ([adapter["rights_ref"]] if adapter else []))),
+            "evidence": parent_record.get("evidence", ""),
+            "verification_status": parent_record.get("verification_status", "unverified"),
+            "verified_by": parent_record.get("verified_by", ""),
+            "takedown_status": parent_record.get("takedown_status", "clear"),
+            "notes": "Generated by local offline ASR; inherits source rights",
+        }
+        if args.replace_track:
+            target_track["clips"] = []
+        target_track.setdefault("clips", []).extend(generated_clips)
+        project.setdefault("assets", []).append(subtitle_asset)
+        add_record(ledger, subtitle_record)
+        _recompute_sequence_duration(sequence)
+        save_ledger(root, ledger)  # validation must see the candidate dependency record
+        validation = validate_project(root, project, strict_rights=False)
+        if not validation["ok"]:
+            output.unlink(missing_ok=True)
+            raise AppError("SUBTITLE_TRANSCRIBE_APPLY_INVALID", "自动字幕应用后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+        base_report.update({
+            "applied": True,
+            "operation_id": operation_id,
+            "before_snapshot_id": snapshot["snapshot_id"],
+            "sequence_id": sequence.get("id"),
+            "track_id": target_track.get("id"),
+            "subtitle_asset": subtitle_asset,
+            "rights": subtitle_record,
+            "generated_clips": generated_clips,
+            "timeline_start_seconds": round(float(args.timeline_start_seconds), 6),
+            "replace_track": bool(args.replace_track),
+            "validation": validation,
+        })
+        atomic_write_json(report_path, base_report)
+        project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "subtitle.transcribe", "asset_id": subtitle_asset_id, "source_asset_id": source_asset.get("id"), "sequence_id": sequence.get("id"), "track_id": target_track.get("id"), "report": str(report_path), "before_snapshot_id": snapshot["snapshot_id"], "at": now_iso()})
+        save_project(root, project)
+        _operation(root, operation_id, {"operation_id": operation_id, "command": "subtitle.transcribe", "status": "succeeded", "asset_id": subtitle_asset_id, "source_asset_id": source_asset.get("id"), "report": str(report_path), "before_snapshot_id": snapshot["snapshot_id"], "clip_ids": [clip["id"] for clip in generated_clips], "created_at": now_iso()})
+        return _envelope("subtitle.transcribe", args, data={"report": str(report_path), "output": str(output), "transcription": transcription, "subtitle_asset": subtitle_asset, "rights": subtitle_record, "generated_clips": generated_clips, "before_snapshot": snapshot, "validation": validation, "applied": True}, operation_id=operation_id)
+
+    except OSError as exc:
         output.unlink(missing_ok=True)
-        raise AppError("RIGHTS_RECORD_MISSING", "ASR 源资产缺少可继承的 Rights Ledger 记录", exit_code=7, path=source_rights_ref)
-    output_digest = sha256_file(output)
-    subtitle_asset = {
-        "id": subtitle_asset_id,
-        "kind": "subtitle",
-        "uri": str(output.relative_to(root)).replace("\\", "/"),
-        "sha256": f"sha256:{output_digest}",
-        "probe": {"duration_seconds": source_duration, "duration_tick": int(round(source_duration * timeline_tps)) if source_duration > 0 else max((int(item["timeline_start_tick"]) + int(item["duration_tick"]) for item in generated_clips), default=1), "subtitle_cues": len(cues)},
-        "rights_ref": subtitle_asset_id,
-        "source": {"source_url": f"local://{output}", "retrieved_at": now_iso(), "original_name": output.name, "derived_from": [source_asset.get("id")]},
-    }
-    subtitle_record = {
-        "asset_id": subtitle_asset_id,
-        "kind": "subtitle",
-        "sha256": f"sha256:{output_digest}",
-        "source_url": f"local://{output}",
-        "source_version": f"derived:{args.transcribe_engine}",
-        "retrieved_at": now_iso(),
-        "creator": parent_record.get("creator", "unknown"),
-        "license_spdx": parent_record.get("license_spdx", "LicenseRef-UNVERIFIED"),
-        "license_url": parent_record.get("license_url", ""),
-        "attribution": parent_record.get("attribution", ""),
-        "permitted_uses": list(parent_record.get("permitted_uses", ["internal"])),
-        "permitted_channels": list(parent_record.get("permitted_channels", [])),
-        "restrictions": list(parent_record.get("restrictions", [])),
-        "derived_from": [source_rights_ref],
-        "evidence": parent_record.get("evidence", ""),
-        "verification_status": parent_record.get("verification_status", "unverified"),
-        "verified_by": parent_record.get("verified_by", ""),
-        "takedown_status": parent_record.get("takedown_status", "clear"),
-        "notes": "Generated by local offline ASR; inherits source rights",
-    }
-    if args.replace_track:
-        target_track["clips"] = []
-    target_track.setdefault("clips", []).extend(generated_clips)
-    project.setdefault("assets", []).append(subtitle_asset)
-    add_record(ledger, subtitle_record)
-    _recompute_sequence_duration(sequence)
-    validation = validate_project(root, project, strict_rights=False)
-    if not validation["ok"]:
+        if report_path:
+            report_path.unlink(missing_ok=True)
+        raise AppError("SUBTITLE_TRANSCRIBE_IO_FAILED", "字幕落盘失败，已恢复项目元数据并清理本轮输出", exit_code=9, cause=str(exc)) from exc
+    except Exception:
         output.unlink(missing_ok=True)
-        raise AppError("SUBTITLE_TRANSCRIBE_APPLY_INVALID", "自动字幕应用后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
-    base_report.update({
-        "applied": True,
-        "operation_id": operation_id,
-        "before_snapshot_id": snapshot["snapshot_id"],
-        "sequence_id": sequence.get("id"),
-        "track_id": target_track.get("id"),
-        "subtitle_asset": subtitle_asset,
-        "rights": subtitle_record,
-        "generated_clips": generated_clips,
-        "timeline_start_seconds": round(float(args.timeline_start_seconds), 6),
-        "replace_track": bool(args.replace_track),
-        "validation": validation,
-    })
-    atomic_write_json(report_path, base_report)
-    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "subtitle.transcribe", "asset_id": subtitle_asset_id, "source_asset_id": source_asset.get("id"), "sequence_id": sequence.get("id"), "track_id": target_track.get("id"), "report": str(report_path), "before_snapshot_id": snapshot["snapshot_id"], "at": now_iso()})
-    save_project(root, project)
-    save_ledger(root, ledger)
-    _operation(root, operation_id, {"operation_id": operation_id, "command": "subtitle.transcribe", "status": "succeeded", "asset_id": subtitle_asset_id, "source_asset_id": source_asset.get("id"), "report": str(report_path), "before_snapshot_id": snapshot["snapshot_id"], "clip_ids": [clip["id"] for clip in generated_clips], "created_at": now_iso()})
-    return _envelope("subtitle.transcribe", args, data={"report": str(report_path), "output": str(output), "transcription": transcription, "subtitle_asset": subtitle_asset, "rights": subtitle_record, "generated_clips": generated_clips, "before_snapshot": snapshot, "validation": validation, "applied": True}, operation_id=operation_id)
+        if report_path:
+            report_path.unlink(missing_ok=True)
+        raise
 
 
 def _tts_text_file(root: Path, value: str) -> tuple[str, dict[str, Any]]:
@@ -5150,6 +5286,7 @@ _READ_ONLY_PROJECT_COMMANDS = {
     ("rights", "impact"),
     ("validate", None),
     ("policy", "audit"),
+    ("subtitle", "evaluate"),
     ("quality", "check"),
     ("motion", "list"),
     ("motion", "inspect"),
@@ -5160,7 +5297,7 @@ def _project_operation_lock(args: argparse.Namespace):
     """Return the operation-wide lock for a mutating project command."""
     project = getattr(args, "project", None)
     key = (getattr(args, "domain", None), getattr(args, "action", None))
-    adapter_read_only = (key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (key in {("tts", "adapter"), ("tts", "voice")} and getattr(args, "registration_action", None) in {"list", "inspect"})
+    adapter_read_only = (key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (key in {("tts", "adapter"), ("tts", "voice"), ("asr", "adapter")} and getattr(args, "registration_action", None) in {"list", "inspect"})
     if not project or getattr(args, "dry_run", False) or key in _READ_ONLY_PROJECT_COMMANDS or adapter_read_only or key == ("queue", "cancel"):
         return contextlib.nullcontext()
     return project_write_lock(project)
@@ -5196,6 +5333,8 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("subtitle", "transcribe"): command_subtitle_transcribe,
     ("tts", "synthesize"): command_tts_synthesize,
     ("tts", "adapter"): command_tts_registration,
+    ("asr", "adapter"): command_asr_adapter,
+    ("subtitle", "evaluate"): command_subtitle_evaluate,
     ("tts", "voice"): command_tts_registration,
     ("effects", "list"): command_effects_list,
     ("effects", "inspect"): command_effects_inspect,
@@ -5258,7 +5397,7 @@ def main(argv: list[str] | None = None) -> int:
         with _project_operation_lock(args):
             transaction_root = getattr(args, "project", None)
             command_key = (args.domain, getattr(args, "action", None))
-            adapter_read_only = (command_key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (command_key in {("tts", "adapter"), ("tts", "voice")} and getattr(args, "registration_action", None) in {"list", "inspect"})
+            adapter_read_only = (command_key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (command_key in {("tts", "adapter"), ("tts", "voice"), ("asr", "adapter")} and getattr(args, "registration_action", None) in {"list", "inspect"})
             transaction_enabled = bool(transaction_root) and not getattr(args, "dry_run", False) and command_key not in _READ_ONLY_PROJECT_COMMANDS and not adapter_read_only and command_key not in {("project", "recover"), ("queue", "cancel")}
             with (project_transaction(transaction_root, command=_command_name(args)) if transaction_enabled else contextlib.nullcontext({"active": False, "recovered": False})) as transaction:
                 if idempotency:

@@ -144,3 +144,7 @@ ASR 结果进入字幕轨道前必须经过以下步骤：
 ## 本地 SoulX 中文模型执行
 
 现有 `tts adapter/voice register/list/inspect` 与 `tts synthesize --adapter-id --voice-id` 已形成专用本地 runner，支持原样参考逐字稿、完整 safetensors/语音 tokenizer 与源码哈希、隔离 Python、网络调用阻断、自然 WAV 时长、资产/音轨和模型/声源权利依赖。契约见[本地 SoulX 中文配音](./本地SoulX中文配音与声线登记契约_v0.1_2026-10-15.md)；真实中文音频、实际渲染和未核验发布阻断见[实测记录](../validation/SoulX中文离线配音实测_2026-10-15.md)。CPU/GGUF、情绪/多声线/语速和广泛中文质量仍待扩展。
+
+## 2026-10-15 原生登记路径
+
+Whisper safetensors 已新增 `asr adapter register/list/inspect`，登记显式 Python、模型/证据文件哈希、CPU/CUDA 和线程预算；生成字幕依赖源素材及模型权利。新 worker 禁止下载、自定义远程代码和 Python 网络调用，保留超过 30 秒的输入，真实短句/原始参考/38.04 秒重复录音已完成入轨与音画渲染。完整契约见[Whisper 登记与验收](./本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md)，真实证据见[实测](../validation/Whisper中文离线转写实测_2026-10-15.md)。旧直接模型路径与 FFmpeg Whisper 继续可用，不自动获得新登记路径的进程隔离保证。`subtitle evaluate` 提供 CER 门禁；逐字强制对齐、说话人、多语言和广泛广告语料仍未验收。

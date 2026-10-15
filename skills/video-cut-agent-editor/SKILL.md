@@ -21,6 +21,16 @@ online service. No adapter keeps the English/ASCII flite behavior described belo
 
 ## Runtime boundary
 
+For local speech recognition use the [registered Whisper contract](../../docs/specs/本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md).
+`asr adapter register/list/inspect` records existing native Python, complete
+safetensors weights, explicit CPU/CUDA and local evidence. Pass `--adapter-id`
+to `media understand --transcribe` or `subtitle transcribe`; the latter can apply
+source/model-dependent subtitle assets to an existing subtitle track. Use new
+project-relative SRT paths and inspect dry-run before applying. `subtitle evaluate`
+compares to a supplied reference and emits CER, including Chinese script differences.
+Local `.ttf/.otf/.ttc` fonts can be ingested and selected with `--font-asset-id`;
+their readability does not establish publication rights.
+
 - Use native Windows Python and the installed `ffmpeg.exe`/`ffprobe.exe` only.
 - Set `PYTHONPATH` to the absolute `product/src` directory and invoke `python -m ai_ad_editor`; the repository wrapper also pins TEMP/TMP and Python/model caches to `product/.runtime/` on E drive.
 - Keep the default network policy disabled. Do not call GUI automation, HTTP services, or any other closed/online provider.

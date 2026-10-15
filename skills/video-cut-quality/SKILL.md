@@ -26,3 +26,12 @@ media hash, settings hash, quality constraints and stable metrics. Re-run
 drift. The manifest proves reproducibility for the captured local FFmpeg build;
 it does not prove cross-device visual equivalence or replace manual subtitle
 review.
+
+For speech/caption accuracy use `subtitle evaluate --project <path> --input
+assets/subtitles/speech.srt --reference validation/reference.txt --report
+validation/speech-cer.json --max-cer 0.1`. Choose a task-appropriate threshold;
+0.1 is an example. The default NFKC/text normalization removes punctuation and
+spacing but never converts Chinese scripts. `--normalization raw` compares decoded
+characters directly. A failed threshold returns code 6 and preserves its report.
+CER checks transcript text; review subtitle boundaries, script preference and
+pronunciation separately. See the [ASR evaluation contract](../../docs/specs/本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md).

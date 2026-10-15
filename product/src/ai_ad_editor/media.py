@@ -16,6 +16,7 @@ VIDEO_EXTENSIONS = {".mp4", ".mov", ".mkv", ".webm", ".avi", ".mxf", ".ts", ".m4
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif"}
 AUDIO_EXTENSIONS = {".wav", ".mp3", ".aac", ".flac", ".m4a", ".ogg", ".opus"}
 SUBTITLE_EXTENSIONS = {".srt", ".vtt", ".ass", ".ssa", ".ttml", ".dfxp", ".xml"}
+FONT_EXTENSIONS = {".ttf", ".otf", ".ttc"}
 MAX_INPUT_BYTES = 2 * 1024 * 1024 * 1024
 MAX_DURATION_SECONDS = 2 * 60 * 60
 MAX_DIMENSION = 8192
@@ -46,6 +47,8 @@ def ffmpeg_version() -> str:
 
 def classify_path(path: Path, probe: dict[str, Any] | None = None) -> str:
     suffix = path.suffix.lower()
+    if suffix in FONT_EXTENSIONS:
+        return "font"
     if suffix in SUBTITLE_EXTENSIONS:
         return "subtitle"
     if suffix in IMAGE_EXTENSIONS:
@@ -87,6 +90,17 @@ def probe_media(path: Path) -> dict[str, Any]:
         raise missing_asset(f"媒体文件不存在: {path}", str(path))
     if path.stat().st_size > MAX_INPUT_BYTES:
         raise AppError("MEDIA_TOO_LARGE", f"媒体超过单文件限制 {MAX_INPUT_BYTES} 字节: {path}", exit_code=3, path=str(path))
+    if path.suffix.lower() in FONT_EXTENSIONS:
+        try:
+            from PIL import ImageFont
+        except ImportError as exc:
+            raise dependency_error("字体导入需要本地 Pillow/FreeType", "使用已安装的本地依赖，不会自动安装") from exc
+        try:
+            font = ImageFont.truetype(str(path), size=32)
+            family, style = font.getname()
+        except (OSError, ValueError) as exc:
+            raise AppError("FONT_PROBE_FAILED", "本地 FreeType 无法读取字体", exit_code=3, path=str(path), cause=str(exc)) from exc
+        return {"duration_seconds": 0.0, "duration_tick": 0, "format": path.suffix.lower().lstrip("."), "format_long_name": "local font", "streams": [], "font": {"family": family, "style": style, "face_index": 0, "engine": "pillow-freetype"}, "video": {"codec": None}, "audio": {"codec": None, "sample_rate": 0, "channels": 0}}
     if path.suffix.lower() in SUBTITLE_EXTENSIONS:
         cues = parse_caption_file(path)
         duration = max((float(cue.get("end", 0.0)) for cue in cues), default=0.0)

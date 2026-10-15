@@ -112,3 +112,7 @@ python -X utf8 -m ai_ad_editor doctor --project .\project
 ## 中文离线配音调用增量
 
 `$video-cut-local-models` 与 `$video-cut-agent-editor` 已同步 SoulX 模型和参考声登记、原样逐字稿、完整性、生成 WAV 资产和 `--apply` 音轨调用。默认 flite 仍只接受 ASCII；中文需显式本地适配器、CUDA 和完整权重。见[配音契约](./specs/本地SoulX中文配音与声线登记契约_v0.1_2026-10-15.md)与[实测记录](./validation/SoulX中文离线配音实测_2026-10-15.md)。发布资格继续由模型、声源、文本及输出权利门禁决定。
+
+## 2026-10-15 Whisper 登记与字幕质量
+
+`video-cut-local-models`、`video-cut-video-understand`、`video-cut-agent-editor` 和 `video-cut-quality` 已同步本地 Whisper 登记、CPU/CUDA、字幕应用、字体导入与 CER 工作流；仍使用既有 14 个 `video-cut-` Skill。优先阅读[Whisper 契约](./specs/本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md)，模型与 Python 都是显式本地输入，不自动安装、下载或切换设备。参考与识别繁简不同必须体现在 CER 报告中，不能据单段指标宣称广泛识别或听感质量已通过。

@@ -56,7 +56,10 @@ def request_fingerprint(command: str, args: Any) -> str:
             continue
         candidate = Path(value).expanduser().resolve()
         values[field] = str(candidate)
-        if candidate.is_file():
+        # Output/report files and project.json are products of the operation.
+        # Hashing their new contents would invalidate an otherwise identical
+        # replay as soon as the first operation succeeded.
+        if field in {"input", "variables"} and candidate.is_file():
             try:
                 values[field + "_sha256"] = sha256_file(candidate)
             except OSError:

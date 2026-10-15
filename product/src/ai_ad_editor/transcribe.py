@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import math
 import re
 import subprocess
 from pathlib import Path
@@ -10,6 +11,7 @@ from .errors import AppError, argument_error, dependency_error
 from .media import ffmpeg_path
 from .captions import write_srt_file
 from .utils import run_process, sha256_file
+from .policy import resolve_local_path
 
 
 def _decode_audio(path: Path, sample_rate: int = 16_000) -> Any:
@@ -28,7 +30,7 @@ def _decode_audio(path: Path, sample_rate: int = 16_000) -> Any:
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise AppError("LOCAL_ASR_AUDIO_FAILED", "本地转写音频解码失败", exit_code=6, retryable=True, cause=str(exc)) from exc
     if result.returncode != 0 or not result.stdout:
-        raise AppError("LOCAL_ASR_AUDIO_FAILED", "FFmpeg 无法解码本地音频", exit_code=3, cause=result.stderr[-2000:])
+        raise AppError("LOCAL_ASR_AUDIO_FAILED", "FFmpeg 无法解码本地音频", exit_code=3, cause=result.stderr[-2000:].decode("utf-8", errors="replace"))
     return np.frombuffer(result.stdout, dtype=np.float32)
 
 
@@ -48,6 +50,8 @@ def _segment_text(processor: Any, tokens: Any) -> str:
     try:
         if hasattr(tokens, "detach"):
             tokens = tokens.detach().cpu()
+        if hasattr(tokens, "tolist"):
+            tokens = tokens.tolist()
         decoded = processor.batch_decode([tokens], skip_special_tokens=True)
         return decoded[0].strip() if decoded else ""
     except Exception:
@@ -77,16 +81,21 @@ def _extract_segments(processor: Any, generated: Any) -> list[dict[str, Any]]:
             sequence = result.get("sequences") if isinstance(result, dict) else getattr(result, "sequences", None)
             if sequence is not None:
                 text = _segment_text(processor, sequence[0] if getattr(sequence, "ndim", 1) > 1 else sequence)
-        if end <= start and not text:
+        if not text:
             continue
         segments.append({"start": round(start, 3), "end": round(max(start, end), 3), "text": text})
     return segments
 
 
-def transcribe_local(path: Path, *, model_path: str | Path | None, language: str | None = None) -> dict[str, Any]:
+def transcribe_local(path: Path, *, model_path: str | Path | None, language: str | None = None, device: str = "cpu") -> dict[str, Any]:
     if not model_path:
         raise argument_error("启用本地转写时必须提供 --model-path；不会自动下载模型", "--model-path")
-    model = Path(model_path).expanduser().resolve()
+    path = resolve_local_path(Path.cwd(), path, field="input")
+    model = resolve_local_path(Path.cwd(), model_path, field="model_path")
+    if not path.is_file():
+        raise argument_error("本地 ASR 输入文件不存在", "input")
+    if device not in {"cpu", "cuda"}:
+        raise argument_error("本地 Whisper 仅支持 cpu/cuda", "device")
     if not model.exists() or not model.is_dir():
         raise AppError("LOCAL_ASR_MODEL_MISSING", f"本地 ASR 模型目录不存在: {model}", exit_code=10, path=str(model), hint="准备离线模型目录后重试；运行时不会联网下载")
     try:
@@ -100,14 +109,15 @@ def transcribe_local(path: Path, *, model_path: str | Path | None, language: str
     os.environ["HF_HUB_OFFLINE"] = "1"
     os.environ["TRANSFORMERS_OFFLINE"] = "1"
     try:
-        processor = AutoProcessor.from_pretrained(str(model), local_files_only=True)
-        speech_model = AutoModelForSpeechSeq2Seq.from_pretrained(str(model), local_files_only=True, torch_dtype=torch.float32)
+        processor = AutoProcessor.from_pretrained(str(model), local_files_only=True, trust_remote_code=False)
+        speech_model = AutoModelForSpeechSeq2Seq.from_pretrained(str(model), local_files_only=True, trust_remote_code=False, torch_dtype=torch.float16 if device == "cuda" else torch.float32)
     except Exception as exc:
         raise AppError("LOCAL_ASR_MODEL_LOAD_FAILED", "本地 ASR 模型加载失败", exit_code=10, path=str(model), cause=str(exc), hint="模型必须完整保存在本地，且与 transformers 兼容") from exc
-    speech_model.to("cpu")
-    inputs = processor(audio, sampling_rate=16_000, return_tensors="pt")
-    generate_kwargs: dict[str, Any] = {"return_timestamps": True}
-    if language:
+    speech_model.to(device).eval()
+    inputs = processor(audio, sampling_rate=16_000, return_tensors="pt", truncation=False, padding="longest", return_attention_mask=True)
+    inputs = {key: value.to(device=device, dtype=(speech_model.dtype if key == "input_features" else value.dtype)) for key, value in inputs.items()}
+    generate_kwargs: dict[str, Any] = {"return_timestamps": True, "do_sample": False}
+    if language and language != "auto":
         generate_kwargs["language"] = language
         generate_kwargs["task"] = "transcribe"
     try:
@@ -207,8 +217,9 @@ def transcribe_local_ffmpeg_whisper(
     if not _WHISPER_LANGUAGE_RE.fullmatch(language_value):
         raise argument_error("language 只能是 auto 或 ASCII 语言代码", "language")
     destination = Path(output_srt).expanduser().resolve()
+    if destination.exists():
+        raise argument_error("字幕输出已存在，请使用新路径", "output_srt")
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.unlink(missing_ok=True)
     model_value = _escape_ffmpeg_filter_value(str(model))
     destination_value = _escape_ffmpeg_filter_value(str(destination))
     filter_spec = (
@@ -288,5 +299,10 @@ def write_srt(transcription: dict[str, Any], path: Path) -> None:
     for index, segment in enumerate(segments, start=1):
         start = float(segment.get("start", 0.0))
         end = float(segment.get("end", start))
+        if not math.isfinite(start) or not math.isfinite(end):
+            raise AppError("LOCAL_ASR_TIMESTAMPS_INVALID", "字幕时码必须为有限数", exit_code=6, path=str(path))
         lines.append({"index": index, "start": start, "end": end, "text": str(segment.get("text", "")).strip()})
+    from .captions import validate_cues
+    if not validate_cues(lines)["ok"]:
+        raise AppError("LOCAL_ASR_TIMESTAMPS_INVALID", "字幕文本、时码或重叠校验失败", exit_code=6, path=str(path))
     write_srt_file(path, lines)

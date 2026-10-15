@@ -268,3 +268,11 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 ## 本地中文配音增量
 
 详细参数、worker 协议、网络阻断、输入/输出哈希、自然时长、错误码和权利依赖见[本地 SoulX 契约](./本地SoulX中文配音与声线登记契约_v0.1_2026-10-15.md)。未指定适配器时 flite 的非 ASCII 拒绝行为保持有效；模型路径、参考声或证据变化时拒绝执行，禁止自动回退在线服务。
+
+## 2026-10-15 本地 Whisper 登记与 CER
+
+新增 `asr adapter register/list/inspect`。register 要求 `--project --adapter-id --python-executable --model-path --evidence`，设备 `--device cpu|cuda`（默认 cpu），线程 `--threads 1..32`（默认 4），支持既有许可/用途/核验状态、dry-run 与幂等。list/inspect 不写元数据，inspect 核验完整性。模型登记在 `extensions.local_asr.adapters` 并建立独立 Rights Ledger 记录。
+
+`subtitle transcribe` 的 `--model-path` 与 `--adapter-id` 二选一；`media understand --transcribe` 同样支持登记模型。登记模型的设备由登记项决定，不能混用 `--use-gpu` 或 `ffmpeg-whisper` 引擎。新 SRT 输出按项目根解析；拒绝覆盖，应用继承源及模型的权利依赖。空文本/非有限/越界/重叠时码拒绝；落盘失败清理本轮输出并由事务恢复原元数据。幂等指纹保留输出路径，但不把本次新生成的 output/report 或变化后的 project.json 当输入内容哈希，绝对路径亦能正确重放。
+
+`subtitle evaluate --input <UTF8或字幕> --reference <UTF8或字幕> [--project <项目>] [--normalization raw|nfkc-text] [--max-cer <非负数>] [--report <新JSON>]` 返回替换/删除/插入计数及 CER。默认归一化不转换繁简；超阈值返回 `ASR_CER_THRESHOLD_EXCEEDED`/6 并保留报告。比较超过 2500 万动态规划单元或单边超过 10 万字时拒绝，须分段评估。`media ingest` 增加经本地 FreeType 验证的 TTF/OTF/TTC 字体资产，集合字体当前只选 face 0。详情见[登记与验收契约](./本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md)。

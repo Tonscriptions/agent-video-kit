@@ -1,0 +1,518 @@
+{
+  "schema_version": "0.1.0",
+  "captured_at_utc": "2026-10-15T11:16:59.824337+00:00",
+  "scope": "Local registered Whisper small Mandarin smoke; repeated input is not independent corpus evidence",
+  "runs": [
+    {
+      "project_relative_path": "workspace/whisper-smoke-20261015-c",
+      "checks": [
+        {
+          "command": "project.init",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "asr.adapter.register",
+          "exit_code": 0,
+          "status": "planned"
+        },
+        {
+          "command": "asr.adapter.register",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "asr.adapter.inspect",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "timeline.compose",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "media.ingest",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "media.ingest",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "timeline.compose",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "subtitle.transcribe",
+          "exit_code": 0,
+          "status": "planned"
+        },
+        {
+          "command": "subtitle.transcribe",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "subtitle.evaluate",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "render",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "quality.check",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "validate",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "policy.audit",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "rights.check",
+          "exit_code": 7,
+          "status": "failed"
+        }
+      ],
+      "adapter": {
+        "adapter_id": "whisper_local",
+        "engine": "transformers-whisper-local-v1",
+        "protocol": "agent-video-whisper-asr-v1",
+        "device": "cpu",
+        "threads": 4,
+        "sha256": "sha256:51f6af20771184bc957fc7caecc367e79763a26cad2faaecfe9bc68e99f5822e",
+        "rights_ref": "asr_adapter_whisper_local"
+      },
+      "cases": [
+        {
+          "source_sha256": "sha256:dedb7d6e05ee63a682a1683d71df9b784f424a8da993fafc87ffa62c106b2951",
+          "input_duration_seconds": 3.44,
+          "model_sha256": "sha256:51f6af20771184bc957fc7caecc367e79763a26cad2faaecfe9bc68e99f5822e",
+          "worker_sha256": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+          "text": "讓每一次創作都變得更加簡單",
+          "segments": [
+            {
+              "start": 0.0,
+              "end": 3.36,
+              "text": "讓每一次創作都變得更加簡單"
+            }
+          ],
+          "cer": {
+            "normalization": "nfkc-text",
+            "script_conversion": "none",
+            "reference_sha256": "sha256:8fcb47abd1dda99e5d89f75d1ecc3077b8661c84f2d15da7ab3310879f81bdcc",
+            "input_sha256": "sha256:8a19a4c3b19689ec16683ded3c5cf9859a4ef054455037539481f0b1b71d8c1e",
+            "reference_characters": 13,
+            "hypothesis_characters": 13,
+            "edit_distance": 5,
+            "substitutions": 5,
+            "deletions": 0,
+            "insertions": 0,
+            "cer": 0.38461538461538464,
+            "exact_match": false
+          },
+          "worker": {
+            "protocol": "agent-video-whisper-asr-v1",
+            "status": "succeeded",
+            "network": "disabled",
+            "blocked_network_events": [],
+            "input_sha256": "sha256:8e0f3e9d552ebbe4bc25808683c03b3479ab7aafdf0d3991c4fff2fc524f528a",
+            "source_sha256": "sha256:dedb7d6e05ee63a682a1683d71df9b784f424a8da993fafc87ffa62c106b2951",
+            "adapter_sha256": "sha256:51f6af20771184bc957fc7caecc367e79763a26cad2faaecfe9bc68e99f5822e",
+            "device": "cpu",
+            "threads": 4,
+            "peak_cuda_bytes": null,
+            "versions": {
+              "python": "3.13.14",
+              "torch": "2.13.0+cu130",
+              "transformers": "5.14.1"
+            },
+            "elapsed_seconds": 17.345
+          },
+          "subtitle_relative_path": "workspace/whisper-smoke-20261015-c/assets/subtitles/case-0.srt",
+          "subtitle_sha256": "sha256:8a19a4c3b19689ec16683ded3c5cf9859a4ef054455037539481f0b1b71d8c1e",
+          "project_validation_ok": true,
+          "input_pcm": {
+            "sample_rate": 48000,
+            "channels": 1,
+            "samples": 165120
+          }
+        }
+      ],
+      "render_relative_path": "workspace/whisper-smoke-20261015-c/renders/whisper-subtitles.mp4",
+      "render_sha256": "sha256:d99a8bcd239c5951a5aa058ab71467955a5ca13bf96182bac2e4c2cb39f98890",
+      "render_dimensions": [
+        640,
+        360
+      ]
+    },
+    {
+      "project_relative_path": "workspace/whisper-smoke-20261015-d",
+      "checks": [
+        {
+          "command": "project.init",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "asr.adapter.register",
+          "exit_code": 0,
+          "status": "planned"
+        },
+        {
+          "command": "asr.adapter.register",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "asr.adapter.inspect",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "timeline.compose",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "media.ingest",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "media.ingest",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "timeline.compose",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "subtitle.transcribe",
+          "exit_code": 0,
+          "status": "planned"
+        },
+        {
+          "command": "subtitle.transcribe",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "subtitle.evaluate",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "media.ingest",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "timeline.compose",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "subtitle.transcribe",
+          "exit_code": 0,
+          "status": "planned"
+        },
+        {
+          "command": "subtitle.transcribe",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "subtitle.evaluate",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "render",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "quality.check",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "validate",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "policy.audit",
+          "exit_code": 0,
+          "status": "succeeded"
+        },
+        {
+          "command": "rights.check",
+          "exit_code": 7,
+          "status": "failed"
+        }
+      ],
+      "adapter": {
+        "adapter_id": "whisper_local",
+        "engine": "transformers-whisper-local-v1",
+        "protocol": "agent-video-whisper-asr-v1",
+        "device": "cuda",
+        "threads": 4,
+        "sha256": "sha256:b80cd63fb233aeedaa90ed4c28924c05d397985944a35ef4a4ade0cab1364222",
+        "rights_ref": "asr_adapter_whisper_local"
+      },
+      "cases": [
+        {
+          "source_sha256": "sha256:2b40301cfbd9f038f981140d73a04f558518bd5dc54a65d8ab2e7aab431c8bfe",
+          "input_duration_seconds": 12.68,
+          "model_sha256": "sha256:b80cd63fb233aeedaa90ed4c28924c05d397985944a35ef4a4ade0cab1364222",
+          "worker_sha256": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+          "text": "我們會把責任扛起來 讓台灣的經濟結構轉型 按部就班來規劃與執行 是各國政府越來越關心的課題 照顧壓力將會減輕",
+          "segments": [
+            {
+              "start": 0.0,
+              "end": 2.2,
+              "text": "我們會把責任扛起來"
+            },
+            {
+              "start": 2.2,
+              "end": 4.84,
+              "text": "讓台灣的經濟結構轉型"
+            },
+            {
+              "start": 4.84,
+              "end": 7.54,
+              "text": "按部就班來規劃與執行"
+            },
+            {
+              "start": 7.54,
+              "end": 10.58,
+              "text": "是各國政府越來越關心的課題"
+            },
+            {
+              "start": 10.58,
+              "end": 12.58,
+              "text": "照顧壓力將會減輕"
+            }
+          ],
+          "cer": {
+            "normalization": "nfkc-text",
+            "script_conversion": "none",
+            "reference_sha256": "sha256:e04269bb7ad276a1c5872bdd1b866590d3eded24b6b70c2728e2313ff4af04a7",
+            "input_sha256": "sha256:74558205d2422c2753afbf74cee7a886517e802b6d71cf64eeb95456e3e1c5bf",
+            "reference_characters": 50,
+            "hypothesis_characters": 50,
+            "edit_distance": 1,
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "cer": 0.02,
+            "exact_match": false
+          },
+          "worker": {
+            "protocol": "agent-video-whisper-asr-v1",
+            "status": "succeeded",
+            "network": "disabled",
+            "blocked_network_events": [],
+            "input_sha256": "sha256:635637f677562b73baa701208372815c97ed2cd6ff36925c421d8620036125f9",
+            "source_sha256": "sha256:2b40301cfbd9f038f981140d73a04f558518bd5dc54a65d8ab2e7aab431c8bfe",
+            "adapter_sha256": "sha256:b80cd63fb233aeedaa90ed4c28924c05d397985944a35ef4a4ade0cab1364222",
+            "device": "NVIDIA GeForce RTX 3060",
+            "threads": 4,
+            "peak_cuda_bytes": 575292416,
+            "versions": {
+              "python": "3.13.14",
+              "torch": "2.13.0+cu130",
+              "transformers": "5.14.1"
+            },
+            "elapsed_seconds": 17.829
+          },
+          "subtitle_relative_path": "workspace/whisper-smoke-20261015-d/assets/subtitles/case-0.srt",
+          "subtitle_sha256": "sha256:74558205d2422c2753afbf74cee7a886517e802b6d71cf64eeb95456e3e1c5bf",
+          "project_validation_ok": true,
+          "input_pcm": {
+            "sample_rate": 24000,
+            "channels": 1,
+            "samples": 304320
+          }
+        },
+        {
+          "source_sha256": "sha256:89b308580d3f8fdc6d19751bb830bfdcb6a28a76d488c73c12140d64bc168a1b",
+          "input_duration_seconds": 38.04,
+          "model_sha256": "sha256:b80cd63fb233aeedaa90ed4c28924c05d397985944a35ef4a4ade0cab1364222",
+          "worker_sha256": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+          "text": "我們會把責任扛起來 讓台灣的經濟結構轉型 按部就班來規劃與執行 是各國政府越來越關心的課題 照顧壓力將會減輕 我們會把責任扛起來 讓台灣的經濟結構轉型 按部就班來規劃與執行 是各國政府越來越關心的課題 照顧壓力將會減輕 我們會把責任扛起來 讓台灣的經濟結構轉型 按部就班來規劃與執行 是各國政府越來越關心的課題 照顧壓力將會減輕",
+          "segments": [
+            {
+              "start": 0.0,
+              "end": 2.18,
+              "text": "我們會把責任扛起來"
+            },
+            {
+              "start": 2.18,
+              "end": 4.84,
+              "text": "讓台灣的經濟結構轉型"
+            },
+            {
+              "start": 4.84,
+              "end": 7.54,
+              "text": "按部就班來規劃與執行"
+            },
+            {
+              "start": 7.54,
+              "end": 10.58,
+              "text": "是各國政府越來越關心的課題"
+            },
+            {
+              "start": 10.58,
+              "end": 12.64,
+              "text": "照顧壓力將會減輕"
+            },
+            {
+              "start": 12.64,
+              "end": 14.88,
+              "text": "我們會把責任扛起來"
+            },
+            {
+              "start": 14.88,
+              "end": 17.48,
+              "text": "讓台灣的經濟結構轉型"
+            },
+            {
+              "start": 17.48,
+              "end": 20.18,
+              "text": "按部就班來規劃與執行"
+            },
+            {
+              "start": 20.18,
+              "end": 23.26,
+              "text": "是各國政府越來越關心的課題"
+            },
+            {
+              "start": 23.26,
+              "end": 25.32,
+              "text": "照顧壓力將會減輕"
+            },
+            {
+              "start": 25.32,
+              "end": 27.56,
+              "text": "我們會把責任扛起來"
+            },
+            {
+              "start": 27.56,
+              "end": 30.18,
+              "text": "讓台灣的經濟結構轉型"
+            },
+            {
+              "start": 30.18,
+              "end": 32.86,
+              "text": "按部就班來規劃與執行"
+            },
+            {
+              "start": 32.86,
+              "end": 35.92,
+              "text": "是各國政府越來越關心的課題"
+            },
+            {
+              "start": 35.92,
+              "end": 38.02,
+              "text": "照顧壓力將會減輕"
+            }
+          ],
+          "cer": {
+            "normalization": "nfkc-text",
+            "script_conversion": "none",
+            "reference_sha256": "sha256:d122cb83ba529fb9a0a02180c9d416d15f7968ba314c41c98904aa2931179f9c",
+            "input_sha256": "sha256:8540884ef4db1ae544310eddbc9bc2d048f0d3ac144b90021387bddb7b3d181f",
+            "reference_characters": 150,
+            "hypothesis_characters": 150,
+            "edit_distance": 3,
+            "substitutions": 3,
+            "deletions": 0,
+            "insertions": 0,
+            "cer": 0.02,
+            "exact_match": false
+          },
+          "worker": {
+            "protocol": "agent-video-whisper-asr-v1",
+            "status": "succeeded",
+            "network": "disabled",
+            "blocked_network_events": [],
+            "input_sha256": "sha256:89b308580d3f8fdc6d19751bb830bfdcb6a28a76d488c73c12140d64bc168a1b",
+            "source_sha256": "sha256:89b308580d3f8fdc6d19751bb830bfdcb6a28a76d488c73c12140d64bc168a1b",
+            "adapter_sha256": "sha256:b80cd63fb233aeedaa90ed4c28924c05d397985944a35ef4a4ade0cab1364222",
+            "device": "NVIDIA GeForce RTX 3060",
+            "threads": 4,
+            "peak_cuda_bytes": 578547200,
+            "versions": {
+              "python": "3.13.14",
+              "torch": "2.13.0+cu130",
+              "transformers": "5.14.1"
+            },
+            "elapsed_seconds": 14.12
+          },
+          "subtitle_relative_path": "workspace/whisper-smoke-20261015-d/assets/subtitles/case-1.srt",
+          "subtitle_sha256": "sha256:8540884ef4db1ae544310eddbc9bc2d048f0d3ac144b90021387bddb7b3d181f",
+          "project_validation_ok": true,
+          "input_pcm": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "samples": 608640
+          }
+        }
+      ],
+      "render_relative_path": "workspace/whisper-smoke-20261015-d/renders/whisper-subtitles.mp4",
+      "render_sha256": "sha256:9ed69e18fa1238ffe2732d121ae8873bd07ba241395df86e74a1fac965326d33",
+      "render_dimensions": [
+        640,
+        360
+      ]
+    }
+  ],
+  "visual_spot_check": {
+    "time_seconds": 1,
+    "frame_sha256": "sha256:fb6a95a93390a1dee744681b96b6e0a29d57ecdb5b8039ab55593d1601e29f2b",
+    "observation": "Chinese glyphs visible within canvas in one sampled frame; no full-film visual/timing acceptance"
+  },
+  "limits": [
+    "No automatic simplified/traditional conversion",
+    "No independent listening, broad ad corpus, diarization or word-alignment acceptance",
+    "All source/model/font/output rights remain unverified; publication blocked",
+    "Python network guard is not an OS sandbox",
+    "Model and private inputs remain local; no weights, audio, fonts or renders uploaded"
+  ],
+  "product_regression": {
+    "tests": 170,
+    "elapsed_seconds": 190.353,
+    "status": "OK",
+    "log_relative_path": "product/.runtime/asr-full-regression-20261015.log",
+    "log_sha256": "sha256:e1eae6e8521cf867f136e939ce894659a9e453210b85ea55761ca15c68d7511a",
+    "post_catalog_regression": "capabilities test passed on final catalog, 1 test in 0.104s"
+  },
+  "implementation_files_sha256": {
+    "product\\src\\ai_ad_editor\\cli.py": "sha256:96528a938447e3cb1479c978c2c179cc72764c9e24de3fa6792006407bc395c7",
+    "product\\src\\ai_ad_editor\\local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+    "product\\src\\ai_ad_editor\\whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product\\src\\ai_ad_editor\\transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product\\src\\ai_ad_editor\\asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product\\src\\ai_ad_editor\\media.py": "sha256:cc1877d2b997ba899e88b6b1114e345d4812ad11e79b6552f977b2706cbde3e1",
+    "product\\src\\ai_ad_editor\\utils.py": "sha256:1b22761b1bbf6bae4b90204df5ff33d7196acbb39205461e35e524890ffa2de5",
+    "product\\src\\ai_ad_editor\\capabilities.py": "sha256:0303a32c8223035ce7739d310cda40417e83f6cffca652a8503c4a91bfcfee79"
+  }
+}
