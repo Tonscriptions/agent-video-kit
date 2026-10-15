@@ -121,6 +121,8 @@ def prepare_audio_adapter(
         runner = Path(runner_text).expanduser().resolve()
         if not runner.exists() or not runner.is_file():
             raise AppError("MODEL_EXECUTABLE_MISSING", f"本地适配器 executable 不存在: {runner}", exit_code=10, path=str(runner))
+        if engine == "command-json-v1" and runner.suffix.lower() in {".cmd", ".bat"}:
+            raise AppError("MODEL_EXECUTABLE_UNSAFE", "command-json-v1 不允许登记 .cmd/.bat shell wrapper", exit_code=10, path=str(runner))
         runner_hash = f"sha256:{sha256_file(runner)}"
     if engine == "command-json-v1" and runner is None:
         raise argument_error("command-json-v1 必须提供 --executable", "executable")

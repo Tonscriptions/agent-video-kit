@@ -64,7 +64,7 @@ from .smart_cut import SMART_CUT_VERSION, build_smart_cut_plan, match_transcript
 from .beat_edit import BEAT_CUT_VERSION, build_beat_cut_plan
 from .multicam import MULTICAM_SYNC_VERSION, build_switch_segments, new_multicam_clip_id, synchronize_multicam_sources
 from .audio_tools import AUDIO_EXTRACT_VERSION, extract_audio, inspect_audio_source
-from .audio_separation import AUDIO_SEPARATION_ENGINE, AUDIO_SEPARATION_VERSION, separate_mid_side
+from .audio_separation import AUDIO_SEPARATION_ENGINE, AUDIO_SEPARATION_VERSION, separate_command_json, separate_mid_side
 from .model_registry import (
     MODEL_REGISTRY_VERSION,
     adapter_for,
@@ -1084,8 +1084,8 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
         adapter_verification = verify_audio_adapter(adapter_record)
         if not adapter_verification["ok"]:
             raise AppError("MODEL_ADAPTER_HASH_INVALID", "本地音频适配器路径或哈希校验失败", exit_code=10, path=str(registry_path(root)), cause=json.dumps(adapter_verification, ensure_ascii=False))
-        if adapter_record.get("engine") != AUDIO_SEPARATION_ENGINE:
-            raise AppError("AUDIO_SEPARATION_ADAPTER_UNAVAILABLE", f"适配器已登记但当前没有对应本地 runner: {adapter_record.get('engine')}", exit_code=10, path=str(args.adapter_id), hint="当前可执行 runner 只有 ffmpeg-local-mid-side-v1；未知模型不会被隐式 fallback")
+        if adapter_record.get("engine") not in {AUDIO_SEPARATION_ENGINE, "command-json-v1"}:
+            raise AppError("AUDIO_SEPARATION_ADAPTER_UNAVAILABLE", f"适配器已登记但当前没有对应本地 runner: {adapter_record.get('engine')}", exit_code=10, path=str(args.adapter_id), hint="当前可执行 runner 只有 ffmpeg-local-mid-side-v1 和 command-json-v1；未知模型不会被隐式 fallback")
     source_asset: dict[str, Any] | None = None
     parent_rights_ref: str | None = None
     if args.asset_id:
@@ -1121,6 +1121,9 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
     if center_output == side_output:
         raise argument_error("center 和 side 输出必须是不同文件", "output")
     if args.dry_run:
+        dry_engine = adapter_record.get("engine") if adapter_record else AUDIO_SEPARATION_ENGINE
+        dry_method = "command-json" if dry_engine == "command-json-v1" else "mid-side"
+        dry_warnings = ([{"code": "AUDIO_SEPARATION_LOCAL_RUNNER_REVIEW", "message": "command-json-v1 将由已登记的本地 runner 执行；正式运行前仍需检查 runner 协议与质量 golden"}] if dry_method == "command-json" else [{"code": "AUDIO_SEPARATION_APPROXIMATE", "message": "mid/side 仅按声道相位生成 center/side，不能替代本地 AI 源分离模型"}])
         return _envelope(
             "audio.separate",
             args,
@@ -1130,8 +1133,8 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
                 "source_asset_id": args.asset_id,
                 "source_sha256": f"sha256:{sha256_file(source)}",
                 "input_probe": input_probe,
-                "method": "mid-side",
-                "engine": AUDIO_SEPARATION_ENGINE,
+                "method": dry_method,
+                "engine": dry_engine,
                 "adapter": adapter_record,
                 "adapter_verification": adapter_verification,
                 "center": {"asset_id": center_id, "output": str(center_output)},
@@ -1141,12 +1144,25 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
                 "timeline_start_seconds": args.timeline_start_seconds,
                 "network": "disabled",
             },
-            warnings=[{"code": "AUDIO_SEPARATION_APPROXIMATE", "message": "mid/side 仅按声道相位生成 center/side，不能替代本地 AI 源分离模型"}],
+            warnings=dry_warnings,
         )
     before_project = copy.deepcopy(project)
     snapshot = create_snapshot(root, before_project, label="before-audio-separate")
     operation_id = new_id("op")
-    separation = separate_mid_side(source, center_output, side_output, sample_rate=args.sample_rate)
+    if adapter_record and adapter_record.get("engine") == "command-json-v1":
+        model_path = Path(str(adapter_record.get("model_path") or "")).expanduser().resolve()
+        executable = Path(str(adapter_record.get("executable") or "")).expanduser().resolve()
+        separation = separate_command_json(
+            source,
+            center_output,
+            side_output,
+            adapter_id=str(args.adapter_id),
+            model_path=model_path,
+            executable=executable,
+            sample_rate=args.sample_rate,
+        )
+    else:
+        separation = separate_mid_side(source, center_output, side_output, sample_rate=args.sample_rate)
     separation["adapter_id"] = args.adapter_id
     ledger = load_ledger(root)
     parent_record = None
@@ -1158,6 +1174,8 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
             side_output.unlink(missing_ok=True)
             raise AppError("RIGHTS_RECORD_MISSING", "源资产缺少可继承的 Rights Ledger 记录", exit_code=7, path=parent_rights_ref)
 
+    derived_version = f"derived:audio-{separation.get('method', 'mid-side')}"
+
     def make_rights_record(asset_id: str, stem: str, details: dict[str, Any]) -> dict[str, Any]:
         source_url = f"local://{details['output']}"
         if parent_record is not None:
@@ -1166,7 +1184,7 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
                 "kind": "audio",
                 "sha256": details["sha256"],
                 "source_url": source_url,
-                "source_version": "derived:audio-mid-side",
+                "source_version": derived_version,
                 "retrieved_at": now_iso(),
                 "creator": parent_record.get("creator", "unknown"),
                 "license_spdx": parent_record.get("license_spdx", "LicenseRef-UNVERIFIED"),
@@ -1180,14 +1198,14 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
                 "verification_status": parent_record.get("verification_status", "unverified"),
                 "verified_by": parent_record.get("verified_by", ""),
                 "takedown_status": parent_record.get("takedown_status", "clear"),
-                "notes": f"Derived by local FFmpeg mid/side {stem} split; inherits source rights",
+                "notes": f"Derived by local {separation.get('engine', AUDIO_SEPARATION_ENGINE)} {stem} split; inherits source rights",
             }
         return {
             "asset_id": asset_id,
             "kind": "audio",
             "sha256": details["sha256"],
             "source_url": source_url,
-            "source_version": "derived:audio-mid-side",
+            "source_version": derived_version,
             "retrieved_at": now_iso(),
             "creator": args.creator,
             "license_spdx": args.license_spdx,
@@ -1201,7 +1219,7 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
             "verification_status": args.verification_status,
             "verified_by": "ai-ad-editor" if args.verification_status == "verified" else "",
             "takedown_status": "clear",
-            "notes": f"Derived by local FFmpeg mid/side {stem} split",
+            "notes": f"Derived by local {separation.get('engine', AUDIO_SEPARATION_ENGINE)} {stem} split",
         }
 
     stems = separation["stems"]
@@ -1265,8 +1283,8 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
         "created_at": now_iso(),
         "operation_id": operation_id,
         "snapshot_id": snapshot["snapshot_id"],
-        "method": "mid-side",
-        "engine": AUDIO_SEPARATION_ENGINE,
+        "method": separation.get("method", "mid-side"),
+        "engine": separation.get("engine", AUDIO_SEPARATION_ENGINE),
         "adapter": adapter_record,
         "source_asset_id": args.asset_id,
         "assets": {"center": center_asset, "side": side_asset},
@@ -1276,10 +1294,10 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
         "validation": validation,
     }
     atomic_write_json(report_path, report)
-    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "audio.separate", "method": "mid-side", "asset_ids": [center_id, side_id], "source_asset_id": args.asset_id, "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "clip_id": generated_clip.get("id") if generated_clip else None, "at": now_iso()})
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "audio.separate", "method": separation.get("method", "mid-side"), "engine": separation.get("engine", AUDIO_SEPARATION_ENGINE), "asset_ids": [center_id, side_id], "source_asset_id": args.asset_id, "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "clip_id": generated_clip.get("id") if generated_clip else None, "at": now_iso()})
     save_project(root, project)
     save_ledger(root, ledger)
-    _operation(root, operation_id, {"operation_id": operation_id, "command": "audio.separate", "status": "succeeded", "method": "mid-side", "asset_ids": [center_id, side_id], "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "created_at": now_iso()})
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "audio.separate", "status": "succeeded", "method": separation.get("method", "mid-side"), "engine": separation.get("engine", AUDIO_SEPARATION_ENGINE), "asset_ids": [center_id, side_id], "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "created_at": now_iso()})
     return _envelope("audio.separate", args, data={"assets": {"center": center_asset, "side": side_asset}, "rights": {"center": center_rights, "side": side_rights}, "snapshot": snapshot, "report": str(report_path), "separation": separation, "adapter": adapter_record, "generated_clip": generated_clip, "validation": validation}, warnings=separation.get("warnings"), operation_id=operation_id)
 
 

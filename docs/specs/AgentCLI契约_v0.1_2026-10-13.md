@@ -123,7 +123,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 
 ## 3.1 本地模型适配器登记与执行门禁
 
-audio adapter register 只接受已存在的本地模型/执行器路径；它不会下载、复制或执行模型。目录按相对路径、大小和文件 SHA-256 形成稳定哈希，正式登记写入 models/audio-adapters.json、Rights Ledger 和 before-audio-adapter-register 快照。audio adapter list/inspect 只读检查路径与哈希。ffmpeg-local-mid-side-v1 是当前可执行 runner；Demucs、UVR、Open-Unmix、ONNX 和 command-json-v1 只能登记，尚无对应 runner 时 audio separate --adapter-id 返回 AUDIO_SEPARATION_ADAPTER_UNAVAILABLE（退出码 10），禁止隐式回退或网络调用。详细字段见本地模型适配器注册与音频分离门禁契约。
+audio adapter register 只接受已存在的本地模型/执行器路径；它不会下载、复制或在登记阶段执行模型。目录按相对路径、大小和文件 SHA-256 形成稳定哈希，正式登记写入 models/audio-adapters.json、Rights Ledger 和 before-audio-adapter-register 快照。audio adapter list/inspect 只读检查路径与哈希。ffmpeg-local-mid-side-v1 与 `command-json-v1` 是当前可执行 runner；后者通过 `agent-video-audio-separation-v1` 的 stdin/stdout JSON 协议生成约定的 center/side WAV，并拒绝 `.cmd/.bat` shell wrapper。Demucs、UVR、Open-Unmix 和 ONNX 专用 engine 仍只能登记，尚无对应 runner 时 audio separate --adapter-id 返回 AUDIO_SEPARATION_ADAPTER_UNAVAILABLE（退出码 10），禁止隐式回退或网络调用。command-json runner 的输出仍需质量 golden 和 Rights Ledger 复核。详细字段见本地模型适配器注册与音频分离门禁契约。
 
 ## 4. 项目迁移、快照和路径规则
 

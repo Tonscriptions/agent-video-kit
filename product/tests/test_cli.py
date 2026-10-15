@@ -1020,6 +1020,76 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(ledger["records"][-1]["asset_id"], "adapter:demucs_fixture")
 
 
+    def test_command_json_audio_adapter_runs_local_protocol_and_registers_stems(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-command-json-audio-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace, "camera.mp4")
+            model = workspace / "model.bin"
+            model.write_bytes(b"command-json model fixture v1")
+            runner = workspace / "runner.py"
+            runner.write_text(
+                """import json
+import subprocess
+import sys
+
+request = json.load(sys.stdin)
+assert request[\"protocol\"] == \"agent-video-audio-separation-v1\"
+for stem in (\"center\", \"side\"):
+    output = request[\"outputs\"][stem]
+    subprocess.run([
+        \"ffmpeg\", \"-hide_banner\", \"-loglevel\", \"error\", \"-y\",
+        \"-i\", request[\"source\"][\"path\"], \"-map\", \"0:a:0\",
+        \"-c:a\", \"pcm_s16le\", output,
+    ], check=True)
+print(json.dumps({
+    \"protocol\": \"agent-video-audio-separation-v1\",
+    \"status\": \"ok\",
+    \"stems\": request[\"outputs\"],
+    \"network\": \"disabled\",
+}))
+""",
+                encoding="utf-8",
+            )
+            unsafe_runner = workspace / "runner.cmd"
+            unsafe_runner.write_text("@echo off\necho unsafe\n", encoding="utf-8")
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            _, ingested = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            source_id = ingested["data"]["asset"]["id"]
+            code, unsafe = invoke(
+                "audio", "adapter", "register", "--project", str(project),
+                "--adapter-id", "unsafe_command_json", "--engine", "command-json-v1",
+                "--model-path", str(model), "--executable", str(unsafe_runner), "--dry-run",
+            )
+            self.assertEqual(code, 10, unsafe)
+            self.assertEqual(unsafe["errors"][0]["code"], "MODEL_EXECUTABLE_UNSAFE")
+            code, registered = invoke(
+                "audio", "adapter", "register", "--project", str(project),
+                "--adapter-id", "command_json_fixture", "--engine", "command-json-v1",
+                "--model-path", str(model), "--executable", str(runner),
+                "--license-spdx", "CC0-1.0", "--verification-status", "verified",
+                "--evidence", "local://command-json-fixture",
+            )
+            self.assertEqual(code, 0, registered)
+            code, separated = invoke(
+                "audio", "separate", "--project", str(project), "--asset-id", source_id,
+                "--adapter-id", "command_json_fixture", "--center-asset-id", "json_center",
+                "--side-asset-id", "json_side",
+            )
+            self.assertEqual(code, 0, separated)
+            separation = separated["data"]["separation"]
+            self.assertEqual(separation["engine"], "command-json-v1")
+            self.assertEqual(separation["method"], "command-json")
+            self.assertEqual(separation["protocol"], "agent-video-audio-separation-v1")
+            self.assertTrue(Path(separation["stems"]["center"]["output"]).exists())
+            self.assertTrue(Path(separation["stems"]["side"]["output"]).exists())
+            self.assertTrue(any(item["code"] == "AUDIO_SEPARATION_LOCAL_RUNNER_REVIEW" for item in separated["warnings"]))
+            payload = json.loads((project / "project.json").read_text(encoding="utf-8"))
+            self.assertEqual({item["id"] for item in payload["assets"][-2:]}, {"json_center", "json_side"})
+            operation = json.loads((project / "operations" / f"{separated['operation_id']}.json").read_text(encoding="utf-8"))
+            self.assertEqual(operation["engine"], "command-json-v1")
+
+
     def test_local_highlight_recommendation_writes_auditable_report(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-highlights-") as raw:
             workspace = Path(raw)
