@@ -1,0 +1,431 @@
+{
+  "checked_at_utc": "2026-10-15T21:21:14.550383+00:00",
+  "scope": "Read-only status verification. No tests or models rerun; implementation remains uncommitted. Current-source acceptance and Jianying parity are not established.",
+  "workspace": "E:\\dev\\sandbox\\AI广告剪辑",
+  "branch": "main",
+  "head_at_check": "f57d84f9de7a320d9e55700eb686c53b81269b1e",
+  "origin_main_at_check": "f57d84f9de7a320d9e55700eb686c53b81269b1e",
+  "published_baseline": {
+    "commit": "2267e39944a99b73903f521b4f982311e3d8e0fa",
+    "full_regression": {
+      "tests": 303,
+      "seconds": 581.394,
+      "ok": true,
+      "log_path": "product/.runtime/inpainting-full-regression-20261016.log",
+      "log_sha256": "sha256:a2099b2885be4da4b6588a3b61977034eb0356fe062d389146e6eecf8efdb078",
+      "tests_by_module": {
+        "test_cli": 122,
+        "test_draft_adapter": 11,
+        "test_local_asr": 22,
+        "test_local_inpainting": 25,
+        "test_local_matting": 24,
+        "test_local_segmentation": 21,
+        "test_local_separation": 22,
+        "test_local_tts": 15,
+        "test_local_vision": 24,
+        "test_tracking_geometry": 17
+      },
+      "log_hash_and_result_rechecked": true,
+      "rerun_during_status_check": false
+    },
+    "source_files_rechecked": 79,
+    "source_hash_mismatches": [],
+    "evidence_path": "docs/validation/evidence/lama-smoke-20261016.json",
+    "evidence_sha256": "sha256:affb409068d4ed93f636e11f303d612e65db847dc1ac4743d5e01a753f4d5160",
+    "full_log_hash_matches": true
+  },
+  "current_working_tree": {
+    "implementation_committed": false,
+    "test_methods_in_source": 337,
+    "tests_by_module": {
+      "test_artifact_locks": 7,
+      "test_atomic_io": 4,
+      "test_cli": 122,
+      "test_draft_adapter": 11,
+      "test_local_asr": 22,
+      "test_local_inpainting": 25,
+      "test_local_matting": 24,
+      "test_local_segmentation": 21,
+      "test_local_separation": 22,
+      "test_local_tts": 15,
+      "test_local_vace": 23,
+      "test_local_vision": 24,
+      "test_tracking_geometry": 17
+    },
+    "latest_targeted_run": {
+      "tests": 34,
+      "seconds": 63.212,
+      "errors": 1,
+      "passed": false,
+      "error_test": "test_shared_snapshot_keeps_old_contents_during_actual_replacement",
+      "cause": "PermissionError WinError 5 during os.replace while shared_binary_reader holds the destination open"
+    },
+    "current_full_regression_passed": false,
+    "historical_full_323_is_current_acceptance": false,
+    "full_326": "Failed; source edits during the run invalidated its integrity-bound acceptance",
+    "full_333": "Interrupted before progress-I/O code changes; no complete result",
+    "source_sha256": {
+      "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+      "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+      "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+      "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+      "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+      "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+      "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+      "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+      "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+      "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+      "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+      "product/src/ai_ad_editor/capabilities.py": "sha256:5ded83d6964ef2ddb05b54c2085a543a7be240edc8193242d234fd2f8450ae3a",
+      "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+      "product/src/ai_ad_editor/cli.py": "sha256:aa34e0e25cb5ac87bd806943381d6f83a589bf6979430ea48241d7dd02e894e8",
+      "product/src/ai_ad_editor/convert.py": "sha256:9cbdcbde37e01e4c97be36cc5e741f1962a269451828a4ec32577464bfbb44ed",
+      "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+      "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+      "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+      "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+      "product/src/ai_ad_editor/inpainting_frames.py": "sha256:3e9b2cb258463f082fc62e2a4bd1e88f9a11dbdce9a9da22ce1b6d16ffcbb9e2",
+      "product/src/ai_ad_editor/lama_worker.py": "sha256:91820085842c144bd87d44f405d616c69ee540590fc2218dab6045a55ca5e8d3",
+      "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+      "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+      "product/src/ai_ad_editor/local_inpainting.py": "sha256:c87fe70dd38df8401af7b5379bfef365b489595d7533153145bb6b5d8b7c51ef",
+      "product/src/ai_ad_editor/local_matting.py": "sha256:6a733106a2ae3f4de99ed704474eacda9c3fb9a3dff9b95146d63ffbab9d571b",
+      "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+      "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+      "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+      "product/src/ai_ad_editor/local_vace.py": "sha256:63ae31d5faa21454789d6d1e7c43756aca48b31b29d0354b9c30e036585bb000",
+      "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+      "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+      "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+      "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+      "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+      "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+      "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+      "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+      "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+      "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+      "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+      "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+      "product/src/ai_ad_editor/render.py": "sha256:ae9626cc7a1037979a5bfa81a03e9d1ed28a8fbf44921c892810f2d0f9424080",
+      "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+      "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+      "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+      "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+      "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+      "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+      "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+      "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+      "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+      "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+      "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+      "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+      "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+      "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+      "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+      "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+      "product/src/ai_ad_editor/utils.py": "sha256:2edfa58a1eb47082e836bb815b47ec5b869e54ed4ee9a10169650d09a5cdad38",
+      "product/src/ai_ad_editor/vace_frames.py": "sha256:60310c6c5c416ea90150503392aa1d5b9ab8af2d581cebd8915e1845831e5d68",
+      "product/src/ai_ad_editor/vace_model.py": "sha256:0ff973056008ddbdfc27aa27a9d6f7b873916e1f8c78893ab873c9511c96719d",
+      "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+      "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+      "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+      "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+      "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+      "product/tests/test_artifact_locks.py": "sha256:939ada19ce27a6dbe0d46606ad414c65bda01cec6dcd50a06af6c444d04e6bd7",
+      "product/tests/test_atomic_io.py": "sha256:5d813501775ddac8ed0b5fcbada2a3be6935c2aef9372cc79c7a14a82adfdfd9",
+      "product/tests/test_cli.py": "sha256:845fcfe25d3413f83ee572d89b1b96e500f2ee73ebdf71623ae3955300e5266f",
+      "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+      "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+      "product/tests/test_local_inpainting.py": "sha256:c3a9da06be29a02b4b960182bd094270d335fdb600a7819560b52623644748c7",
+      "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+      "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+      "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+      "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+      "product/tests/test_local_vace.py": "sha256:272d5c743917bfab8335d7736af736b1c025ab1006c7025c157908a951ef002a",
+      "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+      "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+      "scripts/smoke_lama_local.py": "sha256:e67052fb33a03cd7557de543e6a9390624d8e0d25a7ef71cbd09d228b2ee0067"
+    }
+  },
+  "vace": {
+    "model_files_present": 17,
+    "model_bytes_present": 19037105642,
+    "weight_sha256_repeated_during_status_check": false,
+    "model_manifest_path": "product/.runtime/models/generative/vace-evidence.json",
+    "model_manifest_sha256": "sha256:ee32da2e5a97e3e157ce038670c7c61f7f083f7d4d34d7cf773a30b4f38a9aa5",
+    "developer_api_diagnostic": {
+      "scope": "Developer API/loading diagnostic; full registered pipeline and broad quality acceptance not established",
+      "status": "succeeded",
+      "network": "disabled",
+      "blocked_network_events": [],
+      "model_artifacts_previously_verified_by_download": true,
+      "full_weight_sha256_repeated_in_this_diagnostic": false,
+      "model_revision": "ec4d2cb062b548996b179d493fdd05340de702a1",
+      "cuda_before": {
+        "free": 11799625728,
+        "total": 12884377600
+      },
+      "generation": {
+        "prompt": "A static empty smooth gray and blue gradient background. The background remains clean, still and consistent.",
+        "negative_prompt": "person, object, text, watermark, motion, artifacts",
+        "seed": 0,
+        "inference_steps": 5,
+        "guidance_scale": 5.0,
+        "conditioning_scale": 1.0,
+        "window_frames": 5,
+        "window_overlap": 2,
+        "prompt_max_tokens": 256,
+        "scene_cut_frames": []
+      },
+      "metrics": {
+        "frames": 8,
+        "width": 192,
+        "height": 128,
+        "rgba_sha256": "sha256:772efe967abf54aacf7ce64ddc8b846afeba4a34378fc4a822f27b75d90e6e15",
+        "rgba_bytes": 786432,
+        "source_rgba_sha256": "sha256:61d8d642634b2f3e8f097c6292408f8bae5218825d7c113ce59039ede645a22d",
+        "decoded_mask_rgba_sha256": "sha256:f52dcf88552cb35a66bef12b4d739518983bc5951dc633352cf1be07bfd902ad",
+        "input_alpha_sha256": "sha256:4c8a013301abe61e0de71e163617df5f51ede71919c9210bddef43e74829f243",
+        "output_alpha_sha256": "sha256:4c8a013301abe61e0de71e163617df5f51ede71919c9210bddef43e74829f243",
+        "state_updates": 8,
+        "state_peak_bytes": 11403264,
+        "state_reset": "per-joint-window-and-scene",
+        "buffer_budget_scope": "conservative-owned-window-array-upper-bound-excludes-model-and-torch-temporaries",
+        "input_alpha": "preserve",
+        "alpha_mode": "straight",
+        "alpha_min": 128,
+        "alpha_max": 255,
+        "alpha_mean": 0.998703022875817,
+        "transparent_pixels": 0,
+        "opaque_pixels": 196096,
+        "soft_alpha_pixels": 512,
+        "conditioning": "masked-rgb-127-before-and-after-resize",
+        "model_calls": 2,
+        "empty_windows": 0,
+        "empty_mask_frames": 1,
+        "mask_pixels": 5460,
+        "resized_model_frames": 0,
+        "model_peak_pixels": 112640,
+        "outside_mask_changed_pixels": 0,
+        "clipped_model_values": 0,
+        "padded_frames": 0,
+        "window_count": 2,
+        "window_plan_sha256": "sha256:84800a3744ae5b26289e1f621773f59df40a141de61ef7f08fe065f063a9df66",
+        "overlap_frames_blended": 2,
+        "window_samples": [
+          {
+            "start": 0,
+            "end": 5,
+            "model_frames": 5,
+            "seed": 0,
+            "model_calls": 1,
+            "roi": [
+              4,
+              0,
+              168,
+              128
+            ],
+            "resized": false,
+            "model_pixels": 112640,
+            "padded_frames": 0,
+            "clipped_model_values": 0
+          },
+          {
+            "start": 3,
+            "end": 8,
+            "model_frames": 5,
+            "seed": 1,
+            "model_calls": 1,
+            "roi": [
+              8,
+              0,
+              174,
+              128
+            ],
+            "resized": false,
+            "model_pixels": 112640,
+            "padded_frames": 0,
+            "clipped_model_values": 0
+          }
+        ]
+      },
+      "model_execution": {
+        "versions": {
+          "python": "3.13.14",
+          "numpy": "2.4.6",
+          "torch": "2.13.0+cu130",
+          "diffusers": "0.39.0",
+          "transformers": "5.14.1",
+          "accelerate": "1.14.0",
+          "safetensors": "0.8.0"
+        },
+        "text_device_map": {
+          "shared": "0",
+          "encoder.embed_tokens": "0",
+          "encoder.block.0": "0",
+          "encoder.block.1": "0",
+          "encoder.block.2": "0",
+          "encoder.block.3": "0",
+          "encoder.block.4": "0",
+          "encoder.block.5": "0",
+          "encoder.block.6": "0",
+          "encoder.block.7": "0",
+          "encoder.block.8": "0",
+          "encoder.block.9": "0",
+          "encoder.block.10": "0",
+          "encoder.block.11": "0",
+          "encoder.block.12": "0",
+          "encoder.block.13": "cpu",
+          "encoder.block.14": "cpu",
+          "encoder.block.15": "cpu",
+          "encoder.block.16": "cpu",
+          "encoder.block.17": "cpu",
+          "encoder.block.18": "cpu",
+          "encoder.block.19": "cpu",
+          "encoder.block.20": "cpu",
+          "encoder.block.21": "cpu",
+          "encoder.block.22": "cpu",
+          "encoder.block.23": "cpu",
+          "encoder.final_layer_norm": "cpu",
+          "encoder.dropout": "cpu"
+        },
+        "text_weight_bytes_bfloat16": 11361820672,
+        "text_encoder_released_before_generation": true,
+        "prompt_token_counts": {
+          "prompt": 21,
+          "negative_prompt": 14
+        },
+        "prompt_truncated": false,
+        "prompt_extension": false,
+        "text_phase_seconds": 285.78608720000193,
+        "load_seconds": 517.8307208999904,
+        "cuda_device": "NVIDIA GeForce RTX 3060",
+        "cuda_total_bytes": 12884377600,
+        "transformer_precision": "bfloat16-with-declared-float32-stability-modules",
+        "transformer_parameter_dtype_elements": {
+          "torch.float32": 3311616,
+          "torch.bfloat16": 2150660416
+        },
+        "float32_stability_modules": [
+          "time_embedder",
+          "scale_shift_table",
+          "norm1",
+          "norm2",
+          "norm3"
+        ],
+        "vae_precision": "float32",
+        "vae_spatial_tiling": true,
+        "window_seconds": [
+          7.291271499998402,
+          2.3892720000003465
+        ]
+      },
+      "cuda_peak_allocated_bytes": 7245013504,
+      "elapsed_seconds": 570.9475384999969
+    },
+    "diagnostic_quality_review": {
+      "scope": "5-step API diagnostic, grow=0; synthetic background only, not full registered CLI delivery or broad quality acceptance",
+      "masked_psnr_before_db": 7.737375294555663,
+      "masked_psnr_after_db": 27.046028990048754,
+      "consecutive_error_delta_mae_on_shared_mask": 2.5361905097961426,
+      "source_alpha_exact": true,
+      "outside_mask_changed_pixels": 0,
+      "contact_sheet_sha256": "sha256:3362eedf8c30456f28ebc0830966f6a54f01b9ed8c099013c3e8a28eb49d39b7",
+      "rgba_npy_sha256": "sha256:ae0732fc65b2d6426bd109cba0d116037b018d5ef0b25af7dcc96423d9e90892",
+      "summary_sha256": "sha256:cfc1227345c310a289109ffec2317ac78c26c5065a13becfb09d84eb915c42cc",
+      "manual_review": "Frames 0/3/4/7 sampled: selected object replaced, visible darker rectangular patch and mismatch with gradient truth; continuous playback not reviewed.",
+      "broad_quality_accepted": false
+    },
+    "diagnostic_evidence_hash_checks": {
+      "summary_matches_quality_hash": true,
+      "contact_sheet_matches_quality_hash": true,
+      "rgba_matches_quality_hash": true
+    },
+    "formal_natural_cli": {
+      "status": "failed-before-vace-inference",
+      "stage": "SAM2 segmentation progress-file replacement",
+      "error": "PermissionError WinError 5",
+      "log_path": "product/.runtime/vace-natural-cli-20261016.log"
+    },
+    "broad_quality_accepted": false,
+    "commercial_rights_verified": false
+  },
+  "skill_audit": {
+    "path": "research/video-cut-validation.json",
+    "sha256": "sha256:f0b45a554f5eb4ebc176d6d76935e88cc0e1c5462cdabcd94cb121d6d4794405",
+    "checked_at_utc": "2026-10-15T21:10:45.723688+00:00",
+    "skill_count": 14,
+    "failures": [],
+    "unresolved_markdown_links": [],
+    "current_skill_changes_committed": false
+  },
+  "logs": [
+    {
+      "path": "product/.runtime/inpainting-full-regression-20261016.log",
+      "sha256": "sha256:a2099b2885be4da4b6588a3b61977034eb0356fe062d389146e6eecf8efdb078",
+      "reported_results": [
+        "Ran 303 tests in 581.394s",
+        "OK"
+      ]
+    },
+    {
+      "path": "product/.runtime/vace-full-regression-20261016.log",
+      "sha256": "sha256:b0b6dc3aaaa6aa4d0b6576d1ce829ba0d1f4cb28752f56d8aa16cf527c3702c1",
+      "reported_results": [
+        "Ran 323 tests in 591.144s",
+        "OK"
+      ]
+    },
+    {
+      "path": "product/.runtime/vace-full-regression-20261016-final.log",
+      "sha256": "sha256:5f8f6fd3c08562f2469631e65918eb5f98fcf2f5ad6a021a472ffd0495de302e",
+      "reported_results": [
+        "Ran 326 tests in 946.526s",
+        "FAILED (failures=1)"
+      ]
+    },
+    {
+      "path": "product/.runtime/vace-full-regression-20261016-locked.log",
+      "sha256": "sha256:fba00c090d48e130d9feaa4e266df435fad10c5a3989f68d5bec9f564cd2d464",
+      "reported_results": []
+    },
+    {
+      "path": "product/.runtime/vace-targeted-20261016-locked.log",
+      "sha256": "sha256:ea4ab6f23ce5ca4f3f8d1989e696f3cfd560d965c1900ba3806aed45a451f594",
+      "reported_results": [
+        "Ran 23 tests in 78.032s",
+        "OK"
+      ]
+    },
+    {
+      "path": "product/.runtime/vace-targeted-20261016-io-final.log",
+      "sha256": "sha256:295bb51cac84ce9c9bc3cbfd4cc601f52c0d0e1e3dacfedb7cd381285461e71a",
+      "reported_results": [
+        "Ran 34 tests in 63.212s",
+        "FAILED (errors=1)"
+      ]
+    },
+    {
+      "path": "product/.runtime/vace-loader-probe-20261016.log",
+      "sha256": "sha256:15efd8a96f66d6b3049c95dc4797e45855db086d696d0a5b6fb6d9156669fa0e",
+      "reported_results": []
+    },
+    {
+      "path": "product/.runtime/vace-natural-cli-20261016.log",
+      "sha256": "sha256:b7dd2e5d4688fa3a4a6fb5c94446ee0cf8b8afbf40a230104a1234890df8722b",
+      "reported_results": []
+    }
+  ],
+  "not_established": [
+    "Complete registered VACE CLI delivery on current sources",
+    "Natural video temporal quality and prompt editing acceptance",
+    "Current full 337-method regression",
+    "Whole Jianying functional or visual equivalence",
+    "Commercial licensing for model artifacts and source media"
+  ],
+  "next_steps": [
+    "Repair native Windows progress-file replacement and rerun targeted tests",
+    "Freeze implementation hashes and rerun full regression plus registered SAM2-to-VACE delivery",
+    "Validate temporal transitions, object removal, resource usage and rights evidence on authorized advertising fixtures"
+  ]
+}
