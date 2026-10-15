@@ -21,6 +21,19 @@ online service. No adapter keeps the English/ASCII flite behavior described belo
 
 ## Runtime boundary
 
+For transparent human cutouts use the [local RVM contract](../../docs/specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md).
+Register existing FP32 ONNX, native Python and evidence with `media adapter
+register --engine rvm-onnx-cpu-matting-v1`; inspect, then run `media matting
+--asset-id <ingested-video> --adapter-id <id> --derived-asset-id <new-id>
+--max-edge 1280 --dry-run`. Formal execution registers a QTRLE/ARGB MOV with
+source/model rights and exact RGBA encode/decode hash evidence. Add `--apply
+--track-id <video-track>` and optionally `--audio-track-id <audio-track>` for
+explicit synchronized audio. Existing clip overlap needs `--replace-track`.
+Put the foreground on a higher-order video layer than its background.
+This is CPU-only, recurrent human matting with no downloads/provider fallback.
+Keep model-review and CFR-clock warnings; first-frame edges, hair, movement,
+occlusion and held objects need visual review, and HDR requires prior tone map.
+
 For actual vocal separation, use the [native HDemucs contract](../../docs/specs/本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md).
 Register existing compatible weights, native Python and evidence with
 `audio adapter register --engine torchaudio-hdemucs-local-v1 --device cpu|cuda`.

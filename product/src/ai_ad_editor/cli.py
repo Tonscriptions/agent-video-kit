@@ -85,6 +85,7 @@ from .multicam import MULTICAM_SYNC_VERSION, build_switch_segments, new_multicam
 from .audio_tools import AUDIO_EXTRACT_VERSION, extract_audio, inspect_audio_source
 from .audio_separation import AUDIO_SEPARATION_ENGINE, AUDIO_SEPARATION_VERSION, separate_command_json, separate_mid_side
 from .local_separation import DEMUCS_ENGINE, separate_native
+from .local_matting import MATTING_ENGINE, prepare_plan as prepare_matting_plan, matte_native
 from .model_registry import (
     MODEL_REGISTRY_VERSION,
     adapter_for,
@@ -278,7 +279,8 @@ def build_parser() -> argparse.ArgumentParser:
     visual_adapter_register.add_argument("--engine", required=True, help="本地视觉适配器 engine")
     visual_adapter_register.add_argument("--model-path", required=True)
     visual_adapter_register.add_argument("--executable", required=True, help="command-json-tracking-v1 的本地执行器")
-    visual_adapter_register.add_argument("--threads", type=int, default=4, help="YOLO 原生 CPU 线程数")
+    visual_adapter_register.add_argument("--threads", type=int, default=4, help="原生 ONNX CPU 线程数")
+    visual_adapter_register.add_argument("--downsample-ratio", type=float, default=None, help="RVM 内部降采样比例；默认输出长边缩至 512")
     visual_adapter_register.add_argument("--confidence", type=float, default=0.35)
     visual_adapter_register.add_argument("--low-confidence", type=float, default=0.10)
     visual_adapter_register.add_argument("--match-iou", type=float, default=0.10)
@@ -295,6 +297,26 @@ def build_parser() -> argparse.ArgumentParser:
     visual_adapter_inspect = _leaf_common(vas.add_parser("inspect", help="检查视觉适配器路径与哈希"))
     visual_adapter_inspect.add_argument("--project", required=True)
     visual_adapter_inspect.add_argument("--adapter-id", required=True)
+    matting = _leaf_common(ms.add_parser("matting", help="本地 RVM 人物抠像与透明视频派生资产"))
+    matting.add_argument("--project", required=True)
+    matting.add_argument("--asset-id", required=True)
+    matting.add_argument("--adapter-id", required=True)
+    matting.add_argument("--derived-asset-id", required=True)
+    matting.add_argument("--output", default=None)
+    matting.add_argument("--start-seconds", type=float, default=0.)
+    matting.add_argument("--end-seconds", type=float, default=None)
+    matting.add_argument("--fps", default=None, help="显式 CFR，如 25 或 30000/1001")
+    matting.add_argument("--max-edge", type=int, default=0, help="0 保留显示尺寸；否则仅缩小")
+    matting.add_argument("--max-frames", type=int, default=18000)
+    matting.add_argument("--timeout-seconds", type=float, default=3600.)
+    matting.add_argument("--cancel-file", default=None)
+    matting.add_argument("--no-audio", action="store_true")
+    matting.add_argument("--sequence-id", default=None)
+    matting.add_argument("--track-id", default=None)
+    matting.add_argument("--audio-track-id", default=None, help="入轨时将保留的原声同步写入指定 audio 轨道")
+    matting.add_argument("--timeline-start-seconds", type=float, default=0.)
+    matting.add_argument("--apply", action="store_true")
+    matting.add_argument("--replace-track", action="store_true")
     audio = subs.add_parser("audio", help="本地音频处理")
     aus = audio.add_subparsers(dest="action", required=True)
     extract = _leaf_common(aus.add_parser("extract", help="从本地视频或音频资产提取无损 WAV"))
@@ -1555,7 +1577,7 @@ def command_media_adapter_register(args: argparse.Namespace) -> dict[str, Any]:
         verification_status=args.verification_status,
         evidence=evidence,
         root=root,
-        native_options={'threads':args.threads, 'confidence':args.confidence, 'low_confidence':args.low_confidence, 'match_iou':args.match_iou, 'max_gap_seconds':args.max_gap_seconds, 'class_ids':args.class_id},
+        native_options=({'threads': args.threads, 'downsample_ratio': args.downsample_ratio} if args.engine == MATTING_ENGINE else {'threads':args.threads, 'confidence':args.confidence, 'low_confidence':args.low_confidence, 'match_iou':args.match_iou, 'max_gap_seconds':args.max_gap_seconds, 'class_ids':args.class_id}),
     )
     if args.dry_run:
         return _envelope("media.adapter.register", args, status="planned", data={"registry": str(visual_registry_path(root)), "adapter": adapter_record, "rights": rights_record})
@@ -1565,7 +1587,7 @@ def command_media_adapter_register(args: argparse.Namespace) -> dict[str, Any]:
     registry.setdefault("adapters", []).append(adapter_record)
     add_record(ledger, rights_record)
     operation_id = new_id("op")
-    project.setdefault("provenance", {}).setdefault("local_adapters", []).append({"adapter_id": args.adapter_id, "kind": "object-tracking", "engine": args.engine, "model_sha256": adapter_record.get("model_sha256"), "registered_at": adapter_record["registered_at"]})
+    project.setdefault("provenance", {}).setdefault("local_adapters", []).append({"adapter_id": args.adapter_id, "kind": adapter_record['kind'], "engine": args.engine, "model_sha256": adapter_record.get("model_sha256"), "registered_at": adapter_record["registered_at"]})
     project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "media.adapter.register", "adapter_id": args.adapter_id, "engine": args.engine, "snapshot_id": snapshot["snapshot_id"], "registry": str(visual_registry_path(root)), "at": now_iso()})
     try:
         save_visual_model_registry(root, registry)
@@ -1606,6 +1628,113 @@ def command_media_adapter(args: argparse.Namespace) -> dict[str, Any]:
         return handlers[args.adapter_action](args)
     except KeyError as exc:
         raise argument_error(f"不支持的 media adapter 操作: {args.adapter_action}", "adapter_action") from exc
+
+
+def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    if not math.isfinite(args.timeline_start_seconds) or args.timeline_start_seconds < 0 or not math.isfinite(args.timeout_seconds) or not 0 < args.timeout_seconds <= 604800:
+        raise argument_error('需要非负有限时间线起点及 0..604800 的超时预算', 'timeline_start_seconds/timeout_seconds')
+    if args.apply and not args.track_id or args.replace_track and not args.apply:
+        raise argument_error('--apply 要求 --track-id；--replace-track 要求 --apply', 'track_id/apply')
+    if args.audio_track_id and (not args.apply or args.no_audio):
+        raise argument_error('--audio-track-id 要求 --apply 且不能与 --no-audio 同用', 'audio_track_id')
+    source_asset = asset_map(project).get(args.asset_id)
+    if not source_asset or source_asset.get('kind') != 'video':
+        raise argument_error('抠像要求已摄取的 video 资产', 'asset_id')
+    source = resolve_local_path(root, source_asset['uri'], field='asset.uri')
+    if 'sha256:' + sha256_file(source) != source_asset.get('sha256'):
+        raise AppError('MATTING_SOURCE_HASH_MISMATCH', '抠像源与已登记摘要不符', exit_code=10)
+    adapter = visual_adapter_for(load_visual_model_registry(root), args.adapter_id)
+    if adapter is None or adapter.get('engine') != MATTING_ENGINE:
+        raise AppError('MATTING_ADAPTER_UNAVAILABLE', '抠像要求已登记的 rvm-onnx-cpu-matting-v1', exit_code=10)
+    ledger = load_ledger(root)
+    records = {r['asset_id']: r for r in active_records(ledger)}
+    parent_ref = source_asset.get('rights_ref') or args.asset_id
+    model_ref = adapter['rights_ref']
+    parent = records.get(parent_ref)
+    if parent is None or model_ref not in records or records[model_ref].get('sha256') != adapter['sha256']:
+        raise AppError('MATTING_RIGHTS_DEPENDENCY_MISSING', '源素材或模型缺少匹配的权利记录', exit_code=7)
+    derived_id = str(args.derived_asset_id)
+    assert_id(derived_id, 'derived_asset_id')
+    if derived_id in asset_map(project) or derived_id in records:
+        raise argument_error('派生资产 ID 或权利 ID 已存在', 'derived_asset_id')
+    output = ensure_inside(root, resolve_local_path(root, args.output or f'assets/derived/{derived_id}.mov', field='output'))
+    if output.exists() or output.suffix.lower() != '.mov':
+        raise argument_error('抠像输出须为项目内尚不存在的 .mov', 'output')
+    cancel_file = resolve_local_path(root, args.cancel_file, field='cancel_file') if args.cancel_file else None
+    plan = prepare_matting_plan(source, adapter, start_seconds=args.start_seconds, end_seconds=args.end_seconds, fps=args.fps,
+                                max_edge=args.max_edge, max_frames=args.max_frames, preserve_audio=not args.no_audio)
+    tps = int(project.get('settings', {}).get('timebase', {}).get('ticks_per_second', TICKS_PER_SECOND))
+    start_tick = round(args.timeline_start_seconds * tps)
+    duration_tick = max(1, round(plan['video']['duration_seconds'] * tps))
+    sequence = track = audio_track = None
+    if args.apply:
+        sequence = find_sequence(project, args.sequence_id)
+        track = find_track(sequence, args.track_id, None)
+        if track.get('kind') != 'video':
+            raise argument_error('抠像应用目标须为 video 轨道', 'track_id')
+        if not args.replace_track and any(int(c.get('timeline_start_tick', 0)) < start_tick + duration_tick and int(c.get('timeline_start_tick', 0)) + int(c.get('duration_tick', 0)) > start_tick for c in track.get('clips', [])):
+            raise argument_error('目标时间范围已有片段；指定新轨道或显式 --replace-track', 'track_id')
+        if args.audio_track_id:
+            audio_track = find_track(sequence, args.audio_track_id, None)
+            if not plan['audio']['preserve'] or audio_track.get('kind') != 'audio':
+                raise argument_error('原声入轨要求源有音频且目标为 audio 轨道', 'audio_track_id')
+            if not args.replace_track and any(int(c.get('timeline_start_tick', 0)) < start_tick + duration_tick and int(c.get('timeline_start_tick', 0)) + int(c.get('duration_tick', 0)) > start_tick for c in audio_track.get('clips', [])):
+                raise argument_error('原声目标范围已有片段；指定新轨道或显式 --replace-track', 'audio_track_id')
+    if args.dry_run:
+        return _envelope('media.matting', args, status='planned', data={'plan': plan, 'adapter': adapter, 'derived_asset_id': derived_id, 'output': str(output),
+                         'source_asset_id': args.asset_id, 'track_id': args.track_id, 'audio_track_id': args.audio_track_id, 'rights_dependencies': [parent_ref, model_ref]}, warnings=plan['warnings'])
+    snapshot = create_snapshot(root, copy.deepcopy(project), label='before-media-matting')
+    operation_id = new_id('op')
+    report_path = root / 'validation' / f'matting_{safe_filename(operation_id)}.json'
+    published = False
+    try:
+        _progress(args, operation_id, 'started', 'media.matting', 0, '开始本地 RVM 时序抠像')
+        def progress(frame, total):
+            _progress(args, operation_id, 'progress', 'media.matting.inference', round(90 * frame / total), f'人物抠像 {frame}/{total} 帧')
+        result = matte_native(root, output, adapter=adapter, plan=plan, timeout=args.timeout_seconds, cancel_file=cancel_file, progress=progress)
+        published = True
+        asset = {'id': derived_id, 'kind': 'video', 'uri': output.relative_to(root).as_posix(), 'sha256': result['sha256'], 'probe': result['probe'], 'rights_ref': derived_id,
+                 'source': {'source_url': f'local://{output}', 'retrieved_at': now_iso(), 'original_name': output.name, 'derived_from': [args.asset_id]}}
+        rights = {key: copy.deepcopy(parent.get(key, default)) for key, default in [('creator', 'unknown'), ('license_spdx', 'LicenseRef-UNVERIFIED'), ('license_url', ''),
+                  ('attribution', ''), ('permitted_uses', ['internal']), ('permitted_channels', []), ('restrictions', []), ('evidence', ''), ('verification_status', 'unverified'), ('verified_by', ''), ('takedown_status', 'clear')]}
+        rights.update(asset_id=derived_id, kind='video', sha256=result['sha256'], source_url=f'local://{output}', source_version='derived-video-rvm-matting', retrieved_at=now_iso(),
+                      derived_from=[parent_ref, model_ref], notes='Local recurrent human matting; source and model rights both required')
+        project.setdefault('assets', []).append(asset)
+        add_record(ledger, rights)
+        clip = audio_clip = None
+        if args.apply:
+            if args.replace_track:
+                track['clips'] = []
+            clip = {'id': new_id('clip_matting'), 'asset_id': derived_id, 'timeline_start_tick': start_tick, 'duration_tick': duration_tick, 'source_in_tick': 0, 'source_out_tick': duration_tick}
+            track.setdefault('clips', []).append(clip)
+            if audio_track is not None:
+                if args.replace_track:
+                    audio_track['clips'] = []
+                audio_clip = {**clip, 'id': new_id('clip_matting_audio')}
+                audio_track.setdefault('clips', []).append(audio_clip)
+            _recompute_sequence_duration(sequence)
+        save_ledger(root, ledger)
+        validation = validate_project(root, project, strict_rights=False)
+        if not validation['ok']:
+            raise AppError('MATTING_APPLY_INVALID', '抠像项目校验失败', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+        report = {'version': '0.1.0', 'created_at': now_iso(), 'operation_id': operation_id, 'snapshot_id': snapshot['snapshot_id'], 'source_asset_id': args.asset_id,
+                  'asset': asset, 'rights': rights, 'generated_clip': clip, 'generated_audio_clip': audio_clip, 'matting': result, 'validation': validation}
+        atomic_write_json(report_path, report)
+        project.setdefault('provenance', {}).setdefault('change_log', []).append({'operation_id': operation_id, 'command': 'media.matting', 'engine': MATTING_ENGINE,
+            'asset_id': derived_id, 'source_asset_id': args.asset_id, 'snapshot_id': snapshot['snapshot_id'], 'report': str(report_path), 'at': now_iso()})
+        save_project(root, project)
+        _operation(root, operation_id, {'operation_id': operation_id, 'command': 'media.matting', 'status': 'succeeded', 'asset_id': derived_id,
+                   'snapshot_id': snapshot['snapshot_id'], 'report': str(report_path), 'created_at': now_iso()})
+        _progress(args, operation_id, 'completed', 'media.matting', 100, '透明素材及 RGBA 编码往返校验完成')
+        return _envelope('media.matting', args, data=report, warnings=result['warnings'], operation_id=operation_id)
+    except BaseException as exc:
+        if published:
+            output.unlink(missing_ok=True)
+        report_path.unlink(missing_ok=True)
+        if isinstance(exc, OSError):
+            raise AppError('MATTING_WRITE_FAILED', '抠像输出或元数据写入失败，事务将回滚', exit_code=6, cause=str(exc)) from exc
+        raise
 
 
 def command_media_stabilize(args: argparse.Namespace) -> dict[str, Any]:
@@ -5427,6 +5556,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("project", "recover"): command_project_recover,
     ("media", "ingest"): command_media_ingest,
     ("media", "stabilize"): command_media_stabilize,
+    ("media", "matting"): command_media_matting,
     ("media", "relink"): command_media_relink,
     ("media", "adapter"): command_media_adapter,
     ("media", "track"): command_media_track,

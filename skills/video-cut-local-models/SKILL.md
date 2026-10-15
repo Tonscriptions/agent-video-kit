@@ -1,9 +1,32 @@
 ---
 name: video-cut-local-models
-description: Run registered offline Whisper transcription, SoulX speech, HDemucs vocal separation and YOLO tracking with existing local models and native Python.
+description: Run registered offline Whisper transcription, SoulX speech, HDemucs vocal separation, YOLO tracking and RVM human video matting with existing local models and native Python.
 ---
 
 # Local Models
+
+For human video cutouts, read the [native RVM contract](../../docs/specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md).
+Register `media adapter register --engine rvm-onnx-cpu-matting-v1` with
+an existing self-contained FP32 `.onnx`, native `--executable <Python.exe>`
+and local `--evidence`. numpy/onnx/onnxruntime must already exist in that Python.
+Registration records six artifact hashes, CPU threads and an optional
+`--downsample-ratio`; it never loads or downloads weights. Inspect integrity,
+ingest the video and use `media matting --asset-id <source> --adapter-id <id>
+--derived-asset-id <new-id> --max-edge 1280 --dry-run`. The default output is
+`assets/derived/<new-id>.mov`, lossless QTRLE/ARGB with soft straight alpha.
+The worker recycles four states per frame and multiplies existing input alpha.
+Encoded RGBA must decode to the exact worker byte hash before registration.
+
+Optional `--apply --track-id <video-track>` applies the cutout; add
+`--audio-track-id <audio-track>` to hear preserved audio in the timeline.
+Without that flag audio remains embedded in the MOV and is not auto-mixed.
+Use higher video track order for foreground and lower order for a background.
+Range, rational `--fps`, `--max-edge`, `--max-frames`, timeout and cancellation
+are explicit; CFR resampling and partial final-frame extension are reported.
+HDR must first be explicitly tone mapped. Keep `MATTING_MODEL_REVIEW_REQUIRED`:
+this human model can lose held objects, edges and initial-frame detail; it is
+not general-object segmentation. Model/source rights both gate publication.
+Weights and native Python remain external to project packages.
 
 For model-backed vocal/accompaniment separation, read the [native HDemucs contract](../../docs/specs/本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md).
 Register `audio adapter register --engine torchaudio-hdemucs-local-v1` with

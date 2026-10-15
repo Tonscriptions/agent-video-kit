@@ -6,8 +6,8 @@
 
 ## 当前状态
 
-- 当前分模块进度与待验收项见 [构建进度总表（2026-10-16）](docs/构建进度总表_2026-10-16.md)：本地 CLI 主链路已实现，广告生产能力部分落地；原生离线人声/伴奏分离已接入并完成受控 CPU/CUDA 实测。真实模型广泛质量、内容库、完整草稿映射和产品验收仍待完成，233 项回归通过不等于剪映功能完成率。
-- 最新状态复核以已交付代码 `164ed647` 为依据，已核对本地/远端 main、55 个源码文件及完整回归日志摘要。人物视频抠像目前仅准备了 RVM 本地模型，尚未接入产品；本次状态更新未新增功能或重跑产品回归，见[核对证据](docs/validation/evidence/build-progress-checked-20261016.json)。
+- 当前分模块进度与待验收项见 [构建进度总表（2026-10-16）](docs/构建进度总表_2026-10-16.md)：本地 CLI 主链路已实现，广告生产能力部分落地；原生离线人声/伴奏分离和人物视频抠像均已接入。真实模型广泛质量、内容库、完整草稿映射和产品验收仍待完成，257 项回归通过不等于剪映功能完成率。
+- 人物视频抠像：`media matting` 使用显式登记的本地 RVM FP32 ONNX/CPU，输出软 alpha 的 QTRLE/ARGB MOV，保留音频并支持视频及显式 audio 轨道应用。真实 3 秒/36 帧样例完成两背景 MP4 和透明 WebM；首帧边缘缺失、手持头盔被排除，广泛质量与商业许可尚未验收。见[契约](docs/specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md)和[实测](docs/validation/RVM本地人物抠像与透明成片实测_2026-10-16.md)。
 - P0 CLI 闭环已实现：项目初始化、媒体摄取与探测、时间线变更、关键帧与运镜、字幕、音频、遮罩、转场、渲染、项目内持久化渲染队列、质量检查、权利门禁、快照/迁移/跨文件事务恢复、确定性素材索引/搜索/重复组、增量刷新、FFmpeg 感知候选和受限互操作（OTIO canonical Stack/Gap 与 MLT 帧时间映射）；队列默认顺序执行，也支持显式 `queue run --workers N --continue-on-error` 的有界本地 FFmpeg 并发，项目写入由原生 Windows 文件锁串行化，元数据事务由 `operations/project-transaction.json` 保护，队列取消在渲染持锁时仍可递交并异步确认。
 - 本地项目包：`convert export --target-format package` 会把 Agent Project、Rights Ledger、项目内支持文件和引用素材写成可移植 `.aevpkg.zip`，重写资产 URI 并生成逐文件 SHA-256 manifest；`convert import` 会在落盘前拒绝路径穿越、符号链接、未登记成员和哈希篡改。项目包不含 renders/cache/operations/history，不调用网络或剪映运行时，契约见 [`docs/specs/本地项目包与交换清单契约_v0.1_2026-10-15.md`](docs/specs/本地项目包与交换清单契约_v0.1_2026-10-15.md)。
 - 本地明文草稿支持 `convert import` 自动识别，并提供 `convert export --target-format jianying-draft-json`：支持基础媒体/轨道/源目标时钟、变换/裁切/线性关键帧、文字/本地字体和显式视频原声；`--strict` 在近似、不支持或失败项出现时拒绝写入，私有资源仅脱敏保留。已通过本地音画往返渲染，尚未验证商业版本兼容性、复杂效果与视觉等效，见[适配器契约](docs/specs/本地明文草稿双向适配器契约_v0.1_2026-10-15.md)。同时修复音频尾部补齐和 Windows 中文目录下本地字体渲染。
@@ -16,7 +16,7 @@
 - 原生模型跟踪：新增显式本地 `yolov10-onnx-cpu-tracking-v1`，CPU ONNX 检测与常速度/IoU 全局关联；4 秒受控双目标样例记录 29/32 次观测，已完成文字绑定、竖屏重构图及实际渲染。模型权利进入片段依赖，registry 随快照/事务/项目包保留；长滤镜图使用本地 SHA-256 文件规避 Windows 命令长度。自然遮挡、同类交叉和嵌套父层等完整坐标空间仍待验收，见[实测](docs/validation/YOLO本地多目标跟踪与重构图实测_2026-10-15.md)与[契约](docs/specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md)。
 - 持久跟踪画布绑定：`media track-bind --source-track-id <track> --source-clip-id <clip>` 保存源哈希及源时钟观测，按源裁切/fit/fill/stretch、旋转/锚点/缩放、镜像和剪辑时钟，在每次输出画布上重算。新增 17 项专项回归，受控像素定位 ≤3 px；真实 YOLO + 动态重构图 + 标签已完成横竖两版本地渲染。支持解除绑定、项目包保留关系和外部导出烘焙报告；嵌套/VFR/遮挡与高分辨率性能仍需专项验收，见[坐标契约](docs/specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md)与[实测](docs/validation/跟踪坐标绑定与组合渲染实测_2026-10-15.md)。
 - 本地人声/伴奏分离：`torchaudio-hdemucs-local-v1` 使用显式本地权重、原生 Python 和证据，支持 CPU/CUDA、分段重叠拼接、精确采样、浮点 WAV、音轨应用及源/模型双权利依赖。受控 12.68 秒语音+合成伴奏实测改善约 12.66 dB，策略检查通过，未核验许可仍阻断发布；自然音乐、听感和广泛广告质量待验收。见[契约](docs/specs/本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md)及[实测](docs/validation/HDemucs本地人声伴奏分离实测_2026-10-16.md)。
-- 本轮 E 盘完整回归：`233/233` 通过（370.404 秒），新增 22 项专项回归；14 个 Skill 审计通过。证据见 [`docs/validation/回归验证记录_2026-10-13.md`](docs/validation/回归验证记录_2026-10-13.md)。
+- 本轮 E 盘完整回归：`257/257` 通过（490.389 秒），新增 24 项抠像专项回归；14 个 Skill 审计、编译及 doctor/capabilities 通过。证据见[回归记录](docs/validation/回归验证记录_2026-10-13.md)与[本轮机器证据](docs/validation/evidence/rvm-smoke-20261016.json)。
 - 当前实现仍会明确报告近似和未支持能力，不能把 P0 底座描述成已经完全等同于剪映。对象跟踪的真实模型质量、遮挡/交叉身份恢复、分割/姿态、复杂路径逐点动画、GPU 效果、多语言/情绪配音的广泛质量验收、完整外部工程映射和黄金素材集仍按路线图推进。
 - 生产 Skill 统一使用 `video-cut-` 前缀，并只保留本地 FFmpeg、本地模型和离线编排入口；可用 `$video-cut-技能名` 调用，清单见 [`video-cut-install-manifest.json`](video-cut-install-manifest.json)。
 
@@ -43,6 +43,8 @@ python -X utf8 -m ai_ad_editor media reframe --project .\workspace\demo --asset-
 python -X utf8 -m ai_ad_editor media track-bind --project .\workspace\demo --asset-id <asset_id> --roi 0.20,0.20,0.20,0.35 --target-clip-id product_label --target-track-id track_text_1 --scale-mode roi --dry-run
 python -X utf8 -m ai_ad_editor media adapter register --project .\workspace\demo --adapter-id tracker_local --engine command-json-tracking-v1 --model-path E:\models\tracker.bin --executable E:\models\tracker_runner.py --license-spdx Apache-2.0 --verification-status verified --evidence local://tracker-evidence --dry-run
 python -X utf8 -m ai_ad_editor media adapter list --project .\workspace\demo
+python -X utf8 -m ai_ad_editor media adapter register --project .\workspace\demo --adapter-id rvm_local --engine rvm-onnx-cpu-matting-v1 --model-path E:\models\rvm_mobilenetv3_fp32.onnx --executable E:\python\python.exe --evidence E:\models\rvm-evidence.json --threads 4 --dry-run
+python -X utf8 -m ai_ad_editor media matting --project .\workspace\demo --asset-id <asset_id> --adapter-id rvm_local --derived-asset-id person_alpha --track-id track_video_1 --audio-track-id track_audio_1 --apply --dry-run
 python -X utf8 -m ai_ad_editor media track --project .\workspace\demo --asset-id <asset_id> --adapter-id tracker_local --roi 0.20,0.20,0.20,0.35 --dry-run
 python -X utf8 -m ai_ad_editor media track --project .\workspace\demo --asset-id <asset_id> --adapter-id tracker_multi --roi 0.20,0.20,0.20,0.35 --object-id person_2 --dry-run
 python -X utf8 -m ai_ad_editor media track --project .\workspace\demo --asset-id <asset_id> --adapter-id tracker_multi --roi 0.20,0.20,0.20,0.35 --all-objects --dry-run

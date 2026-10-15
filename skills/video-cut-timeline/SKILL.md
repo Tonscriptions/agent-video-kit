@@ -5,6 +5,16 @@ description: Compose an Agent Project timeline with local clips, tracks, transit
 
 # Timeline Composition
 
+Use `media matting` with a registered RVM adapter to create a local soft-alpha
+human cutout; read the [matting contract](../../docs/specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md).
+Its QTRLE/ARGB MOV is an ordinary video asset. Apply it to a video track with
+higher `order` than the background. `--audio-track-id` explicitly creates a
+matching audio clip; preserved embedded MOV audio alone does not mix itself
+into the sequence. Keep both source/model rights dependencies. Final transparent
+delivery uses the existing WebM/VPX `yuva420p` output, with a decoder that supports
+WebM alpha for visual checks. Review initial-frame defects and held-object loss;
+pipeline verification does not establish broad human matting quality.
+
 Native model tracking is described in the [YOLO contract](../../docs/specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md).
 Review `media track --all-objects` before binding an ID to text or reframing a
 direct clip. Preserve the applied clip's `rights_dependencies` entries with

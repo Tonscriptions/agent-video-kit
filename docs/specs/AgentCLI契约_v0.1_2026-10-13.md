@@ -282,3 +282,9 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 `media track-bind` 增加成对 `--source-track-id/--source-clip-id` 与 `--rotation-mode none|source`。指定源片段时保存源观测和哈希，按源裁切/变换/时钟及输出画布生成可重算绑定；dry-run 不推理/写项目，正式应用保留原快照与权利门禁。`timeline compose` update_clip 支持 `tracking_binding:null` 解除关系；外部格式导出烘焙且报告损失。拒绝无效几何、源篡改/引用循环和超过 20,000 显示帧的编译，详见[坐标空间契约](./本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md)。
 
 `media adapter register` 新增 `--engine yolov10-onnx-cpu-tracking-v1`；`--executable` 为原生 Python `.exe`，`--model-path` 为自包含 YOLOv10 COCO-80 ONNX，`--evidence` 为现有本地文件。显式参数含 `--threads`、`--confidence`、`--low-confidence`、`--match-iou`、`--max-gap-seconds` 和可重复 `--class-id`。`media track --all-objects` 复核后，以 `--object-id` 驱动 track/track-bind/reframe；正式应用要求已摄取 `--asset-id`，保留片段模型权利。报告已存在时拒绝覆盖，native 不回退模板。详见[专用契约](./本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md)。
+
+## 2026-10-16 本地人物抠像增量
+
+`media adapter register --engine rvm-onnx-cpu-matting-v1` 接受现有 FP32 ONNX、原生 Python `.exe`、本地证据、`--threads 1..32` 和可选 `--downsample-ratio`。登记、检查不执行推理，六项文件哈希和固定 CPU provider 进入 manifest；抠像适配器不能作为跟踪适配器使用。
+
+`media matting --project <项目> --asset-id <已摄取视频> --adapter-id <ID> --derived-asset-id <新ID>` 生成项目内无损 QTRLE/ARGB `.mov`，支持范围、分数帧率、画幅/帧数预算、timeout/cancel、dry-run 和幂等。`--apply --track-id <video>` 应用透明视频，`--audio-track-id <audio>` 显式同步原声，`--replace-track` 才可清空本次指定的目标轨道。发布输出前完整验证 RGBA 编码往返哈希，保留源及模型权利依赖；失败清理输出并由项目事务恢复元数据。SDR、CFR、部分片尾延伸和人物模型质量边界见[专用契约](./本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md)。
