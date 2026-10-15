@@ -104,7 +104,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `queue enqueue --project PATH --input JOBS.json` | 单个作业或 `{jobs:[...]}` | 原子写入项目 `operations/render-queue.json`，保存输出规格和初始 `pending` 状态 |
 | `queue list --project PATH [--status STATUS]` | 项目队列和可选状态 | 只读返回队列计数与作业状态 |
 | `queue inspect --project PATH --job-id ID` | 作业 ID | 只读返回作业、尝试次数、警告、错误和关联操作 |
-| `queue run --project PATH [--job-id ID]` | 待处理作业或显式重试作业 | 顺序执行本地渲染；保存 `pending/running/succeeded/failed/cancelled`，可用 `--max-jobs` 和 `--continue-on-error` 控制批次 |
+| `queue run --project PATH [--job-id ID] [--workers N]` | 待处理作业或显式重试作业 | 默认顺序执行本地渲染；`--workers N` 可启用有界本地 FFmpeg worker 并发，N 大于 1 时必须同时提供 `--continue-on-error`；保存 `pending/running/succeeded/failed/cancelled`，可用 `--max-jobs` 控制批次 |
 | `queue cancel --project PATH --job-id ID` | 待处理或运行中作业 | 锁空闲时待处理作业立即标记取消；锁被占用或作业运行中时原子写入取消标记并返回 acknowledged/confirmed |
 | `quality check --project PATH --input FILE` | 已渲染媒体 | 画布、流、时长、音画差、可选黑帧、LUFS 和 true peak 报告 |
 | `quality scopes --project PATH --input FILE` | 项目内或本地视频、抽帧时间点 | 生成本地 waveform/vectorscope/histogram PNG 和带哈希的 scope 报告；不自动判定调色正确性 |
@@ -189,7 +189,7 @@ python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --p
 
 ### 6.1 本地持久化渲染队列
 
-`queue` 将批量输出作业保存为项目内 `operations/render-queue.json`，由同一个本地 FFmpeg 渲染器顺序执行。项目写入命令持有 `operations/project-write.lock`，覆盖读改写和状态提交；锁冲突返回 `PROJECT_WRITE_LOCKED`、退出码 6、`retryable=true`。作业状态、取消标记、尝试次数、错误、警告和 render 操作 ID 都可在进程退出后恢复；不引入服务、守护进程、数据库、Docker、WSL 或网络调度。无 `--job-id` 的 `queue run` 只执行 `pending`，失败或取消作业必须显式指定 ID 重试；`queue cancel` 不等待项目写锁，锁被占用或作业运行中时写入 `operations/queue-cancel/<job_id>.cancel`，响应中的 `acknowledged=true, confirmed=false` 表示已递交、终态待确认；`queue list/inspect` 会反映 `cancel_requested=true`。完整字段和状态机见[本地渲染队列与任务状态契约](./本地渲染队列与任务状态契约_v0.1_2026-10-14.md)。
+`queue` 将批量输出作业保存为项目内 `operations/render-queue.json`，默认由同一个本地 FFmpeg 渲染器顺序执行；显式 `--workers N --continue-on-error` 时只并发 FFmpeg/质量检查阶段，项目输出、操作记录和队列状态由主线程串行提交。项目写入命令持有 `operations/project-write.lock`，覆盖队列读改写和状态提交；锁冲突返回 `PROJECT_WRITE_LOCKED`、退出码 6、`retryable=true`。作业状态、取消标记、尝试次数、错误、警告和 render 操作 ID 都可在进程退出后恢复；不引入服务、守护进程、数据库、Docker、WSL 或网络调度。无 `--job-id` 的 `queue run` 只执行 `pending`，失败或取消作业必须显式指定 ID 重试；并发批次允许已启动的 worker 完成，因此要求 `--continue-on-error`；重复输出路径返回 `QUEUE_OUTPUT_CONFLICT`。`queue cancel` 不等待项目写锁，锁被占用或作业运行中时写入 `operations/queue-cancel/<job_id>.cancel`，响应中的 `acknowledged=true, confirmed=false` 表示已递交、终态待确认；`queue list/inspect` 会反映 `cancel_requested=true`。完整字段和状态机见[本地渲染队列与任务状态契约](./本地渲染队列与任务状态契约_v0.1_2026-10-14.md)。
 
 `quality check` 可用 `--require-audio`、`--max-av-sync-ms`、`--expensive`、`--target-lufs`、`--lufs-tolerance`、`--fail-on-black` 和 `--max-true-peak-dbfs`。质量报告失败时，发布调用必须停止；质量检查不会修改原始媒体或项目。
 
@@ -250,7 +250,7 @@ python -m ai_ad_editor tts synthesize --project .\\work\\demo --text "Hello loca
 python -m ai_ad_editor validate --project .\\work\\demo --strict-rights
 python -m ai_ad_editor render --project .\\work\\demo --profile vertical --progress jsonl --output .\\work\\demo\\renders\\ad.mp4
 python -m ai_ad_editor queue enqueue --project .\\work\\demo --input .\\queue.json
-python -m ai_ad_editor queue run --project .\\work\\demo --continue-on-error --progress jsonl
+python -m ai_ad_editor queue run --project .\\work\\demo --workers 2 --continue-on-error --progress jsonl
 python -m ai_ad_editor queue list --project .\\work\\demo --status failed
 python -m ai_ad_editor quality check --project .\\work\\demo --input .\\work\\demo\\renders\\ad.mp4 --require-audio --expensive
 python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\demo\\renders\\ad.mp4 --mode capture --require-audio --expensive

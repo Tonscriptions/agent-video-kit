@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import copy
 import contextlib
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import io
 import json
 import math
@@ -588,11 +589,12 @@ def build_parser() -> argparse.ArgumentParser:
     queue_inspect = _leaf_common(queue_sub.add_parser("inspect", help="检查单个队列作业"))
     queue_inspect.add_argument("--project", required=True)
     queue_inspect.add_argument("--job-id", required=True)
-    queue_run = _leaf_common(queue_sub.add_parser("run", help="按顺序执行本地渲染作业"))
+    queue_run = _leaf_common(queue_sub.add_parser("run", help="执行本地渲染作业；可用受控 worker 并发"))
     queue_run.add_argument("--project", required=True)
     queue_run.add_argument("--job-id", default=None, help="只执行指定作业；失败或取消作业可显式重试")
     queue_run.add_argument("--max-jobs", type=int, default=None, help="本次最多执行的待处理作业数")
     queue_run.add_argument("--continue-on-error", action="store_true", help="单个作业失败后继续执行后续作业")
+    queue_run.add_argument("--workers", type=int, default=1, help="本次最多并发的本地 FFmpeg worker 数；默认 1，超过 1 时必须同时使用 --continue-on-error")
     queue_cancel = _leaf_common(queue_sub.add_parser("cancel", help="请求取消或取消尚未启动的作业"))
     queue_cancel.add_argument("--project", required=True)
     queue_cancel.add_argument("--job-id", required=True)
@@ -4284,6 +4286,163 @@ def _queue_job_args(root: Path, job: dict[str, Any], args: argparse.Namespace) -
     )
 
 
+def _queue_render_one(root: Path, project: dict[str, Any], job: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
+    """Render one queue job without mutating queue/project metadata.
+
+    Parallel queue workers are deliberately limited to the FFmpeg/render phase.
+    The caller commits project outputs, operation records, and queue state from
+    one thread so the existing JSON/transaction semantics remain deterministic.
+    """
+    job_id = str(job["job_id"])
+    marker = cancel_path(root, job_id)
+    try:
+        sequence = find_sequence(project, job.get("sequence_id"))
+        report = validate_project(root, project, strict_rights=bool(job.get("publish", False)), target="commercial_ad")
+        if not report["ok"]:
+            raise AppError("PROJECT_INVALID", "项目验证失败，拒绝执行队列作业", exit_code=7 if job.get("publish") else 2, cause=json.dumps(report, ensure_ascii=False))
+        render_args = _queue_job_args(root, job, args)
+        render_settings, profile = _render_settings_for_args(project, render_args)
+        output = ensure_inside(root, root / str(job["output"]))
+        progress_callback = None
+        if getattr(args, "progress", "none") == "jsonl":
+            progress_callback = lambda operation_id, event_type, percent, message: _progress(args, operation_id, event_type, "queue.render", percent, message)
+        result = render_project(root, project, sequence, output, dry_run=False, render_settings=render_settings, profile=profile, cancel_file=marker, progress_callback=progress_callback)
+        return {
+            "job_id": job_id,
+            "status": "succeeded",
+            "sequence": sequence,
+            "report": report,
+            "render_settings": render_settings,
+            "profile": profile,
+            "output": output,
+            "result": result,
+        }
+    except AppError as exc:
+        return {
+            "job_id": job_id,
+            "status": "cancelled" if exc.code == "CANCELLED" else "failed",
+            "error": exc.as_dict(),
+            "operation_id": exc.operation_id,
+        }
+
+
+def _queue_output_conflicts(root: Path, jobs: list[dict[str, Any]]) -> list[str]:
+    outputs: dict[str, str] = {}
+    conflicts: list[str] = []
+    for job in jobs:
+        candidate = str(ensure_inside(root, root / str(job["output"])).resolve()).casefold()
+        previous = outputs.get(candidate)
+        if previous is not None:
+            conflicts.append(f"{previous}={job['job_id']}")
+        else:
+            outputs[candidate] = str(job["job_id"])
+    return conflicts
+
+
+def _queue_run_parallel(
+    root: Path,
+    project: dict[str, Any],
+    queue: dict[str, Any],
+    selected: list[dict[str, Any]],
+    args: argparse.Namespace,
+) -> dict[str, Any]:
+    """Run a bounded local worker pool while serializing all metadata commits."""
+    conflicts = _queue_output_conflicts(root, selected)
+    if conflicts:
+        raise AppError("QUEUE_OUTPUT_CONFLICT", "并发队列作业不能共享输出路径", exit_code=2, cause=", ".join(conflicts))
+
+    queue_operation_id = new_id("op")
+    summary = {"selected": len(selected), "succeeded": 0, "failed": 0, "cancelled": 0, "skipped": 0}
+    errors: list[dict[str, Any]] = []
+    job_results: list[dict[str, Any]] = []
+    runnable: list[dict[str, Any]] = []
+
+    # Claim all selected jobs in one short queue-channel transaction. FFmpeg is
+    # never run while this lock is held; queue.cancel can still create markers.
+    with queue_cancel_lock(root, timeout=2.0):
+        _, latest_project = load_project(root)
+        latest_queue = load_queue(root, project_id=latest_project["project"]["id"])
+        for selected_job in selected:
+            job_id = str(selected_job["job_id"])
+            job = find_job(latest_queue, job_id)
+            marker = cancel_path(root, job_id)
+            if marker.exists() and job.get("status") == "pending":
+                set_status(job, "cancelled")
+                job["cancel_requested"] = True
+                summary["cancelled"] += 1
+                job_results.append({"job_id": job_id, "status": "cancelled", "reason": "cancel marker exists before start"})
+                marker.unlink(missing_ok=True)
+                continue
+            marker.unlink(missing_ok=True)
+            job["attempts"] = int(job.get("attempts", 0)) + 1
+            job["cancel_requested"] = False
+            job["operation_id"] = None
+            set_status(job, "running")
+            runnable.append(copy.deepcopy(job))
+        queue = latest_queue
+        project = latest_project
+        save_queue(root, queue)
+
+    if runnable:
+        worker_count = min(int(args.workers), len(runnable))
+        with ThreadPoolExecutor(max_workers=worker_count, thread_name_prefix="ai-ad-editor-queue") as executor:
+            # Each worker gets a frozen project snapshot. The main thread adds
+            # output/provenance records as futures complete; sharing that
+            # mutable dictionary would make render fingerprints order-dependent.
+            futures = {executor.submit(_queue_render_one, root, copy.deepcopy(project), job, args): job for job in runnable}
+            for future in as_completed(futures):
+                rendered = future.result()
+                job_id = str(rendered["job_id"])
+                job = find_job(queue, job_id)
+                try:
+                    if rendered["status"] != "succeeded":
+                        error = rendered["error"]
+                        set_status(job, rendered["status"], error=error, operation_id=rendered.get("operation_id"))
+                        summary[rendered["status"]] += 1
+                        errors.append({"job_id": job_id, **error})
+                        job_results.append({"job_id": job_id, "status": job["status"], "error": error})
+                        with queue_cancel_lock(root, timeout=2.0):
+                            cancel_path(root, job_id).unlink(missing_ok=True)
+                            save_queue(root, queue)
+                        continue
+                    marker = cancel_path(root, job_id)
+                    with queue_cancel_lock(root, timeout=2.0):
+                        if marker.exists():
+                            raise AppError("CANCELLED", "队列作业在渲染完成提交前收到取消请求", exit_code=8, path=str(marker))
+                        result = rendered["result"]
+                        render_settings = rendered["render_settings"]
+                        profile = rendered["profile"]
+                        output = rendered["output"]
+                        sequence = rendered["sequence"]
+                        report = rendered["report"]
+                        encoder = render_settings.get("output", {}) if isinstance(render_settings.get("output"), dict) else {}
+                        project.setdefault("outputs", []).append({"id": new_id("output"), "path": str(output), "container": encoder.get("container", job.get("container", "mp4")), "profile": profile, "canvas": render_settings.get("canvas", {}), "video": encoder.get("video", {}), "audio": encoder.get("audio", {}), "target_platform": "generic"})
+                        project.setdefault("provenance", {}).setdefault("change_log", []).append({"command": "queue.run", "queue_job_id": job_id, "at": now_iso(), "output": str(output), "manifest": result.get("manifest")})
+                        save_project(root, project)
+                        _operation(root, result.get("operation_id", new_id("op")), {"operation_id": result.get("operation_id"), "command": "render", "queue_job_id": job_id, "status": "succeeded", "output": str(output), "manifest": result.get("manifest"), "warnings": result.get("warnings", []), "profile": profile, "settings": render_settings, "project_id": project["project"]["id"], "sequence_id": sequence["id"], "project_fingerprint": result.get("project_fingerprint"), "input_hashes": result.get("input_hashes", {}), "created_at": now_iso()})
+                        queue_warnings = report.get("warnings", []) + result.get("warnings", [])
+                        job["warnings"] = queue_warnings
+                        set_status(job, "succeeded", operation_id=result.get("operation_id"))
+                        summary["succeeded"] += 1
+                        job_results.append({"job_id": job_id, "status": "succeeded", "operation_id": result.get("operation_id"), "path": str(output), "warnings": queue_warnings})
+                        marker.unlink(missing_ok=True)
+                        save_queue(root, queue)
+                except AppError as exc:
+                    error = exc.as_dict()
+                    set_status(job, "cancelled" if exc.code == "CANCELLED" else "failed", error=error, operation_id=exc.operation_id)
+                    summary["cancelled" if exc.code == "CANCELLED" else "failed"] += 1
+                    errors.append({"job_id": job_id, **error})
+                    job_results.append({"job_id": job_id, "status": job["status"], "error": error})
+                    with queue_cancel_lock(root, timeout=2.0):
+                        marker = cancel_path(root, job_id)
+                        marker.unlink(missing_ok=True)
+                        save_queue(root, queue)
+
+    final_status = "succeeded" if not errors and summary["cancelled"] == 0 else "partial"
+    _operation(root, queue_operation_id, {"operation_id": queue_operation_id, "command": "queue.run", "status": final_status, "project_id": project["project"]["id"], "summary": summary, "jobs": job_results, "workers": int(args.workers), "created_at": now_iso()})
+    return _envelope("queue.run", args, data={"queue": str(queue_path(root)), "summary": summary, "jobs": job_results, "counts": _queue_counts(queue), "workers": int(args.workers)}, status=final_status, errors=errors, operation_id=queue_operation_id)
+
+
 def command_queue_enqueue(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     payload = load_json(Path(args.input).expanduser().resolve())
@@ -4416,6 +4575,11 @@ def command_queue_cancel(args: argparse.Namespace) -> dict[str, Any]:
 def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     queue = load_queue(root, project_id=project["project"]["id"])
+    workers = int(getattr(args, "workers", 1) or 1)
+    if workers <= 0:
+        raise argument_error("--workers 必须大于 0", "--workers")
+    if workers > 1 and not args.continue_on_error:
+        raise argument_error("--workers 大于 1 时必须同时使用 --continue-on-error，以保证并发批次的失败语义明确", "--workers")
     if args.job_id:
         selected = [find_job(queue, args.job_id)]
         if selected[0].get("status") not in {"pending", "failed", "cancelled"}:
@@ -4427,7 +4591,11 @@ def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
                 raise argument_error("--max-jobs 必须大于 0", "--max-jobs")
             selected = selected[:args.max_jobs]
     if args.dry_run:
-        return _envelope("queue.run", args, status="planned", data={"queue": str(queue_path(root)), "jobs": [job.get("job_id") for job in selected], "count": len(selected), "continue_on_error": bool(args.continue_on_error)})
+        return _envelope("queue.run", args, status="planned", data={"queue": str(queue_path(root)), "jobs": [job.get("job_id") for job in selected], "count": len(selected), "continue_on_error": bool(args.continue_on_error), "workers": workers})
+
+    if workers > 1 and len(selected) > 1:
+        args.workers = workers
+        return _queue_run_parallel(root, project, queue, selected, args)
 
     queue_operation_id = new_id("op")
     summary = {"selected": len(selected), "succeeded": 0, "failed": 0, "cancelled": 0, "skipped": 0}

@@ -214,7 +214,9 @@ def track_command_json_multi(
     try:
         completed = subprocess.run(
             _tracking_runner_command(runner),
-            input=json.dumps(request, ensure_ascii=False) + "\n",
+            # ASCII JSON avoids GBK/ACP decoding corrupting Unicode paths in
+            # a local Python runner's inherited Windows stdin.
+            input=json.dumps(request, ensure_ascii=True) + "\n",
             text=True,
             encoding="utf-8",
             errors="replace",
@@ -378,7 +380,9 @@ def track_command_json(
     try:
         completed = subprocess.run(
             _tracking_runner_command(runner),
-            input=json.dumps(request, ensure_ascii=False) + "\n",
+            # ASCII JSON avoids GBK/ACP decoding corrupting Unicode paths in
+            # a local Python runner's inherited Windows stdin.
+            input=json.dumps(request, ensure_ascii=True) + "\n",
             text=True,
             encoding="utf-8",
             errors="replace",

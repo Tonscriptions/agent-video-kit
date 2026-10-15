@@ -110,7 +110,9 @@ def separate_command_json(
     try:
         completed = subprocess.run(
             command,
-            input=json.dumps(request, ensure_ascii=False) + "\n",
+            # ASCII JSON keeps Windows child stdin locale-independent while
+            # preserving Unicode paths through JSON \u escapes.
+            input=json.dumps(request, ensure_ascii=True) + "\n",
             capture_output=True,
             text=True,
             encoding="utf-8",

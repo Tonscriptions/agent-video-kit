@@ -297,6 +297,49 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(code, 0, kdenlive_import_result)
             self.assertTrue((kdenlive_imported / "project.json").exists())
 
+    def test_render_queue_bounded_parallel_workers_commit_each_job(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-queue-workers-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace)
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, ingested = invoke(
+                "media", "ingest", "--project", str(project), "--input", str(source),
+                "--verification-status", "verified", "--permitted-use", "commercial_ad",
+                "--source-url", "local://fixture", "--license-spdx", "CC0-1.0",
+                "--license-url", "local://license", "--evidence", "local://evidence",
+            )
+            self.assertEqual(code, 0, ingested)
+            changes = workspace / "changes.json"
+            changes.write_text(json.dumps({"operations": [
+                {"op": "append_clip", "track_id": "track_video_1", "asset_id": ingested["data"]["asset"]["id"], "source_in_tick": 0, "source_out_tick": 90000},
+                {"op": "append_clip", "track_id": "track_audio_1", "asset_id": ingested["data"]["asset"]["id"], "source_in_tick": 0, "source_out_tick": 90000},
+            ]}), encoding="utf-8")
+            self.assertEqual(invoke("timeline", "compose", "--project", str(project), "--input", str(changes))[0], 0)
+            jobs = workspace / "queue.json"
+            jobs.write_text(json.dumps({"jobs": [
+                {"job_id": "parallel-a", "output": "renders/parallel-a.mp4", "profile": "custom", "width": 320, "height": 180},
+                {"job_id": "parallel-b", "output": "renders/parallel-b.mp4", "profile": "custom", "width": 320, "height": 180},
+            ]}), encoding="utf-8")
+            self.assertEqual(invoke("queue", "enqueue", "--project", str(project), "--input", str(jobs))[0], 0)
+            code, result = invoke("queue", "run", "--project", str(project), "--workers", "2", "--continue-on-error")
+            self.assertEqual(code, 0, result)
+            self.assertEqual(result["data"]["workers"], 2)
+            self.assertEqual(result["data"]["summary"]["succeeded"], 2)
+            self.assertEqual(result["data"]["summary"]["failed"], 0)
+            self.assertTrue((project / "renders" / "parallel-a.mp4").exists())
+            self.assertTrue((project / "renders" / "parallel-b.mp4").exists())
+            queue_payload = json.loads((project / "operations" / "render-queue.json").read_text(encoding="utf-8"))
+            self.assertEqual({job["status"] for job in queue_payload["jobs"]}, {"succeeded"})
+
+    def test_render_queue_workers_require_continue_on_error(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-queue-workers-guard-") as raw:
+            project = Path(raw) / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, result = invoke("queue", "run", "--project", str(project), "--workers", "2")
+            self.assertEqual(code, 2, result)
+            self.assertEqual(result["errors"][0]["code"], "ARGUMENT_INVALID")
+
     def test_project_write_lock_rejects_competing_mutation_and_releases(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-write-lock-") as raw:
             workspace = Path(raw)
