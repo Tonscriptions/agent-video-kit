@@ -69,11 +69,11 @@ dry-run 只执行本地文件存在检查和 probe，不创建 WAV、快照、�
 | `AUDIO_SEPARATION_APPROXIMATE` | 声道差分不是 AI stem 分离，必须人工试听 |
 | `RIGHTS_RECORD_MISSING` | 项目资产没有可继承的当前 Rights Ledger 记录 |
 | `.wav` 与输出覆盖 | 输出必须是项目内 `.wav`，已有文件拒绝覆盖 |
-| 模型级分离 | 当前版本不执行未知模型或外部命令；Demucs/UVR/Open-Unmix 等需未来注册离线适配器并单独验证模型哈希、许可证和网络禁用状态 |
+| 模型级分离 | native `torchaudio-hdemucs-local-v1` 已提供专用离线 runner；其他未知模型仍拒绝，不隐式回退；见 [HDemucs 契约](./本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md) |
 
 ## 5. Agent 门禁
 
 1. 先执行 `--dry-run`，检查输入 probe、两组输出路径、资产 ID、时间线起点和 `AUDIO_SEPARATION_APPROXIMATE` warning。
 2. 只有确定需要一个 stem 时才使用 `--apply --track-id --stem`；另一个 stem 仍可作为项目资产在后续轨道中显式使用。
 3. 发布前试听 center/side，检查中心声泄漏、相位伪影、单声道素材和混响；不能只依据文件成功生成判定质量。
-4. 需要真正人声/背景声分离时，必须停在当前边界并等待一个显式注册、哈希可验证、模型和许可证均在本地的离线适配器；不得自动 fallback 到网络服务。
+4. 需要模型人声/伴奏分离时，显式登记并 inspect native HDemucs，使用 vocals/accompaniment 语义输出；复核模型、源素材权利及听感。mid/side 继续保留近似 warning，不得自动 fallback 到网络服务。

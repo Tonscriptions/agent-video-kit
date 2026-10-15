@@ -23,12 +23,14 @@ from .tracking import (
 )
 from .utils import atomic_write_json, assert_id, load_json, now_iso, sha256_bytes, sha256_file
 from .local_vision import YOLO_ENGINE, prepare_adapter as prepare_native_vision, verify_adapter as verify_native_vision
+from .local_separation import DEMUCS_ENGINE, prepare_adapter as prepare_native_separation, verify_adapter as verify_native_separation
 
 
 MODEL_REGISTRY_VERSION = "0.1.0"
 MODEL_REGISTRY_RELATIVE = Path("models") / "audio-adapters.json"
 VISUAL_MODEL_REGISTRY_RELATIVE = Path("models") / "visual-adapters.json"
 VALID_AUDIO_ADAPTER_ENGINES = {
+    DEMUCS_ENGINE,
     "ffmpeg-local-mid-side-v1",
     "command-json-v1",
     "onnx-audio-separation-v1",
@@ -110,6 +112,8 @@ def prepare_audio_adapter(
     permitted_uses: list[str],
     verification_status: str,
     evidence: str,
+    root: Path | None = None,
+    native_options: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Validate local adapter inputs and return registry/rights records."""
     try:
@@ -117,6 +121,8 @@ def prepare_audio_adapter(
     except AppError:
         raise
     engine = str(engine or "").strip()
+    if engine == DEMUCS_ENGINE:
+        return prepare_native_separation(root or Path.cwd(),adapter_id=adapter_id,model_path=str(model_path or ''),executable=str(executable or ''),evidence=evidence,creator=creator,license_spdx=license_spdx,license_url=license_url,permitted_uses=permitted_uses,verification_status=verification_status,options=native_options)
     if engine not in VALID_AUDIO_ADAPTER_ENGINES:
         raise argument_error(f"不支持的本地音频适配器 engine: {engine}", "engine")
     if verification_status not in {"unverified", "verified", "restricted"}:
@@ -189,6 +195,8 @@ def prepare_audio_adapter(
 
 def verify_audio_adapter(adapter: dict[str, Any]) -> dict[str, Any]:
     """Verify registered artifact existence and hashes without executing it."""
+    if adapter.get('engine') == DEMUCS_ENGINE:
+        return verify_native_separation(adapter)
     findings: list[dict[str, Any]] = []
     model_path = adapter.get("model_path")
     if model_path:

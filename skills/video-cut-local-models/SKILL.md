@@ -1,9 +1,23 @@
 ---
 name: video-cut-local-models
-description: Run explicitly registered offline Whisper ASR, SoulX Chinese speech and native YOLO ONNX object tracking without downloads, cloud APIs, or hidden network access.
+description: Run registered offline Whisper transcription, SoulX speech, HDemucs vocal separation and YOLO tracking with existing local models and native Python.
 ---
 
 # Local Models
+
+For model-backed vocal/accompaniment separation, read the [native HDemucs contract](../../docs/specs/本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md).
+Register `audio adapter register --engine torchaudio-hdemucs-local-v1` with
+an existing compatible `.pt/.pth` state dictionary, `--executable <Python.exe>`,
+local `--evidence`, and explicit `--device cpu` or `cuda`. Torch/TorchAudio/numpy
+must already exist in that Python. Inspect integrity, then use `audio separate
+--asset-id <source> --adapter-id <id> --vocals-asset-id <new-id>
+--accompaniment-asset-id <new-id> --dry-run`. Optional `--apply --track-id
+<audio-track> --stem vocals|accompaniment` selects one output for the timeline.
+The model runs at 44.1 kHz stereo; segmented overlap/add preserves all samples.
+Accompaniment is input minus predicted vocals. Float WAV peaks can exceed 1;
+retain the model-review warning and check leakage, seams and listening quality.
+Both stem rights depend on source and model. The legacy `demucs-local-v1`
+metadata engine is separate and remains unavailable for inference.
 
 For native object detection and tracking, read the [YOLO contract](../../docs/specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md).
 Register `media adapter register --engine yolov10-onnx-cpu-tracking-v1`

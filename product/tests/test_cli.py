@@ -1027,6 +1027,8 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(derived["kind"], "audio")
             audio_track = next(track for track in payload["sequences"][0]["tracks"] if track["id"] == "track_audio_1")
             self.assertEqual(audio_track["clips"][0]["asset_id"], "camera_audio")
+            code, audit = invoke("policy", "audit", "--project", str(project))
+            self.assertEqual(code, 0, audit)
 
     def test_local_audio_separate_writes_mid_side_stems_and_applies_selected_stem(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-audio-separate-") as raw:
@@ -1061,6 +1063,9 @@ class P0CliTests(unittest.TestCase):
             self.assertEqual(audio_track["clips"][0]["asset_id"], "camera_center")
             ledger = json.loads((project / "rights-ledger.json").read_text(encoding="utf-8"))
             self.assertEqual(len(ledger["records"]), 3)
+
+            code, audit = invoke("policy", "audit", "--project", str(project))
+            self.assertEqual(code, 0, audit)
 
     def test_local_audio_adapter_registry_hashes_and_gates_unimplemented_runner(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-audio-adapter-") as raw:

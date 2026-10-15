@@ -4,7 +4,7 @@
 |---|---|
 | 文档编号 | SPEC-CLI-001 |
 | 版本 | 0.1.0 |
-| 日期 | 2026-10-14 |
+| 日期 | 2026-10-16 |
 | 状态 | 有效 |
 | 运行根目录 | `E:\dev\sandbox\AI广告剪辑` |
 | 关联规范 | [Agent Project JSON](./AgentProjectJSON规范_v0.1_2026-10-13.md)、[机器 Schema](./agent-project.schema.json)、[产品实现入口](../产品实现入口与P0使用说明_v0.1_2026-10-13.md) |
@@ -70,7 +70,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `media beat-cut --project PATH (--audio-asset-id ID\|--input FILE) --source-asset-id ID --track-id ID` | 本地音频节拍证据、一个或多个已登记视频资产、节拍区间和源选择策略 | 使用本地 FFmpeg 能量峰值生成卡点计划；默认只写 `validation/beat_cut_*.json`，`--apply` 在 `before-beat-cut` 快照、重叠检查和项目校验后写入视频轨道并记录操作；`--replace-track` 才允许清空目标轨道，能量峰值和慢放复用必须保留警告 |
 | `media multicam --project PATH --source-asset-id ID --source-asset-id ID` | 两个或以上含视频/音频流的本地机位资产、参考机位、互相关参数和可选切换计划 | 用本地 FFmpeg PCM + NumPy 能量特征估计各机位相对偏移；`--switch-seconds` 或本地 `--switch-plan` 生成可审计直接媒体片段；`--apply` 在 `before-multicam` 快照、轨道重叠检查和项目校验后写入；不宣称视觉自动导演 |
 | `audio extract --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频、可选 WAV 参数和目标 audio 轨道 | 用本地 FFmpeg 提取第一条音频流为项目内 PCM WAV 派生资产；正式执行创建 `before-audio-extract` 快照、继承/登记 Rights Ledger，并可用 `--apply --track-id` 写入音频轨道；dry-run 不写入；不宣称人声/背景声 AI 分离 |
-| `audio separate --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频、center/side 两个输出资产、可选采样率和目标 audio 轨道/stem | 用本地 FFmpeg `pan` 做 mid/side 声道相位近似，生成 center mono 与 side stereo WAV；正式执行创建 `before-audio-separate` 快照、两个派生 Rights Ledger 记录并可用 `--apply --track-id --stem` 写入一个 stem；dry-run 不写入；不宣称模型级源分离 |
+| `audio separate --project PATH (--asset-id ID\|--input FILE)` | 本地音频、可选 adapter、两个输出资产、采样率和 audio 轨道/stem | 无模型时输出 mid/side 近似；native HDemucs 输出 vocals/accompaniment 浮点 WAV，支持显式 CPU/CUDA、精确分段采样、源/模型权利依赖；正式执行快照、登记并可应用选定 stem，dry-run 不推理或写入；详见 [HDemucs 契约](./本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md) |
 | audio adapter register/list/inspect --project PATH | 已存在的本地模型文件/目录、可选执行器、许可证和证据 | 登记或检查 models/audio-adapters.json；保存确定性模型/执行器哈希、Rights Ledger model-adapter 记录、network=disabled 和 before-audio-adapter-register 快照；未知 runner 只登记 metadata，audio separate --adapter-id 会结构化拒绝，不静默 fallback |
 | media adapter register/list/inspect --project PATH | 已存在的本地视觉模型文件/目录、argv-only 执行器、许可证和证据 | 登记或检查 models/visual-adapters.json；保存确定性模型/执行器哈希、Rights Ledger model-adapter 记录、network=disabled 和 before-media-adapter-register 快照；支持 command-json-tracking-v1 单目标和 command-json-tracking-multi-v1 多目标 runner，未知 engine 不执行 |
 | `media smart-cut --project PATH --track-id ID --clip-id ID` | 直接媒体片段、FFmpeg 静音检测参数、可选项目内字幕和显式 `--remove-phrase`、联动轨道 | 合并本地 `silencedetect` 与字幕 cue 粒度的短语删除区间生成计划；`--apply` 在 `before-smart-cut` 快照后切片视频/音频片段、关键帧和时间线；默认不写回；短语匹配不宣称语义理解 |
@@ -126,7 +126,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 
 ## 3.1 本地模型适配器登记与执行门禁
 
-audio adapter register 只接受已存在的本地模型/执行器路径；它不会下载、复制或在登记阶段执行模型。目录按相对路径、大小和文件 SHA-256 形成稳定哈希，正式登记写入 models/audio-adapters.json、Rights Ledger 和 before-audio-adapter-register 快照。audio adapter list/inspect 只读检查路径与哈希。ffmpeg-local-mid-side-v1 与 `command-json-v1` 是当前可执行 runner；后者通过 `agent-video-audio-separation-v1` 的 stdin/stdout JSON 协议生成约定的 center/side WAV，并拒绝 `.cmd/.bat` shell wrapper。Demucs、UVR、Open-Unmix 和 ONNX 专用 engine 仍只能登记，尚无对应 runner 时 audio separate --adapter-id 返回 AUDIO_SEPARATION_ADAPTER_UNAVAILABLE（退出码 10），禁止隐式回退或网络调用。command-json runner 的输出仍需质量 golden 和 Rights Ledger 复核。详细字段见本地模型适配器注册与音频分离门禁契约。
+audio adapter register/list/inspect 接受既有本地模型/执行器及证据，登记阶段不下载、复制或推理。可执行引擎为 ffmpeg-local-mid-side-v1、command-json-v1 和 torchaudio-hdemucs-local-v1。native HDemucs 要求兼容 .pt/.pth、原生 Python .exe、--evidence，配置 --device cpu/cuda、--threads、--segment-seconds 和 --overlap；六项文件及配置被 manifest 绑定。分离使用 --vocals-asset-id/--accompaniment-asset-id、对应 --vocals-output/--accompaniment-output，入轨选择 --stem vocals/accompaniment。旧 center/side 参数保留；legacy demucs-local-v1、UVR、Open-Unmix、ONNX 无 runner 时仍返回 AUDIO_SEPARATION_ADAPTER_UNAVAILABLE，禁止隐式回退或网络服务。质量与许可门禁见 [registry 契约](./本地模型适配器注册与音频分离门禁契约_v0.1_2026-10-15.md)和 [HDemucs 契约](./本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md)。
 
 media adapter register 使用同样的本地路径、许可证、哈希和 Rights Ledger 规则，但写入 `models/visual-adapters.json`。`command-json-tracking-v1` 通过 `agent-video-object-tracking-v1` 的单个 stdin/stdout JSON 请求返回归一化框和 confidence；`command-json-tracking-multi-v1` 通过 v2 返回带唯一 `object_id` 的多个轨迹。CLI 拒绝 shell wrapper、协议不匹配、超时、过大 stdout、越界/非单调帧、重复身份和哈希变化，并在 `media track`、`track-bind`、`reframe` 中保留外部 runner 复核 warning。模型质量、遮挡恢复、旋转框、多目标身份和视觉 golden 不由 registry 自动证明。详细字段见[本地视觉模型适配器与对象跟踪协议契约](./本地视觉模型适配器与对象跟踪协议契约_v0.1_2026-10-15.md)和[本地多目标视觉跟踪与对象选择协议契约](./本地多目标视觉跟踪与对象选择协议契约_v0.1_2026-10-15.md)。
 

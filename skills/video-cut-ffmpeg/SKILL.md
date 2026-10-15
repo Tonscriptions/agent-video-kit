@@ -15,6 +15,11 @@ metadata:
 
 FFmpeg is the local codec and filter backend. This skill covers common operations for Agent Project assets and render fixtures.
 
+For actual vocal/accompaniment separation, use the registered native HDemucs
+CLI described in the [separation contract](../../docs/specs/本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md).
+FFmpeg decodes/encodes that path; the local TorchAudio model predicts vocals.
+Plain `pan`/mid-side remains an explicitly approximate channel operation.
+
 ## Quick Reference
 
 ### GIF to MP4
