@@ -387,6 +387,9 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
             occupied: list[tuple[int, int, str]] = []
             for ci, clip in enumerate(clips):
                 cp = f"{tp}.clips[{ci}]"
+                dependencies = clip.get('rights_dependencies', [])
+                if not isinstance(dependencies, list) or any(not isinstance(d, dict) or set(d) != {'rights_ref','sha256'} or not isinstance(d.get('rights_ref'), str) or not d['rights_ref'] or not re.fullmatch(r'sha256:[0-9a-f]{64}', str(d.get('sha256',''))) for d in dependencies):
+                    error('CLIP_RIGHTS_DEPENDENCIES_INVALID', '片段权利依赖必须包含非空 rights_ref 和 sha256', f'{cp}.rights_dependencies')
                 track_kind = str(track.get("kind", ""))
                 generator = clip.get("generator")
                 text_generator = isinstance(generator, dict) and str(generator.get("type", "")).lower() == "text"

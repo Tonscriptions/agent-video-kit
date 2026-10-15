@@ -21,6 +21,16 @@ online service. No adapter keeps the English/ASCII flite behavior described belo
 
 ## Runtime boundary
 
+For model-backed object tracking use the [native YOLO contract](../../docs/specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md).
+`media adapter register --engine yolov10-onnx-cpu-tracking-v1` takes an
+existing `.onnx`, `--executable <native-Python.exe>` and local evidence.
+Inspect registration and review `media track --all-objects` before selecting
+an object for `media track-bind` or `media reframe`. Use ingested assets for
+application. Motion-only IDs, source-clock resampling and missing observations
+require review; source layer crop/rotation is not fully mapped into label space.
+Dense crop graphs are passed through hash-checked local files when Windows
+command length requires it. Never lower trajectory sampling to hide a render error.
+
 For local speech recognition use the [registered Whisper contract](../../docs/specs/本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md).
 `asr adapter register/list/inspect` records existing native Python, complete
 safetensors weights, explicit CPU/CUDA and local evidence. Pass `--adapter-id`

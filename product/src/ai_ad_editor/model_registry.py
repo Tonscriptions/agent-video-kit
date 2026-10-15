@@ -22,6 +22,7 @@ from .tracking import (
     OBJECT_TRACKING_PROTOCOL,
 )
 from .utils import atomic_write_json, assert_id, load_json, now_iso, sha256_bytes, sha256_file
+from .local_vision import YOLO_ENGINE, prepare_adapter as prepare_native_vision, verify_adapter as verify_native_vision
 
 
 MODEL_REGISTRY_VERSION = "0.1.0"
@@ -38,6 +39,7 @@ VALID_AUDIO_ADAPTER_ENGINES = {
 VALID_VISUAL_ADAPTER_ENGINES = {
     OBJECT_TRACKING_ENGINE,
     MULTI_OBJECT_TRACKING_ENGINE,
+    YOLO_ENGINE,
 }
 
 
@@ -252,10 +254,14 @@ def prepare_visual_adapter(
     permitted_uses: list[str],
     verification_status: str,
     evidence: str,
+    root: Path | None = None,
+    native_options: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Validate and register an explicitly supplied offline visual runner."""
     assert_id(str(adapter_id), "adapter_id")
     engine = str(engine or "").strip()
+    if engine == YOLO_ENGINE:
+        return prepare_native_vision(root or Path.cwd(), adapter_id=adapter_id, model_path=str(model_path or ''), executable=str(executable or ''), evidence=evidence, creator=creator, license_spdx=license_spdx, license_url=license_url, permitted_uses=permitted_uses, verification_status=verification_status, options=native_options or {})
     if engine not in VALID_VISUAL_ADAPTER_ENGINES:
         raise argument_error(f"不支持的本地视觉适配器 engine: {engine}", "engine")
     if verification_status not in {"unverified", "verified", "restricted"}:
@@ -320,6 +326,8 @@ def prepare_visual_adapter(
 
 def verify_visual_adapter(adapter: dict[str, Any]) -> dict[str, Any]:
     """Verify registered visual model and runner paths without executing them."""
+    if adapter.get('engine') == YOLO_ENGINE:
+        return verify_native_vision(adapter)
     findings: list[dict[str, Any]] = []
     model_path = adapter.get("model_path")
     if not model_path:

@@ -6,6 +6,7 @@ import os
 import copy
 import re
 import threading
+import subprocess
 import time
 from pathlib import Path
 from typing import Any, Callable
@@ -16,7 +17,7 @@ from .policy import resolve_local_path
 from .project import asset_map
 from .quality import check_output
 from .text_layout import build_text_layout, graphemes, text_width, word_ranges
-from .utils import atomic_write_json, new_id, now_iso, run_process, sha256_bytes, sha256_file
+from .utils import atomic_write_json, atomic_write_text, new_id, now_iso, run_process, sha256_bytes, sha256_file
 
 
 OUTPUT_PROFILES: dict[str, tuple[int, int]] = {
@@ -3495,6 +3496,28 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     return inputs, ";".join(filters), input_meta, warnings
 
 
+def _execution_filter_graph(root: Path, args: list[str], graph: str, *, write: bool) -> tuple[list[str], dict[str, Any]]:
+    """Move large graphs to a content-addressed file before CreateProcess."""
+    def units(argv: list[str]) -> int:
+        return len(subprocess.list2cmdline(argv).encode('utf-16-le')) // 2 + 1
+    digest = sha256_bytes(graph.encode('utf-8'))
+    info: dict[str, Any] = {'mode':'inline', 'sha256':'sha256:'+digest, 'utf8_bytes':len(graph.encode('utf-8')), 'logical_command_utf16_units':units(args)}
+    if units(args) <= 28_000:
+        return args, info
+    path = root/'cache'/'render-filtergraphs'/f'{digest}.ffgraph'
+    if path.exists() and sha256_file(path) != digest:
+        raise AppError('RENDER_FILTER_GRAPH_HASH_MISMATCH', '本地滤镜图缓存哈希不匹配', exit_code=6, path=str(path))
+    execution = list(args)
+    index = execution.index('-filter_complex')
+    execution[index:index+2] = ['-/filter_complex', str(path)]
+    if units(execution) > 28_000:
+        raise AppError('RENDER_ARGUMENT_LIMIT', '输入参数超过 Windows 命令行预算，请拆分输入序列', exit_code=2)
+    if write and not path.exists():
+        atomic_write_text(path, graph)
+    info.update({'mode':'local-file', 'path':str(path), 'execution_command_utf16_units':units(execution)})
+    return execution, info
+
+
 def render_project(
     root: Path,
     project: dict[str, Any],
@@ -3547,7 +3570,8 @@ def render_project(
     if container == "mp4":
         args.extend(["-movflags", "+faststart"])
     args.extend(["-f", OUTPUT_CONTAINERS[container], str(temp_output)])
-    plan = {"operation_id": operation_id, "command": args, "filter_complex": graph, "inputs": input_meta, "output": str(output), "encoder": encoder, "warnings": warnings, **fingerprints, "resume_of": resume_of}
+    execution_args, graph_transport = _execution_filter_graph(root, args, graph, write=not dry_run)
+    plan = {"operation_id": operation_id, "command": args, "execution_command":execution_args, "filter_graph_transport":graph_transport, "filter_complex": graph, "inputs": input_meta, "output": str(output), "encoder": encoder, "warnings": warnings, **fingerprints, "resume_of": resume_of}
     if dry_run:
         if progress_callback:
             progress_callback(operation_id, "planned", 0.0, "渲染计划已生成")
@@ -3593,7 +3617,7 @@ def render_project(
     try:
         if cancel_file is not None and cancel_file.exists():
             raise AppError("CANCELLED", "任务在启动前已被取消", exit_code=8, path=str(cancel_file), retryable=False)
-        result = run_process(args, timeout=3600, cwd=root, cancel_file=cancel_file)
+        result = run_process(execution_args, timeout=3600, cwd=root, cancel_file=cancel_file)
         if result.returncode != 0:
             raise AppError("RENDER_FAILED", "FFmpeg 渲染失败", exit_code=6, retryable=True, cause=result.stderr[-6000:])
         if not temp_output.exists() or temp_output.stat().st_size == 0:
@@ -3611,7 +3635,9 @@ def render_project(
             "output": str(output),
             "sha256": sha256_file(output),
             "probe": inspected,
-            "command": args,
+            "command": execution_args,
+            "filter_graph_transport": graph_transport,
+            "filter_complex": graph,
             "inputs": input_meta,
             "profile": profile,
             "settings": effective_project["settings"],
@@ -3625,7 +3651,7 @@ def render_project(
         if progress_callback:
             progress_callback(operation_id, "artifact_written", 100.0, "渲染产物和 manifest 已写入")
             progress_callback(operation_id, "completed", 100.0, "渲染完成")
-        return {"status": "succeeded", "operation_id": operation_id, "path": str(output), "manifest": str(manifest_path), "profile": profile, "settings": effective_project["settings"], "probe": inspected, "warnings": warnings + quality.get("warnings", []), "quality": quality, **fingerprints, "resume_of": resume_of}
+        return {"status": "succeeded", "operation_id": operation_id, "path": str(output), "manifest": str(manifest_path), "filter_graph_transport":graph_transport, "profile": profile, "settings": effective_project["settings"], "probe": inspected, "warnings": warnings + quality.get("warnings", []), "quality": quality, **fingerprints, "resume_of": resume_of}
     except AppError as exc:
         # Make the persisted operation discoverable from the CLI error envelope so
         # callers can invoke `render --resume <operation_id>` without scanning files.

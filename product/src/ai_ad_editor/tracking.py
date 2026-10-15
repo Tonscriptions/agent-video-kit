@@ -11,6 +11,7 @@ from typing import Any
 from .errors import AppError, dependency_error
 from .media import ffmpeg_path, probe_media
 from .utils import run_process, sha256_file
+from .local_vision import YOLO_ENGINE
 
 
 OBJECT_TRACKING_PROTOCOL = "agent-video-object-tracking-v1"
@@ -19,6 +20,7 @@ OBJECT_TRACKING_OUTPUT_CONTRACT = "tracking_frames_v1"
 MULTI_OBJECT_TRACKING_PROTOCOL = "agent-video-object-tracking-v2"
 MULTI_OBJECT_TRACKING_ENGINE = "command-json-tracking-multi-v1"
 MULTI_OBJECT_TRACKING_OUTPUT_CONTRACT = "tracking_objects_v1"
+MULTI_OBJECT_TRACKING_ENGINES = frozenset({MULTI_OBJECT_TRACKING_ENGINE, YOLO_ENGINE})
 
 
 def _fraction(value: Any, default: float) -> float:
@@ -49,7 +51,7 @@ def _parse_roi(roi: str | dict[str, Any] | list[float] | tuple[float, ...]) -> t
         values = [_fraction(roi.get("x"), -1), _fraction(roi.get("y"), -1), _fraction(roi.get("width", roi.get("w")), -1), _fraction(roi.get("height", roi.get("h")), -1)]
     else:
         values = [float(item) for item in roi]
-    if len(values) != 4 or values[2] <= 0 or values[3] <= 0 or values[0] < 0 or values[1] < 0 or values[0] + values[2] > 1 or values[1] + values[3] > 1:
+    if len(values) != 4 or not all(math.isfinite(v) for v in values) or values[2] <= 0 or values[3] <= 0 or values[0] < 0 or values[1] < 0 or values[0] + values[2] > 1 or values[1] + values[3] > 1:
         raise AppError("TRACK_ROI_INVALID", "ROI 必须位于 0..1 且包含正宽高", exit_code=2, path="roi")
     return tuple(values)  # type: ignore[return-value]
 
@@ -153,6 +155,7 @@ def track_command_json_multi(
     max_objects: int = 64,
     ticks_per_second: int = 90_000,
     timeout: int = 1800,
+    native_adapter: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run a local multi-object tracker and validate stable object identities.
 
@@ -211,9 +214,14 @@ def track_command_json_multi(
         "ticks_per_second": ticks_per_second,
         "output_contract": MULTI_OBJECT_TRACKING_OUTPUT_CONTRACT,
     }
+    command = _tracking_runner_command(runner)
+    if native_adapter is not None:
+        from .local_vision import prepare_request
+        command = prepare_request(source, native_adapter, request)
+        end_seconds = request['range']['end_seconds']
     try:
         completed = subprocess.run(
-            _tracking_runner_command(runner),
+            command,
             # ASCII JSON avoids GBK/ACP decoding corrupting Unicode paths in
             # a local Python runner's inherited Windows stdin.
             input=json.dumps(request, ensure_ascii=True) + "\n",
@@ -229,6 +237,16 @@ def track_command_json_multi(
     except OSError as exc:
         raise AppError("TRACKING_RUNNER_START_FAILED", f"无法启动本地多目标视觉 runner: {runner}", exit_code=10, path=str(runner), cause=str(exc)) from exc
     if completed.returncode != 0:
+        if native_adapter is not None:
+            try:
+                failed = json.loads((completed.stdout or '')[:10*1024*1024])
+            except (ValueError, TypeError):
+                failed = {}
+            if not isinstance(failed, dict):
+                failed = {}
+            message = str(failed.get('message', '本地 YOLO worker 失败'))[:3000]
+            code = 'TRACK_OBJECT_NOT_FOUND' if message == 'TRACK_OBJECT_NOT_FOUND' else 'VISION_WORKER_FAILED'
+            raise AppError(code, message, exit_code=6, cause=(completed.stderr or '')[-1000:])
         raise AppError("TRACKING_RUNNER_FAILED", "本地多目标视觉 runner 返回失败", exit_code=6, path=str(runner), cause=completed.stderr[-3000:])
     stdout = completed.stdout or ""
     if len(stdout.encode("utf-8", errors="replace")) > 10 * 1024 * 1024:
@@ -243,6 +261,9 @@ def track_command_json_multi(
         raise AppError("TRACKING_RUNNER_PROTOCOL_MISMATCH", "本地多目标视觉 runner protocol 不匹配", exit_code=6, path="protocol")
     if response.get("status") != "ok":
         raise AppError("TRACKING_RUNNER_FAILED", "本地多目标视觉 runner 未返回 status=ok", exit_code=6, path="status", cause=json.dumps(response, ensure_ascii=False)[:3000])
+    if native_adapter is not None:
+        from .local_vision import validate_response
+        validate_response(response, request)
     raw_objects = response.get("objects")
     if not isinstance(raw_objects, list) or not raw_objects:
         raise AppError("TRACKING_RUNNER_OUTPUT_INVALID", "本地多目标视觉 runner 必须返回非空 objects 数组", exit_code=6, path="objects")
@@ -283,8 +304,8 @@ def track_command_json_multi(
         raise AppError("TRACK_OBJECT_NOT_FOUND", f"runner 没有返回请求的 object_id: {object_id}", exit_code=6, path="object_id")
     selected = next((item for item in objects if item["object_id"] == object_id), None) if object_id else None
     result: dict[str, Any] = {
-        "engine": MULTI_OBJECT_TRACKING_ENGINE,
-        "method": "command-json-multi-object",
+        "engine": YOLO_ENGINE if native_adapter is not None else MULTI_OBJECT_TRACKING_ENGINE,
+        "method": "native-yolov10-motion-association" if native_adapter is not None else "command-json-multi-object",
         "protocol": MULTI_OBJECT_TRACKING_PROTOCOL,
         "output_contract": MULTI_OBJECT_TRACKING_OUTPUT_CONTRACT,
         "adapter_id": str(adapter_id),
@@ -306,6 +327,10 @@ def track_command_json_multi(
     if selected is not None:
         result["frames"] = selected["frames"]
         result["keyframes"] = selected["keyframes"]
+    if native_adapter is not None:
+        result.update({'network':'disabled', 'blocked_network_events':response['blocked_network_events'], 'adapter_sha256':native_adapter['sha256'], 'request_sha256':request['request_sha256'], 'rights_ref':native_adapter['rights_ref']})
+        result['runner']['elapsed_seconds'] = response.get('elapsed_seconds')
+        result['warnings'] = ['motion_only_identity_requires_quality_review', 'missing_observations_are_interpolated_by_editor', 'source_clock_is_ffmpeg_fps_resampled']
     return result
 
 

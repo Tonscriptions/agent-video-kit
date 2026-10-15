@@ -5,6 +5,14 @@ description: Compose an Agent Project timeline with local clips, tracks, transit
 
 # Timeline Composition
 
+Native model tracking is described in the [YOLO contract](../../docs/specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md).
+Review `media track --all-objects` before binding an ID to text or reframing a
+direct clip. Preserve the applied clip's `rights_dependencies` entries with
+model registration SHA-256; they participate in publish gates. Label binding
+uses the full requested time range and normalized source coordinates; cropped,
+rotated or nested source layers still require coordinate review. Do not delete
+dependencies or warnings to make a project pass a release gate.
+
 Write a project-relative JSON change set and apply it with:
 
 ```powershell

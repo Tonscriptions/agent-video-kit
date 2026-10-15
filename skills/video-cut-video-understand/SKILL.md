@@ -5,6 +5,13 @@ description: Understand local video and audio with native FFmpeg analysis, optio
 
 # Local Video Understanding
 
+For detector evidence use a registered `yolov10-onnx-cpu-tracking-v1`
+adapter and `media track --asset-id <id> --adapter-id <id> --roi 0,0,1,1
+--all-objects`. Read the [native YOLO contract](../../docs/specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md).
+Reports contain observed boxes, object IDs and sampling metadata; short-gap
+motion association is not semantic understanding or appearance ReID. Select a
+reviewed ID explicitly for editing and retain model rights dependencies.
+
 Use the product CLI against an existing local file. The command never accepts
 URLs and never downloads a model:
 

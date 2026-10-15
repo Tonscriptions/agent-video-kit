@@ -1,0 +1,416 @@
+{
+  "checked_at_utc": "2026-10-15T12:41:19.254090+00:00",
+  "scope": "controlled two-image instances; missing frames are complete image removal, not natural occlusion or broad identity acceptance",
+  "implementation_base": "26553bf0a05fbd3c27584d6684b4166586e1b20f",
+  "local_output_root": "workspace/vision-smoke-20261015-d",
+  "checks": [
+    {
+      "command": "project.init",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.ingest",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.adapter.register",
+      "exit_code": 0,
+      "status": "planned"
+    },
+    {
+      "command": "media.adapter.register",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.adapter.inspect",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "timeline.compose",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.track",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.track",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "timeline.compose",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.track-bind",
+      "exit_code": 0,
+      "status": "planned"
+    },
+    {
+      "command": "media.track-bind",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "render",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "quality.check",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "project.init",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.ingest",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.adapter.register",
+      "exit_code": 0,
+      "status": "planned"
+    },
+    {
+      "command": "media.adapter.register",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.adapter.inspect",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "timeline.compose",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.reframe",
+      "exit_code": 0,
+      "status": "planned"
+    },
+    {
+      "command": "media.reframe",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "render",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "quality.check",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "validate",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "policy.audit",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "rights.check",
+      "exit_code": 7,
+      "status": "failed"
+    },
+    {
+      "command": "validate",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "policy.audit",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "rights.check",
+      "exit_code": 7,
+      "status": "failed"
+    },
+    {
+      "command": "media.adapter.register",
+      "exit_code": 0,
+      "status": "succeeded"
+    },
+    {
+      "command": "media.track",
+      "exit_code": 6,
+      "status": "failed"
+    },
+    {
+      "command": "media.track",
+      "exit_code": 6,
+      "status": "failed"
+    }
+  ],
+  "source_sha256": "sha256:2242b240484907fc2654d4232a904d03f4b98ea798473662aee518107197cf29",
+  "image_sha256": "sha256:88431cd9653ccd539741b555fb0a46b61558b301d4110412b5bc28b5e3ea6cb5",
+  "model": {
+    "file": "yolov10m.onnx",
+    "bytes": 61659689,
+    "sha256": "sha256:afcdfe8c0034c213054e8e014e1e0b4e31d6ae008d5578ccedfdd3af344ffab8",
+    "license_verified": false,
+    "permitted_uses": [
+      "internal"
+    ]
+  },
+  "adapter_manifest_sha256": "sha256:4590506793da73622741fea6ff1198a866ae0c08895eb5159c2a1e3e8a6bb05d",
+  "registered_artifacts": [
+    {
+      "role": "model",
+      "file": "yolov10m.onnx",
+      "bytes": 61659689,
+      "sha256": "sha256:afcdfe8c0034c213054e8e014e1e0b4e31d6ae008d5578ccedfdd3af344ffab8"
+    },
+    {
+      "role": "python",
+      "file": "python.exe",
+      "bytes": 105696,
+      "sha256": "sha256:ef8f51028ac5329641985112f8efb1c2d4c47c86b8011ddf7e6fae21e2b4e5a1"
+    },
+    {
+      "role": "evidence",
+      "file": "evidence.json",
+      "bytes": 164,
+      "sha256": "sha256:1a34b4a9ad5f989d77571e2a7aafef034a76bca2e59191905471f76f06eb86b3"
+    },
+    {
+      "role": "worker",
+      "file": "yolo_worker.py",
+      "bytes": 12271,
+      "sha256": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86"
+    },
+    {
+      "role": "tracker",
+      "file": "vision_tracker.py",
+      "bytes": 6960,
+      "sha256": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f"
+    },
+    {
+      "role": "controller",
+      "file": "local_vision.py",
+      "bytes": 13179,
+      "sha256": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "obj_0001",
+      "label": "person",
+      "observations": 29,
+      "first_seconds": 0.0,
+      "last_seconds": 3.875,
+      "max_observation_gap_seconds": 0.5
+    },
+    {
+      "object_id": "obj_0002",
+      "label": "person",
+      "observations": 32,
+      "first_seconds": 0.0,
+      "last_seconds": 3.875,
+      "max_observation_gap_seconds": 0.125
+    }
+  ],
+  "native_execution": {
+    "status": "ok",
+    "engine": "yolov10-onnx-cpu-tracking-v1",
+    "metadata": {
+      "sampled_frames": 32,
+      "detected_frames": 32,
+      "observation_count": 61,
+      "video": {
+        "width": 960,
+        "height": 540,
+        "fps": 8.0,
+        "duration_seconds": 4.0,
+        "sample_interval_seconds": 0.125,
+        "expected_samples": 32,
+        "decode_width": 640,
+        "decode_height": 360,
+        "clock": "ffmpeg-fps-resampled-source-seconds"
+      },
+      "device": "cpu",
+      "providers": [
+        "CPUExecutionProvider"
+      ],
+      "onnxruntime_telemetry_disabled": true,
+      "settings": {
+        "threads": 4,
+        "confidence": 0.35,
+        "low_confidence": 0.1,
+        "match_iou": 0.1,
+        "max_gap_seconds": 0.8,
+        "class_ids": [
+          0
+        ],
+        "device": "cpu",
+        "association": "constant-velocity-hungarian-two-stage-v1"
+      },
+      "identity_model": "motion-only-no-appearance-reid",
+      "missing_observations": "not_fabricated; editor_interpolates_between_observations",
+      "last_sample_missing": false,
+      "versions": {
+        "python": "3.13.14",
+        "numpy": "2.4.6",
+        "onnx": "1.22.0",
+        "onnxruntime": "1.28.0",
+        "pillow": "12.3.0"
+      }
+    },
+    "elapsed_seconds": 11.908
+  },
+  "network": "disabled",
+  "blocked_network_events": [],
+  "motion_residual_normalized_x": [
+    0.001055666666666663,
+    0.0006390000000000111
+  ],
+  "motion_residual_pixels": [
+    1.0134399999999966,
+    0.6134400000000106
+  ],
+  "repeated_trajectories_equal": true,
+  "binding_last_tick": 348750,
+  "renders": [
+    {
+      "file": "tracked-label.mp4",
+      "sha256": "sha256:08578f12aebb2dd81b7d8d3e0c40064d06f14dacdf097382d8abb7a0b353249c",
+      "duration_seconds": 4.0,
+      "width": 640,
+      "height": 360,
+      "quality_ok": true,
+      "filter_graph_transport": {
+        "mode": "inline",
+        "sha256": "sha256:b81a8b2cf05f02dab2f6c6f0c35e2826b5d819cbe87edcaf1f0f806c92ccd57f",
+        "utf8_bytes": 7268,
+        "logical_command_utf16_units": 8067
+      },
+      "manifest_sha256": "sha256:3d2855680bfcb9bd6fc96fdf6218f7e2698fc90f3526a70f3e53544d593a3abb"
+    },
+    {
+      "file": "reframed-portrait.mp4",
+      "sha256": "sha256:cbc56e024804fbd0df779160f8e354064b433ff3cbaa3559cd41e4ffd0bc885f",
+      "duration_seconds": 4.0,
+      "width": 360,
+      "height": 640,
+      "quality_ok": true,
+      "filter_graph_transport": {
+        "mode": "local-file",
+        "sha256": "sha256:77742850d8db132933af8ac1f428ce1f47695be6079ea98b97b6b5f6b15dbbe9",
+        "utf8_bytes": 53397,
+        "logical_command_utf16_units": 54197,
+        "execution_command_utf16_units": 963
+      },
+      "manifest_sha256": "sha256:8a4ee377f1a397a623d54dd3df61f7f0037d699796a358cc895229fd2476eaff"
+    }
+  ],
+  "visual_review": [
+    {
+      "file": "tracking/tracked-label-0.5.png",
+      "sha256": "sha256:28cfa8d7f71a64c051cf6b42a28aec65fedbaca194be5b5062391d2b26d03540",
+      "same_as_visually_reviewed_frame": true
+    },
+    {
+      "file": "tracking/tracked-label-3.5.png",
+      "sha256": "sha256:f4425edc0edbbfa5c828bfca5b4a0ae1c9a5c47b5f61b3058f4f6348d67b4d2d",
+      "same_as_visually_reviewed_frame": true
+    },
+    {
+      "file": "reframe/reframed-portrait-0.5.png",
+      "sha256": "sha256:4035028c6efbb111648308c815f814098f524a05c6967b253e73a5aa7053e5f8",
+      "same_as_visually_reviewed_frame": true
+    },
+    {
+      "file": "reframe/reframed-portrait-3.5.png",
+      "sha256": "sha256:b1c0f4315f1bc0f7df339754015b16bad86e3eeb5f9582ef63080bd5be976f75",
+      "same_as_visually_reviewed_frame": true
+    }
+  ],
+  "external_data_rejected": true,
+  "empty_detection_rejected": true,
+  "full_regression": {
+    "tests": 194,
+    "status": "OK",
+    "seconds": 307.168,
+    "local_log": "product/.runtime/vision-full-regression-20261015.log",
+    "sha256": "sha256:ff5fe6e59b474a9379f1f1913853d3d7885cf8f8427159ddfbf6d3c285bb5176"
+  },
+  "implementation_hashes": {
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/render.py": "sha256:ff9307624f3fc49ede9446d25adcb12a55acf9938e6712b288b18111ec7a330d",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:a4bb74dd881ffad8e6340e3ccf16a33362ce80b90721f141bb5c86a7c34153b8",
+    "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/cli.py": "sha256:d1c26d9f3960ae7696512b7b2343627a9954f9e377bde9e620f8043fb08a2a76",
+    "product/src/ai_ad_editor/convert.py": "sha256:58494011ccdc1c63f980986c16975706eb67e9078ee187b32050153082f3ebfd",
+    "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+    "product/src/ai_ad_editor/validator.py": "sha256:99421013b1589b08079d2c31254b4684cfa7f91d79ab1d8dca06c5e7d62aa537"
+  },
+  "not_accepted": [
+    "natural_occlusion",
+    "same_class_crossing",
+    "appearance_reid",
+    "rotated_or_nonzero_pts_sources",
+    "full_source_to_label_coordinate_transforms",
+    "broad_advertising_corpus",
+    "cross_device_performance",
+    "model_commercial_license"
+  ],
+  "docker_or_wsl_started": false,
+  "browser_started": false,
+  "weights_or_packages_downloaded": false,
+  "final_runtime_checks": {
+    "checked_at_utc": "2026-10-15T14:56:36.020481Z",
+    "doctor": {
+      "native_windows": true,
+      "network_default": "disabled",
+      "policy": {
+        "docker_or_wsl_started": false,
+        "closed_services_enabled": false,
+        "jianying_runtime_enabled": false
+      }
+    },
+    "doctor_ok": true,
+    "projects": [
+      {
+        "project": "workspace/vision-smoke-20261015-d/tracking",
+        "ok": true,
+        "network": "disabled",
+        "scanned_files": 26,
+        "findings": []
+      },
+      {
+        "project": "workspace/vision-smoke-20261015-d/reframe",
+        "ok": true,
+        "network": "disabled",
+        "scanned_files": 17,
+        "findings": []
+      }
+    ]
+  }
+}

@@ -17,6 +17,7 @@ from .utils import atomic_write_json, load_json, new_id, now_iso, project_root
 
 
 TICKS_PER_SECOND = 90_000
+MODEL_REGISTRY_FILES = ('models/audio-adapters.json', 'models/visual-adapters.json')
 
 
 def project_file(root: Path) -> Path:
@@ -68,7 +69,7 @@ def _transaction_metadata_files(root: Path) -> list[Path]:
     or deleting large user files.
     """
     candidates: list[Path] = []
-    for fixed in (project_file(root), ledger_file(root), lock_file(root)):
+    for fixed in (project_file(root), ledger_file(root), lock_file(root), *(root/name for name in MODEL_REGISTRY_FILES)):
         if fixed.is_file():
             candidates.append(fixed)
     for directory_name in ("operations", "history", "validation", "exports"):
@@ -484,6 +485,7 @@ def create_snapshot(root: Path, project: dict[str, Any], *, label: str = "manual
         "project": copy.deepcopy(project),
         "rights_ledger": copy.deepcopy(ledger),
         "lock": copy.deepcopy(lock),
+        "model_registries": {name: load_json(root/name) if (root/name).is_file() else None for name in MODEL_REGISTRY_FILES},
     }
     path = history_dir(root) / f"{snapshot_id}.json"
     atomic_write_json(path, payload)
@@ -501,10 +503,20 @@ def restore_snapshot(root: Path, payload: dict[str, Any]) -> dict[str, Any]:
     ledger = payload.get("rights_ledger")
     if not isinstance(project, dict) or not isinstance(ledger, dict):
         raise AppError("SNAPSHOT_INVALID", "快照缺少 project 或 rights_ledger", exit_code=2)
+    registries = payload.get('model_registries')
+    if registries is not None and (not isinstance(registries, dict) or set(registries) != set(MODEL_REGISTRY_FILES) or any(value is not None and (not isinstance(value, dict) or not isinstance(value.get('adapters'), list)) for value in registries.values())):
+        raise AppError('SNAPSHOT_INVALID', '快照模型登记侧车格式无效', exit_code=2)
     atomic_write_json(project_file(root), project)
     atomic_write_json(ledger_file(root), ledger)
     if isinstance(payload.get("lock"), dict):
         atomic_write_json(lock_file(root), payload["lock"])
+    if registries is not None:
+        for name, value in registries.items():
+            destination = root/name
+            if value is not None:
+                atomic_write_json(destination, value)
+            elif destination.is_file():
+                destination.unlink()
     return {"project": str(project_file(root)), "ledger": str(ledger_file(root)), "project_id": project.get("project", {}).get("id")}
 
 

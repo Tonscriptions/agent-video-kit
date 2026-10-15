@@ -312,6 +312,13 @@ def _required_records(project: dict[str, Any], ledger: dict[str, Any]) -> tuple[
     roots: list[dict[str, Any]] = []
     for asset in project.get("assets", []):
         roots.append({"asset_id": str(asset.get("id")), "rights_ref": str(asset.get("rights_ref", "")), "asset_hash": asset.get("sha256"), "context": "project_asset"})
+    for sequence in project.get('sequences', []):
+        for track in sequence.get('tracks', []):
+            for clip in track.get('clips', []):
+                dependencies = clip.get('rights_dependencies', [])
+                for dependency in dependencies if isinstance(dependencies, list) else [None]:
+                    ref = dependency.get('rights_ref') if isinstance(dependency, dict) else ''
+                    roots.append({'asset_id':str(ref or ''), 'rights_ref':str(ref or ''), 'asset_hash':dependency.get('sha256') if isinstance(dependency, dict) else None, 'context':f"clip:{sequence.get('id')}:{clip.get('id')}"})
     for template in project.get("templates", []):
         template_id = str(template.get("id", "<template>"))
         dependencies = template.get("assets", [])

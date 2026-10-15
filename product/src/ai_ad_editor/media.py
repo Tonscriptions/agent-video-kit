@@ -115,7 +115,7 @@ def probe_media(path: Path) -> dict[str, Any]:
             "subtitle": {"format": path.suffix.lower().lstrip("."), "cue_count": len(cues)},
         }
     result = run_process(
-        [ffprobe_path(), "-v", "error", "-show_format", "-show_streams", "-of", "json", str(path)],
+        [ffprobe_path(), "-v", "error", "-protocol_whitelist", "file,pipe", "-show_format", "-show_streams", "-of", "json", str(path)],
         timeout=60,
     )
     if result.returncode != 0:

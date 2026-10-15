@@ -20,7 +20,7 @@ from .utils import atomic_write_json, new_id, now_iso, safe_filename, sha256_fil
 PROJECT_PACKAGE_VERSION = "0.1.0"
 PROJECT_PACKAGE_MANIFEST = "package-manifest.json"
 PROJECT_PACKAGE_REPORT = "conversion-report.json"
-PROJECT_PACKAGE_ROOT_FILES = ("project.json", "rights-ledger.json", "project.lock.json")
+PROJECT_PACKAGE_ROOT_FILES = ("project.json", "rights-ledger.json", "project.lock.json", "models/audio-adapters.json", "models/visual-adapters.json")
 # Assets are handled explicitly from project metadata so their URIs can be
 # rewritten into the portable package namespace.  The remaining directories
 # are small project-owned support payloads; render/cache/operation/history
@@ -193,7 +193,7 @@ def _export_project_package(root: Path, project: dict[str, Any], output: Path) -
         source_files["project.lock.json"] = lock_path.read_bytes()
     for path in _package_files(root):
         relative = _package_relative(path.relative_to(root))
-        if relative in PROJECT_PACKAGE_ROOT_FILES:
+        if relative in PROJECT_PACKAGE_ROOT_FILES[:3]:
             continue
         source_files.setdefault(relative, path.read_bytes())
     for package_path, source in asset_files.items():

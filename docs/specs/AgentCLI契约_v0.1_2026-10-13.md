@@ -276,3 +276,7 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 `subtitle transcribe` 的 `--model-path` 与 `--adapter-id` 二选一；`media understand --transcribe` 同样支持登记模型。登记模型的设备由登记项决定，不能混用 `--use-gpu` 或 `ffmpeg-whisper` 引擎。新 SRT 输出按项目根解析；拒绝覆盖，应用继承源及模型的权利依赖。空文本/非有限/越界/重叠时码拒绝；落盘失败清理本轮输出并由事务恢复原元数据。幂等指纹保留输出路径，但不把本次新生成的 output/report 或变化后的 project.json 当输入内容哈希，绝对路径亦能正确重放。
 
 `subtitle evaluate --input <UTF8或字幕> --reference <UTF8或字幕> [--project <项目>] [--normalization raw|nfkc-text] [--max-cer <非负数>] [--report <新JSON>]` 返回替换/删除/插入计数及 CER。默认归一化不转换繁简；超阈值返回 `ASR_CER_THRESHOLD_EXCEEDED`/6 并保留报告。比较超过 2500 万动态规划单元或单边超过 10 万字时拒绝，须分段评估。`media ingest` 增加经本地 FreeType 验证的 TTF/OTF/TTC 字体资产，集合字体当前只选 face 0。详情见[登记与验收契约](./本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md)。
+
+## 2026-10-15 原生视觉执行增量
+
+`media adapter register` 新增 `--engine yolov10-onnx-cpu-tracking-v1`；`--executable` 为原生 Python `.exe`，`--model-path` 为自包含 YOLOv10 COCO-80 ONNX，`--evidence` 为现有本地文件。显式参数含 `--threads`、`--confidence`、`--low-confidence`、`--match-iou`、`--max-gap-seconds` 和可重复 `--class-id`。`media track --all-objects` 复核后，以 `--object-id` 驱动 track/track-bind/reframe；正式应用要求已摄取 `--asset-id`，保留片段模型权利。报告已存在时拒绝覆盖，native 不回退模板。详见[专用契约](./本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md)。

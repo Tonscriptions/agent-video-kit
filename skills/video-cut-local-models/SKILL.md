@@ -1,9 +1,22 @@
 ---
 name: video-cut-local-models
-description: Run explicitly registered offline models for ASR, SoulX Chinese speech and local visual analysis without downloads, cloud APIs, or hidden network access.
+description: Run explicitly registered offline Whisper ASR, SoulX Chinese speech and native YOLO ONNX object tracking without downloads, cloud APIs, or hidden network access.
 ---
 
 # Local Models
+
+For native object detection and tracking, read the [YOLO contract](../../docs/specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md).
+Register `media adapter register --engine yolov10-onnx-cpu-tracking-v1`
+with an existing self-contained COCO-80 YOLOv10 ONNX, native Python `.exe`
+and local `--evidence`. The Python must already contain numpy/Pillow/onnx/
+onnxruntime. Explicit CPU settings, model/Python/evidence/implementation hashes
+and class filters belong to the registration; there is no install or GPU fallback.
+Inspect the adapter, then use `media track --adapter-id <id> --roi 0,0,1,1
+--all-objects` to review IDs before selecting `--object-id` for editing.
+Native tracking uses motion/IoU association without appearance ReID. Preserve
+missing-observation, resampled-clock and identity-review warnings. Applying
+requires `--asset-id` and retains model rights on the target clip. Registration
+metadata is restored/packaged; external weights and Python remain explicit inputs.
 
 Models are inputs, never dependencies that the CLI fetches. Put a model in a
 project or approved local model directory, record its version, SHA-256 and

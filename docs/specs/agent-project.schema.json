@@ -178,6 +178,10 @@
         "id": {"$ref": "#/$defs/id"},
         "asset_id": {"$ref": "#/$defs/id"},
         "sequence_id": {"$ref": "#/$defs/id"},
+        "rights_dependencies": {
+          "type": "array",
+          "items": {"type": "object", "required": ["rights_ref", "sha256"], "properties": {"rights_ref": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}}, "additionalProperties": false}
+        },
         "timeline_start_tick": {"$ref": "#/$defs/nonNegativeInteger"},
         "duration_tick": {"$ref": "#/$defs/positiveInteger"},
         "source_in_tick": {"$ref": "#/$defs/nonNegativeInteger"},
