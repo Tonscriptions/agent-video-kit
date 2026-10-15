@@ -71,6 +71,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `media multicam --project PATH --source-asset-id ID --source-asset-id ID` | 两个或以上含视频/音频流的本地机位资产、参考机位、互相关参数和可选切换计划 | 用本地 FFmpeg PCM + NumPy 能量特征估计各机位相对偏移；`--switch-seconds` 或本地 `--switch-plan` 生成可审计直接媒体片段；`--apply` 在 `before-multicam` 快照、轨道重叠检查和项目校验后写入；不宣称视觉自动导演 |
 | `audio extract --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频、可选 WAV 参数和目标 audio 轨道 | 用本地 FFmpeg 提取第一条音频流为项目内 PCM WAV 派生资产；正式执行创建 `before-audio-extract` 快照、继承/登记 Rights Ledger，并可用 `--apply --track-id` 写入音频轨道；dry-run 不写入；不宣称人声/背景声 AI 分离 |
 | `audio separate --project PATH (--asset-id ID\|--input FILE)` | 本地视频/音频、center/side 两个输出资产、可选采样率和目标 audio 轨道/stem | 用本地 FFmpeg `pan` 做 mid/side 声道相位近似，生成 center mono 与 side stereo WAV；正式执行创建 `before-audio-separate` 快照、两个派生 Rights Ledger 记录并可用 `--apply --track-id --stem` 写入一个 stem；dry-run 不写入；不宣称模型级源分离 |
+| audio adapter register/list/inspect --project PATH | 已存在的本地模型文件/目录、可选执行器、许可证和证据 | 登记或检查 models/audio-adapters.json；保存确定性模型/执行器哈希、Rights Ledger model-adapter 记录、network=disabled 和 before-audio-adapter-register 快照；未知 runner 只登记 metadata，audio separate --adapter-id 会结构化拒绝，不静默 fallback |
 | `media smart-cut --project PATH --track-id ID --clip-id ID` | 直接媒体片段、FFmpeg 静音检测参数、可选项目内字幕和显式 `--remove-phrase`、联动轨道 | 合并本地 `silencedetect` 与字幕 cue 粒度的短语删除区间生成计划；`--apply` 在 `before-smart-cut` 快照后切片视频/音频片段、关键帧和时间线；默认不写回；短语匹配不宣称语义理解 |
 | `media relink --project PATH --search-root DIR` | 丢失资产和本地搜索目录 | 优先内容哈希精确重链接；`--match-by-name` 仅允许唯一文件名近似匹配并生成报告 |
 | `media track --project PATH ... --roi X,Y,W,H` | 本地视频、归一化 ROI | 本地模板匹配、置信度和位置关键帧；`--clip-id` 写回前创建快照 |
@@ -119,6 +120,10 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `doctor` | 本机环境 | 只读取 Python、FFmpeg、FFprobe、Docker/WSL PATH；绝不启动虚拟化环境 |
 | `operation inspect --project PATH --operation-id ID` | 操作 ID | 读取可重连的操作状态、进度和产物清单 |
 | `version` / `capabilities` | 无 | 版本、引擎、网络策略和 test-backed 本地能力清单 |
+
+## 3.1 本地模型适配器登记与执行门禁
+
+audio adapter register 只接受已存在的本地模型/执行器路径；它不会下载、复制或执行模型。目录按相对路径、大小和文件 SHA-256 形成稳定哈希，正式登记写入 models/audio-adapters.json、Rights Ledger 和 before-audio-adapter-register 快照。audio adapter list/inspect 只读检查路径与哈希。ffmpeg-local-mid-side-v1 是当前可执行 runner；Demucs、UVR、Open-Unmix、ONNX 和 command-json-v1 只能登记，尚无对应 runner 时 audio separate --adapter-id 返回 AUDIO_SEPARATION_ADAPTER_UNAVAILABLE（退出码 10），禁止隐式回退或网络调用。详细字段见本地模型适配器注册与音频分离门禁契约。
 
 ## 4. 项目迁移、快照和路径规则
 

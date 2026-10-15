@@ -964,6 +964,61 @@ class P0CliTests(unittest.TestCase):
             ledger = json.loads((project / "rights-ledger.json").read_text(encoding="utf-8"))
             self.assertEqual(len(ledger["records"]), 3)
 
+    def test_local_audio_adapter_registry_hashes_and_gates_unimplemented_runner(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="ai-ad-editor-audio-adapter-") as raw:
+            workspace = Path(raw)
+            source = self.make_media(workspace, "camera.mp4")
+            model = workspace / "demucs-model.bin"
+            model.write_bytes(b"local model fixture v1")
+            project = workspace / "project"
+            self.assertEqual(invoke("project", "init", str(project))[0], 0)
+            code, ingested = invoke("media", "ingest", "--project", str(project), "--input", str(source))
+            self.assertEqual(code, 0, ingested)
+            source_id = ingested["data"]["asset"]["id"]
+
+            code, planned = invoke(
+                "audio", "adapter", "register", "--project", str(project),
+                "--adapter-id", "demucs_fixture", "--engine", "demucs-local-v1",
+                "--model-path", str(model), "--dry-run",
+            )
+            self.assertEqual(code, 0, planned)
+            self.assertEqual(planned["status"], "planned")
+            self.assertFalse((project / "models" / "audio-adapters.json").exists())
+
+            code, registered = invoke(
+                "audio", "adapter", "register", "--project", str(project),
+                "--adapter-id", "demucs_fixture", "--engine", "demucs-local-v1",
+                "--model-path", str(model), "--license-spdx", "CC0-1.0",
+                "--verification-status", "verified", "--evidence", "local://model-evidence",
+            )
+            self.assertEqual(code, 0, registered)
+            self.assertEqual(registered["data"]["snapshot"]["label"], "before-audio-adapter-register")
+            self.assertTrue(registered["data"]["adapter"]["model_sha256"].startswith("sha256:"))
+            self.assertEqual(registered["data"]["rights"]["kind"], "model-adapter")
+
+            code, listed = invoke("audio", "adapter", "list", "--project", str(project))
+            self.assertEqual(code, 0, listed)
+            self.assertEqual(listed["data"]["count"], 1)
+            self.assertTrue(listed["data"]["adapters"][0]["verification"]["ok"])
+            code, inspected = invoke("audio", "adapter", "inspect", "--project", str(project), "--adapter-id", "demucs_fixture")
+            self.assertEqual(code, 0, inspected)
+            self.assertTrue(inspected["data"]["verification"]["ok"])
+
+            code, rejected = invoke(
+                "audio", "separate", "--project", str(project), "--asset-id", source_id,
+                "--adapter-id", "demucs_fixture",
+            )
+            self.assertEqual(code, 10, rejected)
+            self.assertEqual(rejected["errors"][0]["code"], "AUDIO_SEPARATION_ADAPTER_UNAVAILABLE")
+
+            model.write_bytes(b"local model fixture v2")
+            code, tampered = invoke("audio", "adapter", "inspect", "--project", str(project), "--adapter-id", "demucs_fixture")
+            self.assertEqual(code, 0, tampered)
+            self.assertFalse(tampered["data"]["verification"]["ok"])
+            self.assertEqual(tampered["data"]["verification"]["findings"][0]["code"], "MODEL_HASH_MISMATCH")
+            ledger = json.loads((project / "rights-ledger.json").read_text(encoding="utf-8"))
+            self.assertEqual(ledger["records"][-1]["asset_id"], "adapter:demucs_fixture")
+
 
     def test_local_highlight_recommendation_writes_auditable_report(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-highlights-") as raw:
@@ -1228,6 +1283,8 @@ class P0CliTests(unittest.TestCase):
         self.assertIn("track_mute", manifest["capabilities"]["audio"]["features"])
         self.assertIn("track_solo", manifest["capabilities"]["audio"]["features"])
         self.assertIn("track_volume", manifest["capabilities"]["audio"]["features"])
+        self.assertIn("offline_adapter_registry", manifest["capabilities"]["audio"]["features"])
+        self.assertIn("unknown_audio_adapter_never_falls_back_to_mid_side", manifest["capabilities"]["audio"]["limits"])
         self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.4.0")
         self.assertIn("exposure", manifest["capabilities"]["effects"]["catalog_features"])
         self.assertIn("hsl", manifest["capabilities"]["effects"]["catalog_features"])

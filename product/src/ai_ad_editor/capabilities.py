@@ -119,8 +119,8 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "audio": {
                 "status": "implemented",
-                "features": ["multi_track_mix", "track_mute", "track_solo", "track_volume", "track_pan", "track_role", "volume_automation", "pan_automation", "stereo_preserving_numeric_pan", "fade", "denoise", "compressor", "equalizer", "highpass", "lowpass", "dialogue_enhance", "pitch_shift", "reverb", "loudnorm", "ducking", "pan", "beat_anchors", "freeze_audio_silence_at_timeline_position", "extract_audio_asset", "derived_audio_rights_inheritance", "audio_track_apply", "mid_side_separation_approximation", "separation_asset_pair", "selected_stem_audio_track_apply"],
-                "limits": ["extract_audio_uses_first_local_audio_stream", "extract_audio_outputs_lossless_pcm_wav", "mid_side_separation_is_phase_based_and_approximate", "true_vocal_background_separation_requires_a_registered_offline_model_adapter", "freeze_audio_continue_uses_tail_padding", "audio_speed_curve_uses_piecewise_atempo"],
+                "features": ["multi_track_mix", "track_mute", "track_solo", "track_volume", "track_pan", "track_role", "volume_automation", "pan_automation", "stereo_preserving_numeric_pan", "fade", "denoise", "compressor", "equalizer", "highpass", "lowpass", "dialogue_enhance", "pitch_shift", "reverb", "loudnorm", "ducking", "pan", "beat_anchors", "freeze_audio_silence_at_timeline_position", "extract_audio_asset", "derived_audio_rights_inheritance", "audio_track_apply", "mid_side_separation_approximation", "separation_asset_pair", "selected_stem_audio_track_apply", "offline_adapter_registry", "adapter_hash_verification", "adapter_rights_registration"],
+                "limits": ["extract_audio_uses_first_local_audio_stream", "extract_audio_outputs_lossless_pcm_wav", "mid_side_separation_is_phase_based_and_approximate", "true_vocal_background_separation_requires_a_registered_offline_model_adapter", "registered_model_engines_require_a_dedicated_local_runner", "unknown_audio_adapter_never_falls_back_to_mid_side", "freeze_audio_continue_uses_tail_padding", "audio_speed_curve_uses_piecewise_atempo"],
             },
             "render": {
                 "status": "implemented",
@@ -166,7 +166,7 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "ai": {
                 "status": "local_adapter_only",
-                "features": ["offline_transformers_asr_gate", "ffmpeg_whisper_cpp_asr", "local_asr_subtitle_generation", "local_flite_tts", "heuristic_highlights", "local_ad_plan", "local_ad_plan_apply", "local_template_tracking"],
+                "features": ["offline_transformers_asr_gate", "ffmpeg_whisper_cpp_asr", "local_asr_subtitle_generation", "local_flite_tts", "heuristic_highlights", "local_ad_plan", "local_ad_plan_apply", "local_template_tracking", "offline_model_registry"],
                 "network": "disabled",
                 "asr_contract": "subtitle.transcribe_or_media.understand_uses_an_explicit_local_transformers_directory_or_ffmpeg_whisper_model_and_writes_timestamped_srt_without_network",
                 "tts_contract": "tts.synthesize_uses_ffmpeg_flite_and_writes_project_local_wav_without_network_or_model_download",

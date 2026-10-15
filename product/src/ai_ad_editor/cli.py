@@ -65,6 +65,15 @@ from .beat_edit import BEAT_CUT_VERSION, build_beat_cut_plan
 from .multicam import MULTICAM_SYNC_VERSION, build_switch_segments, new_multicam_clip_id, synchronize_multicam_sources
 from .audio_tools import AUDIO_EXTRACT_VERSION, extract_audio, inspect_audio_source
 from .audio_separation import AUDIO_SEPARATION_ENGINE, AUDIO_SEPARATION_VERSION, separate_mid_side
+from .model_registry import (
+    MODEL_REGISTRY_VERSION,
+    adapter_for,
+    load_model_registry,
+    prepare_audio_adapter,
+    registry_path,
+    save_model_registry,
+    verify_audio_adapter,
+)
 from .utils import atomic_write_json, atomic_write_text, ensure_inside, idempotency_record_path, load_json, new_id, now_iso, request_fingerprint, safe_filename, sha256_file
 from .validator import validate_project
 
@@ -259,6 +268,7 @@ def build_parser() -> argparse.ArgumentParser:
     separate.add_argument("--side-asset-id", default=None)
     separate.add_argument("--center-output", default=None)
     separate.add_argument("--side-output", default=None)
+    separate.add_argument("--adapter-id", default=None, help="可选：项目内已注册的离线音频分离适配器")
     separate.add_argument("--sample-rate", type=int, default=None)
     separate.add_argument("--sequence-id", default=None)
     separate.add_argument("--track-id", default=None, help="--apply 时写入目标音频轨道")
@@ -272,6 +282,25 @@ def build_parser() -> argparse.ArgumentParser:
     separate.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
     separate.add_argument("--evidence", default="")
     separate.add_argument("--creator", default="unknown")
+    adapter = _leaf_common(aus.add_parser("adapter", help="注册或检查本地音频模型适配器"))
+    aas = adapter.add_subparsers(dest="adapter_action", required=True)
+    adapter_register = _leaf_common(aas.add_parser("register", help="登记本地模型/执行器路径与哈希"))
+    adapter_register.add_argument("--project", required=True)
+    adapter_register.add_argument("--adapter-id", required=True)
+    adapter_register.add_argument("--engine", required=True, help="本地适配器 engine；未知模型只登记，不会被隐式执行")
+    adapter_register.add_argument("--model-path", default=None)
+    adapter_register.add_argument("--executable", default=None, help="command-json-v1 的本地执行器")
+    adapter_register.add_argument("--license-spdx", default="LicenseRef-UNVERIFIED")
+    adapter_register.add_argument("--license-url", default="")
+    adapter_register.add_argument("--permitted-use", action="append", default=["internal"])
+    adapter_register.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
+    adapter_register.add_argument("--evidence", default="")
+    adapter_register.add_argument("--creator", default="unknown")
+    adapter_list = _leaf_common(aas.add_parser("list", help="列出项目内已登记适配器"))
+    adapter_list.add_argument("--project", required=True)
+    adapter_inspect = _leaf_common(aas.add_parser("inspect", help="检查适配器路径与哈希"))
+    adapter_inspect.add_argument("--project", required=True)
+    adapter_inspect.add_argument("--adapter-id", required=True)
     track = _leaf_common(ms.add_parser("track", help="本地对象跟踪并生成关键帧"))
     track.add_argument("--project", required=True)
     track.add_argument("--asset-id", default=None, help="项目内视频资产 ID，与 --input 二选一")
@@ -1045,6 +1074,18 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
         raise argument_error("--apply 必须同时提供 --track-id 和 --stem", "track_id")
     if args.replace_track and not args.apply:
         raise argument_error("--replace-track 必须与 --apply 一起使用", "replace_track")
+    adapter_record = None
+    adapter_verification = None
+    if args.adapter_id:
+        registry = load_model_registry(root)
+        adapter_record = adapter_for(registry, args.adapter_id)
+        if adapter_record is None:
+            raise AppError("MODEL_ADAPTER_NOT_FOUND", f"找不到已注册音频适配器: {args.adapter_id}", exit_code=3, path=str(registry_path(root)))
+        adapter_verification = verify_audio_adapter(adapter_record)
+        if not adapter_verification["ok"]:
+            raise AppError("MODEL_ADAPTER_HASH_INVALID", "本地音频适配器路径或哈希校验失败", exit_code=10, path=str(registry_path(root)), cause=json.dumps(adapter_verification, ensure_ascii=False))
+        if adapter_record.get("engine") != AUDIO_SEPARATION_ENGINE:
+            raise AppError("AUDIO_SEPARATION_ADAPTER_UNAVAILABLE", f"适配器已登记但当前没有对应本地 runner: {adapter_record.get('engine')}", exit_code=10, path=str(args.adapter_id), hint="当前可执行 runner 只有 ffmpeg-local-mid-side-v1；未知模型不会被隐式 fallback")
     source_asset: dict[str, Any] | None = None
     parent_rights_ref: str | None = None
     if args.asset_id:
@@ -1091,6 +1132,8 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
                 "input_probe": input_probe,
                 "method": "mid-side",
                 "engine": AUDIO_SEPARATION_ENGINE,
+                "adapter": adapter_record,
+                "adapter_verification": adapter_verification,
                 "center": {"asset_id": center_id, "output": str(center_output)},
                 "side": {"asset_id": side_id, "output": str(side_output)},
                 "track_id": args.track_id,
@@ -1104,6 +1147,7 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
     snapshot = create_snapshot(root, before_project, label="before-audio-separate")
     operation_id = new_id("op")
     separation = separate_mid_side(source, center_output, side_output, sample_rate=args.sample_rate)
+    separation["adapter_id"] = args.adapter_id
     ledger = load_ledger(root)
     parent_record = None
     if source_asset is not None:
@@ -1223,6 +1267,7 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
         "snapshot_id": snapshot["snapshot_id"],
         "method": "mid-side",
         "engine": AUDIO_SEPARATION_ENGINE,
+        "adapter": adapter_record,
         "source_asset_id": args.asset_id,
         "assets": {"center": center_asset, "side": side_asset},
         "rights": {"center": center_rights, "side": side_rights},
@@ -1235,7 +1280,75 @@ def command_audio_separate(args: argparse.Namespace) -> dict[str, Any]:
     save_project(root, project)
     save_ledger(root, ledger)
     _operation(root, operation_id, {"operation_id": operation_id, "command": "audio.separate", "status": "succeeded", "method": "mid-side", "asset_ids": [center_id, side_id], "snapshot_id": snapshot["snapshot_id"], "report": str(report_path), "created_at": now_iso()})
-    return _envelope("audio.separate", args, data={"assets": {"center": center_asset, "side": side_asset}, "rights": {"center": center_rights, "side": side_rights}, "snapshot": snapshot, "report": str(report_path), "separation": separation, "generated_clip": generated_clip, "validation": validation}, warnings=separation.get("warnings"), operation_id=operation_id)
+    return _envelope("audio.separate", args, data={"assets": {"center": center_asset, "side": side_asset}, "rights": {"center": center_rights, "side": side_rights}, "snapshot": snapshot, "report": str(report_path), "separation": separation, "adapter": adapter_record, "generated_clip": generated_clip, "validation": validation}, warnings=separation.get("warnings"), operation_id=operation_id)
+
+
+def command_audio_adapter_register(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    license_url = require_local_reference(args.license_url, field="--license-url") if args.license_url else ""
+    evidence = require_local_reference(args.evidence, field="--evidence") if args.evidence else ""
+    registry = load_model_registry(root)
+    if adapter_for(registry, args.adapter_id) is not None:
+        raise AppError("MODEL_ADAPTER_EXISTS", f"本地音频适配器已存在: {args.adapter_id}", exit_code=2, path=str(registry_path(root)))
+    adapter_record, rights_record = prepare_audio_adapter(
+        adapter_id=args.adapter_id,
+        engine=args.engine,
+        model_path=args.model_path,
+        executable=args.executable,
+        creator=args.creator,
+        license_spdx=args.license_spdx,
+        license_url=license_url,
+        permitted_uses=list(dict.fromkeys(args.permitted_use)),
+        verification_status=args.verification_status,
+        evidence=evidence,
+    )
+    if args.dry_run:
+        return _envelope("audio.adapter.register", args, status="planned", data={"registry": str(registry_path(root)), "adapter": adapter_record, "rights": rights_record})
+    ledger = load_ledger(root)
+    before_project = copy.deepcopy(project)
+    snapshot = create_snapshot(root, before_project, label="before-audio-adapter-register")
+    registry.setdefault("adapters", []).append(adapter_record)
+    add_record(ledger, rights_record)
+    operation_id = new_id("op")
+    project.setdefault("provenance", {}).setdefault("local_adapters", []).append({"adapter_id": args.adapter_id, "engine": args.engine, "model_sha256": adapter_record.get("model_sha256"), "registered_at": adapter_record["registered_at"]})
+    project.setdefault("provenance", {}).setdefault("change_log", []).append({"operation_id": operation_id, "command": "audio.adapter.register", "adapter_id": args.adapter_id, "engine": args.engine, "snapshot_id": snapshot["snapshot_id"], "registry": str(registry_path(root)), "at": now_iso()})
+    save_model_registry(root, registry)
+    save_project(root, project)
+    save_ledger(root, ledger)
+    _operation(root, operation_id, {"operation_id": operation_id, "command": "audio.adapter.register", "status": "succeeded", "adapter_id": args.adapter_id, "engine": args.engine, "snapshot_id": snapshot["snapshot_id"], "registry": str(registry_path(root)), "created_at": now_iso()})
+    return _envelope("audio.adapter.register", args, data={"registry": str(registry_path(root)), "adapter": adapter_record, "rights": rights_record, "snapshot": snapshot}, operation_id=operation_id)
+
+
+def command_audio_adapter_list(args: argparse.Namespace) -> dict[str, Any]:
+    root, _ = load_project(args.project)
+    registry = load_model_registry(root)
+    adapters = []
+    for adapter in registry.get("adapters", []):
+        if not isinstance(adapter, dict):
+            continue
+        adapters.append({"adapter": adapter, "verification": verify_audio_adapter(adapter)})
+    return _envelope("audio.adapter.list", args, data={"registry": str(registry_path(root)), "schema_version": MODEL_REGISTRY_VERSION, "count": len(adapters), "adapters": adapters, "network": "disabled"})
+
+
+def command_audio_adapter_inspect(args: argparse.Namespace) -> dict[str, Any]:
+    root, _ = load_project(args.project)
+    registry = load_model_registry(root)
+    adapter = adapter_for(registry, args.adapter_id)
+    if adapter is None:
+        raise AppError("MODEL_ADAPTER_NOT_FOUND", f"找不到已注册音频适配器: {args.adapter_id}", exit_code=3, path=str(registry_path(root)))
+    return _envelope("audio.adapter.inspect", args, data={"registry": str(registry_path(root)), "adapter": adapter, "verification": verify_audio_adapter(adapter), "network": "disabled"})
+
+
+def command_audio_adapter(args: argparse.Namespace) -> dict[str, Any]:
+    handlers = {
+        "register": command_audio_adapter_register,
+        "list": command_audio_adapter_list,
+        "inspect": command_audio_adapter_inspect,
+    }
+    try:
+        return handlers[args.adapter_action](args)
+    except KeyError as exc:
+        raise argument_error(f"不支持的 audio adapter 操作: {args.adapter_action}", "adapter_action") from exc
 
 
 def command_media_stabilize(args: argparse.Namespace) -> dict[str, Any]:
@@ -4304,7 +4417,8 @@ def _project_operation_lock(args: argparse.Namespace):
     """Return the operation-wide lock for a mutating project command."""
     project = getattr(args, "project", None)
     key = (getattr(args, "domain", None), getattr(args, "action", None))
-    if not project or getattr(args, "dry_run", False) or key in _READ_ONLY_PROJECT_COMMANDS or key == ("queue", "cancel"):
+    adapter_read_only = key == ("audio", "adapter") and getattr(args, "adapter_action", None) in {"list", "inspect"}
+    if not project or getattr(args, "dry_run", False) or key in _READ_ONLY_PROJECT_COMMANDS or adapter_read_only or key == ("queue", "cancel"):
         return contextlib.nullcontext()
     return project_write_lock(project)
 
@@ -4330,6 +4444,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "smart-cut"): command_media_smart_cut,
     ("audio", "extract"): command_audio_extract,
     ("audio", "separate"): command_audio_separate,
+    ("audio", "adapter"): command_audio_adapter,
     ("ad", "plan"): command_ad_plan,
     ("ad", "apply"): command_ad_apply,
     ("subtitle", "validate"): command_subtitle_validate,
@@ -4397,7 +4512,8 @@ def main(argv: list[str] | None = None) -> int:
         with _project_operation_lock(args):
             transaction_root = getattr(args, "project", None)
             command_key = (args.domain, getattr(args, "action", None))
-            transaction_enabled = bool(transaction_root) and not getattr(args, "dry_run", False) and command_key not in _READ_ONLY_PROJECT_COMMANDS and command_key not in {("project", "recover"), ("queue", "cancel")}
+            adapter_read_only = command_key == ("audio", "adapter") and getattr(args, "adapter_action", None) in {"list", "inspect"}
+            transaction_enabled = bool(transaction_root) and not getattr(args, "dry_run", False) and command_key not in _READ_ONLY_PROJECT_COMMANDS and not adapter_read_only and command_key not in {("project", "recover"), ("queue", "cancel")}
             with (project_transaction(transaction_root, command=_command_name(args)) if transaction_enabled else contextlib.nullcontext({"active": False, "recovered": False})) as transaction:
                 if idempotency:
                     root, record_path, fingerprint = idempotency
