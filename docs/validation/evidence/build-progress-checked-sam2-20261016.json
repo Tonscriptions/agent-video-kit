@@ -1,0 +1,241 @@
+{
+  "checked_at_utc": "2026-10-15T18:07:30.393229+00:00",
+  "scope": "Status snapshot only: published RVM baseline and local uncommitted SAM2 increment; no new full-suite or broad quality acceptance",
+  "workspace": "E:\\dev\\sandbox\\AI广告剪辑",
+  "branch": "main",
+  "implementation_head_at_check": "44e0ac17bda8f06ea7d10d7ac2e295ac0404e222",
+  "remote_main_at_check": "44e0ac17bda8f06ea7d10d7ac2e295ac0404e222",
+  "published_baseline": {
+    "commit": "44e0ac17bda8f06ea7d10d7ac2e295ac0404e222",
+    "full_regression": {
+      "status": "passed",
+      "test_count": 257,
+      "seconds": 490.389,
+      "log": "product/.runtime/matting-full-regression-20261016.log",
+      "log_sha256": "sha256:1a248e2d4ef51517dadea47b9c066cf2f230656ca9cc89cfe5efb62815d5c437"
+    },
+    "skill_audit": {
+      "path": "research/video-cut-validation.json",
+      "sha256": "sha256:51827c0c5853f59c99b53766b3ee2768164d89e53d6fbdc1ac41c7abeda3333c",
+      "skill_count": 14,
+      "failures": 0,
+      "unresolved_links": 0,
+      "checked_at_utc": "2026-10-15T17:14:59.668479+00:00"
+    },
+    "evidence": "docs/validation/evidence/rvm-smoke-20261016.json"
+  },
+  "local_increment": {
+    "engine": "transformers-sam2-video-local-v1",
+    "committed": false,
+    "full_suite_run_on_current_increment": false,
+    "sam2_targeted": {
+      "status": "passed",
+      "tests": 21,
+      "seconds": 27.975,
+      "log": "product/.runtime/segmentation-targeted-20261016-c.log",
+      "log_sha256": "sha256:1d9eadb1171f1562eda0aa1d6bcb1fde6e5bab4236c784b1a454a2888708d226"
+    },
+    "shared_rvm_targeted": {
+      "status": "passed",
+      "tests": 24,
+      "seconds": 53.664,
+      "log": "product/.runtime/segmentation-rvm-regression-20261016.log",
+      "log_sha256": "sha256:10e96e7463fb819ae418b4c200beb05560157edc23d7734a86492b8c2c1a7a0e"
+    },
+    "smoke": {
+      "path": "workspace/sam2-smoke-20261016-b/summary.json",
+      "sha256": "sha256:345ce169eb7d16f8bed5b6590788b419893dfce342c4bc0f4481d5d5535226f5",
+      "providers": [
+        "torch-cuda"
+      ],
+      "metrics": {
+        "frames": 36,
+        "width": 512,
+        "height": 512,
+        "rgba_sha256": "sha256:f0154e5b71060e4c8ca8c88229089f2b275b8d5d301a8bde2374e006cf084d7d",
+        "rgba_bytes": 37748736,
+        "state_updates": 36,
+        "state_peak_bytes": 288917720,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "alpha_mean": 0.15811761220296225,
+        "transparent_pixels": 7944999,
+        "opaque_pixels": 1492185,
+        "soft_alpha_pixels": 0,
+        "alpha_mode": "straight",
+        "input_alpha": "multiply",
+        "state_reset": "per-job-and-explicit-frames",
+        "prompt_events": 3,
+        "explicit_resets": 1
+      },
+      "rgba_roundtrip_verified": true,
+      "checks": [
+        {
+          "command": "project.init",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.register",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.adapter.inspect",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "planned",
+          "exit_code": 0
+        },
+        {
+          "command": "media.matting",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "media.ingest",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "timeline.compose",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "render",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "quality.check",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "validate",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "policy.audit",
+          "status": "succeeded",
+          "exit_code": 0
+        },
+        {
+          "command": "rights.check",
+          "status": "failed",
+          "exit_code": 7
+        }
+      ],
+      "rights_expected_exit": 7,
+      "visual_review": {
+        "contact_sheet": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-b\\contact-sheet.png",
+        "sha256": "sha256:927a3b1e945149d4df14bb7b5ad2c954e4798bd0fefe39483c05e46389cee651",
+        "review_completed": true,
+        "finding": "Face point selected face only, alongside the separately boxed helmet; full-person selection not accepted"
+      },
+      "quality_accepted": false
+    },
+    "pending": [
+      "whole-person prompts and visual review",
+      "CPU real-model validation",
+      "natural motion and occlusion",
+      "full product regression",
+      "three updated Skills audit and manifest synchronization",
+      "model and source rights validation",
+      "implementation documentation, commit and push"
+    ]
+  },
+  "production_skill_count_at_committed_baseline": 14,
+  "module_rows": 25,
+  "full_jianying_parity_accepted": false,
+  "runtime_constraints": {
+    "docker_wsl_or_vm_started": false,
+    "browser_tabs_opened": false,
+    "runtime_model_downloads": false,
+    "native_windows": true
+  },
+  "documentation_audit": {
+    "scope": "Git-tracked root README/AGENTS and docs Markdown; excludes uncommitted SAM2 draft, external URLs, and in-page anchors",
+    "markdown_files": 81,
+    "docs_markdown_files": 79,
+    "local_links": 445,
+    "external_links": 380,
+    "anchor_links": 0,
+    "broken_local_links": [],
+    "invalid_or_missing_states": [],
+    "empty_documents": []
+  },
+  "source_hashes": {
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:bf9cceb9c44ce51d54f5ab6609b597dd51a1f3858f656d21d68a02872238505a",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:901872d852ee99280b7a7f112b2416db99af3d516b6dcacfe0510b55ef04bc75",
+    "product/src/ai_ad_editor/cli.py": "sha256:5bb62e8aaa6f124d9db002c42f8b24c71448d37f9b1d2c20e6e2a49f9644862d",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:e2f0d63eb19ae5213d9d3e7bdaeecffe7cf800d2223549d95b57f77047eed4d2",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+    "scripts/smoke_rvm_local.py": "sha256:9a3a07aed4438258560a4d0aacc96038b63cc320ba3bf0a5f6f129a2e9f74d02",
+    "skills/video-cut-local-models/SKILL.md": "sha256:b5cb395504bc636f63ee8dbad6803b050a488290fdc1f4d8ef0e091d120bf1d0",
+    "skills/video-cut-agent-editor/SKILL.md": "sha256:6be1065ee3075cd920b0e26cb511402d8ff67c9aa3979595befd1e0e846b07cf",
+    "skills/video-cut-timeline/SKILL.md": "sha256:a87c928c420f4b55aa5658e040afa15a919aefec319f5915e9d25c5971f38114",
+    "README.md": "sha256:451bedf7bb7e03ba66f657fcebf36a1583b42976f3b54f4e36b3833898687352",
+    "docs/README.md": "sha256:d3f2bf4614a85be0e659e380b0727563ff6ea075c5feacd407a973b6b6ca0406",
+    "docs/构建进度总表_2026-10-16.md": "sha256:1e85039ce0b88fa7d13ca3e8dcb7a5b96dd0385f8fc748845dc3ec0739143845"
+  }
+}
