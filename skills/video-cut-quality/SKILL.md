@@ -5,6 +5,22 @@ description: Produce local quality reports, color scopes, render manifests, and 
 
 # Local Quality
 
+For joint masked video editing, review the [VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
+Check the exact window plan/hash, scene boundaries, tail padding, seed sequence,
+overlap frame count, `conditioning=masked-rgb-127-before-and-after-resize`,
+untruncated token counts and text encoder release before generation. Inspect
+parent/worker `artifact_verification`: complete byte hashes are reused only
+while native read locks deny writes/deletion. Counters describe verification,
+not model reconstruction quality or a cross-command checksum cache.
+
+Compare all decoded frames for original alpha and outside-mask RGB. For
+controlled truth, report masked error using the exact expanded mask, context
+and inference settings. Different mask growth changes the score denominator.
+Review first/last frames and both sides of every overlap/cut; e.g. 32 frames
+with a 17/4 plan overlap at 13–16 and 26–29. Sampled-frame inspection does not
+establish continuous temporal quality. Retain seams, color bias, texture,
+residual objects, generated-content and commercial-rights limitations.
+
 For masked video repair, review the [LaMa contract](../../docs/specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md).
 Check `outside_mask_changed_pixels=0`, matching input/output alpha hashes and
 exact decoded MOV RGBA. Independently compare source/output pixels using the

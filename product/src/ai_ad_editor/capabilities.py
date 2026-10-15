@@ -186,10 +186,19 @@ def build_capability_manifest() -> dict[str, Any]:
             "inpainting": {
                 "status": "local_adapter_only",
                 "engine": "torchscript-lama-local-v1",
+                "engines": ["torchscript-lama-local-v1", "diffusers-wan-vace-local-v1"],
                 "protocol": "agent-video-lama-inpainting-v1",
                 "commands": ["media.adapter.register", "media.adapter.inspect", "media.inpaint"],
                 "features": ["native_torch_cpu_or_cuda", "explicit_local_torchscript", "alpha_or_luma_asset_mask", "mask_clock_and_geometry_validation", "bounded_roi_inference", "outside_rgb_and_source_alpha_preserved", "qtrle_rgba_decode_hash", "audio_timeline_and_rights_dependencies", "cancel_timeout_and_rollback"],
                 "limitations": ["framewise_image_inpainting_not_joint_temporal_video_model", "texture_flicker_and_occlusion_require_review", "no_text_prompt_generative_fill", "external_model_license_and_broad_quality_not_accepted"],
+            },
+            "generative_video_editing": {
+                "status": "local_adapter_only",
+                "engine": "diffusers-wan-vace-local-v1",
+                "protocol": "agent-video-wan-vace-inpainting-v1",
+                "commands": ["media.adapter.register", "media.adapter.inspect", "media.inpaint"],
+                "features": ["fixed_local_wan_vace_1_3b_safetensors", "cuda_bfloat16_and_float32_vae", "staged_local_text_encoder_offload_and_release", "verbatim_prompt_and_negative_prompt_no_truncation", "seed_steps_guidance_and_conditioning", "joint_4k_plus_1_frame_windows", "explicit_scene_boundaries_and_overlap_blending", "source_alpha_and_outside_rgb_preserved", "shared_audio_rights_cancel_and_recovery"],
+                "limitations": ["joint_windows_not_global_full_video_attention", "temporal_seams_identity_texture_and_occlusion_need_review", "array_budget_excludes_model_and_torch_memory", "no_cross_device_byte_determinism", "commercial_rights_broad_quality_and_full_jianying_parity_unaccepted"],
             },
             "matting": {
                 "status": "local_adapter_only",

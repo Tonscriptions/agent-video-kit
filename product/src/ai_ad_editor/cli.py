@@ -88,6 +88,7 @@ from .local_separation import DEMUCS_ENGINE, separate_native
 from .local_matting import MATTING_ENGINE, prepare_plan as prepare_matting_plan, matte_native
 from .local_segmentation import SEGMENTATION_ENGINE, load_prompts as load_segmentation_prompts
 from .local_inpainting import INPAINT_ENGINE, prepare_mask as prepare_inpaint_mask, normalize_options as inpaint_options
+from .local_vace import VACE_ENGINE, normalize_generation as vace_options, window_plan as vace_windows, buffer_budget as vace_buffer_budget
 from .model_registry import (
     MODEL_REGISTRY_VERSION,
     adapter_for,
@@ -282,7 +283,9 @@ def build_parser() -> argparse.ArgumentParser:
     visual_adapter_register.add_argument("--model-path", required=True)
     visual_adapter_register.add_argument("--executable", required=True, help="command-json-tracking-v1 的本地执行器")
     visual_adapter_register.add_argument("--threads", type=int, default=4, help="原生 ONNX CPU 线程数")
-    visual_adapter_register.add_argument("--device", choices=['cpu', 'cuda'], default='cpu', help="SAM2 显式设备，无自动回退")
+    visual_adapter_register.add_argument("--device", choices=['cpu', 'cuda'], default='cpu', help="SAM2/LaMa 显式设备；VACE 要求 cuda，无自动回退")
+    visual_adapter_register.add_argument('--text-gpu-budget-mib', type=int, default=None, help='VACE 文本权重 GPU 分配预算，默认 7168 MiB')
+    visual_adapter_register.add_argument('--text-cpu-budget-mib', type=int, default=None, help='VACE 文本权重 CPU 分配预算，默认 8192 MiB')
     visual_adapter_register.add_argument("--downsample-ratio", type=float, default=None, help="RVM 内部降采样比例；默认输出长边缩至 512")
     visual_adapter_register.add_argument("--confidence", type=float, default=0.35)
     visual_adapter_register.add_argument("--low-confidence", type=float, default=0.10)
@@ -353,6 +356,16 @@ def build_parser() -> argparse.ArgumentParser:
     inpaint.add_argument('--timeline-start-seconds', type=float, default=0.)
     inpaint.add_argument('--apply', action='store_true')
     inpaint.add_argument('--replace-track', action='store_true')
+    inpaint.add_argument('--prompt', default=None, help='VACE 的原文编辑提示词；不扩写、不截断')
+    inpaint.add_argument('--negative-prompt', default=None)
+    inpaint.add_argument('--seed', type=int, default=None)
+    inpaint.add_argument('--inference-steps', type=int, default=None)
+    inpaint.add_argument('--guidance-scale', type=float, default=None)
+    inpaint.add_argument('--conditioning-scale', type=float, default=None)
+    inpaint.add_argument('--window-frames', type=int, default=None)
+    inpaint.add_argument('--window-overlap', type=int, default=None)
+    inpaint.add_argument('--prompt-max-tokens', type=int, default=None)
+    inpaint.add_argument('--scene-cut-frame', type=int, action='append', default=None)
     audio = subs.add_parser("audio", help="本地音频处理")
     aus = audio.add_subparsers(dest="action", required=True)
     extract = _leaf_common(aus.add_parser("extract", help="从本地视频或音频资产提取无损 WAV"))
@@ -1596,8 +1609,10 @@ def command_audio_adapter(args: argparse.Namespace) -> dict[str, Any]:
 
 def command_media_adapter_register(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
-    if args.engine not in {SEGMENTATION_ENGINE, INPAINT_ENGINE} and args.device != 'cpu' or args.engine != MATTING_ENGINE and args.downsample_ratio is not None:
-        raise argument_error('device=cuda 只适用于 SAM2/LaMa；downsample-ratio 只适用于 RVM', 'device/downsample_ratio')
+    if args.engine not in {SEGMENTATION_ENGINE, INPAINT_ENGINE, VACE_ENGINE} and args.device != 'cpu' or args.engine != MATTING_ENGINE and args.downsample_ratio is not None:
+        raise argument_error('device=cuda 只适用于 SAM2/LaMa/VACE；downsample-ratio 只适用于 RVM', 'device/downsample_ratio')
+    if args.engine != VACE_ENGINE and (args.text_gpu_budget_mib is not None or args.text_cpu_budget_mib is not None):
+        raise argument_error('text 权重预算只适用于 VACE', 'text_gpu_budget_mib/text_cpu_budget_mib')
     license_url = require_local_reference(args.license_url, field="--license-url") if args.license_url else ""
     evidence = require_local_reference(args.evidence, field="--evidence") if args.evidence else ""
     registry = load_visual_model_registry(root)
@@ -1615,7 +1630,7 @@ def command_media_adapter_register(args: argparse.Namespace) -> dict[str, Any]:
         verification_status=args.verification_status,
         evidence=evidence,
         root=root,
-        native_options=({'threads': args.threads, 'device': args.device} if args.engine in {SEGMENTATION_ENGINE, INPAINT_ENGINE} else {'threads': args.threads, 'downsample_ratio': args.downsample_ratio} if args.engine == MATTING_ENGINE else {'threads':args.threads, 'confidence':args.confidence, 'low_confidence':args.low_confidence, 'match_iou':args.match_iou, 'max_gap_seconds':args.max_gap_seconds, 'class_ids':args.class_id}),
+        native_options=({'threads':args.threads,'device':args.device,'text_gpu_budget_mib':7168 if args.text_gpu_budget_mib is None else args.text_gpu_budget_mib,'text_cpu_budget_mib':8192 if args.text_cpu_budget_mib is None else args.text_cpu_budget_mib} if args.engine == VACE_ENGINE else {'threads': args.threads, 'device': args.device} if args.engine in {SEGMENTATION_ENGINE, INPAINT_ENGINE} else {'threads': args.threads, 'downsample_ratio': args.downsample_ratio} if args.engine == MATTING_ENGINE else {'threads':args.threads, 'confidence':args.confidence, 'low_confidence':args.low_confidence, 'match_iou':args.match_iou, 'max_gap_seconds':args.max_gap_seconds, 'class_ids':args.class_id}),
     )
     if args.dry_run:
         return _envelope("media.adapter.register", args, status="planned", data={"registry": str(visual_registry_path(root)), "adapter": adapter_record, "rights": rights_record})
@@ -1669,6 +1684,12 @@ def command_media_adapter(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
+    from .artifact_locks import verification_scope
+    with verification_scope():
+        return _command_media_matting(args)
+
+
+def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
     inpainting = args.action == 'inpaint'
     command = 'media.inpaint' if inpainting else 'media.matting'
     result_key = 'inpainting' if inpainting else 'matting'
@@ -1686,9 +1707,10 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
     if 'sha256:' + sha256_file(source) != source_asset.get('sha256'):
         raise AppError('MATTING_SOURCE_HASH_MISMATCH', '抠像源与已登记摘要不符', exit_code=10)
     adapter = visual_adapter_for(load_visual_model_registry(root), args.adapter_id)
-    if adapter is None or adapter.get('engine') not in ({INPAINT_ENGINE} if inpainting else {MATTING_ENGINE, SEGMENTATION_ENGINE}):
-        raise AppError('MATTING_ADAPTER_UNAVAILABLE', '要求已登记且用途匹配的本地 LaMa 修复或 RVM/SAM2 抠像适配器', exit_code=10)
+    if adapter is None or adapter.get('engine') not in ({INPAINT_ENGINE, VACE_ENGINE} if inpainting else {MATTING_ENGINE, SEGMENTATION_ENGINE}):
+        raise AppError('MATTING_ADAPTER_UNAVAILABLE', '要求已登记且用途匹配的本地 LaMa/VACE 修复或 RVM/SAM2 抠像适配器', exit_code=10)
     segmentation = adapter['engine'] == SEGMENTATION_ENGINE
+    joint = adapter['engine'] == VACE_ENGINE
     if segmentation and not args.prompts:
         raise argument_error('SAM2 要求显式本地 --prompts JSON', 'prompts')
     if not segmentation and not inpainting and (args.prompts or args.object_id is not None or args.mask_mode != 'binary' or args.logit_threshold != 0):
@@ -1730,6 +1752,17 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         if plan['mask']['sha256'] != mask_asset.get('sha256'):
             raise AppError('INPAINT_MASK_HASH_MISMATCH', '蒙版文件与已登记摘要不符', exit_code=10)
         plan['inpainting'] = inpaint_options(threshold=args.mask_threshold, grow=args.mask_grow, feather=args.mask_feather, context=args.context_pixels, model_max_edge=args.model_max_edge)
+        generation_args = {'prompt':args.prompt,'negative_prompt':args.negative_prompt,'seed':args.seed,'inference_steps':args.inference_steps,
+                           'guidance_scale':args.guidance_scale,'conditioning_scale':args.conditioning_scale,'window_frames':args.window_frames,
+                           'window_overlap':args.window_overlap,'prompt_max_tokens':args.prompt_max_tokens,'scene_cut_frames':args.scene_cut_frame}
+        if joint:
+            plan['generation'] = vace_options(**generation_args, frames=plan['video']['frames'])
+            plan['windows'] = vace_windows(plan['video']['frames'],plan['generation'])
+            plan['owned_array_budget_bytes'] = vace_buffer_budget(plan['video']['width'],plan['video']['height'],plan['generation'],plan['inpainting']['model_max_edge'])
+            if plan['owned_array_budget_bytes'] > adapter['settings']['state_budget_bytes']:
+                raise AppError('VACE_WINDOW_BUFFER_BUDGET_EXCEEDED','窗口自有数组超预算；显式减小 max-edge、window-frames 或 window-overlap',exit_code=2)
+        elif any(v is not None for v in generation_args.values()):
+            raise argument_error('提示词、seed 和窗口参数只适用于 VACE；LaMa 不接受这些选项','prompt/generation')
         plan['video'].pop('downsample_ratio', None)
         plan['warnings'].append({'code': 'INPAINT_MASK_CLOCK', 'message': '蒙版按自身显示起点加 mask-start-seconds 取样；缩放及 CFR 取样见计划，不推断源时钟或裁切关系'})
     tps = int(project.get('settings', {}).get('timebase', {}).get('ticks_per_second', TICKS_PER_SECOND))
@@ -1757,7 +1790,7 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
     report_path = root / 'validation' / f'{result_key}_{safe_filename(operation_id)}.json'
     published = False
     try:
-        _progress(args, operation_id, 'started', command, 0, '开始本地 LaMa 区域修复' if inpainting else '开始本地对象分割' if segmentation else '开始本地 RVM 时序抠像')
+        _progress(args, operation_id, 'started', command, 0, '开始本地 VACE 联合视频编辑' if joint else '开始本地 LaMa 区域修复' if inpainting else '开始本地对象分割' if segmentation else '开始本地 RVM 时序抠像')
         def progress(frame, total):
             _progress(args, operation_id, 'progress', command + '.inference', round(90 * frame / total), f'{"区域修复" if inpainting else "对象分割" if segmentation else "人物抠像"} {frame}/{total} 帧')
         result = matte_native(root, output, adapter=adapter, plan=plan, timeout=args.timeout_seconds, cancel_file=cancel_file, progress=progress)
@@ -1766,8 +1799,8 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
                  'source': {'source_url': f'local://{output}', 'retrieved_at': now_iso(), 'original_name': output.name, 'derived_from': derived_from_assets}}
         rights = {key: copy.deepcopy(parent.get(key, default)) for key, default in [('creator', 'unknown'), ('license_spdx', 'LicenseRef-UNVERIFIED'), ('license_url', ''),
                   ('attribution', ''), ('permitted_uses', ['internal']), ('permitted_channels', []), ('restrictions', []), ('evidence', ''), ('verification_status', 'unverified'), ('verified_by', ''), ('takedown_status', 'clear')]}
-        rights.update(asset_id=derived_id, kind='video', sha256=result['sha256'], source_url=f'local://{output}', source_version='derived-video-lama-inpainting' if inpainting else 'derived-video-sam2-segmentation' if segmentation else 'derived-video-rvm-matting', retrieved_at=now_iso(),
-                      derived_from=rights_dependencies, notes='Local framewise masked repair; source, mask and model rights required' if inpainting else 'Local prompted object segmentation; source and model rights both required' if segmentation else 'Local recurrent human matting; source and model rights both required')
+        rights.update(asset_id=derived_id, kind='video', sha256=result['sha256'], source_url=f'local://{output}', source_version='derived-video-vace-editing' if joint else 'derived-video-lama-inpainting' if inpainting else 'derived-video-sam2-segmentation' if segmentation else 'derived-video-rvm-matting', retrieved_at=now_iso(),
+                      derived_from=rights_dependencies, notes='Local prompted joint video windows; source, mask and model rights required' if joint else 'Local framewise masked repair; source, mask and model rights required' if inpainting else 'Local prompted object segmentation; source and model rights both required' if segmentation else 'Local recurrent human matting; source and model rights both required')
         project.setdefault('assets', []).append(asset)
         add_record(ledger, rights)
         clip = audio_clip = None

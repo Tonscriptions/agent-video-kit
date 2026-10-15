@@ -1,4 +1,4 @@
-"""Run existing local LaMa weights, optional SAM2 masks, renders and gates."""
+"""Run existing local LaMa/VACE weights, optional SAM2 masks, renders and gates."""
 from __future__ import annotations
 
 import argparse
@@ -26,11 +26,21 @@ def main():
         parser.add_argument('--' + name, default=None)
     parser.add_argument('--sam2-object-id', type=int, action='append', default=None)
     parser.add_argument('--device', choices=['cpu', 'cuda'], default='cpu')
+    parser.add_argument('--engine', choices=['lama','vace'], default='lama')
+    parser.add_argument('--prompt', default=None)
+    parser.add_argument('--negative-prompt', default=None)
+    parser.add_argument('--seed', type=int, default=None)
+    parser.add_argument('--inference-steps', type=int, default=None)
+    parser.add_argument('--window-frames', type=int, default=None)
+    parser.add_argument('--window-overlap', type=int, default=None)
+    parser.add_argument('--execution-only', action='store_true', help='Skip redundant dry-run/inspect reports; formal commands retain all integrity checks')
     parser.add_argument('--mask-channel', choices=['alpha', 'luma'], default='alpha')
     parser.add_argument('--mask-grow', type=int, default=4)
     parser.add_argument('--mask-feather', type=float, default=0.)
     parser.add_argument('--model-max-edge', type=int, default=1024)
     args = parser.parse_args()
+    if args.engine=='vace' and (args.device!='cuda' or not args.prompt):parser.error('VACE requires explicit CUDA and prompt')
+    if args.engine=='lama' and any(getattr(args,k) is not None for k in ('prompt','negative_prompt','seed','inference_steps','window_frames','window_overlap')):parser.error('Prompt/window options require --engine vace')
     if bool(args.mask) == bool(args.sam2_model): parser.error('Choose an existing --mask or local SAM2 model/prompts')
     if args.sam2_model and not all((args.sam2_evidence, args.sam2_prompts)):
         parser.error('SAM2 requires its evidence and prompt JSON')
@@ -63,15 +73,19 @@ def main():
         mask = sam2['asset']
     else:
         mask = invoke('media', 'ingest', '--project', str(project), '--input', str(Path(args.mask).resolve()))['data']['asset']
-    registration = ['media', 'adapter', 'register', '--project', str(project), '--adapter-id', 'lama_local', '--engine', 'torchscript-lama-local-v1',
+    adapter_id=args.engine+'_local'
+    registration = ['media', 'adapter', 'register', '--project', str(project), '--adapter-id', adapter_id, '--engine', 'diffusers-wan-vace-local-v1' if args.engine=='vace' else 'torchscript-lama-local-v1',
                     '--model-path', str(Path(args.model).resolve()), '--executable', str(Path(args.python).resolve()), '--evidence', str(Path(args.evidence).resolve()), '--device', args.device]
-    invoke(*registration, '--dry-run')
+    if not args.execution_only:invoke(*registration, '--dry-run')
     adapter = invoke(*registration)['data']['adapter']
-    assert invoke('media', 'adapter', 'inspect', '--project', str(project), '--adapter-id', 'lama_local')['data']['verification']['ok']
-    command = ['media', 'inpaint', '--project', str(project), '--asset-id', source['id'], '--mask-asset-id', mask['id'], '--adapter-id', 'lama_local', '--derived-asset-id', 'repaired',
+    if not args.execution_only:assert invoke('media', 'adapter', 'inspect', '--project', str(project), '--adapter-id', adapter_id)['data']['verification']['ok']
+    command = ['media', 'inpaint', '--project', str(project), '--asset-id', source['id'], '--mask-asset-id', mask['id'], '--adapter-id', adapter_id, '--derived-asset-id', 'repaired',
                '--mask-channel', args.mask_channel, '--mask-grow', str(args.mask_grow), '--mask-feather', str(args.mask_feather), '--model-max-edge', str(args.model_max_edge),
                '--apply', '--track-id', 'track_video_1', '--audio-track-id', 'track_audio_1']
-    planned = invoke(*command, '--dry-run')['data']['plan']
+    for name in ('prompt','negative_prompt','seed','inference_steps','window_frames','window_overlap'):
+        value=getattr(args,name)
+        if value is not None:command+=['--'+name.replace('_','-'),str(value)]
+    planned = None if args.execution_only else invoke(*command, '--dry-run')['data']['plan']
     generated = invoke(*command)['data']; result = generated['inpainting']; info = result['video']; metrics = result['worker']['metrics']
     import numpy as np
     from PIL import Image, ImageDraw, ImageFilter
@@ -123,6 +137,7 @@ def main():
             sheet.paste(Image.fromarray(pixels).resize((cell, cell)), (col * cell, row * (cell + 22) + 22)); draw.text((col * cell + 5, row * (cell + 22) + 4), f'{label} / frame {index}', fill='white')
     contact = root / 'contact-sheet.png'; sheet.save(contact)
     summary = {'checked_at_utc': now_iso(), 'checks': checks, 'adapter': adapter, 'source_sha256': source['sha256'], 'mask_sha256': mask['sha256'], 'plan': planned, 'inpainting': result,
+               'redundant_preflight_reports_skipped':args.execution_only,
                'sam2': sam2, 'independent_pixel_checks': {'source_alpha_exact': alpha_equal, 'outside_mask_changed_pixels': outside, 'changed_inside_pixels': changed_inside},
                'controlled_reconstruction': reconstruction, 'render': {'sha256': 'sha256:' + sha256_file(output), 'manifest_sha256': 'sha256:' + sha256_file(Path(rendered['data']['manifest']))},
                'quality': quality['data'], 'rights_check': rights['data'], 'rights_expected_exit': 7, 'contact_sheet': str(contact), 'contact_sheet_sha256': 'sha256:' + sha256_file(contact),

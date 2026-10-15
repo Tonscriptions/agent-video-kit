@@ -21,6 +21,18 @@ online service. No adapter keeps the English/ASCII flite behavior described belo
 
 ## Runtime boundary
 
+For text-controlled masked video windows, read the [local VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
+Register existing fixed Wan VACE Diffusers weights/Python/evidence with
+`media adapter register --engine diffusers-wan-vace-local-v1 --device cuda`.
+Use `media inpaint` with source/mask asset IDs and a descriptive `--prompt`;
+review `--window-frames`, `--window-overlap`, seed, steps, token budget and
+explicit scene cuts in dry-run before execution. No prompt is expanded or
+silently truncated. Text GPU/CPU weight budgets are explicit; video generation
+releases the encoder first. Native read locks protect reused digests within
+each command. Review generated texture, object identity and overlap boundaries;
+joint windows do not prove broad video quality or full Jianying parity.
+Source, mask and model rights continue to gate publication.
+
 For removing a selected object, use the [local LaMa contract](../../docs/specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md).
 Register existing TorchScript/Python/evidence with explicit CPU/CUDA and inspect.
 Ingest an alpha or black/white mask, or derive a binary alpha mask using SAM2.

@@ -1,9 +1,34 @@
 ---
 name: video-cut-local-models
-description: Run registered offline speech, transcription, separation, tracking, matting, prompted segmentation and masked video repair with existing local models and native Python.
+description: Run registered offline speech, transcription, separation, tracking, matting, prompted segmentation, masked repair and joint video window editing with existing local models and native Python.
 ---
 
 # Local Models
+
+For prompted joint video editing, read the [VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
+Register an existing complete Wan2.1-VACE-1.3B Diffusers safetensors bundle with
+`media adapter register --engine diffusers-wan-vace-local-v1 --device cuda`,
+native Python and local evidence. Explicit text weight budgets default to
+`--text-gpu-budget-mib 7168 --text-cpu-budget-mib 8192`; the encoder is released
+before video generation. This path uses BF16 with declared FP32 stability
+modules and FP32 VAE, without runtime installation or model downloads.
+
+Use `media inpaint --asset-id <video> --mask-asset-id <mask> --adapter-id <id>
+--derived-asset-id <new-id> --prompt <description-of-result> --window-frames 17
+--window-overlap 4 --inference-steps 30 --dry-run`. Preserve prompt text;
+token overflow fails without truncation or expansion. Seeds, negative prompt,
+guidance, conditioning and prompt token budget are explicit. Repeated
+`--scene-cut-frame` uses zero-based frames after source range/CFR conversion.
+Joint windows and overlap blending do not establish global video attention
+or consistent identity. Tail padding is cropped before delivery.
+
+The worker erases selected RGB to 127 before/after resizing. Original alpha and
+RGB outside the expanded mask remain exact. Model digest reuse is scoped to
+native read handles that deny writes/deletion; each new command verifies again.
+Review texture, object traces, window seams and natural motion; keep
+`VACE_MODEL_REVIEW_REQUIRED`. Use the same audio/application/rights pipeline
+as LaMa below. Array limits exclude model, Torch and total process RAM/VRAM;
+real hardware, quality and commercial rights require independent evidence.
 
 For object removal or local region repair, read the
 [LaMa contract](../../docs/specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md).

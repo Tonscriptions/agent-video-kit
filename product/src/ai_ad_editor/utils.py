@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import json
 import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -90,6 +92,107 @@ def json_text(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, indent=2, sort_keys=False)
 
 
+def _windows_replace_open_file(source: Path, destination: Path) -> None:
+    """Rename atomically while preserving handles that explicitly share deletion.
+
+    MoveFileExW (used by os.replace) can reject an open destination even when
+    its readers share deletion. FileRenameInfoEx with POSIX semantics keeps
+    those readers on the old file; new opens see the complete replacement.
+    Handles that deny deletion still prevent the rename, including model locks.
+    """
+    import ctypes
+    from ctypes import wintypes
+
+    kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+    kernel.CreateFileW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, wintypes.LPVOID, wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+    kernel.CreateFileW.restype = wintypes.HANDLE
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel.CloseHandle.restype = wintypes.BOOL
+    kernel.SetFileInformationByHandle.argtypes = [wintypes.HANDLE, ctypes.c_int, wintypes.LPVOID, wintypes.DWORD]
+    kernel.SetFileInformationByHandle.restype = wintypes.BOOL
+
+    class RenameInfo(ctypes.Structure):
+        _fields_ = [('Flags', wintypes.DWORD), ('RootDirectory', wintypes.HANDLE),
+                    ('FileNameLength', wintypes.DWORD), ('FileName', wintypes.WCHAR * 1)]
+
+    handle = kernel.CreateFileW(str(source.absolute()), 0x10000, 7, None, 3, 0x80, None)
+    if handle == ctypes.c_void_p(-1).value:
+        raise ctypes.WinError(ctypes.get_last_error())
+    try:
+        name = str(destination.absolute()).encode('utf-16-le')
+        buffer = ctypes.create_string_buffer(RenameInfo.FileName.offset + len(name) + 2)
+        info = ctypes.cast(buffer, ctypes.POINTER(RenameInfo)).contents
+        info.Flags = 3  # FILE_RENAME_REPLACE_IF_EXISTS | FILE_RENAME_POSIX_SEMANTICS
+        info.RootDirectory = None
+        info.FileNameLength = len(name)
+        ctypes.memmove(ctypes.addressof(buffer) + RenameInfo.FileName.offset, name, len(name))
+        if not kernel.SetFileInformationByHandle(handle, 22, buffer, len(buffer)):
+            raise ctypes.WinError(ctypes.get_last_error())
+    finally:
+        kernel.CloseHandle(handle)
+
+
+def _replace_atomic_file(source: Path, destination: Path) -> None:
+    for attempt in range(6):
+        try:
+            os.replace(source, destination)
+            return
+        except OSError as exc:
+            if sys.platform != 'win32' or getattr(exc, 'winerror', None) not in {5, 32, 33}:
+                raise
+            try:
+                _windows_replace_open_file(source, destination)
+                return
+            except OSError as native_exc:
+                if getattr(native_exc, 'winerror', None) in {50, 87, 120}:
+                    # An older filesystem/API may only support the original
+                    # rename after transient readers release their handles.
+                    if attempt == 5:
+                        raise exc from native_exc
+                elif getattr(native_exc, 'winerror', None) not in {5, 32, 33} or attempt == 5:
+                    raise
+            time.sleep(.05 * 2**attempt)
+
+
+@contextlib.contextmanager
+def shared_binary_reader(path: Path):
+    """Read a stable handle while allowing Windows atomic file replacement."""
+    if sys.platform != 'win32':
+        with path.open('rb') as stream:
+            yield stream
+        return
+    if str(path).startswith('\\\\'):
+        raise ValueError('Local snapshot path required')
+    import ctypes
+    from ctypes import wintypes
+    import msvcrt
+    kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+    kernel.CreateFileW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, wintypes.LPVOID, wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+    kernel.CreateFileW.restype = wintypes.HANDLE
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel.CloseHandle.restype = wintypes.BOOL
+    handle = kernel.CreateFileW(str(path), 0x80000000, 7, None, 3, 0x80, None)
+    if handle == ctypes.c_void_p(-1).value:
+        raise ctypes.WinError(ctypes.get_last_error())
+    try:
+        fd = msvcrt.open_osfhandle(handle, os.O_RDONLY | os.O_BINARY)
+    except BaseException:
+        kernel.CloseHandle(handle)
+        raise
+    with os.fdopen(fd, 'rb') as stream:
+        yield stream
+
+
+def read_json_snapshot(path: Path, max_bytes: int = 64 * 1024):
+    if type(max_bytes) is not int or not 1 <= max_bytes <= 1024**2:
+        raise ValueError('Snapshot byte budget invalid')
+    with shared_binary_reader(path) as stream:
+        raw = stream.read(max_bytes + 1)
+    if len(raw) > max_bytes:
+        raise ValueError('Snapshot byte budget exceeded')
+    return json.loads(raw.decode('utf-8-sig'))
+
+
 def atomic_write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, raw = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent))
@@ -100,7 +203,7 @@ def atomic_write_json(path: Path, value: Any) -> None:
             handle.write("\n")
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(temp, path)
+        _replace_atomic_file(temp, path)
     finally:
         if temp.exists():
             temp.unlink()
@@ -116,7 +219,7 @@ def atomic_write_text(path: Path, value: str) -> None:
             handle.write(value)
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(temp, path)
+        _replace_atomic_file(temp, path)
     finally:
         if temp.exists():
             temp.unlink()

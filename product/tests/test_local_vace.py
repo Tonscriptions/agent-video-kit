@@ -1,0 +1,377 @@
+"""Joint-window behavior and real FFmpeg protocol tests; fixtures are not model quality evidence."""
+from __future__ import annotations
+
+import copy
+import hashlib
+import io
+import json
+import math
+from pathlib import Path
+import struct
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+from PIL import Image
+
+import test_local_matting as base_fixture
+import test_local_inpainting as inpaint_fixture
+from ai_ad_editor.errors import AppError
+from ai_ad_editor.local_inpainting import normalize_options
+from ai_ad_editor.local_matting import manifest_hash
+from ai_ad_editor.local_matting import _pipeline_workspace
+from ai_ad_editor.local_vace import VACE_ENGINE, MODEL_FILES, buffer_budget, model_files, normalize_generation, settings, verify_adapter, window_plan
+from ai_ad_editor.runtime import configure_local_runtime
+from ai_ad_editor.utils import atomic_write_json
+from ai_ad_editor.vace_frames import process_frames
+
+invoke=base_fixture.invoke
+
+
+class VaceWindowTests(unittest.TestCase):
+    def run_frames(self, *, frames=8, window=17, overlap=4, cuts=None, channel='alpha', options=None, infer=None, empty=False):
+        original=np.full((frames,48,64,4),180,np.uint8);original[:,:,:,3]=np.arange(64,dtype=np.uint8)[None,None,:]*4
+        mask=np.zeros_like(original)
+        if not empty:mask[:,16:32,24:40,3]=255;mask[:,16:32,24:40,:3]=255
+        if channel=='luma':mask[:,:,:,3]=255
+        generation=normalize_generation(prompt='保留背景纹理。\nDo not change the camera.',window_frames=window,window_overlap=overlap,scene_cut_frames=cuts,frames=frames)
+        paired=np.concatenate([original,mask],axis=2)
+        output=io.BytesIO();calls=[]
+        def model(images,masks,g):
+            calls.append((images.copy(),masks.copy(),copy.deepcopy(g)))
+            return infer(images,masks,g) if infer else np.full(images.shape,.2,np.float32)
+        metrics=process_frames(io.BytesIO(paired.tobytes()),output,width=64,height=48,frames=frames,generation=generation,channel=channel,
+                               options=options or normalize_options(grow=0,context=0),infer=model)
+        result=np.frombuffer(output.getvalue(),np.uint8).reshape(original.shape)
+        return original,mask,result,metrics,calls
+
+    def test_joint_context_padding_mask_and_original_alpha(self):
+        original,mask,result,metrics,calls=self.run_frames()
+        self.assertEqual(len(calls),1);self.assertEqual(calls[0][0].shape,(9,64,64,3))
+        np.testing.assert_array_equal(calls[0][0][-1],calls[0][0][-2]);np.testing.assert_array_equal(calls[0][1][-1],calls[0][1][-2])
+        np.testing.assert_array_equal(result[:,16:32,24:40,:3],51)
+        selected=mask[:,:,:,3]!=0
+        np.testing.assert_array_equal(result[~selected],original[~selected]);np.testing.assert_array_equal(result[:,:,:,3],original[:,:,:,3])
+        self.assertEqual(metrics['padded_frames'],1);self.assertEqual(metrics['input_alpha_sha256'],metrics['output_alpha_sha256'])
+
+    def test_selected_source_content_cannot_leak_into_resized_conditioning(self):
+        captured=[]
+        for color in ([255,0,0],[0,0,255]):
+            original=np.full((5,128,192,4),180,np.uint8)
+            original[:,40:88,80:112,:3]=color
+            mask=np.zeros_like(original);mask[:,40:88,80:112,3]=255
+            def infer(images,masks,generation):
+                captured.append((images.copy(),masks.copy()))
+                return np.full(images.shape,.5,np.float32)
+            destination=io.BytesIO()
+            metrics=process_frames(io.BytesIO(np.concatenate([original,mask],axis=2).tobytes()),destination,
+                width=192,height=128,frames=5,generation=normalize_generation(prompt='empty gray background'),
+                options=normalize_options(grow=0,context=1024,model_max_edge=64),channel='alpha',infer=infer)
+            result=np.frombuffer(destination.getvalue(),np.uint8).reshape(original.shape)
+            np.testing.assert_array_equal(result[mask[:,:,:,3]==0],original[mask[:,:,:,3]==0])
+            self.assertEqual(metrics['conditioning'],'masked-rgb-127-before-and-after-resize')
+        np.testing.assert_array_equal(captured[0][0],captured[1][0])
+        np.testing.assert_array_equal(captured[0][1],captured[1][1])
+        np.testing.assert_array_equal(captured[0][0][captured[0][1]!=0],127)
+        self.assertTrue(np.any(captured[0][0][captured[0][1]==0]==180))
+
+    def test_overlap_crossfade_has_known_values_and_no_duplicate_frames(self):
+        _,_,result,metrics,calls=self.run_frames(window=5,overlap=2,infer=lambda image,mask,g:np.full(image.shape,.2 if g['seed']==0 else .8,np.float32))
+        self.assertEqual(len(calls),2)
+        np.testing.assert_array_equal(result[:,20,30,0],[51,51,51,102,153,204,204,204])
+        self.assertEqual(metrics['overlap_frames_blended'],2);self.assertEqual(metrics['frames'],8)
+
+    def test_high_overlap_keeps_all_frames_and_constant_reconstruction(self):
+        _,_,result,metrics,calls=self.run_frames(frames=15,window=5,overlap=4)
+        self.assertEqual(len(calls),11);self.assertEqual(metrics['overlap_frames_blended'],13)
+        np.testing.assert_array_equal(result[:,20,30,0],51)
+
+    def test_scene_boundary_has_no_joint_context_or_crossfade(self):
+        _,_,result,metrics,calls=self.run_frames(frames=8,window=9,overlap=4,cuts=[4],infer=lambda a,m,g:np.full(a.shape,.2 if g['seed']==0 else .8,np.float32))
+        self.assertEqual(len(calls),2);self.assertEqual(metrics['overlap_frames_blended'],0)
+        np.testing.assert_array_equal(result[:,20,30,0],[51]*4+[204]*4)
+        self.assertTrue(all(s['end']<=4 or s['start']>=4 for s in metrics['window_samples']))
+
+    def test_empty_windows_bypass_model_and_preserve_all_input_bytes(self):
+        original,mask,result,metrics,calls=self.run_frames(frames=14,window=5,overlap=2,empty=True)
+        self.assertEqual(calls,[]);np.testing.assert_array_equal(result,original)
+        self.assertEqual(metrics['model_calls'],0);self.assertEqual(metrics['empty_windows'],metrics['window_count'])
+        self.assertEqual(metrics['source_rgba_sha256'],'sha256:'+hashlib.sha256(original.tobytes()).hexdigest())
+        self.assertEqual(metrics['decoded_mask_rgba_sha256'],'sha256:'+hashlib.sha256(mask.tobytes()).hexdigest())
+
+    def test_luma_and_inside_only_feather_respect_source_alpha(self):
+        original,_,result,metrics,_=self.run_frames(channel='luma',options=normalize_options(grow=2,feather=2,context=0))
+        np.testing.assert_array_equal(result[:,:14],original[:,:14]);np.testing.assert_array_equal(result[:,:,:,3],original[:,:,:,3])
+        self.assertGreater(result[0,14,22,0],51);self.assertLess(result[0,14,22,0],180)
+        self.assertEqual(metrics['mask_pixels'],400*8)
+
+    def test_bad_model_dtype_shape_and_nonfinite_are_rejected(self):
+        for callback in (lambda a,m,g:np.zeros((1,1,1,3),np.float32),lambda a,m,g:np.zeros(a.shape,np.float64),lambda a,m,g:np.full(a.shape,np.nan,np.float32)):
+            with self.subTest(callback=callback),self.assertRaisesRegex(ValueError,'OUTPUT_INVALID'):self.run_frames(infer=callback)
+
+    def test_resize_loss_and_window_memory_budget_rejected_before_model(self):
+        original=np.full((1,120,180,4),255,np.uint8);mask=np.zeros_like(original);mask[0,-1,-1,3]=255
+        generation=normalize_generation(prompt='repair')
+        with self.assertRaisesRegex(ValueError,'MASK_LOST_DURING_RESIZE'):
+            process_frames(io.BytesIO(np.concatenate([original,mask],axis=2).tobytes()),io.BytesIO(),width=180,height=120,frames=1,generation=generation,options=normalize_options(grow=0,context=1024,model_max_edge=64),channel='alpha',infer=lambda *_:self.fail())
+        with self.assertRaisesRegex(ValueError,'BUFFER_BUDGET'):
+            process_frames(io.BytesIO(),io.BytesIO(),width=1024,height=1024,frames=10,generation=generation,options=normalize_options(),channel='alpha',infer=lambda *_:self.fail())
+
+    def test_partial_reads_and_truncated_or_extra_frames(self):
+        class Partial(io.BytesIO):
+            def read(self,n=-1):return super().read(min(n,13))
+        pair=np.zeros((3,48,128,4),np.uint8);pair[:,:,:64,3]=128
+        kwargs=dict(width=64,height=48,frames=3,generation=normalize_generation(prompt='repair'),options=normalize_options(),channel='alpha',infer=lambda *_:self.fail())
+        metrics=process_frames(Partial(pair.tobytes()),io.BytesIO(),**kwargs);self.assertEqual(metrics['frames'],3)
+        for raw in (pair.tobytes()[:-1],pair.tobytes()+b'!'):
+            with self.assertRaises(ValueError):process_frames(io.BytesIO(raw),io.BytesIO(),**kwargs)
+
+    def test_prompt_window_and_device_inputs_have_explicit_limits(self):
+        for options in ({'prompt':''},{'seed':True},{'seed':-1},{'window_frames':8},{'window_overlap':17},{'scene_cut_frames':[4,4]},
+                        {'scene_cut_frames':[8]},{'guidance_scale':math.nan},{'conditioning_scale':3},{'prompt_max_tokens':513},{'inference_steps':0}):
+            with self.subTest(options=options),self.assertRaises(AppError):normalize_generation(**({'prompt':'repair','frames':8}|options))
+        for opts in ({'device':'cpu'},{'threads':False},{'text_gpu_budget_mib':0}):
+            with self.assertRaises(AppError):settings(**opts)
+        g=normalize_generation(prompt='原文\n$(literal)',seed=2**63-1,window_frames=5,window_overlap=0)
+        self.assertEqual(g['prompt'],'原文\n$(literal)');self.assertEqual(window_plan(10,g)[1]['seed'],0)
+
+
+@unittest.skipUnless(sys.platform=='win32','Native Windows sharing behavior')
+class PipelineCleanupTests(unittest.TestCase):
+    def open_reader_without_delete_sharing(self,path):
+        import ctypes
+        from ctypes import wintypes
+        kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+        kernel.CreateFileW.argtypes=[wintypes.LPCWSTR,wintypes.DWORD,wintypes.DWORD,wintypes.LPVOID,wintypes.DWORD,wintypes.DWORD,wintypes.HANDLE]
+        kernel.CreateFileW.restype=wintypes.HANDLE
+        kernel.CloseHandle.argtypes=[wintypes.HANDLE];kernel.CloseHandle.restype=wintypes.BOOL
+        handle=kernel.CreateFileW(str(path),0x80000000,3,None,3,0,None)
+        if handle==ctypes.c_void_p(-1).value:raise ctypes.WinError(ctypes.get_last_error())
+        return lambda:kernel.CloseHandle(handle)
+
+    def test_transient_native_reader_is_released_and_cache_removed(self):
+        configure_local_runtime()
+        with tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parents[1]/'.runtime/temp') as temporary:
+            with _pipeline_workspace(Path(temporary)) as work:
+                p=work/'worker.log';p.write_bytes(b'inference failed')
+                close=self.open_reader_without_delete_sharing(p)
+                thread=threading.Thread(target=lambda:(time.sleep(.2),close()))
+                thread.start()
+            thread.join(timeout=2)
+            self.assertFalse(work.exists());self.assertFalse(thread.is_alive())
+
+    def test_permanent_native_reader_reports_retained_cache_path(self):
+        configure_local_runtime()
+        with tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parents[1]/'.runtime/temp') as temporary:
+            close=None
+            try:
+                with self.assertRaises(AppError) as failure:
+                    with _pipeline_workspace(Path(temporary)) as work:
+                        p=work/'worker.log';p.write_bytes(b'locked evidence')
+                        close=self.open_reader_without_delete_sharing(p)
+                self.assertEqual(failure.exception.code,'MATTING_CACHE_CLEANUP_FAILED')
+                self.assertTrue(p.exists());self.assertEqual(p.read_bytes(),b'locked evidence')
+            finally:
+                if close:close()
+
+
+def create_protocol_model(root):
+    """Tiny structural files only. Never passed to Torch or asserted to be real weights."""
+    root.mkdir()
+    configs={
+        'model_index.json':{'_class_name':'WanVACEPipeline','scheduler':['diffusers','UniPCMultistepScheduler'],'text_encoder':['transformers','UMT5EncoderModel'],'tokenizer':['transformers','T5TokenizerFast'],'transformer':['diffusers','WanVACETransformer3DModel'],'vae':['diffusers','AutoencoderKLWan']},
+        'transformer/config.json':{'_class_name':'WanVACETransformer3DModel','num_attention_heads':12,'attention_head_dim':128,'num_layers':30,'in_channels':16,'out_channels':16,'text_dim':4096,'vace_in_channels':96,'patch_size':[1,2,2],'ffn_dim':8960,'freq_dim':256,'vace_layers':list(range(0,30,2)),'image_dim':None,'added_kv_proj_dim':None},
+        'text_encoder/config.json':{'architectures':['UMT5EncoderModel'],'d_model':4096,'d_ff':10240,'d_kv':64,'num_heads':64,'num_layers':24,'vocab_size':256384,'feed_forward_proj':'gated-gelu'},
+        'vae/config.json':{'_class_name':'AutoencoderKLWan','base_dim':96,'dim_mult':[1,2,4,4],'num_res_blocks':2,'temperal_downsample':[False,True,True],'z_dim':16,'attn_scales':[],'latents_mean':[0.]*16,'latents_std':[1.]*16},
+        'scheduler/scheduler_config.json':{'_class_name':'UniPCMultistepScheduler','prediction_type':'flow_prediction','use_flow_sigmas':True,'num_train_timesteps':1000,'solver_order':2}}
+    maps={'text_encoder':{},'transformer':{}}
+    for i,name in enumerate(sorted(MODEL_FILES)):
+        path=root/name;path.parent.mkdir(exist_ok=True,parents=True)
+        if name.endswith('.safetensors'):
+            key='protocol_fixture.'+str(i);header=json.dumps({key:{'dtype':'F32','shape':[1],'data_offsets':[0,4]}}).encode()
+            path.write_bytes(struct.pack('<Q',len(header))+header+struct.pack('<f',.5))
+            if name.startswith(('text_encoder/','transformer/')):maps[name.split('/')[0]][key]=path.name
+        elif name.endswith('.json'):
+            if name.endswith('.index.json'):folder=name.split('/')[0];value={'weight_map':maps[folder]}
+            else:value=configs.get(name,{'protocol_fixture':True})
+            atomic_write_json(path,value)
+        else:path.write_bytes(b'protocol tokenizer fixture, not inference data')
+    # Index files may sort before their shards; write complete maps after construction.
+    for folder,stem in [('text_encoder','model'),('transformer','diffusion_pytorch_model')]:atomic_write_json(root/folder/(stem+'.safetensors.index.json'),{'weight_map':maps[folder]})
+
+
+MOCK_WORKER=r'''
+import json,sys,time
+from pathlib import Path
+sys.path.insert(0,PRODUCT_SOURCE);sys.path.insert(0,NUMPY_SOURCE)
+import numpy as np
+from ai_ad_editor.vace_frames import process_frames
+from ai_ad_editor.utils import atomic_write_json
+request=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'));mode=sys.argv[2]
+if mode in {'wait','cancel'}:
+    if mode=='cancel':Path(sys.argv[3]).write_text('cancel',encoding='utf-8')
+    time.sleep(20)
+if mode=='fail':raise RuntimeError('controlled inference failure')
+info=request['video']
+metrics=process_frames(sys.stdin.buffer,sys.stdout.buffer,width=info['width'],height=info['height'],frames=info['frames'],generation=request['generation'],options=request['inpainting'],channel=request['mask']['channel'],infer=lambda images,masks,g:np.full(images.shape,.2,np.float32))
+response={'protocol':request['protocol'],'engine':request['engine'],'status':'succeeded','network':'disabled','blocked_network_events':[],
+ 'request_sha256':request['request_sha256'],'source_sha256':request['source']['sha256'],'adapter_sha256':request['adapter']['sha256'],
+ 'mask_sha256':request['mask']['sha256'],'mask_plan_sha256':request['mask']['plan_sha256'],'inpainting':request['inpainting'],'generation':request['generation'],'providers':['torch-cuda'],'metrics':metrics,
+ 'model_loaded':metrics['model_calls']>0,'model_execution':{'prompt_truncated':False,'prompt_extension':False,'text_encoder_released_before_generation':True,'transformer_precision':'bfloat16-with-declared-float32-stability-modules','vae_precision':'float32','prompt_token_counts':{'prompt':12,'negative_prompt':1},'window_seconds':[0.1]*metrics['model_calls']}}
+files={a['path']:a['bytes'] for a in request['adapter']['artifacts']}
+response['artifact_verification']={'mode':'windows-read-lock-command-scope','files_hashed':len(files),'bytes_hashed':sum(files.values()),'digest_reuses_while_locked':len(request['adapter']['artifacts']),'write_and_delete_sharing':False,'persists_across_commands':False}
+if mode=='bad_generation':response['generation']={**response['generation'],'seed':99}
+if mode=='bad_window':metrics['window_plan_sha256']='sha256:'+'0'*64
+if mode=='bad_calls':metrics['empty_windows']+=1
+if mode=='bad_alpha':metrics['output_alpha_sha256']='sha256:'+'0'*64
+if mode=='bad_rgba':metrics['rgba_sha256']='sha256:'+'0'*64
+if mode=='bad_network':response['blocked_network_events']=['socket.connect']
+if mode=='bad_provider':response['providers']=['torch-cpu']
+if mode=='bad_loaded':response['model_loaded']=False
+if mode=='bad_tokens':response['model_execution']['prompt_token_counts']['prompt']=100000
+if mode=='bad_precision':response['model_execution']['vae_precision']='float16'
+if mode=='bad_conditioning':metrics['conditioning']='original-object-pixels'
+if mode=='bad_verification':response['artifact_verification']['digest_reuses_while_locked']=0
+if mode=='race':Path(sys.argv[3]).write_bytes(b'external output')
+atomic_write_json(Path(request['response']),response)
+'''
+
+
+class NativeVaceTests(unittest.TestCase):
+    metadata=base_fixture.NativeMattingTests.metadata
+    decode=base_fixture.NativeMattingTests.decode
+    fake_command=base_fixture.NativeMattingTests.fake_command
+    ingest=inpaint_fixture.NativeInpaintingTests.ingest
+
+    @classmethod
+    def setUpClass(cls):configure_local_runtime()
+
+    def setUp(self):
+        base_fixture.NativeMattingTests.setUp(self)
+        self.model=self.base/'vace';create_protocol_model(self.model)
+        self.worker.write_text(MOCK_WORKER.replace('PRODUCT_SOURCE',repr(str(Path(__file__).resolve().parents[1]/'src'))).replace('NUMPY_SOURCE',repr(str(Path(np.__file__).resolve().parent.parent))),encoding='utf-8')
+        self.mask=self.base/'mask.png';pixels=np.zeros((48,64,4),np.uint8);pixels[16:32,24:40,3]=255;Image.fromarray(pixels).save(self.mask)
+        self.mask_id=self.ingest(self.mask)
+        self.options=['--project',str(self.root),'--adapter-id','vace','--engine',VACE_ENGINE,'--model-path',str(self.model),'--executable',sys.executable,'--evidence',str(self.evidence),'--device','cuda']
+        self.output=self.root/'assets/derived/repaired.mov'
+
+    def register(self):
+        code,result=invoke('media','adapter','register',*self.options);self.assertEqual(code,0,result);return result['data']['adapter']
+
+    def command(self):
+        return ['media','inpaint','--project',str(self.root),'--asset-id',self.asset_id,'--mask-asset-id',self.mask_id,'--adapter-id','vace',
+                '--derived-asset-id','repaired','--prompt','修复背景纹理。\nKeep the camera unchanged.','--window-frames','5','--window-overlap','2','--mask-grow','0','--fps','16',
+                '--apply','--track-id','track_video_1','--audio-track-id','track_audio_1']
+
+    def assert_clean_failure(self,before):
+        self.assertFalse(self.output.exists());self.assertEqual(self.metadata(),before)
+        self.assertFalse(list((self.root/'cache/inpainting').glob('*')));self.assertFalse((self.root/'operations/project-transaction.json').exists())
+
+    def test_registration_dry_run_inspect_and_complete_inventory(self):
+        before=self.metadata();code,result=invoke('media','adapter','register',*self.options,'--dry-run')
+        self.assertEqual(code,0,result);self.assertEqual(self.metadata(),before)
+        adapter=self.register();self.assertEqual(adapter['model_file_count'],17);self.assertEqual(len(adapter['artifacts']),29)
+        self.assertTrue(verify_adapter(adapter)['ok'])
+        self.assertTrue(invoke('media','adapter','inspect','--project',str(self.root),'--adapter-id','vace')[1]['data']['verification']['ok'])
+
+    def test_model_inventory_custom_code_architecture_and_map_rejection(self):
+        missing=self.model/'tokenizer/spiece.model';original=missing.read_bytes();missing.unlink()
+        with self.assertRaises(AppError):model_files(self.model)
+        missing.write_bytes(original)
+        extra=self.model/'custom.py';extra.write_text('not executed',encoding='utf-8')
+        with self.assertRaises(AppError):model_files(self.model)
+        extra.unlink()
+        for name,key,value in [('text_encoder/config.json','auto_map',{}),('text_encoder/config.json','num_layers',100000),('transformer/config.json','ffn_dim',1000000)]:
+            path=self.model/name;raw=path.read_bytes();data=json.loads(raw);data[key]=value;atomic_write_json(path,data)
+            with self.subTest(key=key),self.assertRaises(AppError):model_files(self.model)
+            path.write_bytes(raw)
+        path=self.model/'text_encoder/model.safetensors.index.json';raw=path.read_bytes();data=json.loads(raw);data['weight_map'][next(iter(data['weight_map']))]='../outside.safetensors';atomic_write_json(path,data)
+        with self.assertRaises(AppError):model_files(self.model)
+        path.write_bytes(raw)
+
+    def test_model_evidence_settings_and_tokenizer_tamper_rejected(self):
+        adapter=self.register()
+        for path in (self.evidence,self.model/'tokenizer/spiece.model',self.model/'vae/diffusion_pytorch_model.safetensors'):
+            raw=path.read_bytes();path.write_bytes(raw+b'changed')
+            self.assertFalse(verify_adapter(adapter)['ok'])
+            with patch('ai_ad_editor.cli.matte_native') as worker:self.assertEqual(invoke(*self.command())[0],10);worker.assert_not_called()
+            path.write_bytes(raw)
+        changed=copy.deepcopy(adapter);changed['settings']['device']='cpu';changed['sha256']=manifest_hash(changed);self.assertFalse(verify_adapter(changed)['ok'])
+
+    def test_dry_plan_prompt_windows_and_role_gates_do_not_execute(self):
+        self.register();before=self.metadata()
+        with patch('ai_ad_editor.cli.matte_native') as worker:
+            code,result=invoke(*self.command(),'--dry-run');self.assertEqual(code,0,result);worker.assert_not_called()
+            plan=result['data']['plan'];self.assertEqual(len(plan['windows']),2);self.assertEqual(plan['generation']['prompt'],'修复背景纹理。\nKeep the camera unchanged.')
+            for opts in (['--prompt',''],['--window-frames','8'],['--scene-cut-frame','8'],['--model-max-edge','0']):self.assertNotEqual(invoke(*self.command(),*opts,'--dry-run')[0],0)
+            self.assertNotEqual(invoke('media','matting','--project',str(self.root),'--asset-id',self.asset_id,'--adapter-id','vace','--derived-asset-id','wrong')[0],0)
+        self.assertEqual(self.metadata(),before)
+
+    def test_lama_rejects_vace_only_prompt_seed_and_registration_options(self):
+        inpaint_fixture.NativeInpaintingTests.setUp(self)
+        inpaint_fixture.NativeInpaintingTests.register(self)
+        command=inpaint_fixture.NativeInpaintingTests.command(self)
+        before=self.metadata()
+        with patch('ai_ad_editor.cli.matte_native') as worker:
+            for options in (['--prompt','repair'],['--seed','0'],['--window-frames','5']):
+                self.assertEqual(invoke(*command,*options)[0],2)
+            worker.assert_not_called()
+        self.assertEqual(invoke('media','adapter','register',*self.options,'--text-gpu-budget-mib','4096')[0],2)
+        self.assertEqual(self.metadata(),before)
+
+    def test_real_ffmpeg_pipeline_preserves_audio_outside_pixels_and_rights(self):
+        self.register()
+        with self.fake_command():code,result=invoke(*self.command())
+        self.assertEqual(code,0,result);data=result['data'];report=data['inpainting']
+        self.assertTrue(report['rgba_roundtrip_verified']);self.assertEqual(report['worker']['metrics']['model_calls'],2)
+        output=self.decode(self.output);source=np.repeat(self.decode(self.source),2,axis=0)
+        np.testing.assert_array_equal(output[:,:16],source[:,:16]);np.testing.assert_array_equal(output[:,:,:,3],source[:,:,:,3]);np.testing.assert_array_equal(output[:,16:32,24:40,:3],51)
+        self.assertTrue(data['generated_clip']);self.assertTrue(data['generated_audio_clip']);self.assertTrue(report['audio']['preserve'])
+        np.testing.assert_allclose(self.decode(self.output,audio=True),self.decode(self.source,audio=True),atol=1e-5)
+        self.assertEqual(len(data['rights']['derived_from']),3)
+        self.assertEqual(invoke('policy','audit','--project',str(self.root))[0],0)
+        self.assertEqual(invoke('rights','check','--project',str(self.root),'--target','commercial_ad')[0],7)
+
+    def test_malformed_worker_reports_fail_without_publishing(self):
+        self.register();before=self.metadata()
+        for mode in ('bad_generation','bad_window','bad_calls','bad_alpha','bad_rgba','bad_network','bad_provider','bad_loaded','bad_tokens','bad_precision','bad_conditioning','bad_verification','fail'):
+            with self.subTest(mode=mode),self.fake_command(mode):
+                code,result=invoke(*self.command());self.assertEqual(code,6,result);self.assert_clean_failure(before)
+
+    def test_timeout_cancel_kill_all_pipeline_children_and_rollback(self):
+        self.register();before=self.metadata();cancel=self.base/'cancel.flag'
+        real_popen=subprocess.Popen;children=[]
+        def record(*args,**kwargs):
+            child=real_popen(*args,**kwargs);children.append(child);return child
+        for mode,opts in [('wait',['--timeout-seconds','.5']),('cancel',['--cancel-file',str(cancel)])]:
+            with self.subTest(mode=mode),patch('ai_ad_editor.local_matting.subprocess.Popen',side_effect=record),self.fake_command(mode,str(cancel)):
+                code,result=invoke(*self.command(),*opts);self.assertEqual(code,8,result)
+            self.assertTrue(all(child.poll() is not None for child in children));self.assert_clean_failure(before);cancel.unlink(missing_ok=True)
+
+    def test_output_race_and_project_save_failure_preserve_transaction(self):
+        self.register();before=self.metadata()
+        with self.fake_command('race',str(self.output)):code,result=invoke(*self.command())
+        self.assertEqual(code,6,result);self.assertEqual(self.output.read_bytes(),b'external output');self.output.unlink();self.assert_clean_failure(before)
+        with self.fake_command(),patch('ai_ad_editor.cli.save_project',side_effect=OSError('controlled save failure')):code,result=invoke(*self.command())
+        self.assertEqual(code,6,result);self.assert_clean_failure(before)
+
+    def test_idempotent_replay_and_project_package_restore_registry(self):
+        self.register()
+        with self.fake_command():code,result=invoke(*self.command(),'--idempotency-key','vace-once')
+        self.assertEqual(code,0,result)
+        with patch('ai_ad_editor.cli.matte_native') as worker:
+            code,replay=invoke(*self.command(),'--idempotency-key','vace-once');self.assertEqual(code,0,replay);worker.assert_not_called()
+        code,snap=invoke('project','snapshot','--project',str(self.root),'--label','vace-delivery');self.assertEqual(code,0,snap)
+        restored=invoke('project','restore','--project',str(self.root),'--snapshot',snap['data']['snapshot_id']);self.assertEqual(restored[0],0,restored)
+        package=self.base/'vace.aevpkg.zip'
+        code,result=invoke('convert','export','--project',str(self.root),'--output',str(package),'--target-format','package');self.assertEqual(code,0,result)
+        code,result=invoke('convert','import','--input',str(package),'--output',str(self.base/'unpacked'));self.assertEqual(code,0,result)
+        self.assertEqual(invoke('validate','--project',str(self.base/'unpacked'))[0],0)
+
+
+if __name__=='__main__':unittest.main()

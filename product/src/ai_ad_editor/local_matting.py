@@ -5,6 +5,7 @@ import contextlib
 import json
 import math
 import os
+import shutil
 import subprocess
 import tempfile
 import time
@@ -15,7 +16,7 @@ from typing import Any, Callable
 from .errors import AppError, argument_error
 from .media import MAX_INPUT_BYTES, ffmpeg_path, probe_media
 from .policy import resolve_local_path
-from .utils import assert_id, atomic_write_json, now_iso, run_process, sha256_bytes, sha256_file
+from .utils import assert_id, atomic_write_json, now_iso, read_json_snapshot, run_process, sha256_bytes, sha256_file
 
 MATTING_ENGINE = 'rvm-onnx-cpu-matting-v1'
 MATTING_PROTOCOL = 'agent-video-rvm-matting-v1'
@@ -27,6 +28,9 @@ def _verify_pipeline_adapter(adapter: dict) -> dict:
     if adapter.get('engine') == 'torchscript-lama-local-v1':
         from .local_inpainting import verify_adapter as verify_inpainting
         return verify_inpainting(adapter)
+    if adapter.get('engine') == 'diffusers-wan-vace-local-v1':
+        from .local_vace import verify_adapter as verify_vace
+        return verify_vace(adapter)
     from .local_segmentation import verify_adapter as verify_segmentation
     return verify_segmentation(adapter)
 
@@ -34,7 +38,7 @@ def _verify_pipeline_adapter(adapter: dict) -> dict:
 def _prompt_unchanged(plan: dict) -> bool:
     if plan.get('engine') == MATTING_ENGINE:
         return True
-    if plan.get('engine') == 'torchscript-lama-local-v1':
+    if plan.get('engine') in {'torchscript-lama-local-v1', 'diffusers-wan-vace-local-v1'}:
         from .local_inpainting import mask_unchanged
         return mask_unchanged(plan)
     from .local_segmentation import verify_prompt_source
@@ -155,6 +159,8 @@ def prepare_plan(source: Path, adapter: dict, *, start_seconds: float = 0, end_s
         warnings[0] = {'code': 'SEGMENTATION_MODEL_REVIEW_REQUIRED', 'message': '对象分割须复核提示、遮挡、边缘、商品与镜头切换；概率不等于物理 alpha'}
     if adapter['engine'] == 'torchscript-lama-local-v1':
         warnings[0] = {'code': 'INPAINT_MODEL_REVIEW_REQUIRED', 'message': '逐帧 LaMa 补全须复核纹理、物体残留、闪烁与许可；没有跨帧联合修复或生成填充保证'}
+    if adapter['engine'] == 'diffusers-wan-vace-local-v1':
+        warnings[0] = {'code': 'VACE_MODEL_REVIEW_REQUIRED', 'message': '联合窗口生成须复核提示词、纹理、物体/身份、遮挡、窗口接缝与许可；未验收全视频时序或完整剪映效果'}
     return {'engine': adapter['engine'], 'protocol': adapter['protocol'], 'network': 'disabled',
             'source': {'path': str(source.resolve()), 'sha256': 'sha256:' + sha256_file(source)}, 'input_probe': probe,
             'range': {'start_seconds': start, 'end_seconds': end},
@@ -207,12 +213,13 @@ def _windows_job():
 
 
 def _worker_command(adapter: dict, request_path: Path) -> list[str]:
-    name = 'rvm_worker.py' if adapter['engine'] == MATTING_ENGINE else 'lama_worker.py' if adapter['engine'] == 'torchscript-lama-local-v1' else 'sam2_worker.py'
+    name = 'rvm_worker.py' if adapter['engine'] == MATTING_ENGINE else 'lama_worker.py' if adapter['engine'] == 'torchscript-lama-local-v1' else 'vace_worker.py' if adapter['engine'] == 'diffusers-wan-vace-local-v1' else 'sam2_worker.py'
     return [adapter['executable'], '-I', '-B', '-X', 'utf8', str(Path(__file__).with_name(name)), str(request_path)]
 
 
 def validate_response(response: dict, request: dict) -> None:
-    inpainting = request['engine'] == 'torchscript-lama-local-v1'
+    joint = request['engine'] == 'diffusers-wan-vace-local-v1'
+    inpainting = request['engine'] in {'torchscript-lama-local-v1', 'diffusers-wan-vace-local-v1'}
     segmentation = request['engine'] == 'transformers-sam2-video-local-v1'
     providers = ['torch-' + request['adapter']['settings']['device']] if segmentation or inpainting else ['CPUExecutionProvider']
     expected = {'status': 'succeeded', 'protocol': request['protocol'], 'engine': request['engine'], 'network': 'disabled', 'blocked_network_events': [],
@@ -221,10 +228,12 @@ def validate_response(response: dict, request: dict) -> None:
         expected.update(prompt_sha256=request['prompt_plan']['sha256'], object_ids=request['prompt_plan']['object_ids'], mask_mode=request['prompt_plan']['mask_mode'])
     if inpainting:
         expected.update(mask_sha256=request['mask']['sha256'], mask_plan_sha256=request['mask']['plan_sha256'], inpainting=request['inpainting'])
+    if joint:
+        expected['generation'] = request['generation']
     if any(response.get(key) != value for key, value in expected.items()):
         raise AppError('MATTING_WORKER_INTEGRITY_INVALID', '抠像 worker 协议或输入/模型/网络/设备不符', exit_code=6)
     info, metrics = request['video'], response.get('metrics')
-    state_reset = 'per-frame' if inpainting else 'per-job-and-explicit-frames' if segmentation else 'per-job'
+    state_reset = 'per-joint-window-and-scene' if joint else 'per-frame' if inpainting else 'per-job-and-explicit-frames' if segmentation else 'per-job'
     if not isinstance(metrics, dict) or any(type(metrics.get(k)) is not int or metrics[k] != info[k] for k in ('frames', 'width', 'height')) or metrics.get('state_updates') != info['frames'] or metrics.get('rgba_bytes') != info['frames'] * info['width'] * info['height'] * 4 or metrics.get('alpha_mode') != 'straight' or metrics.get('input_alpha') != ('preserve' if inpainting else 'multiply') or metrics.get('state_reset') != state_reset:
         raise AppError('MATTING_WORKER_OUTPUT_INVALID', '抠像帧数、画幅、字节数或状态传递无效', exit_code=6)
     digest = metrics.get('rgba_sha256', '')
@@ -242,21 +251,75 @@ def validate_response(response: dict, request: dict) -> None:
         if segmentation and (type(metrics.get('prompt_events')) is not int or metrics['prompt_events'] != len(request['prompt_plan']['frames']) or type(metrics.get('explicit_resets')) is not int or metrics['explicit_resets'] != sum(e['reset'] for e in request['prompt_plan']['frames'])):
             raise ValueError('prompt event counters')
         if inpainting:
-            for name in ('model_calls', 'empty_mask_frames', 'resized_model_frames'):
+            for name in ('model_calls', 'empty_mask_frames'):
                 if type(metrics.get(name)) is not int or not 0 <= metrics[name] <= info['frames']:
                     raise ValueError('inpainting frame counters')
-            if metrics['model_calls'] + metrics['empty_mask_frames'] != info['frames'] or metrics['resized_model_frames'] > metrics['model_calls'] or type(metrics.get('mask_pixels')) is not int or not 0 <= metrics['mask_pixels'] <= pixels or metrics.get('outside_mask_changed_pixels') != 0:
+            if not joint and (type(metrics.get('resized_model_frames')) is not int or not 0 <= metrics['resized_model_frames'] <= metrics['model_calls'] or metrics['model_calls'] + metrics['empty_mask_frames'] != info['frames']):
+                raise ValueError('framewise inpainting counters')
+            if type(metrics.get('mask_pixels')) is not int or not 0 <= metrics['mask_pixels'] <= pixels or metrics.get('outside_mask_changed_pixels') != 0:
                 raise ValueError('inpainting mask counters')
+            if joint:
+                from .local_vace import window_plan, buffer_budget, plan_digest
+                if metrics.get('conditioning') != 'masked-rgb-127-before-and-after-resize':
+                    raise ValueError('joint inpainting conditioning mismatch')
+                verification = response.get('artifact_verification', {})
+                artifacts = {a['path']: a['bytes'] for a in request['adapter']['artifacts']}
+                if not isinstance(verification, dict) or verification.get('mode') != 'windows-read-lock-command-scope' or verification.get('write_and_delete_sharing') is not False or verification.get('persists_across_commands') is not False:
+                    raise ValueError('joint artifact verification scope')
+                if type(verification.get('files_hashed')) is not int or verification['files_hashed'] != len(artifacts) or type(verification.get('bytes_hashed')) is not int or verification['bytes_hashed'] != sum(artifacts.values()) or type(verification.get('digest_reuses_while_locked')) is not int or verification['digest_reuses_while_locked'] < len(request['adapter']['artifacts']):
+                    raise ValueError('joint artifact verification counters')
+                windows = window_plan(info['frames'], request['generation'])
+                if request['windows'] != windows or type(metrics.get('window_count')) is not int or metrics.get('window_count') != len(windows) or metrics.get('window_plan_sha256') != plan_digest(windows):
+                    raise ValueError('joint window plan mismatch')
+                bounds = {'empty_windows':len(windows), 'padded_frames':3*len(windows), 'overlap_frames_blended':info['frames'],
+                          'resized_model_frames':sum(w['end']-w['start'] for w in windows)}
+                if any(type(metrics.get(k)) is not int or not 0 <= metrics[k] <= maximum for k,maximum in bounds.items()) or metrics['model_calls'] + metrics['empty_windows'] != len(windows):
+                    raise ValueError('joint window counters')
+                if metrics['state_peak_bytes'] != buffer_budget(info['width'],info['height'],request['generation'],request['inpainting']['model_max_edge']):
+                    raise ValueError('joint window buffer estimate')
+                if (metrics['mask_pixels']==0)!=(metrics['model_calls']==0) or (metrics['empty_mask_frames']==info['frames'])!=(metrics['mask_pixels']==0) or response.get('model_loaded') is not (metrics['model_calls']>0):
+                    raise ValueError('joint model/empty-mask execution mismatch')
+                if metrics['model_calls']:
+                    execution=response.get('model_execution',{})
+                    if not isinstance(execution,dict) or execution.get('prompt_truncated') is not False or execution.get('prompt_extension') is not False or execution.get('text_encoder_released_before_generation') is not True or execution.get('transformer_precision')!='bfloat16-with-declared-float32-stability-modules' or execution.get('vae_precision')!='float32':
+                        raise ValueError('joint model/prompt execution contract')
+                    tokens=execution.get('prompt_token_counts',{});seconds=execution.get('window_seconds',[])
+                    if not isinstance(tokens,dict) or set(tokens)!={'prompt','negative_prompt'} or any(type(v) is not int or not 1<=v<=request['generation']['prompt_max_tokens'] for v in tokens.values()) or not isinstance(seconds,list) or len(seconds)!=metrics['model_calls'] or any(type(v) not in {int,float} or not math.isfinite(v) or v<0 for v in seconds):
+                        raise ValueError('joint prompt/window execution metrics')
             if metrics.get('input_alpha_sha256') != metrics.get('output_alpha_sha256'):
                 raise ValueError('source alpha changed')
             for name in ('input_alpha_sha256', 'output_alpha_sha256', 'source_rgba_sha256', 'decoded_mask_rgba_sha256'):
                 value = metrics.get(name, '')
                 if not isinstance(value, str) or len(value) != 71 or not value.startswith('sha256:') or any(c not in '0123456789abcdef' for c in value[7:]):
                     raise ValueError('inpainting input digests')
-            if type(metrics.get('model_peak_pixels')) is not int or not 0 <= metrics['model_peak_pixels'] <= ((request['inpainting']['model_max_edge'] + 7) // 8 * 8)**2:
+            raster_bound = (((request['inpainting']['model_max_edge']+15)//16*16)**2 * request['generation']['window_frames']) if joint else ((request['inpainting']['model_max_edge'] + 7) // 8 * 8)**2
+            if type(metrics.get('model_peak_pixels')) is not int or not 0 <= metrics['model_peak_pixels'] <= raster_bound:
                 raise ValueError('inpainting model raster budget')
     except (KeyError, TypeError, ValueError) as exc:
         raise AppError('MATTING_WORKER_OUTPUT_INVALID', '抠像循环状态或 alpha 统计不合法', exit_code=6) from exc
+
+
+@contextlib.contextmanager
+def _pipeline_workspace(cache: Path):
+    cache = cache.resolve()
+    work = Path(tempfile.mkdtemp(prefix='rgba-', dir=cache)).resolve()
+    try:
+        yield work
+    finally:
+        # Windows scanners/readers can briefly retain a file after a child exits.
+        # Retry sharing/access races within a fixed budget; never hide leftovers.
+        for attempt in range(6):
+            if work.resolve() != work or work.parent != cache or work.is_symlink() or getattr(work, 'is_junction', lambda: False)():
+                raise AppError('MATTING_CACHE_CLEANUP_FAILED', '临时目录边界变化，拒绝递归清理', exit_code=6, path=str(work))
+            try:
+                shutil.rmtree(work)
+                break
+            except FileNotFoundError:
+                break
+            except OSError as exc:
+                if getattr(exc, 'winerror', None) not in {5, 32, 33, 145} or attempt == 5:
+                    raise AppError('MATTING_CACHE_CLEANUP_FAILED', '临时目录未清理，保留路径供恢复', exit_code=6, path=str(work), cause=str(exc)) from exc
+                time.sleep(.05 * 2**attempt)
 
 
 def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout: float = 3600,
@@ -272,7 +335,7 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
         raise AppError('MATTING_INTEGRITY_FAILED', '源或模型在计划之后变化', exit_code=10)
     from .runtime import configure_local_runtime
     runtime = configure_local_runtime()['root']
-    cache = root / 'cache' / ('inpainting' if adapter['engine'] == 'torchscript-lama-local-v1' else 'matting')
+    cache = root / 'cache' / ('inpainting' if adapter['engine'] in {'torchscript-lama-local-v1', 'diffusers-wan-vace-local-v1'} else 'matting')
     cache.mkdir(parents=True, exist_ok=True)
     output.parent.mkdir(parents=True, exist_ok=True)
     ffmpeg = Path(ffmpeg_path()).resolve()
@@ -280,7 +343,7 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
     started = time.monotonic()
     published = False
     try:
-        with tempfile.TemporaryDirectory(prefix='rgba-', dir=cache) as temporary:
+        with _pipeline_workspace(cache) as temporary:
             work = Path(temporary)
             staged = work / 'foreground.mov'
             request = {**plan, 'adapter': adapter, 'runtime_root': runtime, 'response': str(work / 'response.json'), 'progress': str(work / 'progress.json'),
@@ -294,7 +357,7 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
             base = [str(ffmpeg), '-nostdin', '-hide_banner', '-loglevel', 'error', '-protocol_whitelist', 'file,pipe']
             vf = f"setpts=PTS-STARTPTS,trim=start={start:.12f}:end={end:.12f},setpts=PTS-STARTPTS,scale={info['width']}:{info['height']}:flags=lanczos,setsar=1,fps=fps={info['fps']}:start_time=0:round=near,tpad=stop_mode=clone:stop_duration={1 / float(Fraction(info['fps'])):.12f},format=rgba"
             decoder = [*base, '-i', str(source), '-map', f"0:{info['source_stream_index']}", '-an', '-sn', '-dn', '-vf', vf, '-frames:v', str(info['frames']), '-f', 'rawvideo', '-pix_fmt', 'rgba', 'pipe:1']
-            if adapter['engine'] == 'torchscript-lama-local-v1':
+            if adapter['engine'] in {'torchscript-lama-local-v1', 'diffusers-wan-vace-local-v1'}:
                 from .local_inpainting import decoder_command
                 decoder = decoder_command(base, source, plan, vf)
             encoder = [*base, '-n', '-f', 'rawvideo', '-pixel_format', 'rgba', '-video_size', f"{info['width']}x{info['height']}", '-framerate', info['fps'], '-i', 'pipe:0']
@@ -329,9 +392,9 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
                         if any(p.poll() not in (None, 0) for p in processes):
                             break
                         if progress and Path(request['progress']).is_file():
-                            with contextlib.suppress(OSError, ValueError, KeyError):
-                                frame = json.loads(Path(request['progress']).read_text(encoding='utf-8'))['frames']
-                                if frame != last_frame:
+                            with contextlib.suppress(OSError, ValueError, KeyError, TypeError):
+                                frame = read_json_snapshot(Path(request['progress']))['frames']
+                                if type(frame) is int and 0 <= frame <= info['frames'] and frame != last_frame:
                                     progress(min(frame, info['frames']), info['frames'])
                                     last_frame = frame
                         time.sleep(.05)
@@ -387,9 +450,12 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
             # created by an external editor after preflight. Never delete it.
             staged.rename(output)
             published = True
+            from .artifact_locks import verification_summary
+            verification = verification_summary()
             return {'version': '0.1.0', **plan, 'output': str(output), 'sha256': output_hash, 'probe': result_probe,
                     'adapter_id': adapter['adapter_id'], 'adapter_sha256': adapter['sha256'], 'checkpoint_sha256': adapter['model_sha256'],
-                    'rgba_roundtrip_verified': True, 'ffmpeg': request['ffmpeg'], 'worker': response, 'elapsed_seconds': time.monotonic() - started}
+                    'rgba_roundtrip_verified': True, 'ffmpeg': request['ffmpeg'], 'worker': response, 'elapsed_seconds': time.monotonic() - started,
+                    **({'artifact_verification': verification} if verification else {})}
     except BaseException:
         if published:
             output.unlink(missing_ok=True)

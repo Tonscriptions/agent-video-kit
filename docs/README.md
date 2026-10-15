@@ -4,11 +4,13 @@
 |---|---|
 | 文档编号 | DOCS-INDEX-001 |
 | 状态 | 有效 |
-| 审计日期 | 2026-10-16（LaMa 已提交基线与 VACE 在建状态） |
+| 审计日期 | 2026-10-16（VACE 正式自然链路与质量缺口） |
 
 本目录是 `AI广告剪辑` 项目的项目文档唯一入口。当前基线版本为 2026-10-12，最近一次体系审计为 2026-10-15，最近增量审计为 2026-10-16；产品需求、技术方案、兼容性结论、开发计划、验收记录和研究结果都应在这里落盘。
 
-当前进度见[2026-10-16 构建进度总表](./构建进度总表_2026-10-16.md)。本轮新增[LaMa 区域修复契约](./specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md)和[CPU/CUDA、SAM2→修复真模型实测](./validation/LaMa本地区域修复与物体移除实测_2026-10-16.md)。新增 25 项，完整回归 **303/303**，14 个 Skill 审计通过。蒙版外 RGB/全部 alpha 保留、音频/入轨和成片链路通过；自然运动的腿部残影、纹理涂抹、时序质量、生成填充及完整剪映对标仍未完成。当前依据见[LaMa 机器证据](./validation/evidence/lama-smoke-20261016.json)和[文档审计](./validation/evidence/docs-audit-lama-20261016.json)。
+当前进度见[26 模块构建进度总表](./构建进度总表_2026-10-16.md)。本轮 [VACE 契约](./specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md)与[正式实测](./validation/VACE本地多帧编辑与生成填充实测_2026-10-16.md)记录 Windows I/O 修复、338/338 完整回归、35/35 专项及 32 帧 SAM2→VACE→成片。自然镜头有明显色块、形体残影与纹理不连续，部分帧差于匹配输入的 LaMa 对照，画质未通过；8 帧受控正式链路也成功，但暗矩形补丁仍未消除。依据见[VACE 机器证据](./validation/evidence/vace-smoke-20261016.json)。
+
+前序 [LaMa 区域修复契约](./specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md)和[CPU/CUDA、SAM2→修复实测](./validation/LaMa本地区域修复与物体移除实测_2026-10-16.md)记录 303/303 当轮完整回归；自然腿部残影、纹理涂抹及时序质量仍有缺口。14 个 video-cut- Skill 审计通过，完整剪映对标未完成。LaMa 依据见[机器证据](./validation/evidence/lama-smoke-20261016.json)和[当轮文档审计](./validation/evidence/docs-audit-lama-20261016.json)。
 
 上一轮验证见[SAM2 机器证据](./validation/evidence/sam2-smoke-20261016.json)和[文档审计](./validation/evidence/docs-audit-sam2-20261016.json)。此前[在建状态快照](./validation/evidence/build-progress-checked-sam2-20261016.json)为历史记录。RVM [人物抠像契约](./specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md)和[透明成片实测](./validation/RVM本地人物抠像与透明成片实测_2026-10-16.md)继续有效，RVM 轮完整回归为 257/257。
 
@@ -24,7 +26,7 @@
 
 本轮补齐[跟踪坐标与重算契约](./specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md)及[组合渲染实测](./validation/跟踪坐标绑定与组合渲染实测_2026-10-15.md)：直接源层几何/时钟与输出画布重算、实际 YOLO 重构图+标签横竖双版闭环通过；完整产品 **211/211** 回归通过，完整剪映等价仍待验收。
 
-本次进度核对覆盖 26 个模块，已提交产品基线为 `2267e399`、303/303 回归。VACE 已完成 8 帧、2 窗口、5 步真实 API 诊断，蒙版外 RGB/全部 alpha 保留，抽样画面仍有较暗矩形补丁；正式 SAM2→VACE 自然视频链路被 Windows 进度文件替换冲突阻塞。当前源码有 337 个测试方法，最新 34 项专项有 1 项错误，当前全量尚未通过，产品代码未提交。历史 323/323 不代表当前源码验收。见[评审中契约](./specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md)、[当前状态证据](./validation/evidence/build-progress-current-vace-20261016.json)和[本次文档审计](./validation/evidence/docs-audit-current-vace-20261016.json)；[此前核对](./validation/evidence/build-progress-checked-vace-20261016.json)保留为历史。
+本次进度核对覆盖 26 个模块，当前完整回归为 338/338，原子 I/O 与摘要读锁的跨进程验证已通过。VACE、LaMa 等八类模型已有真实本地运行记录；VACE 为实验能力，成功交付和像素保留不等于生成质量达标，#56 保持 degraded。此前[337 方法/34 项专项错误快照](./validation/evidence/build-progress-current-vace-20261016.json)和[323 项历史核对](./validation/evidence/build-progress-checked-vace-20261016.json)保留为历史，不覆盖当前源码。本轮文档链接与状态审计见[审计记录](./validation/evidence/docs-audit-vace-20261016.json)。
 
 ## 文档约束
 
