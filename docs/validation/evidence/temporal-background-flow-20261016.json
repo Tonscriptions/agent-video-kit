@@ -1,0 +1,4631 @@
+{
+  "checked_at_utc": "2026-10-16T04:59:15.319039+00:00",
+  "status": "research-completed-quality-unaccepted",
+  "algorithm": "erased-background-dis-ns-flow-nearest-agreeing-reference-v1",
+  "seconds": 113.59722149999288,
+  "arguments": {
+    "input_manifest": "product/.runtime/flow-probe-inputs-20261016.json",
+    "output_root": "workspace/repair-observed-plate-flow-final-v2-20261016",
+    "array_budget_mib": 1024,
+    "scene_cut_frame": []
+  },
+  "inputs": {
+    "source": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-blend-20261016-lama-natural-v2\\project\\assets\\asset_20261016035315_268604b9_asset_20261015213312_82f95069_natural-motion.mov",
+      "sha256": "sha256:813bc758f73cdb49f2ec206dc5946497279a92f5f900efb042a733249d60c207"
+    },
+    "target_mask": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-blend-20261016-lama-natural-v2\\project\\assets\\asset_20261016035316_c677fdba_selected_mask.mov",
+      "sha256": "sha256:8202185e901516ccb95eaffc2299b308c1167c21ad8de20d949c301bff294153"
+    },
+    "exclusion_mask": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\sam2-smoke-20261016-natural-final\\project\\assets\\derived\\person_alpha.mov",
+      "sha256": "sha256:5d1424a4960e5273e73b2f8a605366add6b279d55dbd4b6a76b5da269dc52d4f"
+    },
+    "fallback": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-blend-20261016-lama-natural-v2\\project\\assets\\derived\\repaired.mov",
+      "sha256": "sha256:0e2cb91d6f96152fc7cbbecbaea302235be450f42966aa85d42feec671d3aafe"
+    }
+  },
+  "manifest_sha256": "sha256:d79464ecd52dce4e5371e9c3e45f7784635ac95abf7767615fd5dba5ccc9eefc",
+  "runtime": {
+    "native_python": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+    "python_sha256": "sha256:ef8f51028ac5329641985112f8efb1c2d4c47c86b8011ddf7e6fae21e2b4e5a1",
+    "opencv": "5.0.0",
+    "numpy": "2.4.6",
+    "opencv_threads": 4,
+    "ffmpeg": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "ffmpeg_sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+    "network_guard_installed": true,
+    "blocked_network_events": [],
+    "model_downloads": false,
+    "learned_model_runs": 0,
+    "docker_wsl_virtualization_started": false,
+    "browser_started": false
+  },
+  "independent_research_tests": {
+    "count": 10,
+    "exit_code": 0,
+    "log_sha256": "sha256:f141fd83abe2f786d2bb6e3c8463357701c34d32775fe98b8393dfec75cabc59",
+    "log": "test_all_forbidden_has_no_motion_edges (test_flow_core.FlowResearchTests.test_all_forbidden_has_no_motion_edges) ... ok\r\ntest_alpha_is_preserved_and_nonopaque_donors_are_excluded (test_flow_core.FlowResearchTests.test_alpha_is_preserved_and_nonopaque_donors_are_excluded) ... ok\r\ntest_analytic_zero_motion_recovers_observed_texture_interior (test_flow_core.FlowResearchTests.test_analytic_zero_motion_recovers_observed_texture_interior) ... ok\r\ntest_budget_failure_precedes_native_flow (test_flow_core.FlowResearchTests.test_budget_failure_precedes_native_flow) ... ok\r\ntest_checkpoint_failure_stops_work (test_flow_core.FlowResearchTests.test_checkpoint_failure_stops_work) ... ok\r\ntest_forbidden_bilinear_corner_is_rejected_exactly (test_flow_core.FlowResearchTests.test_forbidden_bilinear_corner_is_rejected_exactly) ... ok\r\ntest_invalid_shapes_options_and_fallback_rejected (test_flow_core.FlowResearchTests.test_invalid_shapes_options_and_fallback_rejected) ... ok\r\ntest_scene_cut_blocks_the_only_clean_references (test_flow_core.FlowResearchTests.test_scene_cut_blocks_the_only_clean_references) ... ok\r\ntest_selected_colors_cannot_change_motion_estimation (test_flow_core.FlowResearchTests.test_selected_colors_cannot_change_motion_estimation) ... ok\r\ntest_unobserved_region_abstains (test_flow_core.FlowResearchTests.test_unobserved_region_abstains) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 10 tests in 0.726s\r\n\r\nOK\r\n"
+  },
+  "synthetic": {
+    "truth_kind": "seeded-independent-translated-texture-before-foreground-overlay",
+    "seed": 42,
+    "artifact": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\synthetic.npz",
+    "artifact_sha256": "sha256:87ae5e0493e9bca8b0692b9da4d4bdee79f8a7e544a25404898215a2e44c1086",
+    "metrics": {
+      "selected_pixels": 9072,
+      "contributed_pixels": 9071,
+      "observation_availability_fraction": 0.999889770723104,
+      "masked_mse_before": 540.8853248089359,
+      "masked_mse_after": 53.12639623750735,
+      "masked_psnr_before_db": 20.79975162455906,
+      "masked_psnr_after_db": 30.877700037808072,
+      "contributed_mse": 53.1124830044464,
+      "availability_is_not_accuracy": true
+    },
+    "report": {
+      "algorithm": "erased-background-dis-ns-flow-nearest-agreeing-reference-v1",
+      "frames": 12,
+      "width": 160,
+      "height": 96,
+      "scene_cuts": [],
+      "min_donors": 2,
+      "max_spread": 10.0,
+      "owned_array_estimate_bytes": 39321600,
+      "budget_scope": "conservative-owned-array-estimate-excludes-inputs-opencv-internals-total-process-ram",
+      "edges": [
+        {
+          "from": 0,
+          "to": 1,
+          "status": "estimated",
+          "observed_anchors": 13272,
+          "known_flow_median": [
+            -2.000001907348633,
+            6.594576689167297e-07
+          ]
+        },
+        {
+          "from": 1,
+          "to": 0,
+          "status": "estimated",
+          "observed_anchors": 13197,
+          "known_flow_median": [
+            2.000001907348633,
+            -5.928700943513832e-07
+          ]
+        },
+        {
+          "from": 1,
+          "to": 2,
+          "status": "estimated",
+          "observed_anchors": 13258,
+          "known_flow_median": [
+            -1.9999980926513672,
+            6.077929697312356e-07
+          ]
+        },
+        {
+          "from": 2,
+          "to": 1,
+          "status": "estimated",
+          "observed_anchors": 12997,
+          "known_flow_median": [
+            2.0000009536743164,
+            6.849126066299505e-08
+          ]
+        },
+        {
+          "from": 2,
+          "to": 3,
+          "status": "estimated",
+          "observed_anchors": 12963,
+          "known_flow_median": [
+            -2.000002384185791,
+            -2.8248047101442353e-07
+          ]
+        },
+        {
+          "from": 3,
+          "to": 2,
+          "status": "estimated",
+          "observed_anchors": 13187,
+          "known_flow_median": [
+            2.0000014305114746,
+            6.6152642830275e-07
+          ]
+        },
+        {
+          "from": 3,
+          "to": 4,
+          "status": "estimated",
+          "observed_anchors": 13187,
+          "known_flow_median": [
+            -2.000000238418579,
+            4.86476608330122e-07
+          ]
+        },
+        {
+          "from": 4,
+          "to": 3,
+          "status": "estimated",
+          "observed_anchors": 12980,
+          "known_flow_median": [
+            1.999997854232788,
+            -6.195282367116306e-07
+          ]
+        },
+        {
+          "from": 4,
+          "to": 5,
+          "status": "estimated",
+          "observed_anchors": 13156,
+          "known_flow_median": [
+            -2.0000009536743164,
+            3.649714130915527e-07
+          ]
+        },
+        {
+          "from": 5,
+          "to": 4,
+          "status": "estimated",
+          "observed_anchors": 13244,
+          "known_flow_median": [
+            2.000000238418579,
+            5.547694854612928e-07
+          ]
+        },
+        {
+          "from": 5,
+          "to": 6,
+          "status": "estimated",
+          "observed_anchors": 13194,
+          "known_flow_median": [
+            -2.000002861022949,
+            2.8562340048665646e-08
+          ]
+        },
+        {
+          "from": 6,
+          "to": 5,
+          "status": "estimated",
+          "observed_anchors": 13191,
+          "known_flow_median": [
+            2.0000011920928955,
+            5.128915745444829e-07
+          ]
+        },
+        {
+          "from": 6,
+          "to": 7,
+          "status": "estimated",
+          "observed_anchors": 13090,
+          "known_flow_median": [
+            -2.0000016689300537,
+            -5.52762351446745e-08
+          ]
+        },
+        {
+          "from": 7,
+          "to": 6,
+          "status": "estimated",
+          "observed_anchors": 13206,
+          "known_flow_median": [
+            2.0,
+            -6.585145229109912e-07
+          ]
+        },
+        {
+          "from": 7,
+          "to": 8,
+          "status": "estimated",
+          "observed_anchors": 13142,
+          "known_flow_median": [
+            -2.0000014305114746,
+            6.395372338374727e-07
+          ]
+        },
+        {
+          "from": 8,
+          "to": 7,
+          "status": "estimated",
+          "observed_anchors": 13169,
+          "known_flow_median": [
+            1.9999998807907104,
+            -1.4712873053213116e-07
+          ]
+        },
+        {
+          "from": 8,
+          "to": 9,
+          "status": "estimated",
+          "observed_anchors": 12954,
+          "known_flow_median": [
+            -2.000000238418579,
+            -2.8662074669227877e-07
+          ]
+        },
+        {
+          "from": 9,
+          "to": 8,
+          "status": "estimated",
+          "observed_anchors": 13149,
+          "known_flow_median": [
+            1.9999994039535522,
+            -1.293707185823223e-07
+          ]
+        },
+        {
+          "from": 9,
+          "to": 10,
+          "status": "estimated",
+          "observed_anchors": 13001,
+          "known_flow_median": [
+            -2.0000014305114746,
+            8.735941747772813e-08
+          ]
+        },
+        {
+          "from": 10,
+          "to": 9,
+          "status": "estimated",
+          "observed_anchors": 13161,
+          "known_flow_median": [
+            1.9999996423721313,
+            5.182674840398249e-07
+          ]
+        },
+        {
+          "from": 10,
+          "to": 11,
+          "status": "estimated",
+          "observed_anchors": 13030,
+          "known_flow_median": [
+            -2.0000011920928955,
+            5.578384616455878e-07
+          ]
+        },
+        {
+          "from": 11,
+          "to": 10,
+          "status": "estimated",
+          "observed_anchors": 13162,
+          "known_flow_median": [
+            1.9999990463256836,
+            2.2624635676038451e-07
+          ]
+        }
+      ],
+      "per_frame": [
+        {
+          "frame": 0,
+          "selected": 756,
+          "contributed": 756,
+          "donor_frames": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "frame": 1,
+          "selected": 756,
+          "contributed": 756,
+          "donor_frames": [
+            0,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "frame": 2,
+          "selected": 756,
+          "contributed": 756,
+          "donor_frames": [
+            1,
+            0,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "frame": 3,
+          "selected": 756,
+          "contributed": 756,
+          "donor_frames": [
+            2,
+            1,
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "frame": 4,
+          "selected": 756,
+          "contributed": 756,
+          "donor_frames": [
+            3,
+            2,
+            1,
+            0,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "frame": 5,
+          "selected": 756,
+          "contributed": 755,
+          "donor_frames": [
+            4,
+            3,
+            2,
+            1,
+            0,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "frame": 6,
+          "selected": 756,
+          "contributed": 756,
+          "donor_frames": [
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "frame": 7,
+          "selected": 756,
+          "contributed": 756,
+          "donor_frames": [
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "frame": 8,
+          "selected": 756,
+          "contributed": 756,
+          "donor_frames": [
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "frame": 9,
+          "selected": 756,
+          "contributed": 756,
+          "donor_frames": [
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            10,
+            11
+          ]
+        },
+        {
+          "frame": 10,
+          "selected": 756,
+          "contributed": 756,
+          "donor_frames": [
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            11
+          ]
+        },
+        {
+          "frame": 11,
+          "selected": 756,
+          "contributed": 756,
+          "donor_frames": [
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0
+          ]
+        }
+      ],
+      "contributed_pixels": 9071,
+      "selected_pixels": 9072,
+      "outside_mask_changed_pixels": 0,
+      "source_alpha_exact": true,
+      "hidden_motion_verified": false,
+      "full_video_temporal_quality_accepted": false,
+      "product_integrated": false
+    },
+    "contacts": [
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\synthetic-contact-1.png",
+        "sha256": "sha256:0d0a2a4b8d3db886c2d12c00ac48b363ef29dba5e8dfdaec4807d4339b2425a3",
+        "frames": [
+          0,
+          5,
+          11
+        ]
+      }
+    ]
+  },
+  "natural_removal": {
+    "artifact": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\natural.npz",
+    "artifact_sha256": "sha256:bde60bee6426fa57ba15e876f6a95df1ece7fefff30d5ee5e285c5fbaa06b340",
+    "report": {
+      "algorithm": "erased-background-dis-ns-flow-nearest-agreeing-reference-v1",
+      "frames": 32,
+      "width": 512,
+      "height": 288,
+      "scene_cuts": [],
+      "min_donors": 3,
+      "max_spread": 10.0,
+      "owned_array_estimate_bytes": 754974720,
+      "budget_scope": "conservative-owned-array-estimate-excludes-inputs-opencv-internals-total-process-ram",
+      "edges": [
+        {
+          "from": 0,
+          "to": 1,
+          "status": "estimated",
+          "observed_anchors": 96150,
+          "known_flow_median": [
+            -1.8751600980758667,
+            1.126786708831787
+          ]
+        },
+        {
+          "from": 1,
+          "to": 0,
+          "status": "estimated",
+          "observed_anchors": 97149,
+          "known_flow_median": [
+            1.8735822439193726,
+            -1.12057363986969
+          ]
+        },
+        {
+          "from": 1,
+          "to": 2,
+          "status": "estimated",
+          "observed_anchors": 93760,
+          "known_flow_median": [
+            -1.8564224243164062,
+            0.7890026569366455
+          ]
+        },
+        {
+          "from": 2,
+          "to": 1,
+          "status": "estimated",
+          "observed_anchors": 94122,
+          "known_flow_median": [
+            1.8553462028503418,
+            -0.7757371664047241
+          ]
+        },
+        {
+          "from": 2,
+          "to": 3,
+          "status": "estimated",
+          "observed_anchors": 102384,
+          "known_flow_median": [
+            -1.837369680404663,
+            1.040116310119629
+          ]
+        },
+        {
+          "from": 3,
+          "to": 2,
+          "status": "estimated",
+          "observed_anchors": 104170,
+          "known_flow_median": [
+            1.8314753770828247,
+            -1.072638750076294
+          ]
+        },
+        {
+          "from": 3,
+          "to": 4,
+          "status": "estimated",
+          "observed_anchors": 101899,
+          "known_flow_median": [
+            -1.1769922971725464,
+            0.49511829018592834
+          ]
+        },
+        {
+          "from": 4,
+          "to": 3,
+          "status": "estimated",
+          "observed_anchors": 101120,
+          "known_flow_median": [
+            1.167724609375,
+            -0.4894706606864929
+          ]
+        },
+        {
+          "from": 4,
+          "to": 5,
+          "status": "estimated",
+          "observed_anchors": 94097,
+          "known_flow_median": [
+            -1.5717909336090088,
+            0.9042655825614929
+          ]
+        },
+        {
+          "from": 5,
+          "to": 4,
+          "status": "estimated",
+          "observed_anchors": 94871,
+          "known_flow_median": [
+            1.5660126209259033,
+            -0.9337941408157349
+          ]
+        },
+        {
+          "from": 5,
+          "to": 6,
+          "status": "estimated",
+          "observed_anchors": 110765,
+          "known_flow_median": [
+            -0.8238099217414856,
+            0.5379811525344849
+          ]
+        },
+        {
+          "from": 6,
+          "to": 5,
+          "status": "estimated",
+          "observed_anchors": 111921,
+          "known_flow_median": [
+            0.8379737734794617,
+            -0.5072740912437439
+          ]
+        },
+        {
+          "from": 6,
+          "to": 7,
+          "status": "estimated",
+          "observed_anchors": 99499,
+          "known_flow_median": [
+            -1.2771070003509521,
+            0.3512621223926544
+          ]
+        },
+        {
+          "from": 7,
+          "to": 6,
+          "status": "estimated",
+          "observed_anchors": 99828,
+          "known_flow_median": [
+            1.2621350288391113,
+            -0.3999330699443817
+          ]
+        },
+        {
+          "from": 7,
+          "to": 8,
+          "status": "estimated",
+          "observed_anchors": 106727,
+          "known_flow_median": [
+            -0.30415546894073486,
+            0.09491365402936935
+          ]
+        },
+        {
+          "from": 8,
+          "to": 7,
+          "status": "estimated",
+          "observed_anchors": 107112,
+          "known_flow_median": [
+            0.31498950719833374,
+            -0.10776276886463165
+          ]
+        },
+        {
+          "from": 8,
+          "to": 9,
+          "status": "estimated",
+          "observed_anchors": 102891,
+          "known_flow_median": [
+            -0.42927423119544983,
+            -0.1320154368877411
+          ]
+        },
+        {
+          "from": 9,
+          "to": 8,
+          "status": "estimated",
+          "observed_anchors": 103736,
+          "known_flow_median": [
+            0.43165117502212524,
+            0.1232316642999649
+          ]
+        },
+        {
+          "from": 9,
+          "to": 10,
+          "status": "estimated",
+          "observed_anchors": 102824,
+          "known_flow_median": [
+            -0.4729059934616089,
+            -0.1440470814704895
+          ]
+        },
+        {
+          "from": 10,
+          "to": 9,
+          "status": "estimated",
+          "observed_anchors": 102807,
+          "known_flow_median": [
+            0.46312618255615234,
+            0.16109727323055267
+          ]
+        },
+        {
+          "from": 10,
+          "to": 11,
+          "status": "estimated",
+          "observed_anchors": 103970,
+          "known_flow_median": [
+            -0.4867478013038635,
+            -0.09662792086601257
+          ]
+        },
+        {
+          "from": 11,
+          "to": 10,
+          "status": "estimated",
+          "observed_anchors": 103552,
+          "known_flow_median": [
+            0.48207733035087585,
+            0.08592548221349716
+          ]
+        },
+        {
+          "from": 11,
+          "to": 12,
+          "status": "estimated",
+          "observed_anchors": 111335,
+          "known_flow_median": [
+            -0.21561983227729797,
+            -0.01690930314362049
+          ]
+        },
+        {
+          "from": 12,
+          "to": 11,
+          "status": "estimated",
+          "observed_anchors": 111867,
+          "known_flow_median": [
+            0.2121523916721344,
+            0.0028355938848108053
+          ]
+        },
+        {
+          "from": 12,
+          "to": 13,
+          "status": "estimated",
+          "observed_anchors": 109441,
+          "known_flow_median": [
+            0.02633081004023552,
+            0.06849228590726852
+          ]
+        },
+        {
+          "from": 13,
+          "to": 12,
+          "status": "estimated",
+          "observed_anchors": 110489,
+          "known_flow_median": [
+            -0.02815810963511467,
+            -0.07963366061449051
+          ]
+        },
+        {
+          "from": 13,
+          "to": 14,
+          "status": "estimated",
+          "observed_anchors": 114090,
+          "known_flow_median": [
+            -0.03427013382315636,
+            0.0383928120136261
+          ]
+        },
+        {
+          "from": 14,
+          "to": 13,
+          "status": "estimated",
+          "observed_anchors": 115828,
+          "known_flow_median": [
+            0.02185424044728279,
+            -0.04436085373163223
+          ]
+        },
+        {
+          "from": 14,
+          "to": 15,
+          "status": "estimated",
+          "observed_anchors": 101742,
+          "known_flow_median": [
+            0.6639878153800964,
+            0.5572450757026672
+          ]
+        },
+        {
+          "from": 15,
+          "to": 14,
+          "status": "estimated",
+          "observed_anchors": 102056,
+          "known_flow_median": [
+            -0.6722507476806641,
+            -0.5516984462738037
+          ]
+        },
+        {
+          "from": 15,
+          "to": 16,
+          "status": "estimated",
+          "observed_anchors": 115101,
+          "known_flow_median": [
+            0.26593732833862305,
+            0.5402237772941589
+          ]
+        },
+        {
+          "from": 16,
+          "to": 15,
+          "status": "estimated",
+          "observed_anchors": 115464,
+          "known_flow_median": [
+            -0.264339804649353,
+            -0.5604817867279053
+          ]
+        },
+        {
+          "from": 16,
+          "to": 17,
+          "status": "estimated",
+          "observed_anchors": 104568,
+          "known_flow_median": [
+            0.3876991868019104,
+            0.6897003650665283
+          ]
+        },
+        {
+          "from": 17,
+          "to": 16,
+          "status": "estimated",
+          "observed_anchors": 104881,
+          "known_flow_median": [
+            -0.3819648325443268,
+            -0.6891953349113464
+          ]
+        },
+        {
+          "from": 17,
+          "to": 18,
+          "status": "estimated",
+          "observed_anchors": 104596,
+          "known_flow_median": [
+            0.39296865463256836,
+            0.4438486397266388
+          ]
+        },
+        {
+          "from": 18,
+          "to": 17,
+          "status": "estimated",
+          "observed_anchors": 105309,
+          "known_flow_median": [
+            -0.39702263474464417,
+            -0.4710208475589752
+          ]
+        },
+        {
+          "from": 18,
+          "to": 19,
+          "status": "estimated",
+          "observed_anchors": 107083,
+          "known_flow_median": [
+            -0.44928377866744995,
+            -0.1857452094554901
+          ]
+        },
+        {
+          "from": 19,
+          "to": 18,
+          "status": "estimated",
+          "observed_anchors": 107217,
+          "known_flow_median": [
+            0.45591428875923157,
+            0.14388933777809143
+          ]
+        },
+        {
+          "from": 19,
+          "to": 20,
+          "status": "estimated",
+          "observed_anchors": 105605,
+          "known_flow_median": [
+            -0.4984910488128662,
+            -0.11546744406223297
+          ]
+        },
+        {
+          "from": 20,
+          "to": 19,
+          "status": "estimated",
+          "observed_anchors": 104090,
+          "known_flow_median": [
+            0.5061643123626709,
+            0.10928849875926971
+          ]
+        },
+        {
+          "from": 20,
+          "to": 21,
+          "status": "estimated",
+          "observed_anchors": 101257,
+          "known_flow_median": [
+            -1.16934335231781,
+            -0.08699053525924683
+          ]
+        },
+        {
+          "from": 21,
+          "to": 20,
+          "status": "estimated",
+          "observed_anchors": 101667,
+          "known_flow_median": [
+            1.179503321647644,
+            0.08090320229530334
+          ]
+        },
+        {
+          "from": 21,
+          "to": 22,
+          "status": "estimated",
+          "observed_anchors": 97622,
+          "known_flow_median": [
+            -1.393188714981079,
+            0.015928074717521667
+          ]
+        },
+        {
+          "from": 22,
+          "to": 21,
+          "status": "estimated",
+          "observed_anchors": 98327,
+          "known_flow_median": [
+            1.398013710975647,
+            -0.04391566663980484
+          ]
+        },
+        {
+          "from": 22,
+          "to": 23,
+          "status": "estimated",
+          "observed_anchors": 99973,
+          "known_flow_median": [
+            -1.6783137321472168,
+            0.014014005661010742
+          ]
+        },
+        {
+          "from": 23,
+          "to": 22,
+          "status": "estimated",
+          "observed_anchors": 99993,
+          "known_flow_median": [
+            1.668889045715332,
+            -0.03908240795135498
+          ]
+        },
+        {
+          "from": 23,
+          "to": 24,
+          "status": "estimated",
+          "observed_anchors": 101740,
+          "known_flow_median": [
+            -0.40712204575538635,
+            0.10928232967853546
+          ]
+        },
+        {
+          "from": 24,
+          "to": 23,
+          "status": "estimated",
+          "observed_anchors": 102893,
+          "known_flow_median": [
+            0.4154147207736969,
+            -0.12959930300712585
+          ]
+        },
+        {
+          "from": 24,
+          "to": 25,
+          "status": "estimated",
+          "observed_anchors": 98149,
+          "known_flow_median": [
+            -1.4195667505264282,
+            0.0899496078491211
+          ]
+        },
+        {
+          "from": 25,
+          "to": 24,
+          "status": "estimated",
+          "observed_anchors": 95774,
+          "known_flow_median": [
+            1.4289638996124268,
+            -0.09617092460393906
+          ]
+        },
+        {
+          "from": 25,
+          "to": 26,
+          "status": "estimated",
+          "observed_anchors": 102748,
+          "known_flow_median": [
+            -0.9207909107208252,
+            0.2899671792984009
+          ]
+        },
+        {
+          "from": 26,
+          "to": 25,
+          "status": "estimated",
+          "observed_anchors": 102412,
+          "known_flow_median": [
+            0.9239603877067566,
+            -0.3109537363052368
+          ]
+        },
+        {
+          "from": 26,
+          "to": 27,
+          "status": "estimated",
+          "observed_anchors": 99781,
+          "known_flow_median": [
+            -0.933713436126709,
+            0.4409366846084595
+          ]
+        },
+        {
+          "from": 27,
+          "to": 26,
+          "status": "estimated",
+          "observed_anchors": 100457,
+          "known_flow_median": [
+            0.9276041984558105,
+            -0.44781801104545593
+          ]
+        },
+        {
+          "from": 27,
+          "to": 28,
+          "status": "estimated",
+          "observed_anchors": 98843,
+          "known_flow_median": [
+            -1.0468508005142212,
+            0.4257507920265198
+          ]
+        },
+        {
+          "from": 28,
+          "to": 27,
+          "status": "estimated",
+          "observed_anchors": 100057,
+          "known_flow_median": [
+            1.0272401571273804,
+            -0.4768010973930359
+          ]
+        },
+        {
+          "from": 28,
+          "to": 29,
+          "status": "estimated",
+          "observed_anchors": 99078,
+          "known_flow_median": [
+            -0.894554853439331,
+            0.9366995096206665
+          ]
+        },
+        {
+          "from": 29,
+          "to": 28,
+          "status": "estimated",
+          "observed_anchors": 99723,
+          "known_flow_median": [
+            0.8907657265663147,
+            -0.936346173286438
+          ]
+        },
+        {
+          "from": 29,
+          "to": 30,
+          "status": "estimated",
+          "observed_anchors": 96807,
+          "known_flow_median": [
+            -0.626925528049469,
+            0.9646070599555969
+          ]
+        },
+        {
+          "from": 30,
+          "to": 29,
+          "status": "estimated",
+          "observed_anchors": 96036,
+          "known_flow_median": [
+            0.6299009323120117,
+            -0.9776020050048828
+          ]
+        },
+        {
+          "from": 30,
+          "to": 31,
+          "status": "estimated",
+          "observed_anchors": 97951,
+          "known_flow_median": [
+            0.19860538840293884,
+            1.2355057001113892
+          ]
+        },
+        {
+          "from": 31,
+          "to": 30,
+          "status": "estimated",
+          "observed_anchors": 98744,
+          "known_flow_median": [
+            -0.19456154108047485,
+            -1.2300796508789062
+          ]
+        }
+      ],
+      "per_frame": [
+        {
+          "frame": 0,
+          "selected": 8134,
+          "contributed": 3445,
+          "donor_frames": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 1,
+          "selected": 7805,
+          "contributed": 3360,
+          "donor_frames": [
+            0,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 2,
+          "selected": 6656,
+          "contributed": 2944,
+          "donor_frames": [
+            1,
+            0,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 3,
+          "selected": 5924,
+          "contributed": 2750,
+          "donor_frames": [
+            2,
+            1,
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 4,
+          "selected": 6141,
+          "contributed": 3124,
+          "donor_frames": [
+            3,
+            2,
+            1,
+            0,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 5,
+          "selected": 6373,
+          "contributed": 3436,
+          "donor_frames": [
+            4,
+            3,
+            2,
+            1,
+            0,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 6,
+          "selected": 5999,
+          "contributed": 2957,
+          "donor_frames": [
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 7,
+          "selected": 6454,
+          "contributed": 2321,
+          "donor_frames": [
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 8,
+          "selected": 4816,
+          "contributed": 1834,
+          "donor_frames": [
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 9,
+          "selected": 5168,
+          "contributed": 1836,
+          "donor_frames": [
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 10,
+          "selected": 5585,
+          "contributed": 1026,
+          "donor_frames": [
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 11,
+          "selected": 4464,
+          "contributed": 649,
+          "donor_frames": [
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 12,
+          "selected": 3880,
+          "contributed": 335,
+          "donor_frames": [
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 13,
+          "selected": 2442,
+          "contributed": 99,
+          "donor_frames": [
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 14,
+          "selected": 2790,
+          "contributed": 90,
+          "donor_frames": [
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 15,
+          "selected": 3596,
+          "contributed": 75,
+          "donor_frames": [
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 16,
+          "selected": 2367,
+          "contributed": 351,
+          "donor_frames": [
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 17,
+          "selected": 1856,
+          "contributed": 797,
+          "donor_frames": [
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 18,
+          "selected": 1638,
+          "contributed": 130,
+          "donor_frames": [
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 19,
+          "selected": 3982,
+          "contributed": 353,
+          "donor_frames": [
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 20,
+          "selected": 4131,
+          "contributed": 941,
+          "donor_frames": [
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 21,
+          "selected": 2647,
+          "contributed": 831,
+          "donor_frames": [
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 22,
+          "selected": 2232,
+          "contributed": 486,
+          "donor_frames": [
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 23,
+          "selected": 3062,
+          "contributed": 579,
+          "donor_frames": [
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 24,
+          "selected": 3616,
+          "contributed": 1254,
+          "donor_frames": [
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 25,
+          "selected": 4182,
+          "contributed": 1431,
+          "donor_frames": [
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 26,
+          "selected": 3355,
+          "contributed": 1012,
+          "donor_frames": [
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 27,
+          "selected": 4387,
+          "contributed": 1861,
+          "donor_frames": [
+            26,
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 28,
+          "selected": 5531,
+          "contributed": 3182,
+          "donor_frames": [
+            27,
+            26,
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 29,
+          "selected": 6383,
+          "contributed": 2580,
+          "donor_frames": [
+            28,
+            27,
+            26,
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 30,
+          "selected": 7778,
+          "contributed": 3112,
+          "donor_frames": [
+            29,
+            28,
+            27,
+            26,
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            31
+          ]
+        },
+        {
+          "frame": 31,
+          "selected": 7927,
+          "contributed": 3414,
+          "donor_frames": [
+            30,
+            29,
+            28,
+            27,
+            26,
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0
+          ]
+        }
+      ],
+      "contributed_pixels": 52595,
+      "selected_pixels": 151301,
+      "outside_mask_changed_pixels": 0,
+      "source_alpha_exact": true,
+      "hidden_motion_verified": false,
+      "full_video_temporal_quality_accepted": false,
+      "product_integrated": false
+    },
+    "observation_availability_fraction": 0.3476183237387724,
+    "natural_removal_truth_available": false,
+    "natural_removal_psnr_reported": false,
+    "target_mask_grow": 4,
+    "exclusion_mask_grow": 8,
+    "contacts": [
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\natural-contact-1.png",
+        "sha256": "sha256:eb23e42585d3ab6d8c727ef35df7a5e34abdd822f9c66d86f9a61510391ed540",
+        "frames": [
+          0,
+          4,
+          8,
+          12,
+          13,
+          16,
+          17
+        ]
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\natural-contact-2.png",
+        "sha256": "sha256:0b728e05ae7608d827df837a605d479a4d000aac378f08c682127ab2fb95bab4",
+        "frames": [
+          21,
+          25,
+          26,
+          29,
+          30,
+          31
+        ]
+      }
+    ]
+  },
+  "real_picture_holdout": {
+    "truth_kind": "original-real-video-pixels-before-artificial-magenta-occluder",
+    "truth_is_not_human_removal_ground_truth": true,
+    "baseline": "OpenCV-Telea-radius-5",
+    "wall": {
+      "selected_pixels": 70720,
+      "contributed_pixels": 65030,
+      "observation_availability_fraction": 0.9195418552036199,
+      "masked_mse_before": 178.54890177224735,
+      "masked_mse_after": 63.416204751131225,
+      "masked_psnr_before_db": 25.613231776116926,
+      "masked_psnr_after_db": 30.108801134789765,
+      "contributed_mse": 53.688256702034955,
+      "availability_is_not_accuracy": true
+    },
+    "bed": {
+      "selected_pixels": 29256,
+      "contributed_pixels": 24696,
+      "observation_availability_fraction": 0.8441345365053322,
+      "masked_mse_before": 293.94255309452194,
+      "masked_mse_after": 215.1669629021967,
+      "masked_psnr_before_db": 23.448178988633877,
+      "masked_psnr_after_db": 24.80304771060885,
+      "contributed_mse": 175.22883597883597,
+      "availability_is_not_accuracy": true
+    },
+    "combined": {
+      "selected_pixels": 99976,
+      "contributed_pixels": 89726,
+      "observation_availability_fraction": 0.8974753940945827,
+      "masked_mse_before": 212.31657264410126,
+      "masked_mse_after": 107.82306420207516,
+      "masked_psnr_before_db": 24.860964659625104,
+      "masked_psnr_after_db": 27.803686910719808,
+      "contributed_mse": 87.14083617531894,
+      "availability_is_not_accuracy": true
+    },
+    "artifact": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\holdout.npz",
+    "artifact_sha256": "sha256:2b0434a737d660c8d21fd7b355e553eaf04a7a47c2a9559de56b853506af0eab",
+    "report": {
+      "algorithm": "erased-background-dis-ns-flow-nearest-agreeing-reference-v1",
+      "frames": 32,
+      "width": 512,
+      "height": 288,
+      "scene_cuts": [],
+      "min_donors": 3,
+      "max_spread": 10.0,
+      "owned_array_estimate_bytes": 754974720,
+      "budget_scope": "conservative-owned-array-estimate-excludes-inputs-opencv-internals-total-process-ram",
+      "edges": [
+        {
+          "from": 0,
+          "to": 1,
+          "status": "estimated",
+          "observed_anchors": 92758,
+          "known_flow_median": [
+            -1.8847429752349854,
+            1.0905896425247192
+          ]
+        },
+        {
+          "from": 1,
+          "to": 0,
+          "status": "estimated",
+          "observed_anchors": 93710,
+          "known_flow_median": [
+            1.8833203315734863,
+            -1.0890042781829834
+          ]
+        },
+        {
+          "from": 1,
+          "to": 2,
+          "status": "estimated",
+          "observed_anchors": 89714,
+          "known_flow_median": [
+            -1.8552531003952026,
+            0.7795792818069458
+          ]
+        },
+        {
+          "from": 2,
+          "to": 1,
+          "status": "estimated",
+          "observed_anchors": 90108,
+          "known_flow_median": [
+            1.8541895151138306,
+            -0.7712197303771973
+          ]
+        },
+        {
+          "from": 2,
+          "to": 3,
+          "status": "estimated",
+          "observed_anchors": 97156,
+          "known_flow_median": [
+            -1.850724458694458,
+            1.037061333656311
+          ]
+        },
+        {
+          "from": 3,
+          "to": 2,
+          "status": "estimated",
+          "observed_anchors": 99012,
+          "known_flow_median": [
+            1.847974419593811,
+            -1.0727672576904297
+          ]
+        },
+        {
+          "from": 3,
+          "to": 4,
+          "status": "estimated",
+          "observed_anchors": 95953,
+          "known_flow_median": [
+            -1.1802557706832886,
+            0.48347601294517517
+          ]
+        },
+        {
+          "from": 4,
+          "to": 3,
+          "status": "estimated",
+          "observed_anchors": 95160,
+          "known_flow_median": [
+            1.168074131011963,
+            -0.47481441497802734
+          ]
+        },
+        {
+          "from": 4,
+          "to": 5,
+          "status": "estimated",
+          "observed_anchors": 90475,
+          "known_flow_median": [
+            -1.558487057685852,
+            0.8860428333282471
+          ]
+        },
+        {
+          "from": 5,
+          "to": 4,
+          "status": "estimated",
+          "observed_anchors": 91415,
+          "known_flow_median": [
+            1.5535316467285156,
+            -0.9149932265281677
+          ]
+        },
+        {
+          "from": 5,
+          "to": 6,
+          "status": "estimated",
+          "observed_anchors": 106591,
+          "known_flow_median": [
+            -0.8252306580543518,
+            0.5400039553642273
+          ]
+        },
+        {
+          "from": 6,
+          "to": 5,
+          "status": "estimated",
+          "observed_anchors": 107770,
+          "known_flow_median": [
+            0.8366761207580566,
+            -0.5056912302970886
+          ]
+        },
+        {
+          "from": 6,
+          "to": 7,
+          "status": "estimated",
+          "observed_anchors": 96083,
+          "known_flow_median": [
+            -1.2710886001586914,
+            0.36400407552719116
+          ]
+        },
+        {
+          "from": 7,
+          "to": 6,
+          "status": "estimated",
+          "observed_anchors": 96355,
+          "known_flow_median": [
+            1.2580671310424805,
+            -0.4022518992424011
+          ]
+        },
+        {
+          "from": 7,
+          "to": 8,
+          "status": "estimated",
+          "observed_anchors": 103113,
+          "known_flow_median": [
+            -0.29648664593696594,
+            0.08885237574577332
+          ]
+        },
+        {
+          "from": 8,
+          "to": 7,
+          "status": "estimated",
+          "observed_anchors": 103400,
+          "known_flow_median": [
+            0.3081260919570923,
+            -0.10503526777029037
+          ]
+        },
+        {
+          "from": 8,
+          "to": 9,
+          "status": "estimated",
+          "observed_anchors": 100059,
+          "known_flow_median": [
+            -0.42325180768966675,
+            -0.1316109597682953
+          ]
+        },
+        {
+          "from": 9,
+          "to": 8,
+          "status": "estimated",
+          "observed_anchors": 100793,
+          "known_flow_median": [
+            0.4258849620819092,
+            0.1269182711839676
+          ]
+        },
+        {
+          "from": 9,
+          "to": 10,
+          "status": "estimated",
+          "observed_anchors": 101162,
+          "known_flow_median": [
+            -0.46549734473228455,
+            -0.146493062376976
+          ]
+        },
+        {
+          "from": 10,
+          "to": 9,
+          "status": "estimated",
+          "observed_anchors": 100893,
+          "known_flow_median": [
+            0.45365917682647705,
+            0.16028191149234772
+          ]
+        },
+        {
+          "from": 10,
+          "to": 11,
+          "status": "estimated",
+          "observed_anchors": 100318,
+          "known_flow_median": [
+            -0.47975096106529236,
+            -0.09195301681756973
+          ]
+        },
+        {
+          "from": 11,
+          "to": 10,
+          "status": "estimated",
+          "observed_anchors": 99813,
+          "known_flow_median": [
+            0.4683340787887573,
+            0.08190640807151794
+          ]
+        },
+        {
+          "from": 11,
+          "to": 12,
+          "status": "estimated",
+          "observed_anchors": 108784,
+          "known_flow_median": [
+            -0.20517629384994507,
+            -0.014824094250798225
+          ]
+        },
+        {
+          "from": 12,
+          "to": 11,
+          "status": "estimated",
+          "observed_anchors": 109479,
+          "known_flow_median": [
+            0.20111045241355896,
+            0.0042392536997795105
+          ]
+        },
+        {
+          "from": 12,
+          "to": 13,
+          "status": "estimated",
+          "observed_anchors": 106889,
+          "known_flow_median": [
+            0.02490832284092903,
+            0.0723007395863533
+          ]
+        },
+        {
+          "from": 13,
+          "to": 12,
+          "status": "estimated",
+          "observed_anchors": 107979,
+          "known_flow_median": [
+            -0.02873111516237259,
+            -0.08416558802127838
+          ]
+        },
+        {
+          "from": 13,
+          "to": 14,
+          "status": "estimated",
+          "observed_anchors": 110333,
+          "known_flow_median": [
+            -0.03012946993112564,
+            0.04629622772336006
+          ]
+        },
+        {
+          "from": 14,
+          "to": 13,
+          "status": "estimated",
+          "observed_anchors": 112058,
+          "known_flow_median": [
+            0.01783073879778385,
+            -0.04968472570180893
+          ]
+        },
+        {
+          "from": 14,
+          "to": 15,
+          "status": "estimated",
+          "observed_anchors": 99078,
+          "known_flow_median": [
+            0.6754553318023682,
+            0.5222779512405396
+          ]
+        },
+        {
+          "from": 15,
+          "to": 14,
+          "status": "estimated",
+          "observed_anchors": 99154,
+          "known_flow_median": [
+            -0.6832804679870605,
+            -0.514735221862793
+          ]
+        },
+        {
+          "from": 15,
+          "to": 16,
+          "status": "estimated",
+          "observed_anchors": 111125,
+          "known_flow_median": [
+            0.27436238527297974,
+            0.5193774104118347
+          ]
+        },
+        {
+          "from": 16,
+          "to": 15,
+          "status": "estimated",
+          "observed_anchors": 111592,
+          "known_flow_median": [
+            -0.2733612060546875,
+            -0.5319061279296875
+          ]
+        },
+        {
+          "from": 16,
+          "to": 17,
+          "status": "estimated",
+          "observed_anchors": 100441,
+          "known_flow_median": [
+            0.3825782835483551,
+            0.6859098672866821
+          ]
+        },
+        {
+          "from": 17,
+          "to": 16,
+          "status": "estimated",
+          "observed_anchors": 100796,
+          "known_flow_median": [
+            -0.3787459433078766,
+            -0.6911118626594543
+          ]
+        },
+        {
+          "from": 17,
+          "to": 18,
+          "status": "estimated",
+          "observed_anchors": 101349,
+          "known_flow_median": [
+            0.4000437259674072,
+            0.444597989320755
+          ]
+        },
+        {
+          "from": 18,
+          "to": 17,
+          "status": "estimated",
+          "observed_anchors": 102236,
+          "known_flow_median": [
+            -0.4026143550872803,
+            -0.47233012318611145
+          ]
+        },
+        {
+          "from": 18,
+          "to": 19,
+          "status": "estimated",
+          "observed_anchors": 103276,
+          "known_flow_median": [
+            -0.4458206295967102,
+            -0.17054876685142517
+          ]
+        },
+        {
+          "from": 19,
+          "to": 18,
+          "status": "estimated",
+          "observed_anchors": 103251,
+          "known_flow_median": [
+            0.45546138286590576,
+            0.12559494376182556
+          ]
+        },
+        {
+          "from": 19,
+          "to": 20,
+          "status": "estimated",
+          "observed_anchors": 102396,
+          "known_flow_median": [
+            -0.49152079224586487,
+            -0.11210295557975769
+          ]
+        },
+        {
+          "from": 20,
+          "to": 19,
+          "status": "estimated",
+          "observed_anchors": 100846,
+          "known_flow_median": [
+            0.49434715509414673,
+            0.1092948317527771
+          ]
+        },
+        {
+          "from": 20,
+          "to": 21,
+          "status": "estimated",
+          "observed_anchors": 96935,
+          "known_flow_median": [
+            -1.1701300144195557,
+            -0.09270276874303818
+          ]
+        },
+        {
+          "from": 21,
+          "to": 20,
+          "status": "estimated",
+          "observed_anchors": 97264,
+          "known_flow_median": [
+            1.178957462310791,
+            0.08146613836288452
+          ]
+        },
+        {
+          "from": 21,
+          "to": 22,
+          "status": "estimated",
+          "observed_anchors": 90040,
+          "known_flow_median": [
+            -1.3853824138641357,
+            0.016097694635391235
+          ]
+        },
+        {
+          "from": 22,
+          "to": 21,
+          "status": "estimated",
+          "observed_anchors": 90623,
+          "known_flow_median": [
+            1.3879361152648926,
+            -0.03835748881101608
+          ]
+        },
+        {
+          "from": 22,
+          "to": 23,
+          "status": "estimated",
+          "observed_anchors": 97447,
+          "known_flow_median": [
+            -1.6613515615463257,
+            0.017103873193264008
+          ]
+        },
+        {
+          "from": 23,
+          "to": 22,
+          "status": "estimated",
+          "observed_anchors": 97232,
+          "known_flow_median": [
+            1.658419132232666,
+            -0.04344813898205757
+          ]
+        },
+        {
+          "from": 23,
+          "to": 24,
+          "status": "estimated",
+          "observed_anchors": 98459,
+          "known_flow_median": [
+            -0.4065527319908142,
+            0.11902210116386414
+          ]
+        },
+        {
+          "from": 24,
+          "to": 23,
+          "status": "estimated",
+          "observed_anchors": 99578,
+          "known_flow_median": [
+            0.41541898250579834,
+            -0.1400107890367508
+          ]
+        },
+        {
+          "from": 24,
+          "to": 25,
+          "status": "estimated",
+          "observed_anchors": 94703,
+          "known_flow_median": [
+            -1.4221707582473755,
+            0.07872600853443146
+          ]
+        },
+        {
+          "from": 25,
+          "to": 24,
+          "status": "estimated",
+          "observed_anchors": 92489,
+          "known_flow_median": [
+            1.428065299987793,
+            -0.08612125366926193
+          ]
+        },
+        {
+          "from": 25,
+          "to": 26,
+          "status": "estimated",
+          "observed_anchors": 98405,
+          "known_flow_median": [
+            -0.9206027388572693,
+            0.2791444957256317
+          ]
+        },
+        {
+          "from": 26,
+          "to": 25,
+          "status": "estimated",
+          "observed_anchors": 98282,
+          "known_flow_median": [
+            0.9209027290344238,
+            -0.3014788329601288
+          ]
+        },
+        {
+          "from": 26,
+          "to": 27,
+          "status": "estimated",
+          "observed_anchors": 95714,
+          "known_flow_median": [
+            -0.9256089329719543,
+            0.4256019592285156
+          ]
+        },
+        {
+          "from": 27,
+          "to": 26,
+          "status": "estimated",
+          "observed_anchors": 96356,
+          "known_flow_median": [
+            0.9215641021728516,
+            -0.4468510150909424
+          ]
+        },
+        {
+          "from": 27,
+          "to": 28,
+          "status": "estimated",
+          "observed_anchors": 94064,
+          "known_flow_median": [
+            -1.048384189605713,
+            0.4139634370803833
+          ]
+        },
+        {
+          "from": 28,
+          "to": 27,
+          "status": "estimated",
+          "observed_anchors": 95017,
+          "known_flow_median": [
+            1.0304356813430786,
+            -0.46715545654296875
+          ]
+        },
+        {
+          "from": 28,
+          "to": 29,
+          "status": "estimated",
+          "observed_anchors": 94428,
+          "known_flow_median": [
+            -0.8937071561813354,
+            0.9245486259460449
+          ]
+        },
+        {
+          "from": 29,
+          "to": 28,
+          "status": "estimated",
+          "observed_anchors": 95355,
+          "known_flow_median": [
+            0.8881675004959106,
+            -0.9279669523239136
+          ]
+        },
+        {
+          "from": 29,
+          "to": 30,
+          "status": "estimated",
+          "observed_anchors": 93872,
+          "known_flow_median": [
+            -0.6210708618164062,
+            0.9489646553993225
+          ]
+        },
+        {
+          "from": 30,
+          "to": 29,
+          "status": "estimated",
+          "observed_anchors": 93031,
+          "known_flow_median": [
+            0.6210196614265442,
+            -0.9679951071739197
+          ]
+        },
+        {
+          "from": 30,
+          "to": 31,
+          "status": "estimated",
+          "observed_anchors": 94984,
+          "known_flow_median": [
+            0.1975213885307312,
+            1.2259161472320557
+          ]
+        },
+        {
+          "from": 31,
+          "to": 30,
+          "status": "estimated",
+          "observed_anchors": 95876,
+          "known_flow_median": [
+            -0.19288380444049835,
+            -1.2137843370437622
+          ]
+        }
+      ],
+      "per_frame": [
+        {
+          "frame": 0,
+          "selected": 3155,
+          "contributed": 3080,
+          "donor_frames": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 1,
+          "selected": 3155,
+          "contributed": 3063,
+          "donor_frames": [
+            0,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 2,
+          "selected": 3155,
+          "contributed": 3035,
+          "donor_frames": [
+            1,
+            0,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 3,
+          "selected": 3155,
+          "contributed": 3024,
+          "donor_frames": [
+            2,
+            1,
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 4,
+          "selected": 3155,
+          "contributed": 3017,
+          "donor_frames": [
+            3,
+            2,
+            1,
+            0,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 5,
+          "selected": 3155,
+          "contributed": 2988,
+          "donor_frames": [
+            4,
+            3,
+            2,
+            1,
+            0,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 6,
+          "selected": 3155,
+          "contributed": 2975,
+          "donor_frames": [
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 7,
+          "selected": 3155,
+          "contributed": 3001,
+          "donor_frames": [
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 8,
+          "selected": 3155,
+          "contributed": 2963,
+          "donor_frames": [
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 9,
+          "selected": 3155,
+          "contributed": 2906,
+          "donor_frames": [
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 10,
+          "selected": 3155,
+          "contributed": 2895,
+          "donor_frames": [
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 11,
+          "selected": 3155,
+          "contributed": 2917,
+          "donor_frames": [
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 12,
+          "selected": 3155,
+          "contributed": 2902,
+          "donor_frames": [
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 13,
+          "selected": 3155,
+          "contributed": 2895,
+          "donor_frames": [
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 14,
+          "selected": 3071,
+          "contributed": 2648,
+          "donor_frames": [
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 15,
+          "selected": 3155,
+          "contributed": 2693,
+          "donor_frames": [
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 16,
+          "selected": 3155,
+          "contributed": 2717,
+          "donor_frames": [
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 17,
+          "selected": 3121,
+          "contributed": 2749,
+          "donor_frames": [
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 18,
+          "selected": 3155,
+          "contributed": 2702,
+          "donor_frames": [
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 19,
+          "selected": 3155,
+          "contributed": 2571,
+          "donor_frames": [
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 20,
+          "selected": 3155,
+          "contributed": 2676,
+          "donor_frames": [
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 21,
+          "selected": 3155,
+          "contributed": 2844,
+          "donor_frames": [
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 22,
+          "selected": 3155,
+          "contributed": 2931,
+          "donor_frames": [
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 23,
+          "selected": 3155,
+          "contributed": 2847,
+          "donor_frames": [
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 24,
+          "selected": 3155,
+          "contributed": 2738,
+          "donor_frames": [
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 25,
+          "selected": 3155,
+          "contributed": 2682,
+          "donor_frames": [
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 26,
+          "selected": 3155,
+          "contributed": 2672,
+          "donor_frames": [
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 27,
+          "selected": 3155,
+          "contributed": 2671,
+          "donor_frames": [
+            26,
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 28,
+          "selected": 3155,
+          "contributed": 2680,
+          "donor_frames": [
+            27,
+            26,
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 29,
+          "selected": 2824,
+          "contributed": 2417,
+          "donor_frames": [
+            28,
+            27,
+            26,
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            30,
+            31
+          ]
+        },
+        {
+          "frame": 30,
+          "selected": 3155,
+          "contributed": 2652,
+          "donor_frames": [
+            29,
+            28,
+            27,
+            26,
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,
+            31
+          ]
+        },
+        {
+          "frame": 31,
+          "selected": 2620,
+          "contributed": 2175,
+          "donor_frames": [
+            30,
+            29,
+            28,
+            27,
+            26,
+            25,
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0
+          ]
+        }
+      ],
+      "contributed_pixels": 89726,
+      "selected_pixels": 99976,
+      "outside_mask_changed_pixels": 0,
+      "source_alpha_exact": true,
+      "hidden_motion_verified": false,
+      "full_video_temporal_quality_accepted": false,
+      "product_integrated": false
+    },
+    "contacts": [
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\holdout-contact-1.png",
+        "sha256": "sha256:f0db0a4ab2d2c881dcc3d1b2c41389d85f7e98f3a54d6543849ba011f20e66e9",
+        "frames": [
+          0,
+          8,
+          16,
+          24,
+          31
+        ]
+      }
+    ]
+  },
+  "production_source_sha256_before": {
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:1e6f09ef25adf2615dfeab098ac92660d28b827d425a77708ae08308fd319b8f",
+    "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+    "product/src/ai_ad_editor/cli.py": "sha256:8295b261bf8fce867e77893c4fbd74686658cddde69f7323a3f187e2e809c324",
+    "product/src/ai_ad_editor/convert.py": "sha256:9cbdcbde37e01e4c97be36cc5e741f1962a269451828a4ec32577464bfbb44ed",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+    "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+    "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+    "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:ae9626cc7a1037979a5bfa81a03e9d1ed28a8fbf44921c892810f2d0f9424080",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:bb5540b39997d353f81a6c23672b3af5d852a3a461afc36772c3581de9947dd8",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+    "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+    "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+    "product/tests/test_cli.py": "sha256:845fcfe25d3413f83ee572d89b1b96e500f2ee73ebdf71623ae3955300e5266f",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+    "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vace.py": "sha256:a2227a49c43a233b73ed354681a39a03924d9ed0588749eda7df198c2c43807b",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "scripts/create_lama_fixture.py": "sha256:67c273fe4f72766e60ed7aae7f3ef81b19199b56d2b5dfb70dfc6581fc9ecb63",
+    "scripts/smoke_audio_separation.py": "sha256:9c7c664d2b5dadf18e272382816466efa3b527a358db4205b165d62f9a4eb63d",
+    "scripts/smoke_lama_local.py": "sha256:3d3084852625332f9e336e30fae3cb2a23d5cd8bbcd0ad67838265deecd2ddd1",
+    "scripts/smoke_rvm_local.py": "sha256:963faf3c7012ff6785e64559201275be3792ed7ef9c65876a7c8331921595df1",
+    "scripts/smoke_soulx_local.py": "sha256:de90794c2f2e105925cc6f75aa3ecde8b744c6b500162c99d35a761d7b62a92e",
+    "scripts/smoke_tracking_geometry.py": "sha256:07c6889a0c5eb74ac243115da3bc2854edc81b23291779811e2cbe18df0a3586",
+    "scripts/smoke_whisper_local.py": "sha256:136cb4d27c8425b593175bde5be53cf16efcb098e24897ef55be96a1611e2852",
+    "scripts/smoke_yolo_local.py": "sha256:c930222d099c3f28ad8429a67c7474ecf82f92884a86b845d8222004b195c326"
+  },
+  "production_source_sha256_after": {
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:1e6f09ef25adf2615dfeab098ac92660d28b827d425a77708ae08308fd319b8f",
+    "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+    "product/src/ai_ad_editor/cli.py": "sha256:8295b261bf8fce867e77893c4fbd74686658cddde69f7323a3f187e2e809c324",
+    "product/src/ai_ad_editor/convert.py": "sha256:9cbdcbde37e01e4c97be36cc5e741f1962a269451828a4ec32577464bfbb44ed",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+    "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+    "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+    "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:ae9626cc7a1037979a5bfa81a03e9d1ed28a8fbf44921c892810f2d0f9424080",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:bb5540b39997d353f81a6c23672b3af5d852a3a461afc36772c3581de9947dd8",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+    "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+    "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+    "product/tests/test_cli.py": "sha256:845fcfe25d3413f83ee572d89b1b96e500f2ee73ebdf71623ae3955300e5266f",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+    "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vace.py": "sha256:a2227a49c43a233b73ed354681a39a03924d9ed0588749eda7df198c2c43807b",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "scripts/create_lama_fixture.py": "sha256:67c273fe4f72766e60ed7aae7f3ef81b19199b56d2b5dfb70dfc6581fc9ecb63",
+    "scripts/smoke_audio_separation.py": "sha256:9c7c664d2b5dadf18e272382816466efa3b527a358db4205b165d62f9a4eb63d",
+    "scripts/smoke_lama_local.py": "sha256:3d3084852625332f9e336e30fae3cb2a23d5cd8bbcd0ad67838265deecd2ddd1",
+    "scripts/smoke_rvm_local.py": "sha256:963faf3c7012ff6785e64559201275be3792ed7ef9c65876a7c8331921595df1",
+    "scripts/smoke_soulx_local.py": "sha256:de90794c2f2e105925cc6f75aa3ecde8b744c6b500162c99d35a761d7b62a92e",
+    "scripts/smoke_tracking_geometry.py": "sha256:07c6889a0c5eb74ac243115da3bc2854edc81b23291779811e2cbe18df0a3586",
+    "scripts/smoke_whisper_local.py": "sha256:136cb4d27c8425b593175bde5be53cf16efcb098e24897ef55be96a1611e2852",
+    "scripts/smoke_yolo_local.py": "sha256:c930222d099c3f28ad8429a67c7474ecf82f92884a86b845d8222004b195c326"
+  },
+  "production_source_matches_completed_363_regression": true,
+  "research_source_sha256": {
+    "research/temporal-background/flow_core.py": "sha256:9f6bbc483be62e80e93a20690deec05e1a936f293c29c240578bc28c80d4d0cf",
+    "research/temporal-background/run_probe.py": "sha256:070a82ac1a168305ac900c646dec265027bbdc33ecc4544c8d190ee0c19bce0f",
+    "research/temporal-background/test_flow_core.py": "sha256:ff3626fc186abde234ba01458b5f42d64fdb2ad67b2f28ee1f89e26bf09828fe"
+  },
+  "product_integrated": false,
+  "continuous_playback_reviewed": false,
+  "full_jianying_parity_accepted": false,
+  "manual_review": {
+    "reviewed_at_utc": "2026-10-16T05:02:43.512236+00:00",
+    "kind": "sampled-contact-sheets-at-original-resolution",
+    "natural_frames": [
+      0,
+      4,
+      8,
+      12,
+      13,
+      16,
+      17,
+      21,
+      25,
+      26,
+      29,
+      30,
+      31
+    ],
+    "holdout_frames": [
+      0,
+      8,
+      16,
+      24,
+      31
+    ],
+    "synthetic_frames": [
+      0,
+      5,
+      11
+    ],
+    "observations": [
+      "独立平移纹理中，大部分选区出现真实纹理，但修复边界仍有可见平滑或错位，非像素精确重建。",
+      "真实画面人工遮挡的墙纸条纹较 Telea 连续，床单部分线条得到恢复；局部边缘、条纹相位和床单变形仍不等于真值。",
+      "自然男孩移除仅部分墙面/床面得到观测纹理；腿状残留、床单涂抹、局部接缝仍存在，不能作为完整自然修复交付。",
+      "所有结论来自抽帧，未完成持续播放或长期时序复核。"
+    ],
+    "product_candidate_accepted": false,
+    "natural_removal_quality_accepted": false,
+    "continuous_playback_reviewed": false,
+    "full_jianying_parity_accepted": false,
+    "contact_sha256": [
+      "sha256:0d0a2a4b8d3db886c2d12c00ac48b363ef29dba5e8dfdaec4807d4339b2425a3",
+      "sha256:eb23e42585d3ab6d8c727ef35df7a5e34abdd822f9c66d86f9a61510391ed540",
+      "sha256:0b728e05ae7608d827df837a605d479a4d000aac378f08c682127ab2fb95bab4",
+      "sha256:f0db0a4ab2d2c881dcc3d1b2c41389d85f7e98f3a54d6543849ba011f20e66e9"
+    ]
+  },
+  "manual_review_sha256": "sha256:2cc803562f8b2aac000241a57145148e5ddb04cba293be46c1068418da266c0f",
+  "bilinear_footprint_mutation": {
+    "mutation": "replace exact bilinear all-known footprint with >0.999",
+    "original_core_sha256": "sha256:9f6bbc483be62e80e93a20690deec05e1a936f293c29c240578bc28c80d4d0cf",
+    "test_source_sha256": "sha256:ff3626fc186abde234ba01458b5f42d64fdb2ad67b2f28ee1f89e26bf09828fe",
+    "mutant_sha256": "sha256:6f85f83af49b843897f7d3eb2e8a31247e00d4eecf1f9818d0372724a5af4021",
+    "exit_code": 1,
+    "expected_test_failure": true,
+    "log_sha256": "sha256:03e7b6ffdd39221c08dcf7008f6a752a01b3c83bcdf0dd7cdb5fc140c99cf883",
+    "log": "test_forbidden_bilinear_corner_is_rejected_exactly (test_flow_core.FlowResearchTests.test_forbidden_bilinear_corner_is_rejected_exactly) ... FAIL\r\n\r\n======================================================================\r\nFAIL: test_forbidden_bilinear_corner_is_rejected_exactly (test_flow_core.FlowResearchTests.test_forbidden_bilinear_corner_is_rejected_exactly)\r\n----------------------------------------------------------------------\r\nTraceback (most recent call last):\r\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\flow-corner-mutation-20261016\\test_flow_core.py\", line 51, in test_forbidden_bilinear_corner_is_rejected_exactly\r\n    np.testing.assert_array_equal(result[0, 15, 15, :3], [50, 50, 50])\r\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\numpy\\testing\\_private\\utils.py\", line 1121, in assert_array_equal\r\n    assert_array_compare(operator.__eq__, actual, desired, err_msg=err_msg,\r\n    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n                         verbose=verbose, header='Arrays are not equal',\r\n                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n                         strict=strict)\r\n                         ^^^^^^^^^^^^^^\r\n  File \"D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\numpy\\testing\\_private\\utils.py\", line 983, in assert_array_compare\r\n    raise AssertionError(msg)\r\nAssertionError: \r\nArrays are not equal\r\n\r\nMismatched elements: 3 / 3 (100%)\r\nMismatch at indices:\r\n [0]: 60 (ACTUAL), 50 (DESIRED)\r\n [1]: 60 (ACTUAL), 50 (DESIRED)\r\n [2]: 60 (ACTUAL), 50 (DESIRED)\r\nMax absolute difference among violations: 10\r\nMax relative difference among violations: 0.2\r\n ACTUAL: array([60, 60, 60], dtype=uint8)\r\n DESIRED: array([50, 50, 50])\r\n\r\n----------------------------------------------------------------------\r\nRan 1 test in 0.191s\r\n\r\nFAILED (failures=1)\r\n"
+  },
+  "independent_holdout_temporal_error": {
+    "wall": {
+      "shared_selected_pixel_pairs": 60450,
+      "consecutive_error_delta_mae_before": 6.009296894073486,
+      "consecutive_error_delta_mae_after": 4.390146255493164,
+      "scope": "same-canvas adjacent error against unoccluded original video; not motion-compensated flicker or viewing acceptance"
+    },
+    "bed": {
+      "shared_selected_pixel_pairs": 21903,
+      "consecutive_error_delta_mae_before": 12.77366828918457,
+      "consecutive_error_delta_mae_after": 11.207551002502441,
+      "scope": "same-canvas adjacent error against unoccluded original video; not motion-compensated flicker or viewing acceptance"
+    },
+    "selected": {
+      "shared_selected_pixel_pairs": 82353,
+      "consecutive_error_delta_mae_before": 7.808382034301758,
+      "consecutive_error_delta_mae_after": 6.203336238861084,
+      "scope": "same-canvas adjacent error against unoccluded original video; not motion-compensated flicker or viewing acceptance"
+    }
+  },
+  "final_verification": {
+    "checked_at_utc": "2026-10-16T05:02:44.347424+00:00",
+    "research_files_frozen": 3,
+    "production_files_unchanged": 89,
+    "input_hashes_verified": 4,
+    "artifact_hashes_verified": 7,
+    "checked_artifacts": [
+      "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\synthetic.npz",
+      "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\synthetic-contact-1.png",
+      "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\natural.npz",
+      "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\natural-contact-1.png",
+      "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\natural-contact-2.png",
+      "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\holdout.npz",
+      "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\repair-observed-plate-flow-final-v2-20261016\\holdout-contact-1.png"
+    ],
+    "base_commit": "a2ed3fdd66c17fe342d54acf87b05bc398f8e8da"
+  },
+  "evidence_collector_sha256": "sha256:064922cd4a4feadda0c2dee52e24864d22739b30f783a1a37504e61673d19c89",
+  "evidence_collector_source": "from pathlib import Path\nfrom datetime import datetime,timezone,timedelta\nimport hashlib,json,subprocess\nimport numpy as np\nroot=Path(__file__).resolve().parents[2];folder=root/'workspace/repair-observed-plate-flow-final-v2-20261016'\ndef read(p):return json.loads(Path(p).read_text(encoding='utf-8-sig'))\ndef sha(p):return 'sha256:'+hashlib.sha256(Path(p).read_bytes()).hexdigest()\ndef save(p,v):Path(p).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8',newline='\\n')\nd=read(folder/'summary.json');assert d['status']=='research-completed-quality-unaccepted' and d['independent_research_tests']['count']==10 and d['independent_research_tests']['exit_code']==0\nassert d['production_source_sha256_before']==d['production_source_sha256_after']==read(root/'docs/validation/evidence/repair-blend-smoke-20261016.json')['implementation_sha256']\nfor files in [d['production_source_sha256_after'],d['research_source_sha256']]:\n for path,value in files.items():assert sha(root/path)==value,(path,value)\nchecked=[]\nfor name in ['synthetic','natural_removal','real_picture_holdout']:\n case=d[name];assert sha(case['artifact'])==case['artifact_sha256'];checked.append(case['artifact'])\n for c in case['contacts']:assert sha(c['path'])==c['sha256'];checked.append(c['path'])\nfor record in d['inputs'].values():assert sha(record['path'])==record['sha256']\nmutant=read(root/'product/.runtime/flow-corner-mutation-20261016/summary.json');assert mutant['expected_test_failure'] and mutant['exit_code']==1\nassert mutant['original_core_sha256']==d['research_source_sha256']['research/temporal-background/flow_core.py'] and mutant['test_source_sha256']==d['research_source_sha256']['research/temporal-background/test_flow_core.py']\nreview={'reviewed_at_utc':datetime.now(timezone.utc).isoformat(),'kind':'sampled-contact-sheets-at-original-resolution',\n 'natural_frames':[0,4,8,12,13,16,17,21,25,26,29,30,31],'holdout_frames':[0,8,16,24,31],'synthetic_frames':[0,5,11],\n 'observations':['独立平移纹理中，大部分选区出现真实纹理，但修复边界仍有可见平滑或错位，非像素精确重建。','真实画面人工遮挡的墙纸条纹较 Telea 连续，床单部分线条得到恢复；局部边缘、条纹相位和床单变形仍不等于真值。','自然男孩移除仅部分墙面/床面得到观测纹理；腿状残留、床单涂抹、局部接缝仍存在，不能作为完整自然修复交付。','所有结论来自抽帧，未完成持续播放或长期时序复核。'],\n 'product_candidate_accepted':False,'natural_removal_quality_accepted':False,'continuous_playback_reviewed':False,'full_jianying_parity_accepted':False,\n 'contact_sha256':[c['sha256'] for k in ['synthetic','natural_removal','real_picture_holdout'] for c in d[k]['contacts']]}\nsave(folder/'manual-review.json',review)\nwith np.load(d['real_picture_holdout']['artifact'],allow_pickle=False) as a:\n err=a['output'][:,:,:,:3].astype(np.float32)-a['truth'][:,:,:,:3].astype(np.float32)\n old=a['fallback'][:,:,:,:3].astype(np.float32)-a['truth'][:,:,:,:3].astype(np.float32)\n temporal={}\n for name in ['wall','bed','selected']:\n  selection=a[name];shared=selection[1:]&selection[:-1]\n  temporal[name]={'shared_selected_pixel_pairs':int(shared.sum()),'consecutive_error_delta_mae_before':float(np.abs(old[1:]-old[:-1])[shared].mean()),'consecutive_error_delta_mae_after':float(np.abs(err[1:]-err[:-1])[shared].mean()),'scope':'same-canvas adjacent error against unoccluded original video; not motion-compensated flicker or viewing acceptance'}\nd.update(manual_review=review,manual_review_sha256=sha(folder/'manual-review.json'),bilinear_footprint_mutation=mutant,independent_holdout_temporal_error=temporal,\n final_verification={'checked_at_utc':datetime.now(timezone.utc).isoformat(),'research_files_frozen':len(d['research_source_sha256']),'production_files_unchanged':len(d['production_source_sha256_after']),'input_hashes_verified':len(d['inputs']),'artifact_hashes_verified':len(checked),'checked_artifacts':checked,'base_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()},\n evidence_collector_sha256=sha(__file__),evidence_collector_source=Path(__file__).read_text(encoding='utf-8-sig'))\nevidence=root/'docs/validation/evidence/temporal-background-flow-20261016.json';save(evidence,d)\ns=d['synthetic']['metrics'];n=d['natural_removal'];h=d['real_picture_holdout'];wall=h['wall'];bed=h['bed'];both=h['combined']\nreport=f\"\"\"# 本地光流背景传播与遮挡真值实测\n\n| 项目 | 内容 |\n|---|---|\n| 文档编号 | VALIDATION-TEMPORAL-BACKGROUND-001 |\n| 状态 | 有效 |\n| 日期 | 2026-10-16，Asia/Taipei |\n| 关联差异 | #56；研究验证，不关闭自然修复和完整剪映对标 |\n| 产品状态 | 研究代码可重复执行；尚未接入正式 media inpaint、模型登记或发布管线 |\n\n## 1. 本轮问题与实现\n\n前序同画布中位数复用造成碎斑和接缝。本轮在 [flow_core.py](../../research/temporal-background/flow_core.py) 实现背景光流、未知区运动补全和已观测参考传播；[run_probe.py](../../research/temporal-background/run_probe.py) 是本地诊断 CLI，[独立检查](../../research/temporal-background/test_flow_core.py)固定了真值、遮挡排除及失败边界。输入是已有原视频、修复蒙版、所有禁用供体前景的联合蒙版、已有 LaMa harmonic 输出；本轮没有再次运行 SAM2、LaMa、VACE 或其他学习模型。\n\n源 RGB 在选区/排除前景内先抹除，灰度 Telea 仅为 DIS 输入提供连续值；双向 DIS 在已观测背景中筛选锚点，以 Navier–Stokes 方法补全未知光流。流场按相邻帧合成，拒绝越界、显式切镜、距可靠背景过远或双向不一致的映射。候选参考的双线性采样足迹必须全部来自未排除且不透明的像素，至少 3 个颜色接近的供体才复用最近参考；小于 64 像素的分量拒绝，并只在选区内羽化。合成平移样例显式使用至少 2 个供体。\n\n双向一致和颜色一致仍可能同时接受错误的隐藏运动；没有深度、物理表面或学习式光流补全。供体贡献比例仅是可用率，不能充当正确率；羽化也会混入已有 fallback，不保证每个贡献像素等于原供体字节。\n\n## 2. 独立检查与完整性\n\n10/10 研究检查通过：解析零运动纹理重建、禁止双线性角点、被排除 RGB 扰动不变、从未可见区拒绝、显式切镜隔离、alpha/不透明供体限制、全前景拒绝、预算前置、非法参数/形状/非有限流场及取消回调。变异检查把足迹准入改为 >0.999，固定角点测试按预期失败；因为单个无效角点可能只有 1/1024 的插值权重，近似 1 的阈值不能证明足迹完全干净。\n\n最终研究的 3 份 Python 代码在执行前后摘要相同；输入 4 文件、输出 NPZ 和联系表已逐项复核。生产/测试/烟测共 89 份 Python 与已通过 363/363 的上一轮源码完全一致；本轮没有重新运行完整产品回归，也不把研究 10 项相加为 373 项产品回归。详见[本轮机器证据](./evidence/temporal-background-flow-20261016.json)和[上一轮产品证据](./evidence/repair-blend-smoke-20261016.json)。\n\n| 检查 | 结果 | 证据边界 |\n|---|---|---|\n| 研究独立检查 | 10/10；足迹变异检查预期 exit 1 | 单独研究测试，非产品接入/模型画质验收 |\n| 原生环境 | Python、OpenCV {d['runtime']['opencv']}、NumPy {d['runtime']['numpy']}，CPU 4 线程 | 沿用已有本机安装，不装包、不下载模型、不启 Docker/WSL/浏览器 |\n| 网络 | Python audit guard 在 OpenCV 导入前安装，阻断事件 0 | 不代表系统防火墙或完整环境供应链核验 |\n| 保留语义 | 三组最终运行均蒙版外 RGBA 和全部 alpha 精确保留 | 对已归一化输入帧；未做编码、音频、入轨和发布管线 |\n| 执行耗时 | 三组与 10 项检查合计 {d['seconds']:.3f} 秒 | 单次诊断，含解码/输出；非 P50/P95 或模型性能基准 |\n| 数组预算 | 自有数组保守估算 WH×(128N+1024)，32×512×288 为 720 MiB；预算 1024 MiB | 排除输入、OpenCV 内部、总进程 RAM；不是实际峰值，也非长视频流式实现 |\n\n## 3. 可复现真值结果\n\n| 样例 | 真值与基线 | masked PSNR 前→后 | 供体贡献/选区 | 结论 |\n|---|---|---|---|---|\n| 12 帧平移纹理 | seed 42 的独立纹理先平移，再覆盖移动品红块；灰色 fallback | {s['masked_psnr_before_db']:.3f}→{s['masked_psnr_after_db']:.3f} dB | {s['contributed_pixels']:,}/{s['selected_pixels']:,} | 有明显重建改善，边界仍有误差 |\n| 32 帧真实墙面 | 原画面先保存为真值，再覆盖人工色块；Telea 半径 5 fallback | {wall['masked_psnr_before_db']:.3f}→{wall['masked_psnr_after_db']:.3f} dB | {wall['contributed_pixels']:,}/{wall['selected_pixels']:,} | 条纹比逐帧 Telea 连续，仍非精确真值 |\n| 同段真实床单 | 同上，在床面另加移动色块；人物排除区不计入选区 | {bed['masked_psnr_before_db']:.3f}→{bed['masked_psnr_after_db']:.3f} dB | {bed['contributed_pixels']:,}/{bed['selected_pixels']:,} | 改善有限；非刚性表面/遮挡仍未解决 |\n| 墙面＋床单合计 | 同一个 32 帧运行的两个区域，非另增语料 | {both['masked_psnr_before_db']:.3f}→{both['masked_psnr_after_db']:.3f} dB | {both['contributed_pixels']:,}/{both['selected_pixels']:,} | 仅人工遮挡任务，不是移除真实人物的真值 |\n\n独立人工遮挡真值只在最后评分使用，没有进入光流或参考合成。真实床单来自一段自然视频，墙面和床单是同一个源片段，不能算两个独立广告场景。抽看合成 0/5/11 帧及真实遮挡 0/8/16/24/31 帧，仍见边界、纹理相位或形变差异；没有连续播放验收。\n\n## 4. 自然人物移除\n\n沿用已保存的源、目标与双人排除蒙版、LaMa harmonic 输出，32 帧 512×288@8，不运行任何新模型。{n['report']['selected_pixels']:,} 个选区像素中，{n['report']['contributed_pixels']:,} 个有观测参考贡献，约 {n['observation_availability_fraction']*100:.4f}%；该比率不是恢复正确率。\n\n抽看 13 帧：部分被移除人物背后的墙纸线条比 LaMa 模糊区域完整，部分床面也有观测纹理；腿状残留、床单涂抹、碎片式贡献和局部接缝仍在。**自然修复整体画质未通过，不接入生产**。无人物移除背景真值，不给自然移除 PSNR；不能用上一节人工色块任务的分数代替。研究不改变原始蒙版外像素，现有选区之外的残留也不会自动消失。\n\n## 5. 本地复现与下一步\n\n先将以下 JSON 的四个字段填为已有本地视频路径，保存至项目内独立输入清单；源/蒙版/fallback 的帧数、显示尺寸和帧率必须一致，alpha 蒙版采用 >127.5，目标 grow 4、供体排除 grow 8。真实画面 holdout profile 固定为本报告使用的 512×288 样例；其他画幅会拒绝，不推断画布或 VFR 时钟。\n\n```json\n{{\n  \"source\": \"E:/media/source.mov\",\n  \"target_mask\": \"E:/media/selected_object.mov\",\n  \"exclusion_mask\": \"E:/media/all_foreground.mov\",\n  \"fallback\": \"E:/media/existing_repair.mov\"\n}}\n```\n\n```powershell\n& '<已有原生Python.exe>' -I -B -X utf8 research/temporal-background/run_probe.py `\n  --input-manifest '<项目内输入清单.json>' `\n  --output-root '<项目内尚不存在的输出目录>' `\n  --array-budget-mib 1024\n```\n\n原生 Python 须已有 OpenCV/numpy/Pillow；脚本使用项目已有本地 FFmpeg，不安装任何包。`--scene-cut-frame` 可重复，表示输出零基帧之前切镜。研究批次 2..65 帧、每帧至多 1,048,576 像素，按显式预算提前拒绝；长视频窗口/重叠拼接、资源总量、取消文件/超时、模型登记、Rights Ledger、媒体入轨和正式 CLI 均须在产品接入前另行实现并验收。\n\n下一步优先补强隐藏运动/非刚性形变的置信度与时序一致的参考选择，分别验证选区完整性、真实遮挡和未观测区域。当前方法具备运动补偿和真值改善证据，但不足以作为剪映级对象移除内核；差异 #56 及完整功能/效果、开放素材库、性能和发行目标继续有效。\n\n## 6. 原始依据与许可选择\n\nDIS 接口、空间传播和质量/速度参数见 [OpenCV 5.0 官方文档](https://docs.opencv.org/5.0/main_modules/classcv_1_1DISOpticalFlow.html)，图像修复 API 见 [OpenCV 官方说明](https://docs.opencv.org/4.13.0/df/d3d/tutorial_py_inpainting.html)。本轮使用既有 OpenCV 的公开算法接口和自行编写的研究代码，未复制 ProPainter 实现、未调用线上服务。ProPainter 官方仓库明确仅限非商业用途，因此不将其作为开放广告内核基础；见[官方许可声明](https://github.com/sczhou/ProPainter#license)。本段是本轮选型依据，不是对第三方权重、素材或输出的商业授权证明。\n\"\"\"\nreport_path=root/'docs/validation/本地光流背景传播与遮挡真值实测_2026-10-16.md';report_path.write_text(report,encoding='utf-8',newline='\\n')\nprint(json.dumps({'evidence':str(evidence),'research_tests':10,'seconds':d['seconds'],'wall_psnr':wall['masked_psnr_after_db'],'bed_psnr':bed['masked_psnr_after_db'],'product_integrated':False,'production_sources_unchanged':len(d['production_source_sha256_after']),'temporal_error':temporal},ensure_ascii=False))\n"
+}
