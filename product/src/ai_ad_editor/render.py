@@ -1833,6 +1833,7 @@ def _subtitle_filter(
     animation_alpha: list[str] | None = None,
     layout_evidence: dict[str, Any] | None = None,
     dynamic_raster: bool = False,
+    paint_text: Callable[[list[str]], str] | None = None,
 ) -> str | None:
     if not isinstance(subtitle, dict):
         return None
@@ -1863,6 +1864,7 @@ def _subtitle_filter(
         return None
     if subtitle.get("text") is None:
         return None
+    draw = paint_text or (lambda options: ':'.join(options))
     style = subtitle.get("style") if isinstance(subtitle.get("style"), dict) else {}
     source_subtitle_text = str(subtitle.get("text"))
     subtitle_text = source_subtitle_text
@@ -1977,8 +1979,8 @@ def _subtitle_filter(
                     from .text_highlight import multiline_filter
                     return multiline_filter(root, resolved_font_path, font_size,
                                             build_text_layout(source_subtitle_text, style, font_metrics, font_size),
-                                            style, base_parts, base_x, base_y)[0]
-                return ':'.join(base_parts)
+                                            style, base_parts, base_x, base_y, paint_text)[0]
+                return draw(base_parts)
             if resolved_font_path is None:
                 raise AppError('SUBTITLE_WORD_FONT_REQUIRED', '逐字高亮需要明确的本地字体文件', exit_code=2)
             if subtitle.get('animation') or style.get('animation'):
@@ -2000,6 +2002,7 @@ def _subtitle_filter(
                 selected_ranges, timed, base_parts, active_parts,
                 base_x, base_y, time_expression, clip_start, clip_id,
                 window_expression if timeline_window else None,
+                paint_text,
             )
             if layout_evidence is not None:
                 layout_evidence.update(evidence)
@@ -2055,7 +2058,7 @@ def _subtitle_filter(
                 char_parts.append(f"enable={_expr_arg(enable_expr)}")
                 if style.get("box", True):
                     char_parts.extend(["box=1", f"boxcolor={_quoted(style.get('boxcolor', 'black@0.45'))}", f"boxborderw={box_border}"])
-                char_filters.append(":".join(char_parts))
+                char_filters.append(draw(char_parts))
                 prefix_text += char
             return ",".join(char_filters)
         elif animation_type == "pop":
@@ -2084,11 +2087,11 @@ def _subtitle_filter(
         y = next(part[3:-1] for part in parts if part.startswith("y='"))
         value, evidence = multiline_filter(root, resolved_font_path, font_size,
                                             build_text_layout(source_subtitle_text, style, font_metrics, font_size),
-                                            style, parts, x, y)
+                                            style, parts, x, y, paint_text)
         if layout_evidence is not None:
             layout_evidence.update(evidence)
         return value
-    return ":".join(parts)
+    return draw(parts)
 
 
 def _compiled_subtitle_filter(
@@ -2105,14 +2108,24 @@ def _compiled_subtitle_filter(
         raise AppError('SUBTITLE_ASSET_TIME_BASE_INVALID', 'asset_time_base 只支持 sequence 或 clip', exit_code=2)
     author_start = clock['authored_start_seconds']
     author_duration = clock['authored_duration_seconds']
+    isolated_raster = independent or not dynamic_raster
+    external = bool(subtitle.get('asset_uri'))
+    straight_paint = isolated_raster and not external
     animation_alpha: list[str] = []
     layout_evidence: dict[str, Any] = {}
+    paint_records: list[dict[str, Any]] = []
+    def paint_text(parts: list[str]) -> str:
+        from .text_paint import paint_drawtext
+        result, evidence = paint_drawtext(root, parts, f'{clip.get("id")}-{len(paint_records)}')
+        paint_records.append(evidence)
+        return result
     value = _subtitle_filter(
         root, subtitle, warnings, str(clip.get('id')), author_start, author_duration,
         timeline_window=independent, rotation_supported=independent, assets=assets,
         time_expression=_subtitle_authored_expression(clock), visible_window=(start, duration),
         animation_alpha=animation_alpha,
         layout_evidence=layout_evidence, dynamic_raster=dynamic_raster and not independent,
+        paint_text=paint_text if straight_paint else None,
     )
     if value and animation_alpha and dynamic_raster and not independent:
         # FFmpeg's implicit format converters pin the first geometry in a
@@ -2126,8 +2139,6 @@ def _compiled_subtitle_filter(
                          'feature': 'subtitle_inline_dynamic_alpha',
                          'message': '动态尺寸片段的嵌入文字保留原作者时钟，但透明度仍为原生 drawtext 近似；需使用独立字幕层并单独验收'})
         animation_alpha = []
-    isolated_raster = independent or not dynamic_raster
-    external = bool(subtitle.get('asset_uri'))
     if value and external:
         relative = time_base == 'clip'
         if clock['maps'] or relative:
@@ -2149,7 +2160,8 @@ def _compiled_subtitle_filter(
             value += (",format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a="
                       + _expr_arg(f'alpha(X,Y)*({window})') + ',format=rgba')
     if value and isolated_raster:
-        value += ',format=gbrapf32le,unpremultiply=inplace=1,format=rgba'
+        if not straight_paint:
+            value += ',format=gbrapf32le,unpremultiply=inplace=1,format=rgba'
         if animation_alpha:
             opacity = '*'.join(f'({expression})' for expression in animation_alpha)
             value += (",format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a="
@@ -2170,6 +2182,14 @@ def _compiled_subtitle_filter(
              'continuous_playback_reviewed': False}
     if layout_evidence:
         clock['text_layout'] = layout_evidence
+    if value and straight_paint:
+        clock['text_paint'] = {'engine': 'straight-component-source-over', 'paints': paint_records,
+                               'working_color': 'encoded-rgb-8bit', 'linear_light_accepted': False}
+    elif value and not external and not isolated_raster:
+        clock['text_paint'] = {'engine': 'legacy-dynamic-inline-drawtext', 'color_alpha_accepted': False}
+        warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
+                         'feature': 'subtitle_inline_dynamic_color',
+                         'message': '动态尺寸内嵌文字沿用原生 drawtext 颜色混合；颜色/透明度组合未验收，请使用独立文字层'})
     if value and clock.get('freeze_semantics_approximate'):
         warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
                          'feature': 'subtitle_freeze_clock',

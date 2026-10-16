@@ -2274,7 +2274,9 @@ print(json.dumps({
             code, result = invoke("render", "--project", str(project), "--publish", "--output", str(output))
             self.assertEqual(code, 0, result)
             self.assertTrue(output.exists())
-            self.assertEqual(result["data"]["warnings"], [])
+            warnings = result["data"]["warnings"]
+            self.assertEqual([item["feature"] for item in warnings], ["subtitle_inline_dynamic_color"])
+            self.assertEqual(warnings[0]["code"], "RENDER_FEATURE_APPROXIMATE")
 
     def test_extended_effects_and_typewriter_subtitle_render(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-effects-extended-") as raw:

@@ -1,0 +1,38 @@
+test_arbitrary_rgb_stays_straight (test_text_paint.TextPaintTests.test_arbitrary_rgb_stays_straight) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:74: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  alpha = max(image.getchannel('A').getdata())
+E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:75: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  return alpha, [p for p in image.getdata() if p[3] == alpha]
+ok
+test_border_and_shadow_alpha_are_not_squared (test_text_paint.TextPaintTests.test_border_and_shadow_alpha_are_not_squared) ... ok
+test_box_alpha_has_independent_coverage (test_text_paint.TextPaintTests.test_box_alpha_has_independent_coverage) ... ok
+test_color_alpha_endpoints_and_quarters (test_text_paint.TextPaintTests.test_color_alpha_endpoints_and_quarters) ... ok
+test_encoded_independent_color_over_dark_and_light (test_text_paint.TextPaintTests.test_encoded_independent_color_over_dark_and_light) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:199: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  for base, white, painted in zip(underlying[5].getdata(), opaque[5].getdata(), actual[5].getdata()):
+ok
+test_encoded_inline_color_over_dark_and_light (test_text_paint.TextPaintTests.test_encoded_inline_color_over_dark_and_light) ... ok
+test_fade_multiplies_color_alpha_after_painting (test_text_paint.TextPaintTests.test_fade_multiplies_color_alpha_after_painting) ... ok
+test_glyph_coverage_multiplies_authored_alpha_once (test_text_paint.TextPaintTests.test_glyph_coverage_multiplies_authored_alpha_once) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:107: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  errors = [abs(a[3] - b[3] * 127/255) for a, b in zip(actual[5].getdata(), control[5].getdata())]
+E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:109: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  edges = [a for a, b in zip(actual[5].getdata(), control[5].getdata()) if 40 < b[3] < 220 and a[3] > 15]
+ok
+test_half_opacity_is_not_squared (test_text_paint.TextPaintTests.test_half_opacity_is_not_squared) ... ok
+test_hex_alpha_and_named_color_agree (test_text_paint.TextPaintTests.test_hex_alpha_and_named_color_agree) ... ok
+test_invalid_and_random_colors_rejected_without_author_mutation (test_text_paint.TextPaintTests.test_invalid_and_random_colors_rejected_without_author_mutation) ... ok
+test_layer_opacity_multiplies_authored_color_alpha (test_text_paint.TextPaintTests.test_layer_opacity_multiplies_authored_color_alpha) ... ok
+test_multiline_color_uses_the_same_coverage (test_text_paint.TextPaintTests.test_multiline_color_uses_the_same_coverage) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:184: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  self.assertLessEqual(max(abs(a[3] - b[3]*63/255) for a,b in zip(actual[4].getdata(), control[4].getdata())), 2)
+E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:185: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  visible = [p for p in actual[4].getdata() if p[3] > 40]
+ok
+test_overlapping_style_components_follow_source_over (test_text_paint.TextPaintTests.test_overlapping_style_components_follow_source_over) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:141: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  masks.append(list(image[5].getchannel('A').getdata()))
+E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:143: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  for i, pixel in enumerate(actual[5].getdata()):
+ok
+test_word_active_alpha_replaces_base_color (test_text_paint.TextPaintTests.test_word_active_alpha_replaces_base_color) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 37.316s
+
+OK

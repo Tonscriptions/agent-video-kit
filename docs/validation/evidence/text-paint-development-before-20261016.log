@@ -1,0 +1,214 @@
+test_arbitrary_rgb_stays_straight (test_text_paint.TextPaintTests.test_arbitrary_rgb_stays_straight) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:66: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  alpha = max(image.getchannel('A').getdata())
+E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:67: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  return alpha, [p for p in image.getdata() if p[3] == alpha]
+FAIL
+test_border_and_shadow_alpha_are_not_squared (test_text_paint.TextPaintTests.test_border_and_shadow_alpha_are_not_squared) ... 
+  test_border_and_shadow_alpha_are_not_squared (test_text_paint.TextPaintTests.test_border_and_shadow_alpha_are_not_squared) (component={'borderw': 4, 'bordercolor': 'red@0.5'}) ... FAIL
+  test_border_and_shadow_alpha_are_not_squared (test_text_paint.TextPaintTests.test_border_and_shadow_alpha_are_not_squared) (component={'shadowx': 8, 'shadowy': 6, 'shadowcolor': 'red@0.5'}) ... FAIL
+test_box_alpha_has_independent_coverage (test_text_paint.TextPaintTests.test_box_alpha_has_independent_coverage) ... FAIL
+test_color_alpha_endpoints_and_quarters (test_text_paint.TextPaintTests.test_color_alpha_endpoints_and_quarters) ... 
+  test_color_alpha_endpoints_and_quarters (test_text_paint.TextPaintTests.test_color_alpha_endpoints_and_quarters) (alpha='0.125') ... FAIL
+  test_color_alpha_endpoints_and_quarters (test_text_paint.TextPaintTests.test_color_alpha_endpoints_and_quarters) (alpha='0.25') ... FAIL
+  test_color_alpha_endpoints_and_quarters (test_text_paint.TextPaintTests.test_color_alpha_endpoints_and_quarters) (alpha='0.75') ... FAIL
+test_encoded_independent_color_over_dark_and_light (test_text_paint.TextPaintTests.test_encoded_independent_color_over_dark_and_light) ... FAIL
+test_encoded_inline_color_over_dark_and_light (test_text_paint.TextPaintTests.test_encoded_inline_color_over_dark_and_light) ... FAIL
+test_fade_multiplies_color_alpha_after_painting (test_text_paint.TextPaintTests.test_fade_multiplies_color_alpha_after_painting) ... FAIL
+test_glyph_coverage_multiplies_authored_alpha_once (test_text_paint.TextPaintTests.test_glyph_coverage_multiplies_authored_alpha_once) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:99: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  errors = [abs(a[3] - b[3] * 127/255) for a, b in zip(actual[5].getdata(), control[5].getdata())]
+FAIL
+test_half_opacity_is_not_squared (test_text_paint.TextPaintTests.test_half_opacity_is_not_squared) ... FAIL
+test_hex_alpha_and_named_color_agree (test_text_paint.TextPaintTests.test_hex_alpha_and_named_color_agree) ... FAIL
+test_invalid_and_random_colors_rejected_without_author_mutation (test_text_paint.TextPaintTests.test_invalid_and_random_colors_rejected_without_author_mutation) ... FAIL
+test_overlapping_style_components_follow_source_over (test_text_paint.TextPaintTests.test_overlapping_style_components_follow_source_over) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:133: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  masks.append(list(image[5].getchannel('A').getdata()))
+E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py:135: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  for i, pixel in enumerate(actual[5].getdata()):
+FAIL
+test_word_active_alpha_replaces_base_color (test_text_paint.TextPaintTests.test_word_active_alpha_replaces_base_color) ... FAIL
+
+======================================================================
+FAIL: test_arbitrary_rgb_stays_straight (test_text_paint.TextPaintTests.test_arbitrary_rgb_stays_straight)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 78, in test_arbitrary_rgb_stays_straight
+    self.assertLessEqual(abs(alpha - 127), 1)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 64 not less than or equal to 1
+
+======================================================================
+FAIL: test_border_and_shadow_alpha_are_not_squared (test_text_paint.TextPaintTests.test_border_and_shadow_alpha_are_not_squared) (component={'borderw': 4, 'bordercolor': 'red@0.5'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 118, in test_border_and_shadow_alpha_are_not_squared
+    self.assertLessEqual(abs(alpha - 127), 1)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 64 not less than or equal to 1
+
+======================================================================
+FAIL: test_border_and_shadow_alpha_are_not_squared (test_text_paint.TextPaintTests.test_border_and_shadow_alpha_are_not_squared) (component={'shadowx': 8, 'shadowy': 6, 'shadowcolor': 'red@0.5'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 118, in test_border_and_shadow_alpha_are_not_squared
+    self.assertLessEqual(abs(alpha - 127), 1)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 64 not less than or equal to 1
+
+======================================================================
+FAIL: test_box_alpha_has_independent_coverage (test_text_paint.TextPaintTests.test_box_alpha_has_independent_coverage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 108, in test_box_alpha_has_independent_coverage
+    self.assertLessEqual(abs(alpha - 127), 1)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 64 not less than or equal to 1
+
+======================================================================
+FAIL: test_color_alpha_endpoints_and_quarters (test_text_paint.TextPaintTests.test_color_alpha_endpoints_and_quarters) (alpha='0.125')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 86, in test_color_alpha_endpoints_and_quarters
+    self.assertLessEqual(abs(alpha - expected), 1)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 28 not less than or equal to 1
+
+======================================================================
+FAIL: test_color_alpha_endpoints_and_quarters (test_text_paint.TextPaintTests.test_color_alpha_endpoints_and_quarters) (alpha='0.25')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 86, in test_color_alpha_endpoints_and_quarters
+    self.assertLessEqual(abs(alpha - expected), 1)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 48 not less than or equal to 1
+
+======================================================================
+FAIL: test_color_alpha_endpoints_and_quarters (test_text_paint.TextPaintTests.test_color_alpha_endpoints_and_quarters) (alpha='0.75')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 86, in test_color_alpha_endpoints_and_quarters
+    self.assertLessEqual(abs(alpha - expected), 1)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 47 not less than or equal to 1
+
+======================================================================
+FAIL: test_encoded_independent_color_over_dark_and_light (test_text_paint.TextPaintTests.test_encoded_independent_color_over_dark_and_light)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 186, in test_encoded_independent_color_over_dark_and_light
+    self.check_composite(independent=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 173, in check_composite
+    underlying, _ = self.render(blank, independent=independent)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 74, in render
+    self.prepare(subtitle, **options)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 44, in prepare
+    self.call('timeline', 'compose', '--project', self.root, '--input', path)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'timeline.compose', 'request_id': 'req_20261016153041_fc7cd2de', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'ARGUMENT_INVALID', 'message': 'update_clip 不允许修改片段 ID', 'path': 'patch', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T15:30:41.747773Z', 'finished_at': '2026-10-16T15:30:41.747779Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_encoded_inline_color_over_dark_and_light (test_text_paint.TextPaintTests.test_encoded_inline_color_over_dark_and_light)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 189, in test_encoded_inline_color_over_dark_and_light
+    self.check_composite(independent=False)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 173, in check_composite
+    underlying, _ = self.render(blank, independent=independent)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 74, in render
+    self.prepare(subtitle, **options)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 44, in prepare
+    self.call('timeline', 'compose', '--project', self.root, '--input', path)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'timeline.compose', 'request_id': 'req_20261016153042_9db7a081', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'ARGUMENT_INVALID', 'message': 'update_clip 不允许修改片段 ID', 'path': 'patch', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T15:30:42.669167Z', 'finished_at': '2026-10-16T15:30:42.669183Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_fade_multiplies_color_alpha_after_painting (test_text_paint.TextPaintTests.test_fade_multiplies_color_alpha_after_painting)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 151, in test_fade_multiplies_color_alpha_after_painting
+    self.assertLessEqual(abs(alpha - 63.5), 1.5)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 32.5 not less than or equal to 1.5
+
+======================================================================
+FAIL: test_glyph_coverage_multiplies_authored_alpha_once (test_text_paint.TextPaintTests.test_glyph_coverage_multiplies_authored_alpha_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 100, in test_glyph_coverage_multiplies_authored_alpha_once
+    self.assertLessEqual(max(errors), 2)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 64.0 not less than or equal to 2
+
+======================================================================
+FAIL: test_half_opacity_is_not_squared (test_text_paint.TextPaintTests.test_half_opacity_is_not_squared)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 72, in test_half_opacity_is_not_squared
+    self.assertLessEqual(abs(alpha - 127), 1)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 64 not less than or equal to 1
+
+======================================================================
+FAIL: test_hex_alpha_and_named_color_agree (test_text_paint.TextPaintTests.test_hex_alpha_and_named_color_agree)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 93, in test_hex_alpha_and_named_color_agree
+    self.assertLessEqual(abs(alpha - 128), 1)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 64 not less than or equal to 1
+
+======================================================================
+FAIL: test_invalid_and_random_colors_rejected_without_author_mutation (test_text_paint.TextPaintTests.test_invalid_and_random_colors_rejected_without_author_mutation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 198, in test_invalid_and_random_colors_rejected_without_author_mutation
+    self.raw(title)
+    ~~~~~~~~^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 60, in raw
+    self.assertEqual(result.returncode, 0, result.stderr.decode('utf-8', 'replace'))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 4294967274 != 0 : [Parsed_drawtext_0 @ 000002959a7936c0] Cannot find color 'not-a-color'
+
+[Parsed_drawtext_0 @ 000002959a7936c0] Unable to parse "fontcolor" option value "not-a-color" as color
+
+[fc#-1 @ 000002959a790a40] Error applying option 'fontcolor' to filter 'drawtext': Invalid argument
+
+Error opening output file pipe:1.
+
+Error opening output files: Invalid argument
+
+
+
+======================================================================
+FAIL: test_overlapping_style_components_follow_source_over (test_text_paint.TextPaintTests.test_overlapping_style_components_follow_source_over)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 144, in test_overlapping_style_components_follow_source_over
+    self.assertLessEqual(maximum, 5)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: 130.0 not less than or equal to 5
+
+======================================================================
+FAIL: test_word_active_alpha_replaces_base_color (test_text_paint.TextPaintTests.test_word_active_alpha_replaces_base_color)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_text_paint.py", line 164, in test_word_active_alpha_replaces_base_color
+    self.assertGreater(len(selected), 30)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 not greater than 30
+
+----------------------------------------------------------------------
+Ran 13 tests in 10.488s
+
+FAILED (failures=16)

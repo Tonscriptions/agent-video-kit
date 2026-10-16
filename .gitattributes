@@ -48,3 +48,9 @@ docs/validation/evidence/word-layout*.log -text -whitespace
 docs/validation/evidence/glyph-dev*.log -text -whitespace
 docs/validation/evidence/word-policy*.log -text -whitespace
 docs/assets/word-layout*/*.txt -whitespace
+
+# Keep captured color/opacity proofs, raw failure logs and font license bytes.
+scripts/smoke_text_paint.py -text
+docs/validation/evidence/*text-paint*.json -text
+docs/validation/evidence/text-paint*.log -text -whitespace
+docs/assets/text-paint-20261016/font-license.txt -whitespace

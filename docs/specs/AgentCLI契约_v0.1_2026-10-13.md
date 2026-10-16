@@ -332,3 +332,7 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 完整 **491/491，887.673 秒**；94 份 Python 产品源码/测试及 1 份 Schema（共 95 份）执行前后字节摘要一致；21 项新增专项为完整套件子集，固定旧版同测 21 方法失败。九组真实旧版/新版/普通字幕对照，632 个新版主帧与 632 个普通对照帧；R/G 轮廓最大差由 51–255 降至 2（阈值 3），逐词激活/串色、源帧与音频脉冲检查均无不匹配。90 次生成 CLI 含 27 次渲染、9 次质量检查，另有 9 次本地策略审计；0 新模型实测推理。受控字体/字幕排版子项通过；自动换行仍由 Pillow 选行，CJK 仅四个确认字形。动态尺寸内嵌高亮显式降级，任意颜色透明度、复杂文字动画、RTL、定格/VFR、群组、自然质量和整体剪映等价未验收。 见[实测与复现](../validation/逐字高亮原生排版与真实成片实测_2026-10-16.md)和[机器证据](../validation/evidence/word-layout-20261016.json)。
 
 无新增顶层 CLI 参数；继续通过 `timeline compose` / `render` 使用 `subtitle.word_timing`。`start_char` 是原文本 Unicode 码点索引。manifest 的 `subtitle_time_mapping.text_layout` 保存原生字体/执行器摘要、协议与布局证据；未知指标拒绝回退，内部时钟不写回项目。RTL、拆分 grapheme、内部连字边界、状态式位置等按[原生排版契约](./逐字高亮原生排版与颜色选择契约_v0.1_2026-10-16.md)结构化拒绝；动态尺寸内嵌高亮明确 warning 并显示普通完整字幕。
+
+## 2026-10-16 V23 文字颜色与透明度
+
+没有新增顶层参数。`subtitle.style` 已有颜色字段由实际本地 FFmpeg 解析并绑定执行器摘要；固定栅格内嵌/独立文字使用组件覆盖率与 straight RGBA。`subtitle_time_mapping.text_paint` 记录引擎、颜色 RGBA、组件顺序和工作色域；动态尺寸内嵌返回 `subtitle_inline_dynamic_color` 近似警告，不能忽略。非法/随机颜色规划阶段返回 `SUBTITLE_COLOR_INVALID` / `SUBTITLE_COLOR_NONDETERMINISTIC`，退出 2，不产出/改写作者时间线及权利；探针异常 `SUBTITLE_COLOR_PROBE_FAILED`。外部 libass 和已有逐词+动画警告保留。见[契约](./文字颜色透明度与独立覆盖率契约_v0.1_2026-10-16.md)、[506 项和真实成片](../validation/文字颜色透明度与实际合成实测_2026-10-16.md)。

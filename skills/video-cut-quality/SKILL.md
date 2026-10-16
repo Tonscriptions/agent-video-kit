@@ -40,7 +40,9 @@ For transparent resampling, compare identical alpha/visible RGB with different
 hidden RGB, and white layers over white with authored dark styles disabled.
 Use a dark-background positive control to prove the layer is present. Ordinary
 scale, affine sampling and alpha dynamic crop use float premultiplied RGB;
-independent text first converts the drawn raster to straight alpha. See the
+fixed-raster inline/independent text paints separate coverage/color components
+and already produces straight alpha. External subtitle files retain their
+separate native raster path. See the
 [alpha contract](../../docs/specs/透明素材重采样与文字Alpha契约_v0.2_2026-10-16.md).
 Inspect final encoded edges and label centers separately. Other effect warps,
 linear-light color, performance and segmentation keep separate review gates.
@@ -111,7 +113,7 @@ trim offsets and final visibility windows. Check source-frame identity and
 external SRT/ASS time base separately from cue pixels; specify a local font.
 Calibrate encoded opacity against actual blank and opaque CLI controls;
 coverage-weighted moments avoid a sparse threshold bias on fading glyphs.
-Keep raw failed checks. Freeze intervals, arbitrary font color alpha, VFR,
+Keep raw failed checks. Freeze intervals, dynamic-raster inline color alpha, VFR,
 continuous playback and listening still require separate acceptance.
 
 For [word colors](../../docs/specs/逐字高亮原生排版与颜色选择契约_v0.1_2026-10-16.md),
@@ -122,8 +124,19 @@ time separately through the blue-channel change, including repeated words,
 line breaks and centered text. Same-color activation must not thicken glyphs;
 an active transparent color must replace, rather than cover, opaque base text.
 Inspect text_layout engine/font fingerprints in the manifest. Native metrics
-do not accept general shaping, automatic wrapping, arbitrary color alpha or a
+do not accept general shaping, automatic wrapping, dynamic-raster color alpha or a
 suppressed dynamic-raster highlight. Preserve explicit rejection/warnings.
+
+For [text color/opacity](../../docs/specs/文字颜色透明度与独立覆盖率契约_v0.1_2026-10-16.md),
+measure the actual blank and opaque component controls and apply independent
+source-over truth. A native semi-transparent drawtext output is not a color
+truth control. Check solid colors, antialiasing coverage and box/shadow/border/
+fill overlaps, then color alpha times fade/layer opacity. Inspect encoded RGB
+over dark and light backgrounds; the current public fixture gate is 6 levels,
+including the opaque-control and RGB/YUV quantization. Check decoded audio
+invariance separately. Retain old failed outputs and raw color/alpha evidence;
+do not infer linear-light/HDR, ASS, very low-alpha precision or broad typography
+quality from this controlled encoded-RGB acceptance.
 
 Run structural and media gates after rendering:
 

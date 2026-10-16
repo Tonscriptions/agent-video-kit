@@ -41,8 +41,9 @@ crop/fit/fill/stretch, transform, mirror and source-time mapping, supply both
 This saves source-clock observations and recompiles them for the render canvas.
 
 Alpha-media ordinary scale, affine rotation and dynamic-size crop interpolate
-premultiplied RGB, then return straight RGBA; independent text also normalizes
-its drawn source. See the [alpha contract](../../docs/specs/透明素材重采样与文字Alpha契约_v0.2_2026-10-16.md).
+premultiplied RGB, then return straight RGBA. Fixed-raster inline/independent
+text builds straight RGBA from opaque component coverage and authored colors.
+See the [alpha contract](../../docs/specs/透明素材重采样与文字Alpha契约_v0.2_2026-10-16.md).
 Alpha fit bars are transparent; opaque dynamic-fit bars stay black. Position/
 anchor clocks are unchanged. Review encoded output; other effect warps, linear
 light, total memory and broad natural quality require separate acceptance.
@@ -83,8 +84,15 @@ spans preserve source ranges. Use literal text and a local font; bidi, split
 graphemes/internal shaping clusters and stateful position expressions are
 rejected during render planning. Dynamic-size inline highlights retain the
 whole sentence and explicitly suppress highlighting; use an independent title.
-Word/animation combinations, overlapping lines and arbitrary color alpha need
-separate acceptance. A render intentionally records outputs
+Fixed-raster style colors use the [coverage/color contract](../../docs/specs/文字颜色透明度与独立覆盖率契约_v0.1_2026-10-16.md).
+Box, shadow, border and fill retain separate opaque glyph coverage, then apply
+each authored color alpha once in that order. Active word color replaces the
+normal paragraph paint, including its opacity. Color alpha, supported fade
+opacity and layer opacity multiply. Review `text_paint` fingerprints and actual
+encoded controls; working color is 8-bit encoded RGB, with integer rounding.
+Random colors are rejected; dynamic-raster inline colors retain an explicit
+approximation. External ASS, linear-light/HDR, word/animation combinations and
+overlapping lines still need separate acceptance. A render intentionally records outputs
 and provenance; compare authored timeline/assets/settings and Rights Ledger
 when checking that generated internal clocks were not persisted.
 

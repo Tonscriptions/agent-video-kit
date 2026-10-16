@@ -13,7 +13,7 @@ import re
 import unicodedata
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from .errors import AppError
 from .media import ffmpeg_path
@@ -166,15 +166,17 @@ def paragraph_alignment(style: dict[str, Any], values: dict[str, Any]) -> tuple[
 
 
 def paint_paragraph(root: Path, layout: TextLayout, style: dict[str, Any], parts: list[str],
-                    metrics: dict[str, dict[str, Any]], values: dict[str, Any], base_x: str, base_y: str) -> str:
+                    metrics: dict[str, dict[str, Any]], values: dict[str, Any], base_x: str, base_y: str,
+                    paint: Callable[[list[str]], str] | None = None) -> str:
     """Paint whole lines at a common paragraph origin/baseline, one box."""
     def text_option(text):
         digest = hashlib.sha256(text.encode('utf-8')).hexdigest()
         path = root/'cache'/'text-paints'/f'{digest}.txt'
         atomic_write_text(path,text)
         return 'drawtext=textfile='+_quoted(path.relative_to(root).as_posix())
+    draw = paint or (lambda options: ':'.join(options))
     if len(layout.lines)==1:
-        return ':'.join([text_option(layout.text), *(p for p in parts[1:] if not p.startswith('expansion=')), 'expansion=none'])
+        return draw([text_option(layout.text), *(p for p in parts[1:] if not p.startswith('expansion=')), 'expansion=none'])
     if style.get('boxw') and float(style['boxw']) < values['text_w'] or style.get('boxh') and float(style['boxh']) < values['text_h']:
         raise AppError('SUBTITLE_PARAGRAPH_BOX_CLIP_UNSUPPORTED','多行文字的显式 boxw/boxh 不能小于完整段落尺寸',exit_code=2)
     x,y=paragraph_origin(base_x,base_y,values,style)
@@ -186,7 +188,7 @@ def paint_paragraph(root: Path, layout: TextLayout, style: dict[str, Any], parts
     filters=[]
     if style.get('box',True):
         background=[p for p in parts[1:] if not re.match(r'(?:x|y|fontcolor|borderw|shadowx|shadowy|fix_bounds|expansion|boxw|boxh)=',p)]
-        filters.append(':'.join([text_option(' '),*background,'fontcolor=white@0','borderw=0','shadowx=0','shadowy=0',
+        filters.append(draw([text_option(' '),*background,'fontcolor=white@0','borderw=0','shadowx=0','shadowy=0',
                                  f'boxw={int(boxw)}',f'boxh={int(style.get("boxh") or values["text_h"])}',
                                  f'x={_quoted(x)}',f'y={_quoted(y)}','fix_bounds=0','expansion=none']))
     step=values['line_h']+int(style.get('line_spacing',0))
@@ -195,18 +197,19 @@ def paint_paragraph(root: Path, layout: TextLayout, style: dict[str, Any], parts
         width=metrics[line.text]['text_w']
         ox=math.trunc((boxw-width)/(2 if center else 1)) if center or right else 0
         offset_y=oy+index*step+values['top_a']-metrics[line.text]['top_a']
-        filters.append(':'.join([text_option(line.text),*common,f'x={_quoted(f"({x})+{ox}")}',
+        filters.append(draw([text_option(line.text),*common,f'x={_quoted(f"({x})+{ox}")}',
                                  f'y={_quoted(f"({y})+{offset_y:.9f}")}', 'box=0','fix_bounds=0','expansion=none']))
     return ','.join(filters)
 
 
 def multiline_filter(root: Path, font: Path, size: int, layout: TextLayout, style: dict[str, Any],
-                     parts: list[str], base_x: str, base_y: str) -> tuple[str, dict[str, Any]]:
+                     parts: list[str], base_x: str, base_y: str,
+                     paint: Callable[[list[str]], str] | None = None) -> tuple[str, dict[str, Any]]:
     if re.search(r'\b(?:rand|random|st|ld|print|metadata|x|y)\b',base_x+' '+base_y):
         raise AppError('SUBTITLE_PARAGRAPH_POSITION_UNSUPPORTED','多行段落需要无状态、无 x/y 互相引用的位置表达式',exit_code=2)
     metrics,evidence=native_metrics(root,font,size,['Mg',*(line.text for line in layout.lines if line.text)],style)
     values=paragraph_metrics(layout,metrics,style)
-    return paint_paragraph(root,layout,style,parts,metrics,values,base_x,base_y),{
+    return paint_paragraph(root,layout,style,parts,metrics,values,base_x,base_y,paint),{
         **evidence,'engine':'drawtext-lines-shared-paragraph-metrics','paragraph_metrics':values,
         'line_count':len(layout.lines),'newline_glyph_painted':False}
 
@@ -214,7 +217,8 @@ def multiline_filter(root: Path, font: Path, size: int, layout: TextLayout, styl
 def highlight_filter(root: Path, font: Path, size: int, layout: TextLayout, style: dict[str, Any],
                      ranges: list[tuple[dict[str, Any], int, int]], timings: dict[int, tuple[float, float]],
                      normal: list[str], active: list[str], base_x: str, base_y: str, clock: str, clip_start: float,
-                     clip_id: str, visible: str | None) -> tuple[str, dict[str, Any]]:
+                     clip_id: str, visible: str | None,
+                     paint: Callable[[list[str]], str] | None = None) -> tuple[str, dict[str, Any]]:
     """Choose a whole-paragraph paint with word/line rectangles in its space."""
     boundaries = {0, len(layout.source), *(x for a, b, _ in graphemes(layout.source) for x in (a, b))}
     if any(start not in boundaries or end not in boundaries for _, start, end in ranges):
@@ -258,8 +262,8 @@ def highlight_filter(root: Path, font: Path, size: int, layout: TextLayout, styl
             fragments.append((line_index, line.text, entry, before, after, trimmed, through, a == 0, b == len(line.text)))
     metrics, evidence = native_metrics(root, font, size, queries, style)
     paragraph = paragraph_metrics(layout,metrics,style)
-    normal=paint_paragraph(root,layout,style,normal,metrics,paragraph,base_x,base_y)
-    active=paint_paragraph(root,layout,style,active,metrics,paragraph,base_x,base_y)
+    normal=paint_paragraph(root,layout,style,normal,metrics,paragraph,base_x,base_y,paint)
+    active=paint_paragraph(root,layout,style,active,metrics,paragraph,base_x,base_y,paint)
     values = {key: paragraph[key] for key in FIELDS}
     x,y=paragraph_origin(base_x,base_y,values,style)
     center,right,oy,boxw=paragraph_alignment(style,values)
