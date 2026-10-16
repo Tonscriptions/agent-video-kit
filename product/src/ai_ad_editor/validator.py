@@ -6,6 +6,9 @@ import re
 from pathlib import Path
 from typing import Any
 
+from .errors import AppError
+from .speed_curves import compile_curve
+
 from .policy import reference_kind, resolve_local_path
 from .project import asset_map
 from .rights import check_project_rights, load_ledger
@@ -433,6 +436,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                     else:
                         previous_speed_at = -1
                         source_span = max(1, src_out - src_in)
+                        curve_error_start = len(errors)
                         for point_index, point in enumerate(curve_points):
                             if not isinstance(point, dict):
                                 error("SPEED_CURVE_INVALID", "speed_curve.keyframes 项必须是对象", f"{cp}.speed_curve.keyframes[{point_index}]")
@@ -450,6 +454,12 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                             if interpolation not in {"hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"}:
                                 error("SPEED_CURVE_INTERPOLATION_INVALID", "speed 曲线插值类型无效", f"{cp}.speed_curve.keyframes[{point_index}].interpolation")
                             previous_speed_at = at
+                        if len(errors) == curve_error_start:
+                            try:
+                                curve_tps = max(1, _int(project.get('settings', {}).get('timebase', {}).get('ticks_per_second'), 90000))
+                                compile_curve(clip, source_span, curve_tps)
+                            except AppError as exc:
+                                error(exc.code, exc.message, f'{cp}.speed_curve')
                 freeze = clip.get("freeze")
                 if freeze is not None:
                     if not isinstance(freeze, dict):

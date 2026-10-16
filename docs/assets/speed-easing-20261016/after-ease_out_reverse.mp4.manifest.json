@@ -1,0 +1,1419 @@
+{
+  "manifest_version": "0.1.0",
+  "operation_id": "render_20261016125224_e193820c",
+  "project_id": "proj_20261016125213_b9fee539",
+  "sequence_id": "seq_main",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\speed-easing-public-final-20261016\\project\\renders\\after-ease_out_reverse.mp4",
+  "sha256": "f57d4aa8c8e2401f020c214bcd93c711bd23073a2891d2ceceb22694cc4e5cb5",
+  "probe": {
+    "duration_seconds": 1.303,
+    "duration_tick": 117270,
+    "format": "mov,mp4,m4a,3gp,3g2,mj2",
+    "format_long_name": "QuickTime / MOV",
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "profile": "High",
+        "codec_type": "video",
+        "codec_tag_string": "avc1",
+        "codec_tag": "0x31637661",
+        "mime_codec_string": "avc1.640015",
+        "width": 512,
+        "height": 288,
+        "coded_width": 512,
+        "coded_height": 288,
+        "has_b_frames": 2,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "16:9",
+        "pix_fmt": "yuv420p",
+        "level": 21,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "is_avc": "true",
+        "nal_length_size": "4",
+        "id": "0x1",
+        "r_frame_rate": "24/1",
+        "avg_frame_rate": "24/1",
+        "time_base": "1/12288",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "duration_ts": 15872,
+        "duration": "1.291667",
+        "bit_rate": "160258",
+        "bits_per_raw_sample": "8",
+        "nb_frames": "31",
+        "extradata_size": 50,
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "und",
+          "handler_name": "VideoHandler",
+          "encoder": "Lavc62.28.100 libx264"
+        }
+      },
+      {
+        "index": 1,
+        "codec_name": "aac",
+        "codec_long_name": "AAC (Advanced Audio Coding)",
+        "profile": "LC",
+        "codec_type": "audio",
+        "codec_tag_string": "mp4a",
+        "codec_tag": "0x6134706d",
+        "mime_codec_string": "mp4a.40.2",
+        "sample_fmt": "fltp",
+        "sample_rate": "48000",
+        "channels": 2,
+        "channel_layout": "stereo",
+        "bits_per_sample": 0,
+        "initial_padding": 0,
+        "id": "0x2",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/48000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "duration_ts": 62544,
+        "duration": "1.303000",
+        "bit_rate": "189330",
+        "nb_frames": "63",
+        "extradata_size": 5,
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "und",
+          "handler_name": "SoundHandler"
+        }
+      }
+    ],
+    "video": {
+      "codec": "h264",
+      "width": 512,
+      "height": 288,
+      "pix_fmt": "yuv420p",
+      "fps": "24/1",
+      "color_space": "bt709",
+      "duration_seconds": 1.291667,
+      "start_time_seconds": 0.0
+    },
+    "audio": {
+      "codec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 1.303,
+      "start_time_seconds": 0.0
+    }
+  },
+  "command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-hide_banner",
+    "-y",
+    "-loglevel",
+    "error",
+    "-progress",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\speed-easing-public-final-20261016\\project\\renders\\.tmp\\render_20261016125224_e193820c\\ffmpeg-progress.log",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\speed-easing-public-final-20261016\\project\\assets\\frames_source.mp4",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\speed-easing-public-final-20261016\\project\\assets\\pulses_pulses.wav",
+    "-filter_complex",
+    "[0:v]fps=24/1:start_time=0:round=up:eof_action=pass,trim=start=0.000000000000:end=3.000000000000,reverse,settb=AVTB,setpts='((st(0,if(eq(N,0),3.000000000000,3.000000000000-N/(24/1)));st(0,(0+(((clip(((ld(0))-0),0,3))/1))));st(0,(0+((1.3031333333333-((if(lt((clip(((ld(0))-0),0,3)),0.796875),if(lt((clip(((ld(0))-0),0,3)),0.28125),if(lt((clip(((ld(0))-0),0,3)),0.10546875),if(lt((clip(((ld(0))-0),0,3)),0.046875),if(lt((clip(((ld(0))-0),0,3)),0.0234375),if(lt((clip(((ld(0))-0),0,3)),0.01171875),(0+(log(1+3.7703993055556*((clip(((ld(0))-0),0,3))-0))/2.2622395833333)),(0.019112065228956+(log(1+3.5967234142738*((clip(((ld(0))-0),0,3))-0.01171875))/2.2533854166667))),if(lt((clip(((ld(0))-0),0,3)),0.03515625),(0.037433398725653+(log(1+3.4376951408754*((clip(((ld(0))-0),0,3))-0.0234375))/2.24453125)),(0.055029582798633+(log(1+3.2915331862615*((clip(((ld(0))-0),0,3))-0.03515625))/2.2356770833333)))),if(lt((clip(((ld(0))-0),0,3)),0.0703125),if(lt((clip(((ld(0))-0),0,3)),0.05859375),(0.071958379535864+(log(1+3.1567338086339*((clip(((ld(0))-0),0,3))-0.046875))/2.2268229166667)),(0.088270926864021+(log(1+3.0320187899192*((clip(((ld(0))-0),0,3))-0.05859375))/2.21796875))),if(lt((clip(((ld(0))-0),0,3)),0.08203125),(0.10401271434178+(log(1+2.9162946848226*((clip(((ld(0))-0),0,3))-0.0703125))/2.2091145833333)),if(lt((clip(((ld(0))-0),0,3)),0.09375),(0.11922438563981+(log(1+2.8086205978634*((clip(((ld(0))-0),0,3))-0.08203125))/2.2002604166667)),(0.13394240338303+(log(1+2.7081824764663*((clip(((ld(0))-0),0,3))-0.09375))/2.19140625)))))),if(lt((clip(((ld(0))-0),0,3)),0.1640625),if(lt((clip(((ld(0))-0),0,3)),0.12890625),if(lt((clip(((ld(0))-0),0,3)),0.1171875),(0.14819960374645+(log(1+2.6142724329567*((clip(((ld(0))-0),0,3))-0.10546875))/2.1825520833333)),(0.16202566204001+(log(1+2.5262719839592*((clip(((ld(0))-0),0,3))-0.1171875))/2.1736979166667))),if(lt((clip(((ld(0))-0),0,3)),0.140625),(0.17544748589372+(log(1+2.4436383678672*((clip(((ld(0))-0),0,3))-0.12890625))/2.16484375)),(0.18848954914672+(log(1+2.3610352033435*((clip(((ld(0))-0),0,3))-0.140625))/2.1515625)))),if(lt((clip(((ld(0))-0),0,3)),0.2109375),if(lt((clip(((ld(0))-0),0,3)),0.1875),(0.21352248322508+(log(1+2.2188204731139*((clip(((ld(0))-0),0,3))-0.1640625))/2.1338541666667)),(0.23728068645858+(log(1+2.0916344916345*((clip(((ld(0))-0),0,3))-0.1875))/2.1161458333333))),if(lt((clip(((ld(0))-0),0,3)),0.234375),(0.25989678042361+(log(1+1.9772034551373*((clip(((ld(0))-0),0,3))-0.2109375))/2.0984375)),if(lt((clip(((ld(0))-0),0,3)),0.2578125),(0.28148381141244+(log(1+1.8736900731361*((clip(((ld(0))-0),0,3))-0.234375))/2.0807291666667)),(0.30213892436968+(log(1+1.77959361322*((clip(((ld(0))-0),0,3))-0.2578125))/2.0630208333333))))))),if(lt((clip(((ld(0))-0),0,3)),0.4921875),if(lt((clip(((ld(0))-0),0,3)),0.375),if(lt((clip(((ld(0))-0),0,3)),0.328125),if(lt((clip(((ld(0))-0),0,3)),0.3046875),(0.32194621342991+(log(1+1.6936762089601*((clip(((ld(0))-0),0,3))-0.28125))/2.0453125)),(0.34097896103607+(log(1+1.6149077179849*((clip(((ld(0))-0),0,3))-0.3046875))/2.0276041666667))),if(lt((clip(((ld(0))-0),0,3)),0.3515625),(0.35930141656094+(log(1+1.5424239017749*((clip(((ld(0))-0),0,3))-0.328125))/2.0098958333333)),(0.37697022360332+(log(1+1.4754943177195*((clip(((ld(0))-0),0,3))-0.3515625))/1.9921875)))),if(lt((clip(((ld(0))-0),0,3)),0.421875),if(lt((clip(((ld(0))-0),0,3)),0.3984375),(0.39403557607959+(log(1+1.4134973900075*((clip(((ld(0))-0),0,3))-0.375))/1.9744791666667)),(0.41054216269257+(log(1+1.3559008540357*((clip(((ld(0))-0),0,3))-0.3984375))/1.9567708333333))),if(lt((clip(((ld(0))-0),0,3)),0.4453125),(0.42652994462609+(log(1+1.3022462698803*((clip(((ld(0))-0),0,3))-0.421875))/1.9390625)),if(lt((clip(((ld(0))-0),0,3)),0.46875),(0.44203480060239+(log(1+1.2521366501462*((clip(((ld(0))-0),0,3))-0.4453125))/1.9213541666667)),(0.45708906555542+(log(1+1.2052264951981*((clip(((ld(0))-0),0,3))-0.46875))/1.9036458333333)))))),if(lt((clip(((ld(0))-0),0,3)),0.5859375),if(lt((clip(((ld(0))-0),0,3)),0.5390625),if(lt((clip(((ld(0))-0),0,3)),0.515625),(0.47172198330406+(log(1+1.1612137064346*((clip(((ld(0))-0),0,3))-0.4921875))/1.8859375)),(0.48596008919307+(log(1+1.1198329772392*((clip(((ld(0))-0),0,3))-0.515625))/1.8682291666667))),if(lt((clip(((ld(0))-0),0,3)),0.5625),(0.49982753531438+(log(1+1.0808503558994*((clip(((ld(0))-0),0,3))-0.5390625))/1.8505208333333)),(0.51334636834831+(log(1+1.0440587449933*((clip(((ld(0))-0),0,3))-0.5625))/1.8328125)))),if(lt((clip(((ld(0))-0),0,3)),0.65625),if(lt((clip(((ld(0))-0),0,3)),0.609375),(0.52653676807411+(log(1+1.0092741543189*((clip(((ld(0))-0),0,3))-0.5859375))/1.8151041666667)),(0.53941725304778+(log(1+0.97152304414326*((clip(((ld(0))-0),0,3))-0.609375))/1.7885416666667))),if(lt((clip(((ld(0))-0),0,3)),0.703125),(0.56431666448993+(log(1+0.91080669710807*((clip(((ld(0))-0),0,3))-0.65625))/1.753125)),if(lt((clip(((ld(0))-0),0,3)),0.75),(0.58816425654098+(log(1+0.85586615737699*((clip(((ld(0))-0),0,3))-0.703125))/1.7177083333333)),(0.61106387553437+(log(1+0.80588822355289*((clip(((ld(0))-0),0,3))-0.75))/1.6822916666667)))))))),if(lt((clip(((ld(0))-0),0,3)),1.640625),if(lt((clip(((ld(0))-0),0,3)),1.21875),if(lt((clip(((ld(0))-0),0,3)),0.984375),if(lt((clip(((ld(0))-0),0,3)),0.890625),if(lt((clip(((ld(0))-0),0,3)),0.84375),(0.63310522108299+(log(1+0.76020465661415*((clip(((ld(0))-0),0,3))-0.796875))/1.646875)),(0.65436632009197+(log(1+0.71826122283161*((clip(((ld(0))-0),0,3))-0.84375))/1.6114583333333))),if(lt((clip(((ld(0))-0),0,3)),0.9375),(0.67491548315378+(log(1+0.6795943432642*((clip(((ld(0))-0),0,3))-0.890625))/1.5760416666667)),(0.69481286810973+(log(1+0.64381325497878*((clip(((ld(0))-0),0,3))-0.9375))/1.540625)))),if(lt((clip(((ld(0))-0),0,3)),1.078125),if(lt((clip(((ld(0))-0),0,3)),1.03125),(0.71411174181918+(log(1+0.61058622351628*((clip(((ld(0))-0),0,3))-0.984375))/1.5052083333333)),(0.73285950747662+(log(1+0.5796297722663*((clip(((ld(0))-0),0,3))-1.03125))/1.4697916666667))),if(lt((clip(((ld(0))-0),0,3)),1.125),(0.75109854791472+(log(1+0.55070018559136*((clip(((ld(0))-0),0,3))-1.078125))/1.434375)),if(lt((clip(((ld(0))-0),0,3)),1.171875),(0.76886692311115+(log(1+0.52358674463938*((clip(((ld(0))-0),0,3))-1.125))/1.3989583333333)),(0.78619895116719+(log(1+0.49810629708245*((clip(((ld(0))-0),0,3))-1.171875))/1.3635416666667)))))),if(lt((clip(((ld(0))-0),0,3)),1.40625),if(lt((clip(((ld(0))-0),0,3)),1.3125),if(lt((clip(((ld(0))-0),0,3)),1.265625),(0.80312569539461+(log(1+0.47409886355714*((clip(((ld(0))-0),0,3))-1.21875))/1.328125)),(0.81967537517937+(log(1+0.45142405692818*((clip(((ld(0))-0),0,3))-1.265625))/1.2927083333333))),if(lt((clip(((ld(0))-0),0,3)),1.359375),(0.83587371453097+(log(1+0.42995814409119*((clip(((ld(0))-0),0,3))-1.3125))/1.2572916666667)),(0.85174423935463+(log(1+0.40959161960881*((clip(((ld(0))-0),0,3))-1.359375))/1.221875)))),if(lt((clip(((ld(0))-0),0,3)),1.5),if(lt((clip(((ld(0))-0),0,3)),1.453125),(0.86730853226931+(log(1+0.39022718999593*((clip(((ld(0))-0),0,3))-1.40625))/1.1864583333333)),(0.882586452075+(log(1+0.37177808969567*((clip(((ld(0))-0),0,3))-1.453125))/1.1510416666667))),if(lt((clip(((ld(0))-0),0,3)),1.546875),(0.89759632362536+(log(1+0.35416666666666*((clip(((ld(0))-0),0,3))-1.5))/1.115625)),if(lt((clip(((ld(0))-0),0,3)),1.59375),(0.91235510279893+(log(1+0.33732318842789*((clip(((ld(0))-0),0,3))-1.546875))/1.0802083333333)),(0.92687852041853+(log(1+0.32118482938057*((clip(((ld(0))-0),0,3))-1.59375))/1.0447916666667))))))),if(lt((clip(((ld(0))-0),0,3)),2.0625),if(lt((clip(((ld(0))-0),0,3)),1.828125),if(lt((clip(((ld(0))-0),0,3)),1.734375),if(lt((clip(((ld(0))-0),0,3)),1.6875),(0.94118120829321+(log(1+0.30569480797954*((clip(((ld(0))-0),0,3))-1.640625))/1.009375)),(0.95527681001476+(log(1+0.29080164839437*((clip(((ld(0))-0),0,3))-1.6875))/0.97395833333333))),if(lt((clip(((ld(0))-0),0,3)),1.78125),(0.96917807870151+(log(1+0.27645854608042*((clip(((ld(0))-0),0,3))-1.734375))/0.93854166666667)),(0.98289696352517+(log(1+0.26262282046913*((clip(((ld(0))-0),0,3))-1.78125))/0.903125)))),if(lt((clip(((ld(0))-0),0,3)),1.921875),if(lt((clip(((ld(0))-0),0,3)),1.875),(0.99644468656449+(log(1+0.24925544100802*((clip(((ld(0))-0),0,3))-1.828125))/0.86770833333334)),(1.0098318112895+(log(1+0.2363206152026*((clip(((ld(0))-0),0,3))-1.875))/0.83229166666666))),if(lt((clip(((ld(0))-0),0,3)),1.96875),(1.0230683037821+(log(1+0.22378542926488*((clip(((ld(0))-0),0,3))-1.921875))/0.796875)),if(lt((clip(((ld(0))-0),0,3)),2.015625),(1.0361635876352+(log(1+0.21161953355407*((clip(((ld(0))-0),0,3))-1.96875))/0.76145833333333)),(1.0491265933346+(log(1+0.19979486628238*((clip(((ld(0))-0),0,3))-2.015625))/0.72604166666666)))))),if(lt((clip(((ld(0))-0),0,3)),2.53125),if(lt((clip(((ld(0))-0),0,3)),2.25),if(lt((clip(((ld(0))-0),0,3)),2.15625),(1.0619658028151+(log(1+0.18345757898474*((clip(((ld(0))-0),0,3))-2.0625))/0.67291666666667)),(1.0873075989781+(log(1+0.16137081435726*((clip(((ld(0))-0),0,3))-2.15625))/0.60208333333333))),if(lt((clip(((ld(0))-0),0,3)),2.34375),(1.1122463711947+(log(1+0.14026402640264*((clip(((ld(0))-0),0,3))-2.25))/0.53125)),if(lt((clip(((ld(0))-0),0,3)),2.4375),(1.1368375147563+(log(1+0.11998439117083*((clip(((ld(0))-0),0,3))-2.34375))/0.46041666666666)),(1.1611323397505+(log(1+0.10039594658077*((clip(((ld(0))-0),0,3))-2.4375))/0.38958333333333))))),if(lt((clip(((ld(0))-0),0,3)),2.71875),if(lt((clip(((ld(0))-0),0,3)),2.625),(1.185178804718+(log(1+0.081376215407629*((clip(((ld(0))-0),0,3))-2.53125))/0.31875)),(1.2090221502431+(log(1+0.06281340723146*((clip(((ld(0))-0),0,3))-2.625))/0.24791666666667))),if(lt((clip(((ld(0))-0),0,3)),2.8125),(1.2327054549908+(log(1+0.04460405700136*((clip(((ld(0))-0),0,3))-2.71875))/0.17708333333333)),if(lt((clip(((ld(0))-0),0,3)),2.90625),(1.256270132402+(log(1+0.026650989613953*((clip(((ld(0))-0),0,3))-2.8125))/0.10625)),(1.2797563831216+(log(1+0.0088615224225829*((clip(((ld(0))-0),0,3))-2.90625))/0.035416666666663)))))))))*0.99994606932342))))));ld(0)))/TB',fps=24/1:round=up:eof_action=pass,scale=512:288:force_original_aspect_ratio=decrease,pad=512:288:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1[v0];[1:a]atrim=start=0.000000:end=3.000000,asetpts=PTS-STARTPTS,aresample=48000,asplit=24[asplit1_0][asplit1_1][asplit1_2][asplit1_3][asplit1_4][asplit1_5][asplit1_6][asplit1_7][asplit1_8][asplit1_9][asplit1_10][asplit1_11][asplit1_12][asplit1_13][asplit1_14][asplit1_15][asplit1_16][asplit1_17][asplit1_18][asplit1_19][asplit1_20][asplit1_21][asplit1_22][asplit1_23];[asplit1_0]atrim=start=0.000000:end=0.125000,asetpts=PTS-STARTPTS,atempo=0.73096129,apad=whole_len=8208,atrim=end_sample=8208,asetpts=N/SR/TB[aspeed1_0];[asplit1_1]atrim=start=0.125000:end=0.250000,asetpts=PTS-STARTPTS,atempo=1.00540160,apad=whole_len=5968,atrim=end_sample=5968,asetpts=N/SR/TB[aspeed1_1];[asplit1_2]atrim=start=0.250000:end=0.375000,asetpts=PTS-STARTPTS,atempo=1.26674371,apad=whole_len=4737,atrim=end_sample=4737,asetpts=N/SR/TB[aspeed1_2];[asplit1_3]atrim=start=0.375000:end=0.500000,asetpts=PTS-STARTPTS,atempo=1.51569164,apad=whole_len=3958,atrim=end_sample=3958,asetpts=N/SR/TB[aspeed1_3];[asplit1_4]atrim=start=0.500000:end=0.625000,asetpts=PTS-STARTPTS,atempo=1.75250692,apad=whole_len=3424,atrim=end_sample=3424,asetpts=N/SR/TB[aspeed1_4];[asplit1_5]atrim=start=0.625000:end=0.750000,asetpts=PTS-STARTPTS,atempo=1.97723493,apad=whole_len=3034,atrim=end_sample=3034,asetpts=N/SR/TB[aspeed1_5];[asplit1_6]atrim=start=0.750000:end=0.875000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.09506696,apad=whole_len=2740,atrim=end_sample=2740,asetpts=N/SR/TB[aspeed1_6];[asplit1_7]atrim=start=0.875000:end=1.000000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.19557607,apad=whole_len=2509,atrim=end_sample=2509,asetpts=N/SR/TB[aspeed1_7];[asplit1_8]atrim=start=1.000000:end=1.125000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.29014021,apad=whole_len=2326,atrim=end_sample=2326,asetpts=N/SR/TB[aspeed1_8];[asplit1_9]atrim=start=1.125000:end=1.250000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.37878496,apad=whole_len=2175,atrim=end_sample=2175,asetpts=N/SR/TB[aspeed1_9];[asplit1_10]atrim=start=1.250000:end=1.375000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.46151467,apad=whole_len=2053,atrim=end_sample=2053,asetpts=N/SR/TB[aspeed1_10];[asplit1_11]atrim=start=1.375000:end=1.500000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.53831622,apad=whole_len=1950,atrim=end_sample=1950,asetpts=N/SR/TB[aspeed1_11];[asplit1_12]atrim=start=1.500000:end=1.625000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.60920991,apad=whole_len=1865,atrim=end_sample=1865,asetpts=N/SR/TB[aspeed1_12];[asplit1_13]atrim=start=1.625000:end=1.750000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.67419708,apad=whole_len=1791,atrim=end_sample=1791,asetpts=N/SR/TB[aspeed1_13];[asplit1_14]atrim=start=1.750000:end=1.875000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.73326223,apad=whole_len=1731,atrim=end_sample=1731,asetpts=N/SR/TB[aspeed1_14];[asplit1_15]atrim=start=1.875000:end=2.000000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.78642402,apad=whole_len=1680,atrim=end_sample=1680,asetpts=N/SR/TB[aspeed1_15];[asplit1_16]atrim=start=2.000000:end=2.125000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.83356361,apad=whole_len=1636,atrim=end_sample=1636,asetpts=N/SR/TB[aspeed1_16];[asplit1_17]atrim=start=2.125000:end=2.250000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.87483234,apad=whole_len=1600,atrim=end_sample=1600,asetpts=N/SR/TB[aspeed1_17];[asplit1_18]atrim=start=2.250000:end=2.375000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.91027009,apad=whole_len=1570,atrim=end_sample=1570,asetpts=N/SR/TB[aspeed1_18];[asplit1_19]atrim=start=2.375000:end=2.500000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.93975522,apad=whole_len=1547,atrim=end_sample=1547,asetpts=N/SR/TB[aspeed1_19];[asplit1_20]atrim=start=2.500000:end=2.625000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.96342604,apad=whole_len=1528,atrim=end_sample=1528,asetpts=N/SR/TB[aspeed1_20];[asplit1_21]atrim=start=2.625000:end=2.750000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.98114415,apad=whole_len=1514,atrim=end_sample=1514,asetpts=N/SR/TB[aspeed1_21];[asplit1_22]atrim=start=2.750000:end=2.875000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.99291014,apad=whole_len=1506,atrim=end_sample=1506,asetpts=N/SR/TB[aspeed1_22];[asplit1_23]atrim=start=2.875000:end=3.000000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.99886231,apad=whole_len=1500,atrim=end_sample=1500,asetpts=N/SR/TB[aspeed1_23];[aspeed1_0][aspeed1_1][aspeed1_2][aspeed1_3][aspeed1_4][aspeed1_5][aspeed1_6][aspeed1_7][aspeed1_8][aspeed1_9][aspeed1_10][aspeed1_11][aspeed1_12][aspeed1_13][aspeed1_14][aspeed1_15][aspeed1_16][aspeed1_17][aspeed1_18][aspeed1_19][aspeed1_20][aspeed1_21][aspeed1_22][aspeed1_23]concat=n=24:v=0:a=1,areverse[aspeed1];[aspeed1]aresample=48000,adelay=0|0[a1];color=c=black:s=512x288:r=24/1:d=1.303133[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0,aresample=48000,apad=whole_len=62550,atrim=end_sample=62550,asetpts=N/SR/TB[aout]",
+    "-map",
+    "[vout]",
+    "-map",
+    "[aout]",
+    "-t",
+    "1.303133",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "medium",
+    "-crf",
+    "18",
+    "-pix_fmt",
+    "yuv420p",
+    "-color_primaries",
+    "bt709",
+    "-color_trc",
+    "bt709",
+    "-colorspace",
+    "bt709",
+    "-color_range",
+    "tv",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "192k",
+    "-movflags",
+    "+faststart",
+    "-f",
+    "mp4",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\speed-easing-public-final-20261016\\project\\renders\\.tmp\\render_20261016125224_e193820c\\after-ease_out_reverse.mp4"
+  ],
+  "filter_graph_transport": {
+    "mode": "inline",
+    "sha256": "sha256:1cc5240c20dda6e8651db1a84e88b2f16b94b15b2115f4549c98a275c50c6bdb",
+    "utf8_bytes": 15037,
+    "logical_command_utf16_units": 15967
+  },
+  "filter_complex": "[0:v]fps=24/1:start_time=0:round=up:eof_action=pass,trim=start=0.000000000000:end=3.000000000000,reverse,settb=AVTB,setpts='((st(0,if(eq(N,0),3.000000000000,3.000000000000-N/(24/1)));st(0,(0+(((clip(((ld(0))-0),0,3))/1))));st(0,(0+((1.3031333333333-((if(lt((clip(((ld(0))-0),0,3)),0.796875),if(lt((clip(((ld(0))-0),0,3)),0.28125),if(lt((clip(((ld(0))-0),0,3)),0.10546875),if(lt((clip(((ld(0))-0),0,3)),0.046875),if(lt((clip(((ld(0))-0),0,3)),0.0234375),if(lt((clip(((ld(0))-0),0,3)),0.01171875),(0+(log(1+3.7703993055556*((clip(((ld(0))-0),0,3))-0))/2.2622395833333)),(0.019112065228956+(log(1+3.5967234142738*((clip(((ld(0))-0),0,3))-0.01171875))/2.2533854166667))),if(lt((clip(((ld(0))-0),0,3)),0.03515625),(0.037433398725653+(log(1+3.4376951408754*((clip(((ld(0))-0),0,3))-0.0234375))/2.24453125)),(0.055029582798633+(log(1+3.2915331862615*((clip(((ld(0))-0),0,3))-0.03515625))/2.2356770833333)))),if(lt((clip(((ld(0))-0),0,3)),0.0703125),if(lt((clip(((ld(0))-0),0,3)),0.05859375),(0.071958379535864+(log(1+3.1567338086339*((clip(((ld(0))-0),0,3))-0.046875))/2.2268229166667)),(0.088270926864021+(log(1+3.0320187899192*((clip(((ld(0))-0),0,3))-0.05859375))/2.21796875))),if(lt((clip(((ld(0))-0),0,3)),0.08203125),(0.10401271434178+(log(1+2.9162946848226*((clip(((ld(0))-0),0,3))-0.0703125))/2.2091145833333)),if(lt((clip(((ld(0))-0),0,3)),0.09375),(0.11922438563981+(log(1+2.8086205978634*((clip(((ld(0))-0),0,3))-0.08203125))/2.2002604166667)),(0.13394240338303+(log(1+2.7081824764663*((clip(((ld(0))-0),0,3))-0.09375))/2.19140625)))))),if(lt((clip(((ld(0))-0),0,3)),0.1640625),if(lt((clip(((ld(0))-0),0,3)),0.12890625),if(lt((clip(((ld(0))-0),0,3)),0.1171875),(0.14819960374645+(log(1+2.6142724329567*((clip(((ld(0))-0),0,3))-0.10546875))/2.1825520833333)),(0.16202566204001+(log(1+2.5262719839592*((clip(((ld(0))-0),0,3))-0.1171875))/2.1736979166667))),if(lt((clip(((ld(0))-0),0,3)),0.140625),(0.17544748589372+(log(1+2.4436383678672*((clip(((ld(0))-0),0,3))-0.12890625))/2.16484375)),(0.18848954914672+(log(1+2.3610352033435*((clip(((ld(0))-0),0,3))-0.140625))/2.1515625)))),if(lt((clip(((ld(0))-0),0,3)),0.2109375),if(lt((clip(((ld(0))-0),0,3)),0.1875),(0.21352248322508+(log(1+2.2188204731139*((clip(((ld(0))-0),0,3))-0.1640625))/2.1338541666667)),(0.23728068645858+(log(1+2.0916344916345*((clip(((ld(0))-0),0,3))-0.1875))/2.1161458333333))),if(lt((clip(((ld(0))-0),0,3)),0.234375),(0.25989678042361+(log(1+1.9772034551373*((clip(((ld(0))-0),0,3))-0.2109375))/2.0984375)),if(lt((clip(((ld(0))-0),0,3)),0.2578125),(0.28148381141244+(log(1+1.8736900731361*((clip(((ld(0))-0),0,3))-0.234375))/2.0807291666667)),(0.30213892436968+(log(1+1.77959361322*((clip(((ld(0))-0),0,3))-0.2578125))/2.0630208333333))))))),if(lt((clip(((ld(0))-0),0,3)),0.4921875),if(lt((clip(((ld(0))-0),0,3)),0.375),if(lt((clip(((ld(0))-0),0,3)),0.328125),if(lt((clip(((ld(0))-0),0,3)),0.3046875),(0.32194621342991+(log(1+1.6936762089601*((clip(((ld(0))-0),0,3))-0.28125))/2.0453125)),(0.34097896103607+(log(1+1.6149077179849*((clip(((ld(0))-0),0,3))-0.3046875))/2.0276041666667))),if(lt((clip(((ld(0))-0),0,3)),0.3515625),(0.35930141656094+(log(1+1.5424239017749*((clip(((ld(0))-0),0,3))-0.328125))/2.0098958333333)),(0.37697022360332+(log(1+1.4754943177195*((clip(((ld(0))-0),0,3))-0.3515625))/1.9921875)))),if(lt((clip(((ld(0))-0),0,3)),0.421875),if(lt((clip(((ld(0))-0),0,3)),0.3984375),(0.39403557607959+(log(1+1.4134973900075*((clip(((ld(0))-0),0,3))-0.375))/1.9744791666667)),(0.41054216269257+(log(1+1.3559008540357*((clip(((ld(0))-0),0,3))-0.3984375))/1.9567708333333))),if(lt((clip(((ld(0))-0),0,3)),0.4453125),(0.42652994462609+(log(1+1.3022462698803*((clip(((ld(0))-0),0,3))-0.421875))/1.9390625)),if(lt((clip(((ld(0))-0),0,3)),0.46875),(0.44203480060239+(log(1+1.2521366501462*((clip(((ld(0))-0),0,3))-0.4453125))/1.9213541666667)),(0.45708906555542+(log(1+1.2052264951981*((clip(((ld(0))-0),0,3))-0.46875))/1.9036458333333)))))),if(lt((clip(((ld(0))-0),0,3)),0.5859375),if(lt((clip(((ld(0))-0),0,3)),0.5390625),if(lt((clip(((ld(0))-0),0,3)),0.515625),(0.47172198330406+(log(1+1.1612137064346*((clip(((ld(0))-0),0,3))-0.4921875))/1.8859375)),(0.48596008919307+(log(1+1.1198329772392*((clip(((ld(0))-0),0,3))-0.515625))/1.8682291666667))),if(lt((clip(((ld(0))-0),0,3)),0.5625),(0.49982753531438+(log(1+1.0808503558994*((clip(((ld(0))-0),0,3))-0.5390625))/1.8505208333333)),(0.51334636834831+(log(1+1.0440587449933*((clip(((ld(0))-0),0,3))-0.5625))/1.8328125)))),if(lt((clip(((ld(0))-0),0,3)),0.65625),if(lt((clip(((ld(0))-0),0,3)),0.609375),(0.52653676807411+(log(1+1.0092741543189*((clip(((ld(0))-0),0,3))-0.5859375))/1.8151041666667)),(0.53941725304778+(log(1+0.97152304414326*((clip(((ld(0))-0),0,3))-0.609375))/1.7885416666667))),if(lt((clip(((ld(0))-0),0,3)),0.703125),(0.56431666448993+(log(1+0.91080669710807*((clip(((ld(0))-0),0,3))-0.65625))/1.753125)),if(lt((clip(((ld(0))-0),0,3)),0.75),(0.58816425654098+(log(1+0.85586615737699*((clip(((ld(0))-0),0,3))-0.703125))/1.7177083333333)),(0.61106387553437+(log(1+0.80588822355289*((clip(((ld(0))-0),0,3))-0.75))/1.6822916666667)))))))),if(lt((clip(((ld(0))-0),0,3)),1.640625),if(lt((clip(((ld(0))-0),0,3)),1.21875),if(lt((clip(((ld(0))-0),0,3)),0.984375),if(lt((clip(((ld(0))-0),0,3)),0.890625),if(lt((clip(((ld(0))-0),0,3)),0.84375),(0.63310522108299+(log(1+0.76020465661415*((clip(((ld(0))-0),0,3))-0.796875))/1.646875)),(0.65436632009197+(log(1+0.71826122283161*((clip(((ld(0))-0),0,3))-0.84375))/1.6114583333333))),if(lt((clip(((ld(0))-0),0,3)),0.9375),(0.67491548315378+(log(1+0.6795943432642*((clip(((ld(0))-0),0,3))-0.890625))/1.5760416666667)),(0.69481286810973+(log(1+0.64381325497878*((clip(((ld(0))-0),0,3))-0.9375))/1.540625)))),if(lt((clip(((ld(0))-0),0,3)),1.078125),if(lt((clip(((ld(0))-0),0,3)),1.03125),(0.71411174181918+(log(1+0.61058622351628*((clip(((ld(0))-0),0,3))-0.984375))/1.5052083333333)),(0.73285950747662+(log(1+0.5796297722663*((clip(((ld(0))-0),0,3))-1.03125))/1.4697916666667))),if(lt((clip(((ld(0))-0),0,3)),1.125),(0.75109854791472+(log(1+0.55070018559136*((clip(((ld(0))-0),0,3))-1.078125))/1.434375)),if(lt((clip(((ld(0))-0),0,3)),1.171875),(0.76886692311115+(log(1+0.52358674463938*((clip(((ld(0))-0),0,3))-1.125))/1.3989583333333)),(0.78619895116719+(log(1+0.49810629708245*((clip(((ld(0))-0),0,3))-1.171875))/1.3635416666667)))))),if(lt((clip(((ld(0))-0),0,3)),1.40625),if(lt((clip(((ld(0))-0),0,3)),1.3125),if(lt((clip(((ld(0))-0),0,3)),1.265625),(0.80312569539461+(log(1+0.47409886355714*((clip(((ld(0))-0),0,3))-1.21875))/1.328125)),(0.81967537517937+(log(1+0.45142405692818*((clip(((ld(0))-0),0,3))-1.265625))/1.2927083333333))),if(lt((clip(((ld(0))-0),0,3)),1.359375),(0.83587371453097+(log(1+0.42995814409119*((clip(((ld(0))-0),0,3))-1.3125))/1.2572916666667)),(0.85174423935463+(log(1+0.40959161960881*((clip(((ld(0))-0),0,3))-1.359375))/1.221875)))),if(lt((clip(((ld(0))-0),0,3)),1.5),if(lt((clip(((ld(0))-0),0,3)),1.453125),(0.86730853226931+(log(1+0.39022718999593*((clip(((ld(0))-0),0,3))-1.40625))/1.1864583333333)),(0.882586452075+(log(1+0.37177808969567*((clip(((ld(0))-0),0,3))-1.453125))/1.1510416666667))),if(lt((clip(((ld(0))-0),0,3)),1.546875),(0.89759632362536+(log(1+0.35416666666666*((clip(((ld(0))-0),0,3))-1.5))/1.115625)),if(lt((clip(((ld(0))-0),0,3)),1.59375),(0.91235510279893+(log(1+0.33732318842789*((clip(((ld(0))-0),0,3))-1.546875))/1.0802083333333)),(0.92687852041853+(log(1+0.32118482938057*((clip(((ld(0))-0),0,3))-1.59375))/1.0447916666667))))))),if(lt((clip(((ld(0))-0),0,3)),2.0625),if(lt((clip(((ld(0))-0),0,3)),1.828125),if(lt((clip(((ld(0))-0),0,3)),1.734375),if(lt((clip(((ld(0))-0),0,3)),1.6875),(0.94118120829321+(log(1+0.30569480797954*((clip(((ld(0))-0),0,3))-1.640625))/1.009375)),(0.95527681001476+(log(1+0.29080164839437*((clip(((ld(0))-0),0,3))-1.6875))/0.97395833333333))),if(lt((clip(((ld(0))-0),0,3)),1.78125),(0.96917807870151+(log(1+0.27645854608042*((clip(((ld(0))-0),0,3))-1.734375))/0.93854166666667)),(0.98289696352517+(log(1+0.26262282046913*((clip(((ld(0))-0),0,3))-1.78125))/0.903125)))),if(lt((clip(((ld(0))-0),0,3)),1.921875),if(lt((clip(((ld(0))-0),0,3)),1.875),(0.99644468656449+(log(1+0.24925544100802*((clip(((ld(0))-0),0,3))-1.828125))/0.86770833333334)),(1.0098318112895+(log(1+0.2363206152026*((clip(((ld(0))-0),0,3))-1.875))/0.83229166666666))),if(lt((clip(((ld(0))-0),0,3)),1.96875),(1.0230683037821+(log(1+0.22378542926488*((clip(((ld(0))-0),0,3))-1.921875))/0.796875)),if(lt((clip(((ld(0))-0),0,3)),2.015625),(1.0361635876352+(log(1+0.21161953355407*((clip(((ld(0))-0),0,3))-1.96875))/0.76145833333333)),(1.0491265933346+(log(1+0.19979486628238*((clip(((ld(0))-0),0,3))-2.015625))/0.72604166666666)))))),if(lt((clip(((ld(0))-0),0,3)),2.53125),if(lt((clip(((ld(0))-0),0,3)),2.25),if(lt((clip(((ld(0))-0),0,3)),2.15625),(1.0619658028151+(log(1+0.18345757898474*((clip(((ld(0))-0),0,3))-2.0625))/0.67291666666667)),(1.0873075989781+(log(1+0.16137081435726*((clip(((ld(0))-0),0,3))-2.15625))/0.60208333333333))),if(lt((clip(((ld(0))-0),0,3)),2.34375),(1.1122463711947+(log(1+0.14026402640264*((clip(((ld(0))-0),0,3))-2.25))/0.53125)),if(lt((clip(((ld(0))-0),0,3)),2.4375),(1.1368375147563+(log(1+0.11998439117083*((clip(((ld(0))-0),0,3))-2.34375))/0.46041666666666)),(1.1611323397505+(log(1+0.10039594658077*((clip(((ld(0))-0),0,3))-2.4375))/0.38958333333333))))),if(lt((clip(((ld(0))-0),0,3)),2.71875),if(lt((clip(((ld(0))-0),0,3)),2.625),(1.185178804718+(log(1+0.081376215407629*((clip(((ld(0))-0),0,3))-2.53125))/0.31875)),(1.2090221502431+(log(1+0.06281340723146*((clip(((ld(0))-0),0,3))-2.625))/0.24791666666667))),if(lt((clip(((ld(0))-0),0,3)),2.8125),(1.2327054549908+(log(1+0.04460405700136*((clip(((ld(0))-0),0,3))-2.71875))/0.17708333333333)),if(lt((clip(((ld(0))-0),0,3)),2.90625),(1.256270132402+(log(1+0.026650989613953*((clip(((ld(0))-0),0,3))-2.8125))/0.10625)),(1.2797563831216+(log(1+0.0088615224225829*((clip(((ld(0))-0),0,3))-2.90625))/0.035416666666663)))))))))*0.99994606932342))))));ld(0)))/TB',fps=24/1:round=up:eof_action=pass,scale=512:288:force_original_aspect_ratio=decrease,pad=512:288:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1[v0];[1:a]atrim=start=0.000000:end=3.000000,asetpts=PTS-STARTPTS,aresample=48000,asplit=24[asplit1_0][asplit1_1][asplit1_2][asplit1_3][asplit1_4][asplit1_5][asplit1_6][asplit1_7][asplit1_8][asplit1_9][asplit1_10][asplit1_11][asplit1_12][asplit1_13][asplit1_14][asplit1_15][asplit1_16][asplit1_17][asplit1_18][asplit1_19][asplit1_20][asplit1_21][asplit1_22][asplit1_23];[asplit1_0]atrim=start=0.000000:end=0.125000,asetpts=PTS-STARTPTS,atempo=0.73096129,apad=whole_len=8208,atrim=end_sample=8208,asetpts=N/SR/TB[aspeed1_0];[asplit1_1]atrim=start=0.125000:end=0.250000,asetpts=PTS-STARTPTS,atempo=1.00540160,apad=whole_len=5968,atrim=end_sample=5968,asetpts=N/SR/TB[aspeed1_1];[asplit1_2]atrim=start=0.250000:end=0.375000,asetpts=PTS-STARTPTS,atempo=1.26674371,apad=whole_len=4737,atrim=end_sample=4737,asetpts=N/SR/TB[aspeed1_2];[asplit1_3]atrim=start=0.375000:end=0.500000,asetpts=PTS-STARTPTS,atempo=1.51569164,apad=whole_len=3958,atrim=end_sample=3958,asetpts=N/SR/TB[aspeed1_3];[asplit1_4]atrim=start=0.500000:end=0.625000,asetpts=PTS-STARTPTS,atempo=1.75250692,apad=whole_len=3424,atrim=end_sample=3424,asetpts=N/SR/TB[aspeed1_4];[asplit1_5]atrim=start=0.625000:end=0.750000,asetpts=PTS-STARTPTS,atempo=1.97723493,apad=whole_len=3034,atrim=end_sample=3034,asetpts=N/SR/TB[aspeed1_5];[asplit1_6]atrim=start=0.750000:end=0.875000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.09506696,apad=whole_len=2740,atrim=end_sample=2740,asetpts=N/SR/TB[aspeed1_6];[asplit1_7]atrim=start=0.875000:end=1.000000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.19557607,apad=whole_len=2509,atrim=end_sample=2509,asetpts=N/SR/TB[aspeed1_7];[asplit1_8]atrim=start=1.000000:end=1.125000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.29014021,apad=whole_len=2326,atrim=end_sample=2326,asetpts=N/SR/TB[aspeed1_8];[asplit1_9]atrim=start=1.125000:end=1.250000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.37878496,apad=whole_len=2175,atrim=end_sample=2175,asetpts=N/SR/TB[aspeed1_9];[asplit1_10]atrim=start=1.250000:end=1.375000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.46151467,apad=whole_len=2053,atrim=end_sample=2053,asetpts=N/SR/TB[aspeed1_10];[asplit1_11]atrim=start=1.375000:end=1.500000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.53831622,apad=whole_len=1950,atrim=end_sample=1950,asetpts=N/SR/TB[aspeed1_11];[asplit1_12]atrim=start=1.500000:end=1.625000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.60920991,apad=whole_len=1865,atrim=end_sample=1865,asetpts=N/SR/TB[aspeed1_12];[asplit1_13]atrim=start=1.625000:end=1.750000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.67419708,apad=whole_len=1791,atrim=end_sample=1791,asetpts=N/SR/TB[aspeed1_13];[asplit1_14]atrim=start=1.750000:end=1.875000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.73326223,apad=whole_len=1731,atrim=end_sample=1731,asetpts=N/SR/TB[aspeed1_14];[asplit1_15]atrim=start=1.875000:end=2.000000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.78642402,apad=whole_len=1680,atrim=end_sample=1680,asetpts=N/SR/TB[aspeed1_15];[asplit1_16]atrim=start=2.000000:end=2.125000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.83356361,apad=whole_len=1636,atrim=end_sample=1636,asetpts=N/SR/TB[aspeed1_16];[asplit1_17]atrim=start=2.125000:end=2.250000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.87483234,apad=whole_len=1600,atrim=end_sample=1600,asetpts=N/SR/TB[aspeed1_17];[asplit1_18]atrim=start=2.250000:end=2.375000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.91027009,apad=whole_len=1570,atrim=end_sample=1570,asetpts=N/SR/TB[aspeed1_18];[asplit1_19]atrim=start=2.375000:end=2.500000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.93975522,apad=whole_len=1547,atrim=end_sample=1547,asetpts=N/SR/TB[aspeed1_19];[asplit1_20]atrim=start=2.500000:end=2.625000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.96342604,apad=whole_len=1528,atrim=end_sample=1528,asetpts=N/SR/TB[aspeed1_20];[asplit1_21]atrim=start=2.625000:end=2.750000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.98114415,apad=whole_len=1514,atrim=end_sample=1514,asetpts=N/SR/TB[aspeed1_21];[asplit1_22]atrim=start=2.750000:end=2.875000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.99291014,apad=whole_len=1506,atrim=end_sample=1506,asetpts=N/SR/TB[aspeed1_22];[asplit1_23]atrim=start=2.875000:end=3.000000,asetpts=PTS-STARTPTS,atempo=2.0,atempo=1.99886231,apad=whole_len=1500,atrim=end_sample=1500,asetpts=N/SR/TB[aspeed1_23];[aspeed1_0][aspeed1_1][aspeed1_2][aspeed1_3][aspeed1_4][aspeed1_5][aspeed1_6][aspeed1_7][aspeed1_8][aspeed1_9][aspeed1_10][aspeed1_11][aspeed1_12][aspeed1_13][aspeed1_14][aspeed1_15][aspeed1_16][aspeed1_17][aspeed1_18][aspeed1_19][aspeed1_20][aspeed1_21][aspeed1_22][aspeed1_23]concat=n=24:v=0:a=1,areverse[aspeed1];[aspeed1]aresample=48000,adelay=0|0[a1];color=c=black:s=512x288:r=24/1:d=1.303133[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0,aresample=48000,apad=whole_len=62550,atrim=end_sample=62550,asetpts=N/SR/TB[aout]",
+  "inputs": [
+    {
+      "asset_id": "frames",
+      "clip_id": "ease_out_reverse_container_0.ease_out_reverse_video",
+      "input": 0,
+      "kind": "video",
+      "source_in_tick": 0,
+      "source_out_tick": 270000,
+      "nested_time_mapping": {
+        "version": "1",
+        "maps": [
+          {
+            "source_start": 0.0,
+            "source_end": 3.0,
+            "timeline_start": 0.0,
+            "timeline_duration": 3.0,
+            "speed": 1.0,
+            "reverse": false,
+            "segments": [],
+            "curve_scale": 1.0
+          },
+          {
+            "source_start": 0.0,
+            "source_end": 3.0,
+            "timeline_start": 0.0,
+            "timeline_duration": 1.3031333333333333,
+            "speed": 1.0,
+            "reverse": true,
+            "segments": [
+              [
+                0.0,
+                0.01171875,
+                0.6,
+                0.6265106201171875
+              ],
+              [
+                0.01171875,
+                0.0234375,
+                0.6265106201171875,
+                0.6529174804687501
+              ],
+              [
+                0.0234375,
+                0.03515625,
+                0.6529174804687501,
+                0.6792205810546876
+              ],
+              [
+                0.03515625,
+                0.046875,
+                0.6792205810546876,
+                0.7054199218750001
+              ],
+              [
+                0.046875,
+                0.05859375,
+                0.7054199218750001,
+                0.7315155029296876
+              ],
+              [
+                0.05859375,
+                0.0703125,
+                0.7315155029296876,
+                0.75750732421875
+              ],
+              [
+                0.0703125,
+                0.08203125,
+                0.75750732421875,
+                0.7833953857421876
+              ],
+              [
+                0.08203125,
+                0.09375,
+                0.7833953857421876,
+                0.8091796875
+              ],
+              [
+                0.09375,
+                0.10546875,
+                0.8091796875,
+                0.8348602294921876
+              ],
+              [
+                0.10546875,
+                0.1171875,
+                0.8348602294921876,
+                0.8604370117187501
+              ],
+              [
+                0.1171875,
+                0.12890625,
+                0.8604370117187501,
+                0.8859100341796876
+              ],
+              [
+                0.12890625,
+                0.140625,
+                0.8859100341796876,
+                0.9112792968750001
+              ],
+              [
+                0.140625,
+                0.1640625,
+                0.9112792968750001,
+                0.96170654296875
+              ],
+              [
+                0.1640625,
+                0.1875,
+                0.96170654296875,
+                1.01171875
+              ],
+              [
+                0.1875,
+                0.2109375,
+                1.01171875,
+                1.0613159179687501
+              ],
+              [
+                0.2109375,
+                0.234375,
+                1.0613159179687501,
+                1.110498046875
+              ],
+              [
+                0.234375,
+                0.2578125,
+                1.110498046875,
+                1.1592651367187503
+              ],
+              [
+                0.2578125,
+                0.28125,
+                1.1592651367187503,
+                1.2076171875000001
+              ],
+              [
+                0.28125,
+                0.3046875,
+                1.2076171875000001,
+                1.2555541992187502
+              ],
+              [
+                0.3046875,
+                0.328125,
+                1.2555541992187502,
+                1.3030761718750001
+              ],
+              [
+                0.328125,
+                0.3515625,
+                1.3030761718750001,
+                1.35018310546875
+              ],
+              [
+                0.3515625,
+                0.375,
+                1.35018310546875,
+                1.396875
+              ],
+              [
+                0.375,
+                0.3984375,
+                1.396875,
+                1.4431518554687504
+              ],
+              [
+                0.3984375,
+                0.421875,
+                1.4431518554687504,
+                1.4890136718750002
+              ],
+              [
+                0.421875,
+                0.4453125,
+                1.4890136718750002,
+                1.5344604492187504
+              ],
+              [
+                0.4453125,
+                0.46875,
+                1.5344604492187504,
+                1.5794921875000003
+              ],
+              [
+                0.46875,
+                0.4921875,
+                1.5794921875000003,
+                1.6241088867187505
+              ],
+              [
+                0.4921875,
+                0.515625,
+                1.6241088867187505,
+                1.6683105468750004
+              ],
+              [
+                0.515625,
+                0.5390625,
+                1.6683105468750004,
+                1.7120971679687504
+              ],
+              [
+                0.5390625,
+                0.5625,
+                1.7120971679687504,
+                1.7554687500000004
+              ],
+              [
+                0.5625,
+                0.5859375,
+                1.7554687500000004,
+                1.7984252929687505
+              ],
+              [
+                0.5859375,
+                0.609375,
+                1.7984252929687505,
+                1.8409667968750005
+              ],
+              [
+                0.609375,
+                0.65625,
+                1.8409667968750005,
+                1.9248046875000004
+              ],
+              [
+                0.65625,
+                0.703125,
+                1.9248046875000004,
+                2.0069824218750005
+              ],
+              [
+                0.703125,
+                0.75,
+                2.0069824218750005,
+                2.0875000000000004
+              ],
+              [
+                0.75,
+                0.796875,
+                2.0875000000000004,
+                2.1663574218750004
+              ],
+              [
+                0.796875,
+                0.84375,
+                2.1663574218750004,
+                2.2435546875000005
+              ],
+              [
+                0.84375,
+                0.890625,
+                2.2435546875000005,
+                2.3190917968750004
+              ],
+              [
+                0.890625,
+                0.9375,
+                2.3190917968750004,
+                2.3929687500000005
+              ],
+              [
+                0.9375,
+                0.984375,
+                2.3929687500000005,
+                2.4651855468750004
+              ],
+              [
+                0.984375,
+                1.03125,
+                2.4651855468750004,
+                2.5357421875000004
+              ],
+              [
+                1.03125,
+                1.078125,
+                2.5357421875000004,
+                2.6046386718750005
+              ],
+              [
+                1.078125,
+                1.125,
+                2.6046386718750005,
+                2.6718750000000004
+              ],
+              [
+                1.125,
+                1.171875,
+                2.6718750000000004,
+                2.7374511718750005
+              ],
+              [
+                1.171875,
+                1.21875,
+                2.7374511718750005,
+                2.8013671875000004
+              ],
+              [
+                1.21875,
+                1.265625,
+                2.8013671875000004,
+                2.8636230468750004
+              ],
+              [
+                1.265625,
+                1.3125,
+                2.8636230468750004,
+                2.9242187500000005
+              ],
+              [
+                1.3125,
+                1.359375,
+                2.9242187500000005,
+                2.9831542968750004
+              ],
+              [
+                1.359375,
+                1.40625,
+                2.9831542968750004,
+                3.0404296875000005
+              ],
+              [
+                1.40625,
+                1.453125,
+                3.0404296875000005,
+                3.0960449218750004
+              ],
+              [
+                1.453125,
+                1.5,
+                3.0960449218750004,
+                3.1500000000000004
+              ],
+              [
+                1.5,
+                1.546875,
+                3.1500000000000004,
+                3.202294921875
+              ],
+              [
+                1.546875,
+                1.59375,
+                3.202294921875,
+                3.2529296875
+              ],
+              [
+                1.59375,
+                1.640625,
+                3.2529296875,
+                3.301904296875
+              ],
+              [
+                1.640625,
+                1.6875,
+                3.301904296875,
+                3.3492187500000004
+              ],
+              [
+                1.6875,
+                1.734375,
+                3.3492187500000004,
+                3.3948730468750004
+              ],
+              [
+                1.734375,
+                1.78125,
+                3.3948730468750004,
+                3.4388671875000005
+              ],
+              [
+                1.78125,
+                1.828125,
+                3.4388671875000005,
+                3.4812011718750004
+              ],
+              [
+                1.828125,
+                1.875,
+                3.4812011718750004,
+                3.5218750000000005
+              ],
+              [
+                1.875,
+                1.921875,
+                3.5218750000000005,
+                3.5608886718750004
+              ],
+              [
+                1.921875,
+                1.96875,
+                3.5608886718750004,
+                3.5982421875000004
+              ],
+              [
+                1.96875,
+                2.015625,
+                3.5982421875000004,
+                3.633935546875
+              ],
+              [
+                2.015625,
+                2.0625,
+                3.633935546875,
+                3.66796875
+              ],
+              [
+                2.0625,
+                2.15625,
+                3.66796875,
+                3.7310546875000004
+              ],
+              [
+                2.15625,
+                2.25,
+                3.7310546875000004,
+                3.7875
+              ],
+              [
+                2.25,
+                2.34375,
+                3.7875,
+                3.8373046875000005
+              ],
+              [
+                2.34375,
+                2.4375,
+                3.8373046875000005,
+                3.8804687500000004
+              ],
+              [
+                2.4375,
+                2.53125,
+                3.8804687500000004,
+                3.9169921875000004
+              ],
+              [
+                2.53125,
+                2.625,
+                3.9169921875000004,
+                3.9468750000000004
+              ],
+              [
+                2.625,
+                2.71875,
+                3.9468750000000004,
+                3.9701171875000005
+              ],
+              [
+                2.71875,
+                2.8125,
+                3.9701171875000005,
+                3.98671875
+              ],
+              [
+                2.8125,
+                2.90625,
+                3.98671875,
+                3.9966796875000004
+              ],
+              [
+                2.90625,
+                3.0,
+                3.9966796875000004,
+                4.0
+              ]
+            ],
+            "curve_scale": 0.9999460693234191,
+            "curve_compilation": {
+              "version": "1",
+              "adaptive": true,
+              "method": "bernstein-bounded-linear-speed",
+              "source_clock_error_bound_seconds": 0.0001492569421902017,
+              "requested_max_error_seconds": 0.00025,
+              "segment_count": 73,
+              "maximum_segments": 1024,
+              "authored_interpolations": [
+                "ease_out",
+                "linear"
+              ],
+              "source_endpoint_speed_floor": 0.01,
+              "normalized_clock_error_bound_seconds": 0.00029849778532465
+            }
+          }
+        ],
+        "source_display_fps": "24/1",
+        "video_pts": "analytic-composition",
+        "keyframes": "authored-clock"
+      }
+    },
+    {
+      "asset_id": "pulses",
+      "clip_id": "ease_out_reverse_container_0.ease_out_reverse_audio",
+      "track_id": "ease_out_reverse_container_0.ease_out_reverse_leaf_audio",
+      "input": 1,
+      "kind": "audio",
+      "source_in_tick": 0,
+      "source_out_tick": 270000,
+      "nested_time_mapping": {
+        "version": "1",
+        "maps": [
+          {
+            "source_start": 0.0,
+            "source_end": 3.0,
+            "timeline_start": 0.0,
+            "timeline_duration": 3.0,
+            "speed": 1.0,
+            "reverse": false,
+            "segments": [],
+            "curve_scale": 1.0
+          },
+          {
+            "source_start": 0.0,
+            "source_end": 3.0,
+            "timeline_start": 0.0,
+            "timeline_duration": 1.3031333333333333,
+            "speed": 1.0,
+            "reverse": true,
+            "segments": [
+              [
+                0.0,
+                0.01171875,
+                0.6,
+                0.6265106201171875
+              ],
+              [
+                0.01171875,
+                0.0234375,
+                0.6265106201171875,
+                0.6529174804687501
+              ],
+              [
+                0.0234375,
+                0.03515625,
+                0.6529174804687501,
+                0.6792205810546876
+              ],
+              [
+                0.03515625,
+                0.046875,
+                0.6792205810546876,
+                0.7054199218750001
+              ],
+              [
+                0.046875,
+                0.05859375,
+                0.7054199218750001,
+                0.7315155029296876
+              ],
+              [
+                0.05859375,
+                0.0703125,
+                0.7315155029296876,
+                0.75750732421875
+              ],
+              [
+                0.0703125,
+                0.08203125,
+                0.75750732421875,
+                0.7833953857421876
+              ],
+              [
+                0.08203125,
+                0.09375,
+                0.7833953857421876,
+                0.8091796875
+              ],
+              [
+                0.09375,
+                0.10546875,
+                0.8091796875,
+                0.8348602294921876
+              ],
+              [
+                0.10546875,
+                0.1171875,
+                0.8348602294921876,
+                0.8604370117187501
+              ],
+              [
+                0.1171875,
+                0.12890625,
+                0.8604370117187501,
+                0.8859100341796876
+              ],
+              [
+                0.12890625,
+                0.140625,
+                0.8859100341796876,
+                0.9112792968750001
+              ],
+              [
+                0.140625,
+                0.1640625,
+                0.9112792968750001,
+                0.96170654296875
+              ],
+              [
+                0.1640625,
+                0.1875,
+                0.96170654296875,
+                1.01171875
+              ],
+              [
+                0.1875,
+                0.2109375,
+                1.01171875,
+                1.0613159179687501
+              ],
+              [
+                0.2109375,
+                0.234375,
+                1.0613159179687501,
+                1.110498046875
+              ],
+              [
+                0.234375,
+                0.2578125,
+                1.110498046875,
+                1.1592651367187503
+              ],
+              [
+                0.2578125,
+                0.28125,
+                1.1592651367187503,
+                1.2076171875000001
+              ],
+              [
+                0.28125,
+                0.3046875,
+                1.2076171875000001,
+                1.2555541992187502
+              ],
+              [
+                0.3046875,
+                0.328125,
+                1.2555541992187502,
+                1.3030761718750001
+              ],
+              [
+                0.328125,
+                0.3515625,
+                1.3030761718750001,
+                1.35018310546875
+              ],
+              [
+                0.3515625,
+                0.375,
+                1.35018310546875,
+                1.396875
+              ],
+              [
+                0.375,
+                0.3984375,
+                1.396875,
+                1.4431518554687504
+              ],
+              [
+                0.3984375,
+                0.421875,
+                1.4431518554687504,
+                1.4890136718750002
+              ],
+              [
+                0.421875,
+                0.4453125,
+                1.4890136718750002,
+                1.5344604492187504
+              ],
+              [
+                0.4453125,
+                0.46875,
+                1.5344604492187504,
+                1.5794921875000003
+              ],
+              [
+                0.46875,
+                0.4921875,
+                1.5794921875000003,
+                1.6241088867187505
+              ],
+              [
+                0.4921875,
+                0.515625,
+                1.6241088867187505,
+                1.6683105468750004
+              ],
+              [
+                0.515625,
+                0.5390625,
+                1.6683105468750004,
+                1.7120971679687504
+              ],
+              [
+                0.5390625,
+                0.5625,
+                1.7120971679687504,
+                1.7554687500000004
+              ],
+              [
+                0.5625,
+                0.5859375,
+                1.7554687500000004,
+                1.7984252929687505
+              ],
+              [
+                0.5859375,
+                0.609375,
+                1.7984252929687505,
+                1.8409667968750005
+              ],
+              [
+                0.609375,
+                0.65625,
+                1.8409667968750005,
+                1.9248046875000004
+              ],
+              [
+                0.65625,
+                0.703125,
+                1.9248046875000004,
+                2.0069824218750005
+              ],
+              [
+                0.703125,
+                0.75,
+                2.0069824218750005,
+                2.0875000000000004
+              ],
+              [
+                0.75,
+                0.796875,
+                2.0875000000000004,
+                2.1663574218750004
+              ],
+              [
+                0.796875,
+                0.84375,
+                2.1663574218750004,
+                2.2435546875000005
+              ],
+              [
+                0.84375,
+                0.890625,
+                2.2435546875000005,
+                2.3190917968750004
+              ],
+              [
+                0.890625,
+                0.9375,
+                2.3190917968750004,
+                2.3929687500000005
+              ],
+              [
+                0.9375,
+                0.984375,
+                2.3929687500000005,
+                2.4651855468750004
+              ],
+              [
+                0.984375,
+                1.03125,
+                2.4651855468750004,
+                2.5357421875000004
+              ],
+              [
+                1.03125,
+                1.078125,
+                2.5357421875000004,
+                2.6046386718750005
+              ],
+              [
+                1.078125,
+                1.125,
+                2.6046386718750005,
+                2.6718750000000004
+              ],
+              [
+                1.125,
+                1.171875,
+                2.6718750000000004,
+                2.7374511718750005
+              ],
+              [
+                1.171875,
+                1.21875,
+                2.7374511718750005,
+                2.8013671875000004
+              ],
+              [
+                1.21875,
+                1.265625,
+                2.8013671875000004,
+                2.8636230468750004
+              ],
+              [
+                1.265625,
+                1.3125,
+                2.8636230468750004,
+                2.9242187500000005
+              ],
+              [
+                1.3125,
+                1.359375,
+                2.9242187500000005,
+                2.9831542968750004
+              ],
+              [
+                1.359375,
+                1.40625,
+                2.9831542968750004,
+                3.0404296875000005
+              ],
+              [
+                1.40625,
+                1.453125,
+                3.0404296875000005,
+                3.0960449218750004
+              ],
+              [
+                1.453125,
+                1.5,
+                3.0960449218750004,
+                3.1500000000000004
+              ],
+              [
+                1.5,
+                1.546875,
+                3.1500000000000004,
+                3.202294921875
+              ],
+              [
+                1.546875,
+                1.59375,
+                3.202294921875,
+                3.2529296875
+              ],
+              [
+                1.59375,
+                1.640625,
+                3.2529296875,
+                3.301904296875
+              ],
+              [
+                1.640625,
+                1.6875,
+                3.301904296875,
+                3.3492187500000004
+              ],
+              [
+                1.6875,
+                1.734375,
+                3.3492187500000004,
+                3.3948730468750004
+              ],
+              [
+                1.734375,
+                1.78125,
+                3.3948730468750004,
+                3.4388671875000005
+              ],
+              [
+                1.78125,
+                1.828125,
+                3.4388671875000005,
+                3.4812011718750004
+              ],
+              [
+                1.828125,
+                1.875,
+                3.4812011718750004,
+                3.5218750000000005
+              ],
+              [
+                1.875,
+                1.921875,
+                3.5218750000000005,
+                3.5608886718750004
+              ],
+              [
+                1.921875,
+                1.96875,
+                3.5608886718750004,
+                3.5982421875000004
+              ],
+              [
+                1.96875,
+                2.015625,
+                3.5982421875000004,
+                3.633935546875
+              ],
+              [
+                2.015625,
+                2.0625,
+                3.633935546875,
+                3.66796875
+              ],
+              [
+                2.0625,
+                2.15625,
+                3.66796875,
+                3.7310546875000004
+              ],
+              [
+                2.15625,
+                2.25,
+                3.7310546875000004,
+                3.7875
+              ],
+              [
+                2.25,
+                2.34375,
+                3.7875,
+                3.8373046875000005
+              ],
+              [
+                2.34375,
+                2.4375,
+                3.8373046875000005,
+                3.8804687500000004
+              ],
+              [
+                2.4375,
+                2.53125,
+                3.8804687500000004,
+                3.9169921875000004
+              ],
+              [
+                2.53125,
+                2.625,
+                3.9169921875000004,
+                3.9468750000000004
+              ],
+              [
+                2.625,
+                2.71875,
+                3.9468750000000004,
+                3.9701171875000005
+              ],
+              [
+                2.71875,
+                2.8125,
+                3.9701171875000005,
+                3.98671875
+              ],
+              [
+                2.8125,
+                2.90625,
+                3.98671875,
+                3.9966796875000004
+              ],
+              [
+                2.90625,
+                3.0,
+                3.9966796875000004,
+                4.0
+              ]
+            ],
+            "curve_scale": 0.9999460693234191,
+            "curve_compilation": {
+              "version": "1",
+              "adaptive": true,
+              "method": "bernstein-bounded-linear-speed",
+              "source_clock_error_bound_seconds": 0.0001492569421902017,
+              "requested_max_error_seconds": 0.00025,
+              "segment_count": 73,
+              "maximum_segments": 1024,
+              "authored_interpolations": [
+                "ease_out",
+                "linear"
+              ],
+              "source_endpoint_speed_floor": 0.01,
+              "normalized_clock_error_bound_seconds": 0.00029849778532465
+            }
+          }
+        ],
+        "tempo_windows": 24,
+        "sample_rate": 48000,
+        "audio_tempo": "piecewise-integrated-boundaries"
+      }
+    }
+  ],
+  "profile": null,
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 24,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 512,
+      "height": 288,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "warnings": [
+    {
+      "code": "SPEED_CURVE_COMPILED",
+      "clip_id": "ease_out_reverse_container_0",
+      "feature": "speed_curve_easing",
+      "certificate": {
+        "version": "1",
+        "adaptive": true,
+        "method": "bernstein-bounded-linear-speed",
+        "source_clock_error_bound_seconds": 0.0001492569421902017,
+        "requested_max_error_seconds": 0.00025,
+        "segment_count": 73,
+        "maximum_segments": 1024,
+        "authored_interpolations": [
+          "ease_out",
+          "linear"
+        ],
+        "source_endpoint_speed_floor": 0.01
+      },
+      "message": "速度 easing/Bezier 已按有界源时钟编译；未退回端点线性曲线"
+    },
+    {
+      "code": "NESTED_SOURCE_CFR_NORMALIZED",
+      "clip_id": "ease_out_reverse_container_0.ease_out_reverse_video",
+      "fps": "24/1",
+      "message": "嵌套非线性变速以登记帧率建立源显示时钟；VFR 原始时间戳等效未验收"
+    },
+    {
+      "code": "RENDER_FEATURE_APPROXIMATE",
+      "clip_id": "ease_out_reverse_container_0.ease_out_reverse_audio",
+      "feature": "audio_speed_curve_piecewise",
+      "message": "音频速度曲线按固定短段 atempo 近似，累计时长与视频曲线对齐；仍可能有段间相位边界"
+    }
+  ],
+  "quality": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "metrics": {
+      "duration_seconds": 1.303,
+      "width": 512,
+      "height": 288,
+      "audio_codec": "aac",
+      "video_duration_seconds": 1.291667,
+      "audio_duration_seconds": 1.303,
+      "av_duration_delta_seconds": 0.011333000000000037,
+      "probe": {
+        "duration_seconds": 1.303,
+        "duration_tick": 117270,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.640015",
+            "width": 512,
+            "height": 288,
+            "coded_width": 512,
+            "coded_height": 288,
+            "has_b_frames": 2,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p",
+            "level": 21,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "24/1",
+            "avg_frame_rate": "24/1",
+            "time_base": "1/12288",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 15872,
+            "duration": "1.291667",
+            "bit_rate": "160258",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "31",
+            "extradata_size": 50,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_long_name": "AAC (Advanced Audio Coding)",
+            "profile": "LC",
+            "codec_type": "audio",
+            "codec_tag_string": "mp4a",
+            "codec_tag": "0x6134706d",
+            "mime_codec_string": "mp4a.40.2",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 2,
+            "channel_layout": "stereo",
+            "bits_per_sample": 0,
+            "initial_padding": 0,
+            "id": "0x2",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 62544,
+            "duration": "1.303000",
+            "bit_rate": "189330",
+            "nb_frames": "63",
+            "extradata_size": 5,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "SoundHandler"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 512,
+          "height": 288,
+          "pix_fmt": "yuv420p",
+          "fps": "24/1",
+          "color_space": "bt709",
+          "duration_seconds": 1.291667,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "aac",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 1.303,
+          "start_time_seconds": 0.0
+        }
+      }
+    }
+  },
+  "project_fingerprint": "32fc655840f7053f509e4befa202fb57a83bfaa8d0e45a2abb5bfbb3c57ce400",
+  "input_hashes": {
+    "frames": "sha256:c50ce6e8b268abc81147bad14e1b1c4c8eebfafb53a0d1e7a13b2a22ee2f8393",
+    "pulses": "sha256:8dba6dd76889b73b44131f029d67d0d59099039a722303ac0ed1e2ca017e86d5"
+  },
+  "resume_of": null
+}

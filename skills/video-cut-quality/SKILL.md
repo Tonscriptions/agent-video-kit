@@ -98,6 +98,12 @@ VFR timestamps. Measure keyframe geometry in its original child clock, and
 audio pulse timing separately. Pulse-envelope checks exclude explicit boundary
 neighborhoods and do not establish seamless phase, lip sync or listening quality.
 
+For [speed easing](../../docs/specs/速度曲线Easing与Bezier契约_v0.1_2026-10-16.md),
+compare independently integrated authored curves, encoded source frames and
+original keyframe geometry. Read the raw and normalized clock error bounds
+separately; 250 us applies before duration normalization and outer composition.
+Do not count a certificate alone as proof of final encoded timing or audio quality.
+
 Run structural and media gates after rendering:
 
 ```powershell

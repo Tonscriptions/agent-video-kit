@@ -1,0 +1,18 @@
+test_nested_sequence_speed_curve_maps_source_boundaries (test_cli.P0CliTests.test_nested_sequence_speed_curve_maps_source_boundaries) ... ok
+test_nested_sequence_speed_curve_renders_locally (test_cli.P0CliTests.test_nested_sequence_speed_curve_renders_locally) ... ok
+test_reverse_speed_curve_reflects_ramp_without_approximation_warning (test_cli.P0CliTests.test_reverse_speed_curve_reflects_ramp_without_approximation_warning) ... FAIL
+test_speed_curve_with_nonzero_source_in_uses_clip_local_clock (test_cli.P0CliTests.test_speed_curve_with_nonzero_source_in_uses_clip_local_clock) ... ok
+
+======================================================================
+FAIL: test_reverse_speed_curve_reflects_ramp_without_approximation_warning (test_cli.P0CliTests.test_reverse_speed_curve_reflects_ramp_without_approximation_warning)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_cli.py", line 2711, in test_reverse_speed_curve_reflects_ramp_without_approximation_warning
+    self.assertIn("/4.00000000", graph)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '/4.00000000' not found in "[0:v]trim=start=0.000000:end=1.000000,reverse,setpts='((st(0,((PTS-STARTPTS)*TB));st(0,(0+((if(lt((clip(((ld(0))-0),0,1)),0.25),(0+(((clip(((ld(0))-0),0,1))-0)/4)),if(lt((clip(((ld(0))-0),0,1)),0.75),(0.0625+(((clip(((ld(0))-0),0,1))-0.25)/2)),(0.3125+(((clip(((ld(0))-0),0,1))-0.75)/1))))*1))));ld(0)))/TB',fps=30/1:start_time=0.00000000:round=up:eof_action=pass,scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1[v0];color=c=black:s=1080x1920:r=30/1:d=0.562500[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vout];anullsrc=r=48000:cl=stereo,atrim=duration=0.562500[aout]"
+
+----------------------------------------------------------------------
+Ran 4 tests in 2.851s
+
+FAILED (failures=1)

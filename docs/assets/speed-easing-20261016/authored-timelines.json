@@ -1,0 +1,696 @@
+{
+  "forward": {
+    "operations": [
+      {
+        "op": "add_sequence",
+        "id": "forward_leaf",
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "forward_leaf",
+        "track_id": "forward_leaf_video_1",
+        "id": "forward_video",
+        "asset_id": "frames",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "add_track",
+        "sequence_id": "forward_leaf",
+        "track_id": "forward_leaf_audio",
+        "kind": "audio",
+        "order": 1
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "forward_leaf",
+        "track_id": "forward_leaf_audio",
+        "id": "forward_audio",
+        "asset_id": "pulses",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_sequence_clip",
+        "sequence_id": "seq_main",
+        "track_id": "track_video_1",
+        "nested_sequence_id": "forward_leaf",
+        "id": "forward_container_0",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 221760,
+        "reverse": false,
+        "speed_curve": {
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "speed": 0.6,
+              "interpolation": "ease_in"
+            },
+            {
+              "at_tick": 270000,
+              "speed": 4.0,
+              "interpolation": "linear"
+            }
+          ]
+        }
+      }
+    ],
+    "oracle_steps": [
+      {
+        "in": 0.0,
+        "out": 3.0,
+        "start": 0.0,
+        "duration": 2.464,
+        "reverse": false,
+        "pieces": [
+          [
+            0.0,
+            3.0,
+            0.6,
+            4.0,
+            "ease_in",
+            []
+          ]
+        ]
+      }
+    ],
+    "duration_tick": 221760
+  },
+  "ease_out_reverse": {
+    "operations": [
+      {
+        "op": "add_sequence",
+        "id": "ease_out_reverse_leaf",
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "ease_out_reverse_leaf",
+        "track_id": "ease_out_reverse_leaf_video_1",
+        "id": "ease_out_reverse_video",
+        "asset_id": "frames",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "add_track",
+        "sequence_id": "ease_out_reverse_leaf",
+        "track_id": "ease_out_reverse_leaf_audio",
+        "kind": "audio",
+        "order": 1
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "ease_out_reverse_leaf",
+        "track_id": "ease_out_reverse_leaf_audio",
+        "id": "ease_out_reverse_audio",
+        "asset_id": "pulses",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_sequence_clip",
+        "sequence_id": "seq_main",
+        "track_id": "track_video_1",
+        "nested_sequence_id": "ease_out_reverse_leaf",
+        "id": "ease_out_reverse_container_0",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 117282,
+        "reverse": true,
+        "speed_curve": {
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "speed": 0.6,
+              "interpolation": "ease_out"
+            },
+            {
+              "at_tick": 270000,
+              "speed": 4.0,
+              "interpolation": "linear"
+            }
+          ]
+        }
+      }
+    ],
+    "oracle_steps": [
+      {
+        "in": 0.0,
+        "out": 3.0,
+        "start": 0.0,
+        "duration": 1.3031333333333333,
+        "reverse": true,
+        "pieces": [
+          [
+            0.0,
+            3.0,
+            0.6,
+            4.0,
+            "ease_out",
+            []
+          ]
+        ]
+      }
+    ],
+    "duration_tick": 117282
+  },
+  "in_out": {
+    "operations": [
+      {
+        "op": "add_sequence",
+        "id": "in_out_leaf",
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "in_out_leaf",
+        "track_id": "in_out_leaf_video_1",
+        "id": "in_out_video",
+        "asset_id": "frames",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "add_track",
+        "sequence_id": "in_out_leaf",
+        "track_id": "in_out_leaf_audio",
+        "kind": "audio",
+        "order": 1
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "in_out_leaf",
+        "track_id": "in_out_leaf_audio",
+        "id": "in_out_audio",
+        "asset_id": "pulses",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_sequence_clip",
+        "sequence_id": "seq_main",
+        "track_id": "track_video_1",
+        "nested_sequence_id": "in_out_leaf",
+        "id": "in_out_container_0",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 178623,
+        "reverse": false,
+        "speed_curve": {
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "speed": 0.6,
+              "interpolation": "ease_in_out"
+            },
+            {
+              "at_tick": 270000,
+              "speed": 4.0,
+              "interpolation": "linear"
+            }
+          ]
+        }
+      }
+    ],
+    "oracle_steps": [
+      {
+        "in": 0.0,
+        "out": 3.0,
+        "start": 0.0,
+        "duration": 1.9847,
+        "reverse": false,
+        "pieces": [
+          [
+            0.0,
+            3.0,
+            0.6,
+            4.0,
+            "ease_in_out",
+            []
+          ]
+        ]
+      }
+    ],
+    "duration_tick": 178623
+  },
+  "bezier_two": {
+    "operations": [
+      {
+        "op": "add_sequence",
+        "id": "bezier_two_leaf",
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "bezier_two_leaf",
+        "track_id": "bezier_two_leaf_video_1",
+        "id": "bezier_two_video",
+        "asset_id": "frames",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "add_track",
+        "sequence_id": "bezier_two_leaf",
+        "track_id": "bezier_two_leaf_audio",
+        "kind": "audio",
+        "order": 1
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "bezier_two_leaf",
+        "track_id": "bezier_two_leaf_audio",
+        "id": "bezier_two_audio",
+        "asset_id": "pulses",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_sequence_clip",
+        "sequence_id": "seq_main",
+        "track_id": "track_video_1",
+        "nested_sequence_id": "bezier_two_leaf",
+        "id": "bezier_two_container_0",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 170695,
+        "reverse": false,
+        "speed_curve": {
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "speed": 0.6,
+              "interpolation": "bezier",
+              "control_points": [
+                0.05,
+                0.9
+              ]
+            },
+            {
+              "at_tick": 270000,
+              "speed": 4.0,
+              "interpolation": "linear"
+            }
+          ]
+        }
+      }
+    ],
+    "oracle_steps": [
+      {
+        "in": 0.0,
+        "out": 3.0,
+        "start": 0.0,
+        "duration": 1.896611111111111,
+        "reverse": false,
+        "pieces": [
+          [
+            0.0,
+            3.0,
+            0.6,
+            4.0,
+            "bezier",
+            [
+              0.05,
+              0.9
+            ]
+          ]
+        ]
+      }
+    ],
+    "duration_tick": 170695
+  },
+  "bezier_four": {
+    "operations": [
+      {
+        "op": "add_sequence",
+        "id": "bezier_four_leaf",
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "bezier_four_leaf",
+        "track_id": "bezier_four_leaf_video_1",
+        "id": "bezier_four_video",
+        "asset_id": "frames",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "add_track",
+        "sequence_id": "bezier_four_leaf",
+        "track_id": "bezier_four_leaf_audio",
+        "kind": "audio",
+        "order": 1
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "bezier_four_leaf",
+        "track_id": "bezier_four_leaf_audio",
+        "id": "bezier_four_audio",
+        "asset_id": "pulses",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_sequence_clip",
+        "sequence_id": "seq_main",
+        "track_id": "track_video_1",
+        "nested_sequence_id": "bezier_four_leaf",
+        "id": "bezier_four_container_0",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 215554,
+        "reverse": false,
+        "speed_curve": {
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "speed": 0.6,
+              "interpolation": "bezier",
+              "control_points": [
+                0.12,
+                0.02,
+                0.9,
+                0.3
+              ]
+            },
+            {
+              "at_tick": 270000,
+              "speed": 4.0,
+              "interpolation": "linear"
+            }
+          ]
+        }
+      }
+    ],
+    "oracle_steps": [
+      {
+        "in": 0.0,
+        "out": 3.0,
+        "start": 0.0,
+        "duration": 2.3950444444444443,
+        "reverse": false,
+        "pieces": [
+          [
+            0.0,
+            3.0,
+            0.6,
+            4.0,
+            "bezier",
+            [
+              0.12,
+              0.02,
+              0.9,
+              0.3
+            ]
+          ]
+        ]
+      }
+    ],
+    "duration_tick": 215554
+  },
+  "animated": {
+    "operations": [
+      {
+        "op": "add_sequence",
+        "id": "animated_leaf",
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "animated_leaf",
+        "track_id": "animated_leaf_video_1",
+        "id": "animated_video",
+        "asset_id": "frames",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000,
+        "transform": {
+          "scale": 0.4
+        },
+        "keyframes": [
+          {
+            "property": "transform.scale",
+            "keyframes": [
+              {
+                "at_tick": 0,
+                "value": 0.4,
+                "interpolation": "linear"
+              },
+              {
+                "at_tick": 270000,
+                "value": 0.9,
+                "interpolation": "linear"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "op": "add_track",
+        "sequence_id": "animated_leaf",
+        "track_id": "animated_leaf_audio",
+        "kind": "audio",
+        "order": 1
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "animated_leaf",
+        "track_id": "animated_leaf_audio",
+        "id": "animated_audio",
+        "asset_id": "pulses",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000,
+        "transform": {
+          "scale": 0.4
+        },
+        "keyframes": [
+          {
+            "property": "transform.scale",
+            "keyframes": [
+              {
+                "at_tick": 0,
+                "value": 0.4,
+                "interpolation": "linear"
+              },
+              {
+                "at_tick": 270000,
+                "value": 0.9,
+                "interpolation": "linear"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "op": "append_sequence_clip",
+        "sequence_id": "seq_main",
+        "track_id": "track_video_1",
+        "nested_sequence_id": "animated_leaf",
+        "id": "animated_container_0",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 215554,
+        "reverse": false,
+        "speed_curve": {
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "speed": 0.6,
+              "interpolation": "bezier",
+              "control_points": [
+                0.12,
+                0.02,
+                0.9,
+                0.3
+              ]
+            },
+            {
+              "at_tick": 270000,
+              "speed": 4.0,
+              "interpolation": "linear"
+            }
+          ]
+        }
+      }
+    ],
+    "oracle_steps": [
+      {
+        "in": 0.0,
+        "out": 3.0,
+        "start": 0.0,
+        "duration": 2.3950444444444443,
+        "reverse": false,
+        "pieces": [
+          [
+            0.0,
+            3.0,
+            0.6,
+            4.0,
+            "bezier",
+            [
+              0.12,
+              0.02,
+              0.9,
+              0.3
+            ]
+          ]
+        ]
+      }
+    ],
+    "duration_tick": 215554
+  },
+  "compound": {
+    "operations": [
+      {
+        "op": "add_sequence",
+        "id": "compound_leaf",
+        "duration_tick": 270000
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "compound_leaf",
+        "track_id": "compound_leaf_video_1",
+        "id": "compound_video",
+        "asset_id": "frames",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "add_track",
+        "sequence_id": "compound_leaf",
+        "track_id": "compound_leaf_audio",
+        "kind": "audio",
+        "order": 1
+      },
+      {
+        "op": "append_clip",
+        "sequence_id": "compound_leaf",
+        "track_id": "compound_leaf_audio",
+        "id": "compound_audio",
+        "asset_id": "pulses",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 270000
+      },
+      {
+        "op": "add_sequence",
+        "id": "compound_parent_0",
+        "duration_tick": 215554
+      },
+      {
+        "op": "append_sequence_clip",
+        "sequence_id": "compound_parent_0",
+        "track_id": "compound_parent_0_video_1",
+        "nested_sequence_id": "compound_leaf",
+        "id": "compound_container_0",
+        "source_in_tick": 0,
+        "source_out_tick": 270000,
+        "duration_tick": 215554,
+        "reverse": true,
+        "speed_curve": {
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "speed": 0.6,
+              "interpolation": "bezier",
+              "control_points": [
+                0.12,
+                0.02,
+                0.9,
+                0.3
+              ]
+            },
+            {
+              "at_tick": 270000,
+              "speed": 4.0,
+              "interpolation": "linear"
+            }
+          ]
+        }
+      },
+      {
+        "op": "append_sequence_clip",
+        "sequence_id": "seq_main",
+        "track_id": "track_video_1",
+        "nested_sequence_id": "compound_parent_0",
+        "id": "compound_container_1",
+        "source_in_tick": 0,
+        "source_out_tick": 215554,
+        "duration_tick": 143553,
+        "reverse": true,
+        "speed_curve": {
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "speed": 0.8,
+              "interpolation": "ease_out"
+            },
+            {
+              "at_tick": 215554,
+              "speed": 2.0,
+              "interpolation": "linear"
+            }
+          ]
+        }
+      }
+    ],
+    "oracle_steps": [
+      {
+        "in": 0.0,
+        "out": 3.0,
+        "start": 0.0,
+        "duration": 2.3950444444444443,
+        "reverse": true,
+        "pieces": [
+          [
+            0.0,
+            3.0,
+            0.6,
+            4.0,
+            "bezier",
+            [
+              0.12,
+              0.02,
+              0.9,
+              0.3
+            ]
+          ]
+        ]
+      },
+      {
+        "in": 0.0,
+        "out": 2.3950444444444443,
+        "start": 0.0,
+        "duration": 1.5950333333333333,
+        "reverse": true,
+        "pieces": [
+          [
+            0.0,
+            2.3950444444444443,
+            0.8,
+            2.0,
+            "ease_out",
+            []
+          ]
+        ]
+      }
+    ],
+    "duration_tick": 143553
+  }
+}

@@ -1,0 +1,15 @@
+test_speed_easing_nearly_constant_clock_bound_and_ffmpeg_pts (test_speed_easing.SpeedEasingTests.test_speed_easing_nearly_constant_clock_bound_and_ffmpeg_pts) ... FAIL
+
+======================================================================
+FAIL: test_speed_easing_nearly_constant_clock_bound_and_ffmpeg_pts (test_speed_easing.SpeedEasingTests.test_speed_easing_nearly_constant_clock_bound_and_ffmpeg_pts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_speed_easing.py", line 263, in test_speed_easing_nearly_constant_clock_bound_and_ffmpeg_pts
+    self.assertLessEqual(abs(curve_elapsed(segments,span)-oracle(span)),bound+1e-9)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.006184893427416682 not less than or equal to 0.0001302093489423212
+
+----------------------------------------------------------------------
+Ran 1 test in 0.331s
+
+FAILED (failures=1)

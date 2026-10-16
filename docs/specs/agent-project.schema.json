@@ -402,8 +402,15 @@
       "properties": {
         "at_tick": {"$ref": "#/$defs/nonNegativeInteger"},
         "speed": {"type": "number", "exclusiveMinimum": 0},
-        "interpolation": {"type": "string", "enum": ["hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"]}
-      }
+        "interpolation": {"type": "string", "enum": ["hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"]},
+        "control_points": {
+          "oneOf": [
+            {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+            {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "number"}}
+          ]
+        }
+      },
+      "allOf": [{"if": {"required": ["interpolation"], "properties": {"interpolation": {"const": "bezier"}}}, "then": {"required": ["control_points"]}}]
     },
     "template": {
       "type": "object",

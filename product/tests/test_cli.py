@@ -2707,11 +2707,18 @@ print(json.dumps({
             self.assertEqual(code, 0, planned)
             warnings = planned["data"]["plan"]["warnings"]
             self.assertFalse(any(item.get("feature") == "speed_curve_reverse" for item in warnings))
-            graph = planned["data"]["plan"]["filter_complex"]
-            self.assertIn("/4.00000000", graph)
+            authored = json.loads((project / "project.json").read_text(encoding="utf-8-sig"))
+            self.assertEqual(authored["sequences"][0]["tracks"][0]["clips"][0]["duration_tick"], 50625)
             code, rendered = invoke("render", "--project", str(project), "--output", str(project / "renders" / "reverse.mp4"))
             self.assertEqual(code, 0, rendered)
             self.assertTrue((project / "renders" / "reverse.mp4").exists())
+            probe = json.loads(subprocess.run([
+                "ffprobe", "-v", "error", "-select_streams", "v:0", "-count_frames",
+                "-show_entries", "stream=nb_read_frames,duration", "-of", "json",
+                str(project / "renders" / "reverse.mp4"),
+            ], capture_output=True, check=True).stdout)["streams"][0]
+            self.assertEqual(int(probe["nb_read_frames"]), 17)
+            self.assertLessEqual(abs(float(probe["duration"]) - .5625), 1 / 30)
 
     def test_speed_curve_with_nonzero_source_in_uses_clip_local_clock(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ai-ad-editor-speed-source-in-") as raw:

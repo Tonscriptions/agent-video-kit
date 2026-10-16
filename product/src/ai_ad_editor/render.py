@@ -20,6 +20,7 @@ from .policy import resolve_local_path
 from .project import asset_map
 from .quality import check_output
 from .text_layout import build_text_layout, graphemes, text_width, word_ranges
+from .speed_curves import compile_curve
 from .time_mapping import (
     audio_windows as _nested_audio_windows,
     compose_expression as _clock_expression,
@@ -1134,56 +1135,8 @@ def _affine_video_filters(transform: dict[str, str]) -> list[str]:
 
 
 def _speed_curve_segments(clip: dict[str, Any], source_span_tick: int, tps: int) -> list[tuple[float, float, float, float]]:
-    """Normalize a source-relative speed curve into time/remap segments.
-
-    A curve keyframe uses ``at_tick`` relative to the trimmed source span and
-    ``speed`` as the instantaneous playback rate. Missing endpoints inherit
-    the clip's constant ``speed``. Linear interpolation is integrated exactly
-    in the generated setpts expression; unsupported interpolation names fall
-    back to a constant segment and are reported by the caller.
-    """
-    curve = clip.get("speed_curve")
-    if isinstance(curve, list):
-        raw_keyframes = curve
-    elif isinstance(curve, dict):
-        raw_keyframes = curve.get("keyframes", [])
-    else:
-        return []
-    if not isinstance(raw_keyframes, list) or len(raw_keyframes) < 1 or source_span_tick <= 0:
-        return []
-    base_speed = max(0.01, _num(clip.get("speed", 1.0), 1.0))
-    points: list[tuple[int, float, str]] = []
-    for item in raw_keyframes:
-        if not isinstance(item, dict):
-            continue
-        try:
-            at_tick = max(0, min(source_span_tick, int(item.get("at_tick", 0))))
-            speed = max(0.01, float(item.get("speed", item.get("value", base_speed))))
-        except (TypeError, ValueError):
-            continue
-        points.append((at_tick, speed, str(item.get("interpolation", "linear")).lower()))
-    if not points:
-        return []
-    points.sort(key=lambda item: item[0])
-    deduped: list[tuple[int, float, str]] = []
-    for point in points:
-        if deduped and deduped[-1][0] == point[0]:
-            deduped[-1] = point
-        else:
-            deduped.append(point)
-    if deduped[0][0] > 0:
-        deduped.insert(0, (0, base_speed, "hold"))
-    if deduped[-1][0] < source_span_tick:
-        deduped.append((source_span_tick, deduped[-1][1], "hold"))
-    segments: list[tuple[float, float, float, float]] = []
-    for left, right in zip(deduped, deduped[1:]):
-        if right[0] <= left[0]:
-            continue
-        start = left[0] / float(tps)
-        end = right[0] / float(tps)
-        right_speed = right[1] if left[2] in {"linear", "ease_in", "ease_out", "ease_in_out", "bezier"} else left[1]
-        segments.append((start, end, left[1], right_speed))
-    return segments
+    """Preserve authored hold/linear/eased speed with a bounded clock compiler."""
+    return compile_curve(clip, source_span_tick, tps)
 
 
 def _reverse_speed_curve_segments(segments: list[tuple[float, float, float, float]]) -> list[tuple[float, float, float, float]]:
@@ -1220,7 +1173,7 @@ def _speed_curve_audio_parts(segments: list[tuple[float, float, float, float]]) 
         span = max(0.0, end - start)
         if span <= 1e-9:
             continue
-        subdivisions = 1 if abs(right_speed - left_speed) < 1e-8 else max(2, min(16, int(math.ceil(span * 8.0))))
+        subdivisions = 1 if right_speed == left_speed else max(2, min(16, int(math.ceil(span * 8.0))))
         for index in range(subdivisions):
             part_start = start + span * index / subdivisions
             part_end = start + span * (index + 1) / subdivisions
@@ -1229,10 +1182,10 @@ def _speed_curve_audio_parts(segments: list[tuple[float, float, float, float]]) 
             # Match each part's analytic duration rather than its midpoint
             # speed.  Audio still uses constant-tempo windows, but their
             # cumulative boundaries share the video's integrated clock.
-            if abs(part_right_speed - part_left_speed) < 1e-8:
+            if part_right_speed == part_left_speed:
                 speed = part_left_speed
             else:
-                speed = (part_right_speed - part_left_speed) / math.log(part_right_speed / part_left_speed)
+                speed = (part_right_speed - part_left_speed) / math.log1p((part_right_speed-part_left_speed)/part_left_speed)
             parts.append((part_start, part_end, max(0.01, speed)))
     return parts
 
@@ -1257,46 +1210,20 @@ def speed_curve_duration_seconds(clip: dict[str, Any], source_span_tick: int, tp
     segments = _speed_curve_segments(clip, source_span_tick, tps)
     if not segments:
         return None
-    duration = 0.0
-    for start, end, speed_left, speed_right in segments:
-        span = max(0.0, end - start)
-        if abs(speed_right - speed_left) < 1e-8:
-            duration += span / max(0.01, speed_left)
-        else:
-            duration += span / (speed_right - speed_left) * math.log(max(0.01, speed_right) / max(0.01, speed_left))
-    return max(0.001, duration)
-
-
-
+    return max(0.001, _speed_curve_elapsed_seconds(segments, segments[-1][1]))
 
 
 
 def _speed_curve_setpts(segments: list[tuple[float, float, float, float]], timeline_start: float) -> str:
-    total = 0.0
-    segment_outputs: list[tuple[float, float, float, float, float]] = []
-    for start, end, speed_left, speed_right in segments:
-        span = max(0.0, end - start)
-        if abs(speed_right - speed_left) < 1e-8:
-            output_span = span / max(0.01, speed_left)
-        else:
-            output_span = span / (speed_right - speed_left) * math.log(max(0.01, speed_right) / max(0.01, speed_left))
-        segment_outputs.append((start, end, speed_left, speed_right, total))
-        total += output_span
-    # trim keeps input timestamps.  Use the first retained frame as the
-    # origin so a non-zero source_in_tick cannot skip the beginning of the
-    # speed curve or produce an empty clip.
-    source_clock = "((PTS-STARTPTS)*TB)"
-    expression = f"({timeline_start + total:.8f})/TB"
-    for start, end, speed_left, speed_right, output_start in reversed(segment_outputs):
-        span = max(1e-9, end - start)
-        if abs(speed_right - speed_left) < 1e-8:
-            mapped = f"({timeline_start + output_start:.8f}+({source_clock}-{start:.8f})/{speed_left:.8f})/TB"
-        else:
-            delta = speed_right - speed_left
-            speed_at_t = f"({speed_left:.8f}+{delta:.8f}*(({source_clock}-{start:.8f})/{span:.8f}))"
-            mapped = f"({timeline_start + output_start:.8f}+{span:.8f}/{delta:.8f}*log(({speed_at_t})/{speed_left:.8f}))/TB"
-        expression = f"if(lt({source_clock},{end:.8f}),{mapped},{expression})"
-    return f"setpts={_expr_arg(expression)}"
+    """Use the same stable source integral as nested and authored clocks."""
+    if not segments:
+        return f'setpts=PTS-STARTPTS+{timeline_start:.12f}/TB'
+    mapping = {'source_start': 0., 'source_end': segments[-1][1],
+               'timeline_start': timeline_start,
+               'timeline_duration': _speed_curve_elapsed_seconds(segments, segments[-1][1]),
+               'speed': 1., 'reverse': False, 'segments': segments, 'curve_scale': 1.}
+    expression = _clock_expression([mapping], '((PTS-STARTPTS)*TB)', scratch_register=0)
+    return 'setpts=' + _expr_arg(f'({expression})/TB')
 
 
 def _insert_audio_freeze(
@@ -2318,12 +2245,13 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                 overlap_end = min(clip_end, window_end)
                 if overlap_end <= overlap_start:
                     continue
-                curve_value = clip.get('speed_curve')
-                curve_points = curve_value if isinstance(curve_value, list) else curve_value.get('keyframes', []) if isinstance(curve_value, dict) else []
-                if any(str(point.get('interpolation', 'linear')) not in {'linear', 'hold'} for point in curve_points if isinstance(point, dict)):
-                    warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
-                                     'feature': 'speed_curve_easing_linearized',
-                                     'message': '速度曲线 easing/Bezier 仍按源时钟线性速度段积分；未声称精确曲线效果'})
+                if clip.get('speed_curve'):
+                    compiled = _speed_curve_segments(clip, max(1, int(clip.get('source_out_tick', 1))-int(clip.get('source_in_tick', 0))), tps_local)
+                    certificate = getattr(compiled, 'certificate', {})
+                    if certificate.get('adaptive'):
+                        warnings.append({'code': 'SPEED_CURVE_COMPILED', 'clip_id': clip.get('id'),
+                                         'feature': 'speed_curve_easing', 'certificate': copy.deepcopy(certificate),
+                                         'message': '速度 easing/Bezier 已按有界源时钟编译；未退回端点线性曲线'})
                 mapped_left = current_to_final(overlap_start)
                 mapped_right = current_to_final(overlap_end)
                 mapped_start = int(round(min(mapped_left, mapped_right)))
@@ -2399,7 +2327,7 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                         parent_context["dynamic_layers"] = global_layers
                         parent_context["keyframes_are_global"] = True
                     child_windows: list[tuple[int, int]] = [(child_source_in, child_source_out)]
-                    if speed_segments:
+                    if speed_segments and not getattr(speed_segments, 'certificate', {}).get('adaptive'):
                         tps_local = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90000))
                         split_windows: list[tuple[int, int]] = []
                         for segment_start, segment_end, _, _ in speed_segments:
@@ -2432,6 +2360,7 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                 leaf_span_tick = max(1, int(clip.get('source_out_tick', 1)) - int(clip.get('source_in_tick', 0)))
                 leaf_segments = _speed_curve_segments(clip, leaf_span_tick, tps_local)
                 nonlinear_nested = bool(clock_maps) and bool(leaf_segments or any(item['segments'] for item in clock_maps))
+                nonlinear_nested = nonlinear_nested or bool(getattr(leaf_segments, 'certificate', {}).get('adaptive'))
                 exact_nested = nonlinear_nested and not clip.get('freeze')
                 if nonlinear_nested and clip.get('freeze'):
                     warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
@@ -2907,7 +2836,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     if bool(clip.get('reverse')):
                         right_frame_edge = math.ceil(src_out * float(nominal_fps) - 1e-9) / float(nominal_fps)
                         source_clock = f'if(eq(N,0),{src_out:.12f},{right_frame_edge:.12f}-N/({nominal_value}))'
-                    setpts = 'setpts=' + _expr_arg(f'({_clock_expression(nested_maps, source_clock)})/TB')
+                    setpts = 'setpts=' + _expr_arg(f'({_clock_expression(nested_maps, source_clock, scratch_register=0)})/TB')
                     curve_duration = int(clip.get('duration_tick', 1)) / tps
                     warnings.append({'code': 'NESTED_SOURCE_CFR_NORMALIZED', 'clip_id': clip.get('id'),
                                      'fps': nominal_value, 'message': '嵌套非线性变速以登记帧率建立源显示时钟；VFR 原始时间戳等效未验收'})

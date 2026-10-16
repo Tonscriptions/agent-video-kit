@@ -318,3 +318,7 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 ## 嵌套源时钟增量（2026-10-16）
 
 沿用既有 timeline compose/render 参数。内部解析时钟不写回作者字段；manifest 输入保留 nested_time_mapping 和 NESTED_SOURCE_CFR_NORMALIZED。音频仍为分窗近似，超 16384 窗或不足一采样点时在执行前返回 NESTED_AUDIO_TIME_MAPPING_LIMIT。详见[契约](./嵌套序列解析时间映射契约_v0.1_2026-10-16.md)和[真实前后成片](../validation/嵌套变速倒放与关键帧时钟实测_2026-10-16.md)，不能将该结果扩大到 VFR、速度 easing、定格/字幕或完整群组。
+
+## 速度 easing/Bezier 增量（2026-10-16）
+
+无新增 CLI 参数。speed_curve 支持实际 ease_in/out/in_out 与二/四元 Bezier；Bezier 现在必须显式提供合法 control_points，缺失句柄不再线性回退。内部零/负速度及编译超预算在写入/执行前结构化拒绝；manifest 保留 SPEED_CURVE_COMPILED 与原/归一化时钟界。详见[契约](./速度曲线Easing与Bezier契约_v0.1_2026-10-16.md)与[正式成片](../validation/速度Easing与Bezier原时钟实测_2026-10-16.md)，VFR、定格/字幕、群组和音频相位的旧边界继续适用。

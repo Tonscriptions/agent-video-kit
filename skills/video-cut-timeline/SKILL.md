@@ -58,7 +58,14 @@ Keep each reverse attached to its own container, and keep leaf curves in their
 original source domain after trimming. Render manifests record the composed
 maps and explicit source CFR normalization. Audio still uses atempo windows
 with integrated 48 kHz boundaries, so retain its phase/continuous-tempo warning.
-Freeze, caption cues, speed easing, parent pivots and group coordinate spaces
+Use the [speed easing contract](../../docs/specs/速度曲线Easing与Bezier契约_v0.1_2026-10-16.md)
+for ease_in/out/in_out and two/four-value Bezier handles. Keep the authored
+source-domain curve; never replace easing with its endpoint chord. Bezier
+handles must be finite, x handles in 0..1 and the entire speed curve positive.
+Inspect SPEED_CURVE_COMPILED certificates: 250 us is an unnormalized per-curve
+clock bound, not a composed output guarantee. Segment/expression budget failures
+must remain errors; audio is still windowed. Endpoint speed floor 0.01 remains.
+Freeze, caption cues, parent pivots and group coordinate spaces
 keep separate acceptance boundaries. A render intentionally records outputs
 and provenance; compare authored timeline/assets/settings and Rights Ledger
 when checking that generated internal clocks were not persisted.

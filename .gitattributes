@@ -1,5 +1,6 @@
 # Published evidence uses byte hashes; preserve its bytes on Windows checkout.
 product/**/*.py text eol=lf
+docs/specs/agent-project.schema.json text eol=lf
 docs/assets/** -text
 scripts/build_readme_gallery.py -text
 docs/validation/evidence/readme-gallery-20261016.json -text
@@ -25,3 +26,11 @@ docs/validation/evidence/nested-time-quality-20261016.json -text
 docs/validation/evidence/nested-time-*-20261016.log -text whitespace=cr-at-eol
 docs/validation/evidence/nested-time-full-interrupted-fixture-20261016.log -whitespace
 docs/assets/nested-time-20261016/font-license.txt -whitespace
+scripts/smoke_speed_easing.py -text
+docs/validation/evidence/speed-easing-20261016.json -text
+docs/validation/evidence/speed-easing-quality-20261016.json -text
+docs/validation/evidence/speed-easing-stability-20261016.json -text
+docs/validation/evidence/speed-easing-*-20261016.log -text whitespace=cr-at-eol
+# Preserve the captured unittest subTest progress lines, including final spaces.
+docs/validation/evidence/speed-easing-before-20261016.log -whitespace
+docs/assets/speed-easing-20261016/font-license.txt -whitespace
