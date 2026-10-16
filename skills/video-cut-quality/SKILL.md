@@ -20,6 +20,17 @@ and leaves output geometry fixed. Compare the scaled array estimate separately
 from CUDA peaks and total process memory. A higher multiplier or step count
 is a sampling choice whose reconstruction quality needs evidence.
 
+For `--repair-blend harmonic`, inspect `metrics.blend`: nonempty frame count,
+selected-pixel bound, iteration limits, finite residual/target ratio <=1,
+clipping, correction magnitude, elapsed time and the at-most-16 samples.
+Check `base_state_peak_bytes` separately from solver-owned arrays; their
+combined estimate excludes model/Torch/total RAM and VRAM. The source RGB
+inside the mask does not enter correction; optional final feathering can
+still mix it back. Compare against matching direct settings, preserve the
+true mask denominator, and review generated structure, texture and temporal
+seams independently of a reduced color bias. See the
+[harmonic contract](../../docs/specs/本地修复区域色差融合契约_v0.1_2026-10-16.md).
+
 Compare all decoded frames for original alpha and outside-mask RGB. For
 controlled truth, report masked error using the exact expanded mask, context
 and inference settings. Different mask growth changes the score denominator.

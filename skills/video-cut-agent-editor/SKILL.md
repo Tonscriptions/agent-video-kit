@@ -49,6 +49,13 @@ can use `--apply --track-id <video-track> --audio-track-id <audio-track>`.
 Source, mask and model rights gate the result. Review texture and temporal
 flicker; this is framewise repair and does not prove full video/generative parity.
 
+For an explicit boundary color correction after either repair engine, use
+`--repair-blend harmonic`; default `direct` retains the existing composition.
+Read the [harmonic contract](../../docs/specs/本地修复区域色差融合契约_v0.1_2026-10-16.md)
+for solver options, selection-dependent admission and failure behavior.
+Review its convergence report and natural texture/motion separately; the
+mode can reduce a color patch while leaving object traces or flicker.
+
 For selected objects or a person with a held product, use the
 [local SAM2 contract](../../docs/specs/本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md).
 Register existing video safetensors/Python/evidence with explicit CPU or CUDA,

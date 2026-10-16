@@ -50,6 +50,35 @@ class VaceWindowTests(unittest.TestCase):
         result=np.frombuffer(output.getvalue(),np.uint8).reshape(original.shape)
         return original,mask,result,metrics,calls
 
+    def test_harmonic_runs_after_fractional_overlap_mix_and_preserves_original_alpha(self):
+        from ai_ad_editor.repair_blend import harmonize_region, validate_blend_report
+        observed=[]
+        def blend(source,prediction,selected,**kw):
+            observed.append(prediction.copy());return harmonize_region(source,prediction,selected,**kw)
+        def model(images,masks,g):return np.full(images.shape,.2 if g['seed']==0 else .8,np.float32)
+        options=normalize_options(grow=0,context=0,blend_mode='harmonic')
+        with patch('ai_ad_editor.vace_frames.harmonize_region',side_effect=blend):
+            original,mask,result,metrics,calls=self.run_frames(window=5,overlap=2,options=options,infer=model)
+        self.assertEqual(len(calls),2);self.assertEqual(len(observed),8)
+        np.testing.assert_allclose(observed[3][20,30],102,atol=1e-4)
+        np.testing.assert_allclose(observed[4][20,30],153,atol=1e-4)
+        np.testing.assert_array_equal(result,original)
+        self.assertEqual(metrics['blend']['frames'],8)
+        self.assertEqual(metrics['state_peak_bytes'],metrics['base_state_peak_bytes']+metrics['blend']['owned_array_peak_bytes'])
+        validate_blend_report(metrics,options,width=64,height=48,frames=8)
+
+    def test_harmonic_budget_full_selection_and_empty_bypass_before_model(self):
+        generation=normalize_generation(prompt='empty background',window_frames=5,window_overlap=0)
+        options=normalize_options(grow=0,context=0,blend_mode='harmonic')
+        original=np.full((5,48,64,4),180,np.uint8);mask=np.zeros_like(original);mask[:,16:32,24:40,3]=255
+        def run(budget=512*1024**2):
+            return process_frames(io.BytesIO(np.concatenate([original,mask],axis=2).tobytes()),io.BytesIO(),width=64,height=48,frames=5,options=options,generation=generation,channel='alpha',budget=budget,infer=lambda *_:self.fail('Model must not load'))
+        base=buffer_budget(64,48,generation,options['model_max_edge'])+64*48*24
+        with self.assertRaisesRegex(ValueError,'ARRAY_BUDGET_EXCEEDED'):run(base+1)
+        mask[:,:,:,3]=255
+        with self.assertRaisesRegex(ValueError,'NO_BOUNDARY'):run()
+        mask[:]=0;metrics=run();self.assertEqual(metrics['blend']['frames'],0);self.assertEqual(metrics['model_calls'],0)
+
     def test_explicit_input_scale_preserves_original_mapping_and_alpha(self):
         for factor in (1,2,4):
             with self.subTest(factor=factor):
@@ -280,6 +309,10 @@ response={'protocol':request['protocol'],'engine':request['engine'],'status':'su
  'model_loaded':metrics['model_calls']>0,'model_execution':{'prompt_truncated':False,'prompt_extension':False,'text_encoder_released_before_generation':True,'transformer_precision':'bfloat16-with-declared-float32-stability-modules','vae_precision':'float32','prompt_token_counts':{'prompt':12,'negative_prompt':1},'window_seconds':[0.1]*metrics['model_calls'],'flow_shift':request['generation']['flow_shift'],'model_input_scale':request['generation']['model_input_scale'],'window_input_shapes':shapes}}
 files={a['path']:a['bytes'] for a in request['adapter']['artifacts']}
 response['artifact_verification']={'mode':'windows-read-lock-command-scope','files_hashed':len(files),'bytes_hashed':sum(files.values()),'digest_reuses_while_locked':len(request['adapter']['artifacts']),'write_and_delete_sharing':False,'persists_across_commands':False}
+if mode=='bad_blend':metrics['blend']['mode']='invented'
+if mode=='bad_blend_budget':metrics['blend']['owned_array_peak_bytes']+=1
+if mode=='bad_blend_residual':metrics['blend']['residual_ratio_max']=2
+if mode=='bad_blend_samples':metrics['blend']['samples']=[]
 if mode=='bad_generation':response['generation']={**response['generation'],'seed':99}
 if mode=='bad_window':metrics['window_plan_sha256']='sha256:'+'0'*64
 if mode=='bad_calls':metrics['empty_windows']+=1
@@ -335,7 +368,7 @@ class NativeVaceTests(unittest.TestCase):
     def test_registration_dry_run_inspect_and_complete_inventory(self):
         before=self.metadata();code,result=invoke('media','adapter','register',*self.options,'--dry-run')
         self.assertEqual(code,0,result);self.assertEqual(self.metadata(),before)
-        adapter=self.register();self.assertEqual(adapter['model_file_count'],17);self.assertEqual(len(adapter['artifacts']),29)
+        adapter=self.register();self.assertEqual(adapter['model_file_count'],17);self.assertEqual(len(adapter['artifacts']),30)
         self.assertTrue(verify_adapter(adapter)['ok'])
         self.assertTrue(invoke('media','adapter','inspect','--project',str(self.root),'--adapter-id','vace')[1]['data']['verification']['ok'])
 
@@ -420,9 +453,24 @@ class NativeVaceTests(unittest.TestCase):
 
     def test_malformed_worker_reports_fail_without_publishing(self):
         self.register();before=self.metadata()
-        for mode in ('bad_generation','bad_window','bad_calls','bad_alpha','bad_rgba','bad_network','bad_provider','bad_loaded','bad_tokens','bad_precision','bad_conditioning','bad_verification','bad_flow','bad_scale','bad_shape','bad_raster','missing_shapes','fail'):
+        for mode in ('bad_generation','bad_window','bad_calls','bad_alpha','bad_rgba','bad_network','bad_provider','bad_loaded','bad_tokens','bad_precision','bad_conditioning','bad_verification','bad_flow','bad_scale','bad_shape','bad_raster','missing_shapes','bad_blend','fail'):
             with self.subTest(mode=mode),self.fake_command(mode):
                 code,result=invoke(*self.command());self.assertEqual(code,6,result);self.assert_clean_failure(before)
+
+    def test_harmonic_protocol_rollback_and_successful_delivery(self):
+        self.register();before=self.metadata()
+        with self.fake_command():code,result=invoke(*self.command(),'--repair-blend','harmonic','--blend-max-iterations','1')
+        self.assertEqual(code,6,result);self.assert_clean_failure(before)
+        for mode in ('bad_blend_budget','bad_blend_residual','bad_blend_samples'):
+            with self.subTest(mode=mode),self.fake_command(mode):
+                code,result=invoke(*self.command(),'--repair-blend','harmonic');self.assertEqual(code,6,result)
+            self.assert_clean_failure(before)
+        with self.fake_command():code,result=invoke(*self.command(),'--repair-blend','harmonic')
+        self.assertEqual(code,0,result)
+        report=result['data']['inpainting'];self.assertEqual(report['worker']['metrics']['blend']['frames'],8)
+        self.assertTrue(report['rgba_roundtrip_verified']);self.assertTrue(report['audio']['preserve'])
+        output=self.decode(self.output);source=np.repeat(self.decode(self.source),2,axis=0)
+        np.testing.assert_array_equal(output[:,:16],source[:,:16]);np.testing.assert_array_equal(output[:,:,:,3],source[:,:,:,3])
 
     def test_timeout_cancel_kill_all_pipeline_children_and_rollback(self):
         self.register();before=self.metadata();cancel=self.base/'cancel.flag'

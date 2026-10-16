@@ -62,3 +62,9 @@ JSON envelope 的命令为 `media.inpaint`，报告结果位于 `data.inpainting
 共享管道错误保留 `MATTING_*`，LaMa 模型/蒙版专属检查使用 `INPAINT_*`；agent 应同时读取错误 `cause` 和失败报告。Python socket/DNS/HTTP 审计 guard 在 Torch 导入前安装，但它不是系统防火墙。运行期不安装包、不下载媒体或模型、不启动 IOPaint、HTTP、剪映、Docker/WSL。
 
 实测、像素检查和未通过的自然场景质量项见[验证记录](../validation/LaMa本地区域修复与物体移除实测_2026-10-16.md)。
+
+## 7. 显式区域色差融合与惰性加载
+
+默认 `--repair-blend direct` 保留原始模型输出/ROI 缩放和合成语义；显式 `harmonic` 保留模型浮点 RGB 缩回 ROI，随后执行[共享调和颜色修正](./本地修复区域色差融合契约_v0.1_2026-10-16.md)，再进入原有选区/羽化和一次量化。可选求解步数与容差进入请求摘要、幂等和完整性绑定；非收敛、超预算、全画布无边界选区及畸形报告失败，不能回退 direct 后继续发布。
+
+LaMa 权重改为首次有效推理时加载；空选区与无效选区预算先检查。全空管道仍导入原生 Torch/检查 CUDA 和权重摘要，但不加载 TorchScript 权重。已拥有帧/ROI 浮点数组与求解数组合并计入 512 MiB，模型/Torch/总进程和显存另计；报告增加 `base_state_peak_bytes` 与 `blend`。本轮 adapter 绑定 10 项文件（新增共享融合内核），旧摘要须重新登记，不能手改绕过。实测与质量边界见[本轮记录](../validation/本地区域色差融合实测_2026-10-16.md)。

@@ -4,11 +4,13 @@
 |---|---|
 | 文档编号 | DOCS-INDEX-001 |
 | 状态 | 有效 |
-| 审计日期 | 2026-10-16（VACE 显式采样/输入尺度、五组校准及未接入融合原型） |
+| 审计日期 | 2026-10-16（共享区域融合、最终完整回归与真实交付验证完成） |
 
 本目录是 `AI广告剪辑` 项目的项目文档唯一入口。当前基线版本为 2026-10-12，最近一次体系审计为 2026-10-15，最近增量审计为 2026-10-16；产品需求、技术方案、兼容性结论、开发计划、验收记录和研究结果都应在这里落盘。
 
-当前进度见[26 模块构建进度总表](./构建进度总表_2026-10-16.md)。[VACE 契约](./specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md)与[实测](./validation/VACE本地多帧编辑与生成填充实测_2026-10-16.md)新增显式 shift、1/2/4 倍模型输入、倍率平方预算与真实栅格核对；41/41 专项、344/344 完整回归及新受控正式链路通过，87 份源码前后摘要一致；4 倍/shift 16 输出与校准组原始 RGBA 一致，受控画质仍未通过。见[本轮正式证据](./validation/evidence/vace-profiles-20261016.json)。五组同源校准已全部结束，暗矩形补丁均未消除，默认仍为 3/1。见[校准证据](./validation/evidence/vace-calibration-20261016.json)。前序 338/338、32 帧 SAM2→VACE→成片和自然色块/残影/纹理缺口继续见[历史正式证据](./validation/evidence/vace-smoke-20261016.json)，不能用旧回归覆盖本轮改动。
+当前增量：[区域色差融合契约](./specs/本地修复区域色差融合契约_v0.1_2026-10-16.md)及[真实实测](./validation/本地区域色差融合实测_2026-10-16.md)。LaMa/VACE 共享 harmonic 已接入；完整 363/363，含 73 项融合子集，89 份 Python 源码前后不变。LaMa 受控/自然/全空及 VACE 受控完成最终原生验证；独立 RGBA/PCM 和成片检查通过，自然画质未通过。详见[本轮机器证据](./validation/evidence/repair-blend-smoke-20261016.json)。
+
+前序显式参数增量：当前进度见[26 模块构建进度总表](./构建进度总表_2026-10-16.md)。[VACE 契约](./specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md)与[实测](./validation/VACE本地多帧编辑与生成填充实测_2026-10-16.md)新增显式 shift、1/2/4 倍模型输入、倍率平方预算与真实栅格核对；41/41 专项、344/344 完整回归及新受控正式链路通过，87 份源码前后摘要一致；4 倍/shift 16 输出与校准组原始 RGBA 一致，受控画质仍未通过。见[本轮正式证据](./validation/evidence/vace-profiles-20261016.json)。五组同源校准已全部结束，暗矩形补丁均未消除，默认仍为 3/1。见[校准证据](./validation/evidence/vace-calibration-20261016.json)。前序 338/338、32 帧 SAM2→VACE→成片和自然色块/残影/纹理缺口继续见[历史正式证据](./validation/evidence/vace-smoke-20261016.json)，不能用旧回归覆盖本轮改动。
 
 前序 [LaMa 区域修复契约](./specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md)和[CPU/CUDA、SAM2→修复实测](./validation/LaMa本地区域修复与物体移除实测_2026-10-16.md)记录 303/303 当轮完整回归；自然腿部残影、纹理涂抹及时序质量仍有缺口。14 个 video-cut- Skill 审计通过，完整剪映对标未完成。LaMa 依据见[机器证据](./validation/evidence/lama-smoke-20261016.json)和[当轮文档审计](./validation/evidence/docs-audit-lama-20261016.json)。
 
@@ -26,7 +28,7 @@
 
 本轮补齐[跟踪坐标与重算契约](./specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md)及[组合渲染实测](./validation/跟踪坐标绑定与组合渲染实测_2026-10-15.md)：直接源层几何/时钟与输出画布重算、实际 YOLO 重构图+标签横竖双版闭环通过；完整产品 **211/211** 回归通过，完整剪映等价仍待验收。
 
-本次进度核对覆盖 26 个模块；本轮完整回归 344/344、专项 41/41 通过，前序已发布为 338/338。VACE、LaMa 等八类模型已有真实本地运行记录；VACE 为实验能力，成功交付和像素保留不等于生成质量达标，#56 保持 degraded。色差融合仍未接入产品，NumPy 原型 9 项独立测试、29 帧交叉核验见[原型证据](./validation/evidence/vace-numpy-harmonic-prototype-20261016.json)。此前[337 方法/34 项专项错误快照](./validation/evidence/build-progress-current-vace-20261016.json)、[323 项历史核对](./validation/evidence/build-progress-checked-vace-20261016.json)和[前序文档审计](./validation/evidence/docs-audit-vace-20261016.json)保留为历史。
+前序显式参数核对覆盖 26 个模块；当轮完整回归 344/344、专项 41/41 通过，前序已发布为 338/338。VACE、LaMa 等八类模型已有真实本地运行记录；VACE 为实验能力，成功交付和像素保留不等于生成质量达标，#56 保持 degraded。色差融合当时未接入产品；本轮已接入，见上述实测。历史 NumPy 原型 9 项独立测试、29 帧交叉核验见[原型证据](./validation/evidence/vace-numpy-harmonic-prototype-20261016.json)。此前[337 方法/34 项专项错误快照](./validation/evidence/build-progress-current-vace-20261016.json)、[323 项历史核对](./validation/evidence/build-progress-checked-vace-20261016.json)和[前序文档审计](./validation/evidence/docs-audit-vace-20261016.json)保留为历史。
 
 本轮全部文档的链接、元数据状态、空文档及摘要审计见[显式参数文档审计](./validation/evidence/docs-audit-vace-profiles-20261016.json)。审计仅核对本地文件与首个状态，不验证外链、锚点或代替画质/许可验收。
 
@@ -170,3 +172,5 @@ docs/
 
 
 候选开发方向：[本地修复区域色差融合契约](./specs/本地修复区域色差融合契约_v0.1_2026-10-16.md)为草案，开发诊断减轻受控暗补丁，自然形体/纹理仍未通过，尚未计入产品功能。
+
+本轮最终文档审计见[区域融合文档审计](./validation/evidence/docs-audit-repair-blend-20261016.json)，覆盖 README、AGENTS 与 docs 全部 Markdown 的本地目标、首个状态、空文档和摘要；不代替外链/锚点、自然画质或许可验收。

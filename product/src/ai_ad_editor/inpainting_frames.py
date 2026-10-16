@@ -2,16 +2,18 @@
 from __future__ import annotations
 
 import hashlib
+import time
 from typing import BinaryIO, Callable
 
 import numpy as np
 from PIL import Image, ImageFilter
 
 from .matting_frames import read_frame
+from .repair_blend import harmonize_region, required_blend_bytes, new_blend_report, record_blend
 
 
 def repair_frame(source: np.ndarray, mask_rgba: np.ndarray, *, options: dict, channel: str,
-                 infer: Callable, budget: int) -> tuple[np.ndarray, dict]:
+                 infer: Callable, budget: int, checkpoint: Callable | None = None) -> tuple[np.ndarray, dict]:
     if source.dtype != np.uint8 or source.ndim != 3 or source.shape[2] != 4 or mask_rgba.shape != source.shape or mask_rgba.dtype != np.uint8:
         raise ValueError('INPAINT_FRAME_SHAPE_INVALID')
     if channel == 'alpha':
@@ -29,9 +31,11 @@ def repair_frame(source: np.ndarray, mask_rgba: np.ndarray, *, options: dict, ch
     if owned > budget:
         raise ValueError('INPAINT_FRAME_BUFFER_BUDGET_EXCEEDED')
     info = {'mask_pixels': count, 'model_calls': 0, 'resized': False, 'model_pixels': 0,
-            'state_bytes': owned, 'roi': None, 'outside_mask_changed_pixels': 0}
+            'state_bytes': owned, 'base_state_bytes': owned, 'roi': None, 'outside_mask_changed_pixels': 0,
+            'blend_detail': None, 'blend_seconds': 0.}
     if count == 0:
         return output, info
+    blend_owned = required_blend_bytes(source.shape[1], source.shape[0], count, options)
     ys, xs = np.flatnonzero(selected.any(axis=1)), np.flatnonzero(selected.any(axis=0))
     h, w = selected.shape
     context = options['context']
@@ -44,6 +48,10 @@ def repair_frame(source: np.ndarray, mask_rgba: np.ndarray, *, options: dict, ch
     # Account for owned frame arrays, model inputs/output and resized blending
     # buffers. This is a buffer budget, not total Torch RAM/VRAM or model memory.
     owned += pw * ph * 7 * 4 + roi_w * roi_h * 7 * 4 + w * h * 4 + xs.nbytes + ys.nbytes
+    if options.get('blend_mode') == 'harmonic':
+        owned += w * h * 24 + roi_w * roi_h * 48
+    base_owned = owned
+    owned += blend_owned
     if owned > budget:
         raise ValueError('INPAINT_FRAME_BUFFER_BUDGET_EXCEEDED')
     rgb = np.asarray(Image.fromarray(source[y1:y2, x1:x2, :3]).resize((mw, mh), Image.Resampling.BILINEAR))
@@ -59,8 +67,20 @@ def repair_frame(source: np.ndarray, mask_rgba: np.ndarray, *, options: dict, ch
         raise ValueError('INPAINT_MODEL_OUTPUT_INVALID')
     # LaMa may overshoot 0..1 slightly; clipping is explicit and counted.
     clipped = int(np.count_nonzero((predicted < 0) | (predicted > 1)))
-    generated = np.rint(np.clip(predicted[0, :, :mh, :mw].transpose(1, 2, 0), 0, 1) * 255).astype(np.uint8)
-    generated = np.asarray(Image.fromarray(generated).resize((roi_w, roi_h), Image.Resampling.BILINEAR))
+    if options.get('blend_mode') == 'harmonic':
+        # Preserve fractional model detail through ROI reconstruction and correction.
+        frame = np.clip(predicted[0, :, :mh, :mw].transpose(1, 2, 0), 0, 1)
+        generated = np.stack([np.asarray(Image.fromarray(frame[:, :, c]).resize((roi_w, roi_h), Image.Resampling.BILINEAR), dtype=np.float32) for c in range(3)], axis=2) * 255
+        prediction = np.zeros((h, w, 3), np.float32)
+        prediction[y1:y2, x1:x2] = generated
+        began = time.monotonic()
+        corrected, detail = harmonize_region(source, prediction, selected, max_iterations=options['blend_max_iterations'],
+            relative_tolerance=options['blend_tolerance'], array_budget=budget-base_owned, checkpoint=checkpoint)
+        info.update(blend_detail=detail, blend_seconds=time.monotonic()-began)
+        generated = corrected[y1:y2, x1:x2]
+    else:
+        generated = np.rint(np.clip(predicted[0, :, :mh, :mw].transpose(1, 2, 0), 0, 1) * 255).astype(np.uint8)
+        generated = np.asarray(Image.fromarray(generated).resize((roi_w, roi_h), Image.Resampling.BILINEAR))
     weight = selected[y1:y2, x1:x2].astype(np.float32)
     if options['feather']:
         feathered = np.asarray(Image.fromarray(selected.astype(np.uint8) * 255).filter(ImageFilter.GaussianBlur(options['feather'])), dtype=np.float32) / 255
@@ -71,7 +91,7 @@ def repair_frame(source: np.ndarray, mask_rgba: np.ndarray, *, options: dict, ch
     if changed_outside or not np.array_equal(output[:, :, 3], source[:, :, 3]):
         raise ValueError('INPAINT_UNMASKED_OR_ALPHA_CHANGED')
     info.update(model_calls=1, resized=scale < 1, model_pixels=pw * ph, state_bytes=owned,
-                roi=[x1, y1, x2, y2], clipped_model_values=clipped, outside_mask_changed_pixels=changed_outside)
+                roi=[x1, y1, x2, y2], clipped_model_values=clipped, outside_mask_changed_pixels=changed_outside, base_state_bytes=base_owned)
     return output, info
 
 
@@ -84,11 +104,14 @@ def process_frames(source: BinaryIO, destination: BinaryIO, *, width: int, heigh
     original_alpha, output_alpha = hashlib.sha256(), hashlib.sha256()
     calls = masked = resized = model_peak = state_peak = transparent = opaque = alpha_sum = clipped = 0
     alpha_min, alpha_max = 255, 0
-    samples = []
+    samples = []; blend_report = new_blend_report(options); base_peak = 0
     for index in range(frames):
         pair = np.frombuffer(read_frame(source, width * 2 * height * 4), dtype=np.uint8).reshape(height, width * 2, 4)
         original, mask = pair[:, :width], pair[:, width:]
-        output, metrics = repair_frame(original, mask, options=options, channel=channel, infer=infer, budget=budget)
+        output, metrics = repair_frame(original, mask, options=options, channel=channel, infer=infer, budget=budget, checkpoint=(lambda: progress(index)) if progress else None)
+        detail = metrics.pop('blend_detail'); elapsed = metrics.pop('blend_seconds')
+        if detail is not None: record_blend(blend_report, index, detail, elapsed)
+        base_peak = max(base_peak, metrics['base_state_bytes'])
         raw = output.tobytes()
         digest.update(raw); source_digest.update(original.tobytes()); mask_digest.update(mask.tobytes())
         original_alpha.update(original[:, :, 3].tobytes()); output_alpha.update(output[:, :, 3].tobytes())
@@ -106,7 +129,7 @@ def process_frames(source: BinaryIO, destination: BinaryIO, *, width: int, heigh
     pixels = width * height * frames
     return {'frames': frames, 'width': width, 'height': height, 'rgba_sha256': 'sha256:' + digest.hexdigest(),
             'rgba_bytes': pixels * 4, 'source_rgba_sha256': 'sha256:' + source_digest.hexdigest(), 'decoded_mask_rgba_sha256': 'sha256:' + mask_digest.hexdigest(),
-            'state_updates': frames, 'state_peak_bytes': state_peak, 'state_reset': 'per-frame',
+            'state_updates': frames, 'state_peak_bytes': state_peak, 'base_state_peak_bytes': base_peak, 'blend': blend_report, 'state_reset': 'per-frame',
             'buffer_budget_scope': 'conservative-owned-frame-and-input-output-arrays-excludes-model-and-torch-temporaries',
             'input_alpha': 'preserve', 'alpha_mode': 'straight', 'alpha_min': alpha_min, 'alpha_max': alpha_max, 'alpha_mean': alpha_sum / pixels / 255,
             'transparent_pixels': transparent, 'opaque_pixels': opaque, 'soft_alpha_pixels': pixels - transparent - opaque,

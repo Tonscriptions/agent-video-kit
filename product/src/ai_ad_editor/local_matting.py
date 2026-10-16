@@ -258,6 +258,17 @@ def validate_response(response: dict, request: dict) -> None:
                 raise ValueError('framewise inpainting counters')
             if type(metrics.get('mask_pixels')) is not int or not 0 <= metrics['mask_pixels'] <= pixels or metrics.get('outside_mask_changed_pixels') != 0:
                 raise ValueError('inpainting mask counters')
+            from .repair_blend import validate_blend_report, joint_blend_overhead
+            validate_blend_report(metrics, request['inpainting'], width=info['width'], height=info['height'], frames=info['frames'])
+            base_peak = metrics.get('base_state_peak_bytes')
+            blend_peak = metrics['blend']['owned_array_peak_bytes']
+            if type(base_peak) is not int or not max(base_peak, blend_peak) <= metrics['state_peak_bytes'] <= base_peak + blend_peak or base_peak < info['width']*info['height']*21:
+                raise ValueError('repair blend combined owned-array budget')
+            if not joint:
+                w,h=info['width'],info['height'];edge=request['inpainting']['model_max_edge']
+                mw=max(64,min((w+7)//8*8,(edge+7)//8*8));mh=max(64,min((h+7)//8*8,(edge+7)//8*8))
+                maximum=w*h*(125 if request['inpainting']['blend_mode']=='harmonic' else 53)+mw*mh*28+(w+h)*8
+                if base_peak>maximum:raise ValueError('framewise repair base array estimate')
             if joint:
                 from .local_vace import window_plan, buffer_budget, plan_digest
                 if metrics.get('conditioning') != 'masked-rgb-127-before-and-after-resize':
@@ -275,7 +286,8 @@ def validate_response(response: dict, request: dict) -> None:
                           'resized_model_frames':sum(w['end']-w['start'] for w in windows)}
                 if any(type(metrics.get(k)) is not int or not 0 <= metrics[k] <= maximum for k,maximum in bounds.items()) or metrics['model_calls'] + metrics['empty_windows'] != len(windows):
                     raise ValueError('joint window counters')
-                if metrics['state_peak_bytes'] != buffer_budget(info['width'],info['height'],request['generation'],request['inpainting']['model_max_edge']):
+                expected_base=buffer_budget(info['width'],info['height'],request['generation'],request['inpainting']['model_max_edge'])+joint_blend_overhead(info['width'],info['height'],request['inpainting'])
+                if base_peak!=expected_base or metrics['state_peak_bytes']!=expected_base+blend_peak:
                     raise ValueError('joint window buffer estimate')
                 if (metrics['mask_pixels']==0)!=(metrics['model_calls']==0) or (metrics['empty_mask_frames']==info['frames'])!=(metrics['mask_pixels']==0) or response.get('model_loaded') is not (metrics['model_calls']>0):
                     raise ValueError('joint model/empty-mask execution mismatch')

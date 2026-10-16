@@ -40,6 +40,9 @@ def main():
     parser.add_argument('--mask-grow', type=int, default=4)
     parser.add_argument('--mask-feather', type=float, default=0.)
     parser.add_argument('--model-max-edge', type=int, default=1024)
+    parser.add_argument('--repair-blend', choices=['direct','harmonic'], default='direct')
+    parser.add_argument('--blend-max-iterations', type=int, default=None)
+    parser.add_argument('--blend-tolerance', type=float, default=None)
     args = parser.parse_args()
     if args.engine=='vace' and (args.device!='cuda' or not args.prompt):parser.error('VACE requires explicit CUDA and prompt')
     if args.engine=='lama' and any(getattr(args,k) is not None for k in ('prompt','negative_prompt','seed','inference_steps','window_frames','window_overlap','flow_shift','model_input_scale')):parser.error('Prompt/window options require --engine vace')
@@ -82,9 +85,9 @@ def main():
     adapter = invoke(*registration)['data']['adapter']
     if not args.execution_only:assert invoke('media', 'adapter', 'inspect', '--project', str(project), '--adapter-id', adapter_id)['data']['verification']['ok']
     command = ['media', 'inpaint', '--project', str(project), '--asset-id', source['id'], '--mask-asset-id', mask['id'], '--adapter-id', adapter_id, '--derived-asset-id', 'repaired',
-               '--mask-channel', args.mask_channel, '--mask-grow', str(args.mask_grow), '--mask-feather', str(args.mask_feather), '--model-max-edge', str(args.model_max_edge),
+               '--repair-blend', args.repair_blend, '--mask-channel', args.mask_channel, '--mask-grow', str(args.mask_grow), '--mask-feather', str(args.mask_feather), '--model-max-edge', str(args.model_max_edge),
                '--apply', '--track-id', 'track_video_1', '--audio-track-id', 'track_audio_1']
-    for name in ('prompt','negative_prompt','seed','inference_steps','window_frames','window_overlap','flow_shift','model_input_scale'):
+    for name in ('prompt','negative_prompt','seed','inference_steps','window_frames','window_overlap','flow_shift','model_input_scale','blend_max_iterations','blend_tolerance'):
         value=getattr(args,name)
         if value is not None:command+=['--'+name.replace('_','-'),str(value)]
     planned = None if args.execution_only else invoke(*command, '--dry-run')['data']['plan']

@@ -341,6 +341,9 @@ def build_parser() -> argparse.ArgumentParser:
     inpaint.add_argument('--mask-feather', type=float, default=0.)
     inpaint.add_argument('--context-pixels', type=int, default=64)
     inpaint.add_argument('--model-max-edge', type=int, default=1024)
+    inpaint.add_argument('--repair-blend', choices=['direct', 'harmonic'], default='direct', help='显式区域色差融合；默认直接合成')
+    inpaint.add_argument('--blend-max-iterations', type=int, default=None)
+    inpaint.add_argument('--blend-tolerance', type=float, default=None)
     inpaint.add_argument('--output', default=None)
     inpaint.add_argument('--start-seconds', type=float, default=0.)
     inpaint.add_argument('--end-seconds', type=float, default=None)
@@ -1753,7 +1756,10 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         plan['mask'] = prepare_inpaint_mask(root, mask_asset['uri'], kind=mask_asset['kind'], video=plan['video'], channel=args.mask_channel, start_seconds=args.mask_start_seconds, resize=args.mask_resize)
         if plan['mask']['sha256'] != mask_asset.get('sha256'):
             raise AppError('INPAINT_MASK_HASH_MISMATCH', '蒙版文件与已登记摘要不符', exit_code=10)
-        plan['inpainting'] = inpaint_options(threshold=args.mask_threshold, grow=args.mask_grow, feather=args.mask_feather, context=args.context_pixels, model_max_edge=args.model_max_edge)
+        if args.repair_blend == 'direct' and (args.blend_max_iterations is not None or args.blend_tolerance is not None):
+            raise argument_error('求解参数要求显式 --repair-blend harmonic', 'repair_blend')
+        plan['inpainting'] = inpaint_options(threshold=args.mask_threshold, grow=args.mask_grow, feather=args.mask_feather, context=args.context_pixels, model_max_edge=args.model_max_edge,
+            blend_mode=args.repair_blend, blend_max_iterations=2000 if args.blend_max_iterations is None else args.blend_max_iterations, blend_tolerance=1e-6 if args.blend_tolerance is None else args.blend_tolerance)
         generation_args = {'prompt':args.prompt,'negative_prompt':args.negative_prompt,'seed':args.seed,'inference_steps':args.inference_steps,
                            'guidance_scale':args.guidance_scale,'conditioning_scale':args.conditioning_scale,'window_frames':args.window_frames,
                            'window_overlap':args.window_overlap,'prompt_max_tokens':args.prompt_max_tokens,'scene_cut_frames':args.scene_cut_frame,
@@ -1761,11 +1767,16 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         if joint:
             plan['generation'] = vace_options(**generation_args, frames=plan['video']['frames'])
             plan['windows'] = vace_windows(plan['video']['frames'],plan['generation'])
-            plan['owned_array_budget_bytes'] = vace_buffer_budget(plan['video']['width'],plan['video']['height'],plan['generation'],plan['inpainting']['model_max_edge'])
+            from .repair_blend import joint_blend_overhead
+            plan['owned_array_budget_bytes'] = vace_buffer_budget(plan['video']['width'],plan['video']['height'],plan['generation'],plan['inpainting']['model_max_edge'])+joint_blend_overhead(plan['video']['width'],plan['video']['height'],plan['inpainting'])
             if plan['owned_array_budget_bytes'] > adapter['settings']['state_budget_bytes']:
                 raise AppError('VACE_WINDOW_BUFFER_BUDGET_EXCEEDED','窗口自有数组超预算；显式减小 max-edge/model-max-edge、model-input-scale、window-frames 或 window-overlap',exit_code=2)
         elif any(v is not None for v in generation_args.values()):
             raise argument_error('提示词、seed 和窗口参数只适用于 VACE；LaMa 不接受这些选项','prompt/generation')
+        from .repair_blend import blend_budget_plan
+        plan['blend_budget'] = blend_budget_plan(plan['video']['width'], plan['video']['height'], plan['inpainting'], adapter['settings']['state_budget_bytes'], plan.get('owned_array_budget_bytes'))
+        if args.repair_blend == 'harmonic':
+            plan['warnings'].append({'code':'REPAIR_HARMONIZE_REVIEW_REQUIRED','message':'逐帧空间色差修正；结构、纹理、残影、时序和背景真值须独立复核'})
         plan['video'].pop('downsample_ratio', None)
         plan['warnings'].append({'code': 'INPAINT_MASK_CLOCK', 'message': '蒙版按自身显示起点加 mask-start-seconds 取样；缩放及 CFR 取样见计划，不推断源时钟或裁切关系'})
     tps = int(project.get('settings', {}).get('timebase', {}).get('ticks_per_second', TICKS_PER_SECOND))

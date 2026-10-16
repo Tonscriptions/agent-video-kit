@@ -112,6 +112,50 @@ class InpaintingFrameTests(unittest.TestCase):
             with self.subTest(options=options), self.assertRaises(AppError): normalize_options(**options)
 
 
+    def test_harmonic_plane_texture_and_single_quantization(self):
+        y,x=np.indices((48,64))
+        truth=np.stack([30+x+y,60+x,100+y],axis=2).astype(np.float32)
+        self.frame[:,:,:3]=truth.astype(np.uint8)
+        self.frame[16:32,24:40,:3]=[255,0,255]
+        wanted=truth.copy();wanted[21:25,29:33,:]+=.75
+        self.options=normalize_options(grow=0,context=64,blend_mode='harmonic')
+        def infer(image,mask):
+            prediction=(wanted+20)/255
+            prediction=np.pad(prediction,((0,16),(0,0),(0,0)),mode='edge')
+            return np.ascontiguousarray(prediction.transpose(2,0,1)[None],dtype=np.float32)
+        result,stats=repair_frame(self.frame,self.mask,options=self.options,channel='alpha',infer=infer,budget=4_000_000)
+        selected=self.mask[:,:,3]!=0
+        np.testing.assert_array_equal(result[selected,:3],np.rint(wanted[selected]).astype(np.uint8))
+        np.testing.assert_array_equal(result[~selected],self.frame[~selected])
+        np.testing.assert_array_equal(result[:,:,3],self.frame[:,:,3])
+        self.assertEqual(stats['blend_detail']['selected_pixels'],256)
+        self.assertGreater(stats['state_bytes'],stats['base_state_bytes'])
+
+    def test_harmonic_rejects_full_mask_and_budget_before_model_and_bypasses_empty(self):
+        self.options=normalize_options(grow=0,context=0,blend_mode='harmonic')
+        def never(*args):self.fail('Invalid selection must not load or invoke a model')
+        with self.assertRaisesRegex(ValueError,'BUDGET'):
+            repair_frame(self.frame,self.mask,options=self.options,channel='alpha',infer=never,budget=250_000)
+        self.mask[:,:,3]=255
+        with self.assertRaisesRegex(ValueError,'NO_BOUNDARY'):
+            repair_frame(self.frame,self.mask,options=self.options,channel='alpha',infer=never,budget=4_000_000)
+        self.mask[:]=0
+        result,stats=repair_frame(self.frame,self.mask,options=self.options,channel='alpha',infer=never,budget=4_000_000)
+        np.testing.assert_array_equal(result,self.frame);self.assertIsNone(stats['blend_detail'])
+
+    def test_harmonic_nonconvergence_writes_no_partial_frame(self):
+        options=normalize_options(grow=0,context=0,blend_mode='harmonic',blend_max_iterations=1)
+        rng=np.random.default_rng(13);self.frame[:,:,:3]=rng.integers(0,256,(48,64,3),dtype=np.uint8)
+        destination=io.BytesIO();pair=np.concatenate([self.frame,self.mask],axis=1)
+        with self.assertRaisesRegex(ValueError,'NOT_CONVERGED'):
+            process_frames(io.BytesIO(pair.tobytes()),destination,width=64,height=48,frames=1,options=options,channel='alpha',infer=lambda image,mask:np.full_like(image,.2))
+        self.assertEqual(destination.getvalue(),b'')
+
+    def test_blend_option_validation(self):
+        for kw in ({'blend_mode':[]},{'blend_mode':'unknown'},{'blend_max_iterations':True},{'blend_max_iterations':0},{'blend_max_iterations':10001},{'blend_tolerance':float('nan')},{'blend_tolerance':float('inf')},{'blend_tolerance':0},{'blend_tolerance':.02},{'blend_tolerance':True}):
+            with self.subTest(kw=kw),self.assertRaises(AppError):normalize_options(**kw)
+
+
 MOCK_WORKER = r'''
 import json, sys, time
 from pathlib import Path
@@ -140,6 +184,11 @@ if mode=='bad_alpha': metrics['output_alpha_sha256']='sha256:'+'0'*64
 if mode=='bad_calls': metrics['model_calls']+=1
 if mode=='bad_rgba': metrics['rgba_sha256']='sha256:'+'0'*64
 if mode=='bad_network': response['blocked_network_events']=['socket.connect']
+if mode=='bad_blend': metrics['blend']['mode']='invented'
+if mode=='bad_blend_type': metrics['blend']['max_selected_pixels']=False
+if mode=='bad_blend_budget': metrics['blend']['owned_array_peak_bytes']+=1
+if mode=='bad_blend_residual': metrics['blend']['residual_ratio_max']=2
+if mode=='bad_blend_samples': metrics['blend']['samples']=[]
 if mode=='tamper_mask':
     with Path(request['mask']['path']).open('ab') as changed: changed.write(b'changed')
 if mode=='race': Path(sys.argv[3]).write_bytes(b'external editor output')
@@ -190,7 +239,7 @@ class NativeInpaintingTests(unittest.TestCase):
         before = self.metadata()
         self.assertEqual(invoke('media', 'adapter', 'register', *self.options, '--dry-run')[0], 0)
         self.assertEqual(self.metadata(), before)
-        adapter = self.register(); self.assertEqual(len(adapter['artifacts']), 9)
+        adapter = self.register(); self.assertEqual(len(adapter['artifacts']), 10)
         self.assertTrue(verify_adapter(adapter)['ok'])
         before = self.metadata()
         with patch('ai_ad_editor.cli.matte_native') as worker:
@@ -201,6 +250,34 @@ class NativeInpaintingTests(unittest.TestCase):
             self.assertEqual(set(data['data']['rights_dependencies']), {self.asset_id, self.mask_id, adapter['rights_ref']})
             self.assertEqual(invoke('media', 'adapter', 'inspect', '--project', str(self.root), '--adapter-id', 'lama')[0], 0)
         self.assertEqual(self.metadata(), before)
+
+    def test_harmonic_cli_dry_run_and_real_protocol_rollback(self):
+        self.register();before=self.metadata()
+        with patch('ai_ad_editor.cli.matte_native') as worker:
+            for flags in (['--blend-max-iterations','200'],['--blend-tolerance','.001'],['--repair-blend','harmonic','--blend-max-iterations','0'],['--repair-blend','harmonic','--blend-tolerance','nan']):
+                code,data=invoke(*self.command(),*flags,'--dry-run');self.assertEqual(code,2,data)
+            code,data=invoke(*self.command(),'--repair-blend','harmonic','--dry-run');self.assertEqual(code,0,data)
+            self.assertEqual(data['data']['plan']['inpainting']['blend_mode'],'harmonic')
+            self.assertFalse(data['data']['plan']['blend_budget']['mask_pixel_count_known'])
+            worker.assert_not_called()
+        self.assertEqual(self.metadata(),before)
+        with self.fake_command():code,data=invoke(*self.command(),'--repair-blend','harmonic','--blend-max-iterations','1')
+        self.assertEqual(code,6,data);self.assert_clean_failure(before)
+        for mode in ('bad_blend_budget','bad_blend_residual','bad_blend_samples'):
+            with self.subTest(mode=mode),self.fake_command(mode):
+                code,data=invoke(*self.command(),'--repair-blend','harmonic');self.assertEqual(code,6,data)
+            self.assert_clean_failure(before)
+        with self.fake_command():code,data=invoke(*self.command(),'--repair-blend','harmonic','--idempotency-key','blend-once')
+        self.assertEqual(code,0,data)
+        metrics=data['data']['inpainting']['worker']['metrics']
+        self.assertEqual(metrics['blend']['frames'],4);self.assertLessEqual(metrics['blend']['residual_ratio_max'],1)
+        output=self.decode(self.output);selected=np.zeros((48,64),bool);selected[16:32,24:40]=True
+        np.testing.assert_array_equal(output[:,~selected],self.frames[:,~selected]);np.testing.assert_array_equal(output[:,:,:,3],self.frames[:,:,:,3])
+        with patch('ai_ad_editor.cli.matte_native') as worker:
+            for flags in ([],['--repair-blend','harmonic','--blend-max-iterations','1999'],['--repair-blend','harmonic','--blend-tolerance','.00001']):
+                code,result=invoke(*self.command(),*flags,'--idempotency-key','blend-once');self.assertEqual(code,2,result)
+                self.assertEqual(result['errors'][0]['code'],'IDEMPOTENCY_CONFLICT')
+            worker.assert_not_called()
 
     def test_registration_rejects_raw_checkpoint_remote_or_missing_evidence(self):
         bad = self.base / 'raw.pt'; bad.write_bytes(b'not a TorchScript archive')
@@ -282,7 +359,7 @@ class NativeInpaintingTests(unittest.TestCase):
 
     def test_worker_integrity_pixel_contract_and_decode_mismatch_roll_back(self):
         self.register(); before = self.metadata()
-        for mode in ('bad_mask_hash', 'bad_device', 'bad_outside', 'bad_alpha', 'bad_calls', 'bad_rgba', 'bad_network', 'fail'):
+        for mode in ('bad_mask_hash', 'bad_device', 'bad_outside', 'bad_alpha', 'bad_calls', 'bad_rgba', 'bad_network', 'bad_blend', 'bad_blend_type', 'fail'):
             with self.subTest(mode=mode), self.fake_command(mode):
                 code, data = invoke(*self.command())
                 self.assertEqual(code, 6, data)

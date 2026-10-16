@@ -27,6 +27,19 @@ budget excludes Torch/model/VRAM and cannot guarantee freedom from CUDA OOM.
 Larger inputs or more steps require evidence for the chosen footage. LaMa
 rejects both options.
 
+Both repair engines accept `--repair-blend harmonic` for explicit spatial
+boundary color correction; `direct` remains the default. Read the
+[harmonic contract](../../docs/specs/本地修复区域色差融合契约_v0.1_2026-10-16.md)
+when using it. Optional `--blend-max-iterations` (1..10000, default 2000) and
+`--blend-tolerance` (0..0.01 excluding 0, default 1e-6) require harmonic.
+Dry-run cannot know decoded selection size: execution checks the actual
+selection budget before each model call. Empty frames bypass weights; a full
+canvas selection has no fixed boundary and fails. Nonconvergence also fails,
+without silent fallback. Inspect the `blend` report and keep
+`REPAIR_HARMONIZE_REVIEW_REQUIRED`; spatial correction does not reconstruct
+object geometry or temporal consistency. Re-register adapters whose bound
+implementation hashes changed instead of editing their saved digests.
+
 Joint windows and overlap blending do not establish global video attention
 or consistent identity. Tail padding is cropped before delivery.
 

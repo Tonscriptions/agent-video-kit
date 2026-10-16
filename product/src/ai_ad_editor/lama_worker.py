@@ -32,12 +32,15 @@ def infer(request: dict, response: dict) -> None:
     if device == 'cuda':
         torch.backends.cuda.matmul.allow_tf32 = False; torch.backends.cudnn.allow_tf32 = False
         torch.cuda.reset_peak_memory_stats()
-    # File objects support native Windows paths containing non-ASCII characters.
-    with Path(adapter['model_path']).open('rb') as handle:
-        model = torch.jit.load(handle, map_location='cpu').to(device).eval()
-    if any(p.device.type != device or p.is_floating_point() and p.dtype != torch.float32 for p in model.parameters()):
-        raise ValueError('INPAINT_DEVICE_OR_PRECISION_MISMATCH')
+    model = None
     def predict(image, mask):
+        nonlocal model
+        if model is None:
+            # Load only after the frame/mask-dependent resource admission check.
+            with Path(adapter['model_path']).open('rb') as handle:
+                model = torch.jit.load(handle, map_location='cpu').to(device).eval()
+            if any(p.device.type != device or p.is_floating_point() and p.dtype != torch.float32 for p in model.parameters()):
+                raise ValueError('INPAINT_DEVICE_OR_PRECISION_MISMATCH')
         with torch.inference_mode():
             result = model(torch.from_numpy(image).to(device), torch.from_numpy(mask).to(device))
         if not torch.is_tensor(result) or result.dtype != torch.float32 or result.device.type != device:
@@ -53,7 +56,7 @@ def infer(request: dict, response: dict) -> None:
                              infer=predict, options=request['inpainting'], channel=request['mask']['channel'], budget=adapter['settings']['state_budget_bytes'], progress=progress)
     if not verify_adapter(adapter)['ok'] or not mask_unchanged(request) or 'sha256:' + sha256_file(Path(request['source']['path'])) != request['source']['sha256']:
         raise ValueError('INPAINT_INPUT_CHANGED_DURING_INFERENCE')
-    response.update(status='succeeded', metrics=metrics, providers=['torch-' + device],
+    response.update(status='succeeded', metrics=metrics, model_loaded=model is not None, providers=['torch-' + device],
                     versions={'python': sys.version.split()[0], 'numpy': np.__version__, 'torch': torch.__version__})
     if device == 'cuda': response['cuda_peak_allocated_bytes'] = torch.cuda.max_memory_allocated()
 

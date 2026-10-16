@@ -16,7 +16,7 @@ from .utils import assert_id, now_iso, sha256_bytes, sha256_file
 INPAINT_ENGINE = 'torchscript-lama-local-v1'
 INPAINT_PROTOCOL = 'agent-video-lama-inpainting-v1'
 IMPLEMENTATIONS = {'worker': 'lama_worker.py', 'frames': 'inpainting_frames.py', 'controller': 'local_inpainting.py',
-                   'pipeline': 'local_matting.py', 'rgba': 'matting_frames.py', 'guard': 'rvm_worker.py'}
+                   'pipeline': 'local_matting.py', 'rgba': 'matting_frames.py', 'guard': 'rvm_worker.py', 'blend': 'repair_blend.py'}
 
 
 def settings(*, device='cpu', threads=4):
@@ -94,12 +94,16 @@ def verify_adapter(record):
     return {'adapter_id': record.get('adapter_id'), 'engine': record.get('engine'), 'network': 'disabled', 'ok': not findings, 'findings': findings}
 
 
-def normalize_options(*, threshold=.5, grow=4, feather=0., context=64, model_max_edge=1024):
+def normalize_options(*, threshold=.5, grow=4, feather=0., context=64, model_max_edge=1024,
+                      blend_mode="direct", blend_max_iterations=2000, blend_tolerance=1e-6):
     if type(threshold) not in {int, float} or not math.isfinite(threshold) or not 0 <= threshold <= 1 or type(feather) not in {int, float} or not math.isfinite(feather) or not 0 <= feather <= 32:
         raise argument_error('蒙版 threshold 须为 0..1，feather 为 0..32', 'mask_threshold/mask_feather')
     if any(type(v) is not int or not lo <= v <= hi for v, lo, hi in ((grow, 0, 64), (context, 0, 1024), (model_max_edge, 64, 2048))):
         raise argument_error('grow/context/model-max-edge 超出整数预算', 'mask_grow/context_pixels/model_max_edge')
-    return {'threshold': float(threshold), 'grow': grow, 'feather': float(feather), 'context': context, 'model_max_edge': model_max_edge}
+    if not isinstance(blend_mode, str) or blend_mode not in {'direct', 'harmonic'} or type(blend_max_iterations) is not int or not 1 <= blend_max_iterations <= 10000 or type(blend_tolerance) not in {int, float} or not math.isfinite(blend_tolerance) or not 0 < blend_tolerance <= .01:
+        raise argument_error('融合模式或求解迭代/有限容差超出预算', 'repair_blend/blend_max_iterations/blend_tolerance')
+    return {'threshold': float(threshold), 'grow': grow, 'feather': float(feather), 'context': context, 'model_max_edge': model_max_edge,
+            'blend_mode': blend_mode, 'blend_max_iterations': blend_max_iterations, 'blend_tolerance': float(blend_tolerance)}
 
 
 def prepare_mask(root: Path, path: str, *, kind: str, video: dict, channel='alpha', start_seconds=0., resize='reject'):

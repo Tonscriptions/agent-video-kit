@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 import hashlib
+import time
 import numpy as np
 from PIL import Image, ImageFilter
 
 from .local_vace import buffer_budget, window_plan, plan_digest
 from .matting_frames import read_frame
+from .repair_blend import harmonize_region, required_blend_bytes, joint_blend_overhead, new_blend_report, record_blend
 
 
 def _selected(mask, channel, options):
@@ -67,9 +69,10 @@ def _predict_window(entries, spec, *, options, generation, infer):
 
 def process_frames(source, destination, *, width, height, frames, infer, options, generation, channel, budget=512*1024**2, progress=None):
     if any(type(v) is not int or v<1 for v in (width,height,frames,budget)) or width*height>16_777_216:raise ValueError('VACE_FRAME_BUDGET_INVALID')
-    owned=buffer_budget(width,height,generation,options['model_max_edge'])
+    owned=buffer_budget(width,height,generation,options['model_max_edge'])+joint_blend_overhead(width,height,options)
     if owned>budget:raise ValueError('VACE_WINDOW_BUFFER_BUDGET_EXCEEDED')
     windows=window_plan(frames,generation)
+    blend_report=new_blend_report(options);blend_peak=0
     entries={};accum={};weights={};read=emitted=0
     hashes={k:hashlib.sha256() for k in ('rgba','source','mask','input_alpha','output_alpha')}
     transparent=opaque=alpha_sum=masked=empty_frames=blended=0;alpha_min=255;alpha_max=0
@@ -82,6 +85,9 @@ def process_frames(source, destination, *, width, height, frames, infer, options
             hashes['source'].update(original.tobytes());hashes['mask'].update(mask.tobytes())
             hashes['input_alpha'].update(original[:,:,3].tobytes())
             entries[read]=(original,_selected(mask,channel,options));read+=1
+        needed=max(required_blend_bytes(width,height,int(np.count_nonzero(entries[i][1])),options) for i in range(spec['start'],spec['end']))
+        if owned+needed>budget:raise ValueError('REPAIR_HARMONIZE_ARRAY_BUDGET_EXCEEDED')
+        blend_peak=max(blend_peak,needed)
         projections,stats=_predict_window(entries,spec,options=options,generation=generation,infer=infer)
         calls+=stats['model_calls'];empty_windows+=not stats['model_calls'];padded+=stats['padded_frames']
         clipped+=stats['clipped_model_values'];model_peak=max(model_peak,stats['model_pixels'])
@@ -105,6 +111,12 @@ def process_frames(source, destination, *, width, height, frames, infer, options
             if count:
                 if i not in accum or weights.get(i,0)<=0:raise ValueError('VACE_MISSING_WINDOW_CONTRIBUTION')
                 generated=accum.pop(i)/weights.pop(i)
+                if options.get('blend_mode')=='harmonic':
+                    generated=np.clip(generated,0,255)
+                    began=time.monotonic()
+                    generated,detail=harmonize_region(original,generated,selected,max_iterations=options['blend_max_iterations'],
+                        relative_tolerance=options['blend_tolerance'],array_budget=budget-owned,checkpoint=(lambda:progress(emitted)) if progress else None)
+                    record_blend(blend_report,i,detail,time.monotonic()-began)
                 alpha=selected.astype(np.float32)
                 if options['feather']:
                     alpha*=np.asarray(Image.fromarray(selected.astype(np.uint8)*255).filter(ImageFilter.GaussianBlur(options['feather'])),dtype=np.float32)/255
@@ -126,7 +138,7 @@ def process_frames(source, destination, *, width, height, frames, infer, options
     return {'frames':frames,'width':width,'height':height,'rgba_sha256':'sha256:'+hashes['rgba'].hexdigest(),'rgba_bytes':pixels*4,
             'source_rgba_sha256':'sha256:'+hashes['source'].hexdigest(),'decoded_mask_rgba_sha256':'sha256:'+hashes['mask'].hexdigest(),
             'input_alpha_sha256':'sha256:'+hashes['input_alpha'].hexdigest(),'output_alpha_sha256':'sha256:'+hashes['output_alpha'].hexdigest(),
-            'state_updates':frames,'state_peak_bytes':owned,'state_reset':'per-joint-window-and-scene','buffer_budget_scope':'conservative-owned-window-array-upper-bound-excludes-model-and-torch-temporaries',
+            'state_updates':frames,'state_peak_bytes':owned+blend_peak,'base_state_peak_bytes':owned,'blend':blend_report,'state_reset':'per-joint-window-and-scene','buffer_budget_scope':'conservative-owned-window-array-upper-bound-excludes-model-and-torch-temporaries',
             'input_alpha':'preserve','alpha_mode':'straight','alpha_min':alpha_min,'alpha_max':alpha_max,'alpha_mean':alpha_sum/pixels/255,
             'transparent_pixels':transparent,'opaque_pixels':opaque,'soft_alpha_pixels':pixels-transparent-opaque,
             'conditioning':'masked-rgb-127-before-and-after-resize',
