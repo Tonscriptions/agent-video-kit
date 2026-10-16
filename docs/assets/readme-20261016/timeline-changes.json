@@ -1,0 +1,141 @@
+{
+  "sequence_id": "seq_main",
+  "operations": [
+    {
+      "op": "update_track",
+      "track_id": "track_video_1",
+      "overlap_policy": "allow"
+    },
+    {
+      "op": "add_track",
+      "id": "track_overlay",
+      "kind": "video",
+      "order": 2
+    },
+    {
+      "op": "add_track",
+      "id": "track_title",
+      "kind": "video",
+      "order": 3
+    },
+    {
+      "op": "append_clip",
+      "id": "base_a",
+      "track_id": "track_video_1",
+      "asset_id": "source_a",
+      "source_in_tick": 0,
+      "source_out_tick": 270000,
+      "timeline_start_tick": 0,
+      "effects": [
+        {
+          "type": "hsl",
+          "hue": 8,
+          "saturation": 1.1
+        }
+      ]
+    },
+    {
+      "op": "append_clip",
+      "id": "base_b",
+      "track_id": "track_video_1",
+      "asset_id": "source_b",
+      "source_in_tick": 0,
+      "source_out_tick": 270000,
+      "timeline_start_tick": 225000,
+      "transition_in": {
+        "type": "crossfade",
+        "duration": 0.5
+      }
+    },
+    {
+      "op": "append_clip",
+      "id": "circle",
+      "track_id": "track_overlay",
+      "asset_id": "source_b",
+      "source_in_tick": 0,
+      "source_out_tick": 270000,
+      "timeline_start_tick": 67500,
+      "mask": {
+        "type": "circle",
+        "cx": 0.3,
+        "cy": 0.5,
+        "radius": 0.23,
+        "feather": 0.02
+      },
+      "transform": {
+        "scale": 0.62,
+        "position": {
+          "x": 0.77,
+          "y": 0.53
+        }
+      },
+      "keyframes": [
+        {
+          "property": "mask.cx",
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "value": 0.3,
+              "interpolation": "linear"
+            },
+            {
+              "at_tick": 270000,
+              "value": 0.7,
+              "interpolation": "linear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "op": "append_clip",
+      "id": "title_clip",
+      "track_id": "track_title",
+      "asset_id": "title",
+      "source_in_tick": 0,
+      "source_out_tick": 495000,
+      "timeline_start_tick": 0,
+      "keyframes": [
+        {
+          "property": "transform.opacity",
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "value": 0,
+              "interpolation": "linear"
+            },
+            {
+              "at_tick": 27000,
+              "value": 1,
+              "interpolation": "linear"
+            },
+            {
+              "at_tick": 468000,
+              "value": 1,
+              "interpolation": "linear"
+            },
+            {
+              "at_tick": 495000,
+              "value": 0,
+              "interpolation": "linear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "op": "append_clip",
+      "id": "tone_clip",
+      "track_id": "track_audio_1",
+      "asset_id": "tone",
+      "source_in_tick": 0,
+      "source_out_tick": 495000,
+      "timeline_start_tick": 0,
+      "audio": {
+        "volume": 0.8,
+        "fade_in": 0.15,
+        "fade_out": 0.3
+      }
+    }
+  ]
+}

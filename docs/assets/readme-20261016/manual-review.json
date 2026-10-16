@@ -1,0 +1,33 @@
+{
+  "checked_at_utc": "2026-10-16T06:29:14.978326+00:00",
+  "reviewer": "assistant-image-inspection",
+  "method": "local view_image of contact PNGs at original resolution; sampled frames only",
+  "files": {
+    "cli-contact.png": "sha256:ab9106c0847b6301404872f72244a9be487fef6e9fa13e7ab237f2b78c7cbefd",
+    "translation-contact.png": "sha256:2e18a19be08cfe1e0410e3493f6e9829cd354dd1d790c4c2332f5bd9b851ab14",
+    "two-surfaces-contact.png": "sha256:18cd96f6e0a4a8832016ebccdfd5274fd6c95831db459f53864ddb7ccd5578a6"
+  },
+  "cli_sampled_frames": [
+    15,
+    45,
+    83,
+    135
+  ],
+  "research_sampled_frames": {
+    "translation": [
+      6
+    ],
+    "two-surfaces": [
+      6
+    ]
+  },
+  "findings": [
+    "Product: scaled procedural bottle, feathered overlay, blended transition and later ring scene visible; raster title layers visible.",
+    "Translation: magenta input, gray fallback and texture reconstruction differences visible against truth.",
+    "Two surfaces: residual texture/patch differences remain; preserve the slight combined PSNR regression."
+  ],
+  "continuous_playback_reviewed": false,
+  "human_listening_completed": false,
+  "natural_media_published": false,
+  "broad_quality_accepted": false
+}
