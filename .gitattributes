@@ -72,3 +72,9 @@ scripts/smoke_offline_audio_stretch.py -text
 docs/validation/evidence/*audio-stretch*.json -text
 docs/validation/evidence/audio-stretch*.log -text -whitespace
 docs/assets/offline-audio-stretch-20261017/*.txt -whitespace
+
+# V27 preserves actual channel-mode media, PCM and native phase evidence.
+scripts/smoke_audio_channel_modes.py -text
+docs/validation/evidence/*audio-channels*.json -text
+docs/validation/evidence/audio-channels*.log -text -whitespace
+docs/assets/audio-channel-modes-20261017/*.txt -whitespace

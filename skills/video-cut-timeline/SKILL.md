@@ -154,3 +154,13 @@ quality, pitch, local transient timing and listening conclusions separate. A
 4 ms clip stretched to 250 ms can be audible but still fail pitch preservation.
 Unconfigured projects retain the legacy atempo boundary. A unity-tempo positive
 control passing on both versions is not evidence of a historical failure.
+
+The [R3 channel strategy](../../docs/specs/R3声道策略契约_v0.1_2026-10-17.md)
+accepts `settings.audio_stretch.channel_mode`: `together` (the compatible
+default, with `--centre-focus`) or `apart` (native per-channel fidelity
+preference, without that flag). Record the resolved mode and argv in the
+manifest. Modes use distinct immutable caches; omitted and explicit together
+are equivalent. Apart can degrade phase and mono compatibility. Separated
+short-window spectral peaks still do not prove pitch preservation. Never add
+outside-selection audio, padding, short-window processing or pitch correction
+as an implicit workaround. Mono/stereo controls do not accept 3..8-channel quality.

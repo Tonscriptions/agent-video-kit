@@ -209,3 +209,13 @@ quality, pitch, local transient timing and listening conclusions separate. A
 4 ms clip stretched to 250 ms can be audible but still fail pitch preservation.
 Unconfigured projects retain the legacy atempo boundary. A unity-tempo positive
 control passing on both versions is not evidence of a historical failure.
+
+For [R3 channel-mode evidence](../../docs/specs/R3声道策略契约_v0.1_2026-10-17.md),
+inspect both actual decoded channels. Keep sample-count/presence, known-source
+pitch, phase/mono mixing and listening gates separate. Use float PCM for exact
+antiphase `max(abs(L+R))` and silent-channel checks; AAC is a listening delivery,
+not a bit-exact phase oracle. Apart may separate dominant bands while still
+failing pitch and mono compatibility. Preserve these failures and the explicit
+`stereo_phase_accepted: false` boundary; do not infer acceptance from automatic
+quality CLI success. Link original WAV/video, both actual modes, GIF and hashes
+from the numbered README verification row.

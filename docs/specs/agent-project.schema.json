@@ -56,7 +56,8 @@
             },
             "license_path": {"type": "string", "minLength": 1},
             "license_sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
-            "license_spdx": {"type": "string", "minLength": 1}
+            "license_spdx": {"type": "string", "minLength": 1},
+            "channel_mode": {"type": "string", "enum": ["together", "apart"], "default": "together"}
           }
         },
         "timebase": {

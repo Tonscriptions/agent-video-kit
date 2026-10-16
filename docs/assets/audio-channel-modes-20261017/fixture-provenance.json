@@ -1,0 +1,35 @@
+{
+  "media_license_spdx": "CC0-1.0",
+  "original_video_generator": "scripts/smoke_subtitle_clock.py",
+  "original_generator_sha256": "sha256:f7193d623a9a5358854592b9ff4beb615189e12655b5c9fd36e888fcea78b7d3",
+  "audio_generator": "FFmpeg aevalsrc 400/800 Hz stereo, 48 kHz signed16, 3 s",
+  "inputs": {
+    "source.mp4": "sha256:c34f01cd418f018ed6d79b9fac99ef8e549828e9a9abffe6bf4ba69d2e4598ce",
+    "pulses.wav": "sha256:8dba6dd76889b73b44131f029d67d0d59099039a722303ac0ed1e2ca017e86d5",
+    "stereo-tones.wav": "sha256:db6ef91007b85271be5f815aeea5d8e42ddb978eed4f4b4c2a276827282eb5b4",
+    "antiphase.wav": "sha256:0bfcd402ce7ab6049a829e2a798d62d14edee55755e03f95ccc63d3a0b2bf940",
+    "left-only.wav": "sha256:6cdab32c3f7582a8861d7e3de2339be1e75e3abc4d338f93889a34b1e67707a4"
+  },
+  "font": {
+    "sha256": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22",
+    "license_sha256": "sha256:d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e",
+    "binary_distributed": false
+  },
+  "engine": {
+    "engine": "rubberband-r3-offline-v1",
+    "executable": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\rubberband.exe",
+    "sha256": "sha256:d26d81e20f48ea33070e638f58bdeb6a61ce7f0946d8f2629f30441caa2905d1",
+    "dependencies": [
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\sndfile.dll",
+        "sha256": "sha256:4e3bd2de8e1485110eaebef8e1239471f73d608773831c323bf528e05645655e"
+      }
+    ],
+    "license_path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\COPYING.txt",
+    "license_sha256": "sha256:cedd4c1885d75991bf1077cc6e33359103cf04fbc996f20d30ab043d5fc5fcc5",
+    "license_spdx": "GPL-2.0-or-later"
+  },
+  "third_party_binaries_distributed": false,
+  "new_model_inference": 0,
+  "channel_fixture_generator": "FFmpeg aevalsrc, float32 stereo, 48 kHz, 3 s; exact antiphase or silent right"
+}

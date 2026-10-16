@@ -30,9 +30,12 @@ def _error(code, message, field='settings.audio_stretch'):
 def configuration(root: Path, raw) -> dict | None:
     if raw is None:
         return None
-    allowed = {'engine', 'executable', 'sha256', 'dependencies', 'license_path', 'license_sha256', 'license_spdx'}
+    allowed = {'engine', 'executable', 'sha256', 'dependencies', 'license_path', 'license_sha256', 'license_spdx', 'channel_mode'}
     if not isinstance(raw, dict) or set(raw)-allowed or raw.get('engine') != ENGINE:
         raise _error('AUDIO_STRETCH_CONFIG_INVALID', 'audio_stretch 要求显式本地 rubberband-r3-offline-v1 配置')
+    channel_mode = raw.get('channel_mode', 'together')
+    if not isinstance(channel_mode, str) or channel_mode not in ('together', 'apart'):
+        raise _error('AUDIO_STRETCH_CONFIG_INVALID', 'channel_mode 只接受 together 或 apart', 'settings.audio_stretch.channel_mode')
     if not isinstance(raw.get('license_spdx'), str) or not raw['license_spdx'].strip():
         raise _error('AUDIO_STRETCH_CONFIG_INVALID', '需要记录本地伸缩工具的 license_spdx')
     dependencies = raw.get('dependencies')
@@ -62,7 +65,7 @@ def configuration(root: Path, raw) -> dict | None:
         required = executable.with_name('sndfile.dll')
         if str(required) not in {a['path'] for a in artifacts[2:]}:
             raise _error('AUDIO_STRETCH_DEPENDENCY_MISSING', 'Windows Rubber Band CLI 的同目录 sndfile.dll 须显式登记摘要')
-    return {'engine': ENGINE, 'executable': str(executable), 'artifacts': artifacts,
+    return {'engine': ENGINE, 'executable': str(executable), 'artifacts': artifacts, 'channel_mode': channel_mode,
             'license_spdx': raw['license_spdx'].strip(), 'network': 'disabled'}
 
 
@@ -184,7 +187,13 @@ def execute(root: Path, job: dict, temp_dir: Path, *, cancel_file: Path | None =
             before=inspect_pcm(source)
             if before['frames'] != job['source_frames'] or before['channels'] != job['channels']:
                 raise AppError('AUDIO_STRETCH_SOURCE_LENGTH_MISMATCH', '音频实际范围不足或声道与计划不符；不以补零替代输入', exit_code=6)
-            command=[job['engine']['executable'], '-3', '--no-threads', '--centre-focus', '-q',
+            # Keep the V26 centre/mono-compatible default. Native "apart"
+            # favours per-channel spectra but does not preserve stereo phase.
+            channel_mode=job['engine'].get('channel_mode', 'together')
+            if channel_mode not in ('together', 'apart'):
+                raise _error('AUDIO_STRETCH_CONFIG_INVALID', '离线计划的 channel_mode 无效')
+            command=[job['engine']['executable'], '-3', '--no-threads',
+                     *(['--centre-focus'] if channel_mode == 'together' else []), '-q',
                      '-t', format(job['target_frames']/job['source_frames'], '.17g'),
                      *(['--timemap', str(mapping)] if engine_anchors else []), str(source), str(result)]
             processed=run_process(command, timeout=3600, cwd=root, cancel_file=cancel_file)
@@ -210,8 +219,8 @@ def execute(root: Path, job: dict, temp_dir: Path, *, cancel_file: Path | None =
             pinned=artifact_entry(output,'audio-stretch-output')
             if pinned['sha256'] != after['sha256']:
                 raise AppError('AUDIO_STRETCH_HASH_MISMATCH', '离线音频缓存加锁时字节变化', exit_code=6, path=str(output))
-            return {'status':'succeeded','decode_command':decode,'command':command,
+            return {'status':'succeeded','decode_command':decode,'command':command,'channel_mode':channel_mode,
                     'decode_stderr':decoded.stderr,'engine_stderr':processed.stderr,
                     'input_pcm':before,'engine_raw_output_pcm':raw_output,'output_pcm':after,'canonicalization':'float32-pcm-bytes-preserved-no-wall-time-metadata','time_map_utf8':mapping_text,
                     'engine_time_map':engine_anchors,'time_map_sha256':'sha256:'+hashlib.sha256(mapping_text.encode('ascii')).hexdigest(),
-                    'output_artifact':pinned,'pitch_and_listening_accepted':False}
+                    'output_artifact':pinned,'pitch_and_listening_accepted':False,'stereo_phase_accepted':False}
