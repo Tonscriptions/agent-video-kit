@@ -168,6 +168,12 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
 
     settings_value = project.get("settings")
     if isinstance(settings_value, dict):
+        if 'audio_stretch' in settings_value:
+            from .audio_stretch import configuration
+            try:
+                configuration(root, settings_value['audio_stretch'])
+            except AppError as exc:
+                error(exc.code, exc.message, exc.path or 'settings.audio_stretch')
         color_value = settings_value.get("color")
         if color_value is not None:
             if not isinstance(color_value, dict):

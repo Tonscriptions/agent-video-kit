@@ -139,3 +139,18 @@ canvas; `animation.type=rotate` rotates the text layer itself; clip transform/ke
 font assets through `style.font_asset_id` or provide an existing local
 `style.fontfile`. Use `word_timing.start_char` when repeated words need an
 unambiguous highlight anchor; source text mismatches are rejected before save.
+
+
+For [offline audio stretching](../../docs/specs/离线音频伸缩与PCM输出契约_v0.1_2026-10-17.md),
+use only an explicitly pinned local R3 executable, native dependencies and license.
+Planning must not decode audio. Check actual source/output sample counts and
+channels, not padding or container duration alone. Compare encoded float PCM
+with the derived artifact; use MKV pcm_s24le/pcm_s32le/pcm_f32le for precision.
+Inspect whole-clip time maps and engine stderr. R3 must receive interior anchors;
+0 -> 0 can trigger a native NaN warning. Keep full endpoints in the manifest.
+The raw WAV PEAK timestamp is normalized without altering PCM bytes; repeated
+renders must preserve existing cache bytes and reject tampering. Keep automatic
+quality, pitch, local transient timing and listening conclusions separate. A
+4 ms clip stretched to 250 ms can be audible but still fail pitch preservation.
+Unconfigured projects retain the legacy atempo boundary. A unity-tempo positive
+control passing on both versions is not evidence of a historical failure.

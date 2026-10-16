@@ -14,6 +14,8 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .animation import bezier_samples
+from .audio_stretch import configuration as _audio_stretch_configuration, execute as _execute_audio_stretch, plan as _plan_audio_stretch
+from .artifact_locks import verification_scope
 
 from .errors import AppError, dependency_error
 from .media import ffmpeg_path, probe_media
@@ -104,7 +106,7 @@ def output_settings(settings: dict[str, Any]) -> dict[str, Any]:
         audio_codec = "libopus"
     if video_codec not in {"libx264", "libx265", "libvpx-vp9", "libvpx", "libaom-av1"}:
         raise AppError("OUTPUT_VIDEO_CODEC_UNSUPPORTED", f"不支持的视频编码器: {video_codec}", exit_code=2, path="settings.output.video.codec")
-    if audio_codec not in {"aac", "libopus", "pcm_s16le"}:
+    if audio_codec not in {"aac", "libopus", "pcm_s16le", "pcm_s24le", "pcm_s32le", "pcm_f32le"}:
         raise AppError("OUTPUT_AUDIO_CODEC_UNSUPPORTED", f"不支持的音频编码器: {audio_codec}", exit_code=2, path="settings.output.audio.codec")
     try:
         crf = int(video_raw.get("crf", DEFAULT_OUTPUT["video"]["crf"]))
@@ -122,7 +124,7 @@ def output_settings(settings: dict[str, Any]) -> dict[str, Any]:
         raise AppError("OUTPUT_CODEC_CONTAINER_MISMATCH", "webm 需要 VP8/VP9/AV1 视频和 Opus 音频", exit_code=2, path="settings.output")
     if container == "mp4" and audio_codec in {"libopus", "opus"}:
         raise AppError("OUTPUT_CODEC_CONTAINER_MISMATCH", "mp4 当前只接受 AAC 音频", exit_code=2, path="settings.output.audio.codec")
-    if container == "mp4" and audio_codec == "pcm_s16le":
+    if container == "mp4" and audio_codec.startswith('pcm_'):
         raise AppError("OUTPUT_CODEC_CONTAINER_MISMATCH", "mp4 不支持当前 PCM 音频输出，请使用 AAC 或 MKV", exit_code=2, path="settings.output.audio.codec")
     normalized = {
         "container": container,
@@ -1202,6 +1204,8 @@ def _tempo_chain(speed: float) -> str:
     remaining = float(speed)
     if not math.isfinite(remaining) or remaining <= 0:
         raise AppError('SPEED_INVALID', '音频 tempo 必须是有限正数', exit_code=2)
+    if abs(remaining - 1.0) <= 1e-9:
+        return 'anull'
     tempo: list[str] = []
     while remaining > 2.0:
         tempo.append("atempo=2.0")
@@ -2909,6 +2913,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     ducking_requested = False
     input_meta: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
+    local_audio_engine = _audio_stretch_configuration(root, settings.get('audio_stretch'))
     subtitle_overlays: list[dict[str, Any]] = []
     adjustment_layers: list[tuple[str, list[Any], float, float]] = []
     raw_adjustments = settings.get("adjustments")
@@ -3300,7 +3305,19 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                                    for left, right, rate in _speed_curve_audio_parts(speed_segments)]
                 else:
                     audio_parts = []
-                if audio_parts:
+                audio_stretch_job = None
+                requires_retime = any(abs(p[2]-1.) > 1e-9 for p in audio_parts) if audio_parts else abs(speed-1.) > 1e-9
+                if local_audio_engine and requires_retime:
+                    target_duration = curve_duration if curve_duration is not None else (src_out-src_in)/speed
+                    audio_stretch_job = _plan_audio_stretch(root, local_audio_engine, asset, uri, src_in, src_out,
+                                                            audio_parts, target_duration, bool(clip.get('reverse')))
+                    inputs[-1] = audio_stretch_job['output']
+                    audio_chain = [f'[{index}:a]anull']
+                    if bool(clip.get('reverse')):
+                        audio_chain.append('areverse')
+                    warnings.append({'code':'RENDER_FEATURE_APPROXIMATE','clip_id':clip.get('id'),
+                                     'feature':'offline_audio_time_map','message':'本地 R3 对整段音频离线伸缩；采样锚点为引擎约束，局部时序、极短窗音高与听感须独立核验'})
+                elif audio_parts:
                     split_labels = [f"asplit{index}_{part_index}" for part_index in range(len(audio_parts))]
                     filters.append(
                         f"[{index}:a]atrim=start={src_in:.6f}:end={src_out:.6f},asetpts=PTS-STARTPTS,aresample=48000,"
@@ -3477,10 +3494,12 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 else:
                     other_audio_labels.append(label)
                 input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "track_id": track_id, "input": index, "kind": "audio", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
+                if audio_stretch_job:
+                    input_meta[-1]['audio_stretch'] = audio_stretch_job
                 if nested_maps:
                     input_meta[-1]['nested_time_mapping'] = {'version': '1', 'maps': copy.deepcopy(nested_maps),
                                                             'tempo_windows': len(audio_parts), 'sample_rate': 48000,
-                                                            'audio_tempo': 'piecewise-integrated-boundaries'}
+                                                            'audio_tempo': 'offline-r3-time-map' if audio_stretch_job else 'piecewise-integrated-boundaries'}
                 index += 1
     if not video_labels and not subtitle_overlays:
         raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
@@ -3722,6 +3741,7 @@ def _execution_filter_graph(root: Path, args: list[str], graph: str, *, write: b
     return execution, info
 
 
+@verification_scope()
 def render_project(
     root: Path,
     project: dict[str, Any],
@@ -3769,7 +3789,7 @@ def render_project(
     args.extend(["-pix_fmt", str(video_encoder.get("pixel_format", "yuv420p"))])
     args.extend(_output_color_args(effective_project["settings"]))
     args.extend(["-c:a", str(audio_encoder["codec"])])
-    if str(audio_encoder.get("codec")) not in {"pcm_s16le", "pcm_s24le", "pcm_s32le"}:
+    if not str(audio_encoder.get("codec", '')).startswith('pcm_'):
         args.extend(["-b:a", str(audio_encoder.get("bitrate", "192k"))])
     if container == "mp4":
         args.extend(["-movflags", "+faststart"])
@@ -3821,6 +3841,9 @@ def render_project(
     try:
         if cancel_file is not None and cancel_file.exists():
             raise AppError("CANCELLED", "任务在启动前已被取消", exit_code=8, path=str(cancel_file), retryable=False)
+        for item in input_meta:
+            if job := item.get('audio_stretch'):
+                job['execution'] = _execute_audio_stretch(root, job, temp_dir, cancel_file=cancel_file)
         result = run_process(execution_args, timeout=3600, cwd=root, cancel_file=cancel_file)
         if result.returncode != 0:
             raise AppError("RENDER_FAILED", "FFmpeg 渲染失败", exit_code=6, retryable=True, cause=result.stderr[-6000:])

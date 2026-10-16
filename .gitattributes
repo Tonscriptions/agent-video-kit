@@ -66,3 +66,9 @@ scripts/smoke_nested_frame_coverage.py -text
 docs/validation/evidence/*nested*coverage*.json -text
 docs/validation/evidence/nested-coverage*.log -text -whitespace
 docs/assets/nested-frame-coverage-20261017/font-license.txt -whitespace
+
+# V26 keeps actual offline audio proofs and upstream license bytes unchanged.
+scripts/smoke_offline_audio_stretch.py -text
+docs/validation/evidence/*audio-stretch*.json -text
+docs/validation/evidence/audio-stretch*.log -text -whitespace
+docs/assets/offline-audio-stretch-20261017/*.txt -whitespace

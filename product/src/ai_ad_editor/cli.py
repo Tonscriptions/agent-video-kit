@@ -751,7 +751,7 @@ def build_parser() -> argparse.ArgumentParser:
     render.add_argument("--resume", default=None, help="从此前失败/取消且依赖未变化的 render 操作重建")
     render.add_argument("--container", choices=tuple(OUTPUT_CONTAINERS), default=None, help="输出容器：mp4、webm 或 mkv")
     render.add_argument("--video-codec", choices=("libx264", "libx265", "libvpx-vp9", "libvpx", "libaom-av1"), default=None)
-    render.add_argument("--audio-codec", choices=("aac", "libopus", "opus", "pcm_s16le"), default=None)
+    render.add_argument("--audio-codec", choices=("aac", "libopus", "opus", "pcm_s16le", "pcm_s24le", "pcm_s32le", "pcm_f32le"), default=None)
     render.add_argument("--crf", type=int, default=None, help="视频 CRF，范围 0..63")
     render.add_argument("--video-bitrate", default=None, help="可选视频码率，例如 8M")
     render.add_argument("--audio-bitrate", default=None, help="音频码率，例如 192k")

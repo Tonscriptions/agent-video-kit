@@ -1,0 +1,69 @@
+test_cache_tamper_fails_without_overwriting_the_prior_file (test_audio_stretch.OfflineAudioStretchTests.test_cache_tamper_fails_without_overwriting_the_prior_file) ... ok
+test_cancelled_preprocessing_does_not_create_a_derived_file (test_audio_stretch.OfflineAudioStretchTests.test_cancelled_preprocessing_does_not_create_a_derived_file) ... ok
+test_dependency_hash_changes_fail_before_a_process_starts (test_audio_stretch.OfflineAudioStretchTests.test_dependency_hash_changes_fail_before_a_process_starts) ... ok
+test_dry_run_never_decodes_or_runs_the_offline_engine (test_audio_stretch.OfflineAudioStretchTests.test_dry_run_never_decodes_or_runs_the_offline_engine) ... ok
+test_faster_stretch_retains_pitch_and_exact_sample_count (test_audio_stretch.OfflineAudioStretchTests.test_faster_stretch_retains_pitch_and_exact_sample_count) ... ok
+test_float_pcm_rejects_nan_and_truncated_chunks (test_audio_stretch.OfflineAudioStretchTests.test_float_pcm_rejects_nan_and_truncated_chunks) ... ok
+test_four_ms_offline_output_has_sound_in_all_deciles (test_audio_stretch.OfflineAudioStretchTests.test_four_ms_offline_output_has_sound_in_all_deciles) ... ok
+test_genuinely_short_input_is_not_padded_into_success (test_audio_stretch.OfflineAudioStretchTests.test_genuinely_short_input_is_not_padded_into_success) ... ok
+test_high_precision_pcm_matroska_exports_are_real (test_audio_stretch.OfflineAudioStretchTests.test_high_precision_pcm_matroska_exports_are_real) ... 
+  test_high_precision_pcm_matroska_exports_are_real (test_audio_stretch.OfflineAudioStretchTests.test_high_precision_pcm_matroska_exports_are_real) (codec='pcm_s32le') ... FAIL
+  test_high_precision_pcm_matroska_exports_are_real (test_audio_stretch.OfflineAudioStretchTests.test_high_precision_pcm_matroska_exports_are_real) (codec='pcm_f32le') ... FAIL
+test_missing_declared_native_dependency_is_rejected (test_audio_stretch.OfflineAudioStretchTests.test_missing_declared_native_dependency_is_rejected) ... ok
+test_nonlinear_nested_curve_uses_one_whole_clip_time_map (test_audio_stretch.OfflineAudioStretchTests.test_nonlinear_nested_curve_uses_one_whole_clip_time_map) ... ok
+test_pcm_and_channel_budgets_fail_before_decode (test_audio_stretch.OfflineAudioStretchTests.test_pcm_and_channel_budgets_fail_before_decode) ... ok
+test_remote_engine_reference_is_rejected_before_a_process_starts (test_audio_stretch.OfflineAudioStretchTests.test_remote_engine_reference_is_rejected_before_a_process_starts) ... ok
+test_repeated_render_keeps_the_prior_cached_audio_bytes (test_audio_stretch.OfflineAudioStretchTests.test_repeated_render_keeps_the_prior_cached_audio_bytes) ... FAIL
+test_reverse_output_matches_reversed_derived_pcm (test_audio_stretch.OfflineAudioStretchTests.test_reverse_output_matches_reversed_derived_pcm) ... ok
+test_unknown_engine_options_are_rejected (test_audio_stretch.OfflineAudioStretchTests.test_unknown_engine_options_are_rejected) ... ok
+test_whole_clip_scalar_stretch_preserves_stereo_tones (test_audio_stretch.OfflineAudioStretchTests.test_whole_clip_scalar_stretch_preserves_stereo_tones) ... ok
+
+======================================================================
+FAIL: test_high_precision_pcm_matroska_exports_are_real (test_audio_stretch.OfflineAudioStretchTests.test_high_precision_pcm_matroska_exports_are_real) (codec='pcm_s32le')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_stretch.py", line 196, in test_high_precision_pcm_matroska_exports_are_real
+    output,job,_=self.render(codec,('--audio-codec',codec))
+                 ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_stretch.py", line 82, in render
+    output=self.root/f'renders/{name}.mkv';result=self.call('render','--project',self.root,'--output',output,'--container','mkv','--audio-codec','pcm_f32le',*extra)
+                                                  ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 6 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016184125_4acf2f87', 'operation_id': 'render_20261016184124_ab647fd9', 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'AUDIO_STRETCH_CACHE_CONFLICT', 'message': '相同计划的离线音频缓存字节不一致；保留原文件', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\temp\\nested-clock-project-bvt0szf4\\project\\cache\\audio-stretch\\749a04a96f7da0c8a79e14c21be7b4bf3a09a31e9e4f6fb683918b94ae713cfa.wav', 'retryable': False, 'operation_id': 'render_20261016184124_ab647fd9'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T18:41:25.524236Z', 'finished_at': '2026-10-16T18:41:25.524246Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_high_precision_pcm_matroska_exports_are_real (test_audio_stretch.OfflineAudioStretchTests.test_high_precision_pcm_matroska_exports_are_real) (codec='pcm_f32le')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_stretch.py", line 196, in test_high_precision_pcm_matroska_exports_are_real
+    output,job,_=self.render(codec,('--audio-codec',codec))
+                 ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_stretch.py", line 82, in render
+    output=self.root/f'renders/{name}.mkv';result=self.call('render','--project',self.root,'--output',output,'--container','mkv','--audio-codec','pcm_f32le',*extra)
+                                                  ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 6 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016184128_e0a8c0e6', 'operation_id': 'render_20261016184126_95916971', 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'AUDIO_STRETCH_CACHE_CONFLICT', 'message': '相同计划的离线音频缓存字节不一致；保留原文件', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\temp\\nested-clock-project-bvt0szf4\\project\\cache\\audio-stretch\\749a04a96f7da0c8a79e14c21be7b4bf3a09a31e9e4f6fb683918b94ae713cfa.wav', 'retryable': False, 'operation_id': 'render_20261016184126_95916971'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T18:41:28.465185Z', 'finished_at': '2026-10-16T18:41:28.465199Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_repeated_render_keeps_the_prior_cached_audio_bytes (test_audio_stretch.OfflineAudioStretchTests.test_repeated_render_keeps_the_prior_cached_audio_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_stretch.py", line 120, in test_repeated_render_keeps_the_prior_cached_audio_bytes
+    self.prepare();_,first,_=self.render('one');_,second,_=self.render('two')
+                                                           ~~~~~~~~~~~^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_stretch.py", line 82, in render
+    output=self.root/f'renders/{name}.mkv';result=self.call('render','--project',self.root,'--output',output,'--container','mkv','--audio-codec','pcm_f32le',*extra)
+                                                  ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 6 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016184156_1a31a8a4', 'operation_id': 'render_20261016184154_2f019e66', 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'AUDIO_STRETCH_CACHE_CONFLICT', 'message': '相同计划的离线音频缓存字节不一致；保留原文件', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\temp\\nested-clock-project-weitkmqx\\project\\cache\\audio-stretch\\76db915a723b911634226739eff5cde371d450793b9c921f8bcc35cf5ae34e1c.wav', 'retryable': False, 'operation_id': 'render_20261016184154_2f019e66'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T18:41:56.416551Z', 'finished_at': '2026-10-16T18:41:56.416561Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 17 tests in 78.784s
+
+FAILED (failures=3)

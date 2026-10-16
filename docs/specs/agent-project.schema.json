@@ -39,6 +39,26 @@
       "additionalProperties": true,
       "required": ["timebase", "canvas"],
       "properties": {
+        "audio_stretch": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["engine", "executable", "sha256", "dependencies", "license_path", "license_sha256", "license_spdx"],
+          "properties": {
+            "engine": {"const": "rubberband-r3-offline-v1"},
+            "executable": {"type": "string", "minLength": 1},
+            "sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+            "dependencies": {
+              "type": "array", "maxItems": 32,
+              "items": {
+                "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+                "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}}
+              }
+            },
+            "license_path": {"type": "string", "minLength": 1},
+            "license_sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+            "license_spdx": {"type": "string", "minLength": 1}
+          }
+        },
         "timebase": {
           "type": "object",
           "required": ["ticks_per_second", "display_fps"],
