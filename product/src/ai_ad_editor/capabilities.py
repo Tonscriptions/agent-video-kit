@@ -143,9 +143,9 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "render": {
                 "status": "implemented",
-                "features": ["ffmpeg_local", "output_profiles", "jsonl_progress", "cancel_file", "safe_resume"],
+                "features": ["ffmpeg_local", "output_profiles", "jsonl_progress", "cancel_file", "safe_resume", "float_premultiplied_alpha_media_resize", "float_premultiplied_alpha_text_resize"],
                 "resume_contract": "rebuild_from_validated_plan_when_project_and_input_hashes_match",
-                "limits": ["resume_is_not_partial_frame_checkpoint", "changed_inputs_are_rejected", "other_long_tasks_progress_pending"],
+                "limits": ["resume_is_not_partial_frame_checkpoint", "changed_inputs_are_rejected", "other_long_tasks_progress_pending", "premultiplied_alpha_resize_does_not_cover_affine_geq_or_dynamic_crop_sampling", "float_alpha_resize_uses_existing_encoded_RGB_transfer_not_linear_light"],
             },
             "queue": {
                 "status": "implemented",

@@ -36,6 +36,13 @@ transparent-label padding as well as its position: a center metric can pass
 while an opaque border damages the composition. Keep an exceeded pixel
 threshold and failed semantic checks visible, even when project/render succeeds.
 
+For resized transparent media, compare assets with identical alpha/visible RGB
+and different fully transparent RGB. Ordinary fit/fill/stretch and scalar layer
+resize use float premultiplied alpha; inspect the final encoded edges and label
+center separately. See the [alpha resize contract](../../docs/specs/透明素材缩放与预乘Alpha契约_v0.1_2026-10-16.md).
+This does not establish affine/dynamic-crop sampling, linear-light color or
+segmentation quality; retain those review boundaries.
+
 For joint masked video editing, review the [VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
 Check the exact window plan/hash, scene boundaries, tail padding, seed sequence,
 overlap frame count, `conditioning=masked-rgb-127-before-and-after-resize`,

@@ -1033,6 +1033,20 @@ def _transform_exprs(clip: dict[str, Any], start: float, tps: int) -> dict[str, 
     return result
 
 
+def _scale_filters(expression: str, *, alpha: bool = False) -> list[str]:
+    """Keep invisible RGB out of the visible edge of a resized alpha layer.
+
+    FFmpeg scale interpolates straight RGB and alpha independently. Weight
+    RGB by alpha before filtering and divide afterwards, in float planar RGB
+    so faint coverage is not lost to an 8-bit premultiplication round trip.
+    Compositors and subsequent effects still receive straight RGBA.
+    """
+    if not alpha:
+        return [expression]
+    return ['format=gbrapf32le', 'premultiply=inplace=1', expression,
+            'unpremultiply=inplace=1', 'format=rgba']
+
+
 def _video_overlay_position(transform: dict[str, str], width: int, height: int) -> tuple[str, str]:
     """Return overlay coordinates that keep the authored anchor on position.
 
@@ -2572,7 +2586,8 @@ def _build_subtitle_layer(
             scale_w = _expr_arg(f"max(2,iw*({transform['scale']}))")
             scale_h = _expr_arg(f"max(2,ih*({transform['scale']}))")
             scaled_label = f"subtitle_scaled{subtitle_index}"
-            filters.append(f"[{layer_label}]scale=w={scale_w}:h={scale_h}:eval=frame,format=rgba[{scaled_label}]")
+            scale_chain = _scale_filters(f"scale=w={scale_w}:h={scale_h}:eval=frame", alpha=True)
+            filters.append(f"[{layer_label}]"+','.join(scale_chain)+f"[{scaled_label}]")
             layer_label = scaled_label
 
 
@@ -2882,6 +2897,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 crop = clip.get("crop") if isinstance(clip.get("crop"), dict) else {}
                 crop_fit = str(crop.get("fit", crop.get("mode", "fit"))).lower()
                 source_probe = asset.get("probe", {}).get("video", {}) if isinstance(asset.get("probe"), dict) else {}
+                pixel_format = str(source_probe.get('pix_fmt') or '')
+                alpha_padding = transparent_canvas or pixel_format.startswith(('rgba','bgra','argb','abgr','yuva','gbrap','ya')) or pixel_format == 'pal8'
                 source_width = max(0, int(_num(source_probe.get("width", 0), 0)))
                 source_height = max(0, int(_num(source_probe.get("height", 0), 0)))
                 dynamic_crop_rendered = False
@@ -2938,16 +2955,15 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                             chain.append(f"crop={crop_width}:{crop_height}:{crop_x}:{crop_y}:exact=1")
                 if not dynamic_crop_rendered:
                     if crop_fit == "fill":
-                        chain.extend([f"scale={width}:{height}:force_original_aspect_ratio=increase", f"crop={width}:{height}:(iw-ow)/2:(ih-oh)/2", "setsar=1"])
+                        chain.extend(_scale_filters(f"scale={width}:{height}:force_original_aspect_ratio=increase", alpha=alpha_padding))
+                        chain.extend([f"crop={width}:{height}:(iw-ow)/2:(ih-oh)/2", "setsar=1"])
                     elif crop_fit == "stretch":
-                        chain.extend([f"scale={width}:{height}", "setsar=1"])
+                        chain.extend(_scale_filters(f"scale={width}:{height}", alpha=alpha_padding))
+                        chain.append("setsar=1")
                     else:
-                        pixel_format = str(source_probe.get('pix_fmt') or '')
-                        alpha_padding = transparent_canvas or pixel_format.startswith(('rgba','bgra','argb','abgr','yuva','gbrap','ya')) or pixel_format == 'pal8'
-                        if alpha_padding:
-                            chain.append('format=rgba')
                         pad_color = 'black@0' if alpha_padding else 'black'
-                        chain.extend([f"scale={width}:{height}:force_original_aspect_ratio=decrease", f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:color={pad_color}", "setsar=1"])
+                        chain.extend(_scale_filters(f"scale={width}:{height}:force_original_aspect_ratio=decrease", alpha=alpha_padding))
+                        chain.extend([f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:color={pad_color}", "setsar=1"])
                 clip_content_duration = max(
                     0.001,
                     curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9),
@@ -2978,7 +2994,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 elif transforms["scale"] != "1.00000000":
                     scale_expr = _expr_arg(f"max(2,iw*({transforms['scale']}))")
                     height_expr = _expr_arg(f"max(2,ih*({transforms['scale']}))")
-                    chain.append(f"scale=w={scale_expr}:h={height_expr}:eval=frame")
+                    chain.extend(_scale_filters(f"scale=w={scale_expr}:h={height_expr}:eval=frame", alpha=alpha_padding))
                 if transforms["opacity"] != "1.00000000":
                     alpha_expr = f"alpha(X,Y)*clip(({transforms['opacity']}),0,1)"
                     chain.extend(["format=gbrap", f"geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)}", "format=rgba"])

@@ -306,3 +306,7 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 `media matting` 在选定 SAM2 adapter 时必须提供 `--prompts <JSON>`；可重复 `--object-id <整数>`、选择 `--mask-mode binary|probability`（默认 binary）、`--logit-threshold -20..20`（默认 0）。提示为归一化输出坐标和范围/显示归一化/CFR 后的零基帧；第 0 帧至少有一个选中对象，后续修正只影响未来帧。显式 reset 清除镜头状态，须重新提供所有已激活对象的提示。RVM 不接受这些 SAM2 专用参数，SAM2 不接受 RVM downsample-ratio。
 
 输出与音频、应用、取消/超时和事务沿用 RGBA MOV 契约，报告增加提示摘要、选中对象、模式、修正/重置、设备与状态预算。概率不是物理透明度；重置可能改变对象范围，保留质量警告。详细格式见[SAM2 契约](./本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md)，真实边界见[实测](../validation/SAM2本地对象分割与提示修正实测_2026-10-16.md)。
+
+## 透明素材普通缩放
+
+渲染器根据登记像素格式，为具有 alpha 的媒体普通 fit/fill/stretch、图层标量 scale，以及独立文字标量 scale 自动使用浮点预乘/反预乘，输出仍为 straight RGBA；没有新增 CLI 参数。源时钟、锚点和发布门禁不变。仿射/动态尺寸 crop、线性光和性能另行验收。见[契约](./透明素材缩放与预乘Alpha契约_v0.1_2026-10-16.md)与[实测](../validation/透明素材缩放边缘与标签精度实测_2026-10-16.md)。

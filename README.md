@@ -6,7 +6,7 @@
 
 ## 功能核验与真实实测
 
-本表随功能和验证结果同步更新。**功能链路、受控几何和自然质量分别验收，失败结果一并保留。** 本轮接通编码蒙版到轨迹、锚定和重构图，修复透明标签黑色补边；完整回归 **405/405，693.735 秒**，85 份产品源码/测试前后摘要一致；新增专项 26 项为子集。公开原视频、原蒙版、实际横屏/变换/竖屏输出及 GIF；自然手腕漏选与标签像素误差仍未通过。研究 22 项为前序独立结果，不并入产品通过数。
+本表随功能和验证结果同步更新。**功能链路、受控几何和自然质量分别验收，失败结果一并保留。** 本轮修复透明素材缩放的隐藏 RGB 污染；完整回归 **411/411，910.211 秒**，86 份产品源码/测试前后摘要一致；新增 6 项专项为子集。公开原视频、两份原标签、实际修复前后 MP4/GIF。相同自然样例标签误差由 4.10 降至 2.07 px，通过原 3 px 门槛；分割手腕漏选仍失败。研究 22 项为前序独立结果，不并入产品通过数。
 
 | 编号 | 功能 | 已执行的核验与实测结果 | 当前边界 | 证据 |
 |---|---|---|---|---|
@@ -22,12 +22,22 @@
 | V10 | SAM2 点/框、多对象与提示修正 | 原生 CPU/CUDA、选择/修正/重置、自然双人 32 帧、概率蒙版及两背景成片已实跑；前轮在同一场景新增一次 CUDA 修正，5 个明确检查点从 3 个通过到 4 个通过 | **修正后仍失败**：目标手腕继续漏选；保留人物前臂从误选变为排除，不代表完整选区改善 | [前序实测](docs/validation/SAM2本地对象分割与提示修正实测_2026-10-16.md)、[此前逐点实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
 | V11 | LaMa / VACE 修复与色差融合 | 显式 harmonic 受控选区 PSNR 分别 47.45 / 42.90 dB；自然 32 帧链路完成，蒙版外 RGB 与全部 alpha 保留，PCM 原声独立核对一致 | **自然人物移除画质未通过**：残影、纹理涂抹或色块仍存在；VACE 为实验能力 | [实测](docs/validation/本地区域色差融合实测_2026-10-16.md)、[机器证据](docs/validation/evidence/repair-blend-smoke-20261016.json) |
 | V12 | 背景参考传播研究 | 单表面 PSNR 30.878→31.124 dB；双表面合计 **33.448→33.410 dB，略退化**。22 项独立研究检查通过；公开原输入和逐帧对照 | **未接入产品**；人工遮挡真值不代表真实人物移除，自然画质未通过 | [研究 GIF/MP4](#实测演示素材)、[实测](docs/validation/本地多运动参考选择与双表面真值实测_2026-10-16.md) |
-| V13 | 产品自动回归 | 本轮完整 **405/405，693.735 秒**；85 份产品源码/测试前后与 Git 原始字节一致；新增 26 项专项为子集 | 专项是完整运行子集，不加研究数或 CLI 次数；不折算剪映完成率 | [本轮日志](docs/validation/evidence/mask-tracking-full-regression-20261016.log)、[汇总证据](docs/validation/evidence/mask-tracking-20261016.json)、[回归记录](docs/validation/回归验证记录_2026-10-13.md) |
+| V13 | 产品自动回归 | 本轮完整 **411/411，910.211 秒**；86 份产品源码/测试前后与 Git 原始字节一致；新增 6 项专项为子集，旧源码对照同 6 项均失败 | 专项、历史回归、研究与 CLI 次数不相加；不折算剪映完成率 | [本轮日志](docs/validation/evidence/alpha-resampling-full-20261016.log)、[汇总证据](docs/validation/evidence/alpha-resampling-20261016.json)、[回归记录](docs/validation/回归验证记录_2026-10-13.md) |
 | V14 | 编码蒙版范围与正负检查点 | 新增 `quality mask`：逐帧面积/包围框/IoU、明确 selected/clear 检查。自制 4 秒/32 帧样例准确报出第 12 帧缺腿；补全几何后 4 点通过，失败报告及退出码 2 保留；原始 alpha 全帧摘要匹配 | 补全样例为脚本恢复几何，非 AI 修复；检查点不证明完整身份/边缘/自然质量。自然样例修正后仍有 1 点失败 | [原蒙版与 GIF/MP4](#实测演示素材)、[实际 CLI 与媒体证据](docs/assets/mask-review-20261016/evidence.json)、[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
-| V15 | 编码蒙版驱动轨迹、标签与重构图 | 16 次正式 CLI，4 秒/64 帧/16 fps；逐帧 bbox 与自制真值一致。标签位置最大误差：横屏 1.64 px、缩放旋转后 2.14 px、竖屏 2.15 px；包和源/蒙版权利依赖保留 | 自制选区不是模型分割能力。自然 SAM2 仍 4/5 检查点通过，标签最大误差 4.10 px 超过 3 px；持续未验收 | [原视频与 GIF/MP4](#实测演示素材)、[全帧测量](docs/assets/mask-track-20261016/evidence.json)、[自然失败实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
-| V16 | 透明标签合成与失败报告 | 抽帧发现 PNG 的 fit 补边变黑；新增像素回归先失败，修复后 PNG/alpha MOV 通过，公开 64 帧两侧 128 区域核对。检查点失败仍保存诊断、回滚项目 | 位置准确不证明合成正确；修复前原片与失败日志保留；自然标签像素门槛仍失败 | [修复前原成片](docs/assets/mask-track-20261016/before-alpha-fix-bound.mp4)、[前后证据](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
+| V15 | 编码蒙版驱动轨迹、标签与重构图 | 16 次正式 CLI，4 秒/64 帧/16 fps；逐帧 bbox 与自制真值一致。标签位置最大误差：横屏 1.64 px、缩放旋转后 2.14 px、竖屏 2.15 px；包和源/蒙版权利依赖保留 | 自制选区不是模型分割能力。自然 SAM2 仍 4/5 检查点通过；该轮标签 4.10 px 失败，后续 V17 重验通过标签门槛，分割持续未验收 | [原视频与 GIF/MP4](#实测演示素材)、[全帧测量](docs/assets/mask-track-20261016/evidence.json)、[自然失败实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
+| V16 | 透明标签合成与失败报告 | 抽帧发现 PNG 的 fit 补边变黑；新增像素回归先失败，修复后 PNG/alpha MOV 通过，公开 64 帧两侧 128 区域核对。检查点失败仍保存诊断、回滚项目 | 位置准确不证明合成正确；修复前原片与失败日志保留；该轮自然标签失败，后续 V17 补充缩放修复与重验 | [修复前原成片](docs/assets/mask-track-20261016/before-alpha-fix-bound.mp4)、[前后证据](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
+| V17 | 透明素材缩放边缘与自然标签复验 | 正式 CLI 对照同 alpha/可见 RGB、仅隐藏黑/绿不同的标签：旧成片最大差 64，新成片全 32 帧 RGB 差为 0；自然标签最大误差 **4.0954→2.0650 px**，超 3 px 帧 **5→0**，0 新推理 | PNG/MOV/pal8、适配和标量缩放；仿射/动态尺寸 crop、线性光和性能未据此验收；自然蒙版手腕仍漏选 | [原视频与 GIF/MP4](#实测演示素材)、[全帧/源码证据](docs/assets/alpha-resize-20261016/evidence.json)、[自然复验与原失败](docs/validation/透明素材缩放边缘与标签精度实测_2026-10-16.md) |
 
 ## 实测演示素材
+
+**正式产品 CLI：透明标签缩放修复，4 秒。** 左至右为原视频、旧实现、新实现；下方放大窗来自实际解码像素。两份原标签仅全透明 RGB 不同，旧版从本地固定 Git 提交执行，没有用新代码模拟旧效果。
+
+![真实 CLI：原视频、透明边缘修复前后](docs/assets/alpha-resize-20261016/alpha-resampling-comparison.gif)
+
+[原视频](docs/assets/alpha-resize-20261016/source.mp4) · [原黑标签](docs/assets/alpha-resize-20261016/marker-black.png) · [原绿标签](docs/assets/alpha-resize-20261016/marker-green.png) · [旧黑标签成片](docs/assets/alpha-resize-20261016/before-black.mp4) · [新黑标签成片](docs/assets/alpha-resize-20261016/after-black.mp4) · [旧绿标签成片](docs/assets/alpha-resize-20261016/before-green.mp4) · [新绿标签成片](docs/assets/alpha-resize-20261016/after-green.mp4) · [完整对照 MP4](docs/assets/alpha-resize-20261016/alpha-resampling-comparison.mp4) · [复现和失败边界](docs/validation/透明素材缩放边缘与标签精度实测_2026-10-16.md)。
+
+原视频和实际 MP4 均为 32 帧、8 fps、4 秒；GIF 为 32 帧、120/130 ms 交替、总 4 秒，无声。自制 CC0 素材、10 次真实 CLI、SHA-256 和媒体探测见[本批机器记录](docs/assets/alpha-resize-20261016/evidence.json)。自然人物原片权利未核验，只公开测量记录；标签门槛通过不代表蒙版语义或整体剪映质量通过。
+
 
 以下为实际输出的本地媒体，均随仓库提交。GIF 无声并降低色数便于预览，部分演示降低帧率；MP4 保留展示帧率，多轨合成组包含实际渲染音频。所有公开输入为本地合成素材；未确认发布权利的自然人物视频仅保留实测记录。
 
@@ -37,7 +47,7 @@
 
 [原视频](docs/assets/mask-track-20261016/source.mp4) · [原 alpha 蒙版](docs/assets/mask-track-20261016/selected-mask.mov) · [横屏输出](docs/assets/mask-track-20261016/bound.mp4) · [变换后输出](docs/assets/mask-track-20261016/bound-transformed.mp4) · [竖屏输出](docs/assets/mask-track-20261016/portrait.mp4) · [对照 MP4](docs/assets/mask-track-20261016/mask-tracking-comparison.mp4) · [16 次调用/逐帧测量与摘要](docs/assets/mask-track-20261016/evidence.json)
 
-原输入和 MP4 均为 16 fps、64 帧；GIF 间隔取样 32 帧、平均 8 fps、4 秒、无声。已修复透明标签黑色补边，修复前[实际成片](docs/assets/mask-track-20261016/before-alpha-fix-bound.mp4)和[抽帧](docs/assets/mask-track-20261016/before-alpha-fix-contact-frame-32.png)同样保留。自然 SAM2 选区手腕仍漏选，标签像素门槛修复后仍未通过（最大 4.10 px / 门槛 3 px），详情见[实测和复现](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md)。
+原输入和 MP4 均为 16 fps、64 帧；GIF 间隔取样 32 帧、平均 8 fps、4 秒、无声。已修复透明标签黑色补边，修复前[实际成片](docs/assets/mask-track-20261016/before-alpha-fix-bound.mp4)和[抽帧](docs/assets/mask-track-20261016/before-alpha-fix-contact-frame-32.png)同样保留。自然 SAM2 选区手腕仍漏选，补边修复时标签最大 4.10 px 超过 3 px；后续 V17 预乘 alpha 缩放已将同一样例降至 2.07 px，原失败保留，详情见[实测和复现](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md)。
 
 **正式蒙版核验：漏选失败与补全几何通过，4 秒。** 从左到右：完整输入 / 漏选蒙版 / 恢复几何的样例。核验报告来自实际产品 CLI；恢复几何由脚本完成，未调用修复模型。
 
@@ -69,8 +79,8 @@ MP4 与原蒙版均为 8 fps、32 帧；GIF 保留全部 32 帧，帧时长交�
 
 ## 当前状态
 
-- 当前 26 模块进度见[构建进度总表](docs/构建进度总表_2026-10-16.md)：本地 CLI 主链路已实现，广告生产能力部分落地。本轮新增蒙版驱动轨迹/锚定/重构图与透明补边修复，完整 **405/405**，85 份产品源码/测试前后冻结；新增 26 项专项为子集。自然画质、开放内容库、完整草稿映射、性能/发行和完整剪映验收仍待完成。
-- 新增 `--mask-asset-id` 接通 `media track / track-bind / reframe`，支持显式检查点门禁、源时钟映射及源/蒙版/模型权利依赖。受控全帧几何通过，自然漏抠和标签像素误差继续失败，见[契约](docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md)和[实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md)。
+- 当前 26 模块进度见[构建进度总表](docs/构建进度总表_2026-10-16.md)：本地 CLI 主链路已实现，广告生产能力部分落地。本轮新增透明素材浮点预乘 alpha 缩放，完整 **411/411**，86 份源码/测试前后冻结；6 项专项为子集。自然标签通过原像素门槛；自然画质、开放内容库、完整草稿映射、性能/发行和完整剪映验收仍待完成。
+- 新增 `--mask-asset-id` 接通 `media track / track-bind / reframe`，支持显式检查点门禁、源时钟映射及源/蒙版/模型权利依赖。受控全帧几何通过，自然漏抠继续失败；标签像素门槛在 V17 复验通过，见[契约](docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md)和[实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md)。
 - 蒙版核验使用原生 FFmpeg 和 Python 标准库，支持 alpha/luma、明确正负检查点、切点及解码存储预算，失败仍保存报告。公开样例通过实际 CLI 验证；真实 SAM2 提示修正后仍有手腕漏选，检查点从 3/5 到 4/5，不自动接入发布门禁或证明完整分割。见[契约](docs/specs/本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md)与[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md)。
 - VACE 五组同源采样/输入尺度对照 **5/5 已完成，画质均未通过**：暗矩形补丁仍存在，4 倍输入或 50 步未改善该样例。CLI 已接入显式 `--flow-shift` 和 `--model-input-scale {1,2,4}`，默认仍为 3/1；输入数组预算按倍率平方计入，输出画布不变。详见[校准证据](docs/validation/evidence/vace-calibration-20261016.json)和[正式参数验证](docs/validation/evidence/vace-profiles-20261016.json)。
 - VACE 实验性联合编辑：提示词/seed、窗口/重叠/切点和原生 CUDA 已接入；Windows 进度快照/原子替换冲突已修复。真实 **32 帧/3 窗口/30 步 SAM2→VACE→原声/入轨→MP4** 正式链路成功，蒙版外 RGB 改变 0、全部 alpha 一致；Torch 峰值已分配约 6.75 GiB。**自然画质未通过**：彩色块、形体残影、纹理不连续，部分抽样帧明显差于匹配源/蒙版的 LaMa 对照。前序 direct 的 8 帧/2 窗口/30 步受控正式链路也通过，但有暗矩形补丁；许可、长期时序和广泛效果继续验收。见[契约](docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md)、[实测与缺口](docs/validation/VACE本地多帧编辑与生成填充实测_2026-10-16.md)和[机器证据](docs/validation/evidence/vace-smoke-20261016.json)。

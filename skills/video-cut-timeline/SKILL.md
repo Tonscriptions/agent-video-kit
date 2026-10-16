@@ -39,6 +39,11 @@ without source references uses normalized source coordinates. For current
 crop/fit/fill/stretch, transform, mirror and source-time mapping, supply both
 `--source-track-id` and `--source-clip-id`; see the [canvas binding contract](../../docs/specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md).
 This saves source-clock observations and recompiles them for the render canvas.
+
+Ordinary alpha-media fit/fill/stretch and scalar resize use float premultiplied
+alpha to keep invisible RGB out of edges; see the [alpha resize contract](../../docs/specs/透明素材缩放与预乘Alpha契约_v0.1_2026-10-16.md).
+Position/anchor clocks are unchanged. Affine rotation and dynamic-size crop
+sampling have separate alpha-quality limits; review the actual encoded output.
 Optional `--rotation-mode source` follows layer rotation, not object pose.
 Live bindings own their generated transform keys; set `tracking_binding` to null
 with update_clip to detach while retaining saved preview keys. Nested parents,

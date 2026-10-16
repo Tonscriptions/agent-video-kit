@@ -1,0 +1,83 @@
+test_alpha_video_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_alpha_video_hidden_rgb_has_no_visible_influence) ... FAIL
+test_animated_scale_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_animated_scale_hidden_rgb_has_no_visible_influence) ... FAIL
+test_indexed_png_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_indexed_png_hidden_rgb_has_no_visible_influence) ... FAIL
+test_png_fill_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_png_fill_hidden_rgb_has_no_visible_influence) ... FAIL
+test_png_fit_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_png_fit_hidden_rgb_has_no_visible_influence) ... FAIL
+test_png_stretch_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_png_stretch_hidden_rgb_has_no_visible_influence) ... FAIL
+
+======================================================================
+FAIL: test_alpha_video_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_alpha_video_hidden_rgb_has_no_visible_influence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 111, in test_alpha_video_hidden_rgb_has_no_visible_influence
+    self.compare_hidden_rgb('fit', video=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 95, in compare_hidden_rgb
+    self.assertEqual(max(differences), 0, 'Fully transparent RGB must not contaminate visible resampled pixels')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 59 != 0 : Fully transparent RGB must not contaminate visible resampled pixels
+
+======================================================================
+FAIL: test_animated_scale_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_animated_scale_hidden_rgb_has_no_visible_influence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 108, in test_animated_scale_hidden_rgb_has_no_visible_influence
+    self.compare_hidden_rgb('fit', animated=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 95, in compare_hidden_rgb
+    self.assertEqual(max(differences), 0, 'Fully transparent RGB must not contaminate visible resampled pixels')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 61 != 0 : Fully transparent RGB must not contaminate visible resampled pixels
+
+======================================================================
+FAIL: test_indexed_png_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_indexed_png_hidden_rgb_has_no_visible_influence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 114, in test_indexed_png_hidden_rgb_has_no_visible_influence
+    self.compare_hidden_rgb('fit', palette=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 95, in compare_hidden_rgb
+    self.assertEqual(max(differences), 0, 'Fully transparent RGB must not contaminate visible resampled pixels')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 59 != 0 : Fully transparent RGB must not contaminate visible resampled pixels
+
+======================================================================
+FAIL: test_png_fill_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_png_fill_hidden_rgb_has_no_visible_influence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 102, in test_png_fill_hidden_rgb_has_no_visible_influence
+    self.compare_hidden_rgb('fill')
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 95, in compare_hidden_rgb
+    self.assertEqual(max(differences), 0, 'Fully transparent RGB must not contaminate visible resampled pixels')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 64 != 0 : Fully transparent RGB must not contaminate visible resampled pixels
+
+======================================================================
+FAIL: test_png_fit_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_png_fit_hidden_rgb_has_no_visible_influence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 99, in test_png_fit_hidden_rgb_has_no_visible_influence
+    self.compare_hidden_rgb('fit')
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 95, in compare_hidden_rgb
+    self.assertEqual(max(differences), 0, 'Fully transparent RGB must not contaminate visible resampled pixels')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 59 != 0 : Fully transparent RGB must not contaminate visible resampled pixels
+
+======================================================================
+FAIL: test_png_stretch_hidden_rgb_has_no_visible_influence (test_alpha_resampling.AlphaResamplingTests.test_png_stretch_hidden_rgb_has_no_visible_influence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 105, in test_png_stretch_hidden_rgb_has_no_visible_influence
+    self.compare_hidden_rgb('stretch')
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 95, in compare_hidden_rgb
+    self.assertEqual(max(differences), 0, 'Fully transparent RGB must not contaminate visible resampled pixels')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 59 != 0 : Fully transparent RGB must not contaminate visible resampled pixels
+
+----------------------------------------------------------------------
+Ran 6 tests in 19.170s
+
+FAILED (failures=6)
