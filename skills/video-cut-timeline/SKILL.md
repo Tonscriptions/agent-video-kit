@@ -52,6 +52,17 @@ with update_clip to detach while retaining saved preview keys. Nested parents,
 mask/occlusion visibility, VFR and nonlinear warps remain review boundaries. Do not delete
 dependencies or warnings to make a project pass a release gate.
 
+Nested variable-speed clips retain an analytic source-clock composition for
+video and authored keyframes; read the [nested clock contract](../../docs/specs/嵌套序列解析时间映射契约_v0.1_2026-10-16.md).
+Keep each reverse attached to its own container, and keep leaf curves in their
+original source domain after trimming. Render manifests record the composed
+maps and explicit source CFR normalization. Audio still uses atempo windows
+with integrated 48 kHz boundaries, so retain its phase/continuous-tempo warning.
+Freeze, caption cues, speed easing, parent pivots and group coordinate spaces
+keep separate acceptance boundaries. A render intentionally records outputs
+and provenance; compare authored timeline/assets/settings and Rights Ledger
+when checking that generated internal clocks were not persisted.
+
 Write a project-relative JSON change set and apply it with:
 
 ```powershell

@@ -1,0 +1,246 @@
+test_nested_clock_audio_pulses_follow_same_integrated_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_audio_pulses_follow_same_integrated_clock) ... FAIL
+test_nested_clock_double_reverse_does_not_cancel_wrong_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_double_reverse_does_not_cancel_wrong_clock) ... FAIL
+test_nested_clock_forward_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_forward_ramp_matches_source_frames) ... FAIL
+test_nested_clock_inner_parent_animation_uses_outer_inverse_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_inner_parent_animation_uses_outer_inverse_clock) ... FAIL
+test_nested_clock_inner_reverse_preserves_outer_curve (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_inner_reverse_preserves_outer_curve) ... FAIL
+test_nested_clock_mask_local_animation_uses_authored_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_mask_local_animation_uses_authored_clock) ... FAIL
+test_nested_clock_multiple_segments_and_hold_keep_breakpoints (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_multiple_segments_and_hold_keep_breakpoints) ... FAIL
+test_nested_clock_resamples_to_different_output_rate (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_resamples_to_different_output_rate) ... FAIL
+test_nested_clock_reverse_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_reverse_ramp_matches_source_frames) ... FAIL
+test_nested_clock_reversed_multi_segment_curve_keeps_breakpoints (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_reversed_multi_segment_curve_keeps_breakpoints) ... FAIL
+test_nested_clock_transform_animation_uses_authored_child_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_transform_animation_uses_authored_child_clock) ... FAIL
+test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain) ... FAIL
+test_nested_clock_two_nonlinear_parents_compose (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_two_nonlinear_parents_compose) ... FAIL
+
+======================================================================
+FAIL: test_nested_clock_audio_pulses_follow_same_integrated_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_audio_pulses_follow_same_integrated_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 288, in test_nested_clock_audio_pulses_follow_same_integrated_clock
+    output, _, steps, result = self.render_case([{'speeds': (1., 4.)}], audio=True)
+                               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': '9d1a912848bd9cb0c9d8e46555f822bd8a35f8757[110 chars]aab'} != {'project.json': '4bd9c1c4482dd5d988213287d81c95139e18b8cdf[110 chars]aab'}
+- {'project.json': '9d1a912848bd9cb0c9d8e46555f822bd8a35f875774d92fa8bf39425ea2a7226',
++ {'project.json': '4bd9c1c4482dd5d988213287d81c95139e18b8cdf9edf885fb70521558f537ba',
+   'rights-ledger.json': '1441ba8d2119cb412bfc946831b8d310d50bce263aa8acbacfdb078b9a170aab'}
+
+======================================================================
+FAIL: test_nested_clock_double_reverse_does_not_cancel_wrong_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_double_reverse_does_not_cancel_wrong_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 236, in test_nested_clock_double_reverse_does_not_cancel_wrong_clock
+    self.assert_source_clock([{'speeds': (1., 3.), 'reverse': True}, {'speeds': (.7, 1.8), 'reverse': True}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 200, in assert_source_clock
+    _, images, steps, _ = self.render_case(parents, **kwargs)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': '6c4768472f2b5d0010f2798d7cb47a5d3db1219213[109 chars]3e4'} != {'project.json': '6139d0d6f6b8316d3cdbfc49c48fad731aedb08dda[109 chars]3e4'}
+- {'project.json': '6c4768472f2b5d0010f2798d7cb47a5d3db1219213026622d6ccd4483e0b4acb',
++ {'project.json': '6139d0d6f6b8316d3cdbfc49c48fad731aedb08ddaadea477750eff424adb9ca',
+   'rights-ledger.json': '98e68480dcdfdd514f6dee6b95016ce1a66f7dc3174e32597adc24ca2d3703e4'}
+
+======================================================================
+FAIL: test_nested_clock_forward_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_forward_ramp_matches_source_frames)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 224, in test_nested_clock_forward_ramp_matches_source_frames
+    self.assert_source_clock([{'speeds': (1., 4.)}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 200, in assert_source_clock
+    _, images, steps, _ = self.render_case(parents, **kwargs)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': '42f06bcc61ee83e8b394209b04083024893f5b0ea[110 chars]c70'} != {'project.json': '3cee0dde2856a2ecfc56bfb2676eb8611f3c0af12[110 chars]c70'}
+- {'project.json': '42f06bcc61ee83e8b394209b04083024893f5b0ea859d0ff5551445fa2f16e71',
++ {'project.json': '3cee0dde2856a2ecfc56bfb2676eb8611f3c0af1265a98df5a20f3551fe9f400',
+   'rights-ledger.json': '8ca25f01b36af3831523a95350c1cfd63686486fd86c41b3163062e55f45ec70'}
+
+======================================================================
+FAIL: test_nested_clock_inner_parent_animation_uses_outer_inverse_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_inner_parent_animation_uses_outer_inverse_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 265, in test_nested_clock_inner_parent_animation_uses_outer_inverse_clock
+    _, images, steps, _ = self.render_case([{'speeds': (1., 2.), 'animate': True}, {'speeds': (.8, 2.)}])
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': 'bc10b911beb5a008799ac07fed9ca83c5538010d6[110 chars]a63'} != {'project.json': '068c00f52015dd5c5d4cc6ece5a72e059ec9f5e14[110 chars]a63'}
+- {'project.json': 'bc10b911beb5a008799ac07fed9ca83c5538010d65d203dfa96a2c6eb9568a92',
++ {'project.json': '068c00f52015dd5c5d4cc6ece5a72e059ec9f5e1469bd44c93cfb211021b55ba',
+   'rights-ledger.json': 'b9b2baf57ca1802cd26a8a75c545f9044283c05f4779b9d44aac373854e11a63'}
+
+======================================================================
+FAIL: test_nested_clock_inner_reverse_preserves_outer_curve (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_inner_reverse_preserves_outer_curve)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 233, in test_nested_clock_inner_reverse_preserves_outer_curve
+    self.assert_source_clock([{'speeds': (1., 3.), 'reverse': True}, {'speeds': (.7, 1.8)}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 200, in assert_source_clock
+    _, images, steps, _ = self.render_case(parents, **kwargs)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': 'cb9a41de4dfc21bcb2f4021b4717965d24ad56540[110 chars]ef7'} != {'project.json': '9e0f436b5f5350526fb404ae1447fbcb5b5eb5e4e[110 chars]ef7'}
+- {'project.json': 'cb9a41de4dfc21bcb2f4021b4717965d24ad56540672fd9f58acccf35cf0eeb8',
++ {'project.json': '9e0f436b5f5350526fb404ae1447fbcb5b5eb5e4eb1b4a67e3f3ccb14f8d7f2f',
+   'rights-ledger.json': '013048956399d181c5a9297c23b52e725814873a7aa83f36c3374f03b7f1bef7'}
+
+======================================================================
+FAIL: test_nested_clock_mask_local_animation_uses_authored_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_mask_local_animation_uses_authored_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 255, in test_nested_clock_mask_local_animation_uses_authored_clock
+    _, images, steps, _ = self.render_case([{'speeds': (1., 4.)}], mask_animated=True)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': '4c022da231a312e6bcf0fcb38954370e5cd2923b1[110 chars]a96'} != {'project.json': '5126efccf438dcdf9856099b137655de8fbb6fcc7[110 chars]a96'}
+- {'project.json': '4c022da231a312e6bcf0fcb38954370e5cd2923b16fd2c8fec7d2cb78962a18e',
++ {'project.json': '5126efccf438dcdf9856099b137655de8fbb6fcc70d788cf45b84498e1d00829',
+   'rights-ledger.json': '918e70df303407beb095b865af4d0f1243bc95b7773b7c538964f9c0ed7e9a96'}
+
+======================================================================
+FAIL: test_nested_clock_multiple_segments_and_hold_keep_breakpoints (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_multiple_segments_and_hold_keep_breakpoints)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 280, in test_nested_clock_multiple_segments_and_hold_keep_breakpoints
+    self.assert_source_clock([{'points': [(0., 1., 'hold'), (.75, 2., 'linear'),
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                         (2., 4., 'linear'), (3., 1., 'linear')]}])
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 200, in assert_source_clock
+    _, images, steps, _ = self.render_case(parents, **kwargs)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': '31b408bd847b573dd0441a6e674de4546872fd145[110 chars]a63'} != {'project.json': 'eac2489e24b7d1b6b0fcaabd07e54ffdb309c358c[110 chars]a63'}
+- {'project.json': '31b408bd847b573dd0441a6e674de4546872fd14580caffd71819a99ad0fccbe',
++ {'project.json': 'eac2489e24b7d1b6b0fcaabd07e54ffdb309c358c3cefac50485b52f76e38082',
+   'rights-ledger.json': '65c5c59921e2cc58eb07bc3a934ba0ca11077bd5ed4ac7a5c9c3ab863c0c5a63'}
+
+======================================================================
+FAIL: test_nested_clock_resamples_to_different_output_rate (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_resamples_to_different_output_rate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 277, in test_nested_clock_resamples_to_different_output_rate
+    self.assert_source_clock([{'speeds': (1., 4.)}], output_fps=30)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 200, in assert_source_clock
+    _, images, steps, _ = self.render_case(parents, **kwargs)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': '736672eba05e05cc524e961c90aa48ecfff6043cb[110 chars]bef'} != {'project.json': '51331ddf67c0aaaed8ed95d2ea0b3b31eff7272a7[110 chars]bef'}
+- {'project.json': '736672eba05e05cc524e961c90aa48ecfff6043cbc8cd9d7378695252a85e801',
++ {'project.json': '51331ddf67c0aaaed8ed95d2ea0b3b31eff7272a78d94062d7b80089111bc54d',
+   'rights-ledger.json': 'b0bd63fa94d7c5623fcc7c0dda9724595db61fe31d7f286a38957fc6080f8bef'}
+
+======================================================================
+FAIL: test_nested_clock_reverse_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_reverse_ramp_matches_source_frames)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 227, in test_nested_clock_reverse_ramp_matches_source_frames
+    self.assert_source_clock([{'speeds': (1., 4.), 'reverse': True}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 200, in assert_source_clock
+    _, images, steps, _ = self.render_case(parents, **kwargs)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': '04c5292357377f2322c7c159173897af9a33ca963d[109 chars]520'} != {'project.json': '0eb9d15bc5f1c8bae249ba6edc3c9cc5fe6dace029[109 chars]520'}
+- {'project.json': '04c5292357377f2322c7c159173897af9a33ca963d1eff3688c8bbb9265a7109',
++ {'project.json': '0eb9d15bc5f1c8bae249ba6edc3c9cc5fe6dace02983c30a2bcb167ba8842397',
+   'rights-ledger.json': 'cba9cc77acc9b987c725ef4d5e762e048e3cc7e542090e99d3b2a88ea34aa520'}
+
+======================================================================
+FAIL: test_nested_clock_reversed_multi_segment_curve_keeps_breakpoints (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_reversed_multi_segment_curve_keeps_breakpoints)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 284, in test_nested_clock_reversed_multi_segment_curve_keeps_breakpoints
+    self.assert_source_clock([{'reverse': True, 'points': [(0., 1., 'hold'), (.75, 2., 'linear'),
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                          (2., 4., 'linear'), (3., 1., 'linear')]}])
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 200, in assert_source_clock
+    _, images, steps, _ = self.render_case(parents, **kwargs)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': '97efbbb4e0286bee6dbd7b3e5dfc3071dd36c032e[110 chars]b4e'} != {'project.json': '2fda67a5938d3fba815f4fb78a7d6429fa4d4ebd4[110 chars]b4e'}
+- {'project.json': '97efbbb4e0286bee6dbd7b3e5dfc3071dd36c032e48b02889dc67945e2d747ca',
++ {'project.json': '2fda67a5938d3fba815f4fb78a7d6429fa4d4ebd40816711f62d997e049053d5',
+   'rights-ledger.json': 'd7fa39ff786b7a4ba91d535e55b6a01bdc0d9ce32640f24e15a45de79b33bb4e'}
+
+======================================================================
+FAIL: test_nested_clock_transform_animation_uses_authored_child_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_transform_animation_uses_authored_child_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 243, in test_nested_clock_transform_animation_uses_authored_child_clock
+    _, images, steps, _ = self.render_case([{'speeds': (1., 4.)}], animated=True)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': 'b95700f6ddc6b5beaae36a996c93339a3c9721bb6[110 chars]cb4'} != {'project.json': 'edbeb1a99ca759d6e36e7ba13d9b6a8fbdf7d6c30[110 chars]cb4'}
+- {'project.json': 'b95700f6ddc6b5beaae36a996c93339a3c9721bb68c2641cff67e1d48f3b2584',
++ {'project.json': 'edbeb1a99ca759d6e36e7ba13d9b6a8fbdf7d6c300518d8673ea6526c6c7f2de',
+   'rights-ledger.json': '91555e716de63e97ed41d8cf9a437bd2fe8ef0083cb37cf28163997effe2bcb4'}
+
+======================================================================
+FAIL: test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 239, in test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain
+    self.assert_source_clock([{'in': .2, 'out': .95, 'speeds': (.8, 1.7)}],
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                             leaf_speeds=(1., 3.), leaf_reverse=True, source_in=.25, source_out=2.75)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 200, in assert_source_clock
+    _, images, steps, _ = self.render_case(parents, **kwargs)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': '55a59b0723887765810001fecc1e17cf7c211c0d2[110 chars]7a8'} != {'project.json': '45674623f4a3f8738f6bf9b249c09e55700d506f9[110 chars]7a8'}
+- {'project.json': '55a59b0723887765810001fecc1e17cf7c211c0d200b4f3adc508318eabfd41d',
++ {'project.json': '45674623f4a3f8738f6bf9b249c09e55700d506f9965cb83e3bfbd298cd73f0f',
+   'rights-ledger.json': '385b581ce9dfd84a35cedc277b319f3fc2b8f1841ce5e15cec48f7c5057fd7a8'}
+
+======================================================================
+FAIL: test_nested_clock_two_nonlinear_parents_compose (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_two_nonlinear_parents_compose)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 230, in test_nested_clock_two_nonlinear_parents_compose
+    self.assert_source_clock([{'speeds': (1., 3.)}, {'speeds': (.7, 1.8)}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 200, in assert_source_clock
+    _, images, steps, _ = self.render_case(parents, **kwargs)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in render_case
+    self.assertEqual(originals, {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest() for name in originals})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'project.json': 'ea6c7c8cb33b362a3ee6a05238668643e7bf765b6[110 chars]653'} != {'project.json': '024a929befb269c95c315556764172f11cc6cdd35[110 chars]653'}
+- {'project.json': 'ea6c7c8cb33b362a3ee6a05238668643e7bf765b6d87bc21ebfec642713ae6fa',
++ {'project.json': '024a929befb269c95c315556764172f11cc6cdd355ee724d19852f9543aaf1b9',
+   'rights-ledger.json': '4e65c77a0ae6f4566255ca5d9d42abc51d9e22867b1b1c6da13557dc9229f653'}
+
+----------------------------------------------------------------------
+Ran 13 tests in 13.043s
+
+FAILED (failures=13)

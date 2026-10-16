@@ -89,6 +89,15 @@ and consecutive error changes; retain the fixture scope. Review texture seams,
 remaining object edges, movement, occlusion and flicker in natural footage.
 Keep model/source/mask rights gating separate from render-quality success.
 
+For nested speed curves, use a source video with encoded frame identities and
+an independently authored clock oracle. Compare every output frame, including
+fractional curve-segment cuts and reverse combinations. See the
+[nested time contract](../../docs/specs/嵌套序列解析时间映射契约_v0.1_2026-10-16.md).
+The current fixture gate is <=1 CFR source frame; it does not accept arbitrary
+VFR timestamps. Measure keyframe geometry in its original child clock, and
+audio pulse timing separately. Pulse-envelope checks exclude explicit boundary
+neighborhoods and do not establish seamless phase, lip sync or listening quality.
+
 Run structural and media gates after rendering:
 
 ```powershell

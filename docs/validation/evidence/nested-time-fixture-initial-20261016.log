@@ -1,0 +1,136 @@
+test_nested_clock_audio_pulses_follow_same_integrated_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_audio_pulses_follow_same_integrated_clock) ... FAIL
+test_nested_clock_double_reverse_does_not_cancel_wrong_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_double_reverse_does_not_cancel_wrong_clock) ... FAIL
+test_nested_clock_forward_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_forward_ramp_matches_source_frames) ... FAIL
+test_nested_clock_inner_reverse_preserves_outer_curve (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_inner_reverse_preserves_outer_curve) ... FAIL
+test_nested_clock_reverse_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_reverse_ramp_matches_source_frames) ... FAIL
+test_nested_clock_transform_animation_uses_authored_child_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_transform_animation_uses_authored_child_clock) ... FAIL
+test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain) ... FAIL
+test_nested_clock_two_nonlinear_parents_compose (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_two_nonlinear_parents_compose) ... FAIL
+
+======================================================================
+FAIL: test_nested_clock_audio_pulses_follow_same_integrated_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_audio_pulses_follow_same_integrated_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 240, in test_nested_clock_audio_pulses_follow_same_integrated_clock
+    self.assertEqual(mismatches, [], f'Audio envelope follows averaged speed at {mismatches}')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [0.27, 0.29, 0.31, 0.33, 0.35, 0.37, 0.39,[67 chars]1.09] != []
+
+First list contains 19 additional elements.
+First extra element 0:
+0.27
+
++ []
+- [0.27,
+-  0.29,
+-  0.31,
+-  0.33,
+-  0.35,
+-  0.37,
+-  0.39,
+-  0.55,
+-  0.57,
+-  0.83,
+-  0.85,
+-  0.87,
+-  0.89,
+-  0.91,
+-  0.93,
+-  0.95,
+-  0.97,
+-  1.07,
+-  1.09] : Audio envelope follows averaged speed at [0.27, 0.29, 0.31, 0.33, 0.35, 0.37, 0.39, 0.55, 0.57, 0.83, 0.85, 0.87, 0.89, 0.91, 0.93, 0.95, 0.97, 1.07, 1.09]
+
+======================================================================
+FAIL: test_nested_clock_double_reverse_does_not_cancel_wrong_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_double_reverse_does_not_cancel_wrong_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 204, in test_nested_clock_double_reverse_does_not_cancel_wrong_clock
+    self.assert_source_clock([{'speeds': (1., 3.), 'reverse': True}, {'speeds': (.7, 1.8), 'reverse': True}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 189, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 not less than or equal to 1 : Nested source-frame drift: [0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+
+======================================================================
+FAIL: test_nested_clock_forward_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_forward_ramp_matches_source_frames)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 192, in test_nested_clock_forward_ramp_matches_source_frames
+    self.assert_source_clock([{'speeds': (1., 4.)}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 189, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 13 not less than or equal to 1 : Nested source-frame drift: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 10, 10, 11, 11, 12, 12, 12, 12, 13, 12, 12, 11, 11, 10, 10, 10, 9, 7, 6, 5, 4, 2]
+
+======================================================================
+FAIL: test_nested_clock_inner_reverse_preserves_outer_curve (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_inner_reverse_preserves_outer_curve)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 201, in test_nested_clock_inner_reverse_preserves_outer_curve
+    self.assert_source_clock([{'speeds': (1., 3.), 'reverse': True}, {'speeds': (.7, 1.8)}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 189, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 not less than or equal to 1 : Nested source-frame drift: [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+======================================================================
+FAIL: test_nested_clock_reverse_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_reverse_ramp_matches_source_frames)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 195, in test_nested_clock_reverse_ramp_matches_source_frames
+    self.assert_source_clock([{'speeds': (1., 4.), 'reverse': True}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 189, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 12 not less than or equal to 1 : Nested source-frame drift: [0, 1, 3, 5, 6, 8, 9, 9, 10, 11, 11, 12, 12, 12, 12, 12, 12, 12, 12, 11, 11, 10, 10, 10, 9, 8, 7, 6, 6, 5, 4, 2, 1]
+
+======================================================================
+FAIL: test_nested_clock_transform_animation_uses_authored_child_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_transform_animation_uses_authored_child_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 211, in test_nested_clock_transform_animation_uses_authored_child_clock
+    _, images, steps, _ = self.render_case([{'speeds': (1., 4.)}], animated=True)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 154, in render_case
+    self.call('timeline', 'compose', '--project', self.root, '--input', changes)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 105, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'timeline.compose', 'request_id': 'req_20261016113338_225238fa', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'PROJECT_INVALID', 'message': '时间线变更会生成无效项目', 'path': None, 'retryable': False, 'cause': '{"ok": false, "errors": [{"code": "INTERPOLATION_INVALID", "message": "关键帧插值类型无效", "path": "sequences[1].tracks[0].clips[0].keyframes", "retryable": false}, {"code": "INTERPOLATION_INVALID", "message": "关键帧插值类型无效", "path": "sequences[1].tracks[0].clips[0].keyframes", "retryable": false}], "warnings": [{"code": "SCHEMA_FILE_MISSING", "message": "机器 schema 不存在: E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\nested-time-baseline-20261016\\\\docs\\\\specs\\\\agent-project.schema.json", "path": "E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\nested-time-baseline-20261016\\\\docs\\\\specs\\\\agent-project.schema.json"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}], "rights": {"ok": true, "target": "commercial_ad", "checked": 1, "required_records": 1, "failures": [], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}], "disposition_decisions": [], "effective_disposition_decisions": []}, "schema_engine": "builtin", "asset_count": 1, "sequence_count": 2}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T11:33:38.066662Z', 'finished_at': '2026-10-16T11:33:38.066670Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 207, in test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain
+    self.assert_source_clock([{'in': .2, 'out': .95, 'speeds': (.8, 1.7)}],
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                             leaf_speeds=(1., 3.), leaf_reverse=True, source_in=.25, source_out=2.75)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 189, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 7 not less than or equal to 1 : Nested source-frame drift: [4, 5, 6, 7, 7, 6, 7, 7, 5, 5, 5, 4, 3, 2, 1]
+
+======================================================================
+FAIL: test_nested_clock_two_nonlinear_parents_compose (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_two_nonlinear_parents_compose)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 198, in test_nested_clock_two_nonlinear_parents_compose
+    self.assert_source_clock([{'speeds': (1., 3.)}, {'speeds': (.7, 1.8)}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 189, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 18 not less than or equal to 1 : Nested source-frame drift: [0, 2, 3, 4, 5, 7, 8, 9, 10, 12, 12, 13, 14, 15, 15, 16, 16, 18, 18, 18, 18, 18, 18, 17, 17, 17, 16, 15, 13, 12, 10, 8, 5, 2]
+
+----------------------------------------------------------------------
+Ran 8 tests in 6.659s
+
+FAILED (failures=8)

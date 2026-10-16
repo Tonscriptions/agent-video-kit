@@ -8,6 +8,7 @@ import re
 import threading
 import subprocess
 import time
+from fractions import Fraction
 from pathlib import Path
 from typing import Any, Callable
 
@@ -19,6 +20,15 @@ from .policy import resolve_local_path
 from .project import asset_map
 from .quality import check_output
 from .text_layout import build_text_layout, graphemes, text_width, word_ranges
+from .time_mapping import (
+    audio_windows as _nested_audio_windows,
+    compose_expression as _clock_expression,
+    compose_time as _clock_time,
+    curve_elapsed as _speed_curve_elapsed_seconds,
+    curve_source_at_elapsed as _speed_curve_source_seconds_at_elapsed,
+    make_map as _make_clock_map,
+    unmap_time as _unmap_clock_time,
+)
 from .utils import atomic_write_json, atomic_write_text, new_id, now_iso, run_process, sha256_bytes, sha256_file
 
 
@@ -908,8 +918,14 @@ def _keyframe_expr(
     track = next((tracks[name] for name in properties if name in tracks), None)
     if not track:
         return f"{default:.8f}"
+    nested_clock = track.get('_nested_clock')
+    if nested_clock is None and not str(track.get('property', '')).startswith('nested.parent.'):
+        fallback = clip.get('_nested_keyframe_clock')
+        if isinstance(fallback, dict):
+            nested_clock = {**fallback, 'keyframes': track.get('keyframes', [])}
+    authored = nested_clock.get('keyframes', []) if isinstance(nested_clock, dict) else track.get('keyframes', [])
     pairs: list[tuple[float, float, str, Any]] = []
-    for item in track.get("keyframes", []):
+    for item in authored:
         try:
             # Validated project keyframes are non-negative. Internal nested
             # parent tracks may intentionally use negative local offsets so
@@ -921,6 +937,13 @@ def _keyframe_expr(
         return f"{default:.8f}"
     pairs.sort(key=lambda item: item[0])
     local = f"({time_variable}-{clip_start:.8f})"
+    if isinstance(nested_clock, dict):
+        # Video filters receive the final timeline clock; audio automation
+        # receives clip-local time. Reconstruct global time before undoing
+        # the ancestors, then evaluate the original easing in its own clock.
+        absolute = f'(({local})+{int(clip.get("timeline_start_tick", 0)) / tps:.12f})'
+        original = _clock_expression(nested_clock['maps'], absolute, inverse=True)
+        local = f'(({original})-{nested_clock["authored_start"]:.12f})'
     if len(pairs) == 1:
         return f"{pairs[0][1]:.8f}"
     segments: list[str] = []
@@ -1216,7 +1239,9 @@ def _speed_curve_audio_parts(segments: list[tuple[float, float, float, float]]) 
 
 def _tempo_chain(speed: float) -> str:
     """Return an atempo chain that supports speeds outside FFmpeg's 0.5..2 range."""
-    remaining = max(0.01, float(speed))
+    remaining = float(speed)
+    if not math.isfinite(remaining) or remaining <= 0:
+        raise AppError('SPEED_INVALID', '音频 tempo 必须是有限正数', exit_code=2)
     tempo: list[str] = []
     while remaining > 2.0:
         tempo.append("atempo=2.0")
@@ -1242,61 +1267,8 @@ def speed_curve_duration_seconds(clip: dict[str, Any], source_span_tick: int, tp
     return max(0.001, duration)
 
 
-def _speed_curve_elapsed_seconds(segments: list[tuple[float, float, float, float]], source_seconds: float) -> float:
-    """Integrate a normalized speed curve from its source origin.
-
-    ``segments`` use source seconds and instantaneous playback speeds.  The
-    integral is also used by nested sequence flattening so a child sequence's
-    source clock can be mapped onto the parent's final clock without falling
-    back to one constant speed for the entire nested clip.
-    """
-    if not segments:
-        return 0.0
-    target = max(0.0, float(source_seconds))
-    elapsed = 0.0
-    for start, end, speed_left, speed_right in segments:
-        if target <= start:
-            break
-        x = min(target, end)
-        span = max(0.0, end - start)
-        if x <= start or span <= 1e-12:
-            continue
-        local = x - start
-        if abs(speed_right - speed_left) < 1e-8:
-            elapsed += local / max(0.01, speed_left)
-        else:
-            delta = speed_right - speed_left
-            speed_at_x = speed_left + delta * (local / span)
-            elapsed += span / delta * math.log(max(0.01, speed_at_x) / max(0.01, speed_left))
-        if target <= end:
-            break
-    return max(0.0, elapsed)
 
 
-def _speed_curve_source_seconds_at_elapsed(segments: list[tuple[float, float, float, float]], elapsed_seconds: float) -> float:
-    """Invert :func:`_speed_curve_elapsed_seconds` for a monotone curve."""
-    if not segments:
-        return 0.0
-    remaining = max(0.0, float(elapsed_seconds))
-    for start, end, speed_left, speed_right in segments:
-        span = max(0.0, end - start)
-        if span <= 1e-12:
-            continue
-        if abs(speed_right - speed_left) < 1e-8:
-            segment_elapsed = span / max(0.01, speed_left)
-        else:
-            segment_elapsed = span / (speed_right - speed_left) * math.log(
-                max(0.01, speed_right) / max(0.01, speed_left)
-            )
-        if remaining > segment_elapsed + 1e-10:
-            remaining -= segment_elapsed
-            continue
-        if abs(speed_right - speed_left) < 1e-8:
-            return start + remaining * max(0.01, speed_left)
-        delta = speed_right - speed_left
-        speed_at_x = max(0.01, speed_left) * math.exp(delta * remaining / span)
-        return start + span * (speed_at_x - speed_left) / delta
-    return segments[-1][1]
 
 
 def _speed_curve_setpts(segments: list[tuple[float, float, float, float]], timeline_start: float) -> str:
@@ -2124,8 +2096,9 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
     """Flatten nested sequence clips into renderable asset clips.
 
     Nested sequences remain first-class in the project model, while FFmpeg
-    receives a single filter graph. Full-range nested clips are exact in time;
-    cropped ranges are mapped proportionally. Static parent transforms,
+    receives a single filter graph. Nonlinear clocks keep a composed analytic
+    map through source trimming, video PTS and authored keyframe evaluation.
+    Static parent transforms,
     effects and blend settings are flattened into child clips. Direct parent
     transform keyframes are projected onto the final sequence clock so an
     animation keeps one phase across adjacent child clips and multiple parent
@@ -2298,14 +2271,19 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
         inherited: dict[str, Any] | None = None,
         reverse_time: bool = False,
         time_mapper: Callable[[float], float] | None = None,
+        clock_maps: list[dict[str, Any]] | None = None,
     ) -> None:
         current_id = str(current.get("id"))
         if current_id in stack:
             raise AppError("SEQUENCE_CYCLE", "嵌套序列存在循环引用，拒绝渲染", exit_code=2, path="sequences")
         next_stack = stack + (current_id,)
         window_start, window_end = source_window
+        clock_maps = clock_maps or []
+        tps_local = int(project.get('settings', {}).get('timebase', {}).get('ticks_per_second', 90000))
 
         def current_to_final(tick: float) -> float:
+            if clock_maps:
+                return _clock_time(clock_maps, tick / tps_local) * tps_local
             if time_mapper is not None:
                 return float(time_mapper(float(tick)))
             if reverse_time:
@@ -2340,11 +2318,21 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                 overlap_end = min(clip_end, window_end)
                 if overlap_end <= overlap_start:
                     continue
+                curve_value = clip.get('speed_curve')
+                curve_points = curve_value if isinstance(curve_value, list) else curve_value.get('keyframes', []) if isinstance(curve_value, dict) else []
+                if any(str(point.get('interpolation', 'linear')) not in {'linear', 'hold'} for point in curve_points if isinstance(point, dict)):
+                    warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
+                                     'feature': 'speed_curve_easing_linearized',
+                                     'message': '速度曲线 easing/Bezier 仍按源时钟线性速度段积分；未声称精确曲线效果'})
                 mapped_left = current_to_final(overlap_start)
                 mapped_right = current_to_final(overlap_end)
                 mapped_start = int(round(min(mapped_left, mapped_right)))
                 mapped_duration = max(1, int(round(abs(mapped_right - mapped_left))))
                 if clip.get("sequence_id"):
+                    if clip.get('freeze'):
+                        warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
+                                         'feature': 'nested_sequence_freeze_clock',
+                                         'message': '嵌套容器定格尚无精确联合时钟；不能据此接受其视频、动画或音频对应'})
                     child = sequences.get(str(clip.get("sequence_id")))
                     if child is None:
                         raise AppError("SEQUENCE_REFERENCE_MISSING", f"找不到嵌套序列: {clip.get('sequence_id')}", exit_code=2, path=f"clip[{clip.get('id')}].sequence_id")
@@ -2352,55 +2340,18 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                     source_limit = int(clip.get("source_out_tick", source_base + int(child.get("duration_tick", 1))))
                     source_limit = max(source_base + 1, source_limit)
                     effective_reverse = bool(reverse_time) ^ bool(clip.get("reverse"))
-                    parent_elapsed_start = max(0, overlap_start - clip_start)
-                    parent_elapsed_end = max(parent_elapsed_start, overlap_end - clip_start)
                     source_span_tick = max(1, source_limit - source_base)
                     speed_segments = _speed_curve_segments(clip, source_span_tick, int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90000)))
-                    curve_duration_seconds = speed_curve_duration_seconds(
-                        clip,
-                        source_span_tick,
-                        int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90000)),
-                    )
-                    nested_speed = max(0.01, _num(clip.get("speed", 1.0), 1.0))
-                    curve_scale = None
-                    if speed_segments and curve_duration_seconds is not None:
-                        tps_local = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90000))
-                        curve_total_ticks = max(1e-9, curve_duration_seconds * tps_local)
-                        curve_scale = max(1e-9, (clip_end - clip_start) / curve_total_ticks)
+                    clip_clock = _make_clock_map(clip, speed_segments, tps_local)
+                    source_bounds = [
+                        _unmap_clock_time(clip_clock, overlap_start / tps_local),
+                        _unmap_clock_time(clip_clock, overlap_end / tps_local),
+                    ]
+                    child_source_in = int(round(min(source_bounds) * tps_local))
+                    child_source_out = int(round(max(source_bounds) * tps_local))
 
-                        def source_at_parent_elapsed(elapsed_tick: float) -> int:
-                            curve_elapsed = max(0.0, min(curve_duration_seconds, elapsed_tick / curve_scale / tps_local))
-                            source_seconds = _speed_curve_source_seconds_at_elapsed(speed_segments, curve_elapsed)
-                            return source_base + int(round(source_seconds * tps_local))
-
-                        if effective_reverse:
-                            child_source_in = source_at_parent_elapsed(curve_total_ticks * curve_scale - parent_elapsed_end)
-                            child_source_out = source_at_parent_elapsed(curve_total_ticks * curve_scale - parent_elapsed_start)
-                        else:
-                            child_source_in = source_at_parent_elapsed(parent_elapsed_start)
-                            child_source_out = source_at_parent_elapsed(parent_elapsed_end)
-
-                        def child_to_final(child_tick: float) -> float:
-                            source_offset = max(0.0, min(float(source_span_tick), float(child_tick - source_base)))
-                            curve_elapsed = _speed_curve_elapsed_seconds(speed_segments, source_offset / tps_local)
-                            parent_elapsed = curve_elapsed * tps_local * curve_scale
-                            parent_time = clip_end - parent_elapsed if effective_reverse else clip_start + parent_elapsed
-                            return current_to_final(parent_time)
-
-                        warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip.get("id"), "feature": "nested_sequence_speed_curve_piecewise", "message": "嵌套序列 speed_curve 使用本地解析积分映射源时间边界；叶片片段内部按区间平均速度渲染，曲线断点和累计时长保持一致"})
-                    else:
-                        if effective_reverse:
-                            child_source_in = source_limit - int(round(parent_elapsed_end * nested_speed))
-                            child_source_out = source_limit - int(round(parent_elapsed_start * nested_speed))
-                        else:
-                            child_source_in = source_base + int(round(parent_elapsed_start * nested_speed))
-                            child_source_out = source_base + int(round(parent_elapsed_end * nested_speed))
-
-                        def child_to_final(child_tick: float) -> float:
-                            source_offset = max(0.0, min(float(source_span_tick), float(child_tick - source_base)))
-                            parent_elapsed = source_offset / nested_speed
-                            parent_time = clip_end - parent_elapsed if effective_reverse else clip_start + parent_elapsed
-                            return current_to_final(parent_time)
+                    def child_to_final(child_tick: float) -> float:
+                        return _clock_time([clip_clock, *clock_maps], child_tick / tps_local) * tps_local
 
                     child_source_in = max(source_base, min(source_limit - 1, child_source_in))
                     child_source_out = max(child_source_in + 1, min(source_limit, child_source_out))
@@ -2419,6 +2370,12 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                                 for track_value in mapped_layer.get("tracks", []):
                                     mapped_track = copy.deepcopy(track_value)
                                     mapped_track["keyframes"] = []
+                                    if speed_segments or any(item['segments'] for item in clock_maps):
+                                        mapped_track['_nested_clock'] = {
+                                            'maps': copy.deepcopy(clock_maps),
+                                            'authored_start': clip_start / tps_local,
+                                            'keyframes': copy.deepcopy(track_value.get('keyframes', [])),
+                                        }
                                     for keyframe in track_value.get("keyframes", []):
                                         if not isinstance(keyframe, dict):
                                             continue
@@ -2465,19 +2422,28 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                             parent_context,
                             effective_reverse,
                             child_to_final,
+                            [clip_clock, *clock_maps],
                         )
                     continue
                 child_clip = copy.deepcopy(clip)
                 child_clip["id"] = f"{prefix}{clip.get('id', 'clip')}"
                 child_clip["timeline_start_tick"] = mapped_start
                 child_clip["duration_tick"] = mapped_duration
+                leaf_span_tick = max(1, int(clip.get('source_out_tick', 1)) - int(clip.get('source_in_tick', 0)))
+                leaf_segments = _speed_curve_segments(clip, leaf_span_tick, tps_local)
+                nonlinear_nested = bool(clock_maps) and bool(leaf_segments or any(item['segments'] for item in clock_maps))
+                exact_nested = nonlinear_nested and not clip.get('freeze')
+                if nonlinear_nested and clip.get('freeze'):
+                    warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
+                                     'feature': 'nested_sequence_freeze_clock',
+                                     'message': '嵌套非线性速度与定格的联合时钟尚未精确映射；保留显式近似边界'})
                 # A nested sequence reverse (or speed/time remap) changes the
                 # leaf clip's local clock as well as its source frames. Map
                 # every authored keyframe through the same clock function so
                 # transform/crop/mask/audio automation follows the visual
                 # content. Bezier easing is reversed analytically when the
-                # parent timeline runs backwards; a nonlinear speed curve
-                # still has a documented piecewise interpolation boundary.
+                # parent timeline runs backwards. Nonlinear ancestors also
+                # retain the original track/clock for frame-time evaluation.
                 original_keyframe_tracks = child_clip.get("keyframes")
                 if isinstance(original_keyframe_tracks, list):
                     mapped_keyframe_tracks: list[dict[str, Any]] = []
@@ -2487,6 +2453,12 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                             continue
                         mapped_track = copy.deepcopy(track_value)
                         mapped_track["keyframes"] = []
+                        if exact_nested:
+                            mapped_track['_nested_clock'] = {
+                                'maps': copy.deepcopy(clock_maps),
+                                'authored_start': clip_start / tps_local,
+                                'keyframes': copy.deepcopy(track_value.get('keyframes', [])),
+                            }
                         for keyframe_value in track_value.get("keyframes", []):
                             if not isinstance(keyframe_value, dict):
                                 continue
@@ -2506,10 +2478,29 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                 effective_leaf_scale = scale
                 if time_mapper is not None:
                     effective_leaf_scale = abs(mapped_right - mapped_left) / max(1.0, float(overlap_end - overlap_start))
-                if abs(effective_leaf_scale - 1.0) > 1e-9:
+                if not exact_nested and abs(effective_leaf_scale - 1.0) > 1e-9:
                     child_speed = max(0.01, _num(child_clip.get("speed", 1.0), 1.0))
                     child_clip["speed"] = child_speed / max(1e-9, effective_leaf_scale)
-                if reverse_time or overlap_start != clip_start or overlap_end != clip_end:
+                if exact_nested:
+                    leaf_clock = _make_clock_map(clip, leaf_segments, tps_local)
+                    source_bounds = [
+                        _unmap_clock_time(leaf_clock, overlap_start / tps_local),
+                        _unmap_clock_time(leaf_clock, overlap_end / tps_local),
+                    ]
+                    child_clip['source_in_tick'] = int(round(min(source_bounds) * tps_local))
+                    child_clip['source_out_tick'] = max(child_clip['source_in_tick'] + 1, int(round(max(source_bounds) * tps_local)))
+                    child_clip['_nested_time_maps'] = [leaf_clock, *copy.deepcopy(clock_maps)]
+                    child_clip['_nested_keyframe_clock'] = {
+                        'maps': copy.deepcopy(clock_maps), 'authored_start': clip_start / tps_local,
+                    }
+                    child_clip['reverse'] = bool(reverse_time) ^ bool(clip.get('reverse'))
+                    child_clip['speed'] = (child_clip['source_out_tick'] - child_clip['source_in_tick']) / mapped_duration
+                    child_clip.pop('speed_curve', None)
+                    if clip.get('subtitle'):
+                        warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
+                                         'feature': 'nested_sequence_caption_cues',
+                                         'message': '嵌套非线性时间映射已覆盖视频和关键帧；字幕 cue/逐字时间与内置入出场仍需独立映射'})
+                elif reverse_time or overlap_start != clip_start or overlap_end != clip_end:
                     source_in = int(child_clip.get("source_in_tick", 0))
                     source_out = int(child_clip.get("source_out_tick", source_in + max(1, int(child_clip.get("duration_tick", 1)))))
                     source_span = max(1, source_out - source_in)
@@ -2897,10 +2888,39 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     setpts = f"setpts=(PTS-STARTPTS)/{speed:.8f}+{start:.6f}/TB" if abs(speed - 1.0) > 1e-9 else f"setpts=PTS-STARTPTS+{start:.6f}/TB"
                 transforms = _transform_exprs(clip, start, tps)
                 chain = [f"[{index}:v]trim=start={src_in:.6f}:end={src_out:.6f}"]
+                nested_maps = clip.get('_nested_time_maps')
+                if isinstance(nested_maps, list) and nested_maps:
+                    source_probe = asset.get('probe', {}).get('video', {})
+                    try:
+                        nominal_fps = Fraction(str(source_probe.get('fps') or fps_value))
+                        if nominal_fps <= 0 or nominal_fps > 1000:
+                            raise ValueError('invalid source frame rate')
+                    except (ValueError, ZeroDivisionError):
+                        nominal_fps = Fraction(fps_value)
+                    nominal_value = f'{nominal_fps.numerator}/{nominal_fps.denominator}'
+                    # Make the display clock explicit before a possible
+                    # reverse. This is CFR normalization, not a claim of
+                    # retaining every original VFR presentation timestamp.
+                    chain = [f'[{index}:v]fps={nominal_value}:start_time=0:round=up:eof_action=pass',
+                             f'trim=start={src_in:.12f}:end={src_out:.12f}']
+                    source_clock = '(PTS*TB)'
+                    if bool(clip.get('reverse')):
+                        right_frame_edge = math.ceil(src_out * float(nominal_fps) - 1e-9) / float(nominal_fps)
+                        source_clock = f'if(eq(N,0),{src_out:.12f},{right_frame_edge:.12f}-N/({nominal_value}))'
+                    setpts = 'setpts=' + _expr_arg(f'({_clock_expression(nested_maps, source_clock)})/TB')
+                    curve_duration = int(clip.get('duration_tick', 1)) / tps
+                    warnings.append({'code': 'NESTED_SOURCE_CFR_NORMALIZED', 'clip_id': clip.get('id'),
+                                     'fps': nominal_value, 'message': '嵌套非线性变速以登记帧率建立源显示时钟；VFR 原始时间戳等效未验收'})
                 if bool(clip.get("reverse")):
                     chain.append("reverse")
+                if nested_maps:
+                    chain.append('settb=AVTB')
                 chain.append(setpts)
-                chain.append(f"fps={fps_value}:start_time={start:.8f}:round=up:eof_action=pass")
+                # A fractional segment boundary must not reset fps rounding
+                # to that segment's local phase. Leave start_time unset for
+                # composed clocks so every part uses the global frame grid.
+                chain.append(f'fps={fps_value}:round=up:eof_action=pass' if nested_maps else
+                             f"fps={fps_value}:start_time={start:.8f}:round=up:eof_action=pass")
                 if kind == "video" and color_tone_map not in {"", "none"}:
                     chain.extend(_tone_map_filters(settings, warnings, str(clip.get("id")), transparent=transparent_canvas))
                 crop = clip.get("crop") if isinstance(clip.get("crop"), dict) else {}
@@ -3070,6 +3090,10 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     "blend": clip.get("blend"),
                 })
                 input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "input": index, "kind": "video", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
+                if nested_maps:
+                    input_meta[-1]['nested_time_mapping'] = {'version': '1', 'maps': copy.deepcopy(nested_maps),
+                                                            'source_display_fps': nominal_value,
+                                                            'video_pts': 'analytic-composition', 'keyframes': 'authored-clock'}
                 index += 1
             elif kind in {"video", "audio"} and track.get("kind") == "audio":
                 if not asset.get("probe", {}).get("audio", {}).get("codec"):
@@ -3086,8 +3110,20 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 source_span_tick = max(1, int(clip.get("source_out_tick", 1)) - int(clip.get("source_in_tick", 0)))
                 speed_segments = _speed_curve_segments(clip, source_span_tick, tps)
                 curve_duration = speed_curve_duration_seconds(clip, source_span_tick, tps)
-                if speed_segments:
-                    audio_parts = _speed_curve_audio_parts(speed_segments)
+                nested_maps = clip.get('_nested_time_maps')
+                if nested_maps:
+                    try:
+                        audio_parts = _nested_audio_windows(nested_maps, src_in, src_out)
+                    except ValueError as exc:
+                        raise AppError('NESTED_AUDIO_TIME_MAPPING_LIMIT', str(exc), exit_code=2,
+                                       path=f'clips[{clip.get("id")}].speed_curve') from exc
+                    curve_duration = int(clip.get('duration_tick', 1)) / tps
+                elif speed_segments:
+                    audio_parts = [(left, right, rate, _speed_curve_elapsed_seconds(speed_segments, right))
+                                   for left, right, rate in _speed_curve_audio_parts(speed_segments)]
+                else:
+                    audio_parts = []
+                if audio_parts:
                     split_labels = [f"asplit{index}_{part_index}" for part_index in range(len(audio_parts))]
                     filters.append(
                         f"[{index}:a]atrim=start={src_in:.6f}:end={src_out:.6f},asetpts=PTS-STARTPTS,aresample=48000,"
@@ -3095,10 +3131,10 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     )
                     part_labels: list[str] = []
                     previous_end_sample = 0
-                    for part_index, (part_start, part_end, part_speed) in enumerate(audio_parts):
+                    for part_index, (part_start, part_end, part_speed, cumulative_end) in enumerate(audio_parts):
                         part_label = f"aspeed{index}_{part_index}"
                         part_labels.append(part_label)
-                        part_end_sample = int(round(_speed_curve_elapsed_seconds(speed_segments, part_end) * 48000))
+                        part_end_sample = int(round(cumulative_end * 48000))
                         part_samples = max(1, part_end_sample - previous_end_sample)
                         previous_end_sample = part_end_sample
                         filters.append(
@@ -3264,6 +3300,10 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 else:
                     other_audio_labels.append(label)
                 input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "track_id": track_id, "input": index, "kind": "audio", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
+                if nested_maps:
+                    input_meta[-1]['nested_time_mapping'] = {'version': '1', 'maps': copy.deepcopy(nested_maps),
+                                                            'tempo_windows': len(audio_parts), 'sample_rate': 48000,
+                                                            'audio_tempo': 'piecewise-integrated-boundaries'}
                 index += 1
     if not video_labels and not subtitle_overlays:
         raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")

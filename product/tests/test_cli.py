@@ -3291,7 +3291,8 @@ print(json.dumps({
         self.assertEqual([(clip["source_in_tick"], clip["source_out_tick"]) for clip in clips], [(0, 90000), (90000, 180000)])
         self.assertEqual(len({clip["id"] for clip in clips}), 2)
         self.assertTrue(all(abs(clip["speed"] - 1.4427007358) < 1e-6 for clip in clips))
-        self.assertTrue(any(item.get("feature") == "nested_sequence_speed_curve_piecewise" for item in warnings))
+        self.assertTrue(all(clip.get('_nested_time_maps') for clip in clips))
+        self.assertFalse(any(item.get("feature") == "nested_sequence_speed_curve_piecewise" for item in warnings))
         self.assertFalse(any(item.get("feature") == "nested_sequence_speed_curve" for item in warnings))
 
     def test_nested_sequence_speed_curve_renders_locally(self) -> None:
@@ -3314,7 +3315,8 @@ print(json.dumps({
             code, rendered = invoke("render", "--project", str(project), "--output", str(output))
             self.assertEqual(code, 0, rendered)
             self.assertTrue(output.exists())
-            self.assertTrue(any(item.get("feature") == "nested_sequence_speed_curve_piecewise" for item in rendered["data"]["warnings"]))
+            self.assertFalse(any(item.get("feature") == "nested_sequence_speed_curve_piecewise" for item in rendered["data"]["warnings"]))
+            self.assertTrue(any(item.get('code') == 'NESTED_SOURCE_CFR_NORMALIZED' for item in rendered['data']['warnings']))
 
     def test_nested_sequence_reverse_preserves_temporal_order(self) -> None:
         project = {

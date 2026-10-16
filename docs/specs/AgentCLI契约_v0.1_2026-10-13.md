@@ -187,7 +187,7 @@ python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --p
 
 图层变换支持 `transform.anchor.x/y` 或 `anchor_x/anchor_y`，取值为 `0..1`，默认 `(0.5,0.5)`；位置表达式会把该点放到 `transform.position`，同名片段关键帧可逐帧改变锚点。视频叶片旋转会补偿扩展边界以保持锚点，独立文字透明画布仍绕其画布中心；嵌套父级枢轴按叶片放置近似，并在 render manifest 中保留警告。
 
-遮罩使用归一化参数。`rectangle/circle/ellipse` 支持几何标量、`invert`、`feather` 和 `mask.*` 关键帧；动态 feather 通过 alpha-only 软边表达式执行，范围为 `0..0.5`。`path/polygon` 可以使用固定点数 `points`，点坐标可以用 `points.0.x`、`points.0.y` 关键帧驱动；也可以使用 `segments`/`curve_segments`/`curves`，每段支持 `line` 或 `cubic`，cubic 的 `samples` 范围为 `2..16`，总采样点限制为 `3..32`，渲染器将曲线采样成固定多边形并以固定点边缘的内侧距离近似生成 alpha 软边。曲线段不能与 `points` 同时声明；曲线控制点可以使用片段或 mask 内局部关键帧，例如 `mask.segments.1.control1.x`、`mask.segments.1.control2.y`，渲染器在 FFmpeg `geq` 中先缓存控制点表达式再逐帧生成固定采样点。动态 feather 也可以用 `feather`/`mask.feather` 关键帧驱动。`transform.opacity`、正常层 `blend.opacity` 以及 RGB blend 的 `blend.opacity` 都可以用片段关键帧驱动；片段 `crop` 支持 `pixels`/`normalized` 单位和 `fit`/`fill`/`stretch` 模式，`crop.keyframes` 的 `x`/`y`/`width`/`height` 或片段级 `crop.x`/`crop.y`/`crop.width`/`crop.height` 可以逐帧移动和缩放裁切窗口；动态尺寸由 CPU `geq` 固定画布逆向采样保持输出帧尺寸稳定，宽高关键帧必须大于 0。非法点数、坐标、尺寸、时间或属性必须在写入前拒绝。静态嵌套父级 transform/effects/blend 会下推；多级父级动态 transform 关键帧按最终序列时钟合成，父级与子级多重 mask 会顺序合成 alpha，但不同坐标空间仍进入 `RENDER_FEATURE_APPROXIMATE`；reverse 下的关键帧插值同样保留近似警告。
+遮罩使用归一化参数。`rectangle/circle/ellipse` 支持几何标量、`invert`、`feather` 和 `mask.*` 关键帧；动态 feather 通过 alpha-only 软边表达式执行，范围为 `0..0.5`。`path/polygon` 可以使用固定点数 `points`，点坐标可以用 `points.0.x`、`points.0.y` 关键帧驱动；也可以使用 `segments`/`curve_segments`/`curves`，每段支持 `line` 或 `cubic`，cubic 的 `samples` 范围为 `2..16`，总采样点限制为 `3..32`，渲染器将曲线采样成固定多边形并以固定点边缘的内侧距离近似生成 alpha 软边。曲线段不能与 `points` 同时声明；曲线控制点可以使用片段或 mask 内局部关键帧，例如 `mask.segments.1.control1.x`、`mask.segments.1.control2.y`，渲染器在 FFmpeg `geq` 中先缓存控制点表达式再逐帧生成固定采样点。动态 feather 也可以用 `feather`/`mask.feather` 关键帧驱动。`transform.opacity`、正常层 `blend.opacity` 以及 RGB blend 的 `blend.opacity` 都可以用片段关键帧驱动；片段 `crop` 支持 `pixels`/`normalized` 单位和 `fit`/`fill`/`stretch` 模式，`crop.keyframes` 的 `x`/`y`/`width`/`height` 或片段级 `crop.x`/`crop.y`/`crop.width`/`crop.height` 可以逐帧移动和缩放裁切窗口；动态尺寸由 CPU `geq` 固定画布逆向采样保持输出帧尺寸稳定，宽高关键帧必须大于 0。非法点数、坐标、尺寸、时间或属性必须在写入前拒绝。静态嵌套父级 transform/effects/blend 会下推；多级父级动态 transform 关键帧按最终序列时钟合成，父级与子级多重 mask 会顺序合成 alpha，但不同坐标空间仍进入 `RENDER_FEATURE_APPROXIMATE`；嵌套 hold/linear 非线性祖先与 reverse 的原关键帧时钟见[解析时间映射契约](./嵌套序列解析时间映射契约_v0.1_2026-10-16.md)；定格、字幕 cue、父级枢轴与群组坐标仍分别保留验收边界。
 
 ## 6. 渲染、质量和进度
 
@@ -314,3 +314,7 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 ## 透明仿射、动态裁切和独立文字
 
 无新增 CLI 参数。媒体/文字的仿射、alpha 动态 crop 和最终 resize 自动保持浮点预乘，独立文字绘制后先归一为 straight alpha；透明 fit 补边与不透明黑条分别按原素材接口处理。时钟/锚点/权利不变，一般特效畸变和线性光/HDR/性能另验收。见[当前 v0.2 契约](./透明素材重采样与文字Alpha契约_v0.2_2026-10-16.md)和[实际成片](../validation/仿射动态裁切与文字透明合成实测_2026-10-16.md)。
+
+## 嵌套源时钟增量（2026-10-16）
+
+沿用既有 timeline compose/render 参数。内部解析时钟不写回作者字段；manifest 输入保留 nested_time_mapping 和 NESTED_SOURCE_CFR_NORMALIZED。音频仍为分窗近似，超 16384 窗或不足一采样点时在执行前返回 NESTED_AUDIO_TIME_MAPPING_LIMIT。详见[契约](./嵌套序列解析时间映射契约_v0.1_2026-10-16.md)和[真实前后成片](../validation/嵌套变速倒放与关键帧时钟实测_2026-10-16.md)，不能将该结果扩大到 VFR、速度 easing、定格/字幕或完整群组。

@@ -1,0 +1,193 @@
+test_nested_clock_audio_pulses_follow_same_integrated_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_audio_pulses_follow_same_integrated_clock) ... FAIL
+test_nested_clock_double_reverse_does_not_cancel_wrong_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_double_reverse_does_not_cancel_wrong_clock) ... FAIL
+test_nested_clock_forward_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_forward_ramp_matches_source_frames) ... FAIL
+test_nested_clock_inner_parent_animation_uses_outer_inverse_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_inner_parent_animation_uses_outer_inverse_clock) ... FAIL
+test_nested_clock_inner_reverse_preserves_outer_curve (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_inner_reverse_preserves_outer_curve) ... FAIL
+test_nested_clock_mask_local_animation_uses_authored_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_mask_local_animation_uses_authored_clock) ... FAIL
+test_nested_clock_multiple_segments_and_hold_keep_breakpoints (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_multiple_segments_and_hold_keep_breakpoints) ... FAIL
+test_nested_clock_resamples_to_different_output_rate (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_resamples_to_different_output_rate) ... FAIL
+test_nested_clock_reverse_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_reverse_ramp_matches_source_frames) ... FAIL
+test_nested_clock_reversed_multi_segment_curve_keeps_breakpoints (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_reversed_multi_segment_curve_keeps_breakpoints) ... FAIL
+test_nested_clock_transform_animation_uses_authored_child_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_transform_animation_uses_authored_child_clock) ... FAIL
+test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain) ... FAIL
+test_nested_clock_two_nonlinear_parents_compose (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_two_nonlinear_parents_compose) ... FAIL
+
+======================================================================
+FAIL: test_nested_clock_audio_pulses_follow_same_integrated_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_audio_pulses_follow_same_integrated_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 310, in test_nested_clock_audio_pulses_follow_same_integrated_clock
+    self.assertEqual(mismatches, [], f'Audio envelope follows averaged speed at {mismatches}')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [0.27, 0.29, 0.31, 0.33, 0.35, 0.37, 0.39,[67 chars]1.09] != []
+
+First list contains 19 additional elements.
+First extra element 0:
+0.27
+
++ []
+- [0.27,
+-  0.29,
+-  0.31,
+-  0.33,
+-  0.35,
+-  0.37,
+-  0.39,
+-  0.55,
+-  0.57,
+-  0.83,
+-  0.85,
+-  0.87,
+-  0.89,
+-  0.91,
+-  0.93,
+-  0.95,
+-  0.97,
+-  1.07,
+-  1.09] : Audio envelope follows averaged speed at [0.27, 0.29, 0.31, 0.33, 0.35, 0.37, 0.39, 0.55, 0.57, 0.83, 0.85, 0.87, 0.89, 0.91, 0.93, 0.95, 0.97, 1.07, 1.09]
+
+======================================================================
+FAIL: test_nested_clock_double_reverse_does_not_cancel_wrong_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_double_reverse_does_not_cancel_wrong_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 241, in test_nested_clock_double_reverse_does_not_cancel_wrong_clock
+    self.assert_source_clock([{'speeds': (1., 3.), 'reverse': True}, {'speeds': (.7, 1.8), 'reverse': True}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 226, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 not less than or equal to 1 : Nested source-frame drift: [0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+
+======================================================================
+FAIL: test_nested_clock_forward_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_forward_ramp_matches_source_frames)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 229, in test_nested_clock_forward_ramp_matches_source_frames
+    self.assert_source_clock([{'speeds': (1., 4.)}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 226, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 13 not less than or equal to 1 : Nested source-frame drift: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 10, 10, 11, 11, 12, 12, 12, 12, 13, 12, 12, 11, 11, 10, 10, 10, 9, 7, 6, 5, 4, 2]
+
+======================================================================
+FAIL: test_nested_clock_inner_parent_animation_uses_outer_inverse_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_inner_parent_animation_uses_outer_inverse_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 279, in test_nested_clock_inner_parent_animation_uses_outer_inverse_clock
+    self.assertLessEqual(max(errors), 3., f'Parent keyframe clock drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 6.269411644704533 not less than or equal to 3.0 : Parent keyframe clock drift: [0.4000000000000057, 0.8212376583529917, 0.02352310468199903, 1.2063951118303038, 2.369381228068022, 1.5119975039273115, 2.633748212389669, 3.7341255622636567, 2.812609404587313, 3.8686669318854214, 2.9017523701078574, 3.911306663070839, 4.896757149218622, 3.8575172305187806, 4.792986033299556, 5.702548060833379, 4.585572837465364, 5.441414544081368, 6.269411644704533, 5.068886504004709, 5.839144995499339, 4.579476100219466, 5.289151495608714, 5.967425134417589, 4.6135328133496785, 5.22669173121011, 5.806100036301203, 4.350936362803168, 4.86035935587222, 3.333507185181219, 3.7694970466215807, 4.167424651878662, 2.526363705585183, 2.845365369750425, 3.123457715155695, 1.359645159398724, 1.552907891262123, 1.7022012810731724]
+
+======================================================================
+FAIL: test_nested_clock_inner_reverse_preserves_outer_curve (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_inner_reverse_preserves_outer_curve)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 238, in test_nested_clock_inner_reverse_preserves_outer_curve
+    self.assert_source_clock([{'speeds': (1., 3.), 'reverse': True}, {'speeds': (.7, 1.8)}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 226, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 not less than or equal to 1 : Nested source-frame drift: [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+======================================================================
+FAIL: test_nested_clock_mask_local_animation_uses_authored_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_mask_local_animation_uses_authored_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 267, in test_nested_clock_mask_local_animation_uses_authored_clock
+    self.assertLessEqual(max(errors), 3., f'Mask-local keyframe clock drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 23.09900578476119 not less than or equal to 3.0 : Mask-local keyframe clock drift: [0.5999999999999943, 0.9192467733963596, 0.20952948707201813, 0.46961580495757715, 0.6982209586864059, 0.10599448324629179, 0.05557305875974805, 0.18146775069899235, 0.7298281829151136, 0.6798970944791307, 0.670388660858336, 1.7030227478460631, 1.7795923964973923, 1.901966936522669, 3.072095232146694, 3.292009066069859, 3.5638266674068717, 4.889756389728973, 5.272100545596103, 5.713259404237178, 7.2157353593200355, 7.782137274047713, 8.415185011125942, 10.117714155467525, 10.892680937833944, 11.743167367963508, 13.672386586099122, 14.683688442207966, 15.780565312580563, 17.966658163909173, 19.245762875375135, 20.621836829722213, 23.09900578476119]
+
+======================================================================
+FAIL: test_nested_clock_multiple_segments_and_hold_keep_breakpoints (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_multiple_segments_and_hold_keep_breakpoints)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 285, in test_nested_clock_multiple_segments_and_hold_keep_breakpoints
+    self.assert_source_clock([{'points': [(0., 1., 'hold'), (.75, 2., 'linear'),
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                         (2., 4., 'linear'), (3., 1., 'linear')]}])
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 226, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 6 not less than or equal to 1 : Nested source-frame drift: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 2, 1, 0, 2, 3, 4, 5, 6, 6, 5, 4, 4, 3]
+
+======================================================================
+FAIL: test_nested_clock_resamples_to_different_output_rate (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_resamples_to_different_output_rate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 282, in test_nested_clock_resamples_to_different_output_rate
+    self.assert_source_clock([{'speeds': (1., 4.)}], output_fps=30)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 226, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 13 not less than or equal to 1 : Nested source-frame drift: [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 9, 10, 10, 11, 11, 12, 11, 12, 12, 13, 12, 12, 12, 12, 11, 11, 11, 10, 10, 10, 9, 8, 7, 7, 6, 4, 3, 2, 0]
+
+======================================================================
+FAIL: test_nested_clock_reverse_ramp_matches_source_frames (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_reverse_ramp_matches_source_frames)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 232, in test_nested_clock_reverse_ramp_matches_source_frames
+    self.assert_source_clock([{'speeds': (1., 4.), 'reverse': True}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 226, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 12 not less than or equal to 1 : Nested source-frame drift: [0, 1, 3, 5, 6, 8, 9, 9, 10, 11, 11, 12, 12, 12, 12, 12, 12, 12, 12, 11, 11, 10, 10, 10, 9, 8, 7, 6, 6, 5, 4, 2, 1]
+
+======================================================================
+FAIL: test_nested_clock_reversed_multi_segment_curve_keeps_breakpoints (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_reversed_multi_segment_curve_keeps_breakpoints)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 289, in test_nested_clock_reversed_multi_segment_curve_keeps_breakpoints
+    self.assert_source_clock([{'reverse': True, 'points': [(0., 1., 'hold'), (.75, 2., 'linear'),
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                          (2., 4., 'linear'), (3., 1., 'linear')]}])
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 226, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 5 not less than or equal to 1 : Nested source-frame drift: [0, 1, 2, 3, 3, 4, 4, 4, 4, 3, 2, 0, 3, 5, 5, 5, 5, 5, 5, 4, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+======================================================================
+FAIL: test_nested_clock_transform_animation_uses_authored_child_clock (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_transform_animation_uses_authored_child_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 257, in test_nested_clock_transform_animation_uses_authored_child_clock
+    self.assertLessEqual(max(errors), 3., f'Child keyframe clock drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 7.7842646406799645 not less than or equal to 3.0 : Child keyframe clock drift: [0.4000000000000057, 0.08075322660364037, 1.2095294870720181, 1.4696158049575772, 2.698220958686406, 2.894005516753708, 4.055573058759748, 4.181467750698992, 4.270171817084886, 5.320102905520869, 5.329611339141664, 6.296977252153937, 6.220407603502608, 7.098033063477331, 6.927904767853306, 7.707990933930141, 7.436173332593128, 7.110243610271027, 7.727899454403897, 7.286740595762822, 7.7842646406799645, 7.217862725952287, 7.584814988874058, 6.8822858445324755, 7.107319062166056, 6.256832632036492, 5.3276134139008775, 5.316311557792034, 4.219434687419437, 4.033341836090827, 2.754237124624865, 2.3781631702777872, 0.9009942152388106]
+
+======================================================================
+FAIL: test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 244, in test_nested_clock_trimmed_leaf_curve_keeps_original_source_domain
+    self.assert_source_clock([{'in': .2, 'out': .95, 'speeds': (.8, 1.7)}],
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                             leaf_speeds=(1., 3.), leaf_reverse=True, source_in=.25, source_out=2.75)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 226, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 7 not less than or equal to 1 : Nested source-frame drift: [4, 5, 6, 7, 7, 6, 7, 7, 5, 5, 5, 4, 3, 2, 1]
+
+======================================================================
+FAIL: test_nested_clock_two_nonlinear_parents_compose (test_nested_time_mapping.NestedTimeMappingTests.test_nested_clock_two_nonlinear_parents_compose)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 235, in test_nested_clock_two_nonlinear_parents_compose
+    self.assert_source_clock([{'speeds': (1., 3.)}, {'speeds': (.7, 1.8)}])
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 226, in assert_source_clock
+    self.assertLessEqual(max(errors), 1, f'Nested source-frame drift: {errors}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 18 not less than or equal to 1 : Nested source-frame drift: [0, 2, 3, 4, 5, 7, 8, 9, 10, 12, 12, 13, 14, 15, 15, 16, 16, 18, 18, 18, 18, 18, 18, 17, 17, 17, 16, 15, 13, 12, 10, 8, 5, 2]
+
+----------------------------------------------------------------------
+Ran 13 tests in 15.081s
+
+FAILED (failures=13)
