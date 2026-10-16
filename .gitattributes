@@ -78,3 +78,9 @@ scripts/smoke_audio_channel_modes.py -text
 docs/validation/evidence/*audio-channels*.json -text
 docs/validation/evidence/audio-channels*.log -text -whitespace
 docs/assets/audio-channel-modes-20261017/*.txt -whitespace
+
+# V28 preserves sequence canvas pixels, independent references and raw failures.
+scripts/smoke_sequence_compositing.py -text
+docs/validation/evidence/*sequence-groups*.json -text
+docs/validation/evidence/sequence-groups*.log -text -whitespace
+docs/assets/sequence-compositing-20261017/*.txt -whitespace

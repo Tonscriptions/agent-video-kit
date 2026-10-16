@@ -1328,12 +1328,13 @@ def _effect_keyframe_expr(
     default: float,
     clip_start: float,
     tps: int,
+    *, clip: dict[str, Any] | None = None,
 ) -> str:
     tracks = _effect_keyframe_tracks(effect, parameters)
     if not tracks:
         return f"{default:.8f}"
     return _keyframe_expr(
-        {"keyframes": tracks},
+        {**(clip or {}), "keyframes": tracks},
         tuple(str(alias).lower().replace("-", "_") for alias in aliases),
         default,
         clip_start,
@@ -1370,7 +1371,7 @@ def _effect_filters(
         effect_tracks = _effect_keyframe_tracks(effect_value, parameters)
 
         def expression(aliases: tuple[str, ...], default: float) -> str:
-            return _effect_keyframe_expr(effect_value, parameters, aliases, default, clip_start, tps)
+            return _effect_keyframe_expr(effect_value, parameters, aliases, default, clip_start, tps, clip=clip_value)
 
         def has_track(aliases: tuple[str, ...]) -> bool:
             return _effect_has_keyframe(effect_value, parameters, aliases)
@@ -2226,14 +2227,18 @@ def _compiled_subtitle_filter(
     return value, clock
 
 
-def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], warnings: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _flatten_sequence_tracks(
+    project: dict[str, Any], sequence: dict[str, Any], warnings: list[dict[str, Any]],
+    *, groups: dict[str, dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
     """Flatten nested sequence clips into renderable asset clips.
 
     Nested sequences remain first-class in the project model, while FFmpeg
     receives a single filter graph. Nonlinear clocks keep a composed analytic
     map through source trimming, video PTS and authored keyframe evaluation.
-    Static parent transforms,
-    effects and blend settings are flattened into child clips. Direct parent
+    With ``groups`` the production renderer keeps spatial operations on an
+    isolated transparent sequence canvas. Without it, the legacy temporal
+    diagnostic view distributes parent properties. Direct parent
     transform keyframes are projected onto the final sequence clock so an
     animation keeps one phase across adjacent child clips and multiple parent
     layers compose in one expression; reverse interpolation and multiple masks
@@ -2406,6 +2411,7 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
         reverse_time: bool = False,
         time_mapper: Callable[[float], float] | None = None,
         clock_maps: list[dict[str, Any]] | None = None,
+        group_id: str | None = None,
     ) -> None:
         current_id = str(current.get("id"))
         if current_id in stack:
@@ -2492,7 +2498,36 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
 
                     child_source_in = max(source_base, min(source_limit - 1, child_source_in))
                     child_source_out = max(child_source_in + 1, min(source_limit, child_source_out))
-                    parent_context = context_for(inherited or {"transform": None, "effects": [], "masks": [], "mask": None, "blend": None}, clip)
+                    child_group_id = group_id
+                    if groups is not None:
+                        child_group_id = f"{prefix}{clip.get('id')}"
+                        group_clip = copy.deepcopy(clip)
+                        group_clip['id'] = child_group_id
+                        group_clip['_composite_authored_duration_tick'] = int(clip.get('duration_tick', 1))
+                        group_clip['timeline_start_tick'] = mapped_start
+                        group_clip['duration_tick'] = mapped_duration
+                        # Container animation belongs to the containing
+                        # sequence, not to its own retimed source sequence.
+                        group_clip['_nested_keyframe_clock'] = {
+                            'maps': copy.deepcopy(clock_maps), 'authored_start': clip_start / tps_local,
+                        }
+                        if child_group_id in groups:
+                            # Piecewise temporal windows can visit the same
+                            # authored container more than once. Composite its
+                            # spatial state once over the union of those spans.
+                            previous = groups[child_group_id]['clip']
+                            left = min(previous['timeline_start_tick'], mapped_start)
+                            right = max(previous['timeline_start_tick'] + previous['duration_tick'], mapped_start + mapped_duration)
+                            previous['timeline_start_tick'], previous['duration_tick'] = left, right-left
+                        else:
+                            groups[child_group_id] = {
+                                'id': child_group_id, 'parent_id': group_id,
+                                'track_id': virtual_id, 'track_order': int(track.get('order', 0)),
+                                'layer_order': len(groups), 'clip': group_clip,
+                            }
+                        parent_context = {}
+                    else:
+                        parent_context = context_for(inherited or {"transform": None, "effects": [], "masks": [], "mask": None, "blend": None}, clip)
                     if parent_context.get("dynamic_transform"):
                         # Parent keyframes live in the current sequence clock.
                         # Convert each newly-created local layer once to the
@@ -2560,6 +2595,7 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                             effective_reverse,
                             child_to_final,
                             [clip_clock, *clock_maps],
+                            child_group_id,
                         )
                     continue
                 child_clip = copy.deepcopy(clip)
@@ -2659,7 +2695,9 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                     )
                     if reverse_time:
                         child_clip["reverse"] = not bool(child_clip.get("reverse"))
-                if inherited:
+                if groups is not None:
+                    child_clip['_composite_group'] = group_id
+                elif inherited:
                     apply_context(child_clip, inherited)
                 if any(existing.get("id") == child_clip["id"] for existing in output_track["clips"]):
                     base_id = child_clip["id"]
@@ -2721,7 +2759,8 @@ def _build_subtitle_layer(
         progress = f"clip((({animation_time})-{animation_start:.6f})/{animation_duration:.6f},0,1)"
         animation_angle = f"({from_degrees:.6f}+({to_degrees - from_degrees:.6f})*{progress})"
         rotation_expression = f"({transform['rotation']})+({animation_angle})"
-    affine_text = rotation_expression != '0.00000000' or bool(clip_value.get('tracking_binding'))
+    affine_text = (rotation_expression != '0.00000000' or bool(clip_value.get('tracking_binding'))
+                   or (clip_value.get('_composite_group') is not None and transform['scale'] != '1.00000000'))
     if affine_text:
         affine_label = f'subtitle_affine{subtitle_index}'
         filters.append(f'[{layer_label}]'+','.join(_affine_video_filters({**transform,'rotation':rotation_expression}))+f'[{affine_label}]')
@@ -2877,7 +2916,264 @@ def _build_subtitle_layer(
         "duration": clip_duration,
         "blend": clip_value.get("blend"),
         "kind": "subtitle",
+        "group_id": overlay.get('group_id'),
+        "clock": copy.deepcopy(clip_value.get('_nested_keyframe_clock')),
     }
+
+
+def _resolve_visual_transitions(
+    specs: list[dict[str, Any]], filters: list[str], warnings: list[dict[str, Any]],
+    fps: dict[str, int], *, prefix: str = '',
+) -> list[dict[str, Any]]:
+    """Resolve adjacent visual transitions inside one compositing scope."""
+    final_specs: list[dict[str, Any]] = []
+    by_track: dict[str, list[dict[str, Any]]] = {}
+    for spec in specs:
+        by_track.setdefault(str(spec.get("track_id")), []).append(spec)
+    complex_types = (XFADE_TRANSITIONS - {"fade"}) | {"crossfade", "dissolve", "wipe", "slide"}
+    for track_specs in by_track.values():
+        track_specs.sort(key=lambda item: (float(item["start"]), str(item.get("clip_id"))))
+        index = 0
+        while index < len(track_specs):
+            current_spec = track_specs[index]
+            next_spec = track_specs[index + 1] if index + 1 < len(track_specs) else None
+            incoming_transition = next_spec.get("incoming") if next_spec and isinstance(next_spec.get("incoming"), dict) else {}
+            outgoing_transition = current_spec.get("outgoing") if isinstance(current_spec.get("outgoing"), dict) else {}
+            transition = incoming_transition if str(incoming_transition.get("type", "")) else outgoing_transition
+            transition_type = str(transition.get("type", "")).lower()
+            if next_spec and transition_type in complex_types:
+                transition_duration = max(0.001, _num(transition.get("duration", 0.25), 0.25))
+                expected_start = float(current_spec["start"]) + float(current_spec["duration"]) - transition_duration
+                frame_tolerance = max(1.0 / max(1, int(fps["num"])), 0.01)
+                overlap_handles = abs(float(next_spec["start"]) - expected_start) <= frame_tolerance
+                contiguous = abs(float(next_spec["start"]) - (float(current_spec["start"]) + float(current_spec["duration"]))) <= frame_tolerance
+                auto_handle = bool(transition.get("auto_handle", False)) or str(transition.get("handle_policy", "")).lower() == "auto"
+                if transition_duration < float(current_spec["duration"]) and transition_duration < float(next_spec["duration"]) and (overlap_handles or (auto_handle and contiguous)):
+                    left_trim = f"{prefix}tr{len(final_specs)}a"
+                    right_trim = f"{prefix}tr{len(final_specs)}b"
+                    output_label = f"{prefix}transition{len(final_specs)}"
+                    filters.append(f"[{current_spec['label']}]trim=start={float(current_spec['start']):.6f}:end={float(current_spec['start']) + float(current_spec['duration']):.6f},setpts=PTS-STARTPTS[{left_trim}]")
+                    filters.append(f"[{next_spec['label']}]trim=start={float(next_spec['start']):.6f}:end={float(next_spec['start']) + float(next_spec['duration']):.6f},setpts=PTS-STARTPTS[{right_trim}]")
+                    direction = str(transition.get("direction", "left")).lower()
+                    transition_name = {"crossfade": "fade", "dissolve": "fade"}.get(transition_type, transition_type)
+                    if transition_type == "wipe":
+                        transition_name = {"left": "wipeleft", "right": "wiperight", "up": "wipeup", "down": "wipedown"}.get(direction, "wipeleft")
+                    elif transition_type == "slide":
+                        transition_name = {"left": "slideleft", "right": "slideright", "up": "slideup", "down": "slidedown"}.get(direction, "slideright")
+                    if transition_name not in XFADE_TRANSITIONS:
+                        transition_name = "fade"
+                    preserve_contiguous_duration = auto_handle and contiguous and not overlap_handles
+                    tail_padding = f",tpad=stop_mode=clone:stop_duration={transition_duration:.6f}" if preserve_contiguous_duration else ""
+                    filters.append(f"[{left_trim}][{right_trim}]xfade=transition={transition_name}:duration={transition_duration:.6f}:offset={float(current_spec['duration']) - transition_duration:.6f}{tail_padding},setpts=PTS-STARTPTS+{float(current_spec['start']):.6f}/TB[{output_label}]")
+                    if preserve_contiguous_duration:
+                        warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": next_spec.get("clip_id"), "feature": "complex_transition_auto_handle", "message": "相邻片段没有重叠句柄，已用本地 xfade 并保持原时间线长度；转场尾部使用最后一帧填充"})
+                    final_specs.append({"label": output_label, "position": current_spec["position"], "track_id": current_spec.get("track_id"), "track_order": current_spec.get("track_order", 0), "layer_order": current_spec.get("layer_order", len(final_specs)), "group_id": current_spec.get("group_id"), "clip_id": f"{current_spec.get('clip_id')}+{next_spec.get('clip_id')}", "start": current_spec["start"], "duration": float(current_spec["duration"]) + float(next_spec["duration"]) if preserve_contiguous_duration else float(current_spec["duration"]) + float(next_spec["duration"]) - transition_duration})
+                    index += 2
+                    continue
+                warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": next_spec.get("clip_id"), "feature": "complex_transition", "message": "复杂转场要求相邻片段有匹配的重叠时间句柄，当前已保留但未执行"})
+            elif transition_type in complex_types:
+                warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": current_spec.get("clip_id"), "feature": "complex_transition", "message": "没有可配对的相邻片段，复杂转场未执行"})
+            final_specs.append(current_spec)
+            index += 1
+    return final_specs
+
+
+def _composite_visual_layers(
+    final_specs: list[dict[str, Any]], base: str, filters: list[str], warnings: list[dict[str, Any]],
+    *, width: int, height: int, fps_value: str, duration: float, tps: int,
+    prefix: str = '', preserve_alpha: bool = False,
+) -> str:
+    """Source-over or blend positioned layers on a single canvas."""
+    current = base
+    for pos, spec in enumerate(final_specs):
+        target = f"{prefix}vo{pos}"
+        blend = spec.get("blend") if isinstance(spec.get("blend"), dict) else {}
+        blend_mode = str(blend.get("mode", "normal")).lower().replace("-", "_")
+        if blend_mode in {"normal", "source_over", ""}:
+            opacity = _clamp(blend.get("opacity", 1.0), 0.0, 1.0, 1.0)
+            blend_opacity_expr = _keyframe_expr(
+                {"keyframes": spec.get("keyframes", []), "_nested_keyframe_clock": spec.get("clock"), "timeline_start_tick": round(float(spec.get("start", 0.0))*tps)}, ("blend.opacity", "blend_opacity"),
+                opacity, float(spec.get("start", 0.0)), tps, time_variable="T",
+            )
+            source_label = spec['label']
+            if blend_opacity_expr != "1.00000000":
+                source_label = f"{prefix}normalopacity{pos}"
+                alpha_expr = f"alpha(X,Y)*clip(({blend_opacity_expr}),0,1)"
+                filters.append(f"[{spec['label']}]format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)},format=rgba[{source_label}]")
+            filters.append(f"[{current}][{source_label}]overlay={spec['position']}:eof_action=pass:format=auto[{target}]")
+        elif blend_mode in {"addition", "addition128", "and", "average", "burn", "darken", "difference", "divide", "dodge", "exclusion", "freeze", "glow", "hardlight", "hard_mix", "lighten", "multiply", "negation", "or", "phoenix", "pinlight", "reflect", "screen", "softlight", "subtract", "vivid", "xor"}:
+            # FFmpeg's blend filter requires two same-sized frames and has no
+            # notion of the clip's timeline position or alpha coverage.  Build
+            # a transparent, positioned canvas first, then use its alpha as a
+            # masked merge so pixels outside the layer remain untouched.  This
+            # keeps multiply/screen/etc. consistent with source-over behavior.
+            opacity = _clamp(blend.get("opacity", 1.0), 0.0, 1.0, 1.0)
+            ffmpeg_mode = {"hard_mix": "hardmix", "vivid": "vividlight"}.get(blend_mode, blend_mode)
+            layer_prefix = prefix + ("subtitle_" if spec.get("kind") == "subtitle" else "")
+            blend_index = int(spec.get("layer_order", pos)) if spec.get("kind") == "subtitle" else pos
+            blend_canvas = f"{layer_prefix}blendcanvas{blend_index}"
+            blend_source = f"{layer_prefix}blendsource{blend_index}"
+            blend_layer = f"{layer_prefix}blendlayer{blend_index}"
+            blend_base = f"{layer_prefix}blendbase{blend_index}"
+            blend_under = f"{layer_prefix}blendunder{blend_index}"
+            blend_result = f"{layer_prefix}blendresult{blend_index}"
+            blend_alpha = f"{layer_prefix}blendalpha{blend_index}"
+            blend_color_layer = f"{layer_prefix}blendcolor{blend_index}"
+            blend_mask_layer = f"{layer_prefix}blendmask{blend_index}"
+            filters.append(f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba[{blend_canvas}]")
+            filters.append(f"[{spec['label']}]format=rgba[{blend_source}]")
+            filters.append(f"[{blend_canvas}][{blend_source}]overlay={spec['position']}:eof_action=pass:format=auto,format=rgba[{blend_layer}]")
+            blend_opacity_expr = _keyframe_expr(
+                {"keyframes": spec.get("keyframes", []), "_nested_keyframe_clock": spec.get("clock"), "timeline_start_tick": round(float(spec.get("start", 0.0))*tps)},
+                ("blend.opacity", "blend_opacity"),
+                opacity,
+                float(spec.get("start", 0.0)),
+                tps,
+                time_variable="T",
+            )
+            dynamic_blend_opacity = any(
+                isinstance(item, dict) and str(item.get("property", "")) in {"blend.opacity", "blend_opacity"}
+                for item in spec.get("keyframes", [])
+            )
+            if dynamic_blend_opacity:
+                alpha_expr = f"alpha(X,Y)*clip(({blend_opacity_expr}),0,1)"
+                filters.append(f"[{blend_layer}]format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)},format=rgba[{blend_layer}o]")
+                blend_layer = f"{blend_layer}o"
+            elif opacity < 1.0:
+                filters.append(f"[{blend_layer}]colorchannelmixer=aa={opacity:.6f}[{blend_layer}o]")
+                blend_layer = f"{blend_layer}o"
+            if preserve_alpha:
+                # W3C isolated blend: Cs'=(1-Ab)*Cs+Ab*B(Cb,Cs), then
+                # source-over Cs' with the original As. Blending against
+                # invisible black RGB alone would turn multiply transparent
+                # regions black and discard the group's coverage.
+                filters.append(f"[{blend_layer}]split=3[{blend_color_layer}][{blend_color_layer}plain][{blend_mask_layer}]")
+                filters.append(f"[{current}]split=3[{blend_base}][{blend_under}][{blend_base}alpha]")
+                filters.append(f"[{blend_base}]format=gbrp[{blend_base}r]")
+                filters.append(f"[{blend_color_layer}]format=gbrp[{blend_color_layer}r]")
+                filters.append(f"[{blend_color_layer}plain]format=gbrp[{blend_color_layer}plainr]")
+                filters.append(f"[{blend_base}r][{blend_color_layer}r]blend=all_mode={ffmpeg_mode}:all_opacity=1[{blend_result}]")
+                filters.append(f"[{blend_base}alpha]format=rgba,alphaextract,format=gbrp[{blend_alpha}]")
+                filters.append(f"[{blend_color_layer}plainr][{blend_result}][{blend_alpha}]maskedmerge[{blend_result}rgb]")
+                filters.append(f"[{blend_mask_layer}]format=rgba,alphaextract[{blend_mask_layer}a]")
+                filters.append(f"[{blend_result}rgb][{blend_mask_layer}a]alphamerge,format=rgba[{blend_result}rgba]")
+                filters.append(f"[{blend_under}][{blend_result}rgba]overlay=x=0:y=0:eof_action=pass:format=auto,format=rgba[{target}]")
+                current = target
+                continue
+            # Keep independent pixel-format negotiations for the blend math
+            # and alpha mask; otherwise FFmpeg may negotiate the shared stream
+            # to a non-alpha format before alphaextract sees it.
+            filters.append(f"[{blend_layer}]split=2[{blend_color_layer}][{blend_mask_layer}]")
+            filters.append(f"[{current}]split=2[{blend_base}][{blend_under}]")
+            filters.append(f"[{blend_base}]format=gbrp[{blend_base}r]")
+            filters.append(f"[{blend_under}]format=gbrp[{blend_under}r]")
+            filters.append(f"[{blend_color_layer}]format=gbrp[{blend_color_layer}r]")
+            filters.append(f"[{blend_base}r][{blend_color_layer}r]blend=all_mode={ffmpeg_mode}:all_opacity=1[{blend_result}]")
+            # All three maskedmerge inputs must share the RGB plane format.
+            # A gray alpha plane alone would otherwise negotiate the entire
+            # merge to grayscale and discard the composite's color channels.
+            filters.append(f"[{blend_mask_layer}]format=rgba,alphaextract,format=gbrp[{blend_alpha}]")
+            filters.append(f"[{blend_under}r][{blend_result}][{blend_alpha}]maskedmerge[{target}]")
+        else:
+            warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": spec.get("clip_id"), "feature": f"blend:{blend_mode}", "message": "当前 FFmpeg 后端不支持该混合模式，已回退 source-over"})
+            filters.append(f"[{current}][{spec['label']}]overlay={spec['position']}:eof_action=pass:format=auto[{target}]")
+        current = target
+    return current
+
+
+def _build_compositing_tree(
+    root: Path, specs: list[dict[str, Any]], groups: dict[str, dict[str, Any]],
+    filters: list[str], warnings: list[dict[str, Any]], input_meta: list[dict[str, Any]],
+    *, width: int, height: int, fps: dict[str, int], fps_value: str, duration: float,
+    tps: int, transparent_canvas: bool,
+) -> str:
+    """Composite complete child sequences before applying container operations.
+
+    All streams retain the final display clock. Each scope has a transparent
+    full-canvas base, independent z-order and labels; no lossy intermediate
+    file, GUI, background server or second render is needed.
+    """
+    buckets: dict[str | None, list[dict[str, Any]]] = {}
+    for spec in specs:
+        buckets.setdefault(spec.get('group_id'), []).append(spec)
+
+    def canvas(label: str, *, alpha: bool) -> None:
+        color = 'black@0.0' if alpha else 'black'
+        pixel_format = ',format=rgba' if alpha else ''
+        filters.append(f'color=c={color}:s={width}x{height}:r={fps_value}:d={duration:.6f}{pixel_format}[{label}]')
+
+    # Children were registered after their parents. Reverse insertion order
+    # is a postorder even when a temporal window revisits an existing group.
+    for ordinal, group in reversed(list(enumerate(groups.values()))):
+        group_id = group['id']
+        prefix = f'group{ordinal}_'
+        group_specs = _resolve_visual_transitions(buckets.get(group_id, []), filters, warnings, fps, prefix=prefix)
+        group_specs.sort(key=lambda item: (int(item.get('track_order', 0)), float(item.get('start', 0.0)), int(item.get('layer_order', 0))))
+        base = prefix+'base'
+        canvas(base, alpha=True)
+        composite = _composite_visual_layers(group_specs, base, filters, warnings, width=width, height=height,
+                                             fps_value=fps_value, duration=duration, tps=tps, prefix=prefix, preserve_alpha=True)
+        clip = group['clip']
+        start = int(clip['timeline_start_tick'])/tps
+        end = start+int(clip['duration_tick'])/tps
+        chain = ['format=rgba']
+        crop = clip.get('crop')
+        if isinstance(crop, dict) and crop:
+            chain.extend(_dynamic_crop_filters(clip, crop, width, height, width, height, start, tps, alpha=True))
+        transform = _transform_exprs(clip, start, tps)
+        identity = {'scale':'1.00000000','rotation':'0.00000000','position_x':'0.50000000',
+                    'position_y':'0.50000000','anchor_x':'0.50000000','anchor_y':'0.50000000'}
+        if any(transform[key] != value for key,value in identity.items()):
+            chain.extend(_affine_video_filters(transform))
+        if transform['opacity'] != '1.00000000':
+            alpha = f"alpha(X,Y)*clip(({transform['opacity']}),0,1)"
+            chain.extend(['format=gbrap',f"geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha)}",'format=rgba'])
+        chain.extend(_effect_filters(clip.get('effects'), warnings, group_id, root=root, clip=clip, clip_start=start, tps=tps))
+        mask = _mask_filter(clip.get('mask'), warnings, group_id, clip=clip, clip_start=start, tps=tps)
+        if mask:
+            chain.extend(['format=rgba', mask])
+        transition_alpha = '1'
+        authored = clip.get('_nested_keyframe_clock') or {'maps':[], 'authored_start':start}
+        local_clock = f"(({_clock_expression(authored['maps'], 'T', inverse=True)})-{authored['authored_start']:.12f})"
+        original_duration = int(clip['_composite_authored_duration_tick'])/tps
+        for name, accepted in (('transition_in', {'fade','fade_in'}), ('transition_out', {'fade','fade_out'})):
+            transition = clip.get(name)
+            if isinstance(transition, dict) and str(transition.get('type', '')).lower() in accepted:
+                seconds = max(.001, _num(transition.get('duration', .25), .25))
+                numerator = local_clock if name == 'transition_in' else f'({original_duration:.12f}-({local_clock}))'
+                transition_alpha += f'*clip(({numerator})/{seconds:.12f},0,1)'
+        if transition_alpha != '1':
+            alpha = f'alpha(X,Y)*({transition_alpha})'
+            chain.extend(['format=gbrap', f"geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha)}", 'format=rgba'])
+        # Trim on the global display grid. An isolated canvas must not leave a
+        # frozen final frame or opacity outside its half-open visible interval.
+        # trim=start/end quantizes seconds to its input timebase with nearest
+        # rounding; this can drop a final partial frame or expose a clip one
+        # tick early. Every scope starts on frame zero of the global CFR grid.
+        numerator,denominator=int(fps['num']),tps*int(fps['den'])
+        left=Fraction(int(clip['timeline_start_tick'])*numerator,denominator)
+        right=Fraction((int(clip['timeline_start_tick'])+int(clip['duration_tick']))*numerator,denominator)
+        chain.append(f'trim=start_frame={math.ceil(left)}:end_frame={math.ceil(right)}')
+        label = prefix+'out'
+        filters.append(f'[{composite}]'+','.join(chain)+f'[{label}]')
+        buckets.setdefault(group['parent_id'], []).append({
+            'label':label,'position':'x=0:y=0','track_id':group['track_id'],'track_order':group['track_order'],
+            'layer_order':group['layer_order'],'clip_id':group_id,'group_id':group['parent_id'],
+            'start':start,'duration':end-start,'keyframes':copy.deepcopy(clip.get('keyframes', [])),
+            'clock':copy.deepcopy(clip.get('_nested_keyframe_clock')),'blend':copy.deepcopy(clip.get('blend')),
+            'incoming':copy.deepcopy(clip.get('transition_in')),'outgoing':copy.deepcopy(clip.get('transition_out')),
+        })
+        input_meta.append({'kind':'sequence-composite','clip_id':group_id,'parent_id':group['parent_id'],
+                           'sequence_id':clip.get('sequence_id'),'canvas':{'width':width,'height':height,'alpha':True},
+                           'compositing':'isolated-source-over','child_layer_count':len(group_specs),
+                           'timeline_start_tick':int(clip['timeline_start_tick']),'duration_tick':int(clip['duration_tick']),
+                           'spatial_order':['child-composite','crop','transform','opacity','effects','mask','fade'],
+                           'intermediate_files':0})
+    root_specs = _resolve_visual_transitions(buckets.get(None, []), filters, warnings, fps)
+    root_specs.sort(key=lambda item: (int(item.get('track_order', 0)), float(item.get('start', 0.0)), int(item.get('layer_order', 0))))
+    canvas('base', alpha=transparent_canvas)
+    return _composite_visual_layers(root_specs, 'base', filters, warnings, width=width, height=height,
+                                    fps_value=fps_value, duration=duration, tps=tps, preserve_alpha=transparent_canvas)
 
 
 def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, Any]) -> tuple[list[str], str, list[dict[str, Any]], list[dict[str, Any]]]:
@@ -2939,7 +3235,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 adjustment_layers.append((str(raw_layer.get("id", layer_id)), effects, start, end))
     has_adjustments = bool(adjustment_layers)
     index = 0
-    render_tracks = _flatten_sequence_tracks(project, sequence, warnings)
+    composite_groups: dict[str, dict[str, Any]] = {}
+    render_tracks = _flatten_sequence_tracks(project, sequence, warnings, groups=composite_groups)
     audio_track_controls = {
         str(track.get("id")): track.get("audio") if isinstance(track.get("audio"), dict) else {}
         for track in render_tracks
@@ -2990,6 +3287,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                         "track_id": str(track.get("id")),
                         "track_order": int(track.get("order", 0)),
                         "clip": copy.deepcopy(clip),
+                        "group_id": clip.get('_composite_group'),
                         "filter": subtitle_filter,
                         "start": clip_start,
                         "duration": clip_duration,
@@ -3101,7 +3399,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 crop_fit = str(crop.get("fit", crop.get("mode", "fit"))).lower()
                 source_probe = asset.get("probe", {}).get("video", {}) if isinstance(asset.get("probe"), dict) else {}
                 pixel_format = str(source_probe.get('pix_fmt') or '')
-                alpha_padding = transparent_canvas or pixel_format.startswith(('rgba','bgra','argb','abgr','yuva','gbrap','ya')) or pixel_format == 'pal8'
+                alpha_padding = transparent_canvas or clip.get('_composite_group') is not None or pixel_format.startswith(('rgba','bgra','argb','abgr','yuva','gbrap','ya')) or pixel_format == 'pal8'
                 source_width = max(0, int(_num(source_probe.get("width", 0), 0)))
                 source_height = max(0, int(_num(source_probe.get("height", 0), 0)))
                 dynamic_crop_rendered = False
@@ -3191,7 +3489,11 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                         chain.append(f"setpts=N*{frame_duration:.12f}/TB+{first_clock:.8f}/TB")
                         if abs(hold_frames*frame_duration-freeze_extra) > 1e-6:
                             warnings.append({"code":"FREEZE_FRAME_QUANTIZED","clip_id":clip.get("id"),"message":"定格时长已量化到显示帧率","requested_seconds":freeze_extra,"actual_seconds":hold_frames*frame_duration})
-                affine_canvas = transforms['rotation'] != '0.00000000' or bool(clip.get('_tracking_binding_source'))
+                # RGBA overlay caches the first secondary raster dimensions.
+                # Keep a retimed/animated child on a fixed canvas instead of
+                # feeding a scale filter whose output dimensions vary by frame.
+                affine_canvas = (transforms['rotation'] != '0.00000000' or bool(clip.get('_tracking_binding_source'))
+                                 or (clip.get('_composite_group') is not None and transforms['scale'] != '1.00000000'))
                 if affine_canvas:
                     chain.extend(_affine_video_filters(transforms))
                 elif transforms["scale"] != "1.00000000":
@@ -3260,6 +3562,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     "track_id": track.get("id"),
                     "track_order": int(track.get("order", 0)),
                     "layer_order": len(video_specs),
+                    "group_id": clip.get('_composite_group'),
+                    "clock": copy.deepcopy(clip.get('_nested_keyframe_clock')),
                     "clip_id": clip.get("id"),
                     "keyframes": copy.deepcopy(clip.get("keyframes", [])),
                     "start": start,
@@ -3503,8 +3807,6 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 index += 1
     if not video_labels and not subtitle_overlays:
         raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
-    base_filter = f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba" if transparent_canvas else f"color=c=black:s={width}x{height}:r={fps_value}:d={duration:.6f}"
-    filters.append(f"{base_filter}[base]")
     subtitle_specs = [
         _build_subtitle_layer(
             root,
@@ -3520,135 +3822,14 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         )
         for subtitle_index, overlay in enumerate(subtitle_overlays)
     ]
-    final_specs: list[dict[str, Any]] = []
-    by_track: dict[str, list[dict[str, Any]]] = {}
-    for spec in video_specs:
-        by_track.setdefault(str(spec.get("track_id")), []).append(spec)
-    complex_types = (XFADE_TRANSITIONS - {"fade"}) | {"crossfade", "dissolve", "wipe", "slide"}
-    for track_specs in by_track.values():
-        track_specs.sort(key=lambda item: (float(item["start"]), str(item.get("clip_id"))))
-        index = 0
-        while index < len(track_specs):
-            current_spec = track_specs[index]
-            next_spec = track_specs[index + 1] if index + 1 < len(track_specs) else None
-            incoming_transition = next_spec.get("incoming") if next_spec and isinstance(next_spec.get("incoming"), dict) else {}
-            outgoing_transition = current_spec.get("outgoing") if isinstance(current_spec.get("outgoing"), dict) else {}
-            transition = incoming_transition if str(incoming_transition.get("type", "")) else outgoing_transition
-            transition_type = str(transition.get("type", "")).lower()
-            if next_spec and transition_type in complex_types:
-                transition_duration = max(0.001, _num(transition.get("duration", 0.25), 0.25))
-                expected_start = float(current_spec["start"]) + float(current_spec["duration"]) - transition_duration
-                frame_tolerance = max(1.0 / max(1, int(fps["num"])), 0.01)
-                overlap_handles = abs(float(next_spec["start"]) - expected_start) <= frame_tolerance
-                contiguous = abs(float(next_spec["start"]) - (float(current_spec["start"]) + float(current_spec["duration"]))) <= frame_tolerance
-                auto_handle = bool(transition.get("auto_handle", False)) or str(transition.get("handle_policy", "")).lower() == "auto"
-                if transition_duration < float(current_spec["duration"]) and transition_duration < float(next_spec["duration"]) and (overlap_handles or (auto_handle and contiguous)):
-                    left_trim = f"tr{len(final_specs)}a"
-                    right_trim = f"tr{len(final_specs)}b"
-                    output_label = f"transition{len(final_specs)}"
-                    filters.append(f"[{current_spec['label']}]trim=start={float(current_spec['start']):.6f}:end={float(current_spec['start']) + float(current_spec['duration']):.6f},setpts=PTS-STARTPTS[{left_trim}]")
-                    filters.append(f"[{next_spec['label']}]trim=start={float(next_spec['start']):.6f}:end={float(next_spec['start']) + float(next_spec['duration']):.6f},setpts=PTS-STARTPTS[{right_trim}]")
-                    direction = str(transition.get("direction", "left")).lower()
-                    transition_name = {"crossfade": "fade", "dissolve": "fade"}.get(transition_type, transition_type)
-                    if transition_type == "wipe":
-                        transition_name = {"left": "wipeleft", "right": "wiperight", "up": "wipeup", "down": "wipedown"}.get(direction, "wipeleft")
-                    elif transition_type == "slide":
-                        transition_name = {"left": "slideleft", "right": "slideright", "up": "slideup", "down": "slidedown"}.get(direction, "slideright")
-                    if transition_name not in XFADE_TRANSITIONS:
-                        transition_name = "fade"
-                    preserve_contiguous_duration = auto_handle and contiguous and not overlap_handles
-                    tail_padding = f",tpad=stop_mode=clone:stop_duration={transition_duration:.6f}" if preserve_contiguous_duration else ""
-                    filters.append(f"[{left_trim}][{right_trim}]xfade=transition={transition_name}:duration={transition_duration:.6f}:offset={float(current_spec['duration']) - transition_duration:.6f}{tail_padding},setpts=PTS-STARTPTS+{float(current_spec['start']):.6f}/TB[{output_label}]")
-                    if preserve_contiguous_duration:
-                        warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": next_spec.get("clip_id"), "feature": "complex_transition_auto_handle", "message": "相邻片段没有重叠句柄，已用本地 xfade 并保持原时间线长度；转场尾部使用最后一帧填充"})
-                    final_specs.append({"label": output_label, "position": current_spec["position"], "track_id": current_spec.get("track_id"), "track_order": current_spec.get("track_order", 0), "layer_order": current_spec.get("layer_order", len(final_specs)), "clip_id": f"{current_spec.get('clip_id')}+{next_spec.get('clip_id')}", "start": current_spec["start"], "duration": float(current_spec["duration"]) + float(next_spec["duration"]) if preserve_contiguous_duration else float(current_spec["duration"]) + float(next_spec["duration"]) - transition_duration})
-                    index += 2
-                    continue
-                warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": next_spec.get("clip_id"), "feature": "complex_transition", "message": "复杂转场要求相邻片段有匹配的重叠时间句柄，当前已保留但未执行"})
-            elif transition_type in complex_types:
-                warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": current_spec.get("clip_id"), "feature": "complex_transition", "message": "没有可配对的相邻片段，复杂转场未执行"})
-            final_specs.append(current_spec)
-            index += 1
-    final_specs.extend(subtitle_specs)
-    # Video transitions are resolved per track above; this final ordering is
-    # the shared z-order for media and independent text layers.
-    final_specs.sort(key=lambda item: (int(item.get("track_order", 0)), float(item.get("start", 0.0)), int(item.get("layer_order", 0))))
-    current = "base"
-    for pos, spec in enumerate(final_specs):
-        target = "vout" if pos == len(final_specs) - 1 and not has_adjustments else f"vo{pos}"
-        blend = spec.get("blend") if isinstance(spec.get("blend"), dict) else {}
-        blend_mode = str(blend.get("mode", "normal")).lower().replace("-", "_")
-        if blend_mode in {"normal", "source_over", ""}:
-            opacity = _clamp(blend.get("opacity", 1.0), 0.0, 1.0, 1.0)
-            blend_opacity_expr = _keyframe_expr(
-                {"keyframes": spec.get("keyframes", [])}, ("blend.opacity", "blend_opacity"),
-                opacity, float(spec.get("start", 0.0)), tps, time_variable="T",
-            )
-            source_label = spec['label']
-            if blend_opacity_expr != "1.00000000":
-                source_label = f"normalopacity{pos}"
-                alpha_expr = f"alpha(X,Y)*clip(({blend_opacity_expr}),0,1)"
-                filters.append(f"[{spec['label']}]format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)},format=rgba[{source_label}]")
-            filters.append(f"[{current}][{source_label}]overlay={spec['position']}:eof_action=pass:format=auto[{target}]")
-        elif blend_mode in {"addition", "addition128", "and", "average", "burn", "darken", "difference", "divide", "dodge", "exclusion", "freeze", "glow", "hardlight", "hard_mix", "lighten", "multiply", "negation", "or", "phoenix", "pinlight", "reflect", "screen", "softlight", "subtract", "vivid", "xor"}:
-            # FFmpeg's blend filter requires two same-sized frames and has no
-            # notion of the clip's timeline position or alpha coverage.  Build
-            # a transparent, positioned canvas first, then use its alpha as a
-            # masked merge so pixels outside the layer remain untouched.  This
-            # keeps multiply/screen/etc. consistent with source-over behavior.
-            opacity = _clamp(blend.get("opacity", 1.0), 0.0, 1.0, 1.0)
-            ffmpeg_mode = {"hard_mix": "hardmix", "vivid": "vividlight"}.get(blend_mode, blend_mode)
-            layer_prefix = "subtitle_" if spec.get("kind") == "subtitle" else ""
-            blend_index = int(spec.get("layer_order", pos)) if spec.get("kind") == "subtitle" else pos
-            blend_canvas = f"{layer_prefix}blendcanvas{blend_index}"
-            blend_source = f"{layer_prefix}blendsource{blend_index}"
-            blend_layer = f"{layer_prefix}blendlayer{blend_index}"
-            blend_base = f"{layer_prefix}blendbase{blend_index}"
-            blend_under = f"{layer_prefix}blendunder{blend_index}"
-            blend_result = f"{layer_prefix}blendresult{blend_index}"
-            blend_alpha = f"{layer_prefix}blendalpha{blend_index}"
-            blend_color_layer = f"{layer_prefix}blendcolor{blend_index}"
-            blend_mask_layer = f"{layer_prefix}blendmask{blend_index}"
-            filters.append(f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba[{blend_canvas}]")
-            filters.append(f"[{spec['label']}]format=rgba[{blend_source}]")
-            filters.append(f"[{blend_canvas}][{blend_source}]overlay={spec['position']}:eof_action=pass:format=auto,format=rgba[{blend_layer}]")
-            blend_opacity_expr = _keyframe_expr(
-                {"keyframes": spec.get("keyframes", [])},
-                ("blend.opacity", "blend_opacity"),
-                opacity,
-                float(spec.get("start", 0.0)),
-                tps,
-                time_variable="T",
-            )
-            dynamic_blend_opacity = any(
-                isinstance(item, dict) and str(item.get("property", "")) in {"blend.opacity", "blend_opacity"}
-                for item in spec.get("keyframes", [])
-            )
-            if dynamic_blend_opacity:
-                alpha_expr = f"alpha(X,Y)*clip(({blend_opacity_expr}),0,1)"
-                filters.append(f"[{blend_layer}]format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)},format=rgba[{blend_layer}o]")
-                blend_layer = f"{blend_layer}o"
-            elif opacity < 1.0:
-                filters.append(f"[{blend_layer}]colorchannelmixer=aa={opacity:.6f}[{blend_layer}o]")
-                blend_layer = f"{blend_layer}o"
-            # Keep independent pixel-format negotiations for the blend math
-            # and alpha mask; otherwise FFmpeg may negotiate the shared stream
-            # to a non-alpha format before alphaextract sees it.
-            filters.append(f"[{blend_layer}]split=2[{blend_color_layer}][{blend_mask_layer}]")
-            filters.append(f"[{current}]split=2[{blend_base}][{blend_under}]")
-            filters.append(f"[{blend_base}]format=gbrp[{blend_base}r]")
-            filters.append(f"[{blend_under}]format=gbrp[{blend_under}r]")
-            filters.append(f"[{blend_color_layer}]format=gbrp[{blend_color_layer}r]")
-            filters.append(f"[{blend_base}r][{blend_color_layer}r]blend=all_mode={ffmpeg_mode}:all_opacity=1[{blend_result}]")
-            # All three maskedmerge inputs must share the RGB plane format.
-            # A gray alpha plane alone would otherwise negotiate the entire
-            # merge to grayscale and discard the composite's color channels.
-            filters.append(f"[{blend_mask_layer}]format=rgba,alphaextract,format=gbrp[{blend_alpha}]")
-            filters.append(f"[{blend_under}r][{blend_result}][{blend_alpha}]maskedmerge[{target}]")
-        else:
-            warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": spec.get("clip_id"), "feature": f"blend:{blend_mode}", "message": "当前 FFmpeg 后端不支持该混合模式，已回退 source-over"})
-            filters.append(f"[{current}][{spec['label']}]overlay={spec['position']}:eof_action=pass:format=auto[{target}]")
-        current = target
+    current = _build_compositing_tree(
+        root, [*video_specs, *subtitle_specs], composite_groups, filters, warnings, input_meta,
+        width=width, height=height, fps=fps, fps_value=fps_value, duration=duration,
+        tps=tps, transparent_canvas=transparent_canvas,
+    )
+    if not has_adjustments:
+        filters.append(f"[{current}]null[vout]")
+        current = 'vout'
     if has_adjustments:
         for adjustment_index, (adjustment_id, effects, adjustment_start, adjustment_end) in enumerate(adjustment_layers):
             effect_clip = {"id": adjustment_id, "effects": effects}

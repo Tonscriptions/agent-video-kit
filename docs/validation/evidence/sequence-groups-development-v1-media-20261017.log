@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_sequence_compositing.py", line 261, in <module>
+    run(args.output.resolve(),args.work.resolve(),args.font.resolve(),args.font_license.resolve())
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_sequence_compositing.py", line 205, in run
+    results[name]=cli('render','--project',project,'--output',path,'--publish',old=old)
+                  ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_sequence_compositing.py", line 185, in cli
+    if p.returncode and not allow_failure:raise RuntimeError(value)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'ok': False, 'command': 'render', 'request_id': 'req_20261016203234_837746f0', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'ARGUMENT_INVALID', 'message': '输出路径必须位于项目目录内', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\sequence-compositing-development-v1-20261017\\G01-before.mp4', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T20:32:34.736572Z', 'finished_at': '2026-10-16T20:32:34.736582Z', 'network': 'disabled'}}

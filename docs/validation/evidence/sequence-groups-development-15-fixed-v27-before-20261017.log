@@ -1,0 +1,167 @@
+test_blend_in_transparent_group_preserves_uncovered_source (test_sequence_compositing.SequenceCompositingTests.test_blend_in_transparent_group_preserves_uncovered_source) ... FAIL
+test_child_track_order_cannot_escape_parent_track_slot (test_sequence_compositing.SequenceCompositingTests.test_child_track_order_cannot_escape_parent_track_slot) ... FAIL
+test_deep_isolation_applies_each_opacity_once (test_sequence_compositing.SequenceCompositingTests.test_deep_isolation_applies_each_opacity_once) ... FAIL
+test_fractional_blend_uses_both_coverages_in_group (test_sequence_compositing.SequenceCompositingTests.test_fractional_blend_uses_both_coverages_in_group) ... FAIL
+test_group_manifest_exposes_isolation_and_original_project_survives (test_sequence_compositing.SequenceCompositingTests.test_group_manifest_exposes_isolation_and_original_project_survives) ... FAIL
+test_group_visibility_is_half_open_and_gaps_stay_transparent (test_sequence_compositing.SequenceCompositingTests.test_group_visibility_is_half_open_and_gaps_stay_transparent) ... ok
+test_independent_text_tracks_are_isolated_before_parent_opacity (test_sequence_compositing.SequenceCompositingTests.test_independent_text_tracks_are_isolated_before_parent_opacity) ... FAIL
+test_parent_animated_opacity_keeps_phase_across_child_boundary (test_sequence_compositing.SequenceCompositingTests.test_parent_animated_opacity_keeps_phase_across_child_boundary) ... FAIL
+test_parent_blur_runs_after_child_masks_and_overlap (test_sequence_compositing.SequenceCompositingTests.test_parent_blur_runs_after_child_masks_and_overlap) ... FAIL
+test_parent_crop_samples_composite_not_each_source_separately (test_sequence_compositing.SequenceCompositingTests.test_parent_crop_samples_composite_not_each_source_separately) ... FAIL
+test_parent_fade_changes_group_coverage_in_authored_clock (test_sequence_compositing.SequenceCompositingTests.test_parent_fade_changes_group_coverage_in_authored_clock) ... FAIL
+test_parent_mask_uses_post_transform_canvas_coordinates (test_sequence_compositing.SequenceCompositingTests.test_parent_mask_uses_post_transform_canvas_coordinates) ... FAIL
+test_parent_opacity_is_applied_after_overlapping_children (test_sequence_compositing.SequenceCompositingTests.test_parent_opacity_is_applied_after_overlapping_children) ... FAIL
+test_parent_pivot_rotates_complete_sequence_canvas (test_sequence_compositing.SequenceCompositingTests.test_parent_pivot_rotates_complete_sequence_canvas) ... FAIL
+test_two_instances_keep_internal_transition_labels_separate (test_sequence_compositing.SequenceCompositingTests.test_two_instances_keep_internal_transition_labels_separate) ... ok
+
+======================================================================
+FAIL: test_blend_in_transparent_group_preserves_uncovered_source (test_sequence_compositing.SequenceCompositingTests.test_blend_in_transparent_group_preserves_uncovered_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 156, in test_blend_in_transparent_group_preserves_uncovered_source
+    self.pixel(frame,(140,48),(0,160,160))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 106, in pixel
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),tolerance,(xy,actual,expected))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 160 not less than or equal to 4 : ((140, 48), (0, 0, 0), (0, 160, 160))
+
+======================================================================
+FAIL: test_child_track_order_cannot_escape_parent_track_slot (test_sequence_compositing.SequenceCompositingTests.test_child_track_order_cannot_escape_parent_track_slot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 121, in test_child_track_order_cannot_escape_parent_track_slot
+    for frame in frames:self.pixel(frame,(80,48),(0,240,0))
+                        ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 106, in pixel
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),tolerance,(xy,actual,expected))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 240 not less than or equal to 4 : ((80, 48), (1, 2, 240), (0, 240, 0))
+
+======================================================================
+FAIL: test_deep_isolation_applies_each_opacity_once (test_sequence_compositing.SequenceCompositingTests.test_deep_isolation_applies_each_opacity_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 129, in test_deep_isolation_applies_each_opacity_once
+    self.pixel(frame,(20,48),(60,0,0));self.pixel(frame,(80,48),(0,0,60))
+                                       ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 106, in pixel
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),tolerance,(xy,actual,expected))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 44 not less than or equal to 4 : ((80, 48), (44, 0, 58), (0, 0, 60))
+
+======================================================================
+FAIL: test_fractional_blend_uses_both_coverages_in_group (test_sequence_compositing.SequenceCompositingTests.test_fractional_blend_uses_both_coverages_in_group)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 209, in test_fractional_blend_uses_both_coverages_in_group
+    for frame in frames:self.pixel(frame,(80,48),(40,105,105),tolerance=5)
+                        ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 106, in pixel
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),tolerance,(xy,actual,expected))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 40 not less than or equal to 5 : ((80, 48), (40, 65, 66), (40, 105, 105))
+
+======================================================================
+FAIL: test_group_manifest_exposes_isolation_and_original_project_survives (test_sequence_compositing.SequenceCompositingTests.test_group_manifest_exposes_isolation_and_original_project_survives)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 190, in test_group_manifest_exposes_isolation_and_original_project_survives
+    self.assertEqual(len(nodes),1);self.assertEqual(nodes[0]['child_layer_count'],2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_independent_text_tracks_are_isolated_before_parent_opacity (test_sequence_compositing.SequenceCompositingTests.test_independent_text_tracks_are_isolated_before_parent_opacity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 229, in test_independent_text_tracks_are_isolated_before_parent_opacity
+    self.assertGreater(peak,120);self.assertLessEqual(peak,130)
+                                 ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: 191 not less than or equal to 130
+
+======================================================================
+FAIL: test_parent_animated_opacity_keeps_phase_across_child_boundary (test_sequence_compositing.SequenceCompositingTests.test_parent_animated_opacity_keeps_phase_across_child_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 176, in test_parent_animated_opacity_keeps_phase_across_child_boundary
+    self.pixel(frame,(80,48),(level,0,0) if i<4 else (0,0,level))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 106, in pixel
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),tolerance,(xy,actual,expected))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 60 not less than or equal to 4 : ((80, 48), (60, 0, 120), (0, 0, 120))
+
+======================================================================
+FAIL: test_parent_blur_runs_after_child_masks_and_overlap (test_sequence_compositing.SequenceCompositingTests.test_parent_blur_runs_after_child_masks_and_overlap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 199, in test_parent_blur_runs_after_child_masks_and_overlap
+    self.assertGreater(r,20);self.assertGreater(b,20)
+                             ~~~~~~~~~~~~~~~~~~^^^^^^
+AssertionError: 1 not greater than 20
+
+======================================================================
+FAIL: test_parent_crop_samples_composite_not_each_source_separately (test_sequence_compositing.SequenceCompositingTests.test_parent_crop_samples_composite_not_each_source_separately)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 182, in test_parent_crop_samples_composite_not_each_source_separately
+    self.pixel(frame,(16,48),(240,0,0));self.pixel(frame,(40,48),(0,0,240))
+                                        ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 106, in pixel
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),tolerance,(xy,actual,expected))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 239 not less than or equal to 4 : ((40, 48), (239, 0, 1), (0, 0, 240))
+
+======================================================================
+FAIL: test_parent_fade_changes_group_coverage_in_authored_clock (test_sequence_compositing.SequenceCompositingTests.test_parent_fade_changes_group_coverage_in_authored_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 216, in test_parent_fade_changes_group_coverage_in_authored_clock
+    self.pixel(frame,(80,48),(0,0,level))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 106, in pixel
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),tolerance,(xy,actual,expected))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 240 not less than or equal to 4 : ((80, 48), (1, 2, 240), (0, 0, 0))
+
+======================================================================
+FAIL: test_parent_mask_uses_post_transform_canvas_coordinates (test_sequence_compositing.SequenceCompositingTests.test_parent_mask_uses_post_transform_canvas_coordinates)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 146, in test_parent_mask_uses_post_transform_canvas_coordinates
+    self.pixel(frame,(96,48),(240,0,0));self.pixel(frame,(128,48),(0,0,0))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 106, in pixel
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),tolerance,(xy,actual,expected))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 240 not less than or equal to 4 : ((96, 48), (0, 0, 0), (240, 0, 0))
+
+======================================================================
+FAIL: test_parent_opacity_is_applied_after_overlapping_children (test_sequence_compositing.SequenceCompositingTests.test_parent_opacity_is_applied_after_overlapping_children)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 112, in test_parent_opacity_is_applied_after_overlapping_children
+    self.pixel(frame,(20,48),(120,0,0));self.pixel(frame,(80,48),(0,0,120))
+                                        ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 106, in pixel
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),tolerance,(xy,actual,expected))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 62 not less than or equal to 4 : ((80, 48), (62, 1, 119), (0, 0, 120))
+
+======================================================================
+FAIL: test_parent_pivot_rotates_complete_sequence_canvas (test_sequence_compositing.SequenceCompositingTests.test_parent_pivot_rotates_complete_sequence_canvas)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 137, in test_parent_pivot_rotates_complete_sequence_canvas
+    self.pixel(frame,(80,48),(240,0,0));self.pixel(frame,(120,48),(0,0,0))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 106, in pixel
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),tolerance,(xy,actual,expected))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 240 not less than or equal to 4 : ((80, 48), (0, 0, 0), (240, 0, 0))
+
+----------------------------------------------------------------------
+Ran 15 tests in 18.631s
+
+FAILED (failures=13)

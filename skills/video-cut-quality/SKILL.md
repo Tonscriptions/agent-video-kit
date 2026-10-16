@@ -5,6 +5,15 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For nested sequences, review the actual isolated composite against the
+[sequence canvas contract](../../docs/specs/嵌套序列隔离合成契约_v0.1_2026-10-17.md).
+Check overlap opacity, root occlusion order, parent pivot, post-transform mask,
+transparent blend coverage, child animation and half-open gaps separately.
+`sequence-composite` manifest nodes describe the compiled graph and do not
+establish pixel accuracy. Retain old failed outputs and compare all decoded
+frames to an independent reference. Fixed 8-bit RGB fixture checks do not
+accept HDR, natural quality, group audio, nested freeze or full editor parity.
+
 Before inpainting or accepting segmentation, review the actual encoded mask:
 
 ```powershell

@@ -3160,7 +3160,7 @@ print(json.dumps({
             self.assertTrue(output.exists())
             self.assertFalse(any(item.get("feature") == "nested_sequence_inherited_properties" for item in rendered["data"]["warnings"]))
             self.assertFalse(any(item.get("feature") == "nested_sequence_reverse" for item in rendered["data"]["warnings"]))
-            self.assertTrue(any(item.get("feature") == "nested_sequence_multiple_masks" for item in rendered["data"]["warnings"]))
+            self.assertFalse(any(item.get("feature") == "nested_sequence_multiple_masks" for item in rendered["data"]["warnings"]))
             project_json = json.loads((project / "project.json").read_text(encoding="utf-8"))
             nested = next(item for item in project_json["sequences"] if item["id"] == "seq_nested")
             nested["tracks"][0]["clips"].append({"id": "cycle", "sequence_id": "seq_main", "timeline_start_tick": 0, "duration_tick": 1, "source_in_tick": 0, "source_out_tick": 1})

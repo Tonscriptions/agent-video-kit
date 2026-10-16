@@ -5,6 +5,18 @@ description: Compose an Agent Project timeline with local clips, tracks, transit
 
 # Timeline Composition
 
+Nested sequence clips now render as isolated transparent canvases; see the
+[sequence compositing contract](../../docs/specs/嵌套序列隔离合成契约_v0.1_2026-10-17.md).
+Composite the children first. Parent crop, canvas TRS/anchor, opacity, effects,
+mask and fade then act on that result once. Keep the parent on its intended
+root track: a child's high track order cannot escape that slot. Container
+animation uses its containing sequence's authored clock. Do not pre-multiply
+parent opacity into each child, flatten parent masks, or bake a lossy child
+video to simulate a group. Inspect `sequence-composite` manifest inputs.
+All group canvases currently use the root dimensions. Group audio buses,
+nested freeze, standalone slide/wipe, linear-light/HDR and broad performance
+remain acceptance boundaries; preserve existing audio and quality warnings.
+
 Use a registered SAM2 adapter with local `--prompts` for multiple selected
 objects, boxes, positive/negative points and future-frame corrections; read
 the [SAM2 contract](../../docs/specs/本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md).

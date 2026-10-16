@@ -1,0 +1,39 @@
+test_blend_in_transparent_group_preserves_uncovered_source (test_sequence_compositing.SequenceCompositingTests.test_blend_in_transparent_group_preserves_uncovered_source) ... ok
+test_child_track_order_cannot_escape_parent_track_slot (test_sequence_compositing.SequenceCompositingTests.test_child_track_order_cannot_escape_parent_track_slot) ... ok
+test_deep_isolation_applies_each_opacity_once (test_sequence_compositing.SequenceCompositingTests.test_deep_isolation_applies_each_opacity_once) ... ok
+test_group_manifest_exposes_isolation_and_original_project_survives (test_sequence_compositing.SequenceCompositingTests.test_group_manifest_exposes_isolation_and_original_project_survives) ... ERROR
+test_group_visibility_is_half_open_and_gaps_stay_transparent (test_sequence_compositing.SequenceCompositingTests.test_group_visibility_is_half_open_and_gaps_stay_transparent) ... ok
+test_parent_animated_opacity_keeps_phase_across_child_boundary (test_sequence_compositing.SequenceCompositingTests.test_parent_animated_opacity_keeps_phase_across_child_boundary) ... FAIL
+test_parent_crop_samples_composite_not_each_source_separately (test_sequence_compositing.SequenceCompositingTests.test_parent_crop_samples_composite_not_each_source_separately) ... ok
+test_parent_mask_uses_post_transform_canvas_coordinates (test_sequence_compositing.SequenceCompositingTests.test_parent_mask_uses_post_transform_canvas_coordinates) ... ok
+test_parent_opacity_is_applied_after_overlapping_children (test_sequence_compositing.SequenceCompositingTests.test_parent_opacity_is_applied_after_overlapping_children) ... ok
+test_parent_pivot_rotates_complete_sequence_canvas (test_sequence_compositing.SequenceCompositingTests.test_parent_pivot_rotates_complete_sequence_canvas) ... ok
+
+======================================================================
+ERROR: test_group_manifest_exposes_isolation_and_original_project_survives (test_sequence_compositing.SequenceCompositingTests.test_group_manifest_exposes_isolation_and_original_project_survives)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 188, in test_group_manifest_exposes_isolation_and_original_project_survives
+    plan=manifest['plan']
+         ~~~~~~~~^^^^^^^^
+KeyError: 'plan'
+
+======================================================================
+FAIL: test_parent_animated_opacity_keeps_phase_across_child_boundary (test_sequence_compositing.SequenceCompositingTests.test_parent_animated_opacity_keeps_phase_across_child_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 173, in test_parent_animated_opacity_keeps_phase_across_child_boundary
+    frames,_,_=self.render()
+               ~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 86, in render
+    self.call('timeline','compose','--project',self.root,'--input',changes)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 56, in call
+    self.assertEqual(code,0,value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'timeline.compose', 'request_id': 'req_20261016202515_6bcb98eb', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'PROJECT_INVALID', 'message': '时间线变更会生成无效项目', 'path': None, 'retryable': False, 'cause': '{"ok": false, "errors": [{"code": "SCHEMA_VALIDATION_FAILED", "message": "\'interpolation\' is a required property", "path": "sequences.0.tracks.0.clips.0.keyframes.0.keyframes.0", "retryable": false}, {"code": "SCHEMA_VALIDATION_FAILED", "message": "\'interpolation\' is a required property", "path": "sequences.0.tracks.0.clips.0.keyframes.0.keyframes.1", "retryable": false}, {"code": "INTERPOLATION_INVALID", "message": "关键帧插值类型无效", "path": "sequences[0].tracks[0].clips[0].keyframes", "retryable": false}, {"code": "INTERPOLATION_INVALID", "message": "关键帧插值类型无效", "path": "sequences[0].tracks[0].clips[0].keyframes", "retryable": false}], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "blue", "rights_ref": "blue", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "blue", "rights_ref": "blue", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "blue", "rights_ref": "blue", "record_version": 1, "context": "project_asset"}], "rights": {"ok": true, "target": "commercial_ad", "checked": 2, "required_records": 2, "failures": [], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "blue", "rights_ref": "blue", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "blue", "rights_ref": "blue", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "blue", "rights_ref": "blue", "record_version": 1, "context": "project_asset"}], "disposition_decisions": [], "effective_disposition_decisions": []}, "schema_engine": "jsonschema", "asset_count": 2, "sequence_count": 2}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T20:25:15.959005Z', 'finished_at': '2026-10-16T20:25:15.959016Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 10 tests in 32.217s
+
+FAILED (failures=1, errors=1)

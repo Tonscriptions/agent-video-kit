@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import bisect
+import copy
 import hashlib
 import json
 import math
@@ -351,6 +352,12 @@ class SubtitleClockTests(unittest.TestCase):
         project=json.loads((self.root/'project.json').read_text(encoding='utf-8-sig'))
         leaf=next(c for seq in project['sequences'] for t in seq['tracks'] for c in t['clips'] if c['id']=='leaf')
         leaf['keyframes']=[{'property':'transform.scale','keyframes':[{'at_tick':0,'value':.8,'interpolation':'linear'},{'at_tick':3*TPS,'value':1.,'interpolation':'linear'}]}]
+        # An isolated group now supplies a fixed raster. Retain this legacy
+        # warning regression on the direct, changing-dimension clip path.
+        root=next(s for s in project['sequences'] if s['id']=='seq_main')
+        root['tracks'][0]['clips']=[copy.deepcopy(leaf)]
+        root['duration_tick']=int(leaf['timeline_start_tick'])+int(leaf['duration_tick'])
+        project['sequences']=[root]
         atomic_write_json(self.root/'project.json',project)
         result=self.call('render','--project',self.root,'--output',self.output)
         self.assertTrue(any(w.get('feature')=='subtitle_inline_dynamic_alpha' for w in result['warnings']))
