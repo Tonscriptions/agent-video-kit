@@ -1,0 +1,21 @@
+{"before_max_rg_error": 194, "after_max_rg_error": 2, "prefix_max_rg_error": 2, "word_mismatches": 0, "max_source_frame_error": 0, "case": "typing-center"}
+{"before_max_rg_error": 194, "after_max_rg_error": 2, "prefix_max_rg_error": 0, "word_mismatches": 0, "max_source_frame_error": 0, "case": "fade"}
+{"before_max_rg_error": 194, "after_max_rg_error": 2, "prefix_max_rg_error": 0, "word_mismatches": 0, "max_source_frame_error": 0, "case": "slide"}
+{"before_max_rg_error": 194, "after_max_rg_error": 2, "prefix_max_rg_error": 0, "word_mismatches": 0, "max_source_frame_error": 0, "case": "pop"}
+{"before_max_rg_error": 194, "after_max_rg_error": 2, "prefix_max_rg_error": 0, "word_mismatches": 0, "max_source_frame_error": 0, "case": "bounce"}
+{"before_max_rg_error": 194, "after_max_rg_error": 2, "prefix_max_rg_error": 0, "word_mismatches": 0, "max_source_frame_error": 0, "case": "rotate"}
+{"before_max_rg_error": 199, "after_max_rg_error": 2, "prefix_max_rg_error": 2, "word_mismatches": 0, "max_source_frame_error": 0, "case": "typing-multiline"}
+{"before_max_rg_error": 199, "after_max_rg_error": 2, "prefix_max_rg_error": 2, "word_mismatches": 0, "max_source_frame_error": 0, "case": "typing-wrap"}
+{"before_max_rg_error": 194, "after_max_rg_error": 2, "prefix_max_rg_error": 2, "word_mismatches": 0, "max_source_frame_error": 0, "case": "typing-inline"}
+{"before_max_rg_error": 194, "after_max_rg_error": 2, "prefix_max_rg_error": 2, "word_mismatches": 0, "max_source_frame_error": 0, "case": "typing-nested"}
+{"before_max_rg_error": 255, "after_max_rg_error": 2, "prefix_max_rg_error": 2, "word_mismatches": 0, "max_source_frame_error": 5, "case": "typing-nested-trim"}
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_text_animation.py", line 188, in <module>
+    run(args.output.resolve(),args.work.resolve(),args.font.resolve(),args.font_license.resolve(),args.cases)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_text_animation.py", line 117, in run
+    result=cli('render','--project',project,'--output',path,'--crf','0','--pixel-format','yuv444p','--publish',old=variant=='before')
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_text_animation.py", line 48, in cli
+    if p.returncode:raise RuntimeError(json.dumps(value,ensure_ascii=False)[:3000])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {"ok": false, "command": "render", "request_id": "req_20261016171216_f38605fa", "operation_id": "render_20261016171215_bf97f020", "status": "failed", "data": {}, "artifacts": [], "warnings": [], "errors": [{"code": "RENDER_QUALITY_FAILED", "message": "输出未通过结构质量检查", "path": null, "retryable": false, "cause": "[{'code': 'OUTPUT_DURATION_MISMATCH', 'expected': 3.0, 'actual': 3.003, 'tolerance': 0.0015}]", "operation_id": "render_20261016171215_bf97f020"}], "provenance": {"cli_version": "0.1.0", "schema_version": "0.1.0", "engine_version": "ffmpeg-local", "started_at": "2026-10-16T17:12:16.175651Z", "finished_at": "2026-10-16T17:12:16.175663Z", "network": "disabled"}}

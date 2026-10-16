@@ -91,10 +91,25 @@ normal paragraph paint, including its opacity. Color alpha, supported fade
 opacity and layer opacity multiply. Review `text_paint` fingerprints and actual
 encoded controls; working color is 8-bit encoded RGB, with integer rounding.
 Random colors are rejected; dynamic-raster inline colors retain an explicit
-approximation. External ASS, linear-light/HDR, word/animation combinations and
+approximation. External ASS, linear-light/HDR, dynamic-raster combinations and
 overlapping lines still need separate acceptance. A render intentionally records outputs
 and provenance; compare authored timeline/assets/settings and Rights Ledger
 when checking that generated internal clocks were not persisted.
+
+For [combined animations and native typing](../../docs/specs/文字动画高亮组合与原生打字机契约_v0.1_2026-10-17.md),
+apply fixed-raster word timing together with fade, slide, pop, bounce or typing;
+rotate needs an independent text layer. Typing paints whole native prefixes on
+the complete paragraph's fixed origin/baselines, with one complete box. Source
+whitespace consumes steps; LF does not. Existing local fonts and an FFmpeg build
+with drawtext runtime `text` commands are required. Inspect `text_layout.typing`
+and actual encoded glyphs; exit zero alone cannot establish command execution.
+Command files are immutable content-addressed streams; planning a later plain
+or differently styled version must preserve earlier plan/manifest hashes.
+The CFR command schedule uses compiled ancestral author time, including reverse.
+Keep 512-grapheme/128-line/16384-command/4 MiB budgets and planning rejections for
+bidi, stateful positions and undersized boxes. Dynamic-size inline typing keeps
+an explicit approximation; its combination with highlighting is suppressed.
+General VFR, frozen clocks, shaping, HDR and long-project performance remain open.
 
 Write a project-relative JSON change set and apply it with:
 

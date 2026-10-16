@@ -167,7 +167,7 @@ def paragraph_alignment(style: dict[str, Any], values: dict[str, Any]) -> tuple[
 
 def paint_paragraph(root: Path, layout: TextLayout, style: dict[str, Any], parts: list[str],
                     metrics: dict[str, dict[str, Any]], values: dict[str, Any], base_x: str, base_y: str,
-                    paint: Callable[[list[str]], str] | None = None) -> str:
+                    paint: Callable[[list[str]], str] | None = None, typing: Any = None) -> str:
     """Paint whole lines at a common paragraph origin/baseline, one box."""
     def text_option(text):
         digest = hashlib.sha256(text.encode('utf-8')).hexdigest()
@@ -175,6 +175,8 @@ def paint_paragraph(root: Path, layout: TextLayout, style: dict[str, Any], parts
         atomic_write_text(path,text)
         return 'drawtext=textfile='+_quoted(path.relative_to(root).as_posix())
     draw = paint or (lambda options: ':'.join(options))
+    if typing is not None:
+        return typing.paint(parts, metrics, values, base_x, base_y, paint)
     if len(layout.lines)==1:
         return draw([text_option(layout.text), *(p for p in parts[1:] if not p.startswith('expansion=')), 'expansion=none'])
     if style.get('boxw') and float(style['boxw']) < values['text_w'] or style.get('boxh') and float(style['boxh']) < values['text_h']:
@@ -204,12 +206,12 @@ def paint_paragraph(root: Path, layout: TextLayout, style: dict[str, Any], parts
 
 def multiline_filter(root: Path, font: Path, size: int, layout: TextLayout, style: dict[str, Any],
                      parts: list[str], base_x: str, base_y: str,
-                     paint: Callable[[list[str]], str] | None = None) -> tuple[str, dict[str, Any]]:
+                     paint: Callable[[list[str]], str] | None = None, typing: Any = None) -> tuple[str, dict[str, Any]]:
     if re.search(r'\b(?:rand|random|st|ld|print|metadata|x|y)\b',base_x+' '+base_y):
         raise AppError('SUBTITLE_PARAGRAPH_POSITION_UNSUPPORTED','多行段落需要无状态、无 x/y 互相引用的位置表达式',exit_code=2)
     metrics,evidence=native_metrics(root,font,size,['Mg',*(line.text for line in layout.lines if line.text)],style)
     values=paragraph_metrics(layout,metrics,style)
-    return paint_paragraph(root,layout,style,parts,metrics,values,base_x,base_y,paint),{
+    return paint_paragraph(root,layout,style,parts,metrics,values,base_x,base_y,paint,typing),{
         **evidence,'engine':'drawtext-lines-shared-paragraph-metrics','paragraph_metrics':values,
         'line_count':len(layout.lines),'newline_glyph_painted':False}
 
@@ -218,7 +220,7 @@ def highlight_filter(root: Path, font: Path, size: int, layout: TextLayout, styl
                      ranges: list[tuple[dict[str, Any], int, int]], timings: dict[int, tuple[float, float]],
                      normal: list[str], active: list[str], base_x: str, base_y: str, clock: str, clip_start: float,
                      clip_id: str, visible: str | None,
-                     paint: Callable[[list[str]], str] | None = None) -> tuple[str, dict[str, Any]]:
+                     paint: Callable[[list[str]], str] | None = None, typing: Any = None) -> tuple[str, dict[str, Any]]:
     """Choose a whole-paragraph paint with word/line rectangles in its space."""
     boundaries = {0, len(layout.source), *(x for a, b, _ in graphemes(layout.source) for x in (a, b))}
     if any(start not in boundaries or end not in boundaries for _, start, end in ranges):
@@ -262,8 +264,8 @@ def highlight_filter(root: Path, font: Path, size: int, layout: TextLayout, styl
             fragments.append((line_index, line.text, entry, before, after, trimmed, through, a == 0, b == len(line.text)))
     metrics, evidence = native_metrics(root, font, size, queries, style)
     paragraph = paragraph_metrics(layout,metrics,style)
-    normal=paint_paragraph(root,layout,style,normal,metrics,paragraph,base_x,base_y,paint)
-    active=paint_paragraph(root,layout,style,active,metrics,paragraph,base_x,base_y,paint)
+    normal=paint_paragraph(root,layout,style,normal,metrics,paragraph,base_x,base_y,paint,typing)
+    active=paint_paragraph(root,layout,style,active,metrics,paragraph,base_x,base_y,paint,typing)
     values = {key: paragraph[key] for key in FIELDS}
     x,y=paragraph_origin(base_x,base_y,values,style)
     center,right,oy,boxw=paragraph_alignment(style,values)

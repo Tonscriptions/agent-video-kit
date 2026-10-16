@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_text_animation.py", line 188, in <module>
+    run(args.output.resolve(),args.work.resolve(),args.font.resolve(),args.font_license.resolve(),args.cases)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_text_animation.py", line 117, in run
+    result=cli('render','--project',project,'--output',path,'--crf','0','--pixel-format','yuv444p','--publish',old=variant=='before')
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_text_animation.py", line 48, in cli
+    if p.returncode:raise RuntimeError(json.dumps(value,ensure_ascii=False)[:3000])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {"ok": false, "command": "render", "request_id": "req_20261016171332_88b97e98", "operation_id": "render_20261016171331_34022214", "status": "failed", "data": {}, "artifacts": [], "warnings": [], "errors": [{"code": "RENDER_QUALITY_FAILED", "message": "输出未通过结构质量检查", "path": null, "retryable": false, "cause": "[{'code': 'OUTPUT_DURATION_MISMATCH', 'expected': 3.0, 'actual': 3.003, 'tolerance': 0.0015}]", "operation_id": "render_20261016171331_34022214"}], "provenance": {"cli_version": "0.1.0", "schema_version": "0.1.0", "engine_version": "ffmpeg-local", "started_at": "2026-10-16T17:13:32.359575Z", "finished_at": "2026-10-16T17:13:32.359582Z", "network": "disabled"}}

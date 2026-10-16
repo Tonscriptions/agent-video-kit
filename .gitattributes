@@ -54,3 +54,9 @@ scripts/smoke_text_paint.py -text
 docs/validation/evidence/*text-paint*.json -text
 docs/validation/evidence/text-paint*.log -text -whitespace
 docs/assets/text-paint-20261016/font-license.txt -whitespace
+
+# V24 native text animation proofs preserve raw log and font license bytes.
+scripts/smoke_text_animation.py -text
+docs/validation/evidence/*text-animation*.json -text
+docs/validation/evidence/text-animation*.log -text -whitespace
+docs/assets/text-animation-20261017/font-license.txt -whitespace

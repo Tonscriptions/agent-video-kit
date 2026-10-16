@@ -1,0 +1,9 @@
+{"before_max_rg_error": 255, "after_max_rg_error": 2, "prefix_max_rg_error": 2, "word_mismatches": 0, "max_source_frame_error": 5, "case": "typing-nested"}
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_text_animation.py", line 181, in <module>
+    run(args.output.resolve(),args.work.resolve(),args.font.resolve(),args.font_license.resolve(),args.cases)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_text_animation.py", line 156, in run
+    assert record['after_max_rg_error']<=3 and record['prefix_max_rg_error']<=3 and record['word_mismatches']==0 and record['max_source_frame_error']<=1 and record['all_variant_audio_equal']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

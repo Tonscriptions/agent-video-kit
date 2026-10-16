@@ -78,6 +78,10 @@ def paint_drawtext(root: Path, parts: list[str], scope: str) -> tuple[str, dict[
     evidence = {'engine': 'straight-component-source-over', 'coverage': 'opaque-white-drawtext-on-opaque-black',
                 'component_order': [key for key, _ in components], 'colors': colors,
                 'alpha_application': 'coverage-times-color-alpha-once', 'working_color': 'encoded-rgb-8bit'}
+    typing = re.match(r'drawtext@(avk_typing_[A-Za-z0-9_]+)=', parts[0])
+    command_targets: list[str] = []
+    if typing:
+        evidence['command_targets'] = {typing[1]: command_targets}
     if not components:
         return 'null', evidence
     token = hashlib.sha256((scope + json.dumps(parts)).encode('utf-8')).hexdigest()[:16]
@@ -89,6 +93,10 @@ def paint_drawtext(root: Path, parts: list[str], scope: str) -> tuple[str, dict[
         # Keep geometry options even for invisible components: they affect
         # fix_bounds, clipping, alignment and the shadow's outlined bitmap.
         mask_parts = [parts[0], *(part for part in parts[1:] if part.split('=', 1)[0] not in COLOR_KEYS)]
+        if typing:
+            target_name = f'{typing[1]}_{token}_{index}'
+            mask_parts[0] = mask_parts[0].replace('drawtext@'+typing[1]+'=', 'drawtext@'+target_name+'=', 1)
+            command_targets.append(target_name)
         mask_parts.extend(f'{key}={"white" if key == component else "black@0"}' for key in COLOR_KEYS)
         colored = f'paint_{token}_color{index}'
         r, g, b, a = rgba

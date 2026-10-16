@@ -261,8 +261,8 @@ class WordHighlightTests(unittest.TestCase):
         self.assertTrue(self.output.exists())
         self.assertIn('subtitle_word_dynamic_raster', [x.get('feature') for x in result['data']['warnings']])
 
-    def test_word_animation_limitation_is_reported(self):
+    def test_fixed_word_animation_does_not_report_an_unexecuted_combination(self):
         subtitle = self.subtitle(); subtitle['animation']={'type':'fade_in', 'duration':.3}
         self.prepare(subtitle)
         result = self.call('render', '--project', self.root, '--output', self.output, '--dry-run')
-        self.assertIn('subtitle_word_animation', [x.get('feature') for x in result['data']['plan']['warnings']])
+        self.assertNotIn('subtitle_word_animation', [x.get('feature') for x in result['data']['plan']['warnings']])

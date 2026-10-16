@@ -1834,6 +1834,10 @@ def _subtitle_filter(
     layout_evidence: dict[str, Any] | None = None,
     dynamic_raster: bool = False,
     paint_text: Callable[[list[str]], str] | None = None,
+    command_targets: dict[str, list[str]] | None = None,
+    render_clock: dict[str, Any] | None = None,
+    final_fps: str = '30',
+    frame_origin: float = 0.,
 ) -> str | None:
     if not isinstance(subtitle, dict):
         return None
@@ -1932,6 +1936,98 @@ def _subtitle_filter(
         base_x = re.sub(r'\bt\b', lambda _: f'({time_expression})', base_x)
         base_y = re.sub(r'\bt\b', lambda _: f'({time_expression})', base_y)
     word_timing = subtitle.get("word_timing")
+    typing_plan = None
+    def finish(value: str, evidence: dict[str, Any] | None = None) -> str:
+        if evidence and layout_evidence is not None:
+            layout_evidence.update(evidence)
+        if typing_plan is not None:
+            value, typing_evidence = typing_plan.finish(value, command_targets or {})
+            if layout_evidence is not None:
+                layout_evidence['typing'] = typing_evidence
+        return value
+    animation = subtitle.get("animation") if isinstance(subtitle.get("animation"), dict) else style.get("animation") if isinstance(style.get("animation"), dict) else {}
+    animation_type = str(animation.get("type", "")).lower().replace("-", "_")
+    if animation_type:
+        animation_duration = max(0.001, _num(animation.get("duration", min(0.3, max(0.05, clip_duration / 4 or 0.3))), 0.3))
+        delay = max(0.0, _num(animation.get("delay", 0.0), 0.0))
+        start_expr = f"({clip_start:.6f}+{delay:.6f})"
+        end_expr = f"({clip_start:.6f}+{delay + animation_duration:.6f})"
+        progress = f"clip((({time_expression})-{start_expr})/{animation_duration:.6f},0,1)"
+        if animation_type in {"fade_in", "fade"}:
+            add_alpha(f'if(lt(({time_expression}),{start_expr}),0,{progress})')
+        elif animation_type == "fade_out":
+            fade_start = clip_start + max(0.0, clip_duration - animation_duration)
+            add_alpha(f'if(gt(({time_expression}),{fade_start:.6f}),clip(({clip_start + clip_duration:.6f}-({time_expression}))/{animation_duration:.6f},0,1),1)')
+        elif animation_type in {"slide_up", "slide_down", "slide_left", "slide_right"}:
+            distance = max(0.0, _num(animation.get("distance", 80), 80))
+            if animation_type == "slide_up":
+                y_expr = f"({base_y})+((1-({progress}))*{distance:.4f})"
+                parts.append(f"y={_expr_arg(y_expr)}")
+            elif animation_type == "slide_down":
+                y_expr = f"({base_y})-((1-({progress}))*{distance:.4f})"
+                parts.append(f"y={_expr_arg(y_expr)}")
+            elif animation_type == "slide_left":
+                x_expr = f"({base_x})+((1-({progress}))*{distance:.4f})"
+                parts.append(f"x={_expr_arg(x_expr)}")
+            else:
+                x_expr = f"({base_x})-((1-({progress}))*{distance:.4f})"
+                parts.append(f"x={_expr_arg(x_expr)}")
+        elif animation_type in {"typewriter", "typing"}:
+            if dynamic_raster:
+                warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip_id,
+                                 'feature': 'subtitle_typewriter_dynamic_raster',
+                                 'message': '动态尺寸内嵌打字机沿用旧定位；请使用独立字幕层'})
+                if word_timing:
+                    warnings.append({'code': 'RENDER_FEATURE_UNSUPPORTED', 'clip_id': clip_id,
+                                     'feature': 'subtitle_word_animation',
+                                     'message': '动态尺寸内嵌打字机与高亮尚未联合实现，保留整句'})
+                else:
+                    chars = [item[2] for item in graphemes(subtitle_text) if item[2] != "\n"]
+                    if not chars:
+                        return None
+                    char_step = animation_duration / max(1, len(chars))
+                    char_filters: list[str] = []
+                    prefix_text = ""
+                    for index, char in enumerate(chars):
+                        char_parts = [f"drawtext=text='{_drawtext_arg(char)}'", *parts[1:]]
+                        char_parts = [part for part in char_parts if not part.startswith("enable=")]
+                        prefix_width = _subtitle_text_width(font_metrics, prefix_text, font_size)
+                        x_expr = f"({base_x})+({prefix_width:.6f})"
+                        char_parts.append(f"x={_expr_arg(x_expr)}")
+                        char_parts.append(f"y={_expr_arg(base_y)}")
+                        enable_expr = f"gte(({time_expression}),{clip_start + delay + index * char_step:.9f})"
+                        if timeline_window:
+                            enable_expr = f"({enable_expr})*({window_expression})"
+                        char_parts.append(f"enable={_expr_arg(enable_expr)}")
+                        if style.get("box", True):
+                            char_parts.extend(["box=1", f"boxcolor={_quoted(style.get('boxcolor', 'black@0.45'))}", f"boxborderw={box_border}"])
+                        char_filters.append(draw(char_parts))
+                        prefix_text += char
+                    return ",".join(char_filters)
+            else:
+                if resolved_font_path is None:
+                    raise AppError('SUBTITLE_TYPEWRITER_FONT_REQUIRED', '原生打字机需要可用的本地字体', exit_code=2)
+                from .text_typing import TypingParagraph
+                typing_plan = TypingParagraph(root,
+                    build_text_layout(source_subtitle_text, style, font_metrics, font_size),
+                    style, resolved_font_path, font_size, render_clock or {}, final_fps, frame_origin,
+                    clip_start, animation_duration, delay, clip_id, time_expression)
+        elif animation_type == "pop":
+            distance = max(0.0, _num(animation.get("distance", 40), 40))
+            add_alpha(f'if(lt(({time_expression}),{start_expr}),0,{progress})')
+            parts.append(f"y={_expr_arg(f'({base_y})+((1-({progress}))*{distance:.4f})')}")
+        elif animation_type == "bounce":
+            distance = max(0.0, _num(animation.get("distance", 36), 36))
+            bounce_expr = f"({base_y})-abs(sin((({time_expression})-{start_expr})*PI*2))*{distance:.4f}*({progress})"
+            parts.append(f"y={_expr_arg(bounce_expr)}")
+        elif animation_type == "rotate":
+            add_alpha(f'if(lt(({time_expression}),{start_expr}),0,{progress})')
+            if not rotation_supported:
+                warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_animation:rotate", "message": "片段内字幕仍使用淡入近似；独立字幕轨道支持透明文字层旋转"})
+        else:
+            warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": f"subtitle_animation:{animation_type}", "message": "未知字幕动画类型"})
+    base_x = next((option[3:-1] for option in parts if option.startswith("x='")), base_x)
+    base_y = next((option[3:-1] for option in parts if option.startswith("y='")), base_y)
     if word_timing:
         entries: list[tuple[str, float, float, int]] = []
         tick_base = max(1, int(_num(subtitle.get("ticks_per_second", 90000), 90000)))
@@ -1983,10 +2079,6 @@ def _subtitle_filter(
                 return draw(base_parts)
             if resolved_font_path is None:
                 raise AppError('SUBTITLE_WORD_FONT_REQUIRED', '逐字高亮需要明确的本地字体文件', exit_code=2)
-            if subtitle.get('animation') or style.get('animation'):
-                warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip_id,
-                                 'feature': 'subtitle_word_animation',
-                                 'message': '逐字高亮与文字动画尚未联合实现；高亮保留，独立图层旋转仍由外层执行'})
             if int(style.get('line_spacing', 0)) < 0:
                 warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip_id,
                                  'feature': 'subtitle_word_overlapping_lines',
@@ -2002,96 +2094,24 @@ def _subtitle_filter(
                 selected_ranges, timed, base_parts, active_parts,
                 base_x, base_y, time_expression, clip_start, clip_id,
                 window_expression if timeline_window else None,
-                paint_text,
+                paint_text, typing_plan,
             )
-            if layout_evidence is not None:
-                layout_evidence.update(evidence)
-            return value
-    animation = subtitle.get("animation") if isinstance(subtitle.get("animation"), dict) else style.get("animation") if isinstance(style.get("animation"), dict) else {}
-    animation_type = str(animation.get("type", "")).lower().replace("-", "_")
-    if animation_type:
-        animation_duration = max(0.001, _num(animation.get("duration", min(0.3, max(0.05, clip_duration / 4 or 0.3))), 0.3))
-        delay = max(0.0, _num(animation.get("delay", 0.0), 0.0))
-        start_expr = f"({clip_start:.6f}+{delay:.6f})"
-        end_expr = f"({clip_start:.6f}+{delay + animation_duration:.6f})"
-        progress = f"clip((({time_expression})-{start_expr})/{animation_duration:.6f},0,1)"
-        if animation_type in {"fade_in", "fade"}:
-            add_alpha(f'if(lt(({time_expression}),{start_expr}),0,{progress})')
-        elif animation_type == "fade_out":
-            fade_start = clip_start + max(0.0, clip_duration - animation_duration)
-            add_alpha(f'if(gt(({time_expression}),{fade_start:.6f}),clip(({clip_start + clip_duration:.6f}-({time_expression}))/{animation_duration:.6f},0,1),1)')
-        elif animation_type in {"slide_up", "slide_down", "slide_left", "slide_right"}:
-            distance = max(0.0, _num(animation.get("distance", 80), 80))
-            if animation_type == "slide_up":
-                y_expr = f"({base_y})+((1-({progress}))*{distance:.4f})"
-                parts.append(f"y={_expr_arg(y_expr)}")
-            elif animation_type == "slide_down":
-                y_expr = f"({base_y})-((1-({progress}))*{distance:.4f})"
-                parts.append(f"y={_expr_arg(y_expr)}")
-            elif animation_type == "slide_left":
-                x_expr = f"({base_x})+((1-({progress}))*{distance:.4f})"
-                parts.append(f"x={_expr_arg(x_expr)}")
-            else:
-                x_expr = f"({base_x})-((1-({progress}))*{distance:.4f})"
-                parts.append(f"x={_expr_arg(x_expr)}")
-        elif animation_type in {"typewriter", "typing"}:
-            if '\n' in subtitle_text:
-                warnings.append({'code':'RENDER_FEATURE_APPROXIMATE','clip_id':clip_id,
-                                 'feature':'subtitle_multiline_typewriter',
-                                 'message':'多行打字机尚未共享段落排版；当前逐字路径需单独验收'})
-            chars = [item[2] for item in graphemes(subtitle_text) if item[2] != "\n"]
-            if not chars:
-                return None
-            char_step = animation_duration / max(1, len(chars))
-            char_filters: list[str] = []
-            prefix_text = ""
-            for index, char in enumerate(chars):
-                char_parts = [f"drawtext=text='{_drawtext_arg(char)}'", *parts[1:]]
-                char_parts = [part for part in char_parts if not part.startswith("enable=")]
-                prefix_width = _subtitle_text_width(font_metrics, prefix_text, font_size)
-                x_expr = f"({base_x})+({prefix_width:.6f})"
-                char_parts.append(f"x={_expr_arg(x_expr)}")
-                char_parts.append(f"y={_expr_arg(base_y)}")
-                enable_expr = f"gte(({time_expression}),{clip_start + delay + index * char_step:.9f})"
-                if timeline_window:
-                    enable_expr = f"({enable_expr})*({window_expression})"
-                char_parts.append(f"enable={_expr_arg(enable_expr)}")
-                if style.get("box", True):
-                    char_parts.extend(["box=1", f"boxcolor={_quoted(style.get('boxcolor', 'black@0.45'))}", f"boxborderw={box_border}"])
-                char_filters.append(draw(char_parts))
-                prefix_text += char
-            return ",".join(char_filters)
-        elif animation_type == "pop":
-            distance = max(0.0, _num(animation.get("distance", 40), 40))
-            add_alpha(f'if(lt(({time_expression}),{start_expr}),0,{progress})')
-            parts.append(f"y={_expr_arg(f'({base_y})+((1-({progress}))*{distance:.4f})')}")
-        elif animation_type == "bounce":
-            distance = max(0.0, _num(animation.get("distance", 36), 36))
-            bounce_expr = f"({base_y})-abs(sin((({time_expression})-{start_expr})*PI*2))*{distance:.4f}*({progress})"
-            parts.append(f"y={_expr_arg(bounce_expr)}")
-        elif animation_type == "rotate":
-            add_alpha(f'if(lt(({time_expression}),{start_expr}),0,{progress})')
-            if not rotation_supported:
-                warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_animation:rotate", "message": "片段内字幕仍使用淡入近似；独立字幕轨道支持透明文字层旋转"})
-        else:
-            warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": f"subtitle_animation:{animation_type}", "message": "未知字幕动画类型"})
+            return finish(value, evidence)
     if not any(part.startswith("x=") for part in parts):
         parts.append(f"x={_expr_arg(base_x)}")
     if not any(part.startswith("y=") for part in parts):
         parts.append(f"y={_expr_arg(base_y)}")
     if style.get("box", True):
         parts.extend(["box=1", f"boxcolor={_quoted(style.get('boxcolor', 'black@0.45'))}", f"boxborderw={box_border}"])
-    if '\n' in subtitle_text and resolved_font_path is not None:
+    if ('\n' in subtitle_text or typing_plan is not None) and resolved_font_path is not None:
         from .text_highlight import multiline_filter
         x = next(part[3:-1] for part in parts if part.startswith("x='"))
         y = next(part[3:-1] for part in parts if part.startswith("y='"))
         value, evidence = multiline_filter(root, resolved_font_path, font_size,
                                             build_text_layout(source_subtitle_text, style, font_metrics, font_size),
-                                            style, parts, x, y, paint_text)
-        if layout_evidence is not None:
-            layout_evidence.update(evidence)
-        return value
-    return draw(parts)
+                                            style, parts, x, y, paint_text, typing_plan)
+        return finish(value, evidence)
+    return finish(draw(parts))
 
 
 def _compiled_subtitle_filter(
@@ -2114,10 +2134,12 @@ def _compiled_subtitle_filter(
     animation_alpha: list[str] = []
     layout_evidence: dict[str, Any] = {}
     paint_records: list[dict[str, Any]] = []
+    command_targets: dict[str, list[str]] = {}
     def paint_text(parts: list[str]) -> str:
         from .text_paint import paint_drawtext
         result, evidence = paint_drawtext(root, parts, f'{clip.get("id")}-{len(paint_records)}')
         paint_records.append(evidence)
+        command_targets.update(evidence.get('command_targets', {}))
         return result
     value = _subtitle_filter(
         root, subtitle, warnings, str(clip.get('id')), author_start, author_duration,
@@ -2126,6 +2148,8 @@ def _compiled_subtitle_filter(
         animation_alpha=animation_alpha,
         layout_evidence=layout_evidence, dynamic_raster=dynamic_raster and not independent,
         paint_text=paint_text if straight_paint else None,
+        command_targets=command_targets, render_clock=clock, final_fps=fps_value,
+        frame_origin=0. if independent else start,
     )
     if value and animation_alpha and dynamic_raster and not independent:
         # FFmpeg's implicit format converters pin the first geometry in a
@@ -2134,6 +2158,7 @@ def _compiled_subtitle_filter(
         value = _subtitle_filter(
             root, subtitle, warnings, str(clip.get('id')), author_start, author_duration,
             assets=assets, time_expression=_subtitle_authored_expression(clock),
+            dynamic_raster=True,
         )
         warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
                          'feature': 'subtitle_inline_dynamic_alpha',

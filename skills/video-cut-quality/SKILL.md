@@ -138,6 +138,22 @@ invariance separately. Retain old failed outputs and raw color/alpha evidence;
 do not infer linear-light/HDR, ASS, very low-alpha precision or broad typography
 quality from this controlled encoded-RGB acceptance.
 
+For [animation/highlight composition and typing](../../docs/specs/文字动画高亮组合与原生打字机契约_v0.1_2026-10-17.md),
+compare actual untimed animated controls with white/yellow R/G geometry, then
+grade word identity separately. Check revealed prefixes against independently
+authored native prefix runs and a full-paragraph control: center, kerning,
+multiline baselines, wrapping, whitespace delays, one box, border/shadow updates,
+literal command delimiters, reverse/Bezier clocks and fractional CFR. Inspect
+every actual component target and `text_layout.typing` state/command-file hashes.
+Recheck earlier command-file hashes after planning later controls/variants;
+correct existing pixels alone cannot establish deterministic replay integrity.
+Long filter instance names can lose native commands while FFmpeg still exits 0;
+encoded glyph checks are required. Retain old CLI and development failures with
+their frozen sources; separate full-suite, subset and media counts. A declared
+leading timeline gap may be black; preserve the black gate's failure and grade
+the exact authored interval explicitly, without treating all black frames as OK.
+R/G geometry does not accept arbitrary color combinations or general shaping.
+
 Run structural and media gates after rendering:
 
 ```powershell
