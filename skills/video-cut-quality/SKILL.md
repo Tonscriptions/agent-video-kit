@@ -104,6 +104,16 @@ original keyframe geometry. Read the raw and normalized clock error bounds
 separately; 250 us applies before duration normalization and outer composition.
 Do not count a certificate alone as proof of final encoded timing or audio quality.
 
+For [nested captions](../../docs/specs/嵌套字幕与文字动画时钟契约_v0.1_2026-10-16.md),
+check encoded active words, typing prefixes, opacity and rotation against an
+independent original authoring clock. Include reverse half-open boundaries,
+trim offsets and final visibility windows. Check source-frame identity and
+external SRT/ASS time base separately from cue pixels; specify a local font.
+Calibrate encoded opacity against actual blank and opaque CLI controls;
+coverage-weighted moments avoid a sparse threshold bias on fading glyphs.
+Keep raw failed checks. Freeze intervals, arbitrary font color alpha, VFR,
+continuous playback and listening still require separate acceptance.
+
 Run structural and media gates after rendering:
 
 ```powershell

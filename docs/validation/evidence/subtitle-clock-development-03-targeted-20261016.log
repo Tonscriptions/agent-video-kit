@@ -1,0 +1,477 @@
+test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip) ... ERROR
+test_subtitle_clock_asset_style_options_resolve_registered_cues (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_asset_style_options_resolve_registered_cues) ... FAIL
+test_subtitle_clock_fade_animation_uses_authored_duration (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_fade_animation_uses_authored_duration) ... ERROR
+test_subtitle_clock_independent_fade_transition (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_fade_transition) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:281: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  peak=max(.2126*r+.7152*g+.0722*b for r,g,b in image.crop((4,25,WIDTH,HEIGHT)).getdata())
+FAIL
+test_subtitle_clock_independent_rotation_pose (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_rotation_pose) ... ok
+test_subtitle_clock_independent_words_and_final_visibility_window (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_words_and_final_visibility_window) ... 
+  test_subtitle_clock_independent_words_and_final_visibility_window (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_words_and_final_visibility_window) (config={'rates': (1.0, 1.0), 'reverse': True}) ... FAIL
+test_subtitle_clock_inline_eased_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_eased_word_highlights) ... ERROR
+test_subtitle_clock_inline_linear_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_linear_word_highlights) ... ERROR
+test_subtitle_clock_invalid_asset_time_base_rejected_atomically (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_invalid_asset_time_base_rejected_atomically) ... ERROR
+test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing) ... ERROR
+test_subtitle_clock_literal_text_and_custom_position_clock (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_literal_text_and_custom_position_clock) ... ERROR
+test_subtitle_clock_manifest_and_unaccepted_freeze_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_manifest_and_unaccepted_freeze_boundary) ... ERROR
+test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase) ... ERROR
+test_subtitle_clock_reverse_half_open_word_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_reverse_half_open_word_boundary) ... ERROR
+test_subtitle_clock_srt_clip_relative_under_eased_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_srt_clip_relative_under_eased_reverse) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:201: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  count=sum(r>160 and g>160 and b>160 for r,g,b in image.crop((0,23,WIDTH,HEIGHT)).getdata())
+ok
+test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse) ... ERROR
+test_subtitle_clock_typewriter_prefix_matches_original_time (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_typewriter_prefix_matches_original_time) ... ERROR
+
+======================================================================
+ERROR: test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 289, in test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip
+    frames=self.case([{'mode':'ease_in','reverse':True}],file_kind='ass')
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+ERROR: test_subtitle_clock_fade_animation_uses_authored_duration (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_fade_animation_uses_authored_duration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 245, in test_subtitle_clock_fade_animation_uses_authored_duration
+    frames=self.case([{'mode':'ease_in','reverse':True}],independent=independent,text='HHHH',
+                     animation={'type':kind,'duration':1.8})
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+ERROR: test_subtitle_clock_inline_eased_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_eased_word_highlights)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 209, in test_subtitle_clock_inline_eased_word_highlights
+    self.check_words(self.case([{'mode':'ease_in'}]))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+ERROR: test_subtitle_clock_inline_linear_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_linear_word_highlights)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 206, in test_subtitle_clock_inline_linear_word_highlights
+    self.check_words(self.case())
+                     ~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+ERROR: test_subtitle_clock_invalid_asset_time_base_rejected_atomically (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_invalid_asset_time_base_rejected_atomically)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 309, in test_subtitle_clock_invalid_asset_time_base_rejected_atomically
+    self.case(render=False)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+ERROR: test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 215, in test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing
+    self.check_words(self.case([{'mode':'ease_out','reverse':True}],leaf_reverse=True))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+ERROR: test_subtitle_clock_literal_text_and_custom_position_clock (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_literal_text_and_custom_position_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 323, in test_subtitle_clock_literal_text_and_custom_position_clock
+    frames=self.case([{'mode':'ease_in','reverse':True}],text='t t',style=self.style(x='10+12*t'))
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+ERROR: test_subtitle_clock_manifest_and_unaccepted_freeze_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_manifest_and_unaccepted_freeze_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 335, in test_subtitle_clock_manifest_and_unaccepted_freeze_boundary
+    self.case([{'mode':'ease_in'}],render=False)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+ERROR: test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 221, in test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase
+    self.check_words(self.case([{'left':.8,'right':2.7,'start':.23,'mode':'ease_in','reverse':True}]))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+ERROR: test_subtitle_clock_reverse_half_open_word_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_reverse_half_open_word_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 212, in test_subtitle_clock_reverse_half_open_word_boundary
+    self.check_words(self.case([{'rates':(1.,1.),'reverse':True}]))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+ERROR: test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 218, in test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse
+    self.check_words(self.case([{'mode':'bezier','reverse':True},{'rates':(.8,2.),'mode':'ease_out','reverse':True}]))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+ERROR: test_subtitle_clock_typewriter_prefix_matches_original_time (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_typewriter_prefix_matches_original_time)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 229, in test_subtitle_clock_typewriter_prefix_matches_original_time
+    frames=self.case([{'mode':'ease_in','reverse':True}],independent=independent,text='HHHH',
+                     animation={'type':'typewriter','delay':.1,'duration':2.4})
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 109, in call
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 5913, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 4971, in command_render
+    result = render_project(root, project, sequence, output, dry_run=args.dry_run, render_settings=render_settings, profile=profile, cancel_file=cancel_file, progress_callback=progress_callback, resume_of=args.resume)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3599, in render_project
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3070, in build_filter_graph
+    subtitle, subtitle_clock = _compiled_subtitle_filter(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, clip.get('subtitle'), warnings, clip, start,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, fps_value, assets,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 2096, in _compiled_subtitle_filter
+    token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+            ^^^^^^^
+NameError: name 'hashlib' is not defined. Did you forget to import 'hashlib'?
+
+======================================================================
+FAIL: test_subtitle_clock_asset_style_options_resolve_registered_cues (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_asset_style_options_resolve_registered_cues)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 305, in test_subtitle_clock_asset_style_options_resolve_registered_cues
+    result=self.call('render','--project',self.root,'--output',self.output)
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016133921_3c786454', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'PROJECT_INVALID', 'message': '项目验证失败，拒绝渲染', 'path': None, 'retryable': False, 'cause': '{"ok": false, "errors": [{"code": "SOURCE_OUTSIDE_ASSET", "message": "source_out_tick 超出素材长度", "path": "sequences[1].tracks[2].clips[0]", "retryable": false}], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "cues", "rights_ref": "cues", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "cues", "rights_ref": "cues", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "cues", "rights_ref": "cues", "record_version": 1, "context": "project_asset"}], "rights": {"ok": true, "target": "commercial_ad", "checked": 3, "required_records": 3, "failures": [], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "cues", "rights_ref": "cues", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "cues", "rights_ref": "cues", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "cues", "rights_ref": "cues", "record_version": 1, "context": "project_asset"}], "disposition_decisions": [], "effective_disposition_decisions": []}, "schema_engine": "jsonschema", "asset_count": 3, "sequence_count": 2}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T13:39:21.526882Z', 'finished_at': '2026-10-16T13:39:21.526890Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_independent_fade_transition (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_fade_transition)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 283, in test_subtitle_clock_independent_fade_transition
+    self.assertFalse(errors,errors[:12])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: [(26, 0.741234555931926, 0.8116433822660334), (28, 0.6919536720735661, 0.7584556650828546)] is not false : [(26, 0.741234555931926, 0.8116433822660334), (28, 0.6919536720735661, 0.7584556650828546)]
+
+======================================================================
+FAIL: test_subtitle_clock_independent_words_and_final_visibility_window (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_words_and_final_visibility_window) (config={'rates': (1.0, 1.0), 'reverse': True})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 225, in test_subtitle_clock_independent_words_and_final_visibility_window
+    with self.subTest(config=config):self.check_words(self.case([config],independent=True))
+                                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 193, in check_words
+    self.assertFalse(mismatches,mismatches[:12])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [(6, 2.9999944444444444, None, 1, [0, 31])] is not false : [(6, 2.9999944444444444, None, 1, [0, 31])]
+
+----------------------------------------------------------------------
+Ran 17 tests in 21.233s
+
+FAILED (failures=3, errors=12)

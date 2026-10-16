@@ -322,3 +322,7 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 ## 速度 easing/Bezier 增量（2026-10-16）
 
 无新增 CLI 参数。speed_curve 支持实际 ease_in/out/in_out 与二/四元 Bezier；Bezier 现在必须显式提供合法 control_points，缺失句柄不再线性回退。内部零/负速度及编译超预算在写入/执行前结构化拒绝；manifest 保留 SPEED_CURVE_COMPILED 与原/归一化时钟界。详见[契约](./速度曲线Easing与Bezier契约_v0.1_2026-10-16.md)与[正式成片](../validation/速度Easing与Bezier原时钟实测_2026-10-16.md)，VFR、定格/字幕、群组和音频相位的旧边界继续适用。
+
+## 2026-10-16 字幕时间基准
+
+完整 **470/470，1150.472 秒**；92 份产品源码/测试及 Schema 前后摘要一致；18 项新增专项为子集，固定旧版同测 18 方法失败（19 个失败记录，含 subTest）。八组主场景 448 新帧的源帧误差为 0，四份校准另计 288 帧、最大差 1；105 次正式 CLI 含 20 次渲染、12 次质量，0 新模型实测推理。逐字状态、打字机和透明度对应通过；旋转只接受 6 个选定姿态。高亮字形定位仍偏移，动态尺寸内嵌透明度、定格、VFR、群组、自然画质及整体剪映等价未验收。见[实测、原片与复现](../validation/嵌套字幕与文字动画原时钟实测_2026-10-16.md)。

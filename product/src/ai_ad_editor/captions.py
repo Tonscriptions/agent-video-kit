@@ -116,9 +116,13 @@ def parse_ass(text: str) -> list[dict[str, Any]]:
     lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
     format_fields: list[str] = []
     cues: list[dict[str, Any]] = []
+    section = ''
     for line in lines:
         stripped = line.strip()
-        if stripped.lower().startswith("format:") and not format_fields:
+        if stripped.startswith('[') and stripped.endswith(']'):
+            section = stripped.lower()
+            continue
+        if stripped.lower().startswith("format:") and section in {'', '[events]'}:
             format_fields = [item.strip().lower() for item in stripped.split(":", 1)[1].split(",")]
             continue
         if not stripped.lower().startswith("dialogue:"):

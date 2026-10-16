@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import math
 import os
 import copy
@@ -21,6 +22,12 @@ from .project import asset_map
 from .quality import check_output
 from .text_layout import build_text_layout, graphemes, text_width, word_ranges
 from .speed_curves import compile_curve
+from .subtitle_clock import (
+    authored_expression as _subtitle_authored_expression,
+    clock_for_clip as _subtitle_clock_for_clip,
+    make_clock as _make_subtitle_clock,
+    restore_expression as _subtitle_restore_expression,
+)
 from .time_mapping import (
     audio_windows as _nested_audio_windows,
     compose_expression as _clock_expression,
@@ -1821,6 +1828,9 @@ def _subtitle_filter(
     timeline_window: bool = False,
     rotation_supported: bool = False,
     assets: dict[str, dict[str, Any]] | None = None,
+    time_expression: str = 't',
+    visible_window: tuple[float, float] | None = None,
+    animation_alpha: list[str] | None = None,
 ) -> str | None:
     if not isinstance(subtitle, dict):
         return None
@@ -1829,7 +1839,24 @@ def _subtitle_filter(
         if path.exists():
             if subtitle.get("animation") or isinstance(subtitle.get("style"), dict) and subtitle["style"].get("animation"):
                 warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_asset_animation", "message": "外部字幕文件的文字动画未执行"})
-            return f"subtitles=filename='{_quoted(str(path))}'"
+            options = [f"subtitles=filename='{_quoted(_filter_file_path(root, path))}'", "alpha=1"]
+            style = subtitle.get('style') if isinstance(subtitle.get('style'), dict) else {}
+            if style.get('fontfile') or style.get('font_asset_id'):
+                font_path = _subtitle_font_path(root, style, assets)
+                options.append(f"fontsdir='{_quoted(_filter_file_path(root, font_path.parent))}'")
+                metrics = _load_subtitle_font_metrics(font_path, 16)
+                family = metrics.getname()[0] if metrics is not None else ''
+                overrides = []
+                if family and not any(c in family for c in ',=\r\n'):
+                    overrides.append('Fontname=' + family)
+                else:
+                    warnings.append({'code': 'SUBTITLE_ASSET_FONT_FAMILY_UNAVAILABLE', 'clip_id': clip_id,
+                                     'message': '外部字幕可读取本地字体目录，但未取得可用的字体族名称；需核验最终字体'})
+                if 'fontsize' in style:
+                    overrides.append(f"Fontsize={max(1, int(_num(style['fontsize'], 52)))}")
+                if overrides:
+                    options.append(f"force_style='{_quoted(','.join(overrides))}'")
+            return ':'.join(options)
         warnings.append({"code": "SUBTITLE_ASSET_MISSING", "clip_id": clip_id, "message": f"字幕文件不存在: {path}"})
         return None
     if subtitle.get("text") is None:
@@ -1842,8 +1869,18 @@ def _subtitle_filter(
     font_metrics = _load_subtitle_font_metrics(resolved_font_path, font_size)
     subtitle_text = _wrap_subtitle_text(subtitle_text, style, font_size, warnings, clip_id, font_metrics)
     parts = [f"drawtext=text='{_drawtext_arg(subtitle_text)}'", f"fontcolor={_quoted(style.get('fontcolor', 'white'))}", f"fontsize={font_size}"]
+    def add_alpha(expression: str) -> None:
+        if animation_alpha is None:
+            parts.append(f"alpha={_expr_arg(expression)}")
+        else:
+            # drawtext's own alpha option squares opacity on transparent
+            # rasters. Apply authored opacity to normalized glyph alpha.
+            animation_alpha.append(expression)
+
+    window_start, window_duration = visible_window or (clip_start, clip_duration)
+    window_expression = f'gte(t,{window_start:.9f})*lt(t,{window_start + max(0.001, window_duration):.9f})'
     if timeline_window:
-        parts.append(f"enable={_expr_arg(f'between(t,{clip_start:.6f},{clip_start + max(0.001, clip_duration):.6f})')}")
+        parts.append(f"enable={_expr_arg(window_expression)}")
     if resolved_font_path is not None:
         parts.append(f"fontfile='{_quoted(_filter_file_path(root, resolved_font_path))}'")
     integer_options = {
@@ -1887,6 +1924,9 @@ def _subtitle_filter(
             warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": "subtitle_expansion", "message": "字幕 expansion 必须是 none、normal 或 strftime"})
     base_x = str(style.get("x", "(w-text_w)/2"))
     base_y = str(style.get("y", "h-text_h-120"))
+    if time_expression != 't':
+        base_x = re.sub(r'\bt\b', lambda _: f'({time_expression})', base_x)
+        base_y = re.sub(r'\bt\b', lambda _: f'({time_expression})', base_y)
     word_timing = subtitle.get("word_timing")
     if word_timing:
         entries: list[tuple[str, float, float, int]] = []
@@ -1922,9 +1962,9 @@ def _subtitle_filter(
         else:
             base_parts = list(parts)
             if not any(part.startswith("x=") for part in base_parts):
-                base_parts.append(f"x={base_x}")
+                base_parts.append(f"x={_expr_arg(base_x)}")
             if not any(part.startswith("y=") for part in base_parts):
-                base_parts.append(f"y={base_y}")
+                base_parts.append(f"y={_expr_arg(base_y)}")
             if style.get("box", True):
                 base_parts.extend(["box=1", f"boxcolor={_quoted(style.get('boxcolor', 'black@0.45'))}", f"boxborderw={box_border}"])
             word_filters = [":".join(base_parts)]
@@ -1940,8 +1980,8 @@ def _subtitle_filter(
                 prefix_width = _subtitle_text_width(font_metrics, prefix, font_size)
                 word_parts.extend([
                     f"x={_expr_arg(f'({base_x})+({prefix_width:.6f})')}",
-                    f"y={base_y}",
-                    f"enable={_expr_arg(f'gte(t,{clip_start + start_value:.6f})*lt(t,{clip_start + end_value:.6f})')}",
+                    f"y={_expr_arg(base_y)}",
+                    f"enable={_expr_arg(f'gte(({time_expression}),{clip_start + start_value:.9f})*lt(({time_expression}),{clip_start + end_value:.9f})' + ('*(' + window_expression + ')' if timeline_window else ''))}",
                 ])
                 word_filters.append(":".join(word_parts))
                 prefix_text = source_subtitle_text[:source_span[1]] if source_span else prefix_text + word + " "
@@ -1953,12 +1993,12 @@ def _subtitle_filter(
         delay = max(0.0, _num(animation.get("delay", 0.0), 0.0))
         start_expr = f"({clip_start:.6f}+{delay:.6f})"
         end_expr = f"({clip_start:.6f}+{delay + animation_duration:.6f})"
-        progress = f"clip((t-{start_expr})/{animation_duration:.6f},0,1)"
+        progress = f"clip((({time_expression})-{start_expr})/{animation_duration:.6f},0,1)"
         if animation_type in {"fade_in", "fade"}:
-            parts.append(f"alpha={_expr_arg(f'if(lt(t,{start_expr}),0,{progress})')}")
+            add_alpha(f'if(lt(({time_expression}),{start_expr}),0,{progress})')
         elif animation_type == "fade_out":
             fade_start = clip_start + max(0.0, clip_duration - animation_duration)
-            parts.append(f"alpha={_expr_arg(f'if(gt(t,{fade_start:.6f}),clip(({clip_start + clip_duration:.6f}-t)/{animation_duration:.6f},0,1),1)')}")
+            add_alpha(f'if(gt(({time_expression}),{fade_start:.6f}),clip(({clip_start + clip_duration:.6f}-({time_expression}))/{animation_duration:.6f},0,1),1)')
         elif animation_type in {"slide_up", "slide_down", "slide_left", "slide_right"}:
             distance = max(0.0, _num(animation.get("distance", 80), 80))
             if animation_type == "slide_up":
@@ -1986,10 +2026,10 @@ def _subtitle_filter(
                 prefix_width = _subtitle_text_width(font_metrics, prefix_text, font_size)
                 x_expr = f"({base_x})+({prefix_width:.6f})"
                 char_parts.append(f"x={_expr_arg(x_expr)}")
-                char_parts.append(f"y={base_y}")
-                enable_expr = f"gte(t,{clip_start + delay + index * char_step:.6f})"
+                char_parts.append(f"y={_expr_arg(base_y)}")
+                enable_expr = f"gte(({time_expression}),{clip_start + delay + index * char_step:.9f})"
                 if timeline_window:
-                    enable_expr = f"({enable_expr})*lt(t,{clip_start + max(0.001, clip_duration):.6f})"
+                    enable_expr = f"({enable_expr})*({window_expression})"
                 char_parts.append(f"enable={_expr_arg(enable_expr)}")
                 if style.get("box", True):
                     char_parts.extend(["box=1", f"boxcolor={_quoted(style.get('boxcolor', 'black@0.45'))}", f"boxborderw={box_border}"])
@@ -1998,25 +2038,107 @@ def _subtitle_filter(
             return ",".join(char_filters)
         elif animation_type == "pop":
             distance = max(0.0, _num(animation.get("distance", 40), 40))
-            parts.append(f"alpha={_expr_arg(f'if(lt(t,{start_expr}),0,{progress})')}")
+            add_alpha(f'if(lt(({time_expression}),{start_expr}),0,{progress})')
             parts.append(f"y={_expr_arg(f'({base_y})+((1-({progress}))*{distance:.4f})')}")
         elif animation_type == "bounce":
             distance = max(0.0, _num(animation.get("distance", 36), 36))
-            bounce_expr = f"({base_y})-abs(sin((t-{start_expr})*PI*2))*{distance:.4f}*({progress})"
+            bounce_expr = f"({base_y})-abs(sin((({time_expression})-{start_expr})*PI*2))*{distance:.4f}*({progress})"
             parts.append(f"y={_expr_arg(bounce_expr)}")
         elif animation_type == "rotate":
-            parts.append(f"alpha={_expr_arg(f'if(lt(t,{start_expr}),0,{progress})')}")
+            add_alpha(f'if(lt(({time_expression}),{start_expr}),0,{progress})')
             if not rotation_supported:
                 warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "subtitle_animation:rotate", "message": "片段内字幕仍使用淡入近似；独立字幕轨道支持透明文字层旋转"})
         else:
             warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": f"subtitle_animation:{animation_type}", "message": "未知字幕动画类型"})
     if not any(part.startswith("x=") for part in parts):
-        parts.append(f"x={base_x}")
+        parts.append(f"x={_expr_arg(base_x)}")
     if not any(part.startswith("y=") for part in parts):
-        parts.append(f"y={base_y}")
+        parts.append(f"y={_expr_arg(base_y)}")
     if style.get("box", True):
         parts.extend(["box=1", f"boxcolor={_quoted(style.get('boxcolor', 'black@0.45'))}", f"boxborderw={box_border}"])
     return ":".join(parts)
+
+
+def _compiled_subtitle_filter(
+    root: Path, subtitle: Any, warnings: list[dict[str, Any]], clip: dict[str, Any],
+    start: float, duration: float, tps: int, fps_value: str,
+    assets: dict[str, dict[str, Any]], *, independent: bool = False, dynamic_raster: bool = False,
+) -> tuple[str | None, dict[str, Any]]:
+    """Paint at authoring time while keeping the final frame clock intact."""
+    clock = _subtitle_clock_for_clip(clip, start, duration)
+    if not isinstance(subtitle, dict):
+        return None, clock
+    time_base = subtitle.get('asset_time_base', 'sequence')
+    if not isinstance(time_base, str) or time_base not in {'sequence', 'clip'}:
+        raise AppError('SUBTITLE_ASSET_TIME_BASE_INVALID', 'asset_time_base 只支持 sequence 或 clip', exit_code=2)
+    author_start = clock['authored_start_seconds']
+    author_duration = clock['authored_duration_seconds']
+    animation_alpha: list[str] = []
+    value = _subtitle_filter(
+        root, subtitle, warnings, str(clip.get('id')), author_start, author_duration,
+        timeline_window=independent, rotation_supported=independent, assets=assets,
+        time_expression=_subtitle_authored_expression(clock), visible_window=(start, duration),
+        animation_alpha=animation_alpha,
+    )
+    if value and animation_alpha and dynamic_raster and not independent:
+        # FFmpeg's implicit format converters pin the first geometry in a
+        # branched raster; changing clip dimensions can fail or crash it.
+        # Retain the executable legacy drawtext path and disclose its opacity.
+        value = _subtitle_filter(
+            root, subtitle, warnings, str(clip.get('id')), author_start, author_duration,
+            assets=assets, time_expression=_subtitle_authored_expression(clock),
+        )
+        warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
+                         'feature': 'subtitle_inline_dynamic_alpha',
+                         'message': '动态尺寸片段的嵌入文字保留原作者时钟，但透明度仍为原生 drawtext 近似；需使用独立字幕层并单独验收'})
+        animation_alpha = []
+    isolated_raster = independent or not dynamic_raster
+    external = bool(subtitle.get('asset_uri'))
+    if value and external:
+        relative = time_base == 'clip'
+        if clock['maps'] or relative:
+            paint_time = _subtitle_authored_expression(clock, 'PTS*TB', sequential=True)
+            if relative:
+                paint_time = f'(({paint_time})-{author_start:.14g})'
+            if independent:
+                # The title source covers the whole final timeline from 0.
+                # Rebuild that untouched CFR counter outside the visible clip
+                # too, where an ancestor inverse deliberately clamps time.
+                restore = f'N/({fps_value})/TB'
+            else:
+                restored = _subtitle_restore_expression(clock, 'PTS*TB', clip_relative=relative)
+                restore = f'round(({restored})/TB)'
+            value = (f'settb=expr=1/900000000,setpts={_expr_arg(f"({paint_time})/TB")},'
+                     + value + f',setpts={_expr_arg(restore)},settb=expr=1/({fps_value})')
+        if independent:
+            window = f'gte(T,{start:.9f})*lt(T,{start + duration:.9f})'
+            value += (",format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a="
+                      + _expr_arg(f'alpha(X,Y)*({window})') + ',format=rgba')
+    if value and isolated_raster:
+        value += ',format=gbrapf32le,unpremultiply=inplace=1,format=rgba'
+        if animation_alpha:
+            opacity = '*'.join(f'({expression})' for expression in animation_alpha)
+            value += (",format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a="
+                      + _expr_arg('alpha(X,Y)*(' + re.sub(r'\bt\b', 'T', opacity) + ')') + ',format=rgba')
+    if value and not independent and isolated_raster:
+        # Paint onto a separate transparent raster. drawtext/libass alpha on
+        # an existing RGBA image otherwise modifies the base alpha too; a
+        # subsequent compositor can darken even an originally opaque clip.
+        token = hashlib.sha256(str(clip.get('id')).encode('utf-8')).hexdigest()[:16]
+        base, paint, layer = (f'caption_{token}_{name}' for name in ('base', 'paint', 'layer'))
+        value = (f'split=2[{base}][{paint}];[{paint}]format=rgba,'
+                 + 'lutrgb=r=0:g=0:b=0:a=0,' + value
+                 + f'[{layer}];'
+                 + f'[{base}][{layer}]overlay=x=0:y=0:format=auto:shortest=1')
+    clock = {**clock, 'asset_time_base': time_base if external else 'clip-local-inline',
+             'engine': 'libass' if external else 'drawtext',
+             'frame_clock': 'restored-to-final-display-grid' if external else 'unchanged',
+             'continuous_playback_reviewed': False}
+    if value and clock.get('freeze_semantics_approximate'):
+        warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
+                         'feature': 'subtitle_freeze_clock',
+                         'message': '字幕已使用原作者时钟；定格暂停区间尚未精确联合映射，不能据此接受定格字幕对应'})
+    return value, clock
 
 
 def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], warnings: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -2271,6 +2393,8 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                     source_span_tick = max(1, source_limit - source_base)
                     speed_segments = _speed_curve_segments(clip, source_span_tick, int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90000)))
                     clip_clock = _make_clock_map(clip, speed_segments, tps_local)
+                    if clip.get('freeze'):
+                        clip_clock['freeze_semantics_approximate'] = True
                     source_bounds = [
                         _unmap_clock_time(clip_clock, overlap_start / tps_local),
                         _unmap_clock_time(clip_clock, overlap_end / tps_local),
@@ -2357,6 +2481,12 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                 child_clip["id"] = f"{prefix}{clip.get('id', 'clip')}"
                 child_clip["timeline_start_tick"] = mapped_start
                 child_clip["duration_tick"] = mapped_duration
+                if clock_maps and (clip.get('subtitle') or kind == 'subtitle'):
+                    child_clip['_nested_subtitle_clock'] = _make_subtitle_clock(
+                        clip, clock_maps, tps_local, reverse=reverse_time,
+                        approximate_freeze=bool(clip.get('freeze') or any(
+                            value.get('freeze_semantics_approximate') for value in clock_maps)),
+                    )
                 leaf_span_tick = max(1, int(clip.get('source_out_tick', 1)) - int(clip.get('source_in_tick', 0)))
                 leaf_segments = _speed_curve_segments(clip, leaf_span_tick, tps_local)
                 nonlinear_nested = bool(clock_maps) and bool(leaf_segments or any(item['segments'] for item in clock_maps))
@@ -2425,10 +2555,6 @@ def _flatten_sequence_tracks(project: dict[str, Any], sequence: dict[str, Any], 
                     child_clip['reverse'] = bool(reverse_time) ^ bool(clip.get('reverse'))
                     child_clip['speed'] = (child_clip['source_out_tick'] - child_clip['source_in_tick']) / mapped_duration
                     child_clip.pop('speed_curve', None)
-                    if clip.get('subtitle'):
-                        warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
-                                         'feature': 'nested_sequence_caption_cues',
-                                         'message': '嵌套非线性时间映射已覆盖视频和关键帧；字幕 cue/逐字时间与内置入出场仍需独立映射'})
                 elif reverse_time or overlap_start != clip_start or overlap_end != clip_end:
                     source_in = int(child_clip.get("source_in_tick", 0))
                     source_out = int(child_clip.get("source_out_tick", source_in + max(1, int(child_clip.get("duration_tick", 1)))))
@@ -2487,6 +2613,11 @@ def _build_subtitle_layer(
     clip_id = str(overlay.get("clip_id"))
     clip_start = float(overlay.get("start", 0.0))
     clip_duration = max(0.001, float(overlay.get("duration", 0.001)))
+    subtitle_clock = overlay.get('subtitle_clock') or _subtitle_clock_for_clip(clip_value, clip_start, clip_duration)
+    authored_start = subtitle_clock['authored_start_seconds']
+    authored_duration = subtitle_clock['authored_duration_seconds']
+    animation_time = _subtitle_authored_expression(subtitle_clock)
+    animation_time_upper = _subtitle_authored_expression(subtitle_clock, 'T')
     transform = _transform_exprs(clip_value, clip_start, tps)
     canvas_label = f"subtitlecanvas{subtitle_index}"
     layer_label = f"subtitlelayer{subtitle_index}"
@@ -2494,15 +2625,15 @@ def _build_subtitle_layer(
     # drawtext blends onto transparent black as premultiplied RGB. Convert
     # this raster to the straight-alpha contract before effects/transforms;
     # otherwise coverage is multiplied again and glyph edges turn dark.
-    filters.append(f"[{canvas_label}]{overlay['filter']},format=gbrapf32le,unpremultiply=inplace=1,format=rgba[{layer_label}]")
+    filters.append(f"[{canvas_label}]{overlay['filter']},format=rgba[{layer_label}]")
 
     rotation_expression = transform["rotation"]
     if overlay.get("animation_type") == "rotate":
-        animation_start = clip_start + max(0.0, _num(animation.get("delay", 0.0), 0.0))
+        animation_start = authored_start + max(0.0, _num(animation.get("delay", 0.0), 0.0))
         animation_duration = max(0.001, _num(animation.get("duration", 0.3), 0.3))
         from_degrees = _num(animation.get("from_degrees", animation.get("from", -90.0)), -90.0)
         to_degrees = _num(animation.get("to_degrees", animation.get("to", animation.get("angle", 0.0))), 0.0)
-        progress = f"clip((t-{animation_start:.6f})/{animation_duration:.6f},0,1)"
+        progress = f"clip((({animation_time})-{animation_start:.6f})/{animation_duration:.6f},0,1)"
         animation_angle = f"({from_degrees:.6f}+({to_degrees - from_degrees:.6f})*{progress})"
         rotation_expression = f"({transform['rotation']})+({animation_angle})"
     affine_text = rotation_expression != '0.00000000' or bool(clip_value.get('tracking_binding'))
@@ -2606,12 +2737,12 @@ def _build_subtitle_layer(
             return False
         spatial_type, direction = spatial
         transition_duration = max(0.001, _num(config.get("duration", 0.25), 0.25))
-        time_variable = "T" if spatial_type == "wipe" else "t"
+        time_variable = animation_time_upper if spatial_type == 'wipe' else animation_time
         if entering:
-            progress = f"clip(({time_variable}-{clip_start:.6f})/{transition_duration:.6f},0,1)"
+            progress = f"clip((({time_variable})-{authored_start:.6f})/{transition_duration:.6f},0,1)"
         else:
-            transition_start = clip_start + max(0.0, clip_duration - transition_duration)
-            progress = f"clip(({time_variable}-{transition_start:.6f})/{transition_duration:.6f},0,1)"
+            transition_start = authored_start + max(0.0, authored_duration - transition_duration)
+            progress = f"clip((({time_variable})-{transition_start:.6f})/{transition_duration:.6f},0,1)"
         if spatial_type == "slide":
             offset = _slide_offset(direction)
             if entering:
@@ -2628,7 +2759,7 @@ def _build_subtitle_layer(
     if incoming_type:
         if incoming_type in {"fade", "fade_in", "dissolve", "crossfade"}:
             transition_duration = max(0.001, _num(incoming.get("duration", 0.25), 0.25))
-            transition_expr = f"if(lt(T,{clip_start:.6f}),0,clip((T-{clip_start:.6f})/{transition_duration:.6f},0,1))"
+            transition_expr = f"if(lt(({animation_time_upper}),{authored_start:.6f}),0,clip((({animation_time_upper})-{authored_start:.6f})/{transition_duration:.6f},0,1))"
             transition_opacity = f"({transition_opacity})*({transition_expr})"
         elif not _apply_spatial(incoming, incoming_type, entering=True):
             unsupported_transitions.append(f"transition_in:{incoming_type}")
@@ -2636,9 +2767,9 @@ def _build_subtitle_layer(
     if outgoing_type:
         if outgoing_type in {"fade", "fade_out", "dissolve", "crossfade"}:
             transition_duration = max(0.001, _num(outgoing.get("duration", 0.25), 0.25))
-            fade_start = clip_start + max(0.0, clip_duration - transition_duration)
-            fade_end = clip_start + clip_duration
-            transition_expr = f"if(gt(T,{fade_start:.6f}),clip(({fade_end:.6f}-T)/{transition_duration:.6f},0,1),1)"
+            fade_start = authored_start + max(0.0, authored_duration - transition_duration)
+            fade_end = authored_start + authored_duration
+            transition_expr = f"if(gt(({animation_time_upper}),{fade_start:.6f}),clip(({fade_end:.6f}-({animation_time_upper}))/{transition_duration:.6f},0,1),1)"
             transition_opacity = f"({transition_opacity})*({transition_expr})"
         elif not _apply_spatial(outgoing, outgoing_type, entering=False):
             unsupported_transitions.append(f"transition_out:{outgoing_type}")
@@ -2752,23 +2883,20 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 subtitle = clip.get("subtitle") if isinstance(clip.get("subtitle"), dict) else None
                 if subtitle is None and asset and asset.get("kind") == "subtitle":
                     subtitle = {"asset_uri": asset.get("uri")}
+                elif subtitle is not None and asset and asset.get('kind') == 'subtitle' and not subtitle.get('asset_uri') and 'text' not in subtitle:
+                    subtitle = {'asset_uri': asset.get('uri'), **subtitle}
                 if subtitle is None:
                     warnings.append({"code": "SUBTITLE_TRACK_EMPTY", "clip_id": clip.get("id"), "feature": "subtitle_track", "message": "独立字幕轨道片段缺少内联 subtitle 或 subtitle 资产"})
                     continue
                 clip_start = _sec(int(clip.get("timeline_start_tick", 0)), tps)
                 clip_duration = max(0.001, _sec(int(clip.get("duration_tick", 1)), tps))
-                subtitle_filter = _subtitle_filter(
-                    root,
-                    subtitle,
-                    warnings,
-                    str(clip.get("id")),
-                    clip_start,
-                    clip_duration,
-                    timeline_window=True,
-                    rotation_supported=True,
-                    assets=assets,
+                subtitle_filter, subtitle_clock = _compiled_subtitle_filter(
+                    root, subtitle, warnings, clip, clip_start, clip_duration,
+                    tps, fps_value, assets, independent=True,
                 )
                 if subtitle_filter:
+                    input_meta.append({'kind': 'subtitle', 'clip_id': clip.get('id'),
+                                       'subtitle_time_mapping': copy.deepcopy(subtitle_clock)})
                     animation = subtitle.get("animation") if isinstance(subtitle.get("animation"), dict) else subtitle.get("style", {}).get("animation") if isinstance(subtitle.get("style"), dict) and isinstance(subtitle.get("style", {}).get("animation"), dict) else {}
                     animation_type = str(animation.get("type", "")).lower().replace("-", "_")
                     subtitle_overlays.append({
@@ -2781,6 +2909,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                         "duration": clip_duration,
                         "animation_type": animation_type,
                         "animation": animation,
+                        "subtitle_clock": subtitle_clock,
                     })
                 continue
             if not asset:
@@ -2969,7 +3098,12 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 )
                 if speed_segments and curve_duration is not None and abs(curve_duration - (src_out - src_in) / max(speed, 1e-9)) > 1e-6:
                     speed = max(0.01, (src_out - src_in) / max(1e-9, curve_duration))
-                subtitle = _subtitle_filter(root, clip.get("subtitle"), warnings, str(clip.get("id")), start, max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)), assets=assets)
+                subtitle, subtitle_clock = _compiled_subtitle_filter(
+                    root, clip.get('subtitle'), warnings, clip, start,
+                    max(0.001, curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9)),
+                    tps, fps_value, assets,
+                    dynamic_raster=not affine_canvas and not bool(re.fullmatch(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)', transforms['scale'])),
+                )
                 if subtitle:
                     chain.append(subtitle)
                 mask_values: list[dict[str, Any]] = []
@@ -3019,6 +3153,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     "blend": clip.get("blend"),
                 })
                 input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "input": index, "kind": "video", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
+                if subtitle:
+                    input_meta[-1]['subtitle_time_mapping'] = copy.deepcopy(subtitle_clock)
                 if nested_maps:
                     input_meta[-1]['nested_time_mapping'] = {'version': '1', 'maps': copy.deepcopy(nested_maps),
                                                             'source_display_fps': nominal_value,

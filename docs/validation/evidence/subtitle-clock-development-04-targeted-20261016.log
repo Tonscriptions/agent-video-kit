@@ -1,0 +1,46 @@
+test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:201: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  count=sum(r>160 and g>160 and b>160 for r,g,b in image.crop((0,23,WIDTH,HEIGHT)).getdata())
+ok
+test_subtitle_clock_asset_style_options_resolve_registered_cues (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_asset_style_options_resolve_registered_cues) ... ok
+test_subtitle_clock_fade_animation_uses_authored_duration (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_fade_animation_uses_authored_duration) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:246: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  pixels=list(image.crop((4,25,WIDTH,HEIGHT)).getdata())
+FAIL
+test_subtitle_clock_independent_fade_transition (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_fade_transition) ... FAIL
+test_subtitle_clock_independent_rotation_pose (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_rotation_pose) ... ok
+test_subtitle_clock_independent_words_and_final_visibility_window (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_words_and_final_visibility_window) ... ok
+test_subtitle_clock_inline_eased_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_eased_word_highlights) ... ok
+test_subtitle_clock_inline_linear_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_linear_word_highlights) ... ok
+test_subtitle_clock_invalid_asset_time_base_rejected_atomically (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_invalid_asset_time_base_rejected_atomically) ... ok
+test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing) ... ok
+test_subtitle_clock_literal_text_and_custom_position_clock (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_literal_text_and_custom_position_clock) ... ok
+test_subtitle_clock_manifest_and_unaccepted_freeze_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_manifest_and_unaccepted_freeze_boundary) ... ok
+test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase) ... ok
+test_subtitle_clock_reverse_half_open_word_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_reverse_half_open_word_boundary) ... ok
+test_subtitle_clock_srt_clip_relative_under_eased_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_srt_clip_relative_under_eased_reverse) ... ok
+test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse) ... ok
+test_subtitle_clock_typewriter_prefix_matches_original_time (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_typewriter_prefix_matches_original_time) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:239: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  if sum(r>165 and g>165 and b>165 for r,g,b in region.getdata())>4:observed+=1
+ok
+
+======================================================================
+FAIL: test_subtitle_clock_fade_animation_uses_authored_duration (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_fade_animation_uses_authored_duration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 267, in test_subtitle_clock_fade_animation_uses_authored_duration
+    self.assertFalse(errors,errors[:12])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: [(21, 0.876571276949363, 0.8049022968227519), (22, 0.8479556418162858, 0.7497641243719142), (23, 0.8201580862671048, 0.7154725658072879), (24, 0.7931331522333486, 0.665060619216582), (25, 0.7668384805538329, 0.6305335983296266), (26, 0.741234555931926, 0.5853281117864962), (27, 0.7162844657420517, 0.5575958104401466), (28, 0.6919536720735661, 0.5321886724247791), (29, 0.668209829272606, 0.5020696319651808), (30, 0.6450226001664172, 0.4753734949267597), (31, 0.622363498501893, 0.44631679932336), (32, 0.6002057420292982, 0.42139145386140436), (33, 0.5785241207747053, 0.3981524500914324), (34, 0.5572948817732108, 0.3730297748448454), (35, 0.5364956093277854, 0.3501554016094746), (36, 0.5161051329370389, 0.3330704799059817), (37, 0.4961034366687685, 0.3153885278734619), (38, 0.47647156523977957, 0.29887413072652375), (39, 0.45719156342159406, 0.26808041265964444), (40, 0.4382463872467838, 0.2679429512302185), (41, 0.4196198571443579, 0.24984232724151334), (42, 0.40129658407692553, 0.23993049633576635), (43, 0.3832619188577445, 0.22726244452115488), (44, 0.3655019044437145, 0.21258342305681827), (45, 0.34800322931207356, 0.20363016338477924), (46, 0.33075317487189126, 0.1874333476712033), (47, 0.31373958611414626, 0.18364440441054933), (48, 0.29695083014927537, 0.17152224141918265), (49, 0.280375756477508, 0.16049464758204035), (50, 0.2640036730436315, 0.1570576240100883), (51, 0.24782431086982987, 0.14707299708710192), (52, 0.23182779508649362, 0.1443452874999559), (53, 0.21600462289075872, 0.13371858669595016), (54, 0.20034563490862214, 0.13254718332397686), (55, 0.18484199367246865, 0.11650249123093874), (66, 0.022290239217927037, 0.09866700627300524)] is not false : [(21, 0.876571276949363, 0.8049022968227519), (22, 0.8479556418162858, 0.7497641243719142), (23, 0.8201580862671048, 0.7154725658072879), (24, 0.7931331522333486, 0.665060619216582), (25, 0.7668384805538329, 0.6305335983296266), (26, 0.741234555931926, 0.5853281117864962), (27, 0.7162844657420517, 0.5575958104401466), (28, 0.6919536720735661, 0.5321886724247791), (29, 0.668209829272606, 0.5020696319651808), (30, 0.6450226001664172, 0.4753734949267597), (31, 0.622363498501893, 0.44631679932336), (32, 0.6002057420292982, 0.42139145386140436)]
+
+======================================================================
+FAIL: test_subtitle_clock_independent_fade_transition (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_fade_transition)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 296, in test_subtitle_clock_independent_fade_transition
+    self.assertFalse(errors,errors[:12])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: [(44, 0.3655019044437145, 0.4351041902828026), (46, 0.33075317487189126, 0.39647680634707794), (47, 0.31373958611414626, 0.38030352269571915), (48, 0.29695083014927537, 0.36195193533309766), (50, 0.2640036730436315, 0.3351520769081303), (51, 0.24782431086982987, 0.3155972987824903), (52, 0.23182779508649362, 0.29939308658116925), (53, 0.21600462289075872, 0.2914366226444454), (54, 0.20034563490862214, 0.2786592452000729), (55, 0.18484199367246865, 0.25582145277363544), (56, 0.1694851633188507, 0.24677517576882474), (57, 0.1542668850666684, 0.23175688184188709), (58, 0.1391791628515055, 0.21795332965474268), (59, 0.12421424262055213, 0.20832221698005152), (60, 0.10936459497724618, 0.19271050511544277), (61, 0.09462289929353498, 0.19001332505027504), (62, 0.07998202842691007, 0.1614603090288408), (63, 0.06543503539143622, 0.15081365498719382), (64, 0.050975136827333616, 0.1398131578228979), (65, 0.03659570244372011, 0.1277165863133848), (66, 0.022290239217927037, 0.1166176359638686)] is not false : [(44, 0.3655019044437145, 0.4351041902828026), (46, 0.33075317487189126, 0.39647680634707794), (47, 0.31373958611414626, 0.38030352269571915), (48, 0.29695083014927537, 0.36195193533309766), (50, 0.2640036730436315, 0.3351520769081303), (51, 0.24782431086982987, 0.3155972987824903), (52, 0.23182779508649362, 0.29939308658116925), (53, 0.21600462289075872, 0.2914366226444454), (54, 0.20034563490862214, 0.2786592452000729), (55, 0.18484199367246865, 0.25582145277363544), (56, 0.1694851633188507, 0.24677517576882474), (57, 0.1542668850666684, 0.23175688184188709)]
+
+----------------------------------------------------------------------
+Ran 17 tests in 98.438s
+
+FAILED (failures=2)

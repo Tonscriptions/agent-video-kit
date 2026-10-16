@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_subtitle_clock.py", line 209, in <module>
+    p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--font',type=Path,required=True);p.add_argument('--font-license',type=Path,required=True);a=p.parse_args();run(a.output.resolve(),a.work.resolve(),a.font.resolve(),a.font_license.resolve())
+                                                                                                                                                                                                                                                               ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_subtitle_clock.py", line 163, in run
+    if not old:quality[name]=cli('quality','check','--project',project,'--output',path,'--require-audio','--expensive','--fail-on-black','--max-peak-dbfs','-1')['data']
+                             ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_subtitle_clock.py", line 39, in cli
+    p=subprocess.run(argv,cwd=ROOT,capture_output=True,timeout=300);v=json.loads(p.stdout.decode('utf-8-sig'))
+                                                                      ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "json\__init__.py", line 352, in loads
+  File "json\decoder.py", line 345, in decode
+  File "json\decoder.py", line 363, in raw_decode
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)

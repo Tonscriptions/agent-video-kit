@@ -1,0 +1,113 @@
+test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip) ... FAIL
+test_subtitle_clock_asset_style_options_resolve_registered_cues (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_asset_style_options_resolve_registered_cues) ... FAIL
+test_subtitle_clock_fade_animation_uses_authored_duration (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_fade_animation_uses_authored_duration) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:245: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  peak=max(r for r,g,b in image.crop((4,25,WIDTH,HEIGHT)).getdata())
+FAIL
+test_subtitle_clock_independent_fade_transition (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_fade_transition) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:274: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  peak=max(r for r,g,b in image.crop((4,25,WIDTH,HEIGHT)).getdata())
+FAIL
+test_subtitle_clock_independent_rotation_pose (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_rotation_pose) ... ok
+test_subtitle_clock_independent_words_and_final_visibility_window (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_words_and_final_visibility_window) ... ok
+test_subtitle_clock_inline_eased_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_eased_word_highlights) ... ok
+test_subtitle_clock_inline_linear_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_linear_word_highlights) ... ok
+test_subtitle_clock_invalid_asset_time_base_rejected_atomically (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_invalid_asset_time_base_rejected_atomically) ... ok
+test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing) ... ok
+test_subtitle_clock_literal_text_and_custom_position_clock (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_literal_text_and_custom_position_clock) ... FAIL
+test_subtitle_clock_manifest_and_unaccepted_freeze_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_manifest_and_unaccepted_freeze_boundary) ... ok
+test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase) ... FAIL
+test_subtitle_clock_reverse_half_open_word_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_reverse_half_open_word_boundary) ... ok
+test_subtitle_clock_srt_clip_relative_under_eased_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_srt_clip_relative_under_eased_reverse) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:194: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  count=sum(r>160 and g>160 and b>160 for r,g,b in image.crop((0,23,WIDTH,HEIGHT)).getdata())
+FAIL
+test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse) ... ok
+test_subtitle_clock_typewriter_prefix_matches_original_time (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_typewriter_prefix_matches_original_time) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:232: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  if sum(r>165 and g>165 and b>165 for r,g,b in region.getdata())>4:observed+=1
+ok
+
+======================================================================
+FAIL: test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 282, in test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip
+    frames=self.case([{'mode':'ease_in','reverse':True}],file_kind='ass')
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 118, in case
+    ingested=self.call('media','ingest','--project',self.root,'--input',path,'--asset-id','cues')
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'media.ingest', 'request_id': 'req_20261016133400_c0de187a', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'ARGUMENT_INVALID', 'message': 'ASS 时间码无效:  -> ', 'path': 'dialogue', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T13:34:00.432989Z', 'finished_at': '2026-10-16T13:34:00.432997Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_asset_style_options_resolve_registered_cues (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_asset_style_options_resolve_registered_cues)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 293, in test_subtitle_clock_asset_style_options_resolve_registered_cues
+    self.case([{'rates':(1.,1.)}],independent=True,file_kind='ass',render=False)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 118, in case
+    ingested=self.call('media','ingest','--project',self.root,'--input',path,'--asset-id','cues')
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'media.ingest', 'request_id': 'req_20261016133400_65f95fe1', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'ARGUMENT_INVALID', 'message': 'ASS 时间码无效:  -> ', 'path': 'dialogue', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T13:34:00.905006Z', 'finished_at': '2026-10-16T13:34:00.905012Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_fade_animation_uses_authored_duration (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_fade_animation_uses_authored_duration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 248, in test_subtitle_clock_fade_animation_uses_authored_duration
+    self.assertFalse(errors,errors[:12])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: [(19, 0.936455987464998, 0.8564102564102564), (20, 0.9060538578126347, 0.8102564102564103), (21, 0.876571276949363, 0.7538461538461538), (22, 0.8479556418162858, 0.7230769230769231), (23, 0.8201580862671048, 0.6820512820512821), (24, 0.7931331522333486, 0.6358974358974359), (25, 0.7668384805538329, 0.6051282051282051), (26, 0.741234555931926, 0.5435897435897435), (27, 0.7162844657420517, 0.5282051282051282), (28, 0.6919536720735661, 0.5025641025641026), (29, 0.668209829272606, 0.4717948717948718), (30, 0.6450226001664172, 0.4564102564102564), (31, 0.622363498501893, 0.4358974358974359), (32, 0.6002057420292982, 0.41025641025641024), (33, 0.5785241207747053, 0.38461538461538464), (34, 0.5572948817732108, 0.37948717948717947), (35, 0.5364956093277854, 0.35384615384615387), (36, 0.5161051329370389, 0.35384615384615387), (37, 0.4961034366687685, 0.3282051282051282), (38, 0.47647156523977957, 0.29743589743589743), (39, 0.45719156342159406, 0.29743589743589743), (40, 0.4382463872467838, 0.2717948717948718), (41, 0.4196198571443579, 0.26153846153846155), (42, 0.40129658407692553, 0.2564102564102564), (43, 0.3832619188577445, 0.24615384615384617), (44, 0.3655019044437145, 0.24102564102564103), (45, 0.34800322931207356, 0.2358974358974359), (46, 0.33075317487189126, 0.2153846153846154), (47, 0.31373958611414626, 0.2153846153846154), (48, 0.29695083014927537, 0.2153846153846154), (49, 0.280375756477508, 0.18461538461538463), (50, 0.2640036730436315, 0.18461538461538463), (51, 0.24782431086982987, 0.1794871794871795)] is not false : [(19, 0.936455987464998, 0.8564102564102564), (20, 0.9060538578126347, 0.8102564102564103), (21, 0.876571276949363, 0.7538461538461538), (22, 0.8479556418162858, 0.7230769230769231), (23, 0.8201580862671048, 0.6820512820512821), (24, 0.7931331522333486, 0.6358974358974359), (25, 0.7668384805538329, 0.6051282051282051), (26, 0.741234555931926, 0.5435897435897435), (27, 0.7162844657420517, 0.5282051282051282), (28, 0.6919536720735661, 0.5025641025641026), (29, 0.668209829272606, 0.4717948717948718), (30, 0.6450226001664172, 0.4564102564102564)]
+
+======================================================================
+FAIL: test_subtitle_clock_independent_fade_transition (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_fade_transition)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 276, in test_subtitle_clock_independent_fade_transition
+    self.assertFalse(errors,errors[:12])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: [(34, 0.5572948817732108, 0.6307692307692307), (38, 0.47647156523977957, 0.5435897435897435), (44, 0.3655019044437145, 0.4307692307692308), (47, 0.31373958611414626, 0.38974358974358975), (48, 0.29695083014927537, 0.3641025641025641)] is not false : [(34, 0.5572948817732108, 0.6307692307692307), (38, 0.47647156523977957, 0.5435897435897435), (44, 0.3655019044437145, 0.4307692307692308), (47, 0.31373958611414626, 0.38974358974358975), (48, 0.29695083014927537, 0.3641025641025641)]
+
+======================================================================
+FAIL: test_subtitle_clock_literal_text_and_custom_position_clock (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_literal_text_and_custom_position_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 316, in test_subtitle_clock_literal_text_and_custom_position_clock
+    frames=self.case([{'mode':'ease_in','reverse':True}],text='t t',style=self.style(x='10+12*t'))
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 153, in case
+    self.call('render','--project',self.root,'--output',self.output)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 6 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016133418_3a590c32', 'operation_id': 'render_20261016133418_c209af1e', 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'RENDER_FAILED', 'message': 'FFmpeg 渲染失败', 'path': None, 'retryable': True, 'cause': "0,3.2291218927602)),2.6990900384297),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),2.6824771976337),(2.26953125+(1.7986293038922*(exp(0.89464285714286*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.6656122016623))-1))),(2.296875+(1.8043639053255*(exp(0.90535714285714*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.6824771976337))-1)))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),2.7154552830531),(2.32421875+(1.8102841739766*(exp(0.91607142857143*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.6990900384297))-1))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),2.7474594851024),(2.3515625+(1.8059446839081*(exp(0.93214285714285*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.7154552830531))-1))),(2.40625+(1.8188202247191*(exp(0.95357142857143*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.7474594851024))-1)))))))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),3.021149554835),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),2.8940786707422),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),2.837981797724),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),2.8086894834929),(2.4609375+(1.8323317307692*(exp(0.975*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.7785262712734))-1))),(2.515625+(1.846438172043*(exp(0.99642857142857*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.8086894834929))-1)))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),2.8664347337955),(2.5703125+(1.8611019736842*(exp(1.0178571428571*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.837981797724))-1))),(2.625+(1.8762886597938*(exp(1.0392857142857*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.8664347337955))-1))))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),2.9470554820334),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),2.9209428666369),(2.6796875+(1.891966540404*(exp(1.0607142857143*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.8940786707422))-1))),(2.734375+(1.9081064356436*(exp(1.0821428571428*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.9209428666369))-1)))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),2.9724436062557),(2.7890625+(1.9246814320388*(exp(1.1035714285714*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.9470554820334))-1))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),2.997133285878),(2.84375+(1.9416666666667*(exp(1.125*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.9724436062557))-1))),(2.8984375+(1.959039135514*(exp(1.1464285714286*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-2.997133285878))-1))))))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),3.1319390323441),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),3.0672571216062),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),3.0445164656828),(2.953125+(1.9767775229358*(exp(1.1678571428571*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-3.021149554835))-1))),(3.0078125+(1.9948620495495*(exp(1.1892857142857*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-3.0445164656828))-1)))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),3.0893937088299),(3.0625+(2.0132743362832*(exp(1.2107142857143*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-3.0672571216062))-1))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),3.1109475291497),(3.1171875+(2.0319972826087*(exp(1.2321428571429*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-3.0893937088299))-1))),(3.171875+(2.051014957265*(exp(1.2535714285714*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-3.1109475291497))-1)))))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),3.1723128185039),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),3.1523878482733),(3.2265625+(2.0703125*(exp(1.275*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-3.1319390323441))-1))),(3.28125+(2.0898760330579*(exp(1.2964285714286*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-3.1523878482733))-1)))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),3.1917320273325),(3.3359375+(2.1096925813008*(exp(1.3178571428572*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-3.1723128185039))-1))),if(lt((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602)),3.2106628321061),(3.390625+(2.12975*(exp(1.3392857142857*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-3.1917320273325))-1))),(3.4453125+(2.1500369094488*(exp(1.3607142857143*((clip(((3.2291888888889-(((t)-0))))/1.0000207474759,0,3.2291218927602))-3.2106628321061))-1)))))))))))),0,3.5)))-5.5555555555556e-06)):y=34[v0];color=c=black:s=96x64:r=24/1:d=3.229189[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vout];anullsrc=r=48000:cl=stereo,atrim=duration=3.229189[aout]' around: [v0];color=c=black:s=96x64:r=24/1:d=3.229189[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vout];anullsrc=r=48000:cl=stereo,atrim=duration=3.229189[aout]\nError : Invalid argument\n", 'operation_id': 'render_20261016133418_c209af1e'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T13:34:18.511351Z', 'finished_at': '2026-10-16T13:34:18.511360Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 214, in test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase
+    self.check_words(self.case([{'left':.8,'right':2.7,'start':.23,'mode':'ease_in','reverse':True}]))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 186, in check_words
+    self.assertFalse(mismatches,mismatches[:12])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [(0, 2.4499944444444446, 1, None, [0, 0]), (1, 2.4499944444444446, 1, None, [0, 0]), (2, 2.4499944444444446, 1, None, [0, 0]), (3, 2.4499944444444446, 1, None, [0, 0]), (4, 2.4499944444444446, 1, None, [0, 0]), (5, 2.4499944444444446, 1, None, [0, 0])] is not false : [(0, 2.4499944444444446, 1, None, [0, 0]), (1, 2.4499944444444446, 1, None, [0, 0]), (2, 2.4499944444444446, 1, None, [0, 0]), (3, 2.4499944444444446, 1, None, [0, 0]), (4, 2.4499944444444446, 1, None, [0, 0]), (5, 2.4499944444444446, 1, None, [0, 0])]
+
+======================================================================
+FAIL: test_subtitle_clock_srt_clip_relative_under_eased_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_srt_clip_relative_under_eased_reverse)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 279, in test_subtitle_clock_srt_clip_relative_under_eased_reverse
+    self.check_cues(self.case([{'mode':'ease_in','reverse':True}],independent=True,file_kind='srt',time_base='clip'),'clip')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 196, in check_cues
+    self.assertFalse(errors,errors[:12])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: [(9, 2.601165204484305, True, 0), (10, 2.522594966215054, True, 0), (11, 2.4471955823282596, True, 0), (12, 2.374749918318864, True, 0), (13, 2.305059845830232, True, 0), (14, 2.2379441976397136, True, 0), (15, 2.1732369802467524, True, 0), (16, 2.1107857966362937, True, 0), (17, 2.050450485226879, True, 0), (18, 1.9921018840798392, True, 0), (19, 1.9356207774369965, True, 0), (20, 1.8808969440627425, True, 0), (40, 1.0388434970442109, True, 0), (41, 1.0053157428598443, True, 0), (42, 0.972333851338466, True, 0), (43, 0.9398714539439401, True, 0), (44, 0.9079034279986861, True, 0), (45, 0.8764058127617325, True, 0), (46, 0.8453557147694043, True, 0), (47, 0.8147312550054633, True, 0), (48, 0.7845114942686957, True, 0), (49, 0.7546763616595145, True, 0), (50, 0.7252066114785367, True, 0), (51, 0.6960837595656938, True, 0), (52, 0.6672900311556885, True, 0), (53, 0.6388083212033657, True, 0), (54, 0.6106221428355199, True, 0), (55, 0.5827155886104436, True, 0), (56, 0.5550732939739312, True, 0), (57, 0.5276803931200031, True, 0), (58, 0.5005224931327099, True, 0), (59, 0.47358563671699383, True, 0)] is not false : [(9, 2.601165204484305, True, 0), (10, 2.522594966215054, True, 0), (11, 2.4471955823282596, True, 0), (12, 2.374749918318864, True, 0), (13, 2.305059845830232, True, 0), (14, 2.2379441976397136, True, 0), (15, 2.1732369802467524, True, 0), (16, 2.1107857966362937, True, 0), (17, 2.050450485226879, True, 0), (18, 1.9921018840798392, True, 0), (19, 1.9356207774369965, True, 0), (20, 1.8808969440627425, True, 0)]
+
+----------------------------------------------------------------------
+Ran 17 tests in 32.978s
+
+FAILED (failures=7)

@@ -1,0 +1,15 @@
+test_keyframes_effects_subtitle_and_audio_automation_render (test_cli.P0CliTests.test_keyframes_effects_subtitle_and_audio_automation_render) ... FAIL
+
+======================================================================
+FAIL: test_keyframes_effects_subtitle_and_audio_automation_render (test_cli.P0CliTests.test_keyframes_effects_subtitle_and_audio_automation_render)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_cli.py", line 2275, in test_keyframes_effects_subtitle_and_audio_automation_render
+    self.assertEqual(code, 0, result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 6 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016135330_df374f40', 'operation_id': 'render_20261016135329_b38a0566', 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'RENDER_FAILED', 'message': 'FFmpeg 渲染失败', 'path': None, 'retryable': True, 'cause': '[fc#0 @ 0000026e6907c8c0] Error requesting a frame from the filtergraph: Invalid argument\n[fc#0 @ 0000026e6907c8c0] Error sending frames to consumers: Invalid argument\n[fc#0 @ 0000026e6907c8c0] Task finished with error code: -22 (Invalid argument)\n[fc#0 @ 0000026e6907c8c0] Terminating thread with return code -22 (Invalid argument)\n', 'operation_id': 'render_20261016135329_b38a0566'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T13:53:30.259784Z', 'finished_at': '2026-10-16T13:53:30.259793Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 1 test in 2.248s
+
+FAILED (failures=1)

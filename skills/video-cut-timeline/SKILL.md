@@ -65,8 +65,18 @@ handles must be finite, x handles in 0..1 and the entire speed curve positive.
 Inspect SPEED_CURVE_COMPILED certificates: 250 us is an unnormalized per-curve
 clock bound, not a composed output guarantee. Segment/expression budget failures
 must remain errors; audio is still windowed. Endpoint speed floor 0.01 remains.
-Freeze, caption cues, parent pivots and group coordinate spaces
-keep separate acceptance boundaries. A render intentionally records outputs
+Freeze, parent pivots and group coordinate spaces keep separate acceptance
+boundaries. Nested captions use the original authoring clock; see the
+[caption clock contract](../../docs/specs/嵌套字幕与文字动画时钟契约_v0.1_2026-10-16.md).
+Inline word/animation offsets are clip-local; custom x/y t is author-sequence
+time. Leaf media reverse does not independently reverse inline overlay cues.
+External SRT/ASS defaults to author-sequence timestamps; choose
+`subtitle.asset_time_base=clip` for clip-relative files. Supply a local font
+asset and verify its actual family; libass fontsize uses ASS units. Captions
+on frozen intervals, file animation and inline rotate retain explicit limits.
+Dynamic-size inline alpha animation remains approximate; prefer an independent
+title track for that combination. Active-word timing does not accept glyph
+placement: inspect the actual highlight alignment. A render intentionally records outputs
 and provenance; compare authored timeline/assets/settings and Rights Ledger
 when checking that generated internal clocks were not persisted.
 

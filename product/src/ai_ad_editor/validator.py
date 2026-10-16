@@ -426,7 +426,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                         error("SUBTITLE_ASSET_KIND_INVALID", "subtitle 轨道只能引用 subtitle 资产", f"{cp}.asset_id")
                 if clip.get("asset_id"):
                     asset = asset_map(project).get(clip.get("asset_id"))
-                    if asset and _int(asset.get("probe", {}).get("duration_tick", 0)) and src_out > _int(asset["probe"]["duration_tick"]):
+                    if asset and asset.get("kind") != "subtitle" and _int(asset.get("probe", {}).get("duration_tick", 0)) and src_out > _int(asset["probe"]["duration_tick"]):
                         error("SOURCE_OUTSIDE_ASSET", "source_out_tick 超出素材长度", cp)
                 speed_curve = clip.get("speed_curve")
                 if speed_curve is not None:
@@ -957,6 +957,9 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                         error("SUBTITLE_INVALID", "subtitle 必须是对象", f"{cp}.subtitle")
                     else:
                         style = subtitle.get("style") if isinstance(subtitle.get("style"), dict) else {}
+                        subtitle_time_base = subtitle.get('asset_time_base', 'sequence')
+                        if not isinstance(subtitle_time_base, str) or subtitle_time_base not in {'sequence', 'clip'}:
+                            error('SUBTITLE_ASSET_TIME_BASE_INVALID', 'asset_time_base 只支持 sequence 或 clip', f'{cp}.subtitle.asset_time_base')
                         subtitle_numeric_ranges = {
                             "fontsize": (1.0, 4096.0),
                             "line_spacing": (-2000.0, 2000.0),

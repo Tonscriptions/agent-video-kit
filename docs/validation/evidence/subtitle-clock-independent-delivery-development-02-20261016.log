@@ -1,0 +1,15 @@
+D:\dev\comfyui\ComfyUI_windows_portable_nvidia_0_30_0\ComfyUI_windows_portable\python_embeded\Lib\site-packages\numpy\lib\_function_base_impl.py:576: RuntimeWarning: Mean of empty slice
+  avg = a.mean(axis, **keepdims_kw)
+D:\dev\comfyui\ComfyUI_windows_portable_nvidia_0_30_0\ComfyUI_windows_portable\python_embeded\Lib\site-packages\numpy\_core\_methods.py:134: RuntimeWarning: invalid value encountered in divide
+  ret = um.true_divide(
+E:\dev\sandbox\AI广告剪辑\product\.runtime\audit_subtitle_delivery_20261016.py:78: RuntimeWarning: Degrees of freedom <= 0 for slice
+  y,x=np.where(frame[90:278].min(axis=2)>190);cov=np.cov(np.vstack([x,y]),bias=True);v=np.linalg.eigh(cov)[1][:,-1];actual=math.degrees(math.atan2(v[1],v[0]));actual=(actual+90)%180-90
+D:\dev\comfyui\ComfyUI_windows_portable_nvidia_0_30_0\ComfyUI_windows_portable\python_embeded\Lib\site-packages\numpy\lib\_function_base_impl.py:2888: RuntimeWarning: divide by zero encountered in divide
+  c *= np.true_divide(1, fact)
+D:\dev\comfyui\ComfyUI_windows_portable_nvidia_0_30_0\ComfyUI_windows_portable\python_embeded\Lib\site-packages\numpy\lib\_function_base_impl.py:2888: RuntimeWarning: invalid value encountered in multiply
+  c *= np.true_divide(1, fact)
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audit_subtitle_delivery_20261016.py", line 94, in <module>
+    m=load(PUBLIC/'after-srt-external.mp4.manifest.json');cmd=m['command'][:];i=cmd.index('-progress');del cmd[i:i+2];i=cmd.index('-filter_complex');graph=WORK/'font-diagnostic.ffgraph';graph.write_text(m['filter_complex'],encoding='utf-8');cmd[i:i+2]=['-filter_complex_script',str(graph)];cmd[cmd.index('-loglevel')+1]='info';cmd[-1:]=['-frames:v','1',str(WORK/'font-diagnostic.mp4')]
+                                                                                                                        ~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+ValueError: '-filter_complex' is not in list

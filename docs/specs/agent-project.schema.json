@@ -237,7 +237,10 @@
           },
           "required": ["type"]
         },
-        "subtitle": {"type": "object"},
+        "subtitle": {
+          "type": "object",
+          "properties": {"asset_time_base": {"type": "string", "enum": ["sequence", "clip"]}}
+        },
         "audio": {
           "type": "object",
           "additionalProperties": true,
