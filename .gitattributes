@@ -1,4 +1,8 @@
 # Published evidence uses byte hashes; preserve its bytes on Windows checkout.
+product/**/*.py text eol=lf
 docs/assets/** -text
 scripts/build_readme_gallery.py -text
 docs/validation/evidence/readme-gallery-20261016.json -text
+scripts/smoke_mask_review.py -text
+docs/validation/evidence/mask-review-20261016.json -text
+docs/validation/evidence/mask-review-*-20261016.log -text whitespace=cr-at-eol

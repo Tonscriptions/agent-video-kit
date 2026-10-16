@@ -42,6 +42,7 @@ from .project import (
     TICKS_PER_SECOND,
 )
 from .quality import GOLDEN_VERSION, build_golden_manifest, check_output, compare_golden_manifest, normalize_golden_constraints, validate_golden_manifest
+from .mask_review import prepare as prepare_mask_review, review as review_mask
 from .recommend import recommend_highlights
 from .library import duplicate_groups, index_directory, search_catalog, visual_similarity_groups
 from .lut_library import inspect_lut, list_luts, prepare_lut_registration, register_lut
@@ -768,6 +769,18 @@ def build_parser() -> argparse.ArgumentParser:
 
     quality = subs.add_parser("quality", help="输出质量检查")
     qs = quality.add_subparsers(dest="action", required=True)
+    qmask = _leaf_common(qs.add_parser("mask", help="逐帧核对本地蒙版范围与明确正负检查点"))
+    qmask.add_argument("--project", required=True)
+    qmask.add_argument("--asset-id", required=True)
+    qmask.add_argument("--channel", choices=("alpha", "luma"), default="alpha")
+    qmask.add_argument("--threshold", type=int, default=127)
+    qmask.add_argument("--fps", default=None)
+    qmask.add_argument("--max-edge", type=int, default=1280)
+    qmask.add_argument("--max-frames", type=int, default=4096)
+    qmask.add_argument("--budget-mib", type=int, default=256)
+    qmask.add_argument("--expectations", default=None)
+    qmask.add_argument("--scene-cut-frame", type=int, action="append", default=[])
+    qmask.add_argument("--report", default=None)
     qcheck = _leaf_common(qs.add_parser("check", help="检查已渲染媒体"))
     qcheck.add_argument("--project", required=True)
     qcheck.add_argument("--input", required=True)
@@ -5282,6 +5295,29 @@ def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("queue.run", args, data={"queue": str(queue_path(root)), "summary": summary, "jobs": job_results, "counts": _queue_counts(queue)}, status=final_status, errors=errors, operation_id=queue_operation_id)
 
 
+def command_quality_mask(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    asset = asset_map(project).get(args.asset_id)
+    if asset is None:
+        raise argument_error("蒙版资产未登记", "asset-id")
+    plan = prepare_mask_review(root, asset, channel=args.channel, threshold=args.threshold, fps=args.fps,
+                              max_edge=args.max_edge, max_frames=args.max_frames, budget_mib=args.budget_mib,
+                              expectations=args.expectations, scene_cuts=args.scene_cut_frame)
+    report = resolve_local_path(root, args.report, field="report") if args.report else root / "validation" / f"mask_{new_id('review')}.json"
+    try:
+        report.resolve().relative_to((root / "validation").resolve())
+    except ValueError as exc:
+        raise argument_error("蒙版报告必须位于项目 validation 目录", "report") from exc
+    if report.suffix.lower() != ".json" or report == Path(plan['source']['path']) or plan['expectations'] and report == Path(plan['expectations']['path']):
+        raise argument_error("蒙版报告须为 JSON 且不能覆盖输入", "report")
+    if args.dry_run:
+        return _envelope("quality.mask", args, status="planned", data={"report": str(report), "plan": {k: v for k, v in plan.items() if k != 'events'}})
+    result = review_mask(root, plan)
+    atomic_write_json(report, {"created_at": now_iso(), "project_id": project['project']['id'], **result})
+    return _envelope("quality.mask", args, status="succeeded" if result['ok'] else "failed", data={"report": str(report), **result},
+                     warnings=result['warnings'], errors=result['errors'])
+
+
 def command_quality_check(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     media = Path(args.input).expanduser().resolve()
@@ -5648,6 +5684,7 @@ _READ_ONLY_PROJECT_COMMANDS = {
     ("policy", "audit"),
     ("subtitle", "evaluate"),
     ("quality", "check"),
+    ("quality", "mask"),
     ("motion", "list"),
     ("motion", "inspect"),
 }
@@ -5722,6 +5759,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("queue", "run"): command_queue_run,
     ("queue", "cancel"): command_queue_cancel,
     ("quality", "check"): command_quality_check,
+    ("quality", "mask"): command_quality_mask,
     ("quality", "golden"): command_quality_golden,
     ("quality", "scopes"): command_quality_scopes,
     ("convert", "import"): command_convert_import,

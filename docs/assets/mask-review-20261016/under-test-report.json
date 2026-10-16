@@ -1,0 +1,950 @@
+{
+  "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf\\validation\\under-test.json",
+  "report_version": "0.1.0",
+  "plan": {
+    "version": "0.1.0",
+    "source": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf\\assets\\under_test_mask-under-test.mov",
+      "sha256": "sha256:e97c9e530fb86adf14b207de85ec5c5cd71f830696ec918c1ca5e8e29afc78d4",
+      "asset_id": "under_test"
+    },
+    "channel": "alpha",
+    "threshold": 127,
+    "video": {
+      "width": 128,
+      "height": 192,
+      "frames": 32,
+      "fps": "8"
+    },
+    "source_geometry": {
+      "width": 128,
+      "height": 192,
+      "sar": "1",
+      "rotation": 0.0
+    },
+    "source_duration_seconds": 4.0,
+    "clock": "cfr-display-origin-with-last-frame-padding-at-most-one-output-frame",
+    "source_stream_index": 0,
+    "decoder": null,
+    "decoded_storage_bytes": 786432,
+    "decoded_storage_budget_bytes": 268435456,
+    "budget_scope": "temporary-decoded-gray-storage; excludes-ffmpeg-and-total-process-ram",
+    "expectations": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\expectations.json",
+      "sha256": "sha256:dc3bdf1d97a9887a179b5b3d671382053b12e30de7404903c6f5f87c33a8f570"
+    },
+    "scene_cut_frames": []
+  },
+  "ffmpeg": "ffmpeg version 8.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "network": "disabled",
+  "ok": false,
+  "expectations_checked": true,
+  "semantic_quality_accepted": false,
+  "gray_sha256": "sha256:40801222a16896e712c7cd9eda94266236776d519576f27bad5b1c95a21fe90c",
+  "frames": [
+    {
+      "frame": 0,
+      "seconds": 0.0,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        19,
+        12,
+        106,
+        182
+      ],
+      "bbox_normalized": [
+        0.1484375,
+        0.0625,
+        0.828125,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": null,
+      "previous_frame_area_ratio": null,
+      "review_flags": [],
+      "checks": [
+        {
+          "x": 0.5,
+          "y": 0.4,
+          "expected": "selected",
+          "radius_pixels": 0,
+          "minimum_fraction": 1.0,
+          "window_pixels": [
+            64,
+            76,
+            65,
+            77
+          ],
+          "selected_pixels": 1,
+          "pixels": 1,
+          "observed_fraction": 1.0,
+          "passed": true
+        },
+        {
+          "x": 0.95,
+          "y": 0.95,
+          "expected": "clear",
+          "radius_pixels": 0,
+          "minimum_fraction": 1.0,
+          "window_pixels": [
+            121,
+            182,
+            122,
+            183
+          ],
+          "selected_pixels": 0,
+          "pixels": 1,
+          "observed_fraction": 1.0,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "frame": 1,
+      "seconds": 0.125,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        19,
+        12,
+        106,
+        182
+      ],
+      "bbox_normalized": [
+        0.1484375,
+        0.0625,
+        0.828125,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 2,
+      "seconds": 0.25,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        19,
+        12,
+        106,
+        182
+      ],
+      "bbox_normalized": [
+        0.1484375,
+        0.0625,
+        0.828125,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 3,
+      "seconds": 0.375,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        19,
+        12,
+        106,
+        182
+      ],
+      "bbox_normalized": [
+        0.1484375,
+        0.0625,
+        0.828125,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 4,
+      "seconds": 0.5,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        20,
+        12,
+        107,
+        182
+      ],
+      "bbox_normalized": [
+        0.15625,
+        0.0625,
+        0.8359375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 0.949724517906336,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 5,
+      "seconds": 0.625,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        20,
+        12,
+        107,
+        182
+      ],
+      "bbox_normalized": [
+        0.15625,
+        0.0625,
+        0.8359375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 6,
+      "seconds": 0.75,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        20,
+        12,
+        107,
+        182
+      ],
+      "bbox_normalized": [
+        0.15625,
+        0.0625,
+        0.8359375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 7,
+      "seconds": 0.875,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        20,
+        12,
+        107,
+        182
+      ],
+      "bbox_normalized": [
+        0.15625,
+        0.0625,
+        0.8359375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 8,
+      "seconds": 1.0,
+      "selected_pixels": 7843,
+      "selected_fraction": 0.3191324869791667,
+      "bbox_pixels": [
+        21,
+        12,
+        108,
+        182
+      ],
+      "bbox_normalized": [
+        0.1640625,
+        0.0625,
+        0.84375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3191324869791667,
+      "previous_frame_iou": 0.8859385823135535,
+      "previous_frame_area_ratio": 0.9234663840810079,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 9,
+      "seconds": 1.125,
+      "selected_pixels": 7843,
+      "selected_fraction": 0.3191324869791667,
+      "bbox_pixels": [
+        21,
+        12,
+        108,
+        182
+      ],
+      "bbox_normalized": [
+        0.1640625,
+        0.0625,
+        0.84375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3191324869791667,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 10,
+      "seconds": 1.25,
+      "selected_pixels": 7843,
+      "selected_fraction": 0.3191324869791667,
+      "bbox_pixels": [
+        21,
+        12,
+        108,
+        182
+      ],
+      "bbox_normalized": [
+        0.1640625,
+        0.0625,
+        0.84375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3191324869791667,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 11,
+      "seconds": 1.375,
+      "selected_pixels": 7843,
+      "selected_fraction": 0.3191324869791667,
+      "bbox_pixels": [
+        21,
+        12,
+        108,
+        182
+      ],
+      "bbox_normalized": [
+        0.1640625,
+        0.0625,
+        0.84375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3191324869791667,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 12,
+      "seconds": 1.5,
+      "selected_pixels": 7843,
+      "selected_fraction": 0.3191324869791667,
+      "bbox_pixels": [
+        22,
+        12,
+        109,
+        182
+      ],
+      "bbox_normalized": [
+        0.171875,
+        0.0625,
+        0.8515625,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3191324869791667,
+      "previous_frame_iou": 0.9578132800798802,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": [
+        {
+          "x": 0.421875,
+          "y": 0.8333333333333334,
+          "expected": "selected",
+          "radius_pixels": 2,
+          "minimum_fraction": 1.0,
+          "window_pixels": [
+            52,
+            158,
+            57,
+            163
+          ],
+          "selected_pixels": 0,
+          "pixels": 25,
+          "observed_fraction": 0.0,
+          "passed": false
+        }
+      ]
+    },
+    {
+      "frame": 13,
+      "seconds": 1.625,
+      "selected_pixels": 7843,
+      "selected_fraction": 0.3191324869791667,
+      "bbox_pixels": [
+        22,
+        12,
+        109,
+        182
+      ],
+      "bbox_normalized": [
+        0.171875,
+        0.0625,
+        0.8515625,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3191324869791667,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 14,
+      "seconds": 1.75,
+      "selected_pixels": 7843,
+      "selected_fraction": 0.3191324869791667,
+      "bbox_pixels": [
+        22,
+        12,
+        109,
+        182
+      ],
+      "bbox_normalized": [
+        0.171875,
+        0.0625,
+        0.8515625,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3191324869791667,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 15,
+      "seconds": 1.875,
+      "selected_pixels": 7843,
+      "selected_fraction": 0.3191324869791667,
+      "bbox_pixels": [
+        22,
+        12,
+        109,
+        182
+      ],
+      "bbox_normalized": [
+        0.171875,
+        0.0625,
+        0.8515625,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3191324869791667,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 16,
+      "seconds": 2.0,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        23,
+        12,
+        110,
+        182
+      ],
+      "bbox_normalized": [
+        0.1796875,
+        0.0625,
+        0.859375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 0.8859385823135535,
+      "previous_frame_area_ratio": 1.082876450337881,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 17,
+      "seconds": 2.125,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        23,
+        12,
+        110,
+        182
+      ],
+      "bbox_normalized": [
+        0.1796875,
+        0.0625,
+        0.859375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 18,
+      "seconds": 2.25,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        23,
+        12,
+        110,
+        182
+      ],
+      "bbox_normalized": [
+        0.1796875,
+        0.0625,
+        0.859375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 19,
+      "seconds": 2.375,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        23,
+        12,
+        110,
+        182
+      ],
+      "bbox_normalized": [
+        0.1796875,
+        0.0625,
+        0.859375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 20,
+      "seconds": 2.5,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        19,
+        12,
+        106,
+        182
+      ],
+      "bbox_normalized": [
+        0.1484375,
+        0.0625,
+        0.828125,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 0.8130003202049312,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 21,
+      "seconds": 2.625,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        19,
+        12,
+        106,
+        182
+      ],
+      "bbox_normalized": [
+        0.1484375,
+        0.0625,
+        0.828125,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 22,
+      "seconds": 2.75,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        19,
+        12,
+        106,
+        182
+      ],
+      "bbox_normalized": [
+        0.1484375,
+        0.0625,
+        0.828125,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 23,
+      "seconds": 2.875,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        19,
+        12,
+        106,
+        182
+      ],
+      "bbox_normalized": [
+        0.1484375,
+        0.0625,
+        0.828125,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 24,
+      "seconds": 3.0,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        20,
+        12,
+        107,
+        182
+      ],
+      "bbox_normalized": [
+        0.15625,
+        0.0625,
+        0.8359375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 0.949724517906336,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": [
+        {
+          "x": 0.5,
+          "y": 0.4,
+          "expected": "selected",
+          "radius_pixels": 0,
+          "minimum_fraction": 1.0,
+          "window_pixels": [
+            64,
+            76,
+            65,
+            77
+          ],
+          "selected_pixels": 1,
+          "pixels": 1,
+          "observed_fraction": 1.0,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "frame": 25,
+      "seconds": 3.125,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        20,
+        12,
+        107,
+        182
+      ],
+      "bbox_normalized": [
+        0.15625,
+        0.0625,
+        0.8359375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 26,
+      "seconds": 3.25,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        20,
+        12,
+        107,
+        182
+      ],
+      "bbox_normalized": [
+        0.15625,
+        0.0625,
+        0.8359375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 27,
+      "seconds": 3.375,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        20,
+        12,
+        107,
+        182
+      ],
+      "bbox_normalized": [
+        0.15625,
+        0.0625,
+        0.8359375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 28,
+      "seconds": 3.5,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        21,
+        12,
+        108,
+        182
+      ],
+      "bbox_normalized": [
+        0.1640625,
+        0.0625,
+        0.84375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 0.949724517906336,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 29,
+      "seconds": 3.625,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        21,
+        12,
+        108,
+        182
+      ],
+      "bbox_normalized": [
+        0.1640625,
+        0.0625,
+        0.84375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 30,
+      "seconds": 3.75,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        21,
+        12,
+        108,
+        182
+      ],
+      "bbox_normalized": [
+        0.1640625,
+        0.0625,
+        0.84375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    },
+    {
+      "frame": 31,
+      "seconds": 3.875,
+      "selected_pixels": 8493,
+      "selected_fraction": 0.3455810546875,
+      "bbox_pixels": [
+        21,
+        12,
+        108,
+        182
+      ],
+      "bbox_normalized": [
+        0.1640625,
+        0.0625,
+        0.84375,
+        0.9479166666666666
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "alpha_mean": 0.3455810546875,
+      "previous_frame_iou": 1.0,
+      "previous_frame_area_ratio": 1.0,
+      "review_flags": [],
+      "checks": []
+    }
+  ],
+  "checked_points": 4,
+  "failed_points": [
+    {
+      "frame": 12,
+      "x": 0.421875,
+      "y": 0.8333333333333334,
+      "expected": "selected",
+      "radius_pixels": 2,
+      "minimum_fraction": 1.0,
+      "window_pixels": [
+        52,
+        158,
+        57,
+        163
+      ],
+      "selected_pixels": 0,
+      "pixels": 25,
+      "observed_fraction": 0.0,
+      "passed": false
+    }
+  ],
+  "warnings": [
+    {
+      "code": "MASK_SEMANTIC_REVIEW_REQUIRED",
+      "message": "像素范围和检查点不证明完整对象、身份或自然分割质量"
+    }
+  ],
+  "errors": [
+    {
+      "code": "MASK_EXPECTATION_FAILED",
+      "message": "1 个明确检查点未通过"
+    }
+  ]
+}

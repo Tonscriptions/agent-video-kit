@@ -110,6 +110,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `queue run --project PATH [--job-id ID] [--workers N]` | 待处理作业或显式重试作业 | 默认顺序执行本地渲染；`--workers N` 可启用有界本地 FFmpeg worker 并发，N 大于 1 时必须同时提供 `--continue-on-error`；保存 `pending/running/succeeded/failed/cancelled`，可用 `--max-jobs` 控制批次 |
 | `queue cancel --project PATH --job-id ID` | 待处理或运行中作业 | 锁空闲时待处理作业立即标记取消；锁被占用或作业运行中时原子写入取消标记并返回 acknowledged/confirmed |
 | `quality check --project PATH --input FILE` | 已渲染媒体 | 画布、流、时长、音画差、可选黑帧、LUFS 和 true peak 报告 |
+| `quality mask --project PATH --asset-id ID` | 已登记图像/视频、显式 alpha/luma 及可选本地检查点 JSON | 逐帧面积/半开包围框/原始 IoU、正负点与切点；失败保存报告并退出 2；不推断完整对象或接受分割画质 |
 | `quality scopes --project PATH --input FILE` | 项目内或本地视频、抽帧时间点 | 生成本地 waveform/vectorscope/histogram PNG 和带哈希的 scope 报告；不自动判定调色正确性 |
 | `quality golden --project PATH --input FILE --mode capture\|verify` | 本地媒体和项目内 golden JSON | 捕获固定输出哈希、settings 哈希、质量指标和容差；验证时返回字节、settings、质量和指标漂移，不修改媒体 |
 | `convert import --input FILE --output DIR [--strict]` | Agent JSON、项目包 ZIP、OTIO JSON、Kdenlive XML 或明文草稿 JSON | 新建本地项目与转换报告；项目包验证 manifest/路径/SHA-256；草稿候选通过校验后发布，`--strict` 仅用于草稿损失拒绝 |
@@ -199,6 +200,8 @@ python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --p
 `queue` 将批量输出作业保存为项目内 `operations/render-queue.json`，默认由同一个本地 FFmpeg 渲染器顺序执行；显式 `--workers N --continue-on-error` 时只并发 FFmpeg/质量检查阶段，项目输出、操作记录和队列状态由主线程串行提交。项目写入命令持有 `operations/project-write.lock`，覆盖队列读改写和状态提交；锁冲突返回 `PROJECT_WRITE_LOCKED`、退出码 6、`retryable=true`。作业状态、取消标记、尝试次数、错误、警告和 render 操作 ID 都可在进程退出后恢复；不引入服务、守护进程、数据库、Docker、WSL 或网络调度。无 `--job-id` 的 `queue run` 只执行 `pending`，失败或取消作业必须显式指定 ID 重试；并发批次允许已启动的 worker 完成，因此要求 `--continue-on-error`；重复输出路径返回 `QUEUE_OUTPUT_CONFLICT`。`queue cancel` 不等待项目写锁，锁被占用或作业运行中时写入 `operations/queue-cancel/<job_id>.cancel`，响应中的 `acknowledged=true, confirmed=false` 表示已递交、终态待确认；`queue list/inspect` 会反映 `cancel_requested=true`。完整字段和状态机见[本地渲染队列与任务状态契约](./本地渲染队列与任务状态契约_v0.1_2026-10-14.md)。
 
 `quality check` 可用 `--require-audio`、`--max-av-sync-ms`、`--expensive`、`--target-lufs`、`--lufs-tolerance`、`--fail-on-black` 和 `--max-true-peak-dbfs`。质量报告失败时，发布调用必须停止；质量检查不会修改原始媒体或项目。
+
+`quality mask` 默认 `--channel alpha --threshold 127 --max-edge 1280 --max-frames 4096 --budget-mib 256`；阈值为严格大于，解码存储预算不含总 RAM。`--expectations` 与可重复 `--scene-cut-frame` 仅采用显式输入；静态图不接受 `--fps`。`--report` 限项目 `validation/` 内 JSON，不能覆盖源/期望。失败检查点仍落盘且退出 2；不修改项目或台账，也不自动改动现有渲染发布门禁。格式、时钟和语义限制见[蒙版核验契约](./本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md)。
 
 ### 6.2 本地效果目录与渲染契约
 

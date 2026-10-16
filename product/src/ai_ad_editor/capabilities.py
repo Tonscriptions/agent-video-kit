@@ -149,11 +149,11 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "quality": {
                 "status": "implemented",
-                "features": ["stream_presence", "canvas", "duration", "av_duration_delta", "blackdetect_optional", "ebur128_optional", "target_lufs_gate", "true_peak_gate", "fail_on_black", "waveform_scope", "vectorscope", "histogram_scope", "golden_manifest_capture", "golden_manifest_verify", "golden_hash_and_metric_drift_report"],
+                "features": ["stream_presence", "canvas", "duration", "av_duration_delta", "blackdetect_optional", "ebur128_optional", "target_lufs_gate", "true_peak_gate", "fail_on_black", "waveform_scope", "vectorscope", "histogram_scope", "golden_manifest_capture", "golden_manifest_verify", "golden_hash_and_metric_drift_report", "mask_per_frame_extent", "mask_explicit_positive_negative_checks", "mask_scene_boundary_review"],
                 "scope_engine": "ffmpeg-local",
                 "scope_artifacts": ["png", "json_report"],
                 "defaults": {"max_av_sync_ms": 80.0, "lufs_tolerance": 2.0},
-                "limits": ["true_peak_gate_requires_expensive_scan_and_ffmpeg_ebur128", "scope_images_are_review_artifacts_not_automatic_color_judgement", "golden_is_exact_for_the_captured_local_artifact_and_requires_the_same_local_media_and_settings", "cross_device_visual_thresholds_pending"],
+                "limits": ["true_peak_gate_requires_expensive_scan_and_ffmpeg_ebur128", "scope_images_are_review_artifacts_not_automatic_color_judgement", "mask_extent_and_assertions_do_not_establish_object_identity_or_full_segmentation_quality", "mask_temporal_iou_is_not_motion_compensated", "mask_decoded_storage_budget_excludes_ffmpeg_and_total_process_ram", "golden_is_exact_for_the_captured_local_artifact_and_requires_the_same_local_media_and_settings", "cross_device_visual_thresholds_pending"],
             },
             "output": {
                 "status": "implemented",

@@ -89,6 +89,17 @@ correct future output; `reset` starts a new scene and requires fresh prompts
 for active objects. Inspect the canonical prompt hash, device and reset count. Review object extent
 at prompt/reset boundaries: the same points can select a smaller part on another
 frame. Add a bounding box when scope is ambiguous and inspect the new result.
+Before repair, run `quality mask --project <path> --asset-id <mask-id>
+--expectations <local-json> --report validation/mask-review.json` using the
+[mask review contract](../../docs/specs/本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md).
+Keep selected object IDs explicit: a nearby preserved person's legs are not
+automatically target residue. Place positive checks on target extremities and
+negative checks on preserved objects, then compare the encoded result after
+prompt correction. A positive model prompt does not guarantee its pixel passes
+the final binary mask. Later prompts affect that frame and future output only;
+record failed checks and inspect extent beyond the checkpoints. Mask growth can
+cover missed edges and encroach on preserved objects; review the effective
+repair mask separately. `quality mask` measures the supplied raw asset.
 Default binary masks differ from `--mask-mode probability`: sigmoid logits
 are segmentation confidence, not physical transparency or reconstructed hair.
 Both modes keep source RGB and multiply existing alpha. The 512 MiB session

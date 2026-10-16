@@ -1,0 +1,2578 @@
+{
+  "checked_at_utc": "2026-10-16T07:37:19.223110+00:00",
+  "generator_sha256": "sha256:0df4ef5c91859c547f85378ab708f83cef450b06060e63571e5a5d3613cb5bab",
+  "source_sha256": {
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:fb44c8b37acc6089b10eb3aa382deb8450c44321a048a9a634b989a2e09c98eb",
+    "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+    "product/src/ai_ad_editor/cli.py": "sha256:e7ae400d079b665c56167d13eafc45c1707cd574e62d6005ceaf1a280b594612",
+    "product/src/ai_ad_editor/convert.py": "sha256:6ee8214be45da9d1d0846066e88517f6fcff0578720c567888b9f011b19332fc",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+    "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/mask_review.py": "sha256:a2d07d086a3725413519331f0b60846df4f7c0c472d3d01afadc0202963bfed3",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+    "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+    "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:ac38964586d089b1e9ba15b47879e96fff283f509f32c890ff838e2f7ea07251",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:bb5540b39997d353f81a6c23672b3af5d852a3a461afc36772c3581de9947dd8",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+    "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86"
+  },
+  "calls": [
+    {
+      "argv": [
+        "project",
+        "init",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf",
+        "--name",
+        "Public mask expectation failure and pass"
+      ],
+      "exit_code": 0,
+      "result": {
+        "ok": true,
+        "command": "project.init",
+        "request_id": "req_20261016073717_b3f59d09",
+        "operation_id": null,
+        "status": "succeeded",
+        "data": {
+          "project": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf\\project.json",
+          "root": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf",
+          "project_id": "proj_20261016073717_e343384c"
+        },
+        "artifacts": [],
+        "warnings": [],
+        "errors": [],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-16T07:37:17.373279Z",
+          "finished_at": "2026-10-16T07:37:17.373285Z",
+          "network": "disabled"
+        }
+      }
+    },
+    {
+      "argv": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\mask-full.mov",
+        "--asset-id",
+        "full",
+        "--source-url",
+        "local://procedural-mask-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--evidence",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\fixture-provenance.json",
+        "--verification-status",
+        "verified",
+        "--permitted-use",
+        "commercial_ad"
+      ],
+      "exit_code": 0,
+      "result": {
+        "ok": true,
+        "command": "media.ingest",
+        "request_id": "req_20261016073717_c5666403",
+        "operation_id": "op_20261016073717_3570835f",
+        "status": "succeeded",
+        "data": {
+          "asset": {
+            "id": "full",
+            "kind": "video",
+            "uri": "assets/full_mask-full.mov",
+            "sha256": "sha256:81946158dfe93e2d252076bffc833a35452decc68a7ab6af512eb1b87529ad1e",
+            "probe": {
+              "duration_seconds": 4.0,
+              "duration_tick": 360000,
+              "format": "mov,mp4,m4a,3gp,3g2,mj2",
+              "format_long_name": "QuickTime / MOV",
+              "streams": [
+                {
+                  "index": 0,
+                  "codec_name": "qtrle",
+                  "codec_long_name": "QuickTime Animation (RLE) video",
+                  "codec_type": "video",
+                  "codec_tag_string": "rle ",
+                  "codec_tag": "0x20656c72",
+                  "width": 128,
+                  "height": 192,
+                  "coded_width": 128,
+                  "coded_height": 192,
+                  "has_b_frames": 0,
+                  "pix_fmt": "argb",
+                  "level": -99,
+                  "field_order": "progressive",
+                  "id": "0x1",
+                  "r_frame_rate": "8/1",
+                  "avg_frame_rate": "8/1",
+                  "time_base": "1/16384",
+                  "start_pts": 0,
+                  "start_time": "0.000000",
+                  "duration_ts": 65536,
+                  "duration": "4.000000",
+                  "bit_rate": "49688",
+                  "nb_frames": "32",
+                  "disposition": {
+                    "default": 1,
+                    "dub": 0,
+                    "original": 0,
+                    "comment": 0,
+                    "lyrics": 0,
+                    "karaoke": 0,
+                    "forced": 0,
+                    "hearing_impaired": 0,
+                    "visual_impaired": 0,
+                    "clean_effects": 0,
+                    "attached_pic": 0,
+                    "timed_thumbnails": 0,
+                    "non_diegetic": 0,
+                    "captions": 0,
+                    "descriptions": 0,
+                    "metadata": 0,
+                    "dependent": 0,
+                    "still_image": 0,
+                    "multilayer": 0
+                  },
+                  "tags": {
+                    "handler_name": "VideoHandler",
+                    "vendor_id": "FFMP",
+                    "encoder": "Lavc62.28.100 qtrle"
+                  }
+                }
+              ],
+              "video": {
+                "codec": "qtrle",
+                "width": 128,
+                "height": 192,
+                "pix_fmt": "argb",
+                "fps": "8/1",
+                "color_space": null,
+                "duration_seconds": 4.0,
+                "start_time_seconds": 0.0
+              },
+              "audio": {
+                "codec": null,
+                "sample_rate": 0,
+                "channels": 0,
+                "duration_seconds": 0.0,
+                "start_time_seconds": 0.0
+              }
+            },
+            "rights_ref": "full",
+            "source": {
+              "source_url": "local://procedural-mask-fixture",
+              "retrieved_at": "2026-10-16T07:37:17.536308Z",
+              "original_name": "mask-full.mov"
+            }
+          },
+          "rights": {
+            "asset_id": "full",
+            "kind": "video",
+            "sha256": "sha256:81946158dfe93e2d252076bffc833a35452decc68a7ab6af512eb1b87529ad1e",
+            "source_url": "local://procedural-mask-fixture",
+            "source_version": "local",
+            "retrieved_at": "2026-10-16T07:37:17.536322Z",
+            "creator": "unknown",
+            "license_spdx": "CC0-1.0",
+            "license_url": "",
+            "attribution": "",
+            "permitted_uses": [
+              "internal",
+              "commercial_ad"
+            ],
+            "restrictions": [],
+            "evidence": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\fixture-provenance.json",
+            "verification_status": "verified",
+            "verified_by": "ai-ad-editor",
+            "takedown_status": "clear",
+            "notes": "Imported by local CLI",
+            "record_id": "rights_20261016073717_d1eec532",
+            "record_version": 1,
+            "active": true,
+            "recorded_at": "2026-10-16T07:37:17.536736Z",
+            "permitted_channels": []
+          },
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf\\assets\\full_mask-full.mov"
+        },
+        "artifacts": [],
+        "warnings": [],
+        "errors": [],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-16T07:37:17.545673Z",
+          "finished_at": "2026-10-16T07:37:17.545680Z",
+          "network": "disabled"
+        }
+      }
+    },
+    {
+      "argv": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\mask-under-test.mov",
+        "--asset-id",
+        "under_test",
+        "--source-url",
+        "local://procedural-mask-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--evidence",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\fixture-provenance.json",
+        "--verification-status",
+        "verified",
+        "--permitted-use",
+        "commercial_ad"
+      ],
+      "exit_code": 0,
+      "result": {
+        "ok": true,
+        "command": "media.ingest",
+        "request_id": "req_20261016073717_dd5e00b2",
+        "operation_id": "op_20261016073717_94e68ead",
+        "status": "succeeded",
+        "data": {
+          "asset": {
+            "id": "under_test",
+            "kind": "video",
+            "uri": "assets/under_test_mask-under-test.mov",
+            "sha256": "sha256:e97c9e530fb86adf14b207de85ec5c5cd71f830696ec918c1ca5e8e29afc78d4",
+            "probe": {
+              "duration_seconds": 4.0,
+              "duration_tick": 360000,
+              "format": "mov,mp4,m4a,3gp,3g2,mj2",
+              "format_long_name": "QuickTime / MOV",
+              "streams": [
+                {
+                  "index": 0,
+                  "codec_name": "qtrle",
+                  "codec_long_name": "QuickTime Animation (RLE) video",
+                  "codec_type": "video",
+                  "codec_tag_string": "rle ",
+                  "codec_tag": "0x20656c72",
+                  "width": 128,
+                  "height": 192,
+                  "coded_width": 128,
+                  "coded_height": 192,
+                  "has_b_frames": 0,
+                  "pix_fmt": "argb",
+                  "level": -99,
+                  "field_order": "progressive",
+                  "id": "0x1",
+                  "r_frame_rate": "8/1",
+                  "avg_frame_rate": "8/1",
+                  "time_base": "1/16384",
+                  "start_pts": 0,
+                  "start_time": "0.000000",
+                  "duration_ts": 65536,
+                  "duration": "4.000000",
+                  "bit_rate": "47188",
+                  "nb_frames": "32",
+                  "disposition": {
+                    "default": 1,
+                    "dub": 0,
+                    "original": 0,
+                    "comment": 0,
+                    "lyrics": 0,
+                    "karaoke": 0,
+                    "forced": 0,
+                    "hearing_impaired": 0,
+                    "visual_impaired": 0,
+                    "clean_effects": 0,
+                    "attached_pic": 0,
+                    "timed_thumbnails": 0,
+                    "non_diegetic": 0,
+                    "captions": 0,
+                    "descriptions": 0,
+                    "metadata": 0,
+                    "dependent": 0,
+                    "still_image": 0,
+                    "multilayer": 0
+                  },
+                  "tags": {
+                    "handler_name": "VideoHandler",
+                    "vendor_id": "FFMP",
+                    "encoder": "Lavc62.28.100 qtrle"
+                  }
+                }
+              ],
+              "video": {
+                "codec": "qtrle",
+                "width": 128,
+                "height": 192,
+                "pix_fmt": "argb",
+                "fps": "8/1",
+                "color_space": null,
+                "duration_seconds": 4.0,
+                "start_time_seconds": 0.0
+              },
+              "audio": {
+                "codec": null,
+                "sample_rate": 0,
+                "channels": 0,
+                "duration_seconds": 0.0,
+                "start_time_seconds": 0.0
+              }
+            },
+            "rights_ref": "under_test",
+            "source": {
+              "source_url": "local://procedural-mask-fixture",
+              "retrieved_at": "2026-10-16T07:37:17.722465Z",
+              "original_name": "mask-under-test.mov"
+            }
+          },
+          "rights": {
+            "asset_id": "under_test",
+            "kind": "video",
+            "sha256": "sha256:e97c9e530fb86adf14b207de85ec5c5cd71f830696ec918c1ca5e8e29afc78d4",
+            "source_url": "local://procedural-mask-fixture",
+            "source_version": "local",
+            "retrieved_at": "2026-10-16T07:37:17.722477Z",
+            "creator": "unknown",
+            "license_spdx": "CC0-1.0",
+            "license_url": "",
+            "attribution": "",
+            "permitted_uses": [
+              "internal",
+              "commercial_ad"
+            ],
+            "restrictions": [],
+            "evidence": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\fixture-provenance.json",
+            "verification_status": "verified",
+            "verified_by": "ai-ad-editor",
+            "takedown_status": "clear",
+            "notes": "Imported by local CLI",
+            "record_id": "rights_20261016073717_46ff1199",
+            "record_version": 1,
+            "active": true,
+            "recorded_at": "2026-10-16T07:37:17.722854Z",
+            "permitted_channels": []
+          },
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf\\assets\\under_test_mask-under-test.mov"
+        },
+        "artifacts": [],
+        "warnings": [],
+        "errors": [],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-16T07:37:17.733255Z",
+          "finished_at": "2026-10-16T07:37:17.733261Z",
+          "network": "disabled"
+        }
+      }
+    },
+    {
+      "argv": [
+        "quality",
+        "mask",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf",
+        "--asset-id",
+        "under_test",
+        "--expectations",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\expectations.json",
+        "--dry-run"
+      ],
+      "exit_code": 0,
+      "result": {
+        "ok": true,
+        "command": "quality.mask",
+        "request_id": "req_20261016073717_c08b6769",
+        "operation_id": null,
+        "status": "planned",
+        "data": {
+          "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf\\validation\\mask_review_20261016073717_16e18d24.json",
+          "plan": {
+            "version": "0.1.0",
+            "source": {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf\\assets\\under_test_mask-under-test.mov",
+              "sha256": "sha256:e97c9e530fb86adf14b207de85ec5c5cd71f830696ec918c1ca5e8e29afc78d4",
+              "asset_id": "under_test"
+            },
+            "channel": "alpha",
+            "threshold": 127,
+            "video": {
+              "width": 128,
+              "height": 192,
+              "frames": 32,
+              "fps": "8"
+            },
+            "source_geometry": {
+              "width": 128,
+              "height": 192,
+              "sar": "1",
+              "rotation": 0.0
+            },
+            "source_duration_seconds": 4.0,
+            "clock": "cfr-display-origin-with-last-frame-padding-at-most-one-output-frame",
+            "source_stream_index": 0,
+            "decoder": null,
+            "decoded_storage_bytes": 786432,
+            "decoded_storage_budget_bytes": 268435456,
+            "budget_scope": "temporary-decoded-gray-storage; excludes-ffmpeg-and-total-process-ram",
+            "expectations": {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\expectations.json",
+              "sha256": "sha256:dc3bdf1d97a9887a179b5b3d671382053b12e30de7404903c6f5f87c33a8f570"
+            },
+            "scene_cut_frames": []
+          }
+        },
+        "artifacts": [],
+        "warnings": [],
+        "errors": [],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-16T07:37:17.868083Z",
+          "finished_at": "2026-10-16T07:37:17.868089Z",
+          "network": "disabled"
+        }
+      }
+    },
+    {
+      "argv": [
+        "quality",
+        "mask",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf",
+        "--asset-id",
+        "under_test",
+        "--expectations",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\expectations.json",
+        "--report",
+        "validation/under-test.json"
+      ],
+      "exit_code": 2,
+      "result": {
+        "ok": false,
+        "command": "quality.mask",
+        "request_id": "req_20261016073718_fdc4820d",
+        "operation_id": null,
+        "status": "failed",
+        "data": {
+          "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf\\validation\\under-test.json",
+          "report_version": "0.1.0",
+          "plan": {
+            "version": "0.1.0",
+            "source": {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf\\assets\\under_test_mask-under-test.mov",
+              "sha256": "sha256:e97c9e530fb86adf14b207de85ec5c5cd71f830696ec918c1ca5e8e29afc78d4",
+              "asset_id": "under_test"
+            },
+            "channel": "alpha",
+            "threshold": 127,
+            "video": {
+              "width": 128,
+              "height": 192,
+              "frames": 32,
+              "fps": "8"
+            },
+            "source_geometry": {
+              "width": 128,
+              "height": 192,
+              "sar": "1",
+              "rotation": 0.0
+            },
+            "source_duration_seconds": 4.0,
+            "clock": "cfr-display-origin-with-last-frame-padding-at-most-one-output-frame",
+            "source_stream_index": 0,
+            "decoder": null,
+            "decoded_storage_bytes": 786432,
+            "decoded_storage_budget_bytes": 268435456,
+            "budget_scope": "temporary-decoded-gray-storage; excludes-ffmpeg-and-total-process-ram",
+            "expectations": {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\expectations.json",
+              "sha256": "sha256:dc3bdf1d97a9887a179b5b3d671382053b12e30de7404903c6f5f87c33a8f570"
+            },
+            "scene_cut_frames": []
+          },
+          "ffmpeg": "ffmpeg version 8.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+          "network": "disabled",
+          "ok": false,
+          "expectations_checked": true,
+          "semantic_quality_accepted": false,
+          "gray_sha256": "sha256:40801222a16896e712c7cd9eda94266236776d519576f27bad5b1c95a21fe90c",
+          "frames": [
+            {
+              "frame": 0,
+              "seconds": 0.0,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": null,
+              "previous_frame_area_ratio": null,
+              "review_flags": [],
+              "checks": [
+                {
+                  "x": 0.5,
+                  "y": 0.4,
+                  "expected": "selected",
+                  "radius_pixels": 0,
+                  "minimum_fraction": 1.0,
+                  "window_pixels": [
+                    64,
+                    76,
+                    65,
+                    77
+                  ],
+                  "selected_pixels": 1,
+                  "pixels": 1,
+                  "observed_fraction": 1.0,
+                  "passed": true
+                },
+                {
+                  "x": 0.95,
+                  "y": 0.95,
+                  "expected": "clear",
+                  "radius_pixels": 0,
+                  "minimum_fraction": 1.0,
+                  "window_pixels": [
+                    121,
+                    182,
+                    122,
+                    183
+                  ],
+                  "selected_pixels": 0,
+                  "pixels": 1,
+                  "observed_fraction": 1.0,
+                  "passed": true
+                }
+              ]
+            },
+            {
+              "frame": 1,
+              "seconds": 0.125,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 2,
+              "seconds": 0.25,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 3,
+              "seconds": 0.375,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 4,
+              "seconds": 0.5,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.949724517906336,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 5,
+              "seconds": 0.625,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 6,
+              "seconds": 0.75,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 7,
+              "seconds": 0.875,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 8,
+              "seconds": 1.0,
+              "selected_pixels": 7843,
+              "selected_fraction": 0.3191324869791667,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3191324869791667,
+              "previous_frame_iou": 0.8859385823135535,
+              "previous_frame_area_ratio": 0.9234663840810079,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 9,
+              "seconds": 1.125,
+              "selected_pixels": 7843,
+              "selected_fraction": 0.3191324869791667,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3191324869791667,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 10,
+              "seconds": 1.25,
+              "selected_pixels": 7843,
+              "selected_fraction": 0.3191324869791667,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3191324869791667,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 11,
+              "seconds": 1.375,
+              "selected_pixels": 7843,
+              "selected_fraction": 0.3191324869791667,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3191324869791667,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 12,
+              "seconds": 1.5,
+              "selected_pixels": 7843,
+              "selected_fraction": 0.3191324869791667,
+              "bbox_pixels": [
+                22,
+                12,
+                109,
+                182
+              ],
+              "bbox_normalized": [
+                0.171875,
+                0.0625,
+                0.8515625,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3191324869791667,
+              "previous_frame_iou": 0.9578132800798802,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": [
+                {
+                  "x": 0.421875,
+                  "y": 0.8333333333333334,
+                  "expected": "selected",
+                  "radius_pixels": 2,
+                  "minimum_fraction": 1.0,
+                  "window_pixels": [
+                    52,
+                    158,
+                    57,
+                    163
+                  ],
+                  "selected_pixels": 0,
+                  "pixels": 25,
+                  "observed_fraction": 0.0,
+                  "passed": false
+                }
+              ]
+            },
+            {
+              "frame": 13,
+              "seconds": 1.625,
+              "selected_pixels": 7843,
+              "selected_fraction": 0.3191324869791667,
+              "bbox_pixels": [
+                22,
+                12,
+                109,
+                182
+              ],
+              "bbox_normalized": [
+                0.171875,
+                0.0625,
+                0.8515625,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3191324869791667,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 14,
+              "seconds": 1.75,
+              "selected_pixels": 7843,
+              "selected_fraction": 0.3191324869791667,
+              "bbox_pixels": [
+                22,
+                12,
+                109,
+                182
+              ],
+              "bbox_normalized": [
+                0.171875,
+                0.0625,
+                0.8515625,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3191324869791667,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 15,
+              "seconds": 1.875,
+              "selected_pixels": 7843,
+              "selected_fraction": 0.3191324869791667,
+              "bbox_pixels": [
+                22,
+                12,
+                109,
+                182
+              ],
+              "bbox_normalized": [
+                0.171875,
+                0.0625,
+                0.8515625,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3191324869791667,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 16,
+              "seconds": 2.0,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                23,
+                12,
+                110,
+                182
+              ],
+              "bbox_normalized": [
+                0.1796875,
+                0.0625,
+                0.859375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.8859385823135535,
+              "previous_frame_area_ratio": 1.082876450337881,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 17,
+              "seconds": 2.125,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                23,
+                12,
+                110,
+                182
+              ],
+              "bbox_normalized": [
+                0.1796875,
+                0.0625,
+                0.859375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 18,
+              "seconds": 2.25,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                23,
+                12,
+                110,
+                182
+              ],
+              "bbox_normalized": [
+                0.1796875,
+                0.0625,
+                0.859375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 19,
+              "seconds": 2.375,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                23,
+                12,
+                110,
+                182
+              ],
+              "bbox_normalized": [
+                0.1796875,
+                0.0625,
+                0.859375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 20,
+              "seconds": 2.5,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.8130003202049312,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 21,
+              "seconds": 2.625,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 22,
+              "seconds": 2.75,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 23,
+              "seconds": 2.875,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 24,
+              "seconds": 3.0,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.949724517906336,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": [
+                {
+                  "x": 0.5,
+                  "y": 0.4,
+                  "expected": "selected",
+                  "radius_pixels": 0,
+                  "minimum_fraction": 1.0,
+                  "window_pixels": [
+                    64,
+                    76,
+                    65,
+                    77
+                  ],
+                  "selected_pixels": 1,
+                  "pixels": 1,
+                  "observed_fraction": 1.0,
+                  "passed": true
+                }
+              ]
+            },
+            {
+              "frame": 25,
+              "seconds": 3.125,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 26,
+              "seconds": 3.25,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 27,
+              "seconds": 3.375,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 28,
+              "seconds": 3.5,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.949724517906336,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 29,
+              "seconds": 3.625,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 30,
+              "seconds": 3.75,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 31,
+              "seconds": 3.875,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            }
+          ],
+          "checked_points": 4,
+          "failed_points": [
+            {
+              "frame": 12,
+              "x": 0.421875,
+              "y": 0.8333333333333334,
+              "expected": "selected",
+              "radius_pixels": 2,
+              "minimum_fraction": 1.0,
+              "window_pixels": [
+                52,
+                158,
+                57,
+                163
+              ],
+              "selected_pixels": 0,
+              "pixels": 25,
+              "observed_fraction": 0.0,
+              "passed": false
+            }
+          ],
+          "warnings": [
+            {
+              "code": "MASK_SEMANTIC_REVIEW_REQUIRED",
+              "message": "像素范围和检查点不证明完整对象、身份或自然分割质量"
+            }
+          ],
+          "errors": [
+            {
+              "code": "MASK_EXPECTATION_FAILED",
+              "message": "1 个明确检查点未通过"
+            }
+          ]
+        },
+        "artifacts": [],
+        "warnings": [
+          {
+            "code": "MASK_SEMANTIC_REVIEW_REQUIRED",
+            "message": "像素范围和检查点不证明完整对象、身份或自然分割质量"
+          }
+        ],
+        "errors": [
+          {
+            "code": "MASK_EXPECTATION_FAILED",
+            "message": "1 个明确检查点未通过"
+          }
+        ],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-16T07:37:18.194445Z",
+          "finished_at": "2026-10-16T07:37:18.194452Z",
+          "network": "disabled"
+        }
+      }
+    },
+    {
+      "argv": [
+        "quality",
+        "mask",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf",
+        "--asset-id",
+        "full",
+        "--expectations",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\expectations.json",
+        "--report",
+        "validation/full.json"
+      ],
+      "exit_code": 0,
+      "result": {
+        "ok": true,
+        "command": "quality.mask",
+        "request_id": "req_20261016073718_172467ae",
+        "operation_id": null,
+        "status": "succeeded",
+        "data": {
+          "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf\\validation\\full.json",
+          "report_version": "0.1.0",
+          "plan": {
+            "version": "0.1.0",
+            "source": {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-public-20261016-lf\\assets\\full_mask-full.mov",
+              "sha256": "sha256:81946158dfe93e2d252076bffc833a35452decc68a7ab6af512eb1b87529ad1e",
+              "asset_id": "full"
+            },
+            "channel": "alpha",
+            "threshold": 127,
+            "video": {
+              "width": 128,
+              "height": 192,
+              "frames": 32,
+              "fps": "8"
+            },
+            "source_geometry": {
+              "width": 128,
+              "height": 192,
+              "sar": "1",
+              "rotation": 0.0
+            },
+            "source_duration_seconds": 4.0,
+            "clock": "cfr-display-origin-with-last-frame-padding-at-most-one-output-frame",
+            "source_stream_index": 0,
+            "decoder": null,
+            "decoded_storage_bytes": 786432,
+            "decoded_storage_budget_bytes": 268435456,
+            "budget_scope": "temporary-decoded-gray-storage; excludes-ffmpeg-and-total-process-ram",
+            "expectations": {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\expectations.json",
+              "sha256": "sha256:dc3bdf1d97a9887a179b5b3d671382053b12e30de7404903c6f5f87c33a8f570"
+            },
+            "scene_cut_frames": []
+          },
+          "ffmpeg": "ffmpeg version 8.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+          "network": "disabled",
+          "ok": true,
+          "expectations_checked": true,
+          "semantic_quality_accepted": false,
+          "gray_sha256": "sha256:ae784b57372a327d05e8cf05349d8070cf8bfd166630b38382b08dd768b623fd",
+          "frames": [
+            {
+              "frame": 0,
+              "seconds": 0.0,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": null,
+              "previous_frame_area_ratio": null,
+              "review_flags": [],
+              "checks": [
+                {
+                  "x": 0.5,
+                  "y": 0.4,
+                  "expected": "selected",
+                  "radius_pixels": 0,
+                  "minimum_fraction": 1.0,
+                  "window_pixels": [
+                    64,
+                    76,
+                    65,
+                    77
+                  ],
+                  "selected_pixels": 1,
+                  "pixels": 1,
+                  "observed_fraction": 1.0,
+                  "passed": true
+                },
+                {
+                  "x": 0.95,
+                  "y": 0.95,
+                  "expected": "clear",
+                  "radius_pixels": 0,
+                  "minimum_fraction": 1.0,
+                  "window_pixels": [
+                    121,
+                    182,
+                    122,
+                    183
+                  ],
+                  "selected_pixels": 0,
+                  "pixels": 1,
+                  "observed_fraction": 1.0,
+                  "passed": true
+                }
+              ]
+            },
+            {
+              "frame": 1,
+              "seconds": 0.125,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 2,
+              "seconds": 0.25,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 3,
+              "seconds": 0.375,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 4,
+              "seconds": 0.5,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.949724517906336,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 5,
+              "seconds": 0.625,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 6,
+              "seconds": 0.75,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 7,
+              "seconds": 0.875,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 8,
+              "seconds": 1.0,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.949724517906336,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 9,
+              "seconds": 1.125,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 10,
+              "seconds": 1.25,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 11,
+              "seconds": 1.375,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 12,
+              "seconds": 1.5,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                22,
+                12,
+                109,
+                182
+              ],
+              "bbox_normalized": [
+                0.171875,
+                0.0625,
+                0.8515625,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.949724517906336,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": [
+                {
+                  "x": 0.421875,
+                  "y": 0.8333333333333334,
+                  "expected": "selected",
+                  "radius_pixels": 2,
+                  "minimum_fraction": 1.0,
+                  "window_pixels": [
+                    52,
+                    158,
+                    57,
+                    163
+                  ],
+                  "selected_pixels": 25,
+                  "pixels": 25,
+                  "observed_fraction": 1.0,
+                  "passed": true
+                }
+              ]
+            },
+            {
+              "frame": 13,
+              "seconds": 1.625,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                22,
+                12,
+                109,
+                182
+              ],
+              "bbox_normalized": [
+                0.171875,
+                0.0625,
+                0.8515625,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 14,
+              "seconds": 1.75,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                22,
+                12,
+                109,
+                182
+              ],
+              "bbox_normalized": [
+                0.171875,
+                0.0625,
+                0.8515625,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 15,
+              "seconds": 1.875,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                22,
+                12,
+                109,
+                182
+              ],
+              "bbox_normalized": [
+                0.171875,
+                0.0625,
+                0.8515625,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 16,
+              "seconds": 2.0,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                23,
+                12,
+                110,
+                182
+              ],
+              "bbox_normalized": [
+                0.1796875,
+                0.0625,
+                0.859375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.949724517906336,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 17,
+              "seconds": 2.125,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                23,
+                12,
+                110,
+                182
+              ],
+              "bbox_normalized": [
+                0.1796875,
+                0.0625,
+                0.859375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 18,
+              "seconds": 2.25,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                23,
+                12,
+                110,
+                182
+              ],
+              "bbox_normalized": [
+                0.1796875,
+                0.0625,
+                0.859375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 19,
+              "seconds": 2.375,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                23,
+                12,
+                110,
+                182
+              ],
+              "bbox_normalized": [
+                0.1796875,
+                0.0625,
+                0.859375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 20,
+              "seconds": 2.5,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.8130003202049312,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 21,
+              "seconds": 2.625,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 22,
+              "seconds": 2.75,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 23,
+              "seconds": 2.875,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                19,
+                12,
+                106,
+                182
+              ],
+              "bbox_normalized": [
+                0.1484375,
+                0.0625,
+                0.828125,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 24,
+              "seconds": 3.0,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.949724517906336,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": [
+                {
+                  "x": 0.5,
+                  "y": 0.4,
+                  "expected": "selected",
+                  "radius_pixels": 0,
+                  "minimum_fraction": 1.0,
+                  "window_pixels": [
+                    64,
+                    76,
+                    65,
+                    77
+                  ],
+                  "selected_pixels": 1,
+                  "pixels": 1,
+                  "observed_fraction": 1.0,
+                  "passed": true
+                }
+              ]
+            },
+            {
+              "frame": 25,
+              "seconds": 3.125,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 26,
+              "seconds": 3.25,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 27,
+              "seconds": 3.375,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                20,
+                12,
+                107,
+                182
+              ],
+              "bbox_normalized": [
+                0.15625,
+                0.0625,
+                0.8359375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 28,
+              "seconds": 3.5,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 0.949724517906336,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 29,
+              "seconds": 3.625,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 30,
+              "seconds": 3.75,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            },
+            {
+              "frame": 31,
+              "seconds": 3.875,
+              "selected_pixels": 8493,
+              "selected_fraction": 0.3455810546875,
+              "bbox_pixels": [
+                21,
+                12,
+                108,
+                182
+              ],
+              "bbox_normalized": [
+                0.1640625,
+                0.0625,
+                0.84375,
+                0.9479166666666666
+              ],
+              "alpha_min": 0,
+              "alpha_max": 255,
+              "alpha_mean": 0.3455810546875,
+              "previous_frame_iou": 1.0,
+              "previous_frame_area_ratio": 1.0,
+              "review_flags": [],
+              "checks": []
+            }
+          ],
+          "checked_points": 4,
+          "failed_points": [],
+          "warnings": [
+            {
+              "code": "MASK_SEMANTIC_REVIEW_REQUIRED",
+              "message": "像素范围和检查点不证明完整对象、身份或自然分割质量"
+            }
+          ],
+          "errors": []
+        },
+        "artifacts": [],
+        "warnings": [
+          {
+            "code": "MASK_SEMANTIC_REVIEW_REQUIRED",
+            "message": "像素范围和检查点不证明完整对象、身份或自然分割质量"
+          }
+        ],
+        "errors": [],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-16T07:37:18.513604Z",
+          "finished_at": "2026-10-16T07:37:18.513612Z",
+          "network": "disabled"
+        }
+      }
+    }
+  ],
+  "expected_failed_command_count": 1,
+  "expected_failed_points": 1,
+  "passed_points": 4,
+  "project_and_ledger_unchanged_by_review": true,
+  "all_decoded_alpha_bytes_match_authored_arrays": true,
+  "preview": {
+    "probe": {
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "h264",
+          "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+          "profile": "High",
+          "codec_type": "video",
+          "codec_tag_string": "avc1",
+          "codec_tag": "0x31637661",
+          "mime_codec_string": "avc1.640015",
+          "width": 576,
+          "height": 248,
+          "coded_width": 576,
+          "coded_height": 256,
+          "has_b_frames": 2,
+          "pix_fmt": "yuv420p",
+          "level": 21,
+          "chroma_location": "left",
+          "field_order": "progressive",
+          "refs": 4,
+          "is_avc": "true",
+          "nal_length_size": "4",
+          "id": "0x1",
+          "r_frame_rate": "8/1",
+          "avg_frame_rate": "8/1",
+          "time_base": "1/16384",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 65536,
+          "duration": "4.000000",
+          "bit_rate": "36656",
+          "bits_per_raw_sample": "8",
+          "nb_frames": "32",
+          "nb_read_frames": "32",
+          "extradata_size": 46,
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "language": "und",
+            "handler_name": "VideoHandler",
+            "encoder": "Lavc62.28.100 libx264"
+          }
+        }
+      ]
+    },
+    "gif_frames": 32,
+    "gif_frame_durations_ms": [
+      120,
+      130
+    ],
+    "gif_total_ms": 4000,
+    "mp4_all_frames_decoded": true
+  },
+  "numpy_and_pillow_used_by_demo_only": {
+    "numpy": "2.4.6",
+    "pillow": "12.3.0"
+  },
+  "learned_model_runs": 0,
+  "natural_video_quality_accepted": false,
+  "files": {
+    "contact-frame-12.png": {
+      "sha256": "sha256:339be479880b7afdc734c159d3f79ee2456327f51beb0f9d78d89a647c3ac983",
+      "bytes": 6312
+    },
+    "expectations.json": {
+      "sha256": "sha256:dc3bdf1d97a9887a179b5b3d671382053b12e30de7404903c6f5f87c33a8f570",
+      "bytes": 681
+    },
+    "fixture-provenance.json": {
+      "sha256": "sha256:69c4277ac83bf83f45de9223d1219983a558cf2949783bafe42a6ae000feeb07",
+      "bytes": 831
+    },
+    "full-report.json": {
+      "sha256": "sha256:24ee6dcfc2d42cdf7ce3c5563e55b625eb37d0c6b046c8f4a8365c79773dd7c0",
+      "bytes": 20429
+    },
+    "mask-full.mov": {
+      "sha256": "sha256:81946158dfe93e2d252076bffc833a35452decc68a7ab6af512eb1b87529ad1e",
+      "bytes": 25726
+    },
+    "mask-review-comparison.gif": {
+      "sha256": "sha256:ee6ea96c44ca4278e1ed971c6af7833e5f0410b16d8a6a86b6b298db888029ce",
+      "bytes": 218576
+    },
+    "mask-review-comparison.mp4": {
+      "sha256": "sha256:5c9efd0f25e7382cf6b12cb1b4fa522505a3ae282cc5ab95c9b452c3579f9386",
+      "bytes": 19563
+    },
+    "mask-under-test.mov": {
+      "sha256": "sha256:e97c9e530fb86adf14b207de85ec5c5cd71f830696ec918c1ca5e8e29afc78d4",
+      "bytes": 24476
+    },
+    "under-test-report.json": {
+      "sha256": "sha256:ec4539370fb490060aa9ec3c2ef81214f367e2efd7f3c9997d8c51ea29369476",
+      "bytes": 20997
+    }
+  }
+}

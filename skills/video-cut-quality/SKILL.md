@@ -1,9 +1,32 @@
 ---
 name: video-cut-quality
-description: Produce local quality reports, color scopes, render manifests, and machine-readable evidence for Agent video delivery.
+description: Review local encoded masks, explicit selected/clear checkpoints, color scopes, render manifests, and quality evidence for Agent video delivery.
 ---
 
 # Local Quality
+
+Before inpainting or accepting segmentation, review the actual encoded mask:
+
+```powershell
+python -X utf8 -m ai_ad_editor quality mask --project .\work\demo --asset-id selected_mask --channel alpha --expectations .\work\demo\validation\mask-expectations.json --report validation/mask-review.json
+```
+
+Follow the [mask review contract](../../docs/specs/本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md)
+for the strict local JSON format. Add `selected` points on the target's limbs
+and `clear` points on nearby objects that must remain. Check zero-based output
+frames and normalized output coordinates against the actual mask clock. The
+default threshold selects values strictly above 127. Opaque black/white masks
+need explicit `--channel luma`; static images are one frame and reject `--fps`.
+Inspect per-frame area, half-open extent and explicit scene boundaries. Raw
+neighboring-frame IoU has no motion compensation; area/edge flags request review.
+`--budget-mib` bounds decoded gray storage, excluding total RAM and FFmpeg.
+
+Exit 2 preserves a failed checkpoint report. Keep it when a model correction
+still misses the target; do not weaken assertions to produce a pass. Without
+expectations, a successful structural report has `expectations_checked=false`.
+Even all checkpoints passing leaves `semantic_quality_accepted=false`. This
+command reviews the supplied asset; it does not apply inpainting mask growth,
+infer object identity, prove full extent, or accept reconstruction quality.
 
 For joint masked video editing, review the [VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
 Check the exact window plan/hash, scene boundaries, tail padding, seed sequence,

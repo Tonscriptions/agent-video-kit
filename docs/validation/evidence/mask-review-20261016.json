@@ -1,0 +1,1399 @@
+{
+  "checked_at_utc": "2026-10-16T08:24:31.163952+00:00",
+  "status": "functional-mask-gate-verified-natural-correction-still-failed",
+  "full_product_regression": {
+    "started_at_utc": "2026-10-16T07:37:15.239740+00:00",
+    "finished_at_utc": "2026-10-16T07:49:31.342153+00:00",
+    "exit_code": 0,
+    "status": "passed",
+    "test_count": 379,
+    "suite_seconds": 733.981,
+    "wall_seconds": 736.0908443999942,
+    "source_sha256_before": {
+      "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+      "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+      "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+      "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+      "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+      "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+      "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+      "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+      "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+      "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+      "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+      "product/src/ai_ad_editor/capabilities.py": "sha256:fb44c8b37acc6089b10eb3aa382deb8450c44321a048a9a634b989a2e09c98eb",
+      "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+      "product/src/ai_ad_editor/cli.py": "sha256:e7ae400d079b665c56167d13eafc45c1707cd574e62d6005ceaf1a280b594612",
+      "product/src/ai_ad_editor/convert.py": "sha256:6ee8214be45da9d1d0846066e88517f6fcff0578720c567888b9f011b19332fc",
+      "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+      "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+      "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+      "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+      "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+      "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+      "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+      "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+      "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+      "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+      "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+      "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+      "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+      "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+      "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+      "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+      "product/src/ai_ad_editor/mask_review.py": "sha256:a2d07d086a3725413519331f0b60846df4f7c0c472d3d01afadc0202963bfed3",
+      "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+      "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+      "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+      "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+      "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+      "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+      "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+      "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+      "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+      "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+      "product/src/ai_ad_editor/render.py": "sha256:ac38964586d089b1e9ba15b47879e96fff283f509f32c890ff838e2f7ea07251",
+      "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+      "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+      "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+      "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+      "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+      "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+      "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+      "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+      "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+      "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+      "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+      "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+      "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+      "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+      "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+      "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+      "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+      "product/src/ai_ad_editor/utils.py": "sha256:bb5540b39997d353f81a6c23672b3af5d852a3a461afc36772c3581de9947dd8",
+      "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+      "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+      "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+      "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+      "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+      "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+      "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+      "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+      "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+      "product/tests/test_cli.py": "sha256:f28e88c9fb50a999765ebde7f908bc7c2672857d96bae65f6332218e9cde8b67",
+      "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+      "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+      "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+      "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+      "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+      "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+      "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+      "product/tests/test_local_vace.py": "sha256:a2227a49c43a233b73ed354681a39a03924d9ed0588749eda7df198c2c43807b",
+      "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+      "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+      "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+      "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4"
+    },
+    "source_sha256_after": {
+      "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+      "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+      "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+      "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+      "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+      "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+      "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+      "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+      "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+      "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+      "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+      "product/src/ai_ad_editor/capabilities.py": "sha256:fb44c8b37acc6089b10eb3aa382deb8450c44321a048a9a634b989a2e09c98eb",
+      "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+      "product/src/ai_ad_editor/cli.py": "sha256:e7ae400d079b665c56167d13eafc45c1707cd574e62d6005ceaf1a280b594612",
+      "product/src/ai_ad_editor/convert.py": "sha256:6ee8214be45da9d1d0846066e88517f6fcff0578720c567888b9f011b19332fc",
+      "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+      "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+      "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+      "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+      "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+      "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+      "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+      "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+      "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+      "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+      "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+      "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+      "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+      "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+      "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+      "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+      "product/src/ai_ad_editor/mask_review.py": "sha256:a2d07d086a3725413519331f0b60846df4f7c0c472d3d01afadc0202963bfed3",
+      "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+      "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+      "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+      "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+      "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+      "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+      "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+      "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+      "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+      "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+      "product/src/ai_ad_editor/render.py": "sha256:ac38964586d089b1e9ba15b47879e96fff283f509f32c890ff838e2f7ea07251",
+      "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+      "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+      "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+      "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+      "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+      "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+      "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+      "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+      "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+      "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+      "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+      "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+      "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+      "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+      "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+      "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+      "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+      "product/src/ai_ad_editor/utils.py": "sha256:bb5540b39997d353f81a6c23672b3af5d852a3a461afc36772c3581de9947dd8",
+      "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+      "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+      "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+      "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+      "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+      "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+      "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+      "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+      "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+      "product/tests/test_cli.py": "sha256:f28e88c9fb50a999765ebde7f908bc7c2672857d96bae65f6332218e9cde8b67",
+      "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+      "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+      "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+      "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+      "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+      "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+      "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+      "product/tests/test_local_vace.py": "sha256:a2227a49c43a233b73ed354681a39a03924d9ed0588749eda7df198c2c43807b",
+      "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+      "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+      "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+      "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4"
+    },
+    "source_file_count": 83,
+    "log_sha256": "sha256:e8feab4a18c83a9b6eda66f4dafdb691c9de13a694c1f23e82fd5aaccd84f285"
+  },
+  "logs": {
+    "full-regression": {
+      "path": "docs/validation/evidence/mask-review-full-regression-20261016.log",
+      "sha256": "sha256:e8feab4a18c83a9b6eda66f4dafdb691c9de13a694c1f23e82fd5aaccd84f285",
+      "test_count": 379,
+      "seconds": 733.981
+    },
+    "targeted": {
+      "path": "docs/validation/evidence/mask-review-targeted-20261016.log",
+      "sha256": "sha256:dc24882c9937cc1332de8527d0bbf74d724cc3991e8e56bd0a9dc456432bfbb4",
+      "test_count": 16,
+      "seconds": 8.306
+    }
+  },
+  "targeted_checks_are_subset_of_full_suite": true,
+  "first_full_run_before_eol_normalization": {
+    "test_count": 379,
+    "seconds": 624.103,
+    "source_sha256_before": {
+      "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+      "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+      "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+      "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+      "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+      "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+      "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+      "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+      "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+      "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+      "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+      "product/src/ai_ad_editor/capabilities.py": "sha256:fb44c8b37acc6089b10eb3aa382deb8450c44321a048a9a634b989a2e09c98eb",
+      "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+      "product/src/ai_ad_editor/cli.py": "sha256:e7ae400d079b665c56167d13eafc45c1707cd574e62d6005ceaf1a280b594612",
+      "product/src/ai_ad_editor/convert.py": "sha256:9cbdcbde37e01e4c97be36cc5e741f1962a269451828a4ec32577464bfbb44ed",
+      "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+      "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+      "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+      "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+      "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+      "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+      "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+      "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+      "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+      "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+      "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+      "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+      "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+      "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+      "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+      "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+      "product/src/ai_ad_editor/mask_review.py": "sha256:a2d07d086a3725413519331f0b60846df4f7c0c472d3d01afadc0202963bfed3",
+      "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+      "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+      "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+      "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+      "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+      "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+      "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+      "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+      "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+      "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+      "product/src/ai_ad_editor/render.py": "sha256:ae9626cc7a1037979a5bfa81a03e9d1ed28a8fbf44921c892810f2d0f9424080",
+      "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+      "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+      "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+      "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+      "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+      "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+      "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+      "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+      "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+      "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+      "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+      "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+      "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+      "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+      "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+      "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+      "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+      "product/src/ai_ad_editor/utils.py": "sha256:bb5540b39997d353f81a6c23672b3af5d852a3a461afc36772c3581de9947dd8",
+      "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+      "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+      "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+      "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+      "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+      "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+      "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+      "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+      "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+      "product/tests/test_cli.py": "sha256:845fcfe25d3413f83ee572d89b1b96e500f2ee73ebdf71623ae3955300e5266f",
+      "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+      "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+      "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+      "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+      "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+      "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+      "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+      "product/tests/test_local_vace.py": "sha256:a2227a49c43a233b73ed354681a39a03924d9ed0588749eda7df198c2c43807b",
+      "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+      "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+      "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+      "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4"
+    },
+    "source_sha256_after": {
+      "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+      "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+      "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+      "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+      "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+      "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+      "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+      "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+      "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+      "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+      "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+      "product/src/ai_ad_editor/capabilities.py": "sha256:fb44c8b37acc6089b10eb3aa382deb8450c44321a048a9a634b989a2e09c98eb",
+      "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+      "product/src/ai_ad_editor/cli.py": "sha256:e7ae400d079b665c56167d13eafc45c1707cd574e62d6005ceaf1a280b594612",
+      "product/src/ai_ad_editor/convert.py": "sha256:9cbdcbde37e01e4c97be36cc5e741f1962a269451828a4ec32577464bfbb44ed",
+      "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+      "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+      "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+      "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+      "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+      "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+      "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+      "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+      "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+      "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+      "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+      "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+      "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+      "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+      "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+      "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+      "product/src/ai_ad_editor/mask_review.py": "sha256:a2d07d086a3725413519331f0b60846df4f7c0c472d3d01afadc0202963bfed3",
+      "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+      "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+      "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+      "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+      "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+      "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+      "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+      "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+      "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+      "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+      "product/src/ai_ad_editor/render.py": "sha256:ae9626cc7a1037979a5bfa81a03e9d1ed28a8fbf44921c892810f2d0f9424080",
+      "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+      "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+      "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+      "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+      "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+      "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+      "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+      "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+      "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+      "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+      "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+      "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+      "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+      "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+      "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+      "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+      "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+      "product/src/ai_ad_editor/utils.py": "sha256:bb5540b39997d353f81a6c23672b3af5d852a3a461afc36772c3581de9947dd8",
+      "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+      "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+      "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+      "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+      "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+      "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+      "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+      "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+      "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+      "product/tests/test_cli.py": "sha256:845fcfe25d3413f83ee572d89b1b96e500f2ee73ebdf71623ae3955300e5266f",
+      "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+      "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+      "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+      "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+      "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+      "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+      "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+      "product/tests/test_local_vace.py": "sha256:a2227a49c43a233b73ed354681a39a03924d9ed0588749eda7df198c2c43807b",
+      "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+      "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+      "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+      "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4"
+    },
+    "log_sha256": "sha256:edb17061caf7f8e21d9702f91f4665c0172c0fb37a6a56ffd2bb8f9193047cc3",
+    "scope": "earlier passed run; not added to final test count"
+  },
+  "line_ending_normalization_before_final_full_run": [
+    {
+      "path": "product/src/ai_ad_editor/convert.py",
+      "before_sha256": "sha256:9cbdcbde37e01e4c97be36cc5e741f1962a269451828a4ec32577464bfbb44ed",
+      "after_sha256": "sha256:6ee8214be45da9d1d0846066e88517f6fcff0578720c567888b9f011b19332fc",
+      "only_crlf_to_lf": true,
+      "matches_existing_git_index": true
+    },
+    {
+      "path": "product/src/ai_ad_editor/render.py",
+      "before_sha256": "sha256:ae9626cc7a1037979a5bfa81a03e9d1ed28a8fbf44921c892810f2d0f9424080",
+      "after_sha256": "sha256:ac38964586d089b1e9ba15b47879e96fff283f509f32c890ff838e2f7ea07251",
+      "only_crlf_to_lf": true,
+      "matches_existing_git_index": true
+    },
+    {
+      "path": "product/tests/test_cli.py",
+      "before_sha256": "sha256:845fcfe25d3413f83ee572d89b1b96e500f2ee73ebdf71623ae3955300e5266f",
+      "after_sha256": "sha256:f28e88c9fb50a999765ebde7f908bc7c2672857d96bae65f6332218e9cde8b67",
+      "only_crlf_to_lf": true,
+      "matches_existing_git_index": true
+    }
+  ],
+  "python_checkout_policy": "product/**/*.py text eol=lf; final full-suite source bytes must match Git index exactly",
+  "git_index_source_blobs_verified": 83,
+  "research_checks_rerun": false,
+  "prior_research_check_count_not_added": 22,
+  "public_generator": {
+    "path": "scripts/smoke_mask_review.py",
+    "sha256": "sha256:0df4ef5c91859c547f85378ab708f83cef450b06060e63571e5a5d3613cb5bab"
+  },
+  "public_cli_calls": 6,
+  "public_cli_exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    2,
+    0
+  ],
+  "public_verification_sha256": "sha256:b42a29718238357151ea11e6536983426b385d8c4143ba78d6fc9629f5885202",
+  "public_masks_independently_decoded": {
+    "mask-under-test.mov": {
+      "frames": 32,
+      "decoded_alpha_sha256": "sha256:40801222a16896e712c7cd9eda94266236776d519576f27bad5b1c95a21fe90c",
+      "selected_pixels_by_frame": [
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        7843,
+        7843,
+        7843,
+        7843,
+        7843,
+        7843,
+        7843,
+        7843,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493
+      ],
+      "checked_points": 4,
+      "failed_points": [
+        {
+          "frame": 12,
+          "x": 0.421875,
+          "y": 0.8333333333333334,
+          "expected": "selected",
+          "radius_pixels": 2,
+          "minimum_fraction": 1.0,
+          "window_pixels": [
+            52,
+            158,
+            57,
+            163
+          ],
+          "selected_pixels": 0,
+          "pixels": 25,
+          "observed_fraction": 0.0,
+          "passed": false
+        }
+      ],
+      "semantic_quality_accepted": false
+    },
+    "mask-full.mov": {
+      "frames": 32,
+      "decoded_alpha_sha256": "sha256:ae784b57372a327d05e8cf05349d8070cf8bfd166630b38382b08dd768b623fd",
+      "selected_pixels_by_frame": [
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493,
+        8493
+      ],
+      "checked_points": 4,
+      "failed_points": [],
+      "semantic_quality_accepted": false
+    }
+  },
+  "public_preview": {
+    "mp4_probe": {
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "h264",
+          "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+          "profile": "High",
+          "codec_type": "video",
+          "codec_tag_string": "avc1",
+          "codec_tag": "0x31637661",
+          "mime_codec_string": "avc1.640015",
+          "width": 576,
+          "height": 248,
+          "coded_width": 576,
+          "coded_height": 256,
+          "has_b_frames": 2,
+          "pix_fmt": "yuv420p",
+          "level": 21,
+          "chroma_location": "left",
+          "field_order": "progressive",
+          "refs": 4,
+          "is_avc": "true",
+          "nal_length_size": "4",
+          "id": "0x1",
+          "r_frame_rate": "8/1",
+          "avg_frame_rate": "8/1",
+          "time_base": "1/16384",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 65536,
+          "duration": "4.000000",
+          "bit_rate": "36656",
+          "bits_per_raw_sample": "8",
+          "nb_frames": "32",
+          "nb_read_frames": "32",
+          "extradata_size": 46,
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "language": "und",
+            "handler_name": "VideoHandler",
+            "encoder": "Lavc62.28.100 libx264"
+          }
+        }
+      ],
+      "format": {
+        "filename": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\mask-review-20261016\\mask-review-comparison.mp4",
+        "nb_streams": 1,
+        "nb_programs": 0,
+        "nb_stream_groups": 0,
+        "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "start_time": "0.000000",
+        "duration": "4.000000",
+        "size": "19563",
+        "bit_rate": "39126",
+        "probe_score": 100,
+        "tags": {
+          "major_brand": "isom",
+          "minor_version": "512",
+          "compatible_brands": "isomiso2avc1mp41",
+          "encoder": "Lavf62.12.100"
+        }
+      }
+    },
+    "mp4_decoded_frames": 32,
+    "gif_frames": 32,
+    "gif_durations_ms": [
+      120,
+      130
+    ],
+    "gif_total_ms": 4000
+  },
+  "public_files": {
+    "docs/assets/mask-review-20261016/contact-frame-12.png": {
+      "sha256": "sha256:339be479880b7afdc734c159d3f79ee2456327f51beb0f9d78d89a647c3ac983",
+      "bytes": 6312
+    },
+    "docs/assets/mask-review-20261016/evidence.json": {
+      "sha256": "sha256:b42a29718238357151ea11e6536983426b385d8c4143ba78d6fc9629f5885202",
+      "bytes": 86561
+    },
+    "docs/assets/mask-review-20261016/expectations.json": {
+      "sha256": "sha256:dc3bdf1d97a9887a179b5b3d671382053b12e30de7404903c6f5f87c33a8f570",
+      "bytes": 681
+    },
+    "docs/assets/mask-review-20261016/fixture-provenance.json": {
+      "sha256": "sha256:69c4277ac83bf83f45de9223d1219983a558cf2949783bafe42a6ae000feeb07",
+      "bytes": 831
+    },
+    "docs/assets/mask-review-20261016/full-report.json": {
+      "sha256": "sha256:24ee6dcfc2d42cdf7ce3c5563e55b625eb37d0c6b046c8f4a8365c79773dd7c0",
+      "bytes": 20429
+    },
+    "docs/assets/mask-review-20261016/mask-full.mov": {
+      "sha256": "sha256:81946158dfe93e2d252076bffc833a35452decc68a7ab6af512eb1b87529ad1e",
+      "bytes": 25726
+    },
+    "docs/assets/mask-review-20261016/mask-review-comparison.gif": {
+      "sha256": "sha256:ee6ea96c44ca4278e1ed971c6af7833e5f0410b16d8a6a86b6b298db888029ce",
+      "bytes": 218576
+    },
+    "docs/assets/mask-review-20261016/mask-review-comparison.mp4": {
+      "sha256": "sha256:5c9efd0f25e7382cf6b12cb1b4fa522505a3ae282cc5ab95c9b452c3579f9386",
+      "bytes": 19563
+    },
+    "docs/assets/mask-review-20261016/mask-under-test.mov": {
+      "sha256": "sha256:e97c9e530fb86adf14b207de85ec5c5cd71f830696ec918c1ca5e8e29afc78d4",
+      "bytes": 24476
+    },
+    "docs/assets/mask-review-20261016/under-test-report.json": {
+      "sha256": "sha256:ec4539370fb490060aa9ec3c2ef81214f367e2efd7f3c9997d8c51ea29369476",
+      "bytes": 20997
+    }
+  },
+  "natural_evaluation": {
+    "status": "partial-prompt-improvement-one-assertion-still-failed",
+    "source_sha256": "sha256:813bc758f73cdb49f2ec206dc5946497279a92f5f900efb042a733249d60c207",
+    "new_scene_count": 0,
+    "new_model_runs": 1,
+    "target_object_id": 2,
+    "preserved_object_id": 1,
+    "video": {
+      "width": 512,
+      "height": 288,
+      "fps": "8",
+      "frames": 32,
+      "duration_seconds": 4.0,
+      "source_stream_index": 0,
+      "source_width": 512,
+      "source_height": 288,
+      "source_sar": "1",
+      "source_rotation": 0.0,
+      "clock": "ffmpeg-fps-resampled-source-seconds",
+      "alpha_mode": "straight",
+      "codec": "qtrle",
+      "pix_fmt": "argb"
+    },
+    "before_mask_sha256": "sha256:8202185e901516ccb95eaffc2299b308c1167c21ad8de20d949c301bff294153",
+    "after_mask_sha256": "sha256:bea4e9aae7e071902acd0dc6479a3b61ac60da3cb178d325c645871249240635",
+    "prompt_sha256": "sha256:4dc274d2a939465c80b5f489cadeec4885950c04eda9b84253ae795c5ee0c12d",
+    "canonical_prompt_sha256": "sha256:8a891367948503a722e3ea309bc54f61b1b0bf163c83d5a467109b59281c12d9",
+    "expectations_sha256": "sha256:8235b806b9fb6480156b2365828533f877114248c2d897be374e19f85b0468ec",
+    "worker": {
+      "protocol": "agent-video-sam2-segmentation-v1",
+      "engine": "transformers-sam2-video-local-v1",
+      "network": "disabled",
+      "blocked_network_events": [],
+      "request_sha256": "sha256:7cee50e88094d63849b01d4ba893dd4815f987ab46a242af753124298865138f",
+      "adapter_sha256": "sha256:9fb83788d8fa9e60b9b05aba7230fbf5e2c80eb0b7f1194c0ddf25692e105291",
+      "source_sha256": "sha256:813bc758f73cdb49f2ec206dc5946497279a92f5f900efb042a733249d60c207",
+      "status": "succeeded",
+      "metrics": {
+        "frames": 32,
+        "width": 512,
+        "height": 288,
+        "rgba_sha256": "sha256:347768e9973bf4ebdd1eb6e90fe463325e3af20ac4224b53eafb6e5bcdf8b6f1",
+        "rgba_bytes": 18874368,
+        "state_updates": 32,
+        "state_peak_bytes": 288917816,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "alpha_mean": 0.019861645168728296,
+        "transparent_pixels": 4624873,
+        "opaque_pixels": 93719,
+        "soft_alpha_pixels": 0,
+        "alpha_mode": "straight",
+        "input_alpha": "multiply",
+        "state_reset": "per-job-and-explicit-frames",
+        "prompt_events": 2,
+        "explicit_resets": 0
+      },
+      "prompt_sha256": "sha256:8a891367948503a722e3ea309bc54f61b1b0bf163c83d5a467109b59281c12d9",
+      "object_ids": [
+        2
+      ],
+      "mask_mode": "binary",
+      "providers": [
+        "torch-cuda"
+      ],
+      "versions": {
+        "python": "3.13.14",
+        "torch": "2.13.0+cu130",
+        "transformers": "5.14.1",
+        "numpy": "2.4.6"
+      },
+      "memory_window_frames": 16,
+      "cached_rasters": 1,
+      "cuda_peak_allocated_bytes": 640108544,
+      "elapsed_seconds": 98.35880799998995
+    },
+    "source_prompt": {
+      "version": "1.0.0",
+      "coordinate_space": "normalized-output",
+      "frames": [
+        {
+          "frame": 0,
+          "objects": [
+            {
+              "object_id": 1,
+              "box": [
+                0.3,
+                0,
+                0.55,
+                0.76
+              ],
+              "points": [
+                {
+                  "x": 0.42,
+                  "y": 0.38,
+                  "label": 1
+                }
+              ]
+            },
+            {
+              "object_id": 2,
+              "box": [
+                0.14,
+                0.23,
+                0.36,
+                0.78
+              ],
+              "points": [
+                {
+                  "x": 0.24,
+                  "y": 0.52,
+                  "label": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 31,
+          "objects": [
+            {
+              "object_id": 2,
+              "box": [
+                0,
+                0.28,
+                0.2,
+                0.84
+              ],
+              "points": [
+                {
+                  "x": 0.080078125,
+                  "y": 0.3472222222222222,
+                  "label": 1
+                },
+                {
+                  "x": 0.029296875,
+                  "y": 0.7256944444444444,
+                  "label": 1
+                },
+                {
+                  "x": 0.125,
+                  "y": 0.3125,
+                  "label": 0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "expectations": {
+      "version": "1.0.0",
+      "coordinate_space": "normalized-output",
+      "frames": [
+        {
+          "frame": 0,
+          "points": [
+            {
+              "x": 0.245,
+              "y": 0.5,
+              "expected": "selected"
+            },
+            {
+              "x": 0.8,
+              "y": 0.8,
+              "expected": "clear"
+            }
+          ]
+        },
+        {
+          "frame": 31,
+          "points": [
+            {
+              "x": 0.080078125,
+              "y": 0.3472222222222222,
+              "expected": "selected"
+            },
+            {
+              "x": 0.029296875,
+              "y": 0.7256944444444444,
+              "expected": "selected"
+            },
+            {
+              "x": 0.125,
+              "y": 0.3125,
+              "expected": "clear"
+            }
+          ]
+        }
+      ]
+    },
+    "before_checked_points": 5,
+    "before_failed_points": [
+      {
+        "frame": 31,
+        "x": 0.029296875,
+        "y": 0.7256944444444444,
+        "expected": "selected",
+        "radius_pixels": 0,
+        "minimum_fraction": 1.0,
+        "window_pixels": [
+          15,
+          209,
+          16,
+          210
+        ],
+        "selected_pixels": 0,
+        "pixels": 1,
+        "observed_fraction": 0.0,
+        "passed": false
+      },
+      {
+        "frame": 31,
+        "x": 0.125,
+        "y": 0.3125,
+        "expected": "clear",
+        "radius_pixels": 0,
+        "minimum_fraction": 1.0,
+        "window_pixels": [
+          64,
+          90,
+          65,
+          91
+        ],
+        "selected_pixels": 1,
+        "pixels": 1,
+        "observed_fraction": 0.0,
+        "passed": false
+      }
+    ],
+    "after_checked_points": 5,
+    "after_failed_points": [
+      {
+        "frame": 31,
+        "x": 0.029296875,
+        "y": 0.7256944444444444,
+        "expected": "selected",
+        "radius_pixels": 0,
+        "minimum_fraction": 1.0,
+        "window_pixels": [
+          15,
+          209,
+          16,
+          210
+        ],
+        "selected_pixels": 0,
+        "pixels": 1,
+        "observed_fraction": 0.0,
+        "passed": false
+      }
+    ],
+    "frame31_selected_pixels_before": 4935,
+    "frame31_selected_pixels_after": 4351,
+    "independent_decode": {
+      "frames": 32,
+      "before_and_after_rgb_changed_components_vs_source": 0,
+      "all_prior_frames_0_through_30_unchanged": true,
+      "changed_alpha_pixels_by_frame": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        850
+      ],
+      "both_report_gray_sha256_match_independent_decode": true,
+      "frame31_points": [
+        {
+          "frame": 31,
+          "pixel": [
+            41,
+            100
+          ],
+          "label": "head +",
+          "before_alpha": 255,
+          "after_alpha": 255
+        },
+        {
+          "frame": 31,
+          "pixel": [
+            15,
+            209
+          ],
+          "label": "wrist +",
+          "before_alpha": 0,
+          "after_alpha": 0
+        },
+        {
+          "frame": 31,
+          "pixel": [
+            64,
+            90
+          ],
+          "label": "girl arm -",
+          "before_alpha": 255,
+          "after_alpha": 0
+        }
+      ]
+    },
+    "calls": [
+      {
+        "argv": [
+          "project",
+          "init",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\project",
+          "--name",
+          "Natural mask checks - internal evaluation only"
+        ],
+        "exit_code": 0,
+        "status": "succeeded",
+        "seconds": 0.05497749999631196,
+        "errors": []
+      },
+      {
+        "argv": [
+          "media",
+          "ingest",
+          "--project",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\project",
+          "--input",
+          "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\vace-smoke-20261016-natural-v2\\project\\assets\\asset_20261015213312_82f95069_natural-motion.mov",
+          "--asset-id",
+          "source"
+        ],
+        "exit_code": 0,
+        "status": "succeeded",
+        "seconds": 0.657304499996826,
+        "errors": []
+      },
+      {
+        "argv": [
+          "media",
+          "ingest",
+          "--project",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\project",
+          "--input",
+          "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\vace-smoke-20261016-natural-v2\\project\\assets\\derived\\selected_mask.mov",
+          "--asset-id",
+          "before_mask"
+        ],
+        "exit_code": 0,
+        "status": "succeeded",
+        "seconds": 0.2218699000077322,
+        "errors": []
+      },
+      {
+        "argv": [
+          "quality",
+          "mask",
+          "--project",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\project",
+          "--asset-id",
+          "before_mask",
+          "--expectations",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\expectations.json",
+          "--report",
+          "validation/before.json"
+        ],
+        "exit_code": 2,
+        "status": "failed",
+        "seconds": 0.6696486000146251,
+        "errors": [
+          {
+            "code": "MASK_EXPECTATION_FAILED",
+            "message": "2 个明确检查点未通过"
+          }
+        ]
+      },
+      {
+        "argv": [
+          "media",
+          "adapter",
+          "register",
+          "--project",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\project",
+          "--adapter-id",
+          "sam2_local",
+          "--engine",
+          "transformers-sam2-video-local-v1",
+          "--model-path",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\segmentation\\sam2.1-hiera-tiny",
+          "--executable",
+          "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+          "--evidence",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\segmentation\\sam2-evidence.json",
+          "--device",
+          "cuda",
+          "--threads",
+          "4"
+        ],
+        "exit_code": 0,
+        "status": "succeeded",
+        "seconds": 4.751783999992767,
+        "errors": []
+      },
+      {
+        "argv": [
+          "media",
+          "matting",
+          "--project",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\project",
+          "--asset-id",
+          "source",
+          "--adapter-id",
+          "sam2_local",
+          "--derived-asset-id",
+          "corrected_mask",
+          "--prompts",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\prompts-corrected.json",
+          "--object-id",
+          "2",
+          "--mask-mode",
+          "binary",
+          "--max-edge",
+          "512",
+          "--fps",
+          "8/1",
+          "--max-frames",
+          "32"
+        ],
+        "exit_code": 0,
+        "status": "succeeded",
+        "seconds": 104.09998279999127,
+        "errors": []
+      },
+      {
+        "argv": [
+          "quality",
+          "mask",
+          "--project",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\project",
+          "--asset-id",
+          "corrected_mask",
+          "--expectations",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\expectations.json",
+          "--report",
+          "validation/after.json"
+        ],
+        "exit_code": 2,
+        "status": "failed",
+        "seconds": 0.611111299978802,
+        "errors": [
+          {
+            "code": "MASK_EXPECTATION_FAILED",
+            "message": "1 个明确检查点未通过"
+          }
+        ]
+      },
+      {
+        "argv": [
+          "validate",
+          "--project",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\project"
+        ],
+        "exit_code": 0,
+        "status": "succeeded",
+        "seconds": 0.29198800001177005,
+        "errors": []
+      },
+      {
+        "argv": [
+          "policy",
+          "audit",
+          "--project",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\project"
+        ],
+        "exit_code": 0,
+        "status": "succeeded",
+        "seconds": 0.13278169999830425,
+        "errors": []
+      },
+      {
+        "argv": [
+          "rights",
+          "check",
+          "--project",
+          "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\project",
+          "--target",
+          "commercial_ad"
+        ],
+        "exit_code": 7,
+        "status": "failed",
+        "seconds": 0.034293799981242046,
+        "errors": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "source",
+            "rights_ref": "source",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "source",
+            "rights_ref": "source",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "source",
+            "rights_ref": "source",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "before_mask",
+            "rights_ref": "before_mask",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "before_mask",
+            "rights_ref": "before_mask",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "before_mask",
+            "rights_ref": "before_mask",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "corrected_mask",
+            "rights_ref": "corrected_mask",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "corrected_mask",
+            "rights_ref": "corrected_mask",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+            "message": "来源、许可证或证据字段缺失",
+            "asset_id": "corrected_mask",
+            "rights_ref": "corrected_mask",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "visual_adapter_sam2_local",
+            "rights_ref": "visual_adapter_sam2_local",
+            "record_version": 1,
+            "context": "derived_dependency"
+          }
+        ]
+      }
+    ],
+    "initial_wrapper_exit_code": 1,
+    "initial_wrapper_reason": "Correction was expected to pass, but actual quality.mask exit 2 correctly preserved the failed report. Continued from saved project; no rerun.",
+    "policy_result": {
+      "root": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\mask-review-natural-20261016\\project",
+      "network": "disabled",
+      "scanned_files": 14,
+      "findings": [],
+      "ok": true
+    },
+    "rights_result": {
+      "ok": false,
+      "target": "commercial_ad",
+      "checked": 3,
+      "required_records": 4,
+      "failures": [
+        {
+          "status": "unverified",
+          "code": "RIGHTS_STATUS_BLOCKED",
+          "message": "状态 unverified 不允许发布",
+          "asset_id": "source",
+          "rights_ref": "source",
+          "record_version": 1,
+          "context": "project_asset"
+        },
+        {
+          "code": "RIGHTS_USE_NOT_PERMITTED",
+          "message": "记录未允许目标用途: commercial_ad",
+          "asset_id": "source",
+          "rights_ref": "source",
+          "record_version": 1,
+          "context": "project_asset"
+        },
+        {
+          "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+          "message": "来源、许可证或证据字段缺失",
+          "asset_id": "source",
+          "rights_ref": "source",
+          "record_version": 1,
+          "context": "project_asset"
+        },
+        {
+          "status": "unverified",
+          "code": "RIGHTS_STATUS_BLOCKED",
+          "message": "状态 unverified 不允许发布",
+          "asset_id": "before_mask",
+          "rights_ref": "before_mask",
+          "record_version": 1,
+          "context": "project_asset"
+        },
+        {
+          "code": "RIGHTS_USE_NOT_PERMITTED",
+          "message": "记录未允许目标用途: commercial_ad",
+          "asset_id": "before_mask",
+          "rights_ref": "before_mask",
+          "record_version": 1,
+          "context": "project_asset"
+        },
+        {
+          "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+          "message": "来源、许可证或证据字段缺失",
+          "asset_id": "before_mask",
+          "rights_ref": "before_mask",
+          "record_version": 1,
+          "context": "project_asset"
+        },
+        {
+          "status": "unverified",
+          "code": "RIGHTS_STATUS_BLOCKED",
+          "message": "状态 unverified 不允许发布",
+          "asset_id": "corrected_mask",
+          "rights_ref": "corrected_mask",
+          "record_version": 1,
+          "context": "project_asset"
+        },
+        {
+          "code": "RIGHTS_USE_NOT_PERMITTED",
+          "message": "记录未允许目标用途: commercial_ad",
+          "asset_id": "corrected_mask",
+          "rights_ref": "corrected_mask",
+          "record_version": 1,
+          "context": "project_asset"
+        },
+        {
+          "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+          "message": "来源、许可证或证据字段缺失",
+          "asset_id": "corrected_mask",
+          "rights_ref": "corrected_mask",
+          "record_version": 1,
+          "context": "project_asset"
+        },
+        {
+          "status": "unverified",
+          "code": "RIGHTS_STATUS_BLOCKED",
+          "message": "状态 unverified 不允许发布",
+          "asset_id": "visual_adapter_sam2_local",
+          "rights_ref": "visual_adapter_sam2_local",
+          "record_version": 1,
+          "context": "derived_dependency"
+        },
+        {
+          "code": "RIGHTS_USE_NOT_PERMITTED",
+          "message": "记录未允许目标用途: commercial_ad",
+          "asset_id": "visual_adapter_sam2_local",
+          "rights_ref": "visual_adapter_sam2_local",
+          "record_version": 1,
+          "context": "derived_dependency"
+        }
+      ],
+      "warnings": [],
+      "disposition_decisions": [],
+      "effective_disposition_decisions": []
+    },
+    "private_summary_sha256": "sha256:8afd3a85719673298cefdbcda780680f54b069835f80a27cbb05c59a7f92d3c2",
+    "independent_checker_source": "\"\"\"Finish a persisted evaluation after its proposed correction failed one check.\n\nNo new inference and no silent prompt/threshold change. Private images stay here.\n\"\"\"\nfrom datetime import datetime, timezone\nimport contextlib\nimport hashlib\nimport io\nimport json\nfrom pathlib import Path\nimport subprocess\nimport sys\nimport time\n\nimport numpy as np\nfrom PIL import Image, ImageDraw\n\nroot = Path(__file__).resolve().parents[2]\nsys.path.insert(0, str(root / 'product/src'))\nfrom ai_ad_editor.cli import main\nfrom ai_ad_editor.runtime import configure_local_runtime\nfrom ai_ad_editor.media import ffmpeg_path\n\nconfigure_local_runtime()\nwork = root / 'product/.runtime/mask-review-natural-20261016'\nproject = work / 'project'\ncalls = json.loads((work / 'calls.json').read_text(encoding='utf-8-sig'))\nassert len(calls) == 7 and calls[-1]['exit_code'] == 2\nmatting = calls[5]['result']['data']['matting']\nbefore = json.loads((project / 'validation/before.json').read_text(encoding='utf-8-sig'))\nafter = json.loads((project / 'validation/after.json').read_text(encoding='utf-8-sig'))\nassert before['checked_points'] == after['checked_points'] == 5\nassert len(before['failed_points']) == 2 and len(after['failed_points']) == 1\n\ndef sha(path):\n    return 'sha256:' + hashlib.sha256(Path(path).read_bytes()).hexdigest()\n\ndef decode(path, source=False):\n    argv = [ffmpeg_path(), '-v', 'error', '-protocol_whitelist', 'file,pipe', '-i', str(path), '-map', '0:v:0', '-an']\n    if source:\n        argv += ['-vf', 'setpts=PTS-STARTPTS,trim=start=0:end=4,setpts=PTS-STARTPTS,scale=512:288:flags=lanczos,setsar=1,fps=fps=8:start_time=0:round=near,tpad=stop_mode=clone:stop_duration=0.125,format=rgba', '-frames:v', '32']\n    result = subprocess.run([*argv, '-fps_mode', 'passthrough', '-f', 'rawvideo', '-pix_fmt', 'rgba', 'pipe:1'], capture_output=True, check=True, timeout=60)\n    return np.frombuffer(result.stdout, np.uint8).reshape(32, 288, 512, 4).copy()\n\nsource = decode(matting['source']['path'], True)\nprior = decode(before['plan']['source']['path'])\ncorrected = decode(after['plan']['source']['path'])\nfor array, report in [(prior, before), (corrected, after)]:\n    assert 'sha256:' + hashlib.sha256(array[:, :, :, 3].tobytes()).hexdigest() == report['gray_sha256']\n    assert np.array_equal(array[:, :, :, :3], source[:, :, :, :3])\nassert sha(matting['output']) == matting['sha256']\npoints = [(41, 100, 'head +'), (15, 209, 'wrist +'), (64, 90, 'girl arm -')]\npoint_results = []\nfor x, y, label in points:\n    point_results.append({'frame': 31, 'pixel': [x, y], 'label': label, 'before_alpha': int(prior[31, y, x, 3]), 'after_alpha': int(corrected[31, y, x, 3])})\npanel = Image.new('RGB', (1024, 620), (24, 28, 35))\ndraw = ImageDraw.Draw(panel)\nfor col, (label, array) in enumerate([('Before: wrist missing, girl arm selected', prior), ('After: wrist STILL missing, girl arm clear', corrected)]):\n    rgb = source[31, :, :, :3].copy()\n    selected = array[31, :, :, 3] > 127\n    rgb[selected] = np.round(rgb[selected] * .55 + np.array([225, 45, 40]) * .45).astype(np.uint8)\n    crop = Image.fromarray(rgb).crop((0, 55, 200, 260)).resize((480, 492))\n    panel.paste(crop, (col * 512 + 16, 40))\n    draw.text((col * 512 + 16, 14), label, fill='white')\n    for x, y, name in points:\n        cx, cy = col * 512 + 16 + x * 2.4, 40 + (y - 55) * 2.4\n        draw.ellipse((cx - 8, cy - 8, cx + 8, cy + 8), outline=(250, 235, 65), width=2)\n        draw.text((cx + 10, cy), name, fill=(250, 235, 65))\ndraw.text((16, 550), 'Internal evaluation only. Five assertions: before 3/5; after 4/5. Both remain FAILED.', fill='white')\ndraw.text((16, 572), 'Selected object = boy 2. Preserved object = girl 1. No dense ground truth; no repair-quality acceptance.', fill='white')\ncontact = work / 'frame31-before-after-private.png'\npanel.save(contact)\n\ncontinued = []\nfor args, expected in [(['validate', '--project', str(project)], 0), (['policy', 'audit', '--project', str(project)], 0), (['rights', 'check', '--project', str(project), '--target', 'commercial_ad'], 7)]:\n    output = io.StringIO(); started = time.monotonic()\n    with contextlib.redirect_stdout(output):\n        code = main(args)\n    result = json.loads(output.getvalue())\n    continued.append({'argv': args, 'exit_code': code, 'seconds': time.monotonic() - started, 'result': result})\n    assert code == expected, (args, code)\n\nsummary = {'checked_at_utc': datetime.now(timezone.utc).isoformat(),\n           'status': 'partial-prompt-improvement-one-assertion-still-failed',\n           'initial_wrapper_exit_code': 1, 'wrapper_reason': 'Correction was expected to pass, but actual quality.mask exit 2 correctly preserved the failed report. Continued from saved project; no rerun.',\n           'calls': calls + continued, 'source_sha256': matting['source']['sha256'], 'matting': matting,\n           'before': before, 'after': after, 'target_object_id': 2, 'preserved_object_id': 1,\n           'prompt_sha256': sha(work / 'prompts-corrected.json'), 'expectations_sha256': sha(work / 'expectations.json'),\n           'independent_decode': {'frames': 32, 'before_and_after_rgb_changed_components_vs_source': 0,\n               'all_prior_frames_0_through_30_unchanged': bool(np.array_equal(prior[:31], corrected[:31])),\n               'changed_alpha_pixels_by_frame': np.count_nonzero(prior[:, :, :, 3] != corrected[:, :, :, 3], axis=(1, 2)).tolist(),\n               'both_report_gray_sha256_match_independent_decode': True, 'frame31_points': point_results},\n           'private_contact': {'path': str(contact), 'sha256': sha(contact)},\n           'publication_rights_verified': False, 'natural_quality_accepted': False, 'new_scene_count': 0,\n           'independent_dense_truth_available': False, 'continuous_playback_reviewed': False}\n(work / 'summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\\n', encoding='utf-8', newline='\\n')\nprint(json.dumps({'status': summary['status'], 'cli_calls': len(summary['calls']), 'failed_before': 2, 'failed_after': 1, 'independent_decode': summary['independent_decode'], 'continued_exit_codes': [c['exit_code'] for c in continued]}, ensure_ascii=False))\n",
+    "independent_checker_sha256": "sha256:168c9d4cf5c9757007b1bf84337561e98ba2f5393508db477df20ec8b9c0ea17",
+    "publication_rights_verified": false,
+    "private_natural_media_published": false,
+    "independent_dense_truth_available": false,
+    "natural_quality_accepted": false,
+    "quality_statement": "One exclusion checkpoint improved; wrist still failed. Other untested parts can worsen. Not full segmentation or repair acceptance."
+  },
+  "skill_audit_sha256": "sha256:3df05e3332d992a18ea78e41335e0ee3cbab4fb941288aaaeaabe770e9a1f8d6",
+  "manual_review": {
+    "method": "assistant view_image at original resolution; sampled stills",
+    "public_frame": 12,
+    "public_contact_sha256": "sha256:339be479880b7afdc734c159d3f79ee2456327f51beb0f9d78d89a647c3ac983",
+    "private_frame": 31,
+    "private_contact_sha256": "sha256:e4cf2af89b524925ea0f4bd484566aa49fef40880488a46fad11ebb950994e4a",
+    "findings": [
+      "Public procedural preview shows missing leg and failing checkpoint; restored geometry is authored, not model reconstruction.",
+      "Private frame31: boy is target; girl is retained. Girl forearm exclusion improves, boy wrist remains missed; other body extent lacks dense truth."
+    ],
+    "continuous_playback_reviewed": false,
+    "human_listening_completed": false
+  },
+  "natural_visual_quality_accepted": false,
+  "full_jianying_parity_accepted": false,
+  "collector_source": "\"\"\"Independent final delivery checks; keep private natural media out of Git.\"\"\"\nfrom datetime import datetime, timezone\nimport hashlib\nimport io\nimport json\nfrom pathlib import Path\nimport re\nimport subprocess\n\nfrom PIL import Image, ImageSequence\nimport numpy as np\n\nroot = Path(__file__).resolve().parents[2]\nout = root / 'docs/assets/mask-review-20261016'\nproofs = root / 'docs/validation/evidence'\n\ndef load(path):\n    return json.loads(Path(path).read_text(encoding='utf-8-sig'))\n\ndef sha(path):\n    return 'sha256:' + hashlib.sha256(Path(path).read_bytes()).hexdigest()\n\ndef decode(path, width, height, pixel_format, channels):\n    result = subprocess.run(['ffmpeg', '-v', 'error', '-protocol_whitelist', 'file,pipe', '-i', str(path), '-map', '0:v:0', '-an', '-fps_mode', 'passthrough', '-f', 'rawvideo', '-pix_fmt', pixel_format, 'pipe:1'], capture_output=True, check=True, timeout=60)\n    return np.frombuffer(result.stdout, np.uint8).reshape(-1, height, width, channels)\n\nregression = load(root / 'product/.runtime/mask_review_full_regression_20261016.json')\nfirst_regression = load(root / 'product/.runtime/mask_review_full_regression_20261016-before-eol.json')\neol = load(root / 'product/.runtime/mask_review_eol_normalization_20261016.json')\nassert first_regression['status'] == 'passed' and first_regression['test_count'] == 379\nassert all(item['only_crlf_to_lf'] and item['matches_existing_git_index'] for item in eol)\nassert regression['status'] == 'passed' and regression['test_count'] == 379 and regression['source_file_count'] == 83\nassert regression['source_sha256_before'] == regression['source_sha256_after']\nassert all(sha(root / name) == digest for name, digest in regression['source_sha256_after'].items())\nnames = sorted(regression['source_sha256_after'])\nindexed = subprocess.run(['git', '-c', 'core.autocrlf=false', 'cat-file', '--batch'],\n                         input=('\\n'.join(':' + name for name in names) + '\\n').encode('utf-8'),\n                         capture_output=True, check=True, timeout=60)\nstream = io.BytesIO(indexed.stdout)\nfor name in names:\n    fields = stream.readline().split()\n    assert len(fields) == 3 and fields[1] == b'blob', name\n    raw = stream.read(int(fields[2])); assert stream.read(1) == b'\\n'\n    assert 'sha256:' + hashlib.sha256(raw).hexdigest() == regression['source_sha256_after'][name], name\nlogs = {}\nfor stem, raw_name in [('full-regression', 'mask_review_full_regression_20261016.log'), ('targeted', 'mask_review_targeted_20261016_final.log')]:\n    source = root / 'product/.runtime' / raw_name\n    target = proofs / f'mask-review-{stem}-20261016.log'\n    target.write_bytes(source.read_bytes())\n    text = target.read_text(encoding='utf-8-sig')\n    match = re.search(r'Ran (\\d+) tests in ([\\d.]+)s', text)\n    assert match and text.rstrip().endswith('OK')\n    logs[stem] = {'path': target.relative_to(root).as_posix(), 'sha256': sha(target), 'test_count': int(match[1]), 'seconds': float(match[2])}\nassert logs['full-regression']['sha256'] == regression['log_sha256'] and logs['targeted']['test_count'] == 16\n\npublic = load(out / 'evidence.json')\nassert public['generator_sha256'] == sha(root / 'scripts/smoke_mask_review.py')\nassert all(sha(root / name) == digest for name, digest in public['source_sha256'].items())\nassert all(sha(out / name) == item['sha256'] and (out / name).stat().st_size == item['bytes'] for name, item in public['files'].items())\nassert len(public['calls']) == 6\nassert [c['exit_code'] for c in public['calls']] == [0, 0, 0, 0, 2, 0]\nmask_summary = {}\nfor mask, report_name in [('mask-under-test.mov', 'under-test-report.json'), ('mask-full.mov', 'full-report.json')]:\n    frames = decode(out / mask, 128, 192, 'rgba', 4)\n    report = load(out / report_name)\n    alpha = frames[:, :, :, 3]\n    assert len(frames) == 32\n    assert 'sha256:' + hashlib.sha256(alpha.tobytes()).hexdigest() == report['gray_sha256']\n    counts = np.count_nonzero(alpha > 127, axis=(1, 2)).tolist()\n    assert counts == [frame['selected_pixels'] for frame in report['frames']]\n    mask_summary[mask] = {'frames': 32, 'decoded_alpha_sha256': report['gray_sha256'], 'selected_pixels_by_frame': counts, 'checked_points': report['checked_points'], 'failed_points': report['failed_points'], 'semantic_quality_accepted': report['semantic_quality_accepted']}\npreview = decode(out / 'mask-review-comparison.mp4', 576, 248, 'rgb24', 3)\nassert len(preview) == 32\nwith Image.open(out / 'mask-review-comparison.gif') as handle:\n    durations = [frame.info['duration'] for frame in ImageSequence.Iterator(handle)]\nassert len(durations) == 32 and sum(durations) == 4000\nprobe = json.loads(subprocess.run(['ffprobe', '-v', 'error', '-count_frames', '-show_streams', '-show_format', '-of', 'json', str(out / 'mask-review-comparison.mp4')], capture_output=True, check=True, timeout=60).stdout)\nassert probe['streams'][0]['nb_read_frames'] == '32' and probe['streams'][0]['avg_frame_rate'] == '8/1'\nassert float(probe['format']['duration']) == 4.\n\nnatural_path = root / 'product/.runtime/mask-review-natural-20261016/summary.json'\nnatural = load(natural_path)\nassert len(natural['calls']) == 10 and natural['target_object_id'] == 2 and natural['preserved_object_id'] == 1\nassert len(natural['before']['failed_points']) == 2 and len(natural['after']['failed_points']) == 1\nassert natural['independent_decode']['all_prior_frames_0_through_30_unchanged']\nprivate_checker = root / 'product/.runtime/verify_mask_review_natural_20261016.py'\nnatural_record = {'status': natural['status'], 'source_sha256': natural['source_sha256'],\n                 'new_scene_count': 0, 'new_model_runs': 1, 'target_object_id': 2, 'preserved_object_id': 1,\n                 'video': natural['matting']['video'], 'before_mask_sha256': natural['before']['plan']['source']['sha256'],\n                 'after_mask_sha256': natural['after']['plan']['source']['sha256'],\n                 'prompt_sha256': natural['prompt_sha256'], 'canonical_prompt_sha256': natural['matting']['worker']['prompt_sha256'],\n                 'expectations_sha256': natural['expectations_sha256'], 'worker': natural['matting']['worker'],\n                 'source_prompt': load(root / 'product/.runtime/mask-review-natural-20261016/prompts-corrected.json'),\n                 'expectations': load(root / 'product/.runtime/mask-review-natural-20261016/expectations.json'),\n                 'before_checked_points': natural['before']['checked_points'], 'before_failed_points': natural['before']['failed_points'],\n                 'after_checked_points': natural['after']['checked_points'], 'after_failed_points': natural['after']['failed_points'],\n                 'frame31_selected_pixels_before': natural['before']['frames'][31]['selected_pixels'],\n                 'frame31_selected_pixels_after': natural['after']['frames'][31]['selected_pixels'],\n                 'independent_decode': natural['independent_decode'],\n                 'calls': [{'argv': c['argv'], 'exit_code': c['exit_code'], 'status': c['result']['status'], 'seconds': c['seconds'],\n                            'errors': c['result'].get('errors', [])} for c in natural['calls']],\n                 'initial_wrapper_exit_code': natural['initial_wrapper_exit_code'], 'initial_wrapper_reason': natural['wrapper_reason'],\n                 'policy_result': natural['calls'][8]['result']['data'], 'rights_result': natural['calls'][9]['result']['data'],\n                 'private_summary_sha256': sha(natural_path), 'independent_checker_source': private_checker.read_text(encoding='utf-8'),\n                 'independent_checker_sha256': sha(private_checker),\n                 'publication_rights_verified': False, 'private_natural_media_published': False,\n                 'independent_dense_truth_available': False, 'natural_quality_accepted': False,\n                 'quality_statement': 'One exclusion checkpoint improved; wrist still failed. Other untested parts can worsen. Not full segmentation or repair acceptance.'}\nskills_path = proofs / 'skills-audit-mask-review-20261016.json'\nskills = load(skills_path)\nassert skills['skill_count'] == 14 and not skills['broken_links']\nassert all(item['validator_exit_code'] == 0 and item['installed_directory_resolves_to_repo'] and sha(root / 'skills' / item['skill'] / 'SKILL.md') == item['sha256'] for item in skills['results'])\n\nrecord = {'checked_at_utc': datetime.now(timezone.utc).isoformat(), 'status': 'functional-mask-gate-verified-natural-correction-still-failed',\n          'full_product_regression': regression, 'logs': logs, 'targeted_checks_are_subset_of_full_suite': True,\n          'first_full_run_before_eol_normalization': {'test_count': first_regression['test_count'], 'seconds': first_regression['suite_seconds'],\n               'source_sha256_before': first_regression['source_sha256_before'], 'source_sha256_after': first_regression['source_sha256_after'],\n               'log_sha256': first_regression['log_sha256'], 'scope': 'earlier passed run; not added to final test count'},\n          'line_ending_normalization_before_final_full_run': eol,\n          'python_checkout_policy': 'product/**/*.py text eol=lf; final full-suite source bytes must match Git index exactly',\n          'git_index_source_blobs_verified': len(names),\n          'research_checks_rerun': False, 'prior_research_check_count_not_added': 22,\n          'public_generator': {'path': 'scripts/smoke_mask_review.py', 'sha256': sha(root / 'scripts/smoke_mask_review.py')},\n          'public_cli_calls': 6, 'public_cli_exit_codes': [c['exit_code'] for c in public['calls']],\n          'public_verification_sha256': sha(out / 'evidence.json'), 'public_masks_independently_decoded': mask_summary,\n          'public_preview': {'mp4_probe': probe, 'mp4_decoded_frames': len(preview), 'gif_frames': len(durations), 'gif_durations_ms': sorted(set(durations)), 'gif_total_ms': sum(durations)},\n          'public_files': {p.relative_to(root).as_posix(): {'sha256': sha(p), 'bytes': p.stat().st_size} for p in sorted(out.iterdir()) if p.is_file()},\n          'natural_evaluation': natural_record, 'skill_audit_sha256': sha(skills_path),\n          'manual_review': {'method': 'assistant view_image at original resolution; sampled stills', 'public_frame': 12,\n                            'public_contact_sha256': sha(out / 'contact-frame-12.png'), 'private_frame': 31,\n                            'private_contact_sha256': natural['private_contact']['sha256'],\n                            'findings': ['Public procedural preview shows missing leg and failing checkpoint; restored geometry is authored, not model reconstruction.',\n                                         'Private frame31: boy is target; girl is retained. Girl forearm exclusion improves, boy wrist remains missed; other body extent lacks dense truth.'],\n                            'continuous_playback_reviewed': False, 'human_listening_completed': False},\n          'natural_visual_quality_accepted': False, 'full_jianying_parity_accepted': False,\n          'collector_source': Path(__file__).read_text(encoding='utf-8'), 'collector_sha256': sha(Path(__file__))}\ntarget = proofs / 'mask-review-20261016.json'\ntarget.write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\\n', encoding='utf-8', newline='\\n')\nprint(json.dumps({'status': record['status'], 'full_regression': regression['test_count'], 'source_files': regression['source_file_count'], 'targeted': logs['targeted'], 'public_files': len(record['public_files']), 'natural_failed_before': 2, 'natural_failed_after': 1}, ensure_ascii=False))\n",
+  "collector_sha256": "sha256:b7e5d4dea715b453ff902a96ed0197852ee6f21bfa76429f4b10c980977a1887"
+}
