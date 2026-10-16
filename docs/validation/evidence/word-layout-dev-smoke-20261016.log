@@ -1,0 +1,11 @@
+{"case": "inline", "before_rg": 193, "after_rg": 2, "after_timing_mismatches": 0}
+{"case": "center-repeat", "before_rg": 193, "after_rg": 2, "after_timing_mismatches": 0}
+{"case": "multiline", "before_rg": 194, "after_rg": 2, "after_timing_mismatches": 15}
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_word_layout.py", line 173, in <module>
+    run(args.output.resolve(),args.work.resolve(),args.font.resolve(),args.font_license.resolve(),args.cjk_font.resolve(),args.cjk_font_license.resolve())
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_word_layout.py", line 146, in run
+    assert variants['after']['max_rg_error']<=3 and variants['after']['timing_mismatches']==0 and variants['after']['max_source_frame_error']<=1
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

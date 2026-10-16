@@ -1,0 +1,70 @@
+test_a_timed_range_can_cross_a_newline (test_word_highlight.WordHighlightTests.test_a_timed_range_can_cross_a_newline) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py:101: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  self.assertGreater(sum(r > 170 and g > 145 and b < 100 for frame in frames for r,g,b in frame.crop((0,70,W,H)).getdata()), 30)
+ok
+test_active_opacity_can_replace_opaque_foreground (test_word_highlight.WordHighlightTests.test_active_opacity_can_replace_opaque_foreground) ... ok
+test_bidi_mapping_is_rejected_explicitly (test_word_highlight.WordHighlightTests.test_bidi_mapping_is_rejected_explicitly) ... ok
+test_border_shadow_and_box_preserve_geometry (test_word_highlight.WordHighlightTests.test_border_shadow_and_box_preserve_geometry) ... ok
+test_combining_marks_and_literal_percent (test_word_highlight.WordHighlightTests.test_combining_marks_and_literal_percent) ... ok
+test_custom_time_position_and_fix_bounds (test_word_highlight.WordHighlightTests.test_custom_time_position_and_fix_bounds) ... ok
+test_default_center_keeps_the_whole_paragraph_anchor (test_word_highlight.WordHighlightTests.test_default_center_keeps_the_whole_paragraph_anchor) ... ok
+test_dynamic_inline_keeps_a_visible_degradation (test_word_highlight.WordHighlightTests.test_dynamic_inline_keeps_a_visible_degradation) ... FAIL
+test_explicit_repeated_start_char_leaves_first_word_untouched (test_word_highlight.WordHighlightTests.test_explicit_repeated_start_char_leaves_first_word_untouched) ... ok
+test_inline_word_glyph_geometry (test_word_highlight.WordHighlightTests.test_inline_word_glyph_geometry) ... ok
+test_internal_ligature_range_is_rejected_explicitly (test_word_highlight.WordHighlightTests.test_internal_ligature_range_is_rejected_explicitly) ... ok
+test_multiline_descenders_and_right_alignment (test_word_highlight.WordHighlightTests.test_multiline_descenders_and_right_alignment) ... ok
+test_native_layout_does_not_require_pillow_metrics (test_word_highlight.WordHighlightTests.test_native_layout_does_not_require_pillow_metrics) ... ERROR
+test_same_color_highlight_never_repaints_antialiasing (test_word_highlight.WordHighlightTests.test_same_color_highlight_never_repaints_antialiasing) ... ok
+test_split_grapheme_is_rejected_explicitly (test_word_highlight.WordHighlightTests.test_split_grapheme_is_rejected_explicitly) ... ok
+test_translucent_foreground_is_not_painted_twice (test_word_highlight.WordHighlightTests.test_translucent_foreground_is_not_painted_twice) ... FAIL
+test_word_animation_limitation_is_reported (test_word_highlight.WordHighlightTests.test_word_animation_limitation_is_reported) ... ERROR
+test_wrapping_and_repeated_words_follow_source_lines (test_word_highlight.WordHighlightTests.test_wrapping_and_repeated_words_follow_source_lines) ... ok
+
+======================================================================
+ERROR: test_native_layout_does_not_require_pillow_metrics (test_word_highlight.WordHighlightTests.test_native_layout_does_not_require_pillow_metrics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 168, in test_native_layout_does_not_require_pillow_metrics
+    metadata = [x['subtitle_time_mapping']['text_layout'] for x in manifest['plan']['inputs'] if x.get('subtitle_time_mapping', {}).get('text_layout')]
+                                                                   ~~~~~~~~^^^^^^^^
+KeyError: 'plan'
+
+======================================================================
+ERROR: test_word_animation_limitation_is_reported (test_word_highlight.WordHighlightTests.test_word_animation_limitation_is_reported)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 208, in test_word_animation_limitation_is_reported
+    self.assertIn('subtitle_word_animation', [x.get('feature') for x in result['data']['warnings']])
+                                                                        ~~~~~~~~~~~~~~^^^^^^^^^^^^
+KeyError: 'warnings'
+
+======================================================================
+FAIL: test_dynamic_inline_keeps_a_visible_degradation (test_word_highlight.WordHighlightTests.test_dynamic_inline_keeps_a_visible_degradation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 199, in test_dynamic_inline_keeps_a_visible_degradation
+    self.prepare(self.subtitle(), independent=False, dynamic=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 70, in prepare
+    self.call('timeline', 'compose', '--project', self.root, '--input', path)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'timeline.compose', 'request_id': 'req_20261016144322_49893091', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'PROJECT_INVALID', 'message': '时间线变更会生成无效项目', 'path': None, 'retryable': False, 'cause': '{"ok": false, "errors": [{"code": "SCHEMA_VALIDATION_FAILED", "message": "\'interpolation\' is a required property", "path": "sequences.0.tracks.0.clips.0.keyframes.0.keyframes.0", "retryable": false}, {"code": "SCHEMA_VALIDATION_FAILED", "message": "\'interpolation\' is a required property", "path": "sequences.0.tracks.0.clips.0.keyframes.0.keyframes.1", "retryable": false}, {"code": "INTERPOLATION_INVALID", "message": "关键帧插值类型无效", "path": "sequences[0].tracks[0].clips[0].keyframes", "retryable": false}, {"code": "INTERPOLATION_INVALID", "message": "关键帧插值类型无效", "path": "sequences[0].tracks[0].clips[0].keyframes", "retryable": false}], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}], "rights": {"ok": true, "target": "commercial_ad", "checked": 2, "required_records": 2, "failures": [], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "frames", "rights_ref": "frames", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "local_font", "rights_ref": "local_font", "record_version": 1, "context": "project_asset"}], "disposition_decisions": [], "effective_disposition_decisions": []}, "schema_engine": "jsonschema", "asset_count": 2, "sequence_count": 1}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:43:22.011454Z', 'finished_at': '2026-10-16T14:43:22.011460Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_translucent_foreground_is_not_painted_twice (test_word_highlight.WordHighlightTests.test_translucent_foreground_is_not_painted_twice)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 142, in test_translucent_foreground_is_not_painted_twice
+    self.compare_geometry(self.subtitle(fontcolor='white@0.65', active_color='yellow@0.65'))
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 101, in compare_geometry
+    self.assertGreater(sum(r > 170 and g > 145 and b < 100 for frame in frames for r,g,b in frame.crop((0,70,W,H)).getdata()), 30)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 not greater than 30
+
+----------------------------------------------------------------------
+Ran 18 tests in 36.051s
+
+FAILED (failures=2, errors=2)

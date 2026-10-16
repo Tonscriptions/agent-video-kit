@@ -75,8 +75,16 @@ External SRT/ASS defaults to author-sequence timestamps; choose
 asset and verify its actual family; libass fontsize uses ASS units. Captions
 on frozen intervals, file animation and inline rotate retain explicit limits.
 Dynamic-size inline alpha animation remains approximate; prefer an independent
-title track for that combination. Active-word timing does not accept glyph
-placement: inspect the actual highlight alignment. A render intentionally records outputs
+title track for that combination. For word colors, read the
+[native paragraph contract](../../docs/specs/逐字高亮原生排版与颜色选择契约_v0.1_2026-10-16.md).
+Fixed-raster highlights select between two identical full-paragraph paints;
+native FFmpeg/font metrics position the selection. Repeated words and line
+spans preserve source ranges. Use literal text and a local font; bidi, split
+graphemes/internal shaping clusters and stateful position expressions are
+rejected during render planning. Dynamic-size inline highlights retain the
+whole sentence and explicitly suppress highlighting; use an independent title.
+Word/animation combinations, overlapping lines and arbitrary color alpha need
+separate acceptance. A render intentionally records outputs
 and provenance; compare authored timeline/assets/settings and Rights Ledger
 when checking that generated internal clocks were not persisted.
 

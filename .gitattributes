@@ -40,3 +40,11 @@ scripts/smoke_subtitle_clock.py -text
 docs/validation/evidence/subtitle-clock*.json -text
 docs/validation/evidence/subtitle-clock*.log -text -whitespace
 docs/assets/subtitle-clock-20261016/font-license.txt -whitespace
+
+# Native word-layout proofs preserve raw logs and third-party license bytes.
+scripts/smoke_word_layout.py -text
+docs/validation/evidence/*word-layout*.json -text
+docs/validation/evidence/word-layout*.log -text -whitespace
+docs/validation/evidence/glyph-dev*.log -text -whitespace
+docs/validation/evidence/word-policy*.log -text -whitespace
+docs/assets/word-layout*/*.txt -whitespace

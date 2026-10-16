@@ -239,7 +239,7 @@ def _expr_arg(expression: str) -> str:
 
 
 def _drawtext_arg(value: Any) -> str:
-    return str(value).replace("\\", "\\\\").replace("'", "\\'").replace(":", "\\:").replace(",", "\\,").replace("%", "\\%").replace("\n", "\\n")
+    return str(value).replace("\\", "\\\\").replace("'", "\\'").replace(":", "\\:").replace(",", "\\,").replace("%", "\\%")
 
 
 def _wrap_subtitle_text(text: str, style: dict[str, Any], font_size: int, warnings: list[dict[str, Any]], clip_id: str, font_metrics: Any = None) -> str:
@@ -1831,6 +1831,8 @@ def _subtitle_filter(
     time_expression: str = 't',
     visible_window: tuple[float, float] | None = None,
     animation_alpha: list[str] | None = None,
+    layout_evidence: dict[str, Any] | None = None,
+    dynamic_raster: bool = False,
 ) -> str | None:
     if not isinstance(subtitle, dict):
         return None
@@ -1967,25 +1969,41 @@ def _subtitle_filter(
                 base_parts.append(f"y={_expr_arg(base_y)}")
             if style.get("box", True):
                 base_parts.extend(["box=1", f"boxcolor={_quoted(style.get('boxcolor', 'black@0.45'))}", f"boxborderw={box_border}"])
-            word_filters = [":".join(base_parts)]
-            prefix_text = ""
-            highlight_color = _quoted(style.get("active_color", style.get("highlight_color", "yellow")))
-            for word, start_value, end_value, word_index in entries:
-                word_parts = [f"drawtext=text='{_drawtext_arg(word)}'", f"fontcolor={highlight_color}", f"fontsize={font_size}"]
-                if resolved_font_path is not None:
-                    word_parts.append(f"fontfile='{_quoted(_filter_file_path(root, resolved_font_path))}'")
-                original_item = word_timing[word_index] if isinstance(word_timing, list) and word_index < len(word_timing) else None
-                source_span = resolved_words.get(id(original_item)) if isinstance(original_item, dict) else None
-                prefix = source_subtitle_text[:source_span[0]] if source_span else prefix_text
-                prefix_width = _subtitle_text_width(font_metrics, prefix, font_size)
-                word_parts.extend([
-                    f"x={_expr_arg(f'({base_x})+({prefix_width:.6f})')}",
-                    f"y={_expr_arg(base_y)}",
-                    f"enable={_expr_arg(f'gte(({time_expression}),{clip_start + start_value:.9f})*lt(({time_expression}),{clip_start + end_value:.9f})' + ('*(' + window_expression + ')' if timeline_window else ''))}",
-                ])
-                word_filters.append(":".join(word_parts))
-                prefix_text = source_subtitle_text[:source_span[1]] if source_span else prefix_text + word + " "
-            return ",".join(word_filters)
+            if dynamic_raster:
+                warnings.append({'code': 'RENDER_FEATURE_UNSUPPORTED', 'clip_id': clip_id,
+                                 'feature': 'subtitle_word_dynamic_raster',
+                                 'message': '动态尺寸内嵌逐字高亮尚不支持，保留整句；请使用独立字幕层'})
+                if '\n' in subtitle_text and resolved_font_path is not None:
+                    from .text_highlight import multiline_filter
+                    return multiline_filter(root, resolved_font_path, font_size,
+                                            build_text_layout(source_subtitle_text, style, font_metrics, font_size),
+                                            style, base_parts, base_x, base_y)[0]
+                return ':'.join(base_parts)
+            if resolved_font_path is None:
+                raise AppError('SUBTITLE_WORD_FONT_REQUIRED', '逐字高亮需要明确的本地字体文件', exit_code=2)
+            if subtitle.get('animation') or style.get('animation'):
+                warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip_id,
+                                 'feature': 'subtitle_word_animation',
+                                 'message': '逐字高亮与文字动画尚未联合实现；高亮保留，独立图层旋转仍由外层执行'})
+            if int(style.get('line_spacing', 0)) < 0:
+                warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip_id,
+                                 'feature': 'subtitle_word_overlapping_lines',
+                                 'message': '负行距可能使相邻行笔画重叠，逐字颜色需目检'})
+            from .text_highlight import highlight_filter
+            active_color = _quoted(style.get('active_color', style.get('highlight_color', 'yellow')))
+            active_parts = [f'fontcolor={active_color}' if part.startswith('fontcolor=') else part for part in base_parts]
+            timed = {id(word_timing[index]): (start, end) for _, start, end, index in entries}
+            selected_ranges = [(item, *resolved_words[id(item)]) for item in word_timing if isinstance(item, dict) and id(item) in timed]
+            value, evidence = highlight_filter(
+                root, resolved_font_path, font_size,
+                build_text_layout(source_subtitle_text, style, font_metrics, font_size), style,
+                selected_ranges, timed, base_parts, active_parts,
+                base_x, base_y, time_expression, clip_start, clip_id,
+                window_expression if timeline_window else None,
+            )
+            if layout_evidence is not None:
+                layout_evidence.update(evidence)
+            return value
     animation = subtitle.get("animation") if isinstance(subtitle.get("animation"), dict) else style.get("animation") if isinstance(style.get("animation"), dict) else {}
     animation_type = str(animation.get("type", "")).lower().replace("-", "_")
     if animation_type:
@@ -2014,6 +2032,10 @@ def _subtitle_filter(
                 x_expr = f"({base_x})-((1-({progress}))*{distance:.4f})"
                 parts.append(f"x={_expr_arg(x_expr)}")
         elif animation_type in {"typewriter", "typing"}:
+            if '\n' in subtitle_text:
+                warnings.append({'code':'RENDER_FEATURE_APPROXIMATE','clip_id':clip_id,
+                                 'feature':'subtitle_multiline_typewriter',
+                                 'message':'多行打字机尚未共享段落排版；当前逐字路径需单独验收'})
             chars = [item[2] for item in graphemes(subtitle_text) if item[2] != "\n"]
             if not chars:
                 return None
@@ -2056,6 +2078,16 @@ def _subtitle_filter(
         parts.append(f"y={_expr_arg(base_y)}")
     if style.get("box", True):
         parts.extend(["box=1", f"boxcolor={_quoted(style.get('boxcolor', 'black@0.45'))}", f"boxborderw={box_border}"])
+    if '\n' in subtitle_text and resolved_font_path is not None:
+        from .text_highlight import multiline_filter
+        x = next(part[3:-1] for part in parts if part.startswith("x='"))
+        y = next(part[3:-1] for part in parts if part.startswith("y='"))
+        value, evidence = multiline_filter(root, resolved_font_path, font_size,
+                                            build_text_layout(source_subtitle_text, style, font_metrics, font_size),
+                                            style, parts, x, y)
+        if layout_evidence is not None:
+            layout_evidence.update(evidence)
+        return value
     return ":".join(parts)
 
 
@@ -2074,11 +2106,13 @@ def _compiled_subtitle_filter(
     author_start = clock['authored_start_seconds']
     author_duration = clock['authored_duration_seconds']
     animation_alpha: list[str] = []
+    layout_evidence: dict[str, Any] = {}
     value = _subtitle_filter(
         root, subtitle, warnings, str(clip.get('id')), author_start, author_duration,
         timeline_window=independent, rotation_supported=independent, assets=assets,
         time_expression=_subtitle_authored_expression(clock), visible_window=(start, duration),
         animation_alpha=animation_alpha,
+        layout_evidence=layout_evidence, dynamic_raster=dynamic_raster and not independent,
     )
     if value and animation_alpha and dynamic_raster and not independent:
         # FFmpeg's implicit format converters pin the first geometry in a
@@ -2131,9 +2165,11 @@ def _compiled_subtitle_filter(
                  + f'[{layer}];'
                  + f'[{base}][{layer}]overlay=x=0:y=0:format=auto:shortest=1')
     clock = {**clock, 'asset_time_base': time_base if external else 'clip-local-inline',
-             'engine': 'libass' if external else 'drawtext',
+             'engine': 'libass' if external else layout_evidence.get('engine', 'drawtext'),
              'frame_clock': 'restored-to-final-display-grid' if external else 'unchanged',
              'continuous_playback_reviewed': False}
+    if layout_evidence:
+        clock['text_layout'] = layout_evidence
     if value and clock.get('freeze_semantics_approximate'):
         warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
                          'feature': 'subtitle_freeze_clock',

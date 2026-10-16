@@ -1,0 +1,44 @@
+test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:201: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  count=sum(r>160 and g>160 and b>160 for r,g,b in image.crop((0,23,WIDTH,HEIGHT)).getdata())
+ok
+test_subtitle_clock_asset_style_options_resolve_registered_cues (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_asset_style_options_resolve_registered_cues) ... ok
+test_subtitle_clock_dynamic_inline_alpha_remains_explicitly_degraded (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_dynamic_inline_alpha_remains_explicitly_degraded) ... ok
+test_subtitle_clock_fade_animation_uses_authored_duration (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_fade_animation_uses_authored_duration) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:244: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  return sum(.2126*r+.7152*g+.0722*b for r,g,b in image.crop((4,25,WIDTH,HEIGHT)).getdata())-self.luma_base
+ok
+test_subtitle_clock_independent_fade_transition (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_fade_transition) ... ok
+test_subtitle_clock_independent_rotation_pose (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_rotation_pose) ... ok
+test_subtitle_clock_independent_words_and_final_visibility_window (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_words_and_final_visibility_window) ... ok
+test_subtitle_clock_inline_eased_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_eased_word_highlights) ... ok
+test_subtitle_clock_inline_linear_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_linear_word_highlights) ... ok
+test_subtitle_clock_invalid_asset_time_base_rejected_atomically (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_invalid_asset_time_base_rejected_atomically) ... ok
+test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing) ... ok
+test_subtitle_clock_literal_text_and_custom_position_clock (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_literal_text_and_custom_position_clock) ... ok
+test_subtitle_clock_manifest_and_unaccepted_freeze_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_manifest_and_unaccepted_freeze_boundary) ... ok
+test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase) ... ok
+test_subtitle_clock_reverse_half_open_word_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_reverse_half_open_word_boundary) ... ok
+test_subtitle_clock_srt_clip_relative_under_eased_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_srt_clip_relative_under_eased_reverse) ... ok
+test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse) ... FAIL
+test_subtitle_clock_typewriter_prefix_matches_original_time (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_typewriter_prefix_matches_original_time) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:239: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  if sum(r>165 and g>165 and b>165 for r,g,b in region.getdata())>4:observed+=1
+ok
+
+======================================================================
+FAIL: test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 218, in test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse
+    self.check_words(self.case([{'mode':'bezier','reverse':True},{'rates':(.8,2.),'mode':'ease_out','reverse':True}]))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 153, in case
+    self.call('render','--project',self.root,'--output',self.output)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 6 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016143949_8890da87', 'operation_id': 'render_20261016143723_a9be9551', 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'RENDER_FAILED', 'message': 'FFmpeg 渲染失败', 'path': None, 'retryable': True, 'cause': '[AVFilterGraph @ 000002a4fce90980] Error initializing filters\nError : Cannot allocate memory\n', 'operation_id': 'render_20261016143723_a9be9551'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:39:49.893961Z', 'finished_at': '2026-10-16T14:39:49.893967Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 18 tests in 215.906s
+
+FAILED (failures=1)

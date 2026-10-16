@@ -1,0 +1,181 @@
+test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_ass_sequence_time_and_video_frame_roundtrip) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:201: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  count=sum(r>160 and g>160 and b>160 for r,g,b in image.crop((0,23,WIDTH,HEIGHT)).getdata())
+ok
+test_subtitle_clock_asset_style_options_resolve_registered_cues (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_asset_style_options_resolve_registered_cues) ... ok
+test_subtitle_clock_dynamic_inline_alpha_remains_explicitly_degraded (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_dynamic_inline_alpha_remains_explicitly_degraded) ... ok
+test_subtitle_clock_fade_animation_uses_authored_duration (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_fade_animation_uses_authored_duration) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:244: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  return sum(.2126*r+.7152*g+.0722*b for r,g,b in image.crop((4,25,WIDTH,HEIGHT)).getdata())-self.luma_base
+ok
+test_subtitle_clock_independent_fade_transition (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_fade_transition) ... ok
+test_subtitle_clock_independent_rotation_pose (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_rotation_pose) ... ok
+test_subtitle_clock_independent_words_and_final_visibility_window (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_words_and_final_visibility_window) ... 
+  test_subtitle_clock_independent_words_and_final_visibility_window (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_words_and_final_visibility_window) (config={'mode': 'ease_in'}) ... FAIL
+  test_subtitle_clock_independent_words_and_final_visibility_window (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_words_and_final_visibility_window) (config={'rates': (1.0, 1.0), 'reverse': True}) ... FAIL
+test_subtitle_clock_inline_eased_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_eased_word_highlights) ... FAIL
+test_subtitle_clock_inline_linear_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_linear_word_highlights) ... FAIL
+test_subtitle_clock_invalid_asset_time_base_rejected_atomically (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_invalid_asset_time_base_rejected_atomically) ... FAIL
+test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing) ... FAIL
+test_subtitle_clock_literal_text_and_custom_position_clock (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_literal_text_and_custom_position_clock) ... ok
+test_subtitle_clock_manifest_and_unaccepted_freeze_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_manifest_and_unaccepted_freeze_boundary) ... FAIL
+test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase) ... FAIL
+test_subtitle_clock_reverse_half_open_word_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_reverse_half_open_word_boundary) ... FAIL
+test_subtitle_clock_srt_clip_relative_under_eased_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_srt_clip_relative_under_eased_reverse) ... ok
+test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse) ... FAIL
+test_subtitle_clock_typewriter_prefix_matches_original_time (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_typewriter_prefix_matches_original_time) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py:239: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  if sum(r>165 and g>165 and b>165 for r,g,b in region.getdata())>4:observed+=1
+ok
+
+======================================================================
+FAIL: test_subtitle_clock_independent_words_and_final_visibility_window (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_words_and_final_visibility_window) (config={'mode': 'ease_in'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 225, in test_subtitle_clock_independent_words_and_final_visibility_window
+    with self.subTest(config=config):self.check_words(self.case([config],independent=True))
+                                                      ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 10 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016143424_84fbadcf', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'SUBTITLE_NATIVE_METRICS_UNAVAILABLE', 'message': '当前 FFmpeg 未返回完整的原生字形度量；不能退回平均字宽', 'path': None, 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:34:24.784040Z', 'finished_at': '2026-10-16T14:34:24.784048Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_independent_words_and_final_visibility_window (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_independent_words_and_final_visibility_window) (config={'rates': (1.0, 1.0), 'reverse': True})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 225, in test_subtitle_clock_independent_words_and_final_visibility_window
+    with self.subTest(config=config):self.check_words(self.case([config],independent=True))
+                                                      ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 10 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016143425_c2b404f9', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'SUBTITLE_NATIVE_METRICS_UNAVAILABLE', 'message': '当前 FFmpeg 未返回完整的原生字形度量；不能退回平均字宽', 'path': None, 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:34:25.443789Z', 'finished_at': '2026-10-16T14:34:25.443796Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_inline_eased_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_eased_word_highlights)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 209, in test_subtitle_clock_inline_eased_word_highlights
+    self.check_words(self.case([{'mode':'ease_in'}]))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 10 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016143426_1c6e16f7', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'SUBTITLE_NATIVE_METRICS_UNAVAILABLE', 'message': '当前 FFmpeg 未返回完整的原生字形度量；不能退回平均字宽', 'path': None, 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:34:26.172113Z', 'finished_at': '2026-10-16T14:34:26.172122Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_inline_linear_word_highlights (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_inline_linear_word_highlights)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 206, in test_subtitle_clock_inline_linear_word_highlights
+    self.check_words(self.case())
+                     ~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 10 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016143426_cb91ae17', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'SUBTITLE_NATIVE_METRICS_UNAVAILABLE', 'message': '当前 FFmpeg 未返回完整的原生字形度量；不能退回平均字宽', 'path': None, 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:34:26.843449Z', 'finished_at': '2026-10-16T14:34:26.843460Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_invalid_asset_time_base_rejected_atomically (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_invalid_asset_time_base_rejected_atomically)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 323, in test_subtitle_clock_invalid_asset_time_base_rejected_atomically
+    self.case(render=False)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 10 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016143427_5156a1c5', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'SUBTITLE_NATIVE_METRICS_UNAVAILABLE', 'message': '当前 FFmpeg 未返回完整的原生字形度量；不能退回平均字宽', 'path': None, 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:34:27.483064Z', 'finished_at': '2026-10-16T14:34:27.483076Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 215, in test_subtitle_clock_leaf_reverse_keeps_presentation_word_timing
+    self.check_words(self.case([{'mode':'ease_out','reverse':True}],leaf_reverse=True))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 10 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016143428_3feebc28', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'SUBTITLE_NATIVE_METRICS_UNAVAILABLE', 'message': '当前 FFmpeg 未返回完整的原生字形度量；不能退回平均字宽', 'path': None, 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:34:28.095040Z', 'finished_at': '2026-10-16T14:34:28.095048Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_manifest_and_unaccepted_freeze_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_manifest_and_unaccepted_freeze_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 362, in test_subtitle_clock_manifest_and_unaccepted_freeze_boundary
+    self.case([{'mode':'ease_in'}],render=False)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 10 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016143429_c541c3e9', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'SUBTITLE_NATIVE_METRICS_UNAVAILABLE', 'message': '当前 FFmpeg 未返回完整的原生字形度量；不能退回平均字宽', 'path': None, 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:34:29.907092Z', 'finished_at': '2026-10-16T14:34:29.907101Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 221, in test_subtitle_clock_nonzero_trim_and_output_start_preserve_phase
+    self.check_words(self.case([{'left':.8,'right':2.7,'start':.23,'mode':'ease_in','reverse':True}]))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 10 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016143430_d3d18890', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'SUBTITLE_NATIVE_METRICS_UNAVAILABLE', 'message': '当前 FFmpeg 未返回完整的原生字形度量；不能退回平均字宽', 'path': None, 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:34:30.532613Z', 'finished_at': '2026-10-16T14:34:30.532625Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_reverse_half_open_word_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_reverse_half_open_word_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 212, in test_subtitle_clock_reverse_half_open_word_boundary
+    self.check_words(self.case([{'rates':(1.,1.),'reverse':True}]))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 10 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016143431_85ee299d', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'SUBTITLE_NATIVE_METRICS_UNAVAILABLE', 'message': '当前 FFmpeg 未返回完整的原生字形度量；不能退回平均字宽', 'path': None, 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:34:31.169982Z', 'finished_at': '2026-10-16T14:34:31.169989Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 218, in test_subtitle_clock_two_nonlinear_ancestors_and_double_reverse
+    self.check_words(self.case([{'mode':'bezier','reverse':True},{'rates':(.8,2.),'mode':'ease_out','reverse':True}]))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_subtitle_clock.py", line 149, in case
+    self.plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 10 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261016143433_45594f40', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'SUBTITLE_NATIVE_METRICS_UNAVAILABLE', 'message': '当前 FFmpeg 未返回完整的原生字形度量；不能退回平均字宽', 'path': None, 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-16T14:34:33.152070Z', 'finished_at': '2026-10-16T14:34:33.152078Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 18 tests in 52.425s
+
+FAILED (failures=10)

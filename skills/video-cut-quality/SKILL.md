@@ -114,6 +114,17 @@ coverage-weighted moments avoid a sparse threshold bias on fading glyphs.
 Keep raw failed checks. Freeze intervals, arbitrary font color alpha, VFR,
 continuous playback and listening still require separate acceptance.
 
+For [word colors](../../docs/specs/逐字高亮原生排版与颜色选择契约_v0.1_2026-10-16.md),
+compare the encoded full paragraph with an actual untimed CLI control. White
+and yellow preserve R/G: lossless 4:4:4 controls can detect shifted/repainted
+glyphs within a 3-level RGB/YUV round-trip allowance. Check word identity and
+time separately through the blue-channel change, including repeated words,
+line breaks and centered text. Same-color activation must not thicken glyphs;
+an active transparent color must replace, rather than cover, opaque base text.
+Inspect text_layout engine/font fingerprints in the manifest. Native metrics
+do not accept general shaping, automatic wrapping, arbitrary color alpha or a
+suppressed dynamic-raster highlight. Preserve explicit rejection/warnings.
+
 Run structural and media gates after rendering:
 
 ```powershell

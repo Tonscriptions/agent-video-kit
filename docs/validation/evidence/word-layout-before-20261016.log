@@ -1,0 +1,285 @@
+test_a_timed_range_can_cross_a_newline (test_word_highlight.WordHighlightTests.test_a_timed_range_can_cross_a_newline) ... FAIL
+test_active_opacity_can_replace_opaque_foreground (test_word_highlight.WordHighlightTests.test_active_opacity_can_replace_opaque_foreground) ... FAIL
+test_bidi_mapping_is_rejected_explicitly (test_word_highlight.WordHighlightTests.test_bidi_mapping_is_rejected_explicitly) ... FAIL
+test_border_shadow_and_box_preserve_geometry (test_word_highlight.WordHighlightTests.test_border_shadow_and_box_preserve_geometry) ... FAIL
+test_combining_marks_and_literal_percent (test_word_highlight.WordHighlightTests.test_combining_marks_and_literal_percent) ... FAIL
+test_custom_time_position_and_fix_bounds (test_word_highlight.WordHighlightTests.test_custom_time_position_and_fix_bounds) ... FAIL
+test_default_center_keeps_the_whole_paragraph_anchor (test_word_highlight.WordHighlightTests.test_default_center_keeps_the_whole_paragraph_anchor) ... FAIL
+test_dynamic_inline_keeps_a_visible_degradation (test_word_highlight.WordHighlightTests.test_dynamic_inline_keeps_a_visible_degradation) ... FAIL
+test_explicit_repeated_start_char_leaves_first_word_untouched (test_word_highlight.WordHighlightTests.test_explicit_repeated_start_char_leaves_first_word_untouched) ... FAIL
+test_inline_word_glyph_geometry (test_word_highlight.WordHighlightTests.test_inline_word_glyph_geometry) ... FAIL
+test_internal_ligature_range_is_rejected_explicitly (test_word_highlight.WordHighlightTests.test_internal_ligature_range_is_rejected_explicitly) ... FAIL
+test_multiline_box_and_alias_alignment (test_word_highlight.WordHighlightTests.test_multiline_box_and_alias_alignment) ... FAIL
+test_multiline_descenders_and_right_alignment (test_word_highlight.WordHighlightTests.test_multiline_descenders_and_right_alignment) ... FAIL
+test_native_layout_does_not_require_pillow_metrics (test_word_highlight.WordHighlightTests.test_native_layout_does_not_require_pillow_metrics) ... FAIL
+test_plain_multiline_never_paints_a_newline_glyph (test_word_highlight.WordHighlightTests.test_plain_multiline_never_paints_a_newline_glyph) ... FAIL
+test_same_color_highlight_never_repaints_antialiasing (test_word_highlight.WordHighlightTests.test_same_color_highlight_never_repaints_antialiasing) ... FAIL
+test_split_grapheme_is_rejected_explicitly (test_word_highlight.WordHighlightTests.test_split_grapheme_is_rejected_explicitly) ... FAIL
+test_translucent_foreground_is_not_painted_twice (test_word_highlight.WordHighlightTests.test_translucent_foreground_is_not_painted_twice) ... FAIL
+test_word_animation_limitation_is_reported (test_word_highlight.WordHighlightTests.test_word_animation_limitation_is_reported) ... FAIL
+test_wrapped_word_selection_never_leaks_into_the_next_row (test_word_highlight.WordHighlightTests.test_wrapped_word_selection_never_leaks_into_the_next_row) ... FAIL
+test_wrapping_and_repeated_words_follow_source_lines (test_word_highlight.WordHighlightTests.test_wrapping_and_repeated_words_follow_source_lines) ... FAIL
+
+======================================================================
+FAIL: test_a_timed_range_can_cross_a_newline (test_word_highlight.WordHighlightTests.test_a_timed_range_can_cross_a_newline)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 215, in test_a_timed_range_can_cross_a_newline
+    self.compare_geometry(subtitle)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 78 not less than or equal to 3 : Glyph shape/position/opacity changed: 78
+
+======================================================================
+FAIL: test_active_opacity_can_replace_opaque_foreground (test_word_highlight.WordHighlightTests.test_active_opacity_can_replace_opaque_foreground)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 210, in test_active_opacity_can_replace_opaque_foreground
+    self.assertEqual([x.tobytes() for x in base], [x.tobytes() for x in frames])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [b"\x[271871 chars]Yw<YwHc\x7fHc\x7fHc\x7fHc\x7fHc\x7fHc\x7fGb~Fa[8631891 chars]x00"] != [b"\x[271871 chars]Yw<Yw\xdd\xe1\xe7\xdd\xe1\xe7\xdd\xe1\xe7\xdd\[8739363 chars]x00"]
+
+First differing element 0:
+b"\x0[271870 chars]Yw<YwHc\x7fHc\x7fHc\x7fHc\x7fHc\x7fHc\x7fGb~Fa[99410 chars]\x00"
+b"\x0[271870 chars]Yw<Yw\xdd\xe1\xe7\xdd\xe1\xe7\xdd\xe1\xe7\xdd\[103888 chars]\x00"
+
+Diff is 11116806 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_bidi_mapping_is_rejected_explicitly (test_word_highlight.WordHighlightTests.test_bidi_mapping_is_rejected_explicitly)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 246, in test_bidi_mapping_is_rejected_explicitly
+    self.reject(self.subtitle('\u05e9\u05dc\u05d5\u05dd HI'), 'SUBTITLE_WORD_BIDI_UNSUPPORTED')
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 239, in reject
+    self.assertNotEqual(status, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_border_shadow_and_box_preserve_geometry (test_word_highlight.WordHighlightTests.test_border_shadow_and_box_preserve_geometry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 195, in test_border_shadow_and_box_preserve_geometry
+    self.compare_geometry(self.subtitle(borderw=2, bordercolor='black', shadowx=3, shadowy=4,
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        shadowcolor='black@0.6', box=True, boxcolor='blue@0.3', box_padding=7))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 255 not less than or equal to 3 : Glyph shape/position/opacity changed: 255
+
+======================================================================
+FAIL: test_combining_marks_and_literal_percent (test_word_highlight.WordHighlightTests.test_combining_marks_and_literal_percent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 192, in test_combining_marks_and_literal_percent
+    self.compare_geometry(self.subtitle('Cafe\u0301 AV 50%', expansion='none'))
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 194 not less than or equal to 3 : Glyph shape/position/opacity changed: 194
+
+======================================================================
+FAIL: test_custom_time_position_and_fix_bounds (test_word_highlight.WordHighlightTests.test_custom_time_position_and_fix_bounds)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 199, in test_custom_time_position_and_fix_bounds
+    self.compare_geometry(self.subtitle(x='-4+12*t', y='170+2*sin(t)', fix_bounds=True))
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 255 not less than or equal to 3 : Glyph shape/position/opacity changed: 255
+
+======================================================================
+FAIL: test_default_center_keeps_the_whole_paragraph_anchor (test_word_highlight.WordHighlightTests.test_default_center_keeps_the_whole_paragraph_anchor)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 116, in test_default_center_keeps_the_whole_paragraph_anchor
+    _, frames, _ = self.compare_geometry(subtitle)
+                   ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 255 not less than or equal to 3 : Glyph shape/position/opacity changed: 255
+
+======================================================================
+FAIL: test_dynamic_inline_keeps_a_visible_degradation (test_word_highlight.WordHighlightTests.test_dynamic_inline_keeps_a_visible_degradation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 262, in test_dynamic_inline_keeps_a_visible_degradation
+    self.assertIn('subtitle_word_dynamic_raster', [x.get('feature') for x in result['data']['warnings']])
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'subtitle_word_dynamic_raster' not found in []
+
+======================================================================
+FAIL: test_explicit_repeated_start_char_leaves_first_word_untouched (test_word_highlight.WordHighlightTests.test_explicit_repeated_start_char_leaves_first_word_untouched)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 220, in test_explicit_repeated_start_char_leaves_first_word_untouched
+    _, frames, _ = self.compare_geometry(subtitle)
+                   ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 150 not less than or equal to 3 : Glyph shape/position/opacity changed: 150
+
+======================================================================
+FAIL: test_inline_word_glyph_geometry (test_word_highlight.WordHighlightTests.test_inline_word_glyph_geometry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 112, in test_inline_word_glyph_geometry
+    self.compare_geometry(self.subtitle(), independent=False)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 194 not less than or equal to 3 : Glyph shape/position/opacity changed: 194
+
+======================================================================
+FAIL: test_internal_ligature_range_is_rejected_explicitly (test_word_highlight.WordHighlightTests.test_internal_ligature_range_is_rejected_explicitly)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 256, in test_internal_ligature_range_is_rejected_explicitly
+    self.reject(subtitle, 'SUBTITLE_WORD_CLUSTER_LAYOUT_UNSUPPORTED')
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 239, in reject
+    self.assertNotEqual(status, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_multiline_box_and_alias_alignment (test_word_highlight.WordHighlightTests.test_multiline_box_and_alias_alignment)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 164, in test_multiline_box_and_alias_alignment
+    self.compare_geometry(self.subtitle('gyp   HI\nFEATURE   BENEFIT',x='10',y='70',fontsize=20,
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        line_spacing=8,box=True,boxcolor='blue@0.3',box_padding=6,
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        boxw=280,boxh=90,text_align='left+right+top+bottom',borderw=1))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 255 not less than or equal to 3 : Glyph shape/position/opacity changed: 255
+
+======================================================================
+FAIL: test_multiline_descenders_and_right_alignment (test_word_highlight.WordHighlightTests.test_multiline_descenders_and_right_alignment)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 124, in test_multiline_descenders_and_right_alignment
+    base,frames,_=self.compare_geometry(self.subtitle('gyp   HI\nFEATURE   BENEFIT', x='22', y='88', fontsize=20,
+                  ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        line_spacing=11, text_align='right+bottom', boxw=270, boxh=80))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 255 not less than or equal to 3 : Glyph shape/position/opacity changed: 255
+
+======================================================================
+FAIL: test_native_layout_does_not_require_pillow_metrics (test_word_highlight.WordHighlightTests.test_native_layout_does_not_require_pillow_metrics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 226, in test_native_layout_does_not_require_pillow_metrics
+    _, _, result = self.compare_geometry(self.subtitle())
+                   ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 168 not less than or equal to 3 : Glyph shape/position/opacity changed: 168
+
+======================================================================
+FAIL: test_plain_multiline_never_paints_a_newline_glyph (test_word_highlight.WordHighlightTests.test_plain_multiline_never_paints_a_newline_glyph)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 154, in test_plain_multiline_never_paints_a_newline_glyph
+    self.assertEqual(len(lines),2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 1 != 2
+
+======================================================================
+FAIL: test_same_color_highlight_never_repaints_antialiasing (test_word_highlight.WordHighlightTests.test_same_color_highlight_never_repaints_antialiasing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 109, in test_same_color_highlight_never_repaints_antialiasing
+    self.assertEqual([x.tobytes() for x in base], [x.tobytes() for x in frames])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [b"\x[1034965 chars]<Yw\x9f\xad\xbc\xff\xff\xff\xff\xff\xff\xff\xf[8118541 chars]x00"] != [b"\x[1034965 chars]<Yw\xd1\xd7\xdf\xff\xff\xff\xff\xff\xff\xff\xf[8142128 chars]x00"]
+
+First differing element 2:
+b'\x0[271487 chars]<Yw\x9f\xad\xbc\xff\xff\xff\xff\xff\xff\xff\xf[109676 chars]\x00'
+b'\x0[271487 chars]<Yw\xd1\xd7\xdf\xff\xff\xff\xff\xff\xff\xff\xf[109969 chars]\x00'
+
+Diff is 11649349 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_split_grapheme_is_rejected_explicitly (test_word_highlight.WordHighlightTests.test_split_grapheme_is_rejected_explicitly)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 251, in test_split_grapheme_is_rejected_explicitly
+    self.reject(subtitle, 'SUBTITLE_WORD_GRAPHEME_BOUNDARY')
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 239, in reject
+    self.assertNotEqual(status, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_translucent_foreground_is_not_painted_twice (test_word_highlight.WordHighlightTests.test_translucent_foreground_is_not_painted_twice)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 202, in test_translucent_foreground_is_not_painted_twice
+    self.compare_geometry(self.subtitle(fontcolor='white@0.65', active_color='yellow@0.65'))
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 83 not less than or equal to 3 : Glyph shape/position/opacity changed: 83
+
+======================================================================
+FAIL: test_word_animation_limitation_is_reported (test_word_highlight.WordHighlightTests.test_word_animation_limitation_is_reported)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 268, in test_word_animation_limitation_is_reported
+    self.assertIn('subtitle_word_animation', [x.get('feature') for x in result['data']['plan']['warnings']])
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'subtitle_word_animation' not found in []
+
+======================================================================
+FAIL: test_wrapped_word_selection_never_leaks_into_the_next_row (test_word_highlight.WordHighlightTests.test_wrapped_word_selection_never_leaks_into_the_next_row)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 174, in test_wrapped_word_selection_never_leaks_into_the_next_row
+    base,frames,_=self.compare_geometry(subtitle)
+                  ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 194 not less than or equal to 3 : Glyph shape/position/opacity changed: 194
+
+======================================================================
+FAIL: test_wrapping_and_repeated_words_follow_source_lines (test_word_highlight.WordHighlightTests.test_wrapping_and_repeated_words_follow_source_lines)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 169, in test_wrapping_and_repeated_words_follow_source_lines
+    self.compare_geometry(self.subtitle('FEATURE  BENEFIT  FEATURE', x='24', y='76', fontsize=20,
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        max_width=160, line_spacing=5, text_align='center', boxw=270))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_word_highlight.py", line 100, in compare_geometry
+    self.assertLessEqual(maximum, 3, f'Glyph shape/position/opacity changed: {maximum}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 194 not less than or equal to 3 : Glyph shape/position/opacity changed: 194
+
+----------------------------------------------------------------------
+Ran 21 tests in 142.134s
+
+FAILED (failures=21)
