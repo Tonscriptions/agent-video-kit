@@ -66,6 +66,15 @@ handles must be finite, x handles in 0..1 and the entire speed curve positive.
 Inspect SPEED_CURVE_COMPILED certificates: 250 us is an unnormalized per-curve
 clock bound, not a composed output guarantee. Segment/expression budget failures
 must remain errors; audio is still windowed. Endpoint speed floor 0.01 remains.
+For [nested frame coverage](../../docs/specs/嵌套视频帧区间与结束时钟契约_v0.1_2026-10-17.md),
+source CFR frames cover half-open intervals: retain both partial endpoint
+frames with exact rational frame bounds. The native EOF event maps through
+the authored source endpoint after the expected source count. Inspect
+`nested_time_mapping.frame_sampling`, then check the encoded source identities
+and every visible output sample. Keep real leading/trailing timeline gaps;
+the final global frame interval must not reveal early or leak past the end.
+A subframe trim can retain one source frame or have no final output sample.
+The EOF mapping does not pad a genuinely short input or relax publish duration.
 Freeze, parent pivots and group coordinate spaces keep separate acceptance
 boundaries. Nested captions use the original authoring clock; see the
 [caption clock contract](../../docs/specs/嵌套字幕与文字动画时钟契约_v0.1_2026-10-16.md).

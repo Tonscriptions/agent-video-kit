@@ -100,6 +100,16 @@ VFR timestamps. Measure keyframe geometry in its original child clock, and
 audio pulse timing separately. Pulse-envelope checks exclude explicit boundary
 neighborhoods and do not establish seamless phase, lip sync or listening quality.
 
+For [nested frame endpoint coverage](../../docs/specs/嵌套视频帧区间与结束时钟契约_v0.1_2026-10-17.md),
+grade every final sample against the authored half-open visible interval,
+including both leading and trailing gaps. Visibility allows zero mismatches;
+the separate source identity gate remains <=1 registered CFR frame. Include
+partial source frames, very short trims, one-tick offsets, fractional source
+and output rates, and two trimmed reverse ancestors. Check actual EOF traces
+and frame_sampling metadata, not just a correct total MP4 frame count. Retain
+the original V24 failed tail when publishing a V25 recheck. Variant PCM equality
+accepts preservation only; it does not prove seamless audio or listening quality.
+
 For [speed easing](../../docs/specs/速度曲线Easing与Bezier契约_v0.1_2026-10-16.md),
 compare independently integrated authored curves, encoded source frames and
 original keyframe geometry. Read the raw and normalized clock error bounds

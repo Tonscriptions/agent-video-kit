@@ -60,3 +60,9 @@ scripts/smoke_text_animation.py -text
 docs/validation/evidence/*text-animation*.json -text
 docs/validation/evidence/text-animation*.log -text -whitespace
 docs/assets/text-animation-20261017/font-license.txt -whitespace
+
+# V25 keeps native frame, EOF and short-audio failure evidence byte-exact.
+scripts/smoke_nested_frame_coverage.py -text
+docs/validation/evidence/*nested*coverage*.json -text
+docs/validation/evidence/nested-coverage*.log -text -whitespace
+docs/assets/nested-frame-coverage-20261017/font-license.txt -whitespace

@@ -3040,14 +3040,39 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     # Make the display clock explicit before a possible
                     # reverse. This is CFR normalization, not a claim of
                     # retaining every original VFR presentation timestamp.
+                    # A decoded CFR frame represents [k/fps, (k+1)/fps).
+                    # Keep both partially covered endpoint frames. Decimal
+                    # trim seconds otherwise round to the coarse 1/fps TB,
+                    # and can remove an endpoint or the entire short clip.
+                    first_source_frame = math.floor(Fraction(int(clip.get('source_in_tick', 0)), tps) * nominal_fps)
+                    end_source_frame = math.ceil(Fraction(int(clip.get('source_out_tick', 1)), tps) * nominal_fps)
+                    source_frame_count = end_source_frame - first_source_frame
                     chain = [f'[{index}:v]fps={nominal_value}:start_time=0:round=up:eof_action=pass',
-                             f'trim=start={src_in:.12f}:end={src_out:.12f}']
-                    source_clock = '(PTS*TB)'
-                    if bool(clip.get('reverse')):
-                        right_frame_edge = math.ceil(src_out * float(nominal_fps) - 1e-9) / float(nominal_fps)
-                        source_clock = f'if(eq(N,0),{src_out:.12f},{right_frame_edge:.12f}-N/({nominal_value}))'
+                             f'trim=start_pts={first_source_frame}:end_pts={end_source_frame}']
+                    reverse_source = bool(clip.get('reverse'))
+                    first_source_time, eof_source_time = (src_out, src_in) if reverse_source else (src_in, src_out)
+                    interior_source = f'({end_source_frame}-N)/({nominal_value})' if reverse_source else '(PTS*TB)'
+                    # setpts evaluates N once more for the native EOF event.
+                    # Map that event to the true authored boundary after all
+                    # selected frames, including a partial final interval.
+                    # A genuinely short input cannot reach this count and is
+                    # not silently extended to the declared source endpoint.
+                    source_clock = (f'if(eq(N,0),{first_source_time:.12f},'
+                                    f'if(gte(N,{source_frame_count}),{eof_source_time:.12f},{interior_source}))')
                     setpts = 'setpts=' + _expr_arg(f'({_clock_expression(nested_maps, source_clock, scratch_register=0)})/TB')
                     curve_duration = int(clip.get('duration_tick', 1)) / tps
+                    output_rate = Fraction(fps_value)
+                    first_output_frame = math.ceil(Fraction(int(clip.get('timeline_start_tick', 0)), tps) * output_rate)
+                    end_output_frame = math.ceil(Fraction(int(clip.get('timeline_start_tick', 0)) + int(clip.get('duration_tick', 1)), tps) * output_rate)
+                    sampling_metadata = {
+                        'protocol': 'covering-source-cfr-half-open-v1',
+                        'source_frame_start': first_source_frame, 'source_frame_end_exclusive': end_source_frame,
+                        'expected_source_frames': source_frame_count,
+                        'output_frame_start': first_output_frame, 'output_frame_end_exclusive': end_output_frame,
+                        'first_source_seconds': first_source_time, 'eof_source_seconds': eof_source_time,
+                        'eof_event': 'authored-boundary-after-expected-source-frame-count',
+                        'output_interval': 'authored-half-open-on-global-cfr-grid',
+                    }
                     warnings.append({'code': 'NESTED_SOURCE_CFR_NORMALIZED', 'clip_id': clip.get('id'),
                                      'fps': nominal_value, 'message': '嵌套非线性变速以登记帧率建立源显示时钟；VFR 原始时间戳等效未验收'})
                 if bool(clip.get("reverse")):
@@ -3060,6 +3085,11 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 # composed clocks so every part uses the global frame grid.
                 chain.append(f'fps={fps_value}:round=up:eof_action=pass' if nested_maps else
                              f"fps={fps_value}:start_time={start:.8f}:round=up:eof_action=pass")
+                if nested_maps:
+                    # Keep the global phase and exact half-open author window;
+                    # AVTB expression rounding must not reveal an early frame
+                    # or leak a held endpoint into a later timeline gap.
+                    chain.append(f'trim=start_pts={first_output_frame}:end_pts={end_output_frame}')
                 if kind == "video" and color_tone_map not in {"", "none"}:
                     chain.extend(_tone_map_filters(settings, warnings, str(clip.get("id")), transparent=transparent_canvas))
                 crop = clip.get("crop") if isinstance(clip.get("crop"), dict) else {}
@@ -3239,7 +3269,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 if nested_maps:
                     input_meta[-1]['nested_time_mapping'] = {'version': '1', 'maps': copy.deepcopy(nested_maps),
                                                             'source_display_fps': nominal_value,
-                                                            'video_pts': 'analytic-composition', 'keyframes': 'authored-clock'}
+                                                            'video_pts': 'analytic-composition', 'keyframes': 'authored-clock',
+                                                            'frame_sampling': sampling_metadata}
                 index += 1
             elif kind in {"video", "audio"} and track.get("kind") == "audio":
                 if not asset.get("probe", {}).get("audio", {}).get("codec"):
