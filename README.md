@@ -6,7 +6,7 @@
 
 ## 功能核验与真实实测
 
-本表随功能和验证结果同步更新。**功能链路成功、样例指标改善、广泛画质验收是不同结论**；失败和待验收项也在此保留。最近完整产品回归为 **379/379**，733.981 秒，包含新增 16 项蒙版核验和既有融合检查；研究 **22/22** 是前序独立结果。本轮公开蒙版原输入、实际失败/通过报告与 GIF，并在同一自然场景实跑 SAM2 修正。前序多轨演示的 14 次 CLI 调用和 363 项基线证据继续保留。
+本表随功能和验证结果同步更新。**功能链路、受控几何和自然质量分别验收，失败结果一并保留。** 本轮接通编码蒙版到轨迹、锚定和重构图，修复透明标签黑色补边；完整回归 **405/405，693.735 秒**，85 份产品源码/测试前后摘要一致；新增专项 26 项为子集。公开原视频、原蒙版、实际横屏/变换/竖屏输出及 GIF；自然手腕漏选与标签像素误差仍未通过。研究 22 项为前序独立结果，不并入产品通过数。
 
 | 编号 | 功能 | 已执行的核验与实测结果 | 当前边界 | 证据 |
 |---|---|---|---|---|
@@ -19,15 +19,25 @@
 | V07 | YOLO 跟踪、标签绑定、重构图 | 受控双目标 29/32 次观测；标签绑定与横/竖成片已实渲，组合几何回归定位误差 ≤3 px | 自然遮挡、交叉身份恢复与完整嵌套坐标空间待验收 | [模型实测](docs/validation/YOLO本地多目标跟踪与重构图实测_2026-10-15.md)、[组合实测](docs/validation/跟踪坐标绑定与组合渲染实测_2026-10-15.md) |
 | V08 | HDemucs 人声/伴奏分离 | CPU/CUDA 对同一 12.68 秒语音与合成伴奏实跑；SI-SDR 改善约 12.66 dB，分离结果完成入轨和成片 | 自然音乐、听审和模型商业许可待验收 | [实测](docs/validation/HDemucs本地人声伴奏分离实测_2026-10-16.md) |
 | V09 | RVM 人物抠像 | 3 秒/36 帧样例输出软 alpha MOV、两背景 MP4 和透明 WebM，音频链路完成 | 首帧边缘缺失，手持头盔被排除；广泛画质未通过 | [实测](docs/validation/RVM本地人物抠像与透明成片实测_2026-10-16.md) |
-| V10 | SAM2 点/框、多对象与提示修正 | 原生 CPU/CUDA、选择/修正/重置、自然双人 32 帧、概率蒙版及两背景成片已实跑；本轮在同一场景新增一次 CUDA 修正，5 个明确检查点从 3 个通过到 4 个通过 | **修正后仍失败**：目标手腕继续漏选；保留人物前臂从误选变为排除，不代表完整选区改善 | [前序实测](docs/validation/SAM2本地对象分割与提示修正实测_2026-10-16.md)、[本轮逐点实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
+| V10 | SAM2 点/框、多对象与提示修正 | 原生 CPU/CUDA、选择/修正/重置、自然双人 32 帧、概率蒙版及两背景成片已实跑；前轮在同一场景新增一次 CUDA 修正，5 个明确检查点从 3 个通过到 4 个通过 | **修正后仍失败**：目标手腕继续漏选；保留人物前臂从误选变为排除，不代表完整选区改善 | [前序实测](docs/validation/SAM2本地对象分割与提示修正实测_2026-10-16.md)、[此前逐点实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
 | V11 | LaMa / VACE 修复与色差融合 | 显式 harmonic 受控选区 PSNR 分别 47.45 / 42.90 dB；自然 32 帧链路完成，蒙版外 RGB 与全部 alpha 保留，PCM 原声独立核对一致 | **自然人物移除画质未通过**：残影、纹理涂抹或色块仍存在；VACE 为实验能力 | [实测](docs/validation/本地区域色差融合实测_2026-10-16.md)、[机器证据](docs/validation/evidence/repair-blend-smoke-20261016.json) |
 | V12 | 背景参考传播研究 | 单表面 PSNR 30.878→31.124 dB；双表面合计 **33.448→33.410 dB，略退化**。22 项独立研究检查通过；公开原输入和逐帧对照 | **未接入产品**；人工遮挡真值不代表真实人物移除，自然画质未通过 | [研究 GIF/MP4](#实测演示素材)、[实测](docs/validation/本地多运动参考选择与双表面真值实测_2026-10-16.md) |
-| V13 | 产品自动回归 | 本轮完整执行 **379/379，733.981 秒**；83 份产品源码/测试执行前后 SHA-256 相同，新增蒙版专项 16 项为子集 | 耗时不是独立性能基准；不加上研究、专项重跑或 CLI 调用数，不折算剪映完成率 | [完整日志](docs/validation/evidence/mask-review-full-regression-20261016.log)、[摘要证据](docs/validation/evidence/mask-review-20261016.json)、[回归记录](docs/validation/回归验证记录_2026-10-13.md) |
+| V13 | 产品自动回归 | 本轮完整 **405/405，693.735 秒**；85 份产品源码/测试前后与 Git 原始字节一致；新增 26 项专项为子集 | 专项是完整运行子集，不加研究数或 CLI 次数；不折算剪映完成率 | [本轮日志](docs/validation/evidence/mask-tracking-full-regression-20261016.log)、[汇总证据](docs/validation/evidence/mask-tracking-20261016.json)、[回归记录](docs/validation/回归验证记录_2026-10-13.md) |
 | V14 | 编码蒙版范围与正负检查点 | 新增 `quality mask`：逐帧面积/包围框/IoU、明确 selected/clear 检查。自制 4 秒/32 帧样例准确报出第 12 帧缺腿；补全几何后 4 点通过，失败报告及退出码 2 保留；原始 alpha 全帧摘要匹配 | 补全样例为脚本恢复几何，非 AI 修复；检查点不证明完整身份/边缘/自然质量。自然样例修正后仍有 1 点失败 | [原蒙版与 GIF/MP4](#实测演示素材)、[实际 CLI 与媒体证据](docs/assets/mask-review-20261016/evidence.json)、[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
+| V15 | 编码蒙版驱动轨迹、标签与重构图 | 16 次正式 CLI，4 秒/64 帧/16 fps；逐帧 bbox 与自制真值一致。标签位置最大误差：横屏 1.64 px、缩放旋转后 2.14 px、竖屏 2.15 px；包和源/蒙版权利依赖保留 | 自制选区不是模型分割能力。自然 SAM2 仍 4/5 检查点通过，标签最大误差 4.10 px 超过 3 px；持续未验收 | [原视频与 GIF/MP4](#实测演示素材)、[全帧测量](docs/assets/mask-track-20261016/evidence.json)、[自然失败实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
+| V16 | 透明标签合成与失败报告 | 抽帧发现 PNG 的 fit 补边变黑；新增像素回归先失败，修复后 PNG/alpha MOV 通过，公开 64 帧两侧 128 区域核对。检查点失败仍保存诊断、回滚项目 | 位置准确不证明合成正确；修复前原片与失败日志保留；自然标签像素门槛仍失败 | [修复前原成片](docs/assets/mask-track-20261016/before-alpha-fix-bound.mp4)、[前后证据](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
 
 ## 实测演示素材
 
 以下为实际输出的本地媒体，均随仓库提交。GIF 无声并降低色数便于预览，部分演示降低帧率；MP4 保留展示帧率，多轨合成组包含实际渲染音频。所有公开输入为本地合成素材；未确认发布权利的自然人物视频仅保留实测记录。
+
+**正式产品 CLI：蒙版驱动锚定、变换后重算与竖屏，4 秒。** 从左到右：原视频 / 跟随标签 / 源缩放旋转后重新绑定 / 自动竖屏。选区为自制几何，未调用分割模型。
+
+![实际 CLI：蒙版驱动标签、缩放旋转重算与竖屏重构图](docs/assets/mask-track-20261016/mask-tracking-comparison.gif)
+
+[原视频](docs/assets/mask-track-20261016/source.mp4) · [原 alpha 蒙版](docs/assets/mask-track-20261016/selected-mask.mov) · [横屏输出](docs/assets/mask-track-20261016/bound.mp4) · [变换后输出](docs/assets/mask-track-20261016/bound-transformed.mp4) · [竖屏输出](docs/assets/mask-track-20261016/portrait.mp4) · [对照 MP4](docs/assets/mask-track-20261016/mask-tracking-comparison.mp4) · [16 次调用/逐帧测量与摘要](docs/assets/mask-track-20261016/evidence.json)
+
+原输入和 MP4 均为 16 fps、64 帧；GIF 间隔取样 32 帧、平均 8 fps、4 秒、无声。已修复透明标签黑色补边，修复前[实际成片](docs/assets/mask-track-20261016/before-alpha-fix-bound.mp4)和[抽帧](docs/assets/mask-track-20261016/before-alpha-fix-contact-frame-32.png)同样保留。自然 SAM2 选区手腕仍漏选，标签像素门槛修复后仍未通过（最大 4.10 px / 门槛 3 px），详情见[实测和复现](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md)。
 
 **正式蒙版核验：漏选失败与补全几何通过，4 秒。** 从左到右：完整输入 / 漏选蒙版 / 恢复几何的样例。核验报告来自实际产品 CLI；恢复几何由脚本完成，未调用修复模型。
 
@@ -59,7 +69,8 @@ MP4 与原蒙版均为 8 fps、32 帧；GIF 保留全部 32 帧，帧时长交�
 
 ## 当前状态
 
-- 当前 26 模块进度见[构建进度总表（2026-10-16）](docs/构建进度总表_2026-10-16.md)：本地 CLI 主链路已实现，广告生产能力部分落地。本轮 `quality mask` 完整回归 **379/379**，83 份产品源码/测试前后摘要一致；新增 16 项核验为子集。LaMa/VACE 真模型交付验证完成，自然画质、广泛广告质量、开放内容库、完整草稿映射和产品验收仍待完成，测试数量不折算为剪映完成率。
+- 当前 26 模块进度见[构建进度总表](docs/构建进度总表_2026-10-16.md)：本地 CLI 主链路已实现，广告生产能力部分落地。本轮新增蒙版驱动轨迹/锚定/重构图与透明补边修复，完整 **405/405**，85 份产品源码/测试前后冻结；新增 26 项专项为子集。自然画质、开放内容库、完整草稿映射、性能/发行和完整剪映验收仍待完成。
+- 新增 `--mask-asset-id` 接通 `media track / track-bind / reframe`，支持显式检查点门禁、源时钟映射及源/蒙版/模型权利依赖。受控全帧几何通过，自然漏抠和标签像素误差继续失败，见[契约](docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md)和[实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md)。
 - 蒙版核验使用原生 FFmpeg 和 Python 标准库，支持 alpha/luma、明确正负检查点、切点及解码存储预算，失败仍保存报告。公开样例通过实际 CLI 验证；真实 SAM2 提示修正后仍有手腕漏选，检查点从 3/5 到 4/5，不自动接入发布门禁或证明完整分割。见[契约](docs/specs/本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md)与[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md)。
 - VACE 五组同源采样/输入尺度对照 **5/5 已完成，画质均未通过**：暗矩形补丁仍存在，4 倍输入或 50 步未改善该样例。CLI 已接入显式 `--flow-shift` 和 `--model-input-scale {1,2,4}`，默认仍为 3/1；输入数组预算按倍率平方计入，输出画布不变。详见[校准证据](docs/validation/evidence/vace-calibration-20261016.json)和[正式参数验证](docs/validation/evidence/vace-profiles-20261016.json)。
 - VACE 实验性联合编辑：提示词/seed、窗口/重叠/切点和原生 CUDA 已接入；Windows 进度快照/原子替换冲突已修复。真实 **32 帧/3 窗口/30 步 SAM2→VACE→原声/入轨→MP4** 正式链路成功，蒙版外 RGB 改变 0、全部 alpha 一致；Torch 峰值已分配约 6.75 GiB。**自然画质未通过**：彩色块、形体残影、纹理不连续，部分抽样帧明显差于匹配源/蒙版的 LaMa 对照。前序 direct 的 8 帧/2 窗口/30 步受控正式链路也通过，但有暗矩形补丁；许可、长期时序和广泛效果继续验收。见[契约](docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md)、[实测与缺口](docs/validation/VACE本地多帧编辑与生成填充实测_2026-10-16.md)和[机器证据](docs/validation/evidence/vace-smoke-20261016.json)。
@@ -77,7 +88,7 @@ MP4 与原蒙版均为 8 fps、32 帧；GIF 保留全部 32 帧，帧时长交�
 - 原生模型跟踪：新增显式本地 `yolov10-onnx-cpu-tracking-v1`，CPU ONNX 检测与常速度/IoU 全局关联；4 秒受控双目标样例记录 29/32 次观测，已完成文字绑定、竖屏重构图及实际渲染。模型权利进入片段依赖，registry 随快照/事务/项目包保留；长滤镜图使用本地 SHA-256 文件规避 Windows 命令长度。自然遮挡、同类交叉和嵌套父层等完整坐标空间仍待验收，见[实测](docs/validation/YOLO本地多目标跟踪与重构图实测_2026-10-15.md)与[契约](docs/specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md)。
 - 持久跟踪画布绑定：`media track-bind --source-track-id <track> --source-clip-id <clip>` 保存源哈希及源时钟观测，按源裁切/fit/fill/stretch、旋转/锚点/缩放、镜像和剪辑时钟，在每次输出画布上重算。新增 17 项专项回归，受控像素定位 ≤3 px；真实 YOLO + 动态重构图 + 标签已完成横竖两版本地渲染。支持解除绑定、项目包保留关系和外部导出烘焙报告；嵌套/VFR/遮挡与高分辨率性能仍需专项验收，见[坐标契约](docs/specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md)与[实测](docs/validation/跟踪坐标绑定与组合渲染实测_2026-10-15.md)。
 - 本地人声/伴奏分离：`torchaudio-hdemucs-local-v1` 使用显式本地权重、原生 Python 和证据，支持 CPU/CUDA、分段重叠拼接、精确采样、浮点 WAV、音轨应用及源/模型双权利依赖。受控 12.68 秒语音+合成伴奏实测改善约 12.66 dB，策略检查通过，未核验许可仍阻断发布；自然音乐、听感和广泛广告质量待验收。见[契约](docs/specs/本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md)及[实测](docs/validation/HDemucs本地人声伴奏分离实测_2026-10-16.md)。
-- 历史回归：RVM 257/257、LaMa 303/303、VACE 首轮 338/338、显式参数 344/344、区域融合 363/363（其中融合子集 73 项）。本轮蒙版核验完整 **379/379**，详见[回归记录](docs/validation/回归验证记录_2026-10-13.md)和[当前机器证据](docs/validation/evidence/mask-review-20261016.json)。
+- 历史回归：RVM 257/257、LaMa 303/303、VACE 首轮 338/338、显式参数 344/344、区域融合 363/363（其中融合子集 73 项）。前轮蒙版核验完整 **379/379**，详见[回归记录](docs/validation/回归验证记录_2026-10-13.md)和[该轮机器证据](docs/validation/evidence/mask-review-20261016.json)。
 - 当前实现仍会明确报告近似和未支持能力，不能把 P0 底座描述成已经完全等同于剪映。对象跟踪的真实模型质量、遮挡/交叉身份恢复、分割/姿态、复杂路径逐点动画、GPU 效果、多语言/情绪配音的广泛质量验收、完整外部工程映射和黄金素材集仍按路线图推进。
 - 生产 Skill 统一使用 `video-cut-` 前缀，并只保留本地 FFmpeg、本地模型和离线编排入口；可用 `$video-cut-技能名` 调用，清单见 [`video-cut-install-manifest.json`](video-cut-install-manifest.json)。
 
@@ -100,6 +111,8 @@ python -X utf8 -m ai_ad_editor convert export --project .\workspace\demo --outpu
 python -X utf8 -m ai_ad_editor convert import --input .\exports\demo.aevpkg.zip --output .\workspace\demo-imported
 python -X utf8 -m ai_ad_editor convert import --input E:\media\draft_info.json --output .\workspace\draft-imported
 python -X utf8 -m ai_ad_editor convert export --project .\workspace\draft-imported --output .\exports\draft_info.json --target-format jianying-draft-json
+python -X utf8 -m ai_ad_editor media track --project .\workspace\demo --asset-id source --mask-asset-id selected_mask --step-frames 1 --dry-run
+python -X utf8 -m ai_ad_editor media track-bind --project .\workspace\demo --asset-id source --mask-asset-id selected_mask --source-track-id track_video_1 --source-clip-id product --target-track-id labels --target-clip-id label --apply --dry-run
 python -X utf8 -m ai_ad_editor media reframe --project .\workspace\demo --asset-id <asset_id> --roi 0.20,0.20,0.20,0.35 --clip-id talking_head --track-id track_video_1 --dry-run
 python -X utf8 -m ai_ad_editor media track-bind --project .\workspace\demo --asset-id <asset_id> --roi 0.20,0.20,0.20,0.35 --target-clip-id product_label --target-track-id track_text_1 --scale-mode roi --dry-run
 python -X utf8 -m ai_ad_editor media adapter register --project .\workspace\demo --adapter-id tracker_local --engine command-json-tracking-v1 --model-path E:\models\tracker.bin --executable E:\models\tracker_runner.py --license-spdx Apache-2.0 --verification-status verified --evidence local://tracker-evidence --dry-run

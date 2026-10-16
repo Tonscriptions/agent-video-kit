@@ -225,20 +225,27 @@ def recover_pending_transaction(root_value: str | Path) -> dict[str, Any]:
     }
 
 
-def _capture_failed_operation_records(root: Path) -> list[tuple[Path, bytes]]:
-    """Keep explicit failed/cancelled operation facts across a rollback."""
+def _capture_failed_operation_records(root: Path, error: BaseException) -> list[tuple[Path, bytes]]:
+    """Keep failure facts and an explicitly referenced validation diagnostic."""
     operations = root / "operations"
-    if not operations.is_dir():
-        return []
+    candidates = list(operations.glob("*.json")) if operations.is_dir() else []
+    if isinstance(error, AppError) and error.path:
+        try:
+            diagnostic = Path(error.path).resolve()
+        except (OSError, ValueError):
+            diagnostic = None
+        if diagnostic is not None and diagnostic.is_relative_to((root / "validation").resolve()) and diagnostic.suffix.lower() == '.json':
+            candidates.append(diagnostic)
     captured: list[tuple[Path, bytes]] = []
-    for path in operations.glob("*.json"):
+    for path in candidates:
         if path.name == transaction_journal_file(root).name or not path.is_file():
             continue
         try:
             payload = json.loads(path.read_text(encoding="utf-8-sig"))
         except (OSError, UnicodeDecodeError, json.JSONDecodeError):
             continue
-        if isinstance(payload, dict) and payload.get("status") in {"failed", "cancelled", "partial"}:
+        diagnostic_versioned = path.parent == operations or isinstance(payload, dict) and payload.get('report_version')
+        if diagnostic_versioned and isinstance(payload, dict) and payload.get("status") in {"failed", "cancelled", "partial"}:
             captured.append((path, path.read_bytes()))
     return captured
 
@@ -270,8 +277,8 @@ def project_transaction(root_value: str | Path, *, command: str):
     info = {"active": True, "transaction_id": journal["transaction_id"], "recovered": bool(recovered.get("recovered")), "recovery": recovered}
     try:
         yield info
-    except BaseException:
-        failure_records = _capture_failed_operation_records(root)
+    except BaseException as error:
+        failure_records = _capture_failed_operation_records(root, error)
         recover_pending_transaction(root)
         for path, data in failure_records:
             _atomic_write_bytes(path, data)

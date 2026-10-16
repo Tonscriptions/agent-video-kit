@@ -1,0 +1,49 @@
+test_empty_frame_outside_requested_range_is_not_used (test_mask_tracking.MaskObservationTests.test_empty_frame_outside_requested_range_is_not_used) ... ok
+test_encoded_geometry_and_terminal_clock_are_not_stretched (test_mask_tracking.MaskObservationTests.test_encoded_geometry_and_terminal_clock_are_not_stretched) ... ok
+test_even_unsampled_empty_frame_rejects_continuous_track (test_mask_tracking.MaskObservationTests.test_even_unsampled_empty_frame_rejects_continuous_track) ... ok
+test_non_grid_range_boundaries_interpolate_real_box_coordinates (test_mask_tracking.MaskObservationTests.test_non_grid_range_boundaries_interpolate_real_box_coordinates) ... ok
+test_project_tick_collisions_fail_instead_of_duplicate_keys (test_mask_tracking.MaskObservationTests.test_project_tick_collisions_fail_instead_of_duplicate_keys) ... ok
+test_sampling_budget_preserves_both_range_endpoints (test_mask_tracking.MaskObservationTests.test_sampling_budget_preserves_both_range_endpoints) ... ok
+test_scene_endpoint_never_interpolates_toward_next_scene (test_mask_tracking.MaskObservationTests.test_scene_endpoint_never_interpolates_toward_next_scene) ... ok
+test_source_origin_offset_keeps_source_seconds_and_local_ticks (test_mask_tracking.MaskObservationTests.test_source_origin_offset_keeps_source_seconds_and_local_ticks) ... ok
+test_bad_clock_coverage_and_declared_scene_cut_fail_preflight (test_mask_tracking.MaskTrackingCliTests.test_bad_clock_coverage_and_declared_scene_cut_fail_preflight) ... ok
+test_binding_keeps_source_and_mask_rights_and_renders_tracking (test_mask_tracking.MaskTrackingCliTests.test_binding_keeps_source_and_mask_rights_and_renders_tracking) ... ok
+test_empty_unsampled_encoded_frame_is_failed_with_report (test_mask_tracking.MaskTrackingCliTests.test_empty_unsampled_encoded_frame_is_failed_with_report) ... FAIL
+test_failed_expectations_preserve_report_and_do_not_apply (test_mask_tracking.MaskTrackingCliTests.test_failed_expectations_preserve_report_and_do_not_apply) ... ERROR
+test_input_mode_options_and_report_overwrite_are_rejected (test_mask_tracking.MaskTrackingCliTests.test_input_mode_options_and_report_overwrite_are_rejected) ... ok
+test_real_encoded_mask_report_and_read_only_metadata (test_mask_tracking.MaskTrackingCliTests.test_real_encoded_mask_report_and_read_only_metadata) ... ok
+test_reframe_uses_mask_and_inherits_its_rights (test_mask_tracking.MaskTrackingCliTests.test_reframe_uses_mask_and_inherits_its_rights) ... ok
+test_source_and_mask_tamper_and_missing_rights_fail (test_mask_tracking.MaskTrackingCliTests.test_source_and_mask_tamper_and_missing_rights_fail) ... ok
+test_three_dry_runs_preflight_without_decode_or_report (test_mask_tracking.MaskTrackingCliTests.test_three_dry_runs_preflight_without_decode_or_report) ... ok
+
+======================================================================
+ERROR: test_failed_expectations_preserve_report_and_do_not_apply (test_mask_tracking.MaskTrackingCliTests.test_failed_expectations_preserve_report_and_do_not_apply)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_mask_tracking.py", line 180, in test_failed_expectations_preserve_report_and_do_not_apply
+    failed = json.loads((self.root/'validation/failed.json').read_text(encoding='utf-8-sig'))
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 546, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_abc.py", line 632, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\temp\\mask-track-pc55eazc\\project\\validation\\failed.json'
+
+======================================================================
+FAIL: test_empty_unsampled_encoded_frame_is_failed_with_report (test_mask_tracking.MaskTrackingCliTests.test_empty_unsampled_encoded_frame_is_failed_with_report)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_mask_tracking.py", line 196, in test_empty_unsampled_encoded_frame_is_failed_with_report
+    self.assertTrue((self.root/'validation/empty.json').exists())
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 17 tests in 18.321s
+
+FAILED (failures=1, errors=1)

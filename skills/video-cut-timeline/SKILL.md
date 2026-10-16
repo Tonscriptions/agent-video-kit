@@ -24,6 +24,14 @@ WebM alpha for visual checks. Review initial-frame defects and held-object loss;
 pipeline verification does not establish broad human matting quality.
 
 Native model tracking is described in the [YOLO contract](../../docs/specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md).
+
+An already registered selected video mask can drive the same three tracking,
+binding and reframe commands through `--mask-asset-id`, replacing ROI/adapter
+selection; see the [mask tracking contract](../../docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md).
+Keep source/mask time correspondence explicit. Selected/clear expectations can
+gate application, and failures preserve diagnostics while rolling back edits.
+Retain source and mask/model rights dependencies on the target clip.
+
 Review `media track --all-objects` before binding an ID to text or reframing a
 direct clip. Preserve the applied clip's `rights_dependencies` entries with
 model registration SHA-256; they participate in publish gates. Label binding

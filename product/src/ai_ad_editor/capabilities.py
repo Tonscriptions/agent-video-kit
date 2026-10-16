@@ -25,6 +25,14 @@ def build_capability_manifest() -> dict[str, Any]:
                 "status": "implemented",
                 "features": ["probe", "local_ingest", "image_loop", "proxy", "thumbnail", "waveform", "scene_change", "silence", "beat_anchors", "heuristic_highlights", "highlight_rough_cut_apply", "beat_cut_timeline", "multicam_audio_sync", "multicam_switch_plan", "relink_by_hash", "relink_by_unique_name", "local_template_tracking", "local_visual_model_tracking_adapter", "local_multi_object_tracking", "native_yolov10_onnx_cpu", "native_motion_association", "tracking_clip_model_rights_dependencies", "visual_adapter_registry", "local_tracking_bind_to_visual_clip", "local_auto_reframe", "smart_cut_silence", "smart_cut_transcript_phrases", "smart_cut_linked_audio", "stabilize_vidstab_two_pass"],
                 "tracking_contract": "local_template_matching_emits_confidence_and_transform_keyframes",
+                "mask_tracking": {
+                    "status": "implemented_with_limits",
+                    "engine": "local-mask-bbox-tracking-v1",
+                    "commands": ["media.track", "media.track-bind", "media.reframe"],
+                    "features": ["registered_encoded_alpha_or_explicit_luma_mask", "source_clock_offset", "bounded_mask_review", "explicit_checkpoint_gate", "nonempty_dense_range_gate", "scene_cut_gate", "boundary_interpolation", "terminal_hold", "source_clip_canvas_binding", "mask_and_source_rights_closure", "failed_report_survives_metadata_rollback"],
+                    "limits": ["caller_selects_mask_identity_and_extent", "bbox_is_not_pose_or_reidentification", "confidence_means_nonempty_not_model_score", "geometry_follows_supplied_mask_errors", "display_aspect_must_match", "persistent_canvas_binding_requires_existing_square_pixel_zero_rotation_CFR_source_contract", "reframe_apply_rejects_intrinsic_geometry_that_changes_display_dimensions", "interpolation_and_sampling_are_explicit_approximations", "decode_storage_budget_excludes_total_ram_and_ffmpeg", "semantic_segmentation_and_broad_natural_video_quality_unaccepted"],
+                },
+                "alpha_fit_padding_contract": "declared_alpha_rasters_and_transparent_output_use_RGBA_transparent_letterbox_padding_before_layer_transform_and_compositing;_ordinary_opaque_fit_keeps_black_letterbox",
                 "visual_adapter_contract": "media_adapter_registers_hash_verified_local_command_json_tracking_runner;v1_validates_single_object_frames_and_v2_validates_unique_object_trajectories_before_keyframes",
                 "tracking_bind_contract": "legacy_source_normalized_bake_or_explicit_source_clip_timeline_canvas_binding_with_source_hash_observations_and_render_time_recompilation",
                 "canvas_tracking_binding": {
@@ -66,6 +74,7 @@ def build_capability_manifest() -> dict[str, Any]:
                 "migration_contract": "project_migrate_creates_before_migrate_snapshot_and_validates_candidate",
                 "write_lock_contract": "operations/project-write.lock_serializes_cooperating_cli_read_modify_write_operations_and_returns_retryable_PROJECT_WRITE_LOCKED",
                 "transaction_contract": "operations/project-transaction.json_journals_project_rights_lock_and_metadata_records_before_cooperating_cli_mutations;_prepared_journal_is_rolled_back_on_next_start_or_project_recover",
+                "failure_diagnostic_contract": "normal_exception_rollback_preserves_explicitly_referenced_versioned_failed_validation_JSON_and_failed_cancelled_partial_operation_records;_crash_recovery_does_not_infer_exception_diagnostics",
                 "transaction_scope": ["project.json", "rights-ledger.json", "project.lock.json", "operations_metadata", "history_metadata", "validation_metadata", "exports_metadata"],
                 "limits": ["media_and_render_side_effect_files_are_reported_but_not_copied_or_deleted_by_recovery", "direct_external_json_editors_do_not_join_cli_lock_or_transaction", "cross_version_snapshot_migration_is_limited_to_known_legacy_shapes"],
             },

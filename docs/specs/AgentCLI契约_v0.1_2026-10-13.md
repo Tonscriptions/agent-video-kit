@@ -203,6 +203,12 @@ python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --p
 
 `quality mask` 默认 `--channel alpha --threshold 127 --max-edge 1280 --max-frames 4096 --budget-mib 256`；阈值为严格大于，解码存储预算不含总 RAM。`--expectations` 与可重复 `--scene-cut-frame` 仅采用显式输入；静态图不接受 `--fps`。`--report` 限项目 `validation/` 内 JSON，不能覆盖源/期望。失败检查点仍落盘且退出 2；不修改项目或台账，也不自动改动现有渲染发布门禁。格式、时钟和语义限制见[蒙版核验契约](./本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md)。
 
+## 2026-10-16 蒙版驱动跟踪与应用
+
+`media track/track-bind/reframe` 增加 `--mask-asset-id`，与 ROI/adapter/object-ID/input 互斥，需要已登记源视频及蒙版视频。模板/模型模式继续要求 `--roi`。蒙版模式默认 alpha/127，黑白输入显式 `--mask-channel luma`；`--mask-source-start-seconds` 定义帧零对应源秒数。公共预算参数为 `--mask-max-edge 1280 --mask-max-frames 4096 --mask-budget-mib 256`，可选 `--mask-expectations` 与重复 `--mask-scene-cut-frame`。
+
+dry-run 仅预检；正式解码后按源时钟生成包围框轨迹和关键帧。范围中的空选区、跨切点或明确检查点失败均退出 2；报告限制在项目 `validation/` 内 JSON，正常异常回滚仍保留实际失败报告。源/蒙版摘要或探测不符退出 6，缺少匹配权利记录/发布不许可退出 7。持久绑定保留 source+mask/model 权利闭包，沿用现有画布重算限制。`confidence=1` 仅表示非空；姿态/身份/完整分割质量不由该值推断。详见[契约](./本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md)与[实际功能、透明补边修复及失败实测](../validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md)。
+
 ### 6.2 本地效果目录与渲染契约
 
 Agent 在生成项目 JSON 或变更集前应先调用 `effects list`，需要精确参数时调用 `effects inspect --name NAME`。当前目录版本为 `0.4.0`，记录 45 项由本机 FFmpeg 提供的效果，包括 HSL、RGB 曲线、三向色轮和 `frame_interpolation` 光流补帧；每项至少包含 `id`、`aliases`、`category`、`backend`、`source=ffmpeg-local`、`keyframable`、`parameters` 和 `limits`。目录不会下载滤镜包，也不会访问网络。

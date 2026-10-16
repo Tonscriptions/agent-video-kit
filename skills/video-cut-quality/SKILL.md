@@ -28,6 +28,14 @@ Even all checkpoints passing leaves `semantic_quality_accepted=false`. This
 command reviews the supplied asset; it does not apply inpainting mask growth,
 infer object identity, prove full extent, or accept reconstruction quality.
 
+For mask-driven tracking, supply `--mask-expectations` to the tracking/binding/
+reframe command when those checks should gate the edit; a prior standalone
+review is not an implicit gate. See the [mask tracking contract](../../docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md).
+Check the encoded bbox clock and final rendered label separately. Inspect
+transparent-label padding as well as its position: a center metric can pass
+while an opaque border damages the composition. Keep an exceeded pixel
+threshold and failed semantic checks visible, even when project/render succeeds.
+
 For joint masked video editing, review the [VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
 Check the exact window plan/hash, scene boundaries, tail padding, seed sequence,
 overlap frame count, `conditioning=masked-rgb-127-before-and-after-resize`,

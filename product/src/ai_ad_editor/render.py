@@ -2942,7 +2942,12 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     elif crop_fit == "stretch":
                         chain.extend([f"scale={width}:{height}", "setsar=1"])
                     else:
-                        chain.extend([f"scale={width}:{height}:force_original_aspect_ratio=decrease", f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:color=black", "setsar=1"])
+                        pixel_format = str(source_probe.get('pix_fmt') or '')
+                        alpha_padding = transparent_canvas or pixel_format.startswith(('rgba','bgra','argb','abgr','yuva','gbrap','ya')) or pixel_format == 'pal8'
+                        if alpha_padding:
+                            chain.append('format=rgba')
+                        pad_color = 'black@0' if alpha_padding else 'black'
+                        chain.extend([f"scale={width}:{height}:force_original_aspect_ratio=decrease", f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:color={pad_color}", "setsar=1"])
                 clip_content_duration = max(
                     0.001,
                     curve_duration if curve_duration is not None else (src_out - src_in) / max(speed, 1e-9),

@@ -1,0 +1,18 @@
+{
+  "kind": "procedural-mask-tracking-fixture",
+  "generator": "scripts/smoke_mask_tracking.py",
+  "generator_sha256": "sha256:4a580d8e4f9a48d336130590b2ca3cee4ab43f71f39f39dbc82e112c0f91f3af",
+  "license_spdx": "CC0-1.0",
+  "learned_model_runs": 0,
+  "natural_segmentation_accuracy_claim": false,
+  "purpose": "Measure geometry and actual rendered marker positions; selection is authored, not inferred.",
+  "source_clock": "64 frames at 16/1 fps, 4 seconds, source 640x360 and matching-aspect half-size mask 320x180",
+  "audio": "none; this fixture tests visual geometry only",
+  "raster_text": "Pillow built-in default; no font file distributed",
+  "inputs": {
+    "source.mp4": "sha256:ed79dc93660d67987f83aaf9b902d5c54643d3e812d4a265df110dc3a1e764f5",
+    "selected-mask.mov": "sha256:cd2ea3c5fb544181a6a1b28597263ab259915aa4ffff2ce8cc94dd24690749dc",
+    "marker.png": "sha256:beb53602e683e0114a889b08961e99de6c4f580241d6a1e46dd160517da839e3",
+    "truth.json": "sha256:22fcae4322f571035254ac3bb03be096d5d6739998329adaeb6598dd68e178c6"
+  }
+}

@@ -64,6 +64,14 @@ coordinates, positive/negative points, boxes, selected IDs and explicit resets.
 A face click can select only a face; inspect before accepting a whole-person
 cutout. Binary/probability segmentation does not establish hair or matte quality.
 
+To drive labels or portrait reframing from its registered video mask, use
+`media track-bind` or `media reframe --mask-asset-id <mask>` with the source
+asset, without ROI/adapter/object-ID options. Read the [mask tracking contract](../../docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md).
+Review the mask clock and optional `--mask-expectations` in dry-run; explicit
+source-clip references enable render-time canvas recompilation. This measures
+the supplied bbox and retains source/mask/model rights. Segmentation mistakes
+and failed final label-pixel checks remain quality failures.
+
 For transparent human cutouts use the [local RVM contract](../../docs/specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md).
 Register existing FP32 ONNX, native Python and evidence with `media adapter
 register --engine rvm-onnx-cpu-matting-v1`; inspect, then run `media matting

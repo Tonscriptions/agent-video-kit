@@ -162,6 +162,20 @@ are projected through crop, layer transforms, mirror and source-time changes
 again at render time; inference is not rerun. Read the [canvas binding contract](../../docs/specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md).
 Plaintext/OTIO/MLT export bakes this relationship and must report the loss.
 
+For an existing selected SAM2/RVM or authored encoded video mask, use
+`media track`, `media track-bind` or `media reframe` with `--asset-id <source>`
+and `--mask-asset-id <mask>`, without ROI/adapter/object-ID options. Read the
+[mask tracking contract](../../docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md).
+Use alpha by default, explicit `--mask-channel luma` for opaque black/white.
+`--mask-source-start-seconds` maps mask frame zero to source display seconds;
+review range coverage, matching display aspect, decoded-storage budget and
+declared cuts in dry-run. Optional `--mask-expectations` gates selected/clear
+checks before applying. Empty selections and crossed cuts fail explicitly;
+retain failed reports. Confidence 1 means nonempty, not model confidence.
+Use source-clip references for persistent canvas binding and retain both
+source/mask rights dependencies, including the mask's model parent. Bbox
+motion follows segmentation errors; it does not add pose or occlusion recovery.
+
 Models are inputs, never dependencies that the CLI fetches. Put a model in a
 project or approved local model directory, record its version, SHA-256 and
 license in the project provenance/Rights Ledger, then pass the absolute path.
