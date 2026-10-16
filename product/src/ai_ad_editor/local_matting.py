@@ -283,6 +283,15 @@ def validate_response(response: dict, request: dict) -> None:
                     execution=response.get('model_execution',{})
                     if not isinstance(execution,dict) or execution.get('prompt_truncated') is not False or execution.get('prompt_extension') is not False or execution.get('text_encoder_released_before_generation') is not True or execution.get('transformer_precision')!='bfloat16-with-declared-float32-stability-modules' or execution.get('vae_precision')!='float32':
                         raise ValueError('joint model/prompt execution contract')
+                    if type(execution.get('flow_shift')) not in {float,int} or execution['flow_shift']!=request['generation']['flow_shift'] or type(execution.get('model_input_scale')) is not int or execution['model_input_scale']!=request['generation']['model_input_scale']:
+                        raise ValueError('joint sampling configuration mismatch')
+                    shapes=execution.get('window_input_shapes')
+                    factor=request['generation']['model_input_scale']
+                    edge=max(64,(request['inpainting']['model_max_edge']+15)//16*16)*factor
+                    if not isinstance(shapes,list) or len(shapes)!=metrics['model_calls'] or any(not isinstance(shape,list) or len(shape)!=3 or any(type(v) is not int for v in shape) or not 1<=shape[0]<=request['generation']['window_frames'] or shape[0]%4!=1 or any(not 64*factor<=v<=edge or v%(16*factor) for v in shape[1:]) for shape in shapes):
+                        raise ValueError('joint model input shape invalid')
+                    if max(shape[0]*shape[1]*shape[2] for shape in shapes)!=metrics['model_peak_pixels']:
+                        raise ValueError('joint model input raster mismatch')
                     tokens=execution.get('prompt_token_counts',{});seconds=execution.get('window_seconds',[])
                     if not isinstance(tokens,dict) or set(tokens)!={'prompt','negative_prompt'} or any(type(v) is not int or not 1<=v<=request['generation']['prompt_max_tokens'] for v in tokens.values()) or not isinstance(seconds,list) or len(seconds)!=metrics['model_calls'] or any(type(v) not in {int,float} or not math.isfinite(v) or v<0 for v in seconds):
                         raise ValueError('joint prompt/window execution metrics')
@@ -292,7 +301,7 @@ def validate_response(response: dict, request: dict) -> None:
                 value = metrics.get(name, '')
                 if not isinstance(value, str) or len(value) != 71 or not value.startswith('sha256:') or any(c not in '0123456789abcdef' for c in value[7:]):
                     raise ValueError('inpainting input digests')
-            raster_bound = (((request['inpainting']['model_max_edge']+15)//16*16)**2 * request['generation']['window_frames']) if joint else ((request['inpainting']['model_max_edge'] + 7) // 8 * 8)**2
+            raster_bound = (((request['inpainting']['model_max_edge']+15)//16*16)**2 * request['generation']['window_frames'] * request['generation']['model_input_scale']**2) if joint else ((request['inpainting']['model_max_edge'] + 7) // 8 * 8)**2
             if type(metrics.get('model_peak_pixels')) is not int or not 0 <= metrics['model_peak_pixels'] <= raster_bound:
                 raise ValueError('inpainting model raster budget')
     except (KeyError, TypeError, ValueError) as exc:

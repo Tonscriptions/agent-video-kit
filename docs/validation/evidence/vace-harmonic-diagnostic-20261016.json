@@ -1,0 +1,398 @@
+{
+  "checked_at_utc": "2026-10-15T23:28:26.205816+00:00",
+  "scope": "Developer diagnostics on existing saved outputs; spatial postprocessing only; no new native-model or formal CLI acceptance.",
+  "controlled": {
+    "summary_path": "workspace/vace-smoke-harmonic-diagnostic-20261016/summary.json",
+    "summary_sha256": "sha256:5deb851b406a759eb724c251d7fcaaa660e8248216cc009ce913f21495d1b582",
+    "evidence": {
+      "scope": "Developer-only spatial harmonic boundary correction on saved model outputs, not CLI integration, model improvement, temporal reconstruction or broad quality acceptance.",
+      "source_sha256": "sha256:800f9903ca5256f196c0f9328671d41fd9e3ba25880760de24c0bb176e88b6c3",
+      "decoded_mask_sha256": "sha256:f52dcf88552cb35a66bef12b4d739518983bc5951dc633352cf1be07bfd902ad",
+      "truth_sha256": "sha256:e3537405e09582cc046a7db1703a015cea909d2824a3aec9ac79d78e9cb6ec9a",
+      "driver_sha256": "sha256:471bcd6111ab4922840a4e88e892330047ebfbe51a520e1dbe9db8edac6d21d2",
+      "cases": [
+        {
+          "id": "native-shift3-30",
+          "input_sha256": "sha256:8832eb8aacd41f3a3123c4c2476b0a65cad990d3fb9033f333d41bf5a6fcbe82",
+          "output_sha256": "sha256:01382948421663b08b5e96d4afa90fa70576f5441c101861304f17c2724cfc7d",
+          "masked_psnr_db": 42.84072676342258,
+          "outside_changed_pixels": 0,
+          "alpha_exact": true,
+          "frames": [
+            {
+              "empty": true
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                102,
+                102,
+                98
+              ],
+              "max_abs_correction": 13.388388321829542
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                98,
+                101,
+                100
+              ],
+              "max_abs_correction": 17.919686369301836
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                100,
+                100,
+                100
+              ],
+              "max_abs_correction": 17.615889172234077
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                100,
+                100,
+                100
+              ],
+              "max_abs_correction": 16.33370767992968
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                96,
+                98,
+                99
+              ],
+              "max_abs_correction": 23.725355232613083
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                100,
+                96,
+                101
+              ],
+              "max_abs_correction": 19.714415401028425
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                101,
+                100,
+                101
+              ],
+              "max_abs_correction": 18.714262610712204
+            }
+          ]
+        },
+        {
+          "id": "4x-shift16-30",
+          "input_sha256": "sha256:a2da7c7026a1d1425e30a215d54f7a17cec222445a00045844129287ebdbb1e8",
+          "output_sha256": "sha256:0d2ff0b9c387b973e76b70b711cc4d60b7f0383b7b49b725d16bc46f86daa475",
+          "masked_psnr_db": 36.80755760627945,
+          "outside_changed_pixels": 0,
+          "alpha_exact": true,
+          "frames": [
+            {
+              "empty": true
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                102,
+                100,
+                98
+              ],
+              "max_abs_correction": 17.94831758732095
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                100,
+                98,
+                99
+              ],
+              "max_abs_correction": 23.507781481123672
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                102,
+                101,
+                100
+              ],
+              "max_abs_correction": 21.891641627581215
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                101,
+                101,
+                100
+              ],
+              "max_abs_correction": 21.43978622128814
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                101,
+                101,
+                99
+              ],
+              "max_abs_correction": 20.86588287058994
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                94,
+                100,
+                99
+              ],
+              "max_abs_correction": 21.947354109579877
+            },
+            {
+              "selected_pixels": 780,
+              "iterations": [
+                101,
+                99,
+                101
+              ],
+              "max_abs_correction": 23.56821513203431
+            }
+          ]
+        }
+      ],
+      "broad_quality_accepted": false,
+      "contact": {
+        "path": "workspace/vace-smoke-harmonic-diagnostic-20261016/contact.png",
+        "sha256": "sha256:b2005af9dc3cbd56183be9261c0833a0d4abab0a735c225bb7a905e168455572"
+      },
+      "elapsed_seconds": 1.0039952999941306
+    }
+  },
+  "natural": {
+    "summary_path": "workspace/vace-smoke-harmonic-natural-diagnostic-20261016/summary.json",
+    "summary_sha256": "sha256:795e4f0a02c6222b1582aac3a3e5ddd21b32a822231b5274d652d3a64105c606",
+    "evidence": {
+      "scope": "Developer-only sampled natural video diagnostics; no hidden truth, model rerun, production integration or temporal/broad quality acceptance.",
+      "driver_sha256": "sha256:a214b314d1a714c86320f0831083453687f10f2454a9c4c66da5f9a443ac461d",
+      "boundary_algorithm_sha256": "sha256:471bcd6111ab4922840a4e88e892330047ebfbe51a520e1dbe9db8edac6d21d2",
+      "source_summary_sha256": "sha256:ed099c6d53031d6c599f319b3c94a81575228cc3a1882380b40156910a26ef6e",
+      "source_sha256": "sha256:813bc758f73cdb49f2ec206dc5946497279a92f5f900efb042a733249d60c207",
+      "frame_indices": [
+        0,
+        4,
+        8,
+        12,
+        13,
+        16,
+        17,
+        21,
+        25,
+        26,
+        29,
+        30,
+        31
+      ],
+      "source_selected_rgb_perturbation_invariant": true,
+      "source_alpha_exact": true,
+      "outside_mask_changed_pixels": 0,
+      "frames": [
+        {
+          "source_frame": 0,
+          "selected_pixels": 8134,
+          "iterations": [
+            284,
+            286,
+            287
+          ],
+          "max_abs_correction": 119.97535019708239
+        },
+        {
+          "source_frame": 4,
+          "selected_pixels": 6141,
+          "iterations": [
+            253,
+            257,
+            255
+          ],
+          "max_abs_correction": 133.52263768663477
+        },
+        {
+          "source_frame": 8,
+          "selected_pixels": 4816,
+          "iterations": [
+            227,
+            227,
+            227
+          ],
+          "max_abs_correction": 83.41477031696716
+        },
+        {
+          "source_frame": 12,
+          "selected_pixels": 3880,
+          "iterations": [
+            211,
+            208,
+            210
+          ],
+          "max_abs_correction": 148.54901181085935
+        },
+        {
+          "source_frame": 13,
+          "selected_pixels": 2442,
+          "iterations": [
+            177,
+            177,
+            178
+          ],
+          "max_abs_correction": 127.66416827971796
+        },
+        {
+          "source_frame": 16,
+          "selected_pixels": 2367,
+          "iterations": [
+            138,
+            142,
+            143
+          ],
+          "max_abs_correction": 97.08499810926445
+        },
+        {
+          "source_frame": 17,
+          "selected_pixels": 1856,
+          "iterations": [
+            126,
+            127,
+            126
+          ],
+          "max_abs_correction": 96.58199614996512
+        },
+        {
+          "source_frame": 21,
+          "selected_pixels": 2647,
+          "iterations": [
+            154,
+            153,
+            152
+          ],
+          "max_abs_correction": 106.47547610084858
+        },
+        {
+          "source_frame": 25,
+          "selected_pixels": 4182,
+          "iterations": [
+            179,
+            180,
+            180
+          ],
+          "max_abs_correction": 137.33976418355226
+        },
+        {
+          "source_frame": 26,
+          "selected_pixels": 3355,
+          "iterations": [
+            140,
+            145,
+            144
+          ],
+          "max_abs_correction": 160.01179831546798
+        },
+        {
+          "source_frame": 29,
+          "selected_pixels": 6383,
+          "iterations": [
+            251,
+            254,
+            251
+          ],
+          "max_abs_correction": 111.42662592363327
+        },
+        {
+          "source_frame": 30,
+          "selected_pixels": 7778,
+          "iterations": [
+            249,
+            250,
+            251
+          ],
+          "max_abs_correction": 130.54152349908378
+        },
+        {
+          "source_frame": 31,
+          "selected_pixels": 7927,
+          "iterations": [
+            276,
+            274,
+            271
+          ],
+          "max_abs_correction": 112.73405476781441
+        }
+      ],
+      "contacts": [
+        {
+          "path": "workspace/vace-smoke-harmonic-natural-diagnostic-20261016/contact-1.png",
+          "sha256": "sha256:24aca08eb33e7f986eb21f0e9a7e13b359a75b53499ac0514f2d298391260dcd",
+          "frame_indices": [
+            0,
+            4,
+            8,
+            12,
+            13,
+            16,
+            17
+          ]
+        },
+        {
+          "path": "workspace/vace-smoke-harmonic-natural-diagnostic-20261016/contact-2.png",
+          "sha256": "sha256:47010948f83ebc36395face985b234485ec4f89a10347ae0b46d8fbc6195e4d9",
+          "frame_indices": [
+            21,
+            25,
+            26,
+            29,
+            30,
+            31
+          ]
+        }
+      ],
+      "elapsed_seconds": 1.251180999999633,
+      "broad_quality_accepted": false,
+      "continuous_playback_reviewed": false
+    }
+  },
+  "manual_review": {
+    "checked_at_utc": "2026-10-15T23:28:26.204791+00:00",
+    "method": "Direct inspection of controlled contact frames 3/4/7 and both natural contacts containing 13 listed frames.",
+    "controlled_observations": [
+      "The dark patch is greatly reduced for the base-resolution output.",
+      "The corrected 4x output retains a faint patch and local color variation."
+    ],
+    "natural_observations": [
+      "Some block color bias is reduced.",
+      "Body/leg-shaped ghosts, green/purple generated structures, smear and discontinuous bedding texture remain, including overlap/tail samples.",
+      "The spatial correction cannot reconstruct missing scene structure or establish motion continuity."
+    ],
+    "controlled_broad_acceptance": false,
+    "natural_quality_accepted": false,
+    "continuous_playback_reviewed": false,
+    "production_integration": false,
+    "input_or_model_execution_rerun": false
+  },
+  "drivers": {
+    "product/.runtime/vace_harmonic_probe_20261016.py": {
+      "sha256": "sha256:471bcd6111ab4922840a4e88e892330047ebfbe51a520e1dbe9db8edac6d21d2",
+      "source": "\"\"\"Developer-only harmonic boundary color diagnostic; no production integration.\"\"\"\nfrom pathlib import Path\nimport hashlib,json,subprocess,sys,time\nimport numpy as np\nfrom PIL import Image,ImageDraw\nfrom scipy.sparse import csr_matrix\nfrom scipy.sparse.linalg import cg\nroot=Path(__file__).resolve().parents[2];sys.path.insert(0,str(root/'product/src'))\nfrom ai_ad_editor.runtime import configure_local_runtime\nfrom ai_ad_editor.media import ffmpeg_path\nconfigure_local_runtime()\nbase=root/'workspace/vace-smoke-calibration-20261016-controlled-v1'\nout=root/'workspace/vace-smoke-harmonic-diagnostic-20261016'\nassert not out.exists();out.mkdir()\nprevious=json.loads((root/'workspace/vace-smoke-20261016-controlled-v2/summary.json').read_text(encoding='utf-8-sig'))\ndef sha(p):return 'sha256:'+hashlib.sha256(Path(p).read_bytes()).hexdigest()\ndef decode(path):\n raw=subprocess.run([ffmpeg_path(),'-nostdin','-hide_banner','-loglevel','error','-i',str(path),'-an','-f','rawvideo','-pix_fmt','rgba','pipe:1'],capture_output=True,check=True).stdout\n return np.frombuffer(raw,np.uint8).reshape(8,128,192,4)\nsource=decode(previous['inpainting']['source']['path']);mask=decode(previous['inpainting']['mask']['path']);selected=mask[:,:,:,3]>127.5\ntruth_path=root/'product/.runtime/fixtures/lama-20261016-reproduced/ground-truth.npz';truth=np.load(truth_path,allow_pickle=False)['frames']\ndef correct(src,generated,chosen):\n h,w=chosen.shape;ys,xs=np.nonzero(chosen);n=len(ys)\n if not n:return generated.copy(),{'empty':True}\n assert n<h*w and n<=100000\n index=np.full((h,w),-1,np.int32);index[ys,xs]=np.arange(n)\n rows=[];cols=[];values=[];rhs=np.zeros((n,3),np.float64);degree=np.zeros(n,np.float64)\n g=generated[:,:,:3].astype(np.float64)\n for dy,dx in [(-1,0),(1,0),(0,-1),(0,1)]:\n  valid=(ys+dy>=0)&(ys+dy<h)&(xs+dx>=0)&(xs+dx<w)\n  at=np.flatnonzero(valid);qy=ys[at]+dy;qx=xs[at]+dx;neighbor=index[qy,qx];degree[at]+=1\n  interior=neighbor>=0;rows.extend(at[interior]);cols.extend(neighbor[interior]);values.extend([-1.]*int(interior.sum()))\n  at=at[~interior];qy=qy[~interior];qx=qx[~interior]\n  # Boundary errors use source outside selection and extrapolate model colors from inside only.\n  gy=g[ys[at],xs[at]].copy();by=ys[at]-dy;bx=xs[at]-dx\n  back=(by>=0)&(by<h)&(bx>=0)&(bx<w);take=np.flatnonzero(back)\n  valid_back=np.zeros(len(at),bool);valid_back[take]=chosen[by[take],bx[take]]\n  take=np.flatnonzero(valid_back);gy[take]+=gy[take]-g[by[take],bx[take]]\n  rhs[at]+=src[qy,qx,:3].astype(np.float64)-gy\n rows.extend(range(n));cols.extend(range(n));values.extend(degree)\n matrix=csr_matrix((values,(rows,cols)),shape=(n,n));correction=np.zeros((n,3),np.float64);iterations=[]\n for c in range(3):\n  count=[0]\n  def progress(_):count[0]+=1\n  correction[:,c],status=cg(matrix,rhs[:,c],rtol=1e-8,atol=1e-7,maxiter=2000,callback=progress)\n  assert status==0,status;iterations.append(count[0])\n value=generated.copy();value[ys,xs,:3]=np.rint(np.clip(g[ys,xs]+correction,0,255)).astype(np.uint8)\n assert np.array_equal(value[~chosen],generated[~chosen]);assert np.array_equal(value[:,:,3],generated[:,:,3])\n return value,{'selected_pixels':n,'iterations':iterations,'max_abs_correction':float(np.abs(correction).max())}\nmeta={'scope':'Developer-only spatial harmonic boundary correction on saved model outputs, not CLI integration, model improvement, temporal reconstruction or broad quality acceptance.',\n 'source_sha256':previous['source_sha256'],'decoded_mask_sha256':'sha256:'+hashlib.sha256(mask.tobytes()).hexdigest(),'truth_sha256':sha(truth_path),'driver_sha256':sha(__file__),'cases':[],'broad_quality_accepted':False}\nviews=[('truth',truth)];started=time.monotonic()\nfor name in ['native-shift3-30','4x-shift16-30']:\n original=np.load(base/(name+'.npy'),allow_pickle=False);frames=[];records=[]\n for i in range(8):\n  corrected,record=correct(source[i],original[i],selected[i]);frames.append(corrected);records.append(record)\n result=np.stack(frames);errors=(result[:,:,:,:3].astype(np.float64)-truth[:,:,:,:3].astype(np.float64))[selected];mse=float((errors**2).mean());psnr=float(10*np.log10(255**2/mse)) if mse else 100.\n assert not np.any(np.any(result[:,:,:,:3]!=source[:,:,:,:3],axis=3)&~selected);assert np.array_equal(result[:,:,:,3],source[:,:,:,3])\n target=out/(name+'.npy');np.save(target,result,allow_pickle=False);meta['cases'].append({'id':name,'input_sha256':sha(base/(name+'.npy')),'output_sha256':sha(target),'masked_psnr_db':psnr,'outside_changed_pixels':0,'alpha_exact':True,'frames':records})\n views.extend([(name,original),('harmonic '+name,result)])\nwidth,height,label=288,192,22;sheet=Image.new('RGB',(width*len(views),(height+label)*3),'#20232a');draw=ImageDraw.Draw(sheet)\nfor row,i in enumerate([3,4,7]):\n for col,(name,value) in enumerate(views):\n  x=col*width;y=row*(height+label);sheet.paste(Image.fromarray(value[i,:,:,:3]).resize((width,height)),(x,y+label));draw.text((x+4,y+4),name+' / '+str(i),fill='white')\nsheet.save(out/'contact.png');meta['contact']={'path':(out/'contact.png').relative_to(root).as_posix(),'sha256':sha(out/'contact.png')};meta['elapsed_seconds']=time.monotonic()-started\n(out/'summary.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8',newline='\\n')\nprint(json.dumps({'cases':[{k:v for k,v in c.items() if k in ['id','masked_psnr_db']} for c in meta['cases']],'elapsed_seconds':meta['elapsed_seconds'],'contact':meta['contact']},ensure_ascii=False))\n"
+    },
+    "product/.runtime/vace_harmonic_natural_probe_20261016.py": {
+      "sha256": "sha256:a214b314d1a714c86320f0831083453687f10f2454a9c4c66da5f9a443ac461d",
+      "source": "\"\"\"Developer natural-scene review of harmonic color correction; sampled frames only.\"\"\"\nimport os\nos.environ['OPENBLAS_NUM_THREADS']='1';os.environ['OMP_NUM_THREADS']='1';os.environ['MKL_NUM_THREADS']='1'\nfrom pathlib import Path\nimport ast,hashlib,json,subprocess,sys,time\nimport numpy as np\nfrom PIL import Image,ImageDraw,ImageFilter,ImageOps\nfrom scipy.sparse import csr_matrix\nfrom scipy.sparse.linalg import cg\nroot=Path(__file__).resolve().parents[2];sys.path.insert(0,str(root/'product/src'))\nfrom ai_ad_editor.runtime import configure_local_runtime\nfrom ai_ad_editor.media import ffmpeg_path\nconfigure_local_runtime()\ndef sha(p):return 'sha256:'+hashlib.sha256(Path(p).read_bytes()).hexdigest()\nprobe=root/'product/.runtime/vace_harmonic_probe_20261016.py'\nprevious=json.loads((root/'workspace/vace-smoke-harmonic-diagnostic-20261016/summary.json').read_text(encoding='utf-8-sig'));assert sha(probe)==previous['driver_sha256']\nnode=next(n for n in ast.parse(probe.read_text(encoding='utf-8-sig')).body if isinstance(n,ast.FunctionDef) and n.name=='correct')\nexec(compile(ast.fix_missing_locations(ast.Module(body=[node],type_ignores=[])),str(probe),'exec'),globals())\nsummary_path=root/'workspace/vace-smoke-20261016-natural-v2/summary.json';summary=json.loads(summary_path.read_text(encoding='utf-8-sig'));result=summary['inpainting']\nheight,width,frames=(result['video'][k] for k in ['height','width','frames'])\ndef decode(path):\n raw=subprocess.run([ffmpeg_path(),'-nostdin','-hide_banner','-loglevel','error','-i',str(path),'-an','-f','rawvideo','-pix_fmt','rgba','pipe:1'],capture_output=True,check=True).stdout\n return np.frombuffer(raw,np.uint8).reshape(frames,height,width,4)\nsource=decode(result['source']['path']);mask=decode(result['mask']['path']);generated=decode(result['output'])\nselected=mask[:,:,:,3]>result['inpainting']['threshold']*255;grow=result['inpainting']['grow']\nselected=np.array([np.asarray(Image.fromarray(v.astype(np.uint8)*255).filter(ImageFilter.MaxFilter(grow*2+1)))!=0 for v in selected])\nlama_summary=json.loads((root/'workspace/lama-smoke-20261016-vace-matched-natural/summary.json').read_text(encoding='utf-8-sig'));lama=decode(lama_summary['inpainting']['output'])\nindices=[0,4,8,12,13,16,17,21,25,26,29,30,31];out=root/'workspace/vace-smoke-harmonic-natural-diagnostic-20261016';assert not out.exists();out.mkdir()\nstarted=time.monotonic();records=[];outputs=[]\nfor i in indices:\n value,record=correct(source[i],generated[i],selected[i]);outputs.append(value)\n assert np.array_equal(value[:,:,3],source[i,:,:,3]);assert not np.any(np.any(value[:,:,:3]!=source[i,:,:,:3],axis=2)&~selected[i])\n records.append({'source_frame':i,**record});print(json.dumps({'frame':i,'elapsed_seconds':time.monotonic()-started}),flush=True)\n# The source pixels being removed must not participate in boundary estimation.\ni=indices[0];altered=source[i].copy();altered[selected[i],:3]=[255,0,0];changed,_=correct(altered,generated[i],selected[i]);assert np.array_equal(changed,outputs[0])\nnp.save(out/'sampled-outputs.npy',np.stack(outputs),allow_pickle=False)\nviews=[('source',source[indices]),('VACE',generated[indices]),('harmonic diagnostic',np.stack(outputs)),('matched LaMa',lama[indices])];contacts=[]\nfor sheetno,offset in enumerate(range(0,len(indices),7),1):\n chosen=indices[offset:offset+7];cw,ch,label=352,198,22;sheet=Image.new('RGB',(cw*len(views),(ch+label)*len(chosen)),'#20232a');draw=ImageDraw.Draw(sheet)\n for row,frameindex in enumerate(chosen):\n  for col,(name,value) in enumerate(views):\n   x,y=col*cw,row*(ch+label);pic=ImageOps.contain(Image.fromarray(value[offset+row,:,:,:3]),(cw,ch));sheet.paste(pic,(x+(cw-pic.width)//2,y+label+(ch-pic.height)//2));draw.text((x+4,y+4),name+' / '+str(frameindex),fill='white')\n target=out/('contact-'+str(sheetno)+'.png');sheet.save(target);contacts.append({'path':target.relative_to(root).as_posix(),'sha256':sha(target),'frame_indices':chosen})\nmeta={'scope':'Developer-only sampled natural video diagnostics; no hidden truth, model rerun, production integration or temporal/broad quality acceptance.','driver_sha256':sha(__file__),'boundary_algorithm_sha256':sha(probe),'source_summary_sha256':sha(summary_path),\n 'source_sha256':summary['source_sha256'],'frame_indices':indices,'source_selected_rgb_perturbation_invariant':True,'source_alpha_exact':True,'outside_mask_changed_pixels':0,'frames':records,'contacts':contacts,'elapsed_seconds':time.monotonic()-started,'broad_quality_accepted':False,'continuous_playback_reviewed':False}\n(out/'summary.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8',newline='\\n');print(json.dumps({'elapsed_seconds':meta['elapsed_seconds'],'contacts':contacts},ensure_ascii=False))\n"
+    }
+  },
+  "formal_cli_runs_added": 0,
+  "production_integration": false,
+  "broad_quality_accepted": false,
+  "full_jianying_parity_accepted": false
+}

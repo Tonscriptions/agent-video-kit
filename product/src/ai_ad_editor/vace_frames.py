@@ -42,18 +42,26 @@ def _predict_window(entries, spec, *, options, generation, infer):
         rgb[mask!=0]=127
         images.append(np.pad(rgb,((0,ph-mh),(0,pw-mw),(0,0)),mode='edge'))
         masks.append(np.pad(mask,((0,ph-mh),(0,pw-mw)),mode='edge'))
+    factor=generation.get('model_input_scale',1)
+    if type(factor) is not int or factor not in {1,2,4}:raise ValueError('VACE_MODEL_INPUT_SCALE_INVALID')
+    if factor!=1:
+        images=[np.asarray(Image.fromarray(rgb).resize((pw*factor,ph*factor),Image.Resampling.BILINEAR)).copy() for rgb in images]
+        masks=[np.asarray(Image.fromarray(mask).resize((pw*factor,ph*factor),Image.Resampling.NEAREST)) for mask in masks]
+        for rgb,mask in zip(images,masks):rgb[mask!=0]=127
     padded=spec['model_frames']-len(items)
     images.extend([images[-1]]*padded);masks.extend([masks[-1]]*padded)
     predicted=infer(np.stack(images),np.stack(masks),{**generation,'seed':spec['seed']})
-    if not isinstance(predicted,np.ndarray) or predicted.dtype!=np.float32 or predicted.shape!=(spec['model_frames'],ph,pw,3) or not np.isfinite(predicted).all():
+    if not isinstance(predicted,np.ndarray) or predicted.dtype!=np.float32 or predicted.shape!=(spec['model_frames'],ph*factor,pw*factor,3) or not np.isfinite(predicted).all():
         raise ValueError('VACE_MODEL_OUTPUT_INVALID')
     clipped=int(np.count_nonzero((predicted<0)|(predicted>1)))
+    if factor!=1:
+        predicted=np.array([np.stack([np.asarray(Image.fromarray(frame[:,:,c]).resize((pw,ph),Image.Resampling.BILINEAR),dtype=np.float32) for c in range(3)],axis=2) for frame in predicted])
     # Keep float reconstruction through resize and overlap; quantize once on emit.
     projections=[]
     for frame in predicted[:end-start,:mh,:mw]:
         generated=np.stack([np.asarray(Image.fromarray(np.clip(frame[:,:,c],0,1)).resize((rw,rh),Image.Resampling.BILINEAR),dtype=np.float32) for c in range(3)],axis=2)*255
         projections.append(generated)
-    stats.update(model_calls=1,roi=[x1,y1,x2,y2],resized=scale<1,model_pixels=pw*ph*spec['model_frames'],padded_frames=padded,clipped_model_values=clipped)
+    stats.update(model_calls=1,roi=[x1,y1,x2,y2],resized=scale<1 or factor!=1,model_pixels=pw*ph*factor**2*spec['model_frames'],base_model_size=[pw,ph],model_size=[pw*factor,ph*factor],model_input_scale=factor,padded_frames=padded,clipped_model_values=clipped)
     return projections,stats
 
 

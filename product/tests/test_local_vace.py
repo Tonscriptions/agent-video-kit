@@ -34,12 +34,12 @@ invoke=base_fixture.invoke
 
 
 class VaceWindowTests(unittest.TestCase):
-    def run_frames(self, *, frames=8, window=17, overlap=4, cuts=None, channel='alpha', options=None, infer=None, empty=False):
+    def run_frames(self, *, frames=8, window=17, overlap=4, cuts=None, channel='alpha', options=None, infer=None, empty=False, generation_options=None):
         original=np.full((frames,48,64,4),180,np.uint8);original[:,:,:,3]=np.arange(64,dtype=np.uint8)[None,None,:]*4
         mask=np.zeros_like(original)
         if not empty:mask[:,16:32,24:40,3]=255;mask[:,16:32,24:40,:3]=255
         if channel=='luma':mask[:,:,:,3]=255
-        generation=normalize_generation(prompt='保留背景纹理。\nDo not change the camera.',window_frames=window,window_overlap=overlap,scene_cut_frames=cuts,frames=frames)
+        generation=normalize_generation(prompt='保留背景纹理。\nDo not change the camera.',window_frames=window,window_overlap=overlap,scene_cut_frames=cuts,frames=frames,**(generation_options or {}))
         paired=np.concatenate([original,mask],axis=2)
         output=io.BytesIO();calls=[]
         def model(images,masks,g):
@@ -49,6 +49,59 @@ class VaceWindowTests(unittest.TestCase):
                                options=options or normalize_options(grow=0,context=0),infer=model)
         result=np.frombuffer(output.getvalue(),np.uint8).reshape(original.shape)
         return original,mask,result,metrics,calls
+
+    def test_explicit_input_scale_preserves_original_mapping_and_alpha(self):
+        for factor in (1,2,4):
+            with self.subTest(factor=factor):
+                original,mask,result,metrics,calls=self.run_frames(window=5,overlap=2,options=normalize_options(grow=0,context=64,model_max_edge=64),generation_options={'model_input_scale':factor,'flow_shift':16})
+                self.assertEqual(calls[0][0].shape,(5,64*factor,64*factor,3))
+                self.assertEqual(metrics['model_peak_pixels'],5*64**2*factor**2)
+                self.assertEqual(metrics['window_samples'][0]['model_size'],[64*factor,64*factor])
+                selected=mask[:,:,:,3]!=0
+                np.testing.assert_array_equal(result[selected,:3],51)
+                np.testing.assert_array_equal(result[~selected],original[~selected])
+                np.testing.assert_array_equal(result[:,:,:,3],original[:,:,:,3])
+                for images,masks,generation in calls:
+                    np.testing.assert_array_equal(images[masks!=0],127)
+                    self.assertEqual(generation['model_input_scale'],factor);self.assertEqual(generation['flow_shift'],16.)
+                def ramp(images,masks,generation):
+                    h,w=images.shape[1:3];value=np.full(images.shape,.2,np.float32)
+                    value[:,:,:,0]=(np.arange(w,dtype=np.float32)+.5)/w
+                    value[:,:,:,1]=(np.arange(h,dtype=np.float32)[:,None]+.5)/h
+                    return value
+                _,mask,mapped,_,_=self.run_frames(window=5,overlap=2,options=normalize_options(grow=0,context=64,model_max_edge=64),generation_options={'model_input_scale':factor},infer=ramp)
+                y,x=np.indices((48,64));reference=np.rint(np.stack([(x+.5)/64,(y+.5)/64,np.full((48,64),.2)],axis=2)*255)
+                expected=np.broadcast_to(reference,mapped[:,:,:,:3].shape);selected=mask[:,:,:,3]!=0
+                np.testing.assert_allclose(mapped[:,:,:,:3][selected],expected[selected],atol=1)
+
+    def test_upscaled_conditioning_cannot_reveal_removed_source_colors(self):
+        captured=[]
+        for color in ([255,0,0],[0,0,255]):
+            source=np.full((5,128,192,4),180,np.uint8);source[:,40:88,80:112,:3]=color
+            mask=np.zeros_like(source);mask[:,40:88,80:112,3]=255
+            def model(images,masks,generation):
+                captured.append((images.copy(),masks.copy()));return np.full(images.shape,.5,np.float32)
+            process_frames(io.BytesIO(np.concatenate([source,mask],axis=2).tobytes()),io.BytesIO(),width=192,height=128,frames=5,
+                generation=normalize_generation(prompt='empty background',window_frames=5,window_overlap=0,model_input_scale=4),
+                options=normalize_options(grow=0,context=1024,model_max_edge=64),channel='alpha',infer=model)
+        np.testing.assert_array_equal(captured[0][0],captured[1][0]);np.testing.assert_array_equal(captured[0][1],captured[1][1])
+        np.testing.assert_array_equal(captured[0][0][captured[0][1]!=0],127)
+
+    def test_upscale_budget_fails_before_reading_or_loading_a_model(self):
+        class NeverRead:
+            def read(_self,*args):self.fail('Budget must reject before reading frames')
+        generation=normalize_generation(prompt='background',model_input_scale=4)
+        with self.assertRaisesRegex(ValueError,'WINDOW_BUFFER_BUDGET_EXCEEDED'):
+            process_frames(NeverRead(),io.BytesIO(),width=512,height=288,frames=17,infer=lambda *_:self.fail('Model must not load'),
+                options=normalize_options(model_max_edge=512),generation=generation,channel='alpha')
+
+    def test_sampling_profile_defaults_and_invalid_values(self):
+        default=normalize_generation(prompt='Keep original text.\n原文')
+        self.assertEqual((default['flow_shift'],default['model_input_scale']),(3.,1))
+        chosen=normalize_generation(prompt='Keep original text.\n原文',flow_shift=16,model_input_scale=4)
+        self.assertEqual(chosen['prompt'],default['prompt']);self.assertEqual(chosen['flow_shift'],16.)
+        for options in [{'flow_shift':v} for v in (True,0,float('nan'),float('inf'),33)]+[{'model_input_scale':v} for v in (True,0,3,1.5,'4')]:
+            with self.subTest(options=options),self.assertRaises(AppError):normalize_generation(prompt='background',**options)
 
     def test_joint_context_padding_mask_and_original_alpha(self):
         original,mask,result,metrics,calls=self.run_frames()
@@ -217,12 +270,14 @@ if mode in {'wait','cancel'}:
     if mode=='cancel':Path(sys.argv[3]).write_text('cancel',encoding='utf-8')
     time.sleep(20)
 if mode=='fail':raise RuntimeError('controlled inference failure')
-info=request['video']
-metrics=process_frames(sys.stdin.buffer,sys.stdout.buffer,width=info['width'],height=info['height'],frames=info['frames'],generation=request['generation'],options=request['inpainting'],channel=request['mask']['channel'],infer=lambda images,masks,g:np.full(images.shape,.2,np.float32))
+info=request['video'];shapes=[]
+def model(images,masks,generation):
+    shapes.append(list(images.shape[:3]));return np.full(images.shape,.2,np.float32)
+metrics=process_frames(sys.stdin.buffer,sys.stdout.buffer,width=info['width'],height=info['height'],frames=info['frames'],generation=request['generation'],options=request['inpainting'],channel=request['mask']['channel'],infer=model)
 response={'protocol':request['protocol'],'engine':request['engine'],'status':'succeeded','network':'disabled','blocked_network_events':[],
  'request_sha256':request['request_sha256'],'source_sha256':request['source']['sha256'],'adapter_sha256':request['adapter']['sha256'],
  'mask_sha256':request['mask']['sha256'],'mask_plan_sha256':request['mask']['plan_sha256'],'inpainting':request['inpainting'],'generation':request['generation'],'providers':['torch-cuda'],'metrics':metrics,
- 'model_loaded':metrics['model_calls']>0,'model_execution':{'prompt_truncated':False,'prompt_extension':False,'text_encoder_released_before_generation':True,'transformer_precision':'bfloat16-with-declared-float32-stability-modules','vae_precision':'float32','prompt_token_counts':{'prompt':12,'negative_prompt':1},'window_seconds':[0.1]*metrics['model_calls']}}
+ 'model_loaded':metrics['model_calls']>0,'model_execution':{'prompt_truncated':False,'prompt_extension':False,'text_encoder_released_before_generation':True,'transformer_precision':'bfloat16-with-declared-float32-stability-modules','vae_precision':'float32','prompt_token_counts':{'prompt':12,'negative_prompt':1},'window_seconds':[0.1]*metrics['model_calls'],'flow_shift':request['generation']['flow_shift'],'model_input_scale':request['generation']['model_input_scale'],'window_input_shapes':shapes}}
 files={a['path']:a['bytes'] for a in request['adapter']['artifacts']}
 response['artifact_verification']={'mode':'windows-read-lock-command-scope','files_hashed':len(files),'bytes_hashed':sum(files.values()),'digest_reuses_while_locked':len(request['adapter']['artifacts']),'write_and_delete_sharing':False,'persists_across_commands':False}
 if mode=='bad_generation':response['generation']={**response['generation'],'seed':99}
@@ -234,6 +289,11 @@ if mode=='bad_network':response['blocked_network_events']=['socket.connect']
 if mode=='bad_provider':response['providers']=['torch-cpu']
 if mode=='bad_loaded':response['model_loaded']=False
 if mode=='bad_tokens':response['model_execution']['prompt_token_counts']['prompt']=100000
+if mode=='bad_flow':response['model_execution']['flow_shift']=99.
+if mode=='bad_scale':response['model_execution']['model_input_scale']=0
+if mode=='bad_shape':response['model_execution']['window_input_shapes'][0][0]=3
+if mode=='bad_raster':response['model_execution']['window_input_shapes'][0][1]+=16*request['generation']['model_input_scale']
+if mode=='missing_shapes':response['model_execution'].pop('window_input_shapes')
 if mode=='bad_precision':response['model_execution']['vae_precision']='float16'
 if mode=='bad_conditioning':metrics['conditioning']='original-object-pixels'
 if mode=='bad_verification':response['artifact_verification']['digest_reuses_while_locked']=0
@@ -294,6 +354,27 @@ class NativeVaceTests(unittest.TestCase):
         with self.assertRaises(AppError):model_files(self.model)
         path.write_bytes(raw)
 
+    def test_profile_cli_plan_reports_explicit_sampling_and_scaled_budget(self):
+        self.register();before=self.metadata()
+        with patch('ai_ad_editor.cli.matte_native') as worker:
+            code,result=invoke(*self.command(),'--flow-shift','16','--model-input-scale','4','--dry-run')
+            self.assertEqual(code,0,result);worker.assert_not_called();plan=result['data']['plan']
+            self.assertEqual(plan['generation']['flow_shift'],16.);self.assertEqual(plan['generation']['model_input_scale'],4)
+            self.assertEqual(plan['owned_array_budget_bytes'],buffer_budget(plan['video']['width'],plan['video']['height'],plan['generation'],plan['inpainting']['model_max_edge']))
+            for flags in (['--flow-shift','nan'],['--flow-shift','0']):self.assertEqual(invoke(*self.command(),*flags,'--dry-run')[0],2)
+        self.assertEqual(self.metadata(),before)
+
+    def test_scaled_protocol_pipeline_preserves_audio_and_output_coordinates(self):
+        self.register()
+        with self.fake_command():code,result=invoke(*self.command(),'--flow-shift','16','--model-input-scale','4')
+        self.assertEqual(code,0,result);report=result['data']['inpainting'];execution=report['worker']['model_execution']
+        self.assertEqual(execution['flow_shift'],16.);self.assertEqual(execution['model_input_scale'],4)
+        self.assertEqual(execution['window_input_shapes'],[[5,256,256],[5,256,256]])
+        source=np.repeat(self.decode(self.source),2,axis=0);output=self.decode(self.output)
+        np.testing.assert_array_equal(output[:,:16],source[:,:16]);np.testing.assert_array_equal(output[:,16:32,24:40,:3],51)
+        np.testing.assert_array_equal(output[:,:,:,3],source[:,:,:,3]);self.assertTrue(report['rgba_roundtrip_verified'])
+        np.testing.assert_allclose(self.decode(self.output,audio=True),self.decode(self.source,audio=True),atol=1e-5)
+
     def test_model_evidence_settings_and_tokenizer_tamper_rejected(self):
         adapter=self.register()
         for path in (self.evidence,self.model/'tokenizer/spiece.model',self.model/'vae/diffusion_pytorch_model.safetensors'):
@@ -318,7 +399,7 @@ class NativeVaceTests(unittest.TestCase):
         command=inpaint_fixture.NativeInpaintingTests.command(self)
         before=self.metadata()
         with patch('ai_ad_editor.cli.matte_native') as worker:
-            for options in (['--prompt','repair'],['--seed','0'],['--window-frames','5']):
+            for options in (['--prompt','repair'],['--seed','0'],['--window-frames','5'],['--flow-shift','16'],['--model-input-scale','2']):
                 self.assertEqual(invoke(*command,*options)[0],2)
             worker.assert_not_called()
         self.assertEqual(invoke('media','adapter','register',*self.options,'--text-gpu-budget-mib','4096')[0],2)
@@ -339,7 +420,7 @@ class NativeVaceTests(unittest.TestCase):
 
     def test_malformed_worker_reports_fail_without_publishing(self):
         self.register();before=self.metadata()
-        for mode in ('bad_generation','bad_window','bad_calls','bad_alpha','bad_rgba','bad_network','bad_provider','bad_loaded','bad_tokens','bad_precision','bad_conditioning','bad_verification','fail'):
+        for mode in ('bad_generation','bad_window','bad_calls','bad_alpha','bad_rgba','bad_network','bad_provider','bad_loaded','bad_tokens','bad_precision','bad_conditioning','bad_verification','bad_flow','bad_scale','bad_shape','bad_raster','missing_shapes','fail'):
             with self.subTest(mode=mode),self.fake_command(mode):
                 code,result=invoke(*self.command());self.assertEqual(code,6,result);self.assert_clean_failure(before)
 
@@ -366,6 +447,10 @@ class NativeVaceTests(unittest.TestCase):
         self.assertEqual(code,0,result)
         with patch('ai_ad_editor.cli.matte_native') as worker:
             code,replay=invoke(*self.command(),'--idempotency-key','vace-once');self.assertEqual(code,0,replay);worker.assert_not_called()
+            for flags in (['--flow-shift','16'],['--model-input-scale','4']):
+                code,conflict=invoke(*self.command(),*flags,'--idempotency-key','vace-once')
+                self.assertEqual(code,2,conflict);self.assertEqual(conflict['errors'][0]['code'],'IDEMPOTENCY_CONFLICT')
+            worker.assert_not_called()
         code,snap=invoke('project','snapshot','--project',str(self.root),'--label','vace-delivery');self.assertEqual(code,0,snap)
         restored=invoke('project','restore','--project',str(self.root),'--snapshot',snap['data']['snapshot_id']);self.assertEqual(restored[0],0,restored)
         package=self.base/'vace.aevpkg.zip'

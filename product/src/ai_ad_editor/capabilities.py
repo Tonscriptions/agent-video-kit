@@ -197,8 +197,9 @@ def build_capability_manifest() -> dict[str, Any]:
                 "engine": "diffusers-wan-vace-local-v1",
                 "protocol": "agent-video-wan-vace-inpainting-v1",
                 "commands": ["media.adapter.register", "media.adapter.inspect", "media.inpaint"],
-                "features": ["fixed_local_wan_vace_1_3b_safetensors", "cuda_bfloat16_and_float32_vae", "staged_local_text_encoder_offload_and_release", "verbatim_prompt_and_negative_prompt_no_truncation", "seed_steps_guidance_and_conditioning", "joint_4k_plus_1_frame_windows", "explicit_scene_boundaries_and_overlap_blending", "source_alpha_and_outside_rgb_preserved", "shared_audio_rights_cancel_and_recovery"],
-                "limitations": ["joint_windows_not_global_full_video_attention", "temporal_seams_identity_texture_and_occlusion_need_review", "array_budget_excludes_model_and_torch_memory", "no_cross_device_byte_determinism", "commercial_rights_broad_quality_and_full_jianying_parity_unaccepted"],
+                "features": ["fixed_local_wan_vace_1_3b_safetensors", "cuda_bfloat16_and_float32_vae", "staged_local_text_encoder_offload_and_release", "verbatim_prompt_and_negative_prompt_no_truncation", "seed_steps_guidance_and_conditioning", "explicit_flow_shift", "bounded_model_input_scale_1_2_4", "actual_window_input_shapes", "joint_4k_plus_1_frame_windows", "explicit_scene_boundaries_and_overlap_blending", "source_alpha_and_outside_rgb_preserved", "shared_audio_rights_cancel_and_recovery"],
+                "generation_parameters": {"flow_shift": {"default": 3.0, "minimum": 0.1, "maximum": 32.0}, "model_input_scale": {"default": 1, "choices": [1, 2, 4]}},
+                "limitations": ["joint_windows_not_global_full_video_attention", "temporal_seams_identity_texture_and_occlusion_need_review", "base_model_max_edge_precedes_explicit_input_scale", "scaled_array_budget_excludes_model_and_torch_memory_and_is_not_a_cuda_oom_guarantee", "no_cross_device_byte_determinism", "commercial_rights_broad_quality_and_full_jianying_parity_unaccepted"],
             },
             "matting": {
                 "status": "local_adapter_only",

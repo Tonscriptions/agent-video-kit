@@ -184,16 +184,19 @@ def verify_adapter(record):
 
 
 def normalize_generation(*, prompt, negative_prompt=None, seed=None, inference_steps=None, guidance_scale=None, conditioning_scale=None,
-                         window_frames=None, window_overlap=None, prompt_max_tokens=None, scene_cut_frames=None, frames=None):
+                         window_frames=None, window_overlap=None, prompt_max_tokens=None, scene_cut_frames=None, flow_shift=None, model_input_scale=None, frames=None):
     values={'negative_prompt':'' if negative_prompt is None else negative_prompt,'seed':0 if seed is None else seed,
             'inference_steps':30 if inference_steps is None else inference_steps,'guidance_scale':5. if guidance_scale is None else guidance_scale,
             'conditioning_scale':1. if conditioning_scale is None else conditioning_scale,'window_frames':17 if window_frames is None else window_frames,
-            'window_overlap':4 if window_overlap is None else window_overlap,'prompt_max_tokens':256 if prompt_max_tokens is None else prompt_max_tokens}
+            'window_overlap':4 if window_overlap is None else window_overlap,'prompt_max_tokens':256 if prompt_max_tokens is None else prompt_max_tokens,
+            'flow_shift':3. if flow_shift is None else flow_shift,'model_input_scale':1 if model_input_scale is None else model_input_scale}
     if not isinstance(prompt,str) or not prompt.strip() or len(prompt)>8000 or not isinstance(values['negative_prompt'],str) or len(values['negative_prompt'])>8000: raise argument_error('VACE 要求非空原文 prompt；正/负提示词各最多 8000 字符','prompt')
     for name,lo,hi in [('seed',0,2**63-1),('inference_steps',1,1000),('window_frames',5,81),('window_overlap',0,32),('prompt_max_tokens',16,512)]:
         if type(values[name]) is not int or not lo<=values[name]<=hi:raise argument_error('VACE 整数参数超预算',name)
+    if type(values['model_input_scale']) is not int or values['model_input_scale'] not in {1,2,4}:
+        raise argument_error('模型输入放大倍率须为 1、2 或 4；输出画布保持原尺寸','model_input_scale')
     if values['window_frames']%4!=1 or values['window_overlap']>=values['window_frames']:raise argument_error('窗口须 4k+1 帧，重叠须小于窗口','window_frames/window_overlap')
-    for name,lo,hi in [('guidance_scale',1,20),('conditioning_scale',0,2)]:
+    for name,lo,hi in [('guidance_scale',1,20),('conditioning_scale',0,2),('flow_shift',.1,32)]:
         v=values[name]
         if type(v) not in {int,float} or not math.isfinite(v) or not lo<=v<=hi:raise argument_error('VACE 有限比例超预算',name)
         values[name]=float(v)
@@ -218,7 +221,7 @@ def window_plan(frames, generation):
 def buffer_budget(width, height, generation, model_max_edge):
     w=max(64, min((width+15)//16*16,(model_max_edge+15)//16*16))
     h=max(64, min((height+15)//16*16,(model_max_edge+15)//16*16))
-    return width*height*(generation['window_frames']*40+generation['window_overlap']*16+32)+w*h*generation['window_frames']*40
+    return width*height*(generation['window_frames']*40+generation['window_overlap']*16+32)+w*h*generation['window_frames']*40*generation.get('model_input_scale',1)**2
 
 
 def plan_digest(windows):

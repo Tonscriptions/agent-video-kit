@@ -31,6 +31,8 @@ def main():
     parser.add_argument('--negative-prompt', default=None)
     parser.add_argument('--seed', type=int, default=None)
     parser.add_argument('--inference-steps', type=int, default=None)
+    parser.add_argument('--flow-shift', type=float, default=None)
+    parser.add_argument('--model-input-scale', type=int, choices=[1,2,4], default=None)
     parser.add_argument('--window-frames', type=int, default=None)
     parser.add_argument('--window-overlap', type=int, default=None)
     parser.add_argument('--execution-only', action='store_true', help='Skip redundant dry-run/inspect reports; formal commands retain all integrity checks')
@@ -40,7 +42,7 @@ def main():
     parser.add_argument('--model-max-edge', type=int, default=1024)
     args = parser.parse_args()
     if args.engine=='vace' and (args.device!='cuda' or not args.prompt):parser.error('VACE requires explicit CUDA and prompt')
-    if args.engine=='lama' and any(getattr(args,k) is not None for k in ('prompt','negative_prompt','seed','inference_steps','window_frames','window_overlap')):parser.error('Prompt/window options require --engine vace')
+    if args.engine=='lama' and any(getattr(args,k) is not None for k in ('prompt','negative_prompt','seed','inference_steps','window_frames','window_overlap','flow_shift','model_input_scale')):parser.error('Prompt/window options require --engine vace')
     if bool(args.mask) == bool(args.sam2_model): parser.error('Choose an existing --mask or local SAM2 model/prompts')
     if args.sam2_model and not all((args.sam2_evidence, args.sam2_prompts)):
         parser.error('SAM2 requires its evidence and prompt JSON')
@@ -82,7 +84,7 @@ def main():
     command = ['media', 'inpaint', '--project', str(project), '--asset-id', source['id'], '--mask-asset-id', mask['id'], '--adapter-id', adapter_id, '--derived-asset-id', 'repaired',
                '--mask-channel', args.mask_channel, '--mask-grow', str(args.mask_grow), '--mask-feather', str(args.mask_feather), '--model-max-edge', str(args.model_max_edge),
                '--apply', '--track-id', 'track_video_1', '--audio-track-id', 'track_audio_1']
-    for name in ('prompt','negative_prompt','seed','inference_steps','window_frames','window_overlap'):
+    for name in ('prompt','negative_prompt','seed','inference_steps','window_frames','window_overlap','flow_shift','model_input_scale'):
         value=getattr(args,name)
         if value is not None:command+=['--'+name.replace('_','-'),str(value)]
     planned = None if args.execution_only else invoke(*command, '--dry-run')['data']['plan']

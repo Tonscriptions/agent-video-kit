@@ -31,6 +31,12 @@ silently truncated. Text GPU/CPU weight budgets are explicit; video generation
 releases the encoder first. Native read locks protect reused digests within
 each command. Review generated texture, object identity and overlap boundaries;
 joint windows do not prove broad video quality or full Jianying parity.
+Use explicit `--flow-shift` (0.1..32; default 3) and `--model-input-scale`
+(1/2/4; default 1) when the edit needs sampling calibration. Dry-run reports
+the scaled array budget; execution reports actual model input shapes and
+scheduler configuration. Input scaling follows the base `--model-max-edge`
+ROI and preserves output dimensions. It can increase resource use and worsen
+quality, so keep the requested settings visible in the delivery evidence.
 Source, mask and model rights continue to gate publication.
 
 For removing a selected object, use the [local LaMa contract](../../docs/specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md).

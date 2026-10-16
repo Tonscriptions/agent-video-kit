@@ -13,6 +13,13 @@ parent/worker `artifact_verification`: complete byte hashes are reused only
 while native read locks deny writes/deletion. Counters describe verification,
 not model reconstruction quality or a cross-command checksum cache.
 
+Check requested `flow_shift` and `model_input_scale` against model execution,
+and actual `window_input_shapes` against model-call count and peak raster.
+The input multiplier follows base ROI padding, scales model area quadratically,
+and leaves output geometry fixed. Compare the scaled array estimate separately
+from CUDA peaks and total process memory. A higher multiplier or step count
+is a sampling choice whose reconstruction quality needs evidence.
+
 Compare all decoded frames for original alpha and outside-mask RGB. For
 controlled truth, report masked error using the exact expanded mask, context
 and inference settings. Different mask growth changes the score denominator.

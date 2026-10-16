@@ -360,6 +360,8 @@ def build_parser() -> argparse.ArgumentParser:
     inpaint.add_argument('--negative-prompt', default=None)
     inpaint.add_argument('--seed', type=int, default=None)
     inpaint.add_argument('--inference-steps', type=int, default=None)
+    inpaint.add_argument('--flow-shift', type=float, default=None, help='VACE flow-matching 时间偏移，默认 3；显式采样配置')
+    inpaint.add_argument('--model-input-scale', type=int, choices=[1,2,4], default=None, help='VACE 受限 ROI 栅格的 1/2/4 倍模型输入；输出画布不变')
     inpaint.add_argument('--guidance-scale', type=float, default=None)
     inpaint.add_argument('--conditioning-scale', type=float, default=None)
     inpaint.add_argument('--window-frames', type=int, default=None)
@@ -1754,13 +1756,14 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         plan['inpainting'] = inpaint_options(threshold=args.mask_threshold, grow=args.mask_grow, feather=args.mask_feather, context=args.context_pixels, model_max_edge=args.model_max_edge)
         generation_args = {'prompt':args.prompt,'negative_prompt':args.negative_prompt,'seed':args.seed,'inference_steps':args.inference_steps,
                            'guidance_scale':args.guidance_scale,'conditioning_scale':args.conditioning_scale,'window_frames':args.window_frames,
-                           'window_overlap':args.window_overlap,'prompt_max_tokens':args.prompt_max_tokens,'scene_cut_frames':args.scene_cut_frame}
+                           'window_overlap':args.window_overlap,'prompt_max_tokens':args.prompt_max_tokens,'scene_cut_frames':args.scene_cut_frame,
+                           'flow_shift':args.flow_shift,'model_input_scale':args.model_input_scale}
         if joint:
             plan['generation'] = vace_options(**generation_args, frames=plan['video']['frames'])
             plan['windows'] = vace_windows(plan['video']['frames'],plan['generation'])
             plan['owned_array_budget_bytes'] = vace_buffer_budget(plan['video']['width'],plan['video']['height'],plan['generation'],plan['inpainting']['model_max_edge'])
             if plan['owned_array_budget_bytes'] > adapter['settings']['state_budget_bytes']:
-                raise AppError('VACE_WINDOW_BUFFER_BUDGET_EXCEEDED','窗口自有数组超预算；显式减小 max-edge、window-frames 或 window-overlap',exit_code=2)
+                raise AppError('VACE_WINDOW_BUFFER_BUDGET_EXCEEDED','窗口自有数组超预算；显式减小 max-edge/model-max-edge、model-input-scale、window-frames 或 window-overlap',exit_code=2)
         elif any(v is not None for v in generation_args.values()):
             raise argument_error('提示词、seed 和窗口参数只适用于 VACE；LaMa 不接受这些选项','prompt/generation')
         plan['video'].pop('downsample_ratio', None)

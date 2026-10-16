@@ -19,6 +19,14 @@ Use `media inpaint --asset-id <video> --mask-asset-id <mask> --adapter-id <id>
 token overflow fails without truncation or expansion. Seeds, negative prompt,
 guidance, conditioning and prompt token budget are explicit. Repeated
 `--scene-cut-frame` uses zero-based frames after source range/CFR conversion.
+For controlled sampling, `--flow-shift` accepts finite 0.1..32 (default 3);
+`--model-input-scale` accepts 1/2/4 (default 1). Scaling follows the base ROI
+limit/padding from `--model-max-edge`, then returns to the original output canvas.
+Inspect the scaled owned-array budget and actual window input shapes. This
+budget excludes Torch/model/VRAM and cannot guarantee freedom from CUDA OOM.
+Larger inputs or more steps require evidence for the chosen footage. LaMa
+rejects both options.
+
 Joint windows and overlap blending do not establish global video attention
 or consistent identity. Tail padding is cropped before delivery.
 

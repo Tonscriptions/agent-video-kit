@@ -1,0 +1,885 @@
+{
+  "checked_at_utc": "2026-10-15T23:39:36.746252+00:00",
+  "scope": "Unintegrated developer NumPy prototype. Numerical agreement is not background truth, temporal quality, CLI delivery or full Jianying acceptance.",
+  "status": "developer_prototype_verified_not_integrated",
+  "unit_test_methods": 9,
+  "unit_test_run_observation": {
+    "status": "passed",
+    "tests": 9,
+    "seconds": 0.156,
+    "evidence_type": "observed native tool stdout; no persistent unit-test log was captured"
+  },
+  "sampling_verification_summary_path": "workspace/vace-smoke-numpy-harmonic-20261016/summary.json",
+  "sampling_verification_summary_sha256": "sha256:5eb6c85f678ace797dd8276625bb1eecc062dc3e72757548ff8205bedfa11c43",
+  "sampling_verification": {
+    "scope": "Developer-only independent NumPy solver on saved model outputs compared with earlier SciPy diagnostic, not CLI delivery, model improvement or broad quality acceptance.",
+    "driver_sha256": "sha256:13d622168195cf277fea43d8bb0993c4bfa758c08531c0da813551dd9889ea8b",
+    "kernel_sha256": "sha256:361d0bcdc137183f9df22c8ddd6e34fbd729625768ced23cf4c645fe404f1feb",
+    "kernel_source": "\"\"\"Candidate bounded NumPy harmonic color correction. Not integrated into the CLI.\"\"\"\nfrom __future__ import annotations\n\nimport math\nimport numpy as np\n\n\ndef owned_array_bound(width, height, selected_pixels):\n    return width * height * 24 + selected_pixels * 384\n\n\ndef _solve(rhs, degree, neighbors, iterations, tolerance):\n    def apply(value):\n        result = degree * value\n        for direction in range(4):\n            valid = neighbors[:, direction] >= 0\n            result[valid] -= value[neighbors[valid, direction]]\n        return result\n\n    solution = np.zeros_like(rhs)\n    residual = rhs.copy()\n    target = max(1e-7, tolerance * float(np.linalg.norm(rhs)))\n    error = float(np.linalg.norm(residual))\n    if error <= target:\n        return solution, 0, error\n    preconditioned = residual / degree\n    direction = preconditioned.copy()\n    rz = float(np.dot(residual, preconditioned))\n    for step in range(1, iterations + 1):\n        product = apply(direction)\n        denominator = float(np.dot(direction, product))\n        if not math.isfinite(denominator) or denominator <= 0:\n            raise ValueError('REPAIR_HARMONIZE_SOLVER_BREAKDOWN')\n        weight = rz / denominator\n        solution += weight * direction\n        residual -= weight * product\n        if float(np.linalg.norm(residual)) <= target:\n            residual = rhs - apply(solution)\n            error = float(np.linalg.norm(residual))\n            if error <= target:\n                return solution, step, error\n            preconditioned = residual / degree\n            direction = preconditioned.copy()\n            rz = float(np.dot(residual, preconditioned))\n            continue\n        preconditioned = residual / degree\n        next_rz = float(np.dot(residual, preconditioned))\n        if not math.isfinite(next_rz) or next_rz <= 0:\n            raise ValueError('REPAIR_HARMONIZE_SOLVER_BREAKDOWN')\n        direction *= next_rz / rz\n        direction += preconditioned\n        rz = next_rz\n    raise ValueError('REPAIR_HARMONIZE_NOT_CONVERGED')\n\n\ndef harmonize_region(source_rgba, prediction_rgb, selected, *, max_iterations=2000,\n                     relative_tolerance=1e-6, array_budget=256 * 1024**2):\n    if not isinstance(source_rgba, np.ndarray) or source_rgba.dtype != np.uint8 or source_rgba.ndim != 3 or source_rgba.shape[2] != 4:\n        raise ValueError('REPAIR_HARMONIZE_SOURCE_INVALID')\n    height, width = source_rgba.shape[:2]\n    if min(height, width) < 1 or height * width > 16_777_216:\n        raise ValueError('REPAIR_HARMONIZE_CANVAS_BUDGET')\n    if not isinstance(prediction_rgb, np.ndarray) or prediction_rgb.dtype != np.float32 or prediction_rgb.shape != (height, width, 3) or not np.isfinite(prediction_rgb).all() or np.any(prediction_rgb < 0) or np.any(prediction_rgb > 255):\n        raise ValueError('REPAIR_HARMONIZE_PREDICTION_INVALID')\n    if not isinstance(selected, np.ndarray) or selected.dtype != np.bool_ or selected.shape != (height, width):\n        raise ValueError('REPAIR_HARMONIZE_MASK_INVALID')\n    if type(max_iterations) is not int or not 1 <= max_iterations <= 10000 or type(relative_tolerance) not in {int, float} or not math.isfinite(relative_tolerance) or not 0 < relative_tolerance <= .01 or type(array_budget) is not int or array_budget < 1:\n        raise ValueError('REPAIR_HARMONIZE_OPTIONS_INVALID')\n    count = int(np.count_nonzero(selected))\n    metrics = {'selected_pixels': count, 'iterations': [0, 0, 0], 'residual_norm': [0., 0., 0.],\n               'boundary_edges': 0, 'owned_array_budget_bytes': 0, 'clipped_rgb_values': 0,\n               'max_abs_correction': 0., 'solver': 'masked-four-neighbor-jacobi-pcg-float64',\n               'budget_scope': 'incremental-owned-numpy-arrays-excludes-inputs-and-model'}\n    if not count:\n        return prediction_rgb, metrics\n    if count == height * width:\n        raise ValueError('REPAIR_HARMONIZE_FULL_MASK_NO_BOUNDARY')\n    owned = owned_array_bound(width, height, count)\n    if owned > array_budget:\n        raise ValueError('REPAIR_HARMONIZE_ARRAY_BUDGET_EXCEEDED')\n    ys, xs = np.nonzero(selected)\n    index = np.full((height, width), -1, np.int32)\n    index[ys, xs] = np.arange(count, dtype=np.int32)\n    neighbors = np.full((count, 4), -1, np.int32)\n    degree = np.zeros(count, np.float64)\n    rhs = np.zeros((count, 3), np.float64)\n    model = prediction_rgb[ys, xs].astype(np.float64)\n    for column, (dy, dx) in enumerate([(-1, 0), (1, 0), (0, -1), (0, 1)]):\n        valid = (ys + dy >= 0) & (ys + dy < height) & (xs + dx >= 0) & (xs + dx < width)\n        at = np.flatnonzero(valid)\n        qy, qx = ys[at] + dy, xs[at] + dx\n        ids = index[qy, qx]\n        degree[at] += 1\n        neighbors[at, column] = ids\n        boundary = ids < 0\n        at, qy, qx = at[boundary], qy[boundary], qx[boundary]\n        metrics['boundary_edges'] += len(at)\n        extrapolated = model[at].copy()\n        by, bx = ys[at] - dy, xs[at] - dx\n        valid_back = (by >= 0) & (by < height) & (bx >= 0) & (bx < width)\n        take = np.flatnonzero(valid_back)\n        back_ids = np.full(len(at), -1, np.int32)\n        back_ids[take] = index[by[take], bx[take]]\n        take = np.flatnonzero(back_ids >= 0)\n        extrapolated[take] += extrapolated[take] - model[back_ids[take]]\n        rhs[at] += source_rgba[qy, qx, :3].astype(np.float64) - extrapolated\n    correction = np.zeros_like(rhs)\n    for channel in range(3):\n        values, steps, residual = _solve(rhs[:, channel], degree, neighbors, max_iterations, relative_tolerance)\n        correction[:, channel] = values\n        metrics['iterations'][channel] = steps\n        metrics['residual_norm'][channel] = residual\n    corrected = model + correction\n    if not np.isfinite(corrected).all():\n        raise ValueError('REPAIR_HARMONIZE_NONFINITE_RESULT')\n    metrics['clipped_rgb_values'] = int(np.count_nonzero((corrected < 0) | (corrected > 255)))\n    metrics['max_abs_correction'] = float(np.abs(correction).max())\n    metrics['owned_array_budget_bytes'] = owned\n    output = prediction_rgb.copy()\n    output[ys, xs] = np.clip(corrected, 0, 255).astype(np.float32)\n    return output, metrics\n",
+    "source_sha256_before": {
+      "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+      "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+      "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+      "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+      "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+      "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+      "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+      "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+      "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+      "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+      "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+      "product/src/ai_ad_editor/capabilities.py": "sha256:bd29aa107a848cde419d88ab9f41f7d385e2b1671b27df03f2ca424171e66996",
+      "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+      "product/src/ai_ad_editor/cli.py": "sha256:31e54c045717a0fccbc907139d26dc720f317ecf32557023f51845656b2fbaac",
+      "product/src/ai_ad_editor/convert.py": "sha256:9cbdcbde37e01e4c97be36cc5e741f1962a269451828a4ec32577464bfbb44ed",
+      "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+      "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+      "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+      "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+      "product/src/ai_ad_editor/inpainting_frames.py": "sha256:3e9b2cb258463f082fc62e2a4bd1e88f9a11dbdce9a9da22ce1b6d16ffcbb9e2",
+      "product/src/ai_ad_editor/lama_worker.py": "sha256:91820085842c144bd87d44f405d616c69ee540590fc2218dab6045a55ca5e8d3",
+      "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+      "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+      "product/src/ai_ad_editor/local_inpainting.py": "sha256:c87fe70dd38df8401af7b5379bfef365b489595d7533153145bb6b5d8b7c51ef",
+      "product/src/ai_ad_editor/local_matting.py": "sha256:38ba323bc058a10724ee5c234769237c4d4764aff68d24caf989a2f35e678cd2",
+      "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+      "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+      "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+      "product/src/ai_ad_editor/local_vace.py": "sha256:a8d176c95d9c205871c8335843cf09baf4dbceeed9bdd43c489b63d413b1d90b",
+      "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+      "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+      "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+      "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+      "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+      "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+      "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+      "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+      "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+      "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+      "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+      "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+      "product/src/ai_ad_editor/render.py": "sha256:ae9626cc7a1037979a5bfa81a03e9d1ed28a8fbf44921c892810f2d0f9424080",
+      "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+      "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+      "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+      "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+      "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+      "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+      "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+      "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+      "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+      "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+      "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+      "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+      "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+      "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+      "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+      "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+      "product/src/ai_ad_editor/utils.py": "sha256:bb5540b39997d353f81a6c23672b3af5d852a3a461afc36772c3581de9947dd8",
+      "product/src/ai_ad_editor/vace_frames.py": "sha256:c00857766f3d0fc761ecf6c9de8eac1f15f6c22c94c22fea583e6aec1c7291e4",
+      "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+      "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+      "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+      "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+      "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+      "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+      "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+      "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+      "product/tests/test_cli.py": "sha256:845fcfe25d3413f83ee572d89b1b96e500f2ee73ebdf71623ae3955300e5266f",
+      "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+      "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+      "product/tests/test_local_inpainting.py": "sha256:c3a9da06be29a02b4b960182bd094270d335fdb600a7819560b52623644748c7",
+      "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+      "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+      "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+      "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+      "product/tests/test_local_vace.py": "sha256:a7999a0b0c2cd8bd1ad7b0540a5bef4358c6928302f9f6809329b9d3fd9c7241",
+      "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+      "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+      "scripts/create_lama_fixture.py": "sha256:67c273fe4f72766e60ed7aae7f3ef81b19199b56d2b5dfb70dfc6581fc9ecb63",
+      "scripts/smoke_audio_separation.py": "sha256:9c7c664d2b5dadf18e272382816466efa3b527a358db4205b165d62f9a4eb63d",
+      "scripts/smoke_lama_local.py": "sha256:891eedb23a84382c9c16163a87fbbde9a80df6a9fc4f1c9b9a6a5932f34b6668",
+      "scripts/smoke_rvm_local.py": "sha256:963faf3c7012ff6785e64559201275be3792ed7ef9c65876a7c8331921595df1",
+      "scripts/smoke_soulx_local.py": "sha256:de90794c2f2e105925cc6f75aa3ecde8b744c6b500162c99d35a761d7b62a92e",
+      "scripts/smoke_tracking_geometry.py": "sha256:07c6889a0c5eb74ac243115da3bc2854edc81b23291779811e2cbe18df0a3586",
+      "scripts/smoke_whisper_local.py": "sha256:136cb4d27c8425b593175bde5be53cf16efcb098e24897ef55be96a1611e2852",
+      "scripts/smoke_yolo_local.py": "sha256:c930222d099c3f28ad8429a67c7474ecf82f92884a86b845d8222004b195c326"
+    },
+    "cases": [
+      {
+        "id": "native-shift3-30",
+        "frame_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "output_sha256": "sha256:7a304a9c6417a1887ee749e36c20eab2e9d14bafe6341cf09ce82adcc1db3c5b",
+        "reference_sha256": "sha256:01382948421663b08b5e96d4afa90fa70576f5441c101861304f17c2724cfc7d",
+        "comparison": "Numerical agreement with independent SciPy diagnostic, not true background accuracy.",
+        "max_rgba_value_delta_vs_scipy": 1,
+        "rgba_values_differing_vs_scipy": 1,
+        "source_selected_rgb_and_alpha_perturbation_invariant": true,
+        "source_alpha_exact": true,
+        "outside_mask_changed_pixels": 0,
+        "elapsed_seconds": 0.14637089999450836,
+        "frames": [
+          {
+            "source_frame": 0,
+            "selected_pixels": 0,
+            "iterations": [
+              0,
+              0,
+              0
+            ],
+            "residual_norm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "boundary_edges": 0,
+            "owned_array_budget_bytes": 0,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 0.0,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 1,
+            "selected_pixels": 780,
+            "iterations": [
+              83,
+              83,
+              83
+            ],
+            "residual_norm": [
+              7.04844648475408e-05,
+              9.193998051687698e-05,
+              7.214346903897188e-05
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 13.388393110043399,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 2,
+            "selected_pixels": 780,
+            "iterations": [
+              80,
+              80,
+              78
+            ],
+            "residual_norm": [
+              0.00010899132898458378,
+              0.00013259350475884325,
+              0.0001470158429094764
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 17.91969486614339,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 3,
+            "selected_pixels": 780,
+            "iterations": [
+              80,
+              78,
+              79
+            ],
+            "residual_norm": [
+              8.548166074658209e-05,
+              0.0001177213305467161,
+              0.0001300283994909698
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 17.615885301194904,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 4,
+            "selected_pixels": 780,
+            "iterations": [
+              83,
+              79,
+              79
+            ],
+            "residual_norm": [
+              8.466297463722074e-05,
+              0.00012094359114232221,
+              0.0001515123091836892
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 16.333695255886415,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 5,
+            "selected_pixels": 780,
+            "iterations": [
+              78,
+              78,
+              80
+            ],
+            "residual_norm": [
+              0.00011630946485639683,
+              0.00012771497245699394,
+              0.00020838693080620392
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 23.72535239313189,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 6,
+            "selected_pixels": 780,
+            "iterations": [
+              78,
+              78,
+              79
+            ],
+            "residual_norm": [
+              0.00012582179802379196,
+              0.00011673782637361737,
+              0.00015382475435469123
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 19.714413658501286,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 7,
+            "selected_pixels": 780,
+            "iterations": [
+              83,
+              80,
+              83
+            ],
+            "residual_norm": [
+              0.00010128299744537048,
+              0.00012634579757708268,
+              0.00012528520830675774
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 18.71426379653299,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          }
+        ],
+        "masked_psnr_db": 42.84080519061184
+      },
+      {
+        "id": "4x-shift16-30",
+        "frame_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "output_sha256": "sha256:b5572fa9511ca0f407635e5392983e7b881bad4823a2bed01e03aeb6ce68a6aa",
+        "reference_sha256": "sha256:0d2ff0b9c387b973e76b70b711cc4d60b7f0383b7b49b725d16bc46f86daa475",
+        "comparison": "Numerical agreement with independent SciPy diagnostic, not true background accuracy.",
+        "max_rgba_value_delta_vs_scipy": 1,
+        "rgba_values_differing_vs_scipy": 2,
+        "source_selected_rgb_and_alpha_perturbation_invariant": true,
+        "source_alpha_exact": true,
+        "outside_mask_changed_pixels": 0,
+        "elapsed_seconds": 0.1769884999957867,
+        "frames": [
+          {
+            "source_frame": 0,
+            "selected_pixels": 0,
+            "iterations": [
+              0,
+              0,
+              0
+            ],
+            "residual_norm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "boundary_edges": 0,
+            "owned_array_budget_bytes": 0,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 0.0,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 1,
+            "selected_pixels": 780,
+            "iterations": [
+              84,
+              79,
+              78
+            ],
+            "residual_norm": [
+              4.0365775900534005e-05,
+              9.70975697898064e-05,
+              0.00011998288455680003
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 17.948318356862462,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 2,
+            "selected_pixels": 780,
+            "iterations": [
+              78,
+              79,
+              78
+            ],
+            "residual_norm": [
+              6.120623592685136e-05,
+              0.0001248565276968014,
+              0.00018108731449252127
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 23.50777641794497,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 3,
+            "selected_pixels": 780,
+            "iterations": [
+              84,
+              83,
+              78
+            ],
+            "residual_norm": [
+              3.097281134864749e-05,
+              7.891775252241307e-05,
+              0.00018884994775760747
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 21.89165000310116,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 4,
+            "selected_pixels": 780,
+            "iterations": [
+              82,
+              79,
+              79
+            ],
+            "residual_norm": [
+              5.53258858896677e-05,
+              0.00010403403409272684,
+              0.00015391489154093827
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 21.439788390495885,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 5,
+            "selected_pixels": 780,
+            "iterations": [
+              83,
+              80,
+              78
+            ],
+            "residual_norm": [
+              6.953095821175761e-05,
+              0.00013784512854532062,
+              0.00015132032477370232
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 20.865888889925394,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 6,
+            "selected_pixels": 780,
+            "iterations": [
+              79,
+              79,
+              78
+            ],
+            "residual_norm": [
+              0.00010046537613828162,
+              0.00012072849585131586,
+              0.00017748813900753208
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 21.947351124963102,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 7,
+            "selected_pixels": 780,
+            "iterations": [
+              79,
+              74,
+              83
+            ],
+            "residual_norm": [
+              9.274814035592784e-05,
+              0.00014193824636527706,
+              0.00013109081182462745
+            ],
+            "boundary_edges": 112,
+            "owned_array_budget_bytes": 889344,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 23.56821359043566,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          }
+        ],
+        "masked_psnr_db": 36.80744030811959
+      },
+      {
+        "id": "natural-sampled",
+        "frame_indices": [
+          0,
+          4,
+          8,
+          12,
+          13,
+          16,
+          17,
+          21,
+          25,
+          26,
+          29,
+          30,
+          31
+        ],
+        "output_sha256": "sha256:bf077862c0345b75b2da77aebb6ba3b4b25414868691fa635da6ced7fba11dea",
+        "reference_sha256": "sha256:2927b46a70eabd5ec6905562ffeaa2a97fa26728c134766c7faa57b2d0c6e5cf",
+        "comparison": "Numerical agreement with independent SciPy diagnostic, not true background accuracy.",
+        "max_rgba_value_delta_vs_scipy": 1,
+        "rgba_values_differing_vs_scipy": 22,
+        "source_selected_rgb_and_alpha_perturbation_invariant": true,
+        "source_alpha_exact": true,
+        "outside_mask_changed_pixels": 0,
+        "elapsed_seconds": 2.1872737999947276,
+        "frames": [
+          {
+            "source_frame": 0,
+            "selected_pixels": 8134,
+            "iterations": [
+              212,
+              231,
+              231
+            ],
+            "residual_norm": [
+              0.0006924547789518119,
+              0.0007507598330380812,
+              0.0008505946266628704
+            ],
+            "boundary_edges": 532,
+            "owned_array_budget_bytes": 6662400,
+            "clipped_rgb_values": 69,
+            "max_abs_correction": 119.97534848370636,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 4,
+            "selected_pixels": 6141,
+            "iterations": [
+              200,
+              201,
+              202
+            ],
+            "residual_norm": [
+              0.0007063332876172374,
+              0.0008196364137380491,
+              0.001030522630668065
+            ],
+            "boundary_edges": 422,
+            "owned_array_budget_bytes": 5897088,
+            "clipped_rgb_values": 19,
+            "max_abs_correction": 133.52263517618786,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 8,
+            "selected_pixels": 4816,
+            "iterations": [
+              184,
+              182,
+              186
+            ],
+            "residual_norm": [
+              0.0006940167982862903,
+              0.0006769091782593885,
+              0.0007692925205385747
+            ],
+            "boundary_edges": 406,
+            "owned_array_budget_bytes": 5388288,
+            "clipped_rgb_values": 545,
+            "max_abs_correction": 83.41479465103303,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 12,
+            "selected_pixels": 3880,
+            "iterations": [
+              170,
+              168,
+              163
+            ],
+            "residual_norm": [
+              0.0009471619851903755,
+              0.0006895977772552183,
+              0.0007126908502055626
+            ],
+            "boundary_edges": 366,
+            "owned_array_budget_bytes": 5028864,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 148.548990558143,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 13,
+            "selected_pixels": 2442,
+            "iterations": [
+              143,
+              143,
+              143
+            ],
+            "residual_norm": [
+              0.0009590416194576449,
+              0.0006473891392880347,
+              0.0005530318061506989
+            ],
+            "boundary_edges": 220,
+            "owned_array_budget_bytes": 4476672,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 127.66411506376953,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 16,
+            "selected_pixels": 2367,
+            "iterations": [
+              105,
+              107,
+              107
+            ],
+            "residual_norm": [
+              0.001186476294398287,
+              0.0009375228728457365,
+              0.0010141389185022178
+            ],
+            "boundary_edges": 412,
+            "owned_array_budget_bytes": 4447872,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 97.08501729372979,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 17,
+            "selected_pixels": 1856,
+            "iterations": [
+              100,
+              100,
+              99
+            ],
+            "residual_norm": [
+              0.0009541494734470629,
+              0.000827104277719291,
+              0.0007542912140026079
+            ],
+            "boundary_edges": 332,
+            "owned_array_budget_bytes": 4251648,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 96.58197118776542,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 21,
+            "selected_pixels": 2647,
+            "iterations": [
+              122,
+              120,
+              122
+            ],
+            "residual_norm": [
+              0.0011009273516138372,
+              0.001116741023384697,
+              0.0011890884186745354
+            ],
+            "boundary_edges": 412,
+            "owned_array_budget_bytes": 4555392,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 106.47546152927272,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 25,
+            "selected_pixels": 4182,
+            "iterations": [
+              143,
+              141,
+              136
+            ],
+            "residual_norm": [
+              0.0009151500476006778,
+              0.0009510444588561152,
+              0.000956986124301597
+            ],
+            "boundary_edges": 540,
+            "owned_array_budget_bytes": 5144832,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 137.33973992245694,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 26,
+            "selected_pixels": 3355,
+            "iterations": [
+              108,
+              111,
+              110
+            ],
+            "residual_norm": [
+              0.0008877296745547512,
+              0.0010185952983384258,
+              0.0012844593359094241
+            ],
+            "boundary_edges": 544,
+            "owned_array_budget_bytes": 4827264,
+            "clipped_rgb_values": 0,
+            "max_abs_correction": 160.01179188929012,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 29,
+            "selected_pixels": 6383,
+            "iterations": [
+              204,
+              199,
+              190
+            ],
+            "residual_norm": [
+              0.0013817895844143561,
+              0.0012329593165594673,
+              0.001039088086897139
+            ],
+            "boundary_edges": 498,
+            "owned_array_budget_bytes": 5990016,
+            "clipped_rgb_values": 6,
+            "max_abs_correction": 111.42660006048091,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 30,
+            "selected_pixels": 7778,
+            "iterations": [
+              196,
+              195,
+              196
+            ],
+            "residual_norm": [
+              0.0014822321285328042,
+              0.0012218137743040503,
+              0.0012872234633980039
+            ],
+            "boundary_edges": 712,
+            "owned_array_budget_bytes": 6525696,
+            "clipped_rgb_values": 19,
+            "max_abs_correction": 130.54151400811435,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          },
+          {
+            "source_frame": 31,
+            "selected_pixels": 7927,
+            "iterations": [
+              211,
+              217,
+              206
+            ],
+            "residual_norm": [
+              0.00098982917250264,
+              0.0009001112559845137,
+              0.0008605352329916638
+            ],
+            "boundary_edges": 610,
+            "owned_array_budget_bytes": 6582912,
+            "clipped_rgb_values": 882,
+            "max_abs_correction": 112.73405669350733,
+            "solver": "masked-four-neighbor-jacobi-pcg-float64",
+            "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+          }
+        ]
+      }
+    ],
+    "production_integration": false,
+    "formal_cli_runs_added": 0,
+    "broad_quality_accepted": false,
+    "source_sha256_after": {
+      "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+      "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+      "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+      "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+      "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+      "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+      "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+      "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+      "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+      "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+      "product/src/ai_ad_editor/bindings.py": "sha256:710898f6b0b045259905a257b98060fb78d8b804f2c7c55c8bf27be5c963f09a",
+      "product/src/ai_ad_editor/capabilities.py": "sha256:bd29aa107a848cde419d88ab9f41f7d385e2b1671b27df03f2ca424171e66996",
+      "product/src/ai_ad_editor/captions.py": "sha256:9d7c5166484979f0ea1ecc04e5775f4fb8f80401f0523b1d206cb04f1feb72c1",
+      "product/src/ai_ad_editor/cli.py": "sha256:31e54c045717a0fccbc907139d26dc720f317ecf32557023f51845656b2fbaac",
+      "product/src/ai_ad_editor/convert.py": "sha256:9cbdcbde37e01e4c97be36cc5e741f1962a269451828a4ec32577464bfbb44ed",
+      "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+      "product/src/ai_ad_editor/draft_adapter.py": "sha256:ab3a73908b2286f7727efb42d89fff5eb8f42853df69763b6dc71b5e85acc182",
+      "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+      "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+      "product/src/ai_ad_editor/inpainting_frames.py": "sha256:3e9b2cb258463f082fc62e2a4bd1e88f9a11dbdce9a9da22ce1b6d16ffcbb9e2",
+      "product/src/ai_ad_editor/lama_worker.py": "sha256:91820085842c144bd87d44f405d616c69ee540590fc2218dab6045a55ca5e8d3",
+      "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+      "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+      "product/src/ai_ad_editor/local_inpainting.py": "sha256:c87fe70dd38df8401af7b5379bfef365b489595d7533153145bb6b5d8b7c51ef",
+      "product/src/ai_ad_editor/local_matting.py": "sha256:38ba323bc058a10724ee5c234769237c4d4764aff68d24caf989a2f35e678cd2",
+      "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+      "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+      "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+      "product/src/ai_ad_editor/local_vace.py": "sha256:a8d176c95d9c205871c8335843cf09baf4dbceeed9bdd43c489b63d413b1d90b",
+      "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+      "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+      "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+      "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+      "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+      "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+      "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+      "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+      "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+      "product/src/ai_ad_editor/project.py": "sha256:02a94e05ff0d4967c9ad28321609f96c2069c182c95305b4145cffc1153f9e84",
+      "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+      "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+      "product/src/ai_ad_editor/render.py": "sha256:ae9626cc7a1037979a5bfa81a03e9d1ed28a8fbf44921c892810f2d0f9424080",
+      "product/src/ai_ad_editor/render_queue.py": "sha256:cbbf8fbd716d2f4a4931d6ed7d3ca18211e4d5b7878c1a7eaf9e8c6d2a865832",
+      "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+      "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+      "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+      "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+      "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+      "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+      "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+      "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+      "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+      "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+      "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+      "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+      "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+      "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+      "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+      "product/src/ai_ad_editor/utils.py": "sha256:bb5540b39997d353f81a6c23672b3af5d852a3a461afc36772c3581de9947dd8",
+      "product/src/ai_ad_editor/vace_frames.py": "sha256:c00857766f3d0fc761ecf6c9de8eac1f15f6c22c94c22fea583e6aec1c7291e4",
+      "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+      "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+      "product/src/ai_ad_editor/validator.py": "sha256:093d213cf9a325272e693b823f3022fc61c26457c2ec104b66e085cd3dc4ba00",
+      "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+      "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+      "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+      "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+      "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+      "product/tests/test_cli.py": "sha256:845fcfe25d3413f83ee572d89b1b96e500f2ee73ebdf71623ae3955300e5266f",
+      "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+      "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+      "product/tests/test_local_inpainting.py": "sha256:c3a9da06be29a02b4b960182bd094270d335fdb600a7819560b52623644748c7",
+      "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+      "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+      "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+      "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+      "product/tests/test_local_vace.py": "sha256:a7999a0b0c2cd8bd1ad7b0540a5bef4358c6928302f9f6809329b9d3fd9c7241",
+      "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+      "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+      "scripts/create_lama_fixture.py": "sha256:67c273fe4f72766e60ed7aae7f3ef81b19199b56d2b5dfb70dfc6581fc9ecb63",
+      "scripts/smoke_audio_separation.py": "sha256:9c7c664d2b5dadf18e272382816466efa3b527a358db4205b165d62f9a4eb63d",
+      "scripts/smoke_lama_local.py": "sha256:891eedb23a84382c9c16163a87fbbde9a80df6a9fc4f1c9b9a6a5932f34b6668",
+      "scripts/smoke_rvm_local.py": "sha256:963faf3c7012ff6785e64559201275be3792ed7ef9c65876a7c8331921595df1",
+      "scripts/smoke_soulx_local.py": "sha256:de90794c2f2e105925cc6f75aa3ecde8b744c6b500162c99d35a761d7b62a92e",
+      "scripts/smoke_tracking_geometry.py": "sha256:07c6889a0c5eb74ac243115da3bc2854edc81b23291779811e2cbe18df0a3586",
+      "scripts/smoke_whisper_local.py": "sha256:136cb4d27c8425b593175bde5be53cf16efcb098e24897ef55be96a1611e2852",
+      "scripts/smoke_yolo_local.py": "sha256:c930222d099c3f28ad8429a67c7474ecf82f92884a86b845d8222004b195c326"
+    },
+    "implementation_edited_during_run": false,
+    "elapsed_seconds": 10.362500499992166
+  },
+  "reproducible_sources": [
+    {
+      "path": "product/.runtime/repair-harmonize-candidate-20261016/repair_blend.py",
+      "sha256": "sha256:361d0bcdc137183f9df22c8ddd6e34fbd729625768ced23cf4c645fe404f1feb",
+      "source": "\"\"\"Candidate bounded NumPy harmonic color correction. Not integrated into the CLI.\"\"\"\nfrom __future__ import annotations\n\nimport math\nimport numpy as np\n\n\ndef owned_array_bound(width, height, selected_pixels):\n    return width * height * 24 + selected_pixels * 384\n\n\ndef _solve(rhs, degree, neighbors, iterations, tolerance):\n    def apply(value):\n        result = degree * value\n        for direction in range(4):\n            valid = neighbors[:, direction] >= 0\n            result[valid] -= value[neighbors[valid, direction]]\n        return result\n\n    solution = np.zeros_like(rhs)\n    residual = rhs.copy()\n    target = max(1e-7, tolerance * float(np.linalg.norm(rhs)))\n    error = float(np.linalg.norm(residual))\n    if error <= target:\n        return solution, 0, error\n    preconditioned = residual / degree\n    direction = preconditioned.copy()\n    rz = float(np.dot(residual, preconditioned))\n    for step in range(1, iterations + 1):\n        product = apply(direction)\n        denominator = float(np.dot(direction, product))\n        if not math.isfinite(denominator) or denominator <= 0:\n            raise ValueError('REPAIR_HARMONIZE_SOLVER_BREAKDOWN')\n        weight = rz / denominator\n        solution += weight * direction\n        residual -= weight * product\n        if float(np.linalg.norm(residual)) <= target:\n            residual = rhs - apply(solution)\n            error = float(np.linalg.norm(residual))\n            if error <= target:\n                return solution, step, error\n            preconditioned = residual / degree\n            direction = preconditioned.copy()\n            rz = float(np.dot(residual, preconditioned))\n            continue\n        preconditioned = residual / degree\n        next_rz = float(np.dot(residual, preconditioned))\n        if not math.isfinite(next_rz) or next_rz <= 0:\n            raise ValueError('REPAIR_HARMONIZE_SOLVER_BREAKDOWN')\n        direction *= next_rz / rz\n        direction += preconditioned\n        rz = next_rz\n    raise ValueError('REPAIR_HARMONIZE_NOT_CONVERGED')\n\n\ndef harmonize_region(source_rgba, prediction_rgb, selected, *, max_iterations=2000,\n                     relative_tolerance=1e-6, array_budget=256 * 1024**2):\n    if not isinstance(source_rgba, np.ndarray) or source_rgba.dtype != np.uint8 or source_rgba.ndim != 3 or source_rgba.shape[2] != 4:\n        raise ValueError('REPAIR_HARMONIZE_SOURCE_INVALID')\n    height, width = source_rgba.shape[:2]\n    if min(height, width) < 1 or height * width > 16_777_216:\n        raise ValueError('REPAIR_HARMONIZE_CANVAS_BUDGET')\n    if not isinstance(prediction_rgb, np.ndarray) or prediction_rgb.dtype != np.float32 or prediction_rgb.shape != (height, width, 3) or not np.isfinite(prediction_rgb).all() or np.any(prediction_rgb < 0) or np.any(prediction_rgb > 255):\n        raise ValueError('REPAIR_HARMONIZE_PREDICTION_INVALID')\n    if not isinstance(selected, np.ndarray) or selected.dtype != np.bool_ or selected.shape != (height, width):\n        raise ValueError('REPAIR_HARMONIZE_MASK_INVALID')\n    if type(max_iterations) is not int or not 1 <= max_iterations <= 10000 or type(relative_tolerance) not in {int, float} or not math.isfinite(relative_tolerance) or not 0 < relative_tolerance <= .01 or type(array_budget) is not int or array_budget < 1:\n        raise ValueError('REPAIR_HARMONIZE_OPTIONS_INVALID')\n    count = int(np.count_nonzero(selected))\n    metrics = {'selected_pixels': count, 'iterations': [0, 0, 0], 'residual_norm': [0., 0., 0.],\n               'boundary_edges': 0, 'owned_array_budget_bytes': 0, 'clipped_rgb_values': 0,\n               'max_abs_correction': 0., 'solver': 'masked-four-neighbor-jacobi-pcg-float64',\n               'budget_scope': 'incremental-owned-numpy-arrays-excludes-inputs-and-model'}\n    if not count:\n        return prediction_rgb, metrics\n    if count == height * width:\n        raise ValueError('REPAIR_HARMONIZE_FULL_MASK_NO_BOUNDARY')\n    owned = owned_array_bound(width, height, count)\n    if owned > array_budget:\n        raise ValueError('REPAIR_HARMONIZE_ARRAY_BUDGET_EXCEEDED')\n    ys, xs = np.nonzero(selected)\n    index = np.full((height, width), -1, np.int32)\n    index[ys, xs] = np.arange(count, dtype=np.int32)\n    neighbors = np.full((count, 4), -1, np.int32)\n    degree = np.zeros(count, np.float64)\n    rhs = np.zeros((count, 3), np.float64)\n    model = prediction_rgb[ys, xs].astype(np.float64)\n    for column, (dy, dx) in enumerate([(-1, 0), (1, 0), (0, -1), (0, 1)]):\n        valid = (ys + dy >= 0) & (ys + dy < height) & (xs + dx >= 0) & (xs + dx < width)\n        at = np.flatnonzero(valid)\n        qy, qx = ys[at] + dy, xs[at] + dx\n        ids = index[qy, qx]\n        degree[at] += 1\n        neighbors[at, column] = ids\n        boundary = ids < 0\n        at, qy, qx = at[boundary], qy[boundary], qx[boundary]\n        metrics['boundary_edges'] += len(at)\n        extrapolated = model[at].copy()\n        by, bx = ys[at] - dy, xs[at] - dx\n        valid_back = (by >= 0) & (by < height) & (bx >= 0) & (bx < width)\n        take = np.flatnonzero(valid_back)\n        back_ids = np.full(len(at), -1, np.int32)\n        back_ids[take] = index[by[take], bx[take]]\n        take = np.flatnonzero(back_ids >= 0)\n        extrapolated[take] += extrapolated[take] - model[back_ids[take]]\n        rhs[at] += source_rgba[qy, qx, :3].astype(np.float64) - extrapolated\n    correction = np.zeros_like(rhs)\n    for channel in range(3):\n        values, steps, residual = _solve(rhs[:, channel], degree, neighbors, max_iterations, relative_tolerance)\n        correction[:, channel] = values\n        metrics['iterations'][channel] = steps\n        metrics['residual_norm'][channel] = residual\n    corrected = model + correction\n    if not np.isfinite(corrected).all():\n        raise ValueError('REPAIR_HARMONIZE_NONFINITE_RESULT')\n    metrics['clipped_rgb_values'] = int(np.count_nonzero((corrected < 0) | (corrected > 255)))\n    metrics['max_abs_correction'] = float(np.abs(correction).max())\n    metrics['owned_array_budget_bytes'] = owned\n    output = prediction_rgb.copy()\n    output[ys, xs] = np.clip(corrected, 0, 255).astype(np.float32)\n    return output, metrics\n"
+    },
+    {
+      "path": "product/.runtime/repair-harmonize-candidate-20261016/test_repair_blend.py",
+      "sha256": "sha256:2db4f9ad553bf7e41a2d85f997681dd45b47d5fd0b58574d1f96d6d100984d00",
+      "source": "\"\"\"Independent analytic and preservation checks for the candidate numerical kernel.\"\"\"\nimport unittest\nimport numpy as np\nfrom repair_blend import harmonize_region\n\n\nclass HarmonizeTests(unittest.TestCase):\n    def plane(self):\n        y, x = np.indices((24, 32))\n        rgb = np.stack([20+x+y, 50+2*x+y, 100+x-y], axis=2).astype(np.uint8)\n        rgba = np.concatenate([rgb, (x*7 % 256).astype(np.uint8)[:, :, None]], axis=2)\n        mask = np.zeros((24, 32), bool); mask[5:19, 7:25] = True\n        return rgba, rgb.astype(np.float32), mask\n\n    def test_constant_bias_on_a_plane_recovers_independent_truth(self):\n        source, truth, mask = self.plane(); prediction = truth + [25., -20., 10.]\n        prediction = prediction.astype(np.float32); source[mask, :3] = [255, 0, 0]\n        corrected, metrics = harmonize_region(source, prediction, mask)\n        np.testing.assert_allclose(corrected[mask], truth[mask], atol=.002)\n        np.testing.assert_array_equal(corrected[~mask], prediction[~mask])\n        self.assertTrue(all(x > 0 for x in metrics['iterations']))\n\n    def test_compact_model_texture_survives_low_frequency_correction(self):\n        source, truth, mask = self.plane(); wanted = truth.copy(); wanted[9:14, 12:17, 0] += 5\n        prediction = (wanted + [25., -20., 10.]).astype(np.float32)\n        corrected, _ = harmonize_region(source, prediction, mask)\n        np.testing.assert_allclose(corrected[mask], wanted[mask], atol=.002)\n\n    def test_selected_source_colors_and_alpha_cannot_influence_repair(self):\n        source, truth, mask = self.plane(); prediction = (truth + 20).astype(np.float32)\n        first, _ = harmonize_region(source, prediction, mask)\n        source[mask, :3] = [255, 0, 255]; source[:, :, 3] = 0\n        second, _ = harmonize_region(source, prediction, mask)\n        np.testing.assert_array_equal(first, second)\n\n    def test_disconnected_and_canvas_edge_regions_recover_a_plane(self):\n        source, truth, _ = self.plane(); mask = np.zeros((24, 32), bool)\n        mask[:5, :7] = True; mask[12:19, 17:25] = True\n        corrected, _ = harmonize_region(source, (truth + 20).astype(np.float32), mask)\n        np.testing.assert_allclose(corrected[mask], truth[mask], atol=.003)\n\n    def test_matching_plane_is_stable_and_does_not_mutate_inputs(self):\n        source, truth, mask = self.plane(); before_source = source.copy(); before_truth = truth.copy()\n        corrected, metrics = harmonize_region(source, truth, mask)\n        np.testing.assert_array_equal(corrected, truth)\n        np.testing.assert_array_equal(source, before_source); np.testing.assert_array_equal(truth, before_truth)\n        self.assertEqual(metrics['max_abs_correction'], 0.)\n\n    def test_empty_selection_bypasses_and_full_selection_has_no_boundary(self):\n        source, truth, mask = self.plane(); mask[:] = False\n        corrected, metrics = harmonize_region(source, truth, mask, array_budget=1)\n        np.testing.assert_array_equal(corrected, truth); self.assertEqual(metrics['owned_array_budget_bytes'], 0)\n        mask[:] = True\n        with self.assertRaisesRegex(ValueError, 'NO_BOUNDARY'): harmonize_region(source, truth, mask)\n\n    def test_budget_and_nonconvergence_fail_without_changing_inputs(self):\n        source, truth, mask = self.plane(); before_source = source.copy(); before_truth = truth.copy()\n        with self.assertRaisesRegex(ValueError, 'BUDGET_EXCEEDED'): harmonize_region(source, truth, mask, array_budget=1)\n        rng = np.random.default_rng(42); source[~mask, :3] = rng.integers(0, 256, (int((~mask).sum()), 3), dtype=np.uint8)\n        with self.assertRaisesRegex(ValueError, 'NOT_CONVERGED'): harmonize_region(source, truth, mask, max_iterations=1)\n        np.testing.assert_array_equal(truth, before_truth)\n        source[~mask] = before_source[~mask]; np.testing.assert_array_equal(source, before_source)\n\n    def test_fractional_model_detail_is_kept_until_final_quantization(self):\n        source = np.full((9, 9, 4), 100, np.uint8); prediction = np.full((9, 9, 3), 110, np.float32)\n        mask = np.zeros((9, 9), bool); mask[2:7, 2:7] = True; prediction[4, 4] += .25\n        corrected, _ = harmonize_region(source, prediction, mask)\n        self.assertEqual(corrected.dtype, np.float32); np.testing.assert_allclose(corrected[4, 4], 100.25, atol=.001)\n\n    def test_invalid_shapes_types_and_nonfinite_values_are_rejected(self):\n        source, truth, mask = self.plane()\n        for options in [{'max_iterations': True}, {'relative_tolerance': float('nan')}, {'array_budget': 0}]:\n            with self.subTest(options=options), self.assertRaises(ValueError): harmonize_region(source, truth, mask, **options)\n        for value in [truth.astype(np.float64), truth[:, :-1], np.full_like(truth, np.nan)]:\n            with self.assertRaises(ValueError): harmonize_region(source, value, mask)\n        with self.assertRaises(ValueError): harmonize_region(source, truth, mask.astype(np.uint8))\n\n\nif __name__ == '__main__': unittest.main()\n"
+    },
+    {
+      "path": "product/.runtime/vace_numpy_harmonic_probe_20261016.py",
+      "sha256": "sha256:13d622168195cf277fea43d8bb0993c4bfa758c08531c0da813551dd9889ea8b",
+      "source": "\"\"\"Developer-only NumPy kernel comparison; no CLI integration or model rerun.\"\"\"\nimport os\nfor name in ('OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS'):\n    os.environ[name]='1'\nfrom pathlib import Path\nimport hashlib,importlib.util,json,subprocess,sys,time\nimport numpy as np\nfrom PIL import Image,ImageFilter\nroot=Path(__file__).resolve().parents[2]\nsys.path.insert(0,str(root/'product/src'))\nfrom ai_ad_editor.media import ffmpeg_path\nfrom ai_ad_editor.runtime import configure_local_runtime\nconfigure_local_runtime()\nkernel=root/'product/.runtime/repair-harmonize-candidate-20261016/repair_blend.py'\nspec=importlib.util.spec_from_file_location('repair_blend_candidate',kernel)\nmodule=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)\nout=root/'workspace/vace-smoke-numpy-harmonic-20261016';assert not out.exists();out.mkdir()\ndef sha(path):return 'sha256:'+hashlib.sha256(Path(path).read_bytes()).hexdigest()\ndef read(path):return json.loads(Path(path).read_text(encoding='utf-8-sig'))\ndef sources():return {p.relative_to(root).as_posix():sha(p) for p in sorted([*root.joinpath('product/src').rglob('*.py'),*root.joinpath('product/tests').glob('*.py'),*root.joinpath('scripts').glob('*.py')])}\ndef decode(path,n,h,w):\n    result=subprocess.run([ffmpeg_path(),'-nostdin','-hide_banner','-loglevel','error','-i',str(path),'-an','-f','rawvideo','-pix_fmt','rgba','pipe:1'],check=True,capture_output=True)\n    return np.frombuffer(result.stdout,np.uint8).reshape(n,h,w,4)\nbefore=sources();record={'scope':'Developer-only independent NumPy solver on saved model outputs compared with earlier SciPy diagnostic, not CLI delivery, model improvement or broad quality acceptance.','driver_sha256':sha(__file__),'kernel_sha256':sha(kernel),'kernel_source':kernel.read_text(encoding='utf-8-sig'),'source_sha256_before':before,'cases':[],'production_integration':False,'formal_cli_runs_added':0,'broad_quality_accepted':False}\nstarted=time.monotonic()\nfor case in ['controlled','natural']:\n    previous=read(root/('workspace/vace-smoke-20261016-'+case+'-v2/summary.json'));ip=previous['inpainting']\n    n,h,w=(ip['video'][k] for k in ['frames','height','width'])\n    source=decode(ip['source']['path'],n,h,w);mask=decode(ip['mask']['path'],n,h,w)\n    selected=mask[:,:,:,3]>ip['inpainting']['threshold']*255\n    grow=ip['inpainting']['grow']\n    if grow:selected=np.array([np.asarray(Image.fromarray(v.astype(np.uint8)*255).filter(ImageFilter.MaxFilter(grow*2+1)))!=0 for v in selected])\n    if case=='controlled':\n        groups=[]\n        for name in ['native-shift3-30','4x-shift16-30']:\n            oldpath=root/('workspace/vace-smoke-harmonic-diagnostic-20261016/'+name+'.npy')\n            modelpath=root/('workspace/vace-smoke-calibration-20261016-controlled-v1/'+name+'.npy')\n            groups.append((name,np.load(modelpath,allow_pickle=False),np.load(oldpath,allow_pickle=False),list(range(8)),sha(oldpath)))\n        truthpath=root/'product/.runtime/fixtures/lama-20261016-reproduced/ground-truth.npz';truth=np.load(truthpath,allow_pickle=False)['frames']\n    else:\n        diagnostic=root/'workspace/vace-smoke-harmonic-natural-diagnostic-20261016'\n        summary=read(diagnostic/'summary.json');indices=summary['frame_indices']\n        groups=[('natural-sampled',decode(ip['output'],n,h,w)[indices],np.load(diagnostic/'sampled-outputs.npy',allow_pickle=False),indices,sha(diagnostic/'sampled-outputs.npy'))]\n    for name,generated,reference,indices,reference_sha in groups:\n        output=[];frames=[];maximum=0;changed=0;case_started=time.monotonic()\n        for at,i in enumerate(indices):\n            value,metrics=module.harmonize_region(source[i],generated[at,:,:,:3].astype(np.float32),selected[i])\n            result=generated[at].copy();result[selected[i],:3]=np.rint(value[selected[i]]).astype(np.uint8)\n            assert np.array_equal(result[:,:,3],source[i,:,:,3])\n            assert not np.any(np.any(result[:,:,:3]!=source[i,:,:,:3],axis=2)&~selected[i])\n            delta=np.abs(result.astype(np.int16)-reference[at].astype(np.int16));maximum=max(maximum,int(delta.max()));changed+=int(np.count_nonzero(delta))\n            assert delta.max()<=1,(name,i,int(delta.max()))\n            if at==0:\n                altered=source[i].copy();altered[selected[i],:3]=[255,0,0];altered[:,:,3]=0\n                perturb,_=module.harmonize_region(altered,generated[at,:,:,:3].astype(np.float32),selected[i]);assert np.array_equal(value,perturb)\n            output.append(result);frames.append({'source_frame':i,**metrics})\n        output=np.stack(output);target=out/(name+'.npy');np.save(target,output,allow_pickle=False)\n        entry={'id':name,'frame_indices':indices,'output_sha256':sha(target),'reference_sha256':reference_sha,'comparison':'Numerical agreement with independent SciPy diagnostic, not true background accuracy.','max_rgba_value_delta_vs_scipy':maximum,'rgba_values_differing_vs_scipy':changed,'source_selected_rgb_and_alpha_perturbation_invariant':True,'source_alpha_exact':True,'outside_mask_changed_pixels':0,'elapsed_seconds':time.monotonic()-case_started,'frames':frames}\n        if case=='controlled':\n            error=(output[:,:,:,:3].astype(np.float64)-truth[:,:,:,:3].astype(np.float64))[selected]\n            mse=float(np.square(error).mean());entry['masked_psnr_db']=float(10*np.log10(255**2/mse)) if mse else 100.\n        record['cases'].append(entry);print(json.dumps({k:v for k,v in entry.items() if k not in ['frames','frame_indices']},ensure_ascii=False),flush=True)\nafter=sources();assert before==after\nrecord.update(source_sha256_after=after,implementation_edited_during_run=False,elapsed_seconds=time.monotonic()-started)\n(out/'summary.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8',newline='\\n')\nprint(json.dumps({'status':'passed','case_count':len(record['cases']),'frames':sum(len(v['frames']) for v in record['cases']),'elapsed_seconds':record['elapsed_seconds']},ensure_ascii=False),flush=True)\n"
+    }
+  ],
+  "production_integration": false,
+  "formal_cli_runs_added": 0,
+  "broad_quality_accepted": false,
+  "full_jianying_functional_and_visual_parity_accepted": false
+}

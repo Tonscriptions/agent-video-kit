@@ -67,6 +67,7 @@ def load_predictor(model_path, settings, generation, *, progress=None):
                                                 torch_dtype=torch.float32,low_cpu_mem_usage=True,output_loading_info=True)
     if any(loading.get(k) for k in ('missing_keys','unexpected_keys','mismatched_keys','error_msgs')):raise ValueError('VACE_VAE_WEIGHT_LOADING_MISMATCH: '+str(loading))
     scheduler=UniPCMultistepScheduler.from_pretrained(str(root/'scheduler'),local_files_only=True)
+    scheduler=UniPCMultistepScheduler.from_config(scheduler.config,flow_shift=generation['flow_shift'])
     transformer.eval();vae.eval();vae.enable_tiling()
     pipe=WanVACEPipeline(tokenizer=tokenizer,text_encoder=None,transformer=transformer,vae=vae,scheduler=scheduler)
     pipe.to('cuda');pipe.set_progress_bar_config(disable=True)
@@ -83,7 +84,9 @@ def load_predictor(model_path, settings, generation, *, progress=None):
               'prompt_token_counts':token_count,'prompt_truncated':False,'prompt_extension':False,'text_phase_seconds':text_seconds,
               'load_seconds':time.monotonic()-started,'cuda_device':torch.cuda.get_device_name(0),'cuda_total_bytes':total,
               'transformer_precision':'bfloat16-with-declared-float32-stability-modules','transformer_parameter_dtype_elements':dtypes,
-              'float32_stability_modules':list(stability),'vae_precision':'float32','vae_spatial_tiling':True,'window_seconds':[]}
+              'float32_stability_modules':list(stability),'vae_precision':'float32','vae_spatial_tiling':True,'window_seconds':[],
+              'flow_shift':float(scheduler.config.flow_shift),'model_input_scale':generation['model_input_scale'],
+              'window_input_shapes':[]}
     def predict(images,masks,window_generation):
         if {k:v for k,v in window_generation.items() if k!='seed'}!={k:v for k,v in generation.items() if k!='seed'}:raise ValueError('VACE_GENERATION_SETTINGS_CHANGED')
         phase('joint-video-denoising');begin=time.monotonic()
@@ -97,6 +100,7 @@ def load_predictor(model_path, settings, generation, *, progress=None):
                 conditioning_scale=window_generation['conditioning_scale'],generator=torch.Generator(device='cuda').manual_seed(window_generation['seed']),
                 max_sequence_length=window_generation['prompt_max_tokens'],output_type='np',callback_on_step_end=step_callback).frames[0]
         metadata['window_seconds'].append(time.monotonic()-begin)
+        metadata['window_input_shapes'].append(list(images.shape[:3]))
         return np.asarray(value,dtype=np.float32)
     phase('local-video-model-ready')
     return predict,metadata
