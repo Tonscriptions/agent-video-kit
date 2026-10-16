@@ -1,0 +1,136 @@
+test_alpha_geometry_alpha_video_dynamic_crop (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_alpha_video_dynamic_crop) ... FAIL
+test_alpha_geometry_animated_affine_has_no_dark_fringe (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_animated_affine_has_no_dark_fringe) ... FAIL
+test_alpha_geometry_crop_and_rotation_have_no_dark_fringe (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_crop_and_rotation_have_no_dark_fringe) ... FAIL
+test_alpha_geometry_dynamic_fill_hidden_rgb (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_dynamic_fill_hidden_rgb) ... FAIL
+test_alpha_geometry_dynamic_fit_hidden_rgb (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_dynamic_fit_hidden_rgb) ... FAIL
+test_alpha_geometry_dynamic_fit_padding_reveals_background (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_dynamic_fit_padding_reveals_background) ... FAIL
+test_alpha_geometry_dynamic_stretch_hidden_rgb (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_dynamic_stretch_hidden_rgb) ... FAIL
+test_alpha_geometry_independent_text_rotated_edges (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_independent_text_rotated_edges) ... FAIL
+test_alpha_geometry_independent_text_scalar_edges (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_independent_text_scalar_edges) ... FAIL
+test_alpha_geometry_opaque_dynamic_fit_keeps_black_bars (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_opaque_dynamic_fit_keeps_black_bars) ... ok
+test_alpha_geometry_static_rotation_has_no_dark_fringe (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_static_rotation_has_no_dark_fringe) ... FAIL
+
+======================================================================
+FAIL: test_alpha_geometry_alpha_video_dynamic_crop (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_alpha_video_dynamic_crop)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 165, in test_alpha_geometry_alpha_video_dynamic_crop
+    self.compare_hidden_rgb('fit',video=True,dynamic=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 102, in compare_hidden_rgb
+    self.assertEqual(max(differences), 0, 'Fully transparent RGB must not contaminate visible resampled pixels')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 66 != 0 : Fully transparent RGB must not contaminate visible resampled pixels
+
+======================================================================
+FAIL: test_alpha_geometry_animated_affine_has_no_dark_fringe (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_animated_affine_has_no_dark_fringe)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 159, in test_alpha_geometry_animated_affine_has_no_dark_fringe
+    self.white_on_white(animated=True,rotation=17)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 141, in white_on_white
+    self.assertGreaterEqual(min(light),250,'Resampling white over white must not produce a dark alpha fringe or opaque fit bars')
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 218 not greater than or equal to 250 : Resampling white over white must not produce a dark alpha fringe or opaque fit bars
+
+======================================================================
+FAIL: test_alpha_geometry_crop_and_rotation_have_no_dark_fringe (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_crop_and_rotation_have_no_dark_fringe)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 162, in test_alpha_geometry_crop_and_rotation_have_no_dark_fringe
+    self.white_on_white(dynamic=True,animated=True,rotation=17)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 141, in white_on_white
+    self.assertGreaterEqual(min(light),250,'Resampling white over white must not produce a dark alpha fringe or opaque fit bars')
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 not greater than or equal to 250 : Resampling white over white must not produce a dark alpha fringe or opaque fit bars
+
+======================================================================
+FAIL: test_alpha_geometry_dynamic_fill_hidden_rgb (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_dynamic_fill_hidden_rgb)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 147, in test_alpha_geometry_dynamic_fill_hidden_rgb
+    self.compare_hidden_rgb('fill',dynamic=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 102, in compare_hidden_rgb
+    self.assertEqual(max(differences), 0, 'Fully transparent RGB must not contaminate visible resampled pixels')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 75 != 0 : Fully transparent RGB must not contaminate visible resampled pixels
+
+======================================================================
+FAIL: test_alpha_geometry_dynamic_fit_hidden_rgb (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_dynamic_fit_hidden_rgb)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 144, in test_alpha_geometry_dynamic_fit_hidden_rgb
+    self.compare_hidden_rgb('fit',dynamic=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 102, in compare_hidden_rgb
+    self.assertEqual(max(differences), 0, 'Fully transparent RGB must not contaminate visible resampled pixels')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 66 != 0 : Fully transparent RGB must not contaminate visible resampled pixels
+
+======================================================================
+FAIL: test_alpha_geometry_dynamic_fit_padding_reveals_background (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_dynamic_fit_padding_reveals_background)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 153, in test_alpha_geometry_dynamic_fit_padding_reveals_background
+    self.white_on_white(dynamic=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 141, in white_on_white
+    self.assertGreaterEqual(min(light),250,'Resampling white over white must not produce a dark alpha fringe or opaque fit bars')
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 not greater than or equal to 250 : Resampling white over white must not produce a dark alpha fringe or opaque fit bars
+
+======================================================================
+FAIL: test_alpha_geometry_dynamic_stretch_hidden_rgb (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_dynamic_stretch_hidden_rgb)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 150, in test_alpha_geometry_dynamic_stretch_hidden_rgb
+    self.compare_hidden_rgb('stretch',dynamic=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 102, in compare_hidden_rgb
+    self.assertEqual(max(differences), 0, 'Fully transparent RGB must not contaminate visible resampled pixels')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 67 != 0 : Fully transparent RGB must not contaminate visible resampled pixels
+
+======================================================================
+FAIL: test_alpha_geometry_independent_text_rotated_edges (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_independent_text_rotated_edges)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 196, in test_alpha_geometry_independent_text_rotated_edges
+    self.white_text_on_white(23)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 190, in white_text_on_white
+    self.assertGreaterEqual(min(pixels('text-light')),250,'Antialiased white text over white must not darken its edges')
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 189 not greater than or equal to 250 : Antialiased white text over white must not darken its edges
+
+======================================================================
+FAIL: test_alpha_geometry_independent_text_scalar_edges (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_independent_text_scalar_edges)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 193, in test_alpha_geometry_independent_text_scalar_edges
+    self.white_text_on_white(0)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 190, in white_text_on_white
+    self.assertGreaterEqual(min(pixels('text-light')),250,'Antialiased white text over white must not darken its edges')
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 190 not greater than or equal to 250 : Antialiased white text over white must not darken its edges
+
+======================================================================
+FAIL: test_alpha_geometry_static_rotation_has_no_dark_fringe (test_alpha_resampling.AlphaResamplingTests.test_alpha_geometry_static_rotation_has_no_dark_fringe)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 156, in test_alpha_geometry_static_rotation_has_no_dark_fringe
+    self.white_on_white(rotation=23)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_alpha_resampling.py", line 141, in white_on_white
+    self.assertGreaterEqual(min(light),250,'Resampling white over white must not produce a dark alpha fringe or opaque fit bars')
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 224 not greater than or equal to 250 : Resampling white over white must not produce a dark alpha fringe or opaque fit bars
+
+----------------------------------------------------------------------
+Ran 11 tests in 26.187s
+
+FAILED (failures=10)

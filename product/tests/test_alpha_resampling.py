@@ -57,13 +57,20 @@ class AlphaResamplingTests(unittest.TestCase):
         path.write_text(json.dumps({'operations': operations}), encoding='utf-8')
         self.call('timeline', 'compose', '--project', self.root, '--input', path)
 
-    def render(self, asset, fit, *, animated=False):
+    def render(self, asset, fit, *, animated=False, transform=None, keys=None, dynamic=False):
         clip = {'asset_id': asset, 'source_in_tick': 0, 'source_out_tick': 90000, 'duration_tick': 90000,
                 'transform': {'scale': .43}, 'crop': {'fit': fit}}
+        clip['transform'].update(transform or {})
         if animated:
             clip['keyframes'] = [{'property': 'transform.scale', 'keyframes': [
                 {'at_tick': 0, 'value': .43, 'interpolation': 'linear'},
                 {'at_tick': 90000, 'value': .61, 'interpolation': 'linear'}]}]
+        clip.setdefault('keyframes', []).extend(keys or [])
+        if dynamic:
+            clip['crop'].update(unit='normalized', x=.1, y=.1, width=.8, height=.7)
+            clip['keyframes'].append({'property': 'crop.width', 'keyframes': [
+                {'at_tick': 0, 'value': .8, 'interpolation': 'linear'},
+                {'at_tick': 90000, 'value': .5, 'interpolation': 'linear'}]})
         self.compose([{'op': 'append_clip', 'track_id': 'labels', 'id': asset+'_clip', **clip}])
         output = self.root/f'renders/{asset}-{fit}.mp4'
         self.call('render', '--project', self.root, '--output', output)
@@ -72,7 +79,7 @@ class AlphaResamplingTests(unittest.TestCase):
         self.compose([{'op': 'remove_clip', 'track_id': 'labels', 'clip_id': asset+'_clip'}])
         return raw
 
-    def compare_hidden_rgb(self, fit, *, animated=False, video=False, palette=False):
+    def compare_hidden_rgb(self, fit, *, animated=False, video=False, palette=False, **geometry):
         names = ['black', 'green']
         if video or palette:
             names = []
@@ -89,8 +96,8 @@ class AlphaResamplingTests(unittest.TestCase):
                 asset = name+'_converted'
                 self.call('media', 'ingest', '--project', self.root, '--input', target, '--asset-id', asset)
                 names.append(asset)
-        first = self.render(names[0], fit, animated=animated)
-        second = self.render(names[1], fit, animated=animated)
+        first = self.render(names[0], fit, animated=animated, **geometry)
+        second = self.render(names[1], fit, animated=animated, **geometry)
         differences = [abs(a-b) for a, b in zip(first, second)]
         self.assertEqual(max(differences), 0, 'Fully transparent RGB must not contaminate visible resampled pixels')
         self.assertGreater(max(first), 200)
@@ -112,6 +119,81 @@ class AlphaResamplingTests(unittest.TestCase):
 
     def test_indexed_png_hidden_rgb_has_no_visible_influence(self):
         self.compare_hidden_rgb('fit', palette=True)
+
+    def white_on_white(self, *, dynamic=False, animated=False, rotation=0):
+        foreground = Image.new('RGBA', (24,24), (255,255,255,0))
+        foreground.putalpha(self.alpha)
+        foreground.save(self.base/'white-foreground.png')
+        self.call('media','ingest','--project',self.root,'--input',self.base/'white-foreground.png','--asset-id','white_foreground')
+        keys = []
+        if animated:
+            keys = [{'property': 'transform.rotation', 'keyframes': [
+                {'at_tick': 0, 'value': 17., 'interpolation': 'linear'},
+                {'at_tick': 90000, 'value': 67., 'interpolation': 'linear'}]}]
+        transform = {'rotation': rotation, 'position': {'x': .48, 'y': .52}, 'anchor': {'x': .4, 'y': .6}}
+        dark = self.render('white_foreground','fit',dynamic=dynamic,animated=animated,transform=transform,keys=keys)
+        self.assertGreater(sum(value > 230 for value in dark), 30, 'Foreground must actually be visible')
+        background = self.base/'white-background.png'
+        Image.new('RGB',(120,80),'white').save(background)
+        self.call('media','ingest','--project',self.root,'--input',background,'--asset-id','white_background')
+        self.compose([{'op':'append_clip','track_id':'track_video_1','id':'background_clip','asset_id':'white_background','source_in_tick':0,'source_out_tick':90000}])
+        light = self.render('white_foreground','fit',dynamic=dynamic,animated=animated,transform=transform,keys=keys)
+        self.assertGreaterEqual(min(light),250,'Resampling white over white must not produce a dark alpha fringe or opaque fit bars')
+
+    def test_alpha_geometry_dynamic_fit_hidden_rgb(self):
+        self.compare_hidden_rgb('fit',dynamic=True)
+
+    def test_alpha_geometry_dynamic_fill_hidden_rgb(self):
+        self.compare_hidden_rgb('fill',dynamic=True)
+
+    def test_alpha_geometry_dynamic_stretch_hidden_rgb(self):
+        self.compare_hidden_rgb('stretch',dynamic=True)
+
+    def test_alpha_geometry_dynamic_fit_padding_reveals_background(self):
+        self.white_on_white(dynamic=True)
+
+    def test_alpha_geometry_static_rotation_has_no_dark_fringe(self):
+        self.white_on_white(rotation=23)
+
+    def test_alpha_geometry_animated_affine_has_no_dark_fringe(self):
+        self.white_on_white(animated=True,rotation=17)
+
+    def test_alpha_geometry_crop_and_rotation_have_no_dark_fringe(self):
+        self.white_on_white(dynamic=True,animated=True,rotation=17)
+
+    def test_alpha_geometry_alpha_video_dynamic_crop(self):
+        self.compare_hidden_rgb('fit',video=True,dynamic=True)
+
+    def test_alpha_geometry_opaque_dynamic_fit_keeps_black_bars(self):
+        source=self.base/'opaque.png'
+        Image.new('RGB',(24,24),'white').save(source)
+        self.call('media','ingest','--project',self.root,'--input',source,'--asset-id','opaque')
+        raw=self.render('opaque','fit',dynamic=True,transform={'scale':1.})
+        self.assertLess(max(raw[(40*120+1)*3:(40*120+1)*3+3]),5)
+        self.assertGreater(min(raw[(40*120+60)*3:(40*120+60)*3+3]),250)
+
+    def white_text_on_white(self, rotation):
+        self.compose([{'op':'add_track','track_id':'titles','kind':'subtitle','order':3},
+            {'op':'append_clip','track_id':'titles','id':'title_clip','generator':{'type':'text'},
+             'source_in_tick':0,'source_out_tick':90000,'duration_tick':90000,
+             'transform':{'scale':.73,'rotation':rotation},
+             'subtitle':{'text':'AVK','style':{'fontsize':28,'fontcolor':'white','box':False,'borderw':0,'shadowx':0,'shadowy':0,'x':'(w-text_w)/2','y':'(h-text_h)/2'}}}])
+        def pixels(name):
+            output=self.root/f'renders/{name}.mp4'
+            self.call('render','--project',self.root,'--output',output)
+            return subprocess.run(['ffmpeg','-v','error','-i',str(output),'-map','0:v:0','-an','-f','rawvideo','-pix_fmt','rgb24','pipe:1'],capture_output=True,check=True).stdout
+        dark=pixels('text-dark')
+        self.assertGreater(sum(value>230 for value in dark),30)
+        path=self.base/'white-background.png';Image.new('RGB',(120,80),'white').save(path)
+        self.call('media','ingest','--project',self.root,'--input',path,'--asset-id','white_background')
+        self.compose([{'op':'append_clip','track_id':'track_video_1','id':'background_clip','asset_id':'white_background','source_in_tick':0,'source_out_tick':90000}])
+        self.assertGreaterEqual(min(pixels('text-light')),250,'Antialiased white text over white must not darken its edges')
+
+    def test_alpha_geometry_independent_text_scalar_edges(self):
+        self.white_text_on_white(0)
+
+    def test_alpha_geometry_independent_text_rotated_edges(self):
+        self.white_text_on_white(23)
 
 
 if __name__ == '__main__':

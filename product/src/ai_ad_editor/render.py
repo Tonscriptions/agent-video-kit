@@ -395,13 +395,16 @@ def _dynamic_crop_filters(
     source_height: int,
     clip_start: float,
     tps: int,
+    *,
+    alpha: bool = False,
 ) -> list[str]:
     """Animate a crop window while keeping every output frame the same size.
 
-    geq samples the original RGB and alpha planes with bilinear interpolation.
+    geq samples RGB and alpha planes with bilinear interpolation. Alpha
+    inputs stay premultiplied through both geq and the final resize.
     It keeps the native raster size until the final canvas resize, so small
-    crop windows do not allocate an enormous zoomed intermediate frame.  Fit
-    bars are opaque black, matching the static crop/pad contract.  Each plane
+    crop windows do not allocate an enormous zoomed intermediate frame. Fit
+    bars follow the static crop/pad alpha contract. Each plane
     has its own expression state; registers are initialized for every pixel.
     """
     normalized = str(crop.get("unit", "pixels")).lower() in {"normalized", "relative"}
@@ -457,12 +460,13 @@ def _dynamic_crop_filters(
     def plane(name: str, outside: int) -> str:
         return _expr_arg(f"{setup}if(ld(9),{name}({sample_x},{sample_y}),{outside})")
 
-    return [
-        "format=gbrap",
-        f"geq=r={plane('r', 0)}:g={plane('g', 0)}:b={plane('b', 0)}:a={plane('alpha', 255)}:interpolation=bilinear",
+    prefix = ['format=gbrapf32le', 'premultiply=inplace=1'] if alpha else ['format=gbrap']
+    suffix = ['unpremultiply=inplace=1', 'format=rgba'] if alpha else []
+    return prefix + [
+        f"geq=r={plane('r', 0)}:g={plane('g', 0)}:b={plane('b', 0)}:a={plane('alpha', 0 if alpha else 255)}:interpolation=bilinear",
         f"scale={canvas_width}:{canvas_height}:flags=lanczos",
         "setsar=1",
-    ]
+    ] + suffix
 
 
 def _mask_point(value: Any) -> tuple[float, float] | None:
@@ -1101,7 +1105,9 @@ def _affine_video_filters(transform: dict[str, str]) -> list[str]:
     )
     def plane(name: str) -> str:
         return _expr_arg(setup+f"if(ld(7),{name}(clip(ld(5),0,W-1),clip(ld(6),0,H-1)),0)")
-    return ['format=gbrap', f"geq=r={plane('r')}:g={plane('g')}:b={plane('b')}:a={plane('alpha')}:interpolation=bilinear", 'format=rgba']
+    return ['format=gbrapf32le', 'premultiply=inplace=1',
+            f"geq=r={plane('r')}:g={plane('g')}:b={plane('b')}:a={plane('alpha')}:interpolation=bilinear",
+            'unpremultiply=inplace=1', 'format=rgba']
 
 
 def _speed_curve_segments(clip: dict[str, Any], source_span_tick: int, tps: int) -> list[tuple[float, float, float, float]]:
@@ -2565,7 +2571,10 @@ def _build_subtitle_layer(
     canvas_label = f"subtitlecanvas{subtitle_index}"
     layer_label = f"subtitlelayer{subtitle_index}"
     filters.append(f"color=c=black@0.0:s={width}x{height}:r={fps_value}:d={duration:.6f},format=rgba[{canvas_label}]")
-    filters.append(f"[{canvas_label}]{overlay['filter']}[{layer_label}]")
+    # drawtext blends onto transparent black as premultiplied RGB. Convert
+    # this raster to the straight-alpha contract before effects/transforms;
+    # otherwise coverage is multiplied again and glyph edges turn dark.
+    filters.append(f"[{canvas_label}]{overlay['filter']},format=gbrapf32le,unpremultiply=inplace=1,format=rgba[{layer_label}]")
 
     rotation_expression = transform["rotation"]
     if overlay.get("animation_type") == "rotate":
@@ -2936,7 +2945,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     crop_width = max(2, crop_width)
                     crop_height = max(2, crop_height)
                     if (dynamic_width or dynamic_height) and source_width and source_height:
-                        chain.extend(_dynamic_crop_filters(clip, crop, width, height, source_width, source_height, start, tps))
+                        chain.extend(_dynamic_crop_filters(clip, crop, width, height, source_width, source_height, start, tps, alpha=alpha_padding))
                         dynamic_crop_rendered = True
                     elif crop_width >= 2 and crop_height >= 2:
                         if dynamic_x or dynamic_y:

@@ -1,0 +1,213 @@
+{
+  "id": "seq_main",
+  "name": "Main",
+  "duration_tick": 360000,
+  "tracks": [
+    {
+      "id": "track_video_1",
+      "kind": "video",
+      "order": 0,
+      "muted": false,
+      "locked": false,
+      "clips": [
+        {
+          "id": "source_clip",
+          "timeline_start_tick": 0,
+          "duration_tick": 360000,
+          "source_in_tick": 0,
+          "source_out_tick": 360000,
+          "asset_id": "source"
+        }
+      ]
+    },
+    {
+      "id": "track_audio_1",
+      "kind": "audio",
+      "order": 0,
+      "muted": false,
+      "locked": false,
+      "clips": []
+    },
+    {
+      "id": "labels",
+      "kind": "video",
+      "order": 3,
+      "muted": false,
+      "locked": false,
+      "clips": [
+        {
+          "id": "marker_clip",
+          "timeline_start_tick": 0,
+          "duration_tick": 360000,
+          "source_in_tick": 0,
+          "source_out_tick": 360000,
+          "asset_id": "marker_black",
+          "crop": {
+            "unit": "normalized",
+            "x": 0.03,
+            "y": 0.04,
+            "width": 0.95,
+            "height": 0.9,
+            "fit": "fit"
+          },
+          "transform": {
+            "scale": 0.7,
+            "position": {
+              "x": 0.5,
+              "y": 0.55
+            },
+            "anchor": {
+              "x": 0.4,
+              "y": 0.6
+            }
+          },
+          "keyframes": [
+            {
+              "property": "crop.width",
+              "keyframes": [
+                {
+                  "at_tick": 0,
+                  "value": 0.95,
+                  "interpolation": "linear"
+                },
+                {
+                  "at_tick": 180000,
+                  "value": 0.55,
+                  "interpolation": "linear"
+                },
+                {
+                  "at_tick": 360000,
+                  "value": 0.8,
+                  "interpolation": "linear"
+                }
+              ]
+            },
+            {
+              "property": "crop.height",
+              "keyframes": [
+                {
+                  "at_tick": 0,
+                  "value": 0.9,
+                  "interpolation": "linear"
+                },
+                {
+                  "at_tick": 180000,
+                  "value": 0.65,
+                  "interpolation": "linear"
+                },
+                {
+                  "at_tick": 360000,
+                  "value": 0.8,
+                  "interpolation": "linear"
+                }
+              ]
+            },
+            {
+              "property": "transform.rotation",
+              "keyframes": [
+                {
+                  "at_tick": 0,
+                  "value": -20,
+                  "interpolation": "linear"
+                },
+                {
+                  "at_tick": 180000,
+                  "value": 35,
+                  "interpolation": "linear"
+                },
+                {
+                  "at_tick": 360000,
+                  "value": -20,
+                  "interpolation": "linear"
+                }
+              ]
+            },
+            {
+              "property": "transform.scale",
+              "keyframes": [
+                {
+                  "at_tick": 0,
+                  "value": 0.7,
+                  "interpolation": "linear"
+                },
+                {
+                  "at_tick": 180000,
+                  "value": 0.55,
+                  "interpolation": "linear"
+                },
+                {
+                  "at_tick": 360000,
+                  "value": 0.75,
+                  "interpolation": "linear"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "titles",
+      "kind": "subtitle",
+      "order": 4,
+      "muted": false,
+      "locked": false,
+      "clips": [
+        {
+          "id": "title_clip",
+          "timeline_start_tick": 0,
+          "duration_tick": 360000,
+          "source_in_tick": 0,
+          "source_out_tick": 360000,
+          "generator": {
+            "type": "text"
+          },
+          "transform": {
+            "scale": 0.65,
+            "position": {
+              "x": 0.5,
+              "y": 0.16
+            }
+          },
+          "keyframes": [
+            {
+              "property": "transform.rotation",
+              "keyframes": [
+                {
+                  "at_tick": 0,
+                  "value": -10,
+                  "interpolation": "linear"
+                },
+                {
+                  "at_tick": 180000,
+                  "value": 10,
+                  "interpolation": "linear"
+                },
+                {
+                  "at_tick": 360000,
+                  "value": -10,
+                  "interpolation": "linear"
+                }
+              ]
+            }
+          ],
+          "subtitle": {
+            "text": "OPEN AGENT",
+            "style": {
+              "font_asset_id": "local_font",
+              "fontsize": 36,
+              "fontcolor": "#f5cf66",
+              "box": false,
+              "borderw": 0,
+              "shadowx": 0,
+              "shadowy": 0,
+              "x": "(w-text_w)/2",
+              "y": "(h-text_h)/2"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "markers": []
+}
