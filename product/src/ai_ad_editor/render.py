@@ -21,6 +21,7 @@ from .audio_tempo import (CONTEXT_FRAMES as _audio_context_frames,
 from .artifact_locks import verification_scope
 from .sequence_canvas import sequence_canvas, validate_output_alignment
 from .sequence_sampling import configuration as _sequence_sampling_configuration, projection_budget, area_rectangle
+from .source_transitions import compile_for_render as _compile_source_transitions
 
 from .errors import AppError, dependency_error
 from .media import ffmpeg_path, probe_media
@@ -2948,11 +2949,68 @@ def _build_subtitle_layer(
     }
 
 
+def _resolve_source_visual_transitions(specs, filters, *, prefix=''):
+    """Fold declared source-handle chains before legacy edge transitions.
+
+    Every participating picture is already on its own full canvas. The
+    source windows overlap exactly; no frame replication is permitted here.
+    """
+    tracks = {}
+    for spec in specs:
+        tracks.setdefault(str(spec.get('track_id')), []).append(spec)
+    result = []
+    count = 0
+    for rows in tracks.values():
+        rows.sort(key=lambda s: (s['start'], str(s.get('clip_id'))))
+        i = 0
+        while i < len(rows):
+            current = rows[i]
+            while (current.get('outgoing') or {}).get('source_transition_id'):
+                config = current['outgoing']
+                following = rows[i+1] if i+1 < len(rows) else None
+                if following is None or (following.get('incoming') or {}).get('source_transition_id') != config['source_transition_id']:
+                    raise AppError('SOURCE_TRANSITION_RENDER_PAIR', '真实句柄转场未找到同组入片；未退回近似', exit_code=2)
+                seconds = float(config['duration'])
+                if abs(current['start']+current['duration']-following['start']-seconds) > 1e-7:
+                    raise AppError('SOURCE_TRANSITION_RENDER_CLOCK', '真实句柄窗口未精确重叠；未补帧', exit_code=2)
+                a, b, out = (f'{prefix}source_tr{count}_{side}' for side in ('a', 'b', 'out'))
+                count += 1
+                for spec, label in ((current, a), (following, b)):
+                    raster = ',format=gbrap' if config['type'] == 'custom' else ''
+                    filters.append(f"[{spec['label']}]trim=start={spec['start']:.12f}:end={spec['start']+spec['duration']:.12f},setpts=PTS-STARTPTS,settb=AVTB{raster}[{label}]")
+                expression = ''
+                if config['type'] == 'custom':
+                    # xfade P runs from 1 to 0. A cut-centred dip is two
+                    # separate ramps through an opaque RGB black/white frame;
+                    # the built-in fadewhite/black curves have other timing.
+                    split = 1-float(config['cut_fraction'])
+                    color = '255' if config['source_type'] == 'dip_white' else 'if(eq(PLANE,3),255,0)'
+                    if split >= 1:
+                        value = f'B*(1-P)+({color})*P'
+                    else:
+                        value = (f'if(gte(P,{split:.14g}),'
+                                 f'A*(P-{split:.14g})/{1-split:.14g}+({color})*(1-P)/{1-split:.14g},'
+                                 f'B*({split:.14g}-P)/{split:.14g}+({color})*P/{split:.14g})')
+                    expression = ':expr='+_expr_arg(value)
+                filters.append(f"[{a}][{b}]xfade=transition={config['type']}:duration={seconds:.12f}:offset={current['duration']-seconds:.12f}{expression},setpts=PTS-STARTPTS+{current['start']:.12f}/TB[{out}]")
+                current = {**current, 'label': out,
+                           'clip_id': f"{current.get('clip_id')}+{following.get('clip_id')}",
+                           'duration': following['start']+following['duration']-current['start'],
+                           'incoming': {}, 'outgoing': following.get('outgoing'), 'keyframes': [], 'clock': None}
+                i += 1
+            if (current.get('incoming') or {}).get('source_transition_id'):
+                raise AppError('SOURCE_TRANSITION_RENDER_PAIR', '真实句柄入片没有出片；未退回近似', exit_code=2)
+            result.append(current)
+            i += 1
+    return result
+
+
 def _resolve_visual_transitions(
     specs: list[dict[str, Any]], filters: list[str], warnings: list[dict[str, Any]],
     fps: dict[str, int], *, prefix: str = '',
 ) -> list[dict[str, Any]]:
     """Resolve adjacent visual transitions inside one compositing scope."""
+    specs = _resolve_source_visual_transitions(specs, filters, prefix=prefix)
     final_specs: list[dict[str, Any]] = []
     by_track: dict[str, list[dict[str, Any]]] = {}
     for spec in specs:
@@ -3528,6 +3586,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             raise AppError('TRACK_BIND_GEOMETRY_INVALID','绑定引用或源文件完整性检查失败',exit_code=2,cause=json.dumps(findings,ensure_ascii=False))
         project = compile_project_bindings(project)
         sequence = next(s for s in project['sequences'] if s['id'] == sequence['id'])
+    project, sequence, source_transition_plan = _compile_source_transitions(project, sequence['id'])
     settings = project["settings"]
     tps = int(settings["timebase"]["ticks_per_second"])
     root_canvas = sequence_canvas(project, sequence)
@@ -3548,6 +3607,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     video_specs: list[dict[str, Any]] = []
     audio_specs: list[dict[str, Any]] = []
     input_meta: list[dict[str, Any]] = []
+    if source_transition_plan:
+        input_meta.append({'kind': 'source-transition-plan', **source_transition_plan})
     warnings: list[dict[str, Any]] = []
     subtitle_overlays: list[dict[str, Any]] = []
     adjustment_layers: list[tuple[str, list[Any], float, float]] = []
@@ -3824,7 +3885,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 # RGBA overlay caches the first secondary raster dimensions.
                 # Keep a retimed/animated child on a fixed canvas instead of
                 # feeding a scale filter whose output dimensions vary by frame.
-                affine_canvas = (transforms['rotation'] != '0.00000000' or bool(clip.get('_tracking_binding_source'))
+                affine_canvas = (bool(clip.get('_source_handle')) or transforms['rotation'] != '0.00000000' or bool(clip.get('_tracking_binding_source'))
                                  or (clip.get('_composite_group') is not None and transforms['scale'] != '1.00000000'))
                 if affine_canvas:
                     chain.extend(_affine_video_filters(transforms))
@@ -3876,9 +3937,9 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                         chain.append(mask_filter)
                 incoming = clip.get("transition_in") if isinstance(clip.get("transition_in"), dict) else {}
                 outgoing = clip.get("transition_out") if isinstance(clip.get("transition_out"), dict) else {}
-                if str(incoming.get("type", "")).lower() in {"fade", "fade_in", "dissolve"}:
+                if not incoming.get('source_transition_id') and str(incoming.get("type", "")).lower() in {"fade", "fade_in", "dissolve"}:
                     chain.append(f"fade=t=in:st=0:d={max(0.001, _num(incoming.get('duration', 0.25), 0.25)):.6f}")
-                if str(outgoing.get("type", "")).lower() in {"fade", "fade_out", "dissolve"}:
+                if not outgoing.get('source_transition_id') and str(outgoing.get("type", "")).lower() in {"fade", "fade_out", "dissolve"}:
                     fade_duration = max(0.001, _num(outgoing.get("duration", 0.25), 0.25))
                     chain.append(f"fade=t=out:st={max(0.0, clip_content_duration + freeze_extra-fade_duration):.6f}:d={fade_duration:.6f}")
                 filters.append(",".join(chain) + f"[{label}]")
@@ -4029,10 +4090,19 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     )
                 elif freeze_duration > 0:
                     audio_chain.append(f"apad=pad_dur={freeze_duration:.6f}")
+                source_handle = clip.get('_source_handle')
+                fade_clock = ('t' if not source_handle else f'(t-{source_handle["head_tick"]/tps:.12f})')
+                authored_audio_duration = (content_duration+freeze_duration if not source_handle
+                                           else source_handle['authored_duration_tick']/tps)
                 audio_chain.extend(_audio_processing_filters(
                     clip, audio_settings, tps, audio_keyframe_time=audio_keyframe_time,
-                    fade_clock='t', authored_duration=content_duration+freeze_duration,
+                    fade_clock=fade_clock, authored_duration=authored_audio_duration,
                 ))
+                for envelope in clip.get('_source_audio_envelopes', []):
+                    local_start = (envelope['start_tick']-int(clip['timeline_start_tick']))/tps
+                    progress = f'clip((t-{local_start:.12f})/{envelope["duration_tick"]/tps:.12f},0,1)'
+                    gain = progress if envelope['edge'] == 'in' else f'(1-({progress}))'
+                    audio_chain.append(f"aeval=exprs={_expr_arg('val(ch)*('+gain+')')}:c=same")
                 audio_samples = max(1, math.ceil(Fraction((int(clip.get('timeline_start_tick', 0))+int(clip.get('duration_tick', 1)))*48000,tps))-math.ceil(Fraction(int(clip.get('timeline_start_tick', 0))*48000,tps)))
                 audio_start_sample = max(0, math.ceil(Fraction(int(clip.get('timeline_start_tick', 0))*48000,tps)))
                 audio_chain.extend([f'apad=whole_len={audio_samples}', f'atrim=end_sample={audio_samples}',

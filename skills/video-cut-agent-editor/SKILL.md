@@ -7,6 +7,14 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 Use this skill when the requested edit should be represented as a reproducible local Agent Project rather than a GUI project. The implementation lives in `product/` in this project.
 
+For reversible cut transitions, read the [real source-handle contract](../../docs/specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md).
+Use `timeline transition --input <request.json> --dry-run` with add/resize/remove.
+The plan's `project_sha256` can bind formal application. Inspect actual source
+head/tail ticks and frozen linked audio pairs. Clips, cut and sequence length
+stay authored; short handles reject rather than clone a frame. The first
+version requires direct local video, exact frame/tick grids and constant speed;
+nested/curve/freeze/tracking/blend cases explicitly reject. Preserve those errors.
+
 For readable subtitle segments or local piece corrections, read the
 [subtitle segmentation contract](../../docs/specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md).
 Use `subtitle segment --project <root> --input <caption-or-ASR-report-or-source.json>

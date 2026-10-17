@@ -394,3 +394,9 @@ manifest `sequence-projection-budget` 保存可达节点与分量，`sequence-co
 `subtitle segment` 使用已有原生 Node ≥22.2 调用固定纯算法，无 npm/npx、GUI、浏览器或网络。`--mode original|translation|bilingual`，后两者要求明确提供译文；`--corrections` 必须绑定本次输入原字节 SHA，`part` 从 0 起，规则及纠正文件均进入幂等指纹。`--apply --track-id` 才入轨，`--replace-track` 显式替换；输出始终为项目 assets 内新文件，不覆盖已有文件。无 apply 的正式执行仍登记 JSON/SRT 资产，新文字许可默认未核验。
 
 无词标时估时；有起点标记仍估算词内部，不作强制对齐或模型翻译。字幕输入只迁移纯文字及时钟。详见[完整参数、输入与边界](./本地字幕分段与局部回写契约_v0.1_2026-10-17.md)、[实测/失败](../validation/本地字幕分段与双语回写实测_2026-10-17.md)。
+
+## V35：真实源句柄转场编辑
+
+`timeline transition --project --input [--sequence-id] [--expected-project-sha256] --dry-run` 支持 add/resize/remove；正式执行建立快照并加入既有锁、事务、幂等和 Rights Ledger 路径。compose 可批量执行 `source_transition`。输入采用整数 tick、显式同轨片段引用；linked 音频在添加时推导并冻结。
+
+作者片段和工程时长不变；渲染副本扩展真实源范围，缺少余量即拒绝，不使用旧 auto_handle 的末帧复制。原作者动画、字幕和音频包络时钟保留；新增淡化与之相乘。支持非交叠多剪口链，黑白场在原剪口达到不透明黑/白。首版拒绝嵌套、曲线/定格、跟踪绑定、片段 blend、图片/生成器与旧式转场冲突；原生数据可往返，外部格式明确 Unsupported。见[完整契约](./真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md)。

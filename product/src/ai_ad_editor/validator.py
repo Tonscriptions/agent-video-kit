@@ -10,6 +10,7 @@ from .errors import AppError
 from .speed_curves import compile_curve
 from .sequence_canvas import validate_canvas
 from .edit_planner import validate_editing
+from .source_transitions import analyze as analyze_source_transitions
 
 from .policy import reference_kind, resolve_local_path
 from .project import asset_map
@@ -385,6 +386,10 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
     sequence_ids: set[str] = set()
     for si, sequence in enumerate(project.get("sequences", [])):
         sp = f"sequences[{si}]"
+        try:
+            analyze_source_transitions(project, sequence)
+        except AppError as exc:
+            error(exc.code, exc.message, (exc.path or 'sequence.source_transitions').replace('sequence.', sp+'.', 1))
         try:
             validate_editing(sequence)
         except AppError as exc:

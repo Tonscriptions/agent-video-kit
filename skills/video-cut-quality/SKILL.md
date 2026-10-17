@@ -5,6 +5,15 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [real source handles](../../docs/specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md),
+inspect the `source-transition-plan` manifest node and real decoded source
+frame identities around the cut. Check window math, unchanged duration,
+multi-cut chains, source bounds and removal restoration. Compare PCM against
+an independently mixed envelope; AAC/GIF are preview copies. Inspect the
+actual black/white dip at the authored cut, including odd frame windows.
+Passing a catalog render checks execution, not an independent inside-window
+reference for every wipe/slide, natural quality, HDR or listening acceptance.
+
 For [subtitle segmentation](../../docs/specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md),
 check source character coverage, displayed punctuation, line-bound clocks,
 shared translation spans, number/unit protection and correction SHA-256.

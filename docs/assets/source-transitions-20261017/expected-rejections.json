@@ -1,0 +1,120 @@
+[
+  {
+    "case": "oversized-window",
+    "response": {
+      "ok": false,
+      "command": "timeline.transition",
+      "request_id": "req_20261017154515_1029be1c",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "SOURCE_TRANSITION_WINDOW",
+          "message": "转场时长必须小于每个参与片段的原时长",
+          "path": "sequence.source_transitions",
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T15:45:15.031697Z",
+        "finished_at": "2026-10-17T15:45:15.031704Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "case": "stale-hash",
+    "response": {
+      "ok": false,
+      "command": "timeline.transition",
+      "request_id": "req_20261017154516_c22f7b82",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "EDIT_PROJECT_CHANGED",
+          "message": "项目已偏离规划摘要，请重新规划",
+          "path": null,
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T15:45:16.208113Z",
+        "finished_at": "2026-10-17T15:45:16.208119Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "case": "shortfall",
+    "project_unchanged": true,
+    "response": {
+      "ok": false,
+      "command": "timeline.transition",
+      "request_id": "req_20261017154821_4ecfa2ad",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "SOURCE_TRANSITION_HANDLE_SHORTFALL",
+          "message": "片段 video_b_clip 缺少真实源句柄；未补帧/补静音/缩短转场",
+          "path": "sequence.source_transitions",
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T15:48:21.446603Z",
+        "finished_at": "2026-10-17T15:48:21.446652Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "case": "locked",
+    "project_unchanged": true,
+    "response": {
+      "ok": false,
+      "command": "timeline.transition",
+      "request_id": "req_20261017154824_2c9cf1fe",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "SOURCE_TRANSITION_LOCKED",
+          "message": "参与音画轨道被锁定；整组操作拒绝",
+          "path": "sequence.source_transitions",
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T15:48:24.868652Z",
+        "finished_at": "2026-10-17T15:48:24.868663Z",
+        "network": "disabled"
+      }
+    }
+  }
+]

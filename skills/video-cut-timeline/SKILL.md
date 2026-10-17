@@ -14,6 +14,17 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+Use [real source transitions](../../docs/specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md)
+for add/resize/remove across an exact same-track cut. The declaration lives in
+`sequence.source_transitions`; compose batches `{op: "source_transition",
+transition: <request>}`. Authored clips, original keyframe/subtitle clocks and
+sequence length stay put. The renderer extends source windows on a detached
+copy, supports nonintersecting cut chains, and multiplies separate linked-audio
+envelopes. Review `audio=none` when intentionally omitting linkage. Locked audio,
+source shortfall and stale/deleted cut references reject. Native black/white
+dips reach that color at the original cut; legacy auto_handle still reports
+its tail-clone approximation. First-version exclusions are in the contract.
+
 Use the [linked edit planner](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md)
 for link/unlink/remove/close_gap/close_gaps/shift on whole clips. Configure
 `sequence.editing` (main_track_id/sync/linkage/linked), per-track `sync_lock`

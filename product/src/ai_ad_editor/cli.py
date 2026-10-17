@@ -44,6 +44,7 @@ from .project import (
 from .quality import GOLDEN_VERSION, build_golden_manifest, check_output, compare_golden_manifest, normalize_golden_constraints, validate_golden_manifest
 from .sequence_sampling import configuration as sequence_sampling_configuration
 from .edit_planner import build_edit_plan, project_fingerprint as edit_project_fingerprint
+from .source_transitions import build_plan as build_source_transition_plan
 from .mask_review import prepare as prepare_mask_review, review as review_mask
 from .mask_tracking import ENGINE as MASK_TRACKING_ENGINE, prepare as prepare_mask_tracking, execute as execute_mask_tracking, public_plan as public_mask_tracking_plan
 from .recommend import recommend_highlights
@@ -697,6 +698,11 @@ def build_parser() -> argparse.ArgumentParser:
     edit.add_argument("--input", required=True, help="本地编辑请求 JSON；先用 --dry-run 查看影响")
     edit.add_argument("--sequence-id", default=None)
     edit.add_argument("--expected-project-sha256", default=None, help="可选：只应用于 dry-run 返回的项目摘要")
+    transition = _leaf_common(ts.add_parser('transition', help='添加、调长、移除真实源句柄转场；保持剪口和总时长'))
+    transition.add_argument('--project', required=True)
+    transition.add_argument('--input', required=True)
+    transition.add_argument('--sequence-id', default=None)
+    transition.add_argument('--expected-project-sha256', default=None)
 
     validate = _leaf_common(subs.add_parser("validate", help="验证项目"))
     validate.add_argument("--project", required=True)
@@ -4601,6 +4607,31 @@ def command_timeline_edit(args: argparse.Namespace) -> dict[str, Any]:
                      warnings=warnings, operation_id=operation_id)
 
 
+def command_timeline_transition(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    sequence = find_sequence(project, args.sequence_id)
+    if args.expected_project_sha256 is not None and args.expected_project_sha256 != edit_project_fingerprint(project):
+        raise AppError('EDIT_PROJECT_CHANGED', '项目已偏离规划摘要，请重新规划', exit_code=2)
+    validation = validate_project(root, project, strict_rights=False)
+    if not validation['ok']:
+        raise AppError('PROJECT_INVALID', '转场编辑前工程无效', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    candidate, plan = build_source_transition_plan(project, sequence['id'], _load_changes(args.input))
+    validation = validate_project(root, candidate, strict_rights=False)
+    if not validation['ok']:
+        raise AppError('PROJECT_INVALID', '转场编辑后工程无效', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    data = {'sequence_id': sequence['id'], 'plan': plan, 'validation': validation}
+    if args.dry_run:
+        return _envelope('timeline.transition', args, status='planned', data=data)
+    snapshot = create_snapshot(root, project, label='before-source-transition')
+    operation_id = new_id('op')
+    record = {'operation_id': operation_id, 'command': 'timeline.transition', 'created_at': now_iso(),
+              'before_snapshot_id': snapshot['snapshot_id'], 'plan': plan}
+    candidate.setdefault('provenance', {}).setdefault('change_log', []).append(copy.deepcopy(record))
+    save_project(root, candidate)
+    _operation(root, operation_id, {**record, 'status': 'succeeded'})
+    return _envelope('timeline.transition', args, data={**data, 'before_snapshot': snapshot}, operation_id=operation_id)
+
+
 def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     changes = _load_changes(args.input)
@@ -4616,7 +4647,11 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
     applied: list[dict[str, Any]] = []
     for change in operations:
         operation = change.get("op", "append_clip")
-        if operation == 'linked_edit':
+        if operation == 'source_transition':
+            target_sequence = find_sequence(working, change.get('sequence_id') or sequence['id'])
+            working, plan = build_source_transition_plan(working, target_sequence['id'], change.get('transition'))
+            applied.append({'op': operation, 'plan': plan})
+        elif operation == 'linked_edit':
             edit_validation = validate_project(root, working, strict_rights=False)
             if not edit_validation['ok']:
                 raise AppError('PROJECT_INVALID', '关联编辑前批次工程无效', exit_code=2,
@@ -6102,6 +6137,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("motion", "apply"): command_motion_apply,
     ("timeline", "compose"): command_timeline_compose,
     ("timeline", "edit"): command_timeline_edit,
+    ("timeline", "transition"): command_timeline_transition,
     ("validate", None): command_validate,
     ("rights", "check"): command_rights_check,
     ("rights", "list"): command_rights_list,

@@ -1,0 +1,82 @@
+test_authored_audio_volume_and_fades_keep_phase_when_head_extended (test_source_transitions.SourceTransitionCliTests.test_authored_audio_volume_and_fades_keep_phase_when_head_extended) ... FAIL
+test_compose_source_transition_batch_atomicity (test_source_transitions.SourceTransitionCliTests.test_compose_source_transition_batch_atomicity) ... ok
+test_dry_run_snapshot_idempotency_and_stale_hash (test_source_transitions.SourceTransitionCliTests.test_dry_run_snapshot_idempotency_and_stale_hash) ... ok
+test_failure_after_save_rolls_back_all_metadata (test_source_transitions.SourceTransitionCliTests.test_failure_after_save_rolls_back_all_metadata) ... ok
+test_native_roundtrips_preserve_and_external_formats_report_loss (test_source_transitions.SourceTransitionCliTests.test_native_roundtrips_preserve_and_external_formats_report_loss) ... FAIL
+test_real_source_crossfade_chain_pixels_and_independent_pcm (test_source_transitions.SourceTransitionCliTests.test_real_source_crossfade_chain_pixels_and_independent_pcm) ... ok
+test_reverse_source_frames_are_taken_from_real_opposite_handles (test_source_transitions.SourceTransitionCliTests.test_reverse_source_frames_are_taken_from_real_opposite_handles) ... ok
+test_schema_fallback_and_stale_cut_both_reject (test_source_transitions.SourceTransitionCliTests.test_schema_fallback_and_stale_cut_both_reject) ... ok
+test_any_participating_audio_lock_rejects_all_three_actions (test_source_transitions.SourceTransitionPlannerTests.test_any_participating_audio_lock_rejects_all_three_actions) ... ok
+test_constant_speed_scales_handles_without_floats (test_source_transitions.SourceTransitionPlannerTests.test_constant_speed_scales_handles_without_floats) ... ok
+test_duplicate_window_on_same_cut_rejects (test_source_transitions.SourceTransitionPlannerTests.test_duplicate_window_on_same_cut_rejects) ... ok
+test_fractional_frame_rate_odd_window_bias_is_exact (test_source_transitions.SourceTransitionPlannerTests.test_fractional_frame_rate_odd_window_bias_is_exact) ... ok
+test_global_duplicate_id_and_missing_reference_reject (test_source_transitions.SourceTransitionPlannerTests.test_global_duplicate_id_and_missing_reference_reject) ... ok
+test_invalid_input_types_and_unknown_fields_reject (test_source_transitions.SourceTransitionPlannerTests.test_invalid_input_types_and_unknown_fields_reject) ... ok
+test_legacy_edge_transition_is_not_overwritten (test_source_transitions.SourceTransitionPlannerTests.test_legacy_edge_transition_is_not_overwritten) ... ok
+test_linked_audio_edge_mismatch_requires_explicit_none (test_source_transitions.SourceTransitionPlannerTests.test_linked_audio_edge_mismatch_requires_explicit_none) ... ok
+test_mismatched_constant_source_clock_rejects (test_source_transitions.SourceTransitionPlannerTests.test_mismatched_constant_source_clock_rejects) ... ok
+test_nested_use_of_transition_sequence_rejects (test_source_transitions.SourceTransitionPlannerTests.test_nested_use_of_transition_sequence_rejects) ... ok
+test_pure_planning_uses_no_processes (test_source_transitions.SourceTransitionPlannerTests.test_pure_planning_uses_no_processes) ... ok
+test_render_copy_keeps_authored_clocks_and_model_immutable (test_source_transitions.SourceTransitionPlannerTests.test_render_copy_keeps_authored_clocks_and_model_immutable) ... ok
+test_resize_and_remove_restore_original_authored_model (test_source_transitions.SourceTransitionPlannerTests.test_resize_and_remove_restore_original_authored_model) ... ok
+test_reverse_extends_opposite_source_edges (test_source_transitions.SourceTransitionPlannerTests.test_reverse_extends_opposite_source_edges) ... ok
+test_second_cut_chain_preserves_both_middle_handles (test_source_transitions.SourceTransitionPlannerTests.test_second_cut_chain_preserves_both_middle_handles) ... ok
+test_short_source_head_rejects_without_duration_clamp (test_source_transitions.SourceTransitionPlannerTests.test_short_source_head_rejects_without_duration_clamp) ... ok
+test_short_source_tail_rejects_without_padding (test_source_transitions.SourceTransitionPlannerTests.test_short_source_tail_rejects_without_padding) ... ok
+test_source_subtick_extension_rejects (test_source_transitions.SourceTransitionPlannerTests.test_source_subtick_extension_rejects) ... FAIL
+test_source_windows_keep_cut_length_clips_and_linked_audio (test_source_transitions.SourceTransitionPlannerTests.test_source_windows_keep_cut_length_clips_and_linked_audio) ... ok
+test_unaccepted_clip_semantics_reject_explicitly (test_source_transitions.SourceTransitionPlannerTests.test_unaccepted_clip_semantics_reject_explicitly) ... ok
+test_unaligned_duration_and_author_boundary_reject (test_source_transitions.SourceTransitionPlannerTests.test_unaligned_duration_and_author_boundary_reject) ... FAIL
+
+======================================================================
+FAIL: test_authored_audio_volume_and_fades_keep_phase_when_head_extended (test_source_transitions.SourceTransitionCliTests.test_authored_audio_volume_and_fades_keep_phase_when_head_extended)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 412, in test_authored_audio_volume_and_fades_keep_phase_when_head_extended
+    _, before, _ = self.render('audio-before')
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 282, in render
+    self.assertEqual(code, 0, result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261017152649_d8c5230a', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'PROJECT_INVALID', 'message': '项目验证失败，拒绝渲染', 'path': None, 'retryable': False, 'cause': '{"ok": false, "errors": [{"code": "SCHEMA_VALIDATION_FAILED", "message": "\'interpolation\' is a required property", "path": "sequences.0.tracks.1.clips.1.keyframes.0.keyframes.0", "retryable": false}, {"code": "SCHEMA_VALIDATION_FAILED", "message": "\'interpolation\' is a required property", "path": "sequences.0.tracks.1.clips.1.keyframes.0.keyframes.1", "retryable": false}, {"code": "INTERPOLATION_INVALID", "message": "关键帧插值类型无效", "path": "sequences[0].tracks[1].clips[1].keyframes", "retryable": false}, {"code": "INTERPOLATION_INVALID", "message": "关键帧插值类型无效", "path": "sequences[0].tracks[1].clips[1].keyframes", "retryable": false}], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "sound", "rights_ref": "sound", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "sound", "rights_ref": "sound", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "sound", "rights_ref": "sound", "record_version": 1, "context": "project_asset"}], "rights": {"ok": true, "target": "commercial_ad", "checked": 2, "required_records": 2, "failures": [], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "sound", "rights_ref": "sound", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "sound", "rights_ref": "sound", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "sound", "rights_ref": "sound", "record_version": 1, "context": "project_asset"}], "disposition_decisions": [], "effective_disposition_decisions": []}, "schema_engine": "jsonschema", "asset_count": 2, "sequence_count": 1}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T15:26:49.112410Z', 'finished_at': '2026-10-17T15:26:49.112416Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_native_roundtrips_preserve_and_external_formats_report_loss (test_source_transitions.SourceTransitionCliTests.test_native_roundtrips_preserve_and_external_formats_report_loss)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 354, in test_native_roundtrips_preserve_and_external_formats_report_loss
+    self.assertTrue(any(i.get('path') == 'sequence.source_transitions' and i.get('status') == 'Unsupported' for i in report['items']), report)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'report_version': '0.1.0', 'direction': 'export', 'source_format': 'agent-project/0.1.0', 'target_format': 'opentimelineio-json', 'created_at': '2026-10-17T15:26:51.031989Z', 'items': [{'capability': 'project-model', 'status': 'Mapped', 'source': 'Agent Project JSON', 'target': 'OpenTimelineIO JSON', 'detail': '使用标准 Stack/Track/Gap/Clip 节点；完整本地片段保存在 ai_ad_editor metadata'}, {'capability': 'timeline-editing', 'status': 'Unsupported', 'source': 'sequence.source_transitions', 'target': None, 'detail': '外部格式不执行本地关联/同步锁/主轨跟随、真实源句柄转场或文件字幕时钟偏移；metadata 保存不代表外部编辑等效'}, {'capability': 'timeline-editing', 'status': 'Unsupported', 'source': 'clip.link_id', 'target': None, 'detail': '外部格式不执行本地关联/同步锁/主轨跟随、真实源句柄转场或文件字幕时钟偏移；metadata 保存不代表外部编辑等效'}], 'warnings': [{'capability': 'timeline-editing', 'status': 'Unsupported', 'source': 'sequence.source_transitions', 'target': None, 'detail': '外部格式不执行本地关联/同步锁/主轨跟随、真实源句柄转场或文件字幕时钟偏移；metadata 保存不代表外部编辑等效'}, {'capability': 'timeline-editing', 'status': 'Unsupported', 'source': 'clip.link_id', 'target': None, 'detail': '外部格式不执行本地关联/同步锁/主轨跟随、真实源句柄转场或文件字幕时钟偏移；metadata 保存不代表外部编辑等效'}], 'failures': []}
+
+======================================================================
+FAIL: test_source_subtick_extension_rejects (test_source_transitions.SourceTransitionPlannerTests.test_source_subtick_extension_rejects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 141, in test_source_subtick_extension_rejects
+    self.rejects(p, add(duration_tick=3, audio='none'), 'SOURCE_TRANSITION_SOURCE_GRID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 67, in rejects
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_unaligned_duration_and_author_boundary_reject (test_source_transitions.SourceTransitionPlannerTests.test_unaligned_duration_and_author_boundary_reject)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 147, in test_unaligned_duration_and_author_boundary_reject
+    self.rejects(p, add(), 'SOURCE_TRANSITION_CUT')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 69, in rejects
+    self.assertEqual(caught.exception.code, code)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'SOURCE_TRANSITION_LINK_EDGE_MISMATCH' != 'SOURCE_TRANSITION_CUT'
+- SOURCE_TRANSITION_LINK_EDGE_MISMATCH
++ SOURCE_TRANSITION_CUT
+
+
+----------------------------------------------------------------------
+Ran 29 tests in 6.492s
+
+FAILED (failures=4)

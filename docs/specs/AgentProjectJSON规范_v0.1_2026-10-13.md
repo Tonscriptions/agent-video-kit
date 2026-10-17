@@ -212,3 +212,11 @@ method 默认 bilinear，仅允许 bilinear/area；max_working_bytes 默认 1 Gi
 本增量不更改项目 Schema。`subtitle segment` 登记 `kind=generated` 的 JSON 报告资产和 `kind=subtitle` 的 SRT 资产；报告 Rights Ledger 的 derived_from 引用已核验摘要的明确来源，SRT 再依赖报告。新增文字/译文从 unverified/internal 开始，不继承父素材的公开授权。
 
 入轨使用原生 text generator，`rights_dependencies=[{rights_ref,sha256}]` 指向生成 SRT，`extensions.subtitle_segment={source_asset_id,line_id,parts}` 追溯报告资产及原句/片段。源 JSON/报告使用 Unicode 码点和绝对整数 tick；显式入轨偏移只应用于显示 cue/SRT/时间线。原文标点与纠正前后内容保留，样式不从 ASS/TTML 迁入。JSON/SRT 及权利依赖已通过真实项目包导出/重导入专项。见[分段契约](./本地字幕分段与局部回写契约_v0.1_2026-10-17.md)。
+
+## V35：声明式真实源句柄转场
+
+可选 `sequence.source_transitions` 数组最多 256 项，每项严格包含 id/type/duration_tick/from_clip_id/to_clip_id/audio_pairs 六字段。audio_pairs 为显式 from_clip_id/to_clip_id 音频引用对，须处于同一音轨、同一剪口。12 个 type 与精确帧/tick 网格、全局 ID 唯一性、窗口不相交和真实源余量由机器 Schema + builtin 语义校验共同约束。
+
+声明不改 clip 时间、源范围、动画或序列总长。渲染 copy 增加内部真实窗口和原作者时钟；manifest 的 source-transition-plan 明确实际取源、窗口、配对、算法，内部字段不保存为作者 clip。恒速/倒放按精确 Fraction 规划；黑白场通过固定 8-bit gbrap custom xfade，在原剪口达到不透明目标色。删除最后一项会清除该字段。
+
+项目版本继续 0.1.0，此字段为可选增量；没有把旧 auto_handle 自动迁移为真实句柄。原生 JSON/package 保留；外部 OTIO/Kdenlive/明文草稿报告 Unsupported、strict 阻断，不以旁车保留称外部执行。跟踪/嵌套/曲线/定格/图片等首版拒绝范围见[转场契约](./真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md)。

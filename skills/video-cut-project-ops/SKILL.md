@@ -5,6 +5,14 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+For [source-handle transitions](../../docs/specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md),
+`timeline transition` uses the existing project lock, metadata transaction and
+`before-source-transition` snapshot. Its `project_sha256` binds the optional
+expected hash; replay the same idempotency request without reapplying it.
+Remove the declaration to restore source ranges; no clip restoration journal
+is needed. Native JSON/package preserve it; external formats report
+`sequence.source_transitions` as Unsupported and strict export rejects.
+
 For [linked edits](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md),
 dry-run is read-only. Formal `timeline edit` makes a before-timeline-edit
 snapshot and records its plan in the existing metadata transaction. Supply

@@ -189,8 +189,21 @@
             "sync": {"type": "boolean"}, "linkage": {"type": "boolean"}, "linked": {"type": "boolean"}
           }
         },
+        "source_transitions": {"type": "array", "maxItems": 256, "items": {"$ref": "#/$defs/sourceTransition"}},
         "tracks": {"type": "array", "items": {"$ref": "#/$defs/track"}},
         "markers": {"type": "array", "items": {"type": "object"}}
+      }
+    },
+    "sourceTransition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "type", "duration_tick", "from_clip_id", "to_clip_id", "audio_pairs"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "type": {"enum": ["dissolve", "crossfade", "dip_black", "dip_white", "wipe_left", "wipe_right", "wipe_up", "wipe_down", "slide_left", "slide_right", "slide_up", "slide_down"]},
+        "duration_tick": {"$ref": "#/$defs/positiveInteger"},
+        "from_clip_id": {"$ref": "#/$defs/id"}, "to_clip_id": {"$ref": "#/$defs/id"},
+        "audio_pairs": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+          "required": ["from_clip_id", "to_clip_id"], "properties": {"from_clip_id": {"$ref": "#/$defs/id"}, "to_clip_id": {"$ref": "#/$defs/id"}}}}
       }
     },
     "track": {

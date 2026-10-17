@@ -174,6 +174,8 @@ def _content(clip):
 def interchange_features(project):
     """Native authoring semantics that external formats do not implement."""
     features = []
+    if any(s.get('source_transitions') for s in project['sequences']):
+        features.append('sequence.source_transitions')
     if any(s.get('editing') is not None for s in project['sequences']):
         features.append('sequence.editing')
     if any('sync_lock' in t for s in project['sequences'] for t in s['tracks']):

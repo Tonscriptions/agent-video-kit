@@ -156,6 +156,12 @@ def build_capability_manifest() -> dict[str, Any]:
                 "status": "implemented",
                 "features": ["fade", "crossfade", "dissolve", "wipe", "slide", "circlecrop", "rectcrop", "distance", "fadeblack", "fadewhite", "radial", "smooth", "circleopen", "circleclose", "pixelize", "zoomin", "cover", "reveal", "diagonal", "slice", "wind", "blur", "fadegrays", "squeeze", "auto_handle_contiguous_clips"],
                 "xfade_catalog": "local_ffmpeg_xfade",
+                "source_handle_editor": {
+                    "engine": "agent-source-transition-v1", "command": "timeline transition",
+                    "actions": ["add", "resize", "remove"], "field": "sequence.source_transitions",
+                    "features": ["real_source_windows", "unchanged_authored_clips_and_duration", "linked_audio_pairs", "independent_linear_audio_envelopes", "multi_cut_chain", "constant_speed_and_reverse", "native_black_white_dip"],
+                    "limits": ["direct_video_and_explicit_audio_tracks_only", "exact_display_frame_and_integer_source_tick_grid", "source_span_must_match_constant_speed", "no_nested_source_curves_freeze_tracking_or_per_clip_blend", "legacy_transition_fields_conflict", "nonintersecting_windows", "all_natural_quality_hdr_vfr_and_performance_not_accepted"],
+                },
                 "condition": "manual transitions require adjacent clips with matching overlap handles; auto_handle=true or handle_policy=auto enables contiguous clips and preserves their authored timeline length with an explicit tail-padding approximation warning",
             },
             "subtitles": {
