@@ -1,0 +1,135 @@
+{
+  "model": [
+    {
+      "index": 0,
+      "clips": [
+        {
+          "id": "intro",
+          "startMs": 0,
+          "endMs": 1000,
+          "inMs": 0,
+          "speed": 1,
+          "sourceMs": 60000
+        },
+        {
+          "id": "remove",
+          "startMs": 1000,
+          "endMs": 3000,
+          "inMs": 0,
+          "speed": 1,
+          "sourceMs": 60000
+        },
+        {
+          "id": "outro",
+          "startMs": 3000,
+          "endMs": 5000,
+          "inMs": 0,
+          "speed": 1,
+          "sourceMs": 60000
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "role": "audio",
+      "clips": [
+        {
+          "id": "voice",
+          "startMs": 3000,
+          "endMs": 5000,
+          "inMs": 0,
+          "speed": 1,
+          "sourceMs": 60000
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "locked": true,
+      "role": "audio",
+      "clips": [
+        {
+          "id": "bed",
+          "startMs": 0,
+          "endMs": 5000,
+          "inMs": 0,
+          "speed": 1,
+          "sourceMs": 60000
+        }
+      ]
+    }
+  ],
+  "film": {
+    "stage": {
+      "w": 320,
+      "h": 180
+    },
+    "tracks": [
+      {
+        "clips": [
+          {
+            "id": "intro",
+            "src": "intro.mp4",
+            "at": 0,
+            "time": [
+              0,
+              1
+            ]
+          },
+          {
+            "id": "remove",
+            "src": "remove.mp4",
+            "at": 1,
+            "time": [
+              0,
+              2
+            ]
+          },
+          {
+            "id": "outro",
+            "src": "outro.mp4",
+            "at": 3,
+            "time": [
+              0,
+              2
+            ]
+          }
+        ]
+      },
+      {
+        "clips": [
+          {
+            "id": "voice",
+            "src": "voice.mp4",
+            "at": 3,
+            "time": [
+              0,
+              2
+            ]
+          }
+        ]
+      },
+      {
+        "locked": true,
+        "clips": [
+          {
+            "id": "bed",
+            "src": "bed.mp4",
+            "at": 0,
+            "time": [
+              0,
+              5
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "remove": [
+    "remove"
+  ],
+  "options": {
+    "ripple": true,
+    "sync": true
+  }
+}

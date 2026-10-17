@@ -1,0 +1,339 @@
+TAP version 13
+# (node:17524) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: a ripple delete closes the gap on its track only, without sync lock
+ok 1 - a ripple delete closes the gap on its track only, without sync lock
+  ---
+  duration_ms: 5.0639
+  ...
+# Subtest: with sync lock a ripple delete moves the other tracks too, never a locked one
+ok 2 - with sync lock a ripple delete moves the other tracks too, never a locked one
+  ---
+  duration_ms: 0.6815
+  ...
+# Subtest: a clip on a synced track in the way stops the ripple short, so nothing comes apart
+ok 3 - a clip on a synced track in the way stops the ripple short, so nothing comes apart
+  ---
+  duration_ms: 0.7798
+  ...
+# Subtest: a plain delete leaves the gap
+ok 4 - a plain delete leaves the gap
+  ---
+  duration_ms: 0.2712
+  ...
+# Subtest: linked clips are found by their link, and deleted together
+ok 5 - linked clips are found by their link, and deleted together
+  ---
+  duration_ms: 0.6453
+  ...
+# Subtest: deleting the clips of a locked track does nothing to them
+ok 6 - deleting the clips of a locked track does nothing to them
+  ---
+  duration_ms: 0.5378
+  ...
+# Subtest: a gap is the empty time between clips, or before the first; not after the last
+ok 7 - a gap is the empty time between clips, or before the first; not after the last
+  ---
+  duration_ms: 0.4507
+  ...
+# Subtest: closing a gap moves what is after it back, on every unlocked track with sync lock
+ok 8 - closing a gap moves what is after it back, on every unlocked track with sync lock
+  ---
+  duration_ms: 1.4262
+  ...
+# Subtest: a gap a synced track has no room for still closes, on its own track alone
+ok 9 - a gap a synced track has no room for still closes, on its own track alone
+  ---
+  duration_ms: 0.6535
+  ...
+# Subtest: how much source a clip can still show at each edge
+ok 10 - how much source a clip can still show at each edge
+  ---
+  duration_ms: 0.5452
+  ...
+# Subtest: the main track is the lowest picture track; the magnet acts on it alone
+ok 11 - the main track is the lowest picture track; the magnet acts on it alone
+  ---
+  duration_ms: 0.242
+  ...
+# Subtest: a clip rides on the main-track clip its start falls in, or the last one after the end
+ok 12 - a clip rides on the main-track clip its start falls in, or the last one after the end
+  ---
+  duration_ms: 0.1717
+  ...
+# Subtest: with linkage a ripple delete on the main track carries the titles and sound after it, whatever is in the way
+ok 13 - with linkage a ripple delete on the main track carries the titles and sound after it, whatever is in the way
+  ---
+  duration_ms: 1.1335
+  ...
+# Subtest: with linkage what rides on a deleted main-track clip goes with it; a bed under several shots stays
+ok 14 - with linkage what rides on a deleted main-track clip goes with it; a bed under several shots stays
+  ---
+  duration_ms: 0.5431
+  ...
+# Subtest: linkage: a carried clip that runs into one that stayed goes to a free track above, else a new one
+ok 15 - linkage: a carried clip that runs into one that stayed goes to a free track above, else a new one
+  ---
+  duration_ms: 0.9013
+  ...
+# Subtest: with the magnet a delete closes up the main track only; titles leave a gap
+ok 16 - with the magnet a delete closes up the main track only; titles leave a gap
+  ---
+  duration_ms: 1.2491
+  ...
+# Subtest: with linkage a ripple trim of a main-track clip carries what comes after it, not what rides on it
+ok 17 - with linkage a ripple trim of a main-track clip carries what comes after it, not what rides on it
+  ---
+  duration_ms: 0.6887
+  ...
+# Subtest: with linkage an insert on the main track pushes what comes after on every track
+ok 18 - with linkage an insert on the main track pushes what comes after on every track
+  ---
+  duration_ms: 0.3674
+  ...
+# Subtest: with linkage a main-track clip moved along the main track takes its titles along
+ok 19 - with linkage a main-track clip moved along the main track takes its titles along
+  ---
+  duration_ms: 0.8993
+  ...
+# Subtest: linkage leaves a long clip crossing more than one cut where it is: a music bed is the film's, not a shot's
+ok 20 - linkage leaves a long clip crossing more than one cut where it is: a music bed is the film's, not a shot's
+  ---
+  duration_ms: 0.4258
+  ...
+# Subtest: with the magnet a clip taken off the main track closes it up, wherever it lands
+ok 21 - with the magnet a clip taken off the main track closes it up, wherever it lands
+  ---
+  duration_ms: 0.3625
+  ...
+# Subtest: with the magnet clips moved together go in at the insert point by the first of them, whichever is in hand
+ok 22 - with the magnet clips moved together go in at the insert point by the first of them, whichever is in hand
+  ---
+  duration_ms: 0.536
+  ...
+# Subtest: with the magnet a clip let go on another off the main track covers nothing: it goes to a free track
+ok 23 - with the magnet a clip let go on another off the main track covers nothing: it goes to a free track
+  ---
+  duration_ms: 0.4702
+  ...
+# Subtest: clips moved together to new tracks keep their rows: a new track per track they came from
+ok 24 - clips moved together to new tracks keep their rows: a new track per track they came from
+  ---
+  duration_ms: 0.7761
+  ...
+# Subtest: with linkage closing a gap on the main track always closes it whole
+ok 25 - with linkage closing a gap on the main track always closes it whole
+  ---
+  duration_ms: 0.3587
+  ...
+# Subtest: turning the magnet on closes up the main track, before its first clip too, carrying what rides on it
+ok 26 - turning the magnet on closes up the main track, before its first clip too, carrying what rides on it
+  ---
+  duration_ms: 0.455
+  ...
+# Subtest: all the gaps on a track closed at once; on a title track only that track moves
+ok 27 - all the gaps on a track closed at once; on a title track only that track moves
+  ---
+  duration_ms: 0.2182
+  ...
+# Subtest: with linkage a slower main-track clip pushes what comes after on every track
+ok 28 - with linkage a slower main-track clip pushes what comes after on every track
+  ---
+  duration_ms: 0.4082
+  ...
+# Subtest: an insert goes before or after the clip under the hand, in a gap where it is put, past the end flush
+ok 29 - an insert goes before or after the clip under the hand, in a gap where it is put, past the end flush
+  ---
+  duration_ms: 0.125
+  ...
+# Subtest: insert pushes what comes after on, cutting a clip the point falls inside; sync takes the other tracks along
+ok 30 - insert pushes what comes after on, cutting a clip the point falls inside; sync takes the other tracks along
+  ---
+  duration_ms: 0.6343
+  ...
+# Subtest: overwrite takes the time off a track: trims, removes, cuts what spans it, leaves no slivers
+ok 31 - overwrite takes the time off a track: trims, removes, cuts what spans it, leaves no slivers
+  ---
+  duration_ms: 0.4903
+  ...
+# Subtest: room is never made on a locked track
+ok 32 - room is never made on a locked track
+  ---
+  duration_ms: 0.1138
+  ...
+# Subtest: an overwrite also cuts the sound linked to what it covers, on its own track, and nothing else there
+ok 33 - an overwrite also cuts the sound linked to what it covers, on its own track, and nothing else there
+  ---
+  duration_ms: 0.6115
+  ...
+# Subtest: a half cut alone by an insert is linked to nothing
+ok 34 - a half cut alone by an insert is linked to nothing
+  ---
+  duration_ms: 0.2806
+  ...
+# Subtest: a move in overwrite mode over a picture cuts its linked sound too
+ok 35 - a move in overwrite mode over a picture cuts its linked sound too
+  ---
+  duration_ms: 0.2076
+  ...
+# Subtest: a move in overwrite mode lands where it was let go and cuts what is under it
+ok 36 - a move in overwrite mode lands where it was let go and cuts what is under it
+  ---
+  duration_ms: 0.2424
+  ...
+# Subtest: a move in insert mode reorders: lifted out, the gap closes, in before or after the clip under the hand
+ok 37 - a move in insert mode reorders: lifted out, the gap closes, in before or after the clip under the hand
+  ---
+  duration_ms: 0.2073
+  ...
+# Subtest: an insert move takes its linked sound along and keeps the other tracks in sync
+ok 38 - an insert move takes its linked sound along and keeps the other tracks in sync
+  ---
+  duration_ms: 0.3121
+  ...
+# Subtest: a move onto a locked track, or off one, is refused
+ok 39 - a move onto a locked track, or off one, is refused
+  ---
+  duration_ms: 0.1633
+  ...
+# Subtest: a move to a new track opens it; an insert move still closes the gap it leaves
+ok 40 - a move to a new track opens it; an insert move still closes the gap it leaves
+  ---
+  duration_ms: 1.1699
+  ...
+# Subtest: a trim moves the same edge of linked clips, and stops at the first neighbor in the way
+ok 41 - a trim moves the same edge of linked clips, and stops at the first neighbor in the way
+  ---
+  duration_ms: 0.6595
+  ...
+# Subtest: a trim stops at the end of its source and at the shortest clip
+ok 42 - a trim stops at the end of its source and at the shortest clip
+  ---
+  duration_ms: 0.6267
+  ...
+# Subtest: a roll moves the cut: one clip longer, the next shorter, the film the same length
+ok 43 - a roll moves the cut: one clip longer, the next shorter, the film the same length
+  ---
+  duration_ms: 0.8382
+  ...
+# Subtest: a roll takes linked cuts along
+ok 44 - a roll takes linked cuts along
+  ---
+  duration_ms: 0.2765
+  ...
+# Subtest: a slip changes what a clip shows, not where or how long, inside its source
+ok 45 - a slip changes what a clip shows, not where or how long, inside its source
+  ---
+  duration_ms: 0.2093
+  ...
+# Subtest: a ripple trim of the tail moves what follows, on every synced track
+ok 46 - a ripple trim of the tail moves what follows, on every synced track
+  ---
+  duration_ms: 0.2513
+  ...
+# Subtest: a ripple trim stops where a synced track has no room
+ok 47 - a ripple trim stops where a synced track has no room
+  ---
+  duration_ms: 0.2101
+  ...
+# Subtest: a ripple trim of the head keeps the clip where it starts
+ok 48 - a ripple trim of the head keeps the clip where it starts
+  ---
+  duration_ms: 0.3147
+  ...
+# Subtest: Q and W trim to the playhead and close up
+ok 49 - Q and W trim to the playhead and close up
+  ---
+  duration_ms: 0.2813
+  ...
+# Subtest: slower in magnetic mode pushes what follows; otherwise it says how slow it can go
+ok 50 - slower in magnetic mode pushes what follows; otherwise it says how slow it can go
+  ---
+  duration_ms: 0.2253
+  ...
+# Subtest: linked clips get the speed together
+ok 51 - linked clips get the speed together
+  ---
+  duration_ms: 0.1476
+  ...
+# Subtest: link and unlink write data-link, and nothing else
+ok 52 - link and unlink write data-link, and nothing else
+  ---
+  duration_ms: 1.2265
+  ...
+# Subtest: a detached sound goes on a sound track with room, else on a new one under the sound tracks
+ok 53 - a detached sound goes on a sound track with room, else on a new one under the sound tracks
+  ---
+  duration_ms: 0.5299
+  ...
+# Subtest: the model joins a track spread over rows and leaves out drops not written yet
+ok 54 - the model joins a track spread over rows and leaves out drops not written yet
+  ---
+  duration_ms: 0.8
+  ...
+# Subtest: no plan makes two clips on a track overlap
+ok 55 - no plan makes two clips on a track overlap
+  ---
+  duration_ms: 1.4769
+  ...
+# (node:30224) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: cross dissolve: the incoming clip goes above, d earlier, and fades in over the outgoing one, which stays whole; with the magnet what follows closes up
+ok 56 - cross dissolve: the incoming clip goes above, d earlier, and fades in over the outgoing one, which stays whole; with the magnet what follows closes up
+  ---
+  duration_ms: 10.0385
+  ...
+# Subtest: cross dissolve without the magnet leaves what follows where it is; with sync lock other tracks close up too
+ok 57 - cross dissolve without the magnet leaves what follows where it is; with sync lock other tracks close up too
+  ---
+  duration_ms: 2.0146
+  ...
+# Subtest: cross dissolve takes the incoming clip's linked sound along: it overlaps on a sound track below, the sounds crossfade
+ok 58 - cross dissolve takes the incoming clip's linked sound along: it overlaps on a sound track below, the sounds crossfade
+  ---
+  duration_ms: 1.8083
+  ...
+# Subtest: a dissolve made when both pictures faded is still found, and resized to the outgoing one staying whole
+ok 59 - a dissolve made when both pictures faded is still found, and resized to the outgoing one staying whole
+  ---
+  duration_ms: 1.2904
+  ...
+# Subtest: audio crossfade between two sounds: the incoming one on a track below, overlapping
+ok 60 - audio crossfade between two sounds: the incoming one on a track below, overlapping
+  ---
+  duration_ms: 0.9896
+  ...
+# Subtest: dips: half the length each side of the cut, nothing moves; to white over a white page cut in below
+ok 61 - dips: half the length each side of the cut, nothing moves; to white over a white page cut in below
+  ---
+  duration_ms: 2.5375
+  ...
+# Subtest: a clip's edge with nothing against it: a fade; fade presets; locked tracks refuse
+ok 62 - a clip's edge with nothing against it: a fade; fade presets; locked tracks refuse
+  ---
+  duration_ms: 0.726
+  ...
+# Subtest: cutNear: the cut under the pointer, or a clip's edge alone
+ok 63 - cutNear: the cut under the pointer, or a clip's edge alone
+  ---
+  duration_ms: 0.363
+  ...
+# Subtest: fade handles: dragged inward on the frame grid, never past the other fade; linked clips at the same edge too
+ok 64 - fade handles: dragged inward on the frame grid, never past the other fade; linked clips at the same edge too
+  ---
+  duration_ms: 0.6584
+  ...
+# Subtest: a tile clicked: the cut between two selected clips, else the nearest edge of the selection, else the nearest cut
+ok 65 - a tile clicked: the cut between two selected clips, else the nearest edge of the selection, else the nearest cut
+  ---
+  duration_ms: 0.9774
+  ...
+1..65
+# tests 65
+# suites 0
+# pass 65
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 586.2608

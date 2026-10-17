@@ -1,0 +1,141 @@
+{
+  "plan": {
+    "ops": [
+      {
+        "op": "props",
+        "edits": [
+          {
+            "clip": "outro",
+            "prop": "at",
+            "value": 1
+          },
+          {
+            "clip": "voice",
+            "prop": "at",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "op": "remove",
+        "clip": "remove"
+      }
+    ],
+    "placed": {},
+    "shortMs": 0
+  },
+  "result": {
+    "stage": {
+      "w": 320,
+      "h": 180
+    },
+    "tracks": [
+      {
+        "clips": [
+          {
+            "id": "intro",
+            "src": "intro.mp4",
+            "at": 0,
+            "time": [
+              0,
+              1
+            ]
+          },
+          {
+            "id": "outro",
+            "src": "outro.mp4",
+            "at": 1,
+            "time": [
+              0,
+              2
+            ]
+          }
+        ]
+      },
+      {
+        "clips": [
+          {
+            "id": "voice",
+            "src": "voice.mp4",
+            "at": 1,
+            "time": [
+              0,
+              2
+            ]
+          }
+        ]
+      },
+      {
+        "locked": true,
+        "clips": [
+          {
+            "id": "bed",
+            "src": "bed.mp4",
+            "at": 0,
+            "time": [
+              0,
+              5
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "actual": [
+    [
+      [
+        "intro",
+        0,
+        1
+      ],
+      [
+        "outro",
+        1,
+        3
+      ]
+    ],
+    [
+      [
+        "voice",
+        1,
+        3
+      ]
+    ],
+    [
+      [
+        "bed",
+        0,
+        5
+      ]
+    ]
+  ],
+  "expected": [
+    [
+      [
+        "intro",
+        0,
+        1
+      ],
+      [
+        "outro",
+        1,
+        3
+      ]
+    ],
+    [
+      [
+        "voice",
+        1,
+        3
+      ]
+    ],
+    [
+      [
+        "bed",
+        0,
+        5
+      ]
+    ]
+  ],
+  "checks": "exact expected intervals, synced voice moves by 2s, locked bed unchanged"
+}

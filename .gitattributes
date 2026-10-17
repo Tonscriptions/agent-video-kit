@@ -96,3 +96,9 @@ scripts/smoke_audio_tempo_context.py -text
 docs/validation/evidence/*tempo-context*.json -text
 docs/validation/evidence/tempo-context*.log -text -whitespace
 docs/assets/audio-tempo-context-20261017/*.txt -whitespace
+
+# OpenFilm research preserves pinned archive, original failures and exact patches.
+scripts/audit_openfilm_reuse.py -text
+sources/upstream/openfilm/** -text
+docs/validation/evidence/openfilm-reuse-20261017.json -text
+docs/validation/evidence/openfilm-reuse-20261017/** -text -whitespace

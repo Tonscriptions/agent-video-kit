@@ -1,0 +1,4462 @@
+{
+  "started_at_utc": "2026-10-17T10:53:24.340822+00:00",
+  "finished_at_utc": "2026-10-17T10:53:35.694465+00:00",
+  "node_version": "v22.14.0",
+  "source_file_count": 619,
+  "source_unchanged": true,
+  "source_sha256": {
+    ".changeset/config.json": "sha256:e20cf21f81f271d695c0374d3b4787030b79ada1555dcc11e24d17150c324745",
+    ".changeset/doubao-speech-recognition.md": "sha256:01d3a29839c6a1ed490c99f443b0876fd28eaea05f1871ceb7ffd7011faae052",
+    ".changeset/ntsc-typed-timecode.md": "sha256:868a54ca94c60d9c4c52057c2922d235326a9accdc6112b372ce352639eb4386",
+    ".changeset/README.md": "sha256:16b6124885457978bb9f0ea68f4e08ab69d345272461987d36f0865da8f8c113",
+    ".changeset/windows-picker-utf8.md": "sha256:a690a9bf7d529354d3c6cf0f278bcb4b4360e8649dcd8b8886260e92fdcaa761",
+    ".gitattributes": "sha256:46cf993aad48f9dc05adb3a72d79bd3aee70aecc28f49ae4ab83aa08dc2d1258",
+    ".github/CODEOWNERS": "sha256:1c9d0ca604b74d4d8dc84c784777a816355ac0e1c5be4549aafbad2fd67ec733",
+    ".github/ISSUE_TEMPLATE/bug_report.yml": "sha256:9c174882992db5e18759d544b65fabb25c653b346a2c520fe047f464321bd896",
+    ".github/ISSUE_TEMPLATE/config.yml": "sha256:ce4c2a4080af00727d375c193fbac4df534a02a0cfbcb81d2c7fb994f31df981",
+    ".github/ISSUE_TEMPLATE/feature_request.yml": "sha256:b3ec4a3451c7d7b80976ff92081dfbe7e5f21b82383f2008499135e34795b740",
+    ".github/pull_request_template.md": "sha256:546769f508be4d5aec37a9d39f3a4dee04d7fb262c978779616acf01cbc5cc8c",
+    ".github/workflows/ci.yml": "sha256:f802cf49a7e500ce9b874ed9573b9e4a90a9c42caca109f79571e03f6395bd74",
+    ".github/workflows/desktop.yml": "sha256:29b0c003402e2066b22718c82d47fddd535b32d2b11ec5ece56ba690ac9fcb76",
+    ".github/workflows/release.yml": "sha256:925bf7e09eb7694219781d49367dc1b127f51db1ad80786a753fc2abc82a5634",
+    ".gitignore": "sha256:d6e71e8de6786c1c594281c23c2fec8b2f5029ca5c0a442a82aa12beccd761b7",
+    ".gitleaks.toml": "sha256:c10aaf26bf52cd49688af0187988222a748e7d05ed6837e550a0b63fecc47fb2",
+    ".npmrc": "sha256:268bd6a1f93986616a18da03fd705fefa9cd913d6f31deed0fd045521b73eb95",
+    "apps/desktop/.gitignore": "sha256:231a5f318c212814ee3f9f85cdf93d0281991ef86f566af5eb71f1b0e66b7e4b",
+    "apps/desktop/bench/app.mjs": "sha256:a31d3d32fa43a6bda1334c53935cfbd4eb2d4c66175b4ffa6d74f893fefeeb50",
+    "apps/desktop/bench/fake-model.mjs": "sha256:ef3deafce485485d46de2c28e6836f5c5609cbfebfeb22a1ca22f9ce0924720b",
+    "apps/desktop/bench/fixture/film.html": "sha256:b8dbf274277df1e007ac933f5d38826fff2a840b2bbf7b132a7552679189b88f",
+    "apps/desktop/bench/fixture/scenes/sparks.html": "sha256:cfc46b99d00ce2dfb1c8cb2df287b8e10d98f274b22396ce751fa3753a75ff6e",
+    "apps/desktop/bench/fixture/scenes/third.html": "sha256:2e5dfa0c16f2af158f1c351ffd11f6060dcd93a40752820c8e09bfc7c27cb26e",
+    "apps/desktop/bench/fixture/scenes/title.html": "sha256:50955ddfbbcc020b1d82175edb061c711bc7181f63828783485960ce171aa71e",
+    "apps/desktop/bench/measure.mjs": "sha256:5acdd2603c6bb264b409f9cf97485685af7659e1e9e2f3390bc408029d29518a",
+    "apps/desktop/bench/report.mjs": "sha256:204278f0b77baca5a1f3d7229485bdf0363a599c4e0b7368555465b8dff099e1",
+    "apps/desktop/bench/results/baseline.json": "sha256:88c6703c7c1d8ebd6dc3a27b68f0eca1f890f474e9db5e4d69c165fc3abaf89d",
+    "apps/desktop/bench/results/one-page.json": "sha256:69228b393c22ca7ea6a84771df04ee5db1d91a1d5882e161a294487df85d3af1",
+    "apps/desktop/bench/run.mjs": "sha256:14476ea1b09094659f82d1b68054edcd9cd07fe0ce8fce0b7b76acbe618dce0f",
+    "apps/desktop/bench/scenarios.mjs": "sha256:2215e575c07db865456b30453719db78a65b6de80325416101e2fe33906880be",
+    "apps/desktop/build/entitlements.mac.plist": "sha256:85d97186afc33c073b2c524f88c5f8031601c844b3e10d9c71c82f845fcc3a6f",
+    "apps/desktop/build/icon-dev.icns": "sha256:695b5b7a4d93e26a8ca5e96a2a7a2c28f90c04b13a3a173c8b8c036097523d6c",
+    "apps/desktop/build/icon-dev.png": "sha256:13e21f15496c73d90cf47f92484669ccbbd55cebf9989b065b8abeef2be12b9c",
+    "apps/desktop/build/icon.icns": "sha256:30ca2d18f11ff75a70db99f778001d6dc588ca5983ab52b862f1dedbdbc5cb05",
+    "apps/desktop/build/icon.ico": "sha256:114a32aa9e3c39835ffdaf73236cc6abbc4556a2d87602051163e520c3e37dec",
+    "apps/desktop/build/icon.png": "sha256:2800b043262f6bc3acdcb8587a7de01064dc37c456cc56c00749b9f715855ddc",
+    "apps/desktop/build/logo-1024.png": "sha256:1be0acd0368f8aa9105dd95e54b4897b5b1a2f29022de72714a955f40079cba2",
+    "apps/desktop/CHANGELOG.md": "sha256:5c0482347978eb4edb02e26f6e0aea541b7c595043cc87ac9568b749f9904071",
+    "apps/desktop/chat/src/app-bridge.ts": "sha256:4f2f9bdbea713892a80cb16e3dbf3f1af685128512d585b011d5491c349d81a8",
+    "apps/desktop/chat/src/App.tsx": "sha256:b73b91795a48a1bf874d081adc0b90a46659c77cf26840b33663d9eb16fe7e09",
+    "apps/desktop/chat/src/chat.css": "sha256:eb4930f6ccad0ff156235d00ea98ab1b240cc5e04ad0a56715f5c77dcad16369",
+    "apps/desktop/chat/src/components/AgentActivityRow.tsx": "sha256:3cd64aed0bf7a7d23da42569da0ffa1750e66c5ac987fffca0c9441abf2bddb4",
+    "apps/desktop/chat/src/components/AgentIcons.tsx": "sha256:cd6d3222f48e78e22e883902d222fde3470de4d1e2f73a9545ca85cc7fd57165",
+    "apps/desktop/chat/src/components/AttachmentPreview.tsx": "sha256:a5679318d5bf39237cc376c61a07e28006ce351bb6582dbc378d7452e600a102",
+    "apps/desktop/chat/src/components/BalanceNotice.tsx": "sha256:7874ef03a5aba4bafcc6cefc0685681e56621279ee47b6cca18fd89af033ae9d",
+    "apps/desktop/chat/src/components/BrandLogo.tsx": "sha256:9483ca651feb6ffb7c26fc5aab2d868e5b1627664f6a9e9f0ec4c68f8615a5f4",
+    "apps/desktop/chat/src/components/ComposerCard.tsx": "sha256:873547c6e2dc16140b9d37f4c41fa1921ebccbc76d2dda1b0c8d5484aaf09c6f",
+    "apps/desktop/chat/src/components/ContextMeter.tsx": "sha256:5ff80db59cd7b21280303253e5cbbc88ad144847e5cfe5e3b2d028dabb30f399",
+    "apps/desktop/chat/src/components/ConversationSessionBar.tsx": "sha256:30e0b8f6a54982d884493cffad982ea017997f505fa2948fcadee27f81060811",
+    "apps/desktop/chat/src/components/Divider.tsx": "sha256:f0d5190f1410c09201e44f2219d2fe56652bc4345a1e8bee2dbb50531295a1bf",
+    "apps/desktop/chat/src/components/dock-pane-bar.ts": "sha256:6b6e9932fadb8ff48bec11fafcc9dabe17686018acbef0608c88d6108b5d02de",
+    "apps/desktop/chat/src/components/FileChangesList.tsx": "sha256:f29ab459c5186d8bf33a3476204aa5909d2cbe58665c58365e9b40d277079cb2",
+    "apps/desktop/chat/src/components/Markdown.tsx": "sha256:f68925cc4096ca5cc6871fdd4a60e53fd2987564b9c185158576cd5d95ad1148",
+    "apps/desktop/chat/src/components/ModelPopover.tsx": "sha256:bc0f7c2bffee29568cf8bbd302bacd43c6b755a72f7323ab478d47b50e7997cb",
+    "apps/desktop/chat/src/components/NoticeCard.tsx": "sha256:2712479fea5b0155902393d0b721a43435952be87fcc77f774d821a869a2eb39",
+    "apps/desktop/chat/src/components/Popover.tsx": "sha256:bce4c3221f7cc2f3aa93382536b39bcc4be666a1a6153709709a22b9911a2bbd",
+    "apps/desktop/chat/src/components/PreviewFrame.tsx": "sha256:de3091313d1e79c2588e81cd8f6c3a60bcc28a4b9c0aac59864c806286c19e2f",
+    "apps/desktop/chat/src/components/project-version.ts": "sha256:5e5a20483a4c2331887796ca1fd01996d928ec8c16d788d4f817cfa72d7fcb55",
+    "apps/desktop/chat/src/components/ProjectConversation.tsx": "sha256:0ce4780875d5bd3e96d0936440cb2fd27aa03c1d545a3d4eea1fc9190ba3bb8f",
+    "apps/desktop/chat/src/components/ProjectStarters.tsx": "sha256:70466f475bf2cbf92bde440bbd3416f107aed132f61f1cb94434dbb8a5e622dc",
+    "apps/desktop/chat/src/components/prompt-editor/index.ts": "sha256:b714ad7bf309b0aca2d6ac56c60c52f61e6d6ccf34282a71ed7925c06d6e05c1",
+    "apps/desktop/chat/src/components/prompt-editor/mention-menu.ts": "sha256:6d3a03b23793b26351a5222cf2ea1abd66cb68929bdb5dec1d7c50c4014ad767",
+    "apps/desktop/chat/src/components/prompt-editor/MentionMenuPlugin.tsx": "sha256:a4ec704ab8cb080c12534cf942fb2ed9a3fe73b5501bc37e3b839a8db61b351f",
+    "apps/desktop/chat/src/components/prompt-editor/prompt-text.ts": "sha256:2cf24a7367e106eae5b6543352b1e3bb68ef8ef832315fc339591908e1de9210",
+    "apps/desktop/chat/src/components/prompt-editor/PromptEditor.tsx": "sha256:8b894e0ea6c95d18000f931bc89311d7f93e09d102b553671561669841d408ff",
+    "apps/desktop/chat/src/components/prompt-editor/PromptPill.tsx": "sha256:0e886ce8257f13d0c36496a55b086f1a30c2934cb23df72c3a8c259688d42219",
+    "apps/desktop/chat/src/components/prompt-editor/PromptReferenceNode.tsx": "sha256:58dc88d4a38351b3ff9995bcde46c1d23b6677ddf65bd546ee7d22502220f1e4",
+    "apps/desktop/chat/src/components/Tooltip.tsx": "sha256:e6bdbac3bfad88e560f32111bb02fe83f8113db114ee21708c92750265ba446f",
+    "apps/desktop/chat/src/components/TurnLog.tsx": "sha256:d633969b46414c6685ef2724c36a4db7b24373a2b77f9c42f736491be28c3a6b",
+    "apps/desktop/chat/src/components/TurnQuestionCard.tsx": "sha256:3069d0f93945f02e05a3b3bad9e2b838f61dae4bef05ee86f6966dec97e61d5c",
+    "apps/desktop/chat/src/components/useStickToBottom.ts": "sha256:fc712dcca53065d7f3f15460b6a853582687698ca4add8f34125a28227c3e5d9",
+    "apps/desktop/chat/src/components/useTicker.ts": "sha256:f1ba02d03ccafcbb0b57095672ce5bd9157d27175a3529db57a8c3f0f5b344d2",
+    "apps/desktop/chat/src/i18n/index.ts": "sha256:54f10f126bc83b4b036ec1f81e60474c0714d207cba573dfbbcbd4fa82215257",
+    "apps/desktop/chat/src/i18n/locales/en-US.ts": "sha256:d8c0afe9796d3b3a033159e5e5e6b23dc69f8ad7ac9d9368109a6bd47119e4c8",
+    "apps/desktop/chat/src/i18n/locales/es.ts": "sha256:f41a95cd1073627e3ecbc23d0738bc690d1e719ebd60742c45b0fc239b2dc6a2",
+    "apps/desktop/chat/src/i18n/locales/ja.ts": "sha256:d978e3b93c9b1c606f5c46f5b1fe816044b16c5ecb73de7b0f6e7446ad0d2b6d",
+    "apps/desktop/chat/src/i18n/locales/ko.ts": "sha256:f6cc9c30e95393bef7a23b3b72b6c857ef8169ebbde9e3ba2e0c7e3e6eca019b",
+    "apps/desktop/chat/src/i18n/locales/words.ts": "sha256:02e63403d0eb37b1f6d083658117a15b98026973087eb409ffaecca52482eeac",
+    "apps/desktop/chat/src/i18n/locales/zh-CN.ts": "sha256:45ea7aa8c8a43f4ef4bd9b94c335029337310d269ffad9060c1e102d5b1498b6",
+    "apps/desktop/chat/src/i18n/lookup.ts": "sha256:0f379bb33bb9c68dd743ec5be84a541d92911c27cb0fd72ca904de3fb4777141",
+    "apps/desktop/chat/src/lib/agent-activity-runs.ts": "sha256:c7bb393b1b6a8e59b0f33e8c6828301887ee143fb419e0a95df22790079122ad",
+    "apps/desktop/chat/src/lib/agent-refs.ts": "sha256:cc1f08c8a130770d83924a3a03e06b3fa1c63fceb63b16907e98b94d1389a73c",
+    "apps/desktop/chat/src/lib/agent-transcript.ts": "sha256:0913c5582169c7b8dddb891551331d1e6b090aea367c0862d3673e0212202592",
+    "apps/desktop/chat/src/lib/asset-lists.ts": "sha256:fb5cfe3e73cba759e87ceb6a3f28587808bd4235259b9d3f0bb120dffd5aa4cb",
+    "apps/desktop/chat/src/lib/balance.ts": "sha256:bae09f18bc7f7169f7e92aaa4b9a2397a97516704843177048cbb96afec30a67",
+    "apps/desktop/chat/src/lib/chat-layer.ts": "sha256:05ab7c37d451709845102df91f49ada7b71b00de04f1c8fd9062b7c75178f4a7",
+    "apps/desktop/chat/src/lib/chat-menu.ts": "sha256:81aefee4b2b404c51350cea15265a04016f0085ef321969548917a068d542fff",
+    "apps/desktop/chat/src/lib/chat-store.ts": "sha256:da2d46696368f9b485d6c01a99c1a89e86affd61c805b1e98dd93bc8e98a0ea7",
+    "apps/desktop/chat/src/lib/composer-attachments.ts": "sha256:ec567829649c5f5fb5bab7af6b0e3b275744ccec94bdbd9da906b8750b42ff81",
+    "apps/desktop/chat/src/lib/desktop-attachments.ts": "sha256:80e22ec0e751c607a5a6fdf42aec6adf8af6c7c4183fba46d3c6952e71ba96d4",
+    "apps/desktop/chat/src/lib/desktop-bridge.ts": "sha256:4c156f37203a53f12a8feb1b65158f6ed3929842b7fc47bf6bd7eb0239e6ca76",
+    "apps/desktop/chat/src/lib/developer.ts": "sha256:abdf44eddc6b0c4c237ed62492b987fe72534f87fe51cfbbd959024c93b3cec7",
+    "apps/desktop/chat/src/lib/file-changes.ts": "sha256:4cc763d9a2b2e35f8eed029cb025f7866c4b8d63b18445fb75eb60c22d5b38a3",
+    "apps/desktop/chat/src/lib/live-activity.ts": "sha256:ef0c6b8a7a45e443ac2cf8402ba8a35cf0735f512b30974beccd6237ee30ea79",
+    "apps/desktop/chat/src/lib/local-agent-run.ts": "sha256:9532e8fc89b4627d5e91b9da6649374108dfec06b76a9f426e2fb8d4ca9089dc",
+    "apps/desktop/chat/src/lib/local-sessions.ts": "sha256:9f03ba49175c84cad780eb87345905229045bd3ccbe97fb34fd75b39c967d557",
+    "apps/desktop/chat/src/lib/model-calls.ts": "sha256:cdc9696144d69cd9be0f7dea831e3698269065f2169b99e7f0259aaaf4e382cf",
+    "apps/desktop/chat/src/lib/pretty-json.ts": "sha256:77f1ee049a8e0aa89d85479a94fc4d3ce039cee3325ce3bdd28856a5d9812083",
+    "apps/desktop/chat/src/lib/project-resources.ts": "sha256:ce6f96fbf7eb37010b9f328c157866f45f9701f7ae78e9332576c4b68fd88d7f",
+    "apps/desktop/chat/src/lib/project-sessions.ts": "sha256:a80d6347b6d50ba6a6fe71a3b3e4b8b7ae719a6818fe7a8a2d29b0155ca20f12",
+    "apps/desktop/chat/src/lib/project-versions.ts": "sha256:180d2b84fafe80f4f956f7fc389791f345953e5cca9a71482234473f2fc5135e",
+    "apps/desktop/chat/src/lib/ref-pictures.ts": "sha256:ccafba41254283ba7b3f29a68c547a6f76080b625d89470a1db5c6e423927cf3",
+    "apps/desktop/chat/src/lib/relative-time.ts": "sha256:345b19cb96e5a406e6fd08e73d2fc3bcc3325c22c7fbd9ae60878a2e89005de1",
+    "apps/desktop/chat/src/lib/structural-share.ts": "sha256:0cdd0ba035a676b4defdb9ccd5aa57be60e4b28e0666a03dd4993cd62f86ec4d",
+    "apps/desktop/chat/src/lib/studio-film.ts": "sha256:ced7ab23bf8612e9648204010ca89fac94bbf8ff76e281179cbdc78d38073cc1",
+    "apps/desktop/chat/src/lib/studio-transfer.ts": "sha256:5584f66a8385d882215bf6eca449f6cccdabb8a3f144f50f18f33652d19c43f5",
+    "apps/desktop/chat/src/lib/upload-limits.ts": "sha256:31c296a12750e6a4568a57a13d8337a74a42d927d1b5c3f7c7d704ae2a739603",
+    "apps/desktop/chat/src/mount.tsx": "sha256:bcf9ec47e27dbd868236fd482044baf2bb4a620c4c91b8d57d671d48d2f1036c",
+    "apps/desktop/chat/src/state/local-agent-store.ts": "sha256:bb83ae8a1efd42d9cc15109c7f8390bc8cc50204d6857392854a08036b65b734",
+    "apps/desktop/chat/src/studio-refs.ts": "sha256:373428ae5e1d5bc1a67f5f289af0f5cdba8727a8bfaa49f02aafc3789bd8a219",
+    "apps/desktop/chat/tsconfig.json": "sha256:28513a85f7cfd652650e33840146d6689528a61316ce17f7e626f360339257a9",
+    "apps/desktop/package.json": "sha256:1b46e1349327d0a94a2292fa5b09eece695f0417e2e27d87bdf7195375b8d76d",
+    "apps/desktop/README.md": "sha256:367fc3c7bb46e76c61df266f72b035579d71478987dc01ca3dc55fb58d047b37",
+    "apps/desktop/scripts/make-ico.mjs": "sha256:0829e7163275b7eb4cbe1b57fc17855029341a907ff111be4f8aff24e0219c49",
+    "apps/desktop/scripts/release.mjs": "sha256:d0121ff974304129df2244463a22d130f2f53d79e16616bc4a698f8623d6b87a",
+    "apps/desktop/scripts/start.mjs": "sha256:5a0cf8da2b1d66d122c7c6e73f04c8c3319904cafc72dc84a31a09d1c46486e9",
+    "apps/desktop/shell/bridge.ts": "sha256:fbdddc4443ec456b7d0f08cb9282d250cb86830219cfd3a2935467e60c39a6c9",
+    "apps/desktop/shell/index.html": "sha256:61f6af5a7edd2692201cb454070c58f931508ea7cd5bd3aaa2cc71aedc9c25bb",
+    "apps/desktop/shell/main.tsx": "sha256:7ecae8b7158f62f1cada1c5501a04b06cbf4f66e63ea493140af927cd54c4634",
+    "apps/desktop/shell/shell.css": "sha256:fa14a6d90729db52ec092db4fccdda7b6ea5cf5b7e1075557040e530a742ddae",
+    "apps/desktop/shell/tsconfig.json": "sha256:57851c0d76cb17014ed704f993eb00790988d15ec924269c81c77b8e81df5410",
+    "apps/desktop/shell/vite.config.ts": "sha256:e3c7ff8382de816cf8e1695e6b998ef0ae8327705be13d540c2026f7f59a31d3",
+    "apps/desktop/src/agent-installation.mjs": "sha256:145f655db5bdd6a1fd62bb98b63c991751f179a8acdbf4da565bcbc7dd7fc37d",
+    "apps/desktop/src/agent-installation.test.mjs": "sha256:214f457813910cfba7028052205b2be76bc8566b2445a1ef2dfcfdd656a4918e",
+    "apps/desktop/src/agent-marks.test.mjs": "sha256:f37e153d033cc39aaf396f2278b99ad6a17f1f1f4a9b6751c17e316bf1be880d",
+    "apps/desktop/src/agent-prompt.md": "sha256:d4d5624a07a686ee676c0cbebe60301b7bacd002742839ec7b64c26f1641957f",
+    "apps/desktop/src/agent-refs.test.mjs": "sha256:46cbae26cf1dabf3d770f5a579a8a4554e8dc36ea3c2d6c233402062101c7283",
+    "apps/desktop/src/agent-roster.mjs": "sha256:2c2ccb1a250b6c86392ee2278fb30ae923fa447c940b01a93d914e8a89e382fb",
+    "apps/desktop/src/agent-roster.test.mjs": "sha256:062aa79d1202ba1044d8c8d3ae5cc60df06b1b61fff4bea7989d0d53ae264dbc",
+    "apps/desktop/src/agent-usage.mjs": "sha256:f43e5107eb5fcf8d31284cbd5b4eae0ad953507f345790c15b139b3b8e992a51",
+    "apps/desktop/src/agent-usage.test.mjs": "sha256:687cc300c67fa6fde7db03acf48f2ece552b773a2a4f2265f30037806446bf30",
+    "apps/desktop/src/agents.mjs": "sha256:87b1716f8b9c0e7e0bb3b25918e28454db433391491e2e137443d624a2d96aa9",
+    "apps/desktop/src/agents.test.mjs": "sha256:076054b07f6b9485a8cbbf24b16681e0680f70191fdde3aa061fbf0e05925d8b",
+    "apps/desktop/src/as-node.mjs": "sha256:2b9e7be04b63744cb4c8e3f5edbd4bd4d01b38e97fc37e64acc5a5320f63b5db",
+    "apps/desktop/src/chat-ipc.mjs": "sha256:6e9a185f0c8a9fb64db27c295b962a6d14b0a6e8c0bdcdd0ae4266b6306b1788",
+    "apps/desktop/src/chat-store.mjs": "sha256:942f3f4d4aebecf16099263973e29017133742263a192b29361578d909174fe9",
+    "apps/desktop/src/chat-store.test.mjs": "sha256:64298de5ce905d486c2519284487284f422b1ef7f2bd817099168bf83754f1ed",
+    "apps/desktop/src/environment.mjs": "sha256:d1c1c435740bf3d5c10503b45b38a70f04bdba32b97af632d30a9caf87173604",
+    "apps/desktop/src/environment.test.mjs": "sha256:0de571c77a1353c4c2d92f2d293100ebc82a4a1b37e93d3454ef78fe1293aca9",
+    "apps/desktop/src/failed.html": "sha256:ca1e9441c6c299a0ac026d6bbdb6fbf9695dafce8aa67cb838b0f6a8db13882f",
+    "apps/desktop/src/ffmpeg-runtime.mjs": "sha256:681c4e364b7954083ddca201a8b5aee887debbd02ec582fd9aa21d8af8fe0b0e",
+    "apps/desktop/src/ffmpeg-runtime.test.mjs": "sha256:34f60a71260fe8b98b73e8c535f216ab76f2b025af12c5f3d10c94903cbe4481",
+    "apps/desktop/src/file-changes.mjs": "sha256:86150190d1e85b8aab9702f118daaedafe8e774248cb91e072cc8f1863694812",
+    "apps/desktop/src/file-changes.test.mjs": "sha256:f3f3b137209c53ce1ebf1126d11c6fa89379409e7f52a1cac174bb7cbd220e60",
+    "apps/desktop/src/flavor.mjs": "sha256:5b4c92bbeed7188afc4200fc830ef42dfae80feb494ef5eee0aab58a2c191319",
+    "apps/desktop/src/flavor.test.mjs": "sha256:2a94b8f4efe3bc1959548e93c204f1cb3876893ab198a8bfb7844326b089319e",
+    "apps/desktop/src/folder-dialog.mjs": "sha256:a396cd1a8c68078e4b5453c214fff48705ea67e9859a8deba069967f25b38a4c",
+    "apps/desktop/src/folder-dialog.test.mjs": "sha256:2a461805ededb69eb0bec31210cf0681765f77a62688ce2b289a3f39a33ed301",
+    "apps/desktop/src/hidden-windows.mjs": "sha256:8571a94e34195f6d7e9f605b3a45c2e071930d7148301423c52f0c7ea1858ae9",
+    "apps/desktop/src/hidden-windows.test.mjs": "sha256:8dae9a0e6cc78600cf8135aaa0ed54476613e265fa4a067c99d13e87b19a4100",
+    "apps/desktop/src/local-agents-ipc.mjs": "sha256:8492d1d98e8739fa618251eaed6d486d9b701e35afff06acc55ee280f99e5fb4",
+    "apps/desktop/src/main.mjs": "sha256:a9fbe21cdf2c9a73291aa3a6725de2245ce5a04882dd35030da2c497b9f65548",
+    "apps/desktop/src/mention-menu.test.mjs": "sha256:59d8dd8c1ac0aa807a9b274852e7c0fd77fc0cbc0f2143c494bfcb07010dd198",
+    "apps/desktop/src/menu.mjs": "sha256:a73bc66826c83d8a583a98d36bb93c5ffe95a0a65d86360362a6f7a28261d6dc",
+    "apps/desktop/src/node-runtime.mjs": "sha256:28799cca6dfac7f01ca466897300e944b4f5bf2f6df8081c0e036d8aed353c22",
+    "apps/desktop/src/openfilm-command.mjs": "sha256:2be7faed2f61cab759e924610f26c039108bdb1ef7717dc713e0abae3ead44f5",
+    "apps/desktop/src/openfilm-command.test.mjs": "sha256:073842288267b65ca559380c26cc5d647558c5c01795226109f1152b4c6f25fd",
+    "apps/desktop/src/pi-agent.mjs": "sha256:7c80adb90d225c61259dce551ac4c5a44ee31629e6794e75e41b3fdf692cb02c",
+    "apps/desktop/src/pi-agent.test.mjs": "sha256:f62cbc151f5cc51c5eeff339ddd0526cda5ccc5829f2c0f7c62a0312767e34f2",
+    "apps/desktop/src/pi-config.mjs": "sha256:05f4c0f001e08f2d9cdfe19606fa92112a5c0dcadc35dad302f542c45d7cec3f",
+    "apps/desktop/src/pi-config.test.mjs": "sha256:83e89855462e4c47b74a33c2c10c0403e79406b5efcf1bbea908a24575ce9d0b",
+    "apps/desktop/src/preload.cjs": "sha256:62c9c9e5c5c5504456a3d4d804a2ceaa79d6c206833ff018cc74cb60bdeb6dde",
+    "apps/desktop/src/shell-page.test.mjs": "sha256:1d61871a785b9304095e507f4d072b010de7a9ac3b635738835e21db10591803",
+    "apps/desktop/src/studio-process.mjs": "sha256:ec2f40b674f4a0bd0992b957da13dcc91e5919717199ff3d60b1a88f5957dd06",
+    "apps/desktop/src/studio-refs.test.mjs": "sha256:96bf9f4e72bb050f39239af7dcdf1369046aad01b18bd9e2b4ee30a4bfcd799b",
+    "apps/desktop/src/studio.mjs": "sha256:2401ff7d7bc052fe50fa0c7d8d2f0b3d69fca7bf976183436fb662d557ebbbd1",
+    "apps/desktop/src/update-channel.mjs": "sha256:31931038d38199628901e408df5628a52429e50c7cde4752e6356958881c9b88",
+    "apps/desktop/src/update-channel.test.mjs": "sha256:0c10424ed69a3e6eb7d34d930302878a4f17e7d57f373cff7b848f0f41b6cfe3",
+    "apps/desktop/src/update-controller.mjs": "sha256:d623684eaae06ab0efff443499707f73207692d880ec5cf15a005346228d35ac",
+    "apps/desktop/src/update-controller.test.mjs": "sha256:e4e0d72f2d0370f8402ebcb0146847010e0dd7fe1de95b269497e08fdc4b6b33",
+    "apps/desktop/src/update-menu.mjs": "sha256:6d44836210c845638674ffb7a9ee2ec75e1bbafdc976cf31cccbab09a827066d",
+    "apps/desktop/src/update-menu.test.mjs": "sha256:07f36376fadd0c956815707047ff83838dc759744e40a1e24e3ae507b8a629d4",
+    "apps/desktop/src/update-schedule.mjs": "sha256:59c8a1bb1ba7d914531efda9d8debcd18d6a8f1f40b8a446e127c29eb66d21fe",
+    "apps/desktop/src/update-schedule.test.mjs": "sha256:66d2c080dbea336007cd37a969f51cc0826dd963dfe6f13de6f65f9f72c133f9",
+    "apps/desktop/src/updates.mjs": "sha256:2bbc27532e203de6b5af0a2c8689fbbbf0da36d93e4ecf340cce59b16d115d66",
+    "apps/desktop/src/window-state.mjs": "sha256:fef476639815a0594dc88aa2a168f4bfe76929e4ca68c1f1ec66752c8b24318d",
+    "apps/desktop/src/window-state.test.mjs": "sha256:994e53e88d90742e579dc50d45270e4954b488174ce6c1851ced5cfdf1d2fefb",
+    "CODE_OF_CONDUCT.md": "sha256:fb4196661444238b041af45e6b8acad7ccdd7aa0bc2323ddf47aad98554921ee",
+    "CONTRIBUTING.md": "sha256:ee8592220c341027ea938fe6c77b0f38cbed5b8ec138b65c2acf6287bcfcddec",
+    "docs/logo-dark.svg": "sha256:3fedc20d3869fde2ce8710e8c0ae88e2da630bd90a5171271cf8c21891753939",
+    "docs/logo-light.svg": "sha256:1e21dff8c9b719071a08bdf89dfbc34655f8518c0a9ef0e78f5e9d9cf1af053d",
+    "docs/openfilm.webp": "sha256:0c5c084cced0989fd6802137c7e23a0cae20fbbdcc055ef61935759db215259d",
+    "LICENSE": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "package.json": "sha256:80301a283538721f513ef57c6fccb1b01dd8a0a49c1793554aecac3a91a77452",
+    "packages/openfilm/.gitignore": "sha256:73bfedb1abe905bfaccd6db949463ce5db3fe72a92e27c2bf4c1aa2b3bc9c3c9",
+    "packages/openfilm/bin/openfilm.mjs": "sha256:d16915ad600310058e6f08966c6f9f596eba67a37c6abd200025a523c2ccf192",
+    "packages/openfilm/CHANGELOG.md": "sha256:44b970c7b8bbcd7b4053a625e3e99d734c9f743261aae798d5a6d146caeb6abc",
+    "packages/openfilm/LICENSE": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "packages/openfilm/MANUAL.md": "sha256:679985fd79374f76fd1e86c5c7554b857baf9f8e8c73c0046a5df3fd288e042a",
+    "packages/openfilm/package.json": "sha256:5be3d28593830700d3a6257c8831a83f97998ee5a6830121a37bee572394c8b0",
+    "packages/openfilm/product.json": "sha256:d1a400aaad5122151d773aee50f5ee48260b876ff8d868140de6e48d655c1ff6",
+    "packages/openfilm/product.official.json": "sha256:c29632b492aeec6b344cb5b26008740267dd0d381fdd7a105b174b0c0d3eb995",
+    "packages/openfilm/README.md": "sha256:fb3f6e55cf925d8ccec6dfe9af80efac9f34564725923be9dce9150790aef853",
+    "packages/openfilm/scripts/dev.mjs": "sha256:6551341f9d102026bdf6c7c1377566a60ca586f52d4002b6a77c1bb3bccd4864",
+    "packages/openfilm/scripts/preview-probe.mjs": "sha256:370e9590db0059941d64d49efb9a53ab008e852c330645340eadaefc42473be0",
+    "packages/openfilm/scripts/product.mjs": "sha256:a35f02c084764cfebda9415242a6e73c818daae08fea2f46d5583c01192d21a0",
+    "packages/openfilm/SPEC.md": "sha256:c710d7b564cdc3c68eb2ef5457a144eb1e1c577c7e80ad3748c6884299221dfa",
+    "packages/openfilm/src/film-doc.d.mts": "sha256:f252f93ad33b28779a773b774b22ba5e06f8ec473841dda4ac6675976f9b4524",
+    "packages/openfilm/src/film-doc.mjs": "sha256:feef7be8181e7ec63cf2b8760f3a32b7b7e22cd851d4e5a233c04f1768cf719d",
+    "packages/openfilm/src/film-doc.test.mjs": "sha256:3a7e69606166db4f50e99d371f5cd72bf6c096e659f3e37f5ba96c56d830fd0c",
+    "packages/openfilm/src/host-clock.test.mjs": "sha256:4e9928883dc516f0d5ee9b3ba318bb6ba7d83171b40d55052e179c91c5d38e22",
+    "packages/openfilm/src/host.d.mts": "sha256:ede9fc67f0b1aea1143d8ab67e0721e1c3baa449dae258eb54714c3a69b70fdb",
+    "packages/openfilm/src/host.mjs": "sha256:dfed0fd5b068823d06b5091fbc01821791f0f470bbf061741bf21a25dc0bb170",
+    "packages/openfilm/src/host.test.mjs": "sha256:fc75c8cce4bfe784d7bb75ae7c5e41d2e1e800f448bdbf720918fd779db21baf",
+    "packages/openfilm/src/look.d.mts": "sha256:61c7bf9987d436efc5292e7a0d1a45e18b04bb7da538d250d3d4bd01fd260dd9",
+    "packages/openfilm/src/look.mjs": "sha256:a640dc6ee464901257b076ded89104014a432e2db86d2a5ea684eba863d2e420",
+    "packages/openfilm/src/look.test.mjs": "sha256:cef3023a1652dc394d91995620a3609dd47362a366518873650a56a29459a6ea",
+    "packages/openfilm/src/media-links.mjs": "sha256:ff65c045f37edfdc1e3f39454dd6d93f2fb5a112991dd595a46a5e049ab9438f",
+    "packages/openfilm/src/overrides.mjs": "sha256:919fe02956cafaa6f81e63898bae98302a24677d4fd8e7e3537ab0a4c733f6dd",
+    "packages/openfilm/src/render.mjs": "sha256:d308b672e7e2d60b6e06ea432bbf009ae96b5e197b3f4d1d50bab7c40fcae84f",
+    "packages/openfilm/src/render.test.mjs": "sha256:cd70b01a36d6ceff4b82f6e22a77de83a8818432edc61644ac50c81e8563064a",
+    "packages/openfilm/src/seekable.mjs": "sha256:fa3b91513d666ebd414fc6c4fc1798f3aad5c09c6be1e760ca3ae9d95be85b79",
+    "packages/openfilm/src/seekable.test.mjs": "sha256:719a39b4d4d29b0337409713d8fc0e2323e40190fffac532918ef3185fb3a9f6",
+    "packages/openfilm/src/shared.d.mts": "sha256:f6a8ab7633fb07ef46b2bb7b2ae687813130ef05c1bdbc96fc27e8077dcb5f14",
+    "packages/openfilm/src/shared.mjs": "sha256:80aae1cac71dbdc71a8a782a457202a28e9d0becf97da05d63ad0655a264543a",
+    "packages/openfilm/src/shared.test.mjs": "sha256:f9f53fe015f77c418cd1875c5e85d0ee1eb355ca6893ee497513318a51418074",
+    "packages/openfilm/src/timeline.mjs": "sha256:75b4cca45fd22937e1fa6dbc5f67af001ab591d4a2f85efee49fb025e154e0a4",
+    "packages/openfilm/src/timeline.test.mjs": "sha256:ff22cd2d2be4615ed89b6d807c6251d64e4470e56041d97ccbadb40b660b1c82",
+    "packages/openfilm/studio/client.mjs": "sha256:1bba7cb01f1ccbbfed576b0a30bddd1b6ec9836ca3140305c60aa1f4ff931cc3",
+    "packages/openfilm/studio/client.test.mjs": "sha256:bdebaefc232895f5f43eff9ad9a16988292129e6eb4240b379e748681013324b",
+    "packages/openfilm/studio/server/atomic.mjs": "sha256:61374e50c67d76e03d70d73e05ed307378d866d579847c316c4203fbc9cde94f",
+    "packages/openfilm/studio/server/bridge.js": "sha256:67ddad54feaa4875086b9faeaaf6eae4aec2d1005fadc81d6fd8748a4142ebc7",
+    "packages/openfilm/studio/server/bridge.test.mjs": "sha256:9af0351d453c7448bd3129dea0caccfaab466ce99ab114fd4eab5490b4a21ce9",
+    "packages/openfilm/studio/server/browse.mjs": "sha256:289590ebe95e19a0b854061f0492114e477af6d43e18162bf2c2fdc35cc6078a",
+    "packages/openfilm/studio/server/browse.test.mjs": "sha256:26cab524733c4a825b0560c26411aa594aebb81feff028d58e27685e8f6d0b98",
+    "packages/openfilm/studio/server/captions.mjs": "sha256:7a9bd076c307b6296be6e3d05153bf3f386aa01e97503d23f5d5deac1f0d2df0",
+    "packages/openfilm/studio/server/captions.test.mjs": "sha256:8bd12c87cff9c392d132f72dc3415ae4fd2082f5e2ef14d962a227bc75cc077e",
+    "packages/openfilm/studio/server/closure.mjs": "sha256:a46a9514f0ff0c19a109c2370f9c08af6468d927273c519df311010e2e7ede8f",
+    "packages/openfilm/studio/server/closure.test.mjs": "sha256:eb9e4714dd7f82f43ebb04ca3f92e6adb76eb36cdb9768014b2e8de8fd315ea0",
+    "packages/openfilm/studio/server/custom-services.mjs": "sha256:b8dd982b1525e85c2f79689b536dbd39f57f108a3e033f3d7c76fa558efc217b",
+    "packages/openfilm/studio/server/custom-services.test.mjs": "sha256:bb60b1ac418ec00a1ce7dc55882817e181f208b1241aefc6821ad17e6ace77b8",
+    "packages/openfilm/studio/server/derived.mjs": "sha256:fdc4ae961d25735a87fe1d6e1012cb55278c4c04073a2a5f804548ab06384a99",
+    "packages/openfilm/studio/server/derived.test.mjs": "sha256:7c454053c988fef47c1cd9c9dd828fc399d76c43d37ad9ce88f40f997f8ab1e7",
+    "packages/openfilm/studio/server/examples.mjs": "sha256:a5ca1c20f9715aef9921318acdcac0c3586a90e6ff1f3139f71e2928cb2e6945",
+    "packages/openfilm/studio/server/examples.test.mjs": "sha256:ee92847a23229f293e908150d71cdcf258c6aefd111f653831902e3662aa31fe",
+    "packages/openfilm/studio/server/export-capabilities.test.mjs": "sha256:685606e4c2e310920f634d3744804f746ef7e54d4b40b99f727e0686e869c10c",
+    "packages/openfilm/studio/server/exports.mjs": "sha256:868c4de9598fbb3911ac52cb87637d296f99803005a68d91a6e41da79f9a1fea",
+    "packages/openfilm/studio/server/exports.test.mjs": "sha256:0d9b799897d8d7fedb4e028d1e5028985570e0d728fcbbe976a08d68f9c3c5fb",
+    "packages/openfilm/studio/server/fetch-error.mjs": "sha256:5a75f9c88340c9d2c2ea9bf23a0f7cd2569278ac4472bfd55b817a83098442be",
+    "packages/openfilm/studio/server/fetch-github.mjs": "sha256:163ff031c68ddf83e64b548e1631a13952911cce437d90901a07a12709cf588c",
+    "packages/openfilm/studio/server/fetch-repo.mjs": "sha256:1e06ddf546085520d056492d3e1792a191bd735ceae4e093345b41fa357d94ca",
+    "packages/openfilm/studio/server/fetch-repo.test.mjs": "sha256:a8b66fedf58d41a8a4a53b9b4d00fc247e0a42dcc8dfdf9b929459ea81f30b97",
+    "packages/openfilm/studio/server/files.mjs": "sha256:93d65bb02d76ab09e112588d7a852b3d4ada3083ebcd1d9ea2e7d216e82dcf99",
+    "packages/openfilm/studio/server/files.test.mjs": "sha256:e070fd86ff887e5622b19668beefe4bba596d38f54f0c6f3ef990b46f1582700",
+    "packages/openfilm/studio/server/film-subtitle.mjs": "sha256:be4b1852bc254ff597e43694a732044ef51dd43a78df13735c2ff023957687dd",
+    "packages/openfilm/studio/server/film-subtitle.test.mjs": "sha256:74a8be61a0080ab9fa381e2f3b50898253b8a8e697c6e362b15099ac8cbbdeb7",
+    "packages/openfilm/studio/server/film.mjs": "sha256:eb0aab3a4770082a0b273f448b6bda3b0ca043aee791d5444148c459af855d85",
+    "packages/openfilm/studio/server/film.test.mjs": "sha256:df460e6d961247298a17cb78950f7070fc06b82d2f9026bf1ef9cfe14eac094a",
+    "packages/openfilm/studio/server/folder-picker.mjs": "sha256:6f480e8143831a1a769c62f5645aefab2b7e3bdb03c343193dd854b0c4ba178e",
+    "packages/openfilm/studio/server/folder-picker.test.mjs": "sha256:eb5aa99c09e55857a79552544f4052f2727458c0da569c710be84f3ec5d874e0",
+    "packages/openfilm/studio/server/folders.test.mjs": "sha256:6b6d94846c0c0d5c8bc21eb567d884eb237de134cbc4c96f9b322d010b53d4b6",
+    "packages/openfilm/studio/server/fonts.mjs": "sha256:4a15ddc2432f7a1268d36cd75bbcad08076b1334483d2ffb9db28fbc24024615",
+    "packages/openfilm/studio/server/fonts.test.mjs": "sha256:77d7e7a4fe451ee7a8aa91f8c8b6d17cc04cf751111e18787e6dd1c6db9d78a9",
+    "packages/openfilm/studio/server/get.mjs": "sha256:d6b19cae59cbcb8578fcd4ddab3c1326943a7c9a597df9b4b1dfea9d0d582e04",
+    "packages/openfilm/studio/server/get.test.mjs": "sha256:13d65023360e19798a67d5615c46e1dd3b788e42a1feb1793abbeee58249b27a",
+    "packages/openfilm/studio/server/history-migrate.mjs": "sha256:ecc3911070892f6caa7a17f5cbc5391133cc1e72ea4cd58b7e1fd7a82a4172ea",
+    "packages/openfilm/studio/server/history-store.mjs": "sha256:67f88ffe3873e1eeb76195fbebf0a9d71c4f4d52ebd14c6760dc7f793dff36ac",
+    "packages/openfilm/studio/server/history.mjs": "sha256:409eeb89b245b6a157dc71d1e2cff2a8c63a94050bb3dd39ec6abe8f80d951a1",
+    "packages/openfilm/studio/server/history.test.mjs": "sha256:43fca20b898af0e0a5d56b460602d8383554a3a7d9f1a620b69694903730e91a",
+    "packages/openfilm/studio/server/http.mjs": "sha256:357da4dad30c36ca14d7bde8fd02587b58653e915bddb36c220ba02d10c70524",
+    "packages/openfilm/studio/server/jianying.mjs": "sha256:d1daf8c708e8d114d639344c73fdf59da2e6bfc2548faa9944255df0f45108fd",
+    "packages/openfilm/studio/server/jianying.test.mjs": "sha256:f1c757603442496f7b0f1199ae33b81c3777bb53c3a7190ff18bbfe0afbafffc",
+    "packages/openfilm/studio/server/keys.mjs": "sha256:488854aa195fae13e5200ac99651472ece06ec091793d0d36881cbf77156b5db",
+    "packages/openfilm/studio/server/keys.test.mjs": "sha256:9e7a1d248abbbba00b4d33c72bf986e00ba59668c1c780fbdc2395ae742a8a01",
+    "packages/openfilm/studio/server/main.mjs": "sha256:c5cef0cc93a4b6927834291c272c7e53d6163382da3073961fe73f3ebb1c42e0",
+    "packages/openfilm/studio/server/main.test.mjs": "sha256:52dd2c387a34be6d14a2379fa23e7e6eda12af49fd6bb17ed244028b3a5685a6",
+    "packages/openfilm/studio/server/markers.mjs": "sha256:a16e25078d185b0ca49a9be40336a69c4f0627cff610ec97c4a5951b9bff7b52",
+    "packages/openfilm/studio/server/markers.test.mjs": "sha256:334579d6bd1ae29d0f2e55e91bd471af5bc0fdab850e3bb861287f8e5416ceb3",
+    "packages/openfilm/studio/server/nle.mjs": "sha256:e25db69fba970954a6408bf4cf35291e6f748ce9a8ca642fb70628b55d80e88e",
+    "packages/openfilm/studio/server/open-sources.test.mjs": "sha256:f7f620abbb15052201ca9da362516f654de2a7578b9aae009d9d5eff87d88185",
+    "packages/openfilm/studio/server/ops.mjs": "sha256:e44a93286d500391cd61b6f27cc426ecb6fd49f777f816593c17133f0bd15957",
+    "packages/openfilm/studio/server/ops.test.mjs": "sha256:48a694cd243557aebfd1ca3302bc0182b3d6493afdac18e0fef1c1726ff763b0",
+    "packages/openfilm/studio/server/page-links.mjs": "sha256:5489ce9616f2eea8309e7776dcf20f358fd97886e7cd250d6ab813b80fbf8c8e",
+    "packages/openfilm/studio/server/page-links.test.mjs": "sha256:09320539a98694d13f494fe9a65031beee59e247b484dabab369208f7b59ab0f",
+    "packages/openfilm/studio/server/pageframes.mjs": "sha256:87d82f73add17d699aab963a99e45b4406cf68ecf547389b61a24083658f2828",
+    "packages/openfilm/studio/server/pageframes.test.mjs": "sha256:8a2086ad6d0acb4e54b57e3ef95d8cb99fa269781ae56d5a22ea3903c9ef4b5d",
+    "packages/openfilm/studio/server/pages.mjs": "sha256:5b56f4d34606acae83d3b249686078439a0a833323c42e35cd8facfb30abc989",
+    "packages/openfilm/studio/server/prefs.mjs": "sha256:ad46dd3f472f5cc478865fda99376f892fd74563a631389abb3882fcdb7641d2",
+    "packages/openfilm/studio/server/prefs.test.mjs": "sha256:470c7cdf1165be45c132aa625971488a19502287333d8e14d711c67367d16c98",
+    "packages/openfilm/studio/server/project-fonts.mjs": "sha256:edf1113adcd29150c56803c0de50842f4c4b1e420039bc0b3ff9a76ceb9a6f25",
+    "packages/openfilm/studio/server/project-fonts.test.mjs": "sha256:9d1cb301392f59d284b12ce0117c96271b06792ca85b91bf7f41051b82a69441",
+    "packages/openfilm/studio/server/project-settings.mjs": "sha256:c1e794bd481022ad61e8306bb16e5e3d8304c6787b4285641bb36a3605432e39",
+    "packages/openfilm/studio/server/project-settings.test.mjs": "sha256:ebb560ccf145abe732d0351fcbbcdd7ea9eb9cba7f25d85f38e32a8f7bbb30b0",
+    "packages/openfilm/studio/server/projects.mjs": "sha256:f2905720ecc890c4f27a36eb579bfdd4a754774720a03d53b965d3ea0a3c7c3f",
+    "packages/openfilm/studio/server/projects.test.mjs": "sha256:879dd5844ce9c930f256a6da31b70452f4352a1887ff2f7aef2ad5e23869b3e8",
+    "packages/openfilm/studio/server/providers/azure.mjs": "sha256:bcf1892359426d35890e9e72f199b36973a8178dc06d520d578edfdd0d380ff2",
+    "packages/openfilm/studio/server/providers/azure.test.mjs": "sha256:fd77a9ba14c3f1303b10b31de833813f9198cfc189fb70eda491b0968500c7a4",
+    "packages/openfilm/studio/server/providers/brave.mjs": "sha256:bde1599b372ee7f5ff7eb23ddd37aa7ea1962701e9b69a96eabf4371f5063b52",
+    "packages/openfilm/studio/server/providers/brave.test.mjs": "sha256:080d13a69338f876f7f2b6417a4bf748397b10ebee18caf82da0d68bc419cd43",
+    "packages/openfilm/studio/server/providers/common.mjs": "sha256:caf8dd1decebb6862c6f492541f7954a4cac42368bdc9f379fa1d0eb6d722343",
+    "packages/openfilm/studio/server/providers/common.test.mjs": "sha256:309b91fee6ff28da957e2154dadf46f10a3f518881f53e704bc417db2d84ae9f",
+    "packages/openfilm/studio/server/providers/contract.mjs": "sha256:35d440aa98253efdbaec498a4f3654318bd86de0629b2b557f56d3a4e2cc10b1",
+    "packages/openfilm/studio/server/providers/doubao.mjs": "sha256:0c6da3d35f35754e2bc05f027878ae5e0356ddbbffb5a8d9f03719c0fa558f2d",
+    "packages/openfilm/studio/server/providers/doubao.test.mjs": "sha256:3c0f1c4f4f04d01feb86aedbd74a26bbbd2c395f22eca3fe08f80bb3dcfb21a0",
+    "packages/openfilm/studio/server/providers/elevenlabs.mjs": "sha256:b7a5c240e6fcc34e261aa5b405529a760b62b7f16d5e1b7546166d5cd2329457",
+    "packages/openfilm/studio/server/providers/elevenlabs.test.mjs": "sha256:f027510011c8e575640c3b82e6f7f4cd81106114c96a7e49f2809d0c0288381a",
+    "packages/openfilm/studio/server/providers/fal.mjs": "sha256:3ca9ec0b4c6df9238710ed88f87ab4871df2663c6ff6e2d07db5a8f8570734da",
+    "packages/openfilm/studio/server/providers/fal.test.mjs": "sha256:bbe3879073f5e77d574f2ff18824b756a73e72d6f00b63bc7bbb210cb8a1f27e",
+    "packages/openfilm/studio/server/providers/google.mjs": "sha256:38e6fe36f48f5830688de8d9d300cf9da55dbd9733493909a4b33ed06356d37f",
+    "packages/openfilm/studio/server/providers/google.test.mjs": "sha256:c2e0979cd79046c0f862bc23411740a73a4bc9d7681eef0a94bfa2e7e669bb5a",
+    "packages/openfilm/studio/server/providers/groq.mjs": "sha256:5e043d5d81c26dfa82de4ac888766a457d099a0ef706ab82611966da0d28c291",
+    "packages/openfilm/studio/server/providers/groq.test.mjs": "sha256:377848c521f0ce5b5f7b40667a3e3acf8599a241cb4519523a3edaf55ed8a0e4",
+    "packages/openfilm/studio/server/providers/index.mjs": "sha256:949c9033d0c2dfe2db9f125209bdd32bd08e361cd89dacb3ece9506cb1625112",
+    "packages/openfilm/studio/server/providers/index.test.mjs": "sha256:35d4f3ded2a10e329a6ac5c58ae731a425a6e31341e277d1ba46f7d1b4784b61",
+    "packages/openfilm/studio/server/providers/openai.mjs": "sha256:c0662d8de42de7be149d3a2c7e19eb662ace215e9cbbfd8335860651a21dd5ed",
+    "packages/openfilm/studio/server/providers/openai.test.mjs": "sha256:ff63d811ff28c17ae36aa818c99ff8f2ee0424f18bed7343f0c5ad079e5b9cda",
+    "packages/openfilm/studio/server/providers/pexels.mjs": "sha256:7b8790c30424375e256c5b1ba4995a27b8e9f7b76934c3725209253f93c5c041",
+    "packages/openfilm/studio/server/providers/pexels.test.mjs": "sha256:27b452adad61deb2c87e4d1c2bcd7dbfddb1ea5fae7674683503aebe0c1a648c",
+    "packages/openfilm/studio/server/providers/pixabay.mjs": "sha256:9efa5ec35fdff2e8388e45906b8160b5c223746ed465934514cea3e2064130d7",
+    "packages/openfilm/studio/server/providers/pixabay.test.mjs": "sha256:d373708b37c43601370cbd1ce44652a5aa356ab7e85d7922f378f1afc6b1e9d9",
+    "packages/openfilm/studio/server/providers/tavily.mjs": "sha256:fd8504c54f1b6162929e776af8161acbd3738e1767b4ff566c49c642093510c9",
+    "packages/openfilm/studio/server/providers/tavily.test.mjs": "sha256:6e2b60b7f4901df47c9f6e8366ab15df2308caf432584febaed46c1ee6a5251e",
+    "packages/openfilm/studio/server/providers/web.mjs": "sha256:ee5bc76105847ce637a704224d70ff2dee450e6499e5b1a15ca102f8d76922b1",
+    "packages/openfilm/studio/server/providers/web.test.mjs": "sha256:6056afe568bb2c6bcb3f9f3e2b13f6e45724ba735925d37c9e536870014c0801",
+    "packages/openfilm/studio/server/proxies.mjs": "sha256:e384d8d590351cf9a3993d36f30631a1c739e63550cc36e37d9045a79f539047",
+    "packages/openfilm/studio/server/proxies.test.mjs": "sha256:ddb512e16f645ad61b207db0c30721fafe6a19f4bc97eda90efcda15954dd54a",
+    "packages/openfilm/studio/server/render-worker.mjs": "sha256:e67ce8a314bf75d9c09c4786a19171c10455de992647f3d5e40852c021173ad1",
+    "packages/openfilm/studio/server/server.mjs": "sha256:c2da2fcf3b8cab3c6758a8d50a660b9d8d0543b917d9927e52b4cda4f2344a0f",
+    "packages/openfilm/studio/server/server.test.mjs": "sha256:f1e1dce8cbbe6269f89e7770008090d9b0fcbf90634ed559d0d1eb1c4824fc32",
+    "packages/openfilm/studio/server/slides.mjs": "sha256:a47f3f2e4825171eb643439c11df5a33abd04242465bbceff3f2893a8fce2ea1",
+    "packages/openfilm/studio/server/stage.js": "sha256:12ea1ef17b37da85a45edaa50bd6a26da792bb8a5aee97aaa06bdb7096dc9b1f",
+    "packages/openfilm/studio/server/stage.test.mjs": "sha256:6852b450ced0a685c6579a3911377b43ae5fee52caddf180571d26e772d816fa",
+    "packages/openfilm/studio/server/subtitle-edits.mjs": "sha256:59e13625179f2c843667722989149e6ec1c01afd459b1c5b5328a91b6c866e8f",
+    "packages/openfilm/studio/server/subtitle-edits.test.mjs": "sha256:828fa7caacc720cdaa37b68847acfbc6cb13c988abe905cfb032517d67cb6700",
+    "packages/openfilm/studio/server/subtitle-segments.mjs": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "packages/openfilm/studio/server/subtitle-segments.test.mjs": "sha256:c0e3148fbe3d7b486bd66ac9e85e5eb7ab6bcbd625f708b514c2577222d4b92f",
+    "packages/openfilm/studio/server/transcripts.mjs": "sha256:ff2c765bec47e7238a56f787c88da7cd1eea3ce893c8fe2959f0a1bdc6da50d3",
+    "packages/openfilm/studio/server/transcripts.test.mjs": "sha256:892e6466a85bf3b5a77c669a14f4041c718149b3e66ad49c7eaea1053e09ae00",
+    "packages/openfilm/studio/server/transition-pages.mjs": "sha256:2e9a218091e8d60ac6e8b2621687911bb2871154e2c84d8e41136fc0f5bc5fd8",
+    "packages/openfilm/studio/server/transition-pages.test.mjs": "sha256:335910a2fae8e411ca1c75d927565042e3ec7e6651c16e1453839d39e38c23ba",
+    "packages/openfilm/studio/server/trash.mjs": "sha256:26ec5e0a12ca1b836658744db2482643af985325093a63f08d093130e17e046f",
+    "packages/openfilm/studio/server/tsconfig.json": "sha256:d92dc7e4a57d456ff013351c33250bb21b9d79b72f1af08468a18c5c78605a65",
+    "packages/openfilm/studio/server/watch.mjs": "sha256:c4c85f7bd725f518f200a1cb4081c495daf1b2d1e7ba4a9b65e3b5dc2c641b7f",
+    "packages/openfilm/studio/server/watch.test.mjs": "sha256:3ba585d8726bcdc9fb2823b5e35daa7261a00537086a1aef6d523608c235c531",
+    "packages/openfilm/studio/server/websocket.mjs": "sha256:3cc11b2f52d8505a00406b069f8e8a11a6b4db0abaac8973ae52966b64a5d3d5",
+    "packages/openfilm/studio/server/zip.mjs": "sha256:ec32b1f18203c19a9f1d011116b28099778039585f6bffe2814850350bf06c43",
+    "packages/openfilm/studio/ui/index.html": "sha256:ad9b1990f5b1920acca2a0edead9f8504aa253e27208882b4f3310ca0aa54ac6",
+    "packages/openfilm/studio/ui/src/api.ts": "sha256:34f1558c7ec2dd28c435f74827da49b21f974722958dead949e1896785b77034",
+    "packages/openfilm/studio/ui/src/App.tsx": "sha256:b4cede434d9a066a5ae6c1fd8208e068dd421fc49dcb6b19e6ae3b674d02ae22",
+    "packages/openfilm/studio/ui/src/components/AudioMeters.tsx": "sha256:e2d41614e196edfc7b8111220c4eb6e37c66727105712361863d42c13292b907",
+    "packages/openfilm/studio/ui/src/components/BlockThumbs.tsx": "sha256:bd118c3ef3665af2b5566a8ad7dba415c067124d10096ac9d9d585e97968dce2",
+    "packages/openfilm/studio/ui/src/components/BlockWaveform.tsx": "sha256:66a18d17f62e09a918040b766d5abb9cb2204878659e4f2cd7cceab0e421cf40",
+    "packages/openfilm/studio/ui/src/components/BrandLoadingScreen.tsx": "sha256:3cba7a002a1edf813f739d44bbe39313d7ad0f80d80230395b27a1497dd02588",
+    "packages/openfilm/studio/ui/src/components/BrandLogo.tsx": "sha256:d70af64a3d7424376c845bdc3cc84bbccb6ee707168d105d86883ea62a29b6ff",
+    "packages/openfilm/studio/ui/src/components/Card.tsx": "sha256:257b5dd176913c74faac763af670ae27e74aa4036259d7649d9790146c56c98d",
+    "packages/openfilm/studio/ui/src/components/ColorPicker.tsx": "sha256:873e3de3fdb40c255c840d175b39b67459a74d82050f910e9dade69c196cc1c3",
+    "packages/openfilm/studio/ui/src/components/ConfirmDialog.tsx": "sha256:a2d9fab156e094c4e05cf654d8a4aa0ca70d6a912d0416d3f03ee088e81bd166",
+    "packages/openfilm/studio/ui/src/components/ContextMenu.tsx": "sha256:a3715a1b260ca81255a0910d4f0cab7844bd290c4df56f5267df8b5d69a68a71",
+    "packages/openfilm/studio/ui/src/components/DesktopDialog.tsx": "sha256:c8f11a678c2144d6628e5cede8ff983d171d96ffcafe45c13418e9288b99758b",
+    "packages/openfilm/studio/ui/src/components/dock-pane-bar.ts": "sha256:472ff31b26625307173d8277b7c5ef28c670d2b07d45083c36b2adff5a66da67",
+    "packages/openfilm/studio/ui/src/components/export/ExportCenter.tsx": "sha256:f39652bd518f2f9b9e8286b4a649aafa048496966d3ce3f515082ad54e5006fe",
+    "packages/openfilm/studio/ui/src/components/export/ExportTray.tsx": "sha256:b11389233e9c6298cfd08c34b0bc08683034ed159122dcd970e824f9f040e4ad",
+    "packages/openfilm/studio/ui/src/components/film-stage-hit.ts": "sha256:993f489e62e7989f026ace09be5017ed425fc5b08468f85952316a05bf205f7d",
+    "packages/openfilm/studio/ui/src/components/FilmFullscreenBar.tsx": "sha256:aee19845e0209ca8cbb28db600278d25bdd9990eeb5cb9c20fa950d15f18989a",
+    "packages/openfilm/studio/ui/src/components/FilmInspector.tsx": "sha256:6839ddb1395f4825143cb136df47cbc63a54b26783ffa253f93d529ce0aca679",
+    "packages/openfilm/studio/ui/src/components/FilmStageSelect.tsx": "sha256:dec2992d3a981645d449e72c6114e81d469a183f21cac2b21c1abad8d9acb3e1",
+    "packages/openfilm/studio/ui/src/components/FocusNav.tsx": "sha256:501a1b3d7aeaa64e6bdcd1f45c5ea730f9ecfebc3b90353a52b0d3176e1d0f04",
+    "packages/openfilm/studio/ui/src/components/FontFamilyPicker.tsx": "sha256:844e0c90a5de788ef42a48eb5dcaf1f1c6f9d9373ab4b0bd5d66805b121b5d86",
+    "packages/openfilm/studio/ui/src/components/FramePicker.tsx": "sha256:8ea1b3dbf15931009e57f0e2117ec5a7d7f50b444c52ced92960d6e5f812662c",
+    "packages/openfilm/studio/ui/src/components/inspector-fields.tsx": "sha256:799cfb32c65c1253b3e758091cd138f0afa3dfeb5834240ca1ea0d5f141feb01",
+    "packages/openfilm/studio/ui/src/components/inspector-look.tsx": "sha256:e7d08cec315e3d6579bdfe12df9d05e7245c1a34d9901bd003adeb56eee13a2b",
+    "packages/openfilm/studio/ui/src/components/InspectorPanel.tsx": "sha256:b46c7c8f815466c7c2cdb48307450d3ce1f2fb948127a4f0ae6ee77002296357",
+    "packages/openfilm/studio/ui/src/components/LayersPanel.tsx": "sha256:b53c82b40bedc9f883d71b33a7fcb3e1eb77613ddf49aa907dc8e2080610b1d4",
+    "packages/openfilm/studio/ui/src/components/LiveTime.tsx": "sha256:15210cc352bc4ed017ef842d84a9ee7371398b5e83ba0431bc3c0def6b47074b",
+    "packages/openfilm/studio/ui/src/components/MediaPool.tsx": "sha256:6042a02932b0324daa4c4496a13fa1c0de6494190d3f2d006d31498946f52cee",
+    "packages/openfilm/studio/ui/src/components/MediaPreview.tsx": "sha256:11ab4cac5ca5a1feb6c0f849bcbcbed2df6b2a7505848f21b58e37e2151e69e4",
+    "packages/openfilm/studio/ui/src/components/MenuSelect.tsx": "sha256:a307ddd4df20825535a151b178eaa93c2aded7ea0838ef332db87a853cfec434",
+    "packages/openfilm/studio/ui/src/components/MgOutline.tsx": "sha256:dea78eb0b6d6e4977a886cbed65b4927804d6ea8cba09b9eaeb89f54d0b10a94",
+    "packages/openfilm/studio/ui/src/components/OperationHistory.tsx": "sha256:6293d3c9bd1a9d33489cd8536d37c85a96898c75aa02b3cefec10c1bde235c22",
+    "packages/openfilm/studio/ui/src/components/PaneDivider.tsx": "sha256:b4d43eef3ce886f35e15df605f2afd572e91967754ae5071aebb013e380f94e6",
+    "packages/openfilm/studio/ui/src/components/PasteAttrsDialog.tsx": "sha256:c12df7fb7ca879d18085cfdfd8462a1eb636332b7fb6aa8ab5fa6593ddbab981",
+    "packages/openfilm/studio/ui/src/components/player-controls/controls-bar.tsx": "sha256:193bc88f949ccde3c7f4405e92c6eed6060d619ff3301bf3e3a1a18af33ff012",
+    "packages/openfilm/studio/ui/src/components/player-controls/transport.tsx": "sha256:451d64cc4d7fd3f0cbc9272cd6e3dd9f74fde7fa7c4db42fb4eef746688fc31b",
+    "packages/openfilm/studio/ui/src/components/Popover.tsx": "sha256:10efc9faa70640ac37dd293a2401d48ad76f99fd6a0d3a46b3da6046f011c73a",
+    "packages/openfilm/studio/ui/src/components/ProjectHistoryControls.tsx": "sha256:7fa2784e53a9a3579e3b9cff80a85bd8eed3a789686b8855b44c83660e440621",
+    "packages/openfilm/studio/ui/src/components/ProjectLayoutMenu.tsx": "sha256:7dfd88925bba77d97b63bbfee0453761d31f9395aabee7a52aa2360e3800a18c",
+    "packages/openfilm/studio/ui/src/components/ProjectMenu.tsx": "sha256:af3b2a42167e7e8be95422dcea83a47ecd5177a5c957ba60e09e59cc78fee608",
+    "packages/openfilm/studio/ui/src/components/ProjectsLibrary.tsx": "sha256:a6cf509cb38f01c0e7ec5977f8bd11ceed65e6e98c65fb4613647df15abb8736",
+    "packages/openfilm/studio/ui/src/components/ProjectSources.tsx": "sha256:5e5c2c6c46edb6419f9278723b2b295b88a49040cae86b1496111a5f4c25e18b",
+    "packages/openfilm/studio/ui/src/components/ProjectsView.tsx": "sha256:05fd9dbecd4c77592d1fa58494380350d8a739157c2b4451eb051e233001f46e",
+    "packages/openfilm/studio/ui/src/components/ProjectView.tsx": "sha256:1dd6e2e7330924897299e082e7a0a962319da16238d8063b72b9ccd2276dc405",
+    "packages/openfilm/studio/ui/src/components/replace-drop.ts": "sha256:2d4a43948d775d65fdcf569eeb4aeeb0bfb429fe9a4bf50aeb15a2d0b8fff9a3",
+    "packages/openfilm/studio/ui/src/components/ResourceInspector.tsx": "sha256:4e609345a7257cebbe3029ec4ef36d0f4e970cc60496f0f1d7b6a455054e961a",
+    "packages/openfilm/studio/ui/src/components/SelectionToolbar.tsx": "sha256:4aa1a2f8e5699b48c3b02a29d86f0dcae490d46a0dbb794657502da52d4db38c",
+    "packages/openfilm/studio/ui/src/components/settings/AgentsSection.tsx": "sha256:971c1b12185fa1f03509fa9d64b7a24a0b5fc86daf7502ffbb7ee0267a6b198e",
+    "packages/openfilm/studio/ui/src/components/settings/ModelsSection.tsx": "sha256:455418f3d346dcee6c1549351d3c6f206586c0e3635e4d004c67592944264438",
+    "packages/openfilm/studio/ui/src/components/settings/ProviderMark.tsx": "sha256:a65f3bcab8775886e269dce1851a6dd355c8b149dc9dca49029121121be17d54",
+    "packages/openfilm/studio/ui/src/components/settings/ProvidersSection.tsx": "sha256:1fca3ead3ec2667f1410eeddb61c58d0db5f965dc623ac01b49648cab9331a91",
+    "packages/openfilm/studio/ui/src/components/settings/SettingsModal.tsx": "sha256:4a2381ade189b94e90088c32f79e2b1a2e51279feea9105afa33dca99f04150f",
+    "packages/openfilm/studio/ui/src/components/settings/SettingsSelect.tsx": "sha256:191122236e557c00bd8dad648e9366f4ff2d0d87e3a7710e42fd19e934f54599",
+    "packages/openfilm/studio/ui/src/components/settings/theme.ts": "sha256:81064724c18f52dd84ef692a21c7f81206ec2670321aae6a0f7d7479223ad2d0",
+    "packages/openfilm/studio/ui/src/components/settings/ui.tsx": "sha256:efa33b1b9f9ab9a56cbebaab5e4ec5b02321c1ecff0c8a9d3206bf26740446db",
+    "packages/openfilm/studio/ui/src/components/SourcePreview.tsx": "sha256:734f0c39590c73f40d08520d3c73c615f30196256d4244dd44e8a0318d1033ff",
+    "packages/openfilm/studio/ui/src/components/SpendAsks.tsx": "sha256:4d7c3899730b1214ebe73609dcc07777a2f3ea2932eb573d156ecd16602c9810",
+    "packages/openfilm/studio/ui/src/components/stage-menu.tsx": "sha256:82154577c6b2954c035a3a861baf0570fc3f5526411dd80d22bc8f91973073c3",
+    "packages/openfilm/studio/ui/src/components/StageMaskOverlay.tsx": "sha256:fbfab50b240531e4faf3d56b43a25a7413dc40dc8cc619a886b0b23223595dcb",
+    "packages/openfilm/studio/ui/src/components/StageTransformFrame.tsx": "sha256:e43f8f093281cdee12eb0ee4e41095e6c598083e74410bc84ecb51a49dd129ff",
+    "packages/openfilm/studio/ui/src/components/SubtitleInspector.module.css": "sha256:d572dd38c496bb1d223dc5106f5603af9e650fd3a1ff218f56532df9a5e921dc",
+    "packages/openfilm/studio/ui/src/components/SubtitleInspector.tsx": "sha256:f9a79ba59abde4eb91e3100cf7d5b4041ad682983d3f35f13b816408f8d242c6",
+    "packages/openfilm/studio/ui/src/components/SubtitleOverlay.tsx": "sha256:96218f9c1752d83ba2205e7eaebe6e94d13a049301a1d6b4993b2d9016e23c89",
+    "packages/openfilm/studio/ui/src/components/SubtitleRow.tsx": "sha256:12772b8c1d5af1d17f227b318d30eef1cfa17859e29b0beff8ceb2e00f182161",
+    "packages/openfilm/studio/ui/src/components/timeline-head-extras.tsx": "sha256:0dfc370173404eb0774c009342780c9311e4e91cce635184e7173a2d42ba9f0a",
+    "packages/openfilm/studio/ui/src/components/Timeline.tsx": "sha256:ccc6340d94a4c1bb8f10652bdb15647b28e5b6459404a1b27996b4ff49fa8140",
+    "packages/openfilm/studio/ui/src/components/TimelineMarkers.tsx": "sha256:df3ad65c3d06daf0fe3cd0b04ac3a54ac4b3ba723a098dffa29434a0d58c414e",
+    "packages/openfilm/studio/ui/src/components/Toast.tsx": "sha256:8c3c48fde41fc1cbe84db5e48bad73428a7ab1bed5ef4f3f86d1b9855b459790",
+    "packages/openfilm/studio/ui/src/components/Tooltip.tsx": "sha256:f386e1a89b61710f1305addd664d9d2e4f6b77304949679f7ec415e8a9cebdb4",
+    "packages/openfilm/studio/ui/src/components/typing-target.test.ts": "sha256:7644468e0cedec4e8e62a549ffe714d1a35cf40143738256b2196fc066524da4",
+    "packages/openfilm/studio/ui/src/components/typing-target.ts": "sha256:579e588e30a9c6c8f8e15226e944fad5b3678d817f35e2e8d0eaf4b1eee761cc",
+    "packages/openfilm/studio/ui/src/components/UpdateButton.tsx": "sha256:bc9641ecb09b5dd694d0afa360b12500502024274b051e11c93a97a2b6457e94",
+    "packages/openfilm/studio/ui/src/components/use-editor-tools.tsx": "sha256:564bafd3db73f82e8dc27672974a3bbda66d4a443afa5f29b9122efe4583235b",
+    "packages/openfilm/studio/ui/src/components/use-page-changes.ts": "sha256:abd7b1c0f053ecdf72065c147faaf4f796fa6225e7cf943f2bebeaa0b43113ee",
+    "packages/openfilm/studio/ui/src/components/use-project-history.ts": "sha256:a199c835c3e4e9312a0ef3e95132c092c8f5b0b1d81c8f9dd857943b65a9f6bd",
+    "packages/openfilm/studio/ui/src/components/useBlockDrag.ts": "sha256:15ccca22c6c9e9fcc7a49c515cdf9fc27d44f660e0b687da68fe52acf5a907ab",
+    "packages/openfilm/studio/ui/src/components/ViewerBar.tsx": "sha256:34fc60a14015aecf00a949958b80dd0c4bb4436abbf1fe51c17a0e1f18ba42d8",
+    "packages/openfilm/studio/ui/src/components/WhatsNew.tsx": "sha256:bd8934ca9bc8f67968da55aa97eb65b01a6e346ee88c8b7363f22be0b4fed811",
+    "packages/openfilm/studio/ui/src/editor/player.test.ts": "sha256:949c4d83f82d0f27b6958841a22f0981c6b42d896a33530cd321f970de5d648e",
+    "packages/openfilm/studio/ui/src/editor/player.ts": "sha256:2ea31714db996e2a6f1ed1f3701885df3ed12d5c8cec2f44a8b45449b658e6ba",
+    "packages/openfilm/studio/ui/src/editor/preview-frames.test.ts": "sha256:4be299cc4c7d00a4c9ddfd23c595268d7bba8fc4236223e213cb97bf7dcba308",
+    "packages/openfilm/studio/ui/src/editor/preview-frames.ts": "sha256:c42160216af7a9c454736b58b8084d7ce3c3095c395d739004a6b916ef0b2163",
+    "packages/openfilm/studio/ui/src/editor/Preview.tsx": "sha256:f339e126cccedbce2b4887be2ed8eac0e97d5fce628a8c343c0c9ab62720e72c",
+    "packages/openfilm/studio/ui/src/editor/undo.test.ts": "sha256:d3bacf71a660c5a25150e480c6f2d4a3cbe370b41aea1672f02f459bfc7829e8",
+    "packages/openfilm/studio/ui/src/editor/undo.ts": "sha256:1872891974a99648c9394018d7b1d4724ed2169bd4ba02d6416f2fb600fc438b",
+    "packages/openfilm/studio/ui/src/editor/use-film.ts": "sha256:8e88ca064e0a3e5292523952fff567101da0170418641d6e02400772c974dc26",
+    "packages/openfilm/studio/ui/src/globals.css": "sha256:70b336e46da6b9e23ac876af619b815b9611495bb1ef85307ebd189bf4e902df",
+    "packages/openfilm/studio/ui/src/i18n/en.ts": "sha256:79914596ce4a8d88882b56346814ff77d0f4e7c2766654e3adad268cf2f412dc",
+    "packages/openfilm/studio/ui/src/i18n/es.ts": "sha256:da3b78213b6f46392bba1c65d7d874a7cbc190a6383a73032f51a8fb905b2f93",
+    "packages/openfilm/studio/ui/src/i18n/index.ts": "sha256:c561b118ac8571e1d20da65b5385bd51af0a63f34218e56bbd90cc54984ba994",
+    "packages/openfilm/studio/ui/src/i18n/ja.ts": "sha256:3b65ba55c1df2133707efb9e064a8b0c98aa45217e92fe0e2fb179fbbe4eaf0d",
+    "packages/openfilm/studio/ui/src/i18n/ko.ts": "sha256:c96a56a3aa697239b662cf94189bf3e3c5a1a736f89f0f3a92d394329bc76038",
+    "packages/openfilm/studio/ui/src/i18n/words.ts": "sha256:485e599ffd54c1470ffd0df0665227de20f4838685a9ee45a1898bbd68efec11",
+    "packages/openfilm/studio/ui/src/i18n/zh-CN.ts": "sha256:e6f56f457a939ff2f9c5fab1743d8e19af2583f312d9c6d65cffe5f5e37d510e",
+    "packages/openfilm/studio/ui/src/lib/asset-timeline.test.ts": "sha256:ef22c7a1b9aaff42b519ec1145a27309ec9321bafb6c424dce622c4664af911c",
+    "packages/openfilm/studio/ui/src/lib/asset-timeline.ts": "sha256:c5c7680fbf870c7f73acafd524349ab1a521d2a54c718e8787d03c18ab58d8f2",
+    "packages/openfilm/studio/ui/src/lib/audio-levels.test.ts": "sha256:52cd01649fcea9af29d4f1399030585939180235d3f9cf3700ea75f05397ce51",
+    "packages/openfilm/studio/ui/src/lib/audio-levels.ts": "sha256:99a1de17c1ea460c2df5f171e66c0468492fb62766b90aa66f2f8bd619fe61cd",
+    "packages/openfilm/studio/ui/src/lib/canvas-fit.test.ts": "sha256:35c716b7e30357f16d379702781616a7b26be52e6b09621d1e75ea95af8d2aab",
+    "packages/openfilm/studio/ui/src/lib/canvas-fit.ts": "sha256:1cd0d5a4165e6e5f205f7e5803523c39712d748150fe8d3d215c64037b354142",
+    "packages/openfilm/studio/ui/src/lib/chat-marks.test.ts": "sha256:23735cbce10a0cd74b6345d2cef2171e6a3fbede5fa9f17280e9543d464e2f37",
+    "packages/openfilm/studio/ui/src/lib/chat-marks.ts": "sha256:00e2901b1339266939ab16459d1b50a4abcff8b4c0b2b4c8b6710e9921136cd0",
+    "packages/openfilm/studio/ui/src/lib/clip-attrs.test.ts": "sha256:6ececc5b8670feb6b680e870a62c7bf9c0f06ff198cec665d50ca6e147652954",
+    "packages/openfilm/studio/ui/src/lib/clip-attrs.ts": "sha256:daf0109d6de02576af32d25c957fc62ae5d2ee7b3c9d53d1b8e4717a24b92afc",
+    "packages/openfilm/studio/ui/src/lib/clip-fade.ts": "sha256:afa7e92f0082d3f70124eb46f8985bb160ac509ef7e75388aa421efc91851f5e",
+    "packages/openfilm/studio/ui/src/lib/clip-look.test.ts": "sha256:90cf9d9fd19c8197460fc0784136659ae9d11f8bd46aee64b7ab815c53bfa29c",
+    "packages/openfilm/studio/ui/src/lib/clip-look.ts": "sha256:8113eb83072252d4de018cb06c2b712091edf492019a58055d0ba96c53feb52a",
+    "packages/openfilm/studio/ui/src/lib/clip-mask.test.ts": "sha256:aa1ab3db02ad7cb39db03ccd3e26e0395dfd58aaa0a18f892b36d5ed0bbed289",
+    "packages/openfilm/studio/ui/src/lib/clip-mask.ts": "sha256:6af8b00b442853fd939815ee8ec17117f5696977c5f172425db3ed387fc77a48",
+    "packages/openfilm/studio/ui/src/lib/clip-replace.test.ts": "sha256:ec499e2a4d4fbddf82096b4377dcb578809f7c17c0b797d5b86f92585b70019e",
+    "packages/openfilm/studio/ui/src/lib/clip-replace.ts": "sha256:0048148f91b0c5fdb53f3e01359865aa4fe2cf0b8c89683d2127a5ed6f2d6c79",
+    "packages/openfilm/studio/ui/src/lib/desktop-build.ts": "sha256:3673bf6df65714617a26a8952397e20f947355d8b1dd8d5f0ea13b59fdb92a27",
+    "packages/openfilm/studio/ui/src/lib/double-press.test.ts": "sha256:a1afe6730944d42cb25611ede75ef668c42036dae0b2e27e3027d866d32f28df",
+    "packages/openfilm/studio/ui/src/lib/double-press.ts": "sha256:52c6cb888dd9bcf1cf1654428ac5a84b8656260e5b64581d25669305f745490a",
+    "packages/openfilm/studio/ui/src/lib/dropped-overrides.test.ts": "sha256:65cc57cf9c2edb3f17fa72a60b8c70f544a67abe5c4da551135dc29f7d3c8303",
+    "packages/openfilm/studio/ui/src/lib/dropped-overrides.ts": "sha256:8b2f2fc9447467d151739e5c8f6a4d48ad40e6c7b2ee02efb2ee5997352f6a19",
+    "packages/openfilm/studio/ui/src/lib/export-jobs.test.ts": "sha256:8df83885c3b15d2f82b5471b52d438173799025207a9e05058149cdb7b71d268",
+    "packages/openfilm/studio/ui/src/lib/export-jobs.ts": "sha256:c86dad69bab3d0d583378df5f5a26b60be430332933e1c74d8dddd2ef9f4569e",
+    "packages/openfilm/studio/ui/src/lib/export-spec.test.ts": "sha256:941457167a86bad087388df57b6641347c9cc2bd670e12aa1c7e7dab16135483",
+    "packages/openfilm/studio/ui/src/lib/export-spec.ts": "sha256:bbfbe783c4e7fbc365757b444d7fe9d6accc1678516e625bc2672376ab5c91a1",
+    "packages/openfilm/studio/ui/src/lib/field-input.test.ts": "sha256:bc976ca27080bab50a7f126d65ed014f7578e3ebd7c9a3b0881441905541cad3",
+    "packages/openfilm/studio/ui/src/lib/field-input.ts": "sha256:07bedfc711b94fb1589a4169294032af9c7f48afb9131ee14e8ee6df64ab8f20",
+    "packages/openfilm/studio/ui/src/lib/film-clip-edits.test.ts": "sha256:b6d508316b8dedd9cf2b0c27d1eb9d474b42c073a2df57bdeae8719c35f80af9",
+    "packages/openfilm/studio/ui/src/lib/film-clip-edits.ts": "sha256:9c3ba9e7476a213be49e045cf23f19bf867546e00d5d724dbf9aa8508fba2510",
+    "packages/openfilm/studio/ui/src/lib/film-frame.test.ts": "sha256:7edc2c4622ca014869c8b7d4f15fe93974026bd64fff0656277298aa89cef787",
+    "packages/openfilm/studio/ui/src/lib/film-frame.ts": "sha256:9f070cee79442367ae56de6a4a1cf812a25f6eeef7a3faf6804e93c3bbd2342d",
+    "packages/openfilm/studio/ui/src/lib/film-overrides.ts": "sha256:57392e3abd23941fcb66a709ec8e2091d853b4f2ba313c2354e771f5b040ad3b",
+    "packages/openfilm/studio/ui/src/lib/film-shape.test.ts": "sha256:4102ba01d80d324b09b22cfe65bd45d18c55566e245135e65839a1596d65af50",
+    "packages/openfilm/studio/ui/src/lib/film-shape.ts": "sha256:23699e27a8ee6c8d98417cec1b700c3e569ebd0c165746592da70c06b2c55416",
+    "packages/openfilm/studio/ui/src/lib/film.ts": "sha256:a344a3d2f06860254c315e677db8e4a540c9dc61dd162b550d2240607c7bbfef",
+    "packages/openfilm/studio/ui/src/lib/font-menu.test.ts": "sha256:bd0bebbf63f3b7e1ccbab828f9c9f315f5d6322eecb8033ad9906bec98e764e7",
+    "packages/openfilm/studio/ui/src/lib/font-menu.ts": "sha256:9d6f771a460d277417e9045efcb339e0a90db30b696ee563a316d58f82f1efb2",
+    "packages/openfilm/studio/ui/src/lib/font-styles.test.ts": "sha256:5b26fa67eeaba1093c3673c6889b76f2c9478885ee6396656105dd0b1f9b462b",
+    "packages/openfilm/studio/ui/src/lib/font-styles.ts": "sha256:5ee48ce068533e65e1dfc552e88f08aef4ce0c8439190cfb49aa9ac98c32dc3c",
+    "packages/openfilm/studio/ui/src/lib/freeze-frame.test.ts": "sha256:f2420574a1509fd0364e77a8a878109b0ecde6044863a3c5106c21b916e2988a",
+    "packages/openfilm/studio/ui/src/lib/freeze-frame.ts": "sha256:cde51e300e01051ee82ce61844e50d9ad047331beb9e2bcc0495e936888131e7",
+    "packages/openfilm/studio/ui/src/lib/group-drag.test.ts": "sha256:06f16541a6d04855c60df315c8f877e44839d993e451d14c1ca044ab10a9daea",
+    "packages/openfilm/studio/ui/src/lib/host.ts": "sha256:84b6b549a80a695d68a0915681b865f0a22c7e49b8533fc5d8d889ef8a966053",
+    "packages/openfilm/studio/ui/src/lib/inspect-scrub.ts": "sha256:79e94b12db3a823775f601a89572092e9d62e9b5a3f572b1e6d2453522a911bc",
+    "packages/openfilm/studio/ui/src/lib/layers-tree.test.ts": "sha256:e978f27503dfc8e18db1dcd7551107cf0bc67e5e54c35dfb26c17d1f5a58704f",
+    "packages/openfilm/studio/ui/src/lib/layers-tree.ts": "sha256:3591bfb626507dcede9c4e7a84f99cd0dcbe95adbda0a57ebfd8fccd4a023972",
+    "packages/openfilm/studio/ui/src/lib/loudness.test.ts": "sha256:4cbc5fad7ef8cdbfd651316889ac2bc9cc12c87a6193fe74679b5393eeb94f78",
+    "packages/openfilm/studio/ui/src/lib/loudness.ts": "sha256:33fa722afcf5d359c7da96f89f77236711aecac179daee4229d6cb08fda098a8",
+    "packages/openfilm/studio/ui/src/lib/markers.test.ts": "sha256:a3ad3f2a7941a8684e07577589fab63c5d627b81a132b0567b61dae53e06379e",
+    "packages/openfilm/studio/ui/src/lib/markers.ts": "sha256:524c389f26a88286978505d873d0791d04043a4184576902fe3d7f0f0c4fbbfb",
+    "packages/openfilm/studio/ui/src/lib/media-bar.test.ts": "sha256:a10eab62061aa9d6f241a0beddaf94abefe8e7730897fc9d217834d1535b12ba",
+    "packages/openfilm/studio/ui/src/lib/media-bar.ts": "sha256:08a8ec6a9605d3e7b6073df6432ef01c8fe9908454c34095b68bcfbc34cc0d38",
+    "packages/openfilm/studio/ui/src/lib/media-place.test.ts": "sha256:bbb82e3d4ed7cc98183909a8e5b6382de69517f6d7994ba089fb3cb9d2bc575d",
+    "packages/openfilm/studio/ui/src/lib/media-place.ts": "sha256:cc5f2705b8d1350468ebfe78abcefdbb653529e5cdfb5c637f9be07050b71d5c",
+    "packages/openfilm/studio/ui/src/lib/media-queue.test.ts": "sha256:4e19c6ffaca5e2ff30f111622517e5f1cfb4646bfbb6a4d2880089a801eb7c1b",
+    "packages/openfilm/studio/ui/src/lib/media-queue.ts": "sha256:104eaa8d1b260ca64b38557c59524dbd847f5fb98c0a089b13f515bc2f724724",
+    "packages/openfilm/studio/ui/src/lib/media-selection.test.ts": "sha256:14851dc9487f8b5fb24edb30e2ca0dff2875a7e54d8b5c35d541c8715700a524",
+    "packages/openfilm/studio/ui/src/lib/media-selection.ts": "sha256:6c425436af7430d56dfed140651acb343fd0146f2882734a9881ebaaeaed57af",
+    "packages/openfilm/studio/ui/src/lib/menu-position.test.ts": "sha256:0d623d5d36dc37ab74ffe49056e3560947f2944085730e763044870f7db90757",
+    "packages/openfilm/studio/ui/src/lib/menu-position.ts": "sha256:f7d1ffefd2e707cd147c963effeab3b65b32c40f8be7d6266015a854d2d12cc5",
+    "packages/openfilm/studio/ui/src/lib/mg-transform.ts": "sha256:bde5a88c6769830e30827d9c1eb47af2a6a2f60b47f1d9795cc3e000c4c9a9e1",
+    "packages/openfilm/studio/ui/src/lib/page-changes.test.ts": "sha256:16a783df8161d3f762933ad5f345642906e640a746bbc9539fef1188262d3c18",
+    "packages/openfilm/studio/ui/src/lib/page-changes.ts": "sha256:f1527335fa65618394a070f28eb2d84239cd286d420eface921cde8a0c92612f",
+    "packages/openfilm/studio/ui/src/lib/picture-files.test.ts": "sha256:720896d4e9e0425f38025b074e8b22b06e508ede949b0e4b24b825e788f541ed",
+    "packages/openfilm/studio/ui/src/lib/picture-files.ts": "sha256:2583660618625be7c064f323d2258ab4f72e7ad0339168cddfc8c04ea2e4d132",
+    "packages/openfilm/studio/ui/src/lib/project-folders.test.ts": "sha256:bdb326882af149a9c15d442804855bc7beef99aa9bfdc04ea16683810e267ed3",
+    "packages/openfilm/studio/ui/src/lib/project-folders.ts": "sha256:fc8290937b580a3490c9c2450cf5b5f03d64e08c252ebf8401562e206c61d779",
+    "packages/openfilm/studio/ui/src/lib/project-history.test.ts": "sha256:e31e645309c3097cc017b44643eb7b6f7d8da1277bb0406cd2cdde8047c4bf56",
+    "packages/openfilm/studio/ui/src/lib/project-history.ts": "sha256:9407dcd933cb2eb2e04b68fc194ad678cf5d6a5ff2026858ce83993599a8d4b4",
+    "packages/openfilm/studio/ui/src/lib/project-sources.test.ts": "sha256:4dcf135557a2278e4c01c897b403cc6239dfacd3217a792623acc63e2844e208",
+    "packages/openfilm/studio/ui/src/lib/project-sources.ts": "sha256:34fb47616cb5fb30ca17fd372ddcd6c5b532999e834a65d6b8a3436f8e8ee75f",
+    "packages/openfilm/studio/ui/src/lib/provider-marks.test.ts": "sha256:a8b4b76b4d4fbbb290987ef8021a19a437ca11a50d829ca71e3c720d7b9180f4",
+    "packages/openfilm/studio/ui/src/lib/provider-marks.ts": "sha256:d5d84563a9c5eb223ab1391333d7983308aa01c4f9a4c82da11d9f00b4819432",
+    "packages/openfilm/studio/ui/src/lib/providers.test.ts": "sha256:440b1567699cf1677a8bb8201f10e0b1822a112c51290fe8cb56a39149b8a2ab",
+    "packages/openfilm/studio/ui/src/lib/providers.ts": "sha256:31d287d4166cde4163f9509f98b09ae58e136381ee1bc9884556049ae9b43b17",
+    "packages/openfilm/studio/ui/src/lib/resource-drag.ts": "sha256:624e549b08a3e8f6c933532825f5a05e3662d7901310c0f8e8c378b17ef21e26",
+    "packages/openfilm/studio/ui/src/lib/retry-image.ts": "sha256:e85f9684c46ce2a467671b65db471feb8ba69685a241d2f158b97175a936321e",
+    "packages/openfilm/studio/ui/src/lib/select-all-key.test.ts": "sha256:9f7919990be941e5d167837ffa3425e42ab8e89ff4d078ac515176c76b2b4e89",
+    "packages/openfilm/studio/ui/src/lib/select-all-key.ts": "sha256:793741bfc3f740992ba48df8651fbeec0a976f2e5bd8f91202adb19f87e18feb",
+    "packages/openfilm/studio/ui/src/lib/selection-toolbar.test.ts": "sha256:12f3430b82fa19968a32213ba87f152c8e3b5ffc6f54f1321728845f5789a770",
+    "packages/openfilm/studio/ui/src/lib/selection-toolbar.ts": "sha256:95d0b36f2ecd49b70341473ef99e2fa34c38f7a25bfe63fc95f508e0674c0c02",
+    "packages/openfilm/studio/ui/src/lib/shortcut-hint.ts": "sha256:a52a7d452694a134e0b01490e6f5356fd0569f961a221250acc85fd4d806e44a",
+    "packages/openfilm/studio/ui/src/lib/similar-layers.test.ts": "sha256:71e4a380a55a8b4f682eade09f26f22b10c3af04a4eea551e966db0a80c16033",
+    "packages/openfilm/studio/ui/src/lib/similar-layers.ts": "sha256:96e0aa5bb62dc5fb4d05f18ad6730b700c55aaf20acbc37e78ce340e7fc3f5c9",
+    "packages/openfilm/studio/ui/src/lib/solo.test.ts": "sha256:93ecdb9ccf878e144f2126245f7688c6bc3fd6db5803989636e8715f36bb91ce",
+    "packages/openfilm/studio/ui/src/lib/solo.ts": "sha256:d3a053e962e1cc7e6bbbbe0d7daa1af2560fd4e5cc658345356cf88bb81829a4",
+    "packages/openfilm/studio/ui/src/lib/stage-clip.ts": "sha256:5fed722ebd411c8094344e03eecc6a0e375d7e79322a6db366bbe3c96a7841f6",
+    "packages/openfilm/studio/ui/src/lib/stage-crop.test.ts": "sha256:6091732d7027581878fe35b3d274520597d03e8d7960c081b897c44e8f54fb70",
+    "packages/openfilm/studio/ui/src/lib/stage-crop.ts": "sha256:051488d96792ea5344c762f9f8aafe82c14f2d68abe9ec4c8f66b153cbe06b9c",
+    "packages/openfilm/studio/ui/src/lib/stage-gesture.ts": "sha256:eebf0c34553e315021370e9b0f906bcba4b55b5ac324ec73604dd4836af73347",
+    "packages/openfilm/studio/ui/src/lib/stage-layers.ts": "sha256:77fc605059b18d84821c74c26c45a172e3d8ad34d9802e4d2f3c605d5c8e3b90",
+    "packages/openfilm/studio/ui/src/lib/stage-mask.test.ts": "sha256:fd245b8454831107202aaf8a1350bf8e212babeb0b38578560d6bdbea23215ef",
+    "packages/openfilm/studio/ui/src/lib/stage-mask.ts": "sha256:e2657fea8a93b03ac0b1df1848fdef02469dd5e87af44c73051262dea3ea54f7",
+    "packages/openfilm/studio/ui/src/lib/stage-measure.test.ts": "sha256:1a4c13f5db7a068594b02cdcbb169b7a5e16d8faacbaccb100ec563df1443691",
+    "packages/openfilm/studio/ui/src/lib/stage-measure.ts": "sha256:e4515304f1c96def5db674d637a27949622689eb83a56a55e2416002c67af8be",
+    "packages/openfilm/studio/ui/src/lib/stage-types.ts": "sha256:37902f4bc8c9e428c60ccbec89e2eba86e4886d88ff5876bfd8ad1e8ad83a6ca",
+    "packages/openfilm/studio/ui/src/lib/stage.test.ts": "sha256:a65adde628e1739fed44e9fe40d3305d337725d9c72d3d8d14209d4526f691ef",
+    "packages/openfilm/studio/ui/src/lib/studio-refs.test.ts": "sha256:eb2a0a50176c35794a20aa4846604020df7b6596601d5166609b119c07dd0a35",
+    "packages/openfilm/studio/ui/src/lib/studio-refs.ts": "sha256:59155eba6f8a8d45033cb5dad4c4e73e28bd41c2f8fca8abf5018c95fbb6975c",
+    "packages/openfilm/studio/ui/src/lib/studio-version.test.ts": "sha256:bb523a7c8134b16b77db37655f5033b503e19193abbb8df4326d23fac41ce7e8",
+    "packages/openfilm/studio/ui/src/lib/studio-version.ts": "sha256:2617a835b98b9914a59ec5479717ddf5cc54c2af8b3a48b9131ea086a9457ffc",
+    "packages/openfilm/studio/ui/src/lib/subtitle-cues.test.ts": "sha256:c9f1fdbafc610bd9980ddb277e2b02a1d8cd05b4e2fdde1818e94e45960b9907",
+    "packages/openfilm/studio/ui/src/lib/subtitle-cues.ts": "sha256:407dd6773c173637c32d067a152e80622533f250cbabd5e7d99782f20b48d4aa",
+    "packages/openfilm/studio/ui/src/lib/subtitles.test.ts": "sha256:c85301c4f055688dafcd1840ee3390406ce1337ad125774a478eb00db5e3c26c",
+    "packages/openfilm/studio/ui/src/lib/subtitles.ts": "sha256:36ac3afb392a74decc3712a092be01dcff1ebec759ea00dc206e3dc0de9c5525",
+    "packages/openfilm/studio/ui/src/lib/thumb-cache.ts": "sha256:86e81047e7eb73d1e221982740838886ab69868eee93c6f3576f8074b675653c",
+    "packages/openfilm/studio/ui/src/lib/thumb-frame.test.ts": "sha256:3a29afc84960ced917b569620ad76b0d85e1d12891fb0a3adefacf05ba5f64c5",
+    "packages/openfilm/studio/ui/src/lib/thumb-frame.ts": "sha256:01e9040dcd1efc084fe76ef2e6559e771e0e3172e56670b3aa03f7893c8b4e56",
+    "packages/openfilm/studio/ui/src/lib/thumb-pick.test.ts": "sha256:77519769391b2b23909178e08cd1da9486d107f6adb4a9fa74caae64622da5c0",
+    "packages/openfilm/studio/ui/src/lib/thumb-pick.ts": "sha256:0f336c5e00db7dbda582d062cca13dec07dae4617975f740b07bf0f2644dfa75",
+    "packages/openfilm/studio/ui/src/lib/timecode.test.ts": "sha256:f469ae63f65d69a482dc1179007e5e81c088005f9956b759d43ef37a1c6fc5a8",
+    "packages/openfilm/studio/ui/src/lib/timecode.ts": "sha256:158122c570a67352779d0c23e48dd2911f18ed699c6c4b6c79e7d222fd79c450",
+    "packages/openfilm/studio/ui/src/lib/timeline-clipboard.test.ts": "sha256:a93b76d8dc8b0f3d1a37fcc3d5e56513766c08c569f8864a723da5bcc868d7ed",
+    "packages/openfilm/studio/ui/src/lib/timeline-clipboard.ts": "sha256:1c1b27ccad5be880721fc4021378c056a4f6c5221c95baba4b01acfaeb4de519",
+    "packages/openfilm/studio/ui/src/lib/timeline-drag.test.ts": "sha256:f725315d49e24c08eab528a18c933b43dd79307ccb5b3cd5074422eb1ef62a1b",
+    "packages/openfilm/studio/ui/src/lib/timeline-drag.ts": "sha256:f14b136aa460b3734ec66e5e858a5b20682e80b6b29affe6e3958e5f89d69f5c",
+    "packages/openfilm/studio/ui/src/lib/timeline-edit.test.ts": "sha256:be66e8154b4c3fdbf513dfe424ff257ffeb1997c8c93149ca2d959f015358a44",
+    "packages/openfilm/studio/ui/src/lib/timeline-edit.ts": "sha256:76ee3acc5fb689c1aad778c78421b3d4ab9e0b2f86cbac0810023a9acfe0e727",
+    "packages/openfilm/studio/ui/src/lib/timeline-keys.test.ts": "sha256:08ab89926ba80b96366c9b7d9cdb5831d184ae853382c8d9134f4796c62e6205",
+    "packages/openfilm/studio/ui/src/lib/timeline-keys.ts": "sha256:9881ec2a0d6064935f26c71704b518e94d5368e1c04853d2eb1d4343bf8a96bd",
+    "packages/openfilm/studio/ui/src/lib/timeline-layout.test.ts": "sha256:50ffada14b774555a38ca2daac99a3bcacfe03a35d70408e9358f3388ed031df",
+    "packages/openfilm/studio/ui/src/lib/timeline-layout.ts": "sha256:e004d51430bcee151fdeb4b7ac8f37c0c54b6a9193d762a75271855327464968",
+    "packages/openfilm/studio/ui/src/lib/timeline-nav.test.ts": "sha256:8ae06e4883494097e64f79bd690d0e3c0787d915131c1e4097bfae9f979381ff",
+    "packages/openfilm/studio/ui/src/lib/timeline-nav.ts": "sha256:5888c17c861984a6bc4b6872e0f13679051f5535eebe50d39a676b67d80e3ddf",
+    "packages/openfilm/studio/ui/src/lib/timeline-prefs.ts": "sha256:6c992cc538b6746f40cc1dfb593295349904e0947490a2150237b298cf601913",
+    "packages/openfilm/studio/ui/src/lib/timeline-split.test.ts": "sha256:3948c47c5dc7e89ecd32f8b61d823accc99bc2855ef252a5f1d39b289b186d08",
+    "packages/openfilm/studio/ui/src/lib/timeline-split.ts": "sha256:17dba48a4edbc8806f64edb26c375e367deb7323fd0a1eee9f36b2bec115a3ae",
+    "packages/openfilm/studio/ui/src/lib/title.ts": "sha256:5fd77850ad8ddd3d21d46667bef30382b903ec218702861e028e7e798af286eb",
+    "packages/openfilm/studio/ui/src/lib/track-heights.test.ts": "sha256:917cc9b40d3997f65353b7acbdff29842652e63b4154a013d791b67aa16940fa",
+    "packages/openfilm/studio/ui/src/lib/track-heights.ts": "sha256:e9e44ca690ed01e929ba333bb4ad6a6032ae053c0345d883cc75623d603eafba",
+    "packages/openfilm/studio/ui/src/lib/track-lock.test.ts": "sha256:83b56ae9a53ac80662cbd4e9d1514f5fdefbe5463f5f87516bbeb2e17670762c",
+    "packages/openfilm/studio/ui/src/lib/track-lock.ts": "sha256:97d0dbed23bb4a443a672af530c9c3fdd71e812dc6b27ae71a2a86ef072c69a2",
+    "packages/openfilm/studio/ui/src/lib/transitions.test.ts": "sha256:cb4d0dcdce5d93ff52cef50f655533210883733f103cdc3f1ca4fd6aadd15057",
+    "packages/openfilm/studio/ui/src/lib/transitions.ts": "sha256:689fa9d1f6606a704ca76f2980cdb880379b29128a4ce90902e9bd1aa954f63c",
+    "packages/openfilm/studio/ui/src/lib/type-metrics.test.ts": "sha256:7c51e622159f019f011e49b3e6ca8db5014b339c17045021caaac5717e87a922",
+    "packages/openfilm/studio/ui/src/lib/type-metrics.ts": "sha256:0879e3c913bc0cbb0e06dd450912b1642418e4f4f4acf0d2261040ae7d1d50bd",
+    "packages/openfilm/studio/ui/src/lib/use-film-subtitles.ts": "sha256:b8d83bda0308ed3cf497b95df3f26ed56e43c6ba00cd260f81cf07ca4393c6fe",
+    "packages/openfilm/studio/ui/src/lib/use-fonts.ts": "sha256:0c341a4a38c1a5110d8c55b778a9aed4952c8856e9d18145acfe13c13234cb6b",
+    "packages/openfilm/studio/ui/src/lib/use-loaded-thumbs.ts": "sha256:89db7c9c7770c3fd483210b345e1cd0dad227485a37ed7c98587510795af7ad2",
+    "packages/openfilm/studio/ui/src/lib/use-subtitle-edits.ts": "sha256:9d36f6014a5bd7dce0663ce74b1e6c54c30135b13315fc08bff8bf3fc4666b0e",
+    "packages/openfilm/studio/ui/src/lib/use-subtitle-font.ts": "sha256:af9ec0803625a335ea62a6dc8bbd04f63fba003cc933d7e9b14453206e9c0942",
+    "packages/openfilm/studio/ui/src/lib/use-subtitle-style.ts": "sha256:87ae42d4244b9cba4663d6a57628dca896c0f260a9960837ff9983e57d8c7438",
+    "packages/openfilm/studio/ui/src/lib/waveform-columns.ts": "sha256:f2d2a960da66ae1b9c974de9cf0e30b2beca84eab81ab82dd1731d9b00b28632",
+    "packages/openfilm/studio/ui/src/lib/whats-new.test.ts": "sha256:54724a100fae8405e8c21e7692e4b8fc4f6bf6597d5d4ce37c1d05c57ab4df2a",
+    "packages/openfilm/studio/ui/src/lib/whats-new.ts": "sha256:54cde9fecb52bbb8c3cd811f4dbadf65ca83372117833f800c83cdea241c1bb9",
+    "packages/openfilm/studio/ui/src/lib/workspace-resources.test.ts": "sha256:f0a398e88cfa27c9d66f466355f763421b6dfbfce76090392640b6b19291bb58",
+    "packages/openfilm/studio/ui/src/lib/workspace-resources.ts": "sha256:99793fcd72071b015a3323ca2dc7be5e58c1b3631ebff22601607476342bfc6d",
+    "packages/openfilm/studio/ui/src/main.tsx": "sha256:f1a00142a29bcbe3785aedab159fe3aff08133c8c56a2724320616127cdfd0dc",
+    "packages/openfilm/studio/ui/tsconfig.json": "sha256:28e5ebf1bc70e76523d888b24e5865f8e7021aa835d109adfaa7e0d7e52b30a4",
+    "packages/openfilm/studio/ui/vite.config.ts": "sha256:b6dd08a1b784f19af2bba7b9b6f66c81dcd0238deb7a16e00f02e96b2860441a",
+    "packages/openfilm/test/clock/index.html": "sha256:1c82096c9d72dff1e5bb42fe26689de4860ae586e34490e5015033455f94ba8f",
+    "packages/openfilm/test/cut-text/index.html": "sha256:836bffba219b555af8ef353c6f61605b4103ca97de6c960c9fd1b3b23fdbbb62",
+    "packages/openfilm/test/impure/index.html": "sha256:bbce1ab14b38c81b185393a8693e10592380b058273bae6e5cb41e3698118c73",
+    "packages/openfilm/test/layers/index.html": "sha256:1d1ce0ca67e40332310652315debdec25f0c783692248c8ae5dc98f4dc04bc9d",
+    "packages/openfilm/test/subtle-shift/index.html": "sha256:e47cd6f46acc99e3d752752c8b0b7accc76cb0d3fe43b575082243578a559b6d",
+    "packages/openfilm/test/throws/index.html": "sha256:f15acf4b7f4c0e5d4d10ac7110787efe8130689c59dcaf86a5c0cc363bc15a6b",
+    "packages/openfilm/THIRD_PARTY_NOTICES.md": "sha256:bc548c7f663fe7ca3b407be60f65c95fa2b05adbc5a8c04f8de141555a0138e4",
+    "packages/openfilm/TRADEMARK.md": "sha256:c26e3c0cb4e0233ed4a9bd2ae00de36f4a5fe1b9681992c661de43a896769cdc",
+    "packages/shared/CHANGELOG.md": "sha256:0467ae36ccaea3674408dc93e8b04c0638aa4f371537229a35a092f521e6c590",
+    "packages/shared/LICENSE": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "packages/shared/package.json": "sha256:abcfb4b09d7887b33cea89d791e2c15a627020bccea9c46de58bd407ab3d7ad9",
+    "packages/shared/README.md": "sha256:6c19dce51f7c5c01076867da36cdb10d950f4c3807deb506a297a886c96f0ae3",
+    "packages/shared/src/agent-act-asset-schema.test.ts": "sha256:379e5cbdce96f504f69a79bda7ce6c178ca0c92f0ffa8d5ec935a03032937ed1",
+    "packages/shared/src/agent-activity.test.ts": "sha256:6a115686a3957e8c6c2c7914b2480c542422da68c3f74ea55bbfd747ed493ef4",
+    "packages/shared/src/agent-activity.ts": "sha256:d52561246ef36018b170e0dbaed7751590871b02adb88e0088f22eef51056200",
+    "packages/shared/src/contract.test.ts": "sha256:edbf081d97a32a519090a187a225a8f45ce51eb54ceb16548012e29c390f84bc",
+    "packages/shared/src/contract.ts": "sha256:aaec9f98fd272564e338c1158f345821b64bcba13a0c9e2e5238986781c7e8dd",
+    "packages/shared/src/index.ts": "sha256:31442c508a6c32040e55fe26386824fcd3ba2b50859ff239152bf11c27c7e6c1",
+    "packages/shared/src/markdown-blocks.ts": "sha256:13570aba818c4ddbdb0c9761a5bbdb39e75b380b711df06e22671a9033cfdfb5",
+    "packages/shared/src/modality.ts": "sha256:fd9019237936d83257fdf59e82552330f8c33af011d2adb4b8d942d8c11d1a5d",
+    "packages/shared/src/prompt-reference.test.ts": "sha256:ea83afa01abd108c914cae932e9876ed6e31d0639f1933618916b44f077f7583",
+    "packages/shared/src/prompt-reference.ts": "sha256:d54aae365f85d8dcb18658fac868a5e857ff57aa3ba4fd0664e97614a9f13d68",
+    "packages/shared/src/title.test.ts": "sha256:0716721cebb75692f1cad7974c80094aa11f379c44f829de2b0b0227412cdcf7",
+    "packages/shared/src/title.ts": "sha256:9c5699b82a0179c2d5c7c214d66a2f6f406cfef89a8850e2f0184003e0591b34",
+    "packages/shared/src/turn.ts": "sha256:8812a5e9cebdda96b979747e12701ac148dabb10b7d9af5b85a5a13208a0812e",
+    "packages/shared/src/video.ts": "sha256:1a1d56fc0500fe9273cc77da4c443e3b796a2add10da8fae581ab5c4f923b20a",
+    "packages/shared/tsconfig.json": "sha256:4f2cc23e92f0ba04f695a60e1546e0ad73a68667f27b1f4a288386c70125cede",
+    "pnpm-lock.yaml": "sha256:d9faf24e9480b847be99b61ec2b220ef5290530a54b1f6f667845fb8ac2905f9",
+    "pnpm-workspace.yaml": "sha256:af261372097773546d4000a74b771c8c09c4114ca5e9dd715c95018b44e1fbe3",
+    "README.md": "sha256:9da35f30085f22ff22183a50d47ff8a2cebeac6dbdd5a05d6e2a150cd7cdc5c4",
+    "README.zh-CN.md": "sha256:049dec60967f4f093471ec989f42d3a0cdfa0091315d9aaacbae0802fbbd4f39",
+    "scripts/audit-public.mjs": "sha256:912ecb6dc01642b6ba308b08d02d5bec81179ff864f596337648ca693ec9c3cc",
+    "scripts/check-pack.mjs": "sha256:e09e54f0839bfca7b91254febec2ceb66431f82ef91e4c5d2cb73dfb6c64a6e6",
+    "SECURITY.md": "sha256:606d09fc83073a4b51f8ec610f0433d9e3eb6b6b158cdf4e395b3dc9d0a55972",
+    "skills/openfilm/SKILL.md": "sha256:7506dde61d3d518a7534104c22741e85ca292e03ff70e3e6907e01a636404c27",
+    "THIRD_PARTY_NOTICES.md": "sha256:bc548c7f663fe7ca3b407be60f65c95fa2b05adbc5a8c04f8de141555a0138e4",
+    "TRADEMARK.md": "sha256:c26e3c0cb4e0233ed4a9bd2ae00de36f4a5fe1b9681992c661de43a896769cdc"
+  },
+  "runs": [
+    {
+      "id": "O01-upstream-pure",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\source\\packages\\openfilm\\src\\film-doc.test.mjs",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\source\\packages\\openfilm\\studio\\server\\ops.test.mjs",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\source\\packages\\openfilm\\studio\\server\\subtitle-segments.test.mjs",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\source\\packages\\openfilm\\studio\\server\\jianying.test.mjs",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\source\\packages\\openfilm\\studio\\server\\closure.test.mjs"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "wall_seconds": 1.3658197000004293,
+      "test_count": 58,
+      "passed": 58,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "stdout_sha256": "sha256:60bcf1106ed685f94dd40cb0ae5521ed03c05da457a2f12e8628c56db7119b6f",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "upstream selected tests, not agent-video-kit product regression or encoded media validation"
+    },
+    {
+      "id": "O02-original-planners-dependency",
+      "command": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "--test-concurrency=1",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\source\\packages\\openfilm\\studio\\ui\\src\\lib\\timeline-edit.test.ts",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\source\\packages\\openfilm\\studio\\ui\\src\\lib\\transitions.test.ts"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "wall_seconds": 1.0017589999988559,
+      "test_count": 2,
+      "passed": 0,
+      "failed": 2,
+      "cancelled": 0,
+      "skipped": 0,
+      "stdout_sha256": "sha256:eb41b2be7f1f08bfb26663a6fe2f81c937538fbd703214d778e7205b606968ad",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "upstream selected tests, not agent-video-kit product regression or encoded media validation"
+    },
+    {
+      "id": "O03-extracted-planners",
+      "command": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "--test-concurrency=1",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\extraction-with-samples\\adapted-source\\packages\\openfilm\\studio\\ui\\src\\lib\\timeline-edit.test.ts",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\extraction-with-samples\\adapted-source\\packages\\openfilm\\studio\\ui\\src\\lib\\transitions.test.ts"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "wall_seconds": 0.6552790999994613,
+      "test_count": 65,
+      "passed": 65,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "stdout_sha256": "sha256:12fdef733064511563c72d7cddc54725beb57ad996d5acbcaca4cf34372ef759",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "upstream selected tests, not agent-video-kit product regression or encoded media validation"
+    }
+  ],
+  "adapted_changed_files": [
+    "packages/openfilm/studio/ui/src/lib/timecode.ts"
+  ],
+  "original_hook_sha256": "sha256:158122c570a67352779d0c23e48dd2911f18ed699c6c4b6c79e7d222fd79c450",
+  "adapted_hook_sha256": "sha256:854a5556603b14df3ebff28b1f8d8b7b7531fa1fef07eeac95ab59c4f58af563",
+  "modified_pure_planner_algorithms": false,
+  "removed_react_hook_only": true,
+  "public_scope": "Research extraction POC, no product runtime integration",
+  "upstream_full_suite_run": false,
+  "upstream_build_run": false,
+  "browser_opened": false,
+  "gui_opened": false,
+  "provider_calls": 0,
+  "new_dependencies_installed": 0,
+  "node_engine_note": "MJS and experimental TS subset ran with the recorded Node; repository development baseline is >=22.18. This is not full compatibility acceptance.",
+  "data_samples": {
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\extraction-with-samples\\samples.mjs",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\source",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\extraction-with-samples\\adapted-source",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-audit-20261017\\final-with-samples"
+    ],
+    "exit_code": 0,
+    "sample_count": 2,
+    "summary": {
+      "subtitle_pieces": 3,
+      "ripple_exact": true
+    },
+    "worker_sha256": "sha256:238493e60a848222af43871a3707ddc30038d32337ea8d29a0f022874b4536ff",
+    "artifacts": {
+      "S01-subtitle-input.json": "sha256:6765dc7938b2cd3330c9d1a0f20113bdd9a19b93ccb8c32054a15ce4dc8b6068",
+      "S01-subtitle-output.json": "sha256:ce4019cb1ce8faf7c3e646d75bebdbfa62cf8e97977e2b5432eeff1340989e7e",
+      "S02-ripple-input.json": "sha256:7d713230bb7b938e626d620ab8384b172dd38d090fa598bfd69ec208d873e1b9",
+      "S02-ripple-output.json": "sha256:bb2fecfa37b979cbed3bfb43b55743177063e8ccb018ea1f429bcdeaa011ebdd"
+    }
+  },
+  "source_statistics": {
+    "code_files": 531,
+    "code_lines": 115795,
+    "test_files": 157,
+    "test_lines": 16601,
+    "runtime_react_importing_files": 115
+  },
+  "code_inventory": [
+    {
+      "path": "scripts/audit-public.mjs",
+      "lines": 203,
+      "bytes": 10775,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "scripts/check-pack.mjs",
+      "lines": 98,
+      "bytes": 4938,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/agent-act-asset-schema.test.ts",
+      "lines": 13,
+      "bytes": 734,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/agent-activity.test.ts",
+      "lines": 94,
+      "bytes": 6451,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/agent-activity.ts",
+      "lines": 263,
+      "bytes": 11490,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/contract.test.ts",
+      "lines": 26,
+      "bytes": 1306,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/contract.ts",
+      "lines": 283,
+      "bytes": 10840,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/index.ts",
+      "lines": 17,
+      "bytes": 600,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/markdown-blocks.ts",
+      "lines": 252,
+      "bytes": 10199,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/modality.ts",
+      "lines": 4,
+      "bytes": 192,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/prompt-reference.test.ts",
+      "lines": 61,
+      "bytes": 2076,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/prompt-reference.ts",
+      "lines": 113,
+      "bytes": 4911,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/title.test.ts",
+      "lines": 15,
+      "bytes": 542,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/title.ts",
+      "lines": 76,
+      "bytes": 2749,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/turn.ts",
+      "lines": 68,
+      "bytes": 2545,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/shared/src/video.ts",
+      "lines": 26,
+      "bytes": 835,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/bin/openfilm.mjs",
+      "lines": 263,
+      "bytes": 16069,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/scripts/dev.mjs",
+      "lines": 155,
+      "bytes": 7813,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/scripts/preview-probe.mjs",
+      "lines": 343,
+      "bytes": 18345,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/scripts/product.mjs",
+      "lines": 32,
+      "bytes": 1491,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/film-doc.mjs",
+      "lines": 963,
+      "bytes": 54861,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/film-doc.test.mjs",
+      "lines": 314,
+      "bytes": 22004,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/host-clock.test.mjs",
+      "lines": 31,
+      "bytes": 1811,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/host.mjs",
+      "lines": 432,
+      "bytes": 29805,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/host.test.mjs",
+      "lines": 57,
+      "bytes": 2999,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/look.mjs",
+      "lines": 358,
+      "bytes": 24152,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/look.test.mjs",
+      "lines": 117,
+      "bytes": 7666,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/media-links.mjs",
+      "lines": 68,
+      "bytes": 3127,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/overrides.mjs",
+      "lines": 71,
+      "bytes": 3913,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/render.mjs",
+      "lines": 190,
+      "bytes": 12702,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/render.test.mjs",
+      "lines": 32,
+      "bytes": 1894,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/seekable.mjs",
+      "lines": 101,
+      "bytes": 4992,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/seekable.test.mjs",
+      "lines": 51,
+      "bytes": 3025,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/shared.mjs",
+      "lines": 354,
+      "bytes": 18702,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/shared.test.mjs",
+      "lines": 142,
+      "bytes": 8670,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/timeline.mjs",
+      "lines": 943,
+      "bytes": 48623,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/src/timeline.test.mjs",
+      "lines": 762,
+      "bytes": 44367,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/client.mjs",
+      "lines": 311,
+      "bytes": 16444,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/client.test.mjs",
+      "lines": 131,
+      "bytes": 7560,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/atomic.mjs",
+      "lines": 41,
+      "bytes": 1643,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/bridge.js",
+      "lines": 89,
+      "bytes": 5301,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/bridge.test.mjs",
+      "lines": 61,
+      "bytes": 2967,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/browse.mjs",
+      "lines": 104,
+      "bytes": 4992,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/browse.test.mjs",
+      "lines": 63,
+      "bytes": 3353,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/captions.mjs",
+      "lines": 476,
+      "bytes": 28918,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/captions.test.mjs",
+      "lines": 399,
+      "bytes": 25039,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/closure.mjs",
+      "lines": 390,
+      "bytes": 19577,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/closure.test.mjs",
+      "lines": 131,
+      "bytes": 5258,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/custom-services.mjs",
+      "lines": 266,
+      "bytes": 15895,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/custom-services.test.mjs",
+      "lines": 112,
+      "bytes": 7580,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/derived.mjs",
+      "lines": 225,
+      "bytes": 12196,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/derived.test.mjs",
+      "lines": 127,
+      "bytes": 9074,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/examples.mjs",
+      "lines": 89,
+      "bytes": 4853,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/examples.test.mjs",
+      "lines": 49,
+      "bytes": 2896,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/export-capabilities.test.mjs",
+      "lines": 23,
+      "bytes": 1128,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/exports.mjs",
+      "lines": 1423,
+      "bytes": 85165,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/exports.test.mjs",
+      "lines": 735,
+      "bytes": 51262,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/fetch-error.mjs",
+      "lines": 14,
+      "bytes": 567,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/fetch-github.mjs",
+      "lines": 181,
+      "bytes": 9923,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/fetch-repo.mjs",
+      "lines": 399,
+      "bytes": 22078,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/fetch-repo.test.mjs",
+      "lines": 289,
+      "bytes": 16305,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/files.mjs",
+      "lines": 574,
+      "bytes": 29455,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/files.test.mjs",
+      "lines": 364,
+      "bytes": 24753,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/film-subtitle.mjs",
+      "lines": 764,
+      "bytes": 36308,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/film-subtitle.test.mjs",
+      "lines": 93,
+      "bytes": 6025,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/film.mjs",
+      "lines": 87,
+      "bytes": 4218,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/film.test.mjs",
+      "lines": 99,
+      "bytes": 6304,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/folder-picker.mjs",
+      "lines": 199,
+      "bytes": 9848,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/folder-picker.test.mjs",
+      "lines": 88,
+      "bytes": 5515,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/folders.test.mjs",
+      "lines": 96,
+      "bytes": 5983,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/fonts.mjs",
+      "lines": 308,
+      "bytes": 14352,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/fonts.test.mjs",
+      "lines": 137,
+      "bytes": 5904,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/get.mjs",
+      "lines": 678,
+      "bytes": 41794,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/get.test.mjs",
+      "lines": 462,
+      "bytes": 30759,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/history-migrate.mjs",
+      "lines": 237,
+      "bytes": 12932,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/history-store.mjs",
+      "lines": 538,
+      "bytes": 25670,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/history.mjs",
+      "lines": 682,
+      "bytes": 37793,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/history.test.mjs",
+      "lines": 435,
+      "bytes": 26036,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/http.mjs",
+      "lines": 40,
+      "bytes": 1505,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/jianying.mjs",
+      "lines": 289,
+      "bytes": 17073,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/jianying.test.mjs",
+      "lines": 125,
+      "bytes": 8374,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/keys.mjs",
+      "lines": 121,
+      "bytes": 6599,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/keys.test.mjs",
+      "lines": 170,
+      "bytes": 11701,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/main.mjs",
+      "lines": 120,
+      "bytes": 6187,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/main.test.mjs",
+      "lines": 71,
+      "bytes": 3418,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/markers.mjs",
+      "lines": 80,
+      "bytes": 3417,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/markers.test.mjs",
+      "lines": 35,
+      "bytes": 1670,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/nle.mjs",
+      "lines": 537,
+      "bytes": 33173,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/open-sources.test.mjs",
+      "lines": 69,
+      "bytes": 3787,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/ops.mjs",
+      "lines": 402,
+      "bytes": 21743,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/ops.test.mjs",
+      "lines": 117,
+      "bytes": 7556,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/page-links.mjs",
+      "lines": 98,
+      "bytes": 5467,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/page-links.test.mjs",
+      "lines": 53,
+      "bytes": 3042,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/pageframes.mjs",
+      "lines": 335,
+      "bytes": 17816,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/pageframes.test.mjs",
+      "lines": 136,
+      "bytes": 9252,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/pages.mjs",
+      "lines": 197,
+      "bytes": 11898,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/prefs.mjs",
+      "lines": 56,
+      "bytes": 2913,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/prefs.test.mjs",
+      "lines": 31,
+      "bytes": 1587,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/project-fonts.mjs",
+      "lines": 263,
+      "bytes": 12992,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/project-fonts.test.mjs",
+      "lines": 81,
+      "bytes": 4618,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/project-settings.mjs",
+      "lines": 130,
+      "bytes": 6681,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/project-settings.test.mjs",
+      "lines": 55,
+      "bytes": 3274,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/projects.mjs",
+      "lines": 362,
+      "bytes": 18392,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/projects.test.mjs",
+      "lines": 147,
+      "bytes": 8480,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/proxies.mjs",
+      "lines": 151,
+      "bytes": 7342,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/proxies.test.mjs",
+      "lines": 46,
+      "bytes": 3211,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/render-worker.mjs",
+      "lines": 29,
+      "bytes": 1429,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/server.mjs",
+      "lines": 809,
+      "bytes": 55169,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/server.test.mjs",
+      "lines": 704,
+      "bytes": 48234,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/slides.mjs",
+      "lines": 230,
+      "bytes": 15819,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/stage.js",
+      "lines": 1529,
+      "bytes": 83440,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/stage.test.mjs",
+      "lines": 331,
+      "bytes": 20546,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/subtitle-edits.mjs",
+      "lines": 234,
+      "bytes": 13087,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/subtitle-edits.test.mjs",
+      "lines": 132,
+      "bytes": 8790,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/subtitle-segments.mjs",
+      "lines": 602,
+      "bytes": 34218,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/subtitle-segments.test.mjs",
+      "lines": 188,
+      "bytes": 13407,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/transcripts.mjs",
+      "lines": 490,
+      "bytes": 23994,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/transcripts.test.mjs",
+      "lines": 51,
+      "bytes": 3177,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/transition-pages.mjs",
+      "lines": 43,
+      "bytes": 2399,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/transition-pages.test.mjs",
+      "lines": 36,
+      "bytes": 2243,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/trash.mjs",
+      "lines": 70,
+      "bytes": 3572,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/watch.mjs",
+      "lines": 144,
+      "bytes": 7104,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/watch.test.mjs",
+      "lines": 73,
+      "bytes": 3141,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/websocket.mjs",
+      "lines": 82,
+      "bytes": 4370,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/zip.mjs",
+      "lines": 159,
+      "bytes": 6893,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/vite.config.ts",
+      "lines": 12,
+      "bytes": 522,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/api.ts",
+      "lines": 242,
+      "bytes": 15473,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/App.tsx",
+      "lines": 133,
+      "bytes": 6594,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/main.tsx",
+      "lines": 10,
+      "bytes": 352,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/AudioMeters.tsx",
+      "lines": 184,
+      "bytes": 8094,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/BlockThumbs.tsx",
+      "lines": 83,
+      "bytes": 3883,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/BlockWaveform.tsx",
+      "lines": 152,
+      "bytes": 6690,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/BrandLoadingScreen.tsx",
+      "lines": 56,
+      "bytes": 2706,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/BrandLogo.tsx",
+      "lines": 25,
+      "bytes": 1152,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/Card.tsx",
+      "lines": 89,
+      "bytes": 3445,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ColorPicker.tsx",
+      "lines": 204,
+      "bytes": 10146,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ConfirmDialog.tsx",
+      "lines": 90,
+      "bytes": 2805,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ContextMenu.tsx",
+      "lines": 422,
+      "bytes": 18339,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/DesktopDialog.tsx",
+      "lines": 270,
+      "bytes": 14559,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/dock-pane-bar.ts",
+      "lines": 16,
+      "bytes": 997,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/film-stage-hit.ts",
+      "lines": 18,
+      "bytes": 776,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/FilmFullscreenBar.tsx",
+      "lines": 147,
+      "bytes": 4870,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/FilmInspector.tsx",
+      "lines": 2183,
+      "bytes": 104985,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/FilmStageSelect.tsx",
+      "lines": 3224,
+      "bytes": 167074,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/FocusNav.tsx",
+      "lines": 28,
+      "bytes": 1023,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/FontFamilyPicker.tsx",
+      "lines": 293,
+      "bytes": 12984,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/FramePicker.tsx",
+      "lines": 147,
+      "bytes": 7966,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/inspector-fields.tsx",
+      "lines": 862,
+      "bytes": 39504,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/inspector-look.tsx",
+      "lines": 1430,
+      "bytes": 69660,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/InspectorPanel.tsx",
+      "lines": 25,
+      "bytes": 1297,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/LayersPanel.tsx",
+      "lines": 277,
+      "bytes": 14721,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/LiveTime.tsx",
+      "lines": 35,
+      "bytes": 1219,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/MediaPool.tsx",
+      "lines": 1368,
+      "bytes": 80823,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/MediaPreview.tsx",
+      "lines": 188,
+      "bytes": 7569,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/MenuSelect.tsx",
+      "lines": 161,
+      "bytes": 8135,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/MgOutline.tsx",
+      "lines": 24,
+      "bytes": 955,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/OperationHistory.tsx",
+      "lines": 183,
+      "bytes": 6695,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/PaneDivider.tsx",
+      "lines": 292,
+      "bytes": 11933,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/PasteAttrsDialog.tsx",
+      "lines": 69,
+      "bytes": 3271,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/Popover.tsx",
+      "lines": 159,
+      "bytes": 6414,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ProjectHistoryControls.tsx",
+      "lines": 748,
+      "bytes": 37985,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ProjectLayoutMenu.tsx",
+      "lines": 82,
+      "bytes": 5258,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ProjectMenu.tsx",
+      "lines": 101,
+      "bytes": 4172,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ProjectsLibrary.tsx",
+      "lines": 464,
+      "bytes": 21984,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ProjectSources.tsx",
+      "lines": 587,
+      "bytes": 27928,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ProjectsView.tsx",
+      "lines": 1529,
+      "bytes": 61602,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ProjectView.tsx",
+      "lines": 2869,
+      "bytes": 181610,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/replace-drop.ts",
+      "lines": 20,
+      "bytes": 872,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ResourceInspector.tsx",
+      "lines": 100,
+      "bytes": 4824,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/SelectionToolbar.tsx",
+      "lines": 157,
+      "bytes": 7624,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/SourcePreview.tsx",
+      "lines": 405,
+      "bytes": 20427,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/SpendAsks.tsx",
+      "lines": 88,
+      "bytes": 4017,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/stage-menu.tsx",
+      "lines": 237,
+      "bytes": 12757,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/StageMaskOverlay.tsx",
+      "lines": 299,
+      "bytes": 14086,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/StageTransformFrame.tsx",
+      "lines": 246,
+      "bytes": 10288,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/SubtitleInspector.tsx",
+      "lines": 875,
+      "bytes": 37197,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/SubtitleOverlay.tsx",
+      "lines": 147,
+      "bytes": 6547,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/SubtitleRow.tsx",
+      "lines": 413,
+      "bytes": 19939,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/timeline-head-extras.tsx",
+      "lines": 91,
+      "bytes": 3192,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/Timeline.tsx",
+      "lines": 4548,
+      "bytes": 220761,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/TimelineMarkers.tsx",
+      "lines": 329,
+      "bytes": 15797,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/Toast.tsx",
+      "lines": 55,
+      "bytes": 2319,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/Tooltip.tsx",
+      "lines": 193,
+      "bytes": 8605,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/typing-target.test.ts",
+      "lines": 43,
+      "bytes": 2059,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/typing-target.ts",
+      "lines": 45,
+      "bytes": 2361,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/UpdateButton.tsx",
+      "lines": 41,
+      "bytes": 1788,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/use-editor-tools.tsx",
+      "lines": 407,
+      "bytes": 22902,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/use-page-changes.ts",
+      "lines": 48,
+      "bytes": 2013,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/use-project-history.ts",
+      "lines": 113,
+      "bytes": 5307,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/useBlockDrag.ts",
+      "lines": 650,
+      "bytes": 31808,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/ViewerBar.tsx",
+      "lines": 104,
+      "bytes": 4638,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/WhatsNew.tsx",
+      "lines": 147,
+      "bytes": 7445,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/editor/player.test.ts",
+      "lines": 14,
+      "bytes": 689,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/editor/player.ts",
+      "lines": 323,
+      "bytes": 14507,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/editor/preview-frames.test.ts",
+      "lines": 24,
+      "bytes": 1374,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/editor/preview-frames.ts",
+      "lines": 26,
+      "bytes": 1332,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/editor/Preview.tsx",
+      "lines": 303,
+      "bytes": 15172,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/editor/undo.test.ts",
+      "lines": 100,
+      "bytes": 6180,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/editor/undo.ts",
+      "lines": 156,
+      "bytes": 8176,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/editor/use-film.ts",
+      "lines": 207,
+      "bytes": 11609,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/i18n/en.ts",
+      "lines": 1634,
+      "bytes": 69367,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/i18n/es.ts",
+      "lines": 1633,
+      "bytes": 76665,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/i18n/index.ts",
+      "lines": 130,
+      "bytes": 5093,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/i18n/ja.ts",
+      "lines": 1633,
+      "bytes": 90144,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/i18n/ko.ts",
+      "lines": 1632,
+      "bytes": 80758,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/i18n/words.ts",
+      "lines": 6,
+      "bytes": 259,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/i18n/zh-CN.ts",
+      "lines": 1634,
+      "bytes": 70253,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/asset-timeline.test.ts",
+      "lines": 138,
+      "bytes": 10218,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/asset-timeline.ts",
+      "lines": 468,
+      "bytes": 22314,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/audio-levels.test.ts",
+      "lines": 39,
+      "bytes": 1737,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/audio-levels.ts",
+      "lines": 60,
+      "bytes": 2680,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/canvas-fit.test.ts",
+      "lines": 60,
+      "bytes": 3534,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/canvas-fit.ts",
+      "lines": 88,
+      "bytes": 5278,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/chat-marks.test.ts",
+      "lines": 59,
+      "bytes": 3985,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/chat-marks.ts",
+      "lines": 114,
+      "bytes": 5430,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/clip-attrs.test.ts",
+      "lines": 37,
+      "bytes": 2589,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/clip-attrs.ts",
+      "lines": 102,
+      "bytes": 4518,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/clip-fade.ts",
+      "lines": 70,
+      "bytes": 3942,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/clip-look.test.ts",
+      "lines": 132,
+      "bytes": 9060,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/clip-look.ts",
+      "lines": 497,
+      "bytes": 24195,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/clip-mask.test.ts",
+      "lines": 172,
+      "bytes": 10597,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/clip-mask.ts",
+      "lines": 536,
+      "bytes": 27619,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/clip-replace.test.ts",
+      "lines": 61,
+      "bytes": 3746,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/clip-replace.ts",
+      "lines": 60,
+      "bytes": 3503,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/desktop-build.ts",
+      "lines": 44,
+      "bytes": 2192,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/double-press.test.ts",
+      "lines": 26,
+      "bytes": 1178,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/double-press.ts",
+      "lines": 22,
+      "bytes": 1287,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/dropped-overrides.test.ts",
+      "lines": 104,
+      "bytes": 6194,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/dropped-overrides.ts",
+      "lines": 139,
+      "bytes": 6916,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/export-jobs.test.ts",
+      "lines": 28,
+      "bytes": 1721,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/export-jobs.ts",
+      "lines": 178,
+      "bytes": 8771,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/export-spec.test.ts",
+      "lines": 80,
+      "bytes": 5360,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/export-spec.ts",
+      "lines": 252,
+      "bytes": 13458,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/field-input.test.ts",
+      "lines": 78,
+      "bytes": 4528,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/field-input.ts",
+      "lines": 155,
+      "bytes": 6104,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/film-clip-edits.test.ts",
+      "lines": 47,
+      "bytes": 2192,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/film-clip-edits.ts",
+      "lines": 82,
+      "bytes": 4134,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/film-frame.test.ts",
+      "lines": 25,
+      "bytes": 1057,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/film-frame.ts",
+      "lines": 134,
+      "bytes": 5697,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/film-overrides.ts",
+      "lines": 107,
+      "bytes": 4313,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/film-shape.test.ts",
+      "lines": 49,
+      "bytes": 2702,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/film-shape.ts",
+      "lines": 172,
+      "bytes": 8974,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/film.ts",
+      "lines": 92,
+      "bytes": 4429,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/font-menu.test.ts",
+      "lines": 77,
+      "bytes": 5898,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/font-menu.ts",
+      "lines": 236,
+      "bytes": 11303,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/font-styles.test.ts",
+      "lines": 51,
+      "bytes": 3129,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/font-styles.ts",
+      "lines": 129,
+      "bytes": 6199,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/freeze-frame.test.ts",
+      "lines": 45,
+      "bytes": 3056,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/freeze-frame.ts",
+      "lines": 51,
+      "bytes": 2364,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/group-drag.test.ts",
+      "lines": 59,
+      "bytes": 3493,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/host.ts",
+      "lines": 345,
+      "bytes": 20525,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/inspect-scrub.ts",
+      "lines": 26,
+      "bytes": 923,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/layers-tree.test.ts",
+      "lines": 68,
+      "bytes": 4260,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/layers-tree.ts",
+      "lines": 133,
+      "bytes": 5928,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/loudness.test.ts",
+      "lines": 27,
+      "bytes": 1342,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/loudness.ts",
+      "lines": 41,
+      "bytes": 2096,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/markers.test.ts",
+      "lines": 77,
+      "bytes": 3893,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/markers.ts",
+      "lines": 152,
+      "bytes": 6761,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/media-bar.test.ts",
+      "lines": 29,
+      "bytes": 2161,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/media-bar.ts",
+      "lines": 58,
+      "bytes": 2697,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/media-place.test.ts",
+      "lines": 62,
+      "bytes": 4257,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/media-place.ts",
+      "lines": 92,
+      "bytes": 5359,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/media-queue.test.ts",
+      "lines": 87,
+      "bytes": 3923,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/media-queue.ts",
+      "lines": 107,
+      "bytes": 5674,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/media-selection.test.ts",
+      "lines": 36,
+      "bytes": 2771,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/media-selection.ts",
+      "lines": 64,
+      "bytes": 2691,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/menu-position.test.ts",
+      "lines": 42,
+      "bytes": 2013,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/menu-position.ts",
+      "lines": 77,
+      "bytes": 3436,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/mg-transform.ts",
+      "lines": 111,
+      "bytes": 4283,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/page-changes.test.ts",
+      "lines": 35,
+      "bytes": 1931,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/page-changes.ts",
+      "lines": 45,
+      "bytes": 2272,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/picture-files.test.ts",
+      "lines": 14,
+      "bytes": 814,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/picture-files.ts",
+      "lines": 19,
+      "bytes": 1212,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/project-folders.test.ts",
+      "lines": 58,
+      "bytes": 3371,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/project-folders.ts",
+      "lines": 120,
+      "bytes": 5863,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/project-history.test.ts",
+      "lines": 49,
+      "bytes": 3152,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/project-history.ts",
+      "lines": 188,
+      "bytes": 10767,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/project-sources.test.ts",
+      "lines": 97,
+      "bytes": 5446,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/project-sources.ts",
+      "lines": 203,
+      "bytes": 8912,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/provider-marks.test.ts",
+      "lines": 18,
+      "bytes": 945,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/provider-marks.ts",
+      "lines": 33,
+      "bytes": 16212,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/providers.test.ts",
+      "lines": 22,
+      "bytes": 1226,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/providers.ts",
+      "lines": 138,
+      "bytes": 6566,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/resource-drag.ts",
+      "lines": 128,
+      "bytes": 5365,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/retry-image.ts",
+      "lines": 17,
+      "bytes": 721,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/select-all-key.test.ts",
+      "lines": 17,
+      "bytes": 994,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/select-all-key.ts",
+      "lines": 7,
+      "bytes": 499,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/selection-toolbar.test.ts",
+      "lines": 84,
+      "bytes": 4885,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/selection-toolbar.ts",
+      "lines": 158,
+      "bytes": 7907,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/shortcut-hint.ts",
+      "lines": 21,
+      "bytes": 1048,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/similar-layers.test.ts",
+      "lines": 34,
+      "bytes": 2268,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/similar-layers.ts",
+      "lines": 46,
+      "bytes": 2788,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/solo.test.ts",
+      "lines": 18,
+      "bytes": 883,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/solo.ts",
+      "lines": 19,
+      "bytes": 995,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/stage-clip.ts",
+      "lines": 60,
+      "bytes": 3329,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/stage-crop.test.ts",
+      "lines": 99,
+      "bytes": 6179,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/stage-crop.ts",
+      "lines": 232,
+      "bytes": 10827,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/stage-gesture.ts",
+      "lines": 277,
+      "bytes": 14164,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/stage-layers.ts",
+      "lines": 71,
+      "bytes": 3176,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/stage-mask.test.ts",
+      "lines": 94,
+      "bytes": 5065,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/stage-mask.ts",
+      "lines": 176,
+      "bytes": 8360,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/stage-measure.test.ts",
+      "lines": 40,
+      "bytes": 1836,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/stage-measure.ts",
+      "lines": 53,
+      "bytes": 2689,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/stage-types.ts",
+      "lines": 146,
+      "bytes": 5931,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/stage.test.ts",
+      "lines": 217,
+      "bytes": 13647,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/studio-refs.test.ts",
+      "lines": 170,
+      "bytes": 9864,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/studio-refs.ts",
+      "lines": 248,
+      "bytes": 12547,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/studio-version.test.ts",
+      "lines": 58,
+      "bytes": 2670,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/studio-version.ts",
+      "lines": 41,
+      "bytes": 1855,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/subtitle-cues.test.ts",
+      "lines": 110,
+      "bytes": 6738,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/subtitle-cues.ts",
+      "lines": 238,
+      "bytes": 13739,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/subtitles.test.ts",
+      "lines": 26,
+      "bytes": 1471,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/subtitles.ts",
+      "lines": 261,
+      "bytes": 13165,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/thumb-cache.ts",
+      "lines": 63,
+      "bytes": 2400,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/thumb-frame.test.ts",
+      "lines": 14,
+      "bytes": 805,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/thumb-frame.ts",
+      "lines": 76,
+      "bytes": 3297,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/thumb-pick.test.ts",
+      "lines": 20,
+      "bytes": 1102,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/thumb-pick.ts",
+      "lines": 42,
+      "bytes": 1986,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timecode.test.ts",
+      "lines": 122,
+      "bytes": 5146,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timecode.ts",
+      "lines": 161,
+      "bytes": 7378,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-clipboard.test.ts",
+      "lines": 214,
+      "bytes": 13106,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-clipboard.ts",
+      "lines": 364,
+      "bytes": 17213,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-drag.test.ts",
+      "lines": 192,
+      "bytes": 10817,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-drag.ts",
+      "lines": 594,
+      "bytes": 25567,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-edit.test.ts",
+      "lines": 662,
+      "bytes": 38679,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-edit.ts",
+      "lines": 1144,
+      "bytes": 53620,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-keys.test.ts",
+      "lines": 117,
+      "bytes": 6401,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-keys.ts",
+      "lines": 235,
+      "bytes": 11017,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-layout.test.ts",
+      "lines": 126,
+      "bytes": 7883,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-layout.ts",
+      "lines": 1055,
+      "bytes": 43492,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-nav.test.ts",
+      "lines": 107,
+      "bytes": 6812,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-nav.ts",
+      "lines": 153,
+      "bytes": 7825,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-prefs.ts",
+      "lines": 72,
+      "bytes": 3220,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-split.test.ts",
+      "lines": 44,
+      "bytes": 2657,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-split.ts",
+      "lines": 40,
+      "bytes": 2318,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/title.ts",
+      "lines": 39,
+      "bytes": 1458,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/track-heights.test.ts",
+      "lines": 31,
+      "bytes": 1484,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/track-heights.ts",
+      "lines": 55,
+      "bytes": 2816,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/track-lock.test.ts",
+      "lines": 30,
+      "bytes": 1472,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/track-lock.ts",
+      "lines": 27,
+      "bytes": 1548,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/transitions.test.ts",
+      "lines": 224,
+      "bytes": 13827,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/transitions.ts",
+      "lines": 464,
+      "bytes": 26168,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/type-metrics.test.ts",
+      "lines": 42,
+      "bytes": 2593,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/type-metrics.ts",
+      "lines": 83,
+      "bytes": 3888,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/use-film-subtitles.ts",
+      "lines": 111,
+      "bytes": 5158,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/use-fonts.ts",
+      "lines": 181,
+      "bytes": 6876,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/use-loaded-thumbs.ts",
+      "lines": 91,
+      "bytes": 4414,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/use-subtitle-edits.ts",
+      "lines": 134,
+      "bytes": 6691,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/use-subtitle-font.ts",
+      "lines": 51,
+      "bytes": 1873,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/use-subtitle-style.ts",
+      "lines": 68,
+      "bytes": 2776,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/waveform-columns.ts",
+      "lines": 48,
+      "bytes": 2228,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/whats-new.test.ts",
+      "lines": 35,
+      "bytes": 1911,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/whats-new.ts",
+      "lines": 98,
+      "bytes": 7236,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/workspace-resources.test.ts",
+      "lines": 67,
+      "bytes": 3530,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/lib/workspace-resources.ts",
+      "lines": 342,
+      "bytes": 16036,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/export/ExportCenter.tsx",
+      "lines": 1442,
+      "bytes": 72018,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/export/ExportTray.tsx",
+      "lines": 283,
+      "bytes": 13789,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/player-controls/controls-bar.tsx",
+      "lines": 397,
+      "bytes": 14764,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/player-controls/transport.tsx",
+      "lines": 294,
+      "bytes": 9945,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/settings/AgentsSection.tsx",
+      "lines": 478,
+      "bytes": 29236,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/settings/ModelsSection.tsx",
+      "lines": 175,
+      "bytes": 8817,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/settings/ProviderMark.tsx",
+      "lines": 24,
+      "bytes": 1326,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/settings/ProvidersSection.tsx",
+      "lines": 232,
+      "bytes": 13232,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/settings/SettingsModal.tsx",
+      "lines": 514,
+      "bytes": 26442,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/settings/SettingsSelect.tsx",
+      "lines": 84,
+      "bytes": 4434,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/settings/theme.ts",
+      "lines": 38,
+      "bytes": 1538,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/ui/src/components/settings/ui.tsx",
+      "lines": 139,
+      "bytes": 7135,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/azure.mjs",
+      "lines": 100,
+      "bytes": 5880,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/azure.test.mjs",
+      "lines": 105,
+      "bytes": 5633,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/brave.mjs",
+      "lines": 55,
+      "bytes": 2638,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/brave.test.mjs",
+      "lines": 57,
+      "bytes": 3125,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/common.mjs",
+      "lines": 321,
+      "bytes": 18328,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/common.test.mjs",
+      "lines": 97,
+      "bytes": 5608,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/contract.mjs",
+      "lines": 93,
+      "bytes": 4349,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/doubao.mjs",
+      "lines": 65,
+      "bytes": 4171,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/doubao.test.mjs",
+      "lines": 183,
+      "bytes": 10506,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/elevenlabs.mjs",
+      "lines": 144,
+      "bytes": 7633,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/elevenlabs.test.mjs",
+      "lines": 107,
+      "bytes": 6548,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/fal.mjs",
+      "lines": 212,
+      "bytes": 12657,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/fal.test.mjs",
+      "lines": 168,
+      "bytes": 10003,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/google.mjs",
+      "lines": 201,
+      "bytes": 12114,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/google.test.mjs",
+      "lines": 122,
+      "bytes": 7532,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/groq.mjs",
+      "lines": 97,
+      "bytes": 5854,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/groq.test.mjs",
+      "lines": 66,
+      "bytes": 3968,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/index.mjs",
+      "lines": 215,
+      "bytes": 11811,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/index.test.mjs",
+      "lines": 67,
+      "bytes": 3899,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/openai.mjs",
+      "lines": 131,
+      "bytes": 7300,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/openai.test.mjs",
+      "lines": 98,
+      "bytes": 5866,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/pexels.mjs",
+      "lines": 40,
+      "bytes": 2010,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/pexels.test.mjs",
+      "lines": 66,
+      "bytes": 3743,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/pixabay.mjs",
+      "lines": 53,
+      "bytes": 2784,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/pixabay.test.mjs",
+      "lines": 69,
+      "bytes": 3853,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/tavily.mjs",
+      "lines": 68,
+      "bytes": 3721,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/tavily.test.mjs",
+      "lines": 55,
+      "bytes": 3220,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/web.mjs",
+      "lines": 231,
+      "bytes": 12475,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "packages/openfilm/studio/server/providers/web.test.mjs",
+      "lines": 82,
+      "bytes": 4820,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/bench/app.mjs",
+      "lines": 90,
+      "bytes": 4742,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/bench/fake-model.mjs",
+      "lines": 126,
+      "bytes": 8359,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/bench/measure.mjs",
+      "lines": 86,
+      "bytes": 5254,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/bench/report.mjs",
+      "lines": 65,
+      "bytes": 3837,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/bench/run.mjs",
+      "lines": 43,
+      "bytes": 2127,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/bench/scenarios.mjs",
+      "lines": 240,
+      "bytes": 12705,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/scripts/make-ico.mjs",
+      "lines": 42,
+      "bytes": 2049,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/scripts/release.mjs",
+      "lines": 235,
+      "bytes": 14965,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/scripts/start.mjs",
+      "lines": 68,
+      "bytes": 4089,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/shell/bridge.ts",
+      "lines": 385,
+      "bytes": 19787,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/shell/main.tsx",
+      "lines": 17,
+      "bytes": 785,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/shell/vite.config.ts",
+      "lines": 64,
+      "bytes": 3031,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/agent-installation.mjs",
+      "lines": 301,
+      "bytes": 15661,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/agent-installation.test.mjs",
+      "lines": 227,
+      "bytes": 15121,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/agent-marks.test.mjs",
+      "lines": 10,
+      "bytes": 592,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/agent-refs.test.mjs",
+      "lines": 71,
+      "bytes": 4152,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/agent-roster.mjs",
+      "lines": 360,
+      "bytes": 18864,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/agent-roster.test.mjs",
+      "lines": 200,
+      "bytes": 12180,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/agent-usage.mjs",
+      "lines": 119,
+      "bytes": 5931,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/agent-usage.test.mjs",
+      "lines": 27,
+      "bytes": 1550,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/agents.mjs",
+      "lines": 826,
+      "bytes": 46735,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/agents.test.mjs",
+      "lines": 85,
+      "bytes": 6152,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/as-node.mjs",
+      "lines": 20,
+      "bytes": 1037,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/chat-ipc.mjs",
+      "lines": 99,
+      "bytes": 5731,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/chat-store.mjs",
+      "lines": 172,
+      "bytes": 9436,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/chat-store.test.mjs",
+      "lines": 123,
+      "bytes": 6630,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/environment.mjs",
+      "lines": 274,
+      "bytes": 14739,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/environment.test.mjs",
+      "lines": 93,
+      "bytes": 4862,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/ffmpeg-runtime.mjs",
+      "lines": 147,
+      "bytes": 6998,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/ffmpeg-runtime.test.mjs",
+      "lines": 54,
+      "bytes": 3086,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/file-changes.mjs",
+      "lines": 126,
+      "bytes": 5844,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/file-changes.test.mjs",
+      "lines": 83,
+      "bytes": 3752,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/flavor.mjs",
+      "lines": 57,
+      "bytes": 3050,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/flavor.test.mjs",
+      "lines": 23,
+      "bytes": 1161,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/folder-dialog.mjs",
+      "lines": 45,
+      "bytes": 2171,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/folder-dialog.test.mjs",
+      "lines": 35,
+      "bytes": 1648,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/hidden-windows.mjs",
+      "lines": 39,
+      "bytes": 2332,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/hidden-windows.test.mjs",
+      "lines": 27,
+      "bytes": 1840,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/local-agents-ipc.mjs",
+      "lines": 344,
+      "bytes": 18653,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/main.mjs",
+      "lines": 447,
+      "bytes": 24069,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/mention-menu.test.mjs",
+      "lines": 12,
+      "bytes": 731,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/menu.mjs",
+      "lines": 69,
+      "bytes": 2633,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/node-runtime.mjs",
+      "lines": 14,
+      "bytes": 769,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/openfilm-command.mjs",
+      "lines": 56,
+      "bytes": 3235,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/openfilm-command.test.mjs",
+      "lines": 28,
+      "bytes": 1973,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/pi-agent.mjs",
+      "lines": 292,
+      "bytes": 16220,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/pi-agent.test.mjs",
+      "lines": 103,
+      "bytes": 4927,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/pi-config.mjs",
+      "lines": 165,
+      "bytes": 9586,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/pi-config.test.mjs",
+      "lines": 78,
+      "bytes": 6529,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/shell-page.test.mjs",
+      "lines": 13,
+      "bytes": 613,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/studio-process.mjs",
+      "lines": 73,
+      "bytes": 3990,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/studio-refs.test.mjs",
+      "lines": 136,
+      "bytes": 9573,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/studio.mjs",
+      "lines": 129,
+      "bytes": 5829,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/update-channel.mjs",
+      "lines": 36,
+      "bytes": 1640,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/update-channel.test.mjs",
+      "lines": 29,
+      "bytes": 1564,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/update-controller.mjs",
+      "lines": 122,
+      "bytes": 6461,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/update-controller.test.mjs",
+      "lines": 136,
+      "bytes": 6658,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/update-menu.mjs",
+      "lines": 49,
+      "bytes": 2736,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/update-menu.test.mjs",
+      "lines": 51,
+      "bytes": 2553,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/update-schedule.mjs",
+      "lines": 35,
+      "bytes": 1453,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/update-schedule.test.mjs",
+      "lines": 50,
+      "bytes": 1791,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/updates.mjs",
+      "lines": 114,
+      "bytes": 5325,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/window-state.mjs",
+      "lines": 44,
+      "bytes": 2009,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/src/window-state.test.mjs",
+      "lines": 22,
+      "bytes": 1643,
+      "test_file": true,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/app-bridge.ts",
+      "lines": 94,
+      "bytes": 6646,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/App.tsx",
+      "lines": 928,
+      "bytes": 52980,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/mount.tsx",
+      "lines": 19,
+      "bytes": 777,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/studio-refs.ts",
+      "lines": 290,
+      "bytes": 14742,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/components/AgentActivityRow.tsx",
+      "lines": 714,
+      "bytes": 31456,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/AgentIcons.tsx",
+      "lines": 45,
+      "bytes": 11787,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/components/AttachmentPreview.tsx",
+      "lines": 331,
+      "bytes": 12077,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/BalanceNotice.tsx",
+      "lines": 22,
+      "bytes": 892,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/components/BrandLogo.tsx",
+      "lines": 35,
+      "bytes": 1260,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/ComposerCard.tsx",
+      "lines": 182,
+      "bytes": 7685,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/ContextMeter.tsx",
+      "lines": 34,
+      "bytes": 1755,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/components/ConversationSessionBar.tsx",
+      "lines": 292,
+      "bytes": 11211,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/Divider.tsx",
+      "lines": 47,
+      "bytes": 2051,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/dock-pane-bar.ts",
+      "lines": 14,
+      "bytes": 905,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/components/FileChangesList.tsx",
+      "lines": 119,
+      "bytes": 5863,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/Markdown.tsx",
+      "lines": 198,
+      "bytes": 7769,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/ModelPopover.tsx",
+      "lines": 255,
+      "bytes": 15129,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/NoticeCard.tsx",
+      "lines": 87,
+      "bytes": 2320,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/Popover.tsx",
+      "lines": 195,
+      "bytes": 7539,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/PreviewFrame.tsx",
+      "lines": 128,
+      "bytes": 5527,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/project-version.ts",
+      "lines": 35,
+      "bytes": 1444,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/components/ProjectConversation.tsx",
+      "lines": 856,
+      "bytes": 39928,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/ProjectStarters.tsx",
+      "lines": 118,
+      "bytes": 5144,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/Tooltip.tsx",
+      "lines": 191,
+      "bytes": 7720,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/TurnLog.tsx",
+      "lines": 447,
+      "bytes": 29500,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/TurnQuestionCard.tsx",
+      "lines": 133,
+      "bytes": 5433,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/useStickToBottom.ts",
+      "lines": 320,
+      "bytes": 13026,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/useTicker.ts",
+      "lines": 55,
+      "bytes": 2020,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/i18n/index.ts",
+      "lines": 42,
+      "bytes": 1752,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/i18n/lookup.ts",
+      "lines": 12,
+      "bytes": 449,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/agent-activity-runs.ts",
+      "lines": 143,
+      "bytes": 6585,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/agent-refs.ts",
+      "lines": 105,
+      "bytes": 4910,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/agent-transcript.ts",
+      "lines": 440,
+      "bytes": 17417,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/asset-lists.ts",
+      "lines": 75,
+      "bytes": 2368,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/balance.ts",
+      "lines": 16,
+      "bytes": 934,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/chat-layer.ts",
+      "lines": 10,
+      "bytes": 689,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/chat-menu.ts",
+      "lines": 18,
+      "bytes": 692,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/chat-store.ts",
+      "lines": 101,
+      "bytes": 4763,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/composer-attachments.ts",
+      "lines": 189,
+      "bytes": 7823,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/desktop-attachments.ts",
+      "lines": 133,
+      "bytes": 6529,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/desktop-bridge.ts",
+      "lines": 285,
+      "bytes": 14772,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/developer.ts",
+      "lines": 39,
+      "bytes": 1659,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/file-changes.ts",
+      "lines": 32,
+      "bytes": 1545,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/live-activity.ts",
+      "lines": 20,
+      "bytes": 857,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/local-agent-run.ts",
+      "lines": 1160,
+      "bytes": 56067,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/local-sessions.ts",
+      "lines": 25,
+      "bytes": 1241,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/model-calls.ts",
+      "lines": 62,
+      "bytes": 2595,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/pretty-json.ts",
+      "lines": 12,
+      "bytes": 380,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/project-resources.ts",
+      "lines": 64,
+      "bytes": 2568,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/project-sessions.ts",
+      "lines": 62,
+      "bytes": 1918,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/project-versions.ts",
+      "lines": 113,
+      "bytes": 5488,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/ref-pictures.ts",
+      "lines": 116,
+      "bytes": 5489,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/relative-time.ts",
+      "lines": 46,
+      "bytes": 2088,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/structural-share.ts",
+      "lines": 52,
+      "bytes": 2211,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/studio-film.ts",
+      "lines": 44,
+      "bytes": 1845,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/studio-transfer.ts",
+      "lines": 40,
+      "bytes": 1872,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/lib/upload-limits.ts",
+      "lines": 53,
+      "bytes": 2177,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/state/local-agent-store.ts",
+      "lines": 287,
+      "bytes": 14804,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/i18n/locales/en-US.ts",
+      "lines": 319,
+      "bytes": 10277,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/i18n/locales/es.ts",
+      "lines": 319,
+      "bytes": 11188,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/i18n/locales/ja.ts",
+      "lines": 319,
+      "bytes": 12812,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/i18n/locales/ko.ts",
+      "lines": 319,
+      "bytes": 11563,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/i18n/locales/words.ts",
+      "lines": 6,
+      "bytes": 248,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/i18n/locales/zh-CN.ts",
+      "lines": 319,
+      "bytes": 10218,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/components/prompt-editor/index.ts",
+      "lines": 31,
+      "bytes": 871,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/components/prompt-editor/mention-menu.ts",
+      "lines": 206,
+      "bytes": 8401,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/prompt-editor/MentionMenuPlugin.tsx",
+      "lines": 372,
+      "bytes": 15182,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/prompt-editor/prompt-text.ts",
+      "lines": 171,
+      "bytes": 6504,
+      "test_file": false,
+      "react_runtime_import": false
+    },
+    {
+      "path": "apps/desktop/chat/src/components/prompt-editor/PromptEditor.tsx",
+      "lines": 476,
+      "bytes": 17367,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/prompt-editor/PromptPill.tsx",
+      "lines": 393,
+      "bytes": 16108,
+      "test_file": false,
+      "react_runtime_import": true
+    },
+    {
+      "path": "apps/desktop/chat/src/components/prompt-editor/PromptReferenceNode.tsx",
+      "lines": 164,
+      "bytes": 5517,
+      "test_file": false,
+      "react_runtime_import": true
+    }
+  ]
+}
