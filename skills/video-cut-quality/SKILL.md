@@ -5,6 +5,13 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [source edits](../../docs/specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md),
+check both physical source bounds and actual decoded frame identities/PCM.
+Slip preserves author fields; extension reauthors fades/effects and may
+renormalize nested curves. Compare against an explicit new author, not an
+unchanged old-output slice. Retain normalization warnings and post-slip
+transition-handle failures. Separate CLI worker calls from process startups.
+
 For [professional range edits](../../docs/specs/范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md),
 compare insertion/overwrite and lift/extract against explicit original ranges,
 and roll/slide against the full original left/middle/right authors. Check linked

@@ -5,6 +5,12 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+The [source edit actions](../../docs/specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md)
+share timeline snapshots, canonical plan hashes, idempotency and batch rollback.
+Reusing a key must not slip the source twice. A failure in any linked member
+or later batch step retains original project bytes. Review source and native
+retiming changes before applying; these actions preserve asset rights records.
+
 The [range edit actions](../../docs/specs/范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md)
 share the existing timeline transaction, snapshot and idempotency path.
 Preview is read-only; bind `base_project_sha256` when applying, and replay the

@@ -14,6 +14,13 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+Use the [source edit contract](../../docs/specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md)
+for `timeline edit` slip/extend_source and explicit source handles on roll/slide.
+Positive source deltas stay physical-forward even on reversed clips. Linked
+source members are checked atomically; sync/rider movement is separate.
+Inspect reanchored keyframes/freeze, edge reprocessing and nested normalization.
+Legacy compose `slip_clip` defaults to one clip and accepts `linked: true`.
+
 Use the [range edit contract](../../docs/specs/范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md)
 for insert/overwrite with complete incoming clips, lift/extract with explicit
 tracks, roll with a continuous left/right pair, and slide with a middle clip.
@@ -21,7 +28,8 @@ Input positions are group-relative; a declared group duration preserves holes
 and its blank tail. Linked IDs expand across audio; sync and linkage follow
 the operation-specific closure in the contract. Keep split source/curve/
 animation fields unchanged and use presentation windows. Roll/slide need
-retained author handles and complete linked pairs/triples. Slide moves the
+retained author handles by default and complete linked pairs/triples; explicit
+source policy can reauthor finite real handles. Slide moves the
 whole middle body; it is not source-content slip. Markers remain absolute.
 
 Use the [presentation cut contract](../../docs/specs/片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md)

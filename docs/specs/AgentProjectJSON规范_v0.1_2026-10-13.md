@@ -228,3 +228,7 @@ method 默认 bilinear，仅允许 bilinear/area；max_working_bytes 默认 1 Gi
 `timeline edit` 新增 `insert/overwrite/lift/extract/roll/slide`；也可作为 `compose.linked_edit` 原子批量的一步。详见[范围编辑契约](./范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md)与[实际证据](../validation/专业范围编辑与滚滑剪口实测_2026-10-18.md)。incoming 片段的落点相对新组，旧片段的完整作者源/动画/音频字段保持，窗口只选可见区间；计划列出创建/删除/修改、关联剪口和闭包。无新增持久 Schema 字段。roll/slide 只使用保留作者输出句柄。
 
 既有 `compose.slip_clip` 为直接媒体源入/出点整体偏移，`compose.slide_clip` 只改单片段落点；本轮 `timeline edit` 的 slide 调整连续左右邻居并处理关联组，不能混用。复杂关联 slip、源作者范围外扩、全磁吸仍待统一规划，不能因命令名称相近推定等价。
+
+## V40：后续真实源编辑模式
+
+上述历史版本的保留作者窗口/缺项边界保持原记录；后续 V40 详见[真实源编辑契约](./真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md)和[实测](../validation/真实源外扩与关联Slip实测_2026-10-18.md)。`timeline edit:slip/extend_source` 支持关联源闭包，roll/slide 缺省 retained、显式 source 才能补真实有限输入句柄。旧 compose slip_clip 统一使用源规划器，缺省仍只改单片段，可加 linked:true；不再绕过跟踪/转场检查。无新增持久 Schema 字段。真实外扩会重新求值效果/retiming，嵌套曲线时长再归一化有明确警告；完整磁吸、跟踪重规划和任意旧主体时钟保真仍未验收。

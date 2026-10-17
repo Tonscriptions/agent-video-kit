@@ -1,0 +1,57 @@
+test_cli_source_preview_hash_idempotency_and_late_batch_rollback (test_source_edits.SourceMediaTests.test_cli_source_preview_hash_idempotency_and_late_batch_rollback) ... ok
+test_real_both_sided_extension_matches_manual_full_author (test_source_edits.SourceMediaTests.test_real_both_sided_extension_matches_manual_full_author) ... ok
+test_real_frozen_extension_reanchors_hold_and_effect_keys (test_source_edits.SourceMediaTests.test_real_frozen_extension_reanchors_hold_and_effect_keys) ... ok
+test_real_linked_slip_matches_independent_manual_source_ranges (test_source_edits.SourceMediaTests.test_real_linked_slip_matches_independent_manual_source_ranges) ... ok
+test_real_reverse_speed_extension_preserves_physical_source_choice (test_source_edits.SourceMediaTests.test_real_reverse_speed_extension_preserves_physical_source_choice) ... ok
+test_bezier_extension_keeps_original_controls_at_shifted_source_ticks (test_source_edits.SourcePlannerTests.test_bezier_extension_keeps_original_controls_at_shifted_source_ticks) ... ok
+test_extension_requires_actual_timeline_space_at_head (test_source_edits.SourcePlannerTests.test_extension_requires_actual_timeline_space_at_head) ... ok
+test_extension_uses_retained_handles_before_growing_source (test_source_edits.SourcePlannerTests.test_extension_uses_retained_handles_before_growing_source) ... ok
+test_fractional_head_tick_is_rejected_not_rounded (test_source_edits.SourcePlannerTests.test_fractional_head_tick_is_rejected_not_rounded) ... ok
+test_fractional_recorded_source_bound_is_not_rounded_up (test_source_edits.SourcePlannerTests.test_fractional_recorded_source_bound_is_not_rounded_up) ... ok
+test_freeze_and_all_effect_automation_shift_by_new_prefix (test_source_edits.SourcePlannerTests.test_freeze_and_all_effect_automation_shift_by_new_prefix) ... ok
+test_genuine_two_sided_extension (test_source_edits.SourcePlannerTests.test_genuine_two_sided_extension) ... ok
+test_implicit_curve_boundaries_and_original_control_values (test_source_edits.SourcePlannerTests.test_implicit_curve_boundaries_and_original_control_values) ... ok
+test_linked_extension_checks_every_source_before_commit (test_source_edits.SourcePlannerTests.test_linked_extension_checks_every_source_before_commit) ... FAIL
+test_linked_slip_is_atomic_and_explicitly_optional (test_source_edits.SourcePlannerTests.test_linked_slip_is_atomic_and_explicitly_optional) ... ok
+test_locked_linked_member_rejects_the_whole_slip (test_source_edits.SourcePlannerTests.test_locked_linked_member_rejects_the_whole_slip) ... ok
+test_mixed_retained_and_true_head_extension (test_source_edits.SourcePlannerTests.test_mixed_retained_and_true_head_extension) ... ok
+test_negative_and_reverse_slip_use_physical_source_sign (test_source_edits.SourcePlannerTests.test_negative_and_reverse_slip_use_physical_source_sign) ... ok
+test_nested_slip_uses_child_sequence_bound (test_source_edits.SourcePlannerTests.test_nested_slip_uses_child_sequence_bound) ... ok
+test_nested_source_bounds_and_normalized_curve_are_reported (test_source_edits.SourcePlannerTests.test_nested_source_bounds_and_normalized_curve_are_reported) ... ok
+test_padded_author_and_outside_freeze_are_explicit (test_source_edits.SourcePlannerTests.test_padded_author_and_outside_freeze_are_explicit) ... ok
+test_real_transition_slip_rechecks_its_extra_handles (test_source_edits.SourcePlannerTests.test_real_transition_slip_rechecks_its_extra_handles) ... ok
+test_request_types_unknown_fields_and_policy_are_strict (test_source_edits.SourcePlannerTests.test_request_types_unknown_fields_and_policy_are_strict) ... ok
+test_reverse_constant_speed_extension_maps_physical_sides (test_source_edits.SourcePlannerTests.test_reverse_constant_speed_extension_maps_physical_sides) ... ok
+test_roll_uses_true_source_only_by_explicit_policy (test_source_edits.SourcePlannerTests.test_roll_uses_true_source_only_by_explicit_policy) ... ok
+test_slide_true_handles_leave_middle_source_and_processing_unchanged (test_source_edits.SourcePlannerTests.test_slide_true_handles_leave_middle_source_and_processing_unchanged) ... ok
+test_slip_moves_only_source_and_keeps_timeline (test_source_edits.SourcePlannerTests.test_slip_moves_only_source_and_keeps_timeline) ... ok
+test_slip_preserves_curve_freeze_automation_and_window (test_source_edits.SourcePlannerTests.test_slip_preserves_curve_freeze_automation_and_window) ... ok
+test_slip_rejects_either_media_boundary (test_source_edits.SourcePlannerTests.test_slip_rejects_either_media_boundary) ... ok
+test_source_extension_does_not_remove_cut_reference_gates (test_source_edits.SourcePlannerTests.test_source_extension_does_not_remove_cut_reference_gates) ... ok
+test_source_options_do_not_move_sync_tracks_or_riders (test_source_edits.SourcePlannerTests.test_source_options_do_not_move_sync_tracks_or_riders) ... ok
+test_static_asset_is_not_claimed_as_finite_source_video (test_source_edits.SourcePlannerTests.test_static_asset_is_not_claimed_as_finite_source_video) ... ok
+test_tail_includes_minimal_whole_source_tick_then_crops_output (test_source_edits.SourcePlannerTests.test_tail_includes_minimal_whole_source_tick_then_crops_output) ... ok
+test_tracking_source_and_target_slip_reject (test_source_edits.SourcePlannerTests.test_tracking_source_and_target_slip_reject) ... ok
+test_unknown_and_locked_direct_clip_return_structured_errors (test_source_edits.SourcePlannerTests.test_unknown_and_locked_direct_clip_return_structured_errors) ... ok
+test_unknown_or_nonfinite_source_duration_rejects (test_source_edits.SourcePlannerTests.test_unknown_or_nonfinite_source_duration_rejects) ... ok
+test_zero_source_actions_preserve_entire_project (test_source_edits.SourcePlannerTests.test_zero_source_actions_preserve_entire_project) ... ok
+
+======================================================================
+FAIL: test_linked_extension_checks_every_source_before_commit (test_source_edits.SourcePlannerTests.test_linked_extension_checks_every_source_before_commit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_edits.py", line 184, in test_linked_extension_checks_every_source_before_commit
+    self.rejects(value, {'action': 'extend_source', 'clip_id': 'v', 'head_tick': 10}, 'SOURCE_EDIT_PADDED_AUTHOR')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_edits.py", line 44, in rejects
+    self.assertEqual(caught.exception.code, code)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'SOURCE_EDIT_HANDLE_SHORTFALL' != 'SOURCE_EDIT_PADDED_AUTHOR'
+- SOURCE_EDIT_HANDLE_SHORTFALL
++ SOURCE_EDIT_PADDED_AUTHOR
+
+
+----------------------------------------------------------------------
+Ran 37 tests in 148.638s
+
+FAILED (failures=1)

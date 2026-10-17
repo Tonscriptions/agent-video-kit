@@ -5,15 +5,22 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For linked source slip and genuine local source extension, read the
+[source edit contract](../../docs/specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md).
+Use `timeline edit` actions `slip` / `extend_source`; inspect `source_changes`
+and the full before/after diff. Source slip keeps timeline/automation data;
+extension reauthors native processing. Preserve nested curve normalization
+warnings and input bounds. Roll/slide accept explicit `handle_policy: source`.
+
 For insert/overwrite/lift/extract/roll/slide, read the
 [range edit contract](../../docs/specs/范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md).
 Use `timeline edit --input <request.json> --dry-run`; incoming clips have
 group-relative positions and must reference registered local assets. Inspect
 the complete created/removed/modified clip diff, linked/sync/rider closure,
 cut pairs and sequence duration before binding the project hash. Roll and
-slide extend only into retained full-author output handles. Preserve explicit
-shortfall, lock, binding, transition and audio-bus errors; never invent new
-source handles. Compose can batch these requests as `linked_edit`.
+slide default to retained full-author handles; the source policy above uses
+finite real inputs. Preserve explicit shortfall, lock, binding, transition
+and audio-bus errors. Compose can batch these requests as `linked_edit`.
 
 For source-preserving split, trim and interval ripple operations, use the
 [presentation window contract](../../docs/specs/片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md).
@@ -67,7 +74,8 @@ by omitting dry-run; pass `--expected-project-sha256` from the plan when needed.
 Sync takes precedence over main-track linkage; `track.sync_lock=false` opts
 other tracks out. Whole-clip movement preserves source clocks and animation;
 Use the range actions above for insert/overwrite and retained-author cuts.
-True source extension and full main-track magnetism remain separate work.
+Source extension uses the explicit actions above; full main-track magnetism
+and arbitrary nested-curve old-body preservation remain separate work.
 Preserve explicit audio-bus relocation and binding-reference errors.
 
 For Chinese voiceovers, read the [local SoulX contract](../../docs/specs/本地SoulX中文配音与声线登记契约_v0.1_2026-10-15.md).

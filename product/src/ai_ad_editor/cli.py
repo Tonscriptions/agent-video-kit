@@ -4620,6 +4620,7 @@ def command_timeline_edit(args: argparse.Namespace) -> dict[str, Any]:
         raise AppError('PROJECT_INVALID', '时间线编辑会生成无效项目', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
     warnings = ([{'code': 'EDIT_RIPPLE_SHORTFALL', 'message': '同步轨道空间不足，统一保留未闭合 tick；没有单轨回退',
                   'short_tick': plan['short_tick']}] if plan['short_tick'] else [])
+    warnings.extend(plan.get('warnings', []))
     data = {'sequence_id': sequence['id'], 'plan': plan, 'validation': validation}
     if args.dry_run:
         return _envelope('timeline.edit', args, status='planned', data=data, warnings=warnings)
@@ -4744,11 +4745,13 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
         elif operation == "slip_clip":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))
-            asset = asset_map(working).get(str(clip.get("asset_id")))
-            if not asset:
-                raise argument_error("slip_clip 只支持直接引用媒体资产", "asset_id")
-            _source_shift(clip, int(change.get("delta_source_tick", 0)), asset)
-            applied.append({"op": operation, "track_id": track["id"], "clip": clip})
+            cid = clip['id']
+            working, plan = build_edit_plan(working, target_sequence['id'], {
+                'action': 'slip', 'clip_id': cid, 'delta_source_tick': change.get('delta_source_tick', 0),
+                'options': {'linked': change.get('linked', False)}})
+            updated = find_sequence(working, target_sequence['id'])
+            track, clip = _find_clip(updated, cid, track['id'])
+            applied.append({"op": operation, "track_id": track["id"], "clip": clip, 'plan': plan})
         elif operation == "slide_clip":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))

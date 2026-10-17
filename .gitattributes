@@ -132,3 +132,10 @@ docs/validation/evidence/range*.log -text -whitespace
 docs/validation/evidence/range-*/** -text -whitespace
 docs/validation/evidence/openfilm-range-followup-*/** -text -whitespace
 docs/assets/range-edits-*/cli-*.log -text -whitespace
+
+# V40 finite source edits preserve raw CLI, regression and failure evidence.
+scripts/*source_edit*.py -text
+docs/validation/evidence/source-*-20261018.json -text
+docs/validation/evidence/source-*-20261018.log -text -whitespace
+docs/validation/evidence/source-*-20261018/** -text -whitespace
+docs/assets/source-edits-*/cli-*.log -text -whitespace

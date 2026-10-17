@@ -141,7 +141,7 @@ V38 的输出窗口为本项目新实现，不是 `timeline-edit.ts` 的整体�
 | 编号 | 上游内容 | 当前本地实现及采用方式 | 剩余边界 |
 |---|---|---|---|
 | O01 | `studio/server/subtitle-segments.mjs` | [原字节算法](../product/src/ai_ad_editor/openfilm_subtitle_segments.mjs) + [Python 桥](../product/src/ai_ad_editor/subtitle_segments.py)；已进入 `subtitle segment` | 分句不是 ASR；缺词时钟的时间估算、真实语义和对齐质量不能由通过数替代 |
-| O02 | `studio/ui/src/lib/timeline-edit.ts` | [edit_planner.py](../product/src/ai_ad_editor/edit_planner.py) 适配部分关联/主轨/同步规则；[range_edits.py](../product/src/ai_ad_editor/range_edits.py) 原生补充范围编辑 | 并非整个规划器兼容移植；源外扩、复杂关联 slip、完整磁吸等仍开放 |
+| O02 | `studio/ui/src/lib/timeline-edit.ts` | [edit_planner.py](../product/src/ai_ad_editor/edit_planner.py) 适配部分关联/主轨/同步规则；[range_edits.py](../product/src/ai_ad_editor/range_edits.py) 原生补充范围编辑 | 后续 V40 补齐有限源外扩/关联 slip；完整磁吸、任意嵌套旧主体时钟保真/跟踪重规划仍开放 |
 | O03 | `studio/ui/src/lib/transitions.ts` | [source_transitions.py](../product/src/ai_ad_editor/source_transitions.py) 借鉴可逆转场工作流，重新实现真实源句柄 | 未照搬上游移位换轨；受限端点、自然画质及完整转场库仍需实现/验收 |
 | O13 | `studio/server/saved.mjs` + `studio/ui/src/lib/saved-insert.ts` | [fragments.py](../product/src/ai_ad_editor/fragments.py) 借鉴保存/资源闭包/相对时间/ID 隔离流程，提供可编辑组库 | 首版嵌套入轨、相同执行上下文；展开式合并、跨 FPS/色彩和权利撤回传播未完成 |
 
@@ -170,10 +170,14 @@ React Studio、Electron 外壳不符合本项目 CLI 定位；但不能按目录
 
 本次还核对了 `host.mjs` 的 `offline=false` 默认值、`render.mjs` 创建 worker 时未传 offline，以及不透明截图默认 JPEG95 的路径。**不能只因源码存在 offline/close() 就宣称已经符合本项目离线与回收要求**；也不能把 JPEG 截帧、Alpha PNG 或多快门平均当作 HDR/线性光或完整剪映画质验收。
 
-复查脚本为 [audit_openfilm_current_review.py](../scripts/audit_openfilm_current_review.py)，由根目录执行，输出目录需尚不存在：
+R03 历史复查脚本为 [audit_openfilm_current_review.py](../scripts/audit_openfilm_current_review.py)，其 130 文件冻结范围固定于提交 `e60c053de4306f108b22f391acca0bbeeada3555`。V40 新增源模块/测试后为 132 文件，复现 R03 产品冻结检查应在对应旧提交执行，不将旧摘要直接视为新版必须相同；在线 API 还可能变化。下列命令从对应版本仓库根目录执行，输出目录需尚不存在：
 
 ```powershell
 C:\Python313\python.exe -B -X utf8 scripts/audit_openfilm_current_review.py --output docs/validation/evidence/<新的复查目录>
 ```
 
 它只向两个公开 GitHub API 发 GET，保存响应原字节并核对既有源码、冻结产品和文档链接；若 main 变化则保留响应并终止，以便重新审查，不能沿用本次模块结论。整体剪映等价目标继续开放，源码 MIT、素材/模型权利和品牌使用分别管理。
+
+## 后续产品增量：V40
+
+本轮 V40：统一关联 `slip`、真实有限源 `extend_source` 与 roll/slide 显式 `handle_policy:source`；默认仍使用保留作者句柄，源界/关联锁/跟踪观察/转场额外句柄和原子事务统一检查，旧 compose slip 也走相同规划器。完整 **938/938，2478.552 秒**，0 跳过；127 Python+2 MJS+Schema+pyproject+MIT 共 132 文件冻结，41 新增方法为完整子集。九组/79 CLI 入口（66 成功、4 当前预期拒绝、9 固定 V39 缺项拒绝），505 新主帧/2,424,000 立体声采样帧与手工固定 V39 工程完全相同；两组另核对 100 个直接源帧身份，0 错配。同产品参照不独立验收渲染或音质。90 文件离线 wheel/26 独立进程 CLI、14 Skills/128 引用通过；四时刻静态目检，未连续播放/听审；开发失败与主动中断原记录保留。真实外扩重新求值效果/淡入淡出/retiming；嵌套曲线明确告警其时长再归一化，原主体采样不变未验收。完整磁吸、跟踪重规划、自然画质/音质、长片资源、Schema 随包/干净机器、内容库规模及完整剪映等价仍未验收。 见[源编辑契约](specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md)、[正式实测](validation/真实源外扩与关联Slip实测_2026-10-18.md)。本项为已有 OpenFilm O02 关联规则之上的原生源范围规划扩展，没有继续搬入 GUI/HTML/在线执行器，也没有重新请求上游或重跑 R01/R02 研究测试；R03 的 API 星标和源码检查保持原日期记录，未测实际节省人时。

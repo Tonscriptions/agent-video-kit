@@ -15,7 +15,7 @@ from .errors import AppError
 from .utils import ID_RE
 
 ENGINE = 'agent-range-edit-v1'
-ACTIONS = {'insert', 'overwrite', 'lift', 'extract', 'roll', 'slide'}
+ACTIONS = {'insert', 'overwrite', 'lift', 'extract', 'roll', 'slide', 'slip', 'extend_source'}
 
 
 def fail(code, message, path='edit'):
@@ -51,8 +51,10 @@ def normalize(sequence, request):
         'overwrite': {'at_tick', 'duration_tick', 'items'},
         'lift': {'at_tick', 'duration_tick', 'track_ids'},
         'extract': {'at_tick', 'duration_tick', 'track_ids'},
-        'roll': {'left_clip_id', 'right_clip_id', 'delta_tick'},
-        'slide': {'clip_id', 'delta_tick'},
+        'roll': {'left_clip_id', 'right_clip_id', 'delta_tick', 'handle_policy'},
+        'slide': {'clip_id', 'delta_tick', 'handle_policy'},
+        'slip': {'clip_id', 'delta_source_tick'},
+        'extend_source': {'clip_id', 'head_tick', 'tail_tick'},
     }[action]
     if set(request) - fields:
         fail('EDIT_RANGE_REQUEST_INVALID', '该 action 包含未知字段；未静默忽略')
@@ -60,11 +62,20 @@ def normalize(sequence, request):
     if not isinstance(supplied, dict) or set(supplied) - {'sync', 'linkage', 'linked'}:
         fail('EDIT_RANGE_REQUEST_INVALID', 'options 只允许 sync/linkage/linked', 'edit.options')
     options = validate_editing(sequence)
+    if action in {'slip', 'extend_source'}:
+        options.update(sync=False, linkage=False)
     for key, value in supplied.items():
         if type(value) is not bool:
             fail('EDIT_RANGE_REQUEST_INVALID', '编辑开关必须为布尔值', 'edit.options.' + key)
         options[key] = value
+    if action in {'slip', 'extend_source'} and (options['sync'] or options['linkage']):
+        fail('EDIT_RANGE_REQUEST_INVALID', '源编辑只使用 linked；sync/linkage 不能设为 true')
     result = {'action': action, 'options': options}
+    if action in {'roll', 'slide'}:
+        policy = request.get('handle_policy', 'retained')
+        if not isinstance(policy, str) or policy not in {'retained', 'source'}:
+            fail('EDIT_RANGE_REQUEST_INVALID', 'handle_policy 必须为 retained 或 source')
+        result['handle_policy'] = policy
     if action in {'insert', 'overwrite', 'lift', 'extract'}:
         result['at_tick'] = integer(request.get('at_tick'), 'edit.at_tick', 0)
     if action in {'lift', 'extract'}:
@@ -102,9 +113,18 @@ def normalize(sequence, request):
         result['left_clip_id'] = identifier(request.get('left_clip_id'), 'edit.left_clip_id')
         result['right_clip_id'] = identifier(request.get('right_clip_id'), 'edit.right_clip_id')
         result['delta_tick'] = integer(request.get('delta_tick'), 'edit.delta_tick')
-    else:
+    elif action == 'slide':
         result['clip_id'] = identifier(request.get('clip_id'), 'edit.clip_id')
         result['delta_tick'] = integer(request.get('delta_tick'), 'edit.delta_tick')
+    elif action in {'slip', 'extend_source'}:
+        result['clip_id'] = identifier(request.get('clip_id'), 'edit.clip_id')
+        keys = ('delta_source_tick',) if action == 'slip' else ('head_tick', 'tail_tick')
+        for key in keys:
+            value = request.get(key) if action == 'slip' else request.get(key, 0)
+            value = integer(value, 'edit.'+key, 0 if action == 'extend_source' else None)
+            if abs(value) > 2**53-1:
+                fail('EDIT_RANGE_REQUEST_INVALID', '源编辑 tick 超过可精确编译的整数时钟范围')
+            result[key] = value
     return result
 
 
@@ -154,6 +174,7 @@ class RangeDraft:
         self.new_tracks = []
         self.removed_transitions = []
         self.cut_pairs = []
+        self.source_changes = []
         self.old_duration = self.sequence['duration_tick']
         self.protected = {c['id'] for s in self.project['sequences'] for t in s['tracks'] for c in t['clips'] if c.get('tracking_binding')}
         self.protected.update(c['tracking_binding']['source_clip_id'] for s in self.project['sequences']
@@ -231,12 +252,46 @@ class RangeDraft:
             'authored_duration_tick': clip['duration_tick'], 'offset_tick': 0})
         offset = window['offset_tick'] + offset_delta
         if offset < 0 or offset + duration > window['authored_duration_tick']:
-            fail('EDIT_RANGE_HANDLE_SHORTFALL', '原作者输出中没有足够保留句柄；未补帧或改写曲线。真实源范围外扩需另行处理')
+            if self.request.get('handle_policy') != 'source' and self.request['action'] != 'extend_source':
+                fail('EDIT_RANGE_HANDLE_SHORTFALL', '原作者输出没有足够保留句柄；可显式选择 handle_policy=source 使用真实源范围')
+            from .source_edits import expand_author
+            head = max(0, -offset)
+            tail = max(0, offset+duration-window['authored_duration_tick'])
+            result, change = expand_author(self.project, result, head, tail)
+            self.source_changes.append(change)
+            window = result['presentation_window']
+            offset += head
         window['offset_tick'] = offset
         result['duration_tick'], result['timeline_start_tick'] = duration, at
         validate_window(result)
         self.changed.add(result['id'])
         return result
+
+    def slip(self):
+        from .source_edits import slip
+        selected = self.linked({self.request['clip_id']})
+        replacements = {}
+        delta = self.request['delta_source_tick']
+        for cid in sorted(selected):
+            if delta and cid in self.protected:
+                fail('EDIT_RANGE_BINDING_UNSUPPORTED', 'slip 会使跟踪源或目标的既有观察失效；请先重新规划绑定')
+            replacements[cid], change = slip(self.project, self.before[cid][1], delta)
+            if delta:
+                self.changed.add(cid)
+                self.source_changes.append(change)
+        self.selected.update(selected)
+        self.replace(replacements)
+
+    def extend_source(self):
+        selected = self.linked({self.request['clip_id']})
+        head, tail = self.request['head_tick'], self.request['tail_tick']
+        replacements = {}
+        if head or tail:
+            for cid in sorted(selected):
+                clip = self.before[cid][1]
+                replacements[cid] = self.resize(clip, -head, clip['duration_tick']+head+tail, start(clip)-head)
+        self.selected.update(selected)
+        self.replace(replacements)
 
     def range_selection(self, own, a, b, ripple):
         for tid in own:
@@ -470,7 +525,7 @@ class RangeDraft:
 
     def run(self):
         q, action = self.request, self.request['action']
-        if action in {'roll', 'slide'}:
+        if action in {'roll', 'slide', 'slip', 'extend_source'}:
             getattr(self, action)()
         else:
             a, b = q['at_tick'], q['at_tick']+q['duration_tick']
@@ -487,6 +542,9 @@ class RangeDraft:
                 self.sequence['duration_tick'] = max(1, self.old_duration-q['duration_tick'])
         self.settle()
         self.references()
+        if self.source_changes and self.sequence.get('source_transitions'):
+            from .source_transitions import analyze
+            analyze(self.project, self.sequence)
         self.sequence['duration_tick'] = max([self.sequence['duration_tick'], 1,
             *(end(c) for t in self.sequence['tracks'] for c in t['clips'])])
         old = {c['id']: (t['id'], c) for t in self.original['tracks'] for c in t['clips']}
@@ -503,10 +561,15 @@ class RangeDraft:
             'new_tracks': [copy.deepcopy(t) for t in self.sequence['tracks'] if t['id'] in self.new_tracks],
             'rebound_clip_ids': sorted(self.rebound),
             'retimed_subtitle_ids': sorted(self.retimed), 'removed_transition_ids': self.removed_transitions,
-            'cut_pairs': self.cut_pairs,
+            'cut_pairs': self.cut_pairs, 'source_changes': self.source_changes,
+            'warnings': [{'code': 'SOURCE_EDIT_NESTED_CURVE_RENORMALIZED',
+                          'message': '外扩保留嵌套曲线的原生时长归一化；旧主体采样时钟可能变化，请检查前后计划与成片',
+                          'clip_id': change['clip_id']}
+                         for change in self.source_changes if change.get('native_nested_curve_renormalized')],
             'before_duration_tick': self.old_duration, 'after_duration_tick': self.sequence['duration_tick'],
-            'limits': ['markers-remain-absolute', 'roll-and-slide-use-retained-authored-handles',
-                       'source-extension-outside-authored-range-not-yet-implemented',
+            'limits': ['markers-remain-absolute', 'roll-and-slide-default-to-retained-authored-handles',
+                       'source-handles-require-finite-recorded-local-input-bounds',
+                       'source-extension-reauthors-edge-processing-and-native-retiming',
                        'partial-tracking-and-real-transition-endpoint-cuts-reject',
                        'clip-processing-before-cut-track-and-root-processing-after-edit',
                        'existing-native-window-render-budgets-still-apply'],
