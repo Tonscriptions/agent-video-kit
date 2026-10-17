@@ -1,0 +1,162 @@
+[
+  {
+    "engine": "agent-tick-linked-edit-v1",
+    "source": {
+      "repository": "openfilm/openfilm",
+      "revision": "b138595d4c2d1fa5262b4a8a8c7cd98187c4b077",
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-edit.ts",
+      "license": "MIT",
+      "adaptation": "native-integer-ticks-whole-clip-follow-and-gap-planning"
+    },
+    "base_project_sha256": "sha256:138ba73ad896ef37a80d8e3f73096b950d2bc4d2df325ad80304eea47d01d67a",
+    "sequence_id": "seq_main",
+    "request": {
+      "action": "shift",
+      "options": {
+        "main_track_id": "main",
+        "sync": false,
+        "linkage": false,
+        "linked": true,
+        "ripple": false
+      },
+      "clip_ids": [
+        "complex"
+      ],
+      "delta_tick": 90000
+    },
+    "selected_clip_ids": [
+      "complex",
+      "paired_voice"
+    ],
+    "main_track_id": "main",
+    "anchored_clip_ids": [
+      "bed_clip"
+    ],
+    "short_tick": 0,
+    "shifts": [],
+    "changes": [
+      {
+        "clip_id": "complex",
+        "before": {
+          "track_id": "main",
+          "clip": {
+            "id": "complex",
+            "timeline_start_tick": 180000,
+            "duration_tick": 180000,
+            "source_in_tick": 0,
+            "source_out_tick": 180000,
+            "sequence_id": "child",
+            "reverse": true,
+            "link_id": "av",
+            "transform": {
+              "scale": 0.75
+            },
+            "mask": {
+              "type": "rectangle",
+              "x": 0.1,
+              "y": 0.1,
+              "width": 0.8,
+              "height": 0.8
+            },
+            "keyframes": [
+              {
+                "property": "transform.rotation",
+                "keyframes": [
+                  {
+                    "at_tick": 0,
+                    "value": -10,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 180000,
+                    "value": 10,
+                    "interpolation": "linear"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "after": {
+          "track_id": "main",
+          "clip": {
+            "id": "complex",
+            "timeline_start_tick": 270000,
+            "duration_tick": 180000,
+            "source_in_tick": 0,
+            "source_out_tick": 180000,
+            "sequence_id": "child",
+            "reverse": true,
+            "link_id": "av",
+            "transform": {
+              "scale": 0.75
+            },
+            "mask": {
+              "type": "rectangle",
+              "x": 0.1,
+              "y": 0.1,
+              "width": 0.8,
+              "height": 0.8
+            },
+            "keyframes": [
+              {
+                "property": "transform.rotation",
+                "keyframes": [
+                  {
+                    "at_tick": 0,
+                    "value": -10,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 180000,
+                    "value": 10,
+                    "interpolation": "linear"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "clip_id": "paired_voice",
+        "before": {
+          "track_id": "voice",
+          "clip": {
+            "id": "paired_voice",
+            "asset_id": "audio_voice",
+            "timeline_start_tick": 180000,
+            "duration_tick": 180000,
+            "source_in_tick": 0,
+            "source_out_tick": 180000,
+            "link_id": "av"
+          }
+        },
+        "after": {
+          "track_id": "voice",
+          "clip": {
+            "id": "paired_voice",
+            "asset_id": "audio_voice",
+            "timeline_start_tick": 270000,
+            "duration_tick": 180000,
+            "source_in_tick": 0,
+            "source_out_tick": 180000,
+            "link_id": "av"
+          }
+        }
+      }
+    ],
+    "new_track_ids": [],
+    "rebound_clip_ids": [],
+    "retimed_subtitle_ids": [],
+    "new_tracks": [],
+    "before_duration_tick": 450000,
+    "after_duration_tick": 450000,
+    "limits": [
+      "whole-clip-edits-no-source-trim-or-insert-overwrite",
+      "markers-remain-at-absolute-sequence-ticks",
+      "new-collision-lanes-above-existing-order-and-preserve-track-processing",
+      "sync-conflicts-report-short-tick-never-fall-back-to-one-track"
+    ]
+  }
+]

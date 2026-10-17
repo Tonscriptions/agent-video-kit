@@ -7,6 +7,16 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 Use this skill when the requested edit should be represented as a reproducible local Agent Project rather than a GUI project. The implementation lives in `product/` in this project.
 
+For whole-clip linked editing, read the [linked editing contract](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md).
+Use `timeline edit --project <path> --input <request.json> --dry-run` for
+link/unlink/remove/close_gap/close_gaps/shift. Inspect selected IDs, locked
+members, common `short_tick`, collision lanes and subtitle cue offsets. Apply
+by omitting dry-run; pass `--expected-project-sha256` from the plan when needed.
+Sync takes precedence over main-track linkage; `track.sync_lock=false` opts
+other tracks out. Whole-clip movement preserves source clocks and animation;
+it does not implement insert/overwrite, source trimming or full main-track
+magnetism. Preserve explicit audio-bus relocation and binding-reference errors.
+
 For Chinese voiceovers, read the [local SoulX contract](../../docs/specs/本地SoulX中文配音与声线登记契约_v0.1_2026-10-15.md).
 Register explicit existing Python/source/package/model/tokenizer paths with
 `tts adapter register`; ingest the authorized single-speaker reference and use

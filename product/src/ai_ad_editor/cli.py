@@ -43,6 +43,7 @@ from .project import (
 )
 from .quality import GOLDEN_VERSION, build_golden_manifest, check_output, compare_golden_manifest, normalize_golden_constraints, validate_golden_manifest
 from .sequence_sampling import configuration as sequence_sampling_configuration
+from .edit_planner import build_edit_plan, project_fingerprint as edit_project_fingerprint
 from .mask_review import prepare as prepare_mask_review, review as review_mask
 from .mask_tracking import ENGINE as MASK_TRACKING_ENGINE, prepare as prepare_mask_tracking, execute as execute_mask_tracking, public_plan as public_mask_tracking_plan
 from .recommend import recommend_highlights
@@ -672,6 +673,11 @@ def build_parser() -> argparse.ArgumentParser:
     compose.add_argument("--project", required=True)
     compose.add_argument("--input", required=True)
     compose.add_argument("--sequence-id", default=None)
+    edit = _leaf_common(ts.add_parser("edit", help="按整数 tick 规划/应用关联片段、同步锁和主轨联动编辑"))
+    edit.add_argument("--project", required=True)
+    edit.add_argument("--input", required=True, help="本地编辑请求 JSON；先用 --dry-run 查看影响")
+    edit.add_argument("--sequence-id", default=None)
+    edit.add_argument("--expected-project-sha256", default=None, help="可选：只应用于 dry-run 返回的项目摘要")
 
     validate = _leaf_common(subs.add_parser("validate", help="验证项目"))
     validate.add_argument("--project", required=True)
@@ -4085,7 +4091,7 @@ def _clip_from_change(change: dict[str, Any], track: dict[str, Any]) -> dict[str
         clip["sequence_id"] = sequence_id
     if text_generator:
         clip["generator"] = copy.deepcopy(generator)
-    for field in ("speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "generator", "audio", "blend", "mask", "tracking_binding"):
+    for field in ("speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "generator", "audio", "blend", "mask", "tracking_binding", "link_id"):
         if field in change:
             clip[field] = change[field]
     return clip
@@ -4132,6 +4138,8 @@ def _add_track(sequence: dict[str, Any], change: dict[str, Any]) -> dict[str, An
     }
     if "overlap_policy" in change:
         track["overlap_policy"] = change["overlap_policy"]
+    if 'sync_lock' in change:
+        track['sync_lock'] = change['sync_lock']
     if isinstance(change.get("audio"), dict):
         track["audio"] = copy.deepcopy(change["audio"])
     sequence.setdefault("tracks", []).append(track)
@@ -4384,6 +4392,36 @@ def _source_shift(clip: dict[str, Any], delta: int, asset: dict[str, Any]) -> No
     clip["source_out_tick"] = source_out
 
 
+def command_timeline_edit(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    sequence = find_sequence(project, args.sequence_id)
+    expected = args.expected_project_sha256
+    actual = edit_project_fingerprint(project)
+    if expected is not None and expected != actual:
+        raise AppError('EDIT_PROJECT_CHANGED', '项目已偏离已规划的摘要，请重新规划', exit_code=2, path='expected_project_sha256')
+    initial_validation = validate_project(root, project, strict_rights=False)
+    if not initial_validation['ok']:
+        raise AppError('PROJECT_INVALID', '编辑前工程无效', exit_code=2, cause=json.dumps(initial_validation, ensure_ascii=False))
+    candidate, plan = build_edit_plan(project, sequence['id'], _load_changes(args.input))
+    validation = validate_project(root, candidate, strict_rights=False)
+    if not validation['ok']:
+        raise AppError('PROJECT_INVALID', '关联编辑会生成无效项目', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+    warnings = ([{'code': 'EDIT_RIPPLE_SHORTFALL', 'message': '同步轨道空间不足，统一保留未闭合 tick；没有单轨回退',
+                  'short_tick': plan['short_tick']}] if plan['short_tick'] else [])
+    data = {'sequence_id': sequence['id'], 'plan': plan, 'validation': validation}
+    if args.dry_run:
+        return _envelope('timeline.edit', args, status='planned', data=data, warnings=warnings)
+    snapshot = create_snapshot(root, project, label='before-timeline-edit')
+    operation_id = new_id('op')
+    record = {'operation_id': operation_id, 'command': 'timeline.edit', 'created_at': now_iso(),
+              'before_snapshot_id': snapshot['snapshot_id'], 'plan': plan}
+    candidate.setdefault('provenance', {}).setdefault('change_log', []).append(copy.deepcopy(record))
+    save_project(root, candidate)
+    _operation(root, operation_id, {**record, 'status': 'succeeded'})
+    return _envelope('timeline.edit', args, data={**data, 'before_snapshot': snapshot},
+                     warnings=warnings, operation_id=operation_id)
+
+
 def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     changes = _load_changes(args.input)
@@ -4399,7 +4437,15 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
     applied: list[dict[str, Any]] = []
     for change in operations:
         operation = change.get("op", "append_clip")
-        if operation == "append_clip":
+        if operation == 'linked_edit':
+            edit_validation = validate_project(root, working, strict_rights=False)
+            if not edit_validation['ok']:
+                raise AppError('PROJECT_INVALID', '关联编辑前批次工程无效', exit_code=2,
+                               cause=json.dumps(edit_validation, ensure_ascii=False))
+            target_sequence = find_sequence(working, change.get('sequence_id') or sequence['id'])
+            working, plan = build_edit_plan(working, target_sequence['id'], change.get('edit'))
+            applied.append({'op': operation, 'plan': plan})
+        elif operation == "append_clip":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track = find_track(target_sequence, change.get("track_id"), change.get("track_kind", "video"))
             clip = _clip_from_change(change, track)
@@ -4432,8 +4478,8 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
         elif operation == "update_sequence":
             target = find_sequence(working, change.get('sequence_id') or change.get('id') or sequence['id'])
             patch = change.get('patch')
-            if not isinstance(patch, dict) or not patch or set(patch)-{'name', 'duration_tick', 'canvas', 'markers'}:
-                raise argument_error('update_sequence.patch 支持 name/duration_tick/canvas/markers；轨道与片段通过专用操作编辑', 'patch')
+            if not isinstance(patch, dict) or not patch or set(patch)-{'name', 'duration_tick', 'canvas', 'markers', 'editing'}:
+                raise argument_error('update_sequence.patch 支持 name/duration_tick/canvas/markers/editing；轨道与片段通过专用操作编辑', 'patch')
             if 'canvas' in patch:
                 validate_canvas(patch['canvas'])
             target.update(copy.deepcopy(patch))
@@ -4613,7 +4659,7 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track = find_track(target_sequence, change.get("track_id"), None)
             patch = change.get("patch") if isinstance(change.get("patch"), dict) else change
-            for field in ("muted", "locked", "order", "overlap_policy", "audio"):
+            for field in ("muted", "locked", "order", "overlap_policy", "audio", "sync_lock"):
                 if field in patch:
                     track[field] = copy.deepcopy(patch[field]) if field == "audio" else patch[field]
             applied.append({"op": operation, "track_id": track["id"], "track": track})
@@ -4629,7 +4675,7 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
             patch = change.get("patch") if isinstance(change.get("patch"), dict) else change
             if "id" in patch or "clip_id" in patch:
                 raise argument_error("update_clip 不允许修改片段 ID", "patch")
-            for field in ("asset_id", "sequence_id", "timeline_start_tick", "duration_tick", "source_in_tick", "source_out_tick", "speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "generator", "audio", "blend", "mask", "tracking_binding"):
+            for field in ("asset_id", "sequence_id", "timeline_start_tick", "duration_tick", "source_in_tick", "source_out_tick", "speed", "speed_curve", "reverse", "freeze", "crop", "transform", "keyframes", "effects", "transition_in", "transition_out", "subtitle", "generator", "audio", "blend", "mask", "tracking_binding", "link_id"):
                 if field in patch:
                     clip[field] = patch[field]
             _clamp_clip_keyframes(clip)
@@ -5875,6 +5921,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("motion", "inspect"): command_motion_inspect,
     ("motion", "apply"): command_motion_apply,
     ("timeline", "compose"): command_timeline_compose,
+    ("timeline", "edit"): command_timeline_edit,
     ("validate", None): command_validate,
     ("rights", "check"): command_rights_check,
     ("rights", "list"): command_rights_list,

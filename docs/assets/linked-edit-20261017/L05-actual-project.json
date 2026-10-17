@@ -1,0 +1,1107 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "id": "proj_20261017133903_02a2a325",
+    "name": "L05",
+    "created_at": "2026-10-17T13:39:03.684168Z",
+    "updated_at": "2026-10-17T13:39:12.872667Z",
+    "creator": "ai-ad-editor",
+    "source_revision": "local"
+  },
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 8,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 240,
+      "height": 136,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mkv",
+      "video": {
+        "codec": "libx264",
+        "preset": "ultrafast",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "pcm_f32le",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "source",
+      "kind": "video",
+      "uri": "assets/source_source.mp4",
+      "sha256": "sha256:e71895e8155db7f3d4a6637ebb6e2874907ac8089f0e6578b4fe63e7230534c2",
+      "probe": {
+        "duration_seconds": 5.0,
+        "duration_tick": 450000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High 4:4:4 Predictive",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.f4000b",
+            "width": 240,
+            "height": 136,
+            "coded_width": 240,
+            "coded_height": 136,
+            "has_b_frames": 0,
+            "pix_fmt": "gbrp",
+            "level": 11,
+            "color_range": "pc",
+            "color_space": "gbr",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "8/1",
+            "avg_frame_rate": "8/1",
+            "time_base": "1/16384",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 81920,
+            "duration": "5.000000",
+            "bit_rate": "220716",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "40",
+            "extradata_size": 47,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264rgb"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 240,
+          "height": 136,
+          "pix_fmt": "gbrp",
+          "fps": "8/1",
+          "color_space": "gbr",
+          "duration_seconds": 5.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "source",
+      "source": {
+        "source_url": "local://generated-linked-edit",
+        "retrieved_at": "2026-10-17T13:39:04.208364Z",
+        "original_name": "source.mp4"
+      }
+    },
+    {
+      "id": "black",
+      "kind": "image",
+      "uri": "assets/black_black.png",
+      "sha256": "sha256:dd2eb6345f6b646c6ea180cbc716ce004644189df9f5a9ff98d9382911ac0efc",
+      "probe": {
+        "duration_seconds": 0.0,
+        "duration_tick": 0,
+        "format": "png_pipe",
+        "format_long_name": "piped png sequence",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "png",
+            "codec_long_name": "PNG (Portable Network Graphics) image",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "width": 240,
+            "height": 136,
+            "coded_width": 240,
+            "coded_height": 136,
+            "has_b_frames": 0,
+            "pix_fmt": "rgb24",
+            "level": -99,
+            "color_range": "pc",
+            "color_space": "gbr",
+            "r_frame_rate": "25/1",
+            "avg_frame_rate": "25/1",
+            "time_base": "1/25",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            }
+          }
+        ],
+        "video": {
+          "codec": "png",
+          "width": 240,
+          "height": 136,
+          "pix_fmt": "rgb24",
+          "fps": "25/1",
+          "color_space": "gbr",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "black",
+      "source": {
+        "source_url": "local://generated-linked-edit",
+        "retrieved_at": "2026-10-17T13:39:04.744232Z",
+        "original_name": "black.png"
+      }
+    },
+    {
+      "id": "font",
+      "kind": "font",
+      "uri": "assets/font_DejaVuSans.ttf",
+      "sha256": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22",
+      "probe": {
+        "duration_seconds": 0.0,
+        "duration_tick": 0,
+        "format": "ttf",
+        "format_long_name": "local font",
+        "streams": [],
+        "font": {
+          "family": "DejaVu Sans",
+          "style": "Book",
+          "face_index": 0,
+          "engine": "pillow-freetype"
+        },
+        "video": {
+          "codec": null
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0
+        }
+      },
+      "rights_ref": "font",
+      "source": {
+        "source_url": "local://explicit-DejaVu-font",
+        "retrieved_at": "2026-10-17T13:39:05.252848Z",
+        "original_name": "DejaVuSans.ttf"
+      }
+    },
+    {
+      "id": "audio_voice",
+      "kind": "audio",
+      "uri": "assets/audio_voice_voice.wav",
+      "sha256": "sha256:34f5853c5c4a0d0eb1a23506eb87e1f9d154bdef57511935ee4c0ff8306c3677",
+      "probe": {
+        "duration_seconds": 5.0,
+        "duration_tick": 450000,
+        "format": "wav",
+        "format_long_name": "WAV / WAVE (Waveform Audio)",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "pcm_s16le",
+            "codec_long_name": "PCM signed 16-bit little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[1][0][0][0]",
+            "codec_tag": "0x0001",
+            "sample_fmt": "s16",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 16,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "duration_ts": 240000,
+            "duration": "5.000000",
+            "bit_rate": "1536000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            }
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_s16le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 5.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "audio_voice",
+      "source": {
+        "source_url": "local://generated-linked-edit",
+        "retrieved_at": "2026-10-17T13:39:05.854994Z",
+        "original_name": "voice.wav"
+      }
+    },
+    {
+      "id": "audio_sfx",
+      "kind": "audio",
+      "uri": "assets/audio_sfx_sfx.wav",
+      "sha256": "sha256:f8d16c62caa391779ae6845659f42fd22dbf37b23c319659edf1d68cb291d1bf",
+      "probe": {
+        "duration_seconds": 5.0,
+        "duration_tick": 450000,
+        "format": "wav",
+        "format_long_name": "WAV / WAVE (Waveform Audio)",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "pcm_s16le",
+            "codec_long_name": "PCM signed 16-bit little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[1][0][0][0]",
+            "codec_tag": "0x0001",
+            "sample_fmt": "s16",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 16,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "duration_ts": 240000,
+            "duration": "5.000000",
+            "bit_rate": "1536000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            }
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_s16le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 5.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "audio_sfx",
+      "source": {
+        "source_url": "local://generated-linked-edit",
+        "retrieved_at": "2026-10-17T13:39:06.463764Z",
+        "original_name": "sfx.wav"
+      }
+    },
+    {
+      "id": "audio_bed",
+      "kind": "audio",
+      "uri": "assets/audio_bed_bed.wav",
+      "sha256": "sha256:42a07c220924ce1abe27da5966eff7c08291dde78d2febc00869bce4171bc761",
+      "probe": {
+        "duration_seconds": 5.0,
+        "duration_tick": 450000,
+        "format": "wav",
+        "format_long_name": "WAV / WAVE (Waveform Audio)",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "pcm_s16le",
+            "codec_long_name": "PCM signed 16-bit little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[1][0][0][0]",
+            "codec_tag": "0x0001",
+            "sample_fmt": "s16",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 16,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "duration_ts": 240000,
+            "duration": "5.000000",
+            "bit_rate": "1536000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            }
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_s16le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 5.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "audio_bed",
+      "source": {
+        "source_url": "local://generated-linked-edit",
+        "retrieved_at": "2026-10-17T13:39:07.045624Z",
+        "original_name": "bed.wav"
+      }
+    },
+    {
+      "id": "sequence_cues",
+      "kind": "subtitle",
+      "uri": "assets/sequence_cues_sequence_cues.srt",
+      "sha256": "sha256:86040f998e2e1d19d8d47403fa54b85825e90efbde46279411278572796047d3",
+      "probe": {
+        "duration_seconds": 1.75,
+        "duration_tick": 157500,
+        "format": "srt",
+        "format_long_name": "local subtitle",
+        "streams": [
+          {
+            "codec_type": "subtitle",
+            "codec_name": "srt"
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0
+        },
+        "subtitle": {
+          "format": "srt",
+          "cue_count": 1
+        }
+      },
+      "rights_ref": "sequence_cues",
+      "source": {
+        "source_url": "local://generated-linked-edit",
+        "retrieved_at": "2026-10-17T13:39:07.502485Z",
+        "original_name": "sequence_cues.srt"
+      }
+    },
+    {
+      "id": "clip_cues",
+      "kind": "subtitle",
+      "uri": "assets/clip_cues_clip_cues.srt",
+      "sha256": "sha256:b57f7f97755f8d5f501797725b1b25747e2a5dcf125437ae537795881bcff335",
+      "probe": {
+        "duration_seconds": 0.75,
+        "duration_tick": 67500,
+        "format": "srt",
+        "format_long_name": "local subtitle",
+        "streams": [
+          {
+            "codec_type": "subtitle",
+            "codec_name": "srt"
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0
+        },
+        "subtitle": {
+          "format": "srt",
+          "cue_count": 1
+        }
+      },
+      "rights_ref": "clip_cues",
+      "source": {
+        "source_url": "local://generated-linked-edit",
+        "retrieved_at": "2026-10-17T13:39:07.981220Z",
+        "original_name": "clip_cues.srt"
+      }
+    },
+    {
+      "id": "reference_cues",
+      "kind": "subtitle",
+      "uri": "assets/reference_cues_reference_cues.srt",
+      "sha256": "sha256:126e3be1e0339327c579fc147b1ba4cd950cbc4cea4f1a3893889c1581e2273a",
+      "probe": {
+        "duration_seconds": 2.25,
+        "duration_tick": 202500,
+        "format": "srt",
+        "format_long_name": "local subtitle",
+        "streams": [
+          {
+            "codec_type": "subtitle",
+            "codec_name": "srt"
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0
+        },
+        "subtitle": {
+          "format": "srt",
+          "cue_count": 1
+        }
+      },
+      "rights_ref": "reference_cues",
+      "source": {
+        "source_url": "local://generated-linked-edit",
+        "retrieved_at": "2026-10-17T13:39:08.502514Z",
+        "original_name": "reference_cues.srt"
+      }
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq_main",
+      "name": "Main",
+      "duration_tick": 450000,
+      "tracks": [
+        {
+          "id": "main",
+          "name": "main",
+          "kind": "video",
+          "order": 0,
+          "clips": [
+            {
+              "id": "a",
+              "asset_id": "source",
+              "timeline_start_tick": 0,
+              "duration_tick": 90000,
+              "source_in_tick": 0,
+              "source_out_tick": 90000
+            },
+            {
+              "id": "c",
+              "asset_id": "source",
+              "timeline_start_tick": 90000,
+              "duration_tick": 90000,
+              "source_in_tick": 180000,
+              "source_out_tick": 270000
+            },
+            {
+              "id": "d",
+              "asset_id": "source",
+              "timeline_start_tick": 180000,
+              "duration_tick": 90000,
+              "source_in_tick": 270000,
+              "source_out_tick": 360000
+            }
+          ]
+        },
+        {
+          "id": "bed",
+          "name": "bed",
+          "kind": "audio",
+          "order": 8,
+          "clips": [
+            {
+              "id": "bed_clip",
+              "asset_id": "audio_bed",
+              "timeline_start_tick": 0,
+              "duration_tick": 450000,
+              "source_in_tick": 0,
+              "source_out_tick": 450000
+            }
+          ],
+          "locked": true
+        },
+        {
+          "id": "titles",
+          "name": "titles",
+          "kind": "subtitle",
+          "order": 4,
+          "clips": [
+            {
+              "id": "title_d",
+              "timeline_start_tick": 202500,
+              "duration_tick": 45000,
+              "source_in_tick": 0,
+              "source_out_tick": 45000,
+              "subtitle": {
+                "text": "FOLLOW D",
+                "style": {
+                  "font_asset_id": "font",
+                  "fontsize": 24
+                }
+              },
+              "generator": {
+                "type": "text"
+              }
+            }
+          ]
+        },
+        {
+          "id": "voice",
+          "name": "voice",
+          "kind": "audio",
+          "order": 2,
+          "clips": [
+            {
+              "id": "anchored_voice",
+              "asset_id": "audio_voice",
+              "timeline_start_tick": 0,
+              "duration_tick": 225000,
+              "source_in_tick": 0,
+              "source_out_tick": 225000
+            }
+          ],
+          "audio": {
+            "volume": 0.25
+          }
+        },
+        {
+          "id": "wrong_bus",
+          "name": "wrong_bus",
+          "kind": "audio",
+          "order": 3,
+          "clips": [],
+          "audio": {
+            "volume": 1.0
+          }
+        },
+        {
+          "id": "edit_lane_voice",
+          "name": "voice",
+          "kind": "audio",
+          "order": 9,
+          "clips": [
+            {
+              "id": "rider",
+              "asset_id": "audio_sfx",
+              "timeline_start_tick": 191250,
+              "duration_tick": 56250,
+              "source_in_tick": 0,
+              "source_out_tick": 56250
+            }
+          ],
+          "audio": {
+            "volume": 0.25
+          },
+          "locked": false
+        }
+      ],
+      "markers": [
+        {
+          "id": "absolute_marker",
+          "at_tick": 180000,
+          "name": "absolute edit witness"
+        }
+      ],
+      "editing": {
+        "main_track_id": "main"
+      }
+    }
+  ],
+  "templates": [],
+  "outputs": [
+    {
+      "id": "output_20261017133911_7014d84c",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\linked-edit-media-work-final-20261017\\L05\\renders\\input.mkv",
+      "container": "mkv",
+      "profile": null,
+      "canvas": {
+        "width": 240,
+        "height": 136,
+        "pixel_aspect": {
+          "num": 1,
+          "den": 1
+        }
+      },
+      "video": {
+        "codec": "libx264",
+        "preset": "ultrafast",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "pcm_f32le",
+        "bitrate": "192k"
+      },
+      "target_platform": "generic"
+    }
+  ],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "model_versions": [],
+    "input_hashes": [],
+    "change_log": [
+      {
+        "operation_id": "op_20261017133904_138a3da1",
+        "command": "media.ingest",
+        "asset_id": "source",
+        "at": "2026-10-17T13:39:04.208809Z"
+      },
+      {
+        "operation_id": "op_20261017133904_272c7843",
+        "command": "media.ingest",
+        "asset_id": "black",
+        "at": "2026-10-17T13:39:04.744709Z"
+      },
+      {
+        "operation_id": "op_20261017133905_25e1376b",
+        "command": "media.ingest",
+        "asset_id": "font",
+        "at": "2026-10-17T13:39:05.253365Z"
+      },
+      {
+        "operation_id": "op_20261017133905_aa4a2034",
+        "command": "media.ingest",
+        "asset_id": "audio_voice",
+        "at": "2026-10-17T13:39:05.855565Z"
+      },
+      {
+        "operation_id": "op_20261017133906_e1953116",
+        "command": "media.ingest",
+        "asset_id": "audio_sfx",
+        "at": "2026-10-17T13:39:06.464369Z"
+      },
+      {
+        "operation_id": "op_20261017133907_ff6fefe6",
+        "command": "media.ingest",
+        "asset_id": "audio_bed",
+        "at": "2026-10-17T13:39:07.046405Z"
+      },
+      {
+        "operation_id": "op_20261017133907_65f28759",
+        "command": "media.ingest",
+        "asset_id": "sequence_cues",
+        "at": "2026-10-17T13:39:07.503095Z"
+      },
+      {
+        "operation_id": "op_20261017133907_ac0579e2",
+        "command": "media.ingest",
+        "asset_id": "clip_cues",
+        "at": "2026-10-17T13:39:07.981913Z"
+      },
+      {
+        "operation_id": "op_20261017133908_edb40eac",
+        "command": "media.ingest",
+        "asset_id": "reference_cues",
+        "at": "2026-10-17T13:39:08.503124Z"
+      },
+      {
+        "command": "render",
+        "at": "2026-10-17T13:39:11.364750Z",
+        "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\linked-edit-media-work-final-20261017\\L05\\renders\\input.mkv",
+        "manifest": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\linked-edit-media-work-final-20261017\\L05\\renders\\input.mkv.manifest.json"
+      },
+      {
+        "operation_id": "op_20261017133912_ca188070",
+        "command": "timeline.edit",
+        "created_at": "2026-10-17T13:39:12.872523Z",
+        "before_snapshot_id": "snap_20261017133912_4429d316",
+        "plan": {
+          "engine": "agent-tick-linked-edit-v1",
+          "source": {
+            "repository": "openfilm/openfilm",
+            "revision": "b138595d4c2d1fa5262b4a8a8c7cd98187c4b077",
+            "path": "packages/openfilm/studio/ui/src/lib/timeline-edit.ts",
+            "license": "MIT",
+            "adaptation": "native-integer-ticks-whole-clip-follow-and-gap-planning"
+          },
+          "base_project_sha256": "sha256:4669bdabaf7fde2b2c4f748c6657a4e272855ff9756e417482733b024045d9c4",
+          "sequence_id": "seq_main",
+          "request": {
+            "action": "remove",
+            "options": {
+              "main_track_id": "main",
+              "sync": false,
+              "linkage": true,
+              "linked": true,
+              "ripple": "main"
+            },
+            "clip_ids": [
+              "b"
+            ]
+          },
+          "selected_clip_ids": [
+            "b",
+            "title_b"
+          ],
+          "main_track_id": "main",
+          "anchored_clip_ids": [
+            "anchored_voice",
+            "bed_clip"
+          ],
+          "short_tick": 0,
+          "shifts": [
+            {
+              "point_tick": 180000,
+              "delta_tick": -90000,
+              "track_ids": [
+                "main",
+                "titles",
+                "voice",
+                "wrong_bus"
+              ],
+              "clip_ids": [
+                "c",
+                "d",
+                "title_d",
+                "rider"
+              ]
+            }
+          ],
+          "changes": [
+            {
+              "clip_id": "b",
+              "before": {
+                "track_id": "main",
+                "clip": {
+                  "id": "b",
+                  "asset_id": "source",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 180000
+                }
+              },
+              "after": null
+            },
+            {
+              "clip_id": "c",
+              "before": {
+                "track_id": "main",
+                "clip": {
+                  "id": "c",
+                  "asset_id": "source",
+                  "timeline_start_tick": 180000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 180000,
+                  "source_out_tick": 270000
+                }
+              },
+              "after": {
+                "track_id": "main",
+                "clip": {
+                  "id": "c",
+                  "asset_id": "source",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 180000,
+                  "source_out_tick": 270000
+                }
+              }
+            },
+            {
+              "clip_id": "d",
+              "before": {
+                "track_id": "main",
+                "clip": {
+                  "id": "d",
+                  "asset_id": "source",
+                  "timeline_start_tick": 270000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 270000,
+                  "source_out_tick": 360000
+                }
+              },
+              "after": {
+                "track_id": "main",
+                "clip": {
+                  "id": "d",
+                  "asset_id": "source",
+                  "timeline_start_tick": 180000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 270000,
+                  "source_out_tick": 360000
+                }
+              }
+            },
+            {
+              "clip_id": "title_b",
+              "before": {
+                "track_id": "titles",
+                "clip": {
+                  "id": "title_b",
+                  "timeline_start_tick": 112500,
+                  "duration_tick": 45000,
+                  "source_in_tick": 0,
+                  "source_out_tick": 45000,
+                  "subtitle": {
+                    "text": "DELETE WITH B",
+                    "style": {
+                      "font_asset_id": "font",
+                      "fontsize": 22
+                    }
+                  },
+                  "generator": {
+                    "type": "text"
+                  }
+                }
+              },
+              "after": null
+            },
+            {
+              "clip_id": "title_d",
+              "before": {
+                "track_id": "titles",
+                "clip": {
+                  "id": "title_d",
+                  "timeline_start_tick": 292500,
+                  "duration_tick": 45000,
+                  "source_in_tick": 0,
+                  "source_out_tick": 45000,
+                  "subtitle": {
+                    "text": "FOLLOW D",
+                    "style": {
+                      "font_asset_id": "font",
+                      "fontsize": 24
+                    }
+                  },
+                  "generator": {
+                    "type": "text"
+                  }
+                }
+              },
+              "after": {
+                "track_id": "titles",
+                "clip": {
+                  "id": "title_d",
+                  "timeline_start_tick": 202500,
+                  "duration_tick": 45000,
+                  "source_in_tick": 0,
+                  "source_out_tick": 45000,
+                  "subtitle": {
+                    "text": "FOLLOW D",
+                    "style": {
+                      "font_asset_id": "font",
+                      "fontsize": 24
+                    }
+                  },
+                  "generator": {
+                    "type": "text"
+                  }
+                }
+              }
+            },
+            {
+              "clip_id": "rider",
+              "before": {
+                "track_id": "voice",
+                "clip": {
+                  "id": "rider",
+                  "asset_id": "audio_sfx",
+                  "timeline_start_tick": 281250,
+                  "duration_tick": 56250,
+                  "source_in_tick": 0,
+                  "source_out_tick": 56250
+                }
+              },
+              "after": {
+                "track_id": "edit_lane_voice",
+                "clip": {
+                  "id": "rider",
+                  "asset_id": "audio_sfx",
+                  "timeline_start_tick": 191250,
+                  "duration_tick": 56250,
+                  "source_in_tick": 0,
+                  "source_out_tick": 56250
+                }
+              }
+            }
+          ],
+          "new_track_ids": [
+            "edit_lane_voice"
+          ],
+          "rebound_clip_ids": [],
+          "retimed_subtitle_ids": [],
+          "new_tracks": [
+            {
+              "id": "edit_lane_voice",
+              "name": "voice",
+              "kind": "audio",
+              "order": 9,
+              "clips": [
+                {
+                  "id": "rider",
+                  "asset_id": "audio_sfx",
+                  "timeline_start_tick": 191250,
+                  "duration_tick": 56250,
+                  "source_in_tick": 0,
+                  "source_out_tick": 56250
+                }
+              ],
+              "audio": {
+                "volume": 0.25
+              },
+              "locked": false
+            }
+          ],
+          "before_duration_tick": 450000,
+          "after_duration_tick": 450000,
+          "limits": [
+            "whole-clip-edits-no-source-trim-or-insert-overwrite",
+            "markers-remain-at-absolute-sequence-ticks",
+            "new-collision-lanes-above-existing-order-and-preserve-track-processing",
+            "sync-conflicts-report-short-tick-never-fall-back-to-one-track"
+          ]
+        }
+      }
+    ]
+  }
+}

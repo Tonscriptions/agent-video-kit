@@ -257,6 +257,8 @@ def _export_otio(root: Path, project: dict[str, Any], output: Path) -> dict[str,
     items: list[dict[str, Any]] = [report_item("project-model", "Mapped", "Agent Project JSON", "OpenTimelineIO JSON", "使用标准 Stack/Track/Gap/Clip 节点；完整本地片段保存在 ai_ad_editor metadata")]
     if project['settings'].get('sequence_sampling') is not None:
         items.append(report_item('sequence-sampling', 'Unsupported', 'settings.sequence_sampling', detail='外部格式不执行本地序列面积核或工作配额；完整配置请使用 agent-json 或 package'))
+    from .edit_planner import interchange_features
+    items.extend(report_item('timeline-editing', 'Unsupported', field, detail='外部格式不执行本地关联/同步锁/主轨跟随或文件字幕时钟偏移；metadata 保存不代表外部编辑等效') for field in interchange_features(project))
     items.extend(report_item('tracking-binding', 'Approximate', clip_id, detail='活动绑定按当前画布重算为关键帧；外部格式不保留绑定引用，视觉能力按格式报告复核') for clip_id in bound_clips)
     sequence = project.get("sequences", [{}])[0]
     items.extend(report_item('sequence-canvas', 'Unsupported', str(s.get('id')), detail='额外序列及其独立画布未导出；完整图请使用 agent-json 或 package')
@@ -363,6 +365,8 @@ def _export_kdenlive_xml(root: Path, project: dict[str, Any], output: Path) -> d
     items: list[dict[str, Any]] = [report_item("project-model", "Approximate", "Agent Project JSON", "Kdenlive MLT XML", "导出本地 producer 与顺序 playlist；复杂效果需在转换报告中复核")]
     if project['settings'].get('sequence_sampling') is not None:
         items.append(report_item('sequence-sampling', 'Unsupported', 'settings.sequence_sampling', detail='外部格式不执行本地序列面积核或工作配额；完整配置请使用 agent-json 或 package'))
+    from .edit_planner import interchange_features
+    items.extend(report_item('timeline-editing', 'Unsupported', field, detail='外部格式不执行本地关联/同步锁/主轨跟随或文件字幕时钟偏移；metadata 保存不代表外部编辑等效') for field in interchange_features(project))
     items.extend(report_item('tracking-binding', 'Approximate', clip_id, detail='活动绑定按当前画布重算为关键帧；外部格式不保留绑定引用，视觉能力按格式报告复核') for clip_id in bound_clips)
     sequence = project.get("sequences", [{}])[0]
     items.extend(report_item('sequence-canvas', 'Unsupported', str(s.get('id')), detail='额外序列及其独立画布未导出；完整图请使用 agent-json 或 package')

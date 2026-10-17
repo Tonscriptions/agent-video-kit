@@ -1,0 +1,91 @@
+[
+  {
+    "engine": "agent-tick-linked-edit-v1",
+    "source": {
+      "repository": "openfilm/openfilm",
+      "revision": "b138595d4c2d1fa5262b4a8a8c7cd98187c4b077",
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-edit.ts",
+      "license": "MIT",
+      "adaptation": "native-integer-ticks-whole-clip-follow-and-gap-planning"
+    },
+    "base_project_sha256": "sha256:f29e72ae40180e5ef6cf8b673756c4afd01c049c889da0cfdbc77586b7eff893",
+    "sequence_id": "child",
+    "request": {
+      "action": "shift",
+      "options": {
+        "main_track_id": "main",
+        "sync": false,
+        "linkage": false,
+        "linked": true,
+        "ripple": false
+      },
+      "clip_ids": [
+        "file_title"
+      ],
+      "delta_tick": 45000
+    },
+    "selected_clip_ids": [
+      "file_title"
+    ],
+    "main_track_id": "main",
+    "anchored_clip_ids": [],
+    "short_tick": 0,
+    "shifts": [],
+    "changes": [
+      {
+        "clip_id": "file_title",
+        "before": {
+          "track_id": "titles",
+          "clip": {
+            "id": "file_title",
+            "asset_id": "sequence_cues",
+            "timeline_start_tick": 90000,
+            "duration_tick": 180000,
+            "source_in_tick": 0,
+            "source_out_tick": 180000,
+            "subtitle": {
+              "asset_time_base": "sequence",
+              "style": {
+                "font_asset_id": "font",
+                "fontsize": 38
+              }
+            }
+          }
+        },
+        "after": {
+          "track_id": "titles",
+          "clip": {
+            "id": "file_title",
+            "asset_id": "sequence_cues",
+            "timeline_start_tick": 135000,
+            "duration_tick": 180000,
+            "source_in_tick": 0,
+            "source_out_tick": 180000,
+            "subtitle": {
+              "asset_time_base": "sequence",
+              "style": {
+                "font_asset_id": "font",
+                "fontsize": 38
+              },
+              "asset_time_offset_tick": -45000
+            }
+          }
+        }
+      }
+    ],
+    "new_track_ids": [],
+    "rebound_clip_ids": [],
+    "retimed_subtitle_ids": [
+      "file_title"
+    ],
+    "new_tracks": [],
+    "before_duration_tick": 450000,
+    "after_duration_tick": 450000,
+    "limits": [
+      "whole-clip-edits-no-source-trim-or-insert-overwrite",
+      "markers-remain-at-absolute-sequence-ticks",
+      "new-collision-lanes-above-existing-order-and-preserve-track-processing",
+      "sync-conflicts-report-short-tick-never-fall-back-to-one-track"
+    ]
+  }
+]

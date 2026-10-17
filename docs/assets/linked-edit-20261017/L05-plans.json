@@ -1,0 +1,249 @@
+[
+  {
+    "engine": "agent-tick-linked-edit-v1",
+    "source": {
+      "repository": "openfilm/openfilm",
+      "revision": "b138595d4c2d1fa5262b4a8a8c7cd98187c4b077",
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-edit.ts",
+      "license": "MIT",
+      "adaptation": "native-integer-ticks-whole-clip-follow-and-gap-planning"
+    },
+    "base_project_sha256": "sha256:4669bdabaf7fde2b2c4f748c6657a4e272855ff9756e417482733b024045d9c4",
+    "sequence_id": "seq_main",
+    "request": {
+      "action": "remove",
+      "options": {
+        "main_track_id": "main",
+        "sync": false,
+        "linkage": true,
+        "linked": true,
+        "ripple": "main"
+      },
+      "clip_ids": [
+        "b"
+      ]
+    },
+    "selected_clip_ids": [
+      "b",
+      "title_b"
+    ],
+    "main_track_id": "main",
+    "anchored_clip_ids": [
+      "anchored_voice",
+      "bed_clip"
+    ],
+    "short_tick": 0,
+    "shifts": [
+      {
+        "point_tick": 180000,
+        "delta_tick": -90000,
+        "track_ids": [
+          "main",
+          "titles",
+          "voice",
+          "wrong_bus"
+        ],
+        "clip_ids": [
+          "c",
+          "d",
+          "title_d",
+          "rider"
+        ]
+      }
+    ],
+    "changes": [
+      {
+        "clip_id": "b",
+        "before": {
+          "track_id": "main",
+          "clip": {
+            "id": "b",
+            "asset_id": "source",
+            "timeline_start_tick": 90000,
+            "duration_tick": 90000,
+            "source_in_tick": 90000,
+            "source_out_tick": 180000
+          }
+        },
+        "after": null
+      },
+      {
+        "clip_id": "c",
+        "before": {
+          "track_id": "main",
+          "clip": {
+            "id": "c",
+            "asset_id": "source",
+            "timeline_start_tick": 180000,
+            "duration_tick": 90000,
+            "source_in_tick": 180000,
+            "source_out_tick": 270000
+          }
+        },
+        "after": {
+          "track_id": "main",
+          "clip": {
+            "id": "c",
+            "asset_id": "source",
+            "timeline_start_tick": 90000,
+            "duration_tick": 90000,
+            "source_in_tick": 180000,
+            "source_out_tick": 270000
+          }
+        }
+      },
+      {
+        "clip_id": "d",
+        "before": {
+          "track_id": "main",
+          "clip": {
+            "id": "d",
+            "asset_id": "source",
+            "timeline_start_tick": 270000,
+            "duration_tick": 90000,
+            "source_in_tick": 270000,
+            "source_out_tick": 360000
+          }
+        },
+        "after": {
+          "track_id": "main",
+          "clip": {
+            "id": "d",
+            "asset_id": "source",
+            "timeline_start_tick": 180000,
+            "duration_tick": 90000,
+            "source_in_tick": 270000,
+            "source_out_tick": 360000
+          }
+        }
+      },
+      {
+        "clip_id": "title_b",
+        "before": {
+          "track_id": "titles",
+          "clip": {
+            "id": "title_b",
+            "timeline_start_tick": 112500,
+            "duration_tick": 45000,
+            "source_in_tick": 0,
+            "source_out_tick": 45000,
+            "subtitle": {
+              "text": "DELETE WITH B",
+              "style": {
+                "font_asset_id": "font",
+                "fontsize": 22
+              }
+            },
+            "generator": {
+              "type": "text"
+            }
+          }
+        },
+        "after": null
+      },
+      {
+        "clip_id": "title_d",
+        "before": {
+          "track_id": "titles",
+          "clip": {
+            "id": "title_d",
+            "timeline_start_tick": 292500,
+            "duration_tick": 45000,
+            "source_in_tick": 0,
+            "source_out_tick": 45000,
+            "subtitle": {
+              "text": "FOLLOW D",
+              "style": {
+                "font_asset_id": "font",
+                "fontsize": 24
+              }
+            },
+            "generator": {
+              "type": "text"
+            }
+          }
+        },
+        "after": {
+          "track_id": "titles",
+          "clip": {
+            "id": "title_d",
+            "timeline_start_tick": 202500,
+            "duration_tick": 45000,
+            "source_in_tick": 0,
+            "source_out_tick": 45000,
+            "subtitle": {
+              "text": "FOLLOW D",
+              "style": {
+                "font_asset_id": "font",
+                "fontsize": 24
+              }
+            },
+            "generator": {
+              "type": "text"
+            }
+          }
+        }
+      },
+      {
+        "clip_id": "rider",
+        "before": {
+          "track_id": "voice",
+          "clip": {
+            "id": "rider",
+            "asset_id": "audio_sfx",
+            "timeline_start_tick": 281250,
+            "duration_tick": 56250,
+            "source_in_tick": 0,
+            "source_out_tick": 56250
+          }
+        },
+        "after": {
+          "track_id": "edit_lane_voice",
+          "clip": {
+            "id": "rider",
+            "asset_id": "audio_sfx",
+            "timeline_start_tick": 191250,
+            "duration_tick": 56250,
+            "source_in_tick": 0,
+            "source_out_tick": 56250
+          }
+        }
+      }
+    ],
+    "new_track_ids": [
+      "edit_lane_voice"
+    ],
+    "rebound_clip_ids": [],
+    "retimed_subtitle_ids": [],
+    "new_tracks": [
+      {
+        "id": "edit_lane_voice",
+        "name": "voice",
+        "kind": "audio",
+        "order": 9,
+        "clips": [
+          {
+            "id": "rider",
+            "asset_id": "audio_sfx",
+            "timeline_start_tick": 191250,
+            "duration_tick": 56250,
+            "source_in_tick": 0,
+            "source_out_tick": 56250
+          }
+        ],
+        "audio": {
+          "volume": 0.25
+        },
+        "locked": false
+      }
+    ],
+    "before_duration_tick": 450000,
+    "after_duration_tick": 450000,
+    "limits": [
+      "whole-clip-edits-no-source-trim-or-insert-overwrite",
+      "markers-remain-at-absolute-sequence-ticks",
+      "new-collision-lanes-above-existing-order-and-preserve-track-processing",
+      "sync-conflicts-report-short-tick-never-fall-back-to-one-track"
+    ]
+  }
+]

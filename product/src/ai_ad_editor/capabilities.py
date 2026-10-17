@@ -21,6 +21,16 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            "linked_editing": {
+                "status": "implemented_with_limits",
+                "engine": "agent-tick-linked-edit-v1",
+                "commands": ["timeline.edit", "timeline.compose:linked_edit"],
+                "features": ["native_integer_tick_plans", "explicit_or_lowest_video_main_track", "persistent_clip_links", "merge_link_groups", "unlink_orphans", "linked_whole_clip_remove", "linked_whole_clip_shift", "single_gap_and_batch_gap_closing", "sync_common_room_and_shortfall", "track_sync_opt_out", "main_track_riders_and_anchored_music_beds", "collision_lane_processing_gate", "atomic_locked_link_rejection", "subtitle_sequence_clock_offset", "tracking_reference_rebinding", "read_only_dry_run", "optional_stale_project_hash_gate", "snapshot_transaction_and_idempotency"],
+                "limits": ["whole_clip_planning_not_insert_overwrite_roll_or_source_trim", "sync_shortfall_keeps_all_reached_tracks_together_no_single_track_fallback", "markers_keep_absolute_sequence_ticks", "new_lanes_use_next_order_and_copy_processing", "audio_effect_bus_relocation_rejected", "external_authoring_semantics_and_subtitle_offsets_report_unsupported", "no_claim_of_all_capcut_magnet_gestures_or_full_parity"],
+                "source_revision": "b138595d4c2d1fa5262b4a8a8c7cd98187c4b077",
+                "source_license": "MIT",
+                "runtime": "python-standard-library-no-node-browser-or-network",
+            },
             "media": {
                 "status": "implemented",
                 "features": ["probe", "local_ingest", "image_loop", "proxy", "thumbnail", "waveform", "scene_change", "silence", "beat_anchors", "heuristic_highlights", "highlight_rough_cut_apply", "beat_cut_timeline", "multicam_audio_sync", "multicam_switch_plan", "relink_by_hash", "relink_by_unique_name", "local_template_tracking", "local_visual_model_tracking_adapter", "local_multi_object_tracking", "native_yolov10_onnx_cpu", "native_motion_association", "tracking_clip_model_rights_dependencies", "visual_adapter_registry", "local_tracking_bind_to_visual_clip", "local_auto_reframe", "smart_cut_silence", "smart_cut_transcript_phrases", "smart_cut_linked_audio", "stabilize_vidstab_two_pass"],

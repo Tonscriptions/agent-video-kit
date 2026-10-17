@@ -1,0 +1,31 @@
+{
+  "id": "L09",
+  "title": "sequence SRT / reverse parent",
+  "request": {
+    "action": "shift",
+    "clip_ids": [
+      "file_title"
+    ],
+    "delta_tick": 45000
+  },
+  "sequence_id": "child",
+  "deltas": [
+    45000
+  ],
+  "expected": {
+    "background": [
+      "main",
+      0
+    ],
+    "file_title": [
+      "titles",
+      135000
+    ],
+    "bed_clip": [
+      "bed",
+      0
+    ]
+  },
+  "removed": [],
+  "expected_short_tick": 0
+}

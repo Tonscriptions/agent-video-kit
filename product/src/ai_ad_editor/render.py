@@ -2140,6 +2140,10 @@ def _compiled_subtitle_filter(
     author_duration = clock['authored_duration_seconds']
     isolated_raster = independent or not dynamic_raster
     external = bool(subtitle.get('asset_uri'))
+    cue_offset = subtitle.get('asset_time_offset_tick', 0)
+    if type(cue_offset) is not int:
+        raise AppError('SUBTITLE_ASSET_OFFSET_INVALID', '文件字幕时钟偏移必须为整数 tick', exit_code=2)
+    cue_offset_seconds = cue_offset / tps
     straight_paint = isolated_raster and not external
     animation_alpha: list[str] = []
     layout_evidence: dict[str, Any] = {}
@@ -2176,17 +2180,20 @@ def _compiled_subtitle_filter(
         animation_alpha = []
     if value and external:
         relative = time_base == 'clip'
-        if clock['maps'] or relative:
+        if clock['maps'] or relative or cue_offset:
             paint_time = _subtitle_authored_expression(clock, 'PTS*TB', sequential=True)
             if relative:
                 paint_time = f'(({paint_time})-{author_start:.14g})'
+            if cue_offset:
+                paint_time = f'(({paint_time})+({cue_offset_seconds:.14g}))'
             if independent:
                 # The title source covers the whole final timeline from 0.
                 # Rebuild that untouched CFR counter outside the visible clip
                 # too, where an ancestor inverse deliberately clamps time.
                 restore = f'N/({fps_value})/TB'
             else:
-                restored = _subtitle_restore_expression(clock, 'PTS*TB', clip_relative=relative)
+                restore_clock = f'(PTS*TB-({cue_offset_seconds:.14g}))' if cue_offset else 'PTS*TB'
+                restored = _subtitle_restore_expression(clock, restore_clock, clip_relative=relative)
                 restore = f'round(({restored})/TB)'
             value = (f'settb=expr=1/900000000,setpts={_expr_arg(f"({paint_time})/TB")},'
                      + value + f',setpts={_expr_arg(restore)},settb=expr=1/({fps_value})')
@@ -2212,6 +2219,7 @@ def _compiled_subtitle_filter(
                  + f'[{layer}];'
                  + f'[{base}][{layer}]overlay=x=0:y=0:format=auto:shortest=1')
     clock = {**clock, 'asset_time_base': time_base if external else 'clip-local-inline',
+             'asset_time_offset_tick': cue_offset if external else 0,
              'engine': 'libass' if external else layout_evidence.get('engine', 'drawtext'),
              'frame_clock': 'restored-to-final-display-grid' if external else 'unchanged',
              'continuous_playback_reviewed': False}

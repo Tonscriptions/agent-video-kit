@@ -5,6 +5,17 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+For [linked edits](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md),
+dry-run is read-only. Formal `timeline edit` makes a before-timeline-edit
+snapshot and records its plan in the existing metadata transaction. Supply
+the plan's `base_project_sha256` through `--expected-project-sha256` to reject
+stale authorship; reuse an idempotency key only for the same request. A replay
+returns the original result even after its accepted edit changed the project.
+`compose` can batch `linked_edit`; invalid intermediate models and late failures
+roll back. Native JSON/package preserve editing flags, sync locks, links and
+cue offsets. OTIO/Kdenlive/plain drafts report these semantics as Unsupported;
+metadata retention does not establish execution in another editor.
+
 Use the project lifecycle and queue as local files:
 
 ```powershell

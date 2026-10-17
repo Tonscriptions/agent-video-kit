@@ -5,6 +5,19 @@ description: Compose an Agent Project timeline with local clips, tracks, transit
 
 # Timeline Composition
 
+Use the [linked edit planner](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md)
+for link/unlink/remove/close_gap/close_gaps/shift on whole clips. Configure
+`sequence.editing` (main_track_id/sync/linkage/linked), per-track `sync_lock`
+and clip `link_id`. Inspect `timeline edit --dry-run` before applying; a
+`compose` operation `{op: "linked_edit", edit: <request>}` joins one transaction.
+The intermediate project must be valid before that operation. Linked locked
+members reject the whole selection. Sync uses common available room and
+reports `short_tick`; linkage follows riders while multi-cut beds stay anchored.
+Collision lanes preserve processing; effect/ducking audio buses cannot be
+automatically relocated. Keep file-subtitle offsets and tracking references.
+This API does not perform source-edge trimming, insert/overwrite, roll, or
+full magnetic main-track rearrangement. Markers retain absolute sequence ticks.
+
 Nested sequence clips now render as isolated transparent canvases; see the
 [sequence compositing contract](../../docs/specs/嵌套序列隔离合成契约_v0.1_2026-10-17.md).
 Composite the children first. Parent crop, canvas TRS/anchor, opacity, effects,
@@ -17,7 +30,7 @@ Use optional sequence `canvas: {width, height}` for an independent pixel raster;
 see the [sequence canvas contract](../../docs/specs/独立序列画布与父级投影契约_v0.1_2026-10-17.md).
 Omitted or null canvas inherits the effective project/output dimensions, not
 the immediate parent. `add_sequence` accepts canvas; `update_sequence.patch`
-accepts canvas/name/duration_tick/markers, and null clears the canvas override.
+accepts canvas/name/duration_tick/markers/editing, and null clears the canvas override.
 Container crop pixels and cropped anchors belong to the native child; position
 and the post-transform mask belong to its parent. Child text and tracking
 bindings compile locally before projection. Selected-sequence export defaults

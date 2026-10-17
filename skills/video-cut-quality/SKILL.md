@@ -5,6 +5,16 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [linked edits](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md),
+review common `short_tick`, selected/deleted IDs, locked tracks, long beds,
+collision-lane audio processing, source-reference rebinding and accumulated
+sequence-file subtitle offsets. Compare actual encoded output with explicit
+expected intervals and cue timing. A manual timeline rendered by the same
+renderer checks edit semantics, not an independent raster algorithm. Use
+lossless PCM for sample checks and treat AAC/GIF as display copies. Upstream
+planner comparisons, product tests and real media are separate evidence;
+none accepts natural quality, listening or complete Jianying parity by count.
+
 For nested sequences, review the actual isolated composite against the
 [sequence canvas contract](../../docs/specs/嵌套序列隔离合成契约_v0.1_2026-10-17.md).
 Check overlap opacity, root occlusion order, parent pivot, post-transform mask,

@@ -198,3 +198,11 @@
 ```
 
 method 默认 bilinear，仅允许 bilinear/area；max_working_bytes 默认 1 GiB，范围 1 字节到 64 GiB。配置作用于序列容器投影，叶素材采样不随之改变；工作配额包括所有可达容器的保守缓冲模型，不是全进程 RSS 保证。原生 Agent JSON/package 保留该配置；外部格式报告 Unsupported，旁车保存不代表执行等效。临时 CLI/队列覆盖不写回作者设置，但属于输出指纹和取消续跑记录。见[采样契约](./序列面积采样与工作栅格预算契约_v0.1_2026-10-17.md)。
+
+## V33：关联片段、同步锁与主轨联动
+
+序列可声明 `editing: {main_track_id, sync, linkage, linked}`，或省略/null；布尔默认 false/false/true。显式 main_track_id 必须为本序列 video 轨道，不能为 null；省略按 video 的 order/ID 选择。轨道 `sync_lock` 为可选严格布尔，默认 true。片段 `link_id` 是可选 ID/null；组作用于同一序列，不改变片段或素材的持久 ID。
+
+文件字幕可用整数 `subtitle.asset_time_offset_tick` 表示输入文件绘制前的时钟偏移，允许负数。整片段移位时，sequence 基准文件字幕累加负位移；clip 基准不加此补偿。内联文字不依靠该字段。它与 source in/out、speed/curve、reverse 和文字关键帧是不同的时钟层次，不能用重写 SRT 或重置源时钟替代。
+
+上述字段在原生 JSON/package 中保留；外部格式对编辑开关、同步锁、关联及非零字幕偏移报告 Unsupported。源轨因碰撞换轨时，仍引用它的 tracking_binding.source_track_id 同步重绑；锁定依赖或删除仍被引用的源会拒绝。完整规则见[关联编辑契约](./关联片段与主轨联动规划契约_v0.1_2026-10-17.md)。

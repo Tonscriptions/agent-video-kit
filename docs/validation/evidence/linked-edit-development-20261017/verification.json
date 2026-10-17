@@ -1,0 +1,223 @@
+{
+  "collected_at_utc": "2026-10-17T13:41:59.172392+00:00",
+  "records": [
+    {
+      "id": "D01",
+      "kind": "test-fixture",
+      "cause": "Test queried report feature; actual exporter field is capability. Product report already contained Unsupported.",
+      "source": "unit-dev-v2-targeted-20261017.json"
+    },
+    {
+      "id": "D02",
+      "kind": "oracle-adapter",
+      "cause": "Upstream stores data-link in clip attrs, not clip.link. First 60 cases match; 20 group comparisons differ. Fixed adapter gives 80/80.",
+      "source": "oracle-dev1.zip"
+    },
+    {
+      "id": "D03",
+      "kind": "media-fixture",
+      "cause": "Fixture duplicated asset and track IDs: bed/voice/sfx. Validator rejected before edit.",
+      "source": "media-dev1.zip",
+      "last_nonzero_call": [
+        {
+          "call": 12,
+          "args": [
+            "validate",
+            "--project",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\linked-edit-media-work-dev1-20261017\\L01",
+            "--strict-rights"
+          ],
+          "exit_code": 2,
+          "errors": [
+            {
+              "code": "ID_DUPLICATE",
+              "message": "重复 ID: bed",
+              "path": "sequences[0].tracks[1].id",
+              "retryable": false
+            },
+            {
+              "code": "ID_DUPLICATE",
+              "message": "重复 ID: voice",
+              "path": "sequences[0].tracks[2].id",
+              "retryable": false
+            },
+            {
+              "code": "ID_DUPLICATE",
+              "message": "重复 ID: sfx",
+              "path": "sequences[0].tracks[3].id",
+              "retryable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "D04",
+      "kind": "product-integration",
+      "cause": "Actual product provenance persisted a repository URL and failed local policy audit. Fixed to repository slug; new regression verifies stored operations/idempotency/project.",
+      "source": "media-dev2.zip",
+      "last_nonzero_call": [
+        {
+          "call": 23,
+          "args": [
+            "policy",
+            "audit",
+            "--project",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\linked-edit-media-work-dev2-20261017\\L01"
+          ],
+          "exit_code": 2,
+          "errors": [
+            {
+              "code": "POLICY_REMOTE_REFERENCE",
+              "message": "项目产物包含被本地策略禁止的远程或闭源服务引用",
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\linked-edit-media-work-dev2-20261017\\L01\\operations\\idempotency\\95369850b218854f44c9218964d25fe782e863e1544d36662ac4d5f40654e82c.json",
+              "retryable": false,
+              "cause": "{\"code\": \"POLICY_REMOTE_REFERENCE\", \"kind\": \"remote\", \"file\": \"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\linked-edit-media-work-dev2-20261017\\\\L01\\\\operations\\\\idempotency\\\\95369850b218854f44c9218964d25fe782e863e1544d36662ac4d5f40654e82c.json\", \"field\": \"$.response.data.plan.source.repository\", \"value_sha256\": \"3503bcab4b8f5c6e176bbfa9f132a690187396592017d86d1df1dcf896fa3e1b\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "D05",
+      "kind": "media-fixture",
+      "cause": "Fixture used an image asset on a subtitle track. Validator rejected; replaced with native text generator.",
+      "source": "media-dev3.zip",
+      "last_nonzero_call": [
+        {
+          "call": 34,
+          "args": [
+            "validate",
+            "--project",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\linked-edit-media-work-dev3-20261017\\L02",
+            "--strict-rights"
+          ],
+          "exit_code": 2,
+          "errors": [
+            {
+              "code": "SUBTITLE_ASSET_KIND_INVALID",
+              "message": "subtitle 轨道只能引用 subtitle 资产",
+              "path": "sequences[0].tracks[2].clips[0].asset_id",
+              "retryable": false
+            },
+            {
+              "code": "SUBTITLE_ASSET_KIND_INVALID",
+              "message": "subtitle 轨道只能引用 subtitle 资产",
+              "path": "sequences[0].tracks[2].clips[1].asset_id",
+              "retryable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "D06",
+      "kind": "interrupted-not-a-pass",
+      "cause": "Stopped only this task owned unittest worker after real media policy failure; no complete Ran-tests result. Source frozen before/after interruption.",
+      "completed_ok_entries": 49,
+      "source": "interrupted-full-20261017.json"
+    },
+    {
+      "id": "D07",
+      "kind": "publication-metadata",
+      "cause": "Initial successful generator said font binary_distributed=false despite creating native project packages. Public generation corrected this to true and wraps each package with the full DejaVu notice. No pixel/audio product change.",
+      "source": "media-dev4-fixture-provenance.json"
+    },
+    {
+      "id": "D08",
+      "kind": "media-audit-reference",
+      "cause": "Audit reference used a continuous right endpoint rather than reversing the 40-frame isolated child raster. Correct reference maps child index j to output 39-j; no product change.",
+      "source": "media-audit-dev1.json"
+    },
+    {
+      "id": "D09",
+      "kind": "package-audit-reference",
+      "cause": "Audit expected a sha256: prefix, whereas native package manifest uses plain 64-hex SHA-256. File bytes and sizes were not modified; compare the declared plain digest.",
+      "source": "media-audit-dev2.json"
+    }
+  ],
+  "record_count": 9,
+  "policy_failed_media": "docs/assets/linked-edit-20261017/development-policy-rejected-L01-after.mp4",
+  "files": {
+    "interrupted-cli.py": {
+      "sha256": "sha256:c15c92f29a1c9bed42bcb2313485774147289e985d77362cfdb9e0c44ecd9921",
+      "bytes": 405141
+    },
+    "interrupted-edit_planner.py": {
+      "sha256": "sha256:4d62bcf658ec6fdfadb7bc7c9ff3dce31a6bd6d0c565f1015f3f77f7c8fa77a0",
+      "bytes": 26748
+    },
+    "interrupted-full-20261017.json": {
+      "sha256": "sha256:53b1f0ec64b8795135c15de218012be59756072100953fa2e9a89649d8ee63d7",
+      "bytes": 48896
+    },
+    "interrupted-full-20261017.log": {
+      "sha256": "sha256:dc9e1b733c1548a3096f33e3f13feee9483ccd57b6427d9a833a2985284c12dc",
+      "bytes": 7554
+    },
+    "interrupted-test_linked_edit.py": {
+      "sha256": "sha256:7d0b78d9a202e3079ff0e9793a735606ff560c135ebafb339a8a7910f79f1f6e",
+      "bytes": 29740
+    },
+    "media-audit-dev1.json": {
+      "sha256": "sha256:33353e1113391f60976a980508aeb50b3c2e70c61abf733d3d77fd96c057d35e",
+      "bytes": 485
+    },
+    "media-audit-dev1.py": {
+      "sha256": "sha256:34fa449321abea3952f9966ebb9230f39a9bb3cb1302ba1dbce0a29b9ac46973",
+      "bytes": 7467
+    },
+    "media-audit-dev2.json": {
+      "sha256": "sha256:1b80af071e63f0fe5304cd66b1e50b06e163de8f5762c284ec16a04725d9959e",
+      "bytes": 367
+    },
+    "media-audit-dev2.py": {
+      "sha256": "sha256:831b407ac0a2725d697e0b168a530ea5e02736e672c5850ecd1e2c60c66b96b0",
+      "bytes": 7786
+    },
+    "media-dev1.zip": {
+      "sha256": "sha256:c344fcf0ed0d6dd18be6e6c5eab8cd52bfe4b47e94f2f42208e88687f2a1f9e6",
+      "bytes": 70366
+    },
+    "media-dev2.zip": {
+      "sha256": "sha256:3d61bb1586618d2e915e10237f21735a9f9bc5e8247d26fe745897542a50e387",
+      "bytes": 195760
+    },
+    "media-dev3.zip": {
+      "sha256": "sha256:7efba44afd72e49080f39f5ff26ed0e080be1a73efb677d1fc2a024615f5d6c5",
+      "bytes": 142769
+    },
+    "media-dev4-fixture-provenance.json": {
+      "sha256": "sha256:14b0caf1901ae51f9fe68ff4a85e5d455d9c7ca7dee60f58157192b9b61f2ce5",
+      "bytes": 850
+    },
+    "media-dev4-smoke_linked_edit.py": {
+      "sha256": "sha256:1c8a84abb14cf3d81f61a2eaa7570c224cb7902798ffb86f705e5672a7d45494",
+      "bytes": 28579
+    },
+    "oracle-dev1.zip": {
+      "sha256": "sha256:1d558bd8a98db03b4b612014062abd7eb8fe49fd47dcdbaa4f68f69ebf43257d",
+      "bytes": 47124
+    },
+    "unit-dev-v2-cli.py": {
+      "sha256": "sha256:3f53d6c68c00a760eefae00c40486795cc02a0fda098e7740f5b14af5777ebc2",
+      "bytes": 404830
+    },
+    "unit-dev-v2-edit_planner.py": {
+      "sha256": "sha256:6a530ab87cd649011e609e456ae81ea28e7a8968864080c4577f797815a6fe3d",
+      "bytes": 26725
+    },
+    "unit-dev-v2-targeted-20261017.json": {
+      "sha256": "sha256:1ec76082863d5df8c6f08bc4e985b267bda9a65d1cd2eab1cee9cb5d3cfea753",
+      "bytes": 48922
+    },
+    "unit-dev-v2-targeted-20261017.log": {
+      "sha256": "sha256:c95a6e7710fffa42c548a729a3aa522c695fd987050c6802bcbe76d26aea5359",
+      "bytes": 7472
+    },
+    "unit-dev-v2-test_linked_edit.py": {
+      "sha256": "sha256:321a5900caa82e2bcb3ca23885810fde1ff78872cc02ecb6e5bd8b24a0a0625c",
+      "bytes": 26561
+    }
+  }
+}

@@ -664,6 +664,10 @@ def export_draft(root: Path, project: dict[str, Any], output: Path, *, strict: b
         _item(items, 'sequence-sampling', 'Unsupported', 'settings.sequence_sampling',
               detail='外部草稿不执行本地序列面积核或工作配额；原值只保存在旁车',
               preserved_source=project['settings']['sequence_sampling'])
+    from .edit_planner import interchange_features
+    for field in interchange_features(project):
+        _item(items, 'timeline-editing', 'Unsupported', field,
+              detail='外部草稿不执行本地关联/同步锁/主轨跟随或文件字幕时钟偏移；原生配置只在旁车保留')
     if str(canvas.get("background","black")).lower() not in {"black","#000000","0x000000"}:
         _item(items,"canvas-background","Unsupported","settings.canvas.background",detail="非黑色或透明画布尚未映射到外部草稿；源值保存在旁车",preserved_source=canvas.get("background"))
     if len(project["sequences"]) > 1:

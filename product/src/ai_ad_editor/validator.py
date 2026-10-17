@@ -9,6 +9,7 @@ from typing import Any
 from .errors import AppError
 from .speed_curves import compile_curve
 from .sequence_canvas import validate_canvas
+from .edit_planner import validate_editing
 
 from .policy import reference_kind, resolve_local_path
 from .project import asset_map
@@ -385,6 +386,10 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
     for si, sequence in enumerate(project.get("sequences", [])):
         sp = f"sequences[{si}]"
         try:
+            validate_editing(sequence)
+        except AppError as exc:
+            error(exc.code, exc.message, (exc.path or 'sequence.editing').replace('sequence.', sp+'.', 1))
+        try:
             validate_canvas(sequence.get('canvas'), path=sp+'.canvas')
         except AppError as exc:
             error(exc.code, exc.message, exc.path or sp+'.canvas')
@@ -402,6 +407,8 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
         track_ids: set[str] = set()
         for ti, track in enumerate(sequence.get("tracks", [])):
             tp = f"{sp}.tracks[{ti}]"
+            if 'sync_lock' in track and type(track['sync_lock']) is not bool:
+                error('EDIT_CONFIGURATION_INVALID', '轨道 sync_lock 必须是布尔值', tp+'.sync_lock')
             tid = track.get("id")
             if not isinstance(tid, str) or not ID_RE.fullmatch(tid):
                 error("ID_INVALID", "轨道 ID 不符合规范", f"{tp}.id")
@@ -443,6 +450,10 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
             occupied: list[tuple[int, int, str]] = []
             for ci, clip in enumerate(clips):
                 cp = f"{tp}.clips[{ci}]"
+                if clip.get('link_id') is not None and (not isinstance(clip['link_id'], str) or not ID_RE.fullmatch(clip['link_id'])):
+                    error('EDIT_LINK_ID_INVALID', '片段 link_id 必须为有效标识符或 null', cp+'.link_id')
+                if isinstance(clip.get('subtitle'), dict) and 'asset_time_offset_tick' in clip['subtitle'] and type(clip['subtitle']['asset_time_offset_tick']) is not int:
+                    error('SUBTITLE_ASSET_OFFSET_INVALID', '文件字幕时钟偏移必须为整数 tick', cp+'.subtitle.asset_time_offset_tick')
                 dependencies = clip.get('rights_dependencies', [])
                 if not isinstance(dependencies, list) or any(not isinstance(d, dict) or set(d) != {'rights_ref','sha256'} or not isinstance(d.get('rights_ref'), str) or not d['rights_ref'] or not re.fullmatch(r'sha256:[0-9a-f]{64}', str(d.get('sha256',''))) for d in dependencies):
                     error('CLIP_RIGHTS_DEPENDENCIES_INVALID', '片段权利依赖必须包含非空 rights_ref 和 sha256', f'{cp}.rights_dependencies')

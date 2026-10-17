@@ -1,0 +1,197 @@
+[
+  {
+    "engine": "agent-tick-linked-edit-v1",
+    "source": {
+      "repository": "openfilm/openfilm",
+      "revision": "b138595d4c2d1fa5262b4a8a8c7cd98187c4b077",
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-edit.ts",
+      "license": "MIT",
+      "adaptation": "native-integer-ticks-whole-clip-follow-and-gap-planning"
+    },
+    "base_project_sha256": "sha256:3ff01aaf5e3928e7847e1048b724fbe392261351b5bdee9317bf5ebe2ad5c449",
+    "sequence_id": "seq_main",
+    "request": {
+      "action": "remove",
+      "options": {
+        "main_track_id": "main",
+        "sync": false,
+        "linkage": true,
+        "linked": true,
+        "ripple": "main"
+      },
+      "clip_ids": [
+        "b"
+      ]
+    },
+    "selected_clip_ids": [
+      "b",
+      "title_b"
+    ],
+    "main_track_id": "main",
+    "anchored_clip_ids": [
+      "bed_clip"
+    ],
+    "short_tick": 0,
+    "shifts": [
+      {
+        "point_tick": 180000,
+        "delta_tick": -90000,
+        "track_ids": [
+          "main",
+          "titles"
+        ],
+        "clip_ids": [
+          "c",
+          "d",
+          "title_d"
+        ]
+      }
+    ],
+    "changes": [
+      {
+        "clip_id": "b",
+        "before": {
+          "track_id": "main",
+          "clip": {
+            "id": "b",
+            "asset_id": "source",
+            "timeline_start_tick": 90000,
+            "duration_tick": 90000,
+            "source_in_tick": 90000,
+            "source_out_tick": 180000
+          }
+        },
+        "after": null
+      },
+      {
+        "clip_id": "c",
+        "before": {
+          "track_id": "main",
+          "clip": {
+            "id": "c",
+            "asset_id": "source",
+            "timeline_start_tick": 180000,
+            "duration_tick": 90000,
+            "source_in_tick": 180000,
+            "source_out_tick": 270000
+          }
+        },
+        "after": {
+          "track_id": "main",
+          "clip": {
+            "id": "c",
+            "asset_id": "source",
+            "timeline_start_tick": 90000,
+            "duration_tick": 90000,
+            "source_in_tick": 180000,
+            "source_out_tick": 270000
+          }
+        }
+      },
+      {
+        "clip_id": "d",
+        "before": {
+          "track_id": "main",
+          "clip": {
+            "id": "d",
+            "asset_id": "source",
+            "timeline_start_tick": 270000,
+            "duration_tick": 90000,
+            "source_in_tick": 270000,
+            "source_out_tick": 360000
+          }
+        },
+        "after": {
+          "track_id": "main",
+          "clip": {
+            "id": "d",
+            "asset_id": "source",
+            "timeline_start_tick": 180000,
+            "duration_tick": 90000,
+            "source_in_tick": 270000,
+            "source_out_tick": 360000
+          }
+        }
+      },
+      {
+        "clip_id": "title_b",
+        "before": {
+          "track_id": "titles",
+          "clip": {
+            "id": "title_b",
+            "timeline_start_tick": 112500,
+            "duration_tick": 45000,
+            "source_in_tick": 0,
+            "source_out_tick": 45000,
+            "subtitle": {
+              "text": "DELETE WITH B",
+              "style": {
+                "font_asset_id": "font",
+                "fontsize": 22
+              }
+            },
+            "generator": {
+              "type": "text"
+            }
+          }
+        },
+        "after": null
+      },
+      {
+        "clip_id": "title_d",
+        "before": {
+          "track_id": "titles",
+          "clip": {
+            "id": "title_d",
+            "timeline_start_tick": 292500,
+            "duration_tick": 45000,
+            "source_in_tick": 0,
+            "source_out_tick": 45000,
+            "subtitle": {
+              "text": "FOLLOW D",
+              "style": {
+                "font_asset_id": "font",
+                "fontsize": 24
+              }
+            },
+            "generator": {
+              "type": "text"
+            }
+          }
+        },
+        "after": {
+          "track_id": "titles",
+          "clip": {
+            "id": "title_d",
+            "timeline_start_tick": 202500,
+            "duration_tick": 45000,
+            "source_in_tick": 0,
+            "source_out_tick": 45000,
+            "subtitle": {
+              "text": "FOLLOW D",
+              "style": {
+                "font_asset_id": "font",
+                "fontsize": 24
+              }
+            },
+            "generator": {
+              "type": "text"
+            }
+          }
+        }
+      }
+    ],
+    "new_track_ids": [],
+    "rebound_clip_ids": [],
+    "retimed_subtitle_ids": [],
+    "new_tracks": [],
+    "before_duration_tick": 450000,
+    "after_duration_tick": 450000,
+    "limits": [
+      "whole-clip-edits-no-source-trim-or-insert-overwrite",
+      "markers-remain-at-absolute-sequence-ticks",
+      "new-collision-lanes-above-existing-order-and-preserve-track-processing",
+      "sync-conflicts-report-short-tick-never-fall-back-to-one-track"
+    ]
+  }
+]

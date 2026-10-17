@@ -1,0 +1,154 @@
+[
+  {
+    "engine": "agent-tick-linked-edit-v1",
+    "source": {
+      "repository": "openfilm/openfilm",
+      "revision": "b138595d4c2d1fa5262b4a8a8c7cd98187c4b077",
+      "path": "packages/openfilm/studio/ui/src/lib/timeline-edit.ts",
+      "license": "MIT",
+      "adaptation": "native-integer-ticks-whole-clip-follow-and-gap-planning"
+    },
+    "base_project_sha256": "sha256:66def553b8cb188643a355670951b34599f4829d1637f9ee2a7d920885e042b0",
+    "sequence_id": "seq_main",
+    "request": {
+      "action": "remove",
+      "options": {
+        "main_track_id": "main",
+        "sync": true,
+        "linkage": false,
+        "linked": true,
+        "ripple": "main"
+      },
+      "clip_ids": [
+        "b"
+      ]
+    },
+    "selected_clip_ids": [
+      "b"
+    ],
+    "main_track_id": "main",
+    "anchored_clip_ids": [
+      "bed_clip"
+    ],
+    "short_tick": 0,
+    "shifts": [
+      {
+        "point_tick": 180000,
+        "delta_tick": -90000,
+        "track_ids": [
+          "main",
+          "sfx"
+        ],
+        "clip_ids": [
+          "c",
+          "d",
+          "sfx_d"
+        ]
+      }
+    ],
+    "changes": [
+      {
+        "clip_id": "b",
+        "before": {
+          "track_id": "main",
+          "clip": {
+            "id": "b",
+            "asset_id": "source",
+            "timeline_start_tick": 90000,
+            "duration_tick": 90000,
+            "source_in_tick": 90000,
+            "source_out_tick": 180000
+          }
+        },
+        "after": null
+      },
+      {
+        "clip_id": "c",
+        "before": {
+          "track_id": "main",
+          "clip": {
+            "id": "c",
+            "asset_id": "source",
+            "timeline_start_tick": 180000,
+            "duration_tick": 90000,
+            "source_in_tick": 180000,
+            "source_out_tick": 270000
+          }
+        },
+        "after": {
+          "track_id": "main",
+          "clip": {
+            "id": "c",
+            "asset_id": "source",
+            "timeline_start_tick": 90000,
+            "duration_tick": 90000,
+            "source_in_tick": 180000,
+            "source_out_tick": 270000
+          }
+        }
+      },
+      {
+        "clip_id": "d",
+        "before": {
+          "track_id": "main",
+          "clip": {
+            "id": "d",
+            "asset_id": "source",
+            "timeline_start_tick": 270000,
+            "duration_tick": 90000,
+            "source_in_tick": 270000,
+            "source_out_tick": 360000
+          }
+        },
+        "after": {
+          "track_id": "main",
+          "clip": {
+            "id": "d",
+            "asset_id": "source",
+            "timeline_start_tick": 180000,
+            "duration_tick": 90000,
+            "source_in_tick": 270000,
+            "source_out_tick": 360000
+          }
+        }
+      },
+      {
+        "clip_id": "sfx_d",
+        "before": {
+          "track_id": "sfx",
+          "clip": {
+            "id": "sfx_d",
+            "asset_id": "audio_sfx",
+            "timeline_start_tick": 270000,
+            "duration_tick": 90000,
+            "source_in_tick": 0,
+            "source_out_tick": 90000
+          }
+        },
+        "after": {
+          "track_id": "sfx",
+          "clip": {
+            "id": "sfx_d",
+            "asset_id": "audio_sfx",
+            "timeline_start_tick": 180000,
+            "duration_tick": 90000,
+            "source_in_tick": 0,
+            "source_out_tick": 90000
+          }
+        }
+      }
+    ],
+    "new_track_ids": [],
+    "rebound_clip_ids": [],
+    "retimed_subtitle_ids": [],
+    "new_tracks": [],
+    "before_duration_tick": 450000,
+    "after_duration_tick": 450000,
+    "limits": [
+      "whole-clip-edits-no-source-trim-or-insert-overwrite",
+      "markers-remain-at-absolute-sequence-ticks",
+      "new-collision-lanes-above-existing-order-and-preserve-track-processing",
+      "sync-conflicts-report-short-tick-never-fall-back-to-one-track"
+    ]
+  }
+]

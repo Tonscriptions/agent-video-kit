@@ -1,0 +1,969 @@
+test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) ... 
+  test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={'editing': {'sync': 1}}, track_patch=None) ... FAIL
+  test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={'editing': {'main_track_id': None}}, track_patch=None) ... FAIL
+  test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={'editing': {'main_track_id': 'track_audio_1'}}, track_patch=None) ... FAIL
+  test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={'editing': {'unexpected': True}}, track_patch=None) ... FAIL
+  test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={'editing': []}, track_patch=None) ... FAIL
+  test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={}, track_patch='sync_lock') ... FAIL
+test_committed_edit_provenance_remains_local_policy_compatible (test_linked_edit.LinkedEditCliTests.test_committed_edit_provenance_remains_local_policy_compatible) ... FAIL
+test_compose_can_configure_sync_and_batch_edit_then_roll_back_late_failure (test_linked_edit.LinkedEditCliTests.test_compose_can_configure_sync_and_batch_edit_then_roll_back_late_failure) ... FAIL
+test_compose_rejects_invalid_intermediate_model_before_planning (test_linked_edit.LinkedEditCliTests.test_compose_rejects_invalid_intermediate_model_before_planning) ... FAIL
+test_dry_run_is_read_only_apply_is_idempotent_and_stale_plan_rejects (test_linked_edit.LinkedEditCliTests.test_dry_run_is_read_only_apply_is_idempotent_and_stale_plan_rejects) ... FAIL
+test_file_subtitle_clip_clock_moves_without_added_offset (test_linked_edit.LinkedEditCliTests.test_file_subtitle_clip_clock_moves_without_added_offset) ... FAIL
+test_file_subtitle_offset_survives_reverse_parent_clock (test_linked_edit.LinkedEditCliTests.test_file_subtitle_offset_survives_reverse_parent_clock) ... FAIL
+test_file_subtitle_sequence_clock_is_preserved_after_repeated_moves (test_linked_edit.LinkedEditCliTests.test_file_subtitle_sequence_clock_is_preserved_after_repeated_moves) ... FAIL
+test_invalid_link_and_subtitle_offset_are_checked_without_jsonschema (test_linked_edit.LinkedEditCliTests.test_invalid_link_and_subtitle_offset_are_checked_without_jsonschema) ... FAIL
+test_native_exchange_preserves_links_and_external_formats_report_losses (test_linked_edit.LinkedEditCliTests.test_native_exchange_preserves_links_and_external_formats_report_losses) ... FAIL
+test_nonzero_subtitle_offset_is_explicitly_lost_in_external_export (test_linked_edit.LinkedEditCliTests.test_nonzero_subtitle_offset_is_explicitly_lost_in_external_export) ... FAIL
+test_save_then_operation_failure_rolls_back_project_snapshot_and_operations (test_linked_edit.LinkedEditCliTests.test_save_then_operation_failure_rolls_back_project_snapshot_and_operations) ... FAIL
+test_binding_relocation_updates_source_track_and_missing_or_locked_reference_rejects (test_linked_edit.LinkedEditPlannerTests.test_binding_relocation_updates_source_track_and_missing_or_locked_reference_rejects) ... ERROR
+test_collision_reuses_compatible_lane_and_rejects_effect_bus_relocation (test_linked_edit.LinkedEditPlannerTests.test_collision_reuses_compatible_lane_and_rejects_effect_bus_relocation) ... ERROR
+test_large_integer_ticks_retain_one_tick_gap_and_shift (test_linked_edit.LinkedEditPlannerTests.test_large_integer_ticks_retain_one_tick_gap_and_shift) ... ERROR
+test_link_merges_groups_and_unlink_clears_orphan_without_trimming_tail (test_linked_edit.LinkedEditPlannerTests.test_link_merges_groups_and_unlink_clears_orphan_without_trimming_tail) ... ERROR
+test_linkage_collision_creates_lane_with_original_audio_processing (test_linked_edit.LinkedEditPlannerTests.test_linkage_collision_creates_lane_with_original_audio_processing) ... ERROR
+test_linkage_deletes_rider_keeps_long_bed_and_moves_later_title (test_linked_edit.LinkedEditPlannerTests.test_linkage_deletes_rider_keeps_long_bed_and_moves_later_title) ... ERROR
+test_locked_link_member_rejects_whole_edit (test_linked_edit.LinkedEditPlannerTests.test_locked_link_member_rejects_whole_edit) ... 
+  test_locked_link_member_rejects_whole_edit (test_linked_edit.LinkedEditPlannerTests.test_locked_link_member_rejects_whole_edit) (request={'action': 'remove', 'clip_ids': ['a']}) ... ERROR
+  test_locked_link_member_rejects_whole_edit (test_linked_edit.LinkedEditPlannerTests.test_locked_link_member_rejects_whole_edit) (request={'action': 'shift', 'clip_ids': ['a'], 'delta_tick': 1}) ... ERROR
+  test_locked_link_member_rejects_whole_edit (test_linked_edit.LinkedEditPlannerTests.test_locked_link_member_rejects_whole_edit) (request={'action': 'unlink', 'clip_ids': ['a']}) ... ERROR
+  test_locked_link_member_rejects_whole_edit (test_linked_edit.LinkedEditPlannerTests.test_locked_link_member_rejects_whole_edit) (request={'action': 'link', 'clip_ids': ['a', 'v']}) ... ERROR
+test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) ... 
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request=None) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request=[]) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': []}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'download'}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'shift', 'clip_ids': ['a'], 'delta_tick': True}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'shift', 'clip_ids': ['a'], 'delta_tick': 1.0}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'remove', 'clip_ids': ['a', 'a']}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'remove', 'clip_ids': [False]}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'remove', 'clip_ids': ['a'], 'options': {'sync': 1}}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'remove', 'clip_ids': ['a'], 'options': {'ripple': 1}}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'close_gaps', 'track_id': ''}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'close_gaps', 'clip_ids': ['a']}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'close_gap', 'at_tick': 0.5}) ... ERROR
+  test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'remove', 'clip_ids': ['a'], 'options': {'unknown': True}}) ... ERROR
+test_multiple_removed_spans_are_unioned_then_closed_backwards (test_linked_edit.LinkedEditPlannerTests.test_multiple_removed_spans_are_unioned_then_closed_backwards) ... ERROR
+test_noop_preserves_tail_and_preexisting_unrelated_overlaps (test_linked_edit.LinkedEditPlannerTests.test_noop_preserves_tail_and_preexisting_unrelated_overlaps) ... ERROR
+test_planning_uses_no_media_or_network_process (test_linked_edit.LinkedEditPlannerTests.test_planning_uses_no_media_or_network_process) ... ERROR
+test_sequence_file_subtitle_offsets_accumulate_and_clip_relative_does_not (test_linked_edit.LinkedEditPlannerTests.test_sequence_file_subtitle_offsets_accumulate_and_clip_relative_does_not) ... ERROR
+test_shift_rejects_negative_and_main_track_collision_atomically (test_linked_edit.LinkedEditPlannerTests.test_shift_rejects_negative_and_main_track_collision_atomically) ... ERROR
+test_single_tick_gaps_and_fragments_survive_fractional_fps (test_linked_edit.LinkedEditPlannerTests.test_single_tick_gaps_and_fragments_survive_fractional_fps) ... ERROR
+test_surviving_complex_source_clock_keys_rights_and_nested_references_are_unchanged (test_linked_edit.LinkedEditPlannerTests.test_surviving_complex_source_clock_keys_rights_and_nested_references_are_unchanged) ... ERROR
+test_sync_remove_moves_voice_but_preserves_locked_bed (test_linked_edit.LinkedEditPlannerTests.test_sync_remove_moves_voice_but_preserves_locked_bed) ... ERROR
+test_sync_shortfall_uses_common_room_without_single_track_fallback (test_linked_edit.LinkedEditPlannerTests.test_sync_shortfall_uses_common_room_without_single_track_fallback) ... ERROR
+test_sync_wins_over_linkage_and_does_not_delete_rider (test_linked_edit.LinkedEditPlannerTests.test_sync_wins_over_linkage_and_does_not_delete_rider) ... ERROR
+test_track_sync_opt_out_stays_but_explicit_selection_still_edits (test_linked_edit.LinkedEditPlannerTests.test_track_sync_opt_out_stays_but_explicit_selection_still_edits) ... ERROR
+
+======================================================================
+ERROR: test_binding_relocation_updates_source_track_and_missing_or_locked_reference_rejects (test_linked_edit.LinkedEditPlannerTests.test_binding_relocation_updates_source_track_and_missing_or_locked_reference_rejects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 204, in test_binding_relocation_updates_source_track_and_missing_or_locked_reference_rejects
+    result, plan = self.plan(p, {'action': 'shift', 'clip_ids': ['source'], 'delta_tick': -10})
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_collision_reuses_compatible_lane_and_rejects_effect_bus_relocation (test_linked_edit.LinkedEditPlannerTests.test_collision_reuses_compatible_lane_and_rejects_effect_bus_relocation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 170, in test_collision_reuses_compatible_lane_and_rejects_effect_bus_relocation
+    result, plan = self.plan(p, request)
+                   ~~~~~~~~~^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_large_integer_ticks_retain_one_tick_gap_and_shift (test_linked_edit.LinkedEditPlannerTests.test_large_integer_ticks_retain_one_tick_gap_and_shift)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 181, in test_large_integer_ticks_retain_one_tick_gap_and_shift
+    result, plan = self.plan(p, {'action': 'close_gap', 'at_tick': start+1})
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_link_merges_groups_and_unlink_clears_orphan_without_trimming_tail (test_linked_edit.LinkedEditPlannerTests.test_link_merges_groups_and_unlink_clears_orphan_without_trimming_tail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 134, in test_link_merges_groups_and_unlink_clears_orphan_without_trimming_tail
+    result, plan = self.plan(p, {'action': 'link', 'clip_ids': ['a', 'b']})
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_linkage_collision_creates_lane_with_original_audio_processing (test_linked_edit.LinkedEditPlannerTests.test_linkage_collision_creates_lane_with_original_audio_processing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 158, in test_linkage_collision_creates_lane_with_original_audio_processing
+    result, plan = self.plan(p, {'action': 'remove', 'clip_ids': ['b'], 'options': {'ripple': 'main', 'linkage': True}})
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_linkage_deletes_rider_keeps_long_bed_and_moves_later_title (test_linked_edit.LinkedEditPlannerTests.test_linkage_deletes_rider_keeps_long_bed_and_moves_later_title)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 87, in test_linkage_deletes_rider_keeps_long_bed_and_moves_later_title
+    result, plan = self.plan(p, {'action': 'remove', 'clip_ids': ['b'], 'options': {'ripple': 'main', 'linkage': True}})
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_locked_link_member_rejects_whole_edit (test_linked_edit.LinkedEditPlannerTests.test_locked_link_member_rejects_whole_edit) (request={'action': 'remove', 'clip_ids': ['a']})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 147, in test_locked_link_member_rejects_whole_edit
+    self.rejects(p, request, 'EDIT_TRACK_LOCKED')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_locked_link_member_rejects_whole_edit (test_linked_edit.LinkedEditPlannerTests.test_locked_link_member_rejects_whole_edit) (request={'action': 'shift', 'clip_ids': ['a'], 'delta_tick': 1})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 147, in test_locked_link_member_rejects_whole_edit
+    self.rejects(p, request, 'EDIT_TRACK_LOCKED')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_locked_link_member_rejects_whole_edit (test_linked_edit.LinkedEditPlannerTests.test_locked_link_member_rejects_whole_edit) (request={'action': 'unlink', 'clip_ids': ['a']})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 147, in test_locked_link_member_rejects_whole_edit
+    self.rejects(p, request, 'EDIT_TRACK_LOCKED')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_locked_link_member_rejects_whole_edit (test_linked_edit.LinkedEditPlannerTests.test_locked_link_member_rejects_whole_edit) (request={'action': 'link', 'clip_ids': ['a', 'v']})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 147, in test_locked_link_member_rejects_whole_edit
+    self.rejects(p, request, 'EDIT_TRACK_LOCKED')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request=[])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': []})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'download'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'shift', 'clip_ids': ['a'], 'delta_tick': True})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'shift', 'clip_ids': ['a'], 'delta_tick': 1.0})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'remove', 'clip_ids': ['a', 'a']})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'remove', 'clip_ids': [False]})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'remove', 'clip_ids': ['a'], 'options': {'sync': 1}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'remove', 'clip_ids': ['a'], 'options': {'ripple': 1}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'close_gaps', 'track_id': ''})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'close_gaps', 'clip_ids': ['a']})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'close_gap', 'at_tick': 0.5})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_malformed_requests_are_structured_failures (test_linked_edit.LinkedEditPlannerTests.test_malformed_requests_are_structured_failures) (request={'action': 'remove', 'clip_ids': ['a'], 'options': {'unknown': True}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 241, in test_malformed_requests_are_structured_failures
+    self.rejects(p, request, 'EDIT_REQUEST_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_multiple_removed_spans_are_unioned_then_closed_backwards (test_linked_edit.LinkedEditPlannerTests.test_multiple_removed_spans_are_unioned_then_closed_backwards)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 120, in test_multiple_removed_spans_are_unioned_then_closed_backwards
+    result, plan = self.plan(p, {'action': 'remove', 'clip_ids': ['b', 'b_audio'], 'options': {'ripple': True, 'sync': True}})
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_noop_preserves_tail_and_preexisting_unrelated_overlaps (test_linked_edit.LinkedEditPlannerTests.test_noop_preserves_tail_and_preexisting_unrelated_overlaps)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 223, in test_noop_preserves_tail_and_preexisting_unrelated_overlaps
+    result, plan = self.plan(p, {'action': 'close_gaps'})
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_planning_uses_no_media_or_network_process (test_linked_edit.LinkedEditPlannerTests.test_planning_uses_no_media_or_network_process)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 245, in test_planning_uses_no_media_or_network_process
+    module = planner()
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_sequence_file_subtitle_offsets_accumulate_and_clip_relative_does_not (test_linked_edit.LinkedEditPlannerTests.test_sequence_file_subtitle_offsets_accumulate_and_clip_relative_does_not)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 215, in test_sequence_file_subtitle_offsets_accumulate_and_clip_relative_does_not
+    result, plan = self.plan(p, {'action': 'shift', 'clip_ids': ['s', 'relative'], 'delta_tick': 5})
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_shift_rejects_negative_and_main_track_collision_atomically (test_linked_edit.LinkedEditPlannerTests.test_shift_rejects_negative_and_main_track_collision_atomically)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 151, in test_shift_rejects_negative_and_main_track_collision_atomically
+    self.rejects(p, {'action': 'shift', 'clip_ids': ['a'], 'delta_tick': -1}, 'EDIT_NEGATIVE_TIME')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 69, in rejects
+    planner().build_edit_plan(p, 'seq', request)
+    ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_single_tick_gaps_and_fragments_survive_fractional_fps (test_linked_edit.LinkedEditPlannerTests.test_single_tick_gaps_and_fragments_survive_fractional_fps)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 127, in test_single_tick_gaps_and_fragments_survive_fractional_fps
+    result, plan = self.plan(p, {'action': 'close_gaps'})
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_surviving_complex_source_clock_keys_rights_and_nested_references_are_unchanged (test_linked_edit.LinkedEditPlannerTests.test_surviving_complex_source_clock_keys_rights_and_nested_references_are_unchanged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 195, in test_surviving_complex_source_clock_keys_rights_and_nested_references_are_unchanged
+    result, _ = self.plan(p, {'action': 'remove', 'clip_ids': ['gone'], 'options': {'ripple': True}})
+                ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_sync_remove_moves_voice_but_preserves_locked_bed (test_linked_edit.LinkedEditPlannerTests.test_sync_remove_moves_voice_but_preserves_locked_bed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 77, in test_sync_remove_moves_voice_but_preserves_locked_bed
+    result, plan = self.plan(p, {'action': 'remove', 'clip_ids': ['delete'], 'options': {'ripple': True, 'sync': True}})
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_sync_shortfall_uses_common_room_without_single_track_fallback (test_linked_edit.LinkedEditPlannerTests.test_sync_shortfall_uses_common_room_without_single_track_fallback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 111, in test_sync_shortfall_uses_common_room_without_single_track_fallback
+    result, plan = self.plan(p, {'action': 'close_gap', 'track_id': 'main', 'at_tick': 20, 'options': {'sync': True}})
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_sync_wins_over_linkage_and_does_not_delete_rider (test_linked_edit.LinkedEditPlannerTests.test_sync_wins_over_linkage_and_does_not_delete_rider)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 97, in test_sync_wins_over_linkage_and_does_not_delete_rider
+    result, _ = self.plan(p, {'action': 'remove', 'clip_ids': ['b'], 'options': {'ripple': True, 'sync': True, 'linkage': True}})
+                ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+ERROR: test_track_sync_opt_out_stays_but_explicit_selection_still_edits (test_linked_edit.LinkedEditPlannerTests.test_track_sync_opt_out_stays_but_explicit_selection_still_edits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 103, in test_track_sync_opt_out_stays_but_explicit_selection_still_edits
+    result, _ = self.plan(p, {'action': 'remove', 'clip_ids': ['b'], 'options': {'ripple': True, 'sync': True}})
+                ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 62, in plan
+    result = planner().build_edit_plan(p, 'seq', request)
+             ~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 25, in planner
+    return importlib.import_module('ai_ad_editor.edit_planner')
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.edit_planner'
+
+======================================================================
+FAIL: test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={'editing': {'sync': 1}}, track_patch=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 481, in test_builtin_and_schema_reject_new_configuration_types
+    self.assertIn(expected, {e['code'] for e in report['errors']}, report)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'EDIT_CONFIGURATION_INVALID' not found in set() : {'ok': True, 'errors': [], 'warnings': [], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 0, 'required_records': 0, 'failures': [], 'warnings': [], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 0, 'sequence_count': 1}
+
+======================================================================
+FAIL: test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={'editing': {'main_track_id': None}}, track_patch=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 481, in test_builtin_and_schema_reject_new_configuration_types
+    self.assertIn(expected, {e['code'] for e in report['errors']}, report)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'EDIT_CONFIGURATION_INVALID' not found in set() : {'ok': True, 'errors': [], 'warnings': [], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 0, 'required_records': 0, 'failures': [], 'warnings': [], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 0, 'sequence_count': 1}
+
+======================================================================
+FAIL: test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={'editing': {'main_track_id': 'track_audio_1'}}, track_patch=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 481, in test_builtin_and_schema_reject_new_configuration_types
+    self.assertIn(expected, {e['code'] for e in report['errors']}, report)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'EDIT_CONFIGURATION_INVALID' not found in set() : {'ok': True, 'errors': [], 'warnings': [], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 0, 'required_records': 0, 'failures': [], 'warnings': [], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 0, 'sequence_count': 1}
+
+======================================================================
+FAIL: test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={'editing': {'unexpected': True}}, track_patch=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 481, in test_builtin_and_schema_reject_new_configuration_types
+    self.assertIn(expected, {e['code'] for e in report['errors']}, report)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'EDIT_CONFIGURATION_INVALID' not found in set() : {'ok': True, 'errors': [], 'warnings': [], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 0, 'required_records': 0, 'failures': [], 'warnings': [], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 0, 'sequence_count': 1}
+
+======================================================================
+FAIL: test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={'editing': []}, track_patch=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 481, in test_builtin_and_schema_reject_new_configuration_types
+    self.assertIn(expected, {e['code'] for e in report['errors']}, report)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'EDIT_CONFIGURATION_INVALID' not found in set() : {'ok': True, 'errors': [], 'warnings': [], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 0, 'required_records': 0, 'failures': [], 'warnings': [], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 0, 'sequence_count': 1}
+
+======================================================================
+FAIL: test_builtin_and_schema_reject_new_configuration_types (test_linked_edit.LinkedEditCliTests.test_builtin_and_schema_reject_new_configuration_types) (seq_patch={}, track_patch='sync_lock')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 481, in test_builtin_and_schema_reject_new_configuration_types
+    self.assertIn(expected, {e['code'] for e in report['errors']}, report)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'EDIT_CONFIGURATION_INVALID' not found in set() : {'ok': True, 'errors': [], 'warnings': [], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 0, 'required_records': 0, 'failures': [], 'warnings': [], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 0, 'sequence_count': 1}
+
+======================================================================
+FAIL: test_committed_edit_provenance_remains_local_policy_compatible (test_linked_edit.LinkedEditCliTests.test_committed_edit_provenance_remains_local_policy_compatible)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 446, in test_committed_edit_provenance_remains_local_policy_compatible
+    self.assertEqual(code, 0, dry)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'errors': [{'code': 'CLI_USAGE_ERROR'}], 'stderr': "usage: ai-ad-editor timeline [-h] {compose} ...\nai-ad-editor timeline: error: argument action: invalid choice: 'edit' (choose from compose)\n"}
+
+======================================================================
+FAIL: test_compose_can_configure_sync_and_batch_edit_then_roll_back_late_failure (test_linked_edit.LinkedEditCliTests.test_compose_can_configure_sync_and_batch_edit_then_roll_back_late_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 422, in test_compose_can_configure_sync_and_batch_edit_then_roll_back_late_failure
+    self.assertEqual(code, 0, result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'timeline.compose', 'request_id': 'req_20261017133236_e5270e28', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'ARGUMENT_INVALID', 'message': 'update_sequence.patch 支持 name/duration_tick/canvas/markers；轨道与片段通过专用操作编辑', 'path': 'patch', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T13:32:36.562968Z', 'finished_at': '2026-10-17T13:32:36.562979Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_compose_rejects_invalid_intermediate_model_before_planning (test_linked_edit.LinkedEditCliTests.test_compose_rejects_invalid_intermediate_model_before_planning)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 464, in test_compose_rejects_invalid_intermediate_model_before_planning
+    self.assertEqual(result['errors'][0]['code'], 'PROJECT_INVALID')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'ARGUMENT_INVALID' != 'PROJECT_INVALID'
+- ARGUMENT_INVALID
++ PROJECT_INVALID
+
+
+======================================================================
+FAIL: test_dry_run_is_read_only_apply_is_idempotent_and_stale_plan_rejects (test_linked_edit.LinkedEditCliTests.test_dry_run_is_read_only_apply_is_idempotent_and_stale_plan_rejects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 398, in test_dry_run_is_read_only_apply_is_idempotent_and_stale_plan_rejects
+    self.assertEqual(code, 0, result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'errors': [{'code': 'CLI_USAGE_ERROR'}], 'stderr': "usage: ai-ad-editor timeline [-h] {compose} ...\nai-ad-editor timeline: error: argument action: invalid choice: 'edit' (choose from compose)\n"}
+
+======================================================================
+FAIL: test_file_subtitle_clip_clock_moves_without_added_offset (test_linked_edit.LinkedEditCliTests.test_file_subtitle_clip_clock_moves_without_added_offset)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 329, in test_file_subtitle_clip_clock_moves_without_added_offset
+    self.assertEqual(code, 0, result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'errors': [{'code': 'CLI_USAGE_ERROR'}], 'stderr': "usage: ai-ad-editor timeline [-h] {compose} ...\nai-ad-editor timeline: error: argument action: invalid choice: 'edit' (choose from compose)\n"}
+
+======================================================================
+FAIL: test_file_subtitle_offset_survives_reverse_parent_clock (test_linked_edit.LinkedEditCliTests.test_file_subtitle_offset_survives_reverse_parent_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 339, in test_file_subtitle_offset_survives_reverse_parent_clock
+    self.assertEqual(code, 0, result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'errors': [{'code': 'CLI_USAGE_ERROR'}], 'stderr': "usage: ai-ad-editor timeline [-h] {compose} ...\nai-ad-editor timeline: error: argument action: invalid choice: 'edit' (choose from compose)\n"}
+
+======================================================================
+FAIL: test_file_subtitle_sequence_clock_is_preserved_after_repeated_moves (test_linked_edit.LinkedEditCliTests.test_file_subtitle_sequence_clock_is_preserved_after_repeated_moves)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 318, in test_file_subtitle_sequence_clock_is_preserved_after_repeated_moves
+    self.assertEqual(code, 0, result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'errors': [{'code': 'CLI_USAGE_ERROR'}], 'stderr': "usage: ai-ad-editor timeline [-h] {compose} ...\nai-ad-editor timeline: error: argument action: invalid choice: 'edit' (choose from compose)\n"}
+
+======================================================================
+FAIL: test_invalid_link_and_subtitle_offset_are_checked_without_jsonschema (test_linked_edit.LinkedEditCliTests.test_invalid_link_and_subtitle_offset_are_checked_without_jsonschema)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 381, in test_invalid_link_and_subtitle_offset_are_checked_without_jsonschema
+    self.assertTrue({'EDIT_LINK_ID_INVALID', 'SUBTITLE_ASSET_OFFSET_INVALID'} <= codes, report)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'ok': True, 'errors': [], 'warnings': [{'code': 'SCHEMA_EXECUTOR_UNAVAILABLE', 'message': '未安装 jsonschema，已使用内置语义校验', 'path': 'schema'}, {'status': 'unverified', 'code': 'RIGHTS_STATUS_BLOCKED', 'message': '状态 unverified 不允许发布', 'asset_id': 'black', 'rights_ref': 'black', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_USE_NOT_PERMITTED', 'message': '记录未允许目标用途: commercial_ad', 'asset_id': 'black', 'rights_ref': 'black', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_EVIDENCE_INCOMPLETE', 'message': '来源、许可证或证据字段缺失', 'asset_id': 'black', 'rights_ref': 'black', 'record_version': 1, 'context': 'project_asset'}], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 1, 'required_records': 1, 'failures': [], 'warnings': [{'status': 'unverified', 'code': 'RIGHTS_STATUS_BLOCKED', 'message': '状态 unverified 不允许发布', 'asset_id': 'black', 'rights_ref': 'black', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_USE_NOT_PERMITTED', 'message': '记录未允许目标用途: commercial_ad', 'asset_id': 'black', 'rights_ref': 'black', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_EVIDENCE_INCOMPLETE', 'message': '来源、许可证或证据字段缺失', 'asset_id': 'black', 'rights_ref': 'black', 'record_version': 1, 'context': 'project_asset'}], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'builtin', 'asset_count': 1, 'sequence_count': 1}
+
+======================================================================
+FAIL: test_native_exchange_preserves_links_and_external_formats_report_losses (test_linked_edit.LinkedEditCliTests.test_native_exchange_preserves_links_and_external_formats_report_losses)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 368, in test_native_exchange_preserves_links_and_external_formats_report_losses
+    self.assertTrue(any(i.get('capability') == 'timeline-editing' and i.get('status') == 'Unsupported' for i in items), report)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'report_version': '0.1.0', 'direction': 'export', 'source_format': 'agent-project/0.1.0', 'target_format': 'opentimelineio-json', 'created_at': '2026-10-17T13:32:44.034758Z', 'items': [{'capability': 'project-model', 'status': 'Mapped', 'source': 'Agent Project JSON', 'target': 'OpenTimelineIO JSON', 'detail': '使用标准 Stack/Track/Gap/Clip 节点；完整本地片段保存在 ai_ad_editor metadata'}], 'warnings': [], 'failures': []}
+
+======================================================================
+FAIL: test_nonzero_subtitle_offset_is_explicitly_lost_in_external_export (test_linked_edit.LinkedEditCliTests.test_nonzero_subtitle_offset_is_explicitly_lost_in_external_export)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 391, in test_nonzero_subtitle_offset_is_explicitly_lost_in_external_export
+    self.assertTrue(any(i.get('source') == 'subtitle.asset_time_offset_tick' and i['status'] == 'Unsupported' for i in report['items']), report)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'report_version': '0.1.0', 'direction': 'export', 'source_format': 'agent-project/0.1.0', 'target_format': 'opentimelineio-json', 'created_at': '2026-10-17T13:32:44.489624Z', 'items': [{'capability': 'project-model', 'status': 'Mapped', 'source': 'Agent Project JSON', 'target': 'OpenTimelineIO JSON', 'detail': '使用标准 Stack/Track/Gap/Clip 节点；完整本地片段保存在 ai_ad_editor metadata'}, {'capability': 'clip-features', 'status': 'Mapped', 'source': 'bg', 'target': 'bg', 'detail': '完整字段保存在 metadata.ai_ad_editor.clip；外部 OTIO 播放器只保证基础媒体时间范围，字段: subtitle'}], 'warnings': [], 'failures': []}
+
+======================================================================
+FAIL: test_save_then_operation_failure_rolls_back_project_snapshot_and_operations (test_linked_edit.LinkedEditCliTests.test_save_then_operation_failure_rolls_back_project_snapshot_and_operations)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_linked_edit.py", line 440, in test_save_then_operation_failure_rolls_back_project_snapshot_and_operations
+    with self.assertRaisesRegex(OSError, 'injected'):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: OSError not raised
+
+----------------------------------------------------------------------
+Ran 31 tests in 8.509s
+
+FAILED (failures=17, errors=36)

@@ -1,0 +1,46 @@
+{
+  "id": "L04",
+  "title": "sync opt-out",
+  "request": {
+    "action": "remove",
+    "clip_ids": [
+      "b"
+    ],
+    "options": {
+      "ripple": "main",
+      "sync": true
+    }
+  },
+  "sequence_id": "seq_main",
+  "deltas": null,
+  "expected": {
+    "a": [
+      "main",
+      0
+    ],
+    "c": [
+      "main",
+      90000
+    ],
+    "d": [
+      "main",
+      180000
+    ],
+    "bed_clip": [
+      "bed",
+      0
+    ],
+    "voice_c": [
+      "voice",
+      180000
+    ],
+    "sfx_d": [
+      "sfx",
+      180000
+    ]
+  },
+  "removed": [
+    "b"
+  ],
+  "expected_short_tick": 0
+}

@@ -56,6 +56,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 
 | 命令 | 主要输入 | 主要输出和副作用 |
 |---|---|---|
+| `timeline edit --project PATH --input REQUEST [--sequence-id ID] [--expected-project-sha256 SHA]` | link/unlink/remove/close_gap/close_gaps/shift 的整数 tick JSON 请求 | dry-run 只返回计划/候选校验；正式执行创建 before-timeline-edit 快照，在原事务中保存/记录；摘要过期拒绝，幂等重放不重复修改 |
 | `project init PATH` | 项目目录、名称和可选 ID | 创建 `project.json`、`rights-ledger.json`、`project.lock.json`、`operations/project-write.lock`、`assets/`、`renders/`、`validation/`、`history/` 等目录 |
 | `project inspect --project PATH` | 项目目录 | 项目摘要、资产/序列计数、schema 和能力提示 |
 | `project snapshot --project PATH [--label LABEL]` | 当前项目 | 在 `history/` 写入自包含项目、Rights Ledger 和锁文件快照 |

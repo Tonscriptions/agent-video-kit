@@ -1,0 +1,37 @@
+{
+  "id": "L03",
+  "title": "common sync shortfall",
+  "request": {
+    "action": "close_gap",
+    "at_tick": 180000,
+    "options": {
+      "sync": true
+    }
+  },
+  "sequence_id": "seq_main",
+  "deltas": null,
+  "expected": {
+    "a": [
+      "main",
+      0
+    ],
+    "b": [
+      "main",
+      180000
+    ],
+    "crossing": [
+      "voice",
+      45000
+    ],
+    "later": [
+      "voice",
+      225000
+    ],
+    "bed_clip": [
+      "bed",
+      0
+    ]
+  },
+  "removed": [],
+  "expected_short_tick": 90000
+}
