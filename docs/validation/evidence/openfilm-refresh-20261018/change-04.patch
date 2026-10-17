@@ -1,0 +1,374 @@
+--- fixed/apps/desktop/chat/src/App.tsx
++++ head/apps/desktop/chat/src/App.tsx
+@@ -6,24 +6,26 @@
+  * (lib/local-agent-run's saved turns).
+  */
+ import React from 'react';
+-import { ArrowDown, Coins, CornerDownLeft, LibraryBig, Loader2, Play, Plus, ShieldQuestion, Square, SquareSlash, X } from 'lucide-react';
++import { ArrowDown, Blocks, Coins, CornerDownLeft, LibraryBig, Loader2, Play, Plus, ShieldQuestion, Square, SquareSlash, X } from 'lucide-react';
+ import { buildPromptDisplay, type Turn } from '@openfilm/shared';
+-import { useT } from '@/i18n';
++import { useT, useUiLocale } from '@/i18n';
+ import { ConversationSessionBar } from '@/components/ConversationSessionBar';
+ import { ProjectConversation, primeStoredTranscript } from '@/components/ProjectConversation';
+ import { ProjectStarters } from '@/components/ProjectStarters';
++import { AttachmentPreview, type AttachmentPreviewItem } from '@/components/AttachmentPreview';
+ import { ModelPopover } from '@/components/ModelPopover';
+-import { ContextMeter } from '@/components/ContextMeter';
++import { AddSkillDialog, type PickedSkill } from '@/components/AddSkill';
+ import { CardActions, CardButton, ComposerCard } from '@/components/ComposerCard';
+ import { LocalAgentQuestionCard } from '@/components/TurnQuestionCard';
+ import { Tooltip } from '@/components/Tooltip';
+ import { StickToBottomContext, useStickToBottom, useTailSpacer } from '@/components/useStickToBottom';
+-import { PromptEditor, PromptPill, PromptPillHoverContext, PromptPillRevealContext, fileReferenceId, fileReferencePath, promptReferenceToken, resolvePromptReferences, splitPromptReferenceText, type MentionProvider, type PromptEditorHandle, type PromptEditorState, type PromptPillHover, type PromptReference } from '@/components/prompt-editor';
++import { PromptEditor, PromptPill, PromptPillHoverContext, PromptPillRevealContext, activatedSkillIds, fileReferenceId, fileReferencePath, promptReferenceToken, resolvePromptReferences, skillReferenceId, skillReferencePackage, splitPromptReferenceText, type MentionProvider, type PromptEditorHandle, type PromptEditorState, type PromptPillHover, type PromptReference } from '@/components/prompt-editor';
+ import { filesFromTransfer, transferHasFiles } from '@/lib/composer-attachments';
+ import { attachmentIcon } from '@/lib/project-resources';
+ import { attachedPictures, attachedText, attachmentBlocker, formatFileSize, turnAttachments, useDesktopAttachments } from '@/lib/desktop-attachments';
+ import { deriveProjectTurns } from '@/lib/project-versions';
+ import { makePlaceholder, mergeAssetLists } from '@/lib/asset-lists';
++import { isEmptyBackgroundTurn } from '@/lib/unprompted';
+ import {
+   answerLocalAgentPermission,
+   answerLocalAgentQuestion,
+@@ -61,7 +63,7 @@
+ import { loadLastSession, loadSessions, newSession, saveLastSession, saveSessions } from '@/lib/local-sessions';
+ import type { ProjectSessionItem } from '@/lib/project-sessions';
+ import type { TranscriptItem } from '@/lib/agent-transcript';
+-import { app, type FfmpegState, type Project, type StudioRef, type StudioSelection } from './app-bridge';
++import { app, type FfmpegState, type Project, type SkillListing, type StudioRef, type StudioSelection } from './app-bridge';
+ import { Divider } from './components/Divider';
+ import { draftRefs, pillCard, refFromPill, refPill, sameStudioThing, selectionMoment, selectionRange, selectionRefs, studioReferencesText } from './studio-refs';
+ import { inChat } from './lib/chat-layer';
+@@ -75,8 +77,14 @@
+ 
+ /** how often a running turn is kept, at most (it changes with every word) */
+ const KEEP_RUNNING_MS = 1500;
++/** how full the agent's context gets before the chat says a new conversation would work better */
++const CONTEXT_NOTICE_SHARE = 0.85;
+ 
+ /** On a video's thumbnail: it plays, it is not a picture. */
++/* between the chat's root (the add-skill dialog) and the project's chat: a skill added, a skill to make */
++const SKILLS_CHANGED = 'openfilm:skills-changed';
++const MAKE_SKILL = 'openfilm:make-skill';
++
+ function PlayMark() {
+   return (
+     <span aria-hidden className="pointer-events-none absolute inset-0 m-auto flex h-4 w-4 items-center justify-center rounded-full bg-black/55">
+@@ -110,6 +118,11 @@
+     return () => { for (const stop of stops) stop(); };
+   }, []);
+ 
++  /* "Add a skill" in the examples (on a project or a new tab's launcher): its dialog, here at the root so it opens on
++     either; naming the one added and making one with the agent only where a project's chat is */
++  const [addingSkill, setAddingSkill] = React.useState(false);
++  React.useEffect(() => app.onAddSkill?.(() => setAddingSkill(true)), []);
++
+   /* the project's chat record, read from its folder before its conversation shows */
+   const chatReady = useProjectChat(project);
+   const ffState = typeof ffmpeg === 'object' && ffmpeg ? ffmpeg : null;
+@@ -124,8 +137,14 @@
+     </>
+   );
+ 
++  const onProject = Boolean(project) && /^\/projects\//.test(location.pathname);
+   return (
+     <div className={`relative flex h-full flex-col ${assetsOpen ? '' : 'bg-[var(--dock-shell)]'}`}>
++      {addingSkill ? (
++        <AddSkillDialog onClose={() => setAddingSkill(false)} onAdded={async () => { window.dispatchEvent(new Event(SKILLS_CHANGED)); }}
++          onPick={onProject ? (skill) => app.useSkill?.(skill) : undefined}
++          onMake={onProject ? () => window.dispatchEvent(new Event(MAKE_SKILL)) : undefined} />
++      ) : null}
+       {/* under Studio's top bar (it runs over this, across the window): the seam on the left is the handle */}
+       <Divider />
+       <div className="mb-[6px] ml-[6px] mr-[6px] flex min-h-0 flex-1 flex-col">
+@@ -182,7 +201,10 @@
+     const done: Turn = { ...(meta.turn as Turn), ...patch, updatedAt: new Date().toISOString() };
+     primeStoredTranscript(id, turn.items);
+     saveLocalAgentTurn(meta.projectId, done, turn.items);
+-    setTurns((list) => list.map((item) => (item.id === id ? { ...item, ...patch, updatedAt: done.updatedAt } : item)));
++    /* a turn the agent started by itself that ended with nothing in it leaves no line behind */
++    setTurns((list) => (isEmptyBackgroundTurn(done, turn.items)
++      ? list.filter((item) => item.id !== id)
++      : list.map((item) => (item.id === id ? { ...item, ...patch, updatedAt: done.updatedAt } : item))));
+     return done;
+   }
+ 
+@@ -259,6 +281,8 @@
+   const [queued, setQueued] = React.useState(false);
+   const [followUpError, setFollowUpError] = React.useState<string | null>(null);
+   const composerFiles = useDesktopAttachments();
++  /* a file of the message being written, opened to look at */
++  const [openedFile, setOpenedFile] = React.useState<AttachmentPreviewItem | null>(null);
+   const attachInputRef = React.useRef<HTMLInputElement>(null);
+   const [dropping, setDropping] = React.useState(false);
+   /** files of the project pointed at with @ (their pills turn back into their paths when sent) */
+@@ -266,9 +290,11 @@
+   const followUpFilled = followUp.trim().length > 0;
+   /* the composer's button stops the turn while it runs, until something is written to send */
+   const stopping = active && !followUpFilled;
++  /** skills named with the Skills button or `/` (each pill turns into the skill's name, its SKILL.md after the message) */
++  const [skillRefs, setSkillRefs] = React.useState<PromptReference[]>([]);
+   const composerPills = React.useMemo(
+-    () => [...[...studioRefs.entries()].map(([id, ref]) => refPill(id, ref)), ...fileRefs],
+-    [studioRefs, fileRefs],
++    () => [...[...studioRefs.entries()].map(([id, ref]) => refPill(id, ref)), ...fileRefs, ...skillRefs],
++    [studioRefs, fileRefs, skillRefs],
+   );
+ 
+   /* ── the @ menu: this moment in Studio, and the project's files (asked for when the menu opens) ── */
+@@ -295,16 +321,81 @@
+     });
+     return pills;
+   }, []);
+-  /* how full the agent's context is in this conversation */
++  /* how full the agent's context is in this conversation: said only once it is nearly full */
+   const agentContext = useAgentContext(projectKey, sessionId, agent);
+-  /* the agent's own commands, a `/` at the start of the message, as in its own chat: they go as typed */
++  const [contextNoticeOff, setContextNoticeOff] = React.useState<string | null>(null);
++  const contextFull = Boolean(agentContext && agentContext.size > 0 && agentContext.used / agentContext.size >= CONTEXT_NOTICE_SHARE) && contextNoticeOff !== sessionId;
++
++  /* the skills this message can name (the Skills button, and `/`) */
++  const [skillListing, setSkillListing] = React.useState<SkillListing | null>(null);
++  const reloadSkills = React.useCallback(async () => {
++    const next = await app.skills?.list(project.path, agent).catch(() => null);
++    if (next) setSkillListing(next);
++  }, [project.path, agent]);
++  React.useEffect(() => { void reloadSkills(); }, [reloadSkills]);
++  /* a skill as people see it, in the language shown: its title, and what its page says (none: its name and the
++     agent's description) */
++  const locale = useUiLocale();
++  const skillWords = React.useCallback((name: string, description = '') => {
++    const shown = skillListing?.openfilm.find((s) => s.name === name)?.shown;
++    const pick = (words?: Record<string, string>) => (words ? words[locale] ?? words[locale.split('-')[0]!] ?? words.en ?? Object.values(words)[0] : undefined);
++    const summary = pick(shown?.summary);
++    return {
++      title: pick(shown?.title) ?? name,
++      summary: summary ?? description,
++      text: shown ? [summary, ...(pick(shown.details)?.split('\n') ?? [])].filter((w): w is string => Boolean(w)) : description ? [description] : [],
++    };
++  }, [skillListing, locale]);
++  const skillPill = React.useCallback((skill: PickedSkill): PromptReference => {
++    /* its title alone: what it does is in its hover card */
++    const pill: PromptReference = { id: skillReferenceId(skill.name), kind: 'skill', label: skillWords(skill.name, skill.description).title };
++    setSkillRefs((list) => (list.some((p) => p.id === pill.id) ? list : [...list, pill]));
++    return pill;
++  }, [skillWords]);
++  const pickSkill = React.useCallback((skill: PickedSkill) => {
++    const pill = skillPill(skill);
++    requestAnimationFrame(() => { composerRef.current?.insertReference(pill); composerRef.current?.focus(); });
++  }, [skillPill]);
++  /* the skills a message can name: OpenFilm's, and of the agent's own those it has (let in, or all when it cannot be told) */
++  const nameableSkills = React.useMemo(() => [
++    ...(skillListing?.openfilm ?? []),
++    ...(skillListing?.own.skills ?? []).filter((s) => !skillListing?.own.filtered || s.allowed),
++  ], [skillListing]);
++  /* a skill picked in the examples (Studio's, over the film): named in the message; "Add a skill" there: its dialog */
++  React.useEffect(() => app.onUseSkill?.((skill) => pickSkill(skill)), [pickSkill]);
++  /* a skill added from the examples (AddSkillDialog, at the chat's root): the list read again; "make one with the
++     agent" there: its message put in the composer */
++  React.useEffect(() => {
++    const changed = () => { void reloadSkills(); };
++    const make = () => { composerRef.current?.setText(t('skills.makePrompt').replace('{folder}', skillListing?.mine ?? '')); composerRef.current?.focus(); };
++    window.addEventListener(SKILLS_CHANGED, changed);
++    window.addEventListener(MAKE_SKILL, make);
++    return () => { window.removeEventListener(SKILLS_CHANGED, changed); window.removeEventListener(MAKE_SKILL, make); };
++  }, [reloadSkills, skillListing, t]);
++  /* the agent's own skills hidden in OpenFilm: not offered among its commands either */
++  const hiddenSkills = React.useMemo(() => new Set((skillListing?.own.filtered ? skillListing.own.skills.filter((s) => !s.allowed) : []).map((s) => s.name)), [skillListing]);
++
++  /* the agent's own commands, a `/` at the start of the message, as in its own chat: they go as typed; above them, the
++     skills, each a pill */
+   const agentCommands = useAgentCommands(agent);
+-  const commandMenu = React.useMemo(() => (agentCommands.length ? {
++  const commandMenu = React.useMemo(() => (agentCommands.length || nameableSkills.length ? {
+     label: t('composer.commands'),
+-    providers: [{
++    providers: [...(nameableSkills.length ? [{
++      id: 'skills',
++      groupLabel: t('skills.button'),
++      items: nameableSkills.map((skill) => ({
++        id: skillReferenceId(skill.name),
++        kind: 'skill' as const,
++        icon: Blocks,
++        label: skillWords(skill.name).title,
++        ...(skillWords(skill.name, skill.description).summary ? { detail: skillWords(skill.name, skill.description).summary, describes: true } : {}),
++        keywords: [skill.name, skillWords(skill.name).title],
++        select: () => skillPill(skill),
++      })),
++    }] : []), ...(agentCommands.length ? [{
+       id: 'commands',
+       groupLabel: t('composer.commands'),
+-      items: agentCommands.map((c) => ({
++      items: agentCommands.filter((c) => !hiddenSkills.has(c.name)).map((c) => ({
+         id: `command:${c.name}`,
+         kind: 'file' as const,
+         icon: SquareSlash,
+@@ -315,8 +406,8 @@
+         keywords: [c.name],
+         select: () => ({ text: `/${c.name}` }),
+       })),
+-    }],
+-  } : undefined), [agentCommands, t]);
++    }] : [])],
++  } : undefined), [agentCommands, nameableSkills, hiddenSkills, skillPill, skillWords, t]);
+   const mentionProviders = React.useMemo<MentionProvider[]>(() => {
+     const picked = selection?.refs ?? [];
+     const range = selection ? selectionRange(selection) : null;
+@@ -392,8 +483,19 @@
+   };
+ 
+   /* a pill's hover card, in the composer and in what was sent; clicking one there takes the person to it in Studio */
+-  const describePill = React.useCallback((pill: { id: string; label: string; target?: Record<string, unknown> }) => pillCard(pill, t), [t]);
++  const describePill = React.useCallback((pill: { id: string; label: string; target?: Record<string, unknown> }) => {
++    const name = skillReferencePackage(pill.id);
++    if (name) {
++      const skill = nameableSkills.find((s) => s.name === name);
++      const words = skillWords(name, skill?.description);
++      return { title: words.title, rows: [], text: words.text };
++    }
++    return pillCard(pill, t);
++  }, [t, nameableSkills, skillWords]);
+   const revealPill = React.useCallback((pill: { id: string; label: string; target?: Record<string, unknown> }) => {
++    /* a skill: its page in the Community; anything else: where it is in Studio */
++    const name = skillReferencePackage(pill.id);
++    if (name) { app.showExamples?.({ kind: 'skill', name }); return; }
+     const ref = refFromPill(pill);
+     if (ref) app.showInStudio(ref);
+   }, []);
+@@ -451,7 +553,11 @@
+     if (projectId !== projectKey) return null;
+     const id = makeLocalAgentTurnId();
+     const opened = openTurnNow.current(id, '', null, [], { conversation, by, origin: 'background' });
+-    return { turn: opened.turn, meta: opened.meta, done: () => settlers.current.get(id)?.({ status: 'ready' }) };
++    return {
++      turn: opened.turn,
++      meta: opened.meta,
++      done: (outcome) => settlers.current.get(id)?.(outcome === 'cancelled' ? { status: 'cancelled', cancelReason: 'user' } : { status: 'ready' }),
++    };
+   }), [projectKey]);
+ 
+   /**
+@@ -595,7 +701,9 @@
+       if (!ref) return null;
+       used[index - 1] = ref;
+       return `[${index}: ${refPill(pillId, ref).label}]`;
+-    }).trim();
++    }, (pillId) => { const name = skillReferencePackage(pillId); return name ? `skill “${name}”` : null; }).trim();
++    /* the skills it names: each one's SKILL.md follows the message, for the agent to read */
++    const skillNames = activatedSkillIds(followUpRefs);
+     if (!instruction) return;
+     const blocker = attachmentBlocker(composerFiles.files);
+     if (blocker) { setFollowUpError(blocker); return; }
+@@ -607,14 +715,22 @@
+     setFollowUpRefs([]);
+     setStudioRefs(new Map());
+     setFileRefs([]);
++    setSkillRefs([]);
+     const files = composerFiles.take();
+     const id = makeLocalAgentTurnId();
+     const said = instruction + attachedText(files);
+     const refs = used.filter(Boolean);
+     const stage = selection?.stage ?? null;
+     /* each reference's picture is kept in the project for the agent (the block names it), and sent to one that takes pictures */
+-    const prepared = referencePictures(refs, { project: project.path, turnId: id })
+-      .then(({ pictures, images }) => ({ text: said + studioReferencesText(refs, { stage, pictures }), images: [...attachedPictures(files), ...images] }));
++    const skillTexts = skillNames.length ? (app.skills?.texts(project.path, agent, skillNames).catch(() => []) ?? Promise.resolve([])) : Promise.resolve([]);
++    /* an example pointed at: its folder fetched now if it is not yet (the turn waits, as it waits for its reply) */
++    const withFolders = Promise.all(refs.map(async (ref) => (ref.kind === 'example' && !ref.folder
++      ? { ...ref, folder: await app.exampleFolder?.(ref.id).catch(() => undefined) } : ref)));
++    const prepared = withFolders.then((ready) => Promise.all([referencePictures(ready, { project: project.path, turnId: id }), skillTexts])
++      .then(([{ pictures, images }, skills]) => ({
++        text: said + studioReferencesText(ready, { stage, pictures }) + skills.map((s) => `\n\n${s.text}`).join(''),
++        images: [...attachedPictures(files), ...images],
++      })));
+     const opened = openTurn(id, instruction, promptDisplay ?? null, turnAttachments(files));
+     if (steer && asset) steerTurn(asset.id, opened, prepared);
+     else runTurn(opened, prepared);
+@@ -639,6 +755,15 @@
+ 
+   const editComposerCard = (
+     <div className="flex flex-col gap-1">
++      {contextFull ? (
++        <div className="flex items-center gap-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] py-1.5 pl-3 pr-1.5 text-[12px] text-[var(--text-muted)]">
++          <span className="min-w-0 flex-1">{t('composer.contextFull')}</span>
++          <button type="button" onClick={onNewSession}
++            className="h-6 shrink-0 rounded-[6px] px-2 text-[12px] font-medium text-[var(--text)] transition hover:bg-[var(--bg-hover)]">{t('composer.contextFullNew')}</button>
++          <button type="button" onClick={() => setContextNoticeOff(sessionId)} aria-label={t('project.close')}
++            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] text-[var(--text-faint)] transition hover:bg-[var(--bg-hover)] hover:text-[var(--text)]"><X size={12} /></button>
++        </div>
++      ) : null}
+       <div
+         /* a file from the disk dropped on the card is brought along (it goes into the project); Studio's things
+            dropped on it become pills */
+@@ -676,7 +801,8 @@
+         }`}
+       >
+         {composerFiles.files.length > 0 && (
+-          <div className="flex max-h-[76px] flex-wrap gap-1.5 overflow-y-auto px-3.5 pt-3">
++          /* whole rows: up to three show at once (a message's twelve files fit in two), only more than that scrolls */
++          <div className="flex max-h-[144px] flex-wrap gap-1.5 overflow-y-auto px-3.5 pt-3">
+             {composerFiles.files.map((file) => {
+               const Icon = attachmentIcon({ name: file.name, mediaType: file.mediaType });
+               const remove = (
+@@ -693,17 +819,25 @@
+               const busy = file.state === 'importing' ? <Loader2 size={12} className="absolute inset-0 m-auto animate-spin text-white drop-shadow" /> : null;
+               /* a picture shows itself; a video, a frame of itself with a play mark (once one is had) */
+               const picture = file.kind === 'image' ? file.previewUrl : file.thumb;
++              /* clicked, it opens to look at: a picture large, a video played, a text read */
++              const open = file.previewUrl ? {
++                role: 'button' as const,
++                tabIndex: 0,
++                'aria-label': t('composer.openAttachment').replace('{name}', file.name),
++                onClick: () => setOpenedFile({ name: file.name, kind: file.kind, url: file.previewUrl!, ...(file.mediaType ? { mediaType: file.mediaType } : {}) }),
++                onKeyDown: (event: React.KeyboardEvent) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); (event.currentTarget as HTMLElement).click(); } },
++              } : {};
+               return picture ? (
+-                <div key={file.id} title={file.error ?? file.name}
+-                  className={`group relative h-10 w-10 overflow-hidden rounded-[8px] border bg-[var(--surface-2)] transition ${file.state === 'failed' ? 'border-[var(--danger)]' : 'border-[var(--border)] hover:border-[var(--border-strong)]'}`}>
++                <div key={file.id} title={file.error ?? file.name} {...open}
++                  className={`group relative h-10 w-10 overflow-hidden rounded-[8px] border bg-[var(--surface-2)] transition ${file.previewUrl ? 'cursor-pointer' : ''} ${file.state === 'failed' ? 'border-[var(--danger)]' : 'border-[var(--border)] hover:border-[var(--border-strong)]'}`}>
+                   <img src={picture} alt={file.name} className={`h-full w-full object-cover transition ${file.state === 'ready' ? '' : 'opacity-45'}`} />
+                   {file.kind !== 'image' && !busy ? <PlayMark /> : null}
+                   {busy}
+                   {remove}
+                 </div>
+               ) : (
+-                <div key={file.id} title={file.error ?? file.name}
+-                  className={`group relative flex h-10 min-w-0 max-w-[150px] items-center gap-1.5 overflow-hidden rounded-[8px] border bg-[var(--surface-2)] py-1 pl-2 pr-5 transition ${file.state === 'failed' ? 'border-[var(--danger)]' : 'border-[var(--border)] hover:border-[var(--border-strong)]'}`}>
++                <div key={file.id} title={file.error ?? file.name} {...open}
++                  className={`group relative flex h-10 min-w-0 max-w-[150px] items-center gap-1.5 overflow-hidden rounded-[8px] border bg-[var(--surface-2)] py-1 pl-2 pr-5 transition ${file.previewUrl ? 'cursor-pointer' : ''} ${file.state === 'failed' ? 'border-[var(--danger)]' : 'border-[var(--border)] hover:border-[var(--border-strong)]'}`}>
+                   {file.state === 'importing' ? <Loader2 size={13} className="shrink-0 animate-spin text-[var(--text-muted)]" /> : <Icon size={13} className="shrink-0 text-[var(--text-muted)]" />}
+                   <span className="flex min-w-0 flex-col">
+                     <span className="truncate text-[11.5px] leading-tight text-[var(--text-muted)]">{file.name}</span>
+@@ -715,6 +849,7 @@
+             })}
+           </div>
+         )}
++        {openedFile ? <AttachmentPreview item={openedFile} onClose={() => setOpenedFile(null)} /> : null}
+         <div className="flex items-end gap-1 py-2.5 pl-3.5 pr-2">
+           <div className="min-w-0 flex-1">
+             <PromptEditor
+@@ -754,7 +889,6 @@
+       <div className="flex items-center gap-0.5 px-0.5">
+         <ModelPopover placement="top" align="start" />
+         <div className="min-w-0 flex-1" />
+-        <ContextMeter context={agentContext} />
+         <input
+           ref={attachInputRef}
+           type="file"
+@@ -767,6 +901,14 @@
+             <Plus size={16} strokeWidth={1.75} />
+           </button>
+         </Tooltip>
++        {app.showExamples ? (
++          <Tooltip label={t('community.tooltip')}>
++            <button type="button" onClick={() => app.showExamples?.()} className="openfilm-composer-tool" aria-label={t('community.button')}>
++              <Blocks size={16} strokeWidth={1.75} />
++            </button>
++          </Tooltip>
++        ) : null}
++
+         <Tooltip label={t('project.assets')}>
+           <button type="button" onClick={() => app.setAssetsOpen(!assetsOpen)} aria-pressed={assetsOpen} className="openfilm-composer-tool" aria-label={t('project.assets')}>
+             <LibraryBig size={16} strokeWidth={1.75} />

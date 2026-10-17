@@ -1,0 +1,106 @@
+{
+  "source_times": [
+    [
+      3,
+      5
+    ],
+    [
+      3.5,
+      4.5
+    ]
+  ],
+  "library_path": "saved/本地片头组",
+  "bundle": {
+    "clips": [
+      {
+        "track": 0,
+        "at": 0,
+        "clip": {
+          "src": "saved/本地片头组/pages/title.html",
+          "time": [
+            0,
+            2
+          ],
+          "attrs": {
+            "data-link": "pair"
+          }
+        }
+      },
+      {
+        "track": 1,
+        "at": 0.5,
+        "clip": {
+          "src": "saved/本地片头组/assets/logo.svg",
+          "time": [
+            0,
+            1
+          ],
+          "attrs": {
+            "data-link": "pair"
+          }
+        }
+      }
+    ]
+  },
+  "model": [
+    {
+      "index": 0,
+      "clips": [
+        {
+          "id": "existing",
+          "link": "saved-pair",
+          "startMs": 0,
+          "endMs": 1000,
+          "inMs": 0,
+          "speed": 1,
+          "sourceMs": 1000
+        }
+      ]
+    }
+  ],
+  "ops": [
+    {
+      "op": "insert",
+      "clip": {
+        "src": "saved/本地片头组/pages/title.html",
+        "time": [
+          0,
+          2
+        ],
+        "attrs": {
+          "data-link": "pair"
+        }
+      },
+      "at": 1.125,
+      "track": {
+        "insert": 2
+      },
+      "link": "saved-pair-2"
+    },
+    {
+      "op": "insert",
+      "clip": {
+        "src": "saved/本地片头组/assets/logo.svg",
+        "time": [
+          0,
+          1
+        ],
+        "attrs": {
+          "data-link": "pair"
+        }
+      },
+      "at": 1.625,
+      "track": {
+        "insert": 3
+      },
+      "link": "saved-pair-2"
+    }
+  ],
+  "checks": {
+    "independent_copy": true,
+    "relative_offsets": true,
+    "new_link_identity": true,
+    "files_preserve_source_bytes": true
+  },
+  "note": "Data and file-copy check; SVG/HTML not rendered; no audiovisual or rights claim."
+}

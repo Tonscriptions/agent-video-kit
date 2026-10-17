@@ -1,0 +1,30 @@
+--- fixed/apps/desktop/chat/src/components/ModelPopover.tsx
++++ head/apps/desktop/chat/src/components/ModelPopover.tsx
+@@ -38,6 +38,12 @@
+ const ROW = `${ROW_BASE} hover:bg-[var(--bg-hover)] focus-visible:bg-[var(--bg-hover)]`;
+ 
+ type Option = { id: string; name: string; category?: string; options?: Array<{ value: unknown; name: string; description?: string }> };
++
++/** Why the agent could not be started for its settings, as it said, on a few lines; none when it started and offered none. */
++function failureReason(error: { text: string } | undefined): string | null {
++  if (!error || error.text === 'no options') return null;
++  return error.text.replace(/\s+/g, ' ').trim().slice(0, 400) || null;
++}
+ 
+ /** The options the menu offers, in this order: the model, the reasoning effort, the speed (when the model has one). */
+ const isSpeed = (o: Option) => o.category === 'speed' || /^(fast|fast-mode|speed)$/i.test(o.id) || /\b(fast|speed)\b/i.test(o.name);
+@@ -227,7 +233,13 @@
+             ) : rows.length === 0 && options && !la.optionsError[agent] ? null : rows.length === 0 ? (
+               <p className="px-2.5 py-1.5 text-[12px] leading-relaxed text-[var(--text-muted)]">
+                 {la.optionsError[agent]
+-                  ? <>{t('composer.agentOptionsFailed')} <button type="button" onMouseDown={keepFocus} onClick={() => void la.ensureOptions(agent, { retry: true })} className="text-[var(--text)] underline underline-offset-2">{t('project.retry')}</button></>
++                  ? <>
++                    {la.optionsError[agent]?.code === 'outdated' ? t('composer.agentOutdated') : t('composer.agentOptionsFailed')} <button type="button" onMouseDown={keepFocus} onClick={() => void la.ensureOptions(agent, { retry: true })} className="text-[var(--text)] underline underline-offset-2">{t('project.retry')}</button>
++                    {/* what the agent said, so the person can fix it (a setting it cannot read) or tell us */}
++                    {failureReason(la.optionsError[agent]) ? (
++                      <span className="mt-1 line-clamp-4 block select-text break-words text-[11.5px] text-[var(--text-faint)]" title={la.optionsError[agent]?.text}>{failureReason(la.optionsError[agent])}</span>
++                    ) : null}
++                  </>
+                   : t('composer.agentLoading')}
+               </p>
+             ) : rows.map((o, i) => (

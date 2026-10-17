@@ -1,0 +1,20 @@
+--- fixed/packages/openfilm/studio/server/projects.test.mjs
++++ head/packages/openfilm/studio/server/projects.test.mjs
+@@ -46,6 +46,17 @@
+   const two = await createProject();
+   assert.deepEqual([one.name, two.name], ['Untitled', 'Untitled 2']);
+   assert.ok(one.path.startsWith(join(realpathSync(scratch), 'library')));
++});
++
++test('new projects go to the folder chosen in Settings; those made before stay where they are', async () => {
++  const before = await createProject('Before');
++  mkdirSync(process.env.OPENFILM_HOME, { recursive: true });
++  writeFileSync(join(process.env.OPENFILM_HOME, 'prefs.json'), JSON.stringify({ projectsFolder: join(scratch, 'D', 'OpenFilm', 'Projects') }));
++  const after = await createProject('After');
++  assert.ok(after.path.startsWith(join(realpathSync(scratch), 'D', 'OpenFilm', 'Projects')), after.path);
++  const listed = await listProjects();
++  assert.equal(listed.find((p) => p.id === before.id)?.path, before.path, 'the one made before is listed where it is');
++  assert.equal(listed.find((p) => p.id === before.id)?.missing, false);
+ });
+ 
+ test('one folder is one project, however its path reaches it', { skip: process.platform === 'win32' }, async () => {

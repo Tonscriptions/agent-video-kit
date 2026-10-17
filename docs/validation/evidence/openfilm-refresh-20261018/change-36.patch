@@ -1,0 +1,471 @@
+--- fixed/apps/desktop/src/main.mjs
++++ head/apps/desktop/src/main.mjs
+@@ -1,5 +1,7 @@
+ /**
+- * OpenFilm for desktop: one window, Studio on the left and a chat on the right, one page.
++ * OpenFilm for desktop: one window of tabs, a project in each, Studio on the left and a chat on the right, one page
++ * per tab (tabs.mjs). A project is picked in Studio's projects window (the tabs' `+`), and its tab opens; with no tab
++ * open, the window's page is the projects (HOME).
+  *
+  * Studio is the open-source one (the `openfilm` package), run in a utility process (studio.mjs). It serves the
+  * window's page: Studio's editor, built together with the chat beside it (shell/), on Studio's own origin, so the
+@@ -9,7 +11,7 @@
+  */
+ import { BaseWindow, Menu, WebContentsView, app, dialog, ipcMain, nativeTheme, safeStorage, screen, shell } from 'electron';
+ import { appendFileSync, createReadStream, existsSync, mkdirSync, statSync } from 'node:fs';
+-import { basename, join } from 'node:path';
++import { basename, dirname, join } from 'node:path';
+ import { Readable } from 'node:stream';
+ import { fileURLToPath } from 'node:url';
+ import { FLAVOR, IDENTITY, PRODUCT_NAME } from './flavor.mjs';
+@@ -19,7 +21,8 @@
+ import { CHAT_MIN, STUDIO_MIN, WINDOW_MIN, placeOnDisplays, readWindowState, writeWindowState } from './window-state.mjs';
+ import { applicationMenu } from './menu.mjs';
+ import { registerLocalAgentIpc } from './local-agents-ipc.mjs';
+-import { registerChatIpc } from './chat-ipc.mjs';
++import { readPreferences, registerChatIpc } from './chat-ipc.mjs';
++import { registerSkillsIpc } from './skills-ipc.mjs';
+ import { createRoster } from './agent-roster.mjs';
+ import { checkAgentProgram, diagnoseAgent, listAgents, openAgentSignIn, setChosenPaths } from './agents.mjs';
+ import { agentUsage, forgetAgentUsage } from './agent-usage.mjs';
+@@ -27,6 +30,7 @@
+ import { startUpdates } from './updates.mjs';
+ import { ensureFfmpeg, ffmpegDir, ffmpegDownloadable, ffmpegIn, ffmpegOnPath } from './ffmpeg-runtime.mjs';
+ import { PATH_SEP } from './environment.mjs';
++import { createTabs } from './tabs.mjs';
+ 
+ const here = (path) => fileURLToPath(new URL(path, import.meta.url));
+ const mac = process.platform === 'darwin';
+@@ -57,8 +61,19 @@
+ 
+ /** @type {BaseWindow | null} */
+ let win = null;
+-/** @type {WebContentsView | null} */
+-let view = null;
++/** @type {ReturnType<typeof createTabs> | null} */
++let tabs = null;
++/** the page of each tab that has one (a tab left behind long enough has none until it is shown again) */
++/** @type {Map<string, WebContentsView>} */
++const views = new Map();
++/** the page in front */
++const activeView = () => (tabs ? views.get(tabs.activeId() ?? HOME) ?? null : null);
++/** something every page is told (the theme, an update, the agents…) */
++const broadcast = (channel, value) => { for (const v of views.values()) if (!v.webContents.isDestroyed()) v.webContents.send(channel, value); };
++/** the tab whose page this is, or null */
++const tabOf = (contents) => { for (const [id, v] of views) if (v.webContents === contents) return id; return null; };
++/** a tab behind for this long lets its page go (it comes back when shown), unless an agent works in it or it exports */
++const IDLE_PAGE_MS = 5 * 60_000;
+ /** @type {Awaited<ReturnType<typeof startWindowStudio>> | null} */
+ let studio = null;
+ let state = readWindowState(DATA);
+@@ -67,7 +82,7 @@
+ let ffmpegFound = null;
+ /** ffmpeg is being downloaded (ffmpeg-runtime.mjs): Studio's "not found" at its start is not the last word */
+ let ffmpegFetching = false;
+-const tellFfmpeg = (state) => { ffmpegFound = state; view?.webContents.send('desktop:ffmpeg', state); };
++const tellFfmpeg = (state) => { ffmpegFound = state; broadcast('desktop:ffmpeg', state); };
+ /** @type {ReturnType<typeof startUpdates> | null} */
+ let updates = null;
+ let quitting = false;
+@@ -86,17 +101,17 @@
+   win.focus();
+ }
+ 
+-/** The page fills the window. */
++/** Each page fills the window (only the one in front shows). */
+ function layout() {
+-  if (!win || !view) return;
++  if (!win) return;
+   const { width, height } = win.getContentBounds();
+-  view.setBounds({ x: 0, y: 0, width, height });
++  for (const v of views.values()) v.setBounds({ x: 0, y: 0, width, height });
+ }
+ 
+ function saveState() {
+   if (!win) return;
+   const maximized = win.isMaximized() || win.isFullScreen();
+-  state = { ...state, maximized, bounds: maximized ? state.bounds : win.getNormalBounds() };
++  state = { ...state, maximized, bounds: maximized ? state.bounds : win.getNormalBounds(), ...(tabs ? { tabs: tabs.saved() } : {}) };
+   try { writeWindowState(DATA, state); } catch { /* kept until next time */ }
+ }
+ 
+@@ -114,8 +129,137 @@
+   contents.on('will-attach-webview', (event) => event.preventDefault());
+ }
+ 
+-/** IPC only from the page's own main frame. */
+-const fromPage = (event) => Boolean(view) && event.sender === view.webContents && event.senderFrame === view.webContents.mainFrame;
++/** IPC only from a tab's page, its own main frame. */
++const fromPage = (event) => tabOf(event.sender) != null && event.senderFrame === event.sender.mainFrame;
++
++/** A page for a tab: Studio's editor at its project (or its launcher), on Studio's origin. */
++function makeView(tabId) {
++  const v = new WebContentsView({
++    webPreferences: {
++      preload: here('./preload.cjs'),
++      contextIsolation: true,
++      sandbox: true,
++      nodeIntegration: false,
++      spellcheck: true,
++      autoplayPolicy: 'no-user-gesture-required',
++      devTools: !app.isPackaged,
++    },
++  });
++  v.setBackgroundColor(BACKGROUND[theme]);
++  views.set(tabId, v);
++  win.contentView.addChildView(v);
++  const { width, height } = win.getContentBounds();
++  v.setBounds({ x: 0, y: 0, width, height });
++  guard(v.webContents, (url) => Boolean(studio) && url.startsWith(`${studio.origin}/`));
++  /* what went wrong with the page, for the log (logs/studio.log) */
++  v.webContents.on('render-process-gone', (_event, details) => log(`page: renderer gone (${details.reason}, ${details.exitCode})\n`));
++  v.webContents.on('did-fail-load', (_event, code, description, url, mainFrame) => { if (mainFrame) log(`page: ${description} (${code}) loading ${url.replace(/key=[^&]+/, 'key=…')}\n`); });
++  v.webContents.on('unresponsive', () => log('page: not responding\n'));
++  /* the page gone (a crash): it comes back where it was; the agents' turns go on in this process meanwhile */
++  v.webContents.on('render-process-gone', (_event, details) => { if (details.reason !== 'clean-exit' && !quitting) setTimeout(() => { if (!v.webContents.isDestroyed()) v.webContents.reload(); }, 500); });
++  return v;
++}
++
++/** The page shown when no tab is open: Studio's projects (`/` with tabs). */
++const HOME = 'home';
++/** Where a tab's page opens: its project (no tab: the projects). */
++const pageAddress = (tab, path = null) => `${studio.origin}/open?key=${studio.key}&to=${encodeURIComponent(path ?? (tab ? `/projects/${encodeURIComponent(tab.projectId)}` : '/'))}`;
++
++/** Every page told of the tabs as they are now; kept for next time. */
++function tellTabs() {
++  if (!tabs) return;
++  broadcast('desktop:tabs', tabs.list());
++  saveState();
++}
++
++/** Show a page: a tab's (made again when it has none), or HOME. Once a tab shows, HOME's page goes. */
++function showPage(id) {
++  if (!win || !studio) return;
++  let v = views.get(id);
++  if (!v) { v = makeView(id); void v.webContents.loadURL(pageAddress(id === HOME ? null : tabs?.get(id))); }
++  for (const [other, page] of views) page.setVisible(other === id);
++  v.webContents.focus();
++  if (id !== HOME) dropView(HOME);
++}
++
++/** Bring a tab to the front. */
++function showTab(id) {
++  if (!tabs || !tabs.activate(id)) return;
++  showPage(id);
++  tellTabs();
++}
++
++/** A project's tab (in front if it is open already). */
++function newTab(projectId) {
++  if (!tabs || typeof projectId !== 'string' || !projectId) return;
++  showTab(tabs.open({ projectId }).id);
++}
++
++/** Let a tab's page go: closed, or behind too long (the tab stays). */
++function dropView(id) {
++  const v = views.get(id);
++  if (!v) return;
++  views.delete(id);
++  win?.contentView.removeChildView(v);
++  if (!v.webContents.isDestroyed()) v.webContents.close();
++}
++
++/** Close a tab; one whose agent is still at work, only once the person says so. */
++async function closeTab(id) {
++  if (!tabs || !win) return;
++  const tab = tabs.get(id);
++  if (!tab) return;
++  if (tab.working) {
++    const { response } = await dialog.showMessageBox(win, {
++      type: 'warning', buttons: ['Close Tab', 'Cancel'], defaultId: 1, cancelId: 1,
++      message: 'An agent is still working in this project.', detail: 'Closing the tab stops it.',
++    });
++    if (response !== 0) return;
++  }
++  dropView(id);
++  const next = tabs.close(id);
++  if (next) showTab(next.id);
++  else { showPage(HOME); tellTabs(); }
++}
++
++/**
++ * Studio's "open this project" (`openfilm open`, File › Open Project…), heard by every page at once: once only. Its
++ * tab comes to the front, opened if it is not.
++ */
++let lastOpen = { to: '', at: 0 };
++function openInTabs(to) {
++  if (!tabs || typeof to !== 'string') return;
++  if (to === lastOpen.to && Date.now() - lastOpen.at < 2000) return;
++  lastOpen = { to, at: Date.now() };
++  const projectId = /^\/projects\/([\w-]+)/.exec(to)?.[1] ?? null;
++  if (projectId) newTab(projectId);
++}
++
++/** The tabs open when the window opens: those left last time, else the last project's; none: the projects. */
++async function openTabs() {
++  const projects = (await studioApi('/api/projects').catch(() => ({ projects: [] }))).projects.filter((p) => !p.missing);
++  tabs = createTabs({ saved: state.tabs?.tabs?.length ? state.tabs : null });
++  /* a tab of a project no longer there is left out */
++  const known = new Set(projects.map((p) => p.id));
++  for (const t of tabs.list()) if (!known.has(t.projectId)) tabs.close(t.id);
++  if (!tabs.list().length && !state.tabs?.tabs?.length && projects[0]) tabs.open({ projectId: projects[0].id, title: projects[0].name });
++  const front = tabs.activeId();
++  if (front) showTab(front);
++  else { showPage(HOME); tellTabs(); }
++}
++
++/** The projects the chat's agents work in, and wait for an answer in, by Studio's ids (from their folders), on each tab. */
++let projectPaths = new Map();
++const agentFolders = { working: /** @type {string[]} */ ([]), asking: /** @type {string[]} */ ([]) };
++async function tellTabsWorking({ working = agentFolders.working, asking = agentFolders.asking } = {}) {
++  Object.assign(agentFolders, { working, asking });
++  if (!tabs) return;
++  if ([...working, ...asking].some((f) => !projectPaths.has(f))) {
++    projectPaths = new Map((await studioApi('/api/projects').catch(() => ({ projects: [] }))).projects.map((p) => [p.path, p.id]));
++  }
++  const ids = (folders) => folders.map((f) => projectPaths.get(f)).filter(Boolean);
++  if (tabs.setAgents(ids(agentFolders.working), ids(agentFolders.asking))) tellTabs();
++}
+ 
+ async function studioApi(path, method = 'GET', body = undefined) {
+   const res = await fetch(`${studio.origin}${path}`, {
+@@ -160,13 +304,14 @@
+   theme = next === 'dark' ? 'dark' : 'light';
+   nativeTheme.themeSource = theme;
+   win?.setBackgroundColor(BACKGROUND[theme]);
+-  view?.setBackgroundColor(BACKGROUND[theme]);
++  for (const v of views.values()) v.setBackgroundColor(BACKGROUND[theme]);
+   if (windows) win?.setTitleBarOverlay?.(overlayColours(theme));
+ }
+ 
+ /** Tell Studio which folders the chat's agents are working in now. */
+ function tellWorking(/** @type {string[]} */ folders) {
+   studio?.child.postMessage({ type: 'working', folders });
++  void tellTabsWorking({ working: folders });
+ }
+ 
+ async function runStudio(env) {
+@@ -183,7 +328,7 @@
+     },
+     onBrowser: (message) => {
+       if (message.type === 'ffmpeg') { if (!ffmpegFetching) tellFfmpeg(message.found); }
+-      else view?.webContents.send('desktop:studio-browser', message);
++      else broadcast('desktop:studio-browser', message);
+     },
+     onExit: (code) => {
+       if (quitting) return;
+@@ -193,10 +338,12 @@
+   });
+   /* a Studio started again hears where the agents are working */
+   tellWorking(localAgents?.working() ?? []);
+-  /* the page Studio shows at `/` is the last project; a page already open (Studio restarted) stays where it was */
+-  const at = view.webContents.getURL();
+-  const to = at.startsWith('http') ? new URL(at).pathname : '/';
+-  await view.webContents.loadURL(`${studio.origin}/open?key=${studio.key}&to=${encodeURIComponent(to)}`);
++  /* the first time, the tabs; a Studio started again: each page stays where it was */
++  if (!tabs) { await openTabs(); return; }
++  for (const [id, v] of views) {
++    const at = v.webContents.getURL();
++    await v.webContents.loadURL(pageAddress(tabs.get(id), at.startsWith('http') ? new URL(at).pathname : null));
++  }
+ }
+ 
+ async function start() {
+@@ -209,6 +356,8 @@
+       /* the app names Studio's home, which would put exports inside it (Studio's rule for a home kept apart): the
+          Desktop, where `openfilm` puts them, unless this is a flavour with a home of its own */
+       ...(IDENTITY.studioHome || process.env.OPENFILM_EXPORTS ? {} : { OPENFILM_EXPORTS: app.getPath('desktop') }),
++      /* another examples index (a file, to try one), passed through when run from source */
++      ...(process.env.OPENFILM_EXAMPLES_INDEX ? { OPENFILM_EXAMPLES_INDEX: process.env.OPENFILM_EXAMPLES_INDEX } : {}),
+     },
+   });
+ 
+@@ -244,36 +393,13 @@
+   });
+   if (state.maximized) win.maximize();
+ 
+-  view = new WebContentsView({
+-    webPreferences: {
+-      preload: here('./preload.cjs'),
+-      contextIsolation: true,
+-      sandbox: true,
+-      nodeIntegration: false,
+-      spellcheck: true,
+-      autoplayPolicy: 'no-user-gesture-required',
+-      devTools: !app.isPackaged,
+-    },
+-  });
+-  view.setBackgroundColor(BACKGROUND[theme]);
+-  win.contentView.addChildView(view);
+-  layout();
+-
+-  guard(view.webContents, (url) => Boolean(studio) && url.startsWith(`${studio.origin}/`));
+-  /* what went wrong with the page, for the log (logs/studio.log) */
+-  view.webContents.on('render-process-gone', (_event, details) => log(`page: renderer gone (${details.reason}, ${details.exitCode})\n`));
+-  view.webContents.on('did-fail-load', (_event, code, description, url, mainFrame) => { if (mainFrame) log(`page: ${description} (${code}) loading ${url.replace(/key=[^&]+/, 'key=…')}\n`); });
+-  view.webContents.on('unresponsive', () => log('page: not responding\n'));
+-  /* the page gone (a crash): it comes back where it was; the agents' turns go on in this process meanwhile */
+-  view.webContents.on('render-process-gone', (_event, details) => { if (details.reason !== 'clean-exit' && !quitting) setTimeout(() => view?.webContents.reload(), 500); });
+-
+   win.on('resize', layout);
+   win.on('resized', saveState);
+   win.on('moved', saveState);
+-  win.on('enter-full-screen', () => view?.webContents.send('desktop:full-screen', true));
+-  win.on('leave-full-screen', () => view?.webContents.send('desktop:full-screen', false));
++  win.on('enter-full-screen', () => broadcast('desktop:full-screen', true));
++  win.on('leave-full-screen', () => broadcast('desktop:full-screen', false));
+   win.on('close', saveState);
+-  win.on('closed', () => { win = null; view = null; app.quit(); });
++  win.on('closed', () => { win = null; views.clear(); app.quit(); });
+ 
+   ipcMain.on('desktop:theme', (event, next) => { if (fromPage(event)) setTheme(next); });
+   ipcMain.handle('desktop:hello', (event) => {
+@@ -293,21 +419,65 @@
+     projects: async () => (await studioApi('/api/projects')).projects.filter((p) => !p.missing).map((p) => p.path),
+     dataDir: DATA,
+     reveal: (path) => shell.showItemInFolder(path),
+-    tell: (channel, value) => view?.webContents.send(channel, value),
++    tell: (channel, value) => broadcast(channel, value),
+     log,
+   });
++  /* the tabs, drawn by each page in Studio's top bar: asked for, and told of every change (tellTabs) */
++  const tabHandle = (channel, fn) => ipcMain.handle(channel, (event, opts) => {
++    if (!fromPage(event)) throw new Error('not the window\'s page');
++    return fn(tabOf(event.sender), opts ?? {});
++  });
++  tabHandle('desktop:tabs:list', (self) => ({ self, tabs: tabs?.list() ?? [] }));
++  tabHandle('desktop:tabs:new', (_self, { projectId }) => { newTab(projectId); return { ok: true }; });
++  tabHandle('desktop:tabs:show', (_self, { id }) => { showTab(String(id)); return { ok: true }; });
++  tabHandle('desktop:tabs:close', (self, { id }) => { void closeTab(typeof id === 'string' ? id : self); return { ok: true }; });
++  tabHandle('desktop:tabs:move', (_self, { id, index }) => { if (tabs?.move(String(id), Number(index))) tellTabs(); return { ok: true }; });
++  /* what a page shows now: its project's title, an export's progress; or its project gone */
++  tabHandle('desktop:tabs:report', (self, { title, exporting, gone }) => {
++    if (!tabs) return { ok: false };
++    /* its project deleted (in this page or another): its tab closes */
++    if (gone === true) { void closeTab(self); return { ok: true }; }
++    tabs.report(self, { ...(typeof title === 'string' ? { title: title.slice(0, 200) } : {}), ...(exporting !== undefined ? { exporting: typeof exporting === 'number' ? exporting : null } : {}) });
++    tellTabs();
++    return { ok: true };
++  });
++  /* Studio's "open this project", heard by each page: settled once here */
++  tabHandle('desktop:tabs:open', (_self, { to }) => { openInTabs(to); return { ok: true }; });
++  /* a tab left behind long enough lets its page go; it comes back when shown */
++  setInterval(() => { for (const id of tabs?.idle(IDLE_PAGE_MS) ?? []) dropView(id); }, 60_000).unref?.();
++
+   /* the agents: Studio's home and library go with them, so the `openfilm` they run finds this window's Studio */
++  /* the person's own skills: Skills/ beside this app's projects (~/Movies/OpenFilm/Skills), as its `openfilm` finds them */
++  const mySkills = process.env.OPENFILM_SKILLS || (env.OPENFILM_LIBRARY ? join(dirname(env.OPENFILM_LIBRARY), 'Skills') : (await import('openfilm/skills')).mySkillsDir());
+   localAgents = registerLocalAgentIpc(ipcMain, {
+     trusted: fromPage,
+     log,
+     /* Studio refuses to delete a project an agent is working in */
+     onWorking: tellWorking,
++    /* a tab says when its agent waits for the person's answer */
++    onAsking: (folders) => void tellTabsWorking({ asking: folders }),
+     /* the `openfilm` command first (with the app's ffmpeg and browser in it); the app's ffmpeg last, for a computer
+        that has none of its own: the person's own ffmpeg and browsers are what the agent's commands use */
+     binDir: installOpenfilmCommand(DATA, { ffmpeg: ffmpegHere, env: browsers }),
+     fallbackDir: ffmpegHere,
+     env: { OPENFILM_HOME: env.OPENFILM_HOME, ...(env.OPENFILM_LIBRARY ? { OPENFILM_LIBRARY: env.OPENFILM_LIBRARY } : {}) },
+     harness: async (id) => roster?.harness(id) ?? null,
++    /* Developer mode: an agent whose own record lacks what its model got logs it here (agent-logs.mjs) */
++    logDir: () => (readPreferences(DATA).developer ? join(DATA, 'agent-logs') : null),
++    /* each session's skills: its maker's, OpenFilm's, and of the person's own those let in (agent-skills.mjs) */
++    skills: { dataDir: DATA, mine: mySkills },
++  });
++  /* the composer's Skills button */
++  registerSkillsIpc(ipcMain, {
++    trusted: fromPage,
++    projects: async () => (await studioApi('/api/projects')).projects.filter((p) => !p.missing).map((p) => p.path),
++    dataDir: DATA,
++    mine: mySkills,
++    oldMine: join(env.OPENFILM_HOME, 'skills'),
++    reveal: (path) => { void shell.openPath(path); },
++    pickFolder: (words) => pickFolder(words),
++    refreshSkills: (agent) => localAgents?.refreshSkills(agent),
++    log,
+   });
+   /* Settings → Agents (in Studio's page) and the chat's agent menu: one roster, both told of every change */
+   roster = createRoster({
+@@ -318,7 +488,7 @@
+     closeSessions: (id) => { forgetAgentUsage(id); localAgents?.closeAgent(id); },
+     seal,
+     unseal,
+-    onChange: (list) => view?.webContents.send('desktop:agents', list),
++    onChange: (list) => broadcast('desktop:agents', list),
+     /* the program the person points at, for an agent not found where it is looked for */
+     usePaths: setChosenPaths,
+     pickProgram: async (_id, words) => {
+@@ -341,7 +511,8 @@
+   agentHandle('desktop:agents:automatic', ({ id }) => roster.useAutomatic(String(id)));
+   agentHandle('desktop:agents:diagnose', ({ id }) => roster.diagnose(String(id)));
+   agentHandle('desktop:agents:shown', ({ id, shown }) => { roster.setShown(String(id), shown === true); return { ok: true }; });
+-  agentHandle('desktop:agents:byok', ({ config }) => roster.configureByok(config));
++  agentHandle('desktop:agents:own-model', ({ config }) => roster.saveOwnModel(config));
++  agentHandle('desktop:agents:own-model-remove', ({ id }) => { roster.removeOwnModel(String(id)); return { ok: true }; });
+   /* a file on the disk brought into the chat goes into the project the page names, through Studio's own import (it
+      shows in Studio's media at once, and the import is in the project's history); one without a path the page sends
+      itself */
+@@ -367,7 +538,7 @@
+     if (!fromPage(event) || !rect || typeof rect !== 'object') return null;
+     const box = { x: Math.round(rect.x), y: Math.round(rect.y), width: Math.round(rect.width), height: Math.round(rect.height) };
+     if (!Object.values(box).every((n) => Number.isFinite(n)) || box.width < 2 || box.height < 2 || box.width > 8000 || box.height > 8000) return null;
+-    const image = await view.webContents.capturePage(box).catch(() => null);
++    const image = await event.sender.capturePage(box).catch(() => null);
+     return image && !image.isEmpty() ? image.toJPEG(88).toString('base64') : null;
+   });
+ 
+@@ -376,7 +547,7 @@
+     dataDir: DATA,
+     productName: PRODUCT_NAME,
+     getWindow: () => win,
+-    onState: (next) => view?.webContents.send('desktop:update', next),
++    onState: (next) => broadcast('desktop:update', next),
+     prepareRestart: async () => {
+       if (localAgents?.isBusy()) return { ok: false, error: 'agent-busy' };
+       /* Studio's quit-when-idle answers 409 while it exports; otherwise the window's Studio stays (studio-process.mjs
+@@ -391,7 +562,7 @@
+     beforeInstall: async () => {
+       quitting = true;
+       localAgents?.closeAll();
+-      view?.webContents.on('will-prevent-unload', (event) => event.preventDefault());
++      for (const v of views.values()) v.webContents.on('will-prevent-unload', (event) => event.preventDefault());
+       await studio?.quit();
+       updates?.close();
+     },
+@@ -404,10 +575,22 @@
+   Menu.setApplicationMenu(applicationMenu({
+     productName: PRODUCT_NAME,
+     packaged: app.isPackaged,
+-    toggleChat: () => view?.webContents.send('desktop:toggle-chat'),
++    toggleChat: () => activeView()?.webContents.send('desktop:toggle-chat'),
+     openProject: () => void openProjectFolder(),
+-    reload: () => view?.webContents.reload(),
+-    devTools: () => view?.webContents.toggleDevTools(),
++    reload: () => activeView()?.webContents.reload(),
++    devTools: () => activeView()?.webContents.toggleDevTools(),
++    tabs: {
++      /* the projects window, in the page in front, to pick the project a new tab shows */
++      open: () => activeView()?.webContents.send('desktop:tabs:pick') ?? views.get(HOME)?.webContents.focus(),
++      close: () => { if (tabs?.activeId()) void closeTab(tabs.activeId()); },
++      reopen: () => { const tab = tabs?.reopen(); if (tab) showTab(tab.id); },
++      step: (by) => {
++        const list = tabs?.list() ?? [];
++        const i = list.findIndex((t) => t.active);
++        if (list.length > 1) showTab(list[(i + by + list.length) % list.length].id);
++      },
++      pick: (n) => { const list = tabs?.list() ?? []; const tab = n === 9 ? list.at(-1) : list[n - 1]; if (tab) showTab(tab.id); },
++    },
+     updates: updates.packaged ? {
+       check: () => updates.manualCheck(),
+       beta: updates.channel() === 'beta',
+@@ -429,7 +612,8 @@
+     await runStudio(env);
+   } catch (error) {
+     log(`Studio did not start: ${error.stack ?? error}\n`);
+-    void view.webContents.loadFile(here('./failed.html'), { query: { message: String(error.message ?? error) } });
++    const v = makeView('failed');
++    void v.webContents.loadFile(here('./failed.html'), { query: { message: String(error.message ?? error) } });
+   }
+ }
+ 

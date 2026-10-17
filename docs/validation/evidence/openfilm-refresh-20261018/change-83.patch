@@ -1,0 +1,353 @@
+--- fixed/packages/openfilm/studio/server/server.mjs
++++ head/packages/openfilm/studio/server/server.mjs
+@@ -13,7 +13,7 @@
+  * whose name is pointed at this machine (DNS rebinding) gets nothing, not even /api/health.
+  */
+ import { randomBytes, timingSafeEqual } from 'node:crypto';
+-import { existsSync, mkdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
++import { createReadStream, existsSync, mkdirSync, openSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
+ import { basename, extname, isAbsolute, join, normalize, resolve, sep } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+ import { createServer } from 'node:http';
+@@ -32,9 +32,9 @@
+   ProjectError, createFolder, createProject, deleteFolder, deleteProject, libraryRoot, listFolders, listProjects, locateProject, markOpened,
+   moveProjectToFolder, openProject, projectById, renameFolder, renameProject, studioHome, studioKey, TOOL_DIR,
+ } from './projects.mjs';
+-import { FetchError, createFetches } from './fetch-repo.mjs';
++import { FetchError, createFetches, fetchFilm, parseRepoUrl } from './fetch-repo.mjs';
+ import { BrowseError, browseFolder, browsePlaces } from './browse.mjs';
+-import { listExamples } from './examples.mjs';
++import { exampleFile, exampleFolder, listExamples } from './examples.mjs';
+ import { pickFiles, pickFolder } from './folder-picker.mjs';
+ import { readPrefs, writePrefs } from './prefs.mjs';
+ import { ensureProxies } from './proxies.mjs';
+@@ -44,13 +44,16 @@
+ import { installedFonts } from './fonts.mjs';
+ import { projectFonts, resolveIn } from './project-fonts.mjs';
+ import { FILM_PAGE, PageFrameError, closePageFrames, filmPoster, pageFacts, pageFrame, warmFilmPoster } from './pageframes.mjs';
++import { SavedError, bundlePoster, libraryPath, libraryRel, libraryRoot as savedLibrary, listLibrary, saveClip, saveFile, saveGroup, takeSaved } from './saved.mjs';
+ import { FILM_FILE, clipKind, isPage } from '../../src/film-doc.mjs';
++import { listSkills, skillOrigins } from '../../src/skills.mjs';
+ import { providersRoute } from './providers/index.mjs';
+ import { captionRoutes } from './captions.mjs';
+ import { projectSettingsRoute } from './project-settings.mjs';
+ import { markersRoute } from './markers.mjs';
+ import { transitionPageRoutes } from './transition-pages.mjs';
+ import { createAsks, getRoute, subtitleTranscriber, subtitleTranslator } from './get.mjs';
++import { LOCATION_KEYS, locations, usableFolder } from '../../src/locations.mjs';
+ 
+ /** @typedef {import('./http.mjs').Req} Req @typedef {import('./http.mjs').Res} Res */
+ 
+@@ -107,6 +110,8 @@
+   let pageCame = () => {};
+   /** media being made for an agent's `openfilm get` right now (it would be lost, and paid for, if Studio stopped) */
+   let making = 0;
++  /** the update run from the top bar: `{ status: 'updating' | 'failed', version, error? }` (see /api/update) */
++  let updating = /** @type {{ status: 'updating' | 'failed', version: string, error?: string } | null} */ (null);
+   /** whether an app's agent is working in the project at `path` now */
+   const agentIn = (/** @type {string} */ path) => working().some((folder) => resolve(folder) === resolve(path));
+   /** how many editor pages have connected since Studio started: whether one opened an address `/open` gave out */
+@@ -158,7 +163,8 @@
+ 
+     /* which Studio this is: the CLI replaces an older one, and finds its own home's when run.json is gone. Asked
+        without the key, so it says nothing of the machine: its home only as a digest (homeTag), no process id */
+-    if (path === '/api/health') return json(res, 200, { product: 'openfilm-studio', version: VERSION, home: homeTag(), filmOrigin });
++    /* `app`: the desktop app's Studio, which updates with the app (`openfilm update` says so instead) */
++    if (path === '/api/health') return json(res, 200, { product: 'openfilm-studio', version: VERSION, home: homeTag(), filmOrigin, ...(stays ? { app: true } : {}) });
+     const signIn = [`${COOKIE}=${key}; Path=/; HttpOnly; SameSite=Strict`, `${FRAMED}=${key}; Path=/; HttpOnly; Secure; SameSite=None; Partitioned`];
+     /** A page's address with the key in it (the address bar is what a person copies). */
+     const keyed = (/** @type {string} */ to) => {
+@@ -232,7 +238,21 @@
+     if (parts[0] === 'version' && parts.length === 1 && req.method === 'GET') {
+       const now = url.searchParams.get('check') === '1';
+       const { latest, checkedAt } = await npmOpenfilm({ force: now, waitMs: 4000 });
+-      return json(res, 200, { version: VERSION, latest, newer: Boolean(latest && olderThanThis(VERSION, latest)), checkedAt, checking: !process.env.OPENFILM_NO_UPDATE_CHECK && !FROM_SOURCE, source: FROM_SOURCE });
++      return json(res, 200, { version: VERSION, latest, newer: Boolean(latest && olderThanThis(VERSION, latest)), checkedAt, checking: !process.env.OPENFILM_NO_UPDATE_CHECK && !FROM_SOURCE, source: FROM_SOURCE,
++        ...(updating ? { update: updating } : {}) });
++    }
++    /* the top bar's Update (Studio run with npm, not the app's nor a checkout): the newest openfilm run in the
++       background as `openfilm update` (client.mjs updateOpenfilm), which starts Studio again on it; the pages come back
++       on the new version and reload. Not while an export runs or media is made. `/api/version` says how it goes */
++    if (parts[0] === 'update' && parts.length === 1 && req.method === 'POST') {
++      if (stays || FROM_SOURCE) return json(res, 409, { error: 'this Studio does not update itself', code: stays ? 'app' : 'source' });
++      if (exports.busy()) return json(res, 409, { error: 'an export is running', code: 'exporting' });
++      if (making) return json(res, 409, { error: 'media is being made', code: 'making' });
++      if (updating?.status === 'updating') return json(res, 202, { update: updating });
++      const { latest } = await npmOpenfilm({ waitMs: 4000 });
++      if (!latest || !olderThanThis(VERSION, latest)) return json(res, 409, { error: 'this is the newest openfilm', code: 'newest' });
++      updating = runUpdate(latest, (next) => { updating = next; });
++      return json(res, 202, { update: updating });
+     }
+     /* the fonts installed here (what a web page can draw with, in the preview and the export alike) */
+     if (parts[0] === 'fonts' && parts.length === 1 && req.method === 'GET') return json(res, 200, { fonts: await installedFonts() });
+@@ -264,10 +284,76 @@
+         throw new HttpError(501, /** @type {Error} */ (e).message);
+       }
+     }
++    /* Saved, the person's own library for every project (saved.mjs): its files and folders as a project's media are
++       (files.mjs), by their `saved/` paths; a file's bytes, a bundle's picture, and what Studio works out from a file */
++    if (parts[0] === 'saved') {
++      const sub = parts.slice(1).join('/');
++      const lib = await savedLibrary();
++      const rel = (/** @type {unknown} */ path) => { try { return libraryRel(path); } catch (e) { throw new HttpError(400, /** @type {Error} */ (e).message); } };
++      const at = url.searchParams.get('path') ?? '';
++      if (sub === 'files') {
++        if (req.method === 'GET') return json(res, 200, await listLibrary());
++        if (req.method === 'PUT') return json(res, 200, { path: libraryPath((await importFile(lib, rel(at), req)).path) });
++        if (req.method === 'PATCH') {
++          const { from, to } = /** @type {{ from?: unknown, to?: unknown }} */ (await readJson(req) ?? {});
++          return json(res, 200, { path: libraryPath((await moveFile(lib, rel(from), rel(to))).path) });
++        }
++        if (req.method === 'DELETE') { await trashFile(lib, rel(at)); return json(res, 200, {}); }
++      }
++      if (sub === 'folders' && req.method === 'POST') {
++        const { path: folder } = /** @type {{ path?: unknown }} */ (await readJson(req) ?? {});
++        return json(res, 200, { path: libraryPath(await makeFolder(lib, rel(folder))) });
++      }
++      /* files or folders of this computer copied in: the paths given, else the person's pick. { landed } */
++      if (sub === 'files/bring' && req.method === 'POST') {
++        const { into, paths, folder, title } = /** @type {{ into?: unknown, paths?: unknown, folder?: unknown, title?: unknown }} */ (await readJson(req) ?? {});
++        const ask = { title: typeof title === 'string' && title.trim() ? title.trim().slice(0, 120) : 'Choose', at: null };
++        const picked = Array.isArray(paths) ? paths.map(String)
++          : await (folder === true ? pickFolder(ask).then((p) => (p ? [p] : [])) : pickFiles(ask)).catch((e) => { throw new HttpError(501, String(e?.message ?? e)); });
++        return json(res, 200, { landed: (await bringIn(lib, rel(into ?? 'saved'), picked, 'copy', { anywhere: true })).map(libraryPath) });
++      }
++      if (sub === 'reveal' && req.method === 'POST') {
++        const { path: shown } = /** @type {{ path?: unknown }} */ (await readJson(req) ?? {});
++        const where = rel(shown ?? 'saved');
++        if (where) reveal(inside(lib, where)); else openFile(lib);
++        return json(res, 200, {});
++      }
++      if (sub === 'file' && req.method === 'GET') return sendMedia(req, res, inside(lib, rel(at)));
++      if (sub === 'poster' && req.method === 'GET') return sendMedia(req, res, await savedCall(() => bundlePoster(at)));
++      if (sub === 'media' && req.method === 'GET') {
++        const what = url.searchParams.get('what');
++        const file = rel(at);
++        if (what === 'probe') return json(res, 200, isPage(file) ? {} : await probe(lib, file));
++        if (what === 'wave') return json(res, 200, await waveform(lib, file));
++        const jpeg = what === 'poster' && !isPage(file) ? await poster(lib, file)
++          : what === 'frame' && !isPage(file) ? await frame(lib, file, Number(url.searchParams.get('ms')), Number(url.searchParams.get('w')))
++          : null;
++        if (!jpeg) throw new HttpError(400, 'what: probe, poster, frame or wave, of a media file');
++        res.writeHead(200, { 'content-type': 'image/jpeg', 'cache-control': 'private, max-age=86400', 'content-length': jpeg.length });
++        return res.end(jpeg);
++      }
++    }
+     /* Studio's own preferences, the same for every project (prefs.mjs) */
+     if (parts[0] === 'prefs' && parts.length === 1) {
+       if (req.method === 'GET') return json(res, 200, readPrefs());
+-      if (req.method === 'PATCH') return json(res, 200, writePrefs(await readJson(req)));
++      if (req.method === 'PATCH') {
++        /* a folder chosen for new projects is checked, and made, before it is kept */
++        const patch = /** @type {Record<string, unknown>} */ (await readJson(req) ?? {});
++        for (const key of Object.values(LOCATION_KEYS)) {
++          if (patch[key] == null) continue;
++          try { patch[key] = usableFolder(patch[key]); } catch (e) { throw new HttpError(400, /** @type {Error} */ (e).message); }
++        }
++        return json(res, 200, writePrefs(patch));
++      }
++    }
++    /* where new projects go (src/locations.mjs): the folder, its default, and its disk's free space; a POST opens it
++       in the system's file manager */
++    if (parts[0] === 'locations' && parts.length === 1 && req.method === 'GET') return json(res, 200, locations());
++    if (parts[0] === 'locations' && parts[1] === 'projects' && parts.length === 2 && req.method === 'POST') {
++      const folder = locations()[parts[1]].path;
++      mkdirSync(folder, { recursive: true });
++      openFile(folder);
++      return json(res, 200, { ok: true });
+     }
+     /* the system's file dialog (folder-picker.mjs pickFiles), several at once: { paths } (none: cancelled); 501 when
+        this system has none */
+@@ -287,6 +373,48 @@
+     }
+     /* the example films (examples.mjs): none when the index cannot be read */
+     if (parts[0] === 'examples' && parts.length === 1 && req.method === 'GET') return json(res, 200, { examples: await listExamples() });
++    /* a poster or preview beside an index read from this computer (examples.mjs exampleFile) */
++    if (parts[0] === 'examples' && parts[1] === 'file' && parts.length > 2 && req.method === 'GET') {
++      return sendMedia(req, res, exampleFile(parts.slice(2).map(decodeURIComponent).join('/')), { keep: true });
++    }
++    /* an example's folder on this computer, to point an agent at (examples.mjs exampleFolder) */
++    if (parts[0] === 'examples' && parts.length === 3 && parts[2] === 'folder' && req.method === 'POST') {
++      try {
++        const folder = await exampleFolder(decodeURIComponent(parts[1]), {
++          home: studioHome(),
++          fetchFolder: (address, into) => fetchFilm(parseRepoUrl(address), { library: into }),
++        });
++        return json(res, 200, { folder });
++      } catch (e) {
++        throw new HttpError(e instanceof FetchError ? e.status : 404, e instanceof Error ? e.message : String(e));
++      }
++    }
++    /* the skills a project can be made with (../../src/skills.mjs): its own, the person's, the official ones */
++    if (parts[0] === 'skills' && parts.length === 1 && req.method === 'GET') {
++      const id = url.searchParams.get('project');
++      const project = id ? (await listProjects()).find((p) => p.id === id && !p.missing) : null;
++      const skills = listSkills({ project: project?.path ?? null });
++      const origins = skillOrigins();
++      const media = (/** @type {string} */ name, /** @type {'cover' | 'preview'} */ which) => `/api/skills/${encodeURIComponent(name)}/${which}${id ? `?project=${encodeURIComponent(id)}` : ''}`;
++      return json(res, 200, {
++        skills: skills.map((k) => ({
++          name: k.name, description: k.description, source: k.source, scripts: k.scripts.length,
++          ...(k.shown ? { shown: k.shown } : {}), ...(k.version ? { version: k.version } : {}), ...(k.kind ? { kind: k.kind } : {}),
++          ...(k.order != null ? { order: k.order } : {}), ...(k.icon ? { icon: k.icon } : {}), ...(k.repository ? { repository: k.repository } : {}),
++          ...(k.cover ? { cover: media(k.name, 'cover') } : {}), ...(k.preview ? { preview: media(k.name, 'preview') } : {}),
++          /* the person's own: where it came from (none kept: made where it is) */
++          ...(k.source === 'mine' ? { origin: origins[basename(k.folder)] ?? { from: 'made' } } : {}),
++        })),
++      });
++    }
++    /* a skill's cover picture or preview video (its openfilm.json's `cover`, `preview`) */
++    if (parts[0] === 'skills' && parts.length === 3 && (parts[2] === 'cover' || parts[2] === 'preview') && req.method === 'GET') {
++      const id = url.searchParams.get('project');
++      const project = id ? (await listProjects()).find((p) => p.id === id && !p.missing) : null;
++      const skill = listSkills({ project: project?.path ?? null }).find((k) => k.name === decodeURIComponent(parts[1]));
++      const file = skill?.[parts[2]];
++      return sendMedia(req, res, skill && file ? join(skill.folder, file) : null, { keep: true });
++    }
+ 
+     if (parts[0] !== 'projects') throw new HttpError(404, 'no such API');
+     if (parts.length === 1) {
+@@ -539,6 +667,35 @@
+         await trashFile(project.path, at);
+         return json(res, 200, {});
+       }
++    }
++    /* clips, groups of clips and files of this project put in Saved (saved.mjs), each bundle with its picture; and a
++       thing of Saved taken into this project (a file imported, a bundle's files copied in) */
++    if (rest === 'saved' && req.method === 'POST') {
++      const body = /** @type {{ clips?: unknown, groups?: unknown, files?: unknown, into?: unknown }} */ (await readJson(req) ?? {});
++      const asked = (/** @type {unknown} */ list) => (Array.isArray(list) ? list.filter((x) => x && typeof x === 'object').slice(0, 50) : []);
++      const into = typeof body.into === 'string' ? body.into : undefined;
++      const base = pages.folderUrl(project);
++      const paths = await savedCall(async () => {
++        const out = [];
++        for (const c of /** @type {{ id?: unknown, name?: string, durationMs?: number, w?: number, h?: number }[]} */ (asked(body.clips))) {
++          const ms = typeof c.durationMs === 'number' && c.durationMs > 0 ? c.durationMs : 0;
++          out.push(await saveClip(project.path, String(c.id ?? ''), { ...c, into, poster: (clip) => clipPoster(project.path, base, clip, ms) }));
++        }
++        for (const g of /** @type {{ ids?: unknown, name?: string, durationMs?: number, w?: number, h?: number }[]} */ (asked(body.groups))) {
++          const ids = Array.isArray(g.ids) ? g.ids.filter((id) => typeof id === 'string').slice(0, 200) : [];
++          out.push(await saveGroup(project.path, ids, { ...g, into, poster: (clip) => clipPoster(project.path, base, clip, 0) }));
++        }
++        for (const f of /** @type {{ path?: unknown, name?: string, durationMs?: number, w?: number, h?: number }[]} */ (asked(body.files))) {
++          const file = String(f.path ?? '');
++          out.push(await saveFile(project.path, file, { ...f, into, poster: () => clipPoster(project.path, base, { src: file }, typeof f.durationMs === 'number' ? f.durationMs : 0) }));
++        }
++        return out;
++      });
++      return json(res, 200, { paths });
++    }
++    if (rest === 'saved/take' && req.method === 'POST') {
++      const { path: from } = /** @type {{ path?: unknown }} */ (await readJson(req) ?? {});
++      return json(res, 200, await savedCall(() => takeSaved(project.path, from)));
+     }
+     /* what Studio works out from a media file: its length and size, a poster, a frame, a waveform (see derived.mjs) */
+     if (rest === 'media' && req.method === 'GET') {
+@@ -689,6 +846,8 @@
+     })().catch(() => refuse('500 Internal Server Error'));
+   });
+   await new Promise((done, fail) => { editor.once('error', fail); editor.listen(port, '127.0.0.1', () => done(undefined)); });
++  /* the examples index is asked for as Studio starts, so the Examples tab has GitHub's newest when it opens */
++  void listExamples().catch(() => {});
+   const address = /** @type {import('node:net').AddressInfo} */ (editor.address());
+   origin = `http://127.0.0.1:${address.port}`;
+   COOKIE = cookieName(address.port);
+@@ -734,6 +893,35 @@
+ /** Run from a checkout of the repository (the editor's source is beside its build), not from an installed package. */
+ const FROM_SOURCE = existsSync(new URL('../ui/src', import.meta.url));
+ 
++/**
++ * `npx -y openfilm@<version> update` in the background (its words in logs/update.log), as the person would run it: the
++ * newest stops this Studio and starts itself in its place. `then` hears it failed later, with its last words, if this
++ * Studio is still here to hear it; one that cannot start is said at once.
++ * @param {string} version @param {(state: { status: 'failed', version: string, error: string }) => void} then
++ * @returns {{ status: 'updating' | 'failed', version: string, error?: string }}
++ */
++function runUpdate(version, then) {
++  const logs = join(studioHome(), 'logs');
++  mkdirSync(logs, { recursive: true });
++  const file = join(logs, 'update.log');
++  writeFileSync(file, '');
++  const failed = (/** @type {string} */ error) => then({ status: 'failed', version, error });
++  try {
++    const out = openSync(file, 'a');
++    const child = spawn('npx', ['-y', `openfilm@${version}`, 'update'], {
++      detached: true, stdio: ['ignore', out, out], windowsHide: true, shell: process.platform === 'win32', env: { ...process.env, OPENFILM_NO_BROWSER: '1' },
++    });
++    child.once('error', (e) => failed(`npx did not start (it comes with Node.js): ${e.message}`));
++    child.once('exit', (code) => {
++      if (code === 0) return;
++      const said = readFileSync(file, 'utf8').trim().split('\n').filter(Boolean).pop() ?? '';
++      failed(said || `npx stopped (${code})`);
++    });
++    child.unref();
++  } catch (e) { return { status: 'failed', version, error: e instanceof Error ? e.message : String(e) }; }
++  return { status: 'updating', version };
++}
++
+ /** This package's version: the CLI replaces a Studio older than itself. */
+ export const VERSION = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')).version;
+ 
+@@ -795,6 +983,34 @@
+   return platform === 'darwin' ? ['open', target] : ['xdg-open', target];
+ }
+ 
++/**
++ * What saved.mjs answers, its refusals as the HTTP errors they are.
++ * @template T @param {() => Promise<T>} fn @returns {Promise<T>}
++ */
++async function savedCall(fn) {
++  try { return await fn(); } catch (e) {
++    if (e instanceof SavedError) throw new HttpError(/** @type {number} */ (e.status), e.message);
++    throw e;
++  }
++}
++
++/**
++ * A saved clip's picture, from the middle of what it shows: a page drawn with the changes made in it, a video's frame,
++ * a still's own; a sound has none.
++ * @param {string} root @param {string} base the project's folder as the pages are served (pageframes.mjs)
++ * @param {{ src: string, time?: unknown, overrides?: unknown }} clip @param {number} durationMs
++ * @returns {Promise<Buffer | null>}
++ */
++async function clipPoster(root, base, clip, durationMs) {
++  const kind = clipKind(clip.src);
++  const from = Array.isArray(clip.time) && typeof clip.time[0] === 'number' ? clip.time[0] * 1000 : 0;
++  const ms = durationMs > 0 ? from + durationMs / 2 : -1;
++  if (kind === 'page') return pageFrame(root, base, clip.src, ms, 480, Array.isArray(clip.overrides) ? clip.overrides : null);
++  if (kind === 'video') return frame(root, clip.src, Math.max(0, ms), 480);
++  if (kind === 'still') return poster(root, clip.src);
++  return null;
++}
++
+ /** A file in the app the system opens it with. */
+ function openFile(/** @type {string} */ file) {
+   const [cmd, ...args] = opener(file);
+@@ -807,3 +1023,27 @@
+   try { spawn(cmd, args, { stdio: 'ignore', detached: true, windowsHide: true }).on('error', () => {}).unref(); } catch { /* no browser to open */ }
+ }
+ 
++
++/**
++ * A picture or a video from this computer, a range answered as one (a preview is seeked in); none: 404.
++ * @param {import('node:http').IncomingMessage} req @param {import('node:http').ServerResponse} res @param {string | null | undefined} file
++ */
++function sendMedia(req, res, file, { keep = false } = {}) {
++  if (!file || !existsSync(file) || !statSync(file).isFile()) throw new HttpError(404, 'no such file');
++  const { size, mtimeMs } = statSync(file);
++  /* `keep`: a picture that changes only with its file (a skill's cover, an example's poster) is kept by the browser
++     an hour, and then only asked whether it changed */
++  const tag = `"${size.toString(36)}-${Math.round(mtimeMs).toString(36)}"`;
++  const kept = keep ? { etag: tag, 'cache-control': 'private, max-age=3600' } : {};
++  if (keep && req.headers['if-none-match'] === tag) { res.writeHead(304, kept); res.end(); return undefined; }
++  const type = {
++    '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.gif': 'image/gif', '.avif': 'image/avif', '.svg': 'image/svg+xml',
++    '.mp4': 'video/mp4', '.m4v': 'video/mp4', '.webm': 'video/webm', '.mov': 'video/quicktime',
++    '.mp3': 'audio/mpeg', '.m4a': 'audio/mp4', '.aac': 'audio/aac', '.wav': 'audio/wav', '.ogg': 'audio/ogg', '.opus': 'audio/ogg', '.flac': 'audio/flac',
++  }[extname(file).toLowerCase()] ?? 'application/octet-stream';
++  const range = /^bytes=(\d*)-(\d*)$/.exec(String(req.headers.range ?? ''));
++  const [from, to] = range ? [range[1] ? Number(range[1]) : Math.max(0, size - Number(range[2])), range[2] && range[1] ? Math.min(size - 1, Number(range[2])) : size - 1] : [0, size - 1];
++  res.writeHead(range ? 206 : 200, { 'content-type': type, 'content-length': to - from + 1, 'accept-ranges': 'bytes', ...kept, ...(range ? { 'content-range': `bytes ${from}-${to}/${size}` } : {}) });
++  createReadStream(file, { start: from, end: to }).pipe(res);
++  return undefined;
++}

@@ -1,0 +1,65 @@
+--- fixed/packages/openfilm/studio/ui/src/api.ts
++++ head/packages/openfilm/studio/ui/src/api.ts
+@@ -7,7 +7,9 @@
+ 
+ /** `working`: an agent of the app's chat is working in it right now (it cannot be deleted meanwhile). */
+ /** GET /api/version: this Studio's, and npm's latest (null when never learnt; `checking` false: never asked). */
+-export interface StudioVersion { version: string; latest: string | null; newer: boolean; checkedAt: number | null; checking: boolean; source: boolean }
++export interface StudioVersion { version: string; latest: string | null; newer: boolean; checkedAt: number | null; checking: boolean; source: boolean;
++  /** the update Studio runs from the top bar (lib/web-update), or one that failed */
++  update?: { status: 'updating' | 'failed'; version: string; error?: string } }
+ 
+ export type Project = { id: string; path: string; name: string; openedAt: number; missing: boolean; working?: boolean };
+ export type Clip = { src: string; id: string; at?: number; time?: [number] | [number, number];
+@@ -75,16 +77,25 @@
+ const p = (id: string) => `projects/${encodeURIComponent(id)}`;
+ 
+ /** Studio's own preferences, the same for every project (studio/server/prefs.mjs). */
+-export interface StudioPrefs { proxies: { on: boolean; height: 540 | 720 | 1080 }; seenVersion: string | null }
++export interface StudioPrefs { proxies: { on: boolean; height: 540 | 720 | 1080 }; seenVersion: string | null; projectsFolder: string | null }
++/** Where new projects and exports go (src/locations.mjs): the folder, its default, whether the person chose it, the free space on its disk. */
++export interface StudioLocation { path: string; default: string; chosen: boolean; free: number | null }
++export interface StudioLocations { projects: StudioLocation }
+ /** Said on the window when they change, for what plays by them (the preview's proxies). */
+ export const PREFS_EVENT = 'openfilm:prefs';
+ 
+ export const api = {
+   /** this Studio's version and the latest openfilm on npm; `check`: ask npm now */
+   version: (check = false) => call<StudioVersion>(`version${check ? '?check=1' : ''}`),
++  /** the newest openfilm, run in the background (`openfilm update`): Studio starts again on it; refused (ApiError, `body.code`) while busy */
++  update: () => call<{ update: NonNullable<StudioVersion['update']> }>('update', { method: 'POST', json: {} }),
+   projects: () => call<{ projects: Project[] }>('projects').then((r) => r.projects),
+   prefs: () => call<StudioPrefs>('prefs'),
+-  setPrefs: (patch: { proxies?: Partial<StudioPrefs['proxies']>; seenVersion?: string }) => call<StudioPrefs>('prefs', { method: 'PATCH', json: patch }).then((prefs) => {
++  /** where new projects and exports go, and the free space there */
++  locations: () => call<StudioLocations>('locations'),
++  /** one of them in the system's file manager */
++  openLocation: (which: keyof StudioLocations) => call<{ ok: true }>(`locations/${which}`, { method: 'POST', json: {} }),
++  setPrefs: (patch: { proxies?: Partial<StudioPrefs['proxies']>; seenVersion?: string; projectsFolder?: string | null }) => call<StudioPrefs>('prefs', { method: 'PATCH', json: patch }).then((prefs) => {
+     window.dispatchEvent(new Event(PREFS_EVENT));
+     return prefs;
+   }),
+@@ -119,7 +130,23 @@
+   answerAsk: (askId: string, allow: boolean) => call<{ answered: boolean }>(`get/asks/${encodeURIComponent(askId)}`, { method: 'POST', json: { allow } }),
+   /** the provider's own page for its balance, opened in the person's browser */
+   openBilling: (providerId: string) => call<Record<string, never>>(`providers/${encodeURIComponent(providerId)}/billing`, { method: 'POST' }),
++  /** clips (by id), clips together (a group) and files (by path) of a project put in Saved (studio/server/saved.mjs):
++      each one's place there */
++  save: (id: string, what: { clips?: SavedAsk[]; groups?: Array<SavedAsk & { ids: string[] }>; files?: Array<SavedAsk & { path: string }>; into?: string }) => (
++    call<{ paths: string[] }>(`${p(id)}/saved`, { method: 'POST', json: what }).then((r) => r.paths)
++  ),
++  /** a thing of Saved (its `saved/` path) used in the project: a file imported (its place), or a bundle's files brought in
++      and the clip, a group's clips or the page to put on the timeline */
++  takeSaved: (id: string, path: string) => call<{ clip: Record<string, unknown> & { src: string } } | { clips: SavedGroupClip[] } | { path: string }>(
++    `${p(id)}/saved/take`, { method: 'POST', json: { path } },
++  ),
+ };
++
++/** A clip of a saved group: its track counted from the group's top one, its time in seconds from the group's start. */
++export type SavedGroupClip = { track: number; at: number; clip: Record<string, unknown> & { src: string } };
++
++/** What is said of a thing put in Saved: a clip's id (a file's path beside it), a name, and how long and big it is. */
++export type SavedAsk = { id?: string; name?: string; durationMs?: number; w?: number; h?: number };
+ 
+ /** What an agent's `openfilm get` asks the person before it spends (studio/server/get.mjs). */
+ export type SpendAsk = {

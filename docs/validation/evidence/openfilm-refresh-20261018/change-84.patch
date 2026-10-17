@@ -1,0 +1,42 @@
+--- fixed/packages/openfilm/studio/server/server.test.mjs
++++ head/packages/openfilm/studio/server/server.test.mjs
+@@ -200,7 +200,7 @@
+   mkdirSync(join(project.path, 'assets'), { recursive: true });
+   const big = join(project.path, 'assets', 'big.mp4');
+   execFileSync('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', 'testsrc=size=2560x1440:rate=25:duration=1', '-pix_fmt', 'yuv420p', big]);
+-  assert.deepEqual(await (await api('/api/prefs')).json(), { proxies: { on: true, height: 720 }, seenVersion: null });
++  assert.deepEqual(await (await api('/api/prefs')).json(), { proxies: { on: true, height: 720 }, seenVersion: null, projectsFolder: null });
+   let answer;
+   for (const end = Date.now() + 30_000; answer?.states?.['assets/big.mp4']?.state !== 'ready' && Date.now() < end;) {
+     answer = await (await api(`/api/projects/${project.id}/proxies`, { method: 'POST', body: {} })).json();
+@@ -213,7 +213,7 @@
+   assert.ok(played > 0 && played !== statSync(big).size, 'the proxy');
+   assert.equal(await size('?film-facts=1'), statSync(big).size, 'what the file is: the file');
+   /* off: the original, and no proxy asked for */
+-  assert.deepEqual(await (await api('/api/prefs', { method: 'PATCH', body: { proxies: { on: false } } })).json(), { proxies: { on: false, height: 720 }, seenVersion: null });
++  assert.deepEqual(await (await api('/api/prefs', { method: 'PATCH', body: { proxies: { on: false } } })).json(), { proxies: { on: false, height: 720 }, seenVersion: null, projectsFolder: null });
+   assert.equal(await size(), statSync(big).size);
+   assert.deepEqual((await (await api(`/api/projects/${project.id}/proxies`, { method: 'POST', body: {} })).json()).states, {});
+   await api('/api/prefs', { method: 'PATCH', body: { proxies: { on: true } } });
+@@ -499,9 +499,21 @@
+     assert.equal(res.status, 423);
+     assert.match((await res.json()).error, /app/);
+     assert.equal((await fetch(`${kept.origin}/api/health`)).status, 200, 'still there');
++    /* it says it is the app's, so `openfilm update` says the app updates it */
++    assert.equal((await (await fetch(`${kept.origin}/api/health`)).json()).app, true);
++    const update = await fetch(`${kept.origin}/api/update`, { method: 'POST', headers: { 'x-studio-key': kept.key, 'content-type': 'application/json' }, body: '{}' });
++    assert.deepEqual([update.status, (await update.json()).code], [409, 'app'], 'it does not update itself');
+   } finally {
+     await kept.close();
+   }
++});
++
++test('Update is not run from a source checkout (git pull updates it), nor without the key', async () => {
++  assert.equal((await api('/api/update', { method: 'POST', body: {}, key: null })).status, 401);
++  const res = await api('/api/update', { method: 'POST', body: {} });
++  assert.deepEqual([res.status, (await res.json()).code], [409, 'source']);
++  assert.equal((await (await api('/api/health')).json()).app, undefined, 'not an app\'s');
++  assert.equal((await (await api('/api/version')).json()).update, undefined, 'no update running');
+ });
+ 
+ test('`openfilm open` without a folder opens the project opened last, and makes none', async () => {

@@ -1,0 +1,13 @@
+--- fixed/package.json
++++ head/package.json
+@@ -16,7 +16,9 @@
+     "typecheck": "pnpm -r --if-present typecheck",
+     "audit:public": "node scripts/audit-public.mjs",
+     "check:pack": "node scripts/check-pack.mjs",
+-    "changeset": "changeset"
++    "skills:sync": "node scripts/sync-skills.mjs",
++    "changeset": "changeset",
++    "examples:sync": "node scripts/sync-examples.mjs"
+   },
+   "devDependencies": {
+     "@changesets/changelog-github": "0.5.2",

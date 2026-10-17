@@ -1,0 +1,18 @@
+--- original/packages/openfilm/src/shared.mjs
++++ lazy-host/packages/openfilm/src/shared.mjs
+@@ -2,7 +2,6 @@
+ import { createHash } from 'node:crypto';
+ import { existsSync, mkdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
+ import { basename, dirname, join, relative, resolve, sep } from 'node:path';
+-import { FilmPage, FrameError, launch, serve } from './host.mjs';
+ import { FILM_FILE, readFilmFile } from './film-doc.mjs';
+ import { readableLink } from './media-links.mjs';
+ 
+@@ -63,6 +62,7 @@
+ 
+ /** Serve the film's folder, open it in Chromium, wait for window.film and `ready`. */
+ export async function open(target, opts = {}) {
++  const { FilmPage, FrameError, launch, serve } = await import('./host.mjs');
+   const loc = locate(target, opts.root);
+   /* an edit is read before anything opens: its problems, every one, at once */
+   if (loc.isFilm) {

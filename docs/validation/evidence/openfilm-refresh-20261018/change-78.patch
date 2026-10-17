@@ -1,0 +1,22 @@
+--- fixed/packages/openfilm/studio/server/projects.mjs
++++ head/packages/openfilm/studio/server/projects.mjs
+@@ -22,6 +22,7 @@
+ import { EMPTY_FILM } from './film.mjs';
+ import { FILM_FILE, filmHtml } from '../../src/film-doc.mjs';
+ import { writeAtomic } from './atomic.mjs';
++import { libraryRoot } from '../../src/locations.mjs';
+ 
+ export const TOOL_DIR = '.film';
+ 
+@@ -56,9 +57,8 @@
+   return key;
+ }
+ 
+-/** Where new projects go: ~/Movies/OpenFilm/Projects on macOS, ~/Videos/OpenFilm/Projects elsewhere. */
+-export const libraryRoot = () => process.env.OPENFILM_LIBRARY
+-  || join(homedir(), process.platform === 'darwin' ? 'Movies' : 'Videos', 'OpenFilm', 'Projects');
++/** Where new projects go: the folder chosen in Settings, else ~/Movies/OpenFilm/Projects on macOS, ~/Videos/OpenFilm/Projects elsewhere (src/locations.mjs). */
++export { libraryRoot };
+ 
+ /**
+  * @typedef {{ id: string, path: string, openedAt: number, folderId?: string }} Recent

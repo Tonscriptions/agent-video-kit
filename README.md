@@ -50,11 +50,14 @@
 
 ## 开源复用核查
 
+2026-10-18 增量核查 **R02**：OpenFilm 0.2.0 固定 `eefd6a8d`，当次 **809 stars / 89 forks**。完整 619→702 文件对比：489 不变、126 改变、87 新增、4 删除；原七份关键文件与 MIT 不变。新增 Saved 片段组库、HTML 模板参数与十份官方 Skill 值得选择性复用；分离间接 React/Playwright 导入后的 **20/20 上游选定测试**及两组文件/数据样例通过，原加载失败保留。新模块未接入产品，无浏览器/模型/编码视频；20 项包含原树已通过的 12，不能与产品 764 或原研究 123 相加。见[增量复用顺序/工期/边界](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md)。
+
 固定检查 OpenFilm `b138595d`（原快照 704 stars）；10-17 UTC 再查 `eefd6a8d` 时为 790 stars / 89 forks，八个选定文件中七个关键文件原字节一致，README 有更新，详见[复查证据](docs/validation/evidence/openfilm-refresh-20261017/verification.json)。代码 MIT。O02 **整片段关联/同步锁/联动规划**已进入 V33，O01 原字节字幕分句已进入 V34；V35 借鉴 O03 工作流新写真实源句柄转场。HTML 动效、乱序自检和 xmeml 仍是可选增量。O01+O02 的 **7–13 人日适配 / 从头 15–24 人日**是原研究同范围估算；没有实际人时记录，不声称已节省该工期或整个项目比例。
 
 | 编号 | 核验内容 | 真实结果 | 状态与边界 | 证据 |
 |---|---|---|---|---|
 | R01 | OpenFilm 源码、许可证、无 GUI 拆分及数据输出 | 历史原模块 58/58、Hook 分离副本 65/65、619 原文件 SHA 一致；V33 O02 整片段、V34 O01 原算法已复用，V35 O03 工作流新实现；新八文件复查另计 | 原研究 123 项不与产品回归相加；HTML/乱序自检/其余适配仍未集成；原 React 依赖失败保留 | [12 项模块/成本及接入状态](docs/OpenFilm源码拆解与复用成本评估_2026-10-17.md)、[原研究证据](docs/validation/evidence/openfilm-reuse-20261017.json)、[V35](docs/validation/真实源句柄转场与可逆编辑实测_2026-10-17.md) |
+| R02 | OpenFilm 0.2.0 整树更新、片段组库/模板/官方 Skills | 2026-10-18：702 原文件前后摘要一致；独立副本仅改两处依赖边界，20/20 原测试；片段组相对时间/新关联 ID/独立文件副本与模板覆盖两组实际数据通过 | 源码/数据研究；原版间接 Playwright/React 加载失败公开；未安装新 Skill、未集成 HTML/片段组库、未编码视频或运行完整产品回归，工期为估算 | [编号模块/工期/十份 Skill](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md)、[整树证据](docs/validation/evidence/openfilm-refresh-20261018/verification.json)、[20 项与两组数据](docs/validation/evidence/openfilm-increment-verified-20261018/verification.json) |
 
 实际数据：[字幕原输入](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-input.json) → [三段输出](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-output.json)；[跨轨删除原模型](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-input.json) → [操作计划/实际结果/手工预期](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-output.json)。字幕无词标的时间为估算。原 CLI/Skill 连接 Studio、npx latest 与服务商；选用模块需改为固定本地入口、强制离线并保留原版权。GUI 目录内的纯规划算法可提取；上游不是完整剪映或本地 AI 特效替代内核。
 

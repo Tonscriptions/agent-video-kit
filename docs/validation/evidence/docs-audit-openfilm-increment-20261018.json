@@ -1,0 +1,829 @@
+{
+  "at_utc": "2026-10-17T16:36:53.685000+00:00",
+  "scope": "R02 source/data research only. Published V35 HEAD source verified against its prior full-suite freeze; tests not rerun. Excludes five existing uncommitted nested-transition files. Local Markdown targets/metadata and source/evidence bytes checked, external URLs/anchors not fetched.",
+  "markdown_files": 137,
+  "links": 3104,
+  "local_file_links": 2644,
+  "external_links_not_fetched": 437,
+  "broken_links": [],
+  "empty_documents": [],
+  "invalid_metadata_states": [],
+  "document_sha256": {
+    "AGENTS.md": "sha256:450d01db81076d21aaa50ed02d5da466657141d0d29eb1d58ff57df9b0c38a16",
+    "README.md": "sha256:134e1356091d1cff5cd41259dd59c1933dec63d075f267961e6d34c999300700",
+    "docs/10套纯开源AI广告剪辑方案_2026-10-12.md": "sha256:4660e4891721aa21121c1bc232814cd31247bc1624970f687198522d47b75d17",
+    "docs/Concat与pyJianYingDraft_配套Skills_Star排行_2026-10-11.md": "sha256:2d50fdfc8bc3d8de1ed387c39afc420e60d40a125276770d729b9dc132683e92",
+    "docs/Concat与剪映功能差异矩阵_2026-10-12.md": "sha256:96e0505be4cd97b4c42d9644dff9ebad29c2919abb742315bf67008b777f0f51",
+    "docs/Concat无GUIAgent化与剪映差异补全可行性评估_2026-10-12.md": "sha256:de18d4995afa0d6a90857d7319e3996e9b91b0349be662c1161e999dc2988b57",
+    "docs/FFmpeg从头构建Agent视频内核工程量估算_2026-10-12.md": "sha256:93f432c2f27385b5407695d90b4a5b0db11871be077dbfd41be1b0ac6944af36",
+    "docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md": "sha256:d08218c22e3093ef4277a136bc42c15cda7dab80b13a6ef3b21156a7d1f6850f",
+    "docs/OpenFilm源码拆解与复用成本评估_2026-10-17.md": "sha256:8eda5b7e1b9ad612b47808f240130dcd2f13e31e796d1fffb0dfea5148a4a702",
+    "docs/README.md": "sha256:e5a375140c66bb7c2f4e6e8982d2040eceb5d9465d11a06e3d5cb5fa556ce588",
+    "docs/adr/ADR-001_Concat基础路线.md": "sha256:264aef3ee06b328dffaa72ac53104db6f40a8d57ecf404ca09568d06201a2458",
+    "docs/architecture/系统边界与模块契约_v0.1_2026-10-13.md": "sha256:d3ea78597875aa2e297c7326664a571d9e0aaa332344584766b3eb9162d7e184",
+    "docs/ops/安全与隐私边界_v0.1_2026-10-13.md": "sha256:f2d50230441b48f9cea7f451cec1a503a8471b8e7136cc8e2592a5347d346036",
+    "docs/ops/版本依赖与发布门禁_v0.1_2026-10-13.md": "sha256:f0d6642a17b91a959b441f4522d8e7f285974e5af99d5163ec6955569b2ad3be",
+    "docs/run-concat与video-recap-skills_纯开源补充评估_2026-10-12.md": "sha256:e0dc3421792fddc218dd199fe3fa173b4a7cedc99e8e31fe805f033779bc2431",
+    "docs/specs/AgentCLI契约_v0.1_2026-10-13.md": "sha256:a3b2779909e5ab7957bfd232b390ecf345f454c745d2bb2f96d17f17f2dc887c",
+    "docs/specs/AgentProjectJSON规范_v0.1_2026-10-13.md": "sha256:7f0d1185862148a5a64065d4e5fd17c266c15e4f4d39d2dc262fd3e7d3b880cd",
+    "docs/specs/R3声道策略契约_v0.1_2026-10-17.md": "sha256:48621cc47d873654357de18249fbc6fbe4d8672ddae6f1d9d1b97f14117ebff8",
+    "docs/specs/RightsLedger与素材模板登记规范_v0.1_2026-10-13.md": "sha256:b94413ccea02530b01a73fddf04cf0bd43f17bca560505afb9b3c717462b2a9c",
+    "docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md": "sha256:40bee946288e458b0c2ffb88ed15ad18d95c602f5eab1c787297004954d392bc",
+    "docs/specs/关键帧运镜预设契约_v0.1_2026-10-15.md": "sha256:3ef59c68e2acb58af0cc8e918af15ea9100dfca8f611ba142e9fd48e8a457ed3",
+    "docs/specs/分层音频总线与采样包络契约_v0.1_2026-10-17.md": "sha256:0bfe4d8e2102aeabd8de843d97a4ce40270d5c0c1258b9ee015f9fadb20103ea",
+    "docs/specs/分段音频变速上下文契约_v0.1_2026-10-17.md": "sha256:e42fa3e3e7ac92d71745f989df479ec37ab192543d9015fc11e7baa908899a25",
+    "docs/specs/嵌套字幕与文字动画时钟契约_v0.1_2026-10-16.md": "sha256:bce73d3b971bccd42523be6c19d650f2e57c17c6be9be847c8e911682411ddba",
+    "docs/specs/嵌套序列解析时间映射契约_v0.1_2026-10-16.md": "sha256:689f496e28ee69e4e6c8e4b91e498a70692444e2a8ac18f562ff94035f0eea07",
+    "docs/specs/嵌套序列隔离合成契约_v0.1_2026-10-17.md": "sha256:69c2004b093f562385b038a9404fb80bd135572a601838e6180eb21fc22e6748",
+    "docs/specs/嵌套视频帧区间与结束时钟契约_v0.1_2026-10-17.md": "sha256:8790ae9b5a8dfb67814b61bc49e15c4a742b98148e63a67193560077e06a406a",
+    "docs/specs/广告模板变量契约_v0.1_2026-10-14.md": "sha256:75bc3c9a574ecd948b8d8677a8b2a6e0681eec0e26691857d095650e4436dbb4",
+    "docs/specs/广告计划与时间线应用契约_v0.1_2026-10-15.md": "sha256:1e5f3a897ce5d6de1611fc7f711079505b3f7e71abc974bfa36d3448caf11b5f",
+    "docs/specs/序列面积采样与工作栅格预算契约_v0.1_2026-10-17.md": "sha256:df34b091e0d328174dc77e0e3bf5c2ba066a4a60386ffb62d627f883004b3a88",
+    "docs/specs/文字动画高亮组合与原生打字机契约_v0.1_2026-10-17.md": "sha256:6d06ec9665c30ce907fea90c73874993558f24e49b60cb84ee48007464359926",
+    "docs/specs/文字颜色透明度与独立覆盖率契约_v0.1_2026-10-16.md": "sha256:3f4f0e43e53c43cea228d7a41c18abc10c4ae76b7b0377958b1ccba722422b49",
+    "docs/specs/本地AI适配器与字幕流水线规范_v0.1_2026-10-13.md": "sha256:1f58a7fe4fbf80c9eb42bcbd84bee68121908ca3bd8a53d05eb4025b228f49f9",
+    "docs/specs/本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md": "sha256:f2a61e09231676ea20ea812e50a51eedab6ef41cce7ac2fc6b3ff482a3fc6c3a",
+    "docs/specs/本地LUT资产库与效果引用契约_v0.1_2026-10-15.md": "sha256:3c2d88217d0a8c0d11a341d39f1558929a1dbec47c4c3d0fd465a061c87fdfa4",
+    "docs/specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md": "sha256:cd0ba042793cb648c502f07bf5c76fa6cb3600c3d4a6d55ad3f89ebddc05d15e",
+    "docs/specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md": "sha256:268adbd9c055ce2573d85bafaf5a783badbee56b4f74ccf4df4c4bc76c7ad157",
+    "docs/specs/本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md": "sha256:1080ac4769c91e0de32d92b336babdfb4efe2d8bce4b539f7b6bcb18ded38358",
+    "docs/specs/本地SoulX中文配音与声线登记契约_v0.1_2026-10-15.md": "sha256:d702d5eeee916b1da3ee1e086886af8f026f539623aa586111f9ea1efc9baf18",
+    "docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md": "sha256:3a7d5985a25d696db56c4febfd661f317adea56813f8fc49b36f7f34c7ba7458",
+    "docs/specs/本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md": "sha256:648043c017507986343579cd8b6fa170e49f204d0615d1e9c4f8443efb581f56",
+    "docs/specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md": "sha256:8e3303666becb3617cb131cc7e988c583f7dc2b40dff34fcd3a147e758db63ee",
+    "docs/specs/本地修复区域色差融合契约_v0.1_2026-10-16.md": "sha256:901fad14ca6a4701046feedd7e25128020cc1eadda50d2047b820021c35caef7",
+    "docs/specs/本地光流补帧与智能慢动作契约_v0.1_2026-10-15.md": "sha256:ecdbca80f4767458e1bb4e053cceeb82141ef38480ffff4ad29fe38f4625d721",
+    "docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md": "sha256:1ded8756e5ccd41f025dc2ee7effbc077ada260c6e63cfa6ed627cd23baaf2ff",
+    "docs/specs/本地多机位同步与切换契约_v0.1_2026-10-15.md": "sha256:73c977e9e24745d00ca68d3db83b57a907f60cb8ee4f161b21918fe32efaacae",
+    "docs/specs/本地多目标视觉跟踪与对象选择协议契约_v0.1_2026-10-15.md": "sha256:a7b0ba8a692c733c216d28286455ca9804548a4649a62c8fa7080c1cef791d04",
+    "docs/specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md": "sha256:5f4552a2c3cba12285d6e784889d13cfc1ab16858dd6c19ea11b83fc7345bd30",
+    "docs/specs/本地对象跟踪与关键帧规范_v0.1_2026-10-13.md": "sha256:09de1c0f0c66ccc27bfd4afcb5ff03ada740d99e191de1d468c2c61b6c87a018",
+    "docs/specs/本地效果目录与参数契约_v0.1_2026-10-14.md": "sha256:a82472e18fc502a7507162e776eae33a496fc0a0ee909faf83bf6db2db4d9713",
+    "docs/specs/本地明文草稿双向适配器契约_v0.1_2026-10-15.md": "sha256:3a1248f486f4c7464eae476d47d199c849b7557f825bab062dbfad4e129b4b90",
+    "docs/specs/本地智能剪口播与静音裁切契约_v0.1_2026-10-15.md": "sha256:468598bfc3a91ec89a93ed31247d87ffc8f90f2fdaf889de1780019792048116",
+    "docs/specs/本地模型适配器注册与音频分离门禁契约_v0.1_2026-10-15.md": "sha256:c21cf811b7d3aec405eb7a790f2eab0adb2aaaf898e435ef60f96883950646dc",
+    "docs/specs/本地渲染队列与任务状态契约_v0.1_2026-10-14.md": "sha256:a3a356a14d1e84a7dc9d37d9c108339717000d55bc97acf4fea3d0005937f2bf",
+    "docs/specs/本地素材库增量刷新与感知候选契约_v0.1_2026-10-14.md": "sha256:5e873271b90cb1033c14db92d2206beee2665f369cfef309c5fd61435be4cbc2",
+    "docs/specs/本地素材语义索引与重复分组契约_v0.1_2026-10-14.md": "sha256:7450800e923e6896c6175ce5a9e9337ef364236270e68ecb95e0965d755c8aac",
+    "docs/specs/本地自动重构图与对象跟踪应用契约_v0.1_2026-10-15.md": "sha256:ce260f34f4851728477724725e74d90ff70ac78220130f1f99a4b9b8208235ea",
+    "docs/specs/本地色彩Scope审查契约_v0.1_2026-10-14.md": "sha256:a6a5f7abe5a7e04272b1e53130ede2e0938fc54906088619c119a6ec229f625f",
+    "docs/specs/本地节拍卡点与混剪时间线契约_v0.1_2026-10-15.md": "sha256:c19430a9b9587ade35469df9b0975010644ffe722900152bf7e56a5abf1238f1",
+    "docs/specs/本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md": "sha256:7a6d47c7caee1251886f655bb65b9f4678b2e96e2012326c1a8c73a7eb0f8452",
+    "docs/specs/本地视觉模型适配器与对象跟踪协议契约_v0.1_2026-10-15.md": "sha256:5948f3adbfb9e08346b01b73bd99a5daf757bc13c008faf10a67526b07e00516",
+    "docs/specs/本地视频防抖与稳定化派生素材契约_v0.1_2026-10-15.md": "sha256:b05883f4d577bba6f9047836c58e557ba59ff7bef0bd04e2164e70d50149ab34",
+    "docs/specs/本地质量Golden清单规范_v0.1_2026-10-14.md": "sha256:d74f755f4c577e2409bf8453f09be218f8139e614f4e50c33fdf068b8682dd08",
+    "docs/specs/本地跟踪绑定与对象锚定契约_v0.1_2026-10-15.md": "sha256:3a48ca29f5750458bfededa93b1a1fdbb129d9bc89e4c826713022388304f2e1",
+    "docs/specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md": "sha256:5a53d37216a589a4f4971000e8fa55181909f54547cf642758e27371c0069098",
+    "docs/specs/本地运行策略与远程引用审计契约_v0.1_2026-10-14.md": "sha256:059eb5d51409c04dd428805230867fadd5e1eafca54dfbd01708a4a15a88de22",
+    "docs/specs/本地长滤镜图与Windows命令长度契约_v0.1_2026-10-15.md": "sha256:d4b0a5b6e5b07cadec8ce7db64b9f052224d22df5c601616995204c3e9c8d61f",
+    "docs/specs/本地音频mid-side与源分离适配器边界契约_v0.1_2026-10-15.md": "sha256:18c43e8691033840e73c7ec2554d23340bdce118b4ae39815e1cd2b5909baf54",
+    "docs/specs/本地音频提取与派生资产契约_v0.1_2026-10-15.md": "sha256:b05d25db651c41857cb2aecf04df1baa8f4f2048afcbab2b618376ffbd885545",
+    "docs/specs/本地项目写锁与取消通道契约_v0.1_2026-10-14.md": "sha256:833ea223f88701cd3ef63d9e4fbb4f9f19a3fd73347fd3132de15bb8485090a6",
+    "docs/specs/本地项目包与交换清单契约_v0.1_2026-10-15.md": "sha256:18910f709069fd1a2bbb0ffd06021039c9fa08533854a96e2897f5fbeb74bfc4",
+    "docs/specs/本地高光候选与自动粗剪时间线契约_v0.1_2026-10-15.md": "sha256:c65c04daf3d3e8a639085702a787e0e489d5b12e153c5279588fc9f225d78f2c",
+    "docs/specs/独立序列画布与父级投影契约_v0.1_2026-10-17.md": "sha256:aa2e5d294d7672c941185ed94c74274124f24d54fce9253712148aeb27fdd9bc",
+    "docs/specs/独立文字轨道与本地排版契约_v0.1_2026-10-14.md": "sha256:3faeec429fbef5b81abb0c2c2c92bc47c49deaeaeca5fa3d1c782a135df0bf79",
+    "docs/specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md": "sha256:e1b5437c3649368331de85716777524b7902b4de1ce04a475e9c63be22ef09fe",
+    "docs/specs/离线音频伸缩与PCM输出契约_v0.1_2026-10-17.md": "sha256:3afd32311386f319491b32f2fa26310a81194a9a320399e0793deeb79d0d1616",
+    "docs/specs/跨文件项目事务恢复契约_v0.1_2026-10-15.md": "sha256:ca88736c1d34702be8091ebf27c76c25e6edf882a10c4b970031afbd24baa246",
+    "docs/specs/输出档案与渠道渲染规范_v0.1_2026-10-13.md": "sha256:1732745f0052a8d20b3955ea73e738661e28deb60fc3887bd310224c1ecef90e",
+    "docs/specs/透明素材缩放与预乘Alpha契约_v0.1_2026-10-16.md": "sha256:b05aba672b3269aeb4b4bd93d6ed20dfdea03680963690f4903ace37fa7d1541",
+    "docs/specs/透明素材重采样与文字Alpha契约_v0.2_2026-10-16.md": "sha256:52ec20bc9641511eb04cb76c067ee3b7ec7e7a8c2c063f313f0c79e2f9a2e748",
+    "docs/specs/逐字高亮原生排版与颜色选择契约_v0.1_2026-10-16.md": "sha256:ef7ada032a0e2cea1123667256f584f889c0b6d5a3e57f08916995cf42c39c69",
+    "docs/specs/速度曲线Easing与Bezier契约_v0.1_2026-10-16.md": "sha256:08aa226335d6aba714b2685a16e1369d49d6ace48d2adb11c01216abf641e2fd",
+    "docs/specs/项目转换报告规范_v0.1_2026-10-13.md": "sha256:8918c5faf370b41ae1296cd090d2d90cdd3426a0dedaef5dde46ea27122363a5",
+    "docs/third-party/OpenFilm复用声明_2026-10-17.md": "sha256:237c094759d7a4df08bb0b80f325fa66f20df01cc0cf1594c06471105304bf4f",
+    "docs/validation/HDemucs本地人声伴奏分离实测_2026-10-16.md": "sha256:a24fb789c390e24398f177cad512add50dc1fc0450d3a4a6d7fb522de90f4358",
+    "docs/validation/LaMa本地区域修复与物体移除实测_2026-10-16.md": "sha256:a6852274a2a03652f6c3bedc7d49f9a4087bfd6bb370275d0cc5bac0deefab09",
+    "docs/validation/P0黄金样例与验收计划_v0.1_2026-10-13.md": "sha256:225f6dcb2d85f20f25343ea187d59f9df7d0bed2bfa45426f96b600e26f945c6",
+    "docs/validation/R3声道策略与立体声权衡实测_2026-10-17.md": "sha256:989a0f07d9e2751ee8824d151680add49884c42c4cbff3caaefffb7934d5e87f",
+    "docs/validation/README功能核验与实测演示_2026-10-16.md": "sha256:05c32ff06812928abbfc4a49f7b5dfbdb2518b5a758d7ffdfef13f8f334a4ee3",
+    "docs/validation/RVM本地人物抠像与透明成片实测_2026-10-16.md": "sha256:e50a1d5aeb23e7b776be9bdeca19c7ce4c52abd24b8b09b5d141eb6bb68edd4a",
+    "docs/validation/SAM2本地对象分割与提示修正实测_2026-10-16.md": "sha256:c51333e443d0e94de3e1ad1263d16adb8cec1749fbfbca8c0f8ea1ee64468a82",
+    "docs/validation/SoulX中文离线配音实测_2026-10-15.md": "sha256:4d8c25c827acb2c75c7d9fd9a4e8c4ffd1b7da83fad504758da0597d169a595b",
+    "docs/validation/VACE本地多帧编辑与生成填充实测_2026-10-16.md": "sha256:4b7e3168db56548ecf42ac85a61997f211bec06356636184f820b0b826272f0d",
+    "docs/validation/Whisper中文离线转写实测_2026-10-15.md": "sha256:fb8bfa1c52ace6dc3f66113c03317d667650450dad6b0344aec67568f207adb2",
+    "docs/validation/YOLO本地多目标跟踪与重构图实测_2026-10-15.md": "sha256:ea0fa9a1051a13ef13cba9708c8fae1b6d44f070b5d5a468dbf0cffdd706205e",
+    "docs/validation/fixtures/p0/README.md": "sha256:24d351b4f5552b88f6ed8ce3d2b568a3f31c73fe750fff33b8a76b5c0634b6ca",
+    "docs/validation/仿射动态裁切与文字透明合成实测_2026-10-16.md": "sha256:18703605b321d253e9f3e0f79bd64ea247f1f1cb886930e2d46883d5d86fafd1",
+    "docs/validation/关联剪辑与主轨联动真实音画实测_2026-10-17.md": "sha256:de508bb0666b233008824aca33f879f5f64854af4be33a11afffe3bc306c5bf2",
+    "docs/validation/分层音频总线与真实采样实测_2026-10-17.md": "sha256:6c9c17e3c45ee5a00946ff645c88786535841fe342f8c9a0b1ab1b5828465ec4",
+    "docs/validation/分段音频上下文与完整尾部实测_2026-10-17.md": "sha256:e4ba6fde25b4bb2fd245f876a6863d2224c7fb1a22e80f489b8d2c719bb4e207",
+    "docs/validation/回归验证记录_2026-10-13.md": "sha256:49e5bfd57007e904ac87f8b4e42f39293b7900dfeeff5ebfb818e2ca93d92556",
+    "docs/validation/嵌套变速倒放与关键帧时钟实测_2026-10-16.md": "sha256:bb79ecc8652625600b22ffac43ae3dd400b0e8c176955152e2ed2f1ec973b70f",
+    "docs/validation/嵌套字幕与文字动画原时钟实测_2026-10-16.md": "sha256:90054d2dee0a6f9182a71b29eab89be9140aa9def57bab31e88d56319110a245",
+    "docs/validation/嵌套序列隔离合成与逐帧像素实测_2026-10-17.md": "sha256:4623ee2b530b4c02185581aa4eea9d609f923cb7de77dbc38507c565b394a6cd",
+    "docs/validation/嵌套视频帧区间与结束时钟实测_2026-10-17.md": "sha256:662780c14b193daddab441652b5a42079430d09b6ebd334cc4fdf061ebda6add",
+    "docs/validation/序列面积采样与工作配额实测_2026-10-17.md": "sha256:54b473838ad01adbd315ab1a7124f4f7e723d73f8393440c2c31d1dd30cb5721",
+    "docs/validation/性能预算与设备基线_v0.1_2026-10-13.md": "sha256:e3585f1cc4d4640cf4af84ad76f1001d9bafbe18432341571365a5ab8d34ae0c",
+    "docs/validation/文字动画高亮组合与原生打字机实测_2026-10-17.md": "sha256:401ad64d8ebf37cef2514d02cf878c06fa730cfadd94cfa99b83f28f7e07b8ed",
+    "docs/validation/文字颜色透明度与实际合成实测_2026-10-16.md": "sha256:2a77b01b47fe76fc32cb5e5e1dedbf3e81457cc41cf9c6de851b2c5d18ffbc88",
+    "docs/validation/本地光流背景传播与遮挡真值实测_2026-10-16.md": "sha256:625f47965454e78cc77d49f2eda1060661da2fc52c9493244b06d5730f4b1c77",
+    "docs/validation/本地区域色差融合实测_2026-10-16.md": "sha256:3fc6b462987052c5a424f9d825f6abb85a54f2fa3a5cc8afdbd4830662cb6672",
+    "docs/validation/本地多运动参考选择与双表面真值实测_2026-10-16.md": "sha256:7cfda8e383eef62f0df34603e3b44db27ee0b7c456b26b7ccbb3b05c535f123c",
+    "docs/validation/本地字幕分段与双语回写实测_2026-10-17.md": "sha256:906242c4b645294afa54ba758527362dc7ff06443c4332fe74c76ede2f6cd738",
+    "docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md": "sha256:6cef87981c44ddf9a9c8e912bd553b3eed40e4e3212d0253e5d64f41cc101440",
+    "docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md": "sha256:093c8acd9d80c42b0a0892309ea95e973bec337d3bb7117c845f497b2779cb78",
+    "docs/validation/独立序列画布与原生坐标投影实测_2026-10-17.md": "sha256:9621ee45999eeb640d304b7b1a771f43d21adc574957c4e505ebb9625229ea14",
+    "docs/validation/真实源句柄转场与可逆编辑实测_2026-10-17.md": "sha256:3446ad834e3191b487f91c36989283b93a623b57be740956f03f5eeb5014861c",
+    "docs/validation/离线音频伸缩与真实采样实测_2026-10-17.md": "sha256:3d5caedc9561d7f663a6860426a3ce1d622dd0392769d6db2330fa26b5b0fb67",
+    "docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md": "sha256:3b05147f52664e25a0e1f11024a0967198c87d49d94c066080cd8253e238614e",
+    "docs/validation/跟踪坐标绑定与组合渲染实测_2026-10-15.md": "sha256:5c2ef5a147a78fa7186f02f9daffcf7a25e7255c6517ac7c8f2b55f0fa24802e",
+    "docs/validation/透明素材缩放边缘与标签精度实测_2026-10-16.md": "sha256:7a6edb901f2b18661fae0e019325950cb89f23c50a3f849583048733d845ba48",
+    "docs/validation/逐字高亮原生排版与真实成片实测_2026-10-16.md": "sha256:59c7f9d6679d6f20ccb8f22d1cf4a851f508fb120de7ebbcbedb56420eac83bd",
+    "docs/validation/速度Easing与Bezier原时钟实测_2026-10-16.md": "sha256:89902ff1c5433817cfb105fab8cdddf9cc177ece22c38d081685f6957d6264c0",
+    "docs/video-cut_本地Skills使用指南.md": "sha256:35156345bc28f65c9730b7561586ac1eb452a1637b0f25bd4eeda5ab3247a739",
+    "docs/产品实现入口与P0使用说明_v0.1_2026-10-13.md": "sha256:438fedfd7f23a7cc5b709646802cf4f353f6d989fe1e9e1c9405bb241c1252dc",
+    "docs/产品需求与开发路线基线_2026-10-12.md": "sha256:f01bc544b8863e9a97427a7c14e1fe70168fdd5dce1cba5147c9ad30d54f991e",
+    "docs/仓库与运行依赖锁定_v0.1_2026-10-13.md": "sha256:e2671c8fa81133ecf0b23781c817cfe08730f9cdaf54ab981e04a7031889fb65",
+    "docs/工作区迁移记录_2026-10-13.md": "sha256:dd98f5d8d1e913cba08537a99b90e05c0bca81b2129f875ed57c5473dad2c1eb",
+    "docs/开源素材模板库与剪映项目互转可行性评估_2026-10-12.md": "sha256:0e609ed0f321d44aab01dc8f998bc87c8c16d1bd0bc5d9e85e3c9ce66b18a845",
+    "docs/文档体系审计与补全记录_2026-10-13.md": "sha256:4332003c39fa618830d5f9f46dfe1bb73353d32a11aa3e16650ec1c4c86305fc",
+    "docs/构建进度总表_2026-10-15.md": "sha256:63a262d23759bc599c03623c2af2192fe58439fa6301185b33c0c5ee3c0ae1c3",
+    "docs/构建进度总表_2026-10-16.md": "sha256:a6aea0df7ace002f39f93311d4fbfd1bb820d6824a543a37471d1643533c6315",
+    "docs/现状结论_开源Agent剪映内核_2026-10-12.md": "sha256:e78b52680c5e328e99aac7cf799455905943babc25444b7bbe015ce1f6a5d493",
+    "docs/相关Skills_Star排行_2026-10-11.md": "sha256:1da45bdefafdbc1e387ce89d3bf077567854cc8d412cad538c9759d99e3e2654",
+    "docs/程序与Skill_剪映水准评估_2026-10-12.md": "sha256:4dcb568cc016f2124d773b824407200fed58412740b7d37c23676cc555700a3f",
+    "docs/纯开源_程序与Skill_剪映水准评估_2026-10-12.md": "sha256:6ba45c0532934f508f184093b9591ada7f3920612e36918aa2172dd8d53f0be2",
+    "docs/面向Agent的视频编辑内核调研_2026-10-11.md": "sha256:3daa4d3d4aab5e79e83e050ea623239c4e1480104624bf916ea9f7e2114ad307"
+  },
+  "readme_product_rows": 35,
+  "readme_research_rows": 2,
+  "upstream_extracted_test_count": 20,
+  "original_passed_subset_not_added": 12,
+  "original_dependency_failed_files": 2,
+  "data_samples": 2,
+  "source_archive_files": 702,
+  "previous_full_frozen_head_files": 122,
+  "product_regression_run": false,
+  "research_files": {
+    "README.md": {
+      "bytes": 102737,
+      "sha256": "sha256:134e1356091d1cff5cd41259dd59c1933dec63d075f267961e6d34c999300700"
+    },
+    "docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md": {
+      "bytes": 16965,
+      "sha256": "sha256:d08218c22e3093ef4277a136bc42c15cda7dab80b13a6ef3b21156a7d1f6850f"
+    },
+    "docs/OpenFilm源码拆解与复用成本评估_2026-10-17.md": {
+      "bytes": 28897,
+      "sha256": "sha256:8eda5b7e1b9ad612b47808f240130dcd2f13e31e796d1fffb0dfea5148a4a702"
+    },
+    "docs/README.md": {
+      "bytes": 55622,
+      "sha256": "sha256:e5a375140c66bb7c2f4e6e8982d2040eceb5d9465d11a06e3d5cb5fa556ce588"
+    },
+    "docs/third-party/OpenFilm复用声明_2026-10-17.md": {
+      "bytes": 4695,
+      "sha256": "sha256:237c094759d7a4df08bb0b80f325fa66f20df01cc0cf1594c06471105304bf4f"
+    },
+    "docs/validation/evidence/openfilm-increment-20261018/N01-original-data.json": {
+      "bytes": 1083,
+      "sha256": "sha256:0ecf59cabdcbcfee0ac0c30372a0e411319fad492f8d76af5193c3905950311b"
+    },
+    "docs/validation/evidence/openfilm-increment-20261018/N01-original-data.stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/validation/evidence/openfilm-increment-20261018/N01-original-data.stdout.log": {
+      "bytes": 4410,
+      "sha256": "sha256:00a97e4e417574bf741e97d5b51c8b4c72f3a1ced4be23e7362ae2d8c70807aa"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/N01-original-data.json": {
+      "bytes": 1084,
+      "sha256": "sha256:937b37c89df36684b095ea014cab5ed4e705a8c3aff8f09f5bbda9c9ef239c67"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/N01-original-data.stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/N01-original-data.stdout.log": {
+      "bytes": 4409,
+      "sha256": "sha256:a1a364a8533c64c8e26a10a95c59fa16fa9ba7eeb1e61bcbe31859d74a0c43c8"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/N02-original-group-dependency.json": {
+      "bytes": 659,
+      "sha256": "sha256:42da637161af404f03579e5e8a8486168a20bbb583ea6759126a48c656710351"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/N02-original-group-dependency.stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/N02-original-group-dependency.stdout.log": {
+      "bytes": 2012,
+      "sha256": "sha256:0c5611ab78b0dc50b3dfd4acba21e7ff9896af62488e06b414c01aefd18ab7f8"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/N03-extracted-data.json": {
+      "bytes": 1336,
+      "sha256": "sha256:7def64707d3285b253e95a2f427eaa25e575fe6d40dfbe37acb67ae4f162e8cc"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/N03-extracted-data.stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/N03-extracted-data.stdout.log": {
+      "bytes": 4941,
+      "sha256": "sha256:78c6df84508aed1e98c07b21e2feb71581b392cce4730124d3f94d4e2388a9e2"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/N04-data-samples.stderr.log": {
+      "bytes": 177,
+      "sha256": "sha256:75065b7e657ed150b393feb2d373f2450865d9e2054bfcc84aacf689b3d504f9"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/N04-data-samples.stdout.log": {
+      "bytes": 59,
+      "sha256": "sha256:bd72448e635f17915de16aaf80329784c780f103bdfe1fc6515e399189ef9994"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/S03-saved-group.json": {
+      "bytes": 1888,
+      "sha256": "sha256:99b2e7d00e979857cf20d07dc64913f6c7c833a0d4572cff70c8d66813b7b320"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/S04-template-overrides.json": {
+      "bytes": 762,
+      "sha256": "sha256:144daa205ea9cab79c67e64ee3045734da0f6b8afc61d82d71013e4bd9342047"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/data-samples.mjs": {
+      "bytes": 3737,
+      "sha256": "sha256:50db67059bf361a89cc198ca9fc44e4ad20ca2b902100b95c8702c4472b5d9f2"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/lazy-host-import.patch": {
+      "bytes": 900,
+      "sha256": "sha256:033fe0fd18d73889a630fcf404fed3528a6ebc33ad2240772e91448ed00a12de"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/react-hook-only.patch": {
+      "bytes": 871,
+      "sha256": "sha256:4ad394ee1a99893eb17f467921a5ba04d25e6739ce528a6a36e4d938cfdd32e1"
+    },
+    "docs/validation/evidence/openfilm-increment-verified-20261018/verification.json": {
+      "bytes": 187705,
+      "sha256": "sha256:191dadbfbf93df4f24f8c4459d996f7cfe436925a3ba5cea9406da6b580eaf36"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-00.patch": {
+      "bytes": 1352,
+      "sha256": "sha256:5a31a07a067bcf6c1fea0a6cfa14dc9f3aa65b5b656fbd08d43917deebda38a6"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-01.patch": {
+      "bytes": 692,
+      "sha256": "sha256:1e9e9fec279035316fc40f4de122e246d108a8f102cf47514a70b4cf6fc221e4"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-02.patch": {
+      "bytes": 25662,
+      "sha256": "sha256:3af4813fd16435c1606e52c7896357e94c944d88b944c505d2514c91a0de57a5"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-03.patch": {
+      "bytes": 1015,
+      "sha256": "sha256:82c1d854c58b124c7022f48d2febff35d767032d3425b730e3f4139521bb3b75"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-04.patch": {
+      "bytes": 23994,
+      "sha256": "sha256:5b11a1365c50fb21d134754a256eb399c557f19a735a35ba53c545b6e92e441a"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-05.patch": {
+      "bytes": 5465,
+      "sha256": "sha256:5e5fe9db27d1bf2177a92024ede51c870d6a7999f75d432cf84f29e05ebef5e0"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-06.patch": {
+      "bytes": 2393,
+      "sha256": "sha256:5827ba9e3982c2ed210ca41e0bc6f7f5168ce5ffa941770348f54c804fe4aeb7"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-07.patch": {
+      "bytes": 20240,
+      "sha256": "sha256:8a254cd10c8929d6fdde024f6bbfff7bab3e0586a7bace4547ca32e0febbd620"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-08.patch": {
+      "bytes": 2604,
+      "sha256": "sha256:d767ef931e0969ada2955b9aa94b0a08a1e28079119d6526a1c6555380ea7759"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-09.patch": {
+      "bytes": 656,
+      "sha256": "sha256:925292d32e2ddc0048bb7f748b102efe2a617323ba0bc2d7dc34a83e513d038d"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-10.patch": {
+      "bytes": 6362,
+      "sha256": "sha256:9ad58bf96fca25f14222acb576745329891a6c9989e2bcda20cc80349b7811a9"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-100.patch": {
+      "bytes": 1045,
+      "sha256": "sha256:f0e84dcab43cbcd8b2a9252a6f9b790de560403dd9df4ca094c338e1459b507a"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-101.patch": {
+      "bytes": 30578,
+      "sha256": "sha256:9a2ab0d2005ac77e7918c1a89990ed453ee0b8f2ef4f94ffea617fa5f12f0bd4"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-102.patch": {
+      "bytes": 2226,
+      "sha256": "sha256:67243887f193af841fc24151eba0dc5268daeb42925ea8e13ece37c184f95593"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-103.patch": {
+      "bytes": 9071,
+      "sha256": "sha256:86e6f7ae1f209f49e8056295c0d764044b38c26f84de2e011a14693327c8b002"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-104.patch": {
+      "bytes": 3382,
+      "sha256": "sha256:e026b70997fa53b06ca4847fa15c83218b27eb0b194b624710cc346f88e9fd16"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-105.patch": {
+      "bytes": 1268,
+      "sha256": "sha256:d33cc85e9ee8f4f12117de0c38ed284dcecbc0d66ef836a5610d3c875485ecdb"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-106.patch": {
+      "bytes": 2356,
+      "sha256": "sha256:3059eefe7cd7937b752d60a7201732634e92771c2a1045187625e0e46dbbd6b5"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-107.patch": {
+      "bytes": 788,
+      "sha256": "sha256:5052063b83aff55c1af6933c238cc5ca92b8f4b52255e780ad2ba861ace6fb9f"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-108.patch": {
+      "bytes": 14565,
+      "sha256": "sha256:ea13d8fadbb29a439863aa8d3ad588f7181cd746b01dce4acc7887a1cb66bd92"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-109.patch": {
+      "bytes": 15977,
+      "sha256": "sha256:15fe423a20fa8d9b7490791e756172a9210efeb4480fb34003b045d2f8f89d84"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-11.patch": {
+      "bytes": 6998,
+      "sha256": "sha256:64714414a7fef759162bbf405d33cef477dca1ded591314476efc7231912c570"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-110.patch": {
+      "bytes": 19752,
+      "sha256": "sha256:9e63cbea813df7c42c557f499a721f77b7e34d692106038570f1752292a4da32"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-111.patch": {
+      "bytes": 17628,
+      "sha256": "sha256:a32e3653007674637c3acb2216e3b09b56fddb169210ecb55926a65aa05b5322"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-112.patch": {
+      "bytes": 16594,
+      "sha256": "sha256:0deee429ac2c9bc262bc2fb181c7bb4d279beb25236ed8d885e7a478c94bbd26"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-113.patch": {
+      "bytes": 1226,
+      "sha256": "sha256:b01786c662015955f0d5df3db25d70ea2ba3a013af57be53c917988d00fa40e4"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-114.patch": {
+      "bytes": 811,
+      "sha256": "sha256:25ed12c19982d9b756b938c636b0af810e6eeb38b692e80d34bfb2d7de938498"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-115.patch": {
+      "bytes": 8804,
+      "sha256": "sha256:d4dbce7e3a138a7eee699bdb2dfb638083f10a534d9e3029eb8435bccb1c94c6"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-116.patch": {
+      "bytes": 4655,
+      "sha256": "sha256:55927f987d938ce98ec00e5e8a67cd918eec1031e35dbe5fffffaa5f7b6cd6db"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-117.patch": {
+      "bytes": 1185,
+      "sha256": "sha256:91a73cf700bd5f98202a37cec83bf4a0fbf2601157107302eca770477f99bdba"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-118.patch": {
+      "bytes": 640,
+      "sha256": "sha256:c9c1d212e145030d96be34b594142d5f996fada7bac3e1e6a9c3fec8019193d0"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-119.patch": {
+      "bytes": 1134,
+      "sha256": "sha256:61e1fa32ac6549dc4630fd01f5894e9548a45d71b6472551faac257ad7cc9af6"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-12.patch": {
+      "bytes": 8491,
+      "sha256": "sha256:13ae369e962cdfc408c918a1cfff879ceb164aecaff8674b6fc5049ccfdf4e69"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-120.patch": {
+      "bytes": 12915,
+      "sha256": "sha256:74c42c66bda1b973d355c684b1d3c14fbd3361dcffcad70b6292c419d5ac370a"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-121.patch": {
+      "bytes": 2490,
+      "sha256": "sha256:95ea004d163b29b70a39957858f6c3a745d5f0d6c9c076ac86f800815d25b499"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-122.patch": {
+      "bytes": 139,
+      "sha256": "sha256:cba5455ddf5f285f2e2afa6ae587fc8d8ae46498e12d11f5c5566618ad25a2c3"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-123.patch": {
+      "bytes": 235,
+      "sha256": "sha256:78e518b26c5e06d3bb34d42a35d4247201165f88211f738d8694a2ab9d1bbc0f"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-124.patch": {
+      "bytes": 482,
+      "sha256": "sha256:fedeb41df8236b812fecd4c29023426e5d7bdd8ed9b5d8310ab06a2853282a2d"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-125.patch": {
+      "bytes": 1467,
+      "sha256": "sha256:8e502daf1157c485f2b3d67490c8fe71a29a30d1d4382e161b3c4a2757eec7fd"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-13.patch": {
+      "bytes": 7474,
+      "sha256": "sha256:8494b77ddc8821f6e9afdaae3e855726dd2292944e440ca0d8dbc3f4f0baf87e"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-14.patch": {
+      "bytes": 6508,
+      "sha256": "sha256:7478dce7cbc5bd07f2f98b19eae041feb927e014f1430995fb65bdd18d849310"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-15.patch": {
+      "bytes": 1207,
+      "sha256": "sha256:ffcbd608cf69ea2b887024f542342b75288d6d60e3df6e02abc1e77b8d098983"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-16.patch": {
+      "bytes": 1012,
+      "sha256": "sha256:efbccffa11656b43fa5b5e7eb625ab758b8e6206bb297ecdb583fdd7f42f6521"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-17.patch": {
+      "bytes": 5436,
+      "sha256": "sha256:8decd74c4933b9afc13d5389735d624d312d78f8ca204c172c5aa32ac5d1349f"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-18.patch": {
+      "bytes": 3834,
+      "sha256": "sha256:ff5fe8b9f406734914d38dcfa1519f735e158371271b897cb549a5eefae73ec7"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-19.patch": {
+      "bytes": 7507,
+      "sha256": "sha256:df83388dd14144ce93cc7743a7d798a8a97c5aed642cc89c279550f6d4955499"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-20.patch": {
+      "bytes": 2886,
+      "sha256": "sha256:627302c6b44866ba3512099ccc2367c9c114c4e40edef999f279815181208b7e"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-21.patch": {
+      "bytes": 925,
+      "sha256": "sha256:938bba63128f0dc099f01df440e601c1057caefefff48216f9e178d493c2de8a"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-22.patch": {
+      "bytes": 2358,
+      "sha256": "sha256:27bf0a9b257f73936e859c35aa3df3400e978e3766feeb539861abffe0341f36"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-23.patch": {
+      "bytes": 6060,
+      "sha256": "sha256:606353ad32a14a2ea681737c97d0bc9500cc1634f8457284e574e690431d8688"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-24.patch": {
+      "bytes": 5944,
+      "sha256": "sha256:6a86bbb5a3cf88961d15b38db6b3fb4c62c1b491d196e2642f9488cb93ade439"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-25.patch": {
+      "bytes": 3971,
+      "sha256": "sha256:d34543be27a14d2666280a9eb1d08ed36f722e865100b71bb8742ad7afb0c133"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-26.patch": {
+      "bytes": 5301,
+      "sha256": "sha256:5187022a9de026df15b9ff3de3287f8bdd37164b56eab7eeba1c6a165526595f"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-27.patch": {
+      "bytes": 15791,
+      "sha256": "sha256:5e486886b9ea57ba2a9907327d8fa034110d8a26dc0257ba8f22d23be6a35ac2"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-28.patch": {
+      "bytes": 13426,
+      "sha256": "sha256:2fe0f44adc51e343b09d16456224e9bb8b51d8038b53d743a726bd8175247fcc"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-29.patch": {
+      "bytes": 22570,
+      "sha256": "sha256:3515992ef3b713746ef4ab7d642aeed862074f3f4b918e001459a98710e0e20c"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-30.patch": {
+      "bytes": 5303,
+      "sha256": "sha256:a55d163809e0c25629e8078950482be924ab4713204a1307e0704b35c7631ece"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-31.patch": {
+      "bytes": 4677,
+      "sha256": "sha256:ff0342933ac89c83588187e9993390aa0180ddd0e96c150ccce68917a5d5347b"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-32.patch": {
+      "bytes": 3999,
+      "sha256": "sha256:24f42918b4058a5330533ae2b2077622f97fc5599158533eafe5b535d0c1242e"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-33.patch": {
+      "bytes": 4002,
+      "sha256": "sha256:b48ed6eff1bf0cff8e102bfe46b43062ff767916ec69a48b2d5fb4e4712c33d8"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-34.patch": {
+      "bytes": 701,
+      "sha256": "sha256:0cf67ef4e26d253293ab7391815a483eb5d2bed9527e6604a3164ababdcb3381"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-35.patch": {
+      "bytes": 12408,
+      "sha256": "sha256:83ae5e27292b89776e2fa650e510c3de49bee17033a5b17400fdc5b2e2e2c663"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-36.patch": {
+      "bytes": 24594,
+      "sha256": "sha256:2b8084d2aad7f5fc3bfc4012d7b6677adcce298c228468a0c7d73bccae67d302"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-37.patch": {
+      "bytes": 3031,
+      "sha256": "sha256:e717949c034acf1d098802015d4106079184ab48e7e6657cd954cba2e1d5fa79"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-38.patch": {
+      "bytes": 9850,
+      "sha256": "sha256:f8cbc5d4771bb010e62eb7b47023eb73e494f9246ef8e5d3b3283822543dfc68"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-39.patch": {
+      "bytes": 6423,
+      "sha256": "sha256:b204712e87167b8367379dfee220ffe94f6c55d3d2d3052482b7b9ab53d54504"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-40.patch": {
+      "bytes": 6361,
+      "sha256": "sha256:3a7061e3b6b953b09231f9fb0a0098f76305f2e583531a666ac21ffce162732f"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-41.patch": {
+      "bytes": 5993,
+      "sha256": "sha256:543ba571890a9eb6eccae808cc1b36cced85c04562a6b6b46277c9449cb47b3e"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-42.patch": {
+      "bytes": 3636,
+      "sha256": "sha256:46989598d7c3ede237abdb907b2e81ccc34bddecf35f87180183ed2a2311b8f4"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-43.patch": {
+      "bytes": 1858,
+      "sha256": "sha256:06ba8a87ce24ea1fe4ec95018a339a61ec612fcc366391508c24305c3a0fbf22"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-44.patch": {
+      "bytes": 979,
+      "sha256": "sha256:787b278c47e4aec40abf71b00bc9a0f0a68f975408b9b1165de53e9e68905cc8"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-45.patch": {
+      "bytes": 1825,
+      "sha256": "sha256:eebfcd76b2f3344ac5fba86bd167ebf3ea560b10129d8f32295d5312a003c14c"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-46.patch": {
+      "bytes": 463,
+      "sha256": "sha256:9168e05c1b426327a4779aced3843a387132f7579478fda3684d11bcbadd9c56"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-47.patch": {
+      "bytes": 25941,
+      "sha256": "sha256:fbf0c79a0d0b9ca109e8e4a9612444503bc67378e587bd1bb95f66d33d2f2c91"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-48.patch": {
+      "bytes": 1533,
+      "sha256": "sha256:4be9ce73593330f245f1fffe3991f0a53b104e9b8ba1cb70ad52d7292fe070f5"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-49.patch": {
+      "bytes": 1119,
+      "sha256": "sha256:e8bc25c9bd89b3ed320689fb0349f07431d09a4afd1b15cc59a9d59fefe4ca17"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-50.patch": {
+      "bytes": 1121,
+      "sha256": "sha256:92a022eb9656c70a56fa64081454aa3d4f8cf4fd6acfe573bc309398ea55b9ff"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-51.patch": {
+      "bytes": 6800,
+      "sha256": "sha256:c86e3aba82f155337e1b94b11add49e8cbb71b925efcba5b48057cac57336608"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-52.patch": {
+      "bytes": 913,
+      "sha256": "sha256:24ac3e203311c544342af2967060b35487647f55489b98af2317987209a368be"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-53.patch": {
+      "bytes": 1385,
+      "sha256": "sha256:163e780002c6ef3e34817e8b5eec9c28cb46ff0f4adfef969d6e295038a502a5"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-54.patch": {
+      "bytes": 1582,
+      "sha256": "sha256:7fde7b53fecbaf8d0de15ddf39f0fa0c15bfefc38086ac6e0aac5ff3f19f4e74"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-55.patch": {
+      "bytes": 847,
+      "sha256": "sha256:1ac34f5106d6d20b5e88382f1a96a4fec15a88e1cf5cf2de853836f8d1dd19e2"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-56.patch": {
+      "bytes": 761,
+      "sha256": "sha256:b20900e8349cd58519949d4ef5e98b4ef3b830ee6eb586ea6a3a80f3a648c5e3"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-57.patch": {
+      "bytes": 1024,
+      "sha256": "sha256:77612cacd2efc25b4ffc57c22de75e3d32d7634b541692a9090804fc1c3998b8"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-58.patch": {
+      "bytes": 5387,
+      "sha256": "sha256:d6ca95f04cf379b9bd608301bdcdc6b136aa170c22bf339b2870534a5fddfc3b"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-59.patch": {
+      "bytes": 4061,
+      "sha256": "sha256:7117791ef9ea30cc61cf7e56ba51873c01e9b525d33add410f7e186071b1886f"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-60.patch": {
+      "bytes": 6810,
+      "sha256": "sha256:8ef011612c994047b0bb2388411baaa4b981b86ecac58f9f01c9bdc878a748ac"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-61.patch": {
+      "bytes": 2417,
+      "sha256": "sha256:20a30cb22389327268986f766522a46ba2e87d0b440a95903e8275f6eed31830"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-62.patch": {
+      "bytes": 5353,
+      "sha256": "sha256:dfd586fe10d0b3e7515b0a021287cd9285daf22932523902b2d89edd0a9d5c7f"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-63.patch": {
+      "bytes": 950,
+      "sha256": "sha256:021fdefdd0d81b6782a394695935d73087acb5626aa5d3ae1bdeda9af6caeb54"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-64.patch": {
+      "bytes": 1847,
+      "sha256": "sha256:c861bdaa261f85921a08004e9ab55f286b7aff0b7771f8717de9b19ee134b859"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-65.patch": {
+      "bytes": 1278,
+      "sha256": "sha256:b06725cd80f78810896f29e623779cb42936b8aa00a0c6fdb5fcf52d90120421"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-66.patch": {
+      "bytes": 4183,
+      "sha256": "sha256:37fd417f8356da2716e20a7d61813ea99362794cf870beace1d2c586772f0f0c"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-67.patch": {
+      "bytes": 2000,
+      "sha256": "sha256:ed07079ab7f3f2f45219fab2db98c907fb036257d3bf36c06bf0175a7b017c9e"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-68.patch": {
+      "bytes": 10692,
+      "sha256": "sha256:81acdd5694227d50f320da8eb6f50a52ba72533b53b0a3ece52369bb915b5375"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-69.patch": {
+      "bytes": 6138,
+      "sha256": "sha256:11b63b0a331c1b8eb871d02271d114247a96f66f0358a4e9db60e3d48d8a70bb"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-70.patch": {
+      "bytes": 1022,
+      "sha256": "sha256:c6dad94809be25e05d34609f2fc375d007c1f2f085368371dfe7c2980ad9c226"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-71.patch": {
+      "bytes": 690,
+      "sha256": "sha256:7dfd1ba105476d30782605b42b7e96a3692d64ff5658c830344803cdf3f6805e"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-72.patch": {
+      "bytes": 4345,
+      "sha256": "sha256:faf0af317e8502f30b19c4f2f996f3501cf405286e623ceff89e24781a0a7ac4"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-73.patch": {
+      "bytes": 2345,
+      "sha256": "sha256:6fc92cafc3167659aa9be69854bd465161bea847cdf1dc96ab83a33652bd832e"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-74.patch": {
+      "bytes": 3815,
+      "sha256": "sha256:cacc03e56f3be786c98544886984fd741aec922a289eea408aefffb3d1953564"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-75.patch": {
+      "bytes": 2182,
+      "sha256": "sha256:b528c0be3f69281ac2d1266120deb683dbea8a337275ddb6e944a9422d2db0d8"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-76.patch": {
+      "bytes": 583,
+      "sha256": "sha256:a24a540ee1ddda3126e8c61f542ac2cb15c90968ffc0cf61c884cc5f9229652c"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-77.patch": {
+      "bytes": 2841,
+      "sha256": "sha256:cc4463333dffbd62d7997a1003d9e0790774cbc57de856a912c8b894849b23bc"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-78.patch": {
+      "bytes": 960,
+      "sha256": "sha256:cc296131c29d6a91410a83bf96ee50261ca2b0ba2ab43b22d8a18fd01dc15974"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-79.patch": {
+      "bytes": 1209,
+      "sha256": "sha256:61b05fe356277e28fbecc19686c7b2c12bbfb1e51494e309cc5098f1120dcef0"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-80.patch": {
+      "bytes": 869,
+      "sha256": "sha256:0af00424fe84ff83758aad608ebaf4c4215a962b53d81284bd1d356474a5441e"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-81.patch": {
+      "bytes": 836,
+      "sha256": "sha256:3b5956d82531d28dae48e6784edf1034ac3a961e26d7776762ea27423b7a93ed"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-82.patch": {
+      "bytes": 1183,
+      "sha256": "sha256:ccc6f4a8606b06234b6426d86ddc5170251d5f617cb88cba037cb3bd2eae108a"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-83.patch": {
+      "bytes": 23929,
+      "sha256": "sha256:1e54f8a379c0ac5c03f8fccae4aab49821d7be1b9c89026f8b6f3e5b5d01bf10"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-84.patch": {
+      "bytes": 3128,
+      "sha256": "sha256:91c5b0a14e7030ebf6182797380fbe6c4d708a56e574a9ea6fea875f790facc4"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-85.patch": {
+      "bytes": 7173,
+      "sha256": "sha256:55550a8b36044b44ad4c30965770f34d08932d8861b6c097a68e693419f959e2"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-86.patch": {
+      "bytes": 4210,
+      "sha256": "sha256:d9d6aafa1f8f42e351d35d9591ebf1aefd0fe77279edc48adbd70870e6bfe64c"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-87.patch": {
+      "bytes": 3939,
+      "sha256": "sha256:cfc47e56f712738812365bccbcba8ec0dae76fafa90e9ff75af720debf3c89cf"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-88.patch": {
+      "bytes": 5086,
+      "sha256": "sha256:1fd4d1b271d3ac122230f5d16d6fd29520409676d352c62d689c676b9464fb38"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-89.patch": {
+      "bytes": 956,
+      "sha256": "sha256:f287a6c3e41cab06db63bf953769b6e50824da4446114ace38c0ce540025930f"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-90.patch": {
+      "bytes": 943,
+      "sha256": "sha256:87d90b09135768141c3698ecf8fa2368180a235cabb863cd6df7767091ca1a15"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-91.patch": {
+      "bytes": 1167,
+      "sha256": "sha256:ee22e62e3b83b46c4bb8c773515211984afadbbe031b49bddb20bc50172051bc"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-92.patch": {
+      "bytes": 2960,
+      "sha256": "sha256:2f3c562aea4ff542cb70601b0ebe66c3b0df628f2f34abab80daf67f12b6adb6"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-93.patch": {
+      "bytes": 2676,
+      "sha256": "sha256:be21d780e5a7c6394ab5b8e315680aada2bc8721e739ddae548f4d0b68af8c63"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-94.patch": {
+      "bytes": 18413,
+      "sha256": "sha256:8d009b8d6aff250114cf6b758a6ae13e561260bd1c741f04caff21ab738245c4"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-95.patch": {
+      "bytes": 32438,
+      "sha256": "sha256:3a6ea66aa5b251475f368c2e96d04c1b931bca06a281ac933250f5a720852b19"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-96.patch": {
+      "bytes": 6848,
+      "sha256": "sha256:0822ba29c1f9ee4644c9e8723a81a7e6a402e7160e9637175626c0ba654223ac"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-97.patch": {
+      "bytes": 1849,
+      "sha256": "sha256:53b234298b26f6e7ff96e11c8cc4957aba5004b9b474c7d3e0b90a0d78c64329"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-98.patch": {
+      "bytes": 756,
+      "sha256": "sha256:c90677cd64815340216a766474f7d1e931d0f1d83dd8ef8ae543ef4aa3ce2d78"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/change-99.patch": {
+      "bytes": 4310,
+      "sha256": "sha256:0f26d5af8880364337f4f284b4e0dc3f6b74537f15aec699e17b370f44331e3a"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/commit.json": {
+      "bytes": 217622,
+      "sha256": "sha256:051ebfd0b36e3f6ea0723bf52bb23c5aa684ba3f19e3725e10dca97b3fbe58bc"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/repository.json": {
+      "bytes": 6320,
+      "sha256": "sha256:e572997f28d58f012817a9a24e039cd1b6353d446981d0f5893f359e7501dc61"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/requests.json": {
+      "bytes": 815,
+      "sha256": "sha256:226c2ff88fc38605f8246c00ea85317d99b585c98dc6c865eb3ed58c7ea0fe92"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/skills-LICENSE.txt": {
+      "bytes": 1078,
+      "sha256": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/skills-license.json": {
+      "bytes": 2401,
+      "sha256": "sha256:b3330ea40f26aca3c80ed1afcffd39759265c418130ad7b5889022def0216619"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/skills-repository.json": {
+      "bytes": 6070,
+      "sha256": "sha256:ec6e4878662e8e56c611ca4dfa967ca2d933945751bb5207d1bf7a2a543889cf"
+    },
+    "docs/validation/evidence/openfilm-refresh-20261018/verification.json": {
+      "bytes": 192368,
+      "sha256": "sha256:14c58140f617da5e022f0274c20e95b2c92fad76dde824cc30e1ad5d45a50122"
+    },
+    "docs/产品需求与开发路线基线_2026-10-12.md": {
+      "bytes": 57178,
+      "sha256": "sha256:f01bc544b8863e9a97427a7c14e1fe70168fdd5dce1cba5147c9ad30d54f991e"
+    },
+    "docs/仓库与运行依赖锁定_v0.1_2026-10-13.md": {
+      "bytes": 10461,
+      "sha256": "sha256:e2671c8fa81133ecf0b23781c817cfe08730f9cdaf54ab981e04a7031889fb65"
+    },
+    "docs/构建进度总表_2026-10-16.md": {
+      "bytes": 49259,
+      "sha256": "sha256:a6aea0df7ace002f39f93311d4fbfd1bb820d6824a543a37471d1643533c6315"
+    },
+    "scripts/audit_openfilm_increment.py": {
+      "bytes": 10648,
+      "sha256": "sha256:f79b1da8789cdbdbf79f35fe063fe4abec10c30cbcc16dd7ff71fb9ed4d87b86"
+    },
+    "scripts/audit_openfilm_refresh.py": {
+      "bytes": 6348,
+      "sha256": "sha256:d939ed3abc6eade84cf78add72908f87ec0f7ccd2778804cded1149e29565a35"
+    },
+    "sources/upstream-manifest.json": {
+      "bytes": 5651,
+      "sha256": "sha256:aa96685930a368cb1ec3c24ed602583773c6a816c0b9e613013954d1672d36e2"
+    },
+    "sources/upstream/openfilm-0.2.0/LICENSE": {
+      "bytes": 1078,
+      "sha256": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc"
+    },
+    "sources/upstream/openfilm-0.2.0/download.json": {
+      "bytes": 559,
+      "sha256": "sha256:768c71ccb362a7cec7193fdf64215d13bec3510886f5909c53a79269daf90e30"
+    },
+    "sources/upstream/openfilm-0.2.0/repo.zip": {
+      "bytes": 11289603,
+      "sha256": "sha256:7af40e33f59a43c4426fcb4332a964bf3f814b63b954d375d557c964160dcee2"
+    }
+  }
+}

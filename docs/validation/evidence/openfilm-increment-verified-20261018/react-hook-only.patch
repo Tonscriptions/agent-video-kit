@@ -1,0 +1,24 @@
+--- original/packages/openfilm/studio/ui/src/lib/timecode.ts
++++ without-hook/packages/openfilm/studio/ui/src/lib/timecode.ts
+@@ -13,7 +13,6 @@
+  *
+  * Fixed width (`00:` even under an hour): a timecode is read while it changes, and a changing width makes it jitter.
+  */
+-import { useSyncExternalStore } from 'react';
+ 
+ /** The frame rate before a project says otherwise, and the grid the ruler's steps are counted in. */
+ export const DISPLAY_FPS = 30;
+@@ -76,13 +75,6 @@
+ }
+ 
+ /** The rate, kept up to date: a component that shows frames renders again when the project's rate changes. */
+-export function useTimecodeFps(): number {
+-  return useSyncExternalStore(
+-    (fn) => { listeners.add(fn); return () => { listeners.delete(fn); }; },
+-    timecodeFps,
+-    () => DISPLAY_FPS,
+-  );
+-}
+ 
+ function pad(n: number): string {
+   return String(n).padStart(2, '0');

@@ -1,0 +1,79 @@
+--- fixed/packages/openfilm/studio/ui/src/App.tsx
++++ head/packages/openfilm/studio/ui/src/App.tsx
+@@ -3,6 +3,10 @@
+  * opened last, or (none left, or only ones whose folder is gone) shows the Projects window on its own, with "New
+  * project" in it: no folder is made that the person did not ask for. The address is the state, so the agent's
+  * `openfilm open` (which sends the page to a project) and the browser's back button both work.
++ *
++ * In an app with tabs (lib/host.ts `tabs`) this page is one project's tab: a project picked opens in its own tab (the
++ * app's to open), `/` is the projects (the window with no tab open), and `openfilm open` is the app's to settle (every
++ * tab hears it).
+  */
+ import { useEffect, useState, useSyncExternalStore } from 'react';
+ import { api, listen, studioConnection } from './api';
+@@ -10,8 +14,10 @@
+ import { ProjectView } from './components/ProjectView';
+ import { BrandLoadingScreen } from './components/BrandLoadingScreen';
+ import { ProjectsPopover } from './components/ProjectsLibrary';
++import { Launcher } from './components/Launcher';
+ import { studioHost } from './lib/host';
+ import { WhatsNew } from './components/WhatsNew';
++import { sourcesApi } from './lib/project-sources';
+ 
+ /**
+  * `to` with this page's key in its address (the server puts it there): the address bar is what a person copies, and
+@@ -26,6 +32,8 @@
+ };
+ 
+ const projectIn = (path: string) => /^\/projects\/([\w-]+)/.exec(path)?.[1] ?? null;
++/** the app's tabs, when Studio is a tab of an app's window */
++const tabs = studioHost?.tabs ?? null;
+ 
+ export function App() {
+   const [path, setPath] = useState(location.pathname);
+@@ -34,19 +42,31 @@
+     setPath(to);
+   };
+ 
++  /* the examples and skills, read as Studio opens: a gallery opened later shows them at once */
++  useEffect(() => { sourcesApi.preload(); }, []);
++
+   useEffect(() => {
+     const onPop = () => setPath(location.pathname);
+     window.addEventListener('popstate', onPop);
+-    /* `openfilm open` while this page is open: show the project it opened */
+-    const stop = listen('events', (event) => { if (event.type === 'open') go(event.to); }, { watch: true });
++    /* `openfilm open` while this page is open: show the project it opened (with tabs, the app says which tab does) */
++    const stop = listen('events', (event) => {
++      if (event.type !== 'open') return;
++      if (tabs) tabs.openRequest(event.to); else go(event.to);
++    }, { watch: true });
+     return () => { window.removeEventListener('popstate', onPop); stop(); };
+   }, []);
+ 
++  /** Show a project: here, or (with tabs) in its own tab. */
++  const open = (projectId: string) => { if (tabs) tabs.open(projectId); else go(`/projects/${projectId}`); };
++  /** The project shown was deleted: its tab closes (with tabs), or back to the last project. */
++  const leave = () => { if (tabs) tabs.report({ gone: true }); else go('/', true); };
++
+   const id = projectIn(path);
+-  /* no project in the address: the one opened last that is still there, else the Projects window (`none`) */
++  /* no project in the address: the one opened last that is still there, else the Projects window (`none`); with
++     tabs, the projects (no tab is open) */
+   const [none, setNone] = useState(false);
+   useEffect(() => {
+-    if (id) return;
++    if (id || tabs) return;
+     let alive = true;
+     void api.projects().then((projects) => {
+       if (!alive) return;
+@@ -57,7 +77,8 @@
+     return () => { alive = false; setNone(false); };
+   }, [id]);
+ 
+-  const page = id ? <ProjectView key={id} projectId={id} onProject={(next) => go(`/projects/${next}`)} onLeave={() => go('/', true)} />
++  const page = id ? <ProjectView key={id} projectId={id} onProject={open} onLeave={leave} />
++    : tabs ? <Launcher onOpen={open} />
+     : !none ? <BrandLoadingScreen labelKey="projects.opening" />
+       : (
+         <div className="workspace-shell bg-[var(--dock-shell)]">

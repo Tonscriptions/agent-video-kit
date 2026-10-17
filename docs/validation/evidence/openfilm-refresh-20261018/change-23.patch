@@ -1,0 +1,104 @@
+--- fixed/apps/desktop/shell/bridge.ts
++++ head/apps/desktop/shell/bridge.ts
+@@ -10,7 +10,7 @@
+  * (src/preload.cjs). Imported before Studio's modules and the chat's: Studio reads its host as it loads.
+  */
+ import { flushSync } from 'react-dom';
+-import type { HostAgent, HostAsk, HostUpdate, HostUpdateState, StudioCommand, StudioHost, StudioRef, StudioSelection } from 'openfilm/studio-ui/lib/host.ts';
++import type { CommunityItem, HostAgent, HostAsk, HostUpdate, HostUpdateState, StudioCommand, StudioHost, StudioRef, StudioSelection } from 'openfilm/studio-ui/lib/host.ts';
+ 
+ type Listener<T> = (value: T) => void;
+ type Stop = () => void;
+@@ -25,9 +25,13 @@
+   pickFolder(options?: { title?: string; button?: string; at?: string }): Promise<string | null>;
+   capture(rect: { x: number; y: number; width: number; height: number }): Promise<string | null>;
+   agents: NonNullable<StudioHost['agents']>;
++  /* the window's tabs (src/tabs.mjs) */
++  tabs: NonNullable<StudioHost['tabs']>;
+   localAgents: Record<string, unknown>;
+   importFile(request: { projectId: string; path: string; name: string }): Promise<{ ok: true; path: string } | { ok: false; error: string }>;
+   chat: Record<string, (...args: never[]) => Promise<unknown>>;
++  /* the composer's Skills button (src/skills-ipc.mjs) */
++  skills: Record<string, (...args: never[]) => Promise<unknown>>;
+   prefs: { get(): Promise<AppPrefs>; set(next: Partial<AppPrefs>): Promise<unknown>; onChange(listener: Listener<AppPrefs>): Stop };
+   saveLayout(layout: { chatOpen: boolean; chatWidth: number }): void;
+   setTheme(theme: Theme): void;
+@@ -70,8 +74,10 @@
+ const panelState = () => ({ open: layout.open, width: shownWidth(), assets: { open: assets.open && layout.open, bottom: assets.bottom } });
+ const panelListeners = new Set<Listener<ReturnType<typeof panelState>>>();
+ 
++/** The page shows a project (not a new tab's launcher): only then is there a chat to show. */
++const onProject = () => /^\/projects\/[\w-]+/.test(location.pathname);
+ function place() {
+-  column.hidden = !layout.open;
++  column.hidden = !layout.open || !onProject();
+   column.style.width = `${shownWidth()}px`;
+   column.style.top = `${TOP_BAR}px`;
+   /* the column never moves or resizes for the assets: the chat shows only its composer then, and the rest of the
+@@ -137,14 +143,17 @@
+ }
+ for (const method of ['pushState', 'replaceState'] as const) {
+   const original = history[method].bind(history);
+-  history[method] = (...args: Parameters<History['pushState']>) => { original(...args); projectReady = follow(); };
+-}
+-addEventListener('popstate', () => { projectReady = follow(); });
++  history[method] = (...args: Parameters<History['pushState']>) => { original(...args); projectReady = follow(); place(); };
++}
++addEventListener('popstate', () => { projectReady = follow(); place(); });
+ projectReady = follow();
+ 
+ /* ── between Studio and the chat: what is selected, what is referenced, what Studio is asked to show ── */
+ const selection = signal<StudioSelection | null>(null);
+ const refer = events<StudioRef>();
++/* a skill picked in the examples (Studio's ExamplesDialog), to be named in the message; and "Add a skill" there */
++const skillPicked = events<{ name: string; description: string }>();
++const skillAdd = events<void>();
+ /** what the pointer is over in Studio (null: nothing), for the chat to light its pills that point at it */
+ const hover = signal<StudioRef | null>(null);
+ let command: ((command: StudioCommand) => void) | null = null;
+@@ -271,6 +280,9 @@
+   developer,
+   update,
+   folders: { pick: native.pickFolder, pathOf: native.pathForFile },
++  tabs: native.tabs,
++  useSkill: (skill) => skillPicked.set(skill),
++  skills: { add: () => skillAdd.set(undefined) },
+ };
+ (window as unknown as { openfilmHost: StudioHost }).openfilmHost = host;
+ 
+@@ -302,6 +314,8 @@
+     case 'track': return { type: 'show-track', track: ref.track };
+     case 'file': return { type: 'show-file', path: ref.path };
+     case 'subtitle': return { type: 'show-subtitle', start: ref.start, end: ref.end };
++    /* another film: the examples, where it came from */
++    case 'example': return { type: 'show-examples', open: { kind: 'example', id: ref.id } };
+   }
+ }
+ const uploadName = (name: string) => name.split(/[\\/]/).pop()!.replace(/[\u0000-\u001f]+/g, '').slice(0, 200) || 'file';
+@@ -337,6 +351,18 @@
+   onSelection: (listener: Listener<StudioSelection>) => selection.on((s) => { if (s) listener(s); }),
+   onFfmpeg: native.onFfmpeg,
+   showInStudio: (ref: StudioRef) => command?.(commandFor(ref)),
++  /* an example's folder on this computer (Studio fetches it when needed), for a reference to one in a message sent */
++  async exampleFolder(id: string) {
++    const res = await fetch(`/api/examples/${encodeURIComponent(id)}/folder`, { method: 'POST' });
++    const body = await res.json().catch(() => ({})) as { folder?: string; error?: string };
++    if (!res.ok || !body.folder) throw new Error(body.error ?? `Studio answered ${res.status}`);
++    return body.folder;
++  },
++  /* the composer's examples button: the examples over the film, to point at one or name a skill */
++  showExamples: (open?: CommunityItem) => command?.({ type: 'show-examples', ...(open ? { open } : {}) }),
++  onUseSkill: skillPicked.on,
++  onAddSkill: skillAdd.on,
++  useSkill: (skill: { name: string; description: string }) => skillPicked.set(skill),
+   /* a reference made in the chat (⌘L there, the @ menu) gets its picture as Studio's own do */
+   withPicture: (ref: StudioRef) => { const done = pictured.then(() => withPicture(ref)); pictured = done.then(() => {}); return done; },
+   /* what a pill hovered in the chat points at, lit in Studio while it is (null: none); and the references of the
+@@ -378,6 +404,7 @@
+   setMenuOpen() {},
+   /* the chat's record of each project, in its .film/chat and .film/logs */
+   chat: native.chat,
++  skills: native.skills,
+   asks: { get: asks.get, onChange: asks.on, answer: (id: string, allow: boolean) => answerAsk(id, allow) },
+   developer,
+ };

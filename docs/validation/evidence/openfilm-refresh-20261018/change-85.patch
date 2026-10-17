@@ -1,0 +1,127 @@
+--- fixed/packages/openfilm/studio/server/stage.js
++++ head/packages/openfilm/studio/server/stage.js
+@@ -9,6 +9,7 @@
+  *
+  *   editor → { source: 'openfilm-studio', type: 'stage', seq, op, ...args }    (ops below, at `ops`)
+  *   film   → { source: 'openfilm-film', type: 'stage', seq, result }           the answer (null when nothing)
++ *            { type: 'stage-event', event: 'typing', handle, value }   the words of an in-place edit as they are typed
+  *            { type: 'stage-event', event: 'text', handle, commit, value?, before? }   an in-place edit ended
+  *            { type: 'stage-event', event: 'key', key, code, repeat, metaKey, ctrlKey, shiftKey, altKey }
+  *                                                   a key pressed in the picture (not while typing in it)
+@@ -101,6 +102,8 @@
+   const INLINE = new Set(['BR', 'WBR', 'EM', 'STRONG', 'B', 'I', 'U', 'S', 'SPAN', 'SMALL', 'SUP', 'SUB', 'A', 'MARK', 'CODE', 'ABBR', 'Q', 'TIME']);
+   const EDITOR_ATTR = 'data-openfilm-text-editor';
+   const LIMIT = 1500;
++  /** At most this many custom properties, and as many words, as a page's template controls. */
++  const CONTROLS = 40;
+ 
+   const view = (el) => el.ownerDocument.defaultView;
+   const css = (el) => view(el).getComputedStyle(el);
+@@ -583,6 +586,30 @@
+    */
+   const backdrop = (c, hit) => hit.kind === 'box' && !hit.frame.r
+     && hit.rect.left <= 1 && hit.rect.top <= 1 && hit.rect.right >= c.win.innerWidth - 1 && hit.rect.bottom >= c.win.innerHeight - 1;
++  /** A layer that fills its whole page, whatever it is (a vignette's box, a grain's canvas, a letterbox's picture). */
++  const fillsPage = (c, hit) => !hit.frame.r
++    && hit.rect.left <= 1 && hit.rect.top <= 1 && hit.rect.right >= c.win.innerWidth - 1 && hit.rect.bottom >= c.win.innerHeight - 1;
++  /**
++   * The page a point of the picture is about. The top page under it, unless all it has there fills the page (a
++   * letterbox, a vignette, grain laid over the film) while a page under it has a layer of its own there: then that
++   * one, so a click on a title under a full-frame overlay takes the title. A layer in hand keeps its own page.
++   */
++  const pageAt = (x, y, includeLocked, held) => {
++    const inside = (c) => { const p = matrixOf(c).inverse().transformPoint(new DOMPoint(x, y)); return p.x >= 0 && p.y >= 0 && p.x <= c.w && p.y <= c.h ? p : null; };
++    if (held) {
++      const own = shown().find((c) => c.kind === 'page' && c.win && c.win.document === held.ownerDocument && inside(c));
++      if (own) return own;
++    }
++    const top = clipAt(x, y);
++    if (!top || top.kind !== 'page' || !top.win) return top;
++    for (const c of shown()) {
++      const p = inside(c);
++      if (!p) continue;
++      if (c.kind !== 'page' || !c.win) break;
++      if (layersAt(c, p.x, p.y, includeLocked).some((h) => !fillsPage(c, h))) return c;
++    }
++    return top;
++  };
+   /** A layer inside a group is the group until the group is entered (a layer of it is in hand). */
+   const liftToGroup = (hit, current) => {
+     const groups = [];
+@@ -901,7 +928,12 @@
+         else el.style.setProperty(prop, extra[k], 'important');
+       }
+     };
+-    const onInput = () => { if (search && editing) editing.hold = search(holdInline); };
++    /* the editor shows the words as they are typed (the inspector's box with them); they are kept at Enter or blur */
++    const onInput = () => {
++      if (!editing) return;
++      if (search) editing.hold = search(holdInline);
++      post({ type: 'stage-event', event: 'typing', handle, value: overlay ? collapse(host.innerText ?? host.textContent ?? '') : stageText(host) });
++    };
+     const host = overlay ? openOverlay(el) : el;
+     /* the line hidden under its overlay, the blocks in it still shown (they are not what is typed) */
+     const blocks = overlay ? blocksIn(el).map((b) => [b, b.getAttribute('style')]) : [];
+@@ -1227,7 +1259,7 @@
+   const ops = {
+     /** The layer under a point: the smallest (Alt: the next one under `cycleFrom`); groups stand for their layers. */
+     hit({ x, y, cycleFrom, includeLocked, from, enter, detail }) {
+-      const c = clipAt(x, y);
++      const c = pageAt(x, y, Boolean(includeLocked), nodeOf(cycleFrom) ?? nodeOf(from));
+       if (!c || c.kind !== 'page' || !c.win) return null;
+       const p = matrixOf(c).inverse().transformPoint(new DOMPoint(x, y));
+       const all = layersAt(c, p.x, p.y, Boolean(includeLocked));
+@@ -1507,6 +1539,53 @@
+     },
+     textStart: startText,
+     textFinish({ commit }) { finishText(Boolean(commit)); return true; },
++    /**
++     * A page clip's template controls, what the inspector offers to change in it without opening the page: the CSS
++     * custom properties its stylesheets set on `:root` (or `html`), each with its value now; its words, each layer of
++     * text with its selector and its words now; and its pictures, each <img> and each box painted with one image, with
++     * the address drawn now. Null when the clip is not a page on the picture now.
++     */
++    controls({ clip }) {
++      const c = clipById(clip);
++      const doc = c?.kind === 'page' ? c.win?.document : null;
++      if (!doc?.documentElement || !doc.body) return null;
++      const names = new Set();
++      const root = /^(?::root|html)$/i;
++      const read = (rules) => {
++        for (const rule of rules ?? []) {
++          if (names.size >= CONTROLS) return;
++          if (rule.cssRules && !rule.selectorText) { read(rule.cssRules); continue; }
++          if (!rule.selectorText || !rule.selectorText.split(',').some((sel) => root.test(sel.trim()))) continue;
++          for (const prop of rule.style) if (prop.startsWith('--')) names.add(prop);
++        }
++      };
++      for (const sheet of doc.styleSheets) {
++        try { read(sheet.cssRules); } catch { /* a stylesheet from elsewhere: not readable */ }
++      }
++      const now = c.win.getComputedStyle(doc.documentElement);
++      const vars = [...names].slice(0, CONTROLS).map((name) => ({ name, value: now.getPropertyValue(name).trim() }));
++      const texts = [];
++      for (const el of layersOf(doc)) {
++        if (texts.length >= CONTROLS) break;
++        if (kindOf(el) !== 'text' || isSvgText(el) || el.closest('svg')) continue;
++        const value = textOf(el);
++        if (!value) continue;
++        const { at, n } = locOf(el);
++        texts.push({ at, ...(n ? { n } : {}), label: el.id ? nameOf(el) : '', value });
++      }
++      const images = [];
++      for (const el of layersOf(doc)) {
++        if (images.length >= CONTROLS) break;
++        if (el.closest('svg')) continue;
++        const img = el.localName.toLowerCase() === 'img';
++        const painted = img ? null : /^url\("?([^"]*)"?\)$/.exec(css(el).backgroundImage);
++        const src = img ? el.currentSrc || el.src : painted?.[1] ?? '';
++        if (!src) continue;
++        const { at, n } = locOf(el);
++        images.push({ at, ...(n ? { n } : {}), label: el.id ? nameOf(el) : (img && el.alt) || '', kind: img ? 'img' : 'bg', src });
++      }
++      return { vars, texts, images, page: c.win.location.href };
++    },
+   };
+ 
+   window.addEventListener('message', async (e) => {

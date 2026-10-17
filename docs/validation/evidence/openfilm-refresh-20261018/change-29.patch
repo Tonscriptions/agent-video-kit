@@ -1,0 +1,351 @@
+--- fixed/apps/desktop/src/agents.mjs
++++ head/apps/desktop/src/agents.mjs
+@@ -32,7 +32,9 @@
+ import { fileURLToPath } from 'node:url';
+ import * as acp from '@agentclientprotocol/sdk';
+ import { PATH_SEP, childEnvironment, lastPathSource, loginShellEnvironment, loginShellVariables, shellSubset } from './environment.mjs';
+-import { AGENT_PROGRAMS, HOME_BIN_CANDIDATES, chosenProgram, consoleProgram, detectAgentInstallation, searchReport } from './agent-installation.mjs';
++import { AGENT_PROGRAMS, HOME_BIN_CANDIDATES, chosenProgram, codexVersion, consoleProgram, detectAgentInstallation, laterVersion, searchReport } from './agent-installation.mjs';
++import { logSwitches } from './agent-logs.mjs';
++import { mergeConfig, sessionSkills } from './agent-skills.mjs';
+ import { nodeBinary } from './node-runtime.mjs';
+ import { outOfBalance } from './pi-config.mjs';
+ 
+@@ -64,7 +66,7 @@
+   codex: {
+     label: 'Codex',
+     adapter: '@agentclientprotocol/codex-acp',
+-    env: (path) => ({ CODEX_PATH: path }),
++    env: (path) => codexLaunchEnv(path),
+     auth: ['login', 'status'],
+     login: ['login'],
+     systemPrompt: true,
+@@ -84,6 +86,14 @@
+ export const HARNESS_AGENTS = Object.freeze(['byok']);
+ export const isChatAgent = (id) => isAgentId(id) || HARNESS_AGENTS.includes(id);
+ 
++/** How the person points at things in Studio, and how the agent points back: told to every agent, the app's own too. */
++export const STUDIO_REFERENCES = `When the person mentions something in Studio, they may name a clip, a page or a moment (as seconds); find it in
++film.html and the project's files.
++
++In your replies you can point at things in Studio for the person: [[clip:ID]] (a clip, by its id in film.html),
++[[t:SECONDS]] (a moment), [[range:START-END]] (a stretch, in seconds), [[track:N]] (a track, 0 is the first) and
++[[file:PATH]] (a file of the project). They show as links that open it in Studio.`;
++
+ /** What the agent is told about where it is, on top of its own instructions. */
+ export const INSTRUCTIONS = `You are working inside OpenFilm, a desktop app for making videos. Beside this chat the person sees OpenFilm Studio,
+ the video editor, showing the project in your working directory; it updates live as you save files.
+@@ -95,30 +105,19 @@
+ to see what you made. Render the MP4 only when the person asks for it; they can also export from Studio. Reply in the
+ language the person writes in.
+ 
+-When the person mentions something in Studio, they may name a clip, a page or a moment (as seconds); find it in
+-film.html and the project's files.
+-
+-In your replies you can point at things in Studio for the person: [[clip:ID]] (a clip, by its id in film.html),
+-[[t:SECONDS]] (a moment), [[range:START-END]] (a stretch, in seconds), [[track:N]] (a track, 0 is the first) and
+-[[file:PATH]] (a file of the project). They show as links that open it in Studio.`;
+-
+-/**
+- * For the app's own agent, which has no web tools of its own: web search and web pages from a service the person
+- * connected (Brave Search or Tavily), like any other media (`openfilm get` lists them for an agent with OPENFILM_GET_WEB=1).
+- */
+-export const WEB_INSTRUCTIONS = `To search the web, run \`openfilm get web-search --query "…"\`; to read a page, \`openfilm get web-fetch --url …\`
+-(it saves the page's text in the project). Both work once the person has connected a web search service (Brave Search
+-or Tavily) with their own key; until then, read public pages with \`curl\`.`;
+-
+-/**
+- * The app's own agent's whole system prompt, in place of Pi's (a coding assistant's, with Pi's own docs): who it is
+- * and how it works with the person (agent-prompt.md), where it is (INSTRUCTIONS, WEB_INSTRUCTIONS), and the manual
+- * `openfilm` prints, so it starts knowing it.
++${STUDIO_REFERENCES}`;
++
++/**
++ * The app's own agent's whole system prompt, in place of Pi's (a coding assistant's, with Pi's own docs): who it is,
++ * where it is and how it works with the person (agent-prompt.md: written for it, so not INSTRUCTIONS, which tell
++ * another agent to go and read the manual), how the person points at Studio (STUDIO_REFERENCES), and the manual
++ * `openfilm` prints, so it starts knowing it. Each thing is said once: what the manual says (`openfilm get`'s
++ * services, rendering, the person's changes) and what Pi's tools say of themselves are not said again.
+  */
+ export function ownAgentPrompt() {
+   const prompt = readFileSync(new URL('./agent-prompt.md', import.meta.url), 'utf8').trim();
+   const manual = readFileSync(join(dirname(require.resolve('openfilm/package.json')), 'MANUAL.md'), 'utf8').replaceAll('npx openfilm', 'openfilm').trim();
+-  return `${prompt}\n\n## Where you are\n\n${INSTRUCTIONS}\n\n${WEB_INSTRUCTIONS}\n\n<manual>\n${manual}\n</manual>`;
++  return `${prompt}\n\n## Pointing at Studio\n\n${STUDIO_REFERENCES}\n\n<manual>\n${manual}\n</manual>`;
+ }
+ 
+ /**
+@@ -156,6 +155,28 @@
+ }
+ 
+ const windows = process.platform === 'win32';
++
++/**
++ * How the Codex adapter is told where Codex is. On Windows it starts it through cmd.exe, whose own messages (a program
++ * not found, access refused) are in the console's code page, which the adapter reads as UTF-8: on a Chinese Windows
++ * the reason came out as `������`. There Codex is started through a script that turns the console to UTF-8 first, made
++ * on disk (the app's own files are in an archive cmd.exe cannot run from); Codex's own messages are UTF-8 already.
++ */
++export const CODEX_UTF8_CMD = '@echo off\r\nchcp 65001 >nul\r\n"%OPENFILM_CODEX%" %*\r\n';
++export function codexLaunchEnv(/** @type {string} */ path, { win = windows, dir = join(tmpdir(), 'openfilm-codex') } = {}) {
++  if (!win) return { CODEX_PATH: path };
++  try {
++    const script = join(dir, 'codex-utf8.cmd');
++    if (!existsSync(script) || readFileSync(script, 'utf8') !== CODEX_UTF8_CMD) {
++      mkdirSync(dir, { recursive: true });
++      writeFileSync(script, CODEX_UTF8_CMD);
++    }
++    return { CODEX_PATH: script, OPENFILM_CODEX: path };
++  } catch {
++    /* no room for the script: Codex as before, its reasons maybe unreadable */
++    return { CODEX_PATH: path };
++  }
++}
+ /** what the slower search found last (Windows): npm's global folder, Codex inside a Microsoft Store app */
+ let slowFound = { npmPrefix: null, storeCodex: null };
+ let slowCache = null;
+@@ -311,7 +332,7 @@
+ /**
+  * Signed in, and as whom, asked of the program: `account` is what it says of its sign-in (Claude Code: email,
+  * organization, plan; Codex: how, ChatGPT or an API key), never a key or a token.
+- * @returns {Promise<{ signedIn: boolean | null, account: AgentAccount | null }>}
++ * @returns {Promise<{ signedIn: boolean | null, account: AgentAccount | null, problem?: string }>}
+  */
+ export async function agentStatus(id, cliPath) {
+   const spec = AGENTS[id];
+@@ -325,7 +346,8 @@
+ /**
+  * @typedef {{ method: 'claude.ai' | 'console' | 'api-key' | 'chatgpt' | 'other', email?: string, org?: string, plan?: string }} AgentAccount
+  * What a sign-in status says: Claude Code's JSON, Codex's words. @param {string} id @param {string} stdout @param {string} out
+- * @returns {{ signedIn: boolean | null, account: AgentAccount | null }}
++ * `problem`: why it could not say, when that is something the person can fix (its settings it cannot read).
++ * @returns {{ signedIn: boolean | null, account: AgentAccount | null, problem?: string }}
+  */
+ export function readAgentStatus(id, stdout, out) {
+   if (id === 'claude') {
+@@ -338,6 +360,9 @@
+       return { signedIn: true, account: { method, email: text(s.email), org: text(s.orgName), plan: text(s.subscriptionType) } };
+     } catch { /* not JSON: read the words */ }
+   }
++  /* settings it cannot read (a value only a later version knows): it can't say, nor start a session, until fixed */
++  const broken = /error loading config(?:uration)?\b[:\s]*(.*)/i.exec(out);
++  if (broken) return { signedIn: null, account: null, problem: broken[0].trim().slice(0, 500) };
+   if (/\bnot logged in\b/i.test(out)) return { signedIn: false, account: null };
+   if (/\blogged in\b/i.test(out)) {
+     const method = /chatgpt/i.test(out) ? 'chatgpt' : /api key/i.test(out) ? 'api-key' : 'other';
+@@ -485,10 +510,14 @@
+ export async function listAgents() {
+   /* looked at as the person comes back from installing one: a PATH from a few seconds ago at most */
+   const pathDirs = (await loginShellEnvironment({ maxAgeMs: 10_000 })).PATH.split(PATH_SEP);
+-  /* one not found the quick way: the slower search (Windows), then all of them again; waited for a few seconds at
+-     most, what it finds later is there on the next look */
+-  if (windows && Object.keys(AGENTS).some((id) => !resolveAgentCli(id, { pathDirs }))) {
+-    await Promise.race([windowsSlowSearch(), new Promise((done) => setTimeout(done, 3000).unref?.())]);
++  /* the slower search (Windows): always, as it finds Codex inside a Store app, which may be later than one on the PATH
++     (resolveAgentCli takes the later); waited for, a few seconds at most, when one is not found the quick way. What it
++     finds later is there on the next look */
++  if (windows) {
++    const slow = windowsSlowSearch();
++    if (Object.keys(AGENTS).some((id) => !resolveAgentCli(id, { pathDirs }))) {
++      await Promise.race([slow, new Promise((done) => setTimeout(done, 3000).unref?.())]);
++    }
+   }
+   return Promise.all(Object.entries(AGENTS).map(async ([id, spec]) => {
+     const cli = resolveAgentCli(id, { pathDirs });
+@@ -611,10 +640,31 @@
+ /** ACP's auth_required: the agent wants its own sign-in first. */
+ const AUTH_REQUIRED = -32000;
+ 
+-/** A session refused for the agent's sign-in, said so (`code: 'sign-in'`); any other error as it was. */
+-function signInError(label, e) {
+-  if (e?.code !== AUTH_REQUIRED) return e;
+-  return Object.assign(new Error(`${label} is not signed in. Sign in under Settings → Agents.`), { code: 'sign-in' });
++/** The oldest Codex the chat was tried with: an older one may have an app server the adapter can't talk to. */
++export const CODEX_TESTED = '0.132.0';
++
++/**
++ * A Codex that did not start, older than the ones tried: its reason, and that updating it is the likely fix (an old
++ * one's app server goes away as the session opens, "connection got disposed", and says nothing more).
++ * @param {string} agent @param {string | undefined} path @param {any} e @param {(file: string) => string | null} [versionOf]
++ */
++export function codexTooOld(agent, path, e, versionOf = codexVersion) {
++  if (agent !== 'codex' || !path || e?.code === 'sign-in' || e?.code === 'not-installed') return e;
++  const version = versionOf(path);
++  if (!version || !laterVersion(CODEX_TESTED, version)) return e;
++  const why = e instanceof Error ? e.message : String(e);
++  return Object.assign(new Error(`Codex ${version} is older than OpenFilm needs (${CODEX_TESTED} or later): update Codex, then try again. ${why}`.trim()), { code: 'outdated' });
++}
++
++/**
++ * A session refused for the agent's sign-in, said so (`code: 'sign-in'`); any other error with its reason: an error
++ * the agent sends as "Internal error" carries the reason in its `data` (Codex's settings it cannot read, for one).
++ */
++export function signInError(label, e) {
++  if (e?.code === AUTH_REQUIRED) return Object.assign(new Error(`${label} is not signed in. Sign in under Settings → Agents.`), { code: 'sign-in' });
++  const data = e?.data;
++  const why = typeof data === 'string' ? data : [data?.message, data?.details].find((v) => typeof v === 'string') ?? '';
++  return why.trim() ? Object.assign(new Error(why.trim()), { code: e.code }) : e;
+ }
+ 
+ /** The answer that lets it go ahead (for good, where it offers that), or null when none does. */
+@@ -645,13 +695,22 @@
+  */
+ export class AgentSession {
+   /**
+-   * `harness` (for 'byok'): agent-roster.mjs's `harness(id)`, Pi's folder, its service and its model.
++   * `harness` (for 'byok'): agent-roster.mjs's `harness(id)`, Pi's folder, the person's models (each its own service)
++   * and the one it starts on.
+    * @param {{ agent: string, cwd: string, resume?: string | null, binDir?: string | null, fallbackDir?: string | null,
+    *           harness?: any,
+-   *           env?: Record<string, string>,
++   *           env?: Record<string, string>, logDir?: string | null,
++   *           skills?: { dataDir: string, mine?: string, allowed?: string[], mcpAllowed?: string[] } | null,
+    *           onUpdate?: (update: any) => void, onPermission?: (params: any) => Promise<string | null>,
+    *           onQuestion?: (ask: { message: string, toolCallId: string | null, questions: any[] }) => Promise<Record<string, { label?: string, text?: string }> | null>,
+-   *           onExit?: (info: { code: number | null, stderr: string }) => void }} opts
++   *           onExit?: (info: { code: number | null, stderr: string }) => void,
++   *           onSend?: (sent: { prompt: any[], _meta?: any }) => void }} opts
++   * `onSend` hears each message as it goes to the agent, whole (the app's words before the first one's, for an agent
++   * told them there); `opened`, once started, says what it was started and opened with.
++   * `skills`: the session has its maker's skills and MCP servers, OpenFilm's skills, and of the person's own only those
++   * let in (`allowed`, `mcpAllowed`), each agent told by its own switch (agent-skills.mjs); `opened.skills` says how.
++   * `logDir` (Developer mode): an agent whose own record lacks what its model got is started with its own logging
++   * switch, writing under this folder (agent-logs.mjs); `opened.log` says where.
+    */
+   constructor(opts) {
+     if (!isChatAgent(opts.agent)) throw new Error(`Unknown agent: ${String(opts.agent)}`);
+@@ -672,10 +731,19 @@
+    * `openfilm` first on its PATH; the app's ffmpeg (`fallbackDir`) last, for a computer that has none of its own.
+    */
+   async start() {
++    try {
++      return await this.open();
++    } catch (e) {
++      throw codexTooOld(this.opts.agent, this.cli?.path, e);
++    }
++  }
++
++  async open() {
+     const shell = agentShell(this.opts.agent, await loginShellVariables({ staleOk: true }));
+     const harness = this.opts.harness ?? null;
+     const cli = harness ? null : resolveAgentCli(this.opts.agent, { pathDirs: shell.PATH.split(PATH_SEP) });
+     if (!harness && !cli) throw Object.assign(new Error(`${this.spec.label} is not installed on this computer.`), { code: 'not-installed' });
++    this.cli = cli;
+     const node = nodeRuntime();
+     const path = [this.opts.binDir, shell.PATH, this.opts.fallbackDir].filter(Boolean).join(PATH_SEP);
+     const instructions = INSTRUCTIONS;
+@@ -684,15 +752,27 @@
+     const own = !harness ? {} : {
+       ...harness.env,
+       OPENFILM_GET_WEB: '1',
+-      OPENFILM_PI: JSON.stringify({ agentDir: harness.home, provider: harness.provider, model: harness.model, models: harness.models ?? [harness.model], efforts: harness.efforts ?? {}, systemPrompt: ownAgentPrompt() }),
+     };
++    /* its skills and MCP servers: its maker's, OpenFilm's skills, and the person's own only those let in (agent-skills.mjs) */
++    const skills = this.opts.skills
++      ? await sessionSkills(this.opts.agent, { cwd: this.opts.cwd, env: shell, ...this.opts.skills }).catch(() => null) : null;
++    if (harness) own.OPENFILM_PI = JSON.stringify({ agentDir: harness.home, models: harness.models, model: harness.model, systemPrompt: ownAgentPrompt(), skills: skills?.piSkills ?? null });
++    /* Developer mode: the agent's own logging switch, so the turn log has what its model got; none when the person
++       set its telemetry themselves (agent-logs.mjs) */
++    this.logging = this.opts.logDir && cli && !this.spec.adapter
++      ? await logSwitches(this.opts.agent, { base: this.opts.logDir, shell, cwd: this.opts.cwd }).catch(() => null) : null;
+     /* an agent that speaks ACP itself: its own program, started as the registry starts it */
+-    const native = cli && !this.spec.adapter ? starting(cli.path, this.spec.args) : null;
+-    const env = childEnvironment({ shell: { ...shell, PATH: path }, extra: { ...this.opts.env, ...(native ? native.env : node.env), ...(cli && this.spec.env ? this.spec.env(cli.path) : {}), ...own } });
++    const native = cli && !this.spec.adapter ? starting(cli.path, [...this.spec.args, ...(this.logging?.args ?? []), ...(skills?.args ?? [])]) : null;
++    const extra = { ...this.opts.env, ...(native ? native.env : node.env), ...(cli && this.spec.env ? this.spec.env(cli.path) : {}), ...own, ...skills?.env, ...this.logging?.env };
++    /* OpenCode's inline configuration carries both its skills and, in Developer mode, its logging */
++    if (skills?.env?.OPENCODE_CONFIG_CONTENT && this.logging?.env?.OPENCODE_CONFIG_CONTENT) {
++      extra.OPENCODE_CONFIG_CONTENT = JSON.stringify(mergeConfig(JSON.parse(skills.env.OPENCODE_CONFIG_CONTENT), JSON.parse(this.logging.env.OPENCODE_CONFIG_CONTENT)));
++    }
++    const env = childEnvironment({ shell: { ...shell, PATH: path }, extra });
+     const claude = this.spec.adapter === AGENTS.claude.adapter;
+     if (this.spec.adapter === AGENTS.codex.adapter) {
+       const theirs = codexDeveloperInstructions(codexConfigText(shell));
+-      env.CODEX_CONFIG = JSON.stringify({ developer_instructions: theirs ? `${theirs}\n\n${instructions}` : instructions });
++      env.CODEX_CONFIG = JSON.stringify(mergeConfig({ developer_instructions: theirs ? `${theirs}\n\n${instructions}` : instructions }, skills?.codexConfig ?? {}));
+     }
+     /* the others have no place for it: the session's first message carries it */
+     this.instructions = harness || this.spec.systemPrompt ? null : instructions;
+@@ -727,12 +807,13 @@
+       protocolVersion: acp.PROTOCOL_VERSION,
+       clientCapabilities: CLIENT_CAPABILITIES,
+       clientInfo: CLIENT_INFO,
+-    });
++    }).catch((e) => { throw signInError(this.spec.label, e); });
+ 
+     const params = {
+       cwd: this.opts.cwd,
+       mcpServers: [],
+-      ...(claude ? { _meta: { systemPrompt: { append: instructions } } } : {}),
++      ...(skills?.additionalDirectories ? { additionalDirectories: skills.additionalDirectories } : {}),
++      ...(claude ? { _meta: { systemPrompt: { append: instructions }, ...(skills?.claude ? { claudeCode: { options: skills.claude } } : {}) } } : {}),
+     };
+     /* the program's own sign-in, taken up (Cursor asks for this before any session) */
+     if (this.spec.authenticate && (init.authMethods ?? []).some((m) => m.id === this.spec.authenticate)) {
+@@ -767,6 +848,25 @@
+       /* a message sent while it works joins the turn it is in (steer), as in its own chat */
+       steering: init._meta?.steering?.supported === true,
+     };
++    this.noteModel(this.info.configOptions);
++    /* what the agent was started and opened with, for the turn log: every word the app adds to its own, and the
++       variables the app set (a key's value never: it reads "(hidden)") */
++    const secret = new Set(Object.keys(harness?.env ?? {}));
++    this.opened = {
++      program: harness ? 'pi' : cli.path,
++      /* the command line the agent's process was started with: its own program, or the app's Node running its adapter (or Pi) */
++      command: native ? [native.cmd, ...native.args] : [node.command, ...(node.env.ELECTRON_RUN_AS_NODE ? [AS_NODE] : []), script],
++      adapter: this.spec.adapter ?? null,
++      env: Object.fromEntries(Object.entries(extra).map(([k, v]) => [k, secret.has(k) || /KEY|TOKEN|SECRET|PASSWORD/i.test(k) ? '(hidden)' : k === 'OPENFILM_PI' ? JSON.parse(v) : v])),
++      ...(env.CODEX_CONFIG ? { codexConfig: JSON.parse(env.CODEX_CONFIG) } : {}),
++      path: { first: this.opts.binDir ?? null, last: this.opts.fallbackDir ?? null },
++      fromShell: this.spec.fromShell ? Object.keys(shell).sort() : 'all',
++      initialize: { request: { protocolVersion: acp.PROTOCOL_VERSION, clientCapabilities: CLIENT_CAPABILITIES, clientInfo: CLIENT_INFO }, response: init },
++      session: { method: !resumed ? 'session/new' : caps.sessionCapabilities?.resume ? 'session/resume' : 'session/load', params: { ...params, ...(resumed ? { sessionId: resume } : {}) } },
++      firstMessage: this.instructions,
++      log: this.logging?.log ?? null,
++      skills: skills?.log ?? null,
++    };
+     return this.info;
+   }
+ 
+@@ -779,10 +879,13 @@
+     const meta = this.opts.harness && turnId ? { _meta: { openfilm: { turnId, cwd: this.opts.cwd } } } : {};
+     const told = this.instructions ? [{ type: 'text', text: this.instructions }] : [];
+     this.instructions = null;
++    /* the message exactly as the agent gets it, for the turn log */
++    this.opts.onSend?.({ prompt: [...told, ...blocks], ...meta });
+     const r = await this.conn.agent.request(acp.methods.agent.session.prompt, { sessionId: this.sessionId, prompt: [...told, ...blocks], ...meta })
+       .catch((e) => {
+         /* the app's own agent: a service with no balance left is said the same for every service, with its page */
+-        const broke = this.opts.harness ? outOfBalance(this.opts.harness.provider, e) : null;
++        const own = this.opts.harness?.models?.find((m) => m.id === this.modelNow) ?? this.opts.harness?.models?.[0];
++        const broke = own ? outOfBalance({ id: own.name, baseUrl: own.baseUrl }, e) : null;
+         if (broke) throw broke;
+         if (!isAgentId(this.opts.agent)) throw e;
+         const said = signInError(this.spec.label, e);
+@@ -812,7 +915,15 @@
+   async setConfigOption(configId, value) {
+     if (this.legacy && configId === 'mode') return this.setMode(value);
+     if (this.legacy && configId === 'model') return this.conn.agent.request('session/set_model', { sessionId: this.sessionId, modelId: value });
+-    return this.conn.agent.request(acp.methods.agent.session.setConfigOption, { sessionId: this.sessionId, configId, value });
++    const r = await this.conn.agent.request(acp.methods.agent.session.setConfigOption, { sessionId: this.sessionId, configId, value });
++    this.noteModel(r?.configOptions);
++    return r;
++  }
++
++  /** The model the session is on (its `model` option's value): the app's own agent names the service a failure was on by it. */
++  noteModel(configOptions) {
++    const model = (configOptions ?? []).find((o) => o?.id === 'model');
++    if (model) this.modelNow = model.currentValue;
+   }
+ 
+   async setMode(modeId) {
+@@ -822,5 +933,6 @@
+   close() {
+     try { this.conn?.close(); } catch { /* gone already */ }
+     if (this.child && this.child.exitCode === null) this.child.kill('SIGTERM');
+-  }
+-}
++    this.logging?.close();
++  }
++}

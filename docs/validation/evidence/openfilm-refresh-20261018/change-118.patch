@@ -1,0 +1,19 @@
+--- fixed/packages/openfilm/studio/ui/src/lib/resource-drag.ts
++++ head/packages/openfilm/studio/ui/src/lib/resource-drag.ts
+@@ -34,6 +34,8 @@
+   w?: number;
+   h?: number;
+   fps?: number;
++  /** A saved thing (lib/saved), not a file of the project: its files are brought in as it lands. */
++  saved?: string;
+ }
+ 
+ const KINDS: readonly ResourceKind[] = ['video', 'image', 'audio', 'mg', 'other'];
+@@ -101,6 +103,7 @@
+     ...(w === undefined ? {} : { w }),
+     ...(h === undefined ? {} : { h }),
+     ...(fps === undefined ? {} : { fps }),
++    ...(typeof item.saved === 'string' && item.saved ? { saved: item.saved } : {}),
+   };
+ }
+ 
