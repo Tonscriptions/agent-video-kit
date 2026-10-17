@@ -222,3 +222,9 @@ method 默认 bilinear，仅允许 bilinear/area；max_working_bytes 默认 1 Gi
 声明不改 clip 时间、源范围、动画或序列总长。渲染 copy 增加内部真实窗口和原作者时钟；manifest 的 source-transition-plan 明确实际取源、窗口、配对、算法，内部字段不保存为作者 clip。恒速/倒放按精确 Fraction 规划；黑白场通过固定 8-bit gbrap custom xfade，在原剪口达到不透明目标色。删除最后一项会清除该字段。
 
 项目版本继续 0.1.0，此字段为可选增量；没有把旧 auto_handle 自动迁移为真实句柄。原生 JSON/package 保留；外部 OTIO/Kdenlive/明文草稿报告 Unsupported、strict 阻断，不以旁车保留称外部执行。跟踪/嵌套/曲线/定格/图片等首版拒绝范围见[转场契约](./真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md)。
+
+## V39：专业范围编辑与既有基础操作
+
+`timeline edit` 新增 `insert/overwrite/lift/extract/roll/slide`；也可作为 `compose.linked_edit` 原子批量的一步。详见[范围编辑契约](./范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md)与[实际证据](../validation/专业范围编辑与滚滑剪口实测_2026-10-18.md)。incoming 片段的落点相对新组，旧片段的完整作者源/动画/音频字段保持，窗口只选可见区间；计划列出创建/删除/修改、关联剪口和闭包。无新增持久 Schema 字段。roll/slide 只使用保留作者输出句柄。
+
+既有 `compose.slip_clip` 为直接媒体源入/出点整体偏移，`compose.slide_clip` 只改单片段落点；本轮 `timeline edit` 的 slide 调整连续左右邻居并处理关联组，不能混用。复杂关联 slip、源作者范围外扩、全磁吸仍待统一规划，不能因命令名称相近推定等价。

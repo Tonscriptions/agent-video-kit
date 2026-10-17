@@ -695,7 +695,7 @@ def build_parser() -> argparse.ArgumentParser:
     compose.add_argument("--project", required=True)
     compose.add_argument("--input", required=True)
     compose.add_argument("--sequence-id", default=None)
-    edit = _leaf_common(ts.add_parser("edit", help="按整数 tick 规划/应用关联片段、同步锁和主轨联动编辑"))
+    edit = _leaf_common(ts.add_parser("edit", help="按整数 tick 规划关联、同步锁、主轨联动、插入/覆盖、范围删除与双边剪口编辑"))
     edit.add_argument("--project", required=True)
     edit.add_argument("--input", required=True, help="本地编辑请求 JSON；先用 --dry-run 查看影响")
     edit.add_argument("--sequence-id", default=None)
@@ -4617,7 +4617,7 @@ def command_timeline_edit(args: argparse.Namespace) -> dict[str, Any]:
     candidate, plan = build_edit_plan(project, sequence['id'], _load_changes(args.input))
     validation = validate_project(root, candidate, strict_rights=False)
     if not validation['ok']:
-        raise AppError('PROJECT_INVALID', '关联编辑会生成无效项目', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+        raise AppError('PROJECT_INVALID', '时间线编辑会生成无效项目', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
     warnings = ([{'code': 'EDIT_RIPPLE_SHORTFALL', 'message': '同步轨道空间不足，统一保留未闭合 tick；没有单轨回退',
                   'short_tick': plan['short_tick']}] if plan['short_tick'] else [])
     data = {'sequence_id': sequence['id'], 'plan': plan, 'validation': validation}

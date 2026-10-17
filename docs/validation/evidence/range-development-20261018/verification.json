@@ -1,0 +1,69 @@
+{
+  "status": "retained-original-evidence",
+  "records": [
+    {
+      "name": "range-development-20261018",
+      "methods": 47,
+      "failures": 2,
+      "note": "ID validation priority fixed; malformed legacy action error expectation corrected."
+    },
+    {
+      "name": "range-development2-20261018",
+      "methods": 52,
+      "failures": 0,
+      "note": "Before incoming link-ID boundary guard; not final current-source verification."
+    },
+    {
+      "name": "first-smoke",
+      "note": "Eight pixel/PCM cases passed; generator G04 expected wrong error code; 259-file hashes and all original JSON/CLI logs retained."
+    },
+    {
+      "name": "first-wheel",
+      "note": "Copied operation history retains old idempotency key; different absolute request rejects correctly. Retry uses unique wheel keys."
+    },
+    {
+      "name": "first-media-audit",
+      "note": "Passed 268 files before caption-static PNG was added; final audit includes 269."
+    }
+  ],
+  "files": {
+    "first-media-audit-before-caption-static.json": {
+      "sha256": "sha256:b59e43ea74d72faca01e99f59e491b9e452585923c547ff7c38aa4ce9c8bc887",
+      "bytes": 226111
+    },
+    "first-smoke-raw-json-logs.zip": {
+      "sha256": "sha256:774274ff381ee287c00676582ca7993bdfa9df1bbcbfd84904b8db2827ec8e3b",
+      "bytes": 254835
+    },
+    "first-smoke-record.json": {
+      "sha256": "sha256:dd33ce4580d9f0b7bf078bbc6b1095d6cabbb8594a003fea8c451d2acd192d63",
+      "bytes": 38312
+    },
+    "first-wheel-raw-logs-script.zip": {
+      "sha256": "sha256:307096f44815281474f40f5424218e8dda3a2e16a8e5cd2291e98a3ebf92a832",
+      "bytes": 23584
+    },
+    "first-wheel-record.json": {
+      "sha256": "sha256:55aeb6c6c770b89d5d982eccda91f4c7b21e08b2c0fde9d7b4c734fa6437513a",
+      "bytes": 503
+    },
+    "range-development-20261018.json": {
+      "sha256": "sha256:aceb3cf191394a9261c55feeb690ab94dec7adfc635cf930656a610f5dcffc9c",
+      "bytes": 32534
+    },
+    "range-development-20261018.log": {
+      "sha256": "sha256:210f2310c2951b8b44f2630647835c319fe1ab987ad6493874595c174f526596",
+      "bytes": 9624
+    },
+    "range-development2-20261018.json": {
+      "sha256": "sha256:4f01f9ee1b444333e5effea4009d55e25e533142e5f89f842677b00157f43d02",
+      "bytes": 32534
+    },
+    "range-development2-20261018.log": {
+      "sha256": "sha256:4f3ef0a878a1dd242f03777f9842b80ded7830f8291670bf96a098ba77c48a54",
+      "bytes": 7919
+    }
+  },
+  "cannot_add_pass_counts": true,
+  "no_product_source_change_during_final_full": true
+}

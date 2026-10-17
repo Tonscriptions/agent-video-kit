@@ -1,0 +1,945 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "id": "proj_20261017200040_4cb1b509",
+    "name": "seed",
+    "created_at": "2026-10-17T20:00:40.516257Z",
+    "updated_at": "2026-10-17T20:01:51.903041Z",
+    "creator": "ai-ad-editor",
+    "source_revision": "local"
+  },
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 10,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 240,
+      "height": 136
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "video",
+      "kind": "video",
+      "uri": "assets/video_source-a.mp4",
+      "sha256": "sha256:6d36606b4b7520184fd8170db52e55c9d0c4e9571255ca5cc3577f9ae62def95",
+      "probe": {
+        "duration_seconds": 8.0,
+        "duration_tick": 720000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High 4:4:4 Predictive",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.f4000b",
+            "width": 240,
+            "height": 136,
+            "coded_width": 240,
+            "coded_height": 136,
+            "has_b_frames": 0,
+            "pix_fmt": "gbrp",
+            "level": 11,
+            "color_range": "pc",
+            "color_space": "gbr",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "10/1",
+            "avg_frame_rate": "10/1",
+            "time_base": "1/10240",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 81920,
+            "duration": "8.000000",
+            "bit_rate": "196723",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "80",
+            "extradata_size": 47,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264rgb"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 240,
+          "height": 136,
+          "pix_fmt": "gbrp",
+          "fps": "10/1",
+          "color_space": "gbr",
+          "duration_seconds": 8.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "video",
+      "source": {
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\range-edits-20261018\\source-a.mp4",
+        "retrieved_at": "2026-10-17T20:00:41.612170Z",
+        "original_name": "source-a.mp4"
+      }
+    },
+    {
+      "id": "audio",
+      "kind": "audio",
+      "uri": "assets/audio_sound-a.wav",
+      "sha256": "sha256:884246144dbfc307f8bbc984de9a3ef1380669442894b08528113a9168c6198c",
+      "probe": {
+        "duration_seconds": 8.0,
+        "duration_tick": 720000,
+        "format": "wav",
+        "format_long_name": "WAV / WAVE (Waveform Audio)",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "pcm_s16le",
+            "codec_long_name": "PCM signed 16-bit little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[1][0][0][0]",
+            "codec_tag": "0x0001",
+            "sample_fmt": "s16",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 16,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "duration_ts": 384000,
+            "duration": "8.000000",
+            "bit_rate": "1536000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            }
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_s16le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 8.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "audio",
+      "source": {
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\range-edits-20261018\\sound-a.wav",
+        "retrieved_at": "2026-10-17T20:00:42.676183Z",
+        "original_name": "sound-a.wav"
+      }
+    },
+    {
+      "id": "font",
+      "kind": "font",
+      "uri": "assets/font_agent-grid-cc0.ttf",
+      "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1",
+      "probe": {
+        "duration_seconds": 0.0,
+        "duration_tick": 0,
+        "format": "ttf",
+        "format_long_name": "local font",
+        "streams": [],
+        "font": {
+          "family": "Agent Grid CC0",
+          "style": "Regular",
+          "face_index": 0,
+          "engine": "pillow-freetype"
+        },
+        "video": {
+          "codec": null
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0
+        }
+      },
+      "rights_ref": "font",
+      "source": {
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\range-edits-20261018\\agent-grid-cc0.ttf",
+        "retrieved_at": "2026-10-17T20:00:43.627190Z",
+        "original_name": "agent-grid-cc0.ttf"
+      }
+    },
+    {
+      "id": "captions",
+      "kind": "subtitle",
+      "uri": "assets/captions_captions.srt",
+      "sha256": "sha256:4475c4024c4bd958bc93f11450410233019853b0e1a7f548699ebb83c94e9eb5",
+      "probe": {
+        "duration_seconds": 3.0,
+        "duration_tick": 270000,
+        "format": "srt",
+        "format_long_name": "local subtitle",
+        "streams": [
+          {
+            "codec_type": "subtitle",
+            "codec_name": "srt"
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0
+        },
+        "subtitle": {
+          "format": "srt",
+          "cue_count": 1
+        }
+      },
+      "rights_ref": "captions",
+      "source": {
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\range-edits-20261018\\captions.srt",
+        "retrieved_at": "2026-10-17T20:00:44.546627Z",
+        "original_name": "captions.srt"
+      }
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq_main",
+      "name": "Main",
+      "duration_tick": 360000,
+      "tracks": [
+        {
+          "id": "track_video_1",
+          "kind": "video",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "Lv",
+              "asset_id": "video",
+              "timeline_start_tick": 0,
+              "duration_tick": 135000,
+              "source_in_tick": 90000,
+              "source_out_tick": 450000,
+              "link_id": "L",
+              "reverse": false,
+              "keyframes": [
+                {
+                  "property": "transform.position.x",
+                  "keyframes": [
+                    {
+                      "at_tick": 0,
+                      "value": 0.5,
+                      "interpolation": "ease_in_out"
+                    },
+                    {
+                      "at_tick": 360000,
+                      "value": 0.65,
+                      "interpolation": "linear"
+                    }
+                  ]
+                }
+              ],
+              "presentation_window": {
+                "version": 1,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 360000,
+                "offset_tick": 0
+              }
+            },
+            {
+              "id": "Mv",
+              "asset_id": "video",
+              "timeline_start_tick": 135000,
+              "duration_tick": 90000,
+              "source_in_tick": 450000,
+              "source_out_tick": 540000,
+              "link_id": "M",
+              "reverse": false,
+              "keyframes": [
+                {
+                  "property": "transform.position.x",
+                  "keyframes": [
+                    {
+                      "at_tick": 0,
+                      "value": 0.5,
+                      "interpolation": "ease_in_out"
+                    },
+                    {
+                      "at_tick": 90000,
+                      "value": 0.65,
+                      "interpolation": "linear"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "Rv",
+              "asset_id": "video",
+              "timeline_start_tick": 225000,
+              "duration_tick": 135000,
+              "source_in_tick": 270000,
+              "source_out_tick": 630000,
+              "link_id": "R",
+              "reverse": true,
+              "keyframes": [
+                {
+                  "property": "transform.position.x",
+                  "keyframes": [
+                    {
+                      "at_tick": 0,
+                      "value": 0.5,
+                      "interpolation": "ease_in_out"
+                    },
+                    {
+                      "at_tick": 360000,
+                      "value": 0.65,
+                      "interpolation": "linear"
+                    }
+                  ]
+                }
+              ],
+              "presentation_window": {
+                "version": 1,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 360000,
+                "offset_tick": 225000
+              }
+            }
+          ]
+        },
+        {
+          "id": "track_audio_1",
+          "kind": "audio",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "La",
+              "asset_id": "audio",
+              "timeline_start_tick": 0,
+              "duration_tick": 135000,
+              "source_in_tick": 90000,
+              "source_out_tick": 450000,
+              "link_id": "L",
+              "reverse": false,
+              "audio": {
+                "fade_in": 0.3,
+                "fade_out": 0.4
+              },
+              "presentation_window": {
+                "version": 1,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 360000,
+                "offset_tick": 0
+              }
+            },
+            {
+              "id": "Ma",
+              "asset_id": "audio",
+              "timeline_start_tick": 135000,
+              "duration_tick": 90000,
+              "source_in_tick": 450000,
+              "source_out_tick": 540000,
+              "link_id": "M",
+              "reverse": false,
+              "audio": {
+                "fade_in": 0.3,
+                "fade_out": 0.4
+              }
+            },
+            {
+              "id": "Ra",
+              "asset_id": "audio",
+              "timeline_start_tick": 225000,
+              "duration_tick": 135000,
+              "source_in_tick": 270000,
+              "source_out_tick": 630000,
+              "link_id": "R",
+              "reverse": true,
+              "audio": {
+                "fade_in": 0.3,
+                "fade_out": 0.4
+              },
+              "presentation_window": {
+                "version": 1,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 360000,
+                "offset_tick": 225000
+              }
+            }
+          ]
+        }
+      ],
+      "markers": []
+    }
+  ],
+  "templates": [],
+  "outputs": [
+    {
+      "id": "output_20261017200146_31b88742",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\range-smoke-verified-20261018\\R06-before\\renders\\R06-original.mkv",
+      "container": "mkv",
+      "profile": null,
+      "canvas": {
+        "width": 240,
+        "height": 136
+      },
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "pcm_f32le",
+        "bitrate": "192k"
+      },
+      "target_platform": "generic"
+    }
+  ],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "model_versions": [],
+    "input_hashes": [],
+    "change_log": [
+      {
+        "operation_id": "op_20261017200041_6ad98fdb",
+        "command": "media.ingest",
+        "asset_id": "video",
+        "at": "2026-10-17T20:00:41.612834Z"
+      },
+      {
+        "operation_id": "op_20261017200042_6cac2bb3",
+        "command": "media.ingest",
+        "asset_id": "audio",
+        "at": "2026-10-17T20:00:42.676769Z"
+      },
+      {
+        "operation_id": "op_20261017200043_ab5b501b",
+        "command": "media.ingest",
+        "asset_id": "font",
+        "at": "2026-10-17T20:00:43.627778Z"
+      },
+      {
+        "operation_id": "op_20261017200044_3a9bc49d",
+        "command": "media.ingest",
+        "asset_id": "captions",
+        "at": "2026-10-17T20:00:44.547192Z"
+      },
+      {
+        "command": "render",
+        "at": "2026-10-17T20:01:46.916988Z",
+        "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\range-smoke-verified-20261018\\R06-before\\renders\\R06-original.mkv",
+        "manifest": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\range-smoke-verified-20261018\\R06-before\\renders\\R06-original.mkv.manifest.json"
+      },
+      {
+        "operation_id": "op_20261017200151_2170c344",
+        "command": "timeline.edit",
+        "created_at": "2026-10-17T20:01:51.902745Z",
+        "before_snapshot_id": "snap_20261017200151_a300b4d9",
+        "plan": {
+          "engine": "agent-range-edit-v1",
+          "base_project_sha256": "sha256:dc163fa0af9ded076b1d497205878c15090adf50e90c155869e8f31f47a4f4ad",
+          "sequence_id": "seq_main",
+          "request": {
+            "action": "slide",
+            "options": {
+              "main_track_id": "track_video_1",
+              "sync": false,
+              "linkage": false,
+              "linked": true
+            },
+            "clip_id": "Mv",
+            "delta_tick": 45000
+          },
+          "main_track_id": "track_video_1",
+          "selected_clip_ids": [
+            "La",
+            "Lv",
+            "Ma",
+            "Mv",
+            "Ra",
+            "Rv"
+          ],
+          "incoming_clip_ids": [],
+          "changes": [
+            {
+              "clip_id": "La",
+              "before": {
+                "track_id": "track_audio_1",
+                "clip": {
+                  "id": "La",
+                  "asset_id": "audio",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 90000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 450000,
+                  "link_id": "L",
+                  "reverse": false,
+                  "audio": {
+                    "fade_in": 0.3,
+                    "fade_out": 0.4
+                  },
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 0
+                  }
+                }
+              },
+              "after": {
+                "track_id": "track_audio_1",
+                "clip": {
+                  "id": "La",
+                  "asset_id": "audio",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 135000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 450000,
+                  "link_id": "L",
+                  "reverse": false,
+                  "audio": {
+                    "fade_in": 0.3,
+                    "fade_out": 0.4
+                  },
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 0
+                  }
+                }
+              }
+            },
+            {
+              "clip_id": "Lv",
+              "before": {
+                "track_id": "track_video_1",
+                "clip": {
+                  "id": "Lv",
+                  "asset_id": "video",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 90000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 450000,
+                  "link_id": "L",
+                  "reverse": false,
+                  "keyframes": [
+                    {
+                      "property": "transform.position.x",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.5,
+                          "interpolation": "ease_in_out"
+                        },
+                        {
+                          "at_tick": 360000,
+                          "value": 0.65,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ],
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 0
+                  }
+                }
+              },
+              "after": {
+                "track_id": "track_video_1",
+                "clip": {
+                  "id": "Lv",
+                  "asset_id": "video",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 135000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 450000,
+                  "link_id": "L",
+                  "reverse": false,
+                  "keyframes": [
+                    {
+                      "property": "transform.position.x",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.5,
+                          "interpolation": "ease_in_out"
+                        },
+                        {
+                          "at_tick": 360000,
+                          "value": 0.65,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ],
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 0
+                  }
+                }
+              }
+            },
+            {
+              "clip_id": "Ma",
+              "before": {
+                "track_id": "track_audio_1",
+                "clip": {
+                  "id": "Ma",
+                  "asset_id": "audio",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 450000,
+                  "source_out_tick": 540000,
+                  "link_id": "M",
+                  "reverse": false,
+                  "audio": {
+                    "fade_in": 0.3,
+                    "fade_out": 0.4
+                  }
+                }
+              },
+              "after": {
+                "track_id": "track_audio_1",
+                "clip": {
+                  "id": "Ma",
+                  "asset_id": "audio",
+                  "timeline_start_tick": 135000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 450000,
+                  "source_out_tick": 540000,
+                  "link_id": "M",
+                  "reverse": false,
+                  "audio": {
+                    "fade_in": 0.3,
+                    "fade_out": 0.4
+                  }
+                }
+              }
+            },
+            {
+              "clip_id": "Mv",
+              "before": {
+                "track_id": "track_video_1",
+                "clip": {
+                  "id": "Mv",
+                  "asset_id": "video",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 450000,
+                  "source_out_tick": 540000,
+                  "link_id": "M",
+                  "reverse": false,
+                  "keyframes": [
+                    {
+                      "property": "transform.position.x",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.5,
+                          "interpolation": "ease_in_out"
+                        },
+                        {
+                          "at_tick": 90000,
+                          "value": 0.65,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "after": {
+                "track_id": "track_video_1",
+                "clip": {
+                  "id": "Mv",
+                  "asset_id": "video",
+                  "timeline_start_tick": 135000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 450000,
+                  "source_out_tick": 540000,
+                  "link_id": "M",
+                  "reverse": false,
+                  "keyframes": [
+                    {
+                      "property": "transform.position.x",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.5,
+                          "interpolation": "ease_in_out"
+                        },
+                        {
+                          "at_tick": 90000,
+                          "value": 0.65,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "clip_id": "Ra",
+              "before": {
+                "track_id": "track_audio_1",
+                "clip": {
+                  "id": "Ra",
+                  "asset_id": "audio",
+                  "timeline_start_tick": 180000,
+                  "duration_tick": 180000,
+                  "source_in_tick": 270000,
+                  "source_out_tick": 630000,
+                  "link_id": "R",
+                  "reverse": true,
+                  "audio": {
+                    "fade_in": 0.3,
+                    "fade_out": 0.4
+                  },
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 180000
+                  }
+                }
+              },
+              "after": {
+                "track_id": "track_audio_1",
+                "clip": {
+                  "id": "Ra",
+                  "asset_id": "audio",
+                  "timeline_start_tick": 225000,
+                  "duration_tick": 135000,
+                  "source_in_tick": 270000,
+                  "source_out_tick": 630000,
+                  "link_id": "R",
+                  "reverse": true,
+                  "audio": {
+                    "fade_in": 0.3,
+                    "fade_out": 0.4
+                  },
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 225000
+                  }
+                }
+              }
+            },
+            {
+              "clip_id": "Rv",
+              "before": {
+                "track_id": "track_video_1",
+                "clip": {
+                  "id": "Rv",
+                  "asset_id": "video",
+                  "timeline_start_tick": 180000,
+                  "duration_tick": 180000,
+                  "source_in_tick": 270000,
+                  "source_out_tick": 630000,
+                  "link_id": "R",
+                  "reverse": true,
+                  "keyframes": [
+                    {
+                      "property": "transform.position.x",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.5,
+                          "interpolation": "ease_in_out"
+                        },
+                        {
+                          "at_tick": 360000,
+                          "value": 0.65,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ],
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 180000
+                  }
+                }
+              },
+              "after": {
+                "track_id": "track_video_1",
+                "clip": {
+                  "id": "Rv",
+                  "asset_id": "video",
+                  "timeline_start_tick": 225000,
+                  "duration_tick": 135000,
+                  "source_in_tick": 270000,
+                  "source_out_tick": 630000,
+                  "link_id": "R",
+                  "reverse": true,
+                  "keyframes": [
+                    {
+                      "property": "transform.position.x",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.5,
+                          "interpolation": "ease_in_out"
+                        },
+                        {
+                          "at_tick": 360000,
+                          "value": 0.65,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ],
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 225000
+                  }
+                }
+              }
+            }
+          ],
+          "short_tick": 0,
+          "new_track_ids": [],
+          "new_tracks": [],
+          "rebound_clip_ids": [],
+          "retimed_subtitle_ids": [],
+          "removed_transition_ids": [],
+          "cut_pairs": [
+            {
+              "left_clip_id": "La",
+              "clip_id": "Ma",
+              "right_clip_id": "Ra"
+            },
+            {
+              "left_clip_id": "Lv",
+              "clip_id": "Mv",
+              "right_clip_id": "Rv"
+            }
+          ],
+          "before_duration_tick": 360000,
+          "after_duration_tick": 360000,
+          "limits": [
+            "markers-remain-absolute",
+            "roll-and-slide-use-retained-authored-handles",
+            "source-extension-outside-authored-range-not-yet-implemented",
+            "partial-tracking-and-real-transition-endpoint-cuts-reject",
+            "clip-processing-before-cut-track-and-root-processing-after-edit",
+            "existing-native-window-render-budgets-still-apply"
+          ]
+        }
+      }
+    ]
+  }
+}

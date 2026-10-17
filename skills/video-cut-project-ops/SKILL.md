@@ -5,6 +5,15 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+The [range edit actions](../../docs/specs/范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md)
+share the existing timeline transaction, snapshot and idempotency path.
+Preview is read-only; bind `base_project_sha256` when applying, and replay the
+same accepted request/key even though its original digest is now stale.
+`compose` can batch a range `linked_edit` with later commands; a late error
+must retain the exact original project. Review new/removed IDs and detached
+transition declarations in the full plan. A completed range edit does not
+authorize new source downloads or publication of unverified assets.
+
 For the [fragment library](../../docs/specs/可复用片段组库与跨项目插入契约_v0.1_2026-10-18.md),
 save versions under a local library; apply uses the project lock, a
 before-fragment-apply snapshot, metadata transaction and normal idempotency.

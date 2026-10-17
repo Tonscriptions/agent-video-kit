@@ -5,6 +5,16 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [professional range edits](../../docs/specs/范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md),
+compare insertion/overwrite and lift/extract against explicit original ranges,
+and roll/slide against the full original left/middle/right authors. Check linked
+PCM cut points, moving file cues, unchanged middle-body processing and parent
+child buses separately. Use a real animation/caption negative control so an
+unapplied fixture cannot pass. Root/track processing is evaluated after edits;
+a slice of an old final mix is valid only for the fixture's processing scope.
+Inspect short-handle rejection and actual project bytes after failed batches.
+Same-product reference equality does not accept its original retiming quality.
+
 Review [output-window cuts](../../docs/specs/片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md)
 against the corresponding ranges of the complete original render. Compare RGB
 and lossless PCM separately, including held frames/silence, file cue clocks,

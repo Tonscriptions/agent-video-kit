@@ -14,6 +14,16 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+Use the [range edit contract](../../docs/specs/范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md)
+for insert/overwrite with complete incoming clips, lift/extract with explicit
+tracks, roll with a continuous left/right pair, and slide with a middle clip.
+Input positions are group-relative; a declared group duration preserves holes
+and its blank tail. Linked IDs expand across audio; sync and linkage follow
+the operation-specific closure in the contract. Keep split source/curve/
+animation fields unchanged and use presentation windows. Roll/slide need
+retained author handles and complete linked pairs/triples. Slide moves the
+whole middle body; it is not source-content slip. Markers remain absolute.
+
 Use the [presentation cut contract](../../docs/specs/片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md)
 for compose split_clip/trim_clip/ripple_insert/ripple_delete. These preserve the
 complete authored source, curve, keyframes, freeze and clip audio processing in
@@ -64,8 +74,9 @@ members reject the whole selection. Sync uses common available room and
 reports `short_tick`; linkage follows riders while multi-cut beds stay anchored.
 Collision lanes preserve processing; effect/ducking audio buses cannot be
 automatically relocated. Keep file-subtitle offsets and tracking references.
-This API does not perform source-edge trimming, insert/overwrite, roll, or
-full magnetic main-track rearrangement. Markers retain absolute sequence ticks.
+These whole-clip actions do not extend source edges or implement full magnetic
+main-track rearrangement. The range actions above cover insert/overwrite and
+roll/slide within retained authors. Markers retain absolute sequence ticks.
 
 Nested sequence clips now render as isolated transparent canvases; see the
 [sequence compositing contract](../../docs/specs/嵌套序列隔离合成契约_v0.1_2026-10-17.md).

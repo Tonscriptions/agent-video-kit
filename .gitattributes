@@ -124,3 +124,11 @@ docs/validation/evidence/windows*.log -text -whitespace
 docs/validation/evidence/windows-*/** -text -whitespace
 docs/validation/evidence/openfilm-window-followup-*/** -text -whitespace
 docs/assets/clip-windows-*/cli-*.log -text -whitespace
+
+# V39 range edits retain native command logs, frozen sources and failures.
+scripts/*range_edit*.py -text
+docs/validation/evidence/range*.json -text
+docs/validation/evidence/range*.log -text -whitespace
+docs/validation/evidence/range-*/** -text -whitespace
+docs/validation/evidence/openfilm-range-followup-*/** -text -whitespace
+docs/assets/range-edits-*/cli-*.log -text -whitespace

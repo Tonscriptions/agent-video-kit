@@ -402,3 +402,9 @@ manifest `sequence-projection-budget` 保存可达节点与分量，`sequence-co
 `timeline transition --project --input [--sequence-id] [--expected-project-sha256] --dry-run` 支持 add/resize/remove；正式执行建立快照并加入既有锁、事务、幂等和 Rights Ledger 路径。compose 可批量执行 `source_transition`。输入采用整数 tick、显式同轨片段引用；linked 音频在添加时推导并冻结。
 
 作者片段和工程时长不变；渲染副本扩展真实源范围，缺少余量即拒绝，不使用旧 auto_handle 的末帧复制。原作者动画、字幕和音频包络时钟保留；新增淡化与之相乘。支持非交叠多剪口链，黑白场在原剪口达到不透明黑/白。首版拒绝嵌套、曲线/定格、跟踪绑定、片段 blend、图片/生成器与旧式转场冲突；原生数据可往返，外部格式明确 Unsupported。见[完整契约](./真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md)。
+
+## V39：专业范围编辑与既有基础操作
+
+`timeline edit` 新增 `insert/overwrite/lift/extract/roll/slide`；也可作为 `compose.linked_edit` 原子批量的一步。详见[范围编辑契约](./范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md)与[实际证据](../validation/专业范围编辑与滚滑剪口实测_2026-10-18.md)。incoming 片段的落点相对新组，旧片段的完整作者源/动画/音频字段保持，窗口只选可见区间；计划列出创建/删除/修改、关联剪口和闭包。无新增持久 Schema 字段。roll/slide 只使用保留作者输出句柄。
+
+既有 `compose.slip_clip` 为直接媒体源入/出点整体偏移，`compose.slide_clip` 只改单片段落点；本轮 `timeline edit` 的 slide 调整连续左右邻居并处理关联组，不能混用。复杂关联 slip、源作者范围外扩、全磁吸仍待统一规划，不能因命令名称相近推定等价。
