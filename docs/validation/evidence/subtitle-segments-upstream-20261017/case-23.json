@@ -1,0 +1,66 @@
+{
+  "case": 23,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "我今天没有去公司上班因为外面一直在下很大的雨",
+          "start_tick": 900017,
+          "end_tick": 1530017
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "我今天没有去公司上班",
+      "display_text": "我今天没有去公司上班",
+      "cells": 10,
+      "from": 0,
+      "to": 10,
+      "start_tick": 900017,
+      "end_tick": 1186397
+    },
+    {
+      "part": 1,
+      "text": "因为外面一直在下很大的雨",
+      "display_text": "因为外面一直在下很大的雨",
+      "cells": 12,
+      "from": 10,
+      "to": 22,
+      "start_tick": 1186397,
+      "end_tick": 1530017
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "我今天没有去公司上班",
+      "display_text": "我今天没有去公司上班",
+      "from": 0,
+      "to": 10,
+      "cells": 10,
+      "start_tick": 900017,
+      "end_tick": 1186397
+    },
+    {
+      "part": 1,
+      "text": "因为外面一直在下很大的雨",
+      "display_text": "因为外面一直在下很大的雨",
+      "from": 10,
+      "to": 22,
+      "cells": 12,
+      "start_tick": 1186397,
+      "end_tick": 1530017
+    }
+  ],
+  "equal": true
+}

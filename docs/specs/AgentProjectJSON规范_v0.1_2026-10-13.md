@@ -206,3 +206,9 @@ method 默认 bilinear，仅允许 bilinear/area；max_working_bytes 默认 1 Gi
 文件字幕可用整数 `subtitle.asset_time_offset_tick` 表示输入文件绘制前的时钟偏移，允许负数。整片段移位时，sequence 基准文件字幕累加负位移；clip 基准不加此补偿。内联文字不依靠该字段。它与 source in/out、speed/curve、reverse 和文字关键帧是不同的时钟层次，不能用重写 SRT 或重置源时钟替代。
 
 上述字段在原生 JSON/package 中保留；外部格式对编辑开关、同步锁、关联及非零字幕偏移报告 Unsupported。源轨因碰撞换轨时，仍引用它的 tracking_binding.source_track_id 同步重绑；锁定依赖或删除仍被引用的源会拒绝。完整规则见[关联编辑契约](./关联片段与主轨联动规划契约_v0.1_2026-10-17.md)。
+
+## V34：分段报告、派生字幕与片段依赖
+
+本增量不更改项目 Schema。`subtitle segment` 登记 `kind=generated` 的 JSON 报告资产和 `kind=subtitle` 的 SRT 资产；报告 Rights Ledger 的 derived_from 引用已核验摘要的明确来源，SRT 再依赖报告。新增文字/译文从 unverified/internal 开始，不继承父素材的公开授权。
+
+入轨使用原生 text generator，`rights_dependencies=[{rights_ref,sha256}]` 指向生成 SRT，`extensions.subtitle_segment={source_asset_id,line_id,parts}` 追溯报告资产及原句/片段。源 JSON/报告使用 Unicode 码点和绝对整数 tick；显式入轨偏移只应用于显示 cue/SRT/时间线。原文标点与纠正前后内容保留，样式不从 ASS/TTML 迁入。JSON/SRT 及权利依赖已通过真实项目包导出/重导入专项。见[分段契约](./本地字幕分段与局部回写契约_v0.1_2026-10-17.md)。

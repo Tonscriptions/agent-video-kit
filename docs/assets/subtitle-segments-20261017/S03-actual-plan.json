@@ -1,0 +1,269 @@
+{
+  "format": "agent-subtitle-segments-v1",
+  "index_unit": "unicode-code-point",
+  "source": {
+    "format": "agent-subtitle-source-v1",
+    "ticks_per_second": 90000,
+    "lines": [
+      {
+        "id": "ad",
+        "text": "本地字幕，數字保護，字幕清楚。",
+        "start_tick": 45000,
+        "end_tick": 495000,
+        "marks": [
+          {
+            "index": 5,
+            "start_tick": 180000
+          },
+          {
+            "index": 10,
+            "start_tick": 337500
+          }
+        ],
+        "translation": "Local captions. Numbers stay together. Clear captions."
+      }
+    ]
+  },
+  "original_source": {
+    "format": "agent-subtitle-source-v1",
+    "ticks_per_second": 90000,
+    "lines": [
+      {
+        "id": "ad",
+        "text": "本地剪輯，免費開源，字幕清楚。",
+        "start_tick": 45000,
+        "end_tick": 495000,
+        "marks": [
+          {
+            "index": 0,
+            "start_tick": 45000
+          },
+          {
+            "index": 5,
+            "start_tick": 180000
+          },
+          {
+            "index": 10,
+            "start_tick": 337500
+          }
+        ],
+        "translation": "Local editing. Free and open source. Clear captions."
+      }
+    ]
+  },
+  "rules": {
+    "maxCells": 16,
+    "maxChars": 42,
+    "minUnits": 4,
+    "pauseMs": 500,
+    "minMs": 700,
+    "maxMs": 7000,
+    "holdMs": 200,
+    "closeGapMs": 150,
+    "msPerCell": 220,
+    "weight": {
+      "latin": 0.32,
+      "space": 0.15,
+      "clause": 1.5,
+      "sentence": 2.5
+    },
+    "cost": {
+      "piece": 10,
+      "balance": 4,
+      "short": 6,
+      "over": 50,
+      "long": 20,
+      "cjk": 1,
+      "cjkSingle": 1,
+      "mixed": 3,
+      "bracket": 8,
+      "leansBack": 8,
+      "leansForward": 4,
+      "conjunction": -4,
+      "particle": -3,
+      "pause": -10,
+      "sentence": -6,
+      "clause": -4,
+      "distance": 20,
+      "merge": 6
+    }
+  },
+  "pieces": [
+    {
+      "part": 0,
+      "text": "本地字幕，",
+      "display_text": "本地字幕",
+      "from": 0,
+      "to": 5,
+      "cells": 4,
+      "translation": {
+        "text": "Local captions.",
+        "from": 0,
+        "to": 15
+      },
+      "line_id": "ad",
+      "start_tick": 45000,
+      "end_tick": 142200,
+      "timing_basis": "provided-onsets-with-weighted-interiors",
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 45000
+        }
+      ]
+    },
+    {
+      "part": 1,
+      "text": "數字保護，",
+      "display_text": "數字保護",
+      "from": 5,
+      "to": 10,
+      "cells": 4,
+      "translation": {
+        "text": "Numbers stay together.",
+        "from": 16,
+        "to": 38
+      },
+      "line_id": "ad",
+      "start_tick": 180000,
+      "end_tick": 277200,
+      "timing_basis": "provided-onsets-with-weighted-interiors",
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 180000
+        }
+      ]
+    },
+    {
+      "part": 2,
+      "text": "字幕清楚。",
+      "display_text": "字幕清楚",
+      "from": 10,
+      "to": 15,
+      "cells": 4,
+      "translation": {
+        "text": "Clear captions.",
+        "from": 39,
+        "to": 54
+      },
+      "line_id": "ad",
+      "start_tick": 337500,
+      "end_tick": 495000,
+      "timing_basis": "provided-onsets-with-weighted-interiors",
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 337500
+        }
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "line_id": "ad",
+      "target": "text",
+      "part": 1,
+      "before": "免費開源，",
+      "after": "數字保護",
+      "from": 5,
+      "to": 10
+    },
+    {
+      "line_id": "ad",
+      "target": "text",
+      "part": 0,
+      "before": "本地剪輯，",
+      "after": "本地字幕",
+      "from": 0,
+      "to": 5
+    },
+    {
+      "line_id": "ad",
+      "target": "translation",
+      "part": 1,
+      "before": "Free and open source.",
+      "after": "Numbers stay together.",
+      "from": 15,
+      "to": 36
+    },
+    {
+      "line_id": "ad",
+      "target": "translation",
+      "part": 0,
+      "before": "Local editing.",
+      "after": "Local captions.",
+      "from": 0,
+      "to": 14
+    }
+  ],
+  "algorithm": {
+    "repository": "openfilm/openfilm",
+    "revision": "b138595d4c2d1fa5262b4a8a8c7cd98187c4b077",
+    "path": "packages/openfilm/studio/server/subtitle-segments.mjs",
+    "license": "MIT",
+    "sha256": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "versions": {
+      "node": "22.14.0",
+      "icu": "76.1",
+      "unicode": "16.0"
+    }
+  },
+  "network": "disabled",
+  "warnings": [
+    {
+      "code": "SUBTITLE_TRANSLATION_HEURISTIC_ALIGNMENT",
+      "line_id": "ad"
+    }
+  ],
+  "input": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\subtitle-segments-20261017\\S03-source.json",
+  "input_sha256": "sha256:d149b89b34ffe0ff6927dacf11f577fa372afcb530d17026ad4613631d19e482",
+  "mode": "bilingual",
+  "display_cues": [
+    {
+      "start_tick": 45000,
+      "end_tick": 142200,
+      "text": "本地字幕\nLocal captions.",
+      "line_id": "ad",
+      "parts": [
+        0
+      ],
+      "translation_group": [
+        "ad",
+        0,
+        15
+      ]
+    },
+    {
+      "start_tick": 180000,
+      "end_tick": 277200,
+      "text": "數字保護\nNumbers stay together.",
+      "line_id": "ad",
+      "parts": [
+        1
+      ],
+      "translation_group": [
+        "ad",
+        16,
+        38
+      ]
+    },
+    {
+      "start_tick": 337500,
+      "end_tick": 495000,
+      "text": "字幕清楚\nClear captions.",
+      "line_id": "ad",
+      "parts": [
+        2
+      ],
+      "translation_group": [
+        "ad",
+        39,
+        54
+      ]
+    }
+  ],
+  "timeline_start_tick": 0,
+  "parent_rights_refs": [],
+  "operation_id": "op_20261017142750_b160c1e7"
+}

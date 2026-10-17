@@ -1,0 +1,244 @@
+{
+  "case": 32,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "The U.S. economy grew 3.5% in Q1. Then it slowed.",
+          "start_tick": 900017,
+          "end_tick": 1530017,
+          "marks": [
+            {
+              "index": 0,
+              "start_tick": 900017
+            },
+            {
+              "index": 4,
+              "start_tick": 963017
+            },
+            {
+              "index": 9,
+              "start_tick": 1026017
+            },
+            {
+              "index": 17,
+              "start_tick": 1089017
+            },
+            {
+              "index": 22,
+              "start_tick": 1152017
+            },
+            {
+              "index": 27,
+              "start_tick": 1215017
+            },
+            {
+              "index": 30,
+              "start_tick": 1278017
+            },
+            {
+              "index": 34,
+              "start_tick": 1341017
+            },
+            {
+              "index": 39,
+              "start_tick": 1404017
+            },
+            {
+              "index": 42,
+              "start_tick": 1467017
+            }
+          ]
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "The U.S. economy grew 3.5% in",
+      "display_text": "The U.S. economy grew 3.5% in",
+      "cells": 14.5,
+      "from": 0,
+      "to": 29,
+      "start_tick": 900017,
+      "end_tick": 1245707,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 4,
+          "start_tick": 963017
+        },
+        {
+          "index": 9,
+          "start_tick": 1026017
+        },
+        {
+          "index": 17,
+          "start_tick": 1089017
+        },
+        {
+          "index": 22,
+          "start_tick": 1152017
+        },
+        {
+          "index": 27,
+          "start_tick": 1215017
+        }
+      ]
+    },
+    {
+      "part": 1,
+      "text": "Q1.",
+      "display_text": "Q1.",
+      "cells": 1.5,
+      "from": 30,
+      "to": 33,
+      "start_tick": 1278017,
+      "end_tick": 1341017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1278017
+        }
+      ]
+    },
+    {
+      "part": 2,
+      "text": "Then it",
+      "display_text": "Then it",
+      "cells": 3.5,
+      "from": 34,
+      "to": 41,
+      "start_tick": 1341017,
+      "end_tick": 1434707,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1341017
+        },
+        {
+          "index": 5,
+          "start_tick": 1404017
+        }
+      ]
+    },
+    {
+      "part": 3,
+      "text": "slowed.",
+      "display_text": "slowed.",
+      "cells": 3.5,
+      "from": 42,
+      "to": 49,
+      "start_tick": 1467017,
+      "end_tick": 1530017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1467017
+        }
+      ]
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "The U.S. economy grew 3.5% in",
+      "display_text": "The U.S. economy grew 3.5% in",
+      "from": 0,
+      "to": 29,
+      "cells": 14.5,
+      "start_tick": 900017,
+      "end_tick": 1245707,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 4,
+          "start_tick": 963017
+        },
+        {
+          "index": 9,
+          "start_tick": 1026017
+        },
+        {
+          "index": 17,
+          "start_tick": 1089017
+        },
+        {
+          "index": 22,
+          "start_tick": 1152017
+        },
+        {
+          "index": 27,
+          "start_tick": 1215017
+        }
+      ]
+    },
+    {
+      "part": 1,
+      "text": "Q1.",
+      "display_text": "Q1.",
+      "from": 30,
+      "to": 33,
+      "cells": 1.5,
+      "start_tick": 1278017,
+      "end_tick": 1341017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1278017
+        }
+      ]
+    },
+    {
+      "part": 2,
+      "text": "Then it",
+      "display_text": "Then it",
+      "from": 34,
+      "to": 41,
+      "cells": 3.5,
+      "start_tick": 1341017,
+      "end_tick": 1434707,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1341017
+        },
+        {
+          "index": 5,
+          "start_tick": 1404017
+        }
+      ]
+    },
+    {
+      "part": 3,
+      "text": "slowed.",
+      "display_text": "slowed.",
+      "from": 42,
+      "to": 49,
+      "cells": 3.5,
+      "start_tick": 1467017,
+      "end_tick": 1530017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1467017
+        }
+      ]
+    }
+  ],
+  "equal": true
+}

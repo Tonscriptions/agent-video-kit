@@ -1,0 +1,193 @@
+{
+  "case": 42,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "Café is ready, and the camera is rolling.",
+          "start_tick": 900017,
+          "end_tick": 1215017,
+          "marks": [
+            {
+              "index": 0,
+              "start_tick": 900017
+            },
+            {
+              "index": 6,
+              "start_tick": 939392
+            },
+            {
+              "index": 9,
+              "start_tick": 978767
+            },
+            {
+              "index": 16,
+              "start_tick": 1018142
+            },
+            {
+              "index": 20,
+              "start_tick": 1057517
+            },
+            {
+              "index": 24,
+              "start_tick": 1096892
+            },
+            {
+              "index": 31,
+              "start_tick": 1136267
+            },
+            {
+              "index": 34,
+              "start_tick": 1175642
+            }
+          ],
+          "translation": "A local video workflow. Every subtitle keeps its source text, and every edit stays on this computer."
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "Café is ready,",
+      "display_text": "Café is ready,",
+      "cells": 7.5,
+      "from": 0,
+      "to": 15,
+      "start_tick": 900017,
+      "end_tick": 1018187,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 6,
+          "start_tick": 939392
+        },
+        {
+          "index": 9,
+          "start_tick": 978767
+        }
+      ],
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      }
+    },
+    {
+      "part": 1,
+      "text": "and the camera is rolling.",
+      "display_text": "and the camera is rolling.",
+      "cells": 13,
+      "from": 16,
+      "to": 42,
+      "start_tick": 1018187,
+      "end_tick": 1215017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1018142
+        },
+        {
+          "index": 4,
+          "start_tick": 1057517
+        },
+        {
+          "index": 8,
+          "start_tick": 1096892
+        },
+        {
+          "index": 15,
+          "start_tick": 1136267
+        },
+        {
+          "index": 18,
+          "start_tick": 1175642
+        }
+      ],
+      "translation": {
+        "text": "Every subtitle keeps its source text, and every edit stays on this computer.",
+        "from": 24,
+        "to": 100
+      }
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "Café is ready,",
+      "display_text": "Café is ready,",
+      "from": 0,
+      "to": 15,
+      "cells": 7.5,
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      },
+      "start_tick": 900017,
+      "end_tick": 1018187,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 6,
+          "start_tick": 939392
+        },
+        {
+          "index": 9,
+          "start_tick": 978767
+        }
+      ]
+    },
+    {
+      "part": 1,
+      "text": "and the camera is rolling.",
+      "display_text": "and the camera is rolling.",
+      "from": 16,
+      "to": 42,
+      "cells": 13,
+      "translation": {
+        "text": "Every subtitle keeps its source text, and every edit stays on this computer.",
+        "from": 24,
+        "to": 100
+      },
+      "start_tick": 1018187,
+      "end_tick": 1215017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1018142
+        },
+        {
+          "index": 4,
+          "start_tick": 1057517
+        },
+        {
+          "index": 8,
+          "start_tick": 1096892
+        },
+        {
+          "index": 15,
+          "start_tick": 1136267
+        },
+        {
+          "index": 18,
+          "start_tick": 1175642
+        }
+      ]
+    }
+  ],
+  "equal": true
+}

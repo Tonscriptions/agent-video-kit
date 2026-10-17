@@ -84,6 +84,7 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 | `subtitle validate --input FILE` | SRT/VTT/ASS/SSA/TTML | 解析、时长、顺序和重叠报告；TTML 只接受本地时钟/offset 语法并拒绝外部实体 |
 | `subtitle normalize --input FILE --output FILE` | 字幕文件 | 通过校验后规范化为 SRT；项目模式下输出必须位于项目内 |
 | `subtitle transcribe --project PATH (--asset-id ID\|--input FILE) --model-path PATH` | 本地音视频、显式离线 ASR 模型、可选字幕轨道 | 使用 Transformers 或 FFmpeg `whisper.cpp` 生成时间戳 SRT；`--apply` 继承已登记源素材权利，创建字幕资产、独立字幕片段、快照、校验和操作记录；无源资产权利时拒绝应用 |
+| `subtitle segment --project PATH --input FILE --output FILE` | 本地字幕、ASR 报告或源 JSON；可选规则/双语/纠正 | 固定原算法、Unicode 码点/整数 tick；新的 assets 内 JSON/SRT；可选 apply 到字幕轨；新文字默认未核验，源权利依赖/快照/锁/事务/幂等 |
 | `tts synthesize --project PATH (--text TEXT\|--input FILE)` | 默认 flite 英文，或 `--adapter-id` + `--voice-id` 选择本地 SoulX 中文 | 生成项目 assets 内 WAV 并登记音频资产；可用 `--apply --track-id` 入轨；支持 dry-run、哈希、快照、事务、幂等与权利依赖 |
 | `tts adapter register/list/inspect` | 显式 Python、源码、依赖、完整模型、tokenizer 和证据 | 项目内模型登记/完整性核验；CUDA + HF/BF16，无下载或在线回退 |
 | `tts voice register/list/inspect` | 已登记参考音频、原样 UTF-8 逐字稿和本地授权/来源证据 | 声线登记、哈希核验、源权利依赖；默认未核验 |
@@ -387,3 +388,9 @@ render、quality check/golden 支持 `--sequence-sampling bilinear|area` 和 `--
 manifest `sequence-projection-budget` 保存可达节点与分量，`sequence-composite` 保存采样核及估算。超限 `SEQUENCE_PROJECTION_BUDGET_EXCEEDED`、退出 2，在任务/大型数组/FFmpeg 启动前拒绝；dry-run 也受约束。估算不构成全进程 RSS 上界。配置校验报告 SEQUENCE_SAMPLING_INVALID，render 的作者工程错误可能以 PROJECT_INVALID 包装并保留具体 cause；外部格式导出明确报告采样契约 Unsupported。
 
 默认 bilinear 九组与固定 V31 像素一致，area 的一般旋转使用源轴矩形核。见[契约](./序列面积采样与工作栅格预算契约_v0.1_2026-10-17.md)和[九组真实成片及失败](../validation/序列面积采样与工作配额实测_2026-10-17.md)。
+
+## V34：字幕分段、双语与摘要绑定纠正
+
+`subtitle segment` 使用已有原生 Node ≥22.2 调用固定纯算法，无 npm/npx、GUI、浏览器或网络。`--mode original|translation|bilingual`，后两者要求明确提供译文；`--corrections` 必须绑定本次输入原字节 SHA，`part` 从 0 起，规则及纠正文件均进入幂等指纹。`--apply --track-id` 才入轨，`--replace-track` 显式替换；输出始终为项目 assets 内新文件，不覆盖已有文件。无 apply 的正式执行仍登记 JSON/SRT 资产，新文字许可默认未核验。
+
+无词标时估时；有起点标记仍估算词内部，不作强制对齐或模型翻译。字幕输入只迁移纯文字及时钟。详见[完整参数、输入与边界](./本地字幕分段与局部回写契约_v0.1_2026-10-17.md)、[实测/失败](../validation/本地字幕分段与双语回写实测_2026-10-17.md)。

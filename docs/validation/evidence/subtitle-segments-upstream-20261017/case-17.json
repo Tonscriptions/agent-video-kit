@@ -1,0 +1,87 @@
+{
+  "case": 17,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "我们准备了剧本、分镜、配乐、字幕、调色和最后的成片导出",
+          "start_tick": 900017,
+          "end_tick": 1215017,
+          "translation": "A local video workflow. Every subtitle keeps its source text, and every edit stays on this computer."
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "我们准备了剧本、分镜、配乐、",
+      "display_text": "我们准备了剧本、分镜、配乐",
+      "cells": 13,
+      "from": 0,
+      "to": 14,
+      "start_tick": 900017,
+      "end_tick": 1068407,
+      "translation": {
+        "text": "A local video workflow. Every subtitle keeps its source text,",
+        "from": 0,
+        "to": 61
+      }
+    },
+    {
+      "part": 1,
+      "text": "字幕、调色和最后的成片导出",
+      "display_text": "字幕、调色和最后的成片导出",
+      "cells": 13,
+      "from": 14,
+      "to": 27,
+      "start_tick": 1068407,
+      "end_tick": 1215017,
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      }
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "我们准备了剧本、分镜、配乐、",
+      "display_text": "我们准备了剧本、分镜、配乐",
+      "from": 0,
+      "to": 14,
+      "cells": 13,
+      "translation": {
+        "text": "A local video workflow. Every subtitle keeps its source text,",
+        "from": 0,
+        "to": 61
+      },
+      "start_tick": 900017,
+      "end_tick": 1068407
+    },
+    {
+      "part": 1,
+      "text": "字幕、调色和最后的成片导出",
+      "display_text": "字幕、调色和最后的成片导出",
+      "from": 14,
+      "to": 27,
+      "cells": 13,
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      },
+      "start_tick": 1068407,
+      "end_tick": 1215017
+    }
+  ],
+  "equal": true
+}

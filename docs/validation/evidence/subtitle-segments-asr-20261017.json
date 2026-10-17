@@ -1,0 +1,476 @@
+{
+  "checked_at_utc": "2026-10-17T14:31:58.622025+00:00",
+  "status": "passed",
+  "scope": "one existing Mandarin reference recording, reused corpus; no new independent speaker or word alignment",
+  "new_model_inference": 1,
+  "device_requested": "cpu",
+  "audio_sha256": "sha256:2b40301cfbd9f038f981140d73a04f558518bd5dc54a65d8ab2e7aab431c8bfe",
+  "reference_sha256": "sha256:e04269bb7ad276a1c5872bdd1b866590d3eded24b6b70c2728e2313ff4af04a7",
+  "input_duration_seconds": 12.68,
+  "adapter_sha256": "sha256:51f6af20771184bc957fc7caecc367e79763a26cad2faaecfe9bc68e99f5822e",
+  "transcription": {
+    "status": "ok",
+    "provider": "transformers-local",
+    "model_path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\asr\\whisper-small",
+    "language": "zh",
+    "text": "我們會把責任扛起來 讓台灣的經濟結構轉型 按部就班來規劃與執行 是各國政府越來越關心的課題 照顧壓力將會減輕",
+    "segments": [
+      {
+        "start": 0.0,
+        "end": 2.2,
+        "text": "我們會把責任扛起來"
+      },
+      {
+        "start": 2.2,
+        "end": 4.84,
+        "text": "讓台灣的經濟結構轉型"
+      },
+      {
+        "start": 4.84,
+        "end": 7.54,
+        "text": "按部就班來規劃與執行"
+      },
+      {
+        "start": 7.54,
+        "end": 10.58,
+        "text": "是各國政府越來越關心的課題"
+      },
+      {
+        "start": 10.58,
+        "end": 12.58,
+        "text": "照顧壓力將會減輕"
+      }
+    ],
+    "timed": true,
+    "network": "disabled",
+    "engine": "transformers-whisper-local-v1",
+    "adapter_id": "whisper_local",
+    "model_sha256": "sha256:51f6af20771184bc957fc7caecc367e79763a26cad2faaecfe9bc68e99f5822e",
+    "source_sha256": "sha256:2b40301cfbd9f038f981140d73a04f558518bd5dc54a65d8ab2e7aab431c8bfe",
+    "worker_sha256": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "worker": {
+      "protocol": "agent-video-whisper-asr-v1",
+      "status": "succeeded",
+      "network": "disabled",
+      "blocked_network_events": [],
+      "input_sha256": "sha256:635637f677562b73baa701208372815c97ed2cd6ff36925c421d8620036125f9",
+      "source_sha256": "sha256:2b40301cfbd9f038f981140d73a04f558518bd5dc54a65d8ab2e7aab431c8bfe",
+      "adapter_sha256": "sha256:51f6af20771184bc957fc7caecc367e79763a26cad2faaecfe9bc68e99f5822e",
+      "device": "cpu",
+      "threads": 4,
+      "peak_cuda_bytes": null,
+      "versions": {
+        "python": "3.13.14",
+        "torch": "2.13.0+cu130",
+        "transformers": "5.14.1"
+      },
+      "module_paths": {
+        "torch": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\torch\\__init__.py",
+        "transformers": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\transformers\\__init__.py"
+      },
+      "elapsed_seconds": 112.25
+    },
+    "review_required": true,
+    "srt": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\subtitle-segments-asr-20261017\\assets\\subtitles\\asr-original.srt"
+  },
+  "cer": {
+    "reference": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\asr-fixtures\\s4-reference.txt",
+    "input": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\subtitle-segments-asr-20261017\\assets\\subtitles\\asr-original.srt",
+    "reference_sha256": "sha256:e04269bb7ad276a1c5872bdd1b866590d3eded24b6b70c2728e2313ff4af04a7",
+    "input_sha256": "sha256:74558205d2422c2753afbf74cee7a886517e802b6d71cf64eeb95456e3e1c5bf",
+    "normalization": "nfkc-text",
+    "script_conversion": "none",
+    "reference_text": "我們會把責任扛起來讓臺灣的經濟結構轉型按部就班來規劃與執行是各國政府越來越關心的課題照顧壓力將會減輕",
+    "hypothesis_text": "我們會把責任扛起來讓台灣的經濟結構轉型按部就班來規劃與執行是各國政府越來越關心的課題照顧壓力將會減輕",
+    "reference_characters": 50,
+    "hypothesis_characters": 50,
+    "edit_distance": 1,
+    "substitutions": 1,
+    "deletions": 0,
+    "insertions": 0,
+    "cer": 0.02,
+    "exact_match": false,
+    "created_at": "2026-10-17T14:31:25.599456Z",
+    "max_cer": null,
+    "ok": true,
+    "network": "disabled"
+  },
+  "source_line_count": 5,
+  "segmented_cue_count": 9,
+  "line_checks": [
+    {
+      "line_id": "line_000001",
+      "source_text": "我們會把責任扛起來",
+      "start_tick": 0,
+      "end_tick": 198000,
+      "parts": 2,
+      "text_preserved": true,
+      "pieces_inside_source_clock": true
+    },
+    {
+      "line_id": "line_000002",
+      "source_text": "讓台灣的經濟結構轉型",
+      "start_tick": 198000,
+      "end_tick": 435600,
+      "parts": 2,
+      "text_preserved": true,
+      "pieces_inside_source_clock": true
+    },
+    {
+      "line_id": "line_000003",
+      "source_text": "按部就班來規劃與執行",
+      "start_tick": 435600,
+      "end_tick": 678600,
+      "parts": 2,
+      "text_preserved": true,
+      "pieces_inside_source_clock": true
+    },
+    {
+      "line_id": "line_000004",
+      "source_text": "是各國政府越來越關心的課題",
+      "start_tick": 678600,
+      "end_tick": 952200,
+      "parts": 2,
+      "text_preserved": true,
+      "pieces_inside_source_clock": true
+    },
+    {
+      "line_id": "line_000005",
+      "source_text": "照顧壓力將會減輕",
+      "start_tick": 952200,
+      "end_tick": 1132200,
+      "parts": 1,
+      "text_preserved": true,
+      "pieces_inside_source_clock": true
+    }
+  ],
+  "timing_basis": [
+    "estimated-from-line"
+  ],
+  "rules": {
+    "maxCells": 8,
+    "maxChars": 42,
+    "minUnits": 4,
+    "pauseMs": 500,
+    "minMs": 500,
+    "maxMs": 7000,
+    "holdMs": 200,
+    "closeGapMs": 150,
+    "msPerCell": 220,
+    "weight": {
+      "latin": 0.32,
+      "space": 0.15,
+      "clause": 1.5,
+      "sentence": 2.5
+    },
+    "cost": {
+      "piece": 10,
+      "balance": 4,
+      "short": 6,
+      "over": 50,
+      "long": 20,
+      "cjk": 1,
+      "cjkSingle": 1,
+      "mixed": 3,
+      "bracket": 8,
+      "leansBack": 8,
+      "leansForward": 4,
+      "conjunction": -4,
+      "particle": -3,
+      "pause": -10,
+      "sentence": -6,
+      "clause": -4,
+      "distance": 20,
+      "merge": 6
+    }
+  },
+  "render": {
+    "sha256": "sha256:16b5e50e6962c6d333d64945f9a8bbec2affa8fd2aaba4b3c9613fa44af12dc5",
+    "decoded_rgb_frames": 101,
+    "probe": {
+      "duration_seconds": 12.68,
+      "duration_tick": 1141200,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "h264",
+          "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+          "profile": "High",
+          "codec_type": "video",
+          "codec_tag_string": "avc1",
+          "codec_tag": "0x31637661",
+          "mime_codec_string": "avc1.640016",
+          "width": 640,
+          "height": 360,
+          "coded_width": 640,
+          "coded_height": 360,
+          "has_b_frames": 2,
+          "sample_aspect_ratio": "1:1",
+          "display_aspect_ratio": "16:9",
+          "pix_fmt": "yuv420p",
+          "level": 22,
+          "color_range": "tv",
+          "color_space": "bt709",
+          "chroma_location": "left",
+          "field_order": "progressive",
+          "is_avc": "true",
+          "nal_length_size": "4",
+          "id": "0x1",
+          "r_frame_rate": "8/1",
+          "avg_frame_rate": "8/1",
+          "time_base": "1/16384",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 206848,
+          "duration": "12.625000",
+          "bit_rate": "14269",
+          "bits_per_raw_sample": "8",
+          "nb_frames": "101",
+          "extradata_size": 51,
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "language": "und",
+            "handler_name": "VideoHandler",
+            "encoder": "Lavc62.28.100 libx264"
+          }
+        },
+        {
+          "index": 1,
+          "codec_name": "aac",
+          "codec_long_name": "AAC (Advanced Audio Coding)",
+          "profile": "LC",
+          "codec_type": "audio",
+          "codec_tag_string": "mp4a",
+          "codec_tag": "0x6134706d",
+          "mime_codec_string": "mp4a.40.2",
+          "sample_fmt": "fltp",
+          "sample_rate": "48000",
+          "channels": 1,
+          "channel_layout": "mono",
+          "bits_per_sample": 0,
+          "initial_padding": 0,
+          "id": "0x2",
+          "r_frame_rate": "0/0",
+          "avg_frame_rate": "0/0",
+          "time_base": "1/48000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 608640,
+          "duration": "12.680000",
+          "bit_rate": "143984",
+          "nb_frames": "596",
+          "extradata_size": 5,
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "language": "und",
+            "handler_name": "SoundHandler"
+          }
+        }
+      ],
+      "video": {
+        "codec": "h264",
+        "width": 640,
+        "height": 360,
+        "pix_fmt": "yuv420p",
+        "fps": "8/1",
+        "color_space": "bt709",
+        "duration_seconds": 12.625,
+        "start_time_seconds": 0.0
+      },
+      "audio": {
+        "codec": "aac",
+        "sample_rate": 48000,
+        "channels": 1,
+        "duration_seconds": 12.68,
+        "start_time_seconds": 0.0
+      }
+    }
+  },
+  "audio_unchanged": true,
+  "decoded_audio_sample_frames": 609280,
+  "publication_blocked": true,
+  "publication_error_codes": [
+    "PROJECT_INVALID"
+  ],
+  "cli_calls": [
+    {
+      "command": "project.init",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:0e0feb71d18dd75043baaf01e592796cd7b242cfe8635321c12242739593cb27",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "asr.adapter.register",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:2a862773a1db832657abc1a7f69d260c1ed476c550803f725147d79a4a3a347d",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "asr.adapter.inspect",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:396cf4d4bbfcc0eea5cc792d3e1b35c77a4a5aeb72ac9ca77525f69d25363e97",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "media.ingest",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:bb959d1ff6d51bb0f101f7c7dd11fd5847e83b4813025b74ce2c783ab72c897f",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "media.ingest",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:1d86d7ebd7589db18a9343c0bc5c5de3414132a0b9f81ce463e2a735963a7a73",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "timeline.compose",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:482954e3794dda9a2bee08ba72f3b498e7952d823c09e5965d269be51c5a9441",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "subtitle.transcribe",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:947da340a2f44c07028a53e933be90e46f2e289091b7ed56c2aa0136c9a4bb1f",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "subtitle.evaluate",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:a815a55044bb0cd15084ec57ad50afc722ced902163873f4fb22754a74058d0a",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "timeline.compose",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:88007bf852e051548f7443bed8c1144484b455bdf16c36768d0d7a9894d0c175",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "render",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:8a51bb0aba4aec07680144809e9b23889424f31c357bd9c6ea78de9b8e2dd079",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "subtitle.segment",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:2a05f980c29a1e6b975444c3bfb271ea5b3d8d121bbe6705ec36259154ee7569",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "subtitle.segment",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:bde2e7eca75b7a0caae2d37e518b460d275e7f334e48b43d070171ba8da5525d",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "timeline.compose",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:8267ff1060748b993caee2908e27e795f29a3de58be629e99ca47e3fc24d0f65",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "render",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:e5d2b880a1c3a2a0196593e24ffb852b443ade11f6ca406b5bbf0c479b08500d",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "quality.check",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:11d29209897361d3a66a36bd8d357a394a9807137104db50ceb19b3a98b5874f",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "validate",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:dd7f1a3b35802669b74fbae0d44bc2b608a02dc2b5e86f7446291a0993ed1abc",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "policy.audit",
+      "exit_code": 0,
+      "expected": 0,
+      "stdout_sha256": "sha256:3381a6f3a7c8f3aff717759ed3a3890d98f48bec9e2e21431eab24bd74fc96c2",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "rights.check",
+      "exit_code": 7,
+      "expected": 7,
+      "stdout_sha256": "sha256:7e9353d2f43f63cfdf88cccf6ef180adb4724fa420293a1d4758eba60b7e3605",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "render",
+      "exit_code": 7,
+      "expected": 7,
+      "stdout_sha256": "sha256:58830f0fe180d5b741670a2d8d4af333c076b3b7c1377a77dbbb416347b0d3d4",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "continuous_playback_reviewed": false,
+  "audio_listened": false,
+  "public_audio_or_video": false,
+  "local_artifact_directory": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\subtitle-segments-asr-20261017"
+}

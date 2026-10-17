@@ -7,6 +7,18 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 Use this skill when the requested edit should be represented as a reproducible local Agent Project rather than a GUI project. The implementation lives in `product/` in this project.
 
+For readable subtitle segments or local piece corrections, read the
+[subtitle segmentation contract](../../docs/specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md).
+Use `subtitle segment --project <root> --input <caption-or-ASR-report-or-source.json>
+--output assets/subtitles/<new>.json --dry-run`; native local Node >=22.2 is
+required. Add `--apply --track-id <subtitle-track>` and optionally
+`--mode bilingual` for explicitly supplied translations. Inspect source ranges,
+estimated timing, shared translation groups and reading-limit warnings.
+Corrections bind the raw input SHA-256 and the original line/part; public
+indexes are Unicode codepoints. New text starts with unverified rights.
+This neither recognizes speech nor translates it; preserve source/model
+dependencies through `--source-asset-id` or the registered ASR subtitle asset.
+
 For whole-clip linked editing, read the [linked editing contract](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md).
 Use `timeline edit --project <path> --input <request.json> --dry-run` for
 link/unlink/remove/close_gap/close_gaps/shift. Inspect selected IDs, locked

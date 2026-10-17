@@ -1,0 +1,196 @@
+{
+  "case": 30,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "The U.S. economy grew 3.5% in Q1. Then it slowed.",
+          "start_tick": 900017,
+          "end_tick": 1215017,
+          "marks": [
+            {
+              "index": 0,
+              "start_tick": 900017
+            },
+            {
+              "index": 4,
+              "start_tick": 931517
+            },
+            {
+              "index": 9,
+              "start_tick": 963017
+            },
+            {
+              "index": 17,
+              "start_tick": 994517
+            },
+            {
+              "index": 22,
+              "start_tick": 1026017
+            },
+            {
+              "index": 27,
+              "start_tick": 1057517
+            },
+            {
+              "index": 30,
+              "start_tick": 1089017
+            },
+            {
+              "index": 34,
+              "start_tick": 1120517
+            },
+            {
+              "index": 39,
+              "start_tick": 1152017
+            },
+            {
+              "index": 42,
+              "start_tick": 1183517
+            }
+          ]
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "The U.S. economy grew 3.5% in Q1.",
+      "display_text": "The U.S. economy grew 3.5% in Q1.",
+      "cells": 16.5,
+      "from": 0,
+      "to": 33,
+      "start_tick": 900017,
+      "end_tick": 1120517,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 4,
+          "start_tick": 931517
+        },
+        {
+          "index": 9,
+          "start_tick": 963017
+        },
+        {
+          "index": 17,
+          "start_tick": 994517
+        },
+        {
+          "index": 22,
+          "start_tick": 1026017
+        },
+        {
+          "index": 27,
+          "start_tick": 1057517
+        },
+        {
+          "index": 30,
+          "start_tick": 1089017
+        }
+      ]
+    },
+    {
+      "part": 1,
+      "text": "Then it slowed.",
+      "display_text": "Then it slowed.",
+      "cells": 7.5,
+      "from": 34,
+      "to": 49,
+      "start_tick": 1120517,
+      "end_tick": 1215017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1120517
+        },
+        {
+          "index": 5,
+          "start_tick": 1152017
+        },
+        {
+          "index": 8,
+          "start_tick": 1183517
+        }
+      ]
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "The U.S. economy grew 3.5% in Q1.",
+      "display_text": "The U.S. economy grew 3.5% in Q1.",
+      "from": 0,
+      "to": 33,
+      "cells": 16.5,
+      "start_tick": 900017,
+      "end_tick": 1120517,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 4,
+          "start_tick": 931517
+        },
+        {
+          "index": 9,
+          "start_tick": 963017
+        },
+        {
+          "index": 17,
+          "start_tick": 994517
+        },
+        {
+          "index": 22,
+          "start_tick": 1026017
+        },
+        {
+          "index": 27,
+          "start_tick": 1057517
+        },
+        {
+          "index": 30,
+          "start_tick": 1089017
+        }
+      ]
+    },
+    {
+      "part": 1,
+      "text": "Then it slowed.",
+      "display_text": "Then it slowed.",
+      "from": 34,
+      "to": 49,
+      "cells": 7.5,
+      "start_tick": 1120517,
+      "end_tick": 1215017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1120517
+        },
+        {
+          "index": 5,
+          "start_tick": 1152017
+        },
+        {
+          "index": 8,
+          "start_tick": 1183517
+        }
+      ]
+    }
+  ],
+  "equal": true
+}

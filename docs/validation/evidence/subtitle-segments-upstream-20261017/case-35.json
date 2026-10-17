@@ -1,0 +1,117 @@
+{
+  "case": 35,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "This is a really long sentence that goes on without any commas because we want to see where it breaks",
+          "start_tick": 900017,
+          "end_tick": 1530017,
+          "translation": "A local video workflow. Every subtitle keeps its source text, and every edit stays on this computer."
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "This is a really long sentence",
+      "display_text": "This is a really long sentence",
+      "cells": 15,
+      "from": 0,
+      "to": 30,
+      "start_tick": 900017,
+      "end_tick": 1092797,
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      }
+    },
+    {
+      "part": 1,
+      "text": "that goes on without any commas",
+      "display_text": "that goes on without any commas",
+      "cells": 15.5,
+      "from": 31,
+      "to": 62,
+      "start_tick": 1092797,
+      "end_tick": 1292417,
+      "translation": {
+        "text": "Every subtitle keeps its source text,",
+        "from": 24,
+        "to": 61
+      }
+    },
+    {
+      "part": 2,
+      "text": "because we want to see where it breaks",
+      "display_text": "because we want to see where it breaks",
+      "cells": 19,
+      "from": 63,
+      "to": 101,
+      "start_tick": 1292417,
+      "end_tick": 1530017,
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      }
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "This is a really long sentence",
+      "display_text": "This is a really long sentence",
+      "from": 0,
+      "to": 30,
+      "cells": 15,
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      },
+      "start_tick": 900017,
+      "end_tick": 1092797
+    },
+    {
+      "part": 1,
+      "text": "that goes on without any commas",
+      "display_text": "that goes on without any commas",
+      "from": 31,
+      "to": 62,
+      "cells": 15.5,
+      "translation": {
+        "text": "Every subtitle keeps its source text,",
+        "from": 24,
+        "to": 61
+      },
+      "start_tick": 1092797,
+      "end_tick": 1292417
+    },
+    {
+      "part": 2,
+      "text": "because we want to see where it breaks",
+      "display_text": "because we want to see where it breaks",
+      "from": 63,
+      "to": 101,
+      "cells": 19,
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      },
+      "start_tick": 1292417,
+      "end_tick": 1530017
+    }
+  ],
+  "equal": true
+}

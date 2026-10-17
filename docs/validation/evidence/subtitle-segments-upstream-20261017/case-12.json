@@ -1,0 +1,379 @@
+{
+  "case": 12,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "我们先做一个原型（大概需要两周），然后再看效果。",
+          "start_tick": 900017,
+          "end_tick": 1530017,
+          "marks": [
+            {
+              "index": 0,
+              "start_tick": 900017
+            },
+            {
+              "index": 1,
+              "start_tick": 931517
+            },
+            {
+              "index": 2,
+              "start_tick": 963017
+            },
+            {
+              "index": 3,
+              "start_tick": 994517
+            },
+            {
+              "index": 4,
+              "start_tick": 1026017
+            },
+            {
+              "index": 5,
+              "start_tick": 1057517
+            },
+            {
+              "index": 6,
+              "start_tick": 1089017
+            },
+            {
+              "index": 7,
+              "start_tick": 1120517
+            },
+            {
+              "index": 9,
+              "start_tick": 1152017
+            },
+            {
+              "index": 10,
+              "start_tick": 1183517
+            },
+            {
+              "index": 11,
+              "start_tick": 1215017
+            },
+            {
+              "index": 12,
+              "start_tick": 1246517
+            },
+            {
+              "index": 13,
+              "start_tick": 1278017
+            },
+            {
+              "index": 14,
+              "start_tick": 1309517
+            },
+            {
+              "index": 17,
+              "start_tick": 1341017
+            },
+            {
+              "index": 18,
+              "start_tick": 1372517
+            },
+            {
+              "index": 19,
+              "start_tick": 1404017
+            },
+            {
+              "index": 20,
+              "start_tick": 1435517
+            },
+            {
+              "index": 21,
+              "start_tick": 1467017
+            },
+            {
+              "index": 22,
+              "start_tick": 1498517
+            }
+          ],
+          "translation": "A local video workflow. Every subtitle keeps its source text, and every edit stays on this computer."
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "我们先做一个原型",
+      "display_text": "我们先做一个原型",
+      "cells": 8,
+      "from": 0,
+      "to": 8,
+      "start_tick": 900017,
+      "end_tick": 1152017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 1,
+          "start_tick": 931517
+        },
+        {
+          "index": 2,
+          "start_tick": 963017
+        },
+        {
+          "index": 3,
+          "start_tick": 994517
+        },
+        {
+          "index": 4,
+          "start_tick": 1026017
+        },
+        {
+          "index": 5,
+          "start_tick": 1057517
+        },
+        {
+          "index": 6,
+          "start_tick": 1089017
+        },
+        {
+          "index": 7,
+          "start_tick": 1120517
+        }
+      ],
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      }
+    },
+    {
+      "part": 1,
+      "text": "（大概需要两周），",
+      "display_text": "（大概需要两周）",
+      "cells": 8,
+      "from": 8,
+      "to": 17,
+      "start_tick": 1152017,
+      "end_tick": 1341017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1152017
+        },
+        {
+          "index": 1,
+          "start_tick": 1152017
+        },
+        {
+          "index": 2,
+          "start_tick": 1183517
+        },
+        {
+          "index": 3,
+          "start_tick": 1215017
+        },
+        {
+          "index": 4,
+          "start_tick": 1246517
+        },
+        {
+          "index": 5,
+          "start_tick": 1278017
+        },
+        {
+          "index": 6,
+          "start_tick": 1309517
+        }
+      ],
+      "translation": {
+        "text": "Every subtitle keeps its source text,",
+        "from": 24,
+        "to": 61
+      }
+    },
+    {
+      "part": 2,
+      "text": "然后再看效果。",
+      "display_text": "然后再看效果",
+      "cells": 6,
+      "from": 17,
+      "to": 24,
+      "start_tick": 1341017,
+      "end_tick": 1530017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1341017
+        },
+        {
+          "index": 1,
+          "start_tick": 1372517
+        },
+        {
+          "index": 2,
+          "start_tick": 1404017
+        },
+        {
+          "index": 3,
+          "start_tick": 1435517
+        },
+        {
+          "index": 4,
+          "start_tick": 1467017
+        },
+        {
+          "index": 5,
+          "start_tick": 1498517
+        }
+      ],
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      }
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "我们先做一个原型",
+      "display_text": "我们先做一个原型",
+      "from": 0,
+      "to": 8,
+      "cells": 8,
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      },
+      "start_tick": 900017,
+      "end_tick": 1152017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 1,
+          "start_tick": 931517
+        },
+        {
+          "index": 2,
+          "start_tick": 963017
+        },
+        {
+          "index": 3,
+          "start_tick": 994517
+        },
+        {
+          "index": 4,
+          "start_tick": 1026017
+        },
+        {
+          "index": 5,
+          "start_tick": 1057517
+        },
+        {
+          "index": 6,
+          "start_tick": 1089017
+        },
+        {
+          "index": 7,
+          "start_tick": 1120517
+        }
+      ]
+    },
+    {
+      "part": 1,
+      "text": "（大概需要两周），",
+      "display_text": "（大概需要两周）",
+      "from": 8,
+      "to": 17,
+      "cells": 8,
+      "translation": {
+        "text": "Every subtitle keeps its source text,",
+        "from": 24,
+        "to": 61
+      },
+      "start_tick": 1152017,
+      "end_tick": 1341017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1152017
+        },
+        {
+          "index": 1,
+          "start_tick": 1152017
+        },
+        {
+          "index": 2,
+          "start_tick": 1183517
+        },
+        {
+          "index": 3,
+          "start_tick": 1215017
+        },
+        {
+          "index": 4,
+          "start_tick": 1246517
+        },
+        {
+          "index": 5,
+          "start_tick": 1278017
+        },
+        {
+          "index": 6,
+          "start_tick": 1309517
+        }
+      ]
+    },
+    {
+      "part": 2,
+      "text": "然后再看效果。",
+      "display_text": "然后再看效果",
+      "from": 17,
+      "to": 24,
+      "cells": 6,
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      },
+      "start_tick": 1341017,
+      "end_tick": 1530017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1341017
+        },
+        {
+          "index": 1,
+          "start_tick": 1372517
+        },
+        {
+          "index": 2,
+          "start_tick": 1404017
+        },
+        {
+          "index": 3,
+          "start_tick": 1435517
+        },
+        {
+          "index": 4,
+          "start_tick": 1467017
+        },
+        {
+          "index": 5,
+          "start_tick": 1498517
+        }
+      ]
+    }
+  ],
+  "equal": true
+}

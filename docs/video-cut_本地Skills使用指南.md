@@ -3,7 +3,7 @@
 | 文档编号 | OPS-2026-10-001 |
 |---|---|
 | 状态 | 有效 |
-| 本次审计复核 | 2026-10-17，V33，14 项格式/联接/100 本地引用 |
+| 本次审计复核 | 2026-10-17，V34，14 项格式/联接/104 本地引用 |
 | 证据性质 | 本地 Skill 注册、目录校验与运行策略；不等于完整剪映功能验收 |
 
 > **运行策略（2026-10-14）：** 生产 Skill 只允许调用本地项目、系统 FFmpeg、本地模型和本地文件。禁止剪映、闭源 SaaS、远程 API、在线素材下载、远程渲染和需要联网才能完成的工作流。`sources/` 仍保留公开仓库快照用于许可证、来源和差异审计，但不作为生产 Skill 的可调用依赖。
@@ -118,3 +118,9 @@ python -X utf8 -m ai_ad_editor doctor --project .\project
 `video-cut-local-models`、`video-cut-video-understand`、`video-cut-agent-editor` 和 `video-cut-quality` 已同步本地 Whisper 登记、CPU/CUDA、字幕应用、字体导入与 CER 工作流；仍使用既有 14 个 `video-cut-` Skill。优先阅读[Whisper 契约](./specs/本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md)，模型与 Python 都是显式本地输入，不自动安装、下载或切换设备。参考与识别繁简不同必须体现在 CER 报告中，不能据单段指标宣称广泛识别或听感质量已通过。
 
 V33：既有 agent-editor/timeline/project-ops/quality 四个技能已同步[整片段关联/同步锁/联动契约](./specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md)，包括 dry-run、旧摘要、幂等、共同 short_tick、冲突处理和字幕偏移。产品使用原生 Python/FFmpeg，不使用上游 npx/Studio；[14 项审计](./validation/evidence/linked-edit-skills-20261017.json)不替代自然广告与完整剪映验收。
+
+## V34：字幕分段与局部回写
+
+`$video-cut-agent-editor` 编排 `subtitle segment`，`$video-cut-video-understand` 先取得本地 ASR 证据，`$video-cut-timeline` 处理文字入轨，`$video-cut-quality` 复核原文范围、估算时钟、共享译文及字幕/成片证据。四个现有技能已更新，未增加上游 latest/Studio 入口。全部 14 项格式、104 本地链接与发现目录到 E 盘联接通过，[机器记录](./validation/evidence/subtitle-segments-skills-20261017.json)。
+
+调用顺序是明确本地输入与源 SHA→dry-run→检查规则、模式和可选纠正→正式生成/入轨→权利复核→渲染/质量。双语必须提供译文，新文字默认未核验，不自动继承来源公开许可；没有词标就保持 estimated 标签。详见[参数契约](./specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md)和[四组/真实 ASR 实测](./validation/本地字幕分段与双语回写实测_2026-10-17.md)。

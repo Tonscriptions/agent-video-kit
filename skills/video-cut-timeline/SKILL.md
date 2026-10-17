@@ -3,6 +3,15 @@ name: video-cut-timeline
 description: Compose an Agent Project timeline with local clips, tracks, transitions, keyframes, masks, speed curves, nested sequences, captions, and audio automation.
 ---
 
+For generated subtitle pieces, read the
+[segmentation contract](../../docs/specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md).
+`subtitle segment --apply --track-id <id>` creates ordinary inline text clips,
+with source line/part references and explicit generated-SRT rights dependencies.
+Use `--timeline-start-tick` for an integer placement offset and
+`--replace-track` only when replacing that track is intended. Locked tracks,
+overlaps, stale correction hashes and zero-duration quantization reject the
+whole operation. Preserve those dependency fields during later edits.
+
 # Timeline Composition
 
 Use the [linked edit planner](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md)

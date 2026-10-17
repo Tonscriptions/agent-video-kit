@@ -1,0 +1,373 @@
+{
+  "case": 18,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "我们准备了剧本、分镜、配乐、字幕、调色和最后的成片导出",
+          "start_tick": 900017,
+          "end_tick": 1215017,
+          "marks": [
+            {
+              "index": 0,
+              "start_tick": 900017
+            },
+            {
+              "index": 1,
+              "start_tick": 913713
+            },
+            {
+              "index": 2,
+              "start_tick": 927408
+            },
+            {
+              "index": 3,
+              "start_tick": 941104
+            },
+            {
+              "index": 4,
+              "start_tick": 954800
+            },
+            {
+              "index": 5,
+              "start_tick": 968495
+            },
+            {
+              "index": 6,
+              "start_tick": 982191
+            },
+            {
+              "index": 8,
+              "start_tick": 995887
+            },
+            {
+              "index": 9,
+              "start_tick": 1009582
+            },
+            {
+              "index": 11,
+              "start_tick": 1023278
+            },
+            {
+              "index": 12,
+              "start_tick": 1036974
+            },
+            {
+              "index": 14,
+              "start_tick": 1050669
+            },
+            {
+              "index": 15,
+              "start_tick": 1064365
+            },
+            {
+              "index": 17,
+              "start_tick": 1078060
+            },
+            {
+              "index": 18,
+              "start_tick": 1091756
+            },
+            {
+              "index": 19,
+              "start_tick": 1105452
+            },
+            {
+              "index": 20,
+              "start_tick": 1119147
+            },
+            {
+              "index": 21,
+              "start_tick": 1132843
+            },
+            {
+              "index": 22,
+              "start_tick": 1146539
+            },
+            {
+              "index": 23,
+              "start_tick": 1160234
+            },
+            {
+              "index": 24,
+              "start_tick": 1173930
+            },
+            {
+              "index": 25,
+              "start_tick": 1187626
+            },
+            {
+              "index": 26,
+              "start_tick": 1201321
+            }
+          ],
+          "translation": "A local video workflow. Every subtitle keeps its source text, and every edit stays on this computer."
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "我们准备了剧本、分镜、配乐、",
+      "display_text": "我们准备了剧本、分镜、配乐",
+      "cells": 13,
+      "from": 0,
+      "to": 14,
+      "start_tick": 900017,
+      "end_tick": 1050677,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 1,
+          "start_tick": 913713
+        },
+        {
+          "index": 2,
+          "start_tick": 927408
+        },
+        {
+          "index": 3,
+          "start_tick": 941104
+        },
+        {
+          "index": 4,
+          "start_tick": 954800
+        },
+        {
+          "index": 5,
+          "start_tick": 968495
+        },
+        {
+          "index": 6,
+          "start_tick": 982191
+        },
+        {
+          "index": 8,
+          "start_tick": 995887
+        },
+        {
+          "index": 9,
+          "start_tick": 1009582
+        },
+        {
+          "index": 11,
+          "start_tick": 1023278
+        },
+        {
+          "index": 12,
+          "start_tick": 1036974
+        }
+      ],
+      "translation": {
+        "text": "A local video workflow. Every subtitle keeps its source text,",
+        "from": 0,
+        "to": 61
+      }
+    },
+    {
+      "part": 1,
+      "text": "字幕、调色和最后的成片导出",
+      "display_text": "字幕、调色和最后的成片导出",
+      "cells": 13,
+      "from": 14,
+      "to": 27,
+      "start_tick": 1050677,
+      "end_tick": 1215017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1050669
+        },
+        {
+          "index": 1,
+          "start_tick": 1064365
+        },
+        {
+          "index": 3,
+          "start_tick": 1078060
+        },
+        {
+          "index": 4,
+          "start_tick": 1091756
+        },
+        {
+          "index": 5,
+          "start_tick": 1105452
+        },
+        {
+          "index": 6,
+          "start_tick": 1119147
+        },
+        {
+          "index": 7,
+          "start_tick": 1132843
+        },
+        {
+          "index": 8,
+          "start_tick": 1146539
+        },
+        {
+          "index": 9,
+          "start_tick": 1160234
+        },
+        {
+          "index": 10,
+          "start_tick": 1173930
+        },
+        {
+          "index": 11,
+          "start_tick": 1187626
+        },
+        {
+          "index": 12,
+          "start_tick": 1201321
+        }
+      ],
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      }
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "我们准备了剧本、分镜、配乐、",
+      "display_text": "我们准备了剧本、分镜、配乐",
+      "from": 0,
+      "to": 14,
+      "cells": 13,
+      "translation": {
+        "text": "A local video workflow. Every subtitle keeps its source text,",
+        "from": 0,
+        "to": 61
+      },
+      "start_tick": 900017,
+      "end_tick": 1050677,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 1,
+          "start_tick": 913713
+        },
+        {
+          "index": 2,
+          "start_tick": 927408
+        },
+        {
+          "index": 3,
+          "start_tick": 941104
+        },
+        {
+          "index": 4,
+          "start_tick": 954800
+        },
+        {
+          "index": 5,
+          "start_tick": 968495
+        },
+        {
+          "index": 6,
+          "start_tick": 982191
+        },
+        {
+          "index": 8,
+          "start_tick": 995887
+        },
+        {
+          "index": 9,
+          "start_tick": 1009582
+        },
+        {
+          "index": 11,
+          "start_tick": 1023278
+        },
+        {
+          "index": 12,
+          "start_tick": 1036974
+        }
+      ]
+    },
+    {
+      "part": 1,
+      "text": "字幕、调色和最后的成片导出",
+      "display_text": "字幕、调色和最后的成片导出",
+      "from": 14,
+      "to": 27,
+      "cells": 13,
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      },
+      "start_tick": 1050677,
+      "end_tick": 1215017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1050669
+        },
+        {
+          "index": 1,
+          "start_tick": 1064365
+        },
+        {
+          "index": 3,
+          "start_tick": 1078060
+        },
+        {
+          "index": 4,
+          "start_tick": 1091756
+        },
+        {
+          "index": 5,
+          "start_tick": 1105452
+        },
+        {
+          "index": 6,
+          "start_tick": 1119147
+        },
+        {
+          "index": 7,
+          "start_tick": 1132843
+        },
+        {
+          "index": 8,
+          "start_tick": 1146539
+        },
+        {
+          "index": 9,
+          "start_tick": 1160234
+        },
+        {
+          "index": 10,
+          "start_tick": 1173930
+        },
+        {
+          "index": 11,
+          "start_tick": 1187626
+        },
+        {
+          "index": 12,
+          "start_tick": 1201321
+        }
+      ]
+    }
+  ],
+  "equal": true
+}

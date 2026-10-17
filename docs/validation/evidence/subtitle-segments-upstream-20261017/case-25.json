@@ -1,0 +1,117 @@
+{
+  "case": 25,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "Mr. Smith arrived at 3.5 s, e.g. right on time, and we started the demo.",
+          "start_tick": 900017,
+          "end_tick": 1215017,
+          "translation": "A local video workflow. Every subtitle keeps its source text, and every edit stays on this computer."
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "Mr. Smith arrived at 3.5 s,",
+      "display_text": "Mr. Smith arrived at 3.5 s,",
+      "cells": 13.5,
+      "from": 0,
+      "to": 27,
+      "start_tick": 900017,
+      "end_tick": 1025207,
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      }
+    },
+    {
+      "part": 1,
+      "text": "e.g. right on time,",
+      "display_text": "e.g. right on time,",
+      "cells": 9.5,
+      "from": 28,
+      "to": 47,
+      "start_tick": 1025207,
+      "end_tick": 1129787,
+      "translation": {
+        "text": "Every subtitle keeps its source text,",
+        "from": 24,
+        "to": 61
+      }
+    },
+    {
+      "part": 2,
+      "text": "and we started the demo.",
+      "display_text": "and we started the demo.",
+      "cells": 12,
+      "from": 48,
+      "to": 72,
+      "start_tick": 1129787,
+      "end_tick": 1215017,
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      }
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "Mr. Smith arrived at 3.5 s,",
+      "display_text": "Mr. Smith arrived at 3.5 s,",
+      "from": 0,
+      "to": 27,
+      "cells": 13.5,
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      },
+      "start_tick": 900017,
+      "end_tick": 1025207
+    },
+    {
+      "part": 1,
+      "text": "e.g. right on time,",
+      "display_text": "e.g. right on time,",
+      "from": 28,
+      "to": 47,
+      "cells": 9.5,
+      "translation": {
+        "text": "Every subtitle keeps its source text,",
+        "from": 24,
+        "to": 61
+      },
+      "start_tick": 1025207,
+      "end_tick": 1129787
+    },
+    {
+      "part": 2,
+      "text": "and we started the demo.",
+      "display_text": "and we started the demo.",
+      "from": 48,
+      "to": 72,
+      "cells": 12,
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      },
+      "start_tick": 1129787,
+      "end_tick": 1215017
+    }
+  ],
+  "equal": true
+}

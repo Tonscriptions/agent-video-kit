@@ -1,0 +1,87 @@
+{
+  "case": 43,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "Café is ready, and the camera is rolling.",
+          "start_tick": 900017,
+          "end_tick": 1530017,
+          "translation": "A local video workflow. Every subtitle keeps its source text, and every edit stays on this computer."
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "Café is ready,",
+      "display_text": "Café is ready,",
+      "cells": 7.5,
+      "from": 0,
+      "to": 15,
+      "start_tick": 900017,
+      "end_tick": 1085147,
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      }
+    },
+    {
+      "part": 1,
+      "text": "and the camera is rolling.",
+      "display_text": "and the camera is rolling.",
+      "cells": 13,
+      "from": 16,
+      "to": 42,
+      "start_tick": 1133657,
+      "end_tick": 1530017,
+      "translation": {
+        "text": "Every subtitle keeps its source text, and every edit stays on this computer.",
+        "from": 24,
+        "to": 100
+      }
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "Café is ready,",
+      "display_text": "Café is ready,",
+      "from": 0,
+      "to": 15,
+      "cells": 7.5,
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      },
+      "start_tick": 900017,
+      "end_tick": 1085147
+    },
+    {
+      "part": 1,
+      "text": "and the camera is rolling.",
+      "display_text": "and the camera is rolling.",
+      "from": 16,
+      "to": 42,
+      "cells": 13,
+      "translation": {
+        "text": "Every subtitle keeps its source text, and every edit stays on this computer.",
+        "from": 24,
+        "to": 100
+      },
+      "start_tick": 1133657,
+      "end_tick": 1530017
+    }
+  ],
+  "equal": true
+}

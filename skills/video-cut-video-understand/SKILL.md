@@ -39,3 +39,12 @@ first. Output paths are relative to the project and must name a new SRT.
 Segment timestamps do not establish word timing or speaker identity. Evaluate
 against a supplied transcript with `subtitle evaluate --max-cer <threshold>`;
 preserve the report, including script differences and failures.
+
+For display segmentation after ASR, use `subtitle segment --project <root>
+--input <registered-ASR-SRT> --output assets/subtitles/<new>.json --dry-run`.
+Read the [segmentation contract](../../docs/specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md).
+The existing SRT asset automatically carries source/model rights to the new
+report/SRT/clip chain. Line timestamps are distributed by speaking weights;
+they are not new word alignment. Explicit Unicode-codepoint/tick marks and
+supplied translations use the source JSON format. Keep recognition CER
+separate from segmentation timing and typography review.

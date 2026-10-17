@@ -5,6 +5,14 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [subtitle segmentation](../../docs/specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md),
+check source character coverage, displayed punctuation, line-bound clocks,
+shared translation spans, number/unit protection and correction SHA-256.
+Distinguish supplied synthetic onsets from actual ASR timestamps and forced
+alignment. A reference made with the same renderer verifies text/timing
+adaptation; it does not independently accept font rasterization or language
+quality. New transcript rights remain unverified until explicitly reviewed.
+
 For [linked edits](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md),
 review common `short_tick`, selected/deleted IDs, locked tracks, long beds,
 collision-lane audio processing, source-reference rebinding and accumulated

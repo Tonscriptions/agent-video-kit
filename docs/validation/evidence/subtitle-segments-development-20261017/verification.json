@@ -1,0 +1,71 @@
+{
+  "collected_at_utc": "2026-10-17T14:43:51.193314+00:00",
+  "records": [
+    {
+      "id": "D01",
+      "kind": "product-integration",
+      "cause": "Generated source_version used derived:openfilm-subtitle-segments, which local policy correctly interpreted as a URI. Changed to derived-openfilm-subtitle-segments; no policy relaxation.",
+      "result": "Initial targeted run: 34 methods, one failure. Corrected run: 34/34; expanded final targeted run: 38/38.",
+      "evidence": "subtitle-segments-development-20261017-a.log"
+    },
+    {
+      "id": "D02",
+      "kind": "media-helper",
+      "cause": "The first public fixture requested a render outside the project directory. Product rejected it before generating a baseline output. Helper now renders inside project/renders and then copies public delivery files.",
+      "evidence": "media-helper-project-output-rejection.zip",
+      "failed_output_video_exists": false
+    },
+    {
+      "id": "D03",
+      "kind": "baseline-helper",
+      "cause": "Initial git archive command omitted --format=zip; ZIP reader rejected the TAR bytes before any baseline CLI call. Corrected helper requests ZIP explicitly.",
+      "evidence": "baseline-helper-original.py",
+      "original_console_output_persisted": false,
+      "observed_error": "zipfile.BadZipFile: File is not a zip file"
+    },
+    {
+      "id": "D04",
+      "kind": "regression-environment",
+      "cause": "First full run omitted explicit existing local Rubber Band test executable. Two class setup skips meant 27 methods were not executed; the 706-method run is retained but is not the complete no-skip acceptance. Full suite restarted with AI_AD_EDITOR_TEST_RUBBERBAND pointing to existing native executable.",
+      "evidence": "missing-rubberband-path-full.log",
+      "methods_run": 706,
+      "setup_skips": 2,
+      "product_source_changed_for_retry": false
+    }
+  ],
+  "record_count": 4,
+  "files": {
+    "baseline-helper-original.py": {
+      "sha256": "sha256:34fca45965d821c47398f6e79ef8d68c006d07147edcd4cb33fac4ece04e3a44",
+      "bytes": 2383
+    },
+    "media-helper-project-output-rejection.zip": {
+      "sha256": "sha256:e0f44a4c390999750e58b2fa6315adee95129a483a88bc479c1ab7e7a05c3186",
+      "bytes": 8901
+    },
+    "missing-rubberband-path-full.json": {
+      "sha256": "sha256:2d73eb52631f674ea0211349d05910a1bde5e801445a0f38933253ba5acd07b1",
+      "bytes": 29839
+    },
+    "missing-rubberband-path-full.log": {
+      "sha256": "sha256:f7e53bf63bb506614065daec5cdaeaa7dd84045666ea12a42edd0017bcd85271",
+      "bytes": 118648
+    },
+    "subtitle-segments-development-20261017-a.json": {
+      "sha256": "sha256:1eb5115956446b89eac8c1a0365321ba96e125f09b699d5d4b3e7e51689872b6",
+      "bytes": 29888
+    },
+    "subtitle-segments-development-20261017-a.log": {
+      "sha256": "sha256:a9f9314ad13172a545e9d40b5e12ce0fe988634b2a349bef04f1064b7f216cde",
+      "bytes": 8464
+    },
+    "subtitle-segments-development-20261017-b.json": {
+      "sha256": "sha256:9225996593e344c053879c48cda710f902197ca9a896edd7e6be61d2ff37fdee",
+      "bytes": 29888
+    },
+    "subtitle-segments-development-20261017-b.log": {
+      "sha256": "sha256:74f774124d8d949a6743ff47bb494c997306ed2cc605046131fae88cbd64fc93",
+      "bytes": 6042
+    }
+  }
+}

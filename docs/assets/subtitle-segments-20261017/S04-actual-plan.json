@@ -1,0 +1,189 @@
+{
+  "format": "agent-subtitle-segments-v1",
+  "index_unit": "unicode-code-point",
+  "source": {
+    "format": "agent-subtitle-source-v1",
+    "ticks_per_second": 90000,
+    "lines": [
+      {
+        "id": "ad",
+        "text": "Render in 3.5 s, keep 60 fps, and export the whole clip.",
+        "start_tick": 45000,
+        "end_tick": 495000,
+        "marks": [
+          {
+            "index": 0,
+            "start_tick": 45000
+          },
+          {
+            "index": 17,
+            "start_tick": 180000
+          },
+          {
+            "index": 30,
+            "start_tick": 337500
+          }
+        ]
+      }
+    ]
+  },
+  "original_source": null,
+  "rules": {
+    "maxCells": 16,
+    "maxChars": 32,
+    "minUnits": 4,
+    "pauseMs": 500,
+    "minMs": 700,
+    "maxMs": 7000,
+    "holdMs": 2000,
+    "closeGapMs": 2000,
+    "msPerCell": 220,
+    "weight": {
+      "latin": 0.32,
+      "space": 0.15,
+      "clause": 1.5,
+      "sentence": 2.5
+    },
+    "cost": {
+      "piece": 10,
+      "balance": 4,
+      "short": 6,
+      "over": 50,
+      "long": 20,
+      "cjk": 1,
+      "cjkSingle": 1,
+      "mixed": 3,
+      "bracket": 8,
+      "leansBack": 8,
+      "leansForward": 4,
+      "conjunction": -4,
+      "particle": -3,
+      "pause": -10,
+      "sentence": -6,
+      "clause": -4,
+      "distance": 20,
+      "merge": 6
+    }
+  },
+  "pieces": [
+    {
+      "part": 0,
+      "text": "Render in 3.5 s,",
+      "display_text": "Render in 3.5 s,",
+      "from": 0,
+      "to": 16,
+      "cells": 8,
+      "line_id": "ad",
+      "start_tick": 45000,
+      "end_tick": 180000,
+      "timing_basis": "provided-onsets-with-weighted-interiors",
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 45000
+        }
+      ]
+    },
+    {
+      "part": 1,
+      "text": "keep 60 fps,",
+      "display_text": "keep 60 fps,",
+      "from": 17,
+      "to": 29,
+      "cells": 6,
+      "line_id": "ad",
+      "start_tick": 180000,
+      "end_tick": 337500,
+      "timing_basis": "provided-onsets-with-weighted-interiors",
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 180000
+        }
+      ]
+    },
+    {
+      "part": 2,
+      "text": "and export the whole clip.",
+      "display_text": "and export the whole clip.",
+      "from": 30,
+      "to": 56,
+      "cells": 13,
+      "line_id": "ad",
+      "start_tick": 337500,
+      "end_tick": 495000,
+      "timing_basis": "provided-onsets-with-weighted-interiors",
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 337500
+        }
+      ]
+    }
+  ],
+  "corrections": [],
+  "algorithm": {
+    "repository": "openfilm/openfilm",
+    "revision": "b138595d4c2d1fa5262b4a8a8c7cd98187c4b077",
+    "path": "packages/openfilm/studio/server/subtitle-segments.mjs",
+    "license": "MIT",
+    "sha256": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "versions": {
+      "node": "22.14.0",
+      "icu": "76.1",
+      "unicode": "16.0"
+    }
+  },
+  "network": "disabled",
+  "warnings": [],
+  "input": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\subtitle-segments-20261017\\S04-source.json",
+  "input_sha256": "sha256:c75761df05cb549b18fbfaff4bb538daa3e4e38b9f678a6dbe2ab550caf8f950",
+  "mode": "original",
+  "display_cues": [
+    {
+      "start_tick": 45000,
+      "end_tick": 180000,
+      "text": "Render in 3.5 s,",
+      "line_id": "ad",
+      "parts": [
+        0
+      ],
+      "translation_group": [
+        "ad",
+        null,
+        null
+      ]
+    },
+    {
+      "start_tick": 180000,
+      "end_tick": 337500,
+      "text": "keep 60 fps,",
+      "line_id": "ad",
+      "parts": [
+        1
+      ],
+      "translation_group": [
+        "ad",
+        null,
+        null
+      ]
+    },
+    {
+      "start_tick": 337500,
+      "end_tick": 495000,
+      "text": "and export the whole clip.",
+      "line_id": "ad",
+      "parts": [
+        2
+      ],
+      "translation_group": [
+        "ad",
+        null,
+        null
+      ]
+    }
+  ],
+  "timeline_start_tick": 0,
+  "parent_rights_refs": [],
+  "operation_id": "op_20261017142824_6cee9faf"
+}

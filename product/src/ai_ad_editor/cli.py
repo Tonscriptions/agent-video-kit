@@ -54,6 +54,9 @@ from .capabilities import build_capability_manifest
 from .transcribe import ffmpeg_whisper_available, transcribe_local, transcribe_local_ffmpeg_whisper, write_srt
 from .local_asr import ASR_ENGINE, asr_registry, registry_item as asr_registry_item, prepare_adapter as prepare_asr_adapter, verify_adapter as verify_asr_adapter, transcribe_registered
 from .asr_quality import evaluate_transcripts
+from .subtitle_segments import (load_source as load_segment_source, checked_rules as checked_segment_rules,
+    checked_corrections as checked_segment_corrections, segment_source, display_cues as segment_display_cues,
+    srt_text as segmented_srt_text)
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
 from .sequence_canvas import sequence_canvas, validate_canvas, validate_output_alignment
 from .rights import VALID_STATUSES, active_records, add_record, apply_disposition_to_project, check_project_rights, create_disposition_decision, disposition_decisions, effective_disposition_decisions, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
@@ -548,6 +551,22 @@ def build_parser() -> argparse.ArgumentParser:
     subtitle_normalize.add_argument("--output", required=True)
     subtitle_normalize.add_argument("--project", default=None)
     subtitle_normalize.add_argument("--allow-overlap", action="store_true")
+    subtitle_segment = _leaf_common(ss.add_parser("segment", help="本地分句、双语分段和带摘要的局部回写"))
+    subtitle_segment.add_argument("--project", required=True)
+    subtitle_segment.add_argument("--input", required=True, help="本地字幕、ASR 报告或 agent-subtitle-source-v1 JSON")
+    subtitle_segment.add_argument("--output", required=True, help="新的项目内分段 JSON")
+    subtitle_segment.add_argument("--srt", default=None, help="新的项目内 SRT；默认与输出 JSON 同名")
+    subtitle_segment.add_argument("--rules", default=None, help="本地分段规则 JSON")
+    subtitle_segment.add_argument("--corrections", default=None, help="绑定输入 SHA-256 的局部纠正 JSON")
+    subtitle_segment.add_argument("--expected-input-sha256", default=None)
+    subtitle_segment.add_argument("--mode", choices=("original", "translation", "bilingual"), default="original")
+    subtitle_segment.add_argument("--source-asset-id", action="append", default=[], help="可重复声明来源权利依赖")
+    subtitle_segment.add_argument("--sequence-id", default=None)
+    subtitle_segment.add_argument("--track-id", default=None)
+    subtitle_segment.add_argument("--font-asset-id", default=None)
+    subtitle_segment.add_argument("--timeline-start-tick", type=int, default=0)
+    subtitle_segment.add_argument("--apply", action="store_true")
+    subtitle_segment.add_argument("--replace-track", action="store_true")
     subtitle_transcribe = _leaf_common(ss.add_parser("transcribe", help="使用本地 ASR 生成带时间戳字幕，并可应用到字幕轨道"))
     subtitle_transcribe.add_argument("--project", required=True)
     subtitle_source = subtitle_transcribe.add_mutually_exclusive_group(required=True)
@@ -3632,6 +3651,166 @@ def command_subtitle_normalize(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("subtitle.normalize", args, data={"input": str(source), "output": str(output), "cue_count": len(cues), "validation": report})
 
 
+def command_subtitle_segment(args: argparse.Namespace) -> dict[str, Any]:
+    from .artifact_locks import verification_scope
+    with verification_scope():
+        return _command_subtitle_segment_locked(args)
+
+
+def _command_subtitle_segment_locked(args: argparse.Namespace) -> dict[str, Any]:
+    from .artifact_locks import artifact_entry
+    root, project = load_project(args.project)
+    tps = int(project['settings']['timebase']['ticks_per_second'])
+    source_path = resolve_local_path(root, args.input, field='input')
+    input_digest = artifact_entry(source_path, 'subtitle-input')['sha256']
+    source, inherited_rules = load_segment_source(source_path, tps)
+    if args.expected_input_sha256 is not None and args.expected_input_sha256 != input_digest:
+        raise AppError('SUBTITLE_SEGMENT_STALE_INPUT', '输入摘要与预览不一致', exit_code=2)
+    def config(path_value: str | None) -> dict[str, Any] | None:
+        if not path_value:
+            return None
+        path = resolve_local_path(root, path_value, field='configuration')
+        if not path.is_file() or path.stat().st_size > 8 * 1024 * 1024:
+            raise argument_error('配置文件不存在或超过 8 MiB', str(path))
+        artifact_entry(path, 'subtitle-configuration')
+        return load_json(path)
+    overrides = config(args.rules)
+    rules = {**inherited_rules, **(overrides or {})}
+    for group in ('weight', 'cost'):
+        if overrides and group in overrides:
+            rules[group] = {**inherited_rules.get(group, {}), **overrides[group]} if isinstance(overrides[group], dict) else overrides[group]
+    rules = checked_segment_rules(rules)
+    edits = checked_segment_corrections(config(args.corrections), input_digest, source)
+    output = resolve_local_path(root, args.output, field='output')
+    srt = resolve_local_path(root, args.srt, field='srt') if args.srt else output.with_suffix('.srt')
+    for path in (output, srt):
+        ensure_inside(root / 'assets', path)
+        if path.exists():
+            raise argument_error('字幕输出已经存在，必须指定新文件', str(path))
+    if output.suffix.lower() != '.json' or srt.suffix.lower() != '.srt' or output == srt:
+        raise argument_error('分段输出必须为 assets 内新的 JSON 和 SRT', 'output')
+    if args.timeline_start_tick < 0 or args.timeline_start_tick > 2**63 - 1:
+        raise argument_error('timeline-start-tick 必须是非负整数', 'timeline_start_tick')
+    if not args.apply and (args.track_id or args.sequence_id or args.font_asset_id or args.replace_track or args.timeline_start_tick):
+        raise argument_error('入轨选项需要 --apply', 'apply')
+    ledger = load_ledger(root)
+    records = {str(r['asset_id']): r for r in active_records(ledger)}
+    assets = asset_map(project)
+    parent_ids = list(dict.fromkeys(args.source_asset_id + [a['id'] for a in assets.values()
+        if resolve_local_path(root, a.get('uri', ''), field='asset.uri') == source_path]))
+    parents = []
+    for aid in parent_ids:
+        asset = assets.get(aid)
+        if not asset:
+            raise argument_error('字幕来源资产不存在', aid)
+        path = resolve_local_path(root, asset.get('uri', ''), field='source_asset_id')
+        digest = artifact_entry(path, 'subtitle-parent')['sha256'] if path.is_file() else None
+        ref = str(asset.get('rights_ref') or aid)
+        if digest != asset.get('sha256') or ref not in records or records[ref].get('sha256') != digest:
+            raise AppError('SUBTITLE_SEGMENT_SOURCE_INVALID', '字幕来源文件或权利摘要不匹配', exit_code=7, path=aid)
+        parents.append(ref)
+    sequence = find_sequence(project, args.sequence_id) if args.apply else None
+    track = find_track(sequence, args.track_id, None) if args.apply and args.track_id else None
+    if args.apply and (track is None or track.get('kind') != 'subtitle'):
+        raise argument_error('应用需要 subtitle 目标轨道', 'track_id')
+    if track and track.get('locked'):
+        raise AppError('SUBTITLE_SEGMENT_TRACK_LOCKED', '字幕目标轨道已锁定', exit_code=2)
+    if args.font_asset_id:
+        font = assets.get(args.font_asset_id)
+        if not font or font.get('kind') != 'font':
+            raise argument_error('font-asset-id 必须是已登记字体', 'font_asset_id')
+    result = segment_source(source, rules=rules, edits=edits)
+    cues = segment_display_cues(result, args.mode)
+    for cue in cues:
+        cue['start_tick'] += args.timeline_start_tick
+        cue['end_tick'] += args.timeline_start_tick
+        if cue['end_tick'] > 2**63 - 1:
+            raise argument_error('字幕偏移超过 tick 范围', 'timeline_start_tick')
+    text = segmented_srt_text(cues, tps)
+    if track and not args.replace_track:
+        for cue in cues:
+            for existing in track.get('clips', []):
+                a = int(existing.get('timeline_start_tick', 0))
+                b = a + int(existing.get('duration_tick', 0))
+                if max(a, cue['start_tick']) < min(b, cue['end_tick']):
+                    raise AppError('SUBTITLE_SEGMENT_TRACK_OVERLAP', '分段字幕与既有片段重叠；需要显式 --replace-track', exit_code=2)
+    result.update({'input': str(source_path), 'input_sha256': input_digest, 'mode': args.mode,
+                   'display_cues': cues, 'timeline_start_tick': args.timeline_start_tick,
+                   'parent_rights_refs': parents})
+    data = {'output': str(output), 'srt': str(srt), 'plan': result, 'applied': bool(args.apply)}
+    if args.dry_run:
+        return _envelope('subtitle.segment', args, data=data, status='planned', warnings=result['warnings'])
+    created: list[Path] = []
+    def write_new(path: Path, value: str) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open('xb') as stream:
+            created.append(path)
+            stream.write(value.encode('utf-8'))
+            stream.flush()
+            os.fsync(stream.fileno())
+    try:
+        snapshot = create_snapshot(root, project, label='before-subtitle-segment')
+        operation_id = new_id('op')
+        result['operation_id'] = operation_id
+        write_new(output, json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + '\n')
+        write_new(srt, text)
+        registered = []
+        for path, kind in ((output, 'generated'), (srt, 'subtitle')):
+            aid = new_id('subtitle_segments' if kind == 'generated' else 'subtitle_asset')
+            digest = 'sha256:' + sha256_file(path)
+            dependencies = parents if kind == 'generated' else [registered[0]['rights_ref']]
+            asset = {'id': aid, 'kind': kind, 'uri': path.relative_to(root).as_posix(), 'sha256': digest,
+                     'rights_ref': aid, 'probe': {'duration_tick': max(c['end_tick'] for c in cues), 'subtitle_cues': len(cues)},
+                     'source': {'source_url': f'local://{path}', 'original_name': path.name, 'retrieved_at': now_iso()}}
+            record = {'asset_id': aid, 'kind': kind, 'sha256': digest, 'source_url': f'local://{path}',
+                      'source_version': 'derived-openfilm-subtitle-segments', 'retrieved_at': now_iso(),
+                      'creator': 'unknown', 'license_spdx': 'LicenseRef-UNVERIFIED', 'license_url': '',
+                      'attribution': '', 'permitted_uses': ['internal'], 'permitted_channels': [], 'restrictions': [],
+                      'derived_from': list(dependencies), 'evidence': f'local://{output}',
+                      'verification_status': 'unverified', 'verified_by': '', 'takedown_status': 'clear',
+                      'notes': 'Local subtitle text/translation requires rights review; algorithm MIT does not license transcript content'}
+            project.setdefault('assets', []).append(asset)
+            add_record(ledger, record)
+            registered.append(asset)
+        generated = []
+        if track:
+            style = {'fontsize': 52, 'fontcolor': 'white', 'borderw': 3, 'bordercolor': 'black',
+                     'x': '(w-text_w)/2', 'y': 'h-text_h-40'}
+            if args.font_asset_id:
+                style['font_asset_id'] = args.font_asset_id
+            for i, cue in enumerate(cues):
+                duration = cue['end_tick'] - cue['start_tick']
+                generated.append({'id': new_id('subtitle_piece'), 'timeline_start_tick': cue['start_tick'],
+                    'duration_tick': duration, 'source_in_tick': 0, 'source_out_tick': duration,
+                    'generator': {'type': 'text'}, 'subtitle': {'text': cue['text'], 'style': copy.deepcopy(style)},
+                    'rights_dependencies': [{'rights_ref': registered[-1]['rights_ref'], 'sha256': registered[-1]['sha256']}],
+                    'extensions': {'subtitle_segment': {'source_asset_id': registered[0]['id'], 'line_id': cue['line_id'], 'parts': cue['parts']}}})
+            if args.replace_track:
+                track['clips'] = []
+            track.setdefault('clips', []).extend(generated)
+            sequence['duration_tick'] = max(int(sequence.get('duration_tick', 1)), max(c['end_tick'] for c in cues))
+        save_ledger(root, ledger)
+        validation = validate_project(root, project, strict_rights=False)
+        if not validation['ok']:
+            raise AppError('SUBTITLE_SEGMENT_APPLY_INVALID', '字幕资产/应用未通过项目验证', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+        project.setdefault('provenance', {}).setdefault('change_log', []).append({
+            'operation_id': operation_id, 'command': 'subtitle.segment', 'input_sha256': input_digest,
+            'report': output.relative_to(root).as_posix(), 'mode': args.mode,
+            'before_snapshot_id': snapshot['snapshot_id'], 'at': now_iso()})
+        save_project(root, project)
+        _operation(root, operation_id, {'operation_id': operation_id, 'command': 'subtitle.segment', 'status': 'succeeded',
+            'assets': [a['id'] for a in registered], 'clip_ids': [c['id'] for c in generated],
+            'before_snapshot_id': snapshot['snapshot_id'], 'created_at': now_iso()})
+        data.update({'registered_assets': registered, 'generated_clips': generated, 'validation': validation, 'before_snapshot': snapshot})
+        return _envelope('subtitle.segment', args, data=data, operation_id=operation_id, warnings=result['warnings'])
+    except Exception as exc:
+        for path in reversed(created):
+            path.unlink(missing_ok=True)
+        if isinstance(exc, OSError):
+            raise AppError('SUBTITLE_SEGMENT_IO_FAILED', '字幕写入失败；本轮新文件已清理，项目由原事务恢复', exit_code=9, cause=str(exc)) from exc
+        raise
+
+
 def command_subtitle_transcribe(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     adapter = _selected_asr_adapter(root, project, args)
@@ -5909,6 +6088,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("ad", "apply"): command_ad_apply,
     ("subtitle", "validate"): command_subtitle_validate,
     ("subtitle", "normalize"): command_subtitle_normalize,
+    ("subtitle", "segment"): command_subtitle_segment,
     ("subtitle", "transcribe"): command_subtitle_transcribe,
     ("tts", "synthesize"): command_tts_synthesize,
     ("tts", "adapter"): command_tts_registration,

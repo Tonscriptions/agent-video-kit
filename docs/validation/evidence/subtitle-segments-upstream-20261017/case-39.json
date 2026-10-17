@@ -1,0 +1,86 @@
+{
+  "case": 39,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "🎬 它叫 OpenFilm，免费开源，MIT 协议。",
+          "start_tick": 900017,
+          "end_tick": 1530017
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "🎬 它叫 OpenFilm，",
+      "display_text": "🎬 它叫 OpenFilm",
+      "cells": 7.5,
+      "from": 0,
+      "to": 14,
+      "start_tick": 900017,
+      "end_tick": 1093247
+    },
+    {
+      "part": 1,
+      "text": "免费开源，",
+      "display_text": "免费开源",
+      "cells": 4,
+      "from": 14,
+      "to": 19,
+      "start_tick": 1129337,
+      "end_tick": 1291607
+    },
+    {
+      "part": 2,
+      "text": "MIT 协议。",
+      "display_text": "MIT 协议",
+      "cells": 4,
+      "from": 19,
+      "to": 26,
+      "start_tick": 1327697,
+      "end_tick": 1530017
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "🎬 它叫 OpenFilm，",
+      "display_text": "🎬 它叫 OpenFilm",
+      "from": 0,
+      "to": 14,
+      "cells": 7.5,
+      "start_tick": 900017,
+      "end_tick": 1093247
+    },
+    {
+      "part": 1,
+      "text": "免费开源，",
+      "display_text": "免费开源",
+      "from": 14,
+      "to": 19,
+      "cells": 4,
+      "start_tick": 1129337,
+      "end_tick": 1291607
+    },
+    {
+      "part": 2,
+      "text": "MIT 协议。",
+      "display_text": "MIT 协议",
+      "from": 19,
+      "to": 26,
+      "cells": 4,
+      "start_tick": 1327697,
+      "end_tick": 1530017
+    }
+  ],
+  "equal": true
+}

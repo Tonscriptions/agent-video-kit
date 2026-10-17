@@ -1,0 +1,66 @@
+{
+  "case": 13,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "渲染一帧只要 3.5 秒，比以前快了 10 倍。",
+          "start_tick": 900017,
+          "end_tick": 1215017
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "渲染一帧只要 3.5 秒，",
+      "display_text": "渲染一帧只要 3.5 秒",
+      "cells": 9.5,
+      "from": 0,
+      "to": 13,
+      "start_tick": 900017,
+      "end_tick": 1075967
+    },
+    {
+      "part": 1,
+      "text": "比以前快了 10 倍。",
+      "display_text": "比以前快了 10 倍",
+      "cells": 8,
+      "from": 13,
+      "to": 24,
+      "start_tick": 1075967,
+      "end_tick": 1215017
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "渲染一帧只要 3.5 秒，",
+      "display_text": "渲染一帧只要 3.5 秒",
+      "from": 0,
+      "to": 13,
+      "cells": 9.5,
+      "start_tick": 900017,
+      "end_tick": 1075967
+    },
+    {
+      "part": 1,
+      "text": "比以前快了 10 倍。",
+      "display_text": "比以前快了 10 倍",
+      "from": 13,
+      "to": 24,
+      "cells": 8,
+      "start_tick": 1075967,
+      "end_tick": 1215017
+    }
+  ],
+  "equal": true
+}

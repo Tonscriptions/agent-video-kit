@@ -1,0 +1,117 @@
+{
+  "case": 3,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "它叫 OpenFilm，免费开源，MIT 协议。",
+          "start_tick": 900017,
+          "end_tick": 1530017,
+          "translation": "A local video workflow. Every subtitle keeps its source text, and every edit stays on this computer."
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "它叫 OpenFilm，",
+      "display_text": "它叫 OpenFilm",
+      "cells": 6.5,
+      "from": 0,
+      "to": 12,
+      "start_tick": 900017,
+      "end_tick": 1089377,
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      }
+    },
+    {
+      "part": 1,
+      "text": "免费开源，",
+      "display_text": "免费开源",
+      "cells": 4,
+      "from": 12,
+      "to": 17,
+      "start_tick": 1125917,
+      "end_tick": 1289357,
+      "translation": {
+        "text": "Every subtitle keeps its source text,",
+        "from": 24,
+        "to": 61
+      }
+    },
+    {
+      "part": 2,
+      "text": "MIT 协议。",
+      "display_text": "MIT 协议",
+      "cells": 4,
+      "from": 17,
+      "to": 24,
+      "start_tick": 1325987,
+      "end_tick": 1530017,
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      }
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "它叫 OpenFilm，",
+      "display_text": "它叫 OpenFilm",
+      "from": 0,
+      "to": 12,
+      "cells": 6.5,
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      },
+      "start_tick": 900017,
+      "end_tick": 1089377
+    },
+    {
+      "part": 1,
+      "text": "免费开源，",
+      "display_text": "免费开源",
+      "from": 12,
+      "to": 17,
+      "cells": 4,
+      "translation": {
+        "text": "Every subtitle keeps its source text,",
+        "from": 24,
+        "to": 61
+      },
+      "start_tick": 1125917,
+      "end_tick": 1289357
+    },
+    {
+      "part": 2,
+      "text": "MIT 协议。",
+      "display_text": "MIT 协议",
+      "from": 17,
+      "to": 24,
+      "cells": 4,
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      },
+      "start_tick": 1325987,
+      "end_tick": 1530017
+    }
+  ],
+  "equal": true
+}

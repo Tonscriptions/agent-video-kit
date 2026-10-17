@@ -1,0 +1,371 @@
+{
+  "case": 36,
+  "input": {
+    "source": {
+      "format": "agent-subtitle-source-v1",
+      "ticks_per_second": 90000,
+      "lines": [
+        {
+          "id": "line",
+          "text": "This is a really long sentence that goes on without any commas because we want to see where it breaks",
+          "start_tick": 900017,
+          "end_tick": 1530017,
+          "marks": [
+            {
+              "index": 0,
+              "start_tick": 900017
+            },
+            {
+              "index": 5,
+              "start_tick": 931517
+            },
+            {
+              "index": 8,
+              "start_tick": 963017
+            },
+            {
+              "index": 10,
+              "start_tick": 994517
+            },
+            {
+              "index": 17,
+              "start_tick": 1026017
+            },
+            {
+              "index": 22,
+              "start_tick": 1057517
+            },
+            {
+              "index": 31,
+              "start_tick": 1089017
+            },
+            {
+              "index": 36,
+              "start_tick": 1120517
+            },
+            {
+              "index": 41,
+              "start_tick": 1152017
+            },
+            {
+              "index": 44,
+              "start_tick": 1183517
+            },
+            {
+              "index": 52,
+              "start_tick": 1215017
+            },
+            {
+              "index": 56,
+              "start_tick": 1246517
+            },
+            {
+              "index": 63,
+              "start_tick": 1278017
+            },
+            {
+              "index": 71,
+              "start_tick": 1309517
+            },
+            {
+              "index": 74,
+              "start_tick": 1341017
+            },
+            {
+              "index": 79,
+              "start_tick": 1372517
+            },
+            {
+              "index": 82,
+              "start_tick": 1404017
+            },
+            {
+              "index": 86,
+              "start_tick": 1435517
+            },
+            {
+              "index": 92,
+              "start_tick": 1467017
+            },
+            {
+              "index": 95,
+              "start_tick": 1498517
+            }
+          ],
+          "translation": "A local video workflow. Every subtitle keeps its source text, and every edit stays on this computer."
+        }
+      ]
+    },
+    "rules": {
+      "maxCells": 16,
+      "maxChars": 42
+    }
+  },
+  "expected": [
+    {
+      "part": 0,
+      "text": "This is a really long sentence",
+      "display_text": "This is a really long sentence",
+      "cells": 15,
+      "from": 0,
+      "to": 30,
+      "start_tick": 900017,
+      "end_tick": 1089017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 5,
+          "start_tick": 931517
+        },
+        {
+          "index": 8,
+          "start_tick": 963017
+        },
+        {
+          "index": 10,
+          "start_tick": 994517
+        },
+        {
+          "index": 17,
+          "start_tick": 1026017
+        },
+        {
+          "index": 22,
+          "start_tick": 1057517
+        }
+      ],
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      }
+    },
+    {
+      "part": 1,
+      "text": "that goes on without any commas",
+      "display_text": "that goes on without any commas",
+      "cells": 15.5,
+      "from": 31,
+      "to": 62,
+      "start_tick": 1089017,
+      "end_tick": 1278017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1089017
+        },
+        {
+          "index": 5,
+          "start_tick": 1120517
+        },
+        {
+          "index": 10,
+          "start_tick": 1152017
+        },
+        {
+          "index": 13,
+          "start_tick": 1183517
+        },
+        {
+          "index": 21,
+          "start_tick": 1215017
+        },
+        {
+          "index": 25,
+          "start_tick": 1246517
+        }
+      ],
+      "translation": {
+        "text": "Every subtitle keeps its source text,",
+        "from": 24,
+        "to": 61
+      }
+    },
+    {
+      "part": 2,
+      "text": "because we want to see where it breaks",
+      "display_text": "because we want to see where it breaks",
+      "cells": 19,
+      "from": 63,
+      "to": 101,
+      "start_tick": 1278017,
+      "end_tick": 1530017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1278017
+        },
+        {
+          "index": 8,
+          "start_tick": 1309517
+        },
+        {
+          "index": 11,
+          "start_tick": 1341017
+        },
+        {
+          "index": 16,
+          "start_tick": 1372517
+        },
+        {
+          "index": 19,
+          "start_tick": 1404017
+        },
+        {
+          "index": 23,
+          "start_tick": 1435517
+        },
+        {
+          "index": 29,
+          "start_tick": 1467017
+        },
+        {
+          "index": 32,
+          "start_tick": 1498517
+        }
+      ],
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      }
+    }
+  ],
+  "actual": [
+    {
+      "part": 0,
+      "text": "This is a really long sentence",
+      "display_text": "This is a really long sentence",
+      "from": 0,
+      "to": 30,
+      "cells": 15,
+      "translation": {
+        "text": "A local video workflow.",
+        "from": 0,
+        "to": 23
+      },
+      "start_tick": 900017,
+      "end_tick": 1089017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 900017
+        },
+        {
+          "index": 5,
+          "start_tick": 931517
+        },
+        {
+          "index": 8,
+          "start_tick": 963017
+        },
+        {
+          "index": 10,
+          "start_tick": 994517
+        },
+        {
+          "index": 17,
+          "start_tick": 1026017
+        },
+        {
+          "index": 22,
+          "start_tick": 1057517
+        }
+      ]
+    },
+    {
+      "part": 1,
+      "text": "that goes on without any commas",
+      "display_text": "that goes on without any commas",
+      "from": 31,
+      "to": 62,
+      "cells": 15.5,
+      "translation": {
+        "text": "Every subtitle keeps its source text,",
+        "from": 24,
+        "to": 61
+      },
+      "start_tick": 1089017,
+      "end_tick": 1278017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1089017
+        },
+        {
+          "index": 5,
+          "start_tick": 1120517
+        },
+        {
+          "index": 10,
+          "start_tick": 1152017
+        },
+        {
+          "index": 13,
+          "start_tick": 1183517
+        },
+        {
+          "index": 21,
+          "start_tick": 1215017
+        },
+        {
+          "index": 25,
+          "start_tick": 1246517
+        }
+      ]
+    },
+    {
+      "part": 2,
+      "text": "because we want to see where it breaks",
+      "display_text": "because we want to see where it breaks",
+      "from": 63,
+      "to": 101,
+      "cells": 19,
+      "translation": {
+        "text": "and every edit stays on this computer.",
+        "from": 62,
+        "to": 100
+      },
+      "start_tick": 1278017,
+      "end_tick": 1530017,
+      "marks": [
+        {
+          "index": 0,
+          "start_tick": 1278017
+        },
+        {
+          "index": 8,
+          "start_tick": 1309517
+        },
+        {
+          "index": 11,
+          "start_tick": 1341017
+        },
+        {
+          "index": 16,
+          "start_tick": 1372517
+        },
+        {
+          "index": 19,
+          "start_tick": 1404017
+        },
+        {
+          "index": 23,
+          "start_tick": 1435517
+        },
+        {
+          "index": 29,
+          "start_tick": 1467017
+        },
+        {
+          "index": 32,
+          "start_tick": 1498517
+        }
+      ]
+    }
+  ],
+  "equal": true
+}
