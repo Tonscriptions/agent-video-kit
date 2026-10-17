@@ -5,6 +5,16 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For the [coherent reference research contract](../../docs/specs/空间与时序一致参考选择研究契约_v0.1_2026-10-18.md),
+keep the [actual failed evaluation](../../docs/validation/空间与时序一致参考选择实测_2026-10-18.md)
+separate from product acceptance. The v3 candidate failed four of twelve
+overlapping scored regions and made no strict MSE gains on the three new
+fixtures. A post-hoc motion-compensated diagnostic cannot replace the declared
+gate. Preserve original input, failed candidates, exact-alpha controls and
+truth before occlusion; no natural pixels are authorized for publication.
+The 41 research checks overlap earlier runs and must not be added to V41's
+975 product methods. No continuous-playback or natural-quality acceptance.
+
 For browser motion, read the [offline HTML motion contract](../../docs/specs/离线HTML动效与可编辑源码契约_v0.1_2026-10-18.md).
 Require the actual `motion html-render` report: input PNG hashes, two fresh
 context orders for every frame, fixed toolchain and native Job cleanup.

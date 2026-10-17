@@ -5,6 +5,17 @@ description: Run registered offline speech, transcription, separation, tracking,
 
 # Local Models
 
+The [coherent reference experiment](../../docs/specs/空间与时序一致参考选择研究契约_v0.1_2026-10-18.md)
+is research only; its [measured quality gate failed](../../docs/validation/空间与时序一致参考选择实测_2026-10-18.md).
+Do not expose it as a production `media inpaint` adapter or silently replace
+LaMa/VACE. The separate `scripts/run_coherent_reference_fixture.py` accepts only
+bounded local NPZ arrays and writes into a new project `.runtime` directory;
+it reads no truth array, registers no model or rights asset, and runs no model.
+Use the published original synthetic fixture and explicit scene-cut/min-donor
+options for research reproduction. Cancellation/timeout work at checkpoints,
+not as hard deadlines inside native calls. Previous repairs are costs, never
+new donor observations; unresolved motion groups abstain.
+
 For prompted joint video editing, read the [VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
 Register an existing complete Wan2.1-VACE-1.3B Diffusers safetensors bundle with
 `media adapter register --engine diffusers-wan-vace-local-v1 --device cuda`,

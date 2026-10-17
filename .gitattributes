@@ -153,3 +153,11 @@ docs/validation/evidence/html-motion*.py -text
 docs/validation/evidence/html-motion-*/** -text -whitespace
 docs/validation/evidence/openfilm-html-adoption-*/** -text -whitespace
 docs/assets/html-motion-*/** -text -whitespace
+
+# V42 research retains unsuccessful candidates and reproducible NPZ/frame evidence.
+research/temporal-background/*.py text eol=lf
+scripts/*coherent_reference*.py -text
+scripts/create_repair_reference_holdouts.py -text
+docs/validation/evidence/coherent-reference*.json -text whitespace=cr-at-eol
+docs/validation/evidence/coherent-reference-*/** -text -whitespace
+docs/validation/evidence/docs-audit-coherent-reference*.json -text

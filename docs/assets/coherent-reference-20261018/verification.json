@@ -1,0 +1,321 @@
+{
+  "status": "encoded_and_every_lossless_frame_verified",
+  "generator": "scripts/build_coherent_reference_media.py",
+  "generator_sha256": "sha256:41488ee1c3cc008509cc2cf7f243bceeab76de9a58c9f699bf5f84134976e1a1",
+  "license": "CC0-1.0 original synthetic inputs and AgentGrid font",
+  "model_runs": 0,
+  "network_guard_events": [],
+  "natural_media_published": false,
+  "product_integrated": false,
+  "continuous_playback_reviewed": false,
+  "listening_reviewed": false,
+  "audio_streams_expected": 0,
+  "preview_mp4_is_lossy_not_pixel_oracle": true,
+  "cases": {
+    "two_surfaces": {
+      "origin_npz": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-final-20261018\\two_surfaces.npz",
+      "origin_npz_sha256": "sha256:0b0414039461aff788b21a395b9019233157f258dfdbadfbb70c6e95d9ca4eee",
+      "frames": 12,
+      "width": 256,
+      "height": 160,
+      "source_fps": 12,
+      "source_duration_seconds": 1.0,
+      "gif_frames": 12,
+      "gif_duration_ms": 1000,
+      "candidate_equals_reference_rgba": true,
+      "changed_candidate_rgb_pixels": 0,
+      "panels": [
+        "INPUT",
+        "REFERENCE",
+        "FAILED V1",
+        "CANDIDATE V3",
+        "TRUTH"
+      ],
+      "product_integrated": false
+    },
+    "two_motion_cut": {
+      "origin_npz": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-final-20261018\\two_motion_cut.npz",
+      "origin_npz_sha256": "sha256:ede8ab55fb23701965b7a86a7ec2ce775240d9674a9e097edced42a26f68e2d9",
+      "frames": 12,
+      "width": 160,
+      "height": 96,
+      "source_fps": 12,
+      "source_duration_seconds": 1.0,
+      "gif_frames": 12,
+      "gif_duration_ms": 1000,
+      "candidate_equals_reference_rgba": false,
+      "changed_candidate_rgb_pixels": 32,
+      "panels": [
+        "INPUT",
+        "REFERENCE",
+        "CANDIDATE V3",
+        "TRUTH"
+      ],
+      "product_integrated": false
+    },
+    "elastic_exposure": {
+      "origin_npz": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-final-20261018\\elastic_exposure.npz",
+      "origin_npz_sha256": "sha256:17e0a3ccf22739646c1f3695c2cb10833bf8d45f6a0d321a47fa4d1c82d73303",
+      "frames": 12,
+      "width": 160,
+      "height": 96,
+      "source_fps": 12,
+      "source_duration_seconds": 1.0,
+      "gif_frames": 12,
+      "gif_duration_ms": 1000,
+      "candidate_equals_reference_rgba": false,
+      "changed_candidate_rgb_pixels": 54,
+      "panels": [
+        "INPUT",
+        "REFERENCE",
+        "CANDIDATE V3",
+        "TRUTH"
+      ],
+      "product_integrated": false
+    }
+  },
+  "lossless_streams": [
+    {
+      "path": "two_surfaces-input.nut",
+      "frames": 12,
+      "width": 256,
+      "height": 160,
+      "fps": 12,
+      "rgba_sha256": "sha256:f19fb832057ba338726fb7613686662b91dd68a4faf7cd30752546ca1e0ee215",
+      "time_base": "1/49152",
+      "every_pts_exact": true
+    },
+    {
+      "path": "two_surfaces-candidate.nut",
+      "frames": 12,
+      "width": 256,
+      "height": 160,
+      "fps": 12,
+      "rgba_sha256": "sha256:86346f328f0a6fc1e14e07d6fb4194cd3477b71162834ebbb008e68bcb0cb24a",
+      "time_base": "1/49152",
+      "every_pts_exact": true
+    },
+    {
+      "path": "two_surfaces-failed-v1.nut",
+      "frames": 12,
+      "width": 256,
+      "height": 160,
+      "fps": 12,
+      "rgba_sha256": "sha256:5febf0a6638e003f33bfc9d35bf86ae6a3d471112cc77bb874f97827eaf0fae8",
+      "time_base": "1/49152",
+      "every_pts_exact": true
+    },
+    {
+      "path": "two_surfaces-comparison.nut",
+      "frames": 12,
+      "width": 1280,
+      "height": 192,
+      "fps": 12,
+      "rgba_sha256": "sha256:2a257868e82531e7567def5e180a29cbfca443f88156c88dc6d39daba8c13003",
+      "time_base": "1/49152",
+      "every_pts_exact": true
+    },
+    {
+      "path": "two_motion_cut-input.nut",
+      "frames": 12,
+      "width": 160,
+      "height": 96,
+      "fps": 12,
+      "rgba_sha256": "sha256:47964f385a10cc3ebec6537f9fe10ea389c86bebd9a04c63ccb576c4a4b66513",
+      "time_base": "1/49152",
+      "every_pts_exact": true
+    },
+    {
+      "path": "two_motion_cut-candidate.nut",
+      "frames": 12,
+      "width": 160,
+      "height": 96,
+      "fps": 12,
+      "rgba_sha256": "sha256:21bfc393bea710bfaf8fc6adb405749ea54919c6ef7a0a168694ca174c0fe3c5",
+      "time_base": "1/49152",
+      "every_pts_exact": true
+    },
+    {
+      "path": "two_motion_cut-comparison.nut",
+      "frames": 12,
+      "width": 640,
+      "height": 128,
+      "fps": 12,
+      "rgba_sha256": "sha256:8c1b8fde4c2f0c5e62fd502c8f8f8bbf3ea3729120ad1c33124db14504cdc531",
+      "time_base": "1/49152",
+      "every_pts_exact": true
+    },
+    {
+      "path": "elastic_exposure-input.nut",
+      "frames": 12,
+      "width": 160,
+      "height": 96,
+      "fps": 12,
+      "rgba_sha256": "sha256:ac14065c5858d0b0b84aa707333c89d92a2f9c2c011ac7e94fc8984e42eb03d5",
+      "time_base": "1/49152",
+      "every_pts_exact": true
+    },
+    {
+      "path": "elastic_exposure-candidate.nut",
+      "frames": 12,
+      "width": 160,
+      "height": 96,
+      "fps": 12,
+      "rgba_sha256": "sha256:92145884d45607f9275e48020e367d028274e882478ae47b9817bbe743ace6dd",
+      "time_base": "1/49152",
+      "every_pts_exact": true
+    },
+    {
+      "path": "elastic_exposure-comparison.nut",
+      "frames": 12,
+      "width": 640,
+      "height": 128,
+      "fps": 12,
+      "rgba_sha256": "sha256:f593fe4bc885fb52913dd92b071e0a0f99fd844e44d41093da765af08337e3d3",
+      "time_base": "1/49152",
+      "every_pts_exact": true
+    }
+  ],
+  "files": {
+    "elastic_exposure-candidate.mp4": {
+      "bytes": 17322,
+      "sha256": "sha256:45900b3bcc57dc25c84e9feeaf9280cb9d7f0b2062e19b5b0b7ffc60a64dbd61"
+    },
+    "elastic_exposure-candidate.nut": {
+      "bytes": 319274,
+      "sha256": "sha256:4334e6e6b393138e3a21632cbdc4a356236c312f828f60a99e8ee0cd721981d6"
+    },
+    "elastic_exposure-comparison.gif": {
+      "bytes": 611484,
+      "sha256": "sha256:775349b4c52d23b5d8bd57b81f1bb0b8a0f10addd87a64e15dec4ed2671feb8a"
+    },
+    "elastic_exposure-comparison.mp4": {
+      "bytes": 70777,
+      "sha256": "sha256:f72e0df3ebb7a5c61807b8a51998197c6a63a43a1ba6924675f258ff481702b9"
+    },
+    "elastic_exposure-comparison.nut": {
+      "bytes": 1364234,
+      "sha256": "sha256:b9c7aff753824f282d827eda92b2d1f2a69eaf6ad440a6c3f3374bc665bf1205"
+    },
+    "elastic_exposure-frame-00.png": {
+      "bytes": 34172,
+      "sha256": "sha256:f78c41a6340648bf2b2bee94b9ed21c1cd10332036b2f79d5e43d5416f8d5f2f"
+    },
+    "elastic_exposure-frame-06.png": {
+      "bytes": 33894,
+      "sha256": "sha256:008c27589e0cf9f0f0d781c10ee3106d5d5fbbfa9dc68037bf1d64dc58e508b3"
+    },
+    "elastic_exposure-frame-11.png": {
+      "bytes": 33911,
+      "sha256": "sha256:aa34675d27605499fc09e67cf8b7efff30bf13e0edab0a95c139ba822d073a46"
+    },
+    "elastic_exposure-input.mp4": {
+      "bytes": 18825,
+      "sha256": "sha256:4c63e909aba49e59f949f02c886415c70eb67a99bdeb15d78550f0d67f0baec8"
+    },
+    "elastic_exposure-input.nut": {
+      "bytes": 306379,
+      "sha256": "sha256:5d54b5df1023c5d9d72b74755107d92c00c42409fd51747f404f6d7f8b78e50e"
+    },
+    "elastic_exposure.npz": {
+      "bytes": 2500361,
+      "sha256": "sha256:99be8e7cc450e9bb64ded9d67c5cb681081cc2e6489ca4a5c730efb70a72234b"
+    },
+    "font.ttf": {
+      "bytes": 2976,
+      "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1"
+    },
+    "two_motion_cut-candidate.mp4": {
+      "bytes": 14685,
+      "sha256": "sha256:a0fa23fbca94c458fc800681a7d36a1b67bfb16f58ab40eedfcc52834563bcff"
+    },
+    "two_motion_cut-candidate.nut": {
+      "bytes": 328748,
+      "sha256": "sha256:987a7f42c11c89a741638793c04c5dc208d036caa4343bcb165ab08d5f96a02a"
+    },
+    "two_motion_cut-comparison.gif": {
+      "bytes": 618387,
+      "sha256": "sha256:e965519c10e8fc0fa5ee3294f8e845a68643cc643d93d8d3f22f10c9aa0a9707"
+    },
+    "two_motion_cut-comparison.mp4": {
+      "bytes": 57108,
+      "sha256": "sha256:703343ba2c26b52759579694e902a1bda908951f11b02e5a54943ecf40360ab6"
+    },
+    "two_motion_cut-comparison.nut": {
+      "bytes": 1404161,
+      "sha256": "sha256:67047d4551d4ad254c4efea4bf5ffba230d619f246b843672184fddc882c7bc6"
+    },
+    "two_motion_cut-frame-00.png": {
+      "bytes": 35222,
+      "sha256": "sha256:b554348caace4bbe6769063c6ae5c21275ca5a8a4ba288371039fe8855670dd5"
+    },
+    "two_motion_cut-frame-06.png": {
+      "bytes": 35101,
+      "sha256": "sha256:2ff77cb6f14efa1c9dd39f3aa7ce9b6358d62359de9f0bf570c7a16b2bd94e22"
+    },
+    "two_motion_cut-frame-11.png": {
+      "bytes": 34310,
+      "sha256": "sha256:61ceceab8f4a5ce758caaa62700f9da37fdc9a1a6edc35c268beb3f0f330184b"
+    },
+    "two_motion_cut-input.mp4": {
+      "bytes": 16129,
+      "sha256": "sha256:fad9aa5a54efddeb869811220123a1a8098665de7fda5cbc47e8332c0a797bc2"
+    },
+    "two_motion_cut-input.nut": {
+      "bytes": 314962,
+      "sha256": "sha256:8d32459fe21f93cfd0b452527457091fcf32ac89cd589313a1aaef5668147111"
+    },
+    "two_motion_cut.npz": {
+      "bytes": 2543511,
+      "sha256": "sha256:c8da39c4788e70dc779614fbad96b455a77c949d3420d2e080db5f82ee67fe3a"
+    },
+    "two_surfaces-candidate.mp4": {
+      "bytes": 36445,
+      "sha256": "sha256:6ee4863ab8b2969458b0056d84c7d47b2cc088d838f831134e27b78498501ccf"
+    },
+    "two_surfaces-candidate.nut": {
+      "bytes": 897092,
+      "sha256": "sha256:4f327123ee966608d6808f17bf12f1540f7f04e6b98391943458b0f43c298488"
+    },
+    "two_surfaces-comparison.gif": {
+      "bytes": 1879263,
+      "sha256": "sha256:4e60e2d6851bc8d6189bdbf28a774f60f7f988cb49579420a5366b3ffacc81b0"
+    },
+    "two_surfaces-comparison.mp4": {
+      "bytes": 180943,
+      "sha256": "sha256:fcd16fae1a32f369eb8d0d89631e70cb315fd346867efc85a09c2c83c198272a"
+    },
+    "two_surfaces-comparison.nut": {
+      "bytes": 4599687,
+      "sha256": "sha256:4acc83a8b608ebf9732832ea3fc99912bb0606c5f6fa08db73c70a1100088a24"
+    },
+    "two_surfaces-failed-v1.nut": {
+      "bytes": 897050,
+      "sha256": "sha256:68f8b554538c542beaeb646b6a7ebd6c74e4d0332f952635f4a064c18389a729"
+    },
+    "two_surfaces-frame-00.png": {
+      "bytes": 89629,
+      "sha256": "sha256:da679b3fd1d12844f198e26aa0d391e8d7b4e8c4a6477c82b2cbbf7902f7479f"
+    },
+    "two_surfaces-frame-06.png": {
+      "bytes": 89783,
+      "sha256": "sha256:c82f8434c0b6f916d4bd4d3729095caed97f4cc014e57894ed45db4cb575dd7d"
+    },
+    "two_surfaces-frame-11.png": {
+      "bytes": 89702,
+      "sha256": "sha256:fa152069670a41ef9093c6d1343836d857689bab1fec4599d65ae1248ac5c8b3"
+    },
+    "two_surfaces-input.mp4": {
+      "bytes": 40620,
+      "sha256": "sha256:ef544be538d50f06986b682cad1711323148a07e5de2b984de5115ed0d49530b"
+    },
+    "two_surfaces-input.nut": {
+      "bytes": 870337,
+      "sha256": "sha256:3515d8100249dcff7c5930ac0ee1476f066006fe1e4530695ecc53bafc4a25be"
+    },
+    "two_surfaces.npz": {
+      "bytes": 6923360,
+      "sha256": "sha256:296ce88a63867114abd34936a85b97c28b4c5f44d45da47f6e04ea2e041cfbb4"
+    }
+  }
+}

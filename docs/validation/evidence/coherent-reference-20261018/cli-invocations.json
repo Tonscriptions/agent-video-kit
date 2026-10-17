@@ -1,0 +1,54 @@
+{
+  "started_at_utc": "2026-10-17T23:16:07.003331+00:00",
+  "product_cli": false,
+  "invocations": [
+    {
+      "name": "public",
+      "command": [
+        "D:/dev/comfyui/ComfyUI_windows_portable_nvidia_0_30_0/ComfyUI_windows_portable/python_embeded/python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "scripts/run_coherent_reference_fixture.py",
+        "--input",
+        "docs/assets/coherent-reference-20261018/elastic_exposure.npz",
+        "--min-donors",
+        "2",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-cli-smoke-20261018\\public"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "log": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-cli-smoke-20261018\\public.log",
+      "log_sha256": "sha256:d5bd65528e4aafdf752ee1d02fd4e22c0e47574b5f5e0138c4a0d40d50828943",
+      "verification": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-cli-smoke-20261018\\public\\verification.json"
+    },
+    {
+      "name": "cancelled",
+      "command": [
+        "D:/dev/comfyui/ComfyUI_windows_portable_nvidia_0_30_0/ComfyUI_windows_portable/python_embeded/python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "scripts/run_coherent_reference_fixture.py",
+        "--input",
+        "docs/assets/coherent-reference-20261018/elastic_exposure.npz",
+        "--min-donors",
+        "2",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-cli-smoke-20261018\\cancelled",
+        "--cancel-file",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-cli-smoke-20261018\\cancel.flag"
+      ],
+      "exit_code": 2,
+      "expected_exit_code": 2,
+      "log": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-cli-smoke-20261018\\cancelled.log",
+      "log_sha256": "sha256:c588d91803af8535ac768e58af88e101953f10683455aa851b5f98327eeea139",
+      "verification": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-cli-smoke-20261018\\cancelled\\verification.json"
+    }
+  ],
+  "finished_at_utc": "2026-10-17T23:16:10.289315+00:00",
+  "status": "completed"
+}

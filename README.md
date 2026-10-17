@@ -6,7 +6,11 @@
 
 ## 功能核验与真实实测
 
-本表随功能和验证结果同步更新。**功能执行、实际内容、自动质量与听感分别验收，失败记录保留。** 本轮 V41：提取 OpenFilm 原帧时钟，新增完全本地 `motion html-register/html-source/html-inspect/html-render`；保留 HTML/CSS/SVG/Canvas 源码、固定资源/工具链、强类型参数、新版本重建和普通时间线透明叠加。完整 **975/975，1302.879 秒**，0 跳过；137 文件冻结，37 新增专项为完整子集。五组成功内容/三项页面拒绝共 30 CLI 入口调用，96 HTML 编码输入帧、192 全帧乱序重绘、24 原生时间线主帧分计；独立 RGB 合成最大差 3、均值 0.476496，工程包/片段组重建 RGBA 一致，所有实际浏览器 Job 回收。94 文件离线 wheel/11 独立进程 CLI、14 Skills/133 本地引用通过；六张静帧目检，未连续播放/听审。初始 MKV 帧时钟错位、源长和回收/工具链诊断失败原证据保留；正式采用逐帧精确 PTS 的 FFV1/BGRA NUT。完整 OpenFilm HTML 时间线/媒体/WebGL、自动模板控件/缺字越界诊断、HDR/自然广告美学、长片资源、Schema 随包/干净机器及完整剪映等价仍未验收。
+本表随功能和验证结果同步更新。**功能执行、实际内容、自动质量与听感分别验收，失败记录保留。**
+
+2026-10-18 **V42（研究）**：空间/时序一致供体选择完成 7 组、124 候选帧及独立复核，**41/41 研究检查，质量门槛未通过（12 区域中 4 失败）**；三组新增输入无严格 MSE 改善。原输入/失败/GIF 和研究 CLI 已保留，未进入产品；137 产品文件与 V41 一致，本轮未重跑其 975 项完整回归，研究与产品计数分开。 [实测/原片](docs/validation/空间与时序一致参考选择实测_2026-10-18.md)、[机器证据](docs/validation/evidence/coherent-reference-20261018/verification.json)。
+
+最近产品 V41：提取 OpenFilm 原帧时钟，新增完全本地 `motion html-register/html-source/html-inspect/html-render`；保留 HTML/CSS/SVG/Canvas 源码、固定资源/工具链、强类型参数、新版本重建和普通时间线透明叠加。完整 **975/975，1302.879 秒**，0 跳过；137 文件冻结，37 新增专项为完整子集。五组成功内容/三项页面拒绝共 30 CLI 入口调用，96 HTML 编码输入帧、192 全帧乱序重绘、24 原生时间线主帧分计；独立 RGB 合成最大差 3、均值 0.476496，工程包/片段组重建 RGBA 一致，所有实际浏览器 Job 回收。94 文件离线 wheel/11 独立进程 CLI、14 Skills/133 本地引用通过；六张静帧目检，未连续播放/听审。初始 MKV 帧时钟错位、源长和回收/工具链诊断失败原证据保留；正式采用逐帧精确 PTS 的 FFV1/BGRA NUT。完整 OpenFilm HTML 时间线/媒体/WebGL、自动模板控件/缺字越界诊断、HDR/自然广告美学、长片资源、Schema 随包/干净机器及完整剪映等价仍未验收。
 
 历史 V34：固定复用 OpenFilm O01 原算法，新增本地 `subtitle segment`：中文/英文/数字单位分段、明确提供的双语、绑定输入摘要的局部回写，生成 JSON/SRT 并可入轨。完整 **733/733，1604.604 秒**，0 跳过；115 Python+2 MJS+Schema+打包配置+MIT 原文共 120 文件前后字节冻结；38 新增专项为完整子集。四组/108 CLI（100 成功、8 预期拒绝），192 新帧与手工文字/时钟参考一致；参考使用同一渲染器，编辑前后 PCM 一致。另一次真实 Whisper CPU 推理将 5 条原句分成 9 条字幕，CER 2%，同一既有语料、无逐字对齐，音视频因权利未核验留本地。上游 13 测试/48 数据另计；离线 wheel 的 84 文件和 7 次隔离 CLI、14 Skills/104 引用通过。仅三帧静态目检，未连续播放/听审；分段估时、启发式译文对齐、样式迁移、广泛语言/自然质量、干净机器发行与完整剪映等价仍未验收。 历史行按当轮结果保留。
 
@@ -53,6 +57,7 @@
 | V39 | 插入/覆盖/留空删除/波纹提取/滚动剪口/滑动片段 | 八组/73 CLI，340 新帧/163.2 万采样帧匹配固定 V38 完整作者选区；关联音轨、同步/骑乘、字幕、嵌套总线、幂等/回滚及拒绝核验 | 仅保留作者句柄；源外扩/复杂关联 slip/完整磁吸、自然画质/听审/长片、干净机器及完整剪映未验 | [原片/GIF](#实测演示素材)、[契约](docs/specs/范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md)、[实测/失败](docs/validation/专业范围编辑与滚滑剪口实测_2026-10-18.md) |
 | V40 | 关联源 slip、真实源外扩与源句柄滚滑剪口 | 九组/79 CLI，505 新帧/242.4 万采样帧匹配固定 V39 手工作者工程；100 直接源帧身份无错配；旧入口/锁/源界/警告/幂等/回滚 | 外扩重新处理；嵌套曲线再归一化告警、旧主体时钟保真未验；跟踪重规划/完整磁吸/自然质量/听审/长片/完整剪映未验 | [原片/GIF](#实测演示素材)、[契约](docs/specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md)、[实测/原失败](docs/validation/真实源外扩与关联Slip实测_2026-10-18.md) |
 | V41 | 离线 HTML/SVG/Canvas 动效与可编辑源码 | 30 CLI、全帧正序/反序/乱序与真实 PTS；透明叠加独立最大 RGB 差 3；包/片段组可重建，失败/取消 Job 回收 | 五组为原创几何/英文字体；自然广告、中文复杂排版、全 film.html/媒体/WebGL/HDR/长片未验 | [原输入与实际 GIF/MP4](#实测演示素材)、[实测](docs/validation/离线HTML动效源码与透明合成实测_2026-10-18.md)、[证据](docs/validation/evidence/html-motion-20261018.json) |
+| V42 | 空间与时序供体选择（研究） | 41 研究检查、7 组/124 候选帧；逐区独立重算，2 成功/1 取消研究 CLI；三组原片/失败/GIF | 质量 4/12 区域失败；新三组无 MSE 改善，未产品化；975 产品回归本轮未重跑 | [研究实测](docs/validation/空间与时序一致参考选择实测_2026-10-18.md)、[原输入/失败动画](docs/assets/coherent-reference-20261018/two_surfaces-comparison.gif)、[独立证据](docs/validation/evidence/coherent-reference-20261018/verification.json) |
 
 ## 开源复用核查
 
@@ -75,6 +80,15 @@
 实际数据：[字幕原输入](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-input.json) → [三段输出](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-output.json)；[跨轨删除原模型](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-input.json) → [操作计划/实际结果/手工预期](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-output.json)。字幕无词标的时间为估算。原 CLI/Skill 连接 Studio、npx latest 与服务商；选用模块需改为固定本地入口、强制离线并保留原版权。GUI 目录内的纯规划算法可提取；上游不是完整剪映或本地 AI 特效替代内核。
 
 ## 实测演示素材
+
+### V42 研究：质量未通过，未进入正式修复内核
+
+三组原创输入公开，保留参考、失败 v1、v3 和遮挡前真值。旧双表面的 v3 与参考相等；新增运动场景仍退步，不能以 GIF 或检查通过数宣称画质提升。每组 12 帧、12 fps、1 秒，无音频；无损 NUT 回读/PTS 与独立指标复核通过，未连续播放或听审。
+
+![V42 未集成研究：输入、参考、失败 v1、v3、真值](docs/assets/coherent-reference-20261018/two_surfaces-comparison.gif)
+
+[双表面原输入](docs/assets/coherent-reference-20261018/two_surfaces-input.mp4) · [双运动/切镜原输入](docs/assets/coherent-reference-20261018/two_motion_cut-input.mp4) · [实际双运动 GIF](docs/assets/coherent-reference-20261018/two_motion_cut-comparison.gif) · [非刚性/曝光原输入](docs/assets/coherent-reference-20261018/elastic_exposure-input.mp4) · [实际非刚性 GIF](docs/assets/coherent-reference-20261018/elastic_exposure-comparison.gif) · [复现 CLI/指标与失败](docs/validation/空间与时序一致参考选择实测_2026-10-18.md)
+
 
 **正式产品 CLI V41：保留动效源码，生成透明标题并叠入时间线。** 左列为原创底图输入，右列为真实产品时间线成片；SVG 商品、文字、CSS 动画与 Canvas 标记均由本地 Chromium 逐帧生成。
 

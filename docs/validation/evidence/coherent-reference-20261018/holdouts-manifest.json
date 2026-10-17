@@ -1,0 +1,60 @@
+{
+  "status": "generated_before_candidate_evaluation",
+  "license": "CC0-1.0",
+  "generator": "scripts/create_repair_reference_holdouts.py",
+  "generator_sha256": "sha256:cfe582c3a6a116c6d2e89a5563ca7a3e5942d651e2ba6cb296557f654aee9c71",
+  "network_guard_events": [],
+  "cases": {
+    "stationary": {
+      "seed": 20261018,
+      "scene_cuts": [],
+      "min_donors": 2,
+      "width": 160,
+      "height": 96,
+      "frames": 12,
+      "fps": {
+        "num": 12,
+        "den": 1
+      },
+      "truth_precedes_occlusion": true,
+      "description": "stationary texture positive control",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-holdouts-20261018\\stationary.npz",
+      "sha256": "sha256:b457b50b12fc4ce7769e8fa8f1727d9dda8c67b5655d63924440ce9e02045a22"
+    },
+    "two_motion_cut": {
+      "seed": 20261019,
+      "scene_cuts": [
+        6
+      ],
+      "min_donors": 2,
+      "width": 160,
+      "height": 96,
+      "frames": 12,
+      "fps": {
+        "num": 12,
+        "den": 1
+      },
+      "truth_precedes_occlusion": true,
+      "description": "opposite independently moving surfaces and an explicit color cut",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-holdouts-20261018\\two_motion_cut.npz",
+      "sha256": "sha256:e97f404c079852fc7027f185ced01c06e07c6f66e323d69170e2b76749a4e425"
+    },
+    "elastic_exposure": {
+      "seed": 20261020,
+      "scene_cuts": [],
+      "min_donors": 2,
+      "width": 160,
+      "height": 96,
+      "frames": 12,
+      "fps": {
+        "num": 12,
+        "den": 1
+      },
+      "truth_precedes_occlusion": true,
+      "description": "nonrigid texture with exposure change and preserved foreground exclusion",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\coherent-reference-holdouts-20261018\\elastic_exposure.npz",
+      "sha256": "sha256:711daac458aeaa691cdba84f43b21fb8c19246172d0da76dd6a9f39aa08e6396"
+    }
+  },
+  "evaluation_gate": "Per region candidate MSE and same-canvas error-delta MAE <= paired baseline, no tolerance relaxation; natural quality is separate."
+}
