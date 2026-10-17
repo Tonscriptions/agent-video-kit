@@ -129,12 +129,20 @@ def normalize_job(root: Path, raw: dict[str, Any]) -> dict[str, Any]:
         "video_bitrate": raw.get("video_bitrate"),
         "audio_bitrate": raw.get("audio_bitrate"),
         "pixel_format": raw.get("pixel_format"),
+        "sequence_sampling": raw.get('sequence_sampling'),
+        "sequence_memory_mib": raw.get('sequence_memory_mib'),
         "attempts": 0,
         "operation_id": None,
         "cancel_requested": False,
         "errors": [],
         "warnings": [],
     }
+    sampling = normalized['sequence_sampling']
+    if sampling is not None and (not isinstance(sampling, str) or sampling not in {'bilinear','area'}):
+        raise argument_error('队列 sequence_sampling 只允许 bilinear 或 area', 'sequence_sampling')
+    memory_mib = normalized['sequence_memory_mib']
+    if memory_mib is not None and (type(memory_mib) is not int or not 1 <= memory_mib <= 65536):
+        raise argument_error('队列 sequence_memory_mib 必须为 1..65536 的整数', 'sequence_memory_mib')
     for field in ("width", "height", "crf"):
         if normalized[field] is not None:
             try:

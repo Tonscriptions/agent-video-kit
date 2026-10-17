@@ -1,0 +1,230 @@
+[
+  {
+    "bad": [
+      "invalid"
+    ],
+    "action": "check",
+    "exit_code": 9,
+    "result": {
+      "ok": false,
+      "command": "quality.check",
+      "request_id": "req_20261017121532_4b2ef289",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "INTERNAL_INPUT_ERROR",
+          "message": "list indices must be integers or slices, not str",
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T12:15:32.030759Z",
+        "finished_at": "2026-10-17T12:15:32.030769Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "bad": [
+      "invalid"
+    ],
+    "action": "golden",
+    "exit_code": 9,
+    "result": {
+      "ok": false,
+      "command": "quality.golden",
+      "request_id": "req_20261017121532_1ea6b963",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "INTERNAL_INPUT_ERROR",
+          "message": "list indices must be integers or slices, not str",
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T12:15:32.071818Z",
+        "finished_at": "2026-10-17T12:15:32.071824Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "bad": false,
+    "action": "check",
+    "exit_code": 0,
+    "result": {
+      "ok": true,
+      "command": "quality.check",
+      "request_id": "req_20261017121532_878aea7b",
+      "operation_id": null,
+      "status": "planned",
+      "data": {
+        "input": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\sequence-sampling-invalid-quality\\project\\assets\\input.png",
+        "expected_duration": null,
+        "expensive": false,
+        "require_audio": false,
+        "max_av_sync_ms": 80.0,
+        "target_lufs": null,
+        "lufs_tolerance": 2.0,
+        "fail_on_black": false,
+        "max_true_peak_dbfs": null,
+        "profile": null,
+        "settings": {
+          "timebase": {
+            "ticks_per_second": 90000,
+            "display_fps": {
+              "num": 30,
+              "den": 1
+            }
+          },
+          "canvas": {
+            "width": 1080,
+            "height": 1920,
+            "pixel_aspect": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "color": {
+            "primaries": "bt709",
+            "transfer": "bt709",
+            "matrix": "bt709",
+            "range": "limited"
+          },
+          "audio": {
+            "sample_rate": 48000,
+            "channels": 2
+          },
+          "output": {
+            "container": "mp4",
+            "video": {
+              "codec": "libx264",
+              "preset": "medium",
+              "crf": 18,
+              "pixel_format": "yuv420p"
+            },
+            "audio": {
+              "codec": "aac",
+              "bitrate": "192k"
+            }
+          },
+          "sequence_sampling": {
+            "method": "area",
+            "max_working_bytes": 1073741824
+          }
+        }
+      },
+      "artifacts": [],
+      "warnings": [],
+      "errors": [],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T12:15:32.128733Z",
+        "finished_at": "2026-10-17T12:15:32.128747Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "bad": false,
+    "action": "golden",
+    "exit_code": 0,
+    "result": {
+      "ok": true,
+      "command": "quality.golden",
+      "request_id": "req_20261017121532_cfe7224a",
+      "operation_id": null,
+      "status": "planned",
+      "data": {
+        "mode": "capture",
+        "manifest": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\sequence-sampling-invalid-quality\\project\\validation\\golden-quality.json",
+        "input": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\sequence-sampling-invalid-quality\\project\\assets\\input.png",
+        "sequence_id": null,
+        "expected_duration": null,
+        "golden_version": "0.1.0",
+        "profile": null,
+        "settings": {
+          "timebase": {
+            "ticks_per_second": 90000,
+            "display_fps": {
+              "num": 30,
+              "den": 1
+            }
+          },
+          "canvas": {
+            "width": 1080,
+            "height": 1920,
+            "pixel_aspect": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "color": {
+            "primaries": "bt709",
+            "transfer": "bt709",
+            "matrix": "bt709",
+            "range": "limited"
+          },
+          "audio": {
+            "sample_rate": 48000,
+            "channels": 2
+          },
+          "output": {
+            "container": "mp4",
+            "video": {
+              "codec": "libx264",
+              "preset": "medium",
+              "crf": 18,
+              "pixel_format": "yuv420p"
+            },
+            "audio": {
+              "codec": "aac",
+              "bitrate": "192k"
+            }
+          },
+          "sequence_sampling": {
+            "method": "area",
+            "max_working_bytes": 1073741824
+          }
+        },
+        "constraints": {
+          "require_audio": false,
+          "expensive": false,
+          "max_av_sync_ms": 80.0,
+          "target_lufs": null,
+          "lufs_tolerance": 2.0,
+          "fail_on_black": false,
+          "max_true_peak_dbfs": null
+        }
+      },
+      "artifacts": [],
+      "warnings": [],
+      "errors": [],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T12:15:32.172452Z",
+        "finished_at": "2026-10-17T12:15:32.172459Z",
+        "network": "disabled"
+      }
+    }
+  }
+]

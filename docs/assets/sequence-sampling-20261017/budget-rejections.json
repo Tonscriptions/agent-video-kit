@@ -1,0 +1,61 @@
+{
+  "cases": [
+    {
+      "ok": false,
+      "command": "render",
+      "request_id": "req_20261017122122_ed82a66d",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "SEQUENCE_PROJECTION_BUDGET_EXCEEDED",
+          "message": "序列投影工作栅格超过显式配额",
+          "path": "settings.sequence_sampling.max_working_bytes",
+          "retryable": false,
+          "cause": "{\"kind\": \"sequence-projection-budget\", \"method\": \"area\", \"max_working_bytes\": 1, \"nodes\": [{\"clip_id\": \"parent\", \"parent_id\": null, \"source_canvas\": {\"width\": 576, \"height\": 324}, \"parent_canvas\": {\"width\": 192, \"height\": 108}, \"working_canvas\": {\"width\": 576, \"height\": 324}, \"components_bytes\": {\"source_rgba_buffers\": 1492992, \"parent_rgba_buffers\": 331776, \"working_float_and_byte_buffers\": 10450944, \"summed_area_double_planes\": 5971968}, \"estimated_working_bytes\": 18247680}], \"estimated_working_bytes\": 18247680, \"scope\": \"reachable-sequence-projection-instances-only-not-process-rss\", \"time_disjoint_instances_charged\": true, \"unused_sequences_charged\": false}",
+          "hint": "请显式调整画布、容器数量或 --sequence-memory-mib；系统不会降低分辨率或自行放宽配额"
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T12:21:22.798300Z",
+        "finished_at": "2026-10-17T12:21:22.798314Z",
+        "network": "disabled"
+      }
+    },
+    {
+      "ok": false,
+      "command": "render",
+      "request_id": "req_20261017122123_42e6286e",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "SEQUENCE_PROJECTION_BUDGET_EXCEEDED",
+          "message": "序列投影工作栅格超过显式配额",
+          "path": "settings.sequence_sampling.max_working_bytes",
+          "retryable": false,
+          "cause": "{\"kind\": \"sequence-projection-budget\", \"method\": \"area\", \"max_working_bytes\": 1, \"nodes\": [{\"clip_id\": \"parent\", \"parent_id\": null, \"source_canvas\": {\"width\": 576, \"height\": 324}, \"parent_canvas\": {\"width\": 192, \"height\": 108}, \"working_canvas\": {\"width\": 576, \"height\": 324}, \"components_bytes\": {\"source_rgba_buffers\": 1492992, \"parent_rgba_buffers\": 331776, \"working_float_and_byte_buffers\": 10450944, \"summed_area_double_planes\": 5971968}, \"estimated_working_bytes\": 18247680}], \"estimated_working_bytes\": 18247680, \"scope\": \"reachable-sequence-projection-instances-only-not-process-rss\", \"time_disjoint_instances_charged\": true, \"unused_sequences_charged\": false}",
+          "hint": "请显式调整画布、容器数量或 --sequence-memory-mib；系统不会降低分辨率或自行放宽配额"
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T12:21:23.877694Z",
+        "finished_at": "2026-10-17T12:21:23.877732Z",
+        "network": "disabled"
+      }
+    }
+  ],
+  "no_output_temp_operation_or_author_mutation": true
+}

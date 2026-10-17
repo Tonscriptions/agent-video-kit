@@ -29,3 +29,10 @@ default to that sequence's effective width/height. A per-job profile or explicit
 dimensions override only the selected root; authored child canvases remain.
 Preserve canvas in snapshots and native project/package exchange; external
 formats report unsupported child rasters instead of implying full nested parity.
+
+Queue fields `sequence_sampling: area` and `sequence_memory_mib: 1024` are
+per-job overrides, matching render/quality flags in the [sampling contract](../../docs/specs/序列面积采样与工作栅格预算契约_v0.1_2026-10-17.md).
+They do not edit author settings. Cancelled render resume retains effective
+sampling and quota; explicit replacement settings must match its fingerprint.
+Projection budget rejection also applies to dry-run; the estimate excludes
+decoders, encoders, other effects, threads and simultaneous jobs.

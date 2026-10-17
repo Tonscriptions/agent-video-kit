@@ -42,6 +42,7 @@ from .project import (
     TICKS_PER_SECOND,
 )
 from .quality import GOLDEN_VERSION, build_golden_manifest, check_output, compare_golden_manifest, normalize_golden_constraints, validate_golden_manifest
+from .sequence_sampling import configuration as sequence_sampling_configuration
 from .mask_review import prepare as prepare_mask_review, review as review_mask
 from .mask_tracking import ENGINE as MASK_TRACKING_ENGINE, prepare as prepare_mask_tracking, execute as execute_mask_tracking, public_plan as public_mask_tracking_plan
 from .recommend import recommend_highlights
@@ -829,6 +830,12 @@ def build_parser() -> argparse.ArgumentParser:
     qgolden.add_argument("--profile", choices=tuple(OUTPUT_PROFILES) + ("custom",), default=None)
     qgolden.add_argument("--width", type=int, default=None)
     qgolden.add_argument("--height", type=int, default=None)
+
+    for output_parser in (render, qcheck, qgolden):
+        output_parser.add_argument('--sequence-sampling', choices=('bilinear','area'), default=None,
+                                   help='本次输出的序列容器投影采样，不改写作者工程')
+        output_parser.add_argument('--sequence-memory-mib', type=int, default=None,
+                                   help='序列投影工作配额 MiB，1..65536；不是进程总内存上界')
 
     convert = subs.add_parser("convert", help="项目/交换格式互操作")
     cs = convert.add_subparsers(dest="action", required=True)
@@ -4899,6 +4906,19 @@ def _render_settings_for_args(project: dict[str, Any], args: argparse.Namespace)
     if profile and profile != "custom":
         width, height = OUTPUT_PROFILES[profile]
     settings = copy.deepcopy(project["settings"])
+    sampling = getattr(args, 'sequence_sampling', None)
+    memory_mib = getattr(args, 'sequence_memory_mib', None)
+    if sampling is not None or memory_mib is not None:
+        sampling_patch = sequence_sampling_configuration(settings.get('sequence_sampling'))
+        if sampling is not None:
+            sampling_patch['method'] = sampling
+        if memory_mib is not None:
+            if type(memory_mib) is not int or not 1 <= memory_mib <= 65536:
+                raise argument_error('--sequence-memory-mib 必须为 1..65536 的整数', 'sequence_memory_mib')
+            sampling_patch['max_working_bytes'] = memory_mib*1024*1024
+        settings['sequence_sampling'] = sequence_sampling_configuration(sampling_patch)
+    else:
+        sequence_sampling_configuration(settings.get('sequence_sampling'))
     selected_sequence = find_sequence(project, getattr(args, 'sequence_id', None))
     settings['canvas'] = {**settings.get('canvas', {}), **sequence_canvas(project, selected_sequence)}
     output_patch: dict[str, Any] = {}
@@ -4957,7 +4977,7 @@ def command_render(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     sequence = find_sequence(project, args.sequence_id)
     resume_record = _load_render_resume(root, project, sequence, args.resume) if args.resume else None
-    settings_overridden = any(getattr(args, field, None) is not None for field in ("profile", "width", "height", "container", "video_codec", "audio_codec", "crf", "video_bitrate", "audio_bitrate", "pixel_format"))
+    settings_overridden = any(getattr(args, field, None) is not None for field in ("profile", "width", "height", "container", "video_codec", "audio_codec", "crf", "video_bitrate", "audio_bitrate", "pixel_format", "sequence_sampling", "sequence_memory_mib"))
     if resume_record:
         if args.output is None:
             args.output = resume_record.get("output")
@@ -5015,6 +5035,8 @@ def _queue_job_args(root: Path, job: dict[str, Any], args: argparse.Namespace) -
         video_bitrate=job.get("video_bitrate"),
         audio_bitrate=job.get("audio_bitrate"),
         pixel_format=job.get("pixel_format"),
+        sequence_sampling=job.get('sequence_sampling'),
+        sequence_memory_mib=job.get('sequence_memory_mib'),
         output=str(root / str(job["output"])),
         publish=bool(job.get("publish", False)),
         sequence_id=job.get("sequence_id"),

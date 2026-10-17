@@ -188,3 +188,13 @@
 6. 外部扩展即使未被当前引擎支持，也被保存在原始包或 `extensions` 中。
 
 
+
+## V32：显式序列投影采样与工作配额
+
+`settings.sequence_sampling` 可省略/null，或为以下对象；未知键和非整数/布尔预算由内建校验拒绝，Schema 同步列出枚举和范围：
+
+```json
+{"method":"area","max_working_bytes":1073741824}
+```
+
+method 默认 bilinear，仅允许 bilinear/area；max_working_bytes 默认 1 GiB，范围 1 字节到 64 GiB。配置作用于序列容器投影，叶素材采样不随之改变；工作配额包括所有可达容器的保守缓冲模型，不是全进程 RSS 保证。原生 Agent JSON/package 保留该配置；外部格式报告 Unsupported，旁车保存不代表执行等效。临时 CLI/队列覆盖不写回作者设置，但属于输出指纹和取消续跑记录。见[采样契约](./序列面积采样与工作栅格预算契约_v0.1_2026-10-17.md)。

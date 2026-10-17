@@ -1,0 +1,497 @@
+{
+  "manifest_version": "0.1.0",
+  "operation_id": "render_20261017121851_75d1c515",
+  "project_id": "proj_20261017121838_c6c7a20d",
+  "sequence_id": "seq_main",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\sequence-sampling-final-work-20261017\\S02\\renders\\area.mp4",
+  "sha256": "b34746b54a8f9108604d48505caa2b6cbbd7d0ec5b20b3e0f2e2623a8bb8b801",
+  "probe": {
+    "duration_seconds": 2.0,
+    "duration_tick": 180000,
+    "format": "mov,mp4,m4a,3gp,3g2,mj2",
+    "format_long_name": "QuickTime / MOV",
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "profile": "High 4:4:4 Predictive",
+        "codec_type": "video",
+        "codec_tag_string": "avc1",
+        "codec_tag": "0x31637661",
+        "mime_codec_string": "avc1.f4000a",
+        "width": 192,
+        "height": 108,
+        "coded_width": 192,
+        "coded_height": 108,
+        "has_b_frames": 0,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "16:9",
+        "pix_fmt": "yuv444p",
+        "level": 10,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "is_avc": "true",
+        "nal_length_size": "4",
+        "id": "0x1",
+        "r_frame_rate": "8/1",
+        "avg_frame_rate": "8/1",
+        "time_base": "1/16384",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "duration_ts": 32768,
+        "duration": "2.000000",
+        "bit_rate": "242644",
+        "bits_per_raw_sample": "8",
+        "nb_frames": "16",
+        "extradata_size": 48,
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "und",
+          "handler_name": "VideoHandler",
+          "encoder": "Lavc62.28.100 libx264"
+        }
+      },
+      {
+        "index": 1,
+        "codec_name": "aac",
+        "codec_long_name": "AAC (Advanced Audio Coding)",
+        "profile": "LC",
+        "codec_type": "audio",
+        "codec_tag_string": "mp4a",
+        "codec_tag": "0x6134706d",
+        "mime_codec_string": "mp4a.40.2",
+        "sample_fmt": "fltp",
+        "sample_rate": "48000",
+        "channels": 2,
+        "channel_layout": "stereo",
+        "bits_per_sample": 0,
+        "initial_padding": 0,
+        "id": "0x2",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/48000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "duration_ts": 96000,
+        "duration": "2.000000",
+        "bit_rate": "2323",
+        "nb_frames": "95",
+        "extradata_size": 5,
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "und",
+          "handler_name": "SoundHandler"
+        }
+      }
+    ],
+    "video": {
+      "codec": "h264",
+      "width": 192,
+      "height": 108,
+      "pix_fmt": "yuv444p",
+      "fps": "8/1",
+      "color_space": "bt709",
+      "duration_seconds": 2.0,
+      "start_time_seconds": 0.0
+    },
+    "audio": {
+      "codec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 2.0,
+      "start_time_seconds": 0.0
+    }
+  },
+  "command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-hide_banner",
+    "-y",
+    "-loglevel",
+    "error",
+    "-progress",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\sequence-sampling-final-work-20261017\\S02\\renders\\.tmp\\render_20261017121851_75d1c515\\ffmpeg-progress.log",
+    "-loop",
+    "1",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\sequence-sampling-final-work-20261017\\S02\\assets\\pattern_S02-source.png",
+    "-filter_complex",
+    "[0:v]trim=start=0.000000:end=2.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=8/1:start_time=0.00000000:round=up:eof_action=pass,crop=576:216:0:0:exact=1,format=gbrapf32le,premultiply=inplace=1,scale=576:216,unpremultiply=inplace=1,format=rgba,setsar=1[v0];color=c=black@0.0:s=576x216:r=8/1:d=2.000000,format=rgba[group0_base];[group0_base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[group0_vo0];[group0_vo0]format=rgba,format=rgba,pad=576:216:0:0:color=black@0,setsar=1,format=gbrapf32le,premultiply=inplace=1,geq=r='if(lt(X,192)*lt(Y,108),st(0,clip((576.00000000),2,576));st(1,clip((216.00000000),2,216));st(2,clip((0.00000000),0,576-ld(0)));st(3,clip((0.00000000),0,216-ld(1)));st(4,192/ld(0));st(5,108/ld(1));st(6,ld(2)+(0.50000000)*ld(0)+((X+0.5-(0.50000000)*192)*cos((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*sin((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(4))-0.5);st(7,ld(3)+(0.50000000)*ld(1)+(-(X+0.5-(0.50000000)*192)*sin((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*cos((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(5))-0.5);st(4,max(1,1/(max(0.00000001,abs(1.00000000))*ld(4))));st(5,max(1,1/(max(0.00000001,abs(1.00000000))*ld(5))));st(8,clip(ld(6)+0.5-ld(4)/2,ld(2),ld(2)+ld(0)));st(9,clip(ld(6)+0.5+ld(4)/2,ld(2),ld(2)+ld(0)));st(2,clip(ld(7)+0.5-ld(5)/2,ld(3),ld(3)+ld(1)));st(3,clip(ld(7)+0.5+ld(5)/2,ld(3),ld(3)+ld(1)));(((1-(ld(9)-floor(ld(9))))*(1-(ld(3)-floor(ld(3))))*rsum(floor(ld(9))-1,floor(ld(3))-1)+(ld(9)-floor(ld(9)))*(1-(ld(3)-floor(ld(3))))*rsum(floor(ld(9)),floor(ld(3))-1)+(1-(ld(9)-floor(ld(9))))*(ld(3)-floor(ld(3)))*rsum(floor(ld(9))-1,floor(ld(3)))+(ld(9)-floor(ld(9)))*(ld(3)-floor(ld(3)))*rsum(floor(ld(9)),floor(ld(3))))-((1-(ld(8)-floor(ld(8))))*(1-(ld(3)-floor(ld(3))))*rsum(floor(ld(8))-1,floor(ld(3))-1)+(ld(8)-floor(ld(8)))*(1-(ld(3)-floor(ld(3))))*rsum(floor(ld(8)),floor(ld(3))-1)+(1-(ld(8)-floor(ld(8))))*(ld(3)-floor(ld(3)))*rsum(floor(ld(8))-1,floor(ld(3)))+(ld(8)-floor(ld(8)))*(ld(3)-floor(ld(3)))*rsum(floor(ld(8)),floor(ld(3))))-((1-(ld(9)-floor(ld(9))))*(1-(ld(2)-floor(ld(2))))*rsum(floor(ld(9))-1,floor(ld(2))-1)+(ld(9)-floor(ld(9)))*(1-(ld(2)-floor(ld(2))))*rsum(floor(ld(9)),floor(ld(2))-1)+(1-(ld(9)-floor(ld(9))))*(ld(2)-floor(ld(2)))*rsum(floor(ld(9))-1,floor(ld(2)))+(ld(9)-floor(ld(9)))*(ld(2)-floor(ld(2)))*rsum(floor(ld(9)),floor(ld(2))))+((1-(ld(8)-floor(ld(8))))*(1-(ld(2)-floor(ld(2))))*rsum(floor(ld(8))-1,floor(ld(2))-1)+(ld(8)-floor(ld(8)))*(1-(ld(2)-floor(ld(2))))*rsum(floor(ld(8)),floor(ld(2))-1)+(1-(ld(8)-floor(ld(8))))*(ld(2)-floor(ld(2)))*rsum(floor(ld(8))-1,floor(ld(2)))+(ld(8)-floor(ld(8)))*(ld(2)-floor(ld(2)))*rsum(floor(ld(8)),floor(ld(2)))))/(ld(4)*ld(5)),0)':g='if(lt(X,192)*lt(Y,108),st(0,clip((576.00000000),2,576));st(1,clip((216.00000000),2,216));st(2,clip((0.00000000),0,576-ld(0)));st(3,clip((0.00000000),0,216-ld(1)));st(4,192/ld(0));st(5,108/ld(1));st(6,ld(2)+(0.50000000)*ld(0)+((X+0.5-(0.50000000)*192)*cos((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*sin((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(4))-0.5);st(7,ld(3)+(0.50000000)*ld(1)+(-(X+0.5-(0.50000000)*192)*sin((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*cos((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(5))-0.5);st(4,max(1,1/(max(0.00000001,abs(1.00000000))*ld(4))));st(5,max(1,1/(max(0.00000001,abs(1.00000000))*ld(5))));st(8,clip(ld(6)+0.5-ld(4)/2,ld(2),ld(2)+ld(0)));st(9,clip(ld(6)+0.5+ld(4)/2,ld(2),ld(2)+ld(0)));st(2,clip(ld(7)+0.5-ld(5)/2,ld(3),ld(3)+ld(1)));st(3,clip(ld(7)+0.5+ld(5)/2,ld(3),ld(3)+ld(1)));(((1-(ld(9)-floor(ld(9))))*(1-(ld(3)-floor(ld(3))))*gsum(floor(ld(9))-1,floor(ld(3))-1)+(ld(9)-floor(ld(9)))*(1-(ld(3)-floor(ld(3))))*gsum(floor(ld(9)),floor(ld(3))-1)+(1-(ld(9)-floor(ld(9))))*(ld(3)-floor(ld(3)))*gsum(floor(ld(9))-1,floor(ld(3)))+(ld(9)-floor(ld(9)))*(ld(3)-floor(ld(3)))*gsum(floor(ld(9)),floor(ld(3))))-((1-(ld(8)-floor(ld(8))))*(1-(ld(3)-floor(ld(3))))*gsum(floor(ld(8))-1,floor(ld(3))-1)+(ld(8)-floor(ld(8)))*(1-(ld(3)-floor(ld(3))))*gsum(floor(ld(8)),floor(ld(3))-1)+(1-(ld(8)-floor(ld(8))))*(ld(3)-floor(ld(3)))*gsum(floor(ld(8))-1,floor(ld(3)))+(ld(8)-floor(ld(8)))*(ld(3)-floor(ld(3)))*gsum(floor(ld(8)),floor(ld(3))))-((1-(ld(9)-floor(ld(9))))*(1-(ld(2)-floor(ld(2))))*gsum(floor(ld(9))-1,floor(ld(2))-1)+(ld(9)-floor(ld(9)))*(1-(ld(2)-floor(ld(2))))*gsum(floor(ld(9)),floor(ld(2))-1)+(1-(ld(9)-floor(ld(9))))*(ld(2)-floor(ld(2)))*gsum(floor(ld(9))-1,floor(ld(2)))+(ld(9)-floor(ld(9)))*(ld(2)-floor(ld(2)))*gsum(floor(ld(9)),floor(ld(2))))+((1-(ld(8)-floor(ld(8))))*(1-(ld(2)-floor(ld(2))))*gsum(floor(ld(8))-1,floor(ld(2))-1)+(ld(8)-floor(ld(8)))*(1-(ld(2)-floor(ld(2))))*gsum(floor(ld(8)),floor(ld(2))-1)+(1-(ld(8)-floor(ld(8))))*(ld(2)-floor(ld(2)))*gsum(floor(ld(8))-1,floor(ld(2)))+(ld(8)-floor(ld(8)))*(ld(2)-floor(ld(2)))*gsum(floor(ld(8)),floor(ld(2)))))/(ld(4)*ld(5)),0)':b='if(lt(X,192)*lt(Y,108),st(0,clip((576.00000000),2,576));st(1,clip((216.00000000),2,216));st(2,clip((0.00000000),0,576-ld(0)));st(3,clip((0.00000000),0,216-ld(1)));st(4,192/ld(0));st(5,108/ld(1));st(6,ld(2)+(0.50000000)*ld(0)+((X+0.5-(0.50000000)*192)*cos((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*sin((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(4))-0.5);st(7,ld(3)+(0.50000000)*ld(1)+(-(X+0.5-(0.50000000)*192)*sin((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*cos((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(5))-0.5);st(4,max(1,1/(max(0.00000001,abs(1.00000000))*ld(4))));st(5,max(1,1/(max(0.00000001,abs(1.00000000))*ld(5))));st(8,clip(ld(6)+0.5-ld(4)/2,ld(2),ld(2)+ld(0)));st(9,clip(ld(6)+0.5+ld(4)/2,ld(2),ld(2)+ld(0)));st(2,clip(ld(7)+0.5-ld(5)/2,ld(3),ld(3)+ld(1)));st(3,clip(ld(7)+0.5+ld(5)/2,ld(3),ld(3)+ld(1)));(((1-(ld(9)-floor(ld(9))))*(1-(ld(3)-floor(ld(3))))*bsum(floor(ld(9))-1,floor(ld(3))-1)+(ld(9)-floor(ld(9)))*(1-(ld(3)-floor(ld(3))))*bsum(floor(ld(9)),floor(ld(3))-1)+(1-(ld(9)-floor(ld(9))))*(ld(3)-floor(ld(3)))*bsum(floor(ld(9))-1,floor(ld(3)))+(ld(9)-floor(ld(9)))*(ld(3)-floor(ld(3)))*bsum(floor(ld(9)),floor(ld(3))))-((1-(ld(8)-floor(ld(8))))*(1-(ld(3)-floor(ld(3))))*bsum(floor(ld(8))-1,floor(ld(3))-1)+(ld(8)-floor(ld(8)))*(1-(ld(3)-floor(ld(3))))*bsum(floor(ld(8)),floor(ld(3))-1)+(1-(ld(8)-floor(ld(8))))*(ld(3)-floor(ld(3)))*bsum(floor(ld(8))-1,floor(ld(3)))+(ld(8)-floor(ld(8)))*(ld(3)-floor(ld(3)))*bsum(floor(ld(8)),floor(ld(3))))-((1-(ld(9)-floor(ld(9))))*(1-(ld(2)-floor(ld(2))))*bsum(floor(ld(9))-1,floor(ld(2))-1)+(ld(9)-floor(ld(9)))*(1-(ld(2)-floor(ld(2))))*bsum(floor(ld(9)),floor(ld(2))-1)+(1-(ld(9)-floor(ld(9))))*(ld(2)-floor(ld(2)))*bsum(floor(ld(9))-1,floor(ld(2)))+(ld(9)-floor(ld(9)))*(ld(2)-floor(ld(2)))*bsum(floor(ld(9)),floor(ld(2))))+((1-(ld(8)-floor(ld(8))))*(1-(ld(2)-floor(ld(2))))*bsum(floor(ld(8))-1,floor(ld(2))-1)+(ld(8)-floor(ld(8)))*(1-(ld(2)-floor(ld(2))))*bsum(floor(ld(8)),floor(ld(2))-1)+(1-(ld(8)-floor(ld(8))))*(ld(2)-floor(ld(2)))*bsum(floor(ld(8))-1,floor(ld(2)))+(ld(8)-floor(ld(8)))*(ld(2)-floor(ld(2)))*bsum(floor(ld(8)),floor(ld(2)))))/(ld(4)*ld(5)),0)':a='if(lt(X,192)*lt(Y,108),st(0,clip((576.00000000),2,576));st(1,clip((216.00000000),2,216));st(2,clip((0.00000000),0,576-ld(0)));st(3,clip((0.00000000),0,216-ld(1)));st(4,192/ld(0));st(5,108/ld(1));st(6,ld(2)+(0.50000000)*ld(0)+((X+0.5-(0.50000000)*192)*cos((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*sin((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(4))-0.5);st(7,ld(3)+(0.50000000)*ld(1)+(-(X+0.5-(0.50000000)*192)*sin((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*cos((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(5))-0.5);st(4,max(1,1/(max(0.00000001,abs(1.00000000))*ld(4))));st(5,max(1,1/(max(0.00000001,abs(1.00000000))*ld(5))));st(8,clip(ld(6)+0.5-ld(4)/2,ld(2),ld(2)+ld(0)));st(9,clip(ld(6)+0.5+ld(4)/2,ld(2),ld(2)+ld(0)));st(2,clip(ld(7)+0.5-ld(5)/2,ld(3),ld(3)+ld(1)));st(3,clip(ld(7)+0.5+ld(5)/2,ld(3),ld(3)+ld(1)));(((1-(ld(9)-floor(ld(9))))*(1-(ld(3)-floor(ld(3))))*alphasum(floor(ld(9))-1,floor(ld(3))-1)+(ld(9)-floor(ld(9)))*(1-(ld(3)-floor(ld(3))))*alphasum(floor(ld(9)),floor(ld(3))-1)+(1-(ld(9)-floor(ld(9))))*(ld(3)-floor(ld(3)))*alphasum(floor(ld(9))-1,floor(ld(3)))+(ld(9)-floor(ld(9)))*(ld(3)-floor(ld(3)))*alphasum(floor(ld(9)),floor(ld(3))))-((1-(ld(8)-floor(ld(8))))*(1-(ld(3)-floor(ld(3))))*alphasum(floor(ld(8))-1,floor(ld(3))-1)+(ld(8)-floor(ld(8)))*(1-(ld(3)-floor(ld(3))))*alphasum(floor(ld(8)),floor(ld(3))-1)+(1-(ld(8)-floor(ld(8))))*(ld(3)-floor(ld(3)))*alphasum(floor(ld(8))-1,floor(ld(3)))+(ld(8)-floor(ld(8)))*(ld(3)-floor(ld(3)))*alphasum(floor(ld(8)),floor(ld(3))))-((1-(ld(9)-floor(ld(9))))*(1-(ld(2)-floor(ld(2))))*alphasum(floor(ld(9))-1,floor(ld(2))-1)+(ld(9)-floor(ld(9)))*(1-(ld(2)-floor(ld(2))))*alphasum(floor(ld(9)),floor(ld(2))-1)+(1-(ld(9)-floor(ld(9))))*(ld(2)-floor(ld(2)))*alphasum(floor(ld(9))-1,floor(ld(2)))+(ld(9)-floor(ld(9)))*(ld(2)-floor(ld(2)))*alphasum(floor(ld(9)),floor(ld(2))))+((1-(ld(8)-floor(ld(8))))*(1-(ld(2)-floor(ld(2))))*alphasum(floor(ld(8))-1,floor(ld(2))-1)+(ld(8)-floor(ld(8)))*(1-(ld(2)-floor(ld(2))))*alphasum(floor(ld(8)),floor(ld(2))-1)+(1-(ld(8)-floor(ld(8))))*(ld(2)-floor(ld(2)))*alphasum(floor(ld(8))-1,floor(ld(2)))+(ld(8)-floor(ld(8)))*(ld(2)-floor(ld(2)))*alphasum(floor(ld(8)),floor(ld(2)))))/(ld(4)*ld(5)),0)':interpolation=bilinear,crop=192:108:0:0:exact=1,unpremultiply=inplace=1,format=rgba,trim=start_frame=0:end_frame=16[group0_out];color=c=black:s=192x108:r=8/1:d=2.000000[base];[base][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo0];[vo0]null[vout];anullsrc=r=48000:cl=stereo,atrim=end_sample=96000[aout]",
+    "-map",
+    "[vout]",
+    "-map",
+    "[aout]",
+    "-t",
+    "2.000000",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "ultrafast",
+    "-crf",
+    "0",
+    "-pix_fmt",
+    "yuv444p",
+    "-color_primaries",
+    "bt709",
+    "-color_trc",
+    "bt709",
+    "-colorspace",
+    "bt709",
+    "-color_range",
+    "tv",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "192k",
+    "-movflags",
+    "+faststart",
+    "-f",
+    "mp4",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\sequence-sampling-final-work-20261017\\S02\\renders\\.tmp\\render_20261017121851_75d1c515\\area.mp4"
+  ],
+  "filter_graph_transport": {
+    "mode": "inline",
+    "sha256": "sha256:34036256371301d403aae9bc6d3b795e4d51764bbbde2e97aba8dff0823261ef",
+    "utf8_bytes": 9604,
+    "logical_command_utf16_units": 10418
+  },
+  "filter_complex": "[0:v]trim=start=0.000000:end=2.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=8/1:start_time=0.00000000:round=up:eof_action=pass,crop=576:216:0:0:exact=1,format=gbrapf32le,premultiply=inplace=1,scale=576:216,unpremultiply=inplace=1,format=rgba,setsar=1[v0];color=c=black@0.0:s=576x216:r=8/1:d=2.000000,format=rgba[group0_base];[group0_base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[group0_vo0];[group0_vo0]format=rgba,format=rgba,pad=576:216:0:0:color=black@0,setsar=1,format=gbrapf32le,premultiply=inplace=1,geq=r='if(lt(X,192)*lt(Y,108),st(0,clip((576.00000000),2,576));st(1,clip((216.00000000),2,216));st(2,clip((0.00000000),0,576-ld(0)));st(3,clip((0.00000000),0,216-ld(1)));st(4,192/ld(0));st(5,108/ld(1));st(6,ld(2)+(0.50000000)*ld(0)+((X+0.5-(0.50000000)*192)*cos((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*sin((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(4))-0.5);st(7,ld(3)+(0.50000000)*ld(1)+(-(X+0.5-(0.50000000)*192)*sin((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*cos((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(5))-0.5);st(4,max(1,1/(max(0.00000001,abs(1.00000000))*ld(4))));st(5,max(1,1/(max(0.00000001,abs(1.00000000))*ld(5))));st(8,clip(ld(6)+0.5-ld(4)/2,ld(2),ld(2)+ld(0)));st(9,clip(ld(6)+0.5+ld(4)/2,ld(2),ld(2)+ld(0)));st(2,clip(ld(7)+0.5-ld(5)/2,ld(3),ld(3)+ld(1)));st(3,clip(ld(7)+0.5+ld(5)/2,ld(3),ld(3)+ld(1)));(((1-(ld(9)-floor(ld(9))))*(1-(ld(3)-floor(ld(3))))*rsum(floor(ld(9))-1,floor(ld(3))-1)+(ld(9)-floor(ld(9)))*(1-(ld(3)-floor(ld(3))))*rsum(floor(ld(9)),floor(ld(3))-1)+(1-(ld(9)-floor(ld(9))))*(ld(3)-floor(ld(3)))*rsum(floor(ld(9))-1,floor(ld(3)))+(ld(9)-floor(ld(9)))*(ld(3)-floor(ld(3)))*rsum(floor(ld(9)),floor(ld(3))))-((1-(ld(8)-floor(ld(8))))*(1-(ld(3)-floor(ld(3))))*rsum(floor(ld(8))-1,floor(ld(3))-1)+(ld(8)-floor(ld(8)))*(1-(ld(3)-floor(ld(3))))*rsum(floor(ld(8)),floor(ld(3))-1)+(1-(ld(8)-floor(ld(8))))*(ld(3)-floor(ld(3)))*rsum(floor(ld(8))-1,floor(ld(3)))+(ld(8)-floor(ld(8)))*(ld(3)-floor(ld(3)))*rsum(floor(ld(8)),floor(ld(3))))-((1-(ld(9)-floor(ld(9))))*(1-(ld(2)-floor(ld(2))))*rsum(floor(ld(9))-1,floor(ld(2))-1)+(ld(9)-floor(ld(9)))*(1-(ld(2)-floor(ld(2))))*rsum(floor(ld(9)),floor(ld(2))-1)+(1-(ld(9)-floor(ld(9))))*(ld(2)-floor(ld(2)))*rsum(floor(ld(9))-1,floor(ld(2)))+(ld(9)-floor(ld(9)))*(ld(2)-floor(ld(2)))*rsum(floor(ld(9)),floor(ld(2))))+((1-(ld(8)-floor(ld(8))))*(1-(ld(2)-floor(ld(2))))*rsum(floor(ld(8))-1,floor(ld(2))-1)+(ld(8)-floor(ld(8)))*(1-(ld(2)-floor(ld(2))))*rsum(floor(ld(8)),floor(ld(2))-1)+(1-(ld(8)-floor(ld(8))))*(ld(2)-floor(ld(2)))*rsum(floor(ld(8))-1,floor(ld(2)))+(ld(8)-floor(ld(8)))*(ld(2)-floor(ld(2)))*rsum(floor(ld(8)),floor(ld(2)))))/(ld(4)*ld(5)),0)':g='if(lt(X,192)*lt(Y,108),st(0,clip((576.00000000),2,576));st(1,clip((216.00000000),2,216));st(2,clip((0.00000000),0,576-ld(0)));st(3,clip((0.00000000),0,216-ld(1)));st(4,192/ld(0));st(5,108/ld(1));st(6,ld(2)+(0.50000000)*ld(0)+((X+0.5-(0.50000000)*192)*cos((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*sin((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(4))-0.5);st(7,ld(3)+(0.50000000)*ld(1)+(-(X+0.5-(0.50000000)*192)*sin((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*cos((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(5))-0.5);st(4,max(1,1/(max(0.00000001,abs(1.00000000))*ld(4))));st(5,max(1,1/(max(0.00000001,abs(1.00000000))*ld(5))));st(8,clip(ld(6)+0.5-ld(4)/2,ld(2),ld(2)+ld(0)));st(9,clip(ld(6)+0.5+ld(4)/2,ld(2),ld(2)+ld(0)));st(2,clip(ld(7)+0.5-ld(5)/2,ld(3),ld(3)+ld(1)));st(3,clip(ld(7)+0.5+ld(5)/2,ld(3),ld(3)+ld(1)));(((1-(ld(9)-floor(ld(9))))*(1-(ld(3)-floor(ld(3))))*gsum(floor(ld(9))-1,floor(ld(3))-1)+(ld(9)-floor(ld(9)))*(1-(ld(3)-floor(ld(3))))*gsum(floor(ld(9)),floor(ld(3))-1)+(1-(ld(9)-floor(ld(9))))*(ld(3)-floor(ld(3)))*gsum(floor(ld(9))-1,floor(ld(3)))+(ld(9)-floor(ld(9)))*(ld(3)-floor(ld(3)))*gsum(floor(ld(9)),floor(ld(3))))-((1-(ld(8)-floor(ld(8))))*(1-(ld(3)-floor(ld(3))))*gsum(floor(ld(8))-1,floor(ld(3))-1)+(ld(8)-floor(ld(8)))*(1-(ld(3)-floor(ld(3))))*gsum(floor(ld(8)),floor(ld(3))-1)+(1-(ld(8)-floor(ld(8))))*(ld(3)-floor(ld(3)))*gsum(floor(ld(8))-1,floor(ld(3)))+(ld(8)-floor(ld(8)))*(ld(3)-floor(ld(3)))*gsum(floor(ld(8)),floor(ld(3))))-((1-(ld(9)-floor(ld(9))))*(1-(ld(2)-floor(ld(2))))*gsum(floor(ld(9))-1,floor(ld(2))-1)+(ld(9)-floor(ld(9)))*(1-(ld(2)-floor(ld(2))))*gsum(floor(ld(9)),floor(ld(2))-1)+(1-(ld(9)-floor(ld(9))))*(ld(2)-floor(ld(2)))*gsum(floor(ld(9))-1,floor(ld(2)))+(ld(9)-floor(ld(9)))*(ld(2)-floor(ld(2)))*gsum(floor(ld(9)),floor(ld(2))))+((1-(ld(8)-floor(ld(8))))*(1-(ld(2)-floor(ld(2))))*gsum(floor(ld(8))-1,floor(ld(2))-1)+(ld(8)-floor(ld(8)))*(1-(ld(2)-floor(ld(2))))*gsum(floor(ld(8)),floor(ld(2))-1)+(1-(ld(8)-floor(ld(8))))*(ld(2)-floor(ld(2)))*gsum(floor(ld(8))-1,floor(ld(2)))+(ld(8)-floor(ld(8)))*(ld(2)-floor(ld(2)))*gsum(floor(ld(8)),floor(ld(2)))))/(ld(4)*ld(5)),0)':b='if(lt(X,192)*lt(Y,108),st(0,clip((576.00000000),2,576));st(1,clip((216.00000000),2,216));st(2,clip((0.00000000),0,576-ld(0)));st(3,clip((0.00000000),0,216-ld(1)));st(4,192/ld(0));st(5,108/ld(1));st(6,ld(2)+(0.50000000)*ld(0)+((X+0.5-(0.50000000)*192)*cos((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*sin((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(4))-0.5);st(7,ld(3)+(0.50000000)*ld(1)+(-(X+0.5-(0.50000000)*192)*sin((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*cos((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(5))-0.5);st(4,max(1,1/(max(0.00000001,abs(1.00000000))*ld(4))));st(5,max(1,1/(max(0.00000001,abs(1.00000000))*ld(5))));st(8,clip(ld(6)+0.5-ld(4)/2,ld(2),ld(2)+ld(0)));st(9,clip(ld(6)+0.5+ld(4)/2,ld(2),ld(2)+ld(0)));st(2,clip(ld(7)+0.5-ld(5)/2,ld(3),ld(3)+ld(1)));st(3,clip(ld(7)+0.5+ld(5)/2,ld(3),ld(3)+ld(1)));(((1-(ld(9)-floor(ld(9))))*(1-(ld(3)-floor(ld(3))))*bsum(floor(ld(9))-1,floor(ld(3))-1)+(ld(9)-floor(ld(9)))*(1-(ld(3)-floor(ld(3))))*bsum(floor(ld(9)),floor(ld(3))-1)+(1-(ld(9)-floor(ld(9))))*(ld(3)-floor(ld(3)))*bsum(floor(ld(9))-1,floor(ld(3)))+(ld(9)-floor(ld(9)))*(ld(3)-floor(ld(3)))*bsum(floor(ld(9)),floor(ld(3))))-((1-(ld(8)-floor(ld(8))))*(1-(ld(3)-floor(ld(3))))*bsum(floor(ld(8))-1,floor(ld(3))-1)+(ld(8)-floor(ld(8)))*(1-(ld(3)-floor(ld(3))))*bsum(floor(ld(8)),floor(ld(3))-1)+(1-(ld(8)-floor(ld(8))))*(ld(3)-floor(ld(3)))*bsum(floor(ld(8))-1,floor(ld(3)))+(ld(8)-floor(ld(8)))*(ld(3)-floor(ld(3)))*bsum(floor(ld(8)),floor(ld(3))))-((1-(ld(9)-floor(ld(9))))*(1-(ld(2)-floor(ld(2))))*bsum(floor(ld(9))-1,floor(ld(2))-1)+(ld(9)-floor(ld(9)))*(1-(ld(2)-floor(ld(2))))*bsum(floor(ld(9)),floor(ld(2))-1)+(1-(ld(9)-floor(ld(9))))*(ld(2)-floor(ld(2)))*bsum(floor(ld(9))-1,floor(ld(2)))+(ld(9)-floor(ld(9)))*(ld(2)-floor(ld(2)))*bsum(floor(ld(9)),floor(ld(2))))+((1-(ld(8)-floor(ld(8))))*(1-(ld(2)-floor(ld(2))))*bsum(floor(ld(8))-1,floor(ld(2))-1)+(ld(8)-floor(ld(8)))*(1-(ld(2)-floor(ld(2))))*bsum(floor(ld(8)),floor(ld(2))-1)+(1-(ld(8)-floor(ld(8))))*(ld(2)-floor(ld(2)))*bsum(floor(ld(8))-1,floor(ld(2)))+(ld(8)-floor(ld(8)))*(ld(2)-floor(ld(2)))*bsum(floor(ld(8)),floor(ld(2)))))/(ld(4)*ld(5)),0)':a='if(lt(X,192)*lt(Y,108),st(0,clip((576.00000000),2,576));st(1,clip((216.00000000),2,216));st(2,clip((0.00000000),0,576-ld(0)));st(3,clip((0.00000000),0,216-ld(1)));st(4,192/ld(0));st(5,108/ld(1));st(6,ld(2)+(0.50000000)*ld(0)+((X+0.5-(0.50000000)*192)*cos((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*sin((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(4))-0.5);st(7,ld(3)+(0.50000000)*ld(1)+(-(X+0.5-(0.50000000)*192)*sin((0.00000000)*PI/180)+(Y+0.5-(0.50000000)*108)*cos((0.00000000)*PI/180))/(max(0.00000001,abs(1.00000000))*ld(5))-0.5);st(4,max(1,1/(max(0.00000001,abs(1.00000000))*ld(4))));st(5,max(1,1/(max(0.00000001,abs(1.00000000))*ld(5))));st(8,clip(ld(6)+0.5-ld(4)/2,ld(2),ld(2)+ld(0)));st(9,clip(ld(6)+0.5+ld(4)/2,ld(2),ld(2)+ld(0)));st(2,clip(ld(7)+0.5-ld(5)/2,ld(3),ld(3)+ld(1)));st(3,clip(ld(7)+0.5+ld(5)/2,ld(3),ld(3)+ld(1)));(((1-(ld(9)-floor(ld(9))))*(1-(ld(3)-floor(ld(3))))*alphasum(floor(ld(9))-1,floor(ld(3))-1)+(ld(9)-floor(ld(9)))*(1-(ld(3)-floor(ld(3))))*alphasum(floor(ld(9)),floor(ld(3))-1)+(1-(ld(9)-floor(ld(9))))*(ld(3)-floor(ld(3)))*alphasum(floor(ld(9))-1,floor(ld(3)))+(ld(9)-floor(ld(9)))*(ld(3)-floor(ld(3)))*alphasum(floor(ld(9)),floor(ld(3))))-((1-(ld(8)-floor(ld(8))))*(1-(ld(3)-floor(ld(3))))*alphasum(floor(ld(8))-1,floor(ld(3))-1)+(ld(8)-floor(ld(8)))*(1-(ld(3)-floor(ld(3))))*alphasum(floor(ld(8)),floor(ld(3))-1)+(1-(ld(8)-floor(ld(8))))*(ld(3)-floor(ld(3)))*alphasum(floor(ld(8))-1,floor(ld(3)))+(ld(8)-floor(ld(8)))*(ld(3)-floor(ld(3)))*alphasum(floor(ld(8)),floor(ld(3))))-((1-(ld(9)-floor(ld(9))))*(1-(ld(2)-floor(ld(2))))*alphasum(floor(ld(9))-1,floor(ld(2))-1)+(ld(9)-floor(ld(9)))*(1-(ld(2)-floor(ld(2))))*alphasum(floor(ld(9)),floor(ld(2))-1)+(1-(ld(9)-floor(ld(9))))*(ld(2)-floor(ld(2)))*alphasum(floor(ld(9))-1,floor(ld(2)))+(ld(9)-floor(ld(9)))*(ld(2)-floor(ld(2)))*alphasum(floor(ld(9)),floor(ld(2))))+((1-(ld(8)-floor(ld(8))))*(1-(ld(2)-floor(ld(2))))*alphasum(floor(ld(8))-1,floor(ld(2))-1)+(ld(8)-floor(ld(8)))*(1-(ld(2)-floor(ld(2))))*alphasum(floor(ld(8)),floor(ld(2))-1)+(1-(ld(8)-floor(ld(8))))*(ld(2)-floor(ld(2)))*alphasum(floor(ld(8))-1,floor(ld(2)))+(ld(8)-floor(ld(8)))*(ld(2)-floor(ld(2)))*alphasum(floor(ld(8)),floor(ld(2)))))/(ld(4)*ld(5)),0)':interpolation=bilinear,crop=192:108:0:0:exact=1,unpremultiply=inplace=1,format=rgba,trim=start_frame=0:end_frame=16[group0_out];color=c=black:s=192x108:r=8/1:d=2.000000[base];[base][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo0];[vo0]null[vout];anullsrc=r=48000:cl=stereo,atrim=end_sample=96000[aout]",
+  "inputs": [
+    {
+      "kind": "sequence-projection-budget",
+      "method": "area",
+      "max_working_bytes": 1073741824,
+      "nodes": [
+        {
+          "clip_id": "parent",
+          "parent_id": null,
+          "source_canvas": {
+            "width": 576,
+            "height": 216
+          },
+          "parent_canvas": {
+            "width": 192,
+            "height": 108
+          },
+          "working_canvas": {
+            "width": 576,
+            "height": 216
+          },
+          "components_bytes": {
+            "source_rgba_buffers": 995328,
+            "parent_rgba_buffers": 331776,
+            "working_float_and_byte_buffers": 6967296,
+            "summed_area_double_planes": 3981312
+          },
+          "estimated_working_bytes": 12275712
+        }
+      ],
+      "estimated_working_bytes": 12275712,
+      "scope": "reachable-sequence-projection-instances-only-not-process-rss",
+      "time_disjoint_instances_charged": true,
+      "unused_sequences_charged": false
+    },
+    {
+      "asset_id": "pattern",
+      "clip_id": "parent.texture",
+      "input": 0,
+      "kind": "video",
+      "source_in_tick": 0,
+      "source_out_tick": 180000
+    },
+    {
+      "kind": "sequence-composite",
+      "clip_id": "parent",
+      "parent_id": null,
+      "sequence_id": "child",
+      "canvas": {
+        "width": 576,
+        "height": 216,
+        "alpha": true
+      },
+      "parent_canvas": {
+        "width": 192,
+        "height": 108
+      },
+      "anchor_space": "cropped-child-canvas",
+      "raster_adaptation": "crop-fit-trs-inverse-sampling",
+      "working_canvas": {
+        "width": 576,
+        "height": 216
+      },
+      "spatial_sampler": "native-premultiplied-area-once",
+      "sampling_kernel": "source-axis-separable-box-minimum-one-pixel",
+      "projection_working_bytes": 12275712,
+      "compositing": "isolated-source-over",
+      "child_layer_count": 1,
+      "timeline_start_tick": 0,
+      "duration_tick": 180000,
+      "spatial_order": [
+        "child-composite",
+        "crop",
+        "transform",
+        "opacity",
+        "effects",
+        "mask",
+        "fade"
+      ],
+      "intermediate_files": 0
+    },
+    {
+      "kind": "sequence-audio-root",
+      "sample_rate": 48000,
+      "output_samples": 96000,
+      "child_input_count": 0,
+      "mixing": "float-sum-normalize-disabled",
+      "automatic_limiter": false,
+      "has_audible_inputs": false
+    }
+  ],
+  "profile": null,
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 8,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 192,
+      "height": 108,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "ultrafast",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    },
+    "sequence_sampling": {
+      "method": "area",
+      "max_working_bytes": 1073741824
+    }
+  },
+  "warnings": [],
+  "quality": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "metrics": {
+      "duration_seconds": 2.0,
+      "width": 192,
+      "height": 108,
+      "audio_codec": "aac",
+      "video_duration_seconds": 2.0,
+      "audio_duration_seconds": 2.0,
+      "av_duration_delta_seconds": 0.0,
+      "probe": {
+        "duration_seconds": 2.0,
+        "duration_tick": 180000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High 4:4:4 Predictive",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.f4000a",
+            "width": 192,
+            "height": 108,
+            "coded_width": 192,
+            "coded_height": 108,
+            "has_b_frames": 0,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv444p",
+            "level": 10,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "8/1",
+            "avg_frame_rate": "8/1",
+            "time_base": "1/16384",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 32768,
+            "duration": "2.000000",
+            "bit_rate": "242644",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "16",
+            "extradata_size": 48,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_long_name": "AAC (Advanced Audio Coding)",
+            "profile": "LC",
+            "codec_type": "audio",
+            "codec_tag_string": "mp4a",
+            "codec_tag": "0x6134706d",
+            "mime_codec_string": "mp4a.40.2",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 2,
+            "channel_layout": "stereo",
+            "bits_per_sample": 0,
+            "initial_padding": 0,
+            "id": "0x2",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 96000,
+            "duration": "2.000000",
+            "bit_rate": "2323",
+            "nb_frames": "95",
+            "extradata_size": 5,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "SoundHandler"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 192,
+          "height": 108,
+          "pix_fmt": "yuv444p",
+          "fps": "8/1",
+          "color_space": "bt709",
+          "duration_seconds": 2.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "aac",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 2.0,
+          "start_time_seconds": 0.0
+        }
+      }
+    }
+  },
+  "project_fingerprint": "c18a94df82ae388b8549754ba17943c85b5e87bc7764bcb259465b0296086876",
+  "input_hashes": {
+    "pattern": "sha256:b8c61b7af8b238e291385830c59aa3b85a3691f6a131c207ecfd8e6bfffe4299"
+  },
+  "resume_of": null
+}

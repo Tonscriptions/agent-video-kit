@@ -20,6 +20,7 @@ from .audio_tempo import (CONTEXT_FRAMES as _audio_context_frames,
                          context_windows as _audio_context_windows)
 from .artifact_locks import verification_scope
 from .sequence_canvas import sequence_canvas, validate_output_alignment
+from .sequence_sampling import configuration as _sequence_sampling_configuration, projection_budget, area_rectangle
 
 from .errors import AppError, dependency_error
 from .media import ffmpeg_path, probe_media
@@ -3101,7 +3102,7 @@ def _composite_visual_layers(
 
 def _sequence_raster_filters(
     clip: dict[str, Any], transform: dict[str, str], source: dict[str, int], target: dict[str, int],
-    start: float, tps: int,
+    start: float, tps: int, *, sampling: str = 'bilinear',
 ) -> list[str]:
     """Project a child raster into its parent's canvas around the child anchor.
 
@@ -3138,12 +3139,20 @@ def _sequence_raster_filters(
         f'st(4,{fit_x});st(5,{fit_y});'
         f"st(6,ld(2)+({values['anchor_x']})*ld(0)+({dx}*cos({angle})+{dy}*sin({angle}))/({scale}*ld(4))-0.5);"
         f"st(7,ld(3)+({values['anchor_y']})*ld(1)+(-{dx}*sin({angle})+{dy}*cos({angle}))/({scale}*ld(5))-0.5);"
-        'st(8,gte(ld(6),ld(2)-0.5)*lt(ld(6),ld(2)+ld(0)-0.5)*gte(ld(7),ld(3)-0.5)*lt(ld(7),ld(3)+ld(1)-0.5));'
     )
     sample_x = 'clip(ld(6),ld(2),ld(2)+ld(0)-1)'
     sample_y = 'clip(ld(7),ld(3),ld(3)+ld(1)-1)'
     def plane(name: str) -> str:
-        return _expr_arg(setup+f'if(ld(8),{name}({sample_x},{sample_y}),0)')
+        if sampling == 'area':
+            # Reuse registers only after their old values have been consumed.
+            edges = (f'st(4,max(1,1/({scale}*ld(4))));st(5,max(1,1/({scale}*ld(5))));'
+                     'st(8,clip(ld(6)+0.5-ld(4)/2,ld(2),ld(2)+ld(0)));'
+                     'st(9,clip(ld(6)+0.5+ld(4)/2,ld(2),ld(2)+ld(0)));'
+                     'st(2,clip(ld(7)+0.5-ld(5)/2,ld(3),ld(3)+ld(1)));'
+                     'st(3,clip(ld(7)+0.5+ld(5)/2,ld(3),ld(3)+ld(1)));')
+            return _expr_arg(f'if(lt(X,{tw})*lt(Y,{th}),'+setup+edges+area_rectangle(name)+',0)')
+        inside = 'st(8,gte(ld(6),ld(2)-0.5)*lt(ld(6),ld(2)+ld(0)-0.5)*gte(ld(7),ld(3)-0.5)*lt(ld(7),ld(3)+ld(1)-0.5));'
+        return _expr_arg(setup+inside+f'if(ld(8),{name}({sample_x},{sample_y}),0)')
     return ['format=rgba', f'pad={max(sw,tw)}:{max(sh,th)}:0:0:color=black@0', 'setsar=1',
             'format=gbrapf32le', 'premultiply=inplace=1',
             f"geq=r={plane('r')}:g={plane('g')}:b={plane('b')}:a={plane('alpha')}:interpolation=bilinear",
@@ -3154,7 +3163,7 @@ def _build_compositing_tree(
     root: Path, specs: list[dict[str, Any]], groups: dict[str, dict[str, Any]],
     filters: list[str], warnings: list[dict[str, Any]], input_meta: list[dict[str, Any]],
     *, width: int, height: int, fps: dict[str, int], fps_value: str, duration: float,
-    tps: int, transparent_canvas: bool,
+    tps: int, transparent_canvas: bool, sampling: str = 'bilinear',
 ) -> str:
     """Composite complete child sequences before applying container operations.
 
@@ -3163,6 +3172,8 @@ def _build_compositing_tree(
     file, GUI, background server or second render is needed.
     """
     buckets: dict[str | None, list[dict[str, Any]]] = {}
+    quota_nodes = {node['clip_id']:node for item in input_meta if item.get('kind')=='sequence-projection-budget'
+                   for node in item['nodes']}
     for spec in specs:
         buckets.setdefault(spec.get('group_id'), []).append(spec)
 
@@ -3192,9 +3203,9 @@ def _build_compositing_tree(
         transform = _transform_exprs(clip, start, tps)
         identity = {'scale':'1.00000000','rotation':'0.00000000','position_x':'0.50000000',
                     'position_y':'0.50000000','anchor_x':'0.50000000','anchor_y':'0.50000000'}
-        adapt_raster = source_canvas != parent_canvas or bool(crop)
+        adapt_raster = source_canvas != parent_canvas or bool(crop) or sampling == 'area'
         if adapt_raster:
-            chain.extend(_sequence_raster_filters(clip, transform, source_canvas, parent_canvas, start, tps))
+            chain.extend(_sequence_raster_filters(clip, transform, source_canvas, parent_canvas, start, tps, sampling=sampling))
         else:
             if any(transform[key] != value for key,value in identity.items()):
                 chain.extend(_affine_video_filters(transform))
@@ -3242,7 +3253,9 @@ def _build_compositing_tree(
                            'raster_adaptation':'crop-fit-trs-inverse-sampling' if adapt_raster else 'same-raster',
                            'working_canvas':{'width':max(source_canvas['width'],parent_canvas['width']),
                                              'height':max(source_canvas['height'],parent_canvas['height'])} if adapt_raster else copy.deepcopy(source_canvas),
-                           'spatial_sampler':'native-premultiplied-bilinear-once' if adapt_raster else 'legacy-same-raster',
+                           'spatial_sampler':f'native-premultiplied-{sampling}-once' if adapt_raster else 'legacy-same-raster',
+                           'sampling_kernel':'source-axis-separable-box-minimum-one-pixel' if sampling == 'area' else 'bilinear',
+                           'projection_working_bytes':quota_nodes[group_id]['estimated_working_bytes'],
                            'compositing':'isolated-source-over','child_layer_count':len(group_specs),
                            'timeline_start_tick':int(clip['timeline_start_tick']),'duration_tick':int(clip['duration_tick']),
                            'spatial_order':['child-composite','crop','transform','opacity','effects','mask','fade'],
@@ -3528,7 +3541,6 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     audio_specs: list[dict[str, Any]] = []
     input_meta: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
-    local_audio_engine = _audio_stretch_configuration(root, settings.get('audio_stretch'))
     subtitle_overlays: list[dict[str, Any]] = []
     adjustment_layers: list[tuple[str, list[Any], float, float]] = []
     raw_adjustments = settings.get("adjustments")
@@ -3556,6 +3568,9 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     index = 0
     composite_groups: dict[str, dict[str, Any]] = {}
     render_tracks = _flatten_sequence_tracks(project, sequence, warnings, groups=composite_groups)
+    sampling_config = _sequence_sampling_configuration(settings.get('sequence_sampling'))
+    input_meta.append(projection_budget(composite_groups, sampling_config))
+    local_audio_engine = _audio_stretch_configuration(root, settings.get('audio_stretch'))
     for track in sorted(render_tracks, key=lambda item: int(item.get("order", 0))):
         track_audio = track.get("audio") if isinstance(track.get("audio"), dict) else {}
         track_id = str(track.get("id"))
@@ -4061,7 +4076,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     current = _build_compositing_tree(
         root, [*video_specs, *subtitle_specs], composite_groups, filters, warnings, input_meta,
         width=width, height=height, fps=fps, fps_value=fps_value, duration=duration,
-        tps=tps, transparent_canvas=transparent_canvas,
+        tps=tps, transparent_canvas=transparent_canvas, sampling=sampling_config['method'],
     )
     if not has_adjustments:
         filters.append(f"[{current}]null[vout]")

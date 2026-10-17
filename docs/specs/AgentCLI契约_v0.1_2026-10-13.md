@@ -378,3 +378,11 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 render/quality/golden/queue 选中子序列时默认使用其有效画布；显式输出尺寸只覆盖本次选中根，不改作者项目或其他显式子画布。2..8192 整数内部画布允许奇数；自定义 CLI 输出仍 64..8192，420 宽高/422 宽对齐不满足返回 `OUTPUT_CANVAS_ALIGNMENT_INVALID`（退出 2，任务创建前拒绝），非法作者画布返回 `SEQUENCE_CANVAS_INVALID` 或 Schema 错误。manifest 的 sequence-composite 记录源 canvas/parent_canvas、cropped-child-canvas anchor、工作栅格及原生一次采样；没有新增顶层 GUI 或远程服务。见[空间顺序与继承契约](./独立序列画布与父级投影契约_v0.1_2026-10-17.md)。
 
 本轮 V31：序列可声明独立像素画布，子级先在本地画布合成，父级按原生子坐标一次预乘双线性投影；选中子序列的 render/quality/queue 默认使用其画布。完整 **643/643，1128.545 秒**，0 跳过，109 Python+1 Schema 共 110 文件原字节冻结；25 新增/114 关联方法均为完整子集。固定 V30 同测 25 方法：20 失败、5 控制通过，含子测试 30 条失败记录。九组/65 次正式 CLI 全成功，216 新主帧、216 旧帧、216 参考帧与 24 个单独子级帧分计；C01–C08 最大 RGB 误差 2（门槛 5），C09 与旧版字节一致。168 帧为空间独立参考，24 帧只验字形投影，24 帧只验继承兼容。开发配置失败和错误参考保留，0 新模型推理；未连续播放或听审。独立子 FPS/色域/SAR、高频抗锯齿、长片资源、自然质量和完整剪映等价仍未验收。 [九组实际视频及失败](../validation/独立序列画布与原生坐标投影实测_2026-10-17.md)、[机器证据](../validation/evidence/sequence-canvas-20261017.json)。
+
+## V32：序列面积核与工作配额
+
+render、quality check/golden 支持 `--sequence-sampling bilinear|area` 和 `--sequence-memory-mib 1..65536`，只覆盖本次输出。队列用 `sequence_sampling` / `sequence_memory_mib`，非法值入队前原子拒绝。作者 `settings.sequence_sampling` 可声明 method/max_working_bytes（1 字节..64 GiB），省略/null 默认 bilinear 与 1 GiB。配置属于输出指纹，取消续跑无覆盖时恢复原值；显式改值仍执行既有指纹检查。
+
+manifest `sequence-projection-budget` 保存可达节点与分量，`sequence-composite` 保存采样核及估算。超限 `SEQUENCE_PROJECTION_BUDGET_EXCEEDED`、退出 2，在任务/大型数组/FFmpeg 启动前拒绝；dry-run 也受约束。估算不构成全进程 RSS 上界。配置校验报告 SEQUENCE_SAMPLING_INVALID，render 的作者工程错误可能以 PROJECT_INVALID 包装并保留具体 cause；外部格式导出明确报告采样契约 Unsupported。
+
+默认 bilinear 九组与固定 V31 像素一致，area 的一般旋转使用源轴矩形核。见[契约](./序列面积采样与工作栅格预算契约_v0.1_2026-10-17.md)和[九组真实成片及失败](../validation/序列面积采样与工作配额实测_2026-10-17.md)。

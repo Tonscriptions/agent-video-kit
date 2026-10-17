@@ -31,6 +31,13 @@ default canvas, while explicit output dimensions affect only the selected root.
 Keep internal odd rasters distinct from final encoder alignment requirements.
 This does not add independent child FPS, color space or HDR acceptance.
 
+For reduced sequence layers, read the [area sampling contract](../../docs/specs/序列面积采样与工作栅格预算契约_v0.1_2026-10-17.md).
+Use `render --sequence-sampling area` explicitly; omitted settings retain
+bilinear behavior. `--sequence-memory-mib` controls the projection admission
+quota (default 1024 MiB), not whole-process RSS. A quota error occurs before
+render allocation; inspect its node breakdown before changing sizes or budget.
+Area uses a source-axis box, not exact rotated-pixel geometry or HDR filtering.
+
 For text-controlled masked video windows, read the [local VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
 Register existing fixed Wan VACE Diffusers weights/Python/evidence with
 `media adapter register --engine diffusers-wan-vace-local-v1 --device cuda`.

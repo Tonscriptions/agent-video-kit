@@ -39,6 +39,14 @@
       "additionalProperties": true,
       "required": ["timebase", "canvas"],
       "properties": {
+        "sequence_sampling": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "method": {"type": "string", "enum": ["bilinear", "area"], "default": "bilinear"},
+            "max_working_bytes": {"type": "integer", "minimum": 1, "maximum": 68719476736, "default": 1073741824}
+          }
+        },
         "audio_stretch": {
           "type": ["object", "null"],
           "additionalProperties": false,

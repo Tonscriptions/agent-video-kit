@@ -660,6 +660,10 @@ def export_draft(root: Path, project: dict[str, Any], output: Path, *, strict: b
             if all(clip.get(field) == video.get(field) for field in fields) and clip.get("keyframes",[]) == audio_frames and linked not in foldable.values():
                 foldable[clip["id"]] = linked
     _item(items, "project-model", "Mapped", "agent-project/0.1.0", DRAFT_PROFILE, "本地明文文件；商业版本可打开性与视觉结果需独立验收")
+    if project['settings'].get('sequence_sampling') is not None:
+        _item(items, 'sequence-sampling', 'Unsupported', 'settings.sequence_sampling',
+              detail='外部草稿不执行本地序列面积核或工作配额；原值只保存在旁车',
+              preserved_source=project['settings']['sequence_sampling'])
     if str(canvas.get("background","black")).lower() not in {"black","#000000","0x000000"}:
         _item(items,"canvas-background","Unsupported","settings.canvas.background",detail="非黑色或透明画布尚未映射到外部草稿；源值保存在旁车",preserved_source=canvas.get("background"))
     if len(project["sequences"]) > 1:

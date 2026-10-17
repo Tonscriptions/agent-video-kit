@@ -1,0 +1,40 @@
+test_animated_crop_and_scale_keep_author_clock (test_sequence_sampling.SequenceSamplingTests.test_animated_crop_and_scale_keep_author_clock) ... ok
+test_anisotropic_color_minification_matches_cell_overlap (test_sequence_sampling.SequenceSamplingTests.test_anisotropic_color_minification_matches_cell_overlap) ... ok
+test_area_identity_retains_native_pixel_values (test_sequence_sampling.SequenceSamplingTests.test_area_identity_retains_native_pixel_values) ... ok
+test_budget_rejection_precedes_ffmpeg_and_job_allocation (test_sequence_sampling.SequenceSamplingTests.test_budget_rejection_precedes_ffmpeg_and_job_allocation) ... ok
+test_cancel_resume_retains_area_and_rejects_changed_override (test_sequence_sampling.SequenceSamplingTests.test_cancel_resume_retains_area_and_rejects_changed_override) ... ok
+test_cli_quality_fingerprints_and_author_settings (test_sequence_sampling.SequenceSamplingTests.test_cli_quality_fingerprints_and_author_settings) ... ok
+test_exact_budget_and_repeated_references_are_accounted_separately (test_sequence_sampling.SequenceSamplingTests.test_exact_budget_and_repeated_references_are_accounted_separately) ... FAIL
+test_extreme_cross_aspect_canvas_is_rejected_without_large_arrays (test_sequence_sampling.SequenceSamplingTests.test_extreme_cross_aspect_canvas_is_rejected_without_large_arrays) ... ok
+test_fractional_crop_uses_fractional_pixel_edges (test_sequence_sampling.SequenceSamplingTests.test_fractional_crop_uses_fractional_pixel_edges) ... ok
+test_general_rotation_uses_declared_source_axis_kernel (test_sequence_sampling.SequenceSamplingTests.test_general_rotation_uses_declared_source_axis_kernel) ... ok
+test_hidden_transparent_color_does_not_tint_area_average (test_sequence_sampling.SequenceSamplingTests.test_hidden_transparent_color_does_not_tint_area_average) ... ok
+test_invalid_sampling_rejected_by_builtin_and_schema (test_sequence_sampling.SequenceSamplingTests.test_invalid_sampling_rejected_by_builtin_and_schema) ... ok
+test_native_exchange_retains_sampling_external_reports_loss (test_sequence_sampling.SequenceSamplingTests.test_native_exchange_retains_sampling_external_reports_loss) ... ok
+test_omitted_and_explicit_bilinear_are_pixel_compatible (test_sequence_sampling.SequenceSamplingTests.test_omitted_and_explicit_bilinear_are_pixel_compatible) ... ok
+test_quarter_turn_and_noncentral_anchor (test_sequence_sampling.SequenceSamplingTests.test_quarter_turn_and_noncentral_anchor) ... ok
+test_queue_persists_and_executes_area_override (test_sequence_sampling.SequenceSamplingTests.test_queue_persists_and_executes_area_override) ... ok
+test_queue_rejects_malformed_sampling_atomically (test_sequence_sampling.SequenceSamplingTests.test_queue_rejects_malformed_sampling_atomically) ... ok
+test_same_canvas_shrink_also_selects_area_sampling (test_sequence_sampling.SequenceSamplingTests.test_same_canvas_shrink_also_selects_area_sampling) ... ok
+test_three_pixel_stripes_preserve_their_area_mean (test_sequence_sampling.SequenceSamplingTests.test_three_pixel_stripes_preserve_their_area_mean) ... ok
+test_unused_large_sequence_is_not_charged_to_root (test_sequence_sampling.SequenceSamplingTests.test_unused_large_sequence_is_not_charged_to_root) ... ok
+
+======================================================================
+FAIL: test_exact_budget_and_repeated_references_are_accounted_separately (test_sequence_sampling.SequenceSamplingTests.test_exact_budget_and_repeated_references_are_accounted_separately)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_sampling.py", line 209, in test_exact_budget_and_repeated_references_are_accounted_separately
+    self.track('seq_main','again',1);self.container('child',track='again',id='again');self.compose()
+                                                                                      ~~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_canvas.py", line 46, in compose
+    return self.call('timeline','compose','--project',self.root,'--input',path)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 56, in call
+    self.assertEqual(code,0,value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'timeline.compose', 'request_id': 'req_20261017115417_8bd1dfc6', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'PROJECT_INVALID', 'message': '时间线变更会生成无效项目', 'path': None, 'retryable': False, 'cause': '{"ok": false, "errors": [{"code": "ID_DUPLICATE", "message": "重复 ID: again", "path": "sequences[0].tracks[2].clips[0].id", "retryable": false}], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "pattern", "rights_ref": "pattern", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "pattern", "rights_ref": "pattern", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "pattern", "rights_ref": "pattern", "record_version": 1, "context": "project_asset"}], "rights": {"ok": true, "target": "commercial_ad", "checked": 1, "required_records": 1, "failures": [], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "pattern", "rights_ref": "pattern", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "pattern", "rights_ref": "pattern", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "pattern", "rights_ref": "pattern", "record_version": 1, "context": "project_asset"}], "disposition_decisions": [], "effective_disposition_decisions": []}, "schema_engine": "jsonschema", "asset_count": 1, "sequence_count": 2}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T11:54:17.279955Z', 'finished_at': '2026-10-17T11:54:17.279961Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 20 tests in 23.345s
+
+FAILED (failures=1)

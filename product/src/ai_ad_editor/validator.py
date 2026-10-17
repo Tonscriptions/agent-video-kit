@@ -204,6 +204,12 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
 
     settings_value = project.get("settings")
     if isinstance(settings_value, dict):
+        if 'sequence_sampling' in settings_value:
+            from .sequence_sampling import configuration as sequence_sampling_configuration
+            try:
+                sequence_sampling_configuration(settings_value['sequence_sampling'])
+            except AppError as exc:
+                error(exc.code, exc.message, exc.path or 'settings.sequence_sampling')
         if 'audio_stretch' in settings_value:
             from .audio_stretch import configuration
             try:

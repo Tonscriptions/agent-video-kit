@@ -28,6 +28,12 @@ Named audio send/return, independent child FPS/color/SAR, nested freeze,
 standalone slide/wipe, linear-light/HDR and broad performance remain acceptance
 boundaries; preserve existing audio and quality warnings. Native bilinear
 sampling is not a promise of high-frequency minification quality.
+An explicit `settings.sequence_sampling.method: area` selects a premultiplied
+source-axis box for sequence containers, including same-canvas shrink; see the
+[sampling and quota contract](../../docs/specs/序列面积采样与工作栅格预算契约_v0.1_2026-10-17.md).
+Leaf sampling remains separate. General rotation is not exact rotated-pixel
+integration. Inspect `sequence-projection-budget` and preserve a resource
+rejection instead of silently shrinking, dropping frames or raising the budget.
 
 Use a registered SAM2 adapter with local `--prompts` for multiple selected
 objects, boxes, positive/negative points and future-frame corrections; read

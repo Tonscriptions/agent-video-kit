@@ -22,6 +22,14 @@ Keep standalone-child glyph projection separate from independent text shaping,
 and baseline compatibility controls separate from independent spatial oracles.
 Odd internal RGBA does not prove a valid final 4:2:0 or 4:2:2 encode.
 
+For explicit [sequence area sampling](../../docs/specs/序列面积采样与工作栅格预算契约_v0.1_2026-10-17.md),
+pass matching `--sequence-sampling` and `--sequence-memory-mib` to quality
+check/golden when render used temporary overrides. Keep default-bilinear
+compatibility separate from an independent source-cell area reference. Inspect
+high-frequency means, fractional crop and soft alpha. Source-axis box checks
+do not accept exact rotated footprints, linear-light/HDR or leaf resampling.
+The projection quota is not a measured or guaranteed process RSS ceiling.
+
 Before inpainting or accepting segmentation, review the actual encoded mask:
 
 ```powershell
