@@ -14,6 +14,17 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+Use the [presentation cut contract](../../docs/specs/片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md)
+for compose split_clip/trim_clip/ripple_insert/ripple_delete. These preserve the
+complete authored source, curve, keyframes, freeze and clip audio processing in
+presentation_window; source_in/out describe the full author input. Trim ranges
+are relative to the current visible window; set timeline_start_tick to move the
+result. Presets accept visible-local ticks and store author ticks. Speed/curve,
+reverse and freeze commands require a full take; smart-cut/reframe/tracking on
+windows reject. Remove affected real-handle or legacy cross-clip transitions
+first. Markers stay absolute; full main-track magnet/linkage rules are separate.
+Review frame/sample selections and repeated author-graph cost in render metadata.
+
 Use [saved fragments](../../docs/specs/可复用片段组库与跨项目插入契约_v0.1_2026-10-18.md)
 for editable cross-project groups. Insertion creates one container on an
 unlocked video track; its source range selects the saved group's original

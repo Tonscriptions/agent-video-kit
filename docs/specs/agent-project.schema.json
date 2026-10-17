@@ -258,6 +258,16 @@
         "duration_tick": {"$ref": "#/$defs/positiveInteger"},
         "source_in_tick": {"$ref": "#/$defs/nonNegativeInteger"},
         "source_out_tick": {"$ref": "#/$defs/positiveInteger"},
+        "presentation_window": {
+          "type": "object", "additionalProperties": false,
+          "required": ["version", "authored_start_tick", "authored_duration_tick", "offset_tick"],
+          "properties": {
+            "version": {"type": "integer", "const": 1},
+            "authored_start_tick": {"$ref": "#/$defs/nonNegativeInteger"},
+            "authored_duration_tick": {"$ref": "#/$defs/positiveInteger"},
+            "offset_tick": {"$ref": "#/$defs/nonNegativeInteger"}
+          }
+        },
         "speed": {"type": "number", "exclusiveMinimum": 0},
         "speed_curve": {
           "oneOf": [

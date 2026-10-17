@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from . import ENGINE_ID, SCHEMA_VERSION, VERSION
+from .clip_windows import apply_operation as apply_window_operation, OPERATIONS as WINDOW_OPERATIONS
 from .ad_plan import build_ad_plan
 from .captions import parse_caption_file, validate_cues, write_srt_file
 from .convert import export_external, import_external
@@ -2571,6 +2572,8 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
         raise argument_error("必须且只能提供 --asset-id 或 --input")
     sequence = find_sequence(project, args.sequence_id)
     _, clip = _find_clip(sequence, str(args.clip_id), args.track_id)
+    if clip.get('presentation_window') is not None:
+        raise AppError('REFRAME_PRESENTATION_WINDOW_UNSUPPORTED','请先在完整作者片段上重构图，再裁切输出窗口',exit_code=2,path='clip.presentation_window')
     if clip.get("sequence_id"):
         raise AppError("REFRAME_NESTED_UNSUPPORTED", "自动重构图当前只支持直接媒体片段", exit_code=2, path="clip_id")
     try:
@@ -3438,6 +3441,8 @@ def command_media_smart_cut(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     sequence = find_sequence(project, getattr(args, "sequence_id", None))
     target_track, clip = _find_clip(sequence, args.clip_id, args.track_id)
+    if clip.get('presentation_window') is not None:
+        raise AppError('SMART_CUT_PRESENTATION_WINDOW_UNSUPPORTED','源分析尚未映射到输出窗口；请分析完整作者片段后再裁切',exit_code=2,path='clip.presentation_window')
     asset = asset_map(project).get(str(clip.get("asset_id")))
     if not asset:
         raise argument_error("智能剪口播目标必须引用项目内媒体资产", "clip_id")
@@ -4362,7 +4367,7 @@ def _set_keyframe_track(clip: dict[str, Any], property_name: str, values: list[t
 
 
 def _clamp_clip_keyframes(clip: dict[str, Any]) -> None:
-    duration = max(1, int(clip.get("duration_tick", 1)))
+    duration = max(1, int((clip.get('presentation_window') or {}).get('authored_duration_tick', clip.get('duration_tick', 1))))
     retained: list[dict[str, Any]] = []
     for track in clip.get("keyframes", []):
         if not isinstance(track, dict):
@@ -4400,6 +4405,9 @@ def _apply_motion_preset(clip: dict[str, Any], change: dict[str, Any]) -> dict[s
     end_tick = min(duration, int(change.get("end_tick", duration)))
     if end_tick <= start_tick:
         raise argument_error("运动预设的时间范围无效", "start_tick/end_tick")
+    offset_tick = (clip.get('presentation_window') or {}).get('offset_tick',0)
+    start_tick += offset_tick
+    end_tick += offset_tick
     parameter_values = definition.get("parameters", {})
 
     def _number(name: str, *, absolute: bool = False) -> float:
@@ -4666,7 +4674,11 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
     applied: list[dict[str, Any]] = []
     for change in operations:
         operation = change.get("op", "append_clip")
-        if operation == 'source_transition':
+        if operation in WINDOW_OPERATIONS:
+            target_sequence = find_sequence(working, change.get('sequence_id') or sequence['id'])
+            working, plan = apply_window_operation(working, target_sequence['id'], change)
+            applied.append({'op': operation, 'plan': plan})
+        elif operation == 'source_transition':
             target_sequence = find_sequence(working, change.get('sequence_id') or sequence['id'])
             working, plan = build_source_transition_plan(working, target_sequence['id'], change.get('transition'))
             applied.append({'op': operation, 'plan': plan})
@@ -4729,81 +4741,6 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
             track.setdefault("clips", []).append(clip)
             target_sequence["duration_tick"] = max(int(target_sequence.get("duration_tick", 1)), clip["timeline_start_tick"] + clip["duration_tick"])
             applied.append({"op": operation, "track_id": track["id"], "clip": clip})
-        elif operation == "split_clip":
-            target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
-            track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))
-            split_tick = int(change.get("at_tick", 0))
-            duration = int(clip.get("duration_tick", 0))
-            if split_tick <= 0 or split_tick >= duration:
-                raise argument_error("split_clip 的 at_tick 必须位于片段内部", "at_tick")
-            source_span = int(clip.get("source_out_tick", 0)) - int(clip.get("source_in_tick", 0))
-            source_split = int(clip.get("source_in_tick", 0)) + int(round(source_span * split_tick / duration))
-            left = copy.deepcopy(clip)
-            right = copy.deepcopy(clip)
-            left["id"] = str(change.get("left_id") or f"{clip['id']}_a")
-            right["id"] = str(change.get("right_id") or f"{clip['id']}_b")
-            if left["id"] == right["id"] or any(item.get("id") in {left["id"], right["id"]} for item in track.get("clips", []) if item is not clip):
-                raise argument_error("split_clip 生成的片段 ID 已存在", "left_id/right_id")
-            left["duration_tick"] = split_tick
-            left["source_out_tick"] = source_split
-            right["timeline_start_tick"] = int(clip.get("timeline_start_tick", 0)) + split_tick
-            right["duration_tick"] = duration - split_tick
-            right["source_in_tick"] = source_split
-            left["keyframes"], right["keyframes"] = _split_clip_keyframes(clip, split_tick)
-            position = track["clips"].index(clip)
-            track["clips"][position : position + 1] = [left, right]
-            applied.append({"op": operation, "track_id": track["id"], "source_clip_id": clip["id"], "clips": [left, right]})
-        elif operation == "ripple_insert":
-            target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
-            at_tick = int(change.get("at_tick", 0))
-            delta = int(change.get("duration_tick", 0))
-            if at_tick < 0 or delta <= 0:
-                raise argument_error("ripple_insert 需要非负 at_tick 和正 duration_tick")
-            selected = [find_track(target_sequence, change.get("track_id"), None)] if change.get("track_id") else target_sequence.get("tracks", [])
-            for track in selected:
-                for clip in track.get("clips", []):
-                    start = int(clip.get("timeline_start_tick", 0))
-                    end = start + int(clip.get("duration_tick", 0))
-                    if start < at_tick < end:
-                        raise argument_error("ripple_insert 暂不在片段内部切开；请先 split_clip", "at_tick")
-                    if start >= at_tick:
-                        clip["timeline_start_tick"] = start + delta
-            target_sequence["duration_tick"] = int(target_sequence.get("duration_tick", 1)) + delta
-            applied.append({"op": operation, "at_tick": at_tick, "duration_tick": delta})
-        elif operation == "ripple_delete":
-            target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
-            at_tick = int(change.get("at_tick", 0))
-            delta = int(change.get("duration_tick", 0))
-            if at_tick < 0 or delta <= 0:
-                raise argument_error("ripple_delete 需要非负 at_tick 和正 duration_tick")
-            end_tick = at_tick + delta
-            selected = [find_track(target_sequence, change.get("track_id"), None)] if change.get("track_id") else target_sequence.get("tracks", [])
-            for track in selected:
-                retained: list[dict[str, Any]] = []
-                for clip in track.get("clips", []):
-                    start = int(clip.get("timeline_start_tick", 0))
-                    end = start + int(clip.get("duration_tick", 0))
-                    if end <= at_tick:
-                        retained.append(clip)
-                    elif start >= end_tick:
-                        clip["timeline_start_tick"] = start - delta
-                        retained.append(clip)
-                    elif start < at_tick and end > end_tick:
-                        new_duration = int(clip.get("duration_tick", 0)) - delta
-                        _adjust_source_for_duration(clip, new_duration)
-                        retained.append(clip)
-                    elif start < at_tick:
-                        new_duration = max(1, at_tick - start)
-                        _adjust_source_for_duration(clip, new_duration)
-                        retained.append(clip)
-                    elif end > end_tick:
-                        clip["timeline_start_tick"] = at_tick
-                        clip["source_in_tick"] = int(clip.get("source_in_tick", 0)) + int(round(delta * abs(float(clip.get("speed", 1.0) or 1.0))))
-                        clip["duration_tick"] = end - end_tick
-                        retained.append(clip)
-                track["clips"] = retained
-            target_sequence["duration_tick"] = max(1, int(target_sequence.get("duration_tick", 1)) - delta)
-            applied.append({"op": operation, "at_tick": at_tick, "duration_tick": delta})
         elif operation == "slip_clip":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))
@@ -4827,15 +4764,23 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
             speed = float(change.get("speed", 1.0))
             if speed <= 0:
                 raise argument_error("speed 必须大于 0", "speed")
+            window = clip.get('presentation_window')
+            if window and (window['offset_tick'] != 0 or window['authored_duration_tick'] != clip['duration_tick']):
+                raise AppError('CLIP_WINDOW_AUTHOR_EDIT_REQUIRES_FULL_TAKE', '请在完整作者片段上修改速度后重新裁切；当前选区不会隐式扩展', exit_code=2)
             clip["speed"] = speed
             if str(change.get("duration_mode", "preserve_source")) == "preserve_source":
                 source_span = max(1, int(clip.get("source_out_tick", 1)) - int(clip.get("source_in_tick", 0)))
                 clip["duration_tick"] = max(1, int(round(source_span / speed)))
+            if window:
+                window['authored_duration_tick'] = clip['duration_tick']
             _recompute_sequence_duration(target_sequence)
             applied.append({"op": operation, "track_id": track["id"], "clip": clip})
         elif operation == "set_clip_speed_curve":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))
+            window = clip.get('presentation_window')
+            if window and (window['offset_tick'] != 0 or window['authored_duration_tick'] != clip['duration_tick']):
+                raise AppError('CLIP_WINDOW_AUTHOR_EDIT_REQUIRES_FULL_TAKE', '请在完整作者片段上修改变速曲线后重新裁切',exit_code=2)
             curve = change.get("speed_curve") if isinstance(change.get("speed_curve"), (dict, list)) else {"keyframes": change.get("keyframes", [])}
             if isinstance(curve, dict):
                 keyframes = curve.get("keyframes")
@@ -4848,17 +4793,25 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
             curve_duration = speed_curve_duration_seconds(clip, source_span, int(working["settings"]["timebase"]["ticks_per_second"]))
             if curve_duration is not None and str(change.get("duration_mode", "preserve_source")) == "preserve_source":
                 clip["duration_tick"] = max(1, int(round(curve_duration * int(working["settings"]["timebase"]["ticks_per_second"]))))
+            if window:
+                window['authored_duration_tick'] = clip['duration_tick']
             _clamp_clip_keyframes(clip)
             _recompute_sequence_duration(target_sequence)
             applied.append({"op": operation, "track_id": track["id"], "clip": clip, "curve_duration_seconds": curve_duration})
         elif operation == "reverse_clip":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))
+            window = clip.get('presentation_window')
+            if window and (window['offset_tick'] != 0 or window['authored_duration_tick'] != clip['duration_tick']):
+                raise AppError('CLIP_WINDOW_AUTHOR_EDIT_REQUIRES_FULL_TAKE','请先对完整作者片段倒放，再重新裁切；不隐式重排选区动画或定格',exit_code=2)
             clip["reverse"] = bool(change.get("enabled", not bool(clip.get("reverse", False))))
             applied.append({"op": operation, "track_id": track["id"], "clip_id": clip["id"], "reverse": clip["reverse"]})
         elif operation == "freeze_frame":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))
+            window = clip.get('presentation_window')
+            if window and (window['offset_tick'] != 0 or window['authored_duration_tick'] != clip['duration_tick']):
+                raise AppError('CLIP_WINDOW_AUTHOR_EDIT_REQUIRES_FULL_TAKE', '请在完整作者片段上添加定格后重新裁切；当前选区不会隐式扩展', exit_code=2)
             freeze_duration = int(change.get("duration_tick", 0))
             if freeze_duration <= 0:
                 raise argument_error("freeze_frame 需要正 duration_tick", "duration_tick")
@@ -4870,6 +4823,8 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
                 raise argument_error("freeze_frame 的 audio_mode 只支持 silence 或 continue", "audio_mode")
             clip["freeze"] = {"at_tick": at_tick, "duration_tick": freeze_duration, "audio_mode": audio_mode}
             clip["duration_tick"] = int(clip.get("duration_tick", 1)) + freeze_duration
+            if window:
+                window['authored_duration_tick'] = clip['duration_tick']
             _clamp_clip_keyframes(clip)
             _recompute_sequence_duration(target_sequence)
             applied.append({"op": operation, "track_id": track["id"], "clip": clip})

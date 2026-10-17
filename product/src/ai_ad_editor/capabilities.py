@@ -21,6 +21,23 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'presentation_cuts': {
+                'status':'implemented_with_limits', 'engine':'agent-presentation-window-v1',
+                'commands':['timeline.compose:split_clip','timeline.compose:trim_clip',
+                            'timeline.compose:ripple_insert','timeline.compose:ripple_delete'],
+                'features':['non_destructive_author_clock','middle_delete_keeps_both_sides',
+                    'split_inside_clips','original_reverse_curves_freeze_animation_and_audio_processing',
+                    'recursive_native_av_graph','global_id_and_lock_guards','atomic_compose_batch',
+                    'cross_track_link_gate_for_scoped_ripple','explicit_frame_and_sample_selection'],
+                'limits':['window_inside_authored_duration_only','markers_keep_absolute_ticks',
+                    'not_roll_slide_overwrite_or_full_magnetic_editing','tracking_bindings_rejected',
+                    'affected_source_transitions_and_legacy_cross_clip_track_transitions_must_be_removed','inline_processed_child_r3_retime_rejected',
+                    'speed_curve_reverse_and_freeze_edits_require_full_author_take',
+                    'smart_cut_reframe_and_tracking_on_output_windows_rejected',
+                    '64_direct_windows_16_recursion_levels_plus_existing_raster_budget',
+                    'external_formats_report_unsupported','full_author_processing_can_repeat_work',
+                    'subframe_cuts_sample_on_display_grid_not_continuous_video'],
+            },
             'fragment_library': {
                 'status': 'implemented_with_limits', 'engine': 'agent-local-fragment-library-v1',
                 'commands': ['fragment.save', 'fragment.list', 'fragment.inspect', 'fragment.apply'],

@@ -5,6 +5,14 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+Review [output-window cuts](../../docs/specs/片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md)
+against the corresponding ranges of the complete original render. Compare RGB
+and lossless PCM separately, including held frames/silence, file cue clocks,
+nested buses and opaque contain bars over a lower track. Inspect window offset,
+author duration, selected display frames/samples and recursive work budget in
+sequence-inline-surface evidence. This proves selection of that authored result;
+it does not accept the original model, speed audio quality or continuous viewing.
+
 For [real source handles](../../docs/specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md),
 inspect the `source-transition-plan` manifest node and real decoded source
 frame identities around the cut. Check window math, unchanged duration,

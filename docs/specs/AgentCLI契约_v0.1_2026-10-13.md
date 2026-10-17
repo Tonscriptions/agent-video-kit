@@ -160,9 +160,11 @@ v2 适配器执行 `media track` 时必须显式选择 `--object-id ID` 或 `--a
 
 ## 5. 时间线与关键帧契约
 
-所有 `at_tick` 是片段内时间，使用项目 `settings.timebase.ticks_per_second`。关键帧必须单调递增，插值可用 `hold`、`linear`、`ease_in`、`ease_out`、`ease_in_out` 或带合法控制点的 `bezier`。
+时间使用项目 `settings.timebase.ticks_per_second`。关键帧和 `split_clip.at_tick` 是片段内时间；`ripple_insert/ripple_delete.at_tick` 是所选序列时间，不能混用。关键帧必须单调递增，插值可用 `hold`、`linear`、`ease_in`、`ease_out`、`ease_in_out` 或带合法控制点的 `bezier`。
 
-`timeline compose` 变更集支持 `append_clip`、`update_clip`、`remove_clip`、`split_clip`、`ripple_insert`、`ripple_delete`、`slip_clip`、`slide_clip`、`set_clip_speed`、`set_clip_speed_curve`、`reverse_clip`、`freeze_frame`、`add_sequence`、`update_sequence`、`append_sequence_clip`、轨道增删改、标记增删和序列时长调整。任何变更保存前都会重新执行 Schema、引用、时间范围、嵌套循环和 Rights 语义校验。
+`timeline compose` 变更集支持 `append_clip`、`update_clip`、`remove_clip`、`split_clip`、`trim_clip`、`ripple_insert`、`ripple_delete`、`slip_clip`、`slide_clip`、`set_clip_speed`、`set_clip_speed_curve`、`reverse_clip`、`freeze_frame`、`add_sequence`、`update_sequence`、`append_sequence_clip`、轨道增删改、标记增删和序列时长调整。任何变更保存前都会重新执行 Schema、引用、时间范围、嵌套循环和 Rights 语义校验。
+
+V38 的拆分、内部波纹插删和 `trim_clip` 使用持久 `presentation_window`：保留完整作者处理，随后选取可见区间。`trim_clip.start_tick/end_tick` 相对当前可见片段，默认新落点为旧落点加 start，可用 `timeline_start_tick` 显式重新放置；不是源范围外扩或完整磁吸。旧关键帧仍在完整作者轴上，运镜预设的可见局部范围在写入时加窗口 offset。部分窗口的高层速度/倒放/定格、跟踪、智能剪辑及受影响转场有明确拒绝，详见[输出窗口契约](./片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md)及[实测边界](../validation/输出窗口裁切与作者时钟实测_2026-10-18.md)。
 
 ### 5.1 关键帧运镜预设
 

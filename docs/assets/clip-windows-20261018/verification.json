@@ -1,0 +1,2348 @@
+{
+  "status": "passed",
+  "fixed_original_renderer_commit": "23ca3cbcd030c7a41e4618cdcfdf0b7cf3bcbb98",
+  "fixed_original_renderer_sha256": {
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_stretch.py": "sha256:3f1cf4dbaa6e09cdfdd1068c1d477595eb7e2506ae4e8dcaac1a960f9e787fc1",
+    "product/src/ai_ad_editor/audio_tempo.py": "sha256:3284a08dc75a25dcbeed30c7088a18898c46d398e6e7ae9380efcf0e366afcee",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:ac21526fa23dd723ed0be4cc89d518182f6ddbb49d06e1cf3507e29a06393f79",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:1e3a1253e7763a8630c892f6fe32db4eb910bfd49cb9412c3bcc9f5dbb8329b9",
+    "product/src/ai_ad_editor/captions.py": "sha256:f9a4534682417235a1c2e6ba36072bb92de9354cb5d83b76d06e3ecb22144d28",
+    "product/src/ai_ad_editor/cli.py": "sha256:4a3f49879c1780676ff666beac2c6590ac104c6f312369c39ea801a4ca0515d7",
+    "product/src/ai_ad_editor/convert.py": "sha256:be361768225b6a0cf30588ce7c6059f2ba3d0a8a289d0e77216ad626405f867e",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:5be108ac010d024742334a6a37ef0eeaa88696471068062eaf528538988379bb",
+    "product/src/ai_ad_editor/edit_planner.py": "sha256:3c45ac0821bcb1a5a4b65377b31e01b8b5a2fafb509cef0eb801f4f34bd7ca16",
+    "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/fragments.py": "sha256:73e1bc5ac139b299ec123c48cce83bbce16f6042fb6f6987a71b2380d347b460",
+    "product/src/ai_ad_editor/inline_sequences.py": "sha256:2cebb6537d60b11d7e48f4bf1b244198926ab4136208f96b04610992d54fce61",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/mask_review.py": "sha256:a2d07d086a3725413519331f0b60846df4f7c0c472d3d01afadc0202963bfed3",
+    "product/src/ai_ad_editor/mask_tracking.py": "sha256:724f8f9800536d3ffdc99675fadf79e1262532ec7f9a3d879cf94674ba531b8d",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/OPENFILM_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_subtitle_segments.mjs": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+    "product/src/ai_ad_editor/project.py": "sha256:d5fc34a6efe179a473c697e1bd474a63d82d638e8d10b16d419c5818dac4cd6d",
+    "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:f55fc09558f3adde5f9ec064b6529b6af4085302f96989715ad13183dad07908",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:b806d815b9a456f0446a0a601ae9bcfdb957418ace18eb472bd1301b76138802",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/sequence_canvas.py": "sha256:462542e26058d350c2d0a29d0cf4127c4054cab7462a763811b85bfca171412f",
+    "product/src/ai_ad_editor/sequence_sampling.py": "sha256:1aa171ef6043878afce099f7a04b214b9c458879147c46147062a77d36356ec2",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:22449405a0e6ddb9b14bee7ae60c16279e317ac17650d72732ffe1dcf658d6f4",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/source_transitions.py": "sha256:1bb47bbf3e8ce929b155c9077171c1bf568f787e4d34b65c84d39026c7869ce5",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/speed_curves.py": "sha256:41fbddd764bfa481e6158e8401333113c871e1c38e34257911f9aa676b9bfff9",
+    "product/src/ai_ad_editor/subtitle_clock.py": "sha256:49ca2001da0f250d682f5818d95f4f51ee362cbaee979fb9a99649a847cd4645",
+    "product/src/ai_ad_editor/subtitle_segments.py": "sha256:5590e04147f0b50cb60df3b4e543059a560dbfd684b3085c5f25f8fb04631aea",
+    "product/src/ai_ad_editor/subtitle_segment_worker.mjs": "sha256:66ca5d7fab0926efe15615da29dba3024897cbfbfb1b28e6a6a189697b6d5bdc",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_highlight.py": "sha256:d08bee683f0bd00bac363a78df5957475765741a7c53d92ac025575b334f78e5",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/text_paint.py": "sha256:a924644f0396b5204efbb0e085f25d51f6cda5bfc75f2d44febc6796e42cb028",
+    "product/src/ai_ad_editor/text_typing.py": "sha256:6cc022af8300fb4270cb21f2f53ffe2b33210ac203169fed653d11d75e591ec3",
+    "product/src/ai_ad_editor/time_mapping.py": "sha256:70db06e3d2ec00fd9d951854cc73410caa2a35e036bcfba21363146ada1a7c55",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:38b3f6e04f9137eef024afe362197948c4bc7d1fe80e30f92e42a504bad06c92",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+    "product/src/ai_ad_editor/validator.py": "sha256:a310914955ef2e0867eb258f864b4ba03e509d37a43b3baa0a3fcb0ebfd20ffa",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "docs/specs/agent-project.schema.json": "sha256:6fe2e5514d4a90de2aa31bc54e61d3dd9611ab35f7d5429aa1493a4688da13f8"
+  },
+  "source_before": {
+    "docs/specs/agent-project.schema.json": "sha256:c7c96ca3dee426ef8e6ed63a23e5e41ef3533221e375a0c53ca0df833e22c505",
+    "product/pyproject.toml": "sha256:ba63e06d74e90f86903e69dfcc3e6cab7a792eac2b10743f2d931dafdc303789",
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_stretch.py": "sha256:3f1cf4dbaa6e09cdfdd1068c1d477595eb7e2506ae4e8dcaac1a960f9e787fc1",
+    "product/src/ai_ad_editor/audio_tempo.py": "sha256:3284a08dc75a25dcbeed30c7088a18898c46d398e6e7ae9380efcf0e366afcee",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:2dbb8bce11ecb7f7fd6fa893cca08efdaa6f9c21a3c6f8a4588cbed5092c3a65",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:f1198c15acbe82f7333d7b12dda99fa4f5603e527fb9070d11145ff0c04b28ca",
+    "product/src/ai_ad_editor/captions.py": "sha256:f9a4534682417235a1c2e6ba36072bb92de9354cb5d83b76d06e3ecb22144d28",
+    "product/src/ai_ad_editor/cli.py": "sha256:60b845163873501a441863c89fcf9681dd5478d404ef284d34fb6d8e319dc4e4",
+    "product/src/ai_ad_editor/clip_windows.py": "sha256:3014424ecce4ec780b2e241afd50c310681c69c4450ebd88b689cea221149377",
+    "product/src/ai_ad_editor/convert.py": "sha256:be361768225b6a0cf30588ce7c6059f2ba3d0a8a289d0e77216ad626405f867e",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:5be108ac010d024742334a6a37ef0eeaa88696471068062eaf528538988379bb",
+    "product/src/ai_ad_editor/edit_planner.py": "sha256:2b2dbb74fb4a4c9c4b06ade398009555b6d32fccc48354d0c1f88848cd207dfa",
+    "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/fragments.py": "sha256:73e1bc5ac139b299ec123c48cce83bbce16f6042fb6f6987a71b2380d347b460",
+    "product/src/ai_ad_editor/inline_sequences.py": "sha256:03bfed67b153be61b74b7493305d904349e74c93cbcafb78424b850a8474c68f",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/mask_review.py": "sha256:a2d07d086a3725413519331f0b60846df4f7c0c472d3d01afadc0202963bfed3",
+    "product/src/ai_ad_editor/mask_tracking.py": "sha256:724f8f9800536d3ffdc99675fadf79e1262532ec7f9a3d879cf94674ba531b8d",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/OPENFILM_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_subtitle_segments.mjs": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+    "product/src/ai_ad_editor/project.py": "sha256:d5fc34a6efe179a473c697e1bd474a63d82d638e8d10b16d419c5818dac4cd6d",
+    "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:c057989d1314902bab784b591f2561e86bbf387ee2b99a093a136295c783497c",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:b806d815b9a456f0446a0a601ae9bcfdb957418ace18eb472bd1301b76138802",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/sequence_canvas.py": "sha256:462542e26058d350c2d0a29d0cf4127c4054cab7462a763811b85bfca171412f",
+    "product/src/ai_ad_editor/sequence_sampling.py": "sha256:1aa171ef6043878afce099f7a04b214b9c458879147c46147062a77d36356ec2",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:ba871f7bff0f186ad55d9e22c5fcd75e09032e8d7299a01c7ea7b76b2e1a21a1",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/source_transitions.py": "sha256:6f0af4ccaca0881fb256df264e7725d986e3e5ab7ff70a89299a616564440ec3",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/speed_curves.py": "sha256:41fbddd764bfa481e6158e8401333113c871e1c38e34257911f9aa676b9bfff9",
+    "product/src/ai_ad_editor/subtitle_clock.py": "sha256:49ca2001da0f250d682f5818d95f4f51ee362cbaee979fb9a99649a847cd4645",
+    "product/src/ai_ad_editor/subtitle_segment_worker.mjs": "sha256:66ca5d7fab0926efe15615da29dba3024897cbfbfb1b28e6a6a189697b6d5bdc",
+    "product/src/ai_ad_editor/subtitle_segments.py": "sha256:5590e04147f0b50cb60df3b4e543059a560dbfd684b3085c5f25f8fb04631aea",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_highlight.py": "sha256:d08bee683f0bd00bac363a78df5957475765741a7c53d92ac025575b334f78e5",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/text_paint.py": "sha256:a924644f0396b5204efbb0e085f25d51f6cda5bfc75f2d44febc6796e42cb028",
+    "product/src/ai_ad_editor/text_typing.py": "sha256:6cc022af8300fb4270cb21f2f53ffe2b33210ac203169fed653d11d75e591ec3",
+    "product/src/ai_ad_editor/time_mapping.py": "sha256:70db06e3d2ec00fd9d951854cc73410caa2a35e036bcfba21363146ada1a7c55",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:38b3f6e04f9137eef024afe362197948c4bc7d1fe80e30f92e42a504bad06c92",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+    "product/src/ai_ad_editor/validator.py": "sha256:fcf97f43c84e5f300a3a4748d98a7c3a16cceca597e53f43b6f481692a1c1e20",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_alpha_resampling.py": "sha256:db2e2764a5022c18bba23ad407a6bf15a320edfea5f5a8331eda706d7c4046de",
+    "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+    "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+    "product/tests/test_audio_buses.py": "sha256:60a7dcb286af7e1cff95a6aa69275ee2965df2f704b0310e964e99558e7629e0",
+    "product/tests/test_audio_channel_modes.py": "sha256:815a9ea0117dd7ed0cce3a75d14ed67a4a8a06b413df1836d233f33359290e79",
+    "product/tests/test_audio_stretch.py": "sha256:53dea6b0ec9f8c00861b6a1844d7c34e0c87e432d78a4e4847c7245fd9893ce9",
+    "product/tests/test_audio_tempo_context.py": "sha256:ad3c7c53cfdaecdd00693aa745a22be2455e2dcd446583e4912cd1066b6aac3a",
+    "product/tests/test_audio_unity.py": "sha256:02dcf66038d4fcbc1f0c144e604efa451b9d7925817d1d2b089f8c087aa58810",
+    "product/tests/test_cli.py": "sha256:cefbec9b92fbdd2c5664454c35547d549b1da8db981f8be20102065c52cc4e79",
+    "product/tests/test_clip_windows.py": "sha256:42863fb28d81d22a0ac90ff1036ef5359186a29ab730d5404db36fae0660ecb3",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_fragments.py": "sha256:d021051b4a5b48deac872e319407c9dae0cb2e7b3c8f1a7ab71704dff756a35f",
+    "product/tests/test_linked_edit.py": "sha256:d3b5d8fb402df059ea006d125fbb6fb651c891132fcd78deccfdbe41036d87d7",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+    "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vace.py": "sha256:a2227a49c43a233b73ed354681a39a03924d9ed0588749eda7df198c2c43807b",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+    "product/tests/test_mask_tracking.py": "sha256:f8f2c1d0495410815b91d4f0a507a3a3909d2ca25c44817612970d4330578245",
+    "product/tests/test_nested_frame_coverage.py": "sha256:35f721f1a4a3f27ba5fb0df1fa3642a1585d8692ba9820d4bb8a477a0a188ba0",
+    "product/tests/test_nested_time_mapping.py": "sha256:64415c49e45c5e7edf8d5f5ee745bbf22d30b6cdd5a0cde7cd731d88d6c6fad4",
+    "product/tests/test_nested_transitions.py": "sha256:b421478e8ef622024beb4032fe00e20da894b42057affac2af7d7df3551eb089",
+    "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+    "product/tests/test_sequence_canvas.py": "sha256:6f2b622c81932c0dcf80e7b3a528256b5e1a7209ef455b68f2c75a4c9154f4b0",
+    "product/tests/test_sequence_compositing.py": "sha256:1eea9b170c3fabe0623032b4de81a07e085cb7c88b5d79e8380d73399be21b0a",
+    "product/tests/test_sequence_sampling.py": "sha256:c75a6153aee2dbef11e9455a27656d204e46f0ce6061393ea91b6f46f8d7253f",
+    "product/tests/test_source_transitions.py": "sha256:8813a84843bfbb7aed5b5418011a287c9dae1b8628620114468df716401f2b4a",
+    "product/tests/test_speed_easing.py": "sha256:4797885a66a7e12b327fdf31e0cc937576620353e653c2c762ee905f2d61a5d7",
+    "product/tests/test_subtitle_clock.py": "sha256:f71c3885c2a39e39f809ed6fb69233e952cbe2ff766f9252a441942e15ecbecb",
+    "product/tests/test_subtitle_segments.py": "sha256:aba64ed147276a6b1e59ad845557f86f2b6271db8d0dc75c006db328cac233c2",
+    "product/tests/test_text_animation_composition.py": "sha256:6ce0117f31339d36c574c70a8f2d83235813dc95d91f3108730cb954987c12de",
+    "product/tests/test_text_paint.py": "sha256:99887918ba5813b39a74cef18d02384ed503581e8695821530554590d38e219f",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "product/tests/test_word_highlight.py": "sha256:bf3f56f299d2452e8330bb192d31880c550e277ef93d04c4292fe816b79e172a"
+  },
+  "source_after": {
+    "docs/specs/agent-project.schema.json": "sha256:c7c96ca3dee426ef8e6ed63a23e5e41ef3533221e375a0c53ca0df833e22c505",
+    "product/pyproject.toml": "sha256:ba63e06d74e90f86903e69dfcc3e6cab7a792eac2b10743f2d931dafdc303789",
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_stretch.py": "sha256:3f1cf4dbaa6e09cdfdd1068c1d477595eb7e2506ae4e8dcaac1a960f9e787fc1",
+    "product/src/ai_ad_editor/audio_tempo.py": "sha256:3284a08dc75a25dcbeed30c7088a18898c46d398e6e7ae9380efcf0e366afcee",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:2dbb8bce11ecb7f7fd6fa893cca08efdaa6f9c21a3c6f8a4588cbed5092c3a65",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:f1198c15acbe82f7333d7b12dda99fa4f5603e527fb9070d11145ff0c04b28ca",
+    "product/src/ai_ad_editor/captions.py": "sha256:f9a4534682417235a1c2e6ba36072bb92de9354cb5d83b76d06e3ecb22144d28",
+    "product/src/ai_ad_editor/cli.py": "sha256:60b845163873501a441863c89fcf9681dd5478d404ef284d34fb6d8e319dc4e4",
+    "product/src/ai_ad_editor/clip_windows.py": "sha256:3014424ecce4ec780b2e241afd50c310681c69c4450ebd88b689cea221149377",
+    "product/src/ai_ad_editor/convert.py": "sha256:be361768225b6a0cf30588ce7c6059f2ba3d0a8a289d0e77216ad626405f867e",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:5be108ac010d024742334a6a37ef0eeaa88696471068062eaf528538988379bb",
+    "product/src/ai_ad_editor/edit_planner.py": "sha256:2b2dbb74fb4a4c9c4b06ade398009555b6d32fccc48354d0c1f88848cd207dfa",
+    "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/fragments.py": "sha256:73e1bc5ac139b299ec123c48cce83bbce16f6042fb6f6987a71b2380d347b460",
+    "product/src/ai_ad_editor/inline_sequences.py": "sha256:03bfed67b153be61b74b7493305d904349e74c93cbcafb78424b850a8474c68f",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:18c0bf857d2bbe2c8dc485bcb26463daba6ba3f7367d9ec36d3561a81e77598b",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/mask_review.py": "sha256:a2d07d086a3725413519331f0b60846df4f7c0c472d3d01afadc0202963bfed3",
+    "product/src/ai_ad_editor/mask_tracking.py": "sha256:724f8f9800536d3ffdc99675fadf79e1262532ec7f9a3d879cf94674ba531b8d",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:f8463c1dc6339147dc41e701cddb15683e7756709b73f74ca4f19d2902db41ad",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/OPENFILM_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_subtitle_segments.mjs": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "product/src/ai_ad_editor/policy.py": "sha256:cf1165d7b17e665c99979a8fb4fdc329fb49b351f2e4ba278dcf120a79bb9ceb",
+    "product/src/ai_ad_editor/project.py": "sha256:d5fc34a6efe179a473c697e1bd474a63d82d638e8d10b16d419c5818dac4cd6d",
+    "product/src/ai_ad_editor/quality.py": "sha256:f0b5842af20994fb3bcfdf65e5565b898845afa58e35386eb0b70a2ba054c480",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:c057989d1314902bab784b591f2561e86bbf387ee2b99a093a136295c783497c",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:b806d815b9a456f0446a0a601ae9bcfdb957418ace18eb472bd1301b76138802",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/sequence_canvas.py": "sha256:462542e26058d350c2d0a29d0cf4127c4054cab7462a763811b85bfca171412f",
+    "product/src/ai_ad_editor/sequence_sampling.py": "sha256:1aa171ef6043878afce099f7a04b214b9c458879147c46147062a77d36356ec2",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:ba871f7bff0f186ad55d9e22c5fcd75e09032e8d7299a01c7ea7b76b2e1a21a1",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/source_transitions.py": "sha256:6f0af4ccaca0881fb256df264e7725d986e3e5ab7ff70a89299a616564440ec3",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/speed_curves.py": "sha256:41fbddd764bfa481e6158e8401333113c871e1c38e34257911f9aa676b9bfff9",
+    "product/src/ai_ad_editor/subtitle_clock.py": "sha256:49ca2001da0f250d682f5818d95f4f51ee362cbaee979fb9a99649a847cd4645",
+    "product/src/ai_ad_editor/subtitle_segment_worker.mjs": "sha256:66ca5d7fab0926efe15615da29dba3024897cbfbfb1b28e6a6a189697b6d5bdc",
+    "product/src/ai_ad_editor/subtitle_segments.py": "sha256:5590e04147f0b50cb60df3b4e543059a560dbfd684b3085c5f25f8fb04631aea",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_highlight.py": "sha256:d08bee683f0bd00bac363a78df5957475765741a7c53d92ac025575b334f78e5",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/text_paint.py": "sha256:a924644f0396b5204efbb0e085f25d51f6cda5bfc75f2d44febc6796e42cb028",
+    "product/src/ai_ad_editor/text_typing.py": "sha256:6cc022af8300fb4270cb21f2f53ffe2b33210ac203169fed653d11d75e591ec3",
+    "product/src/ai_ad_editor/time_mapping.py": "sha256:70db06e3d2ec00fd9d951854cc73410caa2a35e036bcfba21363146ada1a7c55",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:38b3f6e04f9137eef024afe362197948c4bc7d1fe80e30f92e42a504bad06c92",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+    "product/src/ai_ad_editor/validator.py": "sha256:fcf97f43c84e5f300a3a4748d98a7c3a16cceca597e53f43b6f481692a1c1e20",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_alpha_resampling.py": "sha256:db2e2764a5022c18bba23ad407a6bf15a320edfea5f5a8331eda706d7c4046de",
+    "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+    "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+    "product/tests/test_audio_buses.py": "sha256:60a7dcb286af7e1cff95a6aa69275ee2965df2f704b0310e964e99558e7629e0",
+    "product/tests/test_audio_channel_modes.py": "sha256:815a9ea0117dd7ed0cce3a75d14ed67a4a8a06b413df1836d233f33359290e79",
+    "product/tests/test_audio_stretch.py": "sha256:53dea6b0ec9f8c00861b6a1844d7c34e0c87e432d78a4e4847c7245fd9893ce9",
+    "product/tests/test_audio_tempo_context.py": "sha256:ad3c7c53cfdaecdd00693aa745a22be2455e2dcd446583e4912cd1066b6aac3a",
+    "product/tests/test_audio_unity.py": "sha256:02dcf66038d4fcbc1f0c144e604efa451b9d7925817d1d2b089f8c087aa58810",
+    "product/tests/test_cli.py": "sha256:cefbec9b92fbdd2c5664454c35547d549b1da8db981f8be20102065c52cc4e79",
+    "product/tests/test_clip_windows.py": "sha256:42863fb28d81d22a0ac90ff1036ef5359186a29ab730d5404db36fae0660ecb3",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_fragments.py": "sha256:d021051b4a5b48deac872e319407c9dae0cb2e7b3c8f1a7ab71704dff756a35f",
+    "product/tests/test_linked_edit.py": "sha256:d3b5d8fb402df059ea006d125fbb6fb651c891132fcd78deccfdbe41036d87d7",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+    "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vace.py": "sha256:a2227a49c43a233b73ed354681a39a03924d9ed0588749eda7df198c2c43807b",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+    "product/tests/test_mask_tracking.py": "sha256:f8f2c1d0495410815b91d4f0a507a3a3909d2ca25c44817612970d4330578245",
+    "product/tests/test_nested_frame_coverage.py": "sha256:35f721f1a4a3f27ba5fb0df1fa3642a1585d8692ba9820d4bb8a477a0a188ba0",
+    "product/tests/test_nested_time_mapping.py": "sha256:64415c49e45c5e7edf8d5f5ee745bbf22d30b6cdd5a0cde7cd731d88d6c6fad4",
+    "product/tests/test_nested_transitions.py": "sha256:b421478e8ef622024beb4032fe00e20da894b42057affac2af7d7df3551eb089",
+    "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+    "product/tests/test_sequence_canvas.py": "sha256:6f2b622c81932c0dcf80e7b3a528256b5e1a7209ef455b68f2c75a4c9154f4b0",
+    "product/tests/test_sequence_compositing.py": "sha256:1eea9b170c3fabe0623032b4de81a07e085cb7c88b5d79e8380d73399be21b0a",
+    "product/tests/test_sequence_sampling.py": "sha256:c75a6153aee2dbef11e9455a27656d204e46f0ce6061393ea91b6f46f8d7253f",
+    "product/tests/test_source_transitions.py": "sha256:8813a84843bfbb7aed5b5418011a287c9dae1b8628620114468df716401f2b4a",
+    "product/tests/test_speed_easing.py": "sha256:4797885a66a7e12b327fdf31e0cc937576620353e653c2c762ee905f2d61a5d7",
+    "product/tests/test_subtitle_clock.py": "sha256:f71c3885c2a39e39f809ed6fb69233e952cbe2ff766f9252a441942e15ecbecb",
+    "product/tests/test_subtitle_segments.py": "sha256:aba64ed147276a6b1e59ad845557f86f2b6271db8d0dc75c006db328cac233c2",
+    "product/tests/test_text_animation_composition.py": "sha256:6ce0117f31339d36c574c70a8f2d83235813dc95d91f3108730cb954987c12de",
+    "product/tests/test_text_paint.py": "sha256:99887918ba5813b39a74cef18d02384ed503581e8695821530554590d38e219f",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "product/tests/test_word_highlight.py": "sha256:bf3f56f299d2452e8330bb192d31880c550e277ef93d04c4292fe816b79e172a"
+  },
+  "frozen_equal": true,
+  "cases": [
+    {
+      "case": "C01",
+      "frames": 40,
+      "stereo_sample_frames": 192000,
+      "max_rgb_difference": 0,
+      "mean_rgb_difference": 0.0,
+      "max_pcm_difference": 0.0,
+      "rgb_sha256": "sha256:ac2c9662acac7791311e909d44d04df09a4737be90266f07f21a555457a02139",
+      "pcm_sha256": "sha256:1d79467db7dc8106624a0cdc889b39f81746a44030e6ce78f33f4a65be9294af",
+      "raw_expectation": "slice-or-insert-decoded-fixed-v37-original",
+      "status": "passed"
+    },
+    {
+      "case": "C02",
+      "frames": 30,
+      "stereo_sample_frames": 144000,
+      "max_rgb_difference": 0,
+      "mean_rgb_difference": 0.0,
+      "max_pcm_difference": 0.0,
+      "rgb_sha256": "sha256:a5203b6838497416cf466ef51d4b9548290ad5456e4856f10b9c17bcfbe3dd09",
+      "pcm_sha256": "sha256:a136a541c073c2e9508382307ca97c2a0335a96e024de26c41a5281c6d4c5780",
+      "raw_expectation": "slice-or-insert-decoded-fixed-v37-original",
+      "status": "passed"
+    },
+    {
+      "case": "C03",
+      "frames": 20,
+      "stereo_sample_frames": 96000,
+      "max_rgb_difference": 0,
+      "mean_rgb_difference": 0.0,
+      "max_pcm_difference": 0.0,
+      "rgb_sha256": "sha256:af8b19a5eb0111bf7958008b644f239c04f10ba522e9754253d14c98e27a9f99",
+      "pcm_sha256": "sha256:0f5b583c3a970b7fd054b6f86c36f438dce875127377f24326b87a79881a90d9",
+      "raw_expectation": "slice-or-insert-decoded-fixed-v37-original",
+      "status": "passed"
+    },
+    {
+      "case": "C04",
+      "frames": 40,
+      "stereo_sample_frames": 192000,
+      "max_rgb_difference": 0,
+      "mean_rgb_difference": 0.0,
+      "max_pcm_difference": 0.0,
+      "rgb_sha256": "sha256:c7844dcb9d9858cca0bb5d20285092f1a6ce011fdac7d98bc4994f2e6ef601fb",
+      "pcm_sha256": "sha256:32cd12dbca0d0ab35db4a18a090884b20c02b9988f64141e212a9449a2851a20",
+      "raw_expectation": "slice-or-insert-decoded-fixed-v37-original",
+      "status": "passed"
+    },
+    {
+      "case": "C05",
+      "frames": 30,
+      "stereo_sample_frames": 144000,
+      "max_rgb_difference": 0,
+      "mean_rgb_difference": 0.0,
+      "max_pcm_difference": 0.0,
+      "rgb_sha256": "sha256:c7f034d10d9dbb5df338e8f1cb51666ef85fb4d9242ba649cbdbeaf1ea35e23a",
+      "pcm_sha256": "sha256:ebf8d3bae837801d3cce00e7a97c172e3d021ae71d0fe6f06592c76d92b06707",
+      "raw_expectation": "slice-or-insert-decoded-fixed-v37-original",
+      "status": "passed"
+    },
+    {
+      "case": "C06",
+      "frames": 20,
+      "stereo_sample_frames": 96000,
+      "max_rgb_difference": 0,
+      "mean_rgb_difference": 0.0,
+      "max_pcm_difference": 0.0,
+      "rgb_sha256": "sha256:62771dd41f771aceaf23b5a80b347c5268bf761fb2f6258d3c24c1dc2ad0b9d6",
+      "pcm_sha256": "sha256:50555c25954f1f148c5878f60971a405167e928adef936441114e78b631a2089",
+      "raw_expectation": "slice-or-insert-decoded-fixed-v37-original",
+      "status": "passed"
+    },
+    {
+      "case": "C07",
+      "frames": 50,
+      "stereo_sample_frames": 240000,
+      "max_rgb_difference": 0,
+      "mean_rgb_difference": 0.0,
+      "max_pcm_difference": 0.0,
+      "rgb_sha256": "sha256:d3358cd741db3a00334617b63e212b61eb75ddb47503f37e54143cea7d860155",
+      "pcm_sha256": "sha256:577e54c6dddb601d3bd1477e83de18376ed54d337a3e21098598ec8af448ee5d",
+      "raw_expectation": "slice-or-insert-decoded-fixed-v37-original",
+      "status": "passed"
+    },
+    {
+      "case": "C08",
+      "frames": 30,
+      "stereo_sample_frames": 144000,
+      "max_rgb_difference": 0,
+      "max_pcm_difference": 0.0,
+      "status": "passed",
+      "rgb_sha256": "sha256:a5203b6838497416cf466ef51d4b9548290ad5456e4856f10b9c17bcfbe3dd09",
+      "pcm_sha256": "sha256:a136a541c073c2e9508382307ca97c2a0335a96e024de26c41a5281c6d4c5780"
+    },
+    {
+      "case": "C09",
+      "frames": 40,
+      "stereo_sample_frames": 192000,
+      "max_rgb_difference": 0,
+      "max_pcm_difference": 0.0,
+      "status": "passed",
+      "rgb_sha256": "sha256:6c196110e39199bc72996b20aba60c7ed14defd27844453e26bae7851f405502",
+      "pcm_sha256": "sha256:32cd12dbca0d0ab35db4a18a090884b20c02b9988f64141e212a9449a2851a20"
+    }
+  ],
+  "cli_count": 54,
+  "calls": [
+    {
+      "index": 0,
+      "args": [
+        "project",
+        "init",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\seed"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.8374007000020356,
+      "stdout_sha256": "sha256:a396d0c331234487e98f32b8f7c45b66b4e4594f090ca8425f2ad598e25f996f"
+    },
+    {
+      "index": 1,
+      "args": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\seed",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\clip-windows-20261018\\source-a.mp4",
+        "--asset-id",
+        "video",
+        "--verification-status",
+        "verified",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--evidence",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\clip-windows-20261018\\fixture-provenance.json"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9665691999980481,
+      "stdout_sha256": "sha256:d10e1ba505f39349216ced9321e709c358e237942a37a32c2092985b54140b28"
+    },
+    {
+      "index": 2,
+      "args": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\seed",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\clip-windows-20261018\\sound-a.wav",
+        "--asset-id",
+        "audio",
+        "--verification-status",
+        "verified",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--evidence",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\clip-windows-20261018\\fixture-provenance.json"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9812433999977657,
+      "stdout_sha256": "sha256:6d7d094f7337618e584d54d2c7bffdb46d6a88c825d87985d6884500b5a5cd4f"
+    },
+    {
+      "index": 3,
+      "args": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\seed",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\clip-windows-20261018\\agent-grid-cc0.ttf",
+        "--asset-id",
+        "font",
+        "--verification-status",
+        "verified",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--evidence",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\clip-windows-20261018\\fixture-provenance.json"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9888405000019702,
+      "stdout_sha256": "sha256:5f5f28975ae35ed557c5769068f2dc5cc9fd0186868f75e66b470b4743391a74"
+    },
+    {
+      "index": 4,
+      "args": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\seed",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\clip-windows-20261018\\captions.srt",
+        "--asset-id",
+        "captions",
+        "--verification-status",
+        "verified",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--evidence",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\clip-windows-20261018\\fixture-provenance.json"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.8832476000025054,
+      "stdout_sha256": "sha256:7ea33d774ac244db4784e93802eff16b8fbf65bf6c108f0b23cf5df65d1e8870"
+    },
+    {
+      "index": 5,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C01",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C01\\renders\\C01-original.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": true,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.4821756000019377,
+      "stdout_sha256": "sha256:3fd5b23f3743366cf77eb8c4678f226894e3e7041291f527514961323a56485f"
+    },
+    {
+      "index": 6,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C01",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C01-request.json",
+        "--dry-run"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9626829999979236,
+      "stdout_sha256": "sha256:9eb57f80871c4224e7c4b7294ec2c716c3879f42f4b7ed12ff3aa7c6a66e4f05"
+    },
+    {
+      "index": 7,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C01",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C01-request.json",
+        "--idempotency-key",
+        "C01"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0849211999957333,
+      "stdout_sha256": "sha256:10ee730f9c879970a3b0b8a4e94d57462b411f3a0ae3e5cef85676299b52b00c"
+    },
+    {
+      "index": 8,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C01",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C01-request.json",
+        "--idempotency-key",
+        "C01"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9283782999991672,
+      "stdout_sha256": "sha256:ec0730872edf460a9e5fa6f42ea72d4e038a568792550bb5c03b11b871e8191b"
+    },
+    {
+      "index": 9,
+      "args": [
+        "validate",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C01",
+        "--strict-rights"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9645508000030532,
+      "stdout_sha256": "sha256:0f86d6a5f060d55b3f5939e18fb82514d8a7cf08d12918fa2f6b2f4943d20f2c"
+    },
+    {
+      "index": 10,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C01",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C01\\renders\\C01-actual.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.5394222999966587,
+      "stdout_sha256": "sha256:0b53e0c2c7c845a6eaec3b9708cb62237661a7dc69e5120224323aa01f2db99a"
+    },
+    {
+      "index": 11,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02\\renders\\C02-original.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": true,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.5746469000005163,
+      "stdout_sha256": "sha256:e339ed998c6202c743b5cea943223a7dd21f605af3ed10ded686288dbce5b9ec"
+    },
+    {
+      "index": 12,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02-request.json",
+        "--dry-run"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9767932999966433,
+      "stdout_sha256": "sha256:380f704e30cf348ab709cc6342b04fc4ef6c809a6ba018aa25a5e65a57673d7a"
+    },
+    {
+      "index": 13,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02-request.json",
+        "--idempotency-key",
+        "C02"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0176322999977856,
+      "stdout_sha256": "sha256:9573b1cb5fab4f642df1613b35559edbb15d31865b86a3f0b719b7e645cd2207"
+    },
+    {
+      "index": 14,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02-request.json",
+        "--idempotency-key",
+        "C02"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9011883999992278,
+      "stdout_sha256": "sha256:c936040a3785cc2182d076f3eea0bc64a949c6b2c9e975bc1e2f47c38266ea91"
+    },
+    {
+      "index": 15,
+      "args": [
+        "validate",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02",
+        "--strict-rights"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9524869000015315,
+      "stdout_sha256": "sha256:27507588d024e9eefef4e658b94eeed773a682be8e268469b57986f0f9c175a9"
+    },
+    {
+      "index": 16,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02\\renders\\C02-actual.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.6090925999960746,
+      "stdout_sha256": "sha256:e23027b5b4817c199e7d8c0ef9dfd9f23f0efd74e9ff0e48c77cc45a8173415f"
+    },
+    {
+      "index": 17,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C03",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C03\\renders\\C03-original.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": true,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.469307100000151,
+      "stdout_sha256": "sha256:eb7320550c266ba6324a996847af768037f78a0749f1f6489abe7e9789306a26"
+    },
+    {
+      "index": 18,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C03",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C03-request.json",
+        "--dry-run"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9564820999949006,
+      "stdout_sha256": "sha256:59a0cb699ccadf4ef0e1d4894919c8e94f47fe0481a4c0d81097b6d014ce679c"
+    },
+    {
+      "index": 19,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C03",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C03-request.json",
+        "--idempotency-key",
+        "C03"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0280201000059606,
+      "stdout_sha256": "sha256:1af549d7bcfe62ec035502dc1d8744555e575d25a36f34ca260946fd844bf50c"
+    },
+    {
+      "index": 20,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C03",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C03-request.json",
+        "--idempotency-key",
+        "C03"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.8968250000034459,
+      "stdout_sha256": "sha256:d2289bb039f2402fccdb73808f8a186efda165416fee25f15c7d402688f24d36"
+    },
+    {
+      "index": 21,
+      "args": [
+        "validate",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C03",
+        "--strict-rights"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9673401000036392,
+      "stdout_sha256": "sha256:64921fb12172a61c1655e70455ab4bc14a3e614224f3709e03d93d5f96f794dc"
+    },
+    {
+      "index": 22,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C03",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C03\\renders\\C03-actual.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.3679535999981454,
+      "stdout_sha256": "sha256:6958a3d9200eca19a45deb7fe4dd66def1b4f78a2a38982cb21ab1a6778517d5"
+    },
+    {
+      "index": 23,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C04",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C04\\renders\\C04-original.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": true,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.5705143999948632,
+      "stdout_sha256": "sha256:79702af3f8d689b2a4790fad78e2623587ae9779a733ceb7745a78eba9cde190"
+    },
+    {
+      "index": 24,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C04",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C04-request.json",
+        "--dry-run"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9412127999967197,
+      "stdout_sha256": "sha256:958e296e15f67bb64463a4fc683e2214327c9dae59b29d86e5a25705bc5d7afc"
+    },
+    {
+      "index": 25,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C04",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C04-request.json",
+        "--idempotency-key",
+        "C04"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0259384000019054,
+      "stdout_sha256": "sha256:1a023d74133b2326ec3431b95e66768be4a586dbbdb9b6b3b5cf2568a8521860"
+    },
+    {
+      "index": 26,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C04",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C04-request.json",
+        "--idempotency-key",
+        "C04"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9480454000004102,
+      "stdout_sha256": "sha256:219480e027b152c2dbddc7be8b8a39c9ae81e3c2aff8b5c077e9024cf750bfb7"
+    },
+    {
+      "index": 27,
+      "args": [
+        "validate",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C04",
+        "--strict-rights"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9615069999999832,
+      "stdout_sha256": "sha256:a4233f6b482f1166a7089be02be432596f7e61252eef0fc5543addd2cedf9e7e"
+    },
+    {
+      "index": 28,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C04",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C04\\renders\\C04-actual.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.4975981000025058,
+      "stdout_sha256": "sha256:faf6ebfcc713795089c14d0304320d8e40471d92a2c10cc36e06e75d972030c7"
+    },
+    {
+      "index": 29,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C05",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C05\\renders\\C05-original.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": true,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.4934634000019287,
+      "stdout_sha256": "sha256:07d716d9928864aee045d9b69011bae9cf204233e65cf650d298b0fbcd68e147"
+    },
+    {
+      "index": 30,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C05",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C05-request.json",
+        "--dry-run"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9321034999957192,
+      "stdout_sha256": "sha256:6219a8c45a812191c3c599703c81451c46bd9090355502e888a894ea80ce7b65"
+    },
+    {
+      "index": 31,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C05",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C05-request.json",
+        "--idempotency-key",
+        "C05"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.1663958000062848,
+      "stdout_sha256": "sha256:2831c7f099ecefceffc4a5bfc4e692b5220f2002571988c47b68b9dc2eb2f931"
+    },
+    {
+      "index": 32,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C05",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C05-request.json",
+        "--idempotency-key",
+        "C05"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0612965000036638,
+      "stdout_sha256": "sha256:c8f71c39d6046a98cf81f679019769c3fdd3a465217ac7be9a72d116d55a3939"
+    },
+    {
+      "index": 33,
+      "args": [
+        "validate",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C05",
+        "--strict-rights"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.9848620999982813,
+      "stdout_sha256": "sha256:06d04b4d54effcd177cc28a6b4eab300dfb17ae7a2169ac11282ff4a0ce4f885"
+    },
+    {
+      "index": 34,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C05",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C05\\renders\\C05-actual.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.3829549000001862,
+      "stdout_sha256": "sha256:f3fdde682c00d6d92d3470fcfe9c2f381401957a39de8aac358f3294c29611f0"
+    },
+    {
+      "index": 35,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C06",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C06\\renders\\C06-original.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": true,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.6121151999977883,
+      "stdout_sha256": "sha256:457fa9c459755970bb1217685aeac93434191e7b51068428da7888bb5f755c19"
+    },
+    {
+      "index": 36,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C06",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C06-request.json",
+        "--dry-run"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.926724999997532,
+      "stdout_sha256": "sha256:7f0ba6b4b12228209729007d07d0a31d18ee51c712d0bbd3d63e3a0b1e9ed4a1"
+    },
+    {
+      "index": 37,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C06",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C06-request.json",
+        "--idempotency-key",
+        "C06"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.1779481999983545,
+      "stdout_sha256": "sha256:4537d4426e8b68f4d48550c1bbb132327f8c65e76217fff0a0a074150c3b0365"
+    },
+    {
+      "index": 38,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C06",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C06-request.json",
+        "--idempotency-key",
+        "C06"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.063619699998526,
+      "stdout_sha256": "sha256:f7841b5812ce6d00cd361000d25f4fe16d2e44e85f52ed5abd500a777cdb7161"
+    },
+    {
+      "index": 39,
+      "args": [
+        "validate",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C06",
+        "--strict-rights"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0312275000032969,
+      "stdout_sha256": "sha256:4a5e56e4aab47b845d537ff30ec687392a6051128aa9effcacfc7762e731627c"
+    },
+    {
+      "index": 40,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C06",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C06\\renders\\C06-actual.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.5494409000020823,
+      "stdout_sha256": "sha256:07ec51e53da4283152f75f132f782230e83fbd4304c08a4b75a4cc3accb24a98"
+    },
+    {
+      "index": 41,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C07",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C07\\renders\\C07-original.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": true,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.433449299998756,
+      "stdout_sha256": "sha256:cd0b03802efbfdaf70c4bd10d5510d3d5cf572eb71f08ab7004e8ac8e54cf3e2"
+    },
+    {
+      "index": 42,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C07",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C07-request.json",
+        "--dry-run"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0545503000030294,
+      "stdout_sha256": "sha256:dee763c7bc129f702a8929f5d9337e7b403ddf6728fe06f64c0c80ca5d15a11d"
+    },
+    {
+      "index": 43,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C07",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C07-request.json",
+        "--idempotency-key",
+        "C07"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.1127188999962527,
+      "stdout_sha256": "sha256:3aefc1296400ce5513f49d239c4e35d047bf18346ef3587a99509d91cfff8572"
+    },
+    {
+      "index": 44,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C07",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C07-request.json",
+        "--idempotency-key",
+        "C07"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0182054999968386,
+      "stdout_sha256": "sha256:0ece14f3b01729f93db780ec6f8fb3bba8157d465292e2225c4c74ee9f185c8c"
+    },
+    {
+      "index": 45,
+      "args": [
+        "validate",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C07",
+        "--strict-rights"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0837014999997336,
+      "stdout_sha256": "sha256:7d7eaf45c72790a755e53bea8076b9d27fb2799cd0945ef9ed52518b0f5e736c"
+    },
+    {
+      "index": 46,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C07",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C07\\renders\\C07-actual.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.4924106999969808,
+      "stdout_sha256": "sha256:edd5d27af2caaa5e4fa6cdf3c8b26ab747668f578fd9ef6585d567fc11b985d4"
+    },
+    {
+      "index": 47,
+      "args": [
+        "fragment",
+        "save",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C02",
+        "--library",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\library",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\fragment.json"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.1521945999993477,
+      "stdout_sha256": "sha256:9ec8baeca230ad2661e6dbdd2a2c4c48527e66d1ba90346071304896977b161d"
+    },
+    {
+      "index": 48,
+      "args": [
+        "fragment",
+        "apply",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C08",
+        "--library",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\library",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\fragment.json"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.1918402000010246,
+      "stdout_sha256": "sha256:771817d56862778abcf6462bfcfa9873ada4fe425c4d48c3ae592d80e0c6e415"
+    },
+    {
+      "index": 49,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C08",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C08\\renders\\C08-actual.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.720928199996706,
+      "stdout_sha256": "sha256:ba8d2d1f4b440c924ab14fe4d04db5ae2fb278d3e5d8229b6f472de5f564f209"
+    },
+    {
+      "index": 50,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C09",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C09\\renders\\C09-original.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": true,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.485837599997467,
+      "stdout_sha256": "sha256:734ebcbd44fac6a9f9b270838d19eb707719518f51af7e651cbadd66d1e51486"
+    },
+    {
+      "index": 51,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C09",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C09-request.json"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0043424000032246,
+      "stdout_sha256": "sha256:41ccb1cecf22aaa21330564c4d299b383bd027c812e2e195b7f725df6f0cf10f"
+    },
+    {
+      "index": 52,
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C09",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\C09\\renders\\C09-actual.mkv",
+        "--container",
+        "mkv",
+        "--crf",
+        "0",
+        "--pixel-format",
+        "yuv444p",
+        "--audio-codec",
+        "pcm_f32le",
+        "--publish"
+      ],
+      "fixed_v37": false,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.353432600000815,
+      "stdout_sha256": "sha256:29f623c3ef4555b5f005d7913a209432bd568682284eca0a0e5f1d45ebc20e20"
+    },
+    {
+      "index": 53,
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\rejected",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\windows-smoke-final5-20261018\\locked.json"
+      ],
+      "fixed_v37": false,
+      "exit_code": 2,
+      "expected_exit_code": 2,
+      "seconds": 0.9230181000020821,
+      "stdout_sha256": "sha256:a07361e00b5c687df658b7a18f211f36a6e55136ef75bfab04b57a68b7becd88"
+    }
+  ],
+  "expected_rejections": 1,
+  "new_frames": 300,
+  "new_stereo_sample_frames": 1440000,
+  "new_model_inference": 0,
+  "continuous_playback_or_listening": false,
+  "oracle_limit": "fixed same product renderer; not an independent source-time or image-quality algorithm",
+  "fixture_provenance": {
+    "license_spdx": "CC0-1.0",
+    "source": "original counter/audio fixtures from V35; original grid font V37; new CTA cue",
+    "files": {
+      "agent-grid-cc0.ttf": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1",
+      "captions.srt": "sha256:5a1316137ad3dc5989d9b707099a33bb7eab75d2c2a6d6084227063bb165deec",
+      "run-state.json": "sha256:32d1279dea1afc6c6ee95fefe1ef31d85cdb09458fad157ebe35356616ddfab7",
+      "sound-a.wav": "sha256:884246144dbfc307f8bbc984de9a3ef1380669442894b08528113a9168c6198c",
+      "source-a.mp4": "sha256:6d36606b4b7520184fd8170db52e55c9d0c4e9571255ca5cc3577f9ae62def95"
+    },
+    "new_model_inference": 0,
+    "network_runtime": false,
+    "virtualization": false
+  },
+  "files": {
+    "agent-grid-cc0.ttf": {
+      "bytes": 2976,
+      "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1"
+    },
+    "C01-actual-project.json": {
+      "bytes": 16580,
+      "sha256": "sha256:e683b8921f3e11d1add67a632f0ac6b6f055f687afeb84ea60e24f6c2d41a297"
+    },
+    "C01-actual-render.json": {
+      "bytes": 10453,
+      "sha256": "sha256:692f16cdb0b6fc8ef199cd1f0db9360cb37406ff3589afc5a889bfd9506b65f6"
+    },
+    "C01-actual.mkv": {
+      "bytes": 1552809,
+      "sha256": "sha256:bb99403e2409270c0a2f017662937cf16681ea8716ca875590baf01263ced576"
+    },
+    "C01-actual.mp4": {
+      "bytes": 82449,
+      "sha256": "sha256:3f8b13ac41523adf27726981f8727e625992fe5d0f5a9b467a1d6734e2a95bb5"
+    },
+    "C01-original-project.json": {
+      "bytes": 11296,
+      "sha256": "sha256:fc0ed81afb8d20e166ebc4d63d4d241f3baa55913e2caead7461ed1a8036eac0"
+    },
+    "C01-original-render.json": {
+      "bytes": 10457,
+      "sha256": "sha256:3cf758b62faa7e35e9a272f5fc0a39854b77bbcdc2357635508a54ee41668731"
+    },
+    "C01-original.mkv": {
+      "bytes": 1552802,
+      "sha256": "sha256:5cfb8b65c9343a08088b6f3f35e851b8b4d657002e6868d156991f3021015a95"
+    },
+    "C01-original.mp4": {
+      "bytes": 82449,
+      "sha256": "sha256:3f8b13ac41523adf27726981f8727e625992fe5d0f5a9b467a1d6734e2a95bb5"
+    },
+    "C01-request.json": {
+      "bytes": 195,
+      "sha256": "sha256:c1d32066b21fce103d5875c8d6e0b5830370f6ea8b8edc7daeb7d3602d5bc424"
+    },
+    "C01-verification.json": {
+      "bytes": 427,
+      "sha256": "sha256:59ab0bb095bda781450c7380f3c5c3af6a272e220eaf1a6941708f6511f81299"
+    },
+    "C02-actual-project.json": {
+      "bytes": 17833,
+      "sha256": "sha256:e329cea3dd426f5a94551628cccd37b6295e91db77dab5c421c414d9a7a112a1"
+    },
+    "C02-actual-render.json": {
+      "bytes": 19681,
+      "sha256": "sha256:32d80bc7fc58aa64baa1503900ae1e6cb969cfa8da0e75a75df86c1d121d6c6c"
+    },
+    "C02-actual.mkv": {
+      "bytes": 1164002,
+      "sha256": "sha256:aba061b3b9c83c4abacb2cf84b43482796e3398ed2503e0e62252f6a3c76f451"
+    },
+    "C02-actual.mp4": {
+      "bytes": 64016,
+      "sha256": "sha256:b3a8c0828ac30adaeab4026aaefabb14243854126e6adc43c5f6905d420d7e04"
+    },
+    "C02-original-project.json": {
+      "bytes": 12128,
+      "sha256": "sha256:e6c2b25a601532e4739d90de7e5deaa9b50657b4e97200cc7e34d74139234ec1"
+    },
+    "C02-original-render.json": {
+      "bytes": 14419,
+      "sha256": "sha256:1de8207a051d3545c22f9ce148060cc69d618939b0a9d3077e111f0cfa71050d"
+    },
+    "C02-original.mkv": {
+      "bytes": 1551976,
+      "sha256": "sha256:108238d0973733865b9876c0de32b93b68b7555c9ef3a828f020bb8ecd20c3c9"
+    },
+    "C02-original.mp4": {
+      "bytes": 85159,
+      "sha256": "sha256:d4aba45fd694264daf12c81ecfb9281a213f759e8370d3a9a46329767137cbd1"
+    },
+    "C02-request.json": {
+      "bytes": 120,
+      "sha256": "sha256:73e28fff7ea471266fa9aff867b96d012b52d6e519c3288c64fea1f474317ab6"
+    },
+    "C02-verification.json": {
+      "bytes": 427,
+      "sha256": "sha256:bd8fae818dad66f2ae48e2ce867b9cef352c26817a7699f6135d2b98d8c958d0"
+    },
+    "C03-actual-project.json": {
+      "bytes": 14573,
+      "sha256": "sha256:aafe97edc3c411acf3277fb6fcc4099248f6794e5908ee0c821708c2698c86d4"
+    },
+    "C03-actual-render.json": {
+      "bytes": 10453,
+      "sha256": "sha256:caf5a469915f68be3e929878e174847329d549c5b6dd3206114cb7f18295213d"
+    },
+    "C03-actual.mkv": {
+      "bytes": 775547,
+      "sha256": "sha256:082d394cfb770cb0187267a71debac603a50513c142cadcc44e376f5d2a34011"
+    },
+    "C03-actual.mp4": {
+      "bytes": 34457,
+      "sha256": "sha256:ee5c4a7589cacc734fd5d107d189434ee772620ae82ca6b96d997d4b227b2225"
+    },
+    "C03-original-project.json": {
+      "bytes": 10882,
+      "sha256": "sha256:44431ab38c1d22bb3d8f351c65798ed4a299dccd2c85eeba09cc7d2714ee9ea2"
+    },
+    "C03-original-render.json": {
+      "bytes": 10457,
+      "sha256": "sha256:1f87a215c75623cea9b5c20730d381ad37a9d28cdaa9bb077366778e22786fad"
+    },
+    "C03-original.mkv": {
+      "bytes": 1937025,
+      "sha256": "sha256:b12d8d2ae0a789c8df1e9a1511d2c6c2a8f33b536e130a8526bc65a7441c7cc5"
+    },
+    "C03-original.mp4": {
+      "bytes": 85059,
+      "sha256": "sha256:7c31daba331a2cd61c7306e5de93d60d895be1ac4b5ffe15d962f6d9415dcdc9"
+    },
+    "C03-request.json": {
+      "bytes": 395,
+      "sha256": "sha256:cafce28c4a4e37be340f2f7fae369e0fb2132ff010b7fb0e7e5d3730116752ad"
+    },
+    "C03-verification.json": {
+      "bytes": 426,
+      "sha256": "sha256:6989692c1313ca991171be36ed2425ed1ea00a4ba59f439ffad95fc144b12021"
+    },
+    "C04-actual-project.json": {
+      "bytes": 15024,
+      "sha256": "sha256:07e431daaf6908bb4801b4351c5dc09ba5f725516198deacd78a00ebcdfcccb0"
+    },
+    "C04-actual-render.json": {
+      "bytes": 11798,
+      "sha256": "sha256:9edbb998838cf944b26cd404f7ab98209b125d89955e3ad8e52f2e8cb078abdc"
+    },
+    "C04-actual.mkv": {
+      "bytes": 1553402,
+      "sha256": "sha256:46a92f2fb88dbd03f3d00c59c6a54bf36d4935c5dfe69d4465e07336e98c8c08"
+    },
+    "C04-actual.mp4": {
+      "bytes": 82969,
+      "sha256": "sha256:8ab354602722fdebe592b6f0ebb4d73ad08ec0498225c23c1e3e8ee9f7589e02"
+    },
+    "C04-original-project.json": {
+      "bytes": 11303,
+      "sha256": "sha256:9af10823c33f29a46a307163d747191ba48e56a6cf85e44676c509494a523c50"
+    },
+    "C04-original-render.json": {
+      "bytes": 11154,
+      "sha256": "sha256:ea5b3da97d0fda5173f5df4fd640943bf0c3e1d66b7c49d44a4bd3fa92969265"
+    },
+    "C04-original.mkv": {
+      "bytes": 1553402,
+      "sha256": "sha256:e7a79c99afb329159138de3bfe7a5e8cf0fb3c3deef73b6528b45e9aa606c69f"
+    },
+    "C04-original.mp4": {
+      "bytes": 82969,
+      "sha256": "sha256:8ab354602722fdebe592b6f0ebb4d73ad08ec0498225c23c1e3e8ee9f7589e02"
+    },
+    "C04-request.json": {
+      "bytes": 112,
+      "sha256": "sha256:8421fe08c3fbe278004332f894fdedf49498693aefe47f98884343e4665465af"
+    },
+    "C04-verification.json": {
+      "bytes": 427,
+      "sha256": "sha256:5ebdd6dcb18453eda680dd883eddb953b93ad51860153eef18e7cf1bc290c71f"
+    },
+    "C05-actual-project.json": {
+      "bytes": 16325,
+      "sha256": "sha256:a7a521667bbc5af4e20678ba5420f19de3743bd8c424f275c6c0ac6673fd7676"
+    },
+    "C05-actual-render.json": {
+      "bytes": 11855,
+      "sha256": "sha256:6f494358af7b130a3ef0f0e161358edbb4d0d9e23662083f8bd64ecb22fb3f8e"
+    },
+    "C05-actual.mkv": {
+      "bytes": 1164732,
+      "sha256": "sha256:305fc866d349888af5e72fdb940352d076bc0df9c6ec0475f5577609a270e874"
+    },
+    "C05-actual.mp4": {
+      "bytes": 61739,
+      "sha256": "sha256:4d3341aa370275a50002a7635a59f9d8ce1c6d22e34cbc7c28fdc4b6987db2d5"
+    },
+    "C05-original-project.json": {
+      "bytes": 11505,
+      "sha256": "sha256:bbde7ab8794463454176e9ca3c03287b4953985be67d4f030cfecdf65789cc95"
+    },
+    "C05-original-render.json": {
+      "bytes": 10457,
+      "sha256": "sha256:e2cc65bade19269c37ffbe1e2c6b7181ed1fb1465981bb5fd5c7d649f2ef05ae"
+    },
+    "C05-original.mkv": {
+      "bytes": 1551742,
+      "sha256": "sha256:0f9b3a17d365750bed31eb8ec47a1877ae0d689db2f801e0a91d3b599b8654ab"
+    },
+    "C05-original.mp4": {
+      "bytes": 81190,
+      "sha256": "sha256:146cd49f467f8f4cfd9af45015af2d35fc92673d988eed5039153041184bf8f1"
+    },
+    "C05-request.json": {
+      "bytes": 392,
+      "sha256": "sha256:f1a28c7ae901042767108c270c59eedb96af02e7fb7f279d22794b9cc208b3eb"
+    },
+    "C05-verification.json": {
+      "bytes": 427,
+      "sha256": "sha256:c9a56b0eec03d750d08149266a639677e589ff70bbcd67d4dd3a4b351f67c2cb"
+    },
+    "C06-actual-project.json": {
+      "bytes": 14630,
+      "sha256": "sha256:d3d118d63ec818fe85dbf4b6084c978ad9faeaf162b67d8252b9df20f1f8c14a"
+    },
+    "C06-actual-render.json": {
+      "bytes": 10453,
+      "sha256": "sha256:77ffc6f9bd66657fd09933942bf85b87d621eca9d627e4bc58f84ae576c692ac"
+    },
+    "C06-actual.mkv": {
+      "bytes": 776886,
+      "sha256": "sha256:33b9e1d1b859534b5cb3620a51f90323f23021ae5c69304e6c0b24575fefeae8"
+    },
+    "C06-actual.mp4": {
+      "bytes": 41808,
+      "sha256": "sha256:bba12322fc7283b2c892eac9da28ffda8b008c0228e52151e404e95efb4c1b78"
+    },
+    "C06-original-project.json": {
+      "bytes": 11584,
+      "sha256": "sha256:337b2765e42074f6196aa706e7f29f8b99c3e1884964214834c1a20cbbacf76b"
+    },
+    "C06-original-render.json": {
+      "bytes": 10457,
+      "sha256": "sha256:c5b79a49e0f2aa43885189577ec3fb655fd36c06a12d001b642a61aa907688c7"
+    },
+    "C06-original.mkv": {
+      "bytes": 1551742,
+      "sha256": "sha256:1a341990857d1c7cc2d0ee61188ef70a0853bf7da12541682082e7e32adccf04"
+    },
+    "C06-original.mp4": {
+      "bytes": 81804,
+      "sha256": "sha256:2eeb6b8f74f9ebaa4c123b946a1100a9cb5904c48daa3dea13bfa0abac76f816"
+    },
+    "C06-request.json": {
+      "bytes": 257,
+      "sha256": "sha256:569c1317e085112d32a2b8618e00c6866a3baa2aad3937f140c203c5b989a746"
+    },
+    "C06-verification.json": {
+      "bytes": 426,
+      "sha256": "sha256:adea3b9b80df555bd2da628203c4790cb1a0b932b54bd3cbad2a1e1949f5bdb6"
+    },
+    "C07-actual-project.json": {
+      "bytes": 14713,
+      "sha256": "sha256:566d200b11633ea2a09eff1b177b5dbd688ba55f3c96867a85b3c73aa62ed5da"
+    },
+    "C07-actual-render.json": {
+      "bytes": 10453,
+      "sha256": "sha256:aadd36267aaa3ee75425718eab7bd881797592c557867ad9394f1c271218c4d9"
+    },
+    "C07-actual.mkv": {
+      "bytes": 1936979,
+      "sha256": "sha256:7b056d5bb6363ca95d4e6010c60cc9439bb70864955e37ccac180eb2af75c52a"
+    },
+    "C07-actual.mp4": {
+      "bytes": 85119,
+      "sha256": "sha256:cc9abf33112743e89dd62bc68d18f1a66c823eff703b3e9451f0334a7ed675bb"
+    },
+    "C07-original-project.json": {
+      "bytes": 10568,
+      "sha256": "sha256:d6b884afa7b2bce057debb5a94f030a87a219077edcb3f1569106c6b6e9568fd"
+    },
+    "C07-original-render.json": {
+      "bytes": 10456,
+      "sha256": "sha256:c851e2881d7e138b2dc347d5c4c6e4cb03f978014b18fe2d3e07e8f8fde3dc37"
+    },
+    "C07-original.mkv": {
+      "bytes": 1552430,
+      "sha256": "sha256:4a9de1f3e8183f7901e0dc2cbb28b86153d22786d4c322a03fe4bcb67ed0c7e1"
+    },
+    "C07-original.mp4": {
+      "bytes": 81997,
+      "sha256": "sha256:894ef64b368eefa70101d2e37e18defa0fc481fd24a788d37ce1168a8673c131"
+    },
+    "C07-request.json": {
+      "bytes": 120,
+      "sha256": "sha256:d13ab2a9eb1a7bf9cbdc1d61f565cc13e1f61ff2b7dfd47f5d79a8de73394905"
+    },
+    "C07-verification.json": {
+      "bytes": 427,
+      "sha256": "sha256:cd80cd31108a27535255b5ae1ab1776c6b91d5af71b30dd054935d08f3ea4ca4"
+    },
+    "C08-actual-project.json": {
+      "bytes": 29791,
+      "sha256": "sha256:6a0c6ed1aba2d9e9acfc24d507c10a8a3d2eae9b2608ec9a9d8ab192c806f46c"
+    },
+    "C08-actual-render.json": {
+      "bytes": 23519,
+      "sha256": "sha256:a7e63b13d35bb6324afad9ecde5753675d2673ed99e5b5708dfc65fee28dc781"
+    },
+    "C08-actual.mkv": {
+      "bytes": 1164151,
+      "sha256": "sha256:73ee88627f19c342ef57d8435bd5bb83c957d2dce832b5037a8e361d6d9af45d"
+    },
+    "C08-actual.mp4": {
+      "bytes": 64016,
+      "sha256": "sha256:b3a8c0828ac30adaeab4026aaefabb14243854126e6adc43c5f6905d420d7e04"
+    },
+    "C08-verification.json": {
+      "bytes": 330,
+      "sha256": "sha256:cb0d67b226707c49cbacc7e8135583fcb00d0abce30e404537e1a899d94378f6"
+    },
+    "C09-actual-project.json": {
+      "bytes": 14717,
+      "sha256": "sha256:de87302709484a501337ca4473cbcc7219ccb36d151a22499e22ac0bc7d1da53"
+    },
+    "C09-actual-render.json": {
+      "bytes": 10453,
+      "sha256": "sha256:0cf927423cf5539ec3e26ec1c24e2df716329cd97f218c08a9874245c62bee3e"
+    },
+    "C09-actual.mkv": {
+      "bytes": 1547056,
+      "sha256": "sha256:4f90c64aa69e453083d8cd4519bae4cc2f443c7ae6ca4aa1b1a3c6b9a5ead283"
+    },
+    "C09-actual.mp4": {
+      "bytes": 76627,
+      "sha256": "sha256:e9e67237d01001a64e26d92a4d8ca80aa0b1547b397e10f5b77685ea438a8c00"
+    },
+    "C09-original-project.json": {
+      "bytes": 11138,
+      "sha256": "sha256:3330d90cab07120818c9e337abe549d7d984507461e11e80326cd3a6c1d44103"
+    },
+    "C09-original-render.json": {
+      "bytes": 10457,
+      "sha256": "sha256:bbf0c5564560b22d0db0cabfa9f57af1c7b56c53609bff3bdaa8ec8412011582"
+    },
+    "C09-original.mkv": {
+      "bytes": 1547056,
+      "sha256": "sha256:b91944db70b1ddd21c4aee8e61401dfbdfe5f2be110e1487aeafd032b1c7572f"
+    },
+    "C09-original.mp4": {
+      "bytes": 76627,
+      "sha256": "sha256:e9e67237d01001a64e26d92a4d8ca80aa0b1547b397e10f5b77685ea438a8c00"
+    },
+    "C09-request.json": {
+      "bytes": 110,
+      "sha256": "sha256:12edf9667c3324ad2e5e28cb39c0ed56c7da1385f9bec438e1dcfe6f59c06b93"
+    },
+    "C09-verification.json": {
+      "bytes": 330,
+      "sha256": "sha256:d885e494001e08117e5be8a0cdc790bb74e3146105f67f2e929dcf5b2d531272"
+    },
+    "captions.srt": {
+      "bytes": 39,
+      "sha256": "sha256:5a1316137ad3dc5989d9b707099a33bb7eab75d2c2a6d6084227063bb165deec"
+    },
+    "cli-000-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-000-stdout.log": {
+      "bytes": 631,
+      "sha256": "sha256:a396d0c331234487e98f32b8f7c45b66b4e4594f090ca8425f2ad598e25f996f"
+    },
+    "cli-001-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-001-stdout.log": {
+      "bytes": 3207,
+      "sha256": "sha256:d10e1ba505f39349216ced9321e709c358e237942a37a32c2092985b54140b28"
+    },
+    "cli-002-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-002-stdout.log": {
+      "bytes": 2784,
+      "sha256": "sha256:6d7d094f7337618e584d54d2c7bffdb46d6a88c825d87985d6884500b5a5cd4f"
+    },
+    "cli-003-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-003-stdout.log": {
+      "bytes": 2020,
+      "sha256": "sha256:5f5f28975ae35ed557c5769068f2dc5cc9fd0186868f75e66b470b4743391a74"
+    },
+    "cli-004-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-004-stdout.log": {
+      "bytes": 2090,
+      "sha256": "sha256:7ea33d774ac244db4784e93802eff16b8fbf65bf6c108f0b23cf5df65d1e8870"
+    },
+    "cli-005-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-005-stdout.log": {
+      "bytes": 6298,
+      "sha256": "sha256:3fd5b23f3743366cf77eb8c4678f226894e3e7041291f527514961323a56485f"
+    },
+    "cli-006-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-006-stdout.log": {
+      "bytes": 1168,
+      "sha256": "sha256:9eb57f80871c4224e7c4b7294ec2c716c3879f42f4b7ed12ff3aa7c6a66e4f05"
+    },
+    "cli-007-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-007-stdout.log": {
+      "bytes": 1502,
+      "sha256": "sha256:10ee730f9c879970a3b0b8a4e94d57462b411f3a0ae3e5cef85676299b52b00c"
+    },
+    "cli-008-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-008-stdout.log": {
+      "bytes": 1626,
+      "sha256": "sha256:ec0730872edf460a9e5fa6f42ea72d4e038a568792550bb5c03b11b871e8191b"
+    },
+    "cli-009-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-009-stdout.log": {
+      "bytes": 797,
+      "sha256": "sha256:0f86d6a5f060d55b3f5939e18fb82514d8a7cf08d12918fa2f6b2f4943d20f2c"
+    },
+    "cli-010-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-010-stdout.log": {
+      "bytes": 6294,
+      "sha256": "sha256:0b53e0c2c7c845a6eaec3b9708cb62237661a7dc69e5120224323aa01f2db99a"
+    },
+    "cli-011-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-011-stdout.log": {
+      "bytes": 9268,
+      "sha256": "sha256:e339ed998c6202c743b5cea943223a7dd21f605af3ed10ded686288dbce5b9ec"
+    },
+    "cli-012-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-012-stdout.log": {
+      "bytes": 931,
+      "sha256": "sha256:380f704e30cf348ab709cc6342b04fc4ef6c809a6ba018aa25a5e65a57673d7a"
+    },
+    "cli-013-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-013-stdout.log": {
+      "bytes": 1265,
+      "sha256": "sha256:9573b1cb5fab4f642df1613b35559edbb15d31865b86a3f0b719b7e645cd2207"
+    },
+    "cli-014-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-014-stdout.log": {
+      "bytes": 1389,
+      "sha256": "sha256:c936040a3785cc2182d076f3eea0bc64a949c6b2c9e975bc1e2f47c38266ea91"
+    },
+    "cli-015-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-015-stdout.log": {
+      "bytes": 797,
+      "sha256": "sha256:27507588d024e9eefef4e658b94eeed773a682be8e268469b57986f0f9c175a9"
+    },
+    "cli-016-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-016-stdout.log": {
+      "bytes": 13098,
+      "sha256": "sha256:e23027b5b4817c199e7d8c0ef9dfd9f23f0efd74e9ff0e48c77cc45a8173415f"
+    },
+    "cli-017-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-017-stdout.log": {
+      "bytes": 6298,
+      "sha256": "sha256:eb7320550c266ba6324a996847af768037f78a0749f1f6489abe7e9789306a26"
+    },
+    "cli-018-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-018-stdout.log": {
+      "bytes": 1243,
+      "sha256": "sha256:59a0cb699ccadf4ef0e1d4894919c8e94f47fe0481a4c0d81097b6d014ce679c"
+    },
+    "cli-019-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-019-stdout.log": {
+      "bytes": 1577,
+      "sha256": "sha256:1af549d7bcfe62ec035502dc1d8744555e575d25a36f34ca260946fd844bf50c"
+    },
+    "cli-020-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-020-stdout.log": {
+      "bytes": 1701,
+      "sha256": "sha256:d2289bb039f2402fccdb73808f8a186efda165416fee25f15c7d402688f24d36"
+    },
+    "cli-021-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-021-stdout.log": {
+      "bytes": 797,
+      "sha256": "sha256:64921fb12172a61c1655e70455ab4bc14a3e614224f3709e03d93d5f96f794dc"
+    },
+    "cli-022-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-022-stdout.log": {
+      "bytes": 6294,
+      "sha256": "sha256:6958a3d9200eca19a45deb7fe4dd66def1b4f78a2a38982cb21ab1a6778517d5"
+    },
+    "cli-023-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-023-stdout.log": {
+      "bytes": 6867,
+      "sha256": "sha256:79702af3f8d689b2a4790fad78e2623587ae9779a733ceb7745a78eba9cde190"
+    },
+    "cli-024-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-024-stdout.log": {
+      "bytes": 923,
+      "sha256": "sha256:958e296e15f67bb64463a4fc683e2214327c9dae59b29d86e5a25705bc5d7afc"
+    },
+    "cli-025-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-025-stdout.log": {
+      "bytes": 1257,
+      "sha256": "sha256:1a023d74133b2326ec3431b95e66768be4a586dbbdb9b6b3b5cf2568a8521860"
+    },
+    "cli-026-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-026-stdout.log": {
+      "bytes": 1381,
+      "sha256": "sha256:219480e027b152c2dbddc7be8b8a39c9ae81e3c2aff8b5c077e9024cf750bfb7"
+    },
+    "cli-027-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-027-stdout.log": {
+      "bytes": 797,
+      "sha256": "sha256:a4233f6b482f1166a7089be02be432596f7e61252eef0fc5543addd2cedf9e7e"
+    },
+    "cli-028-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-028-stdout.log": {
+      "bytes": 7307,
+      "sha256": "sha256:faf6ebfcc713795089c14d0304320d8e40471d92a2c10cc36e06e75d972030c7"
+    },
+    "cli-029-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-029-stdout.log": {
+      "bytes": 6298,
+      "sha256": "sha256:07d716d9928864aee045d9b69011bae9cf204233e65cf650d298b0fbcd68e147"
+    },
+    "cli-030-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-030-stdout.log": {
+      "bytes": 1232,
+      "sha256": "sha256:6219a8c45a812191c3c599703c81451c46bd9090355502e888a894ea80ce7b65"
+    },
+    "cli-031-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-031-stdout.log": {
+      "bytes": 1566,
+      "sha256": "sha256:2831c7f099ecefceffc4a5bfc4e692b5220f2002571988c47b68b9dc2eb2f931"
+    },
+    "cli-032-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-032-stdout.log": {
+      "bytes": 1690,
+      "sha256": "sha256:c8f71c39d6046a98cf81f679019769c3fdd3a465217ac7be9a72d116d55a3939"
+    },
+    "cli-033-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-033-stdout.log": {
+      "bytes": 797,
+      "sha256": "sha256:06d04b4d54effcd177cc28a6b4eab300dfb17ae7a2169ac11282ff4a0ce4f885"
+    },
+    "cli-034-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-034-stdout.log": {
+      "bytes": 7496,
+      "sha256": "sha256:f3fdde682c00d6d92d3470fcfe9c2f381401957a39de8aac358f3294c29611f0"
+    },
+    "cli-035-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-035-stdout.log": {
+      "bytes": 6298,
+      "sha256": "sha256:457fa9c459755970bb1217685aeac93434191e7b51068428da7888bb5f755c19"
+    },
+    "cli-036-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-036-stdout.log": {
+      "bytes": 1006,
+      "sha256": "sha256:7f0ba6b4b12228209729007d07d0a31d18ee51c712d0bbd3d63e3a0b1e9ed4a1"
+    },
+    "cli-037-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-037-stdout.log": {
+      "bytes": 1340,
+      "sha256": "sha256:4537d4426e8b68f4d48550c1bbb132327f8c65e76217fff0a0a074150c3b0365"
+    },
+    "cli-038-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-038-stdout.log": {
+      "bytes": 1464,
+      "sha256": "sha256:f7841b5812ce6d00cd361000d25f4fe16d2e44e85f52ed5abd500a777cdb7161"
+    },
+    "cli-039-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-039-stdout.log": {
+      "bytes": 797,
+      "sha256": "sha256:4a5e56e4aab47b845d537ff30ec687392a6051128aa9effcacfc7762e731627c"
+    },
+    "cli-040-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-040-stdout.log": {
+      "bytes": 6294,
+      "sha256": "sha256:07ec51e53da4283152f75f132f782230e83fbd4304c08a4b75a4cc3accb24a98"
+    },
+    "cli-041-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-041-stdout.log": {
+      "bytes": 6297,
+      "sha256": "sha256:cd0b03802efbfdaf70c4bd10d5510d3d5cf572eb71f08ab7004e8ac8e54cf3e2"
+    },
+    "cli-042-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-042-stdout.log": {
+      "bytes": 931,
+      "sha256": "sha256:dee763c7bc129f702a8929f5d9337e7b403ddf6728fe06f64c0c80ca5d15a11d"
+    },
+    "cli-043-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-043-stdout.log": {
+      "bytes": 1265,
+      "sha256": "sha256:3aefc1296400ce5513f49d239c4e35d047bf18346ef3587a99509d91cfff8572"
+    },
+    "cli-044-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-044-stdout.log": {
+      "bytes": 1389,
+      "sha256": "sha256:0ece14f3b01729f93db780ec6f8fb3bba8157d465292e2225c4c74ee9f185c8c"
+    },
+    "cli-045-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-045-stdout.log": {
+      "bytes": 797,
+      "sha256": "sha256:7d7eaf45c72790a755e53bea8076b9d27fb2799cd0945ef9ed52518b0f5e736c"
+    },
+    "cli-046-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-046-stdout.log": {
+      "bytes": 6294,
+      "sha256": "sha256:edd5d27af2caaa5e4fa6cdf3c8b26ab747668f578fd9ef6585d567fc11b985d4"
+    },
+    "cli-047-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-047-stdout.log": {
+      "bytes": 11317,
+      "sha256": "sha256:9ec8baeca230ad2661e6dbdd2a2c4c48527e66d1ba90346071304896977b161d"
+    },
+    "cli-048-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-048-stdout.log": {
+      "bytes": 5247,
+      "sha256": "sha256:771817d56862778abcf6462bfcfa9873ada4fe425c4d48c3ae592d80e0c6e415"
+    },
+    "cli-049-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-049-stdout.log": {
+      "bytes": 16584,
+      "sha256": "sha256:ba8d2d1f4b440c924ab14fe4d04db5ae2fb278d3e5d8229b6f472de5f564f209"
+    },
+    "cli-050-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-050-stdout.log": {
+      "bytes": 6298,
+      "sha256": "sha256:734ebcbd44fac6a9f9b270838d19eb707719518f51af7e651cbadd66d1e51486"
+    },
+    "cli-051-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-051-stdout.log": {
+      "bytes": 1255,
+      "sha256": "sha256:41ccb1cecf22aaa21330564c4d299b383bd027c812e2e195b7f725df6f0cf10f"
+    },
+    "cli-052-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-052-stdout.log": {
+      "bytes": 6294,
+      "sha256": "sha256:29f623c3ef4555b5f005d7913a209432bd568682284eca0a0e5f1d45ebc20e20"
+    },
+    "cli-053-stderr.log": {
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cli-053-stdout.log": {
+      "bytes": 478,
+      "sha256": "sha256:a07361e00b5c687df658b7a18f211f36a6e55136ef75bfab04b57a68b7becd88"
+    },
+    "comparison.gif": {
+      "bytes": 64534,
+      "sha256": "sha256:f145d0f453e43adc3bb7d21fc793acd02ee1bc8a3f215ab09f093ae82b2a3ad1"
+    },
+    "fixture-provenance.json": {
+      "bytes": 707,
+      "sha256": "sha256:a01e524f6acedc2de5e3bfd72aa7ca574fecdcd7163e5144fe003483354f9f24"
+    },
+    "run-state.json": {
+      "bytes": 31104,
+      "sha256": "sha256:36ac76b0fafb336a0371810a43b9bef6a41ec22506cd0edb7acdbc6b0b2e9642"
+    },
+    "sound-a.wav": {
+      "bytes": 1536078,
+      "sha256": "sha256:884246144dbfc307f8bbc984de9a3ef1380669442894b08528113a9168c6198c"
+    },
+    "source-a.mp4": {
+      "bytes": 197887,
+      "sha256": "sha256:6d36606b4b7520184fd8170db52e55c9d0c4e9571255ca5cc3577f9ae62def95"
+    }
+  }
+}

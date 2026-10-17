@@ -5,6 +5,12 @@ description: Build and apply local advertising templates, or save and reuse edit
 
 # Local Templates
 
+Edited groups may contain [presentation windows](../../docs/specs/片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md).
+Preserve original source ranges, author start/duration and window offsets when
+saving or applying; do not normalize them to the visible clip duration. The
+native group path preserves these clocks across projects. Keep current context,
+rights and supported-operation gates when continuing to edit an inserted group.
+
 To reuse an already edited intro, CTA or caption group, use the
 [local fragment library](../../docs/specs/可复用片段组库与跨项目插入契约_v0.1_2026-10-18.md).
 `fragment save` takes an immutable ID/version and an optional clip selection;

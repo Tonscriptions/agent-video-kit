@@ -5,6 +5,13 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For source-preserving split, trim and interval ripple operations, use the
+[presentation window contract](../../docs/specs/片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md).
+The visible clip range is separate from its full author source/animation clock.
+Native rendering computes the full clip before selecting its output; external
+formats report this authoring feature unsupported. Keep the explicit operation
+gates for tracking, smart-cut/reframe, transitions and partial-take speed/reverse.
+
 Use this skill when the requested edit should be represented as a reproducible local Agent Project rather than a GUI project. The implementation lives in `product/` in this project.
 
 For cross-project reuse of edited clips, read the

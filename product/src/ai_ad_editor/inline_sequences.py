@@ -55,7 +55,8 @@ def transition_descendants(project, sequence_id):
             return bearing[sid]
         child = sequences[sid]
         flags = [visit(ref, (*stack,sid)) for ref in sorted(_references(child))]
-        bearing[sid] = bool(child.get('source_transitions')) or any(flags)
+        bearing[sid] = bool(child.get('source_transitions')) or any(flags) or any(
+            c.get('presentation_window') for t in child.get('tracks', []) for c in t.get('clips', []))
         return bearing[sid]
     visit(sequence_id)
     return reachable, bearing
@@ -74,6 +75,13 @@ def prepare(root, project, sequence, build_graph, *, stack=()):
     surfaces = {}
     for ordinal, sid in enumerate(direct):
         child = sequences[sid]
+        def has_window(current, seen=()):
+            if current in seen:
+                raise AppError('SEQUENCE_CYCLE', '窗口子序列存在循环', exit_code=2)
+            value = sequences[current]
+            return any(c.get('presentation_window') for t in value['tracks'] for c in t['clips']) or any(
+                has_window(ref, (*seen,current)) for ref in _references(value))
+        complete_audio = has_window(sid)
         # Adjustments are selected-root controls, not authored child effects.
         child_project = {**project,'settings':copy.deepcopy(project['settings'])}
         child_project['settings'].pop('adjustments', None)
@@ -83,21 +91,23 @@ def prepare(root, project, sequence, build_graph, *, stack=()):
         output['video'] = {**(video if isinstance(video, dict) else {}),'pixel_format':'yuva420p'}
         child_project['settings']['output'] = output
         child_inputs, graph, child_meta, warnings = build_graph(
-            root, child_project, child, _video_only=True, _inline_stack=(*stack,sequence['id']))
+            root, child_project, child, _video_only=not complete_audio, _inline_stack=(*stack,sequence['id']))
         prefix, offset = f'inline{ordinal}_', inputs.count('-i')
         inputs.extend(child_inputs)
         filters.append(graph_namespace(graph, prefix, offset))
-        filters.append(f'[{prefix}aout]anullsink')
+        if not complete_audio:
+            filters.append(f'[{prefix}aout]anullsink')
         raster = sequence_canvas(project, child)
         aid = f'__inline_video_{sid}'
         while any(a['id']==aid for a in project.get('assets', [])) or aid in surfaces:
             aid += '_'
-        surfaces[aid] = {'sequence_id':sid,'label':prefix+'vout','canvas':raster}
+        surfaces[aid] = {'sequence_id':sid,'label':prefix+'vout','canvas':raster,
+                         'audio_label':prefix+'aout' if complete_audio else None}
         metadata.append({'kind':'sequence-inline-surface','sequence_id':sid,'asset_id':aid,
                          'input_offset':offset,'input_count':len(child_inputs) and child_inputs.count('-i'),
                          'filter_namespace':prefix,'native_canvas':raster,'inputs':child_meta,'warnings':warnings,
                          'video_clock':'child-authored-composite-before-ancestor-time-map',
-                         'audio_path':'original-source-leaves-and-authored-buses',
+                         'audio_path':'complete-authored-child-bus' if complete_audio else 'original-source-leaves-and-authored-buses',
                          'intermediate_files':0,'estimated_surface_working_bytes':raster['width']*raster['height']*16})
     detached = copy.deepcopy(project)
     # Native audio envelopes remain on original files. Compile all reachable
@@ -111,10 +121,19 @@ def prepare(root, project, sequence, build_graph, *, stack=()):
     fps = project['settings']['timebase'].get('display_fps', {'num':30,'den':1})
     for aid,surface in surfaces.items():
         child = next(s for s in detached['sequences'] if s['id']==surface['sequence_id'])
-        child['_inline_video_asset_id'] = aid
-        detached['assets'].append({'id':aid,'kind':'video','_inline_video':surface,
+        asset = {'id':aid,'kind':'video','_inline_video':surface,
             'probe':{'duration_seconds':child['duration_tick']/tps,
-                     'video':{**surface['canvas'],'pix_fmt':'rgba','fps':f'{fps["num"]}/{fps["den"]}'}}})
+                     'video':{**surface['canvas'],'pix_fmt':'rgba','fps':f'{fps["num"]}/{fps["den"]}'}}}
+        if surface.get('audio_label'):
+            asset['_inline_audio'] = {'label':surface['audio_label']}
+            asset['probe']['audio'] = {'codec':'pcm_f32le','channels':2,'sample_rate':48000}
+            child['tracks'] = [{'id':f'{aid}_{kind}_track','kind':kind,'order':0,'clips':[
+                {'id':f'{aid}_{kind}_clip','asset_id':aid,'timeline_start_tick':0,
+                 'duration_tick':child['duration_tick'],'source_in_tick':0,'source_out_tick':child['duration_tick']}]} for kind in ('video','audio')]
+            child.pop('source_transitions', None)
+        else:
+            child['_inline_video_asset_id'] = aid
+        detached['assets'].append(asset)
     return detached, next(s for s in detached['sequences'] if s['id']==sequence['id']), inputs, filters, metadata
 
 

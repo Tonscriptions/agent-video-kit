@@ -174,6 +174,8 @@ def _content(clip):
 def interchange_features(project):
     """Native authoring semantics that external formats do not implement."""
     features = []
+    if any(c.get('presentation_window') is not None for s in project['sequences'] for t in s['tracks'] for c in t['clips']):
+        features.append('clip.presentation_window')
     if any(s.get('source_transitions') for s in project['sequences']):
         features.append('sequence.source_transitions')
     if any(s.get('editing') is not None for s in project['sequences']):
@@ -363,7 +365,7 @@ class _Draft:
                 delta = _start(clip) - _start(old)
                 subtitle = clip.get('subtitle', {})
                 external = assets.get(clip.get('asset_id'), {}).get('kind') == 'subtitle' or bool(subtitle.get('asset_uri'))
-                if delta and external and subtitle.get('asset_time_base', 'sequence') == 'sequence':
+                if delta and external and not clip.get('presentation_window') and subtitle.get('asset_time_base', 'sequence') == 'sequence':
                     clip.setdefault('subtitle', {})['asset_time_offset_tick'] = subtitle.get('asset_time_offset_tick', 0) - delta
                     self.retimed_subtitles.append(clip['id'])
 

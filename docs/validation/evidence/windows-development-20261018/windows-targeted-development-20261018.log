@@ -1,0 +1,101 @@
+test_cli_batch_dry_run_and_rejected_cut_do_not_write (test_clip_windows.ClipWindowTests.test_cli_batch_dry_run_and_rejected_cut_do_not_write) ... ok
+test_curved_reverse_ripple_matches_removed_original_range (test_clip_windows.ClipWindowTests.test_curved_reverse_ripple_matches_removed_original_range) ... ERROR
+test_freeze_window_cut_inside_held_picture_and_silence (test_clip_windows.ClipWindowTests.test_freeze_window_cut_inside_held_picture_and_silence) ... ERROR
+test_insert_inside_clip_renders_black_and_silence_gap (test_clip_windows.ClipWindowTests.test_insert_inside_clip_renders_black_and_silence_gap) ... ERROR
+test_internal_ripple_deletes_middle_not_tail (test_clip_windows.ClipWindowTests.test_internal_ripple_deletes_middle_not_tail) ... ok
+test_nested_window_sequence_preserves_source_clock (test_clip_windows.ClipWindowTests.test_nested_window_sequence_preserves_source_clock) ... ERROR
+test_repeated_slice_preserves_authored_payload_and_composes_offset (test_clip_windows.ClipWindowTests.test_repeated_slice_preserves_authored_payload_and_composes_offset) ... ok
+test_ripple_boundary_crossing_removes_correct_head (test_clip_windows.ClipWindowTests.test_ripple_boundary_crossing_removes_correct_head) ... ok
+test_split_is_global_id_safe_and_lock_atomic (test_clip_windows.ClipWindowTests.test_split_is_global_id_safe_and_lock_atomic) ... ok
+test_split_render_is_identical_to_original_frames_and_processed_audio (test_clip_windows.ClipWindowTests.test_split_render_is_identical_to_original_frames_and_processed_audio) ... ERROR
+test_strict_window_ranges (test_clip_windows.ClipWindowTests.test_strict_window_ranges) ... ok
+test_track_scoped_ripple_does_not_truncate_unselected_tracks (test_clip_windows.ClipWindowTests.test_track_scoped_ripple_does_not_truncate_unselected_tracks) ... ok
+test_window_validation_keeps_author_keyframes_outside_visible_range (test_clip_windows.ClipWindowTests.test_window_validation_keeps_author_keyframes_outside_visible_range) ... FAIL
+
+======================================================================
+ERROR: test_curved_reverse_ripple_matches_removed_original_range (test_clip_windows.ClipWindowTests.test_curved_reverse_ripple_matches_removed_original_range)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 180, in test_curved_reverse_ripple_matches_removed_original_range
+    frames,samples=self.pixels_and_samples(self.project)
+                   ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 64, in pixels_and_samples
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 4109, in build_filter_graph
+    audio_input = f'{audio_input}'
+                     ^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'audio_input' where it is not associated with a value
+
+======================================================================
+ERROR: test_freeze_window_cut_inside_held_picture_and_silence (test_clip_windows.ClipWindowTests.test_freeze_window_cut_inside_held_picture_and_silence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 192, in test_freeze_window_cut_inside_held_picture_and_silence
+    frames,samples=self.pixels_and_samples(self.project)
+                   ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 64, in pixels_and_samples
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 4109, in build_filter_graph
+    audio_input = f'{audio_input}'
+                     ^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'audio_input' where it is not associated with a value
+
+======================================================================
+ERROR: test_insert_inside_clip_renders_black_and_silence_gap (test_clip_windows.ClipWindowTests.test_insert_inside_clip_renders_black_and_silence_gap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 202, in test_insert_inside_clip_renders_black_and_silence_gap
+    frames,samples=self.pixels_and_samples(self.project)
+                   ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 64, in pixels_and_samples
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 4109, in build_filter_graph
+    audio_input = f'{audio_input}'
+                     ^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'audio_input' where it is not associated with a value
+
+======================================================================
+ERROR: test_nested_window_sequence_preserves_source_clock (test_clip_windows.ClipWindowTests.test_nested_window_sequence_preserves_source_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 221, in test_nested_window_sequence_preserves_source_clock
+    frames,samples=self.pixels_and_samples(self.project)
+                   ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 64, in pixels_and_samples
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 4109, in build_filter_graph
+    audio_input = f'{audio_input}'
+                     ^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'audio_input' where it is not associated with a value
+
+======================================================================
+ERROR: test_split_render_is_identical_to_original_frames_and_processed_audio (test_clip_windows.ClipWindowTests.test_split_render_is_identical_to_original_frames_and_processed_audio)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 168, in test_split_render_is_identical_to_original_frames_and_processed_audio
+    before=self.pixels_and_samples(self.project)
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 64, in pixels_and_samples
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 4109, in build_filter_graph
+    audio_input = f'{audio_input}'
+                     ^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'audio_input' where it is not associated with a value
+
+======================================================================
+FAIL: test_window_validation_keeps_author_keyframes_outside_visible_range (test_clip_windows.ClipWindowTests.test_window_validation_keeps_author_keyframes_outside_visible_range)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 145, in test_window_validation_keeps_author_keyframes_outside_visible_range
+    self.assertTrue(result['ok'],result)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'ok': False, 'errors': [{'code': 'SCHEMA_VALIDATION_FAILED', 'message': "'interpolation' is a required property", 'path': 'sequences.0.tracks.0.clips.0.keyframes.0.keyframes.0', 'retryable': False}, {'code': 'SCHEMA_VALIDATION_FAILED', 'message': "'interpolation' is a required property", 'path': 'sequences.0.tracks.0.clips.0.keyframes.0.keyframes.1', 'retryable': False}, {'code': 'INTERPOLATION_INVALID', 'message': '关键帧插值类型无效', 'path': 'sequences[0].tracks[0].clips[0].keyframes', 'retryable': False}, {'code': 'INTERPOLATION_INVALID', 'message': '关键帧插值类型无效', 'path': 'sequences[0].tracks[0].clips[0].keyframes', 'retryable': False}], 'warnings': [{'status': 'unverified', 'code': 'RIGHTS_STATUS_BLOCKED', 'message': '状态 unverified 不允许发布', 'asset_id': 'asset_20261017184440_31e2bff7', 'rights_ref': 'asset_20261017184440_31e2bff7', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_USE_NOT_PERMITTED', 'message': '记录未允许目标用途: commercial_ad', 'asset_id': 'asset_20261017184440_31e2bff7', 'rights_ref': 'asset_20261017184440_31e2bff7', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_EVIDENCE_INCOMPLETE', 'message': '来源、许可证或证据字段缺失', 'asset_id': 'asset_20261017184440_31e2bff7', 'rights_ref': 'asset_20261017184440_31e2bff7', 'record_version': 1, 'context': 'project_asset'}, {'status': 'unverified', 'code': 'RIGHTS_STATUS_BLOCKED', 'message': '状态 unverified 不允许发布', 'asset_id': 'asset_20261017184441_2458a414', 'rights_ref': 'asset_20261017184441_2458a414', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_USE_NOT_PERMITTED', 'message': '记录未允许目标用途: commercial_ad', 'asset_id': 'asset_20261017184441_2458a414', 'rights_ref': 'asset_20261017184441_2458a414', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_EVIDENCE_INCOMPLETE', 'message': '来源、许可证或证据字段缺失', 'asset_id': 'asset_20261017184441_2458a414', 'rights_ref': 'asset_20261017184441_2458a414', 'record_version': 1, 'context': 'project_asset'}], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 2, 'required_records': 2, 'failures': [], 'warnings': [{'status': 'unverified', 'code': 'RIGHTS_STATUS_BLOCKED', 'message': '状态 unverified 不允许发布', 'asset_id': 'asset_20261017184440_31e2bff7', 'rights_ref': 'asset_20261017184440_31e2bff7', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_USE_NOT_PERMITTED', 'message': '记录未允许目标用途: commercial_ad', 'asset_id': 'asset_20261017184440_31e2bff7', 'rights_ref': 'asset_20261017184440_31e2bff7', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_EVIDENCE_INCOMPLETE', 'message': '来源、许可证或证据字段缺失', 'asset_id': 'asset_20261017184440_31e2bff7', 'rights_ref': 'asset_20261017184440_31e2bff7', 'record_version': 1, 'context': 'project_asset'}, {'status': 'unverified', 'code': 'RIGHTS_STATUS_BLOCKED', 'message': '状态 unverified 不允许发布', 'asset_id': 'asset_20261017184441_2458a414', 'rights_ref': 'asset_20261017184441_2458a414', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_USE_NOT_PERMITTED', 'message': '记录未允许目标用途: commercial_ad', 'asset_id': 'asset_20261017184441_2458a414', 'rights_ref': 'asset_20261017184441_2458a414', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_EVIDENCE_INCOMPLETE', 'message': '来源、许可证或证据字段缺失', 'asset_id': 'asset_20261017184441_2458a414', 'rights_ref': 'asset_20261017184441_2458a414', 'record_version': 1, 'context': 'project_asset'}], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 2, 'sequence_count': 1}
+
+----------------------------------------------------------------------
+Ran 13 tests in 24.792s
+
+FAILED (failures=1, errors=5)

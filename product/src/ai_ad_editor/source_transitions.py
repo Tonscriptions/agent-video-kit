@@ -72,6 +72,8 @@ def _grid(tick, frame):
 
 
 def _handles(project, track, clip, head, tail, assets):
+    if clip.get('presentation_window') is not None:
+        fail('SOURCE_TRANSITION_ENDPOINT_UNSUPPORTED', '输出裁切窗口尚不支持真实源句柄扩展')
     duration = _duration(clip)
     if clip.get('sequence_id') or clip.get('speed_curve') or clip.get('freeze') or clip.get('tracking_binding'):
         fail('SOURCE_TRANSITION_CLIP_UNSUPPORTED', '真实句柄暂不支持嵌套容器、曲线变速、定格或跟踪绑定片段')

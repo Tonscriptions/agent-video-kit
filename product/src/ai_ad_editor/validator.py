@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .errors import AppError
+from .clip_windows import validate_window, validate_track_transitions
 from .speed_curves import compile_curve
 from .sequence_canvas import validate_canvas
 from .edit_planner import validate_editing
@@ -453,6 +454,10 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                         error("TRACK_AUDIO_ROLE_INVALID", "轨道 audio.role 必须是非空字符串", f"{tp}.audio.role")
             clips = track.get("clips", [])
             occupied: list[tuple[int, int, str]] = []
+            try:
+                validate_track_transitions(track)
+            except AppError as exc:
+                error(exc.code,exc.message,tp)
             for ci, clip in enumerate(clips):
                 cp = f"{tp}.clips[{ci}]"
                 if clip.get('link_id') is not None and (not isinstance(clip['link_id'], str) or not ID_RE.fullmatch(clip['link_id'])):
@@ -497,6 +502,12 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                     asset = asset_map(project).get(clip.get("asset_id"))
                     if asset and asset.get("kind") != "subtitle" and _int(asset.get("probe", {}).get("duration_tick", 0)) and src_out > _int(asset["probe"]["duration_tick"]):
                         error("SOURCE_OUTSIDE_ASSET", "source_out_tick 超出素材长度", cp)
+                authored_dur = dur
+                if 'presentation_window' in clip:
+                    try:
+                        authored_dur = validate_window(clip)
+                    except AppError as exc:
+                        error(exc.code, exc.message, cp+'.presentation_window')
                 speed_curve = clip.get("speed_curve")
                 if speed_curve is not None:
                     curve_points = speed_curve if isinstance(speed_curve, list) else speed_curve.get("keyframes") if isinstance(speed_curve, dict) else None
@@ -536,7 +547,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                     else:
                         freeze_duration = _int(freeze.get("duration_tick"), 0)
                         freeze_at = _int(freeze.get("at_tick"), -1)
-                        original_duration = dur - freeze_duration
+                        original_duration = authored_dur - freeze_duration
                         if freeze_duration <= 0:
                             error("FREEZE_DURATION_INVALID", "freeze.duration_tick 必须为正数", f"{cp}.freeze.duration_tick")
                         if original_duration <= 0:
@@ -634,7 +645,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                         error("CROP_KEYFRAMES_INVALID", "crop keyframe 必须是对象", keyframe_path)
                                         continue
                                     at = _int(keyframe_value.get("at_tick"), -1)
-                                    if at < 0 or at > dur or at < previous_at:
+                                    if at < 0 or at > authored_dur or at < previous_at:
                                         error("CROP_KEYFRAME_TIME_INVALID", "crop keyframe at_tick 必须单调且位于片段内", f"{keyframe_path}.at_tick")
                                     previous_at = at
                                     interpolation = keyframe_value.get("interpolation")
@@ -705,7 +716,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                         error("EFFECT_KEYFRAMES_INVALID", "效果 keyframe 必须是对象", keyframe_path)
                                         continue
                                     at = _int(keyframe_value.get("at_tick"), -1)
-                                    if at < 0 or at > dur or at < previous_at:
+                                    if at < 0 or at > authored_dur or at < previous_at:
                                         error("EFFECT_KEYFRAME_TIME_INVALID", "效果 keyframe at_tick 必须单调且位于片段内", f"{keyframe_path}.at_tick")
                                     previous_at = at
                                     interpolation = keyframe_value.get("interpolation")
@@ -784,7 +795,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                             elif not 0.0 <= anchor_value <= 1.0:
                                 error("TRANSFORM_ANCHOR_KEYFRAME_RANGE", "锚点关键帧 value 必须位于 0 到 1", f"{cp}.keyframes")
                         at = _int(keyframe.get("at_tick"), -1)
-                        if at < previous or at > dur:
+                        if at < previous or at > authored_dur:
                             error("KEYFRAME_INVALID", "关键帧必须单调且位于片段内", f"{cp}.keyframes")
                         interpolation = keyframe.get("interpolation")
                         if interpolation not in {"hold", "linear", "ease_in", "ease_out", "ease_in_out", "bezier"}:
@@ -954,7 +965,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                         error("MASK_KEYFRAMES_INVALID", "mask keyframe 必须是对象", keyframe_path)
                                         continue
                                     at = _int(keyframe_value.get("at_tick"), -1)
-                                    if at < 0 or at > dur or at < previous_at:
+                                    if at < 0 or at > authored_dur or at < previous_at:
                                         error("MASK_KEYFRAME_TIME_INVALID", "mask keyframe at_tick 必须单调且位于片段内", f"{keyframe_path}.at_tick")
                                     previous_at = at
                                     interpolation = keyframe_value.get("interpolation")

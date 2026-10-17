@@ -116,3 +116,11 @@ scripts/run_frozen_regression.py -text
 docs/validation/evidence/fragments*.json -text
 docs/validation/evidence/fragments*.log -text -whitespace
 docs/validation/evidence/fragments-*/** -text -whitespace
+
+# V38 native output cuts: preserve raw CLI/failure logs and source freezes.
+scripts/*clip_window*.py -text
+docs/validation/evidence/windows*.json -text
+docs/validation/evidence/windows*.log -text -whitespace
+docs/validation/evidence/windows-*/** -text -whitespace
+docs/validation/evidence/openfilm-window-followup-*/** -text -whitespace
+docs/assets/clip-windows-*/cli-*.log -text -whitespace

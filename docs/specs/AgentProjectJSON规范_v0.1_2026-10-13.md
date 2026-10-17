@@ -103,6 +103,8 @@
 
 片段可带 `rights_dependencies: [{"rights_ref":"visual_adapter_<id>","sha256":"sha256:<64位摘要>"}]`。该字段是渲染编辑所用模型等非媒体依赖，Schema 和内置语义校验均消费；权利闭包、发布清单、缺记录与哈希门禁不得忽略它。模型跟踪写入登记 manifest 的摘要，避免只有关键帧而丢失模型许可依赖。源素材仍通过已摄取项目资产保留权利。
 
+V38 新增可选 `presentation_window: {"version":1,"authored_start_tick":0,"authored_duration_tick":360000,"offset_tick":90000}`。出现时，片段 `timeline_start_tick/duration_tick` 表示新可见落点/时长；源范围、曲线、定格、关键帧、字幕和片段音频仍保留完整作者数据，先执行作者图再取输出选区。窗口只允许这四个严格整数字段，`offset_tick + duration_tick <= authored_duration_tick`；null、布尔/浮点或未知字段拒绝。关键帧范围按作者时长校验，轨道占位按可见时长校验。原生工程/片段组保留该字段，外部工程格式报告 Unsupported。完整规则、编辑操作、绑定/转场门禁与资源边界见[输出窗口契约](./片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md)，不能把作者轴和可见局部轴互换。
+
 关键帧对象使用：
 
 ```json

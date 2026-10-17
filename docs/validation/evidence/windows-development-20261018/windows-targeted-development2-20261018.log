@@ -1,0 +1,32 @@
+test_cli_batch_dry_run_and_rejected_cut_do_not_write (test_clip_windows.ClipWindowTests.test_cli_batch_dry_run_and_rejected_cut_do_not_write) ... ok
+test_curved_reverse_ripple_matches_removed_original_range (test_clip_windows.ClipWindowTests.test_curved_reverse_ripple_matches_removed_original_range) ... ok
+test_freeze_window_cut_inside_held_picture_and_silence (test_clip_windows.ClipWindowTests.test_freeze_window_cut_inside_held_picture_and_silence) ... ok
+test_insert_inside_clip_renders_black_and_silence_gap (test_clip_windows.ClipWindowTests.test_insert_inside_clip_renders_black_and_silence_gap) ... ok
+test_internal_ripple_deletes_middle_not_tail (test_clip_windows.ClipWindowTests.test_internal_ripple_deletes_middle_not_tail) ... ok
+test_nested_window_sequence_preserves_source_clock (test_clip_windows.ClipWindowTests.test_nested_window_sequence_preserves_source_clock) ... FAIL
+test_repeated_slice_preserves_authored_payload_and_composes_offset (test_clip_windows.ClipWindowTests.test_repeated_slice_preserves_authored_payload_and_composes_offset) ... ok
+test_ripple_boundary_crossing_removes_correct_head (test_clip_windows.ClipWindowTests.test_ripple_boundary_crossing_removes_correct_head) ... ok
+test_split_is_global_id_safe_and_lock_atomic (test_clip_windows.ClipWindowTests.test_split_is_global_id_safe_and_lock_atomic) ... ok
+test_split_render_is_identical_to_original_frames_and_processed_audio (test_clip_windows.ClipWindowTests.test_split_render_is_identical_to_original_frames_and_processed_audio) ... ok
+test_strict_window_ranges (test_clip_windows.ClipWindowTests.test_strict_window_ranges) ... ok
+test_track_scoped_ripple_does_not_truncate_unselected_tracks (test_clip_windows.ClipWindowTests.test_track_scoped_ripple_does_not_truncate_unselected_tracks) ... ok
+test_window_validation_keeps_author_keyframes_outside_visible_range (test_clip_windows.ClipWindowTests.test_window_validation_keeps_author_keyframes_outside_visible_range) ... ok
+
+======================================================================
+FAIL: test_nested_window_sequence_preserves_source_clock (test_clip_windows.ClipWindowTests.test_nested_window_sequence_preserves_source_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 227, in test_nested_window_sequence_preserves_source_clock
+    newframes,newsamples=self.pixels_and_samples(candidate)
+                         ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_clip_windows.py", line 72, in pixels_and_samples
+    self.assertEqual(run.returncode,0,run.stderr.decode('utf-8','replace'))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 4294967274 != 0 : [fc#0 @ 000001cdbec99180] Filter 'split' has output 0 (inline0_vout_use1) unconnected
+Error binding filtergraph inputs/outputs: Invalid argument
+
+
+----------------------------------------------------------------------
+Ran 13 tests in 20.297s
+
+FAILED (failures=1)

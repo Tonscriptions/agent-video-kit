@@ -37,6 +37,8 @@ def find_source(sequence: dict, binding: dict) -> tuple[dict, dict]:
         if track.get('id') == binding['source_track_id']:
             for clip in track.get('clips', []):
                 if clip.get('id') == binding['source_clip_id']:
+                    if clip.get('presentation_window') is not None:
+                        raise invalid('跟踪绑定源暂不支持输出窗口时钟；请绑定完整作者片段')
                     if track.get('kind') not in {'video', 'overlay'} or clip.get('sequence_id') or clip.get('asset_id') != binding['asset_id']:
                         raise invalid('绑定源必须是匹配 asset_id 的直接视频片段')
                     return track, clip

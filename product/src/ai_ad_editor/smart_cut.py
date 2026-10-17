@@ -273,6 +273,8 @@ def _slice_keyframes(keyframe_tracks: Any, start_tick: int, end_tick: int) -> li
 
 def slice_clip(clip: dict[str, Any], ranges: list[dict[str, Any]], *, ticks_per_second: int) -> list[dict[str, Any]]:
     """Create source-bounded clip pieces while preserving local automation."""
+    if clip.get('presentation_window') is not None:
+        raise AppError('SMART_CUT_PRESENTATION_WINDOW_UNSUPPORTED','智能口播剪切尚未将源分析时钟映射到输出窗口；请分析完整作者片段',exit_code=2,path='clip.presentation_window')
     if clip.get("sequence_id"):
         raise AppError("SMART_CUT_NESTED_UNSUPPORTED", "智能剪口播当前只允许直接媒体片段，不会隐式改写嵌套序列", exit_code=2, path="clip.sequence_id")
     if clip.get("speed_curve") is not None:
