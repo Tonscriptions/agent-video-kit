@@ -23,3 +23,9 @@ returns `acknowledged=true, confirmed=false`, and the runner later confirms the
 terminal state. Retry a failed or cancelled job explicitly after inspecting its
 report. Never start a daemon, database, container, remote worker or cloud
 artifact service.
+
+Queue jobs selecting an [independent sequence canvas](../../docs/specs/独立序列画布与父级投影契约_v0.1_2026-10-17.md)
+default to that sequence's effective width/height. A per-job profile or explicit
+dimensions override only the selected root; authored child canvases remain.
+Preserve canvas in snapshots and native project/package exchange; external
+formats report unsupported child rasters instead of implying full nested parity.

@@ -14,6 +14,7 @@ from .policy import assert_local_project_reference
 from .media import classify_path, probe_media
 from .project import TICKS_PER_SECOND, create_project, save_project
 from .rights import add_record, load_ledger, save_ledger
+from .sequence_canvas import sequence_canvas, validate_canvas
 from .utils import atomic_write_json, new_id, now_iso, safe_filename, sha256_file
 
 
@@ -256,6 +257,10 @@ def _export_otio(root: Path, project: dict[str, Any], output: Path) -> dict[str,
     items: list[dict[str, Any]] = [report_item("project-model", "Mapped", "Agent Project JSON", "OpenTimelineIO JSON", "使用标准 Stack/Track/Gap/Clip 节点；完整本地片段保存在 ai_ad_editor metadata")]
     items.extend(report_item('tracking-binding', 'Approximate', clip_id, detail='活动绑定按当前画布重算为关键帧；外部格式不保留绑定引用，视觉能力按格式报告复核') for clip_id in bound_clips)
     sequence = project.get("sequences", [{}])[0]
+    items.extend(report_item('sequence-canvas', 'Unsupported', str(s.get('id')), detail='额外序列及其独立画布未导出；完整图请使用 agent-json 或 package')
+                 for s in project.get('sequences', [])[1:] if s.get('canvas') is not None)
+    if sequence.get('canvas') is not None:
+        items.append(report_item('sequence-canvas', 'Approximate', str(sequence.get('id')), detail='首序列尺寸写入本地 metadata；外部 OTIO 播放器不保证执行该元数据'))
     for track in sorted(sequence.get("tracks", []), key=lambda item: int(item.get("order", 0))):
         kind = "Audio" if track.get("kind") == "audio" else "Video"
         track_metadata = {
@@ -321,7 +326,9 @@ def _export_otio(root: Path, project: dict[str, Any], output: Path) -> dict[str,
     payload = {
         "OTIO_SCHEMA": "Timeline.1",
         "name": project.get("project", {}).get("name", "Agent Project"),
-        "metadata": {"ai_ad_editor": {"schema_version": project.get("schema_version"), "ticks_per_second": tps, "duration_tick": int(sequence.get("duration_tick", 1))}},
+        "metadata": {"ai_ad_editor": {"schema_version": project.get("schema_version"), "ticks_per_second": tps, "duration_tick": int(sequence.get("duration_tick", 1)),
+                                     "canvas": sequence_canvas(project, sequence), "sequence_canvas": copy.deepcopy(sequence.get('canvas')),
+                                     "project_canvas": sequence_canvas(project, {'canvas':None})}},
         "tracks": {"OTIO_SCHEMA": "Stack.1", "name": "tracks", "children": tracks},
     }
     atomic_write_json(output, payload)
@@ -334,6 +341,8 @@ def _export_otio(root: Path, project: dict[str, Any], output: Path) -> dict[str,
 def _export_kdenlive_xml(root: Path, project: dict[str, Any], output: Path) -> dict[str, Any]:
     from .bindings import bake_interchange_bindings
     project,bound_clips = bake_interchange_bindings(project)
+    sequence = project.get('sequences', [{}])[0]
+    canvas = sequence_canvas(project, sequence)
     tps = int(project["settings"]["timebase"]["ticks_per_second"])
     fps = project["settings"]["timebase"].get("display_fps", {"num": 30, "den": 1})
     fps_num = max(1, int(fps.get("num", 30)))
@@ -345,13 +354,15 @@ def _export_kdenlive_xml(root: Path, project: dict[str, Any], output: Path) -> d
         "description": "Agent Video Kit",
         "frame_rate_num": str(fps_num),
         "frame_rate_den": str(fps_den),
-        "width": str(int(project["settings"].get("canvas", {}).get("width", 1080))),
-        "height": str(int(project["settings"].get("canvas", {}).get("height", 1920))),
+        "width": str(canvas['width']),
+        "height": str(canvas['height']),
     })
     producers: list[tuple[str, dict[str, Any]]] = []
     items: list[dict[str, Any]] = [report_item("project-model", "Approximate", "Agent Project JSON", "Kdenlive MLT XML", "导出本地 producer 与顺序 playlist；复杂效果需在转换报告中复核")]
     items.extend(report_item('tracking-binding', 'Approximate', clip_id, detail='活动绑定按当前画布重算为关键帧；外部格式不保留绑定引用，视觉能力按格式报告复核') for clip_id in bound_clips)
     sequence = project.get("sequences", [{}])[0]
+    items.extend(report_item('sequence-canvas', 'Unsupported', str(s.get('id')), detail='额外序列及其独立画布未导出；完整图请使用 agent-json 或 package')
+                 for s in project.get('sequences', [])[1:] if s.get('canvas') is not None)
     playlists: list[str] = []
     producer_index = 0
     for track_index, track in enumerate(sorted(sequence.get("tracks", []), key=lambda item: int(item.get("order", 0)))):
@@ -437,6 +448,17 @@ def _import_otio(source: Path, destination: Path, payload: dict[str, Any]) -> tu
     root, project = create_project(destination, name=payload.get("name") or source.stem)
     ledger = {"schema_version": "0.1.0", "updated_at": now_iso(), "records": [], "policy": {}}
     sequence = project["sequences"][0]
+    metadata = payload.get('metadata') if isinstance(payload.get('metadata'), dict) else {}
+    local = metadata.get('ai_ad_editor') if isinstance(metadata.get('ai_ad_editor'), dict) else {}
+    if local.get('canvas') is not None:
+        validate_canvas(local['canvas'], path='metadata.ai_ad_editor.canvas')
+        sequence['canvas'] = copy.deepcopy(local['canvas'])
+        if local.get('project_canvas') is not None:
+            validate_canvas(local['project_canvas'], path='metadata.ai_ad_editor.project_canvas')
+            project['settings']['canvas'].update(local['project_canvas'])
+            if 'sequence_canvas' in local:
+                validate_canvas(local['sequence_canvas'], path='metadata.ai_ad_editor.sequence_canvas')
+                sequence['canvas'] = copy.deepcopy(local['sequence_canvas'])
     import_tps = int(project["settings"]["timebase"]["ticks_per_second"])
     report_items: list[dict[str, Any]] = [report_item("project-model", "Mapped", "OpenTimelineIO", "Agent Project JSON", "标准 Stack/Track/Gap/Clip 以及 ai_ad_editor metadata 已映射到本地时间线")]
     asset_by_uri: dict[str, dict[str, Any]] = {}
@@ -569,6 +591,10 @@ def _import_kdenlive_xml(source: Path, destination: Path) -> tuple[dict[str, Any
             if path.exists():
                 producers[producer.get("id", new_id("producer"))] = path
     sequence = project["sequences"][0]
+    if profile is not None and profile.get('width') is not None and profile.get('height') is not None:
+        canvas = {'width':int(profile.get('width')), 'height':int(profile.get('height'))}
+        validate_canvas(canvas, path='profile.canvas')
+        sequence['canvas'] = canvas
     asset_by_path: dict[str, dict[str, Any]] = {}
     track_by_id: dict[str, dict[str, Any]] = {}
     def target_track(playlist: ET.Element, playlist_index: int) -> dict[str, Any]:

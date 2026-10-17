@@ -160,7 +160,7 @@ v2 适配器执行 `media track` 时必须显式选择 `--object-id ID` 或 `--a
 
 所有 `at_tick` 是片段内时间，使用项目 `settings.timebase.ticks_per_second`。关键帧必须单调递增，插值可用 `hold`、`linear`、`ease_in`、`ease_out`、`ease_in_out` 或带合法控制点的 `bezier`。
 
-`timeline compose` 变更集支持 `append_clip`、`update_clip`、`remove_clip`、`split_clip`、`ripple_insert`、`ripple_delete`、`slip_clip`、`slide_clip`、`set_clip_speed`、`set_clip_speed_curve`、`reverse_clip`、`freeze_frame`、`add_sequence`、`append_sequence_clip`、轨道增删改、标记增删和序列时长调整。任何变更保存前都会重新执行 Schema、引用、时间范围、嵌套循环和 Rights 语义校验。
+`timeline compose` 变更集支持 `append_clip`、`update_clip`、`remove_clip`、`split_clip`、`ripple_insert`、`ripple_delete`、`slip_clip`、`slide_clip`、`set_clip_speed`、`set_clip_speed_curve`、`reverse_clip`、`freeze_frame`、`add_sequence`、`update_sequence`、`append_sequence_clip`、轨道增删改、标记增删和序列时长调整。任何变更保存前都会重新执行 Schema、引用、时间范围、嵌套循环和 Rights 语义校验。
 
 ### 5.1 关键帧运镜预设
 
@@ -187,7 +187,7 @@ python -m ai_ad_editor motion apply --project .\work\demo --clip-id clip_001 --p
 
 图层变换支持 `transform.anchor.x/y` 或 `anchor_x/anchor_y`，取值为 `0..1`，默认 `(0.5,0.5)`；位置表达式会把该点放到 `transform.position`，同名片段关键帧可逐帧改变锚点。媒体和独立文字旋转使用固定画布逆向采样保持作者 anchor。嵌套容器先隔离合成完整子画布，再围绕容器画布的 anchor 变换，见[隔离合成契约](./嵌套序列隔离合成契约_v0.1_2026-10-17.md)。
 
-遮罩使用归一化参数。`rectangle/circle/ellipse` 支持几何标量、`invert`、`feather` 和 `mask.*` 关键帧；动态 feather 通过 alpha-only 软边表达式执行，范围为 `0..0.5`。`path/polygon` 可以使用固定点数 `points`，点坐标可以用 `points.0.x`、`points.0.y` 关键帧驱动；也可以使用 `segments`/`curve_segments`/`curves`，每段支持 `line` 或 `cubic`，cubic 的 `samples` 范围为 `2..16`，总采样点限制为 `3..32`，渲染器将曲线采样成固定多边形并以固定点边缘的内侧距离近似生成 alpha 软边。曲线段不能与 `points` 同时声明；曲线控制点可以使用片段或 mask 内局部关键帧，例如 `mask.segments.1.control1.x`、`mask.segments.1.control2.y`，渲染器在 FFmpeg `geq` 中先缓存控制点表达式再逐帧生成固定采样点。动态 feather 也可以用 `feather`/`mask.feather` 关键帧驱动。`transform.opacity`、正常层 `blend.opacity` 以及 RGB blend 的 `blend.opacity` 都可以用片段关键帧驱动；片段 `crop` 支持 `pixels`/`normalized` 单位和 `fit`/`fill`/`stretch` 模式，`crop.keyframes` 的 `x`/`y`/`width`/`height` 或片段级 `crop.x`/`crop.y`/`crop.width`/`crop.height` 可以逐帧移动和缩放裁切窗口；动态尺寸由 CPU `geq` 固定画布逆向采样保持输出帧尺寸稳定，宽高关键帧必须大于 0。非法点数、坐标、尺寸、时间或属性必须在写入前拒绝。正式嵌套渲染按“子层合成→父 crop→父 TRS/opacity→父 effects→父 mask→父 fade”执行，父 blend 再与外层混合；容器动画使用所属序列的原作者时钟，子轨道顺序不越过父轨道槽位。父子 mask 分别在各自画布阶段生效；manifest 的 `sequence-composite` 输入记录隔离节点，见[隔离合成契约](./嵌套序列隔离合成契约_v0.1_2026-10-17.md)。时间映射仍见[解析时间映射契约](./嵌套序列解析时间映射契约_v0.1_2026-10-16.md)。组级混音总线、嵌套定格、独立子画布配置、孤立容器空间转场、通用字体/色彩与完整群组等价继续未验收。
+遮罩使用归一化参数。`rectangle/circle/ellipse` 支持几何标量、`invert`、`feather` 和 `mask.*` 关键帧；动态 feather 通过 alpha-only 软边表达式执行，范围为 `0..0.5`。`path/polygon` 可以使用固定点数 `points`，点坐标可以用 `points.0.x`、`points.0.y` 关键帧驱动；也可以使用 `segments`/`curve_segments`/`curves`，每段支持 `line` 或 `cubic`，cubic 的 `samples` 范围为 `2..16`，总采样点限制为 `3..32`，渲染器将曲线采样成固定多边形并以固定点边缘的内侧距离近似生成 alpha 软边。曲线段不能与 `points` 同时声明；曲线控制点可以使用片段或 mask 内局部关键帧，例如 `mask.segments.1.control1.x`、`mask.segments.1.control2.y`，渲染器在 FFmpeg `geq` 中先缓存控制点表达式再逐帧生成固定采样点。动态 feather 也可以用 `feather`/`mask.feather` 关键帧驱动。`transform.opacity`、正常层 `blend.opacity` 以及 RGB blend 的 `blend.opacity` 都可以用片段关键帧驱动；片段 `crop` 支持 `pixels`/`normalized` 单位和 `fit`/`fill`/`stretch` 模式，`crop.keyframes` 的 `x`/`y`/`width`/`height` 或片段级 `crop.x`/`crop.y`/`crop.width`/`crop.height` 可以逐帧移动和缩放裁切窗口；动态尺寸由 CPU `geq` 固定画布逆向采样保持输出帧尺寸稳定，宽高关键帧必须大于 0。非法点数、坐标、尺寸、时间或属性必须在写入前拒绝。正式嵌套渲染按“子层合成→父 crop→父 TRS/opacity→父 effects→父 mask→父 fade”执行，父 blend 再与外层混合；容器动画使用所属序列的原作者时钟，子轨道顺序不越过父轨道槽位。父子 mask 分别在各自画布阶段生效；manifest 的 `sequence-composite` 输入记录隔离节点，见[隔离合成契约](./嵌套序列隔离合成契约_v0.1_2026-10-17.md)。时间映射仍见[解析时间映射契约](./嵌套序列解析时间映射契约_v0.1_2026-10-16.md)。序列可声明独立 canvas.width/height，原生子画布裁切/锚点与父画布位置/蒙版分开处理，见[独立画布契约](./独立序列画布与父级投影契约_v0.1_2026-10-17.md)。任意音频路由、嵌套定格、独立子级 FPS/色域/SAR、孤立容器空间转场、通用字体/色彩与完整群组等价继续未验收。
 
 ## 6. 渲染、质量和进度
 
@@ -370,3 +370,11 @@ python -m ai_ad_editor quality golden --project .\\work\\demo --input .\\work\\d
 ## V30：分段音频上下文、末端与资源门限
 
 本轮 V30：默认分段 atempo 使用作者选区内的 float32 上下文，末段从实际伸缩结果取尾；超过 64 MiB 估算末端 PCM 时在规划阶段拒绝。完整 **618/618，1529.147 秒**，0 跳过，107 Python+1 Schema 共 108 文件原字节冻结；12 新增及 94 关联方法均为完整子集。固定 V29 同测 12 项为 6 失败/6 控制。11 组、88 次正式 CLI 全成功；396 新视频帧与旧版像素一致。1,584,000 新立体声采样帧检查长度/有限性及各自声明的内容条件；六组 DC 完整有效区间均通过，T01 检查区零采样帧 82→0。S01 资源拒绝另计 6 次 CLI；开发尾部缺样和错误参考预览保留。未连续播放或听审，通用音高/相位/瞬态、极短输入、自然声音及完整剪映等价仍未验收。 既有 `timeline compose / render` 接口不变；manifest 新增 `audio_tempo_context`（engine v2、选区/上下文/输出范围、实际末端截取模式、质量未接受标志）。超估算门限返回 `AUDIO_TEMPO_CONTEXT_LIMIT`、退出码 2。末端模式的实际裁切起点未知，字段为 null；恒速/单位控制可无上下文节点。见[契约](./分段音频变速上下文契约_v0.1_2026-10-17.md)和[正式实测](../validation/分段音频上下文与完整尾部实测_2026-10-17.md)。
+
+## V31：独立序列画布与选中子级输出
+
+`timeline compose` 的 `add_sequence.canvas` 及 `update_sequence.patch` 支持序列像素尺寸，后者只允许 name/duration_tick/canvas/markers 且不得为空。`canvas: null` 清除显式尺寸；画布缺省/null 继承有效工程输出，非直接父容器。无效后续操作整体回滚，dry-run 不落盘。
+
+render/quality/golden/queue 选中子序列时默认使用其有效画布；显式输出尺寸只覆盖本次选中根，不改作者项目或其他显式子画布。2..8192 整数内部画布允许奇数；自定义 CLI 输出仍 64..8192，420 宽高/422 宽对齐不满足返回 `OUTPUT_CANVAS_ALIGNMENT_INVALID`（退出 2，任务创建前拒绝），非法作者画布返回 `SEQUENCE_CANVAS_INVALID` 或 Schema 错误。manifest 的 sequence-composite 记录源 canvas/parent_canvas、cropped-child-canvas anchor、工作栅格及原生一次采样；没有新增顶层 GUI 或远程服务。见[空间顺序与继承契约](./独立序列画布与父级投影契约_v0.1_2026-10-17.md)。
+
+本轮 V31：序列可声明独立像素画布，子级先在本地画布合成，父级按原生子坐标一次预乘双线性投影；选中子序列的 render/quality/queue 默认使用其画布。完整 **643/643，1128.545 秒**，0 跳过，109 Python+1 Schema 共 110 文件原字节冻结；25 新增/114 关联方法均为完整子集。固定 V30 同测 25 方法：20 失败、5 控制通过，含子测试 30 条失败记录。九组/65 次正式 CLI 全成功，216 新主帧、216 旧帧、216 参考帧与 24 个单独子级帧分计；C01–C08 最大 RGB 误差 2（门槛 5），C09 与旧版字节一致。168 帧为空间独立参考，24 帧只验字形投影，24 帧只验继承兼容。开发配置失败和错误参考保留，0 新模型推理；未连续播放或听审。独立子 FPS/色域/SAR、高频抗锯齿、长片资源、自然质量和完整剪映等价仍未验收。 [九组实际视频及失败](../validation/独立序列画布与原生坐标投影实测_2026-10-17.md)、[机器证据](../validation/evidence/sequence-canvas-20261017.json)。

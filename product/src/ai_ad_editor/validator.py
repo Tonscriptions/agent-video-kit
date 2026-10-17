@@ -8,6 +8,7 @@ from typing import Any
 
 from .errors import AppError
 from .speed_curves import compile_curve
+from .sequence_canvas import validate_canvas
 
 from .policy import reference_kind, resolve_local_path
 from .project import asset_map
@@ -377,6 +378,10 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
     sequence_ids: set[str] = set()
     for si, sequence in enumerate(project.get("sequences", [])):
         sp = f"sequences[{si}]"
+        try:
+            validate_canvas(sequence.get('canvas'), path=sp+'.canvas')
+        except AppError as exc:
+            error(exc.code, exc.message, exc.path or sp+'.canvas')
         sid = sequence.get("id")
         if not isinstance(sid, str) or not ID_RE.fullmatch(sid):
             error("ID_INVALID", "序列 ID 不符合规范", f"{sp}.id")

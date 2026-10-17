@@ -21,6 +21,16 @@ online service. No adapter keeps the English/ASCII flite behavior described belo
 
 ## Runtime boundary
 
+For independent nested raster dimensions, read the
+[sequence canvas contract](../../docs/specs/独立序列画布与父级投影契约_v0.1_2026-10-17.md).
+Sequence canvas is optional width/height; null inherits effective project
+dimensions. Compose with `add_sequence.canvas` or `update_sequence.patch`.
+Parent crop/fit/anchor projects the complete native child; text/bindings remain
+in child coordinates. Render/quality/queue selection uses that sequence's
+default canvas, while explicit output dimensions affect only the selected root.
+Keep internal odd rasters distinct from final encoder alignment requirements.
+This does not add independent child FPS, color space or HDR acceptance.
+
 For text-controlled masked video windows, read the [local VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
 Register existing fixed Wan VACE Diffusers weights/Python/evidence with
 `media adapter register --engine diffusers-wan-vace-local-v1 --device cuda`.

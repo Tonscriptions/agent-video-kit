@@ -19,6 +19,7 @@ from .audio_tempo import (CONTEXT_FRAMES as _audio_context_frames,
                          MAX_TERMINAL_CONTEXT_PCM_BYTES as _audio_terminal_context_budget,
                          context_windows as _audio_context_windows)
 from .artifact_locks import verification_scope
+from .sequence_canvas import sequence_canvas, validate_output_alignment
 
 from .errors import AppError, dependency_error
 from .media import ffmpeg_path, probe_media
@@ -2536,6 +2537,8 @@ def _flatten_sequence_tracks(
                                 'id': child_group_id, 'parent_id': group_id,
                                 'track_id': virtual_id, 'track_order': int(track.get('order', 0)),
                                 'layer_order': len(groups), 'clip': group_clip,
+                                'canvas': sequence_canvas(project, child),
+                                'parent_canvas': sequence_canvas(project, current),
                             }
                         parent_context = {}
                     else:
@@ -3096,6 +3099,57 @@ def _composite_visual_layers(
     return current
 
 
+def _sequence_raster_filters(
+    clip: dict[str, Any], transform: dict[str, str], source: dict[str, int], target: dict[str, int],
+    start: float, tps: int,
+) -> list[str]:
+    """Project a child raster into its parent's canvas around the child anchor.
+
+    Retain the complete native texture on a padded working raster and sample
+    its crop/fit/TRS coordinates once. Rotation may reveal source content
+    hidden by fill at the resting pose. The output rectangle is cropped only
+    after sampling; interpolation is premultiplied, before the parent mask.
+    """
+    sw, sh = source['width'], source['height']
+    tw, th = target['width'], target['height']
+    crop = clip.get('crop') or {}
+    normalized = str(crop.get('unit', 'pixels')).lower() in {'normalized', 'relative'}
+    def scalar(names: tuple[str, ...], default: float, extent: int) -> str:
+        value = next((crop[n] for n in names if n in crop), default)
+        result = _crop_keyframe_expr(clip, crop, names, _num(value, default), start, tps, time_variable='T')
+        return f'({result})*{extent}' if normalized else result
+    w = scalar(('width', 'w'), 1. if normalized else sw, sw)
+    h = scalar(('height', 'h'), 1. if normalized else sh, sh)
+    x = scalar(('x',), 0., sw)
+    y = scalar(('y',), 0., sh)
+    fit = str(crop.get('fit', crop.get('mode', 'fit'))).lower()
+    if fit == 'stretch':
+        fit_x, fit_y = f'{tw}/ld(0)', f'{th}/ld(1)'
+    else:
+        select = 'max' if fit == 'fill' else 'min'
+        fit_x = fit_y = f'{select}({tw}/ld(0),{th}/ld(1))'
+    values = {k: re.sub(r'\bt\b', 'T', v) for k,v in transform.items()}
+    angle = f"({values['rotation']})*PI/180"
+    dx, dy = f"(X+0.5-({values['position_x']})*{tw})", f"(Y+0.5-({values['position_y']})*{th})"
+    scale = f"max(0.00000001,abs({values['scale']}))"
+    setup = (
+        f'st(0,clip(({w}),2,{sw}));st(1,clip(({h}),2,{sh}));'
+        f'st(2,clip(({x}),0,{sw}-ld(0)));st(3,clip(({y}),0,{sh}-ld(1)));'
+        f'st(4,{fit_x});st(5,{fit_y});'
+        f"st(6,ld(2)+({values['anchor_x']})*ld(0)+({dx}*cos({angle})+{dy}*sin({angle}))/({scale}*ld(4))-0.5);"
+        f"st(7,ld(3)+({values['anchor_y']})*ld(1)+(-{dx}*sin({angle})+{dy}*cos({angle}))/({scale}*ld(5))-0.5);"
+        'st(8,gte(ld(6),ld(2)-0.5)*lt(ld(6),ld(2)+ld(0)-0.5)*gte(ld(7),ld(3)-0.5)*lt(ld(7),ld(3)+ld(1)-0.5));'
+    )
+    sample_x = 'clip(ld(6),ld(2),ld(2)+ld(0)-1)'
+    sample_y = 'clip(ld(7),ld(3),ld(3)+ld(1)-1)'
+    def plane(name: str) -> str:
+        return _expr_arg(setup+f'if(ld(8),{name}({sample_x},{sample_y}),0)')
+    return ['format=rgba', f'pad={max(sw,tw)}:{max(sh,th)}:0:0:color=black@0', 'setsar=1',
+            'format=gbrapf32le', 'premultiply=inplace=1',
+            f"geq=r={plane('r')}:g={plane('g')}:b={plane('b')}:a={plane('alpha')}:interpolation=bilinear",
+            f'crop={tw}:{th}:0:0:exact=1', 'unpremultiply=inplace=1', 'format=rgba']
+
+
 def _build_compositing_tree(
     root: Path, specs: list[dict[str, Any]], groups: dict[str, dict[str, Any]],
     filters: list[str], warnings: list[dict[str, Any]], input_meta: list[dict[str, Any]],
@@ -3112,34 +3166,38 @@ def _build_compositing_tree(
     for spec in specs:
         buckets.setdefault(spec.get('group_id'), []).append(spec)
 
-    def canvas(label: str, *, alpha: bool) -> None:
+    def canvas(label: str, *, alpha: bool, raster: dict[str, int] | None = None) -> None:
         color = 'black@0.0' if alpha else 'black'
         pixel_format = ',format=rgba' if alpha else ''
-        filters.append(f'color=c={color}:s={width}x{height}:r={fps_value}:d={duration:.6f}{pixel_format}[{label}]')
+        cw, ch = (raster['width'], raster['height']) if raster else (width, height)
+        filters.append(f'color=c={color}:s={cw}x{ch}:r={fps_value}:d={duration:.6f}{pixel_format}[{label}]')
 
     # Children were registered after their parents. Reverse insertion order
     # is a postorder even when a temporal window revisits an existing group.
     for ordinal, group in reversed(list(enumerate(groups.values()))):
         group_id = group['id']
+        source_canvas, parent_canvas = group['canvas'], group['parent_canvas']
         prefix = f'group{ordinal}_'
         group_specs = _resolve_visual_transitions(buckets.get(group_id, []), filters, warnings, fps, prefix=prefix)
         group_specs.sort(key=lambda item: (int(item.get('track_order', 0)), float(item.get('start', 0.0)), int(item.get('layer_order', 0))))
         base = prefix+'base'
-        canvas(base, alpha=True)
-        composite = _composite_visual_layers(group_specs, base, filters, warnings, width=width, height=height,
+        canvas(base, alpha=True, raster=source_canvas)
+        composite = _composite_visual_layers(group_specs, base, filters, warnings, width=source_canvas['width'], height=source_canvas['height'],
                                              fps_value=fps_value, duration=duration, tps=tps, prefix=prefix, preserve_alpha=True)
         clip = group['clip']
         start = int(clip['timeline_start_tick'])/tps
         end = start+int(clip['duration_tick'])/tps
         chain = ['format=rgba']
         crop = clip.get('crop')
-        if isinstance(crop, dict) and crop:
-            chain.extend(_dynamic_crop_filters(clip, crop, width, height, width, height, start, tps, alpha=True))
         transform = _transform_exprs(clip, start, tps)
         identity = {'scale':'1.00000000','rotation':'0.00000000','position_x':'0.50000000',
                     'position_y':'0.50000000','anchor_x':'0.50000000','anchor_y':'0.50000000'}
-        if any(transform[key] != value for key,value in identity.items()):
-            chain.extend(_affine_video_filters(transform))
+        adapt_raster = source_canvas != parent_canvas or bool(crop)
+        if adapt_raster:
+            chain.extend(_sequence_raster_filters(clip, transform, source_canvas, parent_canvas, start, tps))
+        else:
+            if any(transform[key] != value for key,value in identity.items()):
+                chain.extend(_affine_video_filters(transform))
         if transform['opacity'] != '1.00000000':
             alpha = f"alpha(X,Y)*clip(({transform['opacity']}),0,1)"
             chain.extend(['format=gbrap',f"geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha)}",'format=rgba'])
@@ -3179,7 +3237,12 @@ def _build_compositing_tree(
             'incoming':copy.deepcopy(clip.get('transition_in')),'outgoing':copy.deepcopy(clip.get('transition_out')),
         })
         input_meta.append({'kind':'sequence-composite','clip_id':group_id,'parent_id':group['parent_id'],
-                           'sequence_id':clip.get('sequence_id'),'canvas':{'width':width,'height':height,'alpha':True},
+                           'sequence_id':clip.get('sequence_id'),'canvas':{**source_canvas,'alpha':True},
+                           'parent_canvas':copy.deepcopy(parent_canvas),'anchor_space':'cropped-child-canvas',
+                           'raster_adaptation':'crop-fit-trs-inverse-sampling' if adapt_raster else 'same-raster',
+                           'working_canvas':{'width':max(source_canvas['width'],parent_canvas['width']),
+                                             'height':max(source_canvas['height'],parent_canvas['height'])} if adapt_raster else copy.deepcopy(source_canvas),
+                           'spatial_sampler':'native-premultiplied-bilinear-once' if adapt_raster else 'legacy-same-raster',
                            'compositing':'isolated-source-over','child_layer_count':len(group_specs),
                            'timeline_start_tick':int(clip['timeline_start_tick']),'duration_tick':int(clip['duration_tick']),
                            'spatial_order':['child-composite','crop','transform','opacity','effects','mask','fade'],
@@ -3446,8 +3509,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         sequence = next(s for s in project['sequences'] if s['id'] == sequence['id'])
     settings = project["settings"]
     tps = int(settings["timebase"]["ticks_per_second"])
-    width = int(settings["canvas"]["width"])
-    height = int(settings["canvas"]["height"])
+    root_canvas = sequence_canvas(project, sequence)
+    width, height = root_canvas['width'], root_canvas['height']
     fps = settings["timebase"].get("display_fps", {"num": 30, "den": 1})
     fps_value = f"{fps['num']}/{fps['den']}"
     frame_duration = max(1e-6, float(fps.get("den", 1)) / max(1.0, float(fps.get("num", 30))))
@@ -3499,6 +3562,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         if track.get("muted"):
             continue
         for clip in sorted(track.get("clips", []), key=lambda item: int(item.get("timeline_start_tick", 0))):
+            clip_canvas = composite_groups[clip['_composite_group']]['canvas'] if clip.get('_composite_group') else root_canvas
+            width, height = clip_canvas['width'], clip_canvas['height']
             if clip.get('_tracking_binding_plan'):
                 binding_plan = clip['_tracking_binding_plan']
                 input_meta.append({'kind':'tracking-binding','clip_id':clip['id'],**binding_plan})
@@ -3977,6 +4042,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 index += 1
     if not video_labels and not subtitle_overlays:
         raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+    width, height = root_canvas['width'], root_canvas['height']
     subtitle_specs = [
         _build_subtitle_layer(
             root,
@@ -3984,8 +4050,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             subtitle_index,
             filters,
             warnings,
-            width=width,
-            height=height,
+            width=composite_groups[overlay['group_id']]['canvas']['width'] if overlay.get('group_id') else width,
+            height=composite_groups[overlay['group_id']]['canvas']['height'] if overlay.get('group_id') else height,
             fps_value=fps_value,
             duration=duration,
             tps=tps,
@@ -4086,12 +4152,20 @@ def render_project(
     progress_callback: Callable[[str, str, float | None, str], None] | None = None,
     resume_of: str | None = None,
 ) -> dict[str, Any]:
-    effective_project = project
-    if render_settings is not None:
-        effective_project = dict(project)
-        effective_project["settings"] = render_settings
+    effective_project = dict(project)
+    effective_project['settings'] = copy.deepcopy(render_settings if render_settings is not None else project['settings'])
+    if render_settings is None:
+        effective_project['settings']['canvas'] = {**effective_project['settings']['canvas'], **sequence_canvas(project, sequence)}
+    render_sequence = sequence
+    if sequence.get('canvas') is not None:
+        # A profile overrides only this render's selected root; explicitly
+        # authored child rasters remain independent. Keep fingerprint inputs
+        # and persisted project data in their original authoring state.
+        render_sequence = {**sequence, 'canvas': {k: int(effective_project['settings']['canvas'][k]) for k in ('width', 'height')}}
+        effective_project['sequences'] = [render_sequence if s.get('id') == sequence.get('id') else s for s in project['sequences']]
     encoder = output_settings(effective_project["settings"])
-    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, sequence)
+    validate_output_alignment(sequence_canvas(effective_project, render_sequence), str(encoder['video']['pixel_format']))
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, render_sequence)
     fingerprints = render_fingerprints(project, sequence, effective_project["settings"], root)
     output.parent.mkdir(parents=True, exist_ok=True)
     operation_id = new_id("render")

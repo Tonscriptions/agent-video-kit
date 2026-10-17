@@ -16,6 +16,7 @@ from typing import Any
 
 from .animation import keyframe_value
 from .errors import AppError
+from .sequence_canvas import sequence_canvas
 
 BINDING_VERSION = 'timeline-canvas-v1'
 MAX_BINDING_FRAMES = 20_000
@@ -220,7 +221,8 @@ def compile_binding(project: dict, sequence: dict, track: dict, target: dict) ->
     video = asset['probe']['video']
     settings = project['settings']; tps = settings['timebase']['ticks_per_second']
     fps_value = settings['timebase']['display_fps']; fps = Fraction(fps_value['num'],fps_value['den'])
-    width,height = (settings['canvas'][k] for k in ('width','height'))
+    canvas = sequence_canvas(project, sequence)
+    width,height = (canvas[k] for k in ('width','height'))
     start,duration = target['timeline_start_tick'],target['duration_tick']
     first = math.ceil(Fraction(start,tps)*fps)
     last = math.ceil(Fraction(start+duration,tps)*fps)

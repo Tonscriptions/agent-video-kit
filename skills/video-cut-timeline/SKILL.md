@@ -13,9 +13,21 @@ root track: a child's high track order cannot escape that slot. Container
 animation uses its containing sequence's authored clock. Do not pre-multiply
 parent opacity into each child, flatten parent masks, or bake a lossy child
 video to simulate a group. Inspect `sequence-composite` manifest inputs.
-All group canvases currently use the root dimensions. Named audio send/return,
-nested freeze, standalone slide/wipe, linear-light/HDR and broad performance
-remain acceptance boundaries; preserve existing audio and quality warnings.
+Use optional sequence `canvas: {width, height}` for an independent pixel raster;
+see the [sequence canvas contract](../../docs/specs/独立序列画布与父级投影契约_v0.1_2026-10-17.md).
+Omitted or null canvas inherits the effective project/output dimensions, not
+the immediate parent. `add_sequence` accepts canvas; `update_sequence.patch`
+accepts canvas/name/duration_tick/markers, and null clears the canvas override.
+Container crop pixels and cropped anchors belong to the native child; position
+and the post-transform mask belong to its parent. Child text and tracking
+bindings compile locally before projection. Selected-sequence export defaults
+to that raster; profile/width/height override only the selected root for that
+render. Odd internal rasters are valid; final 4:2:0 requires even width/height,
+and 4:2:2 requires even width. Explicit child rasters survive parent overrides.
+Named audio send/return, independent child FPS/color/SAR, nested freeze,
+standalone slide/wipe, linear-light/HDR and broad performance remain acceptance
+boundaries; preserve existing audio and quality warnings. Native bilinear
+sampling is not a promise of high-frequency minification quality.
 
 Use a registered SAM2 adapter with local `--prompts` for multiple selected
 objects, boxes, positive/negative points and future-frame corrections; read

@@ -53,6 +53,7 @@ from .transcribe import ffmpeg_whisper_available, transcribe_local, transcribe_l
 from .local_asr import ASR_ENGINE, asr_registry, registry_item as asr_registry_item, prepare_adapter as prepare_asr_adapter, verify_adapter as verify_asr_adapter, transcribe_registered
 from .asr_quality import evaluate_transcripts
 from .render import OUTPUT_CONTAINERS, OUTPUT_PIXEL_FORMATS, OUTPUT_PROFILES, output_settings, render_fingerprints, render_project, speed_curve_duration_seconds
+from .sequence_canvas import sequence_canvas, validate_canvas, validate_output_alignment
 from .rights import VALID_STATUSES, active_records, add_record, apply_disposition_to_project, check_project_rights, create_disposition_decision, disposition_decisions, effective_disposition_decisions, impacted_artifacts, load_ledger, record_history, release_manifest, revise_record, save_ledger
 from .understand import detect_beats, understand_media
 from .tracking import (
@@ -4414,10 +4415,22 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
             if any(item.get("id") == sequence_id for item in working.get("sequences", [])):
                 raise argument_error(f"序列 ID 已存在: {sequence_id}", "id")
             target = {"id": sequence_id, "name": str(change.get("name") or sequence_id), "duration_tick": max(1, int(change.get("duration_tick", 1))), "tracks": [], "markers": []}
+            if 'canvas' in change:
+                validate_canvas(change['canvas'])
+                target['canvas'] = copy.deepcopy(change['canvas'])
             for track_kind, track_id, order in (("video", f"{sequence_id}_video_1", 0), ("audio", f"{sequence_id}_audio_1", 0)):
                 target["tracks"].append({"id": str(change.get(f"{track_kind}_track_id") or track_id), "kind": track_kind, "order": order, "muted": False, "locked": False, "clips": []})
             working.setdefault("sequences", []).append(target)
             applied.append({"op": operation, "sequence": target})
+        elif operation == "update_sequence":
+            target = find_sequence(working, change.get('sequence_id') or change.get('id') or sequence['id'])
+            patch = change.get('patch')
+            if not isinstance(patch, dict) or not patch or set(patch)-{'name', 'duration_tick', 'canvas', 'markers'}:
+                raise argument_error('update_sequence.patch 支持 name/duration_tick/canvas/markers；轨道与片段通过专用操作编辑', 'patch')
+            if 'canvas' in patch:
+                validate_canvas(patch['canvas'])
+            target.update(copy.deepcopy(patch))
+            applied.append({'op': operation, 'sequence': copy.deepcopy(target)})
         elif operation == "append_sequence_clip":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track = find_track(target_sequence, change.get("track_id"), change.get("track_kind", "video"))
@@ -4886,6 +4899,8 @@ def _render_settings_for_args(project: dict[str, Any], args: argparse.Namespace)
     if profile and profile != "custom":
         width, height = OUTPUT_PROFILES[profile]
     settings = copy.deepcopy(project["settings"])
+    selected_sequence = find_sequence(project, getattr(args, 'sequence_id', None))
+    settings['canvas'] = {**settings.get('canvas', {}), **sequence_canvas(project, selected_sequence)}
     output_patch: dict[str, Any] = {}
     if getattr(args, "container", None) is not None:
         output_patch["container"] = args.container
@@ -4908,16 +4923,16 @@ def _render_settings_for_args(project: dict[str, Any], args: argparse.Namespace)
     if width is None:
         normalized = output_settings(settings)
         settings["output"] = normalized
+        validate_output_alignment(settings['canvas'], str(normalized['video']['pixel_format']))
         return settings, None
     width = int(width)
     height = int(height)
     if width < 64 or height < 64 or width > 8192 or height > 8192:
         raise argument_error("输出画布必须在 64 到 8192 像素之间")
-    if width % 2 or height % 2:
-        raise argument_error("输出画布宽高必须是偶数，以兼容 yuv420p")
     settings["canvas"] = dict(project["settings"].get("canvas", {}))
     settings["canvas"].update({"width": width, "height": height})
     settings["output"] = output_settings(settings)
+    validate_output_alignment(settings['canvas'], str(settings['output']['video']['pixel_format']))
     return settings, profile or "custom"
 
 

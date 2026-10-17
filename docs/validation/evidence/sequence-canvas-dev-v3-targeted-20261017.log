@@ -1,0 +1,52 @@
+test_tracking_binding_recompiles_in_authored_sequence_canvas (test_sequence_canvas.SequenceCanvasBindingTests.test_tracking_binding_recompiles_in_authored_sequence_canvas) ... ERROR
+test_animated_child_anchor_retains_original_clock (test_sequence_canvas.SequenceCanvasTests.test_animated_child_anchor_retains_original_clock) ... ok
+test_canvas_does_not_modify_child_audio_samples (test_sequence_canvas.SequenceCanvasTests.test_canvas_does_not_modify_child_audio_samples) ... ok
+test_child_anchor_positions_its_own_left_edge (test_sequence_canvas.SequenceCanvasTests.test_child_anchor_positions_its_own_left_edge) ... ok
+test_deep_mixed_rasters_preserve_each_container_geometry (test_sequence_canvas.SequenceCanvasTests.test_deep_mixed_rasters_preserve_each_container_geometry) ... ok
+test_direct_render_api_uses_selected_native_canvas_without_mutation (test_sequence_canvas.SequenceCanvasTests.test_direct_render_api_uses_selected_native_canvas_without_mutation) ... ok
+test_fill_rotation_can_reveal_previously_offscreen_source (test_sequence_canvas.SequenceCanvasTests.test_fill_rotation_can_reveal_previously_offscreen_source) ... ok
+test_inherited_child_uses_project_canvas_not_its_parent_canvas (test_sequence_canvas.SequenceCanvasTests.test_inherited_child_uses_project_canvas_not_its_parent_canvas) ... ok
+test_invalid_canvas_rejected_by_builtin_validation_without_schema (test_sequence_canvas.SequenceCanvasTests.test_invalid_canvas_rejected_by_builtin_validation_without_schema) ... ok
+test_invalid_later_sequence_update_rolls_back_entire_operation_batch (test_sequence_canvas.SequenceCanvasTests.test_invalid_later_sequence_update_rolls_back_entire_operation_batch) ... ok
+test_multiline_text_is_laid_out_in_native_child_before_projection (test_sequence_canvas.SequenceCanvasTests.test_multiline_text_is_laid_out_in_native_child_before_projection) ... E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_canvas.py:274: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  binary=Image.new('L',frame.size);binary.putdata([255 if min(p)>180 else 0 for p in frame.getdata()]);return binary.getbbox()
+ok
+test_normalized_crop_animation_uses_child_units_and_original_clock (test_sequence_canvas.SequenceCanvasTests.test_normalized_crop_animation_uses_child_units_and_original_clock) ... ok
+test_odd_child_raster_is_preserved_inside_even_parent (test_sequence_canvas.SequenceCanvasTests.test_odd_child_raster_is_preserved_inside_even_parent) ... ok
+test_odd_selected_output_requires_compatible_pixel_format_before_job (test_sequence_canvas.SequenceCanvasTests.test_odd_selected_output_requires_compatible_pixel_format_before_job) ... ok
+test_output_override_is_local_to_selected_root (test_sequence_canvas.SequenceCanvasTests.test_output_override_is_local_to_selected_root) ... ok
+test_parent_rotation_and_mask_use_separate_coordinate_spaces (test_sequence_canvas.SequenceCanvasTests.test_parent_rotation_and_mask_use_separate_coordinate_spaces) ... ok
+test_pixel_crop_uses_native_child_dimensions (test_sequence_canvas.SequenceCanvasTests.test_pixel_crop_uses_native_child_dimensions) ... ok
+test_portrait_fit_uses_child_geometry_and_transparent_bars (test_sequence_canvas.SequenceCanvasTests.test_portrait_fit_uses_child_geometry_and_transparent_bars) ... ok
+test_queue_and_quality_use_selected_sequence_default_canvas (test_sequence_canvas.SequenceCanvasTests.test_queue_and_quality_use_selected_sequence_default_canvas) ... FAIL
+test_selected_explicit_root_override_keeps_grandchild_canvas_and_authoring (test_sequence_canvas.SequenceCanvasTests.test_selected_explicit_root_override_keeps_grandchild_canvas_and_authoring) ... ok
+test_selected_sequence_exports_its_own_canvas_and_passes_quality (test_sequence_canvas.SequenceCanvasTests.test_selected_sequence_exports_its_own_canvas_and_passes_quality) ... ok
+test_stretch_fills_parent_without_changing_child (test_sequence_canvas.SequenceCanvasTests.test_stretch_fills_parent_without_changing_child) ... ok
+test_update_and_clear_canvas_are_atomic_and_dry_run_is_read_only (test_sequence_canvas.SequenceCanvasTests.test_update_and_clear_canvas_are_atomic_and_dry_run_is_read_only) ... ok
+
+======================================================================
+ERROR: test_tracking_binding_recompiles_in_authored_sequence_canvas (test_sequence_canvas.SequenceCanvasBindingTests.test_tracking_binding_recompiles_in_authored_sequence_canvas)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_canvas.py", line 294, in test_tracking_binding_recompiles_in_authored_sequence_canvas
+    plan=compile_binding(project,sequence,track,target)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\bindings.py", line 218, in compile_binding
+    b = target['tracking_binding']
+        ~~~~~~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'tracking_binding'
+
+======================================================================
+FAIL: test_queue_and_quality_use_selected_sequence_default_canvas (test_sequence_canvas.SequenceCanvasTests.test_queue_and_quality_use_selected_sequence_default_canvas)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_canvas.py", line 256, in test_queue_and_quality_use_selected_sequence_default_canvas
+    result=self.call('queue','run','--project',self.root,'--job-id','portrait')
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 56, in call
+    self.assertEqual(code,0,value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'queue.run', 'request_id': 'req_20261017110739_a81c54f9', 'operation_id': 'op_20261017110739_68b5b506', 'status': 'partial', 'data': {'queue': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\temp\\sequence-group-project-kjjhgj5p\\project\\operations\\render-queue.json', 'summary': {'selected': 1, 'succeeded': 0, 'failed': 1, 'cancelled': 0, 'skipped': 0}, 'jobs': [{'job_id': 'portrait', 'status': 'failed', 'error': {'code': 'OUTPUT_CODEC_CONTAINER_MISMATCH', 'message': 'mp4 不支持当前 PCM 音频输出，请使用 AAC 或 MKV', 'path': 'settings.output.audio.codec', 'retryable': False}}], 'counts': {'cancelled': 0, 'failed': 1, 'pending': 0, 'running': 0, 'succeeded': 0}}, 'artifacts': [], 'warnings': [], 'errors': [{'job_id': 'portrait', 'code': 'OUTPUT_CODEC_CONTAINER_MISMATCH', 'message': 'mp4 不支持当前 PCM 音频输出，请使用 AAC 或 MKV', 'path': 'settings.output.audio.codec', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T11:07:39.720378Z', 'finished_at': '2026-10-17T11:07:39.720387Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 23 tests in 28.360s
+
+FAILED (failures=1, errors=1)

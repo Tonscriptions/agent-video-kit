@@ -14,6 +14,14 @@ establish pixel accuracy. Retain old failed outputs and compare all decoded
 frames to an independent reference. Fixed 8-bit RGB fixture checks do not
 accept HDR, natural quality, group audio, nested freeze or full editor parity.
 
+For [independent sequence rasters](../../docs/specs/独立序列画布与父级投影契约_v0.1_2026-10-17.md),
+check native child crop/anchor, parent position/mask, fill-then-rotate visibility,
+local glyph layout and multilevel projection. Selected-sequence quality defaults
+to its effective canvas; use the actual output profile for a temporary override.
+Keep standalone-child glyph projection separate from independent text shaping,
+and baseline compatibility controls separate from independent spatial oracles.
+Odd internal RGBA does not prove a valid final 4:2:0 or 4:2:2 encode.
+
 Before inpainting or accepting segmentation, review the actual encoded mask:
 
 ```powershell

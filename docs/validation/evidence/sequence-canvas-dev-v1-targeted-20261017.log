@@ -1,0 +1,45 @@
+test_animated_child_anchor_retains_original_clock (test_sequence_canvas.SequenceCanvasTests.test_animated_child_anchor_retains_original_clock) ... FAIL
+test_canvas_does_not_modify_child_audio_samples (test_sequence_canvas.SequenceCanvasTests.test_canvas_does_not_modify_child_audio_samples) ... ok
+test_child_anchor_positions_its_own_left_edge (test_sequence_canvas.SequenceCanvasTests.test_child_anchor_positions_its_own_left_edge) ... ok
+test_deep_mixed_rasters_preserve_each_container_geometry (test_sequence_canvas.SequenceCanvasTests.test_deep_mixed_rasters_preserve_each_container_geometry) ... ok
+test_invalid_canvas_rejected_by_builtin_validation_without_schema (test_sequence_canvas.SequenceCanvasTests.test_invalid_canvas_rejected_by_builtin_validation_without_schema) ... ok
+test_odd_child_raster_is_preserved_inside_even_parent (test_sequence_canvas.SequenceCanvasTests.test_odd_child_raster_is_preserved_inside_even_parent) ... ok
+test_output_override_is_local_to_selected_root (test_sequence_canvas.SequenceCanvasTests.test_output_override_is_local_to_selected_root) ... ok
+test_parent_rotation_and_mask_use_separate_coordinate_spaces (test_sequence_canvas.SequenceCanvasTests.test_parent_rotation_and_mask_use_separate_coordinate_spaces) ... ok
+test_pixel_crop_uses_native_child_dimensions (test_sequence_canvas.SequenceCanvasTests.test_pixel_crop_uses_native_child_dimensions) ... FAIL
+test_portrait_fit_uses_child_geometry_and_transparent_bars (test_sequence_canvas.SequenceCanvasTests.test_portrait_fit_uses_child_geometry_and_transparent_bars) ... ok
+test_selected_sequence_exports_its_own_canvas_and_passes_quality (test_sequence_canvas.SequenceCanvasTests.test_selected_sequence_exports_its_own_canvas_and_passes_quality) ... ok
+test_stretch_fills_parent_without_changing_child (test_sequence_canvas.SequenceCanvasTests.test_stretch_fills_parent_without_changing_child) ... ok
+test_update_and_clear_canvas_are_atomic_and_dry_run_is_read_only (test_sequence_canvas.SequenceCanvasTests.test_update_and_clear_canvas_are_atomic_and_dry_run_is_read_only) ... ok
+
+======================================================================
+FAIL: test_animated_child_anchor_retains_original_clock (test_sequence_canvas.SequenceCanvasTests.test_animated_child_anchor_retains_original_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_canvas.py", line 67, in test_animated_child_anchor_retains_original_clock
+    frames,_,_=self.render()
+               ~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 86, in render
+    self.call('timeline','compose','--project',self.root,'--input',changes)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 56, in call
+    self.assertEqual(code,0,value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'timeline.compose', 'request_id': 'req_20261017104230_d5cefa73', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'PROJECT_INVALID', 'message': '时间线变更会生成无效项目', 'path': None, 'retryable': False, 'cause': '{"ok": false, "errors": [{"code": "SCHEMA_VALIDATION_FAILED", "message": "\'interpolation\' is a required property", "path": "sequences.0.tracks.0.clips.0.keyframes.0.keyframes.0", "retryable": false}, {"code": "SCHEMA_VALIDATION_FAILED", "message": "\'interpolation\' is a required property", "path": "sequences.0.tracks.0.clips.0.keyframes.0.keyframes.1", "retryable": false}, {"code": "INTERPOLATION_INVALID", "message": "关键帧插值类型无效", "path": "sequences[0].tracks[0].clips[0].keyframes", "retryable": false}, {"code": "INTERPOLATION_INVALID", "message": "关键帧插值类型无效", "path": "sequences[0].tracks[0].clips[0].keyframes", "retryable": false}], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}], "rights": {"ok": true, "target": "commercial_ad", "checked": 1, "required_records": 1, "failures": [], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_EVIDENCE_INCOMPLETE", "message": "来源、许可证或证据字段缺失", "asset_id": "red", "rights_ref": "red", "record_version": 1, "context": "project_asset"}], "disposition_decisions": [], "effective_disposition_decisions": []}, "schema_engine": "jsonschema", "asset_count": 1, "sequence_count": 2}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T10:42:30.259067Z', 'finished_at': '2026-10-17T10:42:30.259075Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_pixel_crop_uses_native_child_dimensions (test_sequence_canvas.SequenceCanvasTests.test_pixel_crop_uses_native_child_dimensions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_canvas.py", line 83, in test_pixel_crop_uses_native_child_dimensions
+    for xy in ((5,5),(80,48),(154,90)):self.pixel(im,xy,(0,0,240))
+                                       ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_sequence_compositing.py", line 106, in pixel
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),tolerance,(xy,actual,expected))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 11 not less than or equal to 4 : ((5, 5), (0, 1, 251), (0, 0, 240))
+
+----------------------------------------------------------------------
+Ran 13 tests in 16.716s
+
+FAILED (failures=2)

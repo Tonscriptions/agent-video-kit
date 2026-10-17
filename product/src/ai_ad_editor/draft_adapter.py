@@ -21,6 +21,7 @@ from .errors import AppError
 from .policy import reference_kind, resolve_local_path
 from .project import TICKS_PER_SECOND, create_project, initial_ledger, save_project
 from .rights import add_record, save_ledger
+from .sequence_canvas import sequence_canvas
 from .utils import ID_RE, atomic_write_json, new_id, now_iso, safe_filename, sha256_bytes, sha256_file
 from .validator import validate_project
 
@@ -638,8 +639,8 @@ def export_draft(root: Path, project: dict[str, Any], output: Path, *, strict: b
         _item(items,'tracking-binding','Baked',clip_id,detail='按当前画布和源片段重算为普通关键帧；外部工程不保留活动绑定，完整源保存在旁车')
     tps = int(project["settings"]["timebase"]["ticks_per_second"])
     fps = project["settings"]["timebase"]["display_fps"]
-    canvas = project["settings"]["canvas"]
     sequence = project["sequences"][0]
+    canvas = {**project['settings']['canvas'], **sequence_canvas(project, sequence)}
     materials: dict[str, list[dict[str, Any]]] = {group:[] for group in ("videos","audios","texts","speeds","audio_fades","effects","transitions","stickers","images")}
     tracks = []
     assets = {asset["id"]:asset for asset in project["assets"]}
