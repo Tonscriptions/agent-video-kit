@@ -13,7 +13,7 @@ root track: a child's high track order cannot escape that slot. Container
 animation uses its containing sequence's authored clock. Do not pre-multiply
 parent opacity into each child, flatten parent masks, or bake a lossy child
 video to simulate a group. Inspect `sequence-composite` manifest inputs.
-All group canvases currently use the root dimensions. Group audio buses,
+All group canvases currently use the root dimensions. Named audio send/return,
 nested freeze, standalone slide/wipe, linear-light/HDR and broad performance
 remain acceptance boundaries; preserve existing audio and quality warnings.
 
@@ -164,7 +164,7 @@ The raw WAV PEAK timestamp is normalized without altering PCM bytes; repeated
 renders must preserve existing cache bytes and reject tampering. Keep automatic
 quality, pitch, local transient timing and listening conclusions separate. A
 4 ms clip stretched to 250 ms can be audible but still fail pitch preservation.
-Unconfigured projects retain the legacy atempo boundary. A unity-tempo positive
+Unconfigured projects use the default native atempo path and its explicit limits. A unity-tempo positive
 control passing on both versions is not evidence of a historical failure.
 
 The [R3 channel strategy](../../docs/specs/R3声道策略契约_v0.1_2026-10-17.md)
@@ -198,5 +198,20 @@ the inner automation clock. Numeric stereo pan is balance, not equal-power mono
 pan. Put fades on clips or containers; track fades have no authored clip window
 and emit an unsupported warning. General effect-parameter automation is pending.
 Inspect `audio-track-bus`, `sequence-audio-bus`, `sequence-audio-root` and leaf
-sample-window nodes in the actual render manifest. Keep the existing nonlinear
-windowed-atempo DC amplitude/gap failure open even when gain-clock checks pass.
+sample-window nodes in the actual render manifest. Keep gain-clock acceptance
+separate from the approximate retimed content and its remaining failures.
+
+The [native tempo context contract](../../docs/specs/分段音频变速上下文契约_v0.1_2026-10-17.md)
+warms each default atempo segment with audio contained in the same authored
+selection, then selects the original integrated output core. Inspect
+`audio_tempo_context` for source/core bounds, cumulative output samples,
+`output_selection` and `shortfall_policy=zero-pad-core`. The final non-unity core
+selects the actual retimed end; do not substitute its nominal offset for the
+unknown native output position. Endpoint context uses float32 and a 64-MiB
+estimated PCM preflight limit, not a total RAM guarantee. Unity retains `anull`; an explicitly pinned R3
+engine keeps its own whole-clip path. Context reduces controlled interior DC
+gaps but does not accept continuous phase, transients, arbitrary pitch or
+listening. Preserve the development slow/cropped-tail failures and recheck the
+current complete active interval and actual terminal source marker. Arbitrary
+or ultra-short input can still be insufficient and require zero padding; an
+interior amplitude pass and correct container length do not establish quality.

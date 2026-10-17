@@ -1,0 +1,776 @@
+{
+  "scope": "Separate dry-run preflight, no render/decode delivery or performance acceptance",
+  "operations": [
+    {
+      "op": "update_track",
+      "track_id": "track_video_1",
+      "patch": {
+        "overlap_policy": "allow"
+      }
+    },
+    {
+      "op": "append_clip",
+      "track_id": "track_video_1",
+      "id": "background",
+      "asset_id": "frames",
+      "source_in_tick": 0,
+      "source_out_tick": 270000,
+      "duration_tick": 270000,
+      "timeline_start_tick": 0
+    },
+    {
+      "op": "add_sequence",
+      "id": "child",
+      "duration_tick": 180000
+    },
+    {
+      "op": "append_clip",
+      "sequence_id": "child",
+      "track_id": "child_audio_1",
+      "id": "leaf",
+      "asset_id": "dc",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000,
+      "timeline_start_tick": 0
+    },
+    {
+      "op": "add_sequence",
+      "id": "middle",
+      "duration_tick": 18000000
+    },
+    {
+      "op": "append_sequence_clip",
+      "sequence_id": "middle",
+      "track_id": "middle_video_1",
+      "id": "slow_inner",
+      "nested_sequence_id": "child",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 18000000,
+      "timeline_start_tick": 0,
+      "speed": 0.01
+    },
+    {
+      "op": "append_sequence_clip",
+      "track_id": "track_video_1",
+      "id": "slow_outer",
+      "nested_sequence_id": "middle",
+      "source_in_tick": 0,
+      "source_out_tick": 18000000,
+      "duration_tick": 1247664925,
+      "timeline_start_tick": 0,
+      "speed_curve": {
+        "keyframes": [
+          {
+            "at_tick": 0,
+            "speed": 0.01
+          },
+          {
+            "at_tick": 18000000,
+            "speed": 0.02
+          }
+        ]
+      }
+    }
+  ],
+  "cli_count": 6,
+  "cli_calls": [
+    {
+      "args": [
+        "project",
+        "init",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget"
+      ],
+      "old": false,
+      "exit_code": 0,
+      "seconds": 0.4149880999993911,
+      "result": {
+        "ok": true,
+        "command": "project.init",
+        "request_id": "req_20261017100757_66609031",
+        "operation_id": null,
+        "status": "succeeded",
+        "data": {
+          "project": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget\\project.json",
+          "root": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget",
+          "project_id": "proj_20261017100757_a52d47bb"
+        },
+        "artifacts": [],
+        "warnings": [],
+        "errors": [],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-17T10:07:57.416243Z",
+          "finished_at": "2026-10-17T10:07:57.416252Z",
+          "network": "disabled"
+        }
+      }
+    },
+    {
+      "args": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-tempo-context-20261017\\source.mp4",
+        "--asset-id",
+        "frames",
+        "--verification-status",
+        "verified",
+        "--permitted-use",
+        "commercial_ad",
+        "--source-url",
+        "local://generated-audio-tempo-context",
+        "--license-spdx",
+        "CC0-1.0",
+        "--evidence",
+        "local://scripts/smoke_audio_tempo_context.py"
+      ],
+      "old": false,
+      "exit_code": 0,
+      "seconds": 0.663164700001289,
+      "result": {
+        "ok": true,
+        "command": "media.ingest",
+        "request_id": "req_20261017100758_fb6e1c5a",
+        "operation_id": "op_20261017100758_f71d2af8",
+        "status": "succeeded",
+        "data": {
+          "asset": {
+            "id": "frames",
+            "kind": "video",
+            "uri": "assets/frames_source.mp4",
+            "sha256": "sha256:c4880410c090e8c84208cfc46d8eb57a0e010b5516412f91813787c5643e6433",
+            "probe": {
+              "duration_seconds": 3.0,
+              "duration_tick": 270000,
+              "format": "mov,mp4,m4a,3gp,3g2,mj2",
+              "format_long_name": "QuickTime / MOV",
+              "streams": [
+                {
+                  "index": 0,
+                  "codec_name": "h264",
+                  "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+                  "profile": "High 4:4:4 Predictive",
+                  "codec_type": "video",
+                  "codec_tag_string": "avc1",
+                  "codec_tag": "0x31637661",
+                  "mime_codec_string": "avc1.f4000b",
+                  "width": 320,
+                  "height": 160,
+                  "coded_width": 320,
+                  "coded_height": 160,
+                  "has_b_frames": 0,
+                  "pix_fmt": "gbrp",
+                  "level": 11,
+                  "color_range": "pc",
+                  "color_space": "gbr",
+                  "chroma_location": "left",
+                  "field_order": "progressive",
+                  "is_avc": "true",
+                  "nal_length_size": "4",
+                  "id": "0x1",
+                  "r_frame_rate": "12/1",
+                  "avg_frame_rate": "12/1",
+                  "time_base": "1/12288",
+                  "start_pts": 0,
+                  "start_time": "0.000000",
+                  "duration_ts": 36864,
+                  "duration": "3.000000",
+                  "bit_rate": "130365",
+                  "bits_per_raw_sample": "8",
+                  "nb_frames": "36",
+                  "extradata_size": 46,
+                  "disposition": {
+                    "default": 1,
+                    "dub": 0,
+                    "original": 0,
+                    "comment": 0,
+                    "lyrics": 0,
+                    "karaoke": 0,
+                    "forced": 0,
+                    "hearing_impaired": 0,
+                    "visual_impaired": 0,
+                    "clean_effects": 0,
+                    "attached_pic": 0,
+                    "timed_thumbnails": 0,
+                    "non_diegetic": 0,
+                    "captions": 0,
+                    "descriptions": 0,
+                    "metadata": 0,
+                    "dependent": 0,
+                    "still_image": 0,
+                    "multilayer": 0
+                  },
+                  "tags": {
+                    "language": "und",
+                    "handler_name": "VideoHandler",
+                    "encoder": "Lavc62.28.100 libx264rgb"
+                  }
+                }
+              ],
+              "video": {
+                "codec": "h264",
+                "width": 320,
+                "height": 160,
+                "pix_fmt": "gbrp",
+                "fps": "12/1",
+                "color_space": "gbr",
+                "duration_seconds": 3.0,
+                "start_time_seconds": 0.0
+              },
+              "audio": {
+                "codec": null,
+                "sample_rate": 0,
+                "channels": 0,
+                "duration_seconds": 0.0,
+                "start_time_seconds": 0.0
+              }
+            },
+            "rights_ref": "frames",
+            "source": {
+              "source_url": "local://generated-audio-tempo-context",
+              "retrieved_at": "2026-10-17T10:07:58.045852Z",
+              "original_name": "source.mp4"
+            }
+          },
+          "rights": {
+            "asset_id": "frames",
+            "kind": "video",
+            "sha256": "sha256:c4880410c090e8c84208cfc46d8eb57a0e010b5516412f91813787c5643e6433",
+            "source_url": "local://generated-audio-tempo-context",
+            "source_version": "local",
+            "retrieved_at": "2026-10-17T10:07:58.045894Z",
+            "creator": "unknown",
+            "license_spdx": "CC0-1.0",
+            "license_url": "",
+            "attribution": "",
+            "permitted_uses": [
+              "internal",
+              "commercial_ad"
+            ],
+            "restrictions": [],
+            "evidence": "local://scripts/smoke_audio_tempo_context.py",
+            "verification_status": "verified",
+            "verified_by": "ai-ad-editor",
+            "takedown_status": "clear",
+            "notes": "Imported by local CLI",
+            "record_id": "rights_20261017100758_61179d89",
+            "record_version": 1,
+            "active": true,
+            "recorded_at": "2026-10-17T10:07:58.046986Z",
+            "permitted_channels": []
+          },
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget\\assets\\frames_source.mp4"
+        },
+        "artifacts": [],
+        "warnings": [],
+        "errors": [],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-17T10:07:58.060839Z",
+          "finished_at": "2026-10-17T10:07:58.060848Z",
+          "network": "disabled"
+        }
+      }
+    },
+    {
+      "args": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-tempo-context-20261017\\dc.wav",
+        "--asset-id",
+        "dc",
+        "--verification-status",
+        "verified",
+        "--permitted-use",
+        "commercial_ad",
+        "--source-url",
+        "local://generated-audio-tempo-context",
+        "--license-spdx",
+        "CC0-1.0",
+        "--evidence",
+        "local://scripts/smoke_audio_tempo_context.py"
+      ],
+      "old": false,
+      "exit_code": 0,
+      "seconds": 0.6790980999994645,
+      "result": {
+        "ok": true,
+        "command": "media.ingest",
+        "request_id": "req_20261017100758_16a1daf1",
+        "operation_id": "op_20261017100758_76806de9",
+        "status": "succeeded",
+        "data": {
+          "asset": {
+            "id": "dc",
+            "kind": "audio",
+            "uri": "assets/dc_dc.wav",
+            "sha256": "sha256:942003c29837e39b8a12056e5492fc10ad13fa34385fdf745183d9ade04d6eb9",
+            "probe": {
+              "duration_seconds": 2.0,
+              "duration_tick": 180000,
+              "format": "wav",
+              "format_long_name": "WAV / WAVE (Waveform Audio)",
+              "streams": [
+                {
+                  "index": 0,
+                  "codec_name": "pcm_s16le",
+                  "codec_long_name": "PCM signed 16-bit little-endian",
+                  "codec_type": "audio",
+                  "codec_tag_string": "[1][0][0][0]",
+                  "codec_tag": "0x0001",
+                  "sample_fmt": "s16",
+                  "sample_rate": "48000",
+                  "channels": 2,
+                  "bits_per_sample": 16,
+                  "initial_padding": 0,
+                  "r_frame_rate": "0/0",
+                  "avg_frame_rate": "0/0",
+                  "time_base": "1/48000",
+                  "duration_ts": 96000,
+                  "duration": "2.000000",
+                  "bit_rate": "1536000",
+                  "disposition": {
+                    "default": 0,
+                    "dub": 0,
+                    "original": 0,
+                    "comment": 0,
+                    "lyrics": 0,
+                    "karaoke": 0,
+                    "forced": 0,
+                    "hearing_impaired": 0,
+                    "visual_impaired": 0,
+                    "clean_effects": 0,
+                    "attached_pic": 0,
+                    "timed_thumbnails": 0,
+                    "non_diegetic": 0,
+                    "captions": 0,
+                    "descriptions": 0,
+                    "metadata": 0,
+                    "dependent": 0,
+                    "still_image": 0,
+                    "multilayer": 0
+                  }
+                }
+              ],
+              "video": {
+                "codec": null,
+                "width": null,
+                "height": null,
+                "pix_fmt": null,
+                "fps": null,
+                "color_space": null,
+                "duration_seconds": 0.0,
+                "start_time_seconds": 0.0
+              },
+              "audio": {
+                "codec": "pcm_s16le",
+                "sample_rate": 48000,
+                "channels": 2,
+                "duration_seconds": 2.0,
+                "start_time_seconds": 0.0
+              }
+            },
+            "rights_ref": "dc",
+            "source": {
+              "source_url": "local://generated-audio-tempo-context",
+              "retrieved_at": "2026-10-17T10:07:58.766521Z",
+              "original_name": "dc.wav"
+            }
+          },
+          "rights": {
+            "asset_id": "dc",
+            "kind": "audio",
+            "sha256": "sha256:942003c29837e39b8a12056e5492fc10ad13fa34385fdf745183d9ade04d6eb9",
+            "source_url": "local://generated-audio-tempo-context",
+            "source_version": "local",
+            "retrieved_at": "2026-10-17T10:07:58.766540Z",
+            "creator": "unknown",
+            "license_spdx": "CC0-1.0",
+            "license_url": "",
+            "attribution": "",
+            "permitted_uses": [
+              "internal",
+              "commercial_ad"
+            ],
+            "restrictions": [],
+            "evidence": "local://scripts/smoke_audio_tempo_context.py",
+            "verification_status": "verified",
+            "verified_by": "ai-ad-editor",
+            "takedown_status": "clear",
+            "notes": "Imported by local CLI",
+            "record_id": "rights_20261017100758_8be2549d",
+            "record_version": 1,
+            "active": true,
+            "recorded_at": "2026-10-17T10:07:58.767173Z",
+            "permitted_channels": []
+          },
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget\\assets\\dc_dc.wav"
+        },
+        "artifacts": [],
+        "warnings": [],
+        "errors": [],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-17T10:07:58.778459Z",
+          "finished_at": "2026-10-17T10:07:58.778469Z",
+          "network": "disabled"
+        }
+      }
+    },
+    {
+      "args": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget\\changes.json"
+      ],
+      "old": false,
+      "exit_code": 0,
+      "seconds": 0.6218956000011531,
+      "result": {
+        "ok": true,
+        "command": "timeline.compose",
+        "request_id": "req_20261017100759_4f282cc9",
+        "operation_id": "op_20261017100759_06719139",
+        "status": "succeeded",
+        "data": {
+          "sequence_id": "seq_main",
+          "applied": [
+            {
+              "op": "update_track",
+              "track_id": "track_video_1",
+              "track": {
+                "id": "track_video_1",
+                "kind": "video",
+                "order": 0,
+                "muted": false,
+                "locked": false,
+                "clips": [
+                  {
+                    "id": "background",
+                    "timeline_start_tick": 0,
+                    "duration_tick": 270000,
+                    "source_in_tick": 0,
+                    "source_out_tick": 270000,
+                    "asset_id": "frames"
+                  },
+                  {
+                    "id": "slow_outer",
+                    "timeline_start_tick": 0,
+                    "duration_tick": 1247664925,
+                    "source_in_tick": 0,
+                    "source_out_tick": 18000000,
+                    "sequence_id": "middle",
+                    "speed_curve": {
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "speed": 0.01
+                        },
+                        {
+                          "at_tick": 18000000,
+                          "speed": 0.02
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "overlap_policy": "allow"
+              }
+            },
+            {
+              "op": "append_clip",
+              "track_id": "track_video_1",
+              "clip": {
+                "id": "background",
+                "timeline_start_tick": 0,
+                "duration_tick": 270000,
+                "source_in_tick": 0,
+                "source_out_tick": 270000,
+                "asset_id": "frames"
+              }
+            },
+            {
+              "op": "add_sequence",
+              "sequence": {
+                "id": "child",
+                "name": "child",
+                "duration_tick": 180000,
+                "tracks": [
+                  {
+                    "id": "child_video_1",
+                    "kind": "video",
+                    "order": 0,
+                    "muted": false,
+                    "locked": false,
+                    "clips": []
+                  },
+                  {
+                    "id": "child_audio_1",
+                    "kind": "audio",
+                    "order": 0,
+                    "muted": false,
+                    "locked": false,
+                    "clips": [
+                      {
+                        "id": "leaf",
+                        "timeline_start_tick": 0,
+                        "duration_tick": 180000,
+                        "source_in_tick": 0,
+                        "source_out_tick": 180000,
+                        "asset_id": "dc"
+                      }
+                    ]
+                  }
+                ],
+                "markers": []
+              }
+            },
+            {
+              "op": "append_clip",
+              "track_id": "child_audio_1",
+              "clip": {
+                "id": "leaf",
+                "timeline_start_tick": 0,
+                "duration_tick": 180000,
+                "source_in_tick": 0,
+                "source_out_tick": 180000,
+                "asset_id": "dc"
+              }
+            },
+            {
+              "op": "add_sequence",
+              "sequence": {
+                "id": "middle",
+                "name": "middle",
+                "duration_tick": 18000000,
+                "tracks": [
+                  {
+                    "id": "middle_video_1",
+                    "kind": "video",
+                    "order": 0,
+                    "muted": false,
+                    "locked": false,
+                    "clips": [
+                      {
+                        "id": "slow_inner",
+                        "timeline_start_tick": 0,
+                        "duration_tick": 18000000,
+                        "source_in_tick": 0,
+                        "source_out_tick": 180000,
+                        "sequence_id": "child",
+                        "speed": 0.01
+                      }
+                    ]
+                  },
+                  {
+                    "id": "middle_audio_1",
+                    "kind": "audio",
+                    "order": 0,
+                    "muted": false,
+                    "locked": false,
+                    "clips": []
+                  }
+                ],
+                "markers": []
+              }
+            },
+            {
+              "op": "append_sequence_clip",
+              "track_id": "middle_video_1",
+              "clip": {
+                "id": "slow_inner",
+                "timeline_start_tick": 0,
+                "duration_tick": 18000000,
+                "source_in_tick": 0,
+                "source_out_tick": 180000,
+                "sequence_id": "child",
+                "speed": 0.01
+              }
+            },
+            {
+              "op": "append_sequence_clip",
+              "track_id": "track_video_1",
+              "clip": {
+                "id": "slow_outer",
+                "timeline_start_tick": 0,
+                "duration_tick": 1247664925,
+                "source_in_tick": 0,
+                "source_out_tick": 18000000,
+                "sequence_id": "middle",
+                "speed_curve": {
+                  "keyframes": [
+                    {
+                      "at_tick": 0,
+                      "speed": 0.01
+                    },
+                    {
+                      "at_tick": 18000000,
+                      "speed": 0.02
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "validation": {
+            "ok": true,
+            "errors": [],
+            "warnings": [],
+            "rights": {
+              "ok": true,
+              "target": "commercial_ad",
+              "checked": 2,
+              "required_records": 2,
+              "failures": [],
+              "warnings": [],
+              "disposition_decisions": [],
+              "effective_disposition_decisions": []
+            },
+            "schema_engine": "jsonschema",
+            "asset_count": 2,
+            "sequence_count": 3
+          },
+          "before_snapshot": {
+            "snapshot_id": "snap_20261017100759_6b5e4777",
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget\\history\\snap_20261017100759_6b5e4777.json",
+            "label": "before-timeline-compose",
+            "created_at": "2026-10-17T10:07:59.351728Z"
+          }
+        },
+        "artifacts": [],
+        "warnings": [],
+        "errors": [],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-17T10:07:59.369493Z",
+          "finished_at": "2026-10-17T10:07:59.369513Z",
+          "network": "disabled"
+        }
+      }
+    },
+    {
+      "args": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget\\renders\\never-created.mkv",
+        "--dry-run"
+      ],
+      "old": false,
+      "exit_code": 2,
+      "seconds": 0.8374155999990762,
+      "result": {
+        "ok": false,
+        "command": "render",
+        "request_id": "req_20261017100800_54b1c577",
+        "operation_id": null,
+        "status": "failed",
+        "data": {},
+        "artifacts": [],
+        "warnings": [],
+        "errors": [
+          {
+            "code": "AUDIO_TEMPO_CONTEXT_LIMIT",
+            "message": "末端变速上下文的预估 float32 PCM 超过 64 MiB；请拆分选区或减少嵌套慢速倍率",
+            "path": "audio_tempo_context",
+            "retryable": false,
+            "cause": "estimated_terminal_pcm_bytes=576804776; budget_bytes=67108864"
+          }
+        ],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-17T10:08:00.282385Z",
+          "finished_at": "2026-10-17T10:08:00.282393Z",
+          "network": "disabled"
+        }
+      }
+    },
+    {
+      "args": [
+        "policy",
+        "audit",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget"
+      ],
+      "old": false,
+      "exit_code": 0,
+      "seconds": 0.43639040000016394,
+      "result": {
+        "ok": true,
+        "command": "policy.audit",
+        "request_id": "req_20261017100800_e463f21b",
+        "operation_id": null,
+        "status": "succeeded",
+        "data": {
+          "root": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\S01-budget",
+          "network": "disabled",
+          "scanned_files": 8,
+          "findings": [],
+          "ok": true
+        },
+        "artifacts": [],
+        "warnings": [],
+        "errors": [],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "schema_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "started_at": "2026-10-17T10:08:00.731434Z",
+          "finished_at": "2026-10-17T10:08:00.731442Z",
+          "network": "disabled"
+        }
+      }
+    }
+  ],
+  "expected_rejection": {
+    "ok": false,
+    "command": "render",
+    "request_id": "req_20261017100800_54b1c577",
+    "operation_id": null,
+    "status": "failed",
+    "data": {},
+    "artifacts": [],
+    "warnings": [],
+    "errors": [
+      {
+        "code": "AUDIO_TEMPO_CONTEXT_LIMIT",
+        "message": "末端变速上下文的预估 float32 PCM 超过 64 MiB；请拆分选区或减少嵌套慢速倍率",
+        "path": "audio_tempo_context",
+        "retryable": false,
+        "cause": "estimated_terminal_pcm_bytes=576804776; budget_bytes=67108864"
+      }
+    ],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-17T10:08:00.282385Z",
+      "finished_at": "2026-10-17T10:08:00.282393Z",
+      "network": "disabled"
+    }
+  },
+  "expected_exit_code": 2,
+  "authored_project_and_ledger_unchanged": true,
+  "output_not_created": true
+}

@@ -1,0 +1,668 @@
+{
+  "manifest_version": "0.1.0",
+  "operation_id": "render_20261017100706_39a8ddd2",
+  "project_id": "proj_20261017100659_51602317",
+  "sequence_id": "seq_main",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\T06\\renders\\after.mkv",
+  "sha256": "cee5ea5b65a6ad50799c60368c3f8e560e8c526c09956797cf92960f9dd5337b",
+  "probe": {
+    "duration_seconds": 3.0,
+    "duration_tick": 270000,
+    "format": "matroska,webm",
+    "format_long_name": "Matroska / WebM",
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "profile": "High 4:4:4 Predictive",
+        "codec_type": "video",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "mime_codec_string": "avc1.f4000b",
+        "width": 320,
+        "height": 160,
+        "coded_width": 320,
+        "coded_height": 160,
+        "has_b_frames": 0,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "2:1",
+        "pix_fmt": "yuv444p",
+        "level": 11,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "is_avc": "true",
+        "nal_length_size": "4",
+        "r_frame_rate": "12/1",
+        "avg_frame_rate": "12/1",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bits_per_raw_sample": "8",
+        "extradata_size": 47,
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 libx264",
+          "DURATION": "00:00:03.000000000"
+        }
+      },
+      {
+        "index": 1,
+        "codec_name": "pcm_f32le",
+        "codec_long_name": "PCM 32-bit floating point little-endian",
+        "codec_type": "audio",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "sample_fmt": "flt",
+        "sample_rate": "48000",
+        "channels": 2,
+        "bits_per_sample": 32,
+        "initial_padding": 0,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bit_rate": "3072000",
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 pcm_f32le",
+          "DURATION": "00:00:03.000000000"
+        }
+      }
+    ],
+    "video": {
+      "codec": "h264",
+      "width": 320,
+      "height": 160,
+      "pix_fmt": "yuv444p",
+      "fps": "12/1",
+      "color_space": "bt709",
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    },
+    "audio": {
+      "codec": "pcm_f32le",
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    }
+  },
+  "command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-hide_banner",
+    "-y",
+    "-loglevel",
+    "error",
+    "-progress",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\T06\\renders\\.tmp\\render_20261017100706_39a8ddd2\\ffmpeg-progress.log",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\T06\\assets\\frames_source.mp4",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\T06\\assets\\selection_selection.wav",
+    "-filter_complex",
+    "[0:v]trim=start=0.000000:end=3.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=12/1:start_time=0.00000000:round=up:eof_action=pass,scale=320:160:force_original_aspect_ratio=decrease,pad=320:160:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1[v0];[1:a]aresample=48000,aformat=sample_fmts=flt,atrim=start_sample=24000:end_sample=72000,asetpts=N/SR/TB,asplit=8[asplit1_0][asplit1_1][asplit1_2][asplit1_3][asplit1_4][asplit1_5][asplit1_6][asplit1_7];[asplit1_0]atrim=start_sample=0:end_sample=14694,asetpts=N/SR/TB,atempo=1.06127757,atrim=start_sample=0:end_sample=5654,apad=whole_len=5654,atrim=end_sample=5654,asetpts=N/SR/TB[aspeed1_0];[asplit1_1]atrim=start_sample=0:end_sample=21720,asetpts=N/SR/TB,atempo=1.18640738,atrim=start_sample=5057:end_sample=10114,apad=whole_len=5057,atrim=end_sample=5057,asetpts=N/SR/TB[aspeed1_1];[asplit1_2]atrim=start_sample=1256:end_sample=28744,asetpts=N/SR/TB,atempo=1.31151251,atrim=start_sample=8192:end_sample=12767,apad=whole_len=4575,atrim=end_sample=4575,asetpts=N/SR/TB[aspeed1_2];[asplit1_3]atrim=start_sample=6231:end_sample=35769,asetpts=N/SR/TB,atempo=1.43659942,atrim=start_sample=8192:end_sample=12368,apad=whole_len=4176,atrim=end_sample=4176,asetpts=N/SR/TB[aspeed1_3];[asplit1_4]atrim=start_sample=11206:end_sample=42794,asetpts=N/SR/TB,atempo=1.56167248,atrim=start_sample=8192:end_sample=12034,apad=whole_len=3842,atrim=end_sample=3842,asetpts=N/SR/TB[aspeed1_4];[asplit1_5]atrim=start_sample=16182:end_sample=48000,asetpts=N/SR/TB,atempo=1.68673477,atrim=start_sample=8192:end_sample=11749,apad=whole_len=3557,atrim=end_sample=3557,asetpts=N/SR/TB[aspeed1_5];[asplit1_6]atrim=start_sample=21157:end_sample=48000,asetpts=N/SR/TB,atempo=1.81178853,atrim=start_sample=8192:end_sample=11504,apad=whole_len=3312,atrim=end_sample=3312,asetpts=N/SR/TB[aspeed1_6];[asplit1_7]atrim=start_sample=26133:end_sample=48000,asetpts=N/SR/TB,atempo=1.93683542,areverse,atrim=end_sample=3098,areverse,apad=whole_len=3098,atrim=end_sample=3098,asetpts=N/SR/TB[aspeed1_7];[aspeed1_0][aspeed1_1][aspeed1_2][aspeed1_3][aspeed1_4][aspeed1_5][aspeed1_6][aspeed1_7]concat=n=8:v=0:a=1[aspeed1];[aspeed1]aresample=48000,apad=whole_len=33271,atrim=end_sample=33271,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black@0.0:s=320x160:r=12/1:d=3.000000,format=rgba[group0_base];[group0_base]format=rgba,trim=start_frame=0:end_frame=9[group0_out];color=c=black:s=320x160:r=12/1:d=3.000000[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo1];[vo1]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]apad=whole_len=33271,atrim=start_sample=0:end_sample=33271,asetpts=N/SR/TB,aresample=48000,apad=whole_len=33271,atrim=end_sample=33271,asetpts=N/SR/TB,adelay=0S:all=1[abus3];[abus3]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus4];[abus4]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus5];[abus5]aresample=48000,apad=whole_len=144000,atrim=end_sample=144000,asetpts=N/SR/TB[aout]",
+    "-map",
+    "[vout]",
+    "-map",
+    "[aout]",
+    "-t",
+    "3.000000",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "ultrafast",
+    "-crf",
+    "0",
+    "-pix_fmt",
+    "yuv444p",
+    "-color_primaries",
+    "bt709",
+    "-color_trc",
+    "bt709",
+    "-colorspace",
+    "bt709",
+    "-color_range",
+    "tv",
+    "-c:a",
+    "pcm_f32le",
+    "-f",
+    "matroska",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\tempo-context-media-final-v4-20261017\\T06\\renders\\.tmp\\render_20261017100706_39a8ddd2\\after.mkv"
+  ],
+  "filter_graph_transport": {
+    "mode": "inline",
+    "sha256": "sha256:00eeeec98908efaa3d66e78ef8bccadd5c1b37919c37524282ff15bd1ad45320",
+    "utf8_bytes": 3184,
+    "logical_command_utf16_units": 4081
+  },
+  "filter_complex": "[0:v]trim=start=0.000000:end=3.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=12/1:start_time=0.00000000:round=up:eof_action=pass,scale=320:160:force_original_aspect_ratio=decrease,pad=320:160:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1[v0];[1:a]aresample=48000,aformat=sample_fmts=flt,atrim=start_sample=24000:end_sample=72000,asetpts=N/SR/TB,asplit=8[asplit1_0][asplit1_1][asplit1_2][asplit1_3][asplit1_4][asplit1_5][asplit1_6][asplit1_7];[asplit1_0]atrim=start_sample=0:end_sample=14694,asetpts=N/SR/TB,atempo=1.06127757,atrim=start_sample=0:end_sample=5654,apad=whole_len=5654,atrim=end_sample=5654,asetpts=N/SR/TB[aspeed1_0];[asplit1_1]atrim=start_sample=0:end_sample=21720,asetpts=N/SR/TB,atempo=1.18640738,atrim=start_sample=5057:end_sample=10114,apad=whole_len=5057,atrim=end_sample=5057,asetpts=N/SR/TB[aspeed1_1];[asplit1_2]atrim=start_sample=1256:end_sample=28744,asetpts=N/SR/TB,atempo=1.31151251,atrim=start_sample=8192:end_sample=12767,apad=whole_len=4575,atrim=end_sample=4575,asetpts=N/SR/TB[aspeed1_2];[asplit1_3]atrim=start_sample=6231:end_sample=35769,asetpts=N/SR/TB,atempo=1.43659942,atrim=start_sample=8192:end_sample=12368,apad=whole_len=4176,atrim=end_sample=4176,asetpts=N/SR/TB[aspeed1_3];[asplit1_4]atrim=start_sample=11206:end_sample=42794,asetpts=N/SR/TB,atempo=1.56167248,atrim=start_sample=8192:end_sample=12034,apad=whole_len=3842,atrim=end_sample=3842,asetpts=N/SR/TB[aspeed1_4];[asplit1_5]atrim=start_sample=16182:end_sample=48000,asetpts=N/SR/TB,atempo=1.68673477,atrim=start_sample=8192:end_sample=11749,apad=whole_len=3557,atrim=end_sample=3557,asetpts=N/SR/TB[aspeed1_5];[asplit1_6]atrim=start_sample=21157:end_sample=48000,asetpts=N/SR/TB,atempo=1.81178853,atrim=start_sample=8192:end_sample=11504,apad=whole_len=3312,atrim=end_sample=3312,asetpts=N/SR/TB[aspeed1_6];[asplit1_7]atrim=start_sample=26133:end_sample=48000,asetpts=N/SR/TB,atempo=1.93683542,areverse,atrim=end_sample=3098,areverse,apad=whole_len=3098,atrim=end_sample=3098,asetpts=N/SR/TB[aspeed1_7];[aspeed1_0][aspeed1_1][aspeed1_2][aspeed1_3][aspeed1_4][aspeed1_5][aspeed1_6][aspeed1_7]concat=n=8:v=0:a=1[aspeed1];[aspeed1]aresample=48000,apad=whole_len=33271,atrim=end_sample=33271,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black@0.0:s=320x160:r=12/1:d=3.000000,format=rgba[group0_base];[group0_base]format=rgba,trim=start_frame=0:end_frame=9[group0_out];color=c=black:s=320x160:r=12/1:d=3.000000[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo1];[vo1]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]apad=whole_len=33271,atrim=start_sample=0:end_sample=33271,asetpts=N/SR/TB,aresample=48000,apad=whole_len=33271,atrim=end_sample=33271,asetpts=N/SR/TB,adelay=0S:all=1[abus3];[abus3]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus4];[abus4]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus5];[abus5]aresample=48000,apad=whole_len=144000,atrim=end_sample=144000,asetpts=N/SR/TB[aout]",
+  "inputs": [
+    {
+      "asset_id": "frames",
+      "clip_id": "background",
+      "input": 0,
+      "kind": "video",
+      "source_in_tick": 0,
+      "source_out_tick": 270000
+    },
+    {
+      "asset_id": "selection",
+      "clip_id": "container.leaf",
+      "track_id": "container.child_audio_1",
+      "input": 1,
+      "kind": "audio",
+      "source_in_tick": 45000,
+      "source_out_tick": 135000,
+      "timeline_start_sample": 0,
+      "duration_samples": 33271,
+      "sample_rate": 48000,
+      "group_id": "container",
+      "audio_tempo_context": {
+        "engine": "ffmpeg-atempo-source-context-v2",
+        "sample_rate": 48000,
+        "core_sample_format": "float32",
+        "source_start_sample": 24000,
+        "source_end_sample": 72000,
+        "source_selection_samples": 48000,
+        "context_policy_samples": 8192,
+        "context_outside_selection": false,
+        "terminal_context_pcm_budget_bytes": 67108864,
+        "terminal_core_alignment": "actual-retimed-source-end",
+        "windows": [
+          {
+            "core_start_sample": 0,
+            "core_end_sample": 6000,
+            "context_start_sample": 0,
+            "context_end_sample": 14694,
+            "requested_guard_samples": 8694,
+            "tempo": 1.06127756622909,
+            "output_selection": "nominal-source-offset",
+            "estimated_terminal_pcm_bytes": 0,
+            "nominal_retimed_core_start_sample": 0,
+            "nominal_retimed_core_end_sample": 5654,
+            "retimed_trim_start_sample": 0,
+            "retimed_trim_end_sample": 5654,
+            "output_start_sample": 0,
+            "output_end_sample": 5654,
+            "output_samples": 5654
+          },
+          {
+            "core_start_sample": 6000,
+            "core_end_sample": 12000,
+            "context_start_sample": 0,
+            "context_end_sample": 21720,
+            "requested_guard_samples": 9720,
+            "tempo": 1.1864073808298181,
+            "output_selection": "nominal-source-offset",
+            "estimated_terminal_pcm_bytes": 0,
+            "nominal_retimed_core_start_sample": 5057,
+            "nominal_retimed_core_end_sample": 10114,
+            "retimed_trim_start_sample": 5057,
+            "retimed_trim_end_sample": 10114,
+            "output_start_sample": 5654,
+            "output_end_sample": 10711,
+            "output_samples": 5057
+          },
+          {
+            "core_start_sample": 12000,
+            "core_end_sample": 18000,
+            "context_start_sample": 1256,
+            "context_end_sample": 28744,
+            "requested_guard_samples": 10744,
+            "tempo": 1.3115125129457446,
+            "output_selection": "nominal-source-offset",
+            "estimated_terminal_pcm_bytes": 0,
+            "nominal_retimed_core_start_sample": 8192,
+            "nominal_retimed_core_end_sample": 12767,
+            "retimed_trim_start_sample": 8192,
+            "retimed_trim_end_sample": 12767,
+            "output_start_sample": 10711,
+            "output_end_sample": 15286,
+            "output_samples": 4575
+          },
+          {
+            "core_start_sample": 18000,
+            "core_end_sample": 24000,
+            "context_start_sample": 6231,
+            "context_end_sample": 35769,
+            "requested_guard_samples": 11769,
+            "tempo": 1.436599416641557,
+            "output_selection": "nominal-source-offset",
+            "estimated_terminal_pcm_bytes": 0,
+            "nominal_retimed_core_start_sample": 8192,
+            "nominal_retimed_core_end_sample": 12368,
+            "retimed_trim_start_sample": 8192,
+            "retimed_trim_end_sample": 12368,
+            "output_start_sample": 15286,
+            "output_end_sample": 19462,
+            "output_samples": 4176
+          },
+          {
+            "core_start_sample": 24000,
+            "core_end_sample": 30000,
+            "context_start_sample": 11206,
+            "context_end_sample": 42794,
+            "requested_guard_samples": 12794,
+            "tempo": 1.5616724753279203,
+            "output_selection": "nominal-source-offset",
+            "estimated_terminal_pcm_bytes": 0,
+            "nominal_retimed_core_start_sample": 8192,
+            "nominal_retimed_core_end_sample": 12034,
+            "retimed_trim_start_sample": 8192,
+            "retimed_trim_end_sample": 12034,
+            "output_start_sample": 19462,
+            "output_end_sample": 23304,
+            "output_samples": 3842
+          },
+          {
+            "core_start_sample": 30000,
+            "core_end_sample": 36000,
+            "context_start_sample": 16182,
+            "context_end_sample": 48000,
+            "requested_guard_samples": 13818,
+            "tempo": 1.6867347707908233,
+            "output_selection": "nominal-source-offset",
+            "estimated_terminal_pcm_bytes": 0,
+            "nominal_retimed_core_start_sample": 8192,
+            "nominal_retimed_core_end_sample": 11749,
+            "retimed_trim_start_sample": 8192,
+            "retimed_trim_end_sample": 11749,
+            "output_start_sample": 23304,
+            "output_end_sample": 26861,
+            "output_samples": 3557
+          },
+          {
+            "core_start_sample": 36000,
+            "core_end_sample": 42000,
+            "context_start_sample": 21157,
+            "context_end_sample": 48000,
+            "requested_guard_samples": 14843,
+            "tempo": 1.8117885330823216,
+            "output_selection": "nominal-source-offset",
+            "estimated_terminal_pcm_bytes": 0,
+            "nominal_retimed_core_start_sample": 8192,
+            "nominal_retimed_core_end_sample": 11504,
+            "retimed_trim_start_sample": 8192,
+            "retimed_trim_end_sample": 11504,
+            "output_start_sample": 26861,
+            "output_end_sample": 30173,
+            "output_samples": 3312
+          },
+          {
+            "core_start_sample": 42000,
+            "core_end_sample": 48000,
+            "context_start_sample": 26133,
+            "context_end_sample": 48000,
+            "requested_guard_samples": 15867,
+            "tempo": 1.9368354158290677,
+            "output_selection": "last-retimed-samples",
+            "estimated_terminal_pcm_bytes": 155864,
+            "nominal_retimed_core_start_sample": 8192,
+            "nominal_retimed_core_end_sample": 11290,
+            "retimed_trim_start_sample": null,
+            "retimed_trim_end_sample": null,
+            "output_start_sample": 30173,
+            "output_end_sample": 33271,
+            "output_samples": 3098
+          }
+        ],
+        "shortfall_policy": "zero-pad-core",
+        "continuous_phase_accepted": false,
+        "pitch_and_listening_accepted": false,
+        "local_content_sample_alignment_accepted": false
+      },
+      "nested_time_mapping": {
+        "version": "1",
+        "maps": [
+          {
+            "source_start": 0.0,
+            "source_end": 2.0,
+            "timeline_start": 0.0,
+            "timeline_duration": 2.0,
+            "speed": 1.0,
+            "reverse": false,
+            "segments": [],
+            "curve_scale": 1.0
+          },
+          {
+            "source_start": 0.5,
+            "source_end": 1.5,
+            "timeline_start": 0.0,
+            "timeline_duration": 0.6931444444444445,
+            "speed": 1.0,
+            "reverse": false,
+            "segments": [
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ]
+            ],
+            "curve_scale": 0.9999960526197357
+          }
+        ],
+        "tempo_windows": 8,
+        "sample_rate": 48000,
+        "audio_tempo": "piecewise-source-context-integrated-boundaries"
+      }
+    },
+    {
+      "kind": "sequence-composite",
+      "clip_id": "container",
+      "parent_id": null,
+      "sequence_id": "child",
+      "canvas": {
+        "width": 320,
+        "height": 160,
+        "alpha": true
+      },
+      "compositing": "isolated-source-over",
+      "child_layer_count": 0,
+      "timeline_start_tick": 0,
+      "duration_tick": 62383,
+      "spatial_order": [
+        "child-composite",
+        "crop",
+        "transform",
+        "opacity",
+        "effects",
+        "mask",
+        "fade"
+      ],
+      "intermediate_files": 0
+    },
+    {
+      "kind": "audio-track-bus",
+      "track_id": "container.child_audio_1",
+      "scope_id": "container",
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "processing": {},
+      "sample_rate": 48000
+    },
+    {
+      "kind": "sequence-audio-bus",
+      "clip_id": "container",
+      "parent_id": null,
+      "sequence_id": "child",
+      "child_input_count": 1,
+      "sample_rate": 48000,
+      "start_sample": 0,
+      "end_sample": 33271,
+      "mixing": "float-sum-normalize-disabled",
+      "processing": {},
+      "authored_clock": {
+        "maps": [],
+        "authored_start": 0.0
+      },
+      "processing_order": [
+        "child-clips",
+        "local-ducking",
+        "track-sum",
+        "track-processing",
+        "sequence-sum",
+        "container-volume-effects-pan-fade",
+        "sample-window"
+      ],
+      "intermediate_files": 0
+    },
+    {
+      "kind": "audio-track-bus",
+      "track_id": "track_video_1",
+      "scope_id": null,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "processing": {},
+      "sample_rate": 48000
+    },
+    {
+      "kind": "sequence-audio-root",
+      "sample_rate": 48000,
+      "output_samples": 144000,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "automatic_limiter": false,
+      "has_audible_inputs": true
+    }
+  ],
+  "profile": null,
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 12,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 320,
+      "height": 160,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mkv",
+      "video": {
+        "codec": "libx264",
+        "preset": "ultrafast",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "pcm_f32le",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "warnings": [
+    {
+      "code": "RENDER_FEATURE_APPROXIMATE",
+      "clip_id": "container.leaf",
+      "feature": "audio_speed_curve_piecewise",
+      "message": "音频速度曲线按带选区内上下文的短段 atempo 近似，末段按真实伸缩末端选取；累计采样锚点对齐，局部时序、段间相位、瞬态、极短选区与听感仍须独立核验；输出不足仍可能补静音"
+    }
+  ],
+  "quality": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "metrics": {
+      "duration_seconds": 3.0,
+      "width": 320,
+      "height": 160,
+      "audio_codec": "pcm_f32le",
+      "video_duration_seconds": 3.0,
+      "audio_duration_seconds": null,
+      "av_duration_delta_seconds": null,
+      "probe": {
+        "duration_seconds": 3.0,
+        "duration_tick": 270000,
+        "format": "matroska,webm",
+        "format_long_name": "Matroska / WebM",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High 4:4:4 Predictive",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "mime_codec_string": "avc1.f4000b",
+            "width": 320,
+            "height": 160,
+            "coded_width": 320,
+            "coded_height": 160,
+            "has_b_frames": 0,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "2:1",
+            "pix_fmt": "yuv444p",
+            "level": 11,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "r_frame_rate": "12/1",
+            "avg_frame_rate": "12/1",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bits_per_raw_sample": "8",
+            "extradata_size": 47,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 libx264",
+              "DURATION": "00:00:03.000000000"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "pcm_f32le",
+            "codec_long_name": "PCM 32-bit floating point little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "sample_fmt": "flt",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 32,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bit_rate": "3072000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 pcm_f32le",
+              "DURATION": "00:00:03.000000000"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 320,
+          "height": 160,
+          "pix_fmt": "yuv444p",
+          "fps": "12/1",
+          "color_space": "bt709",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_f32le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      }
+    }
+  },
+  "project_fingerprint": "3d687f0ff36c3855c8d000c75e8b713288741a9724d8f06be2c561bec9b5f49b",
+  "input_hashes": {
+    "frames": "sha256:c4880410c090e8c84208cfc46d8eb57a0e010b5516412f91813787c5643e6433",
+    "selection": "sha256:e0cac2e8115690ef99c41939023ecebf37a5c519d5bb2d0b36a193f66e51effb"
+  },
+  "resume_of": null
+}

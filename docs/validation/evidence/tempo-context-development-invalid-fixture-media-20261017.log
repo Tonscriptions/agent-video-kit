@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_audio_tempo_context.py", line 271, in <module>
+    args=parser.parse_args();run(args.output.resolve(),args.work.resolve(),args.font.resolve(),args.font_license.resolve())
+                             ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_audio_tempo_context.py", line 162, in run
+    results[name]=cli('render','--project',project,'--output',path,'--publish',old=old)
+                  ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_audio_tempo_context.py", line 144, in cli
+    if p.returncode and not allow_failure:raise RuntimeError(value)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'ok': False, 'command': 'render', 'request_id': 'req_20261017094423_1c6bcc3a', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'PROJECT_INVALID', 'message': '项目验证失败，拒绝渲染', 'path': None, 'retryable': False, 'cause': '{"ok": false, "errors": [{"code": "CLIP_OUTSIDE_SEQUENCE", "message": "片段超出序列时长", "path": "sequences[0].tracks[0].clips[1]", "retryable": false}], "warnings": [], "rights": {"ok": true, "target": "commercial_ad", "checked": 2, "required_records": 2, "failures": [], "warnings": [], "disposition_decisions": [], "effective_disposition_decisions": []}, "schema_engine": "jsonschema", "asset_count": 2, "sequence_count": 2}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T09:44:23.699412Z', 'finished_at': '2026-10-17T09:44:23.699429Z', 'network': 'disabled'}}

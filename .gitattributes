@@ -90,3 +90,9 @@ scripts/smoke_audio_buses.py -text
 docs/validation/evidence/*audio-buses*.json -text
 docs/validation/evidence/audio-buses*.log -text -whitespace
 docs/assets/audio-buses-20261017/*.txt -whitespace
+
+# V30 retains actual tempo PCM, terminal failures and immutable native logs.
+scripts/smoke_audio_tempo_context.py -text
+docs/validation/evidence/*tempo-context*.json -text
+docs/validation/evidence/tempo-context*.log -text -whitespace
+docs/assets/audio-tempo-context-20261017/*.txt -whitespace

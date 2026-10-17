@@ -6,7 +6,7 @@
 
 ## 功能核验与真实实测
 
-本表随功能和验证结果同步更新。**功能执行、实际内容、自动质量与听感分别验收，失败记录保留。** 本轮 V29：片段→轨道→子序列→父容器分层混音，轨道/容器效果在各自求和之后执行；音频 mute/solo 按序列作用，音量包络逐采样计算。完整 **606/606，2333.520 秒**，0 跳过，105 Python+1 Schema 共 106 份原字节冻结；24 新增与 83 关联方法均为完整子集。固定 V28 同测 24 方法：23 失败、1 控制通过；31 条失败记录包含参数子测试。12 组/102 次正式 CLI 全成功，含 24 渲染、12 质量、12 策略；1,152,000 个新立体声采样帧（2,304,000 个通道数值）全部检查，最大绝对差 0，阈值 2e-6。旧版采样、独立参考分别同量另计；288 新主视频帧与旧版逐像素一致。旧版 11 组内容失败、1 控制通过。另保留非线性 atempo DC 诊断：幅度偏差 0.30517578125、检查区内 82 个零采样帧，包络对照通过不能关闭该内容失败。多轨由自动归一化改为浮点求和，旧工程音量可能改变；无自动限幅。命名 send/return、空间音频、通用效果自动化、嵌套 freeze/VFR、长片性能和完整剪映等价未完成；既有极短音高/相位失败保留，未连续播放或听审。 历史行按当轮结果保留。
+本表随功能和验证结果同步更新。**功能执行、实际内容、自动质量与听感分别验收，失败记录保留。** 本轮 V30：默认分段 atempo 使用作者选区内的 float32 上下文，末段从实际伸缩结果取尾；超过 64 MiB 估算末端 PCM 时在规划阶段拒绝。完整 **618/618，1529.147 秒**，0 跳过，107 Python+1 Schema 共 108 文件原字节冻结；12 新增及 94 关联方法均为完整子集。固定 V29 同测 12 项为 6 失败/6 控制。11 组、88 次正式 CLI 全成功；396 新视频帧与旧版像素一致。1,584,000 新立体声采样帧检查长度/有限性及各自声明的内容条件；六组 DC 完整有效区间均通过，T01 检查区零采样帧 82→0。S01 资源拒绝另计 6 次 CLI；开发尾部缺样和错误参考预览保留。未连续播放或听审，通用音高/相位/瞬态、极短输入、自然声音及完整剪映等价仍未验收。 历史行按当轮结果保留。
 
 | 编号 | 功能 | 已执行的核验与实测结果 | 当前边界 | 证据 |
 |---|---|---|---|---|
@@ -22,7 +22,7 @@
 | V10 | SAM2 点/框、多对象与提示修正 | 原生 CPU/CUDA、选择/修正/重置、自然双人 32 帧、概率蒙版及两背景成片已实跑；前轮在同一场景新增一次 CUDA 修正，5 个明确检查点从 3 个通过到 4 个通过 | **修正后仍失败**：目标手腕继续漏选；保留人物前臂从误选变为排除，不代表完整选区改善 | [前序实测](docs/validation/SAM2本地对象分割与提示修正实测_2026-10-16.md)、[此前逐点实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
 | V11 | LaMa / VACE 修复与色差融合 | 显式 harmonic 受控选区 PSNR 分别 47.45 / 42.90 dB；自然 32 帧链路完成，蒙版外 RGB 与全部 alpha 保留，PCM 原声独立核对一致 | **自然人物移除画质未通过**：残影、纹理涂抹或色块仍存在；VACE 为实验能力 | [实测](docs/validation/本地区域色差融合实测_2026-10-16.md)、[机器证据](docs/validation/evidence/repair-blend-smoke-20261016.json) |
 | V12 | 背景参考传播研究 | 单表面 PSNR 30.878→31.124 dB；双表面合计 **33.448→33.410 dB，略退化**。22 项独立研究检查通过；公开原输入和逐帧对照 | **未接入产品**；人工遮挡真值不代表真实人物移除，自然画质未通过 | [研究 GIF/MP4](#实测演示素材)、[实测](docs/validation/本地多运动参考选择与双表面真值实测_2026-10-16.md) |
-| V13 | 产品自动回归 | 完整 **606/606，2333.520 秒**，0 跳过；105 Python+1 Schema 共 106 文件冻结；24 新增/83 关联为子集；固定 V28 同 24 方法为 23 失败/1 控制（31 条含参数子测试） | 绿色回归不关闭 DC 内容、既有音高/相位、自然质量或完整剪映差异；历史和正式 CLI 分计 | [完整日志](docs/validation/evidence/audio-buses-full-20261017.log)、[机器证据](docs/validation/evidence/audio-buses-20261017.json) |
+| V13 | 产品自动回归 | 完整 **618/618，1529.147 秒**，0 跳过；107 Python+1 Schema 共 108 文件冻结；12 新增/94 关联为子集；固定 V29 同 12 为 6 失败/6 控制 | 绿色回归不关闭通用音高/相位、自然质量、听感或完整剪映差异；开发/正式 CLI 分计 | [完整日志](docs/validation/evidence/tempo-context-full-20261017.log)、[机器证据](docs/validation/evidence/tempo-context-20261017.json) |
 | V14 | 编码蒙版范围与正负检查点 | 新增 `quality mask`：逐帧面积/包围框/IoU、明确 selected/clear 检查。自制 4 秒/32 帧样例准确报出第 12 帧缺腿；补全几何后 4 点通过，失败报告及退出码 2 保留；原始 alpha 全帧摘要匹配 | 补全样例为脚本恢复几何，非 AI 修复；检查点不证明完整身份/边缘/自然质量。自然样例修正后仍有 1 点失败 | [原蒙版与 GIF/MP4](#实测演示素材)、[实际 CLI 与媒体证据](docs/assets/mask-review-20261016/evidence.json)、[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
 | V15 | 编码蒙版驱动轨迹、标签与重构图 | 16 次正式 CLI，4 秒/64 帧/16 fps；逐帧 bbox 与自制真值一致。标签位置最大误差：横屏 1.64 px、缩放旋转后 2.14 px、竖屏 2.15 px；包和源/蒙版权利依赖保留 | 自制选区不是模型分割能力。自然 SAM2 仍 4/5 检查点通过；该轮标签 4.10 px 失败，后续 V17 重验通过标签门槛，分割持续未验收 | [原视频与 GIF/MP4](#实测演示素材)、[全帧测量](docs/assets/mask-track-20261016/evidence.json)、[自然失败实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
 | V16 | 透明标签合成与失败报告 | 抽帧发现 PNG 的 fit 补边变黑；新增像素回归先失败，修复后 PNG/alpha MOV 通过，公开 64 帧两侧 128 区域核对。检查点失败仍保存诊断、回滚项目 | 位置准确不证明合成正确；修复前原片与失败日志保留；该轮自然标签失败，后续 V17 补充缩放修复与重验 | [修复前原成片](docs/assets/mask-track-20261016/before-alpha-fix-bound.mp4)、[前后证据](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
@@ -38,17 +38,26 @@
 | V26 | 本地整段离线音频变速与高精度 PCM | 2026-10-17：8 组/72 CLI 含 24 渲染；210 新主帧+210 精度控制；MKV 24/32-bit/float PCM、倒放、Bezier、采样/声道、缓存复现/篡改/取消；4 组受控通过 | **4 组极短音高失败**；8 组质量 CLI 通过不等于听感通过；未配置仍走 atempo，瞬态/相位/完整质量未验 | [原片/音频/GIF/成片](#实测演示素材)、[八组编号与失败](docs/validation/离线音频伸缩与真实采样实测_2026-10-17.md)、[机器证据](docs/validation/evidence/offline-audio-stretch-20261017.json) |
 | V27 | R3 声道策略与立体声取舍 | 2026-10-17：20 组/180 CLI 含 60 渲染；516 新主帧+516 精度控制；默认 10 组与固定 V26 音频一致；显式 together/apart、mono/静音声道、反相、缓存；11 组受控通过 | **8 组极短音高失败、1 组 apart 反相混合失败**；20 组质量 CLI 通过不等于内容/听感通过；全功能剪映对标未完成 | [原视频/双声道/GIF/成片](#实测演示素材)、[20 组编号与失败](docs/validation/R3声道策略与立体声权衡实测_2026-10-17.md)、[机器证据](docs/validation/evidence/audio-channels-20261017.json) |
 | V28 | 嵌套序列隔离合成、父枢轴与透明混合 | 2026-10-17：14 组/112 CLI（28 渲染、14 质量、14 策略）；360 新主帧与 360 独立参考全像素核对，最大 RGB 差 3；固定 V27 12 组失败/2 控制；另有 57 帧开发回归对照 | 已测空间子项通过；组级音频/独立子画布/定格/VFR/HDR/长片性能仍未验收；既有音高/相位失败保留，未连续播放或听审 | [原片/GIF/实际成片](#实测演示素材)、[14 组编号与失败记录](docs/validation/嵌套序列隔离合成与逐帧像素实测_2026-10-17.md)、[机器证据](docs/validation/evidence/sequence-groups-20261017.json) |
-| V29 | 分层音频总线、后置效果与采样包络 | 2026-10-17：12 组/102 CLI（24 渲染/12 质量/12 策略）；1,152,000 新立体声采样帧全检查，最大差 0≤2e-6；288 新主视频帧与旧版像素一致；旧版 11 组失败/1 控制 | 浮点求和改变旧多轨音量，无自动限幅；DC 诊断 82 个零采样帧仍失败，极短音高/相位及听感未验收；命名路由/空间音频未完成 | [原视频/WAV/GIF/成片](#实测演示素材)、[12 组编号与失败](docs/validation/分层音频总线与真实采样实测_2026-10-17.md)、[机器证据](docs/validation/evidence/audio-buses-20261017.json) |
+| V29 | 分层音频总线、后置效果与采样包络 | 2026-10-17：12 组/102 CLI（24 渲染/12 质量/12 策略）；1,152,000 新立体声采样帧全检查，最大差 0≤2e-6；288 新主视频帧与旧版像素一致；旧版 11 组失败/1 控制 | 浮点求和改变旧多轨音量，无自动限幅；V29 当轮 DC 诊断 82 个零采样帧失败，后续 V30 同源受控重验通过；极短音高/相位及听感未验收；命名路由/空间音频未完成 | [原视频/WAV/GIF/成片](#实测演示素材)、[12 组编号与失败](docs/validation/分层音频总线与真实采样实测_2026-10-17.md)、[机器证据](docs/validation/evidence/audio-buses-20261017.json) |
+| V30 | 分段音频上下文、实际尾部与资源拒绝 | 2026-10-17：11 组/88 CLI（22 渲染/11 质量/11 策略）；396 新视频帧与旧版相同；1,584,000 新立体声采样帧按声明条件检查；六组 DC 全有效区间通过、T01 内部零帧 82→0；S01 另 6 CLI 按预期拒绝超预算 | 分段近似/极短输入补静音边界保留；通用音高/相位/瞬态、自然声音、听感与完整剪映未验；开发尾部缺样及错误参考公开 | [原视频/WAV/GIF/新旧成片](#实测演示素材)、[11 组编号及失败记录](docs/validation/分段音频上下文与完整尾部实测_2026-10-17.md)、[机器证据](docs/validation/evidence/tempo-context-20261017.json) |
 
 ## 实测演示素材
 
-**正式产品 CLI V29：分层混音与逐采样核验。** 左至右为固定 V28 / 新版实际解码 / 独立参考 PCM；上下独立显示 L/R 通道。12 组无损采样检查通过，旧版 11 组失败、1 正控制；自然声音与听感仍未验收。
+**正式产品 CLI V30：分段变速的实际音频与完整尾部。** 三列为原始输入 / 固定 V29 / V30 真实解码，上下分开显示 L/R。T01 内部零采样帧 82→0，六组 DC 完整有效区间均通过；自然声音与听感仍未验收。
+
+![原始 DC、固定 V29 与 V30 实际解码对照](docs/assets/audio-tempo-context-20261017/comparison.gif)
+
+[原视频](docs/assets/audio-tempo-context-20261017/source.mp4) · [DC 原声](docs/assets/audio-tempo-context-20261017/dc.wav) · [旧失败 MP4](docs/assets/audio-tempo-context-20261017/T01-before.mp4) · [当前 MP4](docs/assets/audio-tempo-context-20261017/T01-after.mp4) · [无损 MKV](docs/assets/audio-tempo-context-20261017/T01-after.mkv) · [解码 WAV](docs/assets/audio-tempo-context-20261017/T01-after.wav) · [三列预览 MP4](docs/assets/audio-tempo-context-20261017/comparison.mp4) · [完整尾部对照](docs/assets/audio-tempo-context-20261017/slow-tail-comparison.png) · [11 组编号、来源与复现](docs/validation/分段音频上下文与完整尾部实测_2026-10-17.md)。
+
+预览 960×544；MP4 12 fps、36 帧/3 秒，GIF **18 编码帧/3000 ms**，均无声；原 WAV/正式成片有声。自制 CC0，0 新模型推理，[来源与 SHA-256](docs/assets/audio-tempo-context-20261017/fixture-provenance.json)。396 个新视频帧及 1,584,000 个新立体声采样帧完成声明范围的自动检查；目检首末/慢速尾部静态图，**未连续播放或听审**。这不等于全部采样与独立高质量变速参考相等；AAC MP4 仅供播放。另公开[开发版尾部缺样](docs/assets/audio-tempo-context-20261017/development-context-only-T05.mkv)、[错误参考截图](docs/assets/audio-tempo-context-20261017/development-preview-invalid-reference.png)与[失败说明](docs/assets/audio-tempo-context-20261017/development-verification.json)。
+
+**历史 V29 正式产品 CLI：分层混音与逐采样核验。** 左至右为固定 V28 / 新版实际解码 / 独立参考 PCM；上下独立显示 L/R 通道。12 组无损采样检查通过，旧版 11 组失败、1 正控制；自然声音与听感仍未验收。
 
 ![固定 V28、新版实际与参考的分层混音对照](docs/assets/audio-buses-20261017/comparison.gif)
 
 [原视频](docs/assets/audio-buses-20261017/source.mp4) · [A 原声](docs/assets/audio-buses-20261017/tone_a.wav) · [B 原声](docs/assets/audio-buses-20261017/tone_b.wav) · [旧包络失败 MP4](docs/assets/audio-buses-20261017/B04-before.mp4) · [新包络 MP4](docs/assets/audio-buses-20261017/B04-after.mp4) · [无损新 MKV](docs/assets/audio-buses-20261017/B04-after.mkv) · [参考 WAV](docs/assets/audio-buses-20261017/B04-reference.wav) · [三列预览 MP4](docs/assets/audio-buses-20261017/comparison.mp4) · [12 组编号、原始日志与复现](docs/validation/分层音频总线与真实采样实测_2026-10-17.md)。
 
-预览 960×1074；MP4 12 fps、24 帧/2 秒，GIF **12 编码帧/2000 ms**，均无声；正式成片/WAV 有声。源素材为自制双声道正弦波和移动帧码，[CC0 来源/许可](docs/assets/audio-buses-20261017/fixture-provenance.json)。全部 1,152,000 新采样帧及 288 新视频帧已自动检查，并目检预览首末图，**未连续播放或听审**。MKV float PCM 用于精度验收，AAC MP4 仅供播放。另公开[非线性 atempo DC 失败](docs/assets/audio-buses-20261017/dc-diagnostic-retimed-plain.mkv)及[采样诊断](docs/assets/audio-buses-20261017/dc-diagnostic-verification.json)；82 个零采样帧的问题继续开放。旧多轨工程音量可能因关闭自动归一化而变化，未自动加限制器。
+预览 960×1074；MP4 12 fps、24 帧/2 秒，GIF **12 编码帧/2000 ms**，均无声；正式成片/WAV 有声。源素材为自制双声道正弦波和移动帧码，[CC0 来源/许可](docs/assets/audio-buses-20261017/fixture-provenance.json)。全部 1,152,000 新采样帧及 288 新视频帧已自动检查，并目检预览首末图，**未连续播放或听审**。MKV float PCM 用于精度验收，AAC MP4 仅供播放。另公开[非线性 atempo DC 失败](docs/assets/audio-buses-20261017/dc-diagnostic-retimed-plain.mkv)及[采样诊断](docs/assets/audio-buses-20261017/dc-diagnostic-verification.json)；该 V29 历史输出保留；V30 对同字节输入的受控重验已消除检查区 82 个零采样帧，通用音高/相位与听感仍开放。旧多轨工程音量可能因关闭自动归一化而变化，未自动加限制器。
 
 补充 [S01 容器内部画面静音对照](docs/assets/audio-buses-20261017/S01-verification.json)：只有子容器提供画面时，静音/有声版 24 帧逐像素一致，静音 PCM 为零、有声 PCM 与原 WAV 一致；10 次额外 CLI 与主批次分计。[有声 MP4](docs/assets/audio-buses-20261017/S01-audible.mp4) · [静音 MP4](docs/assets/audio-buses-20261017/S01-muted.mp4)。
 
@@ -199,7 +208,7 @@ MP4 与原蒙版均为 8 fps、32 帧；GIF 保留全部 32 帧，帧时长交�
 
 ## 当前状态
 
-- 当前 26 模块进度见[构建进度总表](docs/构建进度总表_2026-10-16.md)：V29 完整 **606/606**、0 跳过；12 组音频实测通过已声明采样门槛。DC 变速幅度/静音、极短音高/相位、自然 AI 画质、开放库、工程映射、性能/发行和完整剪映验收继续待完成。
+- 当前 26 模块进度见[构建进度总表](docs/构建进度总表_2026-10-16.md)：V30 完整 **618/618**、0 跳过；11 组音频实测满足各自声明门槛，六组 DC 完整有效区间通过。极短音高/apart 相位、自然 AI 画质/声音/听感、开放库、复杂工程映射、性能/发行和完整剪映验收继续待完成。
 - 新增 `--mask-asset-id` 接通 `media track / track-bind / reframe`，支持显式检查点门禁、源时钟映射及源/蒙版/模型权利依赖。受控全帧几何通过，自然漏抠继续失败；标签像素门槛在 V17 复验通过，见[契约](docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md)和[实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md)。
 - 蒙版核验使用原生 FFmpeg 和 Python 标准库，支持 alpha/luma、明确正负检查点、切点及解码存储预算，失败仍保存报告。公开样例通过实际 CLI 验证；真实 SAM2 提示修正后仍有手腕漏选，检查点从 3/5 到 4/5，不自动接入发布门禁或证明完整分割。见[契约](docs/specs/本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md)与[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md)。
 - VACE 五组同源采样/输入尺度对照 **5/5 已完成，画质均未通过**：暗矩形补丁仍存在，4 倍输入或 50 步未改善该样例。CLI 已接入显式 `--flow-shift` 和 `--model-input-scale {1,2,4}`，默认仍为 3/1；输入数组预算按倍率平方计入，输出画布不变。详见[校准证据](docs/validation/evidence/vace-calibration-20261016.json)和[正式参数验证](docs/validation/evidence/vace-profiles-20261016.json)。
@@ -309,7 +318,7 @@ python -X utf8 -m ai_ad_editor quality golden --project .\workspace\demo --input
 
 ## 主要能力
 
-嵌套序列采用[隔离合成契约](docs/specs/嵌套序列隔离合成契约_v0.1_2026-10-17.md)：子画布先合成，父级空间操作和透明混合统一执行，时间映射沿用原作者时钟。manifest 可审计每个组节点；V29 加入[分层音频总线](docs/specs/分层音频总线与采样包络契约_v0.1_2026-10-17.md)，已测组增益/后置效果通过，任意命名路由和完整群组验收仍开放。
+嵌套序列采用[隔离合成契约](docs/specs/嵌套序列隔离合成契约_v0.1_2026-10-17.md)：子画布先合成，父级空间操作和透明混合统一执行，时间映射沿用原作者时钟。manifest 可审计每个组节点；V29 加入[分层音频总线](docs/specs/分层音频总线与采样包络契约_v0.1_2026-10-17.md)，已测组增益/后置效果通过，任意命名路由和完整群组验收仍开放。V30 的[分段音频上下文与实际末端](docs/specs/分段音频变速上下文契约_v0.1_2026-10-17.md)限定在作者选区内，资源拒绝及通用质量未验标志可审计。
 
 自动字幕流水线提供登记模型路径：先执行 `asr adapter register --project <项目> --adapter-id <ID> --python-executable <现有原生Python.exe> --model-path <本地Whisper目录> --evidence <本地证据文件> --device cpu --threads 4 --dry-run`，复核后正式登记并使用 `asr adapter inspect`；再将 `--adapter-id` 传给 `subtitle transcribe` 或 `media understand --transcribe`。登记模型经独立原生进程执行，字幕应用保留源素材与模型的权利依赖；`subtitle evaluate --input <SRT> --reference <UTF8逐字稿> --max-cer <阈值>` 可执行字符错误率门禁，默认不转换繁简。
 

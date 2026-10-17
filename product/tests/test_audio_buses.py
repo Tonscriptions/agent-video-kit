@@ -212,9 +212,9 @@ class AudioBusTests(unittest.TestCase):
         duration=round(2*math.log(2)*TPS)
         self.group('middle',duration_tick=duration,speed_curve={'keyframes':[{'at_tick':0,'speed':1},{'at_tick':2*TPS,'speed':2}]})
         actual,_,_,_=self.render()
-        # The existing windowed atempo path does not preserve a DC amplitude.
-        # Compare the same retimed signal without this gain, so this test
-        # accepts the authored envelope, not the still-degraded retimer.
+        # Compare the same retimed signal without this gain: this test accepts
+        # the authored envelope independently of the approximate retimer.
+        # Dedicated context tests check the retained native DC regression.
         p=json.loads((self.root/'project.json').read_text(encoding='utf-8-sig'))
         for s in p['sequences']:
             for t in s['tracks']:

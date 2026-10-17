@@ -1,0 +1,63 @@
+test_authored_silence_remains_silent_in_ramped_source (test_audio_tempo_context.TempoContextTests.test_authored_silence_remains_silent_in_ramped_source) ... ok
+test_context_cannot_read_loud_content_outside_parent_source_selection (test_audio_tempo_context.TempoContextTests.test_context_cannot_read_loud_content_outside_parent_source_selection) ... FAIL
+test_direct_ramp_keeps_dc_without_interior_zero_padding (test_audio_tempo_context.TempoContextTests.test_direct_ramp_keeps_dc_without_interior_zero_padding) ... FAIL
+test_nested_ramp_keeps_dc_without_interior_zero_padding (test_audio_tempo_context.TempoContextTests.test_nested_ramp_keeps_dc_without_interior_zero_padding) ... FAIL
+test_nested_reverse_ramp_keeps_dc_without_interior_zero_padding (test_audio_tempo_context.TempoContextTests.test_nested_reverse_ramp_keeps_dc_without_interior_zero_padding) ... ok
+test_nested_scalar_fast_keeps_dc_between_authored_anchors (test_audio_tempo_context.TempoContextTests.test_nested_scalar_fast_keeps_dc_between_authored_anchors) ... ok
+test_nested_slow_ramp_keeps_dc_without_interior_zero_padding (test_audio_tempo_context.TempoContextTests.test_nested_slow_ramp_keeps_dc_without_interior_zero_padding) ... FAIL
+test_silent_right_channel_does_not_receive_left_channel_audio (test_audio_tempo_context.TempoContextTests.test_silent_right_channel_does_not_receive_left_channel_audio) ... ok
+test_stereo_antiphase_is_preserved_through_joint_wsola (test_audio_tempo_context.TempoContextTests.test_stereo_antiphase_is_preserved_through_joint_wsola) ... ok
+test_unity_nested_samples_remain_an_exact_identity (test_audio_tempo_context.TempoContextTests.test_unity_nested_samples_remain_an_exact_identity) ... ok
+
+======================================================================
+FAIL: test_context_cannot_read_loud_content_outside_parent_source_selection (test_audio_tempo_context.TempoContextTests.test_context_cannot_read_loud_content_outside_parent_source_selection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_tempo_context.py", line 80, in test_context_cannot_read_loud_content_outside_parent_source_selection
+    actual, _, _, _ = self.render(); self.check_dc(actual, .1, .5)
+                                     ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_tempo_context.py", line 53, in check_dc
+    self.assertLessEqual(max(abs(x-10000/32768) for x in checked), .001)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.30517578125 not less than or equal to 0.001
+
+======================================================================
+FAIL: test_direct_ramp_keeps_dc_without_interior_zero_padding (test_audio_tempo_context.TempoContextTests.test_direct_ramp_keeps_dc_without_interior_zero_padding)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_tempo_context.py", line 65, in test_direct_ramp_keeps_dc_without_interior_zero_padding
+    actual, _, _, _ = self.render(); self.check_dc(actual)
+                                     ~~~~~~~~~~~~~^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_tempo_context.py", line 53, in check_dc
+    self.assertLessEqual(max(abs(x-10000/32768) for x in checked), .001)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.30517578125 not less than or equal to 0.001
+
+======================================================================
+FAIL: test_nested_ramp_keeps_dc_without_interior_zero_padding (test_audio_tempo_context.TempoContextTests.test_nested_ramp_keeps_dc_without_interior_zero_padding)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_tempo_context.py", line 57, in test_nested_ramp_keeps_dc_without_interior_zero_padding
+    self.ramp(); actual, _, _, _ = self.render(); self.check_dc(actual)
+                                                  ~~~~~~~~~~~~~^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_tempo_context.py", line 53, in check_dc
+    self.assertLessEqual(max(abs(x-10000/32768) for x in checked), .001)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.30517578125 not less than or equal to 0.001
+
+======================================================================
+FAIL: test_nested_slow_ramp_keeps_dc_without_interior_zero_padding (test_audio_tempo_context.TempoContextTests.test_nested_slow_ramp_keeps_dc_without_interior_zero_padding)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_tempo_context.py", line 73, in test_nested_slow_ramp_keeps_dc_without_interior_zero_padding
+    self.ramp(low=.5, high=1); actual, _, _, _ = self.render(duration_tick=3*TPS); self.check_dc(actual, .2, 1.8)
+                                                                                   ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_tempo_context.py", line 53, in check_dc
+    self.assertLessEqual(max(abs(x-10000/32768) for x in checked), .001)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.30517578125 not less than or equal to 0.001
+
+----------------------------------------------------------------------
+Ran 10 tests in 28.133s
+
+FAILED (failures=4)

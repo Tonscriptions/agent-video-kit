@@ -216,7 +216,7 @@ The raw WAV PEAK timestamp is normalized without altering PCM bytes; repeated
 renders must preserve existing cache bytes and reject tampering. Keep automatic
 quality, pitch, local transient timing and listening conclusions separate. A
 4 ms clip stretched to 250 ms can be audible but still fail pitch preservation.
-Unconfigured projects retain the legacy atempo boundary. A unity-tempo positive
+Unconfigured projects use the default native atempo path and its explicit limits. A unity-tempo positive
 control passing on both versions is not evidence of a historical failure.
 
 For [R3 channel-mode evidence](../../docs/specs/R3声道策略契约_v0.1_2026-10-17.md),
@@ -245,9 +245,23 @@ duration convention; a correct container length alone proves no content timing.
 
 Keep nonlinear retimer quality separate from the gain clock: compare an
 enveloped output with the same retimed plain control times an independent
-inverse-clock envelope. Preserve the DC amplitude/literal-silence failure in the
-plain control. The old R3 ultra-short pitch and apart antiphase failures also
+inverse-clock envelope. Retain old DC amplitude/literal-silence failures and
+recheck the current plain control independently. The old R3 ultra-short pitch and apart antiphase failures also
 remain open. Publish original WAV/video, old/new lossless files, reference WAV,
 actual decoded waveform GIF, complete sample metrics, hashes and raw failures
 in the numbered README row; static waveform inspection does not establish
 continuous playback, natural-audio quality or listening acceptance.
+
+For [default tempo context](../../docs/specs/分段音频变速上下文契约_v0.1_2026-10-17.md),
+compare fixed old/new lossless PCM. Record interior and full active-interval DC
+error and literal zero runs separately. Source-context boundaries must stay
+inside the selected 48-kHz buffer; loud content outside a cropped parent must
+not become warm-up content. Also verify authored silence, silent channels,
+exact antiphase cancellation and unity samples. These are distinct controls,
+not a general pitch or perceptual gate. Keep development slow/cropped-tail
+padding failures visible and verify the current end selection against the
+complete authored interval, terminal source marker and trailing silence.
+Validate the estimated buffer rejection separately from media/quality runs.
+Preserve actual old,
+new and original audio, a decoded waveform preview, and the failed tail image
+in the numbered README row.

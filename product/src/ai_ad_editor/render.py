@@ -15,6 +15,9 @@ from typing import Any, Callable
 
 from .animation import bezier_samples
 from .audio_stretch import configuration as _audio_stretch_configuration, execute as _execute_audio_stretch, plan as _plan_audio_stretch
+from .audio_tempo import (CONTEXT_FRAMES as _audio_context_frames,
+                         MAX_TERMINAL_CONTEXT_PCM_BYTES as _audio_terminal_context_budget,
+                         context_windows as _audio_context_windows)
 from .artifact_locks import verification_scope
 
 from .errors import AppError, dependency_error
@@ -1200,7 +1203,7 @@ def _speed_curve_audio_parts(segments: list[tuple[float, float, float, float]]) 
 
 
 def _tempo_chain(speed: float) -> str:
-    """Return an atempo chain that supports speeds outside FFmpeg's 0.5..2 range."""
+    """Keep each native atempo stage within 0.5..2, preserving unity identity."""
     remaining = float(speed)
     if not math.isfinite(remaining) or remaining <= 0:
         raise AppError('SPEED_INVALID', '音频 tempo 必须是有限正数', exit_code=2)
@@ -3852,6 +3855,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 else:
                     audio_parts = []
                 audio_stretch_job = None
+                audio_context_plan = None
                 requires_retime = any(abs(p[2]-1.) > 1e-9 for p in audio_parts) if audio_parts else abs(speed-1.) > 1e-9
                 if local_audio_engine and requires_retime:
                     target_duration = curve_duration if curve_duration is not None else (src_out-src_in)/speed
@@ -3864,22 +3868,41 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     warnings.append({'code':'RENDER_FEATURE_APPROXIMATE','clip_id':clip.get('id'),
                                      'feature':'offline_audio_time_map','message':'本地 R3 对整段音频离线伸缩；采样锚点为引擎约束，局部时序、极短窗音高与听感须独立核验'})
                 elif audio_parts:
+                    source_start_sample = round(src_in * 48000)
+                    source_end_sample = round(src_out * 48000)
+                    mapped_duration = audio_parts[-1][3]
+                    clip_duration_seconds = int(clip.get('duration_tick', 1))/tps
+                    has_audio_freeze = isinstance(clip.get('freeze'),dict) and int(clip['freeze'].get('duration_tick',0)) > 0
+                    if not has_audio_freeze and abs(mapped_duration-clip_duration_seconds) <= 1/tps:
+                        # The clip owns a half-open global sample interval;
+                        # do not leave one rounded-away sample at its end.
+                        target_samples = max(1, math.ceil(Fraction((int(clip.get('timeline_start_tick', 0))+int(clip.get('duration_tick', 1)))*48000,tps))-math.ceil(Fraction(int(clip.get('timeline_start_tick', 0))*48000,tps)))
+                    else:
+                        # Freeze insertion or an explicitly different authored
+                        # clip window is handled after this content retime.
+                        target_samples = max(1, math.ceil(mapped_duration*48000))
+                    audio_context_plan = _audio_context_windows(audio_parts, source_end_sample-source_start_sample,
+                                                               target_samples=target_samples,
+                                                               channels=max(1,int((asset.get('probe',{}).get('audio') or {}).get('channels',2))))
                     split_labels = [f"asplit{index}_{part_index}" for part_index in range(len(audio_parts))]
                     filters.append(
-                        f"[{index}:a]atrim=start={src_in:.6f}:end={src_out:.6f},asetpts=PTS-STARTPTS,aresample=48000,"
+                        f"[{index}:a]aresample=48000,aformat=sample_fmts=flt,atrim=start_sample={source_start_sample}:end_sample={source_end_sample},asetpts=N/SR/TB,"
                         f"asplit={len(split_labels)}" + "".join(f"[{label}]" for label in split_labels)
                     )
                     part_labels: list[str] = []
-                    previous_end_sample = 0
-                    for part_index, (part_start, part_end, part_speed, cumulative_end) in enumerate(audio_parts):
+                    for part_index, part in enumerate(audio_context_plan):
                         part_label = f"aspeed{index}_{part_index}"
                         part_labels.append(part_label)
-                        part_end_sample = int(round(cumulative_end * 48000))
-                        part_samples = max(1, part_end_sample - previous_end_sample)
-                        previous_end_sample = part_end_sample
+                        part_samples = part['output_samples']
+                        if part['output_selection'] == 'last-retimed-samples':
+                            core_selection = f'areverse,atrim=end_sample={part_samples},areverse,'
+                        else:
+                            core_selection = f"atrim=start_sample={part['retimed_trim_start_sample']}:end_sample={part['retimed_trim_end_sample']},"
                         filters.append(
-                            f"[{split_labels[part_index]}]atrim=start={part_start:.6f}:end={part_end:.6f},"
-                            f"asetpts=PTS-STARTPTS,{_tempo_chain(part_speed)},apad=whole_len={part_samples},"
+                            f"[{split_labels[part_index]}]atrim=start_sample={part['context_start_sample']}:end_sample={part['context_end_sample']},"
+                            f"asetpts=N/SR/TB,{_tempo_chain(part['tempo'])},"
+                            f"{core_selection}"
+                            f"apad=whole_len={part_samples},"
                             f"atrim=end_sample={part_samples},asetpts=N/SR/TB[{part_label}]"
                         )
                     speed_label = f"aspeed{index}"
@@ -3888,7 +3911,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                         concat_chain += ",areverse"
                     filters.append(f"{concat_chain}[{speed_label}]")
                     audio_chain = [f"[{speed_label}]aresample=48000"]
-                    warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip.get("id"), "feature": "audio_speed_curve_piecewise", "message": "音频速度曲线按固定短段 atempo 近似，累计时长与视频曲线对齐；仍可能有段间相位边界"})
+                    warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip.get("id"), "feature": "audio_speed_curve_piecewise", "message": "音频速度曲线按带选区内上下文的短段 atempo 近似，末段按真实伸缩末端选取；累计采样锚点对齐，局部时序、段间相位、瞬态、极短选区与听感仍须独立核验；输出不足仍可能补静音"})
                 else:
                     audio_chain = [f"[{index}:a]atrim=start={src_in:.6f}:end={src_out:.6f}", "asetpts=PTS-STARTPTS", "aresample=48000"]
                     if bool(clip.get("reverse")):
@@ -3934,10 +3957,23 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                                       sample_rate=48000,group_id=clip.get('_composite_group'))
                 if audio_stretch_job:
                     input_meta[-1]['audio_stretch'] = audio_stretch_job
+                if audio_context_plan is not None:
+                    input_meta[-1]['audio_tempo_context'] = {
+                        'engine': 'ffmpeg-atempo-source-context-v2', 'sample_rate': 48000,
+                        'core_sample_format': 'float32',
+                        'source_start_sample': source_start_sample, 'source_end_sample': source_end_sample,
+                        'source_selection_samples': source_end_sample-source_start_sample,
+                        'context_policy_samples': _audio_context_frames, 'context_outside_selection': False,
+                        'terminal_context_pcm_budget_bytes': _audio_terminal_context_budget,
+                        'terminal_core_alignment': 'actual-retimed-source-end',
+                        'windows': audio_context_plan, 'shortfall_policy': 'zero-pad-core',
+                        'continuous_phase_accepted': False, 'pitch_and_listening_accepted': False,
+                        'local_content_sample_alignment_accepted': False,
+                    }
                 if nested_maps:
                     input_meta[-1]['nested_time_mapping'] = {'version': '1', 'maps': copy.deepcopy(nested_maps),
                                                             'tempo_windows': len(audio_parts), 'sample_rate': 48000,
-                                                            'audio_tempo': 'offline-r3-time-map' if audio_stretch_job else 'piecewise-integrated-boundaries'}
+                                                            'audio_tempo': 'offline-r3-time-map' if audio_stretch_job else 'piecewise-source-context-integrated-boundaries'}
                 index += 1
     if not video_labels and not subtitle_overlays:
         raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
