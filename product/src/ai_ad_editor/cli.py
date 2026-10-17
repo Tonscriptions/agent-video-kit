@@ -45,6 +45,7 @@ from .quality import GOLDEN_VERSION, build_golden_manifest, check_output, compar
 from .sequence_sampling import configuration as sequence_sampling_configuration
 from .edit_planner import build_edit_plan, project_fingerprint as edit_project_fingerprint
 from .source_transitions import build_plan as build_source_transition_plan
+from . import fragments
 from .mask_review import prepare as prepare_mask_review, review as review_mask
 from .mask_tracking import ENGINE as MASK_TRACKING_ENGINE, prepare as prepare_mask_tracking, execute as execute_mask_tracking, public_plan as public_mask_tracking_plan
 from .recommend import recommend_highlights
@@ -923,6 +924,24 @@ def build_parser() -> argparse.ArgumentParser:
     lsimilar = _leaf_common(ls.add_parser("similar", help="按可选 FFmpeg 感知哈希列出相似画面候选组"))
     lsimilar.add_argument("--catalog", required=True)
     lsimilar.add_argument("--max-distance", type=int, default=12, help="平均哈希汉明距离上限")
+
+    fragment = subs.add_parser('fragment', help='离线可复用已编辑片段组')
+    fragments_sub = fragment.add_subparsers(dest='action', required=True)
+    for action in ('save', 'apply', 'list', 'inspect'):
+        leaf = _leaf_common(fragments_sub.add_parser(action))
+        leaf.add_argument('--library', required=True)
+        if action in {'save', 'apply'}:
+            leaf.add_argument('--project', required=True)
+            leaf.add_argument('--input', required=True, help='本地保存/插入请求 JSON')
+            leaf.add_argument('--expected-project-sha256', default=None)
+            leaf.add_argument('--expected-fragment-sha256', default=None)
+        if action == 'inspect':
+            leaf.add_argument('--id', required=True)
+            leaf.add_argument('--version', required=True, type=int)
+        if action == 'list':
+            leaf.add_argument('--query', default='')
+        else:
+            leaf.add_argument('--max-bytes', type=int, default=fragments.DEFAULT_MAX_BYTES)
 
     lut = subs.add_parser("lut", help="项目内本地 LUT 资产库")
     luts = lut.add_subparsers(dest="action", required=True)
@@ -5876,6 +5895,92 @@ def command_template_batch(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope("template.batch", args, data={"report": str(report_path), **report}, status=status, errors=[item for item in report["variants"] if item["status"] != "succeeded"])
 
 
+def command_fragment(args: argparse.Namespace) -> dict[str, Any]:
+    try:
+        return _command_fragment(args)
+    except OSError as exc:
+        raise AppError('FRAGMENT_IO_FAILED', '片段组本地文件操作失败；未发布的版本或未提交工程将回滚',
+                       exit_code=2, path=str(getattr(exc, 'filename', None) or args.library), cause=str(exc)) from exc
+
+
+def _command_fragment(args: argparse.Namespace) -> dict[str, Any]:
+    from .artifact_locks import artifact_entry, verification_scope, verification_summary
+    command = 'fragment.'+args.action
+    library = fragments.library_path(args.library)
+    with verification_scope():
+        if args.action == 'list':
+            return _envelope(command, args, data={'fragments': fragments.list_fragments(library, args.query)})
+        if args.action == 'inspect':
+            payload, info = fragments.inspect(library, args.id, args.version, max_bytes=args.max_bytes)
+            return _envelope(command, args, data={'fragment': payload, **info, 'verification': verification_summary()}, warnings=payload.get('warnings', []))
+        # Read handles freeze all source metadata and request bytes on Windows;
+        # the normal project operation lock protects cooperating mutations.
+        source_root = Path(args.project).expanduser().resolve()
+        if source_root.name.lower() == 'project.json':
+            source_root = source_root.parent
+        artifact_entry(project_file(source_root), 'fragment-project-metadata')
+        artifact_entry(ledger_file(source_root), 'fragment-rights-metadata')
+        artifact_entry(Path(args.input).expanduser().resolve(), 'fragment-request')
+        root, project = load_project(args.project)
+        ledger = load_ledger(root)
+        request = _load_changes(args.input)
+        if args.expected_project_sha256 is not None and args.expected_project_sha256 != edit_project_fingerprint(project):
+            raise AppError('FRAGMENT_PROJECT_CHANGED', '工程已偏离已审查片段组计划', exit_code=2)
+        validation = validate_project(root, project, strict_rights=False)
+        if not validation['ok']:
+            raise AppError('PROJECT_INVALID', '片段组操作前工程无效', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+        if args.action == 'save':
+            payload, sources = fragments.prepare_save(root, project, ledger, request, max_bytes=args.max_bytes)
+            if fragments.entry_path(library, payload['id'], payload['version']).exists():
+                raise AppError('FRAGMENT_VERSION_EXISTS', '片段组版本已存在；请使用新版本号', exit_code=2)
+            info = {'fragment_sha256': fragments.digest(payload), 'project_sha256': edit_project_fingerprint(project),
+                    'files': len(payload['files']), 'bytes': sum(i['bytes'] for i in payload['files'])}
+            if args.expected_fragment_sha256 is not None and args.expected_fragment_sha256 != info['fragment_sha256']:
+                raise AppError('FRAGMENT_VERSION_CHANGED', '待保存内容已偏离已审查计划', exit_code=2)
+            if not args.dry_run:
+                info.update(fragments.save(library, payload, sources))
+            return _envelope(command, args, status='planned' if args.dry_run else 'succeeded',
+                             data={'fragment': payload, 'plan': info, 'verification': verification_summary()}, warnings=payload.get('warnings', []))
+        payload, info = fragments.inspect(library, request.get('id'), request.get('version'), max_bytes=args.max_bytes)
+        if args.expected_fragment_sha256 is not None and args.expected_fragment_sha256 != info['fragment_sha256']:
+            raise AppError('FRAGMENT_VERSION_CHANGED', '片段组版本已偏离已审查摘要', exit_code=2)
+        candidate, candidate_ledger, plan = fragments.prepare_apply(project, ledger, payload, info, request)
+        warnings = list(payload.get('warnings', []))
+        if not plan['rights']['ok']:
+            warnings.append({'code': 'FRAGMENT_RIGHTS_REVIEW_REQUIRED', 'message': '导入保留原权利限制；商业发布仍受门禁约束'})
+        if args.dry_run:
+            return _envelope(command, args, status='planned', data={'plan': plan, 'verification': verification_summary()}, warnings=warnings)
+    # Source handles remain frozen for resource copying. Project/ledger read
+    # locks must end before their atomic replacements; use a second scope for
+    # immutable library files, with metadata fingerprint rechecked below.
+    with verification_scope():
+        payload, current_info = fragments.inspect(library, request['id'], request['version'], max_bytes=args.max_bytes)
+        if current_info['fragment_sha256'] != info['fragment_sha256']:
+            raise AppError('FRAGMENT_VERSION_CHANGED', '复制前片段组清单发生变化', exit_code=2)
+        if edit_project_fingerprint(load_project(root)[1]) != plan['project_sha256'] or fragments.digest(load_ledger(root)) != fragments.digest(ledger):
+            raise AppError('FRAGMENT_PROJECT_CHANGED', '复制前工程或台账发生变化', exit_code=2)
+        snapshot = create_snapshot(root, project, label='before-fragment-apply')
+        copied = None
+        try:
+            copied = fragments.copy_resources(root, fragments.entry_path(library, payload['id'], payload['version']), plan)
+            validation = validate_project(root, candidate, strict_rights=False)
+            if not validation['ok']:
+                raise AppError('FRAGMENT_PROJECT_INVALID', '插入后工程未通过验证', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+            operation_id = new_id('op')
+            record = {'operation_id': operation_id, 'command': command, 'created_at': now_iso(),
+                      'before_snapshot_id': snapshot['snapshot_id'], 'plan': plan}
+            candidate.setdefault('provenance', {}).setdefault('change_log', []).append(copy.deepcopy(record))
+            save_ledger(root, candidate_ledger)
+            save_project(root, candidate)
+            _operation(root, operation_id, {**record, 'status': 'succeeded'})
+            return _envelope(command, args, data={'plan': plan, 'validation': validation, 'before_snapshot': snapshot,
+                'verification': verification_summary()}, warnings=warnings, operation_id=operation_id)
+        except BaseException:
+            if copied is not None and copied.exists():
+                shutil.rmtree(copied)
+            raise
+
+
 def command_library_index(args: argparse.Namespace) -> dict[str, Any]:
     source_root = Path(args.root).expanduser().resolve()
     output = Path(args.output).expanduser().resolve()
@@ -6167,6 +6272,10 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("library", "search"): command_library_search,
     ("library", "duplicates"): command_library_duplicates,
     ("library", "similar"): command_library_similar,
+    ('fragment', 'save'): command_fragment,
+    ('fragment', 'apply'): command_fragment,
+    ('fragment', 'list'): command_fragment,
+    ('fragment', 'inspect'): command_fragment,
     ("lut", "register"): command_lut_register,
     ("lut", "list"): command_lut_list,
     ("lut", "inspect"): command_lut_inspect,

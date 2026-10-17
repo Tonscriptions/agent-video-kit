@@ -21,6 +21,23 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'fragment_library': {
+                'status': 'implemented_with_limits', 'engine': 'agent-local-fragment-library-v1',
+                'commands': ['fragment.save', 'fragment.list', 'fragment.inspect', 'fragment.apply'],
+                'features': ['immutable_versions', 'local_search', 'streamed_hashed_resources',
+                    'linked_transition_and_binding_selection_closure', 'recursive_editable_sequences',
+                    'original_author_ticks_and_native_canvas', 'isolated_instance_ids',
+                    'rights_revision_and_disposition_history', 'fixed_file_luts_fonts_and_captions',
+                    'hash_bound_plans', 'dry_run_snapshot_transaction_idempotency'],
+                'limits': ['same_timebase_fps_color_and_audio_context_required',
+                    'global_adjustments_and_external_audio_executables_rejected',
+                    'partial_ducking_bus_selection_rejected', 'compound_video_track_insertion_only',
+                    'model_weights_and_executable_adapters_not_bundled',
+                    'source_rights_changes_do_not_automatically_propagate',
+                    'crash_may_leave_unreferenced_resources', 'default_4gib_4096files_32mib_manifest'],
+                'runtime': 'native-python-no-node-browser-network-or-virtualization',
+                'workflow_reference_revision': 'eefd6a8d379289102141359a4718dbab12170526',
+            },
             "subtitle_segmentation": {
                 "status": "implemented_with_limits",
                 "engine": "openfilm-local-subtitle-segment-v1",

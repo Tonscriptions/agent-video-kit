@@ -1,0 +1,32 @@
+test_unpublished_staging_manifest_is_never_a_visible_library_version (test_fragments.FragmentTests.test_unpublished_staging_manifest_is_never_a_visible_library_version) ... FAIL
+test_version_directory_junction_cannot_escape_the_library_root (test_fragments.FragmentTests.test_version_directory_junction_cannot_escape_the_library_root) ... FAIL
+
+======================================================================
+FAIL: test_unpublished_staging_manifest_is_never_a_visible_library_version (test_fragments.FragmentTests.test_unpublished_staging_manifest_is_never_a_visible_library_version)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_fragments.py", line 503, in test_unpublished_staging_manifest_is_never_a_visible_library_version
+    result = self.call('fragment', 'list', '--library', self.library)
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_fragments.py", line 96, in call
+    self.assertEqual(code, expected, result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'fragment.list', 'request_id': 'req_20261017175648_b30de335', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'FRAGMENT_MANIFEST_INVALID', 'message': '库目录与声明 ID/版本不符', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\temp\\fragment-test-q9o_n6k1\\library\\entries\\c432b372e0e30267e65e26a12a42c7957ab52e25dfe3c6d4b929213d88965e45\\.fragment-interrupted-save\\fragment.json', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T17:56:48.106529Z', 'finished_at': '2026-10-17T17:56:48.106539Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_version_directory_junction_cannot_escape_the_library_root (test_fragments.FragmentTests.test_version_directory_junction_cannot_escape_the_library_root)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_fragments.py", line 519, in test_version_directory_junction_cannot_escape_the_library_root
+    self.assertEqual(result['errors'][0]['code'], 'FRAGMENT_PATH_INVALID')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'FRAGMENT_MANIFEST_INVALID' != 'FRAGMENT_PATH_INVALID'
+- FRAGMENT_MANIFEST_INVALID
+?          ^ -----
++ FRAGMENT_PATH_INVALID
+?          ^  +
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 7.917s
+
+FAILED (failures=2)

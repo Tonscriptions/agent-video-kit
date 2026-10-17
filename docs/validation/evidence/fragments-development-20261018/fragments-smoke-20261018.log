@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_fragments.py", line 308, in <module>
+    args = parser.parse_args(); run(args.output.resolve(), args.work.resolve())
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_fragments.py", line 123, in run
+    cli('media', 'ingest', '--project', source, '--input', path, '--asset-id', aid, *rights_args)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\smoke_fragments.py", line 89, in cli
+    assert result.returncode == expected, (args, value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (('media', 'ingest', '--project', WindowsPath('E:/dev/sandbox/AI广告剪辑/product/.runtime/fragments-smoke-20261018/source'), '--input', WindowsPath('E:/dev/sandbox/AI广告剪辑/docs/assets/fragments-20261018/agent-grid-cc0.ttf'), '--asset-id', 'font', '--verification-status', 'verified', '--license-spdx', 'CC0-1.0', '--permitted-use', 'commercial_ad', '--evidence', WindowsPath('E:/dev/sandbox/AI广告剪辑/docs/assets/fragments-20261018/fixture-provenance.json')), {'ok': False, 'command': 'media.ingest', 'request_id': 'req_20261017173512_2d3282d2', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'DEPENDENCY_UNAVAILABLE', 'message': '字体导入需要本地 Pillow/FreeType', 'path': None, 'retryable': False, 'hint': '使用已安装的本地依赖，不会自动安装'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T17:35:12.915126Z', 'finished_at': '2026-10-17T17:35:12.915133Z', 'network': 'disabled'}})

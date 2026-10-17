@@ -1,0 +1,151 @@
+[
+  {
+    "id": "N01",
+    "error_code": "FRAGMENT_RESOURCE_HASH_MISMATCH",
+    "response": {
+      "ok": false,
+      "command": "fragment.apply",
+      "request_id": "req_20261017180037_00ea0529",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "FRAGMENT_RESOURCE_HASH_MISMATCH",
+          "message": "片段组资源已损坏或改变",
+          "path": "files/884246144dbfc307f8bbc984de9a3ef1380669442894b08528113a9168c6198c.wav",
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T18:00:37.003553Z",
+        "finished_at": "2026-10-17T18:00:37.003563Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "id": "N02",
+    "error_code": "FRAGMENT_PROJECT_CHANGED",
+    "response": {
+      "ok": false,
+      "command": "fragment.apply",
+      "request_id": "req_20261017180038_2d8c91d7",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "FRAGMENT_PROJECT_CHANGED",
+          "message": "工程已偏离已审查片段组计划",
+          "path": null,
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T18:00:38.092361Z",
+        "finished_at": "2026-10-17T18:00:38.092368Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "id": "N03",
+    "response": {
+      "ok": false,
+      "command": "fragment.apply",
+      "request_id": "req_20261017180039_5019adba",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "FRAGMENT_CONTEXT_MISMATCH",
+          "message": "源与目标的时基/帧率/色彩/音频执行设置不同，首版不做隐式转换",
+          "path": "settings",
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T18:00:39.405202Z",
+        "finished_at": "2026-10-17T18:00:39.405209Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "id": "N04",
+    "response": {
+      "ok": false,
+      "command": "fragment.apply",
+      "request_id": "req_20261017180042_04a470b1",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "FRAGMENT_TARGET_COLLISION",
+          "message": "插入区间与目标轨道已有片段重叠",
+          "path": "fragment",
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T18:00:42.693172Z",
+        "finished_at": "2026-10-17T18:00:42.693178Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "id": "N05",
+    "response": {
+      "ok": false,
+      "command": "render",
+      "request_id": "req_20261017180048_21dd6622",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "PROJECT_INVALID",
+          "message": "项目验证失败，拒绝渲染",
+          "path": null,
+          "retryable": false,
+          "cause": "{\"ok\": false, \"errors\": [{\"status\": \"blocked\", \"code\": \"RIGHTS_STATUS_BLOCKED\", \"message\": \"状态 blocked 不允许发布\", \"asset_id\": \"fg_58d8475a214e2caad83f5c1074d53ec52355e9d0\", \"rights_ref\": \"fg_58d8475a214e2caad83f5c1074d53ec52355e9d0\", \"record_version\": 1, \"context\": \"project_asset\", \"path\": \"rights[fg_58d8475a214e2caad83f5c1074d53ec52355e9d0]\"}], \"warnings\": [], \"rights\": {\"ok\": false, \"target\": \"commercial_ad\", \"checked\": 7, \"required_records\": 8, \"failures\": [{\"status\": \"blocked\", \"code\": \"RIGHTS_STATUS_BLOCKED\", \"message\": \"状态 blocked 不允许发布\", \"asset_id\": \"fg_58d8475a214e2caad83f5c1074d53ec52355e9d0\", \"rights_ref\": \"fg_58d8475a214e2caad83f5c1074d53ec52355e9d0\", \"record_version\": 1, \"context\": \"project_asset\"}], \"warnings\": [], \"disposition_decisions\": [], \"effective_disposition_decisions\": []}, \"schema_engine\": \"jsonschema\", \"asset_count\": 7, \"sequence_count\": 2}"
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-17T18:00:48.947272Z",
+        "finished_at": "2026-10-17T18:00:48.947278Z",
+        "network": "disabled"
+      }
+    },
+    "no_encoded_output": true
+  }
+]

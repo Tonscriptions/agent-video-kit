@@ -14,6 +14,15 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+Use [saved fragments](../../docs/specs/可复用片段组库与跨项目插入契约_v0.1_2026-10-18.md)
+for editable cross-project groups. Insertion creates one container on an
+unlocked video track; its source range selects the saved group's original
+author clock. Do not zero child clip ticks or external subtitle cue times.
+Review all automatically included link/transition/binding dependencies and
+fresh ID maps before applying. Tick/FPS/color/audio context mismatches,
+overlaps and partial ducking-bus selections reject; independent source canvas
+and original transition endpoint limits remain in force.
+
 Use [real source transitions](../../docs/specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md)
 for add/resize/remove across an exact same-track cut. The declaration lives in
 `sequence.source_transitions`; compose batches `{op: "source_transition",

@@ -14,7 +14,7 @@
 
 **可以拆用，建议继续保留现有 Agent Project + Python/FFmpeg 主链，按模块复用。** 最新增量中，跨项目片段组库最有直接价值，模板参数和参考片复刻流程其次。HTML 动效可弥补复杂标题、SVG/Canvas/WebGL 的表达能力，但需要额外浏览器后端；它并不补齐本地分割、修复、声音或完整剪映能力。
 
-R02 是源码与数据研究，**没有把 0.2 新模块接入产品，也没有新增模型推理或编码视频**。R02 交付时最近完整产品基线是 V35 的 764/764；其后完成的 V36 嵌套转场另见末节与产品实测，不计入这批研究结果。
+R02 是源码与数据研究，**没有把 0.2 新模块接入产品，也没有新增模型推理或编码视频**。R02 交付时最近完整产品基线是 V35 的 764/764；后续 V36 嵌套转场与 V37 本地片段组库另见末节及各自产品实测，不计入这批研究结果。
 
 ## 1. 这次比此前多检查了什么
 
@@ -39,7 +39,7 @@ R02 是源码与数据研究，**没有把 0.2 新模块接入产品，也没有
 | O01 | [subtitle-segments.mjs](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/server/subtitle-segments.mjs) | 直接复用中文/英文分句、数字单位保护、双语分段和局部回写规则 | **已进入 V34**，固定原字节 Node worker；不是 ASR、逐字对齐或翻译模型 | 已接入，不重算工期/收益 |
 | O02 | [timeline-edit.ts](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/ui/src/lib/timeline-edit.ts) | 关联、同步锁、主轨联动、跨轨删除/闭隙的规划规则和测试 | **整片段子集已进入 V33**；完整源边缘裁切、插入/覆盖、磁吸重排仍需专门实现与验收 | 保留既有适配；未实现部分另立契约 |
 | O03 | [transitions.ts](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/ui/src/lib/transitions.ts) | 添加/调整/移除转场及关联音频的操作流程 | **V35 已借鉴工作流**，本地真实源句柄为新实现；不能称为原算法整体移植 | 无需重复接一套移位/换轨模型 |
-| O13 | [saved.mjs](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/server/saved.mjs)（316 行）+[saved-insert.ts](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/ui/src/lib/saved-insert.ts)（40 行） | 跨项目保存片段组、收集资源、保留相对轨道/时差、重新生成 link ID；可做可复用片头、CTA、字幕包装组 | 本项目已有素材库、模板和便携包，增量是“从已编辑片段保存成可复用组”；需映射 tick/嵌套/字幕/LUT/字体/音频总线，补 Rights Ledger、哈希、冲突/事务及版本规则 | **第一优先，3–5 人日**；同范围从头约 6–10 人日 |
+| O13 | [saved.mjs](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/server/saved.mjs)（316 行）+[saved-insert.ts](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/ui/src/lib/saved-insert.ts)（40 行） | 跨项目保存片段组、收集资源、保留相对轨道/时差、重新生成 link ID；可做可复用片头、CTA、字幕包装组 | **后续 V37 已实现受控子集**：本地不可变片段组、作者 tick/嵌套/字体/LUT/字幕与权利历史闭包、独立 ID 跨工程可编辑插入；相同执行上下文、嵌套入轨，展开多轨/来源撤回传播未验 | R02 原估算 3–5 人日、同范围从头约 6–10；已接入子集见末节，未记录实际人时，不宣称实测节省 |
 | O14 | [template-controls.ts](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/ui/src/lib/template-controls.ts)（127 行）+ overrides | CSS 变量类型/单位、文字、图片替换与覆盖恢复；可让 Agent 批量改 HTML 标题卡品牌色/文案/产品图 | 本项目 JSON 模板变量已有；这是将来 HTML 模板桥，不能当新增全套模板系统；需资源/字体权利与离线闭包 | **随 HTML 后端，1–3 人日增量**；同范围从头约 3–5；不含 HTML 渲染 |
 | O04/O06 | [look.mjs](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/look.mjs) + host 的时钟/乱序机制 | 联系表、两种乱序重复绘制、字体/页面错误/越界检查；减少 Agent 只生成而不验片的缺口 | 适用于 frame(t) 页面；当前 FFmpeg 普通视频不是同一执行模型；抽样确定性不证明美感/每帧质量 | **质量工具候选，3–5 人日**；从头约 6–10；与 O05 共享工作 |
 | O05 | [render.mjs](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/render.mjs) + host/seekable | HTML/CSS/SVG/Canvas/WebGL 动效、透明层、时间采样与运动模糊编排 | 可独立于 React/Electron，但仍需要 Node + Playwright + Chromium；输出登记为本地资产，再交现有 FFmpeg 主链 | **第二批可选后端，5–10 人日**；同范围从头约 12–20；不含完整色彩/HDR/性能验收 |
@@ -47,7 +47,7 @@ R02 是源码与数据研究，**没有把 0.2 新模块接入产品，也没有
 | O15 | [官方十份 Skill](https://github.com/openfilm/openfilm/tree/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/skills) | 参考片拆解、节奏对照、录屏追焦、长转短、产品发布片等创作流程和交付标准 | 原文使用 `npx openfilm`/`get`/服务商，不能原样接入；需改成本地资产、现有 CLI、受检模型与实际对照。Skill 是任务指导，不会自动新增视觉理解/模型算法 | **参考片/录屏/长转短优先，单套流程 1–2 人日**；从头约 2–4；不含缺失功能实现 |
 | O16 | [capture.mjs](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/capture.mjs)（51 行） | 页面全图/元素截图、视口/主题和点击隐藏编排 | 默认接受网络页面，不符合本项目默认离线；已有浏览器工具时净收益小。将来仅显式本地静态页面，输出再登记 | **低优先，不进默认运行时**；无本轮功能/截图实测 |
 
-**下一批具体建议：先建设 O13 的可复用片段组契约，再适配 O15 的参考片拆解/对照流程；HTML 动效单独设可选后端里程碑。** O13 先支持现有模型中可无损表达的片段组，对不支持的总线、绑定及动态闭包明确报错，不能悄悄丢失。无需因引入 O13 替换现有素材索引、模板、权利台账或事务系统。
+**R02 当时的下一批建议为先建设 O13，再适配 O15；O13 已于后续 V37 接入受控子集，详见末节。HTML 动效仍独立设为可选后端里程碑。** O13 先支持现有模型中可无损表达的片段组，对不支持的总线、绑定及动态闭包明确报错，不能悄悄丢失。无需因引入 O13 替换现有素材索引、模板、权利台账或事务系统。
 
 ## 3. 新官方 Skills 的可借鉴内容
 
@@ -111,3 +111,9 @@ C:\Python313\python.exe -B -X utf8 scripts/audit_openfilm_increment.py --source 
 ## 后续产品增量：V36
 
 本研究之后，V36 已原生补充含转场子序列的父级裁切/倒放/恒速/曲线合成，见[契约](specs/嵌套转场合成与作者时钟契约_v0.1_2026-10-18.md)和[22 组/完整回归实测](validation/嵌套转场与父级重映射实测_2026-10-18.md)。这是既有 O03 工作流实现的后续扩展，没有接入 O13 Saved/HTML/其他 0.2 新 runtime；R02 原 20 项研究与 V36 完整产品套件分计。
+
+## 后续产品增量：V37
+
+O13 的本地可复用片段组工作流已进入产品：`fragment save/list/inspect/apply`，保存已编辑内容、自动补全关联/转场/绑定源、递归资源及权利闭包，并在另一工程以独立 ID 的可编辑嵌套组使用。见[契约](specs/可复用片段组库与跨项目插入契约_v0.1_2026-10-18.md)与[六组/五项拒绝/814 完整实测](validation/可复用片段组库与跨项目插入实测_2026-10-18.md)。340 新主帧和 163.2 万立体声采样帧与固定 V36 手工作者工程完全一致；这项参照不能独立证明既有渲染算法或剪映等价。
+
+适配没有引入上游 GUI、HTML、在线资源或执行器，也没有自动安装十份上游 Skill；四份现有 `$video-cut-` 技能已加入库的使用流程。首版要求相同执行上下文，只做嵌套入轨；展开式合并、跨 FPS/色彩、部分闪避总线、自动传播权利变更及大规模内容库仍开放。R02 的 3–5 人日是原估算，不能以本次代码量或测试通过数倒算实际节省。下一步可结合 O15 做参考片/录屏/长转短任务工作流；HTML 后端继续单独评估成本。

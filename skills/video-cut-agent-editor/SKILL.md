@@ -1,11 +1,20 @@
 ---
 name: video-cut-agent-editor
-description: "Drive the local Agent-first advertising video editor CLI for project setup, local media ingest, timeline composition, local TTS, templates, validation, rights checks, conversion, and FFmpeg rendering."
+description: "Drive the local Agent-first advertising video editor CLI for project setup, timeline composition, edited clip-group reuse, local TTS, templates, validation, rights checks, conversion, and FFmpeg rendering."
 ---
 
 # Video Cut Agent Editor
 
 Use this skill when the requested edit should be represented as a reproducible local Agent Project rather than a GUI project. The implementation lives in `product/` in this project.
+
+For cross-project reuse of edited clips, read the
+[fragment library contract](../../docs/specs/可复用片段组库与跨项目插入契约_v0.1_2026-10-18.md).
+Use `fragment save/apply --project <root> --library <local-dir> --input
+<request.json> --dry-run`. Inspect expanded link/transition/binding selection,
+resource bytes, rights and ID maps; bind formal execution with both expected
+project/fragment hashes. The result remains an editable nested group with
+original author clocks. Keep context/track/collision errors and publication
+gates. `fragment inspect` verifies files; `list --query` only searches metadata.
 
 For reversible cut transitions, read the [real source-handle contract](../../docs/specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md).
 Use `timeline transition --input <request.json> --dry-run` with add/resize/remove.

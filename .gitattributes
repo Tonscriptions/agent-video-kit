@@ -109,3 +109,10 @@ docs/validation/evidence/sequence-canvas*.json -text
 docs/validation/evidence/sequence-canvas*.log -text -whitespace
 docs/validation/evidence/sequence-canvas-dev-v3-generator.py -text
 docs/assets/sequence-canvas-20261017/font-license.txt -whitespace
+
+# V37 retains fragment resource proofs, frozen source records and raw failures.
+scripts/*fragment*.py -text
+scripts/run_frozen_regression.py -text
+docs/validation/evidence/fragments*.json -text
+docs/validation/evidence/fragments*.log -text -whitespace
+docs/validation/evidence/fragments-*/** -text -whitespace

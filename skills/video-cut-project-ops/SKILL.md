@@ -5,6 +5,16 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+For the [fragment library](../../docs/specs/可复用片段组库与跨项目插入契约_v0.1_2026-10-18.md),
+save versions under a local library; apply uses the project lock, a
+before-fragment-apply snapshot, metadata transaction and normal idempotency.
+Bind a reviewed plan with `--expected-project-sha256` and
+`--expected-fragment-sha256`. A new instance owns fresh resource and ID
+namespaces. Ordinary handler failures remove copied resources; process death
+can leave unreferenced files after metadata recovery. Preserve and inspect
+those files before cleanup. A library version does not overwrite an earlier
+version or automatically propagate source-rights changes to existing copies.
+
 For [source-handle transitions](../../docs/specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md),
 `timeline transition` uses the existing project lock, metadata transaction and
 `before-source-transition` snapshot. Its `project_sha256` binds the optional
