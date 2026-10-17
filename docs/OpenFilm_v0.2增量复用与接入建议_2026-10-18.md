@@ -129,3 +129,51 @@ V38 的输出窗口为本项目新实现，不是 `timeline-edit.ts` 的整体�
 2026-10-18 04:01（Asia/Taipei）再查 API：**829 stars / 90 forks**，main 仍为 `eefd6a8d379289102141359a4718dbab12170526`；[原请求/摘要](validation/evidence/openfilm-range-followup-20261018/verification.json)。没有新增源码差异，R01/R02 研究通过数不重算。
 
 本轮 V39：新增本地 `insert/overwrite/lift/extract/roll/slide` 六种专业范围编辑，复用完整作者输出窗口，保留曲线/倒放/动画/音频；关联音轨、同步锁、骑乘片段、文件字幕偏移、全差异计划和批量事务共用现有入口。完整 **897/897，1510.144 秒**，0 跳过；125 Python+2 MJS+Schema+pyproject+MIT 共 130 文件冻结，53 新增专项为完整子集。八组/73 CLI（59 成功、6 当前预期拒绝、8 固定 V38 缺项拒绝），340 新主帧、1,632,000 立体声采样帧与固定同产品 V38 完整作者选区/拼接完全相同；参照不是独立渲染或变速算法。89 文件离线 wheel/30 产品隔离 CLI、14 Skills/124 引用通过；四个时刻静态对照和 CTA 移位抽查，未连续播放/听审。开发报错优先级/非法 action、生成器错误码和复制幂等历史失败保留。roll/slide 只用保留作者句柄；源范围外扩、复杂关联 slip、完整磁吸、自然质量/长片资源、Schema 随包/干净机器与完整剪映等价仍未验收。 见[专业范围编辑实测](validation/专业范围编辑与滚滑剪口实测_2026-10-18.md)与[契约](specs/范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md)。该增量沿用已借鉴关联规则并新写原生范围规划器，没有继续搬入 GUI/HTML/上游执行器。仍无实际人时记录；不能由新增测试或局部代码量宣称节省整个项目的比例。
+
+## 当前复用落地决策（R03）
+
+**有可复用内容，推荐保持现有 Python/FFmpeg 主内核，按模块拆入。** 2026-10-18 再查公开 GitHub API，main 仍为 `eefd6a8d379289102141359a4718dbab12170526`，快照 829 stars / 90 forks，无需重复下载同一版本。获取时刻与响应原字节见[本次机器证据](validation/evidence/openfilm-current-review-20261018/verification.json)。网页显示可能存在缓存差异，本表按记录的 API 时点描述，不作永久 star 排名。
+
+本次重新核对固定 ZIP 与本地 702 份上游文件、V39 的 130 份产品冻结文件，原字幕算法与 MIT 完全一致；同时检查文档本地文件链接。没有运行上游 CLI、Studio、浏览器、Docker/WSL、服务商、模型、编码器或新增 Skill；无新增 tab。历史 20 项上游测试及 897 项产品回归的原证据保留，**本次没有重跑，不能相加或改记为新的功能通过数**。这是源码与落地决策复查，不新增视频/GIF。
+
+### 已采用的部分
+
+| 编号 | 上游内容 | 当前本地实现及采用方式 | 剩余边界 |
+|---|---|---|---|
+| O01 | `studio/server/subtitle-segments.mjs` | [原字节算法](../product/src/ai_ad_editor/openfilm_subtitle_segments.mjs) + [Python 桥](../product/src/ai_ad_editor/subtitle_segments.py)；已进入 `subtitle segment` | 分句不是 ASR；缺词时钟的时间估算、真实语义和对齐质量不能由通过数替代 |
+| O02 | `studio/ui/src/lib/timeline-edit.ts` | [edit_planner.py](../product/src/ai_ad_editor/edit_planner.py) 适配部分关联/主轨/同步规则；[range_edits.py](../product/src/ai_ad_editor/range_edits.py) 原生补充范围编辑 | 并非整个规划器兼容移植；源外扩、复杂关联 slip、完整磁吸等仍开放 |
+| O03 | `studio/ui/src/lib/transitions.ts` | [source_transitions.py](../product/src/ai_ad_editor/source_transitions.py) 借鉴可逆转场工作流，重新实现真实源句柄 | 未照搬上游移位换轨；受限端点、自然画质及完整转场库仍需实现/验收 |
+| O13 | `studio/server/saved.mjs` + `studio/ui/src/lib/saved-insert.ts` | [fragments.py](../product/src/ai_ad_editor/fragments.py) 借鉴保存/资源闭包/相对时间/ID 隔离流程，提供可编辑组库 | 首版嵌套入轨、相同执行上下文；展开式合并、跨 FPS/色彩和权利撤回传播未完成 |
+
+以上模块已经形成受控能力，不再按“下一步复用”重复估算收益。代码、规则适配和工作流借鉴三种采用方式各自标明，MIT 原文继续随包，详见[复用声明](third-party/OpenFilm复用声明_2026-10-17.md)。
+
+### 仍值得拆用的部分
+
+下列工期沿用前述同范围估算：1 名熟悉本项目、Python/Node 的工程师，1 人日约 6 小时有效开发，包含适配与针对性验收；不是实测人时，也不包含完整剪映验收或整体产品开发。
+
+| 顺序 / 编号 | 具体可拆模块与入口 | 在本项目中的接法 | 适配 / 同范围从头 | 必须验证的内容 |
+|---|---|---|---|---|
+| 先做流程 / O15 | 官方 `replicate`、`screen-demo`、`long-to-short` Skill；其余 7 份见第 3 节 | 将参考片拆解、录屏追焦、长转短的任务步骤绑定现有离线 CLI；正式适配用 `$video-cut-` 前缀 | 待明确动作清单后估算；这些文字本身不提供新算法 | 固定本地入口、原素材追溯、ASR/跟踪真实输出、明确验片标准；不原样执行 npx/get/在线下载 |
+| HTML 后端 / O05 | `src/host.mjs` 的 `FilmPage.open`、`src/render.mjs`、`seekable/shared` | 独立 Node worker 驱动固定本地 Chromium，把 HTML/CSS/SVG/Canvas/WebGL 动效变为可登记的本地 RGBA 帧/资产，再交 FFmpeg 主图 | **5–10 / 12–20 人日** | 所有 probe/worker 离线拦截、固定字体与依赖哈希、取消超时、进程/page/context 回收、内存预算、帧时钟与 Alpha/颜色 |
+| 随 HTML / O04、O06 | `src/look.mjs`、host 的时钟机制 | 提取联系表、两种乱序重绘和字体/越界/请求诊断；通过结果写入本项目质量报告 | **3–5 / 6–10 人日**，与 O05 有共享工作 | 确定性页面、动态字体/资源、失败报告、跨次取帧；抽样一致不代表每帧或美学验收 |
+| 随 HTML / O14 | `template-controls.ts`、`overrides.mjs` | 作为现有模板库的 HTML 参数适配器，保留品牌色、文字、图片及 CSS 单位；不另起第二套权威工程模型 | **增量 1–3 / 3–5 人日**，不含 HTML 后端 | 变量类型/默认值、替换资源权利、离线闭包、覆盖保留及真实渲染 |
+| 按交换需求 / O07 | `studio/server/nle.mjs` 的 `planNleTimeline` | 增加 xmeml 适配与 copy/link/bake 清单，复用原帧边界量化和 lane 规划思想 | **3–6 / 7–12 人日** | 先接入本项目损失报告、relink、音画链接；烘焙结果不能冒称参数仍可编辑 |
+| 后续可选 / O09、O10 | `closure.mjs`、`film-doc.mjs` | 仅在支持 OpenFilm HTML 格式时复用资源闭包和局部文本修改；现有 JSON/ticks 保持权威 | 分别 **2–4 / 4–7**、**3–6 / 6–12 人日** | 动态路径的闭包缺口、格式损失、秒/ms 与 tick 量化，以及外部资源访问门禁 |
+
+**下一项技术验证优先选择 O05 的最小离线标题卡后端；O04/O06/O14 与其一并规划但不重复累加工时。** 用一份完全本地的标题卡，验证任意时间取帧、透明输出、失败退出/取消、资源封装及浏览器最终回收，再决定是否扩为正式模块。先适配 O15 的三种流程也有价值，但流程说明不能替代标题动效、语音识别、跟踪或美学质量算法。当前没有该 HTML 接口或样例的产品验收，不将以上估算列为已节省工时。
+
+### 不作为本地功能内核搬入的部分
+
+React Studio、Electron 外壳不符合本项目 CLI 定位；但不能按目录整体删除 `studio/ui`，其 `lib` 下有纯规划、时间和模板算法，应先分离依赖。已有真实失败表明 `timecode.ts` 的 React Hook 与 `shared.mjs` 的顶层 host 导入会把纯数据模块拖入 React/Playwright 依赖。
+
+服务商 `get/providers` 路由只组织云请求，不提供本地抠像、修复、生成、ASR 或 TTS 模型内核；不纳入默认本地链。`capture` 的网页导航也不自动符合离线模板需求。上游剪映草稿写出器可作为格式回归参考，但不是通用双向解析器，不解决加密工程或私有素材/特效可编辑转换。
+
+本次还核对了 `host.mjs` 的 `offline=false` 默认值、`render.mjs` 创建 worker 时未传 offline，以及不透明截图默认 JPEG95 的路径。**不能只因源码存在 offline/close() 就宣称已经符合本项目离线与回收要求**；也不能把 JPEG 截帧、Alpha PNG 或多快门平均当作 HDR/线性光或完整剪映画质验收。
+
+复查脚本为 [audit_openfilm_current_review.py](../scripts/audit_openfilm_current_review.py)，由根目录执行，输出目录需尚不存在：
+
+```powershell
+C:\Python313\python.exe -B -X utf8 scripts/audit_openfilm_current_review.py --output docs/validation/evidence/<新的复查目录>
+```
+
+它只向两个公开 GitHub API 发 GET，保存响应原字节并核对既有源码、冻结产品和文档链接；若 main 变化则保留响应并终止，以便重新审查，不能沿用本次模块结论。整体剪映等价目标继续开放，源码 MIT、素材/模型权利和品牌使用分别管理。

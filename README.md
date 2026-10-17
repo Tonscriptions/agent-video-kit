@@ -54,6 +54,8 @@
 
 ## 开源复用核查
 
+2026-10-18 复查 **R03**：OpenFilm main 仍为 `eefd6a8d`，API 快照 **829 stars / 90 forks**，与已审查版本无代码差异。重新核对固定 ZIP、本地 **702 份上游文件**、产品 **130 份冻结文件**及原字幕/MIT 字节；本轮没有重跑历史测试、编码视频或安装新 Skill。[复用落地清单、剩余成本与排除项](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#当前复用落地决策r03)；[本次 API/摘要/文档链接核对](docs/validation/evidence/openfilm-current-review-20261018/verification.json)。已采用的字幕、关联规则、转场和片段组不重复计收益；剩余优先候选为十份官方 Skill 的本地流程适配，以及 HTML 动效/模板/乱序检查的独立可选后端。
+
 2026-10-18 04:01（Asia/Taipei）复查 GitHub API：**829 stars / 90 forks**，main 仍为已审查 `eefd6a8d`；无新增代码差异。[原 API/时间/SHA](docs/validation/evidence/openfilm-range-followup-20261018/verification.json)。V39 在此前 O02 规则之上原生补齐六种范围编辑；Saved、字幕与关联模块已有受控接入，HTML 动效和模板 CSS 控制仍为单独候选，不重算既有收益。
 
 2026-10-18 03:04（Asia/Taipei）再查 GitHub API：**826 stars / 90 forks**，main 仍为 `eefd6a8d379289102141359a4718dbab12170526`；与 R02 的 809/89 时点分别保留。无新增上游源码差异；[原 API/SHA/修正记录](docs/validation/evidence/openfilm-window-followup-20261018/verification.json)。V38 的复杂作者时钟输出裁切是本项目新实现；下一候选为十份官方 Skill 中的参考片/录屏/长转短流程，原在线接口需替换，HTML 动效另立可选浏览器后端。
@@ -66,6 +68,7 @@
 |---|---|---|---|---|
 | R01 | OpenFilm 源码、许可证、无 GUI 拆分及数据输出 | 历史原模块 58/58、Hook 分离副本 65/65、619 原文件 SHA 一致；V33 O02 整片段、V34 O01 原算法已复用，V35 O03 工作流新实现；新八文件复查另计 | 原研究 123 项不与产品回归相加；HTML/乱序自检/其余适配仍未集成；原 React 依赖失败保留 | [12 项模块/成本及接入状态](docs/OpenFilm源码拆解与复用成本评估_2026-10-17.md)、[原研究证据](docs/validation/evidence/openfilm-reuse-20261017.json)、[V35](docs/validation/真实源句柄转场与可逆编辑实测_2026-10-17.md) |
 | R02 | OpenFilm 0.2.0 整树更新、片段组库/模板/官方 Skills | 2026-10-18：702 原文件前后摘要一致；独立副本仅改两处依赖边界，20/20 原测试；片段组相对时间/新关联 ID/独立文件副本与模板覆盖两组实际数据通过 | 源码/数据研究；原版间接 Playwright/React 加载失败公开；未安装新 Skill、R02 时未集成 HTML/片段组库、未编码视频或运行完整回归；V37 后续实现 O13 子集，工期为估算 | [编号模块/工期/十份 Skill](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md)、[整树证据](docs/validation/evidence/openfilm-refresh-20261018/verification.json)、[20 项与两组数据](docs/validation/evidence/openfilm-increment-verified-20261018/verification.json) |
+| R03 | OpenFilm 当前版本与复用落地决策复核 | 两次公开 API GET；main 与已审查版本相同，702 上游文件及 130 产品冻结文件摘要一致，字幕和 MIT 保留原字节；文档本地链接核对 | 本轮只做源码/证据/文档检查；20 项上游与 897 项产品为历史结果，未重跑、不累加；HTML 后端及新官方 Skill 未接入，无新视频/模型推理 | [具体可拆模块与成本](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#当前复用落地决策r03)、[本次机器证据](docs/validation/evidence/openfilm-current-review-20261018/verification.json) |
 
 实际数据：[字幕原输入](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-input.json) → [三段输出](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-output.json)；[跨轨删除原模型](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-input.json) → [操作计划/实际结果/手工预期](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-output.json)。字幕无词标的时间为估算。原 CLI/Skill 连接 Studio、npx latest 与服务商；选用模块需改为固定本地入口、强制离线并保留原版权。GUI 目录内的纯规划算法可提取；上游不是完整剪映或本地 AI 特效替代内核。
 
