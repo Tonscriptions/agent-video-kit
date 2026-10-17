@@ -1,0 +1,260 @@
+"""Actual offline CLI fixtures for nested transition-bearing child sequences.
+
+Reuse byte-verified CC0 source media from V35. Compare composed child frames
+against fixed V35 plus independent source-blend/time math, and selected PCM
+against independent source windows/envelopes. Curved/stretched natural audio
+and the artistic direction of wipe/slide remain separate acceptance scopes.
+"""
+from __future__ import annotations
+import argparse,copy,hashlib,io,json,math,shutil,subprocess,sys,time,zipfile
+from datetime import datetime,timezone
+from pathlib import Path
+
+ROOT=Path(__file__).resolve().parents[1]
+BASELINE='c084a101e9e8e6cd2720bdc04da802ab820a5b04'
+TPS,FPS,W,H,SR=90000,10,240,136,48000
+TYPES=['dissolve','crossfade','dip_black','dip_white','wipe_left','wipe_right','wipe_up','wipe_down',
+       'slide_left','slide_right','slide_up','slide_down']
+def digest(raw):return 'sha256:'+hashlib.sha256(raw).hexdigest()
+def sha(p):return digest(p.read_bytes())
+def save(p,value):p.write_text(json.dumps(value,ensure_ascii=False,indent=2,allow_nan=False)+'\n',encoding='utf-8',newline='\n')
+def frozen():
+ paths=[*(ROOT/'product/src').rglob('*.py'),*(ROOT/'product/tests').rglob('*.py'),
+        *(ROOT/'product/src').rglob('*.mjs'),ROOT/'product/pyproject.toml',ROOT/'docs/specs/agent-project.schema.json',
+        ROOT/'product/src/ai_ad_editor/OPENFILM_LICENSE.txt']
+ return {p.relative_to(ROOT).as_posix():sha(p) for p in sorted(paths)}
+
+def run(output,work):
+ import numpy as np
+ from PIL import Image
+ output.mkdir(parents=True,exist_ok=False);work.mkdir(parents=True,exist_ok=False)
+ before=frozen();old=work/'baseline';calls=[]
+ archive=subprocess.check_output(['git','-c','core.autocrlf=false','archive','--format=zip',BASELINE,
+                                 'product/src','docs/specs/agent-project.schema.json'],cwd=ROOT)
+ with zipfile.ZipFile(io.BytesIO(archive)) as z:
+  for item in z.infolist():
+   if item.is_dir():continue
+   path=(old/item.filename).resolve();assert path.is_relative_to(old.resolve())
+   path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(z.read(item))
+ old_hashes={p.relative_to(old).as_posix():sha(p) for p in old.rglob('*') if p.is_file()}
+ def ff(args,data=None):
+  return subprocess.run(['ffmpeg','-v','error','-y','-threads','1',*map(str,args)],input=data,
+                        capture_output=True,check=True,timeout=300).stdout
+ def rgb(path):return np.frombuffer(ff(['-i',path,'-an','-pix_fmt','rgb24','-f','rawvideo','pipe:1']),np.uint8).reshape(-1,H,W,3)
+ def pcm(path):return np.frombuffer(ff(['-i',path,'-vn','-ar',SR,'-ac',2,'-f','f32le','pipe:1']),'<f4').reshape(-1,2)
+ def encode(path,frames):
+  ff(['-f','rawvideo','-pix_fmt','rgb24','-s',f'{frames.shape[2]}x{frames.shape[1]}','-r',FPS,'-i','pipe:0',
+      '-an','-c:v','libx264rgb','-preset','ultrafast','-crf',0,path],frames.tobytes())
+ bootstrap='import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();from ai_ad_editor.cli import main;raise SystemExit(main())'
+ def cli(*args,baseline=False,expected=0):
+  command=[sys.executable,'-I','-B','-X','utf8','-c',bootstrap,str(old/'product/src' if baseline else ROOT/'product/src'),*map(str,args)]
+  begin=time.monotonic();result=subprocess.run(command,cwd=ROOT,capture_output=True,timeout=300)
+  index=len(calls)
+  for name,raw in (('stdout',result.stdout),('stderr',result.stderr)):(work/f'{index:03}.{name}.log').write_bytes(raw)
+  value=json.loads(result.stdout.decode('utf-8-sig')) if result.stdout.strip() else {'stderr':result.stderr.decode('utf-8','replace')}
+  calls.append({'index':index,'args':list(map(str,args)),'baseline':baseline,'exit_code':result.returncode,'expected_exit_code':expected,
+                'seconds':time.monotonic()-begin,'stdout_sha256':digest(result.stdout),'stderr_sha256':digest(result.stderr)})
+  save(work/'partial-calls.json',calls)
+  assert result.returncode==expected,(args,value)
+  return value
+ original=ROOT/'docs/assets/source-transitions-20261017'
+ original_record=json.loads((original/'verification.json').read_text(encoding='utf-8'))
+ source_rgb,source_pcm={},{}
+ for sid in ('a','b','c'):
+  for name in (f'source-{sid}.mp4',f'sound-{sid}.wav'):
+   assert sha(original/name)==original_record['files'][name]['sha256']
+   shutil.copyfile(original/name,output/name)
+  source_rgb[sid]=rgb(output/f'source-{sid}.mp4');source_pcm[sid]=pcm(output/f'sound-{sid}.wav')
+ provenance={'license_spdx':'CC0-1.0','source':'byte-identical copies of V35 self-authored counters, moving boxes and synthetic stereo tones',
+  'original_provenance':'docs/assets/source-transitions-20261017/fixture-provenance.json','original_sha256':sha(original/'fixture-provenance.json'),
+  'generator':'scripts/smoke_nested_transitions.py','generator_sha256':sha(Path(__file__)),
+  'baseline_ref':BASELINE,'source_video':{'width':W,'height':H,'fps':FPS,'frames':80,'seconds':8},
+  'source_audio':{'sample_rate':SR,'channels':2,'sample_frames':8*SR},'new_model_inference':0,'browser_invocations':0}
+ save(output/'fixture-provenance.json',provenance)
+ cli('doctor');cli('capabilities')
+ base=work/'base-project';cli('project','init',base)
+ for sid in ('a','b','c'):
+  for aid,path in ((f'video_{sid}',output/f'source-{sid}.mp4'),(f'audio_{sid}',output/f'sound-{sid}.wav')):
+   cli('media','ingest','--project',base,'--input',path,'--asset-id',aid,'--verification-status','verified',
+       '--permitted-use','commercial_ad','--license-spdx','CC0-1.0','--source','self-authored-procedural-fixture','--evidence',output/'fixture-provenance.json')
+ author=json.loads((base/'project.json').read_text(encoding='utf-8'))
+ author['settings']['canvas'].update(width=W,height=H);author['settings']['timebase']['display_fps']={'num':FPS,'den':1}
+ main=author['sequences'][0]['id'];child=copy.deepcopy(author['sequences'][0]);child.update(id='child',duration_tick=6*TPS,tracks=[])
+ for kind in ('video','audio'):
+  clips=[{'id':f'{kind}_{sid}_clip','asset_id':f'{kind}_{sid}','link_id':f'group_{sid}',
+          'timeline_start_tick':i*2*TPS,'duration_tick':2*TPS,'source_in_tick':2*TPS,'source_out_tick':4*TPS}
+         for i,sid in enumerate(('a','b','c'))]
+  child['tracks'].append({'id':f'{kind}_track','kind':kind,'order':len(child['tracks']),'clips':clips})
+ def parent(scenario):
+  clip={'id':'parent_clip','sequence_id':'child','timeline_start_tick':0,'duration_tick':4*TPS,'source_in_tick':TPS,'source_out_tick':5*TPS}
+  if scenario=='partial':clip.update(source_in_tick=189000,source_out_tick=369000,duration_tick=2*TPS)
+  if scenario in ('reverse','curve-reverse'):clip['reverse']=True
+  if scenario=='double':clip.update(speed=2,duration_tick=2*TPS)
+  if scenario in ('curve','curve-reverse','parent-opacity'):
+   clip['speed_curve']=[{'at_tick':0,'speed':1},{'at_tick':4*TPS,'speed':3}]
+  if scenario=='parent-opacity':clip['keyframes']=[{'property':'transform.opacity','keyframes':[
+      {'at_tick':0,'value':.4,'interpolation':'linear'},{'at_tick':4*TPS,'value':.8,'interpolation':'linear'}]}]
+  if scenario=='twice':clip.update(source_in_tick=0,source_out_tick=6*TPS,duration_tick=6*TPS)
+  root={'id':main,'name':scenario,'duration_tick':clip['duration_tick'],'tracks':[{'id':'parent_video','kind':'video','order':1,'clips':[clip]}]}
+  if scenario=='twice':
+   again=copy.deepcopy(clip);again.update(id='again',timeline_start_tick=6*TPS)
+   root['tracks'][0]['clips'].append(again);root['duration_tick']=12*TPS
+  if scenario=='child-alpha':root['tracks'].insert(0,{'id':'background','kind':'video','order':0,'clips':[
+      {'id':'background_clip','asset_id':'video_a','timeline_start_tick':0,'duration_tick':4*TPS,'source_in_tick':0,'source_out_tick':4*TPS}]})
+  sequences=[root,copy.deepcopy(child)]
+  if scenario=='child-alpha':
+   for c in sequences[1]['tracks'][0]['clips']:c['transform']={'opacity':.5}
+  if scenario=='grandparent':
+   root['id']='middle';outer={'id':main,'name':'outer','duration_tick':4*TPS,'tracks':[
+      {'id':'outer_video','kind':'video','order':0,'clips':[{'id':'outer_clip','sequence_id':'middle','timeline_start_tick':0,
+      'duration_tick':4*TPS,'source_in_tick':0,'source_out_tick':4*TPS,'reverse':True}]}]}
+   sequences.insert(0,outer)
+  p=copy.deepcopy(author);p['sequences']=sequences
+  return p
+ def render(project,name,baseline=False,selected=None):
+  target=project/'renders'/(name+'.mkv')
+  args=['render','--project',project,'--output',target,'--container','mkv','--crf',0,'--pixel-format','yuv444p','--audio-codec','pcm_f32le','--publish']
+  if selected:args+=['--sequence-id',selected]
+  response=cli(*args,baseline=baseline)
+  preview=output/(name+'.mp4');ff(['-i',target,'-c:v','copy','-c:a','aac','-b:a','128k',preview])
+  manifest=json.loads(Path(response['data']['manifest']).read_text(encoding='utf-8'))
+  return rgb(target),pcm(target),{'local_mkv':str(target),'sha256':sha(target),'preview':preview.name,'response':response,
+                                 'manifest':manifest}
+ def add(project,kind):
+  for id,a,b in (('tr_ab','a','b'),('tr_bc','b','c')):
+   req={'action':'add','id':id,'from_clip_id':f'video_{a}_clip','to_clip_id':f'video_{b}_clip','type':kind,'duration_tick':TPS,'audio':'linked'}
+   path=project/'request.json';save(path,req)
+   dry=cli('timeline','transition','--project',project,'--sequence-id','child','--input',path,'--dry-run')
+   cli('timeline','transition','--project',project,'--sequence-id','child','--input',path,'--expected-project-sha256',dry['data']['plan']['project_sha256'])
+ def child_reference(kind,alpha=False):
+  project=work/('reference-'+kind+('-alpha' if alpha else ''));shutil.copytree(base,project)
+  p=copy.deepcopy(author);c=copy.deepcopy(child)
+  if alpha:
+   for clip in c['tracks'][0]['clips']:clip['transform']={'opacity':.5}
+  p['sequences']=[c];save(project/'project.json',p);add(project,kind)
+  return render(project,'fixed-child-'+kind+('-alpha' if alpha else ''),baseline=True,selected='child')
+ references={kind:child_reference(kind) for kind in TYPES}
+ def positions(scenario):
+  duration=2 if scenario in ('partial','double') else 12 if scenario=='twice' else 4
+  t=np.arange(duration*FPS)/FPS
+  if scenario=='partial':s=2.1+t
+  elif scenario in ('reverse','grandparent'):s=5-t
+  elif scenario=='double':s=1+2*t
+  elif scenario in ('curve','curve-reverse','parent-opacity'):
+   phase=4-t if scenario=='curve-reverse' else t
+   s=1+(np.exp(math.log(3)*phase/4)-1)/.5
+  elif scenario=='twice':s=np.mod(t,6)
+  else:s=1+t
+  selected=np.ceil(s*FPS-1e-6).astype(int)-1 if scenario in ('reverse','grandparent','curve-reverse') else np.floor(s*FPS+1e-6).astype(int)
+  return t,s,selected
+ independent=np.concatenate([source_rgb[sid][20:40] for sid in ('a','b','c')]).astype(float)
+ for start,left,right in ((15,'a','b'),(35,'b','c')):
+  for k in range(start,start+10):
+   w=(k-start)/10;local=k-(0 if start==15 else 20)
+   independent[k]=source_rgb[left][20+local]*(1-w)+source_rgb[right][local]*w
+ def independent_pcm(scenario):
+  if scenario not in ('trim','partial','reverse','grandparent','child-alpha','twice'):return None
+  if scenario=='twice':return np.concatenate([independent_pcm_window(0,6,False)]*2)
+  a,b=(2.1,4.1) if scenario=='partial' else (1,5)
+  return independent_pcm_window(a,b,scenario in ('reverse','grandparent'))
+ def independent_pcm_window(a,b,reverse):
+  out=np.zeros((round((b-a)*SR),2),float)
+  for ca,cb,sa,sid in ((0,2.5,2,'a'),(1.5,4.5,1.5,'b'),(3.5,6,1.5,'c')):
+   lo,hi=max(a,ca),min(b,cb)
+   if hi<=lo:continue
+   begin,end=(round((b-hi)*SR),round((b-lo)*SR)) if reverse else (round((lo-a)*SR),round((hi-a)*SR))
+   signal=source_pcm[sid][round((sa+lo-ca)*SR):round((sa+hi-ca)*SR)]
+   if reverse:signal=signal[::-1]
+   clock=b-np.arange(begin,end)/SR if reverse else a+np.arange(begin,end)/SR
+   gain=np.ones(end-begin)
+   if sid in ('a','b'):gain*=1-np.clip(clock-(1.5 if sid=='a' else 3.5),0,1)
+   if sid in ('b','c'):gain*=np.clip(clock-(1.5 if sid=='b' else 3.5),0,1)
+   out[begin:end]+=signal*gain[:,None]
+  return out
+ cases=[];images={};inputs={};baseline_control=None
+ scenarios=['trim','partial','reverse','double','curve','curve-reverse','grandparent','child-alpha','parent-opacity','twice']
+ specs=[(f'C{i+1:02}',scenario,'dissolve') for i,scenario in enumerate(scenarios)]
+ specs += [(f'N{i+1:02}','curve-reverse',kind) for i,kind in enumerate(TYPES)]
+ for cid,scenario,kind in specs:
+  project=work/cid;shutil.copytree(base,project);p=parent(scenario);save(project/'project.json',p)
+  if cid.startswith('C'):
+   in_rgb,in_pcm,input_record=render(project,cid+'-input');inputs[scenario]=(in_rgb,in_pcm,input_record)
+   if cid=='C01':
+    old_rgb,old_pcm,old_record=render(project,'fixed-v35-no-transition',baseline=True)
+    assert np.array_equal(in_rgb,old_rgb) and np.array_equal(in_pcm,old_pcm)
+    baseline_control={'rgb_pcm_exact':True,'fixed':old_record,'current':input_record}
+  else:in_rgb,in_pcm,input_record=inputs[scenario]
+  original_tracks=copy.deepcopy(p['sequences']);add(project,kind)
+  authored=json.loads((project/'project.json').read_text(encoding='utf-8'))
+  for a,b in zip(original_tracks,authored['sequences']):assert a['tracks']==b['tracks'] and a['duration_tick']==b['duration_tick']
+  save(output/(cid+'-project.json'),authored)
+  cli('validate','--project',project,'--strict-rights');cli('policy','audit','--project',project)
+  actual,audio,record=render(project,cid+'-actual');t,source,selected=positions(scenario)
+  reference=references[kind][0][selected].astype(float)
+  analytic=independent[selected] if kind in ('dissolve','crossfade') else None
+  if scenario=='parent-opacity':
+   factor=(.4+t*.1)[:,None,None,None];reference*=factor
+   if analytic is not None:analytic=analytic*factor
+  if scenario=='child-alpha':
+   reference=references[kind][0][selected]*.5+source_rgb['a'][:len(t)]*.5
+   analytic=independent[selected]*.5+source_rgb['a'][:len(t)]*.5
+  error=float(np.abs(actual.astype(float)-reference).max());assert error<=4,(cid,error)
+  independent_error=float(np.abs(actual.astype(float)-analytic).max()) if analytic is not None else None
+  assert independent_error is None or independent_error<=4,(cid,independent_error)
+  expected=independent_pcm(scenario);audio_error=float(np.abs(audio-expected).max()) if expected is not None else None
+  assert audio_error is None or audio_error<=3e-7,(cid,audio_error)
+  assert len(audio)==round(len(t)/FPS*SR) and np.isfinite(audio).all()
+  manifest=record['manifest'];surfaces=[v for v in manifest['inputs'] if v.get('kind')=='sequence-inline-surface']
+  assert surfaces and all(v['intermediate_files']==0 for v in surfaces)
+  assert not any('__inline' in str(v) for v in manifest['command'] if isinstance(v,str) and Path(v).suffix in ('.mp4','.mkv','.wav'))
+  record.pop('manifest')
+  save(output/(cid+'-verification.json'),{'id':cid,'scenario':scenario,'transition_type':kind,'frames':len(t),
+       'sample_frames':len(audio),'fixed_child_mapped_rgb_max_error':error,'independent_rgb_max_error':independent_error,
+       'independent_pcm_max_error':audio_error,'inputs_preview':input_record['preview'],'render':record,
+       'rgb_sha256':digest(actual.tobytes()),'pcm_sha256':digest(audio.tobytes()),'intermediate_files':0})
+  cases.append(json.loads((output/(cid+'-verification.json')).read_text(encoding='utf-8')))
+  if cid in ('C01','C03','C05','C08'):
+   ref=np.rint(analytic if analytic is not None else reference).clip(0,255).astype(np.uint8)
+   encode(output/(cid+'-reference.mp4'),ref);images[cid]=(in_rgb.copy(),actual.copy(),ref)
+  if cid in ('C01','C03'):shutil.copyfile(record['local_mkv'],output/(cid+'-actual.mkv'))
+  print(json.dumps({'id':cid,'frames':len(t),'rgb_max':error,'pcm_max':audio_error}),flush=True)
+ # The old version rejects the newly supported composition. Keep that proof
+ # distinct from its accepted direct-child and no-transition controls.
+ failure=cli('render','--project',work/'C01','--dry-run',baseline=True,expected=2)
+ save(output/'fixed-v35-nested-rejection.json',failure)
+ rejection_project=work/'reject-budget';shutil.copytree(work/'C01',rejection_project)
+ p=json.loads((rejection_project/'project.json').read_text(encoding='utf-8'))
+ p['settings']['sequence_sampling']={'max_working_bytes':W*H*16+1};save(rejection_project/'project.json',p)
+ failure=cli('render','--project',rejection_project,'--dry-run',expected=2)
+ assert failure['errors'][0]['code']=='SEQUENCE_INLINE_BUDGET_EXCEEDED';save(output/'budget-rejection.json',failure)
+ comparison=np.concatenate([np.concatenate(images[cid],axis=2) for cid in ('C01','C03','C05','C08')],axis=1)
+ encode(output/'comparison.mp4',comparison)
+ ff(['-i',output/'comparison.mp4','-vf','fps=5,split[a][b];[a]palettegen[p];[b][p]paletteuse','-loop',0,output/'comparison.gif'])
+ for k in (0,20,39):Image.fromarray(comparison[k]).save(output/f'comparison-{k:02}.png')
+ with Image.open(output/'comparison.gif') as gif:
+  gif_info={'frames':gif.n_frames,'width':gif.width,'height':gif.height,
+            'duration_ms':sum((gif.seek(i) or gif.info.get('duration',0)) for i in range(gif.n_frames))}
+ save(output/'cli-calls.json',calls)
+ with zipfile.ZipFile(output/'cli-logs.zip','w',compression=zipfile.ZIP_DEFLATED) as z:
+  for path in sorted(work.glob('*.log')):z.write(path,path.name)
+ after=frozen();assert before==after
+ assert old_hashes=={p.relative_to(old).as_posix():sha(p) for p in old.rglob('*') if p.is_file()}
+ files={p.relative_to(output).as_posix():{'bytes':p.stat().st_size,'sha256':sha(p)} for p in sorted(output.rglob('*')) if p.is_file()}
+ record={'at_utc':datetime.now(timezone.utc).isoformat(),'frozen_before':before,'frozen_after':after,'frozen_equal':True,
+         'baseline_source':old_hashes,'baseline_source_unchanged':True,'baseline_control':baseline_control,
+         'cases':cases,'new_output_frames':sum(c['frames'] for c in cases),
+         'new_output_sample_frames':sum(c['sample_frames'] for c in cases),'case_count':len(cases),
+         'fixed_child_reference_cases':12,'fixed_child_reference_frames':720,
+         'current_no_transition_input_frames':sum(len(v[0]) for v in inputs.values()),'gif':gif_info,
+         'cli_count':len(calls),'cli_success':sum(c['exit_code']==0 for c in calls),'expected_rejections':sum(c['exit_code']!=0 for c in calls),
+         'files':files,'continuous_playback_reviewed':False,'audio_listened':False,'new_model_inference':0,'browser_invocations':0,
+         'limits':['wipe-slide inside-window art/algorithm acceptance uses the fixed child renderer, not independent image semantics',
+                   'curved/constant-speed atempo audio is checked for duration/finiteness only, no independent pitch/phase/listening acceptance',
+                   'controlled CFR/encoded RGB/short clips; no natural ad, HDR/VFR, long-form RSS or complete CapCut parity acceptance']}
+ save(output/'verification.json',record)
+ print(json.dumps({k:record[k] for k in ('case_count','new_output_frames','new_output_sample_frames','cli_count','cli_success','expected_rejections','gif')},indent=2))
+
+if __name__=='__main__':
+ parser=argparse.ArgumentParser(description=__doc__)
+ parser.add_argument('--output',type=Path,required=True);parser.add_argument('--work',type=Path,required=True)
+ args=parser.parse_args();run(args.output.resolve(),args.work.resolve())

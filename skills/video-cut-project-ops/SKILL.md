@@ -12,6 +12,14 @@ expected hash; replay the same idempotency request without reapplying it.
 Remove the declaration to restore source ranges; no clip restoration journal
 is needed. Native JSON/package preserve it; external formats report
 `sequence.source_transitions` as Unsupported and strict export rejects.
+For [transitioned nested sources](../../docs/specs/嵌套转场合成与作者时钟契约_v0.1_2026-10-18.md),
+keep author declarations and references in snapshots/native packages. Internal
+video surfaces exist only in the detached render graph; do not register,
+relink, package or add rights entries for synthetic surface IDs. Original
+media and model dependencies still gate publication. Child warnings propagate
+with `inline_sequence_path`. Queue render/dry-run use the existing sampling
+quota plus recursive surface/projection charges and preserve explicit
+`SEQUENCE_INLINE_BUDGET_EXCEEDED` errors. This is not a total RAM guarantee.
 
 For [linked edits](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md),
 dry-run is read-only. Formal `timeline edit` makes a before-timeline-edit

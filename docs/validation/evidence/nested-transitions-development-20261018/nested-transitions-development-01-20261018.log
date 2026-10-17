@@ -1,0 +1,26 @@
+test_frozen_ancestor_remains_an_explicit_rejection (test_nested_transitions.InlineSequencePlanningTests.test_frozen_ancestor_remains_an_explicit_rejection) ... ok
+test_namespace_preserves_quoted_text_and_escaped_brackets (test_nested_transitions.InlineSequencePlanningTests.test_namespace_preserves_quoted_text_and_escaped_brackets) ... ok
+test_reachable_transition_branches_and_cycles (test_nested_transitions.InlineSequencePlanningTests.test_reachable_transition_branches_and_cycles) ... ok
+test_surface_and_child_projection_charges_are_cumulative (test_nested_transitions.InlineSequencePlanningTests.test_surface_and_child_projection_charges_are_cumulative) ... ok
+test_combined_surface_budget_rejects_before_render_job (test_nested_transitions.NestedTransitionCliTests.test_combined_surface_budget_rejects_before_render_job) ... ok
+test_graph_planning_does_not_run_processes_or_modify_author_data (test_nested_transitions.NestedTransitionCliTests.test_graph_planning_does_not_run_processes_or_modify_author_data) ... ok
+test_parent_double_speed_selects_completed_child_frames (test_nested_transitions.NestedTransitionCliTests.test_parent_double_speed_selects_completed_child_frames) ... ok
+test_parent_nonlinear_curve_retimes_the_composite_not_crossfade_endpoints (test_nested_transitions.NestedTransitionCliTests.test_parent_nonlinear_curve_retimes_the_composite_not_crossfade_endpoints) ... ok
+test_parent_reverse_reverses_completed_transition_pixels (test_nested_transitions.NestedTransitionCliTests.test_parent_reverse_reverses_completed_transition_pixels) ... ok
+test_same_child_twice_uses_independent_frame_windows (test_nested_transitions.NestedTransitionCliTests.test_same_child_twice_uses_independent_frame_windows) ... ok
+test_trim_entering_the_middle_of_a_transition_keeps_original_progress (test_nested_transitions.NestedTransitionCliTests.test_trim_entering_the_middle_of_a_transition_keeps_original_progress) ... ok
+test_trimmed_parent_preserves_two_authored_transition_windows (test_nested_transitions.NestedTransitionCliTests.test_trimmed_parent_preserves_two_authored_transition_windows) ... FAIL
+
+======================================================================
+FAIL: test_trimmed_parent_preserves_two_authored_transition_windows (test_nested_transitions.NestedTransitionCliTests.test_trimmed_parent_preserves_two_authored_transition_windows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 100, in test_trimmed_parent_preserves_two_authored_transition_windows
+    self.assertEqual(before,(self.root/'project.json').read_bytes())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\n[201 chars]6:20:29.388459Z",\n    "creator": "ai-ad-edito[10220 chars]n}\n' != b'{\n[201 chars]6:20:30.195375Z",\n    "creator": "ai-ad-edito[11454 chars]n}\n'
+
+----------------------------------------------------------------------
+Ran 12 tests in 7.229s
+
+FAILED (failures=1)

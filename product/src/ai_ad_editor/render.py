@@ -22,6 +22,7 @@ from .artifact_locks import verification_scope
 from .sequence_canvas import sequence_canvas, validate_output_alignment
 from .sequence_sampling import configuration as _sequence_sampling_configuration, projection_budget, area_rectangle
 from .source_transitions import compile_for_render as _compile_source_transitions
+from .inline_sequences import prepare as _prepare_inline_sequences, budget as _inline_sequence_budget
 
 from .errors import AppError, dependency_error
 from .media import ffmpeg_path, probe_media
@@ -2259,6 +2260,7 @@ def _flatten_sequence_tracks(
     in different coordinate spaces remain explicit approximation warnings.
     """
     sequences = {str(item.get("id")): item for item in project.get("sequences", []) if item.get("id")}
+    inline_asset_ids = {a['id'] for a in project.get('assets', []) if a.get('_inline_video')}
     collected: dict[tuple[str, str], dict[str, Any]] = {}
 
     def transform_values(raw: Any) -> dict[str, float]:
@@ -2427,6 +2429,7 @@ def _flatten_sequence_tracks(
         clock_maps: list[dict[str, Any]] | None = None,
         group_id: str | None = None,
         audio_enabled: bool = True,
+        video_enabled: bool = True,
     ) -> None:
         current_id = str(current.get("id"))
         if current_id in stack:
@@ -2435,6 +2438,23 @@ def _flatten_sequence_tracks(
         window_start, window_end = source_window
         clock_maps = clock_maps or []
         tps_local = int(project.get('settings', {}).get('timebase', {}).get('ticks_per_second', 90000))
+        if video_enabled and current.get('_inline_video_asset_id'):
+            reserved = set(sequences) | set(stack)
+            reserved.update(str(t.get('id')) for t in current.get('tracks', []))
+            reserved.update(str(c.get('id')) for t in current.get('tracks', []) for c in t.get('clips', []))
+            def internal_id(base):
+                while base in reserved:
+                    base += '_'
+                reserved.add(base)
+                return base
+            surface = {'id': internal_id(current_id+'__surface'), 'duration_tick':current['duration_tick'], 'tracks':[
+                {'id':internal_id('__surface_video'),'kind':'video','order':0,'clips':[
+                    {'id':internal_id('__surface_picture'),'asset_id':current['_inline_video_asset_id'],
+                     'timeline_start_tick':0,'duration_tick':current['duration_tick'],
+                     'source_in_tick':0,'source_out_tick':current['duration_tick']}]}]}
+            visit(surface, origin_tick, scale, source_window, prefix, stack, inherited,
+                  reverse_time, time_mapper, clock_maps, group_id, False, True)
+            video_enabled = False
 
         def current_to_final(tick: float) -> float:
             if clock_maps:
@@ -2475,6 +2495,8 @@ def _flatten_sequence_tracks(
                 },
             )
             for clip in sorted(track.get("clips", []), key=lambda item: int(item.get("timeline_start_tick", 0))):
+                if not video_enabled and kind != 'audio' and not clip.get('sequence_id'):
+                    continue
                 clip_start = int(clip.get("timeline_start_tick", 0))
                 clip_end = clip_start + int(clip.get("duration_tick", 0))
                 overlap_start = max(clip_start, window_start)
@@ -2549,6 +2571,7 @@ def _flatten_sequence_tracks(
                                 'layer_order': len(groups), 'clip': group_clip,
                                 'canvas': sequence_canvas(project, child),
                                 'parent_canvas': sequence_canvas(project, current),
+                                'video_enabled': video_enabled,
                             }
                         parent_context = {}
                     else:
@@ -2623,6 +2646,7 @@ def _flatten_sequence_tracks(
                             [clip_clock, *clock_maps],
                             child_group_id,
                             track_audio_enabled and not (clip_audio.get('mute') or clip_audio.get('muted')),
+                            video_enabled,
                         )
                     continue
                 child_clip = copy.deepcopy(clip)
@@ -2630,6 +2654,12 @@ def _flatten_sequence_tracks(
                 child_clip["timeline_start_tick"] = mapped_start
                 child_clip["duration_tick"] = mapped_duration
                 child_clip['_audio_scope_enabled'] = bool(track_audio_enabled)
+                source_handle = clip.get('_source_handle')
+                authored_start_tick = source_handle['authored_start_tick'] if source_handle else clip_start
+                if source_handle and clock_maps:
+                    child_clip['_nested_keyframe_clock'] = {'maps':copy.deepcopy(clock_maps),
+                                                           'authored_start':authored_start_tick/tps_local}
+                    child_clip['_source_envelope_clock'] = {'maps':copy.deepcopy(clock_maps)}
                 if clock_maps and (clip.get('subtitle') or kind == 'subtitle'):
                     child_clip['_nested_subtitle_clock'] = _make_subtitle_clock(
                         clip, clock_maps, tps_local, reverse=reverse_time,
@@ -2640,7 +2670,11 @@ def _flatten_sequence_tracks(
                 leaf_segments = _speed_curve_segments(clip, leaf_span_tick, tps_local)
                 nonlinear_nested = bool(clock_maps) and bool(leaf_segments or any(item['segments'] for item in clock_maps))
                 nonlinear_nested = nonlinear_nested or bool(getattr(leaf_segments, 'certificate', {}).get('adaptive'))
-                exact_nested = nonlinear_nested and not clip.get('freeze')
+                # Even a constant-speed composed surface needs the precise
+                # clock path. Dividing its coarse 1/fps PTS directly makes
+                # adjacent frames collide, advancing 2x playback by one frame.
+                exact_nested = (nonlinear_nested or bool(clock_maps and (
+                    source_handle or clip.get('asset_id') in inline_asset_ids))) and not clip.get('freeze')
                 if nonlinear_nested and clip.get('freeze'):
                     warnings.append({'code': 'RENDER_FEATURE_APPROXIMATE', 'clip_id': clip.get('id'),
                                      'feature': 'nested_sequence_freeze_clock',
@@ -2664,7 +2698,7 @@ def _flatten_sequence_tracks(
                         if exact_nested:
                             mapped_track['_nested_clock'] = {
                                 'maps': copy.deepcopy(clock_maps),
-                                'authored_start': clip_start / tps_local,
+                                'authored_start': authored_start_tick / tps_local,
                                 'keyframes': copy.deepcopy(track_value.get('keyframes', [])),
                             }
                         for keyframe_value in track_value.get("keyframes", []):
@@ -2672,7 +2706,7 @@ def _flatten_sequence_tracks(
                                 continue
                             mapped_keyframe = copy.deepcopy(keyframe_value)
                             local_at = _num(keyframe_value.get("at_tick", 0), 0.0)
-                            final_at = current_to_final(clip_start + local_at)
+                            final_at = current_to_final((authored_start_tick if clock_maps else clip_start) + local_at)
                             mapped_keyframe["at_tick"] = int(round(final_at - mapped_start))
                             if reverse_time:
                                 _reverse_keyframe_controls(mapped_keyframe)
@@ -2699,7 +2733,7 @@ def _flatten_sequence_tracks(
                     child_clip['source_out_tick'] = max(child_clip['source_in_tick'] + 1, int(round(max(source_bounds) * tps_local)))
                     child_clip['_nested_time_maps'] = [leaf_clock, *copy.deepcopy(clock_maps)]
                     child_clip['_nested_keyframe_clock'] = {
-                        'maps': copy.deepcopy(clock_maps), 'authored_start': clip_start / tps_local,
+                        'maps': copy.deepcopy(clock_maps), 'authored_start': authored_start_tick / tps_local,
                     }
                     child_clip['reverse'] = bool(reverse_time) ^ bool(clip.get('reverse'))
                     child_clip['speed'] = (child_clip['source_out_tick'] - child_clip['source_in_tick']) / mapped_duration
@@ -3252,6 +3286,8 @@ def _build_compositing_tree(
     # Children were registered after their parents. Reverse insertion order
     # is a postorder even when a temporal window revisits an existing group.
     for ordinal, group in reversed(list(enumerate(groups.values()))):
+        if not group.get('video_enabled', True):
+            continue
         group_id = group['id']
         source_canvas, parent_canvas = group['canvas'], group['parent_canvas']
         prefix = f'group{ordinal}_'
@@ -3578,7 +3614,8 @@ def _build_audio_bus_tree(
     return root_bus
 
 
-def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, Any]) -> tuple[list[str], str, list[dict[str, Any]], list[dict[str, Any]]]:
+def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, Any], *, _video_only: bool = False,
+                       _inline_stack: tuple[str, ...] = ()) -> tuple[list[str], str, list[dict[str, Any]], list[dict[str, Any]]]:
     if any(c.get('tracking_binding') for s in project.get('sequences',[]) for t in s.get('tracks',[]) for c in t.get('clips',[])):
         from .bindings import compile_project_bindings,validate_project_bindings
         findings = validate_project_bindings(project,root)
@@ -3587,6 +3624,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         project = compile_project_bindings(project)
         sequence = next(s for s in project['sequences'] if s['id'] == sequence['id'])
     project, sequence, source_transition_plan = _compile_source_transitions(project, sequence['id'])
+    project, sequence, inline_inputs, inline_filters, inline_meta = _prepare_inline_sequences(
+        root, project, sequence, build_filter_graph, stack=_inline_stack)
     settings = project["settings"]
     tps = int(settings["timebase"]["ticks_per_second"])
     root_canvas = sequence_canvas(project, sequence)
@@ -3600,16 +3639,20 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     transparent_canvas = str(raw_video_output.get("pixel_format", "")).lower() in ALPHA_OUTPUT_PIXEL_FORMATS
     color_tone_map = str((settings.get("color") or {}).get("tone_map", (settings.get("color") or {}).get("tone_mapping", "none"))).lower() if isinstance(settings.get("color"), dict) else "none"
     assets = asset_map(project)
-    inputs: list[str] = []
-    filters: list[str] = []
+    inputs: list[str] = list(inline_inputs)
+    filters: list[str] = list(inline_filters)
     video_labels: list[str] = []
     video_positions: list[str] = []
     video_specs: list[dict[str, Any]] = []
     audio_specs: list[dict[str, Any]] = []
-    input_meta: list[dict[str, Any]] = []
+    input_meta: list[dict[str, Any]] = list(inline_meta)
     if source_transition_plan:
         input_meta.append({'kind': 'source-transition-plan', **source_transition_plan})
     warnings: list[dict[str, Any]] = []
+    for surface in inline_meta:
+        for finding in surface.get('warnings', []):
+            warnings.append({**finding, 'inline_sequence_path':[
+                surface['sequence_id'], *finding.get('inline_sequence_path', [])]})
     subtitle_overlays: list[dict[str, Any]] = []
     adjustment_layers: list[tuple[str, list[Any], float, float]] = []
     raw_adjustments = settings.get("adjustments")
@@ -3634,13 +3677,30 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 end = duration if duration_tick <= 0 else min(duration, start + _sec(duration_tick, tps))
                 adjustment_layers.append((str(raw_layer.get("id", layer_id)), effects, start, end))
     has_adjustments = bool(adjustment_layers)
-    index = 0
+    index = physical_index = inputs.count('-i')
     composite_groups: dict[str, dict[str, Any]] = {}
     render_tracks = _flatten_sequence_tracks(project, sequence, warnings, groups=composite_groups)
     sampling_config = _sequence_sampling_configuration(settings.get('sequence_sampling'))
-    input_meta.append(projection_budget(composite_groups, sampling_config))
+    projection = projection_budget({k:g for k,g in composite_groups.items() if g.get('video_enabled',True)}, sampling_config)
+    input_meta.append(projection)
+    if inline_meta:
+        input_meta.append(_inline_sequence_budget(inline_meta, projection, sampling_config))
+    surface_labels = {}
+    for asset_id, asset in assets.items():
+        if not asset.get('_inline_video'):
+            continue
+        count = sum(c.get('asset_id') == asset_id for t in render_tracks for c in t.get('clips', []))
+        source_label = asset['_inline_video']['label']
+        if count:
+            labels = [f'{source_label}_use{i}' for i in range(count)]
+            filters.append(f'[{source_label}]split={count}'+''.join(f'[{label}]' for label in labels))
+            surface_labels[asset_id] = labels
+        else:
+            filters.append(f'[{source_label}]nullsink')
     local_audio_engine = _audio_stretch_configuration(root, settings.get('audio_stretch'))
     for track in sorted(render_tracks, key=lambda item: int(item.get("order", 0))):
+        if _video_only and track.get('kind') == 'audio':
+            continue
         track_audio = track.get("audio") if isinstance(track.get("audio"), dict) else {}
         track_id = str(track.get("id"))
         if track.get("muted"):
@@ -3695,17 +3755,26 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 for keyframe in keyframe_track.get("keyframes", []):
                     if keyframe.get("interpolation") == "bezier" and not isinstance(keyframe.get("control_points"), list):
                         warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip.get("id"), "feature": "bezier_keyframe", "message": "Bezier 关键帧未提供控制点，使用默认三次曲线控制点"})
-            uri = Path(str(asset["uri"]))
-            if not uri.is_absolute():
-                uri = root / uri
-            if not uri.exists():
-                raise AppError("ASSET_FILE_MISSING", f"渲染输入不存在: {uri}", exit_code=3, path=str(uri))
+            inline_surface = asset.get('_inline_video')
+            uri = None if inline_surface else Path(str(asset["uri"]))
+            if uri is not None:
+                if not uri.is_absolute():
+                    uri = root / uri
+                if not uri.exists():
+                    raise AppError("ASSET_FILE_MISSING", f"渲染输入不存在: {uri}", exit_code=3, path=str(uri))
+            source_index = physical_index
             kind = asset.get("kind", "video")
             if kind in {"video", "image"} and track.get("kind") == "video":
-                if kind == "image":
+                if inline_surface:
+                    video_input = '['+surface_labels[asset['id']].pop(0)+']'
+                elif kind == "image":
                     inputs.extend(["-loop", "1", "-i", str(uri)])
+                    physical_index += 1
                 else:
                     inputs.extend(["-i", str(uri)])
+                    physical_index += 1
+                if not inline_surface:
+                    video_input = f'[{source_index}:v]'
                 src_in = _sec(int(clip.get("source_in_tick", 0)), tps)
                 src_out = _sec(int(clip.get("source_out_tick", clip.get("duration_tick", 1))), tps)
                 start = _sec(int(clip.get("timeline_start_tick", 0)), tps)
@@ -3722,7 +3791,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 else:
                     setpts = f"setpts=(PTS-STARTPTS)/{speed:.8f}+{start:.6f}/TB" if abs(speed - 1.0) > 1e-9 else f"setpts=PTS-STARTPTS+{start:.6f}/TB"
                 transforms = _transform_exprs(clip, start, tps)
-                chain = [f"[{index}:v]trim=start={src_in:.6f}:end={src_out:.6f}"]
+                chain = [f"{video_input}trim=start={src_in:.6f}:end={src_out:.6f}"]
                 nested_maps = clip.get('_nested_time_maps')
                 if isinstance(nested_maps, list) and nested_maps:
                     source_probe = asset.get('probe', {}).get('video', {})
@@ -3743,7 +3812,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     first_source_frame = math.floor(Fraction(int(clip.get('source_in_tick', 0)), tps) * nominal_fps)
                     end_source_frame = math.ceil(Fraction(int(clip.get('source_out_tick', 1)), tps) * nominal_fps)
                     source_frame_count = end_source_frame - first_source_frame
-                    chain = [f'[{index}:v]fps={nominal_value}:start_time=0:round=up:eof_action=pass',
+                    chain = [f'{video_input}fps={nominal_value}:start_time=0:round=up:eof_action=pass',
                              f'trim=start_pts={first_source_frame}:end_pts={end_source_frame}']
                     reverse_source = bool(clip.get('reverse'))
                     first_source_time, eof_source_time = (src_out, src_in) if reverse_source else (src_in, src_out)
@@ -3786,7 +3855,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     # AVTB expression rounding must not reveal an early frame
                     # or leak a held endpoint into a later timeline gap.
                     chain.append(f'trim=start_pts={first_output_frame}:end_pts={end_output_frame}')
-                if kind == "video" and color_tone_map not in {"", "none"}:
+                if kind == "video" and not inline_surface and color_tone_map not in {"", "none"}:
                     chain.extend(_tone_map_filters(settings, warnings, str(clip.get("id")), transparent=transparent_canvas))
                 crop = clip.get("crop") if isinstance(clip.get("crop"), dict) else {}
                 crop_fit = str(crop.get("fit", crop.get("mode", "fit"))).lower()
@@ -3965,7 +4034,9 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     "outgoing": outgoing,
                     "blend": clip.get("blend"),
                 })
-                input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "input": index, "kind": "video", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
+                input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "input": None if inline_surface else source_index, "kind": "video", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
+                if inline_surface:
+                    input_meta[-1]['inline_sequence_id'] = inline_surface['sequence_id']
                 if subtitle:
                     input_meta[-1]['subtitle_time_mapping'] = copy.deepcopy(subtitle_clock)
                 if nested_maps:
@@ -3981,6 +4052,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     warnings.append({"code": "AUDIO_STREAM_MISSING", "clip_id": clip.get("id"), "message": "音频轨道引用的素材没有音频流，已跳过"})
                     continue
                 inputs.extend(["-i", str(uri)])
+                physical_index += 1
                 src_in = _sec(int(clip.get("source_in_tick", 0)), tps)
                 src_out = _sec(int(clip.get("source_out_tick", clip.get("duration_tick", 1))), tps)
                 label = f"a{index}"
@@ -4011,7 +4083,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     audio_stretch_job = _plan_audio_stretch(root, local_audio_engine, asset, uri, src_in, src_out,
                                                             audio_parts, target_duration, bool(clip.get('reverse')))
                     inputs[-1] = audio_stretch_job['output']
-                    audio_chain = [f'[{index}:a]anull']
+                    audio_chain = [f'[{source_index}:a]anull']
                     if bool(clip.get('reverse')):
                         audio_chain.append('areverse')
                     warnings.append({'code':'RENDER_FEATURE_APPROXIMATE','clip_id':clip.get('id'),
@@ -4035,7 +4107,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                                                                channels=max(1,int((asset.get('probe',{}).get('audio') or {}).get('channels',2))))
                     split_labels = [f"asplit{index}_{part_index}" for part_index in range(len(audio_parts))]
                     filters.append(
-                        f"[{index}:a]aresample=48000,aformat=sample_fmts=flt,atrim=start_sample={source_start_sample}:end_sample={source_end_sample},asetpts=N/SR/TB,"
+                        f"[{source_index}:a]aresample=48000,aformat=sample_fmts=flt,atrim=start_sample={source_start_sample}:end_sample={source_end_sample},asetpts=N/SR/TB,"
                         f"asplit={len(split_labels)}" + "".join(f"[{label}]" for label in split_labels)
                     )
                     part_labels: list[str] = []
@@ -4059,10 +4131,13 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     if bool(clip.get("reverse")):
                         concat_chain += ",areverse"
                     filters.append(f"{concat_chain}[{speed_label}]")
-                    audio_chain = [f"[{speed_label}]aresample=48000"]
+                    # concat uses a microsecond timebase. After areverse the
+                    # inherited timestamps need not describe sample positions;
+                    # automation must see the continuous local sample clock.
+                    audio_chain = [f"[{speed_label}]aresample=48000", "asetpts=N/SR/TB"]
                     warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip.get("id"), "feature": "audio_speed_curve_piecewise", "message": "音频速度曲线按带选区内上下文的短段 atempo 近似，末段按真实伸缩末端选取；累计采样锚点对齐，局部时序、段间相位、瞬态、极短选区与听感仍须独立核验；输出不足仍可能补静音"})
                 else:
-                    audio_chain = [f"[{index}:a]atrim=start={src_in:.6f}:end={src_out:.6f}", "asetpts=PTS-STARTPTS", "aresample=48000"]
+                    audio_chain = [f"[{source_index}:a]atrim=start={src_in:.6f}:end={src_out:.6f}", "asetpts=PTS-STARTPTS", "aresample=48000"]
                     if bool(clip.get("reverse")):
                         audio_chain.append("areverse")
                     if abs(speed - 1.0) > 1e-9:
@@ -4091,7 +4166,11 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 elif freeze_duration > 0:
                     audio_chain.append(f"apad=pad_dur={freeze_duration:.6f}")
                 source_handle = clip.get('_source_handle')
-                fade_clock = ('t' if not source_handle else f'(t-{source_handle["head_tick"]/tps:.12f})')
+                envelope_clock = clip.get('_source_envelope_clock')
+                source_author_time = (_clock_expression(envelope_clock['maps'], f'(t+{int(clip["timeline_start_tick"])/tps:.12f})', inverse=True)
+                                      if envelope_clock else None)
+                fade_clock = (f'({source_author_time}-{source_handle["authored_start_tick"]/tps:.12f})' if source_author_time
+                              else 't' if not source_handle else f'(t-{source_handle["head_tick"]/tps:.12f})')
                 authored_audio_duration = (content_duration+freeze_duration if not source_handle
                                            else source_handle['authored_duration_tick']/tps)
                 audio_chain.extend(_audio_processing_filters(
@@ -4100,7 +4179,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 ))
                 for envelope in clip.get('_source_audio_envelopes', []):
                     local_start = (envelope['start_tick']-int(clip['timeline_start_tick']))/tps
-                    progress = f'clip((t-{local_start:.12f})/{envelope["duration_tick"]/tps:.12f},0,1)'
+                    progress = (f'clip(({source_author_time}-{envelope["start_tick"]/tps:.12f})/{envelope["duration_tick"]/tps:.12f},0,1)' if source_author_time
+                                else f'clip((t-{local_start:.12f})/{envelope["duration_tick"]/tps:.12f},0,1)')
                     gain = progress if envelope['edge'] == 'in' else f'(1-({progress}))'
                     audio_chain.append(f"aeval=exprs={_expr_arg('val(ch)*('+gain+')')}:c=same")
                 audio_samples = max(1, math.ceil(Fraction((int(clip.get('timeline_start_tick', 0))+int(clip.get('duration_tick', 1)))*48000,tps))-math.ceil(Fraction(int(clip.get('timeline_start_tick', 0))*48000,tps)))
@@ -4110,7 +4190,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 filters.append(",".join(audio_chain) + f"[{label}]")
                 audio_specs.append({'label':label,'group_id':clip.get('_composite_group'),
                                     'track_id':track_id,'clip_id':clip.get('id'),'audio':copy.deepcopy(audio_settings)})
-                input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "track_id": track_id, "input": index, "kind": "audio", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
+                input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "track_id": track_id, "input": source_index, "kind": "audio", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
                 input_meta[-1].update(timeline_start_sample=audio_start_sample,duration_samples=audio_samples,
                                       sample_rate=48000,group_id=clip.get('_composite_group'))
                 if audio_stretch_job:
@@ -4133,7 +4213,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                                                             'tempo_windows': len(audio_parts), 'sample_rate': 48000,
                                                             'audio_tempo': 'offline-r3-time-map' if audio_stretch_job else 'piecewise-source-context-integrated-boundaries'}
                 index += 1
-    if not video_labels and not subtitle_overlays:
+    if not video_labels and not subtitle_overlays and not _video_only:
         raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
     width, height = root_canvas['width'], root_canvas['height']
     subtitle_specs = [

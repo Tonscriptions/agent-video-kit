@@ -23,7 +23,16 @@ copy, supports nonintersecting cut chains, and multiplies separate linked-audio
 envelopes. Review `audio=none` when intentionally omitting linkage. Locked audio,
 source shortfall and stale/deleted cut references reject. Native black/white
 dips reach that color at the original cut; legacy auto_handle still reports
-its tail-clone approximation. First-version exclusions are in the contract.
+its tail-clone approximation. Endpoint exclusions remain in that contract.
+For parent use of a transitioned child, read the
+[nested transition contract](../../docs/specs/嵌套转场合成与作者时钟契约_v0.1_2026-10-18.md).
+Add declarations with `--sequence-id <child>`. The complete transparent child
+is composed before ancestor trimming, reversal, constant/curved retiming and
+spatial projection. Do not move transition starts to a parent's trim window.
+Audio retains original source leaves and buses; reverse envelopes use the
+continuous child author clock. Inspect `sequence-inline-surface` and
+`sequence-inline-budget`, including child warnings. Ancestor freeze and
+container/curved/frozen/tracked/blended cut endpoints remain rejected.
 
 Use the [linked edit planner](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md)
 for link/unlink/remove/close_gap/close_gaps/shift on whole clips. Configure

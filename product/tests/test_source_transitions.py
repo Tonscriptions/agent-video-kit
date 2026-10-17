@@ -193,10 +193,12 @@ class SourceTransitionPlannerTests(unittest.TestCase):
         p['sequences'][0]['tracks'][0]['clips'][0]['transition_out'] = {'type': 'fade'}
         self.rejects(p, add(), 'SOURCE_TRANSITION_EDGE_CONFLICT')
 
-    def test_nested_use_of_transition_sequence_rejects(self):
+    def test_nested_use_of_transition_sequence_keeps_original_declaration(self):
         p = fixture()
         p['sequences'].append({'id': 'parent', 'tracks': [{'id': 'pt', 'clips': [{'id': 'pc', 'sequence_id': 'seq'}]}]})
-        self.rejects(p, add(), 'SOURCE_TRANSITION_SCOPE_UNSUPPORTED')
+        changed, _ = self.plan(p, add())
+        self.assertEqual(changed['sequences'][1], p['sequences'][1])
+        self.assertEqual(changed['sequences'][0]['tracks'], p['sequences'][0]['tracks'])
 
     def test_global_duplicate_id_and_missing_reference_reject(self):
         self.rejects(fixture(), add(id='main'), 'SOURCE_TRANSITION_ID_DUPLICATE')
@@ -218,9 +220,9 @@ class SourceTransitionPlannerTests(unittest.TestCase):
             self.plan(fixture(), add())
 
 
-def raw_source(path, phase=0, *, width=W, height=H, frames=80):
+def raw_source(path, phase=0, *, width=W, height=H, frames=80, step=2):
     """Analytic grayscale source: frame index is visible in each pixel."""
-    values = (32+((np.arange(frames)+phase)*2)%190).astype('uint8')
+    values = (32+((np.arange(frames)+phase)*step)%190).astype('uint8')
     rgb = np.broadcast_to(values[:, None, None, None], (frames, height, width, 3)).copy()
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24',
                     '-s', f'{width}x{height}', '-r', str(FPS), '-i', 'pipe:0', '-an', '-c:v', 'ffv1',

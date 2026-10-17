@@ -1,0 +1,27 @@
+{
+  "ok": false,
+  "command": "render",
+  "request_id": "req_20261017165829_86ef2603",
+  "operation_id": null,
+  "status": "failed",
+  "data": {},
+  "artifacts": [],
+  "warnings": [],
+  "errors": [
+    {
+      "code": "SEQUENCE_INLINE_BUDGET_EXCEEDED",
+      "message": "嵌套转场合成与投影工作栅格超过显式配额",
+      "path": "settings.sequence_sampling.max_working_bytes",
+      "retryable": false,
+      "cause": "{\"kind\": \"sequence-inline-budget\", \"estimated_working_bytes\": 3133440, \"max_working_bytes\": 2611201, \"scope\": \"reachable-inline-surfaces-and-sequence-projection-not-process-rss\", \"intermediate_files\": 0, \"time_disjoint_instances_charged\": true}"
+    }
+  ],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "schema_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "started_at": "2026-10-17T16:58:29.597115Z",
+    "finished_at": "2026-10-17T16:58:29.597121Z",
+    "network": "disabled"
+  }
+}

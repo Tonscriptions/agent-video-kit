@@ -1,0 +1,1121 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "id": "proj_20261017165304_ad716ed6",
+    "name": "base-project",
+    "created_at": "2026-10-17T16:53:04.259730Z",
+    "updated_at": "2026-10-17T16:54:41.921474Z",
+    "creator": "ai-ad-editor",
+    "source_revision": "local"
+  },
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 10,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 240,
+      "height": 136,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "video_a",
+      "kind": "video",
+      "uri": "assets/video_a_source-a.mp4",
+      "sha256": "sha256:6d36606b4b7520184fd8170db52e55c9d0c4e9571255ca5cc3577f9ae62def95",
+      "probe": {
+        "duration_seconds": 8.0,
+        "duration_tick": 720000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High 4:4:4 Predictive",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.f4000b",
+            "width": 240,
+            "height": 136,
+            "coded_width": 240,
+            "coded_height": 136,
+            "has_b_frames": 0,
+            "pix_fmt": "gbrp",
+            "level": 11,
+            "color_range": "pc",
+            "color_space": "gbr",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "10/1",
+            "avg_frame_rate": "10/1",
+            "time_base": "1/10240",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 81920,
+            "duration": "8.000000",
+            "bit_rate": "196723",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "80",
+            "extradata_size": 47,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264rgb"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 240,
+          "height": 136,
+          "pix_fmt": "gbrp",
+          "fps": "10/1",
+          "color_space": "gbr",
+          "duration_seconds": 8.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "video_a",
+      "source": {
+        "source_url": "self-authored-procedural-fixture",
+        "retrieved_at": "2026-10-17T16:53:05.150606Z",
+        "original_name": "source-a.mp4"
+      }
+    },
+    {
+      "id": "audio_a",
+      "kind": "audio",
+      "uri": "assets/audio_a_sound-a.wav",
+      "sha256": "sha256:884246144dbfc307f8bbc984de9a3ef1380669442894b08528113a9168c6198c",
+      "probe": {
+        "duration_seconds": 8.0,
+        "duration_tick": 720000,
+        "format": "wav",
+        "format_long_name": "WAV / WAVE (Waveform Audio)",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "pcm_s16le",
+            "codec_long_name": "PCM signed 16-bit little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[1][0][0][0]",
+            "codec_tag": "0x0001",
+            "sample_fmt": "s16",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 16,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "duration_ts": 384000,
+            "duration": "8.000000",
+            "bit_rate": "1536000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            }
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_s16le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 8.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "audio_a",
+      "source": {
+        "source_url": "self-authored-procedural-fixture",
+        "retrieved_at": "2026-10-17T16:53:06.086989Z",
+        "original_name": "sound-a.wav"
+      }
+    },
+    {
+      "id": "video_b",
+      "kind": "video",
+      "uri": "assets/video_b_source-b.mp4",
+      "sha256": "sha256:989d53fae14a209b3aa522772a2be31e68e0abfa5234a6a406916079dc8b513a",
+      "probe": {
+        "duration_seconds": 8.0,
+        "duration_tick": 720000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High 4:4:4 Predictive",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.f4000b",
+            "width": 240,
+            "height": 136,
+            "coded_width": 240,
+            "coded_height": 136,
+            "has_b_frames": 0,
+            "pix_fmt": "gbrp",
+            "level": 11,
+            "color_range": "pc",
+            "color_space": "gbr",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "10/1",
+            "avg_frame_rate": "10/1",
+            "time_base": "1/10240",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 81920,
+            "duration": "8.000000",
+            "bit_rate": "189435",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "80",
+            "extradata_size": 47,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264rgb"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 240,
+          "height": 136,
+          "pix_fmt": "gbrp",
+          "fps": "10/1",
+          "color_space": "gbr",
+          "duration_seconds": 8.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "video_b",
+      "source": {
+        "source_url": "self-authored-procedural-fixture",
+        "retrieved_at": "2026-10-17T16:53:07.019399Z",
+        "original_name": "source-b.mp4"
+      }
+    },
+    {
+      "id": "audio_b",
+      "kind": "audio",
+      "uri": "assets/audio_b_sound-b.wav",
+      "sha256": "sha256:75fcc7bc833ec241d1a653e8e59d64a40b8bcaf03e8760f16c3d7866e1d60b94",
+      "probe": {
+        "duration_seconds": 8.0,
+        "duration_tick": 720000,
+        "format": "wav",
+        "format_long_name": "WAV / WAVE (Waveform Audio)",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "pcm_s16le",
+            "codec_long_name": "PCM signed 16-bit little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[1][0][0][0]",
+            "codec_tag": "0x0001",
+            "sample_fmt": "s16",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 16,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "duration_ts": 384000,
+            "duration": "8.000000",
+            "bit_rate": "1536000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            }
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_s16le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 8.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "audio_b",
+      "source": {
+        "source_url": "self-authored-procedural-fixture",
+        "retrieved_at": "2026-10-17T16:53:07.959239Z",
+        "original_name": "sound-b.wav"
+      }
+    },
+    {
+      "id": "video_c",
+      "kind": "video",
+      "uri": "assets/video_c_source-c.mp4",
+      "sha256": "sha256:72d595fdd83d7dc5fb28382639464950e57fc85e8144180b4ba262aae5031910",
+      "probe": {
+        "duration_seconds": 8.0,
+        "duration_tick": 720000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High 4:4:4 Predictive",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.f4000b",
+            "width": 240,
+            "height": 136,
+            "coded_width": 240,
+            "coded_height": 136,
+            "has_b_frames": 0,
+            "pix_fmt": "gbrp",
+            "level": 11,
+            "color_range": "pc",
+            "color_space": "gbr",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "10/1",
+            "avg_frame_rate": "10/1",
+            "time_base": "1/10240",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 81920,
+            "duration": "8.000000",
+            "bit_rate": "164736",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "80",
+            "extradata_size": 47,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264rgb"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 240,
+          "height": 136,
+          "pix_fmt": "gbrp",
+          "fps": "10/1",
+          "color_space": "gbr",
+          "duration_seconds": 8.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "video_c",
+      "source": {
+        "source_url": "self-authored-procedural-fixture",
+        "retrieved_at": "2026-10-17T16:53:08.920899Z",
+        "original_name": "source-c.mp4"
+      }
+    },
+    {
+      "id": "audio_c",
+      "kind": "audio",
+      "uri": "assets/audio_c_sound-c.wav",
+      "sha256": "sha256:54bab663f050db5ff15e33540e32a8a4c92264cb930ff458ae5e81dc09a3d0ce",
+      "probe": {
+        "duration_seconds": 8.0,
+        "duration_tick": 720000,
+        "format": "wav",
+        "format_long_name": "WAV / WAVE (Waveform Audio)",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "pcm_s16le",
+            "codec_long_name": "PCM signed 16-bit little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[1][0][0][0]",
+            "codec_tag": "0x0001",
+            "sample_fmt": "s16",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 16,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "duration_ts": 384000,
+            "duration": "8.000000",
+            "bit_rate": "1536000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            }
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_s16le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 8.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "audio_c",
+      "source": {
+        "source_url": "self-authored-procedural-fixture",
+        "retrieved_at": "2026-10-17T16:53:10.040273Z",
+        "original_name": "sound-c.wav"
+      }
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq_main",
+      "name": "partial",
+      "duration_tick": 180000,
+      "tracks": [
+        {
+          "id": "parent_video",
+          "kind": "video",
+          "order": 1,
+          "clips": [
+            {
+              "id": "parent_clip",
+              "sequence_id": "child",
+              "timeline_start_tick": 0,
+              "duration_tick": 180000,
+              "source_in_tick": 189000,
+              "source_out_tick": 369000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "child",
+      "name": "Main",
+      "duration_tick": 540000,
+      "tracks": [
+        {
+          "id": "video_track",
+          "kind": "video",
+          "order": 0,
+          "clips": [
+            {
+              "id": "video_a_clip",
+              "asset_id": "video_a",
+              "link_id": "group_a",
+              "timeline_start_tick": 0,
+              "duration_tick": 180000,
+              "source_in_tick": 180000,
+              "source_out_tick": 360000
+            },
+            {
+              "id": "video_b_clip",
+              "asset_id": "video_b",
+              "link_id": "group_b",
+              "timeline_start_tick": 180000,
+              "duration_tick": 180000,
+              "source_in_tick": 180000,
+              "source_out_tick": 360000
+            },
+            {
+              "id": "video_c_clip",
+              "asset_id": "video_c",
+              "link_id": "group_c",
+              "timeline_start_tick": 360000,
+              "duration_tick": 180000,
+              "source_in_tick": 180000,
+              "source_out_tick": 360000
+            }
+          ]
+        },
+        {
+          "id": "audio_track",
+          "kind": "audio",
+          "order": 1,
+          "clips": [
+            {
+              "id": "audio_a_clip",
+              "asset_id": "audio_a",
+              "link_id": "group_a",
+              "timeline_start_tick": 0,
+              "duration_tick": 180000,
+              "source_in_tick": 180000,
+              "source_out_tick": 360000
+            },
+            {
+              "id": "audio_b_clip",
+              "asset_id": "audio_b",
+              "link_id": "group_b",
+              "timeline_start_tick": 180000,
+              "duration_tick": 180000,
+              "source_in_tick": 180000,
+              "source_out_tick": 360000
+            },
+            {
+              "id": "audio_c_clip",
+              "asset_id": "audio_c",
+              "link_id": "group_c",
+              "timeline_start_tick": 360000,
+              "duration_tick": 180000,
+              "source_in_tick": 180000,
+              "source_out_tick": 360000
+            }
+          ]
+        }
+      ],
+      "markers": [],
+      "source_transitions": [
+        {
+          "id": "tr_ab",
+          "type": "dissolve",
+          "duration_tick": 90000,
+          "from_clip_id": "video_a_clip",
+          "to_clip_id": "video_b_clip",
+          "audio_pairs": [
+            {
+              "from_clip_id": "audio_a_clip",
+              "to_clip_id": "audio_b_clip"
+            }
+          ]
+        },
+        {
+          "id": "tr_bc",
+          "type": "dissolve",
+          "duration_tick": 90000,
+          "from_clip_id": "video_b_clip",
+          "to_clip_id": "video_c_clip",
+          "audio_pairs": [
+            {
+              "from_clip_id": "audio_b_clip",
+              "to_clip_id": "audio_c_clip"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "templates": [],
+  "outputs": [
+    {
+      "id": "output_20261017165438_c9a1b25a",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\nested-transitions-smoke-20261018\\C02\\renders\\C02-input.mkv",
+      "container": "mkv",
+      "profile": null,
+      "canvas": {
+        "width": 240,
+        "height": 136,
+        "pixel_aspect": {
+          "num": 1,
+          "den": 1
+        }
+      },
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "pcm_f32le",
+        "bitrate": "192k"
+      },
+      "target_platform": "generic"
+    }
+  ],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "model_versions": [],
+    "input_hashes": [],
+    "change_log": [
+      {
+        "operation_id": "op_20261017165305_08e9236b",
+        "command": "media.ingest",
+        "asset_id": "video_a",
+        "at": "2026-10-17T16:53:05.151053Z"
+      },
+      {
+        "operation_id": "op_20261017165306_5d073f76",
+        "command": "media.ingest",
+        "asset_id": "audio_a",
+        "at": "2026-10-17T16:53:06.087406Z"
+      },
+      {
+        "operation_id": "op_20261017165307_e6ede1a2",
+        "command": "media.ingest",
+        "asset_id": "video_b",
+        "at": "2026-10-17T16:53:07.019853Z"
+      },
+      {
+        "operation_id": "op_20261017165307_a58841e4",
+        "command": "media.ingest",
+        "asset_id": "audio_b",
+        "at": "2026-10-17T16:53:07.959843Z"
+      },
+      {
+        "operation_id": "op_20261017165308_5e8053c3",
+        "command": "media.ingest",
+        "asset_id": "video_c",
+        "at": "2026-10-17T16:53:08.921648Z"
+      },
+      {
+        "operation_id": "op_20261017165310_6d27e782",
+        "command": "media.ingest",
+        "asset_id": "audio_c",
+        "at": "2026-10-17T16:53:10.040796Z"
+      },
+      {
+        "command": "render",
+        "at": "2026-10-17T16:54:38.407097Z",
+        "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\nested-transitions-smoke-20261018\\C02\\renders\\C02-input.mkv",
+        "manifest": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\nested-transitions-smoke-20261018\\C02\\renders\\C02-input.mkv.manifest.json"
+      },
+      {
+        "operation_id": "op_20261017165440_1d5b666f",
+        "command": "timeline.transition",
+        "created_at": "2026-10-17T16:54:40.234686Z",
+        "before_snapshot_id": "snap_20261017165440_cd209824",
+        "plan": {
+          "engine": "agent-source-transition-v1",
+          "action": "add",
+          "transition_id": "tr_ab",
+          "project_sha256": "sha256:4bafc80d1e2d9e136737f721b4cb5bb6b314f306f2d1f808e9bbe833056596ed",
+          "sequence_id": "child",
+          "before": null,
+          "after": {
+            "id": "tr_ab",
+            "type": "dissolve",
+            "duration_tick": 90000,
+            "from_clip_id": "video_a_clip",
+            "to_clip_id": "video_b_clip",
+            "audio_pairs": [
+              {
+                "from_clip_id": "audio_a_clip",
+                "to_clip_id": "audio_b_clip"
+              }
+            ]
+          },
+          "affected_clip_ids": [
+            "video_a_clip",
+            "video_b_clip",
+            "audio_a_clip",
+            "audio_b_clip"
+          ],
+          "authored_clips_unchanged": true,
+          "sequence_duration_tick": 540000,
+          "render_plan": {
+            "engine": "agent-source-transition-v1",
+            "transitions": [
+              {
+                "id": "tr_ab",
+                "type": "dissolve",
+                "duration_tick": 90000,
+                "from_clip_id": "video_a_clip",
+                "to_clip_id": "video_b_clip",
+                "audio_pairs": [
+                  {
+                    "from_clip_id": "audio_a_clip",
+                    "to_clip_id": "audio_b_clip"
+                  }
+                ],
+                "cut_tick": 180000,
+                "start_tick": 135000,
+                "end_tick": 225000,
+                "pre_tick": 45000,
+                "post_tick": 45000,
+                "xfade": "fade",
+                "pairs": [
+                  [
+                    "video_a_clip",
+                    "video_b_clip",
+                    "video"
+                  ],
+                  [
+                    "audio_a_clip",
+                    "audio_b_clip",
+                    "audio"
+                  ]
+                ]
+              }
+            ],
+            "handles": [
+              {
+                "clip_id": "audio_a_clip",
+                "track_id": "audio_track",
+                "head_tick": 0,
+                "tail_tick": 45000,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 180000,
+                "timeline_start_tick": 0,
+                "duration_tick": 225000,
+                "source_in_tick": 180000,
+                "source_out_tick": 405000,
+                "authored_source_in_tick": 180000,
+                "authored_source_out_tick": 360000,
+                "reverse": false,
+                "speed": "1"
+              },
+              {
+                "clip_id": "audio_b_clip",
+                "track_id": "audio_track",
+                "head_tick": 45000,
+                "tail_tick": 0,
+                "authored_start_tick": 180000,
+                "authored_duration_tick": 180000,
+                "timeline_start_tick": 135000,
+                "duration_tick": 225000,
+                "source_in_tick": 135000,
+                "source_out_tick": 360000,
+                "authored_source_in_tick": 180000,
+                "authored_source_out_tick": 360000,
+                "reverse": false,
+                "speed": "1"
+              },
+              {
+                "clip_id": "video_a_clip",
+                "track_id": "video_track",
+                "head_tick": 0,
+                "tail_tick": 45000,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 180000,
+                "timeline_start_tick": 0,
+                "duration_tick": 225000,
+                "source_in_tick": 180000,
+                "source_out_tick": 405000,
+                "authored_source_in_tick": 180000,
+                "authored_source_out_tick": 360000,
+                "reverse": false,
+                "speed": "1"
+              },
+              {
+                "clip_id": "video_b_clip",
+                "track_id": "video_track",
+                "head_tick": 45000,
+                "tail_tick": 0,
+                "authored_start_tick": 180000,
+                "authored_duration_tick": 180000,
+                "timeline_start_tick": 135000,
+                "duration_tick": 225000,
+                "source_in_tick": 135000,
+                "source_out_tick": 360000,
+                "authored_source_in_tick": 180000,
+                "authored_source_out_tick": 360000,
+                "reverse": false,
+                "speed": "1"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "operation_id": "op_20261017165441_e0090335",
+        "command": "timeline.transition",
+        "created_at": "2026-10-17T16:54:41.921332Z",
+        "before_snapshot_id": "snap_20261017165441_6816073f",
+        "plan": {
+          "engine": "agent-source-transition-v1",
+          "action": "add",
+          "transition_id": "tr_bc",
+          "project_sha256": "sha256:bffa30cfc2cb014035a4a03ea9948e5b8b7a7a11841f2fa71fac1c2a2de21e45",
+          "sequence_id": "child",
+          "before": null,
+          "after": {
+            "id": "tr_bc",
+            "type": "dissolve",
+            "duration_tick": 90000,
+            "from_clip_id": "video_b_clip",
+            "to_clip_id": "video_c_clip",
+            "audio_pairs": [
+              {
+                "from_clip_id": "audio_b_clip",
+                "to_clip_id": "audio_c_clip"
+              }
+            ]
+          },
+          "affected_clip_ids": [
+            "video_b_clip",
+            "video_c_clip",
+            "audio_b_clip",
+            "audio_c_clip"
+          ],
+          "authored_clips_unchanged": true,
+          "sequence_duration_tick": 540000,
+          "render_plan": {
+            "engine": "agent-source-transition-v1",
+            "transitions": [
+              {
+                "id": "tr_ab",
+                "type": "dissolve",
+                "duration_tick": 90000,
+                "from_clip_id": "video_a_clip",
+                "to_clip_id": "video_b_clip",
+                "audio_pairs": [
+                  {
+                    "from_clip_id": "audio_a_clip",
+                    "to_clip_id": "audio_b_clip"
+                  }
+                ],
+                "cut_tick": 180000,
+                "start_tick": 135000,
+                "end_tick": 225000,
+                "pre_tick": 45000,
+                "post_tick": 45000,
+                "xfade": "fade",
+                "pairs": [
+                  [
+                    "video_a_clip",
+                    "video_b_clip",
+                    "video"
+                  ],
+                  [
+                    "audio_a_clip",
+                    "audio_b_clip",
+                    "audio"
+                  ]
+                ]
+              },
+              {
+                "id": "tr_bc",
+                "type": "dissolve",
+                "duration_tick": 90000,
+                "from_clip_id": "video_b_clip",
+                "to_clip_id": "video_c_clip",
+                "audio_pairs": [
+                  {
+                    "from_clip_id": "audio_b_clip",
+                    "to_clip_id": "audio_c_clip"
+                  }
+                ],
+                "cut_tick": 360000,
+                "start_tick": 315000,
+                "end_tick": 405000,
+                "pre_tick": 45000,
+                "post_tick": 45000,
+                "xfade": "fade",
+                "pairs": [
+                  [
+                    "video_b_clip",
+                    "video_c_clip",
+                    "video"
+                  ],
+                  [
+                    "audio_b_clip",
+                    "audio_c_clip",
+                    "audio"
+                  ]
+                ]
+              }
+            ],
+            "handles": [
+              {
+                "clip_id": "audio_a_clip",
+                "track_id": "audio_track",
+                "head_tick": 0,
+                "tail_tick": 45000,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 180000,
+                "timeline_start_tick": 0,
+                "duration_tick": 225000,
+                "source_in_tick": 180000,
+                "source_out_tick": 405000,
+                "authored_source_in_tick": 180000,
+                "authored_source_out_tick": 360000,
+                "reverse": false,
+                "speed": "1"
+              },
+              {
+                "clip_id": "audio_b_clip",
+                "track_id": "audio_track",
+                "head_tick": 45000,
+                "tail_tick": 45000,
+                "authored_start_tick": 180000,
+                "authored_duration_tick": 180000,
+                "timeline_start_tick": 135000,
+                "duration_tick": 270000,
+                "source_in_tick": 135000,
+                "source_out_tick": 405000,
+                "authored_source_in_tick": 180000,
+                "authored_source_out_tick": 360000,
+                "reverse": false,
+                "speed": "1"
+              },
+              {
+                "clip_id": "audio_c_clip",
+                "track_id": "audio_track",
+                "head_tick": 45000,
+                "tail_tick": 0,
+                "authored_start_tick": 360000,
+                "authored_duration_tick": 180000,
+                "timeline_start_tick": 315000,
+                "duration_tick": 225000,
+                "source_in_tick": 135000,
+                "source_out_tick": 360000,
+                "authored_source_in_tick": 180000,
+                "authored_source_out_tick": 360000,
+                "reverse": false,
+                "speed": "1"
+              },
+              {
+                "clip_id": "video_a_clip",
+                "track_id": "video_track",
+                "head_tick": 0,
+                "tail_tick": 45000,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 180000,
+                "timeline_start_tick": 0,
+                "duration_tick": 225000,
+                "source_in_tick": 180000,
+                "source_out_tick": 405000,
+                "authored_source_in_tick": 180000,
+                "authored_source_out_tick": 360000,
+                "reverse": false,
+                "speed": "1"
+              },
+              {
+                "clip_id": "video_b_clip",
+                "track_id": "video_track",
+                "head_tick": 45000,
+                "tail_tick": 45000,
+                "authored_start_tick": 180000,
+                "authored_duration_tick": 180000,
+                "timeline_start_tick": 135000,
+                "duration_tick": 270000,
+                "source_in_tick": 135000,
+                "source_out_tick": 405000,
+                "authored_source_in_tick": 180000,
+                "authored_source_out_tick": 360000,
+                "reverse": false,
+                "speed": "1"
+              },
+              {
+                "clip_id": "video_c_clip",
+                "track_id": "video_track",
+                "head_tick": 45000,
+                "tail_tick": 0,
+                "authored_start_tick": 360000,
+                "authored_duration_tick": 180000,
+                "timeline_start_tick": 315000,
+                "duration_tick": 225000,
+                "source_in_tick": 135000,
+                "source_out_tick": 360000,
+                "authored_source_in_tick": 180000,
+                "authored_source_out_tick": 360000,
+                "reverse": false,
+                "speed": "1"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

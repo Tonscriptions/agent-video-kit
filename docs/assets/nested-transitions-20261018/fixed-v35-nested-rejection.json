@@ -1,0 +1,27 @@
+{
+  "ok": false,
+  "command": "render",
+  "request_id": "req_20261017165828_fc3f3b8b",
+  "operation_id": null,
+  "status": "failed",
+  "data": {},
+  "artifacts": [],
+  "warnings": [],
+  "errors": [
+    {
+      "code": "PROJECT_INVALID",
+      "message": "项目验证失败，拒绝渲染",
+      "path": null,
+      "retryable": false,
+      "cause": "{\"ok\": false, \"errors\": [{\"code\": \"SOURCE_TRANSITION_SCOPE_UNSUPPORTED\", \"message\": \"含真实句柄转场的序列暂不能作为嵌套源\", \"path\": \"sequences[1].source_transitions\", \"retryable\": false}], \"warnings\": [{\"code\": \"SCHEMA_EXECUTOR_UNAVAILABLE\", \"message\": \"未安装 jsonschema，已使用内置语义校验\", \"path\": \"schema\"}], \"rights\": {\"ok\": true, \"target\": \"commercial_ad\", \"checked\": 6, \"required_records\": 6, \"failures\": [], \"warnings\": [], \"disposition_decisions\": [], \"effective_disposition_decisions\": []}, \"schema_engine\": \"builtin\", \"asset_count\": 6, \"sequence_count\": 2}"
+    }
+  ],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "schema_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "started_at": "2026-10-17T16:58:28.741781Z",
+    "finished_at": "2026-10-17T16:58:28.741787Z",
+    "network": "disabled"
+  }
+}

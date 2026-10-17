@@ -13,6 +13,16 @@ an independently mixed envelope; AAC/GIF are preview copies. Inspect the
 actual black/white dip at the authored cut, including odd frame windows.
 Passing a catalog render checks execution, not an independent inside-window
 reference for every wipe/slide, natural quality, HDR or listening acceptance.
+For [nested transitions](../../docs/specs/嵌套转场合成与作者时钟契约_v0.1_2026-10-18.md),
+use high-contrast frame identities to catch one-frame shifts hidden by RGB
+rounding tolerances. Check the completed child picture against independent
+parent time math; a fixed child renderer is a compatibility reference, not an
+independent oracle for each wipe/slide algorithm. Compare original-source PCM
+and envelopes on the continuous child clock, keeping raw-sample reversal
+distinct from envelope evaluation. Constant/curved atempo and registered R3
+duration checks do not prove pitch, phase or listening quality. Preserve
+`inline_sequence_path` warnings. The combined surface/projection admission
+quota is not a process RSS limit; internal surfaces are not intermediate files.
 
 For [subtitle segmentation](../../docs/specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md),
 check source character coverage, displayed punctuation, line-bound clocks,

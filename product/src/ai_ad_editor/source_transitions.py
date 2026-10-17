@@ -115,11 +115,16 @@ def analyze(project, sequence):
         fail('SOURCE_TRANSITION_INVALID', 'source_transitions 必须是最多 256 项的数组')
     if not declarations:
         return {'engine': ENGINE, 'transitions': [], 'handles': []}
-    # A nonlinear parent changes the crossfade clock itself. Do not silently
-    # flatten these declarations through an unaccepted ancestor time mapping.
-    if any(c.get('sequence_id') == sequence['id'] for s in project.get('sequences', [])
-           for t in s.get('tracks', []) for c in t.get('clips', [])):
-        fail('SOURCE_TRANSITION_SCOPE_UNSUPPORTED', '含真实句柄转场的序列暂不能作为嵌套源')
+    ancestors = {sequence['id']}
+    while True:
+        parents = [(s, c) for s in project.get('sequences', []) for t in s.get('tracks', [])
+                   for c in t.get('clips', []) if c.get('sequence_id') in ancestors]
+        if any(c.get('freeze') for _, c in parents):
+            fail('SOURCE_TRANSITION_SCOPE_UNSUPPORTED', '嵌套转场的父级定格联合时钟尚未验收')
+        expanded = ancestors | {s['id'] for s, _ in parents}
+        if expanded == ancestors:
+            break
+        ancestors = expanded
     index, assets, frame = _index(sequence), {a['id']: a for a in project.get('assets', [])}, _frame_tick(project)
     used_ids = {v['id'] for s in project.get('sequences', []) for v in [s, *s.get('tracks', []),
                 *(c for t in s.get('tracks', []) for c in t.get('clips', []))]}

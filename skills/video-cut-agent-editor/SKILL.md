@@ -12,8 +12,14 @@ Use `timeline transition --input <request.json> --dry-run` with add/resize/remov
 The plan's `project_sha256` can bind formal application. Inspect actual source
 head/tail ticks and frozen linked audio pairs. Clips, cut and sequence length
 stay authored; short handles reject rather than clone a frame. The first
-version requires direct local video, exact frame/tick grids and constant speed;
-nested/curve/freeze/tracking/blend cases explicitly reject. Preserve those errors.
+version requires direct local video endpoints, exact frame/tick grids and
+constant leaf speed; endpoint containers/curves/freeze/tracking/blend reject.
+For using a transitioned child in a parent, read the
+[nested transition contract](../../docs/specs/嵌套转场合成与作者时钟契约_v0.1_2026-10-18.md).
+Parent trim/reverse/constant speed/curves operate on the completed native
+child surface in the same FFmpeg graph. Keep original-source audio, scoped
+`inline_sequence_path` warnings and the combined projection/surface quota.
+Ancestor freeze still rejects. Preserve these explicit boundary errors.
 
 For readable subtitle segments or local piece corrections, read the
 [subtitle segmentation contract](../../docs/specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md).

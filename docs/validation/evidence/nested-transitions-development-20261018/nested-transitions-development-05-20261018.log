@@ -1,0 +1,759 @@
+test_internal_surface_ids_do_not_collide_with_authored_sequence_or_audio_ids (test_nested_transitions.NestedTransitionCliTests.test_internal_surface_ids_do_not_collide_with_authored_sequence_or_audio_ids) ... ERROR
+test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) ... 
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='dissolve') ... ERROR
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='crossfade') ... ERROR
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='dip_black') ... ERROR
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='dip_white') ... ERROR
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='wipe_left') ... ERROR
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='wipe_right') ... ERROR
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='wipe_up') ... ERROR
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='wipe_down') ... ERROR
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='slide_left') ... ERROR
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='slide_right') ... ERROR
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='slide_up') ... ERROR
+  test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='slide_down') ... ERROR
+
+======================================================================
+ERROR: test_internal_surface_ids_do_not_collide_with_authored_sequence_or_audio_ids (test_nested_transitions.NestedTransitionCliTests.test_internal_surface_ids_do_not_collide_with_authored_sequence_or_audio_ids)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 238, in test_internal_surface_ids_do_not_collide_with_authored_sequence_or_audio_ids
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,p['sequences'][0])
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3622, in build_filter_graph
+    project, sequence, inline_inputs, inline_filters, inline_meta = _prepare_inline_sequences(
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, project, sequence, build_filter_graph, stack=_inline_stack)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\inline_sequences.py", line 85, in prepare
+    child_inputs, graph, child_meta, warnings = build_graph(
+                                                ~~~~~~~~~~~^
+        root, child_project, child, _video_only=True, _inline_stack=(*stack,sequence['id']))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3621, in build_filter_graph
+    project, sequence, source_transition_plan = _compile_source_transitions(project, sequence['id'])
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\source_transitions.py", line 282, in compile_for_render
+    plan = analyze(project, sequence)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\source_transitions.py", line 171, in analyze
+    a, b = identifier(pair['from_clip_id']), identifier(pair['to_clip_id'])
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\source_transitions.py", line 31, in identifier
+    fail('SOURCE_TRANSITION_INVALID', '转场/片段 ID 无效')
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\source_transitions.py", line 26, in fail
+    raise AppError(code, message, exit_code=2, path=path)
+ai_ad_editor.errors.AppError: 转场/片段 ID 无效
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='dissolve')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='crossfade')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='dip_black')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='dip_white')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='wipe_left')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='wipe_right')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='wipe_up')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='wipe_down')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='slide_left')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='slide_right')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='slide_up')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent (test_nested_transitions.NestedTransitionCliTests.test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent) (kind='slide_down')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2179, in _parse_known_args
+    start_index = consume_optional(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2017, in consume_optional
+    raise ArgumentError(None, msg % args)
+argparse.ArgumentError: ambiguous option: --sequence could match --sequence-id, --sequence-sampling, --sequence-memory-mib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_transitions.py", line 253, in test_all_transition_types_keep_child_pixels_under_reverse_nonlinear_parent
+    code,result=base_tests.invoke('render','--project',str(self.root),'--sequence','child',
+                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--output',str(output),'--container','mkv','--crf','0','--pixel-format','yuv444p','--audio-codec','pcm_f32le')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_source_transitions.py", line 54, in invoke
+    code = main(list(argv))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6188, in main
+    args = parser.parse_args(argv)
+  File "C:\Python313\Lib\argparse.py", line 1889, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1928, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2160, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "C:\Python313\Lib\argparse.py", line 2135, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2004, in take_action
+    action(self, namespace, argument_values, option_string)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1255, in __call__
+    subnamespace, arg_strings = subparser.parse_known_args(arg_strings, None)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1899, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 1930, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2645, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\argparse.py", line 2632, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.458s
+
+FAILED (errors=13)

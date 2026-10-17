@@ -1,0 +1,134 @@
+{
+  "reason": "C04 public counter fixture exposed a real one-source-frame advance at parent constant speed 2; prior adjacent gray frames differed by only 2 and passed tolerance 3",
+  "actual_exception": "AssertionError: ('C04', 243.0)",
+  "full_run_interrupted": true,
+  "interruption_reason": "confirmed product bug from concurrently completed public smoke; preserve partial full run and rerun after fix",
+  "full_not_counted_as_pass": true,
+  "checks_not_yet_reached": [
+    "public C05 onward",
+    "combined budget harness uses an incorrect 16-byte quota and needs 80-byte root projection + 1"
+  ],
+  "files": {
+    "C04-before.mkv": {
+      "bytes": 779833,
+      "sha256": "sha256:2cfda66c41f493e799ed32123e7f2831dc695bf287ad1ab47d66db2b56a0431b"
+    },
+    "C04-fixed-child.mkv": {
+      "bytes": 2331106,
+      "sha256": "sha256:361c0de7f5b16b2f147ac50838907ed930e7a585a655c191dfbd3e4b3aa0e36f"
+    },
+    "C04-time-diagnostic.json": {
+      "bytes": 23324,
+      "sha256": "sha256:24f5aa99d7653b09625f0d50cb44cf2b6e1d16a59e4a43ba6f77a15360f040fc"
+    },
+    "nested-transitions-development-01-20261018.log": {
+      "bytes": 3094,
+      "sha256": "sha256:f2b9bbdb6e35480195e38d4a09f561046d910e19b1e59f9b1f16df2b6fec058a"
+    },
+    "nested-transitions-development-02-20261018.log": {
+      "bytes": 12382,
+      "sha256": "sha256:0a85c7f2993444dfc005831b302fbab36a7653795e3c4d3133c94a63d4efb73a"
+    },
+    "nested-transitions-development-03-20261018.log": {
+      "bytes": 8606,
+      "sha256": "sha256:654e066786de23c4bab1b072fbe666fa390550583fed4963d8ef7ef71197f448"
+    },
+    "nested-transitions-development-04-20261018.log": {
+      "bytes": 6414,
+      "sha256": "sha256:1543eb5cf1181b8726c382bea2264ea8449e804130b52414232fc3b40edf501c"
+    },
+    "nested-transitions-development-05-20261018.log": {
+      "bytes": 52799,
+      "sha256": "sha256:2ff4c8bb1737e58487b61affb6661145edb42201884b3a855094b46a92cdffd7"
+    },
+    "nested-transitions-development-06-20261018.log": {
+      "bytes": 520,
+      "sha256": "sha256:450ebc51ebe9321294bcd9af56d80a4bf6ec049012c1b495413f31bb4e302880"
+    },
+    "nested-transitions-full-20261018.json": {
+      "bytes": 31142,
+      "sha256": "sha256:cf61d37506a126b30f32c92b82062e0c0e9a2aae2311ce53069c37d08b08a366"
+    },
+    "nested-transitions-full-20261018.log": {
+      "bytes": 31743,
+      "sha256": "sha256:2b744af32482ca0b8542b7ad97c9181d99fe06578457c39a878d0a810168717b"
+    },
+    "render.py.before.py.txt": {
+      "bytes": 278252,
+      "sha256": "sha256:ca55279e357e9532f0089d77fc2ca268db25921705db32f4ea2d02f804488138"
+    },
+    "smoke-first-cli-logs.zip": {
+      "bytes": 170605,
+      "sha256": "sha256:a5f6c354d82a2414ffd28efb7b28349561d2905a26252c7e4d24e6e510173131"
+    },
+    "smoke-first.py.txt": {
+      "bytes": 19289,
+      "sha256": "sha256:8366822a37b74ff4df79b4b826c348947e7905142e11414c1b464b35a5f99dae"
+    },
+    "source-before-verification.json": {
+      "bytes": 931,
+      "sha256": "sha256:935ae2958117af07f08dfd4279a84bd8ceca6613a96bb6153e3248e73d7d617e"
+    },
+    "test_nested_transitions.py.before.py.txt": {
+      "bytes": 15383,
+      "sha256": "sha256:ea8ae31b2d9867896a1dea0414c64a24aa633128b09b0ad5bc20e2cbac1b33ba"
+    },
+    "test_source_transitions.py.before.py.txt": {
+      "bytes": 25828,
+      "sha256": "sha256:fe7ce8b49f9f11f90b621d9a77390df839104b68082ecc351c2e26be68f5f69b"
+    },
+    "wheel-first-logs.zip": {
+      "bytes": 28908,
+      "sha256": "sha256:d2009d849aa41c01af0662bf2501672d1494127e0e44d624d1b0746dd6f6707c"
+    },
+    "wheel-first.py.txt": {
+      "bytes": 6713,
+      "sha256": "sha256:376be2f6c8fcb20b31c5c77963f12c2f642a722a84555ddf01b4d923533c0b70"
+    }
+  },
+  "wheel_first_failure": {
+    "code": "SOURCE_TRANSITION_WINDOW",
+    "fixture_duration_tick": 180000,
+    "actual_clip_duration_tick": 180000,
+    "corrected_duration_tick": 135000,
+    "product_change_needed": false
+  },
+  "development_runs": [
+    {
+      "log": "nested-transitions-development-01-20261018.log",
+      "methods": 12,
+      "suite_seconds": 7.229,
+      "summary": "FAILED (failures=1)"
+    },
+    {
+      "log": "nested-transitions-development-02-20261018.log",
+      "methods": 49,
+      "suite_seconds": 28.942,
+      "summary": "FAILED (failures=3)"
+    },
+    {
+      "log": "nested-transitions-development-03-20261018.log",
+      "methods": 49,
+      "suite_seconds": 29.139,
+      "summary": "OK"
+    },
+    {
+      "log": "nested-transitions-development-04-20261018.log",
+      "methods": 20,
+      "suite_seconds": 16.413,
+      "summary": "FAILED (errors=1)"
+    },
+    {
+      "log": "nested-transitions-development-05-20261018.log",
+      "methods": 2,
+      "suite_seconds": 1.458,
+      "summary": "FAILED (errors=13)"
+    },
+    {
+      "log": "nested-transitions-development-06-20261018.log",
+      "methods": 2,
+      "suite_seconds": 29.474,
+      "summary": "OK"
+    }
+  ]
+}
