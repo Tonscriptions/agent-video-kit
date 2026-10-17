@@ -228,3 +228,26 @@ failing pitch and mono compatibility. Preserve these failures and the explicit
 `stereo_phase_accepted: false` boundary; do not infer acceptance from automatic
 quality CLI success. Link original WAV/video, both actual modes, GIF and hashes
 from the numbered README verification row.
+
+For [hierarchical audio buses](../../docs/specs/分层音频总线与采样包络契约_v0.1_2026-10-17.md),
+decode lossless float32 MKV and compare every stereo sample with an independently
+authored sum/envelope. Test group/track compression against an independently
+pre-summed PCM input to native FFmpeg; that proves processing placement, not the
+compressor algorithm or perceptual quality. AAC previews are lossy playback
+artifacts and must not serve as sample-equality references.
+
+Check additive mixing, silent extra inputs, nested gain, sample fades, one-tick
+placement, local solo, audio-only mute, effect tails and multiple detector
+branches. Recheck old/new video pixels when changing audio. Inspect manifest
+sample windows and `automatic_limiter: false`; super-unit float peaks require
+their own delivery/headroom decision. The root sample count uses the declared
+duration convention; a correct container length alone proves no content timing.
+
+Keep nonlinear retimer quality separate from the gain clock: compare an
+enveloped output with the same retimed plain control times an independent
+inverse-clock envelope. Preserve the DC amplitude/literal-silence failure in the
+plain control. The old R3 ultra-short pitch and apart antiphase failures also
+remain open. Publish original WAV/video, old/new lossless files, reference WAV,
+actual decoded waveform GIF, complete sample metrics, hashes and raw failures
+in the numbered README row; static waveform inspection does not establish
+continuous playback, natural-audio quality or listening acceptance.

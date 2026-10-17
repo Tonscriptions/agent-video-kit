@@ -1,0 +1,389 @@
+test_compressor_processes_sum_once (test_audio_buses.AudioBusTests.test_compressor_processes_sum_once) ... FAIL
+test_container_fades_apply_to_summed_samples (test_audio_buses.AudioBusTests.test_container_fades_apply_to_summed_samples) ... FAIL
+test_container_gain_and_track_gain_follow_child_sum (test_audio_buses.AudioBusTests.test_container_gain_and_track_gain_follow_child_sum) ... FAIL
+test_deep_container_gain_is_applied_once_per_level (test_audio_buses.AudioBusTests.test_deep_container_gain_is_applied_once_per_level) ... FAIL
+test_float_mix_preserves_over_unit_peak_for_explicit_mastering (test_audio_buses.AudioBusTests.test_float_mix_preserves_over_unit_peak_for_explicit_mastering) ... FAIL
+test_group_equalizer_and_filters_match_independent_sum_processing (test_audio_buses.AudioBusTests.test_group_equalizer_and_filters_match_independent_sum_processing) ... FAIL
+test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) ... 
+  test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'volume': -1}) ... FAIL
+  test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'volume': True}) ... FAIL
+  test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'volume': 5}) ... FAIL
+  test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'muted': 'yes'}) ... FAIL
+  test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'fade_in': -1}) ... FAIL
+  test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'compressor': {'threshold': 0}}) ... FAIL
+  test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'compressor': {'ratio': 50}}) ... FAIL
+  test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'reverb': {'delays': '80|100', 'decays': '0.5'}}) ... FAIL
+  test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'loudnorm': {'i': 1}}) ... FAIL
+test_invalid_volume_keyframe_is_rejected (test_audio_buses.AudioBusTests.test_invalid_volume_keyframe_is_rejected) ... FAIL
+test_multiple_ducking_inputs_use_independent_detector_outputs (test_audio_buses.AudioBusTests.test_multiple_ducking_inputs_use_independent_detector_outputs) ... FAIL
+test_muted_container_keeps_video_and_silences_descendants (test_audio_buses.AudioBusTests.test_muted_container_keeps_video_and_silences_descendants) ... FAIL
+test_muted_leaf_does_not_reappear_in_mix (test_audio_buses.AudioBusTests.test_muted_leaf_does_not_reappear_in_mix) ... FAIL
+test_muted_video_track_audio_keeps_picture (test_audio_buses.AudioBusTests.test_muted_video_track_audio_keeps_picture) ... FAIL
+test_nested_solo_does_not_silence_root_sibling (test_audio_buses.AudioBusTests.test_nested_solo_does_not_silence_root_sibling) ... FAIL
+test_nonlinear_ancestor_gain_uses_inverse_original_clock (test_audio_buses.AudioBusTests.test_nonlinear_ancestor_gain_uses_inverse_original_clock) ... FAIL
+test_outer_reverse_reverses_inner_authored_gain (test_audio_buses.AudioBusTests.test_outer_reverse_reverses_inner_authored_gain) ... FAIL
+test_outer_trim_preserves_inner_fade_phase (test_audio_buses.AudioBusTests.test_outer_trim_preserves_inner_fade_phase) ... FAIL
+test_parent_balance_preserves_independent_stereo_channels (test_audio_buses.AudioBusTests.test_parent_balance_preserves_independent_stereo_channels) ... FAIL
+test_parent_volume_automation_keeps_phase_across_children (test_audio_buses.AudioBusTests.test_parent_volume_automation_keeps_phase_across_children) ... FAIL
+test_reverb_tail_is_clipped_to_container_window (test_audio_buses.AudioBusTests.test_reverb_tail_is_clipped_to_container_window) ... ok
+test_reverse_container_does_not_reverse_its_own_automation (test_audio_buses.AudioBusTests.test_reverse_container_does_not_reverse_its_own_automation) ... FAIL
+test_root_tracks_sum_without_input_count_attenuation (test_audio_buses.AudioBusTests.test_root_tracks_sum_without_input_count_attenuation) ... FAIL
+test_silent_third_input_does_not_change_audible_gain (test_audio_buses.AudioBusTests.test_silent_third_input_does_not_change_audible_gain) ... FAIL
+test_submillisecond_start_uses_sample_grid (test_audio_buses.AudioBusTests.test_submillisecond_start_uses_sample_grid) ... FAIL
+test_track_compressor_processes_overlapping_clips_after_sum (test_audio_buses.AudioBusTests.test_track_compressor_processes_overlapping_clips_after_sum) ... FAIL
+
+======================================================================
+FAIL: test_compressor_processes_sum_once (test_audio_buses.AudioBusTests.test_compressor_processes_sum_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 157, in test_compressor_processes_sum_once
+    self.close_pcm(actual,reference)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.05994832515716553 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_container_fades_apply_to_summed_samples (test_audio_buses.AudioBusTests.test_container_fades_apply_to_summed_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 167, in test_container_fades_apply_to_summed_samples
+    actual,_,_,_=self.render();self.close_pcm(actual,[v*min(1,n//2/SR/.5)*min(1,(2-n//2/SR)/.5) for n,v in enumerate(self.pcm['tone'])])
+                               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.33527374267578125 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_container_gain_and_track_gain_follow_child_sum (test_audio_buses.AudioBusTests.test_container_gain_and_track_gain_follow_child_sum)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 111, in test_container_gain_and_track_gain_follow_child_sum
+    actual,_,manifest,_=self.render();self.close_pcm(actual,[(a+.5*b)*.25 for a,b in zip(self.pcm['tone'],self.pcm['other'])])
+                                      ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.07320022583007812 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_deep_container_gain_is_applied_once_per_level (test_audio_buses.AudioBusTests.test_deep_container_gain_is_applied_once_per_level)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 120, in test_deep_container_gain_is_applied_once_per_level
+    actual,_,_,_=self.render();self.close_pcm(actual,[v*.25 for v in self.pcm['tone']])
+                               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.25177001953125 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_float_mix_preserves_over_unit_peak_for_explicit_mastering (test_audio_buses.AudioBusTests.test_float_mix_preserves_over_unit_peak_for_explicit_mastering)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 233, in test_float_mix_preserves_over_unit_peak_for_explicit_mastering
+    actual,_,_,_=self.render();self.close_pcm(actual,[v*8 for v in self.pcm['dc']]);self.assertGreater(max(actual),2)
+                               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1.220703125 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_group_equalizer_and_filters_match_independent_sum_processing (test_audio_buses.AudioBusTests.test_group_equalizer_and_filters_match_independent_sum_processing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 240, in test_group_equalizer_and_filters_match_independent_sum_processing
+    self.close_pcm(actual,expected)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.13361799716949463 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'volume': -1})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 249, in test_invalid_container_audio_rolls_back_before_render
+    self.ops[-1]['audio']=control;self.compose(expected=2)
+                                  ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 74, in compose
+    return self.call('timeline','compose','--project',self.root,'--input',changes,expected=expected)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 53, in call
+    value=json.loads(capture.getvalue());self.assertEqual(code,expected,value);return value
+                                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : {'ok': True, 'command': 'timeline.compose', 'request_id': 'req_20261017084628_474123d4', 'operation_id': 'op_20261017084628_c7cdaaea', 'status': 'succeeded', 'data': {'sequence_id': 'seq_main', 'applied': [{'op': 'update_track', 'track_id': 'track_video_1', 'track': {'id': 'track_video_1', 'kind': 'video', 'order': 0, 'muted': False, 'locked': False, 'clips': [{'id': 'background', 'timeline_start_tick': 0, 'duration_tick': 180000, 'source_in_tick': 0, 'source_out_tick': 180000, 'asset_id': 'picture'}, {'id': 'group_3', 'timeline_start_tick': 0, 'duration_tick': 180000, 'source_in_tick': 0, 'source_out_tick': 180000, 'sequence_id': 'child', 'audio': {'volume': -1}}], 'overlap_policy': 'allow'}}, {'op': 'append_clip', 'track_id': 'track_video_1', 'clip': {'id': 'background', 'timeline_start_tick': 0, 'duration_tick': 180000, 'source_in_tick': 0, 'source_out_tick': 180000, 'asset_id': 'picture'}}, {'op': 'add_sequence', 'sequence': {'id': 'child', 'name': 'child', 'duration_tick': 180000, 'tracks': [{'id': 'child_video_1', 'kind': 'video', 'order': 0, 'muted': False, 'locked': False, 'clips': []}, {'id': 'child_audio_1', 'kind': 'audio', 'order': 0, 'muted': False, 'locked': False, 'clips': []}], 'markers': []}}, {'op': 'append_sequence_clip', 'track_id': 'track_video_1', 'clip': {'id': 'group_3', 'timeline_start_tick': 0, 'duration_tick': 180000, 'source_in_tick': 0, 'source_out_tick': 180000, 'sequence_id': 'child', 'audio': {'volume': -1}}}], 'validation': {'ok': True, 'errors': [], 'warnings': [{'status': 'unverified', 'code': 'RIGHTS_STATUS_BLOCKED', 'message': '状态 unverified 不允许发布', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_USE_NOT_PERMITTED', 'message': '记录未允许目标用途: commercial_ad', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_EVIDENCE_INCOMPLETE', 'message': '来源、许可证或证据字段缺失', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 1, 'required_records': 1, 'failures': [], 'warnings': [{'status': 'unverified', 'code': 'RIGHTS_STATUS_BLOCKED', 'message': '状态 unverified 不允许发布', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_USE_NOT_PERMITTED', 'message': '记录未允许目标用途: commercial_ad', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_EVIDENCE_INCOMPLETE', 'message': '来源、许可证或证据字段缺失', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 1, 'sequence_count': 2}, 'before_snapshot': {'snapshot_id': 'snap_20261017084628_b20e712c', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-buses-baseline-20261017\\product\\.runtime\\temp\\audio-bus-project-9nkwk_3v\\project\\history\\snap_20261017084628_b20e712c.json', 'label': 'before-timeline-compose', 'created_at': '2026-10-17T08:46:28.266338Z'}}, 'artifacts': [], 'warnings': [], 'errors': [], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T08:46:28.306715Z', 'finished_at': '2026-10-17T08:46:28.306735Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'volume': True})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 250, in test_invalid_container_audio_rolls_back_before_render
+    self.assertEqual((self.root/'project.json').read_bytes(),project_before)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\n[195 chars]:46:28.293776Z",\n    "creator": "ai-ad-editor[8658 chars]n}\n' != b'{\n[195 chars]:46:27.915227Z",\n    "creator": "ai-ad-editor[4347 chars]n}\n'
+
+======================================================================
+FAIL: test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'volume': 5})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 250, in test_invalid_container_audio_rolls_back_before_render
+    self.assertEqual((self.root/'project.json').read_bytes(),project_before)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\n[195 chars]:46:28.293776Z",\n    "creator": "ai-ad-editor[8658 chars]n}\n' != b'{\n[195 chars]:46:27.915227Z",\n    "creator": "ai-ad-editor[4347 chars]n}\n'
+
+======================================================================
+FAIL: test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'muted': 'yes'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 250, in test_invalid_container_audio_rolls_back_before_render
+    self.assertEqual((self.root/'project.json').read_bytes(),project_before)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\n[195 chars]:46:28.293776Z",\n    "creator": "ai-ad-editor[8658 chars]n}\n' != b'{\n[195 chars]:46:27.915227Z",\n    "creator": "ai-ad-editor[4347 chars]n}\n'
+
+======================================================================
+FAIL: test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'fade_in': -1})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 250, in test_invalid_container_audio_rolls_back_before_render
+    self.assertEqual((self.root/'project.json').read_bytes(),project_before)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\n[195 chars]:46:28.293776Z",\n    "creator": "ai-ad-editor[8658 chars]n}\n' != b'{\n[195 chars]:46:27.915227Z",\n    "creator": "ai-ad-editor[4347 chars]n}\n'
+
+======================================================================
+FAIL: test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'compressor': {'threshold': 0}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 250, in test_invalid_container_audio_rolls_back_before_render
+    self.assertEqual((self.root/'project.json').read_bytes(),project_before)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\n[195 chars]:46:28.293776Z",\n    "creator": "ai-ad-editor[8658 chars]n}\n' != b'{\n[195 chars]:46:27.915227Z",\n    "creator": "ai-ad-editor[4347 chars]n}\n'
+
+======================================================================
+FAIL: test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'compressor': {'ratio': 50}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 250, in test_invalid_container_audio_rolls_back_before_render
+    self.assertEqual((self.root/'project.json').read_bytes(),project_before)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\n[195 chars]:46:28.293776Z",\n    "creator": "ai-ad-editor[8658 chars]n}\n' != b'{\n[195 chars]:46:27.915227Z",\n    "creator": "ai-ad-editor[4347 chars]n}\n'
+
+======================================================================
+FAIL: test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'reverb': {'delays': '80|100', 'decays': '0.5'}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 250, in test_invalid_container_audio_rolls_back_before_render
+    self.assertEqual((self.root/'project.json').read_bytes(),project_before)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\n[195 chars]:46:28.293776Z",\n    "creator": "ai-ad-editor[8658 chars]n}\n' != b'{\n[195 chars]:46:27.915227Z",\n    "creator": "ai-ad-editor[4347 chars]n}\n'
+
+======================================================================
+FAIL: test_invalid_container_audio_rolls_back_before_render (test_audio_buses.AudioBusTests.test_invalid_container_audio_rolls_back_before_render) (audio={'loudnorm': {'i': 1}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 250, in test_invalid_container_audio_rolls_back_before_render
+    self.assertEqual((self.root/'project.json').read_bytes(),project_before)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\n[195 chars]:46:28.293776Z",\n    "creator": "ai-ad-editor[8658 chars]n}\n' != b'{\n[195 chars]:46:27.915227Z",\n    "creator": "ai-ad-editor[4347 chars]n}\n'
+
+======================================================================
+FAIL: test_invalid_volume_keyframe_is_rejected (test_audio_buses.AudioBusTests.test_invalid_volume_keyframe_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 256, in test_invalid_volume_keyframe_is_rejected
+    before=(self.root/'project.json').read_bytes();self.compose(expected=2);self.assertEqual((self.root/'project.json').read_bytes(),before)
+                                                   ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 74, in compose
+    return self.call('timeline','compose','--project',self.root,'--input',changes,expected=expected)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 53, in call
+    value=json.loads(capture.getvalue());self.assertEqual(code,expected,value);return value
+                                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : {'ok': True, 'command': 'timeline.compose', 'request_id': 'req_20261017084632_1f952a92', 'operation_id': 'op_20261017084632_344ae5fd', 'status': 'succeeded', 'data': {'sequence_id': 'seq_main', 'applied': [{'op': 'update_track', 'track_id': 'track_video_1', 'track': {'id': 'track_video_1', 'kind': 'video', 'order': 0, 'muted': False, 'locked': False, 'clips': [{'id': 'background', 'timeline_start_tick': 0, 'duration_tick': 180000, 'source_in_tick': 0, 'source_out_tick': 180000, 'asset_id': 'picture'}, {'id': 'group_3', 'timeline_start_tick': 0, 'duration_tick': 180000, 'source_in_tick': 0, 'source_out_tick': 180000, 'sequence_id': 'child', 'keyframes': [{'property': 'audio.volume', 'keyframes': [{'at_tick': 0, 'value': 1, 'interpolation': 'linear'}, {'at_tick': 90000, 'value': -1, 'interpolation': 'linear'}]}]}], 'overlap_policy': 'allow'}}, {'op': 'append_clip', 'track_id': 'track_video_1', 'clip': {'id': 'background', 'timeline_start_tick': 0, 'duration_tick': 180000, 'source_in_tick': 0, 'source_out_tick': 180000, 'asset_id': 'picture'}}, {'op': 'add_sequence', 'sequence': {'id': 'child', 'name': 'child', 'duration_tick': 180000, 'tracks': [{'id': 'child_video_1', 'kind': 'video', 'order': 0, 'muted': False, 'locked': False, 'clips': []}, {'id': 'child_audio_1', 'kind': 'audio', 'order': 0, 'muted': False, 'locked': False, 'clips': []}], 'markers': []}}, {'op': 'append_sequence_clip', 'track_id': 'track_video_1', 'clip': {'id': 'group_3', 'timeline_start_tick': 0, 'duration_tick': 180000, 'source_in_tick': 0, 'source_out_tick': 180000, 'sequence_id': 'child', 'keyframes': [{'property': 'audio.volume', 'keyframes': [{'at_tick': 0, 'value': 1, 'interpolation': 'linear'}, {'at_tick': 90000, 'value': -1, 'interpolation': 'linear'}]}]}}], 'validation': {'ok': True, 'errors': [], 'warnings': [{'status': 'unverified', 'code': 'RIGHTS_STATUS_BLOCKED', 'message': '状态 unverified 不允许发布', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_USE_NOT_PERMITTED', 'message': '记录未允许目标用途: commercial_ad', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_EVIDENCE_INCOMPLETE', 'message': '来源、许可证或证据字段缺失', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 1, 'required_records': 1, 'failures': [], 'warnings': [{'status': 'unverified', 'code': 'RIGHTS_STATUS_BLOCKED', 'message': '状态 unverified 不允许发布', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_USE_NOT_PERMITTED', 'message': '记录未允许目标用途: commercial_ad', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}, {'code': 'RIGHTS_EVIDENCE_INCOMPLETE', 'message': '来源、许可证或证据字段缺失', 'asset_id': 'picture', 'rights_ref': 'picture', 'record_version': 1, 'context': 'project_asset'}], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 1, 'sequence_count': 2}, 'before_snapshot': {'snapshot_id': 'snap_20261017084632_4e24d83e', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-buses-baseline-20261017\\product\\.runtime\\temp\\audio-bus-project-oey4hch6\\project\\history\\snap_20261017084632_4e24d83e.json', 'label': 'before-timeline-compose', 'created_at': '2026-10-17T08:46:32.601772Z'}}, 'artifacts': [], 'warnings': [], 'errors': [], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T08:46:32.732652Z', 'finished_at': '2026-10-17T08:46:32.732663Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_multiple_ducking_inputs_use_independent_detector_outputs (test_audio_buses.AudioBusTests.test_multiple_ducking_inputs_use_independent_detector_outputs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 185, in test_multiple_ducking_inputs_use_independent_detector_outputs
+    actual,result,_,_=self.render();self.assertGreater(max(map(abs,actual)),.05)
+                      ~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 84, in render
+    result=self.call('render','--project',self.root,'--output',path);self.assertEqual(before,authored())
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 53, in call
+    value=json.loads(capture.getvalue());self.assertEqual(code,expected,value);return value
+                                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 6 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261017084635_a5651ec5', 'operation_id': 'render_20261017084635_08edf067', 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'RENDER_FAILED', 'message': 'FFmpeg 渲染失败', 'path': None, 'retryable': True, 'cause': "[fc#0 @ 0000019dca91ccc0] Stream specifier 'voicebus' in filtergraph description [0:v]trim=start=0.000000:end=2.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=30/1:start_time=0.00000000:round=up:eof_action=pass,scale=128:80:force_original_aspect_ratio=decrease,pad=128:80:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1[v0];[1:a]atrim=start=0.000000:end=2.000000,asetpts=PTS-STARTPTS,aresample=48000,volume=volume='0.30000000':eval=frame,adelay=0|0[a1];[2:a]atrim=start=0.000000:end=2.000000,asetpts=PTS-STARTPTS,aresample=48000,volume=volume='0.30000000':eval=frame,adelay=0|0[a2];[3:a]atrim=start=0.000000:end=2.000000,asetpts=PTS-STARTPTS,aresample=48000,volume=volume='0.30000000':eval=frame,adelay=0|0[a3];[4:a]atrim=start=0.000000:end=2.000000,asetpts=PTS-STARTPTS,aresample=48000,volume=volume='0.30000000':eval=frame,adelay=0|0[a4];color=c=black:s=128x80:r=30/1:d=2.000000[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0]null[vout];[a1][a2]amix=inputs=2:duration=longest:dropout_transition=0,aresample=48000[voicebus];[a3][voicebus]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=300:makeup=1[duck0];[a4][voicebus]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=300:makeup=1[duck1];[a1][a2][duck0][duck1]amix=inputs=4:duration=longest:dropout_transition=0,aresample=48000,apad=whole_len=96000,atrim=end_sample=96000,asetpts=N/SR/TB[aout] matches no streams.\nError binding filtergraph inputs/outputs: Invalid argument\n", 'operation_id': 'render_20261017084635_08edf067'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T08:46:35.925692Z', 'finished_at': '2026-10-17T08:46:35.925705Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_muted_container_keeps_video_and_silences_descendants (test_audio_buses.AudioBusTests.test_muted_container_keeps_video_and_silences_descendants)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 135, in test_muted_container_keeps_video_and_silences_descendants
+    actual,_,_,path=self.render();self.assertEqual(max(map(abs,actual)),0)
+                                  ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.335693359375 != 0
+
+======================================================================
+FAIL: test_muted_leaf_does_not_reappear_in_mix (test_audio_buses.AudioBusTests.test_muted_leaf_does_not_reappear_in_mix)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 145, in test_muted_leaf_does_not_reappear_in_mix
+    self.tone(audio={'mute':True});actual,_,_,_=self.render();self.assertEqual(max(map(abs,actual)),0)
+                                                              ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.335693359375 != 0
+
+======================================================================
+FAIL: test_muted_video_track_audio_keeps_picture (test_audio_buses.AudioBusTests.test_muted_video_track_audio_keeps_picture)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 142, in test_muted_video_track_audio_keeps_picture
+    actual,_,_,_=self.render();self.assertEqual(max(map(abs,actual)),0)
+                 ~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 84, in render
+    result=self.call('render','--project',self.root,'--output',path);self.assertEqual(before,authored())
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 53, in call
+    value=json.loads(capture.getvalue());self.assertEqual(code,expected,value);return value
+                                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261017084642_fed8e2ed', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'VIDEO_TRACK_EMPTY', 'message': '没有可渲染的视频片段或独立文字轨道', 'path': 'sequences[].tracks', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T08:46:42.620857Z', 'finished_at': '2026-10-17T08:46:42.620873Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_nested_solo_does_not_silence_root_sibling (test_audio_buses.AudioBusTests.test_nested_solo_does_not_silence_root_sibling)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 150, in test_nested_solo_does_not_silence_root_sibling
+    actual,_,_,_=self.render();self.close_pcm(actual,[a+b for a,b in zip(self.pcm['tone'],self.pcm['other'])])
+                               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.1373291015625 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_nonlinear_ancestor_gain_uses_inverse_original_clock (test_audio_buses.AudioBusTests.test_nonlinear_ancestor_gain_uses_inverse_original_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 229, in test_nonlinear_ancestor_gain_uses_inverse_original_clock
+    self.assertLessEqual(maximum,2e-6)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 0.27288887500536757 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_outer_reverse_reverses_inner_authored_gain (test_audio_buses.AudioBusTests.test_outer_reverse_reverses_inner_authored_gain)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 201, in test_outer_reverse_reverses_inner_authored_gain
+    self.close_pcm(actual,[v*(1-n/SR/2) for n,frame in enumerate(frames) for v in frame])
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.3355849583943685 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_outer_trim_preserves_inner_fade_phase (test_audio_buses.AudioBusTests.test_outer_trim_preserves_inner_fade_phase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 207, in test_outer_trim_preserves_inner_fade_phase
+    self.close_pcm(actual,expected)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.16774177551269528 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_parent_balance_preserves_independent_stereo_channels (test_audio_buses.AudioBusTests.test_parent_balance_preserves_independent_stereo_channels)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 131, in test_parent_balance_preserves_independent_stereo_channels
+    actual,_,_,_=self.render();self.close_pcm(actual,[v*(.5 if n%2==0 else 1) for n,v in enumerate(self.pcm['stereo'])])
+                               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.1678466796875 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_parent_volume_automation_keeps_phase_across_children (test_audio_buses.AudioBusTests.test_parent_volume_automation_keeps_phase_across_children)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 127, in test_parent_volume_automation_keeps_phase_across_children
+    actual,_,_,_=self.render();self.close_pcm(actual,[v*(n//2/SR/2) for n,v in enumerate(self.pcm['tone'])])
+                               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.1677417755126953 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_reverse_container_does_not_reverse_its_own_automation (test_audio_buses.AudioBusTests.test_reverse_container_does_not_reverse_its_own_automation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 193, in test_reverse_container_does_not_reverse_its_own_automation
+    expected=[v*n/SR/2 for n,frame in enumerate(frames) for v in frame];self.close_pcm(actual,expected)
+                                                                        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.33559195200602215 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_root_tracks_sum_without_input_count_attenuation (test_audio_buses.AudioBusTests.test_root_tracks_sum_without_input_count_attenuation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 101, in test_root_tracks_sum_without_input_count_attenuation
+    actual,_,_,_=self.render();self.close_pcm(actual,[a+b for a,b in zip(self.pcm['tone'],self.pcm['other'])])
+                               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.1678619384765625 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_silent_third_input_does_not_change_audible_gain (test_audio_buses.AudioBusTests.test_silent_third_input_does_not_change_audible_gain)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 105, in test_silent_third_input_does_not_change_audible_gain
+    actual,_,_,_=self.render();self.close_pcm(actual,self.pcm['tone'])
+                               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.1678466796875 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_submillisecond_start_uses_sample_grid (test_audio_buses.AudioBusTests.test_submillisecond_start_uses_sample_grid)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 173, in test_submillisecond_start_uses_sample_grid
+    self.close_pcm(actual,expected);node=next(n for n in manifest['inputs'] if n.get('kind')=='audio')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.3662109375 not less than or equal to 2e-06
+
+======================================================================
+FAIL: test_track_compressor_processes_overlapping_clips_after_sum (test_audio_buses.AudioBusTests.test_track_compressor_processes_overlapping_clips_after_sum)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 162, in test_track_compressor_processes_overlapping_clips_after_sum
+    actual,_,_,_=self.render();self.close_pcm(actual,self.reference_filter([v*.5 for v in self.pcm['tone']],
+                               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+         'acompressor=threshold=0.1:ratio=4:attack=1:release=50'))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+                                                ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.05994832515716553 not less than or equal to 2e-06
+
+----------------------------------------------------------------------
+Ran 24 tests in 89.261s
+
+FAILED (failures=31)

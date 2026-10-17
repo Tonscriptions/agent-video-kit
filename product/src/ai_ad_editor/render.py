@@ -2412,6 +2412,7 @@ def _flatten_sequence_tracks(
         time_mapper: Callable[[float], float] | None = None,
         clock_maps: list[dict[str, Any]] | None = None,
         group_id: str | None = None,
+        audio_enabled: bool = True,
     ) -> None:
         current_id = str(current.get("id"))
         if current_id in stack:
@@ -2430,10 +2431,18 @@ def _flatten_sequence_tracks(
                 return float(origin_tick + (window_end - tick) * scale)
             return float(origin_tick + (tick - window_start) * scale)
 
+        # Solo belongs to the authored sequence, not to every flattened audio
+        # track in the project. A nested solo must not silence root siblings.
+        local_solo = {str(t.get('id')) for t in current.get('tracks', [])
+                      if t.get('kind') == 'audio' and isinstance(t.get('audio'), dict) and t['audio'].get('solo')}
         for track in sorted(current.get("tracks", []), key=lambda item: int(item.get("order", 0))):
             if track.get("muted"):
                 continue
             kind = str(track.get("kind", "video"))
+            track_audio = track.get('audio') if isinstance(track.get('audio'), dict) else {}
+            track_audio_enabled = audio_enabled and not (track_audio.get('mute') or track_audio.get('muted'))
+            if kind == 'audio' and local_solo and str(track.get('id')) not in local_solo:
+                track_audio_enabled = False
             virtual_id = f"{prefix}{track.get('id', 'track')}"
             key = (kind, virtual_id)
             output_track = collected.setdefault(
@@ -2584,6 +2593,7 @@ def _flatten_sequence_tracks(
                         if split_windows:
                             child_windows = split_windows
                     for child_window in child_windows:
+                        clip_audio = clip.get('audio') if isinstance(clip.get('audio'), dict) else {}
                         visit(
                             child,
                             0,
@@ -2596,12 +2606,14 @@ def _flatten_sequence_tracks(
                             child_to_final,
                             [clip_clock, *clock_maps],
                             child_group_id,
+                            track_audio_enabled and not (clip_audio.get('mute') or clip_audio.get('muted')),
                         )
                     continue
                 child_clip = copy.deepcopy(clip)
                 child_clip["id"] = f"{prefix}{clip.get('id', 'clip')}"
                 child_clip["timeline_start_tick"] = mapped_start
                 child_clip["duration_tick"] = mapped_duration
+                child_clip['_audio_scope_enabled'] = bool(track_audio_enabled)
                 if clock_maps and (clip.get('subtitle') or kind == 'subtitle'):
                     child_clip['_nested_subtitle_clock'] = _make_subtitle_clock(
                         clip, clock_maps, tps_local, reverse=reverse_time,
@@ -3176,6 +3188,251 @@ def _build_compositing_tree(
                                     fps_value=fps_value, duration=duration, tps=tps, preserve_alpha=transparent_canvas)
 
 
+def _audio_processing_filters(
+    clip: dict[str, Any], audio_settings: dict[str, Any], tps: int,
+    *, audio_keyframe_time: str = "t", clip_start: float = 0.0,
+    fade_clock: str = "t", authored_duration: float = 0.0,
+) -> list[str]:
+    """Apply clip or bus processing once; automation uses a sample clock."""
+    chain: list[str] = []
+    volume = _num(audio_settings.get("volume", clip.get("volume", 1.0)), 1.0)
+    volume_expr = _keyframe_expr(clip, ("audio.volume", "volume"), volume, clip_start, tps, time_variable=audio_keyframe_time)
+    if volume_expr != f"{volume:.8f}" or abs(volume - 1.0) > 1e-9:
+        if volume_expr != f"{volume:.8f}":
+            gain_expression = f'val(ch)*({volume_expr})'
+            chain.append(f"aeval=exprs={_expr_arg(gain_expression)}:c=same")
+        else:
+            chain.append(f"volume=volume={volume:.8f}")
+    if audio_settings.get("noise_reduction") or audio_settings.get("denoise"):
+        reduction = _num(audio_settings.get("noise_reduction", audio_settings.get("denoise", -25)), -25)
+        if isinstance(audio_settings.get('noise_reduction',audio_settings.get('denoise')),bool):reduction=-25
+        chain.append(f"afftdn=nf={reduction:.2f}")
+    if audio_settings.get("compressor"):
+        compressor = audio_settings.get("compressor") if isinstance(audio_settings.get("compressor"), dict) else {}
+        chain.append(
+            "acompressor="
+            f"threshold={_num(compressor.get('threshold', 0.125), 0.125):.6f}:"
+            f"ratio={max(1.0, _num(compressor.get('ratio', 2.0), 2.0)):.6f}:"
+            f"attack={max(0.01, _num(compressor.get('attack', 20), 20)):.3f}:"
+            f"release={max(1.0, _num(compressor.get('release', 250), 250)):.3f}"
+        )
+    equalizer = audio_settings.get("equalizer", audio_settings.get("eq"))
+    if isinstance(equalizer, dict):
+        frequency = max(20.0, min(20000.0, _num(equalizer.get("frequency", equalizer.get("f", 1000)), 1000)))
+        gain = max(-24.0, min(24.0, _num(equalizer.get("gain", equalizer.get("g", 0)), 0)))
+        bandwidth = max(0.05, min(10.0, _num(equalizer.get("width", equalizer.get("w", 1)), 1)))
+        chain.append(f"equalizer=f={frequency:.3f}:t=q:w={bandwidth:.4f}:g={gain:.4f}")
+    if audio_settings.get("highpass"):
+        chain.append(f"highpass=f={max(20.0, min(20000.0, _num(audio_settings.get('highpass'), 80))):.3f}")
+    if audio_settings.get("lowpass"):
+        chain.append(f"lowpass=f={max(20.0, min(20000.0, _num(audio_settings.get('lowpass'), 16000))):.3f}")
+    if audio_settings.get("dialogue_enhance") or audio_settings.get("voice_enhance"):
+        chain.append("dialoguenhance")
+    pitch = audio_settings.get("pitch_semitones")
+    if pitch is not None and abs(_num(pitch, 0)) > 1e-6:
+        semitones = max(-24.0, min(24.0, _num(pitch, 0)))
+        chain.append(f"rubberband=pitch={2 ** (semitones / 12.0):.8f}")
+    reverb = audio_settings.get("reverb")
+    if isinstance(reverb, dict):
+        in_gain = max(0.0, min(1.0, _num(reverb.get("in_gain", 0.8), 0.8)))
+        out_gain = max(0.0, min(1.0, _num(reverb.get("out_gain", 0.9), 0.9)))
+        delays = str(reverb.get("delays", "60|90"))
+        decays = str(reverb.get("decays", "0.25|0.15"))
+        chain.append(f"aecho={in_gain:.4f}:{out_gain:.4f}:{delays}:{decays}")
+    loudnorm = audio_settings.get("loudnorm")
+    if isinstance(loudnorm, dict):
+        integrated = _num(loudnorm.get("i", loudnorm.get("integrated", -16)), -16)
+        true_peak = _num(loudnorm.get("tp", loudnorm.get("true_peak", -1.5)), -1.5)
+        loudness_range = _num(loudnorm.get("lra", 11), 11)
+        chain.append(f"loudnorm=I={integrated:.3f}:TP={true_peak:.3f}:LRA={max(1.0, loudness_range):.3f}")
+    pan = audio_settings.get("pan")
+    raw_pan_expression = False
+    if isinstance(pan, str) and pan.strip():
+        try:
+            float(pan)
+        except (TypeError, ValueError):
+            raw_pan_expression = True
+    if raw_pan_expression:
+        chain.append(f"pan={pan.strip()}")
+    else:
+        # Numeric pan is normalized to -1 (left) .. +1 (right).
+        # Normalize every source to stereo, then apply a frame-
+        # evaluated balance expression. This duplicates mono
+        # sources but preserves independent left/right channels
+        # for stereo assets instead of collapsing them to mono.
+        raw_pan = pan if pan is not None else clip.get("pan", 0.0)
+        try:
+            pan_value = float(raw_pan)
+        except (TypeError, ValueError):
+            pan_value = 0.0
+        pan_tracks = [
+            item for item in clip.get("keyframes", [])
+            if isinstance(item, dict) and str(item.get("property", "")) in {"audio.pan", "pan"}
+        ]
+        if pan_tracks or abs(pan_value) > 1e-9:
+            pan_expr = _keyframe_expr(clip, ("audio.pan", "pan"), pan_value, clip_start, tps, time_variable=audio_keyframe_time)
+            pan_expr = f"clip(({pan_expr}),-1,1)"
+            left_expr = f"val(0)*(1-max(({pan_expr}),0))"
+            right_expr = f"val(1)*(1+min(({pan_expr}),0))"
+            chain.extend([
+                "aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo",
+                f"aeval=exprs={_expr_arg(left_expr + '|' + right_expr)}:c=stereo",
+                "aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo",
+            ])
+
+    fade_in = _num(audio_settings.get("fade_in", 0.0), 0.0)
+    fade_out = _num(audio_settings.get("fade_out", 0.0), 0.0)
+    envelope = []
+    if fade_in > 0:
+        envelope.append(f"clip(({fade_clock})/{fade_in:.12f},0,1)")
+    if fade_out > 0:
+        envelope.append(f"clip(({authored_duration:.12f}-({fade_clock}))/{fade_out:.12f},0,1)")
+    if envelope:
+        chain.append(f"aeval=exprs={_expr_arg('val(ch)*('+ '*'.join(envelope)+')')}:c=same")
+    return chain
+
+
+def _build_audio_bus_tree(
+    specs: list[dict[str, Any]], groups: dict[str, dict[str, Any]], tracks: list[dict[str, Any]],
+    filters: list[str], warnings: list[dict[str, Any]], input_meta: list[dict[str, Any]],
+    *, duration_tick: int, tps: int,
+) -> str | None:
+    """Mix child clips, process tracks, then process each containing sequence.
+
+    Every input is on the final 48-kHz sample grid. Unnormalized float sums
+    make grouping transparent and prevent mute/input-count dependent gain.
+    Clip automation is evaluated before this stage; container automation is
+    evaluated in its containing sequence's authored clock, once after mixing.
+    """
+    track_map = {str(track['id']): track for track in tracks}
+    buckets: dict[str | None, list[dict[str, Any]]] = {}
+    for spec in specs:
+        buckets.setdefault(spec.get('group_id'), []).append(copy.deepcopy(spec))
+    next_label = 0
+
+    def label() -> str:
+        nonlocal next_label
+        next_label += 1
+        return f'abus{next_label}'
+
+    def mix(items: list[str]) -> str:
+        target = label()
+        filters.append(''.join(f'[{item}]' for item in items)
+                       + f'amix=inputs={len(items)}:duration=longest:dropout_transition=0:normalize=0[{target}]')
+        return target
+
+    def scope(items: list[dict[str, Any]], scope_id: str | None) -> str | None:
+        if not items:
+            return None
+        voices: list[dict[str, Any]] = []
+        ducked: list[dict[str, Any]] = []
+        for item in items:
+            track = track_map[item['track_id']]
+            control = track.get('audio') if isinstance(track.get('audio'), dict) else {}
+            audio = item.get('audio') or {}
+            role = str(audio.get('role', control.get('role', track.get('role') or 'other'))).lower()
+            if role in {'voice', 'dialogue', 'narration', 'speech'}:
+                voices.append(item)
+            if role in {'music', 'bgm', 'background'} and (
+                audio.get('duck_under_voice') or isinstance(audio.get('ducking'), dict)
+                or control.get('duck_under_voice') or track.get('duck_under_voice')
+            ):
+                ducked.append(item)
+        if voices and ducked:
+            detectors: list[str] = []
+            for voice in voices:
+                audible, detector = label(), label()
+                filters.append(f'[{voice["label"]}]asplit=2[{audible}][{detector}]')
+                voice['label'] = audible
+                detectors.append(detector)
+            detector_bus = mix(detectors)
+            sidechains = [label() for _ in ducked]
+            filters.append(f'[{detector_bus}]asplit={len(sidechains)}'+''.join(f'[{v}]' for v in sidechains))
+            for item, detector in zip(ducked, sidechains):
+                target = label()
+                filters.append(f'[{item["label"]}][{detector}]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=300:makeup=1[{target}]')
+                item['label'] = target
+            warnings.append({'code':'AUDIO_DUCKING_APPLIED','scope_id':scope_id,
+                             'voice_inputs':len(voices),'ducked_inputs':len(ducked),
+                             'message':'已在所属序列内使用本地 sidechaincompress；检测支路显式拆分，其他序列不参与'})
+        by_track: dict[str, list[str]] = {}
+        for item in items:
+            by_track.setdefault(item['track_id'], []).append(item['label'])
+        outputs = []
+        for track_id, children in by_track.items():
+            track = track_map[track_id]
+            control = copy.deepcopy(track.get('audio') or {})
+            # Track fades have no authored clip interval. Keep them explicit
+            # rather than pretending they mean each child's fade envelope.
+            for field in ('fade_in', 'fade_out'):
+                if control.pop(field, None):
+                    warnings.append({'code':'RENDER_FEATURE_UNSUPPORTED','track_id':track_id,
+                                     'feature':'track_audio.'+field,'message':'轨道没有片段包络；请在片段或序列容器上声明音频淡入淡出'})
+            mixed = mix(children)
+            chain = _audio_processing_filters({}, control, tps)
+            if chain:
+                target = label()
+                filters.append(f'[{mixed}]'+','.join(chain)+f'[{target}]')
+                mixed = target
+            outputs.append(mixed)
+            input_meta.append({'kind':'audio-track-bus','track_id':track_id,'scope_id':scope_id,
+                               'child_input_count':len(children),'mixing':'float-sum-normalize-disabled',
+                               'processing':copy.deepcopy(control),'sample_rate':48000})
+        return mix(outputs)
+
+    for group_id, group in reversed(list(groups.items())):
+        items = buckets.get(group_id, [])
+        composite = scope(items, group_id)
+        if composite is None:
+            continue
+        clip = group['clip']
+        start_tick = int(clip['timeline_start_tick'])
+        end_tick = start_tick+int(clip['duration_tick'])
+        first = math.ceil(Fraction(start_tick*48000,tps))
+        end = math.ceil(Fraction(end_tick*48000,tps))
+        if end <= first:
+            filters.append(f'[{composite}]anullsink')
+            continue
+        authored = clip.get('_nested_keyframe_clock') or {'maps':[], 'authored_start':start_tick/tps}
+        original_duration = int(clip.get('_composite_authored_duration_tick',clip['duration_tick']))/tps
+        # The visible cut can be inside an ancestor's source window. Recover
+        # the original container envelope rather than restarting at this cut.
+        absolute = f'(t+{first/48000:.12f})'
+        fade_clock = f'(({_clock_expression(authored["maps"],absolute,inverse=True)})-{authored["authored_start"]:.12f})'
+        sample_clip = copy.deepcopy(clip)
+        # Account for ceil-to-sample placement before undoing ancestor maps.
+        # _keyframe_expr restores timeline_start itself, so supply the small
+        # residual in its local time argument.
+        local_time = f'(t+{first/48000-start_tick/tps:.12f})'
+        chain = [f'apad=whole_len={end}',f'atrim=start_sample={first}:end_sample={end}','asetpts=N/SR/TB']
+        control = copy.deepcopy(clip.get('audio') or {})
+        chain.extend(_audio_processing_filters(sample_clip,control,tps,audio_keyframe_time=local_time,
+                                               fade_clock=fade_clock,authored_duration=original_duration))
+        # Effects such as reverb may have tails. The container's sample window
+        # clips them before the bus is placed back on its parent's timeline.
+        chain.extend(['aresample=48000',f'apad=whole_len={end-first}',f'atrim=end_sample={end-first}',
+                      'asetpts=N/SR/TB',f'adelay={first}S:all=1'])
+        target = label()
+        filters.append(f'[{composite}]'+','.join(chain)+f'[{target}]')
+        buckets.setdefault(group['parent_id'], []).append({'label':target,'group_id':group['parent_id'],
+                   'track_id':group['track_id'],'clip_id':group_id,'audio':control})
+        input_meta.append({'kind':'sequence-audio-bus','clip_id':group_id,'parent_id':group['parent_id'],
+                           'sequence_id':clip.get('sequence_id'),'child_input_count':len(items),
+                           'sample_rate':48000,'start_sample':first,'end_sample':end,
+                           'mixing':'float-sum-normalize-disabled','processing':control,
+                           'authored_clock':copy.deepcopy(authored),
+                           'processing_order':['child-clips','local-ducking','track-sum','track-processing',
+                                               'sequence-sum','container-volume-effects-pan-fade','sample-window'],
+                           'intermediate_files':0})
+    root_inputs = buckets.get(None, [])
+    root_bus = scope(root_inputs, None)
+    input_meta.append({'kind':'sequence-audio-root','sample_rate':48000,
+                       'output_samples':max(1,round(Fraction(duration_tick*48000,tps))),
+                       'child_input_count':len(root_inputs),'mixing':'float-sum-normalize-disabled',
+                       'automatic_limiter':False,'has_audible_inputs':root_bus is not None})
+    return root_bus
+
+
 def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, Any]) -> tuple[list[str], str, list[dict[str, Any]], list[dict[str, Any]]]:
     if any(c.get('tracking_binding') for s in project.get('sequences',[]) for t in s.get('tracks',[]) for c in t.get('clips',[])):
         from .bindings import compile_project_bindings,validate_project_bindings
@@ -3202,11 +3459,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     video_labels: list[str] = []
     video_positions: list[str] = []
     video_specs: list[dict[str, Any]] = []
-    audio_labels: list[str] = []
-    voice_audio_labels: list[str] = []
-    music_audio_labels: list[str] = []
-    other_audio_labels: list[str] = []
-    ducking_requested = False
+    audio_specs: list[dict[str, Any]] = []
     input_meta: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
     local_audio_engine = _audio_stretch_configuration(root, settings.get('audio_stretch'))
@@ -3237,22 +3490,10 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     index = 0
     composite_groups: dict[str, dict[str, Any]] = {}
     render_tracks = _flatten_sequence_tracks(project, sequence, warnings, groups=composite_groups)
-    audio_track_controls = {
-        str(track.get("id")): track.get("audio") if isinstance(track.get("audio"), dict) else {}
-        for track in render_tracks
-        if track.get("kind") == "audio"
-    }
-    solo_audio_tracks = {
-        track_id
-        for track_id, controls in audio_track_controls.items()
-        if bool(controls.get("solo", False))
-    }
     for track in sorted(render_tracks, key=lambda item: int(item.get("order", 0))):
         track_audio = track.get("audio") if isinstance(track.get("audio"), dict) else {}
         track_id = str(track.get("id"))
-        if track.get("kind") == "audio" and solo_audio_tracks and track_id not in solo_audio_tracks:
-            continue
-        if track.get("muted") or bool(track_audio.get("muted", False) or track_audio.get("mute", False)):
+        if track.get("muted"):
             continue
         for clip in sorted(track.get("clips", []), key=lambda item: int(item.get("timeline_start_tick", 0))):
             if clip.get('_tracking_binding_plan'):
@@ -3582,13 +3823,14 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                                                             'frame_sampling': sampling_metadata}
                 index += 1
             elif kind in {"video", "audio"} and track.get("kind") == "audio":
+                if not clip.get('_audio_scope_enabled', True) or (isinstance(clip.get('audio'), dict) and (clip['audio'].get('muted') or clip['audio'].get('mute'))):
+                    continue
                 if not asset.get("probe", {}).get("audio", {}).get("codec"):
                     warnings.append({"code": "AUDIO_STREAM_MISSING", "clip_id": clip.get("id"), "message": "音频轨道引用的素材没有音频流，已跳过"})
                     continue
                 inputs.extend(["-i", str(uri)])
                 src_in = _sec(int(clip.get("source_in_tick", 0)), tps)
                 src_out = _sec(int(clip.get("source_out_tick", clip.get("duration_tick", 1))), tps)
-                start_ms = int(round(_sec(int(clip.get("timeline_start_tick", 0)), tps) * 1000))
                 label = f"a{index}"
                 speed = _num(clip.get("speed", 1.0), 1.0)
                 if speed <= 0:
@@ -3676,128 +3918,20 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     )
                 elif freeze_duration > 0:
                     audio_chain.append(f"apad=pad_dur={freeze_duration:.6f}")
-                volume = _num(audio_settings.get("volume", clip.get("volume", 1.0)), 1.0)
-                volume_expr = _keyframe_expr(clip, ("audio.volume", "volume"), volume, 0.0, tps, time_variable=audio_keyframe_time)
-                if volume_expr != f"{volume:.8f}" or abs(volume - 1.0) > 1e-9:
-                    audio_chain.append(f"volume=volume={_expr_arg(volume_expr)}:eval=frame")
-                if audio_settings.get("noise_reduction") or audio_settings.get("denoise"):
-                    reduction = _num(audio_settings.get("noise_reduction", audio_settings.get("denoise", -25)), -25)
-                    audio_chain.append(f"afftdn=nf={reduction:.2f}")
-                if audio_settings.get("compressor"):
-                    compressor = audio_settings.get("compressor") if isinstance(audio_settings.get("compressor"), dict) else {}
-                    audio_chain.append(
-                        "acompressor="
-                        f"threshold={_num(compressor.get('threshold', 0.125), 0.125):.6f}:"
-                        f"ratio={max(1.0, _num(compressor.get('ratio', 2.0), 2.0)):.6f}:"
-                        f"attack={max(0.01, _num(compressor.get('attack', 20), 20)):.3f}:"
-                        f"release={max(1.0, _num(compressor.get('release', 250), 250)):.3f}"
-                    )
-                equalizer = audio_settings.get("equalizer", audio_settings.get("eq"))
-                if isinstance(equalizer, dict):
-                    frequency = max(20.0, min(20000.0, _num(equalizer.get("frequency", equalizer.get("f", 1000)), 1000)))
-                    gain = max(-24.0, min(24.0, _num(equalizer.get("gain", equalizer.get("g", 0)), 0)))
-                    bandwidth = max(0.05, min(10.0, _num(equalizer.get("width", equalizer.get("w", 1)), 1)))
-                    audio_chain.append(f"equalizer=f={frequency:.3f}:t=q:w={bandwidth:.4f}:g={gain:.4f}")
-                if audio_settings.get("highpass"):
-                    audio_chain.append(f"highpass=f={max(20.0, min(20000.0, _num(audio_settings.get('highpass'), 80))):.3f}")
-                if audio_settings.get("lowpass"):
-                    audio_chain.append(f"lowpass=f={max(20.0, min(20000.0, _num(audio_settings.get('lowpass'), 16000))):.3f}")
-                if audio_settings.get("dialogue_enhance") or audio_settings.get("voice_enhance"):
-                    audio_chain.append("dialoguenhance")
-                pitch = audio_settings.get("pitch_semitones")
-                if pitch is not None and abs(_num(pitch, 0)) > 1e-6:
-                    semitones = max(-24.0, min(24.0, _num(pitch, 0)))
-                    audio_chain.append(f"rubberband=pitch={2 ** (semitones / 12.0):.8f}")
-                reverb = audio_settings.get("reverb")
-                if isinstance(reverb, dict):
-                    in_gain = max(0.0, min(1.0, _num(reverb.get("in_gain", 0.8), 0.8)))
-                    out_gain = max(0.0, min(1.0, _num(reverb.get("out_gain", 0.9), 0.9)))
-                    delays = str(reverb.get("delays", "60|90"))
-                    decays = str(reverb.get("decays", "0.25|0.15"))
-                    audio_chain.append(f"aecho={in_gain:.4f}:{out_gain:.4f}:{delays}:{decays}")
-                loudnorm = audio_settings.get("loudnorm")
-                if isinstance(loudnorm, dict):
-                    integrated = _num(loudnorm.get("i", loudnorm.get("integrated", -16)), -16)
-                    true_peak = _num(loudnorm.get("tp", loudnorm.get("true_peak", -1.5)), -1.5)
-                    loudness_range = _num(loudnorm.get("lra", 11), 11)
-                    audio_chain.append(f"loudnorm=I={integrated:.3f}:TP={true_peak:.3f}:LRA={max(1.0, loudness_range):.3f}")
-                pan = audio_settings.get("pan")
-                raw_pan_expression = False
-                if isinstance(pan, str) and pan.strip():
-                    try:
-                        float(pan)
-                    except (TypeError, ValueError):
-                        raw_pan_expression = True
-                if raw_pan_expression:
-                    audio_chain.append(f"pan={pan.strip()}")
-                else:
-                    # Numeric pan is normalized to -1 (left) .. +1 (right).
-                    # Normalize every source to stereo, then apply a frame-
-                    # evaluated balance expression. This duplicates mono
-                    # sources but preserves independent left/right channels
-                    # for stereo assets instead of collapsing them to mono.
-                    raw_pan = pan if pan is not None else clip.get("pan", 0.0)
-                    try:
-                        pan_value = float(raw_pan)
-                    except (TypeError, ValueError):
-                        pan_value = 0.0
-                    pan_tracks = [
-                        item for item in clip.get("keyframes", [])
-                        if isinstance(item, dict) and str(item.get("property", "")) in {"audio.pan", "pan"}
-                    ]
-                    if pan_tracks or abs(pan_value) > 1e-9:
-                        pan_expr = _keyframe_expr(clip, ("audio.pan", "pan"), pan_value, 0.0, tps, time_variable=audio_keyframe_time)
-                        pan_expr = f"clip(({pan_expr}),-1,1)"
-                        left_expr = f"val(0)*(1-max(({pan_expr}),0))"
-                        right_expr = f"val(1)*(1+min(({pan_expr}),0))"
-                        audio_chain.extend([
-                            "aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo",
-                            f"aeval=exprs={_expr_arg(left_expr + '|' + right_expr)}:c=stereo",
-                            "aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo",
-                        ])
-                track_volume_raw = track_audio.get("volume")
-                if track_volume_raw is not None:
-                    track_volume = max(0.0, min(4.0, _num(track_volume_raw, 1.0)))
-                    if abs(track_volume - 1.0) > 1e-9:
-                        audio_chain.append(f"volume=volume={track_volume:.6f}")
-                track_pan_raw = track_audio.get("pan")
-                if track_pan_raw is not None:
-                    try:
-                        track_pan_value = float(track_pan_raw)
-                    except (TypeError, ValueError):
-                        track_pan_value = math.nan
-                    if isinstance(track_pan_raw, bool) or not math.isfinite(track_pan_value) or not -1.0 <= track_pan_value <= 1.0:
-                        warnings.append({"code": "AUDIO_TRACK_PAN_INVALID", "clip_id": clip.get("id"), "track_id": track_id, "feature": "track_audio.pan", "message": "音频轨道 pan 必须是 -1..1 的有限数字，已忽略"})
-                    elif abs(track_pan_value) > 1e-9:
-                        track_pan_expr = f"clip({track_pan_value:.8f},-1,1)"
-                        left_expr = f"val(0)*(1-max(({track_pan_expr}),0))"
-                        right_expr = f"val(1)*(1+min(({track_pan_expr}),0))"
-                        audio_chain.extend([
-                            "aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo",
-                            f"aeval=exprs={_expr_arg(left_expr + '|' + right_expr)}:c=stereo",
-                            "aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo",
-                        ])
-                fade_in = audio_settings.get("fade_in")
-                if fade_in:
-                    audio_chain.append(f"afade=t=in:st=0:d={max(0.001, _num(fade_in, 0.25)):.6f}")
-                fade_out = audio_settings.get("fade_out")
-                if fade_out:
-                    fade_duration = max(0.001, _num(fade_out, 0.25))
-                    clip_seconds = content_duration + freeze_duration
-                    audio_chain.append(f"afade=t=out:st={max(0.0, clip_seconds-fade_duration):.6f}:d={fade_duration:.6f}")
-                audio_chain.append(f"adelay={start_ms}|{start_ms}")
+                audio_chain.extend(_audio_processing_filters(
+                    clip, audio_settings, tps, audio_keyframe_time=audio_keyframe_time,
+                    fade_clock='t', authored_duration=content_duration+freeze_duration,
+                ))
+                audio_samples = max(1, math.ceil(Fraction((int(clip.get('timeline_start_tick', 0))+int(clip.get('duration_tick', 1)))*48000,tps))-math.ceil(Fraction(int(clip.get('timeline_start_tick', 0))*48000,tps)))
+                audio_start_sample = max(0, math.ceil(Fraction(int(clip.get('timeline_start_tick', 0))*48000,tps)))
+                audio_chain.extend([f'apad=whole_len={audio_samples}', f'atrim=end_sample={audio_samples}',
+                                    'asetpts=N/SR/TB', f'adelay={audio_start_sample}S:all=1'])
                 filters.append(",".join(audio_chain) + f"[{label}]")
-                audio_labels.append(label)
-                role = str(audio_settings.get("role", track_audio.get("role", track.get("role", "other")))).lower()
-                if role in {"voice", "dialogue", "narration", "speech"}:
-                    voice_audio_labels.append(label)
-                elif role in {"music", "bgm", "background"}:
-                    music_audio_labels.append(label)
-                    if audio_settings.get("duck_under_voice") or isinstance(audio_settings.get("ducking"), dict) or track_audio.get("duck_under_voice") or track.get("duck_under_voice"):
-                        ducking_requested = True
-                else:
-                    other_audio_labels.append(label)
+                audio_specs.append({'label':label,'group_id':clip.get('_composite_group'),
+                                    'track_id':track_id,'clip_id':clip.get('id'),'audio':copy.deepcopy(audio_settings)})
                 input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "track_id": track_id, "input": index, "kind": "audio", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
+                input_meta[-1].update(timeline_start_sample=audio_start_sample,duration_samples=audio_samples,
+                                      sample_rate=48000,group_id=clip.get('_composite_group'))
                 if audio_stretch_job:
                     input_meta[-1]['audio_stretch'] = audio_stretch_job
                 if nested_maps:
@@ -3869,34 +4003,14 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         filters.append(f"[{current}]" + ("format=rgba," if transparent_canvas else "") + f"null[{adjusted_output}]")
         current = adjusted_output
 
-    if audio_labels:
-        mix_labels = list(audio_labels)
-        if ducking_requested and voice_audio_labels and music_audio_labels:
-            voice_bus = "voicebus"
-            filters.append(f"{''.join(f'[{item}]' for item in voice_audio_labels)}amix=inputs={len(voice_audio_labels)}:duration=longest:dropout_transition=0,aresample=48000[{voice_bus}]")
-            ducked_labels: list[str] = []
-            for duck_index, label in enumerate(music_audio_labels):
-                ducked = f"duck{duck_index}"
-                filters.append(f"[{label}][{voice_bus}]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=300:makeup=1[{ducked}]")
-                ducked_labels.append(ducked)
-            mix_labels = voice_audio_labels + ducked_labels + other_audio_labels
-            warnings.append({"code": "AUDIO_DUCKING_APPLIED", "message": "已使用本地 FFmpeg sidechaincompress 对背景音乐做旁白闪避"})
-        # The authored sequence duration is the audio bus contract.  `amix`
-        # with `duration=longest` ends at the last contributing clip, which
-        # drops trailing silence whenever the visual timeline extends beyond
-        # its final audio segment.  Pad and trim after resampling so every
-        # project has a deterministic number of output samples and the
-        # quality gate can distinguish real drift from an intentionally quiet
-        # tail.
-        audio_target_samples = max(1, int(round(duration * 48000)))
-        filters.append(
-            f"{''.join(f'[{item}]' for item in mix_labels)}"
-            f"amix=inputs={len(mix_labels)}:duration=longest:dropout_transition=0,"
-            f"aresample=48000,apad=whole_len={audio_target_samples},"
-            f"atrim=end_sample={audio_target_samples},asetpts=N/SR/TB[aout]"
-        )
+    audio_root = _build_audio_bus_tree(audio_specs, composite_groups, render_tracks, filters, warnings, input_meta,
+                                      duration_tick=int(sequence['duration_tick']), tps=tps)
+    audio_target_samples = max(1, int(round(duration * 48000)))
+    if audio_root:
+        filters.append(f'[{audio_root}]aresample=48000,apad=whole_len={audio_target_samples},'
+                       f'atrim=end_sample={audio_target_samples},asetpts=N/SR/TB[aout]')
     else:
-        filters.append(f"anullsrc=r=48000:cl=stereo,atrim=duration={duration:.6f}[aout]")
+        filters.append(f'anullsrc=r=48000:cl=stereo,atrim=end_sample={audio_target_samples}[aout]')
     return inputs, ";".join(filters), input_meta, warnings
 
 

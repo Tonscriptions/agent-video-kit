@@ -84,3 +84,9 @@ scripts/smoke_sequence_compositing.py -text
 docs/validation/evidence/*sequence-groups*.json -text
 docs/validation/evidence/sequence-groups*.log -text -whitespace
 docs/assets/sequence-compositing-20261017/*.txt -whitespace
+
+# V29 preserves float PCM, actual bus evidence and native failure logs.
+scripts/smoke_audio_buses.py -text
+docs/validation/evidence/*audio-buses*.json -text
+docs/validation/evidence/audio-buses*.log -text -whitespace
+docs/assets/audio-buses-20261017/*.txt -whitespace

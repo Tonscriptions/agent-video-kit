@@ -266,7 +266,18 @@
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "pan": {"oneOf": [{"type": "number", "minimum": -1, "maximum": 1}, {"type": "string", "minLength": 1}]}
+            "pan": {"oneOf": [{"type": "number", "minimum": -1, "maximum": 1}, {"type": "string", "minLength": 1}]},
+            "volume": {"type": "number", "minimum": 0, "maximum": 4},
+            "mute": {"type": "boolean"},
+            "muted": {"type": "boolean"},
+            "fade_in": {"type": "number", "minimum": 0, "maximum": 86400},
+            "fade_out": {"type": "number", "minimum": 0, "maximum": 86400},
+            "pitch_semitones": {"type": "number", "minimum": -24, "maximum": 24},
+            "compressor": {"oneOf": [{"type": "boolean"}, {"type": "object"}]},
+            "equalizer": {"type": "object"},
+            "eq": {"type": "object"},
+            "reverb": {"type": "object"},
+            "loudnorm": {"type": "object"}
           }
         },
         "blend": {"type": "object"},

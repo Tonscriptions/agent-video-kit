@@ -102,6 +102,41 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
     def warning(code: str, message: str, path: str) -> None:
         warnings.append({"code": code, "message": message, "path": path})
 
+    def validate_audio_processing(control: dict[str, Any], path: str) -> None:
+        def bounded(value: Any, lower: float, upper: float, location: str) -> None:
+            if isinstance(value, bool) or not isinstance(value, (int,float)) or not math.isfinite(value) or not lower <= value <= upper:
+                error('AUDIO_PARAMETER_INVALID',f'音频参数必须是 {lower}..{upper} 的有限数字',location)
+        for field in ('mute','muted','solo','duck_under_voice','dialogue_enhance','voice_enhance'):
+            if field in control and not isinstance(control[field],bool):
+                error('AUDIO_BOOLEAN_INVALID',f'audio.{field} 必须是布尔值',path+'.'+field)
+        for field,limits in {'volume':(0,4),'fade_in':(0,86400),'fade_out':(0,86400),
+                             'pitch_semitones':(-24,24),'highpass':(20,20000),'lowpass':(20,20000)}.items():
+            if field in control:bounded(control[field],*limits,path+'.'+field)
+        for field in ('noise_reduction','denoise'):
+            if field in control and not isinstance(control[field],bool):bounded(control[field],-80,-20,path+'.'+field)
+        for field in ('compressor','equalizer','eq','reverb','loudnorm'):
+            value=control.get(field)
+            if value is None:continue
+            if field=='compressor' and isinstance(value,bool):continue
+            if not isinstance(value,dict):
+                error('AUDIO_EFFECT_INVALID',f'audio.{field} 必须是参数对象',path+'.'+field);continue
+            ranges={'compressor':{'threshold':(.000976563,1),'ratio':(1,20),'attack':(.01,2000),'release':(1,9000)},
+                    'equalizer':{'frequency':(20,20000),'f':(20,20000),'gain':(-24,24),'g':(-24,24),'width':(.05,10),'w':(.05,10)},
+                    'reverb':{'in_gain':(0,1),'out_gain':(0,1)},
+                    'loudnorm':{'i':(-70,-5),'integrated':(-70,-5),'tp':(-9,0),'true_peak':(-9,0),'lra':(1,50)}}
+            for parameter,limits in ranges.get('equalizer' if field=='eq' else field,{}).items():
+                if parameter in value:bounded(value[parameter],*limits,path+'.'+field+'.'+parameter)
+            if field=='reverb':
+                counts=[]
+                for parameter,default,limits in (('delays','60|90',(0,90000)),('decays','0.25|0.15',(0,1))):
+                    raw=value.get(parameter,default)
+                    if not isinstance(raw,str) or not re.fullmatch(r'\d+(?:\.\d+)?(?:\|\d+(?:\.\d+)?)*',raw):
+                        error('AUDIO_REVERB_INVALID','回声 delays/decays 必须是以 | 分隔的非负数字',path+'.reverb.'+parameter);continue
+                    parts=raw.split('|');counts.append(len(parts))
+                    if len(parts)>32:error('AUDIO_REVERB_INVALID','回声抽头不能超过 32 个',path+'.reverb.'+parameter)
+                    for part in parts:bounded(float(part),*limits,path+'.reverb.'+parameter)
+                if len(counts)==2 and counts[0]!=counts[1]:error('AUDIO_REVERB_INVALID','回声 delays/decays 数量必须一致',path+'.reverb')
+
     def validate_lut_resource(effect_value: dict[str, Any], effect_path: str) -> None:
         effect_type = str(effect_value.get("type", "")).lower().replace("-", "_")
         if effect_type not in LUT_EFFECT_TYPES:
@@ -371,6 +406,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                 if not isinstance(track_audio, dict):
                     error("TRACK_AUDIO_INVALID", "轨道 audio 必须是对象", f"{tp}.audio")
                 else:
+                    validate_audio_processing(track_audio,f'{tp}.audio')
                     for boolean_field in ("mute", "muted", "solo", "duck_under_voice"):
                         if boolean_field in track_audio and not isinstance(track_audio[boolean_field], bool):
                             error("TRACK_AUDIO_BOOLEAN_INVALID", f"轨道 audio.{boolean_field} 必须是布尔值", f"{tp}.audio.{boolean_field}")
@@ -706,6 +742,10 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                 error("PAN_KEYFRAME_INVALID", "声像关键帧 value 必须是有限数字", f"{cp}.keyframes")
                             elif not -1.0 <= pan_value <= 1.0:
                                 error("PAN_KEYFRAME_RANGE", "声像关键帧 value 必须位于 -1 到 1", f"{cp}.keyframes")
+                        if property_name in {'audio.volume','volume'}:
+                            value=keyframe.get('value')
+                            if isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value) or not 0 <= value <= 4:
+                                error('AUDIO_VOLUME_KEYFRAME_INVALID','音量关键帧必须是 0..4 的有限数字',f'{cp}.keyframes')
                         if property_name in {"transform.anchor.x", "anchor.x", "anchor_x", "transform.anchor.y", "anchor.y", "anchor_y"}:
                             value = keyframe.get("value")
                             try:
@@ -941,6 +981,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                 if not math.isfinite(opacity) or not 0.0 <= opacity <= 1.0:
                                     error("BLEND_OPACITY_RANGE", "blend.opacity 必须位于 0 到 1", f"{cp}.blend.opacity")
                 audio_settings = clip.get("audio")
+                if isinstance(audio_settings,dict):validate_audio_processing(audio_settings,f'{cp}.audio')
                 if audio_settings is not None:
                     if not isinstance(audio_settings, dict):
                         error("AUDIO_INVALID", "audio 必须是对象", f"{cp}.audio")

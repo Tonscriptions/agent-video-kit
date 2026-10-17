@@ -176,3 +176,27 @@ are equivalent. Apart can degrade phase and mono compatibility. Separated
 short-window spectral peaks still do not prove pitch preservation. Never add
 outside-selection audio, padding, short-window processing or pitch correction
 as an implicit workaround. Mono/stereo controls do not accept 3..8-channel quality.
+
+For [hierarchical audio buses](../../docs/specs/分层音频总线与采样包络契约_v0.1_2026-10-17.md),
+use existing clip/container `audio` controls and `audio.volume` / `audio.pan`
+keyframes. Clips mix into tracks, track effects run after that sum, and container
+effects run after the child sequence sum. Every mix uses floating addition with
+normalization disabled; adding a silent input must not attenuate other inputs.
+Old multitrack project levels can change. Provide headroom explicitly: float
+peaks can exceed 1 and no automatic limiter is inserted.
+
+Mute audio through `clip.audio.mute/muted` or `track.audio.mute/muted` to retain
+video. `track.muted` still removes the whole track. Audio-track solo and explicit
+music ducking are local to each authored sequence; a parent treats a child bus
+as one role. Give the container an explicit role when the parent needs it as a
+voice or music input. Named send/return, feedback and spatial routing remain open.
+
+Place audio on the 48-kHz half-open sample grid using rational ceiling, without
+integer-millisecond rounding. Container automation uses its own authored clock:
+its reverse changes child content, while an ancestor reverse or trim changes
+the inner automation clock. Numeric stereo pan is balance, not equal-power mono
+pan. Put fades on clips or containers; track fades have no authored clip window
+and emit an unsupported warning. General effect-parameter automation is pending.
+Inspect `audio-track-bus`, `sequence-audio-bus`, `sequence-audio-root` and leaf
+sample-window nodes in the actual render manifest. Keep the existing nonlinear
+windowed-atempo DC amplitude/gap failure open even when gain-clock checks pass.
