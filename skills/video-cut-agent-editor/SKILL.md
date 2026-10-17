@@ -31,6 +31,14 @@ gates for tracking, smart-cut/reframe, transitions and partial-take speed/revers
 
 Use this skill when the requested edit should be represented as a reproducible local Agent Project rather than a GUI project. The implementation lives in `product/` in this project.
 
+For editable HTML/SVG/Canvas titles, read the [offline HTML motion contract](../../docs/specs/离线HTML动效与可编辑源码契约_v0.1_2026-10-18.md).
+Use `motion html-register` with explicit existing native toolchain paths, then
+`html-source`, `html-inspect`, and `html-render --dry-run`. Bind formal rendering
+with its project hash; optional `--apply --track-id` inserts a normal alpha video.
+`--from-asset-id` rebuilds preserved source and typed parameters to a new asset
+version. Keep original image/font rights, frame-order and Job cleanup reports.
+No downloads, live-site capture, embedded video/iframes or WebGL are enabled.
+
 For cross-project reuse of edited clips, read the
 [fragment library contract](../../docs/specs/可复用片段组库与跨项目插入契约_v0.1_2026-10-18.md).
 Use `fragment save/apply --project <root> --library <local-dir> --input

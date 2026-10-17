@@ -1,12 +1,12 @@
 # Agent Video Kit
 
-面向 Agent 的本地视频广告编辑内核。项目使用原生 Windows、Python 和本地 FFmpeg，通过 CLI、结构化 Agent Project JSON、Skills 和可审计的素材权利台账完成广告剪辑流水线；当前工作区位于 `E:\dev\sandbox\AI广告剪辑`。
+面向 Agent 的本地视频广告编辑内核。项目使用原生 Windows、Python 和本地 FFmpeg，并提供显式登记的本地 Node/Chromium 动效后端，通过 CLI、结构化 Agent Project JSON、Skills 和可审计的素材权利台账完成广告剪辑流水线；当前工作区位于 `E:\dev\sandbox\AI广告剪辑`。
 
 项目明确不依赖剪映/Jianying 私有运行时、登录态、闭源线上服务、Docker、WSL 或其他虚拟化环境。网络默认关闭，模型、媒体和字体必须从显式本地路径提供。
 
 ## 功能核验与真实实测
 
-本表随功能和验证结果同步更新。**功能执行、实际内容、自动质量与听感分别验收，失败记录保留。** 本轮 V40：统一关联 `slip`、真实有限源 `extend_source` 与 roll/slide 显式 `handle_policy:source`；默认仍使用保留作者句柄，源界/关联锁/跟踪观察/转场额外句柄和原子事务统一检查，旧 compose slip 也走相同规划器。完整 **938/938，2478.552 秒**，0 跳过；127 Python+2 MJS+Schema+pyproject+MIT 共 132 文件冻结，41 新增方法为完整子集。九组/79 CLI 入口（66 成功、4 当前预期拒绝、9 固定 V39 缺项拒绝），505 新主帧/2,424,000 立体声采样帧与手工固定 V39 工程完全相同；两组另核对 100 个直接源帧身份，0 错配。同产品参照不独立验收渲染或音质。90 文件离线 wheel/26 独立进程 CLI、14 Skills/128 引用通过；四时刻静态目检，未连续播放/听审；开发失败与主动中断原记录保留。真实外扩重新求值效果/淡入淡出/retiming；嵌套曲线明确告警其时长再归一化，原主体采样不变未验收。完整磁吸、跟踪重规划、自然画质/音质、长片资源、Schema 随包/干净机器、内容库规模及完整剪映等价仍未验收。
+本表随功能和验证结果同步更新。**功能执行、实际内容、自动质量与听感分别验收，失败记录保留。** 本轮 V41：提取 OpenFilm 原帧时钟，新增完全本地 `motion html-register/html-source/html-inspect/html-render`；保留 HTML/CSS/SVG/Canvas 源码、固定资源/工具链、强类型参数、新版本重建和普通时间线透明叠加。完整 **975/975，1302.879 秒**，0 跳过；137 文件冻结，37 新增专项为完整子集。五组成功内容/三项页面拒绝共 30 CLI 入口调用，96 HTML 编码输入帧、192 全帧乱序重绘、24 原生时间线主帧分计；独立 RGB 合成最大差 3、均值 0.476496，工程包/片段组重建 RGBA 一致，所有实际浏览器 Job 回收。94 文件离线 wheel/11 独立进程 CLI、14 Skills/133 本地引用通过；六张静帧目检，未连续播放/听审。初始 MKV 帧时钟错位、源长和回收/工具链诊断失败原证据保留；正式采用逐帧精确 PTS 的 FFV1/BGRA NUT。完整 OpenFilm HTML 时间线/媒体/WebGL、自动模板控件/缺字越界诊断、HDR/自然广告美学、长片资源、Schema 随包/干净机器及完整剪映等价仍未验收。
 
 历史 V34：固定复用 OpenFilm O01 原算法，新增本地 `subtitle segment`：中文/英文/数字单位分段、明确提供的双语、绑定输入摘要的局部回写，生成 JSON/SRT 并可入轨。完整 **733/733，1604.604 秒**，0 跳过；115 Python+2 MJS+Schema+打包配置+MIT 原文共 120 文件前后字节冻结；38 新增专项为完整子集。四组/108 CLI（100 成功、8 预期拒绝），192 新帧与手工文字/时钟参考一致；参考使用同一渲染器，编辑前后 PCM 一致。另一次真实 Whisper CPU 推理将 5 条原句分成 9 条字幕，CER 2%，同一既有语料、无逐字对齐，音视频因权利未核验留本地。上游 13 测试/48 数据另计；离线 wheel 的 84 文件和 7 次隔离 CLI、14 Skills/104 引用通过。仅三帧静态目检，未连续播放/听审；分段估时、启发式译文对齐、样式迁移、广泛语言/自然质量、干净机器发行与完整剪映等价仍未验收。 历史行按当轮结果保留。
 
@@ -24,7 +24,7 @@
 | V10 | SAM2 点/框、多对象与提示修正 | 原生 CPU/CUDA、选择/修正/重置、自然双人 32 帧、概率蒙版及两背景成片已实跑；前轮在同一场景新增一次 CUDA 修正，5 个明确检查点从 3 个通过到 4 个通过 | **修正后仍失败**：目标手腕继续漏选；保留人物前臂从误选变为排除，不代表完整选区改善 | [前序实测](docs/validation/SAM2本地对象分割与提示修正实测_2026-10-16.md)、[此前逐点实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
 | V11 | LaMa / VACE 修复与色差融合 | 显式 harmonic 受控选区 PSNR 分别 47.45 / 42.90 dB；自然 32 帧链路完成，蒙版外 RGB 与全部 alpha 保留，PCM 原声独立核对一致 | **自然人物移除画质未通过**：残影、纹理涂抹或色块仍存在；VACE 为实验能力 | [实测](docs/validation/本地区域色差融合实测_2026-10-16.md)、[机器证据](docs/validation/evidence/repair-blend-smoke-20261016.json) |
 | V12 | 背景参考传播研究 | 单表面 PSNR 30.878→31.124 dB；双表面合计 **33.448→33.410 dB，略退化**。22 项独立研究检查通过；公开原输入和逐帧对照 | **未接入产品**；人工遮挡真值不代表真实人物移除，自然画质未通过 | [研究 GIF/MP4](#实测演示素材)、[实测](docs/validation/本地多运动参考选择与双表面真值实测_2026-10-16.md) |
-| V13 | 产品自动回归 | 完整 **938/938，2478.552 秒**，0 跳过；132 文件冻结，41 新增源编辑方法为完整子集 | 媒体 79 CLI 入口、wheel 26 独立进程 CLI、历史开发/研究分计；完整剪映未验 | [完整日志](docs/validation/evidence/source-final-full-20261018.log)、[机器证据](docs/validation/evidence/source-edits-20261018.json) |
+| V13 | 产品自动回归 | 完整 **975/975，1302.879 秒**，0 跳过；137 文件冻结，37 HTML 专项为完整子集 | 30 内容 CLI 入口、11 wheel 独立进程 CLI 和历史研究分计；完整剪映未验 | [完整日志](docs/validation/evidence/html-motion-final-full-20261018.log)、[机器证据](docs/validation/evidence/html-motion-20261018.json) |
 | V14 | 编码蒙版范围与正负检查点 | 新增 `quality mask`：逐帧面积/包围框/IoU、明确 selected/clear 检查。自制 4 秒/32 帧样例准确报出第 12 帧缺腿；补全几何后 4 点通过，失败报告及退出码 2 保留；原始 alpha 全帧摘要匹配 | 补全样例为脚本恢复几何，非 AI 修复；检查点不证明完整身份/边缘/自然质量。自然样例修正后仍有 1 点失败 | [原蒙版与 GIF/MP4](#实测演示素材)、[实际 CLI 与媒体证据](docs/assets/mask-review-20261016/evidence.json)、[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
 | V15 | 编码蒙版驱动轨迹、标签与重构图 | 16 次正式 CLI，4 秒/64 帧/16 fps；逐帧 bbox 与自制真值一致。标签位置最大误差：横屏 1.64 px、缩放旋转后 2.14 px、竖屏 2.15 px；包和源/蒙版权利依赖保留 | 自制选区不是模型分割能力。自然 SAM2 仍 4/5 检查点通过；该轮标签 4.10 px 失败，后续 V17 重验通过标签门槛，分割持续未验收 | [原视频与 GIF/MP4](#实测演示素材)、[全帧测量](docs/assets/mask-track-20261016/evidence.json)、[自然失败实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
 | V16 | 透明标签合成与失败报告 | 抽帧发现 PNG 的 fit 补边变黑；新增像素回归先失败，修复后 PNG/alpha MOV 通过，公开 64 帧两侧 128 区域核对。检查点失败仍保存诊断、回滚项目 | 位置准确不证明合成正确；修复前原片与失败日志保留；该轮自然标签失败，后续 V17 补充缩放修复与重验 | [修复前原成片](docs/assets/mask-track-20261016/before-alpha-fix-bound.mp4)、[前后证据](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
@@ -52,6 +52,7 @@
 | V38 | 非破坏裁切、拆分与内部波纹编辑 | 九组/54 CLI，300 新帧/144 万立体声采样帧与固定 V37 原片选区完全相同；倒放/曲线/定格/字幕/嵌套总线/多轨黑边/片段组及锁门禁 | 作者图处理后选区；部分窗口变速/跟踪/智能剪辑/受影响转场明确拒绝；范围外扩/完整磁吸/自然质量/长片未验 | [原片/GIF](#实测演示素材)、[契约](docs/specs/片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md)、[实测/失败](docs/validation/输出窗口裁切与作者时钟实测_2026-10-18.md) |
 | V39 | 插入/覆盖/留空删除/波纹提取/滚动剪口/滑动片段 | 八组/73 CLI，340 新帧/163.2 万采样帧匹配固定 V38 完整作者选区；关联音轨、同步/骑乘、字幕、嵌套总线、幂等/回滚及拒绝核验 | 仅保留作者句柄；源外扩/复杂关联 slip/完整磁吸、自然画质/听审/长片、干净机器及完整剪映未验 | [原片/GIF](#实测演示素材)、[契约](docs/specs/范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md)、[实测/失败](docs/validation/专业范围编辑与滚滑剪口实测_2026-10-18.md) |
 | V40 | 关联源 slip、真实源外扩与源句柄滚滑剪口 | 九组/79 CLI，505 新帧/242.4 万采样帧匹配固定 V39 手工作者工程；100 直接源帧身份无错配；旧入口/锁/源界/警告/幂等/回滚 | 外扩重新处理；嵌套曲线再归一化告警、旧主体时钟保真未验；跟踪重规划/完整磁吸/自然质量/听审/长片/完整剪映未验 | [原片/GIF](#实测演示素材)、[契约](docs/specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md)、[实测/原失败](docs/validation/真实源外扩与关联Slip实测_2026-10-18.md) |
+| V41 | 离线 HTML/SVG/Canvas 动效与可编辑源码 | 30 CLI、全帧正序/反序/乱序与真实 PTS；透明叠加独立最大 RGB 差 3；包/片段组可重建，失败/取消 Job 回收 | 五组为原创几何/英文字体；自然广告、中文复杂排版、全 film.html/媒体/WebGL/HDR/长片未验 | [原输入与实际 GIF/MP4](#实测演示素材)、[实测](docs/validation/离线HTML动效源码与透明合成实测_2026-10-18.md)、[证据](docs/validation/evidence/html-motion-20261018.json) |
 
 ## 开源复用核查
 
@@ -74,6 +75,15 @@
 实际数据：[字幕原输入](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-input.json) → [三段输出](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-output.json)；[跨轨删除原模型](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-input.json) → [操作计划/实际结果/手工预期](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-output.json)。字幕无词标的时间为估算。原 CLI/Skill 连接 Studio、npx latest 与服务商；选用模块需改为固定本地入口、强制离线并保留原版权。GUI 目录内的纯规划算法可提取；上游不是完整剪映或本地 AI 特效替代内核。
 
 ## 实测演示素材
+
+**正式产品 CLI V41：保留动效源码，生成透明标题并叠入时间线。** 左列为原创底图输入，右列为真实产品时间线成片；SVG 商品、文字、CSS 动画与 Canvas 标记均由本地 Chromium 逐帧生成。
+
+![原始输入与实际原生时间线成片](docs/assets/html-motion-20261018/native-comparison.gif)
+
+[原输入 PNG](docs/assets/html-motion-20261018/source.png) · [原输入 MP4](docs/assets/html-motion-20261018/source.mp4) · [HTML/清单](docs/assets/html-motion-20261018/template/index.html) · [SVG 原素材](docs/assets/html-motion-20261018/template/bottle.svg) · [透明原文件 NUT](docs/assets/html-motion-20261018/S01-alpha.nut) · [实际产品 MP4](docs/assets/html-motion-20261018/S03-timeline.mp4) · [实际产品 MKV](docs/assets/html-motion-20261018/S03-timeline.mkv) · [改参预览](docs/assets/html-motion-20261018/S02-preview.mp4) · [可重建工程包](docs/assets/html-motion-20261018/editable-project.zip) · [五组/失败/复现](docs/validation/离线HTML动效源码与透明合成实测_2026-10-18.md)。
+
+自制 CC0 背景、几何商品和原创像素字体；原片/主输出 640×360、12 fps、24 帧、2 秒。双列 GIF **960×270、12 帧/2000 ms**，无声；主 MKV 另有自动生成的精确静音流。96 成功 HTML 输入帧、192 乱序重绘与 24 原生时间线主帧分计，S03 与独立 alpha/RGB 合成最大差 3、均值 0.476496。78 文件/6,332,822 字节、10 视频/1 静音音频流复解码；两组三时刻静态目检，未连续播放/听审。绿色块为几何核验标记；未验中文长标题、照片广告或自然美学。[来源/30 原始 CLI](docs/assets/html-motion-20261018/verification.json)、[媒体审计](docs/validation/evidence/html-motion-media-final-20261018.json)、[原 MKV 错位成片](docs/assets/html-motion-clock-failure-20261018/S03-timeline.mkv)、[失败与原冻结源码](docs/validation/evidence/html-motion-development-20261018/verification.json)。MIT 只授权复用代码，源码/字体/图片权利继续分别登记。
+
 
 **正式产品 CLI V40：真实扩展输入范围，并联动音频延长滚动剪口。** 左列固定 V39 手工作者工程，右列本轮实际输出；上行 S02 双侧外扩，下行 S07 关联 roll。
 

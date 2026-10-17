@@ -1,0 +1,51 @@
+test_actual_alpha_frames_match_independent_rectangles_and_two_orders (test_html_motion.HTMLNativeTests.test_actual_alpha_frames_match_independent_rectangles_and_two_orders) ... ok
+test_cancel_after_page_open_kills_all_native_descendants (test_html_motion.HTMLNativeTests.test_cancel_after_page_open_kills_all_native_descendants) ... ok
+test_dry_run_does_not_start_browser (test_html_motion.HTMLNativeTests.test_dry_run_does_not_start_browser) ... ok
+test_external_fetch_is_rejected_and_browser_closed (test_html_motion.HTMLNativeTests.test_external_fetch_is_rejected_and_browser_closed) ... ok
+test_infinite_frame_timeout_kills_all_native_descendants (test_html_motion.HTMLNativeTests.test_infinite_frame_timeout_kills_all_native_descendants) ... ok
+test_parameter_rebuild_retains_source_and_changes_actual_pixels (test_html_motion.HTMLNativeTests.test_parameter_rebuild_retains_source_and_changes_actual_pixels) ... ok
+test_stateful_page_rejected_and_project_rolled_back (test_html_motion.HTMLNativeTests.test_stateful_page_rejected_and_project_rolled_back) ... ok
+test_twelve_fps_retains_every_frame_after_native_timeline_composition (test_html_motion.HTMLNativeTests.test_twelve_fps_retains_every_frame_after_native_timeline_composition) ... FAIL
+test_websocket_is_rejected_even_if_page_catches_exception (test_html_motion.HTMLNativeTests.test_websocket_is_rejected_even_if_page_catches_exception) ... ok
+test_absolute_network_reference_rejected (test_html_motion.HTMLSourceTests.test_absolute_network_reference_rejected) ... ok
+test_archive_extra_member_rejected_even_with_updated_outer_hash (test_html_motion.HTMLSourceTests.test_archive_extra_member_rejected_even_with_updated_outer_hash) ... ok
+test_asset_variable_requires_source_resource_version (test_html_motion.HTMLSourceTests.test_asset_variable_requires_source_resource_version) ... ok
+test_binary_files_require_registered_resource (test_html_motion.HTMLSourceTests.test_binary_files_require_registered_resource) ... ok
+test_boolean_dimension_rejected (test_html_motion.HTMLSourceTests.test_boolean_dimension_rejected) ... ok
+test_boolean_is_not_integer_parameter (test_html_motion.HTMLSourceTests.test_boolean_is_not_integer_parameter) ... ok
+test_case_alias_rejected (test_html_motion.HTMLSourceTests.test_case_alias_rejected) ... ok
+test_dry_run_no_asset_or_bundle (test_html_motion.HTMLSourceTests.test_dry_run_no_asset_or_bundle) ... ok
+test_excessive_frame_work_rejected (test_html_motion.HTMLSourceTests.test_excessive_frame_work_rejected) ... ok
+test_fractional_frame_duration_rejected (test_html_motion.HTMLSourceTests.test_fractional_frame_duration_rejected) ... ok
+test_inspect_hash_and_page_bytes (test_html_motion.HTMLSourceTests.test_inspect_hash_and_page_bytes) ... ok
+test_linked_directory_rejected (test_html_motion.HTMLSourceTests.test_linked_directory_rejected) ... ok
+test_missing_required_parameter_rejected (test_html_motion.HTMLSourceTests.test_missing_required_parameter_rejected) ... ok
+test_mutable_browser_diagnostic_does_not_hide_distribution_changes (test_html_motion.HTMLSourceTests.test_mutable_browser_diagnostic_does_not_hide_distribution_changes) ... ok
+test_mutated_zip_rejected (test_html_motion.HTMLSourceTests.test_mutated_zip_rejected) ... ok
+test_nan_parameter_rejected (test_html_motion.HTMLSourceTests.test_nan_parameter_rejected) ... ok
+test_parameter_names_cannot_collide_with_portable_asset_references (test_html_motion.HTMLSourceTests.test_parameter_names_cannot_collide_with_portable_asset_references) ... ok
+test_reserved_device_path_rejected (test_html_motion.HTMLSourceTests.test_reserved_device_path_rejected) ... ok
+test_runtime_registration_participates_in_project_metadata_rollback (test_html_motion.HTMLSourceTests.test_runtime_registration_participates_in_project_metadata_rollback) ... ok
+test_source_idempotency_replays_without_new_asset (test_html_motion.HTMLSourceTests.test_source_idempotency_replays_without_new_asset) ... ok
+test_source_rights_default_unverified (test_html_motion.HTMLSourceTests.test_source_rights_default_unverified) ... ok
+test_source_zip_is_reproducible_and_retains_code (test_html_motion.HTMLSourceTests.test_source_zip_is_reproducible_and_retains_code) ... ok
+test_traversal_rejected (test_html_motion.HTMLSourceTests.test_traversal_rejected) ... ok
+test_typed_parameters_and_defaults (test_html_motion.HTMLSourceTests.test_typed_parameters_and_defaults) ... ok
+test_unknown_manifest_field_rejected (test_html_motion.HTMLSourceTests.test_unknown_manifest_field_rejected) ... ok
+test_unknown_parameter_rejected (test_html_motion.HTMLSourceTests.test_unknown_parameter_rejected) ... ok
+test_unlisted_entry_rejected (test_html_motion.HTMLSourceTests.test_unlisted_entry_rejected) ... ok
+test_unregistered_image_rejected (test_html_motion.HTMLSourceTests.test_unregistered_image_rejected) ... ok
+
+======================================================================
+FAIL: test_twelve_fps_retains_every_frame_after_native_timeline_composition (test_html_motion.HTMLNativeTests.test_twelve_fps_retains_every_frame_after_native_timeline_composition)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_motion.py", line 314, in test_twelve_fps_retains_every_frame_after_native_timeline_composition
+    self.assertEqual(code,0,result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-render', 'request_id': 'req_20261017222233_db43c0f6', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_APPLY_INVALID', 'message': '动效写入后项目校验失败', 'path': None, 'retryable': False, 'cause': '{"ok": false, "errors": [{"code": "SOURCE_OUTSIDE_ASSET", "message": "source_out_tick 超出素材长度", "path": "sequences[0].tracks[0].clips[0]", "retryable": false}], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}], "rights": {"ok": false, "target": "commercial_ad", "checked": 2, "required_records": 1, "failures": [{"asset_id": "rendered", "context": "project_asset", "code": "RIGHTS_RECORD_MISSING", "message": "没有对应 Rights Ledger 记录"}], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}], "disposition_decisions": [], "effective_disposition_decisions": []}, "schema_engine": "jsonschema", "asset_count": 2, "sequence_count": 1}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T22:22:33.561318Z', 'finished_at': '2026-10-17T22:22:33.561323Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 37 tests in 36.421s
+
+FAILED (failures=1)

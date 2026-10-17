@@ -14,6 +14,12 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+For HTML/SVG/Canvas overlay assets, read the [offline HTML motion contract](../../docs/specs/离线HTML动效与可编辑源码契约_v0.1_2026-10-18.md).
+The FFV1/BGRA output of `motion html-source/html-render` uses ordinary timeline
+edits. Preserve `html_motion.source_asset_id` and the source's image/font
+references in packages and fragments. Rebuild parameters to a new asset
+version; keep the editable ZIP and review any changes to existing clip uses.
+
 Use the [source edit contract](../../docs/specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md)
 for `timeline edit` slip/extend_source and explicit source handles on roll/slide.
 Positive source deltas stay physical-forward even on reversed clips. Linked

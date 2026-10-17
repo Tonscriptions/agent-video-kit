@@ -1,0 +1,640 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "id": "proj_20261017222312_a3c58c60",
+    "name": "main",
+    "created_at": "2026-10-17T22:23:12.766164Z",
+    "updated_at": "2026-10-17T22:23:57.252733Z",
+    "creator": "ai-ad-editor",
+    "source_revision": "local"
+  },
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 12,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 640,
+      "height": 360,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "font",
+      "kind": "font",
+      "uri": "assets/font_font.ttf",
+      "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1",
+      "probe": {
+        "duration_seconds": 0.0,
+        "duration_tick": 0,
+        "format": "ttf",
+        "format_long_name": "local font",
+        "streams": [],
+        "font": {
+          "family": "Agent Grid CC0",
+          "style": "Regular",
+          "face_index": 0,
+          "engine": "pillow-freetype"
+        },
+        "video": {
+          "codec": null
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0
+        }
+      },
+      "rights_ref": "font",
+      "source": {
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\html-motion-20261018\\template\\font.ttf",
+        "retrieved_at": "2026-10-17T22:23:14.372397Z",
+        "original_name": "font.ttf"
+      }
+    },
+    {
+      "id": "background",
+      "kind": "image",
+      "uri": "assets/background_source.png",
+      "sha256": "sha256:c1c9061225409d535c41d7d5592eea9e615059d0b1ed4f75b08235636320da62",
+      "probe": {
+        "duration_seconds": 0.0,
+        "duration_tick": 0,
+        "format": "png_pipe",
+        "format_long_name": "piped png sequence",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "png",
+            "codec_long_name": "PNG (Portable Network Graphics) image",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "width": 640,
+            "height": 360,
+            "coded_width": 640,
+            "coded_height": 360,
+            "has_b_frames": 0,
+            "pix_fmt": "rgb24",
+            "level": -99,
+            "color_range": "pc",
+            "color_space": "gbr",
+            "r_frame_rate": "25/1",
+            "avg_frame_rate": "25/1",
+            "time_base": "1/25",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            }
+          }
+        ],
+        "video": {
+          "codec": "png",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "rgb24",
+          "fps": "25/1",
+          "color_space": "gbr",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "background",
+      "source": {
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\html-motion-20261018\\source.png",
+        "retrieved_at": "2026-10-17T22:23:14.564848Z",
+        "original_name": "source.png"
+      }
+    },
+    {
+      "id": "editable",
+      "kind": "generated",
+      "uri": "assets/html-motion/16ccf899a26641eff821460a4c1b80ad.zip",
+      "sha256": "sha256:d42fb05d2185556594bebbd40e1dfaf7078075d5129e4c4e7b634dfd165669f2",
+      "rights_ref": "editable",
+      "probe": {
+        "format": "agent-html-motion-source"
+      },
+      "source": {
+        "source_url": "assets/html-motion/16ccf899a26641eff821460a4c1b80ad.zip",
+        "retrieved_at": "2026-10-17T22:23:14.700785Z",
+        "original_name": "16ccf899a26641eff821460a4c1b80ad.zip"
+      },
+      "html_source": {
+        "engine": "agent-local-html-motion-v1",
+        "version": "0.1.0",
+        "ticks_per_second": 90000,
+        "resources": [
+          {
+            "path": "font.ttf",
+            "asset_id": "font",
+            "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "orange",
+      "kind": "video",
+      "uri": "assets/html-motion/1b4c9133da73a711322404314402765a.nut",
+      "sha256": "sha256:9d8ca5f3ea27d461f72e201945062b767151f85e3ff341d69bfc9cc375e7531a",
+      "rights_ref": "orange",
+      "probe": {
+        "duration_seconds": 2.0,
+        "duration_tick": 180000,
+        "format": "nut",
+        "format_long_name": "NUT",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "ffv1",
+            "codec_long_name": "FFmpeg video codec #1",
+            "codec_type": "video",
+            "codec_tag_string": "FFV1",
+            "codec_tag": "0x31564646",
+            "width": 640,
+            "height": 360,
+            "coded_width": 640,
+            "coded_height": 360,
+            "has_b_frames": 0,
+            "pix_fmt": "bgra",
+            "level": -99,
+            "r_frame_rate": "12/1",
+            "avg_frame_rate": "12/1",
+            "time_base": "1/49152",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bits_per_raw_sample": "8",
+            "extradata_size": 42,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "encoder": "Lavc62.28.100 ffv1"
+            }
+          }
+        ],
+        "video": {
+          "codec": "ffv1",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "bgra",
+          "fps": "12/1",
+          "color_space": null,
+          "duration_seconds": 2.0,
+          "start_time_seconds": 0.0,
+          "frame_count": 24
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "container_duration_seconds": 1.916667,
+        "duration_basis": "verified_exact_cfr_frames"
+      },
+      "source": {
+        "source_url": "assets/html-motion/1b4c9133da73a711322404314402765a.nut",
+        "retrieved_at": "2026-10-17T22:23:22.734299Z",
+        "original_name": "1b4c9133da73a711322404314402765a.nut"
+      },
+      "html_motion": {
+        "engine": "agent-local-html-motion-v1",
+        "source_asset_id": "editable",
+        "parameters": {
+          "title": "EDIT VIDEO",
+          "brand": "#fb923c"
+        },
+        "spec": {
+          "entry": "index.html",
+          "width": 640,
+          "height": 360,
+          "fps": {
+            "den": 1,
+            "num": 12
+          },
+          "duration_tick": 180000,
+          "variables": [
+            {
+              "default": "EDIT VIDEO",
+              "max_length": 12,
+              "name": "title",
+              "type": "string"
+            },
+            {
+              "default": "#fb923c",
+              "name": "brand",
+              "type": "color"
+            }
+          ]
+        },
+        "frame_count": 24
+      }
+    },
+    {
+      "id": "blue",
+      "kind": "video",
+      "uri": "assets/html-motion/16477688c0e00699c6cfa4497a3612d7.nut",
+      "sha256": "sha256:209b89ac2036776484f4363b57829109318ad0f65dad9dc77617e10264ac33f0",
+      "rights_ref": "blue",
+      "probe": {
+        "duration_seconds": 2.0,
+        "duration_tick": 180000,
+        "format": "nut",
+        "format_long_name": "NUT",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "ffv1",
+            "codec_long_name": "FFmpeg video codec #1",
+            "codec_type": "video",
+            "codec_tag_string": "FFV1",
+            "codec_tag": "0x31564646",
+            "width": 640,
+            "height": 360,
+            "coded_width": 640,
+            "coded_height": 360,
+            "has_b_frames": 0,
+            "pix_fmt": "bgra",
+            "level": -99,
+            "r_frame_rate": "12/1",
+            "avg_frame_rate": "12/1",
+            "time_base": "1/49152",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bits_per_raw_sample": "8",
+            "extradata_size": 42,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "encoder": "Lavc62.28.100 ffv1"
+            }
+          }
+        ],
+        "video": {
+          "codec": "ffv1",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "bgra",
+          "fps": "12/1",
+          "color_space": null,
+          "duration_seconds": 2.0,
+          "start_time_seconds": 0.0,
+          "frame_count": 24
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "container_duration_seconds": 1.916667,
+        "duration_basis": "verified_exact_cfr_frames"
+      },
+      "source": {
+        "source_url": "assets/html-motion/16477688c0e00699c6cfa4497a3612d7.nut",
+        "retrieved_at": "2026-10-17T22:23:29.625584Z",
+        "original_name": "16477688c0e00699c6cfa4497a3612d7.nut"
+      },
+      "html_motion": {
+        "engine": "agent-local-html-motion-v1",
+        "source_asset_id": "editable",
+        "parameters": {
+          "title": "EDIT 2",
+          "brand": "#38bdf8"
+        },
+        "spec": {
+          "entry": "index.html",
+          "width": 640,
+          "height": 360,
+          "fps": {
+            "den": 1,
+            "num": 12
+          },
+          "duration_tick": 180000,
+          "variables": [
+            {
+              "default": "EDIT VIDEO",
+              "max_length": 12,
+              "name": "title",
+              "type": "string"
+            },
+            {
+              "default": "#fb923c",
+              "name": "brand",
+              "type": "color"
+            }
+          ]
+        },
+        "frame_count": 24
+      }
+    },
+    {
+      "id": "F01-source",
+      "kind": "generated",
+      "uri": "assets/html-motion/f983ce90bb7552cfb007f98bc18b47d5.zip",
+      "sha256": "sha256:85a8d2d478d3433734b58a3313e378aa26f16a0473e28c3d969bbb586ca242e1",
+      "rights_ref": "F01-source",
+      "probe": {
+        "format": "agent-html-motion-source"
+      },
+      "source": {
+        "source_url": "assets/html-motion/f983ce90bb7552cfb007f98bc18b47d5.zip",
+        "retrieved_at": "2026-10-17T22:23:50.014675Z",
+        "original_name": "f983ce90bb7552cfb007f98bc18b47d5.zip"
+      },
+      "html_source": {
+        "engine": "agent-local-html-motion-v1",
+        "version": "0.1.0",
+        "ticks_per_second": 90000,
+        "resources": []
+      }
+    },
+    {
+      "id": "F02-source",
+      "kind": "generated",
+      "uri": "assets/html-motion/2b152972c8cd9ff8a73213bc91ec6d1d.zip",
+      "sha256": "sha256:6668d1759c659c28743e708b5f336b3cfb97631bfb810cb1d2b556fcf93b78dc",
+      "rights_ref": "F02-source",
+      "probe": {
+        "format": "agent-html-motion-source"
+      },
+      "source": {
+        "source_url": "assets/html-motion/2b152972c8cd9ff8a73213bc91ec6d1d.zip",
+        "retrieved_at": "2026-10-17T22:23:53.115777Z",
+        "original_name": "2b152972c8cd9ff8a73213bc91ec6d1d.zip"
+      },
+      "html_source": {
+        "engine": "agent-local-html-motion-v1",
+        "version": "0.1.0",
+        "ticks_per_second": 90000,
+        "resources": []
+      }
+    },
+    {
+      "id": "F03-source",
+      "kind": "generated",
+      "uri": "assets/html-motion/5ab99e66b43b97ded165d6e0a7ed726b.zip",
+      "sha256": "sha256:fb1cce2a75feb68c9840d5d0d315aba80d97f2d074e4696e536ed7bac8b7de41",
+      "rights_ref": "F03-source",
+      "probe": {
+        "format": "agent-html-motion-source"
+      },
+      "source": {
+        "source_url": "assets/html-motion/5ab99e66b43b97ded165d6e0a7ed726b.zip",
+        "retrieved_at": "2026-10-17T22:23:57.220603Z",
+        "original_name": "5ab99e66b43b97ded165d6e0a7ed726b.zip"
+      },
+      "html_source": {
+        "engine": "agent-local-html-motion-v1",
+        "version": "0.1.0",
+        "ticks_per_second": 90000,
+        "resources": []
+      }
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq_main",
+      "name": "Main",
+      "duration_tick": 180000,
+      "tracks": [
+        {
+          "id": "track_video_1",
+          "kind": "video",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "base",
+              "asset_id": "background",
+              "timeline_start_tick": 0,
+              "duration_tick": 180000,
+              "source_in_tick": 0,
+              "source_out_tick": 180000
+            }
+          ]
+        },
+        {
+          "id": "track_audio_1",
+          "kind": "audio",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": []
+        },
+        {
+          "id": "overlay",
+          "kind": "video",
+          "order": 1,
+          "locked": false,
+          "muted": false,
+          "clips": [
+            {
+              "id": "clip_html_20261017222322_b98e1bb7",
+              "asset_id": "orange",
+              "timeline_start_tick": 0,
+              "duration_tick": 180000,
+              "source_in_tick": 0,
+              "source_out_tick": 180000
+            }
+          ]
+        }
+      ],
+      "markers": []
+    }
+  ],
+  "templates": [],
+  "outputs": [
+    {
+      "id": "output_20261017222331_c958f4ef",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-motion-final-nut-20261018\\main\\renders\\S03-timeline.mkv",
+      "container": "mkv",
+      "profile": null,
+      "canvas": {
+        "width": 640,
+        "height": 360,
+        "pixel_aspect": {
+          "num": 1,
+          "den": 1
+        }
+      },
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "pcm_f32le",
+        "bitrate": "192k"
+      },
+      "target_platform": "generic"
+    }
+  ],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "model_versions": [],
+    "input_hashes": [],
+    "change_log": [
+      {
+        "operation_id": "op_20261017222314_226fccef",
+        "command": "media.ingest",
+        "asset_id": "font",
+        "at": "2026-10-17T22:23:14.372779Z"
+      },
+      {
+        "operation_id": "op_20261017222314_2cf4b12e",
+        "command": "media.ingest",
+        "asset_id": "background",
+        "at": "2026-10-17T22:23:14.565394Z"
+      },
+      {
+        "command": "motion.html-source",
+        "operation_id": "op_20261017222314_c137e9da",
+        "asset_id": "editable",
+        "snapshot_id": "snap_20261017222314_a4ba51f4",
+        "at": "2026-10-17T22:23:14.729694Z"
+      },
+      {
+        "command": "motion.html-render",
+        "operation_id": "op_20261017222317_a0950d0a",
+        "asset_id": "orange",
+        "source_asset_id": "editable",
+        "snapshot_id": "snap_20261017222317_27e1126d",
+        "at": "2026-10-17T22:23:22.881339Z"
+      },
+      {
+        "command": "motion.html-render",
+        "operation_id": "op_20261017222324_aaaf472c",
+        "asset_id": "blue",
+        "source_asset_id": "editable",
+        "snapshot_id": "snap_20261017222324_129d5e38",
+        "at": "2026-10-17T22:23:29.645797Z"
+      },
+      {
+        "command": "render",
+        "at": "2026-10-17T22:23:31.823846Z",
+        "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-motion-final-nut-20261018\\main\\renders\\S03-timeline.mkv",
+        "manifest": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-motion-final-nut-20261018\\main\\renders\\S03-timeline.mkv.manifest.json"
+      },
+      {
+        "command": "motion.html-source",
+        "operation_id": "op_20261017222350_2ea1c8a6",
+        "asset_id": "F01-source",
+        "snapshot_id": "snap_20261017222350_a8eec7bb",
+        "at": "2026-10-17T22:23:50.034800Z"
+      },
+      {
+        "command": "motion.html-source",
+        "operation_id": "op_20261017222353_a24dfe44",
+        "asset_id": "F02-source",
+        "snapshot_id": "snap_20261017222353_cea5788d",
+        "at": "2026-10-17T22:23:53.129464Z"
+      },
+      {
+        "command": "motion.html-source",
+        "operation_id": "op_20261017222357_10b3ec36",
+        "asset_id": "F03-source",
+        "snapshot_id": "snap_20261017222357_dd5615d7",
+        "at": "2026-10-17T22:23:57.252726Z"
+      }
+    ]
+  }
+}

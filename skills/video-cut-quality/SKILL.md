@@ -5,6 +5,13 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For browser motion, read the [offline HTML motion contract](../../docs/specs/离线HTML动效与可编辑源码契约_v0.1_2026-10-18.md).
+Require the actual `motion html-render` report: input PNG hashes, two fresh
+context orders for every frame, fixed toolchain and native Job cleanup.
+Check decoded alpha and timeline composition separately. Equal hashes do not
+establish typography, natural quality, HDR, cross browser consistency,
+continuous playback or sound review.
+
 For [source edits](../../docs/specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md),
 check both physical source bounds and actual decoded frame identities/PCM.
 Slip preserves author fields; extension reauthors fades/effects and may

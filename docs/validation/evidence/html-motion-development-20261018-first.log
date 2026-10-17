@@ -1,0 +1,86 @@
+test_actual_alpha_frames_match_independent_rectangles_and_two_orders (test_html_motion.HTMLNativeTests.test_actual_alpha_frames_match_independent_rectangles_and_two_orders) ... E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py:4357: ResourceWarning: unclosed file <_io.BufferedReader name=8>
+  result = html_motion.render_frames(root, plan, output, report_path, timeout=args.timeout_seconds, cancel_file=cancel)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_cancel_after_page_open_kills_all_native_descendants (test_html_motion.HTMLNativeTests.test_cancel_after_page_open_kills_all_native_descendants) ... E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py:6440: ResourceWarning: unclosed file <_io.BufferedWriter name=7>
+  return exc.exit_code
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py:6440: ResourceWarning: unclosed file <_io.BufferedWriter name=6>
+  return exc.exit_code
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py:6440: ResourceWarning: unclosed file <_io.BufferedReader name=8>
+  return exc.exit_code
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_dry_run_does_not_start_browser (test_html_motion.HTMLNativeTests.test_dry_run_does_not_start_browser) ... ok
+test_external_fetch_is_rejected_and_browser_closed (test_html_motion.HTMLNativeTests.test_external_fetch_is_rejected_and_browser_closed) ... FAIL
+test_infinite_frame_timeout_kills_all_native_descendants (test_html_motion.HTMLNativeTests.test_infinite_frame_timeout_kills_all_native_descendants) ... ok
+test_parameter_rebuild_retains_source_and_changes_actual_pixels (test_html_motion.HTMLNativeTests.test_parameter_rebuild_retains_source_and_changes_actual_pixels) ... ok
+test_stateful_page_rejected_and_project_rolled_back (test_html_motion.HTMLNativeTests.test_stateful_page_rejected_and_project_rolled_back) ... FAIL
+test_websocket_is_rejected_even_if_page_catches_exception (test_html_motion.HTMLNativeTests.test_websocket_is_rejected_even_if_page_catches_exception) ... FAIL
+test_absolute_network_reference_rejected (test_html_motion.HTMLSourceTests.test_absolute_network_reference_rejected) ... ok
+test_archive_extra_member_rejected_even_with_updated_outer_hash (test_html_motion.HTMLSourceTests.test_archive_extra_member_rejected_even_with_updated_outer_hash) ... ok
+test_asset_variable_requires_source_resource_version (test_html_motion.HTMLSourceTests.test_asset_variable_requires_source_resource_version) ... ok
+test_binary_files_require_registered_resource (test_html_motion.HTMLSourceTests.test_binary_files_require_registered_resource) ... ok
+test_boolean_dimension_rejected (test_html_motion.HTMLSourceTests.test_boolean_dimension_rejected) ... ok
+test_boolean_is_not_integer_parameter (test_html_motion.HTMLSourceTests.test_boolean_is_not_integer_parameter) ... ok
+test_case_alias_rejected (test_html_motion.HTMLSourceTests.test_case_alias_rejected) ... ok
+test_dry_run_no_asset_or_bundle (test_html_motion.HTMLSourceTests.test_dry_run_no_asset_or_bundle) ... ok
+test_excessive_frame_work_rejected (test_html_motion.HTMLSourceTests.test_excessive_frame_work_rejected) ... ok
+test_fractional_frame_duration_rejected (test_html_motion.HTMLSourceTests.test_fractional_frame_duration_rejected) ... ok
+test_inspect_hash_and_page_bytes (test_html_motion.HTMLSourceTests.test_inspect_hash_and_page_bytes) ... ok
+test_linked_directory_rejected (test_html_motion.HTMLSourceTests.test_linked_directory_rejected) ... ok
+test_missing_required_parameter_rejected (test_html_motion.HTMLSourceTests.test_missing_required_parameter_rejected) ... ok
+test_mutated_zip_rejected (test_html_motion.HTMLSourceTests.test_mutated_zip_rejected) ... ok
+test_nan_parameter_rejected (test_html_motion.HTMLSourceTests.test_nan_parameter_rejected) ... ok
+test_reserved_device_path_rejected (test_html_motion.HTMLSourceTests.test_reserved_device_path_rejected) ... ok
+test_source_idempotency_replays_without_new_asset (test_html_motion.HTMLSourceTests.test_source_idempotency_replays_without_new_asset) ... ok
+test_source_rights_default_unverified (test_html_motion.HTMLSourceTests.test_source_rights_default_unverified) ... ok
+test_source_zip_is_reproducible_and_retains_code (test_html_motion.HTMLSourceTests.test_source_zip_is_reproducible_and_retains_code) ... ok
+test_traversal_rejected (test_html_motion.HTMLSourceTests.test_traversal_rejected) ... ok
+test_typed_parameters_and_defaults (test_html_motion.HTMLSourceTests.test_typed_parameters_and_defaults) ... ok
+test_unknown_manifest_field_rejected (test_html_motion.HTMLSourceTests.test_unknown_manifest_field_rejected) ... ok
+test_unknown_parameter_rejected (test_html_motion.HTMLSourceTests.test_unknown_parameter_rejected) ... ok
+test_unlisted_entry_rejected (test_html_motion.HTMLSourceTests.test_unlisted_entry_rejected) ... ok
+test_unregistered_image_rejected (test_html_motion.HTMLSourceTests.test_unregistered_image_rejected) ... ok
+
+======================================================================
+FAIL: test_external_fetch_is_rejected_and_browser_closed (test_html_motion.HTMLNativeTests.test_external_fetch_is_rejected_and_browser_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_motion.py", line 260, in test_external_fetch_is_rejected_and_browser_closed
+    self.assertEqual(result['errors'][0]['code'],'HTML_PAGE_ERROR')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'HTML_PROCESS_FAILED' != 'HTML_PAGE_ERROR'
+- HTML_PROCESS_FAILED
++ HTML_PAGE_ERROR
+
+
+======================================================================
+FAIL: test_stateful_page_rejected_and_project_rolled_back (test_html_motion.HTMLNativeTests.test_stateful_page_rejected_and_project_rolled_back)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_motion.py", line 251, in test_stateful_page_rejected_and_project_rolled_back
+    self.assertEqual(result['errors'][0]['code'],'HTML_FRAME_NONDETERMINISTIC')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'HTML_PROCESS_FAILED' != 'HTML_FRAME_NONDETERMINISTIC'
+- HTML_PROCESS_FAILED
++ HTML_FRAME_NONDETERMINISTIC
+
+
+======================================================================
+FAIL: test_websocket_is_rejected_even_if_page_catches_exception (test_html_motion.HTMLNativeTests.test_websocket_is_rejected_even_if_page_catches_exception)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_motion.py", line 267, in test_websocket_is_rejected_even_if_page_catches_exception
+    self.assertEqual(result['errors'][0]['code'],'HTML_FEATURE_DENIED')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'HTML_PROCESS_FAILED' != 'HTML_FEATURE_DENIED'
+- HTML_PROCESS_FAILED
++ HTML_FEATURE_DENIED
+
+
+----------------------------------------------------------------------
+Ran 33 tests in 96.286s
+
+FAILED (failures=3)

@@ -139,3 +139,17 @@ docs/validation/evidence/source-*-20261018.json -text
 docs/validation/evidence/source-*-20261018.log -text -whitespace
 docs/validation/evidence/source-*-20261018/** -text -whitespace
 docs/assets/source-edits-*/cli-*.log -text -whitespace
+
+# V41 native HTML motion preserves exact workers, source snapshots and raw logs.
+product/**/*.mjs -text
+product/pyproject.toml text eol=lf
+product/src/ai_ad_editor/OPENFILM_LICENSE.txt -text
+skills/**/SKILL.md text eol=lf
+scripts/*html_motion*.py -text
+scripts/audit_openfilm_html_adoption.py -text
+docs/validation/evidence/html-motion*.json -text whitespace=cr-at-eol
+docs/validation/evidence/html-motion*.log -text -whitespace
+docs/validation/evidence/html-motion*.py -text
+docs/validation/evidence/html-motion-*/** -text -whitespace
+docs/validation/evidence/openfilm-html-adoption-*/** -text -whitespace
+docs/assets/html-motion-*/** -text -whitespace

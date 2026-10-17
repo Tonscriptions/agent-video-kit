@@ -17,7 +17,7 @@ from .utils import atomic_write_json, load_json, new_id, now_iso, project_root
 
 
 TICKS_PER_SECOND = 90_000
-MODEL_REGISTRY_FILES = ('models/audio-adapters.json', 'models/visual-adapters.json')
+MODEL_REGISTRY_FILES = ('models/audio-adapters.json', 'models/visual-adapters.json', 'config/html-motion-runtime.json')
 
 
 def project_file(root: Path) -> Path:

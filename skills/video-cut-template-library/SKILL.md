@@ -5,6 +5,13 @@ description: Build and apply local advertising templates, or save and reuse edit
 
 # Local Templates
 
+For editable browser motion, read the [offline HTML motion contract](../../docs/specs/离线HTML动效与可编辑源码契约_v0.1_2026-10-18.md).
+`motion html-source` freezes listed code and registered images/fonts.
+`html-render --from-asset-id` rebuilds preserved typed parameters to a new
+asset version. Carry source/resource references through packages/fragments;
+recipient projects register their own existing local toolchain. The template
+does not authorize downloads or upgrade template/media rights.
+
 Edited groups may contain [presentation windows](../../docs/specs/片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md).
 Preserve original source ranges, author start/duration and window offsets when
 saving or applying; do not normalize them to the visible clip duration. The

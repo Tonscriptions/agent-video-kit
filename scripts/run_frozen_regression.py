@@ -19,6 +19,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', type=Path, required=True, help='new JSON evidence path; adjacent .log is retained')
     parser.add_argument('--pattern', default='test*.py')
+    parser.add_argument('--html-runtime', type=Path, default=os.environ.get('AI_AD_EDITOR_TEST_HTML_RUNTIME'),
+                        help='explicit existing native Node/playwright-core/Chromium JSON; never downloads')
     parser.add_argument('--rubberband', type=Path, default=os.environ.get('AI_AD_EDITOR_TEST_RUBBERBAND'),
                         help='explicit existing native executable, with COPYING.txt and sndfile.dll beside it')
     args = parser.parse_args()
@@ -49,6 +51,10 @@ def main():
                PYTHONPATH=str(ROOT/'product/src'))
     if args.rubberband:
         env['AI_AD_EDITOR_TEST_RUBBERBAND'] = str(binary)
+    if args.html_runtime:
+        html_runtime = args.html_runtime.resolve(strict=True)
+        record['native_html_configuration'] = {'path': str(html_runtime), 'sha256': sha(html_runtime)}
+        env['AI_AD_EDITOR_TEST_HTML_RUNTIME'] = str(html_runtime)
     record['subprocess_product_pythonpath'] = env['PYTHONPATH']
     record['command'] = command
     save()

@@ -1,0 +1,56 @@
+test_actual_alpha_frames_match_independent_rectangles_and_two_orders (test_html_motion.HTMLNativeTests.test_actual_alpha_frames_match_independent_rectangles_and_two_orders) ... ok
+test_cancel_after_page_open_kills_all_native_descendants (test_html_motion.HTMLNativeTests.test_cancel_after_page_open_kills_all_native_descendants) ... ok
+test_dry_run_does_not_start_browser (test_html_motion.HTMLNativeTests.test_dry_run_does_not_start_browser) ... ok
+test_external_fetch_is_rejected_and_browser_closed (test_html_motion.HTMLNativeTests.test_external_fetch_is_rejected_and_browser_closed) ... ok
+test_infinite_frame_timeout_kills_all_native_descendants (test_html_motion.HTMLNativeTests.test_infinite_frame_timeout_kills_all_native_descendants) ... ok
+test_parameter_rebuild_retains_source_and_changes_actual_pixels (test_html_motion.HTMLNativeTests.test_parameter_rebuild_retains_source_and_changes_actual_pixels) ... ok
+test_stateful_page_rejected_and_project_rolled_back (test_html_motion.HTMLNativeTests.test_stateful_page_rejected_and_project_rolled_back) ... FAIL
+test_websocket_is_rejected_even_if_page_catches_exception (test_html_motion.HTMLNativeTests.test_websocket_is_rejected_even_if_page_catches_exception) ... FAIL
+test_absolute_network_reference_rejected (test_html_motion.HTMLSourceTests.test_absolute_network_reference_rejected) ... ok
+test_archive_extra_member_rejected_even_with_updated_outer_hash (test_html_motion.HTMLSourceTests.test_archive_extra_member_rejected_even_with_updated_outer_hash) ... ok
+test_asset_variable_requires_source_resource_version (test_html_motion.HTMLSourceTests.test_asset_variable_requires_source_resource_version) ... ok
+test_binary_files_require_registered_resource (test_html_motion.HTMLSourceTests.test_binary_files_require_registered_resource) ... ok
+test_boolean_dimension_rejected (test_html_motion.HTMLSourceTests.test_boolean_dimension_rejected) ... ok
+test_boolean_is_not_integer_parameter (test_html_motion.HTMLSourceTests.test_boolean_is_not_integer_parameter) ... ok
+test_case_alias_rejected (test_html_motion.HTMLSourceTests.test_case_alias_rejected) ... ok
+test_dry_run_no_asset_or_bundle (test_html_motion.HTMLSourceTests.test_dry_run_no_asset_or_bundle) ... ok
+test_excessive_frame_work_rejected (test_html_motion.HTMLSourceTests.test_excessive_frame_work_rejected) ... ok
+test_fractional_frame_duration_rejected (test_html_motion.HTMLSourceTests.test_fractional_frame_duration_rejected) ... ok
+test_inspect_hash_and_page_bytes (test_html_motion.HTMLSourceTests.test_inspect_hash_and_page_bytes) ... ok
+test_linked_directory_rejected (test_html_motion.HTMLSourceTests.test_linked_directory_rejected) ... ok
+test_missing_required_parameter_rejected (test_html_motion.HTMLSourceTests.test_missing_required_parameter_rejected) ... ok
+test_mutated_zip_rejected (test_html_motion.HTMLSourceTests.test_mutated_zip_rejected) ... ok
+test_nan_parameter_rejected (test_html_motion.HTMLSourceTests.test_nan_parameter_rejected) ... ok
+test_reserved_device_path_rejected (test_html_motion.HTMLSourceTests.test_reserved_device_path_rejected) ... ok
+test_source_idempotency_replays_without_new_asset (test_html_motion.HTMLSourceTests.test_source_idempotency_replays_without_new_asset) ... ok
+test_source_rights_default_unverified (test_html_motion.HTMLSourceTests.test_source_rights_default_unverified) ... ok
+test_source_zip_is_reproducible_and_retains_code (test_html_motion.HTMLSourceTests.test_source_zip_is_reproducible_and_retains_code) ... ok
+test_traversal_rejected (test_html_motion.HTMLSourceTests.test_traversal_rejected) ... ok
+test_typed_parameters_and_defaults (test_html_motion.HTMLSourceTests.test_typed_parameters_and_defaults) ... ok
+test_unknown_manifest_field_rejected (test_html_motion.HTMLSourceTests.test_unknown_manifest_field_rejected) ... ok
+test_unknown_parameter_rejected (test_html_motion.HTMLSourceTests.test_unknown_parameter_rejected) ... ok
+test_unlisted_entry_rejected (test_html_motion.HTMLSourceTests.test_unlisted_entry_rejected) ... ok
+test_unregistered_image_rejected (test_html_motion.HTMLSourceTests.test_unregistered_image_rejected) ... ok
+
+======================================================================
+FAIL: test_stateful_page_rejected_and_project_rolled_back (test_html_motion.HTMLNativeTests.test_stateful_page_rejected_and_project_rolled_back)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_motion.py", line 250, in test_stateful_page_rejected_and_project_rolled_back
+    self.assertEqual(code,6,result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 6 : {'ok': False, 'command': 'motion.html-render', 'request_id': 'req_20261017221406_69b998f4', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_TOOLCHAIN_CHANGED', 'message': '已固定工具链字节或版本变化，必须重新审查登记', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\temp\\html-native-8600qxy3\\project\\config\\html-motion-runtime.json', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T22:14:06.105064Z', 'finished_at': '2026-10-17T22:14:06.105071Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_websocket_is_rejected_even_if_page_catches_exception (test_html_motion.HTMLNativeTests.test_websocket_is_rejected_even_if_page_catches_exception)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_motion.py", line 266, in test_websocket_is_rejected_even_if_page_catches_exception
+    self.assertEqual(code,6,result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 6 : {'ok': False, 'command': 'motion.html-render', 'request_id': 'req_20261017221408_6d139167', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_TOOLCHAIN_CHANGED', 'message': '已固定工具链字节或版本变化，必须重新审查登记', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\temp\\html-native-1k6g_bio\\project\\config\\html-motion-runtime.json', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-17T22:14:08.349464Z', 'finished_at': '2026-10-17T22:14:08.349470Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 33 tests in 41.364s
+
+FAILED (failures=2)

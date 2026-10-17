@@ -17,3 +17,9 @@ Only project-relative paths, existing local absolute paths, `local://`, and
 packages, or plugins. Do not call cloud APIs, webhooks, GUI automation, or
 virtualization. A failed audit is a hard stop; preserve its JSON envelope as
 the evidence for the Agent caller.
+
+For [offline HTML motion](../../docs/specs/离线HTML动效与可编辑源码契约_v0.1_2026-10-18.md),
+use only explicitly registered native Node/Playwright/Chromium files. The host
+fulfills a synthetic origin from the source bundle without an HTTP server.
+Keep external-request failures, full-frame verification and native process
+cleanup evidence. No live-site capture or network allowlist is enabled.

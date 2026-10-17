@@ -21,6 +21,22 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'html_motion': {
+                'status': 'implemented_with_limits', 'engine': 'agent-local-html-motion-v1',
+                'commands': ['motion.html-register','motion.html-source','motion.html-inspect','motion.html-render'],
+                'features': ['explicit_byte_pinned_local_node_playwright_chromium',
+                    'editable_source_bundle_and_registered_image_font_closure',
+                    'typed_template_parameters_and_rebuild_to_new_asset_version',
+                    'straight_alpha_ffv1_bgra_nut_exact_rational_frame_clock',
+                    'all_frames_rechecked_in_two_fresh_context_orders',
+                    'native_windows_job_timeout_cancel_and_descendant_cleanup',
+                    'dry_run_hash_binding_idempotency_and_project_transactions'],
+                'limits': ['native_windows_existing_toolchain_required_no_downloads',
+                    'trusted_local_templates_not_general_hostile_javascript_sandbox',
+                    'no_full_openfilm_timeline_iframe_embedded_media_or_webgl',
+                    '1800_frames_2_billion_pixel_work_64_mib_bundle_512_mib_output',
+                    'not_cross_browser_font_or_hdr_capcut_quality_acceptance'],
+            },
             'range_edits': {
                 'status': 'implemented_with_limits', 'engine': 'agent-range-edit-v1',
                 'commands': ['timeline.edit:insert', 'timeline.edit:overwrite',

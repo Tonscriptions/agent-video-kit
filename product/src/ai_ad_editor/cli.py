@@ -47,6 +47,7 @@ from .sequence_sampling import configuration as sequence_sampling_configuration
 from .edit_planner import build_edit_plan, project_fingerprint as edit_project_fingerprint
 from .source_transitions import build_plan as build_source_transition_plan
 from . import fragments
+from . import html_motion
 from .mask_review import prepare as prepare_mask_review, review as review_mask
 from .mask_tracking import ENGINE as MASK_TRACKING_ENGINE, prepare as prepare_mask_tracking, execute as execute_mask_tracking, public_plan as public_mask_tracking_plan
 from .recommend import recommend_highlights
@@ -688,6 +689,33 @@ def build_parser() -> argparse.ArgumentParser:
     motion_apply.add_argument("--points", type=int, default=None, help="shake 关键帧点数；默认使用目录值")
     motion_apply.add_argument("--start-tick", type=int, default=None, help="片段内起始 tick；默认 0")
     motion_apply.add_argument("--end-tick", type=int, default=None, help="片段内结束 tick；默认片段时长")
+
+    html_register = _leaf_common(motion_sub.add_parser('html-register', help='固定已有本地 Node/Playwright/Chromium 工具链'))
+    html_register.add_argument('--project', required=True)
+    html_register.add_argument('--input', required=True)
+    html_source = _leaf_common(motion_sub.add_parser('html-source', help='封装可编辑离线 HTML 动效源码与已登记资源'))
+    html_source.add_argument('--project', required=True)
+    html_source.add_argument('--input', required=True)
+    html_source.add_argument('--asset-id', required=True)
+    html_source.add_argument('--creator', default='unknown')
+    html_source.add_argument('--license-spdx', default='LicenseRef-UNVERIFIED')
+    html_inspect = _leaf_common(motion_sub.add_parser('html-inspect', help='校验并查看动效源码清单'))
+    html_inspect.add_argument('--project', required=True)
+    html_inspect.add_argument('--source-asset-id', required=True)
+    html_render = _leaf_common(motion_sub.add_parser('html-render', help='离线逐帧生成透明动效并验证全帧乱序重绘'))
+    html_render.add_argument('--project', required=True)
+    html_input = html_render.add_mutually_exclusive_group(required=True)
+    html_input.add_argument('--source-asset-id')
+    html_input.add_argument('--from-asset-id')
+    html_render.add_argument('--asset-id', required=True)
+    html_render.add_argument('--params')
+    html_render.add_argument('--apply', action='store_true')
+    html_render.add_argument('--track-id')
+    html_render.add_argument('--sequence-id')
+    html_render.add_argument('--timeline-start-tick', type=int, default=0)
+    html_render.add_argument('--expected-project-sha256')
+    html_render.add_argument('--timeout-seconds', type=float, default=600)
+    html_render.add_argument('--cancel-file')
 
     timeline = subs.add_parser("timeline", help="时间线编排")
     ts = timeline.add_subparsers(dest="action", required=True)
@@ -4242,6 +4270,136 @@ def command_effects_inspect(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def command_html_register(args: argparse.Namespace) -> dict[str, Any]:
+    root, _ = load_project(args.project)
+    path = resolve_local_path(root, args.input, field='input')
+    record = html_motion.prepare_runtime(root, load_json(path))
+    if not args.dry_run:
+        atomic_write_json(root / 'config/html-motion-runtime.json', record)
+    return _envelope('motion.html-register', args, status='planned' if args.dry_run else 'succeeded',
+                     data={'runtime': record, 'automatic_downloads': False})
+
+
+def _html_rights(asset: dict, parents: list[str], *, creator='unknown', license_spdx='LicenseRef-UNVERIFIED') -> dict:
+    return {'asset_id': asset['id'], 'kind': asset['kind'], 'sha256': asset['sha256'],
+        'source_url': asset['uri'], 'source_version': html_motion.ENGINE,
+        'retrieved_at': now_iso(), 'creator': creator, 'license_spdx': license_spdx, 'license_url': '',
+        'attribution': '', 'permitted_uses': ['internal'], 'restrictions': [], 'derived_from': parents,
+        'evidence': asset['uri'], 'verification_status': 'unverified', 'verified_by': '',
+        'takedown_status': 'clear', 'notes': 'Local editable HTML motion; template, image and font rights require separate review'}
+
+
+def command_html_source(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    assert_id(args.asset_id, 'asset_id')
+    if args.asset_id in asset_map(project):
+        raise argument_error('源码资产 ID 已存在', 'asset_id')
+    content, plan = html_motion.build_source(root, project, args.input)
+    output = ensure_inside(root, root / 'assets/html-motion' / (html_motion.digest(args.asset_id.encode())[7:39] + '.zip'))
+    if output.exists():
+        raise argument_error('源码包路径已存在，必须使用新的 ID', str(output))
+    asset = {'id': args.asset_id, 'kind': 'generated', 'uri': output.relative_to(root).as_posix(),
+        'sha256': html_motion.digest(content), 'rights_ref': args.asset_id, 'probe': {'format': 'agent-html-motion-source'},
+        'source': {'source_url': output.relative_to(root).as_posix(), 'retrieved_at': now_iso(), 'original_name': output.name},
+        'html_source': {'engine': html_motion.ENGINE, 'version': html_motion.VERSION,
+            'ticks_per_second': project['settings']['timebase']['ticks_per_second'], 'resources': plan['resources']}}
+    parents = list(dict.fromkeys(asset_map(project)[r['asset_id']]['rights_ref'] for r in plan['resources']))
+    record = _html_rights(asset, parents, creator=args.creator, license_spdx=args.license_spdx)
+    if args.dry_run:
+        return _envelope('motion.html-source', args, status='planned', data={'asset': asset, 'rights': record, 'plan': plan})
+    snapshot = create_snapshot(root, project, label='before-html-source')
+    created = False
+    try:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        with output.open('xb') as stream:
+            created = True
+            stream.write(content)
+        ledger = load_ledger(root)
+        add_record(ledger, record)
+        project['assets'].append(asset)
+        operation_id = new_id('op')
+        project['provenance'].setdefault('change_log', []).append({'command': 'motion.html-source',
+            'operation_id': operation_id, 'asset_id': asset['id'], 'snapshot_id': snapshot['snapshot_id'], 'at': now_iso()})
+        save_project(root, project)
+        save_ledger(root, ledger)
+        _operation(root, operation_id, {'command': 'motion.html-source', 'status': 'succeeded',
+                   'asset_id': asset['id'], 'created_at': now_iso()})
+        return _envelope('motion.html-source', args, data={'asset': asset, 'rights': record, 'plan': plan,
+                         'snapshot': snapshot}, operation_id=operation_id)
+    except BaseException:
+        if created:
+            output.unlink(missing_ok=True)
+        raise
+
+
+def command_html_inspect(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    source = html_motion.inspect_source(root, project, args.source_asset_id)
+    source.pop('data')
+    return _envelope('motion.html-inspect', args, data=source)
+
+
+def command_html_render(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    plan = html_motion.prepare_render(root, project, args)
+    public = html_motion.public_plan(plan)
+    if args.dry_run:
+        return _envelope('motion.html-render', args, status='planned', data={'plan': public})
+    output = ensure_inside(root, root / 'assets/html-motion' / (html_motion.digest(args.asset_id.encode())[7:39] + '.nut'))
+    if output.exists():
+        raise argument_error('动效输出已存在，必须使用新的 ID', str(output))
+    cancel = resolve_local_path(root, args.cancel_file, field='cancel_file') if args.cancel_file else None
+    snapshot = create_snapshot(root, project, label='before-html-render')
+    operation_id = new_id('op')
+    report_path = root / 'validation' / f'html-motion-{operation_id}.json'
+    created = False
+    try:
+        result = html_motion.render_frames(root, plan, output, report_path, timeout=args.timeout_seconds, cancel_file=cancel)
+        created = True
+        asset = {'id': args.asset_id, 'kind': 'video', 'uri': output.relative_to(root).as_posix(),
+            'sha256': result['output_sha256'], 'rights_ref': args.asset_id, 'probe': result['probe'],
+            'source': {'source_url': output.relative_to(root).as_posix(), 'retrieved_at': now_iso(), 'original_name': output.name},
+            'html_motion': {'engine': html_motion.ENGINE, 'source_asset_id': plan['source_asset_id'],
+                'parameters': plan['parameters'], 'spec': plan['spec'], 'frame_count': plan['frame_count']}}
+        record = _html_rights(asset, [plan['asset']['rights_ref']])
+        project['assets'].append(asset)
+        ledger = load_ledger(root)
+        add_record(ledger, record)
+        clip = None
+        if plan['track'] is not None:
+            clip = {'id': new_id('clip_html'), 'asset_id': asset['id'], 'timeline_start_tick': args.timeline_start_tick,
+                'duration_tick': plan['spec']['duration_tick'], 'source_in_tick': 0, 'source_out_tick': plan['spec']['duration_tick']}
+            plan['track']['clips'].append(clip)
+            _recompute_sequence_duration(find_sequence(project, args.sequence_id))
+        save_ledger(root, ledger)  # validation sees the same candidate rights; transaction protects rollback
+        validation = validate_project(root, project, strict_rights=False)
+        if not validation['ok']:
+            raise AppError('HTML_APPLY_INVALID', '动效写入后项目校验失败', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+        project['provenance'].setdefault('change_log', []).append({'command': 'motion.html-render', 'operation_id': operation_id,
+            'asset_id': asset['id'], 'source_asset_id': plan['source_asset_id'], 'snapshot_id': snapshot['snapshot_id'], 'at': now_iso()})
+        save_project(root, project)
+        save_ledger(root, ledger)
+        _operation(root, operation_id, {'command': 'motion.html-render', 'status': 'succeeded', 'asset_id': asset['id'],
+                   'report': str(report_path), 'created_at': now_iso()})
+        return _envelope('motion.html-render', args, data={'plan': public, 'asset': asset, 'rights': record,
+                         'generated_clip': clip, 'snapshot': snapshot, 'report': str(report_path), 'validation': validation}, operation_id=operation_id)
+    except BaseException as exc:
+        if created:
+            output.unlink(missing_ok=True)
+        if report_path.is_file():
+            try:
+                failed = load_json(report_path)
+                failed['render_status'] = failed['status']
+                failed['status'] = 'failed'
+                failed['application_error'] = exc.as_dict() if isinstance(exc, AppError) else {'message': str(exc)}
+                atomic_write_json(report_path, failed)
+                if isinstance(exc, AppError):
+                    exc.path = str(report_path)
+            except (OSError, ValueError):
+                pass
+        raise
+
+
 def command_motion_list(args: argparse.Namespace) -> dict[str, Any]:
     presets = list_motion_presets(args.query)
     return _envelope(
@@ -6144,6 +6302,7 @@ _READ_ONLY_PROJECT_COMMANDS = {
     ("quality", "mask"),
     ("motion", "list"),
     ("motion", "inspect"),
+    ('motion', 'html-inspect'),
 }
 
 
@@ -6198,6 +6357,10 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("motion", "list"): command_motion_list,
     ("motion", "inspect"): command_motion_inspect,
     ("motion", "apply"): command_motion_apply,
+    ('motion', 'html-register'): command_html_register,
+    ('motion', 'html-source'): command_html_source,
+    ('motion', 'html-inspect'): command_html_inspect,
+    ('motion', 'html-render'): command_html_render,
     ("timeline", "compose"): command_timeline_compose,
     ("timeline", "edit"): command_timeline_edit,
     ("timeline", "transition"): command_timeline_transition,
