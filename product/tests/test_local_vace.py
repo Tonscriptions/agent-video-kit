@@ -303,10 +303,27 @@ info=request['video'];shapes=[]
 def model(images,masks,generation):
     shapes.append(list(images.shape[:3]));return np.full(images.shape,.2,np.float32)
 metrics=process_frames(sys.stdin.buffer,sys.stdout.buffer,width=info['width'],height=info['height'],frames=info['frames'],generation=request['generation'],options=request['inpainting'],channel=request['mask']['channel'],infer=model)
+from ai_ad_editor.cuda_admission import HEADROOM_BYTES,POLICY,window_summary,record_window
+# Protocol-only metadata: never presented as real device/model evidence.
+def admitted(stage,required):
+    return {'policy':POLICY,'stage':stage,'status':'admitted','reservation':False,'oom_guarantee':False,
+      'device_uuid':'GPU-00000000-0000-0000-0000-000000000001','logical_device_index':0,'required_free_bytes':required,
+      'torch_free_bytes':32*1024**3,'torch_total_bytes':32*1024**3,'physical_free_bytes':24*1024**3,
+      'physical_total_bytes':32*1024**3,'effective_free_bytes':24*1024**3,
+      'idle_cache_release':{'scope':'current-worker','synchronized':True,'empty_cache_called':True,
+        'completed':True,'active_allocation_preserved':True,'allocated_before_bytes':1024,
+        'reserved_before_bytes':2048,'allocated_after_bytes':1024,'reserved_after_bytes':1024,
+        'released_reserved_bytes':1024}}
+gpu={'policy':POLICY,'reservation':False,'oom_guarantee':False,'headroom_bytes':HEADROOM_BYTES,
+ 'text':admitted('text-weights',request['adapter']['settings']['text_gpu_budget_mib']*1024**2+HEADROOM_BYTES),
+ 'video':admitted('video-weights',2*1024**3+4096+HEADROOM_BYTES),'video_weight_bytes':2*1024**3,
+ 'prompt_embedding_bytes':4096,'windows':window_summary()}
+for i in range(metrics['model_calls']):record_window(gpu['windows'],admitted('video-window-'+str(i+1),HEADROOM_BYTES))
 response={'protocol':request['protocol'],'engine':request['engine'],'status':'succeeded','network':'disabled','blocked_network_events':[],
  'request_sha256':request['request_sha256'],'source_sha256':request['source']['sha256'],'adapter_sha256':request['adapter']['sha256'],
  'mask_sha256':request['mask']['sha256'],'mask_plan_sha256':request['mask']['plan_sha256'],'inpainting':request['inpainting'],'generation':request['generation'],'providers':['torch-cuda'],'metrics':metrics,
- 'model_loaded':metrics['model_calls']>0,'model_execution':{'prompt_truncated':False,'prompt_extension':False,'text_encoder_released_before_generation':True,'transformer_precision':'bfloat16-with-declared-float32-stability-modules','vae_precision':'float32','prompt_token_counts':{'prompt':12,'negative_prompt':1},'window_seconds':[0.1]*metrics['model_calls'],'flow_shift':request['generation']['flow_shift'],'model_input_scale':request['generation']['model_input_scale'],'window_input_shapes':shapes}}
+ 'model_loaded':metrics['model_calls']>0,'model_execution':{'gpu_admission':gpu,'prompt_truncated':False,'prompt_extension':False,'text_encoder_released_before_generation':True,'transformer_precision':'bfloat16-with-declared-float32-stability-modules','vae_precision':'float32','prompt_token_counts':{'prompt':12,'negative_prompt':1},'window_seconds':[0.1]*metrics['model_calls'],'flow_shift':request['generation']['flow_shift'],'model_input_scale':request['generation']['model_input_scale'],'window_input_shapes':shapes}}
+response['model_execution']['text_offload_hooks_removed_before_generation']=True
 files={a['path']:a['bytes'] for a in request['adapter']['artifacts']}
 response['artifact_verification']={'mode':'windows-read-lock-command-scope','files_hashed':len(files),'bytes_hashed':sum(files.values()),'digest_reuses_while_locked':len(request['adapter']['artifacts']),'write_and_delete_sharing':False,'persists_across_commands':False}
 if mode=='bad_blend':metrics['blend']['mode']='invented'
@@ -328,6 +345,14 @@ if mode=='bad_shape':response['model_execution']['window_input_shapes'][0][0]=3
 if mode=='bad_raster':response['model_execution']['window_input_shapes'][0][1]+=16*request['generation']['model_input_scale']
 if mode=='missing_shapes':response['model_execution'].pop('window_input_shapes')
 if mode=='bad_precision':response['model_execution']['vae_precision']='float16'
+if mode=='missing_gpu':response['model_execution'].pop('gpu_admission')
+if mode=='bad_gpu_device':gpu['video']['device_uuid']='GPU-00000000-0000-0000-0000-000000000002'
+if mode=='bad_gpu_free':gpu['text']['physical_free_bytes']=1
+if mode=='bad_gpu_count':gpu['windows']['count']+=1
+if mode=='bad_gpu_guarantee':gpu['oom_guarantee']=True
+if mode=='missing_gpu_cache':gpu['video'].pop('idle_cache_release')
+if mode=='bad_gpu_cache':gpu['video']['idle_cache_release']['allocated_after_bytes']=1
+if mode=='bad_text_hooks':response['model_execution']['text_offload_hooks_removed_before_generation']=False
 if mode=='bad_conditioning':metrics['conditioning']='original-object-pixels'
 if mode=='bad_verification':response['artifact_verification']['digest_reuses_while_locked']=0
 if mode=='race':Path(sys.argv[3]).write_bytes(b'external output')
@@ -368,9 +393,16 @@ class NativeVaceTests(unittest.TestCase):
     def test_registration_dry_run_inspect_and_complete_inventory(self):
         before=self.metadata();code,result=invoke('media','adapter','register',*self.options,'--dry-run')
         self.assertEqual(code,0,result);self.assertEqual(self.metadata(),before)
-        adapter=self.register();self.assertEqual(adapter['model_file_count'],17);self.assertEqual(len(adapter['artifacts']),30)
+        adapter=self.register();self.assertEqual(adapter['model_file_count'],17);self.assertEqual(len(adapter['artifacts']),31)
         self.assertTrue(verify_adapter(adapter)['ok'])
         self.assertTrue(invoke('media','adapter','inspect','--project',str(self.root),'--adapter-id','vace')[1]['data']['verification']['ok'])
+
+    def test_missing_cuda_admission_implementation_cannot_reuse_old_manifest(self):
+        adapter=self.register()
+        self.assertEqual(sum(a['role']=='cuda_admission' for a in adapter['artifacts']),1)
+        adapter['artifacts']=[a for a in adapter['artifacts'] if a['role']!='cuda_admission']
+        adapter['sha256']=manifest_hash(adapter)
+        self.assertFalse(verify_adapter(adapter)['ok'])
 
     def test_model_inventory_custom_code_architecture_and_map_rejection(self):
         missing=self.model/'tokenizer/spiece.model';original=missing.read_bytes();missing.unlink()
@@ -453,7 +485,7 @@ class NativeVaceTests(unittest.TestCase):
 
     def test_malformed_worker_reports_fail_without_publishing(self):
         self.register();before=self.metadata()
-        for mode in ('bad_generation','bad_window','bad_calls','bad_alpha','bad_rgba','bad_network','bad_provider','bad_loaded','bad_tokens','bad_precision','bad_conditioning','bad_verification','bad_flow','bad_scale','bad_shape','bad_raster','missing_shapes','bad_blend','fail'):
+        for mode in ('bad_generation','bad_window','bad_calls','bad_alpha','bad_rgba','bad_network','bad_provider','bad_loaded','bad_tokens','bad_precision','bad_conditioning','bad_verification','bad_flow','bad_scale','bad_shape','bad_raster','missing_shapes','bad_blend','missing_gpu','bad_gpu_device','bad_gpu_free','bad_gpu_count','bad_gpu_guarantee','missing_gpu_cache','bad_gpu_cache','bad_text_hooks','fail'):
             with self.subTest(mode=mode),self.fake_command(mode):
                 code,result=invoke(*self.command());self.assertEqual(code,6,result);self.assert_clean_failure(before)
 

@@ -8,19 +8,24 @@ import time
 
 def load_predictor(model_path, settings, generation, *, progress=None):
     # Imports happen only inside the isolated network-guarded worker.
-    import accelerate
-    import diffusers
-    import numpy as np
-    from PIL import Image
-    import safetensors
     import torch
-    import transformers
-    from transformers import AutoTokenizer, UMT5Config, UMT5EncoderModel
-    from diffusers import AutoencoderKLWan, UniPCMultistepScheduler, WanVACEPipeline, WanVACETransformer3DModel
+    from .cuda_admission import HEADROOM_BYTES, POLICY, admit_cuda, record_window, window_summary
 
     started=time.monotonic();root=Path(model_path)
     def phase(name):
         if progress:progress(name)
+    phase('admitting-text-gpu-memory')
+    text_check=admit_cuda(torch,settings['text_gpu_budget_mib']*1024**2+HEADROOM_BYTES,'text-weights')
+    import accelerate
+    from accelerate.hooks import remove_hook_from_module
+    import diffusers
+    import numpy as np
+    from PIL import Image
+    import safetensors
+    import transformers
+    from transformers import AutoTokenizer, UMT5Config, UMT5EncoderModel
+    from diffusers import AutoencoderKLWan, UniPCMultistepScheduler, WanVACEPipeline, WanVACETransformer3DModel
+
     phase('tokenizing-local-prompt')
     tokenizer=AutoTokenizer.from_pretrained(str(root/'tokenizer'),local_files_only=True,trust_remote_code=False)
     token_count={}
@@ -37,9 +42,6 @@ def load_predictor(model_path, settings, generation, *, progress=None):
     needed=sum(p.numel() for p in skeleton.parameters())*2;del skeleton
     if needed>(settings['text_gpu_budget_mib']+settings['text_cpu_budget_mib'])*1024**2:
         raise ValueError('VACE_TEXT_WEIGHT_BUDGET_INSUFFICIENT_NO_DISK_FALLBACK')
-    free,total=torch.cuda.mem_get_info()
-    if free<(settings['text_gpu_budget_mib']+768)*1024**2:
-        raise ValueError('VACE_FREE_CUDA_MEMORY_BELOW_EXPLICIT_TEXT_BUDGET')
     encoder,loading=UMT5EncoderModel.from_pretrained(str(root/'text_encoder'),dtype=torch.bfloat16,local_files_only=True,use_safetensors=True,
         device_map='auto',max_memory={0:settings['text_gpu_budget_mib']*1024**2,'cpu':settings['text_cpu_budget_mib']*1024**2},
         low_cpu_mem_usage=True,output_loading_info=True)
@@ -56,6 +58,8 @@ def load_predictor(model_path, settings, generation, *, progress=None):
             result[:,length:]=0
             return result
     prompt_embeds=encode(positive);negative_embeds=encode(negative)
+    phase('releasing-local-text-encoder')
+    remove_hook_from_module(encoder,recurse=True)
     del encoder,positive,negative
     gc.collect();torch.cuda.synchronize();torch.cuda.empty_cache()
     text_seconds=time.monotonic()-started
@@ -70,6 +74,12 @@ def load_predictor(model_path, settings, generation, *, progress=None):
     scheduler=UniPCMultistepScheduler.from_config(scheduler.config,flow_shift=generation['flow_shift'])
     transformer.eval();vae.eval();vae.enable_tiling()
     pipe=WanVACEPipeline(tokenizer=tokenizer,text_encoder=None,transformer=transformer,vae=vae,scheduler=scheduler)
+    video_weight_bytes=sum(value.numel()*value.element_size() for model in (transformer,vae)
+                           for values in (model.parameters(),model.buffers()) for value in values)
+    prompt_embedding_bytes=sum(value.numel()*value.element_size() for value in (prompt_embeds,negative_embeds))
+    phase('admitting-video-gpu-memory')
+    video_check=admit_cuda(torch,video_weight_bytes+prompt_embedding_bytes+HEADROOM_BYTES,'video-weights',
+                          expected_uuid=text_check['device_uuid'])
     pipe.to('cuda');pipe.set_progress_bar_config(disable=True)
     stability=tuple(transformer._keep_in_fp32_modules)
     dtypes={}
@@ -81,14 +91,22 @@ def load_predictor(model_path, settings, generation, *, progress=None):
     metadata={'versions':{'python':__import__('sys').version.split()[0],'numpy':np.__version__,'torch':torch.__version__,'diffusers':diffusers.__version__,
                          'transformers':transformers.__version__,'accelerate':accelerate.__version__,'safetensors':safetensors.__version__},
               'text_device_map':placement,'text_weight_bytes_bfloat16':needed,'text_encoder_released_before_generation':True,
+              'text_offload_hooks_removed_before_generation':True,
               'prompt_token_counts':token_count,'prompt_truncated':False,'prompt_extension':False,'text_phase_seconds':text_seconds,
-              'load_seconds':time.monotonic()-started,'cuda_device':torch.cuda.get_device_name(0),'cuda_total_bytes':total,
+              'load_seconds':time.monotonic()-started,'cuda_device':torch.cuda.get_device_name(0),'cuda_total_bytes':text_check['torch_total_bytes'],
+              'gpu_admission':{'policy':POLICY,'reservation':False,'oom_guarantee':False,'headroom_bytes':HEADROOM_BYTES,
+                               'text':text_check,'video':video_check,'video_weight_bytes':video_weight_bytes,
+                               'prompt_embedding_bytes':prompt_embedding_bytes,'windows':window_summary()},
               'transformer_precision':'bfloat16-with-declared-float32-stability-modules','transformer_parameter_dtype_elements':dtypes,
               'float32_stability_modules':list(stability),'vae_precision':'float32','vae_spatial_tiling':True,'window_seconds':[],
               'flow_shift':float(scheduler.config.flow_shift),'model_input_scale':generation['model_input_scale'],
               'window_input_shapes':[]}
     def predict(images,masks,window_generation):
         if {k:v for k,v in window_generation.items() if k!='seed'}!={k:v for k,v in generation.items() if k!='seed'}:raise ValueError('VACE_GENERATION_SETTINGS_CHANGED')
+        phase('admitting-video-window-gpu-memory')
+        summary=metadata['gpu_admission']['windows']
+        check=admit_cuda(torch,HEADROOM_BYTES,'video-window-'+str(summary['count']+1),expected_uuid=text_check['device_uuid'])
+        record_window(summary,check)
         phase('joint-video-denoising');begin=time.monotonic()
         def step_callback(_pipe,_step,_time,kwargs):
             phase('joint-video-denoising-step-'+str(_step+1));return kwargs

@@ -16,7 +16,8 @@ VACE_ENGINE = 'diffusers-wan-vace-local-v1'
 VACE_PROTOCOL = 'agent-video-wan-vace-inpainting-v1'
 IMPLEMENTATIONS = {'worker': 'vace_worker.py', 'frames': 'vace_frames.py', 'controller': 'local_vace.py',
                    'model_loader': 'vace_model.py', 'pipeline': 'local_matting.py', 'mask_controller': 'local_inpainting.py',
-                   'rgba': 'matting_frames.py', 'guard': 'rvm_worker.py', 'artifact_verification': 'artifact_locks.py', 'io': 'utils.py', 'blend': 'repair_blend.py'}
+                   'rgba': 'matting_frames.py', 'guard': 'rvm_worker.py', 'artifact_verification': 'artifact_locks.py', 'io': 'utils.py', 'blend': 'repair_blend.py',
+                   'cuda_admission': 'cuda_admission.py'}
 CAPABILITIES = ['prompted_masked_video_editing', 'joint_temporal_windows', 'native_cuda_bfloat16', 'outside_rgb_and_alpha_preserved']
 MODEL_FILES = {'model_index.json', 'scheduler/scheduler_config.json', 'text_encoder/config.json',
                'text_encoder/model.safetensors.index.json', 'tokenizer/special_tokens_map.json', 'tokenizer/spiece.model',

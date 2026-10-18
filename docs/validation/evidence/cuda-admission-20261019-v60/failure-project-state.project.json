@@ -1,0 +1,346 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "id": "proj_20261018211834_42b9688b",
+    "name": "project",
+    "created_at": "2026-10-18T21:18:34.662679Z",
+    "updated_at": "2026-10-18T21:27:18.528591Z",
+    "creator": "ai-ad-editor",
+    "source_revision": "local"
+  },
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 30,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 1080,
+      "height": 1920,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "asset_20261018211834_ae728840",
+      "kind": "video",
+      "uri": "assets/asset_20261018211834_ae728840_source.mov",
+      "sha256": "sha256:800f9903ca5256f196c0f9328671d41fd9e3ba25880760de24c0bb176e88b6c3",
+      "probe": {
+        "duration_seconds": 1.0,
+        "duration_tick": 90000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "qtrle",
+            "codec_long_name": "QuickTime Animation (RLE) video",
+            "codec_type": "video",
+            "codec_tag_string": "rle ",
+            "codec_tag": "0x20656c72",
+            "width": 192,
+            "height": 128,
+            "coded_width": 192,
+            "coded_height": 128,
+            "has_b_frames": 0,
+            "pix_fmt": "argb",
+            "level": -99,
+            "field_order": "progressive",
+            "id": "0x1",
+            "r_frame_rate": "8/1",
+            "avg_frame_rate": "8/1",
+            "time_base": "1/16384",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 16384,
+            "duration": "1.000000",
+            "bit_rate": "823672",
+            "nb_frames": "8",
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "handler_name": "VideoHandler",
+              "vendor_id": "FFMP",
+              "encoder": "Lavc62.28.100 qtrle"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "pcm_s16le",
+            "codec_long_name": "PCM signed 16-bit little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "sowt",
+            "codec_tag": "0x74776f73",
+            "sample_fmt": "s16",
+            "sample_rate": "48000",
+            "channels": 1,
+            "channel_layout": "mono",
+            "bits_per_sample": 16,
+            "initial_padding": 0,
+            "id": "0x2",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 48000,
+            "duration": "1.000000",
+            "bit_rate": "768000",
+            "nb_frames": "48000",
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "handler_name": "SoundHandler",
+              "vendor_id": "[0][0][0][0]"
+            }
+          }
+        ],
+        "video": {
+          "codec": "qtrle",
+          "width": 192,
+          "height": 128,
+          "pix_fmt": "argb",
+          "fps": "8/1",
+          "color_space": null,
+          "duration_seconds": 1.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_s16le",
+          "sample_rate": 48000,
+          "channels": 1,
+          "duration_seconds": 1.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "asset_20261018211834_ae728840",
+      "source": {
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\cuda-admission-vace-real-20261019-v60\\fixture\\source.mov",
+        "retrieved_at": "2026-10-18T21:18:35.027925Z",
+        "original_name": "source.mov"
+      }
+    },
+    {
+      "id": "asset_20261018211835_8d2c47ef",
+      "kind": "video",
+      "uri": "assets/asset_20261018211835_8d2c47ef_mask.mov",
+      "sha256": "sha256:1ba8880a706f86a1c6a006647c0cf7256904feacb3c9297c15472318f81a0663",
+      "probe": {
+        "duration_seconds": 1.0,
+        "duration_tick": 90000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "qtrle",
+            "codec_long_name": "QuickTime Animation (RLE) video",
+            "codec_type": "video",
+            "codec_tag_string": "rle ",
+            "codec_tag": "0x20656c72",
+            "width": 192,
+            "height": 128,
+            "coded_width": 192,
+            "coded_height": 128,
+            "has_b_frames": 0,
+            "pix_fmt": "argb",
+            "level": -99,
+            "field_order": "progressive",
+            "id": "0x1",
+            "r_frame_rate": "8/1",
+            "avg_frame_rate": "8/1",
+            "time_base": "1/16384",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 16384,
+            "duration": "1.000000",
+            "bit_rate": "32624",
+            "nb_frames": "8",
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "handler_name": "VideoHandler",
+              "vendor_id": "FFMP",
+              "encoder": "Lavc62.28.100 qtrle"
+            }
+          }
+        ],
+        "video": {
+          "codec": "qtrle",
+          "width": 192,
+          "height": 128,
+          "pix_fmt": "argb",
+          "fps": "8/1",
+          "color_space": null,
+          "duration_seconds": 1.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "asset_20261018211835_8d2c47ef",
+      "source": {
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\cuda-admission-vace-real-20261019-v60\\fixture\\mask.mov",
+        "retrieved_at": "2026-10-18T21:18:35.474768Z",
+        "original_name": "mask.mov"
+      }
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq_main",
+      "name": "Main",
+      "duration_tick": 1,
+      "tracks": [
+        {
+          "id": "track_video_1",
+          "kind": "video",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": []
+        },
+        {
+          "id": "track_audio_1",
+          "kind": "audio",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": []
+        }
+      ],
+      "markers": []
+    }
+  ],
+  "templates": [],
+  "outputs": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "model_versions": [],
+    "input_hashes": [],
+    "change_log": [
+      {
+        "operation_id": "op_20261018211835_3bbc795b",
+        "command": "media.ingest",
+        "asset_id": "asset_20261018211834_ae728840",
+        "at": "2026-10-18T21:18:35.028421Z"
+      },
+      {
+        "operation_id": "op_20261018211835_5200a637",
+        "command": "media.ingest",
+        "asset_id": "asset_20261018211835_8d2c47ef",
+        "at": "2026-10-18T21:18:35.475382Z"
+      },
+      {
+        "operation_id": "op_20261018212718_e154b91e",
+        "command": "media.adapter.register",
+        "adapter_id": "vace_local",
+        "engine": "diffusers-wan-vace-local-v1",
+        "snapshot_id": "snap_20261018212718_410b7fc9",
+        "registry": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\cuda-admission-vace-real-20261019-v60\\actual\\project\\models\\visual-adapters.json",
+        "at": "2026-10-18T21:27:18.524249Z"
+      }
+    ],
+    "local_adapters": [
+      {
+        "adapter_id": "vace_local",
+        "kind": "video-inpainting",
+        "engine": "diffusers-wan-vace-local-v1",
+        "model_sha256": "sha256:5a634bfa299951a011112dde59027a2daafd7e51263b6e5e63c5b2843df3a991",
+        "registered_at": "2026-10-18T21:27:18.499677Z"
+      }
+    ]
+  }
+}

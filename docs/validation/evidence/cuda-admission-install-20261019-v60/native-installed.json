@@ -1,0 +1,123 @@
+{
+  "status": "passed_native_cuda_sampling_allocation_and_loader_rejection",
+  "started_at_utc": "2026-10-18T21:10:40.399505+00:00",
+  "source": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\cuda-admission-install-20261019-v60\\installed\\site",
+  "runtime": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\cuda-admission-install-20261019-v60\\native-probe-runtime",
+  "native_python": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+  "python": "3.13.14",
+  "allocation_mib": 0,
+  "model_forward_calls": 0,
+  "model_weights_loaded": false,
+  "network": "disabled",
+  "virtualization": false,
+  "browser": false,
+  "other_user_processes_modified": false,
+  "generator_sha256": "sha256:82b748900e81015ae3e7b00a7909fbdcce7f44234622c39f1b95b2a2257b3535",
+  "implementation_sha256": {
+    "cuda_admission.py": "sha256:9cee4346109a60f52640a265b9ce70796028d635bc0b0cd01e84bcf0508da606",
+    "vace_model.py": "sha256:7b7b4469eda69b7932de0f5c6e9dda1c10e9cde4751da81de5f693bf5a07e5a9",
+    "vace_worker.py": "sha256:40d2653fc075c8da472d51f635dac8d820924761608f199633ed3216155de6ef",
+    "local_vace.py": "sha256:f098a86e8cdee834b222a52b877aa9bfa3ee54fb1fc24d1cafe823ac76ea24d2",
+    "local_matting.py": "sha256:e464cce3045465b74f9d9564df0881228af634f55d23be2ca738aec848fa0dab"
+  },
+  "imported_admission": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\cuda-admission-install-20261019-v60\\installed\\site\\ai_ad_editor\\cuda_admission.py",
+  "stage": "rejecting-impossible-text-weight-budget",
+  "torch": "2.13.0+cu130",
+  "device": "NVIDIA GeForce RTX 3060",
+  "torch_uuid_type": "<class 'torch._C._CUuuid'>",
+  "before_allocation": {
+    "policy": "cuda-uuid-physical-and-torch-free-v1",
+    "stage": "native-before-allocation",
+    "required_free_bytes": 805306368,
+    "reservation": false,
+    "oom_guarantee": false,
+    "query_started_at_utc": "2026-10-18T21:10:47.279024+00:00",
+    "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+    "logical_device_index": 0,
+    "query_command": [
+      "C:\\Windows\\System32\\nvidia-smi.EXE",
+      "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+      "--query-gpu=uuid,memory.total,memory.free",
+      "--format=csv,noheader,nounits"
+    ],
+    "torch_free_bytes": 11799625728,
+    "torch_total_bytes": 12884377600,
+    "physical_free_bytes": 11706302464,
+    "physical_total_bytes": 12884901888,
+    "effective_free_bytes": 11706302464,
+    "query_finished_at_utc": "2026-10-18T21:10:47.493127+00:00",
+    "sample_seconds": 0.21410970000033558,
+    "status": "admitted"
+  },
+  "actual_allocation_bytes": 0,
+  "after_allocation": {
+    "policy": "cuda-uuid-physical-and-torch-free-v1",
+    "stage": "native-after-allocation",
+    "required_free_bytes": 805306368,
+    "reservation": false,
+    "oom_guarantee": false,
+    "query_started_at_utc": "2026-10-18T21:10:47.493559+00:00",
+    "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+    "logical_device_index": 0,
+    "query_command": [
+      "C:\\Windows\\System32\\nvidia-smi.EXE",
+      "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+      "--query-gpu=uuid,memory.total,memory.free",
+      "--format=csv,noheader,nounits"
+    ],
+    "torch_free_bytes": 11799625728,
+    "torch_total_bytes": 12884377600,
+    "physical_free_bytes": 11609833472,
+    "physical_total_bytes": 12884901888,
+    "effective_free_bytes": 11609833472,
+    "query_finished_at_utc": "2026-10-18T21:10:47.558775+00:00",
+    "sample_seconds": 0.06521749999956228,
+    "status": "admitted"
+  },
+  "allocation_released": true,
+  "expected_budget_rejection": {
+    "policy": "cuda-uuid-physical-and-torch-free-v1",
+    "stage": "text-weights",
+    "required_free_bytes": 69524783104,
+    "reservation": false,
+    "oom_guarantee": false,
+    "query_started_at_utc": "2026-10-18T21:10:47.623321+00:00",
+    "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+    "logical_device_index": 0,
+    "query_command": [
+      "C:\\Windows\\System32\\nvidia-smi.EXE",
+      "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+      "--query-gpu=uuid,memory.total,memory.free",
+      "--format=csv,noheader,nounits"
+    ],
+    "torch_free_bytes": 11799625728,
+    "torch_total_bytes": 12884377600,
+    "physical_free_bytes": 11609833472,
+    "physical_total_bytes": 12884901888,
+    "effective_free_bytes": 11609833472,
+    "query_finished_at_utc": "2026-10-18T21:10:47.702286+00:00",
+    "sample_seconds": 0.07898410000052536,
+    "status": "rejected",
+    "error_code": "CUDA_ADMISSION_INSUFFICIENT_PHYSICAL_FREE"
+  },
+  "loader_phases": [
+    "admitting-text-gpu-memory"
+  ],
+  "components_before": {
+    "diffusers": false,
+    "accelerate": false,
+    "transformers": false
+  },
+  "components_after": {
+    "diffusers": false,
+    "accelerate": false,
+    "transformers": false
+  },
+  "cuda_peak_allocated_bytes": 0,
+  "reservation": false,
+  "oom_guarantee": false,
+  "quality_acceptance": false,
+  "finished_at_utc": "2026-10-18T21:10:47.702633+00:00",
+  "elapsed_seconds": 7.300944900000104,
+  "blocked_network_events": []
+}

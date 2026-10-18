@@ -1,0 +1,63 @@
+{
+  "protocol": "agent-video-wan-vace-inpainting-v1",
+  "engine": "diffusers-wan-vace-local-v1",
+  "network": "disabled",
+  "blocked_network_events": [],
+  "request_sha256": "sha256:9bf55354ecf4d7a2bffe363a051d1f62e95f1ed286a5efa6f6273ea09fdc0451",
+  "adapter_sha256": "sha256:ecd00c637214527d72f035e878c55f948d1841384ae889ee60b8c761b433cbb6",
+  "source_sha256": "sha256:800f9903ca5256f196c0f9328671d41fd9e3ba25880760de24c0bb176e88b6c3",
+  "mask_sha256": "sha256:1ba8880a706f86a1c6a006647c0cf7256904feacb3c9297c15472318f81a0663",
+  "mask_plan_sha256": "sha256:083cfe960a79d23914cfee5c25e495ce17e84c1b932b6ade5f4f6d3ae6c87359",
+  "inpainting": {
+    "threshold": 0.5,
+    "grow": 0,
+    "feather": 0.0,
+    "context": 64,
+    "model_max_edge": 192,
+    "blend_mode": "direct",
+    "blend_max_iterations": 2000,
+    "blend_tolerance": 1e-06
+  },
+  "generation": {
+    "prompt": "A static empty smooth gray and blue gradient background. The background remains clean, still and consistent.",
+    "negative_prompt": "person, object, text, watermark, motion, artifacts",
+    "seed": 0,
+    "inference_steps": 30,
+    "guidance_scale": 5.0,
+    "conditioning_scale": 1.0,
+    "window_frames": 5,
+    "window_overlap": 2,
+    "prompt_max_tokens": 256,
+    "flow_shift": 3.0,
+    "model_input_scale": 1,
+    "scene_cut_frames": []
+  },
+  "status": "failed",
+  "error": "CudaAdmissionError: CUDA_ADMISSION_INSUFFICIENT_TORCH_FREE",
+  "gpu_admission_failure": {
+    "policy": "cuda-uuid-physical-and-torch-free-v1",
+    "stage": "video-window-1",
+    "required_free_bytes": 805306368,
+    "reservation": false,
+    "oom_guarantee": false,
+    "query_started_at_utc": "2026-10-18T22:03:05.899297+00:00",
+    "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+    "logical_device_index": 0,
+    "query_command": [
+      "C:\\Windows\\System32\\nvidia-smi.EXE",
+      "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+      "--query-gpu=uuid,memory.total,memory.free",
+      "--format=csv,noheader,nounits"
+    ],
+    "torch_free_bytes": 547819520,
+    "torch_total_bytes": 12884377600,
+    "physical_free_bytes": 1309671424,
+    "physical_total_bytes": 12884901888,
+    "effective_free_bytes": 547819520,
+    "query_finished_at_utc": "2026-10-18T22:03:05.969314+00:00",
+    "sample_seconds": 0.0700170000000071,
+    "status": "rejected",
+    "error_code": "CUDA_ADMISSION_INSUFFICIENT_TORCH_FREE"
+  },
+  "elapsed_seconds": 1672.7090485999997
+}

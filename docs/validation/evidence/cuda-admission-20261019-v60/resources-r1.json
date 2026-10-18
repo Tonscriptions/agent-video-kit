@@ -1,0 +1,38 @@
+{
+  "status": "observed_shared_gpu_resources_no_mutation",
+  "observed_at_utc": "2026-10-18T22:30:03.705610+00:00",
+  "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+  "identity_source_sha256": "sha256:5cca06d49e5bc32e988e7d206435dcc5823a4db8e35fb1b8595e7d08f761ba71",
+  "driver_command": [
+    "C:\\Windows\\System32\\nvidia-smi.EXE",
+    "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+    "--query-gpu=uuid,memory.total,memory.free,memory.used",
+    "--format=csv,noheader,nounits"
+  ],
+  "physical_total_bytes": 12884901888,
+  "physical_free_bytes": 468713472,
+  "physical_used_bytes": 12233736192,
+  "original_run_pid_observations": [],
+  "separately_observed_native_processes": [
+    {
+      "pid": 21520,
+      "started_at_utc": "2026-10-18T18:41:36.4910730Z",
+      "matches_first_run_workdir": false
+    },
+    {
+      "pid": 17580,
+      "started_at_utc": "2026-10-18T21:58:12.9692060Z",
+      "matches_first_run_workdir": false
+    }
+  ],
+  "external_process_titles_paths_and_command_lines_redacted": true,
+  "per_process_gpu_bytes_attributed": false,
+  "runtime_admission": false,
+  "cuda_context_created": false,
+  "torch_imported": false,
+  "allocations_performed": 0,
+  "processes_modified": false,
+  "virtualization": false,
+  "browser": false,
+  "generator_sha256": "sha256:b7791245ce78a085461eff33813e7f92a1c7dc035400756b22f885633538ab48"
+}

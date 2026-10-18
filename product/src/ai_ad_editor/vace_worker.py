@@ -62,7 +62,10 @@ def main():
         with verification_scope() as verification:
             infer(request,response)
             response['artifact_verification']=verification.summary() if verification else {'mode':'uncached-full-hashes'}
-    except Exception as exc:response['error']=type(exc).__name__+': '+str(exc)
+    except Exception as exc:
+        response['error']=type(exc).__name__+': '+str(exc)
+        from ai_ad_editor.cuda_admission import CudaAdmissionError
+        if isinstance(exc,CudaAdmissionError):response['gpu_admission_failure']=exc.report
     response['elapsed_seconds']=time.monotonic()-started;atomic_write_json(Path(request['response']),response)
     return 0 if response['status']=='succeeded' else 1
 

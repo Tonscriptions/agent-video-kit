@@ -96,6 +96,23 @@ options for research reproduction. Cancellation/timeout work at checkpoints,
 not as hard deadlines inside native calls. Previous repairs are costs, never
 new donor observations; unresolved motion groups abstain.
 
+<!-- V60-CUDA -->
+Follow the [V60 device contract](../../docs/specs/VACE物理显卡准入与分阶段资源检查契约_v0.1_2026-10-19.md) and
+[measured failures and pending GPU delivery](../../docs/validation/VACE物理显卡准入与真实交付实测_2026-10-19.md).
+VACE maps logical CUDA 0 to its full GPU UUID and admits against the
+smaller physical/Torch free count. Before each admission it synchronizes
+this worker and releases its unused allocator cache, preserving active
+allocation counts; it removes text offload hooks after encoding. Text
+requires its GPU budget plus 768 MiB; video weights/embeddings are checked
+before transfer; every nonempty window requires 768 MiB free. These are
+observations, not reservations or activation/OOM guarantees. Current CPU
+regression, native 128 MiB active allocation/cache release, package/CLI
+and installed CUDA admission checks passed. Complete revised trained-model
+delivery remains pending. Never stop unrelated jobs, lower quality or switch to CPU/cloud
+to conceal a rejection. Re-register with a new adapter ID; retain old
+receipts and never edit old hashes. Other engines keep existing policies.
+<!-- /V60-CUDA -->
+
 For prompted joint video editing, read the [VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
 Register an existing complete Wan2.1-VACE-1.3B Diffusers safetensors bundle with
 `media adapter register --engine diffusers-wan-vace-local-v1 --device cuda`,

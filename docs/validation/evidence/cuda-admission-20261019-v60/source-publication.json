@@ -1,0 +1,123 @@
+{
+  "status": "published_original_input_only_no_new_repair",
+  "published_at_utc": "2026-10-18T22:32:43.919154+00:00",
+  "new_source_scenes": 0,
+  "new_repaired_output": false,
+  "model_forward_calls": 0,
+  "calls": [
+    {
+      "name": "decode-source",
+      "command": [
+        "ffmpeg",
+        "-nostdin",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\cuda-admission-source-20261019-v60\\source.mov",
+        "-an",
+        "-fps_mode",
+        "passthrough",
+        "-pix_fmt",
+        "rgba",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "sha256:61d8d642634b2f3e8f097c6292408f8bae5218825d7c113ce59039ede645a22d",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "decode-mask",
+      "command": [
+        "ffmpeg",
+        "-nostdin",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\cuda-admission-source-20261019-v60\\mask.mov",
+        "-an",
+        "-fps_mode",
+        "passthrough",
+        "-pix_fmt",
+        "rgba",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "sha256:f52dcf88552cb35a66bef12b4d739518983bc5951dc633352cf1be07bfd902ad",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "preview",
+      "command": [
+        "ffmpeg",
+        "-nostdin",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\cuda-admission-source-20261019-v60\\source.mov",
+        "-c:v",
+        "libx264",
+        "-crf",
+        "18",
+        "-pix_fmt",
+        "yuv420p",
+        "-c:a",
+        "aac",
+        "-movflags",
+        "+faststart",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\cuda-admission-source-20261019-v60\\source-preview.mp4"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source_only": true,
+  "frames": 8,
+  "contact_frame_indices": [
+    0,
+    4,
+    7
+  ],
+  "files": [
+    {
+      "path": "docs/assets/cuda-admission-source-20261019-v60/ground-truth.npz",
+      "bytes": 263991,
+      "sha256": "sha256:e3537405e09582cc046a7db1703a015cea909d2824a3aec9ac79d78e9cb6ec9a"
+    },
+    {
+      "path": "docs/assets/cuda-admission-source-20261019-v60/input-contact.png",
+      "bytes": 28742,
+      "sha256": "sha256:862f4123eb43980398ebc11b48832036977c9c8d22ff1913d8849f5bae755159"
+    },
+    {
+      "path": "docs/assets/cuda-admission-source-20261019-v60/input-only.gif",
+      "bytes": 144573,
+      "sha256": "sha256:0ca7f23ae6aaa811973224c9a8d5cb295e1dacbb30a5bb6d2df3dd91f2ff9706"
+    },
+    {
+      "path": "docs/assets/cuda-admission-source-20261019-v60/mask.mov",
+      "bytes": 4856,
+      "sha256": "sha256:1ba8880a706f86a1c6a006647c0cf7256904feacb3c9297c15472318f81a0663"
+    },
+    {
+      "path": "docs/assets/cuda-admission-source-20261019-v60/provenance.json",
+      "bytes": 389,
+      "sha256": "sha256:9e838d4bfb8ee8baa92aeb44e34432d35e5728fdb2c39d808ba06ff51faf8fcd"
+    },
+    {
+      "path": "docs/assets/cuda-admission-source-20261019-v60/source-preview.mp4",
+      "bytes": 13376,
+      "sha256": "sha256:ffb070e0c18ef53381989dd5706ef99e247e22e3fe51b49343fc2375e1e09515"
+    },
+    {
+      "path": "docs/assets/cuda-admission-source-20261019-v60/source.mov",
+      "bytes": 200306,
+      "sha256": "sha256:800f9903ca5256f196c0f9328671d41fd9e3ba25880760de24c0bb176e88b6c3"
+    }
+  ],
+  "generator_sha256": "sha256:2e170a05ad7a31b82b792a848ade90940d27ff530508564e7b49a969576bbc3b"
+}

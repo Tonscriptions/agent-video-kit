@@ -368,3 +368,15 @@ docs/assets/rose-*/** -text -whitespace
 docs/specs/ROSE离线对象移除与副作用核验契约_v0.1_2026-10-19.md text eol=lf
 docs/third-party/ROSE原生研究依赖与来源说明_2026-10-19.md text eol=lf
 docs/validation/ROSE*.md text eol=lf
+
+# V60 CUDA admission evidence and executed recipes retain exact bytes.
+product/src/ai_ad_editor/cuda_admission.py -text
+product/tests/test_cuda_admission.py text eol=lf
+scripts/*cuda_admission*.py -text
+docs/validation/evidence/cuda-admission-*/** -text -whitespace
+docs/assets/cuda-admission-*/** -text -whitespace
+docs/specs/VACE物理显卡准入与分阶段资源检查契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/VACE物理显卡准入与真实交付实测_2026-10-19.md text eol=lf
+scripts/audit_openfilm_workflow_routes.py -text
+docs/validation/evidence/openfilm-workflow-map-*/** -text -whitespace
+docs/OpenFilm创作流程本地适配设计_2026-10-19.md text eol=lf

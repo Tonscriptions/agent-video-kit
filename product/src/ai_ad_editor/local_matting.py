@@ -297,6 +297,10 @@ def validate_response(response: dict, request: dict) -> None:
                         raise ValueError('joint model/prompt execution contract')
                     if type(execution.get('flow_shift')) not in {float,int} or execution['flow_shift']!=request['generation']['flow_shift'] or type(execution.get('model_input_scale')) is not int or execution['model_input_scale']!=request['generation']['model_input_scale']:
                         raise ValueError('joint sampling configuration mismatch')
+                    from .cuda_admission import validate_execution
+                    if execution.get('text_offload_hooks_removed_before_generation') is not True:
+                        raise ValueError('text offload hooks were not released')
+                    validate_execution(execution,text_gpu_budget_mib=request['adapter']['settings']['text_gpu_budget_mib'],model_calls=metrics['model_calls'])
                     shapes=execution.get('window_input_shapes')
                     factor=request['generation']['model_input_scale']
                     edge=max(64,(request['inpainting']['model_max_edge']+15)//16*16)*factor
