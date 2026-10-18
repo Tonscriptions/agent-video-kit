@@ -328,10 +328,11 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "quality": {
                 "status": "implemented",
-                "features": ["stream_presence", "canvas", "duration", "av_duration_delta", "blackdetect_optional", "ebur128_optional", "target_lufs_gate", "true_peak_gate", "fail_on_black", "waveform_scope", "vectorscope", "histogram_scope", "golden_manifest_capture", "golden_manifest_verify", "golden_hash_and_metric_drift_report", "mask_per_frame_extent", "mask_explicit_positive_negative_checks", "mask_scene_boundary_review"],
+                "features": ["stream_presence", "canvas", "duration", "av_duration_delta", "authored_cfr_sample_endpoints", "av_start_and_end_residuals", "matroska_stream_duration_tags", "blackdetect_optional", "ebur128_optional", "target_lufs_gate", "true_peak_gate", "fail_on_black", "waveform_scope", "vectorscope", "histogram_scope", "golden_manifest_capture", "golden_manifest_verify", "golden_hash_and_metric_drift_report", "mask_per_frame_extent", "mask_explicit_positive_negative_checks", "mask_scene_boundary_review"],
                 "scope_engine": "ffmpeg-local",
                 "scope_artifacts": ["png", "json_report"],
                 "defaults": {"max_av_sync_ms": 80.0, "lufs_tolerance": 2.0},
+                "av_clock_contract": "known_author_duration_predicts_video_ceil_CFR_and_audio_ceil_sample_endpoints; raw_delta_is_preserved; unchanged_limit_applies_to_start_end_and_quantization_residuals; quality_CLI_requires_explicit_sequence_binding; missing_stream_duration_is_unverified",
                 "limits": ["true_peak_gate_requires_expensive_scan_and_ffmpeg_ebur128", "scope_images_are_review_artifacts_not_automatic_color_judgement", "mask_extent_and_assertions_do_not_establish_object_identity_or_full_segmentation_quality", "mask_temporal_iou_is_not_motion_compensated", "mask_decoded_storage_budget_excludes_ffmpeg_and_total_process_ram", "golden_is_exact_for_the_captured_local_artifact_and_requires_the_same_local_media_and_settings", "cross_device_visual_thresholds_pending"],
             },
             "output": {
@@ -340,12 +341,12 @@ def build_capability_manifest() -> dict[str, Any]:
                 "containers": ["mp4", "webm", "mkv"],
                 "video_codecs": ["libx264", "libx265", "libvpx-vp9", "libvpx", "libaom-av1"],
                 "pixel_formats": ["yuv420p", "yuv422p", "yuv444p", "yuv420p10le", "yuv422p10le", "yuv444p10le", "yuva420p"],
-                "audio_codecs": ["aac", "libopus", "opus", "pcm_s16le"],
+                "audio_codecs": ["aac", "libopus", "opus", "pcm_s16le", "pcm_s24le", "pcm_s32le", "pcm_f32le"],
                 "defaults": {"container": "mp4", "video_codec": "libx264", "audio_codec": "aac"},
                 "color_metadata_contract": "settings.color_is_forwarded_as_ffmpeg_primaries_transfer_matrix_range; optional_hdr_tone_map_uses_local_zscale_float_tonemap_to_bt709",
                 "tone_mapping": ["linear", "gamma", "clip", "reinhard", "hable", "mobius"],
-                "alpha_contract": "yuva420p_preserves_transparent_canvas_for_webm_vpx_outputs_and_sets_alpha_mode_metadata",
-                "limits": ["codec availability still depends on the local FFmpeg build", "10_bit_requires_encoder_and_container_support", "transparent_output_requires_webm_vpx_and_yuva420p", "webm requires VPX/AV1 video plus Opus audio"],
+                "alpha_contract": "separate_original_8_bit_alpha_from_RGB_to_YUV_conversion; VP9_CRF0_without_bitrate_uses_lossless_YUV_alpha; tagged_VPX_input_uses_explicit_libvpx_decoder_and_straight_RGBA_before_blending; VP8_transparency_disables_auto_alt_ref",
+                "limits": ["codec availability still depends on the local FFmpeg build", "10_bit_requires_encoder_and_container_support", "transparent_output_requires_webm_vpx_and_yuva420p", "webm requires VPX/AV1 video plus Opus audio", "lossless_VP9_YUV_alpha_is_not_lossless_RGBA_RGB_420_color", "VP8_and_nonzero_CRF_or_bitrate_alpha_are_lossy", "resampling_rotation_HDR_and_other_decoders_need_separate_precision_acceptance"],
             },
             "interoperability": {
                 "status": "degraded",

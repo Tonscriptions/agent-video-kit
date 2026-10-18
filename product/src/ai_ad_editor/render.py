@@ -76,6 +76,17 @@ OUTPUT_PIXEL_FORMATS = (
 
 ALPHA_OUTPUT_PIXEL_FORMATS = ("yuva420p",)
 
+
+def _alpha_video_decoder(asset: dict[str, Any]) -> str | None:
+    """The native VPX decoders omit WebM's separate alpha bitstream."""
+    probe = asset.get('probe', {})
+    stream = next((row for row in probe.get('streams', []) if row.get('codec_type') == 'video'), {})
+    tags = stream.get('tags', {})
+    alpha = next((value for key, value in tags.items() if str(key).lower() == 'alpha_mode'), None)
+    if str(alpha) != '1':
+        return None
+    return {'vp8': 'libvpx', 'vp9': 'libvpx-vp9'}.get(stream.get('codec_name') or probe.get('video', {}).get('codec'))
+
 # Names accepted by the local FFmpeg xfade filter.  ``crossfade``/``dissolve``
 # and directional ``wipe``/``slide`` are Agent-friendly aliases; the remaining
 # names map one-to-one so a template can expose the same transition catalog as
@@ -3818,12 +3829,16 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             source_index = physical_index
             kind = asset.get("kind", "video")
             if kind in {"video", "image"} and track.get("kind") == "video":
+                alpha_decoder = None
                 if inline_surface:
                     video_input = '['+surface_labels[asset['id']].pop(0)+']'
                 elif kind == "image":
                     inputs.extend(["-loop", "1", "-i", str(uri)])
                     physical_index += 1
                 else:
+                    alpha_decoder = _alpha_video_decoder(asset)
+                    if alpha_decoder:
+                        inputs.extend(['-c:v', alpha_decoder])
                     inputs.extend(["-i", str(uri)])
                     physical_index += 1
                 if not inline_surface:
@@ -3911,13 +3926,18 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     # AVTB expression rounding must not reveal an early frame
                     # or leak a held endpoint into a later timeline gap.
                     chain.append(f'trim=start_pts={first_output_frame}:end_pts={end_output_frame}')
+                if alpha_decoder:
+                    # Pin straight RGBA before blending. Negotiating a decoded
+                    # yuva420p directly with an opaque YUV canvas would blend
+                    # subsampled chroma using neighbouring alpha coverage.
+                    chain.append('format=rgba')
                 if kind == "video" and not inline_surface and color_tone_map not in {"", "none"}:
                     chain.extend(_tone_map_filters(settings, warnings, str(clip.get("id")), transparent=transparent_canvas))
                 crop = clip.get("crop") if isinstance(clip.get("crop"), dict) else {}
                 crop_fit = str(crop.get("fit", crop.get("mode", "fit"))).lower()
                 source_probe = asset.get("probe", {}).get("video", {}) if isinstance(asset.get("probe"), dict) else {}
                 pixel_format = str(source_probe.get('pix_fmt') or '')
-                alpha_padding = clip.get('_window_original_canvas_alpha',transparent_canvas) or clip.get('_composite_group') is not None or pixel_format.startswith(('rgba','bgra','argb','abgr','yuva','gbrap','ya')) or pixel_format == 'pal8'
+                alpha_padding = clip.get('_window_original_canvas_alpha',transparent_canvas) or alpha_decoder is not None or clip.get('_composite_group') is not None or pixel_format.startswith(('rgba','bgra','argb','abgr','yuva','gbrap','ya')) or pixel_format == 'pal8'
                 source_width = max(0, int(_num(source_probe.get("width", 0), 0)))
                 source_height = max(0, int(_num(source_probe.get("height", 0), 0)))
                 dynamic_crop_rendered = False
@@ -4097,6 +4117,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     "blend": clip.get("blend"),
                 })
                 input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "input": None if inline_surface else source_index, "kind": "video", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
+                if alpha_decoder:
+                    input_meta[-1]['decoder'] = {'name': alpha_decoder, 'reason': 'webm-alpha-mode'}
                 if inline_surface:
                     input_meta[-1]['inline_sequence_id'] = inline_surface['sequence_id']
                 if subtitle:
@@ -4418,6 +4440,22 @@ def render_project(
     container = encoder["container"]
     video_encoder = encoder["video"]
     audio_encoder = encoder["audio"]
+    lossless_vp9 = (video_encoder['codec'] == 'libvpx-vp9' and
+                    video_encoder['crf'] == 0 and not video_encoder.get('bitrate'))
+    delivery: dict[str, Any] = {}
+    video_output = 'vout'
+    if video_encoder['pixel_format'] in ALPHA_OUTPUT_PIXEL_FORMATS:
+        # swscale's combined RGBA -> YUVA conversion can round alpha levels
+        # 128..254 upwards. Keep the original byte plane outside color math.
+        graph += (';[vout]format=rgba,split=2[delivery_rgb][delivery_a]'
+                  ';[delivery_a]alphaextract,format=gray[delivery_alpha]'
+                  ';[delivery_rgb]format=yuv420p[delivery_yuv]'
+                  ';[delivery_yuv][delivery_alpha]alphamerge,format=yuva420p[delivery_vout]')
+        video_output = 'delivery_vout'
+        delivery['alpha'] = {'conversion': 'separate-original-8-bit-plane',
+                             'encoding_precision': 'lossless-yuv-alpha' if lossless_vp9 else 'lossy-yuv-alpha',
+                             'rgba_lossless': False, 'pixel_format': 'yuva420p',
+                             'decoder': 'libvpx-vp9' if video_encoder['codec'] == 'libvpx-vp9' else 'libvpx'}
     # FFmpeg rounds an output -t on the encoder frame timebase. Keep every
     # display frame whose start belongs to the author's half-open interval;
     # audio is separately trimmed to its exact authored sample count in aout.
@@ -4426,10 +4464,15 @@ def render_project(
     authored_seconds = Fraction(max(int(sequence.get('duration_tick', 1)), 1),
                                 int(project['settings']['timebase']['ticks_per_second']))
     encoded_end = Fraction(math.ceil(authored_seconds*output_rate), 1)/output_rate
+    delivery['clock'] = {'authored_duration_tick': int(sequence['duration_tick']),
+                          'ticks_per_second': int(project['settings']['timebase']['ticks_per_second']),
+                          'expected_video_frames': math.ceil(authored_seconds*output_rate),
+                          'expected_video_end_seconds': float(encoded_end),
+                          'expected_audio_samples_48000': math.ceil(authored_seconds*48000)}
     args = [
         ffmpeg_path(), "-hide_banner", "-y", "-loglevel", "error",
         "-progress", str(progress_file),
-        *inputs, "-filter_complex", graph, "-map", "[vout]", "-map", "[aout]",
+        *inputs, "-filter_complex", graph, "-map", f"[{video_output}]", "-map", "[aout]",
         "-t", f"{float(encoded_end):.9f}",
         "-c:v", str(video_encoder["codec"]),
     ]
@@ -4441,6 +4484,10 @@ def render_project(
         args.extend(["-crf", str(video_encoder.get("crf", 18))])
     if str(video_encoder.get("codec")) in {"libvpx-vp9", "libvpx"} and not video_encoder.get("bitrate"):
         args.extend(["-b:v", "0"])
+    if lossless_vp9:
+        args.extend(['-lossless', '1'])
+    if video_encoder['codec'] == 'libvpx' and video_encoder['pixel_format'] in ALPHA_OUTPUT_PIXEL_FORMATS:
+        args.extend(['-auto-alt-ref', '0'])
     args.extend(["-pix_fmt", str(video_encoder.get("pixel_format", "yuv420p"))])
     args.extend(_output_color_args(effective_project["settings"]))
     args.extend(["-c:a", str(audio_encoder["codec"])])
@@ -4450,7 +4497,7 @@ def render_project(
         args.extend(["-movflags", "+faststart"])
     args.extend(["-f", OUTPUT_CONTAINERS[container], str(temp_output)])
     execution_args, graph_transport = _execution_filter_graph(root, args, graph, write=not dry_run)
-    plan = {"operation_id": operation_id, "command": args, "execution_command":execution_args, "filter_graph_transport":graph_transport, "filter_complex": graph, "inputs": input_meta, "output": str(output), "encoder": encoder, "warnings": warnings, **fingerprints, "resume_of": resume_of}
+    plan = {"operation_id": operation_id, "command": args, "execution_command":execution_args, "filter_graph_transport":graph_transport, "filter_complex": graph, "inputs": input_meta, "output": str(output), "encoder": encoder, "delivery": delivery, "warnings": warnings, **fingerprints, "resume_of": resume_of}
     if dry_run:
         if progress_callback:
             progress_callback(operation_id, "planned", 0.0, "渲染计划已生成")
@@ -4523,6 +4570,7 @@ def render_project(
             "inputs": input_meta,
             "profile": profile,
             "settings": effective_project["settings"],
+            "delivery": delivery,
             "warnings": warnings,
             "quality": quality,
             **fingerprints,
@@ -4533,7 +4581,7 @@ def render_project(
         if progress_callback:
             progress_callback(operation_id, "artifact_written", 100.0, "渲染产物和 manifest 已写入")
             progress_callback(operation_id, "completed", 100.0, "渲染完成")
-        return {"status": "succeeded", "operation_id": operation_id, "path": str(output), "manifest": str(manifest_path), "filter_graph_transport":graph_transport, "profile": profile, "settings": effective_project["settings"], "probe": inspected, "warnings": warnings + quality.get("warnings", []), "quality": quality, **fingerprints, "resume_of": resume_of}
+        return {"status": "succeeded", "operation_id": operation_id, "path": str(output), "manifest": str(manifest_path), "filter_graph_transport":graph_transport, "profile": profile, "settings": effective_project["settings"], "delivery": delivery, "probe": inspected, "warnings": warnings + quality.get("warnings", []), "quality": quality, **fingerprints, "resume_of": resume_of}
     except AppError as exc:
         # Make the persisted operation discoverable from the CLI error envelope so
         # callers can invoke `render --resume <operation_id>` without scanning files.

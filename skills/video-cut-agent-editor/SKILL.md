@@ -5,6 +5,15 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For transparent output or a root ending between display frames, read the
+[delivery clock/alpha contract](../../docs/specs/透明视频交付与音画端点契约_v0.1_2026-10-18.md).
+Use WebM/libvpx-vp9/yuva420p with CRF=0 and no bitrate override for lossless
+YUV/alpha; RGB 4:2:0 remains lossy. Tagged VP8/VP9 input selects libvpx locally.
+Use quality check/golden capture --sequence-id to bind authored duration and
+retain raw deltas plus the quantified frame/sample tail. Unknown duration
+gets no guessed exemption. See the
+[actual exports, rejected offsets and native install](../../docs/validation/透明视频交付与音画端点实测_2026-10-18.md).
+
 For a detached native installation, read the
 [offline release contract](../../docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md).
 Use the reviewed manifest hash and a new target with the bundled installer;
@@ -96,7 +105,8 @@ For using a transitioned child in a parent, read the
 Parent trim/reverse/constant speed/curves operate on the completed native
 child surface in the same FFmpeg graph. Keep original-source audio, scoped
 `inline_sequence_path` warnings and the combined projection/surface quota.
-Ancestor freeze still rejects. Preserve these explicit boundary errors.
+Ancestor freeze follows complete-child picture/audio holds in V51; parent
+animation continues. Preserve the remaining endpoint and inline-R3 errors.
 
 For real supplied-text word/character timing, read the
 [offline CTC contract](../../docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md).

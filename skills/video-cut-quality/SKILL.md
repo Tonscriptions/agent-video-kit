@@ -13,10 +13,26 @@ hold index and 8-bit opacity formula; a second YUV round trip adds unrelated
 error. Preserve the failed encoded reference and the unchanged RGB threshold.
 Distinguish lossless native-graph alpha/PCM precision from supported CLI
 VP9/WebM delivery. Decode VP9 alpha explicitly with libvpx-vp9; Opus is not a
-sample-equality oracle. A 10-fps/4.01-second root still fails the existing
-MP4 AV gate at a 90-ms tail difference; correct 41-frame/192480-sample MKV
-counts do not accept that delivery. Review
+sample-equality oracle. V51's 10-fps/4.01-second root failed the old MP4 AV
+gate at a 90-ms tail difference. That historical failure is retained. Review
 [all executed cases and their limits](../../docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md).
+
+For final transparent delivery, use the
+[alpha and stream-end contract](../../docs/specs/透明视频交付与音画端点契约_v0.1_2026-10-18.md).
+VP9 CRF=0 without a bitrate override explicitly selects lossless YUV/alpha;
+the separate original 8-bit alpha plane avoids color-conversion rounding.
+This is not lossless RGB/RGBA. VP8 and nonzero-CRF/bitrate alpha remain lossy.
+Tagged VPX inputs select a local libvpx decoder and straight RGBA before
+compositing. Check reimported footage over light and dark controls as well
+as exact alpha. Keep measured lossy errors visible in
+[the real delivery/installed-package record](../../docs/validation/透明视频交付与音画端点实测_2026-10-18.md).
+Bind independent quality check/golden capture with --sequence-id when author
+duration is known; omitted sequence keeps strict unknown-duration behaviour.
+Retain raw stream-duration/start/end deltas, expected CFR/sample quantization
+and remaining error. The 80-ms default is unchanged; positive/negative audio
+offsets and a common timestamp shift must still fail. Missing stream timing
+is unverified, not a container-duration substitute. AAC/Opus decode padding
+and same-version repeat equality do not prove original PCM fidelity.
 
 For [boundary-model research](../../docs/specs/字词边界模型对照核验契约_v0.1_2026-10-18.md),
 inspect [all signed sample errors and raw Chinese anomalies](../../docs/validation/开源字词边界模型对照实测_2026-10-18.md).

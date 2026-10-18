@@ -1,6 +1,8 @@
 # Agent Video Kit
 
-2026-10-18 **V51（产品）**：复合片段先完成完整子画面/字幕/动画/转场与子音频总线，再统一定格；父动画继续。完整 **1161/1161，2083.168 秒**，0 跳过，**172 文件**冻结；26 新增专项为全量子集，相同测试在固定 V50 上 22 失败/4 控制通过。九组 **30 CLI /327 主帧 /1,567,101 立体声采样帧**；曲线音频只验长度/有限性。**117 包内文件 /9 隔离 CLI /80 新安装帧**与开发版 RGB/PCM 一致；**14 Skills /182 引用**通过。**正式 VP9 精确 alpha 失败：326,400 像素最大差 1（128→129）**；另 3 CLI/41 帧门禁诊断中，10 fps /4.01 秒 MP4 被现有 80 ms AV 门禁拒绝。无损图精确不能替代交付通过。四时刻静帧、未连续播放/听审，0 新模型前向；自然声音/AI、长片/HDR与完整剪映等价仍未验收。 [原片/GIF/安装包与失败](docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md)。
+2026-10-18 **V52（产品）**：受控 VP9 无损交付及重新入轨的 Alpha 最大差 **0**；4.01 秒工程按作者时钟核对端点，保留原始 90 ms 差及 **80 ms** 门槛，真实偏移仍拒绝。完整 **1183/1183，2258.638 秒**、0 跳过、**173 文件**冻结；22 新增专项是全量子集。**36 当前 CLI /251 主帧**，另有 4 次 V51 对照；**117 包内文件 /13 隔离 CLI /98 安装帧**，**14 Skills /186 引用**通过。有损 VP9 /VP8 的 Alpha 差 **12 /4**，仍不接受精确交付；YUV 4:2:0 不代表 RGB 无损。8 时刻静帧、未连续播放/听审；自然 AI/声音、另一台机器、长片/HDR与完整剪映等价仍未验收。 [原输入/GIF/原视频/安装包与失败](docs/validation/透明视频交付与音画端点实测_2026-10-18.md)。
+
+历史产品 2026-10-18 **V51（产品）**：复合片段先完成完整子画面/字幕/动画/转场与子音频总线，再统一定格；父动画继续。完整 **1161/1161，2083.168 秒**，0 跳过，**172 文件**冻结；26 新增专项为全量子集，相同测试在固定 V50 上 22 失败/4 控制通过。九组 **30 CLI /327 主帧 /1,567,101 立体声采样帧**；曲线音频只验长度/有限性。**117 包内文件 /9 隔离 CLI /80 新安装帧**与开发版 RGB/PCM 一致；**14 Skills /182 引用**通过。**正式 VP9 精确 alpha 失败：326,400 像素最大差 1（128→129）**；另 3 CLI/41 帧门禁诊断中，10 fps /4.01 秒 MP4 被现有 80 ms AV 门禁拒绝。无损图精确不能替代交付通过。四时刻静帧、未连续播放/听审，0 新模型前向；自然声音/AI、长片/HDR与完整剪映等价仍未验收。 [原片/GIF/安装包与失败](docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md)。
 
 面向 Agent 的本地视频广告编辑内核。项目使用原生 Windows、Python 和本地 FFmpeg，并提供显式登记的本地 Node/Chromium 动效后端，通过 CLI、结构化 Agent Project JSON、Skills 和可审计的素材权利台账完成广告剪辑流水线；当前工作区位于 `E:\dev\sandbox\AI广告剪辑`。
 
@@ -48,7 +50,7 @@
 | V10 | SAM2 点/框、多对象与提示修正 | 原生 CPU/CUDA、选择/修正/重置、自然双人 32 帧、概率蒙版及两背景成片已实跑；前轮在同一场景新增一次 CUDA 修正，5 个明确检查点从 3 个通过到 4 个通过 | **该轮仍失败**：目标手腕继续漏选；保留人物前臂从误选变为排除，不代表完整选区改善；V43 显式笔刷后 5/5 旧点通过，不是 SAM2 模型改善 | [前序实测](docs/validation/SAM2本地对象分割与提示修正实测_2026-10-16.md)、[此前逐点实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
 | V11 | LaMa / VACE 修复与色差融合 | 显式 harmonic 受控选区 PSNR 分别 47.45 / 42.90 dB；自然 32 帧链路完成，蒙版外 RGB 与全部 alpha 保留，PCM 原声独立核对一致 | **自然人物移除画质未通过**：残影、纹理涂抹或色块仍存在；VACE 为实验能力 | [实测](docs/validation/本地区域色差融合实测_2026-10-16.md)、[机器证据](docs/validation/evidence/repair-blend-smoke-20261016.json) |
 | V12 | 背景参考传播研究 | 单表面 PSNR 30.878→31.124 dB；双表面合计 **33.448→33.410 dB，略退化**。22 项独立研究检查通过；公开原输入和逐帧对照 | **未接入产品**；人工遮挡真值不代表真实人物移除，自然画质未通过 | [研究 GIF/MP4](#实测演示素材)、[实测](docs/validation/本地多运动参考选择与双表面真值实测_2026-10-16.md) |
-| V13 | 产品自动回归 | 最近 V51 完整 **1161/1161**、2083.168 秒、0 跳过；172 文件冻结，26 新增专项为完整子集 | 开发/安装/反事实与历史分计；VP9 精确 alpha 及自然质量仍失败/未验，完整剪映未验 | [完整日志](docs/validation/evidence/nested-freeze-tests-20261018/full-2.log)、[冻结终态](docs/validation/evidence/nested-freeze-tests-20261018/full-2.json) |
+| V13 | 产品自动回归 | 最近 V52 完整 **1183/1183**、2258.638 秒、0 跳过；173 文件冻结，22 新增专项为完整子集 | 开发/安装/反事实与历史分计；有损 Alpha 未过精确门槛，自然质量与完整剪映未验 | [完整日志](docs/validation/evidence/delivery-precision-tests-20261018/full-1.log)、[冻结终态](docs/validation/evidence/delivery-precision-tests-20261018/full-1.json) |
 | V14 | 编码蒙版范围与正负检查点 | 新增 `quality mask`：逐帧面积/包围框/IoU、明确 selected/clear 检查。自制 4 秒/32 帧样例准确报出第 12 帧缺腿；补全几何后 4 点通过，失败报告及退出码 2 保留；原始 alpha 全帧摘要匹配 | 补全样例为脚本恢复几何，非 AI 修复；检查点不证明完整身份/边缘/自然质量。该轮自然仍有 1 点失败；V43 显式笔刷补点后 5/5，完整质量未验 | [原蒙版与 GIF/MP4](#实测演示素材)、[实际 CLI 与媒体证据](docs/assets/mask-review-20261016/evidence.json)、[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
 | V15 | 编码蒙版驱动轨迹、标签与重构图 | 16 次正式 CLI，4 秒/64 帧/16 fps；逐帧 bbox 与自制真值一致。标签位置最大误差：横屏 1.64 px、缩放旋转后 2.14 px、竖屏 2.15 px；包和源/蒙版权利依赖保留 | 自制选区不是模型分割能力。自然 SAM2 仍 4/5 检查点通过；该轮标签 4.10 px 失败，后续 V17 重验通过标签门槛，分割持续未验收 | [原视频与 GIF/MP4](#实测演示素材)、[全帧测量](docs/assets/mask-track-20261016/evidence.json)、[自然失败实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
 | V16 | 透明标签合成与失败报告 | 抽帧发现 PNG 的 fit 补边变黑；新增像素回归先失败，修复后 PNG/alpha MOV 通过，公开 64 帧两侧 128 区域核对。检查点失败仍保存诊断、回滚项目 | 位置准确不证明合成正确；修复前原片与失败日志保留；该轮自然标签失败，后续 V17 补充缩放修复与重验 | [修复前原成片](docs/assets/mask-track-20261016/before-alpha-fix-bound.mp4)、[前后证据](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
@@ -87,6 +89,7 @@
 | V49 | 离线 CTC 字词强制对齐 | 中英真实 5 worker/8 前向；236 帧高亮/377,550 个 48 kHz 样本；116 文件/11 隔离 CLI/七轮安装，另一次真实模型；完整 1135/1135、170 文件冻结；14 Skills/172 引用 | **定位门槛失败 258.1875 ms >66.6667 ms**；中文无精标；三静帧无播放/听审；自然质量和剪映等价未验 | [原片/GIF/发行/失败](docs/validation/离线CTC字词强制对齐实测_2026-10-18.md)、[全量](docs/validation/evidence/ctc-tests-20261018/full-2.json) |
 | V50 | 开源字词边界模型对照（研究） | 3 模型 worker/6 新前向；CTC 4 CLI；两份最终图 458 帧/243,835 原 PCM；170 产品文件未变 | Qwen 220 /161 ms 仍失败；中文零时长/重叠，未接入正式 engine；两静帧无播放/听审；1135/1135 为历史 | [原 WAV/GIF/实测](docs/validation/开源字词边界模型对照实测_2026-10-18.md)、[逐词评分](docs/validation/evidence/boundary-final-score-20261018.json) |
 | V51 | 完整复合片段定格与音画时钟 | 26 新增专项/完整 1161；30 CLI、327 主帧/156.7101 万采样帧；另 3 CLI/41 帧门禁诊断；117 包内文件/9 隔离 CLI/80 帧；14 Skills/182 引用 | 内核图 alpha 精确；正式 VP9 差 1 仍失败；10 fps /4.01 秒 MP4 被 AV 门禁拒绝；曲线音频、自然布局/听审及完整剪映未验 | [原片/GIF/失败/安装包](docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md)、[完整回归](docs/validation/evidence/nested-freeze-tests-20261018/full-2.json) |
+| V52 | 透明交付、重新入轨与作者端点门禁 | 22 专项/完整 1183；36 当前 CLI、251 主帧/119.1904 万解码采样帧；4 次旧版对照另计；117 文件/13 隔离 CLI/98 安装帧；14 Skills/186 引用 | 受控 lossless VP9 Alpha 差 0；真实偏移拒绝，80 ms 不变；有损 VP9 /VP8 Alpha 差 12 /4，RGB 4:2:0 非无损；无连续播放/听审或完整等价 | [原输入/GIF/成片/失败/发行包](docs/validation/透明视频交付与音画端点实测_2026-10-18.md)、[完整回归](docs/validation/evidence/delivery-precision-tests-20261018/full-1.json) |
 
 **V50 研究对照**：下图来自真实 CTC /Whisper /Qwen 时间，灰色是作者词块参考；全部未通过原门槛。图为测量可视化，正式内核沿用 V49。 [原 WAV、原稿、两组 MP4/MKV、逐词误差和失败记录](docs/validation/开源字词边界模型对照实测_2026-10-18.md)。
 
@@ -121,6 +124,14 @@ V45 已进一步采用 O14：MIT 原字节 `overrides.mjs` 和四个模板字段
 实际数据：[字幕原输入](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-input.json) → [三段输出](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-output.json)；[跨轨删除原模型](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-input.json) → [操作计划/实际结果/手工预期](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-output.json)。字幕无词标的时间为估算。原 CLI/Skill 连接 Studio、npx latest 与服务商；选用模块需改为固定本地入口、强制离线并保留原版权。GUI 目录内的纯规划算法可提取；上游不是完整剪映或本地 AI 特效替代内核。
 
 ## 实测演示素材
+
+V52 实际交付对照：原覆盖率、固定 V51 成片与当前无损 VP9。Alpha 一个灰阶差由全像素测量确定；GIF 是实际解码结果的棋盘投影。只做 8 时刻静帧检查，未连续播放或听审。 [原透明源](docs/assets/delivery-precision-20261018/source-ramp.mkv)、[原源预览](docs/assets/delivery-precision-20261018/source-checkerboard.mp4)、[原 WAV](docs/assets/delivery-precision-20261018/source-audio.wav)、[当前 WebM](docs/assets/delivery-precision-20261018/DP01-vp9-freeze.webm)、[全部数据/失败](docs/validation/透明视频交付与音画端点实测_2026-10-18.md)。
+
+![V52 透明交付实际对照](docs/assets/delivery-precision-20261018/alpha-before-after.gif)
+
+4.01 秒作者区间的实际 MP4：10 fps 下 41 帧显示到 4.1 秒，音轨元数据 4.01 秒；AAC 解码多出 32 采样帧的填充另行报告。结尾留黑和计数/字幕叠置为诊断布局，未作为自然广告排版验收。 [实际 MP4](docs/assets/delivery-precision-20261018/DP09-fractional-mp4.mp4)。
+
+![V52 非整帧时长实际 MP4](docs/assets/delivery-precision-20261018/fractional-mp4.gif)
 
 V51 实际 CLI 输出：子运镜和字幕随复合片段暂停，父透明度继续。诊断文字与原片计数叠置，自然广告排版未验；仅四时刻静态目检，未连续播放/听审。 [原 A](docs/assets/nested-freeze-v51-final-20261018/source-a.mp4)、[原 B](docs/assets/nested-freeze-v51-final-20261018/source-b.mp4)、[实际 MP4](docs/assets/nested-freeze-v51-final-20261018/NF06.mp4)、[全部样例/透明编码失败](docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md)。
 
@@ -432,7 +443,7 @@ MP4 与原蒙版均为 8 fps、32 帧；GIF 保留全部 32 帧，帧时长交�
 
 ## 当前状态
 
-- 当前模块进度见[构建进度总表](docs/构建进度总表_2026-10-16.md)：最近产品 V51 完整 **1161/1161**、0 跳过、172 文件冻结；完整复合定格与本机隔离安装已受控验证。正式 VP9 精确 alpha 仍失败，10 fps /4.01 秒 MP4 仍被 AV 门禁拒绝；CTC 声学边界、FGT 自然修复、声音/听审、另一台机器、长片/HDR、内容库及完整剪映等价仍未验收。
+- 当前模块进度见[构建进度总表](docs/构建进度总表_2026-10-16.md)：最近产品 V52 完整 **1183/1183**、0 跳过、173 文件冻结；无损 VP9 精确 Alpha、透明重新入轨及非整帧端点已受控验证，80 ms 门槛不变。有损 Alpha 未过精确门槛；CTC 声学边界、FGT 自然修复、声音/听审、另一台机器、长片/HDR、内容库及完整剪映等价仍未验收。
 - 新增 `--mask-asset-id` 接通 `media track / track-bind / reframe`，支持显式检查点门禁、源时钟映射及源/蒙版/模型权利依赖。受控全帧几何通过，自然漏抠继续失败；标签像素门槛在 V17 复验通过，见[契约](docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md)和[实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md)。
 - 蒙版核验使用原生 FFmpeg 和 Python 标准库，支持 alpha/luma、明确正负检查点、切点及解码存储预算，失败仍保存报告。公开样例通过实际 CLI 验证；V14 真实 SAM2 提示修正后手腕仍漏选、从 3/5 到 4/5；V43 显式笔刷后同五点通过，不自动接入发布门禁或证明完整分割。见[契约](docs/specs/本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md)与[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md)。
 - VACE 五组同源采样/输入尺度对照 **5/5 已完成，画质均未通过**：暗矩形补丁仍存在，4 倍输入或 50 步未改善该样例。CLI 已接入显式 `--flow-shift` 和 `--model-input-scale {1,2,4}`，默认仍为 3/1；输入数组预算按倍率平方计入，输出画布不变。详见[校准证据](docs/validation/evidence/vace-calibration-20261016.json)和[正式参数验证](docs/validation/evidence/vace-profiles-20261016.json)。

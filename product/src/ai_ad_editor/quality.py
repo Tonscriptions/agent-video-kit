@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import math
 import re
+from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,10 @@ GOLDEN_METRIC_KEYS = (
     "video_duration_seconds",
     "audio_duration_seconds",
     "av_duration_delta_seconds",
+    "av_sync_residual_seconds",
+    "av_start_delta_seconds",
+    "expected_video_duration_seconds",
+    "expected_audio_duration_seconds",
     "black_intervals",
     "integrated_lufs",
     "lufs_deviation",
@@ -32,6 +37,10 @@ GOLDEN_METRIC_TOLERANCES = {
     "video_duration_seconds": 0.001,
     "audio_duration_seconds": 0.001,
     "av_duration_delta_seconds": 0.001,
+    "av_sync_residual_seconds": 0.001,
+    "av_start_delta_seconds": 0.001,
+    "expected_video_duration_seconds": 0.001,
+    "expected_audio_duration_seconds": 0.001,
     "integrated_lufs": 0.1,
     "lufs_deviation": 0.1,
     "true_peak_dbfs": 0.1,
@@ -192,6 +201,66 @@ def compare_golden_manifest(
     return mismatches
 
 
+def _finite_number(value: Any) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def _stream_timing(probe: dict[str, Any], kind: str) -> dict[str, Any]:
+    """Read a stream's own end; a container end cannot measure both streams."""
+    stream = next((row for row in probe.get('streams', []) if row.get('codec_type') == kind), {})
+    normalized = probe.get(kind, {})
+    start = _finite_number(normalized.get('start_time_seconds'))
+    start_source = 'stream-start-time'
+    if start is None:
+        start = _finite_number(stream.get('start_time'))
+    if start is None:
+        start, start_source = 0.0, 'assumed-zero'
+    duration = _finite_number(normalized.get('duration_seconds'))
+    if duration is None or duration <= 0:
+        duration = _finite_number(stream.get('duration'))
+    source = 'stream-duration'
+    if duration is None or duration <= 0:
+        duration, source = None, 'unavailable'
+        tags = stream.get('tags', {})
+        tag = next((value for key, value in tags.items() if str(key).lower() == 'duration'), None)
+        match = re.fullmatch(r'(\d+):([0-5]\d):([0-5]\d(?:\.\d+)?)', str(tag or ''))
+        if match:
+            end = int(match[1])*3600+int(match[2])*60+float(match[3])
+            if math.isfinite(end) and end > start:
+                duration, source = end-start, 'matroska-duration-tag'
+    return {'start_seconds': start, 'start_source': start_source,
+            'duration_seconds': duration, 'duration_source': source,
+            'end_seconds': start+duration if duration is not None else None}
+
+
+def _delivery_clock(settings: dict[str, Any], expected_duration: float | None,
+                    sample_rate: int) -> dict[str, Any]:
+    """Predict only authored CFR/sample quantization, retaining exact tick edges."""
+    seconds = _finite_number(expected_duration)
+    if seconds is None or seconds <= 0:
+        return {}
+    timebase = settings.get('timebase', {})
+    tps = max(1, int(timebase.get('ticks_per_second', 90000)))
+    ticks = round(seconds*tps)
+    # The CLI passes an integer-tick division as float. Recover only its ULP
+    # representation error; a genuine next tick must produce another frame.
+    duration = (Fraction(ticks, tps) if abs(seconds-ticks/tps) <= 4*math.ulp(seconds)
+                else Fraction(str(seconds)))
+    fps = timebase.get('display_fps', {'num': 30, 'den': 1})
+    rate = Fraction(max(1, int(fps.get('num', 30))), max(1, int(fps.get('den', 1))))
+    frames = math.ceil(duration*rate)
+    samples = math.ceil(duration*sample_rate)
+    video_end, audio_end = Fraction(frames, 1)/rate, Fraction(samples, sample_rate)
+    return {'expected_video_frames': frames, 'expected_audio_samples': samples,
+            'expected_video_duration_seconds': float(video_end),
+            'expected_audio_duration_seconds': float(audio_end),
+            'expected_quantization_delta_seconds': float(video_end-audio_end)}
+
+
 def check_output(
     path: Path,
     settings: dict[str, Any],
@@ -227,18 +296,45 @@ def check_output(
         errors.append({"code": "OUTPUT_AUDIO_STREAM_MISSING", "message": "该样例要求音频流，但输出没有音频"})
     actual_duration = float(probe.get("duration_seconds", 0.0))
     audio = probe.get("audio", {})
-    video_duration = float(video.get("duration_seconds", 0.0) or actual_duration)
-    audio_duration = float(audio.get("duration_seconds", 0.0) or 0.0)
-    if video.get("codec") and audio.get("codec") and audio_duration and max_av_sync_ms is not None:
-        av_sync_delta = abs(video_duration - audio_duration)
-        if av_sync_delta * 1000.0 > max(0.0, float(max_av_sync_ms)):
-            errors.append({"code": "OUTPUT_AV_SYNC_OUT_OF_RANGE", "expected_max_ms": max_av_sync_ms, "actual_ms": round(av_sync_delta * 1000.0, 3)})
+    timing = {kind: _stream_timing(probe, kind) for kind in ('video', 'audio')}
+    vt, at = timing['video'], timing['audio']
+    video_duration, audio_duration = vt['duration_seconds'], at['duration_seconds']
+    clock = _delivery_clock(settings, expected_duration, max(1, int(audio.get('sample_rate', 48000) or 48000)))
+    residuals: dict[str, float] = {}
+    if video.get('codec') and audio.get('codec'):
+        if video_duration is None or audio_duration is None:
+            warnings.append({'code': 'OUTPUT_AV_TIMING_UNAVAILABLE',
+                             'message': '缺少独立视频/音频流时长，无法核验音画端点；未用容器时长代替',
+                             'stream_timing': timing})
+        else:
+            residuals['start_delta_seconds'] = abs(vt['start_seconds']-at['start_seconds'])
+            residuals['end_delta_seconds'] = abs(vt['end_seconds']-at['end_seconds']-
+                                                   clock.get('expected_quantization_delta_seconds', 0.0))
+            if clock:
+                residuals.update(video_start_seconds=abs(vt['start_seconds']),
+                                 audio_start_seconds=abs(at['start_seconds']),
+                                 video_end_seconds=abs(vt['end_seconds']-clock['expected_video_duration_seconds']),
+                                 audio_end_seconds=abs(at['end_seconds']-clock['expected_audio_duration_seconds']))
+            av_sync_residual = max(residuals.values())
+            if max_av_sync_ms is not None and av_sync_residual*1000 > max(0.0, float(max_av_sync_ms))+1e-9:
+                errors.append({'code': 'OUTPUT_AV_SYNC_OUT_OF_RANGE', 'expected_max_ms': max_av_sync_ms,
+                               'actual_ms': round(av_sync_residual*1000, 3),
+                               'raw_duration_delta_ms': round(abs(video_duration-audio_duration)*1000, 3),
+                               'expected_quantization_delta_ms': round(clock.get('expected_quantization_delta_seconds', 0.0)*1000, 3),
+                               'residuals_ms': {key: round(value*1000, 3) for key, value in residuals.items()}})
     if expected_duration is not None:
         fps = settings.get("timebase", {}).get("display_fps", {"num": 30, "den": 1})
         frame_tolerance = max(max(1, int(fps.get("den", 1))) / max(1, int(fps.get("num", 30))), 0.001) * 1.5
         if abs(actual_duration - expected_duration) > frame_tolerance:
             errors.append({"code": "OUTPUT_DURATION_MISMATCH", "expected": expected_duration, "actual": actual_duration, "tolerance": frame_tolerance})
-    metrics: dict[str, Any] = {"duration_seconds": actual_duration, "width": video.get("width"), "height": video.get("height"), "audio_codec": probe.get("audio", {}).get("codec"), "video_duration_seconds": video_duration, "audio_duration_seconds": audio_duration or None, "av_duration_delta_seconds": abs(video_duration - audio_duration) if audio_duration else None, "probe": probe}
+    metrics: dict[str, Any] = {"duration_seconds": actual_duration, "width": video.get("width"),
+        "height": video.get("height"), "audio_codec": audio.get("codec"),
+        "video_duration_seconds": video_duration, "audio_duration_seconds": audio_duration,
+        "av_duration_delta_seconds": abs(video_duration-audio_duration) if video_duration is not None and audio_duration is not None else None,
+        "av_start_delta_seconds": abs(vt['start_seconds']-at['start_seconds']) if residuals else None,
+        "av_end_delta_seconds": abs(vt['end_seconds']-at['end_seconds']) if residuals else None,
+        "av_sync_residual_seconds": max(residuals.values()) if residuals else None,
+        "av_sync_residuals": residuals, "stream_timing": timing, **clock, "probe": probe}
     if run_expensive:
         black = run_process([ffmpeg_path(), "-hide_banner", "-nostats", "-i", str(path), "-vf", "blackdetect=d=0.1:pix_th=0.1", "-an", "-f", "null", "-"], timeout=600)
         black_intervals = [{"start": float(start), "end": float(end)} for start, end in BLACK_RE.findall(black.stderr)]
