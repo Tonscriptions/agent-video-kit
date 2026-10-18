@@ -1,0 +1,19 @@
+--- fixed/apps/desktop/src/agents.mjs
++++ head/apps/desktop/src/agents.mjs
+@@ -1,6 +1,7 @@
+ /**
+  * The chat's agents: the person's own Claude Code, Codex, Gemini CLI, GitHub Copilot, Cursor, OpenCode, CodeBuddy,
+- * Qwen Code or Kimi, driven over the Agent Client Protocol (ACP): a child process speaking JSON-RPC over stdin/stdout.
++ * Qwen Code, Kimi or MiniMax Code, driven over the Agent Client Protocol (ACP): a child process speaking JSON-RPC over
++ * stdin/stdout.
+  * The app is the client: initialize, session/new (or session/resume for a conversation from before), session/prompt;
+  * session/update draws the chat, and session/request_permission asks the person in the chat.
+  *
+@@ -78,6 +79,7 @@
+   codebuddy: { label: 'CodeBuddy', args: ['--acp', '--permission-mode', 'bypassPermissions'], login: [], approve: true },
+   qwen: { label: 'Qwen Code', args: ['--acp', '--approval-mode', 'yolo'], login: [], approve: true },
+   kimi: { label: 'Kimi', args: ['acp'], login: ['login'], approve: true },
++  minimax: { label: 'MiniMax Code', args: ['acp'], login: ['login'], approve: true },
+ });
+ 
+ export const isAgentId = (id) => typeof id === 'string' && Object.hasOwn(AGENTS, id);

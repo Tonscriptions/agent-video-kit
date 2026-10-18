@@ -1,0 +1,207 @@
+TAP version 13
+# Subtest: a custom property is set as it is named, its value as it is; a camelCase one as CSS names it
+ok 1 - a custom property is set as it is named, its value as it is; a camelCase one as CSS names it
+  ---
+  duration_ms: 1.7932
+  ...
+# Subtest: continuous main-track pictures occupy the primary storyline instead of connecting to a gap
+ok 2 - continuous main-track pictures occupy the primary storyline instead of connecting to a gap
+  ---
+  duration_ms: 2.3567
+  ...
+# Subtest: FCPXML keeps exact NTSC times, source trims, layering, transforms and separate sound without duplicate audio
+ok 3 - FCPXML keeps exact NTSC times, source trims, layering, transforms and separate sound without duplicate audio
+  ---
+  duration_ms: 1.0333
+  ...
+# Subtest: only real empty intervals become primary gaps, with overlays anchored in source time
+ok 4 - only real empty intervals become primary gaps, with overlays anchored in source time
+  ---
+  duration_ms: 0.7565
+  ...
+# Subtest: FCPXML also writes integer-rate, audio-only timelines with a full-length primary storyline
+ok 5 - FCPXML also writes integer-rate, audio-only timelines with a full-length primary storyline
+  ---
+  duration_ms: 0.6049
+  ...
+# Subtest: FCPXML includes editable subtitle titles above pictures, clipped to the sequence, with escaped multiline text
+ok 6 - FCPXML includes editable subtitle titles above pictures, clipped to the sequence, with escaped multiline text
+  ---
+  duration_ms: 2.0755
+  ...
+# Subtest: subtitle titles on an audio-only timeline omit empty cues and end at the next subtitle
+ok 7 - subtitle titles on an audio-only timeline omit empty cues and end at the next subtitle
+  ---
+  duration_ms: 0.5352
+  ...
+# Subtest: invalid plans fail instead of silently attaching a connection to an unrelated primary clip
+ok 8 - invalid plans fail instead of silently attaching a connection to an unrelated primary clip
+  ---
+  duration_ms: 0.8156
+  ...
+# Subtest: FCPXML validates against Final Cut Pro’s installed 1.10 DTD
+ok 9 - FCPXML validates against Final Cut Pro’s installed 1.10 DTD # SKIP Final Cut Pro DTD not installed
+  ---
+  duration_ms: 0.0985
+  ...
+# Subtest: a stored style is read field by field; the earlier { look, size } shape still reads
+ok 10 - a stored style is read field by field; the earlier { look, size } shape still reads
+  ---
+  duration_ms: 2.5933
+  ...
+# Subtest: a look is picked while the style is exactly it, at any size
+ok 11 - a look is picked while the style is exactly it, at any size
+  ---
+  duration_ms: 0.364
+  ...
+# Subtest: the CSS grows away from the nearest edge and keeps the stroke outside the letters
+ok 12 - the CSS grows away from the nearest edge and keeps the stroke outside the letters
+  ---
+  duration_ms: 0.9746
+  ...
+# Subtest: on a vertical frame an unmoved subtitle rises above the feed's own buttons
+ok 13 - on a vertical frame an unmoved subtitle rises above the feed's own buttons
+  ---
+  duration_ms: 0.2682
+  ...
+# Subtest: the shown line: the later one where two overlap; the picked language, or both
+ok 14 - the shown line: the later one where two overlap; the picked language, or both
+  ---
+  duration_ms: 0.96
+  ...
+# Subtest: word highlight: the word being said, by its share of the line
+ok 15 - word highlight: the word being said, by its share of the line
+  ---
+  duration_ms: 17.9989
+  ...
+# Subtest: files: overlapping lines give way, speakers stay apart from the text
+ok 16 - files: overlapping lines give way, speakers stay apart from the text
+  ---
+  duration_ms: 0.5557
+  ...
+# Subtest: files: a VTT line with & or < reads as written, not as a tag
+ok 17 - files: a VTT line with & or < reads as written, not as a tag
+  ---
+  duration_ms: 0.1877
+  ...
+# Subtest: a burned-in frame: the line in the frame's pixels, escaped, nothing when off or silent
+ok 18 - a burned-in frame: the line in the frame's pixels, escaped, nothing when off or silent
+  ---
+  duration_ms: 0.812
+  ...
+# Subtest: the two lines that started it: a clause per subtitle, its comma gone
+ok 19 - the two lines that started it: a clause per subtitle, its comma gone
+  ---
+  duration_ms: 21.5478
+  ...
+# Subtest: a clause mark makes no orphan: both sides need 4 CJK characters or 2 words
+ok 20 - a clause mark makes no orphan: both sides need 4 CJK characters or 2 words
+  ---
+  duration_ms: 2.1844
+  ...
+# Subtest: a long clause with no punctuation is cut where it costs least: before a conjunction, never inside a word
+ok 21 - a long clause with no punctuation is cut where it costs least: before a conjunction, never inside a word
+  ---
+  duration_ms: 1.9759
+  ...
+# Subtest: mixed CJK and English: an English word or name is never cut, and a term like "MIT 协议" stays together
+ok 22 - mixed CJK and English: an English word or name is never cut, and a term like "MIT 协议" stays together
+  ---
+  duration_ms: 1.5511
+  ...
+# Subtest: English: sentences end at full stops, not at abbreviations, initials or decimals; commas start clauses and stay
+ok 23 - English: sentences end at full stops, not at abbreviations, initials or decimals; commas start clauses and stay
+  ---
+  duration_ms: 1.9136
+  ...
+# Subtest: a number keeps its unit, however tight the line
+ok 24 - a number keeps its unit, however tight the line
+  ---
+  duration_ms: 0.6246
+  ...
+# Subtest: very short lines stay whole; a piece too short to read joins its neighbor
+ok 25 - very short lines stay whole; a piece too short to read joins its neighbor
+  ---
+  duration_ms: 0.6471
+  ...
+# Subtest: a pause of half a second ends a subtitle; a short breath does not
+ok 26 - a pause of half a second ends a subtitle; a short breath does not
+  ---
+  duration_ms: 0.6236
+  ...
+# Subtest: times: a subtitle holds 200 ms after its last word, never into the next; small gaps close; at most 7 s
+ok 27 - times: a subtitle holds 200 ms after its last word, never into the next; small gaps close; at most 7 s
+  ---
+  duration_ms: 1.2025
+  ...
+# Subtest: the end of a subtitle: Chinese drops ，。、；：, keeps ？！… and quotes; Latin keeps its punctuation
+ok 28 - the end of a subtitle: Chinese drops ，。、；：, keeps ？！… and quotes; Latin keeps its punctuation
+  ---
+  duration_ms: 0.3823
+  ...
+# Subtest: a translation is cut to follow the original's pieces, at its own clause marks, or spans them when it cannot be
+ok 29 - a translation is cut to follow the original's pieces, at its own clause marks, or spans them when it cannot be
+  ---
+  duration_ms: 1.1912
+  ...
+# Subtest: a correction of one piece goes into its words in the line; the other pieces keep their times
+ok 30 - a correction of one piece goes into its words in the line; the other pieces keep their times
+  ---
+  duration_ms: 1.576
+  ...
+# Subtest: the rules are one table
+ok 31 - the rules are one table
+  ---
+  duration_ms: 0.4755
+  ...
+# (node:20088) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node.EXE --trace-warnings ...` to show where the warning was created)
+# Subtest: a custom property is changed as a color, a number with its unit, words, or as typed
+ok 32 - a custom property is changed as a color, a number with its unit, words, or as typed
+  ---
+  duration_ms: 2.9786
+  ...
+# Subtest: a field writes back what CSS reads
+ok 33 - a field writes back what CSS reads
+  ---
+  duration_ms: 0.24
+  ...
+# Subtest: a custom property is named as a person reads it
+ok 34 - a custom property is named as a person reads it
+  ---
+  duration_ms: 0.2649
+  ...
+# Subtest: a custom property is kept in the :root entry, beside what else the person changed
+ok 35 - a custom property is kept in the :root entry, beside what else the person changed
+  ---
+  duration_ms: 0.5576
+  ...
+# Subtest: a layer's words are its text override, by its selector and which match
+ok 36 - a layer's words are its text override, by its selector and which match
+  ---
+  duration_ms: 0.2007
+  ...
+# Subtest: a picture put in a page is named from the page's folder, as CSS writes a url
+ok 37 - a picture put in a page is named from the page's folder, as CSS writes a url
+  ---
+  duration_ms: 1.3938
+  ...
+# Subtest: a picture is replaced with the CSS that draws another file in its place: content for an <img>, a background for a box
+ok 38 - a picture is replaced with the CSS that draws another file in its place: content for an <img>, a background for a box
+  ---
+  duration_ms: 0.8327
+  ...
+# Subtest: a custom property that names a font gets the font picker
+ok 39 - a custom property that names a font gets the font picker
+  ---
+  duration_ms: 0.3785
+  ...
+1..39
+# tests 39
+# suites 0
+# pass 38
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 622.5749

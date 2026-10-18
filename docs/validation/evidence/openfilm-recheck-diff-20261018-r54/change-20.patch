@@ -1,0 +1,33 @@
+--- fixed/apps/desktop/src/main.mjs
++++ head/apps/desktop/src/main.mjs
+@@ -515,14 +515,28 @@
+   agentHandle('desktop:agents:own-model-remove', ({ id }) => { roster.removeOwnModel(String(id)); return { ok: true }; });
+   /* a file on the disk brought into the chat goes into the project the page names, through Studio's own import (it
+      shows in Studio's media at once, and the import is in the project's history); one without a path the page sends
+-     itself */
++     itself. A folder goes as it is, through Studio's bring (files.mjs bringIn): every file in it, copied where the disk
++     can clone, hidden ones left out */
+   ipcMain.handle('desktop:import-file', async (event, request) => {
+     if (!fromPage(event) || !studio) return { ok: false, error: 'Studio is not running.' };
+     const projectId = String(request?.projectId ?? '');
+     if (!/^[\w-]+$/.test(projectId)) return { ok: false, error: 'No project is open.' };
+     const name = basename(String(request?.name ?? '')).replace(/[\u0000-\u001f/\\]+/g, '').slice(0, 200) || 'file';
+     const path = typeof request?.path === 'string' ? request.path : '';
+-    try { if (!path || !statSync(path).isFile()) return { ok: false, error: 'That is not a file.' }; } catch { return { ok: false, error: 'That file is not there any more.' }; }
++    if (!path) return { ok: false, error: 'That file is not there any more.' };
++    let info;
++    try { info = statSync(path); } catch { return { ok: false, error: 'That file is not there any more.' }; }
++    if (info.isDirectory()) {
++      try {
++        const res = await fetch(`${studio.origin}/api/projects/${encodeURIComponent(projectId)}/files/bring`, {
++          method: 'POST', headers: { 'x-studio-key': studio.key, 'content-type': 'application/json' },
++          body: JSON.stringify({ into: 'assets/upload', mode: 'copy', paths: [path] }),
++        });
++        const answer = await res.json().catch(() => ({}));
++        return res.ok && answer.landed?.[0] ? { ok: true, path: answer.landed[0], folder: true } : { ok: false, error: answer.error ?? `Studio answered ${res.status}` };
++      } catch (error) { return { ok: false, error: error.message }; }
++    }
++    if (!info.isFile()) return { ok: false, error: 'That is not a file.' };
+     try {
+       const res = await fetch(`${studio.origin}/api/projects/${encodeURIComponent(projectId)}/files?path=${encodeURIComponent(`assets/upload/${name}`)}`, {
+         method: 'PUT', headers: { 'x-studio-key': studio.key }, body: Readable.toWeb(createReadStream(path)), duplex: 'half',

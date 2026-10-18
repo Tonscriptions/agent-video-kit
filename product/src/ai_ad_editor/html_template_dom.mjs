@@ -1,5 +1,7 @@
 // Agent Video Kit DOM bridge; OpenFilm's MIT functions are injected beside it.
 // No network, module imports, user scripts, or raw CSS styles enter this bridge.
+// CSS URL escape fix adapted from OpenFilm 5c2000b8cd049074f7944e31b8d991d8dfc69bea
+// template-controls.ts (MIT). Copyright (c) 2026 OpenFilm contributors; see OPENFILM_LICENSE.txt.
 export const TEMPLATE_DOM = String.raw`
 const state = {win: window, touched: new Map(), found: []};
 const issue = (code, message) => {throw Object.assign(new Error(code+': '+message), {code});};
@@ -34,7 +36,7 @@ function selectorOf(el) {
   return selector;
 }
 function urlValue(css) {
-  const m = /^\s*url\(\s*(?:"((?:\\.|[^"])*)"|'((?:\\.|[^'])*)'|([^)\s]*))\s*\)\s*$/.exec(css ?? '');
+  const m = /^\s*url\(\s*(?:"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)'|([^)\s]*))\s*\)\s*$/.exec(css ?? '');
   return m ? (m[1] ?? m[2] ?? m[3] ?? '').replace(/\\(.)/g, '$1') : null;
 }
 function sourceAddress(value) {

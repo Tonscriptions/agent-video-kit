@@ -1,0 +1,24 @@
+--- fixed/packages/openfilm/studio/client.test.mjs
++++ head/packages/openfilm/studio/client.test.mjs
+@@ -9,9 +9,18 @@
+ import { join } from 'node:path';
+ import { ensureStudio, olderThanThis, openInStudio, updateOpenfilm } from './client.mjs';
+ 
+-const freePort = () => new Promise((resolve) => {
+-  const probe = createServer().listen(0, '127.0.0.1', () => { const { port } = probe.address(); probe.close(() => resolve(port)); });
+-});
++/* Studio's port, and the film's next to it, both free. They are below the range every system hands out on its own
++   (Linux from 32768, macOS and Windows from 49152), so no connection or other server takes them while one Studio
++   gives them up to the next. */
++const freePort = async () => {
++  const free = (port) => new Promise((done) => {
++    const probe = createServer().once('error', () => done(false)).listen(port, '127.0.0.1', () => probe.close(() => done(true)));
++  });
++  for (;;) {
++    const port = 20_000 + Math.floor(Math.random() * 12_000);
++    if (await free(port) && await free(port + 1)) return port;
++  }
++};
+ 
+ test('the CLI starts one Studio in the background, reuses it, and it cleans up when stopped', { timeout: 60_000 }, async () => {
+   const scratch = mkdtempSync(join(tmpdir(), 'of-client-'));

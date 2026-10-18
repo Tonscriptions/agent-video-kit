@@ -1,0 +1,11 @@
+--- fixed/packages/openfilm/studio/ui/src/components/settings/AgentsSection.tsx
++++ head/packages/openfilm/studio/ui/src/components/settings/AgentsSection.tsx
+@@ -45,7 +45,7 @@
+ }
+ 
+ /** The person's own agents (the app's AGENTS), in the roster's order. */
+-const OWN: readonly HostAgentId[] = ['codex', 'claude', 'gemini', 'copilot', 'cursor', 'opencode', 'codebuddy', 'qwen', 'kimi'];
++const OWN: readonly HostAgentId[] = ['codex', 'claude', 'gemini', 'copilot', 'cursor', 'opencode', 'codebuddy', 'qwen', 'kimi', 'minimax'];
+ /** whose maker's mark is its company's */
+ function AgentMark({ id }: { id: HostAgentId }) {
+   return id === 'byok' ? <KeyRound size={16} /> : <ProviderMark id={agentMark(id)} size={17} />;

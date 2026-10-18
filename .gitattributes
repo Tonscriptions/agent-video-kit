@@ -210,6 +210,13 @@ docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md text e
 docs/third-party/OpenFilm复用声明_2026-10-17.md text eol=lf
 skills/video-cut-agent-editor/SKILL.md text eol=lf
 
+# R04/V54 preserve fixed upstream bytes, watchdog evidence and failed fixtures.
+scripts/audit_openfilm_recheck*.py -text
+docs/validation/evidence/openfilm-recheck-*/** -text -whitespace
+docs/validation/evidence/openfilm-recheck-*.json -text -whitespace
+sources/upstream/openfilm-recheck-*/** -text -whitespace
+docs/OpenFilm最新源码复核与降本清单_2026-10-18.md text eol=lf
+
 # V53 keep executed generators, partial failures and exact media byte evidence.
 scripts/*magnetic_reorder*.py -text
 docs/validation/evidence/magnetic-reorder-*/** -text -whitespace

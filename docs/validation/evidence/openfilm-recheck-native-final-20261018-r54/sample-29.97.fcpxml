@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+<fcpxml version="1.10">
+  <resources>
+    <format id="sequence-format" frameDuration="1001/30000s" width="1920" height="1080" colorSpace="1-1-1 (Rec. 709)"/>
+    <format id="format-video" frameDuration="1/25s" width="1920" height="1080" colorSpace="1-1-1 (Rec. 709)"/>
+    <asset id="video" name="local &amp; shot.mov" start="0s" duration="300300/30000s" hasVideo="1" format="format-video" videoSources="1">
+      <media-rep kind="original-media" src="file:///E:/dev/sandbox/AI%E5%B9%BF%E5%91%8A%E5%89%AA%E8%BE%91/docs/validation/evidence/openfilm-recheck-native-final-20261018-r54/local%20&amp;%20shot.mov"/>
+    </asset>
+    <asset id="audio" name="local.wav" start="0s" duration="300300/30000s" hasAudio="1" audioSources="1" audioChannels="2" audioRate="48000">
+      <media-rep kind="original-media" src="file:///E:/dev/sandbox/AI%E5%B9%BF%E5%91%8A%E5%89%AA%E8%BE%91/docs/validation/evidence/openfilm-recheck-native-final-20261018-r54/local.wav"/>
+    </asset>
+    <effect id="subtitle-title" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
+  </resources>
+  <library>
+    <event name="AVK research &lt;local&gt; &amp; 中文">
+      <project name="AVK research &lt;local&gt; &amp; 中文">
+        <sequence format="sequence-format" duration="90090/30000s" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+          <spine>
+            <asset-clip ref="video" name="A" lane="0" offset="0/30000s" start="60060/30000s" duration="30030/30000s" enabled="1" srcEnable="video">
+              <adjust-conform type="none"/>
+              <asset-clip ref="audio" name="voice" lane="-1" offset="75075/30000s" start="30030/30000s" duration="45045/30000s" enabled="1" srcEnable="audio" audioRole="OpenFilm A1">
+                <adjust-volume amount="-6.0206dB"/>
+              </asset-clip>
+            </asset-clip>
+            <asset-clip ref="video" name="B" lane="0" offset="30030/30000s" start="15015/30000s" duration="60060/30000s" enabled="1" srcEnable="video">
+              <adjust-conform type="none"/>
+              <asset-clip ref="video" name="overlay" lane="1" offset="30030/30000s" start="5005/30000s" duration="30030/30000s" enabled="1" srcEnable="video">
+                <adjust-conform type="none"/>
+              </asset-clip>
+              <title ref="subtitle-title" name="Hello &amp; &lt;world&gt;&#10;第二行" lane="2" offset="18018/30000s" start="0s" duration="21021/30000s" role="titles.OpenFilm Subtitles">
+                <text><text-style ref="subtitle-style-1">Ann：Hello &amp; &lt;world&gt;
+第二行</text-style></text>
+                <text-style-def id="subtitle-style-1">
+                  <text-style font="Helvetica" fontSize="48" fontColor="1 1 1 1" strokeColor="0 0 0 1" strokeWidth="2" alignment="center"/>
+                </text-style-def>
+                <adjust-transform position="0 -40"/>
+              </title>
+            </asset-clip>
+          </spine>
+        </sequence>
+      </project>
+    </event>
+  </library>
+</fcpxml>

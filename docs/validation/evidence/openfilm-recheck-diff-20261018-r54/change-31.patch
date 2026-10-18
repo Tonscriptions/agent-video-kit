@@ -1,0 +1,20 @@
+--- fixed/packages/openfilm/src/look.mjs
++++ head/packages/openfilm/src/look.mjs
+@@ -3,7 +3,7 @@
+ import { spawnSync } from 'node:child_process';
+ import { existsSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+ import { basename, dirname, extname, join, resolve } from 'node:path';
+-import { FrameError, launch } from './host.mjs';
++import { FrameError, launch, SOFTWARE_GL } from './host.mjs';
+ import { blockDiff, checkSound, cutText, fileOf, ffmpeg, filmSound, fmt, hash, homeFor, mix, open, outDir, parseTarget, SAME_LIMIT, shown, shuffled, spread, UsageError } from './shared.mjs';
+ 
+ const MEDIA = /\.(mp4|mov|m4v|webm|mkv|avi|png|jpe?g|webp|gif|mp3|wav|m4a|aac|ogg|flac)$/i;
+@@ -34,7 +34,7 @@
+     /* a page plays no sound of its own: what it still lists in `audio` is heard nowhere until it is a clip */
+     for (const page of await pagesWithAudio()) warnings.push(`${page}: window.film.audio is not played: a sound is a clip in film.html`);
+     const gpu = await film.gpu();
+-    if (/swiftshader|llvmpipe|software/i.test(gpu)) warnings.push(`WebGL runs in software (${gpu}): slow, and pictures may differ from a GPU`);
++    if (SOFTWARE_GL.test(gpu)) warnings.push(`WebGL runs in software (${gpu}): slow, and pictures may differ from a GPU`);
+     if (errors.length) return finish();
+ 
+     try { await draw(); } catch (e) {

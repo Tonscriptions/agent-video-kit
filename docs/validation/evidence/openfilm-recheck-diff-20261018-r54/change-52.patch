@@ -1,0 +1,14 @@
+--- fixed/packages/openfilm/studio/ui/src/lib/template-controls.ts
++++ head/packages/openfilm/studio/ui/src/lib/template-controls.ts
+@@ -108,9 +108,9 @@
+ /** A file's place as CSS writes it. */
+ export const cssUrl = (path: string) => `url("${path.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}")`;
+ 
+-/** The place a CSS `url()` names, or null. */
++/** The place a CSS `url()` names, or null. A backslash only starts an escape, so a quote left open fails at once. */
+ export function urlOf(css: string | null | undefined): string | null {
+-  const m = /^\s*url\(\s*(?:"((?:\\.|[^"])*)"|'((?:\\.|[^'])*)'|([^)\s]*))\s*\)\s*$/.exec(css ?? '');
++  const m = /^\s*url\(\s*(?:"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)'|([^)\s]*))\s*\)\s*$/.exec(css ?? '');
+   if (!m) return null;
+   return (m[1] ?? m[2] ?? m[3] ?? '').replace(/\\(.)/g, '$1');
+ }

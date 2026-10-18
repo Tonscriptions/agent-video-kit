@@ -1,0 +1,15 @@
+--- fixed/packages/openfilm/studio/server/film-subtitle.test.mjs
++++ head/packages/openfilm/studio/server/film-subtitle.test.mjs
+@@ -80,6 +80,12 @@
+   assert.equal(filmSubtitleSrt([]), '');
+ });
+ 
++test('files: a VTT line with & or < reads as written, not as a tag', () => {
++  const cues = [{ startMs: 0, durMs: 1000, text: 'Tom & <Jerry> --> out', speaker: 'Q&A <host>' }];
++  assert.equal(filmSubtitleVtt(cues), 'WEBVTT\n\n00:00:00.000 --> 00:00:01.000\n<v Q&amp;A &lt;host&gt;>Tom &amp; &lt;Jerry&gt; --&gt; out\n');
++  assert.equal(filmSubtitleSrt(cues), '1\n00:00:00,000 --> 00:00:01,000\nQ&A <host>:Tom & <Jerry> --> out\n');
++});
++
+ test('a burned-in frame: the line in the frame\'s pixels, escaped, nothing when off or silent', () => {
+   const cues = [{ startMs: 0, durMs: 1000, text: 'Tom & <Jerry>' }];
+   const html = filmSubtitleFrameHtml(cues, D, { w: 1920, h: 1080 }, 500);

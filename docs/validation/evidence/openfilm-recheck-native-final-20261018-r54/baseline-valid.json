@@ -1,0 +1,17 @@
+{
+  "id": "baseline-valid",
+  "command": [
+    "D:\\Program Files\\nodejs\\node.EXE",
+    "--input-type=module",
+    "-e",
+    "\nimport assert from 'node:assert/strict';\nimport { pathToFileURL } from 'node:url';\nconst { TEMPLATE_DOM } = await import(pathToFileURL(process.argv[1]));\nconst begin = TEMPLATE_DOM.indexOf('function urlValue(');\nconst end = TEMPLATE_DOM.indexOf('function sourceAddress(', begin);\nassert.ok(begin >= 0 && end > begin, 'use the actual production bridge function');\nconst urlValue = new Function(TEMPLATE_DOM.slice(begin, end) + '\\nreturn urlValue;')();\nconst mode = process.argv[2];\nlet cases = 0;\nif (mode === 'valid') {\n  for (const [css, expected] of [\n    ['url(\"../assets/logo.png\")', '../assets/logo.png'],\n    [\"url('a b.png')\", 'a b.png'],\n    [' url(logo.png) ', 'logo.png'],\n    ['url(\"a\\\\\"b.png\")', 'a\"b.png'],\n    [\"url('a\\\\'b.png')\", \"a'b.png\"],\n    ['url(\"folder\\\\\\\\logo.png\")', 'folder\\\\logo.png'],\n    ['none', null],\n  ]) { assert.equal(urlValue(css), expected); cases++; }\n} else {\n  const quote = mode === 'double' ? '\"' : \"'\";\n  for (const count of [40, 1000]) {\n    assert.equal(urlValue('url(' + quote + '\\\\!'.repeat(count)), null);\n    cases++;\n  }\n}\nprocess.stdout.write(JSON.stringify({ mode, cases, passed: true }) + '\\n');\n",
+    "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\openfilm-recheck-native-final-20261018-r54\\baseline-html_template_dom.mjs",
+    "valid"
+  ],
+  "exit_code": 0,
+  "deadline_seconds": 5,
+  "timed_out": false,
+  "seconds": 0.06653669998922851,
+  "stdout_sha256": "sha256:471645a85b25c37054af8b12a646da829de362d4ae651859083710ab6c7b908d",
+  "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

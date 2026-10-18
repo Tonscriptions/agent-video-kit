@@ -1,0 +1,14 @@
+--- fixed/apps/desktop/src/agent-skills.mjs
++++ head/apps/desktop/src/agent-skills.mjs
+@@ -20,8 +20,9 @@
+  *   Copilot       OpenFilm's through COPILOT_SKILLS_DIRS and `--disable-mcp-server` for the person's own servers; it
+  *                 has no way to hide a skill, so it keeps all of the person's.
+  *   Pi            OpenFilm's only.
+- * CodeBuddy, Cursor and Kimi are not told anything: they have the person's skills and servers as in their own terminal,
+- * and OpenFilm's skills when named in a message. A system-defaults file the person set themselves is left as it is.
++ * CodeBuddy, Cursor, Kimi and MiniMax Code are not told anything: they have the person's skills and servers as in their
++ * own terminal, and OpenFilm's skills when named in a message. A system-defaults file the person set themselves is left
++ * as it is.
+  *
+  * Which are the person's own is read from where each agent keeps them; its maker's are elsewhere or marked (Claude
+  * Code's skills/synced/ from claude.ai and its claude.ai connectors, Codex's .system skills, OpenAI's plugins and the

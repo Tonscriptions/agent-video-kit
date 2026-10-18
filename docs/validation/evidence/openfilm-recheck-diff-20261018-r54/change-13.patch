@@ -1,0 +1,30 @@
+--- fixed/apps/desktop/chat/src/lib/local-agent-run.ts
++++ head/apps/desktop/chat/src/lib/local-agent-run.ts
+@@ -848,19 +848,23 @@
+   endUnprompted(session.key);
+   turnByKey.set(session.key, turn);
+ 
+-  /* Picked options: set only when they differ from the session's current value, saving a round trip. The model
+-     first (it decides which efforts there are), then the rest at once */
++  /* Picked options: set only when they differ from what the session holds, the model first (it decides which efforts
++     there are), then the rest one after another. An agent may change other options when one is set (MiniMax Code
++     resets its thinking effort when the model changes), so what it answers replaces what the session holds */
+   const live = session;
+   const setOption = async ([configId, value]: [string, unknown]) => {
+     const option = live.info.configOptions?.find((o) => o.id === configId);
+     if (!option || option.currentValue === value) return;
+     const r = await bridge.setOption(live.key, configId, value);
+-    if (r.ok) option.currentValue = value;
++    if (!r.ok) return;
++    const answered = r.result?.configOptions;
++    if (Array.isArray(answered) && answered.length) live.info.configOptions = answered;
++    else option.currentValue = value;
+   };
+   const picked = Object.entries(options);
+   const isModel = ([configId]: [string, unknown]) => live.info.configOptions?.find((o) => o.id === configId)?.category === 'model';
+   for (const entry of picked.filter(isModel)) await setOption(entry);
+-  await Promise.all(picked.filter((entry) => !isModel(entry)).map(setOption));
++  for (const entry of picked.filter((entry) => !isModel(entry))) await setOption(entry);
+ 
+   /* where it is and how to work (the project, the `openfilm` manual, Studio already open) it was told when the
+      session started (apps/desktop src/agents.mjs INSTRUCTIONS): the message goes as the person wrote it */

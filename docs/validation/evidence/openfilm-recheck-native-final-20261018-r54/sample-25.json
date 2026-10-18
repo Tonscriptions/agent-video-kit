@@ -1,0 +1,93 @@
+{
+  "name": "AVK research <local> & 中文",
+  "rate": {
+    "timebase": 25,
+    "ntsc": false,
+    "fps": 25
+  },
+  "width": 1920,
+  "height": 1080,
+  "durationFrames": 90,
+  "files": [
+    {
+      "id": "video",
+      "name": "local & shot.mov",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\openfilm-recheck-native-final-20261018-r54\\local & shot.mov",
+      "durationFrames": 300,
+      "video": {
+        "w": 1920,
+        "h": 1080,
+        "alpha": false,
+        "still": false,
+        "fps": 25
+      }
+    },
+    {
+      "id": "audio",
+      "name": "local.wav",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\openfilm-recheck-native-final-20261018-r54\\local.wav",
+      "durationFrames": 300,
+      "audio": {
+        "channels": 2,
+        "sampleRate": 48000
+      }
+    }
+  ],
+  "video": [
+    {
+      "enabled": true,
+      "clips": [
+        {
+          "name": "A",
+          "fileId": "video",
+          "start": 0,
+          "end": 30,
+          "in": 60,
+          "out": 90,
+          "enabled": true
+        },
+        {
+          "name": "B",
+          "fileId": "video",
+          "start": 30,
+          "end": 90,
+          "in": 15,
+          "out": 75,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "clips": [
+        {
+          "name": "overlay",
+          "fileId": "video",
+          "start": 45,
+          "end": 75,
+          "in": 5,
+          "out": 35,
+          "enabled": true
+        }
+      ]
+    }
+  ],
+  "audio": [
+    {
+      "enabled": true,
+      "sourceTrack": 3,
+      "clips": [
+        {
+          "name": "voice",
+          "fileId": "audio",
+          "start": 15,
+          "end": 60,
+          "in": 30,
+          "out": 75,
+          "enabled": true,
+          "gain": 0.5
+        }
+      ]
+    }
+  ]
+}

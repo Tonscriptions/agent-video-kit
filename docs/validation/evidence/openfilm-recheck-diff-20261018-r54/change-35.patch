@@ -1,0 +1,23 @@
+--- fixed/packages/openfilm/studio/server/files.mjs
++++ head/packages/openfilm/studio/server/files.mjs
+@@ -104,11 +104,15 @@
+     try { real = realpathSync.native(at); } catch {
+       let there = null;
+       try { there = lstatSync(at, { throwIfNoEntry: false }); } catch { /* a file on the way (ENOTDIR): not there */ }
+-      if (there) return false;
+-      const up = dirname(at);
+-      if (up === at) return false;
+-      at = up;
+-      continue;
++      if (there) {
++        /* made just now (an import beside this one makes its folder), or a link that leads nowhere: look once more */
++        try { real = realpathSync.native(at); } catch { return false; }
++      } else {
++        const up = dirname(at);
++        if (up === at) return false;
++        at = up;
++        continue;
++      }
+     }
+     const back = relative(home, real);
+     if (!back) return true;

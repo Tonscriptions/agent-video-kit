@@ -1,0 +1,29 @@
+--- fixed/apps/desktop/chat/src/lib/desktop-attachments.ts
++++ head/apps/desktop/chat/src/lib/desktop-attachments.ts
+@@ -27,6 +27,8 @@
+   state: 'importing' | 'ready' | 'failed';
+   /** where it landed in the project */
+   path?: string;
++  /** a folder brought in whole: every file in it is under `path` */
++  folder?: boolean;
+   /** a picture, as its agent is sent it beside the text */
+   picture?: PromptImage;
+   error?: string;
+@@ -81,7 +83,7 @@
+       const path = (window as unknown as { openfilmDesktop?: { pathForFile?: (f: File) => string } }).openfilmDesktop?.pathForFile?.(file) ?? '';
+       void (path ? Promise.resolve(null) : file.arrayBuffer())
+         .then((bytes) => app.importFile(path ? { path, name: item.name } : { bytes: bytes!, name: item.name }))
+-        .then((r) => patch(item.id, r.ok ? { state: 'ready', path: r.path } : { state: 'failed', error: r.error }))
++        .then((r) => patch(item.id, r.ok ? { state: 'ready', path: r.path, ...(r.folder ? { folder: true } : {}) } : { state: 'failed', error: r.error }))
+         .catch((error: unknown) => patch(item.id, { state: 'failed', error: error instanceof Error ? error.message : String(error) }));
+     }
+   }, []);
+@@ -121,7 +123,7 @@
+ export function attachedText(files: readonly DesktopAttachment[]): string {
+   const placed = files.filter((f) => f.path);
+   if (!placed.length) return '';
+-  return `\n\nAttached files (in this project folder):\n${placed.map((f) => `- ${f.path} (${attachmentKind({ name: f.name, mediaType: f.mediaType })}, ${formatFileSize(f.size)})`).join('\n')}`;
++  return `\n\nAttached files (in this project folder):\n${placed.map((f) => `- ${f.path} (${f.folder ? 'folder: every file in it' : `${attachmentKind({ name: f.name, mediaType: f.mediaType })}, ${formatFileSize(f.size)}`})`).join('\n')}`;
+ }
+ 
+ /** The pictures among them, as their agent is sent them. */
