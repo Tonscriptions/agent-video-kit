@@ -9,7 +9,10 @@
 本表随功能和验证结果同步更新。**功能执行、实际内容、自动质量与听感分别验收，失败记录保留。**
 
 
-2026-10-18 **V45（产品）**：复用 OpenFilm MIT 模板字段与原字节覆盖/恢复函数，新增 `motion html-controls` 和 `html-render --overrides`；CSS 单位、原文/换行、已登记图片、逐帧恢复、配方继承/单项 null 撤销及跨工程重建可用。完整 **1025/1025，1436.703 秒**，0 跳过；**146 文件（含测试）**冻结，20 新增专项为全量子集。原创样例 **26 CLI / 72 编码帧**，144 次额外乱序重绘、2 次单帧检查；17,280 品牌像素及 84,924 不透明图片像素与独立参考一致，继承/撤销/工程包/片段组重建 RGBA 一致，浏览器 Job 全部回收。**100 包内文件 / 11 独立进程 CLI** 的离线 wheel、**14 Skills / 150 引用**通过。三时刻静帧目检，未连续播放；原创样例无音频、0 新模型推理。缺字/越界、自然广告美学、长片/HDR、Schema 随包/干净机器及完整剪映等价仍未验收；FGT 继续为 V44 研究候选，自然画质和来源链未关闭。 [契约](docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md)、[原片/GIF/完整实测](docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)。
+
+2026-10-18 **V46（产品）**：采用 OpenFilm MIT `cutText` 原函数作同帧诊断对照，新增 `motion html-quality` 和 `html-render --layout-check strict`；逐帧检查部分/完全出框、容器独立轴裁切、实际平台字体及本地 Unicode→glyph 映射。严格门禁随配方继承并重新执行，失败报告/PNG 保留，工程/台账/新编码资产不变。完整 **1051/1051，1697.011 秒**，0 跳过；**152 文件（含测试）**冻结，26 新增专项为全量子集。原创样例 **26 CLI / 60 编码帧**，120 次额外渲染重绘；9 次质量检查共 108 帧及 108 次独立反序重绘，FontTools 独立核对 120 个字符，33 页面全关闭/Job 回收，继承及工程包重建 RGBA 一致。**104 包内文件 / 14 独立进程 CLI** 的离线 wheel、**14 Skills / 156 引用**通过。V45 缺 O 字体负例及两轮开发实测失败保留；公开出框/裁切/修复使用新原创完整字体，不发布系统 fallback 像素。三时刻静帧，未连续播放；无音频、0 新模型推理。复杂字形/变换、WOFF2、自然质量、长片/HDR、Schema 随包/干净机器、FGT 自然画质与来源链及完整剪映等价仍未验收。 [契约](docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md)、[原片/GIF/实测](docs/validation/HTML文字布局与字体覆盖实测_2026-10-18.md)。
+
+历史产品 2026-10-18 **V45（产品）**：复用 OpenFilm MIT 模板字段与原字节覆盖/恢复函数，新增 `motion html-controls` 和 `html-render --overrides`；CSS 单位、原文/换行、已登记图片、逐帧恢复、配方继承/单项 null 撤销及跨工程重建可用。完整 **1025/1025，1436.703 秒**，0 跳过；**146 文件（含测试）**冻结，20 新增专项为全量子集。原创样例 **26 CLI / 72 编码帧**，144 次额外乱序重绘、2 次单帧检查；17,280 品牌像素及 84,924 不透明图片像素与独立参考一致，继承/撤销/工程包/片段组重建 RGBA 一致，浏览器 Job 全部回收。**100 包内文件 / 11 独立进程 CLI** 的离线 wheel、**14 Skills / 150 引用**通过。三时刻静帧目检，未连续播放；原创样例无音频、0 新模型推理。缺字/越界、自然广告美学、长片/HDR、Schema 随包/干净机器及完整剪映等价仍未验收；FGT 继续为 V44 研究候选，自然画质和来源链未关闭。 [契约](docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md)、[原片/GIF/完整实测](docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)。
 
 历史研究 2026-10-18 **V44（研究）**：FGT 原生离线多帧修复在一个原创双表面样本通过预声明门槛：选区 PSNR **26.143899→33.137925 dB**，已知运动残差 MAE **5.213643→0.908588**；同一自然 32 帧仍有残留/纹理补丁，**自然质量与完整剪映等价未验收**。两个 worker 合计 RAFT 124 / LAFC 124 / FGT 14 次前向，受控 LaMa 32 次；ROSE 仅断网导入、0 次推理。全部编码帧/PTS/alpha/选区外 RGB 核对通过，自然 768,000 字节 PCM 一致；四时刻静态目检，未连续播放/听审。生产 **141 文件**与 V43 相同，本轮未重跑最近 **1005/1005**、0 跳过的完整产品回归，不增加产品 CLI/测试计数。FGT 尚未注册产品适配器，来源链/商业权利仍开放。 [原片/GIF/实测](docs/validation/开源FGT时序修复候选实测_2026-10-18.md)、[机器证据](docs/validation/evidence/fgt-temporal-20261018/verification.json)。
 
@@ -35,7 +38,7 @@
 | V10 | SAM2 点/框、多对象与提示修正 | 原生 CPU/CUDA、选择/修正/重置、自然双人 32 帧、概率蒙版及两背景成片已实跑；前轮在同一场景新增一次 CUDA 修正，5 个明确检查点从 3 个通过到 4 个通过 | **该轮仍失败**：目标手腕继续漏选；保留人物前臂从误选变为排除，不代表完整选区改善；V43 显式笔刷后 5/5 旧点通过，不是 SAM2 模型改善 | [前序实测](docs/validation/SAM2本地对象分割与提示修正实测_2026-10-16.md)、[此前逐点实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
 | V11 | LaMa / VACE 修复与色差融合 | 显式 harmonic 受控选区 PSNR 分别 47.45 / 42.90 dB；自然 32 帧链路完成，蒙版外 RGB 与全部 alpha 保留，PCM 原声独立核对一致 | **自然人物移除画质未通过**：残影、纹理涂抹或色块仍存在；VACE 为实验能力 | [实测](docs/validation/本地区域色差融合实测_2026-10-16.md)、[机器证据](docs/validation/evidence/repair-blend-smoke-20261016.json) |
 | V12 | 背景参考传播研究 | 单表面 PSNR 30.878→31.124 dB；双表面合计 **33.448→33.410 dB，略退化**。22 项独立研究检查通过；公开原输入和逐帧对照 | **未接入产品**；人工遮挡真值不代表真实人物移除，自然画质未通过 | [研究 GIF/MP4](#实测演示素材)、[实测](docs/validation/本地多运动参考选择与双表面真值实测_2026-10-16.md) |
-| V13 | 产品自动回归 | 完整 **1005/1005，1432.864 秒**，0 跳过；141 文件冻结，30 新增蒙版专项为完整子集 | 12 公开/11 自然 CLI 入口、11 wheel 新进程 CLI 与历史研究分计；自然质量和完整剪映未验 | [完整日志](docs/validation/evidence/mask-edits-20261018/mask-edit-full-final-host-20261018.log)、[机器证据](docs/validation/evidence/mask-edits-20261018/verification.json) |
+| V13 | 产品自动回归 | 最近 V46 完整 **1051/1051**、0 跳过；152 文件（含测试）冻结，26 新增专项为完整子集 | 26 实测 CLI、14 wheel 新进程和历史研究分计；自然质量与完整剪映未验 | [完整日志](docs/validation/evidence/html-quality-tests-20261018/full.log)、[冻结与终态](docs/validation/evidence/html-quality-tests-20261018/full.json) |
 | V14 | 编码蒙版范围与正负检查点 | 新增 `quality mask`：逐帧面积/包围框/IoU、明确 selected/clear 检查。自制 4 秒/32 帧样例准确报出第 12 帧缺腿；补全几何后 4 点通过，失败报告及退出码 2 保留；原始 alpha 全帧摘要匹配 | 补全样例为脚本恢复几何，非 AI 修复；检查点不证明完整身份/边缘/自然质量。该轮自然仍有 1 点失败；V43 显式笔刷补点后 5/5，完整质量未验 | [原蒙版与 GIF/MP4](#实测演示素材)、[实际 CLI 与媒体证据](docs/assets/mask-review-20261016/evidence.json)、[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md) |
 | V15 | 编码蒙版驱动轨迹、标签与重构图 | 16 次正式 CLI，4 秒/64 帧/16 fps；逐帧 bbox 与自制真值一致。标签位置最大误差：横屏 1.64 px、缩放旋转后 2.14 px、竖屏 2.15 px；包和源/蒙版权利依赖保留 | 自制选区不是模型分割能力。自然 SAM2 仍 4/5 检查点通过；该轮标签 4.10 px 失败，后续 V17 重验通过标签门槛，分割持续未验收 | [原视频与 GIF/MP4](#实测演示素材)、[全帧测量](docs/assets/mask-track-20261016/evidence.json)、[自然失败实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
 | V16 | 透明标签合成与失败报告 | 抽帧发现 PNG 的 fit 补边变黑；新增像素回归先失败，修复后 PNG/alpha MOV 通过，公开 64 帧两侧 128 区域核对。检查点失败仍保存诊断、回滚项目 | 位置准确不证明合成正确；修复前原片与失败日志保留；该轮自然标签失败，后续 V17 补充缩放修复与重验 | [修复前原成片](docs/assets/mask-track-20261016/before-alpha-fix-bound.mp4)、[前后证据](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) |
@@ -68,12 +71,15 @@
 | V43 | 编码蒙版笔刷、关键帧及修复衔接 | 2026-10-18：完整 1005/1005；四形状/切镜 16 帧与独立 RGBA 真值一致，24/24 检查点；同一自然五点 4/5→5/5，LaMa 实际消费，选区外 RGB/源 alpha/PCM 保留；96 文件 wheel、11 独立 CLI | 手工几何只修指定区域，前 31 帧 alpha 不变；自然涂抹/密集边缘/时序仍未过，失败记录保留；未连续播放/听审 | [原片/GIF/实测](docs/validation/本地蒙版笔刷与关键帧修正实测_2026-10-18.md)、[机器证据](docs/validation/evidence/mask-edits-20261018/verification.json) |
 | V44 | 开源时序修复内核候选（研究） | 真实两组/64 帧 FGT；一个原创双表面样本三行预声明门槛通过，PSNR 26.14→33.14 dB、运动残差 5.21→0.91；自然 PCM/帧/alpha/区外精确保留 | 研究 runner 未产品化，自然残留/补丁未过；ROSE 只导入；141 生产文件不变，本轮不重跑历史 1005/1005 | [原输入/实际 GIF/实测](docs/validation/开源FGT时序修复候选实测_2026-10-18.md)、[独立证据](docs/validation/evidence/fgt-temporal-20261018/verification.json) |
 | V45 | OpenFilm HTML 模板控件与覆盖恢复 | 实际 CSS/文字/图片控件；26 CLI、72 HTML 帧，继承/撤销与工程包/片段组 RGBA 一致；完整 1025/1025，146 文件冻结；100 文件 wheel/11 新进程 CLI；14 Skills/150 引用 | 20 新增专项是全量子集；三时刻静帧，无连续播放；缺字/布局/自然广告美学、HDR/长片/干净机器及剪映等价未验收 | [原片/GIF/实测](docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)、[独立像素/迁移](docs/validation/evidence/html-template-20261018/verification.json)、[全量](docs/validation/evidence/html-template-tests-20261018/full.json) |
+| V46 | HTML 全帧文字布局与本地字体覆盖门禁 | 部分/完全出框、独立轴裁切与实际字体映射；26 CLI/60 编码帧，9 次质量/108 帧、独立 FontTools 120 字符；继承/工程包 RGBA 一致；完整 1051/1051、152 文件冻结；104 文件 wheel/14 新进程；14 Skills/156 引用 | 26 新增专项属全量子集；旧字体缺 O/开发失败保留；系统 fallback 不公开像素，复杂布局/塑形/自然质量/完整剪映等价未验 | [原片/GIF/实测](docs/validation/HTML文字布局与字体覆盖实测_2026-10-18.md)、[机器证据](docs/validation/evidence/html-quality-20261018/verification.json)、[全量](docs/validation/evidence/html-quality-tests-20261018/full.json) |
 
 ## 开源复用核查
 
-V45 已进一步采用 O14：MIT 原字节 `overrides.mjs` 和四个模板字段函数，现有离线 host 可发现 CSS/文字/图片控件、保存覆盖并单项恢复；工程包及片段组实际重建通过。新的 Git 引用检查确认 main 仍为 `eefd6a8d`，星数仅沿用下方 08:38 的 API 快照，不把缓存页面或失败的新 API 请求当成最新计数。[最新采用与剩余范围](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#v45-html-模板控件受控接入)、[来源引用检查](docs/validation/evidence/openfilm-template-current-20261018/verification.json)。O15 三种创作流程、完整页面/媒体范围、布局/字体诊断仍可继续复用；没有实测人时，不能据此宣称节省某个工期比例。
+V46 继续提取固定 `eefd6a8d` 的 MIT `cutText` 原函数（38 行，带来源头 2262 字节）作实际帧对照，本项目补充完全出框、独立轴裁切、body overflow 传播、标准库字体映射及严格门禁。原算法会漏掉本轮后 3 帧完全出框标题，新检查实际检出；字体加载成功不等于覆盖。[采用与效果](docs/validation/HTML文字布局与字体覆盖实测_2026-10-18.md)、[固定 ZIP/原函数摘要](docs/validation/evidence/openfilm-layout-adoption-20261018/verification.json)。本轮未重新获取 GitHub 星数、核验整树或重跑上游测试；既有快照按各自时间保留。剩余重点是复杂字形/Canvas 语义、完整媒体范围与官方创作流程的本地绑定。
 
-2026-10-18 08:38（Asia/Taipei）API 历史快照：OpenFilm **836 stars / 90 forks**，main 仍为固定 `eefd6a8d` / MIT。字幕分段、部分关联规则、Saved 片段组工作流和帧时钟已经采用；V45 已采用离线模板字段与覆盖恢复；剩余可复用范围包括布局/字体诊断和官方 Skill 工作流。云 provider 不提供本地 AI 修复内核；本轮另外实测的 FGT 仍为独立研究。[最新接入/剩余成本](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#v44-研究与-openfilm-边界)、[原 API](docs/validation/evidence/fgt-temporal-20261018/openfilm-current/verification.json)。
+V45 已进一步采用 O14：MIT 原字节 `overrides.mjs` 和四个模板字段函数，现有离线 host 可发现 CSS/文字/图片控件、保存覆盖并单项恢复；工程包及片段组实际重建通过。新的 Git 引用检查确认 main 仍为 `eefd6a8d`，星数仅沿用下方 08:38 的 API 快照，不把缓存页面或失败的新 API 请求当成最新计数。[最新采用与剩余范围](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#v45-html-模板控件受控接入)、[来源引用检查](docs/validation/evidence/openfilm-template-current-20261018/verification.json)。V45 当时剩余的 O15 创作流程、完整页面/媒体范围和布局/字体诊断仍需适配；布局/字体受控子集随后见 V46；没有实测人时，不能据此宣称节省某个工期比例。
+
+2026-10-18 08:38（Asia/Taipei）API 历史快照：OpenFilm **836 stars / 90 forks**，main 仍为固定 `eefd6a8d` / MIT。字幕分段、部分关联规则、Saved 片段组工作流和帧时钟已经采用；V45 已采用离线模板字段与覆盖恢复；V46 已补充受控布局/字体诊断，剩余包括复杂布局语义和官方 Skill 工作流。云 provider 不提供本地 AI 修复内核；本轮另外实测的 FGT 仍为独立研究。[最新接入/剩余成本](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#v44-研究与-openfilm-边界)、[原 API](docs/validation/evidence/fgt-temporal-20261018/openfilm-current/verification.json)。
 
 2026-10-18 复查 **R03**：OpenFilm main 仍为 `eefd6a8d`，API 快照 **829 stars / 90 forks**，与已审查版本无代码差异。重新核对固定 ZIP、本地 **702 份上游文件**、产品 **130 份冻结文件**及原字幕/MIT 字节；该 R03 研究没有重跑历史测试、编码视频或安装新 Skill；随后 V40 产品增量见本页功能表。[复用落地清单、剩余成本与排除项](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#当前复用落地决策r03)；[本次 API/摘要/文档链接核对](docs/validation/evidence/openfilm-current-review-20261018/verification.json)。已采用的字幕、关联规则、转场和片段组不重复计收益；剩余优先候选为十份官方 Skill 的本地流程适配，以及 HTML 动效/模板/乱序检查的独立可选后端。
 
@@ -94,6 +100,12 @@ V45 已进一步采用 O14：MIT 原字节 `overrides.mjs` 和四个模板字段
 实际数据：[字幕原输入](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-input.json) → [三段输出](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-output.json)；[跨轨删除原模型](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-input.json) → [操作计划/实际结果/手工预期](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-output.json)。字幕无词标的时间为估算。原 CLI/Skill 连接 Studio、npx latest 与服务商；选用模块需改为固定本地入口、强制离线并保留原版权。GUI 目录内的纯规划算法可提取；上游不是完整剪映或本地 AI 特效替代内核。
 
 ## 实测演示素材
+
+**V46 布局诊断与修复**：左为后段标题完全出框，中为 CTA 容器裁切，右为修复。实际三列输出使用新原创完整字体；旧字体的系统 fallback 仅发布诊断元数据。每列 384×216、12 帧/6 fps/2 秒；GIF 768×144、12 帧/2 秒，无音频。
+
+![V46 完全出框、容器裁切与修复](docs/assets/html-quality-20261018/comparison.gif)
+
+[出框视频](docs/assets/html-quality-20261018/outside.mp4) · [裁切视频](docs/assets/html-quality-20261018/clip.mp4) · [修复视频](docs/assets/html-quality-20261018/fixed.mp4) · [联系表](docs/assets/html-quality-20261018/contact.png) · [诊断/失败/来源](docs/validation/HTML文字布局与字体覆盖实测_2026-10-18.md)
 
 **V45 离线模板控件**：左为原模板，中为换品牌色/图片/文案，右为 null 撤销后重建。三列为实际同帧输出；原片 384×216、12 帧/6 fps/2 秒；GIF 768×144、12 帧/2 秒，无音频。
 
@@ -377,7 +389,7 @@ MP4 与原蒙版均为 8 fps、32 帧；GIF 保留全部 32 帧，帧时长交�
 
 ## 当前状态
 
-- 当前模块进度见[构建进度总表](docs/构建进度总表_2026-10-16.md)：最近产品 V45 完整 **1025/1025**、0 跳过，146 文件（含测试）冻结；模板控件、覆盖/撤销与跨工程实际重建通过。V44 FGT 仍未接入产品。自然 AI/声音/听审、密集边缘、长片资源、开放内容库、干净机器和完整剪映等价仍未验收。
+- 当前模块进度见[构建进度总表](docs/构建进度总表_2026-10-16.md)：最近产品 V46 完整 **1051/1051**、0 跳过，152 文件（含测试）冻结；逐帧布局/字体门禁、继承及工程包重建通过。V44 FGT 仍未接入产品。自然 AI/声音/听审、密集边缘、长片资源、开放内容库、干净机器和完整剪映等价仍未验收。
 - 新增 `--mask-asset-id` 接通 `media track / track-bind / reframe`，支持显式检查点门禁、源时钟映射及源/蒙版/模型权利依赖。受控全帧几何通过，自然漏抠继续失败；标签像素门槛在 V17 复验通过，见[契约](docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md)和[实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md)。
 - 蒙版核验使用原生 FFmpeg 和 Python 标准库，支持 alpha/luma、明确正负检查点、切点及解码存储预算，失败仍保存报告。公开样例通过实际 CLI 验证；V14 真实 SAM2 提示修正后手腕仍漏选、从 3/5 到 4/5；V43 显式笔刷后同五点通过，不自动接入发布门禁或证明完整分割。见[契约](docs/specs/本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md)与[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md)。
 - VACE 五组同源采样/输入尺度对照 **5/5 已完成，画质均未通过**：暗矩形补丁仍存在，4 倍输入或 50 步未改善该样例。CLI 已接入显式 `--flow-shift` 和 `--model-input-scale {1,2,4}`，默认仍为 3/1；输入数组预算按倍率平方计入，输出画布不变。详见[校准证据](docs/validation/evidence/vace-calibration-20261016.json)和[正式参数验证](docs/validation/evidence/vace-profiles-20261016.json)。

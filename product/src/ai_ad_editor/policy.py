@@ -132,7 +132,7 @@ def _html_template_data_fields(value: Any, path: str = "$") -> set[str]:
             branches = [('template_overrides',), ('plan','template_overrides'), ('plan','compiled_overrides'),
                 ('worker','template_controls'), ('worker','effective_template_controls'),
                 ('worker','sample','controls'), ('worker','sample','effective_controls'),
-                ('controls',), ('effective_controls',)]
+                ('controls',), ('effective_controls',), ('frames',), ('issues',), ('font_sources',)]
             for branch in branches:
                 node, prefix = value, path
                 for key in branch:
@@ -141,7 +141,8 @@ def _html_template_data_fields(value: Any, path: str = "$") -> set[str]:
                     node=node[key];prefix+='.'+key
                 else:
                     for field, scalar in _walk_scalars(node,prefix):
-                        if isinstance(scalar,str) and (field.endswith(('.at','.value','.label','.src')) or '.variables.' in field):
+                        if isinstance(scalar,str) and (field.endswith(('.at','.value','.label','.src','.text','.painted_text','.container',
+                            '.sel','.font_family','.family','.familyName','.postScriptName','.postscript_name')) or '.variables.' in field):
                             result.add(field)
         for key, child in value.items():
             result.update(_html_template_data_fields(child,f'{path}.{key}'))

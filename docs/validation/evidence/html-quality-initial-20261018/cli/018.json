@@ -1,0 +1,44 @@
+{
+  "number": 18,
+  "args": [
+    "motion",
+    "html-render",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-quality-smoke-20261018\\main",
+    "--source-asset-id",
+    "source-legacy",
+    "--asset-id",
+    "blocked-legacy",
+    "--layout-check",
+    "strict"
+  ],
+  "exit_code": 2,
+  "stdout": {
+    "ok": false,
+    "command": "motion.html-render",
+    "request_id": "req_20261018021322_4c97d672",
+    "operation_id": null,
+    "status": "failed",
+    "data": {},
+    "artifacts": [],
+    "warnings": [],
+    "errors": [
+      {
+        "code": "HTML_QUALITY_FAILED",
+        "message": "文字布局或字体存在问题/未核验项；详情见保留报告",
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-quality-smoke-20261018\\main\\validation\\html-quality-gate_20261018021319_ee7f73d9.json",
+        "retryable": false
+      }
+    ],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T02:13:22.928604Z",
+      "finished_at": "2026-10-18T02:13:22.928611Z",
+      "network": "disabled"
+    }
+  },
+  "stderr": "",
+  "seconds": 5.567480500001693
+}

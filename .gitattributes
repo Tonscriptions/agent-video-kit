@@ -209,3 +209,15 @@ docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md text e
 docs/third-party/OpenFilm复用声明_2026-10-17.md text eol=lf
 skills/video-cut-agent-editor/SKILL.md text eol=lf
 skills/video-cut-template-library/SKILL.md text eol=lf
+
+# V46 diagnostic sources, failure records and rendered media retain exact bytes.
+product/src/ai_ad_editor/openfilm_text_bounds.mjs -text -whitespace
+product/src/ai_ad_editor/html_quality_dom.mjs -text
+scripts/*html_quality*.py -text
+docs/validation/evidence/html-quality*/** -text -whitespace
+docs/validation/evidence/html-quality*.json -text
+docs/validation/evidence/openfilm-layout*/** -text -whitespace
+docs/validation/evidence/docs-audit-html-quality*.json -text
+docs/assets/html-quality-20261018/** whitespace=cr-at-eol
+docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/HTML文字布局与字体覆盖实测_2026-10-18.md text eol=lf

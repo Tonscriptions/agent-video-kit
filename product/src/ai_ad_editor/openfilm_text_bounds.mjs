@@ -1,0 +1,40 @@
+// OpenFilm MIT: original cutText; eefd6a8d379289102141359a4718dbab12170526.
+// Source: packages/openfilm/src/shared.mjs. See OPENFILM_LICENSE.txt.
+export function cutText() {
+  const W = innerWidth, H = innerHeight, out = [];
+  const name = (el) => {
+    if (el.id) return `#${el.id}`;
+    const tag = el.tagName.toLowerCase();
+    const cls = [...el.classList].slice(0, 2).map((c) => `.${c}`).join('');
+    const up = el.parentElement && el.parentElement !== document.body ? name(el.parentElement) + ' > ' : '';
+    return up + tag + cls;
+  };
+  const shows = (el) => {
+    if (typeof el.checkVisibility === 'function' && !el.checkVisibility({ opacityProperty: true, visibilityProperty: true })) return false;
+    for (let e = el; e; e = e.parentElement) if (Number(getComputedStyle(e).opacity) < 0.05) return false;
+    return true;
+  };
+  const partly = (r, b) => {
+    const inside = Math.max(0, Math.min(r.right, b.right) - Math.max(r.left, b.left)) * Math.max(0, Math.min(r.bottom, b.bottom) - Math.max(r.top, b.top));
+    const over = r.left < b.left - 2 || r.right > b.right + 2 || r.top < b.top - 2 || r.bottom > b.bottom + 2;
+    return over && inside > 0;
+  };
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const seen = new Set();
+  for (let n = walker.nextNode(); n && out.length < 50; n = walker.nextNode()) {
+    const el = n.parentElement;
+    if (!el || seen.has(el) || !n.textContent.trim() || /^(SCRIPT|STYLE|NOSCRIPT|TITLE)$/.test(el.tagName)) continue;
+    seen.add(el);
+    const range = document.createRange(); range.selectNodeContents(n);
+    const r = range.getBoundingClientRect();
+    if (!(r.width > 1 && r.height > 1) || !shows(el)) continue;
+    if (partly(r, { left: 0, top: 0, right: W, bottom: H })) { out.push({ sel: name(el), why: 'edge', text: n.textContent.trim().slice(0, 40) }); continue; }
+    for (let a = el.parentElement; a && a !== document.body && a !== document.documentElement; a = a.parentElement) {
+      const cs = getComputedStyle(a);
+      if (!/hidden|clip/.test(cs.overflowX + cs.overflowY)) continue;
+      if (partly(r, a.getBoundingClientRect())) out.push({ sel: name(el), why: 'box', text: n.textContent.trim().slice(0, 40) });
+      break;
+    }
+  }
+  return out;
+}

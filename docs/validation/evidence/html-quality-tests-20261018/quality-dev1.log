@@ -1,0 +1,155 @@
+test_all_frames_font_sources_geometry_and_previews (test_html_quality.NativeHTMLQualityTests.test_all_frames_font_sources_geometry_and_previews) ... FAIL
+test_cancellation_preserves_read_only_failure_evidence (test_html_quality.NativeHTMLQualityTests.test_cancellation_preserves_read_only_failure_evidence) ... FAIL
+test_container_x_and_y_clipping_are_independent (test_html_quality.NativeHTMLQualityTests.test_container_x_and_y_clipping_are_independent) ... FAIL
+test_dry_run_has_no_browser_or_report (test_html_quality.NativeHTMLQualityTests.test_dry_run_has_no_browser_or_report) ... FAIL
+test_hidden_parent_does_not_create_false_visible_text (test_html_quality.NativeHTMLQualityTests.test_hidden_parent_does_not_create_false_visible_text) ... FAIL
+test_last_frame_problem_cannot_hide_behind_first_sample (test_html_quality.NativeHTMLQualityTests.test_last_frame_problem_cannot_hide_behind_first_sample) ... FAIL
+test_nested_words_and_literal_colon_remain_policy_compatible (test_html_quality.NativeHTMLQualityTests.test_nested_words_and_literal_colon_remain_policy_compatible) ... FAIL
+test_partial_and_fully_outside_text_are_distinct (test_html_quality.NativeHTMLQualityTests.test_partial_and_fully_outside_text_are_distinct) ... FAIL
+test_rotation_and_canvas_are_explicit_unverified_regions (test_html_quality.NativeHTMLQualityTests.test_rotation_and_canvas_are_explicit_unverified_regions) ... FAIL
+test_source_font_missing_character_and_real_fallback (test_html_quality.NativeHTMLQualityTests.test_source_font_missing_character_and_real_fallback) ... FAIL
+test_strict_render_rejects_before_new_asset_and_preserves_state (test_html_quality.NativeHTMLQualityTests.test_strict_render_rejects_before_new_asset_and_preserves_state) ... FAIL
+test_strict_success_inherits_and_reruns_gate_on_rebuild (test_html_quality.NativeHTMLQualityTests.test_strict_success_inherits_and_reruns_gate_on_rebuild) ... FAIL
+
+======================================================================
+FAIL: test_all_frames_font_sources_geometry_and_previews (test_html_quality.NativeHTMLQualityTests.test_all_frames_font_sources_geometry_and_previews)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 49, in test_all_frames_font_sources_geometry_and_previews
+    source=self.source(frame='words.style.left=(4+Math.round(t*4))+"px";')
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020354_ed3c93f8', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:54.839094Z', 'finished_at': '2026-10-18T02:03:54.839102Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_cancellation_preserves_read_only_failure_evidence (test_html_quality.NativeHTMLQualityTests.test_cancellation_preserves_read_only_failure_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 120, in test_cancellation_preserves_read_only_failure_evidence
+    source=self.source();marker=self.root/'cancel';marker.write_text('cancel')
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020355_b83cc833', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:55.014152Z', 'finished_at': '2026-10-18T02:03:55.014159Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_container_x_and_y_clipping_are_independent (test_html_quality.NativeHTMLQualityTests.test_container_x_and_y_clipping_are_independent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 69, in test_container_x_and_y_clipping_are_independent
+    report,_=self.quality(self.source(css=css,wrapper=True),expected=2)
+                          ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020355_d463ba6a', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:55.189824Z', 'finished_at': '2026-10-18T02:03:55.189830Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_dry_run_has_no_browser_or_report (test_html_quality.NativeHTMLQualityTests.test_dry_run_has_no_browser_or_report)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 115, in test_dry_run_has_no_browser_or_report
+    source=self.source();code,result=cli('motion','html-quality','--project',self.root,'--source-asset-id',source,'--dry-run')
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020355_9c8b2685', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:55.364472Z', 'finished_at': '2026-10-18T02:03:55.364482Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_hidden_parent_does_not_create_false_visible_text (test_html_quality.NativeHTMLQualityTests.test_hidden_parent_does_not_create_false_visible_text)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 84, in test_hidden_parent_does_not_create_false_visible_text
+    report,_=self.quality(self.source(css='#box{opacity:0}p{left:120px}',text='B',wrapper=True))
+                          ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020355_5fd63adf', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:55.584126Z', 'finished_at': '2026-10-18T02:03:55.584135Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_last_frame_problem_cannot_hide_behind_first_sample (test_html_quality.NativeHTMLQualityTests.test_last_frame_problem_cannot_hide_behind_first_sample)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 74, in test_last_frame_problem_cannot_hide_behind_first_sample
+    report,_=self.quality(self.source(frame='words.style.left=t<0.75?"4px":"110px";'),expected=2)
+                          ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020355_077027ea', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:55.770496Z', 'finished_at': '2026-10-18T02:03:55.770502Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_nested_words_and_literal_colon_remain_policy_compatible (test_html_quality.NativeHTMLQualityTests.test_nested_words_and_literal_colon_remain_policy_compatible)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 93, in test_nested_words_and_literal_colon_remain_policy_compatible
+    report,_=self.quality(self.source(text='CTA:<em>EDIT</em>'),expected=2)
+                          ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020355_829cd4e6', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:55.974894Z', 'finished_at': '2026-10-18T02:03:55.974903Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_partial_and_fully_outside_text_are_distinct (test_html_quality.NativeHTMLQualityTests.test_partial_and_fully_outside_text_are_distinct)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 62, in test_partial_and_fully_outside_text_are_distinct
+    source=self.source(css=f'p{{left:{left}px}}');report,_=self.quality(source,expected=2)
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020356_42c55994', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:56.183474Z', 'finished_at': '2026-10-18T02:03:56.183482Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_rotation_and_canvas_are_explicit_unverified_regions (test_html_quality.NativeHTMLQualityTests.test_rotation_and_canvas_are_explicit_unverified_regions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 89, in test_rotation_and_canvas_are_explicit_unverified_regions
+    report,_=self.quality(self.source(**kwargs),expected=2)
+                          ~~~~~~~~~~~^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020356_64526072', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:56.371989Z', 'finished_at': '2026-10-18T02:03:56.371995Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_source_font_missing_character_and_real_fallback (test_html_quality.NativeHTMLQualityTests.test_source_font_missing_character_and_real_fallback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 78, in test_source_font_missing_character_and_real_fallback
+    report,_=self.quality(self.source(text='B'),expected=2)
+                          ~~~~~~~~~~~^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020356_cc210c61', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:56.592427Z', 'finished_at': '2026-10-18T02:03:56.592434Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_strict_render_rejects_before_new_asset_and_preserves_state (test_html_quality.NativeHTMLQualityTests.test_strict_render_rejects_before_new_asset_and_preserves_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 99, in test_strict_render_rejects_before_new_asset_and_preserves_state
+    source=self.source(css='p{left:110px}')
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020356_7e1e42d7', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:56.787932Z', 'finished_at': '2026-10-18T02:03:56.787940Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_strict_success_inherits_and_reruns_gate_on_rebuild (test_html_quality.NativeHTMLQualityTests.test_strict_success_inherits_and_reruns_gate_on_rebuild)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 107, in test_strict_success_inherits_and_reruns_gate_on_rebuild
+    source=self.source()
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_quality.py", line 36, in source
+    self.assertEqual(code,0,result);return asset
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-source', 'request_id': 'req_20261018020356_f861ab7e', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_RESOURCE_INVALID', 'message': '非代码文件必须通过已登记资源引用', 'path': 'font.ttf', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T02:03:56.996422Z', 'finished_at': '2026-10-18T02:03:56.996430Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 12 tests in 4.179s
+
+FAILED (failures=12)

@@ -5,6 +5,13 @@ description: Build and apply local advertising templates, or save and reuse edit
 
 # Local Templates
 
+For repeatable template text QA, run `motion html-quality` under the
+[all-frame layout/font contract](../../docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md).
+Use `html-render --layout-check strict` to save a mandatory gate in the new
+recipe; omitted mode inherits on rebuild and package import. Preserve
+[failed/repaired evidence](../../docs/validation/HTML文字布局与字体覆盖实测_2026-10-18.md),
+including missing glyphs, fallback, fully outside text and unknown geometry.
+
 For an existing HTML title card, use the [local template controls contract](../../docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md).
 `motion html-controls --source-asset-id <id> --frame-index <n>` draws one frame
 twice and reports root CSS variables, direct text and images. Preserve CSS

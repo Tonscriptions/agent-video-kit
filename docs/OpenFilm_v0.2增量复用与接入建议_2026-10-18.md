@@ -13,17 +13,17 @@
 | 原研究 | [O01–O12、原生测试与工期假设](OpenFilm源码拆解与复用成本评估_2026-10-17.md) |
 
 
-**当前结论（V45）**：OpenFilm 可以降低局部模块的二次开发成本，适合接入现有 Agent Project + Python/FFmpeg 主链。已采用的原码、借鉴的业务规则和仍待适配的能力分开记录：
+**当前结论（V46）**：OpenFilm 可以降低局部模块的二次开发成本，适合接入现有 Agent Project + Python/FFmpeg 主链。已采用的原码、借鉴的业务规则和仍待适配的能力分开记录：
 
 | 优先级 | 模块 | 当前采用方式 | 能减少的工作 / 剩余成本 |
 |---|---|---|---|
-| 1 | O14 模板字段、覆盖与恢复 | 本轮采用原 MIT overrides 字节和四个纯字段函数；本地 CLI/资源闭包自行集成 | 复用字段分类、直接文字/图片覆盖和恢复规则；字体布局诊断、Canvas 内部语义仍需实现 |
+| 1 | O14 模板字段、覆盖与恢复 | V45 采用原 MIT overrides 字节和四个纯字段函数；本地 CLI/资源闭包自行集成 | 复用字段分类、直接文字/图片覆盖和恢复规则；V46 已补受控字体映射/布局门禁；Canvas 内部语义和复杂塑形仍需实现 |
 | 2 | O01 字幕分句 | 既有固定原码 worker | 可复用分句、数字单位与双语规则；本地 ASR、逐字对齐和声音质量继续独立建设 |
 | 3 | O02/O03/O13 时间线与片段组 | 既有部分规则/流程借鉴，本项目作者时钟与资源/权利事务实现 | 可复用操作规划和可编辑组工作流；不重复移植已实现主链，剩余源范围/展开多轨另验 |
-| 4 | O04–O06 帧时钟、HTML 动效与诊断 | 既有原码时钟和本地最小 host | HTML 动效与乱序重绘已经可用；下一步重点字体/布局诊断，完整媒体/WebGL/HDR 未验 |
+| 4 | O04–O06 帧时钟、HTML 动效与诊断 | 原帧时钟、本地最小 host；V46 原 cutText 对照和扩展质量门禁 | 全帧出框/独立轴裁切/本地字体映射可用；复杂塑形/变换、完整媒体/WebGL/HDR 未验 |
 | 5 | O15 官方创作 Skills | 尚未安装或宣称产品接入；优先参考片、录屏、长转短 | 可复用任务步骤和对照片段标准；需绑定现有本地工具、模型、素材和实际验收 |
 
-本轮功能验证、公开原片/GIF、失败记录及发行检查见[产品实测](validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)。代码许可不能替代素材/字体/模型权利；在线 provider、Studio/Electron 不在采用范围。下文人日均为历史同范围估算，没有实测总人时或项目节省比例，不能加总为剪映全量工期。当前源码引用检查见[固定 main/新 API 失败记录](validation/evidence/openfilm-template-current-20261018/verification.json)，不将旧星数写成新计数。
+当前 V46 功能/原片/GIF/失败/发行见[布局字体实测](validation/HTML文字布局与字体覆盖实测_2026-10-18.md)，V45 模板控件保留[当轮实测](validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)。代码许可不能替代素材/字体/模型权利；在线 provider、Studio/Electron 不在采用范围。下文人日均为历史同范围估算，没有实测总人时或项目节省比例，不能加总为剪映全量工期。当前源码引用检查见[固定 main/新 API 失败记录](validation/evidence/openfilm-template-current-20261018/verification.json)，不将旧星数写成新计数。
 
 **V41 落地状态（历史；V45 见末节）**：固定上游提交未变；新增本地 HTML/SVG/Canvas 最小后端，原帧时钟按字节采用，其余资源封装、事务、精确 PTS 和进程回收为本项目实现。下列 R02/R03 估算和失败记录按历史保留，当前采用范围见[本页 V41](#产品增量-v41离线动效与可重建源码)与[实际视频/失败记录](validation/离线HTML动效源码与透明合成实测_2026-10-18.md)，不能把历史待办当成全部仍未实现。
 
@@ -238,6 +238,14 @@ C:\Python313\python.exe -B -X utf8 scripts/audit_openfilm_current_review.py --ou
 | O01/O02/O13/O04–O06 | 继续保留既有字幕、关联、片段组、时钟和离线 host，未重复计收益 | 全 film.html、媒体/WebGL 与自然质量仍独立验收 |
 | O15 | 十份官方 Skill 仍为流程候选，优先 reference/replicate、screen-demo、long-to-short 的本地绑定 | 原文 npx/get/provider 不能原样执行；文档不提供 ASR、跟踪、视觉理解或修复算法 |
 
-下一批诊断优先提取 DOM 检查，不整套引入上游 host。固定源码的 [look.mjs 第 45 行](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/look.mjs#L45) 仅检查 FontFace 加载 error，不能证明所用字体覆盖全部中文字形。实际裁切函数位于 [shared.mjs 的 cutText](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/shared.mjs#L361)，扫描 DOM 文字 Range：2 CSS 像素容差、最多 50 条、只报告仍与画面/容器有交集的部分裁切，完全在画面外的文字可能漏检；不提供 Canvas/SVG 语义文字或字形覆盖检查。look 在至少两个采样帧发现后给警告，不代表整段布局通过。共享模块间接耦合 host/Playwright，上游 host 还有可选网络放行，接入时继续使用本项目断网和 Job 回收边界。[本次三文件静态复核](validation/evidence/openfilm-template-current-20261018/diagnostics-source-review.json)没有新增运行检查或生产采用，也不增加上游 20 测试计数。
+V45 当时的下一批诊断建议为提取 DOM 检查；随后 V46 受控接入见末节。固定源码的 [look.mjs 第 45 行](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/look.mjs#L45) 仅检查 FontFace 加载 error，不能证明所用字体覆盖全部中文字形。实际裁切函数位于 [shared.mjs 的 cutText](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/shared.mjs#L361)，扫描 DOM 文字 Range：2 CSS 像素容差、最多 50 条、只报告仍与画面/容器有交集的部分裁切，完全在画面外的文字可能漏检；不提供 Canvas/SVG 语义文字或字形覆盖检查。look 在至少两个采样帧发现后给警告，不代表整段布局通过。共享模块间接耦合 host/Playwright，上游 host 还有可选网络放行，接入时继续使用本项目断网和 Job 回收边界。[本次三文件静态复核](validation/evidence/openfilm-template-current-20261018/diagnostics-source-review.json)没有新增运行检查或生产采用，也不增加上游 20 测试计数。
 
 本轮只重新确认 main 引用仍为固定提交，API 新请求遇到本机 DNS 失败，星数沿用 V44 的 08:38 快照；没有再核验全部 702 文件或上游 20 测试。[引用与失败](validation/evidence/openfilm-template-current-20261018/verification.json)、[实际采用字节](validation/evidence/openfilm-template-adoption-20261018-e2/verification.json)、[产品终态与原片](validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)。原 1–3/3–5 人日是同范围历史估算；本轮没有采集真实人时，不能宣称整个差额或项目百分比已经节省。FGT 权利与自然画质未通过，不把它混入 OpenFilm 的 MIT 采用清单。
+
+## V46 全帧布局与字体映射受控接入
+
+O04/O06 的 `shared.mjs:cutText` 原函数 38 行已提取为带来源头的 2262 字节 MIT 模块，同帧实际执行作对照。其 2 px/最多 50 条/只查部分相交限制按原样保留；产品新的 DOM 文字检查覆盖完全出框、overflow 独立轴和 body 传播，另通过 CDP 实际字体、标准库 SFNT/WOFF1 映射与明确预算实现 `html-quality`/strict 门禁。这些扩展不是上游原功能，未引入完整 host、Studio、在线服务或云模型。
+
+本轮真实输出发现旧原创字体缺 O，前 6 帧实际 fallback/映射未核验；动态标题最后 3 帧完全出框由新检查检出，原函数未报。修复后严格门禁继承、工程包重建通过，26 CLI/60 编码帧与 108 质量帧分计，33 页全关闭。完整 1051/1051、104 包内文件/14 新进程和 14 Skills/156 引用见[实测/原片/失败](validation/HTML文字布局与字体覆盖实测_2026-10-18.md)；[固定 ZIP/原函数字节](validation/evidence/openfilm-layout-adoption-20261018/verification.json)可复核。没有本轮新星数/整树/上游测试计数，也没有真实节省人时测量。
+
+剩余 O15 优先参考片复刻、录屏示范、长转短流程的本地绑定；其 Skill 不提供本地 ASR/视觉理解/生成式修复算法。复杂塑形/变换、WOFF2、完整媒体/WebGL/film.html 语义、自然广告与 AI 质量仍独立验收。原 MIT 代码不能替代字体、素材、模型和内容模板权利；FGT 继续是独立研究，未作为 OpenFilm 功能引入。

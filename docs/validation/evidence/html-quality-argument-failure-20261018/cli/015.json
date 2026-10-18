@@ -1,0 +1,474 @@
+{
+  "number": 15,
+  "args": [
+    "motion",
+    "html-render",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-quality-smoke-20261018-e2\\main",
+    "--source-asset-id",
+    "source-clip",
+    "--asset-id",
+    "clip-output"
+  ],
+  "exit_code": 0,
+  "stdout": {
+    "ok": true,
+    "command": "motion.html-render",
+    "request_id": "req_20261018021829_53156f56",
+    "operation_id": "op_20261018021825_dd21a21c",
+    "status": "succeeded",
+    "data": {
+      "plan": {
+        "spec": {
+          "entry": "index.html",
+          "width": 384,
+          "height": 216,
+          "fps": {
+            "den": 1,
+            "num": 6
+          },
+          "duration_tick": 180000,
+          "variables": []
+        },
+        "frame_count": 12,
+        "files": [
+          {
+            "bytes": 3228,
+            "path": "font.ttf",
+            "sha256": "sha256:b22a86af36f8a83c7592780074437fcbcda4399f6092dcc21f8db9f6cab8d0f8"
+          },
+          {
+            "bytes": 270,
+            "path": "index.html",
+            "sha256": "sha256:f328ffd201efc31c2f92115a3fbdc2db57a43d9b8532d6724016a0e88e368431"
+          },
+          {
+            "bytes": 613,
+            "path": "product.png",
+            "sha256": "sha256:8d54fd4c7aff26a97a376bbe5f0ad8a276fdcc35ee6461363e48f3700ec58cbf"
+          },
+          {
+            "bytes": 330,
+            "path": "scene.mjs",
+            "sha256": "sha256:8888245c5be4c20167e855f2ebae8118fbe169377a5c671a2d620e227e132fef"
+          },
+          {
+            "bytes": 774,
+            "path": "style.css",
+            "sha256": "sha256:e55f4e064617df516b23f2bde8e3227bf1e11b815373d5d6370bc858a62f3ec1"
+          }
+        ],
+        "source_asset_id": "source-clip",
+        "parameters": {},
+        "template_overrides": {
+          "variables": {},
+          "texts": [],
+          "images": []
+        },
+        "compiled_overrides": [],
+        "override_resources": [],
+        "layout_check": "off",
+        "project_sha256": "sha256:f747f66a90010ffdfb545e1010a5f1a2cdfbb8f8fc01e15dee7bd365779264d4",
+        "engine": "agent-local-html-motion-v1",
+        "toolchain": {
+          "node_version": "v22.14.0",
+          "playwright_version": "1.62.1",
+          "node_sha256": "sha256:33b1bc1a8aca11fd5a4f2699e51019c63c0af30cf437701d07af69be7706771b"
+        },
+        "all_frames_checked_in_two_fresh_context_orders": true,
+        "output": "ffv1-bgra-nut",
+        "rights_status": "unverified",
+        "limits": [
+          "not_full_openfilm_timeline",
+          "no_embedded_media_iframes_or_webgl",
+          "not_hdr_or_capcut_parity"
+        ]
+      },
+      "asset": {
+        "id": "clip-output",
+        "kind": "video",
+        "uri": "assets/html-motion/6ffb7a5dfed50e090638ce4cf13c2d3d.nut",
+        "sha256": "sha256:65f8e29a7d2cb959191a384a5113f0497b0a9a2eef00b29ee4142cbf6d99fbc4",
+        "rights_ref": "clip-output",
+        "probe": {
+          "duration_seconds": 2.0,
+          "duration_tick": 180000,
+          "format": "nut",
+          "format_long_name": "NUT",
+          "streams": [
+            {
+              "index": 0,
+              "codec_name": "ffv1",
+              "codec_long_name": "FFmpeg video codec #1",
+              "codec_type": "video",
+              "codec_tag_string": "FFV1",
+              "codec_tag": "0x31564646",
+              "width": 384,
+              "height": 216,
+              "coded_width": 384,
+              "coded_height": 216,
+              "has_b_frames": 0,
+              "pix_fmt": "bgra",
+              "level": -99,
+              "r_frame_rate": "6/1",
+              "avg_frame_rate": "6/1",
+              "time_base": "1/49152",
+              "start_pts": 0,
+              "start_time": "0.000000",
+              "bits_per_raw_sample": "8",
+              "extradata_size": 42,
+              "disposition": {
+                "default": 0,
+                "dub": 0,
+                "original": 0,
+                "comment": 0,
+                "lyrics": 0,
+                "karaoke": 0,
+                "forced": 0,
+                "hearing_impaired": 0,
+                "visual_impaired": 0,
+                "clean_effects": 0,
+                "attached_pic": 0,
+                "timed_thumbnails": 0,
+                "non_diegetic": 0,
+                "captions": 0,
+                "descriptions": 0,
+                "metadata": 0,
+                "dependent": 0,
+                "still_image": 0,
+                "multilayer": 0
+              },
+              "tags": {
+                "encoder": "Lavc62.28.100 ffv1"
+              }
+            }
+          ],
+          "video": {
+            "codec": "ffv1",
+            "width": 384,
+            "height": 216,
+            "pix_fmt": "bgra",
+            "fps": "6/1",
+            "color_space": null,
+            "duration_seconds": 2.0,
+            "start_time_seconds": 0.0,
+            "frame_count": 12
+          },
+          "audio": {
+            "codec": null,
+            "sample_rate": 0,
+            "channels": 0,
+            "duration_seconds": 0.0,
+            "start_time_seconds": 0.0
+          },
+          "container_duration_seconds": 1.833333,
+          "duration_basis": "verified_exact_cfr_frames"
+        },
+        "source": {
+          "source_url": "assets/html-motion/6ffb7a5dfed50e090638ce4cf13c2d3d.nut",
+          "retrieved_at": "2026-10-18T02:18:29.207572Z",
+          "original_name": "6ffb7a5dfed50e090638ce4cf13c2d3d.nut"
+        },
+        "html_motion": {
+          "engine": "agent-local-html-motion-v1",
+          "source_asset_id": "source-clip",
+          "parameters": {},
+          "spec": {
+            "entry": "index.html",
+            "width": 384,
+            "height": 216,
+            "fps": {
+              "den": 1,
+              "num": 6
+            },
+            "duration_tick": 180000,
+            "variables": []
+          },
+          "frame_count": 12,
+          "template_overrides": {
+            "variables": {},
+            "texts": [],
+            "images": []
+          },
+          "override_resources": [],
+          "layout_check": "off"
+        }
+      },
+      "rights": {
+        "asset_id": "clip-output",
+        "kind": "video",
+        "sha256": "sha256:65f8e29a7d2cb959191a384a5113f0497b0a9a2eef00b29ee4142cbf6d99fbc4",
+        "source_url": "assets/html-motion/6ffb7a5dfed50e090638ce4cf13c2d3d.nut",
+        "source_version": "agent-local-html-motion-v1",
+        "retrieved_at": "2026-10-18T02:18:29.207608Z",
+        "creator": "unknown",
+        "license_spdx": "LicenseRef-UNVERIFIED",
+        "license_url": "",
+        "attribution": "",
+        "permitted_uses": [
+          "internal"
+        ],
+        "restrictions": [],
+        "derived_from": [
+          "source-clip"
+        ],
+        "evidence": "assets/html-motion/6ffb7a5dfed50e090638ce4cf13c2d3d.nut",
+        "verification_status": "unverified",
+        "verified_by": "",
+        "takedown_status": "clear",
+        "notes": "Local editable HTML motion; template, image and font rights require separate review",
+        "record_id": "rights_20261018021829_1427ae34",
+        "record_version": 1,
+        "active": true,
+        "recorded_at": "2026-10-18T02:18:29.208483Z",
+        "permitted_channels": []
+      },
+      "generated_clip": null,
+      "snapshot": {
+        "snapshot_id": "snap_20261018021825_54519701",
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-quality-smoke-20261018-e2\\main\\history\\snap_20261018021825_54519701.json",
+        "label": "before-html-render",
+        "created_at": "2026-10-18T02:18:25.973186Z"
+      },
+      "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-quality-smoke-20261018-e2\\main\\validation\\html-motion-op_20261018021825_dd21a21c.json",
+      "validation": {
+        "ok": true,
+        "errors": [],
+        "warnings": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "source-legacy",
+            "rights_ref": "source-legacy",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "source-legacy",
+            "rights_ref": "source-legacy",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "source-fixed",
+            "rights_ref": "source-fixed",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "source-fixed",
+            "rights_ref": "source-fixed",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "source-outside",
+            "rights_ref": "source-outside",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "source-outside",
+            "rights_ref": "source-outside",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "source-clip",
+            "rights_ref": "source-clip",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "source-clip",
+            "rights_ref": "source-clip",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "outside-output",
+            "rights_ref": "outside-output",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "outside-output",
+            "rights_ref": "outside-output",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "clip-output",
+            "rights_ref": "clip-output",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "clip-output",
+            "rights_ref": "clip-output",
+            "record_version": 1,
+            "context": "project_asset"
+          }
+        ],
+        "rights": {
+          "ok": true,
+          "target": "commercial_ad",
+          "checked": 9,
+          "required_records": 9,
+          "failures": [],
+          "warnings": [
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "source-legacy",
+              "rights_ref": "source-legacy",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "source-legacy",
+              "rights_ref": "source-legacy",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "source-fixed",
+              "rights_ref": "source-fixed",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "source-fixed",
+              "rights_ref": "source-fixed",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "source-outside",
+              "rights_ref": "source-outside",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "source-outside",
+              "rights_ref": "source-outside",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "source-clip",
+              "rights_ref": "source-clip",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "source-clip",
+              "rights_ref": "source-clip",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "outside-output",
+              "rights_ref": "outside-output",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "outside-output",
+              "rights_ref": "outside-output",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "clip-output",
+              "rights_ref": "clip-output",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "clip-output",
+              "rights_ref": "clip-output",
+              "record_version": 1,
+              "context": "project_asset"
+            }
+          ],
+          "disposition_decisions": [],
+          "effective_disposition_decisions": []
+        },
+        "schema_engine": "jsonschema",
+        "asset_count": 9,
+        "sequence_count": 1
+      },
+      "layout_report": null
+    },
+    "artifacts": [],
+    "warnings": [],
+    "errors": [],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T02:18:29.265316Z",
+      "finished_at": "2026-10-18T02:18:29.265326Z",
+      "network": "disabled"
+    }
+  },
+  "stderr": "",
+  "seconds": 5.360328399998252
+}

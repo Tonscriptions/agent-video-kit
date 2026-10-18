@@ -5,6 +5,14 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For all-frame HTML text checks, use `motion html-quality` under the
+[layout/font contract](../../docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md).
+Pass `html-render --layout-check strict` when those checks must gate encoding;
+saved strict recipes inherit and rerun the gate on rebuild. Inspect actual
+source fonts, fallback, late-frame bounds and unsupported regions in
+[the validation record](../../docs/validation/HTML文字布局与字体覆盖实测_2026-10-18.md).
+Nonzero glyph mapping does not accept shaping or visual quality.
+
 For CSS/text/image changes to an existing HTML asset, use
 `motion html-controls` and `html-render --overrides` under the
 [template controls contract](../../docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md).

@@ -730,6 +730,15 @@ def build_parser() -> argparse.ArgumentParser:
     html_controls.add_argument('--frame-index', type=int, default=0)
     html_controls.add_argument('--timeout-seconds', type=float, default=120)
     html_controls.add_argument('--cancel-file')
+    html_quality = _leaf_common(motion_sub.add_parser('html-quality',help='逐帧核验文字裁切、出框与实际本地字体覆盖'))
+    html_quality.add_argument('--project',required=True)
+    quality_source=html_quality.add_mutually_exclusive_group(required=True)
+    quality_source.add_argument('--source-asset-id')
+    quality_source.add_argument('--from-asset-id')
+    html_quality.add_argument('--params')
+    html_quality.add_argument('--overrides')
+    html_quality.add_argument('--timeout-seconds',type=float,default=600)
+    html_quality.add_argument('--cancel-file')
     html_render = _leaf_common(motion_sub.add_parser('html-render', help='离线逐帧生成透明动效并验证全帧乱序重绘'))
     html_render.add_argument('--project', required=True)
     html_input = html_render.add_mutually_exclusive_group(required=True)
@@ -738,6 +747,7 @@ def build_parser() -> argparse.ArgumentParser:
     html_render.add_argument('--asset-id', required=True)
     html_render.add_argument('--params')
     html_render.add_argument('--overrides', help='本地 CSS 变量、文字、已登记图片替换；null 恢复页面值')
+    html_render.add_argument('--layout-check',choices=('off','strict'),help='strict 在编码前核验全帧布局/字体；省略继承配方，旧配方默认 off')
     html_render.add_argument('--apply', action='store_true')
     html_render.add_argument('--track-id')
     html_render.add_argument('--sequence-id')
@@ -4479,7 +4489,23 @@ def command_html_controls(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope('motion.html-controls', args, data={'inspection': result, 'report': str(report_path)})
 
 
+def command_html_quality(args: argparse.Namespace) -> dict[str, Any]:
+    root,project=load_project(args.project)
+    inspection_args=copy.copy(args)
+    inspection_args.asset_id=new_id('quality_html');inspection_args.apply=False
+    inspection_args.track_id=None;inspection_args.timeline_start_tick=0;inspection_args.expected_project_sha256=None
+    plan=html_motion.prepare_render(root,project,inspection_args)
+    if args.dry_run:
+        return _envelope('motion.html-quality',args,status='planned',data={'plan':html_motion.public_quality_plan(plan)})
+    cancel=resolve_local_path(root,args.cancel_file,field='cancel_file') if args.cancel_file else None
+    report_path=root/'validation'/f'html-quality-{new_id("inspect")}.json'
+    result=html_motion.inspect_layout(root,plan,report_path,timeout=args.timeout_seconds,cancel_file=cancel)
+    return _envelope('motion.html-quality',args,data={'quality':result,'report':str(report_path)})
+
+
 def command_html_render(args: argparse.Namespace) -> dict[str, Any]:
+    from time import monotonic
+    started=monotonic()
     root, project = load_project(args.project)
     plan = html_motion.prepare_render(root, project, args)
     public = html_motion.public_plan(plan)
@@ -4489,19 +4515,30 @@ def command_html_render(args: argparse.Namespace) -> dict[str, Any]:
     if output.exists():
         raise argument_error('动效输出已存在，必须使用新的 ID', str(output))
     cancel = resolve_local_path(root, args.cancel_file, field='cancel_file') if args.cancel_file else None
+    layout_result=None;layout_path=None
+    if plan['layout_check']=='strict':
+        layout_path=root/'validation'/f'html-quality-{new_id("gate")}.json'
+        layout_result=html_motion.inspect_layout(root,plan,layout_path,timeout=args.timeout_seconds,cancel_file=cancel)
+    remaining=args.timeout_seconds-(monotonic()-started)
+    if remaining<=0:
+        raise AppError('HTML_TIMEOUT','HTML 布局预检与渲染共用的总期限已到',exit_code=6,path=str(layout_path) if layout_path else None)
     snapshot = create_snapshot(root, project, label='before-html-render')
     operation_id = new_id('op')
     report_path = root / 'validation' / f'html-motion-{operation_id}.json'
     created = False
     try:
-        result = html_motion.render_frames(root, plan, output, report_path, timeout=args.timeout_seconds, cancel_file=cancel)
+        result = html_motion.render_frames(root, plan, output, report_path, timeout=remaining, cancel_file=cancel)
         created = True
         asset = {'id': args.asset_id, 'kind': 'video', 'uri': output.relative_to(root).as_posix(),
             'sha256': result['output_sha256'], 'rights_ref': args.asset_id, 'probe': result['probe'],
             'source': {'source_url': output.relative_to(root).as_posix(), 'retrieved_at': now_iso(), 'original_name': output.name},
             'html_motion': {'engine': html_motion.ENGINE, 'source_asset_id': plan['source_asset_id'],
                 'parameters': plan['parameters'], 'spec': plan['spec'], 'frame_count': plan['frame_count'],
-                'template_overrides': plan['template_overrides'], 'override_resources': plan['override_resources']}}
+                'template_overrides': plan['template_overrides'], 'override_resources': plan['override_resources'],
+                'layout_check':plan['layout_check']}}
+        if layout_result is not None:
+            asset['html_motion']['layout_evidence']={'report_sha256':'sha256:'+sha256_file(layout_path),
+                'frame_count':layout_result['frame_count'],'quality_passed':True,'all_frame_orders_equal':True}
         record = _html_rights(asset, list(dict.fromkeys([plan['asset']['rights_ref'],*[r['rights_ref'] for r in plan['override_resources']]])))
         project['assets'].append(asset)
         ledger = load_ledger(root)
@@ -4523,7 +4560,8 @@ def command_html_render(args: argparse.Namespace) -> dict[str, Any]:
         _operation(root, operation_id, {'command': 'motion.html-render', 'status': 'succeeded', 'asset_id': asset['id'],
                    'report': str(report_path), 'created_at': now_iso()})
         return _envelope('motion.html-render', args, data={'plan': public, 'asset': asset, 'rights': record,
-                         'generated_clip': clip, 'snapshot': snapshot, 'report': str(report_path), 'validation': validation}, operation_id=operation_id)
+                         'generated_clip': clip, 'snapshot': snapshot, 'report': str(report_path), 'validation': validation,
+                         'layout_report':str(layout_path) if layout_path else None}, operation_id=operation_id)
     except BaseException as exc:
         if created:
             output.unlink(missing_ok=True)
@@ -6445,6 +6483,7 @@ _READ_ONLY_PROJECT_COMMANDS = {
     ("motion", "inspect"),
     ('motion', 'html-inspect'),
     ('motion', 'html-controls'),
+    ('motion', 'html-quality'),
 }
 
 
@@ -6504,6 +6543,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ('motion', 'html-source'): command_html_source,
     ('motion', 'html-inspect'): command_html_inspect,
     ('motion', 'html-controls'): command_html_controls,
+    ('motion', 'html-quality'): command_html_quality,
     ('motion', 'html-render'): command_html_render,
     ("timeline", "compose"): command_timeline_compose,
     ("timeline", "edit"): command_timeline_edit,

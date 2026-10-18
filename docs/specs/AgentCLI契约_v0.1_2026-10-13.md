@@ -424,3 +424,11 @@ manifest `sequence-projection-budget` 保存可达节点与分量，`sequence-co
 `motion html-controls --project --source-asset-id|--from-asset-id [--params] [--overrides] [--frame-index 0] [--timeout-seconds 120] [--cancel-file]`：单个 CFR 帧/两个新上下文的实际控件检查，不编码或登记资产，返回 controls/effective_controls/采样摘要和回收报告；dry-run 不启动浏览器。`motion html-render` 新增 `--overrides <本地 JSON>`，保存到新输出的 html_motion.template_overrides；省略项继承，null 删除已有覆盖。图片使用 asset_id、独立摘要及权利依赖，可随工程包/片段组重映射。CSS 数值单位必须明确，无效/缺失目标和错图片类型运行时拒绝；dry-run 不冒充 DOM 验收。
 
 字段与预算、逐帧恢复/动画时钟和实际发布边界见[契约](./离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md)、[原片/终态/失败](../validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)。这两个命令继续执行原生 Windows/离线工具链、超时取消和 Job 回收约束。
+
+## V46 HTML 全帧布局与字体质量
+
+`motion html-quality --project --source-asset-id|--from-asset-id [--params] [--overrides] [--timeout-seconds 600] [--cancel-file] [--dry-run]`：逐个有理 CFR 帧绘制，并在独立上下文反序重绘、核对 PNG/布局。只写 validation 报告和 cache/html-quality 预览，最多 8 帧，不修改工程/资产/权利；dry-run 不运行浏览器。实际字体来源、Unicode cmap 与 DOM 行矩形分别记录，未知来源/复杂布局/序列不冒充通过。
+
+`html-render --layout-check off|strict`：省略继承既有配方，未配置/旧配方 off。strict 在编码之前重新执行同计划的全帧门禁，与编码共享总期限；失败/未核验返回 `HTML_QUALITY_FAILED` 退出 2，实际报告和 PNG 在事务回滚后仍保留，工程/台账/新编码资产不变。运行/超时错误 6、取消 8。成功输出保存 layout_check 和绑定摘要的 layout_evidence；不把系统字体 fallback 自动登记为有商业权利。
+
+[范围/预算契约](./HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md)、[实际缺字/裁切/继承/发行](../validation/HTML文字布局与字体覆盖实测_2026-10-18.md)。

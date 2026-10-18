@@ -5,6 +5,14 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [HTML text layout and font coverage](../../docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md),
+review every CFR frame and the independent reverse redraw. Separate partial
+clipping, completely outside text and unsupported geometry. Check actual CDP
+fonts against source file hashes and cmap coverage, keeping system fallback,
+unknown formats and variation sequences unverified. Use the explicit strict
+render gate when required; keep [negative and repaired cases](../../docs/validation/HTML文字布局与字体覆盖实测_2026-10-18.md).
+Mapping coverage and DOM rectangles do not prove ink, shaping or aesthetics.
+
 For [HTML template controls](../../docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md),
 separate a twice-drawn sample catalog from all-frame encoded evidence. Check
 CSS units, literal multiline words, registered replacement image pixels,

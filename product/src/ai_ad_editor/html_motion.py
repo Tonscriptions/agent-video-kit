@@ -303,6 +303,7 @@ def prepare_render(root,project,args):
     assets=asset_map(project)
     values={}
     saved_overrides=None
+    saved_layout_check='off'
     source_id=args.source_asset_id
     if args.from_asset_id:
         previous=assets.get(args.from_asset_id,{})
@@ -311,6 +312,7 @@ def prepare_render(root,project,args):
             fail('HTML_RECIPE_MISSING','已有输出没有可重建源码配方')
         source_id=recipe['source_asset_id'];values=copy.deepcopy(recipe['parameters'])
         saved_overrides=recipe.get('template_overrides')
+        saved_layout_check=recipe.get('layout_check','off')
     source=inspect_source(root,project,source_id)
     if args.params:
         path=_local(root,args.params,'params')
@@ -346,8 +348,12 @@ def prepare_render(root,project,args):
     elif args.track_id:
         fail('HTML_TRACK_INVALID','track_id 须与 apply 一起使用')
     runtime=verify_runtime(root)
+    layout_check=getattr(args,'layout_check',None) or saved_layout_check
+    if layout_check not in {'off','strict'}:
+        fail('HTML_LAYOUT_MODE_INVALID','layout_check 要求 off 或 strict')
     source.update({'source_asset_id':source_id,'parameters':params,'runtime':runtime,'track':track,
                    'template_overrides':changes,'compiled_overrides':compiled,'override_resources':references,
+                   'layout_check':layout_check,
                    'project_sha256':project_fingerprint(project)})
     return source
 
@@ -412,6 +418,95 @@ def inspect_controls(root,plan,report_path,*,frame_index=0,timeout=120,cancel_fi
         if isinstance(exc,AppError):
             exc.path=str(report_path);raise exc
         raise AppError('HTML_PROCESS_FAILED','模板检查失败',exit_code=6,path=str(report_path),cause=str(exc)[:2000]) from exc
+    finally:
+        if job:report['cleanup']=job.close()
+        atomic_write_json(report_path,report)
+
+
+def public_quality_plan(plan):
+    result=public_plan(plan)
+    result.update(output=None,quality_only=True,all_frames_checked_in_two_fresh_context_orders=False,
+                  all_frames_checked_in_primary_and_fresh_reverse=True)
+    return result
+
+
+def inspect_layout(root,plan,report_path,*,timeout=600,cancel_file=None):
+    """Inspect every actual frame; quality failures retain their complete report."""
+    from .html_quality import font_catalogue,review_frame
+    from .utils import atomic_write_json
+    catalogue,fonts=font_catalogue(plan)
+    report={'engine':ENGINE,'report_version':VERSION,'created_at':now_iso(),'status':'started','quality_only':True,
+            'plan':public_quality_plan(plan),'font_sources':catalogue,'frames':[],'issues':[],
+            'scope':'all-CFR-frames-DOM-range-geometry-and-source-font-Unicode-mapping',
+            'shaping_and_aesthetics_accepted':False,'validation_complete':False}
+    job=None;previews=root/'cache/html-quality'/report_path.stem;budget_bytes=0
+    try:
+        with tempfile.TemporaryDirectory(prefix='html-quality-') as folder,contextlib.ExitStack() as cleanup:
+            temp=Path(folder);bundle=temp/'source';bundle.mkdir()
+            for name,content in plan['data'].items():
+                path=bundle/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(content)
+            runtime=plan['runtime'];job=BrowserProcessJob(timeout,cancel_file);cleanup.callback(job.close)
+            env=dict(os.environ)
+            env.update(TEMP=str(temp),TMP=str(temp),TMPDIR=str(temp),PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD='1',NODE_OPTIONS='')
+            with (temp/'node.stderr').open('wb') as stderr:
+                node=job.start([runtime['node'],str(Path(__file__).with_name('html_motion_worker.mjs'))],cwd=temp,env=env,
+                    stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=stderr)
+                request={'task':'quality','root':str(bundle),'files':plan['files'],'spec':plan['spec'],'params':plan['parameters'],
+                    'overrides':plan['compiled_overrides'],'frame_count':plan['frame_count'],
+                    'ticks_per_second':plan['asset']['html_source']['ticks_per_second'],
+                    'playwright':runtime['playwright'],'chromium':runtime['chromium'],'log_file':str(temp/'chromium.log'),
+                    'frame_timeout_ms':min(15000,int(timeout*1000))}
+                node.stdin.write(encoded(request).replace(b'\n',b'')+b'\n');node.stdin.flush()
+                limit=max(2*1024**2,plan['spec']['width']*plan['spec']['height']*6+200000)
+                while True:
+                    line=node.stdout.readline(limit+1);job.check()
+                    if not line or len(line)>limit or not line.endswith(b'\n'):
+                        fail('HTML_PROTOCOL_INVALID','布局检查没有返回完整有界消息')
+                    item=json.loads(line)
+                    if item.get('type')=='error':
+                        report['worker']=item;raise AppError(item['code'],item['message'],exit_code=6)
+                    if item.get('type')=='done':
+                        report['worker']=item;receipt=item.get('cleanup',{})
+                        if not item.get('quality_only') or not item.get('all_frame_orders_equal') or len(report['frames'])!=plan['frame_count'] or item.get('frame_hashes')!=[f['sha256'] for f in report['frames']]:
+                            fail('HTML_PROTOCOL_INVALID','布局检查缺少全帧/独立重绘回执')
+                        if receipt.get('pages_opened')!=2 or receipt.get('pages_closed')!=2 or not receipt.get('browser_closed') or receipt.get('denied_requests')!=0:
+                            fail('HTML_PROTOCOL_INVALID','布局检查离线或关闭回执不完整')
+                        break
+                    index=len(report['frames'])
+                    if item.get('type')!='quality-frame' or item.get('index')!=index or index>=plan['frame_count']:
+                        fail('HTML_PROTOCOL_INVALID','布局检查帧序不连续')
+                    reviewed=review_frame(item['layout'],fonts)
+                    frame={'index':index,'sha256':item['sha256'],'layout':reviewed}
+                    if item.get('png'):
+                        png=base64.b64decode(item['png'],validate=True)
+                        if png[:8]!=b'\x89PNG\r\n\x1a\n' or len(png)<24 or struct.unpack('>II',png[16:24])!=(plan['spec']['width'],plan['spec']['height']) or digest(png)!=item['sha256']:
+                            fail('HTML_PROTOCOL_INVALID','布局预览 PNG 尺寸或摘要不符')
+                        previews.mkdir(parents=True,exist_ok=True)
+                        preview=previews/f'frame-{index:06}.png';preview.write_bytes(png)
+                        frame['preview']=preview.relative_to(root).as_posix()
+                    issues=[{'frame':index,**issue} for issue in reviewed['issues']]
+                    budget_bytes+=len(encoded(frame))+len(encoded(issues))
+                    if budget_bytes>16*1024**2:
+                        fail('HTML_LAYOUT_BUDGET','布局报告超过 16 MiB')
+                    report['frames'].append(frame);report['issues'].extend(issues)
+                    node.stdin.write(encoded({'ack':index}).replace(b'\n',b'')+b'\n');node.stdin.flush()
+                node.stdin.close()
+                if node.wait(timeout=15)!=0:fail('HTML_PROCESS_FAILED','布局检查进程异常退出')
+                job.check()
+            report['cleanup']=job.close()
+            report.update(validation_complete=True,quality_passed=not report['issues'],all_frame_orders_equal=True,
+                frame_count=len(report['frames']),text_ranges_checked=sum(len(f['layout']['rows']) for f in report['frames']),
+                issue_count=len(report['issues']),status='succeeded' if not report['issues'] else 'failed')
+            if report['issues']:
+                raise AppError('HTML_QUALITY_FAILED','文字布局或字体存在问题/未核验项；详情见保留报告',exit_code=2,path=str(report_path))
+            return report
+    except BaseException as exc:
+        if job:
+            try:job.check()
+            except AppError as reason:exc=reason
+        report.update(status='failed',error=exc.as_dict() if isinstance(exc,AppError) else {'code':'HTML_PROCESS_FAILED','message':str(exc)[:2000]})
+        if isinstance(exc,AppError):exc.path=str(report_path);raise exc
+        raise AppError('HTML_PROCESS_FAILED','布局检查失败',exit_code=6,path=str(report_path),cause=str(exc)[:2000]) from exc
     finally:
         if job:report['cleanup']=job.close()
         atomic_write_json(report_path,report)

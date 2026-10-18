@@ -7,8 +7,10 @@ import {createHash} from 'node:crypto';
 import {once} from 'node:events';
 import {FILM_CLOCK} from './openfilm_frame_clock.mjs';
 import {TEMPLATE_DOM} from './html_template_dom.mjs';
+import {QUALITY_DOM} from './html_quality_dom.mjs';
 const TEMPLATE_HOST = '(()=>{\n'+['openfilm_template_fields.mjs','openfilm_overrides.mjs'].map(name =>
-  readFileSync(new URL(name, import.meta.url), 'utf8').replace(/^export /gm, '')).join('\n')+'\n'+TEMPLATE_DOM+'\n})();';
+  readFileSync(new URL(name, import.meta.url), 'utf8').replace(/^export /gm, '')).join('\n')+'\n'+TEMPLATE_DOM+'\n'+
+  readFileSync(new URL('openfilm_text_bounds.mjs',import.meta.url),'utf8').replace(/^export /gm,'')+'\n'+QUALITY_DOM+'\n})();';
 
 const lines = createInterface({input: process.stdin, crlfDelay: Infinity})[Symbol.asyncIterator]();
 const send = async value => { if (!process.stdout.write(JSON.stringify(value)+'\n')) await once(process.stdout, 'drain'); };
@@ -103,7 +105,7 @@ try {
     function requireClean() { if(errors.length) throw problem(errors[0].code,JSON.stringify(errors)); }
     requireClean();
     await page.addScriptTag({content:TEMPLATE_HOST});
-    return {context, page, requireClean};
+    return {context, page, cdp, requireClean};
   }
 
   async function limited(promise, ms) {
@@ -124,7 +126,7 @@ try {
       const applied = await window.__agentVideoTemplate.apply(overrides);
       await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
       return {controls, applied, effective_controls:collect ? window.__agentVideoTemplate.collect() : null};
-    },{t,params,overrides:request.overrides || [],collect:request.task === 'controls' || index === 0}),request.frame_timeout_ms);
+    },{t,params,overrides:request.overrides || [],collect:request.task !== 'quality' && (request.task === 'controls' || index === 0)}),request.frame_timeout_ms);
     host.requireClean();
     const png = await host.page.screenshot({type:'png',omitBackground:true,timeout:request.frame_timeout_ms,scale:'css'});
     host.requireClean();
@@ -135,7 +137,41 @@ try {
     contexts=contexts.filter(c=>c!==host.context);
     receipt.pages_closed++;
   }
-  if(request.task === 'controls') {
+  if(request.task === 'quality') {
+    const hashes=[], diagnostics=[];let reportBytes=0,previewCount=0;
+    async function inspect(host,index) {
+      const {png,hash}=await draw(host,index);
+      const layout=await limited(host.page.evaluate(()=>window.__agentVideoQuality.capture()),request.frame_timeout_ms);
+      const document=await host.cdp.send('DOM.getDocument',{depth:0});
+      for(const row of layout.rows) {
+        const {nodeId}=await host.cdp.send('DOM.querySelector',{nodeId:document.root.nodeId,selector:row.at});
+        if(!nodeId)throw problem('HTML_LAYOUT_CHANGED','Text element disappeared during diagnosis');
+        const {fonts}=await host.cdp.send('CSS.getPlatformFontsForNode',{nodeId});
+        row.platform_fonts=fonts.sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)));
+      }
+      host.requireClean();return {png,hash,layout};
+    }
+    const host=await pageForPass();
+    await host.cdp.send('DOM.enable');await host.cdp.send('CSS.enable');
+    for(let i=0;i<frameCount;i++) {
+      const {png,hash,layout}=await inspect(host,i);const serial=JSON.stringify(layout);
+      reportBytes+=Buffer.byteLength(serial);
+      if(reportBytes>8*1024**2)throw problem('HTML_LAYOUT_BUDGET','Layout evidence exceeds 8 MiB');
+      hashes.push(hash);diagnostics.push(sha(Buffer.from(serial)));
+      const preview=previewCount<8 && (i===0 || layout.unsupported.length || layout.rows.some(r=>r.problems.length || r.platform_fonts.some(f=>!f.isCustomFont && f.glyphCount>0)));
+      if(preview)previewCount++;
+      await send({type:'quality-frame',index:i,sha256:hash,layout,png:preview?png.toString('base64'):null});
+      const ack=await lines.next();if(ack.done||JSON.parse(ack.value).ack!==i)throw problem('HTML_PROTOCOL_INVALID','Missing quality acknowledgement');
+    }
+    await closePage(host);
+    const again=await pageForPass();await again.cdp.send('DOM.enable');await again.cdp.send('CSS.enable');
+    for(let i=frameCount-1;i>=0;i--) {
+      const {hash,layout}=await inspect(again,i);
+      if(hash!==hashes[i] || sha(Buffer.from(JSON.stringify(layout)))!==diagnostics[i])throw problem('HTML_FRAME_NONDETERMINISTIC','Layout or frame differs on reverse redraw '+i);
+    }
+    await closePage(again);
+    outcome={quality_only:true,frame_hashes:hashes,diagnostic_hashes:diagnostics,all_frame_orders_equal:true,browser_version:browser.version(),preview_count:previewCount};
+  } else if(request.task === 'controls') {
     const samples = [];
     for(let pass=0;pass<2;pass++) {
       const host = await pageForPass();
