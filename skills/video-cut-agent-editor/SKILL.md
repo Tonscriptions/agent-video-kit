@@ -9,10 +9,14 @@ For a detached native installation, read the
 [offline release contract](../../docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md).
 Use the reviewed manifest hash and a new target with the bundled installer;
 the generated launcher uses the installed dependency site and local caches.
+For font/text rendering use a `font-text-v1` bundle with seven pinned wheels,
+including Pillow; the historical six-wheel `core-v1` bundle lacks that dependency.
 `schema show/export` supplies the exact contract. Missing schema/executor or
 invalid `project.created_at` is an error. See the
 [actual install/edit/package checks](../../docs/validation/离线发行与随包Schema实测_2026-10-18.md)
 before treating the same-machine result as portability evidence.
+The [CTC install and quality record](../../docs/validation/离线CTC字词强制对齐实测_2026-10-18.md)
+keeps the actual font failure and failed acoustic precision gate.
 
 For all-frame HTML text checks, use `motion html-quality` under the
 [layout/font contract](../../docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md).
@@ -93,6 +97,14 @@ Parent trim/reverse/constant speed/curves operate on the completed native
 child surface in the same FFmpeg graph. Keep original-source audio, scoped
 `inline_sequence_path` warnings and the combined projection/surface quota.
 Ancestor freeze still rejects. Preserve these explicit boundary errors.
+
+For real supplied-text word/character timing, read the
+[offline CTC contract](../../docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md).
+Use registered `transformers-wav2vec2-ctc-local-v1` with `subtitle align`,
+an explicit local transcript and new JSON output. Character/whitespace units,
+case mapping, SRT source windows, local font/track application and model rights
+remain explicit. OOV fails without script conversion. Keep review warnings;
+forced alignment is separate from Whisper transcription and subtitle splitting.
 
 For readable subtitle segments or local piece corrections, read the
 [subtitle segmentation contract](../../docs/specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md).

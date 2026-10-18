@@ -1,0 +1,148 @@
+{
+  "error": "AssertionError((7, b'{\"ok\":false,\"command\":\"media.ingest\",\"request_id\":\"req_20261018061737_7e5604e8\",\"operation_id\":null,\"status\":\"failed\",\"data\":{},\"artifacts\":[],\"warnings\":[],\"errors\":[{\"code\":\"DEPENDENCY_UNAVAILABLE\",\"message\":\"\\xe5\\xad\\x97\\xe4\\xbd\\x93\\xe5\\xaf\\xbc\\xe5\\x85\\xa5\\xe9\\x9c\\x80\\xe8\\xa6\\x81\\xe6\\x9c\\xac\\xe5\\x9c\\xb0 Pillow/FreeType\",\"path\":null,\"retryable\":false,\"hint\":\"\\xe4\\xbd\\xbf\\xe7\\x94\\xa8\\xe5\\xb7\\xb2\\xe5\\xae\\x89\\xe8\\xa3\\x85\\xe7\\x9a\\x84\\xe6\\x9c\\xac\\xe5\\x9c\\xb0\\xe4\\xbe\\x9d\\xe8\\xb5\\x96\\xef\\xbc\\x8c\\xe4\\xb8\\x8d\\xe4\\xbc\\x9a\\xe8\\x87\\xaa\\xe5\\x8a\\xa8\\xe5\\xae\\x89\\xe8\\xa3\\x85\"}],\"provenance\":{\"cli_version\":\"0.1.0\",\"schema_version\":\"0.1.0\",\"engine_version\":\"ffmpeg-local\",\"started_at\":\"2026-10-18T06:17:37.958935Z\",\"finished_at\":\"2026-10-18T06:17:37.958958Z\",\"network\":\"disabled\"}}\\r\\n', b''))",
+  "calls": [
+    {
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-I",
+        "-S",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\installed\\run.py",
+        "schema",
+        "show"
+      ],
+      "exit_code": 0,
+      "seconds": 5.129
+    },
+    {
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-I",
+        "-S",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\installed\\run.py",
+        "capabilities"
+      ],
+      "exit_code": 0,
+      "seconds": 1.43
+    },
+    {
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-I",
+        "-S",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\installed\\run.py",
+        "project",
+        "init",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\project"
+      ],
+      "exit_code": 0,
+      "seconds": 2.188
+    },
+    {
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-I",
+        "-S",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\installed\\run.py",
+        "asr",
+        "adapter",
+        "register",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\project",
+        "--adapter-id",
+        "ctc",
+        "--engine",
+        "transformers-wav2vec2-ctc-local-v1",
+        "--python-executable",
+        "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+        "--model-path",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-en-runtime",
+        "--device",
+        "cuda",
+        "--threads",
+        "4",
+        "--evidence",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\ctc-model-conversion-20261018\\en-runtime.json",
+        "--license-spdx",
+        "Apache-2.0"
+      ],
+      "exit_code": 0,
+      "seconds": 12.097
+    },
+    {
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-I",
+        "-S",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\installed\\run.py",
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\project",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\ctc-alignment-20261018\\input.wav",
+        "--asset-id",
+        "speech"
+      ],
+      "exit_code": 0,
+      "seconds": 1.792
+    },
+    {
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-I",
+        "-S",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\installed\\run.py",
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\project",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\ctc-alignment-20261018\\input.mp4",
+        "--asset-id",
+        "background"
+      ],
+      "exit_code": 0,
+      "seconds": 2.339
+    },
+    {
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-I",
+        "-S",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\installed\\run.py",
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ctc-native-installed-20261018\\project",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\ctc-alignment-20261018\\font.ttf",
+        "--asset-id",
+        "font"
+      ],
+      "exit_code": 10,
+      "seconds": 2.316
+    }
+  ],
+  "partials_preserved": true
+}

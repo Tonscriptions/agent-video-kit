@@ -1,0 +1,139 @@
+{
+  "args": [
+    "media",
+    "ingest",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\ctc-zh-smoke-20261018-b",
+    "--input",
+    "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\soulx-smoke-20261015-d\\assets\\asset_20261015102331_6d133120_speaker_4_cv_tw_female_52d6.wav",
+    "--asset-id",
+    "speech"
+  ],
+  "exit_code": 0,
+  "seconds": 0.395,
+  "stderr": "",
+  "result": {
+    "ok": true,
+    "command": "media.ingest",
+    "request_id": "req_20261018061027_97719606",
+    "operation_id": "op_20261018061027_5e0bf97f",
+    "status": "succeeded",
+    "data": {
+      "asset": {
+        "id": "speech",
+        "kind": "audio",
+        "uri": "assets/speech_asset_20261015102331_6d133120_speaker_4_cv_tw_female_52d6.wav",
+        "sha256": "sha256:2b40301cfbd9f038f981140d73a04f558518bd5dc54a65d8ab2e7aab431c8bfe",
+        "probe": {
+          "duration_seconds": 12.68,
+          "duration_tick": 1141200,
+          "format": "wav",
+          "format_long_name": "WAV / WAVE (Waveform Audio)",
+          "streams": [
+            {
+              "index": 0,
+              "codec_name": "pcm_s16le",
+              "codec_long_name": "PCM signed 16-bit little-endian",
+              "codec_type": "audio",
+              "codec_tag_string": "[1][0][0][0]",
+              "codec_tag": "0x0001",
+              "sample_fmt": "s16",
+              "sample_rate": "24000",
+              "channels": 1,
+              "bits_per_sample": 16,
+              "initial_padding": 0,
+              "r_frame_rate": "0/0",
+              "avg_frame_rate": "0/0",
+              "time_base": "1/24000",
+              "duration_ts": 304320,
+              "duration": "12.680000",
+              "bit_rate": "384000",
+              "disposition": {
+                "default": 0,
+                "dub": 0,
+                "original": 0,
+                "comment": 0,
+                "lyrics": 0,
+                "karaoke": 0,
+                "forced": 0,
+                "hearing_impaired": 0,
+                "visual_impaired": 0,
+                "clean_effects": 0,
+                "attached_pic": 0,
+                "timed_thumbnails": 0,
+                "non_diegetic": 0,
+                "captions": 0,
+                "descriptions": 0,
+                "metadata": 0,
+                "dependent": 0,
+                "still_image": 0,
+                "multilayer": 0
+              }
+            }
+          ],
+          "video": {
+            "codec": null,
+            "width": null,
+            "height": null,
+            "pix_fmt": null,
+            "fps": null,
+            "color_space": null,
+            "duration_seconds": 0.0,
+            "start_time_seconds": 0.0
+          },
+          "audio": {
+            "codec": "pcm_s16le",
+            "sample_rate": 24000,
+            "channels": 1,
+            "duration_seconds": 12.68,
+            "start_time_seconds": 0.0
+          }
+        },
+        "rights_ref": "speech",
+        "source": {
+          "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\workspace\\soulx-smoke-20261015-d\\assets\\asset_20261015102331_6d133120_speaker_4_cv_tw_female_52d6.wav",
+          "retrieved_at": "2026-10-18T06:10:27.789143Z",
+          "original_name": "asset_20261015102331_6d133120_speaker_4_cv_tw_female_52d6.wav"
+        }
+      },
+      "rights": {
+        "asset_id": "speech",
+        "kind": "audio",
+        "sha256": "sha256:2b40301cfbd9f038f981140d73a04f558518bd5dc54a65d8ab2e7aab431c8bfe",
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\workspace\\soulx-smoke-20261015-d\\assets\\asset_20261015102331_6d133120_speaker_4_cv_tw_female_52d6.wav",
+        "source_version": "local",
+        "retrieved_at": "2026-10-18T06:10:27.789168Z",
+        "creator": "unknown",
+        "license_spdx": "LicenseRef-UNVERIFIED",
+        "license_url": "",
+        "attribution": "",
+        "permitted_uses": [
+          "internal"
+        ],
+        "restrictions": [],
+        "evidence": "",
+        "verification_status": "unverified",
+        "verified_by": "",
+        "takedown_status": "clear",
+        "notes": "Imported by local CLI",
+        "record_id": "rights_20261018061027_1f501462",
+        "record_version": 1,
+        "active": true,
+        "recorded_at": "2026-10-18T06:10:27.790004Z",
+        "permitted_channels": []
+      },
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\ctc-zh-smoke-20261018-b\\assets\\speech_asset_20261015102331_6d133120_speaker_4_cv_tw_female_52d6.wav"
+    },
+    "artifacts": [],
+    "warnings": [],
+    "errors": [],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T06:10:27.803989Z",
+      "finished_at": "2026-10-18T06:10:27.803998Z",
+      "network": "disabled"
+    }
+  }
+}

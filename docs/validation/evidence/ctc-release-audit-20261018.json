@@ -1,0 +1,208 @@
+{
+  "status": "evidence_verified_with_acoustic_quality_gate_failed",
+  "checked_at_utc": "2026-10-18T06:54:32.691255+00:00",
+  "full_methods": 1135,
+  "frozen_files": 170,
+  "unchanged_since_real_model_files": 166,
+  "distribution_only_changed_files": [
+    "product/offline/build.py",
+    "product/offline/install.py",
+    "product/pyproject.toml",
+    "product/tests/test_offline_install.py"
+  ],
+  "development_cli_calls": {
+    "en": 15,
+    "zh": 12,
+    "zh_expected_oov_rejections": 1
+  },
+  "development_worker_processes": 5,
+  "development_model_forward_calls": 8,
+  "actual_model_runs": [
+    {
+      "language": "en",
+      "samples": 125850,
+      "forward_calls": 1,
+      "peak_cuda_bytes": 511436288
+    },
+    {
+      "language": "en",
+      "samples": 755100,
+      "forward_calls": 2,
+      "peak_cuda_bytes": 866922496
+    },
+    {
+      "language": "en",
+      "samples": 125850,
+      "forward_calls": 2,
+      "peak_cuda_bytes": 467504128
+    },
+    {
+      "language": "zh",
+      "samples": 202880,
+      "forward_calls": 1,
+      "peak_cuda_bytes": 1573686272
+    },
+    {
+      "language": "zh",
+      "samples": 608640,
+      "forward_calls": 2,
+      "peak_cuda_bytes": 1960642048
+    }
+  ],
+  "installed_cli_calls": 11,
+  "installed_worker_processes": 1,
+  "installed_forward_calls": 1,
+  "package_files": 116,
+  "release_wheels": 7,
+  "encoded_frames": 236,
+  "encoded_audio_samples_48k": 377550,
+  "gif_frames": 79,
+  "gif_duration_ms": 7900,
+  "acoustic_word_boundary_gate": {
+    "reference": "authored trimmed word blocks; not phonetic annotations",
+    "predeclared_max_error_seconds": 0.06666666666666667,
+    "observed_max_error_seconds": 0.2581875,
+    "passed": false,
+    "words": [
+      {
+        "word": "RED",
+        "start_error_seconds": 0.2225,
+        "end_error_seconds": -0.20225
+      },
+      {
+        "word": "BLUE",
+        "start_error_seconds": 0.23775,
+        "end_error_seconds": -0.2018125
+      },
+      {
+        "word": "GREEN",
+        "start_error_seconds": 0.2581875,
+        "end_error_seconds": -0.1403125
+      },
+      {
+        "word": "RED",
+        "start_error_seconds": 0.2196875,
+        "end_error_seconds": -0.2050625
+      },
+      {
+        "word": "BLUE",
+        "start_error_seconds": 0.2349375,
+        "end_error_seconds": -0.204625
+      },
+      {
+        "word": "GREEN",
+        "start_error_seconds": 0.255375,
+        "end_error_seconds": -0.143125
+      }
+    ]
+  },
+  "natural_quality_accepted": false,
+  "continuous_playback_review": false,
+  "listening_review": false,
+  "skills": 14,
+  "skill_links": 172,
+  "documents": 174,
+  "local_links": 3635,
+  "generated_self_output_links": 1,
+  "broken_links": [],
+  "files": {
+    "docs/assets/ctc-alignment-20261018/agent-video-kit-cp313-win_amd64.zip": {
+      "bytes": 8103829,
+      "sha256": "sha256:2d2e568deb62de574cca12f41941db58873e56ad0850941aae6b97429f1a0f3b"
+    },
+    "docs/assets/ctc-alignment-20261018/aligned-lossless.mkv": {
+      "bytes": 1644710,
+      "sha256": "sha256:f13ffaa043ecaeadf2e35547e08a5c5f799abdf0b92591f55d43410b586a6a1c"
+    },
+    "docs/assets/ctc-alignment-20261018/aligned-verified.mkv": {
+      "bytes": 1644710,
+      "sha256": "sha256:08d13d44f80996627288d8e72f54538ff5a08ca5e6336f6039e48ed0512ef669"
+    },
+    "docs/assets/ctc-alignment-20261018/aligned.srt": {
+      "bytes": 62,
+      "sha256": "sha256:33a00c55abcd8bec84ee81ba3f080b2554f1e7d7349d61dc696fcc6fabe2419c"
+    },
+    "docs/assets/ctc-alignment-20261018/background.png": {
+      "bytes": 8339,
+      "sha256": "sha256:d7181c709ff5cfccda58c4d4c26e2adc3e29d0bedb14bdbc675f3f9f6905779c"
+    },
+    "docs/assets/ctc-alignment-20261018/blue-flite-raw.wav": {
+      "bytes": 29838,
+      "sha256": "sha256:2c2d57148c7f74ed214131aeded7636f466013e6f91b216c74e29e1017430b7e"
+    },
+    "docs/assets/ctc-alignment-20261018/comparison.gif": {
+      "bytes": 77501,
+      "sha256": "sha256:c08a9e13d0f57e31d0c0f6d44a87903fcac04655c67eccf473d5df6a71baeac5"
+    },
+    "docs/assets/ctc-alignment-20261018/comparison.mp4": {
+      "bytes": 90739,
+      "sha256": "sha256:4c8d802c7faf2281eaca81cee0bbc6859514228afe8a115b8c8c47456352f7bc"
+    },
+    "docs/assets/ctc-alignment-20261018/contact.png": {
+      "bytes": 46294,
+      "sha256": "sha256:4054376f70f52ef0fd68cad53073fa852dda7835bec92cea96da512b59217cd3"
+    },
+    "docs/assets/ctc-alignment-20261018/font.ttf": {
+      "bytes": 2976,
+      "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1"
+    },
+    "docs/assets/ctc-alignment-20261018/green-flite-raw.wav": {
+      "bytes": 24238,
+      "sha256": "sha256:942cfcf2e148994075ac2b278764717b5fa6e5247d66c241deb703482f4a9a50"
+    },
+    "docs/assets/ctc-alignment-20261018/initial-double-audio.mkv": {
+      "bytes": 1644710,
+      "sha256": "sha256:f13ffaa043ecaeadf2e35547e08a5c5f799abdf0b92591f55d43410b586a6a1c"
+    },
+    "docs/assets/ctc-alignment-20261018/input-long.wav": {
+      "bytes": 1510244,
+      "sha256": "sha256:1f8a329980b552cb7689099ffc49329b2986df95264f853ac1fe37d60cd18643"
+    },
+    "docs/assets/ctc-alignment-20261018/input-provenance.json": {
+      "bytes": 5971,
+      "sha256": "sha256:b3e8d6c8f0b6d0afaf8219392c0a990b36127e8b7ce61541389efeb912c73839"
+    },
+    "docs/assets/ctc-alignment-20261018/input.mp4": {
+      "bytes": 76190,
+      "sha256": "sha256:84daa7aa0f05a46731e53441d417bdca922538dd97aacd530b24bbfcfc087308"
+    },
+    "docs/assets/ctc-alignment-20261018/input.wav": {
+      "bytes": 251744,
+      "sha256": "sha256:eea24cb10f383c972a64ae8742795e3eb5e404ba4dd37f98440197f8c84a0d30"
+    },
+    "docs/assets/ctc-alignment-20261018/install-receipt.json": {
+      "bytes": 1817,
+      "sha256": "sha256:6ab10599d76a8c7c1c1b5d8b9968a6eb070b7b25a83374c15b6275463a71df7c"
+    },
+    "docs/assets/ctc-alignment-20261018/red-flite-raw.wav": {
+      "bytes": 22158,
+      "sha256": "sha256:0fca0f6394502072dc6af1f826915b56e0ddde0061b20c93b93c3b89d8cd5337"
+    },
+    "docs/assets/ctc-alignment-20261018/reference-48k-mono.wav": {
+      "bytes": 1510292,
+      "sha256": "sha256:c788a465f1f0a1ce29d4aab9262fb750bc9048c6f60418ff32e923775f90c4c9"
+    },
+    "docs/assets/ctc-alignment-20261018/release-manifest.json": {
+      "bytes": 5164,
+      "sha256": "sha256:7b2377a3ffaa64a19f822b8c27149e8d87de4d97c86741c87942b9c3dc2ec3dd"
+    },
+    "docs/assets/ctc-alignment-20261018/result.mp4": {
+      "bytes": 137564,
+      "sha256": "sha256:cd0f5121948bb8029027253fcede08fa3d18ce39a292ae40699713e2b8bdaf21"
+    },
+    "docs/assets/ctc-alignment-20261018/short-alignment.json": {
+      "bytes": 14260,
+      "sha256": "sha256:fe6a38431c8b6796b9c70e72379f6667fb19f8144fa6ae3e7da43d831dee6841"
+    },
+    "docs/assets/ctc-alignment-20261018/transcript-long.txt": {
+      "bytes": 179,
+      "sha256": "sha256:e44884bfa88cced075e107d0197e39531a21c1aa73debc308f4fa6c289649757"
+    },
+    "docs/assets/ctc-alignment-20261018/transcript.txt": {
+      "bytes": 29,
+      "sha256": "sha256:39c37b920c4d4972a6b5314a294f67c6ed8569735741f099b7c05ee9b8519684"
+    }
+  },
+  "full_regression_sha256": "sha256:e409614fcd88f43b8ff7dd9d34df50f017ad2d0858075363550732e54be2dfe4",
+  "generator_sha256": "sha256:e36ec52da2d6f2df2563d7550bc7e8478b04f1fa3d62a762cbd885a95fe796d1"
+}

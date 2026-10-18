@@ -269,3 +269,15 @@ docs/specs/离线逐笔描线动效契约_v0.1_2026-10-18.md text eol=lf
 docs/validation/离线逐笔描线动效实测_2026-10-18.md text eol=lf
 docs/third-party/OpenFilm示例描线函数复用声明_2026-10-18.md text eol=lf
 docs/CTC对齐模型来源预研_2026-10-18.md text eol=lf
+
+# V49 preserve captured CTC clocks, raw CLI logs and third-party notices.
+scripts/*ctc*.py -text
+scripts/acquire_pillow_release_wheel.py -text
+docs/validation/evidence/ctc-*/** -text -whitespace
+docs/validation/evidence/ctc-*.json -text whitespace=cr-at-eol
+docs/validation/evidence/pillow-release-wheel-*/** -text -whitespace
+docs/third-party/flite-source-*/** -text -whitespace
+docs/assets/ctc-alignment-*/** -text whitespace=cr-at-eol
+docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/离线CTC字词强制对齐实测_2026-10-18.md text eol=lf
+docs/third-party/CTC模型与英文演示语音来源_2026-10-18.md text eol=lf

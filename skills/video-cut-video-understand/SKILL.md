@@ -30,6 +30,13 @@ artifacts. A missing model or unsupported locale is a structured degraded
 result. Do not install packages, fetch weights, open a browser or hand a URL
 to a downloader.
 
+For a supplied corrected transcript, use the separate
+[offline CTC alignment path](../../docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md)
+via registered `transformers-wav2vec2-ctc-local-v1` and `subtitle align`.
+It produces acoustic character/word times, preserving source codepoint indices;
+it does not recognize missing text or translate/convert Chinese scripts.
+Review supplied text and low-posterior words even when the CTC path is reachable.
+
 For the registered Whisper path read the [ASR contract](../../docs/specs/本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md).
 Use `asr adapter register/list/inspect` with existing native Python, safetensors
 weights and evidence. CPU/CUDA and thread limits belong to the registration.

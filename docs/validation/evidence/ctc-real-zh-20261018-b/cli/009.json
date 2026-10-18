@@ -1,0 +1,139 @@
+{
+  "args": [
+    "media",
+    "ingest",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\ctc-zh-smoke-20261018-b",
+    "--input",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\asr-fixtures\\s4-three-copies.wav",
+    "--asset-id",
+    "speech-long"
+  ],
+  "exit_code": 0,
+  "seconds": 0.395,
+  "stderr": "",
+  "result": {
+    "ok": true,
+    "command": "media.ingest",
+    "request_id": "req_20261018061143_e620b7f6",
+    "operation_id": "op_20261018061143_f8dda6ef",
+    "status": "succeeded",
+    "data": {
+      "asset": {
+        "id": "speech-long",
+        "kind": "audio",
+        "uri": "assets/speech-long_s4-three-copies.wav",
+        "sha256": "sha256:89b308580d3f8fdc6d19751bb830bfdcb6a28a76d488c73c12140d64bc168a1b",
+        "probe": {
+          "duration_seconds": 38.04,
+          "duration_tick": 3423600,
+          "format": "wav",
+          "format_long_name": "WAV / WAVE (Waveform Audio)",
+          "streams": [
+            {
+              "index": 0,
+              "codec_name": "pcm_s16le",
+              "codec_long_name": "PCM signed 16-bit little-endian",
+              "codec_type": "audio",
+              "codec_tag_string": "[1][0][0][0]",
+              "codec_tag": "0x0001",
+              "sample_fmt": "s16",
+              "sample_rate": "16000",
+              "channels": 1,
+              "bits_per_sample": 16,
+              "initial_padding": 0,
+              "r_frame_rate": "0/0",
+              "avg_frame_rate": "0/0",
+              "time_base": "1/16000",
+              "duration_ts": 608640,
+              "duration": "38.040000",
+              "bit_rate": "256000",
+              "disposition": {
+                "default": 0,
+                "dub": 0,
+                "original": 0,
+                "comment": 0,
+                "lyrics": 0,
+                "karaoke": 0,
+                "forced": 0,
+                "hearing_impaired": 0,
+                "visual_impaired": 0,
+                "clean_effects": 0,
+                "attached_pic": 0,
+                "timed_thumbnails": 0,
+                "non_diegetic": 0,
+                "captions": 0,
+                "descriptions": 0,
+                "metadata": 0,
+                "dependent": 0,
+                "still_image": 0,
+                "multilayer": 0
+              }
+            }
+          ],
+          "video": {
+            "codec": null,
+            "width": null,
+            "height": null,
+            "pix_fmt": null,
+            "fps": null,
+            "color_space": null,
+            "duration_seconds": 0.0,
+            "start_time_seconds": 0.0
+          },
+          "audio": {
+            "codec": "pcm_s16le",
+            "sample_rate": 16000,
+            "channels": 1,
+            "duration_seconds": 38.04,
+            "start_time_seconds": 0.0
+          }
+        },
+        "rights_ref": "speech-long",
+        "source": {
+          "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\asr-fixtures\\s4-three-copies.wav",
+          "retrieved_at": "2026-10-18T06:11:43.606660Z",
+          "original_name": "s4-three-copies.wav"
+        }
+      },
+      "rights": {
+        "asset_id": "speech-long",
+        "kind": "audio",
+        "sha256": "sha256:89b308580d3f8fdc6d19751bb830bfdcb6a28a76d488c73c12140d64bc168a1b",
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\asr-fixtures\\s4-three-copies.wav",
+        "source_version": "local",
+        "retrieved_at": "2026-10-18T06:11:43.606701Z",
+        "creator": "unknown",
+        "license_spdx": "LicenseRef-UNVERIFIED",
+        "license_url": "",
+        "attribution": "",
+        "permitted_uses": [
+          "internal"
+        ],
+        "restrictions": [],
+        "evidence": "",
+        "verification_status": "unverified",
+        "verified_by": "",
+        "takedown_status": "clear",
+        "notes": "Imported by local CLI",
+        "record_id": "rights_20261018061143_0619c1a1",
+        "record_version": 1,
+        "active": true,
+        "recorded_at": "2026-10-18T06:11:43.608059Z",
+        "permitted_channels": []
+      },
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\ctc-zh-smoke-20261018-b\\assets\\speech-long_s4-three-copies.wav"
+    },
+    "artifacts": [],
+    "warnings": [],
+    "errors": [],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T06:11:43.667910Z",
+      "finished_at": "2026-10-18T06:11:43.667924Z",
+      "network": "disabled"
+    }
+  }
+}

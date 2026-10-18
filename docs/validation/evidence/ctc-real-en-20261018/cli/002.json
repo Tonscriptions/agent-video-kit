@@ -1,0 +1,56 @@
+{
+  "args": [
+    "asr",
+    "adapter",
+    "register",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\ctc-en-smoke-20261018",
+    "--adapter-id",
+    "ctc",
+    "--engine",
+    "transformers-wav2vec2-ctc-local-v1",
+    "--python-executable",
+    "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+    "--model-path",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-en",
+    "--device",
+    "cuda",
+    "--threads",
+    "4",
+    "--evidence",
+    "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\ctc-model-conversion-20261018\\en.json",
+    "--license-spdx",
+    "Apache-2.0",
+    "--creator",
+    "upstream model authors"
+  ],
+  "exit_code": 10,
+  "seconds": 1.188,
+  "stderr": "",
+  "result": {
+    "ok": false,
+    "command": "asr.adapter",
+    "request_id": "req_20261018060404_b7f54e18",
+    "operation_id": null,
+    "status": "failed",
+    "data": {},
+    "artifacts": [],
+    "warnings": [],
+    "errors": [
+      {
+        "code": "ALIGNMENT_MODEL_INVALID",
+        "message": "本地 CTC 模型/词表不完整或不安全: CTC requires the explicit 16 kHz Wav2Vec2 extractor",
+        "path": null,
+        "retryable": false
+      }
+    ],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T06:04:04.231844Z",
+      "finished_at": "2026-10-18T06:04:04.231853Z",
+      "network": "disabled"
+    }
+  }
+}

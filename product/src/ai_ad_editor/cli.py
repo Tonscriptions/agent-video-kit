@@ -59,6 +59,8 @@ from .batch import _load_variants, run_template_batch
 from .capabilities import build_capability_manifest
 from .transcribe import ffmpeg_whisper_available, transcribe_local, transcribe_local_ffmpeg_whisper, write_srt
 from .local_asr import ASR_ENGINE, asr_registry, registry_item as asr_registry_item, prepare_adapter as prepare_asr_adapter, verify_adapter as verify_asr_adapter, transcribe_registered
+from .local_ctc import ENGINE as CTC_ENGINE
+from .ctc_cli import command_subtitle_align
 from .asr_quality import evaluate_transcripts
 from .subtitle_segments import (load_source as load_segment_source, checked_rules as checked_segment_rules,
     checked_corrections as checked_segment_corrections, segment_source, display_cues as segment_display_cues,
@@ -590,6 +592,21 @@ def build_parser() -> argparse.ArgumentParser:
     subtitle_segment.add_argument("--timeline-start-tick", type=int, default=0)
     subtitle_segment.add_argument("--apply", action="store_true")
     subtitle_segment.add_argument("--replace-track", action="store_true")
+    subtitle_align = _leaf_common(ss.add_parser('align', help='用已登记的离线 CTC 模型将原文对齐为字符/词时间'))
+    for name in ('project', 'asset-id', 'transcript', 'adapter-id', 'output'):
+        subtitle_align.add_argument('--' + name, required=True)
+    subtitle_align.add_argument('--case', choices=('upper', 'lower', 'preserve'), default='upper')
+    subtitle_align.add_argument('--granularity', choices=('character', 'whitespace'), default='character')
+    subtitle_align.add_argument('--window-seconds', type=float, default=30.0)
+    subtitle_align.add_argument('--context-seconds', type=float, default=.5)
+    subtitle_align.add_argument('--timeout', type=float, default=3600)
+    subtitle_align.add_argument('--cancel-file', default=None)
+    subtitle_align.add_argument('--apply', action='store_true')
+    subtitle_align.add_argument('--track-id', default=None)
+    subtitle_align.add_argument('--sequence-id', default=None)
+    subtitle_align.add_argument('--font-asset-id', default=None)
+    subtitle_align.add_argument('--replace-track', action='store_true')
+    subtitle_align.add_argument('--timeline-start-tick', type=int, default=0)
     subtitle_transcribe = _leaf_common(ss.add_parser("transcribe", help="使用本地 ASR 生成带时间戳字幕，并可应用到字幕轨道"))
     subtitle_transcribe.add_argument("--project", required=True)
     subtitle_source = subtitle_transcribe.add_mutually_exclusive_group(required=True)
@@ -617,7 +634,7 @@ def build_parser() -> argparse.ArgumentParser:
     subtitle_evaluate.add_argument("--max-cer", type=float, default=None)
     subtitle_evaluate.add_argument("--report", default=None)
 
-    asr = subs.add_parser("asr", help="登记与核验显式本地 Whisper 模型")
+    asr = subs.add_parser("asr", help="登记与核验显式本地 Whisper/CTC 模型")
     asr_sub = asr.add_subparsers(dest="action", required=True)
     asr_adapter = asr_sub.add_parser("adapter")
     asr_actions = asr_adapter.add_subparsers(dest="registration_action", required=True)
@@ -627,6 +644,7 @@ def build_parser() -> argparse.ArgumentParser:
         if action != "list":
             leaf.add_argument("--adapter-id", required=True)
         if action == "register":
+            leaf.add_argument('--engine', choices=(ASR_ENGINE, CTC_ENGINE), default=ASR_ENGINE)
             leaf.add_argument("--python-executable", required=True)
             leaf.add_argument("--model-path", required=True)
             leaf.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
@@ -2883,6 +2901,12 @@ def command_media_reframe(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def command_asr_adapter(args: argparse.Namespace) -> dict[str, Any]:
+    from .artifact_locks import verification_scope
+    with verification_scope():
+        return _command_asr_adapter_locked(args)
+
+
+def _command_asr_adapter_locked(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     command = f"asr.adapter.{args.registration_action}"
     if args.registration_action in {"list", "inspect"}:
@@ -2894,7 +2918,7 @@ def command_asr_adapter(args: argparse.Namespace) -> dict[str, Any]:
         return _envelope(command, args, data=data)
     if any(item.get("adapter_id") == args.adapter_id for item in asr_registry(project).get("adapters", [])):
         raise AppError("ASR_REGISTRATION_EXISTS", "ASR 模型登记已存在，请使用新的 ID", exit_code=2)
-    record, rights = prepare_asr_adapter(root, adapter_id=args.adapter_id, python_executable=args.python_executable, model_path=args.model_path, device=args.device, threads=args.threads, evidence=args.evidence, license_spdx=args.license_spdx, creator=args.creator, status=args.verification_status, uses=args.permitted_use or ["internal"])
+    record, rights = prepare_asr_adapter(root, adapter_id=args.adapter_id, python_executable=args.python_executable, model_path=args.model_path, device=args.device, threads=args.threads, evidence=args.evidence, license_spdx=args.license_spdx, creator=args.creator, status=args.verification_status, uses=args.permitted_use or ["internal"], engine=args.engine)
     if args.dry_run:
         return _envelope(command, args, status="planned", data={"adapter": record, "rights": rights, "network": "disabled"})
     snapshot = create_snapshot(root, project, label="before-asr-adapter-register")
@@ -2917,6 +2941,8 @@ def _selected_asr_adapter(root: Path, project: dict[str, Any], args: argparse.Na
     if args.transcribe_engine != "transformers" or args.use_gpu:
         raise argument_error("登记模型的引擎与设备由登记项确定，不能混用 --transcribe-engine ffmpeg-whisper 或 --use-gpu", "adapter_id")
     adapter = asr_registry_item(project, args.adapter_id)
+    if adapter.get('engine') != ASR_ENGINE:
+        raise argument_error('CTC 模型用于 subtitle align，不能用作 Whisper 转写', 'adapter_id')
     verification = verify_asr_adapter(adapter)
     if not verification["ok"]:
         raise AppError("ASR_INTEGRITY_FAILED", "ASR 模型完整性核验失败", exit_code=10, cause=json.dumps(verification, ensure_ascii=False))
@@ -6560,6 +6586,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("subtitle", "normalize"): command_subtitle_normalize,
     ("subtitle", "segment"): command_subtitle_segment,
     ("subtitle", "transcribe"): command_subtitle_transcribe,
+    ('subtitle', 'align'): command_subtitle_align,
     ("tts", "synthesize"): command_tts_synthesize,
     ("tts", "adapter"): command_tts_registration,
     ("asr", "adapter"): command_asr_adapter,

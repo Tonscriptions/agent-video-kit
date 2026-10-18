@@ -1,0 +1,285 @@
+{
+  "args": [
+    "asr",
+    "adapter",
+    "inspect",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\ctc-zh-smoke-20261018-b",
+    "--adapter-id",
+    "ctc"
+  ],
+  "exit_code": 0,
+  "seconds": 4.156,
+  "stderr": "",
+  "result": {
+    "ok": true,
+    "command": "asr.adapter.inspect",
+    "request_id": "req_20261018061027_5edd8ad2",
+    "operation_id": null,
+    "status": "succeeded",
+    "data": {
+      "adapters": [
+        {
+          "adapter": {
+            "adapter_id": "ctc",
+            "engine": "transformers-wav2vec2-ctc-local-v1",
+            "protocol": "agent-video-ctc-align-v1",
+            "python_executable": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+            "model_path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime",
+            "device": "cuda",
+            "threads": 4,
+            "artifacts": [
+              {
+                "path": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+                "role": "python",
+                "bytes": 105696,
+                "sha256": "sha256:ef8f51028ac5329641985112f8efb1c2d4c47c86b8011ddf7e6fae21e2b4e5a1"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\ctc-model-conversion-20261018\\zh-runtime.json",
+                "role": "evidence",
+                "bytes": 1468,
+                "sha256": "sha256:2f1361ce8d2b0d9ac59cab52e51319929c419f75b6cd73c4a6a08d60f7e0ed54"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\config.json",
+                "role": "model",
+                "bytes": 1567,
+                "sha256": "sha256:9af98614e322a5300c75605227d93c98af0c8f78754aba1dfc279166688afddd"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\model.safetensors",
+                "role": "model",
+                "bytes": 1276169764,
+                "sha256": "sha256:30cb9fb8c9e2f6b8782bd115fcdd206cbbb9e390cfbf78e56450005fb2d537c3"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\preprocessor_config.json",
+                "role": "model",
+                "bytes": 223,
+                "sha256": "sha256:be7e66c7ec3c32d65edf7e378b4788fa4369bea3c2af2db47bd7c3e0b4aceea8"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\special_tokens_map.json",
+                "role": "model",
+                "bytes": 85,
+                "sha256": "sha256:bb7068de1150661a10b55f9e4b12a0e77af8bf91f5e45e1b58afaf1d0e17f675"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\tokenizer_config.json",
+                "role": "model",
+                "bytes": 207,
+                "sha256": "sha256:065c86a78f9bdebcf1aed2cdf4e47698d2133f99edce12e71d36429f90d5c34d"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\vocab.json",
+                "role": "model",
+                "bytes": 44357,
+                "sha256": "sha256:33fea3444869c2cd2433f59da079b04ce91515f946d21fe1b0ff3825398bcec7"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\local_ctc.py",
+                "role": "implementation",
+                "bytes": 14593,
+                "sha256": "sha256:f4e6bef1bf35603a5828f161462570afa9ca04af4364e0032708700ae3141716"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\ctc_alignment.py",
+                "role": "implementation",
+                "bytes": 11422,
+                "sha256": "sha256:a475e9b1acd8ceba2be90884729f0b5a4c76ed354853bc0a57b47f1f9787edd7"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\ctc_worker.py",
+                "role": "implementation",
+                "bytes": 9830,
+                "sha256": "sha256:933d1c7ca4ac7dc8512d49e17a090b0a89e580724d0228a9ab44a3a14e3e9810"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\ctc_cli.py",
+                "role": "implementation",
+                "bytes": 13537,
+                "sha256": "sha256:2f20af923ea0a7af6fe9d5080cdb999d6b7c2f26c133a6c2f702d782747c22c8"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\local_asr.py",
+                "role": "implementation",
+                "bytes": 14600,
+                "sha256": "sha256:7c8582144a9b17e08558f36777c312099e10fee82f18f49589b07f40b61fb9dc"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\artifact_locks.py",
+                "role": "implementation",
+                "bytes": 4696,
+                "sha256": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\whisper_worker.py",
+                "role": "implementation",
+                "bytes": 4364,
+                "sha256": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\utils.py",
+                "role": "implementation",
+                "bytes": 12980,
+                "sha256": "sha256:78f984613b0c253d108dd4d515557f77bc4ebd4df4945108a63d8fdb38ad202b"
+              },
+              {
+                "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\policy.py",
+                "role": "implementation",
+                "bytes": 8705,
+                "sha256": "sha256:775449c9012e5e79c228c140712e1c1c6c7f3eb668f0638703f177beb894242e"
+              }
+            ],
+            "rights_ref": "asr_adapter_ctc",
+            "registered_at": "2026-10-18T06:10:23.210877Z",
+            "network": "disabled",
+            "sha256": "sha256:e3eb3e42e3877d0f1bad2136ee71cda48b3b9827ac7c50337fe11f9c3e31337d"
+          },
+          "verification": {
+            "ok": true,
+            "findings": [],
+            "checked_files": 17,
+            "network": "disabled"
+          }
+        }
+      ],
+      "network": "disabled",
+      "adapter": {
+        "adapter_id": "ctc",
+        "engine": "transformers-wav2vec2-ctc-local-v1",
+        "protocol": "agent-video-ctc-align-v1",
+        "python_executable": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+        "model_path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime",
+        "device": "cuda",
+        "threads": 4,
+        "artifacts": [
+          {
+            "path": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+            "role": "python",
+            "bytes": 105696,
+            "sha256": "sha256:ef8f51028ac5329641985112f8efb1c2d4c47c86b8011ddf7e6fae21e2b4e5a1"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\ctc-model-conversion-20261018\\zh-runtime.json",
+            "role": "evidence",
+            "bytes": 1468,
+            "sha256": "sha256:2f1361ce8d2b0d9ac59cab52e51319929c419f75b6cd73c4a6a08d60f7e0ed54"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\config.json",
+            "role": "model",
+            "bytes": 1567,
+            "sha256": "sha256:9af98614e322a5300c75605227d93c98af0c8f78754aba1dfc279166688afddd"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\model.safetensors",
+            "role": "model",
+            "bytes": 1276169764,
+            "sha256": "sha256:30cb9fb8c9e2f6b8782bd115fcdd206cbbb9e390cfbf78e56450005fb2d537c3"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\preprocessor_config.json",
+            "role": "model",
+            "bytes": 223,
+            "sha256": "sha256:be7e66c7ec3c32d65edf7e378b4788fa4369bea3c2af2db47bd7c3e0b4aceea8"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\special_tokens_map.json",
+            "role": "model",
+            "bytes": 85,
+            "sha256": "sha256:bb7068de1150661a10b55f9e4b12a0e77af8bf91f5e45e1b58afaf1d0e17f675"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\tokenizer_config.json",
+            "role": "model",
+            "bytes": 207,
+            "sha256": "sha256:065c86a78f9bdebcf1aed2cdf4e47698d2133f99edce12e71d36429f90d5c34d"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\ctc-zh-runtime\\vocab.json",
+            "role": "model",
+            "bytes": 44357,
+            "sha256": "sha256:33fea3444869c2cd2433f59da079b04ce91515f946d21fe1b0ff3825398bcec7"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\local_ctc.py",
+            "role": "implementation",
+            "bytes": 14593,
+            "sha256": "sha256:f4e6bef1bf35603a5828f161462570afa9ca04af4364e0032708700ae3141716"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\ctc_alignment.py",
+            "role": "implementation",
+            "bytes": 11422,
+            "sha256": "sha256:a475e9b1acd8ceba2be90884729f0b5a4c76ed354853bc0a57b47f1f9787edd7"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\ctc_worker.py",
+            "role": "implementation",
+            "bytes": 9830,
+            "sha256": "sha256:933d1c7ca4ac7dc8512d49e17a090b0a89e580724d0228a9ab44a3a14e3e9810"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\ctc_cli.py",
+            "role": "implementation",
+            "bytes": 13537,
+            "sha256": "sha256:2f20af923ea0a7af6fe9d5080cdb999d6b7c2f26c133a6c2f702d782747c22c8"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\local_asr.py",
+            "role": "implementation",
+            "bytes": 14600,
+            "sha256": "sha256:7c8582144a9b17e08558f36777c312099e10fee82f18f49589b07f40b61fb9dc"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\artifact_locks.py",
+            "role": "implementation",
+            "bytes": 4696,
+            "sha256": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\whisper_worker.py",
+            "role": "implementation",
+            "bytes": 4364,
+            "sha256": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\utils.py",
+            "role": "implementation",
+            "bytes": 12980,
+            "sha256": "sha256:78f984613b0c253d108dd4d515557f77bc4ebd4df4945108a63d8fdb38ad202b"
+          },
+          {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\policy.py",
+            "role": "implementation",
+            "bytes": 8705,
+            "sha256": "sha256:775449c9012e5e79c228c140712e1c1c6c7f3eb668f0638703f177beb894242e"
+          }
+        ],
+        "rights_ref": "asr_adapter_ctc",
+        "registered_at": "2026-10-18T06:10:23.210877Z",
+        "network": "disabled",
+        "sha256": "sha256:e3eb3e42e3877d0f1bad2136ee71cda48b3b9827ac7c50337fe11f9c3e31337d"
+      },
+      "verification": {
+        "ok": true,
+        "findings": [],
+        "checked_files": 17,
+        "network": "disabled"
+      }
+    },
+    "artifacts": [],
+    "warnings": [],
+    "errors": [],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T06:10:27.405953Z",
+      "finished_at": "2026-10-18T06:10:27.405964Z",
+      "network": "disabled"
+    }
+  }
+}

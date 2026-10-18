@@ -3,6 +3,14 @@ name: video-cut-timeline
 description: Compose an Agent Project timeline with local clips, tracks, transitions, keyframes, masks, speed curves, nested sequences, captions, and audio automation.
 ---
 
+For existing local audio plus corrected text, the
+[CTC alignment contract](../../docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md)
+defines `subtitle align --apply --track-id <subtitle> --font-asset-id <font>`.
+Generated word times use the source sample clock and exact original character
+indices; `--timeline-start-tick` shifts application without altering acoustic
+samples. Font/text/model/source rights remain separate. Forced alignment
+does not automatically author Chinese strokes or make the transcript correct.
+
 For generated subtitle pieces, read the
 [segmentation contract](../../docs/specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md).
 `subtitle segment --apply --track-id <id>` creates ordinary inline text clips,

@@ -50,6 +50,36 @@ class OfflineInstallationTests(unittest.TestCase):
         with self.assertRaises(installer.InstallError) as context:installer.validate_bundle(self.bundle,'sha256:'+'0'*64)
         self.assertEqual(context.exception.code,'MANIFEST_DIGEST_MISMATCH')
 
+    def test_font_text_profile_requires_the_seventh_pinned_pillow_wheel(self):
+        self.manifest['runtime_profile']='font-text-v1';self.save()
+        with self.assertRaises(installer.InstallError) as caught:installer.validate_bundle(self.bundle,self.digest)
+        self.assertEqual(caught.exception.code,'WHEEL_SET_INVALID')
+
+    def test_font_text_profile_and_legacy_core_have_separate_exact_inventories(self):
+        self.assertEqual(len(installer.validate_bundle(self.bundle,self.digest)['wheels']),6)
+        path='wheels/pillow-12.1.0-cp313-cp313-win_amd64.whl'
+        with zipfile.ZipFile(self.bundle/path,'w') as archive:
+            archive.writestr('pillow-12.1.0.dist-info/METADATA','Metadata-Version: 2.1\nName: Pillow\nVersion: 12.1.0\n')
+            archive.writestr('pillow-12.1.0.dist-info/WHEEL','Wheel-Version: 1.0\nTag: cp313-cp313-win_amd64\n')
+        self.manifest['wheels'].append({'name':'pillow','version':'12.1.0','path':path})
+        (self.bundle/'requirements.lock').write_bytes(''.join('./'+x['path']+' --hash='+installer.sha(self.bundle/x['path'])+'\n' for x in self.manifest['wheels']).encode())
+        self.manifest['runtime_profile']='font-text-v1';self.reinventory()
+        self.assertEqual(len(installer.validate_bundle(self.bundle,self.digest)['wheels']),7)
+        self.manifest['runtime_profile']='core-v1';self.save()
+        with self.assertRaises(installer.InstallError):installer.validate_bundle(self.bundle,self.digest)
+        self.manifest['runtime_profile']='unknown';self.save()
+        with self.assertRaises(installer.InstallError):installer.validate_bundle(self.bundle,self.digest)
+
+    def test_product_requiring_pillow_cannot_claim_legacy_core_profile(self):
+        path=self.bundle/self.manifest['wheels'][0]['path']
+        with zipfile.ZipFile(path,'w') as archive:
+            archive.writestr('ai_ad_editor-0.1.dist-info/METADATA','Metadata-Version: 2.1\nName: ai-ad-editor\nVersion: 0.1\nRequires-Dist: Pillow>=12.1,<13\n')
+            archive.writestr('ai_ad_editor-0.1.dist-info/WHEEL','Wheel-Version: 1.0\nTag: py3-none-any\n')
+        (self.bundle/'requirements.lock').write_bytes(''.join('./'+x['path']+' --hash='+installer.sha(self.bundle/x['path'])+'\n' for x in self.manifest['wheels']).encode())
+        self.reinventory()
+        with self.assertRaises(installer.InstallError) as caught:installer.validate_bundle(self.bundle,self.digest)
+        self.assertEqual(caught.exception.code,'WHEEL_SET_INVALID')
+
     def test_actual_wheel_byte_change_is_detected(self):
         path=self.bundle/self.manifest['wheels'][0]['path'];path.write_bytes(path.read_bytes()+b'x')
         with self.assertRaises(installer.InstallError) as context:installer.validate_bundle(self.bundle,self.digest)

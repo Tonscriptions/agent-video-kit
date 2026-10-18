@@ -1,0 +1,45 @@
+{
+  "args": [
+    "subtitle",
+    "align",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\ctc-zh-smoke-20261018-b",
+    "--asset-id",
+    "speech",
+    "--adapter-id",
+    "ctc",
+    "--transcript",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\asr-fixtures\\s4-reference.txt",
+    "--output",
+    "assets/aligned/traditional.json"
+  ],
+  "exit_code": 2,
+  "seconds": 4.746,
+  "stderr": "",
+  "result": {
+    "ok": false,
+    "command": "subtitle.align",
+    "request_id": "req_20261018061143_18ad3cc8",
+    "operation_id": null,
+    "status": "failed",
+    "data": {},
+    "artifacts": [],
+    "warnings": [],
+    "errors": [
+      {
+        "code": "ALIGNMENT_OOV_CHARACTER",
+        "message": "原文码点 1 的字符不在词表内: '們'",
+        "path": null,
+        "retryable": false
+      }
+    ],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T06:11:43.292515Z",
+      "finished_at": "2026-10-18T06:11:43.292528Z",
+      "network": "disabled"
+    }
+  }
+}

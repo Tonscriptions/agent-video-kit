@@ -57,6 +57,9 @@ def build(output,wheelhouse):
     contract=ROOT/'product/src/ai_ad_editor/agent-project.schema.json'
     if contract.read_bytes()!=(ROOT/'docs/specs/agent-project.schema.json').read_bytes():raise ValueError('Source and packaged schemas differ')
     manifest={'format':'agent-video-kit-offline-v1','target':'cp313-win_amd64','created_at_utc':datetime.now(timezone.utc).isoformat(),'schema_sha256':sha(contract),'wheels':rows,'files':files,'python_included':False,'ffmpeg_included':False,'network':'disabled','author_signature':False}
+    manifest['runtime_profile']='font-text-v1'
+    if {r['name'] for r in rows}!={'ai-ad-editor','jsonschema','attrs','jsonschema-specifications','referencing','rpds-py','pillow'}:
+        raise ValueError('Font/text release requires product plus six pinned dependency wheels')
     (output/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
     archive_path=output.with_suffix('.zip')
     if archive_path.exists():raise ValueError('Existing archive is preserved')
@@ -67,5 +70,5 @@ def build(output,wheelhouse):
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=Path,required=True);parser.add_argument('--wheelhouse',type=Path,default=ROOT/'sources/python-runtime/cp313-win_amd64')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=Path,required=True);parser.add_argument('--wheelhouse',type=Path,default=ROOT/'sources/python-runtime/cp313-win_amd64-text')
     args=parser.parse_args();print(json.dumps(build(args.output,args.wheelhouse),ensure_ascii=False))

@@ -16,3 +16,9 @@
 后续修改合同须同步 `docs/specs/agent-project.schema.json`、`product/src/ai_ad_editor/agent-project.schema.json` 与 `schema_contract.py` 的固定摘要；随包字节和当前执行覆盖都要实际核验。发行包的 ABI/依赖版本必须另建明确锁定清单，不能把本轮 `cp313-win_amd64` 成功外推到其他 Python/平台。
 
 机器安装验证不等于另一台干净机器或全部操作系统兼容性，文件摘要不等于作者签名。公开演示复用既有有来源的原创输入并保留视频/时钟/音频探测；静帧目检、连续播放和听审分别记录。自然 AI 质量、完整剪映等价、长片/HDR/跨设备和内容库仍独立验收。
+
+## V49 字体依赖补充
+
+首次隔离安装实际执行字体导入时，发现历史六轮包缺少 Pillow；开发机用户 site 的现成依赖曾掩盖该问题。失败记录保留在[CTC 安装实测](../validation/离线CTC字词强制对齐实测_2026-10-18.md)。新增 `font-text-v1` 明确要求七个 wheel：产品、jsonschema、attrs、jsonschema-specifications、referencing、rpds-py 和 Pillow。Pillow 固定 12.1.0 / `cp313-cp313-win_amd64`，取得、大小、SHA 和原始许可证单独存证。构建器仅消费本地 wheel，不联网。
+
+历史清单省略 profile 时按 `core-v1` 六轮清单验证，不能把声明 Pillow 的新产品放入旧清单；未知 profile、缺第七轮、名称或摘要不符均拒绝。安装后在 `-I -S` 新进程中检查实际 `PIL` 导入路径及版本属于目标目录，再执行真实字体导入和渲染。Python/FFmpeg、Torch/Transformers 与模型仍为明确外部本地输入，不声称基础七轮包包含全部 AI 工具链。

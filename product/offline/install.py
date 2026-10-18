@@ -102,7 +102,11 @@ def validate_bundle(bundle,expected_manifest):
         if file.is_file():actual.add(file.relative_to(bundle).as_posix())
     if actual!=set(inventory)|{'manifest.json'}:raise InstallError('BUNDLE_INVENTORY_MISMATCH','Extra or missing bundle files')
     wheels=manifest['wheels'];names=set();requirements=[]
-    if len(wheels)!=6:raise InstallError('WHEEL_SET_INVALID','Exactly product and five pinned dependency wheels required')
+    profile=manifest.get('runtime_profile','core-v1')
+    if profile not in {'core-v1','font-text-v1'}:raise InstallError('WHEEL_SET_INVALID','Unknown offline runtime profile')
+    expected_names={'ai-ad-editor','jsonschema','attrs','jsonschema-specifications','referencing','rpds-py'}
+    if profile=='font-text-v1':expected_names.add('pillow')
+    if len(wheels)!=len(expected_names):raise InstallError('WHEEL_SET_INVALID','Pinned wheel count differs from declared runtime profile')
     for row in wheels:
         name=safe_name(row['path'])
         if name not in inventory or not name.startswith('wheels/') or not name.endswith('.whl'):raise InstallError('WHEEL_SET_INVALID','Wheel missing from inventory')
@@ -120,9 +124,11 @@ def validate_bundle(bundle,expected_manifest):
             normalized=re.sub(r'[-_.]+','-',info['Name']).lower()
             if normalized!=row['name'] or info['Version']!=row['version'] or normalized in names:raise InstallError('WHEEL_INVALID','Wheel name/version mismatch')
             names.add(normalized)
+            if normalized=='ai-ad-editor' and profile=='core-v1' and any(re.match(r'(?i)^pillow\b',r) for r in info.get_all('Requires-Dist',[])):
+                raise InstallError('WHEEL_SET_INVALID','Product declares Pillow; font-text-v1 profile is required')
             if not set(wheel_info.get_all('Tag',[])) & {'py3-none-any','cp313-cp313-win_amd64'}:raise InstallError('WHEEL_INVALID','Unsupported wheel ABI')
         requirements.append('./'+name+' --hash='+inventory[name]['sha256'])
-    if names!={'ai-ad-editor','jsonschema','attrs','jsonschema-specifications','referencing','rpds-py'}:raise InstallError('WHEEL_SET_INVALID','Unexpected wheel set')
+    if names!=expected_names:raise InstallError('WHEEL_SET_INVALID','Unexpected wheel set for declared runtime profile')
     if (bundle/'requirements.lock').read_bytes()!=('\n'.join(requirements)+'\n').encode():raise InstallError('REQUIREMENTS_INVALID','Lock differs from hashed wheel inventory')
     return manifest
 
@@ -181,9 +187,11 @@ def install(bundle,target,expected_manifest,*,dry_run=False,cancel_file=None,tim
         command=[sys.executable,'-I','-B','-m','pip','install','--no-index','--no-deps','--require-hashes','--only-binary=:all:','--no-compile','--target',str(staging/'site'),'--requirement',str(staging/'requirements.lock')]
         run_owned(command,cwd=staging,env=env,log=staging/'install.log',cancel_file=cancel_file,deadline=deadline)
         # Fresh-process audit forbids a core module falling through to host site.
-        audit="""import sys,json,pathlib,importlib,importlib.metadata
+        modules=[('ai_ad_editor','ai-ad-editor'),('jsonschema','jsonschema'),('attrs','attrs'),('jsonschema_specifications','jsonschema-specifications'),('referencing','referencing'),('rpds','rpds-py')]
+        if manifest.get('runtime_profile')=='font-text-v1':modules.append(('PIL','pillow'))
+        audit='MODULES='+repr(modules)+'\n'+"""import sys,json,pathlib,importlib,importlib.metadata
 site=pathlib.Path(sys.argv[1]).resolve();sys.path[:]=[str(site),*[p for p in sys.path if not {'site-packages','dist-packages'} & set(pathlib.Path(p).parts)]];items={}
-for module,dist in [('ai_ad_editor','ai-ad-editor'),('jsonschema','jsonschema'),('attrs','attrs'),('jsonschema_specifications','jsonschema-specifications'),('referencing','referencing'),('rpds','rpds-py')]:
+for module,dist in MODULES:
  m=importlib.import_module(module);p=pathlib.Path(m.__file__).resolve();assert p.is_relative_to(site),(module,str(p));items[dist]={'version':importlib.metadata.version(dist),'path':str(p.relative_to(site))}
 from ai_ad_editor.schema_contract import probe
 check=probe();assert check['ok'],check
@@ -210,7 +218,7 @@ raise SystemExit(main())
         if time.monotonic()>=deadline:raise InstallError('INSTALL_TIMEOUT','Deadline before publication',8)
         # Windows rename refuses an existing destination, including an empty dir.
         os.rename(staging,target)
-        return {'status':'installed','target':str(target),'manifest_sha256':expected_manifest,'wheels':6,'audit':audit_result}
+        return {'status':'installed','target':str(target),'manifest_sha256':expected_manifest,'wheels':len(manifest['wheels']),'audit':audit_result}
     finally:
         if staging.exists():remove_owned(staging,target.parent)
 

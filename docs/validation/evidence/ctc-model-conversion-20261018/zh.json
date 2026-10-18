@@ -1,0 +1,83 @@
+{
+  "language": "zh",
+  "repository": "jonatasgrosman/wav2vec2-large-xlsr-53-chinese-zh-cn",
+  "revision": "99ccb2737be22b8bb50dcfcc39ad4d567fb90cfd",
+  "declared_model_license": "apache-2.0",
+  "runtime_downloads": false,
+  "source_files": [
+    {
+      "name": "config.json",
+      "bytes": 1567,
+      "sha256": "9af98614e322a5300c75605227d93c98af0c8f78754aba1dfc279166688afddd"
+    },
+    {
+      "name": "preprocessor_config.json",
+      "bytes": 158,
+      "sha256": "c403ce09975b90dff0dd8302c42d422e9de1f166cd7772df23490069893cb0cf"
+    },
+    {
+      "name": "special_tokens_map.json",
+      "bytes": 85,
+      "sha256": "bb7068de1150661a10b55f9e4b12a0e77af8bf91f5e45e1b58afaf1d0e17f675"
+    },
+    {
+      "name": "vocab.json",
+      "bytes": 44357,
+      "sha256": "33fea3444869c2cd2433f59da079b04ce91515f946d21fe1b0ff3825398bcec7"
+    },
+    {
+      "name": "pytorch_model.bin",
+      "bytes": 1276296151,
+      "sha256": "de031fd4b29e0c0667e5346450fadfe1326c89936b888b59c4ede608db763ee4"
+    }
+  ],
+  "generator_sha256": "e65583050e72f3876779aea9d6c243d6e3bbf90569937dc181030ee27e5e9f12",
+  "weights_executed_for_inference": false,
+  "conversion": "torch.load(weights_only=True,mmap=True,cpu) -> safetensors.save_file",
+  "converted_tensors": 424,
+  "conversion_seconds": 45.115,
+  "torch_version": "2.13.0+cu130",
+  "blocked_network_events": [],
+  "generated_tokenizer_configuration": {
+    "tokenizer_class": "Wav2Vec2CTCTokenizer",
+    "do_lower_case": false,
+    "word_delimiter_token": "|",
+    "bos_token": "<s>",
+    "eos_token": "</s>",
+    "unk_token": "<unk>",
+    "pad_token": "<pad>"
+  },
+  "status": "verified",
+  "output_files": [
+    {
+      "name": "config.json",
+      "bytes": 1567,
+      "sha256": "9af98614e322a5300c75605227d93c98af0c8f78754aba1dfc279166688afddd"
+    },
+    {
+      "name": "model.safetensors",
+      "bytes": 1276169764,
+      "sha256": "30cb9fb8c9e2f6b8782bd115fcdd206cbbb9e390cfbf78e56450005fb2d537c3"
+    },
+    {
+      "name": "preprocessor_config.json",
+      "bytes": 158,
+      "sha256": "c403ce09975b90dff0dd8302c42d422e9de1f166cd7772df23490069893cb0cf"
+    },
+    {
+      "name": "special_tokens_map.json",
+      "bytes": 85,
+      "sha256": "bb7068de1150661a10b55f9e4b12a0e77af8bf91f5e45e1b58afaf1d0e17f675"
+    },
+    {
+      "name": "tokenizer_config.json",
+      "bytes": 207,
+      "sha256": "065c86a78f9bdebcf1aed2cdf4e47698d2133f99edce12e71d36429f90d5c34d"
+    },
+    {
+      "name": "vocab.json",
+      "bytes": 44357,
+      "sha256": "33fea3444869c2cd2433f59da079b04ce91515f946d21fe1b0ff3825398bcec7"
+    }
+  ]
+}

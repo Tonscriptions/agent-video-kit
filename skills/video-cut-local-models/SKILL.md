@@ -5,6 +5,37 @@ description: Run registered offline speech, transcription, separation, tracking,
 
 # Local Models
 
+For supplied text that needs acoustic word/character times, use the
+[offline CTC alignment contract](../../docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md).
+Register `asr adapter register --engine transformers-wav2vec2-ctc-local-v1`
+with an existing complete standard Wav2Vec2 CTC safetensors bundle, native
+Torch/Transformers Python, explicit CPU/CUDA and local rights evidence.
+Runtime rejects pickle weights and custom code; it never installs or downloads.
+Then use `subtitle align --project <root> --asset-id <audio-or-video>
+--adapter-id <ctc> --transcript <local.txt-or.srt>
+--output assets/subtitles/<new>.json --dry-run`.
+Choose `--case upper|lower|preserve` and `--granularity character|whitespace`
+explicitly. SRT windows are authored source intervals. OOV letters or Chinese
+characters fail; never silently convert traditional/simplified text or delete
+unknown letters. Keep original codepoint indices and the ignored punctuation
+ledger. Default 30-second windows use real convolution stride/receptive fields,
+overlap context and explicit final zero padding, not uniform character timing.
+Optional `--apply --track-id <subtitle> --font-asset-id <font>` creates existing
+word-highlight clips; each applied cue supports at most 128 timed ranges.
+Use explicit SRT pieces for larger displays. Max 1800 seconds/16384 codepoints/
+8192 tokens, 512 MiB emissions and 64 million traceback cells are admission
+limits, not total RAM/VRAM promises. `--timeout` and `--cancel-file` fail without
+half-registered outputs and retain cache diagnostics. Replay returns the
+historical result, not a fresh model check. JSON/SRT/copied original text all
+retain source/transcript/model rights. Keep `ALIGNMENT_REVIEW_REQUIRED`:
+forced text can be wrong, and posterior confidence is not calibrated accuracy.
+Review the [real evidence and failed quality gates](../../docs/validation/离线CTC字词强制对齐实测_2026-10-18.md)
+separately from mock protocol tests, speech recognition, diarization or singing.
+The measured English word-block boundary error reached 258.1875 ms and failed
+the declared 66.6667 ms gate. Successful inference/highlighting does not accept
+that precision. The base font/text release includes Pillow, while native Torch,
+Transformers and registered weights remain explicit external local inputs.
+
 The [FGT candidate contract](../../docs/specs/开源时序修复候选核验契约_v0.1_2026-10-18.md)
 and [measured evaluation](../../docs/validation/开源FGT时序修复候选实测_2026-10-18.md)
 describe a separate native research runner, not a registered `media inpaint`

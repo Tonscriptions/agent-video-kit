@@ -5,6 +5,21 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [offline CTC word alignment](../../docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md),
+check original codepoint coverage, explicit OOV/script decisions, model/input/
+implementation hashes, source sample anchors and every retained convolution
+cell across windows. Distinguish actual worker forwards from mock protocol
+tests and idempotent replays. Check word-highlight source indices separately
+from acoustic boundary errors. Authored word-block intervals are not phonetic
+labels; retain a failed predeclared 2/30-second gate without relaxing it.
+The English fixture measured a 258.1875 ms maximum error and failed that gate.
+The existing renderer mixes 16 kHz input at 48 kHz: check against an explicitly
+resampled source and retain the failed direct-rate expectation separately.
+Keep [actual runs, original media and failures](../../docs/validation/离线CTC字词强制对齐实测_2026-10-18.md).
+High posterior does not validate the supplied transcript; forced wrong text,
+singing, overlapping speakers and broad natural quality require independent
+review. Never publish private Chinese reference voices based on test success.
+
 Use `doctor` and `schema show` to inspect the bundled validation contract,
 under the [offline schema contract](../../docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md).
 Missing executors/resources and changed schema bytes must fail; semantic
@@ -13,6 +28,8 @@ checks alone do not establish Schema acceptance. Inspect the declared
 [release validation evidence](../../docs/validation/离线发行与随包Schema实测_2026-10-18.md)
 for independent source frame/PCM checks, actual rollback cases and the
 separate static/playback/listening boundaries.
+Font/text installers use the seven-wheel `font-text-v1` profile with Pillow;
+verify actual font ingestion under the isolated launcher, not host imports.
 
 For [HTML text layout and font coverage](../../docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md),
 review every CFR frame and the independent reverse redraw. Separate partial

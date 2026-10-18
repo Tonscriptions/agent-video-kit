@@ -87,7 +87,7 @@ def _int(value: Any, default: int = 0) -> int:
         return default
 
 
-def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool = False, target: str = "commercial_ad") -> dict[str, Any]:
+def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool = False, target: str = "commercial_ad", rights_ledger: dict[str, Any] | None = None) -> dict[str, Any]:
     errors: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
     schema_errors, schema_warnings, schema_engine = _schema_report(project)
@@ -1171,7 +1171,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
 
     from .bindings import validate_project_bindings
     errors.extend(validate_project_bindings(project,root))
-    rights = check_project_rights(project, load_ledger(root), target, strict=strict_rights)
+    rights = check_project_rights(project, load_ledger(root) if rights_ledger is None else rights_ledger, target, strict=strict_rights)
     if strict_rights:
         errors.extend({**item, "path": f"rights[{item.get('asset_id')}]"} for item in rights.get("failures", []))
     else:

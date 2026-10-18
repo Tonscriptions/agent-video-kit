@@ -379,6 +379,14 @@ def build_capability_manifest() -> dict[str, Any]:
                 "features": ["native_onnx_cpu", "recurrent_human_video_alpha", "soft_straight_alpha", "input_alpha_multiply", "bounded_rgba_pipeline", "qtrle_argb_mov", "rgba_decode_hash_verification", "audio_offset_and_range_preservation", "source_rotation_and_sar_normalization", "source_model_rights_dependencies", "timeline_apply", "cancel_timeout_process_cleanup"],
                 "limits": ["explicit_existing_fp32_onnx_native_python_and_evidence_required", "no_download_install_or_provider_fallback", "self_contained_onnx_without_custom_domains", "sdr_rgb_8bit_only_hdr_requires_explicit_tone_map", "cfr_resampling_and_partial_tail_frame_extension_are_reported", "max_16777216_pixels_per_frame", "default_18000_frames_budget_is_explicitly_adjustable", "project_media_file_size_limit_applies_to_lossless_output", "human_only_quality_hair_motion_occlusion_scene_cuts_require_review", "python_network_guard_is_not_an_os_sandbox", "broad_advertising_quality_and_model_commercial_license_acceptance_pending"],
             },
+            "forced_alignment": {
+                "status": "local_adapter_only",
+                "engine": "transformers-wav2vec2-ctc-local-v1",
+                "protocol": "agent-video-ctc-align-v1",
+                "commands": ["asr.adapter.register", "asr.adapter.inspect", "subtitle.align"],
+                "features": ["native_offline_wav2vec2_ctc_safetensors", "explicit_corrected_text_or_srt_windows", "full_repeated_token_viterbi", "original_codepoint_mapping", "explicit_case_and_granularity", "receptive_field_sample_grid", "overlapped_30_second_inference_windows", "character_and_word_highlight_track_apply", "source_transcript_model_rights_closure", "command_scoped_native_read_locks", "idempotency_cancel_timeout_and_transaction_rollback"],
+                "limits": ["1800_seconds_16384_codepoints_8192_tokens", "512_mib_emissions_64_million_traceback_cells_excludes_total_process_and_model_memory", "oov_or_script_conversion_requires_explicit_user_corrected_text", "posterior_is_not_calibrated_accuracy", "wrong_transcripts_can_be_forced_into_audio", "python_network_guard_is_not_an_os_sandbox", "singing_diarization_broad_natural_quality_and_full_capcut_equivalence_unaccepted"],
+            },
             "ai": {
                 "status": "local_adapter_only",
                 "features": ["offline_transformers_asr_gate", "registered_native_whisper_asr", "asr_model_integrity_registry", "asr_long_form_attention_mask", "subtitle_cer_evaluation", "ffmpeg_whisper_cpp_asr", "local_asr_subtitle_generation", "local_flite_tts", "registered_soulx_chinese_tts", "tts_voice_transcript_registry", "tts_generated_audio_asset_and_track_apply", "tts_model_voice_rights_dependencies", "heuristic_highlights", "highlight_rough_cut_apply", "local_ad_plan", "local_ad_plan_apply", "local_template_tracking", "offline_model_registry"],

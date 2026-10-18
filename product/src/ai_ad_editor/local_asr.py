@@ -81,7 +81,11 @@ def manifest_hash(record: dict[str, Any]) -> str:
     return "sha256:" + sha256_bytes(json.dumps(fields, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))
 
 
-def prepare_adapter(root: Path, *, adapter_id: str, python_executable: str, model_path: str, device: str, threads: int, evidence: str, license_spdx: str, creator: str, status: str, uses: list[str]) -> tuple[dict[str, Any], dict[str, Any]]:
+def prepare_adapter(root: Path, *, adapter_id: str, python_executable: str, model_path: str, device: str, threads: int, evidence: str, license_spdx: str, creator: str, status: str, uses: list[str], engine: str = ASR_ENGINE) -> tuple[dict[str, Any], dict[str, Any]]:
+    from .local_ctc import ENGINE as CTC_ENGINE, PROTOCOL as CTC_PROTOCOL, model_files as ctc_files, implementation_files
+    from .artifact_locks import artifact_entry
+    if engine not in {ASR_ENGINE, CTC_ENGINE}:
+        raise argument_error('不支持的本地语音引擎', 'engine')
     assert_id(adapter_id, "adapter_id")
     if device not in {"cpu", "cuda"} or not 1 <= threads <= 32 or status not in {"unverified", "verified", "restricted"}:
         raise argument_error("ASR device 只能为 cpu/cuda，threads 必须为 1–32", "device/threads")
@@ -89,29 +93,39 @@ def prepare_adapter(root: Path, *, adapter_id: str, python_executable: str, mode
     model, proof = _local(root, model_path, "model_path", directory=True), _local(root, evidence, "evidence")
     if python.suffix.lower() != ".exe":
         raise argument_error("ASR 仅支持显式原生 Windows Python .exe", "python_executable")
-    entries = [_entry(python, "python"), _entry(proof, "evidence")]
-    entries.extend(_entry(p, "model") for p in _model_files(model))
-    record = {"adapter_id": adapter_id, "engine": ASR_ENGINE, "protocol": ASR_PROTOCOL, "python_executable": str(python), "model_path": str(model), "device": device, "threads": threads, "artifacts": entries, "rights_ref": f"asr_adapter_{adapter_id}", "registered_at": now_iso(), "network": "disabled"}
+    entry = artifact_entry if engine == CTC_ENGINE else _entry
+    entries = [entry(python, "python"), entry(proof, "evidence")]
+    entries.extend(entry(p, "model") for p in (ctc_files(model) if engine == CTC_ENGINE else _model_files(model)))
+    if engine == CTC_ENGINE:
+        entries.extend(entry(p, 'implementation') for p in implementation_files())
+    record = {"adapter_id": adapter_id, "engine": engine, "protocol": CTC_PROTOCOL if engine == CTC_ENGINE else ASR_PROTOCOL, "python_executable": str(python), "model_path": str(model), "device": device, "threads": threads, "artifacts": entries, "rights_ref": f"asr_adapter_{adapter_id}", "registered_at": now_iso(), "network": "disabled"}
     record["sha256"] = manifest_hash(record)
     rights = {"asset_id": record["rights_ref"], "kind": "asr-model-adapter", "sha256": record["sha256"], "source_url": f"local://asr/{adapter_id}", "source_version": ASR_VERSION, "retrieved_at": now_iso(), "creator": creator, "license_spdx": license_spdx, "license_url": "", "attribution": "", "permitted_uses": list(dict.fromkeys(uses or ["internal"])), "permitted_channels": [], "restrictions": [], "derived_from": [], "evidence": str(proof), "verification_status": status, "verified_by": "explicit-local-registration" if status == "verified" else "", "takedown_status": "clear", "notes": "Explicit offline ASR evidence; model and source rights need separate review"}
     return record, rights
 
 
 def verify_adapter(record: dict[str, Any]) -> dict[str, Any]:
+    from .local_ctc import ENGINE as CTC_ENGINE, PROTOCOL as CTC_PROTOCOL, model_files as ctc_files, implementation_files
+    from .artifact_locks import artifact_entry
     findings: list[dict[str, Any]] = []
     entries = record.get("artifacts", [])
-    if not isinstance(entries, list) or not entries or record.get("sha256") != manifest_hash(record) or record.get("engine") != ASR_ENGINE or record.get("protocol") != ASR_PROTOCOL or record.get("rights_ref") != f"asr_adapter_{record.get('adapter_id')}" or record.get("network") != "disabled" or record.get("device") not in {"cpu", "cuda"} or type(record.get("threads")) is not int or not 1 <= record["threads"] <= 32:
+    protocols = {ASR_ENGINE: ASR_PROTOCOL, CTC_ENGINE: CTC_PROTOCOL}
+    if not isinstance(entries, list) or not entries or record.get("sha256") != manifest_hash(record) or not isinstance(record.get('engine'), str) or record.get("engine") not in protocols or record.get("protocol") != protocols[record['engine']] or record.get("rights_ref") != f"asr_adapter_{record.get('adapter_id')}" or record.get("network") != "disabled" or record.get("device") not in {"cpu", "cuda"} or type(record.get("threads")) is not int or not 1 <= record["threads"] <= 32:
         return {"ok": False, "findings": [{"code": "ASR_MANIFEST_INVALID"}], "checked_files": 0}
     try:
         model = Path(record["model_path"])
-        expected = {(str(p.resolve()), "model") for p in _model_files(model)}
+        ctc = record['engine'] == CTC_ENGINE
+        expected = {(str(p.resolve()), "model") for p in (ctc_files(model) if ctc else _model_files(model))}
+        if ctc:
+            expected.update((str(p.resolve()), 'implementation') for p in implementation_files())
         expected.add((record["python_executable"], "python"))
         actual = {(item["path"], item["role"]) for item in entries}
         if not expected.issubset(actual) or len(actual) != len(entries) or len(actual - expected) != 1 or next(iter(actual - expected))[1] != "evidence":
             findings.append({"code": "ASR_MANIFEST_INVENTORY_CHANGED"})
         for item in entries:
             path = Path(item["path"])
-            if path.is_symlink() or not path.is_file() or path.stat().st_size != item["bytes"] or "sha256:" + sha256_file(path) != item["sha256"]:
+            actual_entry = artifact_entry(path, item['role']) if ctc else _entry(path, item['role'])
+            if actual_entry['bytes'] != item['bytes'] or actual_entry['sha256'] != item['sha256']:
                 findings.append({"code": "ASR_ARTIFACT_HASH_MISMATCH", "path": str(path)})
     except (AppError, OSError, KeyError, TypeError, ValueError) as exc:
         findings.append({"code": "ASR_ARTIFACT_INVALID", "message": str(exc)})
@@ -146,6 +160,8 @@ def checked_transcription(value: Any, duration: float) -> dict[str, Any]:
 
 
 def transcribe_registered(root: Path, source: Path, *, adapter: dict[str, Any], language: str | None) -> dict[str, Any]:
+    if adapter.get('engine') != ASR_ENGINE:
+        raise argument_error('转写需要 Whisper；CTC 登记项应使用 subtitle align', 'adapter_id')
     source = _local(root, source, "input")
     verification = verify_adapter(adapter)
     if not verification["ok"]:
