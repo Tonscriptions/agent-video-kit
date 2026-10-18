@@ -1,0 +1,177 @@
+{
+  "status": "independent_delivered_checks_passed_quality_separate",
+  "files_rehashed": 59,
+  "production_files_frozen": 186,
+  "independent_scorer": "unchanged V44 roll scorer vs V59 explicit row-coordinate sums",
+  "original_scorer_sha256": "sha256:33527166e74a3930ddfe4d61547d3e5932ee5fa4cf265a807c4b75b700166b8a",
+  "delivered_remeasured": {
+    "rose-selected": [
+      {
+        "region": "upper",
+        "selected_pixels": 98304,
+        "masked_mse": 89.47635565863715,
+        "masked_psnr_db": 28.6137207374881,
+        "known_motion_residual_mae_rgb": 2.8677718852267415,
+        "temporal_samples_rgb": 273792
+      },
+      {
+        "region": "lower",
+        "selected_pixels": 86016,
+        "masked_mse": 112.73720005580357,
+        "masked_psnr_db": 27.610131163994794,
+        "known_motion_residual_mae_rgb": 4.112937361324458,
+        "temporal_samples_rgb": 234360
+      },
+      {
+        "region": "overall",
+        "selected_pixels": 184320,
+        "masked_mse": 100.33141637731481,
+        "masked_psnr_db": 28.1164341764862,
+        "known_motion_residual_mae_rgb": 3.4420429320360837,
+        "temporal_samples_rgb": 508152
+      }
+    ],
+    "lama": [
+      {
+        "region": "upper",
+        "selected_pixels": 98304,
+        "masked_mse": 165.5687289767795,
+        "masked_psnr_db": 25.9410204602325,
+        "known_motion_residual_mae_rgb": 5.085751227208976,
+        "temporal_samples_rgb": 273792
+      },
+      {
+        "region": "lower",
+        "selected_pixels": 86016,
+        "masked_mse": 149.37606569320437,
+        "masked_psnr_db": 26.387993441788634,
+        "known_motion_residual_mae_rgb": 5.36305256869773,
+        "temporal_samples_rgb": 234360
+      },
+      {
+        "region": "overall",
+        "selected_pixels": 184320,
+        "masked_mse": 158.01215277777777,
+        "masked_psnr_db": 26.14389870866897,
+        "known_motion_residual_mae_rgb": 5.213642768305546,
+        "temporal_samples_rgb": 508152
+      }
+    ],
+    "fgt": [
+      {
+        "region": "upper",
+        "selected_pixels": 98304,
+        "masked_mse": 32.519500732421875,
+        "masked_psnr_db": 33.00936491560229,
+        "known_motion_residual_mae_rgb": 0.8473184022907901,
+        "temporal_samples_rgb": 273792
+      },
+      {
+        "region": "lower",
+        "selected_pixels": 86016,
+        "masked_mse": 30.48692878844246,
+        "masked_psnr_db": 33.289666845318195,
+        "known_motion_residual_mae_rgb": 0.9801672640382317,
+        "temporal_samples_rgb": 234360
+      },
+      {
+        "region": "overall",
+        "selected_pixels": 184320,
+        "masked_mse": 31.570967158564816,
+        "masked_psnr_db": 33.13792474408254,
+        "known_motion_residual_mae_rgb": 0.9085883751318503,
+        "temporal_samples_rgb": 508152
+      }
+    ]
+  },
+  "delivered": {
+    "rose-selected": {
+      "frames": 32,
+      "decoded_rgba_sha256": "sha256:23f2388d6fdea5dfb9d6510c5c40ad488729698e409073e5d488c898de043822"
+    },
+    "lama": {
+      "frames": 32,
+      "decoded_rgba_sha256": "sha256:d4f8633c719f0e2259e0255b51784f26882af1fe734148eb354e417f67f7b047"
+    },
+    "fgt": {
+      "frames": 32,
+      "decoded_rgba_sha256": "sha256:1174bbf194ab7dce0864b6fb23a918be11ffc3a4f322d16bd98f492322e47162"
+    }
+  },
+  "model_calls_by_case": [
+    {
+      "case": "public",
+      "T5": 2,
+      "T5_blocks": 48,
+      "transformer": 50,
+      "transformer_blocks": 1500,
+      "VAE_encode": 1,
+      "VAE_decode": 1,
+      "CLIP": 0
+    },
+    {
+      "case": "natural",
+      "T5": 2,
+      "T5_blocks": 48,
+      "transformer": 50,
+      "transformer_blocks": 1500,
+      "VAE_encode": 1,
+      "VAE_decode": 1,
+      "CLIP": 0
+    }
+  ],
+  "new_source_scenes": 0,
+  "same_v44_controlled_fixture": true,
+  "raw_outside_changed_pixels": 3131976,
+  "controlled_quality_passed": false,
+  "natural_quality_accepted": false,
+  "quality_gates_independently_recomputed": [
+    {
+      "region": "upper",
+      "psnr_at_least_30": false,
+      "psnr_no_worse_than_fgt": false,
+      "motion_mae_at_most_5": true,
+      "motion_mae_no_worse_than_fgt": false
+    },
+    {
+      "region": "lower",
+      "psnr_at_least_30": false,
+      "psnr_no_worse_than_fgt": false,
+      "motion_mae_at_most_5": true,
+      "motion_mae_no_worse_than_fgt": false
+    },
+    {
+      "region": "overall",
+      "psnr_at_least_30": false,
+      "psnr_no_worse_than_fgt": false,
+      "motion_mae_at_most_5": true,
+      "motion_mae_no_worse_than_fgt": false
+    }
+  ],
+  "windows_process_observations_checked": 2,
+  "unique_frozen_local_files_rehashed": 32,
+  "large_checkpoint_evidence": "full SHA in each succeeded worker before and after inference; acquisition SHA binding and current lengths here",
+  "large_checkpoints_current_lengths_checked": {
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rose-bundle-20261019-v59\\base\\Wan2.1_VAE.pth": {
+      "sha256": "sha256:38071ab59bd94681c686fa51d75a1968f64e470262043be31f7a094e442fd981",
+      "bytes": 507609880
+    },
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rose-bundle-20261019-v59\\base\\models_t5_umt5-xxl-enc-bf16.pth": {
+      "sha256": "sha256:7cace0da2b446bbbbc57d031ab6cf163a3d59b366da94e5afe36745b746fd81d",
+      "bytes": 11361920418
+    },
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rose-bundle-20261019-v59\\transformer\\diffusion_pytorch_model.safetensors": {
+      "sha256": "sha256:f4461e70bd9e32447126ebc0d85a71226ac6bae2e49d3ae110095913655bc9fe",
+      "bytes": 3128957992
+    }
+  },
+  "product_integrated": false,
+  "natural_pixels_published": false,
+  "curated_original_files": 12,
+  "source_receipt_sha256": "sha256:f9e9eaa313ad823b61680db4ffdae6c99b3523ddd8d2803b15460ba172e0e4cb",
+  "generator_sha256": "sha256:da04bec7494715cca5ada055f5b068bf62b3054100c9312b5bbf00bdddac18f0",
+  "full_product_regression_rerun": false,
+  "current_historical_full_regression": "V58 1357/1357",
+  "continuous_playback_reviewed": false,
+  "audio_listening_reviewed": false
+}

@@ -56,8 +56,18 @@ engine. Author weights use explicit local SHA checks and weights-only loading.
 One two-surface synthetic sequence passed its declared gate; the existing
 natural shot still has visible residue and texture patches. Never infer
 natural acceptance, automatic shadow/reflection selection or commercial
-clearance from that gate. ROSE was imported offline only; no ROSE inference
-or weights acquisition passed. ProPainter's noncommercial terms and missing
+clearance from that gate. V44 only imported ROSE; the later
+[V59 loading evidence](../../docs/validation/ROSE本地模型获取与离线预检_2026-10-19.md)
+is a historical zero-forward snapshot. The subsequent
+[V59 real inference](../../docs/validation/ROSE本地对象移除与原始全画面输出实测_2026-10-19.md)
+runs the author T5/ROSE/VAE on two unchanged 32-frame, 50-step cases.
+The controlled gate failed; natural quality and global GPU
+admission remain unaccepted.
+Raw full-frame results and selected-region composites are separate;
+outside-region preservation comes from explicit composition. No ROSE
+production adapter is registered. Research acquisition is an explicit
+development operation, never a runtime or Skill download.
+ProPainter's noncommercial terms and missing
 FuseFormer licensing must not be replaced by a wrapper's permissive license.
 
 For an existing encoded selection with missed or unwanted regions, use

@@ -1,5 +1,9 @@
 # Agent Video Kit
 
+<!-- V59-RESEARCH -->
+2026-10-19 **V59（研究）**：固定 ROSE 作者 Transformer、Wan T5/VAE 在现有 Windows 原生 CUDA Python 真实运行两条既有样例，各 32 帧@8 fps、50 步；补末帧至 33 后裁回，不改原时钟。受控整体 **28.116434 dB /运动残差 3.442043**，沿用 ≥30 dB、MAE≤5 且不差于 FGT 的门槛，结果 **未通过**。原始全画面和限于选区的合成分别保存；区外 RGB/原 Alpha/每帧 PTS 与自然 768,000 字节 PCM 核对。ROSE 仍为独立研究 runner，未注册生产引擎；#56 自然背景/纹理/阴影反射、全局显存准入与完整剪映等价未验收。186 产品输入未改，未重跑产品全量；最近完整产品回归仍为 V58 1357/1357。 [原片/GIF/失败与范围](docs/validation/ROSE本地对象移除与原始全画面输出实测_2026-10-19.md)、[先行契约](docs/specs/ROSE离线对象移除与副作用核验契约_v0.1_2026-10-19.md)。
+<!-- /V59-RESEARCH -->
+
 <!-- R05-RESEARCH -->
 2026-10-19 **R05（OpenFilm 源码研究）**：最新固定 `7a64d1fe`，API **947 stars /99 forks** 为 02:21:46 Asia/Taipei 时点；713→727 文件，14 新增/41 修改，148 个既有 CLI/渲染/服务端文件原字节不变。选定原测试 **63 通过、1 跳过**，窗口仅 mock，无 GUI/服务商/新模型。现有拆取方案继续适用；新增主要为桌面会话/设置，不新增本地 AI 剪辑内核。[编号复用决策、剩余人日和原始证据](docs/OpenFilm复用复核与开发成本更新_2026-10-19.md)。研究结果与 V58 产品回归分别计数。
 <!-- /R05-RESEARCH -->
@@ -116,6 +120,13 @@
 | V56 | 持久主轨磁吸与跨剪口同步拆分 | 66 集成含 26 新增；1289/1289、1986.638 秒、0 跳过、181 文件冻结；44 CLI/236 主帧/1,132,800 采样帧，RGB 1/PCM 0；121 文件/39 隔离 CLI/316 安装帧；14 Skills/198 引用 | 原帧/PCM 独立参考与复杂作者图参考分计；片段组失败和旧回归中断保留；未连续播放/听审，全手势及完整等价未验 | [契约](docs/specs/主轨磁吸模式与跨剪口同步拆分契约_v0.1_2026-10-18.md)、[原输入/成片/GIF/片段组/发行与失败](docs/validation/主轨磁吸模式与跨剪口同步拆分实测_2026-10-18.md) |
 | V57 | 完整作者输出变速与磁吸联动 | 40 新增；1329/1329、2092.274 秒、0 跳过、184 文件冻结；62 CLI/344 帧/1,651,200 采样帧；123 文件/51 隔离 CLI/454 安装帧；14 Skills/202 引用 | 原帧/原 PCM、同版作者图及原生 DSP 尾部参考分计；真实失败保留；未听审或完整等价 | [契约](docs/specs/完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md)、[原片/GIF/失败/安装](docs/validation/完整作者输出变速与磁吸联动实测_2026-10-19.md) |
 | V58 | 逐帧调色参数自动化 | 5 类/19 通道；28 新增；1357/1357、2022.398 秒、0 跳过、186 文件冻结；64 CLI/262 帧；124 文件/65 隔离 CLI/282 安装帧；另复合容器 6 CLI/20 帧；14 Skills/206 引用 | 独立参数与同 FFmpeg 交付边界分清；文字实际变色/Alpha；曝光与文字失败保留；自然调色及完整等价未验 | [契约](docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md)、[14 组及复合容器原片/GIF/失败/安装](docs/validation/逐帧调色参数自动化实测_2026-10-19.md) |
+| V59 | ROSE 离线对象移除研究 | 两条既有 32 帧/50 步；受控 28.116434 dB /运动残差 3.442043，门槛未通过；原始/选区输出和自然 PCM 独立核对 | 未接入生产；自然质量/阴影反射/全局显存准入未验；186 产品文件未改，未重跑 V58 全量 | [原输入/实际 MP4/GIF/失败](docs/validation/ROSE本地对象移除与原始全画面输出实测_2026-10-19.md) |
+
+<!-- V59-DEMO -->
+**V59 研究原片对照**：六格依次为原输入、历史 LaMa、历史 FGT、实际 ROSE 原始全画面、ROSE 限于选区合成和独立真值；受控门槛未通过，自然与生产未验收。[原视频](docs/assets/rose-native-20261019-v59/source.mp4)、[实际选区输出](docs/assets/rose-native-20261019-v59/rose-selected.mp4)、[完整对照](docs/assets/rose-native-20261019-v59/comparison.mp4)。
+
+![V59 真实离线 ROSE 研究对照](docs/assets/rose-native-20261019-v59/comparison.gif)
+<!-- /V59-DEMO -->
 
 <!-- V58-DEMO -->
 **V58 实际逐帧调色**：原创色卡/瓶体图案，2 秒内依次变化；四格为色温、九色轮、曝光、色阶的真实成片。GIF 无声音。[原图](docs/assets/color-automation-r7-20261019-v58/source.png)、[原 MKV](docs/assets/color-automation-r7-20261019-v58/source.mkv)、[原 WAV](docs/assets/color-automation-r7-20261019-v58/source.wav)、[原输入 MP4](docs/assets/color-automation-r7-20261019-v58/source-preview.mp4)、[曝光 MP4](docs/assets/color-automation-r7-20261019-v58/CA04.mp4)、[有色文字 MP4](docs/assets/color-automation-r7-20261019-v58/CA12.mp4)、[复合容器效果 MP4](docs/assets/color-group-r2-20261019-v58/CA15-group.mp4)、[可编辑工程](docs/assets/color-automation-r7-20261019-v58/CA04.aevpkg.zip)、[原生离线包](docs/assets/color-automation-r7-20261019-v58/agent-video-kit-cp313-win_amd64.zip)。[全部 14 组/失败/范围](docs/validation/逐帧调色参数自动化实测_2026-10-19.md)。

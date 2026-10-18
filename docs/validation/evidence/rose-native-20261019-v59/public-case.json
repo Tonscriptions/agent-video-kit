@@ -1,0 +1,99 @@
+{
+  "case": "public",
+  "runner_sha256": "sha256:a8628adb6a3e6bc971430f6d5e11eb2b9fb7038928ecab5d6b8629732d1e1790",
+  "worker_sha256": "sha256:b17c25b751e5014ca10c9977e9c5377fcc4516d47021c9651c3a870c1b8816ec",
+  "contract_sha256": "sha256:cc4b2ac658b56f415b9711bc29bc14496fe223fe4f5b4d1b158e345713fe0d63",
+  "options": {
+    "steps": 50,
+    "guidance": 6.0,
+    "seed": 0,
+    "prompt": "",
+    "negative_prompt": "",
+    "text_dtype": "bfloat16",
+    "transformer_dtype": "bfloat16",
+    "time_embedding_dtype": "float32",
+    "vae_dtype": "float32",
+    "text_gpu_budget_mib": 7168,
+    "text_cpu_budget_mib": 8192
+  },
+  "historical_files": [
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\fgt-temporal-20261018\\source-lossless.mp4",
+      "sha256": "sha256:f3b6d9f0295e077212eb90142a887bbbfb01cfa65e25ddbc67bcf2f951138d93"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\fgt-temporal-20261018\\truth-lossless.mp4",
+      "sha256": "sha256:f3d0739a47cefb79ade9308e4edf0eab5ff47154a9eb5e8b5835fcd492b7f56e"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\fgt-temporal-20261018\\final-lossless.mp4",
+      "sha256": "sha256:44ade60c92af8fd8e9c04098438cfe3e49789d4fc35392e32cc969c45867e2ef"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\fgt-temporal-20261018\\lama-lossless.mp4",
+      "sha256": "sha256:b66801b541e84778530a47221be41f1e2cc672c22fee0e4b9c097a32e218783c"
+    }
+  ],
+  "fgt_reference_scores": [
+    {
+      "region": "upper",
+      "selected_pixels": 98304,
+      "masked_mse": 32.519500732421875,
+      "masked_psnr_db": 33.00936491560229,
+      "known_motion_residual_mae_rgb": 0.8473184022907901,
+      "temporal_samples_rgb": 273792
+    },
+    {
+      "region": "lower",
+      "selected_pixels": 86016,
+      "masked_mse": 30.48692878844246,
+      "masked_psnr_db": 33.289666845318195,
+      "known_motion_residual_mae_rgb": 0.9801672640382317,
+      "temporal_samples_rgb": 234360
+    },
+    {
+      "region": "overall",
+      "selected_pixels": 184320,
+      "masked_mse": 31.570967158564816,
+      "masked_psnr_db": 33.13792474408254,
+      "known_motion_residual_mae_rgb": 0.9085883751318503,
+      "temporal_samples_rgb": 508152
+    }
+  ],
+  "lama_reference_scores": [
+    {
+      "region": "upper",
+      "selected_pixels": 98304,
+      "masked_mse": 165.5687289767795,
+      "masked_psnr_db": 25.9410204602325,
+      "known_motion_residual_mae_rgb": 5.085751227208976,
+      "temporal_samples_rgb": 273792
+    },
+    {
+      "region": "lower",
+      "selected_pixels": 86016,
+      "masked_mse": 149.37606569320437,
+      "masked_psnr_db": 26.387993441788634,
+      "known_motion_residual_mae_rgb": 5.36305256869773,
+      "temporal_samples_rgb": 234360
+    },
+    {
+      "region": "overall",
+      "selected_pixels": 184320,
+      "masked_mse": 158.01215277777777,
+      "masked_psnr_db": 26.14389870866897,
+      "known_motion_residual_mae_rgb": 5.213642768305546,
+      "temporal_samples_rgb": 508152
+    }
+  ],
+  "audio_source": null,
+  "input_sha256": "sha256:341a4f4794b8be8a9375fab3a96ffc368c346c07e1b9ee7ef132b7bcfb03f293",
+  "selection_sha256": "sha256:6a89af8c1dfcbfaa0eb9fd2604a86ccafc340558b7fccba2b7dbc0a1259c467d",
+  "frames": 32,
+  "height": 240,
+  "width": 432,
+  "fps": "8/1",
+  "network": "disabled",
+  "blocked_network_events": [],
+  "status": "prepared_not_inferred"
+}

@@ -1,0 +1,291 @@
+{
+  "status": "execution_verified_quality_unaccepted",
+  "case": "natural",
+  "worker": {
+    "status": "succeeded",
+    "research_only": true,
+    "network": "disabled",
+    "blocked_network_events": [],
+    "model_calls": {
+      "T5": 2,
+      "T5_blocks": 48,
+      "transformer": 50,
+      "transformer_blocks": 1500,
+      "VAE_encode": 1,
+      "VAE_decode": 1,
+      "CLIP": 0
+    },
+    "phases": [
+      {
+        "phase": "verifying-frozen-local-inputs",
+        "seconds": 3.99999953515362e-06
+      },
+      {
+        "phase": "loading-local-tokenizer-and-meta-text-encoder",
+        "seconds": 550.9834573999997
+      },
+      {
+        "phase": "encoding-real-local-text",
+        "seconds": 725.8090544000006
+      },
+      {
+        "phase": "strict-loading-local-transformer-and-vae",
+        "seconds": 925.7714622999993
+      },
+      {
+        "phase": "joint-video-inference",
+        "seconds": 1176.9120944000006,
+        "video_shape": [
+          1,
+          3,
+          33,
+          288,
+          512
+        ],
+        "mask_shape": [
+          1,
+          1,
+          33,
+          288,
+          512
+        ]
+      },
+      {
+        "phase": "vae-encode",
+        "seconds": 1177.7337807999993,
+        "input_shape": [
+          1,
+          3,
+          33,
+          288,
+          512
+        ]
+      },
+      {
+        "phase": "denoising-forward",
+        "seconds": 1203.6552186999998,
+        "completed_forwards": 1,
+        "expected_forwards": 50
+      },
+      {
+        "phase": "denoising-forward",
+        "seconds": 1220.1437979000002,
+        "completed_forwards": 5,
+        "expected_forwards": 50
+      },
+      {
+        "phase": "denoising-forward",
+        "seconds": 1237.7618141999992,
+        "completed_forwards": 10,
+        "expected_forwards": 50
+      },
+      {
+        "phase": "denoising-forward",
+        "seconds": 1256.2022770000003,
+        "completed_forwards": 15,
+        "expected_forwards": 50
+      },
+      {
+        "phase": "denoising-forward",
+        "seconds": 1274.3462034999993,
+        "completed_forwards": 20,
+        "expected_forwards": 50
+      },
+      {
+        "phase": "denoising-forward",
+        "seconds": 1292.2882320000008,
+        "completed_forwards": 25,
+        "expected_forwards": 50
+      },
+      {
+        "phase": "denoising-forward",
+        "seconds": 1311.0541073000004,
+        "completed_forwards": 30,
+        "expected_forwards": 50
+      },
+      {
+        "phase": "denoising-forward",
+        "seconds": 1328.8548042000002,
+        "completed_forwards": 35,
+        "expected_forwards": 50
+      },
+      {
+        "phase": "denoising-forward",
+        "seconds": 1346.5537143000001,
+        "completed_forwards": 40,
+        "expected_forwards": 50
+      },
+      {
+        "phase": "denoising-forward",
+        "seconds": 1365.2729278999996,
+        "completed_forwards": 45,
+        "expected_forwards": 50
+      },
+      {
+        "phase": "denoising-forward",
+        "seconds": 1384.2703961000007,
+        "completed_forwards": 50,
+        "expected_forwards": 50
+      },
+      {
+        "phase": "vae-decode",
+        "seconds": 1388.2151233000004,
+        "latent_shape": [
+          1,
+          16,
+          9,
+          36,
+          64
+        ]
+      },
+      {
+        "phase": "verifying-frozen-inputs-after-inference",
+        "seconds": 1419.0116689000006
+      }
+    ],
+    "versions": {
+      "python": "3.13.14",
+      "torch": "2.13.0+cu130",
+      "numpy": "2.4.6",
+      "diffusers": "0.39.0",
+      "transformers": "5.14.1",
+      "accelerate": "1.14.0",
+      "safetensors": "0.8.0"
+    },
+    "cuda_device": "NVIDIA GeForce RTX 3060",
+    "cuda_free_before_bytes": 11799625728,
+    "cuda_total_bytes": 12884377600,
+    "loaded_checkpoints": [
+      {
+        "component": "T5",
+        "tensor_count": 242,
+        "elements": 5680910336,
+        "dtype_elements": {
+          "torch.bfloat16": 5680910336
+        },
+        "missing_keys": [],
+        "unexpected_keys": [],
+        "strict": true,
+        "assigned": true
+      },
+      {
+        "component": "ROSE-transformer",
+        "tensor_count": 983,
+        "elements": 1564428608,
+        "dtype_elements": {
+          "torch.bfloat16": 1564428608
+        },
+        "missing_keys": [],
+        "unexpected_keys": [],
+        "strict": true,
+        "assigned": true
+      },
+      {
+        "component": "Wan-VAE",
+        "tensor_count": 194,
+        "elements": 126892531,
+        "dtype_elements": {
+          "torch.float32": 126892531
+        },
+        "missing_keys": [],
+        "unexpected_keys": [],
+        "strict": true,
+        "assigned": true
+      }
+    ],
+    "text_device_map": {
+      "token_embedding": "0",
+      "dropout": "0",
+      "blocks.0": "0",
+      "blocks.1": "0",
+      "blocks.2": "0",
+      "blocks.3": "0",
+      "blocks.4": "0",
+      "blocks.5": "0",
+      "blocks.6": "0",
+      "blocks.7": "0",
+      "blocks.8": "0",
+      "blocks.9": "0",
+      "blocks.10": "0",
+      "blocks.11": "0",
+      "blocks.12": "0",
+      "blocks.13": "cpu",
+      "blocks.14": "cpu",
+      "blocks.15": "cpu",
+      "blocks.16": "cpu",
+      "blocks.17": "cpu",
+      "blocks.18": "cpu",
+      "blocks.19": "cpu",
+      "blocks.20": "cpu",
+      "blocks.21": "cpu",
+      "blocks.22": "cpu",
+      "blocks.23": "cpu",
+      "norm": "cpu"
+    },
+    "prompt_tokens": [
+      1,
+      1
+    ],
+    "text_encoder_released_before_generation": true,
+    "cuda_allocated_after_text_release_bytes": 8519680,
+    "input": {
+      "frames": 32,
+      "model_frames": 33,
+      "height": 288,
+      "width": 512,
+      "padding": "repeat last frame then crop back; no clock resampling",
+      "original_object_preserved_in_condition": true
+    },
+    "options": {
+      "steps": 50,
+      "guidance": 6.0,
+      "seed": 0,
+      "prompt": "",
+      "negative_prompt": "",
+      "text_dtype": "bfloat16",
+      "transformer_dtype": "bfloat16",
+      "time_embedding_dtype": "float32",
+      "vae_dtype": "float32",
+      "text_gpu_budget_mib": 7168,
+      "text_cpu_budget_mib": 8192
+    },
+    "raw_sha256": "sha256:60bfbfdf44892a81e1d20d2d2e638c635ec82c150357a71c6387e8eba589c966",
+    "raw_frames": 32,
+    "raw_range": [
+      0,
+      255
+    ],
+    "clip_reference_supplied": false,
+    "clip_zero_context_proof": "source-backed no-reference branch only",
+    "cuda_peak_allocated_bytes": 7382380544,
+    "cuda_peak_reserved_bytes": 7457472512,
+    "product_integrated": false,
+    "natural_quality_accepted": false,
+    "elapsed_seconds": 1807.5986719000011
+  },
+  "frames": 32,
+  "height": 288,
+  "width": 512,
+  "fps": "8/1",
+  "duration_seconds": 4.0,
+  "raw_outside_selection_changed_pixels": 4554291,
+  "final_outside_selection_changed_pixels": 0,
+  "original_alpha_exact": true,
+  "rgba_roundtrip_exact": true,
+  "every_pts_exact": true,
+  "audio": {
+    "exact": true,
+    "decoded_pcm_bytes": 768000,
+    "sha256": "sha256:5104654d71b86b772336be13c9f07f0d25f4932319f35c0307e97a2eb02fb32f"
+  },
+  "parent_network": "disabled",
+  "parent_blocked_network_events": [],
+  "product_integrated": false,
+  "natural_quality_accepted": false,
+  "continuous_playback_reviewed": false,
+  "audio_listening_reviewed": false,
+  "runner_sha256": "sha256:a8628adb6a3e6bc971430f6d5e11eb2b9fb7038928ecab5d6b8629732d1e1790",
+  "worker_sha256": "sha256:b17c25b751e5014ca10c9977e9c5377fcc4516d47021c9651c3a870c1b8816ec",
+  "contract_sha256": "sha256:cc4b2ac658b56f415b9711bc29bc14496fe223fe4f5b4d1b158e345713fe0d63",
+  "total_seconds": 1820.0200532
+}

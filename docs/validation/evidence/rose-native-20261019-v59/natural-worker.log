@@ -1,0 +1,53 @@
+{"phase": "verifying-frozen-local-inputs", "seconds": 3.99999953515362e-06}
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\models\wan_transformer3d.py:222: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  @amp.autocast(enabled=False)
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\models\wan_transformer3d.py:233: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  @amp.autocast(enabled=False)
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\models\wan_transformer3d.py:292: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  @amp.autocast(enabled=False)
+{"phase": "loading-local-tokenizer-and-meta-text-encoder", "seconds": 550.9834573999997}
+There are modules in WanT5EncoderModel that should be kept in float32: []. Casting directly with `to()` can lead to inconsistent results; set `torch_dtype` in `from_pretrained()` instead to keep these modules in float32.
+Some parameters are on the meta device because they were offloaded to the cpu.
+{"phase": "encoding-real-local-text", "seconds": 725.8090544000006}
+{"phase": "strict-loading-local-transformer-and-vae", "seconds": 925.7714622999993}
+There are modules in WanTransformer3DModel that should be kept in float32: []. Casting directly with `to()` can lead to inconsistent results; set `torch_dtype` in `from_pretrained()` instead to keep these modules in float32.
+There are modules in AutoencoderKLWan that should be kept in float32: []. Casting directly with `to()` can lead to inconsistent results; set `torch_dtype` in `from_pretrained()` instead to keep these modules in float32.
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\pipeline\pipeline_wan_fun_inpaint.py:182: FutureWarning: Accessing config attribute `spacial_compression_ratio` directly via 'AutoencoderKLWan' object attribute is deprecated. Please access 'spacial_compression_ratio' over 'AutoencoderKLWan's config object instead, e.g. 'unet.config.spacial_compression_ratio'.
+  self.video_processor = VideoProcessor(vae_scale_factor=self.vae.spacial_compression_ratio)
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\pipeline\pipeline_wan_fun_inpaint.py:183: FutureWarning: Accessing config attribute `spacial_compression_ratio` directly via 'AutoencoderKLWan' object attribute is deprecated. Please access 'spacial_compression_ratio' over 'AutoencoderKLWan's config object instead, e.g. 'unet.config.spacial_compression_ratio'.
+  self.image_processor = VaeImageProcessor(vae_scale_factor=self.vae.spacial_compression_ratio)
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\pipeline\pipeline_wan_fun_inpaint.py:185: FutureWarning: Accessing config attribute `spacial_compression_ratio` directly via 'AutoencoderKLWan' object attribute is deprecated. Please access 'spacial_compression_ratio' over 'AutoencoderKLWan's config object instead, e.g. 'unet.config.spacial_compression_ratio'.
+  vae_scale_factor=self.vae.spacial_compression_ratio, do_normalize=False, do_binarize=True, do_convert_grayscale=True
+{"phase": "joint-video-inference", "seconds": 1176.9120944000006, "video_shape": [1, 3, 33, 288, 512], "mask_shape": [1, 1, 33, 288, 512]}
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\pipeline\pipeline_wan_fun_inpaint.py:325: FutureWarning: Accessing config attribute `temporal_compression_ratio` directly via 'AutoencoderKLWan' object attribute is deprecated. Please access 'temporal_compression_ratio' over 'AutoencoderKLWan's config object instead, e.g. 'unet.config.temporal_compression_ratio'.
+  (num_frames - 1) // self.vae.temporal_compression_ratio + 1,
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\pipeline\pipeline_wan_fun_inpaint.py:326: FutureWarning: Accessing config attribute `spacial_compression_ratio` directly via 'AutoencoderKLWan' object attribute is deprecated. Please access 'spacial_compression_ratio' over 'AutoencoderKLWan's config object instead, e.g. 'unet.config.spacial_compression_ratio'.
+  height // self.vae.spacial_compression_ratio,
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\pipeline\pipeline_wan_fun_inpaint.py:327: FutureWarning: Accessing config attribute `spacial_compression_ratio` directly via 'AutoencoderKLWan' object attribute is deprecated. Please access 'spacial_compression_ratio' over 'AutoencoderKLWan's config object instead, e.g. 'unet.config.spacial_compression_ratio'.
+  width // self.vae.spacial_compression_ratio,
+{"phase": "vae-encode", "seconds": 1177.7337807999993, "input_shape": [1, 3, 33, 288, 512]}
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\pipeline\pipeline_wan_fun_inpaint.py:660: FutureWarning: Accessing config attribute `latent_channels` directly via 'AutoencoderKLWan' object attribute is deprecated. Please access 'latent_channels' over 'AutoencoderKLWan's config object instead, e.g. 'unet.config.latent_channels'.
+  target_shape = (self.vae.latent_channels, (num_frames - 1) // self.vae.temporal_compression_ratio + 1, width // self.vae.spacial_compression_ratio, height // self.vae.spacial_compression_ratio)
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\pipeline\pipeline_wan_fun_inpaint.py:660: FutureWarning: Accessing config attribute `temporal_compression_ratio` directly via 'AutoencoderKLWan' object attribute is deprecated. Please access 'temporal_compression_ratio' over 'AutoencoderKLWan's config object instead, e.g. 'unet.config.temporal_compression_ratio'.
+  target_shape = (self.vae.latent_channels, (num_frames - 1) // self.vae.temporal_compression_ratio + 1, width // self.vae.spacial_compression_ratio, height // self.vae.spacial_compression_ratio)
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\pipeline\pipeline_wan_fun_inpaint.py:660: FutureWarning: Accessing config attribute `spacial_compression_ratio` directly via 'AutoencoderKLWan' object attribute is deprecated. Please access 'spacial_compression_ratio' over 'AutoencoderKLWan's config object instead, e.g. 'unet.config.spacial_compression_ratio'.
+  target_shape = (self.vae.latent_channels, (num_frames - 1) // self.vae.temporal_compression_ratio + 1, width // self.vae.spacial_compression_ratio, height // self.vae.spacial_compression_ratio)
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\pipeline\pipeline_wan_fun_inpaint.py:677: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(dtype=weight_dtype):
+{"phase": "denoising-forward", "seconds": 1203.6552186999998, "completed_forwards": 1, "expected_forwards": 50}
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\models\wan_transformer3d.py:880: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with amp.autocast(dtype=torch.float32):
+E:\dev\sandbox\AI广告剪辑\product\.runtime\rose-source-r2-20261019-v59\source\rose\models\wan_transformer3d.py:193: UserWarning: Padding mask is disabled when using scaled_dot_product_attention. It can have a significant impact on performance.
+  warnings.warn(
+{"phase": "denoising-forward", "seconds": 1220.1437979000002, "completed_forwards": 5, "expected_forwards": 50}
+{"phase": "denoising-forward", "seconds": 1237.7618141999992, "completed_forwards": 10, "expected_forwards": 50}
+{"phase": "denoising-forward", "seconds": 1256.2022770000003, "completed_forwards": 15, "expected_forwards": 50}
+{"phase": "denoising-forward", "seconds": 1274.3462034999993, "completed_forwards": 20, "expected_forwards": 50}
+{"phase": "denoising-forward", "seconds": 1292.2882320000008, "completed_forwards": 25, "expected_forwards": 50}
+{"phase": "denoising-forward", "seconds": 1311.0541073000004, "completed_forwards": 30, "expected_forwards": 50}
+{"phase": "denoising-forward", "seconds": 1328.8548042000002, "completed_forwards": 35, "expected_forwards": 50}
+{"phase": "denoising-forward", "seconds": 1346.5537143000001, "completed_forwards": 40, "expected_forwards": 50}
+{"phase": "denoising-forward", "seconds": 1365.2729278999996, "completed_forwards": 45, "expected_forwards": 50}
+{"phase": "denoising-forward", "seconds": 1384.2703961000007, "completed_forwards": 50, "expected_forwards": 50}
+{"phase": "vae-decode", "seconds": 1388.2151233000004, "latent_shape": [1, 16, 9, 36, 64]}
+{"phase": "verifying-frozen-inputs-after-inference", "seconds": 1419.0116689000006}
