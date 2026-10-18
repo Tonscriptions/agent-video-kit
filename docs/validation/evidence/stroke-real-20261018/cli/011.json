@@ -1,0 +1,43 @@
+{
+  "args": [
+    "motion",
+    "html-render",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\stroke-smoke-20261018\\main",
+    "--from-asset-id",
+    "ink-green",
+    "--asset-id",
+    "bad-color",
+    "--params",
+    "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\stroke-motion-20261018\\bad-params.json"
+  ],
+  "exit_code": 6,
+  "result": {
+    "ok": false,
+    "command": "motion.html-render",
+    "request_id": "req_20261018044413_79a76364",
+    "operation_id": null,
+    "status": "failed",
+    "data": {},
+    "artifacts": [],
+    "warnings": [],
+    "errors": [
+      {
+        "code": "HTML_WORKER_FAILED",
+        "message": "HTML worker diagnostic; page.evaluate: Error: STROKE_COLOR_INVALID: #RRGGBB required\n    at Object.frame (sha256:b772ffb5120dcd3790803a51a3c7947bb3c5d05953ab1ff6887ca4de3c5e08c0\n    at eval (eval at evaluate (:311:30), <anonymous>:5:25)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\stroke-smoke-20261018\\main\\validation\\html-motion-op_20261018044412_c9502f45.json",
+        "retryable": false
+      }
+    ],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T04:44:13.482263Z",
+      "finished_at": "2026-10-18T04:44:13.482272Z",
+      "network": "disabled"
+    }
+  },
+  "stderr": "",
+  "seconds": 2.7326361000014003
+}

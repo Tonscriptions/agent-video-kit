@@ -21,6 +21,19 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'stroke_motion': {
+                'status':'implemented_with_limits', 'engine':'agent-stroke-motion-v1',
+                'commands':['motion.stroke-source','motion.html-render'],
+                'features':['explicit_authored_unicode_polylines_and_character_times',
+                    'original_openfilm_canvas2d_progressive_ink_functions',
+                    'integer_project_clock_and_arbitrary_frame_order',
+                    'editable_deterministic_source_bundle_and_color_parameter',
+                    'existing_offline_transparent_render_package_and_rights_pipeline'],
+                'limits':['no_automatic_glyph_generation_chinese_stroke_order_or_audio_alignment',
+                    'no_svg_font_parser_kerning_or_complex_text_shaping',
+                    '256_characters_2048_strokes_32768_points_8_million_point_frames',
+                    'explicit_geometry_bounds_not_canvas_text_semantics_or_capcut_parity'],
+            },
             'schema': {
                 'status':'implemented','commands':['schema.show','schema.export'],
                 'features':['byte_pinned_packaged_draft202012_schema','explicit_local_date_time_checker',

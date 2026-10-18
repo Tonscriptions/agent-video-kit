@@ -1,0 +1,165 @@
+{
+  "args": [
+    "motion",
+    "stroke-source",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\stroke-smoke-20261018\\main",
+    "--input",
+    "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\stroke-motion-20261018\\authored-plan.json",
+    "--asset-id",
+    "ink-source",
+    "--creator",
+    "Agent Video Kit fixture",
+    "--license-spdx",
+    "LicenseRef-CC0-MIT",
+    "--idempotency-key",
+    "authored-ink"
+  ],
+  "exit_code": 0,
+  "result": {
+    "ok": true,
+    "command": "motion.stroke-source",
+    "request_id": "req_20261018044351_397b91b8",
+    "operation_id": "op_20261018044351_408b78d2",
+    "status": "succeeded",
+    "data": {
+      "asset": {
+        "id": "ink-source",
+        "kind": "generated",
+        "uri": "assets/html-motion/b84d511ad97eb9858286af4becd17934.zip",
+        "sha256": "sha256:b0153edf163f95e81418c04822703aebcdcdb7e343bb038b5a9ced894e829b25",
+        "rights_ref": "ink-source",
+        "probe": {
+          "format": "agent-html-motion-source"
+        },
+        "source": {
+          "source_url": "assets/html-motion/b84d511ad97eb9858286af4becd17934.zip",
+          "retrieved_at": "2026-10-18T04:43:51.558321Z",
+          "original_name": "b84d511ad97eb9858286af4becd17934.zip"
+        },
+        "html_source": {
+          "engine": "agent-local-html-motion-v1",
+          "version": "0.1.0",
+          "ticks_per_second": 90000,
+          "resources": []
+        }
+      },
+      "rights": {
+        "asset_id": "ink-source",
+        "kind": "generated",
+        "sha256": "sha256:b0153edf163f95e81418c04822703aebcdcdb7e343bb038b5a9ced894e829b25",
+        "source_url": "assets/html-motion/b84d511ad97eb9858286af4becd17934.zip",
+        "source_version": "agent-local-html-motion-v1",
+        "retrieved_at": "2026-10-18T04:43:51.558338Z",
+        "creator": "Agent Video Kit fixture",
+        "license_spdx": "LicenseRef-CC0-MIT",
+        "license_url": "",
+        "attribution": "",
+        "permitted_uses": [
+          "internal"
+        ],
+        "restrictions": [],
+        "derived_from": [],
+        "evidence": "assets/html-motion/b84d511ad97eb9858286af4becd17934.zip",
+        "verification_status": "unverified",
+        "verified_by": "",
+        "takedown_status": "clear",
+        "notes": "Local editable HTML motion; template, image and font rights require separate review",
+        "record_id": "rights_20261018044351_d6ba80bb",
+        "record_version": 1,
+        "active": true,
+        "recorded_at": "2026-10-18T04:43:51.567305Z",
+        "permitted_channels": []
+      },
+      "plan": {
+        "spec": {
+          "entry": "index.html",
+          "width": 384,
+          "height": 216,
+          "fps": {
+            "num": 12,
+            "den": 1
+          },
+          "duration_tick": 270000,
+          "variables": [
+            {
+              "name": "ink_color",
+              "type": "color",
+              "default": "#4ee2b1"
+            }
+          ]
+        },
+        "frame_count": 36,
+        "resources": [],
+        "members": [
+          {
+            "path": "OPENFILM_EXAMPLES_LICENSE.txt",
+            "sha256": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+            "bytes": 1078
+          },
+          {
+            "path": "PDOOM_VIDEO_LICENSE.txt",
+            "sha256": "sha256:5fc212466ce7183be5d85a3ee34fea461712842d5cd256b470978a83577083cb",
+            "bytes": 1074
+          },
+          {
+            "path": "authored-plan.json",
+            "sha256": "sha256:f1a76456e4169973a8c69840a8aa1cd809913d8e676f986d81eed066e2045747",
+            "bytes": 1266
+          },
+          {
+            "path": "geometry.json",
+            "sha256": "sha256:d3d1a4f3f0cdf033be3d176dbf5aa341b0ce6e07c9e3642b7db19347eb5ef08b",
+            "bytes": 1625
+          },
+          {
+            "path": "index.html",
+            "sha256": "sha256:0cbd2f8e613ab9fb74c4011fcf977314abf79aa0016380c7e08c494c38fade7b",
+            "bytes": 837
+          },
+          {
+            "path": "openfilm_stroke.mjs",
+            "sha256": "sha256:6c20aaff3a85b8a98654d82bfbea34029d78b0366af6b95b17c70abfafd265a1",
+            "bytes": 1584
+          }
+        ],
+        "stroke": {
+          "characters": 3,
+          "strokes": 5,
+          "points": 11,
+          "point_frames": 396,
+          "frame_count": 36,
+          "text": "A I",
+          "automatic_alignment": false,
+          "engine": "agent-stroke-motion-v1",
+          "input_sha256": "sha256:f1a76456e4169973a8c69840a8aa1cd809913d8e676f986d81eed066e2045747"
+        }
+      },
+      "snapshot": {
+        "snapshot_id": "snap_20261018044351_b18849e0",
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\stroke-smoke-20261018\\main\\history\\snap_20261018044351_b18849e0.json",
+        "label": "before-html-source",
+        "created_at": "2026-10-18T04:43:51.558951Z"
+      }
+    },
+    "artifacts": [],
+    "warnings": [
+      {
+        "code": "IDEMPOTENT_REPLAY",
+        "message": "已返回相同幂等键的既有结果",
+        "operation_id": "op_20261018044351_408b78d2"
+      }
+    ],
+    "errors": [],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T04:43:51.575951Z",
+      "finished_at": "2026-10-18T04:43:51.575956Z",
+      "network": "disabled"
+    }
+  },
+  "stderr": "",
+  "seconds": 0.141190700000152
+}

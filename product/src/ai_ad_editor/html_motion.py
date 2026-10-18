@@ -243,6 +243,19 @@ def build_source(root, project, manifest_path):
         references.append({'path':relative,'asset_id':asset['id'],'sha256':asset['sha256']})
     if spec['entry'] not in data:
         fail('HTML_RESOURCE_INVALID','入口未列入 files')
+    return pack_source(spec, data, ticks, references)
+
+
+def pack_source(spec, data, ticks, references):
+    """Pack already validated local generators using the same editable format."""
+    spec, count = validate_spec(spec, ticks)
+    if spec['entry'] not in data or 'motion.json' in data or len(data) > MAX_FILES:
+        fail('HTML_RESOURCE_INVALID', '生成源码缺少入口或成员无效')
+    if len({p.casefold() for p in data}) != len(data) or sum(map(len, data.values())) > MAX_BYTES:
+        fail('HTML_SOURCE_BUDGET', '生成源码成员重复或超过预算')
+    for p in data:
+        _relative(p)
+    data = dict(data)
     members=[{'path':p,'sha256':digest(b),'bytes':len(b)} for p,b in sorted(data.items())]
     packed={'version':VERSION,'engine':ENGINE,'ticks_per_second':ticks,'spec':spec,'files':members}
     data['motion.json']=encoded(packed)

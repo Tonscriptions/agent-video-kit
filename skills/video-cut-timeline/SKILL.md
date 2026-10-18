@@ -14,6 +14,14 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+For explicit vector lettering, use `motion stroke-source --project <path>
+--input <local-plan.json> --asset-id <new-source>`, then `motion html-render`
+to encode/apply it on an ordinary video track. The
+[stroke contract](../../docs/specs/离线逐笔描线动效契约_v0.1_2026-10-18.md)
+defines character times, bounded absolute polylines and a hex ink color.
+Keep the editable source and its original plan. This path generates no glyphs,
+Chinese stroke order or speech alignment; Canvas ink is outside DOM text checks.
+
 For HTML/SVG/Canvas overlay assets, read the [offline HTML motion contract](../../docs/specs/离线HTML动效与可编辑源码契约_v0.1_2026-10-18.md).
 The FFV1/BGRA output of `motion html-source/html-render` uses ordinary timeline
 edits. Preserve `html_motion.source_asset_id` and the source's image/font

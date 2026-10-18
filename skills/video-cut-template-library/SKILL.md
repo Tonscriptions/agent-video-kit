@@ -3,6 +3,14 @@ name: video-cut-template-library
 description: Build and apply local advertising templates, or save and reuse edited clip groups across projects, with media indexing, rights and variable validation, and batch rendering.
 ---
 
+An explicit vector title can start with `motion stroke-source`, followed by
+the existing offline `motion html-render` pipeline. Read the
+[stroke contract](../../docs/specs/离线逐笔描线动效契约_v0.1_2026-10-18.md)
+for plan fields and quotas; `ink_color` is the only runtime parameter.
+The source ZIP preserves the authored plan and both MIT notices. Rebuild to
+a new asset/version rather than replacing it. The overall source stays
+unverified/internal until its authored content rights are separately reviewed.
+
 # Local Templates
 
 For repeatable template text QA, run `motion html-quality` under the

@@ -1,0 +1,40 @@
+{
+  "status": "development_failures_preserved",
+  "new_success_totals_from_failed_runs": false,
+  "failures": [
+    {
+      "case": "isolated-script-import",
+      "result": "run_frozen_regression could not be imported; explicit scripts path added",
+      "cli_calls": 0
+    },
+    {
+      "case": "review-library-python",
+      "result": "C:/Python313/python.exe lacked NumPy; used existing native D-drive review Python; product needs no NumPy",
+      "cli_calls": 0
+    },
+    {
+      "case": "invalid-color-exit",
+      "result": "expected 2 but product correctly returned 6 for worker failure",
+      "evidence": "docs/validation/evidence/stroke-real-20261018/cli/011.json"
+    },
+    {
+      "case": "relative-render-output",
+      "result": "relative path resolved from command cwd and correctly rejected outside project; fixture changed to absolute project path",
+      "evidence": "docs/validation/evidence/stroke-real-final-20261018/cli/012.json"
+    },
+    {
+      "case": "wheel-missing-dependencies",
+      "result": "isolated site lacked jsonschema, product refused validation success; reused pinned offline dependencies",
+      "evidence": "docs/validation/evidence/stroke-wheel-20261018/08.stdout.json"
+    },
+    {
+      "case": "installer-no-site",
+      "result": "-S on installation host hid existing pip; PIP_REQUIRED; installed launcher still uses -I -S",
+      "evidence": "docs/validation/evidence/stroke-native-install-20261018/install.stdout.json"
+    },
+    {
+      "case": "gif-count",
+      "result": "Pillow merged identical hold frames: actual 16 frames/2970ms, not 18; validator corrected; encoded GIF unchanged"
+    }
+  ]
+}

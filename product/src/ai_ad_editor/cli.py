@@ -718,6 +718,12 @@ def build_parser() -> argparse.ArgumentParser:
     html_source.add_argument('--asset-id', required=True)
     html_source.add_argument('--creator', default='unknown')
     html_source.add_argument('--license-spdx', default='LicenseRef-UNVERIFIED')
+    stroke_source = _leaf_common(motion_sub.add_parser('stroke-source', help='从显式笔画和字符时间生成离线逐笔描线源'))
+    stroke_source.add_argument('--project', required=True)
+    stroke_source.add_argument('--input', required=True)
+    stroke_source.add_argument('--asset-id', required=True)
+    stroke_source.add_argument('--creator', default='unknown')
+    stroke_source.add_argument('--license-spdx', default='LicenseRef-UNVERIFIED')
     html_inspect = _leaf_common(motion_sub.add_parser('html-inspect', help='校验并查看动效源码清单'))
     html_inspect.add_argument('--project', required=True)
     html_inspect.add_argument('--source-asset-id', required=True)
@@ -4428,7 +4434,12 @@ def command_html_source(args: argparse.Namespace) -> dict[str, Any]:
     assert_id(args.asset_id, 'asset_id')
     if args.asset_id in asset_map(project):
         raise argument_error('源码资产 ID 已存在', 'asset_id')
-    content, plan = html_motion.build_source(root, project, args.input)
+    command = 'motion.' + args.action
+    if args.action == 'stroke-source':
+        from .stroke_motion import build_source
+        content, plan = build_source(root, project, args.input)
+    else:
+        content, plan = html_motion.build_source(root, project, args.input)
     output = ensure_inside(root, root / 'assets/html-motion' / (html_motion.digest(args.asset_id.encode())[7:39] + '.zip'))
     if output.exists():
         raise argument_error('源码包路径已存在，必须使用新的 ID', str(output))
@@ -4440,7 +4451,7 @@ def command_html_source(args: argparse.Namespace) -> dict[str, Any]:
     parents = list(dict.fromkeys(asset_map(project)[r['asset_id']]['rights_ref'] for r in plan['resources']))
     record = _html_rights(asset, parents, creator=args.creator, license_spdx=args.license_spdx)
     if args.dry_run:
-        return _envelope('motion.html-source', args, status='planned', data={'asset': asset, 'rights': record, 'plan': plan})
+        return _envelope(command, args, status='planned', data={'asset': asset, 'rights': record, 'plan': plan})
     snapshot = create_snapshot(root, project, label='before-html-source')
     created = False
     try:
@@ -4452,13 +4463,13 @@ def command_html_source(args: argparse.Namespace) -> dict[str, Any]:
         add_record(ledger, record)
         project['assets'].append(asset)
         operation_id = new_id('op')
-        project['provenance'].setdefault('change_log', []).append({'command': 'motion.html-source',
+        project['provenance'].setdefault('change_log', []).append({'command': command,
             'operation_id': operation_id, 'asset_id': asset['id'], 'snapshot_id': snapshot['snapshot_id'], 'at': now_iso()})
         save_project(root, project)
         save_ledger(root, ledger)
-        _operation(root, operation_id, {'command': 'motion.html-source', 'status': 'succeeded',
+        _operation(root, operation_id, {'command': command, 'status': 'succeeded',
                    'asset_id': asset['id'], 'created_at': now_iso()})
-        return _envelope('motion.html-source', args, data={'asset': asset, 'rights': record, 'plan': plan,
+        return _envelope(command, args, data={'asset': asset, 'rights': record, 'plan': plan,
                          'snapshot': snapshot}, operation_id=operation_id)
     except BaseException:
         if created:
@@ -6561,6 +6572,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("motion", "apply"): command_motion_apply,
     ('motion', 'html-register'): command_html_register,
     ('motion', 'html-source'): command_html_source,
+    ('motion', 'stroke-source'): command_html_source,
     ('motion', 'html-inspect'): command_html_inspect,
     ('motion', 'html-controls'): command_html_controls,
     ('motion', 'html-quality'): command_html_quality,

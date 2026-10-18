@@ -1,0 +1,394 @@
+{
+  "args": [
+    "motion",
+    "html-render",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\stroke-smoke-20261018\\main",
+    "--from-asset-id",
+    "ink-green",
+    "--asset-id",
+    "ink-blue",
+    "--params",
+    "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\stroke-motion-20261018\\blue-params.json"
+  ],
+  "exit_code": 0,
+  "result": {
+    "ok": true,
+    "command": "motion.html-render",
+    "request_id": "req_20261018044410_d890cc84",
+    "operation_id": "op_20261018044403_851b3e29",
+    "status": "succeeded",
+    "data": {
+      "plan": {
+        "spec": {
+          "entry": "index.html",
+          "width": 384,
+          "height": 216,
+          "fps": {
+            "den": 1,
+            "num": 12
+          },
+          "duration_tick": 270000,
+          "variables": [
+            {
+              "default": "#4ee2b1",
+              "name": "ink_color",
+              "type": "color"
+            }
+          ]
+        },
+        "frame_count": 36,
+        "files": [
+          {
+            "bytes": 1078,
+            "path": "OPENFILM_EXAMPLES_LICENSE.txt",
+            "sha256": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc"
+          },
+          {
+            "bytes": 1074,
+            "path": "PDOOM_VIDEO_LICENSE.txt",
+            "sha256": "sha256:5fc212466ce7183be5d85a3ee34fea461712842d5cd256b470978a83577083cb"
+          },
+          {
+            "bytes": 1266,
+            "path": "authored-plan.json",
+            "sha256": "sha256:f1a76456e4169973a8c69840a8aa1cd809913d8e676f986d81eed066e2045747"
+          },
+          {
+            "bytes": 1625,
+            "path": "geometry.json",
+            "sha256": "sha256:d3d1a4f3f0cdf033be3d176dbf5aa341b0ce6e07c9e3642b7db19347eb5ef08b"
+          },
+          {
+            "bytes": 837,
+            "path": "index.html",
+            "sha256": "sha256:0cbd2f8e613ab9fb74c4011fcf977314abf79aa0016380c7e08c494c38fade7b"
+          },
+          {
+            "bytes": 1584,
+            "path": "openfilm_stroke.mjs",
+            "sha256": "sha256:6c20aaff3a85b8a98654d82bfbea34029d78b0366af6b95b17c70abfafd265a1"
+          }
+        ],
+        "source_asset_id": "ink-source",
+        "parameters": {
+          "ink_color": "#60a5fa"
+        },
+        "template_overrides": {
+          "variables": {},
+          "texts": [],
+          "images": []
+        },
+        "compiled_overrides": [],
+        "override_resources": [],
+        "layout_check": "off",
+        "project_sha256": "sha256:8a0837f8ecc5ba3993cbf8dcb0ec3b98bee6d8fb2cdf9403b34727aadcd9df8a",
+        "engine": "agent-local-html-motion-v1",
+        "toolchain": {
+          "node_version": "v22.14.0",
+          "playwright_version": "1.62.1",
+          "node_sha256": "sha256:33b1bc1a8aca11fd5a4f2699e51019c63c0af30cf437701d07af69be7706771b"
+        },
+        "all_frames_checked_in_two_fresh_context_orders": true,
+        "output": "ffv1-bgra-nut",
+        "rights_status": "unverified",
+        "limits": [
+          "not_full_openfilm_timeline",
+          "no_embedded_media_iframes_or_webgl",
+          "not_hdr_or_capcut_parity"
+        ]
+      },
+      "asset": {
+        "id": "ink-blue",
+        "kind": "video",
+        "uri": "assets/html-motion/0c91cbc010eac6cb1afed4117c703b0a.nut",
+        "sha256": "sha256:2e3ea56cbf19232e05b53c3ed3c8e4570deea5c36bb5a94f103150406776ea5a",
+        "rights_ref": "ink-blue",
+        "probe": {
+          "duration_seconds": 3.0,
+          "duration_tick": 270000,
+          "format": "nut",
+          "format_long_name": "NUT",
+          "streams": [
+            {
+              "index": 0,
+              "codec_name": "ffv1",
+              "codec_long_name": "FFmpeg video codec #1",
+              "codec_type": "video",
+              "codec_tag_string": "FFV1",
+              "codec_tag": "0x31564646",
+              "width": 384,
+              "height": 216,
+              "coded_width": 384,
+              "coded_height": 216,
+              "has_b_frames": 0,
+              "pix_fmt": "bgra",
+              "level": -99,
+              "r_frame_rate": "12/1",
+              "avg_frame_rate": "12/1",
+              "time_base": "1/49152",
+              "start_pts": 0,
+              "start_time": "0.000000",
+              "bits_per_raw_sample": "8",
+              "extradata_size": 42,
+              "disposition": {
+                "default": 0,
+                "dub": 0,
+                "original": 0,
+                "comment": 0,
+                "lyrics": 0,
+                "karaoke": 0,
+                "forced": 0,
+                "hearing_impaired": 0,
+                "visual_impaired": 0,
+                "clean_effects": 0,
+                "attached_pic": 0,
+                "timed_thumbnails": 0,
+                "non_diegetic": 0,
+                "captions": 0,
+                "descriptions": 0,
+                "metadata": 0,
+                "dependent": 0,
+                "still_image": 0,
+                "multilayer": 0
+              },
+              "tags": {
+                "encoder": "Lavc62.28.100 ffv1"
+              }
+            }
+          ],
+          "video": {
+            "codec": "ffv1",
+            "width": 384,
+            "height": 216,
+            "pix_fmt": "bgra",
+            "fps": "12/1",
+            "color_space": null,
+            "duration_seconds": 3.0,
+            "start_time_seconds": 0.0,
+            "frame_count": 36
+          },
+          "audio": {
+            "codec": null,
+            "sample_rate": 0,
+            "channels": 0,
+            "duration_seconds": 0.0,
+            "start_time_seconds": 0.0
+          },
+          "container_duration_seconds": 2.916667,
+          "duration_basis": "verified_exact_cfr_frames"
+        },
+        "source": {
+          "source_url": "assets/html-motion/0c91cbc010eac6cb1afed4117c703b0a.nut",
+          "retrieved_at": "2026-10-18T04:44:10.551590Z",
+          "original_name": "0c91cbc010eac6cb1afed4117c703b0a.nut"
+        },
+        "html_motion": {
+          "engine": "agent-local-html-motion-v1",
+          "source_asset_id": "ink-source",
+          "parameters": {
+            "ink_color": "#60a5fa"
+          },
+          "spec": {
+            "entry": "index.html",
+            "width": 384,
+            "height": 216,
+            "fps": {
+              "den": 1,
+              "num": 12
+            },
+            "duration_tick": 270000,
+            "variables": [
+              {
+                "default": "#4ee2b1",
+                "name": "ink_color",
+                "type": "color"
+              }
+            ]
+          },
+          "frame_count": 36,
+          "template_overrides": {
+            "variables": {},
+            "texts": [],
+            "images": []
+          },
+          "override_resources": [],
+          "layout_check": "off"
+        }
+      },
+      "rights": {
+        "asset_id": "ink-blue",
+        "kind": "video",
+        "sha256": "sha256:2e3ea56cbf19232e05b53c3ed3c8e4570deea5c36bb5a94f103150406776ea5a",
+        "source_url": "assets/html-motion/0c91cbc010eac6cb1afed4117c703b0a.nut",
+        "source_version": "agent-local-html-motion-v1",
+        "retrieved_at": "2026-10-18T04:44:10.551619Z",
+        "creator": "unknown",
+        "license_spdx": "LicenseRef-UNVERIFIED",
+        "license_url": "",
+        "attribution": "",
+        "permitted_uses": [
+          "internal"
+        ],
+        "restrictions": [],
+        "derived_from": [
+          "ink-source"
+        ],
+        "evidence": "assets/html-motion/0c91cbc010eac6cb1afed4117c703b0a.nut",
+        "verification_status": "unverified",
+        "verified_by": "",
+        "takedown_status": "clear",
+        "notes": "Local editable HTML motion; template, image and font rights require separate review",
+        "record_id": "rights_20261018044410_699c0398",
+        "record_version": 1,
+        "active": true,
+        "recorded_at": "2026-10-18T04:44:10.552190Z",
+        "permitted_channels": []
+      },
+      "generated_clip": null,
+      "snapshot": {
+        "snapshot_id": "snap_20261018044403_6c932646",
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\stroke-smoke-20261018\\main\\history\\snap_20261018044403_6c932646.json",
+        "label": "before-html-render",
+        "created_at": "2026-10-18T04:44:03.967620Z"
+      },
+      "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\stroke-smoke-20261018\\main\\validation\\html-motion-op_20261018044403_851b3e29.json",
+      "validation": {
+        "ok": true,
+        "errors": [],
+        "warnings": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "ink-source",
+            "rights_ref": "ink-source",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "ink-source",
+            "rights_ref": "ink-source",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "ink-green",
+            "rights_ref": "ink-green",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "ink-green",
+            "rights_ref": "ink-green",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "ink-blue",
+            "rights_ref": "ink-blue",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "ink-blue",
+            "rights_ref": "ink-blue",
+            "record_version": 1,
+            "context": "project_asset"
+          }
+        ],
+        "rights": {
+          "ok": true,
+          "target": "commercial_ad",
+          "checked": 4,
+          "required_records": 4,
+          "failures": [],
+          "warnings": [
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "ink-source",
+              "rights_ref": "ink-source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "ink-source",
+              "rights_ref": "ink-source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "ink-green",
+              "rights_ref": "ink-green",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "ink-green",
+              "rights_ref": "ink-green",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "ink-blue",
+              "rights_ref": "ink-blue",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "ink-blue",
+              "rights_ref": "ink-blue",
+              "record_version": 1,
+              "context": "project_asset"
+            }
+          ],
+          "disposition_decisions": [],
+          "effective_disposition_decisions": []
+        },
+        "schema_engine": "jsonschema",
+        "asset_count": 4,
+        "sequence_count": 1
+      },
+      "layout_report": null
+    },
+    "artifacts": [],
+    "warnings": [],
+    "errors": [],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T04:44:10.578680Z",
+      "finished_at": "2026-10-18T04:44:10.578687Z",
+      "network": "disabled"
+    }
+  },
+  "stderr": "",
+  "seconds": 8.187373400010983
+}
