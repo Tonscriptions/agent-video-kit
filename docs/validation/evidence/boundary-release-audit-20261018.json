@@ -1,0 +1,268 @@
+{
+  "status": "research_verified_all_acoustic_gates_failed",
+  "checked_at_utc": "2026-10-18T08:09:42.080915+00:00",
+  "real_model_workers": 3,
+  "real_model_forwards": 6,
+  "product_cli_calls": 4,
+  "zero_forward_probes": 5,
+  "workers": [
+    {
+      "run": "boundary-whisper-real-20261018",
+      "forwards": 2,
+      "result_sha256": "sha256:d60e8ac287e9f6d79789505edcce0217363a6462e66fa576aa2d6fa31e34a196",
+      "seconds": 250.99513239999942,
+      "peak_cuda_bytes": 2409545728
+    },
+    {
+      "run": "boundary-qwen-real-20261018",
+      "forwards": 3,
+      "result_sha256": "sha256:101fa67386586da4daebefa9cbf477e4dce35a4ab94d66203dd734a9d3a475f7",
+      "seconds": 26.33932279999135,
+      "peak_cuda_bytes": 1958242304
+    },
+    {
+      "run": "boundary-ctc-heldout-20261018",
+      "forwards": 1,
+      "cli_calls": 4
+    }
+  ],
+  "all_candidate_gates_failed": true,
+  "product_files_unchanged": 170,
+  "current_product_matches_historical_frozen": true,
+  "historical_full_methods": 1135,
+  "full_regression_rerun": false,
+  "historical_full_sha256": "sha256:e409614fcd88f43b8ff7dd9d34df50f017ad2d0858075363550732e54be2dfe4",
+  "final_chart_frames": 458,
+  "distinct_source_pcm_samples": 243835,
+  "public": {
+    "boundary-known-readable-20261018": {
+      "frames": 236,
+      "samples": 125850,
+      "verification_sha256": "sha256:301f8cd5694b6a4540e29df8888d28ffa22325e5ae94eed3a1f3c3da8bd44431"
+    },
+    "boundary-heldout-readable-20261018": {
+      "frames": 222,
+      "samples": 117985,
+      "verification_sha256": "sha256:d3cce6dde571d750fb1e2806e6f04bda0238c202c97634be8c51f549386aef1b"
+    }
+  },
+  "static_reviewed_final_frames": 2,
+  "continuous_playback_review": false,
+  "listening_review": false,
+  "skills": 14,
+  "skill_local_links": 176,
+  "documents": 177,
+  "local_links": 3669,
+  "broken_links": [],
+  "files": {
+    "docs/assets/boundary-heldout-20261018/editor-rms-raw.wav": {
+      "bytes": 25678,
+      "sha256": "sha256:ab67b2879b85dfdc6eef741fd7cf7e201ef0ad73c3d508b1c63f2851c793f506"
+    },
+    "docs/assets/boundary-heldout-20261018/every-rms-raw.wav": {
+      "bytes": 25358,
+      "sha256": "sha256:f76f75d5fb7545f73e8d4aa6a7640cd36b39e90f2b5a02b197f8c8e614717a58"
+    },
+    "docs/assets/boundary-heldout-20261018/input-provenance.json": {
+      "bytes": 7912,
+      "sha256": "sha256:729cc9271956e132ef0a79a29b7a1333e54be6e31c7e2daea88158c57da485d7"
+    },
+    "docs/assets/boundary-heldout-20261018/input.wav": {
+      "bytes": 236014,
+      "sha256": "sha256:e615ea11cefabcfd85bc674b4e0e9a70b7e639d4284c1a54862db6e4784b1b5d"
+    },
+    "docs/assets/boundary-heldout-20261018/keeps-rms-raw.wav": {
+      "bytes": 29198,
+      "sha256": "sha256:8166c5e3955145b9f87dac32b0bb1f517fa39ebc317cefeb49975b9d54c74d94"
+    },
+    "docs/assets/boundary-heldout-20261018/local-rms-raw.wav": {
+      "bytes": 30638,
+      "sha256": "sha256:cbca31de7db6fc4c4c98ee2720b9735b4758c0c466a5db32a6502dc639f3361d"
+    },
+    "docs/assets/boundary-heldout-20261018/original-rms-raw.wav": {
+      "bytes": 33678,
+      "sha256": "sha256:b99abe479174ab7286270a99d6217545d940726dc694023b3c825de7f6e0b49c"
+    },
+    "docs/assets/boundary-heldout-20261018/transcript.txt": {
+      "bytes": 44,
+      "sha256": "sha256:3e4fdafa4d22cc16b11306714e2fac467a1d856c80b6650575d1e2000b80b495"
+    },
+    "docs/assets/boundary-heldout-20261018/video-rms-raw.wav": {
+      "bytes": 31598,
+      "sha256": "sha256:a813fe5e380bbb83e490ca8cb5ac8bf7ade4940d08f0d4158a1868e8013ac3f9"
+    },
+    "docs/assets/boundary-heldout-20261018/word-rms-raw.wav": {
+      "bytes": 22958,
+      "sha256": "sha256:023ab086ef91b20cf4d06c5e046df29821d5877053a061509884af88f6d8895a"
+    },
+    "docs/assets/boundary-heldout-comparison-20261018/chart.png": {
+      "bytes": 18654,
+      "sha256": "sha256:7a8a1967b790d45e06410e8a7b01ba933ab045d9f05002764f1baf95fbb98a64"
+    },
+    "docs/assets/boundary-heldout-comparison-20261018/comparison.gif": {
+      "bytes": 622042,
+      "sha256": "sha256:6e841650f6c373c8bab320fc988c2dcf4243fcf4866ac386b5df08deeeeb31c4"
+    },
+    "docs/assets/boundary-heldout-comparison-20261018/comparison.mkv": {
+      "bytes": 377458,
+      "sha256": "sha256:03c39d68670f38e4d49a0972ec97a8edc11e5ffc5f44af055a584cb27923d69f"
+    },
+    "docs/assets/boundary-heldout-comparison-20261018/comparison.mp4": {
+      "bytes": 193199,
+      "sha256": "sha256:dd09be7681ebbeca1a5541c662f9b895c33898e196c448fccd4f957c50085ae0"
+    },
+    "docs/assets/boundary-heldout-comparison-20261018/executed-generator.py": {
+      "bytes": 8516,
+      "sha256": "sha256:e5803166450dc8e60e72cc143d72cf16353496f7b6bcba5cb9ff72f6c062f77a"
+    },
+    "docs/assets/boundary-heldout-comparison-20261018/frame-000.png": {
+      "bytes": 150348,
+      "sha256": "sha256:cad8dea893242e7060d85d33a915297db7392ea55cd50ed43cc0fc0b00dc8693"
+    },
+    "docs/assets/boundary-heldout-comparison-20261018/frame-111.png": {
+      "bytes": 155831,
+      "sha256": "sha256:492fd8aacf9fbf2afeb816b66d5f72e9b2db902dec7f65f148c36fe1bdb99ce0"
+    },
+    "docs/assets/boundary-heldout-comparison-20261018/frame-221.png": {
+      "bytes": 159127,
+      "sha256": "sha256:14a92e6b6d756193ee619e2119231a7a96b622fa3688d82bf4486c47153c7f66"
+    },
+    "docs/assets/boundary-heldout-comparison-20261018/verification.json": {
+      "bytes": 3535,
+      "sha256": "sha256:a3ab6fa067278d012fe3ecd228d6524ca2216509f86898daeb45e790401891f4"
+    },
+    "docs/assets/boundary-heldout-readable-20261018/chart.png": {
+      "bytes": 44431,
+      "sha256": "sha256:f1e7aa4860ce20b01167be3714f68586f52e0fdce205422f9315b9221e60d699"
+    },
+    "docs/assets/boundary-heldout-readable-20261018/comparison.gif": {
+      "bytes": 648560,
+      "sha256": "sha256:44f032216b28c6513a527f2cf682c38a538edad60ac7f9ba024a7d979228da45"
+    },
+    "docs/assets/boundary-heldout-readable-20261018/comparison.mkv": {
+      "bytes": 378326,
+      "sha256": "sha256:ea5d53ea972aad3aef9cb13fe4a095a5f293484fa2ead568b046b5d2dd675b03"
+    },
+    "docs/assets/boundary-heldout-readable-20261018/comparison.mp4": {
+      "bytes": 194026,
+      "sha256": "sha256:768a8598e11f43fc0ade299f090e61efcca4e9701d62f5dcd6a517833f4a4f0e"
+    },
+    "docs/assets/boundary-heldout-readable-20261018/executed-generator.py": {
+      "bytes": 8599,
+      "sha256": "sha256:9f18b2b68bc6af9751f18910ad2e8822bd8d150d0ee87054cfe6e8ab7432f688"
+    },
+    "docs/assets/boundary-heldout-readable-20261018/frame-000.png": {
+      "bytes": 157081,
+      "sha256": "sha256:0a30587c55bc94fc89344929b189efccd0be32b3f3044cf8f4a70ac2287efa1c"
+    },
+    "docs/assets/boundary-heldout-readable-20261018/frame-111.png": {
+      "bytes": 162805,
+      "sha256": "sha256:bde84a65450bc0483a91ab290db9a276be4447218016ba8d361513b750fb075f"
+    },
+    "docs/assets/boundary-heldout-readable-20261018/frame-221.png": {
+      "bytes": 166617,
+      "sha256": "sha256:5e01d8b64537d05985d70193e134c1d01bd9c372653622e9ebef3be18a6d5554"
+    },
+    "docs/assets/boundary-heldout-readable-20261018/static-review.json": {
+      "bytes": 536,
+      "sha256": "sha256:ae9f33502973f55ed8acff99855d2f4b9dcd3e850b268ff731e4d2eea423ee5e"
+    },
+    "docs/assets/boundary-heldout-readable-20261018/verification.json": {
+      "bytes": 3532,
+      "sha256": "sha256:d3cce6dde571d750fb1e2806e6f04bda0238c202c97634be8c51f549386aef1b"
+    },
+    "docs/assets/boundary-known-comparison-20261018/chart.png": {
+      "bytes": 15603,
+      "sha256": "sha256:fa21bc708666790bb38c64b484350962ec766fe5dde8f91667c8d6058bfe7e93"
+    },
+    "docs/assets/boundary-known-comparison-20261018/comparison.gif": {
+      "bytes": 854459,
+      "sha256": "sha256:b64b2eaf5047f95f84e47bd086a9574fdcdf92ad9b89c23fc10ff9b27bc0bdf0"
+    },
+    "docs/assets/boundary-known-comparison-20261018/comparison.mkv": {
+      "bytes": 361922,
+      "sha256": "sha256:bda204e73525062a742db0633c456d5485991ac881528edb24c8e69b3d69f572"
+    },
+    "docs/assets/boundary-known-comparison-20261018/comparison.mp4": {
+      "bytes": 152918,
+      "sha256": "sha256:61256330a67113390a5b8a0ed9bbf0317d0b048e02643dfc7e01e5e9e2396e99"
+    },
+    "docs/assets/boundary-known-comparison-20261018/executed-generator.py": {
+      "bytes": 8516,
+      "sha256": "sha256:e5803166450dc8e60e72cc143d72cf16353496f7b6bcba5cb9ff72f6c062f77a"
+    },
+    "docs/assets/boundary-known-comparison-20261018/frame-000.png": {
+      "bytes": 123677,
+      "sha256": "sha256:4c5c57f46d8d01e8c5307f3314475459eb9820c35ba2dc7544a39dc350fa4ca1"
+    },
+    "docs/assets/boundary-known-comparison-20261018/frame-118.png": {
+      "bytes": 126696,
+      "sha256": "sha256:c2ab20d44989cef63dff0caeb89cfeb8aab4f20a56dec2ce2674abe42dbcc5ca"
+    },
+    "docs/assets/boundary-known-comparison-20261018/frame-235.png": {
+      "bytes": 129213,
+      "sha256": "sha256:0ec31ef33590e13d24473377c25928d6e42c07e15ca1a819daba51184205eb21"
+    },
+    "docs/assets/boundary-known-comparison-20261018/static-review.json": {
+      "bytes": 317,
+      "sha256": "sha256:ea846167a2990d59e2e4ea7a3afa0d37386456518a5b6445d4de79dc73f20c02"
+    },
+    "docs/assets/boundary-known-comparison-20261018/verification.json": {
+      "bytes": 3605,
+      "sha256": "sha256:827d3219f4611397797d541138a4a814e4c5ed5a7a9107c255c03224db158a76"
+    },
+    "docs/assets/boundary-known-readable-20261018/chart.png": {
+      "bytes": 34092,
+      "sha256": "sha256:9f8260c705829f04904eb76f09d8e6d3cc507d7a4a79d6c27200c56860751772"
+    },
+    "docs/assets/boundary-known-readable-20261018/comparison.gif": {
+      "bytes": 1072525,
+      "sha256": "sha256:3a74a6d7c690676bf54ff4a5467fd10bf0958affb5cc8aeb1390c1059b219930"
+    },
+    "docs/assets/boundary-known-readable-20261018/comparison.mkv": {
+      "bytes": 365499,
+      "sha256": "sha256:a9a587d9ef52a5966c830ae55a0cd7752361eb623f1a31221be510771096ab54"
+    },
+    "docs/assets/boundary-known-readable-20261018/comparison.mp4": {
+      "bytes": 156541,
+      "sha256": "sha256:458425ae3dc1f71d13dba448aa1cbccf589d64ab670a08ce6a6d6dc651fca213"
+    },
+    "docs/assets/boundary-known-readable-20261018/executed-generator.py": {
+      "bytes": 8599,
+      "sha256": "sha256:9f18b2b68bc6af9751f18910ad2e8822bd8d150d0ee87054cfe6e8ab7432f688"
+    },
+    "docs/assets/boundary-known-readable-20261018/frame-000.png": {
+      "bytes": 125615,
+      "sha256": "sha256:7be6a276e56d499504226c113fdeb507ffe8cd3765b41a6125b0854be9f87fde"
+    },
+    "docs/assets/boundary-known-readable-20261018/frame-118.png": {
+      "bytes": 130806,
+      "sha256": "sha256:698b33a85966bf3598b59d11c734e577d723f980850f704290475f256beb0ef3"
+    },
+    "docs/assets/boundary-known-readable-20261018/frame-235.png": {
+      "bytes": 134550,
+      "sha256": "sha256:462db2b111e9bf70697e60e84d2b77600c76fd394950acae38225c45e04fac29"
+    },
+    "docs/assets/boundary-known-readable-20261018/static-review.json": {
+      "bytes": 536,
+      "sha256": "sha256:9330a7876d0984b2c5cee860aeac818bdf3a0267b24942ab3eb1735a00fb87de"
+    },
+    "docs/assets/boundary-known-readable-20261018/verification.json": {
+      "bytes": 3603,
+      "sha256": "sha256:301f8cd5694b6a4540e29df8888d28ffa22325e5ae94eed3a1f3c3da8bd44431"
+    },
+    "docs/assets/boundary-readable-font-20261018/DejaVuSans.ttf": {
+      "bytes": 756072,
+      "sha256": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+    },
+    "docs/assets/boundary-readable-font-20261018/LICENSE_DEJAVU": {
+      "bytes": 4816,
+      "sha256": "sha256:d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    "docs/assets/boundary-readable-font-20261018/source.json": {
+      "bytes": 685,
+      "sha256": "sha256:dbc36561ba5d2806509c6e9d16925e1c5babec8cd2dbfda088df8f02a76e8610"
+    }
+  },
+  "generator_sha256": "sha256:6926cc6a157b3b0eb8974387f9a2b5399f9ddd56d14bdf0ff2be991b28b69c3e"
+}

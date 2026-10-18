@@ -1,5 +1,6 @@
 # Published evidence uses byte hashes; preserve its bytes on Windows checkout.
 .gitattributes text eol=lf
+.gitignore text eol=lf
 product/**/*.py text eol=lf
 docs/specs/agent-project.schema.json text eol=lf
 docs/assets/** -text
@@ -278,6 +279,12 @@ docs/validation/evidence/ctc-*.json -text whitespace=cr-at-eol
 docs/validation/evidence/pillow-release-wheel-*/** -text -whitespace
 docs/third-party/flite-source-*/** -text -whitespace
 docs/assets/ctc-alignment-*/** -text whitespace=cr-at-eol
+scripts/*boundary*.py -text
+docs/validation/evidence/boundary-*/** -text -whitespace
+docs/validation/evidence/boundary-*.json -text whitespace=cr-at-eol
+docs/assets/boundary-*/** -text whitespace=cr-at-eol
+docs/third-party/boundary-*/** -text -whitespace
+docs/assets/boundary-readable-font-*/LICENSE_DEJAVU -whitespace
 docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md text eol=lf
 docs/validation/离线CTC字词强制对齐实测_2026-10-18.md text eol=lf
 docs/third-party/CTC模型与英文演示语音来源_2026-10-18.md text eol=lf

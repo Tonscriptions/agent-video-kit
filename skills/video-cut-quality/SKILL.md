@@ -5,6 +5,19 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [boundary-model research](../../docs/specs/字词边界模型对照核验契约_v0.1_2026-10-18.md),
+inspect [all signed sample errors and raw Chinese anomalies](../../docs/validation/开源字词边界模型对照实测_2026-10-18.md).
+Qwen, the supplied-text Whisper-DTW baseline and new CTC holdout all failed
+the unchanged maximum-error gate. Authored trimmed word blocks are not manual
+phonetic labels. Keep zero-duration/overlap predictions before any upstream
+interpolation. Distinguish three real model workers/six new forwards from
+zero-forward import/meta probes and historical V49 results. The two final
+charts check 458 frame PTS and 243835 original PCM samples; they are research
+measurement visuals. Only two middle screenshots received readability review;
+there was no continuous playback or listening. Preserve the unreadable first
+font attempt and the separately licensed readable font. Product source remains
+at V49; its 1135-method full regression was not rerun for this research.
+
 For [offline CTC word alignment](../../docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md),
 check original codepoint coverage, explicit OOV/script decisions, model/input/
 implementation hashes, source sample anchors and every retained convolution

@@ -1,0 +1,105 @@
+{
+  "status": "verified",
+  "research_measurement_not_product_render": true,
+  "frames": 222,
+  "fps": 30,
+  "samples": 117985,
+  "sample_rate": 16000,
+  "pcm_equal_to_original": true,
+  "pcm_sha256": "5e8e6d250b93470a6216209df7d1eb9806e09d99fe112555046527e850b22037",
+  "all_video_pts_checked": true,
+  "gif_frames": 74,
+  "gif_duration_ms": 7400,
+  "source_duration_seconds": 7.3740625,
+  "pillow_version": "12.1.0",
+  "font": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\html-quality-20261018\\inputs\\complete-font.ttf",
+  "font_sha256": "b22a86af36f8a83c7592780074437fcbcda4399f6092dcc21f8db9f6cab8d0f8",
+  "dependencies": [
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\boundary-heldout-20261018\\input-provenance.json",
+      "sha256": "729cc9271956e132ef0a79a29b7a1333e54be6e31c7e2daea88158c57da485d7"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\boundary-ctc-heldout-20261018\\result.json",
+      "sha256": "b54e450495c901d8bf7b8c81eccefaf11be6ca523b021a6d833599e851c53382"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\boundary-whisper-real-20261018\\result.json",
+      "sha256": "d60e8ac287e9f6d79789505edcce0217363a6462e66fa576aa2d6fa31e34a196"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\boundary-qwen-real-20261018\\result.json",
+      "sha256": "101fa67386586da4daebefa9cbf477e4dce35a4ab94d66203dd734a9d3a475f7"
+    }
+  ],
+  "command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-v",
+    "error",
+    "-nostdin",
+    "-n",
+    "-f",
+    "rawvideo",
+    "-pixel_format",
+    "rgb24",
+    "-video_size",
+    "1280x720",
+    "-framerate",
+    "30",
+    "-i",
+    "pipe:0",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\boundary-heldout-20261018\\input.wav",
+    "-map",
+    "0:v",
+    "-map",
+    "1:a",
+    "-c:v",
+    "libx264",
+    "-crf",
+    "18",
+    "-pix_fmt",
+    "yuv420p",
+    "-c:a",
+    "pcm_s16le",
+    "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\boundary-heldout-comparison-20261018\\comparison.mkv"
+  ],
+  "generator_sha256": "e5803166450dc8e60e72cc143d72cf16353496f7b6bcba5cb9ff72f6c062f77a",
+  "continuous_playback_review": false,
+  "listening_review": false,
+  "static_review": false,
+  "files": {
+    "chart.png": {
+      "bytes": 18654,
+      "sha256": "7a8a1967b790d45e06410e8a7b01ba933ab045d9f05002764f1baf95fbb98a64"
+    },
+    "comparison.gif": {
+      "bytes": 622042,
+      "sha256": "6e841650f6c373c8bab320fc988c2dcf4243fcf4866ac386b5df08deeeeb31c4"
+    },
+    "comparison.mkv": {
+      "bytes": 377458,
+      "sha256": "03c39d68670f38e4d49a0972ec97a8edc11e5ffc5f44af055a584cb27923d69f"
+    },
+    "comparison.mp4": {
+      "bytes": 193199,
+      "sha256": "dd09be7681ebbeca1a5541c662f9b895c33898e196c448fccd4f957c50085ae0"
+    },
+    "executed-generator.py": {
+      "bytes": 8516,
+      "sha256": "e5803166450dc8e60e72cc143d72cf16353496f7b6bcba5cb9ff72f6c062f77a"
+    },
+    "frame-000.png": {
+      "bytes": 150348,
+      "sha256": "cad8dea893242e7060d85d33a915297db7392ea55cd50ed43cc0fc0b00dc8693"
+    },
+    "frame-111.png": {
+      "bytes": 155831,
+      "sha256": "492fd8aacf9fbf2afeb816b66d5f72e9b2db902dec7f65f148c36fe1bdb99ce0"
+    },
+    "frame-221.png": {
+      "bytes": 159127,
+      "sha256": "14a92e6b6d756193ee619e2119231a7a96b622fa3688d82bf4486c47153c7f66"
+    }
+  }
+}

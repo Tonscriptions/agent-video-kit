@@ -1,0 +1,109 @@
+{
+  "status": "verified",
+  "research_measurement_not_product_render": true,
+  "frames": 236,
+  "fps": 30,
+  "samples": 125850,
+  "sample_rate": 16000,
+  "pcm_equal_to_original": true,
+  "pcm_sha256": "b1a29c399f2f9cc07e516b24da6018a48abb7ad6fb19f7a9a870f26edc3a867b",
+  "all_video_pts_checked": true,
+  "gif_frames": 79,
+  "gif_duration_ms": 7900,
+  "source_duration_seconds": 7.865625,
+  "pillow_version": "12.1.0",
+  "font": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\html-quality-20261018\\inputs\\complete-font.ttf",
+  "font_sha256": "b22a86af36f8a83c7592780074437fcbcda4399f6092dcc21f8db9f6cab8d0f8",
+  "dependencies": [
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\ctc-alignment-20261018\\input-provenance.json",
+      "sha256": "b3e8d6c8f0b6d0afaf8219392c0a990b36127e8b7ce61541389efeb912c73839"
+    },
+    {
+      "historical_inference_reused": true,
+      "new_forward_calls": 0
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\ctc-real-en-20261018-b\\results.json",
+      "sha256": "45851c46c9ac829d21b98706c54ea82777302ff93b89a3c04b9d64918232581b"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\boundary-whisper-real-20261018\\result.json",
+      "sha256": "d60e8ac287e9f6d79789505edcce0217363a6462e66fa576aa2d6fa31e34a196"
+    },
+    {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\boundary-qwen-real-20261018\\result.json",
+      "sha256": "101fa67386586da4daebefa9cbf477e4dce35a4ab94d66203dd734a9d3a475f7"
+    }
+  ],
+  "command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-v",
+    "error",
+    "-nostdin",
+    "-n",
+    "-f",
+    "rawvideo",
+    "-pixel_format",
+    "rgb24",
+    "-video_size",
+    "1280x720",
+    "-framerate",
+    "30",
+    "-i",
+    "pipe:0",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\ctc-alignment-20261018\\input.wav",
+    "-map",
+    "0:v",
+    "-map",
+    "1:a",
+    "-c:v",
+    "libx264",
+    "-crf",
+    "18",
+    "-pix_fmt",
+    "yuv420p",
+    "-c:a",
+    "pcm_s16le",
+    "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\boundary-known-comparison-20261018\\comparison.mkv"
+  ],
+  "generator_sha256": "e5803166450dc8e60e72cc143d72cf16353496f7b6bcba5cb9ff72f6c062f77a",
+  "continuous_playback_review": false,
+  "listening_review": false,
+  "static_review": false,
+  "files": {
+    "chart.png": {
+      "bytes": 15603,
+      "sha256": "fa21bc708666790bb38c64b484350962ec766fe5dde8f91667c8d6058bfe7e93"
+    },
+    "comparison.gif": {
+      "bytes": 854459,
+      "sha256": "b64b2eaf5047f95f84e47bd086a9574fdcdf92ad9b89c23fc10ff9b27bc0bdf0"
+    },
+    "comparison.mkv": {
+      "bytes": 361922,
+      "sha256": "bda204e73525062a742db0633c456d5485991ac881528edb24c8e69b3d69f572"
+    },
+    "comparison.mp4": {
+      "bytes": 152918,
+      "sha256": "61256330a67113390a5b8a0ed9bbf0317d0b048e02643dfc7e01e5e9e2396e99"
+    },
+    "executed-generator.py": {
+      "bytes": 8516,
+      "sha256": "e5803166450dc8e60e72cc143d72cf16353496f7b6bcba5cb9ff72f6c062f77a"
+    },
+    "frame-000.png": {
+      "bytes": 123677,
+      "sha256": "4c5c57f46d8d01e8c5307f3314475459eb9820c35ba2dc7544a39dc350fa4ca1"
+    },
+    "frame-118.png": {
+      "bytes": 126696,
+      "sha256": "c2ab20d44989cef63dff0caeb89cfeb8aab4f20a56dec2ce2674abe42dbcc5ca"
+    },
+    "frame-235.png": {
+      "bytes": 129213,
+      "sha256": "0ec31ef33590e13d24473377c25928d6e42c07e15ca1a819daba51184205eb21"
+    }
+  }
+}

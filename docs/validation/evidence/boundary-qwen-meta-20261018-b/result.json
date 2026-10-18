@@ -1,0 +1,12 @@
+{
+  "status": "failed",
+  "research_only": true,
+  "product_engine_registered": false,
+  "network": "disabled",
+  "blocked_network_events": [],
+  "model_forward_calls": 0,
+  "generator_sha256": "cf434f9d0e2d3fe0b7e1ed0b1268f3c75bee20050a19db53217efc0c2d62b45e",
+  "error": "AppError(code='LOCAL_ARTIFACT_LOCK_FAILED', message='模型依赖不能为空', exit_code=10, path='E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\boundary-python-overlay-20261018\\\\huggingface_hub\\\\inference\\\\__init__.py', retryable=False, cause=None, hint=None, operation_id=None)",
+  "traceback": "Traceback (most recent call last):\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\scripts\\research_qwen_boundary.py\", line 95, in main\n    assert artifact_entry(path, 'pinned-research-python-overlay')['sha256'] == 'sha256:' + expected\n           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\artifact_locks.py\", line 105, in artifact_entry\n    return current.entry(path, role)\n           ~~~~~~~~~~~~~^^^^^^^^^^^^\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\artifact_locks.py\", line 30, in entry\n    raise AppError('LOCAL_ARTIFACT_LOCK_FAILED', '模型依赖不能为空', exit_code=10, path=key)\nai_ad_editor.errors.AppError: 模型依赖不能为空\n",
+  "seconds": 0.5904963000066346
+}

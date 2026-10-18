@@ -1,0 +1,60 @@
+{
+  "status": "import_only_succeeded",
+  "research_only": true,
+  "product_engine_registered": false,
+  "network": "disabled",
+  "blocked_network_events": [],
+  "model_forward_calls": 0,
+  "generator_sha256": "4c72bfc6f1856a2ea8d2fba57be16ae2e92a66bb0d4a591f2b10d54c825b3e01",
+  "versions": {
+    "python": "3.13.14",
+    "torch": "2.13.0+cu130",
+    "transformers": "5.14.1",
+    "numpy": "2.4.6"
+  },
+  "module_paths": {
+    "torch": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\torch\\__init__.py",
+    "transformers": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\transformers\\__init__.py"
+  },
+  "compatibility": {
+    "target": "5.14.1",
+    "files": [
+      {
+        "file": "__init__.py",
+        "original_sha256": "6de5cac018e0c994e04e855ef7fe9ed142383e88ffdcdf80463cbc7d5028b21d",
+        "adapted_sha256": "6de5cac018e0c994e04e855ef7fe9ed142383e88ffdcdf80463cbc7d5028b21d",
+        "changed": false
+      },
+      {
+        "file": "configuration_qwen3_asr.py",
+        "original_sha256": "acf6c3f1cb3dc1ea0df621a11f7df6ccca109be73b6bf51508b5052942f5bec1",
+        "adapted_sha256": "acf6c3f1cb3dc1ea0df621a11f7df6ccca109be73b6bf51508b5052942f5bec1",
+        "changed": false
+      },
+      {
+        "file": "modeling_qwen3_asr.py",
+        "original_sha256": "2fb5d98da1933748f5117ee05ce4e7150c9ead8154fb8e25f7af3968b853adc7",
+        "adapted_sha256": "d3e22341e19ce257a797d08d9207ebbe654cf1e3f185c57a4251646d23844f14",
+        "changed": true
+      },
+      {
+        "file": "processing_qwen3_asr.py",
+        "original_sha256": "a61f1fbfc06e3dfc63a2b8d15e3b29e98b032792c3fb7d0e01c04ca9c2181ffb",
+        "adapted_sha256": "a61f1fbfc06e3dfc63a2b8d15e3b29e98b032792c3fb7d0e01c04ca9c2181ffb",
+        "changed": false
+      }
+    ],
+    "change": "Current check_model_inputs takes function directly; remove obsolete decorator factory parentheses",
+    "upstream_and_installed_libraries_modified": false
+  },
+  "source_import_succeeded": true,
+  "artifact_locks": {
+    "mode": "windows-read-lock-command-scope",
+    "files_hashed": 8,
+    "bytes_hashed": 174730,
+    "digest_reuses_while_locked": 0,
+    "write_and_delete_sharing": false,
+    "persists_across_commands": false
+  },
+  "seconds": 8.69745919998968
+}

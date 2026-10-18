@@ -1,0 +1,59 @@
+{
+  "status": "failed",
+  "research_only": true,
+  "product_engine_registered": false,
+  "network": "disabled",
+  "blocked_network_events": [],
+  "model_forward_calls": 0,
+  "generator_sha256": "2fbbea70286a0c7b8780ac9ab7ab5bb1ca2190802c46f0c9695a0bbc0e4bb4d9",
+  "versions": {
+    "python": "3.13.14",
+    "torch": "2.13.0+cu130",
+    "transformers": "5.14.1",
+    "numpy": "2.4.6"
+  },
+  "module_paths": {
+    "torch": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\torch\\__init__.py",
+    "transformers": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\transformers\\__init__.py"
+  },
+  "compatibility": {
+    "target": "5.14.1",
+    "files": [
+      {
+        "file": "__init__.py",
+        "original_sha256": "6de5cac018e0c994e04e855ef7fe9ed142383e88ffdcdf80463cbc7d5028b21d",
+        "adapted_sha256": "6de5cac018e0c994e04e855ef7fe9ed142383e88ffdcdf80463cbc7d5028b21d",
+        "changed": false
+      },
+      {
+        "file": "configuration_qwen3_asr.py",
+        "original_sha256": "acf6c3f1cb3dc1ea0df621a11f7df6ccca109be73b6bf51508b5052942f5bec1",
+        "adapted_sha256": "acf6c3f1cb3dc1ea0df621a11f7df6ccca109be73b6bf51508b5052942f5bec1",
+        "changed": false
+      },
+      {
+        "file": "modeling_qwen3_asr.py",
+        "original_sha256": "2fb5d98da1933748f5117ee05ce4e7150c9ead8154fb8e25f7af3968b853adc7",
+        "adapted_sha256": "d3e22341e19ce257a797d08d9207ebbe654cf1e3f185c57a4251646d23844f14",
+        "changed": true
+      },
+      {
+        "file": "processing_qwen3_asr.py",
+        "original_sha256": "a61f1fbfc06e3dfc63a2b8d15e3b29e98b032792c3fb7d0e01c04ca9c2181ffb",
+        "adapted_sha256": "a61f1fbfc06e3dfc63a2b8d15e3b29e98b032792c3fb7d0e01c04ca9c2181ffb",
+        "changed": false
+      }
+    ],
+    "change": "Current check_model_inputs takes function directly; remove obsolete decorator factory parentheses",
+    "upstream_and_installed_libraries_modified": false
+  },
+  "source_import_succeeded": true,
+  "config": {
+    "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\qwen3-forced-aligner-0.6b\\config.json",
+    "role": "qwen-config-meta-probe",
+    "bytes": 5982,
+    "sha256": "sha256:d616c65d46c4b90bdc651b0a0963ea932732241140f337f9bb6b0335a9c8ef09"
+  },
+  "error": "AttributeError(\"'Qwen3ASRConfig' object has no attribute 'thinker_config'\")",
+  "traceback": "Traceback (most recent call last):\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\scripts\\research_qwen_boundary.py\", line 131, in main\n    config = module.Qwen3ASRConfig.from_pretrained(str(args.model.resolve()), local_files_only=True,\n                                                trust_remote_code=False)\n  File \"D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\transformers\\configuration_utils.py\", line 701, in from_pretrained\n    return cls.from_dict(config_dict, **kwargs)\n           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\transformers\\configuration_utils.py\", line 878, in from_dict\n    config = cls(**config_dict)\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\qwen-boundary-research\\transformers-5.14.1-backend\\configuration_qwen3_asr.py\", line 403, in __init__\n    super().__init__(**kwargs)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^\n  File \"D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\huggingface_hub\\dataclasses.py\", line 276, in init_with_validate\n    cls.validate(self)  # type: ignore [attr-defined]\n    ~~~~~~~~~~~~^^^^^^\n  File \"D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\huggingface_hub\\dataclasses.py\", line 251, in validate\n    validator(self)\n    ~~~~~~~~~^^^^^^\n  File \"D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\transformers\\configuration_utils.py\", line 488, in validate_token_ids\n    text_config = self.get_text_config(decoder=True)\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\qwen-boundary-research\\transformers-5.14.1-backend\\configuration_qwen3_asr.py\", line 422, in get_text_config\n    return self.thinker_config.get_text_config()\n           ^^^^^^^^^^^^^^^^^^^\n  File \"D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\transformers\\configuration_utils.py\", line 464, in __getattribute__\n    return super().__getattribute__(key)\n           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^\n  File \"D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\transformers\\integrations\\heterogeneity\\configuration_utils.py\", line 280, in __getattribute__\n    return super().__getattribute__(key)\n           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^\nAttributeError: 'Qwen3ASRConfig' object has no attribute 'thinker_config'\n"
+}

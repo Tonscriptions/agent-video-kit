@@ -1,0 +1,21 @@
+{
+  "status": "failed",
+  "research_only": true,
+  "product_engine_registered": false,
+  "network": "disabled",
+  "blocked_network_events": [],
+  "model_forward_calls": 0,
+  "generator_sha256": "768fdc73b79ef4626af3182238e6568080d8e2db92b2147867ae88fff744df40",
+  "versions": {
+    "python": "3.13.14",
+    "torch": "2.13.0+cu130",
+    "transformers": "5.14.1",
+    "numpy": "2.4.6"
+  },
+  "module_paths": {
+    "torch": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\torch\\__init__.py",
+    "transformers": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\transformers\\__init__.py"
+  },
+  "error": "TypeError(\"check_model_inputs() missing 1 required positional argument: 'func'\")",
+  "traceback": "Traceback (most recent call last):\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\scripts\\research_qwen_boundary.py\", line 96, in main\n    spec.loader.exec_module(module)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^\n  File \"<frozen importlib._bootstrap_external>\", line 1023, in exec_module\n  File \"<frozen importlib._bootstrap>\", line 488, in _call_with_frames_removed\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\sources\\boundary-alignment-20261018\\Qwen3-ASR-7c6daf77a2421100f5fb066495372c00129d39ff\\qwen_asr\\core\\transformers_backend\\__init__.py\", line 17, in <module>\n    from .modeling_qwen3_asr import Qwen3ASRForConditionalGeneration\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\sources\\boundary-alignment-20261018\\Qwen3-ASR-7c6daf77a2421100f5fb066495372c00129d39ff\\qwen_asr\\core\\transformers_backend\\modeling_qwen3_asr.py\", line 961, in <module>\n    class Qwen3ASRThinkerTextModel(Qwen3ASRPreTrainedModel):\n    ...<97 lines>...\n            )\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\sources\\boundary-alignment-20261018\\Qwen3-ASR-7c6daf77a2421100f5fb066495372c00129d39ff\\qwen_asr\\core\\transformers_backend\\modeling_qwen3_asr.py\", line 986, in Qwen3ASRThinkerTextModel\n    @check_model_inputs()\n     ~~~~~~~~~~~~~~~~~~^^\nTypeError: check_model_inputs() missing 1 required positional argument: 'func'\n"
+}

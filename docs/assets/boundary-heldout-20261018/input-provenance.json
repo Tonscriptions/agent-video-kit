@@ -1,0 +1,276 @@
+{
+  "format": "boundary-heldout-authored-blocks-v1",
+  "created_at_utc": "2026-10-18T07:15:33.748757+00:00",
+  "created_before_candidate_inference": true,
+  "sample_rate": 16000,
+  "samples": 117985,
+  "words": [
+    {
+      "word": "LOCAL",
+      "start_sample": 4800,
+      "end_sample": 16332
+    },
+    {
+      "word": "VIDEO",
+      "start_sample": 19532,
+      "end_sample": 31504
+    },
+    {
+      "word": "EDITOR",
+      "start_sample": 37104,
+      "end_sample": 48341
+    },
+    {
+      "word": "KEEPS",
+      "start_sample": 52341,
+      "end_sample": 63080
+    },
+    {
+      "word": "EVERY",
+      "start_sample": 69480,
+      "end_sample": 80474
+    },
+    {
+      "word": "ORIGINAL",
+      "start_sample": 85274,
+      "end_sample": 100870
+    },
+    {
+      "word": "WORD",
+      "start_sample": 103270,
+      "end_sample": 110785
+    }
+  ],
+  "voice": "rms",
+  "word_sources": [
+    {
+      "word": "LOCAL",
+      "file": "local-rms-raw.wav",
+      "trim_first_sample": 2816,
+      "trim_end_sample": 14348,
+      "following_gap_samples": 3200,
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-nostdin",
+        "-n",
+        "-f",
+        "lavfi",
+        "-i",
+        "flite=text=local:voice=rms",
+        "-ar",
+        "16000",
+        "-ac",
+        "1",
+        "-c:a",
+        "pcm_s16le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\boundary-heldout-20261018\\local-rms-raw.wav"
+      ]
+    },
+    {
+      "word": "VIDEO",
+      "file": "video-rms-raw.wav",
+      "trim_first_sample": 2688,
+      "trim_end_sample": 14660,
+      "following_gap_samples": 5600,
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-nostdin",
+        "-n",
+        "-f",
+        "lavfi",
+        "-i",
+        "flite=text=video:voice=rms",
+        "-ar",
+        "16000",
+        "-ac",
+        "1",
+        "-c:a",
+        "pcm_s16le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\boundary-heldout-20261018\\video-rms-raw.wav"
+      ]
+    },
+    {
+      "word": "EDITOR",
+      "file": "editor-rms-raw.wav",
+      "trim_first_sample": 467,
+      "trim_end_sample": 11704,
+      "following_gap_samples": 4000,
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-nostdin",
+        "-n",
+        "-f",
+        "lavfi",
+        "-i",
+        "flite=text=editor:voice=rms",
+        "-ar",
+        "16000",
+        "-ac",
+        "1",
+        "-c:a",
+        "pcm_s16le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\boundary-heldout-20261018\\editor-rms-raw.wav"
+      ]
+    },
+    {
+      "word": "KEEPS",
+      "file": "keeps-rms-raw.wav",
+      "trim_first_sample": 2264,
+      "trim_end_sample": 13003,
+      "following_gap_samples": 6400,
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-nostdin",
+        "-n",
+        "-f",
+        "lavfi",
+        "-i",
+        "flite=text=keeps:voice=rms",
+        "-ar",
+        "16000",
+        "-ac",
+        "1",
+        "-c:a",
+        "pcm_s16le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\boundary-heldout-20261018\\keeps-rms-raw.wav"
+      ]
+    },
+    {
+      "word": "EVERY",
+      "file": "every-rms-raw.wav",
+      "trim_first_sample": 467,
+      "trim_end_sample": 11461,
+      "following_gap_samples": 4800,
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-nostdin",
+        "-n",
+        "-f",
+        "lavfi",
+        "-i",
+        "flite=text=every:voice=rms",
+        "-ar",
+        "16000",
+        "-ac",
+        "1",
+        "-c:a",
+        "pcm_s16le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\boundary-heldout-20261018\\every-rms-raw.wav"
+      ]
+    },
+    {
+      "word": "ORIGINAL",
+      "file": "original-rms-raw.wav",
+      "trim_first_sample": 381,
+      "trim_end_sample": 15977,
+      "following_gap_samples": 2400,
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-nostdin",
+        "-n",
+        "-f",
+        "lavfi",
+        "-i",
+        "flite=text=original:voice=rms",
+        "-ar",
+        "16000",
+        "-ac",
+        "1",
+        "-c:a",
+        "pcm_s16le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\boundary-heldout-20261018\\original-rms-raw.wav"
+      ]
+    },
+    {
+      "word": "WORD",
+      "file": "word-rms-raw.wav",
+      "trim_first_sample": 2504,
+      "trim_end_sample": 10019,
+      "following_gap_samples": 7200,
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-nostdin",
+        "-n",
+        "-f",
+        "lavfi",
+        "-i",
+        "flite=text=word:voice=rms",
+        "-ar",
+        "16000",
+        "-ac",
+        "1",
+        "-c:a",
+        "pcm_s16le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\boundary-heldout-20261018\\word-rms-raw.wav"
+      ]
+    }
+  ],
+  "criterion": "first/last absolute signed PCM >=32; authored blocks, not phonetic labels",
+  "quality_goal": {
+    "boundary_error_seconds_max": 0.06666666666666667,
+    "predeclared_fps": 30
+  },
+  "rights": {
+    "text_and_placement": "CC0-1.0",
+    "speech": "Flite CMU US rms; separate permissive attribution in docs/third-party/flite-source-20261018",
+    "not_a_human_voice_clone": true
+  },
+  "contract_sha256": "9a3daaff2f7bd03afe06492da076beb9f7e7d6b691a3c137152e1ded3232b21e",
+  "generator_sha256": "0d3be8690bb8267e926178c1da68cbfcb3ccead128f1f7a15421da6307460480",
+  "ffmpeg_sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+  "static_review": false,
+  "continuous_playback_review": false,
+  "listening_review": false,
+  "files": {
+    "editor-rms-raw.wav": {
+      "bytes": 25678,
+      "sha256": "ab67b2879b85dfdc6eef741fd7cf7e201ef0ad73c3d508b1c63f2851c793f506"
+    },
+    "every-rms-raw.wav": {
+      "bytes": 25358,
+      "sha256": "f76f75d5fb7545f73e8d4aa6a7640cd36b39e90f2b5a02b197f8c8e614717a58"
+    },
+    "input.wav": {
+      "bytes": 236014,
+      "sha256": "e615ea11cefabcfd85bc674b4e0e9a70b7e639d4284c1a54862db6e4784b1b5d"
+    },
+    "keeps-rms-raw.wav": {
+      "bytes": 29198,
+      "sha256": "8166c5e3955145b9f87dac32b0bb1f517fa39ebc317cefeb49975b9d54c74d94"
+    },
+    "local-rms-raw.wav": {
+      "bytes": 30638,
+      "sha256": "cbca31de7db6fc4c4c98ee2720b9735b4758c0c466a5db32a6502dc639f3361d"
+    },
+    "original-rms-raw.wav": {
+      "bytes": 33678,
+      "sha256": "b99abe479174ab7286270a99d6217545d940726dc694023b3c825de7f6e0b49c"
+    },
+    "transcript.txt": {
+      "bytes": 44,
+      "sha256": "3e4fdafa4d22cc16b11306714e2fac467a1d856c80b6650575d1e2000b80b495"
+    },
+    "video-rms-raw.wav": {
+      "bytes": 31598,
+      "sha256": "a813fe5e380bbb83e490ca8cb5ac8bf7ade4940d08f0d4158a1868e8013ac3f9"
+    },
+    "word-rms-raw.wav": {
+      "bytes": 22958,
+      "sha256": "023ab086ef91b20cf4d06c5e046df29821d5877053a061509884af88f6d8895a"
+    }
+  }
+}

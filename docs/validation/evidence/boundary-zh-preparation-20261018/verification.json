@@ -1,0 +1,30 @@
+{
+  "source": "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\soulx-smoke-20261015-d\\assets\\asset_20261015102331_6d133120_speaker_4_cv_tw_female_52d6.wav",
+  "source_sha256": "2b40301cfbd9f038f981140d73a04f558518bd5dc54a65d8ab2e7aab431c8bfe",
+  "original_transcript": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\asr-fixtures\\s4-reference.txt",
+  "transcript_sha256": "e04269bb7ad276a1c5872bdd1b866590d3eded24b6b70c2728e2313ff4af04a7",
+  "runtime_transcript_rewrite": false,
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\boundary-zh-16k.wav",
+  "output_sha256": "635637f677562b73baa701208372815c97ed2cd6ff36925c421d8620036125f9",
+  "sample_rate": 16000,
+  "samples": 202880,
+  "command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-v",
+    "error",
+    "-nostdin",
+    "-n",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\workspace\\soulx-smoke-20261015-d\\assets\\asset_20261015102331_6d133120_speaker_4_cv_tw_female_52d6.wav",
+    "-map",
+    "0:a:0",
+    "-ar",
+    "16000",
+    "-ac",
+    "1",
+    "-c:a",
+    "pcm_s16le",
+    "product\\.runtime\\boundary-zh-16k.wav"
+  ],
+  "private_audio_published": false
+}
