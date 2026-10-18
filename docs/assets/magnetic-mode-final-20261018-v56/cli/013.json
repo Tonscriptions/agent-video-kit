@@ -1,0 +1,371 @@
+{
+  "ok": true,
+  "command": "timeline.compose",
+  "request_id": "req_20261018150356_64c823c5",
+  "operation_id": "op_20261018150356_15d56e6d",
+  "status": "succeeded",
+  "data": {
+    "sequence_id": "seq_main",
+    "applied": [
+      {
+        "op": "remove_clip",
+        "track_id": "shots",
+        "clip_id": "b",
+        "plan": {
+          "engine": "agent-magnetic-mode-v1",
+          "base_project_sha256": "sha256:9be53d117764a0ad396563af5bc000a5225e148ac4d1053cd7d1e1ba3204e4c0",
+          "sequence_id": "seq_main",
+          "request": {
+            "action": "remove",
+            "options": {
+              "main_track_id": "shots",
+              "sync": true,
+              "linkage": false,
+              "linked": true,
+              "magnetic": true,
+              "ripple": false
+            },
+            "clip_ids": [
+              "b"
+            ]
+          },
+          "main_track_id": "shots",
+          "short_tick": 0,
+          "steps": [
+            {
+              "engine": "agent-range-edit-v1",
+              "base_project_sha256": "sha256:9be53d117764a0ad396563af5bc000a5225e148ac4d1053cd7d1e1ba3204e4c0",
+              "sequence_id": "seq_main",
+              "request": {
+                "action": "extract",
+                "options": {
+                  "main_track_id": "shots",
+                  "sync": true,
+                  "linkage": false,
+                  "linked": true,
+                  "magnetic": true
+                },
+                "at_tick": 90000,
+                "track_ids": [
+                  "shots"
+                ],
+                "duration_tick": 90000
+              },
+              "main_track_id": "shots",
+              "selected_clip_ids": [
+                "b",
+                "c",
+                "d",
+                "music"
+              ],
+              "incoming_clip_ids": [],
+              "changes": [
+                {
+                  "clip_id": "b",
+                  "before": {
+                    "track_id": "shots",
+                    "clip": {
+                      "id": "b",
+                      "asset_id": "frames",
+                      "timeline_start_tick": 90000,
+                      "duration_tick": 90000,
+                      "source_in_tick": 180000,
+                      "source_out_tick": 270000
+                    }
+                  },
+                  "after": null
+                },
+                {
+                  "clip_id": "c",
+                  "before": {
+                    "track_id": "shots",
+                    "clip": {
+                      "id": "c",
+                      "asset_id": "frames",
+                      "timeline_start_tick": 180000,
+                      "duration_tick": 90000,
+                      "source_in_tick": 270000,
+                      "source_out_tick": 360000
+                    }
+                  },
+                  "after": {
+                    "track_id": "shots",
+                    "clip": {
+                      "id": "c",
+                      "asset_id": "frames",
+                      "timeline_start_tick": 90000,
+                      "duration_tick": 90000,
+                      "source_in_tick": 270000,
+                      "source_out_tick": 360000
+                    }
+                  }
+                },
+                {
+                  "clip_id": "d",
+                  "before": {
+                    "track_id": "shots",
+                    "clip": {
+                      "id": "d",
+                      "asset_id": "frames",
+                      "timeline_start_tick": 270000,
+                      "duration_tick": 90000,
+                      "source_in_tick": 360000,
+                      "source_out_tick": 450000
+                    }
+                  },
+                  "after": {
+                    "track_id": "shots",
+                    "clip": {
+                      "id": "d",
+                      "asset_id": "frames",
+                      "timeline_start_tick": 180000,
+                      "duration_tick": 90000,
+                      "source_in_tick": 360000,
+                      "source_out_tick": 450000
+                    }
+                  }
+                },
+                {
+                  "clip_id": "music",
+                  "before": {
+                    "track_id": "stem",
+                    "clip": {
+                      "id": "music",
+                      "asset_id": "sound",
+                      "timeline_start_tick": 0,
+                      "duration_tick": 360000,
+                      "source_in_tick": 90000,
+                      "source_out_tick": 450000
+                    }
+                  },
+                  "after": {
+                    "track_id": "stem",
+                    "clip": {
+                      "id": "music",
+                      "asset_id": "sound",
+                      "timeline_start_tick": 0,
+                      "duration_tick": 90000,
+                      "source_in_tick": 90000,
+                      "source_out_tick": 450000,
+                      "presentation_window": {
+                        "version": 1,
+                        "authored_start_tick": 0,
+                        "authored_duration_tick": 360000,
+                        "offset_tick": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "clip_id": "music_after",
+                  "before": null,
+                  "after": {
+                    "track_id": "stem",
+                    "clip": {
+                      "id": "music_after",
+                      "asset_id": "sound",
+                      "timeline_start_tick": 90000,
+                      "duration_tick": 180000,
+                      "source_in_tick": 90000,
+                      "source_out_tick": 450000,
+                      "presentation_window": {
+                        "version": 1,
+                        "authored_start_tick": 0,
+                        "authored_duration_tick": 360000,
+                        "offset_tick": 180000
+                      }
+                    }
+                  }
+                }
+              ],
+              "short_tick": 0,
+              "new_track_ids": [],
+              "new_tracks": [],
+              "rebound_clip_ids": [],
+              "retimed_subtitle_ids": [],
+              "removed_transition_ids": [],
+              "cut_pairs": [],
+              "source_changes": [],
+              "warnings": [],
+              "before_duration_tick": 360000,
+              "after_duration_tick": 270000,
+              "limits": [
+                "markers-remain-absolute",
+                "roll-and-slide-default-to-retained-authored-handles",
+                "source-handles-require-finite-recorded-local-input-bounds",
+                "source-extension-reauthors-edge-processing-and-native-retiming",
+                "partial-tracking-and-real-transition-endpoint-cuts-reject",
+                "clip-processing-before-cut-track-and-root-processing-after-edit",
+                "existing-native-window-render-budgets-still-apply"
+              ]
+            }
+          ],
+          "changes": [
+            {
+              "clip_id": "b",
+              "before": {
+                "track_id": "shots",
+                "clip": {
+                  "id": "b",
+                  "asset_id": "frames",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 180000,
+                  "source_out_tick": 270000
+                }
+              },
+              "after": null
+            },
+            {
+              "clip_id": "c",
+              "before": {
+                "track_id": "shots",
+                "clip": {
+                  "id": "c",
+                  "asset_id": "frames",
+                  "timeline_start_tick": 180000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 270000,
+                  "source_out_tick": 360000
+                }
+              },
+              "after": {
+                "track_id": "shots",
+                "clip": {
+                  "id": "c",
+                  "asset_id": "frames",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 270000,
+                  "source_out_tick": 360000
+                }
+              }
+            },
+            {
+              "clip_id": "d",
+              "before": {
+                "track_id": "shots",
+                "clip": {
+                  "id": "d",
+                  "asset_id": "frames",
+                  "timeline_start_tick": 270000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 360000,
+                  "source_out_tick": 450000
+                }
+              },
+              "after": {
+                "track_id": "shots",
+                "clip": {
+                  "id": "d",
+                  "asset_id": "frames",
+                  "timeline_start_tick": 180000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 360000,
+                  "source_out_tick": 450000
+                }
+              }
+            },
+            {
+              "clip_id": "music",
+              "before": {
+                "track_id": "stem",
+                "clip": {
+                  "id": "music",
+                  "asset_id": "sound",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 360000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 450000
+                }
+              },
+              "after": {
+                "track_id": "stem",
+                "clip": {
+                  "id": "music",
+                  "asset_id": "sound",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 90000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 450000,
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 0
+                  }
+                }
+              }
+            },
+            {
+              "clip_id": "music_after",
+              "before": null,
+              "after": {
+                "track_id": "stem",
+                "clip": {
+                  "id": "music_after",
+                  "asset_id": "sound",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 180000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 450000,
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 180000
+                  }
+                }
+              }
+            }
+          ],
+          "before_duration_tick": 360000,
+          "after_duration_tick": 270000,
+          "magnetic": true,
+          "warnings": [],
+          "limits": [
+            "logical-tick-boundaries-not-screen-pixel-snapping",
+            "markers-and-bus-automation-remain-absolute",
+            "author-speed-curve-freeze-changes-need-explicit-follow-plans",
+            "existing-range-transition-tracking-and-nonlinear-lane-boundaries-remain"
+          ]
+        }
+      }
+    ],
+    "validation": {
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "rights": {
+        "ok": true,
+        "target": "commercial_ad",
+        "checked": 4,
+        "required_records": 4,
+        "failures": [],
+        "warnings": [],
+        "disposition_decisions": [],
+        "effective_disposition_decisions": []
+      },
+      "schema_engine": "jsonschema",
+      "asset_count": 4,
+      "sequence_count": 1
+    },
+    "before_snapshot": {
+      "snapshot_id": "snap_20261018150356_8a4cb10d",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-mode-final-v56\\MM02\\history\\snap_20261018150356_8a4cb10d.json",
+      "label": "before-timeline-compose",
+      "created_at": "2026-10-18T15:03:56.832234Z"
+    }
+  },
+  "artifacts": [],
+  "warnings": [],
+  "errors": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "schema_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "started_at": "2026-10-18T15:03:56.861099Z",
+    "finished_at": "2026-10-18T15:03:56.861104Z",
+    "network": "disabled"
+  }
+}

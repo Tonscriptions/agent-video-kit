@@ -28,7 +28,7 @@ def end(clip):
 
 
 def normalize(sequence, request):
-    fields = {'action', 'clip_ids', 'before_clip_id', 'options', 'transition_policy'}
+    fields = {'action', 'clip_ids', 'before_clip_id', 'options', 'transition_policy', 'sync_span_policy'}
     if not isinstance(request, dict) or set(request) - fields or request.get('action') != 'reorder':
         _error('EDIT_REQUEST_INVALID', 'reorder 只接受 action/clip_ids/before_clip_id/options/transition_policy')
     ids = request.get('clip_ids')
@@ -53,8 +53,11 @@ def normalize(sequence, request):
     policy = request.get('transition_policy', 'preserve')
     if policy not in ('preserve', 'drop_broken'):
         _error('EDIT_REQUEST_INVALID', 'transition_policy 只接受 preserve/drop_broken')
+    span_policy = request.get('sync_span_policy', 'split' if options.get('magnetic') else 'reject')
+    if not isinstance(span_policy, str) or span_policy not in ('reject', 'split'):
+        _error('EDIT_REQUEST_INVALID', 'sync_span_policy 只接受 reject/split')
     return {'action': 'reorder', 'clip_ids': ids, 'before_clip_id': target,
-            'options': options, 'transition_policy': policy}
+            'options': options, 'transition_policy': policy, 'sync_span_policy': span_policy}
 
 
 def _transitions(project, sequence, original, policy):
@@ -163,6 +166,10 @@ def build_reorder_plan(project, sequence_id, request):
         main_deltas[clip['id']] = cursor-old_starts[clip['id']]
         cursor += clip['duration_tick']
 
+    splits = []
+    if normalized['sync_span_policy'] == 'split':
+        from .magnetic_sync import split_sync
+        splits = split_sync(candidate, sequence, ordered, main_deltas, options, MAX_CLIPS)
     draft = _Draft(candidate, sequence, normalized, compute_anchors=False)
     proposals = {cid: (delta, 'main-track') for cid, delta in main_deltas.items()}
     groups = defaultdict(list)
@@ -256,6 +263,11 @@ def build_reorder_plan(project, sequence_id, request):
                       if track['id'] != main_id and not proposals.get(cid, (0,))[0])
     warnings = ([{'code': 'EDIT_REORDER_TRANSITIONS_REMOVED', 'message': '按显式 drop_broken 移除受影响转场',
                   'source_transitions': removed, 'legacy_fields': dropped}] if removed or dropped else [])
+    locations = {c['id']: (t['id'], start(c), end(c)) for t in sequence['tracks'] for c in t['clips']}
+    for split in splits:
+        for piece in split['pieces']:
+            tid, first, last = locations[piece['clip_id']]
+            piece.update(after_track_id=tid, after_range_tick=[first, last])
     plan = {'engine': ENGINE, 'base_project_sha256': project_fingerprint(project),
             'sequence_id': sequence_id, 'request': normalized, 'main_track_id': main_id,
             'selected_clip_ids': [c['id'] for c in ordered if c['id'] in selected],
@@ -266,10 +278,11 @@ def build_reorder_plan(project, sequence_id, request):
             'new_track_ids': draft.new_tracks, 'new_tracks': [copy.deepcopy(draft.track(tid)) for tid in draft.new_tracks],
             'rebound_clip_ids': draft.rebound, 'retimed_subtitle_ids': draft.retimed_subtitles,
             'removed_transition_ids': [row['id'] for row in removed], 'dropped_legacy_transition_fields': dropped,
+            'sync_splits': splits,
             'before_duration_tick': original['duration_tick'], 'after_duration_tick': sequence['duration_tick'],
             'warnings': warnings,
             'limits': ['explicit-whole-clip-reorder-not-a-persistent-magnet-mode-or-screen-snap-gesture',
-                       'cross-cut-sync-items-with-different-deltas-require-explicit-splitting',
+                       'sync_span_policy_split_partitions_full_author_windows_otherwise_rejects',
                        'markers-remain-absolute', 'effect-and-ducking-bus-relocation-rejects',
                        'original-author-graph-preserved-track-and-root-effects-evaluate-at-new-time',
                        '20000-clip-admission-is-not-a-total-RSS-or-long-film-benchmark']}

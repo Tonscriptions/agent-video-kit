@@ -1,0 +1,113 @@
+{
+  "ok": true,
+  "command": "convert.export",
+  "request_id": "req_20261018150359_1064f558",
+  "operation_id": null,
+  "status": "succeeded",
+  "data": {
+    "output": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-mode-final-20261018-v56\\MM03.aevpkg.zip",
+    "report": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-mode-final-20261018-v56\\MM03.aevpkg.zip.conversion-report.json",
+    "report_data": {
+      "report_version": "0.1.0",
+      "direction": "export",
+      "source_format": "agent-project/0.1.0",
+      "target_format": "agent-project-package/0.1.0",
+      "created_at": "2026-10-18T15:03:59.530971Z",
+      "items": [
+        {
+          "capability": "project-package",
+          "status": "Exact",
+          "source": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-mode-final-v56\\MM03",
+          "target": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-mode-final-20261018-v56\\MM03.aevpkg.zip",
+          "detail": "项目、登记权利和本地素材已写入自包含 ZIP"
+        }
+      ],
+      "warnings": [
+        {
+          "capability": "package-excluded-runtime",
+          "status": "Approximate",
+          "source": "project runtime",
+          "target": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-mode-final-20261018-v56\\MM03.aevpkg.zip",
+          "detail": "renders/cache/operations/history 未打包"
+        }
+      ],
+      "failures": []
+    },
+    "manifest": {
+      "package_format": "agent-project-package",
+      "package_version": "0.1.0",
+      "created_at": "2026-10-18T15:03:59.530921Z",
+      "project_id": "proj_20261018150353_64d16648",
+      "project_schema_version": "0.1.0",
+      "files": [
+        {
+          "path": "assets/captions_captions_captions.srt",
+          "size": 150,
+          "sha256": "2063485ff2fd0d3238333e461e67e95da21ab82c434a3866afdab3235ace1f81"
+        },
+        {
+          "path": "assets/font_font_DejaVuSans.ttf",
+          "size": 756072,
+          "sha256": "3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+        },
+        {
+          "path": "assets/frames_frames_source.mkv",
+          "size": 58854,
+          "sha256": "433b96fcab35e93f1f63d0837f1fd41e0100adf83cfe0bfac7e7e664ced523a4"
+        },
+        {
+          "path": "assets/sound_sound_source.wav",
+          "size": 1152044,
+          "sha256": "73253ce20fbfe6d0b3cafd4a983749b22b2391e54f582a15aa19cbff2011bf46"
+        },
+        {
+          "path": "project.json",
+          "size": 22709,
+          "sha256": "488a4a1b7c59e1468fe026f65d46ccb4ba1bff24ff6223c584a342137c635ee6"
+        },
+        {
+          "path": "project.lock.json",
+          "size": 307,
+          "sha256": "3cec46f7b2358470abec1481beb1b2766cc1119c2c360f33f4e37e052258e998"
+        },
+        {
+          "path": "rights-ledger.json",
+          "size": 5452,
+          "sha256": "28103aa60cbf9023f44572078ae17ccfa64776b3a017f7799f04c6228163b2de"
+        },
+        {
+          "path": "validation/validation_run_20261018150354_7e3613a4.json",
+          "size": 477,
+          "sha256": "44ab447e5d4b7373a981d4da8f79dbc6873a3779a306becc08471ac8db8df858"
+        }
+      ],
+      "excluded": [
+        "renders/",
+        "cache/",
+        "operations/",
+        "history/"
+      ],
+      "network": "disabled",
+      "upstream_runtime": "none"
+    }
+  },
+  "artifacts": [],
+  "warnings": [
+    {
+      "capability": "package-excluded-runtime",
+      "status": "Approximate",
+      "source": "project runtime",
+      "target": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-mode-final-20261018-v56\\MM03.aevpkg.zip",
+      "detail": "renders/cache/operations/history 未打包"
+    }
+  ],
+  "errors": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "schema_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "started_at": "2026-10-18T15:03:59.579585Z",
+    "finished_at": "2026-10-18T15:03:59.579595Z",
+    "network": "disabled"
+  }
+}

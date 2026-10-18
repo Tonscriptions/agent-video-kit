@@ -56,9 +56,9 @@ def validate_editing(sequence: dict[str, Any]) -> dict[str, Any]:
     value = sequence.get('editing')
     if value is None:
         value = {}
-    if not isinstance(value, dict) or set(value) - {'main_track_id', 'sync', 'linkage', 'linked'}:
-        _error('EDIT_CONFIGURATION_INVALID', 'sequence.editing 只允许 main_track_id/sync/linkage/linked', 'sequence.editing')
-    for key in ('sync', 'linkage', 'linked'):
+    if not isinstance(value, dict) or set(value) - {'main_track_id', 'sync', 'linkage', 'linked', 'magnetic'}:
+        _error('EDIT_CONFIGURATION_INVALID', 'sequence.editing 只允许 main_track_id/sync/linkage/linked/magnetic', 'sequence.editing')
+    for key in ('sync', 'linkage', 'linked', 'magnetic'):
         if key in value and type(value[key]) is not bool:
             _error('EDIT_CONFIGURATION_INVALID', 'editing 开关必须是布尔值', 'sequence.editing.' + key)
     tracks = sequence.get('tracks', [])
@@ -70,8 +70,9 @@ def validate_editing(sequence: dict[str, Any]) -> dict[str, Any]:
         pictures = [t for t in tracks if t.get('kind') == 'video']
         if pictures:
             main = min(pictures, key=lambda t: (t.get('order') if type(t.get('order')) is int else 0, str(t.get('id', ''))))['id']
-    return {'main_track_id': main, 'sync': value.get('sync', False),
-            'linkage': value.get('linkage', False), 'linked': value.get('linked', True)}
+    return {'main_track_id': main, 'sync': value.get('sync', value.get('magnetic', False)),
+            'linkage': value.get('linkage', False), 'linked': value.get('linked', True),
+            'magnetic': value.get('magnetic', False)}
 
 
 def normalize_request(sequence: dict[str, Any], request: Any) -> dict[str, Any]:
@@ -413,11 +414,17 @@ def _plan_changes(before, after):
         elif tid != current[0] or clip != current[1]:
             changes.append({'clip_id': cid, 'before': {'track_id': tid, 'clip': clip},
                             'after': {'track_id': current[0], 'clip': current[1]}})
+    changes.extend({'clip_id': cid, 'before': None, 'after': {'track_id': tid, 'clip': clip}}
+                   for cid, (tid, clip) in new.items() if cid not in old)
     return changes
 
 
 def build_edit_plan(project: dict[str, Any], sequence_id: str, request: Any) -> tuple[dict[str, Any], dict[str, Any]]:
     """Return an isolated candidate plus a reviewable plan; never mutate input."""
+    from .magnetic_mode import maybe_plan
+    magnetic = maybe_plan(project, sequence_id, request)
+    if magnetic is not None:
+        return magnetic
     if isinstance(request, dict) and isinstance(request.get('action'), str):
         if request['action'] == 'reorder':
             from .magnetic_reorder import build_reorder_plan

@@ -5,6 +5,20 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For persistent main-track magnet editing, read the
+[mode and sync-split contract](../../docs/specs/主轨磁吸模式与跨剪口同步拆分契约_v0.1_2026-10-18.md).
+Use `timeline edit` action `magnet` with an explicit boolean `enabled`.
+In enabled sequences, main shift/append/remove/trim plans keep the main track
+gapless; nearest-cut ties choose the earlier original boundary. Differently
+displaced sync spans use complete-author presentation windows; shared side
+links receive matching cut regions and fresh IDs. Ordinary reorder can opt
+in with `sync_span_policy: split`. Review dry-run changes and expected hash
+before applying. Partial magnetic fragment saving expands the full sequence.
+Automatic following for speed/curve/freeze duration edits, all GUI gestures
+and natural quality remain open; invalid geometry still rejects atomically.
+The [real outputs, failures and installed replay](../../docs/validation/主轨磁吸模式与跨剪口同步拆分实测_2026-10-18.md)
+keeps independent source references separate from same-renderer author graphs.
+
 For named audio buses, read the
 [routing contract](../../docs/specs/命名音频总线发送返回与侧链契约_v0.1_2026-10-18.md).
 Set `sequence.audio_routing` through compose `update_sequence`; review
@@ -22,10 +36,11 @@ explicit `before_clip_id` (null means the end). Original selection order is
 retained and the whole main track packs from zero. Review every displaced
 shot's links, sync/rider attachments and collision lanes before hash-bound
 application. Broken transitions reject unless `drop_broken` is explicit;
-different-delta sync spans need explicit splitting. Markers stay absolute.
+different-delta sync spans reject unless `sync_span_policy: split` is selected.
+Markers stay absolute.
 The [frame/PCM and installation record](../../docs/validation/主轨磁吸重排与关联附着实测_2026-10-18.md)
 distinguishes independent source truth from same-renderer author blocks.
-This action does not implement a persistent magnetic mode or GUI snapping.
+Persistent mode uses this action through the planner above; GUI snapping remains open.
 
 For transparent output or a root ending between display frames, read the
 [delivery clock/alpha contract](../../docs/specs/透明视频交付与音画端点契约_v0.1_2026-10-18.md).

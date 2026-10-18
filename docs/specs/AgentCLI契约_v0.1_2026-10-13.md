@@ -1,5 +1,23 @@
 # Agent CLI 契约 v0.1
 
+V56 调用示例（JSON 请求交给现有 `timeline edit --input <本地文件>`）：
+
+```json
+{"action":"magnet","enabled":true}
+```
+
+```json
+{"action":"shift","clip_ids":["shot_c"],"delta_tick":-180000}
+```
+
+```json
+{"action":"reorder","clip_ids":["shot_c"],"before_clip_id":"shot_a","sync_span_policy":"split"}
+```
+
+`sequence.editing.magnetic` 为严格布尔值；开启时主轨从零连续排列，未显式设置的 sync 缺省 true。普通模式下 sync 与跨剪口策略仍沿用旧缺省。磁吸主轨 compose append/remove/slide/trim 统一规划；副轨保留既有语义。shift 根据所选块最早起点加 delta_tick 选择剩余主轨最近的原始剪口，等距取较早边界。trim 不同时接受独立 timeline_start；标记/序列自动化不改作者时钟。输出计划包含切分源区间、宿主位移、分段和关联 ID、最终轨道及字幕变化，仍支持 dry-run、预期摘要、快照与幂等。局部磁吸片段组保存报告全序列选择扩展。更多字段/拒绝与未实现行为以本轮磁吸契约和实测为准。
+
+2026-10-18 **V56（产品）**：持久主轨磁吸、剪口吸附及 append/remove/shift/trim 联动，跨不同位移剪口的连续音频/字幕/嵌套输出自动分段。完整 **1289/1289，1986.638 秒**、0 跳过、**181 文件**冻结；66 磁吸专项含 26 新增与 40 旧重排，为完整子集。**44 CLI /236 主帧 /1,132,800 立体声采样帧**，RGB 最大差 1、PCM 0；**121 包内文件 /39 隔离 CLI /316 安装帧 /1,516,800 采样帧**，开发版与安装版解码一致；**14 Skills /198 引用**通过。局部片段组真实失败与旧回归中断保留；复杂音频/字形参考使用同版完整作者图，独立原源参考另计。未连续播放/听审；速度/曲线/定格长度自动随动、全手势、自然质量、长片/HDR、另一台机器及完整剪映等价未验收。[契约](主轨磁吸模式与跨剪口同步拆分契约_v0.1_2026-10-18.md)、[原输入/MP4/GIF/失败/发行](../validation/主轨磁吸模式与跨剪口同步拆分实测_2026-10-18.md)。
+
 2026-10-18 V55 扩展：[命名音频路由契约](命名音频总线发送返回与侧链契约_v0.1_2026-10-18.md)。现有 `timeline compose` 的 `add_sequence.audio_routing` 与 `update_sequence.patch.audio_routing` 写入序列局部 DAG，null 恢复旧树状混音；字段、引用、循环与配额随事务校验。`render` 产生 `sequence-audio-routing` 清单，随后执行 `policy audit`。完整子音频先于祖先时间映射；图选择/外部交换边界与[真实原输入、PCM、发行及失败记录](../validation/命名音频总线发送返回与侧链实测_2026-10-18.md)单列。没有增加 GUI 或在线处理命令。
 
 | 项目 | 内容 |

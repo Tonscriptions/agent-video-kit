@@ -113,9 +113,10 @@ def _selection(project: dict, sequence: dict, requested: list[str] | None):
     if not selected or selected-set(index):
         fail('FRAGMENT_SELECTION_INVALID', '选择为空或片段不在指定序列', 'clip_ids')
     original = set(selected)
-    if sequence.get('audio_routing') is not None:
-        # Nonlinear buses and detector state belong to the full author clock.
-        # Publish an explicit expanded selection instead of a changed mix.
+    from .magnetic_mode import enabled as magnetic_enabled
+    if sequence.get('audio_routing') is not None or magnetic_enabled(sequence):
+        # Nonlinear buses and the magnetic main invariant belong to the full
+        # sequence. Report expanded selection instead of changing either clock.
         selected.update(index)
     while True:
         prior = set(selected)

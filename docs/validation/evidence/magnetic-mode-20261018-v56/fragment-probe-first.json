@@ -1,0 +1,419 @@
+[
+  {
+    "arguments": [
+      "fragment",
+      "save",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-mode-first-v56\\MM01",
+      "--library",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-fragment-probe-v56\\library",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-fragment-probe-v56\\save.json"
+    ],
+    "exit_code": 0,
+    "result": {
+      "ok": true,
+      "command": "fragment.save",
+      "request_id": "req_20261018150211_7c0c7b4a",
+      "operation_id": null,
+      "status": "succeeded",
+      "data": {
+        "fragment": {
+          "fragment_version": "0.1.0",
+          "engine": "agent-local-fragment-library-v1",
+          "id": "probe",
+          "version": 1,
+          "name": "partial magnetic",
+          "tags": [],
+          "source": {
+            "project_id": "proj_20261018145858_c66177d8",
+            "project_sha256": "sha256:5fd190e8994f827b0acd59725f1b018cefc54affe0ec750b2508fe596b78bc9d",
+            "rights_sha256": "sha256:a2581f994ac1ff7b24c2745ab88a2ae79603f81ab31d8aec36edd522179466cf"
+          },
+          "entry": {
+            "sequence_id": "seq_main",
+            "origin_tick": 90000,
+            "duration_tick": 90000
+          },
+          "selection": {
+            "requested": [
+              "a"
+            ],
+            "included": [
+              "a"
+            ],
+            "expanded": []
+          },
+          "context": {
+            "timebase": {
+              "ticks_per_second": 90000,
+              "display_fps": {
+                "num": 10,
+                "den": 1
+              }
+            },
+            "color": {
+              "primaries": "bt709",
+              "transfer": "bt709",
+              "matrix": "bt709",
+              "range": "limited"
+            },
+            "audio": {
+              "sample_rate": 48000,
+              "channels": 2
+            }
+          },
+          "project": {
+            "schema_version": "0.1.0",
+            "project": {
+              "id": "proj_20261018145858_c66177d8",
+              "name": "base",
+              "created_at": "2026-10-18T14:58:58.307048Z",
+              "updated_at": "2026-10-18T14:59:00.780037Z",
+              "creator": "ai-ad-editor",
+              "source_revision": "local"
+            },
+            "settings": {
+              "timebase": {
+                "ticks_per_second": 90000,
+                "display_fps": {
+                  "num": 10,
+                  "den": 1
+                }
+              },
+              "canvas": {
+                "width": 160,
+                "height": 64,
+                "pixel_aspect": {
+                  "num": 1,
+                  "den": 1
+                }
+              },
+              "color": {
+                "primaries": "bt709",
+                "transfer": "bt709",
+                "matrix": "bt709",
+                "range": "limited"
+              },
+              "audio": {
+                "sample_rate": 48000,
+                "channels": 2
+              },
+              "output": {
+                "container": "mp4",
+                "video": {
+                  "codec": "libx264",
+                  "preset": "medium",
+                  "crf": 18,
+                  "pixel_format": "yuv420p"
+                },
+                "audio": {
+                  "codec": "aac",
+                  "bitrate": "192k"
+                }
+              }
+            },
+            "sequences": [
+              {
+                "id": "seq_main",
+                "name": "four main shots and complete stem",
+                "duration_tick": 360000,
+                "editing": {
+                  "main_track_id": "shots",
+                  "magnetic": true
+                },
+                "tracks": [
+                  {
+                    "id": "shots",
+                    "kind": "video",
+                    "order": 0,
+                    "clips": [
+                      {
+                        "id": "a",
+                        "asset_id": "frames",
+                        "timeline_start_tick": 90000,
+                        "duration_tick": 90000,
+                        "source_in_tick": 90000,
+                        "source_out_tick": 180000,
+                        "rights_dependencies": [
+                          {
+                            "rights_ref": "frames",
+                            "sha256": "sha256:a62ff19bfb8777e1dac7a892072580069c382ba6a86f94d8c8db2ff1c725fc3a"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "stem",
+                    "kind": "audio",
+                    "order": 0,
+                    "clips": []
+                  }
+                ],
+                "source_transitions": [],
+                "canvas": {
+                  "width": 160,
+                  "height": 64
+                }
+              }
+            ],
+            "assets": [
+              {
+                "id": "frames",
+                "kind": "video",
+                "uri": "files/a62ff19bfb8777e1dac7a892072580069c382ba6a86f94d8c8db2ff1c725fc3a.mkv",
+                "sha256": "sha256:a62ff19bfb8777e1dac7a892072580069c382ba6a86f94d8c8db2ff1c725fc3a",
+                "probe": {
+                  "duration_seconds": 6.0,
+                  "duration_tick": 540000,
+                  "format": "matroska,webm",
+                  "format_long_name": "Matroska / WebM",
+                  "streams": [
+                    {
+                      "index": 0,
+                      "codec_name": "ffv1",
+                      "codec_long_name": "FFmpeg video codec #1",
+                      "codec_type": "video",
+                      "codec_tag_string": "[0][0][0][0]",
+                      "codec_tag": "0x0000",
+                      "width": 160,
+                      "height": 64,
+                      "coded_width": 160,
+                      "coded_height": 64,
+                      "has_b_frames": 0,
+                      "pix_fmt": "bgr0",
+                      "level": -99,
+                      "color_range": "pc",
+                      "color_space": "gbr",
+                      "field_order": "progressive",
+                      "r_frame_rate": "10/1",
+                      "avg_frame_rate": "10/1",
+                      "time_base": "1/1000",
+                      "start_pts": 0,
+                      "start_time": "0.000000",
+                      "bits_per_raw_sample": "8",
+                      "extradata_size": 42,
+                      "disposition": {
+                        "default": 0,
+                        "dub": 0,
+                        "original": 0,
+                        "comment": 0,
+                        "lyrics": 0,
+                        "karaoke": 0,
+                        "forced": 0,
+                        "hearing_impaired": 0,
+                        "visual_impaired": 0,
+                        "clean_effects": 0,
+                        "attached_pic": 0,
+                        "timed_thumbnails": 0,
+                        "non_diegetic": 0,
+                        "captions": 0,
+                        "descriptions": 0,
+                        "metadata": 0,
+                        "dependent": 0,
+                        "still_image": 0,
+                        "multilayer": 0
+                      },
+                      "tags": {
+                        "ENCODER": "Lavc62.28.100 ffv1",
+                        "DURATION": "00:00:06.000000000"
+                      }
+                    }
+                  ],
+                  "video": {
+                    "codec": "ffv1",
+                    "width": 160,
+                    "height": 64,
+                    "pix_fmt": "bgr0",
+                    "fps": "10/1",
+                    "color_space": "gbr",
+                    "duration_seconds": 0.0,
+                    "start_time_seconds": 0.0
+                  },
+                  "audio": {
+                    "codec": null,
+                    "sample_rate": 0,
+                    "channels": 0,
+                    "duration_seconds": 0.0,
+                    "start_time_seconds": 0.0
+                  }
+                },
+                "rights_ref": "frames",
+                "source": {
+                  "source_url": "local authored fixture or unmodified licensed font",
+                  "retrieved_at": "2026-10-18T14:58:58.562343Z",
+                  "original_name": "source.mkv"
+                }
+              }
+            ],
+            "templates": [],
+            "outputs": [],
+            "provenance": {
+              "change_log": []
+            }
+          },
+          "rights_ledger": {
+            "schema_version": "0.2.0",
+            "updated_at": "2026-10-18T14:58:59.153035Z",
+            "records": [
+              {
+                "asset_id": "frames",
+                "kind": "video",
+                "sha256": "sha256:a62ff19bfb8777e1dac7a892072580069c382ba6a86f94d8c8db2ff1c725fc3a",
+                "source_url": "local authored fixture or unmodified licensed font",
+                "source_version": "local",
+                "retrieved_at": "2026-10-18T14:58:58.562356Z",
+                "creator": "fixture authors or DejaVu/Bitstream authors",
+                "license_spdx": "CC0-1.0",
+                "license_url": "",
+                "attribution": "",
+                "permitted_uses": [
+                  "internal",
+                  "commercial_ad"
+                ],
+                "restrictions": [],
+                "evidence": "files/a5b98bf076dac6e4bbba6b2c56e80e1265566503648bbd688dfc9ac26924e927.json",
+                "verification_status": "verified",
+                "verified_by": "ai-ad-editor",
+                "takedown_status": "clear",
+                "notes": "Imported by local CLI",
+                "record_id": "rights_20261018145858_c59ff241",
+                "record_version": 1,
+                "active": true,
+                "recorded_at": "2026-10-18T14:58:58.562730Z",
+                "permitted_channels": []
+              }
+            ],
+            "events": [
+              {
+                "event_id": "rightsevent_20261018145858_cfca264b",
+                "event": "created",
+                "asset_id": "frames",
+                "record_id": "rights_20261018145858_c59ff241",
+                "record_version": 1,
+                "at": "2026-10-18T14:58:58.562730Z",
+                "actor": "ai-ad-editor"
+              }
+            ],
+            "decisions": [],
+            "policy": {
+              "default_target": "commercial_ad",
+              "unverified_publish": false
+            }
+          },
+          "files": [
+            {
+              "path": "files/a5b98bf076dac6e4bbba6b2c56e80e1265566503648bbd688dfc9ac26924e927.json",
+              "sha256": "sha256:a5b98bf076dac6e4bbba6b2c56e80e1265566503648bbd688dfc9ac26924e927",
+              "bytes": 695
+            },
+            {
+              "path": "files/a62ff19bfb8777e1dac7a892072580069c382ba6a86f94d8c8db2ff1c725fc3a.mkv",
+              "sha256": "sha256:a62ff19bfb8777e1dac7a892072580069c382ba6a86f94d8c8db2ff1c725fc3a",
+              "bytes": 58854
+            }
+          ],
+          "adaptations": [],
+          "warnings": []
+        },
+        "plan": {
+          "fragment_sha256": "sha256:1a288ef385eab48551adefd73c15eb60d80255814f3a5c4b394d335be2b4cbac",
+          "project_sha256": "sha256:5fd190e8994f827b0acd59725f1b018cefc54affe0ec750b2508fe596b78bc9d",
+          "files": 2,
+          "bytes": 59549,
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-fragment-probe-v56\\library\\entries\\ba9c736f19e7f60b7f6764adb0b7908c0a2b394e09b6c09863528c7f2bc86095\\1\\fragment.json"
+        },
+        "verification": {
+          "mode": "windows-read-lock-command-scope",
+          "files_hashed": 5,
+          "bytes_hashed": 99746,
+          "digest_reuses_while_locked": 0,
+          "write_and_delete_sharing": false,
+          "persists_across_commands": false
+        }
+      },
+      "artifacts": [],
+      "warnings": [],
+      "errors": [],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-18T15:02:11.396948Z",
+        "finished_at": "2026-10-18T15:02:11.396955Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "arguments": [
+      "project",
+      "init",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-fragment-probe-v56\\target"
+    ],
+    "exit_code": 0,
+    "result": {
+      "ok": true,
+      "command": "project.init",
+      "request_id": "req_20261018150211_8ffdcdf5",
+      "operation_id": null,
+      "status": "succeeded",
+      "data": {
+        "project": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-fragment-probe-v56\\target\\project.json",
+        "root": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-fragment-probe-v56\\target",
+        "project_id": "proj_20261018150211_19a3d3d9"
+      },
+      "artifacts": [],
+      "warnings": [],
+      "errors": [],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-18T15:02:11.463369Z",
+        "finished_at": "2026-10-18T15:02:11.463379Z",
+        "network": "disabled"
+      }
+    }
+  },
+  {
+    "arguments": [
+      "fragment",
+      "apply",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-fragment-probe-v56\\target",
+      "--library",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-fragment-probe-v56\\library",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-fragment-probe-v56\\save.json"
+    ],
+    "exit_code": 2,
+    "result": {
+      "ok": false,
+      "command": "fragment.apply",
+      "request_id": "req_20261018150211_417b6ec4",
+      "operation_id": null,
+      "status": "failed",
+      "data": {},
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "FRAGMENT_PROJECT_INVALID",
+          "message": "[{\"code\": \"EDIT_MAGNETIC_MAIN_GAP_OR_OVERLAP\", \"message\": \"磁吸主轨必须从零紧邻排列；使用 magnet/shift/insert/extract/trim 规划几何变化\", \"path\": \"edit\", \"retryable\": false}]",
+          "path": "fragment",
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-18T15:02:11.591033Z",
+        "finished_at": "2026-10-18T15:02:11.591039Z",
+        "network": "disabled"
+      }
+    }
+  }
+]

@@ -22,6 +22,26 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+For persistent main-track editing, read the
+[magnetic mode contract](../../docs/specs/主轨磁吸模式与跨剪口同步拆分契约_v0.1_2026-10-18.md).
+`timeline edit` with `{action: "magnet", enabled: true}` packs existing gaps
+and persists `sequence.editing.magnetic`; existing main overlaps reject.
+Main `shift` chooses the nearest original cut of the remaining main track,
+with earlier ties. Compose main append/remove/slide/trim uses the mode planner;
+trim cannot also request a separate placement. Review the full hash-bound plan.
+The mode defaults sync on only when sync was not explicitly configured.
+Reorder `sync_span_policy: split` partitions differently displaced sync spans
+after the complete author graph, keeping source/curve/freeze/audio clocks.
+Magnetic mode defaults to split; ordinary mode defaults to reject. Direct
+main links keep their explicit host. Linked side cohorts share cut regions
+and fresh later link IDs. Locked members, transition endpoints and tracking
+references reject automatic splitting. Keep detector/nonlinear lane protections.
+Saving a partial magnetic fragment expands the full sequence and reports it.
+Other speed/curve/freeze edits must still satisfy the gapless main invariant;
+automatic duration following and GUI gestures remain open. Markers and sequence
+automation stay absolute. Read the
+[actual media, fragment failure and installed checks](../../docs/validation/主轨磁吸模式与跨剪口同步拆分实测_2026-10-18.md).
+
 Use the [named audio routing contract](../../docs/specs/命名音频总线发送返回与侧链契约_v0.1_2026-10-18.md)
 for `update_sequence.patch.audio_routing` (null restores legacy tree mixing).
 Track rows reference local video/audio tracks; output defaults to master,
@@ -39,13 +59,14 @@ For whole-main-track ordering, use the
 `timeline edit` action `reorder` takes main `clip_ids` and a mandatory
 `before_clip_id` (null appends). Stable selected clips become one block, and
 all main clips pack from zero without changing their author payload. Links
-on displaced shots follow too; sync spans requiring different deltas reject
-and must first be split explicitly. Inspect the plan's moves/anchored IDs,
+on displaced shots follow too; differently displaced sync spans reject by
+default in ordinary mode or use explicit `sync_span_policy: split` above.
+Inspect the plan's moves/anchored IDs,
 lane changes, subtitle offsets, references and transitions before applying.
 Keep `transition_policy: preserve` unless removing broken declarations or
 legacy fields is intended. See the
 [actual frame/sample and package checks](../../docs/validation/主轨磁吸重排与关联附着实测_2026-10-18.md).
-This explicit action is separate from persistent magnetic mode and screen snaps.
+This explicit action is also used by persistent mode; it does not define screen snaps.
 
 For a [compound freeze](../../docs/specs/复合片段定格与完整音画时钟契约_v0.1_2026-10-18.md),
 apply the existing compose `freeze_frame` to the `sequence_id` container. The
@@ -349,7 +370,8 @@ Mute audio through `clip.audio.mute/muted` or `track.audio.mute/muted` to retain
 video. `track.muted` still removes the whole track. Audio-track solo and explicit
 music ducking are local to each authored sequence; a parent treats a child bus
 as one role. Give the container an explicit role when the parent needs it as a
-voice or music input. Named send/return, feedback and spatial routing remain open.
+voice or music input. V55 adds the bounded named sends/returns described above;
+feedback and spatial routing remain open.
 
 Place audio on the 48-kHz half-open sample grid using rational ceiling, without
 integer-millisecond rounding. Container automation uses its own authored clock:

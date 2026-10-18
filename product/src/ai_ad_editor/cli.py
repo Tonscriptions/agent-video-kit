@@ -5057,7 +5057,15 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
         operation = change.get("op", "append_clip")
         if operation in WINDOW_OPERATIONS:
             target_sequence = find_sequence(working, change.get('sequence_id') or sequence['id'])
-            working, plan = apply_window_operation(working, target_sequence['id'], change)
+            from .magnetic_mode import enabled as magnet_enabled, main_track as magnet_main, trim as magnet_trim
+            is_main_trim = False
+            if operation == 'trim_clip' and magnet_enabled(target_sequence):
+                trim_track, trim_clip = _find_clip(target_sequence, change.get('clip_id', change.get('id')), change.get('track_id'))
+                is_main_trim = trim_track is magnet_main(target_sequence)
+            if is_main_trim:
+                working, plan = magnet_trim(working, target_sequence['id'], trim_track, trim_clip, change)
+            else:
+                working, plan = apply_window_operation(working, target_sequence['id'], change)
             applied.append({'op': operation, 'plan': plan})
         elif operation == 'source_transition':
             target_sequence = find_sequence(working, change.get('sequence_id') or sequence['id'])
@@ -5082,12 +5090,17 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
                     clip["duration_tick"] = max(1, int(round(curve_duration * int(working["settings"]["timebase"]["ticks_per_second"]))))
             if any(existing.get("id") == clip["id"] for existing in track.get("clips", [])):
                 raise argument_error(f"片段 ID 已存在: {clip['id']}")
-            track.setdefault("clips", []).append(clip)
-            target_sequence["duration_tick"] = max(int(target_sequence.get("duration_tick", 1)), clip["timeline_start_tick"] + clip["duration_tick"])
             preset = change.get("motion_preset") or change.get("preset")
             applied_item = {"op": operation, "track_id": track["id"], "clip": clip}
             if preset:
                 applied_item["motion"] = _apply_motion_preset(clip, {**change, "motion_preset": preset})
+            from .magnetic_mode import enabled as magnet_enabled, main_track as magnet_main, insert as magnet_insert
+            if magnet_enabled(target_sequence) and track is magnet_main(target_sequence):
+                working, applied_item['plan'] = magnet_insert(working, target_sequence['id'], track, clip, clip['timeline_start_tick'])
+                _, applied_item['clip'] = _find_clip(find_sequence(working, target_sequence['id']), clip['id'], track['id'])
+            else:
+                track.setdefault("clips", []).append(clip)
+                target_sequence["duration_tick"] = max(int(target_sequence.get("duration_tick", 1)), clip["timeline_start_tick"] + clip["duration_tick"])
             applied.append(applied_item)
         elif operation == "add_sequence":
             sequence_id = str(change.get("id") or change.get("sequence_id") or new_id("seq"))
@@ -5099,6 +5112,8 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
                 target['canvas'] = copy.deepcopy(change['canvas'])
             if 'audio_routing' in change:
                 target['audio_routing'] = copy.deepcopy(change['audio_routing'])
+            if 'editing' in change:
+                target['editing'] = copy.deepcopy(change['editing'])
             for track_kind, track_id, order in (("video", f"{sequence_id}_video_1", 0), ("audio", f"{sequence_id}_audio_1", 0)):
                 target["tracks"].append({"id": str(change.get(f"{track_kind}_track_id") or track_id), "kind": track_kind, "order": order, "muted": False, "locked": False, "clips": []})
             working.setdefault("sequences", []).append(target)
@@ -5121,9 +5136,15 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
                 raise argument_error("append_sequence_clip 必须提供 nested_sequence_id", "nested_sequence_id")
             if any(existing.get("id") == clip["id"] for existing in track.get("clips", [])):
                 raise argument_error(f"片段 ID 已存在: {clip['id']}")
-            track.setdefault("clips", []).append(clip)
-            target_sequence["duration_tick"] = max(int(target_sequence.get("duration_tick", 1)), clip["timeline_start_tick"] + clip["duration_tick"])
-            applied.append({"op": operation, "track_id": track["id"], "clip": clip})
+            from .magnetic_mode import enabled as magnet_enabled, main_track as magnet_main, insert as magnet_insert
+            item = {"op": operation, "track_id": track["id"], "clip": clip}
+            if magnet_enabled(target_sequence) and track is magnet_main(target_sequence):
+                working, item['plan'] = magnet_insert(working, target_sequence['id'], track, clip, clip['timeline_start_tick'])
+                _, item['clip'] = _find_clip(find_sequence(working, target_sequence['id']), clip['id'], track['id'])
+            else:
+                track.setdefault("clips", []).append(clip)
+                target_sequence["duration_tick"] = max(int(target_sequence.get("duration_tick", 1)), clip["timeline_start_tick"] + clip["duration_tick"])
+            applied.append(item)
         elif operation == "slip_clip":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))
@@ -5140,9 +5161,16 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
             new_start = int(clip.get("timeline_start_tick", 0)) + int(change.get("delta_tick", 0))
             if new_start < 0:
                 raise argument_error("slide_clip 不能移动到负时间", "delta_tick")
-            clip["timeline_start_tick"] = new_start
-            _recompute_sequence_duration(target_sequence)
-            applied.append({"op": operation, "track_id": track["id"], "clip": clip})
+            from .magnetic_mode import enabled as magnet_enabled, main_track as magnet_main
+            item = {"op": operation, "track_id": track["id"], "clip": clip}
+            if magnet_enabled(target_sequence) and track is magnet_main(target_sequence):
+                working, item['plan'] = build_edit_plan(working, target_sequence['id'],
+                    {'action': 'shift', 'clip_ids': [clip['id']], 'delta_tick': change.get('delta_tick', 0)})
+                _, item['clip'] = _find_clip(find_sequence(working, target_sequence['id']), clip['id'], track['id'])
+            else:
+                clip["timeline_start_tick"] = new_start
+                _recompute_sequence_duration(target_sequence)
+            applied.append(item)
         elif operation == "set_clip_speed":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))
@@ -5239,9 +5267,15 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
         elif operation == "remove_clip":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))
-            track["clips"] = [item for item in track.get("clips", []) if item is not clip]
-            _recompute_sequence_duration(target_sequence)
-            applied.append({"op": operation, "track_id": track["id"], "clip_id": clip["id"]})
+            from .magnetic_mode import enabled as magnet_enabled, main_track as magnet_main
+            item = {"op": operation, "track_id": track["id"], "clip_id": clip['id']}
+            if magnet_enabled(target_sequence) and track is magnet_main(target_sequence):
+                working, item['plan'] = build_edit_plan(working, target_sequence['id'],
+                    {'action': 'remove', 'clip_ids': [clip['id']]})
+            else:
+                track["clips"] = [value for value in track.get("clips", []) if value is not clip]
+                _recompute_sequence_duration(target_sequence)
+            applied.append(item)
         elif operation == "update_clip":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))

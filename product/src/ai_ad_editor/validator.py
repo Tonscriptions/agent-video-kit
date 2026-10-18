@@ -392,6 +392,8 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
             error(exc.code, exc.message, (exc.path or 'sequence.source_transitions').replace('sequence.', sp+'.', 1))
         try:
             validate_editing(sequence)
+            from .magnetic_mode import validate as validate_magnetic
+            validate_magnetic(sequence)
         except AppError as exc:
             error(exc.code, exc.message, (exc.path or 'sequence.editing').replace('sequence.', sp+'.', 1))
         try:
