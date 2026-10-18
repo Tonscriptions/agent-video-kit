@@ -1,0 +1,23 @@
+{
+  "label": "missing-schema",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-I",
+    "-S",
+    "-B",
+    "-X",
+    "utf8",
+    "-c",
+    "import sys,os,pathlib,importlib.abc,importlib,runpy\nroot=pathlib.Path(sys.argv[1]).resolve();site=root/'site'\nsys.path[:]=[str(site),*[p for p in sys.path if not {'site-packages','dist-packages'} & set(pathlib.Path(p).parts)]]\nclass Block(importlib.abc.MetaPathFinder):\n def find_spec(self,fullname,path=None,target=None):\n  if fullname.split('.')[0] in {'numpy','PIL','torch','requests','httpx'}:raise ModuleNotFoundError('offline optional-library guard: '+fullname)\nsys.meta_path.insert(0,Block())\ndef guard(event,args):\n if event in {'socket.connect','socket.getaddrinfo','http.client.connect','urllib.Request'}:raise RuntimeError('offline network guard: '+event)\nsys.addaudithook(guard)\nfor module in ('ai_ad_editor','jsonschema','attrs','jsonschema_specifications','referencing','rpds'):\n m=importlib.import_module(module);assert pathlib.Path(m.__file__).resolve().is_relative_to(site),module\nos.environ['AI_AD_EDITOR_RUNTIME_DIR']=str(root/'runtime')\nfrom ai_ad_editor.cli import main\nraise SystemExit(main(sys.argv[2:]))\n",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\missing-schema",
+    "validate",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\edited-project"
+  ],
+  "cwd": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018",
+  "exit_code": 2,
+  "expected_exit_code": 2,
+  "seconds": 1.8716128999949433,
+  "stdout": "{\"ok\":false,\"command\":\"validate\",\"request_id\":\"req_20261018034323_76a1fae4\",\"operation_id\":null,\"status\":\"failed\",\"data\":{\"report\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-pathguard-real-20261018\\\\edited-project\\\\validation\\\\validation_run_20261018034323_70ad10e1.json\",\"ok\":false,\"errors\":[{\"code\":\"SCHEMA_RESOURCE_MISSING\",\"message\":\"随包 Schema 无法读取；请重新离线安装\",\"path\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-pathguard-real-20261018\\\\missing-schema\\\\site\\\\ai_ad_editor\\\\agent-project.schema.json\",\"retryable\":false,\"cause\":\"[Errno 2] No such file or directory: 'E:\\\\\\\\dev\\\\\\\\sandbox\\\\\\\\AI广告剪辑\\\\\\\\product\\\\\\\\.runtime\\\\\\\\offline-release-pathguard-real-20261018\\\\\\\\missing-schema\\\\\\\\site\\\\\\\\ai_ad_editor\\\\\\\\agent-project.schema.json'\"}],\"warnings\":[],\"rights\":{\"ok\":true,\"target\":\"commercial_ad\",\"checked\":2,\"required_records\":2,\"failures\":[],\"warnings\":[],\"disposition_decisions\":[],\"effective_disposition_decisions\":[]},\"schema_engine\":\"unavailable\",\"asset_count\":2,\"sequence_count\":1},\"artifacts\":[],\"warnings\":[],\"errors\":[{\"code\":\"SCHEMA_RESOURCE_MISSING\",\"message\":\"随包 Schema 无法读取；请重新离线安装\",\"path\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-pathguard-real-20261018\\\\missing-schema\\\\site\\\\ai_ad_editor\\\\agent-project.schema.json\",\"retryable\":false,\"cause\":\"[Errno 2] No such file or directory: 'E:\\\\\\\\dev\\\\\\\\sandbox\\\\\\\\AI广告剪辑\\\\\\\\product\\\\\\\\.runtime\\\\\\\\offline-release-pathguard-real-20261018\\\\\\\\missing-schema\\\\\\\\site\\\\\\\\ai_ad_editor\\\\\\\\agent-project.schema.json'\"}],\"provenance\":{\"cli_version\":\"0.1.0\",\"schema_version\":\"0.1.0\",\"engine_version\":\"ffmpeg-local\",\"started_at\":\"2026-10-18T03:43:23.531182Z\",\"finished_at\":\"2026-10-18T03:43:23.531188Z\",\"network\":\"disabled\"}}\r\n",
+  "stderr": ""
+}

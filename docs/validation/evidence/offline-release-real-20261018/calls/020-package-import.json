@@ -1,0 +1,26 @@
+{
+  "label": "package-import",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-I",
+    "-S",
+    "-B",
+    "-X",
+    "utf8",
+    "-c",
+    "import sys,os,pathlib,importlib.abc,importlib,runpy\nroot=pathlib.Path(sys.argv[1]).resolve();site=root/'site'\nsys.path[:]=[str(site),*[p for p in sys.path if not {'site-packages','dist-packages'} & set(pathlib.Path(p).parts)]]\nclass Block(importlib.abc.MetaPathFinder):\n def find_spec(self,fullname,path=None,target=None):\n  if fullname.split('.')[0] in {'numpy','PIL','torch','requests','httpx'}:raise ModuleNotFoundError('offline optional-library guard: '+fullname)\nsys.meta_path.insert(0,Block())\ndef guard(event,args):\n if event in {'socket.connect','socket.getaddrinfo','http.client.connect','urllib.Request'}:raise RuntimeError('offline network guard: '+event)\nsys.addaudithook(guard)\nfor module in ('ai_ad_editor','jsonschema','attrs','jsonschema_specifications','referencing','rpds'):\n m=importlib.import_module(module);assert pathlib.Path(m.__file__).resolve().is_relative_to(site),module\nos.environ['AI_AD_EDITOR_RUNTIME_DIR']=str(root/'runtime')\nfrom ai_ad_editor.cli import main\nraise SystemExit(main(sys.argv[2:]))\n",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-real-20261018\\independent-install",
+    "convert",
+    "import",
+    "--input",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-real-20261018\\edited-project.zip",
+    "--output",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-real-20261018\\restored-project"
+  ],
+  "cwd": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-real-20261018",
+  "exit_code": 0,
+  "expected_exit_code": 0,
+  "seconds": 2.451073500007624,
+  "stdout": "{\"ok\":true,\"command\":\"convert.import\",\"request_id\":\"req_20261018032015_9d664d1b\",\"operation_id\":null,\"status\":\"succeeded\",\"data\":{\"root\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-real-20261018\\\\restored-project\",\"project\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-real-20261018\\\\restored-project\\\\project.json\",\"report\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-real-20261018\\\\restored-project\\\\validation\\\\conversion_report_20261018032015_c8329b7f.json\",\"report_data\":{\"report_version\":\"0.1.0\",\"direction\":\"import\",\"source_format\":\"agent-project-package/0.1.0\",\"target_format\":\"agent-project/0.1.0\",\"created_at\":\"2026-10-18T03:20:15.722635Z\",\"items\":[{\"capability\":\"project-package\",\"status\":\"Exact\",\"source\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-real-20261018\\\\edited-project.zip\",\"target\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-real-20261018\\\\restored-project\",\"detail\":\"manifest、文件哈希和本地路径安全检查通过\"},{\"capability\":\"project-model\",\"status\":\"Exact\",\"source\":\"agent-project-package/0.1.0\",\"target\":\"Agent Project JSON\",\"detail\":\"\"},{\"capability\":\"rights-ledger\",\"status\":\"Exact\",\"source\":\"rights-ledger.json\",\"target\":\"项目 Rights Ledger\",\"detail\":\"\"}],\"warnings\":[],\"failures\":[]}},\"artifacts\":[],\"warnings\":[],\"errors\":[],\"provenance\":{\"cli_version\":\"0.1.0\",\"schema_version\":\"0.1.0\",\"engine_version\":\"ffmpeg-local\",\"started_at\":\"2026-10-18T03:20:15.728305Z\",\"finished_at\":\"2026-10-18T03:20:15.728314Z\",\"network\":\"disabled\"}}\r\n",
+  "stderr": ""
+}

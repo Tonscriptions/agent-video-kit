@@ -1,0 +1,13 @@
+{
+  "check": "git diff --cached --check",
+  "exit_code": 2,
+  "classification": "byte-preserved native CRLF receipts and verbatim upstream license; no product/test source changes",
+  "affected_files": {
+    "docs/assets/offline-release-20261018/install-receipt.json": 57,
+    "docs/assets/offline-release-dev1-20261018/install-receipt.json": 57,
+    "docs/assets/offline-release-final-20261018/install-receipt.json": 57,
+    "docs/assets/offline-release-pathguard-20261018/install-receipt.json": 57,
+    "product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt": 1
+  },
+  "resolution": "declare CR-at-EOL for only native install receipts and preserve upstream license whitespace; do not modify evidence bytes"
+}

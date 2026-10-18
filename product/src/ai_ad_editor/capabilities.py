@@ -21,6 +21,12 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'schema': {
+                'status':'implemented','commands':['schema.show','schema.export'],
+                'features':['byte_pinned_packaged_draft202012_schema','explicit_local_date_time_checker',
+                    'no_external_reference_retrieval','missing_executor_or_resource_is_an_error','exclusive_original_byte_export'],
+                'limits':['date_time_leap_seconds_not_supported','native_python_and_ffmpeg_provided_separately'],
+            },
             'mask_edit': {
                 'status': 'implemented_with_limits', 'engine': 'agent-local-mask-edit-v1',
                 'commands': ['media.mask-edit'],

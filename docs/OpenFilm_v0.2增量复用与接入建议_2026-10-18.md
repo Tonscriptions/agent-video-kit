@@ -13,7 +13,9 @@
 | 原研究 | [O01–O12、原生测试与工期假设](OpenFilm源码拆解与复用成本评估_2026-10-17.md) |
 
 
-**当前结论（V46）**：OpenFilm 可以降低局部模块的二次开发成本，适合接入现有 Agent Project + Python/FFmpeg 主链。已采用的原码、借鉴的业务规则和仍待适配的能力分开记录：
+本轮后续复核：main 仍为 `eefd6a8d`；**853 stars/91 forks** 是新 API 时点，702 文件与五类已采用代码再次核对。没有新增上游代码、模型推理或安装官方 Skill。见[当前编号决策表](OpenFilm当前复用决策_2026-10-18.md)及[原 API/采用字节](validation/evidence/openfilm-release-review-20261018/verification.json)。V47 仅另补本机离线发行与随包 Schema，[实际发行](validation/离线发行与随包Schema实测_2026-10-18.md)不计为新 OpenFilm 算法。
+
+**当前结论（V46 功能采用；V47 另补发行）**：OpenFilm 可以降低局部模块的二次开发成本，适合接入现有 Agent Project + Python/FFmpeg 主链。已采用的原码、借鉴的业务规则和仍待适配的能力分开记录：
 
 | 优先级 | 模块 | 当前采用方式 | 能减少的工作 / 剩余成本 |
 |---|---|---|---|

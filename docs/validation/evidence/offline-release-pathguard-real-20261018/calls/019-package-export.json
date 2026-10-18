@@ -1,0 +1,28 @@
+{
+  "label": "package-export",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-I",
+    "-S",
+    "-B",
+    "-X",
+    "utf8",
+    "-c",
+    "import sys,os,pathlib,importlib.abc,importlib,runpy\nroot=pathlib.Path(sys.argv[1]).resolve();site=root/'site'\nsys.path[:]=[str(site),*[p for p in sys.path if not {'site-packages','dist-packages'} & set(pathlib.Path(p).parts)]]\nclass Block(importlib.abc.MetaPathFinder):\n def find_spec(self,fullname,path=None,target=None):\n  if fullname.split('.')[0] in {'numpy','PIL','torch','requests','httpx'}:raise ModuleNotFoundError('offline optional-library guard: '+fullname)\nsys.meta_path.insert(0,Block())\ndef guard(event,args):\n if event in {'socket.connect','socket.getaddrinfo','http.client.connect','urllib.Request'}:raise RuntimeError('offline network guard: '+event)\nsys.addaudithook(guard)\nfor module in ('ai_ad_editor','jsonschema','attrs','jsonschema_specifications','referencing','rpds'):\n m=importlib.import_module(module);assert pathlib.Path(m.__file__).resolve().is_relative_to(site),module\nos.environ['AI_AD_EDITOR_RUNTIME_DIR']=str(root/'runtime')\nfrom ai_ad_editor.cli import main\nraise SystemExit(main(sys.argv[2:]))\n",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\independent-install",
+    "convert",
+    "export",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\edited-project",
+    "--target-format",
+    "package",
+    "--output",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\edited-project.zip"
+  ],
+  "cwd": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018",
+  "exit_code": 0,
+  "expected_exit_code": 0,
+  "seconds": 1.2231840999884298,
+  "stdout": "{\"ok\":true,\"command\":\"convert.export\",\"request_id\":\"req_20261018034314_df4a06c6\",\"operation_id\":null,\"status\":\"succeeded\",\"data\":{\"output\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-pathguard-real-20261018\\\\edited-project.zip\",\"report\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-pathguard-real-20261018\\\\edited-project.zip.conversion-report.json\",\"report_data\":{\"report_version\":\"0.1.0\",\"direction\":\"export\",\"source_format\":\"agent-project/0.1.0\",\"target_format\":\"agent-project-package/0.1.0\",\"created_at\":\"2026-10-18T03:43:14.151910Z\",\"items\":[{\"capability\":\"project-package\",\"status\":\"Exact\",\"source\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-pathguard-real-20261018\\\\edited-project\",\"target\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-pathguard-real-20261018\\\\edited-project.zip\",\"detail\":\"项目、登记权利和本地素材已写入自包含 ZIP\"}],\"warnings\":[{\"capability\":\"package-excluded-runtime\",\"status\":\"Approximate\",\"source\":\"project runtime\",\"target\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-pathguard-real-20261018\\\\edited-project.zip\",\"detail\":\"renders/cache/operations/history 未打包\"}],\"failures\":[]},\"manifest\":{\"package_format\":\"agent-project-package\",\"package_version\":\"0.1.0\",\"created_at\":\"2026-10-18T03:43:14.151862Z\",\"project_id\":\"proj_20261018034301_0fcc4081\",\"project_schema_version\":\"0.1.0\",\"files\":[{\"path\":\"assets/audio_audio_sound-a.wav\",\"size\":1536044,\"sha256\":\"ea615612bd6622757300471232caee77ca00788e3284b96013424bce872d7fb1\"},{\"path\":\"assets/video_video_source-a.mp4\",\"size\":197887,\"sha256\":\"6d36606b4b7520184fd8170db52e55c9d0c4e9571255ca5cc3577f9ae62def95\"},{\"path\":\"project.json\",\"size\":14879,\"sha256\":\"056e8e13a171a4eb7076f933f63badbe373722201a7cc3705556d79f0e04aee6\"},{\"path\":\"project.lock.json\",\"size\":307,\"sha256\":\"5ef5b0b274eef384e4eac3483c38921fac50fd4fa48b63b58757c6550936b500\"},{\"path\":\"rights-ledger.json\",\"size\":2876,\"sha256\":\"e685480e37d0a612f6e8e6da4671a6425e111db069e606cc403f51c41b6d3975\"},{\"path\":\"validation/validation_run_20261018034305_37e33d1a.json\",\"size\":477,\"sha256\":\"cf24af9d33fbf7ebfd6c5165dd223382c9fa19aaaa312dfa83a096c28905a90d\"},{\"path\":\"validation/validation_run_20261018034311_065f0316.json\",\"size\":477,\"sha256\":\"f613d51a1e676b9d63be1cc5779ab3e5e3ddff1da556a1a5ded57a0062d71e72\"}],\"excluded\":[\"renders/\",\"cache/\",\"operations/\",\"history/\"],\"network\":\"disabled\",\"upstream_runtime\":\"none\"}},\"artifacts\":[],\"warnings\":[{\"capability\":\"package-excluded-runtime\",\"status\":\"Approximate\",\"source\":\"project runtime\",\"target\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-pathguard-real-20261018\\\\edited-project.zip\",\"detail\":\"renders/cache/operations/history 未打包\"}],\"errors\":[],\"provenance\":{\"cli_version\":\"0.1.0\",\"schema_version\":\"0.1.0\",\"engine_version\":\"ffmpeg-local\",\"started_at\":\"2026-10-18T03:43:14.216002Z\",\"finished_at\":\"2026-10-18T03:43:14.216010Z\",\"network\":\"disabled\"}}\r\n",
+  "stderr": ""
+}

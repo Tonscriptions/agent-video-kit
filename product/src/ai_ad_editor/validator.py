@@ -60,28 +60,22 @@ LUT_EXTENSIONS = {".cube", ".3dl", ".csp", ".dat"}
 
 
 def _schema_path() -> Path:
-    return Path(__file__).resolve().parents[3] / "docs" / "specs" / "agent-project.schema.json"
+    from .schema_contract import schema_path
+    return schema_path()
 
 
 def _schema_report(project: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], str]:
-    """Run the published JSON Schema when the optional local validator is installed."""
+    """Execute the pinned package contract; executor/resource failures are errors."""
+    from .schema_contract import make_validator
     try:
-        import jsonschema
-    except ImportError:
-        return [], [{"code": "SCHEMA_EXECUTOR_UNAVAILABLE", "message": "未安装 jsonschema，已使用内置语义校验", "path": "schema"}], "builtin"
-    path = _schema_path()
-    if not path.exists():
-        return [], [{"code": "SCHEMA_FILE_MISSING", "message": f"机器 schema 不存在: {path}", "path": str(path)}], "builtin"
-    try:
-        schema = json.loads(path.read_text(encoding="utf-8"))
-        validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
+        validator = make_validator()
         failures: list[dict[str, Any]] = []
-        for item in sorted(validator.iter_errors(project), key=lambda error: list(error.absolute_path)):
+        for item in sorted(validator.iter_errors(project), key=lambda error: tuple(str(x) for x in error.absolute_path)):
             parts = [str(value) for value in item.absolute_path]
             failures.append({"code": "SCHEMA_VALIDATION_FAILED", "message": item.message, "path": ".".join(parts) or "$", "retryable": False})
         return failures, [], "jsonschema"
-    except (OSError, ValueError, jsonschema.SchemaError) as exc:
-        return [{"code": "SCHEMA_EXECUTION_FAILED", "message": "机器 schema 执行失败", "path": str(path), "retryable": False, "cause": str(exc)}], [], "builtin"
+    except AppError as exc:
+        return [exc.as_dict()], [], "unavailable"
 
 
 def _int(value: Any, default: int = 0) -> int:

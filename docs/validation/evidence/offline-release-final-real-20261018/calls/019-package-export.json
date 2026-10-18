@@ -1,0 +1,28 @@
+{
+  "label": "package-export",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-I",
+    "-S",
+    "-B",
+    "-X",
+    "utf8",
+    "-c",
+    "import sys,os,pathlib,importlib.abc,importlib,runpy\nroot=pathlib.Path(sys.argv[1]).resolve();site=root/'site'\nsys.path[:]=[str(site),*[p for p in sys.path if not {'site-packages','dist-packages'} & set(pathlib.Path(p).parts)]]\nclass Block(importlib.abc.MetaPathFinder):\n def find_spec(self,fullname,path=None,target=None):\n  if fullname.split('.')[0] in {'numpy','PIL','torch','requests','httpx'}:raise ModuleNotFoundError('offline optional-library guard: '+fullname)\nsys.meta_path.insert(0,Block())\ndef guard(event,args):\n if event in {'socket.connect','socket.getaddrinfo','http.client.connect','urllib.Request'}:raise RuntimeError('offline network guard: '+event)\nsys.addaudithook(guard)\nfor module in ('ai_ad_editor','jsonschema','attrs','jsonschema_specifications','referencing','rpds'):\n m=importlib.import_module(module);assert pathlib.Path(m.__file__).resolve().is_relative_to(site),module\nos.environ['AI_AD_EDITOR_RUNTIME_DIR']=str(root/'runtime')\nfrom ai_ad_editor.cli import main\nraise SystemExit(main(sys.argv[2:]))\n",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-final-real-20261018\\independent-install",
+    "convert",
+    "export",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-final-real-20261018\\edited-project",
+    "--target-format",
+    "package",
+    "--output",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-final-real-20261018\\edited-project.zip"
+  ],
+  "cwd": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-final-real-20261018",
+  "exit_code": 0,
+  "expected_exit_code": 0,
+  "seconds": 1.2595588999975007,
+  "stdout": "{\"ok\":true,\"command\":\"convert.export\",\"request_id\":\"req_20261018035441_27fb7f31\",\"operation_id\":null,\"status\":\"succeeded\",\"data\":{\"output\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-final-real-20261018\\\\edited-project.zip\",\"report\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-final-real-20261018\\\\edited-project.zip.conversion-report.json\",\"report_data\":{\"report_version\":\"0.1.0\",\"direction\":\"export\",\"source_format\":\"agent-project/0.1.0\",\"target_format\":\"agent-project-package/0.1.0\",\"created_at\":\"2026-10-18T03:54:41.832560Z\",\"items\":[{\"capability\":\"project-package\",\"status\":\"Exact\",\"source\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-final-real-20261018\\\\edited-project\",\"target\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-final-real-20261018\\\\edited-project.zip\",\"detail\":\"项目、登记权利和本地素材已写入自包含 ZIP\"}],\"warnings\":[{\"capability\":\"package-excluded-runtime\",\"status\":\"Approximate\",\"source\":\"project runtime\",\"target\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-final-real-20261018\\\\edited-project.zip\",\"detail\":\"renders/cache/operations/history 未打包\"}],\"failures\":[]},\"manifest\":{\"package_format\":\"agent-project-package\",\"package_version\":\"0.1.0\",\"created_at\":\"2026-10-18T03:54:41.832516Z\",\"project_id\":\"proj_20261018035429_a833c404\",\"project_schema_version\":\"0.1.0\",\"files\":[{\"path\":\"assets/audio_audio_sound-a.wav\",\"size\":1536044,\"sha256\":\"ea615612bd6622757300471232caee77ca00788e3284b96013424bce872d7fb1\"},{\"path\":\"assets/video_video_source-a.mp4\",\"size\":197887,\"sha256\":\"6d36606b4b7520184fd8170db52e55c9d0c4e9571255ca5cc3577f9ae62def95\"},{\"path\":\"project.json\",\"size\":14847,\"sha256\":\"d9ea3b9b39dd0990ae8e8233ca5e6c49502296e06ad22964923b08fa5905d41e\"},{\"path\":\"project.lock.json\",\"size\":307,\"sha256\":\"50dd07fc2b1ee47c9643acb3b8aa6803891dcac07a25813ba4ab599e916f0540\"},{\"path\":\"rights-ledger.json\",\"size\":2860,\"sha256\":\"641fe31ef711c2a536e9270cfce057073613e24ac06606bc10c3adabfae85ef5\"},{\"path\":\"validation/validation_run_20261018035433_105e71c9.json\",\"size\":477,\"sha256\":\"d4ccb75085a5de43e29bfe4d5c8c9c06a52ac4863cfe0fd89d08ec5d14c9be0e\"},{\"path\":\"validation/validation_run_20261018035438_919d43a6.json\",\"size\":477,\"sha256\":\"1da7b0a279a0adbed9626fe3801c416be968953397af9d0567a9bfbbcba382ab\"}],\"excluded\":[\"renders/\",\"cache/\",\"operations/\",\"history/\"],\"network\":\"disabled\",\"upstream_runtime\":\"none\"}},\"artifacts\":[],\"warnings\":[{\"capability\":\"package-excluded-runtime\",\"status\":\"Approximate\",\"source\":\"project runtime\",\"target\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-final-real-20261018\\\\edited-project.zip\",\"detail\":\"renders/cache/operations/history 未打包\"}],\"errors\":[],\"provenance\":{\"cli_version\":\"0.1.0\",\"schema_version\":\"0.1.0\",\"engine_version\":\"ffmpeg-local\",\"started_at\":\"2026-10-18T03:54:41.893734Z\",\"finished_at\":\"2026-10-18T03:54:41.893740Z\",\"network\":\"disabled\"}}\r\n",
+  "stderr": ""
+}

@@ -5,6 +5,15 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+For installing outside the source checkout, use the new-target, hash-bound
+wheel-only installer described by the
+[offline release contract](../../docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md).
+Keep existing installations intact; cancellation/failure cleans only owned
+staging. The generated launcher isolates host/user dependency sites, and
+`schema export` writes a new file. Consult the
+[real installation and project-package round trip](../../docs/validation/离线发行与随包Schema实测_2026-10-18.md)
+for current platform and external-tool limits.
+
 The [source edit actions](../../docs/specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md)
 share timeline snapshots, canonical plan hashes, idempotency and batch rollback.
 Reusing a key must not slip the source twice. A failure in any linked member

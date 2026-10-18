@@ -221,3 +221,35 @@ docs/validation/evidence/docs-audit-html-quality*.json -text
 docs/assets/html-quality-20261018/** whitespace=cr-at-eol
 docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md text eol=lf
 docs/validation/HTML文字布局与字体覆盖实测_2026-10-18.md text eol=lf
+
+# V47 preserves the exact contract, dependency wheels and raw execution records.
+product/src/ai_ad_editor/agent-project.schema.json -text
+product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt -text -whitespace
+sources/python-runtime/** -text -whitespace
+product/offline/*.py text eol=lf
+scripts/*offline_release*.py -text
+scripts/acquire_python_runtime_wheels.py -text
+scripts/verify_schema_baseline.py -text
+scripts/review_openfilm_release_reuse.py -text
+scripts/run_frozen_regression.py -text
+scripts/smoke_fragments.py -text
+docs/validation/evidence/offline-*/** -text -whitespace
+docs/validation/evidence/offline-*.json -text
+docs/assets/offline-release*/install-receipt.json whitespace=cr-at-eol
+docs/validation/evidence/schema-release-*.json -text
+docs/validation/evidence/openfilm-release-review-*/** -text -whitespace
+docs/validation/evidence/docs-audit-offline-*.json -text
+docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/离线发行与随包Schema实测_2026-10-18.md text eol=lf
+docs/third-party/离线Python依赖与日期检查器许可说明_2026-10-18.md text eol=lf
+docs/OpenFilm当前复用决策_2026-10-18.md text eol=lf
+skills/video-cut-project-ops/SKILL.md text eol=lf
+scripts/map_openfilm_skills.py -text
+scripts/verify_offline_native_entries.py -text
+scripts/verify_staged_release.py -text
+docs/validation/evidence/openfilm-skill-local-mapping-20261018.json -text
+docs/OpenFilm官方Skill本地能力映射_2026-10-18.md text eol=lf
+scripts/review_openfilm_examples.py -text
+scripts/review_openfilm_example_engine.py -text
+docs/validation/evidence/openfilm-examples-review-*/** -text -whitespace
+docs/OpenFilm示例与动效内核复用评估_2026-10-18.md text eol=lf

@@ -1,0 +1,78 @@
+{
+  "status": "passed",
+  "extra_native_process_calls": 3,
+  "cases": [
+    {
+      "name": "unc-bundle",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\bundle\\install.py",
+        "--bundle",
+        "//avk-invalid.local/share/bundle",
+        "--target",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\no-unc-install",
+        "--manifest-sha256",
+        "sha256:c49dfe5e3beb03b0d8c801a2e6f5a0bdf2d6ab7b4822fd2f6f41234136790bd8"
+      ],
+      "exit_code": 2,
+      "stdout": {
+        "ok": false,
+        "code": "NETWORK_PATH_FORBIDDEN",
+        "message": "Only local filesystem paths; no UNC, device paths or URI"
+      },
+      "stderr": ""
+    },
+    {
+      "name": "unc-target",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\bundle\\install.py",
+        "--target",
+        "//avk-invalid.local/share/install",
+        "--manifest-sha256",
+        "sha256:c49dfe5e3beb03b0d8c801a2e6f5a0bdf2d6ab7b4822fd2f6f41234136790bd8"
+      ],
+      "exit_code": 2,
+      "stdout": {
+        "ok": false,
+        "code": "NETWORK_PATH_FORBIDDEN",
+        "message": "Only local filesystem paths; no UNC, device paths or URI"
+      },
+      "stderr": ""
+    },
+    {
+      "name": "uri-cancel",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\bundle\\install.py",
+        "--target",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\no-uri-cancel-install",
+        "--cancel-file",
+        "https://avk-invalid.local/cancel",
+        "--manifest-sha256",
+        "sha256:c49dfe5e3beb03b0d8c801a2e6f5a0bdf2d6ab7b4822fd2f6f41234136790bd8"
+      ],
+      "exit_code": 2,
+      "stdout": {
+        "ok": false,
+        "code": "NETWORK_PATH_FORBIDDEN",
+        "message": "Only local filesystem paths; no UNC, device paths or URI"
+      },
+      "stderr": ""
+    }
+  ],
+  "no_install_targets_created": true,
+  "mapped_drive_case": "unit test injects native drive-type result; no network drive mounted"
+}

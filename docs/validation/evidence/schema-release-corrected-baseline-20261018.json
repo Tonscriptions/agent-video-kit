@@ -1,0 +1,193 @@
+{
+  "status": "verified",
+  "fixed_commit": "29ee538912043993fe75aa5c59bcebfc9df2769c",
+  "field": "project.created_at",
+  "input": {
+    "schema_version": "0.1.0",
+    "project": {
+      "id": "proj_20261018031145_cc213667",
+      "name": "project",
+      "created_at": "this-is-not-a-date",
+      "updated_at": "2026-10-18T03:11:45.330816Z",
+      "creator": "ai-ad-editor",
+      "source_revision": "local"
+    },
+    "settings": {
+      "timebase": {
+        "ticks_per_second": 90000,
+        "display_fps": {
+          "num": 30,
+          "den": 1
+        }
+      },
+      "canvas": {
+        "width": 1080,
+        "height": 1920,
+        "pixel_aspect": {
+          "num": 1,
+          "den": 1
+        }
+      },
+      "color": {
+        "primaries": "bt709",
+        "transfer": "bt709",
+        "matrix": "bt709",
+        "range": "limited"
+      },
+      "audio": {
+        "sample_rate": 48000,
+        "channels": 2
+      },
+      "output": {
+        "container": "mp4",
+        "video": {
+          "codec": "libx264",
+          "preset": "medium",
+          "crf": 18,
+          "pixel_format": "yuv420p"
+        },
+        "audio": {
+          "codec": "aac",
+          "bitrate": "192k"
+        }
+      }
+    },
+    "assets": [],
+    "sequences": [
+      {
+        "id": "seq_main",
+        "name": "Main",
+        "duration_tick": 1,
+        "tracks": [
+          {
+            "id": "track_video_1",
+            "kind": "video",
+            "order": 0,
+            "muted": false,
+            "locked": false,
+            "clips": []
+          },
+          {
+            "id": "track_audio_1",
+            "kind": "audio",
+            "order": 0,
+            "muted": false,
+            "locked": false,
+            "clips": []
+          }
+        ],
+        "markers": []
+      }
+    ],
+    "templates": [],
+    "outputs": [],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "model_versions": [],
+      "input_hashes": [],
+      "change_log": []
+    }
+  },
+  "input_sha256": "sha256:0a9a9deb74c8e4fd56aafe676767922835cc543839ca4a31412094d73a17689d",
+  "old_source": {
+    "exit_code": 0,
+    "stdout": {
+      "ok": true,
+      "command": "validate",
+      "request_id": "req_20261018031147_92882e50",
+      "operation_id": null,
+      "status": "succeeded",
+      "data": {
+        "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\schema-fixed-v46-20261018\\project\\validation\\validation_run_20261018031146_43781ad4.json",
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "rights": {
+          "ok": true,
+          "target": "commercial_ad",
+          "checked": 0,
+          "required_records": 0,
+          "failures": [],
+          "warnings": [],
+          "disposition_decisions": [],
+          "effective_disposition_decisions": []
+        },
+        "schema_engine": "jsonschema",
+        "asset_count": 0,
+        "sequence_count": 1
+      },
+      "artifacts": [],
+      "warnings": [],
+      "errors": [],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-18T03:11:47.066546Z",
+        "finished_at": "2026-10-18T03:11:47.066562Z",
+        "network": "disabled"
+      }
+    },
+    "stderr": ""
+  },
+  "current_source": {
+    "exit_code": 2,
+    "stdout": {
+      "ok": false,
+      "command": "validate",
+      "request_id": "req_20261018031148_d28fe6de",
+      "operation_id": null,
+      "status": "failed",
+      "data": {
+        "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\schema-fixed-v46-20261018\\project\\validation\\validation_run_20261018031147_b2c01ad6.json",
+        "ok": false,
+        "errors": [
+          {
+            "code": "SCHEMA_VALIDATION_FAILED",
+            "message": "'this-is-not-a-date' is not a 'date-time'",
+            "path": "project.created_at",
+            "retryable": false
+          }
+        ],
+        "warnings": [],
+        "rights": {
+          "ok": true,
+          "target": "commercial_ad",
+          "checked": 0,
+          "required_records": 0,
+          "failures": [],
+          "warnings": [],
+          "disposition_decisions": [],
+          "effective_disposition_decisions": []
+        },
+        "schema_engine": "jsonschema",
+        "asset_count": 0,
+        "sequence_count": 1
+      },
+      "artifacts": [],
+      "warnings": [],
+      "errors": [
+        {
+          "code": "SCHEMA_VALIDATION_FAILED",
+          "message": "'this-is-not-a-date' is not a 'date-time'",
+          "path": "project.created_at",
+          "retryable": false
+        }
+      ],
+      "provenance": {
+        "cli_version": "0.1.0",
+        "schema_version": "0.1.0",
+        "engine_version": "ffmpeg-local",
+        "started_at": "2026-10-18T03:11:48.988513Z",
+        "finished_at": "2026-10-18T03:11:48.988530Z",
+        "network": "disabled"
+      }
+    },
+    "stderr": ""
+  },
+  "project_unchanged": true,
+  "earlier_baseline_correction": "schema-release-baseline-20261018.json used an extra top-level created_at; that call did not prove format coverage. The detached wheel degradation observations are independent. This record uses the declared field.",
+  "network": false,
+  "virtualization": false
+}

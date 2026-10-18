@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from . import ENGINE_ID, SCHEMA_VERSION, VERSION
+from . import schema_contract
 from .clip_windows import apply_operation as apply_window_operation, OPERATIONS as WINDOW_OPERATIONS
 from .ad_plan import build_ad_plan
 from .captions import parse_caption_file, validate_cues, write_srt_file
@@ -1031,6 +1032,11 @@ def build_parser() -> argparse.ArgumentParser:
     lut_inspect.add_argument("--project", required=True)
     lut_inspect.add_argument("--lut-id", required=True)
 
+    schema = subs.add_parser('schema',help='查看/原字节导出随包固定的 Agent Project 合同')
+    schema_sub = schema.add_subparsers(dest='action',required=True)
+    _leaf_common(schema_sub.add_parser('show',help='读取随包合同及实际摘要'))
+    schema_export = _leaf_common(schema_sub.add_parser('export',help='向新本地文件导出原字节合同'))
+    schema_export.add_argument('--output',required=True)
     doctor = _leaf_common(subs.add_parser("doctor", help="检查本机依赖"))
     doctor.add_argument("--project", default=None)
     operation = _leaf_common(subs.add_parser("operation", help="查看操作状态"))
@@ -6419,11 +6425,23 @@ def command_doctor(args: argparse.Namespace) -> dict[str, Any]:
         "ffmpeg_whisper_asr": ffmpeg_whisper_available() if checks["tools"].get("ffmpeg") else False,
     }
     checks["policy"] = {"docker_or_wsl_started": False, "closed_services_enabled": False, "jianying_runtime_enabled": False}
+    checks['schema_validation'] = schema_contract.probe()
     if args.project:
         policy_report = audit_local_tree(Path(args.project))
         checks["project_policy"] = policy_report
-    ok = bool(checks["native_windows"] and checks["tools"].get("ffmpeg") and checks["tools"].get("ffprobe"))
-    return _envelope("doctor", args, data={"ok": ok, "checks": checks}, status="succeeded" if ok else "failed", errors=[] if ok else [{"code": "DEPENDENCY_UNAVAILABLE", "message": "FFmpeg/FFprobe 不完整", "retryable": False}])
+    ok = bool(checks["native_windows"] and checks["tools"].get("ffmpeg") and checks["tools"].get("ffprobe") and checks['schema_validation']['ok'])
+    return _envelope("doctor", args, data={"ok": ok, "checks": checks}, status="succeeded" if ok else "failed", errors=[] if ok else [{"code": "DEPENDENCY_UNAVAILABLE", "message": "FFmpeg/FFprobe 或随包 Schema 执行器不完整", "retryable": False}])
+
+
+def command_schema_show(args: argparse.Namespace) -> dict[str, Any]:
+    _,schema,_=schema_contract.read_contract()
+    return _envelope('schema.show',args,status='planned' if args.dry_run else 'succeeded',data={'contract':schema_contract.descriptor(),'schema':schema})
+
+
+def command_schema_export(args: argparse.Namespace) -> dict[str, Any]:
+    output=resolve_local_path(Path.cwd(),args.output,field='output')
+    result=schema_contract.export_contract(output,dry_run=args.dry_run)
+    return _envelope('schema.export',args,status='planned' if args.dry_run else 'succeeded',data={'output':str(output),'contract':result})
 
 
 def command_operation_inspect(args: argparse.Namespace) -> dict[str, Any]:
@@ -6435,7 +6453,7 @@ def command_operation_inspect(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def command_version(args: argparse.Namespace) -> dict[str, Any]:
-    return _envelope("version", args, data={"cli_version": VERSION, "schema_version": SCHEMA_VERSION, "engine": ENGINE_ID, "runtime": "python+ffmpeg-local", "network": "disabled"})
+    return _envelope("version", args, data={"cli_version": VERSION, "schema_version": SCHEMA_VERSION, "engine": ENGINE_ID, "runtime": "python+ffmpeg-local", "network": "disabled",'schema_validation':schema_contract.probe()})
 
 
 def command_capabilities(args: argparse.Namespace) -> dict[str, Any]:
@@ -6498,6 +6516,8 @@ def _project_operation_lock(args: argparse.Namespace):
 
 
 COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, Any]]] = {
+    ('schema','show'): command_schema_show,
+    ('schema','export'): command_schema_export,
     ("project", "init"): command_project_init,
     ("project", "inspect"): command_project_inspect,
     ("project", "snapshot"): command_project_snapshot,

@@ -1,0 +1,27 @@
+{
+  "label": "slip-preview",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-I",
+    "-S",
+    "-B",
+    "-X",
+    "utf8",
+    "-c",
+    "import sys,os,pathlib,importlib.abc,importlib,runpy\nroot=pathlib.Path(sys.argv[1]).resolve();site=root/'site'\nsys.path[:]=[str(site),*[p for p in sys.path if not {'site-packages','dist-packages'} & set(pathlib.Path(p).parts)]]\nclass Block(importlib.abc.MetaPathFinder):\n def find_spec(self,fullname,path=None,target=None):\n  if fullname.split('.')[0] in {'numpy','PIL','torch','requests','httpx'}:raise ModuleNotFoundError('offline optional-library guard: '+fullname)\nsys.meta_path.insert(0,Block())\ndef guard(event,args):\n if event in {'socket.connect','socket.getaddrinfo','http.client.connect','urllib.Request'}:raise RuntimeError('offline network guard: '+event)\nsys.addaudithook(guard)\nfor module in ('ai_ad_editor','jsonschema','attrs','jsonschema_specifications','referencing','rpds'):\n m=importlib.import_module(module);assert pathlib.Path(m.__file__).resolve().is_relative_to(site),module\nos.environ['AI_AD_EDITOR_RUNTIME_DIR']=str(root/'runtime')\nfrom ai_ad_editor.cli import main\nraise SystemExit(main(sys.argv[2:]))\n",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\independent-install",
+    "timeline",
+    "edit",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\edited-project",
+    "--input",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018\\slip.json",
+    "--dry-run"
+  ],
+  "cwd": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-pathguard-real-20261018",
+  "exit_code": 0,
+  "expected_exit_code": 0,
+  "seconds": 1.187704500000109,
+  "stdout": "{\"ok\":true,\"command\":\"timeline.edit\",\"request_id\":\"req_20261018034308_cf71c042\",\"operation_id\":null,\"status\":\"planned\",\"data\":{\"sequence_id\":\"seq_main\",\"plan\":{\"engine\":\"agent-range-edit-v1\",\"base_project_sha256\":\"sha256:045cdba7ddf179aa25874ef871ce418e9d235119a4660ea186971c147ca25faf\",\"sequence_id\":\"seq_main\",\"request\":{\"action\":\"slip\",\"options\":{\"main_track_id\":\"track_video_1\",\"sync\":false,\"linkage\":false,\"linked\":true},\"clip_id\":\"v\",\"delta_source_tick\":90000},\"main_track_id\":\"track_video_1\",\"selected_clip_ids\":[\"a\",\"v\"],\"incoming_clip_ids\":[],\"changes\":[{\"clip_id\":\"a\",\"before\":{\"track_id\":\"track_audio_1\",\"clip\":{\"id\":\"a\",\"asset_id\":\"audio\",\"link_id\":\"av\",\"timeline_start_tick\":0,\"duration_tick\":270000,\"source_in_tick\":90000,\"source_out_tick\":360000}},\"after\":{\"track_id\":\"track_audio_1\",\"clip\":{\"id\":\"a\",\"asset_id\":\"audio\",\"link_id\":\"av\",\"timeline_start_tick\":0,\"duration_tick\":270000,\"source_in_tick\":180000,\"source_out_tick\":450000}}},{\"clip_id\":\"v\",\"before\":{\"track_id\":\"track_video_1\",\"clip\":{\"id\":\"v\",\"asset_id\":\"video\",\"link_id\":\"av\",\"timeline_start_tick\":0,\"duration_tick\":270000,\"source_in_tick\":90000,\"source_out_tick\":360000}},\"after\":{\"track_id\":\"track_video_1\",\"clip\":{\"id\":\"v\",\"asset_id\":\"video\",\"link_id\":\"av\",\"timeline_start_tick\":0,\"duration_tick\":270000,\"source_in_tick\":180000,\"source_out_tick\":450000}}}],\"short_tick\":0,\"new_track_ids\":[],\"new_tracks\":[],\"rebound_clip_ids\":[],\"retimed_subtitle_ids\":[],\"removed_transition_ids\":[],\"cut_pairs\":[],\"source_changes\":[{\"clip_id\":\"a\",\"source_delta_tick\":90000,\"source_id\":\"audio\",\"source_kind\":\"audio\",\"source_bound_tick\":\"720000\",\"before_source\":[90000,360000],\"after_source\":[180000,450000],\"timeline_duration_automation_and_window_unchanged\":true},{\"clip_id\":\"v\",\"source_delta_tick\":90000,\"source_id\":\"video\",\"source_kind\":\"video\",\"source_bound_tick\":\"720000\",\"before_source\":[90000,360000],\"after_source\":[180000,450000],\"timeline_duration_automation_and_window_unchanged\":true}],\"warnings\":[],\"before_duration_tick\":270000,\"after_duration_tick\":270000,\"limits\":[\"markers-remain-absolute\",\"roll-and-slide-default-to-retained-authored-handles\",\"source-handles-require-finite-recorded-local-input-bounds\",\"source-extension-reauthors-edge-processing-and-native-retiming\",\"partial-tracking-and-real-transition-endpoint-cuts-reject\",\"clip-processing-before-cut-track-and-root-processing-after-edit\",\"existing-native-window-render-budgets-still-apply\"]},\"validation\":{\"ok\":true,\"errors\":[],\"warnings\":[],\"rights\":{\"ok\":true,\"target\":\"commercial_ad\",\"checked\":2,\"required_records\":2,\"failures\":[],\"warnings\":[],\"disposition_decisions\":[],\"effective_disposition_decisions\":[]},\"schema_engine\":\"jsonschema\",\"asset_count\":2,\"sequence_count\":1}},\"artifacts\":[],\"warnings\":[],\"errors\":[],\"provenance\":{\"cli_version\":\"0.1.0\",\"schema_version\":\"0.1.0\",\"engine_version\":\"ffmpeg-local\",\"started_at\":\"2026-10-18T03:43:08.619200Z\",\"finished_at\":\"2026-10-18T03:43:08.619205Z\",\"network\":\"disabled\"}}\r\n",
+  "stderr": ""
+}

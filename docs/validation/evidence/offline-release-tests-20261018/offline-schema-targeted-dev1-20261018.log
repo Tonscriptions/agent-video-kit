@@ -1,0 +1,96 @@
+test_calendar_and_offset_valid_dates (test_schema_contract.BundledSchemaTests.test_calendar_and_offset_valid_dates) ... ok
+test_changed_resource_is_rejected_by_real_bytes (test_schema_contract.BundledSchemaTests.test_changed_resource_is_rejected_by_real_bytes) ... ok
+test_contract_packaged_and_documented_bytes_match (test_schema_contract.BundledSchemaTests.test_contract_packaged_and_documented_bytes_match) ... ok
+test_doctor_rejects_missing_executor_version_remains_diagnosable (test_schema_contract.BundledSchemaTests.test_doctor_rejects_missing_executor_version_remains_diagnosable) ... FAIL
+test_export_dry_run_does_not_create_parent (test_schema_contract.BundledSchemaTests.test_export_dry_run_does_not_create_parent) ... ok
+test_export_exact_bytes_and_existing_target_preserved (test_schema_contract.BundledSchemaTests.test_export_exact_bytes_and_existing_target_preserved) ... ok
+test_export_remote_target_rejected (test_schema_contract.BundledSchemaTests.test_export_remote_target_rejected) ... ok
+test_external_refs_cannot_retrieve_network_or_external_files (test_schema_contract.BundledSchemaTests.test_external_refs_cannot_retrieve_network_or_external_files) ... ok
+test_format_failure_cases_in_actual_validator (test_schema_contract.BundledSchemaTests.test_format_failure_cases_in_actual_validator) ... FAIL
+test_invalid_meta_schema_has_structured_error (test_schema_contract.BundledSchemaTests.test_invalid_meta_schema_has_structured_error) ... ERROR
+test_missing_executor_is_error_and_preserves_semantic_diagnostics (test_schema_contract.BundledSchemaTests.test_missing_executor_is_error_and_preserves_semantic_diagnostics) ... FAIL
+test_missing_resource_never_searches_source_repo (test_schema_contract.BundledSchemaTests.test_missing_resource_never_searches_source_repo) ... ok
+test_nonstring_date_is_rejected_by_schema_type (test_schema_contract.BundledSchemaTests.test_nonstring_date_is_rejected_by_schema_type) ... FAIL
+test_real_cli_rejects_previously_accepted_invalid_date (test_schema_contract.BundledSchemaTests.test_real_cli_rejects_previously_accepted_invalid_date) ... FAIL
+test_show_and_validate_are_independent_of_cwd (test_schema_contract.BundledSchemaTests.test_show_and_validate_are_independent_of_cwd) ... ok
+test_unsupported_format_rejected_instead_of_silently_ignored (test_schema_contract.BundledSchemaTests.test_unsupported_format_rejected_instead_of_silently_ignored) ... ERROR
+
+======================================================================
+ERROR: test_invalid_meta_schema_has_structured_error (test_schema_contract.BundledSchemaTests.test_invalid_meta_schema_has_structured_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_schema_contract.py", line 98, in test_invalid_meta_schema_has_structured_error
+    with self.changed(lambda schema:schema['properties']['created_at'].update(type='never-a-type')):
+         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_schema_contract.py", line 32, in changed
+    data,schema,_=contract.read_contract();edit(schema)
+                                           ~~~~^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_schema_contract.py", line 98, in <lambda>
+    with self.changed(lambda schema:schema['properties']['created_at'].update(type='never-a-type')):
+                                    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+KeyError: 'created_at'
+
+======================================================================
+ERROR: test_unsupported_format_rejected_instead_of_silently_ignored (test_schema_contract.BundledSchemaTests.test_unsupported_format_rejected_instead_of_silently_ignored)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_schema_contract.py", line 94, in test_unsupported_format_rejected_instead_of_silently_ignored
+    with self.changed(lambda schema:schema['properties']['created_at'].update(format='email')):
+         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_schema_contract.py", line 32, in changed
+    data,schema,_=contract.read_contract();edit(schema)
+                                           ~~~~^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_schema_contract.py", line 94, in <lambda>
+    with self.changed(lambda schema:schema['properties']['created_at'].update(format='email')):
+                                    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+KeyError: 'created_at'
+
+======================================================================
+FAIL: test_doctor_rejects_missing_executor_version_remains_diagnosable (test_schema_contract.BundledSchemaTests.test_doctor_rejects_missing_executor_version_remains_diagnosable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_schema_contract.py", line 127, in test_doctor_rejects_missing_executor_version_remains_diagnosable
+    code,result=cli('doctor');self.assertEqual(code,10,result)
+                              ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 2 != 10 : {'ok': False, 'command': 'doctor', 'request_id': 'req_20261018030913_ed4b8737', 'operation_id': None, 'status': 'failed', 'data': {'ok': False, 'checks': {'platform': 'Windows-11-10.0.26200-SP0', 'python': '3.13.1', 'native_windows': True, 'network_default': 'disabled', 'virtualization_commands': {'docker': 'C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.EXE', 'wsl': 'C:\\Windows\\System32\\wsl.EXE'}, 'runtime_storage': {'root': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime', 'temp': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\temp', 'models': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models', 'huggingface': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\huggingface', 'torch': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\torch', 'cache': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\cache', 'pip': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\cache\\pip'}, 'tools': {'ffmpeg': 'C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE', 'ffprobe': 'C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE', 'cargo': None, 'node': 'D:\\Program Files\\nodejs\\node.EXE'}, 'ffmpeg_version': 'ffmpeg version 8.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers', 'local_features': {'flite_tts': True, 'ffmpeg_whisper_asr': True}, 'policy': {'docker_or_wsl_started': False, 'closed_services_enabled': False, 'jianying_runtime_enabled': False}, 'schema_validation': {'ok': False, 'executor': 'unavailable', 'error': {'code': 'SCHEMA_EXECUTOR_UNAVAILABLE', 'message': '缺少声明的本地 jsonschema/referencing 依赖；请离线重装，校验不会降级为成功', 'path': 'schema', 'retryable': False, 'cause': 'import of jsonschema halted; None in sys.modules'}}}}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'DEPENDENCY_UNAVAILABLE', 'message': 'FFmpeg/FFprobe 或随包 Schema 执行器不完整', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T03:09:13.331083Z', 'finished_at': '2026-10-18T03:09:13.331092Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_format_failure_cases_in_actual_validator (test_schema_contract.BundledSchemaTests.test_format_failure_cases_in_actual_validator)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_schema_contract.py", line 59, in test_format_failure_cases_in_actual_validator
+    self.assertTrue(list(validator.iter_errors(dict(self.project,created_at=value))),value)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [] is not true : 2025-02-29T12:00:00Z
+
+======================================================================
+FAIL: test_missing_executor_is_error_and_preserves_semantic_diagnostics (test_schema_contract.BundledSchemaTests.test_missing_executor_is_error_and_preserves_semantic_diagnostics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_schema_contract.py", line 72, in test_missing_executor_is_error_and_preserves_semantic_diagnostics
+    self.assertGreater(len(report['errors']),1)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 not greater than 1
+
+======================================================================
+FAIL: test_nonstring_date_is_rejected_by_schema_type (test_schema_contract.BundledSchemaTests.test_nonstring_date_is_rejected_by_schema_type)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_schema_contract.py", line 64, in test_nonstring_date_is_rejected_by_schema_type
+    self.assertTrue(any(x.validator=='type' for x in errors))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_real_cli_rejects_previously_accepted_invalid_date (test_schema_contract.BundledSchemaTests.test_real_cli_rejects_previously_accepted_invalid_date)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_schema_contract.py", line 47, in test_real_cli_rejects_previously_accepted_invalid_date
+    self.assertEqual(code,2,report);self.assertEqual(path.read_bytes(),before)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : {'ok': True, 'command': 'validate', 'request_id': 'req_20261018030913_bde3e3ee', 'operation_id': None, 'status': 'succeeded', 'data': {'report': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\temp\\schema-contract-nduivea1\\project\\validation\\validation_run_20261018030913_88dc2e85.json', 'ok': True, 'errors': [], 'warnings': [], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 0, 'required_records': 0, 'failures': [], 'warnings': [], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 0, 'sequence_count': 1}, 'artifacts': [], 'warnings': [], 'errors': [], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T03:09:13.874231Z', 'finished_at': '2026-10-18T03:09:13.874238Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 16 tests in 1.345s
+
+FAILED (failures=5, errors=2)

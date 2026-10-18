@@ -5,6 +5,15 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+Use `doctor` and `schema show` to inspect the bundled validation contract,
+under the [offline schema contract](../../docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md).
+Missing executors/resources and changed schema bytes must fail; semantic
+checks alone do not establish Schema acceptance. Inspect the declared
+`project.created_at` field and preserve leap-second limits. See the
+[release validation evidence](../../docs/validation/离线发行与随包Schema实测_2026-10-18.md)
+for independent source frame/PCM checks, actual rollback cases and the
+separate static/playback/listening boundaries.
+
 For [HTML text layout and font coverage](../../docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md),
 review every CFR frame and the independent reverse redraw. Separate partial
 clipping, completely outside text and unsupported geometry. Check actual CDP

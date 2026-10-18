@@ -5,6 +5,15 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For a detached native installation, read the
+[offline release contract](../../docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md).
+Use the reviewed manifest hash and a new target with the bundled installer;
+the generated launcher uses the installed dependency site and local caches.
+`schema show/export` supplies the exact contract. Missing schema/executor or
+invalid `project.created_at` is an error. See the
+[actual install/edit/package checks](../../docs/validation/离线发行与随包Schema实测_2026-10-18.md)
+before treating the same-machine result as portability evidence.
+
 For all-frame HTML text checks, use `motion html-quality` under the
 [layout/font contract](../../docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md).
 Pass `html-render --layout-check strict` when those checks must gate encoding;

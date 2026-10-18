@@ -277,6 +277,7 @@ class MaskEditCliTests(unittest.TestCase):
         self.assertEqual(path.read_bytes(), b'preexisting user file')
 
     def test_native_host_cli_runs_without_numpy_pillow_or_torch(self):
+        import jsonschema
         program = '''import builtins,sys
 original=builtins.__import__
 def guarded(name,*args,**kwargs):
@@ -284,9 +285,11 @@ def guarded(name,*args,**kwargs):
     return original(name,*args,**kwargs)
 builtins.__import__=guarded
 sys.path.insert(0,sys.argv[1])
+sys.path.insert(1,sys.argv[2])
 from ai_ad_editor.cli import main
-raise SystemExit(main(sys.argv[2:]))'''
+raise SystemExit(main(sys.argv[3:]))'''
         command = [sys.executable, '-I', '-B', '-X', 'utf8', '-c', program, str(Path(__file__).resolve().parents[1]/'src'),
+            str(Path(jsonschema.__file__).resolve().parent.parent),
             'media', 'mask-edit', '--project', str(self.root), '--asset-id', 'mask', '--derived-asset-id', 'pure', '--edits', str(self.edits_path)]
         result = subprocess.run(command, capture_output=True, timeout=60)
         self.assertEqual(result.returncode, 0, result.stdout.decode('utf-8')+result.stderr.decode('utf-8'))

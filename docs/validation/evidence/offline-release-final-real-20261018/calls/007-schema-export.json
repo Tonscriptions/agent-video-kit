@@ -1,0 +1,24 @@
+{
+  "label": "schema-export",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-I",
+    "-S",
+    "-B",
+    "-X",
+    "utf8",
+    "-c",
+    "import sys,os,pathlib,importlib.abc,importlib,runpy\nroot=pathlib.Path(sys.argv[1]).resolve();site=root/'site'\nsys.path[:]=[str(site),*[p for p in sys.path if not {'site-packages','dist-packages'} & set(pathlib.Path(p).parts)]]\nclass Block(importlib.abc.MetaPathFinder):\n def find_spec(self,fullname,path=None,target=None):\n  if fullname.split('.')[0] in {'numpy','PIL','torch','requests','httpx'}:raise ModuleNotFoundError('offline optional-library guard: '+fullname)\nsys.meta_path.insert(0,Block())\ndef guard(event,args):\n if event in {'socket.connect','socket.getaddrinfo','http.client.connect','urllib.Request'}:raise RuntimeError('offline network guard: '+event)\nsys.addaudithook(guard)\nfor module in ('ai_ad_editor','jsonschema','attrs','jsonschema_specifications','referencing','rpds'):\n m=importlib.import_module(module);assert pathlib.Path(m.__file__).resolve().is_relative_to(site),module\nos.environ['AI_AD_EDITOR_RUNTIME_DIR']=str(root/'runtime')\nfrom ai_ad_editor.cli import main\nraise SystemExit(main(sys.argv[2:]))\n",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-final-real-20261018\\independent-install",
+    "schema",
+    "export",
+    "--output",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-final-real-20261018\\exported-contract.json"
+  ],
+  "cwd": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-release-final-real-20261018",
+  "exit_code": 0,
+  "expected_exit_code": 0,
+  "seconds": 1.0694419000064954,
+  "stdout": "{\"ok\":true,\"command\":\"schema.export\",\"request_id\":\"req_20261018035426_ca9a40af\",\"operation_id\":null,\"status\":\"succeeded\",\"data\":{\"output\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-final-real-20261018\\\\exported-contract.json\",\"contract\":{\"source\":\"bundled\",\"schema_version\":\"0.1.0\",\"draft\":\"2020-12\",\"path\":\"E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\offline-release-final-real-20261018\\\\independent-install\\\\site\\\\ai_ad_editor\\\\agent-project.schema.json\",\"bytes\":25382,\"sha256\":\"sha256:c7c96ca3dee426ef8e6ed63a23e5e41ef3533221e375a0c53ca0df833e22c505\",\"formats\":[\"date-time\"],\"external_reference_retrieval\":\"disabled\",\"date_time_checker\":\"rfc3339-validator-0.1.4-python3-adaptation\",\"leap_seconds_supported\":false}},\"artifacts\":[],\"warnings\":[],\"errors\":[],\"provenance\":{\"cli_version\":\"0.1.0\",\"schema_version\":\"0.1.0\",\"engine_version\":\"ffmpeg-local\",\"started_at\":\"2026-10-18T03:54:26.277369Z\",\"finished_at\":\"2026-10-18T03:54:26.277380Z\",\"network\":\"disabled\"}}\r\n",
+  "stderr": ""
+}

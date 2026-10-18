@@ -1,0 +1,192 @@
+{
+  "status": "static_mapping_verified",
+  "checked_at_utc": "2026-10-18T03:49:25.111309+00:00",
+  "source_commit": "eefd6a8d379289102141359a4718dbab12170526",
+  "archive_sha256": "sha256:7af40e33f59a43c4426fcb4332a964bf3f814b63b954d375d557c964160dcee2",
+  "current_cli_source_sha256": "sha256:517d4f8286162f0e8167509f58ca7ce671da3605f19e183162ecbc8b4080648c",
+  "dispatch_names_checked": 93,
+  "upstream_skills_checked": 10,
+  "rows": [
+    {
+      "id": "S01",
+      "skill": "replicate",
+      "source_path": "packages/openfilm/skills/replicate/SKILL.md",
+      "source_sha256": "sha256:ad1a37ac1e97ab5312ae872a1de717cd111c8652ed6c3ab0098cd42d0641cb8c",
+      "source_lines": 40,
+      "mapped_cli_dispatch_names": [
+        "media understand",
+        "timeline compose",
+        "motion apply",
+        "quality golden",
+        "rights check"
+      ],
+      "reusable_workflow": "参考片时刻/镜头/动作/声音对照和偏差报告",
+      "unaccepted_capabilities": "自动视觉语义拆解、完整风格复刻、自然广告质量；参考片不能自动成为可发布素材",
+      "new_skill_installed": false,
+      "workflow_executed_this_research": false
+    },
+    {
+      "id": "S02",
+      "skill": "screen-demo",
+      "source_path": "packages/openfilm/skills/screen-demo/SKILL.md",
+      "source_sha256": "sha256:f831c43483983e4d1e2159b50de38d7ed455750057f862a1fe35ff5cf667f957",
+      "source_lines": 36,
+      "mapped_cli_dispatch_names": [
+        "media smart-cut",
+        "media track",
+        "media reframe",
+        "motion apply",
+        "timeline compose"
+      ],
+      "reusable_workflow": "真实录屏裁剪、等待段计划、追焦/放大和速度披露",
+      "unaccepted_capabilities": "界面语义/点击自动定位、隐私逐帧审查、实时录屏入口；跟踪存在不等于理解操作",
+      "new_skill_installed": false,
+      "workflow_executed_this_research": false
+    },
+    {
+      "id": "S03",
+      "skill": "long-to-short",
+      "source_path": "packages/openfilm/skills/long-to-short/SKILL.md",
+      "source_sha256": "sha256:50ebceec0ffe6ef8a863626dfd2ab4196b970b88bcdb2c04f94f67f15abb98f2",
+      "source_lines": 36,
+      "mapped_cli_dispatch_names": [
+        "subtitle transcribe",
+        "subtitle segment",
+        "media highlights",
+        "media reframe",
+        "timeline edit"
+      ],
+      "reusable_workflow": "完整意思的选段卡、问答/限定条件保留、竖屏重构图和字幕流程",
+      "unaccepted_capabilities": "稳定逐词强制对齐、语义完整性、通用说话人/高光选择质量；候选分数不能直接视为好内容",
+      "new_skill_installed": false,
+      "workflow_executed_this_research": false
+    },
+    {
+      "id": "S04",
+      "skill": "keynote",
+      "source_path": "packages/openfilm/skills/keynote/SKILL.md",
+      "source_sha256": "sha256:dae86aa03767990af14e7345eee78fd145bda146aaadf7bd3cdbdf22a9d7a23f",
+      "source_lines": 35,
+      "mapped_cli_dispatch_names": [
+        "ad plan",
+        "ad apply",
+        "motion html-source",
+        "motion html-render",
+        "template apply"
+      ],
+      "reusable_workflow": "一项主张配真实产品证据、可编辑标题/数字、品牌素材编排",
+      "unaccepted_capabilities": "真实产品素材、事实校核、完整发布片美学和品牌一致性；不用远程页面抓取补缺",
+      "new_skill_installed": false,
+      "workflow_executed_this_research": false
+    },
+    {
+      "id": "S05",
+      "skill": "motion-graphics",
+      "source_path": "packages/openfilm/skills/motion-graphics/SKILL.md",
+      "source_sha256": "sha256:64ec633fc49c0e8f1e572d3dfae1b7d0854c4fb89e86706ce915bc818da406aa",
+      "source_lines": 34,
+      "mapped_cli_dispatch_names": [
+        "motion html-controls",
+        "motion html-render",
+        "motion html-quality",
+        "fragment apply"
+      ],
+      "reusable_workflow": "主题化图表/标题与参数替换、可重建动效和全帧质量报告",
+      "unaccepted_capabilities": "复杂字形/变换、Canvas语义、WebGL/完整媒体、品牌美学；不把门禁通过等同高级动效",
+      "new_skill_installed": false,
+      "workflow_executed_this_research": false
+    },
+    {
+      "id": "S06",
+      "skill": "presenter-pip",
+      "source_path": "packages/openfilm/skills/presenter-pip/SKILL.md",
+      "source_sha256": "sha256:12d336f59c8f885aafe3c9fc7097e96795d4ebe2d8b7b22b1f86d74bc638a9ef",
+      "source_lines": 34,
+      "mapped_cli_dispatch_names": [
+        "media matting",
+        "media track-bind",
+        "timeline compose",
+        "subtitle transcribe"
+      ],
+      "reusable_workflow": "讲解画中画、内容/字幕安全区、配合讲话切换信息",
+      "unaccepted_capabilities": "稳定词级同步、头发/手持物边缘、遮挡与自动内容重点理解，需自然长片验证",
+      "new_skill_installed": false,
+      "workflow_executed_this_research": false
+    },
+    {
+      "id": "S07",
+      "skill": "lyric-video",
+      "source_path": "packages/openfilm/skills/lyric-video/SKILL.md",
+      "source_sha256": "sha256:a7a595c3d521c062d400b987f2043bf76d60b27e3519e5c30b4fadf1865fe6f6",
+      "source_lines": 37,
+      "mapped_cli_dispatch_names": [
+        "subtitle normalize",
+        "subtitle segment",
+        "timeline compose",
+        "motion apply"
+      ],
+      "reusable_workflow": "歌词原文/行次保持、字词动效与独立时间误差报告",
+      "unaccepted_capabilities": "上游要求歌词在两帧内落在歌声上；没有本轮独立强制对齐实测，不能靠估时满足",
+      "new_skill_installed": false,
+      "workflow_executed_this_research": false
+    },
+    {
+      "id": "S08",
+      "skill": "collage",
+      "source_path": "packages/openfilm/skills/collage/SKILL.md",
+      "source_sha256": "sha256:e0e11e4332329b85b3a37a264ab73281906ba223afc3f88643d6e45150811cb9",
+      "source_lines": 34,
+      "mapped_cli_dispatch_names": [
+        "media ingest",
+        "media mask-edit",
+        "timeline compose",
+        "fragment save"
+      ],
+      "reusable_workflow": "有来源的照片/纸片/文字拼贴、蒙版和可复用包装组",
+      "unaccepted_capabilities": "授权素材库、自然拼贴风格和人物真实性；模板库尚不等于版权素材商城",
+      "new_skill_installed": false,
+      "workflow_executed_this_research": false
+    },
+    {
+      "id": "S09",
+      "skill": "whiteboard",
+      "source_path": "packages/openfilm/skills/whiteboard/SKILL.md",
+      "source_sha256": "sha256:aa749c2cb1efe5d280f7b3c9806398b68f493120eaa51173c334bbde20c622e5",
+      "source_lines": 40,
+      "mapped_cli_dispatch_names": [
+        "motion html-source",
+        "motion html-render",
+        "tts synthesize",
+        "timeline compose"
+      ],
+      "reusable_workflow": "逐笔绘制与解说节点的设计和误差报告",
+      "unaccepted_capabilities": "可解释的笔画路径、逐词/逐笔对齐和自然成片；整图淡入不能代替逐笔绘制",
+      "new_skill_installed": false,
+      "workflow_executed_this_research": false
+    },
+    {
+      "id": "S10",
+      "skill": "vintage-film",
+      "source_path": "packages/openfilm/skills/vintage-film/SKILL.md",
+      "source_sha256": "sha256:9edf85588612a2ce58de7bf325b741b458a22a325dab8e7d3a1dd6e2fc98d68a",
+      "source_lines": 38,
+      "mapped_cli_dispatch_names": [
+        "lut register",
+        "timeline compose",
+        "timeline transition",
+        "audio extract"
+      ],
+      "reusable_workflow": "保留人脸/事件的原貌、按授权时间顺序组织回忆片和调色",
+      "unaccepted_capabilities": "特定胶片材质/颗粒组合、自然美学、真实元数据；不自动修脸/扩图/生成人物动作",
+      "new_skill_installed": false,
+      "workflow_executed_this_research": false
+    }
+  ],
+  "meaning": "Dispatch names and pinned source were read; not a claim that these workflows ran or their quality passed",
+  "runtime_network": false,
+  "new_model_inference": 0,
+  "new_rendered_frames": 0,
+  "browser_tabs_opened": 0,
+  "virtualization": false,
+  "generator_sha256": "sha256:fd68af346916d3e18e9741a4beda1b38e71b7e218b8e880e9ebd722381b19719"
+}
