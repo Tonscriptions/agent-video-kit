@@ -1,0 +1,73 @@
+{
+  "operations": [
+    {
+      "op": "append_clip",
+      "track_id": "track_video_1",
+      "id": "diagram_clip",
+      "asset_id": "diagram",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000
+    },
+    {
+      "op": "append_clip",
+      "sequence_id": "seq_main",
+      "track_id": "track_audio_1",
+      "id": "clip_1",
+      "asset_id": "tone",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000
+    },
+    {
+      "op": "add_track",
+      "id": "music_track",
+      "kind": "audio",
+      "order": 1
+    },
+    {
+      "op": "append_clip",
+      "sequence_id": "seq_main",
+      "track_id": "music_track",
+      "id": "clip_3",
+      "asset_id": "music",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000
+    },
+    {
+      "op": "update_sequence",
+      "sequence_id": "seq_main",
+      "patch": {
+        "audio_routing": {
+          "version": 1,
+          "tracks": [
+            {
+              "track_id": "track_audio_1",
+              "output": "shared"
+            },
+            {
+              "track_id": "music_track",
+              "output": "shared"
+            }
+          ],
+          "buses": [
+            {
+              "id": "shared",
+              "audio": {
+                "volume": 0.5
+              },
+              "output": "sub"
+            },
+            {
+              "id": "sub",
+              "audio": {
+                "volume": 0.5
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

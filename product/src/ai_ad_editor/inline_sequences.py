@@ -55,7 +55,7 @@ def transition_descendants(project, sequence_id):
             return bearing[sid]
         child = sequences[sid]
         flags = [visit(ref, (*stack,sid)) for ref in sorted(_references(child))]
-        bearing[sid] = bool(child.get('source_transitions')) or any(flags) or any(
+        bearing[sid] = child.get('audio_routing') is not None or bool(child.get('source_transitions')) or any(flags) or any(
             c.get('presentation_window') or (c.get('sequence_id') and c.get('freeze'))
             for t in child.get('tracks', []) for c in t.get('clips', []))
         return bearing[sid]
@@ -92,7 +92,10 @@ def prepare(root, project, sequence, build_graph, *, stack=()):
             value = sequences[current]
             return any(c.get('sequence_id') and c.get('freeze') for t in value['tracks'] for c in t['clips']) or any(
                 has_freeze(ref, (*seen, current)) for ref in _references(value))
-        complete_audio = has_window(sid) or has_freeze(sid)
+        def has_routing(current):
+            value = sequences[current]
+            return value.get('audio_routing') is not None or any(has_routing(ref) for ref in _references(value))
+        complete_audio = has_window(sid) or has_freeze(sid) or has_routing(sid)
         # Adjustments are selected-root controls, not authored child effects.
         child_project = {**project,'settings':copy.deepcopy(project['settings'])}
         child_project['settings'].pop('adjustments', None)
@@ -102,7 +105,8 @@ def prepare(root, project, sequence, build_graph, *, stack=()):
         output['video'] = {**(video if isinstance(video, dict) else {}),'pixel_format':'yuva420p'}
         child_project['settings']['output'] = output
         child_inputs, graph, child_meta, warnings = build_graph(
-            root, child_project, child, _video_only=not complete_audio, _inline_stack=(*stack,sequence['id']))
+            root, child_project, child, _video_only=not complete_audio, _inline_stack=(*stack,sequence['id']),
+            _allow_audio_only=True)
         prefix, offset = f'inline{ordinal}_', inputs.count('-i')
         inputs.extend(child_inputs)
         filters.append(graph_namespace(graph, prefix, offset))
@@ -142,6 +146,7 @@ def prepare(root, project, sequence, build_graph, *, stack=()):
                 {'id':f'{aid}_{kind}_clip','asset_id':aid,'timeline_start_tick':0,
                  'duration_tick':child['duration_tick'],'source_in_tick':0,'source_out_tick':child['duration_tick']}]} for kind in ('video','audio')]
             child.pop('source_transitions', None)
+            child.pop('audio_routing', None)
         else:
             child['_inline_video_asset_id'] = aid
         detached['assets'].append(asset)

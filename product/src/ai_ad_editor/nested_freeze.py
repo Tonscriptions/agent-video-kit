@@ -53,7 +53,7 @@ def prepare(root, project, sequence, build_graph, namespace, *, stack=()):
         # Complete the child bus first: its nonlinear processing and automation
         # must not be re-evaluated independently on leaves during the pause.
         child_inputs, child_graph, child_meta, child_warnings = build_graph(
-            root, child_project, child, _inline_stack=(*stack, sequence['id']))
+            root, child_project, child, _inline_stack=(*stack, sequence['id']), _allow_audio_only=True)
         internal = 'freeze_child_'
         aid = fresh(f'__freeze_asset_{sequence["id"]}_{ordinal}')
         sid = fresh(f'__freeze_sequence_{sequence["id"]}_{ordinal}')

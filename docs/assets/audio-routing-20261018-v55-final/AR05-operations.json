@@ -1,0 +1,90 @@
+{
+  "operations": [
+    {
+      "op": "update_track",
+      "track_id": "track_video_1",
+      "patch": {
+        "overlap_policy": "allow"
+      }
+    },
+    {
+      "op": "append_clip",
+      "track_id": "track_video_1",
+      "id": "diagram_clip",
+      "asset_id": "diagram",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000
+    },
+    {
+      "op": "add_sequence",
+      "id": "child",
+      "duration_tick": 180000
+    },
+    {
+      "op": "append_clip",
+      "sequence_id": "child",
+      "track_id": "child_audio_1",
+      "id": "clip_2",
+      "asset_id": "tone",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000
+    },
+    {
+      "op": "update_sequence",
+      "sequence_id": "child",
+      "patch": {
+        "audio_routing": {
+          "version": 1,
+          "tracks": [
+            {
+              "track_id": "child_audio_1",
+              "output": "local"
+            }
+          ],
+          "buses": [
+            {
+              "id": "local",
+              "audio": {
+                "compressor": {
+                  "threshold": 0.1,
+                  "ratio": 4,
+                  "attack": 1,
+                  "release": 50
+                }
+              },
+              "keyframes": [
+                {
+                  "property": "audio.volume",
+                  "keyframes": [
+                    {
+                      "at_tick": 0,
+                      "value": 0,
+                      "interpolation": "linear"
+                    },
+                    {
+                      "at_tick": 180000,
+                      "value": 1,
+                      "interpolation": "linear"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "op": "append_sequence_clip",
+      "track_id": "track_video_1",
+      "id": "group",
+      "nested_sequence_id": "child",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000,
+      "reverse": true
+    }
+  ]
+}

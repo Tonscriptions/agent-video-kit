@@ -5097,6 +5097,8 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
             if 'canvas' in change:
                 validate_canvas(change['canvas'])
                 target['canvas'] = copy.deepcopy(change['canvas'])
+            if 'audio_routing' in change:
+                target['audio_routing'] = copy.deepcopy(change['audio_routing'])
             for track_kind, track_id, order in (("video", f"{sequence_id}_video_1", 0), ("audio", f"{sequence_id}_audio_1", 0)):
                 target["tracks"].append({"id": str(change.get(f"{track_kind}_track_id") or track_id), "kind": track_kind, "order": order, "muted": False, "locked": False, "clips": []})
             working.setdefault("sequences", []).append(target)
@@ -5104,8 +5106,8 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
         elif operation == "update_sequence":
             target = find_sequence(working, change.get('sequence_id') or change.get('id') or sequence['id'])
             patch = change.get('patch')
-            if not isinstance(patch, dict) or not patch or set(patch)-{'name', 'duration_tick', 'canvas', 'markers', 'editing'}:
-                raise argument_error('update_sequence.patch 支持 name/duration_tick/canvas/markers/editing；轨道与片段通过专用操作编辑', 'patch')
+            if not isinstance(patch, dict) or not patch or set(patch)-{'name', 'duration_tick', 'canvas', 'markers', 'editing', 'audio_routing'}:
+                raise argument_error('update_sequence.patch 支持 name/duration_tick/canvas/markers/editing/audio_routing；轨道与片段通过专用操作编辑', 'patch')
             if 'canvas' in patch:
                 validate_canvas(patch['canvas'])
             target.update(copy.deepcopy(patch))

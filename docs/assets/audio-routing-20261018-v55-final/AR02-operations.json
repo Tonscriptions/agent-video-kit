@@ -1,0 +1,66 @@
+{
+  "operations": [
+    {
+      "op": "append_clip",
+      "track_id": "track_video_1",
+      "id": "diagram_clip",
+      "asset_id": "diagram",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000
+    },
+    {
+      "op": "append_clip",
+      "sequence_id": "seq_main",
+      "track_id": "track_audio_1",
+      "id": "clip_1",
+      "asset_id": "tone",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000
+    },
+    {
+      "op": "update_track",
+      "track_id": "track_audio_1",
+      "patch": {
+        "audio": {
+          "volume": 0.5
+        }
+      }
+    },
+    {
+      "op": "update_sequence",
+      "sequence_id": "seq_main",
+      "patch": {
+        "audio_routing": {
+          "version": 1,
+          "tracks": [
+            {
+              "track_id": "track_audio_1",
+              "sends": [
+                {
+                  "bus_id": "return",
+                  "tap": "pre_fader",
+                  "gain": 0.4
+                },
+                {
+                  "bus_id": "return",
+                  "tap": "post_fader",
+                  "gain": 0.6
+                }
+              ]
+            }
+          ],
+          "buses": [
+            {
+              "id": "return",
+              "audio": {
+                "volume": 0.25
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

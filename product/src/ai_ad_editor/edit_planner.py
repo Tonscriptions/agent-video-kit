@@ -180,6 +180,8 @@ def interchange_features(project):
         features.append('sequence.source_transitions')
     if any(s.get('editing') is not None for s in project['sequences']):
         features.append('sequence.editing')
+    if any(s.get('audio_routing') is not None for s in project['sequences']):
+        features.append('sequence.audio_routing')
     if any('sync_lock' in t for s in project['sequences'] for t in s['tracks']):
         features.append('track.sync_lock')
     if any(c.get('link_id') is not None for s in project['sequences'] for t in s['tracks'] for c in t['clips']):
@@ -301,8 +303,26 @@ class _Draft:
     def relocate(self, source, clip):
         if source['kind'] == 'audio' and (source.get('audio', {}).get('effects') or source.get('audio', {}).get('duck_under_voice')):
             _error('EDIT_AUDIO_BUS_RELOCATION_UNSUPPORTED', '自动换轨会改变有轨道效果或闪避处理的音频总线，请先明确安排轨道')
+        routing = self.sequence.get('audio_routing')
+        rows = routing.get('tracks', []) if isinstance(routing, dict) else []
+        def route_signature(track):
+            return {k: v for row in rows if row['track_id'] == track['id'] for k, v in row.items() if k != 'track_id'}
+        route = route_signature(source)
+        named_detectors = set()
+        if routing is not None:
+            # A new lane cannot replace one nonlinear processor or one named
+            # track detector with two independent states. Shared bus FX remain
+            # safe: cloned linear sends still meet at that single bus.
+            tone = {'denoise', 'noise_reduction', 'compressor', 'equalizer', 'eq', 'highpass', 'lowpass',
+                    'dialogue_enhance', 'voice_enhance', 'pitch_semitones', 'reverb', 'loudnorm'}
+            detectors = [row.get('sidechain', {}) for row in rows+list(routing.get('buses', []))+[routing.get('master', {})]]
+            named_detectors = {d['track_id'] for d in detectors if 'track_id' in d}
+            if route.get('sidechain') is not None or any(source.get('audio', {}).get(k) for k in tone) or any(d.get('track_id') == source['id'] for d in detectors):
+                _error('EDIT_AUDIO_BUS_RELOCATION_UNSUPPORTED', '自动换轨不能拆分命名检测源、轨道侧链或音色处理状态；请先明确安排轨道')
         candidates = [t for t in self.sequence['tracks'] if t is not source and t['id'] != self.main_id
                       and not t.get('locked', False) and self.processing(t) == self.processing(source)
+                      and route_signature(t) == route
+                      and t['id'] not in named_detectors
                       and not any(_overlap(clip, c) for c in t['clips'])]
         candidates.sort(key=lambda t: (abs(t['order'] - source['order']), -t['order'], t['id']))
         if candidates:
@@ -313,6 +333,8 @@ class _Draft:
                           order=max([t['order'] for t in self.sequence['tracks']], default=-1) + 1,
                           clips=[], locked=False)
             self.sequence['tracks'].append(target)
+            if route:
+                routing.setdefault('tracks', []).append({'track_id': target['id'], **copy.deepcopy(route)})
             self.new_tracks.append(target['id'])
         target['clips'].append(clip)
 

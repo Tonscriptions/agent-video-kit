@@ -3488,7 +3488,7 @@ def _audio_processing_filters(
 def _build_audio_bus_tree(
     specs: list[dict[str, Any]], groups: dict[str, dict[str, Any]], tracks: list[dict[str, Any]],
     filters: list[str], warnings: list[dict[str, Any]], input_meta: list[dict[str, Any]],
-    *, duration_tick: int, tps: int,
+    *, duration_tick: int, tps: int, routing_sequence: dict[str, Any] | None = None,
 ) -> str | None:
     """Mix child clips, process tracks, then process each containing sequence.
 
@@ -3515,7 +3515,8 @@ def _build_audio_bus_tree(
         return target
 
     def scope(items: list[dict[str, Any]], scope_id: str | None) -> str | None:
-        if not items:
+        routed = scope_id is None and routing_sequence is not None and routing_sequence.get('audio_routing') is not None
+        if not items and not routed:
             return None
         voices: list[dict[str, Any]] = []
         ducked: list[dict[str, Any]] = []
@@ -3551,6 +3552,11 @@ def _build_audio_bus_tree(
         by_track: dict[str, list[str]] = {}
         for item in items:
             by_track.setdefault(item['track_id'], []).append(item['label'])
+        if routed:
+            from .audio_routing import compile_graph
+            return compile_graph(routing_sequence, by_track, filters, input_meta, warnings, tps=tps,
+                                 process=lambda clip, control: _audio_processing_filters(
+                                     clip, control, tps, authored_duration=duration_tick/tps))
         outputs = []
         for track_id, children in by_track.items():
             track = track_map[track_id]
@@ -4370,7 +4376,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         current = adjusted_output
 
     audio_root = _build_audio_bus_tree(audio_specs, composite_groups, render_tracks, filters, warnings, input_meta,
-                                      duration_tick=int(sequence['duration_tick']), tps=tps)
+                                      duration_tick=int(sequence['duration_tick']), tps=tps,
+                                      routing_sequence=sequence if not _video_only else None)
     audio_target_samples = max(1, math.ceil(Fraction(int(sequence['duration_tick'])*48000, tps)))
     if audio_root:
         filters.append(f'[{audio_root}]aresample=48000,apad=whole_len={audio_target_samples},'

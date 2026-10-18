@@ -1,0 +1,74 @@
+test_missing_references_and_duplicates_are_rejected (test_audio_routing.AudioRoutingContractTests.test_missing_references_and_duplicates_are_rejected) ... FAIL
+test_names_are_local_and_plan_does_not_modify_author_data (test_audio_routing.AudioRoutingContractTests.test_names_are_local_and_plan_does_not_modify_author_data) ... ok
+test_node_edge_and_automation_work_budgets_reject_before_execution (test_audio_routing.AudioRoutingContractTests.test_node_edge_and_automation_work_budgets_reject_before_execution) ... ok
+test_output_send_and_detector_cycles_include_zero_gain_edges (test_audio_routing.AudioRoutingContractTests.test_output_send_and_detector_cycles_include_zero_gain_edges) ... ok
+test_strict_automation_rejects_unknown_properties_times_and_controls (test_audio_routing.AudioRoutingContractTests.test_strict_automation_rejects_unknown_properties_times_and_controls) ... ok
+test_unknown_fields_invalid_types_injection_and_nonfinite_are_rejected (test_audio_routing.AudioRoutingContractTests.test_unknown_fields_invalid_types_injection_and_nonfinite_are_rejected) ... ok
+test_audio_only_routed_child_finishes_compressor_and_gain_before_outer_reverse (test_audio_routing.NamedAudioRoutingTests.test_audio_only_routed_child_finishes_compressor_and_gain_before_outer_reverse) ... ok
+test_bus_mute_silences_pre_fader_sends_and_detector (test_audio_routing.NamedAudioRoutingTests.test_bus_mute_silences_pre_fader_sends_and_detector) ... ok
+test_disconnected_sources_are_drained_and_absent_detector_is_full_length_zero (test_audio_routing.NamedAudioRoutingTests.test_disconnected_sources_are_drained_and_absent_detector_is_full_length_zero) ... ok
+test_empty_graph_and_muted_master_have_exact_silence (test_audio_routing.NamedAudioRoutingTests.test_empty_graph_and_muted_master_have_exact_silence) ... ok
+test_explicit_default_routes_preserve_float_sum_and_author_project (test_audio_routing.NamedAudioRoutingTests.test_explicit_default_routes_preserve_float_sum_and_author_project) ... ok
+test_hold_and_bezier_send_points_keep_independent_channels (test_audio_routing.NamedAudioRoutingTests.test_hold_and_bezier_send_points_keep_independent_channels) ... ok
+test_invalid_cycle_compose_is_atomic_and_dry_run_does_not_write (test_audio_routing.NamedAudioRoutingTests.test_invalid_cycle_compose_is_atomic_and_dry_run_does_not_write) ... ok
+test_nested_routing_trim_preserves_child_author_gain_phase (test_audio_routing.NamedAudioRoutingTests.test_nested_routing_trim_preserves_child_author_gain_phase) ... ok
+test_pan_automation_and_bus_fade_are_sample_evaluated (test_audio_routing.NamedAudioRoutingTests.test_pan_automation_and_bus_fade_are_sample_evaluated) ... ok
+test_pre_and_post_sends_fan_out_without_changing_dry_gain (test_audio_routing.NamedAudioRoutingTests.test_pre_and_post_sends_fan_out_without_changing_dry_gain) ... ok
+test_pre_fader_is_after_track_compressor_and_before_volume (test_audio_routing.NamedAudioRoutingTests.test_pre_fader_is_after_track_compressor_and_before_volume) ... ok
+test_shared_bus_compressor_receives_sum_once (test_audio_routing.NamedAudioRoutingTests.test_shared_bus_compressor_receives_sum_once) ... ok
+test_solo_keeps_full_detector_context_with_non_audible_voice (test_audio_routing.NamedAudioRoutingTests.test_solo_keeps_full_detector_context_with_non_audible_voice) ... FAIL
+test_solo_prunes_dry_bypass_and_unrelated_downstream_inputs (test_audio_routing.NamedAudioRoutingTests.test_solo_prunes_dry_bypass_and_unrelated_downstream_inputs) ... ok
+test_static_pan_preserves_independent_stereo_through_buses (test_audio_routing.NamedAudioRoutingTests.test_static_pan_preserves_independent_stereo_through_buses) ... ok
+test_track_bus_master_and_send_automation_use_sequence_samples (test_audio_routing.NamedAudioRoutingTests.test_track_bus_master_and_send_automation_use_sequence_samples) ... ok
+test_track_pre_fader_detector_is_independent_of_its_output_volume (test_audio_routing.NamedAudioRoutingTests.test_track_pre_fader_detector_is_independent_of_its_output_volume) ... FAIL
+test_two_instances_have_distinct_time_placement_and_no_author_internal_assets (test_audio_routing.NamedAudioRoutingTests.test_two_instances_have_distinct_time_placement_and_no_author_internal_assets) ... ok
+test_two_tracks_share_multilevel_buses_and_master_gain (test_audio_routing.NamedAudioRoutingTests.test_two_tracks_share_multilevel_buses_and_master_gain) ... ok
+
+======================================================================
+FAIL: test_missing_references_and_duplicates_are_rejected (test_audio_routing.AudioRoutingContractTests.test_missing_references_and_duplicates_are_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_routing.py", line 243, in test_missing_references_and_duplicates_are_rejected
+    self.invalid(lambda r: r.update(tracks=[{'track_id': 'audio'}, {'track_id': 'audio'}]), 'AUDIO_ROUTING_REFERENCE_INVALID')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_routing.py", line 235, in invalid
+    self.assertEqual(caught.exception.code, code)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'AUDIO_ROUTING_INVALID' != 'AUDIO_ROUTING_REFERENCE_INVALID'
+- AUDIO_ROUTING_INVALID
++ AUDIO_ROUTING_REFERENCE_INVALID
+?               ++++++++++
+
+
+======================================================================
+FAIL: test_solo_keeps_full_detector_context_with_non_audible_voice (test_audio_routing.NamedAudioRoutingTests.test_solo_keeps_full_detector_context_with_non_audible_voice)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_routing.py", line 156, in test_solo_keeps_full_detector_context_with_non_audible_voice
+    self.close_pcm(actual, self.detector_reference(self.pcm['other'], self.pcm['tone'],
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   'threshold=0.05:ratio=8:attack=1:release=50'))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 192000 != 188416
+
+======================================================================
+FAIL: test_track_pre_fader_detector_is_independent_of_its_output_volume (test_audio_routing.NamedAudioRoutingTests.test_track_pre_fader_detector_is_independent_of_its_output_volume)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_routing.py", line 168, in test_track_pre_fader_detector_is_independent_of_its_output_volume
+    self.close_pcm(actual, self.detector_reference(self.pcm['other'], self.pcm['tone'],
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   'threshold=0.05:ratio=8:attack=1:release=50'))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_audio_buses.py", line 91, in close_pcm
+    self.assertEqual(len(actual),len(expected));self.assertLessEqual(max(map(abs,(a-b for a,b in zip(actual,expected))),default=0),tolerance)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 192000 != 180224
+
+----------------------------------------------------------------------
+Ran 25 tests in 27.297s
+
+FAILED (failures=3)

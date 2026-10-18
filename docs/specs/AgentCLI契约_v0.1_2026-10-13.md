@@ -1,5 +1,7 @@
 # Agent CLI 契约 v0.1
 
+2026-10-18 V55 扩展：[命名音频路由契约](命名音频总线发送返回与侧链契约_v0.1_2026-10-18.md)。现有 `timeline compose` 的 `add_sequence.audio_routing` 与 `update_sequence.patch.audio_routing` 写入序列局部 DAG，null 恢复旧树状混音；字段、引用、循环与配额随事务校验。`render` 产生 `sequence-audio-routing` 清单，随后执行 `policy audit`。完整子音频先于祖先时间映射；图选择/外部交换边界与[真实原输入、PCM、发行及失败记录](../validation/命名音频总线发送返回与侧链实测_2026-10-18.md)单列。没有增加 GUI 或在线处理命令。
+
 | 项目 | 内容 |
 |---|---|
 | 文档编号 | SPEC-CLI-001 |

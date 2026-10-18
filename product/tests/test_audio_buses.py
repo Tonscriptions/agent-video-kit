@@ -9,7 +9,7 @@ from ai_ad_editor.utils import atomic_write_json
 
 TPS,SR,DURATION=90000,48000,2
 
-class AudioBusTests(unittest.TestCase):
+class AudioBusFixture(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         configure_local_runtime()
@@ -96,6 +96,7 @@ class AudioBusTests(unittest.TestCase):
                                '-f','f32le','-c:a','pcm_f32le','pipe:1'],input=raw,capture_output=True,check=True)
         out=array.array('f');out.frombytes(result.stdout);return list(out)
 
+class AudioBusTests(AudioBusFixture):
     def test_root_tracks_sum_without_input_count_attenuation(self):
         self.tone();self.track('seq_main','other');self.tone(track='other',name='other')
         actual,_,_,_=self.render();self.close_pcm(actual,[a+b for a,b in zip(self.pcm['tone'],self.pcm['other'])])

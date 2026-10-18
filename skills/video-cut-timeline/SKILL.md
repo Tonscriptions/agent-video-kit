@@ -22,6 +22,18 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+Use the [named audio routing contract](../../docs/specs/命名音频总线发送返回与侧链契约_v0.1_2026-10-18.md)
+for `update_sequence.patch.audio_routing` (null restores legacy tree mixing).
+Track rows reference local video/audio tracks; output defaults to master,
+null disables only direct output, and sends address local buses. Pre/post
+taps surround volume/pan/fades after tone processing. Automation uses the
+sequence clock; a shortened sequence must contain all retained author points.
+Bus solo isolates paths with the complete sidechain detector context. Child
+routing precedes ancestor trim/reverse/speed/freeze/windows. Routed fragment
+selection expands and is reported. Automatic relocation cannot split named
+detectors or tone state. Review the [actual samples and failures](../../docs/validation/命名音频总线发送返回与侧链实测_2026-10-18.md)
+and run `policy audit` after rendering. No feedback/plugin host/surround is implied.
+
 For whole-main-track ordering, use the
 [magnetic reorder contract](../../docs/specs/主轨磁吸重排与关联附着契约_v0.1_2026-10-18.md).
 `timeline edit` action `reorder` takes main `clip_ids` and a mandatory
@@ -154,7 +166,7 @@ bindings compile locally before projection. Selected-sequence export defaults
 to that raster; profile/width/height override only the selected root for that
 render. Odd internal rasters are valid; final 4:2:0 requires even width/height,
 and 4:2:2 requires even width. Explicit child rasters survive parent overrides.
-Named audio send/return, independent child FPS/color/SAR,
+Independent child FPS/color/SAR,
 standalone slide/wipe, linear-light/HDR and broad performance remain acceptance
 boundaries; preserve existing audio and quality warnings. Native bilinear
 sampling is not a promise of high-frequency minification quality.

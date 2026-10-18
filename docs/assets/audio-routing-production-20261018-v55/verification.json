@@ -1,0 +1,2304 @@
+{
+  "status": "passed_scoped_audio_routing",
+  "checked_at_utc": "2026-10-18T13:49:13.597739+00:00",
+  "native_windows": true,
+  "virtualization": false,
+  "network_used": false,
+  "seconds": 21.060981000002357,
+  "frozen_before": {
+    "docs/specs/agent-project.schema.json": "sha256:07d91dc2054e6ea7e9b99b60685a921d7068aa17f333fe0e624b80211b9b92dc",
+    "product/offline/build.py": "sha256:1b93123f4e34dc18aaf4bb9ecbb4261e423f297103e63e494c9ec883f9871810",
+    "product/offline/install.py": "sha256:4a7bf97d2fe15b92f1448fb118eb07d5625c02741c1585c392a3b0d75dba1c7e",
+    "product/pyproject.toml": "sha256:0b6449306403c1f5f87962e17200b3dfc3eea22b21b722fe0a6b4140bfa3e239",
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/agent-project.schema.json": "sha256:07d91dc2054e6ea7e9b99b60685a921d7068aa17f333fe0e624b80211b9b92dc",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_routing.py": "sha256:40f74750a79ea80f016dd2eb8a353d6103682756f01970ad802c6292be8e5af8",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_stretch.py": "sha256:3f1cf4dbaa6e09cdfdd1068c1d477595eb7e2506ae4e8dcaac1a960f9e787fc1",
+    "product/src/ai_ad_editor/audio_tempo.py": "sha256:3284a08dc75a25dcbeed30c7088a18898c46d398e6e7ae9380efcf0e366afcee",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:2dbb8bce11ecb7f7fd6fa893cca08efdaa6f9c21a3c6f8a4588cbed5092c3a65",
+    "product/src/ai_ad_editor/browser_process.py": "sha256:55c72751a5d3d5e397af030fbf65a7ef5b659646a3890f72e52da816d9ab22a6",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:627377e5c8edea892fa9d924d496a5612a148447b1ca6fc7a264bf3d4634d832",
+    "product/src/ai_ad_editor/captions.py": "sha256:f9a4534682417235a1c2e6ba36072bb92de9354cb5d83b76d06e3ecb22144d28",
+    "product/src/ai_ad_editor/cli.py": "sha256:5ba9b0efb4990d26a8c91374ef88a1e05a8dcea6621a7e96e0847525875a9697",
+    "product/src/ai_ad_editor/clip_windows.py": "sha256:3014424ecce4ec780b2e241afd50c310681c69c4450ebd88b689cea221149377",
+    "product/src/ai_ad_editor/convert.py": "sha256:5ff0ea4edf337b96f88f2a4d5c6ec7e36ab8f42e17260a0a7a9c0bce289c5229",
+    "product/src/ai_ad_editor/ctc_alignment.py": "sha256:a475e9b1acd8ceba2be90884729f0b5a4c76ed354853bc0a57b47f1f9787edd7",
+    "product/src/ai_ad_editor/ctc_cli.py": "sha256:2f20af923ea0a7af6fe9d5080cdb999d6b7c2f26c133a6c2f702d782747c22c8",
+    "product/src/ai_ad_editor/ctc_worker.py": "sha256:933d1c7ca4ac7dc8512d49e17a090b0a89e580724d0228a9ab44a3a14e3e9810",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:0eb1e8f649e66cc6f15ef56bfb75d07166a7d7e3a6f1326f50bca349a1c24071",
+    "product/src/ai_ad_editor/edit_planner.py": "sha256:16a85597ca17354f63d85babd2202a9095dfb998fc80dbb144e8d08aefe5bba4",
+    "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/font_coverage.py": "sha256:2f33b3eb07331ef3b87c78286317df8d903a2c991978e9750a39d6bcd117c243",
+    "product/src/ai_ad_editor/fragments.py": "sha256:72f0038bf51f5b5b6d8698a36cc82750a916829ac26910019996953949b463a6",
+    "product/src/ai_ad_editor/html_motion.py": "sha256:eccfca16e5a3760c9cc9546613231c281fd253ea11e846fad39f98eb7f699889",
+    "product/src/ai_ad_editor/html_motion_worker.mjs": "sha256:435899a68e8ac4e76484c00e2d3f6d8fadcf362475dd9e639d0bd0e7ad7fe0bf",
+    "product/src/ai_ad_editor/html_quality.py": "sha256:7abdb2b18bb86a3d87e058e74b908cb0a430f05273ca9b78122a5985c0b5dba0",
+    "product/src/ai_ad_editor/html_quality_dom.mjs": "sha256:551f997cd5f4f57514354ed4b5292c67e9e82f4c8928db74f4d6c53b57ecdc94",
+    "product/src/ai_ad_editor/html_template.py": "sha256:f3ad9507632d03df9e7de3e4303638325c9667e1005ae9600c62670b06d1436e",
+    "product/src/ai_ad_editor/html_template_dom.mjs": "sha256:ed68388d4dda1adabc689afa508640de471fe8a6e461bc6aeb5292d904950260",
+    "product/src/ai_ad_editor/inline_sequences.py": "sha256:ee1596121f7e0ea88c7d1f8e27d75132b57dc03522a768a2716f97343a1ed911",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:7c8582144a9b17e08558f36777c312099e10fee82f18f49589b07f40b61fb9dc",
+    "product/src/ai_ad_editor/local_ctc.py": "sha256:f4e6bef1bf35603a5828f161462570afa9ca04af4364e0032708700ae3141716",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/magnetic_reorder.py": "sha256:866b2cf52b5027170110de8d7be2236216dd0feb4451d398eb459428250f2452",
+    "product/src/ai_ad_editor/mask_edit.py": "sha256:952aa4c1cc3f49b2b1c9d5dc0c969901d82d4fcbe660387af2f3f7c044d6bb7a",
+    "product/src/ai_ad_editor/mask_edit_geometry.py": "sha256:9bf1d101c1aea8d2265b704fab8dcd65b3bb08c4cc45aed95a4a5cb0ee2ae1f9",
+    "product/src/ai_ad_editor/mask_review.py": "sha256:17de0acd6d76ad9218565302a0f47a577a5001a487bbf0c66432b0b6af278bad",
+    "product/src/ai_ad_editor/mask_tracking.py": "sha256:724f8f9800536d3ffdc99675fadf79e1262532ec7f9a3d879cf94674ba531b8d",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:75755c314fe01111d7ca85138efb6f9b0993e45c14c5a2b65cc1046c5e58cfba",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/nested_freeze.py": "sha256:2294d318840e6285550eaf70109702b041c031c2cde4c8dc0bca3d2bad848a35",
+    "product/src/ai_ad_editor/OPENFILM_EXAMPLES_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_frame_clock.mjs": "sha256:c60b35fb0d26b8629d833f11028757aeccf603917c4c5840f501c01b757de1d5",
+    "product/src/ai_ad_editor/OPENFILM_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_overrides.mjs": "sha256:8fab39a5f4f9696e9070a206f45d9241f54167ea2d9f47c0bcc9975333664832",
+    "product/src/ai_ad_editor/openfilm_stroke.mjs": "sha256:6c20aaff3a85b8a98654d82bfbea34029d78b0366af6b95b17c70abfafd265a1",
+    "product/src/ai_ad_editor/openfilm_subtitle_segments.mjs": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "product/src/ai_ad_editor/openfilm_template_fields.mjs": "sha256:fd4c58532cd3b46e32872e84136b54edef5a8ad9d824f1afa44f9264d81774e3",
+    "product/src/ai_ad_editor/openfilm_text_bounds.mjs": "sha256:94b2ab392b367ef1f901967f9156ac48493419be32bc40b4d6c035cf71a56108",
+    "product/src/ai_ad_editor/PDOOM_VIDEO_LICENSE.txt": "sha256:5fc212466ce7183be5d85a3ee34fea461712842d5cd256b470978a83577083cb",
+    "product/src/ai_ad_editor/policy.py": "sha256:775449c9012e5e79c228c140712e1c1c6c7f3eb668f0638703f177beb894242e",
+    "product/src/ai_ad_editor/project.py": "sha256:dd86c8d1b161cb99660f4bc92ac3ff8c2cc6c10c34f22432fbe6f27af9a7414f",
+    "product/src/ai_ad_editor/quality.py": "sha256:d4e71c9e6616250b681306d562305dafe4cb5867652ab365275277b155e9e047",
+    "product/src/ai_ad_editor/range_edits.py": "sha256:c82bab57fd4a32710459637b625d987a39e9f492fd2951ef9f43588ef5f15411",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:5bb2b6930ba80a8813c9d1feec7a62d960d1d110b07224073a1a34d04d989c5c",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:b806d815b9a456f0446a0a601ae9bcfdb957418ace18eb472bd1301b76138802",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/rfc3339_dates.py": "sha256:344d79048ff55a77af00314134c20b57b5301b75d1b6a32b4a7a3f52ce749105",
+    "product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt": "sha256:5ba1a4f03626ccca6dcbf53a554545e4f776a335bfdaa233ec3bfe9bb7fac15d",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/schema_contract.py": "sha256:a58998ed94b87208540d144416ee022cdf8f90d899c24de83cd024e50eeef0f5",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/sequence_canvas.py": "sha256:462542e26058d350c2d0a29d0cf4127c4054cab7462a763811b85bfca171412f",
+    "product/src/ai_ad_editor/sequence_sampling.py": "sha256:1aa171ef6043878afce099f7a04b214b9c458879147c46147062a77d36356ec2",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:ba871f7bff0f186ad55d9e22c5fcd75e09032e8d7299a01c7ea7b76b2e1a21a1",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/source_edits.py": "sha256:a2bea20a8d162ac4fa9f329045bca2b7e214a624adca107df6021919d5a1d36c",
+    "product/src/ai_ad_editor/source_transitions.py": "sha256:59c2652aa76024b78667293ce46774ba6910e4524db7e39f95dc95bd91b0547a",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/speed_curves.py": "sha256:41fbddd764bfa481e6158e8401333113c871e1c38e34257911f9aa676b9bfff9",
+    "product/src/ai_ad_editor/stroke_motion.py": "sha256:ba53f586ff12c75c15803e347307c802d977e874ce792159d74ebb2b6b42ae03",
+    "product/src/ai_ad_editor/subtitle_clock.py": "sha256:49ca2001da0f250d682f5818d95f4f51ee362cbaee979fb9a99649a847cd4645",
+    "product/src/ai_ad_editor/subtitle_segment_worker.mjs": "sha256:66ca5d7fab0926efe15615da29dba3024897cbfbfb1b28e6a6a189697b6d5bdc",
+    "product/src/ai_ad_editor/subtitle_segments.py": "sha256:5590e04147f0b50cb60df3b4e543059a560dbfd684b3085c5f25f8fb04631aea",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_highlight.py": "sha256:d08bee683f0bd00bac363a78df5957475765741a7c53d92ac025575b334f78e5",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/text_paint.py": "sha256:a924644f0396b5204efbb0e085f25d51f6cda5bfc75f2d44febc6796e42cb028",
+    "product/src/ai_ad_editor/text_typing.py": "sha256:6cc022af8300fb4270cb21f2f53ffe2b33210ac203169fed653d11d75e591ec3",
+    "product/src/ai_ad_editor/time_mapping.py": "sha256:70db06e3d2ec00fd9d951854cc73410caa2a35e036bcfba21363146ada1a7c55",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:78f984613b0c253d108dd4d515557f77bc4ebd4df4945108a63d8fdb38ad202b",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+    "product/src/ai_ad_editor/validator.py": "sha256:3fe31e56e5eb742b1fd80c44073ff3fd17a43c3a1851c4af8230ade0996bd205",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_alpha_resampling.py": "sha256:db2e2764a5022c18bba23ad407a6bf15a320edfea5f5a8331eda706d7c4046de",
+    "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+    "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+    "product/tests/test_audio_buses.py": "sha256:e4b6020208492cf4907a3537c0542321a7f1600692537b22299700f5b4d9dfdc",
+    "product/tests/test_audio_channel_modes.py": "sha256:815a9ea0117dd7ed0cce3a75d14ed67a4a8a06b413df1836d233f33359290e79",
+    "product/tests/test_audio_routing.py": "sha256:8d37d01454f1662d14f45b02fd879d0841a9894467064fa9b63fe3e3a38bd007",
+    "product/tests/test_audio_stretch.py": "sha256:53dea6b0ec9f8c00861b6a1844d7c34e0c87e432d78a4e4847c7245fd9893ce9",
+    "product/tests/test_audio_tempo_context.py": "sha256:ad3c7c53cfdaecdd00693aa745a22be2455e2dcd446583e4912cd1066b6aac3a",
+    "product/tests/test_audio_unity.py": "sha256:02dcf66038d4fcbc1f0c144e604efa451b9d7925817d1d2b089f8c087aa58810",
+    "product/tests/test_cli.py": "sha256:cefbec9b92fbdd2c5664454c35547d549b1da8db981f8be20102065c52cc4e79",
+    "product/tests/test_clip_windows.py": "sha256:42863fb28d81d22a0ac90ff1036ef5359186a29ab730d5404db36fae0660ecb3",
+    "product/tests/test_ctc_alignment.py": "sha256:838a854a442b413cb05be739f47eea86dae36057f12b0567bc820f3f442aec93",
+    "product/tests/test_delivery_precision.py": "sha256:5bc05fca5334ca454f3498b0f53cd28c0b44b8f9e9f3336b980b8a8604bbed03",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_font_coverage.py": "sha256:b382b9449601baf20a6c352c03e055b4f9efcad03b7515b694831376cc5a8234",
+    "product/tests/test_fragments.py": "sha256:d021051b4a5b48deac872e319407c9dae0cb2e7b3c8f1a7ab71704dff756a35f",
+    "product/tests/test_html_motion.py": "sha256:9e382485db151f79059e4d18c13708a6ee3deca38ad5be1272a5b9fb4dc4bc0c",
+    "product/tests/test_html_quality.py": "sha256:1e3d81bf7101b3d97aa89f5f60cebab0a7e64e44845ab60b4872f8d064217aae",
+    "product/tests/test_html_template.py": "sha256:747fb1e13b3bfb60f35012a8ffa18ac10f156f1e2811328792ab29d20e2de29a",
+    "product/tests/test_html_url_parser.py": "sha256:673a8073a536149c6b70366b2911ab6bfb3b395f3e2a14dd425c3d5f57cbcf02",
+    "product/tests/test_linked_edit.py": "sha256:d3b5d8fb402df059ea006d125fbb6fb651c891132fcd78deccfdbe41036d87d7",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+    "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vace.py": "sha256:a2227a49c43a233b73ed354681a39a03924d9ed0588749eda7df198c2c43807b",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_magnetic_reorder.py": "sha256:c4ad34f0ed89c9fe30ca51c188cdf9bfcf982322bd32a6ec6d5d64620c01c2a7",
+    "product/tests/test_mask_edit.py": "sha256:280c825c3a2dc95ac35943209a6eb30e45d519bc5ce1834a6a73c464f90718e1",
+    "product/tests/test_mask_edit_geometry.py": "sha256:7b6367f327d51cbd5b5746b90e89f27768acc7b49b0bb9d7e63cc3d1460bde06",
+    "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+    "product/tests/test_mask_tracking.py": "sha256:f8f2c1d0495410815b91d4f0a507a3a3909d2ca25c44817612970d4330578245",
+    "product/tests/test_nested_frame_coverage.py": "sha256:4bf9aef9aec5c34325f67e2a3e88dbe3424e4ec5c82d8f4e121ec95f7ab8d97f",
+    "product/tests/test_nested_freeze.py": "sha256:03261ace961acfcc5f99f52814a59a2b2bdf88fe3c0def7f48c8c3e897415c9b",
+    "product/tests/test_nested_time_mapping.py": "sha256:64415c49e45c5e7edf8d5f5ee745bbf22d30b6cdd5a0cde7cd731d88d6c6fad4",
+    "product/tests/test_nested_transitions.py": "sha256:9481f1de95ab4c556a17bfdbc1088001ceb29b92bab96d5040c8e6abdeb7881b",
+    "product/tests/test_offline_install.py": "sha256:6497262c7f791c46d706eeddfbaaa41d2d793e109106b93456e88f6786f051fc",
+    "product/tests/test_range_edits.py": "sha256:7634873bff27fbf51e412c82b37efae72cf7f38b20ffd22e1d60fe50359a1f7c",
+    "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+    "product/tests/test_schema_contract.py": "sha256:12d70209363d3b54341118e3f3ab988ebb041464c42eb7fb267c09d801ce483d",
+    "product/tests/test_sequence_canvas.py": "sha256:6f2b622c81932c0dcf80e7b3a528256b5e1a7209ef455b68f2c75a4c9154f4b0",
+    "product/tests/test_sequence_compositing.py": "sha256:1eea9b170c3fabe0623032b4de81a07e085cb7c88b5d79e8380d73399be21b0a",
+    "product/tests/test_sequence_sampling.py": "sha256:c75a6153aee2dbef11e9455a27656d204e46f0ce6061393ea91b6f46f8d7253f",
+    "product/tests/test_source_edits.py": "sha256:b5846137c5de1b1f08e82d43c69a7d95c031cd1c613fdf48613f72361e813614",
+    "product/tests/test_source_transitions.py": "sha256:8813a84843bfbb7aed5b5418011a287c9dae1b8628620114468df716401f2b4a",
+    "product/tests/test_speed_easing.py": "sha256:4797885a66a7e12b327fdf31e0cc937576620353e653c2c762ee905f2d61a5d7",
+    "product/tests/test_stroke_motion.py": "sha256:4ff06a458e6311e4979da31b6be05b5a53c6e09ef3bb6b429c63616368844410",
+    "product/tests/test_subtitle_clock.py": "sha256:1e6696405e30dc4d90e4baadcbffc013d5e6fee5d89bb67e908003c3ebe1de5a",
+    "product/tests/test_subtitle_segments.py": "sha256:aba64ed147276a6b1e59ad845557f86f2b6271db8d0dc75c006db328cac233c2",
+    "product/tests/test_text_animation_composition.py": "sha256:6ce0117f31339d36c574c70a8f2d83235813dc95d91f3108730cb954987c12de",
+    "product/tests/test_text_paint.py": "sha256:99887918ba5813b39a74cef18d02384ed503581e8695821530554590d38e219f",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "product/tests/test_word_highlight.py": "sha256:bf3f56f299d2452e8330bb192d31880c550e277ef93d04c4292fe816b79e172a"
+  },
+  "frozen_after": {
+    "docs/specs/agent-project.schema.json": "sha256:07d91dc2054e6ea7e9b99b60685a921d7068aa17f333fe0e624b80211b9b92dc",
+    "product/offline/build.py": "sha256:1b93123f4e34dc18aaf4bb9ecbb4261e423f297103e63e494c9ec883f9871810",
+    "product/offline/install.py": "sha256:4a7bf97d2fe15b92f1448fb118eb07d5625c02741c1585c392a3b0d75dba1c7e",
+    "product/pyproject.toml": "sha256:0b6449306403c1f5f87962e17200b3dfc3eea22b21b722fe0a6b4140bfa3e239",
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/agent-project.schema.json": "sha256:07d91dc2054e6ea7e9b99b60685a921d7068aa17f333fe0e624b80211b9b92dc",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_routing.py": "sha256:40f74750a79ea80f016dd2eb8a353d6103682756f01970ad802c6292be8e5af8",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_stretch.py": "sha256:3f1cf4dbaa6e09cdfdd1068c1d477595eb7e2506ae4e8dcaac1a960f9e787fc1",
+    "product/src/ai_ad_editor/audio_tempo.py": "sha256:3284a08dc75a25dcbeed30c7088a18898c46d398e6e7ae9380efcf0e366afcee",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:2dbb8bce11ecb7f7fd6fa893cca08efdaa6f9c21a3c6f8a4588cbed5092c3a65",
+    "product/src/ai_ad_editor/browser_process.py": "sha256:55c72751a5d3d5e397af030fbf65a7ef5b659646a3890f72e52da816d9ab22a6",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:627377e5c8edea892fa9d924d496a5612a148447b1ca6fc7a264bf3d4634d832",
+    "product/src/ai_ad_editor/captions.py": "sha256:f9a4534682417235a1c2e6ba36072bb92de9354cb5d83b76d06e3ecb22144d28",
+    "product/src/ai_ad_editor/cli.py": "sha256:5ba9b0efb4990d26a8c91374ef88a1e05a8dcea6621a7e96e0847525875a9697",
+    "product/src/ai_ad_editor/clip_windows.py": "sha256:3014424ecce4ec780b2e241afd50c310681c69c4450ebd88b689cea221149377",
+    "product/src/ai_ad_editor/convert.py": "sha256:5ff0ea4edf337b96f88f2a4d5c6ec7e36ab8f42e17260a0a7a9c0bce289c5229",
+    "product/src/ai_ad_editor/ctc_alignment.py": "sha256:a475e9b1acd8ceba2be90884729f0b5a4c76ed354853bc0a57b47f1f9787edd7",
+    "product/src/ai_ad_editor/ctc_cli.py": "sha256:2f20af923ea0a7af6fe9d5080cdb999d6b7c2f26c133a6c2f702d782747c22c8",
+    "product/src/ai_ad_editor/ctc_worker.py": "sha256:933d1c7ca4ac7dc8512d49e17a090b0a89e580724d0228a9ab44a3a14e3e9810",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:0eb1e8f649e66cc6f15ef56bfb75d07166a7d7e3a6f1326f50bca349a1c24071",
+    "product/src/ai_ad_editor/edit_planner.py": "sha256:16a85597ca17354f63d85babd2202a9095dfb998fc80dbb144e8d08aefe5bba4",
+    "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/font_coverage.py": "sha256:2f33b3eb07331ef3b87c78286317df8d903a2c991978e9750a39d6bcd117c243",
+    "product/src/ai_ad_editor/fragments.py": "sha256:72f0038bf51f5b5b6d8698a36cc82750a916829ac26910019996953949b463a6",
+    "product/src/ai_ad_editor/html_motion.py": "sha256:eccfca16e5a3760c9cc9546613231c281fd253ea11e846fad39f98eb7f699889",
+    "product/src/ai_ad_editor/html_motion_worker.mjs": "sha256:435899a68e8ac4e76484c00e2d3f6d8fadcf362475dd9e639d0bd0e7ad7fe0bf",
+    "product/src/ai_ad_editor/html_quality.py": "sha256:7abdb2b18bb86a3d87e058e74b908cb0a430f05273ca9b78122a5985c0b5dba0",
+    "product/src/ai_ad_editor/html_quality_dom.mjs": "sha256:551f997cd5f4f57514354ed4b5292c67e9e82f4c8928db74f4d6c53b57ecdc94",
+    "product/src/ai_ad_editor/html_template.py": "sha256:f3ad9507632d03df9e7de3e4303638325c9667e1005ae9600c62670b06d1436e",
+    "product/src/ai_ad_editor/html_template_dom.mjs": "sha256:ed68388d4dda1adabc689afa508640de471fe8a6e461bc6aeb5292d904950260",
+    "product/src/ai_ad_editor/inline_sequences.py": "sha256:ee1596121f7e0ea88c7d1f8e27d75132b57dc03522a768a2716f97343a1ed911",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:7c8582144a9b17e08558f36777c312099e10fee82f18f49589b07f40b61fb9dc",
+    "product/src/ai_ad_editor/local_ctc.py": "sha256:f4e6bef1bf35603a5828f161462570afa9ca04af4364e0032708700ae3141716",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/magnetic_reorder.py": "sha256:866b2cf52b5027170110de8d7be2236216dd0feb4451d398eb459428250f2452",
+    "product/src/ai_ad_editor/mask_edit.py": "sha256:952aa4c1cc3f49b2b1c9d5dc0c969901d82d4fcbe660387af2f3f7c044d6bb7a",
+    "product/src/ai_ad_editor/mask_edit_geometry.py": "sha256:9bf1d101c1aea8d2265b704fab8dcd65b3bb08c4cc45aed95a4a5cb0ee2ae1f9",
+    "product/src/ai_ad_editor/mask_review.py": "sha256:17de0acd6d76ad9218565302a0f47a577a5001a487bbf0c66432b0b6af278bad",
+    "product/src/ai_ad_editor/mask_tracking.py": "sha256:724f8f9800536d3ffdc99675fadf79e1262532ec7f9a3d879cf94674ba531b8d",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:75755c314fe01111d7ca85138efb6f9b0993e45c14c5a2b65cc1046c5e58cfba",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/nested_freeze.py": "sha256:2294d318840e6285550eaf70109702b041c031c2cde4c8dc0bca3d2bad848a35",
+    "product/src/ai_ad_editor/OPENFILM_EXAMPLES_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_frame_clock.mjs": "sha256:c60b35fb0d26b8629d833f11028757aeccf603917c4c5840f501c01b757de1d5",
+    "product/src/ai_ad_editor/OPENFILM_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_overrides.mjs": "sha256:8fab39a5f4f9696e9070a206f45d9241f54167ea2d9f47c0bcc9975333664832",
+    "product/src/ai_ad_editor/openfilm_stroke.mjs": "sha256:6c20aaff3a85b8a98654d82bfbea34029d78b0366af6b95b17c70abfafd265a1",
+    "product/src/ai_ad_editor/openfilm_subtitle_segments.mjs": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "product/src/ai_ad_editor/openfilm_template_fields.mjs": "sha256:fd4c58532cd3b46e32872e84136b54edef5a8ad9d824f1afa44f9264d81774e3",
+    "product/src/ai_ad_editor/openfilm_text_bounds.mjs": "sha256:94b2ab392b367ef1f901967f9156ac48493419be32bc40b4d6c035cf71a56108",
+    "product/src/ai_ad_editor/PDOOM_VIDEO_LICENSE.txt": "sha256:5fc212466ce7183be5d85a3ee34fea461712842d5cd256b470978a83577083cb",
+    "product/src/ai_ad_editor/policy.py": "sha256:775449c9012e5e79c228c140712e1c1c6c7f3eb668f0638703f177beb894242e",
+    "product/src/ai_ad_editor/project.py": "sha256:dd86c8d1b161cb99660f4bc92ac3ff8c2cc6c10c34f22432fbe6f27af9a7414f",
+    "product/src/ai_ad_editor/quality.py": "sha256:d4e71c9e6616250b681306d562305dafe4cb5867652ab365275277b155e9e047",
+    "product/src/ai_ad_editor/range_edits.py": "sha256:c82bab57fd4a32710459637b625d987a39e9f492fd2951ef9f43588ef5f15411",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:5bb2b6930ba80a8813c9d1feec7a62d960d1d110b07224073a1a34d04d989c5c",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:b806d815b9a456f0446a0a601ae9bcfdb957418ace18eb472bd1301b76138802",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/rfc3339_dates.py": "sha256:344d79048ff55a77af00314134c20b57b5301b75d1b6a32b4a7a3f52ce749105",
+    "product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt": "sha256:5ba1a4f03626ccca6dcbf53a554545e4f776a335bfdaa233ec3bfe9bb7fac15d",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/schema_contract.py": "sha256:a58998ed94b87208540d144416ee022cdf8f90d899c24de83cd024e50eeef0f5",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/sequence_canvas.py": "sha256:462542e26058d350c2d0a29d0cf4127c4054cab7462a763811b85bfca171412f",
+    "product/src/ai_ad_editor/sequence_sampling.py": "sha256:1aa171ef6043878afce099f7a04b214b9c458879147c46147062a77d36356ec2",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:ba871f7bff0f186ad55d9e22c5fcd75e09032e8d7299a01c7ea7b76b2e1a21a1",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/source_edits.py": "sha256:a2bea20a8d162ac4fa9f329045bca2b7e214a624adca107df6021919d5a1d36c",
+    "product/src/ai_ad_editor/source_transitions.py": "sha256:59c2652aa76024b78667293ce46774ba6910e4524db7e39f95dc95bd91b0547a",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/speed_curves.py": "sha256:41fbddd764bfa481e6158e8401333113c871e1c38e34257911f9aa676b9bfff9",
+    "product/src/ai_ad_editor/stroke_motion.py": "sha256:ba53f586ff12c75c15803e347307c802d977e874ce792159d74ebb2b6b42ae03",
+    "product/src/ai_ad_editor/subtitle_clock.py": "sha256:49ca2001da0f250d682f5818d95f4f51ee362cbaee979fb9a99649a847cd4645",
+    "product/src/ai_ad_editor/subtitle_segment_worker.mjs": "sha256:66ca5d7fab0926efe15615da29dba3024897cbfbfb1b28e6a6a189697b6d5bdc",
+    "product/src/ai_ad_editor/subtitle_segments.py": "sha256:5590e04147f0b50cb60df3b4e543059a560dbfd684b3085c5f25f8fb04631aea",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_highlight.py": "sha256:d08bee683f0bd00bac363a78df5957475765741a7c53d92ac025575b334f78e5",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/text_paint.py": "sha256:a924644f0396b5204efbb0e085f25d51f6cda5bfc75f2d44febc6796e42cb028",
+    "product/src/ai_ad_editor/text_typing.py": "sha256:6cc022af8300fb4270cb21f2f53ffe2b33210ac203169fed653d11d75e591ec3",
+    "product/src/ai_ad_editor/time_mapping.py": "sha256:70db06e3d2ec00fd9d951854cc73410caa2a35e036bcfba21363146ada1a7c55",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:78f984613b0c253d108dd4d515557f77bc4ebd4df4945108a63d8fdb38ad202b",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+    "product/src/ai_ad_editor/validator.py": "sha256:3fe31e56e5eb742b1fd80c44073ff3fd17a43c3a1851c4af8230ade0996bd205",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_alpha_resampling.py": "sha256:db2e2764a5022c18bba23ad407a6bf15a320edfea5f5a8331eda706d7c4046de",
+    "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+    "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+    "product/tests/test_audio_buses.py": "sha256:e4b6020208492cf4907a3537c0542321a7f1600692537b22299700f5b4d9dfdc",
+    "product/tests/test_audio_channel_modes.py": "sha256:815a9ea0117dd7ed0cce3a75d14ed67a4a8a06b413df1836d233f33359290e79",
+    "product/tests/test_audio_routing.py": "sha256:8d37d01454f1662d14f45b02fd879d0841a9894467064fa9b63fe3e3a38bd007",
+    "product/tests/test_audio_stretch.py": "sha256:53dea6b0ec9f8c00861b6a1844d7c34e0c87e432d78a4e4847c7245fd9893ce9",
+    "product/tests/test_audio_tempo_context.py": "sha256:ad3c7c53cfdaecdd00693aa745a22be2455e2dcd446583e4912cd1066b6aac3a",
+    "product/tests/test_audio_unity.py": "sha256:02dcf66038d4fcbc1f0c144e604efa451b9d7925817d1d2b089f8c087aa58810",
+    "product/tests/test_cli.py": "sha256:cefbec9b92fbdd2c5664454c35547d549b1da8db981f8be20102065c52cc4e79",
+    "product/tests/test_clip_windows.py": "sha256:42863fb28d81d22a0ac90ff1036ef5359186a29ab730d5404db36fae0660ecb3",
+    "product/tests/test_ctc_alignment.py": "sha256:838a854a442b413cb05be739f47eea86dae36057f12b0567bc820f3f442aec93",
+    "product/tests/test_delivery_precision.py": "sha256:5bc05fca5334ca454f3498b0f53cd28c0b44b8f9e9f3336b980b8a8604bbed03",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_font_coverage.py": "sha256:b382b9449601baf20a6c352c03e055b4f9efcad03b7515b694831376cc5a8234",
+    "product/tests/test_fragments.py": "sha256:d021051b4a5b48deac872e319407c9dae0cb2e7b3c8f1a7ab71704dff756a35f",
+    "product/tests/test_html_motion.py": "sha256:9e382485db151f79059e4d18c13708a6ee3deca38ad5be1272a5b9fb4dc4bc0c",
+    "product/tests/test_html_quality.py": "sha256:1e3d81bf7101b3d97aa89f5f60cebab0a7e64e44845ab60b4872f8d064217aae",
+    "product/tests/test_html_template.py": "sha256:747fb1e13b3bfb60f35012a8ffa18ac10f156f1e2811328792ab29d20e2de29a",
+    "product/tests/test_html_url_parser.py": "sha256:673a8073a536149c6b70366b2911ab6bfb3b395f3e2a14dd425c3d5f57cbcf02",
+    "product/tests/test_linked_edit.py": "sha256:d3b5d8fb402df059ea006d125fbb6fb651c891132fcd78deccfdbe41036d87d7",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+    "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vace.py": "sha256:a2227a49c43a233b73ed354681a39a03924d9ed0588749eda7df198c2c43807b",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_magnetic_reorder.py": "sha256:c4ad34f0ed89c9fe30ca51c188cdf9bfcf982322bd32a6ec6d5d64620c01c2a7",
+    "product/tests/test_mask_edit.py": "sha256:280c825c3a2dc95ac35943209a6eb30e45d519bc5ce1834a6a73c464f90718e1",
+    "product/tests/test_mask_edit_geometry.py": "sha256:7b6367f327d51cbd5b5746b90e89f27768acc7b49b0bb9d7e63cc3d1460bde06",
+    "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+    "product/tests/test_mask_tracking.py": "sha256:f8f2c1d0495410815b91d4f0a507a3a3909d2ca25c44817612970d4330578245",
+    "product/tests/test_nested_frame_coverage.py": "sha256:4bf9aef9aec5c34325f67e2a3e88dbe3424e4ec5c82d8f4e121ec95f7ab8d97f",
+    "product/tests/test_nested_freeze.py": "sha256:03261ace961acfcc5f99f52814a59a2b2bdf88fe3c0def7f48c8c3e897415c9b",
+    "product/tests/test_nested_time_mapping.py": "sha256:64415c49e45c5e7edf8d5f5ee745bbf22d30b6cdd5a0cde7cd731d88d6c6fad4",
+    "product/tests/test_nested_transitions.py": "sha256:9481f1de95ab4c556a17bfdbc1088001ceb29b92bab96d5040c8e6abdeb7881b",
+    "product/tests/test_offline_install.py": "sha256:6497262c7f791c46d706eeddfbaaa41d2d793e109106b93456e88f6786f051fc",
+    "product/tests/test_range_edits.py": "sha256:7634873bff27fbf51e412c82b37efae72cf7f38b20ffd22e1d60fe50359a1f7c",
+    "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+    "product/tests/test_schema_contract.py": "sha256:12d70209363d3b54341118e3f3ab988ebb041464c42eb7fb267c09d801ce483d",
+    "product/tests/test_sequence_canvas.py": "sha256:6f2b622c81932c0dcf80e7b3a528256b5e1a7209ef455b68f2c75a4c9154f4b0",
+    "product/tests/test_sequence_compositing.py": "sha256:1eea9b170c3fabe0623032b4de81a07e085cb7c88b5d79e8380d73399be21b0a",
+    "product/tests/test_sequence_sampling.py": "sha256:c75a6153aee2dbef11e9455a27656d204e46f0ce6061393ea91b6f46f8d7253f",
+    "product/tests/test_source_edits.py": "sha256:b5846137c5de1b1f08e82d43c69a7d95c031cd1c613fdf48613f72361e813614",
+    "product/tests/test_source_transitions.py": "sha256:8813a84843bfbb7aed5b5418011a287c9dae1b8628620114468df716401f2b4a",
+    "product/tests/test_speed_easing.py": "sha256:4797885a66a7e12b327fdf31e0cc937576620353e653c2c762ee905f2d61a5d7",
+    "product/tests/test_stroke_motion.py": "sha256:4ff06a458e6311e4979da31b6be05b5a53c6e09ef3bb6b429c63616368844410",
+    "product/tests/test_subtitle_clock.py": "sha256:1e6696405e30dc4d90e4baadcbffc013d5e6fee5d89bb67e908003c3ebe1de5a",
+    "product/tests/test_subtitle_segments.py": "sha256:aba64ed147276a6b1e59ad845557f86f2b6271db8d0dc75c006db328cac233c2",
+    "product/tests/test_text_animation_composition.py": "sha256:6ce0117f31339d36c574c70a8f2d83235813dc95d91f3108730cb954987c12de",
+    "product/tests/test_text_paint.py": "sha256:99887918ba5813b39a74cef18d02384ed503581e8695821530554590d38e219f",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "product/tests/test_word_highlight.py": "sha256:bf3f56f299d2452e8330bb192d31880c550e277ef93d04c4292fe816b79e172a"
+  },
+  "cases": [
+    {
+      "id": "AR01",
+      "title": "Shared multi-level buses",
+      "description": "tone + music -> shared x .5 -> sub x .5 -> master",
+      "project": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01",
+      "duration_seconds": 2.0,
+      "output_samples": 96000,
+      "max_absolute_error": 0.0,
+      "tolerance": 2e-06,
+      "reference": "independent float sample math",
+      "source_plan": "AR01-operations.json",
+      "lossless_output": "AR01.mkv",
+      "preview": "AR01.mp4",
+      "source_package": "AR01.aevpkg.zip",
+      "decoded_pcm_sha256": "sha256:c27707bcb2220022b7aa531df17a12f5c5e2812dbc694ffcbacedaadbd39513d"
+    },
+    {
+      "id": "AR02",
+      "title": "Pre/post-fader sends",
+      "description": "dry .5 + (.4 pre + .6 post x .5) x .25 = .675",
+      "project": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02",
+      "duration_seconds": 2.0,
+      "output_samples": 96000,
+      "max_absolute_error": 5.960464483090178e-09,
+      "tolerance": 2e-06,
+      "reference": "independent float sample math",
+      "source_plan": "AR02-operations.json",
+      "lossless_output": "AR02.mkv",
+      "preview": "AR02.mp4",
+      "source_package": "AR02.aevpkg.zip",
+      "decoded_pcm_sha256": "sha256:c0087aca59112a3bdc64aff6741ed8cc6b5fa17f65887e0faab9759611f0b296"
+    },
+    {
+      "id": "AR03",
+      "title": "Sequence-clock automation",
+      "description": "track .25..1 -> bus .5..1, balance +.5 -> master .75",
+      "project": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03",
+      "duration_seconds": 2.0,
+      "output_samples": 96000,
+      "max_absolute_error": 1.7694193887862752e-08,
+      "tolerance": 2e-06,
+      "reference": "independent float sample math",
+      "source_plan": "AR03-operations.json",
+      "lossless_output": "AR03.mkv",
+      "preview": "AR03.mp4",
+      "source_package": "AR03.aevpkg.zip",
+      "decoded_pcm_sha256": "sha256:6613869a02ba27bda064358d91a305635d7634822b8f0886cd53cef9f1d51b0f"
+    },
+    {
+      "id": "AR04",
+      "title": "Solo with unchanged detector",
+      "description": "voice -> detector only | music -> sidechain -> solo bus",
+      "project": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04",
+      "duration_seconds": 2.0,
+      "output_samples": 96000,
+      "max_absolute_error": 0.0,
+      "tolerance": 2e-06,
+      "reference": "independent wiring; same FFmpeg DSP, not independent algorithm",
+      "source_plan": "AR04-operations.json",
+      "lossless_output": "AR04.mkv",
+      "preview": "AR04.mp4",
+      "source_package": "AR04.aevpkg.zip",
+      "decoded_pcm_sha256": "sha256:073dca959c0498ab4b476d2bdf82f85d1dd834af6ff2f853ae833fe0d981120e"
+    },
+    {
+      "id": "AR05",
+      "title": "Complete child before reverse",
+      "description": "child compressor -> child 0..1 gain -> outer reverse",
+      "project": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05",
+      "duration_seconds": 2.0,
+      "output_samples": 96000,
+      "max_absolute_error": 7.448717947999839e-09,
+      "tolerance": 2e-06,
+      "reference": "independent wiring; same FFmpeg DSP, not independent algorithm",
+      "source_plan": "AR05-operations.json",
+      "lossless_output": "AR05.mkv",
+      "preview": "AR05.mp4",
+      "source_package": "AR05.aevpkg.zip",
+      "decoded_pcm_sha256": "sha256:a5f8fa36e6bf4154bcfc16d551d20b2b4b214976a6dcb6254835d6baa85a9c9e"
+    },
+    {
+      "id": "AR06",
+      "title": "Complete child before freeze",
+      "description": "child 0..1 gain -> 1 s silence -> remaining child bus",
+      "project": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06",
+      "duration_seconds": 3.0,
+      "output_samples": 144000,
+      "max_absolute_error": 9.934107481068821e-09,
+      "tolerance": 2e-06,
+      "reference": "independent float sample math",
+      "source_plan": "AR06-operations.json",
+      "lossless_output": "AR06.mkv",
+      "preview": "AR06.mp4",
+      "source_package": "AR06.aevpkg.zip",
+      "decoded_pcm_sha256": "sha256:ef160cef1b3f4eb66f62fdf77ab04c3ea608cdaa5418076b3fbf398d07039fa0"
+    }
+  ],
+  "cli_calls": [
+    {
+      "arguments": [
+        "project",
+        "init",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01",
+        "--name",
+        "AR01"
+      ],
+      "exit_code": 0,
+      "seconds": 0.06608570000389591,
+      "result": "cli/001.json",
+      "result_sha256": "sha256:8c556eda1be89d2b100a090bb209569687eda8defb1a7b5620f528c617f21dbe"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR01-input.png",
+        "--asset-id",
+        "diagram",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.20446669998636935,
+      "result": "cli/002.json",
+      "result_sha256": "sha256:3091ed3ce0edfc12e715d193a2ff8f93fa4b5fd5ac13d19b59ad5219e4bd99a8"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\tone.wav",
+        "--asset-id",
+        "tone",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.20127259999571834,
+      "result": "cli/003.json",
+      "result_sha256": "sha256:ae76eb83a48269b17a55056b895e89bddce20fd5d98f90cce7fe689824fdd50c"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\music.wav",
+        "--asset-id",
+        "music",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2060411000129534,
+      "result": "cli/004.json",
+      "result_sha256": "sha256:2dfb519a95e7c43ec6fc5e4de94cf9f686dd2bc5b3e5f208404e0ad9d3eb93e1"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\stereo.wav",
+        "--asset-id",
+        "stereo",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.3204383999982383,
+      "result": "cli/005.json",
+      "result_sha256": "sha256:4f50c6f951f2c0b3ddabeab5e2d7f79fe2f8229d198f5b419a82283333560508"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\dc.wav",
+        "--asset-id",
+        "dc",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.22306759998900816,
+      "result": "cli/006.json",
+      "result_sha256": "sha256:c45908a196282d1ad7bea0941834bea280d03274179d191f2143820a00307ef4"
+    },
+    {
+      "arguments": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR01-operations.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.38788530000601895,
+      "result": "cli/007.json",
+      "result_sha256": "sha256:532b04771bd8f81e85a668bb2e9eeeaff8907a9b425af42d6e6b7116f889ecb7"
+    },
+    {
+      "arguments": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01\\renders\\result.mkv",
+        "--publish"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5629363999905763,
+      "result": "cli/008.json",
+      "result_sha256": "sha256:31af3879535592d350aaef828ab8a12f751d28d1895144afa2f7cfed8f1d65f1"
+    },
+    {
+      "arguments": [
+        "policy",
+        "audit",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01"
+      ],
+      "exit_code": 0,
+      "seconds": 0.08980909999809228,
+      "result": "cli/009.json",
+      "result_sha256": "sha256:4a665dcc41438f171fa5982d9eaeef813b8dec2afba1159f47625eefd5d8abea"
+    },
+    {
+      "arguments": [
+        "convert",
+        "export",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR01",
+        "--target-format",
+        "package",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR01.aevpkg.zip"
+      ],
+      "exit_code": 0,
+      "seconds": 0.14994850000948645,
+      "result": "cli/010.json",
+      "result_sha256": "sha256:8c518e1b74c4650321a07d445b446fc65d93dbce2e4dba8b8f02ff0581eb2650"
+    },
+    {
+      "arguments": [
+        "project",
+        "init",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02",
+        "--name",
+        "AR02"
+      ],
+      "exit_code": 0,
+      "seconds": 0.059735999995609745,
+      "result": "cli/011.json",
+      "result_sha256": "sha256:cdb1636c80eedc35f34570ee58b2551cf2738633b610e14ce737baf0cb67fc4f"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR02-input.png",
+        "--asset-id",
+        "diagram",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.19528690000879578,
+      "result": "cli/012.json",
+      "result_sha256": "sha256:938f895c7836b5e5cba03479bc6381addfe6d869a7b6c45e2c8a96737fc52388"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\tone.wav",
+        "--asset-id",
+        "tone",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2741558999987319,
+      "result": "cli/013.json",
+      "result_sha256": "sha256:df2014b5ce19247ae4926d3366bcfcabeba7cf24bc76805e7d1eacaa29bbcc82"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\music.wav",
+        "--asset-id",
+        "music",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2116396000055829,
+      "result": "cli/014.json",
+      "result_sha256": "sha256:8843a18259c2ec986f789900b4422509a7fd2437677701682f74d5ce3fb25d8b"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\stereo.wav",
+        "--asset-id",
+        "stereo",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.258255900000222,
+      "result": "cli/015.json",
+      "result_sha256": "sha256:1b8c2bfb6fe1a64f3b93fdb1a2256f5ba7248bdd23a6a810ff38ab115ec52b2d"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\dc.wav",
+        "--asset-id",
+        "dc",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.25315170000249054,
+      "result": "cli/016.json",
+      "result_sha256": "sha256:5221115068e0fbae8579b37935b8ef785531e82862183be42fdbc7520003d5c0"
+    },
+    {
+      "arguments": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR02-operations.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1445372000016505,
+      "result": "cli/017.json",
+      "result_sha256": "sha256:98d3d4f452cc2ae37d8e32644949989aceee0482b9fb0d1ea62c299431771345"
+    },
+    {
+      "arguments": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02\\renders\\result.mkv",
+        "--publish"
+      ],
+      "exit_code": 0,
+      "seconds": 0.460554500008584,
+      "result": "cli/018.json",
+      "result_sha256": "sha256:058aa962e86b994cabbc939ca05e19e664f43c21fe5bc75a85288f273618fb86"
+    },
+    {
+      "arguments": [
+        "policy",
+        "audit",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02"
+      ],
+      "exit_code": 0,
+      "seconds": 0.07894010000745766,
+      "result": "cli/019.json",
+      "result_sha256": "sha256:11f6690c5328eb01636007041adc25036b38540407cb3ef91e7ae582eb59d83f"
+    },
+    {
+      "arguments": [
+        "convert",
+        "export",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR02",
+        "--target-format",
+        "package",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR02.aevpkg.zip"
+      ],
+      "exit_code": 0,
+      "seconds": 0.19019999999727588,
+      "result": "cli/020.json",
+      "result_sha256": "sha256:185215d1c9ea12caf1b9d1a539540cb8905dbfe4d5a6383e55c71f2e784fcf61"
+    },
+    {
+      "arguments": [
+        "project",
+        "init",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03",
+        "--name",
+        "AR03"
+      ],
+      "exit_code": 0,
+      "seconds": 0.05815509999229107,
+      "result": "cli/021.json",
+      "result_sha256": "sha256:fe5a77b8dc65e4affc8bccbf22267bc0c1e3963153c02e2c82811103d1a0b003"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR03-input.png",
+        "--asset-id",
+        "diagram",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.18543290000525303,
+      "result": "cli/022.json",
+      "result_sha256": "sha256:383d3b5a79a63a1047286551d2ac2dcf31644143e7e697bb1f5dcc2b0b428e79"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\tone.wav",
+        "--asset-id",
+        "tone",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.21237809999729507,
+      "result": "cli/023.json",
+      "result_sha256": "sha256:1d9ddc2b47cf72bbf6ff2a858ff0193477af679b510bf40393ab040049325aaf"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\music.wav",
+        "--asset-id",
+        "music",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.20973000000230968,
+      "result": "cli/024.json",
+      "result_sha256": "sha256:117fbd2f33553afd3a00abd70b86054f4cbe054054ae4e1f26b0ceff34f9346c"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\stereo.wav",
+        "--asset-id",
+        "stereo",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2425781000056304,
+      "result": "cli/025.json",
+      "result_sha256": "sha256:a1d45cde15db6dca69502132ccb6b95281c5cabf6c463a1f972fba6c039524a5"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\dc.wav",
+        "--asset-id",
+        "dc",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2136151000013342,
+      "result": "cli/026.json",
+      "result_sha256": "sha256:9368fbae40301e3c91ec3a36362efd40046870076d3978020dfdfb5d4b73a1d3"
+    },
+    {
+      "arguments": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR03-operations.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.15167700000165496,
+      "result": "cli/027.json",
+      "result_sha256": "sha256:d513b9a9d650fd67ac508516d33aabd1bbbf30dc0b1ac7630a260b896e3f8198"
+    },
+    {
+      "arguments": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03\\renders\\result.mkv",
+        "--publish"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5460827000060817,
+      "result": "cli/028.json",
+      "result_sha256": "sha256:9e749774c47c4a4259b483a8247dd656bd1e5fc054e3e9824ea7a87145c5f677"
+    },
+    {
+      "arguments": [
+        "policy",
+        "audit",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03"
+      ],
+      "exit_code": 0,
+      "seconds": 0.07238219999999274,
+      "result": "cli/029.json",
+      "result_sha256": "sha256:b6856cadd0448e88b441101a3e2c7972693c897a393e03ad0269968e2db5f15f"
+    },
+    {
+      "arguments": [
+        "convert",
+        "export",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR03",
+        "--target-format",
+        "package",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR03.aevpkg.zip"
+      ],
+      "exit_code": 0,
+      "seconds": 0.23682839999673888,
+      "result": "cli/030.json",
+      "result_sha256": "sha256:8537a8a9d1fce42af02f9943ec763f25e9ba89b27ba5d02cf02712c3a6c61ba7"
+    },
+    {
+      "arguments": [
+        "project",
+        "init",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04",
+        "--name",
+        "AR04"
+      ],
+      "exit_code": 0,
+      "seconds": 0.05695250000280794,
+      "result": "cli/031.json",
+      "result_sha256": "sha256:93b3055e61fa51497df4014623a52f29e463cabb716b3c38aeb1671c4bb3e1f0"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR04-input.png",
+        "--asset-id",
+        "diagram",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2505961999995634,
+      "result": "cli/032.json",
+      "result_sha256": "sha256:7b6dd63ff340964901f6383dc80417c47879357675c30d02e7215266fbedeaa4"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\tone.wav",
+        "--asset-id",
+        "tone",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.19971510001050774,
+      "result": "cli/033.json",
+      "result_sha256": "sha256:463302a63000b22df01b1b92a168898cdf4f9831d6ac96a069b60701ca7c2011"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\music.wav",
+        "--asset-id",
+        "music",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.23951130000932608,
+      "result": "cli/034.json",
+      "result_sha256": "sha256:2751c078cfa6d1a9721b6d6107ff7300122ac48a4a9f9073b280eb2be9c70d67"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\stereo.wav",
+        "--asset-id",
+        "stereo",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.33285750000504777,
+      "result": "cli/035.json",
+      "result_sha256": "sha256:fcba2e653bec27bc1364b77929df3a0dacdd7428071154e073f2eb330af73c80"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\dc.wav",
+        "--asset-id",
+        "dc",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.24384830000053626,
+      "result": "cli/036.json",
+      "result_sha256": "sha256:08b2b0c25afe2b19e65f2ad6aede7daed93d575adbb3f3cef06394c87919719e"
+    },
+    {
+      "arguments": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR04-operations.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.24323939999158029,
+      "result": "cli/037.json",
+      "result_sha256": "sha256:ed6cebc0a33dd5d1dabf0a7ae31cf9b9d9f11095a6378f5b0d4b41bc7638ebea"
+    },
+    {
+      "arguments": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04\\renders\\result.mkv",
+        "--publish"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5707029000041075,
+      "result": "cli/038.json",
+      "result_sha256": "sha256:577f7199fb77b3230e8632b9afb9e505633fbeed249972048d0163f3e6cdf843"
+    },
+    {
+      "arguments": [
+        "policy",
+        "audit",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04"
+      ],
+      "exit_code": 0,
+      "seconds": 0.0736421000037808,
+      "result": "cli/039.json",
+      "result_sha256": "sha256:509a92e4b39f35e2ecea2cf08a166cec66e0c731f47e8142e2de51eee970ba3b"
+    },
+    {
+      "arguments": [
+        "convert",
+        "export",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR04",
+        "--target-format",
+        "package",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR04.aevpkg.zip"
+      ],
+      "exit_code": 0,
+      "seconds": 0.16517019999446347,
+      "result": "cli/040.json",
+      "result_sha256": "sha256:74ec3876faf91a2f345b3e620c061afa3991156ac6085a12e13c991e11e7d95b"
+    },
+    {
+      "arguments": [
+        "project",
+        "init",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05",
+        "--name",
+        "AR05"
+      ],
+      "exit_code": 0,
+      "seconds": 0.07255969999823719,
+      "result": "cli/041.json",
+      "result_sha256": "sha256:c87f8ba7992fb4bdee79751cf9330edf773ffc60357e4676772e1b92dc890427"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR05-input.png",
+        "--asset-id",
+        "diagram",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.18609409999044146,
+      "result": "cli/042.json",
+      "result_sha256": "sha256:88ee33805a3613ae8c96980f3145ddcc240318ed58764200b223601ab44de1ca"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\tone.wav",
+        "--asset-id",
+        "tone",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.20293459999084007,
+      "result": "cli/043.json",
+      "result_sha256": "sha256:6c49b1e7bfafe88d8fda47071d2068bb3a98d5dbace8f7a6329ce476b1f57b6b"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\music.wav",
+        "--asset-id",
+        "music",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.32691289999638684,
+      "result": "cli/044.json",
+      "result_sha256": "sha256:2a5187386337e546ba3838eec0fcfab066355d03241d8e7f2db4cab7a8c5efff"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\stereo.wav",
+        "--asset-id",
+        "stereo",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2689696000015829,
+      "result": "cli/045.json",
+      "result_sha256": "sha256:b8beda82f6f4f67273a0a08c04caeb9f0d9ac46af2cec80083f77476e0356ef0"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\dc.wav",
+        "--asset-id",
+        "dc",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.32511990000784863,
+      "result": "cli/046.json",
+      "result_sha256": "sha256:8254111da4fba543aa640c8ae64d0d85c646f230c4093daa15bc48cb4da103a9"
+    },
+    {
+      "arguments": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR05-operations.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.14969700000074226,
+      "result": "cli/047.json",
+      "result_sha256": "sha256:ad7f2527328dae4f1fddc70df9eaa8cfb385905f6c9f849dd23434c553ba82a4"
+    },
+    {
+      "arguments": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05\\renders\\result.mkv",
+        "--publish"
+      ],
+      "exit_code": 0,
+      "seconds": 0.695791599995573,
+      "result": "cli/048.json",
+      "result_sha256": "sha256:b781b07053409bb5ef7e681102cba6c1a51c6e34c067e9173ad1016ae0730e08"
+    },
+    {
+      "arguments": [
+        "policy",
+        "audit",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05"
+      ],
+      "exit_code": 0,
+      "seconds": 0.07675110000127461,
+      "result": "cli/049.json",
+      "result_sha256": "sha256:a02794280a22d28d72b5684451d775e0c933764978bed86803aca5e79ccbb0e1"
+    },
+    {
+      "arguments": [
+        "convert",
+        "export",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05",
+        "--target-format",
+        "package",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR05.aevpkg.zip"
+      ],
+      "exit_code": 0,
+      "seconds": 0.18002770000020973,
+      "result": "cli/050.json",
+      "result_sha256": "sha256:dd3b1e67509763e11e37d0b2cbadd7deede4152774e8477606371189a570c7ad"
+    },
+    {
+      "arguments": [
+        "project",
+        "init",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06",
+        "--name",
+        "AR06"
+      ],
+      "exit_code": 0,
+      "seconds": 0.05976990000635851,
+      "result": "cli/051.json",
+      "result_sha256": "sha256:59aa27eb8e7599799c07d84cb7f04a3229677e2b3bc7031ab3a4924a6c2c6881"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR06-input.png",
+        "--asset-id",
+        "diagram",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.18301249999785796,
+      "result": "cli/052.json",
+      "result_sha256": "sha256:eefa7e58511db5125e257876c1fa3ae7a87db39057418dd39ed4d647127cbfc5"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\tone.wav",
+        "--asset-id",
+        "tone",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.4741601000132505,
+      "result": "cli/053.json",
+      "result_sha256": "sha256:c3ccc592bb56724ceebff91ed9ae50d347553adaac8735b12871508195606a29"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\music.wav",
+        "--asset-id",
+        "music",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2276421999995364,
+      "result": "cli/054.json",
+      "result_sha256": "sha256:e08834cc68402163b6c466f8ec9de2e7931610a64077a384bf0666f90cc1e2c6"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\stereo.wav",
+        "--asset-id",
+        "stereo",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.21846390000428073,
+      "result": "cli/055.json",
+      "result_sha256": "sha256:da349b459ec401f7e0911fced549af518c427e5f67596d5900714d1c93d8013b"
+    },
+    {
+      "arguments": [
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\dc.wav",
+        "--asset-id",
+        "dc",
+        "--source-url",
+        "local:original-audio-routing-v55-fixture",
+        "--license-spdx",
+        "CC0-1.0",
+        "--permitted-use",
+        "commercial_ad",
+        "--verification-status",
+        "verified",
+        "--evidence",
+        "original mathematical signal; no external media"
+      ],
+      "exit_code": 0,
+      "seconds": 0.22394369999528863,
+      "result": "cli/056.json",
+      "result_sha256": "sha256:eab49a088a175ba073f25c1593b8ebe4fbbbe2f0c7a251b8a20b31f95c71d3d6"
+    },
+    {
+      "arguments": [
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR06-operations.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.16233680000004824,
+      "result": "cli/057.json",
+      "result_sha256": "sha256:37285a962dfc5f302145c57fcf9abbd689f1b3908e65af2751b52b69634f5791"
+    },
+    {
+      "arguments": [
+        "render",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06\\renders\\result.mkv",
+        "--publish"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5863800000079209,
+      "result": "cli/058.json",
+      "result_sha256": "sha256:9c6aca7f8d493c1e65cea6742f7a25ea918790cbb24591281041174306d3eb3b"
+    },
+    {
+      "arguments": [
+        "policy",
+        "audit",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06"
+      ],
+      "exit_code": 0,
+      "seconds": 0.08233669999754056,
+      "result": "cli/059.json",
+      "result_sha256": "sha256:f75f880663d6ef245c0fc40983276cd8eb4494d7c11784bc2321e3545edf06c0"
+    },
+    {
+      "arguments": [
+        "convert",
+        "export",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR06",
+        "--target-format",
+        "package",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR06.aevpkg.zip"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1605757000070298,
+      "result": "cli/060.json",
+      "result_sha256": "sha256:8497eb414f9400c8dc4a6a9df6c9c6c112d38ab88ed0522d436370416df60f71"
+    }
+  ],
+  "baseline_control": {
+    "commit": "7a4a803c520616fc3b727dada7e6a032d0937ab1",
+    "source_zip_sha256": "sha256:2f53e985f0fbca4f441e9c3a4097361f10256511b76250f9b2eca5e1ac10d131",
+    "exit_code": 0,
+    "dry_only_max_error": 0.0,
+    "new_route_gain": 0.675,
+    "old_ignored_field_gain": 0.5
+  },
+  "files": [
+    {
+      "path": "AR01-input.png",
+      "bytes": 12942,
+      "sha256": "sha256:1be7d7cb036edea0f6191c629c74096cec0e91212857ca623965d0042ca85ab5"
+    },
+    {
+      "path": "AR01-manifest.json",
+      "bytes": 23584,
+      "sha256": "sha256:7beca24ef82169aebbe8df363d5d463f338a9c3f148fdcdbb25716e009dff969"
+    },
+    {
+      "path": "AR01-operations.json",
+      "bytes": 1568,
+      "sha256": "sha256:ad453525cb59f90e615f382b6faf5384db4920fb2a6e5b7af551e5f424ad7555"
+    },
+    {
+      "path": "AR01-preview-probe.json",
+      "bytes": 3569,
+      "sha256": "sha256:457885aa5aaedd19cfb9959096a296817503df5d096d92ebf0c859d144c702e7"
+    },
+    {
+      "path": "AR01-waveform.png",
+      "bytes": 14687,
+      "sha256": "sha256:d69d1fa7cbd000e2878def45c2209db90c0f7d9415ef78e3bc0060773f8718a2"
+    },
+    {
+      "path": "AR01.aevpkg.zip",
+      "bytes": 24405,
+      "sha256": "sha256:a22f6b6405156ca90baaa02629578bf21ce1b58a652a9a1c0e8dabf8a50ff5e8"
+    },
+    {
+      "path": "AR01.aevpkg.zip.conversion-report.json",
+      "bytes": 944,
+      "sha256": "sha256:94ded7cb08bc9ecfd952da7ff0c2a64120166594c0d7441dff031064b5eaf744"
+    },
+    {
+      "path": "AR01.mkv",
+      "bytes": 814887,
+      "sha256": "sha256:a59cbc0dcff8ebe41d67f05cebee8bf94277f00b7943df1022787368c90ac7e4"
+    },
+    {
+      "path": "AR01.mp4",
+      "bytes": 64655,
+      "sha256": "sha256:cb93cc3ba03c5919ba466f7c680f47b069cc506b9c7da6d4ec36ee6b996696cd"
+    },
+    {
+      "path": "AR02-input.png",
+      "bytes": 13130,
+      "sha256": "sha256:b8e2fffe51bcc8a152905ce8a44add2cc6e47a833c2cd6008139dad9d96e3972"
+    },
+    {
+      "path": "AR02-manifest.json",
+      "bytes": 21160,
+      "sha256": "sha256:03af60b729866b6db42eeae8dc56c67d52d8ac7b454badca6b256321e34f4ec7"
+    },
+    {
+      "path": "AR02-operations.json",
+      "bytes": 1406,
+      "sha256": "sha256:acf1c3094955cb2866bea320d8101d3578846988f9253d4cdbd500eeee9108aa"
+    },
+    {
+      "path": "AR02-preview-probe.json",
+      "bytes": 3569,
+      "sha256": "sha256:6fba5c96b9aaa6a1107824132c95af9525a4cc3e83e67b9a08900d388fa5389d"
+    },
+    {
+      "path": "AR02-waveform.png",
+      "bytes": 14862,
+      "sha256": "sha256:8e5c9c961d7aebb41556b5a45770e3a3cdba5aca1e295b48c1181f8c345412e2"
+    },
+    {
+      "path": "AR02.aevpkg.zip",
+      "bytes": 24605,
+      "sha256": "sha256:e9e4475019c7250fba8e971a2e962502ed375c31a9726fe3a5a80ff9978a6a17"
+    },
+    {
+      "path": "AR02.aevpkg.zip.conversion-report.json",
+      "bytes": 944,
+      "sha256": "sha256:72e38b6f62d61cd667a18a8a7fc37242e912e908f67d07a9c6ae4aa9640d8b2c"
+    },
+    {
+      "path": "AR02.mkv",
+      "bytes": 814127,
+      "sha256": "sha256:6bb0098ac8a1214b94d4f5ff9dfced164179ccadab19c1684988377353ca47d0"
+    },
+    {
+      "path": "AR02.mp4",
+      "bytes": 67236,
+      "sha256": "sha256:7c34588af33b0fea8c79bef4222fa81eca332c29a2e58195b1089c763b3c54f3"
+    },
+    {
+      "path": "AR03-input.png",
+      "bytes": 13316,
+      "sha256": "sha256:d2f3ac32d912b73ed6c14cc775ed016ad1043cce1bd3853a4285e70c63f22787"
+    },
+    {
+      "path": "AR03-manifest.json",
+      "bytes": 22235,
+      "sha256": "sha256:f9b6fd68b5190d2f24cb7f4aebb4ed4a81845d848e0f8870674c571cfd021418"
+    },
+    {
+      "path": "AR03-operations.json",
+      "bytes": 2080,
+      "sha256": "sha256:702af651a99dfcb72b1427ecf1ce7e95d3acdf282c774f3458d57497b32bbef5"
+    },
+    {
+      "path": "AR03-preview-probe.json",
+      "bytes": 3569,
+      "sha256": "sha256:fd48d640403195bbf90b5681da5a8bb1c7910116d700f1f8620067d50a7615b6"
+    },
+    {
+      "path": "AR03-waveform.png",
+      "bytes": 15252,
+      "sha256": "sha256:2d71da6f998933da1a7f642369f862c79ee20833f4540d03840910e203ab9868"
+    },
+    {
+      "path": "AR03.aevpkg.zip",
+      "bytes": 24795,
+      "sha256": "sha256:0c12846b4e43195138c83981a203aa8bc2e4317ba63116046d1a605bbc104e28"
+    },
+    {
+      "path": "AR03.aevpkg.zip.conversion-report.json",
+      "bytes": 944,
+      "sha256": "sha256:8869bd78cf39dd77d63507ebd25bd3c468e394b9c86b02629b17f65b63a8596e"
+    },
+    {
+      "path": "AR03.mkv",
+      "bytes": 815850,
+      "sha256": "sha256:289b9f3386656cc0cd53736880e9037bfa4e409e84232d78ceb5e5feec399522"
+    },
+    {
+      "path": "AR03.mp4",
+      "bytes": 71403,
+      "sha256": "sha256:02800a15f13b5b93677ceb87cbd72a6a61316dddee9f66f07a1d74feafea7d10"
+    },
+    {
+      "path": "AR04-input.png",
+      "bytes": 13361,
+      "sha256": "sha256:7a894d3d558cfe2875e611ec4c7349c4d45c701ae0c023fae071c55af8904b74"
+    },
+    {
+      "path": "AR04-manifest.json",
+      "bytes": 28733,
+      "sha256": "sha256:abe242b5a61f55ef1cdfae30088373bc5ddaeb4cc096daa75bb1e66f1473d00e"
+    },
+    {
+      "path": "AR04-operations.json",
+      "bytes": 1771,
+      "sha256": "sha256:85b369a04da74626a3cad3eb55d80dce1aa9ca853790e67676f042fd99295c30"
+    },
+    {
+      "path": "AR04-preview-probe.json",
+      "bytes": 3569,
+      "sha256": "sha256:f111c0ef101ed7746c3a526b5095402073f9f731b253df4a3729687798870abe"
+    },
+    {
+      "path": "AR04-waveform.png",
+      "bytes": 15121,
+      "sha256": "sha256:f493b3f8f305b8e1817c3011a0a6af4ad0449c96928bd3dfbc4eece1713b29c2"
+    },
+    {
+      "path": "AR04.aevpkg.zip",
+      "bytes": 24918,
+      "sha256": "sha256:7dac0b9aa5d60c40aa39f5dc5bf76499d15119bd4a5c8fe8cadb4673fa7a4e11"
+    },
+    {
+      "path": "AR04.aevpkg.zip.conversion-report.json",
+      "bytes": 944,
+      "sha256": "sha256:1f6444c92375bbbf529745b0c04a42b2e61e458988806bb1a9d0263bf5022490"
+    },
+    {
+      "path": "AR04.mkv",
+      "bytes": 817258,
+      "sha256": "sha256:66cb109fdc5b139f29f5d8bf1c824a3dbccb397abddd7ca53ba3ad188ed1ea21"
+    },
+    {
+      "path": "AR04.mp4",
+      "bytes": 52545,
+      "sha256": "sha256:9cd937f289a8aa1bc3349d524711bf4478f27811732d59e0b6394520df1fcab2"
+    },
+    {
+      "path": "AR05-input.png",
+      "bytes": 13610,
+      "sha256": "sha256:e1fe2c2a5e54a2f55f62a9743850f4d8dab600310e0aa128254d0e774908db85"
+    },
+    {
+      "path": "AR05-manifest.json",
+      "bytes": 51147,
+      "sha256": "sha256:2b416fff7c2279baf7986611da464c98b12010811adfdfb60cb1718ecb870ba7"
+    },
+    {
+      "path": "AR05-operations.json",
+      "bytes": 2123,
+      "sha256": "sha256:d2d6da04040805c9afd2e2220e0ce42358cf2c50f83b729045f356d9ed0aa6b2"
+    },
+    {
+      "path": "AR05-preview-probe.json",
+      "bytes": 3569,
+      "sha256": "sha256:7497449b9a2fe4b4570517c3f3f8f5cf1d5286b3468db998ee0b54034007261a"
+    },
+    {
+      "path": "AR05-waveform.png",
+      "bytes": 15524,
+      "sha256": "sha256:15e6f56232b31024ca4b648eba2fb90952bed8c46e131b0b8dc8812afc828c5d"
+    },
+    {
+      "path": "AR05.aevpkg.zip",
+      "bytes": 25303,
+      "sha256": "sha256:8b5d7646744b3e596bc1ced95547b06885de9b6ca5eaffeeb5104b9179ffaf52"
+    },
+    {
+      "path": "AR05.aevpkg.zip.conversion-report.json",
+      "bytes": 944,
+      "sha256": "sha256:b44c0e29d5fd9325ca7dfb5c2d35a08eafb550aadca1bcb929cc4aec9c5543d8"
+    },
+    {
+      "path": "AR05.mkv",
+      "bytes": 816612,
+      "sha256": "sha256:94302d02f4951391ad002a989c4c815fa8a789ffe1776f85963f68b8aeed02e4"
+    },
+    {
+      "path": "AR05.mp4",
+      "bytes": 62519,
+      "sha256": "sha256:84d97ccf8f4b930852c547578388c690d81029005f8b8fc665157c4640eca2bf"
+    },
+    {
+      "path": "AR06-input.png",
+      "bytes": 12981,
+      "sha256": "sha256:ff9b98109c0a2bd26ee1f6f23a4abe08af78d512958f658501d2b3ae62e836a9"
+    },
+    {
+      "path": "AR06-manifest.json",
+      "bytes": 66968,
+      "sha256": "sha256:32a8348eae7ecfdd1fc353ff3a1f19360ced4c22943349fddd41e3b7e6190a1a"
+    },
+    {
+      "path": "AR06-operations.json",
+      "bytes": 2021,
+      "sha256": "sha256:6488873a364b7389a517b9c13abe4ed2829c9abccc8fe6c13b3415e2692ac781"
+    },
+    {
+      "path": "AR06-preview-probe.json",
+      "bytes": 3572,
+      "sha256": "sha256:b1d92a627bc2b526d3f8ff92b4e8a3b3e508ffff90e86576c037edf885816da0"
+    },
+    {
+      "path": "AR06-waveform.png",
+      "bytes": 15074,
+      "sha256": "sha256:8aeba197064275c4ed85cb11afdb81309e341da67fbe58c3ba18cb53d60e4acd"
+    },
+    {
+      "path": "AR06.aevpkg.zip",
+      "bytes": 24688,
+      "sha256": "sha256:51bdd05a5a806082baeb7bbd05d600176694c5cf2d0a09774ccaea261a99f9b0"
+    },
+    {
+      "path": "AR06.aevpkg.zip.conversion-report.json",
+      "bytes": 944,
+      "sha256": "sha256:22ade9fc60491c3999282722e2b5923bafc5eecbd5bb795c1de6deab8c26d248"
+    },
+    {
+      "path": "AR06.mkv",
+      "bytes": 1212050,
+      "sha256": "sha256:ebef6ee82a16c487785081d59a68414120e403c79ba85fe4b0db35d12f4bf8fc"
+    },
+    {
+      "path": "AR06.mp4",
+      "bytes": 69064,
+      "sha256": "sha256:1302c5e651900584cc3fcbbe1ef52df371ea1ce93054b54a6f4968800b863439"
+    },
+    {
+      "path": "audio-routing-showcase.gif",
+      "bytes": 293245,
+      "sha256": "sha256:837fa876b4b3a54cdfd764f941399fdb1229b70605151946e404ba8dabb236e3"
+    },
+    {
+      "path": "audio-routing-showcase.mp4",
+      "bytes": 336794,
+      "sha256": "sha256:8e33950af3b12f79b8716cfb0020de6f92d888e7ac98cd931f62329ab7f8509d"
+    },
+    {
+      "path": "baseline-render.stderr.log",
+      "bytes": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "baseline-render.stdout.json",
+      "bytes": 7262,
+      "sha256": "sha256:09591a60bf68c654ceb7ce9e6075f438bcc0c737b219a41e5bd5a0d23c19046e"
+    },
+    {
+      "path": "cli/001.json",
+      "bytes": 729,
+      "sha256": "sha256:8c556eda1be89d2b100a090bb209569687eda8defb1a7b5620f528c617f21dbe"
+    },
+    {
+      "path": "cli/002.json",
+      "bytes": 3897,
+      "sha256": "sha256:3091ed3ce0edfc12e715d193a2ff8f93fa4b5fd5ac13d19b59ad5219e4bd99a8"
+    },
+    {
+      "path": "cli/003.json",
+      "bytes": 3876,
+      "sha256": "sha256:ae76eb83a48269b17a55056b895e89bddce20fd5d98f90cce7fe689824fdd50c"
+    },
+    {
+      "path": "cli/004.json",
+      "bytes": 3884,
+      "sha256": "sha256:2dfb519a95e7c43ec6fc5e4de94cf9f686dd2bc5b3e5f208404e0ad9d3eb93e1"
+    },
+    {
+      "path": "cli/005.json",
+      "bytes": 3892,
+      "sha256": "sha256:4f50c6f951f2c0b3ddabeab5e2d7f79fe2f8229d198f5b419a82283333560508"
+    },
+    {
+      "path": "cli/006.json",
+      "bytes": 3860,
+      "sha256": "sha256:c45908a196282d1ad7bea0941834bea280d03274179d191f2143820a00307ef4"
+    },
+    {
+      "path": "cli/007.json",
+      "bytes": 5174,
+      "sha256": "sha256:532b04771bd8f81e85a668bb2e9eeeaff8907a9b425af42d6e6b7116f889ecb7"
+    },
+    {
+      "path": "cli/008.json",
+      "bytes": 11989,
+      "sha256": "sha256:31af3879535592d350aaef828ab8a12f751d28d1895144afa2f7cfed8f1d65f1"
+    },
+    {
+      "path": "cli/009.json",
+      "bytes": 647,
+      "sha256": "sha256:4a665dcc41438f171fa5982d9eaeef813b8dec2afba1159f47625eefd5d8abea"
+    },
+    {
+      "path": "cli/010.json",
+      "bytes": 3973,
+      "sha256": "sha256:8c518e1b74c4650321a07d445b446fc65d93dbce2e4dba8b8f02ff0581eb2650"
+    },
+    {
+      "path": "cli/011.json",
+      "bytes": 729,
+      "sha256": "sha256:cdb1636c80eedc35f34570ee58b2551cf2738633b610e14ce737baf0cb67fc4f"
+    },
+    {
+      "path": "cli/012.json",
+      "bytes": 3897,
+      "sha256": "sha256:938f895c7836b5e5cba03479bc6381addfe6d869a7b6c45e2c8a96737fc52388"
+    },
+    {
+      "path": "cli/013.json",
+      "bytes": 3876,
+      "sha256": "sha256:df2014b5ce19247ae4926d3366bcfcabeba7cf24bc76805e7d1eacaa29bbcc82"
+    },
+    {
+      "path": "cli/014.json",
+      "bytes": 3884,
+      "sha256": "sha256:8843a18259c2ec986f789900b4422509a7fd2437677701682f74d5ce3fb25d8b"
+    },
+    {
+      "path": "cli/015.json",
+      "bytes": 3892,
+      "sha256": "sha256:1b8c2bfb6fe1a64f3b93fdb1a2256f5ba7248bdd23a6a810ff38ab115ec52b2d"
+    },
+    {
+      "path": "cli/016.json",
+      "bytes": 3860,
+      "sha256": "sha256:5221115068e0fbae8579b37935b8ef785531e82862183be42fdbc7520003d5c0"
+    },
+    {
+      "path": "cli/017.json",
+      "bytes": 4540,
+      "sha256": "sha256:98d3d4f452cc2ae37d8e32644949989aceee0482b9fb0d1ea62c299431771345"
+    },
+    {
+      "path": "cli/018.json",
+      "bytes": 11899,
+      "sha256": "sha256:058aa962e86b994cabbc939ca05e19e664f43c21fe5bc75a85288f273618fb86"
+    },
+    {
+      "path": "cli/019.json",
+      "bytes": 647,
+      "sha256": "sha256:11f6690c5328eb01636007041adc25036b38540407cb3ef91e7ae582eb59d83f"
+    },
+    {
+      "path": "cli/020.json",
+      "bytes": 3973,
+      "sha256": "sha256:185215d1c9ea12caf1b9d1a539540cb8905dbfe4d5a6383e55c71f2e784fcf61"
+    },
+    {
+      "path": "cli/021.json",
+      "bytes": 729,
+      "sha256": "sha256:fe5a77b8dc65e4affc8bccbf22267bc0c1e3963153c02e2c82811103d1a0b003"
+    },
+    {
+      "path": "cli/022.json",
+      "bytes": 3897,
+      "sha256": "sha256:383d3b5a79a63a1047286551d2ac2dcf31644143e7e697bb1f5dcc2b0b428e79"
+    },
+    {
+      "path": "cli/023.json",
+      "bytes": 3876,
+      "sha256": "sha256:1d9ddc2b47cf72bbf6ff2a858ff0193477af679b510bf40393ab040049325aaf"
+    },
+    {
+      "path": "cli/024.json",
+      "bytes": 3884,
+      "sha256": "sha256:117fbd2f33553afd3a00abd70b86054f4cbe054054ae4e1f26b0ceff34f9346c"
+    },
+    {
+      "path": "cli/025.json",
+      "bytes": 3892,
+      "sha256": "sha256:a1d45cde15db6dca69502132ccb6b95281c5cabf6c463a1f972fba6c039524a5"
+    },
+    {
+      "path": "cli/026.json",
+      "bytes": 3860,
+      "sha256": "sha256:9368fbae40301e3c91ec3a36362efd40046870076d3978020dfdfb5d4b73a1d3"
+    },
+    {
+      "path": "cli/027.json",
+      "bytes": 4767,
+      "sha256": "sha256:d513b9a9d650fd67ac508516d33aabd1bbbf30dc0b1ac7630a260b896e3f8198"
+    },
+    {
+      "path": "cli/028.json",
+      "bytes": 11901,
+      "sha256": "sha256:9e749774c47c4a4259b483a8247dd656bd1e5fc054e3e9824ea7a87145c5f677"
+    },
+    {
+      "path": "cli/029.json",
+      "bytes": 647,
+      "sha256": "sha256:b6856cadd0448e88b441101a3e2c7972693c897a393e03ad0269968e2db5f15f"
+    },
+    {
+      "path": "cli/030.json",
+      "bytes": 3973,
+      "sha256": "sha256:8537a8a9d1fce42af02f9943ec763f25e9ba89b27ba5d02cf02712c3a6c61ba7"
+    },
+    {
+      "path": "cli/031.json",
+      "bytes": 729,
+      "sha256": "sha256:93b3055e61fa51497df4014623a52f29e463cabb716b3c38aeb1671c4bb3e1f0"
+    },
+    {
+      "path": "cli/032.json",
+      "bytes": 3897,
+      "sha256": "sha256:7b6dd63ff340964901f6383dc80417c47879357675c30d02e7215266fbedeaa4"
+    },
+    {
+      "path": "cli/033.json",
+      "bytes": 3876,
+      "sha256": "sha256:463302a63000b22df01b1b92a168898cdf4f9831d6ac96a069b60701ca7c2011"
+    },
+    {
+      "path": "cli/034.json",
+      "bytes": 3884,
+      "sha256": "sha256:2751c078cfa6d1a9721b6d6107ff7300122ac48a4a9f9073b280eb2be9c70d67"
+    },
+    {
+      "path": "cli/035.json",
+      "bytes": 3892,
+      "sha256": "sha256:fcba2e653bec27bc1364b77929df3a0dacdd7428071154e073f2eb330af73c80"
+    },
+    {
+      "path": "cli/036.json",
+      "bytes": 3860,
+      "sha256": "sha256:08b2b0c25afe2b19e65f2ad6aede7daed93d575adbb3f3cef06394c87919719e"
+    },
+    {
+      "path": "cli/037.json",
+      "bytes": 5389,
+      "sha256": "sha256:ed6cebc0a33dd5d1dabf0a7ae31cf9b9d9f11095a6378f5b0d4b41bc7638ebea"
+    },
+    {
+      "path": "cli/038.json",
+      "bytes": 11989,
+      "sha256": "sha256:577f7199fb77b3230e8632b9afb9e505633fbeed249972048d0163f3e6cdf843"
+    },
+    {
+      "path": "cli/039.json",
+      "bytes": 647,
+      "sha256": "sha256:509a92e4b39f35e2ecea2cf08a166cec66e0c731f47e8142e2de51eee970ba3b"
+    },
+    {
+      "path": "cli/040.json",
+      "bytes": 3973,
+      "sha256": "sha256:74ec3876faf91a2f345b3e620c061afa3991156ac6085a12e13c991e11e7d95b"
+    },
+    {
+      "path": "cli/041.json",
+      "bytes": 729,
+      "sha256": "sha256:c87f8ba7992fb4bdee79751cf9330edf773ffc60357e4676772e1b92dc890427"
+    },
+    {
+      "path": "cli/042.json",
+      "bytes": 3897,
+      "sha256": "sha256:88ee33805a3613ae8c96980f3145ddcc240318ed58764200b223601ab44de1ca"
+    },
+    {
+      "path": "cli/043.json",
+      "bytes": 3876,
+      "sha256": "sha256:6c49b1e7bfafe88d8fda47071d2068bb3a98d5dbace8f7a6329ce476b1f57b6b"
+    },
+    {
+      "path": "cli/044.json",
+      "bytes": 3884,
+      "sha256": "sha256:2a5187386337e546ba3838eec0fcfab066355d03241d8e7f2db4cab7a8c5efff"
+    },
+    {
+      "path": "cli/045.json",
+      "bytes": 3892,
+      "sha256": "sha256:b8beda82f6f4f67273a0a08c04caeb9f0d9ac46af2cec80083f77476e0356ef0"
+    },
+    {
+      "path": "cli/046.json",
+      "bytes": 3860,
+      "sha256": "sha256:8254111da4fba543aa640c8ae64d0d85c646f230c4093daa15bc48cb4da103a9"
+    },
+    {
+      "path": "cli/047.json",
+      "bytes": 7196,
+      "sha256": "sha256:ad7f2527328dae4f1fddc70df9eaa8cfb385905f6c9f849dd23434c553ba82a4"
+    },
+    {
+      "path": "cli/048.json",
+      "bytes": 13283,
+      "sha256": "sha256:b781b07053409bb5ef7e681102cba6c1a51c6e34c067e9173ad1016ae0730e08"
+    },
+    {
+      "path": "cli/049.json",
+      "bytes": 647,
+      "sha256": "sha256:a02794280a22d28d72b5684451d775e0c933764978bed86803aca5e79ccbb0e1"
+    },
+    {
+      "path": "cli/050.json",
+      "bytes": 3973,
+      "sha256": "sha256:dd3b1e67509763e11e37d0b2cbadd7deede4152774e8477606371189a570c7ad"
+    },
+    {
+      "path": "cli/051.json",
+      "bytes": 729,
+      "sha256": "sha256:59aa27eb8e7599799c07d84cb7f04a3229677e2b3bc7031ab3a4924a6c2c6881"
+    },
+    {
+      "path": "cli/052.json",
+      "bytes": 3897,
+      "sha256": "sha256:eefa7e58511db5125e257876c1fa3ae7a87db39057418dd39ed4d647127cbfc5"
+    },
+    {
+      "path": "cli/053.json",
+      "bytes": 3876,
+      "sha256": "sha256:c3ccc592bb56724ceebff91ed9ae50d347553adaac8735b12871508195606a29"
+    },
+    {
+      "path": "cli/054.json",
+      "bytes": 3884,
+      "sha256": "sha256:e08834cc68402163b6c466f8ec9de2e7931610a64077a384bf0666f90cc1e2c6"
+    },
+    {
+      "path": "cli/055.json",
+      "bytes": 3892,
+      "sha256": "sha256:da349b459ec401f7e0911fced549af518c427e5f67596d5900714d1c93d8013b"
+    },
+    {
+      "path": "cli/056.json",
+      "bytes": 3860,
+      "sha256": "sha256:eab49a088a175ba073f25c1593b8ebe4fbbbe2f0c7a251b8a20b31f95c71d3d6"
+    },
+    {
+      "path": "cli/057.json",
+      "bytes": 7010,
+      "sha256": "sha256:37285a962dfc5f302145c57fcf9abbd689f1b3908e65af2751b52b69634f5791"
+    },
+    {
+      "path": "cli/058.json",
+      "bytes": 13317,
+      "sha256": "sha256:9c6aca7f8d493c1e65cea6742f7a25ea918790cbb24591281041174306d3eb3b"
+    },
+    {
+      "path": "cli/059.json",
+      "bytes": 647,
+      "sha256": "sha256:f75f880663d6ef245c0fc40983276cd8eb4494d7c11784bc2321e3545edf06c0"
+    },
+    {
+      "path": "cli/060.json",
+      "bytes": 3973,
+      "sha256": "sha256:8497eb414f9400c8dc4a6a9df6c9c6c112d38ab88ed0522d436370416df60f71"
+    },
+    {
+      "path": "contact-sheet.png",
+      "bytes": 55863,
+      "sha256": "sha256:a9979f95645f185065654d92ebc0213abec467c670fe6d63df149ae17cc2dad4"
+    },
+    {
+      "path": "dc.wav",
+      "bytes": 384044,
+      "sha256": "sha256:942003c29837e39b8a12056e5492fc10ad13fa34385fdf745183d9ade04d6eb9"
+    },
+    {
+      "path": "executed-generator.py",
+      "bytes": 18449,
+      "sha256": "sha256:0a439b3c1769a990032f7d1f3813e2e9eabb9da4a68b6e54095f0ffc21b4f599"
+    },
+    {
+      "path": "fixture-provenance.json",
+      "bytes": 465,
+      "sha256": "sha256:ddfc7f5a83d56db91745289dd99ce40ff2fda00d271ab0bfa254cbfbb30a7bdf"
+    },
+    {
+      "path": "music.wav",
+      "bytes": 384044,
+      "sha256": "sha256:8b2ceb0e7673d01aba8d69dac03a36563b83697e5b9ba12d7bca77f2b8b968cf"
+    },
+    {
+      "path": "stereo.wav",
+      "bytes": 384044,
+      "sha256": "sha256:b8028170156f17573d220065850bb90c9adba57bddb759db1a9ee0a3b2b296cb"
+    },
+    {
+      "path": "tone.wav",
+      "bytes": 384044,
+      "sha256": "sha256:aab2c501958df9e29a73cf0252a6517d75374e4fc938a0690810855f768e3ad4"
+    }
+  ],
+  "review": {
+    "decoded_all_output_samples": true,
+    "continuous_playback": false,
+    "human_listening": false,
+    "preview_waveform_is_evidence_wrapper": true,
+    "natural_voice_or_capcut_parity_accepted": false
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "operations": [
+    {
+      "op": "append_clip",
+      "track_id": "track_video_1",
+      "id": "diagram_clip",
+      "asset_id": "diagram",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000
+    },
+    {
+      "op": "append_clip",
+      "sequence_id": "seq_main",
+      "track_id": "track_audio_1",
+      "id": "clip_1",
+      "asset_id": "stereo",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000
+    },
+    {
+      "op": "update_sequence",
+      "sequence_id": "seq_main",
+      "patch": {
+        "audio_routing": {
+          "version": 1,
+          "tracks": [
+            {
+              "track_id": "track_audio_1",
+              "output": "fade",
+              "keyframes": [
+                {
+                  "property": "audio.volume",
+                  "keyframes": [
+                    {
+                      "at_tick": 0,
+                      "value": 0.25,
+                      "interpolation": "linear"
+                    },
+                    {
+                      "at_tick": 180000,
+                      "value": 1,
+                      "interpolation": "linear"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "buses": [
+            {
+              "id": "fade",
+              "audio": {
+                "pan": 0.5
+              },
+              "keyframes": [
+                {
+                  "property": "audio.volume",
+                  "keyframes": [
+                    {
+                      "at_tick": 0,
+                      "value": 0.5,
+                      "interpolation": "linear"
+                    },
+                    {
+                      "at_tick": 180000,
+                      "value": 1,
+                      "interpolation": "linear"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "master": {
+            "audio": {
+              "volume": 0.75
+            }
+          }
+        }
+      }
+    }
+  ]
+}

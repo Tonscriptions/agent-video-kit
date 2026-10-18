@@ -5,6 +5,16 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For named audio buses, read the
+[routing contract](../../docs/specs/命名音频总线发送返回与侧链契约_v0.1_2026-10-18.md).
+Set `sequence.audio_routing` through compose `update_sequence`; review
+outputs, pre/post sends, automation and named sidechains. Bus solo preserves
+an unpruned detector context; mute silences pre-fader taps too. Routed children
+finish their complete audio before ancestor time maps. Fragment saving expands
+the full routed sequence. Render, then run `policy audit`; retain the
+[actual PCM/media and installation evidence](../../docs/validation/命名音频总线发送返回与侧链实测_2026-10-18.md).
+Stereo routing does not establish natural mixing or spatial audio quality.
+
 For a whole-clip main-track permutation, read the
 [magnetic reorder contract](../../docs/specs/主轨磁吸重排与关联附着契约_v0.1_2026-10-18.md).
 Use `timeline edit` with `action: reorder`, selected main `clip_ids`, and an

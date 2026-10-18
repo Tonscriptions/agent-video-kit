@@ -1,0 +1,113 @@
+{
+  "ok": true,
+  "command": "convert.export",
+  "request_id": "req_20261018134906_52a16124",
+  "operation_id": null,
+  "status": "succeeded",
+  "data": {
+    "output": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR05.aevpkg.zip",
+    "report": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR05.aevpkg.zip.conversion-report.json",
+    "report_data": {
+      "report_version": "0.1.0",
+      "direction": "export",
+      "source_format": "agent-project/0.1.0",
+      "target_format": "agent-project-package/0.1.0",
+      "created_at": "2026-10-18T13:49:06.504598Z",
+      "items": [
+        {
+          "capability": "project-package",
+          "status": "Exact",
+          "source": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-production-v55\\AR05",
+          "target": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR05.aevpkg.zip",
+          "detail": "项目、登记权利和本地素材已写入自包含 ZIP"
+        }
+      ],
+      "warnings": [
+        {
+          "capability": "package-excluded-runtime",
+          "status": "Approximate",
+          "source": "project runtime",
+          "target": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR05.aevpkg.zip",
+          "detail": "renders/cache/operations/history 未打包"
+        }
+      ],
+      "failures": []
+    },
+    "manifest": {
+      "package_format": "agent-project-package",
+      "package_version": "0.1.0",
+      "created_at": "2026-10-18T13:49:06.504524Z",
+      "project_id": "proj_20261018134903_20c5e60c",
+      "project_schema_version": "0.1.0",
+      "files": [
+        {
+          "path": "assets/dc_dc_dc.wav",
+          "size": 384044,
+          "sha256": "942003c29837e39b8a12056e5492fc10ad13fa34385fdf745183d9ade04d6eb9"
+        },
+        {
+          "path": "assets/diagram_diagram_AR05-input.png",
+          "size": 13610,
+          "sha256": "e1fe2c2a5e54a2f55f62a9743850f4d8dab600310e0aa128254d0e774908db85"
+        },
+        {
+          "path": "assets/music_music_music.wav",
+          "size": 384044,
+          "sha256": "8b2ceb0e7673d01aba8d69dac03a36563b83697e5b9ba12d7bca77f2b8b968cf"
+        },
+        {
+          "path": "assets/stereo_stereo_stereo.wav",
+          "size": 384044,
+          "sha256": "b8028170156f17573d220065850bb90c9adba57bddb759db1a9ee0a3b2b296cb"
+        },
+        {
+          "path": "assets/tone_tone_tone.wav",
+          "size": 384044,
+          "sha256": "aab2c501958df9e29a73cf0252a6517d75374e4fc938a0690810855f768e3ad4"
+        },
+        {
+          "path": "project.json",
+          "size": 24728,
+          "sha256": "5dc63d1582a1cbed1f55b4428c8afc114e240ed6faa88054cd1523249a976d22"
+        },
+        {
+          "path": "project.lock.json",
+          "size": 307,
+          "sha256": "0fd1d693b6bdd329012c2729abc867d470213f9b2c7d958aed099e968b44584f"
+        },
+        {
+          "path": "rights-ledger.json",
+          "size": 6233,
+          "sha256": "74a3aac47ac4b7e68177d1fe5e1c8a2871edd8770fae82001a9e2a88a2eb601f"
+        }
+      ],
+      "excluded": [
+        "renders/",
+        "cache/",
+        "operations/",
+        "history/"
+      ],
+      "network": "disabled",
+      "upstream_runtime": "none"
+    }
+  },
+  "artifacts": [],
+  "warnings": [
+    {
+      "capability": "package-excluded-runtime",
+      "status": "Approximate",
+      "source": "project runtime",
+      "target": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\audio-routing-production-20261018-v55\\AR05.aevpkg.zip",
+      "detail": "renders/cache/operations/history 未打包"
+    }
+  ],
+  "errors": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "schema_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "started_at": "2026-10-18T13:49:06.528447Z",
+    "finished_at": "2026-10-18T13:49:06.528458Z",
+    "network": "disabled"
+  }
+}

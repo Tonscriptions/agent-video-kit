@@ -113,6 +113,10 @@ def _selection(project: dict, sequence: dict, requested: list[str] | None):
     if not selected or selected-set(index):
         fail('FRAGMENT_SELECTION_INVALID', '选择为空或片段不在指定序列', 'clip_ids')
     original = set(selected)
+    if sequence.get('audio_routing') is not None:
+        # Nonlinear buses and detector state belong to the full author clock.
+        # Publish an explicit expanded selection instead of a changed mix.
+        selected.update(index)
     while True:
         prior = set(selected)
         links = {index[c].get('link_id') for c in selected}-{None, ''}

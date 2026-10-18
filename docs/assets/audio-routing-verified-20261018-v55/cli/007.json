@@ -1,0 +1,194 @@
+{
+  "ok": true,
+  "command": "timeline.compose",
+  "request_id": "req_20261018135745_05fa7b59",
+  "operation_id": "op_20261018135745_af90679b",
+  "status": "succeeded",
+  "data": {
+    "sequence_id": "seq_main",
+    "applied": [
+      {
+        "op": "append_clip",
+        "track_id": "track_video_1",
+        "clip": {
+          "id": "diagram_clip",
+          "timeline_start_tick": 0,
+          "duration_tick": 180000,
+          "source_in_tick": 0,
+          "source_out_tick": 180000,
+          "asset_id": "diagram"
+        }
+      },
+      {
+        "op": "append_clip",
+        "track_id": "track_audio_1",
+        "clip": {
+          "id": "clip_1",
+          "timeline_start_tick": 0,
+          "duration_tick": 180000,
+          "source_in_tick": 0,
+          "source_out_tick": 180000,
+          "asset_id": "tone"
+        }
+      },
+      {
+        "op": "add_track",
+        "sequence_id": "seq_main",
+        "track": {
+          "id": "music_track",
+          "kind": "audio",
+          "order": 1,
+          "muted": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "clip_3",
+              "timeline_start_tick": 0,
+              "duration_tick": 180000,
+              "source_in_tick": 0,
+              "source_out_tick": 180000,
+              "asset_id": "music"
+            }
+          ]
+        }
+      },
+      {
+        "op": "append_clip",
+        "track_id": "music_track",
+        "clip": {
+          "id": "clip_3",
+          "timeline_start_tick": 0,
+          "duration_tick": 180000,
+          "source_in_tick": 0,
+          "source_out_tick": 180000,
+          "asset_id": "music"
+        }
+      },
+      {
+        "op": "update_sequence",
+        "sequence": {
+          "id": "seq_main",
+          "name": "Main",
+          "duration_tick": 180000,
+          "tracks": [
+            {
+              "id": "track_video_1",
+              "kind": "video",
+              "order": 0,
+              "muted": false,
+              "locked": false,
+              "clips": [
+                {
+                  "id": "diagram_clip",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 180000,
+                  "source_in_tick": 0,
+                  "source_out_tick": 180000,
+                  "asset_id": "diagram"
+                }
+              ]
+            },
+            {
+              "id": "track_audio_1",
+              "kind": "audio",
+              "order": 0,
+              "muted": false,
+              "locked": false,
+              "clips": [
+                {
+                  "id": "clip_1",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 180000,
+                  "source_in_tick": 0,
+                  "source_out_tick": 180000,
+                  "asset_id": "tone"
+                }
+              ]
+            },
+            {
+              "id": "music_track",
+              "kind": "audio",
+              "order": 1,
+              "muted": false,
+              "locked": false,
+              "clips": [
+                {
+                  "id": "clip_3",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 180000,
+                  "source_in_tick": 0,
+                  "source_out_tick": 180000,
+                  "asset_id": "music"
+                }
+              ]
+            }
+          ],
+          "markers": [],
+          "audio_routing": {
+            "version": 1,
+            "tracks": [
+              {
+                "track_id": "track_audio_1",
+                "output": "shared"
+              },
+              {
+                "track_id": "music_track",
+                "output": "shared"
+              }
+            ],
+            "buses": [
+              {
+                "id": "shared",
+                "audio": {
+                  "volume": 0.5
+                },
+                "output": "sub"
+              },
+              {
+                "id": "sub",
+                "audio": {
+                  "volume": 0.5
+                }
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "validation": {
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "rights": {
+        "ok": true,
+        "target": "commercial_ad",
+        "checked": 5,
+        "required_records": 5,
+        "failures": [],
+        "warnings": [],
+        "disposition_decisions": [],
+        "effective_disposition_decisions": []
+      },
+      "schema_engine": "jsonschema",
+      "asset_count": 5,
+      "sequence_count": 1
+    },
+    "before_snapshot": {
+      "snapshot_id": "snap_20261018135744_a1dd113e",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-routing-verified-v55\\AR01\\history\\snap_20261018135744_a1dd113e.json",
+      "label": "before-timeline-compose",
+      "created_at": "2026-10-18T13:57:44.992594Z"
+    }
+  },
+  "artifacts": [],
+  "warnings": [],
+  "errors": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "schema_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "started_at": "2026-10-18T13:57:45.094852Z",
+    "finished_at": "2026-10-18T13:57:45.094860Z",
+    "network": "disabled"
+  }
+}
