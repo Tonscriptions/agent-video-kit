@@ -1,0 +1,48 @@
+test_css_numbers_require_explicit_units_as_strings (test_html_template.TemplateContractTests.test_css_numbers_require_explicit_units_as_strings) ... ok
+test_duplicate_json_keys_rejected_before_browser (test_html_template.TemplateContractTests.test_duplicate_json_keys_rejected_before_browser) ... ok
+test_duplicate_target_is_not_silently_last_write_wins (test_html_template.TemplateContractTests.test_duplicate_target_is_not_silently_last_write_wins) ... ok
+test_invalid_variable_name_and_empty_selector_rejected (test_html_template.TemplateContractTests.test_invalid_variable_name_and_empty_selector_rejected) ... ok
+test_merged_byte_budget_includes_inherited_changes (test_html_template.TemplateContractTests.test_merged_byte_budget_includes_inherited_changes) ... ok
+test_negative_zero_boolean_and_null_match_numbers_rejected (test_html_template.TemplateContractTests.test_negative_zero_boolean_and_null_match_numbers_rejected) ... ok
+test_network_variables_and_raw_styles_are_rejected (test_html_template.TemplateContractTests.test_network_variables_and_raw_styles_are_rejected) ... ok
+test_partial_patch_inherits_and_null_restores_one_target (test_html_template.TemplateContractTests.test_partial_patch_inherits_and_null_restores_one_target) ... ok
+test_undeclared_or_changed_image_never_enters_render_bundle (test_html_template.TemplateContractTests.test_undeclared_or_changed_image_never_enters_render_bundle) ... ok
+test_units_and_literal_empty_text_are_retained (test_html_template.TemplateContractTests.test_units_and_literal_empty_text_are_retained) ... ok
+test_actual_color_size_image_and_clock_against_independent_pixels (test_html_template.TemplateNativeTests.test_actual_color_size_image_and_clock_against_independent_pixels) ... ok
+test_actual_inherit_then_null_restores_complete_original_animation (test_html_template.TemplateNativeTests.test_actual_inherit_then_null_restores_complete_original_animation) ... ok
+test_actual_inspection_types_units_and_read_only_project (test_html_template.TemplateNativeTests.test_actual_inspection_types_units_and_read_only_project) ... ok
+test_cancelled_controls_reaps_native_browser_job (test_html_template.TemplateNativeTests.test_cancelled_controls_reaps_native_browser_job) ... ok
+test_controls_dry_run_starts_no_browser_and_has_no_asset (test_html_template.TemplateNativeTests.test_controls_dry_run_starts_no_browser_and_has_no_asset) ... ok
+test_missing_selector_fails_rolls_back_and_closes_tabs (test_html_template.TemplateNativeTests.test_missing_selector_fails_rolls_back_and_closes_tabs) ... ok
+test_unknown_variable_and_wrong_image_kind_fail_explicitly (test_html_template.TemplateNativeTests.test_unknown_variable_and_wrong_image_kind_fail_explicitly) ... 
+  test_unknown_variable_and_wrong_image_kind_fail_explicitly (test_html_template.TemplateNativeTests.test_unknown_variable_and_wrong_image_kind_fail_explicitly) (expected='HTML_OVERRIDE_VARIABLE_MISSING') ... FAIL
+  test_unknown_variable_and_wrong_image_kind_fail_explicitly (test_html_template.TemplateNativeTests.test_unknown_variable_and_wrong_image_kind_fail_explicitly) (expected='HTML_OVERRIDE_IMAGE_KIND') ... FAIL
+
+======================================================================
+FAIL: test_unknown_variable_and_wrong_image_kind_fail_explicitly (test_html_template.TemplateNativeTests.test_unknown_variable_and_wrong_image_kind_fail_explicitly) (expected='HTML_OVERRIDE_VARIABLE_MISSING')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_template.py", line 206, in test_unknown_variable_and_wrong_image_kind_fail_explicitly
+    self.assertNotEqual(code,0,result);self.assertEqual(result['errors'][0]['code'],expected)
+                                       ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'HTML_PROCESS_FAILED' != 'HTML_OVERRIDE_VARIABLE_MISSING'
+- HTML_PROCESS_FAILED
++ HTML_OVERRIDE_VARIABLE_MISSING
+
+
+======================================================================
+FAIL: test_unknown_variable_and_wrong_image_kind_fail_explicitly (test_html_template.TemplateNativeTests.test_unknown_variable_and_wrong_image_kind_fail_explicitly) (expected='HTML_OVERRIDE_IMAGE_KIND')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_html_template.py", line 206, in test_unknown_variable_and_wrong_image_kind_fail_explicitly
+    self.assertNotEqual(code,0,result);self.assertEqual(result['errors'][0]['code'],expected)
+                                       ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'HTML_PROCESS_FAILED' != 'HTML_OVERRIDE_IMAGE_KIND'
+- HTML_PROCESS_FAILED
++ HTML_OVERRIDE_IMAGE_KIND
+
+
+----------------------------------------------------------------------
+Ran 17 tests in 36.192s
+
+FAILED (failures=2)

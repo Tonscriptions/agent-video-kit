@@ -5,6 +5,15 @@ description: Build and apply local advertising templates, or save and reuse edit
 
 # Local Templates
 
+For an existing HTML title card, use the [local template controls contract](../../docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md).
+`motion html-controls --source-asset-id <id> --frame-index <n>` draws one frame
+twice and reports root CSS variables, direct text and images. Preserve CSS
+units in `html-render --overrides <local.json>`; image changes reference local
+registered asset IDs. From an existing output, omitted changes inherit and
+`null` removes only that change. Keep the new recipe, image rights closure,
+failure/cleanup reports and [actual rebuild evidence](../../docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md).
+A sampled catalog does not establish full animation, typography or layout quality.
+
 For editable browser motion, read the [offline HTML motion contract](../../docs/specs/离线HTML动效与可编辑源码契约_v0.1_2026-10-18.md).
 `motion html-source` freezes listed code and registered images/fonts.
 `html-render --from-asset-id` rebuilds preserved typed parameters to a new

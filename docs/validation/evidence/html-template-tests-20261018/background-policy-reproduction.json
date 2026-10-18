@@ -1,0 +1,463 @@
+{
+  "status": "failed",
+  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 11, in <module>\n  File \"E:\\dev\\sandbox\\AI广告剪辑\\product\\tests\\test_html_template.py\", line 237, in test_actual_background_image_and_one_based_text_target\n    self.assertEqual(code,0,audit)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"C:\\Python313\\Lib\\unittest\\case.py\", line 907, in assertEqual\n    assertion_func(first, second, msg=msg)\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Python313\\Lib\\unittest\\case.py\", line 900, in _baseAssertEqual\n    raise self.failureException(msg)\nAssertionError: 2 != 0 : {'ok': False, 'command': 'policy.audit', 'request_id': 'req_20261018011924_f0666c03', 'operation_id': None, 'status': 'failed', 'data': {'root': 'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\temp\\\\html-template-native-hj44sk_t\\\\project', 'network': 'disabled', 'scanned_files': 13, 'findings': [{'code': 'POLICY_REMOTE_REFERENCE', 'kind': 'remote', 'file': 'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\temp\\\\html-template-native-hj44sk_t\\\\project\\\\validation\\\\html-motion-op_20261018011922_ab3af198.json', 'field': '$.worker.template_controls.texts[2].at', 'value_sha256': '6e07bbacc6920166c01b0c5e3a680622cd9a78f45b31625515c76e87355c4682'}, {'code': 'POLICY_REMOTE_REFERENCE', 'kind': 'remote', 'file': 'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\temp\\\\html-template-native-hj44sk_t\\\\project\\\\validation\\\\html-motion-op_20261018011922_ab3af198.json', 'field': '$.worker.template_controls.texts[3].at', 'value_sha256': '81b2bcfd9fcdf0476e8271e970301a184dda8f0268015152ee7ca3c25052bd1f'}, {'code': 'POLICY_REMOTE_REFERENCE', 'kind': 'remote', 'file': 'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\temp\\\\html-template-native-hj44sk_t\\\\project\\\\validation\\\\html-motion-op_20261018011922_ab3af198.json', 'field': '$.worker.template_controls.texts[4].at', 'value_sha256': '3cc1ddd610753c8828f369ccf1d476feecaebbb9ca81dae9eb1c2c4562450dc6'}, {'code': 'POLICY_REMOTE_REFERENCE', 'kind': 'remote', 'file': 'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\temp\\\\html-template-native-hj44sk_t\\\\project\\\\validation\\\\html-motion-op_20261018011922_ab3af198.json', 'field': '$.worker.effective_template_controls.texts[2].at', 'value_sha256': '6e07bbacc6920166c01b0c5e3a680622cd9a78f45b31625515c76e87355c4682'}, {'code': 'POLICY_REMOTE_REFERENCE', 'kind': 'remote', 'file': 'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\temp\\\\html-template-native-hj44sk_t\\\\project\\\\validation\\\\html-motion-op_20261018011922_ab3af198.json', 'field': '$.worker.effective_template_controls.texts[3].at', 'value_sha256': '81b2bcfd9fcdf0476e8271e970301a184dda8f0268015152ee7ca3c25052bd1f'}, {'code': 'POLICY_REMOTE_REFERENCE', 'kind': 'remote', 'file': 'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\temp\\\\html-template-native-hj44sk_t\\\\project\\\\validation\\\\html-motion-op_20261018011922_ab3af198.json', 'field': '$.worker.effective_template_controls.texts[4].at', 'value_sha256': '3cc1ddd610753c8828f369ccf1d476feecaebbb9ca81dae9eb1c2c4562450dc6'}], 'ok': False}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'POLICY_REMOTE_REFERENCE', 'message': '项目产物包含被本地策略禁止的远程或闭源服务引用', 'path': 'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\temp\\\\html-template-native-hj44sk_t\\\\project\\\\validation\\\\html-motion-op_20261018011922_ab3af198.json', 'retryable': False, 'cause': '{\"code\": \"POLICY_REMOTE_REFERENCE\", \"kind\": \"remote\", \"file\": \"E:\\\\\\\\dev\\\\\\\\sandbox\\\\\\\\AI广告剪辑\\\\\\\\product\\\\\\\\.runtime\\\\\\\\temp\\\\\\\\html-template-native-hj44sk_t\\\\\\\\project\\\\\\\\validation\\\\\\\\html-motion-op_20261018011922_ab3af198.json\", \"field\": \"$.worker.template_controls.texts[2].at\", \"value_sha256\": \"6e07bbacc6920166c01b0c5e3a680622cd9a78f45b31625515c76e87355c4682\"}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T01:19:24.983016Z', 'finished_at': '2026-10-18T01:19:24.983023Z', 'network': 'disabled'}}\n",
+  "reports": [
+    {
+      "name": "html-motion-op_20261018011922_ab3af198.json",
+      "data": {
+        "engine": "agent-local-html-motion-v1",
+        "report_version": "0.1.0",
+        "created_at": "2026-10-18T01:19:22.787617Z",
+        "plan": {
+          "spec": {
+            "entry": "index.html",
+            "width": 96,
+            "height": 64,
+            "fps": {
+              "den": 1,
+              "num": 4
+            },
+            "duration_tick": 90000,
+            "variables": []
+          },
+          "frame_count": 4,
+          "files": [
+            {
+              "bytes": 869,
+              "path": "index.html",
+              "sha256": "sha256:28f0ac249a48a4cd6c25df949c291704a8c75899da39f5762bc90afe722a012e"
+            },
+            {
+              "bytes": 75,
+              "path": "red.png",
+              "sha256": "sha256:b201e2de7fd1a6eee7faf6b18a27ff99e0816f951b5d826f2c0b8436e0b60320"
+            },
+            {
+              "path": "__template_images/4c4a0ed079a0894a4196d13af94492f9342e51aa7c019a982b88642cff1db462.png",
+              "bytes": 74,
+              "sha256": "sha256:4c4a0ed079a0894a4196d13af94492f9342e51aa7c019a982b88642cff1db462"
+            }
+          ],
+          "source_asset_id": "source2",
+          "parameters": {},
+          "template_overrides": {
+            "variables": {},
+            "texts": [
+              {
+                "at": ".tag",
+                "n": 2,
+                "value": "<em>literal</em>"
+              }
+            ],
+            "images": [
+              {
+                "at": "#poster",
+                "kind": "bg",
+                "asset_id": "blue"
+              }
+            ]
+          },
+          "compiled_overrides": [
+            {
+              "at": ".tag",
+              "n": 2,
+              "text": "<em>literal</em>"
+            },
+            {
+              "at": "#poster",
+              "style": {
+                "backgroundImage": "url(\"/__template_images/4c4a0ed079a0894a4196d13af94492f9342e51aa7c019a982b88642cff1db462.png\")"
+              },
+              "_image_kind": "bg"
+            }
+          ],
+          "override_resources": [
+            {
+              "asset_id": "blue",
+              "sha256": "sha256:4c4a0ed079a0894a4196d13af94492f9342e51aa7c019a982b88642cff1db462",
+              "rights_ref": "blue",
+              "path": "__template_images/4c4a0ed079a0894a4196d13af94492f9342e51aa7c019a982b88642cff1db462.png"
+            }
+          ],
+          "project_sha256": "sha256:9d31292d2184a6f335fb71eea891b8e9a93bb19e34a47154da574245f1683f48",
+          "engine": "agent-local-html-motion-v1",
+          "toolchain": {
+            "node_version": "v22.14.0",
+            "playwright_version": "1.62.1",
+            "node_sha256": "sha256:33b1bc1a8aca11fd5a4f2699e51019c63c0af30cf437701d07af69be7706771b"
+          },
+          "all_frames_checked_in_two_fresh_context_orders": true,
+          "output": "ffv1-bgra-nut",
+          "rights_status": "unverified",
+          "limits": [
+            "not_full_openfilm_timeline",
+            "no_embedded_media_iframes_or_webgl",
+            "not_hdr_or_capcut_parity"
+          ]
+        },
+        "status": "succeeded",
+        "worker_started": true,
+        "running_job_pids": [
+          18788,
+          7536,
+          16500,
+          32932,
+          13092,
+          17340,
+          19540,
+          30696
+        ],
+        "worker": {
+          "type": "done",
+          "frame_hashes": [
+            "sha256:a636a860249d909d0df70b40030d7ba5b06d31f756801e5a6c5eeeaa956e5023",
+            "sha256:bfd9e5b95861be536de1b915932bbfaafc94790bb7391af750c374e6a5bf0354",
+            "sha256:c5916f061fcca759bf293f2b6b913286a5a68f2fdca53119a27ce1f46b0788a3",
+            "sha256:77fb4578c1c4939cc98362f3b2f11d69272ad2687cc217a8f9888935d74976fd"
+          ],
+          "verification": [
+            {
+              "name": "reverse",
+              "frames": [
+                {
+                  "index": 3,
+                  "sha256": "sha256:77fb4578c1c4939cc98362f3b2f11d69272ad2687cc217a8f9888935d74976fd"
+                },
+                {
+                  "index": 2,
+                  "sha256": "sha256:c5916f061fcca759bf293f2b6b913286a5a68f2fdca53119a27ce1f46b0788a3"
+                },
+                {
+                  "index": 1,
+                  "sha256": "sha256:bfd9e5b95861be536de1b915932bbfaafc94790bb7391af750c374e6a5bf0354"
+                },
+                {
+                  "index": 0,
+                  "sha256": "sha256:a636a860249d909d0df70b40030d7ba5b06d31f756801e5a6c5eeeaa956e5023"
+                }
+              ]
+            },
+            {
+              "name": "odd_then_reverse_even",
+              "frames": [
+                {
+                  "index": 1,
+                  "sha256": "sha256:bfd9e5b95861be536de1b915932bbfaafc94790bb7391af750c374e6a5bf0354"
+                },
+                {
+                  "index": 3,
+                  "sha256": "sha256:77fb4578c1c4939cc98362f3b2f11d69272ad2687cc217a8f9888935d74976fd"
+                },
+                {
+                  "index": 2,
+                  "sha256": "sha256:c5916f061fcca759bf293f2b6b913286a5a68f2fdca53119a27ce1f46b0788a3"
+                },
+                {
+                  "index": 0,
+                  "sha256": "sha256:a636a860249d909d0df70b40030d7ba5b06d31f756801e5a6c5eeeaa956e5023"
+                }
+              ]
+            }
+          ],
+          "browser_version": "149.0.7827.55",
+          "all_frame_orders_equal": true,
+          "template_controls": {
+            "vars": [
+              {
+                "name": "--accent",
+                "value": "#ff0000",
+                "label": "Accent",
+                "field": {
+                  "kind": "color",
+                  "value": "#ff0000"
+                },
+                "font": false
+              },
+              {
+                "name": "--box-size",
+                "value": "16px",
+                "label": "Box size",
+                "field": {
+                  "kind": "number",
+                  "value": 16,
+                  "unit": "px"
+                },
+                "font": false
+              },
+              {
+                "name": "--label",
+                "value": "\"Words\"",
+                "label": "Label",
+                "field": {
+                  "kind": "text",
+                  "value": "Words"
+                },
+                "font": false
+              },
+              {
+                "name": "--title-font",
+                "value": "\"Arial\",sans-serif",
+                "label": "Title font",
+                "field": {
+                  "kind": "raw",
+                  "value": "\"Arial\",sans-serif"
+                },
+                "font": true
+              }
+            ],
+            "texts": [
+              {
+                "at": "#title",
+                "label": "OLD 0\nSECOND",
+                "value": "OLD 0\nSECOND"
+              },
+              {
+                "at": "#mixed",
+                "label": "Keep",
+                "value": "Keep "
+              },
+              {
+                "at": "html:nth-of-type(1) > body:nth-of-type(1) > p:nth-of-type(2) > em:nth-of-type(1)",
+                "label": "INLINE",
+                "value": "INLINE"
+              },
+              {
+                "at": "html:nth-of-type(1) > body:nth-of-type(1) > span:nth-of-type(1)",
+                "label": "FIRST",
+                "value": "FIRST"
+              },
+              {
+                "at": "html:nth-of-type(1) > body:nth-of-type(1) > span:nth-of-type(2)",
+                "label": "OLD SECOND",
+                "value": "OLD SECOND"
+              }
+            ],
+            "images": [
+              {
+                "at": "#logo",
+                "kind": "img",
+                "label": "logo",
+                "src": "local://html-source/red.png"
+              },
+              {
+                "at": "#poster",
+                "kind": "bg",
+                "label": "poster",
+                "src": "local://html-source/red.png"
+              }
+            ],
+            "scope": "visible-DOM-direct-text-single-image-and-root-CSS-at-sampled-frame"
+          },
+          "template_applied": {
+            "entries": 2,
+            "matches": 2,
+            "every_target_found": true
+          },
+          "effective_template_controls": {
+            "vars": [
+              {
+                "name": "--accent",
+                "value": "#ff0000",
+                "label": "Accent",
+                "field": {
+                  "kind": "color",
+                  "value": "#ff0000"
+                },
+                "font": false
+              },
+              {
+                "name": "--box-size",
+                "value": "16px",
+                "label": "Box size",
+                "field": {
+                  "kind": "number",
+                  "value": 16,
+                  "unit": "px"
+                },
+                "font": false
+              },
+              {
+                "name": "--label",
+                "value": "\"Words\"",
+                "label": "Label",
+                "field": {
+                  "kind": "text",
+                  "value": "Words"
+                },
+                "font": false
+              },
+              {
+                "name": "--title-font",
+                "value": "\"Arial\",sans-serif",
+                "label": "Title font",
+                "field": {
+                  "kind": "raw",
+                  "value": "\"Arial\",sans-serif"
+                },
+                "font": true
+              }
+            ],
+            "texts": [
+              {
+                "at": "#title",
+                "label": "OLD 0\nSECOND",
+                "value": "OLD 0\nSECOND"
+              },
+              {
+                "at": "#mixed",
+                "label": "Keep",
+                "value": "Keep "
+              },
+              {
+                "at": "html:nth-of-type(1) > body:nth-of-type(1) > p:nth-of-type(2) > em:nth-of-type(1)",
+                "label": "INLINE",
+                "value": "INLINE"
+              },
+              {
+                "at": "html:nth-of-type(1) > body:nth-of-type(1) > span:nth-of-type(1)",
+                "label": "FIRST",
+                "value": "FIRST"
+              },
+              {
+                "at": "html:nth-of-type(1) > body:nth-of-type(1) > span:nth-of-type(2)",
+                "label": "<em>literal</em>",
+                "value": "<em>literal</em>"
+              }
+            ],
+            "images": [
+              {
+                "at": "#logo",
+                "kind": "img",
+                "label": "logo",
+                "src": "local://html-source/red.png"
+              },
+              {
+                "at": "#poster",
+                "kind": "bg",
+                "label": "poster",
+                "src": "local://html-source/__template_images/4c4a0ed079a0894a4196d13af94492f9342e51aa7c019a982b88642cff1db462.png"
+              }
+            ],
+            "scope": "visible-DOM-direct-text-single-image-and-root-CSS-at-sampled-frame"
+          },
+          "cleanup": {
+            "pages_opened": 3,
+            "pages_closed": 3,
+            "local_requests": 21,
+            "denied_requests": 0,
+            "browser_closed": true
+          }
+        },
+        "cleanup": {
+          "native_job": true,
+          "seen_pids": [
+            252,
+            7536,
+            13092,
+            16500,
+            17340,
+            18788,
+            19540,
+            30176,
+            30696,
+            32932
+          ],
+          "active_before_final_cleanup": [],
+          "active_after_cleanup": [],
+          "all_children_reaped": true,
+          "termination_reason": null
+        },
+        "stderr": {
+          "node": "",
+          "ffmpeg": ""
+        },
+        "encoded_clock": {
+          "time_base": "1/65536",
+          "timestamps": [
+            0,
+            16384,
+            32768,
+            49152
+          ],
+          "all_frames_exact": true,
+          "frame_count": 4
+        },
+        "output_sha256": "sha256:56b53db0d1eb6762a059122c5b3753d064d316c1cb0722d05803f9755acc80b4",
+        "probe": {
+          "duration_seconds": 1.0,
+          "duration_tick": 90000,
+          "format": "nut",
+          "format_long_name": "NUT",
+          "streams": [
+            {
+              "index": 0,
+              "codec_name": "ffv1",
+              "codec_long_name": "FFmpeg video codec #1",
+              "codec_type": "video",
+              "codec_tag_string": "FFV1",
+              "codec_tag": "0x31564646",
+              "width": 96,
+              "height": 64,
+              "coded_width": 96,
+              "coded_height": 64,
+              "has_b_frames": 0,
+              "pix_fmt": "bgra",
+              "level": -99,
+              "r_frame_rate": "4/1",
+              "avg_frame_rate": "4/1",
+              "time_base": "1/65536",
+              "start_pts": 0,
+              "start_time": "0.000000",
+              "bits_per_raw_sample": "8",
+              "extradata_size": 42,
+              "disposition": {
+                "default": 0,
+                "dub": 0,
+                "original": 0,
+                "comment": 0,
+                "lyrics": 0,
+                "karaoke": 0,
+                "forced": 0,
+                "hearing_impaired": 0,
+                "visual_impaired": 0,
+                "clean_effects": 0,
+                "attached_pic": 0,
+                "timed_thumbnails": 0,
+                "non_diegetic": 0,
+                "captions": 0,
+                "descriptions": 0,
+                "metadata": 0,
+                "dependent": 0,
+                "still_image": 0,
+                "multilayer": 0
+              },
+              "tags": {
+                "encoder": "Lavc62.28.100 ffv1"
+              }
+            }
+          ],
+          "video": {
+            "codec": "ffv1",
+            "width": 96,
+            "height": 64,
+            "pix_fmt": "bgra",
+            "fps": "4/1",
+            "color_space": null,
+            "duration_seconds": 1.0,
+            "start_time_seconds": 0.0,
+            "frame_count": 4
+          },
+          "audio": {
+            "codec": null,
+            "sample_rate": 0,
+            "channels": 0,
+            "duration_seconds": 0.0,
+            "start_time_seconds": 0.0
+          },
+          "container_duration_seconds": 0.75,
+          "duration_basis": "verified_exact_cfr_frames"
+        }
+      }
+    }
+  ]
+}

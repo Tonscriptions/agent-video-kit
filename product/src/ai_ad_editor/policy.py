@@ -119,6 +119,38 @@ def _walk_scalars(value: Any, path: str = "$") -> Iterator[tuple[str, Any]]:
         yield path, value
 
 
+def _html_template_data_fields(value: Any, path: str = "$") -> set[str]:
+    """Typed DOM/CSS text is not a resource address (e.g. p:first-child).
+
+    Only the editor's explicit HTML recipe/report structures qualify. Actual
+    URL syntax, known remote schemes and provider markers are still rejected
+    by the caller, including within these data fields.
+    """
+    result: set[str] = set()
+    if isinstance(value, dict):
+        if value.get('engine') == 'agent-local-html-motion-v1':
+            branches = [('template_overrides',), ('plan','template_overrides'), ('plan','compiled_overrides'),
+                ('worker','template_controls'), ('worker','effective_template_controls'),
+                ('worker','sample','controls'), ('worker','sample','effective_controls'),
+                ('controls',), ('effective_controls',)]
+            for branch in branches:
+                node, prefix = value, path
+                for key in branch:
+                    if not isinstance(node,dict) or key not in node:
+                        break
+                    node=node[key];prefix+='.'+key
+                else:
+                    for field, scalar in _walk_scalars(node,prefix):
+                        if isinstance(scalar,str) and (field.endswith(('.at','.value','.label','.src')) or '.variables.' in field):
+                            result.add(field)
+        for key, child in value.items():
+            result.update(_html_template_data_fields(child,f'{path}.{key}'))
+    elif isinstance(value,list):
+        for index, child in enumerate(value):
+            result.update(_html_template_data_fields(child,f'{path}[{index}]'))
+    return result
+
+
 def audit_local_tree(root: Path) -> dict[str, Any]:
     """Audit JSON/JSONL project artifacts without reading or contacting URLs."""
     root = root.expanduser().resolve()
@@ -139,8 +171,14 @@ def audit_local_tree(root: Path) -> dict[str, Any]:
             findings.append({"code": "POLICY_SCAN_PARSE_FAILED", "path": str(path), "detail": str(exc)})
             continue
         for payload in payloads:
+            template_data = _html_template_data_fields(payload)
             for field, value in _walk_scalars(payload):
                 kind = reference_kind(value)
+                if kind == 'remote' and field in template_data and '://' not in value and not URL_RE.search(value):
+                    # Unknown schemes here are CSS pseudo classes or literal
+                    # words, not an endpoint; keep all ordinary URI fields strict.
+                    if urlsplit(value.strip()).scheme.casefold() not in REMOTE_SCHEMES:
+                        continue
                 if kind in {"remote", "provider"}:
                     findings.append({
                         "code": "POLICY_REMOTE_REFERENCE",

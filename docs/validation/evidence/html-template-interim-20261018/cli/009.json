@@ -1,0 +1,460 @@
+{
+  "number": 9,
+  "args": [
+    "motion",
+    "html-render",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-template-smoke-20261018-e2\\main",
+    "--source-asset-id",
+    "editable",
+    "--asset-id",
+    "changed",
+    "--overrides",
+    "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\html-template-20261018\\overrides.json",
+    "--apply",
+    "--track-id",
+    "track_video_1"
+  ],
+  "exit_code": 0,
+  "stdout": {
+    "ok": true,
+    "command": "motion.html-render",
+    "request_id": "req_20261018010352_dc1ee8b3",
+    "operation_id": "op_20261018010349_2ddd21da",
+    "status": "succeeded",
+    "data": {
+      "plan": {
+        "spec": {
+          "entry": "index.html",
+          "width": 384,
+          "height": 216,
+          "fps": {
+            "den": 1,
+            "num": 6
+          },
+          "duration_tick": 180000,
+          "variables": []
+        },
+        "frame_count": 12,
+        "files": [
+          {
+            "bytes": 2976,
+            "path": "font.ttf",
+            "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1"
+          },
+          {
+            "bytes": 247,
+            "path": "index.html",
+            "sha256": "sha256:83c27595b157d225570f1749f60f62e9b1084a461accb49f4c85e6c6ca1c168b"
+          },
+          {
+            "bytes": 613,
+            "path": "product.png",
+            "sha256": "sha256:8d54fd4c7aff26a97a376bbe5f0ad8a276fdcc35ee6461363e48f3700ec58cbf"
+          },
+          {
+            "bytes": 330,
+            "path": "scene.mjs",
+            "sha256": "sha256:8888245c5be4c20167e855f2ebae8118fbe169377a5c671a2d620e227e132fef"
+          },
+          {
+            "bytes": 648,
+            "path": "style.css",
+            "sha256": "sha256:45cea3524dfc43b48c5241e4d0b9c0ffa83c9dcc5c14b744291106420ed89434"
+          },
+          {
+            "path": "__template_images/00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af.png",
+            "bytes": 612,
+            "sha256": "sha256:00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af"
+          }
+        ],
+        "source_asset_id": "editable",
+        "parameters": {},
+        "template_overrides": {
+          "variables": {
+            "--brand": "#38bdf8",
+            "--title-size": "30px"
+          },
+          "texts": [
+            {
+              "at": "#cta",
+              "value": "CTA 2"
+            },
+            {
+              "at": "#title",
+              "value": "VIDEO 2"
+            }
+          ],
+          "images": [
+            {
+              "at": "#product",
+              "kind": "img",
+              "asset_id": "product-new"
+            }
+          ]
+        },
+        "compiled_overrides": [
+          {
+            "at": ":root",
+            "style": {
+              "--brand": "#38bdf8",
+              "--title-size": "30px"
+            }
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2"
+          },
+          {
+            "at": "#title",
+            "text": "VIDEO 2"
+          },
+          {
+            "at": "#product",
+            "style": {
+              "content": "url(\"/__template_images/00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af.png\")"
+            },
+            "_image_kind": "img"
+          }
+        ],
+        "override_resources": [
+          {
+            "asset_id": "product-new",
+            "sha256": "sha256:00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af",
+            "rights_ref": "product-new",
+            "path": "__template_images/00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af.png"
+          }
+        ],
+        "project_sha256": "sha256:ef5e7d1ee420025c9605df28a724615b37a9821a46735e459f920f8dff79ea90",
+        "engine": "agent-local-html-motion-v1",
+        "toolchain": {
+          "node_version": "v22.14.0",
+          "playwright_version": "1.62.1",
+          "node_sha256": "sha256:33b1bc1a8aca11fd5a4f2699e51019c63c0af30cf437701d07af69be7706771b"
+        },
+        "all_frames_checked_in_two_fresh_context_orders": true,
+        "output": "ffv1-bgra-nut",
+        "rights_status": "unverified",
+        "limits": [
+          "not_full_openfilm_timeline",
+          "no_embedded_media_iframes_or_webgl",
+          "not_hdr_or_capcut_parity"
+        ]
+      },
+      "asset": {
+        "id": "changed",
+        "kind": "video",
+        "uri": "assets/html-motion/d67e2e944994496c8d8ec76eed0cf9f0.nut",
+        "sha256": "sha256:ce0d139cc9e905acd4566d3d2acdb80fe07c3ee1fe631ee349f38e558a9cb17f",
+        "rights_ref": "changed",
+        "probe": {
+          "duration_seconds": 2.0,
+          "duration_tick": 180000,
+          "format": "nut",
+          "format_long_name": "NUT",
+          "streams": [
+            {
+              "index": 0,
+              "codec_name": "ffv1",
+              "codec_long_name": "FFmpeg video codec #1",
+              "codec_type": "video",
+              "codec_tag_string": "FFV1",
+              "codec_tag": "0x31564646",
+              "width": 384,
+              "height": 216,
+              "coded_width": 384,
+              "coded_height": 216,
+              "has_b_frames": 0,
+              "pix_fmt": "bgra",
+              "level": -99,
+              "r_frame_rate": "6/1",
+              "avg_frame_rate": "6/1",
+              "time_base": "1/49152",
+              "start_pts": 0,
+              "start_time": "0.000000",
+              "bits_per_raw_sample": "8",
+              "extradata_size": 42,
+              "disposition": {
+                "default": 0,
+                "dub": 0,
+                "original": 0,
+                "comment": 0,
+                "lyrics": 0,
+                "karaoke": 0,
+                "forced": 0,
+                "hearing_impaired": 0,
+                "visual_impaired": 0,
+                "clean_effects": 0,
+                "attached_pic": 0,
+                "timed_thumbnails": 0,
+                "non_diegetic": 0,
+                "captions": 0,
+                "descriptions": 0,
+                "metadata": 0,
+                "dependent": 0,
+                "still_image": 0,
+                "multilayer": 0
+              },
+              "tags": {
+                "encoder": "Lavc62.28.100 ffv1"
+              }
+            }
+          ],
+          "video": {
+            "codec": "ffv1",
+            "width": 384,
+            "height": 216,
+            "pix_fmt": "bgra",
+            "fps": "6/1",
+            "color_space": null,
+            "duration_seconds": 2.0,
+            "start_time_seconds": 0.0,
+            "frame_count": 12
+          },
+          "audio": {
+            "codec": null,
+            "sample_rate": 0,
+            "channels": 0,
+            "duration_seconds": 0.0,
+            "start_time_seconds": 0.0
+          },
+          "container_duration_seconds": 1.833333,
+          "duration_basis": "verified_exact_cfr_frames"
+        },
+        "source": {
+          "source_url": "assets/html-motion/d67e2e944994496c8d8ec76eed0cf9f0.nut",
+          "retrieved_at": "2026-10-18T01:03:52.529539Z",
+          "original_name": "d67e2e944994496c8d8ec76eed0cf9f0.nut"
+        },
+        "html_motion": {
+          "engine": "agent-local-html-motion-v1",
+          "source_asset_id": "editable",
+          "parameters": {},
+          "spec": {
+            "entry": "index.html",
+            "width": 384,
+            "height": 216,
+            "fps": {
+              "den": 1,
+              "num": 6
+            },
+            "duration_tick": 180000,
+            "variables": []
+          },
+          "frame_count": 12,
+          "template_overrides": {
+            "variables": {
+              "--brand": "#38bdf8",
+              "--title-size": "30px"
+            },
+            "texts": [
+              {
+                "at": "#cta",
+                "value": "CTA 2"
+              },
+              {
+                "at": "#title",
+                "value": "VIDEO 2"
+              }
+            ],
+            "images": [
+              {
+                "at": "#product",
+                "kind": "img",
+                "asset_id": "product-new"
+              }
+            ]
+          },
+          "override_resources": [
+            {
+              "asset_id": "product-new",
+              "sha256": "sha256:00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af",
+              "rights_ref": "product-new",
+              "path": "__template_images/00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af.png"
+            }
+          ]
+        }
+      },
+      "rights": {
+        "asset_id": "changed",
+        "kind": "video",
+        "sha256": "sha256:ce0d139cc9e905acd4566d3d2acdb80fe07c3ee1fe631ee349f38e558a9cb17f",
+        "source_url": "assets/html-motion/d67e2e944994496c8d8ec76eed0cf9f0.nut",
+        "source_version": "agent-local-html-motion-v1",
+        "retrieved_at": "2026-10-18T01:03:52.529562Z",
+        "creator": "unknown",
+        "license_spdx": "LicenseRef-UNVERIFIED",
+        "license_url": "",
+        "attribution": "",
+        "permitted_uses": [
+          "internal"
+        ],
+        "restrictions": [],
+        "derived_from": [
+          "editable",
+          "product-new"
+        ],
+        "evidence": "assets/html-motion/d67e2e944994496c8d8ec76eed0cf9f0.nut",
+        "verification_status": "unverified",
+        "verified_by": "",
+        "takedown_status": "clear",
+        "notes": "Local editable HTML motion; template, image and font rights require separate review",
+        "record_id": "rights_20261018010352_29f22ace",
+        "record_version": 1,
+        "active": true,
+        "recorded_at": "2026-10-18T01:03:52.530046Z",
+        "permitted_channels": []
+      },
+      "generated_clip": {
+        "id": "clip_html_20261018010352_fff05898",
+        "asset_id": "changed",
+        "timeline_start_tick": 0,
+        "duration_tick": 180000,
+        "source_in_tick": 0,
+        "source_out_tick": 180000
+      },
+      "snapshot": {
+        "snapshot_id": "snap_20261018010349_2e469324",
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-template-smoke-20261018-e2\\main\\history\\snap_20261018010349_2e469324.json",
+        "label": "before-html-render",
+        "created_at": "2026-10-18T01:03:49.200304Z"
+      },
+      "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-template-smoke-20261018-e2\\main\\validation\\html-motion-op_20261018010349_2ddd21da.json",
+      "validation": {
+        "ok": true,
+        "errors": [],
+        "warnings": [
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "editable",
+            "rights_ref": "editable",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "editable",
+            "rights_ref": "editable",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "original",
+            "rights_ref": "original",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "original",
+            "rights_ref": "original",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "status": "unverified",
+            "code": "RIGHTS_STATUS_BLOCKED",
+            "message": "状态 unverified 不允许发布",
+            "asset_id": "changed",
+            "rights_ref": "changed",
+            "record_version": 1,
+            "context": "project_asset"
+          },
+          {
+            "code": "RIGHTS_USE_NOT_PERMITTED",
+            "message": "记录未允许目标用途: commercial_ad",
+            "asset_id": "changed",
+            "rights_ref": "changed",
+            "record_version": 1,
+            "context": "project_asset"
+          }
+        ],
+        "rights": {
+          "ok": true,
+          "target": "commercial_ad",
+          "checked": 6,
+          "required_records": 6,
+          "failures": [],
+          "warnings": [
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "editable",
+              "rights_ref": "editable",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "editable",
+              "rights_ref": "editable",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "original",
+              "rights_ref": "original",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "original",
+              "rights_ref": "original",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "changed",
+              "rights_ref": "changed",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "changed",
+              "rights_ref": "changed",
+              "record_version": 1,
+              "context": "project_asset"
+            }
+          ],
+          "disposition_decisions": [],
+          "effective_disposition_decisions": []
+        },
+        "schema_engine": "jsonschema",
+        "asset_count": 6,
+        "sequence_count": 1
+      }
+    },
+    "artifacts": [],
+    "warnings": [],
+    "errors": [],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T01:03:52.566246Z",
+      "finished_at": "2026-10-18T01:03:52.566256Z",
+      "network": "disabled"
+    }
+  },
+  "stderr": "",
+  "seconds": 5.353916599997319
+}

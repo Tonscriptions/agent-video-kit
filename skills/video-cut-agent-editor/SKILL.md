@@ -5,6 +5,14 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For CSS/text/image changes to an existing HTML asset, use
+`motion html-controls` and `html-render --overrides` under the
+[template controls contract](../../docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md).
+Inspect a real frame first, keep numeric CSS units and registered image IDs,
+then render a new version. A `null` patch restores the page's own frame values;
+other saved changes inherit. Preserve source/override image rights and
+[the package/fragment rebuild boundary](../../docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md).
+
 For local correction of an encoded mask, use `media mask-edit` with the
 [bound geometry plan](../../docs/specs/本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md).
 Preview with `--dry-run`, create a new mask asset, check it with `quality mask`,

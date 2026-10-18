@@ -302,6 +302,7 @@ def inspect_source(root, project, source_id):
 def prepare_render(root,project,args):
     assets=asset_map(project)
     values={}
+    saved_overrides=None
     source_id=args.source_asset_id
     if args.from_asset_id:
         previous=assets.get(args.from_asset_id,{})
@@ -309,6 +310,7 @@ def prepare_render(root,project,args):
         if not recipe:
             fail('HTML_RECIPE_MISSING','已有输出没有可重建源码配方')
         source_id=recipe['source_asset_id'];values=copy.deepcopy(recipe['parameters'])
+        saved_overrides=recipe.get('template_overrides')
     source=inspect_source(root,project,source_id)
     if args.params:
         path=_local(root,args.params,'params')
@@ -319,6 +321,9 @@ def prepare_render(root,project,args):
             fail('HTML_VARIABLE_INVALID','参数必须为 JSON 对象')
         values.update(supplied)
     params=parameters(source['spec'],values)
+    from .html_template import merge_overrides, read_patch, attach_resources
+    changes=merge_overrides(saved_overrides,read_patch(root,getattr(args,'overrides',None)))
+    compiled,references=attach_resources(root,project,source,changes)
     assert_id(args.asset_id,'asset_id')
     if args.asset_id in assets:
         fail('HTML_ASSET_EXISTS','输出资产 ID 已存在，须使用新版本 ID')
@@ -342,6 +347,7 @@ def prepare_render(root,project,args):
         fail('HTML_TRACK_INVALID','track_id 须与 apply 一起使用')
     runtime=verify_runtime(root)
     source.update({'source_asset_id':source_id,'parameters':params,'runtime':runtime,'track':track,
+                   'template_overrides':changes,'compiled_overrides':compiled,'override_resources':references,
                    'project_sha256':project_fingerprint(project)})
     return source
 
@@ -351,6 +357,64 @@ def public_plan(plan):
         'engine':ENGINE,'toolchain':{k:plan['runtime'][k] for k in ('node_version','playwright_version','node_sha256')},
         'all_frames_checked_in_two_fresh_context_orders':True,'output':'ffv1-bgra-nut',
         'rights_status':'unverified','limits':['not_full_openfilm_timeline','no_embedded_media_iframes_or_webgl','not_hdr_or_capcut_parity']}
+
+
+def inspect_controls(root,plan,report_path,*,frame_index=0,timeout=120,cancel_file=None):
+    """Draw one declared frame twice, close all tabs, and return its real DOM."""
+    _integer(frame_index,'frame_index',0,plan['frame_count']-1)
+    from .utils import atomic_write_json
+    report={'engine':ENGINE,'created_at':now_iso(),'status':'started','inspection_only':True,
+            'source_asset_id':plan['source_asset_id'],'source_sha256':plan['asset']['sha256'],
+            'frame_index':frame_index,'parameters':plan['parameters'],'template_overrides':plan['template_overrides'],
+            'override_resources':plan['override_resources'],'project_sha256':plan['project_sha256']}
+    job=None
+    try:
+        with tempfile.TemporaryDirectory(prefix='html-controls-') as folder, contextlib.ExitStack() as cleanup:
+            temp=Path(folder);bundle=temp/'source';bundle.mkdir()
+            for name,content in plan['data'].items():
+                path=bundle/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(content)
+            runtime=plan['runtime'];job=BrowserProcessJob(timeout,cancel_file)
+            cleanup.callback(job.close)
+            env=dict(os.environ)
+            env.update(TEMP=str(temp),TMP=str(temp),TMPDIR=str(temp),PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD='1',NODE_OPTIONS='')
+            with (temp/'node.stderr').open('wb') as stderr:
+                node=job.start([runtime['node'],str(Path(__file__).with_name('html_motion_worker.mjs'))],cwd=temp,env=env,
+                               stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=stderr)
+                request={'task':'controls','root':str(bundle),'files':plan['files'],'spec':plan['spec'],'params':plan['parameters'],
+                         'overrides':plan['compiled_overrides'],'frame_count':plan['frame_count'],'sample_frame_index':frame_index,
+                         'ticks_per_second':plan['asset']['html_source']['ticks_per_second'],
+                         'playwright':runtime['playwright'],'chromium':runtime['chromium'],'log_file':str(temp/'chromium.log'),
+                         'frame_timeout_ms':min(15000,int(timeout*1000))}
+                node.stdin.write(encoded(request).replace(b'\n',b'')+b'\n');node.stdin.flush()
+                line=node.stdout.readline(2*1024**2+1);job.check()
+                if len(line)>2*1024**2 or not line.endswith(b'\n'):
+                    fail('HTML_PROTOCOL_INVALID','模板检查响应缺失或超过 2 MiB')
+                item=json.loads(line);report['worker']=item
+                if item.get('type')=='error':
+                    raise AppError(item['code'],item['message'],exit_code=6)
+                if item.get('type')!='done' or not item.get('inspection_only') or not item.get('fresh_contexts_equal') or item.get('sample_frame_index')!=frame_index:
+                    fail('HTML_PROTOCOL_INVALID','模板检查采样回执不完整')
+                receipt=item.get('cleanup',{})
+                if receipt.get('pages_opened')!=2 or receipt.get('pages_closed')!=2 or not receipt.get('browser_closed') or receipt.get('denied_requests')!=0:
+                    fail('HTML_PROTOCOL_INVALID','模板检查离线/关闭回执不完整')
+                node.stdin.close()
+                if node.wait(timeout=15)!=0:
+                    fail('HTML_PROCESS_FAILED','模板检查进程异常退出')
+                job.check()
+            report['cleanup']=job.close()
+            report.update(status='succeeded',controls=item['sample']['controls'],effective_controls=item['sample']['effective_controls'],applied=item['sample']['applied'])
+            return report
+    except BaseException as exc:
+        if job:
+            try:job.check()
+            except AppError as reason:exc=reason
+        report.update(status='failed',error=exc.as_dict() if isinstance(exc,AppError) else {'code':'HTML_PROCESS_FAILED','message':str(exc)[:2000]})
+        if isinstance(exc,AppError):
+            exc.path=str(report_path);raise exc
+        raise AppError('HTML_PROCESS_FAILED','模板检查失败',exit_code=6,path=str(report_path),cause=str(exc)[:2000]) from exc
+    finally:
+        if job:report['cleanup']=job.close()
+        atomic_write_json(report_path,report)
 
 
 def render_frames(root, plan, output, report_path, *, timeout, cancel_file=None):
@@ -377,6 +441,7 @@ def render_frames(root, plan, output, report_path, *, timeout, cancel_file=None)
                     cwd=temp,env=env,stdin=subprocess.PIPE,stdout=subprocess.DEVNULL,stderr=encoder_error)
                 node=job.start([runtime['node'],str(worker)],cwd=temp,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=node_error)
                 request={'root':str(bundle),'files':plan['files'],'spec':spec,'params':plan['parameters'],
+                         'overrides':plan['compiled_overrides'],
                          'frame_count':plan['frame_count'],'ticks_per_second':plan['asset']['html_source']['ticks_per_second'],
                          'playwright':runtime['playwright'],'chromium':runtime['chromium'],'log_file':str(temp/'chromium.log'),
                          'frame_timeout_ms':min(15000,int(timeout*1000))}

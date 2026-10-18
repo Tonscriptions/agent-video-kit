@@ -1,0 +1,805 @@
+{
+  "number": 16,
+  "args": [
+    "fragment",
+    "save",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-template-smoke-20261018-e4\\main",
+    "--library",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-template-smoke-20261018-e4\\library",
+    "--input",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-template-smoke-20261018-e4\\fragment.json"
+  ],
+  "exit_code": 0,
+  "stdout": {
+    "ok": true,
+    "command": "fragment.save",
+    "request_id": "req_20261018012624_92d22531",
+    "operation_id": null,
+    "status": "succeeded",
+    "data": {
+      "fragment": {
+        "fragment_version": "0.1.0",
+        "engine": "agent-local-fragment-library-v1",
+        "id": "brand-card",
+        "version": 1,
+        "name": "brand-card",
+        "tags": [],
+        "source": {
+          "project_id": "proj_20261018012552_bbe10f25",
+          "project_sha256": "sha256:12c9c54a8c5a363b128c789bc527834506ab48b6e7dd3e0b5d791e6b1e11e4a9",
+          "rights_sha256": "sha256:4923143fcd7745c2043f9f5374a21e1e94a6cf4e9ffacfb7743bb27251447f9f"
+        },
+        "entry": {
+          "sequence_id": "seq_main",
+          "origin_tick": 0,
+          "duration_tick": 180000
+        },
+        "selection": {
+          "requested": [
+            "clip_html_20261018012607_0b5d92cd"
+          ],
+          "included": [
+            "clip_html_20261018012607_0b5d92cd"
+          ],
+          "expanded": []
+        },
+        "context": {
+          "timebase": {
+            "ticks_per_second": 90000,
+            "display_fps": {
+              "num": 6,
+              "den": 1
+            }
+          },
+          "color": {
+            "primaries": "bt709",
+            "transfer": "bt709",
+            "matrix": "bt709",
+            "range": "limited"
+          },
+          "audio": {
+            "sample_rate": 48000,
+            "channels": 2
+          }
+        },
+        "project": {
+          "schema_version": "0.1.0",
+          "project": {
+            "id": "proj_20261018012552_bbe10f25",
+            "name": "main",
+            "created_at": "2026-10-18T01:25:52.294107Z",
+            "updated_at": "2026-10-18T01:26:17.141007Z",
+            "creator": "ai-ad-editor",
+            "source_revision": "local"
+          },
+          "settings": {
+            "timebase": {
+              "ticks_per_second": 90000,
+              "display_fps": {
+                "num": 6,
+                "den": 1
+              }
+            },
+            "canvas": {
+              "width": 384,
+              "height": 216,
+              "pixel_aspect": {
+                "num": 1,
+                "den": 1
+              }
+            },
+            "color": {
+              "primaries": "bt709",
+              "transfer": "bt709",
+              "matrix": "bt709",
+              "range": "limited"
+            },
+            "audio": {
+              "sample_rate": 48000,
+              "channels": 2
+            },
+            "output": {
+              "container": "mp4",
+              "video": {
+                "codec": "libx264",
+                "preset": "medium",
+                "crf": 18,
+                "pixel_format": "yuv420p"
+              },
+              "audio": {
+                "codec": "aac",
+                "bitrate": "192k"
+              }
+            }
+          },
+          "sequences": [
+            {
+              "id": "seq_main",
+              "name": "Main",
+              "duration_tick": 180000,
+              "tracks": [
+                {
+                  "id": "track_video_1",
+                  "kind": "video",
+                  "order": 0,
+                  "muted": false,
+                  "locked": false,
+                  "clips": [
+                    {
+                      "id": "clip_html_20261018012607_0b5d92cd",
+                      "asset_id": "changed",
+                      "timeline_start_tick": 0,
+                      "duration_tick": 180000,
+                      "source_in_tick": 0,
+                      "source_out_tick": 180000,
+                      "rights_dependencies": [
+                        {
+                          "rights_ref": "changed",
+                          "sha256": "sha256:ce0d139cc9e905acd4566d3d2acdb80fe07c3ee1fe631ee349f38e558a9cb17f"
+                        },
+                        {
+                          "rights_ref": "editable",
+                          "sha256": "sha256:0cee2b402bf912f4e148b83f62b2f101dd1206924fbed7e613095bdd9e2b7508"
+                        },
+                        {
+                          "rights_ref": "font",
+                          "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1"
+                        },
+                        {
+                          "rights_ref": "product-new",
+                          "sha256": "sha256:00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af"
+                        },
+                        {
+                          "rights_ref": "product-original",
+                          "sha256": "sha256:8d54fd4c7aff26a97a376bbe5f0ad8a276fdcc35ee6461363e48f3700ec58cbf"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "track_audio_1",
+                  "kind": "audio",
+                  "order": 0,
+                  "muted": false,
+                  "locked": false,
+                  "clips": []
+                }
+              ],
+              "markers": [],
+              "source_transitions": [],
+              "canvas": {
+                "width": 384,
+                "height": 216
+              }
+            }
+          ],
+          "assets": [
+            {
+              "id": "changed",
+              "kind": "video",
+              "uri": "files/ce0d139cc9e905acd4566d3d2acdb80fe07c3ee1fe631ee349f38e558a9cb17f.nut",
+              "sha256": "sha256:ce0d139cc9e905acd4566d3d2acdb80fe07c3ee1fe631ee349f38e558a9cb17f",
+              "rights_ref": "changed",
+              "probe": {
+                "duration_seconds": 2.0,
+                "duration_tick": 180000,
+                "format": "nut",
+                "format_long_name": "NUT",
+                "streams": [
+                  {
+                    "index": 0,
+                    "codec_name": "ffv1",
+                    "codec_long_name": "FFmpeg video codec #1",
+                    "codec_type": "video",
+                    "codec_tag_string": "FFV1",
+                    "codec_tag": "0x31564646",
+                    "width": 384,
+                    "height": 216,
+                    "coded_width": 384,
+                    "coded_height": 216,
+                    "has_b_frames": 0,
+                    "pix_fmt": "bgra",
+                    "level": -99,
+                    "r_frame_rate": "6/1",
+                    "avg_frame_rate": "6/1",
+                    "time_base": "1/49152",
+                    "start_pts": 0,
+                    "start_time": "0.000000",
+                    "bits_per_raw_sample": "8",
+                    "extradata_size": 42,
+                    "disposition": {
+                      "default": 0,
+                      "dub": 0,
+                      "original": 0,
+                      "comment": 0,
+                      "lyrics": 0,
+                      "karaoke": 0,
+                      "forced": 0,
+                      "hearing_impaired": 0,
+                      "visual_impaired": 0,
+                      "clean_effects": 0,
+                      "attached_pic": 0,
+                      "timed_thumbnails": 0,
+                      "non_diegetic": 0,
+                      "captions": 0,
+                      "descriptions": 0,
+                      "metadata": 0,
+                      "dependent": 0,
+                      "still_image": 0,
+                      "multilayer": 0
+                    },
+                    "tags": {
+                      "encoder": "Lavc62.28.100 ffv1"
+                    }
+                  }
+                ],
+                "video": {
+                  "codec": "ffv1",
+                  "width": 384,
+                  "height": 216,
+                  "pix_fmt": "bgra",
+                  "fps": "6/1",
+                  "color_space": null,
+                  "duration_seconds": 2.0,
+                  "start_time_seconds": 0.0,
+                  "frame_count": 12
+                },
+                "audio": {
+                  "codec": null,
+                  "sample_rate": 0,
+                  "channels": 0,
+                  "duration_seconds": 0.0,
+                  "start_time_seconds": 0.0
+                },
+                "container_duration_seconds": 1.833333,
+                "duration_basis": "verified_exact_cfr_frames"
+              },
+              "source": {
+                "source_url": "assets/html-motion/d67e2e944994496c8d8ec76eed0cf9f0.nut",
+                "retrieved_at": "2026-10-18T01:26:07.186778Z",
+                "original_name": "d67e2e944994496c8d8ec76eed0cf9f0.nut"
+              },
+              "html_motion": {
+                "engine": "agent-local-html-motion-v1",
+                "source_asset_id": "editable",
+                "parameters": {},
+                "spec": {
+                  "entry": "index.html",
+                  "width": 384,
+                  "height": 216,
+                  "fps": {
+                    "den": 1,
+                    "num": 6
+                  },
+                  "duration_tick": 180000,
+                  "variables": []
+                },
+                "frame_count": 12,
+                "template_overrides": {
+                  "variables": {
+                    "--brand": "#38bdf8",
+                    "--title-size": "30px"
+                  },
+                  "texts": [
+                    {
+                      "at": "#cta",
+                      "value": "CTA 2"
+                    },
+                    {
+                      "at": "#title",
+                      "value": "VIDEO 2"
+                    }
+                  ],
+                  "images": [
+                    {
+                      "at": "#product",
+                      "kind": "img",
+                      "asset_id": "product-new"
+                    }
+                  ]
+                },
+                "override_resources": [
+                  {
+                    "asset_id": "product-new",
+                    "sha256": "sha256:00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af",
+                    "rights_ref": "product-new",
+                    "path": "__template_images/00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af.png"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "editable",
+              "kind": "generated",
+              "uri": "files/0cee2b402bf912f4e148b83f62b2f101dd1206924fbed7e613095bdd9e2b7508.zip",
+              "sha256": "sha256:0cee2b402bf912f4e148b83f62b2f101dd1206924fbed7e613095bdd9e2b7508",
+              "rights_ref": "editable",
+              "probe": {
+                "format": "agent-html-motion-source"
+              },
+              "source": {
+                "source_url": "assets/html-motion/16ccf899a26641eff821460a4c1b80ad.zip",
+                "retrieved_at": "2026-10-18T01:25:54.475895Z",
+                "original_name": "16ccf899a26641eff821460a4c1b80ad.zip"
+              },
+              "html_source": {
+                "engine": "agent-local-html-motion-v1",
+                "version": "0.1.0",
+                "ticks_per_second": 90000,
+                "resources": [
+                  {
+                    "path": "font.ttf",
+                    "asset_id": "font",
+                    "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1"
+                  },
+                  {
+                    "path": "product.png",
+                    "asset_id": "product-original",
+                    "sha256": "sha256:8d54fd4c7aff26a97a376bbe5f0ad8a276fdcc35ee6461363e48f3700ec58cbf"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "product-new",
+              "kind": "image",
+              "uri": "files/00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af.png",
+              "sha256": "sha256:00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af",
+              "probe": {
+                "duration_seconds": 0.0,
+                "duration_tick": 0,
+                "format": "png_pipe",
+                "format_long_name": "piped png sequence",
+                "streams": [
+                  {
+                    "index": 0,
+                    "codec_name": "png",
+                    "codec_long_name": "PNG (Portable Network Graphics) image",
+                    "codec_type": "video",
+                    "codec_tag_string": "[0][0][0][0]",
+                    "codec_tag": "0x0000",
+                    "width": 96,
+                    "height": 128,
+                    "coded_width": 96,
+                    "coded_height": 128,
+                    "has_b_frames": 0,
+                    "pix_fmt": "rgba",
+                    "level": -99,
+                    "color_range": "pc",
+                    "color_space": "gbr",
+                    "r_frame_rate": "25/1",
+                    "avg_frame_rate": "25/1",
+                    "time_base": "1/25",
+                    "disposition": {
+                      "default": 0,
+                      "dub": 0,
+                      "original": 0,
+                      "comment": 0,
+                      "lyrics": 0,
+                      "karaoke": 0,
+                      "forced": 0,
+                      "hearing_impaired": 0,
+                      "visual_impaired": 0,
+                      "clean_effects": 0,
+                      "attached_pic": 0,
+                      "timed_thumbnails": 0,
+                      "non_diegetic": 0,
+                      "captions": 0,
+                      "descriptions": 0,
+                      "metadata": 0,
+                      "dependent": 0,
+                      "still_image": 0,
+                      "multilayer": 0
+                    }
+                  }
+                ],
+                "video": {
+                  "codec": "png",
+                  "width": 96,
+                  "height": 128,
+                  "pix_fmt": "rgba",
+                  "fps": "25/1",
+                  "color_space": "gbr",
+                  "duration_seconds": 0.0,
+                  "start_time_seconds": 0.0
+                },
+                "audio": {
+                  "codec": null,
+                  "sample_rate": 0,
+                  "channels": 0,
+                  "duration_seconds": 0.0,
+                  "start_time_seconds": 0.0
+                }
+              },
+              "rights_ref": "product-new",
+              "source": {
+                "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\html-template-20261018\\template\\new-product.png",
+                "retrieved_at": "2026-10-18T01:25:54.313692Z",
+                "original_name": "new-product.png"
+              }
+            },
+            {
+              "id": "font",
+              "kind": "font",
+              "uri": "files/b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1.ttf",
+              "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1",
+              "probe": {
+                "duration_seconds": 0.0,
+                "duration_tick": 0,
+                "format": "ttf",
+                "format_long_name": "local font",
+                "streams": [],
+                "font": {
+                  "family": "Agent Grid CC0",
+                  "style": "Regular",
+                  "face_index": 0,
+                  "engine": "pillow-freetype"
+                },
+                "video": {
+                  "codec": null
+                },
+                "audio": {
+                  "codec": null,
+                  "sample_rate": 0,
+                  "channels": 0
+                }
+              },
+              "rights_ref": "font",
+              "source": {
+                "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\html-template-20261018\\template\\font.ttf",
+                "retrieved_at": "2026-10-18T01:25:53.911903Z",
+                "original_name": "font.ttf"
+              }
+            },
+            {
+              "id": "product-original",
+              "kind": "image",
+              "uri": "files/8d54fd4c7aff26a97a376bbe5f0ad8a276fdcc35ee6461363e48f3700ec58cbf.png",
+              "sha256": "sha256:8d54fd4c7aff26a97a376bbe5f0ad8a276fdcc35ee6461363e48f3700ec58cbf",
+              "probe": {
+                "duration_seconds": 0.0,
+                "duration_tick": 0,
+                "format": "png_pipe",
+                "format_long_name": "piped png sequence",
+                "streams": [
+                  {
+                    "index": 0,
+                    "codec_name": "png",
+                    "codec_long_name": "PNG (Portable Network Graphics) image",
+                    "codec_type": "video",
+                    "codec_tag_string": "[0][0][0][0]",
+                    "codec_tag": "0x0000",
+                    "width": 96,
+                    "height": 128,
+                    "coded_width": 96,
+                    "coded_height": 128,
+                    "has_b_frames": 0,
+                    "pix_fmt": "rgba",
+                    "level": -99,
+                    "color_range": "pc",
+                    "color_space": "gbr",
+                    "r_frame_rate": "25/1",
+                    "avg_frame_rate": "25/1",
+                    "time_base": "1/25",
+                    "disposition": {
+                      "default": 0,
+                      "dub": 0,
+                      "original": 0,
+                      "comment": 0,
+                      "lyrics": 0,
+                      "karaoke": 0,
+                      "forced": 0,
+                      "hearing_impaired": 0,
+                      "visual_impaired": 0,
+                      "clean_effects": 0,
+                      "attached_pic": 0,
+                      "timed_thumbnails": 0,
+                      "non_diegetic": 0,
+                      "captions": 0,
+                      "descriptions": 0,
+                      "metadata": 0,
+                      "dependent": 0,
+                      "still_image": 0,
+                      "multilayer": 0
+                    }
+                  }
+                ],
+                "video": {
+                  "codec": "png",
+                  "width": 96,
+                  "height": 128,
+                  "pix_fmt": "rgba",
+                  "fps": "25/1",
+                  "color_space": "gbr",
+                  "duration_seconds": 0.0,
+                  "start_time_seconds": 0.0
+                },
+                "audio": {
+                  "codec": null,
+                  "sample_rate": 0,
+                  "channels": 0,
+                  "duration_seconds": 0.0,
+                  "start_time_seconds": 0.0
+                }
+              },
+              "rights_ref": "product-original",
+              "source": {
+                "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\html-template-20261018\\template\\original-product.png",
+                "retrieved_at": "2026-10-18T01:25:54.121548Z",
+                "original_name": "original-product.png"
+              }
+            }
+          ],
+          "templates": [],
+          "outputs": [],
+          "provenance": {
+            "change_log": []
+          }
+        },
+        "rights_ledger": {
+          "schema_version": "0.2.0",
+          "updated_at": "2026-10-18T01:26:17.145701Z",
+          "records": [
+            {
+              "asset_id": "font",
+              "kind": "font",
+              "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1",
+              "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\html-template-20261018\\template\\font.ttf",
+              "source_version": "local",
+              "retrieved_at": "2026-10-18T01:25:53.911916Z",
+              "creator": "unknown",
+              "license_spdx": "CC0-1.0",
+              "license_url": "",
+              "attribution": "",
+              "permitted_uses": [
+                "internal",
+                "commercial_ad"
+              ],
+              "restrictions": [],
+              "evidence": "files/86a10a8433b1e1f7a52287ced2991f040510e93c5323a513f65ebd50426811ae.json",
+              "verification_status": "verified",
+              "verified_by": "ai-ad-editor",
+              "takedown_status": "clear",
+              "notes": "Imported by local CLI",
+              "record_id": "rights_20261018012553_39cb8c7d",
+              "record_version": 1,
+              "active": true,
+              "recorded_at": "2026-10-18T01:25:53.912251Z",
+              "permitted_channels": []
+            },
+            {
+              "asset_id": "product-original",
+              "kind": "image",
+              "sha256": "sha256:8d54fd4c7aff26a97a376bbe5f0ad8a276fdcc35ee6461363e48f3700ec58cbf",
+              "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\html-template-20261018\\template\\original-product.png",
+              "source_version": "local",
+              "retrieved_at": "2026-10-18T01:25:54.121560Z",
+              "creator": "unknown",
+              "license_spdx": "CC0-1.0",
+              "license_url": "",
+              "attribution": "",
+              "permitted_uses": [
+                "internal",
+                "commercial_ad"
+              ],
+              "restrictions": [],
+              "evidence": "files/86a10a8433b1e1f7a52287ced2991f040510e93c5323a513f65ebd50426811ae.json",
+              "verification_status": "verified",
+              "verified_by": "ai-ad-editor",
+              "takedown_status": "clear",
+              "notes": "Imported by local CLI",
+              "record_id": "rights_20261018012554_8cb2d0b3",
+              "record_version": 1,
+              "active": true,
+              "recorded_at": "2026-10-18T01:25:54.121953Z",
+              "permitted_channels": []
+            },
+            {
+              "asset_id": "product-new",
+              "kind": "image",
+              "sha256": "sha256:00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af",
+              "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\html-template-20261018\\template\\new-product.png",
+              "source_version": "local",
+              "retrieved_at": "2026-10-18T01:25:54.313708Z",
+              "creator": "unknown",
+              "license_spdx": "CC0-1.0",
+              "license_url": "",
+              "attribution": "",
+              "permitted_uses": [
+                "internal",
+                "commercial_ad"
+              ],
+              "restrictions": [],
+              "evidence": "files/86a10a8433b1e1f7a52287ced2991f040510e93c5323a513f65ebd50426811ae.json",
+              "verification_status": "verified",
+              "verified_by": "ai-ad-editor",
+              "takedown_status": "clear",
+              "notes": "Imported by local CLI",
+              "record_id": "rights_20261018012554_2b691176",
+              "record_version": 1,
+              "active": true,
+              "recorded_at": "2026-10-18T01:25:54.314240Z",
+              "permitted_channels": []
+            },
+            {
+              "asset_id": "editable",
+              "kind": "generated",
+              "sha256": "sha256:0cee2b402bf912f4e148b83f62b2f101dd1206924fbed7e613095bdd9e2b7508",
+              "source_url": "assets/html-motion/16ccf899a26641eff821460a4c1b80ad.zip",
+              "source_version": "agent-local-html-motion-v1",
+              "retrieved_at": "2026-10-18T01:25:54.475948Z",
+              "creator": "unknown",
+              "license_spdx": "CC0-1.0",
+              "license_url": "",
+              "attribution": "",
+              "permitted_uses": [
+                "internal"
+              ],
+              "restrictions": [],
+              "derived_from": [
+                "font",
+                "product-original"
+              ],
+              "evidence": "files/0cee2b402bf912f4e148b83f62b2f101dd1206924fbed7e613095bdd9e2b7508.zip",
+              "verification_status": "unverified",
+              "verified_by": "",
+              "takedown_status": "clear",
+              "notes": "Local editable HTML motion; template, image and font rights require separate review",
+              "record_id": "rights_20261018012554_38edd02d",
+              "record_version": 1,
+              "active": true,
+              "recorded_at": "2026-10-18T01:25:54.488316Z",
+              "permitted_channels": []
+            },
+            {
+              "asset_id": "changed",
+              "kind": "video",
+              "sha256": "sha256:ce0d139cc9e905acd4566d3d2acdb80fe07c3ee1fe631ee349f38e558a9cb17f",
+              "source_url": "assets/html-motion/d67e2e944994496c8d8ec76eed0cf9f0.nut",
+              "source_version": "agent-local-html-motion-v1",
+              "retrieved_at": "2026-10-18T01:26:07.186805Z",
+              "creator": "unknown",
+              "license_spdx": "LicenseRef-UNVERIFIED",
+              "license_url": "",
+              "attribution": "",
+              "permitted_uses": [
+                "internal"
+              ],
+              "restrictions": [],
+              "derived_from": [
+                "editable",
+                "product-new"
+              ],
+              "evidence": "files/ce0d139cc9e905acd4566d3d2acdb80fe07c3ee1fe631ee349f38e558a9cb17f.nut",
+              "verification_status": "unverified",
+              "verified_by": "",
+              "takedown_status": "clear",
+              "notes": "Local editable HTML motion; template, image and font rights require separate review",
+              "record_id": "rights_20261018012607_77e4f583",
+              "record_version": 1,
+              "active": true,
+              "recorded_at": "2026-10-18T01:26:07.187500Z",
+              "permitted_channels": []
+            }
+          ],
+          "events": [
+            {
+              "event_id": "rightsevent_20261018012553_8ef219bf",
+              "event": "created",
+              "asset_id": "font",
+              "record_id": "rights_20261018012553_39cb8c7d",
+              "record_version": 1,
+              "at": "2026-10-18T01:25:53.912251Z",
+              "actor": "ai-ad-editor"
+            },
+            {
+              "event_id": "rightsevent_20261018012554_c89eaced",
+              "event": "created",
+              "asset_id": "product-original",
+              "record_id": "rights_20261018012554_8cb2d0b3",
+              "record_version": 1,
+              "at": "2026-10-18T01:25:54.121953Z",
+              "actor": "ai-ad-editor"
+            },
+            {
+              "event_id": "rightsevent_20261018012554_a9e25a3f",
+              "event": "created",
+              "asset_id": "product-new",
+              "record_id": "rights_20261018012554_2b691176",
+              "record_version": 1,
+              "at": "2026-10-18T01:25:54.314240Z",
+              "actor": "ai-ad-editor"
+            },
+            {
+              "event_id": "rightsevent_20261018012554_08059c8a",
+              "event": "created",
+              "asset_id": "editable",
+              "record_id": "rights_20261018012554_38edd02d",
+              "record_version": 1,
+              "at": "2026-10-18T01:25:54.488316Z",
+              "actor": "ai-ad-editor"
+            },
+            {
+              "event_id": "rightsevent_20261018012607_a9a8c030",
+              "event": "created",
+              "asset_id": "changed",
+              "record_id": "rights_20261018012607_77e4f583",
+              "record_version": 1,
+              "at": "2026-10-18T01:26:07.187500Z",
+              "actor": "ai-ad-editor"
+            }
+          ],
+          "decisions": [],
+          "policy": {
+            "default_target": "commercial_ad",
+            "unverified_publish": false
+          }
+        },
+        "files": [
+          {
+            "path": "files/00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af.png",
+            "sha256": "sha256:00984c91d9db9464b89ab3158aa6be01baded45b24933152afaed7d2e1f1e4af",
+            "bytes": 612
+          },
+          {
+            "path": "files/0cee2b402bf912f4e148b83f62b2f101dd1206924fbed7e613095bdd9e2b7508.zip",
+            "sha256": "sha256:0cee2b402bf912f4e148b83f62b2f101dd1206924fbed7e613095bdd9e2b7508",
+            "bytes": 3223
+          },
+          {
+            "path": "files/86a10a8433b1e1f7a52287ced2991f040510e93c5323a513f65ebd50426811ae.json",
+            "sha256": "sha256:86a10a8433b1e1f7a52287ced2991f040510e93c5323a513f65ebd50426811ae",
+            "bytes": 365
+          },
+          {
+            "path": "files/8d54fd4c7aff26a97a376bbe5f0ad8a276fdcc35ee6461363e48f3700ec58cbf.png",
+            "sha256": "sha256:8d54fd4c7aff26a97a376bbe5f0ad8a276fdcc35ee6461363e48f3700ec58cbf",
+            "bytes": 613
+          },
+          {
+            "path": "files/b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1.ttf",
+            "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1",
+            "bytes": 2976
+          },
+          {
+            "path": "files/ce0d139cc9e905acd4566d3d2acdb80fe07c3ee1fe631ee349f38e558a9cb17f.nut",
+            "sha256": "sha256:ce0d139cc9e905acd4566d3d2acdb80fe07c3ee1fe631ee349f38e558a9cb17f",
+            "bytes": 79912
+          }
+        ],
+        "adaptations": [],
+        "warnings": []
+      },
+      "plan": {
+        "fragment_sha256": "sha256:f01fd9e9d2f107281653758efa26d55b2b15dbc2b346ade58c0ecf6ab144f5e2",
+        "project_sha256": "sha256:12c9c54a8c5a363b128c789bc527834506ab48b6e7dd3e0b5d791e6b1e11e4a9",
+        "files": 6,
+        "bytes": 87701,
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-template-smoke-20261018-e4\\library\\entries\\1bb45c95cc084922976a3a1d0f9f6f3fcbb702a9f359ef787b3b3679ccf4de3f\\1\\fragment.json"
+      },
+      "verification": {
+        "mode": "windows-read-lock-command-scope",
+        "files_hashed": 9,
+        "bytes_hashed": 123977,
+        "digest_reuses_while_locked": 4,
+        "write_and_delete_sharing": false,
+        "persists_across_commands": false
+      }
+    },
+    "artifacts": [],
+    "warnings": [],
+    "errors": [],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T01:26:24.478909Z",
+      "finished_at": "2026-10-18T01:26:24.478937Z",
+      "network": "disabled"
+    }
+  },
+  "stderr": "",
+  "seconds": 0.38532040000427514
+}

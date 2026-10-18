@@ -5,6 +5,15 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [HTML template controls](../../docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md),
+separate a twice-drawn sample catalog from all-frame encoded evidence. Check
+CSS units, literal multiline words, registered replacement image pixels,
+new image rights, inherited/null-reset recipes and package/fragment rebuilds.
+Missing selectors must fail and reap every browser child. Keep
+[actual failures and pixel checks](../../docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md);
+neither control discovery nor pixel equality accepts glyph coverage, layout
+aesthetics, continuous playback or complete CapCut quality.
+
 For [FGT research](../../docs/specs/开源时序修复候选核验契约_v0.1_2026-10-18.md),
 keep [the measured synthetic and natural findings](../../docs/validation/开源FGT时序修复候选实测_2026-10-18.md)
 separate. The declared PSNR and known-motion residual gates passed on one

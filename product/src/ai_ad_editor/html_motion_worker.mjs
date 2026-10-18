@@ -1,4 +1,4 @@
-// Agent Video Kit native offline host; only the clock is upstream original code.
+// Agent Video Kit offline host with pinned MIT clock and DOM override functions.
 import {createInterface} from 'node:readline';
 import {readFileSync, realpathSync} from 'node:fs';
 import {resolve, sep, extname} from 'node:path';
@@ -6,6 +6,9 @@ import {pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
 import {once} from 'node:events';
 import {FILM_CLOCK} from './openfilm_frame_clock.mjs';
+import {TEMPLATE_DOM} from './html_template_dom.mjs';
+const TEMPLATE_HOST = '(()=>{\n'+['openfilm_template_fields.mjs','openfilm_overrides.mjs'].map(name =>
+  readFileSync(new URL(name, import.meta.url), 'utf8').replace(/^export /gm, '')).join('\n')+'\n'+TEMPLATE_DOM+'\n})();';
 
 const lines = createInterface({input: process.stdin, crlfDelay: Infinity})[Symbol.asyncIterator]();
 const send = async value => { if (!process.stdout.write(JSON.stringify(value)+'\n')) await once(process.stdout, 'drain'); };
@@ -99,6 +102,7 @@ try {
     }
     function requireClean() { if(errors.length) throw problem(errors[0].code,JSON.stringify(errors)); }
     requireClean();
+    await page.addScriptTag({content:TEMPLATE_HOST});
     return {context, page, requireClean};
   }
 
@@ -109,29 +113,46 @@ try {
   }
   async function draw(host, index) {
     const t = index*spec.fps.den/spec.fps.num;
-    await limited(host.page.evaluate(async ({t, params}) => {
+    const template = await limited(host.page.evaluate(async ({t, params, overrides, collect}) => {
       if(document.querySelector('iframe,frame,video,audio,object,embed'))throw new Error('Media/subframe tags are unsupported');
+      window.__agentVideoTemplate.restore();
       window.filmHost.time(t);
       await window.film.frame(t, params);
       window.filmHost.settle(t);
       await document.fonts.ready;
+      const controls = collect ? window.__agentVideoTemplate.collect() : null;
+      const applied = await window.__agentVideoTemplate.apply(overrides);
       await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-    },{t,params}),request.frame_timeout_ms);
+      return {controls, applied, effective_controls:collect ? window.__agentVideoTemplate.collect() : null};
+    },{t,params,overrides:request.overrides || [],collect:request.task === 'controls' || index === 0}),request.frame_timeout_ms);
     host.requireClean();
     const png = await host.page.screenshot({type:'png',omitBackground:true,timeout:request.frame_timeout_ms,scale:'css'});
     host.requireClean();
-    return {png, hash:sha(png)};
+    return {png, hash:sha(png), ...template};
   }
   async function closePage(host) {
     await host.context.close();
     contexts=contexts.filter(c=>c!==host.context);
     receipt.pages_closed++;
   }
-  const hashes = [];
+  if(request.task === 'controls') {
+    const samples = [];
+    for(let pass=0;pass<2;pass++) {
+      const host = await pageForPass();
+      const {hash, controls, applied, effective_controls} = await draw(host, request.sample_frame_index);
+      samples.push({sha256:hash, controls, applied, effective_controls}); await closePage(host);
+    }
+    if(JSON.stringify(samples[0]) !== JSON.stringify(samples[1]))
+      throw problem('HTML_FRAME_NONDETERMINISTIC','Template inspection differs between fresh contexts');
+    outcome = {inspection_only:true, sample_frame_index:request.sample_frame_index, sample:samples[0],
+      fresh_contexts_equal:true, browser_version:browser.version()};
+  } else {
+  const hashes = []; let controls, applied, effective_controls;
   const primary = await pageForPass();
   await send({type:'ready',page_opened:true});
   for(let i=0;i<frameCount;i++) {
-    const {png,hash}=await draw(primary,i);hashes.push(hash);
+    const value=await draw(primary,i); const {png,hash}=value;hashes.push(hash);
+    if(i === 0) {controls=value.controls; applied=value.applied; effective_controls=value.effective_controls;}
     await send({type:'frame',index:i,sha256:hash,png:png.toString('base64')});
     const ack=await lines.next();
     if(ack.done||JSON.parse(ack.value).ack!==i)throw problem('HTML_PROTOCOL_INVALID','Missing frame acknowledgement');
@@ -149,9 +170,12 @@ try {
     await closePage(host);
     verification.push({name,frames:observed});
   }
-  outcome={frame_hashes:hashes,verification,browser_version:browser.version(),all_frame_orders_equal:true};
+  outcome={frame_hashes:hashes,verification,browser_version:browser.version(),all_frame_orders_equal:true,
+    template_controls:controls, template_applied:applied, effective_template_controls:effective_controls};
+  }
 } catch(error) {
-  failure={code:error.code??'HTML_WORKER_FAILED',message:String(error.message).replace(/(?:https?|wss?):\/\/[^\s"'<>]+/g, value=>sha(Buffer.from(value))).slice(0,6000)};
+  const templateCode = /\b(HTML_OVERRIDE_[A-Z_]+|HTML_CONTROL_BUDGET)\b/.exec(String(error.message))?.[1];
+  failure={code:error.code??templateCode??'HTML_WORKER_FAILED',message:'HTML worker diagnostic; '+String(error.message).replace(/(?:https?|wss?):\/\/[^\s"'<>]+/g, value=>sha(Buffer.from(value))).slice(0,6000)};
 } finally {
   for(const context of contexts){try{await context.close();receipt.pages_closed++;}catch{}}
   try{if(browser)await browser.close();receipt.browser_closed=true;}catch{receipt.browser_closed=false;}

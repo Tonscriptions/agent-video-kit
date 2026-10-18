@@ -418,3 +418,9 @@ manifest `sequence-projection-budget` 保存可达节点与分量，`sequence-co
 `media mask-edit --project PATH --asset-id MASK --derived-asset-id NEW` 要求互斥的 `--edits FILE` 或 `--edits-from-asset EDITED`。源 SHA/尺寸/通道/CFR 帧网格严格绑定；alpha 默认，黑白图选 luma。默认 max-frames=4096、storage-budget-mib=512、buffer-budget-mib=256、work-budget-million=200；预算不包含整体进程 RSS/FFmpeg/模型。输出新 PNG 或 QTRLE MOV，不覆盖版本，保留 source.mask_edit 计划及权利闭包。项目写锁退出 6、取消/超时退出 8、非法计划/预算退出 2。支持 dry-run、幂等、取消、进度与事务回滚；不自动入轨。
 
 [完整几何/关键帧契约](本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md)、[真实像素/工程包/模型消费核验](../validation/本地蒙版笔刷与关键帧修正实测_2026-10-18.md)。
+
+## V45 HTML 模板增量
+
+`motion html-controls --project --source-asset-id|--from-asset-id [--params] [--overrides] [--frame-index 0] [--timeout-seconds 120] [--cancel-file]`：单个 CFR 帧/两个新上下文的实际控件检查，不编码或登记资产，返回 controls/effective_controls/采样摘要和回收报告；dry-run 不启动浏览器。`motion html-render` 新增 `--overrides <本地 JSON>`，保存到新输出的 html_motion.template_overrides；省略项继承，null 删除已有覆盖。图片使用 asset_id、独立摘要及权利依赖，可随工程包/片段组重映射。CSS 数值单位必须明确，无效/缺失目标和错图片类型运行时拒绝；dry-run 不冒充 DOM 验收。
+
+字段与预算、逐帧恢复/动画时钟和实际发布边界见[契约](./离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md)、[原片/终态/失败](../validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)。这两个命令继续执行原生 Windows/离线工具链、超时取消和 Job 回收约束。

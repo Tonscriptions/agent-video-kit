@@ -1,0 +1,43 @@
+{
+  "number": 23,
+  "args": [
+    "motion",
+    "html-render",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-template-smoke-20261018-e3\\main",
+    "--from-asset-id",
+    "changed",
+    "--asset-id",
+    "bad",
+    "--dry-run"
+  ],
+  "exit_code": 2,
+  "stdout": {
+    "ok": false,
+    "command": "motion.html-render",
+    "request_id": "req_20261018010606_7dc4c9b4",
+    "operation_id": null,
+    "status": "failed",
+    "data": {},
+    "artifacts": [],
+    "warnings": [],
+    "errors": [
+      {
+        "code": "HTML_OVERRIDE_INVALID",
+        "message": "替换图片已偏离登记 SHA-256",
+        "path": "product-new",
+        "retryable": false
+      }
+    ],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T01:06:06.592106Z",
+      "finished_at": "2026-10-18T01:06:06.592113Z",
+      "network": "disabled"
+    }
+  },
+  "stderr": "",
+  "seconds": 0.04657089999818709
+}

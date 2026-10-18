@@ -12,7 +12,20 @@
 | 证据 | [整树比较](validation/evidence/openfilm-refresh-20261018/verification.json)、[原生核验](validation/evidence/openfilm-increment-verified-20261018/verification.json) |
 | 原研究 | [O01–O12、原生测试与工期假设](OpenFilm源码拆解与复用成本评估_2026-10-17.md) |
 
-**最新落地状态（V41）**：固定上游提交未变；新增本地 HTML/SVG/Canvas 最小后端，原帧时钟按字节采用，其余资源封装、事务、精确 PTS 和进程回收为本项目实现。下列 R02/R03 估算和失败记录按历史保留，当前采用范围见[本页 V41](#产品增量-v41离线动效与可重建源码)与[实际视频/失败记录](validation/离线HTML动效源码与透明合成实测_2026-10-18.md)，不能把历史待办当成全部仍未实现。
+
+**当前结论（V45）**：OpenFilm 可以降低局部模块的二次开发成本，适合接入现有 Agent Project + Python/FFmpeg 主链。已采用的原码、借鉴的业务规则和仍待适配的能力分开记录：
+
+| 优先级 | 模块 | 当前采用方式 | 能减少的工作 / 剩余成本 |
+|---|---|---|---|
+| 1 | O14 模板字段、覆盖与恢复 | 本轮采用原 MIT overrides 字节和四个纯字段函数；本地 CLI/资源闭包自行集成 | 复用字段分类、直接文字/图片覆盖和恢复规则；字体布局诊断、Canvas 内部语义仍需实现 |
+| 2 | O01 字幕分句 | 既有固定原码 worker | 可复用分句、数字单位与双语规则；本地 ASR、逐字对齐和声音质量继续独立建设 |
+| 3 | O02/O03/O13 时间线与片段组 | 既有部分规则/流程借鉴，本项目作者时钟与资源/权利事务实现 | 可复用操作规划和可编辑组工作流；不重复移植已实现主链，剩余源范围/展开多轨另验 |
+| 4 | O04–O06 帧时钟、HTML 动效与诊断 | 既有原码时钟和本地最小 host | HTML 动效与乱序重绘已经可用；下一步重点字体/布局诊断，完整媒体/WebGL/HDR 未验 |
+| 5 | O15 官方创作 Skills | 尚未安装或宣称产品接入；优先参考片、录屏、长转短 | 可复用任务步骤和对照片段标准；需绑定现有本地工具、模型、素材和实际验收 |
+
+本轮功能验证、公开原片/GIF、失败记录及发行检查见[产品实测](validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)。代码许可不能替代素材/字体/模型权利；在线 provider、Studio/Electron 不在采用范围。下文人日均为历史同范围估算，没有实测总人时或项目节省比例，不能加总为剪映全量工期。当前源码引用检查见[固定 main/新 API 失败记录](validation/evidence/openfilm-template-current-20261018/verification.json)，不将旧星数写成新计数。
+
+**V41 落地状态（历史；V45 见末节）**：固定上游提交未变；新增本地 HTML/SVG/Canvas 最小后端，原帧时钟按字节采用，其余资源封装、事务、精确 PTS 和进程回收为本项目实现。下列 R02/R03 估算和失败记录按历史保留，当前采用范围见[本页 V41](#产品增量-v41离线动效与可重建源码)与[实际视频/失败记录](validation/离线HTML动效源码与透明合成实测_2026-10-18.md)，不能把历史待办当成全部仍未实现。
 
 后续复核：**2026-10-18 03:04（Asia/Taipei），GitHub API 为 826 stars / 90 forks，main 仍为上述固定提交**；与 R02 当时的 809/89 分别保留，不能当作独立排行榜。网页缓存当次显示 819，实时 API 原文、时间/ETag/SHA 及初次端点尾斜线 404 后修正记录见[复核证据](validation/evidence/openfilm-window-followup-20261018/verification.json)。无新增上游代码差异，未重新计算 R02 的测试通过数。
 
@@ -46,14 +59,14 @@ R02 是源码与数据研究，**没有把 0.2 新模块接入产品，也没有
 | O02 | [timeline-edit.ts](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/ui/src/lib/timeline-edit.ts) | 关联、同步锁、主轨联动、跨轨删除/闭隙的规划规则和测试 | **整片段子集已进入 V33**；后续 V38 原生补齐完整作者输出内裁切/拆分/内部波纹插删；V39 后续原生补齐 insert/overwrite/lift/extract/roll/slide 的作者范围内规划；源范围外扩与完整磁吸仍需实现验收 | 保留既有适配；未实现部分另立契约 |
 | O03 | [transitions.ts](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/ui/src/lib/transitions.ts) | 添加/调整/移除转场及关联音频的操作流程 | **V35 已借鉴工作流**，本地真实源句柄为新实现；不能称为原算法整体移植 | 无需重复接一套移位/换轨模型 |
 | O13 | [saved.mjs](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/server/saved.mjs)（316 行）+[saved-insert.ts](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/ui/src/lib/saved-insert.ts)（40 行） | 跨项目保存片段组、收集资源、保留相对轨道/时差、重新生成 link ID；可做可复用片头、CTA、字幕包装组 | **后续 V37 已实现受控子集**：本地不可变片段组、作者 tick/嵌套/字体/LUT/字幕与权利历史闭包、独立 ID 跨工程可编辑插入；相同执行上下文、嵌套入轨，展开多轨/来源撤回传播未验 | R02 原估算 3–5 人日、同范围从头约 6–10；已接入子集见末节，未记录实际人时，不宣称实测节省 |
-| O14 | [template-controls.ts](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/ui/src/lib/template-controls.ts)（127 行）+ overrides | CSS 变量类型/单位、文字、图片替换与覆盖恢复；可让 Agent 批量改 HTML 标题卡品牌色/文案/产品图 | 本项目 JSON 模板变量已有；这是将来 HTML 模板桥，不能当新增全套模板系统；需资源/字体权利与离线闭包 | **随 HTML 后端，1–3 人日增量**；同范围从头约 3–5；不含 HTML 渲染 |
+| O14 | [template-controls.ts](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/ui/src/lib/template-controls.ts)（127 行）+ overrides | CSS 变量类型/单位、文字、图片替换与覆盖恢复；可让 Agent 批量改 HTML 标题卡品牌色/文案/产品图 | **V45 已接入受控子集**：实际 CSS/文字/图片控件、逐帧覆盖与恢复、配方继承/null 撤销及迁移；Canvas 语义控件、字体/布局诊断仍未验收 | 历史估算：增量 1–3 人日、从头约 3–5；已接入范围见末节，没有采集实测人时 |
 | O04/O06 | [look.mjs](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/look.mjs) + host 的时钟/乱序机制 | 联系表、两种乱序重复绘制、字体/页面错误/越界检查；减少 Agent 只生成而不验片的缺口 | 适用于 frame(t) 页面；当前 FFmpeg 普通视频不是同一执行模型；抽样确定性不证明美感/每帧质量 | **质量工具候选，3–5 人日**；从头约 6–10；与 O05 共享工作 |
 | O05 | [render.mjs](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/render.mjs) + host/seekable | HTML/CSS/SVG/Canvas/WebGL 动效、透明层、时间采样与运动模糊编排 | 可独立于 React/Electron，但仍需要 Node + Playwright + Chromium；输出登记为本地资产，再交现有 FFmpeg 主链 | **第二批可选后端，5–10 人日**；同范围从头约 12–20；不含完整色彩/HDR/性能验收 |
 | O07 | [nle.mjs](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/studio/server/nle.mjs) | xmeml v4、帧边界量化、重叠 lane、可表达参数与烘焙任务计划 | 当前已有 OTIO/Kdenlive/明文草稿，增量主要是 XML；原路径会烘焙旋转/速度/网页效果，需能力损失报告 | **按互操作需求，3–6 人日**；从头约 7–12；未在 Premiere/Resolve 打开实测 |
 | O15 | [官方十份 Skill](https://github.com/openfilm/openfilm/tree/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/skills) | 参考片拆解、节奏对照、录屏追焦、长转短、产品发布片等创作流程和交付标准 | 原文使用 `npx openfilm`/`get`/服务商，不能原样接入；需改成本地资产、现有 CLI、受检模型与实际对照。Skill 是任务指导，不会自动新增视觉理解/模型算法 | **参考片/录屏/长转短优先，单套流程 1–2 人日**；从头约 2–4；不含缺失功能实现 |
 | O16 | [capture.mjs](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/capture.mjs)（51 行） | 页面全图/元素截图、视口/主题和点击隐藏编排 | 默认接受网络页面，不符合本项目默认离线；已有浏览器工具时净收益小。将来仅显式本地静态页面，输出再登记 | **低优先，不进默认运行时**；无本轮功能/截图实测 |
 
-**R02 当时的下一批建议为先建设 O13，再适配 O15；O13 已于后续 V37 接入受控子集，详见末节。HTML 动效仍独立设为可选后端里程碑。** O13 先支持现有模型中可无损表达的片段组，对不支持的总线、绑定及动态闭包明确报错，不能悄悄丢失。无需因引入 O13 替换现有素材索引、模板、权利台账或事务系统。
+**R02 当时的下一批建议为先建设 O13，再适配 O15；O13 已于后续 V37 接入受控子集，详见末节。后续 V41 已交付可选的最小 HTML 后端，V45 补齐模板控件；剩余页面/媒体范围仍独立验收。** O13 先支持现有模型中可无损表达的片段组，对不支持的总线、绑定及动态闭包明确报错，不能悄悄丢失。无需因引入 O13 替换现有素材索引、模板、权利台账或事务系统。
 
 ## 3. 新官方 Skills 的可借鉴内容
 
@@ -214,3 +227,17 @@ C:\Python313\python.exe -B -X utf8 scripts/audit_openfilm_current_review.py --ou
 | 自然 AI 修复 | OpenFilm provider 路由是外部服务编排，不能拆出未包含的本地模型 | 新实测 FGT 在原创两表面达 33.14 dB、运动残差 0.91，自然仍有补丁；这是独立研究，未新增 OpenFilm 算法采用或产品适配器 |
 
 [FGT 实测/原输入/GIF/原始失败](validation/开源FGT时序修复候选实测_2026-10-18.md)与[来源链](third-party/时序修复候选源码与许可说明_2026-10-18.md)支持继续选择本地时序模型，不能据此宣布已补齐剪映 AI 特效、阴影/反射或完整自然重建。本轮未记录开发人时，不声称已经节省固定百分比、具体天数或整个剩余工期。最近产品仍为 V43 的 141 文件/1005 完整回归；本轮研究不与这些计数相加。
+
+## V45 HTML 模板控件受控接入
+
+2026-10-18 **V45（产品）**：复用 OpenFilm MIT 模板字段与原字节覆盖/恢复函数，新增 `motion html-controls` 和 `html-render --overrides`；CSS 单位、原文/换行、已登记图片、逐帧恢复、配方继承/单项 null 撤销及跨工程重建可用。完整 **1025/1025，1436.703 秒**，0 跳过；**146 文件（含测试）**冻结，20 新增专项为全量子集。原创样例 **26 CLI / 72 编码帧**，144 次额外乱序重绘、2 次单帧检查；17,280 品牌像素及 84,924 不透明图片像素与独立参考一致，继承/撤销/工程包/片段组重建 RGBA 一致，浏览器 Job 全部回收。**100 包内文件 / 11 独立进程 CLI** 的离线 wheel、**14 Skills / 150 引用**通过。三时刻静帧目检，未连续播放；原创样例无音频、0 新模型推理。缺字/越界、自然广告美学、长片/HDR、Schema 随包/干净机器及完整剪映等价仍未验收；FGT 继续为 V44 研究候选，自然画质和来源链未关闭。
+
+| 原编号 | 本轮采用 / 结果 | 剩余范围 |
+|---|---|---|
+| O14 | 原字节 overrides.mjs + 四个模板字段函数；CSS/单位、文字/换行、img/bg 图片控件、逐帧恢复、配方继承/null 撤销；工程包和片段组实际重建 | Canvas 内部语义控件、完整页面编辑、字体选择器/缺字/布局诊断；不得把最小控件当成所有网页可编辑 |
+| O01/O02/O13/O04–O06 | 继续保留既有字幕、关联、片段组、时钟和离线 host，未重复计收益 | 全 film.html、媒体/WebGL 与自然质量仍独立验收 |
+| O15 | 十份官方 Skill 仍为流程候选，优先 reference/replicate、screen-demo、long-to-short 的本地绑定 | 原文 npx/get/provider 不能原样执行；文档不提供 ASR、跟踪、视觉理解或修复算法 |
+
+下一批诊断优先提取 DOM 检查，不整套引入上游 host。固定源码的 [look.mjs 第 45 行](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/look.mjs#L45) 仅检查 FontFace 加载 error，不能证明所用字体覆盖全部中文字形。实际裁切函数位于 [shared.mjs 的 cutText](https://github.com/openfilm/openfilm/blob/eefd6a8d379289102141359a4718dbab12170526/packages/openfilm/src/shared.mjs#L361)，扫描 DOM 文字 Range：2 CSS 像素容差、最多 50 条、只报告仍与画面/容器有交集的部分裁切，完全在画面外的文字可能漏检；不提供 Canvas/SVG 语义文字或字形覆盖检查。look 在至少两个采样帧发现后给警告，不代表整段布局通过。共享模块间接耦合 host/Playwright，上游 host 还有可选网络放行，接入时继续使用本项目断网和 Job 回收边界。[本次三文件静态复核](validation/evidence/openfilm-template-current-20261018/diagnostics-source-review.json)没有新增运行检查或生产采用，也不增加上游 20 测试计数。
+
+本轮只重新确认 main 引用仍为固定提交，API 新请求遇到本机 DNS 失败，星数沿用 V44 的 08:38 快照；没有再核验全部 702 文件或上游 20 测试。[引用与失败](validation/evidence/openfilm-template-current-20261018/verification.json)、[实际采用字节](validation/evidence/openfilm-template-adoption-20261018-e2/verification.json)、[产品终态与原片](validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)。原 1–3/3–5 人日是同范围历史估算；本轮没有采集真实人时，不能宣称整个差额或项目百分比已经节省。FGT 权利与自然画质未通过，不把它混入 OpenFilm 的 MIT 采用清单。

@@ -1,0 +1,44 @@
+{
+  "number": 21,
+  "args": [
+    "motion",
+    "html-render",
+    "--project",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-template-smoke-20261018-e3\\main",
+    "--source-asset-id",
+    "editable",
+    "--asset-id",
+    "bad",
+    "--overrides",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-template-smoke-20261018-e3\\invalid.json"
+  ],
+  "exit_code": 6,
+  "stdout": {
+    "ok": false,
+    "command": "motion.html-render",
+    "request_id": "req_20261018010606_50dd48d4",
+    "operation_id": null,
+    "status": "failed",
+    "data": {},
+    "artifacts": [],
+    "warnings": [],
+    "errors": [
+      {
+        "code": "HTML_OVERRIDE_TARGET_MISSING",
+        "message": "HTML worker diagnostic; page.evaluate: Error: HTML_OVERRIDE_TARGET_MISSING: #removed\n    at issue (<anonymous>:115:55)\n    at Object.apply (<anonymous>:195:23)\n    at eval (eval at evaluate (:311:30), <anonymous>:9:57)\n    at async <anonymous>:337:30",
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\html-template-smoke-20261018-e3\\main\\validation\\html-motion-op_20261018010604_8bd734a8.json",
+        "retryable": false
+      }
+    ],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-18T01:06:06.440383Z",
+      "finished_at": "2026-10-18T01:06:06.440403Z",
+      "network": "disabled"
+    }
+  },
+  "stderr": "",
+  "seconds": 3.4959502999990946
+}

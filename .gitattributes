@@ -1,4 +1,5 @@
 # Published evidence uses byte hashes; preserve its bytes on Windows checkout.
+.gitattributes text eol=lf
 product/**/*.py text eol=lf
 docs/specs/agent-project.schema.json text eol=lf
 docs/assets/** -text
@@ -191,3 +192,20 @@ docs/validation/开源FGT时序修复候选实测_2026-10-18.md text eol=lf
 docs/third-party/时序修复候选源码与许可说明_2026-10-18.md text eol=lf
 skills/video-cut-local-models/SKILL.md text eol=lf
 skills/video-cut-quality/SKILL.md text eol=lf
+
+# V45 MIT template sources and real verification evidence retain exact bytes.
+product/src/ai_ad_editor/openfilm_overrides.mjs -text -whitespace
+product/src/ai_ad_editor/openfilm_template_fields.mjs -text -whitespace
+product/src/ai_ad_editor/html_template_dom.mjs -text
+scripts/*html_template*.py -text
+scripts/adopt_openfilm_template_controls.py -text
+docs/validation/evidence/html-template*/** -text -whitespace
+docs/validation/evidence/html-template*.json -text
+docs/validation/evidence/openfilm-template*/** -text -whitespace
+docs/validation/evidence/docs-audit-html-template*.json -text
+docs/assets/html-template-20261018/template/** whitespace=cr-at-eol
+docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md text eol=lf
+docs/third-party/OpenFilm复用声明_2026-10-17.md text eol=lf
+skills/video-cut-agent-editor/SKILL.md text eol=lf
+skills/video-cut-template-library/SKILL.md text eol=lf

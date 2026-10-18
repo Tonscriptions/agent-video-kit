@@ -8,9 +8,12 @@
 
 本表随功能和验证结果同步更新。**功能执行、实际内容、自动质量与听感分别验收，失败记录保留。**
 
-2026-10-18 **V44（研究）**：FGT 原生离线多帧修复在一个原创双表面样本通过预声明门槛：选区 PSNR **26.143899→33.137925 dB**，已知运动残差 MAE **5.213643→0.908588**；同一自然 32 帧仍有残留/纹理补丁，**自然质量与完整剪映等价未验收**。两个 worker 合计 RAFT 124 / LAFC 124 / FGT 14 次前向，受控 LaMa 32 次；ROSE 仅断网导入、0 次推理。全部编码帧/PTS/alpha/选区外 RGB 核对通过，自然 768,000 字节 PCM 一致；四时刻静态目检，未连续播放/听审。生产 **141 文件**与 V43 相同，本轮未重跑最近 **1005/1005**、0 跳过的完整产品回归，不增加产品 CLI/测试计数。FGT 尚未注册产品适配器，来源链/商业权利仍开放。 [原片/GIF/实测](docs/validation/开源FGT时序修复候选实测_2026-10-18.md)、[机器证据](docs/validation/evidence/fgt-temporal-20261018/verification.json)。
 
-2026-10-18 **V43（产品）**：新增标准库/FFmpeg `media mask-edit`，支持笔刷、框、椭圆、多边形、有序布尔覆盖、关键帧和切镜重置，编辑计划随工程包保留并可重建。完整 **1005/1005，1432.864 秒**，0 跳过，134 Python+4 MJS+Schema+pyproject+MIT 共 141 文件冻结；30 新增专项为完整子集。原创 16 帧/12 CLI、1,228,800 RGBA 字节与独立真值完全一致，24 检查点通过；同一自然场景末帧显式修正 261 个 alpha 像素，五个旧检查点由 4/5 到 5/5，前 31 帧 alpha 不变。真实 LaMa 一次 worker/32 次帧调用消费新蒙版，扩张外 RGB 改变 0、源 alpha 与 768,000 字节 PCM 精确保留；**自然背景仍涂抹，完整对象/画质未验收**。96 文件离线 wheel/11 新进程 CLI、14 Skills/140 引用通过；锁码测试误期望、策略元数据真实失败与主动停止的旧回归保留。仅两张静帧目检，未连续播放/听审；完整剪映等价、长片资源与干净机器发行未验收。 [实测/原片/GIF](docs/validation/本地蒙版笔刷与关键帧修正实测_2026-10-18.md)、[机器证据](docs/validation/evidence/mask-edits-20261018/verification.json)。
+2026-10-18 **V45（产品）**：复用 OpenFilm MIT 模板字段与原字节覆盖/恢复函数，新增 `motion html-controls` 和 `html-render --overrides`；CSS 单位、原文/换行、已登记图片、逐帧恢复、配方继承/单项 null 撤销及跨工程重建可用。完整 **1025/1025，1436.703 秒**，0 跳过；**146 文件（含测试）**冻结，20 新增专项为全量子集。原创样例 **26 CLI / 72 编码帧**，144 次额外乱序重绘、2 次单帧检查；17,280 品牌像素及 84,924 不透明图片像素与独立参考一致，继承/撤销/工程包/片段组重建 RGBA 一致，浏览器 Job 全部回收。**100 包内文件 / 11 独立进程 CLI** 的离线 wheel、**14 Skills / 150 引用**通过。三时刻静帧目检，未连续播放；原创样例无音频、0 新模型推理。缺字/越界、自然广告美学、长片/HDR、Schema 随包/干净机器及完整剪映等价仍未验收；FGT 继续为 V44 研究候选，自然画质和来源链未关闭。 [契约](docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md)、[原片/GIF/完整实测](docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)。
+
+历史研究 2026-10-18 **V44（研究）**：FGT 原生离线多帧修复在一个原创双表面样本通过预声明门槛：选区 PSNR **26.143899→33.137925 dB**，已知运动残差 MAE **5.213643→0.908588**；同一自然 32 帧仍有残留/纹理补丁，**自然质量与完整剪映等价未验收**。两个 worker 合计 RAFT 124 / LAFC 124 / FGT 14 次前向，受控 LaMa 32 次；ROSE 仅断网导入、0 次推理。全部编码帧/PTS/alpha/选区外 RGB 核对通过，自然 768,000 字节 PCM 一致；四时刻静态目检，未连续播放/听审。生产 **141 文件**与 V43 相同，本轮未重跑最近 **1005/1005**、0 跳过的完整产品回归，不增加产品 CLI/测试计数。FGT 尚未注册产品适配器，来源链/商业权利仍开放。 [原片/GIF/实测](docs/validation/开源FGT时序修复候选实测_2026-10-18.md)、[机器证据](docs/validation/evidence/fgt-temporal-20261018/verification.json)。
+
+历史产品 2026-10-18 **V43（产品）**：新增标准库/FFmpeg `media mask-edit`，支持笔刷、框、椭圆、多边形、有序布尔覆盖、关键帧和切镜重置，编辑计划随工程包保留并可重建。完整 **1005/1005，1432.864 秒**，0 跳过，134 Python+4 MJS+Schema+pyproject+MIT 共 141 文件冻结；30 新增专项为完整子集。原创 16 帧/12 CLI、1,228,800 RGBA 字节与独立真值完全一致，24 检查点通过；同一自然场景末帧显式修正 261 个 alpha 像素，五个旧检查点由 4/5 到 5/5，前 31 帧 alpha 不变。真实 LaMa 一次 worker/32 次帧调用消费新蒙版，扩张外 RGB 改变 0、源 alpha 与 768,000 字节 PCM 精确保留；**自然背景仍涂抹，完整对象/画质未验收**。96 文件离线 wheel/11 新进程 CLI、14 Skills/140 引用通过；锁码测试误期望、策略元数据真实失败与主动停止的旧回归保留。仅两张静帧目检，未连续播放/听审；完整剪映等价、长片资源与干净机器发行未验收。 [实测/原片/GIF](docs/validation/本地蒙版笔刷与关键帧修正实测_2026-10-18.md)、[机器证据](docs/validation/evidence/mask-edits-20261018/verification.json)。
 
 历史研究 2026-10-18 **V42（研究）**：空间/时序一致供体选择完成 7 组、124 候选帧及独立复核，**41/41 研究检查，质量门槛未通过（12 区域中 4 失败）**；三组新增输入无严格 MSE 改善。原输入/失败/GIF 和研究 CLI 已保留，未进入产品；137 产品文件与 V41 一致，本轮未重跑其 975 项完整回归，研究与产品计数分开。 [实测/原片](docs/validation/空间与时序一致参考选择实测_2026-10-18.md)、[机器证据](docs/validation/evidence/coherent-reference-20261018/verification.json)。
 
@@ -64,10 +67,13 @@
 | V42 | 空间与时序供体选择（研究） | 41 研究检查、7 组/124 候选帧；逐区独立重算，2 成功/1 取消研究 CLI；三组原片/失败/GIF | 质量 4/12 区域失败；新三组无 MSE 改善，未产品化；975 产品回归本轮未重跑 | [研究实测](docs/validation/空间与时序一致参考选择实测_2026-10-18.md)、[原输入/失败动画](docs/assets/coherent-reference-20261018/two_surfaces-comparison.gif)、[独立证据](docs/validation/evidence/coherent-reference-20261018/verification.json) |
 | V43 | 编码蒙版笔刷、关键帧及修复衔接 | 2026-10-18：完整 1005/1005；四形状/切镜 16 帧与独立 RGBA 真值一致，24/24 检查点；同一自然五点 4/5→5/5，LaMa 实际消费，选区外 RGB/源 alpha/PCM 保留；96 文件 wheel、11 独立 CLI | 手工几何只修指定区域，前 31 帧 alpha 不变；自然涂抹/密集边缘/时序仍未过，失败记录保留；未连续播放/听审 | [原片/GIF/实测](docs/validation/本地蒙版笔刷与关键帧修正实测_2026-10-18.md)、[机器证据](docs/validation/evidence/mask-edits-20261018/verification.json) |
 | V44 | 开源时序修复内核候选（研究） | 真实两组/64 帧 FGT；一个原创双表面样本三行预声明门槛通过，PSNR 26.14→33.14 dB、运动残差 5.21→0.91；自然 PCM/帧/alpha/区外精确保留 | 研究 runner 未产品化，自然残留/补丁未过；ROSE 只导入；141 生产文件不变，本轮不重跑历史 1005/1005 | [原输入/实际 GIF/实测](docs/validation/开源FGT时序修复候选实测_2026-10-18.md)、[独立证据](docs/validation/evidence/fgt-temporal-20261018/verification.json) |
+| V45 | OpenFilm HTML 模板控件与覆盖恢复 | 实际 CSS/文字/图片控件；26 CLI、72 HTML 帧，继承/撤销与工程包/片段组 RGBA 一致；完整 1025/1025，146 文件冻结；100 文件 wheel/11 新进程 CLI；14 Skills/150 引用 | 20 新增专项是全量子集；三时刻静帧，无连续播放；缺字/布局/自然广告美学、HDR/长片/干净机器及剪映等价未验收 | [原片/GIF/实测](docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)、[独立像素/迁移](docs/validation/evidence/html-template-20261018/verification.json)、[全量](docs/validation/evidence/html-template-tests-20261018/full.json) |
 
 ## 开源复用核查
 
-2026-10-18 08:38（Asia/Taipei）最新 API：OpenFilm **836 stars / 90 forks**，main 仍为固定 `eefd6a8d` / MIT。字幕分段、部分关联规则、Saved 片段组工作流和帧时钟已经采用；下一个可复用范围是离线模板变量/诊断和官方 Skill 工作流。云 provider 不提供本地 AI 修复内核；本轮另外实测的 FGT 仍为独立研究。[最新接入/剩余成本](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#v44-研究与-openfilm-边界)、[原 API](docs/validation/evidence/fgt-temporal-20261018/openfilm-current/verification.json)。
+V45 已进一步采用 O14：MIT 原字节 `overrides.mjs` 和四个模板字段函数，现有离线 host 可发现 CSS/文字/图片控件、保存覆盖并单项恢复；工程包及片段组实际重建通过。新的 Git 引用检查确认 main 仍为 `eefd6a8d`，星数仅沿用下方 08:38 的 API 快照，不把缓存页面或失败的新 API 请求当成最新计数。[最新采用与剩余范围](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#v45-html-模板控件受控接入)、[来源引用检查](docs/validation/evidence/openfilm-template-current-20261018/verification.json)。O15 三种创作流程、完整页面/媒体范围、布局/字体诊断仍可继续复用；没有实测人时，不能据此宣称节省某个工期比例。
+
+2026-10-18 08:38（Asia/Taipei）API 历史快照：OpenFilm **836 stars / 90 forks**，main 仍为固定 `eefd6a8d` / MIT。字幕分段、部分关联规则、Saved 片段组工作流和帧时钟已经采用；V45 已采用离线模板字段与覆盖恢复；剩余可复用范围包括布局/字体诊断和官方 Skill 工作流。云 provider 不提供本地 AI 修复内核；本轮另外实测的 FGT 仍为独立研究。[最新接入/剩余成本](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#v44-研究与-openfilm-边界)、[原 API](docs/validation/evidence/fgt-temporal-20261018/openfilm-current/verification.json)。
 
 2026-10-18 复查 **R03**：OpenFilm main 仍为 `eefd6a8d`，API 快照 **829 stars / 90 forks**，与已审查版本无代码差异。重新核对固定 ZIP、本地 **702 份上游文件**、产品 **130 份冻结文件**及原字幕/MIT 字节；该 R03 研究没有重跑历史测试、编码视频或安装新 Skill；随后 V40 产品增量见本页功能表。[复用落地清单、剩余成本与排除项](docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#当前复用落地决策r03)；[本次 API/摘要/文档链接核对](docs/validation/evidence/openfilm-current-review-20261018/verification.json)。已采用的字幕、关联规则、转场和片段组不重复计收益；剩余优先候选为十份官方 Skill 的本地流程适配，以及 HTML 动效/模板/乱序检查的独立可选后端。
 
@@ -88,6 +94,12 @@
 实际数据：[字幕原输入](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-input.json) → [三段输出](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-output.json)；[跨轨删除原模型](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-input.json) → [操作计划/实际结果/手工预期](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-output.json)。字幕无词标的时间为估算。原 CLI/Skill 连接 Studio、npx latest 与服务商；选用模块需改为固定本地入口、强制离线并保留原版权。GUI 目录内的纯规划算法可提取；上游不是完整剪映或本地 AI 特效替代内核。
 
 ## 实测演示素材
+
+**V45 离线模板控件**：左为原模板，中为换品牌色/图片/文案，右为 null 撤销后重建。三列为实际同帧输出；原片 384×216、12 帧/6 fps/2 秒；GIF 768×144、12 帧/2 秒，无音频。
+
+![V45 原模板、覆盖与恢复](docs/assets/html-template-20261018/comparison.gif)
+
+[原模板视频](docs/assets/html-template-20261018/original.mp4) · [修改后视频](docs/assets/html-template-20261018/changed.mp4) · [恢复视频](docs/assets/html-template-20261018/restored.mp4) · [实际联系表](docs/assets/html-template-20261018/contact.png) · [来源/逐帧证据](docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)
 
 ### V44 研究：真正多帧修复与独立背景真值
 
@@ -365,7 +377,7 @@ MP4 与原蒙版均为 8 fps、32 帧；GIF 保留全部 32 帧，帧时长交�
 
 ## 当前状态
 
-- 当前模块进度见[构建进度总表](docs/构建进度总表_2026-10-16.md)：最近产品 V43 完整 **1005/1005**、0 跳过；V44 FGT 研究受控门槛通过，141 生产文件不变，未接入产品。自然 AI/声音/听审、密集边缘、长片资源、开放内容库、干净机器和完整剪映等价仍未验收。
+- 当前模块进度见[构建进度总表](docs/构建进度总表_2026-10-16.md)：最近产品 V45 完整 **1025/1025**、0 跳过，146 文件（含测试）冻结；模板控件、覆盖/撤销与跨工程实际重建通过。V44 FGT 仍未接入产品。自然 AI/声音/听审、密集边缘、长片资源、开放内容库、干净机器和完整剪映等价仍未验收。
 - 新增 `--mask-asset-id` 接通 `media track / track-bind / reframe`，支持显式检查点门禁、源时钟映射及源/蒙版/模型权利依赖。受控全帧几何通过，自然漏抠继续失败；标签像素门槛在 V17 复验通过，见[契约](docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md)和[实测](docs/validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md)。
 - 蒙版核验使用原生 FFmpeg 和 Python 标准库，支持 alpha/luma、明确正负检查点、切点及解码存储预算，失败仍保存报告。公开样例通过实际 CLI 验证；V14 真实 SAM2 提示修正后手腕仍漏选、从 3/5 到 4/5；V43 显式笔刷后同五点通过，不自动接入发布门禁或证明完整分割。见[契约](docs/specs/本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md)与[实测](docs/validation/本地蒙版范围与正负检查点实测_2026-10-16.md)。
 - VACE 五组同源采样/输入尺度对照 **5/5 已完成，画质均未通过**：暗矩形补丁仍存在，4 倍输入或 50 步未改善该样例。CLI 已接入显式 `--flow-shift` 和 `--model-input-scale {1,2,4}`，默认仍为 3/1；输入数组预算按倍率平方计入，输出画布不变。详见[校准证据](docs/validation/evidence/vace-calibration-20261016.json)和[正式参数验证](docs/validation/evidence/vace-profiles-20261016.json)。

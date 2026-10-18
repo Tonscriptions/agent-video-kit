@@ -1,0 +1,51 @@
+{
+  "recorded_at_utc": "2026-10-18T01:33:52.173707+00:00",
+  "status": "selected_source_review_only",
+  "commit": "eefd6a8d379289102141359a4718dbab12170526",
+  "archive_sha256": "sha256:7af40e33f59a43c4426fcb4332a964bf3f814b63b954d375d557c964160dcee2",
+  "files": {
+    "openfilm/src/look.mjs": {
+      "sha256": "sha256:a640dc6ee464901257b076ded89104014a432e2db86d2a5ea684eba863d2e420",
+      "bytes": 24152,
+      "lines": 358
+    },
+    "openfilm/src/shared.mjs": {
+      "sha256": "sha256:cc58ebb58fbd860f27ce683dbbb97f423483edd5550021ceed140be45cb9fbfb",
+      "bytes": 21235,
+      "lines": 413
+    },
+    "openfilm/src/host.mjs": {
+      "sha256": "sha256:dfed0fd5b068823d06b5091fbc01821791f0f470bbf061741bf21a25dc0bb170",
+      "bytes": 29805,
+      "lines": 432
+    }
+  },
+  "font_error_check": {
+    "file": "openfilm/src/look.mjs",
+    "line": 45,
+    "meaning": "FontFace status error; not a glyph coverage or Chinese shaping check"
+  },
+  "text_clip_candidate": {
+    "file": "openfilm/src/shared.mjs",
+    "line": 361,
+    "function": "cutText",
+    "limits": [
+      "DOM text ranges only",
+      "2 CSS pixel tolerance",
+      "only partial intersection",
+      "max 50 findings",
+      "ancestor hidden or clip box heuristic",
+      "not Canvas/SVG semantic text or glyph coverage"
+    ]
+  },
+  "repeat_warning": {
+    "file": "openfilm/src/look.mjs",
+    "line": 103,
+    "meaning": "at least two sampled frames; does not prove all-frame layout quality"
+  },
+  "dependency_boundary": "look imports shared and host; host imports playwright-core and includes optional network route continuation. Extract selected DOM functions into existing offline host.",
+  "new_product_code": false,
+  "new_runtime_execution": false,
+  "whole_tree_reaudit": false,
+  "new_model_inference_calls": 0
+}

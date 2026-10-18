@@ -720,6 +720,16 @@ def build_parser() -> argparse.ArgumentParser:
     html_inspect = _leaf_common(motion_sub.add_parser('html-inspect', help='校验并查看动效源码清单'))
     html_inspect.add_argument('--project', required=True)
     html_inspect.add_argument('--source-asset-id', required=True)
+    html_controls = _leaf_common(motion_sub.add_parser('html-controls', help='在两个新上下文实际检查一帧的 CSS、文字和图片控件'))
+    html_controls.add_argument('--project', required=True)
+    controls_source=html_controls.add_mutually_exclusive_group(required=True)
+    controls_source.add_argument('--source-asset-id')
+    controls_source.add_argument('--from-asset-id')
+    html_controls.add_argument('--params')
+    html_controls.add_argument('--overrides')
+    html_controls.add_argument('--frame-index', type=int, default=0)
+    html_controls.add_argument('--timeout-seconds', type=float, default=120)
+    html_controls.add_argument('--cancel-file')
     html_render = _leaf_common(motion_sub.add_parser('html-render', help='离线逐帧生成透明动效并验证全帧乱序重绘'))
     html_render.add_argument('--project', required=True)
     html_input = html_render.add_mutually_exclusive_group(required=True)
@@ -727,6 +737,7 @@ def build_parser() -> argparse.ArgumentParser:
     html_input.add_argument('--from-asset-id')
     html_render.add_argument('--asset-id', required=True)
     html_render.add_argument('--params')
+    html_render.add_argument('--overrides', help='本地 CSS 变量、文字、已登记图片替换；null 恢复页面值')
     html_render.add_argument('--apply', action='store_true')
     html_render.add_argument('--track-id')
     html_render.add_argument('--sequence-id')
@@ -4446,6 +4457,28 @@ def command_html_inspect(args: argparse.Namespace) -> dict[str, Any]:
     return _envelope('motion.html-inspect', args, data=source)
 
 
+def command_html_controls(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    inspection_args = copy.copy(args)
+    inspection_args.asset_id = new_id('inspect_html')
+    inspection_args.apply = False
+    inspection_args.track_id = None
+    inspection_args.timeline_start_tick = 0
+    inspection_args.expected_project_sha256 = None
+    plan = html_motion.prepare_render(root, project, inspection_args)
+    html_motion._integer(args.frame_index, 'frame_index', 0, plan['frame_count']-1)
+    public = html_motion.public_plan(plan)
+    public.update(inspection_only=True, sample_frame_index=args.frame_index,
+                  all_frames_checked_in_two_fresh_context_orders=False, output=None)
+    if args.dry_run:
+        return _envelope('motion.html-controls', args, status='planned', data={'plan': public})
+    cancel = resolve_local_path(root, args.cancel_file, field='cancel_file') if args.cancel_file else None
+    report_path = root / 'validation' / f'html-controls-{new_id("inspect")}.json'
+    result = html_motion.inspect_controls(root, plan, report_path, frame_index=args.frame_index,
+                                         timeout=args.timeout_seconds, cancel_file=cancel)
+    return _envelope('motion.html-controls', args, data={'inspection': result, 'report': str(report_path)})
+
+
 def command_html_render(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     plan = html_motion.prepare_render(root, project, args)
@@ -4467,8 +4500,9 @@ def command_html_render(args: argparse.Namespace) -> dict[str, Any]:
             'sha256': result['output_sha256'], 'rights_ref': args.asset_id, 'probe': result['probe'],
             'source': {'source_url': output.relative_to(root).as_posix(), 'retrieved_at': now_iso(), 'original_name': output.name},
             'html_motion': {'engine': html_motion.ENGINE, 'source_asset_id': plan['source_asset_id'],
-                'parameters': plan['parameters'], 'spec': plan['spec'], 'frame_count': plan['frame_count']}}
-        record = _html_rights(asset, [plan['asset']['rights_ref']])
+                'parameters': plan['parameters'], 'spec': plan['spec'], 'frame_count': plan['frame_count'],
+                'template_overrides': plan['template_overrides'], 'override_resources': plan['override_resources']}}
+        record = _html_rights(asset, list(dict.fromkeys([plan['asset']['rights_ref'],*[r['rights_ref'] for r in plan['override_resources']]])))
         project['assets'].append(asset)
         ledger = load_ledger(root)
         add_record(ledger, record)
@@ -6410,6 +6444,7 @@ _READ_ONLY_PROJECT_COMMANDS = {
     ("motion", "list"),
     ("motion", "inspect"),
     ('motion', 'html-inspect'),
+    ('motion', 'html-controls'),
 }
 
 
@@ -6468,6 +6503,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ('motion', 'html-register'): command_html_register,
     ('motion', 'html-source'): command_html_source,
     ('motion', 'html-inspect'): command_html_inspect,
+    ('motion', 'html-controls'): command_html_controls,
     ('motion', 'html-render'): command_html_render,
     ("timeline", "compose"): command_timeline_compose,
     ("timeline", "edit"): command_timeline_edit,
