@@ -5,6 +5,18 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For automatic duration following after relative speed/curve/reverse/freeze,
+read the [complete output retime contract](../../docs/specs/完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md).
+Use `timeline edit` action `retime`, or compose `retime_clip`, with a transform
+of the current complete visible output. Original author graphs remain editable
+child sequences. Main clips ripple; linked intersections share the host clock.
+Background music defaults to unchanged-speed ripple, with explicit
+`sync_content: retime` for common retiming. Review all partial spans, absolute
+markers, root bus points and the dry-run hash. Existing absolute source setters
+retain their meaning. Animated blend and direct tracking/transition endpoints
+reject. Native tempo timing does not prove natural quality; see the
+[actual outputs and failed references](../../docs/validation/完整作者输出变速与磁吸联动实测_2026-10-19.md).
+
 For persistent main-track magnet editing, read the
 [mode and sync-split contract](../../docs/specs/主轨磁吸模式与跨剪口同步拆分契约_v0.1_2026-10-18.md).
 Use `timeline edit` action `magnet` with an explicit boolean `enabled`.
@@ -14,8 +26,8 @@ displaced sync spans use complete-author presentation windows; shared side
 links receive matching cut regions and fresh IDs. Ordinary reorder can opt
 in with `sync_span_policy: split`. Review dry-run changes and expected hash
 before applying. Partial magnetic fragment saving expands the full sequence.
-Automatic following for speed/curve/freeze duration edits, all GUI gestures
-and natural quality remain open; invalid geometry still rejects atomically.
+Relative speed/curve/freeze duration following uses the planner above. All GUI
+gestures and natural quality remain open; invalid geometry rejects atomically.
 The [real outputs, failures and installed replay](../../docs/validation/主轨磁吸模式与跨剪口同步拆分实测_2026-10-18.md)
 keeps independent source references separate from same-renderer author graphs.
 

@@ -1,0 +1,3193 @@
+{
+  "status": "preserved_and_verified",
+  "checked_at_utc": "2026-10-18T16:26:40.476818+00:00",
+  "generator_sha256": "sha256:d320c0ccfb9f4aeff82fd330ecfdf914431caa2f123a7376025f4faa58da701e",
+  "archive": "pre-release-runs.zip",
+  "archive_sha256": "sha256:9ce76b14e2c67f21382b1f3c8107bad58567814e0e72b6b7c27911b1398fe5e0",
+  "runs": [
+    {
+      "path": "docs/assets/retime-first-20261019-v57",
+      "status": "failed",
+      "error": "AssertionError((('render', '--project', WindowsPath('E:/dev/sandbox/AI广告剪辑/product/.runtime/retime-smoke-first-20261019-v57/RT05-audio-reference'), '--output', WindowsPath('E:/dev/sandbox/AI广告剪辑/product/.runtime/retime-smoke-first-20261019-v57/RT05-audio-reference/renders/RT05-audio-reference.mkv'), '--container', 'mkv', '--audio-codec', 'pcm_f32le', '--pixel-format', 'yuv444p', '--crf', '0', '--publish'), {'ok': False, 'command': 'render', 'request_id': 'req_20261018160837_2cad7d93', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'VIDEO_TRACK_EMPTY', 'message': '没有可渲染的视频片段或独立文字轨道', 'path': 'sequences[].tracks', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T16:08:37.642867Z', 'finished_at': '2026-10-18T16:08:37.642873Z', 'network': 'disabled'}}))",
+      "completed_cases": 4
+    },
+    {
+      "path": "docs/assets/retime-second-20261019-v57",
+      "status": "failed",
+      "error": "AssertionError(('RT05', 'PCM', 0.1399361491203308))",
+      "completed_cases": 4
+    },
+    {
+      "path": "docs/assets/retime-third-20261019-v57",
+      "status": "failed",
+      "error": "AssertionError((('validate', '--project', WindowsPath('E:/dev/sandbox/AI广告剪辑/product/.runtime/retime-smoke-third-20261019-v57/RT06'), '--strict-rights'), {'ok': False, 'command': 'validate', 'request_id': 'req_20261018161403_7ed9f5db', 'operation_id': None, 'status': 'failed', 'data': {'report': 'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\retime-smoke-third-20261019-v57\\\\RT06\\\\validation\\\\validation_run_20261018161403_20807cbe.json', 'ok': False, 'errors': [{'code': 'SCHEMA_VALIDATION_FAILED', 'message': \"'interpolation' is a required property\", 'path': 'sequences.0.tracks.0.clips.1.keyframes.0.keyframes.0', 'retryable': False}, {'code': 'SCHEMA_VALIDATION_FAILED', 'message': \"'interpolation' is a required property\", 'path': 'sequences.0.tracks.0.clips.1.keyframes.0.keyframes.1', 'retryable': False}, {'code': 'INTERPOLATION_INVALID', 'message': '关键帧插值类型无效', 'path': 'sequences[0].tracks[0].clips[1].keyframes', 'retryable': False}, {'code': 'INTERPOLATION_INVALID', 'message': '关键帧插值类型无效', 'path': 'sequences[0].tracks[0].clips[1].keyframes', 'retryable': False}], 'warnings': [], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 4, 'required_records': 4, 'failures': [], 'warnings': [], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 4, 'sequence_count': 2}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'SCHEMA_VALIDATION_FAILED', 'message': \"'interpolation' is a required property\", 'path': 'sequences.0.tracks.0.clips.1.keyframes.0.keyframes.0', 'retryable': False}, {'code': 'SCHEMA_VALIDATION_FAILED', 'message': \"'interpolation' is a required property\", 'path': 'sequences.0.tracks.0.clips.1.keyframes.0.keyframes.1', 'retryable': False}, {'code': 'INTERPOLATION_INVALID', 'message': '关键帧插值类型无效', 'path': 'sequences[0].tracks[0].clips[1].keyframes', 'retryable': False}, {'code': 'INTERPOLATION_INVALID', 'message': '关键帧插值类型无效', 'path': 'sequences[0].tracks[0].clips[1].keyframes', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T16:14:03.715198Z', 'finished_at': '2026-10-18T16:14:03.715211Z', 'network': 'disabled'}}))",
+      "completed_cases": 5
+    },
+    {
+      "path": "docs/assets/retime-fourth-20261019-v57",
+      "status": "failed",
+      "error": "AssertionError(('RT06', 'PCM', 0.08793357014656067))",
+      "completed_cases": 5
+    },
+    {
+      "path": "docs/assets/retime-fifth-20261019-v57",
+      "status": "failed",
+      "error": "AssertionError((('validate', '--project', WindowsPath('E:/dev/sandbox/AI广告剪辑/product/.runtime/retime-smoke-fifth-20261019-v57/RT09'), '--strict-rights'), {'ok': False, 'command': 'validate', 'request_id': 'req_20261018161741_cdfb3d80', 'operation_id': None, 'status': 'failed', 'data': {'report': 'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\retime-smoke-fifth-20261019-v57\\\\RT09\\\\validation\\\\validation_run_20261018161741_92dcc649.json', 'ok': False, 'errors': [{'code': 'EDIT_MAGNETIC_MAIN_GAP_OR_OVERLAP', 'message': '磁吸主轨必须从零紧邻排列；使用 magnet/shift/insert/extract/trim 规划几何变化', 'path': 'edit', 'retryable': False}, {'code': 'TRACK_OVERLAP', 'message': '轨道片段重叠: b 与 c', 'path': 'sequences[0].tracks[0].clips[2]', 'retryable': False}], 'warnings': [], 'rights': {'ok': True, 'target': 'commercial_ad', 'checked': 4, 'required_records': 4, 'failures': [], 'warnings': [], 'disposition_decisions': [], 'effective_disposition_decisions': []}, 'schema_engine': 'jsonschema', 'asset_count': 4, 'sequence_count': 1}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'EDIT_MAGNETIC_MAIN_GAP_OR_OVERLAP', 'message': '磁吸主轨必须从零紧邻排列；使用 magnet/shift/insert/extract/trim 规划几何变化', 'path': 'edit', 'retryable': False}, {'code': 'TRACK_OVERLAP', 'message': '轨道片段重叠: b 与 c', 'path': 'sequences[0].tracks[0].clips[2]', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T16:17:41.795785Z', 'finished_at': '2026-10-18T16:17:41.795792Z', 'network': 'disabled'}}))",
+      "completed_cases": 8
+    },
+    {
+      "path": "docs/assets/retime-final-20261019-v57",
+      "status": "passed_timing_small_subtitle_preview",
+      "error": null,
+      "completed_cases": 9
+    }
+  ],
+  "files": [
+    {
+      "member": "docs/assets/retime-first-20261019-v57/calls.json",
+      "bytes": 15494,
+      "sha256": "sha256:4fd7774947189ef5a0cc79ea0d0e592202429fdab3c286bc261b8f2bfaab0ec7"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/captions.srt",
+      "bytes": 150,
+      "sha256": "sha256:2063485ff2fd0d3238333e461e67e95da21ab82c434a3866afdab3235ace1f81"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cases.json",
+      "bytes": 3009,
+      "sha256": "sha256:342d325f6493ab59aa32f1f98781a91f987881d707f183998c54c29332006375"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/001.json",
+      "bytes": 735,
+      "sha256": "sha256:e0b0c4cff8891099716be9e53ad751ab0afc08bca80006ffe8ff27fb093ee483"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/002.json",
+      "bytes": 4292,
+      "sha256": "sha256:684169a0b985eab5d4093eaa0ebc4fe3ef3ae7d612dbbc30bfd8108e40cac986"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/003.json",
+      "bytes": 3997,
+      "sha256": "sha256:1e79cb43805318b08ee12e054efdaafd464e05f1509f9e601531699b5f13c2ff"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/004.json",
+      "bytes": 2758,
+      "sha256": "sha256:5b54b4f6b80a826a6088d8bb02b40763f305dd6e1b42ef595ecf66dc306b6ba6"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/005.json",
+      "bytes": 2562,
+      "sha256": "sha256:a5416d6246e5b356aa8792609d386cc92357930778c38757cb717bce4a93d4fd"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/006.json",
+      "bytes": 999,
+      "sha256": "sha256:230be64ce6aacded456138c7d4f8212c0dad9624db7698a57b481006b54a1089"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/007.json",
+      "bytes": 12496,
+      "sha256": "sha256:0bc5aa1ba168f20f6fb00a33473c2251bf25b5f22852586056d7dd7417c75852"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/008.json",
+      "bytes": 13306,
+      "sha256": "sha256:f15c6c54d8d5bdab9aecdfe1fd3e28fe908bb1ce932e8ae9de441abf5982e77f"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/009.json",
+      "bytes": 650,
+      "sha256": "sha256:dfe1c7adf168fedac2241250a4a91bd2d50d1ce8913e672c70883d60cc90e307"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/010.json",
+      "bytes": 3953,
+      "sha256": "sha256:afe005efc509a069cb5be6bf1f872564a2047704146715b5ce4d136d3fe14d3d"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/011.json",
+      "bytes": 12507,
+      "sha256": "sha256:c3db6d00703683e5220b0a67a2c722a0d1648a711a87da4efd8c2263d0d93c94"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/012.json",
+      "bytes": 13306,
+      "sha256": "sha256:3d8cc0a632bd1340f1c9e27fc9c4878259bbdfd81975a51c07d5a2b5d5d9c270"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/013.json",
+      "bytes": 650,
+      "sha256": "sha256:e24eddb89eee4aaad00976cd712836b3c07f8252c4f411377eca16314bea6530"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/014.json",
+      "bytes": 3953,
+      "sha256": "sha256:10b75bee82c1243f357b21cee2cf514440f48df12c838155124fb4affec57356"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/015.json",
+      "bytes": 999,
+      "sha256": "sha256:5744ddd8d2fe0f029e8fb20f07521401642411c8de10d650ec33b65af35e2c3d"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/016.json",
+      "bytes": 12086,
+      "sha256": "sha256:29b23ab170cb7bdf93273631ab1546951dc31f8a864ced17033be5490a5db6f1"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/017.json",
+      "bytes": 20356,
+      "sha256": "sha256:80c646d0f170cd221a527aea1d11bff2684b9a1d39b7b962553ec85b29dd93ab"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/018.json",
+      "bytes": 16502,
+      "sha256": "sha256:de07353d7a4d0c8add9b26cadd9f2515e84c64951ea5dd8335038e7216838731"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/019.json",
+      "bytes": 650,
+      "sha256": "sha256:708887f83be68d6d90fd342b8f817995fc5fd72ac03a95c125bbfc7805161997"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/020.json",
+      "bytes": 4160,
+      "sha256": "sha256:15c7c4821ad6b688f6fa75c878f78cf7cd03b89ea7c65854d99952f722dbe091"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/021.json",
+      "bytes": 999,
+      "sha256": "sha256:db23fa788ef3182c9392ef31bb6d71491a77567e2023780b0580cdca7a917988"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/022.json",
+      "bytes": 12086,
+      "sha256": "sha256:834e050ad33fa8161854f8a9f1e83940f1e7ba7340ad4a47a807194cd3e74137"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/023.json",
+      "bytes": 24414,
+      "sha256": "sha256:2c92aa66ab41107e030fee1a7096cfd8258fc7bc5c61bfecce7196b2822445a9"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/024.json",
+      "bytes": 16617,
+      "sha256": "sha256:67f5631f88ec17b0af642e7f35cc31204c30493fa4b573661d8c07d6fd598ae9"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/025.json",
+      "bytes": 650,
+      "sha256": "sha256:6a008e9fda802df657986431e23c358a07a1476ffa074ee476009db42a69d252"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/026.json",
+      "bytes": 4160,
+      "sha256": "sha256:f186ef03c32af79d196897e3cc2b6140aa18a4ccb26f7ec00cf5912d73201890"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/027.json",
+      "bytes": 1015,
+      "sha256": "sha256:d84d3e956e691bd140993bdbf818dd7b421031c1f15156dd077cc376af2deddf"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/cli/028.json",
+      "bytes": 629,
+      "sha256": "sha256:32314bdf7d4e41500ab0b1637d0c958845d3255d0eff56509b4db4be1d483b9e"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/DejaVuSans.ttf",
+      "bytes": 756072,
+      "sha256": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/executed-generator.py",
+      "bytes": 19449,
+      "sha256": "sha256:562c27b2d8e2a4270c6d518a7d4828887e4c87706b3cea343f0c9b709318f9a9"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/failure.json",
+      "bytes": 43036,
+      "sha256": "sha256:cf490d01cc66ad44eca02851920945914690ee20fe8b9479f0b65217f5a32b27"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/LICENSE_DEJAVU",
+      "bytes": 4816,
+      "sha256": "sha256:d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT01-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT01-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:4fdea8a85f8f0fe348322dd36e09d87c4f4d041b4ec724cae0daeca1b298446d"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT01.aevpkg.zip",
+      "bytes": 547689,
+      "sha256": "sha256:d675a77e1e8ebdb4c008a14c45f25a9debaa187101dc6a8b58590e07eb12e848"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT01.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:1cb19b5672f4af407139678390288cabd3026a4c31c302b69f3572d613a77f4e"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT01.manifest.json",
+      "bytes": 48522,
+      "sha256": "sha256:02e027dfd8636c0c59aabc22129f46867a79c93915c41d0dddb0cde58cdd6d08"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT01.mkv",
+      "bytes": 1386676,
+      "sha256": "sha256:8fd3cb4832676922cabfb4f61b53417b0073e575476432f1311a95e86ae762db"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT01.mp4",
+      "bytes": 73113,
+      "sha256": "sha256:73ac5df426e084d9df0b3f76dc7c797686504e64d969bf2bc13a4c038f7ba9a0"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT02-edit.json",
+      "bytes": 93,
+      "sha256": "sha256:70a2cfb4801975934f7952c690740ff4dd2582d69a3a83961abe11918522cd75"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT02-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:4fd0345b51e23c9b656ba4595cfa9e8e299665e2af10b3da98199368a0700cb8"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT02.aevpkg.zip",
+      "bytes": 547681,
+      "sha256": "sha256:911c0555ecfadffb908783a633c24e9a68dc03aad614bb763a746201571e32d7"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT02.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:d60e499f37b32c3a18d443b304c76cc19d003b1a2343bf2cb8b6bedf7624a2e6"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT02.manifest.json",
+      "bytes": 48623,
+      "sha256": "sha256:178838afa28e7a3f60fc7e8cabfc418b862cff71b9adbd021233a5765ba8c208"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT02.mkv",
+      "bytes": 1966241,
+      "sha256": "sha256:f6943b3ea202caa532aa10fed0de7eee9c6d2df7b3449b9ae5d7c18b9f1de185"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT02.mp4",
+      "bytes": 86241,
+      "sha256": "sha256:a95103bf8a59b1a903bccccb66dd869299b8a8c61936e71f1f90326473546a85"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT03-before.manifest.json",
+      "bytes": 19044,
+      "sha256": "sha256:ebc75dd840a22907f1db07b4ba6c2b205445179d8c58eddfc607b98e5ed5c8dc"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT03-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:268eac9205bd8f268d83374d9cf324a05d80136aa90f22deb7bbb0034f730a83"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT03-edit.json",
+      "bytes": 96,
+      "sha256": "sha256:95b6c7f2396c04b0ff31c60ea6c7443e08f76688350a8c9a3be98686f4a19240"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT03-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:bc752f8547365a442335c1d142c5b593ec4c4051e6d879e58f78f618fdf7e6e1"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT03.aevpkg.zip",
+      "bytes": 548811,
+      "sha256": "sha256:13c535b0669a39d92e1749b3d3668db3a52cafda255fcd66d80b24bdd46c701f"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT03.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:101cc60b72596af3754c47815630bcafcf962efadd84836f8012345804f2c113"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT03.manifest.json",
+      "bytes": 109089,
+      "sha256": "sha256:fd4ec0557f345c41544dc21d77acfede46528b264e63a0aab91cb7ebbd03c3fa"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT03.mkv",
+      "bytes": 1583415,
+      "sha256": "sha256:81b5d5ef4e2c0c54ccac2a33c627c1db9f980f3f249d125a9368f3f1d3c032bd"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT03.mp4",
+      "bytes": 83532,
+      "sha256": "sha256:585f4a27dba34c607865da3b3a679e49398d1b25b0e8e8c3d641b916678d1b39"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT04-before.manifest.json",
+      "bytes": 19044,
+      "sha256": "sha256:807f82aa529480dcea8d9fa0d09a6d4516ac92ecfa2a1c3c07063eff77b8e491"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT04-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:c9046ece7b26f3e1907195e96dc56b8aca68b80e8110db3cbd10846f5ed4ab78"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT04-edit.json",
+      "bytes": 182,
+      "sha256": "sha256:dd4ae989e7441b5e6d04e0b38b6c856da51c62c97f2d5bc38e00d0e6288d7026"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT04-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:3d6f1e514a5364632f54390ce7198ee77f2820f748f6413b515fd424d6ba9aa5"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT04.aevpkg.zip",
+      "bytes": 549119,
+      "sha256": "sha256:20c4a7b067a26a2ae3f4a30d70d1e9eb9966c61ce1ec0fd591851c1d52b78c9f"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT04.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:adb029ca63517376ca04fc1965828591ddb9db4623b40e3a007454396a32c977"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT04.manifest.json",
+      "bytes": 114570,
+      "sha256": "sha256:e9fd07c0ba35d6adcbe6e7205967a761285393ef85e83a6e704186c450e1e6e5"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT04.mkv",
+      "bytes": 1699630,
+      "sha256": "sha256:0e9017000acb2e0ed43b3c4918134bcae6982ab4138164222047bc8d03a762a2"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/RT04.mp4",
+      "bytes": 84889,
+      "sha256": "sha256:757828188e96fca7c3767325986496c55eeea51a5c411adb2d787ca0202d97ee"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/source-preview.mp4",
+      "bytes": 122367,
+      "sha256": "sha256:c01a14a0bc41acc26530bf5fe0e6819013b05eca9d5cb0e1d12e51bbef69c5e8"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/source-provenance.json",
+      "bytes": 695,
+      "sha256": "sha256:52fb0fae197eb0b785b39b7c90cab3a974dee9e47ea7bfc516089f184e52f023"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/source.mkv",
+      "bytes": 58854,
+      "sha256": "sha256:654c015d077536b6e60515014d67a6876c7baa7d7b79df67f071620fa27a1422"
+    },
+    {
+      "member": "docs/assets/retime-first-20261019-v57/source.wav",
+      "bytes": 1152044,
+      "sha256": "sha256:73253ce20fbfe6d0b3cafd4a983749b22b2391e54f582a15aa19cbff2011bf46"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/calls.json",
+      "bytes": 16666,
+      "sha256": "sha256:127e6cb6036130615431b4a6fc60f85009df8ee98cbf714ffc54ee8b1387d85a"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/captions.srt",
+      "bytes": 150,
+      "sha256": "sha256:2063485ff2fd0d3238333e461e67e95da21ab82c434a3866afdab3235ace1f81"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cases.json",
+      "bytes": 3009,
+      "sha256": "sha256:57b77086fcdf10ca28bed5c654936e61606de17ca71a0a1daaeb88965dcbcc60"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/001.json",
+      "bytes": 737,
+      "sha256": "sha256:15718f7cf4e879543a1e79f0c472f34ae56dd59c6f638e9025ede9133591cc81"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/002.json",
+      "bytes": 4294,
+      "sha256": "sha256:82b85d65d7bf738d696e76025a5bcc99f176fd448532a45db4ab80dfc943a4ea"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/003.json",
+      "bytes": 3999,
+      "sha256": "sha256:a1c4cd239602715304d67412ae83a80bda1360c25fa83721f55eb2376946fc6e"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/004.json",
+      "bytes": 2760,
+      "sha256": "sha256:833f77fd8adf72b56fe74285dc9dd6b304abe1093af47b845d89e65e029a66ac"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/005.json",
+      "bytes": 2564,
+      "sha256": "sha256:bc1880d062fefa0c9e6fddcdabc187a18bbde9cc35d22f1c1d967a403b7b93c3"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/006.json",
+      "bytes": 1000,
+      "sha256": "sha256:81d72653349b48a109f9676ee2b47e0bdaf14dc8715f0c0e73fe8e09e5abe9ff"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/007.json",
+      "bytes": 12497,
+      "sha256": "sha256:97c8bd538e80eb89ee754ad9fee1d3f039acffe5282c5d2321d44cda0d3f99a3"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/008.json",
+      "bytes": 13308,
+      "sha256": "sha256:f8e0aee17134b920da8d90c7cc616ece651dbff62313bf3986b7500405060f25"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/009.json",
+      "bytes": 651,
+      "sha256": "sha256:c14df64123453475a6e1f9515dfd3f2d91630ba16d22174154d88488b36fc438"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/010.json",
+      "bytes": 3959,
+      "sha256": "sha256:9c26a63a98a8ad1c4973e6ff7ea04527098b443b055af6666df272110820fee0"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/011.json",
+      "bytes": 12508,
+      "sha256": "sha256:893d06ead3f23802397ea5c36dd9a66e1ba5e48300a27e334028513fddcd463e"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/012.json",
+      "bytes": 13308,
+      "sha256": "sha256:fbd7f622a92e3ac15d2951fde5f19ff2b401d1dd37971f51adc8e6097a305c34"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/013.json",
+      "bytes": 651,
+      "sha256": "sha256:8aa3e82cea6c038271d39a987c955bb47554b79023f56e51eedfb1cde6afa24d"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/014.json",
+      "bytes": 3959,
+      "sha256": "sha256:4b1e90ed2fd241d454e1de170a66ec5c81aaacca882654da2e205657ba9b4251"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/015.json",
+      "bytes": 1000,
+      "sha256": "sha256:c3a6f1458c1e05a2dab8acfb29f91fb4b1abdd8215423a8f75ca8886155a49f9"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/016.json",
+      "bytes": 12088,
+      "sha256": "sha256:66e0c9808bf05697452a85d86c189b4a6f6956a67f178c43cfdff61c03e9e277"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/017.json",
+      "bytes": 20357,
+      "sha256": "sha256:1863af211dad10651ea2ea81bb33d903633e903c2c1a55b1ec6d7a0059feccb7"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/018.json",
+      "bytes": 16504,
+      "sha256": "sha256:e1eb4608a3ceb4259f325369cf903a2db05f350b38a08478de02cdf6d89052a3"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/019.json",
+      "bytes": 651,
+      "sha256": "sha256:7d6c8d58b4b2604a18504a463f83d05925ff09d8ff62cdd44e965a5a8c224548"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/020.json",
+      "bytes": 4166,
+      "sha256": "sha256:30b0dcf5f5e8a7ee401b1ab7d3e6046f97f570c69d705a052ef3d6ee61487268"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/021.json",
+      "bytes": 1000,
+      "sha256": "sha256:a27015a9bfdbf83ac74ead110282a433eaa615dd4f3389988bcdd8627522face"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/022.json",
+      "bytes": 12088,
+      "sha256": "sha256:9ea08b091db104d465bd006b6567c3a298746f7dd032c73e85c4670b5c2144a7"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/023.json",
+      "bytes": 24415,
+      "sha256": "sha256:3f081f900fd5fc0e34df500cdf7f49e62e9c3c28b1001328d43737ef6628aef9"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/024.json",
+      "bytes": 16620,
+      "sha256": "sha256:3b98990834e46814312fb1ce3d1c74d0be2f9c20ab8bd7947e968efcc0e19917"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/025.json",
+      "bytes": 651,
+      "sha256": "sha256:e252214534876acf2361547d4380db40d53f776a9c8e6d78b08d069fd4a889f6"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/026.json",
+      "bytes": 4166,
+      "sha256": "sha256:39ec843852706ece0d7873a5e6e59a80311af8eba6686528b78031a44a118bb8"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/027.json",
+      "bytes": 1016,
+      "sha256": "sha256:99105fbd9fbbe1045342db9ccdcbd40c63456b64ea61218c8384cf9d8dffd63a"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/028.json",
+      "bytes": 12760,
+      "sha256": "sha256:4beb3dac5786678e5eba2b4fa3ca3b5ac0ab6f860a21ea57eafdcac054313710"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/029.json",
+      "bytes": 18600,
+      "sha256": "sha256:b6e9121cf4e8f050e5ac3fdcf455c234d89680fcdc9303c5997ae9b79eaede0c"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/cli/030.json",
+      "bytes": 17780,
+      "sha256": "sha256:64c02add3a02bc952316704c0cf9d63ca41a75e12f7a491168947e41743835e4"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/DejaVuSans.ttf",
+      "bytes": 756072,
+      "sha256": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/executed-generator.py",
+      "bytes": 20684,
+      "sha256": "sha256:238079f0e2d468a908d6e09b15d269113c780f78c3bb4364a0c3685a5f591403"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/failure.json",
+      "bytes": 43363,
+      "sha256": "sha256:3180f2b4a89a62c1eb4447991557e1b57c2031bc2556426ffc17b6c3b165d955"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/LICENSE_DEJAVU",
+      "bytes": 4816,
+      "sha256": "sha256:d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT01-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT01-probe.json",
+      "bytes": 3205,
+      "sha256": "sha256:d77e7d28aa1f2609447ab6c002cbe9ecd16b8f1ef2953c9955c7bf847f274bec"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT01.aevpkg.zip",
+      "bytes": 547673,
+      "sha256": "sha256:b92575114fa501b50be93fd15e61648c5f348f44060324cb2a3486874777ee82"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT01.aevpkg.zip.conversion-report.json",
+      "bytes": 926,
+      "sha256": "sha256:2fd879ea00e071fe3aa08c971ebcb817a5f2e0933eaf20840848ddb53b60293f"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT01.manifest.json",
+      "bytes": 48531,
+      "sha256": "sha256:acedf019bec404c630d4c1b0598a007aae8ee230bb0fe4933d6b5f0e566e0c6e"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT01.mkv",
+      "bytes": 1386676,
+      "sha256": "sha256:a5a244d4d36fb4c7b3f52d0aed4974df12f4fa6a2071fe2e545b1f10404af3f3"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT01.mp4",
+      "bytes": 73113,
+      "sha256": "sha256:73ac5df426e084d9df0b3f76dc7c797686504e64d969bf2bc13a4c038f7ba9a0"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT02-edit.json",
+      "bytes": 93,
+      "sha256": "sha256:70a2cfb4801975934f7952c690740ff4dd2582d69a3a83961abe11918522cd75"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT02-probe.json",
+      "bytes": 3205,
+      "sha256": "sha256:339998107fe0bebffd07eec371f7af03ef5b4e3e8b140d88fac7a14c93a9f827"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT02.aevpkg.zip",
+      "bytes": 547667,
+      "sha256": "sha256:70edcb734d607ec6555972f00b81eea287770f5e1ac09279eeb296431902cf52"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT02.aevpkg.zip.conversion-report.json",
+      "bytes": 926,
+      "sha256": "sha256:7fe6a20ff10c9087de757b04f47f2f327d6362558415ea5e26ffa9ea82abcc56"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT02.manifest.json",
+      "bytes": 48632,
+      "sha256": "sha256:5a19a04bf9aa1c8d98045d966461224dfe1f80d0f5945f52255bf417d3bca253"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT02.mkv",
+      "bytes": 1966241,
+      "sha256": "sha256:a49dad3b0bbe21ee6ea2a41fac395dc862bb6c10538e7df5daad4d01c0e22c49"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT02.mp4",
+      "bytes": 86241,
+      "sha256": "sha256:a95103bf8a59b1a903bccccb66dd869299b8a8c61936e71f1f90326473546a85"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT03-before.manifest.json",
+      "bytes": 19052,
+      "sha256": "sha256:a7da4e310ad3845e9fb03bd1717a5a36b7f43b8331b956239562448f6f6c99dd"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT03-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:0519b61c9fb1369896f4670f60fe36e693bbae9c9c6a7182f7dad8543adcddc5"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT03-edit.json",
+      "bytes": 96,
+      "sha256": "sha256:95b6c7f2396c04b0ff31c60ea6c7443e08f76688350a8c9a3be98686f4a19240"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT03-probe.json",
+      "bytes": 3205,
+      "sha256": "sha256:d79c4df6803b6712a01e6aeb234decfd662adc3df9e3011c7becb6864d0a4301"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT03.aevpkg.zip",
+      "bytes": 548800,
+      "sha256": "sha256:c600282632825ecbbdffe084982d069d142a2dc9b0cc3477ca2b4ad956cfd329"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT03.aevpkg.zip.conversion-report.json",
+      "bytes": 926,
+      "sha256": "sha256:a3f66a1564d3580ec932280d82b980a20992665af0a800ebc2d681dafe2f427d"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT03.manifest.json",
+      "bytes": 109099,
+      "sha256": "sha256:51efbaf671b9de0219eb41296a01198c346e3d801b3f752edbeafa0be7e60240"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT03.mkv",
+      "bytes": 1583415,
+      "sha256": "sha256:b1fdd3e95bcdf4f528b91ce2ffc32ee2a16f233182dd4ed7e5cfdc8ec8a6aa88"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT03.mp4",
+      "bytes": 83532,
+      "sha256": "sha256:585f4a27dba34c607865da3b3a679e49398d1b25b0e8e8c3d641b916678d1b39"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT04-before.manifest.json",
+      "bytes": 19052,
+      "sha256": "sha256:155036a76947c2df6902e1fa9df3cf204f64439af0e6ff04cb16b745c7949232"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT04-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:fb6edc6e8e1fde20464d5e4f3d3a531835c095c6000f6e95160e1852ab1a1523"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT04-edit.json",
+      "bytes": 182,
+      "sha256": "sha256:dd4ae989e7441b5e6d04e0b38b6c856da51c62c97f2d5bc38e00d0e6288d7026"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT04-probe.json",
+      "bytes": 3205,
+      "sha256": "sha256:edd433f8d2b8e333f106f848a6bbe54b20059fd02fa06fbd83a4a6a68e184ca1"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT04.aevpkg.zip",
+      "bytes": 549107,
+      "sha256": "sha256:a7905cae324fbc8279a9233423c5bcb8e5189e58b308c1b19ccf33f234d0087f"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT04.aevpkg.zip.conversion-report.json",
+      "bytes": 926,
+      "sha256": "sha256:e3d1da173e4d98ee60d405233b4513740474858322496acf1a5b106d54486bf5"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT04.manifest.json",
+      "bytes": 114582,
+      "sha256": "sha256:b09ea4ebb15769deb84177b3fbb20dd36609681ec074ad8553e7d8720ca9ad5d"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT04.mkv",
+      "bytes": 1699630,
+      "sha256": "sha256:5e406b1b6f0b6f1c5f717f4f91cdeddc6c48684dced84b7e616539cb222209e1"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT04.mp4",
+      "bytes": 84889,
+      "sha256": "sha256:757828188e96fca7c3767325986496c55eeea51a5c411adb2d787ca0202d97ee"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT05-audio-reference.manifest.json",
+      "bytes": 20805,
+      "sha256": "sha256:d7beedf52835e25b8487257e6a232f85210229a3c2beccc0000f1ec0e0a0a4f5"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT05-audio-reference.mkv",
+      "bytes": 1502283,
+      "sha256": "sha256:729f30c34a12dd929bd922c92dff8b038700ce3daa71aea6d224b3d39eb647d9"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT05-edit.json",
+      "bytes": 435,
+      "sha256": "sha256:6af25b5b541c2fdc26400bc6ab67e12fb7f83e90dbcb87d332ed9d080711fcfc"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT05.manifest.json",
+      "bytes": 91531,
+      "sha256": "sha256:985624e82d5fdde0553e2b0e43a7f533bc01db5f00999ff22a15e27649b9f3c9"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/RT05.mkv",
+      "bytes": 1503998,
+      "sha256": "sha256:7d3064d6de245a981604693fe33445d6e5c9a1a45a52b3e9cd75d84393364d28"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/source-preview.mp4",
+      "bytes": 122367,
+      "sha256": "sha256:c01a14a0bc41acc26530bf5fe0e6819013b05eca9d5cb0e1d12e51bbef69c5e8"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/source-provenance.json",
+      "bytes": 695,
+      "sha256": "sha256:6315c0b1d9b764e3ce63e06cdee71738c040f97ee0fed142c8ce988084f72b4d"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/source.mkv",
+      "bytes": 58854,
+      "sha256": "sha256:09eb35976a5f21b42cd490fa40df8d1a442cf95ebd4b726c6463c4b3e1d0eda9"
+    },
+    {
+      "member": "docs/assets/retime-second-20261019-v57/source.wav",
+      "bytes": 1152044,
+      "sha256": "sha256:73253ce20fbfe6d0b3cafd4a983749b22b2391e54f582a15aa19cbff2011bf46"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/calls.json",
+      "bytes": 17859,
+      "sha256": "sha256:8530c1e2ab060ba205dd5325885928ac31d60d028b36b5e36aa92592c8e471aa"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/captions.srt",
+      "bytes": 150,
+      "sha256": "sha256:2063485ff2fd0d3238333e461e67e95da21ab82c434a3866afdab3235ace1f81"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cases.json",
+      "bytes": 3772,
+      "sha256": "sha256:29115ae02d3219301e92f956709d4bed5c70643c599a8b79cfa48e5e34b7fd18"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/001.json",
+      "bytes": 735,
+      "sha256": "sha256:8f860507ebe86117884702658344be00986bdc79d4333419876189a853419c5a"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/002.json",
+      "bytes": 4292,
+      "sha256": "sha256:9f055b24b3c1eae0d29ddea9571b60e12df8b571b716940a4ffd8198e9f08622"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/003.json",
+      "bytes": 3997,
+      "sha256": "sha256:3e04d14d4f60640513394f20e5ab8932de51a52e55c4baf0ebb0ffe0bd70e7fd"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/004.json",
+      "bytes": 2758,
+      "sha256": "sha256:d5422a89cf20e78708aeb788addb8a2c699ecb565e5dd20192f38eb33c1a3a57"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/005.json",
+      "bytes": 2562,
+      "sha256": "sha256:643774baad162b9ea69a60c494c503d96e3f7e6382635d091f52d70b8f0d8b72"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/006.json",
+      "bytes": 999,
+      "sha256": "sha256:9d768cf5d04824a078658755ed4b92a7a8af0e0c85e30f4dbdbb56841ea34eb7"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/007.json",
+      "bytes": 12496,
+      "sha256": "sha256:d84a71a084819348044ba7f5f830d1a6aafbd6222000e06e25b90bae98172992"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/008.json",
+      "bytes": 13306,
+      "sha256": "sha256:6ba44d1564c35538d71147fbf253c70d4f24bb1c994abda3e5179dad149794ec"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/009.json",
+      "bytes": 650,
+      "sha256": "sha256:7376410db624f4bcb246a3d67a79e53f14f5d175e1601b1f9bb537876ad19956"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/010.json",
+      "bytes": 3953,
+      "sha256": "sha256:aebd3f0b5c7c6f97ca3d5fc7879afc7f8f3b261d9e89dd9337f48fc02c445a12"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/011.json",
+      "bytes": 12507,
+      "sha256": "sha256:6f65062220deefc0a50422a7bee7ac69266234df59f27aad3efa1c9a31fca25d"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/012.json",
+      "bytes": 13306,
+      "sha256": "sha256:0c24122f951033b855de6748d1ec03cfb06346ba024a171c425ba9394aba6d29"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/013.json",
+      "bytes": 650,
+      "sha256": "sha256:67f2bf531e1f16125da8260270c2cf4da785b4dcd9815d206cf23c06b178b899"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/014.json",
+      "bytes": 3953,
+      "sha256": "sha256:84f48e351539092be364988398b91c62ca32936178470f5297af437b04a95805"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/015.json",
+      "bytes": 999,
+      "sha256": "sha256:b443fe59acdd1b7fcd47ec860cde7396300aedd4a2de80e60abc6aecf035d06b"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/016.json",
+      "bytes": 12086,
+      "sha256": "sha256:d9b2e1b3dfc95dd76148242e04dcbbf5763ccc28a1452708a49e3d9617d8b15f"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/017.json",
+      "bytes": 20356,
+      "sha256": "sha256:6237cd3f212771cc8259d9499877377d96501037aafefc91a2c7543e467734f8"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/018.json",
+      "bytes": 16502,
+      "sha256": "sha256:9140c7e5912048bd4d85dfd43302b052c6364305e7e7c22a4be0ac3653ab66a4"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/019.json",
+      "bytes": 650,
+      "sha256": "sha256:1493b8fb4ce7ca6327b88fa1949bdd72ab9edf35fee3622e99d0ad2f2dc60802"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/020.json",
+      "bytes": 4160,
+      "sha256": "sha256:920962bfd7af8103e127e83d22d00163752f0d1b637fcdd4354279419f100afb"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/021.json",
+      "bytes": 999,
+      "sha256": "sha256:da43360add27483b99e7e1622fa929ff56d1889e0eddccddf7ab4a19a4c06f51"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/022.json",
+      "bytes": 12086,
+      "sha256": "sha256:ad7da71eb353a461ca1bcbfc96c0ecaf8bd2d6b449b49a65d949d28027c6d607"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/023.json",
+      "bytes": 24414,
+      "sha256": "sha256:dddb686209efece73cd78ff5de771e43a5430b935ba03b41273775ea572bb937"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/024.json",
+      "bytes": 16358,
+      "sha256": "sha256:f1305d552c028f5134aa250fa2cf5ce456ef03a7cb191eb0d4c4a0b8644e5444"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/025.json",
+      "bytes": 650,
+      "sha256": "sha256:9b925bb353e3f936be29c56faf8acd9b37c1f24eb131b5dfcd3e8a5ffc99da69"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/026.json",
+      "bytes": 4160,
+      "sha256": "sha256:9e7b4f9d177f4f2a51e61f73b638872d3296c828d40e50f9a196b5082364c737"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/027.json",
+      "bytes": 1015,
+      "sha256": "sha256:7d28fa9d7f576f4f1286af4e4c14f5f3faed738ac37cd460cf63638097f90a2c"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/028.json",
+      "bytes": 12758,
+      "sha256": "sha256:5f531e98f7f97e61819265b41ee7490b5748d17d3f31fffaaaad75551702f251"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/029.json",
+      "bytes": 18599,
+      "sha256": "sha256:4a62830265bb784537494bb82d39f033d14166fbe5eb00f2e351b5df9ed8d024"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/030.json",
+      "bytes": 14813,
+      "sha256": "sha256:7bc30fa48259f2e12a6a821712c88b0ba0a7fa385dc803087e38e9530a610a86"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/031.json",
+      "bytes": 650,
+      "sha256": "sha256:85c4d373aa8c6e4000c29683b02db63983b870f9b0dd84cf02480416dac8c67f"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/032.json",
+      "bytes": 3953,
+      "sha256": "sha256:dd08bee49edb9a34a5ea38301c8c36a465303bdf17ee7591ff2019aead5a860e"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/cli/033.json",
+      "bytes": 2624,
+      "sha256": "sha256:581043bac6029d05c6b547f772d9f1023a243192ab6206e04da54bbcf2268d02"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/DejaVuSans.ttf",
+      "bytes": 756072,
+      "sha256": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/executed-generator.py",
+      "bytes": 20684,
+      "sha256": "sha256:238079f0e2d468a908d6e09b15d269113c780f78c3bb4364a0c3685a5f591403"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/failure.json",
+      "bytes": 47717,
+      "sha256": "sha256:3e187eddf71b470bb39e9c98532969433425635ff0d29ddf1c1e4ca687138b13"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/LICENSE_DEJAVU",
+      "bytes": 4816,
+      "sha256": "sha256:d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT01-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT01-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:1d076e73e21fece30537822b8f87b293f72d7930d80c9cd72cd6ed93c135fa55"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT01.aevpkg.zip",
+      "bytes": 547679,
+      "sha256": "sha256:8fc9cb9cb9edfdc804376531a270970485b98a17176b3e5aa6d65c5e73fc267e"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT01.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:5af7005b54848b5bd874065fa5c03801e72252c55e34eb6289f94f18be0c5a36"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT01.manifest.json",
+      "bytes": 40748,
+      "sha256": "sha256:fabfa954d43f1c9b8d306b31b18b049a92c34f2bc33e7624ea060b35718748fa"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT01.mkv",
+      "bytes": 1386676,
+      "sha256": "sha256:ffdbf9fe92d45ee0bb92f8ade28166d2293bd62d1ffd450b6fa2260db03f8aa9"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT01.mp4",
+      "bytes": 73113,
+      "sha256": "sha256:73ac5df426e084d9df0b3f76dc7c797686504e64d969bf2bc13a4c038f7ba9a0"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT02-edit.json",
+      "bytes": 93,
+      "sha256": "sha256:70a2cfb4801975934f7952c690740ff4dd2582d69a3a83961abe11918522cd75"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT02-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:474748ed16d319eabeef4d73ab160ff071846bdccb13c025def9c17aedc24dc6"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT02.aevpkg.zip",
+      "bytes": 547659,
+      "sha256": "sha256:fbd18b53895f39772bf666f2cc7932941401d79ef90d732e96724c6db7146677"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT02.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:dac0b44562228323ed627cf80c4ae82ad48e68954d25b07d3396b67aec5daad4"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT02.manifest.json",
+      "bytes": 40759,
+      "sha256": "sha256:5a9a581dea32dd4a2eb6347c3b175900ed6ae9ecd88e096ed9d76a7bd87b72b9"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT02.mkv",
+      "bytes": 1966241,
+      "sha256": "sha256:a5dba5c2e195f3e41e8160734570653c5e62fa7dcfcfed7a36d535c7e73235be"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT02.mp4",
+      "bytes": 86241,
+      "sha256": "sha256:a95103bf8a59b1a903bccccb66dd869299b8a8c61936e71f1f90326473546a85"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT03-before.manifest.json",
+      "bytes": 19044,
+      "sha256": "sha256:bf6a3565bdb26407957b053fccdb588d7972905274e087c14a3703f0a37d1440"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT03-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:cbd9e3dcef9c1d163abf178581ef55f98b5525f941c790fc4a5950290851793c"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT03-edit.json",
+      "bytes": 96,
+      "sha256": "sha256:95b6c7f2396c04b0ff31c60ea6c7443e08f76688350a8c9a3be98686f4a19240"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT03-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:da61fbb40112bd7255536869e5f5a4fc8293bb78babcf73a7916b313448ab031"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT03.aevpkg.zip",
+      "bytes": 548799,
+      "sha256": "sha256:dc7cba5c82e3bb12b87ab22b23e8cfaa75a66964e1abcd88cb228297fb70ee2e"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT03.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:2817fb3759ee950756a356776e50070be8667436e610ae8d5c42a9f86e1e61e9"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT03.manifest.json",
+      "bytes": 86438,
+      "sha256": "sha256:68e1224e34fbb68361d13a02522206e25d564f6b66c8b0b346cb4bc5570acf3d"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT03.mkv",
+      "bytes": 1583369,
+      "sha256": "sha256:84b19d9bbcd9de5956804d9be5ec7727cd0528defaa189262128916757bb1700"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT03.mp4",
+      "bytes": 83532,
+      "sha256": "sha256:585f4a27dba34c607865da3b3a679e49398d1b25b0e8e8c3d641b916678d1b39"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT04-before.manifest.json",
+      "bytes": 19044,
+      "sha256": "sha256:584159f23b1b4b40dea8b0f7e318bc157c743a4274b300fe2b4940540e9d364a"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT04-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:a791af8a0d9e3157a009a7fb7e15c5defd478e6461628e4dc2e3211d6c0cbccc"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT04-edit.json",
+      "bytes": 182,
+      "sha256": "sha256:dd4ae989e7441b5e6d04e0b38b6c856da51c62c97f2d5bc38e00d0e6288d7026"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT04-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:9eb0f1896194360a1d7c9a2d12197722260f0c10ea408b41d2e532773cd4edb0"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT04.aevpkg.zip",
+      "bytes": 549108,
+      "sha256": "sha256:55be59cce5233845e8fbe42f7687861b8b1abc887f26a813d542a1e024ba42da"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT04.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:ab587394a1046b3b346cd89fe81ffba46e05f252c27b074ed9e6e7e66dbe45b0"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT04.manifest.json",
+      "bytes": 109315,
+      "sha256": "sha256:ab1f989e0265ea44b372c37f0640d0e1ae462552f9fa549001b5d29da6174417"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT04.mkv",
+      "bytes": 1699601,
+      "sha256": "sha256:9e0d4e818a01fb7dbd1dd0f2a8dfb3d3241af3a45d62d305bd500bc55cb86e5e"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT04.mp4",
+      "bytes": 84889,
+      "sha256": "sha256:757828188e96fca7c3767325986496c55eeea51a5c411adb2d787ca0202d97ee"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT05-audio-reference.manifest.json",
+      "bytes": 20797,
+      "sha256": "sha256:59371a5a62b448d6e1732cbc37115e384f77bdf4e0ed114fdd0bc9fef41c36fb"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT05-audio-reference.mkv",
+      "bytes": 1502283,
+      "sha256": "sha256:24372fc7c1deaeb645536a5fbc6d0789c862c91b8276d055ea9a154bcd8a9ec3"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT05-edit.json",
+      "bytes": 435,
+      "sha256": "sha256:6af25b5b541c2fdc26400bc6ab67e12fb7f83e90dbcb87d332ed9d080711fcfc"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT05-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:3b7fba043b24a39dec7150ad261a63659652bf26804e583aa866a5f7bd525370"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT05.aevpkg.zip",
+      "bytes": 548217,
+      "sha256": "sha256:8298f937b3a76c7f10c6ce7d70c940bb8fd6826638989163508ab6b1b852728f"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT05.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:3219a050bf246568777c17acde2206e6e907ae1fe5b22e6f4c97c7d1372f9956"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT05.manifest.json",
+      "bytes": 62866,
+      "sha256": "sha256:37dd2ccb1df26057b5e113126f49567fe363e912ccd5f79f7ef28cee456778e3"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT05.mkv",
+      "bytes": 1503952,
+      "sha256": "sha256:e162e13abd34b49588d9ad0b56f89dfc7ab5bc65b47ed14f2dc4f7fa5b0b0283"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/RT05.mp4",
+      "bytes": 78552,
+      "sha256": "sha256:5efc849a768161a83c2365b63d40c8ea2b985cd71089725532cd494fb2eb5a99"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/source-preview.mp4",
+      "bytes": 122367,
+      "sha256": "sha256:c01a14a0bc41acc26530bf5fe0e6819013b05eca9d5cb0e1d12e51bbef69c5e8"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/source-provenance.json",
+      "bytes": 695,
+      "sha256": "sha256:9b64ca3336d6eac1f4121586ba478d904c2a0729598f03e51f0be1882bd4bcc0"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/source.mkv",
+      "bytes": 58854,
+      "sha256": "sha256:94c0650b6c05351c830b1da67858568fce3177362f5100925c41a34006211cd2"
+    },
+    {
+      "member": "docs/assets/retime-third-20261019-v57/source.wav",
+      "bytes": 1152044,
+      "sha256": "sha256:73253ce20fbfe6d0b3cafd4a983749b22b2391e54f582a15aa19cbff2011bf46"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/calls.json",
+      "bytes": 21705,
+      "sha256": "sha256:0ca0c8314f061222101d9cc91dd84c038cb79aaf9beb7b9b9391beef05fdc5c7"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/captions.srt",
+      "bytes": 150,
+      "sha256": "sha256:2063485ff2fd0d3238333e461e67e95da21ab82c434a3866afdab3235ace1f81"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cases.json",
+      "bytes": 3772,
+      "sha256": "sha256:408ae50fdeab27a4a6356d1932052463faf010724d8bb0d8abb242260d284493"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/001.json",
+      "bytes": 737,
+      "sha256": "sha256:5a81421b801573d86329c9ea6a5acc88924144416f680be9107cf80b8b7af644"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/002.json",
+      "bytes": 4294,
+      "sha256": "sha256:f3565263bc17da47746e6308488bc60348369791a2c8dbad95992293b3885e22"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/003.json",
+      "bytes": 3999,
+      "sha256": "sha256:4c9bb3cdd7cb0a3f3afa50a77369189a459f65af07241223671e07b84eef4683"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/004.json",
+      "bytes": 2760,
+      "sha256": "sha256:9a73a1c048c445fa87134524c96cac92f309c7f9ef88582aef0f60b8e192fe6c"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/005.json",
+      "bytes": 2564,
+      "sha256": "sha256:ac2cf7f6e880f3a5e6adc12b6bc760b96a2df88d7d493eb0c7cfbfd490266492"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/006.json",
+      "bytes": 1000,
+      "sha256": "sha256:96de483fc28cc31c19f2d9a7bc9c3f06e4e85303c552f04f48f65af9aa58aa3a"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/007.json",
+      "bytes": 12497,
+      "sha256": "sha256:91cf087dee3ced7d290f3c348b82a9a71e61aa90c8ea0a0e61fae4869f2ccc48"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/008.json",
+      "bytes": 13308,
+      "sha256": "sha256:d8a2be725ded5dd08d6f6dededadfdb68a17ed579ade58a0eb60b4763cce5bb9"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/009.json",
+      "bytes": 651,
+      "sha256": "sha256:ecbebc4e3152c852fcc6356819972076c01f5df32e4fe495c940b4a5d4d9dae9"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/010.json",
+      "bytes": 3959,
+      "sha256": "sha256:81d6c110fd92196411d49fbbcd40a8da0e647bb9238bd0e58970c6e144676a6c"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/011.json",
+      "bytes": 12508,
+      "sha256": "sha256:69e3226b266d426ec5ff1e994aac0feb3face67fe2de4cdbed054a1b50aecbeb"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/012.json",
+      "bytes": 13308,
+      "sha256": "sha256:4031fbbeee83a3a04c09b16501dfaa0d651de3876e604a5ad3438601ddf48342"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/013.json",
+      "bytes": 651,
+      "sha256": "sha256:ab1c5c6894621ea851a444daac12d8d7009bfc2a4deae65a38466fdf54afe3ae"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/014.json",
+      "bytes": 3959,
+      "sha256": "sha256:b0e8341a556a4dc9c65f23cc1a291bccfbc00ac78532bc776d95c97dc663f36c"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/015.json",
+      "bytes": 1000,
+      "sha256": "sha256:086eaf453c15cdd92d714b5ce825e48815e9a62cb21a94a9926c44ec073b56a9"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/016.json",
+      "bytes": 12088,
+      "sha256": "sha256:75f7fc1f32cbc3538fbfd6411de9378469fda372087c7764b9be2b33b25e34ea"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/017.json",
+      "bytes": 20357,
+      "sha256": "sha256:92f9604e5203c5133a068f04bdb3375cefd0a107acf15bb3320ea8aad4c3989d"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/018.json",
+      "bytes": 16504,
+      "sha256": "sha256:1b165259ef269af887a78275706925b5e37d76a7888b8fa049626c294a91e5d3"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/019.json",
+      "bytes": 651,
+      "sha256": "sha256:4199b96bd6c355e2c49cea1ba023d5683c247da837b0048492cce5cac2bd8353"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/020.json",
+      "bytes": 4166,
+      "sha256": "sha256:f163d12dda8ad0eec6a09e97054234f0868d5e6ac3a299c056d44e700e24447e"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/021.json",
+      "bytes": 1000,
+      "sha256": "sha256:29a2c5510c292301fbab56bb11306f6ef24574ec2b7f04dc42174c3a6da9560a"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/022.json",
+      "bytes": 12088,
+      "sha256": "sha256:a91093b846f71ebbb872246787ef8861b3b7936a13afc2804c7e594b29e73261"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/023.json",
+      "bytes": 24415,
+      "sha256": "sha256:9d7f02de9833e279b0b24bcf6f7d7742bb97076a1ca8e9155493988d0fa816db"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/024.json",
+      "bytes": 16360,
+      "sha256": "sha256:712a400fef9c84b31a3bed04c2ce99201d512719ae234a25ae1c97398ed98481"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/025.json",
+      "bytes": 651,
+      "sha256": "sha256:981b2a2f289023dd5e62c0d68710995e06610b6b92968155cd3f6c265f4ef407"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/026.json",
+      "bytes": 4166,
+      "sha256": "sha256:1b8084f86b89f9f91b9e1a608aad3b42836755577089638ee57de8efb7e2e14e"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/027.json",
+      "bytes": 1016,
+      "sha256": "sha256:2ad690b827b39a3b57176420e395e73a1fa693759928b3e6d1a43f29e1d278ac"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/028.json",
+      "bytes": 12760,
+      "sha256": "sha256:afab768c5f6705fd825e706481adad17f0d13fb2d2c0e9d78eea5fc8cdd32cf3"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/029.json",
+      "bytes": 18600,
+      "sha256": "sha256:78cd053d037b2526a1e7ed55d42c1335cf34d7acb0f0ae4157d938cbeb8fe052"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/030.json",
+      "bytes": 14815,
+      "sha256": "sha256:d1b06d6d7c6f48f634b074ccf050a7353df108b2ceb190f96050a9eff778f65d"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/031.json",
+      "bytes": 651,
+      "sha256": "sha256:2eaa522731e3c12bf1e96f9181c8618cc9d6ee4f21a85621e7f43510b6cecd30"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/032.json",
+      "bytes": 3959,
+      "sha256": "sha256:c7beb59087935ff60d1b449ebf55557cd71630852249c21609656c5ff6811df5"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/033.json",
+      "bytes": 1000,
+      "sha256": "sha256:5741fae1077040beab17ba4bfcd6f572f5952944f02d7b4efa9fa150d4dcaa18"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/034.json",
+      "bytes": 14311,
+      "sha256": "sha256:fcb74736b64c5e16c595bc6900c519a62833bec4b31ed9292af7a3b82e7ed3ee"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/035.json",
+      "bytes": 6050,
+      "sha256": "sha256:8f6967cc2b1ad9ed278a83f10693379aeb1789144d370497e0bf2cf372923998"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/036.json",
+      "bytes": 1016,
+      "sha256": "sha256:8ab516a66a40c2788cc41a4b146f885f7ccdd12c0ba98446151ddf69671f7f92"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/037.json",
+      "bytes": 11963,
+      "sha256": "sha256:fe88aeea9665c2e425f6a531c3853de6100b8c72a17f5755d30614287d15d153"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/038.json",
+      "bytes": 13511,
+      "sha256": "sha256:14d6d1ad33a27591d6f78fc7822dd645da1e90c98cbc53ced7dd46d1a985937e"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/cli/039.json",
+      "bytes": 16384,
+      "sha256": "sha256:560c0c2b049af2e83ffa52e60a02eae53e86ef652f17b91b11f8891f187e93ea"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/DejaVuSans.ttf",
+      "bytes": 756072,
+      "sha256": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/executed-generator.py",
+      "bytes": 20751,
+      "sha256": "sha256:f15c7b7c72058b763282ad7ec79abf46838431af7feb94d5b5c5fb0d649d37f7"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/failure.json",
+      "bytes": 49512,
+      "sha256": "sha256:4381c709d5a816262a61864dd33631674750450a989612377a95428a96cdf438"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/LICENSE_DEJAVU",
+      "bytes": 4816,
+      "sha256": "sha256:d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT01-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT01-probe.json",
+      "bytes": 3205,
+      "sha256": "sha256:f610fe463fba06a447a6408183ddf30bbd4f14dc2d3da9d10b3ef6dcb84b841f"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT01.aevpkg.zip",
+      "bytes": 547665,
+      "sha256": "sha256:f85485de6ab1b373b75da8ae91104b70a827aa98912074948abceb5b0a3114cd"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT01.aevpkg.zip.conversion-report.json",
+      "bytes": 926,
+      "sha256": "sha256:ada2d805b5acfb5e5fda5dbea36551699929fcfd4aee219f5e1f56edc4777cee"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT01.manifest.json",
+      "bytes": 40757,
+      "sha256": "sha256:b1112c962fd981f1b614ab22dd26c321abf796cad4ae3f022dd4e8907bbf150d"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT01.mkv",
+      "bytes": 1386676,
+      "sha256": "sha256:0591111533981a15e21da13db8d5cb671837c6cdc5d22be28e960a60fbc8194a"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT01.mp4",
+      "bytes": 73113,
+      "sha256": "sha256:73ac5df426e084d9df0b3f76dc7c797686504e64d969bf2bc13a4c038f7ba9a0"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT02-edit.json",
+      "bytes": 93,
+      "sha256": "sha256:70a2cfb4801975934f7952c690740ff4dd2582d69a3a83961abe11918522cd75"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT02-probe.json",
+      "bytes": 3205,
+      "sha256": "sha256:16b62ab4d35ee2ae17835b6c7b14d53b176e98726530d82bd442472847ca7daa"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT02.aevpkg.zip",
+      "bytes": 547650,
+      "sha256": "sha256:fe44f423c1551f89cdfd7e08498ecf8d35b4f115427cc44a3f5a97a35946b418"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT02.aevpkg.zip.conversion-report.json",
+      "bytes": 926,
+      "sha256": "sha256:61b7730a654789ddf36dc1157d80a00db0a5f71c82407971fdb20bcd0bff04b3"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT02.manifest.json",
+      "bytes": 40768,
+      "sha256": "sha256:e7da492b38f87c5a11cf6d7b131ee2dc1e9f06566563b4dee06c6401235cb4dd"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT02.mkv",
+      "bytes": 1966241,
+      "sha256": "sha256:b63724aaccd9f0958d85343b5450543be82bd8351e0988d824f9eba0ee0ec77d"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT02.mp4",
+      "bytes": 86241,
+      "sha256": "sha256:a95103bf8a59b1a903bccccb66dd869299b8a8c61936e71f1f90326473546a85"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT03-before.manifest.json",
+      "bytes": 19052,
+      "sha256": "sha256:c43e85d6416e4ff5df69fe612bc2cb925a42502b6143d0837cf8a3971c26a161"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT03-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:879a76d968dc93c249c6a5c9e6dbd9e3934f6441f723d532872eab082bddfae4"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT03-edit.json",
+      "bytes": 96,
+      "sha256": "sha256:95b6c7f2396c04b0ff31c60ea6c7443e08f76688350a8c9a3be98686f4a19240"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT03-probe.json",
+      "bytes": 3205,
+      "sha256": "sha256:19b117c49f1cf27202697e484896a576cd48ae7cd3fb0b9eea709f8cb4ba3570"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT03.aevpkg.zip",
+      "bytes": 548790,
+      "sha256": "sha256:bbb70e8d408f27828237711c38f50b9ed9f970f373feb64f3e9d211bafcf733d"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT03.aevpkg.zip.conversion-report.json",
+      "bytes": 926,
+      "sha256": "sha256:ca887aaa25d8b49ea86c9b206cd45984e54e295545bfadc3a0100579188a54ff"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT03.manifest.json",
+      "bytes": 86448,
+      "sha256": "sha256:2fe87590b69930702d882e7d9b7f6c9a09efff9e4e28df3f744551446449d722"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT03.mkv",
+      "bytes": 1583369,
+      "sha256": "sha256:4d7e3f21107060ba1c99813816daaf4e9a92731854385bfb9fdc9737e4e2834d"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT03.mp4",
+      "bytes": 83532,
+      "sha256": "sha256:585f4a27dba34c607865da3b3a679e49398d1b25b0e8e8c3d641b916678d1b39"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT04-before.manifest.json",
+      "bytes": 19052,
+      "sha256": "sha256:b3fa8eed976d0ea3e382e838c95bbac48100a7d965f1179d4d5b595701c86b08"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT04-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:4ec523ae0bd9a312be4dabc8d501a00ecfdb7d5047a124d5018fe308275b1f10"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT04-edit.json",
+      "bytes": 182,
+      "sha256": "sha256:dd4ae989e7441b5e6d04e0b38b6c856da51c62c97f2d5bc38e00d0e6288d7026"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT04-probe.json",
+      "bytes": 3205,
+      "sha256": "sha256:0baa3118e4cbbd41ccf3d353bd888d06d608c2deb9d7d7b3bf47d747a2702c36"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT04.aevpkg.zip",
+      "bytes": 549100,
+      "sha256": "sha256:aa0e338ff81c8a61c0c43f3a23e0716a94ac2d33e60c3ee4cadf169bf0c67bbc"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT04.aevpkg.zip.conversion-report.json",
+      "bytes": 926,
+      "sha256": "sha256:542fbff8e54dbcb1b17b9ddb6f47e63f1a6d377d3e1b9abc5202b2088e5c90f6"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT04.manifest.json",
+      "bytes": 109325,
+      "sha256": "sha256:d6896d054e688f4b0a52c08f9f724756e0001fcfcd208486d4955270a74c28a0"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT04.mkv",
+      "bytes": 1699613,
+      "sha256": "sha256:168fc271e29fe9cca98ad69cdb69dc28e6cd9406336092485ece9522694285d7"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT04.mp4",
+      "bytes": 84889,
+      "sha256": "sha256:757828188e96fca7c3767325986496c55eeea51a5c411adb2d787ca0202d97ee"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT05-audio-reference.manifest.json",
+      "bytes": 20805,
+      "sha256": "sha256:54d33661d795e1a4afcc41369663b14f2e16e8c8594ded6adfd00d20723fcba6"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT05-audio-reference.mkv",
+      "bytes": 1502283,
+      "sha256": "sha256:59a38ee9ec499259f04730dba8a9151c628f9dbf2eea3fd67cc0f49b3d59a58d"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT05-edit.json",
+      "bytes": 435,
+      "sha256": "sha256:6af25b5b541c2fdc26400bc6ab67e12fb7f83e90dbcb87d332ed9d080711fcfc"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT05-probe.json",
+      "bytes": 3205,
+      "sha256": "sha256:d487aa4136a1a4dddaeaa86892d890ef3e4e0fd3d3ee198677ffd7efa70630d1"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT05.aevpkg.zip",
+      "bytes": 548203,
+      "sha256": "sha256:5fec8ec1715505ff5c6345f9fabf6ae14dbc3301bd58af4885130d351ad196fa"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT05.aevpkg.zip.conversion-report.json",
+      "bytes": 926,
+      "sha256": "sha256:7217702ed4d57392625a6b98a4c2f81d9b6f511db780433265ea1b8086530764"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT05.manifest.json",
+      "bytes": 62876,
+      "sha256": "sha256:de40ba086fc08c0ef4ceb9a2c4576926c68b6862b97ca919b494419a7249a45d"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT05.mkv",
+      "bytes": 1503946,
+      "sha256": "sha256:b88173a24ddfb032b9b01fb2860e19a48602beb82463ec244f987a4bbdba4c11"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT05.mp4",
+      "bytes": 78552,
+      "sha256": "sha256:5efc849a768161a83c2365b63d40c8ea2b985cd71089725532cd494fb2eb5a99"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT06-audio-reference.manifest.json",
+      "bytes": 14969,
+      "sha256": "sha256:21c0bea88211fe66c20875d914a6ca773e7f22555c36b7e90a9d3dbf1908bee5"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT06-audio-reference.mkv",
+      "bytes": 1383224,
+      "sha256": "sha256:5fdeee7816706ef4856784e04ee87a50f19829069baf422d8621ecba5287dd01"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT06-before.manifest.json",
+      "bytes": 51066,
+      "sha256": "sha256:79bd8ef9b6988a2a83f5ed7583cfdeb94c79bb0303315ee8b22a473dfe15a87b"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT06-before.mkv",
+      "bytes": 1578882,
+      "sha256": "sha256:3ed19fc525a4486713221eb6d3f7a740db3b8aee224dcd0bd26b7a0cefd13b34"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT06-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT06.manifest.json",
+      "bytes": 80063,
+      "sha256": "sha256:c934aacc672c644c7bc87986150735b97049adcf4742bb3dae50545b3141ecc3"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/RT06.mkv",
+      "bytes": 1384078,
+      "sha256": "sha256:526f940bfb73d1df0e179f9ed213e3aa42d8f902b6dad0f0b8e76898d762da11"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/source-preview.mp4",
+      "bytes": 122367,
+      "sha256": "sha256:c01a14a0bc41acc26530bf5fe0e6819013b05eca9d5cb0e1d12e51bbef69c5e8"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/source-provenance.json",
+      "bytes": 695,
+      "sha256": "sha256:6a0537466ceef01b64fe81e6ab9895bfc39b84769af72f0f8c536eb86334a90d"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/source.mkv",
+      "bytes": 58854,
+      "sha256": "sha256:71ad8206110ac49b4b8d5309c9e24672c644b79b17752a1317ee7480588a439a"
+    },
+    {
+      "member": "docs/assets/retime-fourth-20261019-v57/source.wav",
+      "bytes": 1152044,
+      "sha256": "sha256:73253ce20fbfe6d0b3cafd4a983749b22b2391e54f582a15aa19cbff2011bf46"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/calls.json",
+      "bytes": 27366,
+      "sha256": "sha256:2077230d8f0b9298959aaaff892ec9624c0b5b4fbd9068caef855daf62a66b56"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/captions.srt",
+      "bytes": 150,
+      "sha256": "sha256:2063485ff2fd0d3238333e461e67e95da21ab82c434a3866afdab3235ace1f81"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cases.json",
+      "bytes": 6078,
+      "sha256": "sha256:66b1dbf848674bf6f87c3724981d0ae63d80643006f6e582a70fa3d9d8adf4e2"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/001.json",
+      "bytes": 735,
+      "sha256": "sha256:dbb90f19aa442644dcbd4ee34e5da024770f699e20789d9b001a59ab5da172f0"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/002.json",
+      "bytes": 4292,
+      "sha256": "sha256:39fe90cb288f37a9fd85a8153062f74912457d182dca321efa4d5cfd0cb0c235"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/003.json",
+      "bytes": 3997,
+      "sha256": "sha256:2c193707bbeadcde65b17ebf11545279234f909fc4dc02dce314880a0b03c0fb"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/004.json",
+      "bytes": 2758,
+      "sha256": "sha256:de9fb56bb4fb9ea4c27b9770a049aea8554433e90a766e982e5c1907a21f39dd"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/005.json",
+      "bytes": 2562,
+      "sha256": "sha256:8d42c9f16bec915939f494c4d0b1096446630ed25f3f252b44a75b91c35e44b3"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/006.json",
+      "bytes": 999,
+      "sha256": "sha256:ec8577a0f7466c01c3353cc272e664ea43000e155bc94b8c06ee61cbcd374d52"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/007.json",
+      "bytes": 12496,
+      "sha256": "sha256:d8a3e4c6369a45d82e1c4930a6ea47ee606b445a7efe7d1465224afc0388680f"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/008.json",
+      "bytes": 13306,
+      "sha256": "sha256:6c25eda38468ae7f51b0928ed34d497090bd80251a5fc7f43af1ef0eef1fe4ee"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/009.json",
+      "bytes": 650,
+      "sha256": "sha256:e21fe8c20999c80f9298899974dfdce5bf126938f6c3ca2078975709fde3efd1"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/010.json",
+      "bytes": 3953,
+      "sha256": "sha256:1ad58de2964bed8810256727d0b67e5b08f17f3e5bcca71884a02b1d6813702b"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/011.json",
+      "bytes": 12507,
+      "sha256": "sha256:58eaa1cad936c068f3c28aa5c006da59a60284fa227633f9899c9a7bf12043ee"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/012.json",
+      "bytes": 13306,
+      "sha256": "sha256:f24544e3042d307a0769d11c251a502d79e031ba92c85296b26e5cb953c899fc"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/013.json",
+      "bytes": 650,
+      "sha256": "sha256:b829a77591c97673d5b423cb8403e902a9d21c58b453e509b38c07e75ccb918a"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/014.json",
+      "bytes": 3953,
+      "sha256": "sha256:343c1c311baad0622a0005f990259edca513e191dafef3c025ab71f71a5534b2"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/015.json",
+      "bytes": 999,
+      "sha256": "sha256:6beb37d5d213a89c7fc5be9b1d500b0463c00e2030a5ec2f07ed47f6576956f8"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/016.json",
+      "bytes": 12086,
+      "sha256": "sha256:5749a621e5da69971c8d251797739860575aefe47df389a95a798e801be02aea"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/017.json",
+      "bytes": 20356,
+      "sha256": "sha256:0f7601bae1bf1d05598b3aad2ee71800b02bf745fd0906e9f3ff8856c26589e9"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/018.json",
+      "bytes": 16502,
+      "sha256": "sha256:ac63719214a3541a80f857ef305cd28aa299aaa0af8f0f10fd082ca1b7c57360"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/019.json",
+      "bytes": 650,
+      "sha256": "sha256:5c596bfe99133a266f39d78a46ea997f4cb8584b9d04a54d2ce6fd067165a46a"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/020.json",
+      "bytes": 4160,
+      "sha256": "sha256:918a0e3bf528fdcda7929f91b434a0936561a003200a457383aed82e834e3c59"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/021.json",
+      "bytes": 999,
+      "sha256": "sha256:e42598f412930c009dd74fabf237e4cd1a39c7d57a4ae7f195b14512ec959c89"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/022.json",
+      "bytes": 12086,
+      "sha256": "sha256:bff097c03780f686adf0fbdf986ec0ffa7fb63502f2ce9e3155c878afb05a555"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/023.json",
+      "bytes": 24414,
+      "sha256": "sha256:b044a28ab34a329b7c0cccc19ac279dc7e8d5cae90691e881592c8e50d7cf7df"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/024.json",
+      "bytes": 16358,
+      "sha256": "sha256:8c0a6a394220db9ed7f969da94519da359ae995819bf1893e790c3f2d9792d1c"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/025.json",
+      "bytes": 650,
+      "sha256": "sha256:b695b83476fd95d14f47ccb581c5e917d3842e9d18bb51e502ecf409362ee52b"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/026.json",
+      "bytes": 4160,
+      "sha256": "sha256:e6282721703bffd4fbe52c15dd36ba66f8df78433d4239b1be07a0afd0c673dd"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/027.json",
+      "bytes": 1015,
+      "sha256": "sha256:d78c8170678fffcf53351bd257c27a8fddb34ffb099451c0c3d01f933e33d9f0"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/028.json",
+      "bytes": 12758,
+      "sha256": "sha256:ce55fb5ce64802af93ed6f80a6b32dbd567a88536515d3e87650df328fb664a2"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/029.json",
+      "bytes": 18599,
+      "sha256": "sha256:c3619c2f0e2e69939a946ca9f199daaf41f9a25eaca872d4dd5edbf2dbbdd2f1"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/030.json",
+      "bytes": 14813,
+      "sha256": "sha256:2af5fd0537ad0ea1451d09de2e95e19fbd63e5303ba2a98fd7b1a125e9110965"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/031.json",
+      "bytes": 650,
+      "sha256": "sha256:24eaf9be875dcaf2bb49b0875cd2e479e1f9443b7a24a3b0ee367c427a0d7282"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/032.json",
+      "bytes": 3953,
+      "sha256": "sha256:4fd3a0774b2467842b58984ac9ca24ca64ca059d5378b0c90e6b44a2f6693fc4"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/033.json",
+      "bytes": 999,
+      "sha256": "sha256:73cf0d8d7c503d31f63ae93a21f37eca6fe8206435903c2b7f410eeeb2a5f956"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/034.json",
+      "bytes": 14309,
+      "sha256": "sha256:3339ce069743ee7cefd1b0223e5e56d35b46f3622ca61ae1bfba85d0a734d49f"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/035.json",
+      "bytes": 6048,
+      "sha256": "sha256:195779fa75bda5bcced55c1486afcb04f7dd33c4afc6956a796cd6bab2073f21"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/036.json",
+      "bytes": 1015,
+      "sha256": "sha256:4741134b8b7bcbe45217d2707966651956522adbb11e3c85288b622720edece8"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/037.json",
+      "bytes": 11961,
+      "sha256": "sha256:4a74f42d1ef7f2f42c7f8ae2490dfd134975cb19ef704f3088299362f4906d19"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/038.json",
+      "bytes": 13510,
+      "sha256": "sha256:e3731b69930525e44cae6b8baf9e0c7785dca4a511e91b361e7df4838ee22606"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/039.json",
+      "bytes": 16382,
+      "sha256": "sha256:03d1a2f96cb1f639ac41a0d9eb1bf4ec4a9ca7c62523b5e5beb02e5e461946f7"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/040.json",
+      "bytes": 650,
+      "sha256": "sha256:1291c6ded7a5336d25efa7c5bdde69eb7a8baef4c4a44ab756796233bb828028"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/041.json",
+      "bytes": 4160,
+      "sha256": "sha256:59f10b16fb264c1733dc5c6c25ed5b6f866094d48aa2ab0e32f246509367f112"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/042.json",
+      "bytes": 12496,
+      "sha256": "sha256:0989483796420953b9e4abdabe885693735ad4266e093b889dd8f98de07714df"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/043.json",
+      "bytes": 13268,
+      "sha256": "sha256:69ea88c5d55813b0118dd77687a101b54f9959c678c568d8b19391031a54b6a4"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/044.json",
+      "bytes": 15186,
+      "sha256": "sha256:f6b3960938dfebd5253eeabda17529fcaa2d0cf5a0465861b1d56f29706e8885"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/045.json",
+      "bytes": 650,
+      "sha256": "sha256:43996e9d457dc0172b566efc43c04c6be028ea5a0989e2b5c315fbb6b8f07412"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/046.json",
+      "bytes": 3953,
+      "sha256": "sha256:30472c9e03242f756d90a8acc2feb636c9ff59f8d1539ee965d4b2bf3f0bef7b"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/047.json",
+      "bytes": 23249,
+      "sha256": "sha256:ea036b16730945c57054a47546940c8202c7514023806e26c4b9ffd062bdbb16"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/048.json",
+      "bytes": 17746,
+      "sha256": "sha256:9296474caafd1453cfd284908caa5546992c8120357917365121f09d2ce63cf1"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/049.json",
+      "bytes": 650,
+      "sha256": "sha256:7698d1222e29614acd8f814c5f76487f561bf23cfd8f78c2b880448f6d7cf688"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/050.json",
+      "bytes": 3953,
+      "sha256": "sha256:70b986121b6613fcc3db8d46e0c9360ea8cabfc4dbe147d5c559ec3b2f186213"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/cli/051.json",
+      "bytes": 1818,
+      "sha256": "sha256:67d3b1f6e2e2f2901a08f2ee70860a9305256775f40bc58ccb58fdf0728bb36d"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/DejaVuSans.ttf",
+      "bytes": 756072,
+      "sha256": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/executed-generator.py",
+      "bytes": 22405,
+      "sha256": "sha256:dd1f41d721eb92c453247f61995149475d7701e8776e597b10000fad3ac64d04"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/failure.json",
+      "bytes": 59558,
+      "sha256": "sha256:154b54e52528a12a9c5a21e9ec29103eb6eeb8c72bd53a12d9bb59645aee9a37"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/LICENSE_DEJAVU",
+      "bytes": 4816,
+      "sha256": "sha256:d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT01-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT01-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:ed182d75cb88f31f79b43095b2d62c77bfb2e510a8968372b550e57ca01a6d31"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT01.aevpkg.zip",
+      "bytes": 547670,
+      "sha256": "sha256:989de66b365e8ef4ef3d87a2811d5496ce299d12b5fb52fa3a0b93c665118f9d"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT01.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:ed64b3376ed14ae09d24366332d09608b7470716faa75412894abc14a5c41aa7"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT01.manifest.json",
+      "bytes": 40748,
+      "sha256": "sha256:e60927dce86739ba0bf5d8ad2394699f7beebd972ed5638728e468a2e3036d2e"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT01.mkv",
+      "bytes": 1386676,
+      "sha256": "sha256:0812dd6d053af4dfbb635e6d9a44837ea3a1956d492040deeb46c03a97a29f2c"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT01.mp4",
+      "bytes": 73113,
+      "sha256": "sha256:73ac5df426e084d9df0b3f76dc7c797686504e64d969bf2bc13a4c038f7ba9a0"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT02-edit.json",
+      "bytes": 93,
+      "sha256": "sha256:70a2cfb4801975934f7952c690740ff4dd2582d69a3a83961abe11918522cd75"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT02-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:b106bcab3e7eaf93ff101bc0e72b1a72902e4b0cb73bbfe9ab1edee708b3526c"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT02.aevpkg.zip",
+      "bytes": 547656,
+      "sha256": "sha256:b0c24c16e0b2845d4c5d7e4ee5617cf201e23413c4e740c32a70605b8d46bfa8"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT02.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:6bcd217b72d215c3b27beda34f5d68be4ee9b0f6e8ea5165f7727d8fbda20c42"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT02.manifest.json",
+      "bytes": 40759,
+      "sha256": "sha256:db39f546deaf9e1b61858c8f817712e991c62df17a635026dce5ac355b2af843"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT02.mkv",
+      "bytes": 1966241,
+      "sha256": "sha256:370ea10b3f669e4f6ae01b012092726e185e3eddce505392e1f72a248941978a"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT02.mp4",
+      "bytes": 86241,
+      "sha256": "sha256:a95103bf8a59b1a903bccccb66dd869299b8a8c61936e71f1f90326473546a85"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT03-before.manifest.json",
+      "bytes": 19044,
+      "sha256": "sha256:8f46febc70d36b1fbd23657b1b836eb4e004675b3f1b61ea93fa06581172eb06"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT03-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:bc21546336979a455419834736ae1e0165eb6e119d6d53c224bd15165e50fa3a"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT03-edit.json",
+      "bytes": 96,
+      "sha256": "sha256:95b6c7f2396c04b0ff31c60ea6c7443e08f76688350a8c9a3be98686f4a19240"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT03-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:f8bd74b10008df10df38573a9bed00880fd08781682259a0c207ae6d639e1891"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT03.aevpkg.zip",
+      "bytes": 548800,
+      "sha256": "sha256:741dc70e60bb28ea9ca101ebddd06fad62672aa629fe25d59d4eb2fa8f4d334b"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT03.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:dc57c2859b47f6d44285c65cc28a2aa6a6e2240370290aabb9d09fe88ee550eb"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT03.manifest.json",
+      "bytes": 86438,
+      "sha256": "sha256:faf37e6b489e2c66ddb56a51f5f01c1b4c1c0b1299e3b092cc069c2877c0e935"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT03.mkv",
+      "bytes": 1583369,
+      "sha256": "sha256:1fe184c17aef2e1c44d206243109d2b4ab3e2b6c45f3c7590cac90832b30b35c"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT03.mp4",
+      "bytes": 83532,
+      "sha256": "sha256:585f4a27dba34c607865da3b3a679e49398d1b25b0e8e8c3d641b916678d1b39"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT04-before.manifest.json",
+      "bytes": 19044,
+      "sha256": "sha256:684bf46e659f83f38ebbe2498e472d75812ec9e6928c0defb6817630a2528ab4"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT04-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:345fa5894b8811072d36839b2e924e63898dbfad6ad9d5b187f1310906043866"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT04-edit.json",
+      "bytes": 182,
+      "sha256": "sha256:dd4ae989e7441b5e6d04e0b38b6c856da51c62c97f2d5bc38e00d0e6288d7026"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT04-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:2fae32c8bb1650bd894ab535ac5fad255c4224c1f93772dcf39876dbafe356a2"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT04.aevpkg.zip",
+      "bytes": 549110,
+      "sha256": "sha256:c70cf1154f1bc8b9ad299cfe6f7714da105f1044860621435d30f4bea3cb5de2"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT04.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:e5555574443156defc2fac5742f7aa55643beda2690f47dccac973e7d4c0ff9d"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT04.manifest.json",
+      "bytes": 109315,
+      "sha256": "sha256:8fc95ab8a63d308722a55888e000d291e824ff35d89f5a99690cd8ac22d99e3a"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT04.mkv",
+      "bytes": 1699601,
+      "sha256": "sha256:f98752929da01ae6d38aff91e45b02b5a275d6e82fe23e912a029058b68e8ac3"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT04.mp4",
+      "bytes": 84889,
+      "sha256": "sha256:757828188e96fca7c3767325986496c55eeea51a5c411adb2d787ca0202d97ee"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT05-audio-reference.manifest.json",
+      "bytes": 20797,
+      "sha256": "sha256:ded8e801716ae181b4bfac8acb9be48a9d3053e79cc7a2dec0293ec7b88f4238"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT05-audio-reference.mkv",
+      "bytes": 1502283,
+      "sha256": "sha256:de2de987504b0c5760d81bcd99173395a889c09b2178f2337cbddfdb8f5765d7"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT05-edit.json",
+      "bytes": 435,
+      "sha256": "sha256:6af25b5b541c2fdc26400bc6ab67e12fb7f83e90dbcb87d332ed9d080711fcfc"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT05-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:b092fa5df2adbb624a8214166d3060aea108f943f1185784dcd9bf006e09fb64"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT05.aevpkg.zip",
+      "bytes": 548214,
+      "sha256": "sha256:727b396a7374cd454e08816a885bd27e4a7d4d9b137c82e5bb14c165e08d6826"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT05.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:b7c27f828a7538c7b24984a50f1bd5a080dd97b449fb467c0bd73410c294d40c"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT05.manifest.json",
+      "bytes": 62866,
+      "sha256": "sha256:988a56a594f614649c3bc75b49568ec316b471144a6b126a9f9abd507562103f"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT05.mkv",
+      "bytes": 1503946,
+      "sha256": "sha256:62fb15c87ecf89db73a8dd8e66dc7a6bda9bb856df0758676f05fcc3e0f08642"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT05.mp4",
+      "bytes": 78552,
+      "sha256": "sha256:5efc849a768161a83c2365b63d40c8ea2b985cd71089725532cd494fb2eb5a99"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06-audio-reference.manifest.json",
+      "bytes": 14964,
+      "sha256": "sha256:23f9e01818a9f681378cfc61ffee2a41cc71f5bc83115f03482126799e120fe0"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06-audio-reference.mkv",
+      "bytes": 1383224,
+      "sha256": "sha256:4940a4a8196dda6018a8cbe34b48876a3a67f1933fcd9874b301c1e4a5285e1a"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06-before.manifest.json",
+      "bytes": 51058,
+      "sha256": "sha256:a74fb578ad7a1f43081137d56deb47a95ad9cdf5efb184437433de97cc7c36d7"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06-before.mkv",
+      "bytes": 1578882,
+      "sha256": "sha256:bc83dadd65cc30e8df38641feddcfe7abde8ad9b9e9409efdedfc2a249b94880"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06-legacy-head-comparison.json",
+      "bytes": 415,
+      "sha256": "sha256:93e81e89863a07c8a7c7d8e85fed30fa6f73357074732c0efcd501527ecbe3aa"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06-native-tempo.json",
+      "bytes": 571,
+      "sha256": "sha256:9f6d60cd36f4b49235171bfebfc95abdb97b5aa271b4ebd327478111279c47e6"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:a554589ebbdbac4968a9011ae3eb08bce31ef2e23dcd781664acd5f4133c6eb1"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06.aevpkg.zip",
+      "bytes": 548653,
+      "sha256": "sha256:9d524bf4ddaf2f5250114595005592120c716a5d66dcfb4052ff4c2931cb87c8"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:5bad7db63d3141fe8175313ac73e37381f38d75340fa3fb4533fe5d2a9d25f8f"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06.manifest.json",
+      "bytes": 80055,
+      "sha256": "sha256:2764a58697e261d03b987de667cb56882c939420d52392c59b4c266a7c90ab26"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06.mkv",
+      "bytes": 1384078,
+      "sha256": "sha256:12c4d90cdb6262f7d96ada98cd78d82aa37dfb3a6b70e3a038da807cc8452a5b"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT06.mp4",
+      "bytes": 27991,
+      "sha256": "sha256:a83588369860e3ca8dc1c8c0b0e3c164cecb406c71a573c24117352f7791ed77"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT07-first-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT07-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:7c27a47ad3e6c324023ffd80f12ee04ec5c35adad6823584a873e1f0cfc87f55"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT07-second-compose.json",
+      "bytes": 137,
+      "sha256": "sha256:1bb8cb02a048b452ee32d2e67a3dacf6a99279efc4145758ad445ae48932743b"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT07.aevpkg.zip",
+      "bytes": 548743,
+      "sha256": "sha256:bc7045b6793e837c203aec8021f8b995302665fb66919047df97e6ba30fa79c1"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT07.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:14dbe30ef01c15652dcf681072141fb160be37b3ac317528c28395eab2da72ef"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT07.manifest.json",
+      "bytes": 65870,
+      "sha256": "sha256:bdf502faa91dba4837ef21b507698706bf2603e4f42a81d8393b961e4ec909ee"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT07.mkv",
+      "bytes": 1578513,
+      "sha256": "sha256:d81875c4e852e3384d8f41071b8bbc690f2fa37907899eccacb14776691d69d4"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT07.mp4",
+      "bytes": 75859,
+      "sha256": "sha256:f883ebc77ac3292026191f1b7d5fa2eb9455c90f57317db176f1bd2d0aece293"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT08-B-native-tempo.json",
+      "bytes": 571,
+      "sha256": "sha256:9423ea32cb18f973067648fd40df3cf334f4197fb2b238f3722fc05b7a87768e"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT08-D-native-tempo.json",
+      "bytes": 571,
+      "sha256": "sha256:a58fc85821322ceea820b0039aebe9ba529cfaa72c0ca66947c0edaaf847a7d6"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT08-edit.json",
+      "bytes": 128,
+      "sha256": "sha256:bba28357ddfc1c19d8ca032125f97b2d7f2b598f718beaa8332bf15c3991ae7c"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT08-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:f76a3c2cc767ed09856f7b6758484123743b1fc40e719bc103dfd66fd879f920"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT08.aevpkg.zip",
+      "bytes": 548279,
+      "sha256": "sha256:36f8fa13115a4f94c400aa7ef366f26d09a8642890b8d191fa14a9ac32207d4f"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT08.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:4eff37b276540df51e8f7f6e14048ca8a00ceaf471a44f0af32726686e703315"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT08.manifest.json",
+      "bytes": 94164,
+      "sha256": "sha256:6e14481e626b1ff67bca300ada39c2761aa7f16df32ad6f88c47cde918173087"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT08.mkv",
+      "bytes": 1189272,
+      "sha256": "sha256:53cb308a6400296f16d030847fef57f8e28b7ca068bf19212bae41b050b90785"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/RT08.mp4",
+      "bytes": 63197,
+      "sha256": "sha256:b0f7e1a134cc00d331581c2f7233df4e2e294012f395216085c3303b7d2c3c41"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/source-preview.mp4",
+      "bytes": 122367,
+      "sha256": "sha256:c01a14a0bc41acc26530bf5fe0e6819013b05eca9d5cb0e1d12e51bbef69c5e8"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/source-provenance.json",
+      "bytes": 695,
+      "sha256": "sha256:1520f53208b922bd3b2ab451d5013ed6fb81378d105ff6a3b50eb544dbdbfbb2"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/source.mkv",
+      "bytes": 58854,
+      "sha256": "sha256:30019fdc202d5ccba5928316d6f27ee8eb9b52af98835ef3acca463fd9314191"
+    },
+    {
+      "member": "docs/assets/retime-fifth-20261019-v57/source.wav",
+      "bytes": 1152044,
+      "sha256": "sha256:73253ce20fbfe6d0b3cafd4a983749b22b2391e54f582a15aa19cbff2011bf46"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/atomic-failure-compose.json",
+      "bytes": 249,
+      "sha256": "sha256:c1aff2326a7e376696e3c6682b40886073e3677f743e68834ff99d1cac274f3f"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/calls.json",
+      "bytes": 33113,
+      "sha256": "sha256:ad669d8882b4cb30fa47d2d3ebeabc7f3e03a17976948ba392b9214a94ee7526"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/captions.srt",
+      "bytes": 150,
+      "sha256": "sha256:2063485ff2fd0d3238333e461e67e95da21ab82c434a3866afdab3235ace1f81"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cases.json",
+      "bytes": 6826,
+      "sha256": "sha256:f232eed01d2354a32aecdde4ca5a2d8e8a6694d41965132038f9f5420c59b501"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/001.json",
+      "bytes": 735,
+      "sha256": "sha256:dfda24bb479f7e02e1ef6ccec9102c881672f1e3c6179712060eedf5a9abefd8"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/002.json",
+      "bytes": 4292,
+      "sha256": "sha256:aaaed9deb5769c68a25aa5994444d0dfd91be6b466e4028df135f7a0c2bd9b6d"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/003.json",
+      "bytes": 3997,
+      "sha256": "sha256:3fb73fdbe1ff788881cc8d40c3d6ba36a4ff617c55fcb4b607de51cb236a209e"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/004.json",
+      "bytes": 2758,
+      "sha256": "sha256:f9b5ce79f62d3f088a411f3fd49f66fc897bb1b163622eb456fb91c62900e8b7"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/005.json",
+      "bytes": 2562,
+      "sha256": "sha256:32a085baf842c874ab4d3774458d900ef79cd25dfefff6423b8f038c08e9f167"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/006.json",
+      "bytes": 999,
+      "sha256": "sha256:aeca0d4b7e3c6a70c7dd55bf6bbe10f6f06f58b328aab6e7ed7058bd4f147733"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/007.json",
+      "bytes": 12496,
+      "sha256": "sha256:6b6d0ba72ebe0845f278d98bafde6881f7911c21bb3fc9a622ed215aa1903371"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/008.json",
+      "bytes": 13306,
+      "sha256": "sha256:236e0d041866df1792be8f7b586718349c50e5c80db33bbeedc01bbd1fbc0d51"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/009.json",
+      "bytes": 650,
+      "sha256": "sha256:6fadcb084306863b8e3fd8cc319938b9eec6341c191ef1df33e30c4589e2ecae"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/010.json",
+      "bytes": 3953,
+      "sha256": "sha256:e6bd95aed049d0441db221118b30112fa86b40ca7d6c9a1737f1ef5a538c14cb"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/011.json",
+      "bytes": 12507,
+      "sha256": "sha256:d9247e1b1f8c87a191d902d823092db776f96db2ed93877b7857b532592bf6a9"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/012.json",
+      "bytes": 13306,
+      "sha256": "sha256:dc93aebed1a3dcb9afb1e8ca65ae7723a2e43c91d3d43cc086348c36bd633d20"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/013.json",
+      "bytes": 650,
+      "sha256": "sha256:72b7b6ea13a903dd57d7f68ae175e2e6bb9791cfedd5d3e284eac03cadc59cea"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/014.json",
+      "bytes": 3953,
+      "sha256": "sha256:f92bb84cca2949d8a67eac8b3eba966e892a80154197805cba378310025d2eca"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/015.json",
+      "bytes": 999,
+      "sha256": "sha256:dbd7770ca43f934651df49e57756e69f9ba918912645fdc32163673f9940335c"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/016.json",
+      "bytes": 12086,
+      "sha256": "sha256:e8a9867471521d23763d6fe7bcabe35d66faefea43d0880c6527c23cd8e358ef"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/017.json",
+      "bytes": 20356,
+      "sha256": "sha256:e36bf78d49939b87116e01c53a480099212daf8fb3e49c38d5a318b25e964e69"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/018.json",
+      "bytes": 16502,
+      "sha256": "sha256:2dd6978440bff50d666582d7ac6de4d5df18218ff496e8445387338d7070c1af"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/019.json",
+      "bytes": 650,
+      "sha256": "sha256:13a56e792196bf54286f168ba4cb7f4e914a9249bbde24de508722e84ca23f4c"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/020.json",
+      "bytes": 4160,
+      "sha256": "sha256:fb38ba35ebf73fe5204f2b4bd82b6b8685e2cfafe12075457bf3cd6499eec765"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/021.json",
+      "bytes": 999,
+      "sha256": "sha256:faeaa92fd759de103ae562ecb988b41ca698d33310085d34c8f256985c7e6c0d"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/022.json",
+      "bytes": 12086,
+      "sha256": "sha256:2dc95c5eb03dcb5a004f11fc2150d90269d34883c1e1d7586c055587c9a08268"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/023.json",
+      "bytes": 24414,
+      "sha256": "sha256:94b0bfecd4cf768275c2bb64c8d20480786815280f0547b7457f7ccbe7fea061"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/024.json",
+      "bytes": 16358,
+      "sha256": "sha256:bc1949a424a48e9d681118188fc1d6e71087316ff9b0032a504bdc8746c4f13f"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/025.json",
+      "bytes": 650,
+      "sha256": "sha256:7e1eeea98ec0e67018dea68c1775539980cc5cfee9e674d24d0e3df80760d5b6"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/026.json",
+      "bytes": 4160,
+      "sha256": "sha256:6be11417cc7331fe313f1ec3b99060c721209eb79ea1305a683a18487ea6448f"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/027.json",
+      "bytes": 1015,
+      "sha256": "sha256:edf7f2923f9b471da847cf283b371b1e08e491702585d6068fdbe972065ccb04"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/028.json",
+      "bytes": 12758,
+      "sha256": "sha256:f223f9e43cf13da623dfa8d0049a40e978070e2583845e051818ed6552bfc39b"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/029.json",
+      "bytes": 18599,
+      "sha256": "sha256:ffd6646ec55655bcf95cb2547e40ecc44711bdfc0970607d1b91dda58da34b34"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/030.json",
+      "bytes": 14813,
+      "sha256": "sha256:705aea7254e346ef51d3efa61969aae7f0415969b17e5144639650d1d44b8b92"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/031.json",
+      "bytes": 650,
+      "sha256": "sha256:0382e520afe726533502eccb6f1396ba8c10da4d83ea8df1decbe44318b197e2"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/032.json",
+      "bytes": 3953,
+      "sha256": "sha256:4d50581f8767b9d8d49a6790058045bef8cae6f9038b72f24341c8d5efe4348d"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/033.json",
+      "bytes": 999,
+      "sha256": "sha256:9407aacdea31b82c4c66aaa8f01a0d2599f97efa33e0b19309eb9a8f90e43129"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/034.json",
+      "bytes": 14309,
+      "sha256": "sha256:d0729e747fdf4d46e029eac5b7e8c54d8abca561f7177367da3003acf495a077"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/035.json",
+      "bytes": 6048,
+      "sha256": "sha256:addfe710baed8a550c47acc6884a4c27f99ec570e4d0208ea78cae25a95e13ae"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/036.json",
+      "bytes": 1015,
+      "sha256": "sha256:8f921e2bcef23426268ecbfd0da9e94ef2c284e457270e0bfa0d57381ae973e0"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/037.json",
+      "bytes": 11961,
+      "sha256": "sha256:8b23ac26df94961cd66f0b9df293d2af956cfcf8d39309bbdd938b9456fcbccb"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/038.json",
+      "bytes": 13510,
+      "sha256": "sha256:0d1821d28c7f00277d39a90961085a52ca8262bb456a7c02888bd53394a5c214"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/039.json",
+      "bytes": 16382,
+      "sha256": "sha256:6b65aa49cd9e088a64cd78dd36246c3373801fc3fb6804a53659e605f30b1de5"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/040.json",
+      "bytes": 650,
+      "sha256": "sha256:e7333524e84c81361daf53ee519c1f8ec249c15bbde9eaf0ceeab43d0cebe378"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/041.json",
+      "bytes": 4160,
+      "sha256": "sha256:4449ee20f10e2b77291f64220d4095b86456a16e2cd77dbf4373b37805951918"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/042.json",
+      "bytes": 12496,
+      "sha256": "sha256:fa6a33b59338cebafff48dea31cb79a09ebf05f9bb8b01135e38bf5e0a0018a1"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/043.json",
+      "bytes": 13268,
+      "sha256": "sha256:7ac7d4a91c386eb8d8044d29869aa320e6dadf7b0d41ae15997deb6d728365ac"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/044.json",
+      "bytes": 15186,
+      "sha256": "sha256:0d749665726b1305af505b3fb12832856c3f4a21cdc0cb1fe46edb8f7b31fc54"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/045.json",
+      "bytes": 650,
+      "sha256": "sha256:1a69abacc05ed407a24668aee929d01451821d2acbf090e79fe1682f5eb05f89"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/046.json",
+      "bytes": 3953,
+      "sha256": "sha256:cb077d81ab8f88251ea04de4d0f6481e58ebf88e9f90bb9dc6f5c97ac30ea2c7"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/047.json",
+      "bytes": 23249,
+      "sha256": "sha256:4e61ae6cadfcca5d3e869ab778ac019b757eaa593d39efb375888f9331ac3e6c"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/048.json",
+      "bytes": 17746,
+      "sha256": "sha256:701a320a43cdd7b1159f3317a55ce430cc6c99d226fb686e37560ce21c7e930b"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/049.json",
+      "bytes": 650,
+      "sha256": "sha256:03d0bd6fa8977d7c7bf11a64380a8eae26108d82964523172c5d9a77c35dc66c"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/050.json",
+      "bytes": 3953,
+      "sha256": "sha256:e213d8404ed0858e5bed645c2b9ec619080f095d7c9f2409c36473c7faf9191d"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/051.json",
+      "bytes": 999,
+      "sha256": "sha256:761c95c880cae206a74f17c9274c2e8058f0ee5f8bb45a53f9c719806c55d1d9"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/052.json",
+      "bytes": 11904,
+      "sha256": "sha256:f5cf7898deee8ac3f19899efb435d38517d2789e89ee996773b9d257fee4852e"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/053.json",
+      "bytes": 13655,
+      "sha256": "sha256:1236b1bb9c20cad77ab4046aa552b1bf3c1bceca686e0dd04910e8cd2070a5f1"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/054.json",
+      "bytes": 13306,
+      "sha256": "sha256:cf981fdbd442c476ef06526734f106fbe7bced4c8ed98f2120a6f38c84976e16"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/055.json",
+      "bytes": 650,
+      "sha256": "sha256:534c4bcf360d52789d55e2a8d9a8edf17abcece94ff83c1ead0c40e81263afba"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/056.json",
+      "bytes": 4160,
+      "sha256": "sha256:56d17b3fc55a0b42a29cdcc8cc6be7d160d9f0310730ba694866dfe38cb807bf"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/057.json",
+      "bytes": 12144,
+      "sha256": "sha256:0b0c2acbccb0dd0f19b35655cf4bfb9e924db0de4c3e390f3e2455716a027de9"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/058.json",
+      "bytes": 644,
+      "sha256": "sha256:e11b2185d877b72f66f697edfb4da521e72b727efad3698f51b76ca46f2ac780"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/059.json",
+      "bytes": 1456,
+      "sha256": "sha256:42f3c15ee31692709b95ab0d1b4806ee27482115bcbcc1b4a7522f5dfadbcb95"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/060.json",
+      "bytes": 1987,
+      "sha256": "sha256:939c2405e25943e4b2b49c4956af5ec08f06e676d5b65f7994e57010232631f2"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/061.json",
+      "bytes": 16408,
+      "sha256": "sha256:78a5e20fd62701b98ac1d7953814cfae6c69fccd07a2d85b37be7e1dde43ae93"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/cli/062.json",
+      "bytes": 653,
+      "sha256": "sha256:8372ad08fe85e34bc58db25cc44391630a3df1ce0d4ff1d87b6ef67e5444608c"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/contact-sheet.png",
+      "bytes": 9782,
+      "sha256": "sha256:5df86373cc2a2f9755721966a29922e39ffb914d20817882c229eb4ca224fa58"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/DejaVuSans.ttf",
+      "bytes": 756072,
+      "sha256": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/dry-run.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/encoded-static-review.png",
+      "bytes": 15684,
+      "sha256": "sha256:2da4e234916b73f1491a68de73d129d7bed2e2cf316dffcb0627d2c6ebeff118"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/executed-generator.py",
+      "bytes": 22415,
+      "sha256": "sha256:3598d23d16ebbed91e407ccb4dee62675468c26b8ee51ec78f63dd7e6becb1bf"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/LICENSE_DEJAVU",
+      "bytes": 4816,
+      "sha256": "sha256:d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/retime.gif",
+      "bytes": 233623,
+      "sha256": "sha256:163d0a789bb011d8393bb142a21d0d6eaf3f416a57fb83919e93b70eec2d7c55"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT01-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT01-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:5e5150ccd3882d45b39da03bd8a832e612bfcd9c65617b8209b871fe57fe1ebd"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT01.aevpkg.zip",
+      "bytes": 547674,
+      "sha256": "sha256:b79b06a28ef934f8ee67ec76c15814c8c10342a17ed48d79b251afaebabef1a5"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT01.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:3f5cb868c5b850a30c711c4dad57f4e9176fdaf0b76e2f3c995d9308b202fe59"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT01.manifest.json",
+      "bytes": 40748,
+      "sha256": "sha256:c37767359a7fab8531b7f0176fb3f4949a6354f2faad7d2a2ecb2c94dfa45113"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT01.mkv",
+      "bytes": 1386676,
+      "sha256": "sha256:d4a4edbf67d43b624a3a3082511be473b580d74636af513385eb8e744c3d9848"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT01.mp4",
+      "bytes": 73113,
+      "sha256": "sha256:73ac5df426e084d9df0b3f76dc7c797686504e64d969bf2bc13a4c038f7ba9a0"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT02-edit.json",
+      "bytes": 93,
+      "sha256": "sha256:70a2cfb4801975934f7952c690740ff4dd2582d69a3a83961abe11918522cd75"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT02-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:e974bbf332d510912ce9eaf10886d06545255cef6a48e27aca8f3ae29baf5efe"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT02.aevpkg.zip",
+      "bytes": 547659,
+      "sha256": "sha256:e9f6817cfed6c19f8f1bc598e7e6daca8a9f1c801aac8a1e4c6a7f8a2dcfa03c"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT02.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:6adb1420bc6fcbba4b769843fec6a557dd40a32faca371736bd1a52a2c42f96c"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT02.manifest.json",
+      "bytes": 40759,
+      "sha256": "sha256:6ef0bdc82a63fd42baba3ab61ff03362cc3d5c3e6c22773fd4588c61c6390abe"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT02.mkv",
+      "bytes": 1966241,
+      "sha256": "sha256:2facd496a9810f649d1504ecac2a9f467192da49d78a3326e71f314b9e36bd22"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT02.mp4",
+      "bytes": 86241,
+      "sha256": "sha256:a95103bf8a59b1a903bccccb66dd869299b8a8c61936e71f1f90326473546a85"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT03-before.manifest.json",
+      "bytes": 19044,
+      "sha256": "sha256:909e50fc94ea8aebc36431c63e33baab39d92919b889430414ac9c0dbdc6212d"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT03-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:3aa6dba06ca03ccea9946101fcfed4bb389f957d1cf1693b91283149c2760491"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT03-edit.json",
+      "bytes": 96,
+      "sha256": "sha256:95b6c7f2396c04b0ff31c60ea6c7443e08f76688350a8c9a3be98686f4a19240"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT03-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:15d8227e079e93f8c9bda25e39ae5b914dc2ba12cc3b3272e9be56c57cc20d36"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT03.aevpkg.zip",
+      "bytes": 548794,
+      "sha256": "sha256:952c8ffdadba60c61fca53d5783f311e922337c4de7933363bf64e4c2b3b6ed1"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT03.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:bc822baaeda918cf568a79a51cc630d97da00d9cd555a8b6fab07fd0e3d28edc"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT03.manifest.json",
+      "bytes": 86438,
+      "sha256": "sha256:7116844eac7a7d877421323c111636dbec2c23ed0ffddc6b4eec294ad08f49f9"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT03.mkv",
+      "bytes": 1583369,
+      "sha256": "sha256:0ff9b8a04411d2d5865e931e9c579ba793b791233df49847db26e1e289e9ea2f"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT03.mp4",
+      "bytes": 83532,
+      "sha256": "sha256:585f4a27dba34c607865da3b3a679e49398d1b25b0e8e8c3d641b916678d1b39"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT04-before.manifest.json",
+      "bytes": 19044,
+      "sha256": "sha256:b7dfec8cf6e26c7bf442a2a91e308d1b2b5d2582ca4df6d0b00ccb8eaf7b0d53"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT04-before.mkv",
+      "bytes": 1584024,
+      "sha256": "sha256:7347101ffbb4ae8d6df4ee6c14eaea4c1649883a6c2590c35702984a6a584d5b"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT04-edit.json",
+      "bytes": 182,
+      "sha256": "sha256:dd4ae989e7441b5e6d04e0b38b6c856da51c62c97f2d5bc38e00d0e6288d7026"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT04-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:865eab34982532fe9b748ccc976d50041710ea10d37b91ecb78b2a5be29ea354"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT04.aevpkg.zip",
+      "bytes": 549106,
+      "sha256": "sha256:f76097d56e173e04a4280ff01032994878d3ae7e56c52e6ccfeb1593a8f80162"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT04.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:831a89855b9afbe2eaa82925da1373f5356caf0d1aa51c85b538a38992b571f4"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT04.manifest.json",
+      "bytes": 109315,
+      "sha256": "sha256:958abfe17a07a66c76a49223fc4e62a16ca0a7c9112e58a71695ca340faa3c4f"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT04.mkv",
+      "bytes": 1699595,
+      "sha256": "sha256:05dcd10c862ec47052b7272b62303de56e56d724b086f240ad61a2f13cd9ab93"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT04.mp4",
+      "bytes": 84889,
+      "sha256": "sha256:757828188e96fca7c3767325986496c55eeea51a5c411adb2d787ca0202d97ee"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT05-audio-reference.manifest.json",
+      "bytes": 20797,
+      "sha256": "sha256:124f9d4d37f8605f4a857b4276b9a740b2e8410937b77d006cd2e49b072e1055"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT05-audio-reference.mkv",
+      "bytes": 1502283,
+      "sha256": "sha256:22b3390501fc7002d3808a8996eb6fdda1cc88c4c90b079420c53814e704dee2"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT05-edit.json",
+      "bytes": 435,
+      "sha256": "sha256:6af25b5b541c2fdc26400bc6ab67e12fb7f83e90dbcb87d332ed9d080711fcfc"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT05-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:47fb82c275ce6ff0bfc56e0362652a3ed85df150359c317a841ac639ee93465b"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT05.aevpkg.zip",
+      "bytes": 548214,
+      "sha256": "sha256:948ed7fe33c31b72ee844244f3727fb391016e25561dd465bd7cca7e0ef8c282"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT05.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:691e6ef657944d8aea78ed8a2b05635a08047af75eb9f2caedce21d2ece5df16"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT05.manifest.json",
+      "bytes": 62866,
+      "sha256": "sha256:199fece9a02d740c89b6be40606bdb9a0e63487abdd5a5d533ec9165a560bc73"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT05.mkv",
+      "bytes": 1503946,
+      "sha256": "sha256:aae8c0b21df4e04a8a387cf387830fea815629be27966f6e0439a4b6b8c05531"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT05.mp4",
+      "bytes": 78552,
+      "sha256": "sha256:5efc849a768161a83c2365b63d40c8ea2b985cd71089725532cd494fb2eb5a99"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06-audio-reference.manifest.json",
+      "bytes": 14964,
+      "sha256": "sha256:9a0abb49fa1fbd1956b7b4b0583c59a709acc4e670d91841430cbc7f9157121a"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06-audio-reference.mkv",
+      "bytes": 1383224,
+      "sha256": "sha256:d79321df96f2a4db531c43a46380df40b2205a8b598b8c9c999fbfa3d935e91b"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06-before.manifest.json",
+      "bytes": 51058,
+      "sha256": "sha256:3dea78f926ab5e62a405d5b93ecaf7d11987a6133f74668c5142d31eb4fc39cf"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06-before.mkv",
+      "bytes": 1578882,
+      "sha256": "sha256:157aea737e01ee5a90f31fc99d1624ee8d8966c035789f7cffc39839300bfe87"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06-legacy-head-comparison.json",
+      "bytes": 415,
+      "sha256": "sha256:93e81e89863a07c8a7c7d8e85fed30fa6f73357074732c0efcd501527ecbe3aa"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06-native-tempo.json",
+      "bytes": 571,
+      "sha256": "sha256:9f6d60cd36f4b49235171bfebfc95abdb97b5aa271b4ebd327478111279c47e6"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:fddcde84de2540e75c0f60c33b2c0702b5e2b71512f7c34d35a64550f725620a"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06-restored.manifest.json",
+      "bytes": 80139,
+      "sha256": "sha256:dc796dd9aaab8fb0327df8325ca6b8a92627d53541a9c6b2dceb7582d13933bf"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06-restored.mkv",
+      "bytes": 1384078,
+      "sha256": "sha256:6192b1281b5d1c9e4b2b9b27d876ae06fe045633ddf2ebd75cb64aab4fc3ac15"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06.aevpkg.zip",
+      "bytes": 548660,
+      "sha256": "sha256:5802de2d0319cf29d4fd6a43a50a7a9290ce8dcbaf648591eca63f0e9405279f"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:cb69a5c62feb6b5e11e7d16329f861af0ff7f2c84ca16a1315a3ed7bc4077e2f"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06.manifest.json",
+      "bytes": 80055,
+      "sha256": "sha256:5b3f60b263769036d881f03ddbf8f3d842ea9f385f8bfce427c8f5a39b4c5a4d"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06.mkv",
+      "bytes": 1384078,
+      "sha256": "sha256:c80ce3144c1a220067d88ee3752192cd990dc970b00e31ba070fc109d7e9aa4b"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT06.mp4",
+      "bytes": 27991,
+      "sha256": "sha256:a83588369860e3ca8dc1c8c0b0e3c164cecb406c71a573c24117352f7791ed77"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT07-first-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT07-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:cc7671860f8de87cddd31747a174cec3482096b73b2a7cb6d275cee640f1f188"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT07-second-compose.json",
+      "bytes": 137,
+      "sha256": "sha256:1bb8cb02a048b452ee32d2e67a3dacf6a99279efc4145758ad445ae48932743b"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT07.aevpkg.zip",
+      "bytes": 548745,
+      "sha256": "sha256:b5f2ea447c371be4c6bb4e05d33cfc958d578835d4ad20acaebfe783a8c066f9"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT07.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:2429c183204bc1c9c75de9a52e05a6d475a4c89170949633ccf1ead4092569f4"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT07.manifest.json",
+      "bytes": 65870,
+      "sha256": "sha256:9de11a52702b924d69a5e94b6f82d289dc3a3503ecc8619b40a1078c21e11564"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT07.mkv",
+      "bytes": 1578513,
+      "sha256": "sha256:72e3a8ccc6bb39a97574e88a6daf7626b3c09f7eaa629428a8012e7ea0716988"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT07.mp4",
+      "bytes": 75859,
+      "sha256": "sha256:f883ebc77ac3292026191f1b7d5fa2eb9455c90f57317db176f1bd2d0aece293"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT08-B-native-tempo.json",
+      "bytes": 571,
+      "sha256": "sha256:9423ea32cb18f973067648fd40df3cf334f4197fb2b238f3722fc05b7a87768e"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT08-D-native-tempo.json",
+      "bytes": 571,
+      "sha256": "sha256:a58fc85821322ceea820b0039aebe9ba529cfaa72c0ca66947c0edaaf847a7d6"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT08-edit.json",
+      "bytes": 128,
+      "sha256": "sha256:bba28357ddfc1c19d8ca032125f97b2d7f2b598f718beaa8332bf15c3991ae7c"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT08-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:f9767f775da83496ab2c18fc86020b495c68c92e36b7b783cfb4ab5da099c1c2"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT08.aevpkg.zip",
+      "bytes": 548286,
+      "sha256": "sha256:3e206bc7e53c826fb45b49c8b328eaff37548c9af524a287fe864f245bd62508"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT08.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:68d1c3291404c5080833d37ddbeb8f4f62c294551fee5c7c65585a6f9a94fab7"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT08.manifest.json",
+      "bytes": 94164,
+      "sha256": "sha256:4149a48733b0e6be190d33362793c241387a94f44a9dc270fd90e44a506590e0"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT08.mkv",
+      "bytes": 1189284,
+      "sha256": "sha256:49cffad6310092519684be41a6646d985f4f9d14f99df3e62c53de4775e2a719"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT08.mp4",
+      "bytes": 63197,
+      "sha256": "sha256:b0f7e1a134cc00d331581c2f7233df4e2e294012f395216085c3303b7d2c3c41"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT09-before.manifest.json",
+      "bytes": 20091,
+      "sha256": "sha256:4e04d515ec3c83efb1ba3749c6e383f7c9a35fe9f30cc69560b23d28a2df6825"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT09-before.mkv",
+      "bytes": 1419971,
+      "sha256": "sha256:33aa5027713e30a3c1168087eacc0ec5d81f861584aadfd97da287ee48a0095a"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT09-edit.json",
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT09-probe.json",
+      "bytes": 3204,
+      "sha256": "sha256:ea52469320dd8156064a72fd9184d8b2132f0d6d8af31be515139e6cae746e70"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT09.aevpkg.zip",
+      "bytes": 548390,
+      "sha256": "sha256:3ffa01e9e37a01e429c9b1560d847b545baf635d5b103862851ff4f4d157998a"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT09.aevpkg.zip.conversion-report.json",
+      "bytes": 923,
+      "sha256": "sha256:566b050c590f996b0e666bac53d8b2d907368f14a40adfadbb0cc20127c69f6e"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT09.manifest.json",
+      "bytes": 40934,
+      "sha256": "sha256:e2d59e02a53c1f2e514dd16d03384722f3bbde5c3bdb35279dcd408624033cb2"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT09.mkv",
+      "bytes": 1303275,
+      "sha256": "sha256:af4a5fd2a8b3398a05e1d9e80c3af5d94933ac8acda6d6a2495f502bd94b87c7"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/RT09.mp4",
+      "bytes": 68394,
+      "sha256": "sha256:7452646d76e02eee52103016dd97647c12143cc84c81b7391df08f60d6c78c01"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/source-preview.mp4",
+      "bytes": 122367,
+      "sha256": "sha256:c01a14a0bc41acc26530bf5fe0e6819013b05eca9d5cb0e1d12e51bbef69c5e8"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/source-provenance.json",
+      "bytes": 695,
+      "sha256": "sha256:a802d14248a571a379f3e7dc5ef2f0bb34db66a5883855a8f44e36d828cbc13c"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/source.mkv",
+      "bytes": 58854,
+      "sha256": "sha256:f720169b76fc20827ee95514e461b0d73ab556a7c4ca00e07f402a82fe2aaf2f"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/source.wav",
+      "bytes": 1152044,
+      "sha256": "sha256:73253ce20fbfe6d0b3cafd4a983749b22b2391e54f582a15aa19cbff2011bf46"
+    },
+    {
+      "member": "docs/assets/retime-final-20261019-v57/verification.json",
+      "bytes": 112514,
+      "sha256": "sha256:51c9462029486c57c456825beab5a58decea40e809ce6211f4a912804bffcdc7"
+    },
+    {
+      "member": "source-before-native-tempo-fix/render.py",
+      "bytes": 287983,
+      "sha256": "sha256:5bb2b6930ba80a8813c9d1feec7a62d960d1d110b07224073a1a34d04d989c5c"
+    },
+    {
+      "member": "source-before-native-tempo-fix/time_mapping.py",
+      "bytes": 8904,
+      "sha256": "sha256:70db06e3d2ec00fd9d951854cc73410caa2a35e036bcfba21363146ada1a7c55"
+    },
+    {
+      "member": "probes/author-probe.mkv",
+      "bytes": 777804,
+      "sha256": "sha256:7f5d4cf485814c1217694a5f219fac7aa15bf0f8a4cbb87245eb3aee063ba72a"
+    }
+  ],
+  "author_probe": {
+    "stereo_sample_frames": 96000,
+    "decoded_pcm_sha256": "sha256:9e0ded4c14a35ad344106e9426a98df722e89482fbb7dfbb96155a916bab14df",
+    "max_pcm_difference": 0
+  },
+  "scope": "failed runs and first passed small-subtitle demonstration; not added to final acceptance counts"
+}

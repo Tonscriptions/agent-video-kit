@@ -1,0 +1,1052 @@
+[
+  {
+    "arguments": [
+      "project",
+      "init",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\base"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/001.json",
+    "result_sha256": "sha256:925775670b5b4518da43e13019ca732ca329d4cf23a2b1d81a1c969cf6387907"
+  },
+  {
+    "arguments": [
+      "media",
+      "ingest",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\base",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\source.mkv",
+      "--asset-id",
+      "frames",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad",
+      "--license-spdx",
+      "CC0-1.0",
+      "--source",
+      "local authored fixture or unmodified licensed font",
+      "--creator",
+      "fixture authors or DejaVu/Bitstream authors",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\source-provenance.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/002.json",
+    "result_sha256": "sha256:e2c2e8de326b2377de72b971831558ccf9abf2b2114bbc2e1cdb636139c4efff"
+  },
+  {
+    "arguments": [
+      "media",
+      "ingest",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\base",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\source.wav",
+      "--asset-id",
+      "sound",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad",
+      "--license-spdx",
+      "CC0-1.0",
+      "--source",
+      "local authored fixture or unmodified licensed font",
+      "--creator",
+      "fixture authors or DejaVu/Bitstream authors",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\source-provenance.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/003.json",
+    "result_sha256": "sha256:73bbbddf75692adb76819650e7a84341fb6fc4ff75b31e2abdf41d0d48c1b19f"
+  },
+  {
+    "arguments": [
+      "media",
+      "ingest",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\base",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\captions.srt",
+      "--asset-id",
+      "captions",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad",
+      "--license-spdx",
+      "CC0-1.0",
+      "--source",
+      "local authored fixture or unmodified licensed font",
+      "--creator",
+      "fixture authors or DejaVu/Bitstream authors",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\source-provenance.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/004.json",
+    "result_sha256": "sha256:6a2f4d994bf8978fc6f5181a51350377e6fc061174cacce9923c96ce9016710c"
+  },
+  {
+    "arguments": [
+      "media",
+      "ingest",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\base",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\DejaVuSans.ttf",
+      "--asset-id",
+      "font",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad",
+      "--license-spdx",
+      "Bitstream-Vera",
+      "--source",
+      "local authored fixture or unmodified licensed font",
+      "--creator",
+      "fixture authors or DejaVu/Bitstream authors",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\LICENSE_DEJAVU"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/005.json",
+    "result_sha256": "sha256:84edd0048898b71a1895eb8a7128cba75aa90fdedc5da68ea65b46def78090f3"
+  },
+  {
+    "arguments": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\base",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/006.json",
+    "result_sha256": "sha256:77229f25e3cd0b912c805fa9567b55b0b2d4ca65b23acc0074fc7102531e0af4"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT01",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT01-edit.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/007.json",
+    "result_sha256": "sha256:ccb23be1362c246b0828c316a571dfb4e81a5594332847da25d9fc188e3abed4"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT01",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT01\\renders\\RT01.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/008.json",
+    "result_sha256": "sha256:51beb2db6565c92d00166df3ca80c6c3ff31b8c2499154c9e867b30567dca1a9"
+  },
+  {
+    "arguments": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT01"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/009.json",
+    "result_sha256": "sha256:ca73fe5614c5fd19762a6a75cb485bacce9249267b2575232f01a243d263cd96"
+  },
+  {
+    "arguments": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT01",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT01.aevpkg.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/010.json",
+    "result_sha256": "sha256:81b12258f128a94b0aa86b36d1dfd29f017ca201d9818e002bc5a0d2c042f2d8"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT02",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT02-edit.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/011.json",
+    "result_sha256": "sha256:b7db702b7efca46501fc3b5c728042226ccba4870980a68922ebc8fed837fdff"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT02",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT02\\renders\\RT02.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/012.json",
+    "result_sha256": "sha256:224a45476aa556c5cd8c2f10d0245708228b794cbcfb25811da2ee41150bc81f"
+  },
+  {
+    "arguments": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT02"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/013.json",
+    "result_sha256": "sha256:637060b64dee4e1066dd175e3e587c4f67f8fb9285b6d5825db555361d832353"
+  },
+  {
+    "arguments": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT02",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT02.aevpkg.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/014.json",
+    "result_sha256": "sha256:54db676191bf4158a04aca505dd48eb05208412e431d77902ff670c194968393"
+  },
+  {
+    "arguments": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT03",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/015.json",
+    "result_sha256": "sha256:1a0f5cb5bbe322594052564b6cf34e73953adc55f5e28d0c2da4acc26fe473b9"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT03",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT03\\renders\\RT03-before.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/016.json",
+    "result_sha256": "sha256:42ca112688446d06de75fc6379d7295681c697464928b1194be093575d89f32b"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT03",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT03-edit.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/017.json",
+    "result_sha256": "sha256:400ec8366c0be3343fe774b7540f5b844faf824e8df799e50d23f716fe3435e4"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT03",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT03\\renders\\RT03.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/018.json",
+    "result_sha256": "sha256:6538d2427afc7d9ad4c416762dfc206997d4368c8e320beb3adc9fd061fc53b2"
+  },
+  {
+    "arguments": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT03"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/019.json",
+    "result_sha256": "sha256:4fd8c63ffa9d612c4141d39ae2783fefdc2c4967947488145e3d7a3a8ecc03d3"
+  },
+  {
+    "arguments": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT03",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT03.aevpkg.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/020.json",
+    "result_sha256": "sha256:5446865ed55314c32b528abc53eb13d1f3a8e25953e38d1ab08662c2602939ec"
+  },
+  {
+    "arguments": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT04",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/021.json",
+    "result_sha256": "sha256:e62d6ca560598c6fcd67bbd5cafd17f9152f05061c2d58a7c680c800a3a0ae42"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT04",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT04\\renders\\RT04-before.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/022.json",
+    "result_sha256": "sha256:0fc9b4d7896c3608515cffc641cc0e13b2bedf96eec4494feb6d9749f76d84e3"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT04",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT04-edit.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/023.json",
+    "result_sha256": "sha256:f727fca52e82f94d5337a436f67396875a497c1ca30a1d2b32e8aa9124782cff"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT04",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT04\\renders\\RT04.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/024.json",
+    "result_sha256": "sha256:0868caa40675b46da939e6249b88142d2ec187efd74e6e729d85ef5bd4261c87"
+  },
+  {
+    "arguments": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT04"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/025.json",
+    "result_sha256": "sha256:f42adc6a82af87fccae8594143be0db659a05af5cc81fc6ea984b07e11800d06"
+  },
+  {
+    "arguments": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT04",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT04.aevpkg.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/026.json",
+    "result_sha256": "sha256:c295dc16f73b5a8066f914c1720c2d2e9f42f5f66d11232bd12fb3852ee84abb"
+  },
+  {
+    "arguments": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT05-audio-reference",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/027.json",
+    "result_sha256": "sha256:e57d385f705827db4ada5e4979b850ea879078961d75c835b79d4e2492843227"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT05-audio-reference",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT05-audio-reference\\renders\\RT05-audio-reference.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/028.json",
+    "result_sha256": "sha256:ddb5a083ee7e6329d806d6bee3c27ab75a08c3327bde1640672231938f7109b6"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT05",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT05-edit.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/029.json",
+    "result_sha256": "sha256:b618fc22eff8ad999a2eb9b89a8d0ca6abdccc78528ebb5d18a5b42b27d4bedc"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT05",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT05\\renders\\RT05.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/030.json",
+    "result_sha256": "sha256:ce10f5a606d23749f250bb63279bd256848ae551549be6607257504170e4cdb1"
+  },
+  {
+    "arguments": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT05"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/031.json",
+    "result_sha256": "sha256:1825023b4e3e791df4319c3d26048461e10efc7cbdd0e4a2d0c05f7db501cf77"
+  },
+  {
+    "arguments": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT05",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT05.aevpkg.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/032.json",
+    "result_sha256": "sha256:edf69e1a0f0bd488b6efc9be41019d2503249fbf3c46c9cdcb134f7b4f718890"
+  },
+  {
+    "arguments": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/033.json",
+    "result_sha256": "sha256:cbca219a4b25be732ea1c64a2a072bb07a2ba071d7a78bf4e0137441cc757f44"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06\\renders\\RT06-before.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/034.json",
+    "result_sha256": "sha256:7c9830f0c725e7ce741e438c381097ce9ba6509fa7b8d4e8d24edd48fc31e868"
+  },
+  {
+    "arguments": [
+      "media",
+      "ingest",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06-audio-reference",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06\\renders\\RT06-before.mkv",
+      "--asset-id",
+      "completed_bus",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad",
+      "--license-spdx",
+      "CC0-1.0",
+      "--source",
+      "local original complete author output",
+      "--creator",
+      "fixture author",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\source-provenance.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/035.json",
+    "result_sha256": "sha256:36f5b3a5b3c7c491b64ae2c5ef9f553917c2ab44f916ffb767e2620670a8cdd3"
+  },
+  {
+    "arguments": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06-audio-reference",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/036.json",
+    "result_sha256": "sha256:016b39b98724e5bd0eebe08ed461e3f2d8ee52381289e6740e2098379c526752"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06-audio-reference",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06-audio-reference\\renders\\RT06-audio-reference.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/037.json",
+    "result_sha256": "sha256:efdd421cdb32af27695ee072ba1be69f7d8564bfa4ded1bf467bf08ff317cbc0"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT06-edit.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/038.json",
+    "result_sha256": "sha256:64b1f6cba80ad57968c874847804eacdb77582dfff196c58aba4feef0dcfef02"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06\\renders\\RT06.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/039.json",
+    "result_sha256": "sha256:3b7ebe2006f1ef0303bb9af62a80695382364c775076826f35c87797c85d2b19"
+  },
+  {
+    "arguments": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/040.json",
+    "result_sha256": "sha256:2616a963abb62e838411dcd2a11ba759b6111284714c37cdc5e646757cd2e834"
+  },
+  {
+    "arguments": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT06",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT06.aevpkg.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/041.json",
+    "result_sha256": "sha256:8e636a7f82bccdc7d8210eaa13d1d1ac182b456432df00d613586c1442b658c5"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT07",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT07-first-edit.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/042.json",
+    "result_sha256": "sha256:6e9b0f52e05b98d7809c96ec92db8c5cffe1a5d7259cff76cf305837534d7812"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "compose",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT07",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT07-second-compose.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/043.json",
+    "result_sha256": "sha256:ea18492c72498a9e674bbf302cda0f161af490f555035ec81ab17a36c66d2870"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT07",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT07\\renders\\RT07.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/044.json",
+    "result_sha256": "sha256:beaee2b118af774261b4ab633aeb71cd925640e85439a4faa3bd4d33f40311d6"
+  },
+  {
+    "arguments": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT07"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/045.json",
+    "result_sha256": "sha256:47f19149315bbaafe70fa6a6ef31e368416a7fbf7fa15bd3620a54bb30a31e21"
+  },
+  {
+    "arguments": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT07",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT07.aevpkg.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/046.json",
+    "result_sha256": "sha256:8afc9f1debf96d1f166a43a777abc1a040b4305f308c979b8246f67db7456ac9"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT08",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT08-edit.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/047.json",
+    "result_sha256": "sha256:8bcbe4e66c928b825db2b3110784c23723a54a800b680bf81464091759e6f887"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT08",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT08\\renders\\RT08.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/048.json",
+    "result_sha256": "sha256:0a3beeeb1fd57e026a73b2a531cebd313bb03cf2af5cae9bc457e7e595f10e84"
+  },
+  {
+    "arguments": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT08"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/049.json",
+    "result_sha256": "sha256:ff1dfa34dc19237ee40b0b594a6f7de72b1141b5155fab955e229c8f2871d8d6"
+  },
+  {
+    "arguments": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT08",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT08.aevpkg.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/050.json",
+    "result_sha256": "sha256:588fda92a7c0d50782744267e0501b01ef2c74fc9522035b1425402c5651f8ec"
+  },
+  {
+    "arguments": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT09",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/051.json",
+    "result_sha256": "sha256:f11f2158ac6138c7b739318c6daf1ea623870d744deedb75246f081ac94231d4"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT09",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT09\\renders\\RT09-before.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/052.json",
+    "result_sha256": "sha256:7be3de4e3827fa3433a6960a2878e9337acdf1500be56577790369342820370f"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT09",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT09-edit.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/053.json",
+    "result_sha256": "sha256:fb2cbaf12b8e100e9741ebdddad95a96f757a413507172406590f5a18e0a2b75"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT09",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT09\\renders\\RT09.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/054.json",
+    "result_sha256": "sha256:6275444881da714c60c29ed38787552b163736bdb572af6ecde40185271db38d"
+  },
+  {
+    "arguments": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT09"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/055.json",
+    "result_sha256": "sha256:45e1be1cda2dd4e10db3cc9058ce239858fe27e0bd746023d799f5bb45690d34"
+  },
+  {
+    "arguments": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT09",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT09.aevpkg.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/056.json",
+    "result_sha256": "sha256:94540b7cc2a35b15dfc0fa82553fa7649022150fec46e19926b10d6ec025e679"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT-transaction",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\dry-run.json",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/057.json",
+    "result_sha256": "sha256:ebcd93da9245a04a35e6f649bda9d5a963133f27418ccf30c3798a23bed5d628"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT-transaction",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\dry-run.json",
+      "--expected-project-sha256",
+      "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    ],
+    "exit_code": 2,
+    "expected_exit_code": 2,
+    "result": "cli/058.json",
+    "result_sha256": "sha256:d0226b1f1757c22aa364287f5bdfca8b09f24f83cb9b222a44c2221dbce219a8"
+  },
+  {
+    "arguments": [
+      "timeline",
+      "compose",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT-transaction",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\atomic-failure-compose.json"
+    ],
+    "exit_code": 2,
+    "expected_exit_code": 2,
+    "result": "cli/059.json",
+    "result_sha256": "sha256:b8a4d3a57ebbee8900dc36988bd7aec804cdac8f8eab7d7befb8d2741a9b65fa"
+  },
+  {
+    "arguments": [
+      "convert",
+      "import",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\retime-release-20261019-v57\\RT06.aevpkg.zip",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\restored"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/060.json",
+    "result_sha256": "sha256:de57932e75d124ba48be4b1526dcabc56c5508062a6f3fc2f8a5cf1faadf3df4"
+  },
+  {
+    "arguments": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\restored",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\restored\\renders\\RT06-restored.mkv",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p",
+      "--crf",
+      "0",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/061.json",
+    "result_sha256": "sha256:dc48e93ce2e0fcbece90356c626ba7ee4c3ea21147c38c97756b80bdc6cf0cdb"
+  },
+  {
+    "arguments": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\restored"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "result": "cli/062.json",
+    "result_sha256": "sha256:4a344e6e482b5891711f611043f57c2fe3cbeb209e6e18f34c894194e1241764"
+  }
+]

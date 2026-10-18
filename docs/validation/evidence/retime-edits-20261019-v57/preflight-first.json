@@ -1,0 +1,881 @@
+{
+  "status": "passed_preflight_full_pending",
+  "checked_at_utc": "2026-10-18T16:33:20.543376+00:00",
+  "generator_sha256": "sha256:05e5060423ae5a0107b6197d01259f54c49a1d879a90f3e415b216f4384aa4dd",
+  "frozen_files": 184,
+  "source_freeze": {
+    "docs/specs/agent-project.schema.json": "sha256:5c926ace491aec3d0a8c292afaf80c0950ac0b766f658c791fe08ecf80e6137f",
+    "product/offline/build.py": "sha256:1b93123f4e34dc18aaf4bb9ecbb4261e423f297103e63e494c9ec883f9871810",
+    "product/offline/install.py": "sha256:4a7bf97d2fe15b92f1448fb118eb07d5625c02741c1585c392a3b0d75dba1c7e",
+    "product/pyproject.toml": "sha256:0b6449306403c1f5f87962e17200b3dfc3eea22b21b722fe0a6b4140bfa3e239",
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/agent-project.schema.json": "sha256:5c926ace491aec3d0a8c292afaf80c0950ac0b766f658c791fe08ecf80e6137f",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_routing.py": "sha256:40f74750a79ea80f016dd2eb8a353d6103682756f01970ad802c6292be8e5af8",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_stretch.py": "sha256:3f1cf4dbaa6e09cdfdd1068c1d477595eb7e2506ae4e8dcaac1a960f9e787fc1",
+    "product/src/ai_ad_editor/audio_tempo.py": "sha256:3284a08dc75a25dcbeed30c7088a18898c46d398e6e7ae9380efcf0e366afcee",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:2dbb8bce11ecb7f7fd6fa893cca08efdaa6f9c21a3c6f8a4588cbed5092c3a65",
+    "product/src/ai_ad_editor/browser_process.py": "sha256:55c72751a5d3d5e397af030fbf65a7ef5b659646a3890f72e52da816d9ab22a6",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:da9448d8b53788c7d26f0e61646316766367696a4f22a6efa8885e247b8edf34",
+    "product/src/ai_ad_editor/captions.py": "sha256:f9a4534682417235a1c2e6ba36072bb92de9354cb5d83b76d06e3ecb22144d28",
+    "product/src/ai_ad_editor/cli.py": "sha256:8818ea3159629dad369b5406382e9c5ef7f8de4ac6b94a31fec2402b791d8d6c",
+    "product/src/ai_ad_editor/clip_windows.py": "sha256:3014424ecce4ec780b2e241afd50c310681c69c4450ebd88b689cea221149377",
+    "product/src/ai_ad_editor/convert.py": "sha256:5ff0ea4edf337b96f88f2a4d5c6ec7e36ab8f42e17260a0a7a9c0bce289c5229",
+    "product/src/ai_ad_editor/ctc_alignment.py": "sha256:a475e9b1acd8ceba2be90884729f0b5a4c76ed354853bc0a57b47f1f9787edd7",
+    "product/src/ai_ad_editor/ctc_cli.py": "sha256:2f20af923ea0a7af6fe9d5080cdb999d6b7c2f26c133a6c2f702d782747c22c8",
+    "product/src/ai_ad_editor/ctc_worker.py": "sha256:933d1c7ca4ac7dc8512d49e17a090b0a89e580724d0228a9ab44a3a14e3e9810",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:0eb1e8f649e66cc6f15ef56bfb75d07166a7d7e3a6f1326f50bca349a1c24071",
+    "product/src/ai_ad_editor/edit_planner.py": "sha256:ffe0c9c774f094b57b565ad56f84291d432ce957b1fa578dd44aabd80212b43a",
+    "product/src/ai_ad_editor/effects.py": "sha256:379a8f5508173781541cae76a603c64ba510353fe4fe48670fe0db2b62f12698",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/font_coverage.py": "sha256:2f33b3eb07331ef3b87c78286317df8d903a2c991978e9750a39d6bcd117c243",
+    "product/src/ai_ad_editor/fragments.py": "sha256:108e172ae53f42c6ef4bdbfb06a4f975de0d8690e3088cf8a0e3385b159c6a89",
+    "product/src/ai_ad_editor/html_motion.py": "sha256:eccfca16e5a3760c9cc9546613231c281fd253ea11e846fad39f98eb7f699889",
+    "product/src/ai_ad_editor/html_motion_worker.mjs": "sha256:435899a68e8ac4e76484c00e2d3f6d8fadcf362475dd9e639d0bd0e7ad7fe0bf",
+    "product/src/ai_ad_editor/html_quality.py": "sha256:7abdb2b18bb86a3d87e058e74b908cb0a430f05273ca9b78122a5985c0b5dba0",
+    "product/src/ai_ad_editor/html_quality_dom.mjs": "sha256:551f997cd5f4f57514354ed4b5292c67e9e82f4c8928db74f4d6c53b57ecdc94",
+    "product/src/ai_ad_editor/html_template.py": "sha256:f3ad9507632d03df9e7de3e4303638325c9667e1005ae9600c62670b06d1436e",
+    "product/src/ai_ad_editor/html_template_dom.mjs": "sha256:ed68388d4dda1adabc689afa508640de471fe8a6e461bc6aeb5292d904950260",
+    "product/src/ai_ad_editor/inline_sequences.py": "sha256:ee1596121f7e0ea88c7d1f8e27d75132b57dc03522a768a2716f97343a1ed911",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:7c8582144a9b17e08558f36777c312099e10fee82f18f49589b07f40b61fb9dc",
+    "product/src/ai_ad_editor/local_ctc.py": "sha256:f4e6bef1bf35603a5828f161462570afa9ca04af4364e0032708700ae3141716",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:985c585cb2bbfcaf7598f28b9ed954491af6cca4e566435caf08e2f5b3d78d3b",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:91814a4ae529a3d55b2bb45f6fa5654be587f6ccdce692264f3d13947e2672c5",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/magnetic_mode.py": "sha256:7b74280ed8df6d94b259548122b44216ca45d6726084504aa6fdd05524f460e1",
+    "product/src/ai_ad_editor/magnetic_reorder.py": "sha256:b3db1863adfa7cb88173a864c127d01ebfa33c2ba46dc21b340ea660db03eef1",
+    "product/src/ai_ad_editor/magnetic_sync.py": "sha256:bd4c59d3045eda011a9cc5e7c8720b9380bc756ee41931867b0f4eb4f22ea939",
+    "product/src/ai_ad_editor/mask_edit.py": "sha256:952aa4c1cc3f49b2b1c9d5dc0c969901d82d4fcbe660387af2f3f7c044d6bb7a",
+    "product/src/ai_ad_editor/mask_edit_geometry.py": "sha256:9bf1d101c1aea8d2265b704fab8dcd65b3bb08c4cc45aed95a4a5cb0ee2ae1f9",
+    "product/src/ai_ad_editor/mask_review.py": "sha256:17de0acd6d76ad9218565302a0f47a577a5001a487bbf0c66432b0b6af278bad",
+    "product/src/ai_ad_editor/mask_tracking.py": "sha256:724f8f9800536d3ffdc99675fadf79e1262532ec7f9a3d879cf94674ba531b8d",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:75755c314fe01111d7ca85138efb6f9b0993e45c14c5a2b65cc1046c5e58cfba",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/nested_freeze.py": "sha256:2294d318840e6285550eaf70109702b041c031c2cde4c8dc0bca3d2bad848a35",
+    "product/src/ai_ad_editor/OPENFILM_EXAMPLES_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_frame_clock.mjs": "sha256:c60b35fb0d26b8629d833f11028757aeccf603917c4c5840f501c01b757de1d5",
+    "product/src/ai_ad_editor/OPENFILM_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_overrides.mjs": "sha256:8fab39a5f4f9696e9070a206f45d9241f54167ea2d9f47c0bcc9975333664832",
+    "product/src/ai_ad_editor/openfilm_stroke.mjs": "sha256:6c20aaff3a85b8a98654d82bfbea34029d78b0366af6b95b17c70abfafd265a1",
+    "product/src/ai_ad_editor/openfilm_subtitle_segments.mjs": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "product/src/ai_ad_editor/openfilm_template_fields.mjs": "sha256:fd4c58532cd3b46e32872e84136b54edef5a8ad9d824f1afa44f9264d81774e3",
+    "product/src/ai_ad_editor/openfilm_text_bounds.mjs": "sha256:94b2ab392b367ef1f901967f9156ac48493419be32bc40b4d6c035cf71a56108",
+    "product/src/ai_ad_editor/PDOOM_VIDEO_LICENSE.txt": "sha256:5fc212466ce7183be5d85a3ee34fea461712842d5cd256b470978a83577083cb",
+    "product/src/ai_ad_editor/policy.py": "sha256:775449c9012e5e79c228c140712e1c1c6c7f3eb668f0638703f177beb894242e",
+    "product/src/ai_ad_editor/project.py": "sha256:dd86c8d1b161cb99660f4bc92ac3ff8c2cc6c10c34f22432fbe6f27af9a7414f",
+    "product/src/ai_ad_editor/quality.py": "sha256:d4e71c9e6616250b681306d562305dafe4cb5867652ab365275277b155e9e047",
+    "product/src/ai_ad_editor/range_edits.py": "sha256:eff604efaa3c2a66b63b3fcb332804ffd9e45a11ab880964b279a379d5500e4e",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:eee9ea6da05137595b5308b94e0f75d6bdd71114f501678c9f37b154bb310b38",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:b806d815b9a456f0446a0a601ae9bcfdb957418ace18eb472bd1301b76138802",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/retime_edits.py": "sha256:4dcf1ef57db6bd813d2c25887705ba18590207decb07bd17f4622b0c3c14b881",
+    "product/src/ai_ad_editor/retime_transform.py": "sha256:8b00a27cd939264cece21ddf22ca9949a23a43122dc958c0970cd2526c7bdd35",
+    "product/src/ai_ad_editor/rfc3339_dates.py": "sha256:344d79048ff55a77af00314134c20b57b5301b75d1b6a32b4a7a3f52ce749105",
+    "product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt": "sha256:5ba1a4f03626ccca6dcbf53a554545e4f776a335bfdaa233ec3bfe9bb7fac15d",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/schema_contract.py": "sha256:5fbe1b6ea888069632984a709eed641fe51ec2da6fbde2fb2f4781aad29b6450",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/sequence_canvas.py": "sha256:462542e26058d350c2d0a29d0cf4127c4054cab7462a763811b85bfca171412f",
+    "product/src/ai_ad_editor/sequence_sampling.py": "sha256:1aa171ef6043878afce099f7a04b214b9c458879147c46147062a77d36356ec2",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:ba871f7bff0f186ad55d9e22c5fcd75e09032e8d7299a01c7ea7b76b2e1a21a1",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/source_edits.py": "sha256:a2bea20a8d162ac4fa9f329045bca2b7e214a624adca107df6021919d5a1d36c",
+    "product/src/ai_ad_editor/source_transitions.py": "sha256:59c2652aa76024b78667293ce46774ba6910e4524db7e39f95dc95bd91b0547a",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/speed_curves.py": "sha256:41fbddd764bfa481e6158e8401333113c871e1c38e34257911f9aa676b9bfff9",
+    "product/src/ai_ad_editor/stroke_motion.py": "sha256:ba53f586ff12c75c15803e347307c802d977e874ce792159d74ebb2b6b42ae03",
+    "product/src/ai_ad_editor/subtitle_clock.py": "sha256:49ca2001da0f250d682f5818d95f4f51ee362cbaee979fb9a99649a847cd4645",
+    "product/src/ai_ad_editor/subtitle_segment_worker.mjs": "sha256:66ca5d7fab0926efe15615da29dba3024897cbfbfb1b28e6a6a189697b6d5bdc",
+    "product/src/ai_ad_editor/subtitle_segments.py": "sha256:5590e04147f0b50cb60df3b4e543059a560dbfd684b3085c5f25f8fb04631aea",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_highlight.py": "sha256:d08bee683f0bd00bac363a78df5957475765741a7c53d92ac025575b334f78e5",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/text_paint.py": "sha256:a924644f0396b5204efbb0e085f25d51f6cda5bfc75f2d44febc6796e42cb028",
+    "product/src/ai_ad_editor/text_typing.py": "sha256:6cc022af8300fb4270cb21f2f53ffe2b33210ac203169fed653d11d75e591ec3",
+    "product/src/ai_ad_editor/time_mapping.py": "sha256:89bd69060b3f10af1197018b735621eadb8ce2858b4281972d989fddf79f2ef1",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:78f984613b0c253d108dd4d515557f77bc4ebd4df4945108a63d8fdb38ad202b",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:bfc668d4944c7959ab399e86d53c43ad56ac0ff2982acae9f3fa1b4180335d69",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:e03ff1ff29ebead31a70c14149dd7f86282128299311978d08b8b83f7d76e20f",
+    "product/src/ai_ad_editor/validator.py": "sha256:755e455efd0ef1230a47cc3ada37c1bae4c52a554fbfc5237a1e4ed3837fdafc",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_alpha_resampling.py": "sha256:db2e2764a5022c18bba23ad407a6bf15a320edfea5f5a8331eda706d7c4046de",
+    "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+    "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+    "product/tests/test_audio_buses.py": "sha256:e4b6020208492cf4907a3537c0542321a7f1600692537b22299700f5b4d9dfdc",
+    "product/tests/test_audio_channel_modes.py": "sha256:815a9ea0117dd7ed0cce3a75d14ed67a4a8a06b413df1836d233f33359290e79",
+    "product/tests/test_audio_routing.py": "sha256:0f2d189488b1559fc571ae401188b6f3c576150c34e59f3a9a23e4b5f4dbadef",
+    "product/tests/test_audio_stretch.py": "sha256:53dea6b0ec9f8c00861b6a1844d7c34e0c87e432d78a4e4847c7245fd9893ce9",
+    "product/tests/test_audio_tempo_context.py": "sha256:ad3c7c53cfdaecdd00693aa745a22be2455e2dcd446583e4912cd1066b6aac3a",
+    "product/tests/test_audio_unity.py": "sha256:02dcf66038d4fcbc1f0c144e604efa451b9d7925817d1d2b089f8c087aa58810",
+    "product/tests/test_cli.py": "sha256:cefbec9b92fbdd2c5664454c35547d549b1da8db981f8be20102065c52cc4e79",
+    "product/tests/test_clip_windows.py": "sha256:42863fb28d81d22a0ac90ff1036ef5359186a29ab730d5404db36fae0660ecb3",
+    "product/tests/test_ctc_alignment.py": "sha256:838a854a442b413cb05be739f47eea86dae36057f12b0567bc820f3f442aec93",
+    "product/tests/test_delivery_precision.py": "sha256:5bc05fca5334ca454f3498b0f53cd28c0b44b8f9e9f3336b980b8a8604bbed03",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_font_coverage.py": "sha256:b382b9449601baf20a6c352c03e055b4f9efcad03b7515b694831376cc5a8234",
+    "product/tests/test_fragments.py": "sha256:d021051b4a5b48deac872e319407c9dae0cb2e7b3c8f1a7ab71704dff756a35f",
+    "product/tests/test_html_motion.py": "sha256:9e382485db151f79059e4d18c13708a6ee3deca38ad5be1272a5b9fb4dc4bc0c",
+    "product/tests/test_html_quality.py": "sha256:1e3d81bf7101b3d97aa89f5f60cebab0a7e64e44845ab60b4872f8d064217aae",
+    "product/tests/test_html_template.py": "sha256:747fb1e13b3bfb60f35012a8ffa18ac10f156f1e2811328792ab29d20e2de29a",
+    "product/tests/test_html_url_parser.py": "sha256:673a8073a536149c6b70366b2911ab6bfb3b395f3e2a14dd425c3d5f57cbcf02",
+    "product/tests/test_linked_edit.py": "sha256:d3b5d8fb402df059ea006d125fbb6fb651c891132fcd78deccfdbe41036d87d7",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+    "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vace.py": "sha256:a2227a49c43a233b73ed354681a39a03924d9ed0588749eda7df198c2c43807b",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_magnetic_mode.py": "sha256:aa08ddbfa3db68c89b2a2feb757d5bba12dd467b85e7950377eec218714f2897",
+    "product/tests/test_magnetic_reorder.py": "sha256:c4ad34f0ed89c9fe30ca51c188cdf9bfcf982322bd32a6ec6d5d64620c01c2a7",
+    "product/tests/test_mask_edit.py": "sha256:280c825c3a2dc95ac35943209a6eb30e45d519bc5ce1834a6a73c464f90718e1",
+    "product/tests/test_mask_edit_geometry.py": "sha256:7b6367f327d51cbd5b5746b90e89f27768acc7b49b0bb9d7e63cc3d1460bde06",
+    "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+    "product/tests/test_mask_tracking.py": "sha256:f8f2c1d0495410815b91d4f0a507a3a3909d2ca25c44817612970d4330578245",
+    "product/tests/test_nested_frame_coverage.py": "sha256:4bf9aef9aec5c34325f67e2a3e88dbe3424e4ec5c82d8f4e121ec95f7ab8d97f",
+    "product/tests/test_nested_freeze.py": "sha256:03261ace961acfcc5f99f52814a59a2b2bdf88fe3c0def7f48c8c3e897415c9b",
+    "product/tests/test_nested_time_mapping.py": "sha256:64415c49e45c5e7edf8d5f5ee745bbf22d30b6cdd5a0cde7cd731d88d6c6fad4",
+    "product/tests/test_nested_transitions.py": "sha256:9481f1de95ab4c556a17bfdbc1088001ceb29b92bab96d5040c8e6abdeb7881b",
+    "product/tests/test_offline_install.py": "sha256:6497262c7f791c46d706eeddfbaaa41d2d793e109106b93456e88f6786f051fc",
+    "product/tests/test_range_edits.py": "sha256:7634873bff27fbf51e412c82b37efae72cf7f38b20ffd22e1d60fe50359a1f7c",
+    "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+    "product/tests/test_retime_edits.py": "sha256:751c1c1566a6fe934c7427e1f431d40b3d3e417bf0670e2e73ad313d2a1eadde",
+    "product/tests/test_schema_contract.py": "sha256:12d70209363d3b54341118e3f3ab988ebb041464c42eb7fb267c09d801ce483d",
+    "product/tests/test_sequence_canvas.py": "sha256:6f2b622c81932c0dcf80e7b3a528256b5e1a7209ef455b68f2c75a4c9154f4b0",
+    "product/tests/test_sequence_compositing.py": "sha256:1eea9b170c3fabe0623032b4de81a07e085cb7c88b5d79e8380d73399be21b0a",
+    "product/tests/test_sequence_sampling.py": "sha256:c75a6153aee2dbef11e9455a27656d204e46f0ce6061393ea91b6f46f8d7253f",
+    "product/tests/test_source_edits.py": "sha256:b5846137c5de1b1f08e82d43c69a7d95c031cd1c613fdf48613f72361e813614",
+    "product/tests/test_source_transitions.py": "sha256:8813a84843bfbb7aed5b5418011a287c9dae1b8628620114468df716401f2b4a",
+    "product/tests/test_speed_easing.py": "sha256:4797885a66a7e12b327fdf31e0cc937576620353e653c2c762ee905f2d61a5d7",
+    "product/tests/test_stroke_motion.py": "sha256:4ff06a458e6311e4979da31b6be05b5a53c6e09ef3bb6b429c63616368844410",
+    "product/tests/test_subtitle_clock.py": "sha256:1e6696405e30dc4d90e4baadcbffc013d5e6fee5d89bb67e908003c3ebe1de5a",
+    "product/tests/test_subtitle_segments.py": "sha256:aba64ed147276a6b1e59ad845557f86f2b6271db8d0dc75c006db328cac233c2",
+    "product/tests/test_text_animation_composition.py": "sha256:6ce0117f31339d36c574c70a8f2d83235813dc95d91f3108730cb954987c12de",
+    "product/tests/test_text_paint.py": "sha256:99887918ba5813b39a74cef18d02384ed503581e8695821530554590d38e219f",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "product/tests/test_word_highlight.py": "sha256:bf3f56f299d2452e8330bb192d31880c550e277ef93d04c4292fe816b79e172a"
+  },
+  "full_methods": null,
+  "new_methods": 40,
+  "magnetic_integration_methods": 66,
+  "main_cli_calls": 62,
+  "main_frames": 344,
+  "stereo_sample_frames": 1651200,
+  "native_cli_calls": 51,
+  "native_package_files": 123,
+  "native_frames": 454,
+  "native_stereo_sample_frames": 2179200,
+  "skill_count": 14,
+  "skill_local_links": 202,
+  "documents": {
+    "README.md": "sha256:6337f1bb4f5681d813056c5c4d1d36a65beb612ab2ce55e2e436db50339aad9c",
+    "docs/README.md": "sha256:473eade1cc292df7931b6bfb4b211b6833bc8361c8b0cce2e183be5bb647832a",
+    "docs/构建进度总表_2026-10-16.md": "sha256:a281a6bb12f5fea2404cbdac2be17c870619c04b1206bb2d2a4619a01b261909",
+    "docs/specs/AgentCLI契约_v0.1_2026-10-13.md": "sha256:2ec39c3496d724eeda05696833d52821b1a791f1a141fdf208906ab8df99b57b",
+    "docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md": "sha256:9bf7a0184c9ad762a32f35bc0ec2fa87afaed36fb7a82ac124efd033192225a7",
+    "docs/产品需求与开发路线基线_2026-10-12.md": "sha256:025fd58a4d49b9c10e5215cb042dd98c8e5eee147ae2e86076e14073ed75dab0",
+    "docs/产品实现入口与P0使用说明_v0.1_2026-10-13.md": "sha256:822f60f0d67336c32c1bff32ea85bda37d0dc6ee1366af4eb898fd504d9acb7c",
+    "docs/validation/README功能核验与实测演示_2026-10-16.md": "sha256:7014b025a3e65960fc69d511241fae5c6ba80162e08debed68f5bfaf6cc9877f",
+    "docs/specs/完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md": "sha256:cbc9c2ccd477ae72d8cafc1326b7c7b23c644fefa5aea3e06216a6c3737421c4",
+    "docs/validation/完整作者输出变速与磁吸联动实测_2026-10-19.md": "sha256:acf331364b019ab34b6b6e308c071b9e7ebb525202af270db0baf54c69baae2e",
+    "docs/OpenFilm最新源码复核与降本清单_2026-10-18.md": "sha256:b2192f2edab06301db01d43e1c9d93a27c03265b62ebc5f4e315f929dcbf0209"
+  },
+  "document_local_links": 1665,
+  "fixed_toolchain_residual_processes": [],
+  "public_files": {
+    "agent-video-kit-cp313-win_amd64.zip": {
+      "bytes": 8137785,
+      "sha256": "sha256:623b2fa33e2827ca01e3e6ec8518c846fb03475e3cc945de6342b64daf18efac"
+    },
+    "atomic-failure-compose.json": {
+      "bytes": 249,
+      "sha256": "sha256:c1aff2326a7e376696e3c6682b40886073e3677f743e68834ff99d1cac274f3f"
+    },
+    "calls.json": {
+      "bytes": 33335,
+      "sha256": "sha256:074d74898de9b9c875f9a6f4c16421c833aa5fe27673e4686ad862b4a985d2d6"
+    },
+    "captions.srt": {
+      "bytes": 150,
+      "sha256": "sha256:2063485ff2fd0d3238333e461e67e95da21ab82c434a3866afdab3235ace1f81"
+    },
+    "cases.json": {
+      "bytes": 6826,
+      "sha256": "sha256:ee049448ae0b7bddf893aead612752e58beb5e58792cc652a2d7ef3449eb0ea8"
+    },
+    "cli/001.json": {
+      "bytes": 739,
+      "sha256": "sha256:925775670b5b4518da43e13019ca732ca329d4cf23a2b1d81a1c969cf6387907"
+    },
+    "cli/002.json": {
+      "bytes": 4296,
+      "sha256": "sha256:e2c2e8de326b2377de72b971831558ccf9abf2b2114bbc2e1cdb636139c4efff"
+    },
+    "cli/003.json": {
+      "bytes": 4001,
+      "sha256": "sha256:73bbbddf75692adb76819650e7a84341fb6fc4ff75b31e2abdf41d0d48c1b19f"
+    },
+    "cli/004.json": {
+      "bytes": 2762,
+      "sha256": "sha256:6a2f4d994bf8978fc6f5181a51350377e6fc061174cacce9923c96ce9016710c"
+    },
+    "cli/005.json": {
+      "bytes": 2566,
+      "sha256": "sha256:84edd0048898b71a1895eb8a7128cba75aa90fdedc5da68ea65b46def78090f3"
+    },
+    "cli/006.json": {
+      "bytes": 1001,
+      "sha256": "sha256:77229f25e3cd0b912c805fa9567b55b0b2d4ca65b23acc0074fc7102531e0af4"
+    },
+    "cli/007.json": {
+      "bytes": 12498,
+      "sha256": "sha256:ccb23be1362c246b0828c316a571dfb4e81a5594332847da25d9fc188e3abed4"
+    },
+    "cli/008.json": {
+      "bytes": 13310,
+      "sha256": "sha256:51beb2db6565c92d00166df3ca80c6c3ff31b8c2499154c9e867b30567dca1a9"
+    },
+    "cli/009.json": {
+      "bytes": 652,
+      "sha256": "sha256:ca73fe5614c5fd19762a6a75cb485bacce9249267b2575232f01a243d263cd96"
+    },
+    "cli/010.json": {
+      "bytes": 3965,
+      "sha256": "sha256:81b12258f128a94b0aa86b36d1dfd29f017ca201d9818e002bc5a0d2c042f2d8"
+    },
+    "cli/011.json": {
+      "bytes": 12509,
+      "sha256": "sha256:b7db702b7efca46501fc3b5c728042226ccba4870980a68922ebc8fed837fdff"
+    },
+    "cli/012.json": {
+      "bytes": 13310,
+      "sha256": "sha256:224a45476aa556c5cd8c2f10d0245708228b794cbcfb25811da2ee41150bc81f"
+    },
+    "cli/013.json": {
+      "bytes": 652,
+      "sha256": "sha256:637060b64dee4e1066dd175e3e587c4f67f8fb9285b6d5825db555361d832353"
+    },
+    "cli/014.json": {
+      "bytes": 3965,
+      "sha256": "sha256:54db676191bf4158a04aca505dd48eb05208412e431d77902ff670c194968393"
+    },
+    "cli/015.json": {
+      "bytes": 1001,
+      "sha256": "sha256:1a0f5cb5bbe322594052564b6cf34e73953adc55f5e28d0c2da4acc26fe473b9"
+    },
+    "cli/016.json": {
+      "bytes": 12090,
+      "sha256": "sha256:42ca112688446d06de75fc6379d7295681c697464928b1194be093575d89f32b"
+    },
+    "cli/017.json": {
+      "bytes": 20351,
+      "sha256": "sha256:400ec8366c0be3343fe774b7540f5b844faf824e8df799e50d23f716fe3435e4"
+    },
+    "cli/018.json": {
+      "bytes": 16506,
+      "sha256": "sha256:6538d2427afc7d9ad4c416762dfc206997d4368c8e320beb3adc9fd061fc53b2"
+    },
+    "cli/019.json": {
+      "bytes": 652,
+      "sha256": "sha256:4fd8c63ffa9d612c4141d39ae2783fefdc2c4967947488145e3d7a3a8ecc03d3"
+    },
+    "cli/020.json": {
+      "bytes": 4172,
+      "sha256": "sha256:5446865ed55314c32b528abc53eb13d1f3a8e25953e38d1ab08662c2602939ec"
+    },
+    "cli/021.json": {
+      "bytes": 1001,
+      "sha256": "sha256:e62d6ca560598c6fcd67bbd5cafd17f9152f05061c2d58a7c680c800a3a0ae42"
+    },
+    "cli/022.json": {
+      "bytes": 12090,
+      "sha256": "sha256:0fc9b4d7896c3608515cffc641cc0e13b2bedf96eec4494feb6d9749f76d84e3"
+    },
+    "cli/023.json": {
+      "bytes": 24409,
+      "sha256": "sha256:f727fca52e82f94d5337a436f67396875a497c1ca30a1d2b32e8aa9124782cff"
+    },
+    "cli/024.json": {
+      "bytes": 16362,
+      "sha256": "sha256:0868caa40675b46da939e6249b88142d2ec187efd74e6e729d85ef5bd4261c87"
+    },
+    "cli/025.json": {
+      "bytes": 652,
+      "sha256": "sha256:f42adc6a82af87fccae8594143be0db659a05af5cc81fc6ea984b07e11800d06"
+    },
+    "cli/026.json": {
+      "bytes": 4172,
+      "sha256": "sha256:c295dc16f73b5a8066f914c1720c2d2e9f42f5f66d11232bd12fb3852ee84abb"
+    },
+    "cli/027.json": {
+      "bytes": 1017,
+      "sha256": "sha256:e57d385f705827db4ada5e4979b850ea879078961d75c835b79d4e2492843227"
+    },
+    "cli/028.json": {
+      "bytes": 12762,
+      "sha256": "sha256:ddb5a083ee7e6329d806d6bee3c27ab75a08c3327bde1640672231938f7109b6"
+    },
+    "cli/029.json": {
+      "bytes": 18601,
+      "sha256": "sha256:b618fc22eff8ad999a2eb9b89a8d0ca6abdccc78528ebb5d18a5b42b27d4bedc"
+    },
+    "cli/030.json": {
+      "bytes": 14817,
+      "sha256": "sha256:ce10f5a606d23749f250bb63279bd256848ae551549be6607257504170e4cdb1"
+    },
+    "cli/031.json": {
+      "bytes": 652,
+      "sha256": "sha256:1825023b4e3e791df4319c3d26048461e10efc7cbdd0e4a2d0c05f7db501cf77"
+    },
+    "cli/032.json": {
+      "bytes": 3965,
+      "sha256": "sha256:edf69e1a0f0bd488b6efc9be41019d2503249fbf3c46c9cdcb134f7b4f718890"
+    },
+    "cli/033.json": {
+      "bytes": 1001,
+      "sha256": "sha256:cbca219a4b25be732ea1c64a2a072bb07a2ba071d7a78bf4e0137441cc757f44"
+    },
+    "cli/034.json": {
+      "bytes": 14313,
+      "sha256": "sha256:7c9830f0c725e7ce741e438c381097ce9ba6509fa7b8d4e8d24edd48fc31e868"
+    },
+    "cli/035.json": {
+      "bytes": 6052,
+      "sha256": "sha256:36f5b3a5b3c7c491b64ae2c5ef9f553917c2ab44f916ffb767e2620670a8cdd3"
+    },
+    "cli/036.json": {
+      "bytes": 1017,
+      "sha256": "sha256:016b39b98724e5bd0eebe08ed461e3f2d8ee52381289e6740e2098379c526752"
+    },
+    "cli/037.json": {
+      "bytes": 11965,
+      "sha256": "sha256:efdd421cdb32af27695ee072ba1be69f7d8564bfa4ded1bf467bf08ff317cbc0"
+    },
+    "cli/038.json": {
+      "bytes": 13512,
+      "sha256": "sha256:64b1f6cba80ad57968c874847804eacdb77582dfff196c58aba4feef0dcfef02"
+    },
+    "cli/039.json": {
+      "bytes": 16386,
+      "sha256": "sha256:3b7ebe2006f1ef0303bb9af62a80695382364c775076826f35c87797c85d2b19"
+    },
+    "cli/040.json": {
+      "bytes": 652,
+      "sha256": "sha256:2616a963abb62e838411dcd2a11ba759b6111284714c37cdc5e646757cd2e834"
+    },
+    "cli/041.json": {
+      "bytes": 4172,
+      "sha256": "sha256:8e636a7f82bccdc7d8210eaa13d1d1ac182b456432df00d613586c1442b658c5"
+    },
+    "cli/042.json": {
+      "bytes": 12498,
+      "sha256": "sha256:6e9b0f52e05b98d7809c96ec92db8c5cffe1a5d7259cff76cf305837534d7812"
+    },
+    "cli/043.json": {
+      "bytes": 13270,
+      "sha256": "sha256:ea18492c72498a9e674bbf302cda0f161af490f555035ec81ab17a36c66d2870"
+    },
+    "cli/044.json": {
+      "bytes": 15190,
+      "sha256": "sha256:beaee2b118af774261b4ab633aeb71cd925640e85439a4faa3bd4d33f40311d6"
+    },
+    "cli/045.json": {
+      "bytes": 652,
+      "sha256": "sha256:47f19149315bbaafe70fa6a6ef31e368416a7fbf7fa15bd3620a54bb30a31e21"
+    },
+    "cli/046.json": {
+      "bytes": 3965,
+      "sha256": "sha256:8afc9f1debf96d1f166a43a777abc1a040b4305f308c979b8246f67db7456ac9"
+    },
+    "cli/047.json": {
+      "bytes": 23251,
+      "sha256": "sha256:8bcbe4e66c928b825db2b3110784c23723a54a800b680bf81464091759e6f887"
+    },
+    "cli/048.json": {
+      "bytes": 17750,
+      "sha256": "sha256:0a3beeeb1fd57e026a73b2a531cebd313bb03cf2af5cae9bc457e7e595f10e84"
+    },
+    "cli/049.json": {
+      "bytes": 652,
+      "sha256": "sha256:ff1dfa34dc19237ee40b0b594a6f7de72b1141b5155fab955e229c8f2871d8d6"
+    },
+    "cli/050.json": {
+      "bytes": 3965,
+      "sha256": "sha256:588fda92a7c0d50782744267e0501b01ef2c74fc9522035b1425402c5651f8ec"
+    },
+    "cli/051.json": {
+      "bytes": 1001,
+      "sha256": "sha256:f11f2158ac6138c7b739318c6daf1ea623870d744deedb75246f081ac94231d4"
+    },
+    "cli/052.json": {
+      "bytes": 11908,
+      "sha256": "sha256:7be3de4e3827fa3433a6960a2878e9337acdf1500be56577790369342820370f"
+    },
+    "cli/053.json": {
+      "bytes": 13657,
+      "sha256": "sha256:fb2cbaf12b8e100e9741ebdddad95a96f757a413507172406590f5a18e0a2b75"
+    },
+    "cli/054.json": {
+      "bytes": 13310,
+      "sha256": "sha256:6275444881da714c60c29ed38787552b163736bdb572af6ecde40185271db38d"
+    },
+    "cli/055.json": {
+      "bytes": 652,
+      "sha256": "sha256:45e1be1cda2dd4e10db3cc9058ce239858fe27e0bd746023d799f5bb45690d34"
+    },
+    "cli/056.json": {
+      "bytes": 4172,
+      "sha256": "sha256:94540b7cc2a35b15dfc0fa82553fa7649022150fec46e19926b10d6ec025e679"
+    },
+    "cli/057.json": {
+      "bytes": 12144,
+      "sha256": "sha256:ebcd93da9245a04a35e6f649bda9d5a963133f27418ccf30c3798a23bed5d628"
+    },
+    "cli/058.json": {
+      "bytes": 644,
+      "sha256": "sha256:d0226b1f1757c22aa364287f5bdfca8b09f24f83cb9b222a44c2221dbce219a8"
+    },
+    "cli/059.json": {
+      "bytes": 1456,
+      "sha256": "sha256:b8a4d3a57ebbee8900dc36988bd7aec804cdac8f8eab7d7befb8d2741a9b65fa"
+    },
+    "cli/060.json": {
+      "bytes": 1997,
+      "sha256": "sha256:de57932e75d124ba48be4b1526dcabc56c5508062a6f3fc2f8a5cf1faadf3df4"
+    },
+    "cli/061.json": {
+      "bytes": 16412,
+      "sha256": "sha256:dc48e93ce2e0fcbece90356c626ba7ee4c3ea21147c38c97756b80bdc6cf0cdb"
+    },
+    "cli/062.json": {
+      "bytes": 655,
+      "sha256": "sha256:4a344e6e482b5891711f611043f57c2fe3cbeb209e6e18f34c894194e1241764"
+    },
+    "contact-sheet.png": {
+      "bytes": 10955,
+      "sha256": "sha256:8fd7d54d95c3d147d2341dc2aa6ec2822a08fbfaba4fc1b312d588f4e44f5e17"
+    },
+    "DejaVuSans.ttf": {
+      "bytes": 756072,
+      "sha256": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+    },
+    "dry-run.json": {
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    "encoded-static-review.png": {
+      "bytes": 17627,
+      "sha256": "sha256:0b92fc299a354490cc76eff7ebdbcf3bee614ac6c90b52d79b2a92f35acf4a36"
+    },
+    "executed-generator.py": {
+      "bytes": 22413,
+      "sha256": "sha256:2f9928417b654eef993d301e734b03238dee811f2c03bc07f3512f2bf378a42a"
+    },
+    "install-receipt.json": {
+      "bytes": 1820,
+      "sha256": "sha256:a22480562b60ff90aa52368788a33b36f2f811b00302acd7ea83f24c83d579d1"
+    },
+    "LICENSE_DEJAVU": {
+      "bytes": 4816,
+      "sha256": "sha256:d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    "release-manifest.json": {
+      "bytes": 5164,
+      "sha256": "sha256:d14a0e231ce6808dcd4adc334431999e6c8e4bbb9b8489e62e706169188e91ae"
+    },
+    "retime.gif": {
+      "bytes": 257358,
+      "sha256": "sha256:81fefb6163c625be42261a40f192ec20a682cdc28444656728563f0b36e8398e"
+    },
+    "RT01-edit.json": {
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    "RT01-probe.json": {
+      "bytes": 3206,
+      "sha256": "sha256:6e1929c9face35959f5cc46e3e49a5656b7f0d91df5a303bb1b8ecae0ef86668"
+    },
+    "RT01.aevpkg.zip": {
+      "bytes": 547677,
+      "sha256": "sha256:45219c6756d7730351ca08308d14c6c6bbab9824e6d8d7f647c0da5ba8ae69eb"
+    },
+    "RT01.aevpkg.zip.conversion-report.json": {
+      "bytes": 929,
+      "sha256": "sha256:fdc5de8d451df8ec919c3664b174343bb06163576aeec1c71338f8f7011afaad"
+    },
+    "RT01.manifest.json": {
+      "bytes": 40766,
+      "sha256": "sha256:46fe1ea35043866405320a93a0b456c381b325f442da7211d4cf9fdd9dd5bd93"
+    },
+    "RT01.mkv": {
+      "bytes": 1386676,
+      "sha256": "sha256:27a5778d00037e12f930aaffd937a9bfd3f8aa3ba8f6504727355e80291e7e02"
+    },
+    "RT01.mp4": {
+      "bytes": 73113,
+      "sha256": "sha256:73ac5df426e084d9df0b3f76dc7c797686504e64d969bf2bc13a4c038f7ba9a0"
+    },
+    "RT02-edit.json": {
+      "bytes": 93,
+      "sha256": "sha256:70a2cfb4801975934f7952c690740ff4dd2582d69a3a83961abe11918522cd75"
+    },
+    "RT02-probe.json": {
+      "bytes": 3206,
+      "sha256": "sha256:7eff2b6e0c9916e0220e29c893401f5092c1a7fe4bf396bbf2370f6bc574e843"
+    },
+    "RT02.aevpkg.zip": {
+      "bytes": 547672,
+      "sha256": "sha256:07f22d0783829419e8665e94bc5e7bc6772fa21676eb8901153f5368ac5e9b89"
+    },
+    "RT02.aevpkg.zip.conversion-report.json": {
+      "bytes": 929,
+      "sha256": "sha256:7393d3b1c54cfcde862a1c76e736a8a4584b3c1f523912bbb685323f8921e74c"
+    },
+    "RT02.manifest.json": {
+      "bytes": 40777,
+      "sha256": "sha256:e576e3aac2fa25d11d9c4542851a03c24c30000a904678539bf6ff5770853e88"
+    },
+    "RT02.mkv": {
+      "bytes": 1966241,
+      "sha256": "sha256:1309ea75de342fe6c4e492679a724dbba06f4f9cab21c860c9d9f551650857c8"
+    },
+    "RT02.mp4": {
+      "bytes": 86241,
+      "sha256": "sha256:a95103bf8a59b1a903bccccb66dd869299b8a8c61936e71f1f90326473546a85"
+    },
+    "RT03-before.manifest.json": {
+      "bytes": 19084,
+      "sha256": "sha256:b8e50b8bd48e3c91b554645b5f6fcd511ace406d33cf4170662fb82b47dceeaa"
+    },
+    "RT03-before.mkv": {
+      "bytes": 1591987,
+      "sha256": "sha256:80e9f2fe8488770c4499985bb4bd014cc338a7302a1beeb205b16913dc8f1ccf"
+    },
+    "RT03-edit.json": {
+      "bytes": 96,
+      "sha256": "sha256:95b6c7f2396c04b0ff31c60ea6c7443e08f76688350a8c9a3be98686f4a19240"
+    },
+    "RT03-probe.json": {
+      "bytes": 3206,
+      "sha256": "sha256:d3ac478cf656f9802b6d523d0fd2ff37b0e08cd1c79d43869b69dae2e2b7fb8b"
+    },
+    "RT03.aevpkg.zip": {
+      "bytes": 548811,
+      "sha256": "sha256:85b3a131f615c7232e42b7c892e83c2b464ecf2f7bc3dbbcf2102d2a528e05d8"
+    },
+    "RT03.aevpkg.zip.conversion-report.json": {
+      "bytes": 929,
+      "sha256": "sha256:1e5c16ff58390389c0b476dfaa7c3ed430497c18f009046e95bfadab23515ee2"
+    },
+    "RT03.manifest.json": {
+      "bytes": 86530,
+      "sha256": "sha256:8552e4299a69fe522fe1561cedf5e7cafa6492c8d5abb70a5d80dd0dfe7410d8"
+    },
+    "RT03.mkv": {
+      "bytes": 1590844,
+      "sha256": "sha256:beec962b3f726537eddb56c919d0df2164d8262d32bdac11955284798861598a"
+    },
+    "RT03.mp4": {
+      "bytes": 85040,
+      "sha256": "sha256:5a77f4f4e4c51cdbe87a94d595b84fa9ce0d2bcbd52de749edad9133607d9e2c"
+    },
+    "RT04-before.manifest.json": {
+      "bytes": 19084,
+      "sha256": "sha256:5f063c82f54b431766cfb052c14188a341df99e2a86232396a7cd12898365d04"
+    },
+    "RT04-before.mkv": {
+      "bytes": 1591987,
+      "sha256": "sha256:c48cdee92a7e70cbc3e9afa4c3799dc3614060823e93d40b79e24e2e683ca1ed"
+    },
+    "RT04-edit.json": {
+      "bytes": 182,
+      "sha256": "sha256:dd4ae989e7441b5e6d04e0b38b6c856da51c62c97f2d5bc38e00d0e6288d7026"
+    },
+    "RT04-probe.json": {
+      "bytes": 3206,
+      "sha256": "sha256:2e3ae12000a5e95aa112becbcdbc6d9bbd129b20b7d47cae8a95dee80494b922"
+    },
+    "RT04.aevpkg.zip": {
+      "bytes": 549120,
+      "sha256": "sha256:e29990b943ef2834acff0cb7b8e1f1ae34e10f27b3d052dcc0bc456d5efd263f"
+    },
+    "RT04.aevpkg.zip.conversion-report.json": {
+      "bytes": 929,
+      "sha256": "sha256:af80fd8b548e323c40a7649ddd2c5dc8bf635a9dccf1724fea310b83fcd9c005"
+    },
+    "RT04.manifest.json": {
+      "bytes": 109407,
+      "sha256": "sha256:0440144a86e3aaa277e5bed31b87bb23f8a6dfee1703793be45e2e189383f210"
+    },
+    "RT04.mkv": {
+      "bytes": 1707579,
+      "sha256": "sha256:405dd24058ed0a9ce2650faa1214d05f7e59e20f762b6f8958a4b9b020647e3c"
+    },
+    "RT04.mp4": {
+      "bytes": 86810,
+      "sha256": "sha256:cf4a41413d5a2087ab022a56d61871a52b483e1688a632b482e3f1d55c3033f9"
+    },
+    "RT05-audio-reference.manifest.json": {
+      "bytes": 20813,
+      "sha256": "sha256:7e6759870402a0f9732286c489a7cdd2fe3811cddcdbcdb5cbf68a3887363533"
+    },
+    "RT05-audio-reference.mkv": {
+      "bytes": 1502283,
+      "sha256": "sha256:8620f95fd50eb5c4ba2ad8be08619f914417d9b9aa9f77ed83782060c05ad793"
+    },
+    "RT05-edit.json": {
+      "bytes": 435,
+      "sha256": "sha256:6af25b5b541c2fdc26400bc6ab67e12fb7f83e90dbcb87d332ed9d080711fcfc"
+    },
+    "RT05-probe.json": {
+      "bytes": 3206,
+      "sha256": "sha256:7b7d63a12cc36ecce518fde39a2a2c0bfe5752ff5c6e6fc3f435f5ac7d4b0a1b"
+    },
+    "RT05.aevpkg.zip": {
+      "bytes": 548224,
+      "sha256": "sha256:333ab935846c9c54df8888b3b273e2b581f3beb692fd6a0fa9121c88d95216d4"
+    },
+    "RT05.aevpkg.zip.conversion-report.json": {
+      "bytes": 929,
+      "sha256": "sha256:e63d5c5b2a887cec0c1cf2d6bca5ba2889c8c004846c7731cfe2a8f82677bb84"
+    },
+    "RT05.manifest.json": {
+      "bytes": 62886,
+      "sha256": "sha256:8e83df82fbcae40975385fe906e2c315dd9ca4891ee57e84533f50883a798b84"
+    },
+    "RT05.mkv": {
+      "bytes": 1503952,
+      "sha256": "sha256:4655ed0d931a6060b519db71717c738323f302f0f0be4ef2a5dbf78717b1f06a"
+    },
+    "RT05.mp4": {
+      "bytes": 78552,
+      "sha256": "sha256:5efc849a768161a83c2365b63d40c8ea2b985cd71089725532cd494fb2eb5a99"
+    },
+    "RT06-audio-reference.manifest.json": {
+      "bytes": 14974,
+      "sha256": "sha256:9dec648241e733fbe2e95c8ca0f6a44e7d57d4c3eba110787bdc67aa12f7527a"
+    },
+    "RT06-audio-reference.mkv": {
+      "bytes": 1383224,
+      "sha256": "sha256:093bdd3b80a0aa2b11ac3d00ec3f5f58342199dc4031c8f383d9e41edb304b0e"
+    },
+    "RT06-before.manifest.json": {
+      "bytes": 51074,
+      "sha256": "sha256:ae6dd9fa2c89bd713ea9a2b2a800cb4124820bb69fd1e299b02c74f0f83c89ef"
+    },
+    "RT06-before.mkv": {
+      "bytes": 1578882,
+      "sha256": "sha256:607b3221a1bac08d278db9bbc73069d89f5f605165436ee0cb97a10dfaac4f35"
+    },
+    "RT06-edit.json": {
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    "RT06-legacy-head-comparison.json": {
+      "bytes": 415,
+      "sha256": "sha256:93e81e89863a07c8a7c7d8e85fed30fa6f73357074732c0efcd501527ecbe3aa"
+    },
+    "RT06-native-tempo.json": {
+      "bytes": 571,
+      "sha256": "sha256:9f6d60cd36f4b49235171bfebfc95abdb97b5aa271b4ebd327478111279c47e6"
+    },
+    "RT06-probe.json": {
+      "bytes": 3206,
+      "sha256": "sha256:2a6c323fb77f9dd19f02f5cf54e50ee09e8f6e6d215dc68685b1ca2506696a71"
+    },
+    "RT06-restored.manifest.json": {
+      "bytes": 80155,
+      "sha256": "sha256:7ad82a9c3b52258c445801025317b9fefead16e8c536ffd74e5116346d0eb79b"
+    },
+    "RT06-restored.mkv": {
+      "bytes": 1384078,
+      "sha256": "sha256:6a21173a1db79de45d2d0665c3903310de31240c21ea52ca996977bc9d72c78f"
+    },
+    "RT06.aevpkg.zip": {
+      "bytes": 548664,
+      "sha256": "sha256:a92cf16c0be9b471c149906e9d2f09f72a6c3ebf936796d482abc45123ec0ac4"
+    },
+    "RT06.aevpkg.zip.conversion-report.json": {
+      "bytes": 929,
+      "sha256": "sha256:0e64000cf3bb07861fa0794c1856e4e59d0f698d5ca2457e9092d57062c382c5"
+    },
+    "RT06.manifest.json": {
+      "bytes": 80071,
+      "sha256": "sha256:34b2d3300c60aa64cab42becdee9261ff56ce10f1b0e112577910ab96d496684"
+    },
+    "RT06.mkv": {
+      "bytes": 1384078,
+      "sha256": "sha256:3e2e58e77c79d4d33ec0228ad1fd19e0a9240a86a3886acd7bb618a988eae29d"
+    },
+    "RT06.mp4": {
+      "bytes": 27991,
+      "sha256": "sha256:a83588369860e3ca8dc1c8c0b0e3c164cecb406c71a573c24117352f7791ed77"
+    },
+    "RT07-first-edit.json": {
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    "RT07-probe.json": {
+      "bytes": 3206,
+      "sha256": "sha256:ea38f66971a489508de6b5a52a3e494f94b11cd094354fbe774ad00ce8cb3001"
+    },
+    "RT07-second-compose.json": {
+      "bytes": 137,
+      "sha256": "sha256:1bb8cb02a048b452ee32d2e67a3dacf6a99279efc4145758ad445ae48932743b"
+    },
+    "RT07.aevpkg.zip": {
+      "bytes": 548755,
+      "sha256": "sha256:91cbfb1e0ef6815d02873abef687fbac7e53ab72f145f3800e657ed97553494c"
+    },
+    "RT07.aevpkg.zip.conversion-report.json": {
+      "bytes": 929,
+      "sha256": "sha256:4133ece9f2cd94d3a8d7861e03bf62ff32c043192341a59b4fc73f3593bcd5d5"
+    },
+    "RT07.manifest.json": {
+      "bytes": 65888,
+      "sha256": "sha256:bb4912618e7f2c5af2cea946602dca6d63ee5f94f73dfb2268a914391caab6fe"
+    },
+    "RT07.mkv": {
+      "bytes": 1578513,
+      "sha256": "sha256:efefdf0355a8cde62325522635589b2c4907044aa555a71065d9b7bf95752117"
+    },
+    "RT07.mp4": {
+      "bytes": 75859,
+      "sha256": "sha256:f883ebc77ac3292026191f1b7d5fa2eb9455c90f57317db176f1bd2d0aece293"
+    },
+    "RT08-B-native-tempo.json": {
+      "bytes": 571,
+      "sha256": "sha256:9423ea32cb18f973067648fd40df3cf334f4197fb2b238f3722fc05b7a87768e"
+    },
+    "RT08-D-native-tempo.json": {
+      "bytes": 571,
+      "sha256": "sha256:a58fc85821322ceea820b0039aebe9ba529cfaa72c0ca66947c0edaaf847a7d6"
+    },
+    "RT08-edit.json": {
+      "bytes": 128,
+      "sha256": "sha256:bba28357ddfc1c19d8ca032125f97b2d7f2b598f718beaa8332bf15c3991ae7c"
+    },
+    "RT08-probe.json": {
+      "bytes": 3206,
+      "sha256": "sha256:e43db9b813838856f95932f3bbb53c813803cc6589cb735272a1a8465b81d3c2"
+    },
+    "RT08.aevpkg.zip": {
+      "bytes": 548289,
+      "sha256": "sha256:510b75ad566ba3bf4f805e93e3870cda0ecd864a73e84937de520f233207eb1a"
+    },
+    "RT08.aevpkg.zip.conversion-report.json": {
+      "bytes": 929,
+      "sha256": "sha256:92719a1e8e42666db67c8506d04fcfd692d63e9fbcc2e00b0b854a8882e543cf"
+    },
+    "RT08.manifest.json": {
+      "bytes": 94186,
+      "sha256": "sha256:4497093456f61451d0f0caac9a28c5ae3ba4b0b720621bf40e999141d603916f"
+    },
+    "RT08.mkv": {
+      "bytes": 1189284,
+      "sha256": "sha256:af1ac073da32b0804e5f1411718a8bfb2eb6e09fa9931589a8d2b06e79ba3899"
+    },
+    "RT08.mp4": {
+      "bytes": 63197,
+      "sha256": "sha256:b0f7e1a134cc00d331581c2f7233df4e2e294012f395216085c3303b7d2c3c41"
+    },
+    "RT09-before.manifest.json": {
+      "bytes": 20107,
+      "sha256": "sha256:e064db14324edb88484b428d6c2ea9791b46c72aa4f8040632edcfaeca22158b"
+    },
+    "RT09-before.mkv": {
+      "bytes": 1419971,
+      "sha256": "sha256:bd396735eec94c354014e7b525e078399f621d7584a95d049bb7626f823bae52"
+    },
+    "RT09-edit.json": {
+      "bytes": 91,
+      "sha256": "sha256:0a517c38080c70a81e139e1a00f7f12e327576f728f1e4d5a5d270d6d8f3ae25"
+    },
+    "RT09-probe.json": {
+      "bytes": 3206,
+      "sha256": "sha256:d64099ac80f8c8ea9454fa9def5a77fefffaeff4377632a7896b2e79f30e2b4b"
+    },
+    "RT09.aevpkg.zip": {
+      "bytes": 548388,
+      "sha256": "sha256:66abef8d8aeef86376730ebef4ae64ef285a6b74333ac99e92fcc90366dce152"
+    },
+    "RT09.aevpkg.zip.conversion-report.json": {
+      "bytes": 929,
+      "sha256": "sha256:d62d9a3b50d2f3d432777fb745e6f38d19a8f68462365244dd5171bb6607d533"
+    },
+    "RT09.manifest.json": {
+      "bytes": 40952,
+      "sha256": "sha256:dfd68f891b84f95579d2f4a4c3c8cb0c6a5c1d5367e63b7c7895703cdccc6455"
+    },
+    "RT09.mkv": {
+      "bytes": 1303275,
+      "sha256": "sha256:27f87a9a6377ced17b49a65a526136cf5dc4f96d9376b075ffe7fa221005cb86"
+    },
+    "RT09.mp4": {
+      "bytes": 68394,
+      "sha256": "sha256:7452646d76e02eee52103016dd97647c12143cc84c81b7391df08f60d6c78c01"
+    },
+    "source-preview.mp4": {
+      "bytes": 122367,
+      "sha256": "sha256:c01a14a0bc41acc26530bf5fe0e6819013b05eca9d5cb0e1d12e51bbef69c5e8"
+    },
+    "source-provenance.json": {
+      "bytes": 695,
+      "sha256": "sha256:1bc67abfc2d075fe457ae7f9cda431afabe25fc846f406658fc768d8a9ef80ac"
+    },
+    "source.mkv": {
+      "bytes": 58854,
+      "sha256": "sha256:b929f6ea84ef3c28385af581ecb1fce8eca2a11c41724ea498a7d24e90c3b45c"
+    },
+    "source.wav": {
+      "bytes": 1152044,
+      "sha256": "sha256:73253ce20fbfe6d0b3cafd4a983749b22b2391e54f582a15aa19cbff2011bf46"
+    },
+    "verification.json": {
+      "bytes": 112742,
+      "sha256": "sha256:177ae016d2807c679aedb476accf8c89b0360ce6546df4eab81e0fbaa3e7a696"
+    }
+  },
+  "suite_receipt_sha256": "sha256:4637b22b0992639a5766474684b0aeb41e9e6b54533bd2e68952c0176a6e81d6",
+  "native_receipt_sha256": "sha256:78238ea8b7f45e9d26c8fe8d2762e17ca55aa8a17de587dc321a6115afd80ada",
+  "media_receipt_sha256": "sha256:f54b1a5e6743c1d885437c575a2fe9297c69f93d13f039f648349cd94bdfecea",
+  "static_review_sha256": "sha256:4c13ca1263cef1dd669d53bf189e305ae233a69391695cae22450ee2f14515ed",
+  "preserved_development_index_sha256": "sha256:7ac97c45fbd5d269cc9daf72c392327e631979381389759fe87499bdcf2021de",
+  "full_capcut_parity_accepted": false,
+  "other_machine_accepted": false,
+  "natural_audio_accepted": false
+}

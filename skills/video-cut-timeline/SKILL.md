@@ -22,6 +22,21 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+For relative retiming of the current complete visible output, read the
+[complete output retime contract](../../docs/specs/完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md).
+Use `timeline edit` action `retime` with `clip_ids`, `transform` and optional
+`options` / `sync_content`; compose `retime_clip` joins an atomic batch.
+Speed/curve/reverse/freeze runs after original windows, animation and buses.
+Main durations ripple; intersecting links share the complete host clock.
+Continuous unlinked BGM defaults to unchanged-speed ripple; explicit
+`sync_content: retime` warps its intersecting body. Review the editable child
+sequences and before/body/after spans. Animated external blend, tracking and
+direct transition endpoints reject. Root markers and bus points stay absolute.
+Nested native audio preserves hold knots and merges adjacent equal tempos;
+its terminal source end differs from the legacy constant file path's head
+selection. Keep natural quality separate from the
+[actual frames, PCM and failure evidence](../../docs/validation/完整作者输出变速与磁吸联动实测_2026-10-19.md).
+
 For persistent main-track editing, read the
 [magnetic mode contract](../../docs/specs/主轨磁吸模式与跨剪口同步拆分契约_v0.1_2026-10-18.md).
 `timeline edit` with `{action: "magnet", enabled: true}` packs existing gaps
@@ -37,8 +52,8 @@ main links keep their explicit host. Linked side cohorts share cut regions
 and fresh later link IDs. Locked members, transition endpoints and tracking
 references reject automatic splitting. Keep detector/nonlinear lane protections.
 Saving a partial magnetic fragment expands the full sequence and reports it.
-Other speed/curve/freeze edits must still satisfy the gapless main invariant;
-automatic duration following and GUI gestures remain open. Markers and sequence
+Absolute author speed/curve/freeze setters must still satisfy the main invariant;
+use the relative retime planner above for automatic following. GUI gestures remain open. Markers and sequence
 automation stay absolute. Read the
 [actual media, fragment failure and installed checks](../../docs/validation/主轨磁吸模式与跨剪口同步拆分实测_2026-10-18.md).
 

@@ -1,5 +1,9 @@
 # Agent CLI 契约 v0.1
 
+<!-- V57-CURRENT -->
+2026-10-19 **V57（产品）**：完整作者输出的相对变速、曲线、反向、定格与主轨自动随动，保留可编辑作者子序列；局部关联音画共用宿主时钟，连续 BGM 可选保持速度波纹或显式变速。**1329/1329、2092.274 秒、0 跳过、184 文件冻结**；40 新增专项、66 旧磁吸集成为完整子集，不叠加。**62 CLI /344 主帧 /1,651,200 立体声采样帧**，RGB 最大差 1、PCM 0；**123 包内文件 /51 隔离 CLI /454 安装帧 /2,179,200 采样帧**；**14 Skills /202 引用**。原曲线 PCM 失败已修复；文件头部与总线尾部选样参考分开，开发失败全数保留。未连续播放/听审、自然质量、动态外部 blend、全手势、长片/HDR、另一台机器及完整剪映等价未验收。[契约](完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md)、[原输入/MP4/GIF/失败/发行](../validation/完整作者输出变速与磁吸联动实测_2026-10-19.md)。
+<!-- /V57-CURRENT -->
+
 V56 调用示例（JSON 请求交给现有 `timeline edit --input <本地文件>`）：
 
 ```json
@@ -76,7 +80,8 @@ CLI 不会自动下载模型、素材、插件或字体。需要本地模型时�
 
 | 命令 | 主要输入 | 主要输出和副作用 |
 |---|---|---|
-| `timeline edit --project PATH --input REQUEST [--sequence-id ID] [--expected-project-sha256 SHA]` | link/unlink/remove/close_gap/close_gaps/shift 的整数 tick JSON 请求 | dry-run 只返回计划/候选校验；正式执行创建 before-timeline-edit 快照，在原事务中保存/记录；摘要过期拒绝，幂等重放不重复修改 |
+| `timeline edit --project PATH --input REQUEST [--sequence-id ID] [--expected-project-sha256 SHA]` | 关联、闭隙/shift、范围 insert/overwrite/lift/extract/roll/slide、源 slip/extend_source、reorder/magnet、完整输出 retime 的整数 tick JSON 请求 | dry-run 只返回计划/候选校验；正式执行创建 before-timeline-edit 快照，在原事务中保存/记录；摘要过期拒绝，幂等重放不重复修改 |
+| `timeline edit` 的 `action: retime` / compose 的 `op: retime_clip` | clip_ids（compose 可用 clip_id）、transform、options、sync_content | 对当前完整可见作者输出变速；保留可编辑子序列，主轨时长自动随动。与原绝对源参数入口不同，见[完整输出契约](./完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md) |
 | `project init PATH` | 项目目录、名称和可选 ID | 创建 `project.json`、`rights-ledger.json`、`project.lock.json`、`operations/project-write.lock`、`assets/`、`renders/`、`validation/`、`history/` 等目录 |
 | `project inspect --project PATH` | 项目目录 | 项目摘要、资产/序列计数、schema 和能力提示 |
 | `project snapshot --project PATH [--label LABEL]` | 当前项目 | 在 `history/` 写入自包含项目、Rights Ledger 和锁文件快照 |
@@ -182,7 +187,9 @@ v2 适配器执行 `media track` 时必须显式选择 `--object-id ID` 或 `--a
 
 时间使用项目 `settings.timebase.ticks_per_second`。关键帧和 `split_clip.at_tick` 是片段内时间；`ripple_insert/ripple_delete.at_tick` 是所选序列时间，不能混用。关键帧必须单调递增，插值可用 `hold`、`linear`、`ease_in`、`ease_out`、`ease_in_out` 或带合法控制点的 `bezier`。
 
-`timeline compose` 变更集支持 `append_clip`、`update_clip`、`remove_clip`、`split_clip`、`trim_clip`、`ripple_insert`、`ripple_delete`、`slip_clip`、`slide_clip`、`set_clip_speed`、`set_clip_speed_curve`、`reverse_clip`、`freeze_frame`、`add_sequence`、`update_sequence`、`append_sequence_clip`、轨道增删改、标记增删和序列时长调整。任何变更保存前都会重新执行 Schema、引用、时间范围、嵌套循环和 Rights 语义校验。
+`timeline compose` 变更集支持 `append_clip`、`update_clip`、`remove_clip`、`split_clip`、`trim_clip`、`ripple_insert`、`ripple_delete`、`slip_clip`、`slide_clip`、`set_clip_speed`、`set_clip_speed_curve`、`reverse_clip`、`freeze_frame`、`retime_clip`、`linked_edit`、`source_transition`、`add_sequence`、`update_sequence`、`append_sequence_clip`、轨道增删改、标记增删和序列时长调整。任何变更保存前都会重新执行 Schema、引用、时间范围、嵌套循环和 Rights 语义校验。
+
+V57 当前完整输出变速示例：`{"action":"retime","clip_ids":["b"],"transform":{"speed":2},"sync_content":"ripple"}`。`transform` 可包含 speed、speed_curve、reverse、freeze；原可见窗/字幕/动画/总线先完成，再接受新时钟。主轨多选从后向前处理；关联局部成员按共同宿主时钟分段。其它连续同步 BGM 默认保持自身速度波纹调整，可显式 retime。根标记和总线自动化维持绝对时钟，缩短后越界拒绝。动态外部 blend-opacity、跟踪引用和真实转场端点的直接包装拒绝。声音尾部选样规则与自然质量范围见[实际音画和失败](../validation/完整作者输出变速与磁吸联动实测_2026-10-19.md)。
 
 V38 的拆分、内部波纹插删和 `trim_clip` 使用持久 `presentation_window`：保留完整作者处理，随后选取可见区间。`trim_clip.start_tick/end_tick` 相对当前可见片段，默认新落点为旧落点加 start，可用 `timeline_start_tick` 显式重新放置；不是源范围外扩或完整磁吸。旧关键帧仍在完整作者轴上，运镜预设的可见局部范围在写入时加窗口 offset。部分窗口的高层速度/倒放/定格、跟踪、智能剪辑及受影响转场有明确拒绝，详见[输出窗口契约](./片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md)及[实测边界](../validation/输出窗口裁切与作者时钟实测_2026-10-18.md)。
 

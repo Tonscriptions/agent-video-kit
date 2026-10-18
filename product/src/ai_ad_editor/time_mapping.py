@@ -174,15 +174,33 @@ def audio_windows(mappings, source_start: float, source_end: float):
     count = max(1, int(math.ceil((source_end - source_start) * 8)))
     if count > 16384:
         raise ValueError('nested audio mapping exceeds 16384 tempo windows')
+    cuts = {source_start + (source_end-source_start)*i/count for i in range(count+1)}
+    # Preserve every authored speed knot in the original source clock. A
+    # uniform sample interval may straddle a hold discontinuity; averaging it
+    # moves content and unnecessarily restarts the native tempo processor.
+    for index, mapping in enumerate(mappings):
+        for segment in mapping['segments']:
+            for local in segment[:2]:
+                knot = compose_time(mappings[:index], mapping['source_start']+local, inverse=True)
+                if source_start+1e-10 < knot < source_end-1e-10:
+                    cuts.add(knot)
+    cuts = sorted(cuts)
+    if len(cuts)-1 > 16384:
+        raise ValueError('nested audio mapping exceeds 16384 tempo windows')
     base = compose_time(mappings, source_start)
     parts = []
-    for index in range(count):
-        left = source_start + (source_end - source_start) * index / count
-        right = source_start + (source_end - source_start) * (index + 1) / count
+    for left, right in zip(cuts,cuts[1:]):
+        if right-left < 1e-10:
+            continue
         output_left = compose_time(mappings, left)
         output_right = compose_time(mappings, right)
         duration = abs(output_right - output_left)
         if duration * 48000 < 1:
             raise ValueError('nested audio tempo window is shorter than one 48 kHz sample')
-        parts.append((left - source_start, right - source_start, (right - left) / duration, abs(output_right - base)))
+        part = (left-source_start,right-source_start,(right-left)/duration,abs(output_right-base))
+        if parts and math.isclose(parts[-1][2],part[2],rel_tol=1e-10,abs_tol=1e-12):
+            first = parts.pop()[0]
+            elapsed = abs(output_right-compose_time(mappings,source_start+first))
+            part = (first,right-source_start,(right-source_start-first)/elapsed,abs(output_right-base))
+        parts.append(part)
     return parts

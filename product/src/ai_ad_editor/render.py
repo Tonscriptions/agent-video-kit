@@ -2273,6 +2273,7 @@ def _flatten_sequence_tracks(
     """
     sequences = {str(item.get("id")): item for item in project.get("sequences", []) if item.get("id")}
     inline_asset_ids = {a['id'] for a in project.get('assets', []) if a.get('_inline_video')}
+    inline_audio_asset_ids = {a['id'] for a in project.get('assets', []) if a.get('_inline_audio')}
     collected: dict[tuple[str, str], dict[str, Any]] = {}
 
     def transform_values(raw: Any) -> dict[str, float]:
@@ -2631,7 +2632,9 @@ def _flatten_sequence_tracks(
                         parent_context["dynamic_layers"] = global_layers
                         parent_context["keyframes_are_global"] = True
                     child_windows: list[tuple[int, int]] = [(child_source_in, child_source_out)]
-                    if speed_segments and not getattr(speed_segments, 'certificate', {}).get('adaptive'):
+                    complete_surface = any(c.get('asset_id') in inline_audio_asset_ids
+                        for t in child.get('tracks', []) for c in t.get('clips', []))
+                    if speed_segments and not getattr(speed_segments, 'certificate', {}).get('adaptive') and not complete_surface:
                         tps_local = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", 90000))
                         split_windows: list[tuple[int, int]] = []
                         for segment_start, segment_end, _, _ in speed_segments:

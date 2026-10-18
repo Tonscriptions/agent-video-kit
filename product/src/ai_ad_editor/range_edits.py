@@ -129,13 +129,14 @@ def normalize(sequence, request):
 
 
 class RangeDraft:
-    def __init__(self, project, sequence_id, request):
+    def __init__(self, project, sequence_id, request, *, temporal_options=None):
         self.project = copy.deepcopy(project)
         self.sequence = next((s for s in self.project['sequences'] if s['id'] == sequence_id), None)
         if self.sequence is None:
             fail('EDIT_SEQUENCE_NOT_FOUND', '找不到编辑序列')
         self.original = copy.deepcopy(self.sequence)
-        self.request = normalize(self.sequence, request)
+        self.request = (normalize(self.sequence, request) if temporal_options is None else
+                        {'action':'retime','options':copy.deepcopy(temporal_options)})
         self.options = self.request['options']
         self.before = {c['id']: (t, c) for t in self.original['tracks'] for c in t['clips']}
         self.tracks = {t['id']: t for t in self.sequence['tracks']}

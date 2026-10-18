@@ -5171,6 +5171,14 @@ def command_timeline_compose(args: argparse.Namespace) -> dict[str, Any]:
                 clip["timeline_start_tick"] = new_start
                 _recompute_sequence_duration(target_sequence)
             applied.append(item)
+        elif operation == 'retime_clip':
+            target_sequence = find_sequence(working, change.get('sequence_id') or sequence['id'])
+            if set(change)-{'op','sequence_id','clip_id','clip_ids','transform','options','sync_content'} or ('clip_id' in change and 'clip_ids' in change):
+                raise argument_error('retime_clip 需要 clip_id 或 clip_ids，以及 transform/options/sync_content')
+            query = {k:copy.deepcopy(v) for k,v in change.items() if k in {'transform','options','sync_content'}}
+            query.update(action='retime',clip_ids=change.get('clip_ids',[change.get('clip_id')]))
+            working, plan = build_edit_plan(working,target_sequence['id'],query)
+            applied.append({'op':operation,'plan':plan})
         elif operation == "set_clip_speed":
             target_sequence = find_sequence(working, change.get("sequence_id") or sequence["id"])
             track, clip = _find_clip(target_sequence, str(change.get("clip_id") or change.get("id") or ""), change.get("track_id"))

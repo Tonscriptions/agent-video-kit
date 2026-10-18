@@ -1,0 +1,792 @@
+{
+  "ok": true,
+  "command": "timeline.edit",
+  "request_id": "req_20261018162245_41d1191c",
+  "operation_id": "op_20261018162245_7e4a5911",
+  "status": "succeeded",
+  "data": {
+    "sequence_id": "seq_main",
+    "plan": {
+      "engine": "agent-complete-output-retime-v1",
+      "base_project_sha256": "sha256:05a0dfc208b133862271329a9efd88f0d53ead9abc9f6049704974a5bd0c2530",
+      "sequence_id": "seq_main",
+      "request": {
+        "action": "retime",
+        "clip_ids": [
+          "b"
+        ],
+        "transform": {
+          "freeze": {
+            "at_tick": 45000,
+            "duration_tick": 27000,
+            "audio_mode": "silence"
+          }
+        },
+        "options": {
+          "main_track_id": "shots",
+          "sync": true,
+          "linkage": false,
+          "linked": true,
+          "magnetic": true
+        },
+        "sync_content": "ripple"
+      },
+      "expanded_clip_ids": [
+        "b"
+      ],
+      "before_duration_tick": 360000,
+      "after_duration_tick": 387000,
+      "short_tick": 0,
+      "steps": [
+        {
+          "host_clip_id": "b",
+          "track_id": "shots",
+          "is_main": true,
+          "clock": {
+            "input_duration_tick": 90000,
+            "content_duration_tick": 90000,
+            "output_duration_tick": 117000,
+            "transform": {
+              "freeze": {
+                "at_tick": 45000,
+                "duration_tick": 27000,
+                "audio_mode": "silence"
+              }
+            },
+            "curve_compilation": {},
+            "freeze_hold_frame_tick": 36000.0,
+            "interval_clock": "shared-compiled-host-output-clock-rounded-to-integer-ticks"
+          },
+          "delta_tick": 27000,
+          "retimed_members": [
+            {
+              "original_clip_id": "music",
+              "clip_id": "music_retimed",
+              "sequence_id": "music_retimed_author_sequence",
+              "author_clip_id": "music_retimed_author",
+              "original_range_tick": [
+                90000,
+                180000
+              ],
+              "output_range_tick": [
+                90000,
+                207000
+              ],
+              "host_original_range_tick": [
+                90000,
+                180000
+              ],
+              "source_author_preserved": true,
+              "external_blend_retained": null
+            },
+            {
+              "original_clip_id": "b",
+              "clip_id": "b",
+              "sequence_id": "b_author_sequence",
+              "author_clip_id": "b_author",
+              "original_range_tick": [
+                90000,
+                180000
+              ],
+              "output_range_tick": [
+                90000,
+                207000
+              ],
+              "host_original_range_tick": [
+                90000,
+                180000
+              ],
+              "source_author_preserved": true,
+              "external_blend_retained": null
+            },
+            {
+              "original_clip_id": "words",
+              "clip_id": "words_retimed",
+              "sequence_id": "words_retimed_author_sequence",
+              "author_clip_id": "words_retimed_author",
+              "original_range_tick": [
+                90000,
+                180000
+              ],
+              "output_range_tick": [
+                90000,
+                207000
+              ],
+              "host_original_range_tick": [
+                90000,
+                180000
+              ],
+              "source_author_preserved": true,
+              "external_blend_retained": null
+            }
+          ],
+          "new_tracks": [],
+          "changes": [
+            {
+              "clip_id": "b",
+              "before": {
+                "track_id": "shots",
+                "clip": {
+                  "id": "b",
+                  "asset_id": "frames",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 180000,
+                  "source_out_tick": 270000,
+                  "link_id": "pair"
+                }
+              },
+              "after": {
+                "track_id": "shots",
+                "clip": {
+                  "id": "b",
+                  "sequence_id": "b_author_sequence",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 117000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 180000,
+                  "freeze": {
+                    "at_tick": 45000,
+                    "duration_tick": 27000,
+                    "audio_mode": "silence"
+                  },
+                  "link_id": "pair"
+                }
+              }
+            },
+            {
+              "clip_id": "c",
+              "before": {
+                "track_id": "shots",
+                "clip": {
+                  "id": "c",
+                  "asset_id": "frames",
+                  "timeline_start_tick": 180000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 270000,
+                  "source_out_tick": 360000
+                }
+              },
+              "after": {
+                "track_id": "shots",
+                "clip": {
+                  "id": "c",
+                  "asset_id": "frames",
+                  "timeline_start_tick": 207000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 270000,
+                  "source_out_tick": 360000
+                }
+              }
+            },
+            {
+              "clip_id": "d",
+              "before": {
+                "track_id": "shots",
+                "clip": {
+                  "id": "d",
+                  "asset_id": "frames",
+                  "timeline_start_tick": 270000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 360000,
+                  "source_out_tick": 450000
+                }
+              },
+              "after": {
+                "track_id": "shots",
+                "clip": {
+                  "id": "d",
+                  "asset_id": "frames",
+                  "timeline_start_tick": 297000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 360000,
+                  "source_out_tick": 450000
+                }
+              }
+            },
+            {
+              "clip_id": "music",
+              "before": {
+                "track_id": "stem",
+                "clip": {
+                  "id": "music",
+                  "asset_id": "sound",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 360000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 450000,
+                  "link_id": "pair"
+                }
+              },
+              "after": {
+                "track_id": "stem",
+                "clip": {
+                  "id": "music",
+                  "asset_id": "sound",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 90000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 450000,
+                  "link_id": "pair",
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 0
+                  }
+                }
+              }
+            },
+            {
+              "clip_id": "words",
+              "before": {
+                "track_id": "sub",
+                "clip": {
+                  "id": "words",
+                  "asset_id": "captions",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 360000,
+                  "source_in_tick": 0,
+                  "source_out_tick": 360000,
+                  "link_id": "pair",
+                  "subtitle": {
+                    "style": {
+                      "font_asset_id": "font",
+                      "fontsize": 64,
+                      "position": "center"
+                    }
+                  }
+                }
+              },
+              "after": {
+                "track_id": "sub",
+                "clip": {
+                  "id": "words",
+                  "asset_id": "captions",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 90000,
+                  "source_in_tick": 0,
+                  "source_out_tick": 360000,
+                  "link_id": "pair",
+                  "subtitle": {
+                    "style": {
+                      "font_asset_id": "font",
+                      "fontsize": 64,
+                      "position": "center"
+                    }
+                  },
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 0
+                  }
+                }
+              }
+            },
+            {
+              "clip_id": "music_retimed",
+              "before": null,
+              "after": {
+                "track_id": "stem",
+                "clip": {
+                  "id": "music_retimed",
+                  "sequence_id": "music_retimed_author_sequence",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 117000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 180000,
+                  "freeze": {
+                    "at_tick": 45000,
+                    "duration_tick": 27000,
+                    "audio_mode": "silence"
+                  },
+                  "link_id": "pair"
+                }
+              }
+            },
+            {
+              "clip_id": "music_after",
+              "before": null,
+              "after": {
+                "track_id": "stem",
+                "clip": {
+                  "id": "music_after",
+                  "asset_id": "sound",
+                  "timeline_start_tick": 207000,
+                  "duration_tick": 180000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 450000,
+                  "link_id": "pair",
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 180000
+                  }
+                }
+              }
+            },
+            {
+              "clip_id": "words_retimed",
+              "before": null,
+              "after": {
+                "track_id": "sub",
+                "clip": {
+                  "id": "words_retimed",
+                  "sequence_id": "words_retimed_author_sequence",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 117000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 180000,
+                  "freeze": {
+                    "at_tick": 45000,
+                    "duration_tick": 27000,
+                    "audio_mode": "silence"
+                  },
+                  "link_id": "pair"
+                }
+              }
+            },
+            {
+              "clip_id": "words_after",
+              "before": null,
+              "after": {
+                "track_id": "sub",
+                "clip": {
+                  "id": "words_after",
+                  "asset_id": "captions",
+                  "timeline_start_tick": 207000,
+                  "duration_tick": 180000,
+                  "source_in_tick": 0,
+                  "source_out_tick": 360000,
+                  "link_id": "pair",
+                  "subtitle": {
+                    "style": {
+                      "font_asset_id": "font",
+                      "fontsize": 64,
+                      "position": "center"
+                    }
+                  },
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 180000
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "changes": [
+        {
+          "clip_id": "b",
+          "before": {
+            "track_id": "shots",
+            "clip": {
+              "id": "b",
+              "asset_id": "frames",
+              "timeline_start_tick": 90000,
+              "duration_tick": 90000,
+              "source_in_tick": 180000,
+              "source_out_tick": 270000,
+              "link_id": "pair"
+            }
+          },
+          "after": {
+            "track_id": "shots",
+            "clip": {
+              "id": "b",
+              "sequence_id": "b_author_sequence",
+              "timeline_start_tick": 90000,
+              "duration_tick": 117000,
+              "source_in_tick": 90000,
+              "source_out_tick": 180000,
+              "freeze": {
+                "at_tick": 45000,
+                "duration_tick": 27000,
+                "audio_mode": "silence"
+              },
+              "link_id": "pair"
+            }
+          }
+        },
+        {
+          "clip_id": "c",
+          "before": {
+            "track_id": "shots",
+            "clip": {
+              "id": "c",
+              "asset_id": "frames",
+              "timeline_start_tick": 180000,
+              "duration_tick": 90000,
+              "source_in_tick": 270000,
+              "source_out_tick": 360000
+            }
+          },
+          "after": {
+            "track_id": "shots",
+            "clip": {
+              "id": "c",
+              "asset_id": "frames",
+              "timeline_start_tick": 207000,
+              "duration_tick": 90000,
+              "source_in_tick": 270000,
+              "source_out_tick": 360000
+            }
+          }
+        },
+        {
+          "clip_id": "d",
+          "before": {
+            "track_id": "shots",
+            "clip": {
+              "id": "d",
+              "asset_id": "frames",
+              "timeline_start_tick": 270000,
+              "duration_tick": 90000,
+              "source_in_tick": 360000,
+              "source_out_tick": 450000
+            }
+          },
+          "after": {
+            "track_id": "shots",
+            "clip": {
+              "id": "d",
+              "asset_id": "frames",
+              "timeline_start_tick": 297000,
+              "duration_tick": 90000,
+              "source_in_tick": 360000,
+              "source_out_tick": 450000
+            }
+          }
+        },
+        {
+          "clip_id": "music",
+          "before": {
+            "track_id": "stem",
+            "clip": {
+              "id": "music",
+              "asset_id": "sound",
+              "timeline_start_tick": 0,
+              "duration_tick": 360000,
+              "source_in_tick": 90000,
+              "source_out_tick": 450000,
+              "link_id": "pair"
+            }
+          },
+          "after": {
+            "track_id": "stem",
+            "clip": {
+              "id": "music",
+              "asset_id": "sound",
+              "timeline_start_tick": 0,
+              "duration_tick": 90000,
+              "source_in_tick": 90000,
+              "source_out_tick": 450000,
+              "link_id": "pair",
+              "presentation_window": {
+                "version": 1,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 360000,
+                "offset_tick": 0
+              }
+            }
+          }
+        },
+        {
+          "clip_id": "words",
+          "before": {
+            "track_id": "sub",
+            "clip": {
+              "id": "words",
+              "asset_id": "captions",
+              "timeline_start_tick": 0,
+              "duration_tick": 360000,
+              "source_in_tick": 0,
+              "source_out_tick": 360000,
+              "link_id": "pair",
+              "subtitle": {
+                "style": {
+                  "font_asset_id": "font",
+                  "fontsize": 64,
+                  "position": "center"
+                }
+              }
+            }
+          },
+          "after": {
+            "track_id": "sub",
+            "clip": {
+              "id": "words",
+              "asset_id": "captions",
+              "timeline_start_tick": 0,
+              "duration_tick": 90000,
+              "source_in_tick": 0,
+              "source_out_tick": 360000,
+              "link_id": "pair",
+              "subtitle": {
+                "style": {
+                  "font_asset_id": "font",
+                  "fontsize": 64,
+                  "position": "center"
+                }
+              },
+              "presentation_window": {
+                "version": 1,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 360000,
+                "offset_tick": 0
+              }
+            }
+          }
+        },
+        {
+          "clip_id": "music_retimed",
+          "before": null,
+          "after": {
+            "track_id": "stem",
+            "clip": {
+              "id": "music_retimed",
+              "sequence_id": "music_retimed_author_sequence",
+              "timeline_start_tick": 90000,
+              "duration_tick": 117000,
+              "source_in_tick": 90000,
+              "source_out_tick": 180000,
+              "freeze": {
+                "at_tick": 45000,
+                "duration_tick": 27000,
+                "audio_mode": "silence"
+              },
+              "link_id": "pair"
+            }
+          }
+        },
+        {
+          "clip_id": "music_after",
+          "before": null,
+          "after": {
+            "track_id": "stem",
+            "clip": {
+              "id": "music_after",
+              "asset_id": "sound",
+              "timeline_start_tick": 207000,
+              "duration_tick": 180000,
+              "source_in_tick": 90000,
+              "source_out_tick": 450000,
+              "link_id": "pair",
+              "presentation_window": {
+                "version": 1,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 360000,
+                "offset_tick": 180000
+              }
+            }
+          }
+        },
+        {
+          "clip_id": "words_retimed",
+          "before": null,
+          "after": {
+            "track_id": "sub",
+            "clip": {
+              "id": "words_retimed",
+              "sequence_id": "words_retimed_author_sequence",
+              "timeline_start_tick": 90000,
+              "duration_tick": 117000,
+              "source_in_tick": 90000,
+              "source_out_tick": 180000,
+              "freeze": {
+                "at_tick": 45000,
+                "duration_tick": 27000,
+                "audio_mode": "silence"
+              },
+              "link_id": "pair"
+            }
+          }
+        },
+        {
+          "clip_id": "words_after",
+          "before": null,
+          "after": {
+            "track_id": "sub",
+            "clip": {
+              "id": "words_after",
+              "asset_id": "captions",
+              "timeline_start_tick": 207000,
+              "duration_tick": 180000,
+              "source_in_tick": 0,
+              "source_out_tick": 360000,
+              "link_id": "pair",
+              "subtitle": {
+                "style": {
+                  "font_asset_id": "font",
+                  "fontsize": 64,
+                  "position": "center"
+                }
+              },
+              "presentation_window": {
+                "version": 1,
+                "authored_start_tick": 0,
+                "authored_duration_tick": 360000,
+                "offset_tick": 180000
+              }
+            }
+          }
+        }
+      ],
+      "created_sequences": [
+        {
+          "id": "music_retimed_author_sequence",
+          "name": "Original authored music",
+          "duration_tick": 360000,
+          "canvas": {
+            "width": 160,
+            "height": 64
+          },
+          "tracks": [
+            {
+              "id": "music_retimed_author_track",
+              "kind": "audio",
+              "order": 0,
+              "clips": [
+                {
+                  "id": "music_retimed_author",
+                  "asset_id": "sound",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 360000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 450000,
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 0
+                  }
+                }
+              ]
+            }
+          ],
+          "markers": []
+        },
+        {
+          "id": "b_author_sequence",
+          "name": "Original authored b",
+          "duration_tick": 180000,
+          "canvas": {
+            "width": 160,
+            "height": 64
+          },
+          "tracks": [
+            {
+              "id": "b_author_track",
+              "kind": "video",
+              "order": 0,
+              "clips": [
+                {
+                  "id": "b_author",
+                  "asset_id": "frames",
+                  "timeline_start_tick": 90000,
+                  "duration_tick": 90000,
+                  "source_in_tick": 180000,
+                  "source_out_tick": 270000,
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 90000,
+                    "authored_duration_tick": 90000,
+                    "offset_tick": 0
+                  }
+                }
+              ]
+            }
+          ],
+          "markers": []
+        },
+        {
+          "id": "words_retimed_author_sequence",
+          "name": "Original authored words",
+          "duration_tick": 360000,
+          "canvas": {
+            "width": 160,
+            "height": 64
+          },
+          "tracks": [
+            {
+              "id": "words_retimed_author_track",
+              "kind": "subtitle",
+              "order": 0,
+              "clips": [
+                {
+                  "id": "words_retimed_author",
+                  "asset_id": "captions",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 360000,
+                  "source_in_tick": 0,
+                  "source_out_tick": 360000,
+                  "subtitle": {
+                    "style": {
+                      "font_asset_id": "font",
+                      "fontsize": 64,
+                      "position": "center"
+                    }
+                  },
+                  "presentation_window": {
+                    "version": 1,
+                    "authored_start_tick": 0,
+                    "authored_duration_tick": 360000,
+                    "offset_tick": 0
+                  }
+                }
+              ]
+            }
+          ],
+          "markers": []
+        }
+      ],
+      "warnings": [],
+      "limits": [
+        "relative-complete-visible-output-not-absolute-source-speed",
+        "markers-and-root-automation-retain-absolute-clock",
+        "animated-external-blend-clock-not-yet-supported",
+        "existing-tracking-transition-and-nonlinear-lane-boundaries-retained"
+      ]
+    },
+    "validation": {
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "rights": {
+        "ok": true,
+        "target": "commercial_ad",
+        "checked": 4,
+        "required_records": 4,
+        "failures": [],
+        "warnings": [],
+        "disposition_decisions": [],
+        "effective_disposition_decisions": []
+      },
+      "schema_engine": "jsonschema",
+      "asset_count": 4,
+      "sequence_count": 4
+    },
+    "before_snapshot": {
+      "snapshot_id": "snap_20261018162245_5ae7592b",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\retime-smoke-release-20261019-v57\\RT04\\history\\snap_20261018162245_5ae7592b.json",
+      "label": "before-timeline-edit",
+      "created_at": "2026-10-18T16:22:45.164948Z"
+    }
+  },
+  "artifacts": [],
+  "warnings": [],
+  "errors": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "schema_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "started_at": "2026-10-18T16:22:45.183938Z",
+    "finished_at": "2026-10-18T16:22:45.183946Z",
+    "network": "disabled"
+  }
+}

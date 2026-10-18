@@ -421,6 +421,9 @@ def _plan_changes(before, after):
 
 def build_edit_plan(project: dict[str, Any], sequence_id: str, request: Any) -> tuple[dict[str, Any], dict[str, Any]]:
     """Return an isolated candidate plus a reviewable plan; never mutate input."""
+    if isinstance(request, dict) and request.get('action') == 'retime':
+        from .retime_edits import build_retime_plan
+        return build_retime_plan(project, sequence_id, request)
     from .magnetic_mode import maybe_plan
     magnetic = maybe_plan(project, sequence_id, request)
     if magnetic is not None:
