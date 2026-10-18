@@ -1,0 +1,14 @@
+Filter exposure
+  Adjust exposure of the video stream.
+    slice threading supported
+    Inputs:
+       #0: default (video)
+    Outputs:
+       #0: default (video)
+exposure AVOptions:
+   exposure          <float>      ..FV.....T. set the exposure correction (from -3 to 3) (default 0)
+   black             <float>      ..FV.....T. set the black level correction (from -1 to 1) (default 0)
+
+This filter has support for timeline through the 'enable' option.
+
+Exiting with exit code 0

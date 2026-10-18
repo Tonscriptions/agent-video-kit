@@ -1,0 +1,21 @@
+--- fixed/packages/openfilm/studio/ui/src/i18n/ko.ts
++++ head/packages/openfilm/studio/ui/src/i18n/ko.ts
+@@ -108,7 +108,7 @@
+       sync: { title: '편집기와 양방향 연결', body: '클립, 레이어, 화면 영역, 미디어 파일을 메시지에 넣으세요. 에이전트가 언급한 클립은 클릭 한 번으로 Studio의 해당 위치로 이동합니다.' },
+       live: { title: '변경 사항 실시간 반영', body: '모든 편집이 작성되는 즉시 화면과 타임라인에 나타납니다. 직접 다듬거나 버전 기록에서 되돌릴 수 있습니다.' },
+       drop: { title: '미디어는 끌어다 놓기만', body: '영상, 이미지, 사운드를 채팅에 끌어다 놓으면 바로 영상 폴더에 들어가 쓸 수 있습니다.' },
+-      agents: { title: '주요 에이전트를 자유롭게 전환', body: 'Claude Code, Codex, Gemini CLI, Copilot, Cursor 등 컴퓨터에 있는 에이전트를 자동으로 찾습니다. 채팅에서 바꾸거나 내 API 키를 쓸 수 있습니다.' },
++      agents: { title: '주요 에이전트를 자유롭게 전환', body: 'Claude Code, Codex, Copilot, Cursor 등 컴퓨터에 있는 에이전트를 자동으로 찾습니다. 채팅에서 바꾸거나 내 API 키를 쓸 수 있습니다.' },
+       speed: { title: '더 빠른 미리보기와 내보내기', body: '고정된 렌더링 엔진으로 재생이 부드럽고, 하드웨어 비디오 인코더가 있으면 내보내기에 사용합니다.' },
+       setup: { title: '터미널도, 의존성 관리도 필요 없음', body: 'Node, npm, 패키지 버전을 관리할 필요가 없습니다. ffmpeg와 렌더러가 내장되어 Studio와 함께 테스트되었습니다.' },
+       updates: { title: '항상 최신 상태', body: '업데이트는 백그라운드에서 받아 재시작할 때 설치되며, 내보내기나 답변 도중에는 끼어들지 않습니다.' },
+@@ -1567,6 +1567,9 @@
+       effortStart: '시작 강도',
+       effortHint: '이 모델이 지원하는 추론 강도를 체크하세요. 채팅에는 체크한 것만 나옵니다. "자동"은 아무것도 보내지 않고 서비스에 맡깁니다.',
+       effortLevels: { auto: '자동', off: '끔', minimal: '최소', low: '낮음', medium: '중간', high: '높음', xhigh: '매우 높음', max: '최대' },
++      context: '컨텍스트 길이',
++      contextHint: '토큰 수입니다. 모델 서비스 문서에 나온 값을 입력하세요. 비워 두면 128K입니다.',
++      contextBad: '32,000~10,000,000 사이의 토큰 수를 정수로 입력하세요.',
+       key: 'API 키',
+       keyPlaceholder: 'API 키 붙여넣기',
+       keyKept: '{last4}(으)로 끝나는 키(유지하려면 비워 두세요)',

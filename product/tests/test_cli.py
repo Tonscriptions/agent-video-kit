@@ -1494,7 +1494,7 @@ print(json.dumps({
         self.assertIn("track_volume", manifest["capabilities"]["audio"]["features"])
         self.assertIn("offline_adapter_registry", manifest["capabilities"]["audio"]["features"])
         self.assertIn("unknown_audio_adapter_never_falls_back_to_mid_side", manifest["capabilities"]["audio"]["limits"])
-        self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.4.0")
+        self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.5.0")
         self.assertIn("exposure", manifest["capabilities"]["effects"]["catalog_features"])
         self.assertIn("hsl", manifest["capabilities"]["effects"]["catalog_features"])
         self.assertIn("rgb_curves", manifest["capabilities"]["effects"]["catalog_features"])
@@ -1531,7 +1531,7 @@ print(json.dumps({
 
         code, catalog = invoke("effects", "list")
         self.assertEqual(code, 0, catalog)
-        self.assertEqual(catalog["data"]["catalog_version"], "0.4.0")
+        self.assertEqual(catalog["data"]["catalog_version"], "0.5.0")
         self.assertEqual(catalog["data"]["count"], 45)
         frame_interpolation = next(item for item in catalog["data"]["effects"] if item["id"] == "frame_interpolation")
         self.assertEqual(frame_interpolation["backend"], "ffmpeg:minterpolate")

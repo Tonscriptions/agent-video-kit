@@ -1,0 +1,11 @@
+--- fixed/apps/desktop/chat/src/state/local-agent-store.ts
++++ head/apps/desktop/chat/src/state/local-agent-store.ts
+@@ -22,7 +22,7 @@
+ 
+ type ConfigOptions = NonNullable<LocalAgentSessionInfo['configOptions']>;
+ 
+-const AGENT_IDS: readonly LocalAgentId[] = ['codex', 'claude', 'gemini', 'copilot', 'cursor', 'opencode', 'codebuddy', 'qwen', 'kimi', 'minimax', 'byok'];
++const AGENT_IDS: readonly LocalAgentId[] = ['codex', 'claude', 'copilot', 'cursor', 'opencode', 'codebuddy', 'qwen', 'kimi', 'minimax', 'byok'];
+ const isAgent = (v: unknown): v is LocalAgentId => AGENT_IDS.includes(v as LocalAgentId);
+ 
+ interface Persisted {

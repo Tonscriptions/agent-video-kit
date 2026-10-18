@@ -1,0 +1,18 @@
+--- fixed/apps/desktop/shell/bridge.ts
++++ head/apps/desktop/shell/bridge.ts
+@@ -37,6 +37,7 @@
+   setTheme(theme: Theme): void;
+   onFullScreen(listener: Listener<boolean>): Stop;
+   onToggleChat(listener: Listener<void>): Stop;
++  onOpenSettings(listener: Listener<void>): Stop;
+   onStudioBrowser(listener: Listener<unknown>): Stop;
+   onFfmpeg(listener: Listener<unknown>): Stop;
+   onUpdate(listener: Listener<unknown>): Stop;
+@@ -264,6 +265,7 @@
+   onSelection: (next) => selection.set(next),
+   onHover: (ref) => hover.set(ref ?? null),
+   onCommand: (listener) => { command = listener; },
++  settings: { onOpen: (listener) => native.onOpenSettings(listener) },
+   /* read live: Studio may read the panel before or after the kept layout arrives */
+   panel: {
+     label: 'Chat',

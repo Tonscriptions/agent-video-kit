@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .animation import bezier_samples
+from .effect_automation import EffectAutomation, canonical as _runtime_effect_name
 from .audio_stretch import configuration as _audio_stretch_configuration, execute as _execute_audio_stretch, plan as _plan_audio_stretch
 from .audio_tempo import (CONTEXT_FRAMES as _audio_context_frames,
                          MAX_TERMINAL_CONTEXT_PCM_BYTES as _audio_terminal_context_budget,
@@ -1371,6 +1372,8 @@ def _effect_filters(
     clip: dict[str, Any] | None = None,
     clip_start: float = 0.0,
     tps: int = 90000,
+    automation: EffectAutomation | None = None,
+    automation_meta: list[dict[str, Any]] | None = None,
 ) -> list[str]:
     filters: list[str] = []
     clip_value = clip if isinstance(clip, dict) else {}
@@ -1386,7 +1389,7 @@ def _effect_filters(
             effect_value = effect
         else:
             continue
-        name = effect_type.lower().replace("-", "_")
+        name = effect_type.strip().lower().replace("-", "_")
         effect_tracks = _effect_keyframe_tracks(effect_value, parameters)
 
         def expression(aliases: tuple[str, ...], default: float) -> str:
@@ -1396,7 +1399,7 @@ def _effect_filters(
             return _effect_has_keyframe(effect_value, parameters, aliases)
 
         def warn_unsupported_tracks() -> None:
-            if effect_tracks:
+            if effect_tracks and _runtime_effect_name(name) is None:
                 warnings.append({
                     "code": "RENDER_FEATURE_APPROXIMATE",
                     "clip_id": clip_id,
@@ -1838,6 +1841,15 @@ def _effect_filters(
             filters.append("vflip")
         else:
             warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": f"effect:{effect_type}", "message": "当前 FFmpeg 后端没有安全映射"})
+        if effect_tracks and _runtime_effect_name(name) is not None:
+            if automation is None:
+                raise AppError('EFFECT_AUTOMATION_CONTEXT_MISSING', '动态效果需要完整根图的实例与命令预算上下文', exit_code=6)
+            duration = int(clip_value.get('duration_tick', 0))/tps
+            generated, evidence = automation.bind(effect_value, filters[-1], clip_value,
+                                                   clip_start, clip_start+duration)
+            filters[-1:] = generated
+            if automation_meta is not None:
+                automation_meta.append(evidence)
     return filters
 
 
@@ -2800,6 +2812,8 @@ def _build_subtitle_layer(
     fps_value: str,
     duration: float,
     tps: int,
+    automation: EffectAutomation | None = None,
+    automation_meta: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Compile one independent text clip into a reusable transparent layer.
 
@@ -2860,6 +2874,8 @@ def _build_subtitle_layer(
         clip=clip_value,
         clip_start=clip_start,
         tps=tps,
+        automation=automation,
+        automation_meta=automation_meta,
     )
     if effect_filters:
         effect_label = f"subtitle_effects{subtitle_index}"
@@ -3279,6 +3295,7 @@ def _build_compositing_tree(
     filters: list[str], warnings: list[dict[str, Any]], input_meta: list[dict[str, Any]],
     *, width: int, height: int, fps: dict[str, int], fps_value: str, duration: float,
     tps: int, transparent_canvas: bool, sampling: str = 'bilinear',
+    automation: EffectAutomation | None = None,
 ) -> str:
     """Composite complete child sequences before applying container operations.
 
@@ -3329,7 +3346,8 @@ def _build_compositing_tree(
         if transform['opacity'] != '1.00000000':
             alpha = f"alpha(X,Y)*clip(({transform['opacity']}),0,1)"
             chain.extend(['format=gbrap',f"geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha)}",'format=rgba'])
-        chain.extend(_effect_filters(clip.get('effects'), warnings, group_id, root=root, clip=clip, clip_start=start, tps=tps))
+        chain.extend(_effect_filters(clip.get('effects'), warnings, group_id, root=root, clip=clip,
+                                     clip_start=start, tps=tps, automation=automation, automation_meta=input_meta))
         mask = _mask_filter(clip.get('mask'), warnings, group_id, clip=clip, clip_start=start, tps=tps)
         if mask:
             chain.extend(['format=rgba', mask])
@@ -3636,7 +3654,15 @@ def _build_audio_bus_tree(
 
 
 def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, Any], *, _video_only: bool = False,
-                       _inline_stack: tuple[str, ...] = (), _allow_audio_only: bool = False) -> tuple[list[str], str, list[dict[str, Any]], list[dict[str, Any]]]:
+                       _inline_stack: tuple[str, ...] = (), _allow_audio_only: bool = False,
+                       _effect_runtime: EffectAutomation | None = None) -> tuple[list[str], str, list[dict[str, Any]], list[dict[str, Any]]]:
+    root_effect_runtime = _effect_runtime is None
+    if _effect_runtime is None:
+        base = project['settings']['timebase']
+        fps = base['display_fps']
+        _effect_runtime = EffectAutomation(root, str(Fraction(fps['num'], fps['den'])), int(base['ticks_per_second']))
+    def child_builder(*args, **kwargs):
+        return build_filter_graph(*args, **kwargs, _effect_runtime=_effect_runtime)
     if any(c.get('tracking_binding') for s in project.get('sequences',[]) for t in s.get('tracks',[]) for c in t.get('clips',[])):
         from .bindings import compile_project_bindings,validate_project_bindings
         findings = validate_project_bindings(project,root)
@@ -3646,9 +3672,9 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         sequence = next(s for s in project['sequences'] if s['id'] == sequence['id'])
     project, sequence, source_transition_plan = _compile_source_transitions(project, sequence['id'])
     project, sequence, window_inputs, window_filters, window_meta = _prepare_clip_windows(
-        root, project, sequence, build_filter_graph, stack=_inline_stack, video_only=_video_only)
+        root, project, sequence, child_builder, stack=_inline_stack, video_only=_video_only)
     project, sequence, inline_inputs, inline_filters, inline_meta = _prepare_inline_sequences(
-        root, project, sequence, build_filter_graph, stack=_inline_stack)
+        root, project, sequence, child_builder, stack=_inline_stack)
     if window_inputs or window_filters:
         from .inline_sequences import graph_namespace
         inline_filters = [graph_namespace(g, 'afterwindow_', window_inputs.count('-i')) for g in inline_filters]
@@ -4065,6 +4091,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                         clip=clip,
                         clip_start=start,
                         tps=tps,
+                        automation=_effect_runtime,
+                        automation_meta=input_meta,
                     )
                 )
                 if speed_segments and curve_duration is not None and abs(curve_duration - (src_out - src_in) / max(speed, 1e-9)) > 1e-6:
@@ -4328,6 +4356,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             fps_value=fps_value,
             duration=duration,
             tps=tps,
+            automation=_effect_runtime,
+            automation_meta=input_meta,
         )
         for subtitle_index, overlay in enumerate(subtitle_overlays)
     ]
@@ -4335,13 +4365,15 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         root, [*video_specs, *subtitle_specs], composite_groups, filters, warnings, input_meta,
         width=width, height=height, fps=fps, fps_value=fps_value, duration=duration,
         tps=tps, transparent_canvas=transparent_canvas, sampling=sampling_config['method'],
+        automation=_effect_runtime,
     )
     if not has_adjustments:
         filters.append(f"[{current}]null[vout]")
         current = 'vout'
     if has_adjustments:
         for adjustment_index, (adjustment_id, effects, adjustment_start, adjustment_end) in enumerate(adjustment_layers):
-            effect_clip = {"id": adjustment_id, "effects": effects}
+            effect_clip = {"id": adjustment_id, "effects": effects,
+                           "timeline_start_tick": 0, "duration_tick": round((adjustment_end-adjustment_start)*tps)}
             effect_filters = _effect_filters(
                 effects,
                 warnings,
@@ -4350,6 +4382,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 clip=effect_clip,
                 clip_start=0.0,
                 tps=tps,
+                automation=_effect_runtime,
+                automation_meta=input_meta,
             )
             if not effect_filters:
                 continue
@@ -4387,6 +4421,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                        f'atrim=end_sample={audio_target_samples},asetpts=N/SR/TB[aout]')
     else:
         filters.append(f'anullsrc=r=48000:cl=stereo,atrim=end_sample={audio_target_samples}[aout]')
+    if root_effect_runtime and _effect_runtime.targets:
+        input_meta.append(_effect_runtime.summary())
     return inputs, ";".join(filters), input_meta, warnings
 
 

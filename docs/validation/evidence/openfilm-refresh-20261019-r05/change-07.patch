@@ -1,0 +1,25 @@
+--- fixed/apps/desktop/src/agent-installation.mjs
++++ head/apps/desktop/src/agent-installation.mjs
+@@ -1,5 +1,5 @@
+ /**
+- * Where the person's own agents are (agents.mjs AGENTS: Claude Code, Codex, Gemini CLI, …). Only real installations count: a config folder survives an
++ * Where the person's own agents are (agents.mjs AGENTS: Claude Code, Codex, Qwen Code, …). Only real installations count: a config folder survives an
+  * uninstall and is never evidence. On Windows an install by npm, pnpm or Yarn leaves a `.cmd` shim, which no program
+  * can start without a shell: what it runs is used instead (cmdTarget), and one that cannot be read is started through
+  * cmd.exe (agents.mjs). A program the person chose themselves (Settings → Agents → Locate) comes before any of these.
+@@ -13,7 +13,6 @@
+ export const AGENT_DOWNLOADS = Object.freeze({
+   claude: 'https://claude.com/download',
+   codex: 'https://developers.openai.com/codex',
+-  gemini: 'https://geminicli.com',
+   copilot: 'https://github.com/features/copilot/cli',
+   cursor: 'https://cursor.com/cli',
+   opencode: 'https://opencode.ai/download',
+@@ -30,7 +29,6 @@
+ export const AGENT_PROGRAMS = Object.freeze({
+   claude: { names: ['claude'] },
+   codex: { names: ['codex'] },
+-  gemini: { names: ['gemini'] },
+   copilot: { names: ['copilot'] },
+   cursor: { names: ['cursor-agent'] },
+   opencode: { names: ['opencode'], dirs: (home) => [join(home, '.opencode', 'bin')] },

@@ -1,0 +1,334 @@
+TAP version 13
+# Subtest: closing a page retains its frame until the cold replacement is ready
+ok 1 - closing a page retains its frame until the cold replacement is ready
+  ---
+  duration_ms: 1.6794
+  ...
+# Subtest: warming never focuses a page; an already ready page is presented synchronously
+ok 2 - warming never focuses a page; an already ready page is presented synchronously
+  ---
+  duration_ms: 0.2452
+  ...
+# Subtest: rapid closes cannot reveal a retired or superseded replacement
+ok 3 - rapid closes cannot reveal a retired or superseded replacement
+  ---
+  duration_ms: 0.1565
+  ...
+# Subtest: a failed replacement falls back to HOME before discarding the closed page
+ok 4 - a failed replacement falls back to HOME before discarding the closed page
+  ---
+  duration_ms: 0.3827
+  ...
+# Subtest: an obsolete load rejection neither logs an error nor steals the latest destination
+ok 5 - an obsolete load rejection neither logs an error nor steals the latest destination
+  ---
+  duration_ms: 0.2245
+  ...
+# Subtest: a new request supersedes a pending HOME fallback
+ok 6 - a new request supersedes a pending HOME fallback
+  ---
+  duration_ms: 0.1561
+  ...
+# Subtest: idle cleanup never drops the visible frame or a requested replacement
+ok 7 - idle cleanup never drops the visible frame or a requested replacement
+  ---
+  duration_ms: 0.1935
+  ...
+# Subtest: the native replacement is shown and raised before the outgoing page is hidden
+ok 8 - the native replacement is shown and raised before the outgoing page is hidden
+  ---
+  duration_ms: 0.2583
+  ...
+# Subtest: idle neighbors are evicted even when they are the next close destination
+ok 9 - idle neighbors are evicted even when they are the next close destination
+  ---
+  duration_ms: 0.9252
+  ...
+# Subtest: a hung page load fails without presenting unloaded contents
+ok 10 - a hung page load fails without presenting unloaded contents
+  ---
+  duration_ms: 6.5634
+  ...
+# Subtest: a rejected load never waits for or presents a frame
+ok 11 - a rejected load never waits for or presents a frame
+  ---
+  duration_ms: 0.4391
+  ...
+# Subtest: a successful load requests bounded paint readiness
+ok 12 - a successful load requests bounded paint readiness
+  ---
+  duration_ms: 14.771
+  ...
+# Subtest: two painted frames clear their fallback timer; timeout cancels the pending frame
+ok 13 - two painted frames clear their fallback timer; timeout cancels the pending frame
+  ---
+  duration_ms: 1.335
+  ...
+# Subtest: a loaded but unresponsive renderer cannot leave the host waiting for frames forever
+ok 14 - a loaded but unresponsive renderer cannot leave the host waiting for frames forever
+  ---
+  duration_ms: 13.6763
+  ...
+# Subtest: closing the last tab keeps its frame until cold HOME is ready
+ok 15 - closing the last tab keeps its frame until cold HOME is ready
+  ---
+  duration_ms: 0.4551
+  ...
+# Subtest: macOS close preserves the window and sessions for activation, but explicit quit still closes it
+ok 16 - macOS close preserves the window and sessions for activation, but explicit quit still closes it
+  ---
+  duration_ms: 1.6525
+  ...
+# Subtest: Windows and Linux window close still follows the existing quit path
+ok 17 - Windows and Linux window close still follows the existing quit path
+  ---
+  duration_ms: 0.2246
+  ...
+# Subtest: Close Tab on darwin closes a project, and only macOS closes an empty window
+ok 18 - Close Tab on darwin closes a project, and only macOS closes an empty window
+  ---
+  duration_ms: 1.2324
+  ...
+# Subtest: Close Tab on win32 closes a project, and only macOS closes an empty window
+ok 19 - Close Tab on win32 closes a project, and only macOS closes an empty window
+  ---
+  duration_ms: 0.198
+  ...
+# Subtest: Close Tab on linux closes a project, and only macOS closes an empty window
+ok 20 - Close Tab on linux closes a project, and only macOS closes an empty window
+  ---
+  duration_ms: 0.2897
+  ...
+# Subtest: explicit Quit closes macOS window while Studio starting
+ok 21 - explicit Quit closes macOS window while Studio starting
+  ---
+  duration_ms: 0.4032
+  ...
+# Subtest: explicit Quit closes macOS window while Studio startup failed
+ok 22 - explicit Quit closes macOS window while Studio startup failed
+  ---
+  duration_ms: 0.2575
+  ...
+# Subtest: Quit waits for Studio then re-enters without another shutdown, failure=false
+ok 23 - Quit waits for Studio then re-enters without another shutdown, failure=false
+  ---
+  duration_ms: 0.4989
+  ...
+# Subtest: Quit waits for Studio then re-enters without another shutdown, failure=true
+ok 24 - Quit waits for Studio then re-enters without another shutdown, failure=true
+  ---
+  duration_ms: 0.5353
+  ...
+# Subtest: a custom property is set as it is named, its value as it is; a camelCase one as CSS names it
+ok 25 - a custom property is set as it is named, its value as it is; a camelCase one as CSS names it
+  ---
+  duration_ms: 1.7219
+  ...
+# Subtest: continuous main-track pictures occupy the primary storyline instead of connecting to a gap
+ok 26 - continuous main-track pictures occupy the primary storyline instead of connecting to a gap
+  ---
+  duration_ms: 2.9701
+  ...
+# Subtest: FCPXML keeps exact NTSC times, source trims, layering, transforms and separate sound without duplicate audio
+ok 27 - FCPXML keeps exact NTSC times, source trims, layering, transforms and separate sound without duplicate audio
+  ---
+  duration_ms: 1.5957
+  ...
+# Subtest: only real empty intervals become primary gaps, with overlays anchored in source time
+ok 28 - only real empty intervals become primary gaps, with overlays anchored in source time
+  ---
+  duration_ms: 0.6045
+  ...
+# Subtest: FCPXML also writes integer-rate, audio-only timelines with a full-length primary storyline
+ok 29 - FCPXML also writes integer-rate, audio-only timelines with a full-length primary storyline
+  ---
+  duration_ms: 0.4126
+  ...
+# Subtest: FCPXML includes editable subtitle titles above pictures, clipped to the sequence, with escaped multiline text
+ok 30 - FCPXML includes editable subtitle titles above pictures, clipped to the sequence, with escaped multiline text
+  ---
+  duration_ms: 1.7913
+  ...
+# Subtest: subtitle titles on an audio-only timeline omit empty cues and end at the next subtitle
+ok 31 - subtitle titles on an audio-only timeline omit empty cues and end at the next subtitle
+  ---
+  duration_ms: 0.3941
+  ...
+# Subtest: invalid plans fail instead of silently attaching a connection to an unrelated primary clip
+ok 32 - invalid plans fail instead of silently attaching a connection to an unrelated primary clip
+  ---
+  duration_ms: 0.6227
+  ...
+# Subtest: FCPXML validates against Final Cut Pro’s installed 1.10 DTD
+ok 33 - FCPXML validates against Final Cut Pro’s installed 1.10 DTD # SKIP Final Cut Pro DTD not installed
+  ---
+  duration_ms: 0.0623
+  ...
+# Subtest: a stored style is read field by field; the earlier { look, size } shape still reads
+ok 34 - a stored style is read field by field; the earlier { look, size } shape still reads
+  ---
+  duration_ms: 2.1383
+  ...
+# Subtest: a look is picked while the style is exactly it, at any size
+ok 35 - a look is picked while the style is exactly it, at any size
+  ---
+  duration_ms: 0.2436
+  ...
+# Subtest: the CSS grows away from the nearest edge and keeps the stroke outside the letters
+ok 36 - the CSS grows away from the nearest edge and keeps the stroke outside the letters
+  ---
+  duration_ms: 0.6538
+  ...
+# Subtest: on a vertical frame an unmoved subtitle rises above the feed's own buttons
+ok 37 - on a vertical frame an unmoved subtitle rises above the feed's own buttons
+  ---
+  duration_ms: 0.1897
+  ...
+# Subtest: the shown line: the later one where two overlap; the picked language, or both
+ok 38 - the shown line: the later one where two overlap; the picked language, or both
+  ---
+  duration_ms: 0.9192
+  ...
+# Subtest: word highlight: the word being said, by its share of the line
+ok 39 - word highlight: the word being said, by its share of the line
+  ---
+  duration_ms: 15.1725
+  ...
+# Subtest: files: overlapping lines give way, speakers stay apart from the text
+ok 40 - files: overlapping lines give way, speakers stay apart from the text
+  ---
+  duration_ms: 0.4879
+  ...
+# Subtest: files: a VTT line with & or < reads as written, not as a tag
+ok 41 - files: a VTT line with & or < reads as written, not as a tag
+  ---
+  duration_ms: 0.1736
+  ...
+# Subtest: a burned-in frame: the line in the frame's pixels, escaped, nothing when off or silent
+ok 42 - a burned-in frame: the line in the frame's pixels, escaped, nothing when off or silent
+  ---
+  duration_ms: 0.7911
+  ...
+# Subtest: the two lines that started it: a clause per subtitle, its comma gone
+ok 43 - the two lines that started it: a clause per subtitle, its comma gone
+  ---
+  duration_ms: 25.9704
+  ...
+# Subtest: a clause mark makes no orphan: both sides need 4 CJK characters or 2 words
+ok 44 - a clause mark makes no orphan: both sides need 4 CJK characters or 2 words
+  ---
+  duration_ms: 3.6497
+  ...
+# Subtest: a long clause with no punctuation is cut where it costs least: before a conjunction, never inside a word
+ok 45 - a long clause with no punctuation is cut where it costs least: before a conjunction, never inside a word
+  ---
+  duration_ms: 2.7582
+  ...
+# Subtest: mixed CJK and English: an English word or name is never cut, and a term like "MIT 协议" stays together
+ok 46 - mixed CJK and English: an English word or name is never cut, and a term like "MIT 协议" stays together
+  ---
+  duration_ms: 2.1134
+  ...
+# Subtest: English: sentences end at full stops, not at abbreviations, initials or decimals; commas start clauses and stay
+ok 47 - English: sentences end at full stops, not at abbreviations, initials or decimals; commas start clauses and stay
+  ---
+  duration_ms: 1.3612
+  ...
+# Subtest: a number keeps its unit, however tight the line
+ok 48 - a number keeps its unit, however tight the line
+  ---
+  duration_ms: 0.6214
+  ...
+# Subtest: very short lines stay whole; a piece too short to read joins its neighbor
+ok 49 - very short lines stay whole; a piece too short to read joins its neighbor
+  ---
+  duration_ms: 0.6031
+  ...
+# Subtest: a pause of half a second ends a subtitle; a short breath does not
+ok 50 - a pause of half a second ends a subtitle; a short breath does not
+  ---
+  duration_ms: 0.5229
+  ...
+# Subtest: times: a subtitle holds 200 ms after its last word, never into the next; small gaps close; at most 7 s
+ok 51 - times: a subtitle holds 200 ms after its last word, never into the next; small gaps close; at most 7 s
+  ---
+  duration_ms: 1.5837
+  ...
+# Subtest: the end of a subtitle: Chinese drops ，。、；：, keeps ？！… and quotes; Latin keeps its punctuation
+ok 52 - the end of a subtitle: Chinese drops ，。、；：, keeps ？！… and quotes; Latin keeps its punctuation
+  ---
+  duration_ms: 0.3996
+  ...
+# Subtest: a translation is cut to follow the original's pieces, at its own clause marks, or spans them when it cannot be
+ok 53 - a translation is cut to follow the original's pieces, at its own clause marks, or spans them when it cannot be
+  ---
+  duration_ms: 1.2604
+  ...
+# Subtest: a correction of one piece goes into its words in the line; the other pieces keep their times
+ok 54 - a correction of one piece goes into its words in the line; the other pieces keep their times
+  ---
+  duration_ms: 1.8607
+  ...
+# Subtest: the rules are one table
+ok 55 - the rules are one table
+  ---
+  duration_ms: 0.5924
+  ...
+# (node:16492) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: a context length as typed: empty is none, a whole number from 32K to 10M holds, anything else does not
+ok 56 - a context length as typed: empty is none, a whole number from 32K to 10M holds, anything else does not
+  ---
+  duration_ms: 1.4569
+  ...
+# (node:2680) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: a custom property is changed as a color, a number with its unit, words, or as typed
+ok 57 - a custom property is changed as a color, a number with its unit, words, or as typed
+  ---
+  duration_ms: 2.1435
+  ...
+# Subtest: a field writes back what CSS reads
+ok 58 - a field writes back what CSS reads
+  ---
+  duration_ms: 0.2567
+  ...
+# Subtest: a custom property is named as a person reads it
+ok 59 - a custom property is named as a person reads it
+  ---
+  duration_ms: 0.2546
+  ...
+# Subtest: a custom property is kept in the :root entry, beside what else the person changed
+ok 60 - a custom property is kept in the :root entry, beside what else the person changed
+  ---
+  duration_ms: 0.5343
+  ...
+# Subtest: a layer's words are its text override, by its selector and which match
+ok 61 - a layer's words are its text override, by its selector and which match
+  ---
+  duration_ms: 0.2171
+  ...
+# Subtest: a picture put in a page is named from the page's folder, as CSS writes a url
+ok 62 - a picture put in a page is named from the page's folder, as CSS writes a url
+  ---
+  duration_ms: 0.4157
+  ...
+# Subtest: a picture is replaced with the CSS that draws another file in its place: content for an <img>, a background for a box
+ok 63 - a picture is replaced with the CSS that draws another file in its place: content for an <img>, a background for a box
+  ---
+  duration_ms: 1.3731
+  ...
+# Subtest: a custom property that names a font gets the font picker
+ok 64 - a custom property that names a font gets the font picker
+  ---
+  duration_ms: 0.4214
+  ...
+1..64
+# tests 64
+# suites 0
+# pass 63
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 918.1935

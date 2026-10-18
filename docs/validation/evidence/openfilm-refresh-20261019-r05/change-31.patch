@@ -1,0 +1,21 @@
+--- fixed/packages/openfilm/studio/ui/src/components/ProjectView.tsx
++++ head/packages/openfilm/studio/ui/src/components/ProjectView.tsx
+@@ -48,7 +48,8 @@
+ import { factsOfProbe, mediaListingOf, resourceKindOf, srcHitsAsset, warmProjectMedia, type MediaListing, type MediaProxy, type MediaResult, type MediaSources, type WorkspaceResource } from '@/lib/workspace-resources';
+ import { BrandLoadingScreen } from './BrandLoadingScreen';
+ import { BrandLogo } from './BrandLogo';
+-import { SettingsModal, type SettingsSection } from './settings/SettingsModal';
++import { SettingsModal } from './settings/SettingsModal';
++import { useSettings } from './settings/use-settings';
+ import { DesktopDialog } from './DesktopDialog';
+ import type { ContextMenuEntry } from './ContextMenu';
+ import { studioHost, useHostPanel, type CommunityItem, type HostPanel, type StageBox, type StudioCommand, type StudioRef } from '../lib/host';
+@@ -2439,7 +2440,7 @@
+   /* the examples over the film, opened from the app's chat */
+   /* the Community over the film: closed, open on its list (true), or on one skill's or example's page */
+   const [examplesOpen, setExamplesOpen] = React.useState<boolean | CommunityItem>(false);
+-  const [settingsOpen, setSettingsOpen] = React.useState<SettingsSection | null>(null);
++  const [settingsOpen, setSettingsOpen] = useSettings();
+   /* making subtitles: what went wrong, shown on the CC button; with no service to transcribe, it opens Providers */
+   const [subtitleProblem, setSubtitleProblem] = React.useState<{ text: string; connect: boolean } | null>(null);
+   const makeSubtitles = React.useCallback(() => {

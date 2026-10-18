@@ -1,0 +1,52 @@
+--- fixed/apps/desktop/src/menu.mjs
++++ head/apps/desktop/src/menu.mjs
+@@ -1,7 +1,4 @@
+-/** The menu bar. Studio's own shortcuts live in its page; these are the window's, its tabs' among them. */
+-import { Menu } from 'electron';
+-
+-const mac = process.platform === 'darwin';
++/** Pure native menu template, built by Electron in main.mjs. Studio's editing shortcuts stay in its page. */
+ 
+ /**
+  * `updates`: the packaged app's (updates.mjs), for "Check for Updates…" (the app menu on macOS, Help on Windows) and
+@@ -9,11 +6,14 @@
+  * `tabs`: a new tab (its launcher), the one in front closed, the one closed last opened again, the next or previous,
+  * the nth (9: the last).
+  * @param {{ productName: string, packaged: boolean, toggleChat: () => void, openProject: () => void, reload: () => void,
+- *           devTools: () => void,
++ *           devTools: () => void, openSettings: () => void,
+  *           tabs: { open: () => void, close: () => void, reopen: () => void, step: (by: number) => void, pick: (n: number) => void },
+  *           updates?: { check: () => Promise<void>, beta: boolean, setBeta: (on: boolean) => void } | null }} actions
+  */
+-export function applicationMenu({ productName, packaged, toggleChat, openProject, reload, devTools, tabs, updates = null }) {
++export function applicationMenuTemplate({ productName, packaged, toggleChat, openProject, reload, devTools, openSettings, tabs, updates = null }, platform = process.platform) {
++  const mac = platform === 'darwin';
++  /** @type {Electron.MenuItemConstructorOptions} */
++  const settings = { label: 'Settings…', accelerator: 'CmdOrCtrl+,', click: openSettings };
+   /** @type {Electron.MenuItemConstructorOptions[]} */
+   const updateItems = updates ? [
+     {
+@@ -34,6 +34,8 @@
+         { role: 'about' },
+         ...updateItems,
+         { type: 'separator' },
++        settings,
++        { type: 'separator' },
+         { role: 'services' },
+         { type: 'separator' },
+         { role: 'hide' },
+@@ -48,6 +50,7 @@
+       submenu: [
+         { label: 'New Tab', accelerator: 'CmdOrCtrl+T', click: () => tabs.open() },
+         { label: 'Open Project…', accelerator: 'CmdOrCtrl+O', click: openProject },
++        ...(!mac ? [{ type: 'separator' }, settings] : []),
+         { type: 'separator' },
+         { label: 'Close Tab', accelerator: 'CmdOrCtrl+W', click: () => tabs.close() },
+         { label: 'Reopen Closed Tab', accelerator: 'CmdOrCtrl+Shift+T', click: () => tabs.reopen() },
+@@ -86,5 +89,5 @@
+     },
+     ...(!mac && updateItems.length ? [{ role: 'help', submenu: updateItems }] : []),
+   ];
+-  return Menu.buildFromTemplate(template);
++  return template;
+ }

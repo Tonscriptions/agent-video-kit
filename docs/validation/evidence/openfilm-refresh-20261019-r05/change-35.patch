@@ -1,0 +1,21 @@
+--- fixed/packages/openfilm/studio/ui/src/i18n/es.ts
++++ head/packages/openfilm/studio/ui/src/i18n/es.ts
+@@ -108,7 +108,7 @@
+       sync: { title: 'Conectado al editor en ambos sentidos', body: 'Pon un clip, una capa, una zona de la imagen o un archivo en tu mensaje, y haz clic en cualquier clip que nombre tu agente para ir a él en Studio.' },
+       live: { title: 'Cambios en directo', body: 'Cada edición aparece en la imagen y en la línea de tiempo en cuanto se escribe. Ajústala a mano o vuelve atrás en el historial de versiones.' },
+       drop: { title: 'Suelta tus medios', body: 'Arrastra metraje, imágenes o sonido al chat: van directos a la carpeta de la película, listos para usar.' },
+-      agents: { title: 'Cualquier agente, a un clic', body: 'Claude Code, Codex, Gemini CLI, Copilot, Cursor y más, detectados en tu ordenador. Cámbialos en el chat o usa tu propia clave de API.' },
++      agents: { title: 'Cualquier agente, a un clic', body: 'Claude Code, Codex, Copilot, Cursor y más, detectados en tu ordenador. Cámbialos en el chat o usa tu propia clave de API.' },
+       speed: { title: 'Vista previa y exportación más rápidas', body: 'Un motor de renderizado fijo para una reproducción fluida, y exportaciones con el codificador de vídeo por hardware de tu ordenador cuando lo tiene.' },
+       setup: { title: 'Sin terminal ni dependencias', body: 'Nada de Node, npm ni versiones de paquetes: ffmpeg y el renderizador vienen incluidos y probados con Studio.' },
+       updates: { title: 'Siempre al día', body: 'Las actualizaciones se descargan en segundo plano y se instalan al reiniciar, nunca en mitad de una exportación o una respuesta.' },
+@@ -1568,6 +1568,9 @@
+       effortStart: 'Empieza en',
+       effortHint: 'Marca los esfuerzos que admite este modelo: el chat ofrece esos. Automático no envía ninguno, así decide el servicio.',
+       effortLevels: { auto: 'Automático', off: 'Sin razonar', minimal: 'Mínimo', low: 'Bajo', medium: 'Medio', high: 'Alto', xhigh: 'Muy alto', max: 'Máximo' },
++      context: 'Longitud de contexto',
++      contextHint: 'En tokens, según la documentación del servicio del modelo. Vacío: 128K.',
++      contextBad: 'Un número entero de tokens, de 32.000 a 10.000.000.',
+       key: 'Clave de API',
+       keyPlaceholder: 'Pega tu clave de API',
+       keyKept: 'Clave terminada en {last4} (déjalo vacío para conservarla)',

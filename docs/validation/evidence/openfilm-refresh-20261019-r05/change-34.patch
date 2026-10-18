@@ -1,0 +1,21 @@
+--- fixed/packages/openfilm/studio/ui/src/i18n/en.ts
++++ head/packages/openfilm/studio/ui/src/i18n/en.ts
+@@ -109,7 +109,7 @@
+       sync: { title: 'Two-way with the editor', body: 'Put a clip, a layer, a region of the picture or a media file in your message, and click any clip your agent names to jump to it in Studio.' },
+       live: { title: 'Changes land live', body: 'Every edit shows on the picture and the timeline as it’s written. Adjust it by hand, or step back in Version history.' },
+       drop: { title: 'Drop in your media', body: 'Drag footage, pictures or sound into the chat: they go straight into the film’s folder, ready to use.' },
+-      agents: { title: 'Any agent, one switch away', body: 'Claude Code, Codex, Gemini CLI, Copilot, Cursor and more, found on your computer. Switch in the chat, or use your own API key.' },
++      agents: { title: 'Any agent, one switch away', body: 'Claude Code, Codex, Copilot, Cursor and more, found on your computer. Switch in the chat, or use your own API key.' },
+       speed: { title: 'Faster preview and export', body: 'A pinned rendering engine for smooth playback, and exports on your computer’s hardware video encoder when it has one.' },
+       setup: { title: 'No terminal, no dependencies', body: 'No Node, npm or package versions to manage: ffmpeg and the renderer are built in and tested with Studio.' },
+       updates: { title: 'Always up to date', body: 'Updates download in the background and install on restart, never in the middle of an export or a reply.' },
+@@ -1569,6 +1569,9 @@
+       effortStart: 'Starts on',
+       effortHint: 'Tick the efforts this model takes: the chat offers those. Auto sends none, so the service decides.',
+       effortLevels: { auto: 'Auto', off: 'Off', minimal: 'Minimal', low: 'Low', medium: 'Medium', high: 'High', xhigh: 'Extra high', max: 'Max' },
++      context: 'Context length',
++      contextHint: 'Tokens, as the model\'s service documents it. Empty: 128K.',
++      contextBad: 'A whole number of tokens, from 32,000 to 10,000,000.',
+       key: 'API key',
+       keyPlaceholder: 'Paste your API key',
+       keyKept: 'Key ending in {last4} (leave empty to keep it)',

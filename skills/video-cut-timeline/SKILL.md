@@ -22,6 +22,22 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+For numeric color effect animation, read the
+[color automation contract](../../docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md).
+Existing compose `update_clip.patch.effects` accepts effect keyframe tracks;
+catalog 0.5.0 lists the exact 19 channels of temperature, balance, nine-wheel,
+exposure and levels. Top-level effect keyframes take precedence over parameter
+keyframes. Preserve author ticks through windows, curves, reverse and compound
+holds. Independent text, groups and interval adjustments use the same bounded
+native command compiler; interval clocks reset at their first retained frame.
+Unsupported dynamic channels reject; booleans, curve strings and unlisted
+filters remain outside this contract. Check per-target hashes and the shared
+recursive budget in the manifest. Do not repair a corrupt derived command
+cache by overwriting it. Kelvin keeps the existing shadow-RGB approximation.
+The [actual media, encoding diagnosis and installed replay](../../docs/validation/逐帧调色参数自动化实测_2026-10-19.md)
+compare independently authored parameters on the same pinned FFmpeg delivery
+boundary; they do not establish physical white balance or CapCut color science.
+
 For relative retiming of the current complete visible output, read the
 [complete output retime contract](../../docs/specs/完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md).
 Use `timeline edit` action `retime` with `clip_ids`, `transform` and optional

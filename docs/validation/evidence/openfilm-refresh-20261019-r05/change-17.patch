@@ -1,0 +1,11 @@
+--- fixed/apps/desktop/src/agent-usage.test.mjs
++++ head/apps/desktop/src/agent-usage.test.mjs
+@@ -4,7 +4,7 @@
+ 
+ test('Claude Code\'s usage is not asked: its own report is wrong for Team accounts', async () => {
+   assert.equal(await agentUsage('claude'), null);
+-  assert.equal(await agentUsage('gemini'), null);
++  assert.equal(await agentUsage('qwen'), null);
+ });
+ 
+ test('Codex\'s rate limits as windows, each as long as it says; its account\'s email and plan', () => {

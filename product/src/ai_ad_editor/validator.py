@@ -13,6 +13,9 @@ from .sequence_canvas import validate_canvas
 from .edit_planner import validate_editing
 from .source_transitions import analyze as analyze_source_transitions
 from .audio_routing import plan as plan_audio_routing
+from .effect_automation import (ALIASES as AUTOMATION_EFFECT_ALIASES,
+                                parameter_names as automation_parameter_names,
+                                validate as validate_effect_automation)
 
 from .policy import reference_kind, resolve_local_path
 from .project import asset_map
@@ -45,6 +48,7 @@ EFFECT_KEYFRAME_ALIASES: dict[str, set[str]] = {
     "gamma_adjust": {"gamma", "amount", "value"},
     "vignette": {"angle", "value"},
 }
+EFFECT_KEYFRAME_ALIASES.update({name: automation_parameter_names(name) for name in AUTOMATION_EFFECT_ALIASES})
 
 COLOR_METADATA_VALUES: dict[str, set[str]] = {
     "primaries": {"bt709", "bt2020", "smpte170m", "smpte432"},
@@ -270,6 +274,8 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                         return
                     parameters = effect_value.get("parameters") if isinstance(effect_value.get("parameters"), dict) else effect_value
                     validate_lut_resource(effect_value, effect_path)
+                    for finding in validate_effect_automation(effect_value, duration_tick=keyframe_limit):
+                        error(finding['code'], finding['message'], effect_path+finding['suffix'])
                     raw_tracks = effect_value.get("keyframes")
                     if not isinstance(raw_tracks, list):
                         raw_tracks = parameters.get("keyframes") if isinstance(parameters.get("keyframes"), list) else []
@@ -686,6 +692,8 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                             effect_type = str(effect_value.get("type", "")).lower().replace("-", "_")
                             parameters = effect_value.get("parameters") if isinstance(effect_value.get("parameters"), dict) else effect_value
                             validate_lut_resource(effect_value, effect_path)
+                            for finding in validate_effect_automation(effect_value, duration_tick=authored_dur):
+                                error(finding['code'], finding['message'], effect_path+finding['suffix'])
                             raw_effect_tracks = effect_value.get("keyframes")
                             if not isinstance(raw_effect_tracks, list):
                                 raw_effect_tracks = parameters.get("keyframes") if isinstance(parameters.get("keyframes"), list) else []

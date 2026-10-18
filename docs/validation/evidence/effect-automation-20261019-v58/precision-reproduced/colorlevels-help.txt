@@ -1,0 +1,36 @@
+Filter colorlevels
+  Adjust the color levels.
+    slice threading supported
+    Inputs:
+       #0: default (video)
+    Outputs:
+       #0: default (video)
+colorlevels AVOptions:
+   rimin             <double>     ..FV.....T. set input red black point (from -1 to 1) (default 0)
+   gimin             <double>     ..FV.....T. set input green black point (from -1 to 1) (default 0)
+   bimin             <double>     ..FV.....T. set input blue black point (from -1 to 1) (default 0)
+   aimin             <double>     ..FV.....T. set input alpha black point (from -1 to 1) (default 0)
+   rimax             <double>     ..FV.....T. set input red white point (from -1 to 1) (default 1)
+   gimax             <double>     ..FV.....T. set input green white point (from -1 to 1) (default 1)
+   bimax             <double>     ..FV.....T. set input blue white point (from -1 to 1) (default 1)
+   aimax             <double>     ..FV.....T. set input alpha white point (from -1 to 1) (default 1)
+   romin             <double>     ..FV.....T. set output red black point (from 0 to 1) (default 0)
+   gomin             <double>     ..FV.....T. set output green black point (from 0 to 1) (default 0)
+   bomin             <double>     ..FV.....T. set output blue black point (from 0 to 1) (default 0)
+   aomin             <double>     ..FV.....T. set output alpha black point (from 0 to 1) (default 0)
+   romax             <double>     ..FV.....T. set output red white point (from 0 to 1) (default 1)
+   gomax             <double>     ..FV.....T. set output green white point (from 0 to 1) (default 1)
+   bomax             <double>     ..FV.....T. set output blue white point (from 0 to 1) (default 1)
+   aomax             <double>     ..FV.....T. set output alpha white point (from 0 to 1) (default 1)
+   preserve          <int>        ..FV.....T. set preserve color mode (from 0 to 6) (default none)
+     none            0            ..FV.....T. disabled
+     lum             1            ..FV.....T. luminance
+     max             2            ..FV.....T. max
+     avg             3            ..FV.....T. average
+     sum             4            ..FV.....T. sum
+     nrm             5            ..FV.....T. norm
+     pwr             6            ..FV.....T. power
+
+This filter has support for timeline through the 'enable' option.
+
+Exiting with exit code 0

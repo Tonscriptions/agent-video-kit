@@ -210,6 +210,23 @@ docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md text e
 docs/third-party/OpenFilm复用声明_2026-10-17.md text eol=lf
 skills/video-cut-agent-editor/SKILL.md text eol=lf
 
+# V58 preserve native commands, originals, failed captures and byte-bound receipts.
+scripts/*color_automation*.py -text
+docs/validation/evidence/effect-automation-*/** -text -whitespace
+docs/validation/evidence/color-native-*/** -text -whitespace
+docs/assets/color-automation-*/** -text -whitespace
+docs/assets/color-group-*/** -text -whitespace
+docs/validation/evidence/color-group-*/** -text -whitespace
+docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/逐帧调色参数自动化实测_2026-10-19.md text eol=lf
+docs/specs/本地效果目录与参数契约_v0.1_2026-10-14.md text eol=lf
+
+# R05 preserve fixed public research receipts, patches and executed scripts.
+scripts/audit_openfilm_r05.py -text
+scripts/sync_openfilm_r05_documents.py -text
+docs/validation/evidence/openfilm-*-20261019-r05/** -text -whitespace
+docs/OpenFilm复用复核与开发成本更新_2026-10-19.md text eol=lf
+
 # V57: preserve hashed raw CLI captures, native CRLF receipts and original font notices.
 scripts/*complete_output_retime*.py -text
 docs/validation/evidence/retime-*/** -text -whitespace

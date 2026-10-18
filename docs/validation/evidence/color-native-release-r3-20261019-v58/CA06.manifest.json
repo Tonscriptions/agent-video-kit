@@ -1,0 +1,726 @@
+{
+  "manifest_version": "0.1.0",
+  "operation_id": "render_20261018180951_de345f5f",
+  "project_id": "proj_20261018180408_7c3268cf",
+  "sequence_id": "seq_main",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-native-release-r3-20261019-v58\\CA06\\renders\\CA06.mkv",
+  "sha256": "a0a8ba3e4bfb023e491b9758599440fc16f7bb288b20511e2b73d5b48fd864f8",
+  "probe": {
+    "duration_seconds": 2.0,
+    "duration_tick": 180000,
+    "format": "matroska,webm",
+    "format_long_name": "Matroska / WebM",
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "profile": "High 4:4:4 Predictive",
+        "codec_type": "video",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "mime_codec_string": "avc1.f4000a",
+        "width": 160,
+        "height": 96,
+        "coded_width": 160,
+        "coded_height": 96,
+        "has_b_frames": 0,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "5:3",
+        "pix_fmt": "yuv444p",
+        "level": 10,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "is_avc": "true",
+        "nal_length_size": "4",
+        "r_frame_rate": "10/1",
+        "avg_frame_rate": "10/1",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bits_per_raw_sample": "8",
+        "extradata_size": 48,
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 libx264",
+          "DURATION": "00:00:02.000000000"
+        }
+      },
+      {
+        "index": 1,
+        "codec_name": "pcm_f32le",
+        "codec_long_name": "PCM 32-bit floating point little-endian",
+        "codec_type": "audio",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "sample_fmt": "flt",
+        "sample_rate": "48000",
+        "channels": 2,
+        "bits_per_sample": 32,
+        "initial_padding": 0,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bit_rate": "3072000",
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 pcm_f32le",
+          "DURATION": "00:00:02.000000000"
+        }
+      }
+    ],
+    "video": {
+      "codec": "h264",
+      "width": 160,
+      "height": 96,
+      "pix_fmt": "yuv444p",
+      "fps": "10/1",
+      "color_space": "bt709",
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    },
+    "audio": {
+      "codec": "pcm_f32le",
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    }
+  },
+  "command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-hide_banner",
+    "-y",
+    "-loglevel",
+    "error",
+    "-progress",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-native-release-r3-20261019-v58\\CA06\\renders\\.tmp\\render_20261018180951_de345f5f\\ffmpeg-progress.log",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-native-release-r3-20261019-v58\\CA06\\assets\\frames_frames_source.mkv",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-native-release-r3-20261019-v58\\CA06\\assets\\frames_frames_source.mkv",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-native-release-r3-20261019-v58\\CA06\\assets\\sound_sound_source.wav",
+    "-filter_complex",
+    "[0:v]trim=start=0.000000:end=1.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=10/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1,sendcmd=filename='cache/effect-automation/b7e46606dc8a97dbb27897d0bc23cb2b30d889086359ce5d16f2a36ed40eaadf.ffcmd',colorbalance@avk_ea_0_206c75b99ddf81db=rs=0.000000:gs=0.000000:bs=0.000000,sendcmd=filename='cache/effect-automation/94c8fce2d6ebfac54b40ccd891330ae7dc91e271f9428cc2315e9c26f0829f7a.ffcmd',colorbalance@avk_ea_1_a212c206d9f2411d=rs=0.000000:gs=0.000000:bs=0.000000[v0];[1:v]trim=start=0.000000:end=1.000000,setpts=PTS-STARTPTS+1.000000/TB,fps=10/1:start_time=1.00000000:round=up:eof_action=pass,setsar=1,sendcmd=filename='cache/effect-automation/e1dd9e5c684e894ca8b8efb6178a58abea6196acf7493b99a4dbdca5ba5b0352.ffcmd',colorbalance@avk_ea_2_a1fbd3fbf8979557=rs=0.000000:gs=0.000000:bs=0.000000,sendcmd=filename='cache/effect-automation/d18442cbe54a52c0ce1688c50b3086fecd99a242c7406d4578e1b3561be5a3be.ffcmd',colorbalance@avk_ea_3_84aed0dcc7c50950=rs=0.000000:gs=0.000000:bs=0.000000[v1];[2:a]atrim=start=0.000000:end=2.000000,asetpts=PTS-STARTPTS,aresample=48000,apad=whole_len=96000,atrim=end_sample=96000,asetpts=N/SR/TB,adelay=0S:all=1[a2];color=c=black@0.0:s=160x96:r=10/1:d=2.000000,format=rgba[group1_base];[group1_base][v1]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[group1_vo0];[group1_vo0]format=rgba,trim=start_frame=10:end_frame=20[group1_out];color=c=black@0.0:s=160x96:r=10/1:d=2.000000,format=rgba[group0_base];[group0_base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[group0_vo0];[group0_vo0]format=rgba,trim=start_frame=0:end_frame=10[group0_out];color=c=black:s=160x96:r=10/1:d=2.000000[base];[base][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo0];[vo0][group1_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo1];[vo1]null[vout];[a2]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]aresample=48000,apad=whole_len=96000,atrim=end_sample=96000,asetpts=N/SR/TB[aout]",
+    "-map",
+    "[vout]",
+    "-map",
+    "[aout]",
+    "-t",
+    "2.000000000",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "medium",
+    "-crf",
+    "0",
+    "-pix_fmt",
+    "yuv444p",
+    "-color_primaries",
+    "bt709",
+    "-color_trc",
+    "bt709",
+    "-colorspace",
+    "bt709",
+    "-color_range",
+    "tv",
+    "-c:a",
+    "pcm_f32le",
+    "-f",
+    "matroska",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-native-release-r3-20261019-v58\\CA06\\renders\\.tmp\\render_20261018180951_de345f5f\\CA06.mkv"
+  ],
+  "filter_graph_transport": {
+    "mode": "inline",
+    "sha256": "sha256:9758e92c0ac0f7c03453277c58a5d19fa7fab2de4b644414f90396aa52c9b092",
+    "utf8_bytes": 2170,
+    "logical_command_utf16_units": 3188
+  },
+  "filter_complex": "[0:v]trim=start=0.000000:end=1.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=10/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1,sendcmd=filename='cache/effect-automation/b7e46606dc8a97dbb27897d0bc23cb2b30d889086359ce5d16f2a36ed40eaadf.ffcmd',colorbalance@avk_ea_0_206c75b99ddf81db=rs=0.000000:gs=0.000000:bs=0.000000,sendcmd=filename='cache/effect-automation/94c8fce2d6ebfac54b40ccd891330ae7dc91e271f9428cc2315e9c26f0829f7a.ffcmd',colorbalance@avk_ea_1_a212c206d9f2411d=rs=0.000000:gs=0.000000:bs=0.000000[v0];[1:v]trim=start=0.000000:end=1.000000,setpts=PTS-STARTPTS+1.000000/TB,fps=10/1:start_time=1.00000000:round=up:eof_action=pass,setsar=1,sendcmd=filename='cache/effect-automation/e1dd9e5c684e894ca8b8efb6178a58abea6196acf7493b99a4dbdca5ba5b0352.ffcmd',colorbalance@avk_ea_2_a1fbd3fbf8979557=rs=0.000000:gs=0.000000:bs=0.000000,sendcmd=filename='cache/effect-automation/d18442cbe54a52c0ce1688c50b3086fecd99a242c7406d4578e1b3561be5a3be.ffcmd',colorbalance@avk_ea_3_84aed0dcc7c50950=rs=0.000000:gs=0.000000:bs=0.000000[v1];[2:a]atrim=start=0.000000:end=2.000000,asetpts=PTS-STARTPTS,aresample=48000,apad=whole_len=96000,atrim=end_sample=96000,asetpts=N/SR/TB,adelay=0S:all=1[a2];color=c=black@0.0:s=160x96:r=10/1:d=2.000000,format=rgba[group1_base];[group1_base][v1]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[group1_vo0];[group1_vo0]format=rgba,trim=start_frame=10:end_frame=20[group1_out];color=c=black@0.0:s=160x96:r=10/1:d=2.000000,format=rgba[group0_base];[group0_base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[group0_vo0];[group0_vo0]format=rgba,trim=start_frame=0:end_frame=10[group0_out];color=c=black:s=160x96:r=10/1:d=2.000000[base];[base][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo0];[vo0][group1_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo1];[vo1]null[vout];[a2]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]aresample=48000,apad=whole_len=96000,atrim=end_sample=96000,asetpts=N/SR/TB[aout]",
+  "inputs": [
+    {
+      "kind": "sequence-projection-budget",
+      "method": "bilinear",
+      "max_working_bytes": 1073741824,
+      "nodes": [
+        {
+          "clip_id": "one",
+          "parent_id": null,
+          "source_canvas": {
+            "width": 160,
+            "height": 96
+          },
+          "parent_canvas": {
+            "width": 160,
+            "height": 96
+          },
+          "working_canvas": {
+            "width": 160,
+            "height": 96
+          },
+          "components_bytes": {
+            "source_rgba_buffers": 122880,
+            "parent_rgba_buffers": 245760,
+            "working_float_and_byte_buffers": 860160,
+            "summed_area_double_planes": 0
+          },
+          "estimated_working_bytes": 1228800
+        },
+        {
+          "clip_id": "two",
+          "parent_id": null,
+          "source_canvas": {
+            "width": 160,
+            "height": 96
+          },
+          "parent_canvas": {
+            "width": 160,
+            "height": 96
+          },
+          "working_canvas": {
+            "width": 160,
+            "height": 96
+          },
+          "components_bytes": {
+            "source_rgba_buffers": 122880,
+            "parent_rgba_buffers": 245760,
+            "working_float_and_byte_buffers": 860160,
+            "summed_area_double_planes": 0
+          },
+          "estimated_working_bytes": 1228800
+        }
+      ],
+      "estimated_working_bytes": 2457600,
+      "scope": "reachable-sequence-projection-instances-only-not-process-rss",
+      "time_disjoint_instances_charged": true,
+      "unused_sequences_charged": false
+    },
+    {
+      "kind": "effect-automation",
+      "protocol": "native-color-command-cfr-v1",
+      "clip_id": "one.inner",
+      "effect": "color_balance",
+      "parameters": [
+        "red"
+      ],
+      "backend": "colorbalance",
+      "target": "avk_ea_0_206c75b99ddf81db",
+      "ffmpeg_sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+      "fps": "10",
+      "ticks_per_second": 90000,
+      "sampled_frames": 10,
+      "state_samples": 10,
+      "frame_start": 0,
+      "frame_stop_exclusive": 10,
+      "commands_between_samples": true,
+      "initial_state_explicit": true,
+      "command_count": 10,
+      "command_file": "cache/effect-automation/b7e46606dc8a97dbb27897d0bc23cb2b30d889086359ce5d16f2a36ed40eaadf.ffcmd",
+      "command_file_sha256": "sha256:b7e46606dc8a97dbb27897d0bc23cb2b30d889086359ce5d16f2a36ed40eaadf",
+      "command_bytes": 670,
+      "clamped_parameter_samples": 0,
+      "author_clock": null,
+      "effect_start_seconds": 0.0,
+      "effect_end_seconds": 1.0,
+      "native_value_serialization": "six-decimals-matches-static-filter-options"
+    },
+    {
+      "kind": "effect-automation",
+      "protocol": "native-color-command-cfr-v1",
+      "clip_id": "one.inner",
+      "effect": "color_balance",
+      "parameters": [
+        "blue"
+      ],
+      "backend": "colorbalance",
+      "target": "avk_ea_1_a212c206d9f2411d",
+      "ffmpeg_sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+      "fps": "10",
+      "ticks_per_second": 90000,
+      "sampled_frames": 10,
+      "state_samples": 10,
+      "frame_start": 0,
+      "frame_stop_exclusive": 10,
+      "commands_between_samples": true,
+      "initial_state_explicit": true,
+      "command_count": 10,
+      "command_file": "cache/effect-automation/94c8fce2d6ebfac54b40ccd891330ae7dc91e271f9428cc2315e9c26f0829f7a.ffcmd",
+      "command_file_sha256": "sha256:94c8fce2d6ebfac54b40ccd891330ae7dc91e271f9428cc2315e9c26f0829f7a",
+      "command_bytes": 674,
+      "clamped_parameter_samples": 0,
+      "author_clock": null,
+      "effect_start_seconds": 0.0,
+      "effect_end_seconds": 1.0,
+      "native_value_serialization": "six-decimals-matches-static-filter-options"
+    },
+    {
+      "asset_id": "frames",
+      "clip_id": "one.inner",
+      "input": 0,
+      "kind": "video",
+      "source_in_tick": 0,
+      "source_out_tick": 90000
+    },
+    {
+      "kind": "effect-automation",
+      "protocol": "native-color-command-cfr-v1",
+      "clip_id": "two.inner",
+      "effect": "color_balance",
+      "parameters": [
+        "red"
+      ],
+      "backend": "colorbalance",
+      "target": "avk_ea_2_a1fbd3fbf8979557",
+      "ffmpeg_sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+      "fps": "10",
+      "ticks_per_second": 90000,
+      "sampled_frames": 10,
+      "state_samples": 10,
+      "frame_start": 10,
+      "frame_stop_exclusive": 20,
+      "commands_between_samples": true,
+      "initial_state_explicit": true,
+      "command_count": 10,
+      "command_file": "cache/effect-automation/e1dd9e5c684e894ca8b8efb6178a58abea6196acf7493b99a4dbdca5ba5b0352.ffcmd",
+      "command_file_sha256": "sha256:e1dd9e5c684e894ca8b8efb6178a58abea6196acf7493b99a4dbdca5ba5b0352",
+      "command_bytes": 670,
+      "clamped_parameter_samples": 0,
+      "author_clock": null,
+      "effect_start_seconds": 1.0,
+      "effect_end_seconds": 2.0,
+      "native_value_serialization": "six-decimals-matches-static-filter-options"
+    },
+    {
+      "kind": "effect-automation",
+      "protocol": "native-color-command-cfr-v1",
+      "clip_id": "two.inner",
+      "effect": "color_balance",
+      "parameters": [
+        "blue"
+      ],
+      "backend": "colorbalance",
+      "target": "avk_ea_3_84aed0dcc7c50950",
+      "ffmpeg_sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+      "fps": "10",
+      "ticks_per_second": 90000,
+      "sampled_frames": 10,
+      "state_samples": 10,
+      "frame_start": 10,
+      "frame_stop_exclusive": 20,
+      "commands_between_samples": true,
+      "initial_state_explicit": true,
+      "command_count": 10,
+      "command_file": "cache/effect-automation/d18442cbe54a52c0ce1688c50b3086fecd99a242c7406d4578e1b3561be5a3be.ffcmd",
+      "command_file_sha256": "sha256:d18442cbe54a52c0ce1688c50b3086fecd99a242c7406d4578e1b3561be5a3be",
+      "command_bytes": 674,
+      "clamped_parameter_samples": 0,
+      "author_clock": null,
+      "effect_start_seconds": 1.0,
+      "effect_end_seconds": 2.0,
+      "native_value_serialization": "six-decimals-matches-static-filter-options"
+    },
+    {
+      "asset_id": "frames",
+      "clip_id": "two.inner",
+      "input": 1,
+      "kind": "video",
+      "source_in_tick": 0,
+      "source_out_tick": 90000
+    },
+    {
+      "asset_id": "sound",
+      "clip_id": "music",
+      "track_id": "audio",
+      "input": 2,
+      "kind": "audio",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "timeline_start_sample": 0,
+      "duration_samples": 96000,
+      "sample_rate": 48000,
+      "group_id": null
+    },
+    {
+      "kind": "sequence-composite",
+      "clip_id": "two",
+      "parent_id": null,
+      "sequence_id": "child",
+      "canvas": {
+        "width": 160,
+        "height": 96,
+        "alpha": true
+      },
+      "parent_canvas": {
+        "width": 160,
+        "height": 96
+      },
+      "anchor_space": "cropped-child-canvas",
+      "raster_adaptation": "same-raster",
+      "working_canvas": {
+        "width": 160,
+        "height": 96
+      },
+      "spatial_sampler": "legacy-same-raster",
+      "sampling_kernel": "bilinear",
+      "projection_working_bytes": 1228800,
+      "compositing": "isolated-source-over",
+      "child_layer_count": 1,
+      "timeline_start_tick": 90000,
+      "duration_tick": 90000,
+      "spatial_order": [
+        "child-composite",
+        "crop",
+        "transform",
+        "opacity",
+        "effects",
+        "mask",
+        "fade"
+      ],
+      "intermediate_files": 0
+    },
+    {
+      "kind": "sequence-composite",
+      "clip_id": "one",
+      "parent_id": null,
+      "sequence_id": "child",
+      "canvas": {
+        "width": 160,
+        "height": 96,
+        "alpha": true
+      },
+      "parent_canvas": {
+        "width": 160,
+        "height": 96
+      },
+      "anchor_space": "cropped-child-canvas",
+      "raster_adaptation": "same-raster",
+      "working_canvas": {
+        "width": 160,
+        "height": 96
+      },
+      "spatial_sampler": "legacy-same-raster",
+      "sampling_kernel": "bilinear",
+      "projection_working_bytes": 1228800,
+      "compositing": "isolated-source-over",
+      "child_layer_count": 1,
+      "timeline_start_tick": 0,
+      "duration_tick": 90000,
+      "spatial_order": [
+        "child-composite",
+        "crop",
+        "transform",
+        "opacity",
+        "effects",
+        "mask",
+        "fade"
+      ],
+      "intermediate_files": 0
+    },
+    {
+      "kind": "audio-track-bus",
+      "track_id": "audio",
+      "scope_id": null,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "processing": {},
+      "sample_rate": 48000
+    },
+    {
+      "kind": "sequence-audio-root",
+      "sample_rate": 48000,
+      "output_samples": 96000,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "automatic_limiter": false,
+      "has_audible_inputs": true
+    },
+    {
+      "kind": "effect-automation-budget",
+      "recursive_shared": true,
+      "targets": 4,
+      "state_samples": 40,
+      "commands": 40,
+      "command_bytes": 2688,
+      "limits": {
+        "targets": 1024,
+        "state_samples": 2000000,
+        "commands": 200000,
+        "command_bytes": 16777216
+      }
+    }
+  ],
+  "profile": null,
+  "settings": {
+    "audio": {
+      "channels": 2,
+      "sample_rate": 48000
+    },
+    "canvas": {
+      "height": 96,
+      "pixel_aspect": {
+        "den": 1,
+        "num": 1
+      },
+      "width": 160
+    },
+    "color": {
+      "matrix": "bt709",
+      "primaries": "bt709",
+      "range": "limited",
+      "transfer": "bt709"
+    },
+    "output": {
+      "container": "mkv",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "pcm_f32le",
+        "bitrate": "192k"
+      }
+    },
+    "timebase": {
+      "display_fps": {
+        "den": 1,
+        "num": 10
+      },
+      "ticks_per_second": 90000
+    }
+  },
+  "delivery": {
+    "clock": {
+      "authored_duration_tick": 180000,
+      "ticks_per_second": 90000,
+      "expected_video_frames": 20,
+      "expected_video_end_seconds": 2.0,
+      "expected_audio_samples_48000": 96000
+    }
+  },
+  "warnings": [],
+  "quality": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "metrics": {
+      "duration_seconds": 2.0,
+      "width": 160,
+      "height": 96,
+      "audio_codec": "pcm_f32le",
+      "video_duration_seconds": 2.0,
+      "audio_duration_seconds": 2.0,
+      "av_duration_delta_seconds": 0.0,
+      "av_start_delta_seconds": 0.0,
+      "av_end_delta_seconds": 0.0,
+      "av_sync_residual_seconds": 0.0,
+      "av_sync_residuals": {
+        "start_delta_seconds": 0.0,
+        "end_delta_seconds": 0.0,
+        "video_start_seconds": 0.0,
+        "audio_start_seconds": 0.0,
+        "video_end_seconds": 0.0,
+        "audio_end_seconds": 0.0
+      },
+      "stream_timing": {
+        "video": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 2.0,
+          "duration_source": "matroska-duration-tag",
+          "end_seconds": 2.0
+        },
+        "audio": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 2.0,
+          "duration_source": "matroska-duration-tag",
+          "end_seconds": 2.0
+        }
+      },
+      "expected_video_frames": 20,
+      "expected_audio_samples": 96000,
+      "expected_video_duration_seconds": 2.0,
+      "expected_audio_duration_seconds": 2.0,
+      "expected_quantization_delta_seconds": 0.0,
+      "probe": {
+        "duration_seconds": 2.0,
+        "duration_tick": 180000,
+        "format": "matroska,webm",
+        "format_long_name": "Matroska / WebM",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High 4:4:4 Predictive",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "mime_codec_string": "avc1.f4000a",
+            "width": 160,
+            "height": 96,
+            "coded_width": 160,
+            "coded_height": 96,
+            "has_b_frames": 0,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "5:3",
+            "pix_fmt": "yuv444p",
+            "level": 10,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "r_frame_rate": "10/1",
+            "avg_frame_rate": "10/1",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bits_per_raw_sample": "8",
+            "extradata_size": 48,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 libx264",
+              "DURATION": "00:00:02.000000000"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "pcm_f32le",
+            "codec_long_name": "PCM 32-bit floating point little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "sample_fmt": "flt",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 32,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bit_rate": "3072000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 pcm_f32le",
+              "DURATION": "00:00:02.000000000"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 160,
+          "height": 96,
+          "pix_fmt": "yuv444p",
+          "fps": "10/1",
+          "color_space": "bt709",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_f32le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      }
+    }
+  },
+  "project_fingerprint": "9526a6b81cdf3eeb44946376dcb1b44845bcdf22ae42f2e0729d0bd297a286d0",
+  "input_hashes": {
+    "frames": "sha256:e1a80e2177915a6dd0b9eb4cff5d23aa8915526fc536326ab7a5ff3bde35dcc0",
+    "sound": "sha256:8378724f9c6659b1f016ecbac9157346b9eb516f80128719e4a1aa348ed8d2cd"
+  },
+  "resume_of": null
+}

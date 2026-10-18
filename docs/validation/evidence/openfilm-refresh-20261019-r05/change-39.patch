@@ -1,0 +1,40 @@
+--- fixed/packages/openfilm/studio/ui/src/lib/host.ts
++++ head/packages/openfilm/studio/ui/src/lib/host.ts
+@@ -15,6 +15,8 @@
+ export interface StudioHost {
+   /** the version of this interface the app speaks */
+   version: 1;
++  /** The native Settings menu asks the current page to open General, including the launcher. */
++  settings?: { onOpen: (listener: () => void) => () => void };
+   /** the app's name, for the person */
+   name?: string;
+   /**
+@@ -193,7 +195,7 @@
+ /** An update of the app, ready to install or installing; `waiting`: why the last Restart did not go ahead. */
+ export type HostUpdate = { status: 'ready' | 'installing'; version: string; waiting?: 'agent-busy' | 'exporting' | 'install-failed' | null };
+ 
+-export type HostAgentId = 'codex' | 'claude' | 'gemini' | 'copilot' | 'cursor' | 'opencode' | 'codebuddy' | 'qwen' | 'kimi' | 'minimax' | 'byok';
++export type HostAgentId = 'codex' | 'claude' | 'copilot' | 'cursor' | 'opencode' | 'codebuddy' | 'qwen' | 'kimi' | 'minimax' | 'byok';
+ /**
+  * What was searched for an agent (`agents.diagnose`): the report to copy, the program's name, where it was found, and
+  * when it was not, why: chosen-missing (the program chosen is gone) · wsl (only inside WSL, which the app cannot use) ·
+@@ -231,12 +233,13 @@
+ 
+ /**
+  * One of the person's own models: its `id` (the app's), the `name` the chat's menu shows, its service (API `format`
+- * and `baseUrl`), the `model` asked for there, its efforts, and the last four characters of its key.
+- */
+-export interface HostOwnModel extends HostByokEffort { id: string; name: string; format: HostByokFormat; baseUrl: string; model: string; last4: string }
+-
+-/** What setting up one of the person's own models sends: `id` to change one, no `key` to keep its key. */
+-export interface HostOwnModelConfig { id?: string; name?: string; format: HostByokFormat; baseUrl: string; model: string; key?: string; levels: HostByokEffortLevel[]; effort: HostByokEffortLevel }
++ * and `baseUrl`), the `model` asked for there, its efforts, its `context` length in tokens (none: 128K), and the last
++ * four characters of its key.
++ */
++export interface HostOwnModel extends HostByokEffort { id: string; name: string; format: HostByokFormat; baseUrl: string; model: string; context?: number; last4: string }
++
++/** What setting up one of the person's own models sends: `id` to change one, no `key` to keep its key, no `context` for 128K. */
++export interface HostOwnModelConfig { id?: string; name?: string; format: HostByokFormat; baseUrl: string; model: string; key?: string; levels: HostByokEffortLevel[]; effort: HostByokEffortLevel; context?: number }
+ 
+ /**
+  * The reasoning efforts a model of the person's own key offers, in this order (`auto`: none is sent, the service decides),

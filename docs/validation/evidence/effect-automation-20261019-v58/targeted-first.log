@@ -1,0 +1,78 @@
+test_cli_rejects_unknown_dynamic_channel_without_writing_project (test_effect_automation.EffectAutomationCliTests.test_cli_rejects_unknown_dynamic_channel_without_writing_project) ... ok
+test_real_cli_plan_and_render_persist_runtime_evidence (test_effect_automation.EffectAutomationCliTests.test_real_cli_plan_and_render_persist_runtime_evidence) ... ok
+test_recursive_window_and_parent_own_effects_share_unique_budget (test_effect_automation.EffectAutomationCliTests.test_recursive_window_and_parent_own_effects_share_unique_budget) ... ERROR
+test_alias_prefix_and_top_level_precedence (test_effect_automation.EffectAutomationContractTests.test_alias_prefix_and_top_level_precedence) ... ok
+test_bezier_controls_reject_malformed_numbers_and_x_ranges (test_effect_automation.EffectAutomationContractTests.test_bezier_controls_reject_malformed_numbers_and_x_ranges) ... ok
+test_cache_corruption_is_not_silently_replaced (test_effect_automation.EffectAutomationContractTests.test_cache_corruption_is_not_silently_replaced) ... ok
+test_catalog_advertises_exact_numeric_channels_and_static_boolean (test_effect_automation.EffectAutomationContractTests.test_catalog_advertises_exact_numeric_channels_and_static_boolean) ... ok
+test_command_budget_is_enforced (test_effect_automation.EffectAutomationContractTests.test_command_budget_is_enforced) ... ok
+test_command_text_budget_is_enforced (test_effect_automation.EffectAutomationContractTests.test_command_text_budget_is_enforced) ... ok
+test_disabled_effect_remains_disabled (test_effect_automation.EffectAutomationContractTests.test_disabled_effect_remains_disabled) ... ok
+test_duplicate_aliases_cannot_compete_for_one_native_option (test_effect_automation.EffectAutomationContractTests.test_duplicate_aliases_cannot_compete_for_one_native_option) ... ok
+test_each_easing_is_evaluated_on_author_ticks (test_effect_automation.EffectAutomationContractTests.test_each_easing_is_evaluated_on_author_ticks) ... 
+  test_each_easing_is_evaluated_on_author_ticks (test_effect_automation.EffectAutomationContractTests.test_each_easing_is_evaluated_on_author_ticks) (name='bezier') ... FAIL
+test_fractional_fps_and_between_sample_command_placement (test_effect_automation.EffectAutomationContractTests.test_fractional_fps_and_between_sample_command_placement) ... ok
+test_instance_budget_is_enforced (test_effect_automation.EffectAutomationContractTests.test_instance_budget_is_enforced) ... ok
+test_missing_runtime_commands_fail_before_a_command_file_is_written (test_effect_automation.EffectAutomationContractTests.test_missing_runtime_commands_fail_before_a_command_file_is_written) ... ok
+test_overshoot_is_clamped_and_recorded (test_effect_automation.EffectAutomationContractTests.test_overshoot_is_clamped_and_recorded) ... ok
+test_reverse_ancestor_maps_back_to_original_author_clock (test_effect_automation.EffectAutomationContractTests.test_reverse_ancestor_maps_back_to_original_author_clock) ... ok
+test_sample_budget_rejects_before_native_probe (test_effect_automation.EffectAutomationContractTests.test_sample_budget_rejects_before_native_probe) ... ok
+test_static_path_needs_no_runtime_context_or_commands (test_effect_automation.EffectAutomationContractTests.test_static_path_needs_no_runtime_context_or_commands) ... ok
+test_ticks_are_integer_strict_and_inside_complete_author_range (test_effect_automation.EffectAutomationContractTests.test_ticks_are_integer_strict_and_inside_complete_author_range) ... ok
+test_two_equal_effects_have_distinct_targets_and_deterministic_replay (test_effect_automation.EffectAutomationContractTests.test_two_equal_effects_have_distinct_targets_and_deterministic_replay) ... ok
+test_unknown_dynamic_properties_reject_including_command_tokens (test_effect_automation.EffectAutomationContractTests.test_unknown_dynamic_properties_reject_including_command_tokens) ... ok
+test_values_are_numeric_finite_and_bounded (test_effect_automation.EffectAutomationContractTests.test_values_are_numeric_finite_and_bounded) ... ok
+test_all_nine_wheel_channels_and_preserved_alpha (test_effect_automation.EffectAutomationNativeTests.test_all_nine_wheel_channels_and_preserved_alpha) ... ok
+test_native_fractional_display_rate_uses_actual_sample_times (test_effect_automation.EffectAutomationNativeTests.test_native_fractional_display_rate_uses_actual_sample_times) ... ok
+test_native_hold_changes_on_exact_display_boundary (test_effect_automation.EffectAutomationNativeTests.test_native_hold_changes_on_exact_display_boundary) ... ok
+test_real_native_commands_execute_all_five_color_families (test_effect_automation.EffectAutomationNativeTests.test_real_native_commands_execute_all_five_color_families) ... ok
+test_two_native_instances_do_not_cross_modify (test_effect_automation.EffectAutomationNativeTests.test_two_native_instances_do_not_cross_modify) ... ok
+
+======================================================================
+ERROR: test_recursive_window_and_parent_own_effects_share_unique_budget (test_effect_automation.EffectAutomationCliTests.test_recursive_window_and_parent_own_effects_share_unique_budget)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_effect_automation.py", line 295, in test_recursive_window_and_parent_own_effects_share_unique_budget
+    _, _, metadata, _ = build_filter_graph(self.root, self.project, self.sequence)
+                        ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3676, in build_filter_graph
+    project, sequence, inline_inputs, inline_filters, inline_meta = _prepare_inline_sequences(
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root, project, sequence, child_builder, stack=_inline_stack)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\inline_sequences.py", line 107, in prepare
+    child_inputs, graph, child_meta, warnings = build_graph(
+                                                ~~~~~~~~~~~^
+        root, child_project, child, _video_only=not complete_audio, _inline_stack=(*stack,sequence['id']),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        _allow_audio_only=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3665, in child_builder
+    return build_filter_graph(*args, **kwargs, _effect_runtime=_effect_runtime)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 3674, in build_filter_graph
+    project, sequence, window_inputs, window_filters, window_meta = _prepare_clip_windows(
+                                                                    ~~~~~~~~~~~~~~~~~~~~~^
+        root, project, sequence, child_builder, stack=_inline_stack, video_only=_video_only)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\clip_windows.py", line 211, in prepare
+    authored_duration = validate_window(clip)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\clip_windows.py", line 43, in validate_window
+    fail('窗口必须包含 version/authored_start_tick/authored_duration_tick/offset_tick')
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\clip_windows.py", line 22, in fail
+    raise AppError(code, message, exit_code=2, path=path)
+ai_ad_editor.errors.AppError: 窗口必须包含 version/authored_start_tick/authored_duration_tick/offset_tick
+
+======================================================================
+FAIL: test_each_easing_is_evaluated_on_author_ticks (test_effect_automation.EffectAutomationContractTests.test_each_easing_is_evaluated_on_author_ticks) (name='bezier')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_effect_automation.py", line 110, in test_each_easing_is_evaluated_on_author_ticks
+    self.assertAlmostEqual(curve.value(.25), expected, places=6)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.15624946 != 0.15625 within 6 places (5.399999999933236e-07 difference)
+
+----------------------------------------------------------------------
+Ran 28 tests in 12.041s
+
+FAILED (failures=1, errors=1)

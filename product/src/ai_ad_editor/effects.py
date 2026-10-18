@@ -10,9 +10,10 @@ from __future__ import annotations
 
 from copy import deepcopy
 from typing import Any
+from .effect_automation import SPECS as AUTOMATION_SPECS
 
 
-EFFECT_CATALOG_VERSION = "0.4.0"
+EFFECT_CATALOG_VERSION = "0.5.0"
 
 
 def _parameter(
@@ -43,7 +44,7 @@ def _effect(
     parameters: dict[str, dict[str, Any]] | None = None,
     limits: tuple[str, ...] = (),
 ) -> dict[str, Any]:
-    return {
+    item = {
         "id": effect_id,
         "aliases": list(aliases),
         "category": category,
@@ -54,6 +55,14 @@ def _effect(
         "parameters": parameters or {},
         "limits": list(limits),
     }
+    if effect_id in AUTOMATION_SPECS:
+        item.update(keyframable=True,
+                    keyframe_parameters=list(AUTOMATION_SPECS[effect_id]),
+                    keyframe_engine='native-color-command-cfr-v1')
+        item['limits'].extend(['numeric_channels_only_bool_and_enum_stay_static',
+                               'complete_author_clock_at_CFR_samples',
+                               'recursive_command_and_sampling_budgets'])
+    return item
 
 
 _EFFECTS: tuple[dict[str, Any], ...] = (

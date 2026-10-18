@@ -1,0 +1,388 @@
+{
+  "ok": true,
+  "command": "render",
+  "request_id": "req_20261018180446_658ea3f6",
+  "operation_id": "render_20261018180445_278763eb",
+  "status": "succeeded",
+  "data": {
+    "status": "succeeded",
+    "operation_id": "render_20261018180445_278763eb",
+    "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-automation-r7-20261019-v58\\CA12\\renders\\CA12.webm",
+    "manifest": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-automation-r7-20261019-v58\\CA12\\renders\\CA12.webm.manifest.json",
+    "filter_graph_transport": {
+      "mode": "inline",
+      "sha256": "sha256:8ba1662312beab859c1e04ccf6939525c46cfbfb1cc14f853ece954141a6a072",
+      "utf8_bytes": 1940,
+      "logical_command_utf16_units": 2730
+    },
+    "profile": null,
+    "settings": {
+      "timebase": {
+        "ticks_per_second": 90000,
+        "display_fps": {
+          "num": 10,
+          "den": 1
+        }
+      },
+      "canvas": {
+        "width": 160,
+        "height": 96,
+        "pixel_aspect": {
+          "num": 1,
+          "den": 1
+        }
+      },
+      "color": {
+        "primaries": "bt709",
+        "transfer": "bt709",
+        "matrix": "bt709",
+        "range": "limited"
+      },
+      "audio": {
+        "sample_rate": 48000,
+        "channels": 2
+      },
+      "output": {
+        "container": "webm",
+        "video": {
+          "codec": "libvpx-vp9",
+          "preset": "medium",
+          "crf": 0,
+          "pixel_format": "yuva420p"
+        },
+        "audio": {
+          "codec": "libopus",
+          "bitrate": "192k"
+        }
+      }
+    },
+    "delivery": {
+      "alpha": {
+        "conversion": "separate-original-8-bit-plane",
+        "encoding_precision": "lossless-yuv-alpha",
+        "rgba_lossless": false,
+        "pixel_format": "yuva420p",
+        "decoder": "libvpx-vp9"
+      },
+      "clock": {
+        "authored_duration_tick": 90000,
+        "ticks_per_second": 90000,
+        "expected_video_frames": 10,
+        "expected_video_end_seconds": 1.0,
+        "expected_audio_samples_48000": 48000
+      }
+    },
+    "probe": {
+      "duration_seconds": 1.008,
+      "duration_tick": 90720,
+      "format": "matroska,webm",
+      "format_long_name": "Matroska / WebM",
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "vp9",
+          "codec_long_name": "Google VP9",
+          "profile": "Profile 0",
+          "codec_type": "video",
+          "codec_tag_string": "[0][0][0][0]",
+          "codec_tag": "0x0000",
+          "mime_codec_string": "vp09.00.10.08",
+          "width": 160,
+          "height": 96,
+          "coded_width": 160,
+          "coded_height": 96,
+          "has_b_frames": 0,
+          "sample_aspect_ratio": "1:1",
+          "display_aspect_ratio": "5:3",
+          "pix_fmt": "yuv420p",
+          "level": -99,
+          "color_range": "tv",
+          "color_space": "bt709",
+          "field_order": "progressive",
+          "r_frame_rate": "10/1",
+          "avg_frame_rate": "10/1",
+          "time_base": "1/1000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "disposition": {
+            "default": 0,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "alpha_mode": "1",
+            "ENCODER": "Lavc62.28.100 libvpx-vp9",
+            "DURATION": "00:00:01.000000000"
+          }
+        },
+        {
+          "index": 1,
+          "codec_name": "opus",
+          "codec_long_name": "Opus (Opus Interactive Audio Codec)",
+          "codec_type": "audio",
+          "codec_tag_string": "[0][0][0][0]",
+          "codec_tag": "0x0000",
+          "mime_codec_string": "opus",
+          "sample_fmt": "fltp",
+          "sample_rate": "48000",
+          "channels": 2,
+          "channel_layout": "stereo",
+          "bits_per_sample": 0,
+          "initial_padding": 312,
+          "r_frame_rate": "0/0",
+          "avg_frame_rate": "0/0",
+          "time_base": "1/1000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "extradata_size": 19,
+          "disposition": {
+            "default": 0,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "ENCODER": "Lavc62.28.100 libopus",
+            "DURATION": "00:00:01.008000000"
+          }
+        }
+      ],
+      "video": {
+        "codec": "vp9",
+        "width": 160,
+        "height": 96,
+        "pix_fmt": "yuv420p",
+        "fps": "10/1",
+        "color_space": "bt709",
+        "duration_seconds": 0.0,
+        "start_time_seconds": 0.0
+      },
+      "audio": {
+        "codec": "opus",
+        "sample_rate": 48000,
+        "channels": 2,
+        "duration_seconds": 0.0,
+        "start_time_seconds": 0.0
+      }
+    },
+    "warnings": [],
+    "quality": {
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "duration_seconds": 1.008,
+        "width": 160,
+        "height": 96,
+        "audio_codec": "opus",
+        "video_duration_seconds": 1.0,
+        "audio_duration_seconds": 1.008,
+        "av_duration_delta_seconds": 0.008000000000000007,
+        "av_start_delta_seconds": 0.0,
+        "av_end_delta_seconds": 0.008000000000000007,
+        "av_sync_residual_seconds": 0.008000000000000007,
+        "av_sync_residuals": {
+          "start_delta_seconds": 0.0,
+          "end_delta_seconds": 0.008000000000000007,
+          "video_start_seconds": 0.0,
+          "audio_start_seconds": 0.0,
+          "video_end_seconds": 0.0,
+          "audio_end_seconds": 0.008000000000000007
+        },
+        "stream_timing": {
+          "video": {
+            "start_seconds": 0.0,
+            "start_source": "stream-start-time",
+            "duration_seconds": 1.0,
+            "duration_source": "matroska-duration-tag",
+            "end_seconds": 1.0
+          },
+          "audio": {
+            "start_seconds": 0.0,
+            "start_source": "stream-start-time",
+            "duration_seconds": 1.008,
+            "duration_source": "matroska-duration-tag",
+            "end_seconds": 1.008
+          }
+        },
+        "expected_video_frames": 10,
+        "expected_audio_samples": 48000,
+        "expected_video_duration_seconds": 1.0,
+        "expected_audio_duration_seconds": 1.0,
+        "expected_quantization_delta_seconds": 0.0,
+        "probe": {
+          "duration_seconds": 1.008,
+          "duration_tick": 90720,
+          "format": "matroska,webm",
+          "format_long_name": "Matroska / WebM",
+          "streams": [
+            {
+              "index": 0,
+              "codec_name": "vp9",
+              "codec_long_name": "Google VP9",
+              "profile": "Profile 0",
+              "codec_type": "video",
+              "codec_tag_string": "[0][0][0][0]",
+              "codec_tag": "0x0000",
+              "mime_codec_string": "vp09.00.10.08",
+              "width": 160,
+              "height": 96,
+              "coded_width": 160,
+              "coded_height": 96,
+              "has_b_frames": 0,
+              "sample_aspect_ratio": "1:1",
+              "display_aspect_ratio": "5:3",
+              "pix_fmt": "yuv420p",
+              "level": -99,
+              "color_range": "tv",
+              "color_space": "bt709",
+              "field_order": "progressive",
+              "r_frame_rate": "10/1",
+              "avg_frame_rate": "10/1",
+              "time_base": "1/1000",
+              "start_pts": 0,
+              "start_time": "0.000000",
+              "disposition": {
+                "default": 0,
+                "dub": 0,
+                "original": 0,
+                "comment": 0,
+                "lyrics": 0,
+                "karaoke": 0,
+                "forced": 0,
+                "hearing_impaired": 0,
+                "visual_impaired": 0,
+                "clean_effects": 0,
+                "attached_pic": 0,
+                "timed_thumbnails": 0,
+                "non_diegetic": 0,
+                "captions": 0,
+                "descriptions": 0,
+                "metadata": 0,
+                "dependent": 0,
+                "still_image": 0,
+                "multilayer": 0
+              },
+              "tags": {
+                "alpha_mode": "1",
+                "ENCODER": "Lavc62.28.100 libvpx-vp9",
+                "DURATION": "00:00:01.000000000"
+              }
+            },
+            {
+              "index": 1,
+              "codec_name": "opus",
+              "codec_long_name": "Opus (Opus Interactive Audio Codec)",
+              "codec_type": "audio",
+              "codec_tag_string": "[0][0][0][0]",
+              "codec_tag": "0x0000",
+              "mime_codec_string": "opus",
+              "sample_fmt": "fltp",
+              "sample_rate": "48000",
+              "channels": 2,
+              "channel_layout": "stereo",
+              "bits_per_sample": 0,
+              "initial_padding": 312,
+              "r_frame_rate": "0/0",
+              "avg_frame_rate": "0/0",
+              "time_base": "1/1000",
+              "start_pts": 0,
+              "start_time": "0.000000",
+              "extradata_size": 19,
+              "disposition": {
+                "default": 0,
+                "dub": 0,
+                "original": 0,
+                "comment": 0,
+                "lyrics": 0,
+                "karaoke": 0,
+                "forced": 0,
+                "hearing_impaired": 0,
+                "visual_impaired": 0,
+                "clean_effects": 0,
+                "attached_pic": 0,
+                "timed_thumbnails": 0,
+                "non_diegetic": 0,
+                "captions": 0,
+                "descriptions": 0,
+                "metadata": 0,
+                "dependent": 0,
+                "still_image": 0,
+                "multilayer": 0
+              },
+              "tags": {
+                "ENCODER": "Lavc62.28.100 libopus",
+                "DURATION": "00:00:01.008000000"
+              }
+            }
+          ],
+          "video": {
+            "codec": "vp9",
+            "width": 160,
+            "height": 96,
+            "pix_fmt": "yuv420p",
+            "fps": "10/1",
+            "color_space": "bt709",
+            "duration_seconds": 0.0,
+            "start_time_seconds": 0.0
+          },
+          "audio": {
+            "codec": "opus",
+            "sample_rate": 48000,
+            "channels": 2,
+            "duration_seconds": 0.0,
+            "start_time_seconds": 0.0
+          }
+        }
+      }
+    },
+    "project_fingerprint": "6e38e63eb8087cb78ed95c2e547001d65c1e19d66f12a14e41eb3a40c4ea5454",
+    "input_hashes": {
+      "font": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22",
+      "sound": "sha256:8378724f9c6659b1f016ecbac9157346b9eb516f80128719e4a1aa348ed8d2cd"
+    },
+    "resume_of": null
+  },
+  "artifacts": [],
+  "warnings": [],
+  "errors": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "schema_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "started_at": "2026-10-18T18:04:46.280040Z",
+    "finished_at": "2026-10-18T18:04:46.280051Z",
+    "network": "disabled"
+  }
+}

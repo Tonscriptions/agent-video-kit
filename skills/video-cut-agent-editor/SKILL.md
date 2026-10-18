@@ -5,6 +5,21 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For animated color parameters, read the
+[numeric automation contract](../../docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md).
+Use catalog 0.5.0 `effects list/inspect` and existing compose `update_clip`
+effects: 19 numeric channels of temperature, balance, three-way wheel,
+exposure and levels execute on actual CFR samples. Retain complete author
+graphs in package transfers; the target rebuilds content-addressed command
+files with globally unique filter targets. Unknown dynamic properties,
+unavailable native runtime options, corrupt caches and cumulative graph
+budgets reject explicitly. Inspect `effect-automation` and its root budget.
+Interval adjustment clocks and six-decimal serialization are explicit limits;
+Kelvin still uses the existing shadow-RGB mapping. Review the
+[real outputs, original failures and native installation](../../docs/validation/逐帧调色参数自动化实测_2026-10-19.md).
+Same-FFmpeg static references require the same declared composite/encoding
+boundary; this does not accept HDR, physical white balance or CapCut parity.
+
 For automatic duration following after relative speed/curve/reverse/freeze,
 read the [complete output retime contract](../../docs/specs/完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md).
 Use `timeline edit` action `retime`, or compose `retime_clip`, with a transform

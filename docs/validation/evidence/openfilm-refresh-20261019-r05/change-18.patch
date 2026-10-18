@@ -1,0 +1,77 @@
+--- fixed/apps/desktop/src/agents.mjs
++++ head/apps/desktop/src/agents.mjs
+@@ -1,12 +1,12 @@
+ /**
+- * The chat's agents: the person's own Claude Code, Codex, Gemini CLI, GitHub Copilot, Cursor, OpenCode, CodeBuddy,
+- * Qwen Code, Kimi or MiniMax Code, driven over the Agent Client Protocol (ACP): a child process speaking JSON-RPC over
++ * The chat's agents: the person's own Claude Code, Codex, GitHub Copilot, Cursor, OpenCode, CodeBuddy, Qwen Code,
++ * Kimi or MiniMax Code, driven over the Agent Client Protocol (ACP): a child process speaking JSON-RPC over
+  * stdin/stdout.
+  * The app is the client: initialize, session/new (or session/resume for a conversation from before), session/prompt;
+  * session/update draws the chat, and session/request_permission asks the person in the chat.
+  *
+  * Claude Code and Codex speak it through their makers' official adapters (`@agentclientprotocol/claude-agent-acp`,
+- * `@agentclientprotocol/codex-acp`, Apache-2.0), which the app carries; the others speak it themselves (`gemini --acp`,
++ * `@agentclientprotocol/codex-acp`, Apache-2.0), which the app carries; the others speak it themselves (`qwen --acp`,
+  * `opencode acp`, …), as the ACP registry (agentclientprotocol.com/registry) starts them.
+  *
+  * Why the person's own installation, never one bundled with the app:
+@@ -72,7 +72,6 @@
+     login: ['login'],
+     systemPrompt: true,
+   },
+-  gemini: { label: 'Gemini CLI', args: ['--acp', '--approval-mode', 'yolo'], login: [], approve: true },
+   copilot: { label: 'GitHub Copilot', args: ['--acp', '--allow-all'], login: ['login'], approve: true },
+   cursor: { label: 'Cursor', args: ['--force', 'acp'], auth: ['status'], login: ['login'], authenticate: 'cursor_login', approve: true },
+   opencode: { label: 'OpenCode', args: ['acp'], login: ['auth', 'login'], approve: true },
+@@ -658,15 +657,27 @@
+   return Object.assign(new Error(`Codex ${version} is older than OpenFilm needs (${CODEX_TESTED} or later): update Codex, then try again. ${why}`.trim()), { code: 'outdated' });
+ }
+ 
+-/**
+- * A session refused for the agent's sign-in, said so (`code: 'sign-in'`); any other error with its reason: an error
+- * the agent sends as "Internal error" carries the reason in its `data` (Codex's settings it cannot read, for one).
++/** ACP's internal error: what an agent's own failures come as. */
++const INTERNAL_ERROR = -32603;
++
++/**
++ * A session refused for the agent's sign-in, said so (`code: 'sign-in'`); any other error with its reason (errorCause).
+  */
+ export function signInError(label, e) {
+   if (e?.code === AUTH_REQUIRED) return Object.assign(new Error(`${label} is not signed in. Sign in under Settings → Agents.`), { code: 'sign-in' });
+-  const data = e?.data;
++  return errorCause(e);
++}
++
++/**
++ * An error the agent sends as just "Internal error" with its reason: the reason is in its `data`, as a string or its
++ * `message` or `details` (the ACP SDK puts a thrown Error's text there; Codex its settings it cannot read). The error
++ * it came as stays its `cause`.
++ */
++export function errorCause(e) {
++  if (e?.code !== INTERNAL_ERROR || String(e.message ?? '').trim() !== 'Internal error') return e;
++  const data = e.data;
+   const why = typeof data === 'string' ? data : [data?.message, data?.details].find((v) => typeof v === 'string') ?? '';
+-  return why.trim() ? Object.assign(new Error(why.trim()), { code: e.code }) : e;
++  return why.trim() ? Object.assign(new Error(why.trim(), { cause: e }), { code: e.code }) : e;
+ }
+ 
+ /** The answer that lets it go ahead (for good, where it offers that), or null when none does. */
+@@ -835,7 +846,7 @@
+     const resumed = Boolean(session);
+     session ??= await this.conn.agent.request(acp.methods.agent.session.new, params).catch((e) => { throw signInError(this.spec.label, e); });
+     this.sessionId = session.sessionId;
+-    /* an agent on the older model and mode lists (Gemini CLI): the same choices, as config options */
++    /* an agent on the protocol's older model and mode lists: the same choices, as config options */
+     this.legacy = !session.configOptions && Boolean(session.models || session.modes);
+     if (resumed) this.instructions = null;
+     this.info = {
+@@ -889,7 +900,7 @@
+         const own = this.opts.harness?.models?.find((m) => m.id === this.modelNow) ?? this.opts.harness?.models?.[0];
+         const broke = own ? outOfBalance({ id: own.name, baseUrl: own.baseUrl }, e) : null;
+         if (broke) throw broke;
+-        if (!isAgentId(this.opts.agent)) throw e;
++        if (!isAgentId(this.opts.agent)) throw errorCause(e);
+         const said = signInError(this.spec.label, e);
+         if (said.code === 'sign-in') noteSignedOut(this.opts.agent);
+         throw said;

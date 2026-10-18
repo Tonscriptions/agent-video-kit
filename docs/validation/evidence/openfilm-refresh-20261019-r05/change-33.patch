@@ -1,0 +1,10 @@
+--- fixed/packages/openfilm/studio/ui/src/components/settings/SettingsModal.tsx
++++ head/packages/openfilm/studio/ui/src/components/settings/SettingsModal.tsx
+@@ -488,6 +488,7 @@
+   };
+ 
+   const groups: Array<{ title: string; items: Array<{ label: string; keys: string[] }> }> = [
++    ...(studioHost?.settings ? [{ title: t('settings.sections.general'), items: [{ label: t('settings.title'), keys: [k(',', { mod: true })] }] }] : []),
+     ...SHORTCUTS.map((group) => ({
+       title: t(`settings.shortcuts.${group.group}`),
+       items: group.rows.map((row) => ({ label: t(`settings.shortcuts.${row.label}`), keys: row.keys.map(keyText) })),

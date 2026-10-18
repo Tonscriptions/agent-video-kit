@@ -1,0 +1,1336 @@
+[
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA01.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:35983cca8eb9db2f57797e2d4b9c9e2eebda9a58739552cd540259c061824331",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA01.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:fa5bc1adf607cd8a010b33a87484578cac690998d8da85f7cb102213774be371",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA01.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:ba5b98d1ae50501f6d2e448017031e26d3b1172813b07beb9db02cb82021afab",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA01.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:287a66390e6eac94cfc022529b5502451b7de3e550d3263a79d064d6a610b2f3",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA01.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:cf1e2afb6fbd9f6515793ea489f8140fc79550d9fb904b70e53863aa4822a2b0",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA02.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:a4f0958305d20888851f0d474f224da31696d60e56a6f1c2e25232e4414e4f8c",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA02.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:fa5bc1adf607cd8a010b33a87484578cac690998d8da85f7cb102213774be371",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA02.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:2fcaa508cd52bece6caa18c8d35bfd46a34ce782b0067d693ba708cc9d45ee4b",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA02.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:6f4688617b937900d2ea9804b3f56a9e1fe4bf4e20252a79a81697030aa7cd42",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA02.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:cf1e2afb6fbd9f6515793ea489f8140fc79550d9fb904b70e53863aa4822a2b0",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA03.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:4041532061b1f9bdc2940e2164779a7b4e70678478d6c6e45a2f8b8ee27afb6b",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA03.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:fa5bc1adf607cd8a010b33a87484578cac690998d8da85f7cb102213774be371",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA03.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:ef8e8ec28c958844de6e9039c27c601478c8729ac00a4f404466197d240c6365",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA03.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:c3f20d9ab07eef97a1a7592bd50002d9baca52d9ab5ce0c3d0645dd0d189a548",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA03.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:cf1e2afb6fbd9f6515793ea489f8140fc79550d9fb904b70e53863aa4822a2b0",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA04.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:24751be600447ed7d0c54acacbc19ee1b6132eb7751f620900438d7e6d1d22bb",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA04.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:fa5bc1adf607cd8a010b33a87484578cac690998d8da85f7cb102213774be371",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA04.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:785118c447cc4c95d18ff746893758288c9954381f00ca092a706d6a4f2314a5",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA04.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:8eef686a0e7b7477222d5f65834462c9d77c4c6602b4f280fff0f76e58b8ee92",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA04.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:cf1e2afb6fbd9f6515793ea489f8140fc79550d9fb904b70e53863aa4822a2b0",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA05.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:a9ca5c6437c23290601e5f04aa8f43a6a74068a903d8e2c3231414b86c558d36",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA05.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:fa5bc1adf607cd8a010b33a87484578cac690998d8da85f7cb102213774be371",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA05.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:f5f7d6ec8f7531eaf963e9f700d888ad507e98b8132cb4db235026659b1a682d",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA05.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:aa98b49e4e84e559707426be4752423b345b1ef82990dc04978f04ca6cd23493",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA05.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:cf1e2afb6fbd9f6515793ea489f8140fc79550d9fb904b70e53863aa4822a2b0",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA06.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:5744f2956c2df45ce4c4a61056521fa2c218acfe2067725a68c89f85109c1fad",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA06.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:fa5bc1adf607cd8a010b33a87484578cac690998d8da85f7cb102213774be371",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA06.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:d0ba97cfc7fc62de0e15b245a84d42f41aff67db02a239f34113df0cc4e20643",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA06.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:c9370c869ec4f9e372fec5b3d08cbbeb4a4caeaa18f0ad9111583e837fd12fb2",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA06.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:cf1e2afb6fbd9f6515793ea489f8140fc79550d9fb904b70e53863aa4822a2b0",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA07.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:35c1677e40cb59e0218fec13008efbd5f050209f090579300c35998abb7faea6",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA07.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:fc1cb0a187b817b3f47c16314533eb235f076123c14528869e2ee6db5367ee5f",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA07.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:e005e3e9ac4aeb08ad769b195ee306d0962ae9dacb8aa3c7870b227f0d83d18d",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA07.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:b3c80004cf2801a8a113e326dd1d4f4cbd6a4d404b45e64b15c0c7c8eaeda9df",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA07.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:587bfee272285ef3df690ca14d5ab81e761dc4dba8252cd4d980fc8c6d35aba1",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA08.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:a8a6a5fbb02e2dc34d04de159d57d5ce5a8e631a51e9b9a6ed237f5b04a9fc4d",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA08.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:9f20b17216ce20e00f4ba1d737c93ce78b61237dc9949d342bc55135e1f0994e",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA08.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:1e01a1e3bd16170413e01a994c5f83d95bfbab548453ee0f8ffbf61e4690e93f",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA08.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:44027fe9ac0f4f0092d1b06b63d18a9c55b738a1d2b318610d65c685251e04bd",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA08.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:9d2be55dafaa43fc7c2b7bf199b17811db54faf44b3b07a8949c272a19614df8",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA09.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:1328f3d3fc6ea36c1f0d513273d95a670c2ea699c81b1905df6fc5550f07ba25",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA09.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:f9d298ad50655175eae904d847def050392952011eea0bdbfd06fa08caf784fc",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA09.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:ea71ee0b708863b2458b36a3e5ea426b1302c6d55dbf9e29a4b6f49aaed5e36e",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA09.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:7fd8b06cfbed9dd35a98ccacd9cbb3e3f880484b3ab31cf7a6eb49759632e297",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA09.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:2525663d89a41aac8dde765b9828fa2e4e6e1bee222cd2f5861e6d2c1e011b08",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA10.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:24ba5e858259b401c96b2541e043162d823e192fe3d4b1b8e6d6b0a81c87c239",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA10.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:fa5bc1adf607cd8a010b33a87484578cac690998d8da85f7cb102213774be371",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA10.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:937637198deea095072509e3135c1f54b6f7b6cd2be9819ad8aff17aba481045",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA10.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:1cbe606995f86eed0989b5f1083728c271a2d75fd36a6a4deda6eee4802a3216",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA10.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:cf1e2afb6fbd9f6515793ea489f8140fc79550d9fb904b70e53863aa4822a2b0",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA11.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:44be3d7df54da0cac4dbfe82e11d4cb6978e01772736ea43fbbffd0760a6b0c4",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA11.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:ff3ba73762a689779c762137a84947e415639c4aa994510ff4316a82e47e0d85",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA11.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:580c084be9c25fe07b409ce09159003eb4a99e9335dd663e603076348e9da703",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA11.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:34eb48ffc4b1857a9a34a247270a7f043d95ca5265faec2e93bb372a3bb120ce",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA11.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:5b0a5cbd118de1e3c7bed8d5f282a18713f0744a71c6f517a9869e2b971c690a",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-c:v",
+      "libvpx-vp9",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA12.webm",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:cd5e21eb01425412f991be55c6d22d3cea5a72e39fb2743cc16a924f5636d6bf",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA12.webm",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:6d9ed0406f2a280c0f7ebd9baebd17c8bbb7bb5766122423d346d377d11abf23",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA12.webm"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:85e29cd018880a65b7e5e0697b8c9d5ef166421f80f2df11f62300354e897517",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA12.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:3cf2246c6ffc2bc9351491ae2db3617adaae7fc4b89176ca8ed7a52d5f809930",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA12.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:59439ba7ed6009c1a90daa6332dc4edaf6098997db148aaa60615999f7caf040",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA13.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:f92ad66eb95f30233fc171aa88b18b86dc430ba95519a7195cb2145cf526d284",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA13.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:7fb003195bc9148f0acfc8c9dbee26790cea71515778e7671a6f51177a666bbe",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA13.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:a1be28d05eb8e3a4bc97549733ecfecb0527a5b0da552325dd3337de51ae3a55",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA13.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:ea06bafd9af076b2e1bbfc41072dae0bd408dd73342c60a1690699336ead6732",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA13.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:508a25dafdc27b1ba9a356d614898917b5066d502737a19b6baba6f40dd51143",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA14.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "rgba",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:a67ee9b8cb61b46899efab185d021bf1fe4479f3802313abe1800e8e60e466e9",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA14.mkv",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-f",
+      "f32le",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:fa5bc1adf607cd8a010b33a87484578cac690998d8da85f7cb102213774be371",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA14.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:a87bb093f261e504c899f0b73ef81bc8a8a089ee83e25f47831422fa5b912712",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA14.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:35b57ef1ac49072deeab6432aea357397816071aa8207d407a84c527a26a22f0",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_entries",
+      "frame=best_effort_timestamp_time",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\CA14.mp4"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:cf1e2afb6fbd9f6515793ea489f8140fc79550d9fb904b70e53863aa4822a2b0",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\color-automation-r7-20261019-v58\\source.mkv"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "sha256:7450c67c2b8e9e7c692b9e5816828b7af4886f4e0e7c3618a3a4f96ce12d5721",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

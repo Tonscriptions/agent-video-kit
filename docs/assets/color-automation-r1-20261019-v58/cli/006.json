@@ -1,0 +1,51 @@
+{
+  "ok": false,
+  "command": "validate",
+  "request_id": "req_20261018173155_79891472",
+  "operation_id": null,
+  "status": "failed",
+  "data": {
+    "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-automation-r1-20261019-v58\\base\\validation\\validation_run_20261018173155_84e46aca.json",
+    "ok": false,
+    "errors": [
+      {
+        "code": "ID_DUPLICATE",
+        "message": "重复 ID: picture",
+        "path": "sequences[0].tracks[0].clips[0].id",
+        "retryable": false
+      }
+    ],
+    "warnings": [],
+    "rights": {
+      "ok": true,
+      "target": "commercial_ad",
+      "checked": 4,
+      "required_records": 4,
+      "failures": [],
+      "warnings": [],
+      "disposition_decisions": [],
+      "effective_disposition_decisions": []
+    },
+    "schema_engine": "jsonschema",
+    "asset_count": 4,
+    "sequence_count": 1
+  },
+  "artifacts": [],
+  "warnings": [],
+  "errors": [
+    {
+      "code": "ID_DUPLICATE",
+      "message": "重复 ID: picture",
+      "path": "sequences[0].tracks[0].clips[0].id",
+      "retryable": false
+    }
+  ],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "schema_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "started_at": "2026-10-18T17:31:55.160082Z",
+    "finished_at": "2026-10-18T17:31:55.160088Z",
+    "network": "disabled"
+  }
+}
