@@ -5,6 +5,16 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [FGT research](../../docs/specs/开源时序修复候选核验契约_v0.1_2026-10-18.md),
+keep [the measured synthetic and natural findings](../../docs/validation/开源FGT时序修复候选实测_2026-10-18.md)
+separate. The declared PSNR and known-motion residual gates passed on one
+authored two-surface sequence. Independent integer scoring, decoded RGBA,
+every PTS and natural PCM were checked. Four static natural frames still
+show residue/patches; no hidden-background truth, dense anatomy labels,
+continuous playback or listening acceptance exists. The two workers and
+their RAFT/LAFC/FGT forward counts are not product CLI calls or regression
+methods. This research does not close capability #56 or CapCut parity.
+
 For [encoded mask edits](../../docs/specs/本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md),
 check the actual lossless RGBA round trip, every PTS, operation range and
 independent authored shape coverage. Unchanged frames preserve decoded alpha;

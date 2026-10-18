@@ -1,0 +1,38 @@
+---
+license: mit
+---
+# [ECCV 2022] Flow-Guided Transformer for Video Inpainting
+[![LICENSE](https://img.shields.io/github/license/hitachinsk/FGT)](https://github.com/hitachinsk/FGT/blob/main/LICENSE)
+
+### [[Paper](https://arxiv.org/abs/2208.06768)] / [[Codes](https://github.com/hitachinsk/FGT)] / [[Demo](https://youtu.be/BC32n-NncPs)] / [[Project page](https://hitachinsk.github.io/publication/2022-10-01-Flow-Guided-Transformer-for-Video-Inpainting)]
+
+This repository hosts the pretrained models of the following paper:
+> **Flow-Guided Transformer for Video Inpainting**<br>
+> [Kaidong Zhang](https://hitachinsk.github.io/), [Jingjing Fu](https://www.microsoft.com/en-us/research/people/jifu/) and [Dong Liu](http://staff.ustc.edu.cn/~dongeliu/)<br>
+> European Conference on Computer Vision (**ECCV**), 2022<br>
+
+
+## Details
+There are three models in this repository, here are the details.
+
+- `lafc.pth.tar`: The pretrained model of "Local Aggregation Flow Completion Network", which accepts a sequence of corrupted optical flows, and outputs the completed flows.
+- `lafc_single.pth.tar`: The pretrained model of the single flow completion version of "Local Aggregation Flow Completion Network", it accepts **one** corrupted flow, and outputs **one** completed flow. (Only for the training of the FGT model)
+- `fgt.pth.tar`: The pretrained model of "Flow Guided Transformer", which receives a sequence of corrupted frames and completed optical flows, and outputs the completed frames.
+
+Besides the pretrained weights, we also provide the configuration files of these pretrained models.
+
+- `LAFC_config.yaml`: The configuration file of `lafc.pth.tar`
+- `LAFC_single_config.yaml`: The configuration file of `lafc_single.pth.tar`
+- `FGT_config.yaml`: The configuration file of `fgt.pth.tar`
+
+## Deployment
+Download this repository to the base directory of the codes (please download that at the github page), and run "bash deploy.sh" to form the models and the cofiguration files.
+
+After the step above, you can skip the step 1~3 in the `quick start` section in the github page and run the object removal demo directly.
+
+
+
+
+
+
+

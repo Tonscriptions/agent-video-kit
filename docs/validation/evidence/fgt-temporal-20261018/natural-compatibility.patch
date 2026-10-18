@@ -1,0 +1,41 @@
+--- upstream/tool/video_inpainting.py
++++ research/tool/video_inpainting.py
+@@ -32,7 +32,7 @@
+ from utils.Poisson_blend_img import Poisson_blend_img
+ from get_flowNN_gradient import get_flowNN_gradient
+ from torchvision.transforms import ToTensor
+-import cvbase
++# Optional cvbase visualization is not used by this research invocation.
+ 
+ 
+ def to_tensor(img):
+@@ -425,7 +425,7 @@
+             opts = yaml.full_load(f)
+ 
+     for k in opts.keys():
+-        if k in args:
++        if hasattr(args, k):
+             setattr(args, k, opts[k])
+ 
+     # Flow model.
+@@ -653,7 +653,8 @@
+                     mask[:, :, indFrame],
+                     mask_gradient[:, :, indFrame],
+                 )
+-            except:
++            except Exception as exc:
++                raise RuntimeError('FGT_POISSON_STAGE_FAILED') from exc
+                 frameBlend, UnfilledMask = (
+                     video_comp[:, :, :, indFrame],
+                     mask[:, :, indFrame],
+@@ -743,9 +744,7 @@
+     create_dir(args.outroot)
+     for i in range(len(comp_frames)):
+         comp_frames[i] = comp_frames[i].astype(np.uint8)
+-    imageio.mimwrite(
+-        os.path.join(args.outroot, "result.mp4"), comp_frames, fps=30, quality=8
+-    )
++    np.save(os.path.join(args.outroot, "raw-result.npy"), np.stack(comp_frames), allow_pickle=False)
+     print(f"Done, please check your result in {args.outroot} ")
+ 
+ 

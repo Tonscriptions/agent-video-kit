@@ -1,0 +1,72 @@
+{
+  "case": "natural",
+  "status": "execution_verified_quality_unaccepted",
+  "frames": 32,
+  "runner_sha256": "sha256:33527166e74a3930ddfe4d61547d3e5932ee5fa4cf265a807c4b75b700166b8a",
+  "worker_sha256": "sha256:e4f5faf73944b159ee76d8a49130f7025bb610f0b8e23ad00a6f9c4e1fe079a6",
+  "contract_sha256": "sha256:3d827f4e8fa2bafad6b418f5a6035cfae061cfb2918ac2c977db7391b8e40a19",
+  "parent_network": "disabled",
+  "parent_blocked_network_events": [],
+  "width": 512,
+  "height": 288,
+  "fps": "8/1",
+  "duration_seconds": 4.0,
+  "raw_upstream_outside_selection_changed_pixels": 0,
+  "final_outside_selection_changed_pixels": 0,
+  "original_alpha_exact": true,
+  "rgba_roundtrip_exact": true,
+  "every_pts_exact": true,
+  "worker": {
+    "status": "succeeded",
+    "research_only": true,
+    "network": "disabled",
+    "blocked_network_events": [],
+    "raw_sha256": "sha256:bdf920dd143cb40861cf86e9d16ad77650ab4e64e42bdcbc52786896acb86c28",
+    "model_calls": {
+      "RAFT": 62,
+      "LAFC": 62,
+      "FGT": 7
+    },
+    "loaded_checkpoints": [
+      {
+        "file": "raft-things.pth",
+        "weights_only": true
+      },
+      {
+        "file": "lafc.pth.tar",
+        "weights_only": true
+      },
+      {
+        "file": "fgt.pth.tar",
+        "weights_only": true
+      }
+    ],
+    "versions": {
+      "python": "3.13.14",
+      "torch": "2.13.0+cu130",
+      "numpy": "2.4.6"
+    },
+    "cuda_device": "NVIDIA GeForce RTX 3060",
+    "cuda_peak_allocated_bytes": 2842085888,
+    "source_frame_count": 32,
+    "no_production_adapter": true,
+    "quality_accepted": false,
+    "elapsed_seconds": 74.5421908999997
+  },
+  "audio": {
+    "decoded_pcm_bytes": 768000,
+    "identical": true,
+    "sha256": "5104654d71b86b772336be13c9f07f0d25f4932319f35c0307e97a2eb02fb32f"
+  },
+  "historical_lama": {
+    "record": "docs/validation/evidence/mask-edits-20261018/natural.json",
+    "source_sha256": "sha256:813bc758f73cdb49f2ec206dc5946497279a92f5f900efb042a733249d60c207",
+    "raw_mask_sha256": "sha256:056311e4fce36ff5957985dc78d583a179b3aa439942c2888d2426458f2eac92",
+    "lama_output_sha256": "sha256:36469975887613b5ac5539df6195fb068292e0df58d331374a44a149ee40a262",
+    "new_lama_model_calls": 0
+  },
+  "product_integrated": false,
+  "natural_quality_accepted": false,
+  "continuous_playback_reviewed": false,
+  "audio_listening_reviewed": false
+}

@@ -5,6 +5,17 @@ description: Run registered offline speech, transcription, separation, tracking,
 
 # Local Models
 
+The [FGT candidate contract](../../docs/specs/开源时序修复候选核验契约_v0.1_2026-10-18.md)
+and [measured evaluation](../../docs/validation/开源FGT时序修复候选实测_2026-10-18.md)
+describe a separate native research runner, not a registered `media inpaint`
+engine. Author weights use explicit local SHA checks and weights-only loading.
+One two-surface synthetic sequence passed its declared gate; the existing
+natural shot still has visible residue and texture patches. Never infer
+natural acceptance, automatic shadow/reflection selection or commercial
+clearance from that gate. ROSE was imported offline only; no ROSE inference
+or weights acquisition passed. ProPainter's noncommercial terms and missing
+FuseFormer licensing must not be replaced by a wrapper's permissive license.
+
 For an existing encoded selection with missed or unwanted regions, use
 `media mask-edit --project <path> --asset-id <mask> --edits <local.json>
 --derived-asset-id <new-mask> --dry-run` under the

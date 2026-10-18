@@ -1,0 +1,138 @@
+{
+  "case": "public",
+  "status": "execution_verified_quality_unaccepted",
+  "frames": 32,
+  "runner_sha256": "sha256:33527166e74a3930ddfe4d61547d3e5932ee5fa4cf265a807c4b75b700166b8a",
+  "worker_sha256": "sha256:e4f5faf73944b159ee76d8a49130f7025bb610f0b8e23ad00a6f9c4e1fe079a6",
+  "contract_sha256": "sha256:3d827f4e8fa2bafad6b418f5a6035cfae061cfb2918ac2c977db7391b8e40a19",
+  "parent_network": "disabled",
+  "parent_blocked_network_events": [],
+  "width": 432,
+  "height": 240,
+  "fps": "8/1",
+  "duration_seconds": 4.0,
+  "raw_upstream_outside_selection_changed_pixels": 0,
+  "final_outside_selection_changed_pixels": 0,
+  "original_alpha_exact": true,
+  "rgba_roundtrip_exact": true,
+  "every_pts_exact": true,
+  "worker": {
+    "status": "succeeded",
+    "research_only": true,
+    "network": "disabled",
+    "blocked_network_events": [],
+    "raw_sha256": "sha256:1ce233f245296e95a37527e0deee2d85ed157dd6124e1f77cbb970d0abcfdd27",
+    "model_calls": {
+      "RAFT": 62,
+      "LAFC": 62,
+      "FGT": 7
+    },
+    "loaded_checkpoints": [
+      {
+        "file": "raft-things.pth",
+        "weights_only": true
+      },
+      {
+        "file": "lafc.pth.tar",
+        "weights_only": true
+      },
+      {
+        "file": "fgt.pth.tar",
+        "weights_only": true
+      }
+    ],
+    "versions": {
+      "python": "3.13.14",
+      "torch": "2.13.0+cu130",
+      "numpy": "2.4.6"
+    },
+    "cuda_device": "NVIDIA GeForce RTX 3060",
+    "cuda_peak_allocated_bytes": 1955817472,
+    "source_frame_count": 32,
+    "no_production_adapter": true,
+    "quality_accepted": false,
+    "elapsed_seconds": 58.52233750000596
+  },
+  "audio": null,
+  "historical_lama": null,
+  "product_integrated": false,
+  "natural_quality_accepted": false,
+  "continuous_playback_reviewed": false,
+  "audio_listening_reviewed": false,
+  "fgt_scores": [
+    {
+      "region": "upper",
+      "selected_pixels": 98304,
+      "masked_mse": 32.519500732421875,
+      "masked_psnr_db": 33.00936491560229,
+      "known_motion_residual_mae_rgb": 0.8473184022907901,
+      "temporal_samples_rgb": 273792
+    },
+    {
+      "region": "lower",
+      "selected_pixels": 86016,
+      "masked_mse": 30.48692878844246,
+      "masked_psnr_db": 33.289666845318195,
+      "known_motion_residual_mae_rgb": 0.9801672640382317,
+      "temporal_samples_rgb": 234360
+    },
+    {
+      "region": "overall",
+      "selected_pixels": 184320,
+      "masked_mse": 31.570967158564816,
+      "masked_psnr_db": 33.13792474408254,
+      "known_motion_residual_mae_rgb": 0.9085883751318503,
+      "temporal_samples_rgb": 508152
+    }
+  ],
+  "lama_scores": [
+    {
+      "region": "upper",
+      "selected_pixels": 98304,
+      "masked_mse": 165.5687289767795,
+      "masked_psnr_db": 25.9410204602325,
+      "known_motion_residual_mae_rgb": 5.085751227208976,
+      "temporal_samples_rgb": 273792
+    },
+    {
+      "region": "lower",
+      "selected_pixels": 86016,
+      "masked_mse": 149.37606569320437,
+      "masked_psnr_db": 26.387993441788634,
+      "known_motion_residual_mae_rgb": 5.36305256869773,
+      "temporal_samples_rgb": 234360
+    },
+    {
+      "region": "overall",
+      "selected_pixels": 184320,
+      "masked_mse": 158.01215277777777,
+      "masked_psnr_db": 26.14389870866897,
+      "known_motion_residual_mae_rgb": 5.213642768305546,
+      "temporal_samples_rgb": 508152
+    }
+  ],
+  "quality_gates": [
+    {
+      "region": "upper",
+      "psnr_30_db": true,
+      "psnr_no_worse_than_lama": true,
+      "motion_residual_mae_at_most_5": true,
+      "motion_residual_no_worse_than_lama": true
+    },
+    {
+      "region": "lower",
+      "psnr_30_db": true,
+      "psnr_no_worse_than_lama": true,
+      "motion_residual_mae_at_most_5": true,
+      "motion_residual_no_worse_than_lama": true
+    },
+    {
+      "region": "overall",
+      "psnr_30_db": true,
+      "psnr_no_worse_than_lama": true,
+      "motion_residual_mae_at_most_5": true,
+      "motion_residual_no_worse_than_lama": true
+    }
+  ],
+  "controlled_quality_passed": true
+}
