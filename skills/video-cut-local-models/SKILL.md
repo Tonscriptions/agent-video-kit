@@ -5,6 +5,21 @@ description: Run registered offline speech, transcription, separation, tracking,
 
 # Local Models
 
+For an existing encoded selection with missed or unwanted regions, use
+`media mask-edit --project <path> --asset-id <mask> --edits <local.json>
+--derived-asset-id <new-mask> --dry-run` under the
+[mask editing contract](../../docs/specs/本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md).
+The plan binds the input SHA, dimensions, channel and CFR grid. Rectangle,
+ellipse, polygon and capsule brush support ordered add/subtract/intersect/
+replace, explicit keyframes and cut resets. Inspect the raw selection with
+`quality mask` before passing the new asset to `media inpaint`; growth is a
+separate later operation. This standard-library/FFmpeg path runs no model.
+The output is a white RGB mask with edited alpha, not a source-color cutout.
+Reuse a packaged saved plan with `--edits-from-asset <edited-mask>` and the
+same bound original mask. New geometry requires a new JSON plan/version.
+Saved operations and sparse checkpoint success do not prove object identity,
+complete limbs, temporal stability or natural repair quality.
+
 The [coherent reference experiment](../../docs/specs/空间与时序一致参考选择研究契约_v0.1_2026-10-18.md)
 is research only; its [measured quality gate failed](../../docs/validation/空间与时序一致参考选择实测_2026-10-18.md).
 Do not expose it as a production `media inpaint` adapter or silently replace

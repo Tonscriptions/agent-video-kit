@@ -5,6 +5,13 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For local correction of an encoded mask, use `media mask-edit` with the
+[bound geometry plan](../../docs/specs/本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md).
+Preview with `--dry-run`, create a new mask asset, check it with `quality mask`,
+then explicitly supply it to repair or mask tracking. `--edits-from-asset`
+rebuilds the saved authored plan after packaging. This does not run automatic
+tracking or establish natural object-removal quality.
+
 For linked source slip and genuine local source extension, read the
 [source edit contract](../../docs/specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md).
 Use `timeline edit` actions `slip` / `extend_source`; inspect `source_changes`

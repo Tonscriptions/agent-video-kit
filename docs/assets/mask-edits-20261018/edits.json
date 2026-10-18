@@ -1,0 +1,218 @@
+{
+  "version": "1.0.0",
+  "coordinate_space": "normalized-output",
+  "scene_cut_frames": [
+    8
+  ],
+  "mask": {
+    "asset_id": "mask",
+    "sha256": "sha256:8bd37f73949c00ad6d0d90b300b0a91c8a92b6beca4a2afa916f25b028e236ff",
+    "channel": "alpha",
+    "width": 160,
+    "height": 120,
+    "frames": 16,
+    "fps": "8"
+  },
+  "operations": [
+    {
+      "id": "leg",
+      "mode": "add",
+      "type": "rectangle",
+      "start_frame": 4,
+      "end_frame": 12,
+      "interpolation": "linear",
+      "keyframes": [
+        {
+          "frame": 4,
+          "box": [
+            0.35625,
+            0.5416666666666666,
+            0.40625,
+            0.9166666666666666
+          ]
+        },
+        {
+          "frame": 7,
+          "box": [
+            0.39375,
+            0.5416666666666666,
+            0.44375,
+            0.9166666666666666
+          ]
+        },
+        {
+          "frame": 8,
+          "box": [
+            0.55625,
+            0.5416666666666666,
+            0.60625,
+            0.9166666666666666
+          ]
+        },
+        {
+          "frame": 11,
+          "box": [
+            0.51875,
+            0.5416666666666666,
+            0.56875,
+            0.9166666666666666
+          ]
+        }
+      ]
+    },
+    {
+      "id": "arm",
+      "mode": "add",
+      "type": "brush",
+      "start_frame": 0,
+      "end_frame": 16,
+      "interpolation": "linear",
+      "keyframes": [
+        {
+          "frame": 0,
+          "points": [
+            [
+              0.21875,
+              0.2833333333333333
+            ],
+            [
+              0.13125,
+              0.5416666666666666
+            ]
+          ],
+          "radius_pixels": 4
+        },
+        {
+          "frame": 7,
+          "points": [
+            [
+              0.30625,
+              0.2833333333333333
+            ],
+            [
+              0.21875,
+              0.5416666666666666
+            ]
+          ],
+          "radius_pixels": 4
+        },
+        {
+          "frame": 8,
+          "points": [
+            [
+              0.46875,
+              0.2833333333333333
+            ],
+            [
+              0.38125,
+              0.5416666666666666
+            ]
+          ],
+          "radius_pixels": 4
+        },
+        {
+          "frame": 15,
+          "points": [
+            [
+              0.38125,
+              0.2833333333333333
+            ],
+            [
+              0.29375,
+              0.5416666666666666
+            ]
+          ],
+          "radius_pixels": 4
+        }
+      ]
+    },
+    {
+      "id": "false-disk",
+      "mode": "subtract",
+      "type": "ellipse",
+      "start_frame": 0,
+      "end_frame": 16,
+      "interpolation": "hold",
+      "keyframes": [
+        {
+          "frame": 0,
+          "box": [
+            0.8,
+            0.15,
+            0.925,
+            0.31666666666666665
+          ]
+        },
+        {
+          "frame": 8,
+          "box": [
+            0.8,
+            0.15,
+            0.925,
+            0.31666666666666665
+          ]
+        }
+      ]
+    },
+    {
+      "id": "corner",
+      "mode": "intersect",
+      "type": "polygon",
+      "start_frame": 0,
+      "end_frame": 16,
+      "interpolation": "hold",
+      "keyframes": [
+        {
+          "frame": 0,
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              0.75
+            ],
+            [
+              0.8,
+              1
+            ],
+            [
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "frame": 8,
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              0.75
+            ],
+            [
+              0.8,
+              1
+            ],
+            [
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -21,6 +21,19 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'mask_edit': {
+                'status': 'implemented_with_limits', 'engine': 'agent-local-mask-edit-v1',
+                'commands': ['media.mask-edit'],
+                'features': ['bound_encoded_mask_grid_and_source_sha256', 'add_subtract_intersect_replace_in_order',
+                    'rectangle_ellipse_polygon_capsule_brush', 'hold_linear_geometry_and_explicit_scene_resets',
+                    'bounded_supersampling_opacity_and_inward_feather', 'editable_plan_in_assets_and_packages',
+                    'rebuild_from_registered_authored_plan', 'lossless_alpha_and_exact_cfr_pts',
+                    'dry_run_cancel_timeout_transactions_and_idempotency'],
+                'limits': ['explicit_geometry_not_automatic_object_or_occlusion_reconstruction',
+                    'constant_white_rgb_alpha_coverage_no_audio', 'ellipse_feather_uses_radial_distance_approximation',
+                    'explicit_pixel_buffer_raw_storage_and_work_estimates_not_total_ram',
+                    'not_natural_segmentation_repair_or_capcut_quality_acceptance'],
+            },
             'html_motion': {
                 'status': 'implemented_with_limits', 'engine': 'agent-local-html-motion-v1',
                 'commands': ['motion.html-register','motion.html-source','motion.html-inspect','motion.html-render'],

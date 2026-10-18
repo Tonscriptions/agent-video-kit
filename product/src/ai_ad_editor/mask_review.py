@@ -91,10 +91,15 @@ def prepare(root, asset, *, channel='alpha', threshold=127, fps=None, max_edge=1
         scale = min(1., max_edge/max(width, height)) if max_edge else 1.
         width, height = max(2, round(width*scale)), max(2, round(height*scale))
         rate = Fraction(fps if fps is not None else stream.get('avg_frame_rate') or stream.get('r_frame_rate') or '0') if asset['kind'] == 'video' else Fraction(1)
-        duration = float(stream.get('duration') or probe['duration_seconds']) if asset['kind'] == 'video' else 1.
+        # MOV/MP4 duration_ts is exact; rounded six-decimal duration can turn a
+        # fractional-rate terminal interval into a spurious additional frame.
+        exact_duration = (Fraction(int(stream['duration_ts']))*Fraction(stream['time_base'])
+                          if asset['kind'] == 'video' and stream.get('duration_ts') is not None and stream.get('time_base')
+                          else Fraction(str(stream.get('duration') or probe['duration_seconds'])) if asset['kind'] == 'video' else Fraction(1))
+        duration = float(exact_duration)
         if not 0 < rate <= 240 or not math.isfinite(duration) or not 0 < duration <= 7200 or width*height > 8192**2:
             raise ValueError('invalid clock or size')
-        frames = math.ceil(duration*float(rate)-1e-8) if asset['kind'] == 'video' else 1
+        frames = math.ceil(exact_duration*rate) if asset['kind'] == 'video' else 1
         if not 1 <= frames <= max_frames or width*height*frames > budget_mib*1024*1024:
             raise ValueError('decoded frame/storage budget exceeded')
         cuts = sorted(scene_cuts)

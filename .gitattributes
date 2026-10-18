@@ -161,3 +161,20 @@ scripts/create_repair_reference_holdouts.py -text
 docs/validation/evidence/coherent-reference*.json -text whitespace=cr-at-eol
 docs/validation/evidence/coherent-reference-*/** -text -whitespace
 docs/validation/evidence/docs-audit-coherent-reference*.json -text
+
+# V43 encoded mask editing preserves exact native runs, media and failure records.
+scripts/*mask_edit*.py -text
+docs/validation/evidence/mask-edit*/** -text -whitespace
+docs/validation/evidence/mask-edit*.json -text
+docs/validation/evidence/docs-audit-mask-edit*.json -text
+README.md text eol=lf
+docs/README.md text eol=lf
+docs/构建进度总表_2026-10-16.md text eol=lf
+docs/产品需求与开发路线基线_2026-10-12.md text eol=lf
+docs/产品实现入口与P0使用说明_v0.1_2026-10-13.md text eol=lf
+docs/validation/README功能核验与实测演示_2026-10-16.md text eol=lf
+docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md text eol=lf
+docs/validation/本地蒙版笔刷与关键帧修正实测_2026-10-18.md text eol=lf
+docs/specs/本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md text eol=lf
+docs/specs/AgentCLI契约_v0.1_2026-10-13.md text eol=lf
+video-cut-install-manifest.json text eol=lf

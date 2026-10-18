@@ -412,3 +412,9 @@ manifest `sequence-projection-budget` 保存可达节点与分量，`sequence-co
 ## V40：后续真实源编辑模式
 
 上述历史版本的保留作者窗口/缺项边界保持原记录；后续 V40 详见[真实源编辑契约](./真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md)和[实测](../validation/真实源外扩与关联Slip实测_2026-10-18.md)。`timeline edit:slip/extend_source` 支持关联源闭包，roll/slide 缺省 retained、显式 source 才能补真实有限输入句柄。旧 compose slip_clip 统一使用源规划器，缺省仍只改单片段，可加 linked:true；不再绕过跟踪/转场检查。无新增持久 Schema 字段。真实外扩会重新求值效果/retiming，嵌套曲线时长再归一化有明确警告；完整磁吸、跟踪重规划和任意旧主体时钟保真仍未验收。
+
+## V43 编码蒙版显式修正
+
+`media mask-edit --project PATH --asset-id MASK --derived-asset-id NEW` 要求互斥的 `--edits FILE` 或 `--edits-from-asset EDITED`。源 SHA/尺寸/通道/CFR 帧网格严格绑定；alpha 默认，黑白图选 luma。默认 max-frames=4096、storage-budget-mib=512、buffer-budget-mib=256、work-budget-million=200；预算不包含整体进程 RSS/FFmpeg/模型。输出新 PNG 或 QTRLE MOV，不覆盖版本，保留 source.mask_edit 计划及权利闭包。项目写锁退出 6、取消/超时退出 8、非法计划/预算退出 2。支持 dry-run、幂等、取消、进度与事务回滚；不自动入轨。
+
+[完整几何/关键帧契约](本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md)、[真实像素/工程包/模型消费核验](../validation/本地蒙版笔刷与关键帧修正实测_2026-10-18.md)。

@@ -48,6 +48,7 @@ from .edit_planner import build_edit_plan, project_fingerprint as edit_project_f
 from .source_transitions import build_plan as build_source_transition_plan
 from . import fragments
 from . import html_motion
+from . import mask_edit
 from .mask_review import prepare as prepare_mask_review, review as review_mask
 from .mask_tracking import ENGINE as MASK_TRACKING_ENGINE, prepare as prepare_mask_tracking, execute as execute_mask_tracking, public_plan as public_mask_tracking_plan
 from .recommend import recommend_highlights
@@ -339,6 +340,23 @@ def build_parser() -> argparse.ArgumentParser:
     matting.add_argument("--timeline-start-seconds", type=float, default=0.)
     matting.add_argument("--apply", action="store_true")
     matting.add_argument("--replace-track", action="store_true")
+    maskedit = _leaf_common(ms.add_parser('mask-edit', help='用本地笔刷/形状/关键帧修正已编码蒙版'))
+    maskedit.add_argument('--project', required=True)
+    maskedit.add_argument('--asset-id', required=True)
+    maskedit.add_argument('--derived-asset-id', required=True)
+    edit_source = maskedit.add_mutually_exclusive_group(required=True)
+    edit_source.add_argument('--edits')
+    edit_source.add_argument('--edits-from-asset', help='复用已登记蒙版保存的完整编辑计划，仍校验原输入绑定')
+    maskedit.add_argument('--channel', choices=['alpha', 'luma'], default='alpha')
+    maskedit.add_argument('--fps', default=None)
+    maskedit.add_argument('--max-frames', type=int, default=4096)
+    maskedit.add_argument('--storage-budget-mib', type=int, default=512)
+    maskedit.add_argument('--buffer-budget-mib', type=int, default=256)
+    maskedit.add_argument('--work-budget-million', type=int, default=200)
+    maskedit.add_argument('--timeout-seconds', type=float, default=1800.)
+    maskedit.add_argument('--cancel-file')
+    maskedit.add_argument('--output')
+
     inpaint = _leaf_common(ms.add_parser('inpaint', help='使用显式本地 LaMa 和蒙版修复视频区域'))
     inpaint.add_argument('--project', required=True)
     inpaint.add_argument('--asset-id', required=True)
@@ -1797,6 +1815,95 @@ def command_media_adapter(args: argparse.Namespace) -> dict[str, Any]:
         return handlers[args.adapter_action](args)
     except KeyError as exc:
         raise argument_error(f"不支持的 media adapter 操作: {args.adapter_action}", "adapter_action") from exc
+
+
+def command_media_mask_edit(args: argparse.Namespace) -> dict[str, Any]:
+    root, project = load_project(args.project)
+    asset = asset_map(project).get(args.asset_id)
+    if not asset or asset.get('kind') not in {'image', 'video'}:
+        raise argument_error('蒙版编辑要求已登记 image/video 资产', 'asset-id')
+    assert_id(args.derived_asset_id, 'derived-asset-id')
+    ledger = load_ledger(root)
+    records = {r['asset_id']: r for r in active_records(ledger)}
+    parent_ref = asset.get('rights_ref') or asset['id']
+    parent = records.get(parent_ref)
+    if not parent or parent.get('sha256') != asset.get('sha256'):
+        raise AppError('MASK_EDIT_RIGHTS_MISSING', '输入蒙版缺少摘要匹配的权利记录', exit_code=7)
+    if args.derived_asset_id in asset_map(project) or args.derived_asset_id in records:
+        raise argument_error('派生资产或权利 ID 已存在', 'derived-asset-id')
+    dependencies = [parent_ref]
+    embedded = None
+    if args.edits_from_asset:
+        previous = asset_map(project).get(args.edits_from_asset)
+        authored = previous.get('source', {}).get('mask_edit', {}) if previous else {}
+        embedded = authored.get('plan')
+        if (previous is None or previous.get('kind') not in {'image', 'video'} or authored.get('engine') != mask_edit.ENGINE
+                or not isinstance(embedded, dict) or mask_edit.plan_digest(embedded) != authored.get('plan_sha256')):
+            raise argument_error('复用源没有有效的蒙版编辑计划摘要', 'edits-from-asset')
+        reference = previous.get('rights_ref') or previous['id']
+        if reference not in records or records[reference].get('sha256') != previous.get('sha256'):
+            raise AppError('MASK_EDIT_RIGHTS_MISSING', '复用计划缺少摘要匹配的权利记录', exit_code=7)
+        dependencies = list(dict.fromkeys([*dependencies, reference]))
+    if not math.isfinite(args.timeout_seconds) or not 0 < args.timeout_seconds <= 604800:
+        raise argument_error('timeout-seconds 必须为 0..604800 的有限正数', 'timeout-seconds')
+    plan = mask_edit.prepare(root, asset, edits_path=args.edits, embedded=embedded, channel=args.channel, fps=args.fps,
+        max_frames=args.max_frames, storage_budget_mib=args.storage_budget_mib,
+        buffer_budget_mib=args.buffer_budget_mib, work_budget_million=args.work_budget_million)
+    suffix = '.png' if asset['kind'] == 'image' else '.mov'
+    output = ensure_inside(root, resolve_local_path(root, args.output or f'assets/derived/{args.derived_asset_id}{suffix}', field='output'))
+    if output.exists() or output.suffix.lower() != suffix:
+        raise argument_error('输出须为项目内全新的 .png 图像或 .mov 视频', 'output')
+    cancel = resolve_local_path(root, args.cancel_file, field='cancel-file') if args.cancel_file else None
+    if args.dry_run:
+        return _envelope('media.mask-edit', args, status='planned', data={'plan': mask_edit.public_plan(plan),
+            'derived_asset_id': args.derived_asset_id, 'output': str(output), 'rights_dependencies': dependencies}, warnings=plan['warnings'])
+    snapshot = create_snapshot(root, copy.deepcopy(project), label='before-media-mask-edit')
+    operation_id = new_id('op')
+    report_path = root/'validation'/f'mask-edit_{operation_id}.json'
+    published = False
+    try:
+        _progress(args, operation_id, 'started', 'media.mask-edit', 0, '开始本地蒙版笔刷/关键帧修正')
+        def progress(frame, total):
+            _progress(args, operation_id, 'progress', 'media.mask-edit', round(90*frame/total), f'蒙版修正 {frame}/{total} 帧')
+        result = mask_edit.execute(root, plan, output, timeout=args.timeout_seconds, cancel_file=cancel, progress=progress)
+        published = True
+        derived = {'id': args.derived_asset_id, 'kind': asset['kind'], 'uri': output.relative_to(root).as_posix(),
+            'sha256': result['sha256'], 'probe': result['probe'], 'rights_ref': args.derived_asset_id,
+            'source': {'source_url': f'local://{output}', 'retrieved_at': now_iso(), 'original_name': output.name,
+                'derived_from': [asset['id']], 'mask_edit': {'engine': mask_edit.ENGINE,
+                    'plan': plan['editable_plan'], 'plan_sha256': plan['plan_sha256']}}}
+        rights = {k: copy.deepcopy(parent.get(k, default)) for k, default in [('creator', 'unknown'),
+            ('license_spdx', 'LicenseRef-UNVERIFIED'), ('license_url', ''), ('attribution', ''), ('permitted_uses', ['internal']),
+            ('permitted_channels', []), ('restrictions', []), ('evidence', ''), ('verification_status', 'unverified'),
+            ('verified_by', ''), ('takedown_status', 'clear')]}
+        rights.update(asset_id=args.derived_asset_id, kind=asset['kind'], sha256=result['sha256'],
+            source_url=f'local://{output}', source_version='derived-local-mask-edit', retrieved_at=now_iso(),
+            derived_from=dependencies, notes='Explicit local mask geometry; original mask and reused authored-plan rights remain dependencies')
+        project.setdefault('assets', []).append(derived)
+        add_record(ledger, rights)
+        save_ledger(root, ledger)
+        validation = validate_project(root, project, strict_rights=False)
+        if not validation['ok']:
+            raise AppError('MASK_EDIT_PROJECT_INVALID', '蒙版派生项目校验失败，事务回滚', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+        report = {'version': '0.1.0', 'operation_id': operation_id, 'created_at': now_iso(),
+            'snapshot_id': snapshot['snapshot_id'], 'source_asset_id': asset['id'], 'asset': derived,
+            'rights': rights, 'mask_edit': result, 'validation': validation}
+        atomic_write_json(report_path, report)
+        project.setdefault('provenance', {}).setdefault('change_log', []).append({'operation_id': operation_id,
+            'command': 'media.mask-edit', 'asset_id': args.derived_asset_id, 'source_asset_id': asset['id'],
+            'snapshot_id': snapshot['snapshot_id'], 'report': str(report_path), 'at': now_iso()})
+        save_project(root, project)
+        _operation(root, operation_id, {'operation_id': operation_id, 'command': 'media.mask-edit', 'status': 'succeeded',
+            'asset_id': args.derived_asset_id, 'snapshot_id': snapshot['snapshot_id'], 'report': str(report_path), 'created_at': now_iso()})
+        _progress(args, operation_id, 'completed', 'media.mask-edit', 100, '蒙版编码 RGBA 与精确帧时钟验证完成')
+        return _envelope('media.mask-edit', args, data=report, warnings=result['warnings'], operation_id=operation_id)
+    except BaseException as exc:
+        if published:
+            output.unlink(missing_ok=True)
+        report_path.unlink(missing_ok=True)
+        if isinstance(exc, OSError):
+            raise AppError('MASK_EDIT_WRITE_FAILED', '蒙版产物或项目写入失败，事务将回滚', exit_code=6, cause=str(exc)) from exc
+        raise
 
 
 def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
@@ -6327,6 +6434,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "stabilize"): command_media_stabilize,
     ("media", "matting"): command_media_matting,
     ("media", "inpaint"): command_media_matting,
+    ('media', 'mask-edit'): command_media_mask_edit,
     ("media", "relink"): command_media_relink,
     ("media", "adapter"): command_media_adapter,
     ("media", "track"): command_media_track,

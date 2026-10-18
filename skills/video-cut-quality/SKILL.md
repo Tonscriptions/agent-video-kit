@@ -5,6 +5,16 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [encoded mask edits](../../docs/specs/本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md),
+check the actual lossless RGBA round trip, every PTS, operation range and
+independent authored shape coverage. Unchanged frames preserve decoded alpha;
+output RGB is white and carries no audio. Check selected target extremities
+and clear preserved objects before and after, then inspect the separately
+grown repair mask. A hand-authored correction can satisfy the supplied points
+while missing other anatomy. Keep selection, model consumption, texture,
+flicker, sound and semantic acceptance as separate conclusions. Rebuild the
+embedded plan after a project-package import to verify editability.
+
 For the [coherent reference research contract](../../docs/specs/空间与时序一致参考选择研究契约_v0.1_2026-10-18.md),
 keep the [actual failed evaluation](../../docs/validation/空间与时序一致参考选择实测_2026-10-18.md)
 separate from product acceptance. The v3 candidate failed four of twelve
