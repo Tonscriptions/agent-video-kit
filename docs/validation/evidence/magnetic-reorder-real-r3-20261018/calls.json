@@ -1,0 +1,1065 @@
+[
+  {
+    "index": 1,
+    "args": [
+      "project",
+      "init",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\base"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.0687381000025198,
+    "stdout_sha256": "sha256:6dfb6fdb3f774b827e0132304dc26a0f55f8a68f9a385cccb1ca7f5ee394b9cc",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 2,
+    "args": [
+      "media",
+      "ingest",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\base",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\source-frames.mkv",
+      "--asset-id",
+      "frames",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad",
+      "--license-spdx",
+      "CC0-1.0",
+      "--source",
+      "self-authored procedural frames and PCM",
+      "--creator",
+      "project procedural fixture authors",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\SOURCE_RIGHTS.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.189989999998943,
+    "stdout_sha256": "sha256:1c264671303153d5d6a68590c87a84281ce6937b27a8c33fdeb5478d3ce91ca7",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 3,
+    "args": [
+      "media",
+      "ingest",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\base",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\source-audio.wav",
+      "--asset-id",
+      "sound",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad",
+      "--license-spdx",
+      "CC0-1.0",
+      "--source",
+      "self-authored procedural frames and PCM",
+      "--creator",
+      "project procedural fixture authors",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\SOURCE_RIGHTS.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.3019365000072867,
+    "stdout_sha256": "sha256:bde1e0773872f27b3f0c0c695e2aff5083d74d10a2395054bc721f93e1e6740f",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 4,
+    "args": [
+      "media",
+      "ingest",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\base",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\DejaVuSans.ttf",
+      "--asset-id",
+      "font",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad",
+      "--license-spdx",
+      "Bitstream-Vera",
+      "--source",
+      "existing unmodified DejaVu Sans",
+      "--creator",
+      "DejaVu and Bitstream font authors",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\LICENSE_DEJAVU"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.2872006999969017,
+    "stdout_sha256": "sha256:68e6684c810ac833e3e614904e129a96f9325b94e760931333a6540c7d50b9e7",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 5,
+    "args": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\MR01-before-project.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.8069305999961216,
+    "stdout_sha256": "sha256:3f4e322f9fea1550c752224f0e5f8092007965611f0abfcbcb65d3c92937da81",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 6,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01-request.json",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.7452078000060283,
+    "stdout_sha256": "sha256:70fbc9bac1417c7bfcb4acfb7027b717c3ce6a3c7df18b07899a49cd036c4456",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 7,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01-request.json",
+      "--expected-project-sha256",
+      "sha256:0ff68c03fc2c0622aef24710a0d3f9dc5f6092625bde2cb647974a975900842a",
+      "--idempotency-key",
+      "native-reorder"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.4480908999976236,
+    "stdout_sha256": "sha256:bc611edd18a3cc035eb7430efd4861d4ccde813a416d573ae1b0bfe9cbb43bac",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 8,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01-request.json",
+      "--expected-project-sha256",
+      "sha256:0ff68c03fc2c0622aef24710a0d3f9dc5f6092625bde2cb647974a975900842a",
+      "--idempotency-key",
+      "native-reorder"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.113056999995024,
+    "stdout_sha256": "sha256:8deb4b75814028db55f347df0ab37d1c98f207fd48c053cf2d6a3c34c49f913d",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 9,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01-request.json",
+      "--expected-project-sha256",
+      "sha256:0ff68c03fc2c0622aef24710a0d3f9dc5f6092625bde2cb647974a975900842a"
+    ],
+    "exit_code": 2,
+    "expected_exit_code": 2,
+    "seconds": 1.256202000004123,
+    "stdout_sha256": "sha256:db7ca8f356877a47b1085fe7438585ee6a0afb6da889c4aa44ae59fe89489e2d",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 10,
+    "args": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.2262556000059703,
+    "stdout_sha256": "sha256:87bb11d282f0e916672e5d1da6c69d036204e3ccb216a1a85076909fa6d5882b",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 11,
+    "args": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.0852426999917952,
+    "stdout_sha256": "sha256:9d0ce5e14a2b25a06bd87e50e1a6f0d64a283aaf902d54a4992e824b648f9104",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 12,
+    "args": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01\\renders\\MR01.mkv",
+      "--crf",
+      "0",
+      "--publish",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.91713410000375,
+    "stdout_sha256": "sha256:6ccaf29c5e65ff02ebd0a1764e99701b995029f98a08546bfdf17e2379162e00",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 13,
+    "args": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR01",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\MR01-project.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.4787008999992395,
+    "stdout_sha256": "sha256:269e51830480396a8d3d3e2778d9b02c74b604e696c25444952d9cd3faa06889",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 14,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02-request.json",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.3455304999952205,
+    "stdout_sha256": "sha256:56f861e24f2bf89734ac7e34b3d0a3f83798ba8294d29a203319a4d872f715cf",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 15,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02-request.json",
+      "--expected-project-sha256",
+      "sha256:0ff68c03fc2c0622aef24710a0d3f9dc5f6092625bde2cb647974a975900842a"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.7969758999970509,
+    "stdout_sha256": "sha256:3e466e8666a8ef28ac7fa7078d66d3cb691bd43f644769a5240556e97fb2a657",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 16,
+    "args": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.5251123999914853,
+    "stdout_sha256": "sha256:253aee174d33452582a13ab61565b361d486e1b02fcbf53bf3f22db2bc40a19d",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 17,
+    "args": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.679159699997399,
+    "stdout_sha256": "sha256:4985bf419d93923fcad88ade7de6e526c88e83d9b6f5d8941c74fc85af67e1c3",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 18,
+    "args": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02\\renders\\MR02.mkv",
+      "--crf",
+      "0",
+      "--publish",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.6503612999949837,
+    "stdout_sha256": "sha256:06adb6ba9d1395ce50af1c214b35c5677cb20c34174eb7225717953178d2f0d4",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 19,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02-request.json",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.032383800004027,
+    "stdout_sha256": "sha256:014741dc8cf0737e61a64a6fb5962fa835557ffc6ad0113a5a05caec3c6a4681",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 20,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02-request.json",
+      "--expected-project-sha256",
+      "sha256:8869eca457dc5c357b6ae1cb27adb907bf412b1874dfbc6dffab813e5293a9b0"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.7572655999974813,
+    "stdout_sha256": "sha256:6a21ca63be3f2d5dc7067899fb9645246992fad007f3b6fe86157857ade84517",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 21,
+    "args": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.14798970000993,
+    "stdout_sha256": "sha256:c63e9d0ab43cc9a15d2692283182835a1450a88950980a6c2fd3542bfc36e798",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 22,
+    "args": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.4385791999957291,
+    "stdout_sha256": "sha256:1b29aa68f365ad757da208488500525ad38926db385519dfe84a246af12584b7",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 23,
+    "args": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR02\\renders\\MR02-end.mkv",
+      "--crf",
+      "0",
+      "--publish",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.353740699996706,
+    "stdout_sha256": "sha256:c386a88d1f58bb55bd6419734f67ea58ffa0d2bd8cad742c80829b1e23cc2374",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 24,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR03",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR03-request.json",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.5240720000001602,
+    "stdout_sha256": "sha256:8515fa789dd8a99c5b268b54dc30a0c954e80eef711df39968efc4382fff21a3",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 25,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR03",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR03-request.json",
+      "--expected-project-sha256",
+      "sha256:715b9955831302eff9a52778d25459523ffff6dc02a1309adf35437c2fc1732b"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.7396555999876,
+    "stdout_sha256": "sha256:fe48e5c6f54780b3cad2d8164fa55660ae96b3d28f7557755ce506db8a1031dc",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 26,
+    "args": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR03",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.4500371999893105,
+    "stdout_sha256": "sha256:e078b588bd9f5a3333a5da4f2ef1af8cefc8633c359ab0f0a51fb1558250ed21",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 27,
+    "args": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR03"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.241013999999268,
+    "stdout_sha256": "sha256:52867f443062e98defe1d5e2fc253e0bb07123720012bff42e9b09f2b4cfae0c",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 28,
+    "args": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR03",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR03\\renders\\MR03.mkv",
+      "--crf",
+      "0",
+      "--publish",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.9295181000052253,
+    "stdout_sha256": "sha256:3276e8ef3479064784eb8dc4224cb5d6d1704e465499625c988ff58ae5711170",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 29,
+    "args": [
+      "convert",
+      "import",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\nested-freeze-v51-final-20261018\\NF06-project.zip",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.194553099994664,
+    "stdout_sha256": "sha256:43e29bc11445a0c8c5488e53ec93c823c17050d6d894ab570d3cf367a51f2ffd",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 30,
+    "args": [
+      "media",
+      "ingest",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\source-frames.mkv",
+      "--asset-id",
+      "frames",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad",
+      "--license-spdx",
+      "CC0-1.0",
+      "--source",
+      "self-authored procedural frames and PCM",
+      "--creator",
+      "project procedural fixture authors",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\SOURCE_RIGHTS.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.3215809000103036,
+    "stdout_sha256": "sha256:e74c8e1d4a74523012a07c0780b52a9879c58796163388472cf33c37d81e1d66",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 31,
+    "args": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04\\renders\\MR04-before.mkv",
+      "--crf",
+      "0",
+      "--publish",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 4.064348999992944,
+    "stdout_sha256": "sha256:5e4462e163fe5ddd14f0c650d9038149398c8fbad3d8ea3d9f4fa838c789e109",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 32,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04-request.json",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.190457599994261,
+    "stdout_sha256": "sha256:9d698ae3ee3bf81428d6dbd4a684e2493c3eb8fad6735d6dcf0ef1a0ccf442c3",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 33,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04-request.json",
+      "--expected-project-sha256",
+      "sha256:ab6505465b1f6b93a80b4b58a07cce2722c0f77f027ac8cb7af87b23fcbdb68e"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.3947746000048937,
+    "stdout_sha256": "sha256:7fcaac515543e9e17ed0a1ef07e89bc0c7914eaa49274821b507b8b26cb06fb7",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 34,
+    "args": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.3837086999992607,
+    "stdout_sha256": "sha256:7a708da3e36f520f98094899fbb7521504e49d5432730a08dee69d7944d324f5",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 35,
+    "args": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.0809206999983871,
+    "stdout_sha256": "sha256:419acf3467c582fe9d867177e2a323d3bff9fdc14cf402711a275d08321c88ed",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 36,
+    "args": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04\\renders\\MR04.mkv",
+      "--crf",
+      "0",
+      "--publish",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 3.2566663999896264,
+    "stdout_sha256": "sha256:0a438d3adf43a182f820534da6b2c3bd18b43c89540d03788b0c689ae16c42f0",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 37,
+    "args": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR04",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\MR04-project.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.3154148000030546,
+    "stdout_sha256": "sha256:a0f8d4a92a7613ccd71765386beee56053cba2bc2c284c9b72711121dac5ddbd",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 38,
+    "args": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR05",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR05\\renders\\MR05-before.mkv",
+      "--crf",
+      "0",
+      "--publish",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.1037091000034707,
+    "stdout_sha256": "sha256:f965e59a7ce28976774c74a85231df0deba960d5b37eefee236ea967a8b74a35",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 39,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR05",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR05-request.json",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.4128236999968067,
+    "stdout_sha256": "sha256:a5aafc898c428b770acddb175174092856a6dc2de0b740626f3616a1b268799a",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 40,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR05",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR05-request.json",
+      "--expected-project-sha256",
+      "sha256:d9334b4442d5703dcfbec67f08ef7560232c784762d24b4761ff7938843cb94c"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.3590026999881957,
+    "stdout_sha256": "sha256:8c165230fe1638327d0a602c97fbc77f7c43a9b24b7cf2d72a2cf73be7efc34b",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 41,
+    "args": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR05",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.279782300000079,
+    "stdout_sha256": "sha256:8173df13a1b762da1d8db52b1797c8962e5b623b0d2016c15477c8cab1a62d59",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 42,
+    "args": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR05"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.1139074999955483,
+    "stdout_sha256": "sha256:094f14723e953a079eee8de480151625096e1e48d3f29ac8431dbc687c553340",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 43,
+    "args": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR05",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR05\\renders\\MR05.mkv",
+      "--crf",
+      "0",
+      "--publish",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.0178547000105027,
+    "stdout_sha256": "sha256:14b2dd3b1ed1c96f477b77ffeea1ef9b3c10a466dd6907e382937dc3224bad77",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 44,
+    "args": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR05",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\MR05-project.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.4691988000122365,
+    "stdout_sha256": "sha256:21310782822ae2c2d6facf935b2be71c4eb3d2360a88ae3cdeb27f5c0c8d9884",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 45,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR06",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR06-conflict.json"
+    ],
+    "exit_code": 2,
+    "expected_exit_code": 2,
+    "seconds": 1.4090366000018548,
+    "stdout_sha256": "sha256:de88bd5086411849fa1ddedc4fcf0b194a90fd9941139c2bfa48ef594e7e2171",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 46,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR06",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR06-request.json",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.2977356999908807,
+    "stdout_sha256": "sha256:97183d522def5444fef755297a742ec1a55c8b6a4460d67fd84d5481b43fb756",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 47,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR06",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR06-request.json",
+      "--expected-project-sha256",
+      "sha256:45f4dbd9b67c7f34a680ca27632647774e65d38a85cd4efbc1e4e231b74eb239"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.3899929000035627,
+    "stdout_sha256": "sha256:fbc61dec7db2c1fd7da0988ebd8ea2198b15f131156e119b36819a0c6c365c27",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 48,
+    "args": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR06",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.2644294999918202,
+    "stdout_sha256": "sha256:c3c8e814e389f33143a2c50588479d8cd8292217e2920698eca59af9e3d6991d",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 49,
+    "args": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR06"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.013676000002306,
+    "stdout_sha256": "sha256:4efb4ce217887956fbb0bef0a9e816f1a7e900cc99c291d7f1999abe4c668d86",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 50,
+    "args": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR06",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR06\\renders\\MR06.mkv",
+      "--crf",
+      "0",
+      "--publish",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.826871500001289,
+    "stdout_sha256": "sha256:ff5a9f28c6eb6ba740879092822c2e66fd28fb2ff1620a6d424956cbda715ad0",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 51,
+    "args": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR07",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR07\\renders\\MR07-before.mkv",
+      "--crf",
+      "0",
+      "--publish",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.734423000001698,
+    "stdout_sha256": "sha256:ec5f63696df75a14b24beaf9759f60be18ac8f9c8348df403c263b89dc2d6a14",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 52,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR07",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR07-request.json",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.356130200001644,
+    "stdout_sha256": "sha256:f89a6f0e66c532e3a7f527f0b98d37f4b2f6727bed6547374b4b4d04a518262b",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 53,
+    "args": [
+      "timeline",
+      "edit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR07",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR07-request.json",
+      "--expected-project-sha256",
+      "sha256:525cfad9b92cb128d6230ea937e5c7f7a1ab491d20b5daed81cc08935efacddd"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.3573867000086466,
+    "stdout_sha256": "sha256:a250810be089069f015bce2863c7052c502b0cd143330ad67f8826357253abd1",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 54,
+    "args": [
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR07",
+      "--strict-rights"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.313425600004848,
+    "stdout_sha256": "sha256:099d5d8bbb7e249d084e0e8aec911d36ce379921735f9772e48d180db1b9ff71",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 55,
+    "args": [
+      "policy",
+      "audit",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR07"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.1441980999952648,
+    "stdout_sha256": "sha256:eca6c612205c033c2c9c2b9e070a9a57672bb3dd9fae5cb04582897c3fad4868",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 56,
+    "args": [
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR07",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR07\\renders\\MR07.mkv",
+      "--crf",
+      "0",
+      "--publish",
+      "--container",
+      "mkv",
+      "--audio-codec",
+      "pcm_f32le",
+      "--pixel-format",
+      "yuv444p"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 2.871958600007929,
+    "stdout_sha256": "sha256:2fcfc2e120576c4d78dfb4517e0813b141d7008b447346ec3dc784e2b0440130",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "index": 57,
+    "args": [
+      "convert",
+      "export",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\magnetic-reorder-v53-r3-20261018\\MR07",
+      "--target-format",
+      "package",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\magnetic-reorder-v53-r3-20261018\\MR07-project.zip"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "seconds": 1.321972600009758,
+    "stdout_sha256": "sha256:5b927ec90b48d55e207034691ef292bc9255e3370a00b9b2a5f9701d5d1228f6",
+    "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

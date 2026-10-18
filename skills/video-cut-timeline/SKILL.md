@@ -22,6 +22,19 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+For whole-main-track ordering, use the
+[magnetic reorder contract](../../docs/specs/主轨磁吸重排与关联附着契约_v0.1_2026-10-18.md).
+`timeline edit` action `reorder` takes main `clip_ids` and a mandatory
+`before_clip_id` (null appends). Stable selected clips become one block, and
+all main clips pack from zero without changing their author payload. Links
+on displaced shots follow too; sync spans requiring different deltas reject
+and must first be split explicitly. Inspect the plan's moves/anchored IDs,
+lane changes, subtitle offsets, references and transitions before applying.
+Keep `transition_policy: preserve` unless removing broken declarations or
+legacy fields is intended. See the
+[actual frame/sample and package checks](../../docs/validation/主轨磁吸重排与关联附着实测_2026-10-18.md).
+This explicit action is separate from persistent magnetic mode and screen snaps.
+
 For a [compound freeze](../../docs/specs/复合片段定格与完整音画时钟契约_v0.1_2026-10-18.md),
 apply the existing compose `freeze_frame` to the `sequence_id` container. The
 whole child picture, captions, animation and audio bus finish before the
@@ -104,8 +117,9 @@ is composed before ancestor trimming, reversal, constant/curved retiming and
 spatial projection. Do not move transition starts to a parent's trim window.
 Audio retains original source leaves and buses; reverse envelopes use the
 continuous child author clock. Inspect `sequence-inline-surface` and
-`sequence-inline-budget`, including child warnings. Ancestor freeze and
-container/curved/frozen/tracked/blended cut endpoints remain rejected.
+`sequence-inline-budget`, including child warnings. Ancestor freeze is now
+handled by the compound-freeze path above. Container/curved/frozen/tracked/
+blended cut endpoints retain the source-transition contract's restrictions.
 
 Use the [linked edit planner](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md)
 for link/unlink/remove/close_gap/close_gaps/shift on whole clips. Configure
@@ -117,8 +131,8 @@ members reject the whole selection. Sync uses common available room and
 reports `short_tick`; linkage follows riders while multi-cut beds stay anchored.
 Collision lanes preserve processing; effect/ducking audio buses cannot be
 automatically relocated. Keep file-subtitle offsets and tracking references.
-These whole-clip actions do not extend source edges or implement full magnetic
-main-track rearrangement. The range actions above cover insert/overwrite and
+These older whole-clip actions do not extend source edges; use the explicit
+reorder action above for insertion-style ordering. The range actions cover insert/overwrite and
 roll/slide within retained authors. Markers retain absolute sequence ticks.
 
 Nested sequence clips now render as isolated transparent canvases; see the
@@ -140,7 +154,7 @@ bindings compile locally before projection. Selected-sequence export defaults
 to that raster; profile/width/height override only the selected root for that
 render. Odd internal rasters are valid; final 4:2:0 requires even width/height,
 and 4:2:2 requires even width. Explicit child rasters survive parent overrides.
-Named audio send/return, independent child FPS/color/SAR, nested freeze,
+Named audio send/return, independent child FPS/color/SAR,
 standalone slide/wipe, linear-light/HDR and broad performance remain acceptance
 boundaries; preserve existing audio and quality warnings. Native bilinear
 sampling is not a promise of high-frequency minification quality.

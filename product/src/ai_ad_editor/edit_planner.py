@@ -190,7 +190,7 @@ def interchange_features(project):
 
 
 class _Draft:
-    def __init__(self, project, sequence, request):
+    def __init__(self, project, sequence, request, *, compute_anchors=True):
         self.project = project
         self.sequence = sequence
         self.request = request
@@ -199,8 +199,8 @@ class _Draft:
         self.original_order = [t['id'] for t in sequence['tracks']]
         self.main_id = request['options']['main_track_id']
         self.main = next((copy.deepcopy(t) for t in sequence['tracks'] if t['id'] == self.main_id), None)
-        self.anchored = {c['id'] for t in sequence['tracks'] if t['id'] != self.main_id for c in t['clips']
-                         if self.main is None or not _rides(self.main, c)}
+        self.anchored = ({c['id'] for t in sequence['tracks'] if t['id'] != self.main_id for c in t['clips']
+                         if self.main is None or not _rides(self.main, c)} if compute_anchors else set())
         self.short = 0
         self.shifts = []
         self.settle_needed = False
@@ -397,6 +397,9 @@ def _plan_changes(before, after):
 def build_edit_plan(project: dict[str, Any], sequence_id: str, request: Any) -> tuple[dict[str, Any], dict[str, Any]]:
     """Return an isolated candidate plus a reviewable plan; never mutate input."""
     if isinstance(request, dict) and isinstance(request.get('action'), str):
+        if request['action'] == 'reorder':
+            from .magnetic_reorder import build_reorder_plan
+            return build_reorder_plan(project, sequence_id, request)
         from .range_edits import ACTIONS as RANGE_ACTIONS, build_range_plan
         if request['action'] in RANGE_ACTIONS:
             return build_range_plan(project, sequence_id, request)

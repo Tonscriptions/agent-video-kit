@@ -5,6 +5,18 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For a whole-clip main-track permutation, read the
+[magnetic reorder contract](../../docs/specs/主轨磁吸重排与关联附着契约_v0.1_2026-10-18.md).
+Use `timeline edit` with `action: reorder`, selected main `clip_ids`, and an
+explicit `before_clip_id` (null means the end). Original selection order is
+retained and the whole main track packs from zero. Review every displaced
+shot's links, sync/rider attachments and collision lanes before hash-bound
+application. Broken transitions reject unless `drop_broken` is explicit;
+different-delta sync spans need explicit splitting. Markers stay absolute.
+The [frame/PCM and installation record](../../docs/validation/主轨磁吸重排与关联附着实测_2026-10-18.md)
+distinguishes independent source truth from same-renderer author blocks.
+This action does not implement a persistent magnetic mode or GUI snapping.
+
 For transparent output or a root ending between display frames, read the
 [delivery clock/alpha contract](../../docs/specs/透明视频交付与音画端点契约_v0.1_2026-10-18.md).
 Use WebM/libvpx-vp9/yuva420p with CRF=0 and no bitrate override for lossless
