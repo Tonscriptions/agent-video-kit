@@ -56,7 +56,8 @@ def transition_descendants(project, sequence_id):
         child = sequences[sid]
         flags = [visit(ref, (*stack,sid)) for ref in sorted(_references(child))]
         bearing[sid] = bool(child.get('source_transitions')) or any(flags) or any(
-            c.get('presentation_window') for t in child.get('tracks', []) for c in t.get('clips', []))
+            c.get('presentation_window') or (c.get('sequence_id') and c.get('freeze'))
+            for t in child.get('tracks', []) for c in t.get('clips', []))
         return bearing[sid]
     visit(sequence_id)
     return reachable, bearing
@@ -66,12 +67,16 @@ def prepare(root, project, sequence, build_graph, *, stack=()):
     """Plan child surfaces and compile audio handles without doing any I/O."""
     if sequence['id'] in stack:
         raise AppError('SEQUENCE_CYCLE', '嵌套序列存在循环引用，拒绝渲染', exit_code=2, path='sequences')
+    # Validate the authored reference graph before creating detached instances.
+    transition_descendants(project, sequence['id'])
+    from .nested_freeze import prepare as prepare_freezes
+    project, sequence, inputs, filters, metadata = prepare_freezes(
+        root, project, sequence, build_graph, graph_namespace, stack=stack)
     reachable, bearing = transition_descendants(project, sequence['id'])
     direct = sorted(ref for ref in _references(sequence) if bearing[ref])
     if not direct:
-        return project, sequence, [], [], []
+        return project, sequence, inputs, filters, metadata
     sequences = {s['id']:s for s in project['sequences']}
-    inputs, filters, metadata = [], [], []
     surfaces = {}
     for ordinal, sid in enumerate(direct):
         child = sequences[sid]
@@ -81,7 +86,13 @@ def prepare(root, project, sequence, build_graph, *, stack=()):
             value = sequences[current]
             return any(c.get('presentation_window') for t in value['tracks'] for c in t['clips']) or any(
                 has_window(ref, (*seen,current)) for ref in _references(value))
-        complete_audio = has_window(sid)
+        def has_freeze(current, seen=()):
+            if current in seen:
+                raise AppError('SEQUENCE_CYCLE', '定格子序列存在循环', exit_code=2)
+            value = sequences[current]
+            return any(c.get('sequence_id') and c.get('freeze') for t in value['tracks'] for c in t['clips']) or any(
+                has_freeze(ref, (*seen, current)) for ref in _references(value))
+        complete_audio = has_window(sid) or has_freeze(sid)
         # Adjustments are selected-root controls, not authored child effects.
         child_project = {**project,'settings':copy.deepcopy(project['settings'])}
         child_project['settings'].pop('adjustments', None)

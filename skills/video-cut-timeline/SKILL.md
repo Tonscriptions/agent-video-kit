@@ -22,6 +22,19 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+For a [compound freeze](../../docs/specs/复合片段定格与完整音画时钟契约_v0.1_2026-10-18.md),
+apply the existing compose `freeze_frame` to the `sequence_id` container. The
+whole child picture, captions, animation and audio bus finish before the
+container source window/speed/reverse/freeze. Its own spatial animation keeps
+running; an outer container retimes that complete result. `silence` inserts a
+silent bus interval; `continue` plays original audio then pads its tail.
+Non-frame holds report quantization. File-only R3 cannot consume an inline
+retimed bus. Source-transition endpoints retain their own restrictions; an
+ancestor may freeze a legal transition mid-blend. Keep internal surface IDs
+out of author assets and preserve original rights. See the
+[actual frame/sample checks](../../docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md)
+for same-renderer glyph references versus independent clocks and alpha.
+
 For explicit vector lettering, use `motion stroke-source --project <path>
 --input <local-plan.json> --asset-id <new-source>`, then `motion html-render`
 to encode/apply it on an ordinary video track. The

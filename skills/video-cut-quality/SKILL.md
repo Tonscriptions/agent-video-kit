@@ -5,6 +5,19 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [compound holds](../../docs/specs/复合片段定格与完整音画时钟契约_v0.1_2026-10-18.md),
+check every source-frame identity, transition blend, held/resumed frame and
+stereo sample. Child captions and animation pause; parent animation continues.
+Use an unencoded RGBA child reference for complex glyphs, with an independent
+hold index and 8-bit opacity formula; a second YUV round trip adds unrelated
+error. Preserve the failed encoded reference and the unchanged RGB threshold.
+Distinguish lossless native-graph alpha/PCM precision from supported CLI
+VP9/WebM delivery. Decode VP9 alpha explicitly with libvpx-vp9; Opus is not a
+sample-equality oracle. A 10-fps/4.01-second root still fails the existing
+MP4 AV gate at a 90-ms tail difference; correct 41-frame/192480-sample MKV
+counts do not accept that delivery. Review
+[all executed cases and their limits](../../docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md).
+
 For [boundary-model research](../../docs/specs/字词边界模型对照核验契约_v0.1_2026-10-18.md),
 inspect [all signed sample errors and raw Chinese anomalies](../../docs/validation/开源字词边界模型对照实测_2026-10-18.md).
 Qwen, the supplied-text Whisper-DTW baseline and new CTC holdout all failed
@@ -15,8 +28,8 @@ zero-forward import/meta probes and historical V49 results. The two final
 charts check 458 frame PTS and 243835 original PCM samples; they are research
 measurement visuals. Only two middle screenshots received readability review;
 there was no continuous playback or listening. Preserve the unreadable first
-font attempt and the separately licensed readable font. Product source remains
-at V49; its 1135-method full regression was not rerun for this research.
+font attempt and the separately licensed readable font. During V50 research,
+product source remained at V49 and its 1135-method full regression was not rerun.
 
 For [offline CTC word alignment](../../docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md),
 check original codepoint coverage, explicit OOV/script decisions, model/input/

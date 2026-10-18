@@ -1,0 +1,179 @@
+{
+  "inputs": [
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\nested-freeze-smoke-v51-final-20261018\\NF06\\assets\\video_a_source-a.mp4",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\nested-freeze-smoke-v51-final-20261018\\NF06\\assets\\audio_a_sound-a.wav"
+  ],
+  "graph": "[0:v]trim=start=1.000000:end=4.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=10/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1[v0];[1:a]atrim=start=1.000000:end=4.000000,asetpts=PTS-STARTPTS,aresample=48000,apad=whole_len=144000,atrim=end_sample=144000,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black@0.0:s=240x136:r=10/1:d=3.000000,format=rgba[subtitlecanvas0];[subtitlecanvas0]split=3[word_aade5ff9a6a7eb1d_a][word_aade5ff9a6a7eb1d_b][word_aade5ff9a6a7eb1d_c];[word_aade5ff9a6a7eb1d_a]split=2[paint_8dc78964546ba246_base][paint_8dc78964546ba246_mask0];[paint_8dc78964546ba246_mask0]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=textfile='cache/text-paints/33c5c72edd685be8efe2b1269fe6cc1874cacf31d81d46cb9e36c4403fe377e5.txt':fontsize=18:enable='gte(t,0.000000000)*lt(t,3.000000000)':fontfile='assets/font_DejaVuSans.ttf':x='12':y='12':expansion=none:boxcolor=black@0:shadowcolor=black@0:bordercolor=black@0:fontcolor=white,format=gbrap,geq=r=255:g=255:b=255:a='r(X,Y)*255/255',format=rgba[paint_8dc78964546ba246_color0];[paint_8dc78964546ba246_base][paint_8dc78964546ba246_color0]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_8dc78964546ba246_over0];[paint_8dc78964546ba246_over0]format=rgba,format=gbrap[word_aade5ff9a6a7eb1d_normal];[word_aade5ff9a6a7eb1d_b]split=2[paint_f5834adb2d780d91_base][paint_f5834adb2d780d91_mask0];[paint_f5834adb2d780d91_mask0]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=textfile='cache/text-paints/33c5c72edd685be8efe2b1269fe6cc1874cacf31d81d46cb9e36c4403fe377e5.txt':fontsize=18:enable='gte(t,0.000000000)*lt(t,3.000000000)':fontfile='assets/font_DejaVuSans.ttf':x='12':y='12':expansion=none:boxcolor=black@0:shadowcolor=black@0:bordercolor=black@0:fontcolor=white,format=gbrap,geq=r=255:g=255:b=0:a='r(X,Y)*255/255',format=rgba[paint_f5834adb2d780d91_color0];[paint_f5834adb2d780d91_base][paint_f5834adb2d780d91_color0]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_f5834adb2d780d91_over0];[paint_f5834adb2d780d91_over0]format=rgba,format=gbrap[word_aade5ff9a6a7eb1d_active];[word_aade5ff9a6a7eb1d_c]format=gbrap,lutrgb=r=0:g=0:b=0:a=0,drawbox=x='mod(0,iw)':y='trunc(0/iw)':w=1:h=1:color=white:t=fill:replace=1:enable='gte((t),0.000000000)*lt((t),1.500000000)*(gte(t,0.000000000)*lt(t,3.000000000))',drawbox=x='mod(1,iw)':y='trunc(1/iw)':w=1:h=1:color=white:t=fill:replace=1:enable='gte((t),1.500000000)*lt((t),3.000000000)*(gte(t,0.000000000)*lt(t,3.000000000))',geq=r='255*gt((if(gt(r(mod(0,W),trunc(0/W)),128),lt(X,(12)+61.328125000),0))+(if(gt(r(mod(1,W),trunc(1/W)),128),gte(X,(12)+61.328125000),0)),0)':g='255*gt((if(gt(r(mod(0,W),trunc(0/W)),128),lt(X,(12)+61.328125000),0))+(if(gt(r(mod(1,W),trunc(1/W)),128),gte(X,(12)+61.328125000),0)),0)':b='255*gt((if(gt(r(mod(0,W),trunc(0/W)),128),lt(X,(12)+61.328125000),0))+(if(gt(r(mod(1,W),trunc(1/W)),128),gte(X,(12)+61.328125000),0)),0)':a='255*gt((if(gt(r(mod(0,W),trunc(0/W)),128),lt(X,(12)+61.328125000),0))+(if(gt(r(mod(1,W),trunc(1/W)),128),gte(X,(12)+61.328125000),0)),0)'[word_aade5ff9a6a7eb1d_mask];[word_aade5ff9a6a7eb1d_normal][word_aade5ff9a6a7eb1d_active][word_aade5ff9a6a7eb1d_mask]maskedmerge=planes=15,format=rgba,format=rgba[subtitlelayer0];color=c=black@0.0:s=240x136:r=10/1:d=3.000000,format=rgba[base];[base][v0]overlay=x='(if(lt((t-0.00000000),0.00000000),0.50000000,if(lt((t-0.00000000),3.00000000),(0.50000000+(0.15000000)*(clip((((t-0.00000000)-0.00000000)/3.00000000),0,1))),0.65000000)))*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0][subtitlelayer0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo1];[vo1]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]aresample=48000,apad=whole_len=144000,atrim=end_sample=144000,asetpts=N/SR/TB[aout]",
+  "metadata": [
+    {
+      "kind": "sequence-projection-budget",
+      "method": "bilinear",
+      "max_working_bytes": 1073741824,
+      "nodes": [],
+      "estimated_working_bytes": 0,
+      "scope": "reachable-sequence-projection-instances-only-not-process-rss",
+      "time_disjoint_instances_charged": true,
+      "unused_sequences_charged": false
+    },
+    {
+      "asset_id": "video_a",
+      "clip_id": "video_leaf",
+      "input": 0,
+      "kind": "video",
+      "source_in_tick": 90000,
+      "source_out_tick": 360000
+    },
+    {
+      "asset_id": "audio_a",
+      "clip_id": "audio_leaf",
+      "track_id": "audio_track",
+      "input": 1,
+      "kind": "audio",
+      "source_in_tick": 90000,
+      "source_out_tick": 360000,
+      "timeline_start_sample": 0,
+      "duration_samples": 144000,
+      "sample_rate": 48000,
+      "group_id": null
+    },
+    {
+      "kind": "subtitle",
+      "clip_id": "caption",
+      "subtitle_time_mapping": {
+        "version": "1",
+        "maps": [],
+        "authored_start_seconds": 0.0,
+        "authored_duration_seconds": 3.0,
+        "reverse_boundary_bias_seconds": 0.0,
+        "freeze_semantics_approximate": false,
+        "clock": "original-sequence-presentation-time",
+        "asset_time_base": "clip-local-inline",
+        "asset_time_offset_tick": 0,
+        "engine": "drawtext-whole-paragraph-masked-highlight",
+        "frame_clock": "unchanged",
+        "continuous_playback_reviewed": false,
+        "text_layout": {
+          "protocol": "drawtext-native-metrics-v1",
+          "cache_key": "1c93a89d11d1962fb715b81a042624264314133e1c36db3b83ba8d2eef7a8b77",
+          "ffmpeg_sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+          "font_sha256": "3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22",
+          "query_count": 4,
+          "engine": "drawtext-whole-paragraph-masked-highlight",
+          "paragraph_metrics": {
+            "text_w": 101.0,
+            "text_h": 13.0,
+            "ascent": 13.0,
+            "descent": 0.0,
+            "font_a": 17.0,
+            "font_d": 5.0,
+            "top_a": 13.0,
+            "bottom_d": 0.0,
+            "line_h": 21.0,
+            "max_glyph_h": 13.0,
+            "max_glyph_w": 14.0
+          },
+          "word_rectangles": [
+            {
+              "source_start": 0,
+              "line": 0,
+              "advance_left": 0.0,
+              "advance_right": 61.328125,
+              "start_seconds": 0.0,
+              "end_seconds": 1.5
+            },
+            {
+              "source_start": 6,
+              "line": 0,
+              "advance_left": 61.328125,
+              "advance_right": 100.921875,
+              "start_seconds": 1.5,
+              "end_seconds": 3.0
+            }
+          ],
+          "line_count": 1,
+          "newline_glyph_painted": false,
+          "color_selection": "binary-whole-paragraph-paints",
+          "timing_evaluation": "one-native-enable-per-word-per-frame",
+          "paint_count": 2
+        },
+        "text_paint": {
+          "engine": "straight-component-source-over",
+          "paints": [
+            {
+              "engine": "straight-component-source-over",
+              "coverage": "opaque-white-drawtext-on-opaque-black",
+              "component_order": [
+                "fontcolor"
+              ],
+              "colors": [
+                {
+                  "component": "fontcolor",
+                  "protocol": "ffmpeg-rgba-color-v1",
+                  "ffmpeg_sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+                  "value": "white",
+                  "cache_key": "ffc5165aaef0dc488e607222a550e94f5823e00a4fec25bb49229f00d2dcf945",
+                  "rgba": [
+                    255,
+                    255,
+                    255,
+                    255
+                  ]
+                }
+              ],
+              "alpha_application": "coverage-times-color-alpha-once",
+              "working_color": "encoded-rgb-8bit"
+            },
+            {
+              "engine": "straight-component-source-over",
+              "coverage": "opaque-white-drawtext-on-opaque-black",
+              "component_order": [
+                "fontcolor"
+              ],
+              "colors": [
+                {
+                  "component": "fontcolor",
+                  "protocol": "ffmpeg-rgba-color-v1",
+                  "ffmpeg_sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+                  "value": "yellow",
+                  "cache_key": "fb982dee3907ad99f238bc8f854613300778372a3c4f5f7f277f3968025915ba",
+                  "rgba": [
+                    255,
+                    255,
+                    0,
+                    255
+                  ]
+                }
+              ],
+              "alpha_application": "coverage-times-color-alpha-once",
+              "working_color": "encoded-rgb-8bit"
+            }
+          ],
+          "working_color": "encoded-rgb-8bit",
+          "linear_light_accepted": false
+        }
+      }
+    },
+    {
+      "kind": "audio-track-bus",
+      "track_id": "audio_track",
+      "scope_id": null,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "processing": {},
+      "sample_rate": 48000
+    },
+    {
+      "kind": "sequence-audio-root",
+      "sample_rate": 48000,
+      "output_samples": 144000,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "automatic_limiter": false,
+      "has_audible_inputs": true
+    }
+  ],
+  "warnings": [],
+  "execution": "native graph precision probe; not a supported CLI delivery codec"
+}

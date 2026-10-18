@@ -8,12 +8,14 @@ import math
 from pathlib import Path
 import subprocess
 import unittest
+from unittest.mock import patch
 
 from PIL import Image
 
 import test_nested_time_mapping as fixtures
 import test_speed_easing as reference
 from ai_ad_editor.utils import atomic_write_json
+from ai_ad_editor.quality import check_output
 
 TPS, W, H = 90000, 96, 64
 
@@ -83,6 +85,7 @@ class NestedFrameCoverageTests(unittest.TestCase):
         raw=subprocess.run(['ffmpeg','-v','error','-i',str(output),'-an','-f','rawvideo','-pix_fmt','rgb24','pipe:1'],capture_output=True,check=True).stdout
         stride=W*H*3;self.assertEqual(len(raw)%stride,0)
         frames=[Image.frombytes('RGB',(W,H),raw[i:i+stride]) for i in range(0,len(raw),stride)]
+        self.assertEqual(len(frames),math.ceil(Fraction(project['sequences'][0]['duration_tick'],TPS)*output_fps))
         self.assertGreaterEqual(len(frames),math.ceil(end*float(output_fps))+2)
         observations=[]
         for index,image in enumerate(frames):
@@ -114,6 +117,14 @@ class NestedFrameCoverageTests(unittest.TestCase):
         self.render_coverage([{'in':.217,'out':2.797,'start':.137,'reverse':True,'speeds':(.6,2.8)}])
 
     def test_fractional_output_uses_the_global_half_open_interval(self):
+        settings={'canvas':{'width':W,'height':H},'timebase':{'display_fps':{'num':30000,'den':1001}}}
+        for extra_frames,accepted in ((1,True),(2,False)):
+            with self.subTest(duration_error_display_frames=extra_frames):
+                probe={'video':{'codec':'h264','width':W,'height':H},'duration_seconds':3+extra_frames*1001/30000}
+                with patch('ai_ad_editor.quality.probe_media',return_value=probe):
+                    quality=check_output(self.source,settings,3,run_expensive=False)
+                self.assertEqual(quality['ok'],accepted,quality)
+                if not accepted:self.assertEqual(quality['errors'][0]['code'],'OUTPUT_DURATION_MISMATCH')
         self.render_coverage([self.bezier()],output_fps=Fraction(30000,1001))
 
     def test_one_tick_after_grid_does_not_reveal_an_early_frame(self):

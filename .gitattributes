@@ -288,3 +288,12 @@ docs/assets/boundary-readable-font-*/LICENSE_DEJAVU -whitespace
 docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md text eol=lf
 docs/validation/离线CTC字词强制对齐实测_2026-10-18.md text eol=lf
 docs/third-party/CTC模型与英文演示语音来源_2026-10-18.md text eol=lf
+
+# V51 preserve raw frame/sample evidence, failed runs and original font notices.
+scripts/*nested_freeze*.py -text
+docs/validation/evidence/nested-freeze-*/** -text -whitespace
+docs/validation/evidence/nested-freeze-*.json -text -whitespace
+docs/assets/nested-freeze-*/** -text -whitespace
+docs/specs/复合片段定格与完整音画时钟契约_v0.1_2026-10-18.md text eol=lf
+docs/specs/嵌套转场合成与作者时钟契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md text eol=lf

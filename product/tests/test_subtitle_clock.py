@@ -365,7 +365,7 @@ class SubtitleClockTests(unittest.TestCase):
         self.assertGreater(len(raw),WIDTH*HEIGHT*3*8)
         self.assertGreater(sum(raw[i]>150 and raw[i+1]>150 and raw[i+2]>150 for i in range(0,len(raw),3)),100)
 
-    def test_subtitle_clock_manifest_and_unaccepted_freeze_boundary(self):
+    def test_subtitle_clock_manifest_and_complete_container_freeze_boundary(self):
         self.case([{'mode':'ease_in'}],render=False)
         records=[v['subtitle_time_mapping'] for v in self.plan['inputs'] if v.get('subtitle_time_mapping')]
         self.assertEqual(len(records),1);self.assertTrue(records[0]['maps'])
@@ -377,4 +377,5 @@ class SubtitleClockTests(unittest.TestCase):
         project['sequences'][0]['duration_tick']+=9000
         atomic_write_json(self.root/'project.json',project)
         plan=self.call('render','--project',self.root,'--output',self.output,'--dry-run')['data']['plan']
-        self.assertTrue(any(w.get('feature')=='subtitle_freeze_clock' for w in plan['warnings']))
+        self.assertFalse(any(w.get('feature')=='subtitle_freeze_clock' for w in plan['warnings']))
+        self.assertTrue(any(v.get('purpose')=='nested-sequence-freeze' for v in plan['inputs']))

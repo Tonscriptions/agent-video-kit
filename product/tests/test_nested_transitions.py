@@ -51,11 +51,15 @@ class InlineSequencePlanningTests(unittest.TestCase):
         with self.assertRaises(AppError) as c:budget([child],root,{'max_working_bytes':119})
         self.assertEqual(c.exception.code,'SEQUENCE_INLINE_BUDGET_EXCEEDED')
 
-    def test_frozen_ancestor_remains_an_explicit_rejection(self):
+    def test_frozen_ancestor_keeps_child_transition_authorship(self):
         p=base_tests.fixture()
-        p['sequences'].append({'id':'parent','tracks':[{'clips':[{'sequence_id':'seq','freeze':{'at_tick':1}}]}]})
-        with self.assertRaises(AppError) as c:build_plan(p,'seq',base_tests.add())
-        self.assertEqual(c.exception.code,'SOURCE_TRANSITION_SCOPE_UNSUPPORTED')
+        parent={'id':'parent','tracks':[{'id':'pv','clips':[{'id':'pc','sequence_id':'seq',
+            'duration_tick':7*TPS,'source_in_tick':0,'source_out_tick':6*TPS,
+            'freeze':{'at_tick':2*TPS,'duration_tick':TPS,'audio_mode':'silence'}}]}]}
+        p['sequences'].append(parent)
+        changed,plan=build_plan(p,'seq',base_tests.add())
+        self.assertEqual(changed['sequences'][1],parent)
+        self.assertEqual(len(plan['render_plan']['transitions']),1)
 
 
 class NestedTransitionCliTests(unittest.TestCase):

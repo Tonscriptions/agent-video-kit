@@ -3699,6 +3699,10 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
     input_meta.append(projection)
     if inline_meta:
         input_meta.append(_inline_sequence_budget(inline_meta, projection, sampling_config))
+    # A recursive temporal graph may consume one external surface while the
+    # project also carries surfaces owned by its caller. Only drain unused
+    # outputs actually produced by this graph, never the caller's other pads.
+    owned_surfaces = {item.get('asset_id') for item in inline_meta}
     surface_labels = {}
     for asset_id, asset in assets.items():
         if not asset.get('_inline_video'):
@@ -3709,19 +3713,19 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             labels = [f'{source_label}_use{i}' for i in range(count)]
             filters.append(f'[{source_label}]split={count}'+''.join(f'[{label}]' for label in labels))
             surface_labels[asset_id] = labels
-        else:
+        elif asset_id in owned_surfaces:
             filters.append(f'[{source_label}]nullsink')
     audio_surface_labels = {}
     for aid, asset in assets.items():
         if not asset.get('_inline_audio'):
             continue
-        count = sum(c.get('asset_id') == aid for t in render_tracks if t.get('kind') == 'audio' for c in t.get('clips', []))
+        count = 0 if _video_only else sum(c.get('asset_id') == aid for t in render_tracks if t.get('kind') == 'audio' for c in t.get('clips', []))
         source_label = asset['_inline_audio']['label']
         if count:
             labels = [f'{source_label}_audio{i}' for i in range(count)]
             filters.append(f'[{source_label}]asplit={count}'+''.join(f'[{label}]' for label in labels))
             audio_surface_labels[aid] = labels
-        else:
+        elif aid in owned_surfaces:
             filters.append(f'[{source_label}]anullsink')
     local_audio_engine = _audio_stretch_configuration(root, settings.get('audio_stretch'))
     for track in sorted(render_tracks, key=lambda item: int(item.get("order", 0))):
@@ -3891,7 +3895,10 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                                      'fps': nominal_value, 'message': '嵌套非线性变速以登记帧率建立源显示时钟；VFR 原始时间戳等效未验收'})
                 if bool(clip.get("reverse")):
                     chain.append("reverse")
-                if nested_maps:
+                if nested_maps or inline_surface:
+                    # Complete child surfaces have a coarse display-frame TB.
+                    # Retiming before freeze must not round two source frames
+                    # onto the same timestamp and advance the selected picture.
                     chain.append('settb=AVTB')
                 chain.append(setpts)
                 # A fractional segment boundary must not reset fps rounding
@@ -3966,7 +3973,13 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                         else:
                             chain.append(f"crop={crop_width}:{crop_height}:{crop_x}:{crop_y}:exact=1")
                 if not dynamic_crop_rendered:
-                    if crop_fit == "fill":
+                    if not crop and source_width == width and source_height == height:
+                        # A native-size surface needs no resampling. Avoid a
+                        # redundant rgba -> float -> rgba conversion: swscale
+                        # can round an 8-bit alpha ramp upwards by one here,
+                        # which would accumulate through compound levels.
+                        chain.append('setsar=1')
+                    elif crop_fit == "fill":
                         chain.extend(_scale_filters(f"scale={width}:{height}:force_original_aspect_ratio=increase", alpha=alpha_padding))
                         chain.extend([f"crop={width}:{height}:(iw-ow)/2:(ih-oh)/2", "setsar=1"])
                     elif crop_fit == "stretch":
@@ -4336,7 +4349,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
 
     audio_root = _build_audio_bus_tree(audio_specs, composite_groups, render_tracks, filters, warnings, input_meta,
                                       duration_tick=int(sequence['duration_tick']), tps=tps)
-    audio_target_samples = max(1, int(round(duration * 48000)))
+    audio_target_samples = max(1, math.ceil(Fraction(int(sequence['duration_tick'])*48000, tps)))
     if audio_root:
         filters.append(f'[{audio_root}]aresample=48000,apad=whole_len={audio_target_samples},'
                        f'atrim=end_sample={audio_target_samples},asetpts=N/SR/TB[aout]')
@@ -4405,11 +4418,19 @@ def render_project(
     container = encoder["container"]
     video_encoder = encoder["video"]
     audio_encoder = encoder["audio"]
+    # FFmpeg rounds an output -t on the encoder frame timebase. Keep every
+    # display frame whose start belongs to the author's half-open interval;
+    # audio is separately trimmed to its exact authored sample count in aout.
+    output_rate = Fraction(effective_project['settings']['timebase']['display_fps']['num'],
+                           effective_project['settings']['timebase']['display_fps']['den'])
+    authored_seconds = Fraction(max(int(sequence.get('duration_tick', 1)), 1),
+                                int(project['settings']['timebase']['ticks_per_second']))
+    encoded_end = Fraction(math.ceil(authored_seconds*output_rate), 1)/output_rate
     args = [
         ffmpeg_path(), "-hide_banner", "-y", "-loglevel", "error",
         "-progress", str(progress_file),
         *inputs, "-filter_complex", graph, "-map", "[vout]", "-map", "[aout]",
-        "-t", f"{max(int(sequence.get('duration_tick', 1)), 1) / int(project['settings']['timebase']['ticks_per_second']):.6f}",
+        "-t", f"{float(encoded_end):.9f}",
         "-c:v", str(video_encoder["codec"]),
     ]
     if str(video_encoder.get("codec")) in {"libx264", "libx265"}:

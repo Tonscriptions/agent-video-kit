@@ -1,0 +1,30 @@
+test_fractional_output_uses_the_global_half_open_interval (test_nested_frame_coverage.NestedFrameCoverageTests.test_fractional_output_uses_the_global_half_open_interval) ... FAIL
+test_subtitle_clock_manifest_and_unaccepted_freeze_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_manifest_and_unaccepted_freeze_boundary) ... FAIL
+
+======================================================================
+FAIL: test_fractional_output_uses_the_global_half_open_interval (test_nested_frame_coverage.NestedFrameCoverageTests.test_fractional_output_uses_the_global_half_open_interval)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product/tests\test_nested_frame_coverage.py", line 117, in test_fractional_output_uses_the_global_half_open_interval
+    self.render_coverage([self.bezier()],output_fps=Fraction(30000,1001))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product/tests\test_nested_frame_coverage.py", line 81, in render_coverage
+    result=self.call('render','--project',self.root,'--output',output,'--crf','0','--pixel-format','yuv444p')
+  File "E:\dev\sandbox\AI广告剪辑\product/tests\test_nested_time_mapping.py", line 111, in call
+    self.assertEqual(code, 0, value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 6 != 0 : {'ok': False, 'command': 'render', 'request_id': 'req_20261018092415_f0997060', 'operation_id': 'render_20261018092415_9855d278', 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'RENDER_QUALITY_FAILED', 'message': '输出未通过结构质量检查', 'path': None, 'retryable': False, 'cause': "[{'code': 'OUTPUT_DURATION_MISMATCH', 'expected': 2.4046333333333334, 'actual': 2.435767, 'tolerance': 0.0015}]", 'operation_id': 'render_20261018092415_9855d278'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-18T09:24:15.724814Z', 'finished_at': '2026-10-18T09:24:15.724830Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_subtitle_clock_manifest_and_unaccepted_freeze_boundary (test_subtitle_clock.SubtitleClockTests.test_subtitle_clock_manifest_and_unaccepted_freeze_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product/tests\test_subtitle_clock.py", line 380, in test_subtitle_clock_manifest_and_unaccepted_freeze_boundary
+    self.assertTrue(any(w.get('feature')=='subtitle_freeze_clock' for w in plan['warnings']))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 2 tests in 13.414s
+
+FAILED (failures=2)

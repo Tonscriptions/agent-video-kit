@@ -5,6 +5,15 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+For [compound freeze projects](../../docs/specs/复合片段定格与完整音画时钟契约_v0.1_2026-10-18.md),
+package the authored child sequences, media and fonts. Render-only virtual
+surfaces are graph pads, not generated files or rights entries. Verify native
+package restoration and an actual isolated installed CLI render against the
+development bytes, as scoped in the
+[installation and rebuild evidence](../../docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md).
+The shared estimated quota charges complete child and frozen surfaces;
+loop/reverse buffers and total process RSS still require separate acceptance.
+
 For installing outside the source checkout, use the new-target, hash-bound
 wheel-only installer described by the
 [offline release contract](../../docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md).

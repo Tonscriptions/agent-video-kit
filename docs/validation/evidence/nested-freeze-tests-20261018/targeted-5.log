@@ -1,0 +1,37 @@
+test_child_bus_gain_is_processed_before_pause_parent_gain_after (test_nested_freeze.NestedFreezeTests.test_child_bus_gain_is_processed_before_pause_parent_gain_after) ... ok
+test_child_caption_and_animation_pause_with_complete_picture (test_nested_freeze.NestedFreezeTests.test_child_caption_and_animation_pause_with_complete_picture) ... ok
+test_child_transition_midpoint_is_held_then_progress_resumes (test_nested_freeze.NestedFreezeTests.test_child_transition_midpoint_is_held_then_progress_resumes) ... ok
+test_constant_speed_freeze_samples_complete_child_before_pause (test_nested_freeze.NestedFreezeTests.test_constant_speed_freeze_samples_complete_child_before_pause) ... ok
+test_continue_audio_runs_through_picture_pause_and_pads_tail (test_nested_freeze.NestedFreezeTests.test_continue_audio_runs_through_picture_pause_and_pads_tail) ... ok
+test_double_freeze_pauses_an_already_frozen_child (test_nested_freeze.NestedFreezeTests.test_double_freeze_pauses_an_already_frozen_child) ... ok
+test_fractional_root_duration_keeps_last_half_open_display_frame (test_nested_freeze.NestedFreezeTests.test_fractional_root_duration_keeps_last_half_open_display_frame) ... ok
+test_invalid_freeze_and_cycle_remain_rejected (test_nested_freeze.NestedFreezeTests.test_invalid_freeze_and_cycle_remain_rejected) ... ok
+test_middle_freeze_has_exact_frame_identity_before_during_after (test_nested_freeze.NestedFreezeTests.test_middle_freeze_has_exact_frame_identity_before_during_after) ... ok
+test_non_frame_hold_duration_reports_quantization (test_nested_freeze.NestedFreezeTests.test_non_frame_hold_duration_reports_quantization) ... ok
+test_nonzero_parent_placement_does_not_change_local_hold (test_nested_freeze.NestedFreezeTests.test_nonzero_parent_placement_does_not_change_local_hold) ... ok
+test_outer_curve_maps_the_complete_frozen_child (test_nested_freeze.NestedFreezeTests.test_outer_curve_maps_the_complete_frozen_child) ... ok
+test_outer_reverse_retimes_the_complete_frozen_picture (test_nested_freeze.NestedFreezeTests.test_outer_reverse_retimes_the_complete_frozen_picture) ... ok
+test_parent_animation_keeps_moving_while_child_picture_is_held (test_nested_freeze.NestedFreezeTests.test_parent_animation_keeps_moving_while_child_picture_is_held) ... ok
+test_planning_rejects_projection_quota_without_mutating_authorship (test_nested_freeze.NestedFreezeTests.test_planning_rejects_projection_quota_without_mutating_authorship) ... ok
+test_repeated_child_freezes_are_independent_and_no_pad_is_consumed_twice (test_nested_freeze.NestedFreezeTests.test_repeated_child_freezes_are_independent_and_no_pad_is_consumed_twice) ... ok
+test_smooth_speed_curve_uses_integrated_frame_clock_before_hold (test_nested_freeze.NestedFreezeTests.test_smooth_speed_curve_uses_integrated_frame_clock_before_hold) ... FAIL
+test_start_freeze_uses_first_picture_and_silence_then_entire_source (test_nested_freeze.NestedFreezeTests.test_start_freeze_uses_first_picture_and_silence_then_entire_source) ... ok
+test_tail_freeze_keeps_last_picture_and_has_silent_tail (test_nested_freeze.NestedFreezeTests.test_tail_freeze_keeps_last_picture_and_has_silent_tail) ... ok
+test_transparent_native_child_hold_preserves_every_alpha_pixel (test_nested_freeze.NestedFreezeTests.test_transparent_native_child_hold_preserves_every_alpha_pixel) ... ok
+test_trim_and_reverse_happen_before_freeze (test_nested_freeze.NestedFreezeTests.test_trim_and_reverse_happen_before_freeze) ... ok
+test_video_only_planning_does_not_leave_unconsumed_audio_branches (test_nested_freeze.NestedFreezeTests.test_video_only_planning_does_not_leave_unconsumed_audio_branches) ... ok
+test_window_inside_freeze_then_resume_preserves_complete_author_clock (test_nested_freeze.NestedFreezeTests.test_window_inside_freeze_then_resume_preserves_complete_author_clock) ... ok
+
+======================================================================
+FAIL: test_smooth_speed_curve_uses_integrated_frame_clock_before_hold (test_nested_freeze.NestedFreezeTests.test_smooth_speed_curve_uses_integrated_frame_clock_before_hold)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_nested_freeze.py", line 246, in test_smooth_speed_curve_uses_integrated_frame_clock_before_hold
+    self.assertEqual(len(pcm),math.ceil((duration+TPS)*SR/TPS))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 127100 != 127101
+
+----------------------------------------------------------------------
+Ran 23 tests in 17.842s
+
+FAILED (failures=1)

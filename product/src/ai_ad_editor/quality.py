@@ -235,7 +235,7 @@ def check_output(
             errors.append({"code": "OUTPUT_AV_SYNC_OUT_OF_RANGE", "expected_max_ms": max_av_sync_ms, "actual_ms": round(av_sync_delta * 1000.0, 3)})
     if expected_duration is not None:
         fps = settings.get("timebase", {}).get("display_fps", {"num": 30, "den": 1})
-        frame_tolerance = max(1.0 / max(1, int(fps.get("num", 30))), 0.001) * 1.5
+        frame_tolerance = max(max(1, int(fps.get("den", 1))) / max(1, int(fps.get("num", 30))), 0.001) * 1.5
         if abs(actual_duration - expected_duration) > frame_tolerance:
             errors.append({"code": "OUTPUT_DURATION_MISMATCH", "expected": expected_duration, "actual": actual_duration, "tolerance": frame_tolerance})
     metrics: dict[str, Any] = {"duration_seconds": actual_duration, "width": video.get("width"), "height": video.get("height"), "audio_codec": probe.get("audio", {}).get("codec"), "video_duration_seconds": video_duration, "audio_duration_seconds": audio_duration or None, "av_duration_delta_seconds": abs(video_duration - audio_duration) if audio_duration else None, "probe": probe}
