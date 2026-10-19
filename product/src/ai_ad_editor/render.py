@@ -4216,6 +4216,10 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                         audio_chain.append('areverse')
                     warnings.append({'code':'RENDER_FEATURE_APPROXIMATE','clip_id':clip.get('id'),
                                      'feature':'offline_audio_time_map','message':'本地 R3 对整段音频离线伸缩；采样锚点为引擎约束，局部时序、极短窗音高与听感须独立核验'})
+                    if audio_stretch_job['source_context']['requested_ms']:
+                        warnings.append({'code':'AUDIO_STRETCH_SOURCE_CONTEXT','clip_id':clip.get('id'),
+                                         'source_context':audio_stretch_job['source_context'],
+                                         'message':'显式使用相邻真实源音频作为变速分析上下文，输出裁回作者选区；附近瞬态、音高、相位与自然听感仍须复核'})
                 elif audio_parts:
                     source_start_sample = round(src_in * 48000)
                     source_end_sample = round(src_out * 48000)

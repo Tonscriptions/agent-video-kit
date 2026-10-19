@@ -125,6 +125,12 @@ to conceal a rejection. Re-register with a new adapter ID; retain old
 receipts and never edit old hashes. Other engines keep existing policies.
 <!-- /V60-CUDA -->
 
+The [V63 unchanged-model retry](../../docs/validation/VACE共享显存真实重试与准入拒绝_2026-10-19.md)
+was rejected before text weights: physical free 3718 MiB versus 7936 MiB
+required, despite larger Torch free. It produced no new repaired video or
+model forward. Preserve the original envelope/cause and distinguish this real
+resource rejection from CPU protocol tests and historical model outputs.
+
 For prompted joint video editing, read the [VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
 Register an existing complete Wan2.1-VACE-1.3B Diffusers safetensors bundle with
 `media adapter register --engine diffusers-wan-vace-local-v1 --device cuda`,

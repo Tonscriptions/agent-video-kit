@@ -419,6 +419,14 @@ quality, pitch, local transient timing and listening conclusions separate. A
 Unconfigured projects use the default native atempo path and its explicit limits. A unity-tempo positive
 control passing on both versions is not evidence of a historical failure.
 
+For opt-in [real source context](../../docs/specs/离线音频真实源上下文与精确选区契约_v0.1_2026-10-19.md),
+compare exact decoded float32 selected samples with a fresh extended-window R3
+run, then evaluate pitch and phase separately. Record requested milliseconds,
+actual head/tail, edge slopes and output crop. Default 0 stays explicit. The
+selected 64 ms apart controls can pass pitch while antiphase still fails;
+together can preserve cancellation while missing the right-channel pitch gate.
+Do not accept natural quality or listening from synthetic tones or silent GIFs.
+
 For [R3 channel-mode evidence](../../docs/specs/R3声道策略契约_v0.1_2026-10-17.md),
 inspect both actual decoded channels. Keep sample-count/presence, known-source
 pitch, phase/mono mixing and listening gates separate. Use float PCM for exact

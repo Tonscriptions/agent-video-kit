@@ -1,0 +1,29 @@
+test_audio_shorter_than_probe_rejects_without_stretcher_or_cache (test_audio_source_context.AudioSourceContextTests.test_audio_shorter_than_probe_rejects_without_stretcher_or_cache) ... ok
+test_context_clamps_to_real_source_edges_without_padding (test_audio_source_context.AudioSourceContextTests.test_context_clamps_to_real_source_edges_without_padding) ... ok
+test_dry_run_exposes_context_without_decoding_or_cache (test_audio_source_context.AudioSourceContextTests.test_dry_run_exposes_context_without_decoding_or_cache) ... ok
+test_extended_output_budget_rejects_before_decoding (test_audio_source_context.AudioSourceContextTests.test_extended_output_budget_rejects_before_decoding) ... ok
+test_invalid_context_values_reject_before_any_process (test_audio_source_context.AudioSourceContextTests.test_invalid_context_values_reject_before_any_process) ... ok
+test_missing_source_duration_cannot_invent_context (test_audio_source_context.AudioSourceContextTests.test_missing_source_duration_cannot_invent_context) ... ok
+test_nested_reverse_selects_context_before_sample_reversal (test_audio_source_context.AudioSourceContextTests.test_nested_reverse_selects_context_before_sample_reversal) ... ok
+test_non_linear_map_shifts_all_authored_anchors_and_crops_output (test_audio_source_context.AudioSourceContextTests.test_non_linear_map_shifts_all_authored_anchors_and_crops_output) ... FAIL
+test_real_context_preserves_four_ms_independent_tones (test_audio_source_context.AudioSourceContextTests.test_real_context_preserves_four_ms_independent_tones) ... ok
+
+======================================================================
+FAIL: test_non_linear_map_shifts_all_authored_anchors_and_crops_output (test_audio_source_context.AudioSourceContextTests.test_non_linear_map_shifts_all_authored_anchors_and_crops_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-source-context-20261019-v64-candidate\product\tests\test_audio_source_context.py", line 81, in test_non_linear_map_shifts_all_authored_anchors_and_crops_output
+    self.assertEqual(context['time_map'][1:-1],shifted)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [[3072, 3775], [3295, 4049], [3523, 4330],[1666 chars]775]] != [(3072, 3775), (3295, 4049), (3523, 4330),[1666 chars]775)]
+
+First differing element 0:
+[3072, 3775]
+(3072, 3775)
+
+Diff is 8149 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 9 tests in 18.122s
+
+FAILED (failures=1)

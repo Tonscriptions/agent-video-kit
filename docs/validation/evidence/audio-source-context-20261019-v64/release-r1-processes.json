@@ -1,0 +1,11 @@
+{
+  "checked_at_utc": "2026-10-19T10:59:16.965438+00:00",
+  "query": "$audioOwnedJobs=@(Get-CimInstance Win32_Process | Where-Object { $_.Name -in @('python.exe','ffmpeg.exe') -and $_.CommandLine -match 'run_frozen_regression.py|audio-context-native-install-20261019-v64-r1|audio-source-context-media-20261019-v64-r2|audio-context-independent-20261019-v64-r1' } | Select-Object ProcessId,Name,CommandLine); $audioOwnedBrowsers=@(Get-CimInstance Win32_Process | Where-Object { $_.Name -match 'chrome|chromium|msedge' -and $_.CommandLine -match 'html-motion|html-quality|ai-ad-editor|AI广告剪辑|regression-' } | Select-Object ProcessId,Name,CommandLine); [ordered]@{workers=$audioOwnedJobs;browsers=$audioOwnedBrowsers} | ConvertTo-Json -Depth 4 -Compress",
+  "result": {
+    "workers": [],
+    "browsers": []
+  },
+  "continuous_process_monitor": false,
+  "interactive_browser_started": false,
+  "unrelated_processes_stopped": false
+}

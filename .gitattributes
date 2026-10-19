@@ -1,4 +1,23 @@
 # Published evidence uses byte hashes; preserve its bytes on Windows checkout.
+# V63 rejection and V64 source-context receipts include native raw log bytes.
+docs/validation/evidence/vace-delivery-20261019-v63-r1/** -text -whitespace
+docs/validation/evidence/audio-source-context-20261019-v64/** -text -whitespace
+docs/validation/evidence/audio-context-install-20261019-v64-r1/** -text -whitespace
+docs/validation/evidence/audio-context-media-20261019-v64-r1/** -text -whitespace
+docs/assets/audio-source-context-*/** -text -whitespace
+docs/assets/audio-context-offline-*/** -text -whitespace
+docs/specs/离线音频真实源上下文与精确选区契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/离线音频真实源上下文与短窗音高实测_2026-10-19.md text eol=lf
+docs/validation/VACE共享显存真实重试与准入拒绝_2026-10-19.md text eol=lf
+scripts/probe_audio_source_context.py -text
+scripts/smoke_audio_source_context.py -text
+scripts/verify_audio_source_context_install.py -text
+scripts/audit_audio_source_context_media.py -text
+scripts/build_audio_context_preview.py -text
+scripts/collect_audio_context_development.py -text
+scripts/collect_vace_retry_rejection.py -text
+scripts/sync_audio_source_context_documents.py -text
+scripts/audit_audio_source_context_release.py -text
 .gitattributes text eol=lf
 .gitignore text eol=lf
 product/**/*.py text eol=lf

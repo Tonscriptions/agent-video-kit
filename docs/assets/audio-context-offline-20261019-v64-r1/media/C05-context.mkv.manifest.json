@@ -1,0 +1,3606 @@
+{
+  "manifest_version": "0.1.0",
+  "operation_id": "render_20261019103354_cfef5e1c",
+  "project_id": "proj_20261019103348_080fd43b",
+  "sequence_id": "seq_main",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\outputs\\C05-context.mkv",
+  "sha256": "4a9a5123f83ae25aba397375322d467cf3314cc7e774301f18418f4b5f77bc85",
+  "probe": {
+    "duration_seconds": 1.5,
+    "duration_tick": 135000,
+    "format": "matroska,webm",
+    "format_long_name": "Matroska / WebM",
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "profile": "High 4:4:4 Predictive",
+        "codec_type": "video",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "mime_codec_string": "avc1.f40015",
+        "width": 512,
+        "height": 288,
+        "coded_width": 512,
+        "coded_height": 288,
+        "has_b_frames": 0,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "16:9",
+        "pix_fmt": "yuv444p",
+        "level": 21,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "is_avc": "true",
+        "nal_length_size": "4",
+        "r_frame_rate": "24/1",
+        "avg_frame_rate": "24/1",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bits_per_raw_sample": "8",
+        "extradata_size": 49,
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 libx264",
+          "DURATION": "00:00:01.500000000"
+        }
+      },
+      {
+        "index": 1,
+        "codec_name": "pcm_f32le",
+        "codec_long_name": "PCM 32-bit floating point little-endian",
+        "codec_type": "audio",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "sample_fmt": "flt",
+        "sample_rate": "48000",
+        "channels": 2,
+        "bits_per_sample": 32,
+        "initial_padding": 0,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bit_rate": "3072000",
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 pcm_f32le",
+          "DURATION": "00:00:01.500000000"
+        }
+      }
+    ],
+    "video": {
+      "codec": "h264",
+      "width": 512,
+      "height": 288,
+      "pix_fmt": "yuv444p",
+      "fps": "24/1",
+      "color_space": "bt709",
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    },
+    "audio": {
+      "codec": "pcm_f32le",
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    }
+  },
+  "command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-hide_banner",
+    "-y",
+    "-loglevel",
+    "error",
+    "-progress",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\renders\\.tmp\\render_20261019103354_cfef5e1c\\ffmpeg-progress.log",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\assets\\frames_source.mp4",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\cache\\audio-stretch\\7cb76e066f20733163673773855d8106fc6450daf962b26c678ccb16145ad6e0.wav",
+    "-filter_complex",
+    "[0:v]trim=start=0.000000:end=1.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=24/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1[v0];[1:a]anull,apad=whole_len=72000,atrim=end_sample=72000,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black@0.0:s=512x288:r=24/1:d=1.500000,format=rgba[group0_base];[group0_base]format=rgba,trim=start_frame=0:end_frame=36[group0_out];color=c=black:s=512x288:r=24/1:d=1.500000[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo1];[vo1]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]apad=whole_len=72000,atrim=start_sample=0:end_sample=72000,asetpts=N/SR/TB,aresample=48000,apad=whole_len=72000,atrim=end_sample=72000,asetpts=N/SR/TB,adelay=0S:all=1[abus3];[abus3]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus4];[abus4]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus5];[abus5]aresample=48000,apad=whole_len=72000,atrim=end_sample=72000,asetpts=N/SR/TB[aout]",
+    "-map",
+    "[vout]",
+    "-map",
+    "[aout]",
+    "-t",
+    "1.500000000",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "medium",
+    "-crf",
+    "0",
+    "-pix_fmt",
+    "yuv444p",
+    "-color_primaries",
+    "bt709",
+    "-color_trc",
+    "bt709",
+    "-colorspace",
+    "bt709",
+    "-color_range",
+    "tv",
+    "-c:a",
+    "pcm_f32le",
+    "-f",
+    "matroska",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\renders\\.tmp\\render_20261019103354_cfef5e1c\\C05-context.mkv"
+  ],
+  "filter_graph_transport": {
+    "mode": "inline",
+    "sha256": "sha256:8a5ae8dd5ffaffa2f76ddd58a41caf5f7ca4186acefe59f5dfc71c7195bfe321",
+    "utf8_bytes": 1197,
+    "logical_command_utf16_units": 2242
+  },
+  "filter_complex": "[0:v]trim=start=0.000000:end=1.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=24/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1[v0];[1:a]anull,apad=whole_len=72000,atrim=end_sample=72000,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black@0.0:s=512x288:r=24/1:d=1.500000,format=rgba[group0_base];[group0_base]format=rgba,trim=start_frame=0:end_frame=36[group0_out];color=c=black:s=512x288:r=24/1:d=1.500000[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo1];[vo1]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]apad=whole_len=72000,atrim=start_sample=0:end_sample=72000,asetpts=N/SR/TB,aresample=48000,apad=whole_len=72000,atrim=end_sample=72000,asetpts=N/SR/TB,adelay=0S:all=1[abus3];[abus3]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus4];[abus4]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus5];[abus5]aresample=48000,apad=whole_len=72000,atrim=end_sample=72000,asetpts=N/SR/TB[aout]",
+  "inputs": [
+    {
+      "kind": "sequence-projection-budget",
+      "method": "bilinear",
+      "max_working_bytes": 1073741824,
+      "nodes": [
+        {
+          "clip_id": "sound",
+          "parent_id": null,
+          "source_canvas": {
+            "width": 512,
+            "height": 288
+          },
+          "parent_canvas": {
+            "width": 512,
+            "height": 288
+          },
+          "working_canvas": {
+            "width": 512,
+            "height": 288
+          },
+          "components_bytes": {
+            "source_rgba_buffers": 1179648,
+            "parent_rgba_buffers": 2359296,
+            "working_float_and_byte_buffers": 8257536,
+            "summed_area_double_planes": 0
+          },
+          "estimated_working_bytes": 11796480
+        }
+      ],
+      "estimated_working_bytes": 11796480,
+      "scope": "reachable-sequence-projection-instances-only-not-process-rss",
+      "time_disjoint_instances_charged": true,
+      "unused_sequences_charged": false
+    },
+    {
+      "asset_id": "frames",
+      "clip_id": "picture",
+      "input": 0,
+      "kind": "video",
+      "source_in_tick": 0,
+      "source_out_tick": 90000
+    },
+    {
+      "asset_id": "sound_asset",
+      "clip_id": "sound.leaf",
+      "track_id": "sound.child_audio",
+      "input": 1,
+      "kind": "audio",
+      "source_in_tick": 18000,
+      "source_out_tick": 252000,
+      "timeline_start_sample": 0,
+      "duration_samples": 72000,
+      "sample_rate": 48000,
+      "group_id": "sound",
+      "audio_stretch": {
+        "protocol": "agent-video-offline-audio-stretch-v1",
+        "engine": {
+          "engine": "rubberband-r3-offline-v1",
+          "executable": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\rubberband.exe",
+          "artifacts": [
+            {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\rubberband.exe",
+              "role": "audio-stretch-executable",
+              "bytes": 646496,
+              "sha256": "sha256:d26d81e20f48ea33070e638f58bdeb6a61ce7f0946d8f2629f30441caa2905d1"
+            },
+            {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\COPYING.txt",
+              "role": "audio-stretch-license",
+              "bytes": 30260,
+              "sha256": "sha256:cedd4c1885d75991bf1077cc6e33359103cf04fbc996f20d30ab043d5fc5fcc5"
+            },
+            {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\sndfile.dll",
+              "role": "audio-stretch-dependency",
+              "bytes": 2603520,
+              "sha256": "sha256:4e3bd2de8e1485110eaebef8e1239471f73d608773831c323bf528e05645655e"
+            }
+          ],
+          "channel_mode": "apart",
+          "source_context_ms": 64,
+          "license_spdx": "GPL-2.0-or-later",
+          "network": "disabled"
+        },
+        "source": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\assets\\sound_asset_stereo-tones.wav",
+        "source_sha256": "sha256:db6ef91007b85271be5f815aeea5d8e42ddb978eed4f4b4c2a276827282eb5b4",
+        "source_start_sample": 9600,
+        "source_end_sample": 134400,
+        "source_frames": 124800,
+        "target_frames": 72000,
+        "channels": 2,
+        "sample_rate": 48000,
+        "time_map": [
+          [
+            0,
+            0
+          ],
+          [
+            223,
+            274
+          ],
+          [
+            451,
+            555
+          ],
+          [
+            686,
+            842
+          ],
+          [
+            927,
+            1137
+          ],
+          [
+            1174,
+            1437
+          ],
+          [
+            1428,
+            1745
+          ],
+          [
+            1687,
+            2058
+          ],
+          [
+            1952,
+            2378
+          ],
+          [
+            2223,
+            2704
+          ],
+          [
+            2500,
+            3035
+          ],
+          [
+            2782,
+            3372
+          ],
+          [
+            3071,
+            3714
+          ],
+          [
+            3365,
+            4062
+          ],
+          [
+            3665,
+            4414
+          ],
+          [
+            4281,
+            5134
+          ],
+          [
+            4919,
+            5873
+          ],
+          [
+            5579,
+            6628
+          ],
+          [
+            5943,
+            7041
+          ],
+          [
+            6260,
+            7399
+          ],
+          [
+            6962,
+            8185
+          ],
+          [
+            7684,
+            8984
+          ],
+          [
+            8426,
+            9795
+          ],
+          [
+            9188,
+            10617
+          ],
+          [
+            9969,
+            11448
+          ],
+          [
+            10769,
+            12288
+          ],
+          [
+            11588,
+            13136
+          ],
+          [
+            11886,
+            13441
+          ],
+          [
+            12424,
+            13990
+          ],
+          [
+            13279,
+            14849
+          ],
+          [
+            14150,
+            15712
+          ],
+          [
+            15039,
+            16579
+          ],
+          [
+            15943,
+            17449
+          ],
+          [
+            16864,
+            18320
+          ],
+          [
+            17801,
+            19193
+          ],
+          [
+            17829,
+            19218
+          ],
+          [
+            18753,
+            20065
+          ],
+          [
+            19720,
+            20937
+          ],
+          [
+            20702,
+            21808
+          ],
+          [
+            21697,
+            22677
+          ],
+          [
+            22707,
+            23544
+          ],
+          [
+            23729,
+            24407
+          ],
+          [
+            23771,
+            24442
+          ],
+          [
+            24765,
+            25267
+          ],
+          [
+            26874,
+            26975
+          ],
+          [
+            29029,
+            28664
+          ],
+          [
+            29714,
+            29188
+          ],
+          [
+            31229,
+            30330
+          ],
+          [
+            33470,
+            31971
+          ],
+          [
+            35657,
+            33521
+          ],
+          [
+            35748,
+            33585
+          ],
+          [
+            38061,
+            35170
+          ],
+          [
+            40406,
+            36724
+          ],
+          [
+            41600,
+            37497
+          ],
+          [
+            42778,
+            38247
+          ],
+          [
+            45176,
+            39737
+          ],
+          [
+            47543,
+            41162
+          ],
+          [
+            47596,
+            41193
+          ],
+          [
+            50034,
+            42615
+          ],
+          [
+            52489,
+            44003
+          ],
+          [
+            53486,
+            44555
+          ],
+          [
+            54955,
+            45356
+          ],
+          [
+            57432,
+            46674
+          ],
+          [
+            59429,
+            47708
+          ],
+          [
+            59914,
+            47956
+          ],
+          [
+            62400,
+            49204
+          ],
+          [
+            64886,
+            50417
+          ],
+          [
+            65371,
+            50650
+          ],
+          [
+            67368,
+            51594
+          ],
+          [
+            69845,
+            52737
+          ],
+          [
+            71314,
+            53401
+          ],
+          [
+            72311,
+            53846
+          ],
+          [
+            74766,
+            54920
+          ],
+          [
+            77204,
+            55961
+          ],
+          [
+            77257,
+            55983
+          ],
+          [
+            79624,
+            56967
+          ],
+          [
+            82022,
+            57941
+          ],
+          [
+            83200,
+            58410
+          ],
+          [
+            84394,
+            58881
+          ],
+          [
+            86739,
+            59788
+          ],
+          [
+            89052,
+            60663
+          ],
+          [
+            89143,
+            60698
+          ],
+          [
+            91330,
+            61507
+          ],
+          [
+            93571,
+            62318
+          ],
+          [
+            95086,
+            62857
+          ],
+          [
+            95771,
+            63098
+          ],
+          [
+            97926,
+            63846
+          ],
+          [
+            100035,
+            64564
+          ],
+          [
+            101029,
+            64897
+          ],
+          [
+            102093,
+            65251
+          ],
+          [
+            104098,
+            65907
+          ],
+          [
+            106047,
+            66534
+          ],
+          [
+            106971,
+            66827
+          ],
+          [
+            107936,
+            67130
+          ],
+          [
+            109761,
+            67697
+          ],
+          [
+            111521,
+            68234
+          ],
+          [
+            112914,
+            68652
+          ],
+          [
+            113212,
+            68741
+          ],
+          [
+            114831,
+            69219
+          ],
+          [
+            116374,
+            69668
+          ],
+          [
+            117838,
+            70089
+          ],
+          [
+            118857,
+            70377
+          ],
+          [
+            119221,
+            70479
+          ],
+          [
+            120519,
+            70842
+          ],
+          [
+            121729,
+            71175
+          ],
+          [
+            122848,
+            71479
+          ],
+          [
+            123873,
+            71754
+          ],
+          [
+            124800,
+            72000
+          ]
+        ],
+        "source_context": {
+          "requested_ms": 64,
+          "source_head_frames": 3072,
+          "source_tail_frames": 3072,
+          "output_head_frames": 3775,
+          "output_tail_frames": 815,
+          "decode_start_sample": 6528,
+          "decode_end_sample": 137472,
+          "source_frames": 130944,
+          "target_frames": 76590,
+          "time_map": [
+            [
+              0,
+              0
+            ],
+            [
+              3072,
+              3775
+            ],
+            [
+              3295,
+              4049
+            ],
+            [
+              3523,
+              4330
+            ],
+            [
+              3758,
+              4617
+            ],
+            [
+              3999,
+              4912
+            ],
+            [
+              4246,
+              5212
+            ],
+            [
+              4500,
+              5520
+            ],
+            [
+              4759,
+              5833
+            ],
+            [
+              5024,
+              6153
+            ],
+            [
+              5295,
+              6479
+            ],
+            [
+              5572,
+              6810
+            ],
+            [
+              5854,
+              7147
+            ],
+            [
+              6143,
+              7489
+            ],
+            [
+              6437,
+              7837
+            ],
+            [
+              6737,
+              8189
+            ],
+            [
+              7353,
+              8909
+            ],
+            [
+              7991,
+              9648
+            ],
+            [
+              8651,
+              10403
+            ],
+            [
+              9015,
+              10816
+            ],
+            [
+              9332,
+              11174
+            ],
+            [
+              10034,
+              11960
+            ],
+            [
+              10756,
+              12759
+            ],
+            [
+              11498,
+              13570
+            ],
+            [
+              12260,
+              14392
+            ],
+            [
+              13041,
+              15223
+            ],
+            [
+              13841,
+              16063
+            ],
+            [
+              14660,
+              16911
+            ],
+            [
+              14958,
+              17216
+            ],
+            [
+              15496,
+              17765
+            ],
+            [
+              16351,
+              18624
+            ],
+            [
+              17222,
+              19487
+            ],
+            [
+              18111,
+              20354
+            ],
+            [
+              19015,
+              21224
+            ],
+            [
+              19936,
+              22095
+            ],
+            [
+              20873,
+              22968
+            ],
+            [
+              20901,
+              22993
+            ],
+            [
+              21825,
+              23840
+            ],
+            [
+              22792,
+              24712
+            ],
+            [
+              23774,
+              25583
+            ],
+            [
+              24769,
+              26452
+            ],
+            [
+              25779,
+              27319
+            ],
+            [
+              26801,
+              28182
+            ],
+            [
+              26843,
+              28217
+            ],
+            [
+              27837,
+              29042
+            ],
+            [
+              29946,
+              30750
+            ],
+            [
+              32101,
+              32439
+            ],
+            [
+              32786,
+              32963
+            ],
+            [
+              34301,
+              34105
+            ],
+            [
+              36542,
+              35746
+            ],
+            [
+              38729,
+              37296
+            ],
+            [
+              38820,
+              37360
+            ],
+            [
+              41133,
+              38945
+            ],
+            [
+              43478,
+              40499
+            ],
+            [
+              44672,
+              41272
+            ],
+            [
+              45850,
+              42022
+            ],
+            [
+              48248,
+              43512
+            ],
+            [
+              50615,
+              44937
+            ],
+            [
+              50668,
+              44968
+            ],
+            [
+              53106,
+              46390
+            ],
+            [
+              55561,
+              47778
+            ],
+            [
+              56558,
+              48330
+            ],
+            [
+              58027,
+              49131
+            ],
+            [
+              60504,
+              50449
+            ],
+            [
+              62501,
+              51483
+            ],
+            [
+              62986,
+              51731
+            ],
+            [
+              65472,
+              52979
+            ],
+            [
+              67958,
+              54192
+            ],
+            [
+              68443,
+              54425
+            ],
+            [
+              70440,
+              55369
+            ],
+            [
+              72917,
+              56512
+            ],
+            [
+              74386,
+              57176
+            ],
+            [
+              75383,
+              57621
+            ],
+            [
+              77838,
+              58695
+            ],
+            [
+              80276,
+              59736
+            ],
+            [
+              80329,
+              59758
+            ],
+            [
+              82696,
+              60742
+            ],
+            [
+              85094,
+              61716
+            ],
+            [
+              86272,
+              62185
+            ],
+            [
+              87466,
+              62656
+            ],
+            [
+              89811,
+              63563
+            ],
+            [
+              92124,
+              64438
+            ],
+            [
+              92215,
+              64473
+            ],
+            [
+              94402,
+              65282
+            ],
+            [
+              96643,
+              66093
+            ],
+            [
+              98158,
+              66632
+            ],
+            [
+              98843,
+              66873
+            ],
+            [
+              100998,
+              67621
+            ],
+            [
+              103107,
+              68339
+            ],
+            [
+              104101,
+              68672
+            ],
+            [
+              105165,
+              69026
+            ],
+            [
+              107170,
+              69682
+            ],
+            [
+              109119,
+              70309
+            ],
+            [
+              110043,
+              70602
+            ],
+            [
+              111008,
+              70905
+            ],
+            [
+              112833,
+              71472
+            ],
+            [
+              114593,
+              72009
+            ],
+            [
+              115986,
+              72427
+            ],
+            [
+              116284,
+              72516
+            ],
+            [
+              117903,
+              72994
+            ],
+            [
+              119446,
+              73443
+            ],
+            [
+              120910,
+              73864
+            ],
+            [
+              121929,
+              74152
+            ],
+            [
+              122293,
+              74254
+            ],
+            [
+              123591,
+              74617
+            ],
+            [
+              124801,
+              74950
+            ],
+            [
+              125920,
+              75254
+            ],
+            [
+              126945,
+              75529
+            ],
+            [
+              127872,
+              75775
+            ],
+            [
+              130944,
+              76590
+            ]
+          ],
+          "edge_interval_output_per_source": [
+            "274/223",
+            "82/309"
+          ],
+          "selection": "real-source-handles-only-no-repetition-or-zero-padding",
+          "author_output_frames": 72000,
+          "output_crop": [
+            3775,
+            75775
+          ]
+        },
+        "reverse_after_stretch": false,
+        "implementation_sha256": "sha256:f4120fd82fc4eba79b9dd0bed1093651edbadb19202d7c384530e799d047dced",
+        "ffmpeg": {
+          "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+          "role": "audio-stretch-ffmpeg",
+          "bytes": 223360000,
+          "sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+        },
+        "key": "7cb76e066f20733163673773855d8106fc6450daf962b26c678ccb16145ad6e0",
+        "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\cache\\audio-stretch\\7cb76e066f20733163673773855d8106fc6450daf962b26c678ccb16145ad6e0.wav",
+        "execution": {
+          "status": "succeeded",
+          "decode_command": [
+            "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-i",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\assets\\sound_asset_stereo-tones.wav",
+            "-map",
+            "0:a:0",
+            "-vn",
+            "-af",
+            "aresample=48000,atrim=start_sample=6528:end_sample=137472,asetpts=N/SR/TB",
+            "-c:a",
+            "pcm_f32le",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\renders\\.tmp\\render_20261019103354_cfef5e1c\\audio-stretch-7w95n7p8\\input.wav"
+          ],
+          "command": [
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\rubberband.exe",
+            "-3",
+            "--no-threads",
+            "-q",
+            "-t",
+            "0.58490652492668627",
+            "--timemap",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\renders\\.tmp\\render_20261019103354_cfef5e1c\\audio-stretch-7w95n7p8\\time-map.txt",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\renders\\.tmp\\render_20261019103354_cfef5e1c\\audio-stretch-7w95n7p8\\input.wav",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\renders\\.tmp\\render_20261019103354_cfef5e1c\\audio-stretch-7w95n7p8\\output.wav"
+          ],
+          "channel_mode": "apart",
+          "decode_stderr": "",
+          "engine_stderr": "Using time ratio 0.584907 and frequency ratio 1\n",
+          "input_pcm": {
+            "frames": 124800,
+            "channels": 2,
+            "sample_rate": 48000,
+            "data_offset": 44,
+            "data_bytes": 998400,
+            "nonzero_samples": [
+              122720,
+              120640
+            ],
+            "rms": [
+              0.14142033895799777,
+              0.10606674734035071
+            ],
+            "maximum_absolute_sample": [
+              0.20001220703125,
+              0.149993896484375
+            ],
+            "sha256": "sha256:698fe397e2f12327bc03ed7de30034644bf194987a9259d5ee20df9d8cb117ef"
+          },
+          "engine_raw_output_pcm": {
+            "frames": 76590,
+            "channels": 2,
+            "sample_rate": 48000,
+            "data_offset": 88,
+            "data_bytes": 612720,
+            "nonzero_samples": [
+              76590,
+              76590
+            ],
+            "rms": [
+              0.14108573764323792,
+              0.10558636441344152
+            ],
+            "maximum_absolute_sample": [
+              0.20013058185577393,
+              0.15120260417461395
+            ],
+            "sha256": "sha256:9ecaf3cc2f4a77bf917aa057e5f92381a62fc65c59f14afbd9b0c553b4afdbbe"
+          },
+          "output_pcm": {
+            "frames": 72000,
+            "channels": 2,
+            "sample_rate": 48000,
+            "data_offset": 44,
+            "data_bytes": 576000,
+            "nonzero_samples": [
+              72000,
+              72000
+            ],
+            "rms": [
+              0.14129506557129215,
+              0.10579434760165084
+            ],
+            "maximum_absolute_sample": [
+              0.20011331140995026,
+              0.15099658071994781
+            ],
+            "sha256": "sha256:ced10e16a9d838d38a64edc67080c084552497a078c9fc80b6a4a028c4612358"
+          },
+          "canonicalization": "float32-pcm-bytes-preserved-no-wall-time-metadata",
+          "time_map_utf8": "3072 3775\n3295 4049\n3523 4330\n3758 4617\n3999 4912\n4246 5212\n4500 5520\n4759 5833\n5024 6153\n5295 6479\n5572 6810\n5854 7147\n6143 7489\n6437 7837\n6737 8189\n7353 8909\n7991 9648\n8651 10403\n9015 10816\n9332 11174\n10034 11960\n10756 12759\n11498 13570\n12260 14392\n13041 15223\n13841 16063\n14660 16911\n14958 17216\n15496 17765\n16351 18624\n17222 19487\n18111 20354\n19015 21224\n19936 22095\n20873 22968\n20901 22993\n21825 23840\n22792 24712\n23774 25583\n24769 26452\n25779 27319\n26801 28182\n26843 28217\n27837 29042\n29946 30750\n32101 32439\n32786 32963\n34301 34105\n36542 35746\n38729 37296\n38820 37360\n41133 38945\n43478 40499\n44672 41272\n45850 42022\n48248 43512\n50615 44937\n50668 44968\n53106 46390\n55561 47778\n56558 48330\n58027 49131\n60504 50449\n62501 51483\n62986 51731\n65472 52979\n67958 54192\n68443 54425\n70440 55369\n72917 56512\n74386 57176\n75383 57621\n77838 58695\n80276 59736\n80329 59758\n82696 60742\n85094 61716\n86272 62185\n87466 62656\n89811 63563\n92124 64438\n92215 64473\n94402 65282\n96643 66093\n98158 66632\n98843 66873\n100998 67621\n103107 68339\n104101 68672\n105165 69026\n107170 69682\n109119 70309\n110043 70602\n111008 70905\n112833 71472\n114593 72009\n115986 72427\n116284 72516\n117903 72994\n119446 73443\n120910 73864\n121929 74152\n122293 74254\n123591 74617\n124801 74950\n125920 75254\n126945 75529\n127872 75775\n",
+          "source_context": {
+            "requested_ms": 64,
+            "source_head_frames": 3072,
+            "source_tail_frames": 3072,
+            "output_head_frames": 3775,
+            "output_tail_frames": 815,
+            "decode_start_sample": 6528,
+            "decode_end_sample": 137472,
+            "source_frames": 130944,
+            "target_frames": 76590,
+            "time_map": [
+              [
+                0,
+                0
+              ],
+              [
+                3072,
+                3775
+              ],
+              [
+                3295,
+                4049
+              ],
+              [
+                3523,
+                4330
+              ],
+              [
+                3758,
+                4617
+              ],
+              [
+                3999,
+                4912
+              ],
+              [
+                4246,
+                5212
+              ],
+              [
+                4500,
+                5520
+              ],
+              [
+                4759,
+                5833
+              ],
+              [
+                5024,
+                6153
+              ],
+              [
+                5295,
+                6479
+              ],
+              [
+                5572,
+                6810
+              ],
+              [
+                5854,
+                7147
+              ],
+              [
+                6143,
+                7489
+              ],
+              [
+                6437,
+                7837
+              ],
+              [
+                6737,
+                8189
+              ],
+              [
+                7353,
+                8909
+              ],
+              [
+                7991,
+                9648
+              ],
+              [
+                8651,
+                10403
+              ],
+              [
+                9015,
+                10816
+              ],
+              [
+                9332,
+                11174
+              ],
+              [
+                10034,
+                11960
+              ],
+              [
+                10756,
+                12759
+              ],
+              [
+                11498,
+                13570
+              ],
+              [
+                12260,
+                14392
+              ],
+              [
+                13041,
+                15223
+              ],
+              [
+                13841,
+                16063
+              ],
+              [
+                14660,
+                16911
+              ],
+              [
+                14958,
+                17216
+              ],
+              [
+                15496,
+                17765
+              ],
+              [
+                16351,
+                18624
+              ],
+              [
+                17222,
+                19487
+              ],
+              [
+                18111,
+                20354
+              ],
+              [
+                19015,
+                21224
+              ],
+              [
+                19936,
+                22095
+              ],
+              [
+                20873,
+                22968
+              ],
+              [
+                20901,
+                22993
+              ],
+              [
+                21825,
+                23840
+              ],
+              [
+                22792,
+                24712
+              ],
+              [
+                23774,
+                25583
+              ],
+              [
+                24769,
+                26452
+              ],
+              [
+                25779,
+                27319
+              ],
+              [
+                26801,
+                28182
+              ],
+              [
+                26843,
+                28217
+              ],
+              [
+                27837,
+                29042
+              ],
+              [
+                29946,
+                30750
+              ],
+              [
+                32101,
+                32439
+              ],
+              [
+                32786,
+                32963
+              ],
+              [
+                34301,
+                34105
+              ],
+              [
+                36542,
+                35746
+              ],
+              [
+                38729,
+                37296
+              ],
+              [
+                38820,
+                37360
+              ],
+              [
+                41133,
+                38945
+              ],
+              [
+                43478,
+                40499
+              ],
+              [
+                44672,
+                41272
+              ],
+              [
+                45850,
+                42022
+              ],
+              [
+                48248,
+                43512
+              ],
+              [
+                50615,
+                44937
+              ],
+              [
+                50668,
+                44968
+              ],
+              [
+                53106,
+                46390
+              ],
+              [
+                55561,
+                47778
+              ],
+              [
+                56558,
+                48330
+              ],
+              [
+                58027,
+                49131
+              ],
+              [
+                60504,
+                50449
+              ],
+              [
+                62501,
+                51483
+              ],
+              [
+                62986,
+                51731
+              ],
+              [
+                65472,
+                52979
+              ],
+              [
+                67958,
+                54192
+              ],
+              [
+                68443,
+                54425
+              ],
+              [
+                70440,
+                55369
+              ],
+              [
+                72917,
+                56512
+              ],
+              [
+                74386,
+                57176
+              ],
+              [
+                75383,
+                57621
+              ],
+              [
+                77838,
+                58695
+              ],
+              [
+                80276,
+                59736
+              ],
+              [
+                80329,
+                59758
+              ],
+              [
+                82696,
+                60742
+              ],
+              [
+                85094,
+                61716
+              ],
+              [
+                86272,
+                62185
+              ],
+              [
+                87466,
+                62656
+              ],
+              [
+                89811,
+                63563
+              ],
+              [
+                92124,
+                64438
+              ],
+              [
+                92215,
+                64473
+              ],
+              [
+                94402,
+                65282
+              ],
+              [
+                96643,
+                66093
+              ],
+              [
+                98158,
+                66632
+              ],
+              [
+                98843,
+                66873
+              ],
+              [
+                100998,
+                67621
+              ],
+              [
+                103107,
+                68339
+              ],
+              [
+                104101,
+                68672
+              ],
+              [
+                105165,
+                69026
+              ],
+              [
+                107170,
+                69682
+              ],
+              [
+                109119,
+                70309
+              ],
+              [
+                110043,
+                70602
+              ],
+              [
+                111008,
+                70905
+              ],
+              [
+                112833,
+                71472
+              ],
+              [
+                114593,
+                72009
+              ],
+              [
+                115986,
+                72427
+              ],
+              [
+                116284,
+                72516
+              ],
+              [
+                117903,
+                72994
+              ],
+              [
+                119446,
+                73443
+              ],
+              [
+                120910,
+                73864
+              ],
+              [
+                121929,
+                74152
+              ],
+              [
+                122293,
+                74254
+              ],
+              [
+                123591,
+                74617
+              ],
+              [
+                124801,
+                74950
+              ],
+              [
+                125920,
+                75254
+              ],
+              [
+                126945,
+                75529
+              ],
+              [
+                127872,
+                75775
+              ],
+              [
+                130944,
+                76590
+              ]
+            ],
+            "edge_interval_output_per_source": [
+              "274/223",
+              "82/309"
+            ],
+            "selection": "real-source-handles-only-no-repetition-or-zero-padding",
+            "author_output_frames": 72000,
+            "output_crop": [
+              3775,
+              75775
+            ]
+          },
+          "context_input_pcm": {
+            "frames": 130944,
+            "channels": 2,
+            "sample_rate": 48000,
+            "data_offset": 92,
+            "data_bytes": 1047552,
+            "nonzero_samples": [
+              128761,
+              126579
+            ],
+            "rms": [
+              0.14141053910768325,
+              0.10606448240834687
+            ],
+            "maximum_absolute_sample": [
+              0.20001220703125,
+              0.149993896484375
+            ],
+            "sha256": "sha256:5020f39ddbe3ddeba0ef06eaec1445bff1213b1574eb4c548e4ba7634d4eb7ab"
+          },
+          "engine_time_map": [
+            [
+              3072,
+              3775
+            ],
+            [
+              3295,
+              4049
+            ],
+            [
+              3523,
+              4330
+            ],
+            [
+              3758,
+              4617
+            ],
+            [
+              3999,
+              4912
+            ],
+            [
+              4246,
+              5212
+            ],
+            [
+              4500,
+              5520
+            ],
+            [
+              4759,
+              5833
+            ],
+            [
+              5024,
+              6153
+            ],
+            [
+              5295,
+              6479
+            ],
+            [
+              5572,
+              6810
+            ],
+            [
+              5854,
+              7147
+            ],
+            [
+              6143,
+              7489
+            ],
+            [
+              6437,
+              7837
+            ],
+            [
+              6737,
+              8189
+            ],
+            [
+              7353,
+              8909
+            ],
+            [
+              7991,
+              9648
+            ],
+            [
+              8651,
+              10403
+            ],
+            [
+              9015,
+              10816
+            ],
+            [
+              9332,
+              11174
+            ],
+            [
+              10034,
+              11960
+            ],
+            [
+              10756,
+              12759
+            ],
+            [
+              11498,
+              13570
+            ],
+            [
+              12260,
+              14392
+            ],
+            [
+              13041,
+              15223
+            ],
+            [
+              13841,
+              16063
+            ],
+            [
+              14660,
+              16911
+            ],
+            [
+              14958,
+              17216
+            ],
+            [
+              15496,
+              17765
+            ],
+            [
+              16351,
+              18624
+            ],
+            [
+              17222,
+              19487
+            ],
+            [
+              18111,
+              20354
+            ],
+            [
+              19015,
+              21224
+            ],
+            [
+              19936,
+              22095
+            ],
+            [
+              20873,
+              22968
+            ],
+            [
+              20901,
+              22993
+            ],
+            [
+              21825,
+              23840
+            ],
+            [
+              22792,
+              24712
+            ],
+            [
+              23774,
+              25583
+            ],
+            [
+              24769,
+              26452
+            ],
+            [
+              25779,
+              27319
+            ],
+            [
+              26801,
+              28182
+            ],
+            [
+              26843,
+              28217
+            ],
+            [
+              27837,
+              29042
+            ],
+            [
+              29946,
+              30750
+            ],
+            [
+              32101,
+              32439
+            ],
+            [
+              32786,
+              32963
+            ],
+            [
+              34301,
+              34105
+            ],
+            [
+              36542,
+              35746
+            ],
+            [
+              38729,
+              37296
+            ],
+            [
+              38820,
+              37360
+            ],
+            [
+              41133,
+              38945
+            ],
+            [
+              43478,
+              40499
+            ],
+            [
+              44672,
+              41272
+            ],
+            [
+              45850,
+              42022
+            ],
+            [
+              48248,
+              43512
+            ],
+            [
+              50615,
+              44937
+            ],
+            [
+              50668,
+              44968
+            ],
+            [
+              53106,
+              46390
+            ],
+            [
+              55561,
+              47778
+            ],
+            [
+              56558,
+              48330
+            ],
+            [
+              58027,
+              49131
+            ],
+            [
+              60504,
+              50449
+            ],
+            [
+              62501,
+              51483
+            ],
+            [
+              62986,
+              51731
+            ],
+            [
+              65472,
+              52979
+            ],
+            [
+              67958,
+              54192
+            ],
+            [
+              68443,
+              54425
+            ],
+            [
+              70440,
+              55369
+            ],
+            [
+              72917,
+              56512
+            ],
+            [
+              74386,
+              57176
+            ],
+            [
+              75383,
+              57621
+            ],
+            [
+              77838,
+              58695
+            ],
+            [
+              80276,
+              59736
+            ],
+            [
+              80329,
+              59758
+            ],
+            [
+              82696,
+              60742
+            ],
+            [
+              85094,
+              61716
+            ],
+            [
+              86272,
+              62185
+            ],
+            [
+              87466,
+              62656
+            ],
+            [
+              89811,
+              63563
+            ],
+            [
+              92124,
+              64438
+            ],
+            [
+              92215,
+              64473
+            ],
+            [
+              94402,
+              65282
+            ],
+            [
+              96643,
+              66093
+            ],
+            [
+              98158,
+              66632
+            ],
+            [
+              98843,
+              66873
+            ],
+            [
+              100998,
+              67621
+            ],
+            [
+              103107,
+              68339
+            ],
+            [
+              104101,
+              68672
+            ],
+            [
+              105165,
+              69026
+            ],
+            [
+              107170,
+              69682
+            ],
+            [
+              109119,
+              70309
+            ],
+            [
+              110043,
+              70602
+            ],
+            [
+              111008,
+              70905
+            ],
+            [
+              112833,
+              71472
+            ],
+            [
+              114593,
+              72009
+            ],
+            [
+              115986,
+              72427
+            ],
+            [
+              116284,
+              72516
+            ],
+            [
+              117903,
+              72994
+            ],
+            [
+              119446,
+              73443
+            ],
+            [
+              120910,
+              73864
+            ],
+            [
+              121929,
+              74152
+            ],
+            [
+              122293,
+              74254
+            ],
+            [
+              123591,
+              74617
+            ],
+            [
+              124801,
+              74950
+            ],
+            [
+              125920,
+              75254
+            ],
+            [
+              126945,
+              75529
+            ],
+            [
+              127872,
+              75775
+            ]
+          ],
+          "time_map_sha256": "sha256:3f2b754e7fb57c1c5a8a083536302ec50fbd48a977df7e7b11c0a82f102920ee",
+          "output_artifact": {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-context-native-install-20261019-v64-r1\\media\\C05-context\\cache\\audio-stretch\\7cb76e066f20733163673773855d8106fc6450daf962b26c678ccb16145ad6e0.wav",
+            "role": "audio-stretch-output",
+            "bytes": 576044,
+            "sha256": "sha256:ced10e16a9d838d38a64edc67080c084552497a078c9fc80b6a4a028c4612358"
+          },
+          "pitch_and_listening_accepted": false,
+          "stereo_phase_accepted": false
+        }
+      },
+      "nested_time_mapping": {
+        "version": "1",
+        "maps": [
+          {
+            "source_start": 0.0,
+            "source_end": 3.0,
+            "timeline_start": 0.0,
+            "timeline_duration": 3.0,
+            "speed": 1.0,
+            "reverse": false,
+            "segments": [],
+            "curve_scale": 1.0
+          },
+          {
+            "source_start": 0.2,
+            "source_end": 2.8,
+            "timeline_start": 0.0,
+            "timeline_duration": 1.5,
+            "speed": 1.7333333333333332,
+            "reverse": false,
+            "segments": [
+              [
+                0.0,
+                0.004635602235794067,
+                0.6,
+                0.6013493627309798
+              ],
+              [
+                0.004635602235794067,
+                0.00940110206604004,
+                0.6013493627309798,
+                0.6028188276290893
+              ],
+              [
+                0.00940110206604004,
+                0.014295476675033572,
+                0.6028188276290893,
+                0.6044076472520828
+              ],
+              [
+                0.014295476675033572,
+                0.019317703247070314,
+                0.6044076472520828,
+                0.6061150741577148
+              ],
+              [
+                0.019317703247070314,
+                0.02446675896644593,
+                0.6061150741577148,
+                0.6079403609037399
+              ],
+              [
+                0.02446675896644593,
+                0.02974162101745606,
+                0.6079403609037399,
+                0.6098827600479126
+              ],
+              [
+                0.02974162101745606,
+                0.03514126658439637,
+                0.6098827600479126,
+                0.6119415241479873
+              ],
+              [
+                0.03514126658439637,
+                0.040664672851562514,
+                0.6119415241479873,
+                0.6141159057617187
+              ],
+              [
+                0.040664672851562514,
+                0.04631081700325014,
+                0.6141159057617187,
+                0.6164051574468612
+              ],
+              [
+                0.04631081700325014,
+                0.052078676223754894,
+                0.6164051574468612,
+                0.6188085317611693
+              ],
+              [
+                0.052078676223754894,
+                0.05796722769737245,
+                0.6188085317611693,
+                0.6213252812623976
+              ],
+              [
+                0.05796722769737245,
+                0.06397544860839846,
+                0.6213252812623976,
+                0.6239546585083007
+              ],
+              [
+                0.06397544860839846,
+                0.07010231614112857,
+                0.6239546585083007,
+                0.6266959160566329
+              ],
+              [
+                0.07010231614112857,
+                0.07634680747985842,
+                0.6266959160566329,
+                0.6295483064651488
+              ],
+              [
+                0.07634680747985842,
+                0.08918457031250002,
+                0.6295483064651488,
+                0.63558349609375
+              ],
+              [
+                0.08918457031250002,
+                0.1024805545806885,
+                0.63558349609375,
+                0.6420542478561402
+              ],
+              [
+                0.1024805545806885,
+                0.11622657775878908,
+                0.6420542478561402,
+                0.6489545822143554
+              ],
+              [
+                0.11622657775878908,
+                0.13041445732116702,
+                0.6489545822143554,
+                0.656278519630432
+              ],
+              [
+                0.13041445732116702,
+                0.14503601074218753,
+                0.656278519630432,
+                0.6640200805664063
+              ],
+              [
+                0.14503601074218753,
+                0.16008305549621585,
+                0.6640200805664063,
+                0.672173285484314
+              ],
+              [
+                0.16008305549621585,
+                0.17554740905761723,
+                0.672173285484314,
+                0.6807321548461914
+              ],
+              [
+                0.17554740905761723,
+                0.1914208889007569,
+                0.6807321548461914,
+                0.6896907091140747
+              ],
+              [
+                0.1914208889007569,
+                0.20769531250000003,
+                0.6896907091140747,
+                0.69904296875
+              ],
+              [
+                0.20769531250000003,
+                0.22436249732971195,
+                0.69904296875,
+                0.7087829542160036
+              ],
+              [
+                0.22436249732971195,
+                0.24141426086425785,
+                0.7087829542160036,
+                0.7189046859741212
+              ],
+              [
+                0.24141426086425785,
+                0.258842420578003,
+                0.7189046859741212,
+                0.7294021844863892
+              ],
+              [
+                0.258842420578003,
+                0.27663879394531254,
+                0.7294021844863892,
+                0.7402694702148438
+              ],
+              [
+                0.27663879394531254,
+                0.2947951984405518,
+                0.7402694702148438,
+                0.7515005636215211
+              ],
+              [
+                0.2947951984405518,
+                0.31330345153808603,
+                0.7515005636215211,
+                0.7630894851684571
+              ],
+              [
+                0.31330345153808603,
+                0.3321553707122804,
+                0.7630894851684571,
+                0.7750302553176881
+              ],
+              [
+                0.3321553707122804,
+                0.3513427734375001,
+                0.7750302553176881,
+                0.7873168945312501
+              ],
+              [
+                0.3513427734375001,
+                0.37085747718811046,
+                0.7873168945312501,
+                0.7999434232711793
+              ],
+              [
+                0.37085747718811046,
+                0.3906912994384767,
+                0.7999434232711793,
+                0.8129038619995117
+              ],
+              [
+                0.3906912994384767,
+                0.41083605766296394,
+                0.8129038619995117,
+                0.8261922311782838
+              ],
+              [
+                0.41083605766296394,
+                0.4312835693359376,
+                0.8261922311782838,
+                0.8398025512695313
+              ],
+              [
+                0.4312835693359376,
+                0.4520256519317628,
+                0.8398025512695313,
+                0.8537288427352905
+              ],
+              [
+                0.4520256519317628,
+                0.47305412292480475,
+                0.8537288427352905,
+                0.8679651260375978
+              ],
+              [
+                0.47305412292480475,
+                0.4943607997894287,
+                0.8679651260375978,
+                0.8825054216384889
+              ],
+              [
+                0.4943607997894287,
+                0.5159375,
+                0.8825054216384889,
+                0.89734375
+              ],
+              [
+                0.5159375,
+                0.5598682403564454,
+                0.89734375,
+                0.9278905868530274
+              ],
+              [
+                0.5598682403564454,
+                0.6047808837890626,
+                0.9278905868530274,
+                0.9595578002929688
+              ],
+              [
+                0.6047808837890626,
+                0.6506099700927735,
+                0.9595578002929688,
+                0.9922975540161132
+              ],
+              [
+                0.6506099700927735,
+                0.6972900390625001,
+                0.9922975540161132,
+                1.02606201171875
+              ],
+              [
+                0.6972900390625001,
+                0.7447556304931642,
+                1.02606201171875,
+                1.060803337097168
+              ],
+              [
+                0.7447556304931642,
+                0.7929412841796876,
+                1.060803337097168,
+                1.0964736938476562
+              ],
+              [
+                0.7929412841796876,
+                0.8417815399169922,
+                1.0964736938476562,
+                1.133025245666504
+              ],
+              [
+                0.8417815399169922,
+                0.8912109375000001,
+                1.133025245666504,
+                1.17041015625
+              ],
+              [
+                0.8912109375000001,
+                0.941164016723633,
+                1.17041015625,
+                1.2085805892944337
+              ],
+              [
+                0.941164016723633,
+                0.9915753173828126,
+                1.2085805892944337,
+                1.2474887084960937
+              ],
+              [
+                0.9915753173828126,
+                1.042379379272461,
+                1.2474887084960937,
+                1.2870866775512695
+              ],
+              [
+                1.042379379272461,
+                1.0935107421875,
+                1.2870866775512695,
+                1.32732666015625
+              ],
+              [
+                1.0935107421875,
+                1.1449039459228518,
+                1.32732666015625,
+                1.368160820007324
+              ],
+              [
+                1.1449039459228518,
+                1.1964935302734376,
+                1.368160820007324,
+                1.4095413208007812
+              ],
+              [
+                1.1964935302734376,
+                1.2482140350341797,
+                1.4095413208007812,
+                1.4514203262329102
+              ],
+              [
+                1.2482140350341797,
+                1.3,
+                1.4514203262329102,
+                1.49375
+              ],
+              [
+                1.3,
+                1.3517859649658204,
+                1.49375,
+                1.5364825057983396
+              ],
+              [
+                1.3517859649658204,
+                1.4035064697265625,
+                1.5364825057983396,
+                1.5795700073242185
+              ],
+              [
+                1.4035064697265625,
+                1.4550960540771483,
+                1.5795700073242185,
+                1.6229646682739256
+              ],
+              [
+                1.4550960540771483,
+                1.5064892578125,
+                1.6229646682739256,
+                1.6666186523437498
+              ],
+              [
+                1.5064892578125,
+                1.5576206207275392,
+                1.6666186523437498,
+                1.7104841232299801
+              ],
+              [
+                1.5576206207275392,
+                1.6084246826171875,
+                1.7104841232299801,
+                1.754513244628906
+              ],
+              [
+                1.6084246826171875,
+                1.658835983276367,
+                1.754513244628906,
+                1.7986581802368162
+              ],
+              [
+                1.658835983276367,
+                1.7087890625,
+                1.7986581802368162,
+                1.84287109375
+              ],
+              [
+                1.7087890625,
+                1.758218460083008,
+                1.84287109375,
+                1.887104148864746
+              ],
+              [
+                1.758218460083008,
+                1.8070587158203124,
+                1.887104148864746,
+                1.9313095092773436
+              ],
+              [
+                1.8070587158203124,
+                1.8552443695068361,
+                1.9313095092773436,
+                1.975439338684082
+              ],
+              [
+                1.8552443695068361,
+                1.9027099609375,
+                1.975439338684082,
+                2.0194458007812504
+              ],
+              [
+                1.9027099609375,
+                1.9493900299072264,
+                2.0194458007812504,
+                2.063281059265137
+              ],
+              [
+                1.9493900299072264,
+                1.9952191162109374,
+                2.063281059265137,
+                2.1068972778320316
+              ],
+              [
+                1.9952191162109374,
+                2.040131759643555,
+                2.1068972778320316,
+                2.1502466201782227
+              ],
+              [
+                2.040131759643555,
+                2.0840625,
+                2.1502466201782227,
+                2.19328125
+              ],
+              [
+                2.0840625,
+                2.1269458770751957,
+                2.19328125,
+                2.2359533309936523
+              ],
+              [
+                2.1269458770751957,
+                2.168716430664063,
+                2.2359533309936523,
+                2.278215026855469
+              ],
+              [
+                2.168716430664063,
+                2.209308700561524,
+                2.278215026855469,
+                2.3200185012817385
+              ],
+              [
+                2.209308700561524,
+                2.2486572265625,
+                2.3200185012817385,
+                2.36131591796875
+              ],
+              [
+                2.2486572265625,
+                2.286696548461914,
+                2.36131591796875,
+                2.402059440612793
+              ],
+              [
+                2.286696548461914,
+                2.3233612060546878,
+                2.402059440612793,
+                2.4422012329101563
+              ],
+              [
+                2.3233612060546878,
+                2.3585857391357425,
+                2.4422012329101563,
+                2.481693458557129
+              ],
+              [
+                2.3585857391357425,
+                2.3923046875000002,
+                2.481693458557129,
+                2.52048828125
+              ],
+              [
+                2.3923046875000002,
+                2.4244525909423826,
+                2.52048828125,
+                2.5585378646850585
+              ],
+              [
+                2.4244525909423826,
+                2.454963989257813,
+                2.5585378646850585,
+                2.5957943725585935
+              ],
+              [
+                2.454963989257813,
+                2.483773422241211,
+                2.5957943725585935,
+                2.6322099685668943
+              ],
+              [
+                2.483773422241211,
+                2.5108154296875003,
+                2.6322099685668943,
+                2.66773681640625
+              ],
+              [
+                2.5108154296875003,
+                2.536024551391602,
+                2.66773681640625,
+                2.7023270797729495
+              ],
+              [
+                2.536024551391602,
+                2.559335327148438,
+                2.7023270797729495,
+                2.7359329223632813
+              ],
+              [
+                2.559335327148438,
+                2.5806822967529297,
+                2.7359329223632813,
+                2.768506507873535
+              ],
+              [
+                2.5806822967529297,
+                2.6,
+                2.768506507873535,
+                2.8
+              ]
+            ],
+            "curve_scale": 0.7390667378517183,
+            "curve_compilation": {
+              "version": "1",
+              "adaptive": true,
+              "method": "bernstein-bounded-linear-speed",
+              "source_clock_error_bound_seconds": 9.962139523046258e-05,
+              "requested_max_error_seconds": 0.00025,
+              "segment_count": 87,
+              "maximum_segments": 1024,
+              "authored_interpolations": [
+                "bezier",
+                "linear"
+              ],
+              "source_endpoint_speed_floor": 0.01,
+              "normalized_clock_error_bound_seconds": 0.0001472537191864294
+            }
+          }
+        ],
+        "tempo_windows": 107,
+        "sample_rate": 48000,
+        "audio_tempo": "offline-r3-time-map"
+      }
+    },
+    {
+      "kind": "sequence-composite",
+      "clip_id": "sound",
+      "parent_id": null,
+      "sequence_id": "child",
+      "canvas": {
+        "width": 512,
+        "height": 288,
+        "alpha": true
+      },
+      "parent_canvas": {
+        "width": 512,
+        "height": 288
+      },
+      "anchor_space": "cropped-child-canvas",
+      "raster_adaptation": "same-raster",
+      "working_canvas": {
+        "width": 512,
+        "height": 288
+      },
+      "spatial_sampler": "legacy-same-raster",
+      "sampling_kernel": "bilinear",
+      "projection_working_bytes": 11796480,
+      "compositing": "isolated-source-over",
+      "child_layer_count": 0,
+      "timeline_start_tick": 0,
+      "duration_tick": 135000,
+      "spatial_order": [
+        "child-composite",
+        "crop",
+        "transform",
+        "opacity",
+        "effects",
+        "mask",
+        "fade"
+      ],
+      "intermediate_files": 0
+    },
+    {
+      "kind": "audio-track-bus",
+      "track_id": "sound.child_audio",
+      "scope_id": "sound",
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "processing": {},
+      "sample_rate": 48000
+    },
+    {
+      "kind": "sequence-audio-bus",
+      "clip_id": "sound",
+      "parent_id": null,
+      "sequence_id": "child",
+      "child_input_count": 1,
+      "sample_rate": 48000,
+      "start_sample": 0,
+      "end_sample": 72000,
+      "mixing": "float-sum-normalize-disabled",
+      "processing": {},
+      "authored_clock": {
+        "maps": [],
+        "authored_start": 0.0
+      },
+      "processing_order": [
+        "child-clips",
+        "local-ducking",
+        "track-sum",
+        "track-processing",
+        "sequence-sum",
+        "container-volume-effects-pan-fade",
+        "sample-window"
+      ],
+      "intermediate_files": 0
+    },
+    {
+      "kind": "audio-track-bus",
+      "track_id": "track_audio_1",
+      "scope_id": null,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "processing": {},
+      "sample_rate": 48000
+    },
+    {
+      "kind": "sequence-audio-root",
+      "sample_rate": 48000,
+      "output_samples": 72000,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "automatic_limiter": false,
+      "has_audible_inputs": true
+    }
+  ],
+  "profile": "custom",
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 24,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 512,
+      "height": 288,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mkv",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "pcm_f32le",
+        "bitrate": "192k"
+      }
+    },
+    "audio_stretch": {
+      "engine": "rubberband-r3-offline-v1",
+      "executable": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\rubberband.exe",
+      "sha256": "sha256:d26d81e20f48ea33070e638f58bdeb6a61ce7f0946d8f2629f30441caa2905d1",
+      "dependencies": [
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\sndfile.dll",
+          "sha256": "sha256:4e3bd2de8e1485110eaebef8e1239471f73d608773831c323bf528e05645655e"
+        }
+      ],
+      "license_path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\COPYING.txt",
+      "license_sha256": "sha256:cedd4c1885d75991bf1077cc6e33359103cf04fbc996f20d30ab043d5fc5fcc5",
+      "license_spdx": "GPL-2.0-or-later",
+      "channel_mode": "apart",
+      "source_context_ms": 64
+    }
+  },
+  "delivery": {
+    "clock": {
+      "authored_duration_tick": 135000,
+      "ticks_per_second": 90000,
+      "expected_video_frames": 36,
+      "expected_video_end_seconds": 1.5,
+      "expected_audio_samples_48000": 72000
+    }
+  },
+  "warnings": [
+    {
+      "code": "SPEED_CURVE_COMPILED",
+      "clip_id": "sound",
+      "feature": "speed_curve_easing",
+      "certificate": {
+        "version": "1",
+        "adaptive": true,
+        "method": "bernstein-bounded-linear-speed",
+        "source_clock_error_bound_seconds": 9.962139523046258e-05,
+        "requested_max_error_seconds": 0.00025,
+        "segment_count": 87,
+        "maximum_segments": 1024,
+        "authored_interpolations": [
+          "bezier",
+          "linear"
+        ],
+        "source_endpoint_speed_floor": 0.01
+      },
+      "message": "速度 easing/Bezier 已按有界源时钟编译；未退回端点线性曲线"
+    },
+    {
+      "code": "RENDER_FEATURE_APPROXIMATE",
+      "clip_id": "sound.leaf",
+      "feature": "offline_audio_time_map",
+      "message": "本地 R3 对整段音频离线伸缩；采样锚点为引擎约束，局部时序、极短窗音高与听感须独立核验"
+    },
+    {
+      "code": "AUDIO_STRETCH_SOURCE_CONTEXT",
+      "clip_id": "sound.leaf",
+      "source_context": {
+        "requested_ms": 64,
+        "source_head_frames": 3072,
+        "source_tail_frames": 3072,
+        "output_head_frames": 3775,
+        "output_tail_frames": 815,
+        "decode_start_sample": 6528,
+        "decode_end_sample": 137472,
+        "source_frames": 130944,
+        "target_frames": 76590,
+        "time_map": [
+          [
+            0,
+            0
+          ],
+          [
+            3072,
+            3775
+          ],
+          [
+            3295,
+            4049
+          ],
+          [
+            3523,
+            4330
+          ],
+          [
+            3758,
+            4617
+          ],
+          [
+            3999,
+            4912
+          ],
+          [
+            4246,
+            5212
+          ],
+          [
+            4500,
+            5520
+          ],
+          [
+            4759,
+            5833
+          ],
+          [
+            5024,
+            6153
+          ],
+          [
+            5295,
+            6479
+          ],
+          [
+            5572,
+            6810
+          ],
+          [
+            5854,
+            7147
+          ],
+          [
+            6143,
+            7489
+          ],
+          [
+            6437,
+            7837
+          ],
+          [
+            6737,
+            8189
+          ],
+          [
+            7353,
+            8909
+          ],
+          [
+            7991,
+            9648
+          ],
+          [
+            8651,
+            10403
+          ],
+          [
+            9015,
+            10816
+          ],
+          [
+            9332,
+            11174
+          ],
+          [
+            10034,
+            11960
+          ],
+          [
+            10756,
+            12759
+          ],
+          [
+            11498,
+            13570
+          ],
+          [
+            12260,
+            14392
+          ],
+          [
+            13041,
+            15223
+          ],
+          [
+            13841,
+            16063
+          ],
+          [
+            14660,
+            16911
+          ],
+          [
+            14958,
+            17216
+          ],
+          [
+            15496,
+            17765
+          ],
+          [
+            16351,
+            18624
+          ],
+          [
+            17222,
+            19487
+          ],
+          [
+            18111,
+            20354
+          ],
+          [
+            19015,
+            21224
+          ],
+          [
+            19936,
+            22095
+          ],
+          [
+            20873,
+            22968
+          ],
+          [
+            20901,
+            22993
+          ],
+          [
+            21825,
+            23840
+          ],
+          [
+            22792,
+            24712
+          ],
+          [
+            23774,
+            25583
+          ],
+          [
+            24769,
+            26452
+          ],
+          [
+            25779,
+            27319
+          ],
+          [
+            26801,
+            28182
+          ],
+          [
+            26843,
+            28217
+          ],
+          [
+            27837,
+            29042
+          ],
+          [
+            29946,
+            30750
+          ],
+          [
+            32101,
+            32439
+          ],
+          [
+            32786,
+            32963
+          ],
+          [
+            34301,
+            34105
+          ],
+          [
+            36542,
+            35746
+          ],
+          [
+            38729,
+            37296
+          ],
+          [
+            38820,
+            37360
+          ],
+          [
+            41133,
+            38945
+          ],
+          [
+            43478,
+            40499
+          ],
+          [
+            44672,
+            41272
+          ],
+          [
+            45850,
+            42022
+          ],
+          [
+            48248,
+            43512
+          ],
+          [
+            50615,
+            44937
+          ],
+          [
+            50668,
+            44968
+          ],
+          [
+            53106,
+            46390
+          ],
+          [
+            55561,
+            47778
+          ],
+          [
+            56558,
+            48330
+          ],
+          [
+            58027,
+            49131
+          ],
+          [
+            60504,
+            50449
+          ],
+          [
+            62501,
+            51483
+          ],
+          [
+            62986,
+            51731
+          ],
+          [
+            65472,
+            52979
+          ],
+          [
+            67958,
+            54192
+          ],
+          [
+            68443,
+            54425
+          ],
+          [
+            70440,
+            55369
+          ],
+          [
+            72917,
+            56512
+          ],
+          [
+            74386,
+            57176
+          ],
+          [
+            75383,
+            57621
+          ],
+          [
+            77838,
+            58695
+          ],
+          [
+            80276,
+            59736
+          ],
+          [
+            80329,
+            59758
+          ],
+          [
+            82696,
+            60742
+          ],
+          [
+            85094,
+            61716
+          ],
+          [
+            86272,
+            62185
+          ],
+          [
+            87466,
+            62656
+          ],
+          [
+            89811,
+            63563
+          ],
+          [
+            92124,
+            64438
+          ],
+          [
+            92215,
+            64473
+          ],
+          [
+            94402,
+            65282
+          ],
+          [
+            96643,
+            66093
+          ],
+          [
+            98158,
+            66632
+          ],
+          [
+            98843,
+            66873
+          ],
+          [
+            100998,
+            67621
+          ],
+          [
+            103107,
+            68339
+          ],
+          [
+            104101,
+            68672
+          ],
+          [
+            105165,
+            69026
+          ],
+          [
+            107170,
+            69682
+          ],
+          [
+            109119,
+            70309
+          ],
+          [
+            110043,
+            70602
+          ],
+          [
+            111008,
+            70905
+          ],
+          [
+            112833,
+            71472
+          ],
+          [
+            114593,
+            72009
+          ],
+          [
+            115986,
+            72427
+          ],
+          [
+            116284,
+            72516
+          ],
+          [
+            117903,
+            72994
+          ],
+          [
+            119446,
+            73443
+          ],
+          [
+            120910,
+            73864
+          ],
+          [
+            121929,
+            74152
+          ],
+          [
+            122293,
+            74254
+          ],
+          [
+            123591,
+            74617
+          ],
+          [
+            124801,
+            74950
+          ],
+          [
+            125920,
+            75254
+          ],
+          [
+            126945,
+            75529
+          ],
+          [
+            127872,
+            75775
+          ],
+          [
+            130944,
+            76590
+          ]
+        ],
+        "edge_interval_output_per_source": [
+          "274/223",
+          "82/309"
+        ],
+        "selection": "real-source-handles-only-no-repetition-or-zero-padding",
+        "author_output_frames": 72000,
+        "output_crop": [
+          3775,
+          75775
+        ]
+      },
+      "message": "显式使用相邻真实源音频作为变速分析上下文，输出裁回作者选区；附近瞬态、音高、相位与自然听感仍须复核"
+    }
+  ],
+  "quality": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "metrics": {
+      "duration_seconds": 1.5,
+      "width": 512,
+      "height": 288,
+      "audio_codec": "pcm_f32le",
+      "video_duration_seconds": 1.5,
+      "audio_duration_seconds": 1.5,
+      "av_duration_delta_seconds": 0.0,
+      "av_start_delta_seconds": 0.0,
+      "av_end_delta_seconds": 0.0,
+      "av_sync_residual_seconds": 0.0,
+      "av_sync_residuals": {
+        "start_delta_seconds": 0.0,
+        "end_delta_seconds": 0.0,
+        "video_start_seconds": 0.0,
+        "audio_start_seconds": 0.0,
+        "video_end_seconds": 0.0,
+        "audio_end_seconds": 0.0
+      },
+      "stream_timing": {
+        "video": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 1.5,
+          "duration_source": "matroska-duration-tag",
+          "end_seconds": 1.5
+        },
+        "audio": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 1.5,
+          "duration_source": "matroska-duration-tag",
+          "end_seconds": 1.5
+        }
+      },
+      "expected_video_frames": 36,
+      "expected_audio_samples": 72000,
+      "expected_video_duration_seconds": 1.5,
+      "expected_audio_duration_seconds": 1.5,
+      "expected_quantization_delta_seconds": 0.0,
+      "probe": {
+        "duration_seconds": 1.5,
+        "duration_tick": 135000,
+        "format": "matroska,webm",
+        "format_long_name": "Matroska / WebM",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High 4:4:4 Predictive",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "mime_codec_string": "avc1.f40015",
+            "width": 512,
+            "height": 288,
+            "coded_width": 512,
+            "coded_height": 288,
+            "has_b_frames": 0,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv444p",
+            "level": 21,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "r_frame_rate": "24/1",
+            "avg_frame_rate": "24/1",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bits_per_raw_sample": "8",
+            "extradata_size": 49,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 libx264",
+              "DURATION": "00:00:01.500000000"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "pcm_f32le",
+            "codec_long_name": "PCM 32-bit floating point little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "sample_fmt": "flt",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 32,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bit_rate": "3072000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 pcm_f32le",
+              "DURATION": "00:00:01.500000000"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 512,
+          "height": 288,
+          "pix_fmt": "yuv444p",
+          "fps": "24/1",
+          "color_space": "bt709",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_f32le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      }
+    }
+  },
+  "project_fingerprint": "ef0578a2d9819c68a2489e1ca6e5dfd7f74e26b4794e1a1f87232f54afbb9657",
+  "input_hashes": {
+    "frames": "sha256:c34f01cd418f018ed6d79b9fac99ef8e549828e9a9abffe6bf4ba69d2e4598ce",
+    "sound_asset": "sha256:db6ef91007b85271be5f815aeea5d8e42ddb978eed4f4b4c2a276827282eb5b4"
+  },
+  "resume_of": null
+}

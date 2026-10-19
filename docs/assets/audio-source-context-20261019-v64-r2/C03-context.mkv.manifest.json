@@ -1,0 +1,793 @@
+{
+  "manifest_version": "0.1.0",
+  "operation_id": "render_20261019103135_94fb7017",
+  "project_id": "proj_20261019103122_37bb038f",
+  "sequence_id": "seq_main",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\outputs\\C03-context.mkv",
+  "sha256": "74123497d0d33f5486f686f2829b32815b9850abd04a9ceabbb9b7109dabe772",
+  "probe": {
+    "duration_seconds": 1.0,
+    "duration_tick": 90000,
+    "format": "matroska,webm",
+    "format_long_name": "Matroska / WebM",
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "profile": "High 4:4:4 Predictive",
+        "codec_type": "video",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "mime_codec_string": "avc1.f40015",
+        "width": 512,
+        "height": 288,
+        "coded_width": 512,
+        "coded_height": 288,
+        "has_b_frames": 0,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "16:9",
+        "pix_fmt": "yuv444p",
+        "level": 21,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "is_avc": "true",
+        "nal_length_size": "4",
+        "r_frame_rate": "24/1",
+        "avg_frame_rate": "24/1",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bits_per_raw_sample": "8",
+        "extradata_size": 49,
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 libx264",
+          "DURATION": "00:00:01.000000000"
+        }
+      },
+      {
+        "index": 1,
+        "codec_name": "pcm_f32le",
+        "codec_long_name": "PCM 32-bit floating point little-endian",
+        "codec_type": "audio",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "sample_fmt": "flt",
+        "sample_rate": "48000",
+        "channels": 2,
+        "bits_per_sample": 32,
+        "initial_padding": 0,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bit_rate": "3072000",
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 pcm_f32le",
+          "DURATION": "00:00:01.000000000"
+        }
+      }
+    ],
+    "video": {
+      "codec": "h264",
+      "width": 512,
+      "height": 288,
+      "pix_fmt": "yuv444p",
+      "fps": "24/1",
+      "color_space": "bt709",
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    },
+    "audio": {
+      "codec": "pcm_f32le",
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    }
+  },
+  "command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-hide_banner",
+    "-y",
+    "-loglevel",
+    "error",
+    "-progress",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\renders\\.tmp\\render_20261019103135_94fb7017\\ffmpeg-progress.log",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\assets\\frames_source.mp4",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\cache\\audio-stretch\\d59589e638c5bcab4a6b13e5448194c9587debfed6d9978e461b56c69e5991dc.wav",
+    "-filter_complex",
+    "[0:v]trim=start=0.000000:end=1.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=24/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1[v0];[1:a]anull,apad=whole_len=12000,atrim=end_sample=12000,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black:s=512x288:r=24/1:d=1.000000[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]aresample=48000,apad=whole_len=48000,atrim=end_sample=48000,asetpts=N/SR/TB[aout]",
+    "-map",
+    "[vout]",
+    "-map",
+    "[aout]",
+    "-t",
+    "1.000000000",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "medium",
+    "-crf",
+    "0",
+    "-pix_fmt",
+    "yuv444p",
+    "-color_primaries",
+    "bt709",
+    "-color_trc",
+    "bt709",
+    "-colorspace",
+    "bt709",
+    "-color_range",
+    "tv",
+    "-c:a",
+    "pcm_f32le",
+    "-f",
+    "matroska",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\renders\\.tmp\\render_20261019103135_94fb7017\\C03-context.mkv"
+  ],
+  "filter_graph_transport": {
+    "mode": "inline",
+    "sha256": "sha256:7573ad42c510404bd42a0679f19a0b724f709a96debf21d6720068200f753819",
+    "utf8_bytes": 654,
+    "logical_command_utf16_units": 1667
+  },
+  "filter_complex": "[0:v]trim=start=0.000000:end=1.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=24/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1[v0];[1:a]anull,apad=whole_len=12000,atrim=end_sample=12000,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black:s=512x288:r=24/1:d=1.000000[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]aresample=48000,apad=whole_len=48000,atrim=end_sample=48000,asetpts=N/SR/TB[aout]",
+  "inputs": [
+    {
+      "kind": "sequence-projection-budget",
+      "method": "bilinear",
+      "max_working_bytes": 1073741824,
+      "nodes": [],
+      "estimated_working_bytes": 0,
+      "scope": "reachable-sequence-projection-instances-only-not-process-rss",
+      "time_disjoint_instances_charged": true,
+      "unused_sequences_charged": false
+    },
+    {
+      "asset_id": "frames",
+      "clip_id": "picture",
+      "input": 0,
+      "kind": "video",
+      "source_in_tick": 0,
+      "source_out_tick": 90000
+    },
+    {
+      "asset_id": "sound_asset",
+      "clip_id": "sound",
+      "track_id": "track_audio_1",
+      "input": 1,
+      "kind": "audio",
+      "source_in_tick": 18090,
+      "source_out_tick": 18450,
+      "timeline_start_sample": 0,
+      "duration_samples": 12000,
+      "sample_rate": 48000,
+      "group_id": null,
+      "audio_stretch": {
+        "protocol": "agent-video-offline-audio-stretch-v1",
+        "engine": {
+          "engine": "rubberband-r3-offline-v1",
+          "executable": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\rubberband.exe",
+          "artifacts": [
+            {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\rubberband.exe",
+              "role": "audio-stretch-executable",
+              "bytes": 646496,
+              "sha256": "sha256:d26d81e20f48ea33070e638f58bdeb6a61ce7f0946d8f2629f30441caa2905d1"
+            },
+            {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\COPYING.txt",
+              "role": "audio-stretch-license",
+              "bytes": 30260,
+              "sha256": "sha256:cedd4c1885d75991bf1077cc6e33359103cf04fbc996f20d30ab043d5fc5fcc5"
+            },
+            {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\sndfile.dll",
+              "role": "audio-stretch-dependency",
+              "bytes": 2603520,
+              "sha256": "sha256:4e3bd2de8e1485110eaebef8e1239471f73d608773831c323bf528e05645655e"
+            }
+          ],
+          "channel_mode": "together",
+          "source_context_ms": 64,
+          "license_spdx": "GPL-2.0-or-later",
+          "network": "disabled"
+        },
+        "source": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\assets\\sound_asset_pulses.wav",
+        "source_sha256": "sha256:8dba6dd76889b73b44131f029d67d0d59099039a722303ac0ed1e2ca017e86d5",
+        "source_start_sample": 9648,
+        "source_end_sample": 9840,
+        "source_frames": 192,
+        "target_frames": 12000,
+        "channels": 2,
+        "sample_rate": 48000,
+        "time_map": [
+          [
+            0,
+            0
+          ],
+          [
+            192,
+            12000
+          ]
+        ],
+        "source_context": {
+          "requested_ms": 64,
+          "source_head_frames": 3072,
+          "source_tail_frames": 3072,
+          "output_head_frames": 192000,
+          "output_tail_frames": 192000,
+          "decode_start_sample": 6576,
+          "decode_end_sample": 12912,
+          "source_frames": 6336,
+          "target_frames": 396000,
+          "time_map": [
+            [
+              0,
+              0
+            ],
+            [
+              3072,
+              192000
+            ],
+            [
+              3264,
+              204000
+            ],
+            [
+              6336,
+              396000
+            ]
+          ],
+          "edge_interval_output_per_source": [
+            "125/2",
+            "125/2"
+          ],
+          "selection": "real-source-handles-only-no-repetition-or-zero-padding",
+          "author_output_frames": 12000,
+          "output_crop": [
+            192000,
+            204000
+          ]
+        },
+        "reverse_after_stretch": false,
+        "implementation_sha256": "sha256:f4120fd82fc4eba79b9dd0bed1093651edbadb19202d7c384530e799d047dced",
+        "ffmpeg": {
+          "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+          "role": "audio-stretch-ffmpeg",
+          "bytes": 223360000,
+          "sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+        },
+        "key": "d59589e638c5bcab4a6b13e5448194c9587debfed6d9978e461b56c69e5991dc",
+        "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\cache\\audio-stretch\\d59589e638c5bcab4a6b13e5448194c9587debfed6d9978e461b56c69e5991dc.wav",
+        "execution": {
+          "status": "succeeded",
+          "decode_command": [
+            "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-i",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\assets\\sound_asset_pulses.wav",
+            "-map",
+            "0:a:0",
+            "-vn",
+            "-af",
+            "aresample=48000,atrim=start_sample=6576:end_sample=12912,asetpts=N/SR/TB",
+            "-c:a",
+            "pcm_f32le",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\renders\\.tmp\\render_20261019103135_94fb7017\\audio-stretch-3whkwbcs\\input.wav"
+          ],
+          "command": [
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\rubberband.exe",
+            "-3",
+            "--no-threads",
+            "--centre-focus",
+            "-q",
+            "-t",
+            "62.5",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\renders\\.tmp\\render_20261019103135_94fb7017\\audio-stretch-3whkwbcs\\input.wav",
+            "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\renders\\.tmp\\render_20261019103135_94fb7017\\audio-stretch-3whkwbcs\\output.wav"
+          ],
+          "channel_mode": "together",
+          "decode_stderr": "",
+          "engine_stderr": "Using time ratio 62.5 and frequency ratio 1\nRubberBand: R3Stretcher::ensureOutbuf: WARNING: Forced to increase output buffer size. Using smaller process blocks or an artificially larger value for setMaxProcessSize may avoid this. Samples to write and space available: (500, 36)\nRubberBand: R3Stretcher::ensureOutbuf: old and new sizes: (65536, 131072)\nRubberBand: R3Stretcher::ensureOutbuf: WARNING: Forced to increase output buffer size. Using smaller process blocks or an artificially larger value for setMaxProcessSize may avoid this. Samples to write and space available: (500, 72)\nRubberBand: R3Stretcher::ensureOutbuf: old and new sizes: (131072, 262144)\n",
+          "input_pcm": {
+            "frames": 192,
+            "channels": 2,
+            "sample_rate": 48000,
+            "data_offset": 44,
+            "data_bytes": 1536,
+            "nonzero_samples": [
+              189,
+              189
+            ],
+            "rms": [
+              0.02072752679053888,
+              0.02072752679053888
+            ],
+            "maximum_absolute_sample": [
+              0.029998779296875,
+              0.029998779296875
+            ],
+            "sha256": "sha256:2ef6a592ef45763b8ab593a15b18c753030ee373f41455f9ac51a449a06618ca"
+          },
+          "engine_raw_output_pcm": {
+            "frames": 396000,
+            "channels": 2,
+            "sample_rate": 48000,
+            "data_offset": 88,
+            "data_bytes": 3168000,
+            "nonzero_samples": [
+              396000,
+              396000
+            ],
+            "rms": [
+              0.019674939853590014,
+              0.019674939853590014
+            ],
+            "maximum_absolute_sample": [
+              0.03137559816241264,
+              0.03137559816241264
+            ],
+            "sha256": "sha256:33098c94d7d87f6fdba98f70d8f9e5b1492bc81eb2480217af068258b70d941d"
+          },
+          "output_pcm": {
+            "frames": 12000,
+            "channels": 2,
+            "sample_rate": 48000,
+            "data_offset": 44,
+            "data_bytes": 96000,
+            "nonzero_samples": [
+              12000,
+              12000
+            ],
+            "rms": [
+              0.021360005452039334,
+              0.021360005452039334
+            ],
+            "maximum_absolute_sample": [
+              0.030343571677803993,
+              0.030343571677803993
+            ],
+            "sha256": "sha256:6b84e5da941caeb621c3674934644a3c30bf02c5fe075a00aec125a964788320"
+          },
+          "canonicalization": "float32-pcm-bytes-preserved-no-wall-time-metadata",
+          "time_map_utf8": "",
+          "source_context": {
+            "requested_ms": 64,
+            "source_head_frames": 3072,
+            "source_tail_frames": 3072,
+            "output_head_frames": 192000,
+            "output_tail_frames": 192000,
+            "decode_start_sample": 6576,
+            "decode_end_sample": 12912,
+            "source_frames": 6336,
+            "target_frames": 396000,
+            "time_map": [
+              [
+                0,
+                0
+              ],
+              [
+                3072,
+                192000
+              ],
+              [
+                3264,
+                204000
+              ],
+              [
+                6336,
+                396000
+              ]
+            ],
+            "edge_interval_output_per_source": [
+              "125/2",
+              "125/2"
+            ],
+            "selection": "real-source-handles-only-no-repetition-or-zero-padding",
+            "author_output_frames": 12000,
+            "output_crop": [
+              192000,
+              204000
+            ]
+          },
+          "context_input_pcm": {
+            "frames": 6336,
+            "channels": 2,
+            "sample_rate": 48000,
+            "data_offset": 92,
+            "data_bytes": 50688,
+            "nonzero_samples": [
+              6230,
+              6230
+            ],
+            "rms": [
+              0.021191752560755034,
+              0.021191752560755034
+            ],
+            "maximum_absolute_sample": [
+              0.029998779296875,
+              0.029998779296875
+            ],
+            "sha256": "sha256:0b652b35f65c8930d7b6321fbd6c6c952a58a0ecf08a7f95bca2329c5d7b0bc8"
+          },
+          "engine_time_map": [],
+          "time_map_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "output_artifact": {
+            "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-source-context-media-20261019-v64-r2\\C03-context\\cache\\audio-stretch\\d59589e638c5bcab4a6b13e5448194c9587debfed6d9978e461b56c69e5991dc.wav",
+            "role": "audio-stretch-output",
+            "bytes": 96044,
+            "sha256": "sha256:6b84e5da941caeb621c3674934644a3c30bf02c5fe075a00aec125a964788320"
+          },
+          "pitch_and_listening_accepted": false,
+          "stereo_phase_accepted": false
+        }
+      }
+    },
+    {
+      "kind": "audio-track-bus",
+      "track_id": "track_audio_1",
+      "scope_id": null,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "processing": {},
+      "sample_rate": 48000
+    },
+    {
+      "kind": "sequence-audio-root",
+      "sample_rate": 48000,
+      "output_samples": 48000,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "automatic_limiter": false,
+      "has_audible_inputs": true
+    }
+  ],
+  "profile": "custom",
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 24,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 512,
+      "height": 288,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mkv",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "pcm_f32le",
+        "bitrate": "192k"
+      }
+    },
+    "audio_stretch": {
+      "engine": "rubberband-r3-offline-v1",
+      "executable": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\rubberband.exe",
+      "sha256": "sha256:d26d81e20f48ea33070e638f58bdeb6a61ce7f0946d8f2629f30441caa2905d1",
+      "dependencies": [
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\sndfile.dll",
+          "sha256": "sha256:4e3bd2de8e1485110eaebef8e1239471f73d608773831c323bf528e05645655e"
+        }
+      ],
+      "license_path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\rubberband-offline-probe-20261017\\native\\rubberband-4.0.0-gpl-executable-windows\\COPYING.txt",
+      "license_sha256": "sha256:cedd4c1885d75991bf1077cc6e33359103cf04fbc996f20d30ab043d5fc5fcc5",
+      "license_spdx": "GPL-2.0-or-later",
+      "channel_mode": "together",
+      "source_context_ms": 64
+    }
+  },
+  "delivery": {
+    "clock": {
+      "authored_duration_tick": 90000,
+      "ticks_per_second": 90000,
+      "expected_video_frames": 24,
+      "expected_video_end_seconds": 1.0,
+      "expected_audio_samples_48000": 48000
+    }
+  },
+  "warnings": [
+    {
+      "code": "RENDER_FEATURE_APPROXIMATE",
+      "clip_id": "sound",
+      "feature": "offline_audio_time_map",
+      "message": "本地 R3 对整段音频离线伸缩；采样锚点为引擎约束，局部时序、极短窗音高与听感须独立核验"
+    },
+    {
+      "code": "AUDIO_STRETCH_SOURCE_CONTEXT",
+      "clip_id": "sound",
+      "source_context": {
+        "requested_ms": 64,
+        "source_head_frames": 3072,
+        "source_tail_frames": 3072,
+        "output_head_frames": 192000,
+        "output_tail_frames": 192000,
+        "decode_start_sample": 6576,
+        "decode_end_sample": 12912,
+        "source_frames": 6336,
+        "target_frames": 396000,
+        "time_map": [
+          [
+            0,
+            0
+          ],
+          [
+            3072,
+            192000
+          ],
+          [
+            3264,
+            204000
+          ],
+          [
+            6336,
+            396000
+          ]
+        ],
+        "edge_interval_output_per_source": [
+          "125/2",
+          "125/2"
+        ],
+        "selection": "real-source-handles-only-no-repetition-or-zero-padding",
+        "author_output_frames": 12000,
+        "output_crop": [
+          192000,
+          204000
+        ]
+      },
+      "message": "显式使用相邻真实源音频作为变速分析上下文，输出裁回作者选区；附近瞬态、音高、相位与自然听感仍须复核"
+    }
+  ],
+  "quality": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "metrics": {
+      "duration_seconds": 1.0,
+      "width": 512,
+      "height": 288,
+      "audio_codec": "pcm_f32le",
+      "video_duration_seconds": 1.0,
+      "audio_duration_seconds": 1.0,
+      "av_duration_delta_seconds": 0.0,
+      "av_start_delta_seconds": 0.0,
+      "av_end_delta_seconds": 0.0,
+      "av_sync_residual_seconds": 0.0,
+      "av_sync_residuals": {
+        "start_delta_seconds": 0.0,
+        "end_delta_seconds": 0.0,
+        "video_start_seconds": 0.0,
+        "audio_start_seconds": 0.0,
+        "video_end_seconds": 0.0,
+        "audio_end_seconds": 0.0
+      },
+      "stream_timing": {
+        "video": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 1.0,
+          "duration_source": "matroska-duration-tag",
+          "end_seconds": 1.0
+        },
+        "audio": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 1.0,
+          "duration_source": "matroska-duration-tag",
+          "end_seconds": 1.0
+        }
+      },
+      "expected_video_frames": 24,
+      "expected_audio_samples": 48000,
+      "expected_video_duration_seconds": 1.0,
+      "expected_audio_duration_seconds": 1.0,
+      "expected_quantization_delta_seconds": 0.0,
+      "probe": {
+        "duration_seconds": 1.0,
+        "duration_tick": 90000,
+        "format": "matroska,webm",
+        "format_long_name": "Matroska / WebM",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High 4:4:4 Predictive",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "mime_codec_string": "avc1.f40015",
+            "width": 512,
+            "height": 288,
+            "coded_width": 512,
+            "coded_height": 288,
+            "has_b_frames": 0,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv444p",
+            "level": 21,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "r_frame_rate": "24/1",
+            "avg_frame_rate": "24/1",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bits_per_raw_sample": "8",
+            "extradata_size": 49,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 libx264",
+              "DURATION": "00:00:01.000000000"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "pcm_f32le",
+            "codec_long_name": "PCM 32-bit floating point little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "sample_fmt": "flt",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 32,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bit_rate": "3072000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 pcm_f32le",
+              "DURATION": "00:00:01.000000000"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 512,
+          "height": 288,
+          "pix_fmt": "yuv444p",
+          "fps": "24/1",
+          "color_space": "bt709",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_f32le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      }
+    }
+  },
+  "project_fingerprint": "a32356995566bf70d16dca734013641963eaf7da52ac50741a08b800a00a91ea",
+  "input_hashes": {
+    "frames": "sha256:c34f01cd418f018ed6d79b9fac99ef8e549828e9a9abffe6bf4ba69d2e4598ce",
+    "sound_asset": "sha256:8dba6dd76889b73b44131f029d67d0d59099039a722303ac0ed1e2ca017e86d5"
+  },
+  "resume_of": null
+}

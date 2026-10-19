@@ -388,6 +388,14 @@ quality, pitch, local transient timing and listening conclusions separate. A
 Unconfigured projects use the default native atempo path and its explicit limits. A unity-tempo positive
 control passing on both versions is not evidence of a historical failure.
 
+Explicit [real source context](../../docs/specs/离线音频真实源上下文与精确选区契约_v0.1_2026-10-19.md)
+is available with `settings.audio_stretch.source_context_ms` (integer 0..1000,
+default 0). It uses finite physical source handles, never padding/repetition;
+the output crops back to the original authored sample interval before reverse.
+Review the actual extended PCM budget and context warning. Source-edge shortage
+clamps to actual samples; stale duration/short decoded audio rejects. Adjacent
+transients and stereo phase still require review; this is not timeline-neighbour mixing.
+
 The [R3 channel strategy](../../docs/specs/R3声道策略契约_v0.1_2026-10-17.md)
 accepts `settings.audio_stretch.channel_mode`: `together` (the compatible
 default, with `--centre-focus`) or `apart` (native per-channel fidelity

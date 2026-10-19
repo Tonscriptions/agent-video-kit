@@ -5,6 +5,14 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For opt-in R3 real source handles, read the
+[audio source context contract](../../docs/specs/离线音频真实源上下文与精确选区契约_v0.1_2026-10-19.md).
+Author `settings.audio_stretch.source_context_ms` as an integer 0..1000,
+default 0. This reads adjacent physical source samples, stretches the extended
+window and crops the original authored interval before reverse. Inspect the
+manifest's actual bounds/map/crop and `AUDIO_STRETCH_SOURCE_CONTEXT` warning.
+Short-tone pitch gains do not accept stereo phase, transients or natural sound.
+
 For local visible-text editing use the [OCR contract](../../docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md):
 `ocr adapter register/list/inspect`, `ocr scan` and `ocr anchors`. Register
 existing PP-OCRv4 ONNX/native Python with local evidence, review raw source

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import array
+from fractions import Fraction
 import hashlib
 import json
 import math
@@ -30,12 +31,15 @@ def _error(code, message, field='settings.audio_stretch'):
 def configuration(root: Path, raw) -> dict | None:
     if raw is None:
         return None
-    allowed = {'engine', 'executable', 'sha256', 'dependencies', 'license_path', 'license_sha256', 'license_spdx', 'channel_mode'}
+    allowed = {'engine', 'executable', 'sha256', 'dependencies', 'license_path', 'license_sha256', 'license_spdx', 'channel_mode', 'source_context_ms'}
     if not isinstance(raw, dict) or set(raw)-allowed or raw.get('engine') != ENGINE:
         raise _error('AUDIO_STRETCH_CONFIG_INVALID', 'audio_stretch 要求显式本地 rubberband-r3-offline-v1 配置')
     channel_mode = raw.get('channel_mode', 'together')
     if not isinstance(channel_mode, str) or channel_mode not in ('together', 'apart'):
         raise _error('AUDIO_STRETCH_CONFIG_INVALID', 'channel_mode 只接受 together 或 apart', 'settings.audio_stretch.channel_mode')
+    context_ms = raw.get('source_context_ms', 0)
+    if type(context_ms) is not int or not 0 <= context_ms <= 1000:
+        raise _error('AUDIO_STRETCH_CONFIG_INVALID', 'source_context_ms 必须为 0..1000 的整数', 'settings.audio_stretch.source_context_ms')
     if not isinstance(raw.get('license_spdx'), str) or not raw['license_spdx'].strip():
         raise _error('AUDIO_STRETCH_CONFIG_INVALID', '需要记录本地伸缩工具的 license_spdx')
     dependencies = raw.get('dependencies')
@@ -65,7 +69,7 @@ def configuration(root: Path, raw) -> dict | None:
         required = executable.with_name('sndfile.dll')
         if str(required) not in {a['path'] for a in artifacts[2:]}:
             raise _error('AUDIO_STRETCH_DEPENDENCY_MISSING', 'Windows Rubber Band CLI 的同目录 sndfile.dll 须显式登记摘要')
-    return {'engine': ENGINE, 'executable': str(executable), 'artifacts': artifacts, 'channel_mode': channel_mode,
+    return {'engine': ENGINE, 'executable': str(executable), 'artifacts': artifacts, 'channel_mode': channel_mode, 'source_context_ms': context_ms,
             'license_spdx': raw['license_spdx'].strip(), 'network': 'disabled'}
 
 
@@ -86,12 +90,42 @@ def plan(root: Path, engine: dict, asset: dict, source: Path, start: float, end:
         anchors.append((source_frames, target_frames))
     if len(anchors) > 16385 or any(b[0] <= a[0] or b[1] <= a[1] for a, b in zip(anchors, anchors[1:])):
         raise _error('AUDIO_STRETCH_TIME_MAP_INVALID', '离线伸缩时间映射必须严格递增且不超过 16385 个锚点')
+    context_ms = engine.get('source_context_ms', 0)
+    head = tail = 0
+    if context_ms:
+        bound = (asset.get('probe') or {}).get('duration_seconds')
+        if (type(bound) not in (int, float) or not math.isfinite(bound) or bound <= 0
+                or start_sample < 0 or end_sample > math.floor(bound*RATE+1e-6)):
+            raise _error('AUDIO_STRETCH_CONTEXT_BOUND_INVALID', '源上下文要求有限的已探测时长及有效选区')
+        requested = context_ms*RATE//1000
+        head = min(requested, start_sample)
+        tail = min(requested, math.floor(bound*RATE+1e-6)-end_sample)
+    first_slope = Fraction(anchors[1][1]-anchors[0][1], anchors[1][0]-anchors[0][0])
+    last_slope = Fraction(anchors[-1][1]-anchors[-2][1], anchors[-1][0]-anchors[-2][0])
+    head_out, tail_out = round(head*first_slope), round(tail*last_slope)
+    if (head and head_out < 1) or (tail and tail_out < 1):
+        raise _error('AUDIO_STRETCH_CONTEXT_GRID_INVALID', '上下文映射不足一个输出采样；未静默删除上下文')
+    context_map = [(0, 0)] if head else []
+    context_map.extend((a+head, b+head_out) for a,b in anchors)
+    if tail:
+        context_map.append((source_frames+head+tail, target_frames+head_out+tail_out))
+    full_source, full_target = source_frames+head+tail, target_frames+head_out+tail_out
+    if max(full_source, full_target)*channels*4 > MAX_PCM_BYTES:
+        raise _error('AUDIO_STRETCH_BUDGET_EXCEEDED', '真实源上下文扩展后的每份 PCM 不能超过 512 MiB')
+    context = {'requested_ms': context_ms, 'source_head_frames': head, 'source_tail_frames': tail,
+               'output_head_frames': head_out, 'output_tail_frames': tail_out,
+               'decode_start_sample': start_sample-head, 'decode_end_sample': end_sample+tail,
+               'source_frames': full_source, 'target_frames': full_target, 'time_map': context_map,
+               'edge_interval_output_per_source': [str(first_slope), str(last_slope)],
+               'selection': 'real-source-handles-only-no-repetition-or-zero-padding',
+               'author_output_frames': target_frames, 'output_crop': [head_out, head_out+target_frames]}
     implementation = 'sha256:'+sha256_file(Path(__file__))
     job = {'protocol': 'agent-video-offline-audio-stretch-v1', 'engine': engine,
            'source': str(source.resolve()), 'source_sha256': asset['sha256'],
            'source_start_sample': start_sample, 'source_end_sample': end_sample,
            'source_frames': source_frames, 'target_frames': target_frames,
            'channels': channels, 'sample_rate': RATE, 'time_map': anchors,
+           'source_context': context,
            'reverse_after_stretch': bool(reverse), 'implementation_sha256': implementation,
            'ffmpeg': artifact_entry(Path(ffmpeg_path()).resolve(), 'audio-stretch-ffmpeg')}
     key = hashlib.sha256(json.dumps(job, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
@@ -148,14 +182,18 @@ def inspect_pcm(path: Path) -> dict:
             'sha256': 'sha256:'+sha256_file(path)}
 
 
-def _canonical_pcm(source: Path, destination: Path, pcm: dict) -> None:
+def _canonical_pcm(source: Path, destination: Path, pcm: dict, *, start_frame=0, frames=None) -> None:
     # libsndfile's PEAK chunk includes wall time. Keep every PCM byte while
     # excluding time-dependent metadata from immutable derived WAV artifacts.
-    size=pcm['data_bytes'];channels=pcm['channels']
+    frames = pcm['frames']-start_frame if frames is None else frames
+    if (type(start_frame) is not int or type(frames) is not int or min(start_frame,frames)<0
+            or not frames or start_frame+frames>pcm['frames']):
+        raise _error('AUDIO_STRETCH_PCM_INVALID','PCM 选区必须位于实际解码采样内')
+    channels=pcm['channels'];size=frames*channels*4
     fmt=struct.pack('<HHIIHH',3,channels,RATE,RATE*channels*4,channels*4,32)
     with source.open('rb') as src, destination.open('xb') as dst:
         dst.write(b'RIFF'+struct.pack('<I',size+36)+b'WAVEfmt '+struct.pack('<I',16)+fmt+b'data'+struct.pack('<I',size))
-        src.seek(pcm['data_offset']);remaining=size
+        src.seek(pcm['data_offset']+start_frame*channels*4);remaining=size
         while remaining:
             raw=src.read(min(remaining,1024*1024))
             if not raw:raise _error('AUDIO_STRETCH_PCM_INVALID','离线 PCM 规范化时输入截断')
@@ -172,21 +210,33 @@ def execute(root: Path, job: dict, temp_dir: Path, *, cancel_file: Path | None =
                 raise AppError('AUDIO_STRETCH_HASH_MISMATCH', '离线伸缩输入或程序在规划后变化', exit_code=6, path=expected['path'])
         with tempfile.TemporaryDirectory(prefix='audio-stretch-', dir=str(temp_dir)) as scratch:
             work = Path(scratch);source=work/'input.wav';result=work/'output.wav';mapping=work/'time-map.txt'
+            context=job.get('source_context') or {
+                'source_frames':job['source_frames'],'target_frames':job['target_frames'],
+                'decode_start_sample':job['source_start_sample'],'decode_end_sample':job['source_end_sample'],
+                'source_head_frames':0,'source_tail_frames':0,'output_head_frames':0,
+                'time_map':job['time_map']}
             # R3 treats 0 -> 0 as a zero-length ratio and can emit NaN.
             # Endpoints remain in the plan; only interior anchors go to CLI.
-            engine_anchors=[(a,b) for a,b in job['time_map'] if 0<a<job['source_frames'] and 0<b<job['target_frames']]
+            engine_anchors=[(a,b) for a,b in context['time_map'] if 0<a<context['source_frames'] and 0<b<context['target_frames']]
+            if context.get('requested_ms',0) and all(a*context['target_frames']==b*context['source_frames'] for a,b in engine_anchors):
+                engine_anchors=[]
             mapping_text=''.join(f'{a} {b}\n' for a,b in engine_anchors)
             atomic_write_text(mapping, mapping_text)
             decode=[job['ffmpeg']['path'], '-hide_banner', '-loglevel', 'error', '-y',
                     '-i', job['source'], '-map', '0:a:0', '-vn', '-af',
-                    f"aresample={RATE},atrim=start_sample={job['source_start_sample']}:end_sample={job['source_end_sample']},asetpts=N/SR/TB",
+                    f"aresample={RATE},atrim=start_sample={context['decode_start_sample']}:end_sample={context['decode_end_sample']},asetpts=N/SR/TB",
                     '-c:a', 'pcm_f32le', str(source)]
             decoded=run_process(decode, timeout=3600, cwd=root, cancel_file=cancel_file)
             if decoded.returncode != 0:
                 raise AppError('AUDIO_STRETCH_DECODE_FAILED', '本地伸缩音频解码失败', exit_code=6, cause=decoded.stderr[-6000:])
             before=inspect_pcm(source)
-            if before['frames'] != job['source_frames'] or before['channels'] != job['channels']:
+            if before['frames'] != context['source_frames'] or before['channels'] != job['channels']:
                 raise AppError('AUDIO_STRETCH_SOURCE_LENGTH_MISMATCH', '音频实际范围不足或声道与计划不符；不以补零替代输入', exit_code=6)
+            context_input=before
+            if context['source_head_frames'] or context['source_tail_frames']:
+                selected_input=work/'selected-input.wav'
+                _canonical_pcm(source,selected_input,before,start_frame=context['source_head_frames'],frames=job['source_frames'])
+                before=inspect_pcm(selected_input)
             # Keep the V26 centre/mono-compatible default. Native "apart"
             # favours per-channel spectra but does not preserve stereo phase.
             channel_mode=job['engine'].get('channel_mode', 'together')
@@ -194,20 +244,21 @@ def execute(root: Path, job: dict, temp_dir: Path, *, cancel_file: Path | None =
                 raise _error('AUDIO_STRETCH_CONFIG_INVALID', '离线计划的 channel_mode 无效')
             command=[job['engine']['executable'], '-3', '--no-threads',
                      *(['--centre-focus'] if channel_mode == 'together' else []), '-q',
-                     '-t', format(job['target_frames']/job['source_frames'], '.17g'),
+                     '-t', format(context['target_frames']/context['source_frames'], '.17g'),
                      *(['--timemap', str(mapping)] if engine_anchors else []), str(source), str(result)]
             processed=run_process(command, timeout=3600, cwd=root, cancel_file=cancel_file)
             if processed.returncode != 0 or not result.is_file() or 'NaN or Inf presented' in processed.stderr:
                 raise AppError('AUDIO_STRETCH_FAILED', '本地 Rubber Band R3 离线执行失败', exit_code=6, cause=processed.stderr[-6000:])
             after=inspect_pcm(result)
-            if after['frames'] != job['target_frames'] or after['channels'] != job['channels']:
-                raise AppError('AUDIO_STRETCH_OUTPUT_LENGTH_MISMATCH', '离线伸缩输出采样数或声道错误；不静默补齐', exit_code=6, cause=json.dumps({'expected_frames':job['target_frames'],'actual_pcm':after,'engine_stderr':processed.stderr[-6000:]}))
-            if any(a and not b for a,b in zip(before['nonzero_samples'],after['nonzero_samples'])):
-                raise AppError('AUDIO_STRETCH_CONTENT_LOST', '离线伸缩将非零输入声道变为全静音', exit_code=6)
+            if after['frames'] != context['target_frames'] or after['channels'] != job['channels']:
+                raise AppError('AUDIO_STRETCH_OUTPUT_LENGTH_MISMATCH', '离线伸缩输出采样数或声道错误；不静默补齐', exit_code=6, cause=json.dumps({'expected_frames':context['target_frames'],'actual_pcm':after,'engine_stderr':processed.stderr[-6000:]}))
             if cancel_file is not None and cancel_file.exists():
                 raise AppError('CANCELLED', '离线伸缩结束后任务已取消', exit_code=8, path=str(cancel_file))
-            raw_output=after;canonical=work/'canonical.wav';_canonical_pcm(result,canonical,raw_output)
+            raw_output=after;canonical=work/'canonical.wav'
+            _canonical_pcm(result,canonical,raw_output,start_frame=context['output_head_frames'],frames=job['target_frames'])
             after=inspect_pcm(canonical)
+            if any(a and not b for a,b in zip(before['nonzero_samples'],after['nonzero_samples'])):
+                raise AppError('AUDIO_STRETCH_CONTENT_LOST', '离线伸缩将非零输入声道变为全静音', exit_code=6)
             output=Path(job['output']);output.parent.mkdir(parents=True,exist_ok=True)
             if output.exists():
                 if 'sha256:'+sha256_file(output) != after['sha256']:
@@ -222,5 +273,6 @@ def execute(root: Path, job: dict, temp_dir: Path, *, cancel_file: Path | None =
             return {'status':'succeeded','decode_command':decode,'command':command,'channel_mode':channel_mode,
                     'decode_stderr':decoded.stderr,'engine_stderr':processed.stderr,
                     'input_pcm':before,'engine_raw_output_pcm':raw_output,'output_pcm':after,'canonicalization':'float32-pcm-bytes-preserved-no-wall-time-metadata','time_map_utf8':mapping_text,
+                    'source_context':context,'context_input_pcm':context_input,
                     'engine_time_map':engine_anchors,'time_map_sha256':'sha256:'+hashlib.sha256(mapping_text.encode('ascii')).hexdigest(),
                     'output_artifact':pinned,'pitch_and_listening_accepted':False,'stereo_phase_accepted':False}
