@@ -1,5 +1,9 @@
 # Agent Video Kit
 
+<!-- R07-RESEARCH -->
+2026-10-19 **R07（OpenFilm 0.2.1 源码研究）**：固定 `f6a65ae5`，API **1142 stars /117 forks** 为 19:18:55 Asia/Taipei 时点；731→749 文件，37 新增/179 修改/19 changeset 删除。选定原测试 **75 通过/1 可选 DTD 跳过**，另 13 纯数据夹具通过；**同大小、还原 mtime 的内容修改未改变预览缓存键，直接复用门槛不通过**。优先候选为硬件编解码探测/显式回退、受控诊断；预览缓存需重写内容指纹，FCPXML 为可选交换。10 份创作 Skill 所在 31 文件、provider 目录 29 文件均与 R06 相同；既有 3 套本地工作流保留，不新增本地 AI 特效内核。196 产品输入与 V64 完整回归相同；本轮为研究，无新产品接入/成片/完整回归。 [18 项复用/成本/证据](docs/OpenFilm_0.2.1复用清单与成本复核_2026-10-19.md)。
+<!-- /R07-RESEARCH -->
+
 <!-- V64-DEMO -->
 **V64 音频上下文实测**：原 WAV、实际成片与失败均公开。下图为实际 PCM 的 **3 页/6 秒无声统计图**，非 GUI 录屏；只验证受控音高与采样。
 
@@ -235,6 +239,7 @@ V45 已进一步采用 O14：MIT 原字节 `overrides.mjs` 和四个模板字段
 | R04 | OpenFilm 5c2000b8 源码与模板修复 | 历史 713 文件；上游 38 通过/1 跳过；V54 产品定向 73/73 另列 | 不算完整产品回归；XML 为合成数据、无真实目标软件导入 | [17 项复用/成本](docs/OpenFilm最新源码复核与降本清单_2026-10-18.md) |
 | R05 | OpenFilm 新 main 及可拆模块复核 | 固定 7a64d1fe；727 原文件；148 核心未变；63 通过/1 DTD 跳过；10 类复用决策 | 原窗口为 mock；无 GUI/模型/新运行时/新 Skill；不计作产品回归 | [成本/范围](docs/OpenFilm复用复核与开发成本更新_2026-10-19.md)、[原证据](docs/validation/evidence/openfilm-reuse-final-20261019-r05/verification.json) |
 | R06 | OpenFilm 新导出/轨道源码复核 | 固定 91b4e90c；731 文件；64 原测试通过/1 跳过，8 纯轨道夹具 | 候选模块未接入生产转换；非产品全量/NLE 导入/新 AI 能力验收 | [原始来源/复用判断](docs/OpenFilm导出修复与纯轨道模块复用复核_2026-10-19.md) |
+| R07 | OpenFilm 0.2.1 源码与降本复核 | f6a65ae5；749 文件；原测试 75 通过/1 跳过；13 纯数据夹具；196 产品输入不变 | 缓存同大小/mtime 负例失败；候选未接入、无新媒体/GPU/产品回归 | [18 项复用/投入/原证据](docs/OpenFilm_0.2.1复用清单与成本复核_2026-10-19.md) |
 
 实际数据：[字幕原输入](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-input.json) → [三段输出](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-output.json)；[跨轨删除原模型](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-input.json) → [操作计划/实际结果/手工预期](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-output.json)。字幕无词标的时间为估算。原 CLI/Skill 连接 Studio、npx latest 与服务商；选用模块需改为固定本地入口、强制离线并保留原版权。GUI 目录内的纯规划算法可提取；上游不是完整剪映或本地 AI 特效替代内核。
 

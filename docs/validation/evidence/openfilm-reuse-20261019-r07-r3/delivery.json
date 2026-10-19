@@ -1,0 +1,1305 @@
+{
+  "status": "passed_scoped_r07_delivery_with_cache_negative_retained",
+  "checked_at_utc": "2026-10-19T11:44:23.093628+00:00",
+  "upstream_head": "f6a65ae54fa1c10ec482eeb84dc9ffa6ef33c4d8",
+  "source_files": 749,
+  "selected_original_tests": {
+    "tests": 76,
+    "pass": 75,
+    "fail": 0,
+    "skipped": 1
+  },
+  "independent_pure_fixtures": 13,
+  "negative_cache_suitability_accepted": false,
+  "product_inputs_unchanged": 196,
+  "product_regression_repeated": false,
+  "baseline_completed_product_regression_sha256": "sha256:a7d0c756d4060f5ad5bd2ea1d67a28a0e9b4bd0f7c14153363ece0142f4edbed",
+  "frozen_before": {
+    "docs/specs/agent-project.schema.json": "sha256:d06927a201c0a3cf13510bbe491ee424503dc8cb73e73ead346a709fbccb50fd",
+    "product/offline/build.py": "sha256:1b93123f4e34dc18aaf4bb9ecbb4261e423f297103e63e494c9ec883f9871810",
+    "product/offline/install.py": "sha256:4a7bf97d2fe15b92f1448fb118eb07d5625c02741c1585c392a3b0d75dba1c7e",
+    "product/pyproject.toml": "sha256:4c71032e5cfe55f8d2b4f07e459aef39d172f2292e88f9df0346db0c9746993a",
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/agent-project.schema.json": "sha256:d06927a201c0a3cf13510bbe491ee424503dc8cb73e73ead346a709fbccb50fd",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_routing.py": "sha256:40f74750a79ea80f016dd2eb8a353d6103682756f01970ad802c6292be8e5af8",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_stretch.py": "sha256:f4120fd82fc4eba79b9dd0bed1093651edbadb19202d7c384530e799d047dced",
+    "product/src/ai_ad_editor/audio_tempo.py": "sha256:3284a08dc75a25dcbeed30c7088a18898c46d398e6e7ae9380efcf0e366afcee",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:2dbb8bce11ecb7f7fd6fa893cca08efdaa6f9c21a3c6f8a4588cbed5092c3a65",
+    "product/src/ai_ad_editor/browser_process.py": "sha256:55c72751a5d3d5e397af030fbf65a7ef5b659646a3890f72e52da816d9ab22a6",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:ce915ae76d1719b7f9497c3e21bc6b53473815065229cb34d31b09cff9d86556",
+    "product/src/ai_ad_editor/captions.py": "sha256:f9a4534682417235a1c2e6ba36072bb92de9354cb5d83b76d06e3ecb22144d28",
+    "product/src/ai_ad_editor/cli.py": "sha256:aa1a7f15c8d82ddbe7e2b0258ee1b723b2baede9a500df8adaa209553615c7a6",
+    "product/src/ai_ad_editor/clip_windows.py": "sha256:3014424ecce4ec780b2e241afd50c310681c69c4450ebd88b689cea221149377",
+    "product/src/ai_ad_editor/convert.py": "sha256:5ff0ea4edf337b96f88f2a4d5c6ec7e36ab8f42e17260a0a7a9c0bce289c5229",
+    "product/src/ai_ad_editor/ctc_alignment.py": "sha256:a475e9b1acd8ceba2be90884729f0b5a4c76ed354853bc0a57b47f1f9787edd7",
+    "product/src/ai_ad_editor/ctc_cli.py": "sha256:2f20af923ea0a7af6fe9d5080cdb999d6b7c2f26c133a6c2f702d782747c22c8",
+    "product/src/ai_ad_editor/ctc_worker.py": "sha256:933d1c7ca4ac7dc8512d49e17a090b0a89e580724d0228a9ab44a3a14e3e9810",
+    "product/src/ai_ad_editor/cuda_admission.py": "sha256:8d030f776b09edeb9d6cfecce720caca3f20a1fab058dd3dc406020ed064fd3b",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:0eb1e8f649e66cc6f15ef56bfb75d07166a7d7e3a6f1326f50bca349a1c24071",
+    "product/src/ai_ad_editor/edit_planner.py": "sha256:ffe0c9c774f094b57b565ad56f84291d432ce957b1fa578dd44aabd80212b43a",
+    "product/src/ai_ad_editor/effect_automation.py": "sha256:9537dfbfa6469009b13aeb01d846f5181161be81903324f2efd6461e91cdd3fa",
+    "product/src/ai_ad_editor/effects.py": "sha256:f9c37938e50a217d5a511abd5341aad7fdac2575aff26b75eb13ceb90137e9fc",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/font_coverage.py": "sha256:2f33b3eb07331ef3b87c78286317df8d903a2c991978e9750a39d6bcd117c243",
+    "product/src/ai_ad_editor/fragments.py": "sha256:108e172ae53f42c6ef4bdbfb06a4f975de0d8690e3088cf8a0e3385b159c6a89",
+    "product/src/ai_ad_editor/html_motion.py": "sha256:eccfca16e5a3760c9cc9546613231c281fd253ea11e846fad39f98eb7f699889",
+    "product/src/ai_ad_editor/html_motion_worker.mjs": "sha256:435899a68e8ac4e76484c00e2d3f6d8fadcf362475dd9e639d0bd0e7ad7fe0bf",
+    "product/src/ai_ad_editor/html_quality.py": "sha256:7abdb2b18bb86a3d87e058e74b908cb0a430f05273ca9b78122a5985c0b5dba0",
+    "product/src/ai_ad_editor/html_quality_dom.mjs": "sha256:551f997cd5f4f57514354ed4b5292c67e9e82f4c8928db74f4d6c53b57ecdc94",
+    "product/src/ai_ad_editor/html_template.py": "sha256:f3ad9507632d03df9e7de3e4303638325c9667e1005ae9600c62670b06d1436e",
+    "product/src/ai_ad_editor/html_template_dom.mjs": "sha256:ed68388d4dda1adabc689afa508640de471fe8a6e461bc6aeb5292d904950260",
+    "product/src/ai_ad_editor/inline_sequences.py": "sha256:ee1596121f7e0ea88c7d1f8e27d75132b57dc03522a768a2716f97343a1ed911",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:7c8582144a9b17e08558f36777c312099e10fee82f18f49589b07f40b61fb9dc",
+    "product/src/ai_ad_editor/local_ctc.py": "sha256:f4e6bef1bf35603a5828f161462570afa9ca04af4364e0032708700ae3141716",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:171617467fc6acc9dbf31d6d80e0c1029c3957ad2671e3c1bc25bc5c4455d75e",
+    "product/src/ai_ad_editor/local_ocr.py": "sha256:cd85a6d7b12ec18b3e024327687c483f1f7cfa0deed2369b968f8ab2bccc14b5",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:f098a86e8cdee834b222a52b877aa9bfa3ee54fb1fc24d1cafe823ac76ea24d2",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/magnetic_mode.py": "sha256:7b74280ed8df6d94b259548122b44216ca45d6726084504aa6fdd05524f460e1",
+    "product/src/ai_ad_editor/magnetic_reorder.py": "sha256:b3db1863adfa7cb88173a864c127d01ebfa33c2ba46dc21b340ea660db03eef1",
+    "product/src/ai_ad_editor/magnetic_sync.py": "sha256:bd4c59d3045eda011a9cc5e7c8720b9380bc756ee41931867b0f4eb4f22ea939",
+    "product/src/ai_ad_editor/mask_edit.py": "sha256:952aa4c1cc3f49b2b1c9d5dc0c969901d82d4fcbe660387af2f3f7c044d6bb7a",
+    "product/src/ai_ad_editor/mask_edit_geometry.py": "sha256:9bf1d101c1aea8d2265b704fab8dcd65b3bb08c4cc45aed95a4a5cb0ee2ae1f9",
+    "product/src/ai_ad_editor/mask_review.py": "sha256:17de0acd6d76ad9218565302a0f47a577a5001a487bbf0c66432b0b6af278bad",
+    "product/src/ai_ad_editor/mask_tracking.py": "sha256:724f8f9800536d3ffdc99675fadf79e1262532ec7f9a3d879cf94674ba531b8d",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:75755c314fe01111d7ca85138efb6f9b0993e45c14c5a2b65cc1046c5e58cfba",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/nested_freeze.py": "sha256:2294d318840e6285550eaf70109702b041c031c2cde4c8dc0bca3d2bad848a35",
+    "product/src/ai_ad_editor/ocr_cli.py": "sha256:1a818549a1308e78a38a1a5aa9a025772f5be792bacfcdfeacb5599670e0b4ec",
+    "product/src/ai_ad_editor/ocr_geometry.py": "sha256:a2a4aedf4289ab20bea45000c1be898668239b75ef215386120850d2f7dfce5c",
+    "product/src/ai_ad_editor/ocr_worker.py": "sha256:ee5a2096ec1ee03fc09d2ac4d0b06b1791d5bbfe011772f448045d1377b50d3f",
+    "product/src/ai_ad_editor/OPENFILM_EXAMPLES_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_frame_clock.mjs": "sha256:c60b35fb0d26b8629d833f11028757aeccf603917c4c5840f501c01b757de1d5",
+    "product/src/ai_ad_editor/OPENFILM_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_overrides.mjs": "sha256:8fab39a5f4f9696e9070a206f45d9241f54167ea2d9f47c0bcc9975333664832",
+    "product/src/ai_ad_editor/openfilm_stroke.mjs": "sha256:6c20aaff3a85b8a98654d82bfbea34029d78b0366af6b95b17c70abfafd265a1",
+    "product/src/ai_ad_editor/openfilm_subtitle_segments.mjs": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "product/src/ai_ad_editor/openfilm_template_fields.mjs": "sha256:fd4c58532cd3b46e32872e84136b54edef5a8ad9d824f1afa44f9264d81774e3",
+    "product/src/ai_ad_editor/openfilm_text_bounds.mjs": "sha256:94b2ab392b367ef1f901967f9156ac48493419be32bc40b4d6c035cf71a56108",
+    "product/src/ai_ad_editor/PADDLE_OCR_LICENSE.txt": "sha256:3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e",
+    "product/src/ai_ad_editor/PADDLE_OCR_NOTICE.txt": "sha256:392317bb77f62100b038919472ce0c3fecf0d6c6f9c29fc22a18813fb4a15a32",
+    "product/src/ai_ad_editor/PDOOM_VIDEO_LICENSE.txt": "sha256:5fc212466ce7183be5d85a3ee34fea461712842d5cd256b470978a83577083cb",
+    "product/src/ai_ad_editor/policy.py": "sha256:0433efb46d2561fa9f257dd363aeb592df7ef61c60be147196cbaee7fabbacb8",
+    "product/src/ai_ad_editor/project.py": "sha256:dd86c8d1b161cb99660f4bc92ac3ff8c2cc6c10c34f22432fbe6f27af9a7414f",
+    "product/src/ai_ad_editor/quality.py": "sha256:d4e71c9e6616250b681306d562305dafe4cb5867652ab365275277b155e9e047",
+    "product/src/ai_ad_editor/range_edits.py": "sha256:eff604efaa3c2a66b63b3fcb332804ffd9e45a11ab880964b279a379d5500e4e",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:59ab9bac06429d6837c17526e3ff42f19a619b6b5efb2c8de3215fcb3e0359d6",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:b806d815b9a456f0446a0a601ae9bcfdb957418ace18eb472bd1301b76138802",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/retime_edits.py": "sha256:4dcf1ef57db6bd813d2c25887705ba18590207decb07bd17f4622b0c3c14b881",
+    "product/src/ai_ad_editor/retime_transform.py": "sha256:8b00a27cd939264cece21ddf22ca9949a23a43122dc958c0970cd2526c7bdd35",
+    "product/src/ai_ad_editor/rfc3339_dates.py": "sha256:344d79048ff55a77af00314134c20b57b5301b75d1b6a32b4a7a3f52ce749105",
+    "product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt": "sha256:5ba1a4f03626ccca6dcbf53a554545e4f776a335bfdaa233ec3bfe9bb7fac15d",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/schema_contract.py": "sha256:80001bfb410c94c61f2a3c29a5ba37f8ce77eb19aceb5fe078ba7c2ea4994748",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/sequence_canvas.py": "sha256:462542e26058d350c2d0a29d0cf4127c4054cab7462a763811b85bfca171412f",
+    "product/src/ai_ad_editor/sequence_sampling.py": "sha256:1aa171ef6043878afce099f7a04b214b9c458879147c46147062a77d36356ec2",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:ba871f7bff0f186ad55d9e22c5fcd75e09032e8d7299a01c7ea7b76b2e1a21a1",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/source_edits.py": "sha256:a2bea20a8d162ac4fa9f329045bca2b7e214a624adca107df6021919d5a1d36c",
+    "product/src/ai_ad_editor/source_transitions.py": "sha256:59c2652aa76024b78667293ce46774ba6910e4524db7e39f95dc95bd91b0547a",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/speed_curves.py": "sha256:41fbddd764bfa481e6158e8401333113c871e1c38e34257911f9aa676b9bfff9",
+    "product/src/ai_ad_editor/stroke_motion.py": "sha256:ba53f586ff12c75c15803e347307c802d977e874ce792159d74ebb2b6b42ae03",
+    "product/src/ai_ad_editor/subtitle_clock.py": "sha256:49ca2001da0f250d682f5818d95f4f51ee362cbaee979fb9a99649a847cd4645",
+    "product/src/ai_ad_editor/subtitle_segment_worker.mjs": "sha256:66ca5d7fab0926efe15615da29dba3024897cbfbfb1b28e6a6a189697b6d5bdc",
+    "product/src/ai_ad_editor/subtitle_segments.py": "sha256:5590e04147f0b50cb60df3b4e543059a560dbfd684b3085c5f25f8fb04631aea",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_highlight.py": "sha256:d08bee683f0bd00bac363a78df5957475765741a7c53d92ac025575b334f78e5",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/text_paint.py": "sha256:a924644f0396b5204efbb0e085f25d51f6cda5bfc75f2d44febc6796e42cb028",
+    "product/src/ai_ad_editor/text_typing.py": "sha256:6cc022af8300fb4270cb21f2f53ffe2b33210ac203169fed653d11d75e591ec3",
+    "product/src/ai_ad_editor/time_mapping.py": "sha256:89bd69060b3f10af1197018b735621eadb8ce2858b4281972d989fddf79f2ef1",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:78f984613b0c253d108dd4d515557f77bc4ebd4df4945108a63d8fdb38ad202b",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:63d4983cebaec2f4d29537bf44804f4554b6a5c2d8426430432f6632f3bd2b58",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:40d2653fc075c8da472d51f635dac8d820924761608f199633ed3216155de6ef",
+    "product/src/ai_ad_editor/validator.py": "sha256:16fc2ed2956672223b4cc3620a4c6b966e29548bc3e8b49af0a6a1c9c6e0e308",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_alpha_resampling.py": "sha256:db2e2764a5022c18bba23ad407a6bf15a320edfea5f5a8331eda706d7c4046de",
+    "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+    "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+    "product/tests/test_audio_buses.py": "sha256:e4b6020208492cf4907a3537c0542321a7f1600692537b22299700f5b4d9dfdc",
+    "product/tests/test_audio_channel_modes.py": "sha256:815a9ea0117dd7ed0cce3a75d14ed67a4a8a06b413df1836d233f33359290e79",
+    "product/tests/test_audio_routing.py": "sha256:0f2d189488b1559fc571ae401188b6f3c576150c34e59f3a9a23e4b5f4dbadef",
+    "product/tests/test_audio_source_context.py": "sha256:907ccac6cbd290a98a3d4dca99149d765f16a57b5cc00ac3d436a777884327cd",
+    "product/tests/test_audio_stretch.py": "sha256:53dea6b0ec9f8c00861b6a1844d7c34e0c87e432d78a4e4847c7245fd9893ce9",
+    "product/tests/test_audio_tempo_context.py": "sha256:ad3c7c53cfdaecdd00693aa745a22be2455e2dcd446583e4912cd1066b6aac3a",
+    "product/tests/test_audio_unity.py": "sha256:02dcf66038d4fcbc1f0c144e604efa451b9d7925817d1d2b089f8c087aa58810",
+    "product/tests/test_cli.py": "sha256:d80d63059529d69e66ac070a9ffce3d2f9f6559504e2f07710a3a4ce4521d615",
+    "product/tests/test_clip_windows.py": "sha256:42863fb28d81d22a0ac90ff1036ef5359186a29ab730d5404db36fae0660ecb3",
+    "product/tests/test_ctc_alignment.py": "sha256:838a854a442b413cb05be739f47eea86dae36057f12b0567bc820f3f442aec93",
+    "product/tests/test_cuda_admission.py": "sha256:624a6627495db87288902f06e1d95c57cde0a8506a50e42b1577aaf7614b6abb",
+    "product/tests/test_delivery_precision.py": "sha256:5bc05fca5334ca454f3498b0f53cd28c0b44b8f9e9f3336b980b8a8604bbed03",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_effect_automation.py": "sha256:b637ab8b41405147d3299ff72ae6def7f7656d8fe9828137abe534612cbe3753",
+    "product/tests/test_font_coverage.py": "sha256:b382b9449601baf20a6c352c03e055b4f9efcad03b7515b694831376cc5a8234",
+    "product/tests/test_fragments.py": "sha256:d021051b4a5b48deac872e319407c9dae0cb2e7b3c8f1a7ab71704dff756a35f",
+    "product/tests/test_html_motion.py": "sha256:9e382485db151f79059e4d18c13708a6ee3deca38ad5be1272a5b9fb4dc4bc0c",
+    "product/tests/test_html_quality.py": "sha256:1e3d81bf7101b3d97aa89f5f60cebab0a7e64e44845ab60b4872f8d064217aae",
+    "product/tests/test_html_template.py": "sha256:747fb1e13b3bfb60f35012a8ffa18ac10f156f1e2811328792ab29d20e2de29a",
+    "product/tests/test_html_url_parser.py": "sha256:673a8073a536149c6b70366b2911ab6bfb3b395f3e2a14dd425c3d5f57cbcf02",
+    "product/tests/test_linked_edit.py": "sha256:d3b5d8fb402df059ea006d125fbb6fb651c891132fcd78deccfdbe41036d87d7",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+    "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+    "product/tests/test_local_ocr.py": "sha256:81628df63d391d71a038c48af77b9044976eee623476bdaf7c2a000f31445ec3",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vace.py": "sha256:7755f9bc0539a9c668aa08df8f61eee57d24a902652171cd87c27a7420c10637",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_magnetic_mode.py": "sha256:aa08ddbfa3db68c89b2a2feb757d5bba12dd467b85e7950377eec218714f2897",
+    "product/tests/test_magnetic_reorder.py": "sha256:c4ad34f0ed89c9fe30ca51c188cdf9bfcf982322bd32a6ec6d5d64620c01c2a7",
+    "product/tests/test_mask_edit.py": "sha256:280c825c3a2dc95ac35943209a6eb30e45d519bc5ce1834a6a73c464f90718e1",
+    "product/tests/test_mask_edit_geometry.py": "sha256:7b6367f327d51cbd5b5746b90e89f27768acc7b49b0bb9d7e63cc3d1460bde06",
+    "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+    "product/tests/test_mask_tracking.py": "sha256:f8f2c1d0495410815b91d4f0a507a3a3909d2ca25c44817612970d4330578245",
+    "product/tests/test_nested_frame_coverage.py": "sha256:4bf9aef9aec5c34325f67e2a3e88dbe3424e4ec5c82d8f4e121ec95f7ab8d97f",
+    "product/tests/test_nested_freeze.py": "sha256:03261ace961acfcc5f99f52814a59a2b2bdf88fe3c0def7f48c8c3e897415c9b",
+    "product/tests/test_nested_time_mapping.py": "sha256:64415c49e45c5e7edf8d5f5ee745bbf22d30b6cdd5a0cde7cd731d88d6c6fad4",
+    "product/tests/test_nested_transitions.py": "sha256:9481f1de95ab4c556a17bfdbc1088001ceb29b92bab96d5040c8e6abdeb7881b",
+    "product/tests/test_offline_install.py": "sha256:6497262c7f791c46d706eeddfbaaa41d2d793e109106b93456e88f6786f051fc",
+    "product/tests/test_range_edits.py": "sha256:7634873bff27fbf51e412c82b37efae72cf7f38b20ffd22e1d60fe50359a1f7c",
+    "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+    "product/tests/test_retime_edits.py": "sha256:751c1c1566a6fe934c7427e1f431d40b3d3e417bf0670e2e73ad313d2a1eadde",
+    "product/tests/test_schema_contract.py": "sha256:12d70209363d3b54341118e3f3ab988ebb041464c42eb7fb267c09d801ce483d",
+    "product/tests/test_sequence_canvas.py": "sha256:6f2b622c81932c0dcf80e7b3a528256b5e1a7209ef455b68f2c75a4c9154f4b0",
+    "product/tests/test_sequence_compositing.py": "sha256:1eea9b170c3fabe0623032b4de81a07e085cb7c88b5d79e8380d73399be21b0a",
+    "product/tests/test_sequence_sampling.py": "sha256:c75a6153aee2dbef11e9455a27656d204e46f0ce6061393ea91b6f46f8d7253f",
+    "product/tests/test_source_edits.py": "sha256:b5846137c5de1b1f08e82d43c69a7d95c031cd1c613fdf48613f72361e813614",
+    "product/tests/test_source_transitions.py": "sha256:8813a84843bfbb7aed5b5418011a287c9dae1b8628620114468df716401f2b4a",
+    "product/tests/test_speed_easing.py": "sha256:4797885a66a7e12b327fdf31e0cc937576620353e653c2c762ee905f2d61a5d7",
+    "product/tests/test_stroke_motion.py": "sha256:4ff06a458e6311e4979da31b6be05b5a53c6e09ef3bb6b429c63616368844410",
+    "product/tests/test_subtitle_clock.py": "sha256:1e6696405e30dc4d90e4baadcbffc013d5e6fee5d89bb67e908003c3ebe1de5a",
+    "product/tests/test_subtitle_segments.py": "sha256:aba64ed147276a6b1e59ad845557f86f2b6271db8d0dc75c006db328cac233c2",
+    "product/tests/test_text_animation_composition.py": "sha256:6ce0117f31339d36c574c70a8f2d83235813dc95d91f3108730cb954987c12de",
+    "product/tests/test_text_paint.py": "sha256:99887918ba5813b39a74cef18d02384ed503581e8695821530554590d38e219f",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "product/tests/test_word_highlight.py": "sha256:bf3f56f299d2452e8330bb192d31880c550e277ef93d04c4292fe816b79e172a"
+  },
+  "frozen_after": {
+    "docs/specs/agent-project.schema.json": "sha256:d06927a201c0a3cf13510bbe491ee424503dc8cb73e73ead346a709fbccb50fd",
+    "product/offline/build.py": "sha256:1b93123f4e34dc18aaf4bb9ecbb4261e423f297103e63e494c9ec883f9871810",
+    "product/offline/install.py": "sha256:4a7bf97d2fe15b92f1448fb118eb07d5625c02741c1585c392a3b0d75dba1c7e",
+    "product/pyproject.toml": "sha256:4c71032e5cfe55f8d2b4f07e459aef39d172f2292e88f9df0346db0c9746993a",
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/agent-project.schema.json": "sha256:d06927a201c0a3cf13510bbe491ee424503dc8cb73e73ead346a709fbccb50fd",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_routing.py": "sha256:40f74750a79ea80f016dd2eb8a353d6103682756f01970ad802c6292be8e5af8",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_stretch.py": "sha256:f4120fd82fc4eba79b9dd0bed1093651edbadb19202d7c384530e799d047dced",
+    "product/src/ai_ad_editor/audio_tempo.py": "sha256:3284a08dc75a25dcbeed30c7088a18898c46d398e6e7ae9380efcf0e366afcee",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:2dbb8bce11ecb7f7fd6fa893cca08efdaa6f9c21a3c6f8a4588cbed5092c3a65",
+    "product/src/ai_ad_editor/browser_process.py": "sha256:55c72751a5d3d5e397af030fbf65a7ef5b659646a3890f72e52da816d9ab22a6",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:ce915ae76d1719b7f9497c3e21bc6b53473815065229cb34d31b09cff9d86556",
+    "product/src/ai_ad_editor/captions.py": "sha256:f9a4534682417235a1c2e6ba36072bb92de9354cb5d83b76d06e3ecb22144d28",
+    "product/src/ai_ad_editor/cli.py": "sha256:aa1a7f15c8d82ddbe7e2b0258ee1b723b2baede9a500df8adaa209553615c7a6",
+    "product/src/ai_ad_editor/clip_windows.py": "sha256:3014424ecce4ec780b2e241afd50c310681c69c4450ebd88b689cea221149377",
+    "product/src/ai_ad_editor/convert.py": "sha256:5ff0ea4edf337b96f88f2a4d5c6ec7e36ab8f42e17260a0a7a9c0bce289c5229",
+    "product/src/ai_ad_editor/ctc_alignment.py": "sha256:a475e9b1acd8ceba2be90884729f0b5a4c76ed354853bc0a57b47f1f9787edd7",
+    "product/src/ai_ad_editor/ctc_cli.py": "sha256:2f20af923ea0a7af6fe9d5080cdb999d6b7c2f26c133a6c2f702d782747c22c8",
+    "product/src/ai_ad_editor/ctc_worker.py": "sha256:933d1c7ca4ac7dc8512d49e17a090b0a89e580724d0228a9ab44a3a14e3e9810",
+    "product/src/ai_ad_editor/cuda_admission.py": "sha256:8d030f776b09edeb9d6cfecce720caca3f20a1fab058dd3dc406020ed064fd3b",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:0eb1e8f649e66cc6f15ef56bfb75d07166a7d7e3a6f1326f50bca349a1c24071",
+    "product/src/ai_ad_editor/edit_planner.py": "sha256:ffe0c9c774f094b57b565ad56f84291d432ce957b1fa578dd44aabd80212b43a",
+    "product/src/ai_ad_editor/effect_automation.py": "sha256:9537dfbfa6469009b13aeb01d846f5181161be81903324f2efd6461e91cdd3fa",
+    "product/src/ai_ad_editor/effects.py": "sha256:f9c37938e50a217d5a511abd5341aad7fdac2575aff26b75eb13ceb90137e9fc",
+    "product/src/ai_ad_editor/errors.py": "sha256:0e2fc38a08c0b3c435dbe75e701a7bf9b7aac2bcaae29c120f077b7a586797a5",
+    "product/src/ai_ad_editor/font_coverage.py": "sha256:2f33b3eb07331ef3b87c78286317df8d903a2c991978e9750a39d6bcd117c243",
+    "product/src/ai_ad_editor/fragments.py": "sha256:108e172ae53f42c6ef4bdbfb06a4f975de0d8690e3088cf8a0e3385b159c6a89",
+    "product/src/ai_ad_editor/html_motion.py": "sha256:eccfca16e5a3760c9cc9546613231c281fd253ea11e846fad39f98eb7f699889",
+    "product/src/ai_ad_editor/html_motion_worker.mjs": "sha256:435899a68e8ac4e76484c00e2d3f6d8fadcf362475dd9e639d0bd0e7ad7fe0bf",
+    "product/src/ai_ad_editor/html_quality.py": "sha256:7abdb2b18bb86a3d87e058e74b908cb0a430f05273ca9b78122a5985c0b5dba0",
+    "product/src/ai_ad_editor/html_quality_dom.mjs": "sha256:551f997cd5f4f57514354ed4b5292c67e9e82f4c8928db74f4d6c53b57ecdc94",
+    "product/src/ai_ad_editor/html_template.py": "sha256:f3ad9507632d03df9e7de3e4303638325c9667e1005ae9600c62670b06d1436e",
+    "product/src/ai_ad_editor/html_template_dom.mjs": "sha256:ed68388d4dda1adabc689afa508640de471fe8a6e461bc6aeb5292d904950260",
+    "product/src/ai_ad_editor/inline_sequences.py": "sha256:ee1596121f7e0ea88c7d1f8e27d75132b57dc03522a768a2716f97343a1ed911",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:46a0fe1d902f3928a9773a4e505bc3e92fe5b237bf16377ee6f6a7c230815861",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:7c8582144a9b17e08558f36777c312099e10fee82f18f49589b07f40b61fb9dc",
+    "product/src/ai_ad_editor/local_ctc.py": "sha256:f4e6bef1bf35603a5828f161462570afa9ca04af4364e0032708700ae3141716",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:171617467fc6acc9dbf31d6d80e0c1029c3957ad2671e3c1bc25bc5c4455d75e",
+    "product/src/ai_ad_editor/local_ocr.py": "sha256:cd85a6d7b12ec18b3e024327687c483f1f7cfa0deed2369b968f8ab2bccc14b5",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:5d7e6e9ef4072270b4c0ee526de8fe18391273811928ec036bf05c64c2784544",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:f098a86e8cdee834b222a52b877aa9bfa3ee54fb1fc24d1cafe823ac76ea24d2",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/magnetic_mode.py": "sha256:7b74280ed8df6d94b259548122b44216ca45d6726084504aa6fdd05524f460e1",
+    "product/src/ai_ad_editor/magnetic_reorder.py": "sha256:b3db1863adfa7cb88173a864c127d01ebfa33c2ba46dc21b340ea660db03eef1",
+    "product/src/ai_ad_editor/magnetic_sync.py": "sha256:bd4c59d3045eda011a9cc5e7c8720b9380bc756ee41931867b0f4eb4f22ea939",
+    "product/src/ai_ad_editor/mask_edit.py": "sha256:952aa4c1cc3f49b2b1c9d5dc0c969901d82d4fcbe660387af2f3f7c044d6bb7a",
+    "product/src/ai_ad_editor/mask_edit_geometry.py": "sha256:9bf1d101c1aea8d2265b704fab8dcd65b3bb08c4cc45aed95a4a5cb0ee2ae1f9",
+    "product/src/ai_ad_editor/mask_review.py": "sha256:17de0acd6d76ad9218565302a0f47a577a5001a487bbf0c66432b0b6af278bad",
+    "product/src/ai_ad_editor/mask_tracking.py": "sha256:724f8f9800536d3ffdc99675fadf79e1262532ec7f9a3d879cf94674ba531b8d",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:75755c314fe01111d7ca85138efb6f9b0993e45c14c5a2b65cc1046c5e58cfba",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/nested_freeze.py": "sha256:2294d318840e6285550eaf70109702b041c031c2cde4c8dc0bca3d2bad848a35",
+    "product/src/ai_ad_editor/ocr_cli.py": "sha256:1a818549a1308e78a38a1a5aa9a025772f5be792bacfcdfeacb5599670e0b4ec",
+    "product/src/ai_ad_editor/ocr_geometry.py": "sha256:a2a4aedf4289ab20bea45000c1be898668239b75ef215386120850d2f7dfce5c",
+    "product/src/ai_ad_editor/ocr_worker.py": "sha256:ee5a2096ec1ee03fc09d2ac4d0b06b1791d5bbfe011772f448045d1377b50d3f",
+    "product/src/ai_ad_editor/OPENFILM_EXAMPLES_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_frame_clock.mjs": "sha256:c60b35fb0d26b8629d833f11028757aeccf603917c4c5840f501c01b757de1d5",
+    "product/src/ai_ad_editor/OPENFILM_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_overrides.mjs": "sha256:8fab39a5f4f9696e9070a206f45d9241f54167ea2d9f47c0bcc9975333664832",
+    "product/src/ai_ad_editor/openfilm_stroke.mjs": "sha256:6c20aaff3a85b8a98654d82bfbea34029d78b0366af6b95b17c70abfafd265a1",
+    "product/src/ai_ad_editor/openfilm_subtitle_segments.mjs": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "product/src/ai_ad_editor/openfilm_template_fields.mjs": "sha256:fd4c58532cd3b46e32872e84136b54edef5a8ad9d824f1afa44f9264d81774e3",
+    "product/src/ai_ad_editor/openfilm_text_bounds.mjs": "sha256:94b2ab392b367ef1f901967f9156ac48493419be32bc40b4d6c035cf71a56108",
+    "product/src/ai_ad_editor/PADDLE_OCR_LICENSE.txt": "sha256:3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e",
+    "product/src/ai_ad_editor/PADDLE_OCR_NOTICE.txt": "sha256:392317bb77f62100b038919472ce0c3fecf0d6c6f9c29fc22a18813fb4a15a32",
+    "product/src/ai_ad_editor/PDOOM_VIDEO_LICENSE.txt": "sha256:5fc212466ce7183be5d85a3ee34fea461712842d5cd256b470978a83577083cb",
+    "product/src/ai_ad_editor/policy.py": "sha256:0433efb46d2561fa9f257dd363aeb592df7ef61c60be147196cbaee7fabbacb8",
+    "product/src/ai_ad_editor/project.py": "sha256:dd86c8d1b161cb99660f4bc92ac3ff8c2cc6c10c34f22432fbe6f27af9a7414f",
+    "product/src/ai_ad_editor/quality.py": "sha256:d4e71c9e6616250b681306d562305dafe4cb5867652ab365275277b155e9e047",
+    "product/src/ai_ad_editor/range_edits.py": "sha256:eff604efaa3c2a66b63b3fcb332804ffd9e45a11ab880964b279a379d5500e4e",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:59ab9bac06429d6837c17526e3ff42f19a619b6b5efb2c8de3215fcb3e0359d6",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:b806d815b9a456f0446a0a601ae9bcfdb957418ace18eb472bd1301b76138802",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/retime_edits.py": "sha256:4dcf1ef57db6bd813d2c25887705ba18590207decb07bd17f4622b0c3c14b881",
+    "product/src/ai_ad_editor/retime_transform.py": "sha256:8b00a27cd939264cece21ddf22ca9949a23a43122dc958c0970cd2526c7bdd35",
+    "product/src/ai_ad_editor/rfc3339_dates.py": "sha256:344d79048ff55a77af00314134c20b57b5301b75d1b6a32b4a7a3f52ce749105",
+    "product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt": "sha256:5ba1a4f03626ccca6dcbf53a554545e4f776a335bfdaa233ec3bfe9bb7fac15d",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/schema_contract.py": "sha256:80001bfb410c94c61f2a3c29a5ba37f8ce77eb19aceb5fe078ba7c2ea4994748",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/sequence_canvas.py": "sha256:462542e26058d350c2d0a29d0cf4127c4054cab7462a763811b85bfca171412f",
+    "product/src/ai_ad_editor/sequence_sampling.py": "sha256:1aa171ef6043878afce099f7a04b214b9c458879147c46147062a77d36356ec2",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:ba871f7bff0f186ad55d9e22c5fcd75e09032e8d7299a01c7ea7b76b2e1a21a1",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/source_edits.py": "sha256:a2bea20a8d162ac4fa9f329045bca2b7e214a624adca107df6021919d5a1d36c",
+    "product/src/ai_ad_editor/source_transitions.py": "sha256:59c2652aa76024b78667293ce46774ba6910e4524db7e39f95dc95bd91b0547a",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/speed_curves.py": "sha256:41fbddd764bfa481e6158e8401333113c871e1c38e34257911f9aa676b9bfff9",
+    "product/src/ai_ad_editor/stroke_motion.py": "sha256:ba53f586ff12c75c15803e347307c802d977e874ce792159d74ebb2b6b42ae03",
+    "product/src/ai_ad_editor/subtitle_clock.py": "sha256:49ca2001da0f250d682f5818d95f4f51ee362cbaee979fb9a99649a847cd4645",
+    "product/src/ai_ad_editor/subtitle_segment_worker.mjs": "sha256:66ca5d7fab0926efe15615da29dba3024897cbfbfb1b28e6a6a189697b6d5bdc",
+    "product/src/ai_ad_editor/subtitle_segments.py": "sha256:5590e04147f0b50cb60df3b4e543059a560dbfd684b3085c5f25f8fb04631aea",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_highlight.py": "sha256:d08bee683f0bd00bac363a78df5957475765741a7c53d92ac025575b334f78e5",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/text_paint.py": "sha256:a924644f0396b5204efbb0e085f25d51f6cda5bfc75f2d44febc6796e42cb028",
+    "product/src/ai_ad_editor/text_typing.py": "sha256:6cc022af8300fb4270cb21f2f53ffe2b33210ac203169fed653d11d75e591ec3",
+    "product/src/ai_ad_editor/time_mapping.py": "sha256:89bd69060b3f10af1197018b735621eadb8ce2858b4281972d989fddf79f2ef1",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:78f984613b0c253d108dd4d515557f77bc4ebd4df4945108a63d8fdb38ad202b",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:63d4983cebaec2f4d29537bf44804f4554b6a5c2d8426430432f6632f3bd2b58",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:40d2653fc075c8da472d51f635dac8d820924761608f199633ed3216155de6ef",
+    "product/src/ai_ad_editor/validator.py": "sha256:16fc2ed2956672223b4cc3620a4c6b966e29548bc3e8b49af0a6a1c9c6e0e308",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_alpha_resampling.py": "sha256:db2e2764a5022c18bba23ad407a6bf15a320edfea5f5a8331eda706d7c4046de",
+    "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+    "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+    "product/tests/test_audio_buses.py": "sha256:e4b6020208492cf4907a3537c0542321a7f1600692537b22299700f5b4d9dfdc",
+    "product/tests/test_audio_channel_modes.py": "sha256:815a9ea0117dd7ed0cce3a75d14ed67a4a8a06b413df1836d233f33359290e79",
+    "product/tests/test_audio_routing.py": "sha256:0f2d189488b1559fc571ae401188b6f3c576150c34e59f3a9a23e4b5f4dbadef",
+    "product/tests/test_audio_source_context.py": "sha256:907ccac6cbd290a98a3d4dca99149d765f16a57b5cc00ac3d436a777884327cd",
+    "product/tests/test_audio_stretch.py": "sha256:53dea6b0ec9f8c00861b6a1844d7c34e0c87e432d78a4e4847c7245fd9893ce9",
+    "product/tests/test_audio_tempo_context.py": "sha256:ad3c7c53cfdaecdd00693aa745a22be2455e2dcd446583e4912cd1066b6aac3a",
+    "product/tests/test_audio_unity.py": "sha256:02dcf66038d4fcbc1f0c144e604efa451b9d7925817d1d2b089f8c087aa58810",
+    "product/tests/test_cli.py": "sha256:d80d63059529d69e66ac070a9ffce3d2f9f6559504e2f07710a3a4ce4521d615",
+    "product/tests/test_clip_windows.py": "sha256:42863fb28d81d22a0ac90ff1036ef5359186a29ab730d5404db36fae0660ecb3",
+    "product/tests/test_ctc_alignment.py": "sha256:838a854a442b413cb05be739f47eea86dae36057f12b0567bc820f3f442aec93",
+    "product/tests/test_cuda_admission.py": "sha256:624a6627495db87288902f06e1d95c57cde0a8506a50e42b1577aaf7614b6abb",
+    "product/tests/test_delivery_precision.py": "sha256:5bc05fca5334ca454f3498b0f53cd28c0b44b8f9e9f3336b980b8a8604bbed03",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_effect_automation.py": "sha256:b637ab8b41405147d3299ff72ae6def7f7656d8fe9828137abe534612cbe3753",
+    "product/tests/test_font_coverage.py": "sha256:b382b9449601baf20a6c352c03e055b4f9efcad03b7515b694831376cc5a8234",
+    "product/tests/test_fragments.py": "sha256:d021051b4a5b48deac872e319407c9dae0cb2e7b3c8f1a7ab71704dff756a35f",
+    "product/tests/test_html_motion.py": "sha256:9e382485db151f79059e4d18c13708a6ee3deca38ad5be1272a5b9fb4dc4bc0c",
+    "product/tests/test_html_quality.py": "sha256:1e3d81bf7101b3d97aa89f5f60cebab0a7e64e44845ab60b4872f8d064217aae",
+    "product/tests/test_html_template.py": "sha256:747fb1e13b3bfb60f35012a8ffa18ac10f156f1e2811328792ab29d20e2de29a",
+    "product/tests/test_html_url_parser.py": "sha256:673a8073a536149c6b70366b2911ab6bfb3b395f3e2a14dd425c3d5f57cbcf02",
+    "product/tests/test_linked_edit.py": "sha256:d3b5d8fb402df059ea006d125fbb6fb651c891132fcd78deccfdbe41036d87d7",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_inpainting.py": "sha256:bb228225ab46aa920b2223fa69bcd91c26edd4bbbff84aa24d8f0364a1450d7e",
+    "product/tests/test_local_matting.py": "sha256:ff27635ead27007a9278ce6ec0fdb5f9301af33f1158036ec6a0ef4cc8ec2899",
+    "product/tests/test_local_ocr.py": "sha256:81628df63d391d71a038c48af77b9044976eee623476bdaf7c2a000f31445ec3",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vace.py": "sha256:7755f9bc0539a9c668aa08df8f61eee57d24a902652171cd87c27a7420c10637",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_magnetic_mode.py": "sha256:aa08ddbfa3db68c89b2a2feb757d5bba12dd467b85e7950377eec218714f2897",
+    "product/tests/test_magnetic_reorder.py": "sha256:c4ad34f0ed89c9fe30ca51c188cdf9bfcf982322bd32a6ec6d5d64620c01c2a7",
+    "product/tests/test_mask_edit.py": "sha256:280c825c3a2dc95ac35943209a6eb30e45d519bc5ce1834a6a73c464f90718e1",
+    "product/tests/test_mask_edit_geometry.py": "sha256:7b6367f327d51cbd5b5746b90e89f27768acc7b49b0bb9d7e63cc3d1460bde06",
+    "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+    "product/tests/test_mask_tracking.py": "sha256:f8f2c1d0495410815b91d4f0a507a3a3909d2ca25c44817612970d4330578245",
+    "product/tests/test_nested_frame_coverage.py": "sha256:4bf9aef9aec5c34325f67e2a3e88dbe3424e4ec5c82d8f4e121ec95f7ab8d97f",
+    "product/tests/test_nested_freeze.py": "sha256:03261ace961acfcc5f99f52814a59a2b2bdf88fe3c0def7f48c8c3e897415c9b",
+    "product/tests/test_nested_time_mapping.py": "sha256:64415c49e45c5e7edf8d5f5ee745bbf22d30b6cdd5a0cde7cd731d88d6c6fad4",
+    "product/tests/test_nested_transitions.py": "sha256:9481f1de95ab4c556a17bfdbc1088001ceb29b92bab96d5040c8e6abdeb7881b",
+    "product/tests/test_offline_install.py": "sha256:6497262c7f791c46d706eeddfbaaa41d2d793e109106b93456e88f6786f051fc",
+    "product/tests/test_range_edits.py": "sha256:7634873bff27fbf51e412c82b37efae72cf7f38b20ffd22e1d60fe50359a1f7c",
+    "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+    "product/tests/test_retime_edits.py": "sha256:751c1c1566a6fe934c7427e1f431d40b3d3e417bf0670e2e73ad313d2a1eadde",
+    "product/tests/test_schema_contract.py": "sha256:12d70209363d3b54341118e3f3ab988ebb041464c42eb7fb267c09d801ce483d",
+    "product/tests/test_sequence_canvas.py": "sha256:6f2b622c81932c0dcf80e7b3a528256b5e1a7209ef455b68f2c75a4c9154f4b0",
+    "product/tests/test_sequence_compositing.py": "sha256:1eea9b170c3fabe0623032b4de81a07e085cb7c88b5d79e8380d73399be21b0a",
+    "product/tests/test_sequence_sampling.py": "sha256:c75a6153aee2dbef11e9455a27656d204e46f0ce6061393ea91b6f46f8d7253f",
+    "product/tests/test_source_edits.py": "sha256:b5846137c5de1b1f08e82d43c69a7d95c031cd1c613fdf48613f72361e813614",
+    "product/tests/test_source_transitions.py": "sha256:8813a84843bfbb7aed5b5418011a287c9dae1b8628620114468df716401f2b4a",
+    "product/tests/test_speed_easing.py": "sha256:4797885a66a7e12b327fdf31e0cc937576620353e653c2c762ee905f2d61a5d7",
+    "product/tests/test_stroke_motion.py": "sha256:4ff06a458e6311e4979da31b6be05b5a53c6e09ef3bb6b429c63616368844410",
+    "product/tests/test_subtitle_clock.py": "sha256:1e6696405e30dc4d90e4baadcbffc013d5e6fee5d89bb67e908003c3ebe1de5a",
+    "product/tests/test_subtitle_segments.py": "sha256:aba64ed147276a6b1e59ad845557f86f2b6271db8d0dc75c006db328cac233c2",
+    "product/tests/test_text_animation_composition.py": "sha256:6ce0117f31339d36c574c70a8f2d83235813dc95d91f3108730cb954987c12de",
+    "product/tests/test_text_paint.py": "sha256:99887918ba5813b39a74cef18d02384ed503581e8695821530554590d38e219f",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "product/tests/test_word_highlight.py": "sha256:bf3f56f299d2452e8330bb192d31880c550e277ef93d04c4292fe816b79e172a"
+  },
+  "frozen_equal": true,
+  "doc_links_checked": 1294,
+  "fixed_upstream_links_checked": 24,
+  "documents": [
+    "README.md",
+    "docs/README.md",
+    "docs/构建进度总表_2026-10-16.md",
+    "docs/OpenFilm当前复用决策_2026-10-18.md",
+    "docs/validation/README功能核验与实测演示_2026-10-16.md",
+    "docs/OpenFilm_0.2.1复用清单与成本复核_2026-10-19.md"
+  ],
+  "files": {
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-00.patch": {
+      "sha256": "sha256:63a184a8e9e971b3993f4f1b9e549e5b93f951070eb96753320c3fc816d00d3d",
+      "bytes": 840
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-01.patch": {
+      "sha256": "sha256:5be3845a4df6bf8a483b2a1ac5ca26bf4e725ec36fbea0a2ba5eb1860a5eb25f",
+      "bytes": 3453
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-02.patch": {
+      "sha256": "sha256:2a6c1b6c055ec323b62029901c55cab013bb6fd52f1932543b14c1cf548c73da",
+      "bytes": 1868
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-03.patch": {
+      "sha256": "sha256:a76a7f1d2d944384f5781e0373baef7aeef0eff2bb8de0cb4d0229bcf8af72d7",
+      "bytes": 993
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-04.patch": {
+      "sha256": "sha256:18b4f1060fd6fd9845be73e5d4f9072b608a237889538989602825a4bcfe9cc2",
+      "bytes": 37274
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-05.patch": {
+      "sha256": "sha256:e83168c6069059ef13a16fc764547cda5dfc50f0cb754800b18f4f0e52c99f5b",
+      "bytes": 16685
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-06.patch": {
+      "sha256": "sha256:057e5b63e35fc6ed06ae92474fdb1fe44c66d7e268651be107c45713ec12188c",
+      "bytes": 1924
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-07.patch": {
+      "sha256": "sha256:63f0a8c36d83b0c6ada4ebfc086e46447b99b22a6e8d886bd21a47c644cd08b1",
+      "bytes": 446
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-08.patch": {
+      "sha256": "sha256:fbdbbda8b61869f2c0498984287953a208e96ae3b690169cb0bf012b8c36f0c7",
+      "bytes": 9156
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-09.patch": {
+      "sha256": "sha256:56f2da9c77d7f550f81fbaac0d9b449895f68e502e41ddee938c4cbcf8121b2b",
+      "bytes": 5358
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-10.patch": {
+      "sha256": "sha256:027a83a9bb72ba91d9c124c7310c9083e976199d64e94af4b1dbdd678adf51d9",
+      "bytes": 1570
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-100.patch": {
+      "sha256": "sha256:43950628bed7f1af8d0051dc3de481498ffc073adc99e46146303195bb182362",
+      "bytes": 8843
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-101.patch": {
+      "sha256": "sha256:40490af5139cd5dc1b0fa3ef7b3c2b9354c33a5ffea64104c3d9c7bf9e62c8a8",
+      "bytes": 775
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-102.patch": {
+      "sha256": "sha256:80a88ae197d592457a68e9157d870256bfb9a744cd6616d83e621cc228fcdeca",
+      "bytes": 1947
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-103.patch": {
+      "sha256": "sha256:6b799846c181fcd69049dae0f2ee9bac6f9a561a8920164322dca60ba7e7c498",
+      "bytes": 7482
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-104.patch": {
+      "sha256": "sha256:85016027eaf68fd5c89e091d32c937bac533917dacd0858ca81703d1a55f44bf",
+      "bytes": 9143
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-105.patch": {
+      "sha256": "sha256:2b8ad4da5a2ebb26291fe9dc5edcd537f6fe14fdebea7322231fb44e1192fe77",
+      "bytes": 94819
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-106.patch": {
+      "sha256": "sha256:70ebf59867be68dc19608b497036b9964b98de9003e4239835985ee8a328fdfe",
+      "bytes": 1654
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-107.patch": {
+      "sha256": "sha256:3b223dcbd0142c7750782ad3ce45497d83e52396a45d732cbe616969d5429e94",
+      "bytes": 1520
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-108.patch": {
+      "sha256": "sha256:2a844a2082e68ecec0993b09114bf8fc5614f9a68fe995cfdfe808422d087f7f",
+      "bytes": 2643
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-109.patch": {
+      "sha256": "sha256:44437c6d0b31f3250c30b4d81f10ae022bfc1d7d1942056658912c6bfa87b4cb",
+      "bytes": 5641
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-11.patch": {
+      "sha256": "sha256:81ec3819eba9f4e02746770b80147fb3707c6f433305c5ee5615c6e8c9763d3b",
+      "bytes": 530
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-110.patch": {
+      "sha256": "sha256:ec07cc976851e19ed1b401c266edc331a485c49769d4394bc0c16c1328ab927e",
+      "bytes": 995
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-111.patch": {
+      "sha256": "sha256:09899ef9f9cc94694039606cb07467da5d93b7c813917a2db145c18aa751404c",
+      "bytes": 6796
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-112.patch": {
+      "sha256": "sha256:38396365fa0ac8e3928c3027a9973935c7ba2d86ded030edf4bb566023e809c7",
+      "bytes": 6786
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-113.patch": {
+      "sha256": "sha256:4cbcddc3f3077489e160f801dac8ae0c2bfaf297b01c4904209413e132b65de0",
+      "bytes": 662
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-114.patch": {
+      "sha256": "sha256:78dcbe5ff49d595f8f2c7ac4ba1c789f05edcbc20c912585262ae4caff070b0f",
+      "bytes": 2502
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-115.patch": {
+      "sha256": "sha256:6bc7f651bdfeff307695e1b562f7b556afa2d64975e082827ec8a0395c76ef09",
+      "bytes": 19311
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-116.patch": {
+      "sha256": "sha256:cf88e1fe968c1ad22953ebd4c76f91cdca11bfd0ee11c96ec46f678fdac24aa0",
+      "bytes": 13756
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-117.patch": {
+      "sha256": "sha256:bd45ba8f9b5082af4495ffad52c6a070e9a0c0c122b9e0c33921b47acc504007",
+      "bytes": 2498
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-118.patch": {
+      "sha256": "sha256:5e545141364daaa7d63908d32d114666fdba95f5f0177c7e09a202b3e995d693",
+      "bytes": 20073
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-119.patch": {
+      "sha256": "sha256:4b4013087be2b1fc08fc13d95c50c39ad20cb01acdc70ccd35834dfb7cd27b1f",
+      "bytes": 1288
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-12.patch": {
+      "sha256": "sha256:a9579236f0cda928560806c9bf221ef740c885e356bb715f7ea912c499849574",
+      "bytes": 1299
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-120.patch": {
+      "sha256": "sha256:ada8733061606968c1b6563d16bcf2fc35be513e30e8f9eff382d1697e24f5fc",
+      "bytes": 797
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-121.patch": {
+      "sha256": "sha256:466f820d938e3dc9c43d3dd63b4abf7f21c9a19c0a46fd22071eaf947fc3b116",
+      "bytes": 904
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-122.patch": {
+      "sha256": "sha256:b101f3d0c3d89cfc00254166d9a4d67af5019f6a0142ff31ef2306218ae5a7a5",
+      "bytes": 12252
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-123.patch": {
+      "sha256": "sha256:8c6916273f5081901960bfd7c9c764f1500d985d03ab8f8e262efdd1c827a4d2",
+      "bytes": 13311
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-124.patch": {
+      "sha256": "sha256:cdce4a0965cd6653571497757e81aff117b0248739b0502e9713ff4c720b30f2",
+      "bytes": 16981
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-125.patch": {
+      "sha256": "sha256:ac3dcbb0f6c4748e4c7adee4b981aa123e1f1db10837dd81666f4b3bad718d8e",
+      "bytes": 14671
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-126.patch": {
+      "sha256": "sha256:c21ffb9cdc714103b9c5acfdf89ec1511474776334f29828ce1cb32ce64c27f3",
+      "bytes": 11405
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-127.patch": {
+      "sha256": "sha256:77b8210be4e112106884a6fab02277ae7832c3ae17c389813ab33369968bf74c",
+      "bytes": 2317
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-128.patch": {
+      "sha256": "sha256:8e8320a22aec076a66f3c6e678c519e13e525d9a3ee913a3aea092fab1df91f5",
+      "bytes": 2901
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-129.patch": {
+      "sha256": "sha256:affd9a8ce5906ae0a4fbe74457b19a35661e96e998f7c920adc1a3714766f63a",
+      "bytes": 643
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-13.patch": {
+      "sha256": "sha256:3048428264782b63e3d11acf47ea97bafe9be67f49625e8c165fb0a082cf59f2",
+      "bytes": 1367
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-130.patch": {
+      "sha256": "sha256:53699876d3aabcaae54ce0b475e815433fe3d13fd1c41d7fe04b420245dcab36",
+      "bytes": 1756
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-131.patch": {
+      "sha256": "sha256:9b52e7d65b20625f9e0e0f436b86d2830ea4abf24b5deaa917a95253496d21fa",
+      "bytes": 628
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-132.patch": {
+      "sha256": "sha256:58489df717f11e6a8b0c963fd9486ef69004d2684c06924298151ddb536413c3",
+      "bytes": 842
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-133.patch": {
+      "sha256": "sha256:96207b38dc3f315fce4b6878c6bc10fd50925b0996f6c66b49e998bd58eb4870",
+      "bytes": 2265
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-134.patch": {
+      "sha256": "sha256:fa2776418c26969678f42c12996eaeb210837acc20989bf1ebd3d30a0a98fc58",
+      "bytes": 969
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-135.patch": {
+      "sha256": "sha256:f901fd72aa57fafd6dde1a46efc7f034a5d99ed96fef6522f0df5c4ca64700e3",
+      "bytes": 710
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-136.patch": {
+      "sha256": "sha256:d2fbbe7345a8424fe44c1869b4ce4f2af2e9f951c19c7284e66c08e57d83f12c",
+      "bytes": 1406
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-137.patch": {
+      "sha256": "sha256:68e175c1082d1da6fe21a9807640bc12a6b262fb8a2e7b240146aca3c5124ea9",
+      "bytes": 1261
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-138.patch": {
+      "sha256": "sha256:c7ca260a4877adef87603f557a2ed2c5c0bf64063e727959e803141fcbf2f108",
+      "bytes": 695
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-139.patch": {
+      "sha256": "sha256:f9352806740fe93104b1a38f9f94a28c8f81222f2b75e3bc7a4f2a99da8ad3fe",
+      "bytes": 1071
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-14.patch": {
+      "sha256": "sha256:67985be60b47813c57da26a605fc676593956ae03acbfb4cb233b36edde599b0",
+      "bytes": 1635
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-140.patch": {
+      "sha256": "sha256:a9f447db2813afe279fe11f96fa580d3860841af868e1816865b5d61579481cd",
+      "bytes": 580
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-141.patch": {
+      "sha256": "sha256:b4b1ab1b8b22a92d6919d1f115e5751c275d49b03c6558f03e1eb4e330d9014d",
+      "bytes": 1023
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-142.patch": {
+      "sha256": "sha256:2cfc98afe38b9879f9b7296c5b760543baad18e2e55a00f5edf401c8ec74691f",
+      "bytes": 1926
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-143.patch": {
+      "sha256": "sha256:b9fe2ac064a28279a82beb3100624ad5bba1e9f0646c99aebb1865e61e528505",
+      "bytes": 2510
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-144.patch": {
+      "sha256": "sha256:9cca66e87884faade994cf91465628a1f208f889a66e5879ca28f8df5e86da44",
+      "bytes": 2139
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-145.patch": {
+      "sha256": "sha256:efcb7cc05b4f697ce6744530abbf39b625a89c41053254d7ed17164ac1eb65d8",
+      "bytes": 522
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-146.patch": {
+      "sha256": "sha256:74ccc47e2d7af8293e878eb652a34c884e4bbe2fd5fe0045d24a4db87927804e",
+      "bytes": 4276
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-147.patch": {
+      "sha256": "sha256:90a4230cc7570bc2824755b5ad301b104e0e5e26b425987948b86861316dcb90",
+      "bytes": 5953
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-148.patch": {
+      "sha256": "sha256:063f45ad4e00c452000592feaa0f96d5d53cea64d8627c69700bb8ec300cdbf9",
+      "bytes": 466
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-149.patch": {
+      "sha256": "sha256:20f6e087da43d51eac116ab9ff4faf385b3a4726e86a5acc2d718ec05917a2c6",
+      "bytes": 724
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-15.patch": {
+      "sha256": "sha256:207c8c313c4ab0735298fc3d9de036fccccd8d425b716680b74cc4a54540b5a2",
+      "bytes": 1478
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-150.patch": {
+      "sha256": "sha256:2a8fabd475351db64c8634546374ef2d33b235b399268a19096f8b951b3a80fe",
+      "bytes": 600
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-151.patch": {
+      "sha256": "sha256:bd822c74b391dd9f9ebedbd8a033338ed151b34aa3afd15758ff7e4f53a249e5",
+      "bytes": 1167
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-152.patch": {
+      "sha256": "sha256:5272013681fb95a8659db37f9f3c4aa1a4d721c931230783096d00ab6a7a6815",
+      "bytes": 572
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-153.patch": {
+      "sha256": "sha256:1daa21731e77ce585b08621e7d5375d8c4961da56e43e6e4ddc42d6a9335c978",
+      "bytes": 574
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-154.patch": {
+      "sha256": "sha256:a4b0bba4a8eeb1c1a139bb494a55568ca87aadf8c05a70c40f06e0f93bc79312",
+      "bytes": 405
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-155.patch": {
+      "sha256": "sha256:6ba3636a77ed784e85c8084df898cf5d4f48fa5e3ea6fe71511d03c2c3695def",
+      "bytes": 1286
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-156.patch": {
+      "sha256": "sha256:ed915209649b2375491f1ab50fcda504f982c6898ef3c85ce607e5c5c7ec47da",
+      "bytes": 20479
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-157.patch": {
+      "sha256": "sha256:1cc096741562574ef8c0a7835128948fbf0d78645522471d66a52c363677aa40",
+      "bytes": 21754
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-158.patch": {
+      "sha256": "sha256:6e3b66ce93ea0d1349d5204ab2c11341fe364c4b5f1f7b8c479a793e5eb7b22b",
+      "bytes": 1975
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-159.patch": {
+      "sha256": "sha256:159152af3f858e1397716847b44b0415a17cb160d7fdd8d33bb0d4e1708d12f7",
+      "bytes": 5085
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-16.patch": {
+      "sha256": "sha256:bef697010abde5224bf5996fee4b51ecd267c10630658a70be684aef5e566233",
+      "bytes": 1284
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-160.patch": {
+      "sha256": "sha256:06eb5ee9444d39eb79a3c19a127555d4eb4473cd011340f3748af848fdabbb1f",
+      "bytes": 44994
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-161.patch": {
+      "sha256": "sha256:a22bde07e5d1e8c8f49a2480914e8930ea7eebe102c5e2cdfaae4ae4b4148d72",
+      "bytes": 50593
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-162.patch": {
+      "sha256": "sha256:aca1ea5827e66cd8039204e02356b625e32cd3ef2903e3c0388492e76a8a687a",
+      "bytes": 2522
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-163.patch": {
+      "sha256": "sha256:0c297759c6d4f8b1cf375529f9e0a1a923dc00aeb8240a45ab236dc5a3068f9f",
+      "bytes": 4594
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-164.patch": {
+      "sha256": "sha256:c6e1c872a828df8dbe1d8aad7c93d7a20235c35fcf8fe67b263315b05d399cd6",
+      "bytes": 618
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-165.patch": {
+      "sha256": "sha256:a50a9c15915d8bb8f14b2a3fdf37f78bb0dd25e9e1c568af32729d04f4af559c",
+      "bytes": 2202
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-166.patch": {
+      "sha256": "sha256:0c454ed2681bf2c071bd25db147db6c046a57492f75f674f43d007846849e0ca",
+      "bytes": 5416
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-167.patch": {
+      "sha256": "sha256:f246e8d62d861aad3f6018639d3fb6c7c87a5bfcae378b0597dc9b56fb4fddff",
+      "bytes": 4508
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-168.patch": {
+      "sha256": "sha256:ed1924d2357c20d2eb42280578edc75cebf1b79a08f47c9a01742333346e1dd8",
+      "bytes": 4534
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-169.patch": {
+      "sha256": "sha256:3d2da03a59d51c6da0cde985dffc434eef4076a263bee54728ecb0909fce4f52",
+      "bytes": 497
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-17.patch": {
+      "sha256": "sha256:fa98e888eece801e6a864a7b10bc77cd2e0ed1032e6bf3c1ee95351e7e9b15a4",
+      "bytes": 11972
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-170.patch": {
+      "sha256": "sha256:df1049096e1f4907f9fd73600fbbc5e00183855ea603320a294979cd5c926e5f",
+      "bytes": 2271
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-171.patch": {
+      "sha256": "sha256:f3c5dd488062eef7d1e7b0b65ffd55d22dfd1d71aea3c8ab92c040f30dbe6296",
+      "bytes": 5481
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-172.patch": {
+      "sha256": "sha256:b269097e465b928ceffd24182a4c18c855aa0702c2ba5a172e718d7811eb4b44",
+      "bytes": 1266
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-173.patch": {
+      "sha256": "sha256:40c1110d71897fb656485a46dd3bebeb8bc316f059cfab93224597d71aa92112",
+      "bytes": 6709
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-174.patch": {
+      "sha256": "sha256:f8844be3bca4e03c3e31fccf44b81f2bd39fe602ba3b6ccf6c9751c2cc72062b",
+      "bytes": 868
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-175.patch": {
+      "sha256": "sha256:4791de38c16076324dc3ebccc7608ef0f068917f343e06df196356665f703d32",
+      "bytes": 139
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-176.patch": {
+      "sha256": "sha256:b31c92551886efdd309d196883e9467ccc714d827d0b6fb63060e69efdbd5131",
+      "bytes": 235
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-177.patch": {
+      "sha256": "sha256:a3365d113df20346b9192f3687592d454668bcc59e2368642558838dd4912a80",
+      "bytes": 1177
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-178.patch": {
+      "sha256": "sha256:f5ce7d6398d20ca39b417ab02000657e12ddb161a3dc09b8389dbee8100ab094",
+      "bytes": 570
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-18.patch": {
+      "sha256": "sha256:70c4a1b7033fbf9b617f3718b9f567472b7fae377d107c24297ecb43365b1b9b",
+      "bytes": 1609
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-19.patch": {
+      "sha256": "sha256:51c67be31fc9da2f3623f14181db4fd431c171df582bdc1e291bafaf2729bddd",
+      "bytes": 540
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-20.patch": {
+      "sha256": "sha256:10d1d0feb090270b18524c7bd14c6f417153711edd9a5f61145c393f35d3bfa6",
+      "bytes": 807
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-21.patch": {
+      "sha256": "sha256:d07a99944c575b44e53d87fcc23656b5e5e297a8e51064503a83c1811d4ce5da",
+      "bytes": 2199
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-22.patch": {
+      "sha256": "sha256:f2fd767c2478e69f05231d35e66e5af9f226ae992ba9e3179269a67944276840",
+      "bytes": 708
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-23.patch": {
+      "sha256": "sha256:2de5672001b0b106e4ae4012c7b00e2fdca5df89fc346c130bf0daebe1116e9c",
+      "bytes": 239
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-24.patch": {
+      "sha256": "sha256:8511a3720ce57f4e882253ba101521bccad381e4d68d0a410ff003cea38cd72d",
+      "bytes": 2272
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-25.patch": {
+      "sha256": "sha256:880241102e2d7d53a3a39c31ac164a06b1537312fa08f98212e94a9823fe5e44",
+      "bytes": 2921
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-26.patch": {
+      "sha256": "sha256:2f6d218ac7f61f9a7a0573cd4aeda8a6e8cbc3e7902eb1995f9cb206020d506d",
+      "bytes": 1786
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-27.patch": {
+      "sha256": "sha256:323c2ba87a636b608fb344b5d94c33832dbfbb16926ac0053106aa6c178da57a",
+      "bytes": 4885
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-28.patch": {
+      "sha256": "sha256:a2e5eceb7e245f9b7f40d736c026c8632bcaebf33aef1a3e011c4bbe4f2dbf9b",
+      "bytes": 1912
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-29.patch": {
+      "sha256": "sha256:15b7114651092fc822dc86bd3a190ee7104a97b273d520d6dffa69dd95f319c3",
+      "bytes": 38864
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-30.patch": {
+      "sha256": "sha256:372b01f9c09868eeeb522f297c63c03c916f211a7d9f527f8ac4d7b662179f59",
+      "bytes": 18582
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-31.patch": {
+      "sha256": "sha256:4c462316c65136199a9af33fdc9de98f9882d7f3cb761da6d758e3b56f88d4c8",
+      "bytes": 2504
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-32.patch": {
+      "sha256": "sha256:b910971d6b885c8315c70bc0b71e2b7acd8545391f95faa249b9623024a03bfd",
+      "bytes": 3667
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-33.patch": {
+      "sha256": "sha256:d6b2daed0807f7ca9bbb736b064b831be3a6e9217a1993fd3117a88b5e00c514",
+      "bytes": 3087
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-34.patch": {
+      "sha256": "sha256:355a63ec3528caf730a1c38355278a305ace3dbb894f622e2714550055efbbb0",
+      "bytes": 436
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-35.patch": {
+      "sha256": "sha256:51881495bb1613dad480be212358d62a1bcf9dc8c0ee45d578cfc184df2922b5",
+      "bytes": 3259
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-36.patch": {
+      "sha256": "sha256:163d2bf5c97904d5e12fe698ba92296950043c47ab939b035fa8bb350b684062",
+      "bytes": 1128
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-37.patch": {
+      "sha256": "sha256:0dc0a53f2865bc729097ca1777636c4c2fee43723272d4030fa1317bb3c2b81c",
+      "bytes": 9438
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-38.patch": {
+      "sha256": "sha256:bf6de7c54f4b6da6912cb1aeb47184651808cbea0c5bbd0da846b2c03ed78c76",
+      "bytes": 10777
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-39.patch": {
+      "sha256": "sha256:ec4be269939433c9d0cab2d7227cea9e89338228b1fc920343d0011f9573850d",
+      "bytes": 3514
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-40.patch": {
+      "sha256": "sha256:e8542d68111d7480035859fb71e859550f4746a577d6120585e340a58ab63189",
+      "bytes": 1105
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-41.patch": {
+      "sha256": "sha256:2570fec001c42df2b0c32406326fc40aa9eafc449f605c2cd5a31a1519d7d864",
+      "bytes": 60925
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-42.patch": {
+      "sha256": "sha256:207f7c4350df5717b67c4b9ae3b63e189d7bf103a9a5b83585969c1a866834ca",
+      "bytes": 572
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-43.patch": {
+      "sha256": "sha256:5273e3245b1e530724cd596f5f6698d70c73c91f715949193375fa09b663db50",
+      "bytes": 2979
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-44.patch": {
+      "sha256": "sha256:40b6f2cb5dfd89954ba5ab486a1bfc68fc59ddad20177cdb565bddc25f0c01d8",
+      "bytes": 728
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-45.patch": {
+      "sha256": "sha256:3c55d7830317488e4bd969b58c61052928b739b3334ea0838adfb644e8c45223",
+      "bytes": 5206
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-46.patch": {
+      "sha256": "sha256:71554235d8bc5f4941739b32f67753f37a682b8459203c0455fe047c56cba91f",
+      "bytes": 593
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-47.patch": {
+      "sha256": "sha256:50b2e31c0930b8a6c7471fe95fcd5e70e8f798cbff9c813e1685acbebabd5e6a",
+      "bytes": 3305
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-48.patch": {
+      "sha256": "sha256:ec2b35df86f9acab6d066bd87c9b8bf2af38f4b7a1c9e0d020aba51f32ccccf5",
+      "bytes": 2848
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-49.patch": {
+      "sha256": "sha256:8353283b667515c5c9d7fdb76a919c46fedcd72363554b3dc9d12958636ac196",
+      "bytes": 962
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-50.patch": {
+      "sha256": "sha256:eeaea3c921f1ec6c506b1f670bf9d99cc5a5525349c53f5ba323d57ef7c60d03",
+      "bytes": 6546
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-51.patch": {
+      "sha256": "sha256:d61860a7f97f4e05cfbff05953547b223b0f000110db55723238bc8d54881e57",
+      "bytes": 2804
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-52.patch": {
+      "sha256": "sha256:0210812f7cc362ca68511605a4b2b60bbf26ece5e95cbc1e0064cea0008b2e07",
+      "bytes": 841
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-53.patch": {
+      "sha256": "sha256:dcac5acb5e3ab9b3b7469defe7f1be5091dcb8f5c3d5379d35b227df94bb2c47",
+      "bytes": 11981
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-54.patch": {
+      "sha256": "sha256:8fd5c91de198b3ba4534b0ddeb9382631a1bb100be1bde028b9954cd76ec1127",
+      "bytes": 5991
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-55.patch": {
+      "sha256": "sha256:96e9bf5ec3927cbdcccd8e554f4d4dddee123b79266dc2d451aeb749dab380f7",
+      "bytes": 13051
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-56.patch": {
+      "sha256": "sha256:307ea872db7d011f4b68e960d986d071bacdb9e09861852b1884567ed0175edd",
+      "bytes": 6059
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-57.patch": {
+      "sha256": "sha256:c284c3c4967c896b4b413c8d33a6e157959a21e0151f288d68424cbd864adc91",
+      "bytes": 819
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-58.patch": {
+      "sha256": "sha256:d49fdcf2d8acf50c680c723b6d802b59fdd35adfd90f060ff29314fd731132d5",
+      "bytes": 2423
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-59.patch": {
+      "sha256": "sha256:aa881937a3ee27d74dc4bc0ca12528f198e2028959f6e049742bd72e359cfdeb",
+      "bytes": 25367
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-60.patch": {
+      "sha256": "sha256:9b728d85591a7e1c29a6d301c37fc6d3bf57408cc0ddfd9b74c54288cc1b650d",
+      "bytes": 11722
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-61.patch": {
+      "sha256": "sha256:56193321155312bfdab03b8aa5604834c1818358cb1cb069efaffa8414664a16",
+      "bytes": 465
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-62.patch": {
+      "sha256": "sha256:f9451053f5f44c82f6e364411bb3398cd85e581cf11612c0893cf538b9b8203a",
+      "bytes": 10406
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-63.patch": {
+      "sha256": "sha256:c7e761c3111729210030b2a087174fea5caf85680aaf2eff287c30c29c5d4b44",
+      "bytes": 8348
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-64.patch": {
+      "sha256": "sha256:119c094a77e1120e793aa703312f5d288f14d5e55f1a296343c709c34b6a2f54",
+      "bytes": 1523
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-65.patch": {
+      "sha256": "sha256:fff037bf0680a7f8aa9830a8409ce9fa8e8a6afc3c86d2982b67ad3692b399d5",
+      "bytes": 1530
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-66.patch": {
+      "sha256": "sha256:bc2dfa1d00b7222c520a387ff46e7c73fd65bc34161fadfa60469602b6cf9ff8",
+      "bytes": 23772
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-67.patch": {
+      "sha256": "sha256:559fb1b5eb3e5bbbd928dfe470f8e10f3da735802e84e327af686b0109380a69",
+      "bytes": 6087
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-68.patch": {
+      "sha256": "sha256:6882cd0410eb40e9473d913f3b882d8f665fcd99c360a89c87b4a5c01bda4e94",
+      "bytes": 1134
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-69.patch": {
+      "sha256": "sha256:19ab3f903bbe83755f39b9a9b34948688394a47a9e2485877704ebbe52eb28f5",
+      "bytes": 1464
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-70.patch": {
+      "sha256": "sha256:8afcd9e952962a9402d33db549e613ecf5be3db82e62af912565daf5e41d7638",
+      "bytes": 3262
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-71.patch": {
+      "sha256": "sha256:fc846957767832a96417f104fd235491d0470aa9001436e329ea3524a313360c",
+      "bytes": 1811
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-72.patch": {
+      "sha256": "sha256:36aa62a75b5ad33dd34f1fbba5b8c79163a0c0001501caa8a4444af6d0d659df",
+      "bytes": 3464
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-73.patch": {
+      "sha256": "sha256:1c5a62467db6e8a6cd30868a189325dde13546a512ceb37dfd62c9f11ce4773e",
+      "bytes": 2831
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-74.patch": {
+      "sha256": "sha256:442e3c8cc8e27141df89bcf369c7689aa06012987b9e86c0c784490a8992a354",
+      "bytes": 7220
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-75.patch": {
+      "sha256": "sha256:7124426b42e03f05b419c7b76478e4ec9583e578c1a88067f598071ace6e701a",
+      "bytes": 6264
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-76.patch": {
+      "sha256": "sha256:2ea6000a2e709b1734f9f25769fc1c47a4c71dd860f825429bbeb1f80521e921",
+      "bytes": 4824
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-77.patch": {
+      "sha256": "sha256:e656e18a4cc82b2f9847a484de1234187a011136e6e10a8bb5417494e7e108f8",
+      "bytes": 10469
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-78.patch": {
+      "sha256": "sha256:2278021f46b9e70f826047e15f86e5fd25004f98886281c4293d0b30d7c46972",
+      "bytes": 2815
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-79.patch": {
+      "sha256": "sha256:e0ebce655e935d38a78f8ba6f9f0cf7814817991cd4a734adf607315d8a3ccb7",
+      "bytes": 2686
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-80.patch": {
+      "sha256": "sha256:463a3d313f109f90d8da5d75ef6be3b0b0ce422b2f58138358e9c006ddd6954b",
+      "bytes": 962
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-81.patch": {
+      "sha256": "sha256:a4bffc3469c77dfee4780975e344eb88ab2f7cced51038b9e16921260ba1ab49",
+      "bytes": 6701
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-82.patch": {
+      "sha256": "sha256:7b9623df3c7b556dc6c47b312f145f2633b222738a73abc8138c7fa3f0f956bd",
+      "bytes": 560
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-83.patch": {
+      "sha256": "sha256:b66f94feeefb31f55255387aaa1e6b6882e58db4ea07122bd09c864eb046aaaf",
+      "bytes": 5052
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-84.patch": {
+      "sha256": "sha256:59d6511ad8b9b6e7a701c32dd13e226b7506ee85f68f357fbcbdc6d3e2af0747",
+      "bytes": 540
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-85.patch": {
+      "sha256": "sha256:5d4904460f91aa6e087956db2d2785745a033c5628724f19927a235968232848",
+      "bytes": 1527
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-86.patch": {
+      "sha256": "sha256:02fa37ee2e0d1ad0d44e0548482696d65077cb5d0237c996f11eb94481b0f9ce",
+      "bytes": 5005
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-87.patch": {
+      "sha256": "sha256:563c8da89721e001cf19bbe8f43472a32c010cb567a22bf4a13311e6b1d85159",
+      "bytes": 12636
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-88.patch": {
+      "sha256": "sha256:92a7e7b6f777039d8395080832ccff6009039647e3e702d5ed44f139b2aa712f",
+      "bytes": 495
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-89.patch": {
+      "sha256": "sha256:3521f101a8c7fb122e45e1c41d9419bf2251e05779940596545e0a2963400bca",
+      "bytes": 1106
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-90.patch": {
+      "sha256": "sha256:a2ad21b71099753e55e32fc623f4650131cf65323666056534bec7cbf25531ff",
+      "bytes": 1726
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-91.patch": {
+      "sha256": "sha256:4a9c41cde118446cc0eae8119229ad70758698b382f09a8be465be035f8063fe",
+      "bytes": 4629
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-92.patch": {
+      "sha256": "sha256:c3561a1b4213f79c426992c66c05431782d8d504e9f5ae7aec337f9d1de38354",
+      "bytes": 2321
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-93.patch": {
+      "sha256": "sha256:eb19229179f5b397cc867e5f75803b1ca3eaff583844ef60f31f62cd600c8ae8",
+      "bytes": 796
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-94.patch": {
+      "sha256": "sha256:979151edde0a732cbee6296fcea3e7acecb4be255f5face19abbf788b5546b76",
+      "bytes": 1356
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-95.patch": {
+      "sha256": "sha256:cd679965b987caa2cc98b5d0bf8093b855f79a3f6bf773b4dee4b4e7ec837459",
+      "bytes": 611
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-96.patch": {
+      "sha256": "sha256:5e8fde1fe1cefca1ac9ab5e0922fdd44a22b7f61530e0444111b4f38c4819901",
+      "bytes": 2948
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-97.patch": {
+      "sha256": "sha256:2b504269d5d2161ddd48c89d84fc3e2c390c3a0d9405f4be41aa4b7b564cbeb7",
+      "bytes": 40450
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-98.patch": {
+      "sha256": "sha256:9d0a1c24887088b8e00c07c106eb5615e6ed16680e4b268d63cb4220f4a60818",
+      "bytes": 4947
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/change-99.patch": {
+      "sha256": "sha256:b6d88a56e21d2ba6fbbd259c81f8b2acf57baa2a74cfdcbeb0eeafd947a02c57",
+      "bytes": 1949
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/commit.json": {
+      "sha256": "sha256:4b6ba089203187e1fea60fc30a3fb83b08e8b7fb9aeaac2427d1f87fa24ba12f",
+      "bytes": 170167
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/repository.json": {
+      "sha256": "sha256:f22e303cf078edc586df4cbf80ca2c320a5b2c8b054d76f86ccd914ee42c0865",
+      "bytes": 6326
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/requests.json": {
+      "sha256": "sha256:4fee3380a858f38d5cd2bd32d027feef68df9ae78dc15b44615dcd89e06a71e2",
+      "bytes": 816
+    },
+    "docs/validation/evidence/openfilm-refresh-20261019-r07/verification.json": {
+      "sha256": "sha256:5f41e9274a4ca1c31800d7c8dfbdf0166b861646bf89f3ea7188b0a235d82c97",
+      "bytes": 218342
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r3/executed-generator.py": {
+      "sha256": "sha256:cbea4630d7b3ef3d0bca941852f99c57e61c2046c8180778c0c994ba1be92adf",
+      "bytes": 13792
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r3/fixtures.json": {
+      "sha256": "sha256:d22283fd829df4a0332632deba878bbe9d75b0db0dacca5bb90158bf47bd7e8a",
+      "bytes": 1169
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r3/fixtures.stderr.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r3/fixtures.stdout.log": {
+      "sha256": "sha256:39c45efc7dc7db5f984f24d8f7a65bb2c3eed29b9c6bf1ee601ed2be688b2958",
+      "bytes": 995
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r3/no-runtime-io.mjs": {
+      "sha256": "sha256:5933d3fccf67f8bf6b52aebb741be8c1e60252ed83d8a18a12a1dca917f1404f",
+      "bytes": 923
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r3/pure-fixtures.mjs": {
+      "sha256": "sha256:5353d0bf46eb3b8c16a8afc68160919bb9beadc293081d396646ed29071ce215",
+      "bytes": 5675
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r3/upstream-selected.stderr.log": {
+      "sha256": "sha256:d6f69356177d727370bc5f178625960d25e31eb20dcae3c2b02e40a6854c1b5d",
+      "bytes": 274
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r3/upstream-selected.stdout.log": {
+      "sha256": "sha256:89af7d9d6fcf14dbdab8a632e35c26713b7175d2e625f17344b2359f40c0289b",
+      "bytes": 16208
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r3/verification.json": {
+      "sha256": "sha256:f2f6ee14305521662c77cb3118048b7839bcf1e2e745fece3a89fec8104a6f0f",
+      "bytes": 246557
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07/executed-generator.py": {
+      "sha256": "sha256:0b0205a503ab9a8c606b787d812e80e050cdaaff901e3dab2dfcac9f8f4bb20e",
+      "bytes": 13715
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07/no-runtime-io.mjs": {
+      "sha256": "sha256:5933d3fccf67f8bf6b52aebb741be8c1e60252ed83d8a18a12a1dca917f1404f",
+      "bytes": 923
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07/pure-fixtures.mjs": {
+      "sha256": "sha256:6fca6f2b20b5a604359a5941261260373d057b5c3c924573076e25c22e9597bf",
+      "bytes": 5592
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07/upstream-selected.stderr.log": {
+      "sha256": "sha256:c2219753420baca74f23708eee19b352fe178de8cad43ad62327c4c79364f28a",
+      "bytes": 941
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07/upstream-selected.stdout.log": {
+      "sha256": "sha256:7cb03ab03edf5190a8aa546c78285344395fad3d42d4011cd224f934aef96b3f",
+      "bytes": 15
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07/verification.json": {
+      "sha256": "sha256:2a843c52ee5901cc435b7828d1c42dc778f307c77d6841369923751cb7d6fea2",
+      "bytes": 244020
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r2/executed-generator.py": {
+      "sha256": "sha256:383a6a94d3c157a83da38326b735f6b29ac08f6d338d7dc3ef0ed96c223854df",
+      "bytes": 13709
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r2/fixtures.stderr.log": {
+      "sha256": "sha256:55e0f06d6892d90a71e61b59c19c57d843743e378aaf6c1e26df18d64abe643f",
+      "bytes": 766
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r2/fixtures.stdout.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r2/no-runtime-io.mjs": {
+      "sha256": "sha256:5933d3fccf67f8bf6b52aebb741be8c1e60252ed83d8a18a12a1dca917f1404f",
+      "bytes": 923
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r2/pure-fixtures.mjs": {
+      "sha256": "sha256:6fca6f2b20b5a604359a5941261260373d057b5c3c924573076e25c22e9597bf",
+      "bytes": 5592
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r2/upstream-selected.stderr.log": {
+      "sha256": "sha256:fdcb7ad063ecfa720b99d2e424e8403b2da04afb748fd46d444f8ed788c12523",
+      "bytes": 274
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r2/upstream-selected.stdout.log": {
+      "sha256": "sha256:c900899be82fc2cdada203356fcc27455bc0f8254b390fde2f9f84f2e6241c5d",
+      "bytes": 16209
+    },
+    "docs/validation/evidence/openfilm-reuse-20261019-r07-r2/verification.json": {
+      "sha256": "sha256:07090622397e2c3a24407697a1dd9882d1c6d64ca5fdd6037b8c0d7566dc3ab9",
+      "bytes": 245543
+    },
+    "sources/upstream/openfilm-refresh-20261019-r07/download.json": {
+      "sha256": "sha256:57252077af3698cf859a4a50b8876df3a5c808d107422e98557aa88407f95d30",
+      "bytes": 725
+    },
+    "sources/upstream/openfilm-refresh-20261019-r07/LICENSE": {
+      "sha256": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+      "bytes": 1078
+    },
+    "sources/upstream/openfilm-refresh-20261019-r07/repo.zip": {
+      "sha256": "sha256:2191946cc52e9c21a70dfb5418716487aca35ed22818ffa93bda3781b0de5660",
+      "bytes": 11469498
+    },
+    "README.md": {
+      "sha256": "sha256:0c9ad62811aa6d3612dfa914143f52f16c8fafc118c7e9d73ee94d4e733df347",
+      "bytes": 179156
+    },
+    "docs/README.md": {
+      "sha256": "sha256:215ab989c231cb38466d64aad54dbeaf4074a310ada36c6cf13930bac343ab9c",
+      "bytes": 92162
+    },
+    "docs/构建进度总表_2026-10-16.md": {
+      "sha256": "sha256:7848de1ba0d5538905aad16f92002cf355f1033bd662375c8e29aeed621c5cbd",
+      "bytes": 81648
+    },
+    "docs/OpenFilm当前复用决策_2026-10-18.md": {
+      "sha256": "sha256:cfee7b2ed8da1f0b2a8eaf1a4a99425c09a85dedc75a59e6362a774b593d0a89",
+      "bytes": 11250
+    },
+    "docs/validation/README功能核验与实测演示_2026-10-16.md": {
+      "sha256": "sha256:0d688177f6d342fca556ab385ccf022e0cd579f12b5edc5a1ee1669d7ebd678c",
+      "bytes": 51897
+    },
+    "docs/OpenFilm_0.2.1复用清单与成本复核_2026-10-19.md": {
+      "sha256": "sha256:650a621a1d07d160279c7721c15f526eb564b12f6e585e710013cb6f17bdb69d",
+      "bytes": 18464
+    },
+    ".gitattributes": {
+      "sha256": "sha256:c47ccc8b1a776c2ae19f698465cc165aef84175a65e07ae38f9becca244ed31b",
+      "bytes": 24276
+    },
+    "scripts/audit_openfilm_r07.py": {
+      "sha256": "sha256:cbea4630d7b3ef3d0bca941852f99c57e61c2046c8180778c0c994ba1be92adf",
+      "bytes": 13792
+    },
+    "scripts/sync_openfilm_r07_documents.py": {
+      "sha256": "sha256:176f2f1d47d5fc083038c97a76a3f2d0a4ce7576fb09b547d809bce86df884a0",
+      "bytes": 19541
+    },
+    "scripts/audit_openfilm_r07_delivery.py": {
+      "sha256": "sha256:9008b3ff229a882fc2aff032aa63f5294318eafedae52fc16b9ba5a520b8bfb8",
+      "bytes": 7112
+    }
+  },
+  "new_media": false,
+  "hardware_or_model_execution": false,
+  "full_capcut_parity": false
+}
