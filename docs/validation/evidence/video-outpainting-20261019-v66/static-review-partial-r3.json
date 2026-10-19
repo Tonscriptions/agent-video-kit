@@ -1,0 +1,57 @@
+{
+  "status": "partial_static_review",
+  "reviewed_at_utc": "2026-10-19T16:13:42.743359+00:00",
+  "reviewed_static_frames": 12,
+  "continuous_playback": false,
+  "audio_listened": false,
+  "remaining": [
+    "vace-harmonic-r4"
+  ],
+  "items": [
+    {
+      "case": "lama-direct-r3",
+      "path": "docs/assets/video-outpainting-20261019-v66-lama-direct-r3/contact-sheet.png",
+      "sha256": "sha256:4f6b45dd6f719d5545a6387216e4113514b42428fdb1fa3f10fc0b0613b01425",
+      "source_frames": [
+        0,
+        3,
+        4,
+        7
+      ],
+      "observations": [
+        "第 0/3/4/7 帧的原片红色移动块、左上帧标识和半透明小区域在输出与真值原矩形中一致。",
+        "原灰色扩展区已生成墙面与桌面；新区域的纹理较柔和，边缘仍可见与受控真值的颜色/细线差异。"
+      ]
+    },
+    {
+      "case": "lama-harmonic-r2",
+      "path": "docs/assets/video-outpainting-20261019-v66-lama-harmonic-r2/contact-sheet.png",
+      "sha256": "sha256:20dd4d4ba8ffa19de95b31798c7011a11d76f9a36eaeb49aac9941169963e2a1",
+      "source_frames": [
+        0,
+        3,
+        4,
+        7
+      ],
+      "observations": [
+        "四个时刻均保留原矩形、移动色块、标识及半透明区域。",
+        "扩展边界色差较小，墙面和桌面在静帧上延续；纹理和边线仍与真值存在差异，不据此验收自然时序。"
+      ]
+    },
+    {
+      "case": "installed-r2/media",
+      "path": "docs/assets/video-outpainting-20261019-v66-installed-r2/media/contact-sheet.png",
+      "sha256": "sha256:20dd4d4ba8ffa19de95b31798c7011a11d76f9a36eaeb49aac9941169963e2a1",
+      "source_frames": [
+        0,
+        3,
+        4,
+        7
+      ],
+      "observations": [
+        "四个抽样时刻的画面与开发版 harmonic 接触表一致，原片标识、红块和半透明小块保留。",
+        "灰色外部画布被墙面与桌面替换；该接触表只证明本次静帧查看，没有连续播放或听审。"
+      ]
+    }
+  ]
+}

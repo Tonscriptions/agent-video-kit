@@ -1,0 +1,1111 @@
+{
+  "version": "0.1.0",
+  "created_at": "2026-10-19T16:07:21.135751Z",
+  "operation_id": "op_20261019160639_13b21368",
+  "snapshot_id": "snap_20261019160639_c31fb8de",
+  "source_asset_id": "asset_20261019160618_ece9cfc7",
+  "asset": {
+    "id": "expanded",
+    "kind": "video",
+    "uri": "assets/derived/expanded.mov",
+    "sha256": "sha256:bbacc78a95ba907541b0d6d3b3260681e363ddf0484c59ac3052433961cbe3fb",
+    "probe": {
+      "duration_seconds": 1.0,
+      "duration_tick": 90000,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "qtrle",
+          "codec_long_name": "QuickTime Animation (RLE) video",
+          "codec_type": "video",
+          "codec_tag_string": "rle ",
+          "codec_tag": "0x20656c72",
+          "width": 256,
+          "height": 160,
+          "coded_width": 256,
+          "coded_height": 160,
+          "has_b_frames": 0,
+          "pix_fmt": "argb",
+          "level": -99,
+          "field_order": "progressive",
+          "id": "0x1",
+          "r_frame_rate": "8/1",
+          "avg_frame_rate": "8/1",
+          "time_base": "1/16384",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 16384,
+          "duration": "1.000000",
+          "bit_rate": "3243824",
+          "nb_frames": "8",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "handler_name": "VideoHandler",
+            "vendor_id": "FFMP",
+            "encoder": "Lavc62.28.100 qtrle"
+          }
+        },
+        {
+          "index": 1,
+          "codec_name": "pcm_s24le",
+          "codec_long_name": "PCM signed 24-bit little-endian",
+          "codec_type": "audio",
+          "codec_tag_string": "in24",
+          "codec_tag": "0x34326e69",
+          "sample_fmt": "s32",
+          "sample_rate": "48000",
+          "channels": 2,
+          "channel_layout": "stereo",
+          "bits_per_sample": 24,
+          "initial_padding": 0,
+          "id": "0x2",
+          "r_frame_rate": "0/0",
+          "avg_frame_rate": "0/0",
+          "time_base": "1/48000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 48000,
+          "duration": "1.000000",
+          "bit_rate": "2304000",
+          "bits_per_raw_sample": "24",
+          "nb_frames": "48000",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "handler_name": "SoundHandler",
+            "vendor_id": "[0][0][0][0]"
+          }
+        }
+      ],
+      "video": {
+        "codec": "qtrle",
+        "width": 256,
+        "height": 160,
+        "pix_fmt": "argb",
+        "fps": "8/1",
+        "color_space": null,
+        "duration_seconds": 1.0,
+        "start_time_seconds": 0.0
+      },
+      "audio": {
+        "codec": "pcm_s24le",
+        "sample_rate": 48000,
+        "channels": 2,
+        "duration_seconds": 1.0,
+        "start_time_seconds": 0.0
+      }
+    },
+    "rights_ref": "expanded",
+    "source": {
+      "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\video-outpainting-20261019-v66-lama-harmonic-r2\\project\\assets\\derived\\expanded.mov",
+      "retrieved_at": "2026-10-19T16:07:20.706677Z",
+      "original_name": "expanded.mov",
+      "derived_from": [
+        "asset_20261019160618_ece9cfc7"
+      ],
+      "outpainting": {
+        "version": 1,
+        "source_asset_id": "asset_20261019160618_ece9cfc7",
+        "source_sha256": "sha256:df7818941aebd8ac19758cdd3e8551370b1617964b3f8be8e50f768eea4f9d21",
+        "adapter_id": "outpaint_local",
+        "adapter_sha256": "sha256:e0a86230ba4e62731e0d5f47b58ec9510bc2ada1ff8747c6ee97e04daab47add",
+        "engine": "torchscript-lama-local-v1",
+        "geometry": {
+          "protocol": "agent-video-outpaint-mask-v1",
+          "width": 256,
+          "height": 160,
+          "source_width": 192,
+          "source_height": 128,
+          "offset_x": 32,
+          "offset_y": 16,
+          "outside_rgba": [
+            127,
+            127,
+            127,
+            255
+          ],
+          "original_rgba": "preserve-normalized-display-cfr-samples",
+          "generated_alpha": 255,
+          "mask": "outside-original-half-open-rectangle"
+        },
+        "range": {
+          "start_seconds": 0.0,
+          "end_seconds": 1.0
+        },
+        "fps": "8",
+        "frames": 8,
+        "inpainting": {
+          "threshold": 0.5,
+          "grow": 0,
+          "feather": 0.0,
+          "context": 64,
+          "model_max_edge": 256,
+          "blend_mode": "harmonic",
+          "blend_max_iterations": 2000,
+          "blend_tolerance": 1e-06
+        },
+        "generation": null,
+        "sha256": "sha256:3c123168280d7b5da48ab81cacb0e4ccba173f95e7abf0fc13f5c195a776b5eb"
+      }
+    }
+  },
+  "rights": {
+    "creator": "unknown",
+    "license_spdx": "CC0-1.0",
+    "license_url": "",
+    "attribution": "",
+    "permitted_uses": [
+      "internal",
+      "commercial_ad"
+    ],
+    "permitted_channels": [],
+    "restrictions": [],
+    "evidence": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\video-outpainting-20261019-v66-lama-harmonic-r2\\source-evidence.json",
+    "verification_status": "verified",
+    "verified_by": "ai-ad-editor",
+    "takedown_status": "clear",
+    "asset_id": "expanded",
+    "kind": "video",
+    "sha256": "sha256:bbacc78a95ba907541b0d6d3b3260681e363ddf0484c59ac3052433961cbe3fb",
+    "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\video-outpainting-20261019-v66-lama-harmonic-r2\\project\\assets\\derived\\expanded.mov",
+    "source_version": "derived-video-outpainting",
+    "retrieved_at": "2026-10-19T16:07:20.706818Z",
+    "derived_from": [
+      "asset_20261019160618_ece9cfc7",
+      "visual_adapter_outpaint_local"
+    ],
+    "notes": "Local framewise masked repair; source, mask and model rights required",
+    "record_id": "rights_20261019160720_afd1662c",
+    "record_version": 1,
+    "active": true,
+    "recorded_at": "2026-10-19T16:07:20.707029Z"
+  },
+  "generated_clip": {
+    "id": "clip_matting_20261019160720_21315d0e",
+    "asset_id": "expanded",
+    "timeline_start_tick": 0,
+    "duration_tick": 90000,
+    "source_in_tick": 0,
+    "source_out_tick": 90000
+  },
+  "generated_audio_clip": {
+    "id": "clip_matting_audio_20261019160720_cc4527bd",
+    "asset_id": "expanded",
+    "timeline_start_tick": 0,
+    "duration_tick": 90000,
+    "source_in_tick": 0,
+    "source_out_tick": 90000
+  },
+  "outpainting": {
+    "version": "0.1.0",
+    "engine": "torchscript-lama-local-v1",
+    "protocol": "agent-video-lama-inpainting-v1",
+    "network": "disabled",
+    "source": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\video-outpainting-20261019-v66-lama-harmonic-r2\\project\\assets\\asset_20261019160618_ece9cfc7_source.mov",
+      "sha256": "sha256:df7818941aebd8ac19758cdd3e8551370b1617964b3f8be8e50f768eea4f9d21"
+    },
+    "input_probe": {
+      "duration_seconds": 1.0,
+      "duration_tick": 90000,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "qtrle",
+          "codec_long_name": "QuickTime Animation (RLE) video",
+          "codec_type": "video",
+          "codec_tag_string": "rle ",
+          "codec_tag": "0x20656c72",
+          "width": 192,
+          "height": 128,
+          "coded_width": 192,
+          "coded_height": 128,
+          "has_b_frames": 0,
+          "pix_fmt": "argb",
+          "level": -99,
+          "field_order": "progressive",
+          "id": "0x1",
+          "r_frame_rate": "8/1",
+          "avg_frame_rate": "8/1",
+          "time_base": "1/16384",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 16384,
+          "duration": "1.000000",
+          "bit_rate": "611152",
+          "nb_frames": "8",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "handler_name": "VideoHandler",
+            "vendor_id": "FFMP",
+            "encoder": "Lavc62.28.100 qtrle"
+          }
+        },
+        {
+          "index": 1,
+          "codec_name": "pcm_s16le",
+          "codec_long_name": "PCM signed 16-bit little-endian",
+          "codec_type": "audio",
+          "codec_tag_string": "sowt",
+          "codec_tag": "0x74776f73",
+          "sample_fmt": "s16",
+          "sample_rate": "48000",
+          "channels": 2,
+          "channel_layout": "stereo",
+          "bits_per_sample": 16,
+          "initial_padding": 0,
+          "id": "0x2",
+          "r_frame_rate": "0/0",
+          "avg_frame_rate": "0/0",
+          "time_base": "1/48000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 48000,
+          "duration": "1.000000",
+          "bit_rate": "1536000",
+          "nb_frames": "48000",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "handler_name": "SoundHandler",
+            "vendor_id": "[0][0][0][0]"
+          }
+        }
+      ],
+      "video": {
+        "codec": "qtrle",
+        "width": 192,
+        "height": 128,
+        "pix_fmt": "argb",
+        "fps": "8/1",
+        "color_space": null,
+        "duration_seconds": 1.0,
+        "start_time_seconds": 0.0
+      },
+      "audio": {
+        "codec": "pcm_s16le",
+        "sample_rate": 48000,
+        "channels": 2,
+        "duration_seconds": 1.0,
+        "start_time_seconds": 0.0
+      }
+    },
+    "range": {
+      "start_seconds": 0.0,
+      "end_seconds": 1.0
+    },
+    "video": {
+      "width": 256,
+      "height": 160,
+      "fps": "8",
+      "frames": 8,
+      "duration_seconds": 1.0,
+      "source_stream_index": 0,
+      "source_width": 192,
+      "source_height": 128,
+      "source_sar": "1",
+      "source_rotation": 0.0,
+      "clock": "ffmpeg-fps-resampled-source-seconds",
+      "alpha_mode": "straight",
+      "codec": "qtrle",
+      "pix_fmt": "argb"
+    },
+    "audio": {
+      "preserve": true,
+      "source_offset_seconds": 0.0,
+      "codec": "pcm_s24le"
+    },
+    "warnings": [
+      {
+        "code": "INPAINT_MODEL_REVIEW_REQUIRED",
+        "message": "逐帧 LaMa 补全须复核纹理、物体残留、闪烁与许可；没有跨帧联合修复或生成填充保证"
+      },
+      {
+        "code": "MATTING_CFR_CLOCK",
+        "message": "输出使用显式 CFR，尾部不足一帧按末帧补齐，源时钟与输出时长见报告"
+      },
+      {
+        "code": "OUTPAINT_MODEL_REVIEW_REQUIRED",
+        "message": "仅生成原矩形外；画外结构、纹理、边界、时序与许可须复核，原显示画面受保护不等于生成质量通过"
+      },
+      {
+        "code": "REPAIR_HARMONIZE_REVIEW_REQUIRED",
+        "message": "逐帧空间色差修正；结构、纹理、残影、时序和背景真值须独立复核"
+      }
+    ],
+    "outpainting": {
+      "protocol": "agent-video-outpaint-mask-v1",
+      "width": 256,
+      "height": 160,
+      "source_width": 192,
+      "source_height": 128,
+      "offset_x": 32,
+      "offset_y": 16,
+      "outside_rgba": [
+        127,
+        127,
+        127,
+        255
+      ],
+      "original_rgba": "preserve-normalized-display-cfr-samples",
+      "generated_alpha": 255,
+      "mask": "outside-original-half-open-rectangle"
+    },
+    "mask": {
+      "kind": "generated-outpaint",
+      "channel": "alpha",
+      "geometry": {
+        "protocol": "agent-video-outpaint-mask-v1",
+        "width": 256,
+        "height": 160,
+        "source_width": 192,
+        "source_height": 128,
+        "offset_x": 32,
+        "offset_y": 16,
+        "outside_rgba": [
+          127,
+          127,
+          127,
+          255
+        ],
+        "original_rgba": "preserve-normalized-display-cfr-samples",
+        "generated_alpha": 255,
+        "mask": "outside-original-half-open-rectangle"
+      },
+      "sha256": "sha256:c021d7657f32acb075bff7eb6fcf0a6454714dd6430913d9e55e38dba4176cde",
+      "clock": "same-decoded-source-frames-and-pts",
+      "plan_sha256": "sha256:e08c2695a7aec2f01028251b428e5f77593d2d6bc7be3c1bcba59685adc44ce5"
+    },
+    "inpainting": {
+      "threshold": 0.5,
+      "grow": 0,
+      "feather": 0.0,
+      "context": 64,
+      "model_max_edge": 256,
+      "blend_mode": "harmonic",
+      "blend_max_iterations": 2000,
+      "blend_tolerance": 1e-06
+    },
+    "blend_budget": {
+      "mode": "harmonic",
+      "mask_pixel_count_known": false,
+      "solver_owned_minimum_nonempty_bytes": 983424,
+      "solver_owned_maximum_bytes": 16711296,
+      "state_budget_bytes": 536870912,
+      "admission": "actual-selected-pixels-before-each-model-call-and-before-blend",
+      "scope": "owned-arrays-excludes-model-torch-and-total-process-or-device-memory"
+    },
+    "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\video-outpainting-20261019-v66-lama-harmonic-r2\\project\\assets\\derived\\expanded.mov",
+    "sha256": "sha256:bbacc78a95ba907541b0d6d3b3260681e363ddf0484c59ac3052433961cbe3fb",
+    "probe": {
+      "duration_seconds": 1.0,
+      "duration_tick": 90000,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "qtrle",
+          "codec_long_name": "QuickTime Animation (RLE) video",
+          "codec_type": "video",
+          "codec_tag_string": "rle ",
+          "codec_tag": "0x20656c72",
+          "width": 256,
+          "height": 160,
+          "coded_width": 256,
+          "coded_height": 160,
+          "has_b_frames": 0,
+          "pix_fmt": "argb",
+          "level": -99,
+          "field_order": "progressive",
+          "id": "0x1",
+          "r_frame_rate": "8/1",
+          "avg_frame_rate": "8/1",
+          "time_base": "1/16384",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 16384,
+          "duration": "1.000000",
+          "bit_rate": "3243824",
+          "nb_frames": "8",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "handler_name": "VideoHandler",
+            "vendor_id": "FFMP",
+            "encoder": "Lavc62.28.100 qtrle"
+          }
+        },
+        {
+          "index": 1,
+          "codec_name": "pcm_s24le",
+          "codec_long_name": "PCM signed 24-bit little-endian",
+          "codec_type": "audio",
+          "codec_tag_string": "in24",
+          "codec_tag": "0x34326e69",
+          "sample_fmt": "s32",
+          "sample_rate": "48000",
+          "channels": 2,
+          "channel_layout": "stereo",
+          "bits_per_sample": 24,
+          "initial_padding": 0,
+          "id": "0x2",
+          "r_frame_rate": "0/0",
+          "avg_frame_rate": "0/0",
+          "time_base": "1/48000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 48000,
+          "duration": "1.000000",
+          "bit_rate": "2304000",
+          "bits_per_raw_sample": "24",
+          "nb_frames": "48000",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "handler_name": "SoundHandler",
+            "vendor_id": "[0][0][0][0]"
+          }
+        }
+      ],
+      "video": {
+        "codec": "qtrle",
+        "width": 256,
+        "height": 160,
+        "pix_fmt": "argb",
+        "fps": "8/1",
+        "color_space": null,
+        "duration_seconds": 1.0,
+        "start_time_seconds": 0.0
+      },
+      "audio": {
+        "codec": "pcm_s24le",
+        "sample_rate": 48000,
+        "channels": 2,
+        "duration_seconds": 1.0,
+        "start_time_seconds": 0.0
+      }
+    },
+    "adapter_id": "outpaint_local",
+    "adapter_sha256": "sha256:e0a86230ba4e62731e0d5f47b58ec9510bc2ada1ff8747c6ee97e04daab47add",
+    "checkpoint_sha256": "sha256:344c77bbcb158f17dd143070d1e789f38a66c04202311ae3a258ef66667a9ea9",
+    "rgba_roundtrip_verified": true,
+    "ffmpeg": {
+      "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+      "sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+    },
+    "worker": {
+      "protocol": "agent-video-lama-inpainting-v1",
+      "engine": "torchscript-lama-local-v1",
+      "network": "disabled",
+      "blocked_network_events": [],
+      "request_sha256": "sha256:f789d1cdf38a0926d2046e364eb4e13dcd7e14d5a43c3285835ec0837cfd0330",
+      "adapter_sha256": "sha256:e0a86230ba4e62731e0d5f47b58ec9510bc2ada1ff8747c6ee97e04daab47add",
+      "source_sha256": "sha256:df7818941aebd8ac19758cdd3e8551370b1617964b3f8be8e50f768eea4f9d21",
+      "mask_sha256": "sha256:c021d7657f32acb075bff7eb6fcf0a6454714dd6430913d9e55e38dba4176cde",
+      "mask_plan_sha256": "sha256:e08c2695a7aec2f01028251b428e5f77593d2d6bc7be3c1bcba59685adc44ce5",
+      "inpainting": {
+        "threshold": 0.5,
+        "grow": 0,
+        "feather": 0.0,
+        "context": 64,
+        "model_max_edge": 256,
+        "blend_mode": "harmonic",
+        "blend_max_iterations": 2000,
+        "blend_tolerance": 1e-06
+      },
+      "status": "succeeded",
+      "outpainting": {
+        "protocol": "agent-video-outpaint-mask-v1",
+        "width": 256,
+        "height": 160,
+        "source_width": 192,
+        "source_height": 128,
+        "offset_x": 32,
+        "offset_y": 16,
+        "outside_rgba": [
+          127,
+          127,
+          127,
+          255
+        ],
+        "original_rgba": "preserve-normalized-display-cfr-samples",
+        "generated_alpha": 255,
+        "mask": "outside-original-half-open-rectangle"
+      },
+      "metrics": {
+        "frames": 8,
+        "width": 256,
+        "height": 160,
+        "rgba_sha256": "sha256:5af5113405063cba8828b949d7039727b3d5ccebb41c0d9b9ae28c385208198a",
+        "rgba_bytes": 1310720,
+        "source_rgba_sha256": "sha256:fa0115580dc1b5dbac220e8c8f835af797c087cd4c2206e5d4420d0d6ee21920",
+        "decoded_mask_rgba_sha256": "sha256:8961a2fa66fdbab53a7908e0595ffc74789c69d0cefa8d2550266eb2b94bbb04",
+        "state_updates": 8,
+        "state_peak_bytes": 13544704,
+        "base_state_peak_bytes": 6270208,
+        "blend": {
+          "mode": "harmonic",
+          "solver": "masked-four-neighbor-jacobi-pcg-float64",
+          "frames": 8,
+          "max_selected_pixels": 16384,
+          "owned_array_peak_bytes": 7274496,
+          "iterations_max": [
+            316,
+            313,
+            316
+          ],
+          "residual_ratio_max": 0.99968449623703,
+          "boundary_edges": 5120,
+          "clipped_rgb_values": 0,
+          "max_abs_correction": 8.389175494942608,
+          "seconds": 11.181077599991113,
+          "samples": [
+            {
+              "frame": 0,
+              "selected_pixels": 16384,
+              "iterations": [
+                314,
+                311,
+                302
+              ],
+              "residual_norm": [
+                4.949061644697103e-05,
+                3.92734151041303e-05,
+                4.013513781437782e-05
+              ],
+              "residual_target": [
+                4.95062358506724e-05,
+                4.2171588993784646e-05,
+                4.111555587234871e-05
+              ],
+              "boundary_edges": 640,
+              "owned_array_budget_bytes": 7274496,
+              "clipped_rgb_values": 0,
+              "max_abs_correction": 8.389175494942608,
+              "solver": "masked-four-neighbor-jacobi-pcg-float64",
+              "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+            },
+            {
+              "frame": 1,
+              "selected_pixels": 16384,
+              "iterations": [
+                315,
+                311,
+                307
+              ],
+              "residual_norm": [
+                4.7417298360809925e-05,
+                3.653143535814319e-05,
+                3.6026100170022895e-05
+              ],
+              "residual_target": [
+                4.785957719685765e-05,
+                3.908266114324437e-05,
+                3.7335581964823406e-05
+              ],
+              "boundary_edges": 640,
+              "owned_array_budget_bytes": 7274496,
+              "clipped_rgb_values": 0,
+              "max_abs_correction": 7.64706683870479,
+              "solver": "masked-four-neighbor-jacobi-pcg-float64",
+              "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+            },
+            {
+              "frame": 2,
+              "selected_pixels": 16384,
+              "iterations": [
+                316,
+                311,
+                312
+              ],
+              "residual_norm": [
+                4.416181917664139e-05,
+                3.559537996290857e-05,
+                3.3013267647505176e-05
+              ],
+              "residual_target": [
+                4.5960786783590454e-05,
+                3.699262758950893e-05,
+                3.395106769921154e-05
+              ],
+              "boundary_edges": 640,
+              "owned_array_budget_bytes": 7274496,
+              "clipped_rgb_values": 0,
+              "max_abs_correction": 5.772297826062777,
+              "solver": "masked-four-neighbor-jacobi-pcg-float64",
+              "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+            },
+            {
+              "frame": 3,
+              "selected_pixels": 16384,
+              "iterations": [
+                316,
+                312,
+                314
+              ],
+              "residual_norm": [
+                4.090059506155837e-05,
+                3.325350700791048e-05,
+                2.9713515614583834e-05
+              ],
+              "residual_target": [
+                4.346652542223723e-05,
+                3.551722046417944e-05,
+                3.103472229342546e-05
+              ],
+              "boundary_edges": 640,
+              "owned_array_budget_bytes": 7274496,
+              "clipped_rgb_values": 0,
+              "max_abs_correction": 4.794808962816125,
+              "solver": "masked-four-neighbor-jacobi-pcg-float64",
+              "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+            },
+            {
+              "frame": 4,
+              "selected_pixels": 16384,
+              "iterations": [
+                316,
+                313,
+                316
+              ],
+              "residual_norm": [
+                4.199566372121496e-05,
+                3.2281674284409786e-05,
+                2.997277666917921e-05
+              ],
+              "residual_target": [
+                4.239588300521176e-05,
+                3.5329472246207295e-05,
+                3.0870908504686846e-05
+              ],
+              "boundary_edges": 640,
+              "owned_array_budget_bytes": 7274496,
+              "clipped_rgb_values": 0,
+              "max_abs_correction": 4.972815178452521,
+              "solver": "masked-four-neighbor-jacobi-pcg-float64",
+              "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+            },
+            {
+              "frame": 5,
+              "selected_pixels": 16384,
+              "iterations": [
+                315,
+                313,
+                315
+              ],
+              "residual_norm": [
+                3.993036139027585e-05,
+                3.508710281821708e-05,
+                3.051413268102993e-05
+              ],
+              "residual_target": [
+                4.035128019321462e-05,
+                3.5197340045559726e-05,
+                3.0836009260718664e-05
+              ],
+              "boundary_edges": 640,
+              "owned_array_budget_bytes": 7274496,
+              "clipped_rgb_values": 0,
+              "max_abs_correction": 6.039500722665712,
+              "solver": "masked-four-neighbor-jacobi-pcg-float64",
+              "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+            },
+            {
+              "frame": 6,
+              "selected_pixels": 16384,
+              "iterations": [
+                314,
+                312,
+                315
+              ],
+              "residual_norm": [
+                3.824040491863493e-05,
+                3.469919606675176e-05,
+                3.0788211914287554e-05
+              ],
+              "residual_target": [
+                3.993640875717457e-05,
+                3.5069522531261945e-05,
+                3.1845568834081324e-05
+              ],
+              "boundary_edges": 640,
+              "owned_array_budget_bytes": 7274496,
+              "clipped_rgb_values": 0,
+              "max_abs_correction": 6.511676507575557,
+              "solver": "masked-four-neighbor-jacobi-pcg-float64",
+              "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+            },
+            {
+              "frame": 7,
+              "selected_pixels": 16384,
+              "iterations": [
+                313,
+                313,
+                314
+              ],
+              "residual_norm": [
+                3.926728271019832e-05,
+                3.471664009003901e-05,
+                3.1588927650355636e-05
+              ],
+              "residual_target": [
+                4.074120715389215e-05,
+                3.558480317523741e-05,
+                3.201384897716459e-05
+              ],
+              "boundary_edges": 640,
+              "owned_array_budget_bytes": 7274496,
+              "clipped_rgb_values": 0,
+              "max_abs_correction": 6.06396013343109,
+              "solver": "masked-four-neighbor-jacobi-pcg-float64",
+              "budget_scope": "incremental-owned-numpy-arrays-excludes-inputs-and-model"
+            }
+          ]
+        },
+        "state_reset": "per-frame",
+        "buffer_budget_scope": "conservative-owned-frame-and-input-output-arrays-excludes-model-and-torch-temporaries",
+        "input_alpha": "preserve",
+        "alpha_mode": "straight",
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "alpha_mean": 0.99765625,
+        "transparent_pixels": 96,
+        "opaque_pixels": 326240,
+        "soft_alpha_pixels": 1344,
+        "input_alpha_sha256": "sha256:3ffeaee2ba03887adfde80efb1e7cd3dd4793960c420cd04ef81f3bc8585bf99",
+        "output_alpha_sha256": "sha256:3ffeaee2ba03887adfde80efb1e7cd3dd4793960c420cd04ef81f3bc8585bf99",
+        "model_calls": 8,
+        "empty_mask_frames": 0,
+        "mask_pixels": 131072,
+        "resized_model_frames": 0,
+        "model_peak_pixels": 40960,
+        "outside_mask_changed_pixels": 0,
+        "clipped_model_values": 0,
+        "roi_samples": [
+          {
+            "frame": 0,
+            "mask_pixels": 16384,
+            "model_calls": 1,
+            "resized": false,
+            "model_pixels": 40960,
+            "state_bytes": 13544704,
+            "base_state_bytes": 6270208,
+            "roi": [
+              0,
+              0,
+              256,
+              160
+            ],
+            "outside_mask_changed_pixels": 0,
+            "clipped_model_values": 0
+          },
+          {
+            "frame": 1,
+            "mask_pixels": 16384,
+            "model_calls": 1,
+            "resized": false,
+            "model_pixels": 40960,
+            "state_bytes": 13544704,
+            "base_state_bytes": 6270208,
+            "roi": [
+              0,
+              0,
+              256,
+              160
+            ],
+            "outside_mask_changed_pixels": 0,
+            "clipped_model_values": 0
+          },
+          {
+            "frame": 2,
+            "mask_pixels": 16384,
+            "model_calls": 1,
+            "resized": false,
+            "model_pixels": 40960,
+            "state_bytes": 13544704,
+            "base_state_bytes": 6270208,
+            "roi": [
+              0,
+              0,
+              256,
+              160
+            ],
+            "outside_mask_changed_pixels": 0,
+            "clipped_model_values": 0
+          },
+          {
+            "frame": 3,
+            "mask_pixels": 16384,
+            "model_calls": 1,
+            "resized": false,
+            "model_pixels": 40960,
+            "state_bytes": 13544704,
+            "base_state_bytes": 6270208,
+            "roi": [
+              0,
+              0,
+              256,
+              160
+            ],
+            "outside_mask_changed_pixels": 0,
+            "clipped_model_values": 0
+          },
+          {
+            "frame": 4,
+            "mask_pixels": 16384,
+            "model_calls": 1,
+            "resized": false,
+            "model_pixels": 40960,
+            "state_bytes": 13544704,
+            "base_state_bytes": 6270208,
+            "roi": [
+              0,
+              0,
+              256,
+              160
+            ],
+            "outside_mask_changed_pixels": 0,
+            "clipped_model_values": 0
+          },
+          {
+            "frame": 5,
+            "mask_pixels": 16384,
+            "model_calls": 1,
+            "resized": false,
+            "model_pixels": 40960,
+            "state_bytes": 13544704,
+            "base_state_bytes": 6270208,
+            "roi": [
+              0,
+              0,
+              256,
+              160
+            ],
+            "outside_mask_changed_pixels": 0,
+            "clipped_model_values": 0
+          },
+          {
+            "frame": 6,
+            "mask_pixels": 16384,
+            "model_calls": 1,
+            "resized": false,
+            "model_pixels": 40960,
+            "state_bytes": 13544704,
+            "base_state_bytes": 6270208,
+            "roi": [
+              0,
+              0,
+              256,
+              160
+            ],
+            "outside_mask_changed_pixels": 0,
+            "clipped_model_values": 0
+          },
+          {
+            "frame": 7,
+            "mask_pixels": 16384,
+            "model_calls": 1,
+            "resized": false,
+            "model_pixels": 40960,
+            "state_bytes": 13544704,
+            "base_state_bytes": 6270208,
+            "roi": [
+              0,
+              0,
+              256,
+              160
+            ],
+            "outside_mask_changed_pixels": 0,
+            "clipped_model_values": 0
+          }
+        ]
+      },
+      "model_loaded": true,
+      "providers": [
+        "torch-cpu"
+      ],
+      "versions": {
+        "python": "3.13.14",
+        "numpy": "2.4.6",
+        "torch": "2.13.0+cu130"
+      },
+      "elapsed_seconds": 36.64885110000614
+    },
+    "elapsed_seconds": 39.99481459999515
+  },
+  "validation": {
+    "ok": true,
+    "errors": [],
+    "warnings": [
+      {
+        "status": "unverified",
+        "code": "RIGHTS_STATUS_BLOCKED",
+        "message": "状态 unverified 不允许发布",
+        "asset_id": "visual_adapter_outpaint_local",
+        "rights_ref": "visual_adapter_outpaint_local",
+        "record_version": 1,
+        "context": "derived_dependency"
+      },
+      {
+        "code": "RIGHTS_USE_NOT_PERMITTED",
+        "message": "记录未允许目标用途: commercial_ad",
+        "asset_id": "visual_adapter_outpaint_local",
+        "rights_ref": "visual_adapter_outpaint_local",
+        "record_version": 1,
+        "context": "derived_dependency"
+      }
+    ],
+    "rights": {
+      "ok": true,
+      "target": "commercial_ad",
+      "checked": 2,
+      "required_records": 3,
+      "failures": [],
+      "warnings": [
+        {
+          "status": "unverified",
+          "code": "RIGHTS_STATUS_BLOCKED",
+          "message": "状态 unverified 不允许发布",
+          "asset_id": "visual_adapter_outpaint_local",
+          "rights_ref": "visual_adapter_outpaint_local",
+          "record_version": 1,
+          "context": "derived_dependency"
+        },
+        {
+          "code": "RIGHTS_USE_NOT_PERMITTED",
+          "message": "记录未允许目标用途: commercial_ad",
+          "asset_id": "visual_adapter_outpaint_local",
+          "rights_ref": "visual_adapter_outpaint_local",
+          "record_version": 1,
+          "context": "derived_dependency"
+        }
+      ],
+      "disposition_decisions": [],
+      "effective_disposition_decisions": []
+    },
+    "schema_engine": "jsonschema",
+    "asset_count": 2,
+    "sequence_count": 1
+  }
+}

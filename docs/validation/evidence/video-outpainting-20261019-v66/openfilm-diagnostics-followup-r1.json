@@ -1,0 +1,39 @@
+{
+  "status": "static_followup_only",
+  "checked_at_utc": "2026-10-19T16:25:03.332702+00:00",
+  "upstream_commit": "f6a65ae54fa1c10ec482eeb84dc9ffa6ef33c4d8",
+  "new_fetch_or_star_query": false,
+  "source_archive_sha256": "sha256:2191946cc52e9c21a70dfb5418716487aca35ed22818ffa93bda3781b0de5660",
+  "files": {
+    "packages/openfilm/src/problems.mjs": {
+      "bytes": 6508,
+      "sha256": "sha256:15d38be45cbbb1b53acba873261e2a49b096cbf91d7746e9e10016d6fd593e3c"
+    },
+    "packages/openfilm/studio/server/diagnostics.mjs": {
+      "bytes": 8826,
+      "sha256": "sha256:e401421a9df8a13935c09555cceeb7ac8a4e86035d905f2d2508f7dbcac965ab"
+    }
+  },
+  "observed_cli_error": {
+    "code": "MATTING_PIPELINE_FAILED",
+    "cause_contains_broken_pipe": true,
+    "cause_contains_native_exception_code": false,
+    "error_keys": [
+      "cause",
+      "code",
+      "message",
+      "path",
+      "retryable"
+    ]
+  },
+  "findings": [
+    "problems.mjs provides redaction, per-field limits and retained problem history",
+    "diagnostics.mjs tail first reads the entire UTF-8 file, then truncates by string length",
+    "diagnostics.mjs also contains app/agent conversation and global Codex database collection; do not integrate those collectors",
+    "current native failure output lacks structured native worker PID/exit/stage; independent Windows events supply those fields"
+  ],
+  "upstream_runtime_executed": false,
+  "new_model_forward": false,
+  "product_implementation_changed": false,
+  "automatic_diagnostic_feature_implemented": false
+}

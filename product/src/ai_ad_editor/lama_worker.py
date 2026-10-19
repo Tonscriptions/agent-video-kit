@@ -71,6 +71,7 @@ def main() -> int:
                 'request_sha256': request.get('request_sha256'), 'adapter_sha256': request.get('adapter', {}).get('sha256'),
                 'source_sha256': request.get('source', {}).get('sha256'), 'mask_sha256': request.get('mask', {}).get('sha256'),
                 'mask_plan_sha256': request.get('mask', {}).get('plan_sha256'), 'inpainting': request.get('inpainting'), 'status': 'failed'}
+    if 'outpainting' in request: response['outpainting'] = request['outpainting']
     started = time.monotonic(); install_network_guard(events)
     try:
         infer(request, response)

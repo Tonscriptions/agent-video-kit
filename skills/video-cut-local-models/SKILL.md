@@ -5,6 +5,24 @@ description: Run registered offline OCR, speech, transcription, separation, trac
 
 # Local Models
 
+For a larger video canvas, use the [local outpainting contract](../../docs/specs/本地视频扩图与原画面保护契约_v0.1_2026-10-19.md):
+`media outpaint --project <root> --asset-id <video> --adapter-id <lama-or-vace>
+--derived-asset-id <new> --width <pixels> --height <pixels> --dry-run`.
+Optional integer offsets place the complete normalized source inside the larger
+canvas; the generated outer mask shares its decoded frames and PTS. No external
+mask or grow/feather is accepted. Register a fresh adapter after implementation
+bytes change. LaMa fills per frame; VACE uses the supplied verbatim prompt and
+joint windows. Keep explicit model/array/CUDA budgets and original-audio policy.
+Save the editable recipe and independently check every original RGBA sample,
+generated alpha, PTS and PCM. Rate new-region structure, seams and time stability
+separately; exact protected pixels do not accept generated background quality.
+
+VACE selects safetensors `pread` for its six fixed weight files inside each
+isolated component load, then restores the dependency aliases. Require all three
+component read reports. Unsupported native APIs or missing/wrong reports fail
+closed; never patch shared Python dependencies or retry with mmap. Preserve a
+native loader crash separately from CUDA admission, model output and quality.
+
 For visible text use the [local OCR contract](../../docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md).
 Register `ocr adapter register` with an existing native Python, PP-OCRv4
 detector/recognizer ONNX directory and local evidence. CPU ORT/OpenCV/NumPy
@@ -110,7 +128,7 @@ new donor observations; unresolved motion groups abstain.
 
 <!-- V60-CUDA -->
 Follow the [V60 device contract](../../docs/specs/VACE物理显卡准入与分阶段资源检查契约_v0.1_2026-10-19.md) and
-[measured failures and pending GPU delivery](../../docs/validation/VACE物理显卡准入与真实交付实测_2026-10-19.md).
+[measured failures and later GPU delivery](../../docs/validation/VACE物理显卡准入与真实交付实测_2026-10-19.md).
 VACE maps logical CUDA 0 to its full GPU UUID and admits against the
 smaller physical/Torch free count. Before each admission it synchronizes
 this worker and releases its unused allocator cache, preserving active
@@ -119,8 +137,12 @@ requires its GPU budget plus 768 MiB; video weights/embeddings are checked
 before transfer; every nonempty window requires 768 MiB free. These are
 observations, not reservations or activation/OOM guarantees. Current CPU
 regression, native 128 MiB active allocation/cache release, package/CLI
-and installed CUDA admission checks passed. Complete revised trained-model
-delivery remains pending. Never stop unrelated jobs, lower quality or switch to CPU/cloud
+and installed CUDA admission checks passed. A later unchanged-scene retry on
+archived V65 inputs delivered eight frames with two 30-step joint windows;
+alpha, outside RGBA, every PTS and PCM matched. Its 25.171 dB failed the
+predeclared 30 dB gate and visible dark patches remain. This verifies that
+measured delivery, without accepting natural quality or guaranteeing no OOM.
+Never stop unrelated jobs, lower quality or switch to CPU/cloud
 to conceal a rejection. Re-register with a new adapter ID; retain old
 receipts and never edit old hashes. Other engines keep existing policies.
 <!-- /V60-CUDA -->

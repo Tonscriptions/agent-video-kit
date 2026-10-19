@@ -1,0 +1,20 @@
+{
+  "scope": "exploratory isolated source copy; source not frozen while this run executed",
+  "methods": 19,
+  "suite_seconds": 209.673,
+  "errors": 2,
+  "failures": 0,
+  "status": "failed",
+  "errors_observed": [
+    {
+      "test": "test_no_audio_and_editable_recipe_survive_project_package",
+      "cause": "argparse SystemExit 2: convert import requires --output; fixture passed --project"
+    },
+    {
+      "test": "test_source_range_and_nonzero_frame_identities_are_preserved",
+      "cause": "native FFmpeg returned 4294967274 when fixture used -t .5"
+    }
+  ],
+  "record_basis": "terminal unittest output; complete product release evidence will use separately frozen canonical sources",
+  "real_model_forwards": 0
+}

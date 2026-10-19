@@ -5,6 +5,13 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For generated canvas extension, read the [outpainting contract](../../docs/specs/本地视频扩图与原画面保护契约_v0.1_2026-10-19.md).
+Use `media outpaint` with explicit target width/height and a registered local
+LaMa/VACE adapter; optional integer offsets preserve the entire normalized
+original. Review its dry-run geometry and budget before execution. The generated
+asset retains an editable, validated recipe through project packages. Original
+pixel/audio protection and generated-region quality require separate evidence.
+
 For optional native hardware encoding/decoding, read the [hardware contract](../../docs/specs/硬件编解码探测与显式回退契约_v0.1_2026-10-19.md).
 Use `render --hardware-encode prefer|require --hardware-encoder auto|nvenc|qsv|amf|mf`
 and `--hardware-decode prefer|require --hardware-decoder auto|cuda|d3d11va`.

@@ -224,6 +224,8 @@ def validate_response(response: dict, request: dict) -> None:
     providers = ['torch-' + request['adapter']['settings']['device']] if segmentation or inpainting else ['CPUExecutionProvider']
     expected = {'status': 'succeeded', 'protocol': request['protocol'], 'engine': request['engine'], 'network': 'disabled', 'blocked_network_events': [],
                 'request_sha256': request['request_sha256'], 'adapter_sha256': request['adapter']['sha256'], 'source_sha256': request['source']['sha256'], 'providers': providers}
+    if 'outpainting' in request:
+        expected['outpainting'] = request['outpainting']
     if segmentation:
         expected.update(prompt_sha256=request['prompt_plan']['sha256'], object_ids=request['prompt_plan']['object_ids'], mask_mode=request['prompt_plan']['mask_mode'])
     if inpainting:
@@ -297,6 +299,8 @@ def validate_response(response: dict, request: dict) -> None:
                         raise ValueError('joint model/prompt execution contract')
                     if type(execution.get('flow_shift')) not in {float,int} or execution['flow_shift']!=request['generation']['flow_shift'] or type(execution.get('model_input_scale')) is not int or execution['model_input_scale']!=request['generation']['model_input_scale']:
                         raise ValueError('joint sampling configuration mismatch')
+                    from .vace_model import validate_weight_reads
+                    validate_weight_reads(execution.get('local_weight_reads'))
                     from .cuda_admission import validate_execution
                     if execution.get('text_offload_hooks_removed_before_generation') is not True:
                         raise ValueError('text offload hooks were not released')
@@ -380,7 +384,8 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
             start, end = plan['range']['start_seconds'], plan['range']['end_seconds']
             duration = info['duration_seconds']
             base = [str(ffmpeg), '-nostdin', '-hide_banner', '-loglevel', 'error', '-protocol_whitelist', 'file,pipe']
-            vf = f"setpts=PTS-STARTPTS,trim=start={start:.12f}:end={end:.12f},setpts=PTS-STARTPTS,scale={info['width']}:{info['height']}:flags=lanczos,setsar=1,fps=fps={info['fps']}:start_time=0:round=near,tpad=stop_mode=clone:stop_duration={1 / float(Fraction(info['fps'])):.12f},format=rgba"
+            source_raster = plan.get('outpainting') or {'source_width': info['width'], 'source_height': info['height']}
+            vf = f"setpts=PTS-STARTPTS,trim=start={start:.12f}:end={end:.12f},setpts=PTS-STARTPTS,scale={source_raster['source_width']}:{source_raster['source_height']}:flags=lanczos,setsar=1,fps=fps={info['fps']}:start_time=0:round=near,tpad=stop_mode=clone:stop_duration={1 / float(Fraction(info['fps'])):.12f},format=rgba"
             decoder = [*base, '-i', str(source), '-map', f"0:{info['source_stream_index']}", '-an', '-sn', '-dn', '-vf', vf, '-frames:v', str(info['frames']), '-f', 'rawvideo', '-pix_fmt', 'rgba', 'pipe:1']
             if adapter['engine'] in {'torchscript-lama-local-v1', 'diffusers-wan-vace-local-v1'}:
                 from .local_inpainting import decoder_command

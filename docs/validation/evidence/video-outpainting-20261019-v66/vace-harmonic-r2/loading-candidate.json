@@ -1,0 +1,34 @@
+{
+  "status": "research_candidate_only",
+  "checked_at_utc": "2026-10-19T15:20:04.058115+00:00",
+  "local_crash_report_id": "c871f8d4-ed71-40d4-b435-549d2127c1d3",
+  "primary_sources": [
+    "https://github.com/Comfy-Org/ComfyUI/issues/15424",
+    "https://github.com/safetensors/safetensors/issues/693"
+  ],
+  "findings": [
+    "上游有相似 Windows safetensors/torch_cpu.dll 访问冲突报告及 pread 候选；不能据此证明本机同因。",
+    "当前本机 safetensors 0.8.0 声明 safe_open/load_file 的 backend 参数；Transformers 5.14.1 有 disable_mmap 参数。",
+    "disable_mmap 整片加载与逐张量 pread 的临时内存需求不同，需先做精确权重和峰值内存对照；禁止静默改写已登记原生依赖。"
+  ],
+  "files": {
+    "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\transformers\\modeling_utils.py": {
+      "sha256": "sha256:d8bf1879d6f582888b6cf47b4d63070260285a3bd1dc94ce7e1373304f74168a",
+      "bytes": 274811
+    },
+    "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\safetensors\\__init__.pyi": {
+      "sha256": "sha256:1bf1dd0b9c05cf230a87ba5cc9008e371963a2fe52fe1b101b57e55c2bcebe69",
+      "bytes": 9970
+    },
+    "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\safetensors\\torch.py": {
+      "sha256": "sha256:81f477f2ab5e05e99308fc55ed26028eb2bf36334404e9c5558e4730184483f0",
+      "bytes": 20902
+    }
+  },
+  "candidate_executed": false,
+  "actual_root_cause_confirmed": false,
+  "native_runtime_modified": false,
+  "product_source_modified": false,
+  "sampling_quality_parameters_changed": false,
+  "same_parameters_retry_running": true
+}

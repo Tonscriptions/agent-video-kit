@@ -1,0 +1,532 @@
+{
+  "status": "passed_delivery_quality_separate",
+  "started_at_utc": "2026-10-19T14:24:24.574256+00:00",
+  "source_scope": "exact archived V65 inputs; not later V66 outpaint code",
+  "calls": [
+    {
+      "name": "decode-source",
+      "command": [
+        "ffmpeg",
+        "-nostdin",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\vace-delivery-20261019-v66-r1\\source.mov",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-fps_mode",
+        "passthrough",
+        "-pix_fmt",
+        "rgba",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout": "decode-source.stdout.gz",
+      "stderr": "decode-source.stderr.log",
+      "stdout_sha256": "sha256:77ed84b4a2b893f68651b1a44d6c7782f25260500e2aaa171865e4ed470c4cf9",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_sha256": "sha256:61d8d642634b2f3e8f097c6292408f8bae5218825d7c113ce59039ede645a22d",
+      "raw_bytes": 786432
+    },
+    {
+      "name": "pts-source",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_frames",
+        "-show_streams",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\vace-delivery-20261019-v66-r1\\source.mov"
+      ],
+      "exit_code": 0,
+      "stdout": "pts-source.stdout.gz",
+      "stderr": "pts-source.stderr.log",
+      "stdout_sha256": "sha256:8a75483a40bdffd56aa1ebf9e54a8188b04f719788581e6a35b17f1c4333ddfe",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_sha256": "sha256:d6867b6486ea19dc1bfeaf8fc51625492719aae86658da01be1a9627ca3c0022",
+      "raw_bytes": 8697
+    },
+    {
+      "name": "pcm-source",
+      "command": [
+        "ffmpeg",
+        "-nostdin",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\vace-delivery-20261019-v66-r1\\source.mov",
+        "-map",
+        "0:a:0",
+        "-vn",
+        "-ar",
+        "48000",
+        "-ac",
+        "1",
+        "-f",
+        "s16le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout": "pcm-source.stdout.gz",
+      "stderr": "pcm-source.stderr.log",
+      "stdout_sha256": "sha256:ba5e15648ecd0fdc6ae8c977f624368edf54bb11d1cdecfe5d4eb9ae440db721",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_sha256": "sha256:b211f5b9fb006cd9dec017e23de27de2b842bdecc92a1a29ffd70f40b2af5d3d",
+      "raw_bytes": 96000
+    },
+    {
+      "name": "decode-mask",
+      "command": [
+        "ffmpeg",
+        "-nostdin",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\vace-delivery-20261019-v66-r1\\mask.mov",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-fps_mode",
+        "passthrough",
+        "-pix_fmt",
+        "rgba",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout": "decode-mask.stdout.gz",
+      "stderr": "decode-mask.stderr.log",
+      "stdout_sha256": "sha256:ea8016d16ac9cc6af9142ddd16b61bb4cdf365c94fd0ef2235ce9b61fc55b71d",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_sha256": "sha256:f52dcf88552cb35a66bef12b4d739518983bc5951dc633352cf1be07bfd902ad",
+      "raw_bytes": 786432
+    },
+    {
+      "name": "pts-mask",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_frames",
+        "-show_streams",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\vace-delivery-20261019-v66-r1\\mask.mov"
+      ],
+      "exit_code": 0,
+      "stdout": "pts-mask.stdout.gz",
+      "stderr": "pts-mask.stderr.log",
+      "stdout_sha256": "sha256:d51c12320fa1b17637eb941bc9fabcd3526e3a28f779c220417c533db29b2852",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_sha256": "sha256:6d254b9a13523207e720d58b01f98c08c542a4e2a7de21ead354c5bb40f21f12",
+      "raw_bytes": 8681
+    },
+    {
+      "name": "decode-repaired",
+      "command": [
+        "ffmpeg",
+        "-nostdin",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\vace-delivery-20261019-v66-r1\\repaired.mov",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-fps_mode",
+        "passthrough",
+        "-pix_fmt",
+        "rgba",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout": "decode-repaired.stdout.gz",
+      "stderr": "decode-repaired.stderr.log",
+      "stdout_sha256": "sha256:59d0b8e258f7ee89edf4ff954c7f4c204f774bfc263a8d21b1bf53b39816f187",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_sha256": "sha256:9e127dd34bb4fca7b3abc48f21793d8099756bd8b61b906da0158d8a784ae96b",
+      "raw_bytes": 786432
+    },
+    {
+      "name": "pts-repaired",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_frames",
+        "-show_streams",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\vace-delivery-20261019-v66-r1\\repaired.mov"
+      ],
+      "exit_code": 0,
+      "stdout": "pts-repaired.stdout.gz",
+      "stderr": "pts-repaired.stderr.log",
+      "stdout_sha256": "sha256:2cb7af1949ce738dd37e8209d8f927b3a626c5dfd7b84ef6c8a942ec81003356",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_sha256": "sha256:983e6afc435f1e81eade61665259483ba5b9182be7335ec741b918159cd104f6",
+      "raw_bytes": 8704
+    },
+    {
+      "name": "pcm-repaired",
+      "command": [
+        "ffmpeg",
+        "-nostdin",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\vace-delivery-20261019-v66-r1\\repaired.mov",
+        "-map",
+        "0:a:0",
+        "-vn",
+        "-ar",
+        "48000",
+        "-ac",
+        "1",
+        "-f",
+        "s16le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout": "pcm-repaired.stdout.gz",
+      "stderr": "pcm-repaired.stderr.log",
+      "stdout_sha256": "sha256:ba5e15648ecd0fdc6ae8c977f624368edf54bb11d1cdecfe5d4eb9ae440db721",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_sha256": "sha256:b211f5b9fb006cd9dec017e23de27de2b842bdecc92a1a29ffd70f40b2af5d3d",
+      "raw_bytes": 96000
+    }
+  ],
+  "files": {
+    "docs/assets/vace-delivery-20261019-v66-r1/comparison.gif": {
+      "sha256": "sha256:b31d6f63cc9996c3d6dff82c52e6589b0779bedc298efe7dcdc8a829eb9b3b2c",
+      "bytes": 178191
+    },
+    "docs/assets/vace-delivery-20261019-v66-r1/comparison.mp4": {
+      "sha256": "sha256:e56dbbca87ecf6b95cad8d75325921fb7ebb621a783d9aef8b51c16296b58e26",
+      "bytes": 9661
+    },
+    "docs/assets/vace-delivery-20261019-v66-r1/contact.png": {
+      "sha256": "sha256:3b88f200f29d813aaca2a040d491a07e73b303fe1e7c535c1229ca4ba445e664",
+      "bytes": 43179
+    },
+    "docs/assets/vace-delivery-20261019-v66-r1/ground-truth.npz": {
+      "sha256": "sha256:e3537405e09582cc046a7db1703a015cea909d2824a3aec9ac79d78e9cb6ec9a",
+      "bytes": 263991
+    },
+    "docs/assets/vace-delivery-20261019-v66-r1/mask.mov": {
+      "sha256": "sha256:1ba8880a706f86a1c6a006647c0cf7256904feacb3c9297c15472318f81a0663",
+      "bytes": 4856
+    },
+    "docs/assets/vace-delivery-20261019-v66-r1/provenance.json": {
+      "sha256": "sha256:882fdd58eaee4863c746db3e6471c1d91e6937158a42222feda1eb9e09e12ba2",
+      "bytes": 600
+    },
+    "docs/assets/vace-delivery-20261019-v66-r1/repaired.mov": {
+      "sha256": "sha256:764968342f4096c7f8b0b92bd9970ca5ebf5b5a2e880600231a3f2879b5c2d8c",
+      "bytes": 265559
+    },
+    "docs/assets/vace-delivery-20261019-v66-r1/repaired.mp4": {
+      "sha256": "sha256:b7d68be5d2623ea3d4c1bc4ef82f48e498350251ec7eb3abda1cb6e78d3c1625",
+      "bytes": 27515
+    },
+    "docs/assets/vace-delivery-20261019-v66-r1/source.mov": {
+      "sha256": "sha256:800f9903ca5256f196c0f9328671d41fd9e3ba25880760de24c0bb176e88b6c3",
+      "bytes": 200306
+    },
+    "docs/assets/vace-delivery-20261019-v66-r1/source.mp4": {
+      "sha256": "sha256:ffb070e0c18ef53381989dd5706ef99e247e22e3fe51b49343fc2375e1e09515",
+      "bytes": 13376
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/actual-summary.json": {
+      "sha256": "sha256:3f115b55c9143478fd6eb198f567f7db19ffc484c497b3fba0bc5c8f4b1cac89",
+      "bytes": 49565
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/actual-vace.stderr.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/actual-vace.stdout.log": {
+      "sha256": "sha256:2146f90cfbaa782e6c89df4d0c8d67a5ba2ff0dcd59d1240140d3198ac7b6e40",
+      "bytes": 3434
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/comparison-encode.stderr.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/comparison-encode.stdout.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/decode-mask.stderr.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/decode-mask.stdout.log": {
+      "sha256": "sha256:f52dcf88552cb35a66bef12b4d739518983bc5951dc633352cf1be07bfd902ad",
+      "bytes": 786432
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/decode-repaired.stderr.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/decode-repaired.stdout.log": {
+      "sha256": "sha256:9e127dd34bb4fca7b3abc48f21793d8099756bd8b61b906da0158d8a784ae96b",
+      "bytes": 786432
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/decode-source.stderr.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/decode-source.stdout.log": {
+      "sha256": "sha256:61d8d642634b2f3e8f097c6292408f8bae5218825d7c113ce59039ede645a22d",
+      "bytes": 786432
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/executed-create_lama_fixture.py": {
+      "sha256": "sha256:67c273fe4f72766e60ed7aae7f3ef81b19199b56d2b5dfb70dfc6581fc9ecb63",
+      "bytes": 2911
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/executed-run_cuda_admission_vace.py": {
+      "sha256": "sha256:055734800f47eb0ad48545a06f031fb805c41fcbcde391d6e6ee1363d23d606b",
+      "bytes": 9863
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/executed-smoke_lama_local.py": {
+      "sha256": "sha256:3d3084852625332f9e336e30fae3cb2a23d5cd8bbcd0ad67838265deecd2ddd1",
+      "bytes": 12819
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/fixture.stderr.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/fixture.stdout.log": {
+      "sha256": "sha256:30810f35c31abf67afb21ac134e2e34f7a0b6e4ae03bcf24888f3084ea1279ff",
+      "bytes": 99
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/pcm-repaired.stderr.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/pcm-repaired.stdout.log": {
+      "sha256": "sha256:b211f5b9fb006cd9dec017e23de27de2b842bdecc92a1a29ffd70f40b2af5d3d",
+      "bytes": 96000
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/pcm-source.stderr.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/pcm-source.stdout.log": {
+      "sha256": "sha256:b211f5b9fb006cd9dec017e23de27de2b842bdecc92a1a29ffd70f40b2af5d3d",
+      "bytes": 96000
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/source-preview.stderr.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/source-preview.stdout.log": {
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/source-snapshot.json": {
+      "sha256": "sha256:65b7e466aec83e197e9d3196435b393251d6207545cf8e6535d1292387550702",
+      "bytes": 24448
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/source-snapshot.zip": {
+      "sha256": "sha256:2cf36747d1b58e0c6ff2a763d8936ab8f90e7dfde39c7b4ef68e022aedc6a451",
+      "bytes": 1050178
+    },
+    "docs/validation/evidence/vace-delivery-20261019-v66-r1/verification.json": {
+      "sha256": "sha256:d3936eee06d923e4ed9ea4c843710b90a21e997d09ad5991fe50a71d58ccad24",
+      "bytes": 65165
+    }
+  },
+  "natural_quality_accepted": false,
+  "full_capcut_parity": false,
+  "continuous_playback": false,
+  "audio_listened": false,
+  "base_commit": "538aa63be821d2ce4ee01575d9a8067dcce6dbb9",
+  "archived_inputs": 198,
+  "frames": 8,
+  "fps": "8/1",
+  "every_pts_equal": true,
+  "original_alpha_exact": true,
+  "outside_rgba_changed_pixels": 0,
+  "audio_pcm_exact": true,
+  "mono_sample_frames": 48000,
+  "psnr_db": 25.17089114569786,
+  "controlled_gate_db": 30.0,
+  "controlled_quality_passed": false,
+  "window_calls": 2,
+  "gpu_admission": {
+    "policy": "cuda-uuid-physical-and-torch-free-v1",
+    "reservation": false,
+    "oom_guarantee": false,
+    "headroom_bytes": 805306368,
+    "text": {
+      "policy": "cuda-uuid-physical-and-torch-free-v1",
+      "stage": "text-weights",
+      "required_free_bytes": 8321499136,
+      "reservation": false,
+      "oom_guarantee": false,
+      "query_started_at_utc": "2026-10-19T14:00:23.994996+00:00",
+      "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+      "logical_device_index": 0,
+      "idle_cache_release": {
+        "scope": "current-worker",
+        "synchronized": true,
+        "empty_cache_called": true,
+        "completed": true,
+        "active_allocation_preserved": true,
+        "allocated_before_bytes": 0,
+        "reserved_before_bytes": 0,
+        "allocated_after_bytes": 0,
+        "reserved_after_bytes": 0,
+        "released_reserved_bytes": 0
+      },
+      "query_command": [
+        "C:\\Windows\\System32\\nvidia-smi.EXE",
+        "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+        "--query-gpu=uuid,memory.total,memory.free",
+        "--format=csv,noheader,nounits"
+      ],
+      "torch_free_bytes": 11799625728,
+      "torch_total_bytes": 12884377600,
+      "physical_free_bytes": 11191451648,
+      "physical_total_bytes": 12884901888,
+      "effective_free_bytes": 11191451648,
+      "query_finished_at_utc": "2026-10-19T14:00:24.367051+00:00",
+      "sample_seconds": 0.353985299996566,
+      "status": "admitted"
+    },
+    "video": {
+      "policy": "cuda-uuid-physical-and-torch-free-v1",
+      "stage": "video-weights",
+      "required_free_bytes": 5632686668,
+      "reservation": false,
+      "oom_guarantee": false,
+      "query_started_at_utc": "2026-10-19T14:20:49.677417+00:00",
+      "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+      "logical_device_index": 0,
+      "idle_cache_release": {
+        "scope": "current-worker",
+        "synchronized": true,
+        "empty_cache_called": true,
+        "completed": true,
+        "active_allocation_preserved": true,
+        "allocated_before_bytes": 8519680,
+        "reserved_before_bytes": 20971520,
+        "allocated_after_bytes": 8519680,
+        "reserved_after_bytes": 20971520,
+        "released_reserved_bytes": 0
+      },
+      "query_command": [
+        "C:\\Windows\\System32\\nvidia-smi.EXE",
+        "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+        "--query-gpu=uuid,memory.total,memory.free",
+        "--format=csv,noheader,nounits"
+      ],
+      "torch_free_bytes": 11745099776,
+      "torch_total_bytes": 12884377600,
+      "physical_free_bytes": 10890510336,
+      "physical_total_bytes": 12884901888,
+      "effective_free_bytes": 10890510336,
+      "query_finished_at_utc": "2026-10-19T14:20:49.739458+00:00",
+      "sample_seconds": 0.06204000000434462,
+      "status": "admitted"
+    },
+    "video_weight_bytes": 4823185996,
+    "prompt_embedding_bytes": 4194304,
+    "windows": {
+      "count": 2,
+      "minimum_torch_free_bytes": 6506414080,
+      "minimum_physical_free_bytes": 5651824640,
+      "first": {
+        "policy": "cuda-uuid-physical-and-torch-free-v1",
+        "stage": "video-window-1",
+        "required_free_bytes": 805306368,
+        "reservation": false,
+        "oom_guarantee": false,
+        "query_started_at_utc": "2026-10-19T14:21:42.556618+00:00",
+        "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+        "logical_device_index": 0,
+        "idle_cache_release": {
+          "scope": "current-worker",
+          "synchronized": true,
+          "empty_cache_called": true,
+          "completed": true,
+          "active_allocation_preserved": true,
+          "allocated_before_bytes": 4856760832,
+          "reserved_before_bytes": 5219811328,
+          "allocated_after_bytes": 4856760832,
+          "reserved_after_bytes": 5219811328,
+          "released_reserved_bytes": 0
+        },
+        "query_command": [
+          "C:\\Windows\\System32\\nvidia-smi.EXE",
+          "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+          "--query-gpu=uuid,memory.total,memory.free",
+          "--format=csv,noheader,nounits"
+        ],
+        "torch_free_bytes": 6546259968,
+        "torch_total_bytes": 12884377600,
+        "physical_free_bytes": 5691670528,
+        "physical_total_bytes": 12884901888,
+        "effective_free_bytes": 5691670528,
+        "query_finished_at_utc": "2026-10-19T14:21:42.607037+00:00",
+        "sample_seconds": 0.05041260000143666,
+        "status": "admitted"
+      },
+      "last": {
+        "policy": "cuda-uuid-physical-and-torch-free-v1",
+        "stage": "video-window-2",
+        "required_free_bytes": 805306368,
+        "reservation": false,
+        "oom_guarantee": false,
+        "query_started_at_utc": "2026-10-19T14:21:54.767339+00:00",
+        "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+        "logical_device_index": 0,
+        "idle_cache_release": {
+          "scope": "current-worker",
+          "synchronized": true,
+          "empty_cache_called": true,
+          "completed": true,
+          "active_allocation_preserved": true,
+          "allocated_before_bytes": 4856896512,
+          "reserved_before_bytes": 6314524672,
+          "allocated_after_bytes": 4856896512,
+          "reserved_after_bytes": 5219811328,
+          "released_reserved_bytes": 1094713344
+        },
+        "query_command": [
+          "C:\\Windows\\System32\\nvidia-smi.EXE",
+          "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+          "--query-gpu=uuid,memory.total,memory.free",
+          "--format=csv,noheader,nounits"
+        ],
+        "torch_free_bytes": 6506414080,
+        "torch_total_bytes": 12884377600,
+        "physical_free_bytes": 5651824640,
+        "physical_total_bytes": 12884901888,
+        "effective_free_bytes": 5651824640,
+        "query_finished_at_utc": "2026-10-19T14:21:54.837514+00:00",
+        "sample_seconds": 0.07015830000455026,
+        "status": "admitted"
+      }
+    }
+  },
+  "text_offload": null,
+  "commercial_publish_blocked": true,
+  "finished_at_utc": "2026-10-19T14:24:25.428918+00:00"
+}

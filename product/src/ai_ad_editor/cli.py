@@ -360,50 +360,58 @@ def build_parser() -> argparse.ArgumentParser:
     maskedit.add_argument('--cancel-file')
     maskedit.add_argument('--output')
 
-    inpaint = _leaf_common(ms.add_parser('inpaint', help='使用显式本地 LaMa 和蒙版修复视频区域'))
-    inpaint.add_argument('--project', required=True)
-    inpaint.add_argument('--asset-id', required=True)
-    inpaint.add_argument('--mask-asset-id', required=True)
-    inpaint.add_argument('--adapter-id', required=True)
-    inpaint.add_argument('--derived-asset-id', required=True)
-    inpaint.add_argument('--mask-channel', choices=['alpha', 'luma'], default='alpha')
-    inpaint.add_argument('--mask-start-seconds', type=float, default=0.)
-    inpaint.add_argument('--mask-resize', choices=['reject', 'nearest'], default='reject')
-    inpaint.add_argument('--mask-threshold', type=float, default=.5)
-    inpaint.add_argument('--mask-grow', type=int, default=4)
-    inpaint.add_argument('--mask-feather', type=float, default=0.)
-    inpaint.add_argument('--context-pixels', type=int, default=64)
-    inpaint.add_argument('--model-max-edge', type=int, default=1024)
-    inpaint.add_argument('--repair-blend', choices=['direct', 'harmonic'], default='direct', help='显式区域色差融合；默认直接合成')
-    inpaint.add_argument('--blend-max-iterations', type=int, default=None)
-    inpaint.add_argument('--blend-tolerance', type=float, default=None)
-    inpaint.add_argument('--output', default=None)
-    inpaint.add_argument('--start-seconds', type=float, default=0.)
-    inpaint.add_argument('--end-seconds', type=float, default=None)
-    inpaint.add_argument('--fps', default=None)
-    inpaint.add_argument('--max-edge', type=int, default=0)
-    inpaint.add_argument('--max-frames', type=int, default=18000)
-    inpaint.add_argument('--timeout-seconds', type=float, default=3600.)
-    inpaint.add_argument('--cancel-file', default=None)
-    inpaint.add_argument('--no-audio', action='store_true')
-    inpaint.add_argument('--sequence-id', default=None)
-    inpaint.add_argument('--track-id', default=None)
-    inpaint.add_argument('--audio-track-id', default=None)
-    inpaint.add_argument('--timeline-start-seconds', type=float, default=0.)
-    inpaint.add_argument('--apply', action='store_true')
-    inpaint.add_argument('--replace-track', action='store_true')
-    inpaint.add_argument('--prompt', default=None, help='VACE 的原文编辑提示词；不扩写、不截断')
-    inpaint.add_argument('--negative-prompt', default=None)
-    inpaint.add_argument('--seed', type=int, default=None)
-    inpaint.add_argument('--inference-steps', type=int, default=None)
-    inpaint.add_argument('--flow-shift', type=float, default=None, help='VACE flow-matching 时间偏移，默认 3；显式采样配置')
-    inpaint.add_argument('--model-input-scale', type=int, choices=[1,2,4], default=None, help='VACE 受限 ROI 栅格的 1/2/4 倍模型输入；输出画布不变')
-    inpaint.add_argument('--guidance-scale', type=float, default=None)
-    inpaint.add_argument('--conditioning-scale', type=float, default=None)
-    inpaint.add_argument('--window-frames', type=int, default=None)
-    inpaint.add_argument('--window-overlap', type=int, default=None)
-    inpaint.add_argument('--prompt-max-tokens', type=int, default=None)
-    inpaint.add_argument('--scene-cut-frame', type=int, action='append', default=None)
+    for action in ('inpaint', 'outpaint'):
+        inpaint = _leaf_common(ms.add_parser(action, help='使用显式本地 LaMa/VACE 扩图并保护原画面' if action == 'outpaint' else '使用显式本地 LaMa/VACE 和蒙版修复视频区域'))
+        inpaint.add_argument('--project', required=True)
+        inpaint.add_argument('--asset-id', required=True)
+        inpaint.add_argument('--adapter-id', required=True)
+        inpaint.add_argument('--derived-asset-id', required=True)
+        if action == 'inpaint':
+            inpaint.add_argument('--mask-asset-id', required=True)
+            inpaint.add_argument('--mask-channel', choices=['alpha', 'luma'], default='alpha')
+            inpaint.add_argument('--mask-start-seconds', type=float, default=0.)
+            inpaint.add_argument('--mask-resize', choices=['reject', 'nearest'], default='reject')
+            inpaint.add_argument('--mask-threshold', type=float, default=.5)
+            inpaint.add_argument('--mask-grow', type=int, default=4)
+            inpaint.add_argument('--mask-feather', type=float, default=0.)
+        else:
+            inpaint.add_argument('--width', type=int, required=True)
+            inpaint.add_argument('--height', type=int, required=True)
+            inpaint.add_argument('--offset-x', type=int)
+            inpaint.add_argument('--offset-y', type=int)
+            inpaint.set_defaults(mask_asset_id=None, mask_channel='alpha', mask_start_seconds=0., mask_resize='reject', mask_threshold=.5, mask_grow=0, mask_feather=0.)
+        inpaint.add_argument('--context-pixels', type=int, default=64)
+        inpaint.add_argument('--model-max-edge', type=int, default=1024)
+        inpaint.add_argument('--repair-blend', choices=['direct', 'harmonic'], default='direct', help='显式区域色差融合；默认直接合成')
+        inpaint.add_argument('--blend-max-iterations', type=int, default=None)
+        inpaint.add_argument('--blend-tolerance', type=float, default=None)
+        inpaint.add_argument('--output', default=None)
+        inpaint.add_argument('--start-seconds', type=float, default=0.)
+        inpaint.add_argument('--end-seconds', type=float, default=None)
+        inpaint.add_argument('--fps', default=None)
+        inpaint.add_argument('--max-edge', type=int, default=0)
+        inpaint.add_argument('--max-frames', type=int, default=18000)
+        inpaint.add_argument('--timeout-seconds', type=float, default=3600.)
+        inpaint.add_argument('--cancel-file', default=None)
+        inpaint.add_argument('--no-audio', action='store_true')
+        inpaint.add_argument('--sequence-id', default=None)
+        inpaint.add_argument('--track-id', default=None)
+        inpaint.add_argument('--audio-track-id', default=None)
+        inpaint.add_argument('--timeline-start-seconds', type=float, default=0.)
+        inpaint.add_argument('--apply', action='store_true')
+        inpaint.add_argument('--replace-track', action='store_true')
+        inpaint.add_argument('--prompt', default=None, help='VACE 的原文编辑提示词；不扩写、不截断')
+        inpaint.add_argument('--negative-prompt', default=None)
+        inpaint.add_argument('--seed', type=int, default=None)
+        inpaint.add_argument('--inference-steps', type=int, default=None)
+        inpaint.add_argument('--flow-shift', type=float, default=None, help='VACE flow-matching 时间偏移，默认 3；显式采样配置')
+        inpaint.add_argument('--model-input-scale', type=int, choices=[1,2,4], default=None, help='VACE 受限 ROI 栅格的 1/2/4 倍模型输入；输出画布不变')
+        inpaint.add_argument('--guidance-scale', type=float, default=None)
+        inpaint.add_argument('--conditioning-scale', type=float, default=None)
+        inpaint.add_argument('--window-frames', type=int, default=None)
+        inpaint.add_argument('--window-overlap', type=int, default=None)
+        inpaint.add_argument('--prompt-max-tokens', type=int, default=None)
+        inpaint.add_argument('--scene-cut-frame', type=int, action='append', default=None)
     audio = subs.add_parser("audio", help="本地音频处理")
     aus = audio.add_subparsers(dest="action", required=True)
     extract = _leaf_common(aus.add_parser("extract", help="从本地视频或音频资产提取无损 WAV"))
@@ -1972,9 +1980,10 @@ def command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
-    inpainting = args.action == 'inpaint'
-    command = 'media.inpaint' if inpainting else 'media.matting'
-    result_key = 'inpainting' if inpainting else 'matting'
+    outpainting = args.action == 'outpaint'
+    inpainting = args.action in {'inpaint', 'outpaint'}
+    command = 'media.' + args.action
+    result_key = 'outpainting' if outpainting else 'inpainting' if inpainting else 'matting'
     root, project = load_project(args.project)
     if not math.isfinite(args.timeline_start_seconds) or args.timeline_start_seconds < 0 or not math.isfinite(args.timeout_seconds) or not 0 < args.timeout_seconds <= 604800:
         raise argument_error('需要非负有限时间线起点及 0..604800 的超时预算', 'timeline_start_seconds/timeout_seconds')
@@ -2004,10 +2013,12 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
     parent = records.get(parent_ref)
     if parent is None or model_ref not in records or records[model_ref].get('sha256') != adapter['sha256']:
         raise AppError('MATTING_RIGHTS_DEPENDENCY_MISSING', '源素材或模型缺少匹配的权利记录', exit_code=7)
+    if outpainting and parent.get('sha256') != source_asset.get('sha256'):
+        raise AppError('OUTPAINT_RIGHTS_DEPENDENCY_MISMATCH', '扩图源与权利记录的内容摘要不符', exit_code=7)
     rights_dependencies = [parent_ref, model_ref]
     derived_from_assets = [args.asset_id]
     mask_asset = None
-    if inpainting:
+    if inpainting and not outpainting:
         mask_asset = asset_map(project).get(args.mask_asset_id)
         if mask_asset is None or mask_asset.get('kind') not in {'image', 'video'}:
             raise argument_error('区域修复需要已摄取的 image/video 蒙版资产', 'mask_asset_id')
@@ -2029,9 +2040,13 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
     if segmentation:
         plan['prompt_plan'], plan['prompt_source'] = load_segmentation_prompts(root, args.prompts, frames=plan['video']['frames'], object_ids=args.object_id, mask_mode=args.mask_mode, threshold=args.logit_threshold)
         plan['video'].pop('downsample_ratio', None)
+    if outpainting:
+        from .local_outpainting import extend_plan
+        extend_plan(plan, width=args.width, height=args.height, offset_x=args.offset_x, offset_y=args.offset_y)
     if inpainting:
-        plan['mask'] = prepare_inpaint_mask(root, mask_asset['uri'], kind=mask_asset['kind'], video=plan['video'], channel=args.mask_channel, start_seconds=args.mask_start_seconds, resize=args.mask_resize)
-        if plan['mask']['sha256'] != mask_asset.get('sha256'):
+        if not outpainting:
+            plan['mask'] = prepare_inpaint_mask(root, mask_asset['uri'], kind=mask_asset['kind'], video=plan['video'], channel=args.mask_channel, start_seconds=args.mask_start_seconds, resize=args.mask_resize)
+        if not outpainting and plan['mask']['sha256'] != mask_asset.get('sha256'):
             raise AppError('INPAINT_MASK_HASH_MISMATCH', '蒙版文件与已登记摘要不符', exit_code=10)
         if args.repair_blend == 'direct' and (args.blend_max_iterations is not None or args.blend_tolerance is not None):
             raise argument_error('求解参数要求显式 --repair-blend harmonic', 'repair_blend')
@@ -2055,7 +2070,7 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         if args.repair_blend == 'harmonic':
             plan['warnings'].append({'code':'REPAIR_HARMONIZE_REVIEW_REQUIRED','message':'逐帧空间色差修正；结构、纹理、残影、时序和背景真值须独立复核'})
         plan['video'].pop('downsample_ratio', None)
-        plan['warnings'].append({'code': 'INPAINT_MASK_CLOCK', 'message': '蒙版按自身显示起点加 mask-start-seconds 取样；缩放及 CFR 取样见计划，不推断源时钟或裁切关系'})
+        if not outpainting: plan['warnings'].append({'code': 'INPAINT_MASK_CLOCK', 'message': '蒙版按自身显示起点加 mask-start-seconds 取样；缩放及 CFR 取样见计划，不推断源时钟或裁切关系'})
     tps = int(project.get('settings', {}).get('timebase', {}).get('ticks_per_second', TICKS_PER_SECOND))
     start_tick = round(args.timeline_start_seconds * tps)
     duration_tick = max(1, round(plan['video']['duration_seconds'] * tps))
@@ -2088,9 +2103,12 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         published = True
         asset = {'id': derived_id, 'kind': 'video', 'uri': output.relative_to(root).as_posix(), 'sha256': result['sha256'], 'probe': result['probe'], 'rights_ref': derived_id,
                  'source': {'source_url': f'local://{output}', 'retrieved_at': now_iso(), 'original_name': output.name, 'derived_from': derived_from_assets}}
+        if outpainting:
+            from .local_outpainting import recipe
+            asset['source']['outpainting'] = recipe(plan, adapter, args.asset_id)
         rights = {key: copy.deepcopy(parent.get(key, default)) for key, default in [('creator', 'unknown'), ('license_spdx', 'LicenseRef-UNVERIFIED'), ('license_url', ''),
                   ('attribution', ''), ('permitted_uses', ['internal']), ('permitted_channels', []), ('restrictions', []), ('evidence', ''), ('verification_status', 'unverified'), ('verified_by', ''), ('takedown_status', 'clear')]}
-        rights.update(asset_id=derived_id, kind='video', sha256=result['sha256'], source_url=f'local://{output}', source_version='derived-video-vace-editing' if joint else 'derived-video-lama-inpainting' if inpainting else 'derived-video-sam2-segmentation' if segmentation else 'derived-video-rvm-matting', retrieved_at=now_iso(),
+        rights.update(asset_id=derived_id, kind='video', sha256=result['sha256'], source_url=f'local://{output}', source_version='derived-video-outpainting' if outpainting else 'derived-video-vace-editing' if joint else 'derived-video-lama-inpainting' if inpainting else 'derived-video-sam2-segmentation' if segmentation else 'derived-video-rvm-matting', retrieved_at=now_iso(),
                       derived_from=rights_dependencies, notes='Local prompted joint video windows; source, mask and model rights required' if joint else 'Local framewise masked repair; source, mask and model rights required' if inpainting else 'Local prompted object segmentation; source and model rights both required' if segmentation else 'Local recurrent human matting; source and model rights both required')
         project.setdefault('assets', []).append(asset)
         add_record(ledger, rights)
@@ -2112,7 +2130,7 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
             raise AppError('MATTING_APPLY_INVALID', '抠像项目校验失败', exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
         report = {'version': '0.1.0', 'created_at': now_iso(), 'operation_id': operation_id, 'snapshot_id': snapshot['snapshot_id'], 'source_asset_id': args.asset_id,
                   'asset': asset, 'rights': rights, 'generated_clip': clip, 'generated_audio_clip': audio_clip, result_key: result, 'validation': validation}
-        if inpainting: report['mask_asset_id'] = args.mask_asset_id
+        if inpainting and not outpainting: report['mask_asset_id'] = args.mask_asset_id
         atomic_write_json(report_path, report)
         project.setdefault('provenance', {}).setdefault('change_log', []).append({'operation_id': operation_id, 'command': command, 'engine': adapter['engine'],
             'asset_id': derived_id, 'source_asset_id': args.asset_id, 'snapshot_id': snapshot['snapshot_id'], 'report': str(report_path), 'at': now_iso()})
@@ -6632,6 +6650,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "stabilize"): command_media_stabilize,
     ("media", "matting"): command_media_matting,
     ("media", "inpaint"): command_media_matting,
+    ("media", "outpaint"): command_media_matting,
     ('media', 'mask-edit'): command_media_mask_edit,
     ("media", "relink"): command_media_relink,
     ("media", "adapter"): command_media_adapter,

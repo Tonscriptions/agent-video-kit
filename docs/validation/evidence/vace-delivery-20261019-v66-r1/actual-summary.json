@@ -1,0 +1,1395 @@
+{
+  "checked_at_utc": "2026-10-19T14:22:18.321669Z",
+  "checks": [
+    {
+      "command": "project.init",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "media.ingest",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "media.ingest",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "media.adapter.register",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "media.inpaint",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "render",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "quality.check",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "validate",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "policy.audit",
+      "status": "succeeded",
+      "exit_code": 0
+    },
+    {
+      "command": "rights.check",
+      "status": "failed",
+      "exit_code": 7
+    }
+  ],
+  "adapter": {
+    "adapter_id": "vace_local",
+    "kind": "video-inpainting",
+    "engine": "diffusers-wan-vace-local-v1",
+    "protocol": "agent-video-wan-vace-inpainting-v1",
+    "output_contract": "rgba_video_v1",
+    "model_path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b",
+    "model_sha256": "sha256:5a634bfa299951a011112dde59027a2daafd7e51263b6e5e63c5b2843df3a991",
+    "model_kind": "directory",
+    "model_file_count": 17,
+    "executable": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+    "executable_sha256": "sha256:ef8f51028ac5329641985112f8efb1c2d4c47c86b8011ddf7e6fae21e2b4e5a1",
+    "rights_ref": "visual_adapter_vace_local",
+    "capabilities": [
+      "prompted_masked_video_editing",
+      "joint_temporal_windows",
+      "native_cuda_bfloat16",
+      "outside_rgb_and_alpha_preserved"
+    ],
+    "settings": {
+      "device": "cuda",
+      "threads": 4,
+      "precision": "bfloat16",
+      "vae_precision": "float32",
+      "text_gpu_budget_mib": 7168,
+      "text_cpu_budget_mib": 8192,
+      "text_offload": "explicit-balanced-weights-then-release",
+      "state_budget_bytes": 536870912
+    },
+    "artifacts": [
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\model_index.json",
+        "role": "model",
+        "bytes": 408,
+        "sha256": "sha256:078a0c056f61edae212c2e7e78fcb061e48a9bc886c08fb245bf5e165e371ea2"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\scheduler\\scheduler_config.json",
+        "role": "model",
+        "bytes": 751,
+        "sha256": "sha256:070dc020808eec985634b83015c1596425c264d8fa80afe22aa1e02e9e903e6c"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\text_encoder\\config.json",
+        "role": "model",
+        "bytes": 850,
+        "sha256": "sha256:6de5b5703cea483f528659de1e9f3b81955833a027b2a785d3c0f17dc07a938c"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\text_encoder\\model-00001-of-00003.safetensors",
+        "role": "model",
+        "bytes": 4935812536,
+        "sha256": "sha256:a8e861969c7433e707cc5a74065d795d36cca07ec96eb6763eb4083df7248f58"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\text_encoder\\model-00002-of-00003.safetensors",
+        "role": "model",
+        "bytes": 4983103192,
+        "sha256": "sha256:d57d948ece4837d850b7a859a4415121d57cacf8b9ee1d4db200c67f592902d7"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\text_encoder\\model-00003-of-00003.safetensors",
+        "role": "model",
+        "bytes": 1442935480,
+        "sha256": "sha256:0da9ee284e21d1406df708788db1d502d95d75f69faa25cd26151bf8829b7c5f"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\text_encoder\\model.safetensors.index.json",
+        "role": "model",
+        "bytes": 22476,
+        "sha256": "sha256:31c4c7bcce679eaa0dd4667462394ddb013dc2f748e0bffc893dc9146a320dab"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\tokenizer\\special_tokens_map.json",
+        "role": "model",
+        "bytes": 7079,
+        "sha256": "sha256:456b58fd240a06c743a7c2cf8008bec501240d68ebd1fc4018ea569505fea270"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\tokenizer\\spiece.model",
+        "role": "model",
+        "bytes": 4548313,
+        "sha256": "sha256:e3909a67b780650b35cf529ac782ad2b6b26e6d1f849d3fbb6a872905f452458"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\tokenizer\\tokenizer.json",
+        "role": "model",
+        "bytes": 16837459,
+        "sha256": "sha256:20a46ac256746594ed7e1e3ef733b83fbc5a6f0922aa7480eda961743de080ef"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\tokenizer\\tokenizer_config.json",
+        "role": "model",
+        "bytes": 61786,
+        "sha256": "sha256:89bef11d01c80a229079666dd470d536aba87b8eaa00b51cc481ba625be59269"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\transformer\\config.json",
+        "role": "model",
+        "bytes": 662,
+        "sha256": "sha256:58a07adcbe6ae67624d66918ca2ba65615f931c4a26d8f384ae8ac1e68de0608"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\transformer\\diffusion_pytorch_model-00001-of-00002.safetensors",
+        "role": "model",
+        "bytes": 4999964504,
+        "sha256": "sha256:192804a4e10b5bb0a13f5c224bc4ec9707b3b8cc0def8eea005dbce7c9d6752a"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\transformer\\diffusion_pytorch_model-00002-of-00002.safetensors",
+        "role": "model",
+        "bytes": 2146103400,
+        "sha256": "sha256:dadaf1d5e9ccf826e2c497aa9fc2756a044f606d0aa919e5405a734a121bcf7e"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\transformer\\diffusion_pytorch_model.safetensors.index.json",
+        "role": "model",
+        "bytes": 114130,
+        "sha256": "sha256:2ed4b491e7a7f3e8185526d5d9a259944871a122a1eec86808bac9194a965d83"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\vae\\config.json",
+        "role": "model",
+        "bytes": 724,
+        "sha256": "sha256:7a3afcf422b9a9d63e0b6ca7e0d3b5193220a61f5b203bb8417900bc090705e8"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\wan2.1-vace-1.3b\\vae\\diffusion_pytorch_model.safetensors",
+        "role": "model",
+        "bytes": 507591892,
+        "sha256": "sha256:d6e524b3fffede1787a74e81b30976dce5400c4439ba64222168e607ed19e793"
+      },
+      {
+        "path": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+        "role": "python",
+        "bytes": 105696,
+        "sha256": "sha256:ef8f51028ac5329641985112f8efb1c2d4c47c86b8011ddf7e6fae21e2b4e5a1"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\models\\generative\\vace-evidence.json",
+        "role": "evidence",
+        "bytes": 5762,
+        "sha256": "sha256:ee32da2e5a97e3e157ce038670c7c61f7f083f7d4d34d7cf773a30b4f38a9aa5"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\vace_worker.py",
+        "role": "worker",
+        "bytes": 5286,
+        "sha256": "sha256:40d2653fc075c8da472d51f635dac8d820924761608f199633ed3216155de6ef"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\vace_frames.py",
+        "role": "frames",
+        "bytes": 11383,
+        "sha256": "sha256:760b1c72434be77a4bc748a62818342bf00760a86b675f0d0068c8a2233fb20f"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\local_vace.py",
+        "role": "controller",
+        "bytes": 18193,
+        "sha256": "sha256:f098a86e8cdee834b222a52b877aa9bfa3ee54fb1fc24d1cafe823ac76ea24d2"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\vace_model.py",
+        "role": "model_loader",
+        "bytes": 9307,
+        "sha256": "sha256:63d4983cebaec2f4d29537bf44804f4554b6a5c2d8426430432f6632f3bd2b58"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\local_matting.py",
+        "role": "pipeline",
+        "bytes": 41124,
+        "sha256": "sha256:171617467fc6acc9dbf31d6d80e0c1029c3957ad2671e3c1bc25bc5c4455d75e"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\local_inpainting.py",
+        "role": "mask_controller",
+        "bytes": 13779,
+        "sha256": "sha256:121641ba4f9d0e24f6b238fcd7d76da05940fd557d0a2a1c5538fc10bbae82a7"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\matting_frames.py",
+        "role": "rgba",
+        "bytes": 4054,
+        "sha256": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\rvm_worker.py",
+        "role": "guard",
+        "bytes": 5298,
+        "sha256": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\artifact_locks.py",
+        "role": "artifact_verification",
+        "bytes": 4696,
+        "sha256": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\utils.py",
+        "role": "io",
+        "bytes": 12980,
+        "sha256": "sha256:78f984613b0c253d108dd4d515557f77bc4ebd4df4945108a63d8fdb38ad202b"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\repair_blend.py",
+        "role": "blend",
+        "bytes": 14157,
+        "sha256": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6"
+      },
+      {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\cuda_admission.py",
+        "role": "cuda_admission",
+        "bytes": 11092,
+        "sha256": "sha256:8d030f776b09edeb9d6cfecce720caca3f20a1fab058dd3dc406020ed064fd3b"
+      }
+    ],
+    "network": "disabled",
+    "registered_at": "2026-10-19T13:40:20.802992Z",
+    "verification_status": "unverified",
+    "sha256": "sha256:793eabf0a5b326923afc4b734a6efca4d9beda53330c11c8e922dfb46941e1c0"
+  },
+  "source_sha256": "sha256:800f9903ca5256f196c0f9328671d41fd9e3ba25880760de24c0bb176e88b6c3",
+  "mask_sha256": "sha256:1ba8880a706f86a1c6a006647c0cf7256904feacb3c9297c15472318f81a0663",
+  "plan": null,
+  "inpainting": {
+    "version": "0.1.0",
+    "engine": "diffusers-wan-vace-local-v1",
+    "protocol": "agent-video-wan-vace-inpainting-v1",
+    "network": "disabled",
+    "source": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\vace-delivery-20261019-v66-r1\\actual\\project\\assets\\asset_20261019132907_cac537d1_source.mov",
+      "sha256": "sha256:800f9903ca5256f196c0f9328671d41fd9e3ba25880760de24c0bb176e88b6c3"
+    },
+    "input_probe": {
+      "duration_seconds": 1.0,
+      "duration_tick": 90000,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "qtrle",
+          "codec_long_name": "QuickTime Animation (RLE) video",
+          "codec_type": "video",
+          "codec_tag_string": "rle ",
+          "codec_tag": "0x20656c72",
+          "width": 192,
+          "height": 128,
+          "coded_width": 192,
+          "coded_height": 128,
+          "has_b_frames": 0,
+          "pix_fmt": "argb",
+          "level": -99,
+          "field_order": "progressive",
+          "id": "0x1",
+          "r_frame_rate": "8/1",
+          "avg_frame_rate": "8/1",
+          "time_base": "1/16384",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 16384,
+          "duration": "1.000000",
+          "bit_rate": "823672",
+          "nb_frames": "8",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "handler_name": "VideoHandler",
+            "vendor_id": "FFMP",
+            "encoder": "Lavc62.28.100 qtrle"
+          }
+        },
+        {
+          "index": 1,
+          "codec_name": "pcm_s16le",
+          "codec_long_name": "PCM signed 16-bit little-endian",
+          "codec_type": "audio",
+          "codec_tag_string": "sowt",
+          "codec_tag": "0x74776f73",
+          "sample_fmt": "s16",
+          "sample_rate": "48000",
+          "channels": 1,
+          "channel_layout": "mono",
+          "bits_per_sample": 16,
+          "initial_padding": 0,
+          "id": "0x2",
+          "r_frame_rate": "0/0",
+          "avg_frame_rate": "0/0",
+          "time_base": "1/48000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 48000,
+          "duration": "1.000000",
+          "bit_rate": "768000",
+          "nb_frames": "48000",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "handler_name": "SoundHandler",
+            "vendor_id": "[0][0][0][0]"
+          }
+        }
+      ],
+      "video": {
+        "codec": "qtrle",
+        "width": 192,
+        "height": 128,
+        "pix_fmt": "argb",
+        "fps": "8/1",
+        "color_space": null,
+        "duration_seconds": 1.0,
+        "start_time_seconds": 0.0
+      },
+      "audio": {
+        "codec": "pcm_s16le",
+        "sample_rate": 48000,
+        "channels": 1,
+        "duration_seconds": 1.0,
+        "start_time_seconds": 0.0
+      }
+    },
+    "range": {
+      "start_seconds": 0.0,
+      "end_seconds": 1.0
+    },
+    "video": {
+      "width": 192,
+      "height": 128,
+      "fps": "8",
+      "frames": 8,
+      "duration_seconds": 1.0,
+      "source_stream_index": 0,
+      "source_width": 192,
+      "source_height": 128,
+      "source_sar": "1",
+      "source_rotation": 0.0,
+      "clock": "ffmpeg-fps-resampled-source-seconds",
+      "alpha_mode": "straight",
+      "codec": "qtrle",
+      "pix_fmt": "argb"
+    },
+    "audio": {
+      "preserve": true,
+      "source_offset_seconds": 0.0,
+      "codec": "pcm_s24le"
+    },
+    "warnings": [
+      {
+        "code": "VACE_MODEL_REVIEW_REQUIRED",
+        "message": "联合窗口生成须复核提示词、纹理、物体/身份、遮挡、窗口接缝与许可；未验收全视频时序或完整剪映效果"
+      },
+      {
+        "code": "MATTING_CFR_CLOCK",
+        "message": "输出使用显式 CFR，尾部不足一帧按末帧补齐，源时钟与输出时长见报告"
+      },
+      {
+        "code": "INPAINT_MASK_CLOCK",
+        "message": "蒙版按自身显示起点加 mask-start-seconds 取样；缩放及 CFR 取样见计划，不推断源时钟或裁切关系"
+      }
+    ],
+    "mask": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\vace-delivery-20261019-v66-r1\\actual\\project\\assets\\asset_20261019132908_e8a368c6_mask.mov",
+      "sha256": "sha256:1ba8880a706f86a1c6a006647c0cf7256904feacb3c9297c15472318f81a0663",
+      "kind": "video",
+      "channel": "alpha",
+      "start_seconds": 0.0,
+      "resize": "reject",
+      "source_stream_index": 0,
+      "source_width": 192,
+      "source_height": 128,
+      "display_width": 192.0,
+      "display_height": 128,
+      "source_sar": "1",
+      "source_rotation": 0.0,
+      "source_fps": "8/1",
+      "alpha_decoder": null,
+      "clock": "ffmpeg-fps-resampled-mask-seconds",
+      "layout": "horizontal-source-rgba-mask-rgba",
+      "plan_sha256": "sha256:3df88ee37ca82984c238118c97b3f3a1be730efaee15cae9289d3386ca2979d7"
+    },
+    "inpainting": {
+      "threshold": 0.5,
+      "grow": 0,
+      "feather": 0.0,
+      "context": 64,
+      "model_max_edge": 192,
+      "blend_mode": "direct",
+      "blend_max_iterations": 2000,
+      "blend_tolerance": 1e-06
+    },
+    "generation": {
+      "prompt": "A static empty smooth gray and blue gradient background. The background remains clean, still and consistent.",
+      "negative_prompt": "person, object, text, watermark, motion, artifacts",
+      "seed": 0,
+      "inference_steps": 30,
+      "guidance_scale": 5.0,
+      "conditioning_scale": 1.0,
+      "window_frames": 5,
+      "window_overlap": 2,
+      "prompt_max_tokens": 256,
+      "flow_shift": 3.0,
+      "model_input_scale": 1,
+      "scene_cut_frames": []
+    },
+    "windows": [
+      {
+        "start": 0,
+        "end": 5,
+        "model_frames": 5,
+        "scene_start": 0,
+        "scene_end": 8,
+        "seed": 0
+      },
+      {
+        "start": 3,
+        "end": 8,
+        "model_frames": 5,
+        "scene_start": 0,
+        "scene_end": 8,
+        "seed": 1
+      }
+    ],
+    "owned_array_budget_bytes": 11403264,
+    "blend_budget": {
+      "mode": "direct",
+      "mask_pixel_count_known": false,
+      "solver_owned_minimum_nonempty_bytes": 0,
+      "solver_owned_maximum_bytes": 0,
+      "state_budget_bytes": 536870912,
+      "admission": "actual-selected-pixels-before-each-model-call-and-before-blend",
+      "scope": "owned-arrays-excludes-model-torch-and-total-process-or-device-memory",
+      "owned_array_base_bytes": 11403264,
+      "available_solver_bytes": 525467648
+    },
+    "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\vace-delivery-20261019-v66-r1\\actual\\project\\assets\\derived\\repaired.mov",
+    "sha256": "sha256:764968342f4096c7f8b0b92bd9970ca5ebf5b5a2e880600231a3f2879b5c2d8c",
+    "probe": {
+      "duration_seconds": 1.0,
+      "duration_tick": 90000,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "qtrle",
+          "codec_long_name": "QuickTime Animation (RLE) video",
+          "codec_type": "video",
+          "codec_tag_string": "rle ",
+          "codec_tag": "0x20656c72",
+          "width": 192,
+          "height": 128,
+          "coded_width": 192,
+          "coded_height": 128,
+          "has_b_frames": 0,
+          "pix_fmt": "argb",
+          "level": -99,
+          "field_order": "progressive",
+          "id": "0x1",
+          "r_frame_rate": "8/1",
+          "avg_frame_rate": "8/1",
+          "time_base": "1/16384",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 16384,
+          "duration": "1.000000",
+          "bit_rate": "961264",
+          "nb_frames": "8",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "handler_name": "VideoHandler",
+            "vendor_id": "FFMP",
+            "encoder": "Lavc62.28.100 qtrle"
+          }
+        },
+        {
+          "index": 1,
+          "codec_name": "pcm_s24le",
+          "codec_long_name": "PCM signed 24-bit little-endian",
+          "codec_type": "audio",
+          "codec_tag_string": "in24",
+          "codec_tag": "0x34326e69",
+          "sample_fmt": "s32",
+          "sample_rate": "48000",
+          "channels": 1,
+          "channel_layout": "mono",
+          "bits_per_sample": 24,
+          "initial_padding": 0,
+          "id": "0x2",
+          "r_frame_rate": "0/0",
+          "avg_frame_rate": "0/0",
+          "time_base": "1/48000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 48000,
+          "duration": "1.000000",
+          "bit_rate": "1152000",
+          "bits_per_raw_sample": "24",
+          "nb_frames": "48000",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "handler_name": "SoundHandler",
+            "vendor_id": "[0][0][0][0]"
+          }
+        }
+      ],
+      "video": {
+        "codec": "qtrle",
+        "width": 192,
+        "height": 128,
+        "pix_fmt": "argb",
+        "fps": "8/1",
+        "color_space": null,
+        "duration_seconds": 1.0,
+        "start_time_seconds": 0.0
+      },
+      "audio": {
+        "codec": "pcm_s24le",
+        "sample_rate": 48000,
+        "channels": 1,
+        "duration_seconds": 1.0,
+        "start_time_seconds": 0.0
+      }
+    },
+    "adapter_id": "vace_local",
+    "adapter_sha256": "sha256:793eabf0a5b326923afc4b734a6efca4d9beda53330c11c8e922dfb46941e1c0",
+    "checkpoint_sha256": "sha256:5a634bfa299951a011112dde59027a2daafd7e51263b6e5e63c5b2843df3a991",
+    "rgba_roundtrip_verified": true,
+    "ffmpeg": {
+      "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+      "sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+    },
+    "worker": {
+      "protocol": "agent-video-wan-vace-inpainting-v1",
+      "engine": "diffusers-wan-vace-local-v1",
+      "network": "disabled",
+      "blocked_network_events": [],
+      "request_sha256": "sha256:b37b08f0c3796670a9f0e84767799ad8ef9c62d5388d4d8129ca566c16c41a10",
+      "adapter_sha256": "sha256:793eabf0a5b326923afc4b734a6efca4d9beda53330c11c8e922dfb46941e1c0",
+      "source_sha256": "sha256:800f9903ca5256f196c0f9328671d41fd9e3ba25880760de24c0bb176e88b6c3",
+      "mask_sha256": "sha256:1ba8880a706f86a1c6a006647c0cf7256904feacb3c9297c15472318f81a0663",
+      "mask_plan_sha256": "sha256:3df88ee37ca82984c238118c97b3f3a1be730efaee15cae9289d3386ca2979d7",
+      "inpainting": {
+        "threshold": 0.5,
+        "grow": 0,
+        "feather": 0.0,
+        "context": 64,
+        "model_max_edge": 192,
+        "blend_mode": "direct",
+        "blend_max_iterations": 2000,
+        "blend_tolerance": 1e-06
+      },
+      "generation": {
+        "prompt": "A static empty smooth gray and blue gradient background. The background remains clean, still and consistent.",
+        "negative_prompt": "person, object, text, watermark, motion, artifacts",
+        "seed": 0,
+        "inference_steps": 30,
+        "guidance_scale": 5.0,
+        "conditioning_scale": 1.0,
+        "window_frames": 5,
+        "window_overlap": 2,
+        "prompt_max_tokens": 256,
+        "flow_shift": 3.0,
+        "model_input_scale": 1,
+        "scene_cut_frames": []
+      },
+      "status": "succeeded",
+      "metrics": {
+        "frames": 8,
+        "width": 192,
+        "height": 128,
+        "rgba_sha256": "sha256:9e127dd34bb4fca7b3abc48f21793d8099756bd8b61b906da0158d8a784ae96b",
+        "rgba_bytes": 786432,
+        "source_rgba_sha256": "sha256:61d8d642634b2f3e8f097c6292408f8bae5218825d7c113ce59039ede645a22d",
+        "decoded_mask_rgba_sha256": "sha256:f52dcf88552cb35a66bef12b4d739518983bc5951dc633352cf1be07bfd902ad",
+        "input_alpha_sha256": "sha256:4c8a013301abe61e0de71e163617df5f51ede71919c9210bddef43e74829f243",
+        "output_alpha_sha256": "sha256:4c8a013301abe61e0de71e163617df5f51ede71919c9210bddef43e74829f243",
+        "state_updates": 8,
+        "state_peak_bytes": 11403264,
+        "base_state_peak_bytes": 11403264,
+        "blend": {
+          "mode": "direct",
+          "solver": "none",
+          "frames": 0,
+          "max_selected_pixels": 0,
+          "owned_array_peak_bytes": 0,
+          "iterations_max": [
+            0,
+            0,
+            0
+          ],
+          "residual_ratio_max": 0.0,
+          "boundary_edges": 0,
+          "clipped_rgb_values": 0,
+          "max_abs_correction": 0.0,
+          "seconds": 0.0,
+          "samples": []
+        },
+        "state_reset": "per-joint-window-and-scene",
+        "buffer_budget_scope": "conservative-owned-window-array-upper-bound-excludes-model-and-torch-temporaries",
+        "input_alpha": "preserve",
+        "alpha_mode": "straight",
+        "alpha_min": 128,
+        "alpha_max": 255,
+        "alpha_mean": 0.998703022875817,
+        "transparent_pixels": 0,
+        "opaque_pixels": 196096,
+        "soft_alpha_pixels": 512,
+        "conditioning": "masked-rgb-127-before-and-after-resize",
+        "model_calls": 2,
+        "empty_windows": 0,
+        "empty_mask_frames": 1,
+        "mask_pixels": 5460,
+        "resized_model_frames": 0,
+        "model_peak_pixels": 112640,
+        "outside_mask_changed_pixels": 0,
+        "clipped_model_values": 0,
+        "padded_frames": 0,
+        "window_count": 2,
+        "window_plan_sha256": "sha256:84800a3744ae5b26289e1f621773f59df40a141de61ef7f08fe065f063a9df66",
+        "overlap_frames_blended": 2,
+        "window_samples": [
+          {
+            "start": 0,
+            "end": 5,
+            "model_frames": 5,
+            "seed": 0,
+            "model_calls": 1,
+            "roi": [
+              4,
+              0,
+              168,
+              128
+            ],
+            "resized": false,
+            "model_pixels": 112640,
+            "padded_frames": 0,
+            "clipped_model_values": 0,
+            "base_model_size": [
+              176,
+              128
+            ],
+            "model_size": [
+              176,
+              128
+            ],
+            "model_input_scale": 1
+          },
+          {
+            "start": 3,
+            "end": 8,
+            "model_frames": 5,
+            "seed": 1,
+            "model_calls": 1,
+            "roi": [
+              8,
+              0,
+              174,
+              128
+            ],
+            "resized": false,
+            "model_pixels": 112640,
+            "padded_frames": 0,
+            "clipped_model_values": 0,
+            "base_model_size": [
+              176,
+              128
+            ],
+            "model_size": [
+              176,
+              128
+            ],
+            "model_input_scale": 1
+          }
+        ]
+      },
+      "providers": [
+        "torch-cuda"
+      ],
+      "versions": {
+        "python": "3.13.14",
+        "numpy": "2.4.6",
+        "torch": "2.13.0+cu130",
+        "diffusers": "0.39.0",
+        "transformers": "5.14.1",
+        "accelerate": "1.14.0",
+        "safetensors": "0.8.0"
+      },
+      "model_execution": {
+        "versions": {
+          "python": "3.13.14",
+          "numpy": "2.4.6",
+          "torch": "2.13.0+cu130",
+          "diffusers": "0.39.0",
+          "transformers": "5.14.1",
+          "accelerate": "1.14.0",
+          "safetensors": "0.8.0"
+        },
+        "text_device_map": {
+          "shared": "0",
+          "encoder.embed_tokens": "0",
+          "encoder.block.0": "0",
+          "encoder.block.1": "0",
+          "encoder.block.2": "0",
+          "encoder.block.3": "0",
+          "encoder.block.4": "0",
+          "encoder.block.5": "0",
+          "encoder.block.6": "0",
+          "encoder.block.7": "0",
+          "encoder.block.8": "0",
+          "encoder.block.9": "0",
+          "encoder.block.10": "0",
+          "encoder.block.11": "0",
+          "encoder.block.12": "0",
+          "encoder.block.13": "cpu",
+          "encoder.block.14": "cpu",
+          "encoder.block.15": "cpu",
+          "encoder.block.16": "cpu",
+          "encoder.block.17": "cpu",
+          "encoder.block.18": "cpu",
+          "encoder.block.19": "cpu",
+          "encoder.block.20": "cpu",
+          "encoder.block.21": "cpu",
+          "encoder.block.22": "cpu",
+          "encoder.block.23": "cpu",
+          "encoder.final_layer_norm": "cpu",
+          "encoder.dropout": "cpu"
+        },
+        "text_weight_bytes_bfloat16": 11361820672,
+        "text_encoder_released_before_generation": true,
+        "text_offload_hooks_removed_before_generation": true,
+        "prompt_token_counts": {
+          "prompt": 21,
+          "negative_prompt": 14
+        },
+        "prompt_truncated": false,
+        "prompt_extension": false,
+        "text_phase_seconds": 584.6246211999969,
+        "load_seconds": 1278.4977775999869,
+        "cuda_device": "NVIDIA GeForce RTX 3060",
+        "cuda_total_bytes": 12884377600,
+        "gpu_admission": {
+          "policy": "cuda-uuid-physical-and-torch-free-v1",
+          "reservation": false,
+          "oom_guarantee": false,
+          "headroom_bytes": 805306368,
+          "text": {
+            "policy": "cuda-uuid-physical-and-torch-free-v1",
+            "stage": "text-weights",
+            "required_free_bytes": 8321499136,
+            "reservation": false,
+            "oom_guarantee": false,
+            "query_started_at_utc": "2026-10-19T14:00:23.994996+00:00",
+            "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+            "logical_device_index": 0,
+            "idle_cache_release": {
+              "scope": "current-worker",
+              "synchronized": true,
+              "empty_cache_called": true,
+              "completed": true,
+              "active_allocation_preserved": true,
+              "allocated_before_bytes": 0,
+              "reserved_before_bytes": 0,
+              "allocated_after_bytes": 0,
+              "reserved_after_bytes": 0,
+              "released_reserved_bytes": 0
+            },
+            "query_command": [
+              "C:\\Windows\\System32\\nvidia-smi.EXE",
+              "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+              "--query-gpu=uuid,memory.total,memory.free",
+              "--format=csv,noheader,nounits"
+            ],
+            "torch_free_bytes": 11799625728,
+            "torch_total_bytes": 12884377600,
+            "physical_free_bytes": 11191451648,
+            "physical_total_bytes": 12884901888,
+            "effective_free_bytes": 11191451648,
+            "query_finished_at_utc": "2026-10-19T14:00:24.367051+00:00",
+            "sample_seconds": 0.353985299996566,
+            "status": "admitted"
+          },
+          "video": {
+            "policy": "cuda-uuid-physical-and-torch-free-v1",
+            "stage": "video-weights",
+            "required_free_bytes": 5632686668,
+            "reservation": false,
+            "oom_guarantee": false,
+            "query_started_at_utc": "2026-10-19T14:20:49.677417+00:00",
+            "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+            "logical_device_index": 0,
+            "idle_cache_release": {
+              "scope": "current-worker",
+              "synchronized": true,
+              "empty_cache_called": true,
+              "completed": true,
+              "active_allocation_preserved": true,
+              "allocated_before_bytes": 8519680,
+              "reserved_before_bytes": 20971520,
+              "allocated_after_bytes": 8519680,
+              "reserved_after_bytes": 20971520,
+              "released_reserved_bytes": 0
+            },
+            "query_command": [
+              "C:\\Windows\\System32\\nvidia-smi.EXE",
+              "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+              "--query-gpu=uuid,memory.total,memory.free",
+              "--format=csv,noheader,nounits"
+            ],
+            "torch_free_bytes": 11745099776,
+            "torch_total_bytes": 12884377600,
+            "physical_free_bytes": 10890510336,
+            "physical_total_bytes": 12884901888,
+            "effective_free_bytes": 10890510336,
+            "query_finished_at_utc": "2026-10-19T14:20:49.739458+00:00",
+            "sample_seconds": 0.06204000000434462,
+            "status": "admitted"
+          },
+          "video_weight_bytes": 4823185996,
+          "prompt_embedding_bytes": 4194304,
+          "windows": {
+            "count": 2,
+            "minimum_torch_free_bytes": 6506414080,
+            "minimum_physical_free_bytes": 5651824640,
+            "first": {
+              "policy": "cuda-uuid-physical-and-torch-free-v1",
+              "stage": "video-window-1",
+              "required_free_bytes": 805306368,
+              "reservation": false,
+              "oom_guarantee": false,
+              "query_started_at_utc": "2026-10-19T14:21:42.556618+00:00",
+              "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+              "logical_device_index": 0,
+              "idle_cache_release": {
+                "scope": "current-worker",
+                "synchronized": true,
+                "empty_cache_called": true,
+                "completed": true,
+                "active_allocation_preserved": true,
+                "allocated_before_bytes": 4856760832,
+                "reserved_before_bytes": 5219811328,
+                "allocated_after_bytes": 4856760832,
+                "reserved_after_bytes": 5219811328,
+                "released_reserved_bytes": 0
+              },
+              "query_command": [
+                "C:\\Windows\\System32\\nvidia-smi.EXE",
+                "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+                "--query-gpu=uuid,memory.total,memory.free",
+                "--format=csv,noheader,nounits"
+              ],
+              "torch_free_bytes": 6546259968,
+              "torch_total_bytes": 12884377600,
+              "physical_free_bytes": 5691670528,
+              "physical_total_bytes": 12884901888,
+              "effective_free_bytes": 5691670528,
+              "query_finished_at_utc": "2026-10-19T14:21:42.607037+00:00",
+              "sample_seconds": 0.05041260000143666,
+              "status": "admitted"
+            },
+            "last": {
+              "policy": "cuda-uuid-physical-and-torch-free-v1",
+              "stage": "video-window-2",
+              "required_free_bytes": 805306368,
+              "reservation": false,
+              "oom_guarantee": false,
+              "query_started_at_utc": "2026-10-19T14:21:54.767339+00:00",
+              "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+              "logical_device_index": 0,
+              "idle_cache_release": {
+                "scope": "current-worker",
+                "synchronized": true,
+                "empty_cache_called": true,
+                "completed": true,
+                "active_allocation_preserved": true,
+                "allocated_before_bytes": 4856896512,
+                "reserved_before_bytes": 6314524672,
+                "allocated_after_bytes": 4856896512,
+                "reserved_after_bytes": 5219811328,
+                "released_reserved_bytes": 1094713344
+              },
+              "query_command": [
+                "C:\\Windows\\System32\\nvidia-smi.EXE",
+                "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+                "--query-gpu=uuid,memory.total,memory.free",
+                "--format=csv,noheader,nounits"
+              ],
+              "torch_free_bytes": 6506414080,
+              "torch_total_bytes": 12884377600,
+              "physical_free_bytes": 5651824640,
+              "physical_total_bytes": 12884901888,
+              "effective_free_bytes": 5651824640,
+              "query_finished_at_utc": "2026-10-19T14:21:54.837514+00:00",
+              "sample_seconds": 0.07015830000455026,
+              "status": "admitted"
+            }
+          }
+        },
+        "transformer_precision": "bfloat16-with-declared-float32-stability-modules",
+        "transformer_parameter_dtype_elements": {
+          "torch.float32": 3311616,
+          "torch.bfloat16": 2150660416
+        },
+        "float32_stability_modules": [
+          "time_embedder",
+          "scale_shift_table",
+          "norm1",
+          "norm2",
+          "norm3"
+        ],
+        "vae_precision": "float32",
+        "vae_spatial_tiling": true,
+        "window_seconds": [
+          12.034474800006137,
+          7.038584299996728
+        ],
+        "flow_shift": 3.0,
+        "model_input_scale": 1,
+        "window_input_shapes": [
+          [
+            5,
+            128,
+            176
+          ],
+          [
+            5,
+            128,
+            176
+          ]
+        ]
+      },
+      "model_loaded": true,
+      "cuda_peak_allocated_bytes": 7245013504,
+      "artifact_verification": {
+        "mode": "windows-read-lock-command-scope",
+        "files_hashed": 31,
+        "bytes_hashed": 19037368449,
+        "digest_reuses_while_locked": 31,
+        "write_and_delete_sharing": false,
+        "persists_across_commands": false
+      },
+      "elapsed_seconds": 1823.9056896999973
+    },
+    "elapsed_seconds": 1840.4067058999935,
+    "artifact_verification": {
+      "mode": "windows-read-lock-command-scope",
+      "files_hashed": 31,
+      "bytes_hashed": 19037368449,
+      "digest_reuses_while_locked": 62,
+      "write_and_delete_sharing": false,
+      "persists_across_commands": false
+    }
+  },
+  "redundant_preflight_reports_skipped": true,
+  "sam2": null,
+  "independent_pixel_checks": {
+    "source_alpha_exact": true,
+    "outside_mask_changed_pixels": 0,
+    "changed_inside_pixels": 5460
+  },
+  "controlled_reconstruction": {
+    "ground_truth_sha256": "sha256:e3537405e09582cc046a7db1703a015cea909d2824a3aec9ac79d78e9cb6ec9a",
+    "masked_psnr_before_db": 7.737375294555663,
+    "masked_psnr_after_db": 25.17089114569786,
+    "masked_psnr_improvement_db": 17.433515851142197,
+    "consecutive_error_delta_mae_on_shared_mask": 2.530714273452759,
+    "scope": "this controlled synthetic background only"
+  },
+  "render": {
+    "sha256": "sha256:b7d68be5d2623ea3d4c1bc4ef82f48e498350251ec7eb3abda1cb6e78d3c1625",
+    "manifest_sha256": "sha256:02cf88755c7a8879d1a737f4ad2b4e80227f0bf7d9c1a67bb7bfffc59e895bfc"
+  },
+  "quality": {
+    "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\vace-delivery-20261019-v66-r1\\actual\\project\\validation\\quality_run_20261019142218_fc3b31f7.json",
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "metrics": {
+      "duration_seconds": 1.0,
+      "width": 192,
+      "height": 128,
+      "audio_codec": "aac",
+      "video_duration_seconds": 1.0,
+      "audio_duration_seconds": 1.0,
+      "av_duration_delta_seconds": 0.0,
+      "av_start_delta_seconds": 0.0,
+      "av_end_delta_seconds": 0.0,
+      "av_sync_residual_seconds": 0.0,
+      "av_sync_residuals": {
+        "start_delta_seconds": 0.0,
+        "end_delta_seconds": 0.0
+      },
+      "stream_timing": {
+        "video": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 1.0,
+          "duration_source": "stream-duration",
+          "end_seconds": 1.0
+        },
+        "audio": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 1.0,
+          "duration_source": "stream-duration",
+          "end_seconds": 1.0
+        }
+      },
+      "probe": {
+        "duration_seconds": 1.0,
+        "duration_tick": 90000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.64000a",
+            "width": 192,
+            "height": 128,
+            "coded_width": 192,
+            "coded_height": 128,
+            "has_b_frames": 2,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "3:2",
+            "pix_fmt": "yuv420p",
+            "level": 10,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "8/1",
+            "avg_frame_rate": "8/1",
+            "time_base": "1/16384",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 16384,
+            "duration": "1.000000",
+            "bit_rate": "50184",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "8",
+            "extradata_size": 49,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_long_name": "AAC (Advanced Audio Coding)",
+            "profile": "LC",
+            "codec_type": "audio",
+            "codec_tag_string": "mp4a",
+            "codec_tag": "0x6134706d",
+            "mime_codec_string": "mp4a.40.2",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 1,
+            "channel_layout": "mono",
+            "bits_per_sample": 0,
+            "initial_padding": 0,
+            "id": "0x2",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 48000,
+            "duration": "1.000000",
+            "bit_rate": "152201",
+            "nb_frames": "48",
+            "extradata_size": 5,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "SoundHandler"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 192,
+          "height": 128,
+          "pix_fmt": "yuv420p",
+          "fps": "8/1",
+          "color_space": "bt709",
+          "duration_seconds": 1.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "aac",
+          "sample_rate": 48000,
+          "channels": 1,
+          "duration_seconds": 1.0,
+          "start_time_seconds": 0.0
+        }
+      }
+    }
+  },
+  "rights_check": {
+    "ok": false,
+    "target": "commercial_ad",
+    "checked": 3,
+    "required_records": 4,
+    "failures": [
+      {
+        "status": "unverified",
+        "code": "RIGHTS_STATUS_BLOCKED",
+        "message": "状态 unverified 不允许发布",
+        "asset_id": "asset_20261019132907_cac537d1",
+        "rights_ref": "asset_20261019132907_cac537d1",
+        "record_version": 1,
+        "context": "project_asset"
+      },
+      {
+        "code": "RIGHTS_USE_NOT_PERMITTED",
+        "message": "记录未允许目标用途: commercial_ad",
+        "asset_id": "asset_20261019132907_cac537d1",
+        "rights_ref": "asset_20261019132907_cac537d1",
+        "record_version": 1,
+        "context": "project_asset"
+      },
+      {
+        "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+        "message": "来源、许可证或证据字段缺失",
+        "asset_id": "asset_20261019132907_cac537d1",
+        "rights_ref": "asset_20261019132907_cac537d1",
+        "record_version": 1,
+        "context": "project_asset"
+      },
+      {
+        "status": "unverified",
+        "code": "RIGHTS_STATUS_BLOCKED",
+        "message": "状态 unverified 不允许发布",
+        "asset_id": "asset_20261019132908_e8a368c6",
+        "rights_ref": "asset_20261019132908_e8a368c6",
+        "record_version": 1,
+        "context": "project_asset"
+      },
+      {
+        "code": "RIGHTS_USE_NOT_PERMITTED",
+        "message": "记录未允许目标用途: commercial_ad",
+        "asset_id": "asset_20261019132908_e8a368c6",
+        "rights_ref": "asset_20261019132908_e8a368c6",
+        "record_version": 1,
+        "context": "project_asset"
+      },
+      {
+        "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+        "message": "来源、许可证或证据字段缺失",
+        "asset_id": "asset_20261019132908_e8a368c6",
+        "rights_ref": "asset_20261019132908_e8a368c6",
+        "record_version": 1,
+        "context": "project_asset"
+      },
+      {
+        "status": "unverified",
+        "code": "RIGHTS_STATUS_BLOCKED",
+        "message": "状态 unverified 不允许发布",
+        "asset_id": "repaired",
+        "rights_ref": "repaired",
+        "record_version": 1,
+        "context": "project_asset"
+      },
+      {
+        "code": "RIGHTS_USE_NOT_PERMITTED",
+        "message": "记录未允许目标用途: commercial_ad",
+        "asset_id": "repaired",
+        "rights_ref": "repaired",
+        "record_version": 1,
+        "context": "project_asset"
+      },
+      {
+        "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+        "message": "来源、许可证或证据字段缺失",
+        "asset_id": "repaired",
+        "rights_ref": "repaired",
+        "record_version": 1,
+        "context": "project_asset"
+      },
+      {
+        "status": "unverified",
+        "code": "RIGHTS_STATUS_BLOCKED",
+        "message": "状态 unverified 不允许发布",
+        "asset_id": "visual_adapter_vace_local",
+        "rights_ref": "visual_adapter_vace_local",
+        "record_version": 1,
+        "context": "derived_dependency"
+      },
+      {
+        "code": "RIGHTS_USE_NOT_PERMITTED",
+        "message": "记录未允许目标用途: commercial_ad",
+        "asset_id": "visual_adapter_vace_local",
+        "rights_ref": "visual_adapter_vace_local",
+        "record_version": 1,
+        "context": "derived_dependency"
+      }
+    ],
+    "warnings": [],
+    "disposition_decisions": [],
+    "effective_disposition_decisions": []
+  },
+  "rights_expected_exit": 7,
+  "contact_sheet": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\vace-delivery-20261019-v66-r1\\actual\\contact-sheet.png",
+  "contact_sheet_sha256": "sha256:3b88f200f29d813aaca2a040d491a07e73b303fe1e7c535c1229ca4ba445e664",
+  "runtime_network": "disabled",
+  "runtime_downloads": false,
+  "docker_or_wsl_started": false,
+  "browser_started": false,
+  "broad_quality_accepted": false,
+  "model_commercial_license_accepted": false
+}

@@ -388,6 +388,12 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
             error("ASSET_PROBE_MISSING", "资产 probe 缺失", f"{path}.probe")
         if not asset.get("rights_ref"):
             error("RIGHTS_REF_MISSING", "资产 rights_ref 缺失", f"{path}.rights_ref")
+        if isinstance(asset.get('source'), dict) and 'outpainting' in asset['source']:
+            try:
+                from .local_outpainting import validate_recipe
+                validate_recipe(asset['source']['outpainting'], asset=asset, assets=asset_map(project))
+            except AppError as exc:
+                error(exc.code, exc.message, f'{path}.source.outpainting')
 
     declared_sequence_ids = {str(item.get("id")) for item in project.get("sequences", []) if item.get("id")}
     sequence_ids: set[str] = set()

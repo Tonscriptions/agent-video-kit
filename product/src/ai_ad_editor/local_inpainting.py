@@ -16,7 +16,7 @@ from .utils import assert_id, now_iso, sha256_bytes, sha256_file
 INPAINT_ENGINE = 'torchscript-lama-local-v1'
 INPAINT_PROTOCOL = 'agent-video-lama-inpainting-v1'
 IMPLEMENTATIONS = {'worker': 'lama_worker.py', 'frames': 'inpainting_frames.py', 'controller': 'local_inpainting.py',
-                   'pipeline': 'local_matting.py', 'rgba': 'matting_frames.py', 'guard': 'rvm_worker.py', 'blend': 'repair_blend.py'}
+                   'pipeline': 'local_matting.py', 'rgba': 'matting_frames.py', 'guard': 'rvm_worker.py', 'blend': 'repair_blend.py', 'outpaint': 'local_outpainting.py'}
 
 
 def settings(*, device='cpu', threads=4):
@@ -146,6 +146,9 @@ def prepare_mask(root: Path, path: str, *, kind: str, video: dict, channel='alph
 
 
 def mask_unchanged(plan):
+    if 'outpainting' in plan or isinstance(plan.get('mask'), dict) and plan['mask'].get('kind') == 'generated-outpaint':
+        from .local_outpainting import valid_plan
+        return valid_plan(plan)
     try:
         mask = plan['mask']
         p = Path(mask['path'])
@@ -160,6 +163,11 @@ def decoder_command(base: list[str], source: Path, plan: dict, source_filter: st
     stream = next((s for s in plan['input_probe']['streams'] if s.get('index') == info['source_stream_index']), {})
     alpha_codec = stream.get('codec_name') in {'vp8', 'vp9'} and str(stream.get('tags', {}).get('alpha_mode', '')) == '1'
     command = [*base, *(['-c:v', 'libvpx-vp9' if stream['codec_name'] == 'vp9' else 'libvpx'] if alpha_codec else []), '-i', str(source)]
+    if 'outpainting' in plan:
+        from .local_outpainting import decoder_graph
+        graph = decoder_graph(plan, source_filter)
+        return [*command, '-filter_complex_threads', '1', '-filter_complex', graph, '-map', '[paired]', '-an', '-sn', '-dn',
+                '-frames:v', str(info['frames']), '-f', 'rawvideo', '-pix_fmt', 'rgba', 'pipe:1']
     if mask['kind'] == 'image': command += ['-loop', '1', '-framerate', info['fps']]
     if mask['alpha_decoder']: command += ['-c:v', mask['alpha_decoder']]
     command += ['-protocol_whitelist', 'file,pipe', '-i', mask['path']]

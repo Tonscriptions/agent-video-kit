@@ -603,6 +603,15 @@ def prepare_apply(project: dict, ledger: dict, payload: dict, info: dict, reques
     imported = rewrite(source_project)
     for a in imported['assets']:
         a['id'] = maps['asset'][a['id']]
+    original_assets = {a['id']: a for a in source_project['assets']}
+    for original, asset in zip(source_project['assets'], imported['assets'], strict=True):
+        source = original.get('source') or {}
+        if source.get('outpainting') is not None:
+            from .local_outpainting import rebind_recipe
+            asset['source']['outpainting'] = rebind_recipe(source['outpainting'],
+                source_asset_id=maps['asset'][source['outpainting']['source_asset_id']],
+                asset=original, assets=original_assets)
+            asset['source']['derived_from'] = [maps['asset'][v] for v in source['derived_from']]
     for s in imported['sequences']:
         s['id'] = maps['sequence'][s['id']]
         for t in s['tracks']:

@@ -456,3 +456,19 @@ scripts/audit_hardware_acceleration_release.py -text
 docs/specs/硬件编解码探测与显式回退契约_v0.1_2026-10-19.md text eol=lf
 
 docs/validation/硬件编解码与显式回退实测_2026-10-19.md text eol=lf
+
+# V66 real local outpainting, archived VACE retry and executed evidence.
+docs/validation/evidence/video-outpainting-20261019-v66/** -text -whitespace
+docs/validation/evidence/outpaint-geometry-20261019-v66-r1/** -text -whitespace
+docs/validation/evidence/vace-delivery-20261019-v66-r1/** -text -whitespace
+docs/assets/video-outpainting-20261019-v66-*/** -text -whitespace
+docs/assets/vace-delivery-20261019-v66-r1/** -text -whitespace
+scripts/*video_outpainting*.py -text
+scripts/audit_vace_retry_delivery.py -text
+scripts/probe_safetensors_window_read.py -text
+scripts/integrate_vace_pread.py -text
+docs/specs/本地视频扩图与原画面保护契约_v0.1_2026-10-19.md text eol=lf
+docs/specs/VACE本地权重读取与原生访问冲突约束_v0.1_2026-10-20.md text eol=lf
+docs/validation/本地视频扩图与原画面保护实测_2026-10-19.md text eol=lf
+docs/OpenFilm诊断模块复用与原生模型故障后续项_2026-10-20.md text eol=lf
+docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md text eol=lf

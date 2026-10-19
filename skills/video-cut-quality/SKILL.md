@@ -5,6 +5,19 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For video outpainting, follow the [canvas extension contract](../../docs/specs/本地视频扩图与原画面保护契约_v0.1_2026-10-19.md).
+Compare the lossless MOV's complete original rectangle, including partial alpha,
+against the normalized source; check generated alpha, every PTS and full PCM.
+Score only the generated region against any independently held controlled truth.
+Keep failed quality gates even when protected pixels pass. Inspect geometry and
+the packaged recipe. GIF/MP4 previews, protocol workers and one synthetic scene
+cannot establish natural background quality or full CapCut equivalence.
+
+For native loader faults retain the Windows worker PID, report ID, exception
+module and code alongside the original failed command. A later `pread` delivery
+is scoped evidence, not proof of a permanently resolved native root cause.
+Validate the six-file/three-component read report independently of GPU admission.
+
 For hardware delivery, use the [hardware verification contract](../../docs/specs/硬件编解码探测与显式回退契约_v0.1_2026-10-19.md).
 Read `acceleration` in the manifest and its `renders/diagnostics/acceleration_*` report.
 Check forced hardware frames, CPU-equal probe PTS/pixels, NV12/P010 transport versus

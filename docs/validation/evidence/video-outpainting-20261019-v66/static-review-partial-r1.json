@@ -1,0 +1,43 @@
+{
+  "status": "partial_static_review",
+  "reviewed_at_utc": "2026-10-19T14:36:37.813832+00:00",
+  "reviewed_static_frames": 8,
+  "continuous_playback": false,
+  "audio_listened": false,
+  "remaining": [
+    "vace-harmonic-r2",
+    "installed-r1/media"
+  ],
+  "items": [
+    {
+      "case": "lama-direct-r2",
+      "path": "docs/assets/video-outpainting-20261019-v66-lama-direct-r2/contact-sheet.png",
+      "sha256": "sha256:4f6b45dd6f719d5545a6387216e4113514b42428fdb1fa3f10fc0b0613b01425",
+      "source_frames": [
+        0,
+        3,
+        4,
+        7
+      ],
+      "observations": [
+        "原片四个抽样时刻的移动红块与帧标识在输出中保持相同位置和外观。",
+        "灰色预留边框已被模型生成的墙面与桌面替换；桌面分界在扩展区域延续，边缘纹理较原始真值柔和。"
+      ]
+    },
+    {
+      "case": "lama-harmonic-r1",
+      "path": "docs/assets/video-outpainting-20261019-v66-lama-harmonic-r1/contact-sheet.png",
+      "sha256": "sha256:20dd4d4ba8ffa19de95b31798c7011a11d76f9a36eaeb49aac9941169963e2a1",
+      "source_frames": [
+        0,
+        3,
+        4,
+        7
+      ],
+      "observations": [
+        "原矩形和半透明区域与 direct 样例保持相同显示。",
+        "扩展墙面与桌面的接边颜色较接近真值，边缘仍有纹理/直线误差；四个静帧不足以验收自然时序。"
+      ]
+    }
+  ]
+}

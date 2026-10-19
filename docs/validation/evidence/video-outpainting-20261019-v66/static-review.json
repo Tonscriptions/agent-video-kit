@@ -1,0 +1,70 @@
+{
+  "status": "completed_static_review_only",
+  "reviewed_at_utc": "2026-10-19T16:54:30.364676+00:00",
+  "reviewed_static_frames": 16,
+  "continuous_playback": false,
+  "audio_listened": false,
+  "items": [
+    {
+      "case": "lama-direct-r3",
+      "path": "docs/assets/video-outpainting-20261019-v66-lama-direct-r3/contact-sheet.png",
+      "sha256": "sha256:4f6b45dd6f719d5545a6387216e4113514b42428fdb1fa3f10fc0b0613b01425",
+      "source_frames": [
+        0,
+        3,
+        4,
+        7
+      ],
+      "observations": [
+        "第 0/3/4/7 帧的原片红色移动块、左上帧标识和半透明小区域在输出与真值原矩形中一致。",
+        "原灰色扩展区已生成墙面与桌面；新区域的纹理较柔和，边缘仍可见与受控真值的颜色/细线差异。"
+      ]
+    },
+    {
+      "case": "lama-harmonic-r2",
+      "path": "docs/assets/video-outpainting-20261019-v66-lama-harmonic-r2/contact-sheet.png",
+      "sha256": "sha256:20dd4d4ba8ffa19de95b31798c7011a11d76f9a36eaeb49aac9941169963e2a1",
+      "source_frames": [
+        0,
+        3,
+        4,
+        7
+      ],
+      "observations": [
+        "四个时刻均保留原矩形、移动色块、标识及半透明区域。",
+        "扩展边界色差较小，墙面和桌面在静帧上延续；纹理和边线仍与真值存在差异，不据此验收自然时序。"
+      ]
+    },
+    {
+      "case": "vace-harmonic-r4",
+      "path": "docs/assets/video-outpainting-20261019-v66-vace-harmonic-r4/contact-sheet.png",
+      "sha256": "sha256:6b7867f4744056ae2be7998ee75295f51b738416a01cca6c439f0b00c98a3691",
+      "source_frames": [
+        0,
+        3,
+        4,
+        7
+      ],
+      "observations": [
+        "第 0/3/4/7 帧中，原矩形内的移动红块、帧标识及半透明小区域保留；生成结果覆盖了外部灰色画布。",
+        "右侧桌面被延续为斜切及竖向边界，与受控真值的水平桌面不一致；第 4/7 帧底部可见明显暗色横带，扩展墙面纹理也有差异。",
+        "仅完成四个静帧观察，生成区 PSNR 19.227695469852687 dB 未通过预声明 30 dB；没有连续播放或听审，不验收自然结构与时序质量。"
+      ]
+    },
+    {
+      "case": "installed-r2/media",
+      "path": "docs/assets/video-outpainting-20261019-v66-installed-r2/media/contact-sheet.png",
+      "sha256": "sha256:20dd4d4ba8ffa19de95b31798c7011a11d76f9a36eaeb49aac9941169963e2a1",
+      "source_frames": [
+        0,
+        3,
+        4,
+        7
+      ],
+      "observations": [
+        "四个抽样时刻的画面与开发版 harmonic 接触表一致，原片标识、红块和半透明小块保留。",
+        "灰色外部画布被墙面与桌面替换；该接触表只证明本次静帧查看，没有连续播放或听审。"
+      ]
+    }
+  ]
+}

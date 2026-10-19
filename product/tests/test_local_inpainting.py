@@ -239,7 +239,7 @@ class NativeInpaintingTests(unittest.TestCase):
         before = self.metadata()
         self.assertEqual(invoke('media', 'adapter', 'register', *self.options, '--dry-run')[0], 0)
         self.assertEqual(self.metadata(), before)
-        adapter = self.register(); self.assertEqual(len(adapter['artifacts']), 10)
+        adapter = self.register(); self.assertEqual(len(adapter['artifacts']), 11)
         self.assertTrue(verify_adapter(adapter)['ok'])
         before = self.metadata()
         with patch('ai_ad_editor.cli.matte_native') as worker:

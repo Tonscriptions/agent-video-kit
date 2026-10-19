@@ -1,0 +1,33 @@
+{
+  "status": "passed_native_ffmpeg_geometry_only_no_model",
+  "command": [
+    "ffmpeg",
+    "-nostdin",
+    "-v",
+    "error",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\vace-delivery-20261019-v66-r1\\fixture\\source.mov",
+    "-filter_complex_threads",
+    "1",
+    "-filter_complex",
+    "[0:v:0]setpts=PTS-STARTPTS,scale=192:128:flags=lanczos,setsar=1,fps=8,format=rgba,pad=256:160:32:16:color=0x7f7f7fff,split=2[src][mb];[mb]format=gbrap,geq=r='255':g='255':b='255':a='if(between(X,32,223)*between(Y,16,143),0,255)',format=rgba[mask];[src][mask]hstack=inputs=2:shortest=1,format=rgba[paired]",
+    "-map",
+    "[paired]",
+    "-an",
+    "-frames:v",
+    "8",
+    "-f",
+    "rawvideo",
+    "-pix_fmt",
+    "rgba",
+    "pipe:1"
+  ],
+  "frames": 8,
+  "original_rgba_exact": true,
+  "generated_region_rgb": 127,
+  "generated_region_alpha": 255,
+  "mask_alpha_exact": true,
+  "paired_rgba_sha256": "sha256:041819fded10909c80df3ff17b2a150d14f1e4578140fe877de69cab097d8a87",
+  "source_sha256": "sha256:800f9903ca5256f196c0f9328671d41fd9e3ba25880760de24c0bb176e88b6c3",
+  "synthesized_background_quality_accepted": false
+}

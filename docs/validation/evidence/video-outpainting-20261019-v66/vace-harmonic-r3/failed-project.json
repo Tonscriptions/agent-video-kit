@@ -1,0 +1,251 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "id": "proj_20261019151515_b807860c",
+    "name": "project",
+    "created_at": "2026-10-19T15:15:15.437114Z",
+    "updated_at": "2026-10-19T15:26:47.177541Z",
+    "creator": "ai-ad-editor",
+    "source_revision": "local"
+  },
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 30,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 1080,
+      "height": 1920,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "asset_20261019151517_091fd149",
+      "kind": "video",
+      "uri": "assets/asset_20261019151517_091fd149_source.mov",
+      "sha256": "sha256:df7818941aebd8ac19758cdd3e8551370b1617964b3f8be8e50f768eea4f9d21",
+      "probe": {
+        "duration_seconds": 1.0,
+        "duration_tick": 90000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "qtrle",
+            "codec_long_name": "QuickTime Animation (RLE) video",
+            "codec_type": "video",
+            "codec_tag_string": "rle ",
+            "codec_tag": "0x20656c72",
+            "width": 192,
+            "height": 128,
+            "coded_width": 192,
+            "coded_height": 128,
+            "has_b_frames": 0,
+            "pix_fmt": "argb",
+            "level": -99,
+            "field_order": "progressive",
+            "id": "0x1",
+            "r_frame_rate": "8/1",
+            "avg_frame_rate": "8/1",
+            "time_base": "1/16384",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 16384,
+            "duration": "1.000000",
+            "bit_rate": "611152",
+            "nb_frames": "8",
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "handler_name": "VideoHandler",
+              "vendor_id": "FFMP",
+              "encoder": "Lavc62.28.100 qtrle"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "pcm_s16le",
+            "codec_long_name": "PCM signed 16-bit little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "sowt",
+            "codec_tag": "0x74776f73",
+            "sample_fmt": "s16",
+            "sample_rate": "48000",
+            "channels": 2,
+            "channel_layout": "stereo",
+            "bits_per_sample": 16,
+            "initial_padding": 0,
+            "id": "0x2",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 48000,
+            "duration": "1.000000",
+            "bit_rate": "1536000",
+            "nb_frames": "48000",
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "handler_name": "SoundHandler",
+              "vendor_id": "[0][0][0][0]"
+            }
+          }
+        ],
+        "video": {
+          "codec": "qtrle",
+          "width": 192,
+          "height": 128,
+          "pix_fmt": "argb",
+          "fps": "8/1",
+          "color_space": null,
+          "duration_seconds": 1.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_s16le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 1.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "asset_20261019151517_091fd149",
+      "source": {
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\video-outpainting-20261019-v66-vace-harmonic-r3\\source.mov",
+        "retrieved_at": "2026-10-19T15:15:17.276794Z",
+        "original_name": "source.mov"
+      }
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq_main",
+      "name": "Main",
+      "duration_tick": 1,
+      "tracks": [
+        {
+          "id": "track_video_1",
+          "kind": "video",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": []
+        },
+        {
+          "id": "track_audio_1",
+          "kind": "audio",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": []
+        }
+      ],
+      "markers": []
+    }
+  ],
+  "templates": [],
+  "outputs": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "model_versions": [],
+    "input_hashes": [],
+    "change_log": [
+      {
+        "operation_id": "op_20261019151517_d058b02b",
+        "command": "media.ingest",
+        "asset_id": "asset_20261019151517_091fd149",
+        "at": "2026-10-19T15:15:17.277313Z"
+      },
+      {
+        "operation_id": "op_20261019152647_fd29d119",
+        "command": "media.adapter.register",
+        "adapter_id": "outpaint_local",
+        "engine": "diffusers-wan-vace-local-v1",
+        "snapshot_id": "snap_20261019152647_30f6f3da",
+        "registry": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\video-outpainting-20261019-v66-vace-harmonic-r3\\project\\models\\visual-adapters.json",
+        "at": "2026-10-19T15:26:47.173347Z"
+      }
+    ],
+    "local_adapters": [
+      {
+        "adapter_id": "outpaint_local",
+        "kind": "video-inpainting",
+        "engine": "diffusers-wan-vace-local-v1",
+        "model_sha256": "sha256:5a634bfa299951a011112dde59027a2daafd7e51263b6e5e63c5b2843df3a991",
+        "registered_at": "2026-10-19T15:26:47.130021Z"
+      }
+    ]
+  }
+}

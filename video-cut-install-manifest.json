@@ -59,7 +59,7 @@
       "description": "Drive the local Agent-first advertising video editor CLI for project setup, local media ingest, timeline composition, local TTS, templates, validation, rights checks, conversion, and FFmpeg rendering.",
       "source_kind": "local-product-skill",
       "source_repository": "AI广告剪辑/product",
-      "skill_md_sha256": "aca4313272c9d40b310a28fa80afe0431c2f8dee6cfd2e6bab3fe53891f84c7c",
+      "skill_md_sha256": "a8d89fb311e9f1bcb699c5d2a531e26fd35a7f379e952fc29f8ef7e7726836cf",
       "file_count": 2,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -84,6 +84,11 @@
           "sha256": "9149ddc67f1d0cb0a3027ceb58ecc8954e1f5645fa041f9244c0b51c24db0cdb",
           "replaced_at_utc": "2026-10-19T13:23:41.975610+00:00",
           "reason": "V65 hardware policy/quality/queue contract"
+        },
+        {
+          "sha256": "aca4313272c9d40b310a28fa80afe0431c2f8dee6cfd2e6bab3fe53891f84c7c",
+          "replaced_at_utc": "2026-10-19T17:29:10.389898+00:00",
+          "reason": "V66 local outpainting and independent generated-region quality"
         }
       ]
     },
@@ -125,7 +130,7 @@
       "description": "Run registered offline OCR, speech, transcription, separation, tracking, matting, prompted segmentation, masked repair and joint video window editing with existing local models and native Python.",
       "source_kind": "local-only-skill",
       "source_repository": "AI广告剪辑",
-      "skill_md_sha256": "1325ed32d65cacf133c85e69c5aa183deb7cd6d7deba0fdb67933192f8141ba3",
+      "skill_md_sha256": "bce8c340c92b64eea2c144ea6a3ef562c11660e0938da3068d25dd48296bf9d8",
       "file_count": 1,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -137,7 +142,12 @@
           "sha256": "7f16ed69debfd29ec8609aed4b179c8c21ca0705b04dae6d3cbc2a39fb978f64"
         },
         "643253324d23742a347c7be38cc5b2e1e0c39d76ff13c05e3c72169b8a918e32",
-        "73ccf00587a56c6d039500015050bcb883583c8d9b0e219e8cd5c0aa43654137"
+        "73ccf00587a56c6d039500015050bcb883583c8d9b0e219e8cd5c0aa43654137",
+        {
+          "sha256": "1325ed32d65cacf133c85e69c5aa183deb7cd6d7deba0fdb67933192f8141ba3",
+          "replaced_at_utc": "2026-10-19T17:29:10.390614+00:00",
+          "reason": "V66 local outpainting and independent generated-region quality"
+        }
       ]
     },
     {
@@ -204,7 +214,7 @@
       "description": "Produce local quality reports, color scopes, render manifests, and machine-readable evidence for Agent video delivery.",
       "source_kind": "local-only-skill",
       "source_repository": "AI广告剪辑",
-      "skill_md_sha256": "0768a6c88a730891d83f18a136ca78e0ed1e91cac6d3ec4a7c22412e6be18955",
+      "skill_md_sha256": "3709933c87b67d66941a365046780178d27b7302801e444e0ae15a15b1562310",
       "file_count": 1,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -229,6 +239,11 @@
           "sha256": "282a7a2a998767c603811c35faf8f39b39b752dfea2abea02158530805f117b7",
           "replaced_at_utc": "2026-10-19T13:23:41.977266+00:00",
           "reason": "V65 hardware policy/quality/queue contract"
+        },
+        {
+          "sha256": "0768a6c88a730891d83f18a136ca78e0ed1e91cac6d3ec4a7c22412e6be18955",
+          "replaced_at_utc": "2026-10-19T17:29:10.392119+00:00",
+          "reason": "V66 local outpainting and independent generated-region quality"
         }
       ]
     },
@@ -382,12 +397,12 @@
   },
   "registered_at_utc": "2026-10-15T18:21:52.5523139Z",
   "current_audit": {
-    "record": "docs/validation/evidence/hardware-acceleration-20261019-v65/skills-r1.json",
-    "record_sha256": "sha256:498ff42e04f8027ce0123d9b3ef59a856ac545078963f99bd59ac5989cb47ae9",
-    "checked_at_utc": "2026-10-19T12:40:17.675547+00:00",
+    "record": "docs/validation/evidence/video-outpainting-20261019-v66/skills-r2.json",
+    "record_sha256": "sha256:2f2ec3034ffbf5e17d4bdbd90794977d995227ee9b0065ed4e6458250ab69bd7",
+    "checked_at_utc": "2026-10-19T16:08:33.009418+00:00",
     "skills": 17,
-    "local_links_checked": 235,
-    "semantics": "V65: native hardware encode/decode policy and controlled media; no full CapCut parity claim"
+    "local_links_checked": 238,
+    "semantics": "V66 local outpainting and component-scoped native pread; generated-region quality separate; no full CapCut parity"
   },
   "audit_history": [
     {
@@ -560,6 +575,14 @@
       "skills": 17,
       "local_links_checked": 232,
       "semantics": "V64 explicit real-source audio context and exact authored crop; pitch/phase/natural gates separate; V63 real GPU rejection retained; no full CapCut parity acceptance"
+    },
+    {
+      "record": "docs/validation/evidence/hardware-acceleration-20261019-v65/skills-r1.json",
+      "record_sha256": "sha256:498ff42e04f8027ce0123d9b3ef59a856ac545078963f99bd59ac5989cb47ae9",
+      "checked_at_utc": "2026-10-19T12:40:17.675547+00:00",
+      "skills": 17,
+      "local_links_checked": 235,
+      "semantics": "V65: native hardware encode/decode policy and controlled media; no full CapCut parity claim"
     }
   ]
 }
