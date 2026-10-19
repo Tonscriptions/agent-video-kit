@@ -681,6 +681,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     from .ocr_cli import add_parser as add_ocr_parser
     add_ocr_parser(subs, _leaf_common)
+    from .face_cli import add_parser as add_face_parser
+    add_face_parser(subs, _leaf_common)
 
     tts = subs.add_parser("tts", help="本地离线文本转语音")
     tts_sub = tts.add_subparsers(dest="action", required=True)
@@ -6621,6 +6623,11 @@ def command_ocr(args: argparse.Namespace) -> dict[str, Any]:
     return handle(args)
 
 
+def command_face(args: argparse.Namespace) -> dict[str, Any]:
+    from .face_cli import handle
+    return handle(args)
+
+
 def command_diagnostics(args):
     from . import pipeline_diagnostics as diagnostic_store
     root, _ = load_project(args.project)
@@ -6673,7 +6680,7 @@ def _project_operation_lock(args: argparse.Namespace):
     """Return the operation-wide lock for a mutating project command."""
     project = getattr(args, "project", None)
     key = (getattr(args, "domain", None), getattr(args, "action", None))
-    adapter_read_only = (key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (key in {("tts", "adapter"), ("tts", "voice"), ("asr", "adapter"), ('ocr','adapter')} and getattr(args, "registration_action", None) in {"list", "inspect"})
+    adapter_read_only = (key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (key in {("tts", "adapter"), ("tts", "voice"), ("asr", "adapter"), ('ocr','adapter'), ('face','adapter')} and getattr(args, "registration_action", None) in {"list", "inspect"})
     if not project or getattr(args, "dry_run", False) or key in _READ_ONLY_PROJECT_COMMANDS or adapter_read_only or key == ("queue", "cancel"):
         return contextlib.nullcontext()
     return project_write_lock(project)
@@ -6684,6 +6691,9 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ('diagnostics', 'show'): command_diagnostics,
     ('diagnostics', 'export'): command_diagnostics,
     ('ocr','adapter'): command_ocr,
+    ('face','adapter'): command_face,
+    ('face','scan'): command_face,
+    ('face','retouch'): command_face,
     ('ocr','scan'): command_ocr,
     ('ocr','anchors'): command_ocr,
     ('schema','show'): command_schema_show,
@@ -6801,7 +6811,7 @@ def main(argv: list[str] | None = None) -> int:
         with _project_operation_lock(args):
             transaction_root = getattr(args, "project", None)
             command_key = (args.domain, getattr(args, "action", None))
-            adapter_read_only = (command_key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (command_key in {("tts", "adapter"), ("tts", "voice"), ("asr", "adapter"), ('ocr','adapter')} and getattr(args, "registration_action", None) in {"list", "inspect"})
+            adapter_read_only = (command_key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (command_key in {("tts", "adapter"), ("tts", "voice"), ("asr", "adapter"), ('ocr','adapter'), ('face','adapter')} and getattr(args, "registration_action", None) in {"list", "inspect"})
             transaction_enabled = bool(transaction_root) and not getattr(args, "dry_run", False) and command_key not in _READ_ONLY_PROJECT_COMMANDS and not adapter_read_only and command_key not in {("project", "recover"), ("queue", "cancel")}
             with (project_transaction(transaction_root, command=_command_name(args)) if transaction_enabled else contextlib.nullcontext({"active": False, "recovered": False})) as transaction:
                 if idempotency:

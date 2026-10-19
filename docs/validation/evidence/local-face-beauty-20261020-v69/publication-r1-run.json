@@ -1,0 +1,92 @@
+{
+  "status": "stopped_for_review",
+  "started_at_utc": "2026-10-19T22:43:41.972803+00:00",
+  "pid": 26712,
+  "calls": [
+    {
+      "name": "remote-before",
+      "command": [
+        "git",
+        "ls-remote",
+        "--exit-code",
+        "origin",
+        "refs/heads/main"
+      ],
+      "exit_code": 0,
+      "stdout": "remote-before.stdout.log",
+      "stderr": "remote-before.stderr.log",
+      "stdout_sha256": "sha256:b2d20a5762b99bc7f9b5138dfca594e5e6f13d12fb922ea5b86cebab6939e194",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "sync-documents",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\scripts\\sync_local_face_documents.py"
+      ],
+      "exit_code": 0,
+      "stdout": "sync-documents.stdout.log",
+      "stderr": "sync-documents.stderr.log",
+      "stdout_sha256": "sha256:bb7fdf8c6bfe5c2d575818fac7a19b0e410d60a405dc70efa2e4478b190672b4",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "audit-release",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\scripts\\audit_local_face_release.py",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\local-face-beauty-20261020-v69\\release-r1.json"
+      ],
+      "exit_code": 0,
+      "stdout": "audit-release.stdout.log",
+      "stderr": "audit-release.stderr.log",
+      "stdout_sha256": "sha256:524b8c7c6509ed6730239530968c62841fd09155c4f198d3b41a9c593058d890",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "stage-reviewed-paths",
+      "command": [
+        "git",
+        "add",
+        "-A",
+        "--pathspec-from-file=E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\local-face-beauty-20261020-v69\\finalization-r1\\stage-paths.nul",
+        "--pathspec-file-nul"
+      ],
+      "exit_code": 0,
+      "stdout": "stage-reviewed-paths.stdout.log",
+      "stderr": "stage-reviewed-paths.stderr.log",
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "verify-staged",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "E:\\dev\\sandbox\\AI广告剪辑\\scripts\\verify_staged_release.py",
+        "--full",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\local-face-beauty-20261020-v69\\full-r1.json",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\local-face-beauty-20261020-v69\\staged-r1.json"
+      ],
+      "exit_code": 1,
+      "stdout": "verify-staged.stdout.log",
+      "stderr": "verify-staged.stderr.log",
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "sha256:4ae20b333603cb6eb078d67fd8ab109b0bb0636e97ed9e8bd025ddf7f1ccc413"
+    }
+  ],
+  "force_push": false,
+  "last_wait_at_utc": "2026-10-19T23:23:30.373435+00:00",
+  "error": "RuntimeError: verify-staged failed; retained logs in E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\local-face-beauty-20261020-v69\\finalization-r1",
+  "finished_at_utc": "2026-10-19T23:25:09.684476+00:00"
+}

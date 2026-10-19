@@ -1,0 +1,20 @@
+{
+  "status": "static_png_export_failed",
+  "native_video_contract_status": "passed_native_cli_contract_quality_separate",
+  "core_receipt_unchanged": true,
+  "missing_files": [
+    "comparison-00.png",
+    "comparison-09.png",
+    "comparison-10.png",
+    "comparison-14.png",
+    "comparison-23.png"
+  ],
+  "reproduction": {
+    "opencv_imwrite_absolute_unicode_return": false,
+    "file_exists": false,
+    "imencode_return": true,
+    "pathlib_write_file_exists": true
+  },
+  "fix": "Check imencode success, write encoded bytes through pathlib, check output existence and length. Original video/GIF/receipt remain intact.",
+  "quality_accepted": false
+}

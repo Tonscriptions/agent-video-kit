@@ -5,6 +5,15 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For local face anchors and retouch read the
+[face contract](../../docs/specs/离线人脸锚点与局部修饰契约_v0.1_2026-10-20.md)
+and [real execution and limits](../../docs/validation/离线人脸锚点与局部修饰实测_2026-10-20.md).
+Use `face scan` with an explicitly registered CPU adapter. Use `face retouch`
+with a reviewed report, explicit face selection and chosen controls to create
+a new lossless asset. The source remains an explicit input; recipe replay
+does not rescan or fetch weights. Neutral defaults, project transactions,
+source/model rights and separate visual quality review remain applicable.
+
 For explicit generated overlap conditioning, read the
 [VACE context contract](../../docs/specs/VACE前窗生成上下文与连续输出契约_v0.1_2026-10-20.md)
 and [current verification and failures](../../docs/validation/VACE前窗生成上下文实测_2026-10-20.md).

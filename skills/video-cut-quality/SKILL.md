@@ -5,6 +5,15 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For face edits use the [face contract](../../docs/specs/离线人脸锚点与局部修饰契约_v0.1_2026-10-20.md)
+and [video checks and failures](../../docs/validation/离线人脸锚点与局部修饰实测_2026-10-20.md).
+Check neutral decoded RGBA, unchanged original alpha, pixels outside the
+declared support, every PTS, every original audio stream's PCM and saved-recipe
+replay. Review missing-face and cut behavior separately from geometry IDs.
+Raw heatmap confidence is not accuracy. Static NASA-photo pans establish a
+controlled video contract only; they do not accept natural motion, skin detail,
+occlusion, transparent face boundaries, identity or CapCut beauty quality.
+
 For explicit previous generated conditions, read the
 [context contract](../../docs/specs/VACE前窗生成上下文与连续输出契约_v0.1_2026-10-20.md)
 and [paired execution evidence and open gates](../../docs/validation/VACE前窗生成上下文实测_2026-10-20.md).

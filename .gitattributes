@@ -20,6 +20,22 @@ scripts/sync_audio_source_context_documents.py -text
 scripts/audit_audio_source_context_release.py -text
 .gitattributes text eol=lf
 .gitignore text eol=lf
+docs/validation/evidence/local-face-beauty-20261020-v69/** -text -whitespace
+product/src/ai_ad_editor/OPENSEEFACE_LICENSE.txt -text whitespace=cr-at-eol
+product/src/ai_ad_editor/OPENSEEFACE_NOTICE.txt -text whitespace=cr-at-eol
+scripts/probe_openseeface_native.py -text whitespace=cr-at-eol
+scripts/smoke_local_face.py -text whitespace=cr-at-eol
+docs/assets/local-face-beauty-20261020-v69*/** whitespace=cr-at-eol
+scripts/verify_local_face_install.py -text
+scripts/verify_local_face_worker_cancel.py -text
+scripts/probe_local_face_controls.py -text
+scripts/sync_local_face_documents.py -text
+scripts/audit_local_face_release.py -text
+scripts/audit_local_face_media.py -text
+scripts/finalize_local_face.py -text
+docs/specs/离线人脸锚点与局部修饰契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/离线人脸锚点与局部修饰实测_2026-10-20.md text eol=lf
+docs/third-party/OpenSeeFace模型与原生SDK取舍_2026-10-20.md text eol=lf
 product/**/*.py text eol=lf
 docs/specs/agent-project.schema.json text eol=lf
 docs/assets/** -text

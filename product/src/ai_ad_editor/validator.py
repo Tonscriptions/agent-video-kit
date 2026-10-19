@@ -388,6 +388,15 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
             error("ASSET_PROBE_MISSING", "资产 probe 缺失", f"{path}.probe")
         if not asset.get("rights_ref"):
             error("RIGHTS_REF_MISSING", "资产 rights_ref 缺失", f"{path}.rights_ref")
+        if isinstance(asset.get('source'),dict) and 'face_retouch' in asset['source']:
+            try:
+                from .local_face import validate_recipe
+                metadata = asset['source']['face_retouch']
+                if not isinstance(metadata,dict) or set(metadata) != {'recipe'}:
+                    raise ValueError('FACE_RETOUCH_METADATA_INVALID')
+                validate_recipe(metadata['recipe'])
+            except (ValueError,TypeError,KeyError,OverflowError,ZeroDivisionError) as exc:
+                error('FACE_RETOUCH_METADATA_INVALID',str(exc),f'{path}.source.face_retouch')
         if isinstance(asset.get('source'), dict) and 'outpainting' in asset['source']:
             try:
                 from .local_outpainting import validate_recipe

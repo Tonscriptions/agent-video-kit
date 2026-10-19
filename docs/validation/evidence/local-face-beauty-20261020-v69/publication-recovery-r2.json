@@ -1,0 +1,24 @@
+{
+  "status": "ready_for_ordinary_main_push",
+  "preserved_failure": "publication-r1-failure.json",
+  "full_methods": 1536,
+  "frozen_inputs": 212,
+  "product_bytes_unchanged": true,
+  "staged_integrity": "staged-r2.json",
+  "staged_integrity_sha256": "sha256:da18999584b333e8396a049308640509f9f69c611d6a40a0c8d189c54e27e942",
+  "release_audit": "release-r2.json",
+  "whitespace_policy_cases": [
+    {
+      "case": "valid_crlf",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "case": "real_space_before_crlf",
+      "exit_code": 2,
+      "output": "probe.txt:1: trailing whitespace.\n+bad \r\n"
+    }
+  ],
+  "evidence_bytes_rewritten": false,
+  "force_push": false
+}

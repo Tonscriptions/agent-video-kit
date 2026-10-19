@@ -1,0 +1,12 @@
+OpenSeeFace: https://github.com/emilianavt/OpenSeeFace
+Source revision: 50c09741897010faad721a218b2bbe14ecad6251
+Copyright (c) 2019, Emiliana. BSD-2-Clause; see OPENSEEFACE_LICENSE.txt.
+
+face_landmarks.py adapts tracker.py's RGB normalization, 224/56 face heatmap,
+integer crop convention and 66-point heatmap/offset decoding. Modified for
+explicit local artifacts, CPU-only ONNX sessions, finite shape checks, zero
+network calls, sequential processing and source-pixel (x,y) coordinates.
+The webcam, UDP, avatar, RetinaFace, gaze, 3D head fitting and automatic model
+lookup code are not used. Models are supplied separately by the caller.
+The upstream README explicitly licenses code and models under BSD-2-Clause.
+Its training data and topology limitations remain part of the evidence.

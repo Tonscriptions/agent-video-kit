@@ -1,9 +1,21 @@
 ---
 name: video-cut-local-models
-description: Run registered offline OCR, speech, transcription, separation, tracking, matting, prompted segmentation, masked repair and joint video window editing with existing local models and native Python.
+description: Run registered offline face landmarks, local retouch, OCR, speech, transcription, separation, tracking, matting, segmentation and video repair with existing local models and native Python.
 ---
 
 # Local Models
+
+For face anchors and local retouch, follow the
+[face contract](../../docs/specs/离线人脸锚点与局部修饰契约_v0.1_2026-10-20.md)
+and [actual video evidence](../../docs/validation/离线人脸锚点与局部修饰实测_2026-10-20.md).
+Register the two existing OpenSeeFace ONNX files and native Python using
+`face adapter register`. Inspect the hashes, then scan every source frame with
+explicit frame/face limits and cut points. Select `--all-detected` or track IDs
+for `face retouch`; all four controls default to zero. Missing faces and cuts
+clear adjacent geometric associations. Scores are raw heatmaps, not calibrated
+probabilities or identity. Replaying an asset's complete recipe uses the same
+source SHA without model forwards. Keep source/model rights and the 8-bit SDR,
+CFR and CPU limits. This path never invokes MediaPipe, cameras or UDP.
 
 For opt-in VACE overlap conditioning, read the
 [context contract](../../docs/specs/VACE前窗生成上下文与连续输出契约_v0.1_2026-10-20.md)
