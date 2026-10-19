@@ -7,6 +7,7 @@ import math
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 from fractions import Fraction
@@ -16,7 +17,8 @@ from typing import Any, Callable
 from .errors import AppError, argument_error
 from .media import MAX_INPUT_BYTES, ffmpeg_path, probe_media
 from .policy import resolve_local_path
-from .utils import assert_id, atomic_write_json, now_iso, read_json_snapshot, run_process, sha256_bytes, sha256_file
+from .utils import assert_id, atomic_write_json, now_iso, run_process, sha256_bytes, sha256_file
+from .pipeline_diagnostics import Session as DiagnosticSession
 
 MATTING_ENGINE = 'rvm-onnx-cpu-matting-v1'
 MATTING_PROTOCOL = 'agent-video-rvm-matting-v1'
@@ -75,7 +77,7 @@ def prepare_adapter(root: Path, *, adapter_id: str, model_path: str, executable:
     if model.suffix.lower() != '.onnx' or python.suffix.lower() != '.exe' or proof is None:
         raise argument_error('RVM 需要本地 .onnx、原生 Python .exe 和证据文件', 'model_path/executable/evidence')
     artifacts = [_entry(model, 'model'), _entry(python, 'python'), _entry(proof, 'evidence')]
-    artifacts.extend(_entry(Path(__file__).with_name(name), role) for name, role in [('rvm_worker.py', 'worker'), ('matting_frames.py', 'frames'), ('local_matting.py', 'controller')])
+    artifacts.extend(_entry(Path(__file__).with_name(name), role) for name, role in [('rvm_worker.py', 'worker'), ('matting_frames.py', 'frames'), ('local_matting.py', 'controller'), ('pipeline_diagnostics.py', 'diagnostics'), ('errors.py', 'error_contract'), ('policy.py', 'local_policy')])
     record = {'adapter_id': adapter_id, 'kind': 'video-matting', 'engine': MATTING_ENGINE, 'protocol': MATTING_PROTOCOL, 'output_contract': 'rgba_video_v1',
               'model_path': str(model), 'model_sha256': artifacts[0]['sha256'], 'model_kind': 'file', 'model_file_count': 1,
               'executable': str(python), 'executable_sha256': artifacts[1]['sha256'], 'rights_ref': 'visual_adapter_' + adapter_id,
@@ -101,9 +103,9 @@ def verify_adapter(record: dict) -> dict:
         if manifest_hash(record) != record.get('sha256') or record['rights_ref'] != 'visual_adapter_' + record['adapter_id']:
             raise ValueError('MATTING_MANIFEST_HASH_MISMATCH')
         roles = {item['role']: item for item in record['artifacts']}
-        if len(roles) != 6 or len(record['artifacts']) != 6 or set(roles) != {'model', 'python', 'evidence', 'worker', 'frames', 'controller'}:
+        if len(roles) != 9 or len(record['artifacts']) != 9 or set(roles) != {'model', 'python', 'evidence', 'worker', 'frames', 'controller', 'diagnostics', 'error_contract', 'local_policy'}:
             raise ValueError('MATTING_MANIFEST_INCOMPLETE')
-        for role, expected in [('model', record['model_path']), ('python', record['executable']), ('worker', Path(__file__).with_name('rvm_worker.py')), ('frames', Path(__file__).with_name('matting_frames.py')), ('controller', Path(__file__))]:
+        for role, expected in [('model', record['model_path']), ('python', record['executable']), ('worker', Path(__file__).with_name('rvm_worker.py')), ('frames', Path(__file__).with_name('matting_frames.py')), ('controller', Path(__file__)), ('diagnostics', Path(__file__).with_name('pipeline_diagnostics.py')), ('error_contract', Path(__file__).with_name('errors.py')), ('local_policy', Path(__file__).with_name('policy.py'))]:
             if Path(roles[role]['path']).resolve() != Path(expected).resolve():
                 raise ValueError('MATTING_MANIFEST_PATH_MISMATCH')
         if roles['model']['sha256'] != record['model_sha256'] or roles['python']['sha256'] != record['executable_sha256']:
@@ -329,30 +331,48 @@ def validate_response(response: dict, request: dict) -> None:
 
 
 @contextlib.contextmanager
-def _pipeline_workspace(cache: Path):
+def _pipeline_workspace(cache: Path, on_failure=None):
     cache = cache.resolve()
     work = Path(tempfile.mkdtemp(prefix='rgba-', dir=cache)).resolve()
+    primary = None
     try:
         yield work
+    except BaseException as exc:
+        primary = exc
+        if on_failure:
+            try:
+                on_failure(work, exc)
+            except Exception:
+                exc.diagnostics = {'status': 'unavailable', 'warnings': [{'code': 'DIAGNOSTIC_CALLBACK_FAILED'}]}
+        raise
     finally:
         # Windows scanners/readers can briefly retain a file after a child exits.
         # Retry sharing/access races within a fixed budget; never hide leftovers.
-        for attempt in range(6):
-            if work.resolve() != work or work.parent != cache or work.is_symlink() or getattr(work, 'is_junction', lambda: False)():
-                raise AppError('MATTING_CACHE_CLEANUP_FAILED', '临时目录边界变化，拒绝递归清理', exit_code=6, path=str(work))
-            try:
-                shutil.rmtree(work)
-                break
-            except FileNotFoundError:
-                break
-            except OSError as exc:
-                if getattr(exc, 'winerror', None) not in {5, 32, 33, 145} or attempt == 5:
-                    raise AppError('MATTING_CACHE_CLEANUP_FAILED', '临时目录未清理，保留路径供恢复', exit_code=6, path=str(work), cause=str(exc)) from exc
-                time.sleep(.05 * 2**attempt)
+        try:
+            for attempt in range(6):
+                if work.resolve() != work or work.parent != cache or work.is_symlink() or getattr(work, 'is_junction', lambda: False)():
+                    raise AppError('MATTING_CACHE_CLEANUP_FAILED', '临时目录边界变化，拒绝递归清理', exit_code=6, path=str(work))
+                try:
+                    shutil.rmtree(work)
+                    break
+                except FileNotFoundError:
+                    break
+                except OSError as exc:
+                    if getattr(exc, 'winerror', None) not in {5, 32, 33, 145} or attempt == 5:
+                        raise AppError('MATTING_CACHE_CLEANUP_FAILED', '临时目录未清理，保留路径供恢复', exit_code=6, path=str(work), cause=str(exc)) from exc
+                    time.sleep(.05 * 2**attempt)
+        except AppError as cleanup:
+            if primary is None:
+                if on_failure:
+                    on_failure(work, cleanup)
+                raise
+            reference = getattr(primary, 'diagnostics', None) or {'status': 'unavailable', 'warnings': []}
+            reference.setdefault('warnings', []).append({'code': cleanup.code, 'cache_kind': cache.name, 'cache_subdirectory': work.name})
+            primary.diagnostics = reference
 
 
 def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout: float = 3600,
-                 cancel_file: Path | None = None, progress: Callable | None = None) -> dict:
+                 cancel_file: Path | None = None, progress: Callable | None = None, operation_id: str | None = None) -> dict:
     if not math.isfinite(timeout) or not 0 < timeout <= 604800:
         raise argument_error('timeout-seconds 必须为 0..604800（不含 0）', 'timeout')
     if output.exists() or output.suffix.lower() != '.mov':
@@ -371,8 +391,9 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
     ffmpeg_hash = 'sha256:' + sha256_file(ffmpeg)
     started = time.monotonic()
     published = False
+    diagnostic = DiagnosticSession(root, plan, adapter, operation_id)
     try:
-        with _pipeline_workspace(cache) as temporary:
+        with _pipeline_workspace(cache, on_failure=diagnostic.capture) as temporary:
             work = Path(temporary)
             staged = work / 'foreground.mov'
             request = {**plan, 'adapter': adapter, 'runtime_root': runtime, 'response': str(work / 'response.json'), 'progress': str(work / 'progress.json'),
@@ -380,6 +401,7 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
             request['request_sha256'] = request_hash(request)
             request_path = work / 'request.json'
             atomic_write_json(request_path, request)
+            diagnostic.prepare(work, request)
             info = plan['video']
             start, end = plan['range']['start_seconds'], plan['range']['end_seconds']
             duration = info['duration_seconds']
@@ -403,60 +425,83 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
                 assign = stack.enter_context(_windows_job())
                 logs = [stack.enter_context((work / (name + '.log')).open('w+b')) for name in ('decoder', 'worker', 'encoder')]
                 try:
+                    diagnostic.start_failure_role = 'decoder'
                     decode = subprocess.Popen(decoder, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=logs[0])
+                    diagnostic.processes.started('decoder', decode)
+                    diagnostic.start_failure_role = None
                     processes.append(decode); assign(decode)
+                    diagnostic.start_failure_role = 'worker'
                     worker = subprocess.Popen(_worker_command(adapter, request_path), stdin=decode.stdout, stdout=subprocess.PIPE, stderr=logs[1])
+                    diagnostic.processes.started('worker', worker)
+                    diagnostic.start_failure_role = None
                     processes.append(worker); assign(worker)
                     decode.stdout.close()
+                    diagnostic.start_failure_role = 'encoder'
                     encode = subprocess.Popen(encoder, stdin=worker.stdout, stdout=subprocess.DEVNULL, stderr=logs[2])
+                    diagnostic.processes.started('encoder', encode)
+                    diagnostic.start_failure_role = None
                     processes.append(encode); assign(encode)
                     worker.stdout.close()
+                    diagnostic.start_failure_role = None
+                    diagnostic.stage = 'running'
                     last_frame = -1
                     while any(p.poll() is None for p in processes):
+                        diagnostic.observe()
                         if cancel_file and cancel_file.exists():
                             raise AppError('CANCELLED', '抠像已取消', exit_code=8)
                         if time.monotonic() - started > timeout:
                             raise AppError('TIMEOUT', '抠像超过显式时间预算', exit_code=8)
                         if staged.exists() and staged.stat().st_size > MAX_INPUT_BYTES:
                             raise AppError('MATTING_OUTPUT_TOO_LARGE', '透明中间素材超过项目单文件预算，请调整范围或画幅', exit_code=3)
-                        if any(p.poll() not in (None, 0) for p in processes):
+                        if diagnostic.processes.first_failure_roles or any(p.poll() not in (None, 0) for p in processes):
                             break
-                        if progress and Path(request['progress']).is_file():
+                        if progress:
                             with contextlib.suppress(OSError, ValueError, KeyError, TypeError):
-                                frame = read_json_snapshot(Path(request['progress']))['frames']
+                                frame = diagnostic.read_progress().get('frames')
                                 if type(frame) is int and 0 <= frame <= info['frames'] and frame != last_frame:
                                     progress(min(frame, info['frames']), info['frames'])
                                     last_frame = frame
+                                    diagnostic.last_reported_frame = frame
                         time.sleep(.05)
                     if any(p.poll() not in (0,) for p in processes):
-                        error = ''
-                        if Path(request['response']).is_file():
-                            with Path(request['response']).open('rb') as response_file:
-                                response_file.seek(max(0, Path(request['response']).stat().st_size - 2500))
-                                error = response_file.read(2500).decode('utf-8', errors='replace')
-                        for log in logs:
-                            log.seek(0, 2); size = log.tell(); log.seek(max(0, size - 1500))
-                            error += '\n' + log.read(1500).decode('utf-8', errors='replace')
-                        raise AppError('MATTING_PIPELINE_FAILED', '离线抠像管道失败，全部子进程将停止', exit_code=6, cause=error)
+                        raise AppError('MATTING_PIPELINE_FAILED', '离线视频管道失败，全部子进程将停止', exit_code=6, cause=diagnostic.failure_text())
                 finally:
+                    primary_error = sys.exc_info()[1]
+                    if diagnostic.start_failure_role:
+                        diagnostic.processes.start_failed(diagnostic.start_failure_role)
+                    diagnostic.processes.before_cleanup()
                     for process in processes:
                         if process.poll() is None:
-                            process.kill()
+                            try:
+                                process.kill()
+                            except OSError:
+                                diagnostic.cleanup_warnings.append({'code': 'DIAGNOSTIC_CHILD_KILL_FAILED', 'pid': process.pid})
                     for process in processes:
-                        process.wait()
-                        if process.stdout:
-                            process.stdout.close()
-                if not Path(request['response']).is_file():
-                    raise AppError('MATTING_WORKER_OUTPUT_INVALID', '缺少抠像 worker 报告', exit_code=6)
+                        try:
+                            process.wait(timeout=10)
+                        except (OSError, subprocess.TimeoutExpired):
+                            diagnostic.cleanup_warnings.append({'code': 'DIAGNOSTIC_CHILD_WAIT_FAILED', 'pid': process.pid})
+                        finally:
+                            if process.stdout:
+                                try:
+                                    process.stdout.close()
+                                except OSError:
+                                    diagnostic.cleanup_warnings.append({'code': 'DIAGNOSTIC_PIPE_CLOSE_FAILED', 'pid': process.pid})
+                    diagnostic.processes.finished()
+                    if diagnostic.cleanup_warnings and primary_error is None:
+                        raise AppError('MATTING_PIPELINE_FAILED', '原生视频管道回收未完成', exit_code=6)
+                diagnostic.stage = 'validating-response'
                 try:
-                    if Path(request['response']).stat().st_size > 128 * 1024:
+                    response_bytes, _ = diagnostic.prepared_directory.read('response.json', 128 * 1024)
+                    if response_bytes is None:
                         raise ValueError('response exceeds budget')
-                    response = json.loads(Path(request['response']).read_text(encoding='utf-8'))
+                    response = json.loads(response_bytes)
                     if not isinstance(response, dict):
                         raise ValueError('response is not an object')
                 except (ValueError, OSError) as exc:
                     raise AppError('MATTING_WORKER_OUTPUT_INVALID', '抠像报告格式或大小无效', exit_code=6) from exc
                 validate_response(response, request)
+            diagnostic.stage = 'probing-output'
             result_probe = probe_media(staged)
             video = result_probe.get('video') or {}
             audio = result_probe.get('audio') or {}
@@ -465,6 +510,7 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
                 raise AppError('MATTING_OUTPUT_INVALID', '抠像编码格式、画幅、帧率、时长或音频不符', exit_code=6)
             if plan['audio']['preserve'] and abs(float(audio.get('duration_seconds') or 0) - duration) > max(.002, 2 / float(audio.get('sample_rate') or 48000)):
                 raise AppError('MATTING_AUDIO_CLOCK_INVALID', '抠像音频未覆盖实际输出时长', exit_code=6)
+            diagnostic.stage = 'verifying-rgba'
             checked = run_process([*base, '-i', str(staged), '-map', '0:v:0', '-an', '-pix_fmt', 'rgba', '-fps_mode', 'passthrough', '-f', 'hash', '-hash', 'sha256', 'pipe:1'], timeout=max(.01, timeout - (time.monotonic() - started)), cancel_file=cancel_file)
             expected_hash = response['metrics']['rgba_sha256']
             if checked.returncode or checked.stdout.strip().lower() != 'sha256=' + expected_hash[7:]:
@@ -478,6 +524,7 @@ def matte_native(root: Path, output: Path, *, adapter: dict, plan: dict, timeout
                 raise AppError('TIMEOUT', '抠像校验超过显式时间预算', exit_code=8)
             # Windows rename refuses an existing destination, including one
             # created by an external editor after preflight. Never delete it.
+            diagnostic.stage = 'publishing-output'
             staged.rename(output)
             published = True
             from .artifact_locks import verification_summary

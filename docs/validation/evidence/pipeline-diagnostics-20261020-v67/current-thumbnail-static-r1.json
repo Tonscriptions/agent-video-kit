@@ -1,0 +1,18 @@
+{
+  "checked_at_utc": "2026-10-19T19:08:05.117718+00:00",
+  "scope": "static comparison only; no additional thumbnail render or measured memory saving",
+  "current_source": "product/src/ai_ad_editor/media.py",
+  "source_sha256": "sha256:75755c314fe01111d7ca85138efb6f9b0993e45c14c5a2b65cc1046c5e58cfba",
+  "function": "generate_thumbnail",
+  "start_line": 190,
+  "end_line": 202,
+  "original_function": "def generate_thumbnail(source: Path, output: Path, *, at_seconds: float = 0.0, width: int = 640) -> Path:\n    if width < 64:\n        raise AppError(\"THUMBNAIL_WIDTH_INVALID\", \"缩略图宽度必须不小于 64\", exit_code=2, path=\"thumbnail_width\")\n    _run_media_tool(\n        [\n            ffmpeg_path(), \"-hide_banner\", \"-loglevel\", \"error\", \"-y\", \"-ss\", f\"{max(0.0, at_seconds):.3f}\", \"-i\", str(source),\n            \"-frames:v\", \"1\", \"-vf\", f\"scale=w='min({int(width)},iw)':h=-2:force_original_aspect_ratio=decrease\",\n            \"-q:v\", \"3\", str(output),\n        ],\n        output=output,\n        operation=\"thumbnail\",\n    )\n    return output",
+  "cli_source": "product/src/ai_ad_editor/cli.py",
+  "cli_source_sha256": "sha256:4d3001edfec57711b1402475094ceb858e518b9d74b07df7cf310700b84d2270",
+  "findings": [
+    "existing thumbnail already scales with min(width,iw), default width640, before JPEG encoding",
+    "existing media.prepare writes a JPEG thumbnail; it does not implement the upstream alpha-preserving multi-frame contact sheet",
+    "R08 look.mjs low-memory pattern is not evidence of a current full-resolution base64 bug in this project",
+    "additional reuse should be limited to an explicitly needed transparent contact sheet and decoder selection; no duplicate generic thumbnail subsystem"
+  ]
+}

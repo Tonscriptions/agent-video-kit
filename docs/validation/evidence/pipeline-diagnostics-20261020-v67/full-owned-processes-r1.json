@@ -1,0 +1,49 @@
+{
+  "observed_at_utc": "2026-10-19T18:37:00.7378879Z",
+  "root_pid": 28808,
+  "scope": "Only current full-r2 runner and its observed descendants",
+  "processes": [
+    {
+      "ProcessId": 28808,
+      "ParentProcessId": 4284,
+      "Name": "python.exe",
+      "CreationDate": "2026-10-20T02:11:53.497098+08:00",
+      "CommandLine": "\"C:\\Python313\\python.exe\" -B -X utf8 scripts/run_frozen_regression.py --output docs/validation/evidence/pipeline-diagnostics-20261020-v67/full-r2.json --rubberband product/.runtime/rubberband-offline-probe-20261017/native/rubberband-4.0.0-gpl-executable-windows/rubberband.exe --html-runtime product/.runtime/html-motion-runtime-20261018-e2.json"
+    },
+    {
+      "ProcessId": 37344,
+      "ParentProcessId": 28808,
+      "Name": "python.exe",
+      "CreationDate": "2026-10-20T02:11:53.952426+08:00",
+      "CommandLine": "C:\\Python313\\python.exe -E -B -X utf8 -c \"import sys,unittest;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();unittest.main(module=None)\" E:\\dev\\sandbox\\AI广告剪辑\\product\\src discover -s E:\\dev\\sandbox\\AI广告剪辑\\product\\tests -p test*.py -v"
+    },
+    {
+      "ProcessId": 22796,
+      "ParentProcessId": 37344,
+      "Name": "ffmpeg.exe",
+      "CreationDate": "2026-10-20T02:36:59.953313+08:00",
+      "CommandLine": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE -hide_banner -v error -f image2pipe -framerate 4/1 -vcodec png -i pipe:0 -an -c:v ffv1 -level 3 -pix_fmt bgra -threads 1 -y E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\temp\\html-motion-gs8ao1wb\\result.nut"
+    },
+    {
+      "ProcessId": 39856,
+      "ParentProcessId": 22796,
+      "Name": "conhost.exe",
+      "CreationDate": "2026-10-20T02:36:59.963338+08:00",
+      "CommandLine": "\\??\\C:\\WINDOWS\\system32\\conhost.exe 0x4"
+    },
+    {
+      "ProcessId": 39852,
+      "ParentProcessId": 37344,
+      "Name": "node.exe",
+      "CreationDate": "2026-10-20T02:36:59.964236+08:00",
+      "CommandLine": "\"D:\\Program Files\\nodejs\\node.exe\" E:\\dev\\sandbox\\AI广告剪辑\\product\\src\\ai_ad_editor\\html_motion_worker.mjs"
+    },
+    {
+      "ProcessId": 39908,
+      "ParentProcessId": 39852,
+      "Name": "conhost.exe",
+      "CreationDate": "2026-10-20T02:36:59.97135+08:00",
+      "CommandLine": "\\??\\C:\\WINDOWS\\system32\\conhost.exe 0x4"
+    }
+  ]
+}

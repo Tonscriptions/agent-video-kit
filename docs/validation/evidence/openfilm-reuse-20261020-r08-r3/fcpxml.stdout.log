@@ -1,0 +1,60 @@
+TAP version 13
+# Subtest: continuous main-track pictures occupy the primary storyline instead of connecting to a gap
+ok 1 - continuous main-track pictures occupy the primary storyline instead of connecting to a gap
+  ---
+  duration_ms: 4.6406
+  ...
+# Subtest: FCPXML keeps exact NTSC times, source trims, layering, transforms and separate sound without duplicate audio
+ok 2 - FCPXML keeps exact NTSC times, source trims, layering, transforms and separate sound without duplicate audio
+  ---
+  duration_ms: 2.062
+  ...
+# Subtest: only real empty intervals become primary gaps, with overlays anchored in source time
+ok 3 - only real empty intervals become primary gaps, with overlays anchored in source time
+  ---
+  duration_ms: 1.2258
+  ...
+# Subtest: FCPXML also writes integer-rate, audio-only timelines with a full-length primary storyline
+ok 4 - FCPXML also writes integer-rate, audio-only timelines with a full-length primary storyline
+  ---
+  duration_ms: 0.6815
+  ...
+# Subtest: mixed stems keep Voice and Footage in separate dialogue subroles
+ok 5 - mixed stems keep Voice and Footage in separate dialogue subroles
+  ---
+  duration_ms: 3.0738
+  ...
+# Subtest: FCPXML includes editable subtitle titles above pictures, clipped to the sequence, with escaped multiline text
+ok 6 - FCPXML includes editable subtitle titles above pictures, clipped to the sequence, with escaped multiline text
+  ---
+  duration_ms: 3.8571
+  ...
+# Subtest: subtitle titles keep their relative size and white outlined text across sequence resolutions
+ok 7 - subtitle titles keep their relative size and white outlined text across sequence resolutions
+  ---
+  duration_ms: 1.4901
+  ...
+# Subtest: subtitle titles on an audio-only timeline omit empty cues and end at the next subtitle
+ok 8 - subtitle titles on an audio-only timeline omit empty cues and end at the next subtitle
+  ---
+  duration_ms: 0.3997
+  ...
+# Subtest: invalid plans fail instead of silently attaching a connection to an unrelated primary clip
+ok 9 - invalid plans fail instead of silently attaching a connection to an unrelated primary clip
+  ---
+  duration_ms: 1.3839
+  ...
+# Subtest: FCPXML validates against Final Cut Pro’s installed 1.10 DTD
+ok 10 - FCPXML validates against Final Cut Pro’s installed 1.10 DTD # SKIP Final Cut Pro DTD not installed
+  ---
+  duration_ms: 0.5368
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 122.7569

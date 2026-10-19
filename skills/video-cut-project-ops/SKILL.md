@@ -5,6 +5,18 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+For failed native RVM/SAM2/LaMa/VACE jobs, use the
+[pipeline diagnostic contract](../../docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md).
+Keep the original error/operation ID and optional `diagnostics` reference.
+`diagnostics list --project <root> --operation-id <op>` finds retained records;
+`diagnostics show --project <root> --diagnostic-id <id>
+--expected-manifest-sha256 <sha>` checks their files. Logs require `--include-logs`.
+Export only to an explicitly requested new ZIP in an existing plain directory.
+Read commands do not create snapshots or prune history; retention runs on writes.
+An unavailable/expired attachment does not invalidate the original business error.
+See the [native failure and installation evidence](../../docs/validation/本地模型管道诊断与回收前留证实测_2026-10-20.md)
+for actual scope; neither a simulated exit nor a parser error is a Torch crash.
+
 For optional GPU queues/resume, follow the [hardware policy](../../docs/specs/硬件编解码探测与显式回退契约_v0.1_2026-10-19.md).
 Queue fields are `hardware_encode`, `hardware_decode`, `hardware_encoder`,
 `hardware_decoder`, `hardware_probe_mib` and explicit `video_bitrate`.

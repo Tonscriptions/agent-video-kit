@@ -5,6 +5,17 @@ description: Run registered offline OCR, speech, transcription, separation, trac
 
 # Local Models
 
+Shared native video pipelines now expose optional
+[bounded failure diagnostics](../../docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md).
+Register fresh adapters when implementation hashes change. Preserve each role's
+natural observed exit separately from cleanup termination, including Windows raw,
+unsigned and hex values. Multiple failed roles and the last progress stage are
+clues, not a causal root. Keep cancellation/timeout codes, explicit sampling and
+the original quality gate. Missing/failed diagnostics must not cause an automatic
+model rerun, parameter reduction or scan of unrelated processes or global logs.
+The [real native evidence](../../docs/validation/本地模型管道诊断与回收前留证实测_2026-10-20.md)
+separates controlled invalid-model failure from actual inference and old crashes.
+
 For a larger video canvas, use the [local outpainting contract](../../docs/specs/本地视频扩图与原画面保护契约_v0.1_2026-10-19.md):
 `media outpaint --project <root> --asset-id <video> --adapter-id <lama-or-vace>
 --derived-asset-id <new> --width <pixels> --height <pixels> --dry-run`.

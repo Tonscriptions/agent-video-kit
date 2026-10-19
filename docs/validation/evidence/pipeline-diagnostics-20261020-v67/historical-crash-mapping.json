@@ -1,0 +1,50 @@
+{
+  "scope": "Historical V66 saved events only; no current Windows event log, WER directory or dump inspected. Not a new Torch crash capture.",
+  "root_cause": "unknown",
+  "new_diagnostic_mapping": {
+    "ProcessId": "processes[worker].pid",
+    "ExceptionCode": "independent event evidence; compare unsigned/hex exit, not replace raw exit",
+    "ModuleName": "external fault-module evidence, not inferred from Broken pipe",
+    "observation_order": "no recorded new observation history for these old failures"
+  },
+  "sources": [
+    {
+      "source": "docs/validation/evidence/video-outpainting-20261019-v66/vace-harmonic-r2/windows-native-crash-events.json",
+      "source_sha256": "sha256:dbacba0cea6f8b71471581290a8163059c9780b46b1ce27116bf7247d0ec76cc",
+      "application_error_events": [
+        {
+          "event_id": 1000,
+          "record_id": 219031,
+          "time_utc": "2026-10-19T15:09:52.2954666Z",
+          "fields": {
+            "ModuleName": "torch_cpu.dll",
+            "ExceptionCode": "c0000005",
+            "FaultingOffset": "0000000008e4a279",
+            "ProcessId": "0x5e90",
+            "IntegratorReportId": "c871f8d4-ed71-40d4-b435-549d2127c1d3",
+            "worker_pid_decimal": 24208
+          }
+        }
+      ]
+    },
+    {
+      "source": "docs/validation/evidence/video-outpainting-20261019-v66/vace-harmonic-r3/windows-native-crash-events.json",
+      "source_sha256": "sha256:400ed84bbefb93346a9d187daab169cb0219b293d87d8645ed02b02b022a83eb",
+      "application_error_events": [
+        {
+          "event_id": 1000,
+          "record_id": 219045,
+          "time_utc": "2026-10-19T15:52:54.9544187Z",
+          "fields": {
+            "ModuleName": "torch_cpu.dll",
+            "ExceptionCode": "c0000005",
+            "FaultingOffset": "0000000008e4a279",
+            "ProcessId": "0x865c",
+            "IntegratorReportId": "03b8b551-5e2b-4fc4-926d-a15540c97cdd",
+            "worker_pid_decimal": 34396
+          }
+        }
+      ]
+    }
+  ]
+}

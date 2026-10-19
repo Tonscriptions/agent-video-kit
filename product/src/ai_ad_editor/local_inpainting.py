@@ -16,7 +16,7 @@ from .utils import assert_id, now_iso, sha256_bytes, sha256_file
 INPAINT_ENGINE = 'torchscript-lama-local-v1'
 INPAINT_PROTOCOL = 'agent-video-lama-inpainting-v1'
 IMPLEMENTATIONS = {'worker': 'lama_worker.py', 'frames': 'inpainting_frames.py', 'controller': 'local_inpainting.py',
-                   'pipeline': 'local_matting.py', 'rgba': 'matting_frames.py', 'guard': 'rvm_worker.py', 'blend': 'repair_blend.py', 'outpaint': 'local_outpainting.py'}
+                   'pipeline': 'local_matting.py', 'rgba': 'matting_frames.py', 'guard': 'rvm_worker.py', 'blend': 'repair_blend.py', 'outpaint': 'local_outpainting.py', 'diagnostics': 'pipeline_diagnostics.py', 'error_contract': 'errors.py', 'local_policy': 'policy.py'}
 
 
 def settings(*, device='cpu', threads=4):

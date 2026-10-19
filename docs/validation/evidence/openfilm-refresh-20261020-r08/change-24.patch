@@ -1,0 +1,14 @@
+--- fixed/packages/openfilm/studio/ui/src/lib/export-jobs.ts
++++ head/packages/openfilm/studio/ui/src/lib/export-jobs.ts
+@@ -8,8 +8,9 @@
+ /** `burnSubtitles`: the film's subtitles drawn into the picture, as the editor shows them. */
+ type Framing = { frame?: FilmFrameId; fill?: FilmFrameFill; burnSubtitles?: boolean };
+ 
+-/** One export, as the server takes it. `range` is [from, to] in seconds. */
+-export type ExportRequest = { range?: [number, number]; label?: string } & (
++/** One export, as the server takes it. `range` is [from, to] in seconds; `name` is what its files are called (the
++ * project's name when there is none). */
++export type ExportRequest = { range?: [number, number]; label?: string; name?: string } & (
+   | (Framing & { kind: 'video'; codec: ExportVideoCodec; shortEdge?: number; fps: number; quality: ExportQuality; audio: boolean;
+     clip?: string; scale?: number; preset?: string; sidecar?: 'srt' | 'vtt' })
+   | (Framing & { kind: 'gif'; width: number; fps: number })

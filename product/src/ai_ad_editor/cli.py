@@ -164,6 +164,21 @@ def build_parser() -> argparse.ArgumentParser:
     recover = _leaf_common(ps.add_parser("recover", help="恢复上次中断的项目元数据事务"))
     recover.add_argument("--project", required=True)
 
+    diagnostics = subs.add_parser('diagnostics', help='检查及显式导出本地管道失败诊断')
+    diagnostic_actions = diagnostics.add_subparsers(dest='action', required=True)
+    diagnostic_list = _leaf_common(diagnostic_actions.add_parser('list', help='列出本项目已保存的有限诊断历史'))
+    diagnostic_list.add_argument('--project', required=True)
+    diagnostic_list.add_argument('--operation-id', default=None)
+    for action in ('show', 'export'):
+        diagnostic = _leaf_common(diagnostic_actions.add_parser(action))
+        diagnostic.add_argument('--project', required=True)
+        diagnostic.add_argument('--diagnostic-id', required=True)
+        diagnostic.add_argument('--expected-manifest-sha256', default=None)
+        if action == 'show':
+            diagnostic.add_argument('--include-logs', action='store_true')
+        else:
+            diagnostic.add_argument('--output', required=True)
+
     media = subs.add_parser("media", help="素材管理")
     ms = media.add_subparsers(dest="action", required=True)
     ingest = _leaf_common(ms.add_parser("ingest", help="导入本地素材"))
@@ -2099,7 +2114,7 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         _progress(args, operation_id, 'started', command, 0, '开始本地 VACE 联合视频编辑' if joint else '开始本地 LaMa 区域修复' if inpainting else '开始本地对象分割' if segmentation else '开始本地 RVM 时序抠像')
         def progress(frame, total):
             _progress(args, operation_id, 'progress', command + '.inference', round(90 * frame / total), f'{"区域修复" if inpainting else "对象分割" if segmentation else "人物抠像"} {frame}/{total} 帧')
-        result = matte_native(root, output, adapter=adapter, plan=plan, timeout=args.timeout_seconds, cancel_file=cancel_file, progress=progress)
+        result = matte_native(root, output, adapter=adapter, plan=plan, timeout=args.timeout_seconds, cancel_file=cancel_file, progress=progress, operation_id=operation_id)
         published = True
         asset = {'id': derived_id, 'kind': 'video', 'uri': output.relative_to(root).as_posix(), 'sha256': result['sha256'], 'probe': result['probe'], 'rights_ref': derived_id,
                  'source': {'source_url': f'local://{output}', 'retrieved_at': now_iso(), 'original_name': output.name, 'derived_from': derived_from_assets}}
@@ -2143,8 +2158,11 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         if published:
             output.unlink(missing_ok=True)
         report_path.unlink(missing_ok=True)
+        if isinstance(exc, AppError):
+            exc.operation_id = operation_id
         if isinstance(exc, OSError):
-            raise AppError('MATTING_WRITE_FAILED', '抠像输出或元数据写入失败，事务将回滚', exit_code=6, cause=str(exc)) from exc
+            raise AppError('MATTING_WRITE_FAILED', '抠像输出或元数据写入失败，事务将回滚', exit_code=6, cause=str(exc),
+                operation_id=operation_id, diagnostics=getattr(exc, 'diagnostics', None)) from exc
         raise
 
 
@@ -6600,7 +6618,31 @@ def command_ocr(args: argparse.Namespace) -> dict[str, Any]:
     return handle(args)
 
 
+def command_diagnostics(args):
+    from . import pipeline_diagnostics as diagnostic_store
+    root, _ = load_project(args.project)
+    if args.action == 'list':
+        data = diagnostic_store.list_records(root)
+        if args.operation_id:
+            data['records'] = [row for row in data['records'] if row['operation_id'] == args.operation_id]
+    elif args.action == 'show':
+        manifest, files = diagnostic_store.inspect_record(root, args.diagnostic_id, expected_sha256=args.expected_manifest_sha256)
+        data = {'manifest': manifest, 'manifest_sha256': diagnostic_store.digest(files['manifest.json'])}
+        if args.include_logs:
+            data['logs'] = {name: raw.decode('utf8') for name, raw in files.items() if name.endswith('.log')}
+    else:
+        from .policy import require_local_reference
+        require_local_reference(args.output, field='output')
+        output = Path(args.output)
+        if not output.is_absolute():
+            output = root / output
+        data = diagnostic_store.export_record(root, args.diagnostic_id, output,
+            expected_sha256=args.expected_manifest_sha256, dry_run=args.dry_run)
+    return _envelope('diagnostics.' + args.action, args, data=data, status='planned' if args.dry_run else 'succeeded')
+
+
 _READ_ONLY_PROJECT_COMMANDS = {
+    ('diagnostics', 'list'), ('diagnostics', 'show'), ('diagnostics', 'export'),
     ("project", "inspect"),
     ("operation", "inspect"),
     ("queue", "list"),
@@ -6635,6 +6677,9 @@ def _project_operation_lock(args: argparse.Namespace):
 
 
 COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, Any]]] = {
+    ('diagnostics', 'list'): command_diagnostics,
+    ('diagnostics', 'show'): command_diagnostics,
+    ('diagnostics', 'export'): command_diagnostics,
     ('ocr','adapter'): command_ocr,
     ('ocr','scan'): command_ocr,
     ('ocr','anchors'): command_ocr,

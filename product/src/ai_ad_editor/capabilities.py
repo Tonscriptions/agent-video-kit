@@ -21,6 +21,20 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'pipeline_diagnostics': {
+                'status': 'implemented_with_limits', 'engine': 'agent-native-pipeline-diagnostic-v1',
+                'commands': ['diagnostics.list', 'diagnostics.show', 'diagnostics.export'],
+                'features': ['decoder_worker_encoder_observed_and_cleanup_exit_separation',
+                    'windows_raw_unsigned_and_hex_exit_values', 'bounded_redacted_stderr_before_workspace_cleanup',
+                    'failure_operation_id_and_optional_integrity_bound_reference',
+                    'plain_single_link_file_handle_checks', 'limited_local_history_and_explicit_new_zip_export'],
+                'limits': ['shared_rvm_sam2_lama_vace_native_controller_only',
+                    'not_all_preflight_or_post_publication_failures_have_attachments',
+                    'stderr_64kib_each_response_read_128kib_summaries_32kib_manifest_64kib',
+                    'record_512kib_zip_768kib_history_32_records_64mib_14days_on_write',
+                    'root_cause_unknown_observation_order_is_not_causality',
+                    'redaction_not_complete_secret_recognition_or_crash_stability_acceptance'],
+            },
             'hardware_acceleration': {
                 'status': 'implemented_with_limits', 'engine': 'ffmpeg-native-probed-v1',
                 'commands': ['render', 'queue.enqueue', 'queue.run'],

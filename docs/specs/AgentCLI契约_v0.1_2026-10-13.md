@@ -1,5 +1,23 @@
 # Agent CLI 契约 v0.1
 
+<!-- V67-CURRENT -->
+2026-10-20 **V67（产品限定验收）**：共享 RVM/SAM2/LaMa/VACE 管道新增三角色退出观测、有界脱敏日志、回收前留证和 `diagnostics list/show/export`；保留原错误、operation ID 和事务回滚。完整 **1496/1496、4676.172 秒、0 跳过、202 输入冻结**，34 新专项为子集。开发 **33 CLI**：真实无效 ONNX 解析失败 1 次（0 有效模型前向），LaMa harmonic 真实 **8 次前向/8 帧**；原生离线 **134 包内文件/35 隔离 CLI**，另一次真实解析失败与 8 帧 LaMa 输出，全部解码 RGBA/PCM 与开发版相同；**17 Skills/244 引用**。受控生成区 35.578 dB，≥30 dB 单项通过，沿用原质量门槛；静看 4 帧，未连续播放/听审。**本轮没有新 VACE 模型推理或新 Torch 崩溃，原访问冲突根因/长期稳定性、自然质量及完整剪映等价仍未验收**。 [编号核验/原片/GIF/失败/发行](../validation/本地模型管道诊断与回收前留证实测_2026-10-20.md)。
+<!-- /V67-CURRENT -->
+
+<!-- V67-DIAGNOSTICS-CLI -->
+## 原生管道诊断接口（V67，限定验收通过）
+
+共享 RVM/SAM2/LaMa/VACE 原生管道在进程、响应或输出核验失败时，保留原 `errors[].code`、退出码与 `operation_id`；在 `errors[]` 的对应错误对象内可选增加 `diagnostics`，例如单错误响应读取 `errors[0].diagnostics`。`diagnostics.status=stored` 提供 `diagnostic_id`、项目相对 manifest 路径及 `manifest_sha256`；`status=unavailable` 仅提供次级 `warnings`。附件失败不会替换原业务错误。未进入管道的预检以及发布后的保存失败可能只有 operation ID；调用方须允许没有诊断字段。原有非管道错误的 JSON 字段保持不变。
+
+| 命令 | 参数与行为 |
+|---|---|
+| `diagnostics list` | `--project`；可选 `--operation-id` 过滤有限历史；只读，不触发清理 |
+| `diagnostics show` | `--project --diagnostic-id`；可选 `--expected-manifest-sha256`；默认只返回已核验 manifest，`--include-logs` 显式返回脱敏文本 |
+| `diagnostics export` | 同 show 的 ID/SHA 参数，另需 `--output <新.zip>`；父目录须已存在、不可为联接；`--dry-run` 不写 ZIP，正式执行只写显式输出 |
+
+命令不修改作者工程、账本或快照。缺失/已清理记录退出 3，边界/完整性失败退出 10，导出已有路径/格式无效退出 2；保留原始媒体与模型，不收集 RGBA stdout。记录默认仅保存在本项目 `renders/diagnostics/pipelines/`，不上传。保留策略在新记录写入时执行；读取过期记录不等于保留期自动后台清理。归因/预算/验收要求见[诊断契约](本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md)。
+<!-- /V67-DIAGNOSTICS-CLI -->
+
 <!-- V66-CURRENT -->
 2026-10-20 **V66（产品，10-19 开始的跨日验收）**：新增 `media outpaint`，本地 LaMa/VACE 向更大画布生成背景；显式放置、同源蒙版、归一化原区域 RGBA/PTS/PCM 保护、可编辑配方、工程包与片段组跨项目重绑定。完整 **1462/1462、4928.763 秒、0 跳过、200 输入冻结**；24 扩图专项、41 VACE 专项均为子集，后者含 8 个新增读取方法。开发 **67 CLI/3 次模型交付/24 帧**；原生离线 **133 包内文件/25 隔离 CLI**，LaMa harmonic 的全部 RGBA/PCM 与开发版相同；**17 Skills/238 引用**。生成区预先声明 ≥30 dB，实测 lama/direct 34.485 dB（通过）；lama/harmonic 35.578 dB（通过）；vace/harmonic 19.228 dB（未通过）。原画面保护通过不替代生成质量；**自然扩图、安装版 VACE 推理与完整剪映等价仍未验收**。 VACE 两次原生文本加载访问冲突保留；组件内 `pread` 后本例实际交付通过，**底层根因与长期稳定性仍未确认**。 [原片/GIF/编号核验/失败和发行](../validation/本地视频扩图与原画面保护实测_2026-10-19.md)。
 <!-- /V66-CURRENT -->

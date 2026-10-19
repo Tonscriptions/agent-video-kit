@@ -402,7 +402,7 @@ class NativeVaceTests(unittest.TestCase):
     def test_registration_dry_run_inspect_and_complete_inventory(self):
         before=self.metadata();code,result=invoke('media','adapter','register',*self.options,'--dry-run')
         self.assertEqual(code,0,result);self.assertEqual(self.metadata(),before)
-        adapter=self.register();self.assertEqual(adapter['model_file_count'],17);self.assertEqual(len(adapter['artifacts']),32)
+        adapter=self.register();self.assertEqual(adapter['model_file_count'],17);self.assertEqual(len(adapter['artifacts']),35)
         self.assertTrue(verify_adapter(adapter)['ok'])
         self.assertTrue(invoke('media','adapter','inspect','--project',str(self.root),'--adapter-id','vace')[1]['data']['verification']['ok'])
 

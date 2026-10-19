@@ -12,7 +12,7 @@ from .utils import assert_id, now_iso, sha256_bytes, sha256_file
 
 SEGMENTATION_ENGINE = 'transformers-sam2-video-local-v1'
 SEGMENTATION_PROTOCOL = 'agent-video-sam2-segmentation-v1'
-IMPLEMENTATIONS = {'worker': 'sam2_worker.py', 'frames': 'segmentation_frames.py', 'controller': 'local_segmentation.py', 'pipeline': 'local_matting.py', 'rgba': 'matting_frames.py', 'guard': 'rvm_worker.py'}
+IMPLEMENTATIONS = {'worker': 'sam2_worker.py', 'frames': 'segmentation_frames.py', 'controller': 'local_segmentation.py', 'pipeline': 'local_matting.py', 'rgba': 'matting_frames.py', 'guard': 'rvm_worker.py', 'diagnostics': 'pipeline_diagnostics.py', 'error_contract': 'errors.py', 'local_policy': 'policy.py'}
 
 
 def settings(*, device: str = 'cpu', threads: int = 4) -> dict:

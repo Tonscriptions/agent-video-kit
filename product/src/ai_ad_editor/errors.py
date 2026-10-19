@@ -14,6 +14,7 @@ class AppError(Exception):
     cause: str | None = None
     hint: str | None = None
     operation_id: str | None = None
+    diagnostics: dict[str, Any] | None = None
 
     def __str__(self) -> str:
         return self.message
@@ -31,6 +32,8 @@ class AppError(Exception):
             value["hint"] = self.hint
         if self.operation_id:
             value["operation_id"] = self.operation_id
+        if self.diagnostics is not None:
+            value["diagnostics"] = self.diagnostics
         return value
 
 

@@ -5,6 +5,16 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For a native pipeline failure, review the
+[diagnostic contract](../../docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md)
+and bind `diagnostics show` to the returned manifest SHA. A bounded, redacted
+worker JSON error may contain the useful reason even when stderr is empty.
+`first_failure_roles` records observation, while cleanup exits are separate;
+Broken pipe alone cannot identify a model root cause. Keep original errors when
+evidence is unavailable. Do not rate background quality from an error package;
+use the [actual media and installed evidence](../../docs/validation/本地模型管道诊断与回收前留证实测_2026-10-20.md)
+and retain failed quality gates independently of operational tests.
+
 For video outpainting, follow the [canvas extension contract](../../docs/specs/本地视频扩图与原画面保护契约_v0.1_2026-10-19.md).
 Compare the lossless MOV's complete original rectangle, including partial alpha,
 against the normalized source; check generated alpha, every PTS and full PCM.

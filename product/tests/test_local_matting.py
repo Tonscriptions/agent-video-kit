@@ -177,7 +177,8 @@ class NativeMattingTests(unittest.TestCase):
         self.assertEqual(code, 0, value)
         self.assertEqual(self.metadata(), before)
         adapter = self.register()
-        self.assertEqual(len(adapter['artifacts']), 6)
+        self.assertEqual(len(adapter['artifacts']), 9)
+        self.assertEqual({a['role'] for a in adapter['artifacts']}, {'model', 'python', 'evidence', 'worker', 'frames', 'controller', 'diagnostics', 'error_contract', 'local_policy'})
         self.assertEqual(adapter['kind'], 'video-matting')
         with patch('ai_ad_editor.cli.matte_native') as infer:
             before = self.metadata()
