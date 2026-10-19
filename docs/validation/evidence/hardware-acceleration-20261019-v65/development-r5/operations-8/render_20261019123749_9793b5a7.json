@@ -1,0 +1,305 @@
+{
+  "operation_id": "render_20261019123749_9793b5a7",
+  "command": "render",
+  "status": "cancelled",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\cancel-before-probe.mkv",
+  "profile": null,
+  "project_id": "proj_20261019123605_0945e657",
+  "sequence_id": "seq_main",
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 24,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 320,
+      "height": 180,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mkv",
+      "video": {
+        "codec": "libx264",
+        "preset": "ultrafast",
+        "crf": 18,
+        "pixel_format": "yuv420p",
+        "bitrate": "4M"
+      },
+      "audio": {
+        "codec": "pcm_s16le",
+        "bitrate": "192k"
+      }
+    },
+    "acceleration": {
+      "encode": "require",
+      "decode": "require",
+      "encoder": "nvenc",
+      "decoder": "cuda",
+      "probe_max_bytes": 536870912
+    }
+  },
+  "error": {
+    "code": "CANCELLED",
+    "message": "任务在启动前已被取消",
+    "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\cancel",
+    "retryable": false,
+    "operation_id": "render_20261019123749_9793b5a7"
+  },
+  "plan": {
+    "operation_id": "render_20261019123749_9793b5a7",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-y",
+      "-loglevel",
+      "error",
+      "-progress",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\.tmp\\render_20261019123749_9793b5a7\\ffmpeg-progress.log",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\assets\\source_source-8bit.mkv",
+      "-filter_complex",
+      "[0:v]trim=start=0.000000:end=2.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=24/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1,eq=brightness=0.025000:contrast=1.000000:saturation=1.000000[v0];color=c=black@0.0:s=320x180:r=24/1:d=2.000000,format=rgba[group0_base];[group0_base][v0]overlay=x='(if(lt((t-0.00000000),0.00000000),0.50000000,if(lt((t-0.00000000),2.00000000),(0.50000000+(0.05000000)*(clip((((t-0.00000000)-0.00000000)/2.00000000),0,1))),0.55000000)))*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[group0_vo0];[group0_vo0]format=rgba,trim=start_frame=0:end_frame=48[group0_out];color=c=black:s=320x180:r=24/1:d=2.000000[base];[base][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo0];[vo0]null[hardware_color_output];anullsrc=r=48000:cl=stereo,atrim=end_sample=96000[aout];[hardware_color_output]setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=limited[vout]",
+      "-map",
+      "[vout]",
+      "-map",
+      "[aout]",
+      "-t",
+      "2.000000000",
+      "-c:v",
+      "libx264",
+      "-preset",
+      "ultrafast",
+      "-b:v",
+      "4M",
+      "-pix_fmt",
+      "yuv420p",
+      "-color_primaries",
+      "bt709",
+      "-color_trc",
+      "bt709",
+      "-colorspace",
+      "bt709",
+      "-color_range",
+      "tv",
+      "-c:a",
+      "pcm_s16le",
+      "-f",
+      "matroska",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\.tmp\\render_20261019123749_9793b5a7\\cancel-before-probe.mkv"
+    ],
+    "execution_command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-y",
+      "-loglevel",
+      "error",
+      "-progress",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\.tmp\\render_20261019123749_9793b5a7\\ffmpeg-progress.log",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\assets\\source_source-8bit.mkv",
+      "-filter_complex",
+      "[0:v]trim=start=0.000000:end=2.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=24/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1,eq=brightness=0.025000:contrast=1.000000:saturation=1.000000[v0];color=c=black@0.0:s=320x180:r=24/1:d=2.000000,format=rgba[group0_base];[group0_base][v0]overlay=x='(if(lt((t-0.00000000),0.00000000),0.50000000,if(lt((t-0.00000000),2.00000000),(0.50000000+(0.05000000)*(clip((((t-0.00000000)-0.00000000)/2.00000000),0,1))),0.55000000)))*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[group0_vo0];[group0_vo0]format=rgba,trim=start_frame=0:end_frame=48[group0_out];color=c=black:s=320x180:r=24/1:d=2.000000[base];[base][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo0];[vo0]null[hardware_color_output];anullsrc=r=48000:cl=stereo,atrim=end_sample=96000[aout];[hardware_color_output]setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=limited[vout]",
+      "-map",
+      "[vout]",
+      "-map",
+      "[aout]",
+      "-t",
+      "2.000000000",
+      "-c:v",
+      "libx264",
+      "-preset",
+      "ultrafast",
+      "-b:v",
+      "4M",
+      "-pix_fmt",
+      "yuv420p",
+      "-color_primaries",
+      "bt709",
+      "-color_trc",
+      "bt709",
+      "-colorspace",
+      "bt709",
+      "-color_range",
+      "tv",
+      "-c:a",
+      "pcm_s16le",
+      "-f",
+      "matroska",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\.tmp\\render_20261019123749_9793b5a7\\cancel-before-probe.mkv"
+    ],
+    "filter_graph_transport": {
+      "mode": "inline",
+      "sha256": "sha256:9e05954c3a6c7e3e4f9b6bf1ecfaf42c46c6aa681bfeb4e4ccf09176120095a1",
+      "utf8_bytes": 941,
+      "logical_command_utf16_units": 1800
+    },
+    "filter_complex": "[0:v]trim=start=0.000000:end=2.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=24/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1,eq=brightness=0.025000:contrast=1.000000:saturation=1.000000[v0];color=c=black@0.0:s=320x180:r=24/1:d=2.000000,format=rgba[group0_base];[group0_base][v0]overlay=x='(if(lt((t-0.00000000),0.00000000),0.50000000,if(lt((t-0.00000000),2.00000000),(0.50000000+(0.05000000)*(clip((((t-0.00000000)-0.00000000)/2.00000000),0,1))),0.55000000)))*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[group0_vo0];[group0_vo0]format=rgba,trim=start_frame=0:end_frame=48[group0_out];color=c=black:s=320x180:r=24/1:d=2.000000[base];[base][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo0];[vo0]null[hardware_color_output];anullsrc=r=48000:cl=stereo,atrim=end_sample=96000[aout];[hardware_color_output]setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=limited[vout]",
+    "inputs": [
+      {
+        "kind": "sequence-projection-budget",
+        "method": "bilinear",
+        "max_working_bytes": 1073741824,
+        "nodes": [
+          {
+            "clip_id": "group",
+            "parent_id": null,
+            "source_canvas": {
+              "width": 320,
+              "height": 180
+            },
+            "parent_canvas": {
+              "width": 320,
+              "height": 180
+            },
+            "working_canvas": {
+              "width": 320,
+              "height": 180
+            },
+            "components_bytes": {
+              "source_rgba_buffers": 460800,
+              "parent_rgba_buffers": 921600,
+              "working_float_and_byte_buffers": 3225600,
+              "summed_area_double_planes": 0
+            },
+            "estimated_working_bytes": 4608000
+          }
+        ],
+        "estimated_working_bytes": 4608000,
+        "scope": "reachable-sequence-projection-instances-only-not-process-rss",
+        "time_disjoint_instances_charged": true,
+        "unused_sequences_charged": false
+      },
+      {
+        "asset_id": "source",
+        "clip_id": "group.leaf",
+        "input": 0,
+        "kind": "video",
+        "source_in_tick": 0,
+        "source_out_tick": 180000
+      },
+      {
+        "kind": "sequence-composite",
+        "clip_id": "group",
+        "parent_id": null,
+        "sequence_id": "child",
+        "canvas": {
+          "width": 320,
+          "height": 180,
+          "alpha": true
+        },
+        "parent_canvas": {
+          "width": 320,
+          "height": 180
+        },
+        "anchor_space": "cropped-child-canvas",
+        "raster_adaptation": "same-raster",
+        "working_canvas": {
+          "width": 320,
+          "height": 180
+        },
+        "spatial_sampler": "legacy-same-raster",
+        "sampling_kernel": "bilinear",
+        "projection_working_bytes": 4608000,
+        "compositing": "isolated-source-over",
+        "child_layer_count": 1,
+        "timeline_start_tick": 0,
+        "duration_tick": 180000,
+        "spatial_order": [
+          "child-composite",
+          "crop",
+          "transform",
+          "opacity",
+          "effects",
+          "mask",
+          "fade"
+        ],
+        "intermediate_files": 0
+      },
+      {
+        "kind": "sequence-audio-root",
+        "sample_rate": 48000,
+        "output_samples": 96000,
+        "child_input_count": 0,
+        "mixing": "float-sum-normalize-disabled",
+        "automatic_limiter": false,
+        "has_audible_inputs": false
+      }
+    ],
+    "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\cancel-before-probe.mkv",
+    "encoder": {
+      "container": "mkv",
+      "video": {
+        "codec": "libx264",
+        "preset": "ultrafast",
+        "crf": 18,
+        "pixel_format": "yuv420p",
+        "bitrate": "4M"
+      },
+      "audio": {
+        "codec": "pcm_s16le",
+        "bitrate": "192k"
+      }
+    },
+    "delivery": {
+      "clock": {
+        "authored_duration_tick": 180000,
+        "ticks_per_second": 90000,
+        "expected_video_frames": 48,
+        "expected_video_end_seconds": 2.0,
+        "expected_audio_samples_48000": 96000
+      }
+    },
+    "warnings": [],
+    "project_fingerprint": "aa8a5d704850a68d696ea69cda9e84f402b5815090c7dd1370516e839029aa7a",
+    "input_hashes": {
+      "source": "sha256:0d037d9afc12369c69e8bb637bda2d5fe8e215f4dad15552b89f9b4454027f25"
+    },
+    "resume_of": null,
+    "acceleration": {
+      "version": "1",
+      "request": {
+        "encode": "require",
+        "decode": "require",
+        "encoder": "nvenc",
+        "decoder": "cuda",
+        "probe_max_bytes": 536870912
+      },
+      "status": "cancelled",
+      "probes": [],
+      "attempts": [],
+      "decisions": [],
+      "device": "driver-default; identity not certified",
+      "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\diagnostics\\acceleration_render_20261019123749_9793b5a7\\report.json",
+      "error": {
+        "code": "CANCELLED",
+        "message": "任务在启动前已被取消",
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\cancel",
+        "retryable": false
+      },
+      "selected_encoder": null,
+      "selected_decoders": {}
+    }
+  },
+  "project_fingerprint": "aa8a5d704850a68d696ea69cda9e84f402b5815090c7dd1370516e839029aa7a",
+  "input_hashes": {
+    "source": "sha256:0d037d9afc12369c69e8bb637bda2d5fe8e215f4dad15552b89f9b4454027f25"
+  },
+  "resume_of": null,
+  "created_at": "2026-10-19T12:37:49.392774Z"
+}

@@ -59,7 +59,7 @@
       "description": "Drive the local Agent-first advertising video editor CLI for project setup, local media ingest, timeline composition, local TTS, templates, validation, rights checks, conversion, and FFmpeg rendering.",
       "source_kind": "local-product-skill",
       "source_repository": "AI广告剪辑/product",
-      "skill_md_sha256": "9149ddc67f1d0cb0a3027ceb58ecc8954e1f5645fa041f9244c0b51c24db0cdb",
+      "skill_md_sha256": "aca4313272c9d40b310a28fa80afe0431c2f8dee6cfd2e6bab3fe53891f84c7c",
       "file_count": 2,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -79,7 +79,12 @@
           "record": "docs/validation/evidence/audio-routing-20261018-v55/skills.json",
           "sha256": "705ccd4a76e8140f2c6b8394e0302b0aa449417392ab5d2451717c17e83aea3a"
         },
-        "0aa44ee260dbfe9b7f362600aea713b27af30f8c60ddf86664da24429e85c86e"
+        "0aa44ee260dbfe9b7f362600aea713b27af30f8c60ddf86664da24429e85c86e",
+        {
+          "sha256": "9149ddc67f1d0cb0a3027ceb58ecc8954e1f5645fa041f9244c0b51c24db0cdb",
+          "replaced_at_utc": "2026-10-19T13:23:41.975610+00:00",
+          "reason": "V65 hardware policy/quality/queue contract"
+        }
       ]
     },
     {
@@ -175,7 +180,7 @@
       "description": "Operate local Agent Projects with snapshots, migration, relinking, persistent render queues, cancellation, and deterministic replay.",
       "source_kind": "local-only-skill",
       "source_repository": "AI广告剪辑",
-      "skill_md_sha256": "5777ba513c4b8c3d1f0b2819786801532d3bd9f31e6d9a91a662f265a38b5ac6",
+      "skill_md_sha256": "18c57dc98bdef652026546584cf0377d2fa428839b7626c4560aaae8659c319c",
       "file_count": 1,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -183,7 +188,12 @@
       "previous_manifest_skill_md_sha256": "cb1485c3ea325760ea464b690cb899f98cef129009da858233599c781e8eabb9",
       "skill_md_sha256_history": [
         "37b617344a4e12d017a8d9368cfe6a7d6967a9a695ec9ab7444dce3113abafdd",
-        "2cf28b907acdb952e527528c5fd37fa340ea1aec4b6af88e718a603e73a61e41"
+        "2cf28b907acdb952e527528c5fd37fa340ea1aec4b6af88e718a603e73a61e41",
+        {
+          "sha256": "5777ba513c4b8c3d1f0b2819786801532d3bd9f31e6d9a91a662f265a38b5ac6",
+          "replaced_at_utc": "2026-10-19T13:23:41.976992+00:00",
+          "reason": "V65 hardware policy/quality/queue contract"
+        }
       ]
     },
     {
@@ -194,7 +204,7 @@
       "description": "Produce local quality reports, color scopes, render manifests, and machine-readable evidence for Agent video delivery.",
       "source_kind": "local-only-skill",
       "source_repository": "AI广告剪辑",
-      "skill_md_sha256": "282a7a2a998767c603811c35faf8f39b39b752dfea2abea02158530805f117b7",
+      "skill_md_sha256": "0768a6c88a730891d83f18a136ca78e0ed1e91cac6d3ec4a7c22412e6be18955",
       "file_count": 1,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -214,7 +224,12 @@
         "89b51b7d28e137cb7fb84bfaf35947f59fc9dc0a2f51035d37f05ba9a0e70f33",
         "3726c83182c3ff47dad7c0de20c85de32c863d7e9c4f9295c284d9ae2f380cce",
         "17c39553e1c649bc78ebdf0d0855b2f4a54bffc7138c038a1347a6101174d732",
-        "8ca6a3d79028d7c2a7f5806cea118dcc3e47fc6eeab579a8ae4231c8ea829e97"
+        "8ca6a3d79028d7c2a7f5806cea118dcc3e47fc6eeab579a8ae4231c8ea829e97",
+        {
+          "sha256": "282a7a2a998767c603811c35faf8f39b39b752dfea2abea02158530805f117b7",
+          "replaced_at_utc": "2026-10-19T13:23:41.977266+00:00",
+          "reason": "V65 hardware policy/quality/queue contract"
+        }
       ]
     },
     {
@@ -367,12 +382,12 @@
   },
   "registered_at_utc": "2026-10-15T18:21:52.5523139Z",
   "current_audit": {
-    "record": "docs/validation/evidence/audio-source-context-20261019-v64/skills-r1.json",
-    "record_sha256": "sha256:c4ae857da898713e246438e5fcfb62101d51824c33892f799b8c4c1fc05ec1cb",
-    "checked_at_utc": "2026-10-19T10:46:52.655841+00:00",
+    "record": "docs/validation/evidence/hardware-acceleration-20261019-v65/skills-r1.json",
+    "record_sha256": "sha256:498ff42e04f8027ce0123d9b3ef59a856ac545078963f99bd59ac5989cb47ae9",
+    "checked_at_utc": "2026-10-19T12:40:17.675547+00:00",
     "skills": 17,
-    "local_links_checked": 232,
-    "semantics": "V64 explicit real-source audio context and exact authored crop; pitch/phase/natural gates separate; V63 real GPU rejection retained; no full CapCut parity acceptance"
+    "local_links_checked": 235,
+    "semantics": "V65: native hardware encode/decode policy and controlled media; no full CapCut parity claim"
   },
   "audit_history": [
     {
@@ -537,6 +552,14 @@
       "skills": 17,
       "local_links_checked": 228,
       "semantics": "V62 registered local OCR and reviewed exact-text editable camera focus; existing 17 Skills, six instructions updated. Controlled demonstrations do not accept blind OCR, UI actions, privacy completeness, natural quality or full CapCut parity."
+    },
+    {
+      "record": "docs/validation/evidence/audio-source-context-20261019-v64/skills-r1.json",
+      "record_sha256": "sha256:c4ae857da898713e246438e5fcfb62101d51824c33892f799b8c4c1fc05ec1cb",
+      "checked_at_utc": "2026-10-19T10:46:52.655841+00:00",
+      "skills": 17,
+      "local_links_checked": 232,
+      "semantics": "V64 explicit real-source audio context and exact authored crop; pitch/phase/natural gates separate; V63 real GPU rejection retained; no full CapCut parity acceptance"
     }
   ]
 }

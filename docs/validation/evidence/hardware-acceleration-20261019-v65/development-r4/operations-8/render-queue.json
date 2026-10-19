@@ -1,0 +1,66 @@
+{
+  "queue_version": "0.1.0",
+  "project_id": "proj_20261019123029_e1317a5f",
+  "created_at": "2026-10-19T12:31:55.690660Z",
+  "updated_at": "2026-10-19T12:31:59.702367Z",
+  "jobs": [
+    {
+      "job_id": "gpu",
+      "label": "gpu",
+      "status": "succeeded",
+      "created_at": "2026-10-19T12:31:55.690688Z",
+      "updated_at": "2026-10-19T12:31:59.702237Z",
+      "sequence_id": null,
+      "output": "renders/queue.mkv",
+      "publish": false,
+      "container": "mkv",
+      "profile": null,
+      "width": null,
+      "height": null,
+      "video_codec": null,
+      "audio_codec": null,
+      "crf": null,
+      "video_bitrate": "4M",
+      "audio_bitrate": null,
+      "pixel_format": null,
+      "sequence_sampling": null,
+      "sequence_memory_mib": null,
+      "attempts": 1,
+      "operation_id": "render_20261019123157_0b5f9f79",
+      "cancel_requested": false,
+      "errors": [],
+      "warnings": [
+        {
+          "status": "unverified",
+          "code": "RIGHTS_STATUS_BLOCKED",
+          "message": "状态 unverified 不允许发布",
+          "asset_id": "source",
+          "rights_ref": "source",
+          "record_version": 1,
+          "context": "project_asset"
+        },
+        {
+          "code": "RIGHTS_USE_NOT_PERMITTED",
+          "message": "记录未允许目标用途: commercial_ad",
+          "asset_id": "source",
+          "rights_ref": "source",
+          "record_version": 1,
+          "context": "project_asset"
+        },
+        {
+          "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+          "message": "来源、许可证或证据字段缺失",
+          "asset_id": "source",
+          "rights_ref": "source",
+          "record_version": 1,
+          "context": "project_asset"
+        }
+      ],
+      "hardware_encode": "require",
+      "hardware_decode": "require",
+      "hardware_encoder": "nvenc",
+      "hardware_decoder": "cuda",
+      "hardware_probe_mib": null
+    }
+  ]
+}

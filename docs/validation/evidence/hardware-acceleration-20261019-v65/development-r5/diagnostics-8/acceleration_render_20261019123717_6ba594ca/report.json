@@ -1,0 +1,109 @@
+{
+  "version": "1",
+  "request": {
+    "encode": "require",
+    "decode": "off",
+    "encoder": "amf",
+    "decoder": "auto",
+    "probe_max_bytes": 536870912
+  },
+  "status": "failed",
+  "probes": [
+    {
+      "id": "encoder-list",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-encoders"
+      ],
+      "status": "completed",
+      "stdout": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\diagnostics\\acceleration_render_20261019123717_6ba594ca\\encoder-list.stdout.log",
+        "sha256": "c4f185815eb2300abc40b5d885ad572a0ab8ff9352e77f0f04867ddce54455cc",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "stderr": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\diagnostics\\acceleration_render_20261019123717_6ba594ca\\encoder-list.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "returncode": 0
+    },
+    {
+      "id": "encoder-0",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-y",
+        "-loglevel",
+        "error",
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc2=size=320x180:rate=24/1",
+        "-frames:v",
+        "4",
+        "-an",
+        "-vf",
+        "setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=limited",
+        "-c:v",
+        "h264_amf",
+        "-quality",
+        "quality",
+        "-rc",
+        "vbr_peak",
+        "-b:v",
+        "4M",
+        "-pix_fmt",
+        "nv12",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "-colorspace",
+        "bt709",
+        "-color_range",
+        "tv",
+        "-bsf:v",
+        "h264_metadata=colour_primaries=1:transfer_characteristics=1:matrix_coefficients=1:video_full_range_flag=0",
+        "-f",
+        "matroska",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\.tmp\\render_20261019123717_6ba594ca\\encoder-probe-0.mkv"
+      ],
+      "status": "completed",
+      "stdout": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\diagnostics\\acceleration_render_20261019123717_6ba594ca\\encoder-0.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "stderr": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\diagnostics\\acceleration_render_20261019123717_6ba594ca\\encoder-0.stderr.log",
+        "sha256": "248c4d27b1913784cb2c64c552871dcc242f74c692240d3f94e1c4ad1edfaab9",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "returncode": 2981409195
+    }
+  ],
+  "attempts": [],
+  "decisions": [
+    {
+      "axis": "encode",
+      "reason": "no verified encoder for actual raster, pixel format, color and budget"
+    }
+  ],
+  "device": "driver-default; identity not certified",
+  "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\diagnostics\\acceleration_render_20261019123717_6ba594ca\\report.json",
+  "ffmpeg": {
+    "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+  },
+  "selected_encoder": null,
+  "selected_decoders": {},
+  "error": {
+    "code": "HARDWARE_REQUIRED_UNAVAILABLE",
+    "message": "必须硬件encode，但当前候选不满足要求",
+    "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-8\\renders\\diagnostics\\acceleration_render_20261019123717_6ba594ca\\report.json",
+    "retryable": false,
+    "cause": "no verified encoder for actual raster, pixel format, color and budget"
+  }
+}

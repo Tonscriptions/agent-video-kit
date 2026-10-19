@@ -1,0 +1,50 @@
+test_dry_run_does_not_probe_or_allocate_hardware (test_hardware_acceleration.HardwareNativeFallbackTests.test_dry_run_does_not_probe_or_allocate_hardware) ... ok
+test_quality_failure_does_not_fallback_or_publish (test_hardware_acceleration.HardwareNativeFallbackTests.test_quality_failure_does_not_fallback_or_publish) ... FAIL
+test_real_cpu_fallback_retains_clock_manifest_and_image_exclusion (test_hardware_acceleration.HardwareNativeFallbackTests.test_real_cpu_fallback_retains_clock_manifest_and_image_exclusion) ... ERROR
+test_required_unavailable_keeps_old_output_and_failure_report (test_hardware_acceleration.HardwareNativeFallbackTests.test_required_unavailable_keeps_old_output_and_failure_report) ... ok
+test_cancel_timeout_and_start_error_do_not_retry (test_hardware_acceleration.HardwarePolicyTests.test_cancel_timeout_and_start_error_do_not_retry) ... ok
+test_changed_inputs_stop_before_any_attempt (test_hardware_acceleration.HardwarePolicyTests.test_changed_inputs_stop_before_any_attempt) ... ok
+test_configuration_rejects_unknown_boolean_string_budget_and_modes (test_hardware_acceleration.HardwarePolicyTests.test_configuration_rejects_unknown_boolean_string_budget_and_modes) ... ok
+test_explicit_bitrate_is_required_even_for_prefer (test_hardware_acceleration.HardwarePolicyTests.test_explicit_bitrate_is_required_even_for_prefer) ... ok
+test_final_format_and_color_gate_rejects_silent_loss (test_hardware_acceleration.HardwarePolicyTests.test_final_format_and_color_gate_rejects_silent_loss) ... ok
+test_hash_comparison_keeps_pts_duration_and_sample_size (test_hardware_acceleration.HardwarePolicyTests.test_hash_comparison_keeps_pts_duration_and_sample_size) ... ok
+test_io_and_content_failures_do_not_retry (test_hardware_acceleration.HardwarePolicyTests.test_io_and_content_failures_do_not_retry) ... ok
+test_no_cross_platform_candidate_or_unsupported_codec (test_hardware_acceleration.HardwarePolicyTests.test_no_cross_platform_candidate_or_unsupported_codec) ... ok
+test_physical_input_indices_preserve_image_audio_and_ten_bit (test_hardware_acceleration.HardwarePolicyTests.test_physical_input_indices_preserve_image_audio_and_ten_bit) ... ok
+test_prefer_fallback_is_bounded_and_logs_all_completed_attempts (test_hardware_acceleration.HardwarePolicyTests.test_prefer_fallback_is_bounded_and_logs_all_completed_attempts) ... ok
+test_queue_preserves_policy_and_rejects_invalid_override (test_hardware_acceleration.HardwarePolicyTests.test_queue_preserves_policy_and_rejects_invalid_override) ... ok
+test_required_decode_survives_preferred_encode_fallback (test_hardware_acceleration.HardwarePolicyTests.test_required_decode_survives_preferred_encode_fallback) ... ok
+test_required_encode_never_becomes_cpu (test_hardware_acceleration.HardwarePolicyTests.test_required_encode_never_becomes_cpu) ... ok
+test_schema_rejects_acceleration_extensions (test_hardware_acceleration.HardwarePolicyTests.test_schema_rejects_acceleration_extensions) ... ok
+
+======================================================================
+ERROR: test_real_cpu_fallback_retains_clock_manifest_and_image_exclusion (test_hardware_acceleration.HardwareNativeFallbackTests.test_real_cpu_fallback_retains_clock_manifest_and_image_exclusion)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_hardware_acceleration.py", line 180, in test_real_cpu_fallback_retains_clock_manifest_and_image_exclusion
+    result = render_project(self.root, project, sequence, self.root/'renders/cpu.mkv')
+  File "C:\Python313\Lib\contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\render.py", line 4619, in render_project
+    acceleration.verify_output(inspected)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\hardware_acceleration.py", line 196, in verify_output
+    raise AppError('HARDWARE_OUTPUT_MISMATCH', '编解码输出改变了声明的格式或色彩标签', exit_code=6, cause=str(mismatches))
+ai_ad_editor.errors.AppError: 编解码输出改变了声明的格式或色彩标签
+
+======================================================================
+FAIL: test_quality_failure_does_not_fallback_or_publish (test_hardware_acceleration.HardwareNativeFallbackTests.test_quality_failure_does_not_fallback_or_publish)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_hardware_acceleration.py", line 211, in test_quality_failure_does_not_fallback_or_publish
+    self.assertEqual(caught.exception.code, 'RENDER_QUALITY_FAILED')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'HARDWARE_OUTPUT_MISMATCH' != 'RENDER_QUALITY_FAILED'
+- HARDWARE_OUTPUT_MISMATCH
++ RENDER_QUALITY_FAILED
+
+
+----------------------------------------------------------------------
+Ran 18 tests in 6.469s
+
+FAILED (failures=1, errors=1)

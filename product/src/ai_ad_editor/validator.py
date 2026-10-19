@@ -206,6 +206,11 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
 
     settings_value = project.get("settings")
     if isinstance(settings_value, dict):
+        from .hardware_acceleration import configuration as acceleration_configuration
+        try:
+            acceleration_configuration(settings_value.get('acceleration'))
+        except AppError as exc:
+            error(exc.code, exc.message, exc.path or 'settings.acceleration')
         if 'sequence_sampling' in settings_value:
             from .sequence_sampling import configuration as sequence_sampling_configuration
             try:

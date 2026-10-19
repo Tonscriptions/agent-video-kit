@@ -1,0 +1,119 @@
+{
+  "operation_id": "op_20261019123608_f1b30def",
+  "command": "timeline.compose",
+  "status": "succeeded",
+  "changes": [
+    {
+      "op": "add_sequence",
+      "sequence": {
+        "id": "child",
+        "name": "child",
+        "duration_tick": 180000,
+        "tracks": [
+          {
+            "id": "child_video_1",
+            "kind": "video",
+            "order": 0,
+            "muted": false,
+            "locked": false,
+            "clips": [
+              {
+                "id": "leaf",
+                "timeline_start_tick": 0,
+                "duration_tick": 180000,
+                "source_in_tick": 0,
+                "source_out_tick": 180000,
+                "asset_id": "source",
+                "keyframes": [
+                  {
+                    "property": "transform.position.x",
+                    "keyframes": [
+                      {
+                        "at_tick": 0,
+                        "value": 0.5,
+                        "interpolation": "linear"
+                      },
+                      {
+                        "at_tick": 180000,
+                        "value": 0.55,
+                        "interpolation": "linear"
+                      }
+                    ]
+                  }
+                ],
+                "effects": [
+                  {
+                    "type": "brightness",
+                    "parameters": {
+                      "brightness": 0.025
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "child_audio_1",
+            "kind": "audio",
+            "order": 0,
+            "muted": false,
+            "locked": false,
+            "clips": []
+          }
+        ],
+        "markers": []
+      }
+    },
+    {
+      "op": "append_clip",
+      "track_id": "child_video_1",
+      "clip": {
+        "id": "leaf",
+        "timeline_start_tick": 0,
+        "duration_tick": 180000,
+        "source_in_tick": 0,
+        "source_out_tick": 180000,
+        "asset_id": "source",
+        "keyframes": [
+          {
+            "property": "transform.position.x",
+            "keyframes": [
+              {
+                "at_tick": 0,
+                "value": 0.5,
+                "interpolation": "linear"
+              },
+              {
+                "at_tick": 180000,
+                "value": 0.55,
+                "interpolation": "linear"
+              }
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "brightness",
+            "parameters": {
+              "brightness": 0.025
+            }
+          }
+        ]
+      }
+    },
+    {
+      "op": "append_sequence_clip",
+      "track_id": "track_video_1",
+      "clip": {
+        "id": "group",
+        "timeline_start_tick": 0,
+        "duration_tick": 180000,
+        "source_in_tick": 0,
+        "source_out_tick": 180000,
+        "sequence_id": "child"
+      }
+    }
+  ],
+  "before_snapshot_id": "snap_20261019123608_d918cc78",
+  "created_at": "2026-10-19T12:36:08.993129Z"
+}

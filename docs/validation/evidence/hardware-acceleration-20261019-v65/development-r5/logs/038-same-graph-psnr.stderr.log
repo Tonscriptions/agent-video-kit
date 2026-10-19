@@ -1,0 +1,40 @@
+[aist#0:1/pcm_s16le @ 000001c2a0313200] Guessed Channel Layout: stereo
+Input #0, matroska,webm, from 'E:\dev\sandbox\AI广告剪辑\docs\assets\hardware-acceleration-20261019-v65-r5\nvenc-cuda.mkv':
+  Metadata:
+    ENCODER         : Lavf62.12.100
+  Duration: 00:00:02.00, start: 0.000000, bitrate: 2132 kb/s
+  Stream #0:0: Video: h264 (Main), yuv420p(tv, bt709, progressive), 320x180 [SAR 1:1 DAR 16:9], 24 fps, 24 tbr, 1k tbn
+    Metadata:
+      ENCODER         : Lavc62.28.100 h264_nvenc
+      DURATION        : 00:00:02.000000000
+  Stream #0:1: Audio: pcm_s16le, 48000 Hz, stereo, s16, 1536 kb/s
+    Metadata:
+      ENCODER         : Lavc62.28.100 pcm_s16le
+      DURATION        : 00:00:02.000000000
+[aist#1:1/pcm_s16le @ 000001c2a039d240] Guessed Channel Layout: stereo
+Input #1, matroska,webm, from 'E:\dev\sandbox\AI广告剪辑\docs\assets\hardware-acceleration-20261019-v65-r5\cpu-control.mkv':
+  Metadata:
+    ENCODER         : Lavf62.12.100
+  Duration: 00:00:02.00, start: 0.000000, bitrate: 3098 kb/s
+  Stream #1:0: Video: h264 (Constrained Baseline), yuv420p(tv, bt709/unknown/unknown, progressive), 320x180 [SAR 1:1 DAR 16:9], 24 fps, 24 tbr, 1k tbn
+    Metadata:
+      ENCODER         : Lavc62.28.100 libx264
+      DURATION        : 00:00:02.000000000
+  Stream #1:1: Audio: pcm_s16le, 48000 Hz, stereo, s16, 1536 kb/s
+    Metadata:
+      ENCODER         : Lavc62.28.100 pcm_s16le
+      DURATION        : 00:00:02.000000000
+Stream mapping:
+  Stream #0:0 (h264) -> psnr
+  Stream #1:0 (h264) -> psnr
+  psnr:default -> Stream #0:0 (wrapped_avframe)
+Press [q] to stop, [?] for help
+Output #0, null, to 'pipe:':
+  Metadata:
+    encoder         : Lavf62.12.100
+  Stream #0:0: Video: wrapped_avframe, yuv420p(tv, bt709, progressive), 320x180 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 24 fps, 24 tbn
+    Metadata:
+      encoder         : Lavc62.28.100 wrapped_avframe
+[Parsed_psnr_0 @ 000001c2a0814980] PSNR y:56.015991 u:50.284164 v:51.269734 average:53.493332 min:52.544523 max:55.641936
+[out#0/null @ 000001c2a039e4c0] video:20KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=   48 fps=0.0 q=-0.0 Lsize=N/A time=00:00:02.00 bitrate=N/A speed=51.8x elapsed=0:00:00.03    

@@ -1,0 +1,16 @@
+Input #0, lavfi, from 'testsrc2=size=320x180:rate=24':
+  Duration: N/A, start: 0.000000, bitrate: N/A
+  Stream #0:0: Video: wrapped_avframe, yuv420p, 320x180 [SAR 1:1 DAR 16:9], 24 fps, 24 tbr, 24 tbn
+Stream mapping:
+  Stream #0:0 -> #0:0 (wrapped_avframe (native) -> h264 (h264_nvenc))
+Press [q] to stop, [?] for help
+Output #0, matroska, to 'E:\dev\sandbox\AI广告剪辑\docs\validation\evidence\hardware-acceleration-20261019-v65\prototype\h264_nvenc.mkv':
+  Metadata:
+    encoder         : Lavf62.12.100
+  Stream #0:0: Video: h264 (Main) (H264 / 0x34363248), yuv420p(tv, progressive), 320x180 [SAR 1:1 DAR 16:9], q=2-31, 2000 kb/s, 24 fps, 1k tbn
+    Metadata:
+      encoder         : Lavc62.28.100 h264_nvenc
+    Side data:
+      CPB properties: bitrate max/min/avg: 0/0/2000000 buffer size: 4000000 vbv_delay: N/A
+[out#0/matroska @ 00000206f3495b80] video:17KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 3.842398%
+frame=    4 fps=0.0 q=13.0 Lsize=      18KiB time=00:00:00.04 bitrate=3471.3kbits/s speed=0.148x elapsed=0:00:00.28    

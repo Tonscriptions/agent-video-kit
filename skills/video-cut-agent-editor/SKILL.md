@@ -5,6 +5,13 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For optional native hardware encoding/decoding, read the [hardware contract](../../docs/specs/硬件编解码探测与显式回退契约_v0.1_2026-10-19.md).
+Use `render --hardware-encode prefer|require --hardware-encoder auto|nvenc|qsv|amf|mf`
+and `--hardware-decode prefer|require --hardware-decoder auto|cuda|d3d11va`.
+Encoding needs an explicit `--video-bitrate`; default off preserves the software path.
+A compiled encoder list is not availability: inspect actual probes, chosen backends,
+all attempts and the final format/color gate. Do not assert a speedup or full parity.
+
 For opt-in R3 real source handles, read the
 [audio source context contract](../../docs/specs/离线音频真实源上下文与精确选区契约_v0.1_2026-10-19.md).
 Author `settings.audio_stretch.source_context_ms` as an integer 0..1000,

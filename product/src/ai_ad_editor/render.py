@@ -27,6 +27,7 @@ from .clip_windows import prepare as _prepare_clip_windows
 from .inline_sequences import prepare as _prepare_inline_sequences, budget as _inline_sequence_budget
 
 from .errors import AppError, dependency_error
+from .hardware_acceleration import AccelerationSession, tag_output_frames
 from .media import ffmpeg_path, probe_media
 from .policy import resolve_local_path
 from .project import asset_map
@@ -4483,6 +4484,7 @@ def render_project(
     fingerprints = render_fingerprints(project, sequence, effective_project["settings"], root)
     output.parent.mkdir(parents=True, exist_ok=True)
     operation_id = new_id("render")
+    acceleration = AccelerationSession(root, effective_project['settings'], encoder, operation_id, cancel_file)
     temp_dir = root / "renders" / ".tmp" / operation_id
     temp_dir.mkdir(parents=True, exist_ok=True)
     temp_output = temp_dir / output.name
@@ -4519,6 +4521,8 @@ def render_project(
                           'expected_video_frames': math.ceil(authored_seconds*output_rate),
                           'expected_video_end_seconds': float(encoded_end),
                           'expected_audio_samples_48000': math.ceil(authored_seconds*48000)}
+    if acceleration.enabled:
+        graph = tag_output_frames(graph, video_output, effective_project['settings'])
     args = [
         ffmpeg_path(), "-hide_banner", "-y", "-loglevel", "error",
         "-progress", str(progress_file),
@@ -4548,6 +4552,7 @@ def render_project(
     args.extend(["-f", OUTPUT_CONTAINERS[container], str(temp_output)])
     execution_args, graph_transport = _execution_filter_graph(root, args, graph, write=not dry_run)
     plan = {"operation_id": operation_id, "command": args, "execution_command":execution_args, "filter_graph_transport":graph_transport, "filter_complex": graph, "inputs": input_meta, "output": str(output), "encoder": encoder, "delivery": delivery, "warnings": warnings, **fingerprints, "resume_of": resume_of}
+    plan['acceleration'] = acceleration.evidence
     if dry_run:
         if progress_callback:
             progress_callback(operation_id, "planned", 0.0, "渲染计划已生成")
@@ -4593,19 +4598,41 @@ def render_project(
     try:
         if cancel_file is not None and cancel_file.exists():
             raise AppError("CANCELLED", "任务在启动前已被取消", exit_code=8, path=str(cancel_file), retryable=False)
+        plan['acceleration'] = acceleration.evidence
+        acceleration.prepare(inputs, input_meta, effective_project, temp_dir, _output_color_args(effective_project['settings']))
+        def check_acceleration_inputs():
+            if render_fingerprints(project, sequence, effective_project['settings'], root) != fingerprints:
+                raise AppError('RENDER_INPUT_CHANGED', '探测或渲染期间输入指纹变化，拒绝重试和发布', exit_code=6)
         for item in input_meta:
             if job := item.get('audio_stretch'):
                 job['execution'] = _execute_audio_stretch(root, job, temp_dir, cancel_file=cancel_file)
-        result = run_process(execution_args, timeout=3600, cwd=root, cancel_file=cancel_file)
+        if acceleration.enabled:
+            result, execution_args, graph_transport = acceleration.execute(args, graph,
+                lambda command, current_graph: _execution_filter_graph(root, command, current_graph, write=True),
+                check_acceleration_inputs)
+        else:
+            result = run_process(execution_args, timeout=3600, cwd=root, cancel_file=cancel_file)
         if result.returncode != 0:
             raise AppError("RENDER_FAILED", "FFmpeg 渲染失败", exit_code=6, retryable=True, cause=result.stderr[-6000:])
         if not temp_output.exists() or temp_output.stat().st_size == 0:
             raise AppError("RENDER_EMPTY", "FFmpeg 未生成有效输出", exit_code=6)
         inspected = probe_media(temp_output)
+        if acceleration.enabled:
+            acceleration.verify_output(inspected, temp_output)
         quality = check_output(temp_output, effective_project["settings"], _sec(_tick(sequence.get("duration_tick"), 1), int(effective_project["settings"]["timebase"]["ticks_per_second"])), run_expensive=False)
         if not quality["ok"]:
             raise AppError("RENDER_QUALITY_FAILED", "输出未通过结构质量检查", exit_code=6, cause=str(quality["errors"]))
-        os.replace(temp_output, output)
+        if acceleration.enabled:
+            check_acceleration_inputs()
+            acceleration.evidence.update(status='verified_pending_publish', quality=quality, output_probe=inspected)
+            acceleration.save()
+        try:
+            os.replace(temp_output, output)
+        except OSError as exc:
+            raise AppError('RENDER_PUBLISH_FAILED', '无法原子发布成片', exit_code=6, path=str(output), cause=str(exc)) from exc
+        if acceleration.enabled:
+            acceleration.evidence['status'] = 'verified'
+            acceleration.save()
         manifest = {
             "manifest_version": "0.1.0",
             "operation_id": operation_id,
@@ -4621,6 +4648,7 @@ def render_project(
             "profile": profile,
             "settings": effective_project["settings"],
             "delivery": delivery,
+            "acceleration": acceleration.evidence,
             "warnings": warnings,
             "quality": quality,
             **fingerprints,
@@ -4631,8 +4659,10 @@ def render_project(
         if progress_callback:
             progress_callback(operation_id, "artifact_written", 100.0, "渲染产物和 manifest 已写入")
             progress_callback(operation_id, "completed", 100.0, "渲染完成")
-        return {"status": "succeeded", "operation_id": operation_id, "path": str(output), "manifest": str(manifest_path), "filter_graph_transport":graph_transport, "profile": profile, "settings": effective_project["settings"], "delivery": delivery, "probe": inspected, "warnings": warnings + quality.get("warnings", []), "quality": quality, **fingerprints, "resume_of": resume_of}
+        return {"status": "succeeded", "operation_id": operation_id, "path": str(output), "manifest": str(manifest_path), "filter_graph_transport":graph_transport, "profile": profile, "settings": effective_project["settings"], "delivery": delivery, "acceleration": acceleration.evidence, "probe": inspected, "warnings": warnings + quality.get("warnings", []), "quality": quality, **fingerprints, "resume_of": resume_of}
     except AppError as exc:
+        acceleration.evidence.update(status='cancelled' if exc.code == 'CANCELLED' else 'failed', error=exc.as_dict())
+        acceleration.save()
         # Make the persisted operation discoverable from the CLI error envelope so
         # callers can invoke `render --resume <operation_id>` without scanning files.
         exc.operation_id = operation_id

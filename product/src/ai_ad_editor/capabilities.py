@@ -21,6 +21,22 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'hardware_acceleration': {
+                'status': 'implemented_with_limits', 'engine': 'ffmpeg-native-probed-v1',
+                'commands': ['render', 'queue.enqueue', 'queue.run'],
+                'features': ['independent_off_prefer_require_encode_decode_policy',
+                    'actual_raster_pixel_format_color_bitrate_four_frame_encoder_probe',
+                    'forced_d3d11va_cuda_frames_download_compared_to_cpu_framemd5',
+                    'bounded_recorded_runtime_fallback_and_final_format_gate',
+                    'persistent_probe_attempt_logs_manifest_queue_resume'],
+                'limits': ['windows_backend_catalog_only_no_downloads',
+                    'explicit_video_bitrate_required_not_crf_quality_equivalence',
+                    'decode_yuv420_8_10bit_h264_hevc_vp9_av1_mpeg2_only',
+                    'four_frame_equality_does_not_prove_whole_source_quality',
+                    'pixel_probe_budget_not_total_driver_vram_limit',
+                    'driver_default_device_no_certified_device_identity',
+                    'cpu_effect_filters_not_gpu_ported_no_speed_or_capcut_parity_claim'],
+            },
             'ocr': {
                 'status': 'implemented_with_limits', 'engine': 'ppocr-v4-onnx-cpu-local-v1',
                 'commands': ['ocr.adapter.register', 'ocr.adapter.list', 'ocr.adapter.inspect', 'ocr.scan', 'ocr.anchors'],

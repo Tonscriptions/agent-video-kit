@@ -1,0 +1,226 @@
+[
+  {
+    "id": "version",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-version"
+    ],
+    "returncode": 0
+  },
+  {
+    "id": "encoders",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-encoders"
+    ],
+    "returncode": 0
+  },
+  {
+    "id": "hwaccels",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-hwaccels"
+    ],
+    "returncode": 0
+  },
+  {
+    "id": "h264_nvenc",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-y",
+      "-f",
+      "lavfi",
+      "-i",
+      "testsrc2=size=320x180:rate=24",
+      "-frames:v",
+      "4",
+      "-an",
+      "-c:v",
+      "h264_nvenc",
+      "-preset",
+      "p5",
+      "-rc",
+      "vbr",
+      "-b:v",
+      "2M",
+      "-pix_fmt",
+      "yuv420p",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\hardware-acceleration-20261019-v65\\prototype\\h264_nvenc.mkv"
+    ],
+    "returncode": 0
+  },
+  {
+    "id": "h264_nvenc-none",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-hwaccel",
+      "none",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\hardware-acceleration-20261019-v65\\prototype\\h264_nvenc.mkv",
+      "-map",
+      "0:v:0",
+      "-frames:v",
+      "4",
+      "-an",
+      "-pix_fmt",
+      "yuv420p",
+      "-f",
+      "framemd5",
+      "-"
+    ],
+    "returncode": 0
+  },
+  {
+    "id": "h264_nvenc-d3d11va",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-hwaccel",
+      "d3d11va",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\hardware-acceleration-20261019-v65\\prototype\\h264_nvenc.mkv",
+      "-map",
+      "0:v:0",
+      "-frames:v",
+      "4",
+      "-an",
+      "-pix_fmt",
+      "yuv420p",
+      "-f",
+      "framemd5",
+      "-"
+    ],
+    "returncode": 0
+  },
+  {
+    "id": "h264_nvenc-cuda",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-hwaccel",
+      "cuda",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\hardware-acceleration-20261019-v65\\prototype\\h264_nvenc.mkv",
+      "-map",
+      "0:v:0",
+      "-frames:v",
+      "4",
+      "-an",
+      "-pix_fmt",
+      "yuv420p",
+      "-f",
+      "framemd5",
+      "-"
+    ],
+    "returncode": 0
+  },
+  {
+    "id": "hevc_nvenc",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-y",
+      "-f",
+      "lavfi",
+      "-i",
+      "testsrc2=size=320x180:rate=24",
+      "-frames:v",
+      "4",
+      "-an",
+      "-c:v",
+      "hevc_nvenc",
+      "-preset",
+      "p5",
+      "-rc",
+      "vbr",
+      "-b:v",
+      "2M",
+      "-pix_fmt",
+      "yuv420p10le",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\hardware-acceleration-20261019-v65\\prototype\\hevc_nvenc.mkv"
+    ],
+    "returncode": 0
+  },
+  {
+    "id": "hevc_nvenc-none",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-hwaccel",
+      "none",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\hardware-acceleration-20261019-v65\\prototype\\hevc_nvenc.mkv",
+      "-map",
+      "0:v:0",
+      "-frames:v",
+      "4",
+      "-an",
+      "-pix_fmt",
+      "yuv420p10le",
+      "-f",
+      "framemd5",
+      "-"
+    ],
+    "returncode": 0
+  },
+  {
+    "id": "hevc_nvenc-d3d11va",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-hwaccel",
+      "d3d11va",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\hardware-acceleration-20261019-v65\\prototype\\hevc_nvenc.mkv",
+      "-map",
+      "0:v:0",
+      "-frames:v",
+      "4",
+      "-an",
+      "-pix_fmt",
+      "yuv420p10le",
+      "-f",
+      "framemd5",
+      "-"
+    ],
+    "returncode": 0
+  },
+  {
+    "id": "hevc_nvenc-cuda",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-hwaccel",
+      "cuda",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\hardware-acceleration-20261019-v65\\prototype\\hevc_nvenc.mkv",
+      "-map",
+      "0:v:0",
+      "-frames:v",
+      "4",
+      "-an",
+      "-pix_fmt",
+      "yuv420p10le",
+      "-f",
+      "framemd5",
+      "-"
+    ],
+    "returncode": 0
+  }
+]

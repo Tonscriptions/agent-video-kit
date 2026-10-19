@@ -5,6 +5,13 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+For optional GPU queues/resume, follow the [hardware policy](../../docs/specs/硬件编解码探测与显式回退契约_v0.1_2026-10-19.md).
+Queue fields are `hardware_encode`, `hardware_decode`, `hardware_encoder`,
+`hardware_decoder`, `hardware_probe_mib` and explicit `video_bitrate`.
+Resume retains the original fingerprinted settings and reruns availability probes;
+never reuse a previous machine/driver's success. Failed/cancelled command reports
+remain under `renders/diagnostics`, outside authoring-metadata rollback.
+
 For [compound freeze projects](../../docs/specs/复合片段定格与完整音画时钟契约_v0.1_2026-10-18.md),
 package the authored child sequences, media and fonts. Render-only virtual
 surfaces are graph pads, not generated files or rights entries. Verify native

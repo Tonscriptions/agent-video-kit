@@ -1,0 +1,700 @@
+{
+  "version": "1",
+  "request": {
+    "encode": "require",
+    "decode": "require",
+    "encoder": "nvenc",
+    "decoder": "cuda",
+    "probe_max_bytes": 536870912
+  },
+  "status": "verified",
+  "probes": [
+    {
+      "id": "encoder-list",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-encoders"
+      ],
+      "status": "completed",
+      "stdout": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\encoder-list.stdout.log",
+        "sha256": "c4f185815eb2300abc40b5d885ad572a0ab8ff9352e77f0f04867ddce54455cc",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "stderr": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\encoder-list.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "returncode": 0
+    },
+    {
+      "id": "encoder-0",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-y",
+        "-loglevel",
+        "error",
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc2=size=320x180:rate=24/1",
+        "-frames:v",
+        "4",
+        "-an",
+        "-c:v",
+        "hevc_nvenc",
+        "-preset",
+        "p5",
+        "-rc",
+        "vbr",
+        "-b:v",
+        "4M",
+        "-pix_fmt",
+        "p010le",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "-colorspace",
+        "bt709",
+        "-color_range",
+        "tv",
+        "-bsf:v",
+        "hevc_metadata=colour_primaries=1:transfer_characteristics=1:matrix_coefficients=1:video_full_range_flag=0",
+        "-f",
+        "matroska",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\.tmp\\render_20261019123046_4a03b829\\encoder-probe-0.mkv"
+      ],
+      "status": "completed",
+      "stdout": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\encoder-0.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "stderr": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\encoder-0.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "returncode": 0,
+      "probe": {
+        "duration_seconds": 0.167,
+        "duration_tick": 15030,
+        "format": "matroska,webm",
+        "format_long_name": "Matroska / WebM",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "hevc",
+            "codec_long_name": "H.265 / HEVC (High Efficiency Video Coding)",
+            "profile": "Main 10",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 192,
+            "has_b_frames": 2,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p10le",
+            "level": 93,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "view_ids_available": "",
+            "view_pos_available": "",
+            "r_frame_rate": "24/1",
+            "avg_frame_rate": "24/1",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "extradata_size": 131,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 hevc_nvenc",
+              "DURATION": "00:00:00.167000000"
+            }
+          }
+        ],
+        "video": {
+          "codec": "hevc",
+          "width": 320,
+          "height": 180,
+          "pix_fmt": "yuv420p10le",
+          "fps": "24/1",
+          "color_space": "bt709",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "hardware_decoded_color_frame": {
+          "color_range": "tv",
+          "color_space": "bt709",
+          "color_primaries": "bt709",
+          "color_transfer": "bt709"
+        }
+      }
+    },
+    {
+      "id": "color-metadata-2",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-protocol_whitelist",
+        "file,pipe",
+        "-select_streams",
+        "v:0",
+        "-read_intervals",
+        "%+#16",
+        "-show_frames",
+        "-show_entries",
+        "frame=color_primaries,color_transfer,color_space,color_range",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\.tmp\\render_20261019123046_4a03b829\\encoder-probe-0.mkv"
+      ],
+      "status": "completed",
+      "stdout": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\color-metadata-2.stdout.log",
+        "sha256": "d1324f35aac6d2cdf6648a326baf99875942de77289c9b6eeb03a85406a7d199",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "stderr": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\color-metadata-2.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "returncode": 0
+    },
+    {
+      "id": "decode-0-cpu",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-hwaccel",
+        "none",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\assets\\source_source-10bit.mkv",
+        "-map",
+        "0:v:0",
+        "-frames:v",
+        "4",
+        "-an",
+        "-sn",
+        "-dn",
+        "-pix_fmt",
+        "yuv420p10le",
+        "-f",
+        "framemd5",
+        "-"
+      ],
+      "status": "completed",
+      "stdout": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\decode-0-cpu.stdout.log",
+        "sha256": "1869ace1a805023ba34798327b49d3fd78f97a5a3fd3c1f01ba69344c5449922",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "stderr": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\decode-0-cpu.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "returncode": 0
+    },
+    {
+      "id": "decode-0-cuda",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-hwaccel",
+        "cuda",
+        "-hwaccel_output_format",
+        "cuda",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\assets\\source_source-10bit.mkv",
+        "-map",
+        "0:v:0",
+        "-frames:v",
+        "4",
+        "-an",
+        "-sn",
+        "-dn",
+        "-vf",
+        "hwdownload,format=p010le,format=yuv420p10le",
+        "-pix_fmt",
+        "yuv420p10le",
+        "-f",
+        "framemd5",
+        "-"
+      ],
+      "status": "completed",
+      "stdout": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\decode-0-cuda.stdout.log",
+        "sha256": "1869ace1a805023ba34798327b49d3fd78f97a5a3fd3c1f01ba69344c5449922",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "stderr": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\decode-0-cuda.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "returncode": 0,
+      "matches_cpu": true
+    },
+    {
+      "id": "color-metadata-5",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-protocol_whitelist",
+        "file,pipe",
+        "-select_streams",
+        "v:0",
+        "-read_intervals",
+        "%+#16",
+        "-show_frames",
+        "-show_entries",
+        "frame=color_primaries,color_transfer,color_space,color_range",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\.tmp\\render_20261019123046_4a03b829\\hevc10-cuda.mkv"
+      ],
+      "status": "completed",
+      "stdout": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\color-metadata-5.stdout.log",
+        "sha256": "7710a9f37f881d77a9570327b9261339bd4142f7b1d63c3f07eba8c736add41c",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "stderr": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\color-metadata-5.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "returncode": 0
+    }
+  ],
+  "attempts": [
+    {
+      "id": "render-0",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-y",
+        "-loglevel",
+        "error",
+        "-progress",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\.tmp\\render_20261019123046_4a03b829\\ffmpeg-progress.log",
+        "-hwaccel",
+        "cuda",
+        "-hwaccel_output_format",
+        "cuda",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\assets\\source_source-10bit.mkv",
+        "-filter_complex",
+        "[0:v]hwdownload,format=p010le,format=yuv420p10le[hardware_input_0];[hardware_input_0]trim=start=0.000000:end=2.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=24/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1,eq=brightness=0.025000:contrast=1.000000:saturation=1.000000[v0];color=c=black@0.0:s=320x180:r=24/1:d=2.000000,format=rgba[group0_base];[group0_base][v0]overlay=x='(if(lt((t-0.00000000),0.00000000),0.50000000,if(lt((t-0.00000000),2.00000000),(0.50000000+(0.05000000)*(clip((((t-0.00000000)-0.00000000)/2.00000000),0,1))),0.55000000)))*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[group0_vo0];[group0_vo0]format=rgba,trim=start_frame=0:end_frame=48[group0_out];color=c=black:s=320x180:r=24/1:d=2.000000[base];[base][group0_out]overlay=x=0:y=0:eof_action=pass:format=auto[vo0];[vo0]null[vout];anullsrc=r=48000:cl=stereo,atrim=end_sample=96000[aout]",
+        "-map",
+        "[vout]",
+        "-map",
+        "[aout]",
+        "-t",
+        "2.000000000",
+        "-c:v",
+        "hevc_nvenc",
+        "-preset",
+        "p5",
+        "-rc",
+        "vbr",
+        "-b:v",
+        "4M",
+        "-pix_fmt",
+        "p010le",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "-colorspace",
+        "bt709",
+        "-color_range",
+        "tv",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "matroska",
+        "-bsf:v",
+        "hevc_metadata=colour_primaries=1:transfer_characteristics=1:matrix_coefficients=1:video_full_range_flag=0",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\.tmp\\render_20261019123046_4a03b829\\hevc10-cuda.mkv"
+      ],
+      "status": "completed",
+      "stdout": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\render-0.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "stderr": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\render-0.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scope": "complete decoded UTF-8, replacement on errors"
+      },
+      "returncode": 0,
+      "encoder": "hevc_nvenc",
+      "decoders": {
+        "0": "cuda"
+      }
+    }
+  ],
+  "decisions": [],
+  "device": "driver-default; identity not certified",
+  "report": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\renders\\diagnostics\\acceleration_render_20261019123046_4a03b829\\report.json",
+  "ffmpeg": {
+    "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+  },
+  "selected_encoder": "hevc_nvenc",
+  "selected_decoders": {
+    "0": {
+      "backend": "cuda",
+      "pix_fmt": "yuv420p10le",
+      "source": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r4\\project-10\\assets\\source_source-10bit.mkv",
+      "sha256": "fd729ef9598f78c801330fbab22b0b62c8a07732ddf0193ad7fd1d1b495bf8c2",
+      "frames_compared": 4
+    }
+  },
+  "quality": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "metrics": {
+      "duration_seconds": 2.0,
+      "width": 320,
+      "height": 180,
+      "audio_codec": "pcm_s16le",
+      "video_duration_seconds": 2.0,
+      "audio_duration_seconds": 2.0,
+      "av_duration_delta_seconds": 0.0,
+      "av_start_delta_seconds": 0.0,
+      "av_end_delta_seconds": 0.0,
+      "av_sync_residual_seconds": 0.0,
+      "av_sync_residuals": {
+        "start_delta_seconds": 0.0,
+        "end_delta_seconds": 0.0,
+        "video_start_seconds": 0.0,
+        "audio_start_seconds": 0.0,
+        "video_end_seconds": 0.0,
+        "audio_end_seconds": 0.0
+      },
+      "stream_timing": {
+        "video": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 2.0,
+          "duration_source": "matroska-duration-tag",
+          "end_seconds": 2.0
+        },
+        "audio": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 2.0,
+          "duration_source": "matroska-duration-tag",
+          "end_seconds": 2.0
+        }
+      },
+      "expected_video_frames": 48,
+      "expected_audio_samples": 96000,
+      "expected_video_duration_seconds": 2.0,
+      "expected_audio_duration_seconds": 2.0,
+      "expected_quantization_delta_seconds": 0.0,
+      "probe": {
+        "duration_seconds": 2.0,
+        "duration_tick": 180000,
+        "format": "matroska,webm",
+        "format_long_name": "Matroska / WebM",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "hevc",
+            "codec_long_name": "H.265 / HEVC (High Efficiency Video Coding)",
+            "profile": "Main 10",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 192,
+            "has_b_frames": 2,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p10le",
+            "level": 93,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "view_ids_available": "",
+            "view_pos_available": "",
+            "r_frame_rate": "24/1",
+            "avg_frame_rate": "24/1",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "extradata_size": 131,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 hevc_nvenc",
+              "DURATION": "00:00:02.000000000"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "pcm_s16le",
+            "codec_long_name": "PCM signed 16-bit little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "sample_fmt": "s16",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 16,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bit_rate": "1536000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 pcm_s16le",
+              "DURATION": "00:00:02.000000000"
+            }
+          }
+        ],
+        "video": {
+          "codec": "hevc",
+          "width": 320,
+          "height": 180,
+          "pix_fmt": "yuv420p10le",
+          "fps": "24/1",
+          "color_space": "bt709",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_s16le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      }
+    }
+  },
+  "output_probe": {
+    "duration_seconds": 2.0,
+    "duration_tick": 180000,
+    "format": "matroska,webm",
+    "format_long_name": "Matroska / WebM",
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "hevc",
+        "codec_long_name": "H.265 / HEVC (High Efficiency Video Coding)",
+        "profile": "Main 10",
+        "codec_type": "video",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "width": 320,
+        "height": 180,
+        "coded_width": 320,
+        "coded_height": 192,
+        "has_b_frames": 2,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "16:9",
+        "pix_fmt": "yuv420p10le",
+        "level": 93,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "view_ids_available": "",
+        "view_pos_available": "",
+        "r_frame_rate": "24/1",
+        "avg_frame_rate": "24/1",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "extradata_size": 131,
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 hevc_nvenc",
+          "DURATION": "00:00:02.000000000"
+        }
+      },
+      {
+        "index": 1,
+        "codec_name": "pcm_s16le",
+        "codec_long_name": "PCM signed 16-bit little-endian",
+        "codec_type": "audio",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "sample_fmt": "s16",
+        "sample_rate": "48000",
+        "channels": 2,
+        "bits_per_sample": 16,
+        "initial_padding": 0,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bit_rate": "1536000",
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 pcm_s16le",
+          "DURATION": "00:00:02.000000000"
+        }
+      }
+    ],
+    "video": {
+      "codec": "hevc",
+      "width": 320,
+      "height": 180,
+      "pix_fmt": "yuv420p10le",
+      "fps": "24/1",
+      "color_space": "bt709",
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    },
+    "audio": {
+      "codec": "pcm_s16le",
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    },
+    "hardware_decoded_color_frame": {
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_primaries": "bt709",
+      "color_transfer": "bt709"
+    }
+  }
+}

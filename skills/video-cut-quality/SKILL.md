@@ -5,6 +5,14 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For hardware delivery, use the [hardware verification contract](../../docs/specs/硬件编解码探测与显式回退契约_v0.1_2026-10-19.md).
+Read `acceleration` in the manifest and its `renders/diagnostics/acceleration_*` report.
+Check forced hardware frames, CPU-equal probe PTS/pixels, NV12/P010 transport versus
+actual encoded bit depth, decoded color tags, final frame/sample clocks and every fallback.
+Completed command logs are full decoded text; cancellation/timeout tails are partial.
+Four matching frames and a 10-bit file do not accept whole-source quality or internal
+10-bit compositing precision. Required axes must never silently become CPU.
+
 For [compound holds](../../docs/specs/复合片段定格与完整音画时钟契约_v0.1_2026-10-18.md),
 check every source-frame identity, transition blend, held/resumed frame and
 stereo sample. Child captions and animation pause; parent animation continues.

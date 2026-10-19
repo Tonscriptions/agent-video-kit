@@ -1,0 +1,65 @@
+{
+  "operation_id": "render_20261019123630_4809d563",
+  "command": "render",
+  "status": "succeeded",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-10\\renders\\hevc10-cuda.mkv",
+  "manifest": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r5\\project-10\\renders\\hevc10-cuda.mkv.manifest.json",
+  "warnings": [],
+  "profile": null,
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 24,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 320,
+      "height": 180,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mkv",
+      "video": {
+        "codec": "libx265",
+        "preset": "ultrafast",
+        "crf": 18,
+        "pixel_format": "yuv420p10le",
+        "bitrate": "4M"
+      },
+      "audio": {
+        "codec": "pcm_s16le",
+        "bitrate": "192k"
+      }
+    },
+    "acceleration": {
+      "encode": "require",
+      "decode": "require",
+      "encoder": "nvenc",
+      "decoder": "cuda",
+      "probe_max_bytes": 536870912
+    }
+  },
+  "project_id": "proj_20261019123611_0dccffd4",
+  "sequence_id": "seq_main",
+  "project_fingerprint": "02469f374a85b24b9c7decb01cd4769a641e1a5eea139310ee47743717d079f2",
+  "input_hashes": {
+    "source": "sha256:502ddccdaa2437e9d59b19ab99a12762053bcd484828d57227696d241c407601"
+  },
+  "resume_of": null,
+  "created_at": "2026-10-19T12:36:33.415508Z"
+}

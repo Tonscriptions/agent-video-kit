@@ -1,0 +1,65 @@
+{
+  "operation_id": "render_20261019122814_c970a21a",
+  "command": "render",
+  "status": "succeeded",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r3\\project-8\\renders\\debug-cuda.mkv",
+  "manifest": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\hardware-acceleration-20261019-v65-development-r3\\project-8\\renders\\debug-cuda.mkv.manifest.json",
+  "warnings": [],
+  "profile": null,
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 24,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 320,
+      "height": 180,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mkv",
+      "video": {
+        "codec": "libx264",
+        "preset": "ultrafast",
+        "crf": 18,
+        "pixel_format": "yuv420p",
+        "bitrate": "4M"
+      },
+      "audio": {
+        "codec": "pcm_s16le",
+        "bitrate": "192k"
+      }
+    },
+    "acceleration": {
+      "encode": "require",
+      "decode": "require",
+      "encoder": "auto",
+      "decoder": "cuda",
+      "probe_max_bytes": 536870912
+    }
+  },
+  "project_id": "proj_20261019122633_8e7f1e95",
+  "sequence_id": "seq_main",
+  "project_fingerprint": "7ef04bf3238cc8bbaee1b1c566bf14e29282e238f850be79e9eb0b9c08e97e1c",
+  "input_hashes": {
+    "source": "sha256:4e5ce75e8b973bc5d822318fedd4a9ba24408995bad7ed87fa8624d138126c78"
+  },
+  "resume_of": null,
+  "created_at": "2026-10-19T12:28:18.919077Z"
+}
