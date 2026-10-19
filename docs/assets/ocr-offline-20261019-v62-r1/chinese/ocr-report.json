@@ -1,0 +1,446 @@
+{
+  "report_version": "0.1.0",
+  "engine": "ppocr-v4-onnx-cpu-local-v1",
+  "source": {
+    "asset_id": "asset_20261019081744_a0f73a40",
+    "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ocr-native-install-20261019-v62-r1\\chinese\\project\\assets\\asset_20261019081744_a0f73a40_original-chinese.png",
+    "sha256": "sha256:a412c91e464f028af106c256358e7f78b8c787abc0a8f3374684f1e08f54a14e",
+    "kind": "image",
+    "width": 960,
+    "height": 540,
+    "fps": "1",
+    "source_frames": 1,
+    "frame_indices": [
+      0
+    ],
+    "clock": "original-source-frame-index-and-verified-PTS"
+  },
+  "adapter_id": "ocr_v62",
+  "adapter_sha256": "sha256:e9fd1c44d31457e50eb6c47249d55bf110871b45c4e4907275ea312de3b3f5ff",
+  "rights_dependencies": [
+    "asset_20261019081744_a0f73a40",
+    "ocr_adapter_ocr_v62"
+  ],
+  "request": {
+    "protocol": "agent-video-local-ocr-v1",
+    "engine": "ppocr-v4-onnx-cpu-local-v1",
+    "network": "disabled",
+    "source": {
+      "asset_id": "asset_20261019081744_a0f73a40",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ocr-native-install-20261019-v62-r1\\chinese\\project\\assets\\asset_20261019081744_a0f73a40_original-chinese.png",
+      "sha256": "sha256:a412c91e464f028af106c256358e7f78b8c787abc0a8f3374684f1e08f54a14e",
+      "kind": "image",
+      "width": 960,
+      "height": 540,
+      "fps": "1",
+      "source_frames": 1,
+      "frame_indices": [
+        0
+      ],
+      "clock": "original-source-frame-index-and-verified-PTS"
+    },
+    "adapter": {
+      "adapter_id": "ocr_v62",
+      "engine": "ppocr-v4-onnx-cpu-local-v1",
+      "protocol": "agent-video-local-ocr-v1",
+      "model_path": "E:\\dev\\sandbox\\AI广告剪辑\\sources\\models\\rapidocr-1.3.25-20261019-v62\\extracted\\rapidocr_onnxruntime\\models",
+      "python_executable": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+      "threads": 4,
+      "network": "disabled",
+      "artifacts": [
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\sources\\models\\rapidocr-1.3.25-20261019-v62\\extracted\\rapidocr_onnxruntime\\models\\ch_PP-OCRv4_det_infer.onnx",
+          "role": "detector",
+          "bytes": 4745517,
+          "sha256": "sha256:d2a7720d45a54257208b1e13e36a8479894cb74155a5efe29462512d42f49da9"
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\sources\\models\\rapidocr-1.3.25-20261019-v62\\extracted\\rapidocr_onnxruntime\\models\\ch_PP-OCRv4_rec_infer.onnx",
+          "role": "recognizer",
+          "bytes": 10857958,
+          "sha256": "sha256:48fc40f24f6d2a207a2b1091d3437eb3cc3eb6b676dc3ef9c37384005483683b"
+        },
+        {
+          "path": "D:\\dev\\comfyui\\ComfyUI_windows_portable_nvidia_0_30_0\\ComfyUI_windows_portable\\python_embeded\\python.exe",
+          "role": "python",
+          "bytes": 105696,
+          "sha256": "sha256:ef8f51028ac5329641985112f8efb1c2d4c47c86b8011ddf7e6fae21e2b4e5a1"
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\ocr-acquisition-20261019-v62\\sources.json",
+          "role": "evidence",
+          "bytes": 1244,
+          "sha256": "sha256:1d0fb635d903418e5fd72cb08210411079572f69570d2723d9e38459c2371b38"
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ocr-native-install-20261019-v62-r1\\installed\\site\\ai_ad_editor\\local_ocr.py",
+          "role": "local_ocr.py",
+          "bytes": 17446,
+          "sha256": "sha256:cd85a6d7b12ec18b3e024327687c483f1f7cfa0deed2369b968f8ab2bccc14b5"
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ocr-native-install-20261019-v62-r1\\installed\\site\\ai_ad_editor\\ocr_cli.py",
+          "role": "ocr_cli.py",
+          "bytes": 10902,
+          "sha256": "sha256:1a818549a1308e78a38a1a5aa9a025772f5be792bacfcdfeacb5599670e0b4ec"
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ocr-native-install-20261019-v62-r1\\installed\\site\\ai_ad_editor\\ocr_worker.py",
+          "role": "ocr_worker.py",
+          "bytes": 11782,
+          "sha256": "sha256:ee5a2096ec1ee03fc09d2ac4d0b06b1791d5bbfe011772f448045d1377b50d3f"
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ocr-native-install-20261019-v62-r1\\installed\\site\\ai_ad_editor\\ocr_geometry.py",
+          "role": "ocr_geometry.py",
+          "bytes": 5146,
+          "sha256": "sha256:a2a4aedf4289ab20bea45000c1be898668239b75ef215386120850d2f7dfce5c"
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ocr-native-install-20261019-v62-r1\\installed\\site\\ai_ad_editor\\yolo_worker.py",
+          "role": "yolo_worker.py",
+          "bytes": 12271,
+          "sha256": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86"
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ocr-native-install-20261019-v62-r1\\installed\\site\\ai_ad_editor\\browser_process.py",
+          "role": "browser_process.py",
+          "bytes": 7483,
+          "sha256": "sha256:55c72751a5d3d5e397af030fbf65a7ef5b659646a3890f72e52da816d9ab22a6"
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\ocr-native-install-20261019-v62-r1\\installed\\site\\ai_ad_editor\\policy.py",
+          "role": "policy.py",
+          "bytes": 11235,
+          "sha256": "sha256:0433efb46d2561fa9f257dd363aeb592df7ef61c60be147196cbaee7fabbacb8"
+        }
+      ],
+      "rights_ref": "ocr_adapter_ocr_v62",
+      "registered_at": "2026-10-19T08:17:49.144611Z",
+      "sha256": "sha256:e9fd1c44d31457e50eb6c47249d55bf110871b45c4e4907275ea312de3b3f5ff"
+    },
+    "programs": [
+      {
+        "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "role": "ffmpeg",
+        "bytes": 223360000,
+        "sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+      },
+      {
+        "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.exe",
+        "role": "ffprobe",
+        "bytes": 223153664,
+        "sha256": "sha256:70872c3ffbc43d0b2c570f9837f54d6e9a832f4ca25463e9735b6a3ec0621478"
+      }
+    ],
+    "limits": {
+      "det_max_edge": 1536,
+      "max_boxes": 128,
+      "rec_max_width": 2048,
+      "max_report_bytes": 16777216
+    },
+    "rights_dependencies": [
+      "asset_20261019081744_a0f73a40",
+      "ocr_adapter_ocr_v62"
+    ]
+  },
+  "response": {
+    "protocol": "agent-video-local-ocr-v1",
+    "status": "succeeded",
+    "network": "disabled",
+    "blocked_network_events": [],
+    "engine": "ppocr-v4-onnx-cpu-local-v1",
+    "request_sha256": "sha256:0448f2c9c3834da1ec274b1fa9ede29367dbd51dcb634fec3220e731c4569760",
+    "adapter_sha256": "sha256:e9fd1c44d31457e50eb6c47249d55bf110871b45c4e4907275ea312de3b3f5ff",
+    "source_sha256": "sha256:a412c91e464f028af106c256358e7f78b8c787abc0a8f3374684f1e08f54a14e",
+    "frames": [
+      {
+        "frame_index": 0,
+        "pts_seconds": 0.0,
+        "decoded_bgr_sha256": "sha256:a005d4981022f4b77c93cf8dc8b1cc65abb57969cfcc4e2431f28b6b2cb7beb5",
+        "boxes": [
+          {
+            "text": "本地视频剪辑",
+            "confidence": 0.9997737010320028,
+            "detection_score": 0.984237029597755,
+            "polygon": [
+              [
+                73.0,
+                82.0
+              ],
+              [
+                285.0,
+                82.0
+              ],
+              [
+                285.0,
+                117.0
+              ],
+              [
+                73.0,
+                117.0
+              ]
+            ],
+            "bbox": [
+              0.07604166865348816,
+              0.1518518477678299,
+              0.22083333134651184,
+              0.06481481343507767
+            ]
+          },
+          {
+            "text": "预览广告效果",
+            "confidence": 0.9993497033913931,
+            "detection_score": 0.9112270964002332,
+            "polygon": [
+              [
+                70.0,
+                200.0
+              ],
+              [
+                285.0,
+                200.0
+              ],
+              [
+                285.0,
+                237.0
+              ],
+              [
+                70.0,
+                237.0
+              ]
+            ],
+            "bbox": [
+              0.0729166641831398,
+              0.37037035822868347,
+              0.2239583283662796,
+              0.06851851940155029
+            ]
+          },
+          {
+            "text": "保存当前方案",
+            "confidence": 0.9991882145404816,
+            "detection_score": 0.9837323718807763,
+            "polygon": [
+              [
+                73.0,
+                322.0
+              ],
+              [
+                284.0,
+                322.0
+              ],
+              [
+                284.0,
+                357.0
+              ],
+              [
+                73.0,
+                357.0
+              ]
+            ],
+            "bbox": [
+              0.07604166865348816,
+              0.5962963104248047,
+              0.21979166567325592,
+              0.06481481343507767
+            ]
+          },
+          {
+            "text": "价格199元",
+            "confidence": 0.999147891998291,
+            "detection_score": 0.9633920344734385,
+            "polygon": [
+              [
+                571.0,
+                414.0
+              ],
+              [
+                747.0,
+                414.0
+              ],
+              [
+                747.0,
+                451.0
+              ],
+              [
+                571.0,
+                451.0
+              ]
+            ],
+            "bbox": [
+              0.5947916507720947,
+              0.7666666507720947,
+              0.18333333730697632,
+              0.06851851940155029
+            ]
+          }
+        ]
+      }
+    ],
+    "device": "cpu",
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "detector_forwards": 1,
+    "recognizer_forwards": 4,
+    "source_clock_frames_checked": 1,
+    "versions": {
+      "numpy": "2.4.6",
+      "opencv": "5.0.0",
+      "onnx": "1.22.0",
+      "onnxruntime": "1.28.0"
+    },
+    "dictionary_characters": 6625,
+    "decode_command_sha256": "sha256:55c8e57b85bddee9cc614406f72049219b39cb1e7596eb9d10bc369ed7c63181",
+    "decode_protocol_whitelist": [
+      "file",
+      "pipe"
+    ],
+    "decode_stdout_format": "rawvideo-bgr24",
+    "elapsed_seconds": 9.231
+  },
+  "frames": [
+    {
+      "frame_index": 0,
+      "pts_seconds": 0.0,
+      "decoded_bgr_sha256": "sha256:a005d4981022f4b77c93cf8dc8b1cc65abb57969cfcc4e2431f28b6b2cb7beb5",
+      "boxes": [
+        {
+          "text": "本地视频剪辑",
+          "confidence": 0.9997737010320028,
+          "detection_score": 0.984237029597755,
+          "polygon": [
+            [
+              73.0,
+              82.0
+            ],
+            [
+              285.0,
+              82.0
+            ],
+            [
+              285.0,
+              117.0
+            ],
+            [
+              73.0,
+              117.0
+            ]
+          ],
+          "bbox": [
+            0.07604166865348816,
+            0.1518518477678299,
+            0.22083333134651184,
+            0.06481481343507767
+          ]
+        },
+        {
+          "text": "预览广告效果",
+          "confidence": 0.9993497033913931,
+          "detection_score": 0.9112270964002332,
+          "polygon": [
+            [
+              70.0,
+              200.0
+            ],
+            [
+              285.0,
+              200.0
+            ],
+            [
+              285.0,
+              237.0
+            ],
+            [
+              70.0,
+              237.0
+            ]
+          ],
+          "bbox": [
+            0.0729166641831398,
+            0.37037035822868347,
+            0.2239583283662796,
+            0.06851851940155029
+          ]
+        },
+        {
+          "text": "保存当前方案",
+          "confidence": 0.9991882145404816,
+          "detection_score": 0.9837323718807763,
+          "polygon": [
+            [
+              73.0,
+              322.0
+            ],
+            [
+              284.0,
+              322.0
+            ],
+            [
+              284.0,
+              357.0
+            ],
+            [
+              73.0,
+              357.0
+            ]
+          ],
+          "bbox": [
+            0.07604166865348816,
+            0.5962963104248047,
+            0.21979166567325592,
+            0.06481481343507767
+          ]
+        },
+        {
+          "text": "价格199元",
+          "confidence": 0.999147891998291,
+          "detection_score": 0.9633920344734385,
+          "polygon": [
+            [
+              571.0,
+              414.0
+            ],
+            [
+              747.0,
+              414.0
+            ],
+            [
+              747.0,
+              451.0
+            ],
+            [
+              571.0,
+              451.0
+            ]
+          ],
+          "bbox": [
+            0.5947916507720947,
+            0.7666666507720947,
+            0.18333333730697632,
+            0.06851851940155029
+          ]
+        }
+      ]
+    }
+  ],
+  "process_cleanup": {
+    "native_job": true,
+    "seen_pids": [
+      24540,
+      29292,
+      35624,
+      37592
+    ],
+    "active_before_final_cleanup": [],
+    "active_after_cleanup": [],
+    "all_children_reaped": true,
+    "termination_reason": null
+  },
+  "warnings": [
+    "OCR_REVIEW_REQUIRED",
+    "SAMPLED_TEXT_NOT_COMPLETE_PRIVACY_OR_UI_ACTION_DETECTION"
+  ],
+  "sha256": "sha256:201a6051f1420324c8eab6591f59ef8f0b2080d2cac85fda184b2935ce9107aa"
+}

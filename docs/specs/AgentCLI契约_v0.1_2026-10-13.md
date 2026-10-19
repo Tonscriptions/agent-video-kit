@@ -1,5 +1,33 @@
 # Agent CLI 契约 v0.1
 
+<!-- V62-CLI -->
+## V62 OCR 命令契约
+
+执行细节和预先门槛见[离线 OCR 契约](离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md)。以下 `<root>`、模型/Python/证据都是显式已有本地路径；不提供安装或下载开关。
+
+| 命令 | 必须参数与行为 |
+|---|---|
+| `ocr adapter register` | `--project --adapter-id --model-path --python-executable --evidence`；可选 `--threads 1..16`、许可/用途/核验字段，默认 internal/unverified；模型目录必须含固定 det/rec 文件名；重复 ID 拒绝 |
+| `ocr adapter list/inspect` | 都需 `--project`，inspect 另需 `--adapter-id`；只读并检查登记，不自动改摘要 |
+| `ocr scan` | `--project --asset-id --adapter-id --output validation/<new>.json`；源帧 `--start-frame` 包含、`--end-frame` 排他，默认 step=8/max=120；dry-run 不推理或写报告 |
+| `ocr scan` 执行控制 | `--timeout .1..3600` 秒；`--cancel-file <local-flag>`；预置取消退出 8，超时/worker 失败退出 6，来源/模型变化退出 10；失败不提交报告登记 |
+| `ocr anchors` | `--project --report --clip-id --query --frame-index`；可选 sequence/zoom/hold/return；默认只返回计划，`--apply` 提交，支持 `--dry-run`；未识别/重复精确文字退出 2 |
+
+```powershell
+python -X utf8 -m ai_ad_editor ocr adapter register --project <root> --adapter-id ocr_local --model-path <local-model-dir> --python-executable <native-python.exe> --evidence <local-evidence.json>
+python -X utf8 -m ai_ad_editor ocr adapter inspect --project <root> --adapter-id ocr_local
+python -X utf8 -m ai_ad_editor ocr scan --project <root> --asset-id <video> --adapter-id ocr_local --output validation/text.json --start-frame 0 --end-frame 48 --step-frames 8 --dry-run
+python -X utf8 -m ai_ad_editor ocr anchors --project <root> --report validation/text.json --clip-id <clip> --query 'Select local campaign' --frame-index 0 --zoom 1.5 --hold-seconds .5 --return-seconds .5 --apply --dry-run
+```
+
+省略 dry-run 才实际执行对应动作。`scan` 报告和 `anchors` 只消费登记本地媒体；识别出的 URL 是原样文本，不会被访问。锚点应用前校验报告登记/内封摘要/当前来源及实现，任何执行资源的远程路径都继续拒绝。查询区分大小写和空格，不自动使用最高置信度消除歧义。输出是普通 `transform.position.x/y`、`transform.scale` 作者关键帧及源/模型依赖，工程包保留报告；文字框不代表点击区域。
+
+<!-- /V62-CLI -->
+
+<!-- V62-CURRENT -->
+2026-10-19 **V62（产品）**：新增本地 PP-OCRv4 CPU `ocr adapter/scan/anchors`，源帧/PTS、原文字/多边形、唯一精确查询生成可编辑位置/缩放和回全景。完整 **1401/1401、2428.911 秒、0 跳过、195 文件冻结**；27 OCR 专项为全量子集。开发版 **42 CLI /192 最终帧 /1,152,000 立体声采样帧**；32 聚焦帧边缘最大差 1.484375 px，160 全景帧 RGB 最大差 2，PCM 0。英文四个选定目标/中文四个目标通过，原生前向分别 6 det+60 rec /1 det+4 rec；**英文首帧全十行仅 5/10 完全一致，7/255 字符编辑**，保留空格错误，非盲测。**131 包内文件 /44 隔离 CLI /192 安装帧**，同源预测/解码音画一致；**17 Skills /228 引用**。冒号文本误判、静音夹具/字体缺字、标点阈值参考与旧回归中断保留。静帧已看，未连续播放/听审；文字框不代表点击区域，全隐私、自然 OCR/语义、VACE 修订版完整交付与完整剪映等价仍未验收。 [原片/GIF/识别错误/安装与范围](../validation/离线OCR与文字锚点真实成片实测_2026-10-19.md)。
+<!-- /V62-CURRENT -->
+
 <!-- V58-CURRENT -->
 2026-10-19 **V58（产品）**：色温、基础色彩平衡、三向色轮、曝光、色阶共 **19 数值通道**逐帧执行，保留作者时钟和可编辑字段；独立实例、递归配额、运行时能力及缓存摘要门禁。**1357/1357、2022.398 秒、0 跳过、186 文件冻结**；28 新增专项为全量子集。**64 CLI /14 组 /262 帧 /1,158,528 立体声采样帧**；13 组独立参数参考 RGB 最大差 1，文字另验实际颜色变化、Alpha 0 与同编码音频一致；全部 PCM 0。**124 包内文件 /65 隔离 CLI /282 安装帧 /1,254,528 采样帧；14 Skills /206 引用**。另验复合容器自身效果：6 隔离 CLI/20 帧/96,000 采样帧，RGB/Alpha/PCM 0，重复实例时钟重置。原曝光参考失配与文字夹具修正保留，未放宽误差门槛。原生静态参考共用 FFmpeg 算法及相同交付边界；Kelvin/基础平衡仍为阴影映射，物理白平衡、HDR、自然质量、连续播放/听审、另一台机器及完整剪映等价未验收。[契约](逐帧调色参数自动化契约_v0.1_2026-10-19.md)、[原输入/MP4/GIF/失败/安装](../validation/逐帧调色参数自动化实测_2026-10-19.md)。
 <!-- /V58-CURRENT -->

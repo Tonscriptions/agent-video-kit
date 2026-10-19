@@ -1,0 +1,71 @@
+--- fixed/apps/desktop/chat/src/components/AgentActivityRow.tsx
++++ head/apps/desktop/chat/src/components/AgentActivityRow.tsx
+@@ -11,7 +11,7 @@
+ import { AttachmentPreview } from './AttachmentPreview';
+ import { elapsedLabel, useTick } from './useTicker';
+ import { useT } from '@/i18n';
+-import { actGroupParts, buildRuns, EPHEMERAL_ACT_LABELS, pendingWork } from '@/lib/agent-activity-runs';
++import { actGroupParts, buildRuns, EPHEMERAL_ACT_LABELS, idleStatus, pendingWork } from '@/lib/agent-activity-runs';
+ import { StickToBottomContext } from './useStickToBottom';
+ import { WaitingContext } from '@/lib/developer';
+ 
+@@ -617,9 +617,9 @@
+  *   · neither: the caller's text (reconnecting and the like), else "Thinking".
+  *
+  * The clock counts from the earliest start among the running acts. When the turn ends this row becomes
+- * the footer, at the same height (h-6).
+- */
+-export function StatusLine({ items, fallback }: { items: AgentActivityItem[]; fallback?: string | null }) {
++ * the footer, at the same height (h-6). `ownAgent`: the turn runs on the app's own agent (see IdleStatus).
++ */
++export function StatusLine({ items, fallback, ownAgent = false }: { items: AgentActivityItem[]; fallback?: string | null; ownAgent?: boolean }) {
+   const t = useT();
+   const running = React.useMemo(() => pendingWork(items), [items]);
+   /* The last time anything happened: each new item (text, an act starting or finishing) gives the list a new identity */
+@@ -651,7 +651,7 @@
+   let last: AgentActivityItem | undefined;
+   for (let i = items.length - 1; i >= 0; i -= 1) if (items[i]!.kind !== 'notice') { last = items[i]; break; }
+   if (last?.kind === 'text' && last.pending) return <StatusBlank />;
+-  return <IdleStatus since={changedAt} quietFirst={last?.kind === 'text'} />;
++  return <IdleStatus since={changedAt} quietFirst={last?.kind === 'text'} ownAgent={ownAgent} />;
+ }
+ 
+ /** The status row's empty slot: same height, says nothing. */
+@@ -669,27 +669,29 @@
+  * written, which can be two minutes of silence. With only a stop button showing, that looks frozen. So
+  * the row stays: "Working" plus the seconds since the last activity, "Still working" after half a minute
+  * of quiet. A moving clock shows it is alive.
+- */
+-const QUIET_MS = 30_000;
+-
+-function IdleStatus({ since, quietFirst = false }: { since: number; quietFirst?: boolean }) {
++ *
++ * The app's own agent says "Waiting for the model" after two minutes, with why as the row's faint words: some
++ * models think for minutes before the first word. Those words go in the row, not on a line of their own, so it
++ * stays one row high.
++ */
++function IdleStatus({ since, quietFirst = false, ownAgent = false }: { since: number; quietFirst?: boolean; ownAgent?: boolean }) {
+   const t = useT();
+   const tick = useTick();
+   const idle = (tick ?? Date.now()) - since;
+   if (quietFirst && idle < AFTER_TEXT_MS) return <StatusBlank />;
+-  const quiet = idle >= QUIET_MS;
+-  return <StatusShell label={t(quiet ? 'act.stillWorking' : 'act.working')} since={since} />;
++  const label = idleStatus(idle, ownAgent);
++  return <StatusShell label={t(label)} extra={label === 'act.waitingForModel' ? t('act.waitingForModelHint') : undefined} plain since={since} />;
+ }
+ 
+ /* Status row: the act's icon while an act runs; thinking / working is text only, flush left. The shimmer
+    already says "in progress", so no spinner and no empty slot pushing the text right. */
+-function StatusShell({ Icon, label, extra, since, waiting = false }: { Icon?: LucideIcon | undefined; label: string; extra?: string | undefined; since: number; waiting?: boolean }) {
++function StatusShell({ Icon, label, extra, plain = false, since, waiting = false }: { Icon?: LucideIcon | undefined; label: string; extra?: string | undefined; plain?: boolean; since: number; waiting?: boolean }) {
+   return (
+     <div role="status" className="flex h-6 min-w-0 items-center gap-2 text-[14px]">
+       {Icon ? <Icon size={13} aria-hidden className="shrink-0 text-[var(--chat-hint)]" /> : null}
+       <span className={`${waiting ? '' : 'text-sweep '}min-w-0 truncate ${extra ? 'max-w-[60%] shrink-0' : ''}`}>{label}</span>
+       {extra ? (
+-        <span className={`min-w-0 truncate text-[var(--chat-hint)] opacity-80 ${extra.startsWith('“') ? '' : 'font-mono text-[12.5px]'}`} title={extra}>
++        <span className={`min-w-0 truncate text-[var(--chat-hint)] opacity-80 ${plain || extra.startsWith('“') ? '' : 'font-mono text-[12.5px]'}`} title={extra}>
+           {extra}
+         </span>
+       ) : null}

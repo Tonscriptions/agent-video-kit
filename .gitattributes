@@ -391,3 +391,27 @@ docs/validation/OpenFilm三套本地创作Skill与实片核验_2026-10-19.md tex
 skills/video-cut-reference-remake/SKILL.md text eol=lf
 skills/video-cut-long-to-short/SKILL.md text eol=lf
 skills/video-cut-screen-demo/SKILL.md text eol=lf
+
+# V62 OCR observations, actual native encodes and executed evidence are byte-bound.
+scripts/*ocr*.py -text
+scripts/run_frozen_regression.py -text
+product/src/ai_ad_editor/local_ocr.py -text
+product/src/ai_ad_editor/ocr_cli.py -text
+product/src/ai_ad_editor/ocr_worker.py -text
+product/src/ai_ad_editor/ocr_geometry.py -text
+product/src/ai_ad_editor/PADDLE_OCR_LICENSE.txt -text -whitespace
+product/src/ai_ad_editor/PADDLE_OCR_NOTICE.txt -text
+docs/assets/ocr-*/** -text -whitespace
+docs/validation/evidence/ocr-*/** -text -whitespace
+docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/离线OCR与文字锚点真实成片实测_2026-10-19.md text eol=lf
+docs/third-party/PP-OCRv4离线模型与许可来源_2026-10-19.md text eol=lf
+
+# R06 fixed OpenFilm source research, separate from V62 product evidence.
+scripts/audit_openfilm_r06.py -text
+scripts/sync_openfilm_r06_documents.py -text
+sources/upstream/openfilm-refresh-20261019-r06/** -text -whitespace
+docs/validation/evidence/openfilm-head-20261019-r06/** -text -whitespace
+docs/validation/evidence/openfilm-refresh-20261019-r06/** -text -whitespace
+docs/validation/evidence/openfilm-reuse-20261019-r06/** -text -whitespace
+docs/OpenFilm导出修复与纯轨道模块复用复核_2026-10-19.md text eol=lf

@@ -59,7 +59,7 @@
       "description": "Drive the local Agent-first advertising video editor CLI for project setup, local media ingest, timeline composition, local TTS, templates, validation, rights checks, conversion, and FFmpeg rendering.",
       "source_kind": "local-product-skill",
       "source_repository": "AI广告剪辑/product",
-      "skill_md_sha256": "e4d362386deabddf982ea159dedfce3e88b247a88647909c86b22307384a7c21",
+      "skill_md_sha256": "0aa44ee260dbfe9b7f362600aea713b27af30f8c60ddf86664da24429e85c86e",
       "file_count": 2,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -116,10 +116,10 @@
       "invocation": "$video-cut-local-models",
       "canonical_directory": "E:\\dev\\sandbox\\AI广告剪辑\\skills\\video-cut-local-models",
       "registration_directory": "C:\\Users\\carzy\\.codex\\skills\\video-cut-local-models",
-      "description": "Run registered offline speech, transcription, separation, tracking, matting, prompted segmentation, masked repair and joint video window editing with existing local models and native Python.",
+      "description": "Run registered offline OCR, speech, transcription, separation, tracking, matting, prompted segmentation, masked repair and joint video window editing with existing local models and native Python.",
       "source_kind": "local-only-skill",
       "source_repository": "AI广告剪辑",
-      "skill_md_sha256": "5fc7058231dcb0e26b91a416d0175bbaf05daf4a9f3c1d7a66efa3795c5c7a92",
+      "skill_md_sha256": "73ccf00587a56c6d039500015050bcb883583c8d9b0e219e8cd5c0aa43654137",
       "file_count": 1,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -141,7 +141,7 @@
       "description": "Audit and enforce the local-only runtime policy for Agent video projects. Reject remote media, cloud providers, online downloads, and network endpoints before execution.",
       "source_kind": "local-only-skill",
       "source_repository": "AI广告剪辑",
-      "skill_md_sha256": "be5693fc089c8f79d27160766b6cf779a8c3c327f337a1f00cfe8e05916c2ed6",
+      "skill_md_sha256": "60e754f410cbb3242e0bc30eb95dce169ebc96180ed57683139447c632d022b5",
       "file_count": 1,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -255,7 +255,7 @@
       "source_repository": "openfilm/openfilm",
       "source_commit": "7a64d1feacdb59fb631694af7501a4ca570254ca",
       "source_license_notice": "product/src/ai_ad_editor/OPENFILM_LICENSE.txt",
-      "skill_md_sha256": "e9a00a1741dfc3aead5551784b592e2756ac945fdab90410dc8ddceca5f12df0",
+      "skill_md_sha256": "7f8f34cdb7ac5f30477efb64fc7c73eff351d4f17b50fe3d8206ef46ad32ad4e",
       "file_count": 1,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -293,7 +293,7 @@
       "description": "Compose an Agent Project timeline with local clips, tracks, transitions, keyframes, masks, speed curves, nested sequences, captions, and audio automation.",
       "source_kind": "local-only-skill",
       "source_repository": "AI广告剪辑",
-      "skill_md_sha256": "7a1cb5259e479d61d54a73c07496b7a00d0e38f659cc827518a00b5c6cfe4348",
+      "skill_md_sha256": "e685f9dcaea46fad100b743c019f811ea23ac4458c1cab1d8e5fd183a81525da",
       "file_count": 1,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -344,10 +344,10 @@
       "invocation": "$video-cut-video-understand",
       "canonical_directory": "E:\\dev\\sandbox\\AI广告剪辑\\skills\\video-cut-video-understand",
       "registration_directory": "C:\\Users\\carzy\\.codex\\skills\\video-cut-video-understand",
-      "description": "Understand local video and audio with native FFmpeg analysis, optional explicitly registered offline ASR, frame evidence, silence, scene and beat candidates.",
+      "description": "Understand local video and audio with native FFmpeg analysis, explicitly registered offline OCR or ASR, frame evidence, silence, scene and beat candidates.",
       "source_kind": "local-only-skill",
       "source_repository": "calesthio/OpenMontage",
-      "skill_md_sha256": "4181a3194452c8ca1885275fb60461457d9256423cf0c9698166d358938a13f8",
+      "skill_md_sha256": "45172746dc82c3da80d3907aa1407511020245c696bcdd6f29549f35440ea458",
       "file_count": 4,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -363,12 +363,12 @@
   },
   "registered_at_utc": "2026-10-15T18:21:52.5523139Z",
   "current_audit": {
-    "record": "docs/validation/evidence/openfilm-workflows-20261019-v61/skills.json",
-    "record_sha256": "sha256:a3fb13f05cb8edf76008f0003f41444f7a1377001484c7f152e4d3d3c7c180ce",
-    "checked_at_utc": "2026-10-19T06:49:30.698491+00:00",
+    "record": "docs/validation/evidence/ocr-20261019-v62/skills-r1.json",
+    "record_sha256": "sha256:fdfa5859da499a5a07db4e48452826cf5ec5714c29c2f7cf3d349539cc4c2d22",
+    "checked_at_utc": "2026-10-19T08:16:59.926103+00:00",
     "skills": 17,
-    "local_links_checked": 222,
-    "semantics": "V61: three locally adapted OpenFilm creative workflows, controlled encoded media and explicit limits; 17 video-cut Skills; V60 product inputs unchanged, inherited 1374-method regression; no new AI understanding kernel, speech publication, natural quality or full CapCut parity acceptance"
+    "local_links_checked": 228,
+    "semantics": "V62 registered local OCR and reviewed exact-text editable camera focus; existing 17 Skills, six instructions updated. Controlled demonstrations do not accept blind OCR, UI actions, privacy completeness, natural quality or full CapCut parity."
   },
   "audit_history": [
     {
@@ -517,6 +517,14 @@
       "skills": 14,
       "local_links_checked": 210,
       "semantics": "V60 product: UUID-bound physical/Torch admission, own idle-cache accounting and text offload cleanup; 1374 completed frozen methods, native package/install, two isolated CLI and installed CUDA admission; current native 128 MiB active allocation/cache release passed after resources recovered; first real model and earlier revised small-allocation probe refusals retained; complete revised trained-model delivery remains pending; no new repaired output; observations are not reservations or OOM guarantees; natural quality and full CapCut parity unaccepted"
+    },
+    {
+      "record": "docs/validation/evidence/openfilm-workflows-20261019-v61/skills.json",
+      "record_sha256": "sha256:a3fb13f05cb8edf76008f0003f41444f7a1377001484c7f152e4d3d3c7c180ce",
+      "checked_at_utc": "2026-10-19T06:49:30.698491+00:00",
+      "skills": 17,
+      "local_links_checked": 222,
+      "semantics": "V61: three locally adapted OpenFilm creative workflows, controlled encoded media and explicit limits; 17 video-cut Skills; V60 product inputs unchanged, inherited 1374-method regression; no new AI understanding kernel, speech publication, natural quality or full CapCut parity acceptance"
     }
   ]
 }

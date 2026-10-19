@@ -655,6 +655,9 @@ def build_parser() -> argparse.ArgumentParser:
             leaf.add_argument("--verification-status", choices=("unverified", "verified", "restricted"), default="unverified")
             leaf.add_argument("--permitted-use", action="append", default=None)
 
+    from .ocr_cli import add_parser as add_ocr_parser
+    add_ocr_parser(subs, _leaf_common)
+
     tts = subs.add_parser("tts", help="本地离线文本转语音")
     tts_sub = tts.add_subparsers(dest="action", required=True)
     tts_synthesize = _leaf_common(tts_sub.add_parser("synthesize", help="使用本地 flite 或显式登记的 SoulX 生成 WAV"))
@@ -6562,6 +6565,11 @@ def _idempotency_context(args: argparse.Namespace) -> tuple[Path, Path, str] | N
     return root, idempotency_record_path(root, command, str(key)), request_fingerprint(command, args)
 
 
+def command_ocr(args: argparse.Namespace) -> dict[str, Any]:
+    from .ocr_cli import handle
+    return handle(args)
+
+
 _READ_ONLY_PROJECT_COMMANDS = {
     ("project", "inspect"),
     ("operation", "inspect"),
@@ -6590,13 +6598,16 @@ def _project_operation_lock(args: argparse.Namespace):
     """Return the operation-wide lock for a mutating project command."""
     project = getattr(args, "project", None)
     key = (getattr(args, "domain", None), getattr(args, "action", None))
-    adapter_read_only = (key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (key in {("tts", "adapter"), ("tts", "voice"), ("asr", "adapter")} and getattr(args, "registration_action", None) in {"list", "inspect"})
+    adapter_read_only = (key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (key in {("tts", "adapter"), ("tts", "voice"), ("asr", "adapter"), ('ocr','adapter')} and getattr(args, "registration_action", None) in {"list", "inspect"})
     if not project or getattr(args, "dry_run", False) or key in _READ_ONLY_PROJECT_COMMANDS or adapter_read_only or key == ("queue", "cancel"):
         return contextlib.nullcontext()
     return project_write_lock(project)
 
 
 COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, Any]]] = {
+    ('ocr','adapter'): command_ocr,
+    ('ocr','scan'): command_ocr,
+    ('ocr','anchors'): command_ocr,
     ('schema','show'): command_schema_show,
     ('schema','export'): command_schema_export,
     ("project", "init"): command_project_init,
@@ -6711,7 +6722,7 @@ def main(argv: list[str] | None = None) -> int:
         with _project_operation_lock(args):
             transaction_root = getattr(args, "project", None)
             command_key = (args.domain, getattr(args, "action", None))
-            adapter_read_only = (command_key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (command_key in {("tts", "adapter"), ("tts", "voice"), ("asr", "adapter")} and getattr(args, "registration_action", None) in {"list", "inspect"})
+            adapter_read_only = (command_key in {("audio", "adapter"), ("media", "adapter")} and getattr(args, "adapter_action", None) in {"list", "inspect"}) or (command_key in {("tts", "adapter"), ("tts", "voice"), ("asr", "adapter"), ('ocr','adapter')} and getattr(args, "registration_action", None) in {"list", "inspect"})
             transaction_enabled = bool(transaction_root) and not getattr(args, "dry_run", False) and command_key not in _READ_ONLY_PROJECT_COMMANDS and not adapter_read_only and command_key not in {("project", "recover"), ("queue", "cancel")}
             with (project_transaction(transaction_root, command=_command_name(args)) if transaction_enabled else contextlib.nullcontext({"active": False, "recovered": False})) as transaction:
                 if idempotency:

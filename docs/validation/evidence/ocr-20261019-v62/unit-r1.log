@@ -1,0 +1,54 @@
+test_register_dry_run_list_inspect_and_duplicate_preserve_metadata (test_local_ocr.LocalOcrTests.test_register_dry_run_list_inspect_and_duplicate_preserve_metadata) ... ok
+test_registered_model_evidence_and_implementation_hash_changes_fail (test_local_ocr.LocalOcrTests.test_registered_model_evidence_and_implementation_hash_changes_fail) ... ok
+test_registration_missing_model_remote_path_and_thread_budgets_reject (test_local_ocr.LocalOcrTests.test_registration_missing_model_remote_path_and_thread_budgets_reject) ... ok
+test_scan_dry_run_does_not_call_worker_or_write_report (test_local_ocr.LocalOcrTests.test_scan_dry_run_does_not_call_worker_or_write_report) ... ok
+test_scan_failure_and_cancel_keep_metadata_and_no_report (test_local_ocr.LocalOcrTests.test_scan_failure_and_cancel_keep_metadata_and_no_report) ... ok
+test_scan_output_escape_overwrite_and_source_tamper_reject (test_local_ocr.LocalOcrTests.test_scan_output_escape_overwrite_and_source_tamper_reject) ... ERROR
+test_scan_protocol_report_bound_to_project_and_tamper_rejected (test_local_ocr.LocalOcrTests.test_scan_protocol_report_bound_to_project_and_tamper_rejected) ... ok
+test_worker_response_rejects_clock_box_device_and_network_forgery (test_local_ocr.LocalOcrTests.test_worker_response_rejects_clock_box_device_and_network_forgery) ... ok
+test_anchor_keeps_source_clock_and_explicit_full_frame_return (test_local_ocr.OcrGeometryTests.test_anchor_keeps_source_clock_and_explicit_full_frame_return) ... ok
+test_camera_centers_interior_and_clamps_edge_to_source_coverage (test_local_ocr.OcrGeometryTests.test_camera_centers_interior_and_clamps_edge_to_source_coverage) ... ok
+test_ctc_keeps_repeated_letters_after_blank_and_unmodified_unicode (test_local_ocr.OcrGeometryTests.test_ctc_keeps_repeated_letters_after_blank_and_unmodified_unicode) ... ok
+test_ctc_rejects_out_of_bounds_nan_and_invalid_probability (test_local_ocr.OcrGeometryTests.test_ctc_rejects_out_of_bounds_nan_and_invalid_probability) ... ok
+test_duplicate_text_is_rejected_even_when_confidences_differ (test_local_ocr.OcrGeometryTests.test_duplicate_text_is_rejected_even_when_confidences_differ) ... ok
+test_source_in_is_subtracted_without_changing_report (test_local_ocr.OcrGeometryTests.test_source_in_is_subtracted_without_changing_report) ... ok
+test_transformed_retimed_and_insufficient_tail_clips_are_rejected (test_local_ocr.OcrGeometryTests.test_transformed_retimed_and_insufficient_tail_clips_are_rejected) ... 
+  test_transformed_retimed_and_insufficient_tail_clips_are_rejected (test_local_ocr.OcrGeometryTests.test_transformed_retimed_and_insufficient_tail_clips_are_rejected) (patch_value={'presentation_window': {}}) ... FAIL
+test_unscanned_frame_case_difference_and_missing_text_are_not_guessed (test_local_ocr.OcrGeometryTests.test_unscanned_frame_case_difference_and_missing_text_are_not_guessed) ... ok
+
+======================================================================
+ERROR: test_scan_output_escape_overwrite_and_source_tamper_reject (test_local_ocr.LocalOcrTests.test_scan_output_escape_overwrite_and_source_tamper_reject)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_local_ocr.py", line 176, in test_scan_output_escape_overwrite_and_source_tamper_reject
+    self.assertEqual(self.scan()[0],10)
+                     ~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_local_ocr.py", line 112, in scan
+    return invoke('ocr','scan','--project',self.root,'--asset-id',self.asset,'--adapter-id','ocr','--output','validation/text.json',*extra)
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_local_ocr.py", line 26, in invoke
+    result=main(list(map(str,arguments)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6741, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6570, in command_ocr
+    return handle(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\ocr_cli.py", line 82, in handle
+    report=ocr.seal_report(ocr.execute_scan(root,plan,timeout=args.timeout,cancel_file=cancel))
+                           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\local_ocr.py", line 198, in execute_scan
+    process = job.spawn(command, root, dict(os.environ), stdin=subprocess.PIPE, stdout=stdout, stderr=stderr)
+              ^^^^^^^^^
+AttributeError: 'BrowserProcessJob' object has no attribute 'spawn'
+
+======================================================================
+FAIL: test_transformed_retimed_and_insufficient_tail_clips_are_rejected (test_local_ocr.OcrGeometryTests.test_transformed_retimed_and_insufficient_tail_clips_are_rejected) (patch_value={'presentation_window': {}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_local_ocr.py", line 84, in test_transformed_retimed_and_insufficient_tail_clips_are_rejected
+    with self.subTest(patch_value=patch_value),self.assertRaises(AppError):self.plan()
+                                               ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+----------------------------------------------------------------------
+Ran 16 tests in 37.776s
+
+FAILED (failures=1, errors=1)

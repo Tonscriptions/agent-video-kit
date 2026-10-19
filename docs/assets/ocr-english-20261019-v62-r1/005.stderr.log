@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;raise SystemExit(main())
+                                                                                                     ~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6741, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6570, in command_ocr
+    return handle(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\ocr_cli.py", line 82, in handle
+    report=ocr.seal_report(ocr.execute_scan(root,plan,timeout=args.timeout,cancel_file=cancel))
+                           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\local_ocr.py", line 198, in execute_scan
+    process = job.spawn(command, root, dict(os.environ), stdin=subprocess.PIPE, stdout=stdout, stderr=stderr)
+              ^^^^^^^^^
+AttributeError: 'BrowserProcessJob' object has no attribute 'spawn'

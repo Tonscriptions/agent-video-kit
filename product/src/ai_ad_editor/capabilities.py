@@ -21,6 +21,19 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'ocr': {
+                'status': 'implemented_with_limits', 'engine': 'ppocr-v4-onnx-cpu-local-v1',
+                'commands': ['ocr.adapter.register', 'ocr.adapter.list', 'ocr.adapter.inspect', 'ocr.scan', 'ocr.anchors'],
+                'features': ['explicit_local_det_rec_and_native_python_sha256', 'cpu_onnx_db_detection_and_ctc_recognition',
+                    'original_frame_indices_verified_cfr_pts_and_text_polygons', 'source_model_bound_immutable_reports',
+                    'unique_exact_text_query_to_editable_camera_keyframes', 'focus_then_return_to_full_frame',
+                    'native_process_tree_cancel_timeout_cleanup', 'model_rights_dependencies_snapshots_and_packages'],
+                'limits': ['existing_numpy_opencv_onnx_onnxruntime_native_python_and_models_required',
+                    '120_sample_frames_16m_pixels_128_boxes_rec_width_2048', 'video_cfr_60fps_600seconds_no_rotation_or_sar',
+                    'no_orientation_classifier_curved_or_vertical_text_acceptance', 'anchor_requires_same_canvas_plain_forward_unretimed_clip',
+                    'text_bounds_are_not_clickable_control_bounds_or_action_detection', 'sampled_ocr_does_not_prove_complete_privacy_redaction',
+                    'natural_ocr_quality_and_capcut_parity_unaccepted'],
+            },
             'audio_routing': {
                 'status': 'implemented_with_limits', 'engine': 'agent-audio-routing-v1',
                 'commands': ['timeline.compose:add_sequence', 'timeline.compose:update_sequence', 'render'],

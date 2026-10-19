@@ -5,6 +5,15 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For local visible-text editing use the [OCR contract](../../docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md):
+`ocr adapter register/list/inspect`, `ocr scan` and `ocr anchors`. Register
+existing PP-OCRv4 ONNX/native Python with local evidence, review raw source
+frame text/polygons, then apply a unique exact target as editable camera keys
+with a full-view return. Dry-run does not execute the model or write a report.
+No runtime install/download is offered. OCR confidence, a sampled box or a
+successful render does not establish semantic UI actions, complete privacy,
+natural-scene accuracy or full CapCut equivalence.
+
 For animated color parameters, read the
 [numeric automation contract](../../docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md).
 Use catalog 0.5.0 `effects list/inspect` and existing compose `update_clip`

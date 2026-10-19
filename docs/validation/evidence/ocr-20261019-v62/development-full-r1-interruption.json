@@ -1,0 +1,18 @@
+{
+  "reason": "Input freeze invalidated by native OCR policy correction; interrupt only this owned development unittest tree before final regression",
+  "runner": {
+    "ProcessId": 22516,
+    "ParentProcessId": 27808,
+    "Name": "python.exe",
+    "CreationDate": "2026-10-19T15:50:21.611094+08:00",
+    "CommandLine": "\"C:\\Python313\\python.exe\" -B -X utf8 scripts/run_frozen_regression.py --output docs/validation/evidence/ocr-20261019-v62/full-r1.json --html-runtime product/.runtime/html-motion-runtime-20261018-e2.json --rubberband product/.runtime/rubberband-offline-probe-20261017/native/rubberband-4.0.0-gpl-executable-windows/rubberband.exe"
+  },
+  "test_child": {
+    "ProcessId": 25760,
+    "ParentProcessId": 22516,
+    "Name": "python.exe",
+    "CreationDate": "2026-10-19T15:50:22.719847+08:00",
+    "CommandLine": "C:\\Python313\\python.exe -E -B -X utf8 -c \"import sys,unittest;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();unittest.main(module=None)\" E:\\dev\\sandbox\\AI广告剪辑\\product\\src discover -s E:\\dev\\sandbox\\AI广告剪辑\\product\\tests -p test*.py -v"
+  },
+  "at": "2026-10-19T08:15:23.5016620+00:00"
+}

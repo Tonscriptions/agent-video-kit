@@ -1,9 +1,21 @@
 ---
 name: video-cut-local-models
-description: Run registered offline speech, transcription, separation, tracking, matting, prompted segmentation, masked repair and joint video window editing with existing local models and native Python.
+description: Run registered offline OCR, speech, transcription, separation, tracking, matting, prompted segmentation, masked repair and joint video window editing with existing local models and native Python.
 ---
 
 # Local Models
+
+For visible text use the [local OCR contract](../../docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md).
+Register `ocr adapter register` with an existing native Python, PP-OCRv4
+detector/recognizer ONNX directory and local evidence. CPU ORT/OpenCV/NumPy
+must already be available; this path never installs or downloads them.
+Inspect the registration, then `ocr scan --asset-id <id> --adapter-id <id>
+--output validation/<new>.json --start-frame 0 --end-frame <exclusive>
+--step-frames 8 --dry-run`. Run explicitly to obtain original source frames,
+PTS, raw text, polygons and confidence. Changed implementation/model bytes
+require a fresh adapter ID. Keep OCR review and separate source/model rights;
+sampled text is neither all privacy findings nor automatic UI action recovery.
+Use the exact-frame `ocr anchors` path for a reviewed unique text target.
 
 For boundary-model selection, follow the [predeclared comparison contract](../../docs/specs/字词边界模型对照核验契约_v0.1_2026-10-18.md)
 and [actual three-model results](../../docs/validation/开源字词边界模型对照实测_2026-10-18.md).

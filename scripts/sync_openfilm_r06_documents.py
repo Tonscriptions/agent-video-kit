@@ -1,0 +1,76 @@
+"""Publish fixed R06 reuse findings separately from V62 product qualification."""
+from __future__ import annotations
+import json
+from pathlib import Path
+from sync_color_automation_documents import marked,line
+
+ROOT=Path(__file__).resolve().parents[1]
+REPORT='OpenFilm导出修复与纯轨道模块复用复核_2026-10-19.md'
+
+
+def run():
+    base=ROOT/'docs/validation/evidence/openfilm-reuse-20261019-r06';v=json.loads((base/'verification.json').read_bytes())
+    r=json.loads((ROOT/'docs/validation/evidence/openfilm-refresh-20261019-r06/verification.json').read_bytes())
+    if v['status']!='passed_scoped_r06_source_research' or v['totals']!={'tests':65,'pass':64,'fail':0,'skipped':1} or not v['frozen_equal']:raise ValueError('completed source research required')
+    summary=('2026-10-19 **R06（OpenFilm 源码研究）**：固定 `91b4e90c`，API **1098 stars /116 forks** 为 '
+        '16:37 Asia/Taipei 时点；相对 R05 **727→731 文件，4 新增/20 修改/707 不变**。'
+        '新增可脱离 GUI 的轨道种类/编号/分层函数，修复 FCPXML 音画连接、原轨道标签和 stem 角色；'
+        '**64 原测试通过/1 可选 DTD 跳过，8 个独立轨道夹具通过**，非完整上游套件。'
+        'CLI/渲染 `src/` 28 文件原字节不变。导出/轨道模块仍为候选，未接入生产转换、未运行目标 NLE；'
+        '不新增本地 AI 模型，不改变完整剪映等价未达成的状态。')
+    report=f'''# OpenFilm 导出修复与纯轨道模块复用复核
+
+{summary}
+
+这是用户要求的开源复用检查之 **R06 后续源码快照**，与同时进行的 V62 OCR 产品实现分别验收。R05 的原始社区量、源码及成本表保留，不回写成当前版本。
+
+## 本轮获取与检查
+
+| 编号 | 核验内容 | 结果 |
+|---|---|---|
+| R06-C01 | 固定上游 | [`91b4e90c13be6285b03534dfbafe1f028b29d5cc`](https://github.com/openfilm/openfilm/commit/91b4e90c13be6285b03534dfbafe1f028b29d5cc)，提交时间 2026-10-19 07:58:58 UTC；package 仍为 0.2.0 |
+| R06-C02 | API 时点 | 获取完成 2026-10-19 08:37:33 UTC /16:37:33 Asia/Taipei，1098 stars、116 forks；[原 API/请求/SHA](validation/evidence/openfilm-refresh-20261019-r06/requests.json)。网页缓存数值可能滞后，不能与 API 合并 |
+| R06-C03 | 全树比较 | R05 727→731 文件，4 新增、20 修改、707 不变、0 删除；逐文件 SHA 及 20 份差异补丁见[刷新收据](validation/evidence/openfilm-refresh-20261019-r06/verification.json) |
+| R06-C04 | 固定源码与许可 | [源码 ZIP](../sources/upstream/openfilm-refresh-20261019-r06/repo.zip)，{r['source_archive_bytes']:,} 字节，`{r['source_archive_sha256']}`；根 MIT 与 R05/本地 notice 原字节一致 |
+| R06-C05 | 原始测试子集 | 与 R05 相同 8 个选定文件，65 项：64 通过、0 失败、1 跳过；原生 Node，未安装依赖。[原日志](validation/evidence/openfilm-reuse-20261019-r06/upstream-selected.stdout.log) |
+| R06-C06 | 独立纯函数输入 | 8 项轨道编号、视频只取音频、混合轨类型、重叠分层、输入不变、1/2 ms 边界夹具通过；[输入脚本](validation/evidence/openfilm-reuse-20261019-r06/row-fixtures.mjs)、[输出](validation/evidence/openfilm-reuse-20261019-r06/rows.stdout.log) |
+| R06-C07 | 范围 | 可选 FCP DTD 缺失保留跳过；未运行 Final Cut/其它 NLE 导入，未验真实项目 XML 兼容，未执行 exports 集成套件；原窗口相关测试是 VM/EventEmitter mock，不是真实 GUI/内存回收 |
+| R06-C08 | 本地产品稳定性 | {len(v['frozen_before'])} 产品输入研究前后冻结相同；全部 731 上游文件前后相同，无 GUI/provider/新模型。产品 V62 的完整回归不与本表相加 |
+
+## 可拆取内容与开发成本判断
+
+| 编号 | 模块/变化 | 可复用价值 | 当前决定与剩余工作 |
+|---|---|---|---|
+| REUSE06-01 | `studio/server/track-layout.mjs`：`trackKind/rowBadges/layerBlocks` | 原先 UI 里的种类、P/V/A 编号与重叠贪心排轨已抽为纯模块，依赖纯 `film-doc.mjs`，不需要 React/Studio 状态 | **可直接拆成小工具或移植 Python，P2**。当前产品已有精确 tick 时间线，不为三个小函数增加第二套运行时；其 1 ms 重叠容差不能静默套到本项目精确帧格。小范围适配/定向核验约 0.5–1 人日，属规划估计，无实际人时对照 |
+| REUSE06-02 | `fcpxml.mjs` 的 `<clip><video><audio>` 连接和 `sourceRow/linkGroup` | 录像声音嵌入视频组件，保持关联及原 Studio 行标签；比只输出独立音频更接近工程交换需求 | **更新工程交换候选，P2**。需 Agent Project 的作者窗/嵌套/变速/字幕/权利映射及逐项损失报告；当前没有生产转换入口，不把纯字符串测试称为真实 NLE 导入 |
+| REUSE06-03 | `fcpxml.mjs/nle.mjs` stem 角色及音量 XML | 区分 `dialogue.Voice`、`dialogue.Footage`、effects、music，音量 keyframe 去除目标不支持属性，可避免重复踩 XML 连接/角色表达问题 | 与 REUSE06-02 **共享适配 3–6 人日**的原估计，不叠加；本轮无新的原生目标软件兼容证据，不承诺已完成互通 |
+| REUSE06-04 | `exports.mjs` 生成 source row 的方法 | 从文档轨道得到种类、分层和徽标，再把 clip id 映射到声音源行；可借鉴其数据流 | 拆纯数据映射，不整体引入服务端导出编排；该文件还引用 host/渲染/剪映草稿等既有通道。需按本地策略重写资源边界 |
+| REUSE06-05 | `apps/desktop` 的等待提示、15 分钟模型 idle timeout、重试与 undici | 属于桌面聊天和在线模型客户端体验 | 不纳入本地视频内核。当前 CLI 已有显式任务超时、取消和结构化结果；上游等待优化不会提供本地生成/特效能力 |
+| REUSE06-06 | `packages/openfilm/src/` 28 份 CLI/渲染文件 | 与 R05 原字节相同，已有字幕、HTML 时钟/控件、编辑规则和三套工作流的拆取路线继续有效 | 不重复计算已有收益。三套工作流已在 V61 落地；V62 OCR 是另行集成本地开源模型，非此上游增量提供 |
+
+建议继续沿现有 Agent Project＋Python/FFmpeg 与可选本地 HTML 后端拆模块，优先补本地 AI 质量和功能缺口；FCPXML 属可选格式交换，不是开源内核完整性的先决条件。上表仅是具体任务的适配投入估计，没有可比较的人时基线，不能据此宣称整体节省百分比或完整剪映效果已实现。
+
+## 证据和复现
+
+[原生检查收据](validation/evidence/openfilm-reuse-20261019-r06/verification.json)、[执行脚本](../scripts/audit_openfilm_r06.py)、[首次 HEAD 快照](validation/evidence/openfilm-head-20261019-r06/verification.json)。开发获取有明确联网研究授权，实际产品/模型运行仍本地；没有启动浏览器 tab、Docker/WSL/虚拟环境或供应商。
+
+```powershell
+C:/Python313/python.exe -B -X utf8 scripts/audit_openfilm_r06.py --refresh docs/validation/evidence/openfilm-refresh-20261019-r06/verification.json --output docs/validation/evidence/<新复核目录>
+```
+
+这个检查器拒绝非本次固定 SHA，输入不是未来 main。上游若继续更新，应建立新快照；不修改 R05/R06 的历史结果。
+'''
+    (ROOT/'docs'/REPORT).write_text(report,encoding='utf-8',newline='\n')
+    for name in ('README.md','docs/README.md','docs/OpenFilm复用复核与开发成本更新_2026-10-19.md'):
+        p=ROOT/name;text=p.read_text(encoding='utf-8');prefix='docs/' if name=='README.md' else './'
+        text=marked(text,'R06-RESEARCH',summary+f' [源码变化/编号复用与工期]({prefix}{REPORT})。')
+        if name=='README.md':
+            row=f'| R06 | OpenFilm 新导出/轨道源码复核 | 固定 91b4e90c；731 文件；64 原测试通过/1 跳过，8 纯轨道夹具 | 候选模块未接入生产转换；非产品全量/NLE 导入/新 AI 能力验收 | [原始来源/复用判断]({prefix}{REPORT}) |'
+            if '| R06 |' in text:text=line(text,'| R06 |',row)
+            else:
+                rows=text.splitlines();i=next(i for i,x in enumerate(rows) if x.startswith('| R05 |'));rows.insert(i+1,row);text='\n'.join(rows)+'\n'
+        p.write_text(text,encoding='utf-8',newline='\n')
+    print(json.dumps({'documents':4,'upstream_passed':64,'upstream_skipped':1,'row_fixtures':8}))
+
+
+if __name__=='__main__':run()

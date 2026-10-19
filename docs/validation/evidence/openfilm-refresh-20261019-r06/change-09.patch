@@ -1,0 +1,32 @@
+--- fixed/apps/desktop/src/pi-agent.mjs
++++ head/apps/desktop/src/pi-agent.mjs
+@@ -24,11 +24,18 @@
+ import { Readable, Writable } from 'node:stream';
+ import * as acp from '@agentclientprotocol/sdk';
+ import { DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager, createAgentSession } from '@earendil-works/pi-coding-agent';
++import { Agent, install, setGlobalDispatcher } from 'undici';
+ import { agentSessionsDir, openLog } from './chat-store.mjs';
+-import { THINKING, contextUsed, effortOption, modelOption, modelsJson, providerOf, stopReason, toolCall, toolContent } from './pi-config.mjs';
++import { THINKING, WAIT_MINUTES, contextUsed, effortOption, modelOption, modelsJson, providerOf, stopReason, toolCall, toolContent } from './pi-config.mjs';
+ 
+ /* stdout is the protocol's: anything else Pi or a library prints goes to stderr */
+ console.log = console.info = console.warn = console.debug = (...args) => process.stderr.write(`${args.map(String).join(' ')}\n`);
++
++/* some services think quietly for minutes before they answer: wait that long for a byte (Node's fetch stops at 5
++   minutes), with fetch and its connections from one undici, as Pi's own command line sets them */
++const WAIT_MS = WAIT_MINUTES * 60_000;
++setGlobalDispatcher(new Agent({ headersTimeout: WAIT_MS, bodyTimeout: WAIT_MS }));
++install();
+ 
+ const config = JSON.parse(process.env.OPENFILM_PI ?? '{}');
+ /** OpenFilm's skills for this session (agent-skills.mjs): Pi loads these and no others */
+@@ -106,7 +113,8 @@
+   const file = resumeId ? SessionManager.findById(cwd, resumeId, sessionDir) : null;
+   if (resumeId && !file) throw new Error('That conversation is not here any more.');
+   const sessionManager = file ? SessionManager.open(file, sessionDir) : SessionManager.create(cwd, sessionDir);
+-  const settingsManager = SettingsManager.inMemory({ retry: { enabled: true, maxRetries: 2 } });
++  /* the model clients' own timeout too (WAIT_MS above), then one more try */
++  const settingsManager = SettingsManager.inMemory({ httpIdleTimeoutMs: WAIT_MS, retry: { enabled: true, maxRetries: 1 } });
+   /* the request about to go: its whole context, for the turn's log */
+   let pending = null;
+   /* the session's id, once it has one: the questions `ask` puts are the session's */

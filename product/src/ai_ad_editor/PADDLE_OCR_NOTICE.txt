@@ -1,0 +1,22 @@
+Agent Video Kit local OCR adaptation
+
+The DB detection preprocessing/postprocessing, perspective crop, normalization
+and CTC decoding follow the public PaddleOCR and RapidOCR implementations.
+Copyright (c) 2020 PaddlePaddle Authors. RapidOCR Authors.
+Licensed under the Apache License, Version 2.0; see PADDLE_OCR_LICENSE.txt.
+
+Changes: explicit local model/Python/evidence registration and hashing,
+CPU-only sequential ONNX execution, analytic minimum-rectangle expansion,
+bounded frame/box/recognition budgets, exact supplied frame selection and PTS
+validation, local report provenance, process-tree cleanup, no downloader,
+provider, CLI wrapper or remote dictionary access.
+
+Development model source: rapidocr-onnxruntime 1.3.25 PyPI wheel,
+SHA256 3d8e5416f5bf4ab6566009dfdf24175ff80be937f633578c93befb1b526ff587.
+The ch_PP-OCRv4_det_infer.onnx and ch_PP-OCRv4_rec_infer.onnx artifacts derive
+from PaddleOCR. Model files remain external explicit local inputs and are not
+included in this product distribution. Source/weight rights are recorded
+separately in each project's Rights Ledger.
+
+Primary source/license snapshots and model acquisition hashes are retained in
+docs/validation/evidence/ocr-acquisition-20261019-v62/ in the source repository.

@@ -1,0 +1,12 @@
+--- fixed/apps/desktop/chat/src/i18n/locales/en-US.ts
++++ head/apps/desktop/chat/src/i18n/locales/en-US.ts
+@@ -16,6 +16,9 @@
+   },
+   act: {
+     waitingForYou: 'Waiting for you',
++    /* the app's own agent, after two minutes with nothing from the model (some think for minutes first) */
++    waitingForModel: 'Waiting for the model',
++    waitingForModelHint: "Some models think for a long while before they start to answer. Stop if you don't want to wait.",
+     asset: {
+       genImage: 'Generating image',
+       genVideo: 'Generating video',

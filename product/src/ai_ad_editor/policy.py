@@ -152,6 +152,46 @@ def _html_template_data_fields(value: Any, path: str = "$") -> set[str]:
     return result
 
 
+def _ocr_observation_data_fields(value: Any, path: str = "$") -> set[str]:
+    """OCR observations are inert text, including a URL visible in a frame.
+
+    Only two explicit data structures qualify, and only their text scalars.
+    No resource, adapter, source, program, command or extra field is exempt.
+    This selects field types; report authenticity remains the responsibility
+    of local_ocr.load_report before any observation can drive an edit.
+    """
+    result: set[str] = set()
+    if isinstance(value, dict):
+        response = value.get('response', {})
+        request = value.get('request', {})
+        if (value.get('engine') == 'ppocr-v4-onnx-cpu-local-v1'
+                and value.get('report_version') == '0.1.0'
+                and isinstance(request, dict) and request.get('protocol') == 'agent-video-local-ocr-v1'
+                and isinstance(response, dict) and response.get('protocol') == 'agent-video-local-ocr-v1'
+                and response.get('engine') == value['engine']
+                and isinstance(value.get('frames'), list) and value['frames'] == response.get('frames')):
+            for index, frame in enumerate(value['frames']):
+                if not isinstance(frame, dict) or not isinstance(frame.get('boxes'), list):
+                    continue
+                for box_index, box in enumerate(frame['boxes']):
+                    if isinstance(box, dict) and isinstance(box.get('text'), str):
+                        for prefix in ('frames', 'response.frames'):
+                            result.add(f'{path}.{prefix}[{index}].boxes[{box_index}].text')
+        box = value.get('source_box')
+        if (value.get('observation_protocol') == 'agent-video-ocr-text-anchor-v1'
+                and value.get('method') == 'recognized-text-box-explicit-source-frame'
+                and value.get('automatic_click_detection') is False
+                and isinstance(box, dict) and isinstance(value.get('query'), str)
+                and value['query'] == box.get('text')):
+            result.update((path+'.query', path+'.source_box.text'))
+        for key, child in value.items():
+            result.update(_ocr_observation_data_fields(child, f'{path}.{key}'))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            result.update(_ocr_observation_data_fields(child, f'{path}[{index}]'))
+    return result
+
+
 def audit_local_tree(root: Path) -> dict[str, Any]:
     """Audit JSON/JSONL project artifacts without reading or contacting URLs."""
     root = root.expanduser().resolve()
@@ -173,7 +213,10 @@ def audit_local_tree(root: Path) -> dict[str, Any]:
             continue
         for payload in payloads:
             template_data = _html_template_data_fields(payload)
+            observation_data = _ocr_observation_data_fields(payload)
             for field, value in _walk_scalars(payload):
+                if field in observation_data:
+                    continue
                 kind = reference_kind(value)
                 if kind == 'remote' and field in template_data and '://' not in value and not URL_RE.search(value):
                     # Unknown schemes here are CSS pseudo classes or literal

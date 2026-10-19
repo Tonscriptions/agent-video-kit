@@ -1,0 +1,64 @@
+test_anchor_apply_is_editable_and_retains_model_rights_and_source_span (test_local_ocr.LocalOcrTests.test_anchor_apply_is_editable_and_retains_model_rights_and_source_span) ... FAIL
+test_anchor_rejection_does_not_write_candidate_or_snapshot (test_local_ocr.LocalOcrTests.test_anchor_rejection_does_not_write_candidate_or_snapshot) ... ok
+test_anchors_plan_without_apply_does_not_change_metadata (test_local_ocr.LocalOcrTests.test_anchors_plan_without_apply_does_not_change_metadata) ... ok
+test_presignalled_cancel_reaps_native_worker_without_committing (test_local_ocr.LocalOcrTests.test_presignalled_cancel_reaps_native_worker_without_committing) ... ok
+test_register_dry_run_list_inspect_and_duplicate_preserve_metadata (test_local_ocr.LocalOcrTests.test_register_dry_run_list_inspect_and_duplicate_preserve_metadata) ... ok
+test_registered_model_evidence_and_implementation_hash_changes_fail (test_local_ocr.LocalOcrTests.test_registered_model_evidence_and_implementation_hash_changes_fail) ... ok
+test_registration_missing_model_remote_path_and_thread_budgets_reject (test_local_ocr.LocalOcrTests.test_registration_missing_model_remote_path_and_thread_budgets_reject) ... ok
+test_scan_dry_run_does_not_call_worker_or_write_report (test_local_ocr.LocalOcrTests.test_scan_dry_run_does_not_call_worker_or_write_report) ... ok
+test_scan_failure_and_cancel_keep_metadata_and_no_report (test_local_ocr.LocalOcrTests.test_scan_failure_and_cancel_keep_metadata_and_no_report) ... ok
+test_scan_metadata_write_failure_removes_own_report_and_rolls_back (test_local_ocr.LocalOcrTests.test_scan_metadata_write_failure_removes_own_report_and_rolls_back) ... ERROR
+test_scan_output_escape_overwrite_and_source_tamper_reject (test_local_ocr.LocalOcrTests.test_scan_output_escape_overwrite_and_source_tamper_reject) ... ok
+test_scan_protocol_report_bound_to_project_and_tamper_rejected (test_local_ocr.LocalOcrTests.test_scan_protocol_report_bound_to_project_and_tamper_rejected) ... ok
+test_worker_response_rejects_clock_box_device_and_network_forgery (test_local_ocr.LocalOcrTests.test_worker_response_rejects_clock_box_device_and_network_forgery) ... ok
+test_anchor_keeps_source_clock_and_explicit_full_frame_return (test_local_ocr.OcrGeometryTests.test_anchor_keeps_source_clock_and_explicit_full_frame_return) ... ok
+test_camera_centers_interior_and_clamps_edge_to_source_coverage (test_local_ocr.OcrGeometryTests.test_camera_centers_interior_and_clamps_edge_to_source_coverage) ... ok
+test_ctc_keeps_repeated_letters_after_blank_and_unmodified_unicode (test_local_ocr.OcrGeometryTests.test_ctc_keeps_repeated_letters_after_blank_and_unmodified_unicode) ... ok
+test_ctc_rejects_out_of_bounds_nan_and_invalid_probability (test_local_ocr.OcrGeometryTests.test_ctc_rejects_out_of_bounds_nan_and_invalid_probability) ... ok
+test_duplicate_text_is_rejected_even_when_confidences_differ (test_local_ocr.OcrGeometryTests.test_duplicate_text_is_rejected_even_when_confidences_differ) ... ok
+test_existing_position_alias_or_nested_clip_cannot_be_overwritten (test_local_ocr.OcrGeometryTests.test_existing_position_alias_or_nested_clip_cannot_be_overwritten) ... ok
+test_source_in_is_subtracted_without_changing_report (test_local_ocr.OcrGeometryTests.test_source_in_is_subtracted_without_changing_report) ... ok
+test_transformed_retimed_and_insufficient_tail_clips_are_rejected (test_local_ocr.OcrGeometryTests.test_transformed_retimed_and_insufficient_tail_clips_are_rejected) ... ok
+test_unscanned_frame_case_difference_and_missing_text_are_not_guessed (test_local_ocr.OcrGeometryTests.test_unscanned_frame_case_difference_and_missing_text_are_not_guessed) ... ok
+
+======================================================================
+ERROR: test_scan_metadata_write_failure_removes_own_report_and_rolls_back (test_local_ocr.LocalOcrTests.test_scan_metadata_write_failure_removes_own_report_and_rolls_back)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_local_ocr.py", line 248, in test_scan_metadata_write_failure_removes_own_report_and_rolls_back
+    code,value=self.scan()
+               ~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_local_ocr.py", line 121, in scan
+    return invoke('ocr','scan','--project',self.root,'--asset-id',self.asset,'--adapter-id','ocr','--output','validation/text.json',*extra)
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_local_ocr.py", line 26, in invoke
+    result=main(list(map(str,arguments)))
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6741, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\cli.py", line 6570, in command_ocr
+    return handle(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\src\ai_ad_editor\ocr_cli.py", line 93, in handle
+    save_project(root,project)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\unittest\mock.py", line 1167, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\unittest\mock.py", line 1171, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\unittest\mock.py", line 1226, in _execute_mock_call
+    raise effect
+OSError: injected disk failure
+
+======================================================================
+FAIL: test_anchor_apply_is_editable_and_retains_model_rights_and_source_span (test_local_ocr.LocalOcrTests.test_anchor_apply_is_editable_and_retains_model_rights_and_source_span)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\tests\test_local_ocr.py", line 227, in test_anchor_apply_is_editable_and_retains_model_rights_and_source_span
+    code,result=self.anchors('--apply');self.assertEqual(code,0,result)
+                                        ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 4 != 0 : {'ok': False, 'command': 'ocr.anchors', 'request_id': 'req_20261019073915_a029775b', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'OCR_ANCHOR_VALIDATION_FAILED', 'message': '文字锚点候选校验失败', 'path': None, 'retryable': False, 'cause': '{\'ok\': False, \'errors\': [{\'code\': \'SCHEMA_VALIDATION_FAILED\', \'message\': "\'asset_20261019073905_bb45a7b1\' is not of type \'object\'", \'path\': \'sequences.0.tracks.0.clips.0.rights_dependencies.0\', \'retryable\': False}, {\'code\': \'SCHEMA_VALIDATION_FAILED\', \'message\': "\'ocr_adapter_ocr\' is not of type \'object\'", \'path\': \'sequences.0.tracks.0.clips.0.rights_dependencies.1\', \'retryable\': False}, {\'code\': \'CLIP_RIGHTS_DEPENDENCIES_INVALID\', \'message\': \'片段权利依赖必须包含非空 rights_ref 和 sha256\', \'path\': \'sequences[0].tracks[0].clips[0].rights_dependencies\', \'retryable\': False}], \'warnings\': [{\'status\': \'unverified\', \'code\': \'RIGHTS_STATUS_BLOCKED\', \'message\': \'状态 unverified 不允许发布\', \'asset_id\': \'asset_20261019073857_bb9146a3\', \'rights_ref\': \'asset_20261019073857_bb9146a3\', \'record_version\': 1, \'context\': \'project_asset\'}, {\'code\': \'RIGHTS_USE_NOT_PERMITTED\', \'message\': \'记录未允许目标用途: commercial_ad\', \'asset_id\': \'asset_20261019073857_bb9146a3\', \'rights_ref\': \'asset_20261019073857_bb9146a3\', \'record_version\': 1, \'context\': \'project_asset\'}, {\'code\': \'RIGHTS_EVIDENCE_INCOMPLETE\', \'message\': \'来源、许可证或证据字段缺失\', \'asset_id\': \'asset_20261019073857_bb9146a3\', \'rights_ref\': \'asset_20261019073857_bb9146a3\', \'record_version\': 1, \'context\': \'project_asset\'}, {\'status\': \'unverified\', \'code\': \'RIGHTS_STATUS_BLOCKED\', \'message\': \'状态 unverified 不允许发布\', \'asset_id\': \'asset_20261019073905_bb45a7b1\', \'rights_ref\': \'asset_20261019073905_bb45a7b1\', \'record_version\': 1, \'context\': \'project_asset\'}, {\'code\': \'RIGHTS_USE_NOT_PERMITTED\', \'message\': \'记录未允许目标用途: commercial_ad\', \'asset_id\': \'asset_20261019073905_bb45a7b1\', \'rights_ref\': \'asset_20261019073905_bb45a7b1\', \'record_version\': 1, \'context\': \'project_asset\'}, {\'code\': \'RIGHTS_EVIDENCE_INCOMPLETE\', \'message\': \'来源、许可证或证据字段缺失\', \'asset_id\': \'asset_20261019073905_bb45a7b1\', \'rights_ref\': \'asset_20261019073905_bb45a7b1\', \'record_version\': 1, \'context\': \'project_asset\'}], \'rights\': {\'ok\': False, \'target\': \'commercial_ad\', \'checked\': 2, \'required_records\': 2, \'failures\': [{\'asset_id\': \'\', \'context\': \'clip:seq_main:video\', \'code\': \'RIGHTS_RECORD_MISSING\', \'message\': \'没有对应 Rights Ledger 记录\'}], \'warnings\': [{\'status\': \'unverified\', \'code\': \'RIGHTS_STATUS_BLOCKED\', \'message\': \'状态 unverified 不允许发布\', \'asset_id\': \'asset_20261019073857_bb9146a3\', \'rights_ref\': \'asset_20261019073857_bb9146a3\', \'record_version\': 1, \'context\': \'project_asset\'}, {\'code\': \'RIGHTS_USE_NOT_PERMITTED\', \'message\': \'记录未允许目标用途: commercial_ad\', \'asset_id\': \'asset_20261019073857_bb9146a3\', \'rights_ref\': \'asset_20261019073857_bb9146a3\', \'record_version\': 1, \'context\': \'project_asset\'}, {\'code\': \'RIGHTS_EVIDENCE_INCOMPLETE\', \'message\': \'来源、许可证或证据字段缺失\', \'asset_id\': \'asset_20261019073857_bb9146a3\', \'rights_ref\': \'asset_20261019073857_bb9146a3\', \'record_version\': 1, \'context\': \'project_asset\'}, {\'status\': \'unverified\', \'code\': \'RIGHTS_STATUS_BLOCKED\', \'message\': \'状态 unverified 不允许发布\', \'asset_id\': \'asset_20261019073905_bb45a7b1\', \'rights_ref\': \'asset_20261019073905_bb45a7b1\', \'record_version\': 1, \'context\': \'project_asset\'}, {\'code\': \'RIGHTS_USE_NOT_PERMITTED\', \'message\': \'记录未允许目标用途: commercial_ad\', \'asset_id\': \'asset_20261019073905_bb45a7b1\', \'rights_ref\': \'asset_20261019073905_bb45a7b1\', \'record_version\': 1, \'context\': \'project_asset\'}, {\'code\': \'RIGHTS_EVIDENCE_INCOMPLETE\', \'message\': \'来源、许可证或证据字段缺失\', \'asset_id\': \'asset_20261019073905_bb45a7b1\', \'rights_ref\': \'asset_20261019073905_bb45a7b1\', \'record_version\': 1, \'context\': \'project_asset\'}], \'disposition_decisions\': [], \'effective_disposition_decisions\': []}, \'schema_engine\': \'jsonschema\', \'asset_count\': 2, \'sequence_count\': 1}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-19T07:39:15.992313Z', 'finished_at': '2026-10-19T07:39:15.992320Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 22 tests in 52.415s
+
+FAILED (failures=1, errors=1)

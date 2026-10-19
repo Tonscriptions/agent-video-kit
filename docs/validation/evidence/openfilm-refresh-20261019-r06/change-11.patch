@@ -1,0 +1,20 @@
+--- fixed/apps/desktop/src/pi-config.test.mjs
++++ head/apps/desktop/src/pi-config.test.mjs
+@@ -53,7 +53,7 @@
+   assert.equal(stopReason({ stopReason: 'aborted' }), 'cancelled');
+   assert.throws(() => stopReason({ stopReason: 'error', errorMessage: '400 bad' }), /400 bad/);
+   assert.throws(() => stopReason({ stopReason: 'error', errorMessage: 'Request timed out.' }),
+-    (e) => e.message.startsWith("The model service didn't answer for 5 minutes") && e.details === 'Request timed out.');
++    (e) => e.message.startsWith("The model service didn't answer for 15 minutes") && e.details === 'Request timed out.');
+   assert.deepEqual(contextUsed({ usage: { input: 100, cacheRead: 900, cacheWrite: 0, output: 50 } }, { contextWindow: 10_000 }), { used: 1050, size: 10_000 });
+ });
+ 
+@@ -97,7 +97,7 @@
+ });
+ 
+ test('why a turn failed, in plain words: a service that sent nothing in time, a conversation too long for the model; else as Pi said it', () => {
+-  const timedOut = "The model service didn't answer for 5 minutes, even after retries. Check that the service is running and reachable, then try again.";
++  const timedOut = "The model service didn't answer for 15 minutes, even after trying again. Check that the service is running and reachable, then try again.";
+   assert.equal(failureText('Request timed out.'), timedOut, "the OpenAI and Anthropic clients' own timeout");
+   assert.equal(failureText('Headers Timeout Error'), timedOut);
+   assert.equal(failureText('Body Timeout Error'), timedOut);

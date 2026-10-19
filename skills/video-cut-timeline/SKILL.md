@@ -22,6 +22,15 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+For reviewed text-box camera focus, follow the [OCR anchor contract](../../docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md).
+`ocr anchors --report <registered-report> --clip-id <id> --query <exact-text>
+--frame-index <source-index> --apply --dry-run` plans editable
+`transform.position.x/y` and `transform.scale` keys. Inspect the source frame,
+hold and full-view return before applying. It preserves source/audio spans
+and adds source/model rights dependencies. Same-sized forward 1x clips without
+existing camera/crop/effects are supported; nested, retimed or transformed
+inputs reject instead of guessing coordinates. Locked tracks cannot be edited.
+
 For numeric color effect animation, read the
 [color automation contract](../../docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md).
 Existing compose `update_clip.patch.effects` accepts effect keyframe tracks;

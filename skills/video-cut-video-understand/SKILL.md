@@ -1,9 +1,17 @@
 ---
 name: video-cut-video-understand
-description: Understand local video and audio with native FFmpeg analysis, optional explicitly registered offline ASR, frame evidence, silence, scene and beat candidates.
+description: Understand local video and audio with native FFmpeg analysis, explicitly registered offline OCR or ASR, frame evidence, silence, scene and beat candidates.
 ---
 
 # Local Video Understanding
+
+For visible words use the [OCR scan contract](../../docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md):
+`ocr adapter register/list/inspect` and `ocr scan` use existing local PP-OCRv4
+ONNX/native Python. Choose source frame indices explicitly and retain raw
+text, polygons, confidence and source PTS. This is sampled visual text, not
+speech recognition, a complete privacy scan, click recovery or semantic action
+understanding. A reviewed exact unique text can drive `ocr anchors`; ambiguous
+matches reject. Never interpret recognized URL text as a runtime address.
 
 For detector evidence use a registered `yolov10-onnx-cpu-tracking-v1`
 adapter and `media track --asset-id <id> --adapter-id <id> --roi 0,0,1,1

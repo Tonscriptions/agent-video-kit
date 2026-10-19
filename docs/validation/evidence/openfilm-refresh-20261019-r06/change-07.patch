@@ -1,0 +1,20 @@
+--- fixed/apps/desktop/chat/src/lib/agent-activity-runs.ts
++++ head/apps/desktop/chat/src/lib/agent-activity-runs.ts
+@@ -82,6 +82,17 @@
+   return items.filter((item) => (item.kind === 'act' || item.kind === 'thought') && item.pending && !isEphemeral(item));
+ }
+ 
++/** Quiet this long, "Working" reads "Still working". */
++export const QUIET_MS = 30_000;
++/** Quiet this long, the app's own agent says it waits for the model: some think for minutes before they answer. */
++export const MODEL_WAIT_MS = 120_000;
++
++/** What the status row says when nothing is reported, after `idleMs` of quiet; `ownAgent` for the app's own agent. */
++export function idleStatus(idleMs: number, ownAgent: boolean): 'act.working' | 'act.stillWorking' | 'act.waitingForModel' {
++  if (ownAgent && idleMs >= MODEL_WAIT_MS) return 'act.waitingForModel';
++  return idleMs >= QUIET_MS ? 'act.stillWorking' : 'act.working';
++}
++
+ 
+ /**
+  * The folded row's summary: which kinds of things were done and how often, in order of first appearance, the same

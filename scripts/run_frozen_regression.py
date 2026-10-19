@@ -13,7 +13,7 @@ def frozen():
     paths = [*(ROOT/'product/src').rglob('*.py'), *(ROOT/'product/tests').rglob('*.py'),
              *(ROOT/'product/src').rglob('*.mjs'), ROOT/'product/pyproject.toml',
              ROOT/'docs/specs/agent-project.schema.json', *(ROOT/'product/src').rglob('*.json'),
-             *(ROOT/'product/src').rglob('*LICENSE*.txt'), *(ROOT/'product/offline').glob('*.py')]
+             *(ROOT/'product/src').rglob('*LICENSE*.txt'), *(ROOT/'product/src').rglob('*NOTICE*.txt'), *(ROOT/'product/offline').glob('*.py')]
     return {p.relative_to(ROOT).as_posix(): sha(p) for p in sorted(paths)}
 
 def main():

@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';import {pathToFileURL} from 'node:url';
+const m=await import(pathToFileURL(process.argv[1]).href);
+assert.deepEqual(m.rowBadges(['mg','video','mg','audio','video','audio']),['P2','V2','P1','A1','V1','A2']);
+assert.equal(m.trackKind({clips:[{src:'a.mp4',sound:true}]}),'audio');
+assert.equal(m.trackKind({clips:[{src:'a.html'}]}),'mg');
+assert.equal(m.trackKind({clips:[{src:'a.png'},{src:'b.wav'}]}),'video');
+const blocks=[{id:'c',startMs:500,endMs:1200},{id:'b',startMs:1000,endMs:2000},{id:'a',startMs:0,endMs:1000}];
+const original=structuredClone(blocks);assert.deepEqual(m.layerBlocks(blocks).map(r=>r.map(x=>x.id)),[['a','b'],['c']]);assert.deepEqual(blocks,original);
+assert.deepEqual(m.layerBlocks([{id:'a',startMs:0,endMs:1000},{id:'b',startMs:999,endMs:2000}]).map(r=>r.map(x=>x.id)),[['a','b']]);
+assert.deepEqual(m.layerBlocks([{id:'a',startMs:0,endMs:1000},{id:'b',startMs:998,endMs:2000}]).map(r=>r.map(x=>x.id)),[['a'],['b']]);
+console.log(JSON.stringify({status:'passed_pure_row_fixtures',cases:8,one_millisecond_tolerance_explicit:true}));
