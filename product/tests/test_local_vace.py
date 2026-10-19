@@ -295,6 +295,7 @@ from pathlib import Path
 sys.path.insert(0,PRODUCT_SOURCE);sys.path.insert(0,NUMPY_SOURCE)
 import numpy as np
 from ai_ad_editor.vace_frames import process_frames
+from ai_ad_editor.vace_context import ConditioningTrace
 from ai_ad_editor.utils import atomic_write_json
 request=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'));mode=sys.argv[2]
 if mode in {'wait','cancel'}:
@@ -302,7 +303,9 @@ if mode in {'wait','cancel'}:
     time.sleep(20)
 if mode=='fail':raise RuntimeError('controlled inference failure')
 info=request['video'];shapes=[]
+conditioning_trace=ConditioningTrace() if request['generation'].get('temporal_context')=='previous' else None
 def model(images,masks,generation):
+    if conditioning_trace is not None:conditioning_trace.add(images,masks)
     shapes.append(list(images.shape[:3]));return np.full(images.shape,.2,np.float32)
 metrics=process_frames(sys.stdin.buffer,sys.stdout.buffer,width=info['width'],height=info['height'],frames=info['frames'],generation=request['generation'],options=request['inpainting'],channel=request['mask']['channel'],infer=model)
 from ai_ad_editor.cuda_admission import HEADROOM_BYTES,POLICY,window_summary,record_window
@@ -326,6 +329,8 @@ response={'protocol':request['protocol'],'engine':request['engine'],'status':'su
  'mask_sha256':request['mask']['sha256'],'mask_plan_sha256':request['mask']['plan_sha256'],'inpainting':request['inpainting'],'generation':request['generation'],'providers':['torch-cuda'],'metrics':metrics,
  'model_loaded':metrics['model_calls']>0,'model_execution':{'gpu_admission':gpu,'prompt_truncated':False,'prompt_extension':False,'text_encoder_released_before_generation':True,'transformer_precision':'bfloat16-with-declared-float32-stability-modules','vae_precision':'float32','prompt_token_counts':{'prompt':12,'negative_prompt':1},'window_seconds':[0.1]*metrics['model_calls'],'flow_shift':request['generation']['flow_shift'],'model_input_scale':request['generation']['model_input_scale'],'window_input_shapes':shapes}}
 response['model_execution']['text_offload_hooks_removed_before_generation']=True
+if conditioning_trace is not None and metrics['model_calls']:
+    response['model_execution']['conditioning_trace']=conditioning_trace.snapshot()
 from ai_ad_editor.vace_model import WEIGHT_FILES
 response['model_execution']['local_weight_reads']=[{'component':component,'backend':'pread','files':[{'path':component+'/'+name,'opens':1} for name in sorted(names)]} for component,names in WEIGHT_FILES.items()]
 files={a['path']:a['bytes'] for a in request['adapter']['artifacts']}
@@ -363,6 +368,9 @@ if mode=='bad_read_inventory':response['model_execution']['local_weight_reads'][
 if mode=='bad_read_count':response['model_execution']['local_weight_reads'][0]['files'][0]['opens']=True
 if mode=='bad_read_duplicate':response['model_execution']['local_weight_reads'][1]=response['model_execution']['local_weight_reads'][0]
 if mode=='bad_conditioning':metrics['conditioning']='original-object-pixels'
+if mode=='missing_context_report':metrics.pop('temporal_context',None)
+if mode=='bad_context_trace':response['model_execution']['conditioning_trace']['sha256']='sha256:'+'0'*64
+if mode=='unrequested_context_report':metrics['temporal_context']={}
 if mode=='bad_verification':response['artifact_verification']['digest_reuses_while_locked']=0
 if mode=='race':Path(sys.argv[3]).write_bytes(b'external output')
 atomic_write_json(Path(request['response']),response)
@@ -402,7 +410,7 @@ class NativeVaceTests(unittest.TestCase):
     def test_registration_dry_run_inspect_and_complete_inventory(self):
         before=self.metadata();code,result=invoke('media','adapter','register',*self.options,'--dry-run')
         self.assertEqual(code,0,result);self.assertEqual(self.metadata(),before)
-        adapter=self.register();self.assertEqual(adapter['model_file_count'],17);self.assertEqual(len(adapter['artifacts']),35)
+        adapter=self.register();self.assertEqual(adapter['model_file_count'],17);self.assertEqual(len(adapter['artifacts']),36)
         self.assertTrue(verify_adapter(adapter)['ok'])
         self.assertTrue(invoke('media','adapter','inspect','--project',str(self.root),'--adapter-id','vace')[1]['data']['verification']['ok'])
 
@@ -473,7 +481,7 @@ class NativeVaceTests(unittest.TestCase):
         command=inpaint_fixture.NativeInpaintingTests.command(self)
         before=self.metadata()
         with patch('ai_ad_editor.cli.matte_native') as worker:
-            for options in (['--prompt','repair'],['--seed','0'],['--window-frames','5'],['--flow-shift','16'],['--model-input-scale','2']):
+            for options in (['--prompt','repair'],['--seed','0'],['--window-frames','5'],['--flow-shift','16'],['--model-input-scale','2'],['--temporal-context','none'],['--temporal-context','previous']):
                 self.assertEqual(invoke(*command,*options)[0],2)
             worker.assert_not_called()
         self.assertEqual(invoke('media','adapter','register',*self.options,'--text-gpu-budget-mib','4096')[0],2)

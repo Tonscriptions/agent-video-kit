@@ -17,8 +17,10 @@ VACE_PROTOCOL = 'agent-video-wan-vace-inpainting-v1'
 IMPLEMENTATIONS = {'worker': 'vace_worker.py', 'frames': 'vace_frames.py', 'controller': 'local_vace.py',
                    'model_loader': 'vace_model.py', 'pipeline': 'local_matting.py', 'mask_controller': 'local_inpainting.py',
                    'rgba': 'matting_frames.py', 'guard': 'rvm_worker.py', 'artifact_verification': 'artifact_locks.py', 'io': 'utils.py', 'blend': 'repair_blend.py',
-                   'cuda_admission': 'cuda_admission.py', 'outpaint': 'local_outpainting.py', 'diagnostics': 'pipeline_diagnostics.py', 'error_contract': 'errors.py', 'local_policy': 'policy.py'}
-CAPABILITIES = ['prompted_masked_video_editing', 'joint_temporal_windows', 'native_cuda_bfloat16', 'outside_rgb_and_alpha_preserved']
+                   'cuda_admission': 'cuda_admission.py', 'outpaint': 'local_outpainting.py', 'diagnostics': 'pipeline_diagnostics.py', 'error_contract': 'errors.py', 'local_policy': 'policy.py',
+                   'temporal_context': 'vace_context.py'}
+CAPABILITIES = ['prompted_masked_video_editing', 'joint_temporal_windows', 'native_cuda_bfloat16', 'outside_rgb_and_alpha_preserved',
+                'explicit_previous_generated_overlap_conditioning']
 MODEL_FILES = {'model_index.json', 'scheduler/scheduler_config.json', 'text_encoder/config.json',
                'text_encoder/model.safetensors.index.json', 'tokenizer/special_tokens_map.json', 'tokenizer/spiece.model',
                'tokenizer/tokenizer.json', 'tokenizer/tokenizer_config.json', 'transformer/config.json',
@@ -185,7 +187,7 @@ def verify_adapter(record):
 
 
 def normalize_generation(*, prompt, negative_prompt=None, seed=None, inference_steps=None, guidance_scale=None, conditioning_scale=None,
-                         window_frames=None, window_overlap=None, prompt_max_tokens=None, scene_cut_frames=None, flow_shift=None, model_input_scale=None, frames=None):
+                         window_frames=None, window_overlap=None, prompt_max_tokens=None, scene_cut_frames=None, flow_shift=None, model_input_scale=None, temporal_context=None, frames=None):
     values={'negative_prompt':'' if negative_prompt is None else negative_prompt,'seed':0 if seed is None else seed,
             'inference_steps':30 if inference_steps is None else inference_steps,'guidance_scale':5. if guidance_scale is None else guidance_scale,
             'conditioning_scale':1. if conditioning_scale is None else conditioning_scale,'window_frames':17 if window_frames is None else window_frames,
@@ -197,6 +199,12 @@ def normalize_generation(*, prompt, negative_prompt=None, seed=None, inference_s
     if type(values['model_input_scale']) is not int or values['model_input_scale'] not in {1,2,4}:
         raise argument_error('模型输入放大倍率须为 1、2 或 4；输出画布保持原尺寸','model_input_scale')
     if values['window_frames']%4!=1 or values['window_overlap']>=values['window_frames']:raise argument_error('窗口须 4k+1 帧，重叠须小于窗口','window_frames/window_overlap')
+    if temporal_context not in (None, 'none', 'previous'):
+        raise argument_error('时序上下文须为 none 或 previous', 'temporal_context')
+    if temporal_context == 'previous':
+        if values['window_overlap'] < 1:
+            raise argument_error('前窗生成上下文要求 window-overlap 大于零', 'temporal_context/window_overlap')
+        values['temporal_context'] = temporal_context
     for name,lo,hi in [('guidance_scale',1,20),('conditioning_scale',0,2),('flow_shift',.1,32)]:
         v=values[name]
         if type(v) not in {int,float} or not math.isfinite(v) or not lo<=v<=hi:raise argument_error('VACE 有限比例超预算',name)
@@ -222,7 +230,8 @@ def window_plan(frames, generation):
 def buffer_budget(width, height, generation, model_max_edge):
     w=max(64, min((width+15)//16*16,(model_max_edge+15)//16*16))
     h=max(64, min((height+15)//16*16,(model_max_edge+15)//16*16))
-    return width*height*(generation['window_frames']*40+generation['window_overlap']*16+32)+w*h*generation['window_frames']*40*generation.get('model_input_scale',1)**2
+    context_bytes = width*height*4*generation['window_overlap'] if generation.get('temporal_context') == 'previous' else 0
+    return width*height*(generation['window_frames']*40+generation['window_overlap']*16+32)+w*h*generation['window_frames']*40*generation.get('model_input_scale',1)**2+context_bytes
 
 
 def plan_digest(windows):

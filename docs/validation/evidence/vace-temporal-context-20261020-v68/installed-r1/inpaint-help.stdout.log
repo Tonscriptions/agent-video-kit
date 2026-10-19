@@ -1,0 +1,101 @@
+usage: ai-ad-editor media inpaint [-h] [--format {json,text}]
+                                  [--request-id REQUEST_ID]
+                                  [--idempotency-key IDEMPOTENCY_KEY]
+                                  [--dry-run] [--no-network]
+                                  [--progress {none,jsonl}] --project PROJECT
+                                  --asset-id ASSET_ID --adapter-id ADAPTER_ID
+                                  --derived-asset-id DERIVED_ASSET_ID
+                                  --mask-asset-id MASK_ASSET_ID
+                                  [--mask-channel {alpha,luma}]
+                                  [--mask-start-seconds MASK_START_SECONDS]
+                                  [--mask-resize {reject,nearest}]
+                                  [--mask-threshold MASK_THRESHOLD]
+                                  [--mask-grow MASK_GROW]
+                                  [--mask-feather MASK_FEATHER]
+                                  [--context-pixels CONTEXT_PIXELS]
+                                  [--model-max-edge MODEL_MAX_EDGE]
+                                  [--repair-blend {direct,harmonic}]
+                                  [--blend-max-iterations BLEND_MAX_ITERATIONS]
+                                  [--blend-tolerance BLEND_TOLERANCE]
+                                  [--output OUTPUT]
+                                  [--start-seconds START_SECONDS]
+                                  [--end-seconds END_SECONDS] [--fps FPS]
+                                  [--max-edge MAX_EDGE]
+                                  [--max-frames MAX_FRAMES]
+                                  [--timeout-seconds TIMEOUT_SECONDS]
+                                  [--cancel-file CANCEL_FILE] [--no-audio]
+                                  [--sequence-id SEQUENCE_ID]
+                                  [--track-id TRACK_ID]
+                                  [--audio-track-id AUDIO_TRACK_ID]
+                                  [--timeline-start-seconds TIMELINE_START_SECONDS]
+                                  [--apply] [--replace-track]
+                                  [--prompt PROMPT]
+                                  [--negative-prompt NEGATIVE_PROMPT]
+                                  [--seed SEED]
+                                  [--inference-steps INFERENCE_STEPS]
+                                  [--flow-shift FLOW_SHIFT]
+                                  [--model-input-scale {1,2,4}]
+                                  [--guidance-scale GUIDANCE_SCALE]
+                                  [--conditioning-scale CONDITIONING_SCALE]
+                                  [--window-frames WINDOW_FRAMES]
+                                  [--window-overlap WINDOW_OVERLAP]
+                                  [--temporal-context {none,previous}]
+                                  [--prompt-max-tokens PROMPT_MAX_TOKENS]
+                                  [--scene-cut-frame SCENE_CUT_FRAME]
+
+options:
+  -h, --help            show this help message and exit
+  --format {json,text}  输出格式
+  --request-id REQUEST_ID
+  --idempotency-key IDEMPOTENCY_KEY
+  --dry-run
+  --no-network
+  --progress {none,jsonl}
+  --project PROJECT
+  --asset-id ASSET_ID
+  --adapter-id ADAPTER_ID
+  --derived-asset-id DERIVED_ASSET_ID
+  --mask-asset-id MASK_ASSET_ID
+  --mask-channel {alpha,luma}
+  --mask-start-seconds MASK_START_SECONDS
+  --mask-resize {reject,nearest}
+  --mask-threshold MASK_THRESHOLD
+  --mask-grow MASK_GROW
+  --mask-feather MASK_FEATHER
+  --context-pixels CONTEXT_PIXELS
+  --model-max-edge MODEL_MAX_EDGE
+  --repair-blend {direct,harmonic}
+                        显式区域色差融合；默认直接合成
+  --blend-max-iterations BLEND_MAX_ITERATIONS
+  --blend-tolerance BLEND_TOLERANCE
+  --output OUTPUT
+  --start-seconds START_SECONDS
+  --end-seconds END_SECONDS
+  --fps FPS
+  --max-edge MAX_EDGE
+  --max-frames MAX_FRAMES
+  --timeout-seconds TIMEOUT_SECONDS
+  --cancel-file CANCEL_FILE
+  --no-audio
+  --sequence-id SEQUENCE_ID
+  --track-id TRACK_ID
+  --audio-track-id AUDIO_TRACK_ID
+  --timeline-start-seconds TIMELINE_START_SECONDS
+  --apply
+  --replace-track
+  --prompt PROMPT       VACE 的原文编辑提示词；不扩写、不截断
+  --negative-prompt NEGATIVE_PROMPT
+  --seed SEED
+  --inference-steps INFERENCE_STEPS
+  --flow-shift FLOW_SHIFT
+                        VACE flow-matching 时间偏移，默认 3；显式采样配置
+  --model-input-scale {1,2,4}
+                        VACE 受限 ROI 栅格的 1/2/4 倍模型输入；输出画布不变
+  --guidance-scale GUIDANCE_SCALE
+  --conditioning-scale CONDITIONING_SCALE
+  --window-frames WINDOW_FRAMES
+  --window-overlap WINDOW_OVERLAP
+  --temporal-context {none,previous}
+                        VACE 使用前窗已输出的生成前缀作为后窗条件；默认 none
+  --prompt-max-tokens PROMPT_MAX_TOKENS
+  --scene-cut-frame SCENE_CUT_FRAME

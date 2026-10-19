@@ -5,6 +5,17 @@ description: Run registered offline OCR, speech, transcription, separation, trac
 
 # Local Models
 
+For opt-in VACE overlap conditioning, read the
+[context contract](../../docs/specs/VACE前窗生成上下文与连续输出契约_v0.1_2026-10-20.md)
+and [actual execution status](../../docs/validation/VACE前窗生成上下文实测_2026-10-20.md).
+Use `--temporal-context previous` only with positive window overlap. It reuses
+actual emitted generated pixels for the same global frames and scene; new
+unknown pixels remain erased. Plan an extra `width*height*4*window_overlap`
+owned-array budget. Re-register the adapter: `vace_context.py` belongs to its
+implementation closure. Check controller/model conditioning traces before
+accepting the asset. Keep all sampling and device budgets explicit; a resource
+rejection is not a successful forward or a quality result.
+
 Shared native video pipelines now expose optional
 [bounded failure diagnostics](../../docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md).
 Register fresh adapters when implementation hashes change. Preserve each role's

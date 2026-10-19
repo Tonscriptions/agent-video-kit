@@ -43,6 +43,8 @@ def run(args):
     record={'status':'running','started_at_utc':datetime.now(timezone.utc).isoformat(),'frozen_before':before,
         'base_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         'engine':args.engine,'blend':args.blend,'installed':bool(args.launcher),'calls':calls,'checks':checks,
+        'temporal_context':args.temporal_context or 'none',
+        'text_weight_budgets_mib':{'gpu':args.text_gpu_budget_mib,'cpu':args.text_cpu_budget_mib} if args.engine=='vace' else None,
         'generator_sha256':sha(Path(__file__)),'controlled_psnr_gate_db':30.,'natural_quality_accepted':False,
         'full_capcut_parity':False,'continuous_playback_reviewed':False,'audio_listening_reviewed':False}
     save(args.evidence/'verification.json',record)
@@ -119,15 +121,18 @@ def run(args):
         record['model_evidence']={'original_sha256':sha(archived_evidence),'local_sha256':sha(evidence),
             'historical_reference_fields':reference_fields,'license_status_changed':False}
         engine='torchscript-lama-local-v1' if args.engine=='lama' else 'diffusers-wan-vace-local-v1'
-        adapter=cli(['media','adapter','register','--project',str(project),'--adapter-id','outpaint_local','--engine',engine,
+        registration=['media','adapter','register','--project',str(project),'--adapter-id','outpaint_local','--engine',engine,
             '--model-path',str(model),'--executable',str(model_python),'--evidence',str(evidence),
-            '--device','cpu' if args.engine=='lama' else 'cuda'],'model-register')['data']['adapter']
+            '--device','cpu' if args.engine=='lama' else 'cuda']
+        if args.engine=='vace':registration+=['--text-gpu-budget-mib',str(args.text_gpu_budget_mib),'--text-cpu-budget-mib',str(args.text_cpu_budget_mib)]
+        adapter=cli(registration,'model-register')['data']['adapter']
         argv=['media','outpaint','--project',str(project),'--asset-id',ingested['id'],'--adapter-id','outpaint_local',
             '--derived-asset-id','expanded','--width','256','--height','160','--offset-x',str(args.offset_x),'--offset-y',str(args.offset_y),
             '--repair-blend',args.blend,'--model-max-edge','256','--apply','--track-id','track_video_1','--audio-track-id','track_audio_1',
             '--idempotency-key','real-expand']
         if args.engine=='vace':argv+=['--prompt',PROMPT,'--negative-prompt','text, watermark, camera motion, artifacts',
             '--seed','0','--inference-steps','30','--window-frames','5','--window-overlap','2']
+        if args.temporal_context is not None:argv+=['--temporal-context',args.temporal_context]
         # Expensive VACE preflights repeat complete multi-GB hashes. Their control
         # paths are exercised by the separate portable tests and actual LaMa case.
         if args.engine=='lama':
@@ -143,6 +148,11 @@ def run(args):
             from ai_ad_editor.vace_model import validate_weight_reads
             validate_weight_reads(result['worker']['model_execution'].get('local_weight_reads'))
             check('all_six_native_weight_files_use_pread',True)
+            if args.temporal_context=='previous':
+                context=result['worker']['metrics']['temporal_context']
+                check('actual_model_and_controller_conditioning_trace_equal',context['input_trace']==result['worker']['model_execution']['conditioning_trace'])
+                check('actual_model_used_two_previous_emitted_frames',context['frames_conditioned']==2 and context['windows_conditioned']==1)
+                check('context_prefix_not_blended_or_declared_ground_truth',result['worker']['metrics']['overlap_frames_blended']==0 and context['generated_context_is_ground_truth'] is False)
         check('rgba_encoding_roundtrip',result['rgba_roundtrip_verified'])
         output=project/generated['asset']['uri'];shutil.copyfile(output,args.public/'expanded.mov')
         decoded=decode(args.public/'expanded.mov',256,160,'decode-expanded')
@@ -207,7 +217,8 @@ def run(args):
         checker=np.where((np.indices((160,256)).sum(axis=0)//12%2)[...,None],205,155).astype(np.float32)
         for i in range(8):
             panel=Image.new('RGB',(768,184),'#101722');draw=ImageDraw.Draw(panel)
-            for j,(title,values) in enumerate([('Input pad / no generation',pads),('Actual '+args.engine+' '+args.blend,decoded),('Controlled truth',truth)]):
+            mode_label=(' '+args.temporal_context) if args.temporal_context else ''
+            for j,(title,values) in enumerate([('Input pad / no generation',pads),('Actual '+args.engine+mode_label+' '+args.blend,decoded),('Controlled truth',truth)]):
                 alpha=values[i,...,3:4].astype(np.float32)/255
                 rgb=np.rint(values[i,...,:3]*alpha+checker*(1-alpha)).astype(np.uint8)
                 panel.paste(Image.fromarray(rgb),(j*256,24));draw.text((j*256+4,4),title,fill='white',font=font)
@@ -224,6 +235,7 @@ def run(args):
         source_info=json.loads((args.public/'source-evidence.json').read_bytes())
         save(args.public/'provenance.json',{'source_license':'CC0-1.0','source_generator_sha256':source_info['generator_sha256'],
             'model_result':'actual offline '+engine,'commercial_model_license_accepted':False,'frames':8,'fps':'8/1','duration_seconds':1,
+            'temporal_context':args.temporal_context or 'none',
             'gif_durations_ms':[120,130]*4,'gif_has_audio':False,'mp4_is_lossy_preview':True,'quality':quality,
             'files':{p.name:{'bytes':p.stat().st_size,'sha256':sha(p)} for p in args.public.iterdir() if p.is_file()}})
         save(args.evidence/'actual-result.json',generated)
@@ -247,8 +259,12 @@ if __name__=='__main__':
     parser.add_argument('--engine',choices=['lama','vace'],required=True);parser.add_argument('--blend',choices=['direct','harmonic'],default='direct')
     parser.add_argument('--launcher',type=Path);parser.add_argument('--source-assets',type=Path)
     parser.add_argument('--model-python',type=Path,help='existing native model Python; historical local receipt is the default')
+    parser.add_argument('--temporal-context',choices=['none','previous'],default=None)
+    parser.add_argument('--text-gpu-budget-mib',type=int,default=7168)
+    parser.add_argument('--text-cpu-budget-mib',type=int,default=8192)
     parser.add_argument('--offset-x',type=int,default=32);parser.add_argument('--offset-y',type=int,default=16)
     args=parser.parse_args()
+    if args.temporal_context is not None and args.engine!='vace':parser.error('--temporal-context requires --engine vace')
     for name in ('work','evidence','public','launcher','source_assets','model_python'):
         if getattr(args,name) is not None:setattr(args,name,getattr(args,name).resolve())
     run(args)

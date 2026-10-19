@@ -178,6 +178,8 @@ def load_predictor(model_path, settings, generation, *, progress=None):
               'float32_stability_modules':list(stability),'vae_precision':'float32','vae_spatial_tiling':True,'window_seconds':[],
               'flow_shift':float(scheduler.config.flow_shift),'model_input_scale':generation['model_input_scale'],
               'window_input_shapes':[]}
+    from .vace_context import ConditioningTrace
+    conditioning_trace=ConditioningTrace() if generation.get('temporal_context')=='previous' else None
     def predict(images,masks,window_generation):
         if {k:v for k,v in window_generation.items() if k!='seed'}!={k:v for k,v in generation.items() if k!='seed'}:raise ValueError('VACE_GENERATION_SETTINGS_CHANGED')
         phase('admitting-video-window-gpu-memory')
@@ -187,6 +189,9 @@ def load_predictor(model_path, settings, generation, *, progress=None):
         phase('joint-video-denoising');begin=time.monotonic()
         def step_callback(_pipe,_step,_time,kwargs):
             phase('joint-video-denoising-step-'+str(_step+1));return kwargs
+        if conditioning_trace is not None:
+            conditioning_trace.add(images,masks)
+            metadata['conditioning_trace']=conditioning_trace.snapshot()
         with torch.inference_mode():
             value=pipe(video=[Image.fromarray(x) for x in images],mask=[Image.fromarray(x).convert('RGB') for x in masks],
                 prompt_embeds=prompt_embeds.to('cuda'),negative_prompt_embeds=negative_embeds.to('cuda'),

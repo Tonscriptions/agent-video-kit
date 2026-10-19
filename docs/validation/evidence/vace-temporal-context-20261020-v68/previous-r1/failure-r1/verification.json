@@ -1,0 +1,237 @@
+{
+  "status": "passed",
+  "checked_at_utc": "2026-10-19T20:42:47.217241+00:00",
+  "scope": "actual original admission rejection and post-failure read-only diagnostics; no model rerun",
+  "calls": [
+    {
+      "name": "list",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\src');from ai_ad_editor.cli import main;raise SystemExit(main())",
+        "diagnostics",
+        "list",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\vace-temporal-context-20261020-v68\\previous-r1\\project",
+        "--operation-id",
+        "op_20261019203147_360ad8b1"
+      ],
+      "exit_code": 0,
+      "stdout": "list.stdout.log",
+      "stderr": "list.stderr.log",
+      "stdout_sha256": "sha256:ea9dfec91c6bac832a47280f42e7851168517aa10bf951d80366ea0154357c48",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "show",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\src');from ai_ad_editor.cli import main;raise SystemExit(main())",
+        "diagnostics",
+        "show",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\vace-temporal-context-20261020-v68\\previous-r1\\project",
+        "--diagnostic-id",
+        "diag_08cfcfd31abc4e99ad4162c0e266d00b",
+        "--expected-manifest-sha256",
+        "sha256:e4b79456c4b8a12b0ce26048518b88e219e7c07dd53f9640902101d8e4900120",
+        "--include-logs"
+      ],
+      "exit_code": 0,
+      "stdout": "show.stdout.log",
+      "stderr": "show.stderr.log",
+      "stdout_sha256": "sha256:e3250e05d409f0aae076289493f59a7f2150fd4ecbf1fdf3d19a552ead7f6315",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "export",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\src');from ai_ad_editor.cli import main;raise SystemExit(main())",
+        "diagnostics",
+        "export",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\vace-temporal-context-20261020-v68\\previous-r1\\project",
+        "--diagnostic-id",
+        "diag_08cfcfd31abc4e99ad4162c0e266d00b",
+        "--output",
+        "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\vace-temporal-context-20261020-v68\\previous-r1\\failure-r1\\failure.zip"
+      ],
+      "exit_code": 0,
+      "stdout": "export.stdout.log",
+      "stderr": "export.stderr.log",
+      "stdout_sha256": "sha256:da31751e42f14ec2b41114b761345ecba34d30d8c5cd351a02741e45af08ef1c",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "policy",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,'E:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\src');from ai_ad_editor.cli import main;raise SystemExit(main())",
+        "policy",
+        "audit",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\vace-temporal-context-20261020-v68\\previous-r1\\project"
+      ],
+      "exit_code": 0,
+      "stdout": "policy.stdout.log",
+      "stderr": "policy.stderr.log",
+      "stdout_sha256": "sha256:f4e96c5d48422e56efe32d2453b4395828b27db95b3de69e575f0748f1394c45",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "original_cli_exit": 6,
+  "original_cli_sha256": "sha256:af92dffc112db081db195fd6cae7ffe2c9978697c76cb17d3d55663945ceda98",
+  "operation_id": "op_20261019203147_360ad8b1",
+  "diagnostic": {
+    "protocol": "agent-native-pipeline-diagnostic-v1",
+    "status": "stored",
+    "diagnostic_id": "diag_08cfcfd31abc4e99ad4162c0e266d00b",
+    "manifest": "renders/diagnostics/pipelines/diag_08cfcfd31abc4e99ad4162c0e266d00b/manifest.json",
+    "manifest_sha256": "sha256:e4b79456c4b8a12b0ce26048518b88e219e7c07dd53f9640902101d8e4900120",
+    "warnings": []
+  },
+  "worker_error": "worker error - CudaAdmissionError: CUDA_ADMISSION_INSUFFICIENT_PHYSICAL_FREE",
+  "gpu_admission_failure": {
+    "policy": "cuda-uuid-physical-and-torch-free-v1",
+    "stage": "text-weights",
+    "required_free_bytes": 8321499136,
+    "reservation": false,
+    "oom_guarantee": false,
+    "query_started_at_utc": "2026-10-19T20:39:12.748661+00:00",
+    "device_uuid": "GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+    "logical_device_index": 0,
+    "idle_cache_release": {
+      "scope": "current-worker",
+      "synchronized": true,
+      "empty_cache_called": true,
+      "completed": true,
+      "active_allocation_preserved": true,
+      "allocated_before_bytes": 0,
+      "reserved_before_bytes": 0,
+      "allocated_after_bytes": 0,
+      "reserved_after_bytes": 0,
+      "released_reserved_bytes": 0
+    },
+    "query_command": [
+      "<redacted-local-path>",
+      "--id=GPU-c101fc79-ced0-9579-92ab-a20c8dcd8a21",
+      "--query-gpu=uuid,memory.total,memory.free",
+      "--format=csv,noheader,nounits"
+    ],
+    "torch_free_bytes": 11799625728,
+    "torch_total_bytes": 12884377600,
+    "physical_free_bytes": 5395972096,
+    "physical_total_bytes": 12884901888,
+    "effective_free_bytes": 5395972096,
+    "query_finished_at_utc": "2026-10-19T20:39:13.017073+00:00",
+    "sample_seconds": 0.26839640000252984,
+    "status": "rejected",
+    "error_code": "CUDA_ADMISSION_INSUFFICIENT_PHYSICAL_FREE"
+  },
+  "admission_source": "complete retained object in original errors[0].cause",
+  "admission_object_sha256": "sha256:89b92d5da328919e598c07b021e302c2382781ff33b419ed34f01f5c6a720c30",
+  "accepted_vace_forwards": 0,
+  "generated_output_exists": false,
+  "expanded_asset_registered": false,
+  "cache_empty": true,
+  "metadata_before_diagnostic_queries": {
+    "project.json": "sha256:aaebd5172061e73681ffa9946379705bb4e310c840aeccf4a346443b77bafd6b",
+    "rights-ledger.json": "sha256:20810b8824b6a5ce750ba5698edbd840225028ef6de309f477cba924572de359",
+    "models/visual-adapters.json": "sha256:2f76db462a42ae8910b38c79c93c8e98c59de7d509a2f5bdb4e2c2bac408f133"
+  },
+  "metadata_after_diagnostic_queries": {
+    "project.json": "sha256:aaebd5172061e73681ffa9946379705bb4e310c840aeccf4a346443b77bafd6b",
+    "rights-ledger.json": "sha256:20810b8824b6a5ce750ba5698edbd840225028ef6de309f477cba924572de359",
+    "models/visual-adapters.json": "sha256:2f76db462a42ae8910b38c79c93c8e98c59de7d509a2f5bdb4e2c2bac408f133"
+  },
+  "metadata_before_outpaint_captured": false,
+  "rollback_limit": "checks absence of failed asset/output/cache/journal; pre-outpaint author bytes were not captured",
+  "processes": [
+    {
+      "cleanup_requested": false,
+      "final_exit": {
+        "hex": "0xffffffe0",
+        "raw": 4294967264,
+        "unsigned": 4294967264
+      },
+      "observed_at_utc": "2026-10-19T20:39:13.720704+00:00",
+      "observed_exit": {
+        "hex": "0xffffffe0",
+        "raw": 4294967264,
+        "unsigned": 4294967264
+      },
+      "pid": 1620,
+      "role": "decoder",
+      "started_at_utc": "2026-10-19T20:31:49.164474+00:00",
+      "state": "exited"
+    },
+    {
+      "cleanup_requested": false,
+      "final_exit": {
+        "hex": "0x00000001",
+        "raw": 1,
+        "unsigned": 1
+      },
+      "observed_at_utc": "2026-10-19T20:39:13.759853+00:00",
+      "observed_exit": {
+        "hex": "0x00000001",
+        "raw": 1,
+        "unsigned": 1
+      },
+      "pid": 17488,
+      "role": "worker",
+      "started_at_utc": "2026-10-19T20:31:49.174447+00:00",
+      "state": "exited"
+    },
+    {
+      "cleanup_requested": false,
+      "final_exit": {
+        "hex": "0x00000000",
+        "raw": 0,
+        "unsigned": 0
+      },
+      "observed_at_utc": "2026-10-19T20:39:13.720753+00:00",
+      "observed_exit": {
+        "hex": "0x00000000",
+        "raw": 0,
+        "unsigned": 0
+      },
+      "pid": 38932,
+      "role": "encoder",
+      "started_at_utc": "2026-10-19T20:31:49.184995+00:00",
+      "state": "exited"
+    }
+  ],
+  "first_failure_roles": [
+    "decoder"
+  ],
+  "root_cause_field": "unknown",
+  "archive_sha256": "sha256:0d74ac7d8ba75bbc1e04ee71937b1287a61ac4087ea9d5b4ebc8f9b5b64918ff",
+  "record_bytes": 6726,
+  "archive_bytes": 3554,
+  "budget_or_sampling_lowered": false,
+  "other_gpu_tasks_stopped": false,
+  "native_crash_reproduced": false,
+  "natural_quality_accepted": false,
+  "full_capcut_parity": false
+}

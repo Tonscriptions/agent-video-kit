@@ -5,6 +5,16 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For explicit previous generated conditions, read the
+[context contract](../../docs/specs/VACE前窗生成上下文与连续输出契约_v0.1_2026-10-20.md)
+and [paired execution evidence and open gates](../../docs/validation/VACE前窗生成上下文实测_2026-10-20.md).
+Check actual emitted-prefix identities, scene resets, no prefix replacement,
+bounded context and controller/model trace equality. Generated conditions are
+not truth. Compare none/previous using identical source and sampling; preserve
+the existing 30 dB controlled gate and independent temporal error. Prefix
+stability, callback tests or precise original pixels cannot accept natural
+structure, long-video consistency or full CapCut quality.
+
 For a native pipeline failure, review the
 [diagnostic contract](../../docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md)
 and bind `diagnostics show` to the returned manifest SHA. A bounded, redacted

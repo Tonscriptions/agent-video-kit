@@ -5,6 +5,16 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For explicit generated overlap conditioning, read the
+[VACE context contract](../../docs/specs/VACE前窗生成上下文与连续输出契约_v0.1_2026-10-20.md)
+and [current verification and failures](../../docs/validation/VACE前窗生成上下文实测_2026-10-20.md).
+`media inpaint|outpaint --temporal-context previous` requires positive overlap;
+default/`none` preserves independent windows. Previous uses actual emitted
+selected pixels as known conditions, clears at cuts and never overwrites the
+emitted prefix. It is generated context, not ground truth or whole-video
+attention. Register a fresh adapter after implementation changes. Saved sampling
+metadata does not trigger inference when importing or reusing rendered clips.
+
 For generated canvas extension, read the [outpainting contract](../../docs/specs/本地视频扩图与原画面保护契约_v0.1_2026-10-19.md).
 Use `media outpaint` with explicit target width/height and a registered local
 LaMa/VACE adapter; optional integer offsets preserve the entire normalized

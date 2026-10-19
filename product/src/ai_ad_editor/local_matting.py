@@ -275,7 +275,8 @@ def validate_response(response: dict, request: dict) -> None:
                 if base_peak>maximum:raise ValueError('framewise repair base array estimate')
             if joint:
                 from .local_vace import window_plan, buffer_budget, plan_digest
-                if metrics.get('conditioning') != 'masked-rgb-127-before-and-after-resize':
+                conditioning='masked-rgb-127-and-previous-generated-context' if request['generation'].get('temporal_context')=='previous' else 'masked-rgb-127-before-and-after-resize'
+                if metrics.get('conditioning') != conditioning:
                     raise ValueError('joint inpainting conditioning mismatch')
                 verification = response.get('artifact_verification', {})
                 artifacts = {a['path']: a['bytes'] for a in request['adapter']['artifacts']}
@@ -317,6 +318,9 @@ def validate_response(response: dict, request: dict) -> None:
                     tokens=execution.get('prompt_token_counts',{});seconds=execution.get('window_seconds',[])
                     if not isinstance(tokens,dict) or set(tokens)!={'prompt','negative_prompt'} or any(type(v) is not int or not 1<=v<=request['generation']['prompt_max_tokens'] for v in tokens.values()) or not isinstance(seconds,list) or len(seconds)!=metrics['model_calls'] or any(type(v) not in {int,float} or not math.isfinite(v) or v<0 for v in seconds):
                         raise ValueError('joint prompt/window execution metrics')
+                from .vace_context import validate_context_report
+                validate_context_report(metrics,response.get('model_execution',{}),request['generation'],
+                    width=info['width'],height=info['height'],windows=windows)
             if metrics.get('input_alpha_sha256') != metrics.get('output_alpha_sha256'):
                 raise ValueError('source alpha changed')
             for name in ('input_alpha_sha256', 'output_alpha_sha256', 'source_rgba_sha256', 'decoded_mask_rgba_sha256'):

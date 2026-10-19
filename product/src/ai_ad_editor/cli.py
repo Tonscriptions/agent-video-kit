@@ -425,6 +425,7 @@ def build_parser() -> argparse.ArgumentParser:
         inpaint.add_argument('--conditioning-scale', type=float, default=None)
         inpaint.add_argument('--window-frames', type=int, default=None)
         inpaint.add_argument('--window-overlap', type=int, default=None)
+        inpaint.add_argument('--temporal-context', choices=['none','previous'], default=None, help='VACE 使用前窗已输出的生成前缀作为后窗条件；默认 none')
         inpaint.add_argument('--prompt-max-tokens', type=int, default=None)
         inpaint.add_argument('--scene-cut-frame', type=int, action='append', default=None)
     audio = subs.add_parser("audio", help="本地音频处理")
@@ -2070,7 +2071,7 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         generation_args = {'prompt':args.prompt,'negative_prompt':args.negative_prompt,'seed':args.seed,'inference_steps':args.inference_steps,
                            'guidance_scale':args.guidance_scale,'conditioning_scale':args.conditioning_scale,'window_frames':args.window_frames,
                            'window_overlap':args.window_overlap,'prompt_max_tokens':args.prompt_max_tokens,'scene_cut_frames':args.scene_cut_frame,
-                           'flow_shift':args.flow_shift,'model_input_scale':args.model_input_scale}
+                           'flow_shift':args.flow_shift,'model_input_scale':args.model_input_scale,'temporal_context':args.temporal_context}
         if joint:
             plan['generation'] = vace_options(**generation_args, frames=plan['video']['frames'])
             plan['windows'] = vace_windows(plan['video']['frames'],plan['generation'])
@@ -2121,6 +2122,8 @@ def _command_media_matting(args: argparse.Namespace) -> dict[str, Any]:
         if outpainting:
             from .local_outpainting import recipe
             asset['source']['outpainting'] = recipe(plan, adapter, args.asset_id)
+        elif joint:
+            asset['source']['vace_generation'] = copy.deepcopy(plan['generation'])
         rights = {key: copy.deepcopy(parent.get(key, default)) for key, default in [('creator', 'unknown'), ('license_spdx', 'LicenseRef-UNVERIFIED'), ('license_url', ''),
                   ('attribution', ''), ('permitted_uses', ['internal']), ('permitted_channels', []), ('restrictions', []), ('evidence', ''), ('verification_status', 'unverified'), ('verified_by', ''), ('takedown_status', 'clear')]}
         rights.update(asset_id=derived_id, kind='video', sha256=result['sha256'], source_url=f'local://{output}', source_version='derived-video-outpainting' if outpainting else 'derived-video-vace-editing' if joint else 'derived-video-lama-inpainting' if inpainting else 'derived-video-sam2-segmentation' if segmentation else 'derived-video-rvm-matting', retrieved_at=now_iso(),
