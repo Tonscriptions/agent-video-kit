@@ -17,6 +17,10 @@
 [原视频 MP4](docs/assets/pipeline-diagnostics-20261020-v67-lama-r3/source.mp4) /[实际输出 MP4](docs/assets/pipeline-diagnostics-20261020-v67-lama-r3/expanded.mp4)。诊断包没有可视模型效果，GIF 用于检查同版正常视频输出。
 <!-- /V67-CURRENT -->
 
+<!-- R09-RESEARCH -->
+2026-10-20 **R09（OpenFilm 拆分复核）**：03:53:10 Asia/Taipei API **1269 stars /128 forks**；main 仍为 `71922644` /0.2.1，重新核对 **757 份源码**。新增 **16 个原声明提取夹具**：6 个并发启发式、7 个导出签名、3 个缓存检查；确认低内存仍返回 1 worker、自定义文件名阻止相同内容共用、同大小/恢复 mtime 的内容修改不改变旧缓存 key。优先复用批次规划；按需补透明联系表、HTML 子帧采样和中立格式导出。字幕/模板/帧时钟/三套 Skill/硬件策略/诊断已有限定采用，不重复计算收益。**本次仅源码研究，无新成片/模型/浏览器/产品全量；既有 V68 在开发修改原样保留，未由本轮验收。** [编号复用、剩余人日、依赖与原证据](docs/OpenFilm最新复用评估与成本取舍_2026-10-20.md#r09当前复核与拆取顺序)。
+<!-- /R09-RESEARCH -->
+
 <!-- R08-RESEARCH -->
 OpenFilm 最新复核固定 `71922644` /0.2.1，1252 stars /128 forks 为 2026-10-20 01:56:20 Asia/Taipei 快照；757 文件；10 套创作 Skill 所在 31 文件、29 个 provider 目录文件未变。建议拆诊断和批量导出规划，按需补透明联系表；现有缩略图已先缩放，无需重复建设。预览缓存须重写 key，FCPXML 按需求实施，在线 provider 不接入。 [编号复用、成本、原测试与失败](docs/OpenFilm最新复用评估与成本取舍_2026-10-20.md)。
 <!-- /R08-RESEARCH -->
@@ -287,6 +291,7 @@ V45 已进一步采用 O14：MIT 原字节 `overrides.mjs` 和四个模板字段
 | R05 | OpenFilm 新 main 及可拆模块复核 | 固定 7a64d1fe；727 原文件；148 核心未变；63 通过/1 DTD 跳过；10 类复用决策 | 原窗口为 mock；无 GUI/模型/新运行时/新 Skill；不计作产品回归 | [成本/范围](docs/OpenFilm复用复核与开发成本更新_2026-10-19.md)、[原证据](docs/validation/evidence/openfilm-reuse-final-20261019-r05/verification.json) |
 | R06 | OpenFilm 新导出/轨道源码复核 | 固定 91b4e90c；731 文件；64 原测试通过/1 跳过，8 纯轨道夹具 | 候选模块未接入生产转换；非产品全量/NLE 导入/新 AI 能力验收 | [原始来源/复用判断](docs/OpenFilm导出修复与纯轨道模块复用复核_2026-10-19.md) |
 | R07 | OpenFilm 0.2.1 源码与降本复核 | f6a65ae5；749 文件；原测试 75 通过/1 跳过；13 纯数据夹具；196 产品输入不变 | 缓存同大小/mtime 负例失败；候选未接入、无新媒体/GPU/产品回归 | [18 项复用/投入/原证据](docs/OpenFilm_0.2.1复用清单与成本复核_2026-10-19.md) |
+| R09 | OpenFilm 当前可拆模块、依赖和剩余成本 | 71922644 未变；757 文件重新校验；16 个原声明夹具复现并发/签名/缓存行为 | 低内存、改名去重及缓存需改写；无新产品/模型/视频验收；既有 V68 修改保留 | [拆取顺序/人日/原证据](docs/OpenFilm最新复用评估与成本取舍_2026-10-20.md#r09当前复核与拆取顺序) |
 
 实际数据：[字幕原输入](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-input.json) → [三段输出](docs/validation/evidence/openfilm-reuse-20261017/S01-subtitle-output.json)；[跨轨删除原模型](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-input.json) → [操作计划/实际结果/手工预期](docs/validation/evidence/openfilm-reuse-20261017/S02-ripple-output.json)。字幕无词标的时间为估算。原 CLI/Skill 连接 Studio、npx latest 与服务商；选用模块需改为固定本地入口、强制离线并保留原版权。GUI 目录内的纯规划算法可提取；上游不是完整剪映或本地 AI 特效替代内核。
 

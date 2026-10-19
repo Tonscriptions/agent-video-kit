@@ -1,0 +1,47 @@
+const WORKER_MEMORY = 1.5 * 2 ** 30;
+
+const RESERVE = 2 * 2 ** 30;
+
+const FRAMES_PER_WORKER = 60;
+
+const MAX_WORKERS = 4;
+
+const SOUNDS = new Set(['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.oga', '.opus', '.flac', '.aif', '.aiff', '.aifc', '.vtt', '.srt']);
+
+const MOST_FILES = 20_000;
+
+const VERSION = 1;
+
+export function defaultWorkers({ cores, available } = machine(), frames = Infinity) {
+  return Math.max(1, Math.min(MAX_WORKERS, cores - 1, Math.floor((available - RESERVE) / WORKER_MEMORY), Math.floor(frames / FRAMES_PER_WORKER)));
+}
+
+export function projectPrint(root) {
+  const hash = createHash('sha1');
+  let seen = 0;
+  /** @param {string} dir @param {string} rel */
+  const walk = (dir, rel) => {
+    let names;
+    try { names = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    names.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    for (const d of names) {
+      if (d.name.startsWith('.') || seen > MOST_FILES) continue;
+      const path = rel ? `${rel}/${d.name}` : d.name;
+      if (d.isDirectory()) { walk(join(dir, d.name), path); continue; }
+      if (path === FILM_FILE || SOUNDS.has(extname(d.name).toLowerCase())) continue;
+      seen += 1;
+      try { const s = statSync(join(dir, d.name)); hash.update(`${path}\0${s.size}\0${Math.round(s.mtimeMs)}\n`); } catch { /* gone meanwhile */ }
+    }
+  };
+  walk(root, '');
+  return hash.digest('hex');
+}
+
+export function previewKey(root, a, b, fps, height, print = projectPrint(root)) {
+  let film = '';
+  try { film = readFileSync(join(root, FILM_FILE), 'utf8'); } catch { /* none: nothing renders */ }
+  return createHash('sha1').update(`${VERSION}\0${film}\0${print}\0${a}\0${b}\0${fps}\0${height}`).digest('hex').slice(0, 20);
+}
+
+        const { preset, label, ...rest } = /** @type {ExportAsk & { preset?: string }} */ (ask);
+        const same = ask.kind === 'video' || ask.kind === 'gif' ? JSON.stringify(rest, Object.keys(rest).sort()) : null;

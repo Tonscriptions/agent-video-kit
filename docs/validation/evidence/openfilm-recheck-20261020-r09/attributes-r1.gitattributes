@@ -1,0 +1,488 @@
+# Published evidence uses byte hashes; preserve its bytes on Windows checkout.
+# V63 rejection and V64 source-context receipts include native raw log bytes.
+docs/validation/evidence/vace-delivery-20261019-v63-r1/** -text -whitespace
+docs/validation/evidence/audio-source-context-20261019-v64/** -text -whitespace
+docs/validation/evidence/audio-context-install-20261019-v64-r1/** -text -whitespace
+docs/validation/evidence/audio-context-media-20261019-v64-r1/** -text -whitespace
+docs/assets/audio-source-context-*/** -text -whitespace
+docs/assets/audio-context-offline-*/** -text -whitespace
+docs/specs/离线音频真实源上下文与精确选区契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/离线音频真实源上下文与短窗音高实测_2026-10-19.md text eol=lf
+docs/validation/VACE共享显存真实重试与准入拒绝_2026-10-19.md text eol=lf
+scripts/probe_audio_source_context.py -text
+scripts/smoke_audio_source_context.py -text
+scripts/verify_audio_source_context_install.py -text
+scripts/audit_audio_source_context_media.py -text
+scripts/build_audio_context_preview.py -text
+scripts/collect_audio_context_development.py -text
+scripts/collect_vace_retry_rejection.py -text
+scripts/sync_audio_source_context_documents.py -text
+scripts/audit_audio_source_context_release.py -text
+.gitattributes text eol=lf
+.gitignore text eol=lf
+product/**/*.py text eol=lf
+docs/specs/agent-project.schema.json text eol=lf
+docs/assets/** -text
+scripts/build_readme_gallery.py -text
+docs/validation/evidence/readme-gallery-20261016.json -text
+scripts/smoke_mask_review.py -text
+docs/validation/evidence/mask-review-20261016.json -text
+docs/validation/evidence/mask-review-*-20261016.log -text whitespace=cr-at-eol
+scripts/smoke_mask_tracking.py -text
+docs/validation/evidence/mask-tracking-20261016.json -text
+docs/validation/evidence/mask-tracking-*-20261016.log -text whitespace=cr-at-eol
+# Preserve the interrupted raw progress line, including its final space.
+docs/validation/evidence/mask-tracking-interrupted-full-20261016.log -whitespace
+scripts/smoke_alpha_resampling.py -text
+docs/validation/evidence/alpha-resampling-20261016.json -text
+docs/validation/evidence/alpha-resampling-*-20261016.log -text whitespace=cr-at-eol
+scripts/smoke_alpha_geometry.py -text
+docs/validation/evidence/alpha-geometry-20261016.json -text
+docs/validation/evidence/alpha-geometry-*-20261016.log -text whitespace=cr-at-eol
+# Keep the bundled third-party font license verbatim, including trailing spaces.
+docs/assets/alpha-geometry-20261016/font-license.txt -whitespace
+scripts/smoke_nested_time_mapping.py -text
+docs/validation/evidence/nested-time-20261016.json -text
+docs/validation/evidence/nested-time-quality-20261016.json -text
+docs/validation/evidence/nested-time-*-20261016.log -text whitespace=cr-at-eol
+docs/validation/evidence/nested-time-full-interrupted-fixture-20261016.log -whitespace
+docs/assets/nested-time-20261016/font-license.txt -whitespace
+scripts/smoke_speed_easing.py -text
+docs/validation/evidence/speed-easing-20261016.json -text
+docs/validation/evidence/speed-easing-quality-20261016.json -text
+docs/validation/evidence/speed-easing-stability-20261016.json -text
+docs/validation/evidence/speed-easing-*-20261016.log -text whitespace=cr-at-eol
+# Preserve the captured unittest subTest progress lines, including final spaces.
+docs/validation/evidence/speed-easing-before-20261016.log -whitespace
+docs/assets/speed-easing-20261016/font-license.txt -whitespace
+
+# Keep captured caption verification bytes, including raw progress spaces.
+scripts/smoke_subtitle_clock.py -text
+docs/validation/evidence/subtitle-clock*.json -text
+docs/validation/evidence/subtitle-clock*.log -text -whitespace
+docs/assets/subtitle-clock-20261016/font-license.txt -whitespace
+
+# Native word-layout proofs preserve raw logs and third-party license bytes.
+scripts/smoke_word_layout.py -text
+docs/validation/evidence/*word-layout*.json -text
+docs/validation/evidence/word-layout*.log -text -whitespace
+docs/validation/evidence/glyph-dev*.log -text -whitespace
+docs/validation/evidence/word-policy*.log -text -whitespace
+docs/assets/word-layout*/*.txt -whitespace
+
+# Keep captured color/opacity proofs, raw failure logs and font license bytes.
+scripts/smoke_text_paint.py -text
+docs/validation/evidence/*text-paint*.json -text
+docs/validation/evidence/text-paint*.log -text -whitespace
+docs/assets/text-paint-20261016/font-license.txt -whitespace
+
+# V24 native text animation proofs preserve raw log and font license bytes.
+scripts/smoke_text_animation.py -text
+docs/validation/evidence/*text-animation*.json -text
+docs/validation/evidence/text-animation*.log -text -whitespace
+docs/assets/text-animation-20261017/font-license.txt -whitespace
+
+# V25 keeps native frame, EOF and short-audio failure evidence byte-exact.
+scripts/smoke_nested_frame_coverage.py -text
+docs/validation/evidence/*nested*coverage*.json -text
+docs/validation/evidence/nested-coverage*.log -text -whitespace
+docs/assets/nested-frame-coverage-20261017/font-license.txt -whitespace
+
+# V26 keeps actual offline audio proofs and upstream license bytes unchanged.
+scripts/smoke_offline_audio_stretch.py -text
+docs/validation/evidence/*audio-stretch*.json -text
+docs/validation/evidence/audio-stretch*.log -text -whitespace
+docs/assets/offline-audio-stretch-20261017/*.txt -whitespace
+
+# V27 preserves actual channel-mode media, PCM and native phase evidence.
+scripts/smoke_audio_channel_modes.py -text
+docs/validation/evidence/*audio-channels*.json -text
+docs/validation/evidence/audio-channels*.log -text -whitespace
+docs/assets/audio-channel-modes-20261017/*.txt -whitespace
+
+# V28 preserves sequence canvas pixels, independent references and raw failures.
+scripts/smoke_sequence_compositing.py -text
+docs/validation/evidence/*sequence-groups*.json -text
+docs/validation/evidence/sequence-groups*.log -text -whitespace
+docs/assets/sequence-compositing-20261017/*.txt -whitespace
+
+# V29 preserves float PCM, actual bus evidence and native failure logs.
+scripts/smoke_audio_buses.py -text
+docs/validation/evidence/*audio-buses*.json -text
+docs/validation/evidence/audio-buses*.log -text -whitespace
+docs/assets/audio-buses-20261017/*.txt -whitespace
+
+# V30 retains actual tempo PCM, terminal failures and immutable native logs.
+scripts/smoke_audio_tempo_context.py -text
+docs/validation/evidence/*tempo-context*.json -text
+docs/validation/evidence/tempo-context*.log -text -whitespace
+docs/assets/audio-tempo-context-20261017/*.txt -whitespace
+
+# OpenFilm research preserves pinned archive, original failures and exact patches.
+scripts/audit_openfilm_reuse.py -text
+sources/upstream/openfilm/** -text
+docs/validation/evidence/openfilm-reuse-20261017.json -text
+docs/validation/evidence/openfilm-reuse-20261017/** -text -whitespace
+
+# Preserve independent-canvas demonstrations, raw failures and source hashes.
+scripts/smoke_sequence_canvas.py -text
+docs/validation/evidence/sequence-canvas*.json -text
+docs/validation/evidence/sequence-canvas*.log -text -whitespace
+docs/validation/evidence/sequence-canvas-dev-v3-generator.py -text
+docs/assets/sequence-canvas-20261017/font-license.txt -whitespace
+
+# V37 retains fragment resource proofs, frozen source records and raw failures.
+scripts/*fragment*.py -text
+scripts/run_frozen_regression.py -text
+docs/validation/evidence/fragments*.json -text
+docs/validation/evidence/fragments*.log -text -whitespace
+docs/validation/evidence/fragments-*/** -text -whitespace
+
+# V38 native output cuts: preserve raw CLI/failure logs and source freezes.
+scripts/*clip_window*.py -text
+docs/validation/evidence/windows*.json -text
+docs/validation/evidence/windows*.log -text -whitespace
+docs/validation/evidence/windows-*/** -text -whitespace
+docs/validation/evidence/openfilm-window-followup-*/** -text -whitespace
+docs/assets/clip-windows-*/cli-*.log -text -whitespace
+
+# V39 range edits retain native command logs, frozen sources and failures.
+scripts/*range_edit*.py -text
+docs/validation/evidence/range*.json -text
+docs/validation/evidence/range*.log -text -whitespace
+docs/validation/evidence/range-*/** -text -whitespace
+docs/validation/evidence/openfilm-range-followup-*/** -text -whitespace
+docs/assets/range-edits-*/cli-*.log -text -whitespace
+
+# V40 finite source edits preserve raw CLI, regression and failure evidence.
+scripts/*source_edit*.py -text
+docs/validation/evidence/source-*-20261018.json -text
+docs/validation/evidence/source-*-20261018.log -text -whitespace
+docs/validation/evidence/source-*-20261018/** -text -whitespace
+docs/assets/source-edits-*/cli-*.log -text -whitespace
+
+# V41 native HTML motion preserves exact workers, source snapshots and raw logs.
+product/**/*.mjs -text
+product/pyproject.toml text eol=lf
+product/src/ai_ad_editor/OPENFILM_LICENSE.txt -text
+skills/**/SKILL.md text eol=lf
+scripts/*html_motion*.py -text
+scripts/audit_openfilm_html_adoption.py -text
+docs/validation/evidence/html-motion*.json -text whitespace=cr-at-eol
+docs/validation/evidence/html-motion*.log -text -whitespace
+docs/validation/evidence/html-motion*.py -text
+docs/validation/evidence/html-motion-*/** -text -whitespace
+docs/validation/evidence/openfilm-html-adoption-*/** -text -whitespace
+docs/assets/html-motion-*/** -text -whitespace
+
+# V42 research retains unsuccessful candidates and reproducible NPZ/frame evidence.
+research/temporal-background/*.py text eol=lf
+scripts/*coherent_reference*.py -text
+scripts/create_repair_reference_holdouts.py -text
+docs/validation/evidence/coherent-reference*.json -text whitespace=cr-at-eol
+docs/validation/evidence/coherent-reference-*/** -text -whitespace
+docs/validation/evidence/docs-audit-coherent-reference*.json -text
+
+# V43 encoded mask editing preserves exact native runs, media and failure records.
+scripts/*mask_edit*.py -text
+docs/validation/evidence/mask-edit*/** -text -whitespace
+docs/validation/evidence/mask-edit*.json -text
+docs/validation/evidence/docs-audit-mask-edit*.json -text
+README.md text eol=lf
+docs/README.md text eol=lf
+docs/构建进度总表_2026-10-16.md text eol=lf
+docs/产品需求与开发路线基线_2026-10-12.md text eol=lf
+docs/产品实现入口与P0使用说明_v0.1_2026-10-13.md text eol=lf
+docs/validation/README功能核验与实测演示_2026-10-16.md text eol=lf
+docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md text eol=lf
+docs/validation/本地蒙版笔刷与关键帧修正实测_2026-10-18.md text eol=lf
+docs/specs/本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md text eol=lf
+docs/specs/AgentCLI契约_v0.1_2026-10-13.md text eol=lf
+video-cut-install-manifest.json text eol=lf
+
+# V44 neural temporal research preserves actual source, acquisition and worker bytes.
+research/temporal-neural/*.py -text
+scripts/*fgt*.py -text
+docs/validation/evidence/fgt-temporal-*/** -text -whitespace
+docs/validation/evidence/fgt-temporal*.json -text
+docs/validation/evidence/docs-audit-fgt*.json -text
+docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md text eol=lf
+docs/specs/开源时序修复候选核验契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/开源FGT时序修复候选实测_2026-10-18.md text eol=lf
+docs/third-party/时序修复候选源码与许可说明_2026-10-18.md text eol=lf
+skills/video-cut-local-models/SKILL.md text eol=lf
+skills/video-cut-quality/SKILL.md text eol=lf
+
+# V45 MIT template sources and real verification evidence retain exact bytes.
+product/src/ai_ad_editor/openfilm_overrides.mjs -text -whitespace
+product/src/ai_ad_editor/openfilm_template_fields.mjs -text -whitespace
+product/src/ai_ad_editor/html_template_dom.mjs -text
+scripts/*html_template*.py -text
+scripts/adopt_openfilm_template_controls.py -text
+docs/validation/evidence/html-template*/** -text -whitespace
+docs/validation/evidence/html-template*.json -text
+docs/validation/evidence/openfilm-template*/** -text -whitespace
+docs/validation/evidence/docs-audit-html-template*.json -text
+docs/assets/html-template-20261018/template/** whitespace=cr-at-eol
+docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md text eol=lf
+docs/third-party/OpenFilm复用声明_2026-10-17.md text eol=lf
+skills/video-cut-agent-editor/SKILL.md text eol=lf
+
+# V58 preserve native commands, originals, failed captures and byte-bound receipts.
+scripts/*color_automation*.py -text
+docs/validation/evidence/effect-automation-*/** -text -whitespace
+docs/validation/evidence/color-native-*/** -text -whitespace
+docs/assets/color-automation-*/** -text -whitespace
+docs/assets/color-group-*/** -text -whitespace
+docs/validation/evidence/color-group-*/** -text -whitespace
+docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/逐帧调色参数自动化实测_2026-10-19.md text eol=lf
+docs/specs/本地效果目录与参数契约_v0.1_2026-10-14.md text eol=lf
+
+# R05 preserve fixed public research receipts, patches and executed scripts.
+scripts/audit_openfilm_r05.py -text
+scripts/sync_openfilm_r05_documents.py -text
+docs/validation/evidence/openfilm-*-20261019-r05/** -text -whitespace
+docs/OpenFilm复用复核与开发成本更新_2026-10-19.md text eol=lf
+
+# V57: preserve hashed raw CLI captures, native CRLF receipts and original font notices.
+scripts/*complete_output_retime*.py -text
+docs/validation/evidence/retime-*/** -text -whitespace
+docs/assets/retime-*/** -text -whitespace
+docs/specs/完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/完整作者输出变速与磁吸联动实测_2026-10-19.md text eol=lf
+
+# V56 preserve actual magnetic editing captures, interrupted runs and media.
+scripts/*magnetic_mode*.py -text
+docs/validation/evidence/magnetic-mode-*/** -text -whitespace
+docs/assets/magnetic-mode-*/** -text -whitespace
+docs/specs/主轨磁吸模式与跨剪口同步拆分契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/主轨磁吸模式与跨剪口同步拆分实测_2026-10-18.md text eol=lf
+
+# V55 original PCM/media, failed runs, native logs and exact evidence bytes.
+scripts/*audio_routing*.py -text
+docs/validation/evidence/audio-routing-*/** -text -whitespace
+docs/assets/audio-routing-*/** -text -whitespace
+docs/specs/命名音频总线发送返回与侧链契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/命名音频总线发送返回与侧链实测_2026-10-18.md text eol=lf
+
+# R04/V54 preserve fixed upstream bytes, watchdog evidence and failed fixtures.
+scripts/audit_openfilm_recheck*.py -text
+docs/validation/evidence/openfilm-recheck-*/** -text -whitespace
+docs/validation/evidence/openfilm-recheck-*.json -text -whitespace
+sources/upstream/openfilm-recheck-*/** -text -whitespace
+docs/OpenFilm最新源码复核与降本清单_2026-10-18.md text eol=lf
+
+# V53 keep executed generators, partial failures and exact media byte evidence.
+scripts/*magnetic_reorder*.py -text
+docs/validation/evidence/magnetic-reorder-*/** -text -whitespace
+docs/validation/evidence/magnetic-reorder-*.json -text -whitespace
+docs/assets/magnetic-reorder-*/** -text -whitespace
+docs/specs/主轨磁吸重排与关联附着契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/主轨磁吸重排与关联附着实测_2026-10-18.md text eol=lf
+skills/video-cut-template-library/SKILL.md text eol=lf
+
+# V46 diagnostic sources, failure records and rendered media retain exact bytes.
+product/src/ai_ad_editor/openfilm_text_bounds.mjs -text -whitespace
+product/src/ai_ad_editor/html_quality_dom.mjs -text
+scripts/*html_quality*.py -text
+docs/validation/evidence/html-quality*/** -text -whitespace
+docs/validation/evidence/html-quality*.json -text
+docs/validation/evidence/openfilm-layout*/** -text -whitespace
+docs/validation/evidence/docs-audit-html-quality*.json -text
+docs/assets/html-quality-20261018/** whitespace=cr-at-eol
+docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/HTML文字布局与字体覆盖实测_2026-10-18.md text eol=lf
+
+# V47 preserves the exact contract, dependency wheels and raw execution records.
+product/src/ai_ad_editor/agent-project.schema.json -text
+product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt -text -whitespace
+sources/python-runtime/** -text -whitespace
+product/offline/*.py text eol=lf
+scripts/*offline_release*.py -text
+scripts/acquire_python_runtime_wheels.py -text
+scripts/verify_schema_baseline.py -text
+scripts/review_openfilm_release_reuse.py -text
+scripts/run_frozen_regression.py -text
+scripts/smoke_fragments.py -text
+docs/validation/evidence/offline-*/** -text -whitespace
+docs/validation/evidence/offline-*.json -text
+docs/assets/offline-release*/install-receipt.json whitespace=cr-at-eol
+docs/validation/evidence/schema-release-*.json -text
+docs/validation/evidence/openfilm-release-review-*/** -text -whitespace
+docs/validation/evidence/docs-audit-offline-*.json -text
+docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/离线发行与随包Schema实测_2026-10-18.md text eol=lf
+docs/third-party/离线Python依赖与日期检查器许可说明_2026-10-18.md text eol=lf
+docs/OpenFilm当前复用决策_2026-10-18.md text eol=lf
+skills/video-cut-project-ops/SKILL.md text eol=lf
+scripts/map_openfilm_skills.py -text
+scripts/verify_offline_native_entries.py -text
+scripts/verify_staged_release.py -text
+docs/validation/evidence/openfilm-skill-local-mapping-20261018.json -text
+docs/OpenFilm官方Skill本地能力映射_2026-10-18.md text eol=lf
+scripts/review_openfilm_examples.py -text
+scripts/review_openfilm_example_engine.py -text
+docs/validation/evidence/openfilm-examples-review-*/** -text -whitespace
+docs/OpenFilm示例与动效内核复用评估_2026-10-18.md text eol=lf
+
+# V48 original MIT notices and machine evidence are byte-pinned.
+product/src/ai_ad_editor/openfilm_stroke.mjs -text
+product/src/ai_ad_editor/OPENFILM_EXAMPLES_LICENSE.txt -text -whitespace
+product/src/ai_ad_editor/PDOOM_VIDEO_LICENSE.txt -text -whitespace
+docs/validation/evidence/stroke-*/** -text -whitespace
+docs/validation/evidence/stroke-*.json -text
+docs/validation/evidence/ctc-model-*/** -text -whitespace
+docs/validation/evidence/openfilm-stroke-adoption-*/** -text
+docs/assets/stroke-motion-*/install-receipt.json whitespace=cr-at-eol
+scripts/*stroke*.py -text
+scripts/inspect_ctc_model_sources.py -text
+docs/specs/离线逐笔描线动效契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/离线逐笔描线动效实测_2026-10-18.md text eol=lf
+docs/third-party/OpenFilm示例描线函数复用声明_2026-10-18.md text eol=lf
+docs/CTC对齐模型来源预研_2026-10-18.md text eol=lf
+
+# V49 preserve captured CTC clocks, raw CLI logs and third-party notices.
+scripts/*ctc*.py -text
+scripts/acquire_pillow_release_wheel.py -text
+docs/validation/evidence/ctc-*/** -text -whitespace
+docs/validation/evidence/ctc-*.json -text whitespace=cr-at-eol
+docs/validation/evidence/pillow-release-wheel-*/** -text -whitespace
+docs/third-party/flite-source-*/** -text -whitespace
+docs/assets/ctc-alignment-*/** -text whitespace=cr-at-eol
+scripts/*boundary*.py -text
+docs/validation/evidence/boundary-*/** -text -whitespace
+docs/validation/evidence/boundary-*.json -text whitespace=cr-at-eol
+docs/assets/boundary-*/** -text whitespace=cr-at-eol
+docs/third-party/boundary-*/** -text -whitespace
+docs/assets/boundary-readable-font-*/LICENSE_DEJAVU -whitespace
+docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/离线CTC字词强制对齐实测_2026-10-18.md text eol=lf
+docs/third-party/CTC模型与英文演示语音来源_2026-10-18.md text eol=lf
+
+# V51 preserve raw frame/sample evidence, failed runs and original font notices.
+scripts/*nested_freeze*.py -text
+docs/validation/evidence/nested-freeze-*/** -text -whitespace
+docs/validation/evidence/nested-freeze-*.json -text -whitespace
+docs/assets/nested-freeze-*/** -text -whitespace
+docs/specs/复合片段定格与完整音画时钟契约_v0.1_2026-10-18.md text eol=lf
+docs/specs/嵌套转场合成与作者时钟契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md text eol=lf
+
+# V52 preserve captured alpha planes, encoded media and actual CLI receipts.
+scripts/*delivery_precision*.py -text
+docs/validation/evidence/delivery-precision-*/** -text -whitespace
+docs/validation/evidence/delivery-precision-*.json -text -whitespace
+docs/assets/delivery-precision-*/** -text -whitespace
+docs/specs/透明视频交付与音画端点契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/透明视频交付与音画端点实测_2026-10-18.md text eol=lf
+skills/video-cut-agent-editor/SKILL.md text eol=lf
+
+# V59 preserve original source matching, frozen research receipts and media bytes.
+scripts/*rose*.py -text
+scripts/prepare_rose_research.py -whitespace
+docs/validation/evidence/rose-*/** -text -whitespace
+docs/assets/rose-*/** -text -whitespace
+docs/specs/ROSE离线对象移除与副作用核验契约_v0.1_2026-10-19.md text eol=lf
+docs/third-party/ROSE原生研究依赖与来源说明_2026-10-19.md text eol=lf
+docs/validation/ROSE*.md text eol=lf
+
+# V60 CUDA admission evidence and executed recipes retain exact bytes.
+product/src/ai_ad_editor/cuda_admission.py -text
+product/tests/test_cuda_admission.py text eol=lf
+scripts/*cuda_admission*.py -text
+docs/validation/evidence/cuda-admission-*/** -text -whitespace
+docs/assets/cuda-admission-*/** -text -whitespace
+docs/specs/VACE物理显卡准入与分阶段资源检查契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/VACE物理显卡准入与真实交付实测_2026-10-19.md text eol=lf
+scripts/audit_openfilm_workflow_routes.py -text
+docs/validation/evidence/openfilm-workflow-map-*/** -text -whitespace
+docs/OpenFilm创作流程本地适配设计_2026-10-19.md text eol=lf
+
+# V61 workflow media and executed recipes retain original bytes.
+scripts/*openfilm_workflow*.py -text
+scripts/capture_openfilm_workflow_demo.mjs -text
+docs/assets/openfilm-workflow-*/** -text -whitespace
+docs/validation/evidence/openfilm-workflows-*/** -text -whitespace
+docs/specs/OpenFilm三套本地创作Skill适配与实片核验契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/OpenFilm三套本地创作Skill与实片核验_2026-10-19.md text eol=lf
+skills/video-cut-reference-remake/SKILL.md text eol=lf
+skills/video-cut-long-to-short/SKILL.md text eol=lf
+skills/video-cut-screen-demo/SKILL.md text eol=lf
+
+# V62 OCR observations, actual native encodes and executed evidence are byte-bound.
+scripts/*ocr*.py -text
+scripts/run_frozen_regression.py -text
+product/src/ai_ad_editor/local_ocr.py -text
+product/src/ai_ad_editor/ocr_cli.py -text
+product/src/ai_ad_editor/ocr_worker.py -text
+product/src/ai_ad_editor/ocr_geometry.py -text
+product/src/ai_ad_editor/PADDLE_OCR_LICENSE.txt -text -whitespace
+product/src/ai_ad_editor/PADDLE_OCR_NOTICE.txt -text
+docs/assets/ocr-*/** -text -whitespace
+docs/validation/evidence/ocr-*/** -text -whitespace
+docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/离线OCR与文字锚点真实成片实测_2026-10-19.md text eol=lf
+docs/third-party/PP-OCRv4离线模型与许可来源_2026-10-19.md text eol=lf
+
+# R06 fixed OpenFilm source research, separate from V62 product evidence.
+scripts/audit_openfilm_r06.py -text
+scripts/sync_openfilm_r06_documents.py -text
+sources/upstream/openfilm-refresh-20261019-r06/** -text -whitespace
+docs/validation/evidence/openfilm-head-20261019-r06/** -text -whitespace
+docs/validation/evidence/openfilm-refresh-20261019-r06/** -text -whitespace
+docs/validation/evidence/openfilm-reuse-20261019-r06/** -text -whitespace
+docs/OpenFilm导出修复与纯轨道模块复用复核_2026-10-19.md text eol=lf
+
+# R07 fixed OpenFilm 0.2.1 acquisition and native source-only observations.
+scripts/audit_openfilm_r07.py -text
+scripts/audit_openfilm_r07_delivery.py -text
+scripts/sync_openfilm_r07_documents.py -text
+sources/upstream/openfilm-refresh-20261019-r07/** -text -whitespace
+docs/validation/evidence/openfilm-refresh-20261019-r07/** -text -whitespace
+docs/validation/evidence/openfilm-reuse-20261019-r07*/** -text -whitespace
+docs/OpenFilm_0.2.1复用清单与成本复核_2026-10-19.md text eol=lf
+
+# V65 native hardware execution logs, media and release receipts are byte-bound.
+docs/validation/evidence/hardware-acceleration-20261019-v65/** -text -whitespace
+docs/assets/hardware-acceleration-20261019-v65-*/** -text -whitespace
+scripts/smoke_hardware_acceleration.py -text
+scripts/verify_hardware_acceleration_install.py -text
+scripts/audit_hardware_acceleration_media.py -text
+scripts/sync_hardware_acceleration_documents.py -text
+scripts/audit_hardware_acceleration_release.py -text
+
+docs/specs/硬件编解码探测与显式回退契约_v0.1_2026-10-19.md text eol=lf
+
+docs/validation/硬件编解码与显式回退实测_2026-10-19.md text eol=lf
+
+# V66 real local outpainting, archived VACE retry and executed evidence.
+docs/validation/evidence/video-outpainting-20261019-v66/** -text -whitespace
+docs/validation/evidence/outpaint-geometry-20261019-v66-r1/** -text -whitespace
+docs/validation/evidence/vace-delivery-20261019-v66-r1/** -text -whitespace
+docs/assets/video-outpainting-20261019-v66-*/** -text -whitespace
+docs/assets/vace-delivery-20261019-v66-r1/** -text -whitespace
+
+# V67 diagnostics and R08 research retain exact native evidence bytes.
+sources/upstream/openfilm-refresh-20261020-r08/** -text -whitespace
+docs/validation/evidence/openfilm-refresh-20261020-r08/** -text -whitespace
+docs/validation/evidence/openfilm-reuse-20261020-r08*/** -text -whitespace
+docs/validation/evidence/pipeline-diagnostics-20261020-v67/** -text -whitespace
+docs/assets/pipeline-diagnostics-20261020-v67*/** -text -whitespace
+scripts/*pipeline_diagnostics*.py -text
+scripts/review_openfilm_r08.py -text
+scripts/review_openfilm_r09.py -text
+docs/validation/evidence/openfilm-recheck-20261020-r09/** -text -whitespace
+docs/OpenFilm最新复用评估与成本取舍_2026-10-20.md text eol=lf
+docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/本地模型管道诊断与回收前留证实测_2026-10-20.md text eol=lf
+scripts/*video_outpainting*.py -text
+scripts/audit_vace_retry_delivery.py -text
+scripts/probe_safetensors_window_read.py -text
+scripts/integrate_vace_pread.py -text
+docs/specs/本地视频扩图与原画面保护契约_v0.1_2026-10-19.md text eol=lf
+docs/specs/VACE本地权重读取与原生访问冲突约束_v0.1_2026-10-20.md text eol=lf
+docs/validation/本地视频扩图与原画面保护实测_2026-10-19.md text eol=lf
+docs/OpenFilm诊断模块复用与原生模型故障后续项_2026-10-20.md text eol=lf
+docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md text eol=lf
