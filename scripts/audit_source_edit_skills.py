@@ -17,7 +17,7 @@ def sha(path):
     return 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def run(output):
+def run(output, expected_count=14):
     assert not output.exists(), output
     validator = Path('C:/Users/carzy/.codex/skills/.system/skill-creator/scripts/quick_validate.py')
     results = []
@@ -45,7 +45,7 @@ def run(output):
                         'validator_stderr': process.stderr.decode('utf-8').strip(),
                         'sha256': sha(source), 'local_links_checked': links,
                         'installed_directory_resolves_to_repo': True})
-    assert len(results) == 14
+    assert len(results) == expected_count
     record = {'checked_at_utc': datetime.now(timezone.utc).isoformat(), 'validator': str(validator),
               'validator_sha256': sha(validator), 'skill_count': len(results),
               'local_links_checked': sum(item['local_links_checked'] for item in results),
@@ -58,5 +58,6 @@ def run(output):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--expected-count', type=int, default=14)
     args = parser.parse_args()
-    run(args.output.resolve())
+    run(args.output.resolve(),args.expected_count)

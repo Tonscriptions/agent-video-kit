@@ -1,0 +1,617 @@
+{
+  "manifest_version": "0.1.0",
+  "operation_id": "render_20261019063044_c1b692fc",
+  "project_id": "proj_20261019063021_0fc26437",
+  "sequence_id": "seq_main",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-workflow-shorts-20261019-v61-r3\\short-1\\renders\\short-1.mkv",
+  "sha256": "56545d702153ba812c13ed3963f229f62781948223e4efe47b582a8f3437c8f2",
+  "probe": {
+    "duration_seconds": 4.0,
+    "duration_tick": 360000,
+    "format": "matroska,webm",
+    "format_long_name": "Matroska / WebM",
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "profile": "High 4:4:4 Predictive",
+        "codec_type": "video",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "mime_codec_string": "avc1.f40016",
+        "width": 640,
+        "height": 360,
+        "coded_width": 640,
+        "coded_height": 360,
+        "has_b_frames": 0,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "16:9",
+        "pix_fmt": "yuv444p",
+        "level": 22,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "is_avc": "true",
+        "nal_length_size": "4",
+        "r_frame_rate": "8/1",
+        "avg_frame_rate": "8/1",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bits_per_raw_sample": "8",
+        "extradata_size": 49,
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 libx264",
+          "DURATION": "00:00:04.000000000"
+        }
+      },
+      {
+        "index": 1,
+        "codec_name": "pcm_f32le",
+        "codec_long_name": "PCM 32-bit floating point little-endian",
+        "codec_type": "audio",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "sample_fmt": "flt",
+        "sample_rate": "48000",
+        "channels": 2,
+        "bits_per_sample": 32,
+        "initial_padding": 0,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/1000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bit_rate": "3072000",
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "ENCODER": "Lavc62.28.100 pcm_f32le",
+          "DURATION": "00:00:04.000000000"
+        }
+      }
+    ],
+    "video": {
+      "codec": "h264",
+      "width": 640,
+      "height": 360,
+      "pix_fmt": "yuv444p",
+      "fps": "8/1",
+      "color_space": "bt709",
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    },
+    "audio": {
+      "codec": "pcm_f32le",
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    }
+  },
+  "command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-hide_banner",
+    "-y",
+    "-loglevel",
+    "error",
+    "-progress",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-workflow-shorts-20261019-v61-r3\\short-1\\renders\\.tmp\\render_20261019063044_c1b692fc\\ffmpeg-progress.log",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-workflow-shorts-20261019-v61-r3\\short-1\\assets\\recording_original-speech.mkv",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-workflow-shorts-20261019-v61-r3\\short-1\\assets\\recording_original-speech.mkv",
+    "-filter_complex",
+    "[0:v]trim=start=0.500000:end=4.500000,setpts=PTS-STARTPTS+0.000000/TB,fps=8/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1[v0];[1:a]atrim=start=0.500000:end=4.500000,asetpts=PTS-STARTPTS,aresample=48000,apad=whole_len=192000,atrim=end_sample=192000,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black@0.0:s=640x360:r=8/1:d=4.000000,format=rgba[subtitlecanvas0];[subtitlecanvas0]split=4[paint_4934d70821f5b5eb_base][paint_4934d70821f5b5eb_mask0][paint_4934d70821f5b5eb_mask1][paint_4934d70821f5b5eb_mask2];[paint_4934d70821f5b5eb_mask0]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='If the source is local\\,':fontsize=24:enable='gte(t,0.000000000)*lt(t,1.585000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=white:shadowcolor=black@0:bordercolor=black@0:fontcolor=black@0,format=gbrap,geq=r=0:g=0:b=0:a='r(X,Y)*114/255',format=rgba[paint_4934d70821f5b5eb_color0];[paint_4934d70821f5b5eb_base][paint_4934d70821f5b5eb_color0]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_4934d70821f5b5eb_over0];[paint_4934d70821f5b5eb_mask1]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='If the source is local\\,':fontsize=24:enable='gte(t,0.000000000)*lt(t,1.585000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=black@0:shadowcolor=black@0:bordercolor=white:fontcolor=black@0,format=gbrap,geq=r=0:g=0:b=0:a='r(X,Y)*255/255',format=rgba[paint_4934d70821f5b5eb_color1];[paint_4934d70821f5b5eb_over0][paint_4934d70821f5b5eb_color1]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_4934d70821f5b5eb_over1];[paint_4934d70821f5b5eb_mask2]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='If the source is local\\,':fontsize=24:enable='gte(t,0.000000000)*lt(t,1.585000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=black@0:shadowcolor=black@0:bordercolor=black@0:fontcolor=white,format=gbrap,geq=r=255:g=255:b=255:a='r(X,Y)*255/255',format=rgba[paint_4934d70821f5b5eb_color2];[paint_4934d70821f5b5eb_over1][paint_4934d70821f5b5eb_color2]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_4934d70821f5b5eb_over2];[paint_4934d70821f5b5eb_over2]format=rgba,format=rgba[subtitlelayer0];color=c=black@0.0:s=640x360:r=8/1:d=4.000000,format=rgba[subtitlecanvas1];[subtitlecanvas1]split=4[paint_11e1634606b3e383_base][paint_11e1634606b3e383_mask0][paint_11e1634606b3e383_mask1][paint_11e1634606b3e383_mask2];[paint_11e1634606b3e383_mask0]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='the editor can process it offline.':fontsize=24:enable='gte(t,1.585000000)*lt(t,4.000000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=white:shadowcolor=black@0:bordercolor=black@0:fontcolor=black@0,format=gbrap,geq=r=0:g=0:b=0:a='r(X,Y)*114/255',format=rgba[paint_11e1634606b3e383_color0];[paint_11e1634606b3e383_base][paint_11e1634606b3e383_color0]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_11e1634606b3e383_over0];[paint_11e1634606b3e383_mask1]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='the editor can process it offline.':fontsize=24:enable='gte(t,1.585000000)*lt(t,4.000000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=black@0:shadowcolor=black@0:bordercolor=white:fontcolor=black@0,format=gbrap,geq=r=0:g=0:b=0:a='r(X,Y)*255/255',format=rgba[paint_11e1634606b3e383_color1];[paint_11e1634606b3e383_over0][paint_11e1634606b3e383_color1]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_11e1634606b3e383_over1];[paint_11e1634606b3e383_mask2]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='the editor can process it offline.':fontsize=24:enable='gte(t,1.585000000)*lt(t,4.000000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=black@0:shadowcolor=black@0:bordercolor=black@0:fontcolor=white,format=gbrap,geq=r=255:g=255:b=255:a='r(X,Y)*255/255',format=rgba[paint_11e1634606b3e383_color2];[paint_11e1634606b3e383_over1][paint_11e1634606b3e383_color2]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_11e1634606b3e383_over2];[paint_11e1634606b3e383_over2]format=rgba,format=rgba[subtitlelayer1];color=c=black:s=640x360:r=8/1:d=4.000000[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0][subtitlelayer0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo1];[vo1][subtitlelayer1]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo2];[vo2]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]aresample=48000,apad=whole_len=192000,atrim=end_sample=192000,asetpts=N/SR/TB[aout]",
+    "-map",
+    "[vout]",
+    "-map",
+    "[aout]",
+    "-t",
+    "4.000000000",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "medium",
+    "-crf",
+    "0",
+    "-pix_fmt",
+    "yuv444p",
+    "-color_primaries",
+    "bt709",
+    "-color_trc",
+    "bt709",
+    "-colorspace",
+    "bt709",
+    "-color_range",
+    "tv",
+    "-c:a",
+    "pcm_f32le",
+    "-f",
+    "matroska",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-workflow-shorts-20261019-v61-r3\\short-1\\renders\\.tmp\\render_20261019063044_c1b692fc\\short-1.mkv"
+  ],
+  "filter_graph_transport": {
+    "mode": "inline",
+    "sha256": "sha256:e65e35f5ebcc617f870c2d08f40c6ef560552dcd5d72588d4918da2480082c2e",
+    "utf8_bytes": 5047,
+    "logical_command_utf16_units": 5994
+  },
+  "filter_complex": "[0:v]trim=start=0.500000:end=4.500000,setpts=PTS-STARTPTS+0.000000/TB,fps=8/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1[v0];[1:a]atrim=start=0.500000:end=4.500000,asetpts=PTS-STARTPTS,aresample=48000,apad=whole_len=192000,atrim=end_sample=192000,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black@0.0:s=640x360:r=8/1:d=4.000000,format=rgba[subtitlecanvas0];[subtitlecanvas0]split=4[paint_4934d70821f5b5eb_base][paint_4934d70821f5b5eb_mask0][paint_4934d70821f5b5eb_mask1][paint_4934d70821f5b5eb_mask2];[paint_4934d70821f5b5eb_mask0]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='If the source is local\\,':fontsize=24:enable='gte(t,0.000000000)*lt(t,1.585000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=white:shadowcolor=black@0:bordercolor=black@0:fontcolor=black@0,format=gbrap,geq=r=0:g=0:b=0:a='r(X,Y)*114/255',format=rgba[paint_4934d70821f5b5eb_color0];[paint_4934d70821f5b5eb_base][paint_4934d70821f5b5eb_color0]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_4934d70821f5b5eb_over0];[paint_4934d70821f5b5eb_mask1]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='If the source is local\\,':fontsize=24:enable='gte(t,0.000000000)*lt(t,1.585000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=black@0:shadowcolor=black@0:bordercolor=white:fontcolor=black@0,format=gbrap,geq=r=0:g=0:b=0:a='r(X,Y)*255/255',format=rgba[paint_4934d70821f5b5eb_color1];[paint_4934d70821f5b5eb_over0][paint_4934d70821f5b5eb_color1]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_4934d70821f5b5eb_over1];[paint_4934d70821f5b5eb_mask2]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='If the source is local\\,':fontsize=24:enable='gte(t,0.000000000)*lt(t,1.585000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=black@0:shadowcolor=black@0:bordercolor=black@0:fontcolor=white,format=gbrap,geq=r=255:g=255:b=255:a='r(X,Y)*255/255',format=rgba[paint_4934d70821f5b5eb_color2];[paint_4934d70821f5b5eb_over1][paint_4934d70821f5b5eb_color2]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_4934d70821f5b5eb_over2];[paint_4934d70821f5b5eb_over2]format=rgba,format=rgba[subtitlelayer0];color=c=black@0.0:s=640x360:r=8/1:d=4.000000,format=rgba[subtitlecanvas1];[subtitlecanvas1]split=4[paint_11e1634606b3e383_base][paint_11e1634606b3e383_mask0][paint_11e1634606b3e383_mask1][paint_11e1634606b3e383_mask2];[paint_11e1634606b3e383_mask0]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='the editor can process it offline.':fontsize=24:enable='gte(t,1.585000000)*lt(t,4.000000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=white:shadowcolor=black@0:bordercolor=black@0:fontcolor=black@0,format=gbrap,geq=r=0:g=0:b=0:a='r(X,Y)*114/255',format=rgba[paint_11e1634606b3e383_color0];[paint_11e1634606b3e383_base][paint_11e1634606b3e383_color0]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_11e1634606b3e383_over0];[paint_11e1634606b3e383_mask1]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='the editor can process it offline.':fontsize=24:enable='gte(t,1.585000000)*lt(t,4.000000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=black@0:shadowcolor=black@0:bordercolor=white:fontcolor=black@0,format=gbrap,geq=r=0:g=0:b=0:a='r(X,Y)*255/255',format=rgba[paint_11e1634606b3e383_color1];[paint_11e1634606b3e383_over0][paint_11e1634606b3e383_color1]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_11e1634606b3e383_over1];[paint_11e1634606b3e383_mask2]format=rgba,lutrgb=r=0:g=0:b=0:a=255,drawtext=text='the editor can process it offline.':fontsize=24:enable='gte(t,1.585000000)*lt(t,4.000000000)':fontfile='assets/font_DejaVuSans.ttf':borderw=2:x='(w-text_w)/2':y='h-text_h-24':box=1:boxborderw=12:boxcolor=black@0:shadowcolor=black@0:bordercolor=black@0:fontcolor=white,format=gbrap,geq=r=255:g=255:b=255:a='r(X,Y)*255/255',format=rgba[paint_11e1634606b3e383_color2];[paint_11e1634606b3e383_over1][paint_11e1634606b3e383_color2]overlay=x=0:y=0:format=rgb:alpha=straight:shortest=1[paint_11e1634606b3e383_over2];[paint_11e1634606b3e383_over2]format=rgba,format=rgba[subtitlelayer1];color=c=black:s=640x360:r=8/1:d=4.000000[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0][subtitlelayer0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo1];[vo1][subtitlelayer1]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo2];[vo2]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]aresample=48000,apad=whole_len=192000,atrim=end_sample=192000,asetpts=N/SR/TB[aout]",
+  "inputs": [
+    {
+      "kind": "sequence-projection-budget",
+      "method": "bilinear",
+      "max_working_bytes": 1073741824,
+      "nodes": [],
+      "estimated_working_bytes": 0,
+      "scope": "reachable-sequence-projection-instances-only-not-process-rss",
+      "time_disjoint_instances_charged": true,
+      "unused_sequences_charged": false
+    },
+    {
+      "asset_id": "recording",
+      "clip_id": "source-line-0",
+      "input": 0,
+      "kind": "video",
+      "source_in_tick": 45000,
+      "source_out_tick": 405000
+    },
+    {
+      "asset_id": "recording",
+      "clip_id": "source-audio-0",
+      "track_id": "track_audio_1",
+      "input": 1,
+      "kind": "audio",
+      "source_in_tick": 45000,
+      "source_out_tick": 405000,
+      "timeline_start_sample": 0,
+      "duration_samples": 192000,
+      "sample_rate": 48000,
+      "group_id": null
+    },
+    {
+      "kind": "subtitle",
+      "clip_id": "subtitle_piece_20261019063038_ded1dace",
+      "subtitle_time_mapping": {
+        "version": "1",
+        "maps": [],
+        "authored_start_seconds": 0.0,
+        "authored_duration_seconds": 1.585,
+        "reverse_boundary_bias_seconds": 0.0,
+        "freeze_semantics_approximate": false,
+        "clock": "original-sequence-presentation-time",
+        "asset_time_base": "clip-local-inline",
+        "asset_time_offset_tick": 0,
+        "engine": "drawtext",
+        "frame_clock": "unchanged",
+        "continuous_playback_reviewed": false,
+        "text_paint": {
+          "engine": "straight-component-source-over",
+          "paints": [
+            {
+              "engine": "straight-component-source-over",
+              "coverage": "opaque-white-drawtext-on-opaque-black",
+              "component_order": [
+                "boxcolor",
+                "bordercolor",
+                "fontcolor"
+              ],
+              "colors": [
+                {
+                  "component": "boxcolor",
+                  "protocol": "ffmpeg-rgba-color-v1",
+                  "ffmpeg_sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+                  "value": "black@0.45",
+                  "cache_key": "5256c6b153e2cbedee17ac589f7aa8c01edf887f05d2b9c9f6178cd2824458fc",
+                  "rgba": [
+                    0,
+                    0,
+                    0,
+                    114
+                  ]
+                },
+                {
+                  "component": "bordercolor",
+                  "protocol": "ffmpeg-rgba-color-v1",
+                  "ffmpeg_sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+                  "value": "black",
+                  "cache_key": "241f12d1052462fd1684b24c3754ca538164b91410ec655c3b4187f361f4490d",
+                  "rgba": [
+                    0,
+                    0,
+                    0,
+                    255
+                  ]
+                },
+                {
+                  "component": "fontcolor",
+                  "protocol": "ffmpeg-rgba-color-v1",
+                  "ffmpeg_sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+                  "value": "white",
+                  "cache_key": "ffc5165aaef0dc488e607222a550e94f5823e00a4fec25bb49229f00d2dcf945",
+                  "rgba": [
+                    255,
+                    255,
+                    255,
+                    255
+                  ]
+                }
+              ],
+              "alpha_application": "coverage-times-color-alpha-once",
+              "working_color": "encoded-rgb-8bit"
+            }
+          ],
+          "working_color": "encoded-rgb-8bit",
+          "linear_light_accepted": false
+        }
+      }
+    },
+    {
+      "kind": "subtitle",
+      "clip_id": "subtitle_piece_20261019063038_e1435a8a",
+      "subtitle_time_mapping": {
+        "version": "1",
+        "maps": [],
+        "authored_start_seconds": 1.585,
+        "authored_duration_seconds": 2.415,
+        "reverse_boundary_bias_seconds": 0.0,
+        "freeze_semantics_approximate": false,
+        "clock": "original-sequence-presentation-time",
+        "asset_time_base": "clip-local-inline",
+        "asset_time_offset_tick": 0,
+        "engine": "drawtext",
+        "frame_clock": "unchanged",
+        "continuous_playback_reviewed": false,
+        "text_paint": {
+          "engine": "straight-component-source-over",
+          "paints": [
+            {
+              "engine": "straight-component-source-over",
+              "coverage": "opaque-white-drawtext-on-opaque-black",
+              "component_order": [
+                "boxcolor",
+                "bordercolor",
+                "fontcolor"
+              ],
+              "colors": [
+                {
+                  "component": "boxcolor",
+                  "protocol": "ffmpeg-rgba-color-v1",
+                  "ffmpeg_sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+                  "value": "black@0.45",
+                  "cache_key": "5256c6b153e2cbedee17ac589f7aa8c01edf887f05d2b9c9f6178cd2824458fc",
+                  "rgba": [
+                    0,
+                    0,
+                    0,
+                    114
+                  ]
+                },
+                {
+                  "component": "bordercolor",
+                  "protocol": "ffmpeg-rgba-color-v1",
+                  "ffmpeg_sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+                  "value": "black",
+                  "cache_key": "241f12d1052462fd1684b24c3754ca538164b91410ec655c3b4187f361f4490d",
+                  "rgba": [
+                    0,
+                    0,
+                    0,
+                    255
+                  ]
+                },
+                {
+                  "component": "fontcolor",
+                  "protocol": "ffmpeg-rgba-color-v1",
+                  "ffmpeg_sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+                  "value": "white",
+                  "cache_key": "ffc5165aaef0dc488e607222a550e94f5823e00a4fec25bb49229f00d2dcf945",
+                  "rgba": [
+                    255,
+                    255,
+                    255,
+                    255
+                  ]
+                }
+              ],
+              "alpha_application": "coverage-times-color-alpha-once",
+              "working_color": "encoded-rgb-8bit"
+            }
+          ],
+          "working_color": "encoded-rgb-8bit",
+          "linear_light_accepted": false
+        }
+      }
+    },
+    {
+      "kind": "audio-track-bus",
+      "track_id": "track_audio_1",
+      "scope_id": null,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "processing": {},
+      "sample_rate": 48000
+    },
+    {
+      "kind": "sequence-audio-root",
+      "sample_rate": 48000,
+      "output_samples": 192000,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "automatic_limiter": false,
+      "has_audible_inputs": true
+    }
+  ],
+  "profile": null,
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 8,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 640,
+      "height": 360,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mkv",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "pcm_f32le",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "delivery": {
+    "clock": {
+      "authored_duration_tick": 360000,
+      "ticks_per_second": 90000,
+      "expected_video_frames": 32,
+      "expected_video_end_seconds": 4.0,
+      "expected_audio_samples_48000": 192000
+    }
+  },
+  "warnings": [],
+  "quality": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "metrics": {
+      "duration_seconds": 4.0,
+      "width": 640,
+      "height": 360,
+      "audio_codec": "pcm_f32le",
+      "video_duration_seconds": 4.0,
+      "audio_duration_seconds": 4.0,
+      "av_duration_delta_seconds": 0.0,
+      "av_start_delta_seconds": 0.0,
+      "av_end_delta_seconds": 0.0,
+      "av_sync_residual_seconds": 0.0,
+      "av_sync_residuals": {
+        "start_delta_seconds": 0.0,
+        "end_delta_seconds": 0.0,
+        "video_start_seconds": 0.0,
+        "audio_start_seconds": 0.0,
+        "video_end_seconds": 0.0,
+        "audio_end_seconds": 0.0
+      },
+      "stream_timing": {
+        "video": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 4.0,
+          "duration_source": "matroska-duration-tag",
+          "end_seconds": 4.0
+        },
+        "audio": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 4.0,
+          "duration_source": "matroska-duration-tag",
+          "end_seconds": 4.0
+        }
+      },
+      "expected_video_frames": 32,
+      "expected_audio_samples": 192000,
+      "expected_video_duration_seconds": 4.0,
+      "expected_audio_duration_seconds": 4.0,
+      "expected_quantization_delta_seconds": 0.0,
+      "probe": {
+        "duration_seconds": 4.0,
+        "duration_tick": 360000,
+        "format": "matroska,webm",
+        "format_long_name": "Matroska / WebM",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High 4:4:4 Predictive",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "mime_codec_string": "avc1.f40016",
+            "width": 640,
+            "height": 360,
+            "coded_width": 640,
+            "coded_height": 360,
+            "has_b_frames": 0,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv444p",
+            "level": 22,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "r_frame_rate": "8/1",
+            "avg_frame_rate": "8/1",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bits_per_raw_sample": "8",
+            "extradata_size": 49,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 libx264",
+              "DURATION": "00:00:04.000000000"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "pcm_f32le",
+            "codec_long_name": "PCM 32-bit floating point little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "sample_fmt": "flt",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 32,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bit_rate": "3072000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 pcm_f32le",
+              "DURATION": "00:00:04.000000000"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 640,
+          "height": 360,
+          "pix_fmt": "yuv444p",
+          "fps": "8/1",
+          "color_space": "bt709",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_f32le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      }
+    }
+  },
+  "project_fingerprint": "715283795091eeaa7f9bc6c396c523033853d85be64b5e0c753df550784bee10",
+  "input_hashes": {
+    "font": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22",
+    "recording": "sha256:d2775dba11c89151f635c2435c3efd696422c0a0598db649c69b89a9697221f8"
+  },
+  "resume_of": null
+}

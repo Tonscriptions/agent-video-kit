@@ -1,0 +1,138 @@
+{
+  "format": "agent-subtitle-segments-v1",
+  "index_unit": "unicode-code-point",
+  "source": {
+    "format": "agent-subtitle-source-v1",
+    "ticks_per_second": 90000,
+    "lines": [
+      {
+        "id": "line-0",
+        "text": "If the source is local, the editor can process it offline.",
+        "start_tick": 0,
+        "end_tick": 360000
+      }
+    ]
+  },
+  "original_source": null,
+  "rules": {
+    "maxCells": 16,
+    "maxChars": 42,
+    "minUnits": 4,
+    "pauseMs": 500,
+    "minMs": 700,
+    "maxMs": 7000,
+    "holdMs": 200,
+    "closeGapMs": 150,
+    "msPerCell": 220,
+    "weight": {
+      "latin": 0.32,
+      "space": 0.15,
+      "clause": 1.5,
+      "sentence": 2.5
+    },
+    "cost": {
+      "piece": 10,
+      "balance": 4,
+      "short": 6,
+      "over": 50,
+      "long": 20,
+      "cjk": 1,
+      "cjkSingle": 1,
+      "mixed": 3,
+      "bracket": 8,
+      "leansBack": 8,
+      "leansForward": 4,
+      "conjunction": -4,
+      "particle": -3,
+      "pause": -10,
+      "sentence": -6,
+      "clause": -4,
+      "distance": 20,
+      "merge": 6
+    }
+  },
+  "pieces": [
+    {
+      "part": 0,
+      "text": "If the source is local,",
+      "display_text": "If the source is local,",
+      "from": 0,
+      "to": 23,
+      "cells": 11.5,
+      "line_id": "line-0",
+      "start_tick": 0,
+      "end_tick": 142650,
+      "timing_basis": "estimated-from-line"
+    },
+    {
+      "part": 1,
+      "text": "the editor can process it offline.",
+      "display_text": "the editor can process it offline.",
+      "from": 24,
+      "to": 58,
+      "cells": 17,
+      "line_id": "line-0",
+      "start_tick": 142650,
+      "end_tick": 360000,
+      "timing_basis": "estimated-from-line"
+    }
+  ],
+  "corrections": [],
+  "algorithm": {
+    "repository": "openfilm/openfilm",
+    "revision": "b138595d4c2d1fa5262b4a8a8c7cd98187c4b077",
+    "path": "packages/openfilm/studio/server/subtitle-segments.mjs",
+    "license": "MIT",
+    "sha256": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "versions": {
+      "node": "22.14.0",
+      "icu": "76.1",
+      "unicode": "16.0"
+    }
+  },
+  "network": "disabled",
+  "warnings": [
+    {
+      "code": "SUBTITLE_SEGMENT_ESTIMATED_TIMING",
+      "line_id": "line-0"
+    }
+  ],
+  "input": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-workflow-shorts-20261019-v61-r3\\short-1-captions.json",
+  "input_sha256": "sha256:e52cee9f806ac928958a2eb6b58fb162860721db8e7f35dc946b5fc6f5e9a159",
+  "mode": "original",
+  "display_cues": [
+    {
+      "start_tick": 0,
+      "end_tick": 142650,
+      "text": "If the source is local,",
+      "line_id": "line-0",
+      "parts": [
+        0
+      ],
+      "translation_group": [
+        "line-0",
+        null,
+        null
+      ]
+    },
+    {
+      "start_tick": 142650,
+      "end_tick": 360000,
+      "text": "the editor can process it offline.",
+      "line_id": "line-0",
+      "parts": [
+        1
+      ],
+      "translation_group": [
+        "line-0",
+        null,
+        null
+      ]
+    }
+  ],
+  "timeline_start_tick": 0,
+  "parent_rights_refs": [
+    "recording"
+  ],
+  "operation_id": "op_20261019063038_4fdc3552"
+}
