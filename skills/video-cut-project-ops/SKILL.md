@@ -5,6 +5,15 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+For identical deliverables with different output names, read the
+[serial batch reuse contract](../../docs/specs/同批次相同渲染结果复用契约_v0.1_2026-10-20.md)
+and [actual reuse evidence](../../docs/validation/OpenFilm同批次结果复用实测_2026-10-20.md).
+Use `queue run --reuse-identical` only with one worker and new targets.
+The index lasts for this invocation; each target repeats rights and structural
+checks. Inspect `reuse_summary`, the content snapshot and source operation.
+Copied output does not execute a new encoder or hardware probe. Unsupported
+dependency configurations reject; ordinary queue rendering remains available.
+
 For failed native RVM/SAM2/LaMa/VACE jobs, use the
 [pipeline diagnostic contract](../../docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md).
 Keep the original error/operation ID and optional `diagnostics` reference.

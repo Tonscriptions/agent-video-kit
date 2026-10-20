@@ -935,6 +935,7 @@ def build_parser() -> argparse.ArgumentParser:
     queue_run.add_argument("--max-jobs", type=int, default=None, help="本次最多执行的待处理作业数")
     queue_run.add_argument("--continue-on-error", action="store_true", help="单个作业失败后继续执行后续作业")
     queue_run.add_argument("--workers", type=int, default=1, help="本次最多并发的本地 FFmpeg worker 数；默认 1，超过 1 时必须同时使用 --continue-on-error")
+    queue_run.add_argument('--reuse-identical', action='store_true', help='显式复用同次串行调用内相同内容的成功产物；要求完整本地依赖和新输出路径')
     queue_cancel = _leaf_common(queue_sub.add_parser("cancel", help="请求取消或取消尚未启动的作业"))
     queue_cancel.add_argument("--project", required=True)
     queue_cancel.add_argument("--job-id", required=True)
@@ -5855,6 +5856,7 @@ def _queue_run_parallel(
             job["attempts"] = int(job.get("attempts", 0)) + 1
             job["cancel_requested"] = False
             job["operation_id"] = None
+            job.pop('reuse', None)
             set_status(job, "running")
             runnable.append(copy.deepcopy(job))
         queue = latest_queue
@@ -6056,6 +6058,9 @@ def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
     workers = int(getattr(args, "workers", 1) or 1)
     if workers <= 0:
         raise argument_error("--workers 必须大于 0", "--workers")
+    reuse_enabled = bool(getattr(args, 'reuse_identical', False))
+    if reuse_enabled and workers != 1:
+        raise argument_error('--reuse-identical 首版只支持 --workers 1', '--reuse-identical')
     if workers > 1 and not args.continue_on_error:
         raise argument_error("--workers 大于 1 时必须同时使用 --continue-on-error，以保证并发批次的失败语义明确", "--workers")
     if args.job_id:
@@ -6068,8 +6073,12 @@ def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
             if args.max_jobs <= 0:
                 raise argument_error("--max-jobs 必须大于 0", "--max-jobs")
             selected = selected[:args.max_jobs]
+    if reuse_enabled:
+        conflicts = _queue_output_conflicts(root, selected)
+        if conflicts:
+            raise AppError('QUEUE_OUTPUT_CONFLICT', '复用批次的目标路径不得重复', exit_code=2, cause=', '.join(conflicts))
     if args.dry_run:
-        return _envelope("queue.run", args, status="planned", data={"queue": str(queue_path(root)), "jobs": [job.get("job_id") for job in selected], "count": len(selected), "continue_on_error": bool(args.continue_on_error), "workers": workers})
+        return _envelope("queue.run", args, status="planned", data={"queue": str(queue_path(root)), "jobs": [job.get("job_id") for job in selected], "count": len(selected), "continue_on_error": bool(args.continue_on_error), "workers": workers, 'reuse_identical': reuse_enabled})
 
     if workers > 1 and len(selected) > 1:
         args.workers = workers
@@ -6079,6 +6088,10 @@ def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
     summary = {"selected": len(selected), "succeeded": 0, "failed": 0, "cancelled": 0, "skipped": 0}
     errors: list[dict[str, Any]] = []
     job_results: list[dict[str, Any]] = []
+    reuse_session = None
+    if reuse_enabled:
+        from .queue_reuse import ReuseSession
+        reuse_session = ReuseSession(root)
     for job in selected:
         job_id = str(job["job_id"])
         marker = cancel_path(root, job_id)
@@ -6100,8 +6113,13 @@ def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
             job["attempts"] = int(job.get("attempts", 0)) + 1
             job["cancel_requested"] = False
             job["operation_id"] = None
+            job.pop('reuse', None)
             set_status(job, "running")
             save_queue(root, queue)
+        reuse_output = None
+        committed = False
+        captured = None
+        reused = False
         try:
             sequence = find_sequence(project, job.get("sequence_id"))
             report = validate_project(root, project, strict_rights=bool(job.get("publish", False)), target="commercial_ad")
@@ -6113,7 +6131,24 @@ def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
             progress_callback = None
             if getattr(args, "progress", "none") == "jsonl":
                 progress_callback = lambda operation_id, event_type, percent, message: _progress(args, operation_id, event_type, "queue.render", percent, message)
-            result = render_project(root, project, sequence, output, dry_run=False, render_settings=render_settings, profile=profile, cancel_file=marker, progress_callback=progress_callback)
+            if reuse_session is not None:
+                reuse_session.assert_new_target(output)
+                reuse_output = output
+                snapshot = reuse_session.snapshot(project, sequence, render_settings, marker)
+                previous = reuse_session.entries.get(snapshot['signature'])
+                if previous is not None:
+                    result = reuse_session.clone(previous, snapshot, project, sequence, render_settings, output,
+                        profile=profile, marker=marker, progress_callback=progress_callback)
+                    reused = True
+                else:
+                    from .queue_reuse import cache_inventory, check_entries
+                    existing_cache = cache_inventory(root, marker)
+                    result = render_project(root, project, sequence, output, dry_run=False, render_settings=render_settings, profile=profile, cancel_file=marker, progress_callback=progress_callback)
+                    reuse_session.unchanged(snapshot, project, sequence, render_settings, marker)
+                    check_entries(existing_cache, marker)
+                    captured = reuse_session.capture(snapshot, result, job_id)
+            else:
+                result = render_project(root, project, sequence, output, dry_run=False, render_settings=render_settings, profile=profile, cancel_file=marker, progress_callback=progress_callback)
             with queue_cancel_lock(root, timeout=2.0):
                 if marker.exists():
                     raise AppError("CANCELLED", "队列作业在渲染完成提交前收到取消请求", exit_code=8, path=str(marker))
@@ -6121,14 +6156,22 @@ def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
                 project.setdefault("outputs", []).append({"id": new_id("output"), "path": str(output), "container": encoder.get("container", job.get("container", "mp4")), "profile": profile, "canvas": render_settings.get("canvas", {}), "video": encoder.get("video", {}), "audio": encoder.get("audio", {}), "target_platform": "generic"})
                 project.setdefault("provenance", {}).setdefault("change_log", []).append({"command": "queue.run", "queue_job_id": job_id, "at": now_iso(), "output": str(output), "manifest": result.get("manifest")})
                 save_project(root, project)
-                _operation(root, result.get("operation_id", new_id("op")), {"operation_id": result.get("operation_id"), "command": "render", "queue_job_id": job_id, "status": "succeeded", "output": str(output), "manifest": result.get("manifest"), "warnings": result.get("warnings", []), "profile": profile, "settings": render_settings, "project_id": project["project"]["id"], "sequence_id": sequence["id"], "project_fingerprint": result.get("project_fingerprint"), "input_hashes": result.get("input_hashes", {}), "created_at": now_iso()})
+                _operation(root, result.get("operation_id", new_id("op")), {"operation_id": result.get("operation_id"), "command": "render", "queue_job_id": job_id, "status": "succeeded", "output": str(output), "manifest": result.get("manifest"), "warnings": result.get("warnings", []), "profile": profile, "settings": render_settings, "project_id": project["project"]["id"], "sequence_id": sequence["id"], "project_fingerprint": result.get("project_fingerprint"), "input_hashes": result.get("input_hashes", {}), "created_at": now_iso(), **({'reuse': result['reuse']} if reuse_session is not None else {})})
                 queue_warnings = report.get("warnings", []) + result.get("warnings", [])
                 job["warnings"] = queue_warnings
+                if reuse_session is not None:
+                    job['reuse'] = {key: copy.deepcopy(value) for key, value in result['reuse'].items() if key != 'snapshot'}
                 set_status(job, "succeeded", operation_id=result.get("operation_id"))
                 summary["succeeded"] += 1
-                job_results.append({"job_id": job_id, "status": "succeeded", "operation_id": result.get("operation_id"), "path": str(output), "warnings": queue_warnings})
+                job_results.append({"job_id": job_id, "status": "succeeded", "operation_id": result.get("operation_id"), "path": str(output), "warnings": queue_warnings, **({'reuse': {k: v for k, v in result['reuse'].items() if k != 'snapshot'}} if reuse_session is not None else {})})
                 marker.unlink(missing_ok=True)
                 save_queue(root, queue)
+                committed = True
+                if reuse_session is not None:
+                    if captured is not None:
+                        reuse_session.remember(captured)
+                    if reused:
+                        reuse_session.reused += 1
         except AppError as exc:
             error = exc.as_dict()
             set_status(job, "cancelled" if exc.code == "CANCELLED" else "failed", error=error, operation_id=exc.operation_id)
@@ -6140,10 +6183,14 @@ def command_queue_run(args: argparse.Namespace) -> dict[str, Any]:
                 save_queue(root, queue)
             if exc.code != "CANCELLED" and not args.continue_on_error:
                 break
+        finally:
+            if reuse_output is not None and not committed:
+                reuse_output.unlink(missing_ok=True)
+                reuse_output.with_suffix(reuse_output.suffix + '.manifest.json').unlink(missing_ok=True)
 
     final_status = "succeeded" if not errors and summary["cancelled"] == 0 else "partial"
     _operation(root, queue_operation_id, {"operation_id": queue_operation_id, "command": "queue.run", "status": final_status, "project_id": project["project"]["id"], "summary": summary, "jobs": job_results, "created_at": now_iso()})
-    return _envelope("queue.run", args, data={"queue": str(queue_path(root)), "summary": summary, "jobs": job_results, "counts": _queue_counts(queue)}, status=final_status, errors=errors, operation_id=queue_operation_id)
+    return _envelope("queue.run", args, data={"queue": str(queue_path(root)), "summary": summary, "jobs": job_results, "counts": _queue_counts(queue), **({'reuse_summary': {'encoded_successes': reuse_session.encoded, 'reused_successes': reuse_session.reused, 'scope': 'current_invocation', 'persistent_cache': False}} if reuse_session is not None else {})}, status=final_status, errors=errors, operation_id=queue_operation_id)
 
 
 def command_quality_mask(args: argparse.Namespace) -> dict[str, Any]:

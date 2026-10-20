@@ -59,7 +59,7 @@
       "description": "Drive the local Agent-first advertising video editor CLI for project setup, timeline composition, edited clip-group reuse, local TTS, templates, validation, rights checks, conversion, and FFmpeg rendering.",
       "source_kind": "local-product-skill",
       "source_repository": "AI广告剪辑/product",
-      "skill_md_sha256": "1fcce5070e726481fa5c7cb6d43f65331102deda516870879b85a4e2f6d40be8",
+      "skill_md_sha256": "710b8e77ec9db6be2d3b21bba81588aed121819251aa9000bbf7381e2ea528b0",
       "file_count": 2,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -94,6 +94,11 @@
           "sha256": "d0b0b8eef4997da67c78adb2822dbf098a8606316306c645b100a9ffb0f044e5",
           "replaced_at_utc": "2026-10-19T22:34:00.581320+00:00",
           "reason": "V69 local face landmarks and bounded CPU retouch"
+        },
+        {
+          "sha256": "1fcce5070e726481fa5c7cb6d43f65331102deda516870879b85a4e2f6d40be8",
+          "replaced_at_utc": "2026-10-20T00:04:59.312818+00:00",
+          "reason": "V70 opt-in single-invocation queue output reuse"
         }
       ]
     },
@@ -200,7 +205,7 @@
       "description": "Operate local Agent Projects with snapshots, migration, relinking, persistent render queues, cancellation, and deterministic replay.",
       "source_kind": "local-only-skill",
       "source_repository": "AI广告剪辑",
-      "skill_md_sha256": "91e905082b460647265e7cc4e0fc5a2a5ff07ba30daaae3c9fc35fadf6e63ba8",
+      "skill_md_sha256": "782d09f5d64eb2c95676c6d792141a2d83e51d7b9060479d51cc8113bc0340c5",
       "file_count": 1,
       "validation": "Skill is valid!",
       "prefix_verified": true,
@@ -213,6 +218,11 @@
           "sha256": "5777ba513c4b8c3d1f0b2819786801532d3bd9f31e6d9a91a662f265a38b5ac6",
           "replaced_at_utc": "2026-10-19T13:23:41.976992+00:00",
           "reason": "V65 hardware policy/quality/queue contract"
+        },
+        {
+          "sha256": "91e905082b460647265e7cc4e0fc5a2a5ff07ba30daaae3c9fc35fadf6e63ba8",
+          "replaced_at_utc": "2026-10-20T00:04:59.316117+00:00",
+          "reason": "V70 opt-in single-invocation queue output reuse"
         }
       ]
     },
@@ -412,12 +422,12 @@
   },
   "registered_at_utc": "2026-10-15T18:21:52.5523139Z",
   "current_audit": {
-    "record": "docs/validation/evidence/local-face-beauty-20261020-v69/skills-r1.json",
-    "record_sha256": "sha256:624d81ed77cde985c616a998b3dc288095578e6ca40e9ff47efd3f025eed3875",
-    "checked_at_utc": "2026-10-19T22:32:15.115879+00:00",
+    "record": "docs/validation/evidence/openfilm-batch-reuse-20261020-v70/skills-r1.json",
+    "record_sha256": "sha256:d486e094045e10dc867d55e2ee6556853132b04170612549de73cdd3a3c8d559",
+    "checked_at_utc": "2026-10-20T00:00:14.366566+00:00",
     "skills": 17,
-    "local_links_checked": 256,
-    "semantics": "V69 explicit local face landmarks/CPU retouch; actual source and isolated install contracts; natural quality and full parity unaccepted",
+    "local_links_checked": 260,
+    "semantics": "V70 opt-in same-invocation output reuse; source and isolated native media contracts; performance and full CapCut parity unaccepted",
     "candidate": false
   },
   "audit_history": [
@@ -615,6 +625,15 @@
       "skills": 17,
       "local_links_checked": 250,
       "semantics": "V68: explicit previous generated conditions, CLI/protocol/native-package limited verification; generated context is not truth; real VACE quality, natural quality and full CapCut parity unaccepted"
+    },
+    {
+      "record": "docs/validation/evidence/local-face-beauty-20261020-v69/skills-r1.json",
+      "record_sha256": "sha256:624d81ed77cde985c616a998b3dc288095578e6ca40e9ff47efd3f025eed3875",
+      "checked_at_utc": "2026-10-19T22:32:15.115879+00:00",
+      "skills": 17,
+      "local_links_checked": 256,
+      "semantics": "V69 explicit local face landmarks/CPU retouch; actual source and isolated install contracts; natural quality and full parity unaccepted",
+      "candidate": false
     }
   ]
 }

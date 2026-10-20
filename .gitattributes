@@ -20,6 +20,11 @@ scripts/sync_audio_source_context_documents.py -text
 scripts/audit_audio_source_context_release.py -text
 .gitattributes text eol=lf
 .gitignore text eol=lf
+docs/validation/evidence/openfilm-batch-reuse-20261020-v70/** -text -whitespace
+docs/assets/openfilm-batch-reuse-20261020-v70*/** -text -whitespace
+scripts/*queue_reuse*.py -text whitespace=cr-at-eol
+docs/specs/同批次相同渲染结果复用契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/OpenFilm同批次结果复用实测_2026-10-20.md text eol=lf
 docs/validation/evidence/local-face-beauty-20261020-v69/** -text -whitespace
 product/src/ai_ad_editor/OPENSEEFACE_LICENSE.txt -text whitespace=cr-at-eol
 product/src/ai_ad_editor/OPENSEEFACE_NOTICE.txt -text whitespace=cr-at-eol
@@ -510,3 +515,6 @@ docs/specs/VACE本地权重读取与原生访问冲突约束_v0.1_2026-10-20.md 
 docs/validation/本地视频扩图与原画面保护实测_2026-10-19.md text eol=lf
 docs/OpenFilm诊断模块复用与原生模型故障后续项_2026-10-20.md text eol=lf
 docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md text eol=lf
+
+# Preserve the byte-frozen V70 executed test module; allow its terminal blank line.
+product/tests/test_queue_reuse.py whitespace=-blank-at-eof,blank-at-eol,space-before-tab,cr-at-eol

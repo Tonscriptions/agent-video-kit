@@ -1,0 +1,3620 @@
+{
+  "status": "passed",
+  "started_at_utc": "2026-10-19T23:16:49.408266+00:00",
+  "native_windows": true,
+  "virtualization": false,
+  "installed": null,
+  "calls": [
+    {
+      "label": "generate-source",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-y",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "rgba",
+        "-s",
+        "320x180",
+        "-r",
+        "12",
+        "-i",
+        "pipe:0",
+        "-f",
+        "lavfi",
+        "-i",
+        "aevalsrc=0.1*sin(2*PI*220*t)|0.1*sin(2*PI*330*t):s=48000:d=2",
+        "-shortest",
+        "-c:v",
+        "ffv1",
+        "-pix_fmt",
+        "bgra",
+        "-c:a",
+        "pcm_s16le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\source.mkv"
+      ],
+      "exit_code": 0,
+      "seconds": 0.28839839999272954,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "source-rgba",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\source.mkv",
+        "-map",
+        "0:v:0",
+        "-pix_fmt",
+        "rgba",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2666705000010552,
+      "stdout_bytes": 5529600,
+      "stdout_sha256": "d6d04546d1f6edfb25dde3bdb3d4cd267fdf5b108d5e99d64e6c0bb51672d4c2"
+    },
+    {
+      "label": "source-pts",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "frame=best_effort_timestamp_time,pkt_duration_time",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\source.mkv"
+      ],
+      "exit_code": 0,
+      "seconds": 0.13095530000282452,
+      "stdout_bytes": 1877,
+      "stdout_sha256": "3edb9dd9cb1cf013cb5db7b935849071b342cf92e003190240d64edc31385b8c"
+    },
+    {
+      "label": "source-probe",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-show_format",
+        "-show_streams",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\source.mkv"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1278710000042338,
+      "stdout_bytes": 3793,
+      "stdout_sha256": "b58576b0e5bc1628fe52e6381a38b3d0b7b2cb0148129f1f195a0594f20b1aa2"
+    },
+    {
+      "label": "source-pcm",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\source.mkv",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.12630040000658482,
+      "stdout_bytes": 768000,
+      "stdout_sha256": "11a4a8eee51d0937e3bf69a4bb1d23c22bcfe5f370ee53989e177a0b014155bd"
+    },
+    {
+      "label": "source-preview",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-y",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\source.mkv",
+        "-c:v",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p",
+        "-c:a",
+        "aac",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\source-preview.mp4"
+      ],
+      "exit_code": 0,
+      "seconds": 0.3440304000105243,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "project-init",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;sys.exit(main())",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src",
+        "project",
+        "init",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project"
+      ],
+      "exit_code": 0,
+      "seconds": 3.416840099991532,
+      "stdout_bytes": 773,
+      "stdout_sha256": "4e40092e0c42bf3463625ec8a722a987b6660f9ca1bb0902b9fe0bee398a52b3"
+    },
+    {
+      "label": "ingest-video",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;sys.exit(main())",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src",
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\source.mkv",
+        "--asset-id",
+        "source"
+      ],
+      "exit_code": 0,
+      "seconds": 2.8160590000043157,
+      "stdout_bytes": 3818,
+      "stdout_sha256": "1f5b6fa7250d0f5ac47717b1db349ddbca8373fab46bf25f4d6aa78b8475393d"
+    },
+    {
+      "label": "ingest-font",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;sys.exit(main())",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src",
+        "media",
+        "ingest",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\DejaVuSans.ttf",
+        "--asset-id",
+        "font"
+      ],
+      "exit_code": 0,
+      "seconds": 3.0833731000020634,
+      "stdout_bytes": 2109,
+      "stdout_sha256": "c921399f8778faab6b8a259c21f56a6cc6d9fccdfdc0e1d0571e38c96aa13b29"
+    },
+    {
+      "label": "compose",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;sys.exit(main())",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src",
+        "timeline",
+        "compose",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\compose.json"
+      ],
+      "exit_code": 0,
+      "seconds": 2.707692299998598,
+      "stdout_bytes": 3912,
+      "stdout_sha256": "96973c50f79bdd6e557df2ca91119b0d7b89cb0f22c89ad1c92c3b0b5a0687e7"
+    },
+    {
+      "label": "enqueue",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;sys.exit(main())",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src",
+        "queue",
+        "enqueue",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project",
+        "--input",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\jobs.json"
+      ],
+      "exit_code": 0,
+      "seconds": 2.606653399998322,
+      "stdout_bytes": 4597,
+      "stdout_sha256": "f59f793f1f79e2f87ef6893182261f026f7569b63b51c78d3b172425e238705f"
+    },
+    {
+      "label": "dry-run",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;sys.exit(main())",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src",
+        "queue",
+        "run",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project",
+        "--reuse-identical",
+        "--dry-run"
+      ],
+      "exit_code": 0,
+      "seconds": 2.6286713000008604,
+      "stdout_bytes": 708,
+      "stdout_sha256": "37db8155b301e9c4f64c034847c7423286cb47c042f3dc08f67b00a9c9b2fd85"
+    },
+    {
+      "label": "queue-run",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;sys.exit(main())",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src",
+        "queue",
+        "run",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project",
+        "--reuse-identical",
+        "--continue-on-error",
+        "--progress",
+        "jsonl"
+      ],
+      "exit_code": 2,
+      "seconds": 49.98574850001023,
+      "stdout_bytes": 18491,
+      "stdout_sha256": "f5d03dc6bbd61cebfa4fe85a2ba5099d2138c451b2eab5a5f4fd546563eace52"
+    },
+    {
+      "label": "first-mp4-rgba",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\first.mp4",
+        "-map",
+        "0:v:0",
+        "-pix_fmt",
+        "rgba",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9570416000060504,
+      "stdout_bytes": 5529600,
+      "stdout_sha256": "d061766917a6d9e7fa10ca7beb217e720146135522afd91b22a4dd60bfe1664c"
+    },
+    {
+      "label": "first-mp4-pts",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "frame=best_effort_timestamp_time,pkt_duration_time",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\first.mp4"
+      ],
+      "exit_code": 0,
+      "seconds": 0.24369580000347923,
+      "stdout_bytes": 1966,
+      "stdout_sha256": "b3a1a7da1760b79059615d48439514cf2055fa5f9e3e162b0690499f84aac508"
+    },
+    {
+      "label": "first-mp4-probe",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-show_format",
+        "-show_streams",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\first.mp4"
+      ],
+      "exit_code": 0,
+      "seconds": 0.40653750000637956,
+      "stdout_bytes": 4697,
+      "stdout_sha256": "c302f8a8908980046e81e34b89729c949c60d1149cf084c0afb3680ffa824dc2"
+    },
+    {
+      "label": "first-mp4-pcm",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\first.mp4",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.40852620000077877,
+      "stdout_bytes": 770048,
+      "stdout_sha256": "1fd0c2ffe3321393b5179e17f91d3b08486718a97c046232ecd8347009e31535"
+    },
+    {
+      "label": "renamed-mp4-rgba",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\renamed.mp4",
+        "-map",
+        "0:v:0",
+        "-pix_fmt",
+        "rgba",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5093879000050947,
+      "stdout_bytes": 5529600,
+      "stdout_sha256": "d061766917a6d9e7fa10ca7beb217e720146135522afd91b22a4dd60bfe1664c"
+    },
+    {
+      "label": "renamed-mp4-pts",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "frame=best_effort_timestamp_time,pkt_duration_time",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\renamed.mp4"
+      ],
+      "exit_code": 0,
+      "seconds": 0.16499649999605026,
+      "stdout_bytes": 1966,
+      "stdout_sha256": "b3a1a7da1760b79059615d48439514cf2055fa5f9e3e162b0690499f84aac508"
+    },
+    {
+      "label": "renamed-mp4-probe",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-show_format",
+        "-show_streams",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\renamed.mp4"
+      ],
+      "exit_code": 0,
+      "seconds": 0.17643259999749716,
+      "stdout_bytes": 4699,
+      "stdout_sha256": "372791a0c53063acb0e593955d7cecffe2b48b478670b443e3a1099c49c1f733"
+    },
+    {
+      "label": "renamed-mp4-pcm",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\renamed.mp4",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2038495999877341,
+      "stdout_bytes": 770048,
+      "stdout_sha256": "1fd0c2ffe3321393b5179e17f91d3b08486718a97c046232ecd8347009e31535"
+    },
+    {
+      "label": "smaller-mp4-rgba",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\smaller.mp4",
+        "-map",
+        "0:v:0",
+        "-pix_fmt",
+        "rgba",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2721390000078827,
+      "stdout_bytes": 3538944,
+      "stdout_sha256": "6104ffe6faae6fc617405d7b9d3c5c1f1ec830bd069c151c84d2b6268c707fb5"
+    },
+    {
+      "label": "smaller-mp4-pts",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "frame=best_effort_timestamp_time,pkt_duration_time",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\smaller.mp4"
+      ],
+      "exit_code": 0,
+      "seconds": 0.18001289998937864,
+      "stdout_bytes": 1966,
+      "stdout_sha256": "b3a1a7da1760b79059615d48439514cf2055fa5f9e3e162b0690499f84aac508"
+    },
+    {
+      "label": "smaller-mp4-probe",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-show_format",
+        "-show_streams",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\smaller.mp4"
+      ],
+      "exit_code": 0,
+      "seconds": 0.24379890000273008,
+      "stdout_bytes": 4699,
+      "stdout_sha256": "762785cbf63a966945d09996720beadfac8ebbc50025089a54a1d7180b46add4"
+    },
+    {
+      "label": "smaller-mp4-pcm",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\smaller.mp4",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2036050000024261,
+      "stdout_bytes": 770048,
+      "stdout_sha256": "1fd0c2ffe3321393b5179e17f91d3b08486718a97c046232ecd8347009e31535"
+    },
+    {
+      "label": "alpha-first-webm-rgba",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-c:v",
+        "libvpx-vp9",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-first.webm",
+        "-map",
+        "0:v:0",
+        "-pix_fmt",
+        "rgba",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.3069064999872353,
+      "stdout_bytes": 5529600,
+      "stdout_sha256": "e633bfa78986747e5b29c0e552bdfe22eb509555fe6dbbc5df16785ee2debe3a"
+    },
+    {
+      "label": "alpha-first-webm-pts",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "frame=best_effort_timestamp_time,pkt_duration_time",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-first.webm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.16212919999088626,
+      "stdout_bytes": 1877,
+      "stdout_sha256": "3edb9dd9cb1cf013cb5db7b935849071b342cf92e003190240d64edc31385b8c"
+    },
+    {
+      "label": "alpha-first-webm-probe",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-show_format",
+        "-show_streams",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-first.webm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.24085990000457969,
+      "stdout_bytes": 4038,
+      "stdout_sha256": "08827590c45cd0389fcd5fada7f58ea4d0ecef05d79846c6627b48e09656c0b4"
+    },
+    {
+      "label": "alpha-first-webm-pcm",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-first.webm",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1425870999955805,
+      "stdout_bytes": 768000,
+      "stdout_sha256": "fa30d896be113ea216a5925865765e69472e77353718a1ce89f35e0fff3de3a9"
+    },
+    {
+      "label": "alpha-copy-webm-rgba",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-c:v",
+        "libvpx-vp9",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-copy.webm",
+        "-map",
+        "0:v:0",
+        "-pix_fmt",
+        "rgba",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2147893999936059,
+      "stdout_bytes": 5529600,
+      "stdout_sha256": "e633bfa78986747e5b29c0e552bdfe22eb509555fe6dbbc5df16785ee2debe3a"
+    },
+    {
+      "label": "alpha-copy-webm-pts",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "frame=best_effort_timestamp_time,pkt_duration_time",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-copy.webm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.13024569999834057,
+      "stdout_bytes": 1877,
+      "stdout_sha256": "3edb9dd9cb1cf013cb5db7b935849071b342cf92e003190240d64edc31385b8c"
+    },
+    {
+      "label": "alpha-copy-webm-probe",
+      "command": [
+        "ffprobe",
+        "-v",
+        "error",
+        "-show_format",
+        "-show_streams",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-copy.webm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.13954069999454077,
+      "stdout_bytes": 4037,
+      "stdout_sha256": "c0f6fefbd994a36efc01c8e3eacec3aefc832a82df46d2dfb68a60def9b06a5a"
+    },
+    {
+      "label": "alpha-copy-webm-pcm",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-copy.webm",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2655289999966044,
+      "stdout_bytes": 768000,
+      "stdout_sha256": "fa30d896be113ea216a5925865765e69472e77353718a1ce89f35e0fff3de3a9"
+    },
+    {
+      "label": "inspect-copy",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;sys.exit(main())",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src",
+        "queue",
+        "inspect",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project",
+        "--job-id",
+        "copy"
+      ],
+      "exit_code": 0,
+      "seconds": 2.7880896999995457,
+      "stdout_bytes": 6826,
+      "stdout_sha256": "ef9b7ea91ef98e633c31a45bcdbdf255e7d72d3b5bcc5340c787f279bbd6c477"
+    },
+    {
+      "label": "validate",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;sys.exit(main())",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src",
+        "validate",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project"
+      ],
+      "exit_code": 0,
+      "seconds": 2.148806199998944,
+      "stdout_bytes": 4088,
+      "stdout_sha256": "e3ab6c79b52997aa8d21890e80c5d0b0c2252e5f0d826409651639a3c8afdd4f"
+    },
+    {
+      "label": "policy-audit",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-E",
+        "-B",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;sys.exit(main())",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src",
+        "policy",
+        "audit",
+        "--project",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project"
+      ],
+      "exit_code": 0,
+      "seconds": 2.4244631999899866,
+      "stdout_bytes": 607,
+      "stdout_sha256": "876de76c32ad9ba2e11d40d2fcd6378e13e87f928cec2d6f8528080bf6e96d43"
+    },
+    {
+      "label": "comparison-gif",
+      "command": [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-y",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\first.mp4",
+        "-filter_complex",
+        "fps=6,scale=480:-1:flags=lanczos,split[a][b];[a]palettegen[p];[b][p]paletteuse",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\preview.gif"
+      ],
+      "exit_code": 0,
+      "seconds": 0.20873549999669194,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "checks": [
+    {
+      "name": "source-complete-frames",
+      "ok": true
+    },
+    {
+      "name": "source-rgba-byte-exact",
+      "ok": true
+    },
+    {
+      "name": "dry-run-preserves-queue",
+      "ok": true
+    },
+    {
+      "name": "five-success-one-rejected",
+      "ok": true
+    },
+    {
+      "name": "three-encodes-two-copies",
+      "ok": true
+    },
+    {
+      "name": "actual-progress-execution-counts",
+      "ok": true
+    },
+    {
+      "name": "first-mp4-complete-frames",
+      "ok": true
+    },
+    {
+      "name": "renamed-mp4-complete-frames",
+      "ok": true
+    },
+    {
+      "name": "smaller-mp4-complete-frames",
+      "ok": true
+    },
+    {
+      "name": "alpha-first-webm-complete-frames",
+      "ok": true
+    },
+    {
+      "name": "alpha-copy-webm-complete-frames",
+      "ok": true
+    },
+    {
+      "name": "first.mp4-copy-file-equal",
+      "ok": true
+    },
+    {
+      "name": "first.mp4-copy-full-rgba-equal",
+      "ok": true
+    },
+    {
+      "name": "first.mp4-copy-pts-equal",
+      "ok": true
+    },
+    {
+      "name": "first.mp4-copy-pcm-equal",
+      "ok": true
+    },
+    {
+      "name": "renamed.mp4-honest-copy-provenance",
+      "ok": true
+    },
+    {
+      "name": "alpha-first.webm-copy-file-equal",
+      "ok": true
+    },
+    {
+      "name": "alpha-first.webm-copy-full-rgba-equal",
+      "ok": true
+    },
+    {
+      "name": "alpha-first.webm-copy-pts-equal",
+      "ok": true
+    },
+    {
+      "name": "alpha-first.webm-copy-pcm-equal",
+      "ok": true
+    },
+    {
+      "name": "alpha-copy.webm-honest-copy-provenance",
+      "ok": true
+    },
+    {
+      "name": "alpha-not-opaque",
+      "ok": true
+    }
+  ],
+  "frozen_before": {
+    "docs/specs/agent-project.schema.json": "sha256:7b3a91d818199c179a41e54c725df26403449775fcec66b573e83b2c2faf965f",
+    "product/offline/build.py": "sha256:1b93123f4e34dc18aaf4bb9ecbb4261e423f297103e63e494c9ec883f9871810",
+    "product/offline/install.py": "sha256:4a7bf97d2fe15b92f1448fb118eb07d5625c02741c1585c392a3b0d75dba1c7e",
+    "product/pyproject.toml": "sha256:4c71032e5cfe55f8d2b4f07e459aef39d172f2292e88f9df0346db0c9746993a",
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/agent-project.schema.json": "sha256:7b3a91d818199c179a41e54c725df26403449775fcec66b573e83b2c2faf965f",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_routing.py": "sha256:40f74750a79ea80f016dd2eb8a353d6103682756f01970ad802c6292be8e5af8",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_stretch.py": "sha256:f4120fd82fc4eba79b9dd0bed1093651edbadb19202d7c384530e799d047dced",
+    "product/src/ai_ad_editor/audio_tempo.py": "sha256:3284a08dc75a25dcbeed30c7088a18898c46d398e6e7ae9380efcf0e366afcee",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:2dbb8bce11ecb7f7fd6fa893cca08efdaa6f9c21a3c6f8a4588cbed5092c3a65",
+    "product/src/ai_ad_editor/browser_process.py": "sha256:55c72751a5d3d5e397af030fbf65a7ef5b659646a3890f72e52da816d9ab22a6",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:95ca093d179a783244ef1d235b9af8841f31cc2c522fccd54b00332d953b8a5b",
+    "product/src/ai_ad_editor/captions.py": "sha256:f9a4534682417235a1c2e6ba36072bb92de9354cb5d83b76d06e3ecb22144d28",
+    "product/src/ai_ad_editor/cli.py": "sha256:5b4988dbf1982988aea74462f21474a208e60e7489ecd42cda762ff2dda56ec0",
+    "product/src/ai_ad_editor/clip_windows.py": "sha256:3014424ecce4ec780b2e241afd50c310681c69c4450ebd88b689cea221149377",
+    "product/src/ai_ad_editor/convert.py": "sha256:5ff0ea4edf337b96f88f2a4d5c6ec7e36ab8f42e17260a0a7a9c0bce289c5229",
+    "product/src/ai_ad_editor/ctc_alignment.py": "sha256:a475e9b1acd8ceba2be90884729f0b5a4c76ed354853bc0a57b47f1f9787edd7",
+    "product/src/ai_ad_editor/ctc_cli.py": "sha256:2f20af923ea0a7af6fe9d5080cdb999d6b7c2f26c133a6c2f702d782747c22c8",
+    "product/src/ai_ad_editor/ctc_worker.py": "sha256:933d1c7ca4ac7dc8512d49e17a090b0a89e580724d0228a9ab44a3a14e3e9810",
+    "product/src/ai_ad_editor/cuda_admission.py": "sha256:8d030f776b09edeb9d6cfecce720caca3f20a1fab058dd3dc406020ed064fd3b",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:0eb1e8f649e66cc6f15ef56bfb75d07166a7d7e3a6f1326f50bca349a1c24071",
+    "product/src/ai_ad_editor/edit_planner.py": "sha256:ffe0c9c774f094b57b565ad56f84291d432ce957b1fa578dd44aabd80212b43a",
+    "product/src/ai_ad_editor/effect_automation.py": "sha256:9537dfbfa6469009b13aeb01d846f5181161be81903324f2efd6461e91cdd3fa",
+    "product/src/ai_ad_editor/effects.py": "sha256:f9c37938e50a217d5a511abd5341aad7fdac2575aff26b75eb13ceb90137e9fc",
+    "product/src/ai_ad_editor/errors.py": "sha256:1525e91f86ad7f22c061a35c383d3513cdcad77acab2e364510b42adde0a9721",
+    "product/src/ai_ad_editor/font_coverage.py": "sha256:2f33b3eb07331ef3b87c78286317df8d903a2c991978e9750a39d6bcd117c243",
+    "product/src/ai_ad_editor/fragments.py": "sha256:6087fe24f6f0a2041473ac5ccc04507f7c25c2b598c5a6f65dd7b4ddafe9567f",
+    "product/src/ai_ad_editor/hardware_acceleration.py": "sha256:670ab26584d75f45ca6d6a12df0e096bdbe0d25dba6edc9ef3ea4ccba3f5132f",
+    "product/src/ai_ad_editor/html_motion.py": "sha256:eccfca16e5a3760c9cc9546613231c281fd253ea11e846fad39f98eb7f699889",
+    "product/src/ai_ad_editor/html_motion_worker.mjs": "sha256:435899a68e8ac4e76484c00e2d3f6d8fadcf362475dd9e639d0bd0e7ad7fe0bf",
+    "product/src/ai_ad_editor/html_quality.py": "sha256:7abdb2b18bb86a3d87e058e74b908cb0a430f05273ca9b78122a5985c0b5dba0",
+    "product/src/ai_ad_editor/html_quality_dom.mjs": "sha256:551f997cd5f4f57514354ed4b5292c67e9e82f4c8928db74f4d6c53b57ecdc94",
+    "product/src/ai_ad_editor/html_template.py": "sha256:f3ad9507632d03df9e7de3e4303638325c9667e1005ae9600c62670b06d1436e",
+    "product/src/ai_ad_editor/html_template_dom.mjs": "sha256:ed68388d4dda1adabc689afa508640de471fe8a6e461bc6aeb5292d904950260",
+    "product/src/ai_ad_editor/inline_sequences.py": "sha256:ee1596121f7e0ea88c7d1f8e27d75132b57dc03522a768a2716f97343a1ed911",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:c8b78f2e476e417ed54ea62aa502858eeb13b14c8e91b29fdd15021a4c648154",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:7c8582144a9b17e08558f36777c312099e10fee82f18f49589b07f40b61fb9dc",
+    "product/src/ai_ad_editor/local_ctc.py": "sha256:f4e6bef1bf35603a5828f161462570afa9ca04af4364e0032708700ae3141716",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:34294b2a7184afeda6527db59def5aa6b02efa83e8f3beb6e8e53fec0fe03890",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:c70b82dd131de94729f2fe096fa35e3ad2775e5e2476a04a0b97e11a6939a3c6",
+    "product/src/ai_ad_editor/local_ocr.py": "sha256:cd85a6d7b12ec18b3e024327687c483f1f7cfa0deed2369b968f8ab2bccc14b5",
+    "product/src/ai_ad_editor/local_outpainting.py": "sha256:577ecf6fe26a0718cc734ba6b526f52e974b97262965f965aa37f431add1bd55",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:30c0acaea0c261f35c5e10b3e0df36ebf10b9137608b18109a1c4739095ed361",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:44cb7558644b219234e15c8e4088cb7c760a8f200e00e1ba66fb16b338c83571",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/magnetic_mode.py": "sha256:7b74280ed8df6d94b259548122b44216ca45d6726084504aa6fdd05524f460e1",
+    "product/src/ai_ad_editor/magnetic_reorder.py": "sha256:b3db1863adfa7cb88173a864c127d01ebfa33c2ba46dc21b340ea660db03eef1",
+    "product/src/ai_ad_editor/magnetic_sync.py": "sha256:bd4c59d3045eda011a9cc5e7c8720b9380bc756ee41931867b0f4eb4f22ea939",
+    "product/src/ai_ad_editor/mask_edit.py": "sha256:952aa4c1cc3f49b2b1c9d5dc0c969901d82d4fcbe660387af2f3f7c044d6bb7a",
+    "product/src/ai_ad_editor/mask_edit_geometry.py": "sha256:9bf1d101c1aea8d2265b704fab8dcd65b3bb08c4cc45aed95a4a5cb0ee2ae1f9",
+    "product/src/ai_ad_editor/mask_review.py": "sha256:17de0acd6d76ad9218565302a0f47a577a5001a487bbf0c66432b0b6af278bad",
+    "product/src/ai_ad_editor/mask_tracking.py": "sha256:724f8f9800536d3ffdc99675fadf79e1262532ec7f9a3d879cf94674ba531b8d",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:75755c314fe01111d7ca85138efb6f9b0993e45c14c5a2b65cc1046c5e58cfba",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/nested_freeze.py": "sha256:2294d318840e6285550eaf70109702b041c031c2cde4c8dc0bca3d2bad848a35",
+    "product/src/ai_ad_editor/ocr_cli.py": "sha256:1a818549a1308e78a38a1a5aa9a025772f5be792bacfcdfeacb5599670e0b4ec",
+    "product/src/ai_ad_editor/ocr_geometry.py": "sha256:a2a4aedf4289ab20bea45000c1be898668239b75ef215386120850d2f7dfce5c",
+    "product/src/ai_ad_editor/ocr_worker.py": "sha256:ee5a2096ec1ee03fc09d2ac4d0b06b1791d5bbfe011772f448045d1377b50d3f",
+    "product/src/ai_ad_editor/OPENFILM_EXAMPLES_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_frame_clock.mjs": "sha256:c60b35fb0d26b8629d833f11028757aeccf603917c4c5840f501c01b757de1d5",
+    "product/src/ai_ad_editor/OPENFILM_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_overrides.mjs": "sha256:8fab39a5f4f9696e9070a206f45d9241f54167ea2d9f47c0bcc9975333664832",
+    "product/src/ai_ad_editor/openfilm_stroke.mjs": "sha256:6c20aaff3a85b8a98654d82bfbea34029d78b0366af6b95b17c70abfafd265a1",
+    "product/src/ai_ad_editor/openfilm_subtitle_segments.mjs": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "product/src/ai_ad_editor/openfilm_template_fields.mjs": "sha256:fd4c58532cd3b46e32872e84136b54edef5a8ad9d824f1afa44f9264d81774e3",
+    "product/src/ai_ad_editor/openfilm_text_bounds.mjs": "sha256:94b2ab392b367ef1f901967f9156ac48493419be32bc40b4d6c035cf71a56108",
+    "product/src/ai_ad_editor/PADDLE_OCR_LICENSE.txt": "sha256:3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e",
+    "product/src/ai_ad_editor/PADDLE_OCR_NOTICE.txt": "sha256:392317bb77f62100b038919472ce0c3fecf0d6c6f9c29fc22a18813fb4a15a32",
+    "product/src/ai_ad_editor/PDOOM_VIDEO_LICENSE.txt": "sha256:5fc212466ce7183be5d85a3ee34fea461712842d5cd256b470978a83577083cb",
+    "product/src/ai_ad_editor/pipeline_diagnostics.py": "sha256:10293635791333ef437e592d7a58f8dcf341ade759552a26149c1297bb9cac81",
+    "product/src/ai_ad_editor/policy.py": "sha256:0433efb46d2561fa9f257dd363aeb592df7ef61c60be147196cbaee7fabbacb8",
+    "product/src/ai_ad_editor/project.py": "sha256:dd86c8d1b161cb99660f4bc92ac3ff8c2cc6c10c34f22432fbe6f27af9a7414f",
+    "product/src/ai_ad_editor/quality.py": "sha256:d4e71c9e6616250b681306d562305dafe4cb5867652ab365275277b155e9e047",
+    "product/src/ai_ad_editor/queue_reuse.py": "sha256:d939247ceee094b9255bc8833afcb6897cb3f0f06a280c717306d316e1f38f61",
+    "product/src/ai_ad_editor/range_edits.py": "sha256:eff604efaa3c2a66b63b3fcb332804ffd9e45a11ab880964b279a379d5500e4e",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:3b3cd6d7963a179057ba36668515b8ee87e9e0a23914395dc5c7c13635e81bfe",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:171db5bb475f3eaeb4ce05dacdc3c19ba90c2b3f429349d50c949b9d3c97f2be",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/retime_edits.py": "sha256:4dcf1ef57db6bd813d2c25887705ba18590207decb07bd17f4622b0c3c14b881",
+    "product/src/ai_ad_editor/retime_transform.py": "sha256:8b00a27cd939264cece21ddf22ca9949a23a43122dc958c0970cd2526c7bdd35",
+    "product/src/ai_ad_editor/rfc3339_dates.py": "sha256:344d79048ff55a77af00314134c20b57b5301b75d1b6a32b4a7a3f52ce749105",
+    "product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt": "sha256:5ba1a4f03626ccca6dcbf53a554545e4f776a335bfdaa233ec3bfe9bb7fac15d",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/schema_contract.py": "sha256:1a9495976956a595d88cb95e69955d28abbac76bd33de97615fd9a19bda2a5ec",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/sequence_canvas.py": "sha256:462542e26058d350c2d0a29d0cf4127c4054cab7462a763811b85bfca171412f",
+    "product/src/ai_ad_editor/sequence_sampling.py": "sha256:1aa171ef6043878afce099f7a04b214b9c458879147c46147062a77d36356ec2",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:ba871f7bff0f186ad55d9e22c5fcd75e09032e8d7299a01c7ea7b76b2e1a21a1",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/source_edits.py": "sha256:a2bea20a8d162ac4fa9f329045bca2b7e214a624adca107df6021919d5a1d36c",
+    "product/src/ai_ad_editor/source_transitions.py": "sha256:59c2652aa76024b78667293ce46774ba6910e4524db7e39f95dc95bd91b0547a",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/speed_curves.py": "sha256:41fbddd764bfa481e6158e8401333113c871e1c38e34257911f9aa676b9bfff9",
+    "product/src/ai_ad_editor/stroke_motion.py": "sha256:ba53f586ff12c75c15803e347307c802d977e874ce792159d74ebb2b6b42ae03",
+    "product/src/ai_ad_editor/subtitle_clock.py": "sha256:49ca2001da0f250d682f5818d95f4f51ee362cbaee979fb9a99649a847cd4645",
+    "product/src/ai_ad_editor/subtitle_segment_worker.mjs": "sha256:66ca5d7fab0926efe15615da29dba3024897cbfbfb1b28e6a6a189697b6d5bdc",
+    "product/src/ai_ad_editor/subtitle_segments.py": "sha256:5590e04147f0b50cb60df3b4e543059a560dbfd684b3085c5f25f8fb04631aea",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_highlight.py": "sha256:d08bee683f0bd00bac363a78df5957475765741a7c53d92ac025575b334f78e5",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/text_paint.py": "sha256:a924644f0396b5204efbb0e085f25d51f6cda5bfc75f2d44febc6796e42cb028",
+    "product/src/ai_ad_editor/text_typing.py": "sha256:6cc022af8300fb4270cb21f2f53ffe2b33210ac203169fed653d11d75e591ec3",
+    "product/src/ai_ad_editor/time_mapping.py": "sha256:89bd69060b3f10af1197018b735621eadb8ce2858b4281972d989fddf79f2ef1",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:78f984613b0c253d108dd4d515557f77bc4ebd4df4945108a63d8fdb38ad202b",
+    "product/src/ai_ad_editor/vace_context.py": "sha256:aef2d4318720c10a99644e96ea35ba27d48e9b405a332f6b2075b6a558f0e0e6",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:aadc7d5785347422ee62b1d4a195e5dfbf1bcb497eeedc43aa4d839aff6f55de",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:8a8f96a14aac93a7b9577f88fe576fecbbfd4fcc206e27843de79f7b1ba54961",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:0ce1dc459b3c0d7f1c95ec2208e78e5fe299200582c878f5de34c9382f4582f5",
+    "product/src/ai_ad_editor/validator.py": "sha256:edc86ca5f1058d811e2f00c483eb4144db142b3dd140ece9805cc1c643cc4fa4",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_alpha_resampling.py": "sha256:db2e2764a5022c18bba23ad407a6bf15a320edfea5f5a8331eda706d7c4046de",
+    "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+    "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+    "product/tests/test_audio_buses.py": "sha256:e4b6020208492cf4907a3537c0542321a7f1600692537b22299700f5b4d9dfdc",
+    "product/tests/test_audio_channel_modes.py": "sha256:815a9ea0117dd7ed0cce3a75d14ed67a4a8a06b413df1836d233f33359290e79",
+    "product/tests/test_audio_routing.py": "sha256:0f2d189488b1559fc571ae401188b6f3c576150c34e59f3a9a23e4b5f4dbadef",
+    "product/tests/test_audio_source_context.py": "sha256:907ccac6cbd290a98a3d4dca99149d765f16a57b5cc00ac3d436a777884327cd",
+    "product/tests/test_audio_stretch.py": "sha256:53dea6b0ec9f8c00861b6a1844d7c34e0c87e432d78a4e4847c7245fd9893ce9",
+    "product/tests/test_audio_tempo_context.py": "sha256:ad3c7c53cfdaecdd00693aa745a22be2455e2dcd446583e4912cd1066b6aac3a",
+    "product/tests/test_audio_unity.py": "sha256:02dcf66038d4fcbc1f0c144e604efa451b9d7925817d1d2b089f8c087aa58810",
+    "product/tests/test_cli.py": "sha256:d80d63059529d69e66ac070a9ffce3d2f9f6559504e2f07710a3a4ce4521d615",
+    "product/tests/test_clip_windows.py": "sha256:42863fb28d81d22a0ac90ff1036ef5359186a29ab730d5404db36fae0660ecb3",
+    "product/tests/test_ctc_alignment.py": "sha256:838a854a442b413cb05be739f47eea86dae36057f12b0567bc820f3f442aec93",
+    "product/tests/test_cuda_admission.py": "sha256:624a6627495db87288902f06e1d95c57cde0a8506a50e42b1577aaf7614b6abb",
+    "product/tests/test_delivery_precision.py": "sha256:5bc05fca5334ca454f3498b0f53cd28c0b44b8f9e9f3336b980b8a8604bbed03",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_effect_automation.py": "sha256:b637ab8b41405147d3299ff72ae6def7f7656d8fe9828137abe534612cbe3753",
+    "product/tests/test_font_coverage.py": "sha256:b382b9449601baf20a6c352c03e055b4f9efcad03b7515b694831376cc5a8234",
+    "product/tests/test_fragments.py": "sha256:d021051b4a5b48deac872e319407c9dae0cb2e7b3c8f1a7ab71704dff756a35f",
+    "product/tests/test_hardware_acceleration.py": "sha256:44b451a7a620b8f897dd0ff1ac535ff7ffa9ce7ae481afe9a3019dcc14373dd2",
+    "product/tests/test_html_motion.py": "sha256:9e382485db151f79059e4d18c13708a6ee3deca38ad5be1272a5b9fb4dc4bc0c",
+    "product/tests/test_html_quality.py": "sha256:1e3d81bf7101b3d97aa89f5f60cebab0a7e64e44845ab60b4872f8d064217aae",
+    "product/tests/test_html_template.py": "sha256:747fb1e13b3bfb60f35012a8ffa18ac10f156f1e2811328792ab29d20e2de29a",
+    "product/tests/test_html_url_parser.py": "sha256:673a8073a536149c6b70366b2911ab6bfb3b395f3e2a14dd425c3d5f57cbcf02",
+    "product/tests/test_linked_edit.py": "sha256:d3b5d8fb402df059ea006d125fbb6fb651c891132fcd78deccfdbe41036d87d7",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_inpainting.py": "sha256:17214dd5116aca692f36ff50f9990c4f86acf1e62acb98a504bc8e55f01c4606",
+    "product/tests/test_local_matting.py": "sha256:b338e886fa4c7d8036ec7201b6c67468aa44ff8e4b0373062670a89725c7bfe1",
+    "product/tests/test_local_ocr.py": "sha256:81628df63d391d71a038c48af77b9044976eee623476bdaf7c2a000f31445ec3",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vace.py": "sha256:1845be8e66e5237420fffa6185d7dd5053632c9fa2340344ed35460a291eba92",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_magnetic_mode.py": "sha256:aa08ddbfa3db68c89b2a2feb757d5bba12dd467b85e7950377eec218714f2897",
+    "product/tests/test_magnetic_reorder.py": "sha256:c4ad34f0ed89c9fe30ca51c188cdf9bfcf982322bd32a6ec6d5d64620c01c2a7",
+    "product/tests/test_mask_edit.py": "sha256:280c825c3a2dc95ac35943209a6eb30e45d519bc5ce1834a6a73c464f90718e1",
+    "product/tests/test_mask_edit_geometry.py": "sha256:7b6367f327d51cbd5b5746b90e89f27768acc7b49b0bb9d7e63cc3d1460bde06",
+    "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+    "product/tests/test_mask_tracking.py": "sha256:f8f2c1d0495410815b91d4f0a507a3a3909d2ca25c44817612970d4330578245",
+    "product/tests/test_nested_frame_coverage.py": "sha256:4bf9aef9aec5c34325f67e2a3e88dbe3424e4ec5c82d8f4e121ec95f7ab8d97f",
+    "product/tests/test_nested_freeze.py": "sha256:03261ace961acfcc5f99f52814a59a2b2bdf88fe3c0def7f48c8c3e897415c9b",
+    "product/tests/test_nested_time_mapping.py": "sha256:64415c49e45c5e7edf8d5f5ee745bbf22d30b6cdd5a0cde7cd731d88d6c6fad4",
+    "product/tests/test_nested_transitions.py": "sha256:9481f1de95ab4c556a17bfdbc1088001ceb29b92bab96d5040c8e6abdeb7881b",
+    "product/tests/test_offline_install.py": "sha256:6497262c7f791c46d706eeddfbaaa41d2d793e109106b93456e88f6786f051fc",
+    "product/tests/test_outpainting.py": "sha256:34b5f0d735f23b6e8ef4c30b573f110aefdf3f661eed7e3aac18dd23e69fa0b8",
+    "product/tests/test_pipeline_diagnostics.py": "sha256:a5202268d6a64545a6594d5f45847bc7fa14e7a83eb3fb594b1b420056dd5b67",
+    "product/tests/test_queue_reuse.py": "sha256:ba346166b0c438e6f4ca3669fe3f47608f1a022b1422065f9936d4bc614355f1",
+    "product/tests/test_range_edits.py": "sha256:7634873bff27fbf51e412c82b37efae72cf7f38b20ffd22e1d60fe50359a1f7c",
+    "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+    "product/tests/test_retime_edits.py": "sha256:751c1c1566a6fe934c7427e1f431d40b3d3e417bf0670e2e73ad313d2a1eadde",
+    "product/tests/test_schema_contract.py": "sha256:12d70209363d3b54341118e3f3ab988ebb041464c42eb7fb267c09d801ce483d",
+    "product/tests/test_sequence_canvas.py": "sha256:6f2b622c81932c0dcf80e7b3a528256b5e1a7209ef455b68f2c75a4c9154f4b0",
+    "product/tests/test_sequence_compositing.py": "sha256:1eea9b170c3fabe0623032b4de81a07e085cb7c88b5d79e8380d73399be21b0a",
+    "product/tests/test_sequence_sampling.py": "sha256:c75a6153aee2dbef11e9455a27656d204e46f0ce6061393ea91b6f46f8d7253f",
+    "product/tests/test_source_edits.py": "sha256:b5846137c5de1b1f08e82d43c69a7d95c031cd1c613fdf48613f72361e813614",
+    "product/tests/test_source_transitions.py": "sha256:8813a84843bfbb7aed5b5418011a287c9dae1b8628620114468df716401f2b4a",
+    "product/tests/test_speed_easing.py": "sha256:4797885a66a7e12b327fdf31e0cc937576620353e653c2c762ee905f2d61a5d7",
+    "product/tests/test_stroke_motion.py": "sha256:4ff06a458e6311e4979da31b6be05b5a53c6e09ef3bb6b429c63616368844410",
+    "product/tests/test_subtitle_clock.py": "sha256:1e6696405e30dc4d90e4baadcbffc013d5e6fee5d89bb67e908003c3ebe1de5a",
+    "product/tests/test_subtitle_segments.py": "sha256:aba64ed147276a6b1e59ad845557f86f2b6271db8d0dc75c006db328cac233c2",
+    "product/tests/test_text_animation_composition.py": "sha256:6ce0117f31339d36c574c70a8f2d83235813dc95d91f3108730cb954987c12de",
+    "product/tests/test_text_paint.py": "sha256:99887918ba5813b39a74cef18d02384ed503581e8695821530554590d38e219f",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "product/tests/test_vace_context.py": "sha256:86afab95b73c2deada46dd1d0bba400d02bc9a9d967698a1e6f84c7ab084edde",
+    "product/tests/test_word_highlight.py": "sha256:bf3f56f299d2452e8330bb192d31880c550e277ef93d04c4292fe816b79e172a"
+  },
+  "goal_complete": false,
+  "script_sha256": "7bdd908e2bda8f9d2e0d4200959b2f8e198380ceea3d0baea9c5f05215bb91c0",
+  "queue_result": {
+    "ok": false,
+    "command": "queue.run",
+    "request_id": "req_20261019231758_9369638f",
+    "operation_id": "op_20261019231711_8091cbea",
+    "status": "partial",
+    "data": {
+      "queue": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\operations\\render-queue.json",
+      "summary": {
+        "selected": 6,
+        "succeeded": 5,
+        "failed": 1,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "jobs": [
+        {
+          "job_id": "bad",
+          "status": "failed",
+          "error": {
+            "code": "OUTPUT_VIDEO_CODEC_UNSUPPORTED",
+            "message": "不支持的视频编码器: fixture-invalid-codec",
+            "path": "settings.output.video.codec",
+            "retryable": false
+          }
+        },
+        {
+          "job_id": "first",
+          "status": "succeeded",
+          "operation_id": "render_20261019231715_7d01b482",
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\first.mp4",
+          "warnings": [
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+              "message": "来源、许可证或证据字段缺失",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+              "message": "来源、许可证或证据字段缺失",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RENDER_FEATURE_APPROXIMATE",
+              "clip_id": "picture",
+              "feature": "subtitle_inline_dynamic_color",
+              "message": "动态尺寸内嵌文字沿用原生 drawtext 颜色混合；颜色/透明度组合未验收，请使用独立文字层"
+            }
+          ],
+          "reuse": {
+            "protocol": "agent-video-queue-reuse-v1",
+            "signature": "a6fa4b673c3126bd6f04296507ab558f5059e03e779f8ba6758f8e79ee063ed5",
+            "encoding_executed": true
+          }
+        },
+        {
+          "job_id": "copy",
+          "status": "succeeded",
+          "operation_id": "reuse_20261019231723_a66277f7",
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\renamed.mp4",
+          "warnings": [
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+              "message": "来源、许可证或证据字段缺失",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+              "message": "来源、许可证或证据字段缺失",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RENDER_FEATURE_APPROXIMATE",
+              "clip_id": "picture",
+              "feature": "subtitle_inline_dynamic_color",
+              "message": "动态尺寸内嵌文字沿用原生 drawtext 颜色混合；颜色/透明度组合未验收，请使用独立文字层"
+            },
+            {
+              "code": "QUEUE_RESULT_REUSED",
+              "message": "本次复制已完成产物；编码器与设备观测属于来源操作"
+            }
+          ],
+          "reuse": {
+            "protocol": "agent-video-queue-reuse-v1",
+            "signature": "a6fa4b673c3126bd6f04296507ab558f5059e03e779f8ba6758f8e79ee063ed5",
+            "source_job_id": "first",
+            "source_operation_id": "render_20261019231715_7d01b482",
+            "source_output": {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\first.mp4",
+              "sha256": "fbba9c5aa6eef771b436257a04dc841776d938af0c37e90e628c2a52f59cdc81",
+              "bytes": 64880
+            },
+            "source_manifest": {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\first.mp4.manifest.json",
+              "sha256": "448bade2dcfee1ef4d4f16dfe56bd6652c6897443d099ffd71bac9960da8cae9",
+              "bytes": 96651
+            },
+            "source_derived_files": [],
+            "encoding_executed": false,
+            "copy_sha256": "fbba9c5aa6eef771b436257a04dc841776d938af0c37e90e628c2a52f59cdc81",
+            "source_encoding_evidence": {
+              "command": [
+                "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+                "-hide_banner",
+                "-y",
+                "-loglevel",
+                "error",
+                "-progress",
+                "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\.tmp\\render_20261019231715_7d01b482\\ffmpeg-progress.log",
+                "-i",
+                "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\assets\\source_source.mkv",
+                "-i",
+                "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\assets\\source_source.mkv",
+                "-filter_complex",
+                "[0:v]trim=start=0.000000:end=2.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=12/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1,format=gbrapf32le,premultiply=inplace=1,scale=w='max(2,iw*(if(lt((t-0.00000000),0.00000000),0.80000000,if(lt((t-0.00000000),2.00000000),(0.80000000+(0.20000000)*(clip((((t-0.00000000)-0.00000000)/2.00000000),0,1))),1.00000000))))':h='max(2,ih*(if(lt((t-0.00000000),0.00000000),0.80000000,if(lt((t-0.00000000),2.00000000),(0.80000000+(0.20000000)*(clip((((t-0.00000000)-0.00000000)/2.00000000),0,1))),1.00000000))))':eval=frame,unpremultiply=inplace=1,format=rgba,drawtext=text='ONE ENCODE / REUSED COPY':fontcolor=white:fontsize=16:fontfile='assets/font_DejaVuSans.ttf':borderw=1:bordercolor=black:x='12':y='14':box=1:boxcolor=black@0.45:boxborderw=12[v0];[1:a]atrim=start=0.000000:end=2.000000,asetpts=PTS-STARTPTS,aresample=48000,apad=whole_len=96000,atrim=end_sample=96000,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black:s=320x180:r=12/1:d=2.000000[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]aresample=48000,apad=whole_len=96000,atrim=end_sample=96000,asetpts=N/SR/TB[aout]",
+                "-map",
+                "[vout]",
+                "-map",
+                "[aout]",
+                "-t",
+                "2.000000000",
+                "-c:v",
+                "libx264",
+                "-preset",
+                "medium",
+                "-crf",
+                "18",
+                "-pix_fmt",
+                "yuv420p",
+                "-color_primaries",
+                "bt709",
+                "-color_trc",
+                "bt709",
+                "-colorspace",
+                "bt709",
+                "-color_range",
+                "tv",
+                "-c:a",
+                "aac",
+                "-b:a",
+                "192k",
+                "-movflags",
+                "+faststart",
+                "-f",
+                "mp4",
+                "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\.tmp\\render_20261019231715_7d01b482\\first.mp4"
+              ],
+              "acceleration": {
+                "version": "1",
+                "request": {
+                  "encode": "off",
+                  "decode": "off",
+                  "encoder": "auto",
+                  "decoder": "auto",
+                  "probe_max_bytes": 536870912
+                },
+                "status": "planned",
+                "probes": [],
+                "attempts": [],
+                "decisions": [],
+                "device": "driver-default; identity not certified",
+                "report": null
+              },
+              "filter_graph_transport": {
+                "mode": "inline",
+                "sha256": "sha256:a3f7f59b9aead2aa109b4043a7fe6bed0430baae66c758a15a418d23ddd0025d",
+                "utf8_bytes": 1371,
+                "logical_command_utf16_units": 2521
+              }
+            }
+          }
+        },
+        {
+          "job_id": "smaller",
+          "status": "succeeded",
+          "operation_id": "render_20261019231733_843622c2",
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\smaller.mp4",
+          "warnings": [
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+              "message": "来源、许可证或证据字段缺失",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+              "message": "来源、许可证或证据字段缺失",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RENDER_FEATURE_APPROXIMATE",
+              "clip_id": "picture",
+              "feature": "subtitle_inline_dynamic_color",
+              "message": "动态尺寸内嵌文字沿用原生 drawtext 颜色混合；颜色/透明度组合未验收，请使用独立文字层"
+            }
+          ],
+          "reuse": {
+            "protocol": "agent-video-queue-reuse-v1",
+            "signature": "76136a25f22d22a0d1574d9e6ed60b2f460ad401df3d1868d68245a25141078a",
+            "encoding_executed": true
+          }
+        },
+        {
+          "job_id": "alpha-first",
+          "status": "succeeded",
+          "operation_id": "render_20261019231741_3a267f52",
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-first.webm",
+          "warnings": [
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+              "message": "来源、许可证或证据字段缺失",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+              "message": "来源、许可证或证据字段缺失",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RENDER_FEATURE_APPROXIMATE",
+              "clip_id": "picture",
+              "feature": "subtitle_inline_dynamic_color",
+              "message": "动态尺寸内嵌文字沿用原生 drawtext 颜色混合；颜色/透明度组合未验收，请使用独立文字层"
+            }
+          ],
+          "reuse": {
+            "protocol": "agent-video-queue-reuse-v1",
+            "signature": "99644ab25f2337c81395a2742bdc3ff34a6c29d23bb6acc8fc2492c5d0737945",
+            "encoding_executed": true
+          }
+        },
+        {
+          "job_id": "alpha-copy",
+          "status": "succeeded",
+          "operation_id": "reuse_20261019231750_cb297546",
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-copy.webm",
+          "warnings": [
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+              "message": "来源、许可证或证据字段缺失",
+              "asset_id": "source",
+              "rights_ref": "source",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "status": "unverified",
+              "code": "RIGHTS_STATUS_BLOCKED",
+              "message": "状态 unverified 不允许发布",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_USE_NOT_PERMITTED",
+              "message": "记录未允许目标用途: commercial_ad",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RIGHTS_EVIDENCE_INCOMPLETE",
+              "message": "来源、许可证或证据字段缺失",
+              "asset_id": "font",
+              "rights_ref": "font",
+              "record_version": 1,
+              "context": "project_asset"
+            },
+            {
+              "code": "RENDER_FEATURE_APPROXIMATE",
+              "clip_id": "picture",
+              "feature": "subtitle_inline_dynamic_color",
+              "message": "动态尺寸内嵌文字沿用原生 drawtext 颜色混合；颜色/透明度组合未验收，请使用独立文字层"
+            },
+            {
+              "code": "QUEUE_RESULT_REUSED",
+              "message": "本次复制已完成产物；编码器与设备观测属于来源操作"
+            }
+          ],
+          "reuse": {
+            "protocol": "agent-video-queue-reuse-v1",
+            "signature": "99644ab25f2337c81395a2742bdc3ff34a6c29d23bb6acc8fc2492c5d0737945",
+            "source_job_id": "alpha-first",
+            "source_operation_id": "render_20261019231741_3a267f52",
+            "source_output": {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-first.webm",
+              "sha256": "d18c46cf938b1236e7554f829d06a1dfc3828b46f197483d418414c1c705f75a",
+              "bytes": 146455
+            },
+            "source_manifest": {
+              "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-first.webm.manifest.json",
+              "sha256": "17db4d29951d9f317183a1f213deffddfb647640ff8e432446d38607f4186d1e",
+              "bytes": 96498
+            },
+            "source_derived_files": [],
+            "encoding_executed": false,
+            "copy_sha256": "d18c46cf938b1236e7554f829d06a1dfc3828b46f197483d418414c1c705f75a",
+            "source_encoding_evidence": {
+              "command": [
+                "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+                "-hide_banner",
+                "-y",
+                "-loglevel",
+                "error",
+                "-progress",
+                "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\.tmp\\render_20261019231741_3a267f52\\ffmpeg-progress.log",
+                "-i",
+                "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\assets\\source_source.mkv",
+                "-i",
+                "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\assets\\source_source.mkv",
+                "-filter_complex",
+                "[0:v]trim=start=0.000000:end=2.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=12/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1,format=gbrapf32le,premultiply=inplace=1,scale=w='max(2,iw*(if(lt((t-0.00000000),0.00000000),0.80000000,if(lt((t-0.00000000),2.00000000),(0.80000000+(0.20000000)*(clip((((t-0.00000000)-0.00000000)/2.00000000),0,1))),1.00000000))))':h='max(2,ih*(if(lt((t-0.00000000),0.00000000),0.80000000,if(lt((t-0.00000000),2.00000000),(0.80000000+(0.20000000)*(clip((((t-0.00000000)-0.00000000)/2.00000000),0,1))),1.00000000))))':eval=frame,unpremultiply=inplace=1,format=rgba,drawtext=text='ONE ENCODE / REUSED COPY':fontcolor=white:fontsize=16:fontfile='assets/font_DejaVuSans.ttf':borderw=1:bordercolor=black:x='12':y='14':box=1:boxcolor=black@0.45:boxborderw=12[v0];[1:a]atrim=start=0.000000:end=2.000000,asetpts=PTS-STARTPTS,aresample=48000,apad=whole_len=96000,atrim=end_sample=96000,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black@0.0:s=320x180:r=12/1:d=2.000000,format=rgba[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]aresample=48000,apad=whole_len=96000,atrim=end_sample=96000,asetpts=N/SR/TB[aout];[vout]format=rgba,split=2[delivery_rgb][delivery_a];[delivery_a]alphaextract,format=gray[delivery_alpha];[delivery_rgb]format=yuv420p[delivery_yuv];[delivery_yuv][delivery_alpha]alphamerge,format=yuva420p[delivery_vout]",
+                "-map",
+                "[delivery_vout]",
+                "-map",
+                "[aout]",
+                "-t",
+                "2.000000000",
+                "-c:v",
+                "libvpx-vp9",
+                "-crf",
+                "0",
+                "-b:v",
+                "0",
+                "-lossless",
+                "1",
+                "-pix_fmt",
+                "yuva420p",
+                "-color_primaries",
+                "bt709",
+                "-color_trc",
+                "bt709",
+                "-colorspace",
+                "bt709",
+                "-color_range",
+                "tv",
+                "-c:a",
+                "libopus",
+                "-b:a",
+                "192k",
+                "-f",
+                "webm",
+                "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\.tmp\\render_20261019231741_3a267f52\\alpha-first.webm"
+              ],
+              "acceleration": {
+                "version": "1",
+                "request": {
+                  "encode": "off",
+                  "decode": "off",
+                  "encoder": "auto",
+                  "decoder": "auto",
+                  "probe_max_bytes": 536870912
+                },
+                "status": "planned",
+                "probes": [],
+                "attempts": [],
+                "decisions": [],
+                "device": "driver-default; identity not certified",
+                "report": null
+              },
+              "filter_graph_transport": {
+                "mode": "inline",
+                "sha256": "sha256:6e5573e714cbe84d589106c370762111b2d9e4f9f61332e94a9aaa40a8da9970",
+                "utf8_bytes": 1607,
+                "logical_command_utf16_units": 2764
+              }
+            }
+          }
+        }
+      ],
+      "counts": {
+        "cancelled": 0,
+        "failed": 1,
+        "pending": 0,
+        "running": 0,
+        "succeeded": 5
+      },
+      "reuse_summary": {
+        "encoded_successes": 3,
+        "reused_successes": 2,
+        "scope": "current_invocation",
+        "persistent_cache": false
+      }
+    },
+    "artifacts": [],
+    "warnings": [],
+    "errors": [
+      {
+        "job_id": "bad",
+        "code": "OUTPUT_VIDEO_CODEC_UNSUPPORTED",
+        "message": "不支持的视频编码器: fixture-invalid-codec",
+        "path": "settings.output.video.codec",
+        "retryable": false
+      }
+    ],
+    "provenance": {
+      "cli_version": "0.1.0",
+      "schema_version": "0.1.0",
+      "engine_version": "ffmpeg-local",
+      "started_at": "2026-10-19T23:17:58.118665Z",
+      "finished_at": "2026-10-19T23:17:58.118685Z",
+      "network": "disabled"
+    }
+  },
+  "events": [
+    {
+      "event_id": "event_20261019231715_ec762b7d",
+      "operation_id": "render_20261019231715_7d01b482",
+      "type": "render_started",
+      "at": "2026-10-19T23:17:15.827864Z",
+      "stage": "queue.render",
+      "percent": 0.0,
+      "message": "FFmpeg 渲染开始",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231716_01ad266b",
+      "operation_id": "render_20261019231715_7d01b482",
+      "type": "render_progress",
+      "at": "2026-10-19T23:17:16.645057Z",
+      "stage": "queue.render",
+      "percent": 91.67,
+      "message": "FFmpeg 渲染进行中",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231716_7f4309f7",
+      "operation_id": "render_20261019231715_7d01b482",
+      "type": "render_progress",
+      "at": "2026-10-19T23:17:16.645262Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "FFmpeg 已完成编码",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231716_a4177d6e",
+      "operation_id": "render_20261019231715_7d01b482",
+      "type": "render_progress",
+      "at": "2026-10-19T23:17:16.848307Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "FFmpeg 已完成编码",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231716_e182a8b6",
+      "operation_id": "render_20261019231715_7d01b482",
+      "type": "artifact_written",
+      "at": "2026-10-19T23:17:16.865828Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "渲染产物和 manifest 已写入",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231716_15a2db54",
+      "operation_id": "render_20261019231715_7d01b482",
+      "type": "completed",
+      "at": "2026-10-19T23:17:16.866359Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "渲染完成",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231726_e8f2a629",
+      "operation_id": "reuse_20261019231723_a66277f7",
+      "type": "reuse_started",
+      "at": "2026-10-19T23:17:26.993549Z",
+      "stage": "queue.render",
+      "percent": 0.0,
+      "message": "复制本批次已成功的相同结果",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231730_e1d39fa3",
+      "operation_id": "reuse_20261019231723_a66277f7",
+      "type": "completed",
+      "at": "2026-10-19T23:17:30.364464Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "复制及独立核验完成",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231733_7f2f7bcf",
+      "operation_id": "render_20261019231733_843622c2",
+      "type": "render_started",
+      "at": "2026-10-19T23:17:33.963324Z",
+      "stage": "queue.render",
+      "percent": 0.0,
+      "message": "FFmpeg 渲染开始",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231734_4737bb2c",
+      "operation_id": "render_20261019231733_843622c2",
+      "type": "render_progress",
+      "at": "2026-10-19T23:17:34.595065Z",
+      "stage": "queue.render",
+      "percent": 91.67,
+      "message": "FFmpeg 渲染进行中",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231734_09baa892",
+      "operation_id": "render_20261019231733_843622c2",
+      "type": "render_progress",
+      "at": "2026-10-19T23:17:34.595274Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "FFmpeg 已完成编码",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231734_18f17167",
+      "operation_id": "render_20261019231733_843622c2",
+      "type": "artifact_written",
+      "at": "2026-10-19T23:17:34.774732Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "渲染产物和 manifest 已写入",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231734_ddb3421e",
+      "operation_id": "render_20261019231733_843622c2",
+      "type": "completed",
+      "at": "2026-10-19T23:17:34.774867Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "渲染完成",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231741_72d26797",
+      "operation_id": "render_20261019231741_3a267f52",
+      "type": "render_started",
+      "at": "2026-10-19T23:17:41.992104Z",
+      "stage": "queue.render",
+      "percent": 0.0,
+      "message": "FFmpeg 渲染开始",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231743_d1e40ade",
+      "operation_id": "render_20261019231741_3a267f52",
+      "type": "render_progress",
+      "at": "2026-10-19T23:17:43.052583Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "FFmpeg 渲染进行中",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231743_362ca197",
+      "operation_id": "render_20261019231741_3a267f52",
+      "type": "render_progress",
+      "at": "2026-10-19T23:17:43.052773Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "FFmpeg 已完成编码",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231743_548662f4",
+      "operation_id": "render_20261019231741_3a267f52",
+      "type": "render_progress",
+      "at": "2026-10-19T23:17:43.268842Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "FFmpeg 已完成编码",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231743_110ba17b",
+      "operation_id": "render_20261019231741_3a267f52",
+      "type": "artifact_written",
+      "at": "2026-10-19T23:17:43.425747Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "渲染产物和 manifest 已写入",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231743_a2297b7f",
+      "operation_id": "render_20261019231741_3a267f52",
+      "type": "completed",
+      "at": "2026-10-19T23:17:43.425912Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "渲染完成",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231753_fb2c1f7f",
+      "operation_id": "reuse_20261019231750_cb297546",
+      "type": "reuse_started",
+      "at": "2026-10-19T23:17:53.973424Z",
+      "stage": "queue.render",
+      "percent": 0.0,
+      "message": "复制本批次已成功的相同结果",
+      "artifacts": []
+    },
+    {
+      "event_id": "event_20261019231758_0a1e72e6",
+      "operation_id": "reuse_20261019231750_cb297546",
+      "type": "completed",
+      "at": "2026-10-19T23:17:58.067880Z",
+      "stage": "queue.render",
+      "percent": 100.0,
+      "message": "复制及独立核验完成",
+      "artifacts": []
+    }
+  ],
+  "decoded": {
+    "first.mp4": {
+      "rgba_sha256": "d061766917a6d9e7fa10ca7beb217e720146135522afd91b22a4dd60bfe1664c",
+      "frames": 24,
+      "frame_sha256": [
+        "71ba81941ee3cd35090c507b195a247d79ddae4877046e02bfe8c5193d6dbf4b",
+        "fd9f5b9818df37e6741350faf631896f145ad9d84b06ce01c1869f5c0b305ec9",
+        "2d2ceb8b0bef92dd40a5abfb5927f9ba8afc8ba62477d1b7f405c2065f51064d",
+        "39241391e25321a2dd4d50a5eb0564f330738b3f20c2115848ee556f6f298270",
+        "2160b9a419cc66e0463fae92ecee0f08d5e70e18362b580071d087ec980fbf7b",
+        "7ddf99ddebcbdc35a72079e21f5d80ec84a99e940fbf7d5130b656a284cf23de",
+        "9b2505b386eaafe27f81fa1e3466b7226ab19e9608bdbb08908cabf8fdcf9708",
+        "bfca3dc1dc99d82a629b091d14ed48988d06b7a8c1dc9aec0ab73ea177e3ac5e",
+        "678c460da9aaa9c83a0022002fe3285b261f55327a1ec10738a41b937d7060ed",
+        "4469506766d5432def5de9f3895a31242d177cb5b33dd9e72377763d454728cd",
+        "cd089bb05134e65a4a1146fcd69bb463e544523006c81a65d2a794b753bc425c",
+        "cc813edbe71240e927b6611b9ce02446cda52aa51a73117085187b945c2c68ff",
+        "5ebe8f4912db8eac301ab0d0c861a34df5f4bf2e6b2031703153a070dae658c5",
+        "e9f8a802bf6cabfc78d95e7134ebdfcb195cbe113e78feeeea12325253fea158",
+        "864fa4a8ff6a30b51e85ca2c545a9694a44afde5fab3539a9c20717166870ddc",
+        "391482474b0974166caa453ebf392b99afe78f9383a084ef60983bca0639cae1",
+        "a69ca59eadcdca10ae7dde200ae46b82ba06ef4f60d0b4046f1a3d8004944bb6",
+        "5231b778417ad4f3aab2a422ea8b7a479c12f484ae5a3d1555e519beed9d9932",
+        "860c95a2eea96e61ed61338fca8b7c96997cb7c568e6ac351ab5bd10576f38d8",
+        "17440d3ebd219e6a92b36bdc2fc8c4ac167516103416b95373e89a44be7ab8e9",
+        "33a2787189cecda1c6725a897f349d3123fb13dd80e7f918a8b17c42197ad0d7",
+        "7b8518a30ed38f2f61332d1f4983a23ad97f8570ec49586dcd258c48aa67e578",
+        "ba4101acc1dd0c443351c06dffb893db81081acc6f3b081a1e365757bfef3d16",
+        "0217367929d196f71443f3089cde63ebf359092890544a04387571cb73750451"
+      ],
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "pts": [
+        {
+          "best_effort_timestamp_time": "0.000000",
+          "side_data_list": [
+            {}
+          ]
+        },
+        {
+          "best_effort_timestamp_time": "0.083333"
+        },
+        {
+          "best_effort_timestamp_time": "0.166667"
+        },
+        {
+          "best_effort_timestamp_time": "0.250000"
+        },
+        {
+          "best_effort_timestamp_time": "0.333333"
+        },
+        {
+          "best_effort_timestamp_time": "0.416667"
+        },
+        {
+          "best_effort_timestamp_time": "0.500000"
+        },
+        {
+          "best_effort_timestamp_time": "0.583333"
+        },
+        {
+          "best_effort_timestamp_time": "0.666667"
+        },
+        {
+          "best_effort_timestamp_time": "0.750000"
+        },
+        {
+          "best_effort_timestamp_time": "0.833333"
+        },
+        {
+          "best_effort_timestamp_time": "0.916667"
+        },
+        {
+          "best_effort_timestamp_time": "1.000000"
+        },
+        {
+          "best_effort_timestamp_time": "1.083333"
+        },
+        {
+          "best_effort_timestamp_time": "1.166667"
+        },
+        {
+          "best_effort_timestamp_time": "1.250000"
+        },
+        {
+          "best_effort_timestamp_time": "1.333333"
+        },
+        {
+          "best_effort_timestamp_time": "1.416667"
+        },
+        {
+          "best_effort_timestamp_time": "1.500000"
+        },
+        {
+          "best_effort_timestamp_time": "1.583333"
+        },
+        {
+          "best_effort_timestamp_time": "1.666667"
+        },
+        {
+          "best_effort_timestamp_time": "1.750000"
+        },
+        {
+          "best_effort_timestamp_time": "1.833333"
+        },
+        {
+          "best_effort_timestamp_time": "1.916667"
+        }
+      ],
+      "pcm_sha256": "1fd0c2ffe3321393b5179e17f91d3b08486718a97c046232ecd8347009e31535",
+      "pcm_float_values": 192512,
+      "probe": {
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.64000c",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 180,
+            "has_b_frames": 2,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p",
+            "level": 12,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "12/1",
+            "avg_frame_rate": "12/1",
+            "time_base": "1/12288",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 24576,
+            "duration": "2.000000",
+            "bit_rate": "57904",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "24",
+            "extradata_size": 49,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_long_name": "AAC (Advanced Audio Coding)",
+            "profile": "LC",
+            "codec_type": "audio",
+            "codec_tag_string": "mp4a",
+            "codec_tag": "0x6134706d",
+            "mime_codec_string": "mp4a.40.2",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 2,
+            "channel_layout": "stereo",
+            "bits_per_sample": 0,
+            "initial_padding": 0,
+            "id": "0x2",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 96000,
+            "duration": "2.000000",
+            "bit_rate": "190310",
+            "nb_frames": "95",
+            "extradata_size": 5,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "SoundHandler"
+            }
+          }
+        ],
+        "format": {
+          "filename": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\first.mp4",
+          "nb_streams": 2,
+          "nb_programs": 0,
+          "nb_stream_groups": 0,
+          "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+          "format_long_name": "QuickTime / MOV",
+          "start_time": "0.000000",
+          "duration": "2.000000",
+          "size": "64880",
+          "bit_rate": "259520",
+          "probe_score": 100,
+          "tags": {
+            "major_brand": "isom",
+            "minor_version": "512",
+            "compatible_brands": "isomiso2avc1mp41",
+            "encoder": "Lavf62.12.100"
+          }
+        }
+      }
+    },
+    "renamed.mp4": {
+      "rgba_sha256": "d061766917a6d9e7fa10ca7beb217e720146135522afd91b22a4dd60bfe1664c",
+      "frames": 24,
+      "frame_sha256": [
+        "71ba81941ee3cd35090c507b195a247d79ddae4877046e02bfe8c5193d6dbf4b",
+        "fd9f5b9818df37e6741350faf631896f145ad9d84b06ce01c1869f5c0b305ec9",
+        "2d2ceb8b0bef92dd40a5abfb5927f9ba8afc8ba62477d1b7f405c2065f51064d",
+        "39241391e25321a2dd4d50a5eb0564f330738b3f20c2115848ee556f6f298270",
+        "2160b9a419cc66e0463fae92ecee0f08d5e70e18362b580071d087ec980fbf7b",
+        "7ddf99ddebcbdc35a72079e21f5d80ec84a99e940fbf7d5130b656a284cf23de",
+        "9b2505b386eaafe27f81fa1e3466b7226ab19e9608bdbb08908cabf8fdcf9708",
+        "bfca3dc1dc99d82a629b091d14ed48988d06b7a8c1dc9aec0ab73ea177e3ac5e",
+        "678c460da9aaa9c83a0022002fe3285b261f55327a1ec10738a41b937d7060ed",
+        "4469506766d5432def5de9f3895a31242d177cb5b33dd9e72377763d454728cd",
+        "cd089bb05134e65a4a1146fcd69bb463e544523006c81a65d2a794b753bc425c",
+        "cc813edbe71240e927b6611b9ce02446cda52aa51a73117085187b945c2c68ff",
+        "5ebe8f4912db8eac301ab0d0c861a34df5f4bf2e6b2031703153a070dae658c5",
+        "e9f8a802bf6cabfc78d95e7134ebdfcb195cbe113e78feeeea12325253fea158",
+        "864fa4a8ff6a30b51e85ca2c545a9694a44afde5fab3539a9c20717166870ddc",
+        "391482474b0974166caa453ebf392b99afe78f9383a084ef60983bca0639cae1",
+        "a69ca59eadcdca10ae7dde200ae46b82ba06ef4f60d0b4046f1a3d8004944bb6",
+        "5231b778417ad4f3aab2a422ea8b7a479c12f484ae5a3d1555e519beed9d9932",
+        "860c95a2eea96e61ed61338fca8b7c96997cb7c568e6ac351ab5bd10576f38d8",
+        "17440d3ebd219e6a92b36bdc2fc8c4ac167516103416b95373e89a44be7ab8e9",
+        "33a2787189cecda1c6725a897f349d3123fb13dd80e7f918a8b17c42197ad0d7",
+        "7b8518a30ed38f2f61332d1f4983a23ad97f8570ec49586dcd258c48aa67e578",
+        "ba4101acc1dd0c443351c06dffb893db81081acc6f3b081a1e365757bfef3d16",
+        "0217367929d196f71443f3089cde63ebf359092890544a04387571cb73750451"
+      ],
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "pts": [
+        {
+          "best_effort_timestamp_time": "0.000000",
+          "side_data_list": [
+            {}
+          ]
+        },
+        {
+          "best_effort_timestamp_time": "0.083333"
+        },
+        {
+          "best_effort_timestamp_time": "0.166667"
+        },
+        {
+          "best_effort_timestamp_time": "0.250000"
+        },
+        {
+          "best_effort_timestamp_time": "0.333333"
+        },
+        {
+          "best_effort_timestamp_time": "0.416667"
+        },
+        {
+          "best_effort_timestamp_time": "0.500000"
+        },
+        {
+          "best_effort_timestamp_time": "0.583333"
+        },
+        {
+          "best_effort_timestamp_time": "0.666667"
+        },
+        {
+          "best_effort_timestamp_time": "0.750000"
+        },
+        {
+          "best_effort_timestamp_time": "0.833333"
+        },
+        {
+          "best_effort_timestamp_time": "0.916667"
+        },
+        {
+          "best_effort_timestamp_time": "1.000000"
+        },
+        {
+          "best_effort_timestamp_time": "1.083333"
+        },
+        {
+          "best_effort_timestamp_time": "1.166667"
+        },
+        {
+          "best_effort_timestamp_time": "1.250000"
+        },
+        {
+          "best_effort_timestamp_time": "1.333333"
+        },
+        {
+          "best_effort_timestamp_time": "1.416667"
+        },
+        {
+          "best_effort_timestamp_time": "1.500000"
+        },
+        {
+          "best_effort_timestamp_time": "1.583333"
+        },
+        {
+          "best_effort_timestamp_time": "1.666667"
+        },
+        {
+          "best_effort_timestamp_time": "1.750000"
+        },
+        {
+          "best_effort_timestamp_time": "1.833333"
+        },
+        {
+          "best_effort_timestamp_time": "1.916667"
+        }
+      ],
+      "pcm_sha256": "1fd0c2ffe3321393b5179e17f91d3b08486718a97c046232ecd8347009e31535",
+      "pcm_float_values": 192512,
+      "probe": {
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.64000c",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 180,
+            "has_b_frames": 2,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p",
+            "level": 12,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "12/1",
+            "avg_frame_rate": "12/1",
+            "time_base": "1/12288",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 24576,
+            "duration": "2.000000",
+            "bit_rate": "57904",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "24",
+            "extradata_size": 49,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_long_name": "AAC (Advanced Audio Coding)",
+            "profile": "LC",
+            "codec_type": "audio",
+            "codec_tag_string": "mp4a",
+            "codec_tag": "0x6134706d",
+            "mime_codec_string": "mp4a.40.2",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 2,
+            "channel_layout": "stereo",
+            "bits_per_sample": 0,
+            "initial_padding": 0,
+            "id": "0x2",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 96000,
+            "duration": "2.000000",
+            "bit_rate": "190310",
+            "nb_frames": "95",
+            "extradata_size": 5,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "SoundHandler"
+            }
+          }
+        ],
+        "format": {
+          "filename": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\renamed.mp4",
+          "nb_streams": 2,
+          "nb_programs": 0,
+          "nb_stream_groups": 0,
+          "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+          "format_long_name": "QuickTime / MOV",
+          "start_time": "0.000000",
+          "duration": "2.000000",
+          "size": "64880",
+          "bit_rate": "259520",
+          "probe_score": 100,
+          "tags": {
+            "major_brand": "isom",
+            "minor_version": "512",
+            "compatible_brands": "isomiso2avc1mp41",
+            "encoder": "Lavf62.12.100"
+          }
+        }
+      }
+    },
+    "smaller.mp4": {
+      "rgba_sha256": "6104ffe6faae6fc617405d7b9d3c5c1f1ec830bd069c151c84d2b6268c707fb5",
+      "frames": 24,
+      "frame_sha256": [
+        "1a0c767cd0fd3f32bdb79538715e6ffb5ea7a528595c10ab701c2672a6a6207d",
+        "87b3257c99450a600c435b9e5cc429d06c709edba755eb87c0ec9dcbdd481775",
+        "2a2729f41faeff758223ce89c7c64f5dfad956d4648656d7839e675bf9e3eb03",
+        "45df8c3870986ec16d3e5e348447c93d15d7081fba0ebfad02cf6efb4a156979",
+        "941dae473e151770bf5747e890e3e60f4bc003b60d9d6f1e91467520aa565517",
+        "050d9bfd7ec9ec7ed482a701f97d26049eed09493b5a3fccfde49bc535c3ce4e",
+        "95efe9e0a72cec61fe710cf79da57a3c63bb4a055cd01d1e487d532d4b225e37",
+        "19e13fc4a77502330e139e34e238744f9b4082ca768c94653387017ac9b9c1ea",
+        "4bcc06e6119145826b054cd01d67afe2b74273dd4edb80926e8bafe14cba42cf",
+        "f08879f49fefe92041392b621f57044f22ab2cab60b2c875bc2b2f77515486ee",
+        "544dd7950b7506f3c60f39e9eda27fc914a3206c40d90accb44f3ca0a8afbcb2",
+        "d4a7de6127ec6c710a9d924c5406ee608e90664f5033ba1cfbea9961648d02d3",
+        "2367acdd71631051efbbf0e3dc2b846e3b636482b63f28a24449a84cc7b9c27c",
+        "dbaf2f5cfec878421f65f58a7e0d0db9b20eea1bd924c906442036aac350c4fb",
+        "3269e29a48cc5229ea51b1a616dafc54f63cfa501f1d7e9cc855466f96537fca",
+        "59ad11231882f3f96a4147215e77fa3c8765adf43e04b81439904a4042dbff1c",
+        "c20b7d3fd837af43a2e0316c6118b3f55791f3baf76f66bc46d75f45576649ea",
+        "e319f3130f41f4f14efce0795cdb80d4984c8d2315c990b090142250329d49de",
+        "9556c97edd550207d759b5321fd4b75c81792b89980ecdc20489d9735fbae6f4",
+        "701d4eed7aff8c453fd977a7c3b8aedae043d20af735448f79647becb33e7ed8",
+        "9d30042e2fe32aa7338a210ddbfefce065ca6584ad08602ded3f5a82a1ba5013",
+        "2ea8fe5316e066e9454b62c7d2e24cb868039695a42675ac299321997eb96a79",
+        "4fbb29f17f1822e75874d1781e72ded445ee9226e6955b53bc76e0c81a52c803",
+        "80e1ea73ed4c5c85c876bdd6bebd8a251868b6b66d8f4ab25d821716e1376511"
+      ],
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "pts": [
+        {
+          "best_effort_timestamp_time": "0.000000",
+          "side_data_list": [
+            {}
+          ]
+        },
+        {
+          "best_effort_timestamp_time": "0.083333"
+        },
+        {
+          "best_effort_timestamp_time": "0.166667"
+        },
+        {
+          "best_effort_timestamp_time": "0.250000"
+        },
+        {
+          "best_effort_timestamp_time": "0.333333"
+        },
+        {
+          "best_effort_timestamp_time": "0.416667"
+        },
+        {
+          "best_effort_timestamp_time": "0.500000"
+        },
+        {
+          "best_effort_timestamp_time": "0.583333"
+        },
+        {
+          "best_effort_timestamp_time": "0.666667"
+        },
+        {
+          "best_effort_timestamp_time": "0.750000"
+        },
+        {
+          "best_effort_timestamp_time": "0.833333"
+        },
+        {
+          "best_effort_timestamp_time": "0.916667"
+        },
+        {
+          "best_effort_timestamp_time": "1.000000"
+        },
+        {
+          "best_effort_timestamp_time": "1.083333"
+        },
+        {
+          "best_effort_timestamp_time": "1.166667"
+        },
+        {
+          "best_effort_timestamp_time": "1.250000"
+        },
+        {
+          "best_effort_timestamp_time": "1.333333"
+        },
+        {
+          "best_effort_timestamp_time": "1.416667"
+        },
+        {
+          "best_effort_timestamp_time": "1.500000"
+        },
+        {
+          "best_effort_timestamp_time": "1.583333"
+        },
+        {
+          "best_effort_timestamp_time": "1.666667"
+        },
+        {
+          "best_effort_timestamp_time": "1.750000"
+        },
+        {
+          "best_effort_timestamp_time": "1.833333"
+        },
+        {
+          "best_effort_timestamp_time": "1.916667"
+        }
+      ],
+      "pcm_sha256": "1fd0c2ffe3321393b5179e17f91d3b08486718a97c046232ecd8347009e31535",
+      "pcm_float_values": 192512,
+      "probe": {
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.64000b",
+            "width": 256,
+            "height": 144,
+            "coded_width": 256,
+            "coded_height": 144,
+            "has_b_frames": 2,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p",
+            "level": 11,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "12/1",
+            "avg_frame_rate": "12/1",
+            "time_base": "1/12288",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 24576,
+            "duration": "2.000000",
+            "bit_rate": "50712",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "24",
+            "extradata_size": 48,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_long_name": "AAC (Advanced Audio Coding)",
+            "profile": "LC",
+            "codec_type": "audio",
+            "codec_tag_string": "mp4a",
+            "codec_tag": "0x6134706d",
+            "mime_codec_string": "mp4a.40.2",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 2,
+            "channel_layout": "stereo",
+            "bits_per_sample": 0,
+            "initial_padding": 0,
+            "id": "0x2",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 96000,
+            "duration": "2.000000",
+            "bit_rate": "190310",
+            "nb_frames": "95",
+            "extradata_size": 5,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "SoundHandler"
+            }
+          }
+        ],
+        "format": {
+          "filename": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\smaller.mp4",
+          "nb_streams": 2,
+          "nb_programs": 0,
+          "nb_stream_groups": 0,
+          "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+          "format_long_name": "QuickTime / MOV",
+          "start_time": "0.000000",
+          "duration": "2.000000",
+          "size": "63073",
+          "bit_rate": "252292",
+          "probe_score": 100,
+          "tags": {
+            "major_brand": "isom",
+            "minor_version": "512",
+            "compatible_brands": "isomiso2avc1mp41",
+            "encoder": "Lavf62.12.100"
+          }
+        }
+      }
+    },
+    "alpha-first.webm": {
+      "rgba_sha256": "e633bfa78986747e5b29c0e552bdfe22eb509555fe6dbbc5df16785ee2debe3a",
+      "frames": 24,
+      "frame_sha256": [
+        "92c590ac0785a0337958ee5733140f26d6914295725f2df8f18f3366c8c65803",
+        "e5a31aef0b5e1e94d1f928a98f5ee903ccc08b394f36d75d22a69b5bf2f613d1",
+        "8d65c346a1372fc1bdb0673cfbc9eb1b31740dcbdf6ae9fc526a90318b1294a8",
+        "549c1b53406235c0c232b40f4f437581a511941c2899f14790aaea55d204a19c",
+        "c9ea567942c8c1446475870949e28b8a7143cbdbfcaeef3235d66258174b9b20",
+        "6e13fd7acb8230d16f9cd1dbd77e052fd5fa7db74c472907a88ba2be871dbc3b",
+        "db744e3b82acd4718fe1c1016e75c1f8d6f3a2e5bf42acc750d9c48f5aadcd51",
+        "a369f5ef669fb90e2fcb748b7b3c6a9a4725848053c5938f0cdeef797f53485b",
+        "ceaebe1af557450d69619c94005fc21275414a97fc03b774986311e37a927bf6",
+        "a621992caa18621e6e4e6d1d3de83b243d6088b0d780e34ac5532b1a63a7a42a",
+        "a70f975c44401cac1f1680b6c30a11800f1115c15458341a7afc3803966bb2d2",
+        "286217c8a810f8bf6dff9ae62af114363a72b0adeaf6e68dc40cc8d44d53a015",
+        "01ea6bfe94e574530e5f7235c4ad41756740e8613d238c5325ebf04e8ad5c56a",
+        "2eabe25ddad5ea53b45e1a4ad4c38bc24136d3d713e10fbb3298b581e443e649",
+        "f4715fb87b41ee5c79704e8cd65c681aa9fae64ec63a95fddec30958dcf6dd2a",
+        "e54c03f8c5f1b504969ecce0e0353e07da7c6b43d3c733ac2678641c97c9a6bf",
+        "80770a7a37d3e25408d4414f9bde129da52be9b392157d8436e64fb59ff60f93",
+        "32ca0e64640465bcc25a37ddab8ce968eab55ebdbd09d25e82071efccba41af3",
+        "446be963a620cc54b256b9322d6d95ebeffef3d30d51bb09e9ce3f896032a6f6",
+        "252e0e938f33937d573d94bfdf09c2f87a693a968d9793c32cb1d9c7febabe6e",
+        "c4f5d93a1f78f971eaefc93bf3aa43b1f6b0dcae9e685191a946f2379b4aaa50",
+        "4d0fb089598d50d2a39bc008ee5eea4f1a585ac672c6a7278e45f558039440bf",
+        "d787820ff0d958fb0173a440715e61d7498bdc984db2531186aae94c53f49273",
+        "68b22283a969b0cea908401a6ebfa875baf801158222de7b4b8d83e780f14c09"
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "pts": [
+        {
+          "best_effort_timestamp_time": "0.000000"
+        },
+        {
+          "best_effort_timestamp_time": "0.083000"
+        },
+        {
+          "best_effort_timestamp_time": "0.167000"
+        },
+        {
+          "best_effort_timestamp_time": "0.250000"
+        },
+        {
+          "best_effort_timestamp_time": "0.333000"
+        },
+        {
+          "best_effort_timestamp_time": "0.417000"
+        },
+        {
+          "best_effort_timestamp_time": "0.500000"
+        },
+        {
+          "best_effort_timestamp_time": "0.583000"
+        },
+        {
+          "best_effort_timestamp_time": "0.667000"
+        },
+        {
+          "best_effort_timestamp_time": "0.750000"
+        },
+        {
+          "best_effort_timestamp_time": "0.833000"
+        },
+        {
+          "best_effort_timestamp_time": "0.917000"
+        },
+        {
+          "best_effort_timestamp_time": "1.000000"
+        },
+        {
+          "best_effort_timestamp_time": "1.083000"
+        },
+        {
+          "best_effort_timestamp_time": "1.167000"
+        },
+        {
+          "best_effort_timestamp_time": "1.250000"
+        },
+        {
+          "best_effort_timestamp_time": "1.333000"
+        },
+        {
+          "best_effort_timestamp_time": "1.417000"
+        },
+        {
+          "best_effort_timestamp_time": "1.500000"
+        },
+        {
+          "best_effort_timestamp_time": "1.583000"
+        },
+        {
+          "best_effort_timestamp_time": "1.667000"
+        },
+        {
+          "best_effort_timestamp_time": "1.750000"
+        },
+        {
+          "best_effort_timestamp_time": "1.833000"
+        },
+        {
+          "best_effort_timestamp_time": "1.917000"
+        }
+      ],
+      "pcm_sha256": "fa30d896be113ea216a5925865765e69472e77353718a1ce89f35e0fff3de3a9",
+      "pcm_float_values": 192000,
+      "probe": {
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "vp9",
+            "codec_long_name": "Google VP9",
+            "profile": "Profile 0",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "mime_codec_string": "vp09.00.11.08",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 180,
+            "has_b_frames": 0,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p",
+            "level": -99,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "field_order": "progressive",
+            "r_frame_rate": "12/1",
+            "avg_frame_rate": "12/1",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "alpha_mode": "1",
+              "ENCODER": "Lavc62.28.100 libvpx-vp9",
+              "DURATION": "00:00:02.000000000"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "opus",
+            "codec_long_name": "Opus (Opus Interactive Audio Codec)",
+            "codec_type": "audio",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "mime_codec_string": "opus",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 2,
+            "channel_layout": "stereo",
+            "bits_per_sample": 0,
+            "initial_padding": 312,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "extradata_size": 19,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 libopus",
+              "DURATION": "00:00:02.008000000"
+            }
+          }
+        ],
+        "format": {
+          "filename": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-first.webm",
+          "nb_streams": 2,
+          "nb_programs": 0,
+          "nb_stream_groups": 0,
+          "format_name": "matroska,webm",
+          "format_long_name": "Matroska / WebM",
+          "start_time": "0.000000",
+          "duration": "2.008000",
+          "size": "146455",
+          "bit_rate": "583486",
+          "probe_score": 100,
+          "tags": {
+            "ENCODER": "Lavf62.12.100"
+          }
+        }
+      }
+    },
+    "alpha-copy.webm": {
+      "rgba_sha256": "e633bfa78986747e5b29c0e552bdfe22eb509555fe6dbbc5df16785ee2debe3a",
+      "frames": 24,
+      "frame_sha256": [
+        "92c590ac0785a0337958ee5733140f26d6914295725f2df8f18f3366c8c65803",
+        "e5a31aef0b5e1e94d1f928a98f5ee903ccc08b394f36d75d22a69b5bf2f613d1",
+        "8d65c346a1372fc1bdb0673cfbc9eb1b31740dcbdf6ae9fc526a90318b1294a8",
+        "549c1b53406235c0c232b40f4f437581a511941c2899f14790aaea55d204a19c",
+        "c9ea567942c8c1446475870949e28b8a7143cbdbfcaeef3235d66258174b9b20",
+        "6e13fd7acb8230d16f9cd1dbd77e052fd5fa7db74c472907a88ba2be871dbc3b",
+        "db744e3b82acd4718fe1c1016e75c1f8d6f3a2e5bf42acc750d9c48f5aadcd51",
+        "a369f5ef669fb90e2fcb748b7b3c6a9a4725848053c5938f0cdeef797f53485b",
+        "ceaebe1af557450d69619c94005fc21275414a97fc03b774986311e37a927bf6",
+        "a621992caa18621e6e4e6d1d3de83b243d6088b0d780e34ac5532b1a63a7a42a",
+        "a70f975c44401cac1f1680b6c30a11800f1115c15458341a7afc3803966bb2d2",
+        "286217c8a810f8bf6dff9ae62af114363a72b0adeaf6e68dc40cc8d44d53a015",
+        "01ea6bfe94e574530e5f7235c4ad41756740e8613d238c5325ebf04e8ad5c56a",
+        "2eabe25ddad5ea53b45e1a4ad4c38bc24136d3d713e10fbb3298b581e443e649",
+        "f4715fb87b41ee5c79704e8cd65c681aa9fae64ec63a95fddec30958dcf6dd2a",
+        "e54c03f8c5f1b504969ecce0e0353e07da7c6b43d3c733ac2678641c97c9a6bf",
+        "80770a7a37d3e25408d4414f9bde129da52be9b392157d8436e64fb59ff60f93",
+        "32ca0e64640465bcc25a37ddab8ce968eab55ebdbd09d25e82071efccba41af3",
+        "446be963a620cc54b256b9322d6d95ebeffef3d30d51bb09e9ce3f896032a6f6",
+        "252e0e938f33937d573d94bfdf09c2f87a693a968d9793c32cb1d9c7febabe6e",
+        "c4f5d93a1f78f971eaefc93bf3aa43b1f6b0dcae9e685191a946f2379b4aaa50",
+        "4d0fb089598d50d2a39bc008ee5eea4f1a585ac672c6a7278e45f558039440bf",
+        "d787820ff0d958fb0173a440715e61d7498bdc984db2531186aae94c53f49273",
+        "68b22283a969b0cea908401a6ebfa875baf801158222de7b4b8d83e780f14c09"
+      ],
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "pts": [
+        {
+          "best_effort_timestamp_time": "0.000000"
+        },
+        {
+          "best_effort_timestamp_time": "0.083000"
+        },
+        {
+          "best_effort_timestamp_time": "0.167000"
+        },
+        {
+          "best_effort_timestamp_time": "0.250000"
+        },
+        {
+          "best_effort_timestamp_time": "0.333000"
+        },
+        {
+          "best_effort_timestamp_time": "0.417000"
+        },
+        {
+          "best_effort_timestamp_time": "0.500000"
+        },
+        {
+          "best_effort_timestamp_time": "0.583000"
+        },
+        {
+          "best_effort_timestamp_time": "0.667000"
+        },
+        {
+          "best_effort_timestamp_time": "0.750000"
+        },
+        {
+          "best_effort_timestamp_time": "0.833000"
+        },
+        {
+          "best_effort_timestamp_time": "0.917000"
+        },
+        {
+          "best_effort_timestamp_time": "1.000000"
+        },
+        {
+          "best_effort_timestamp_time": "1.083000"
+        },
+        {
+          "best_effort_timestamp_time": "1.167000"
+        },
+        {
+          "best_effort_timestamp_time": "1.250000"
+        },
+        {
+          "best_effort_timestamp_time": "1.333000"
+        },
+        {
+          "best_effort_timestamp_time": "1.417000"
+        },
+        {
+          "best_effort_timestamp_time": "1.500000"
+        },
+        {
+          "best_effort_timestamp_time": "1.583000"
+        },
+        {
+          "best_effort_timestamp_time": "1.667000"
+        },
+        {
+          "best_effort_timestamp_time": "1.750000"
+        },
+        {
+          "best_effort_timestamp_time": "1.833000"
+        },
+        {
+          "best_effort_timestamp_time": "1.917000"
+        }
+      ],
+      "pcm_sha256": "fa30d896be113ea216a5925865765e69472e77353718a1ce89f35e0fff3de3a9",
+      "pcm_float_values": 192000,
+      "probe": {
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "vp9",
+            "codec_long_name": "Google VP9",
+            "profile": "Profile 0",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "mime_codec_string": "vp09.00.11.08",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 180,
+            "has_b_frames": 0,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p",
+            "level": -99,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "field_order": "progressive",
+            "r_frame_rate": "12/1",
+            "avg_frame_rate": "12/1",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "alpha_mode": "1",
+              "ENCODER": "Lavc62.28.100 libvpx-vp9",
+              "DURATION": "00:00:02.000000000"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "opus",
+            "codec_long_name": "Opus (Opus Interactive Audio Codec)",
+            "codec_type": "audio",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "mime_codec_string": "opus",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 2,
+            "channel_layout": "stereo",
+            "bits_per_sample": 0,
+            "initial_padding": 312,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "extradata_size": 19,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 libopus",
+              "DURATION": "00:00:02.008000000"
+            }
+          }
+        ],
+        "format": {
+          "filename": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\alpha-copy.webm",
+          "nb_streams": 2,
+          "nb_programs": 0,
+          "nb_stream_groups": 0,
+          "format_name": "matroska,webm",
+          "format_long_name": "Matroska / WebM",
+          "start_time": "0.000000",
+          "duration": "2.008000",
+          "size": "146455",
+          "bit_rate": "583486",
+          "probe_score": 100,
+          "tags": {
+            "ENCODER": "Lavf62.12.100"
+          }
+        }
+      }
+    }
+  },
+  "source_decoded": {
+    "rgba_sha256": "d6d04546d1f6edfb25dde3bdb3d4cd267fdf5b108d5e99d64e6c0bb51672d4c2",
+    "frames": 24,
+    "frame_sha256": [
+      "8b03cc6a89b371914a8e6639f3b469e673b239b16cf31f43bd221fb16139ee1a",
+      "e929348e5abe49994f09f0a7c037f6b27c0c0843b355c35b238634159bd149b3",
+      "7fe1cb1c32ef7f8c15ab86c6449b5e272a0d2c51072f79dff40db3f4815ab02d",
+      "a59a31e3b917077571fac4248841622e1dabd771607d0a346a6ebda0fb939d79",
+      "441fe1c9bf181b1f4e378bb243e7dc292a74515ad667e29963710a9f8b59b83e",
+      "583fc7dea541d34d8434c8a6b24446833af58d6be1e38a0f9e38efcfe02e586e",
+      "3b8e16cccb8059fcef0532505ed86c06d255377b82169175aea2e18d34a738a9",
+      "091354a6e3badf23a78f50815e294ec967c50fe054170f7caa36eaf67cf3eb67",
+      "81851d2d1f3c7cbbedf1e336ef66b89dcb44a70895475ec8b1dfe8e3f3887317",
+      "f1442bb80777eaad3e4e30a4202bde243347689d36dec83e0d2ec859adde5485",
+      "2ed0b61902b7a291f2fc0785f27e53599ca3053fc6701f98333fcc129a5a9d35",
+      "263500b4419f6386eb606241265652549baceeb63e49ce9938078a0bb583bf9d",
+      "18477f468d4795db83012a487ffe7ad176104a6f6bf8fe3c0fe2b3d17b4866c8",
+      "4601563a9803d54dd2330aa1c8c85719d782193bd71369fdd1793efe136fc65c",
+      "6ae8535e73cbf8104e61f7687dd7aa117d9a3946b680de5e82ad8e93bc9c717a",
+      "2fe93e44522064f6e3d4c6d4de0a940583ca9667bf6d89bb0e89ed8e0c811748",
+      "7a57a3150063e3e7b3b36e7d533bb0d14252496d30a27d08bfe45f34b70d5652",
+      "4b282bff31e6f20fe90f601041d9e9cad5715c79b542d190a925dc0ba16da2db",
+      "930ff81536c65af2eb21ccd4c8edf70de5bb7f80191d5ab5c0c8304d07fdf33d",
+      "1b1eebe3c282b9231478e1d4e19f296eb9df6f6772ba3762cfc213a5d9ad5113",
+      "234fbed4de1ab72cc8fbaf9b0645d582cd073695bb4421b5da6e76bc1222de37",
+      "f6886ca35e62843f1bd1780019636b3fae79c3ef6aaddca5b1b715e6856549f2",
+      "c3d651ca07bca1e3708e055ad3236f4bb515fec68a19c8b45574fdf73663ab71",
+      "9059c60bd8a73f1b9cd2d3d0680b65ceb46c849e233aaa97a5212c50e39f07d7"
+    ],
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "pts": [
+      {
+        "best_effort_timestamp_time": "0.000000"
+      },
+      {
+        "best_effort_timestamp_time": "0.083000"
+      },
+      {
+        "best_effort_timestamp_time": "0.167000"
+      },
+      {
+        "best_effort_timestamp_time": "0.250000"
+      },
+      {
+        "best_effort_timestamp_time": "0.333000"
+      },
+      {
+        "best_effort_timestamp_time": "0.417000"
+      },
+      {
+        "best_effort_timestamp_time": "0.500000"
+      },
+      {
+        "best_effort_timestamp_time": "0.583000"
+      },
+      {
+        "best_effort_timestamp_time": "0.667000"
+      },
+      {
+        "best_effort_timestamp_time": "0.750000"
+      },
+      {
+        "best_effort_timestamp_time": "0.833000"
+      },
+      {
+        "best_effort_timestamp_time": "0.917000"
+      },
+      {
+        "best_effort_timestamp_time": "1.000000"
+      },
+      {
+        "best_effort_timestamp_time": "1.083000"
+      },
+      {
+        "best_effort_timestamp_time": "1.167000"
+      },
+      {
+        "best_effort_timestamp_time": "1.250000"
+      },
+      {
+        "best_effort_timestamp_time": "1.333000"
+      },
+      {
+        "best_effort_timestamp_time": "1.417000"
+      },
+      {
+        "best_effort_timestamp_time": "1.500000"
+      },
+      {
+        "best_effort_timestamp_time": "1.583000"
+      },
+      {
+        "best_effort_timestamp_time": "1.667000"
+      },
+      {
+        "best_effort_timestamp_time": "1.750000"
+      },
+      {
+        "best_effort_timestamp_time": "1.833000"
+      },
+      {
+        "best_effort_timestamp_time": "1.917000"
+      }
+    ],
+    "pcm_sha256": "11a4a8eee51d0937e3bf69a4bb1d23c22bcfe5f370ee53989e177a0b014155bd",
+    "pcm_float_values": 192000,
+    "probe": {
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "ffv1",
+          "codec_long_name": "FFmpeg video codec #1",
+          "codec_type": "video",
+          "codec_tag_string": "[0][0][0][0]",
+          "codec_tag": "0x0000",
+          "width": 320,
+          "height": 180,
+          "coded_width": 320,
+          "coded_height": 180,
+          "has_b_frames": 0,
+          "pix_fmt": "bgra",
+          "level": -99,
+          "color_range": "pc",
+          "color_space": "gbr",
+          "field_order": "progressive",
+          "r_frame_rate": "12/1",
+          "avg_frame_rate": "12/1",
+          "time_base": "1/1000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "bits_per_raw_sample": "8",
+          "extradata_size": 42,
+          "disposition": {
+            "default": 0,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "ENCODER": "Lavc62.28.100 ffv1",
+            "DURATION": "00:00:02.000000000"
+          }
+        },
+        {
+          "index": 1,
+          "codec_name": "pcm_s16le",
+          "codec_long_name": "PCM signed 16-bit little-endian",
+          "codec_type": "audio",
+          "codec_tag_string": "[0][0][0][0]",
+          "codec_tag": "0x0000",
+          "sample_fmt": "s16",
+          "sample_rate": "48000",
+          "channels": 2,
+          "bits_per_sample": 16,
+          "initial_padding": 0,
+          "r_frame_rate": "0/0",
+          "avg_frame_rate": "0/0",
+          "time_base": "1/1000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "bit_rate": "1536000",
+          "disposition": {
+            "default": 0,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "ENCODER": "Lavc62.28.100 pcm_s16le",
+            "DURATION": "00:00:02.000000000"
+          }
+        }
+      ],
+      "format": {
+        "filename": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\source.mkv",
+        "nb_streams": 2,
+        "nb_programs": 0,
+        "nb_stream_groups": 0,
+        "format_name": "matroska,webm",
+        "format_long_name": "Matroska / WebM",
+        "start_time": "0.000000",
+        "duration": "2.000000",
+        "size": "481146",
+        "bit_rate": "1924584",
+        "probe_score": 100,
+        "tags": {
+          "ENCODER": "Lavf62.12.100"
+        }
+      }
+    }
+  },
+  "public_files": [
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/alpha-copy.webm",
+      "bytes": 146455,
+      "sha256": "d18c46cf938b1236e7554f829d06a1dfc3828b46f197483d418414c1c705f75a"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/alpha-copy.webm.manifest.json",
+      "bytes": 96510,
+      "sha256": "dc2c2321a10be700807a8b658bf2b6641128fea66aa332d3ebc85da160dcaf46"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/alpha-first.webm",
+      "bytes": 146455,
+      "sha256": "d18c46cf938b1236e7554f829d06a1dfc3828b46f197483d418414c1c705f75a"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/alpha-first.webm.manifest.json",
+      "bytes": 96498,
+      "sha256": "17db4d29951d9f317183a1f213deffddfb647640ff8e432446d38607f4186d1e"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/comparison-frame-0.png",
+      "bytes": 13513,
+      "sha256": "0d4247c295de23ec064c53b3a5bce9edf906d466484c7c095ce2862427141d61"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/DejaVuSans.ttf",
+      "bytes": 756072,
+      "sha256": "3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/first.mp4",
+      "bytes": 64880,
+      "sha256": "fbba9c5aa6eef771b436257a04dc841776d938af0c37e90e628c2a52f59cdc81"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/first.mp4.manifest.json",
+      "bytes": 96651,
+      "sha256": "448bade2dcfee1ef4d4f16dfe56bd6652c6897443d099ffd71bac9960da8cae9"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/LICENSE_DEJAVU",
+      "bytes": 4816,
+      "sha256": "d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/preview.gif",
+      "bytes": 137755,
+      "sha256": "8b697458bc6705a523472dd2bcbb814d55c68e64e8adaf23be50274d672f4177"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/renamed.mp4",
+      "bytes": 64880,
+      "sha256": "fbba9c5aa6eef771b436257a04dc841776d938af0c37e90e628c2a52f59cdc81"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/renamed.mp4.manifest.json",
+      "bytes": 97041,
+      "sha256": "13366ac24cd09a72a5a71752f868d851e5b513223ae89adadf053658fb0eec65"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/smaller.mp4",
+      "bytes": 63073,
+      "sha256": "7e3ae78ade69841b314c129662a59219e33ce0d88b3a278a9cb4a4746f42752a"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/smaller.mp4.manifest.json",
+      "bytes": 97005,
+      "sha256": "e024d6294bd5f7588fa806fa6d4d0b6257031256f5e69d7e8f14fac543c61abf"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/source-origin.json",
+      "bytes": 595,
+      "sha256": "a7c4164d172e8d9fafb621e38cf992774f49df1f7bc80ef53c0cc5634da9e002"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/source-preview.mp4",
+      "bytes": 40134,
+      "sha256": "800f0dd094d07b1bb5e7dbbb43317751a793a4835989dceb99ee6b9c6c46c13b"
+    },
+    {
+      "path": "docs/assets/openfilm-batch-reuse-20261020-v70-native-r2/source.mkv",
+      "bytes": 481146,
+      "sha256": "8ce5f11593dec83d936f2cf38a61da7bece52e81df86a16a8af5f22629201752"
+    }
+  ],
+  "cli_calls": 10,
+  "visual_review": "pending",
+  "continuous_playback_review": false,
+  "audio_listening_review": false,
+  "capcut_parity_accepted": false,
+  "finished_at_utc": "2026-10-19T23:18:13.178650+00:00",
+  "frozen_after": {
+    "docs/specs/agent-project.schema.json": "sha256:7b3a91d818199c179a41e54c725df26403449775fcec66b573e83b2c2faf965f",
+    "product/offline/build.py": "sha256:1b93123f4e34dc18aaf4bb9ecbb4261e423f297103e63e494c9ec883f9871810",
+    "product/offline/install.py": "sha256:4a7bf97d2fe15b92f1448fb118eb07d5625c02741c1585c392a3b0d75dba1c7e",
+    "product/pyproject.toml": "sha256:4c71032e5cfe55f8d2b4f07e459aef39d172f2292e88f9df0346db0c9746993a",
+    "product/src/ai_ad_editor/__init__.py": "sha256:ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+    "product/src/ai_ad_editor/__main__.py": "sha256:307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "product/src/ai_ad_editor/ad_plan.py": "sha256:4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+    "product/src/ai_ad_editor/agent-project.schema.json": "sha256:7b3a91d818199c179a41e54c725df26403449775fcec66b573e83b2c2faf965f",
+    "product/src/ai_ad_editor/animation.py": "sha256:b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+    "product/src/ai_ad_editor/artifact_locks.py": "sha256:317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+    "product/src/ai_ad_editor/asr_quality.py": "sha256:e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+    "product/src/ai_ad_editor/audio_routing.py": "sha256:40f74750a79ea80f016dd2eb8a353d6103682756f01970ad802c6292be8e5af8",
+    "product/src/ai_ad_editor/audio_separation.py": "sha256:bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+    "product/src/ai_ad_editor/audio_stretch.py": "sha256:f4120fd82fc4eba79b9dd0bed1093651edbadb19202d7c384530e799d047dced",
+    "product/src/ai_ad_editor/audio_tempo.py": "sha256:3284a08dc75a25dcbeed30c7088a18898c46d398e6e7ae9380efcf0e366afcee",
+    "product/src/ai_ad_editor/audio_tools.py": "sha256:9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+    "product/src/ai_ad_editor/batch.py": "sha256:5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+    "product/src/ai_ad_editor/beat_edit.py": "sha256:0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+    "product/src/ai_ad_editor/bindings.py": "sha256:2dbb8bce11ecb7f7fd6fa893cca08efdaa6f9c21a3c6f8a4588cbed5092c3a65",
+    "product/src/ai_ad_editor/browser_process.py": "sha256:55c72751a5d3d5e397af030fbf65a7ef5b659646a3890f72e52da816d9ab22a6",
+    "product/src/ai_ad_editor/capabilities.py": "sha256:95ca093d179a783244ef1d235b9af8841f31cc2c522fccd54b00332d953b8a5b",
+    "product/src/ai_ad_editor/captions.py": "sha256:f9a4534682417235a1c2e6ba36072bb92de9354cb5d83b76d06e3ecb22144d28",
+    "product/src/ai_ad_editor/cli.py": "sha256:5b4988dbf1982988aea74462f21474a208e60e7489ecd42cda762ff2dda56ec0",
+    "product/src/ai_ad_editor/clip_windows.py": "sha256:3014424ecce4ec780b2e241afd50c310681c69c4450ebd88b689cea221149377",
+    "product/src/ai_ad_editor/convert.py": "sha256:5ff0ea4edf337b96f88f2a4d5c6ec7e36ab8f42e17260a0a7a9c0bce289c5229",
+    "product/src/ai_ad_editor/ctc_alignment.py": "sha256:a475e9b1acd8ceba2be90884729f0b5a4c76ed354853bc0a57b47f1f9787edd7",
+    "product/src/ai_ad_editor/ctc_cli.py": "sha256:2f20af923ea0a7af6fe9d5080cdb999d6b7c2f26c133a6c2f702d782747c22c8",
+    "product/src/ai_ad_editor/ctc_worker.py": "sha256:933d1c7ca4ac7dc8512d49e17a090b0a89e580724d0228a9ab44a3a14e3e9810",
+    "product/src/ai_ad_editor/cuda_admission.py": "sha256:8d030f776b09edeb9d6cfecce720caca3f20a1fab058dd3dc406020ed064fd3b",
+    "product/src/ai_ad_editor/demucs_worker.py": "sha256:8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+    "product/src/ai_ad_editor/draft_adapter.py": "sha256:0eb1e8f649e66cc6f15ef56bfb75d07166a7d7e3a6f1326f50bca349a1c24071",
+    "product/src/ai_ad_editor/edit_planner.py": "sha256:ffe0c9c774f094b57b565ad56f84291d432ce957b1fa578dd44aabd80212b43a",
+    "product/src/ai_ad_editor/effect_automation.py": "sha256:9537dfbfa6469009b13aeb01d846f5181161be81903324f2efd6461e91cdd3fa",
+    "product/src/ai_ad_editor/effects.py": "sha256:f9c37938e50a217d5a511abd5341aad7fdac2575aff26b75eb13ceb90137e9fc",
+    "product/src/ai_ad_editor/errors.py": "sha256:1525e91f86ad7f22c061a35c383d3513cdcad77acab2e364510b42adde0a9721",
+    "product/src/ai_ad_editor/font_coverage.py": "sha256:2f33b3eb07331ef3b87c78286317df8d903a2c991978e9750a39d6bcd117c243",
+    "product/src/ai_ad_editor/fragments.py": "sha256:6087fe24f6f0a2041473ac5ccc04507f7c25c2b598c5a6f65dd7b4ddafe9567f",
+    "product/src/ai_ad_editor/hardware_acceleration.py": "sha256:670ab26584d75f45ca6d6a12df0e096bdbe0d25dba6edc9ef3ea4ccba3f5132f",
+    "product/src/ai_ad_editor/html_motion.py": "sha256:eccfca16e5a3760c9cc9546613231c281fd253ea11e846fad39f98eb7f699889",
+    "product/src/ai_ad_editor/html_motion_worker.mjs": "sha256:435899a68e8ac4e76484c00e2d3f6d8fadcf362475dd9e639d0bd0e7ad7fe0bf",
+    "product/src/ai_ad_editor/html_quality.py": "sha256:7abdb2b18bb86a3d87e058e74b908cb0a430f05273ca9b78122a5985c0b5dba0",
+    "product/src/ai_ad_editor/html_quality_dom.mjs": "sha256:551f997cd5f4f57514354ed4b5292c67e9e82f4c8928db74f4d6c53b57ecdc94",
+    "product/src/ai_ad_editor/html_template.py": "sha256:f3ad9507632d03df9e7de3e4303638325c9667e1005ae9600c62670b06d1436e",
+    "product/src/ai_ad_editor/html_template_dom.mjs": "sha256:ed68388d4dda1adabc689afa508640de471fe8a6e461bc6aeb5292d904950260",
+    "product/src/ai_ad_editor/inline_sequences.py": "sha256:ee1596121f7e0ea88c7d1f8e27d75132b57dc03522a768a2716f97343a1ed911",
+    "product/src/ai_ad_editor/inpainting_frames.py": "sha256:bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+    "product/src/ai_ad_editor/lama_worker.py": "sha256:c8b78f2e476e417ed54ea62aa502858eeb13b14c8e91b29fdd15021a4c648154",
+    "product/src/ai_ad_editor/library.py": "sha256:60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+    "product/src/ai_ad_editor/local_asr.py": "sha256:7c8582144a9b17e08558f36777c312099e10fee82f18f49589b07f40b61fb9dc",
+    "product/src/ai_ad_editor/local_ctc.py": "sha256:f4e6bef1bf35603a5828f161462570afa9ca04af4364e0032708700ae3141716",
+    "product/src/ai_ad_editor/local_inpainting.py": "sha256:34294b2a7184afeda6527db59def5aa6b02efa83e8f3beb6e8e53fec0fe03890",
+    "product/src/ai_ad_editor/local_matting.py": "sha256:c70b82dd131de94729f2fe096fa35e3ad2775e5e2476a04a0b97e11a6939a3c6",
+    "product/src/ai_ad_editor/local_ocr.py": "sha256:cd85a6d7b12ec18b3e024327687c483f1f7cfa0deed2369b968f8ab2bccc14b5",
+    "product/src/ai_ad_editor/local_outpainting.py": "sha256:577ecf6fe26a0718cc734ba6b526f52e974b97262965f965aa37f431add1bd55",
+    "product/src/ai_ad_editor/local_segmentation.py": "sha256:30c0acaea0c261f35c5e10b3e0df36ebf10b9137608b18109a1c4739095ed361",
+    "product/src/ai_ad_editor/local_separation.py": "sha256:8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+    "product/src/ai_ad_editor/local_tts.py": "sha256:028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+    "product/src/ai_ad_editor/local_vace.py": "sha256:44cb7558644b219234e15c8e4088cb7c760a8f200e00e1ba66fb16b338c83571",
+    "product/src/ai_ad_editor/local_vision.py": "sha256:d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+    "product/src/ai_ad_editor/lut_library.py": "sha256:369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "product/src/ai_ad_editor/magnetic_mode.py": "sha256:7b74280ed8df6d94b259548122b44216ca45d6726084504aa6fdd05524f460e1",
+    "product/src/ai_ad_editor/magnetic_reorder.py": "sha256:b3db1863adfa7cb88173a864c127d01ebfa33c2ba46dc21b340ea660db03eef1",
+    "product/src/ai_ad_editor/magnetic_sync.py": "sha256:bd4c59d3045eda011a9cc5e7c8720b9380bc756ee41931867b0f4eb4f22ea939",
+    "product/src/ai_ad_editor/mask_edit.py": "sha256:952aa4c1cc3f49b2b1c9d5dc0c969901d82d4fcbe660387af2f3f7c044d6bb7a",
+    "product/src/ai_ad_editor/mask_edit_geometry.py": "sha256:9bf1d101c1aea8d2265b704fab8dcd65b3bb08c4cc45aed95a4a5cb0ee2ae1f9",
+    "product/src/ai_ad_editor/mask_review.py": "sha256:17de0acd6d76ad9218565302a0f47a577a5001a487bbf0c66432b0b6af278bad",
+    "product/src/ai_ad_editor/mask_tracking.py": "sha256:724f8f9800536d3ffdc99675fadf79e1262532ec7f9a3d879cf94674ba531b8d",
+    "product/src/ai_ad_editor/matting_frames.py": "sha256:e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+    "product/src/ai_ad_editor/media.py": "sha256:75755c314fe01111d7ca85138efb6f9b0993e45c14c5a2b65cc1046c5e58cfba",
+    "product/src/ai_ad_editor/migration.py": "sha256:b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+    "product/src/ai_ad_editor/model_registry.py": "sha256:b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+    "product/src/ai_ad_editor/motion_presets.py": "sha256:6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+    "product/src/ai_ad_editor/multicam.py": "sha256:fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+    "product/src/ai_ad_editor/nested_freeze.py": "sha256:2294d318840e6285550eaf70109702b041c031c2cde4c8dc0bca3d2bad848a35",
+    "product/src/ai_ad_editor/ocr_cli.py": "sha256:1a818549a1308e78a38a1a5aa9a025772f5be792bacfcdfeacb5599670e0b4ec",
+    "product/src/ai_ad_editor/ocr_geometry.py": "sha256:a2a4aedf4289ab20bea45000c1be898668239b75ef215386120850d2f7dfce5c",
+    "product/src/ai_ad_editor/ocr_worker.py": "sha256:ee5a2096ec1ee03fc09d2ac4d0b06b1791d5bbfe011772f448045d1377b50d3f",
+    "product/src/ai_ad_editor/OPENFILM_EXAMPLES_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_frame_clock.mjs": "sha256:c60b35fb0d26b8629d833f11028757aeccf603917c4c5840f501c01b757de1d5",
+    "product/src/ai_ad_editor/OPENFILM_LICENSE.txt": "sha256:4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+    "product/src/ai_ad_editor/openfilm_overrides.mjs": "sha256:8fab39a5f4f9696e9070a206f45d9241f54167ea2d9f47c0bcc9975333664832",
+    "product/src/ai_ad_editor/openfilm_stroke.mjs": "sha256:6c20aaff3a85b8a98654d82bfbea34029d78b0366af6b95b17c70abfafd265a1",
+    "product/src/ai_ad_editor/openfilm_subtitle_segments.mjs": "sha256:b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+    "product/src/ai_ad_editor/openfilm_template_fields.mjs": "sha256:fd4c58532cd3b46e32872e84136b54edef5a8ad9d824f1afa44f9264d81774e3",
+    "product/src/ai_ad_editor/openfilm_text_bounds.mjs": "sha256:94b2ab392b367ef1f901967f9156ac48493419be32bc40b4d6c035cf71a56108",
+    "product/src/ai_ad_editor/PADDLE_OCR_LICENSE.txt": "sha256:3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e",
+    "product/src/ai_ad_editor/PADDLE_OCR_NOTICE.txt": "sha256:392317bb77f62100b038919472ce0c3fecf0d6c6f9c29fc22a18813fb4a15a32",
+    "product/src/ai_ad_editor/PDOOM_VIDEO_LICENSE.txt": "sha256:5fc212466ce7183be5d85a3ee34fea461712842d5cd256b470978a83577083cb",
+    "product/src/ai_ad_editor/pipeline_diagnostics.py": "sha256:10293635791333ef437e592d7a58f8dcf341ade759552a26149c1297bb9cac81",
+    "product/src/ai_ad_editor/policy.py": "sha256:0433efb46d2561fa9f257dd363aeb592df7ef61c60be147196cbaee7fabbacb8",
+    "product/src/ai_ad_editor/project.py": "sha256:dd86c8d1b161cb99660f4bc92ac3ff8c2cc6c10c34f22432fbe6f27af9a7414f",
+    "product/src/ai_ad_editor/quality.py": "sha256:d4e71c9e6616250b681306d562305dafe4cb5867652ab365275277b155e9e047",
+    "product/src/ai_ad_editor/queue_reuse.py": "sha256:d939247ceee094b9255bc8833afcb6897cb3f0f06a280c717306d316e1f38f61",
+    "product/src/ai_ad_editor/range_edits.py": "sha256:eff604efaa3c2a66b63b3fcb332804ffd9e45a11ab880964b279a379d5500e4e",
+    "product/src/ai_ad_editor/recommend.py": "sha256:0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+    "product/src/ai_ad_editor/render.py": "sha256:3b3cd6d7963a179057ba36668515b8ee87e9e0a23914395dc5c7c13635e81bfe",
+    "product/src/ai_ad_editor/render_queue.py": "sha256:171db5bb475f3eaeb4ce05dacdc3c19ba90c2b3f429349d50c949b9d3c97f2be",
+    "product/src/ai_ad_editor/repair_blend.py": "sha256:1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+    "product/src/ai_ad_editor/retime_edits.py": "sha256:4dcf1ef57db6bd813d2c25887705ba18590207decb07bd17f4622b0c3c14b881",
+    "product/src/ai_ad_editor/retime_transform.py": "sha256:8b00a27cd939264cece21ddf22ca9949a23a43122dc958c0970cd2526c7bdd35",
+    "product/src/ai_ad_editor/rfc3339_dates.py": "sha256:344d79048ff55a77af00314134c20b57b5301b75d1b6a32b4a7a3f52ce749105",
+    "product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt": "sha256:5ba1a4f03626ccca6dcbf53a554545e4f776a335bfdaa233ec3bfe9bb7fac15d",
+    "product/src/ai_ad_editor/rights.py": "sha256:ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+    "product/src/ai_ad_editor/runtime.py": "sha256:b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+    "product/src/ai_ad_editor/rvm_worker.py": "sha256:b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+    "product/src/ai_ad_editor/sam2_worker.py": "sha256:a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+    "product/src/ai_ad_editor/schema_contract.py": "sha256:1a9495976956a595d88cb95e69955d28abbac76bd33de97615fd9a19bda2a5ec",
+    "product/src/ai_ad_editor/scopes.py": "sha256:e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+    "product/src/ai_ad_editor/segmentation_frames.py": "sha256:e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+    "product/src/ai_ad_editor/separation_dsp.py": "sha256:2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+    "product/src/ai_ad_editor/sequence_canvas.py": "sha256:462542e26058d350c2d0a29d0cf4127c4054cab7462a763811b85bfca171412f",
+    "product/src/ai_ad_editor/sequence_sampling.py": "sha256:1aa171ef6043878afce099f7a04b214b9c458879147c46147062a77d36356ec2",
+    "product/src/ai_ad_editor/smart_cut.py": "sha256:ba871f7bff0f186ad55d9e22c5fcd75e09032e8d7299a01c7ea7b76b2e1a21a1",
+    "product/src/ai_ad_editor/soulx_worker.py": "sha256:20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+    "product/src/ai_ad_editor/source_edits.py": "sha256:a2bea20a8d162ac4fa9f329045bca2b7e214a624adca107df6021919d5a1d36c",
+    "product/src/ai_ad_editor/source_transitions.py": "sha256:59c2652aa76024b78667293ce46774ba6910e4524db7e39f95dc95bd91b0547a",
+    "product/src/ai_ad_editor/speech.py": "sha256:26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+    "product/src/ai_ad_editor/speed_curves.py": "sha256:41fbddd764bfa481e6158e8401333113c871e1c38e34257911f9aa676b9bfff9",
+    "product/src/ai_ad_editor/stroke_motion.py": "sha256:ba53f586ff12c75c15803e347307c802d977e874ce792159d74ebb2b6b42ae03",
+    "product/src/ai_ad_editor/subtitle_clock.py": "sha256:49ca2001da0f250d682f5818d95f4f51ee362cbaee979fb9a99649a847cd4645",
+    "product/src/ai_ad_editor/subtitle_segment_worker.mjs": "sha256:66ca5d7fab0926efe15615da29dba3024897cbfbfb1b28e6a6a189697b6d5bdc",
+    "product/src/ai_ad_editor/subtitle_segments.py": "sha256:5590e04147f0b50cb60df3b4e543059a560dbfd684b3085c5f25f8fb04631aea",
+    "product/src/ai_ad_editor/template.py": "sha256:25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+    "product/src/ai_ad_editor/text_highlight.py": "sha256:d08bee683f0bd00bac363a78df5957475765741a7c53d92ac025575b334f78e5",
+    "product/src/ai_ad_editor/text_layout.py": "sha256:1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+    "product/src/ai_ad_editor/text_paint.py": "sha256:a924644f0396b5204efbb0e085f25d51f6cda5bfc75f2d44febc6796e42cb028",
+    "product/src/ai_ad_editor/text_typing.py": "sha256:6cc022af8300fb4270cb21f2f53ffe2b33210ac203169fed653d11d75e591ec3",
+    "product/src/ai_ad_editor/time_mapping.py": "sha256:89bd69060b3f10af1197018b735621eadb8ce2858b4281972d989fddf79f2ef1",
+    "product/src/ai_ad_editor/tracking.py": "sha256:3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+    "product/src/ai_ad_editor/transcribe.py": "sha256:877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+    "product/src/ai_ad_editor/understand.py": "sha256:3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+    "product/src/ai_ad_editor/utils.py": "sha256:78f984613b0c253d108dd4d515557f77bc4ebd4df4945108a63d8fdb38ad202b",
+    "product/src/ai_ad_editor/vace_context.py": "sha256:aef2d4318720c10a99644e96ea35ba27d48e9b405a332f6b2075b6a558f0e0e6",
+    "product/src/ai_ad_editor/vace_frames.py": "sha256:aadc7d5785347422ee62b1d4a195e5dfbf1bcb497eeedc43aa4d839aff6f55de",
+    "product/src/ai_ad_editor/vace_model.py": "sha256:8a8f96a14aac93a7b9577f88fe576fecbbfd4fcc206e27843de79f7b1ba54961",
+    "product/src/ai_ad_editor/vace_worker.py": "sha256:0ce1dc459b3c0d7f1c95ec2208e78e5fe299200582c878f5de34c9382f4582f5",
+    "product/src/ai_ad_editor/validator.py": "sha256:edc86ca5f1058d811e2f00c483eb4144db142b3dd140ece9805cc1c643cc4fa4",
+    "product/src/ai_ad_editor/vision_tracker.py": "sha256:add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+    "product/src/ai_ad_editor/whisper_worker.py": "sha256:39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+    "product/src/ai_ad_editor/yolo_worker.py": "sha256:fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+    "product/tests/test_alpha_resampling.py": "sha256:db2e2764a5022c18bba23ad407a6bf15a320edfea5f5a8331eda706d7c4046de",
+    "product/tests/test_artifact_locks.py": "sha256:8ded2327c7ad553578e2fea8fa28ac7c32b169c6710276d2d5995b94332a4178",
+    "product/tests/test_atomic_io.py": "sha256:ff3ff52c6de1dc9b2eeb4c57944e2a9d9cc5eee54cc345299c6f1c5cbc03db5c",
+    "product/tests/test_audio_buses.py": "sha256:e4b6020208492cf4907a3537c0542321a7f1600692537b22299700f5b4d9dfdc",
+    "product/tests/test_audio_channel_modes.py": "sha256:815a9ea0117dd7ed0cce3a75d14ed67a4a8a06b413df1836d233f33359290e79",
+    "product/tests/test_audio_routing.py": "sha256:0f2d189488b1559fc571ae401188b6f3c576150c34e59f3a9a23e4b5f4dbadef",
+    "product/tests/test_audio_source_context.py": "sha256:907ccac6cbd290a98a3d4dca99149d765f16a57b5cc00ac3d436a777884327cd",
+    "product/tests/test_audio_stretch.py": "sha256:53dea6b0ec9f8c00861b6a1844d7c34e0c87e432d78a4e4847c7245fd9893ce9",
+    "product/tests/test_audio_tempo_context.py": "sha256:ad3c7c53cfdaecdd00693aa745a22be2455e2dcd446583e4912cd1066b6aac3a",
+    "product/tests/test_audio_unity.py": "sha256:02dcf66038d4fcbc1f0c144e604efa451b9d7925817d1d2b089f8c087aa58810",
+    "product/tests/test_cli.py": "sha256:d80d63059529d69e66ac070a9ffce3d2f9f6559504e2f07710a3a4ce4521d615",
+    "product/tests/test_clip_windows.py": "sha256:42863fb28d81d22a0ac90ff1036ef5359186a29ab730d5404db36fae0660ecb3",
+    "product/tests/test_ctc_alignment.py": "sha256:838a854a442b413cb05be739f47eea86dae36057f12b0567bc820f3f442aec93",
+    "product/tests/test_cuda_admission.py": "sha256:624a6627495db87288902f06e1d95c57cde0a8506a50e42b1577aaf7614b6abb",
+    "product/tests/test_delivery_precision.py": "sha256:5bc05fca5334ca454f3498b0f53cd28c0b44b8f9e9f3336b980b8a8604bbed03",
+    "product/tests/test_draft_adapter.py": "sha256:8f5287ad55a4744e8887ab910de0cc5b4977d9bea610a89f067692b6c2216fee",
+    "product/tests/test_effect_automation.py": "sha256:b637ab8b41405147d3299ff72ae6def7f7656d8fe9828137abe534612cbe3753",
+    "product/tests/test_font_coverage.py": "sha256:b382b9449601baf20a6c352c03e055b4f9efcad03b7515b694831376cc5a8234",
+    "product/tests/test_fragments.py": "sha256:d021051b4a5b48deac872e319407c9dae0cb2e7b3c8f1a7ab71704dff756a35f",
+    "product/tests/test_hardware_acceleration.py": "sha256:44b451a7a620b8f897dd0ff1ac535ff7ffa9ce7ae481afe9a3019dcc14373dd2",
+    "product/tests/test_html_motion.py": "sha256:9e382485db151f79059e4d18c13708a6ee3deca38ad5be1272a5b9fb4dc4bc0c",
+    "product/tests/test_html_quality.py": "sha256:1e3d81bf7101b3d97aa89f5f60cebab0a7e64e44845ab60b4872f8d064217aae",
+    "product/tests/test_html_template.py": "sha256:747fb1e13b3bfb60f35012a8ffa18ac10f156f1e2811328792ab29d20e2de29a",
+    "product/tests/test_html_url_parser.py": "sha256:673a8073a536149c6b70366b2911ab6bfb3b395f3e2a14dd425c3d5f57cbcf02",
+    "product/tests/test_linked_edit.py": "sha256:d3b5d8fb402df059ea006d125fbb6fb651c891132fcd78deccfdbe41036d87d7",
+    "product/tests/test_local_asr.py": "sha256:6482e267344909fe7400414ddfae114ca7cdc3a29ad7c421882b688648e6ff0b",
+    "product/tests/test_local_inpainting.py": "sha256:17214dd5116aca692f36ff50f9990c4f86acf1e62acb98a504bc8e55f01c4606",
+    "product/tests/test_local_matting.py": "sha256:b338e886fa4c7d8036ec7201b6c67468aa44ff8e4b0373062670a89725c7bfe1",
+    "product/tests/test_local_ocr.py": "sha256:81628df63d391d71a038c48af77b9044976eee623476bdaf7c2a000f31445ec3",
+    "product/tests/test_local_segmentation.py": "sha256:77e27f00c48ff2918f2a4224a83e284d0db81f5f517141f2bc7f3d7f7d13a765",
+    "product/tests/test_local_separation.py": "sha256:16c8807ea75de1e172bff6c5a73e90c4d7e148e4ce2866c1f2077d66708c26c0",
+    "product/tests/test_local_tts.py": "sha256:36b086aa6c621d779b951d9e2232be071cc80de3d94862b4e9370b6d3af392a8",
+    "product/tests/test_local_vace.py": "sha256:1845be8e66e5237420fffa6185d7dd5053632c9fa2340344ed35460a291eba92",
+    "product/tests/test_local_vision.py": "sha256:b1fb7c316a2a0f01b802cc522a056515a43e80ed81f3852dfb99a076a047bd36",
+    "product/tests/test_magnetic_mode.py": "sha256:aa08ddbfa3db68c89b2a2feb757d5bba12dd467b85e7950377eec218714f2897",
+    "product/tests/test_magnetic_reorder.py": "sha256:c4ad34f0ed89c9fe30ca51c188cdf9bfcf982322bd32a6ec6d5d64620c01c2a7",
+    "product/tests/test_mask_edit.py": "sha256:280c825c3a2dc95ac35943209a6eb30e45d519bc5ce1834a6a73c464f90718e1",
+    "product/tests/test_mask_edit_geometry.py": "sha256:7b6367f327d51cbd5b5746b90e89f27768acc7b49b0bb9d7e63cc3d1460bde06",
+    "product/tests/test_mask_review.py": "sha256:64bce51f4a9cc424831b0b27b5e449b270bfec8afd2b24575b3b9b342a308650",
+    "product/tests/test_mask_tracking.py": "sha256:f8f2c1d0495410815b91d4f0a507a3a3909d2ca25c44817612970d4330578245",
+    "product/tests/test_nested_frame_coverage.py": "sha256:4bf9aef9aec5c34325f67e2a3e88dbe3424e4ec5c82d8f4e121ec95f7ab8d97f",
+    "product/tests/test_nested_freeze.py": "sha256:03261ace961acfcc5f99f52814a59a2b2bdf88fe3c0def7f48c8c3e897415c9b",
+    "product/tests/test_nested_time_mapping.py": "sha256:64415c49e45c5e7edf8d5f5ee745bbf22d30b6cdd5a0cde7cd731d88d6c6fad4",
+    "product/tests/test_nested_transitions.py": "sha256:9481f1de95ab4c556a17bfdbc1088001ceb29b92bab96d5040c8e6abdeb7881b",
+    "product/tests/test_offline_install.py": "sha256:6497262c7f791c46d706eeddfbaaa41d2d793e109106b93456e88f6786f051fc",
+    "product/tests/test_outpainting.py": "sha256:34b5f0d735f23b6e8ef4c30b573f110aefdf3f661eed7e3aac18dd23e69fa0b8",
+    "product/tests/test_pipeline_diagnostics.py": "sha256:a5202268d6a64545a6594d5f45847bc7fa14e7a83eb3fb594b1b420056dd5b67",
+    "product/tests/test_queue_reuse.py": "sha256:ba346166b0c438e6f4ca3669fe3f47608f1a022b1422065f9936d4bc614355f1",
+    "product/tests/test_range_edits.py": "sha256:7634873bff27fbf51e412c82b37efae72cf7f38b20ffd22e1d60fe50359a1f7c",
+    "product/tests/test_repair_blend.py": "sha256:7d1c6c6c4d32dba7d8c61b825b42209892e2af684740c027c17d3652d94684f1",
+    "product/tests/test_retime_edits.py": "sha256:751c1c1566a6fe934c7427e1f431d40b3d3e417bf0670e2e73ad313d2a1eadde",
+    "product/tests/test_schema_contract.py": "sha256:12d70209363d3b54341118e3f3ab988ebb041464c42eb7fb267c09d801ce483d",
+    "product/tests/test_sequence_canvas.py": "sha256:6f2b622c81932c0dcf80e7b3a528256b5e1a7209ef455b68f2c75a4c9154f4b0",
+    "product/tests/test_sequence_compositing.py": "sha256:1eea9b170c3fabe0623032b4de81a07e085cb7c88b5d79e8380d73399be21b0a",
+    "product/tests/test_sequence_sampling.py": "sha256:c75a6153aee2dbef11e9455a27656d204e46f0ce6061393ea91b6f46f8d7253f",
+    "product/tests/test_source_edits.py": "sha256:b5846137c5de1b1f08e82d43c69a7d95c031cd1c613fdf48613f72361e813614",
+    "product/tests/test_source_transitions.py": "sha256:8813a84843bfbb7aed5b5418011a287c9dae1b8628620114468df716401f2b4a",
+    "product/tests/test_speed_easing.py": "sha256:4797885a66a7e12b327fdf31e0cc937576620353e653c2c762ee905f2d61a5d7",
+    "product/tests/test_stroke_motion.py": "sha256:4ff06a458e6311e4979da31b6be05b5a53c6e09ef3bb6b429c63616368844410",
+    "product/tests/test_subtitle_clock.py": "sha256:1e6696405e30dc4d90e4baadcbffc013d5e6fee5d89bb67e908003c3ebe1de5a",
+    "product/tests/test_subtitle_segments.py": "sha256:aba64ed147276a6b1e59ad845557f86f2b6271db8d0dc75c006db328cac233c2",
+    "product/tests/test_text_animation_composition.py": "sha256:6ce0117f31339d36c574c70a8f2d83235813dc95d91f3108730cb954987c12de",
+    "product/tests/test_text_paint.py": "sha256:99887918ba5813b39a74cef18d02384ed503581e8695821530554590d38e219f",
+    "product/tests/test_tracking_geometry.py": "sha256:50b1b0b083d971f0a532803e3878130c58b52fad2c6b1ebe53e907a5943779d4",
+    "product/tests/test_vace_context.py": "sha256:86afab95b73c2deada46dd1d0bba400d02bc9a9d967698a1e6f84c7ab084edde",
+    "product/tests/test_word_highlight.py": "sha256:bf3f56f299d2452e8330bb192d31880c550e277ef93d04c4292fe816b79e172a"
+  },
+  "frozen_equal": true
+}

@@ -14,6 +14,14 @@ a new lossless asset. The source remains an explicit input; recipe replay
 does not rescan or fetch weights. Neutral defaults, project transactions,
 source/model rights and separate visual quality review remain applicable.
 
+For duplicate serial deliverables, use opt-in `queue run --reuse-identical`
+under the [batch reuse contract](../../docs/specs/同批次相同渲染结果复用契约_v0.1_2026-10-20.md).
+Read the [actual checks and limitations](../../docs/validation/OpenFilm同批次结果复用实测_2026-10-20.md).
+Inspect source provenance and actual encoded/reused success counts. Different
+content or settings must not share an output, and copying never proves a new
+encoder, model or device execution. New targets and explicit dependencies are
+required; there is no persistent cache.
+
 For explicit generated overlap conditioning, read the
 [VACE context contract](../../docs/specs/VACE前窗生成上下文与连续输出契约_v0.1_2026-10-20.md)
 and [current verification and failures](../../docs/validation/VACE前窗生成上下文实测_2026-10-20.md).

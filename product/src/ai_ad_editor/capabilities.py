@@ -457,12 +457,12 @@ def build_capability_manifest() -> dict[str, Any]:
             },
             "queue": {
                 "status": "implemented",
-                "features": ["enqueue", "list", "inspect", "sequential_run", "bounded_local_workers", "continue_on_error_worker_guard", "serial_metadata_commit", "explicit_retry", "cancel_pending", "cancel_running", "cancel_ack_while_project_lock_held"],
+                "features": ["enqueue", "list", "inspect", "sequential_run", "bounded_local_workers", "continue_on_error_worker_guard", "serial_metadata_commit", "explicit_retry", "cancel_pending", "cancel_running", "cancel_ack_while_project_lock_held", "opt_in_same_invocation_result_reuse"],
                 "state_file": "operations/render-queue.json",
                 "execution": "single_process_default_sequential_or_explicit_bounded_local_ffmpeg_workers",
                 "worker_contract": "workers_only_render_frozen_project_snapshots_and_quality; project_outputs_operations_and_queue_metadata_commit_serially",
                 "cancel_contract": "pending_cancel_confirms_when_queue_lock_is_free; running_or_lock_contended_cancel_acknowledges_marker_then_queue_run_confirms_terminal_state",
-                "limits": ["workers_greater_than_one_requires_continue_on_error", "distributed_workers_pending", "priority_and_fairness_pending", "cross_machine_artifacts_pending", "running_cancel_confirmation_is_eventual"],
+                "limits": ["workers_greater_than_one_requires_continue_on_error", "reuse_requires_serial_workers_new_targets_and_explicit_local_dependencies", "reuse_has_no_cross_invocation_cache", "reuse_rejects_hardware_probes_external_stretch_tracking_bindings_and_font_fallback", "distributed_workers_pending", "priority_and_fairness_pending", "cross_machine_artifacts_pending", "running_cancel_confirmation_is_eventual"],
             },
             "quality": {
                 "status": "implemented",

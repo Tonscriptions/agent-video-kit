@@ -1,0 +1,2148 @@
+{
+  "manifest_version": "0.1.0",
+  "operation_id": "reuse_20261019231723_a66277f7",
+  "project_id": "proj_20261019231654_00997825",
+  "sequence_id": "seq_main",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\renamed.mp4",
+  "sha256": "fbba9c5aa6eef771b436257a04dc841776d938af0c37e90e628c2a52f59cdc81",
+  "command": [],
+  "inputs": [
+    {
+      "kind": "sequence-projection-budget",
+      "method": "bilinear",
+      "max_working_bytes": 1073741824,
+      "nodes": [],
+      "estimated_working_bytes": 0,
+      "scope": "reachable-sequence-projection-instances-only-not-process-rss",
+      "time_disjoint_instances_charged": true,
+      "unused_sequences_charged": false
+    },
+    {
+      "asset_id": "source",
+      "clip_id": "picture",
+      "input": 0,
+      "kind": "video",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "subtitle_time_mapping": {
+        "version": "1",
+        "maps": [],
+        "authored_start_seconds": 0.0,
+        "authored_duration_seconds": 2.0,
+        "reverse_boundary_bias_seconds": 0.0,
+        "freeze_semantics_approximate": false,
+        "clock": "original-sequence-presentation-time",
+        "asset_time_base": "clip-local-inline",
+        "asset_time_offset_tick": 0,
+        "engine": "drawtext",
+        "frame_clock": "unchanged",
+        "continuous_playback_reviewed": false,
+        "text_paint": {
+          "engine": "legacy-dynamic-inline-drawtext",
+          "color_alpha_accepted": false
+        }
+      }
+    },
+    {
+      "asset_id": "source",
+      "clip_id": "sound",
+      "track_id": "track_audio_1",
+      "input": 1,
+      "kind": "audio",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "timeline_start_sample": 0,
+      "duration_samples": 96000,
+      "sample_rate": 48000,
+      "group_id": null
+    },
+    {
+      "kind": "audio-track-bus",
+      "track_id": "track_audio_1",
+      "scope_id": null,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "processing": {},
+      "sample_rate": 48000
+    },
+    {
+      "kind": "sequence-audio-root",
+      "sample_rate": 48000,
+      "output_samples": 96000,
+      "child_input_count": 1,
+      "mixing": "float-sum-normalize-disabled",
+      "automatic_limiter": false,
+      "has_audible_inputs": true
+    }
+  ],
+  "created_at": "2026-10-19T23:17:30.351911Z",
+  "filter_graph_transport": {
+    "mode": "not_executed_copy"
+  },
+  "profile": null,
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 12,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 320,
+      "height": 180,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    },
+    "acceleration": {
+      "encode": "off",
+      "decode": "off",
+      "encoder": "auto",
+      "decoder": "auto",
+      "probe_max_bytes": 536870912
+    }
+  },
+  "delivery": {
+    "clock": {
+      "authored_duration_tick": 180000,
+      "ticks_per_second": 90000,
+      "expected_video_frames": 24,
+      "expected_video_end_seconds": 2.0,
+      "expected_audio_samples_48000": 96000
+    }
+  },
+  "acceleration": {
+    "status": "reused_existing_output",
+    "executed": false,
+    "source_operation_id": "render_20261019231715_7d01b482"
+  },
+  "probe": {
+    "duration_seconds": 2.0,
+    "duration_tick": 180000,
+    "format": "mov,mp4,m4a,3gp,3g2,mj2",
+    "format_long_name": "QuickTime / MOV",
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "profile": "High",
+        "codec_type": "video",
+        "codec_tag_string": "avc1",
+        "codec_tag": "0x31637661",
+        "mime_codec_string": "avc1.64000c",
+        "width": 320,
+        "height": 180,
+        "coded_width": 320,
+        "coded_height": 180,
+        "has_b_frames": 2,
+        "sample_aspect_ratio": "1:1",
+        "display_aspect_ratio": "16:9",
+        "pix_fmt": "yuv420p",
+        "level": 12,
+        "color_range": "tv",
+        "color_space": "bt709",
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "is_avc": "true",
+        "nal_length_size": "4",
+        "id": "0x1",
+        "r_frame_rate": "12/1",
+        "avg_frame_rate": "12/1",
+        "time_base": "1/12288",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "duration_ts": 24576,
+        "duration": "2.000000",
+        "bit_rate": "57904",
+        "bits_per_raw_sample": "8",
+        "nb_frames": "24",
+        "extradata_size": 49,
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "und",
+          "handler_name": "VideoHandler",
+          "encoder": "Lavc62.28.100 libx264"
+        }
+      },
+      {
+        "index": 1,
+        "codec_name": "aac",
+        "codec_long_name": "AAC (Advanced Audio Coding)",
+        "profile": "LC",
+        "codec_type": "audio",
+        "codec_tag_string": "mp4a",
+        "codec_tag": "0x6134706d",
+        "mime_codec_string": "mp4a.40.2",
+        "sample_fmt": "fltp",
+        "sample_rate": "48000",
+        "channels": 2,
+        "channel_layout": "stereo",
+        "bits_per_sample": 0,
+        "initial_padding": 0,
+        "id": "0x2",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/48000",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "duration_ts": 96000,
+        "duration": "2.000000",
+        "bit_rate": "190310",
+        "nb_frames": "95",
+        "extradata_size": 5,
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "und",
+          "handler_name": "SoundHandler"
+        }
+      }
+    ],
+    "video": {
+      "codec": "h264",
+      "width": 320,
+      "height": 180,
+      "pix_fmt": "yuv420p",
+      "fps": "12/1",
+      "color_space": "bt709",
+      "duration_seconds": 2.0,
+      "start_time_seconds": 0.0
+    },
+    "audio": {
+      "codec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 2.0,
+      "start_time_seconds": 0.0
+    }
+  },
+  "warnings": [
+    {
+      "code": "RENDER_FEATURE_APPROXIMATE",
+      "clip_id": "picture",
+      "feature": "subtitle_inline_dynamic_color",
+      "message": "动态尺寸内嵌文字沿用原生 drawtext 颜色混合；颜色/透明度组合未验收，请使用独立文字层"
+    },
+    {
+      "code": "QUEUE_RESULT_REUSED",
+      "message": "本次复制已完成产物；编码器与设备观测属于来源操作"
+    }
+  ],
+  "quality": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "metrics": {
+      "duration_seconds": 2.0,
+      "width": 320,
+      "height": 180,
+      "audio_codec": "aac",
+      "video_duration_seconds": 2.0,
+      "audio_duration_seconds": 2.0,
+      "av_duration_delta_seconds": 0.0,
+      "av_start_delta_seconds": 0.0,
+      "av_end_delta_seconds": 0.0,
+      "av_sync_residual_seconds": 0.0,
+      "av_sync_residuals": {
+        "start_delta_seconds": 0.0,
+        "end_delta_seconds": 0.0,
+        "video_start_seconds": 0.0,
+        "audio_start_seconds": 0.0,
+        "video_end_seconds": 0.0,
+        "audio_end_seconds": 0.0
+      },
+      "stream_timing": {
+        "video": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 2.0,
+          "duration_source": "stream-duration",
+          "end_seconds": 2.0
+        },
+        "audio": {
+          "start_seconds": 0.0,
+          "start_source": "stream-start-time",
+          "duration_seconds": 2.0,
+          "duration_source": "stream-duration",
+          "end_seconds": 2.0
+        }
+      },
+      "expected_video_frames": 24,
+      "expected_audio_samples": 96000,
+      "expected_video_duration_seconds": 2.0,
+      "expected_audio_duration_seconds": 2.0,
+      "expected_quantization_delta_seconds": 0.0,
+      "probe": {
+        "duration_seconds": 2.0,
+        "duration_tick": 180000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.64000c",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 180,
+            "has_b_frames": 2,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p",
+            "level": 12,
+            "color_range": "tv",
+            "color_space": "bt709",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "12/1",
+            "avg_frame_rate": "12/1",
+            "time_base": "1/12288",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 24576,
+            "duration": "2.000000",
+            "bit_rate": "57904",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "24",
+            "extradata_size": 49,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_long_name": "AAC (Advanced Audio Coding)",
+            "profile": "LC",
+            "codec_type": "audio",
+            "codec_tag_string": "mp4a",
+            "codec_tag": "0x6134706d",
+            "mime_codec_string": "mp4a.40.2",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 2,
+            "channel_layout": "stereo",
+            "bits_per_sample": 0,
+            "initial_padding": 0,
+            "id": "0x2",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 96000,
+            "duration": "2.000000",
+            "bit_rate": "190310",
+            "nb_frames": "95",
+            "extradata_size": 5,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "SoundHandler"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 320,
+          "height": 180,
+          "pix_fmt": "yuv420p",
+          "fps": "12/1",
+          "color_space": "bt709",
+          "duration_seconds": 2.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "aac",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 2.0,
+          "start_time_seconds": 0.0
+        }
+      }
+    }
+  },
+  "project_fingerprint": "bf8191bd1c502e2d2c3f10a7cda0647233cfff8851fd0fa87ca6db64782b9098",
+  "input_hashes": {
+    "font": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22",
+    "source": "sha256:8ce5f11593dec83d936f2cf38a61da7bece52e81df86a16a8af5f22629201752"
+  },
+  "resume_of": null,
+  "reuse": {
+    "protocol": "agent-video-queue-reuse-v1",
+    "signature": "a6fa4b673c3126bd6f04296507ab558f5059e03e779f8ba6758f8e79ee063ed5",
+    "source_job_id": "first",
+    "source_operation_id": "render_20261019231715_7d01b482",
+    "source_output": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\first.mp4",
+      "sha256": "fbba9c5aa6eef771b436257a04dc841776d938af0c37e90e628c2a52f59cdc81",
+      "bytes": 64880
+    },
+    "source_manifest": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\first.mp4.manifest.json",
+      "sha256": "448bade2dcfee1ef4d4f16dfe56bd6652c6897443d099ffd71bac9960da8cae9",
+      "bytes": 96651
+    },
+    "snapshot": {
+      "signature": "a6fa4b673c3126bd6f04296507ab558f5059e03e779f8ba6758f8e79ee063ed5",
+      "protocol": "agent-video-queue-reuse-v1",
+      "project": {
+        "schema_version": "0.1.0",
+        "project": {
+          "id": "proj_20261019231654_00997825",
+          "name": "project",
+          "created_at": "2026-10-19T23:16:54.388584Z",
+          "creator": "ai-ad-editor",
+          "source_revision": "local"
+        },
+        "settings": {
+          "timebase": {
+            "ticks_per_second": 90000,
+            "display_fps": {
+              "num": 12,
+              "den": 1
+            }
+          },
+          "canvas": {
+            "width": 320,
+            "height": 180,
+            "pixel_aspect": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "color": {
+            "primaries": "bt709",
+            "transfer": "bt709",
+            "matrix": "bt709",
+            "range": "limited"
+          },
+          "audio": {
+            "sample_rate": 48000,
+            "channels": 2
+          },
+          "output": {
+            "container": "mp4",
+            "video": {
+              "codec": "libx264",
+              "preset": "medium",
+              "crf": 18,
+              "pixel_format": "yuv420p"
+            },
+            "audio": {
+              "codec": "aac",
+              "bitrate": "192k"
+            }
+          },
+          "acceleration": {
+            "encode": "off",
+            "decode": "off",
+            "encoder": "auto",
+            "decoder": "auto",
+            "probe_max_bytes": 536870912
+          },
+          "sequence_sampling": {
+            "method": "bilinear",
+            "max_working_bytes": 1073741824
+          }
+        },
+        "assets": [
+          {
+            "id": "source",
+            "kind": "video",
+            "uri": "assets/source_source.mkv",
+            "sha256": "sha256:8ce5f11593dec83d936f2cf38a61da7bece52e81df86a16a8af5f22629201752",
+            "probe": {
+              "duration_seconds": 2.0,
+              "duration_tick": 180000,
+              "format": "matroska,webm",
+              "format_long_name": "Matroska / WebM",
+              "streams": [
+                {
+                  "index": 0,
+                  "codec_name": "ffv1",
+                  "codec_long_name": "FFmpeg video codec #1",
+                  "codec_type": "video",
+                  "codec_tag_string": "[0][0][0][0]",
+                  "codec_tag": "0x0000",
+                  "width": 320,
+                  "height": 180,
+                  "coded_width": 320,
+                  "coded_height": 180,
+                  "has_b_frames": 0,
+                  "pix_fmt": "bgra",
+                  "level": -99,
+                  "color_range": "pc",
+                  "color_space": "gbr",
+                  "field_order": "progressive",
+                  "r_frame_rate": "12/1",
+                  "avg_frame_rate": "12/1",
+                  "time_base": "1/1000",
+                  "start_pts": 0,
+                  "start_time": "0.000000",
+                  "bits_per_raw_sample": "8",
+                  "extradata_size": 42,
+                  "disposition": {
+                    "default": 0,
+                    "dub": 0,
+                    "original": 0,
+                    "comment": 0,
+                    "lyrics": 0,
+                    "karaoke": 0,
+                    "forced": 0,
+                    "hearing_impaired": 0,
+                    "visual_impaired": 0,
+                    "clean_effects": 0,
+                    "attached_pic": 0,
+                    "timed_thumbnails": 0,
+                    "non_diegetic": 0,
+                    "captions": 0,
+                    "descriptions": 0,
+                    "metadata": 0,
+                    "dependent": 0,
+                    "still_image": 0,
+                    "multilayer": 0
+                  },
+                  "tags": {
+                    "ENCODER": "Lavc62.28.100 ffv1",
+                    "DURATION": "00:00:02.000000000"
+                  }
+                },
+                {
+                  "index": 1,
+                  "codec_name": "pcm_s16le",
+                  "codec_long_name": "PCM signed 16-bit little-endian",
+                  "codec_type": "audio",
+                  "codec_tag_string": "[0][0][0][0]",
+                  "codec_tag": "0x0000",
+                  "sample_fmt": "s16",
+                  "sample_rate": "48000",
+                  "channels": 2,
+                  "bits_per_sample": 16,
+                  "initial_padding": 0,
+                  "r_frame_rate": "0/0",
+                  "avg_frame_rate": "0/0",
+                  "time_base": "1/1000",
+                  "start_pts": 0,
+                  "start_time": "0.000000",
+                  "bit_rate": "1536000",
+                  "disposition": {
+                    "default": 0,
+                    "dub": 0,
+                    "original": 0,
+                    "comment": 0,
+                    "lyrics": 0,
+                    "karaoke": 0,
+                    "forced": 0,
+                    "hearing_impaired": 0,
+                    "visual_impaired": 0,
+                    "clean_effects": 0,
+                    "attached_pic": 0,
+                    "timed_thumbnails": 0,
+                    "non_diegetic": 0,
+                    "captions": 0,
+                    "descriptions": 0,
+                    "metadata": 0,
+                    "dependent": 0,
+                    "still_image": 0,
+                    "multilayer": 0
+                  },
+                  "tags": {
+                    "ENCODER": "Lavc62.28.100 pcm_s16le",
+                    "DURATION": "00:00:02.000000000"
+                  }
+                }
+              ],
+              "video": {
+                "codec": "ffv1",
+                "width": 320,
+                "height": 180,
+                "pix_fmt": "bgra",
+                "fps": "12/1",
+                "color_space": "gbr",
+                "duration_seconds": 0.0,
+                "start_time_seconds": 0.0
+              },
+              "audio": {
+                "codec": "pcm_s16le",
+                "sample_rate": 48000,
+                "channels": 2,
+                "duration_seconds": 0.0,
+                "start_time_seconds": 0.0
+              }
+            },
+            "rights_ref": "source",
+            "source": {
+              "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\source.mkv",
+              "retrieved_at": "2026-10-19T23:16:57.070329Z",
+              "original_name": "source.mkv"
+            }
+          },
+          {
+            "id": "font",
+            "kind": "font",
+            "uri": "assets/font_DejaVuSans.ttf",
+            "sha256": "sha256:3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22",
+            "probe": {
+              "duration_seconds": 0.0,
+              "duration_tick": 0,
+              "format": "ttf",
+              "format_long_name": "local font",
+              "streams": [],
+              "font": {
+                "family": "DejaVu Sans",
+                "style": "Book",
+                "face_index": 0,
+                "engine": "pillow-freetype"
+              },
+              "video": {
+                "codec": null
+              },
+              "audio": {
+                "codec": null,
+                "sample_rate": 0,
+                "channels": 0
+              }
+            },
+            "rights_ref": "font",
+            "source": {
+              "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\docs\\assets\\openfilm-batch-reuse-20261020-v70-native-r2\\DejaVuSans.ttf",
+              "retrieved_at": "2026-10-19T23:17:00.181232Z",
+              "original_name": "DejaVuSans.ttf"
+            }
+          }
+        ],
+        "sequences": [
+          {
+            "id": "seq_main",
+            "name": "Main",
+            "duration_tick": 180000,
+            "tracks": [
+              {
+                "id": "track_video_1",
+                "kind": "video",
+                "order": 0,
+                "muted": false,
+                "locked": false,
+                "clips": [
+                  {
+                    "id": "picture",
+                    "timeline_start_tick": 0,
+                    "duration_tick": 180000,
+                    "source_in_tick": 0,
+                    "source_out_tick": 180000,
+                    "asset_id": "source",
+                    "keyframes": [
+                      {
+                        "property": "scale",
+                        "keyframes": [
+                          {
+                            "at_tick": 0,
+                            "value": 0.8,
+                            "interpolation": "linear"
+                          },
+                          {
+                            "at_tick": 180000,
+                            "value": 1.0,
+                            "interpolation": "linear"
+                          }
+                        ]
+                      }
+                    ],
+                    "subtitle": {
+                      "text": "ONE ENCODE / REUSED COPY",
+                      "style": {
+                        "font_asset_id": "font",
+                        "fontsize": 16,
+                        "x": "12",
+                        "y": "14",
+                        "fontcolor": "white",
+                        "borderw": 1,
+                        "bordercolor": "black"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "track_audio_1",
+                "kind": "audio",
+                "order": 0,
+                "muted": false,
+                "locked": false,
+                "clips": [
+                  {
+                    "id": "sound",
+                    "timeline_start_tick": 0,
+                    "duration_tick": 180000,
+                    "source_in_tick": 0,
+                    "source_out_tick": 180000,
+                    "asset_id": "source"
+                  }
+                ]
+              }
+            ],
+            "markers": []
+          }
+        ],
+        "templates": [],
+        "provenance": {
+          "cli_version": "0.1.0",
+          "engine_version": "ffmpeg-local",
+          "model_versions": [],
+          "input_hashes": []
+        }
+      },
+      "sequence_id": "seq_main",
+      "dependencies": [
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\assets\\font_DejaVuSans.ttf",
+          "sha256": "3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22",
+          "bytes": 756072
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\assets\\source_source.mkv",
+          "sha256": "8ce5f11593dec83d936f2cf38a61da7bece52e81df86a16a8af5f22629201752",
+          "bytes": 481146
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\rights-ledger.json",
+          "sha256": "909f3d8245e76ddac76fab80109b9a22433c266d69bcb17223e47cb65d003351",
+          "bytes": 2744
+        }
+      ],
+      "runtime": [
+        {
+          "path": "C:\\Python313\\python.exe",
+          "sha256": "03573716a7fcbd8b7fed8fe0163bbfbd3a852546920d6a666123f307c8dac7d9",
+          "bytes": 105840
+        },
+        {
+          "path": "C:\\Python313\\python3.dll",
+          "sha256": "c1de4bfe57dc4a5be8c72c865d617dc39dfd8162fcd2ce1fac9f401cf9efb504",
+          "bytes": 72560
+        },
+        {
+          "path": "C:\\Python313\\python313.dll",
+          "sha256": "78b1dd211c0e66a0603df48da2c9b67a915ab3258701b9285d3faa255ed8dc25",
+          "bytes": 6093816
+        },
+        {
+          "path": "C:\\Python313\\vcruntime140.dll",
+          "sha256": "36585912e5eaf83ba9fea0631534f690ccdc2d7ba91537166fe53e56c221e153",
+          "bytes": 120400
+        },
+        {
+          "path": "C:\\Python313\\vcruntime140_1.dll",
+          "sha256": "82a2f9ae1e6146ae3cb0f4bc5a62b7227e0384209d9b1aef86bbcc105912f7cd",
+          "bytes": 49744
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+          "sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+          "bytes": 223360000
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.exe",
+          "sha256": "70872c3ffbc43d0b2c570f9837f54d6e9a832f4ca25463e9735b6a3ec0621478",
+          "bytes": 223153664
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\__init__.py",
+          "sha256": "67eb17066b48015983c2ac01748e8be115a35b172056f437bf8486d0dc4a7965",
+          "bytes": 2118
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\__main__.py",
+          "sha256": "5fc788a469661df9e9ef36b3a7999d6afdb6f08b5c7f696488c3f4b4b53a5fd7",
+          "bytes": 140
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_avif.cp313-win_amd64.pyd",
+          "sha256": "79278117cd394ed0dc36eef1e30fd684a9718cce1a9fd2442f0fba162ce9c6d7",
+          "bytes": 7834112
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_binary.py",
+          "sha256": "71bf69fbf9b0cc162e9a556c59b9e84d6b2b2e8e7db68c00e9ab4b399be33b7c",
+          "bytes": 2662
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_deprecate.py",
+          "sha256": "522ac3970b3279feaeeac2ffae51379a72ad45fd666af9a7864b7fd4f03b43c0",
+          "bytes": 2106
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_imaging.cp313-win_amd64.pyd",
+          "sha256": "c446a1e3e03ac2bc836eeb7c4e1547625958e04e625547663c737b3b370b7ff2",
+          "bytes": 2588160
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_imagingcms.cp313-win_amd64.pyd",
+          "sha256": "7e19fe243f99b4cbdec0a2a8256000ad84c8fff8c9901587c59f3f4ec7162f5c",
+          "bytes": 269824
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_imagingft.cp313-win_amd64.pyd",
+          "sha256": "614fbcd5ec3160df7ea6c9aad90dba52c91ebd494dda5d7a5b4c90a2af1f2153",
+          "bytes": 2170880
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_imagingmath.cp313-win_amd64.pyd",
+          "sha256": "f1ab775bad05260c123b2a3232bf74f6c3bdbe2bd20ca73747b83b2d8756bd03",
+          "bytes": 25088
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_imagingmorph.cp313-win_amd64.pyd",
+          "sha256": "f4bd8852fdeaec50b5f351175d5f6ade5c9ee993c620d7393ad73013367babe9",
+          "bytes": 13824
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_imagingtk.cp313-win_amd64.pyd",
+          "sha256": "f4dce1924cae6a7ba30570b94d32b155ddef7e561c4341abc0cfedd3fb964735",
+          "bytes": 14848
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_tkinter_finder.py",
+          "sha256": "1f5530ddd57b8161c88ffa2c527245c56875691b10d8c74aa4d3f7bd0c10716d",
+          "bytes": 558
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_typing.py",
+          "sha256": "b7e3154b97ffa5174bf8cd3bd9866a957141fc3f33d4a3a5f0470ab13fddf6ce",
+          "bytes": 964
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_util.py",
+          "sha256": "78ff087e658999b13f3ea6d425be2a4ea18d2e2e334f44d369daebaa6ca483b6",
+          "bytes": 713
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_version.py",
+          "sha256": "73df20654e1e9adeac36d08b63ff5486b1781d69d5a0ee8364f90257893d224d",
+          "bytes": 91
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\_webp.cp313-win_amd64.pyd",
+          "sha256": "aad5f6dd25c23fb497c37905fe8a11517995177700a13169af266160fedd324a",
+          "bytes": 410112
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\AvifImagePlugin.py",
+          "sha256": "602c37986b198aef0b0e9bbc79466e7f8a3eee7b8f4ce5ba08503a1483e45933",
+          "bytes": 9323
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\BdfFontFile.py",
+          "sha256": "6c0a5b325daf61171e40a22448315ad34d98c2bf65695ae9d8d18af71ce54bff",
+          "bytes": 3407
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\BlpImagePlugin.py",
+          "sha256": "1291e85528585f2a6ac671288924a19e00fb08f842798f1e7f0487d46e659d79",
+          "bytes": 17066
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\BmpImagePlugin.py",
+          "sha256": "34cce2e9f88565253122e610448a0e594a2d74f5e95d94bccd60726d2dca77ec",
+          "bytes": 20442
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\BufrStubImagePlugin.py",
+          "sha256": "b94f671ba4079ee29ea9929df270119563d4ea86b6d796350d796676a29b9cc2",
+          "bytes": 1841
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ContainerIO.py",
+          "sha256": "23ac8efd814412a30a035724804133176aff224e69fc68ccf91ad63896234a56",
+          "bytes": 4777
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\CurImagePlugin.py",
+          "sha256": "3bf6c5b56f3662100cf3f17cb69af73b952bcca3cfca257d4b6ce357d430a9a2",
+          "bytes": 1866
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\DcxImagePlugin.py",
+          "sha256": "2f6d5cde0557e883e6938cee7ff96db779807917dcb8209c5e1902569b9e7765",
+          "bytes": 2264
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\DdsImagePlugin.py",
+          "sha256": "d89c73bd3b276a2684e71584f9b523363bae37a1e3842695ba8cd8ef8325f585",
+          "bytes": 19556
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\EpsImagePlugin.py",
+          "sha256": "e5c1f3cf18f5bd47df70b62bf8c10ee53935cd378b63833fb4c37c6f00d4c69a",
+          "bytes": 17107
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ExifTags.py",
+          "sha256": "c46e8fb9920949793b6df9017d7875d5880a9565641751d643f23b5f2c0504cb",
+          "bytes": 10313
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\features.py",
+          "sha256": "cbf7a5342ce007a46030ff4031fdc274e3f78dda0de21a38bf1a122b383a7967",
+          "bytes": 11118
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\FitsImagePlugin.py",
+          "sha256": "bf8a5e2c0eb021dc928c70730cccd5239516c7ccebd23236037a9865268c8b1b",
+          "bytes": 4796
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\FliImagePlugin.py",
+          "sha256": "2f5bdfe108ec68c57479141399fcb5c27a89f65f61195e65bd320b5bbce7cc3f",
+          "bytes": 5113
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\FontFile.py",
+          "sha256": "88b495df6c907ad2e71384a01bc1e71dbd8576a92a1418d8f67fbe13abb9504d",
+          "bytes": 3711
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\FpxImagePlugin.py",
+          "sha256": "e0d01d888b99fd517a397ada602b75dafcd0a84844252bbbb3769a325c431694",
+          "bytes": 7622
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\FtexImagePlugin.py",
+          "sha256": "fb32afbe131373351ede8d1fe07a430bdfc32ba94a1d3e4b0017f4af9fb797ee",
+          "bytes": 3685
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\GbrImagePlugin.py",
+          "sha256": "21bff2df967334e98ca86d92b8eca3c518773b1b78d90a5c11c80b6ba0619ad0",
+          "bytes": 3156
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\GdImageFile.py",
+          "sha256": "2e331a94aefb570f54e69047e0a4256e2d8f688afbdeef43aadc4de7c3b5ac1b",
+          "bytes": 2890
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\GifImagePlugin.py",
+          "sha256": "d510a1d1b588c61fd5705f33b539737c11ed86ecc4a0bca5ad613d411a670d25",
+          "bytes": 43521
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\GimpGradientFile.py",
+          "sha256": "91b5d9a2326ca2428102077f28e5fd2c093669a6c8216269770675e9e2afc537",
+          "bytes": 4135
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\GimpPaletteFile.py",
+          "sha256": "126047710f44c42e1fe3bb5a0fb4bb1ba55a324afd1e3ca7955f0d7535d5e624",
+          "bytes": 1935
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\GribStubImagePlugin.py",
+          "sha256": "372a7987997e7f080183a28161707ac2ac59580233e90fb67b6b137a50db7eed",
+          "bytes": 1870
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\Hdf5StubImagePlugin.py",
+          "sha256": "a029d7a5f2cf091cdce6fadae9871b1fdbc72d7cbf89059b8dad5dd0f97e4a03",
+          "bytes": 1852
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\IcnsImagePlugin.py",
+          "sha256": "596e864f48dc61c1bf33bb7e69bdb149bf523090af8eca79d6522f7e0492bc61",
+          "bytes": 12842
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\IcoImagePlugin.py",
+          "sha256": "0d9a018f6ccabfbe9293de8f2aaf1e97d69900cd89df050b56a3dea27a3fd33d",
+          "bytes": 13499
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\Image.py",
+          "sha256": "472fb0b48fa29aaae8b2aa1f648007979f8e4490b9798d1b8c87709565023fec",
+          "bytes": 153145
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageChops.py",
+          "sha256": "859f043d43e5408cee82c11e755f2dae4297d230420c66fa0acce66ba65e3194",
+          "bytes": 8257
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageCms.py",
+          "sha256": "e6b0cdf8588b1de6ca9563f690dea36ef0c417d8dc6f7b289a405a0d7f1d15bb",
+          "bytes": 41752
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageColor.py",
+          "sha256": "295faeec79d95abacbdf3b8100e2ea7ab23eeef15c5d3c5d2dea1a6158ec9f02",
+          "bytes": 9761
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageDraw.py",
+          "sha256": "f8227b1cca67bda8f65b29d9f0e694a0de630b6433fd18867a857862020449e1",
+          "bytes": 37323
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageDraw2.py",
+          "sha256": "fdee88da73f17a26708ce8c1109cd4bf1a3202497399cfb117a47ccfc89e3800",
+          "bytes": 7470
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageEnhance.py",
+          "sha256": "ba00d4d2c963691ff369389bb6e9a54ef7fea851f5c755ba97640ca5cdfce975",
+          "bytes": 3740
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageFile.py",
+          "sha256": "13c0d72a8bdc0bd8779610133a4b5e613b2fcf8ff6bb0d1e5b3e0f96056c1421",
+          "bytes": 30910
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageFilter.py",
+          "sha256": "9f7693d4c91b2aba863dea12baac665a5895aa19213a02d9de2c632e7f2fa8af",
+          "bytes": 19336
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageFont.py",
+          "sha256": "1a73a8e72363d030d1748a725c423ed251e4b46be9800cc5ed6f6c1302998a22",
+          "bytes": 64573
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageGrab.py",
+          "sha256": "54a9a8ac63d57d660634e21c6121332ec022385bc084d37611050b0b8968a266",
+          "bytes": 7974
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageMath.py",
+          "sha256": "c6118186f7addafedb8322d197f69dcd55a7999ef355c6d3f1dd6ad5ca491c52",
+          "bytes": 10683
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageMode.py",
+          "sha256": "50b900fa3b02806c31563af62cf48fe367439a3ea759a424f4be142a3eca7d28",
+          "bytes": 2480
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageMorph.py",
+          "sha256": "56bd50401e6f198a4655f7d11894287781fbfc095098ede5f81961a5a61e0f22",
+          "bytes": 10673
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageOps.py",
+          "sha256": "d107343d3839afcb7c25281a2a4cddf9c8d8306b4c5143120645e699a266f895",
+          "bytes": 26313
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImagePalette.py",
+          "sha256": "b7054aa89162e92132b3fafb6d5ba169aa0f4dd8b72a68dcda51c041c08064db",
+          "bytes": 9379
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImagePath.py",
+          "sha256": "6679c9baf40db5b2918429abeb54c4984875bd5579ffdd163043cbf0ea72e65f",
+          "bytes": 391
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageQt.py",
+          "sha256": "4a9c4778f81687981d8d5206342e061b9bfd577b26426fe73e224372b8671d77",
+          "bytes": 6903
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageSequence.py",
+          "sha256": "82e64751da56af39f3664718d0e6290f3b85d2e15794212edbad283feedefdf2",
+          "bytes": 2341
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageShow.py",
+          "sha256": "4ea3ba9f38f910cc29e5d1316a0de3841257747a2371c9c5c79f4b3a73106a8d",
+          "bytes": 10468
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageStat.py",
+          "sha256": "5b4b946bc60d0babe1a3095ead2cd923013b46ef8aa76ad6baa18d2c114b672a",
+          "bytes": 5662
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageText.py",
+          "sha256": "62180d4d1ba650596492494766a2e5e7c4f24426360641513dec105e62f7c834",
+          "bytes": 12440
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageTk.py",
+          "sha256": "4f1d337fd913681b801af66ea342401eb35b9379fa7b0af86677569d6c592b44",
+          "bytes": 8398
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageTransform.py",
+          "sha256": "66eea8c925c436dabbd76fa792a14ba9a7d83ef891020b209337cb586d0add5f",
+          "bytes": 4052
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImageWin.py",
+          "sha256": "6fe7ceea49f889c1e9cbece4f9783e9cedfcdb33d797e30a8d972cdef0179754",
+          "bytes": 8332
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImImagePlugin.py",
+          "sha256": "5fd881490e31eeb6aec5b3889fbda3eefe9301481995da580f970073a67530d0",
+          "bytes": 11992
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\ImtImagePlugin.py",
+          "sha256": "afe643cf75e38ba10117c7949caea2b8211912d965a74c4b452210d3f875e141",
+          "bytes": 2768
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\IptcImagePlugin.py",
+          "sha256": "020bf4599377b5058fe57f5ffed9281452a0bfb053767910fc02b7dbc5717463",
+          "bytes": 6812
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\Jpeg2KImagePlugin.py",
+          "sha256": "2e38bf178d8b93980888a4a79036f2235d66a77f1a560f2e2261485ae68c4a09",
+          "bytes": 14450
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\JpegImagePlugin.py",
+          "sha256": "06fd7382455908153398460c25a199b13eb4226aebeb6799f33acaad6eb32dfd",
+          "bytes": 32438
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\JpegPresets.py",
+          "sha256": "51422c2b3bf2cdd3f3b2774e0ddf747aefe5b8ca9ab86d4f261d7450eb90be68",
+          "bytes": 12621
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\McIdasImagePlugin.py",
+          "sha256": "3fd77592be12b5ed10564c5faa2c77d6c7c60fcb169fe7959982b4c20e83bc8c",
+          "bytes": 1955
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\MicImagePlugin.py",
+          "sha256": "b82c463389652053e37eed8a8e2fb34a73da727aa2194646aacfc3b5bdc992d2",
+          "bytes": 2702
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\MpegImagePlugin.py",
+          "sha256": "91e9bdce87ec06d22aeb194c25cb0590e5d370908f1080a4f657214df47da432",
+          "bytes": 2094
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\MpoImagePlugin.py",
+          "sha256": "cde7396b13654702167d7d7e657cc38b5bba01c4895066c13ec3e2b39e135da5",
+          "bytes": 6996
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\MspImagePlugin.py",
+          "sha256": "5bcaee33ad0e6546e23ee50143b041905ce49757e268f12fb2f44cc8dae0d7c0",
+          "bytes": 6092
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PaletteFile.py",
+          "sha256": "41d11af7d8cb0be3cf844a86cbaff87c3b9af13cca4925339007987029455fb3",
+          "bytes": 1270
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PalmImagePlugin.py",
+          "sha256": "7cd221587d3a577e6e2e0c081d430c73fdb1ba67a520426c982c21c36c210712",
+          "bytes": 8965
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PcdImagePlugin.py",
+          "sha256": "819b027170c8a845532b6cfe1962a9b53db9a455350143a0a6bdc9d3a7233c28",
+          "bytes": 1842
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PcfFontFile.py",
+          "sha256": "2da12e68a90669a8738c2912ecfec96dda0ee17401f71ecd8dcdf176f01ba248",
+          "bytes": 7481
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PcxImagePlugin.py",
+          "sha256": "3a2362597db89396ad5d924d6d2d172f1a7e122925240c32b992ae93d8f1a8a1",
+          "bytes": 6473
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PdfImagePlugin.py",
+          "sha256": "80932bd2c4845b3ca7ecb9cae4fe56408f7de42bbf97e5b74fc157e2356061ff",
+          "bytes": 9632
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PdfParser.py",
+          "sha256": "d23c9aba2b1add56c05f18a7b66c636d2770ee6d71b9a0106e2b7ef72b6efc13",
+          "bytes": 39071
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PixarImagePlugin.py",
+          "sha256": "f919ee2521a1185f0cb14b221d9ab757307157e04d9cadf99018c97e1633c17b",
+          "bytes": 1830
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PngImagePlugin.py",
+          "sha256": "243250ec47deaa482f83c61eedc8aaecf4316b282e1c303195d90200352bf30b",
+          "bytes": 53285
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PpmImagePlugin.py",
+          "sha256": "5a1b4294614c00ef1565953d9850597cc8fb0db932b59f173fb9d06d5b593795",
+          "bytes": 12766
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PsdImagePlugin.py",
+          "sha256": "7c3295ccca255235650204bd799a41660e770fa9ee41058a0a66251164e1b257",
+          "bytes": 9054
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\PSDraw.py",
+          "sha256": "b80afe320e63f7f1b744bc16c78fc9d70bad260fc355e0c0138a9677732f8bd5",
+          "bytes": 7155
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\QoiImagePlugin.py",
+          "sha256": "5ca593eafe5fee5ff75a64d6c5b9a6356b0c9339798fe521e699c9c15db26c58",
+          "bytes": 8842
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\report.py",
+          "sha256": "ea6ecd3afd5adb8e7bed9889a315fcf62a7925e3a07f63b517de5febed4ae5a3",
+          "bytes": 105
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\SgiImagePlugin.py",
+          "sha256": "c35c55e3e10b6011ca2ff01a19ff68252609cc1c13a5d27eacd3ea880aca806b",
+          "bytes": 6620
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\SpiderImagePlugin.py",
+          "sha256": "277571b4117e4aa79889ebbcec858a3b7e095d186745c2e8753993e49fd0b1c9",
+          "bytes": 10638
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\SunImagePlugin.py",
+          "sha256": "60a604bee1b84149227acdf838ab5758a4d8499f14deacdc13fbdd4eb3ae46cc",
+          "bytes": 4734
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\TarIO.py",
+          "sha256": "2bab4b9050dc69aaf7bdbe84c986fb1b8a15101e35c7f2ccb8625e513f70e434",
+          "bytes": 1503
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\TgaImagePlugin.py",
+          "sha256": "38cbd99ffc4a8c1d5d675ff83243aabb32411e949422901fe6650425988b0532",
+          "bytes": 7244
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\TiffImagePlugin.py",
+          "sha256": "9425464d8407c4dc6370a7049a4d8d98082885e1eba09f4d38d9dc39701e114d",
+          "bytes": 87340
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\TiffTags.py",
+          "sha256": "16c76a6c8409388ee2846ecc67f2b8614403678ce8fab6986e28550dee3653d1",
+          "bytes": 17772
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\WalImageFile.py",
+          "sha256": "a5a1e48269a05b6fcb5e080f493c613e24715bee81db004a456dc614eef43dc9",
+          "bytes": 5889
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\WebPImagePlugin.py",
+          "sha256": "9aa75b945dd4459fd5d9d8a3597b65a0cdf6f3f25afadc4c51eaefcc4548d169",
+          "bytes": 10171
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\WmfImagePlugin.py",
+          "sha256": "8bcc3b9cdd4a0b54db1a2cf4e0f94dd61c376c445d2b7f5d62427ec4b41d0a96",
+          "bytes": 5504
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\XbmImagePlugin.py",
+          "sha256": "c1cd0da5f4f3952871f589a2d33c28d1a5598c36b8fc1ecd1221b64e008eeb94",
+          "bytes": 2767
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\XpmImagePlugin.py",
+          "sha256": "c187fb43b4c6a3824bea7e68b90c7ca5b4cc9cc655b21829fb1c2800c64450a8",
+          "bytes": 4557
+        },
+        {
+          "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\PIL\\XVThumbImagePlugin.py",
+          "sha256": "384b448508022cb82fc7c275888f75d533338c9e624e538ea90a4b431d5bcd0e",
+          "bytes": 2209
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\__init__.py",
+          "sha256": "ffa9fc2a0e34ed20a78684e9e6df4496dc270d6d9e28b37563e67f122163f07d",
+          "bytes": 180
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\__main__.py",
+          "sha256": "307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+          "bytes": 79
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\ad_plan.py",
+          "sha256": "4d6482f6f0baf87cf60ae01be604af0047069e794c2784a9d0c86f30a1a458ac",
+          "bytes": 5506
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\agent-project.schema.json",
+          "sha256": "7b3a91d818199c179a41e54c725df26403449775fcec66b573e83b2c2faf965f",
+          "bytes": 30903
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\animation.py",
+          "sha256": "b90064bd9de4fbe1aea85ba7bb11e5acfefc82a85c2b8078ba36bac64c59b949",
+          "bytes": 2900
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\artifact_locks.py",
+          "sha256": "317a6c056545092ee7ff010f0c222f080aba1fd16f6df99b479c3783b4452590",
+          "bytes": 4696
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\asr_quality.py",
+          "sha256": "e2407215903a2552a3efd1acd04840bae03862b470dce72b489573b36d6c1f90",
+          "bytes": 3359
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\audio_routing.py",
+          "sha256": "40f74750a79ea80f016dd2eb8a353d6103682756f01970ad802c6292be8e5af8",
+          "bytes": 21723
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\audio_separation.py",
+          "sha256": "bb36d993ca948deea171e9569c6b4954105bdd5c7b79c70d2f5c14a79878f0de",
+          "bytes": 13921
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\audio_stretch.py",
+          "sha256": "f4120fd82fc4eba79b9dd0bed1093651edbadb19202d7c384530e799d047dced",
+          "bytes": 19432
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\audio_tempo.py",
+          "sha256": "3284a08dc75a25dcbeed30c7088a18898c46d398e6e7ae9380efcf0e366afcee",
+          "bytes": 3760
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\audio_tools.py",
+          "sha256": "9e636d1b27707dad3777811827d3c3c3e69ca393a9a3757733e9876517506f5e",
+          "bytes": 4799
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\batch.py",
+          "sha256": "5a416712628d104c5e9cf1b96bafeb118b2e8bfb44690b51831242b716ff2a92",
+          "bytes": 6398
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\beat_edit.py",
+          "sha256": "0cbc12d37b80417e022741818f812f61d287123d816217c7e5462f872cfd78fb",
+          "bytes": 9126
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\bindings.py",
+          "sha256": "2dbb8bce11ecb7f7fd6fa893cca08efdaa6f9c21a3c6f8a4588cbed5092c3a65",
+          "bytes": 24915
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\browser_process.py",
+          "sha256": "55c72751a5d3d5e397af030fbf65a7ef5b659646a3890f72e52da816d9ab22a6",
+          "bytes": 7483
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\capabilities.py",
+          "sha256": "95ca093d179a783244ef1d235b9af8841f31cc2c522fccd54b00332d953b8a5b",
+          "bytes": 73679
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\captions.py",
+          "sha256": "f9a4534682417235a1c2e6ba36072bb92de9354cb5d83b76d06e3ecb22144d28",
+          "bytes": 13585
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\cli.py",
+          "sha256": "5b4988dbf1982988aea74462f21474a208e60e7489ecd42cda762ff2dda56ec0",
+          "bytes": 465810
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\clip_windows.py",
+          "sha256": "3014424ecce4ec780b2e241afd50c310681c69c4450ebd88b689cea221149377",
+          "bytes": 16855
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\convert.py",
+          "sha256": "5ff0ea4edf337b96f88f2a4d5c6ec7e36ab8f42e17260a0a7a9c0bce289c5229",
+          "bytes": 53314
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\ctc_alignment.py",
+          "sha256": "a475e9b1acd8ceba2be90884729f0b5a4c76ed354853bc0a57b47f1f9787edd7",
+          "bytes": 11422
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\ctc_cli.py",
+          "sha256": "2f20af923ea0a7af6fe9d5080cdb999d6b7c2f26c133a6c2f702d782747c22c8",
+          "bytes": 13537
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\ctc_worker.py",
+          "sha256": "933d1c7ca4ac7dc8512d49e17a090b0a89e580724d0228a9ab44a3a14e3e9810",
+          "bytes": 9830
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\cuda_admission.py",
+          "sha256": "8d030f776b09edeb9d6cfecce720caca3f20a1fab058dd3dc406020ed064fd3b",
+          "bytes": 11092
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\demucs_worker.py",
+          "sha256": "8a5347b8e2ad0c93fb42b9c1867737ff989914e662753ef11104602c944bba95",
+          "bytes": 5409
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\draft_adapter.py",
+          "sha256": "0eb1e8f649e66cc6f15ef56bfb75d07166a7d7e3a6f1326f50bca349a1c24071",
+          "bytes": 56926
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\edit_planner.py",
+          "sha256": "ffe0c9c774f094b57b565ad56f84291d432ce957b1fa578dd44aabd80212b43a",
+          "bytes": 29922
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\effect_automation.py",
+          "sha256": "9537dfbfa6469009b13aeb01d846f5181161be81903324f2efd6461e91cdd3fa",
+          "bytes": 14642
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\effects.py",
+          "sha256": "f9c37938e50a217d5a511abd5341aad7fdac2575aff26b75eb13ceb90137e9fc",
+          "bytes": 17109
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\errors.py",
+          "sha256": "1525e91f86ad7f22c061a35c383d3513cdcad77acab2e364510b42adde0a9721",
+          "bytes": 1609
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\font_coverage.py",
+          "sha256": "2f33b3eb07331ef3b87c78286317df8d903a2c991978e9750a39d6bcd117c243",
+          "bytes": 8755
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\fragments.py",
+          "sha256": "6087fe24f6f0a2041473ac5ccc04507f7c25c2b598c5a6f65dd7b4ddafe9567f",
+          "bytes": 39060
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\hardware_acceleration.py",
+          "sha256": "670ab26584d75f45ca6d6a12df0e096bdbe0d25dba6edc9ef3ea4ccba3f5132f",
+          "bytes": 21762
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\html_motion.py",
+          "sha256": "eccfca16e5a3760c9cc9546613231c281fd253ea11e846fad39f98eb7f699889",
+          "bytes": 39510
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\html_motion_worker.mjs",
+          "sha256": "435899a68e8ac4e76484c00e2d3f6d8fadcf362475dd9e639d0bd0e7ad7fe0bf",
+          "bytes": 15006
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\html_quality.py",
+          "sha256": "7abdb2b18bb86a3d87e058e74b908cb0a430f05273ca9b78122a5985c0b5dba0",
+          "bytes": 4215
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\html_quality_dom.mjs",
+          "sha256": "551f997cd5f4f57514354ed4b5292c67e9e82f4c8928db74f4d6c53b57ecdc94",
+          "bytes": 5875
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\html_template.py",
+          "sha256": "f3ad9507632d03df9e7de3e4303638325c9667e1005ae9600c62670b06d1436e",
+          "bytes": 7268
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\html_template_dom.mjs",
+          "sha256": "ed68388d4dda1adabc689afa508640de471fe8a6e461bc6aeb5292d904950260",
+          "bytes": 6086
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\inline_sequences.py",
+          "sha256": "ee1596121f7e0ea88c7d1f8e27d75132b57dc03522a768a2716f97343a1ed911",
+          "bytes": 9710
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\inpainting_frames.py",
+          "sha256": "bf86f16db2c99574715464ec789481d1720635091a88578a39717f45e489065f",
+          "bytes": 9857
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\lama_worker.py",
+          "sha256": "c8b78f2e476e417ed54ea62aa502858eeb13b14c8e91b29fdd15021a4c648154",
+          "bytes": 5174
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\library.py",
+          "sha256": "60148ae6a1fd92013f97c78ef87a2f68cf4d3a61398af8a1d3c366ca3495af4e",
+          "bytes": 20636
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\local_asr.py",
+          "sha256": "7c8582144a9b17e08558f36777c312099e10fee82f18f49589b07f40b61fb9dc",
+          "bytes": 14600
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\local_ctc.py",
+          "sha256": "f4e6bef1bf35603a5828f161462570afa9ca04af4364e0032708700ae3141716",
+          "bytes": 14593
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\local_inpainting.py",
+          "sha256": "34294b2a7184afeda6527db59def5aa6b02efa83e8f3beb6e8e53fec0fe03890",
+          "bytes": 14477
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\local_matting.py",
+          "sha256": "c70b82dd131de94729f2fe096fa35e3ad2775e5e2476a04a0b97e11a6939a3c6",
+          "bytes": 44791
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\local_ocr.py",
+          "sha256": "cd85a6d7b12ec18b3e024327687c483f1f7cfa0deed2369b968f8ab2bccc14b5",
+          "bytes": 17446
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\local_outpainting.py",
+          "sha256": "577ecf6fe26a0718cc734ba6b526f52e974b97262965f965aa37f431add1bd55",
+          "bytes": 10211
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\local_segmentation.py",
+          "sha256": "30c0acaea0c261f35c5e10b3e0df36ebf10b9137608b18109a1c4739095ed361",
+          "bytes": 13876
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\local_separation.py",
+          "sha256": "8fe3784386cbb125b5707bd01dd5d714058e2556aeda852bd5326e57fa839332",
+          "bytes": 13940
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\local_tts.py",
+          "sha256": "028216041f53481ee2230642a642304eab3adabd32735fecdad7b952650055ba",
+          "bytes": 18989
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\local_vace.py",
+          "sha256": "44cb7558644b219234e15c8e4088cb7c760a8f200e00e1ba66fb16b338c83571",
+          "bytes": 19026
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\local_vision.py",
+          "sha256": "d69b94220d749e076e485432cc1b70445f398ad876a8582a3ae75b7668e6c329",
+          "bytes": 13179
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\lut_library.py",
+          "sha256": "369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+          "bytes": 16158
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\magnetic_mode.py",
+          "sha256": "7b74280ed8df6d94b259548122b44216ca45d6726084504aa6fdd05524f460e1",
+          "bytes": 9034
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\magnetic_reorder.py",
+          "sha256": "b3db1863adfa7cb88173a864c127d01ebfa33c2ba46dc21b340ea660db03eef1",
+          "bytes": 16486
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\magnetic_sync.py",
+          "sha256": "bd4c59d3045eda011a9cc5e7c8720b9380bc756ee41931867b0f4eb4f22ea939",
+          "bytes": 5340
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\mask_edit.py",
+          "sha256": "952aa4c1cc3f49b2b1c9d5dc0c969901d82d4fcbe660387af2f3f7c044d6bb7a",
+          "bytes": 13490
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\mask_edit_geometry.py",
+          "sha256": "9bf1d101c1aea8d2265b704fab8dcd65b3bb08c4cc45aed95a4a5cb0ee2ae1f9",
+          "bytes": 11012
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\mask_review.py",
+          "sha256": "17de0acd6d76ad9218565302a0f47a577a5001a487bbf0c66432b0b6af278bad",
+          "bytes": 14812
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\mask_tracking.py",
+          "sha256": "724f8f9800536d3ffdc99675fadf79e1262532ec7f9a3d879cf94674ba531b8d",
+          "bytes": 11000
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\matting_frames.py",
+          "sha256": "e1491c575fe0dff5626439cb27fe422b8e92955ca1dd7503df59bbd6a3509f09",
+          "bytes": 4054
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\media.py",
+          "sha256": "75755c314fe01111d7ca85138efb6f9b0993e45c14c5a2b65cc1046c5e58cfba",
+          "bytes": 18960
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\migration.py",
+          "sha256": "b081ca767872d8bfa04f3aac1cd2f1c4d0c03a92e4ad5be53fba29fec0584fa4",
+          "bytes": 6471
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\model_registry.py",
+          "sha256": "b8081e3de4e8559b982fbf2e9b07678959388447bf56d23974c1f60ac0e1344c",
+          "bytes": 19560
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\motion_presets.py",
+          "sha256": "6c3c61a7ed62e6ca0ca9d0d033331430e46aca94b3d15df59845ffea4fea15ea",
+          "bytes": 7150
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\multicam.py",
+          "sha256": "fb9665755ffe3e083254219ee888e492124dcb983bd327c47adb3be925ea754d",
+          "bytes": 16299
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\nested_freeze.py",
+          "sha256": "2294d318840e6285550eaf70109702b041c031c2cde4c8dc0bca3d2bad848a35",
+          "bytes": 7203
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\ocr_cli.py",
+          "sha256": "1a818549a1308e78a38a1a5aa9a025772f5be792bacfcdfeacb5599670e0b4ec",
+          "bytes": 10902
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\ocr_geometry.py",
+          "sha256": "a2a4aedf4289ab20bea45000c1be898668239b75ef215386120850d2f7dfce5c",
+          "bytes": 5146
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\ocr_worker.py",
+          "sha256": "ee5a2096ec1ee03fc09d2ac4d0b06b1791d5bbfe011772f448045d1377b50d3f",
+          "bytes": 11782
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\OPENFILM_EXAMPLES_LICENSE.txt",
+          "sha256": "4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+          "bytes": 1078
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\openfilm_frame_clock.mjs",
+          "sha256": "c60b35fb0d26b8629d833f11028757aeccf603917c4c5840f501c01b757de1d5",
+          "bytes": 1284
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\OPENFILM_LICENSE.txt",
+          "sha256": "4f39fecc5d074a4795bb7c55c5aaad1a4505b5e022ae6c2c3b55b4f26e7c43fc",
+          "bytes": 1078
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\openfilm_overrides.mjs",
+          "sha256": "8fab39a5f4f9696e9070a206f45d9241f54167ea2d9f47c0bcc9975333664832",
+          "bytes": 4117
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\openfilm_stroke.mjs",
+          "sha256": "6c20aaff3a85b8a98654d82bfbea34029d78b0366af6b95b17c70abfafd265a1",
+          "bytes": 1584
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\openfilm_subtitle_segments.mjs",
+          "sha256": "b4791b6ec527379aeedaa5329ee7efc3855b8b5dc99cf36db25c2d4652e5784f",
+          "bytes": 34218
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\openfilm_template_fields.mjs",
+          "sha256": "fd4c58532cd3b46e32872e84136b54edef5a8ad9d824f1afa44f9264d81774e3",
+          "bytes": 2032
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\openfilm_text_bounds.mjs",
+          "sha256": "94b2ab392b367ef1f901967f9156ac48493419be32bc40b4d6c035cf71a56108",
+          "bytes": 2262
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\PADDLE_OCR_LICENSE.txt",
+          "sha256": "3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e",
+          "bytes": 11376
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\PADDLE_OCR_NOTICE.txt",
+          "sha256": "392317bb77f62100b038919472ce0c3fecf0d6c6f9c29fc22a18813fb4a15a32",
+          "bytes": 1251
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\PDOOM_VIDEO_LICENSE.txt",
+          "sha256": "5fc212466ce7183be5d85a3ee34fea461712842d5cd256b470978a83577083cb",
+          "bytes": 1074
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\pipeline_diagnostics.py",
+          "sha256": "10293635791333ef437e592d7a58f8dcf341ade759552a26149c1297bb9cac81",
+          "bytes": 32733
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\policy.py",
+          "sha256": "0433efb46d2561fa9f257dd363aeb592df7ef61c60be147196cbaee7fabbacb8",
+          "bytes": 11235
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\project.py",
+          "sha256": "dd86c8d1b161cb99660f4bc92ac3ff8c2cc6c10c34f22432fbe6f27af9a7414f",
+          "bytes": 24104
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\quality.py",
+          "sha256": "d4e71c9e6616250b681306d562305dafe4cb5867652ab365275277b155e9e047",
+          "bytes": 20246
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\queue_reuse.py",
+          "sha256": "d939247ceee094b9255bc8833afcb6897cb3f0f06a280c717306d316e1f38f61",
+          "bytes": 18253
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\range_edits.py",
+          "sha256": "eff604efaa3c2a66b63b3fcb332804ffd9e45a11ab880964b279a379d5500e4e",
+          "bytes": 32285
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\recommend.py",
+          "sha256": "0747f63b0089e317ac335e0e2bdc19cde9373691ca145c5fb84cb8cb2e88c5a4",
+          "bytes": 3579
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\render.py",
+          "sha256": "3b3cd6d7963a179057ba36668515b8ee87e9e0a23914395dc5c7c13635e81bfe",
+          "bytes": 292904
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\render_queue.py",
+          "sha256": "171db5bb475f3eaeb4ce05dacdc3c19ba90c2b3f429349d50c949b9d3c97f2be",
+          "bytes": 9931
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\repair_blend.py",
+          "sha256": "1d4d01f381444cf13416daf82832edc6aa927180aeb1bc8765cf2b5a2ddaa2c6",
+          "bytes": 14157
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\retime_edits.py",
+          "sha256": "4dcf1ef57db6bd813d2c25887705ba18590207decb07bd17f4622b0c3c14b881",
+          "bytes": 12037
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\retime_transform.py",
+          "sha256": "8b00a27cd939264cece21ddf22ca9949a23a43122dc958c0970cd2526c7bdd35",
+          "bytes": 4935
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\rfc3339_dates.py",
+          "sha256": "344d79048ff55a77af00314134c20b57b5301b75d1b6a32b4a7a3f52ce749105",
+          "bytes": 1217
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\RFC3339_VALIDATOR_LICENSE.txt",
+          "sha256": "5ba1a4f03626ccca6dcbf53a554545e4f776a335bfdaa233ec3bfe9bb7fac15d",
+          "bytes": 1074
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\rights.py",
+          "sha256": "ee65bdf0e6a4a8d44122e3dba5f933e81ff04c194c5aed3f78cdf276db867195",
+          "bytes": 36660
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\runtime.py",
+          "sha256": "b8a81adbd7b19e2269988a0494b8435b59274fc02db22b73d40b858feabe723e",
+          "bytes": 1763
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\rvm_worker.py",
+          "sha256": "b4ee231349b26fe8d3e94f9bab1ba2f70566b8c2dbe0b806b8864e92957fbeb1",
+          "bytes": 5298
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\sam2_worker.py",
+          "sha256": "a7df14a7edbe22b78a593ef16e87528645b9043168b314884da332c4e0eef554",
+          "bytes": 9043
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\schema_contract.py",
+          "sha256": "1a9495976956a595d88cb95e69955d28abbac76bd33de97615fd9a19bda2a5ec",
+          "bytes": 5001
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\scopes.py",
+          "sha256": "e68311f38f64d0afc6ed4aa68421697942fe4ad20ac68f662428fc54c361b746",
+          "bytes": 2556
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\segmentation_frames.py",
+          "sha256": "e934f93150500a9bcb7d386dd91e43d27ae31da4e1c2dc887dd4720ae9fcc5ea",
+          "bytes": 3162
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\separation_dsp.py",
+          "sha256": "2e32d4159c2906c6d0aceb1846df4f86f3437572ae7127afc30adaf05022965d",
+          "bytes": 5092
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\sequence_canvas.py",
+          "sha256": "462542e26058d350c2d0a29d0cf4127c4054cab7462a763811b85bfca171412f",
+          "bytes": 1742
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\sequence_sampling.py",
+          "sha256": "1aa171ef6043878afce099f7a04b214b9c458879147c46147062a77d36356ec2",
+          "bytes": 4506
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\smart_cut.py",
+          "sha256": "ba871f7bff0f186ad55d9e22c5fcd75e09032e8d7299a01c7ea7b76b2e1a21a1",
+          "bytes": 15350
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\soulx_worker.py",
+          "sha256": "20dc7a046934925b3620f35922f08a7c97845527a78ee437950e0db9addba3e5",
+          "bytes": 6412
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\source_edits.py",
+          "sha256": "a2bea20a8d162ac4fa9f329045bca2b7e214a624adca107df6021919d5a1d36c",
+          "bytes": 11950
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\source_transitions.py",
+          "sha256": "59c2652aa76024b78667293ce46774ba6910e4524db7e39f95dc95bd91b0547a",
+          "bytes": 17263
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\speech.py",
+          "sha256": "26a17ac367475ebe56a498a3f2950cf1529ec0e7d63238ad6399c8b27c713abd",
+          "bytes": 6344
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\speed_curves.py",
+          "sha256": "41fbddd764bfa481e6158e8401333113c871e1c38e34257911f9aa676b9bfff9",
+          "bytes": 6776
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\stroke_motion.py",
+          "sha256": "ba53f586ff12c75c15803e347307c802d977e874ce792159d74ebb2b6b42ae03",
+          "bytes": 6423
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\subtitle_clock.py",
+          "sha256": "49ca2001da0f250d682f5818d95f4f51ee362cbaee979fb9a99649a847cd4645",
+          "bytes": 2229
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\subtitle_segment_worker.mjs",
+          "sha256": "66ca5d7fab0926efe15615da29dba3024897cbfbfb1b28e6a6a189697b6d5bdc",
+          "bytes": 4960
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\subtitle_segments.py",
+          "sha256": "5590e04147f0b50cb60df3b4e543059a560dbfd684b3085c5f25f8fb04631aea",
+          "bytes": 21218
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\template.py",
+          "sha256": "25cff8f3f5a76d88358c746dabb5adc50b0b0c345ffee53aa3a175f72248ec7d",
+          "bytes": 15317
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\text_highlight.py",
+          "sha256": "d08bee683f0bd00bac363a78df5957475765741a7c53d92ac025575b334f78e5",
+          "bytes": 21721
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\text_layout.py",
+          "sha256": "1f3831478b41ea23c7dd445a66ba08249a4833cce852eb9190ac0a35936a210b",
+          "bytes": 5045
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\text_paint.py",
+          "sha256": "a924644f0396b5204efbb0e085f25d51f6cda5bfc75f2d44febc6796e42cb028",
+          "bytes": 6220
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\text_typing.py",
+          "sha256": "6cc022af8300fb4270cb21f2f53ffe2b33210ac203169fed653d11d75e591ec3",
+          "bytes": 11561
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\time_mapping.py",
+          "sha256": "89bd69060b3f10af1197018b735621eadb8ce2858b4281972d989fddf79f2ef1",
+          "bytes": 9895
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\tracking.py",
+          "sha256": "3ef89e454292f7cedec1dbfcb8c6a5a9220c802b9e886e18f5aaffffb6a1934b",
+          "bytes": 40754
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\transcribe.py",
+          "sha256": "877f1cb336233e70d010d39884b1fde6ab475b3df8d55e929bc793b7cfb17ce7",
+          "bytes": 14266
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\understand.py",
+          "sha256": "3b440295b06683c8b7e0fd8a19a0422239bd86e163081677d47fcc5b1da83a15",
+          "bytes": 5199
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\utils.py",
+          "sha256": "78f984613b0c253d108dd4d515557f77bc4ebd4df4945108a63d8fdb38ad202b",
+          "bytes": 12980
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\vace_context.py",
+          "sha256": "aef2d4318720c10a99644e96ea35ba27d48e9b405a332f6b2075b6a558f0e0e6",
+          "bytes": 9866
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\vace_frames.py",
+          "sha256": "aadc7d5785347422ee62b1d4a195e5dfbf1bcb497eeedc43aa4d839aff6f55de",
+          "bytes": 15072
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\vace_model.py",
+          "sha256": "8a8f96a14aac93a7b9577f88fe576fecbbfd4fcc206e27843de79f7b1ba54961",
+          "bytes": 13701
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\vace_worker.py",
+          "sha256": "0ce1dc459b3c0d7f1c95ec2208e78e5fe299200582c878f5de34c9382f4582f5",
+          "bytes": 5368
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\validator.py",
+          "sha256": "edc86ca5f1058d811e2f00c483eb4144db142b3dd140ece9805cc1c643cc4fa4",
+          "bytes": 92287
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\vision_tracker.py",
+          "sha256": "add01f7ecc50a645a1f0e9a0f21f817f5538359aa7f5f268158c23c36769ec4f",
+          "bytes": 6960
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\whisper_worker.py",
+          "sha256": "39220014386155a911d4714c3dc20493c76720dd98312d4410826728a2f59d2a",
+          "bytes": 4364
+        },
+        {
+          "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\src\\ai_ad_editor\\yolo_worker.py",
+          "sha256": "fe93653d9ae37e811325655ca81635311cd9c6504d0e41b8d1e7c6fa43e77e86",
+          "bytes": 12271
+        }
+      ]
+    },
+    "source_derived_files": [],
+    "encoding_executed": false,
+    "copy_sha256": "fbba9c5aa6eef771b436257a04dc841776d938af0c37e90e628c2a52f59cdc81",
+    "source_encoding_evidence": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-y",
+        "-loglevel",
+        "error",
+        "-progress",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\.tmp\\render_20261019231715_7d01b482\\ffmpeg-progress.log",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\assets\\source_source.mkv",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\assets\\source_source.mkv",
+        "-filter_complex",
+        "[0:v]trim=start=0.000000:end=2.000000,setpts=PTS-STARTPTS+0.000000/TB,fps=12/1:start_time=0.00000000:round=up:eof_action=pass,setsar=1,format=gbrapf32le,premultiply=inplace=1,scale=w='max(2,iw*(if(lt((t-0.00000000),0.00000000),0.80000000,if(lt((t-0.00000000),2.00000000),(0.80000000+(0.20000000)*(clip((((t-0.00000000)-0.00000000)/2.00000000),0,1))),1.00000000))))':h='max(2,ih*(if(lt((t-0.00000000),0.00000000),0.80000000,if(lt((t-0.00000000),2.00000000),(0.80000000+(0.20000000)*(clip((((t-0.00000000)-0.00000000)/2.00000000),0,1))),1.00000000))))':eval=frame,unpremultiply=inplace=1,format=rgba,drawtext=text='ONE ENCODE / REUSED COPY':fontcolor=white:fontsize=16:fontfile='assets/font_DejaVuSans.ttf':borderw=1:bordercolor=black:x='12':y='14':box=1:boxcolor=black@0.45:boxborderw=12[v0];[1:a]atrim=start=0.000000:end=2.000000,asetpts=PTS-STARTPTS,aresample=48000,apad=whole_len=96000,atrim=end_sample=96000,asetpts=N/SR/TB,adelay=0S:all=1[a1];color=c=black:s=320x180:r=12/1:d=2.000000[base];[base][v0]overlay=x='(0.50000000)*W-w*(0.50000000)':y='(0.50000000)*H-h*(0.50000000)':eof_action=pass:format=auto[vo0];[vo0]null[vout];[a1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus1];[abus1]amix=inputs=1:duration=longest:dropout_transition=0:normalize=0[abus2];[abus2]aresample=48000,apad=whole_len=96000,atrim=end_sample=96000,asetpts=N/SR/TB[aout]",
+        "-map",
+        "[vout]",
+        "-map",
+        "[aout]",
+        "-t",
+        "2.000000000",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "medium",
+        "-crf",
+        "18",
+        "-pix_fmt",
+        "yuv420p",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "-colorspace",
+        "bt709",
+        "-color_range",
+        "tv",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "192k",
+        "-movflags",
+        "+faststart",
+        "-f",
+        "mp4",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\openfilm-batch-reuse-20261020-v70\\native-r2\\project\\renders\\.tmp\\render_20261019231715_7d01b482\\first.mp4"
+      ],
+      "acceleration": {
+        "version": "1",
+        "request": {
+          "encode": "off",
+          "decode": "off",
+          "encoder": "auto",
+          "decoder": "auto",
+          "probe_max_bytes": 536870912
+        },
+        "status": "planned",
+        "probes": [],
+        "attempts": [],
+        "decisions": [],
+        "device": "driver-default; identity not certified",
+        "report": null
+      },
+      "filter_graph_transport": {
+        "mode": "inline",
+        "sha256": "sha256:a3f7f59b9aead2aa109b4043a7fe6bed0430baae66c758a15a418d23ddd0025d",
+        "utf8_bytes": 1371,
+        "logical_command_utf16_units": 2521
+      }
+    }
+  }
+}

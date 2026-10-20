@@ -1,0 +1,23 @@
+usage: ai-ad-editor queue run [-h] [--format {json,text}]
+                              [--request-id REQUEST_ID]
+                              [--idempotency-key IDEMPOTENCY_KEY] [--dry-run]
+                              [--no-network] [--progress {none,jsonl}]
+                              --project PROJECT [--job-id JOB_ID]
+                              [--max-jobs MAX_JOBS] [--continue-on-error]
+                              [--workers WORKERS] [--reuse-identical]
+
+options:
+  -h, --help            show this help message and exit
+  --format {json,text}  输出格式
+  --request-id REQUEST_ID
+  --idempotency-key IDEMPOTENCY_KEY
+  --dry-run
+  --no-network
+  --progress {none,jsonl}
+  --project PROJECT
+  --job-id JOB_ID       只执行指定作业；失败或取消作业可显式重试
+  --max-jobs MAX_JOBS   本次最多执行的待处理作业数
+  --continue-on-error   单个作业失败后继续执行后续作业
+  --workers WORKERS     本次最多并发的本地 FFmpeg worker 数；默认 1，超过 1 时必须同时使用
+                        --continue-on-error
+  --reuse-identical     显式复用同次串行调用内相同内容的成功产物；要求完整本地依赖和新输出路径
