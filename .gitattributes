@@ -1,4 +1,11 @@
 # Published evidence uses byte hashes; preserve its bytes on Windows checkout.
+# R13 preserves original source, HTTP responses, tests, and legal notices verbatim.
+docs/validation/evidence/openfilm-024-20261021-r13/** -text -whitespace
+scripts/capture_openfilm_r13.py text eol=lf
+scripts/review_openfilm_r13.py text eol=lf
+scripts/sync_openfilm_r13_documents.py text eol=lf
+scripts/audit_openfilm_r13.py text eol=lf
+docs/OpenFilm_0.2.4复用复核与成本更新_2026-10-21.md text eol=lf
 # V63 rejection and V64 source-context receipts include native raw log bytes.
 docs/validation/evidence/vace-delivery-20261019-v63-r1/** -text -whitespace
 docs/validation/evidence/audio-source-context-20261019-v64/** -text -whitespace

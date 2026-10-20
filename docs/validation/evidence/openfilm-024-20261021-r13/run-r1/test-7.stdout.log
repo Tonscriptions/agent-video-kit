@@ -1,0 +1,75 @@
+TAP version 13
+# Subtest: each of the person's models is a provider of its own in Pi's models.json: its address, its key's variable, its model
+ok 1 - each of the person's models is a provider of its own in Pi's models.json: its address, its key's variable, its model
+  ---
+  duration_ms: 2.0059
+  ...
+# Subtest: a model's context length is its window in Pi, and a quarter of it its answers, never more than 32K
+ok 2 - a model's context length is its window in Pi, and a quarter of it its answers, never more than 32K
+  ---
+  duration_ms: 0.6015
+  ...
+# Subtest: the chat's menu reads the person's models by their names, each picked by its id
+ok 3 - the chat's menu reads the person's models by their names, each picked by its id
+  ---
+  duration_ms: 0.2778
+  ...
+# Subtest: what Pi does reads in the chat as Codex's did: a command's kind and title, a file's path, the result's text and pictures
+ok 4 - what Pi does reads in the chat as Codex's did: a command's kind and title, a file's path, the result's text and pictures
+  ---
+  duration_ms: 0.9093
+  ...
+# Subtest: no balance left, as each service says it, is one outcome with the service's own page; a rate limit or another error is not
+ok 5 - no balance left, as each service says it, is one outcome with the service's own page; a rate limit or another error is not
+  ---
+  duration_ms: 1.0523
+  ...
+# Subtest: a model given levels is its service twice: as itself (no reasoning setting) and thinking, told only those levels
+ok 6 - a model given levels is its service twice: as itself (no reasoning setting) and thinking, told only those levels
+  ---
+  duration_ms: 0.3703
+  ...
+# Subtest: the effort option: for a model offering more than one, its levels named
+ok 7 - the effort option: for a model offering more than one, its levels named
+  ---
+  duration_ms: 0.1492
+  ...
+# Subtest: why a turn failed, in plain words: a service that sent nothing in time, a conversation too long for the model; else as Pi said it
+ok 8 - why a turn failed, in plain words: a service that sent nothing in time, a conversation too long for the model; else as Pi said it
+  ---
+  duration_ms: 0.2701
+  ...
+# Subtest: a model service tried again, as a notice: one that sent nothing in time in plain words, else with what Pi said
+ok 9 - a model service tried again, as a notice: one that sent nothing in time in plain words, else with what Pi said
+  ---
+  duration_ms: 0.4435
+  ...
+# Subtest: each of the person's models reads pictures as Pi does (2000 px, 4.5 MB at most), and a request carries 32 MB of them
+ok 10 - each of the person's models reads pictures as Pi does (2000 px, 4.5 MB at most), and a request carries 32 MB of them
+  ---
+  duration_ms: 1.2728
+  ...
+# Subtest: a request's pictures within its budget: the newest kept, the older ones a line naming their file
+ok 11 - a request's pictures within its budget: the newest kept, the older ones a line naming their file
+  ---
+  duration_ms: 0.8619
+  ...
+# Subtest: a request refused as too large is told apart from other failures, and said in plain words
+ok 12 - a request refused as too large is told apart from other failures, and said in plain words
+  ---
+  duration_ms: 0.2531
+  ...
+# Subtest: pictures only in the latest five tool results that hold one; an older one's a line naming its file
+ok 13 - pictures only in the latest five tool results that hold one; an older one's a line naming its file
+  ---
+  duration_ms: 0.2981
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 21.3935

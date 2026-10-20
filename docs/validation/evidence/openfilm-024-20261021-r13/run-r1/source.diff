@@ -1,0 +1,977 @@
+--- old/apps/desktop/CHANGELOG.md
++++ new/apps/desktop/CHANGELOG.md
+@@ -1,4 +1,13 @@
+ # @openfilm/desktop
++
++## 0.2.4
++
++### Patch Changes
++
++- [#148](https://github.com/openfilm/openfilm/pull/148) [`0a90640`](https://github.com/openfilm/openfilm/commit/0a90640fa5412ab5501daeeb8f01e83691b9de76) Thanks [@PazChen](https://github.com/PazChen)! - The app's own agent (your own key) keeps a long conversation going when it looks at many frames. Pictures keep their full quality. A request carries the pictures of the agent's latest five reads, and at most 32 MB of them; an older one is left out of the request with a line naming its file, so the agent can read it again (the conversation keeps them). A model service that refuses a request as too large (HTTP 413, a proxy's page included) is tried again at once with half of the older pictures left out, and says so in the chat; before, every message after it failed the same way. Settings › Agents says that the agent's rules are the project's own AGENTS.md.
++
++- Updated dependencies [[`0a90640`](https://github.com/openfilm/openfilm/commit/0a90640fa5412ab5501daeeb8f01e83691b9de76), [`29346ca`](https://github.com/openfilm/openfilm/commit/29346ca43b426a014faebafcebe3e8ce3a738faa)]:
++  - openfilm@0.2.4
+ 
+ ## 0.2.3
+ 
+--- old/apps/desktop/package.json
++++ new/apps/desktop/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "@openfilm/desktop",
+-  "version": "0.2.3",
++  "version": "0.2.4",
+   "private": true,
+   "type": "module",
+   "productName": "OpenFilm",
+--- old/apps/desktop/src/pi-agent.mjs
++++ new/apps/desktop/src/pi-agent.mjs
+@@ -16,6 +16,12 @@
+  * context, as Pi sends it, and the answer) is written there (chat-store.mjs's `<turn>.model.jsonl`), only what is new
+  * since the request before.
+  *
++ * Pictures are kept within the model services' size limits (pi-config.mjs): a request carries those of the latest
++ * KEEP_PICTURE_RESULTS tool results that hold one, and at most IMAGE_BUDGET of them, the oldest left out of the request
++ * first (never out of the session). A service refusing a request as too large (HTTP 413, a proxy's page included) is
++ * tried again once with half of those pictures, as Pi tries a busy one; that half stays the conversation's limit. A
++ * request with no pictures in it is not tried again: its own words are too large, and the turn says so.
++ *
+  * What Pi does goes to the chat as ACP session updates: its words and thinking as they stream, each tool call (its
+  * kind, title and input) and its result, after each answer how full the context is, and a model service tried again.
+  */
+@@ -26,7 +32,7 @@
+ import { DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager, createAgentSession } from '@earendil-works/pi-coding-agent';
+ import { Agent, install, setGlobalDispatcher } from 'undici';
+ import { agentSessionsDir, openLog } from './chat-store.mjs';
+-import { THINKING, WAIT_MINUTES, contextUsed, effortOption, modelOption, modelsJson, providerOf, retryNotice, stopReason, toolCall, toolContent } from './pi-config.mjs';
++import { IMAGE_BUDGET, THINKING, TOO_LARGE, WAIT_MINUTES, contextUsed, effortOption, fitImages, modelOption, modelsJson, providerOf, retryNotice, stopReason, toolCall, toolContent } from './pi-config.mjs';
+ 
+ /* stdout is the protocol's: anything else Pi or a library prints goes to stderr */
+ console.log = console.info = console.warn = console.debug = (...args) => process.stderr.write(`${args.map(String).join(' ')}\n`);
+@@ -119,6 +125,9 @@
+   let pending = null;
+   /* the session's id, once it has one: the questions `ask` puts are the session's */
+   let sessionId = null;
++  /* the pictures a request carries at most (pi-config.mjs IMAGE_BUDGET), and those the last one carried (bytes) */
++  let imageBudget = IMAGE_BUDGET;
++  let imagesSent = 0;
+   const resourceLoader = new DefaultResourceLoader({
+     cwd, agentDir: config.agentDir, settingsManager, noExtensions: true, noPromptTemplates: true, noThemes: true,
+     /* OpenFilm's skills, and no other Pi would find (in the project, or its own folders) */
+@@ -128,6 +137,14 @@
+     appendSystemPromptOverride: () => [],
+     agentsFilesOverride: ({ agentsFiles }) => ({ agentsFiles: agentsFiles.filter((f) => dirname(resolve(f.path)) === resolve(cwd)) }),
+     extensionFactories: [
++      /* each request's pictures within the budget, the oldest left out first: the request only, never the session */
++      { name: 'openfilm-images', hidden: true, factory: (pi) => {
++        pi.on('context', (event) => {
++          const fitted = fitImages(event.messages, imageBudget);
++          imagesSent = fitted.kept;
++          return fitted.messages === event.messages ? undefined : { messages: fitted.messages };
++        });
++      } },
+       { name: 'openfilm-log', hidden: true, factory: (pi) => {
+         pi.on('context_with_system', (event) => { pending = { startedAt: Date.now(), messages: event.messages }; });
+       } },
+@@ -141,6 +158,10 @@
+     ...(startEffort !== 'auto' ? { thinkingLevel: startEffort } : {}),
+     resourceLoader, sessionManager, settingsManager, tools: ['read', 'bash', 'edit', 'write', 'ask'],
+   });
++  /* a request refused as too large is one Pi tries again (its retry: once, the failed attempt left out of what is sent)
++     when it held pictures to leave out; Pi neither retries a 413 nor, but for Anthropic's own words, compacts for it */
++  const retryable = session._isRetryableError.bind(session);
++  session._isRetryableError = (message) => (TOO_LARGE.test(String(message?.errorMessage ?? '')) ? imagesSent > 0 : retryable(message));
+   /* what it runs on now, as the chat names it (a conversation taken up again may be on another model and effort) */
+   const now = ownOf(session.model);
+   const onModel = now.id ?? startModel;
+@@ -165,6 +186,8 @@
+         if (message?.role !== 'assistant') break;
+         /* the turn's last answer: Pi drops one too long for the model from the conversation as it tries to recover */
+         entry.answer = message;
++        /* refused as too large: the request tried again (see below) carries half of its pictures */
++        if (message.stopReason === 'error' && TOO_LARGE.test(String(message.errorMessage ?? '')) && imagesSent > 0) imageBudget = Math.floor(imagesSent / 2);
+         if (pending && entry.log) {
+           const toolsNow = (session.agent?.state?.tools ?? []).map((t) => ({ name: t.name, description: t.description, parameters: t.parameters }));
+           entry.log.write({ startedAt: pending.startedAt, messages: pending.messages, toolsNow, answer: { message, systemPrompt: session.systemPrompt } });
+--- old/apps/desktop/src/pi-agent.test.mjs
++++ new/apps/desktop/src/pi-agent.test.mjs
+@@ -2,12 +2,14 @@
+ import assert from 'node:assert/strict';
+ import { createServer } from 'node:http';
+ import { mkdtempSync } from 'node:fs';
++import { randomBytes } from 'node:crypto';
++import { crc32, deflateSync } from 'node:zlib';
+ import { tmpdir } from 'node:os';
+ import { join } from 'node:path';
+ import { AgentSession } from './agents.mjs';
+ 
+ /** A service on the Chat Completions API that answers "ok" and notes the model each request named (and each request, and its key). */
+-async function service({ broke = false, fails = null, busyOnce = false } = {}) {
++async function service({ broke = false, fails = null, busyOnce = false, largest = Infinity } = {}) {
+   const asked = [];
+   const bodies = [];
+   const keys = [];
+@@ -19,6 +21,8 @@
+       asked.push(model);
+       bodies.push(JSON.parse(body || '{}'));
+       keys.push(String(req.headers.authorization ?? ''));
++      /* a proxy in front of the service refusing a body past its size, with its own HTML page */
++      if (body.length > largest) { res.writeHead(413, { 'content-type': 'text/html' }); res.end('<html><head><title>413 Request Entity Too Large</title></head><body><center><h1>413 Request Entity Too Large</h1></center><hr><center>openresty</center></body></html>'); return; }
+       if (broke) { res.writeHead(402, { 'content-type': 'application/json' }); res.end(JSON.stringify({ error: { message: 'Insufficient Balance' } })); return; }
+       if (busyOnce && asked.length === 1) { res.writeHead(503, { 'content-type': 'application/json' }); res.end(JSON.stringify({ error: { message: 'The service is busy.' } })); return; }
+       if (fails) { res.writeHead(400, { 'content-type': 'application/json' }); res.end(JSON.stringify({ error: { message: fails } })); return; }
+@@ -197,3 +201,79 @@
+     svc.close();
+   }
+ });
++
++/** A picture of noise, which no encoding makes smaller: `w` × `h`, RGB, as a PNG. */
++function noisePng(w, h) {
++  const chunk = (type, data) => {
++    const head = Buffer.alloc(8);
++    head.writeUInt32BE(data.length, 0);
++    head.write(type, 4, 'ascii');
++    const crc = Buffer.alloc(4);
++    crc.writeUInt32BE(crc32(Buffer.concat([Buffer.from(type, 'ascii'), data])) >>> 0, 0);
++    return Buffer.concat([head, data, crc]);
++  };
++  const ihdr = Buffer.alloc(13);
++  ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4); ihdr[8] = 8; ihdr[9] = 2;
++  const rows = Buffer.concat(Array.from({ length: h }, () => Buffer.concat([Buffer.from([0]), randomBytes(w * 3)])));
++  return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(rows, { level: 0 })), chunk('IEND', Buffer.alloc(0))]);
++}
++
++test('a request refused as too large is tried again at once with half of its pictures, and the turn goes on', { timeout: 60_000 }, async () => {
++  const svc = await service({ largest: 8 * 1024 * 1024 });
++  const session = new AgentSession({
++    agent: 'byok',
++    cwd: mkdtempSync(join(tmpdir(), 'of-pi-')),
++    harness: { home: mkdtempSync(join(tmpdir(), 'of-pi-home-')), models: [own('a', svc.url)], model: 'a', env: { OPENFILM_BYOK_KEY_a: 'sk' } },
++  });
++  /* fourteen pictures of about 0.95 MB each (Pi sends them as they are): 13 MB, past this service's 8 MB */
++  const pictures = Array.from({ length: 14 }, () => ({ type: 'image', mimeType: 'image/png', data: noisePng(560, 420).toString('base64') }));
++  try {
++    await session.start();
++    await session.prompt([{ type: 'text', text: 'look' }, ...pictures]);
++    assert.equal(svc.bodies.length, 2, 'refused once, then tried again');
++    const last = JSON.stringify(svc.bodies.at(-1));
++    assert.ok(last.length < 8 * 1024 * 1024, 'the request tried again is within the service\'s size');
++    assert.equal((last.match(/left out of this request to keep it small/g) ?? []).length, 7, 'half of the pictures left out, the oldest');
++  } finally {
++    session.close();
++    svc.close();
++  }
++});
++
++test('a request still too large when tried again with half of its pictures says so, and the next message goes on with fewer', { timeout: 60_000 }, async () => {
++  const svc = await service({ largest: 4 * 1024 * 1024 });
++  const session = new AgentSession({
++    agent: 'byok',
++    cwd: mkdtempSync(join(tmpdir(), 'of-pi-')),
++    harness: { home: mkdtempSync(join(tmpdir(), 'of-pi-home-')), models: [own('a', svc.url)], model: 'a', env: { OPENFILM_BYOK_KEY_a: 'sk' } },
++  });
++  const pictures = Array.from({ length: 14 }, () => ({ type: 'image', mimeType: 'image/png', data: noisePng(560, 420).toString('base64') }));
++  try {
++    await session.start();
++    const error = await session.prompt([{ type: 'text', text: 'look' }, ...pictures]).then(() => null, (e) => e);
++    assert.match(error?.message ?? '', /too large for the model service, even with older pictures left out/);
++    await session.prompt([{ type: 'text', text: 'go on' }]);
++    assert.ok(JSON.stringify(svc.bodies.at(-1)).length < 4 * 1024 * 1024, 'the next message goes with fewer pictures still');
++  } finally {
++    session.close();
++    svc.close();
++  }
++});
++
++test('a request too large with no pictures in it is not tried again, and says so', { timeout: 60_000 }, async () => {
++  const svc = await service({ largest: 10 });
++  const session = new AgentSession({
++    agent: 'byok',
++    cwd: mkdtempSync(join(tmpdir(), 'of-pi-')),
++    harness: { home: mkdtempSync(join(tmpdir(), 'of-pi-home-')), models: [own('a', svc.url)], model: 'a', env: { OPENFILM_BYOK_KEY_a: 'sk' } },
++  });
++  try {
++    await session.start();
++    const error = await session.prompt([{ type: 'text', text: 'hi' }]).then(() => null, (e) => e);
++    assert.match(error?.message ?? '', /too large for the model service/);
++    assert.equal(svc.bodies.length, 1, 'not tried again');
++  } finally {
++    session.close();
++    svc.close();
++  }
++});
+--- old/apps/desktop/src/pi-config.mjs
++++ new/apps/desktop/src/pi-config.mjs
+@@ -40,6 +40,59 @@
+ const CONTEXT = 128_000;
+ /** The most a model is asked to write in one answer: a quarter of 128K, so a long context does not ask for more. */
+ const MAX_OUTPUT = 32_000;
++
++/**
++ * The pictures one request carries at most (their base64, bytes): 32 MB, the request size Anthropic's API documents
++ * as its limit. Pi makes each picture at most 2000 px and 4.5 MB as it reads it (its defaults), so
++ * a frame keeps its full quality; but every picture goes again with each request after it, and the context's token
++ * count hardly sees a picture's bytes, so nothing else keeps a conversation that looks at many frames under a service's
++ * size limit. Past this, the oldest are left out of the request (never out of the conversation).
++ */
++export const IMAGE_BUDGET = 32 * 1024 * 1024;
++/** A model service refusing a request as too large: HTTP 413, as services and the proxies before them say it. */
++export const TOO_LARGE = /^\s*413\b|request entity too large|payload too large|request_too_large|request too large/i;
++
++/**
++ * The tool results whose pictures a request carries: the latest few that hold one. An older one's pictures are left out
++ * of the request; the agent reads a file again when it needs to look back.
++ */
++export const KEEP_PICTURE_RESULTS = 5;
++
++/**
++ * The conversation as one request sends it: pictures only in the latest KEEP_PICTURE_RESULTS tool results that hold
++ * one, and all of them within `budget` (bytes of base64), the newest kept. Each picture left out is a line saying so
++ * and which file it was, so the agent can read it again. `messages` the same when nothing is left out; `kept`, the
++ * bytes of the pictures that go.
++ * @param {any[]} messages @param {number} budget
++ * @returns {{ messages: any[], kept: number }}
++ */
++export function fitImages(messages, budget) {
++  /* which file each tool call read, to name a picture left out */
++  const paths = new Map();
++  for (const m of messages) {
++    if (m?.role !== 'assistant' || !Array.isArray(m.content)) continue;
++    for (const c of m.content) if (c?.type === 'toolCall' && typeof c.arguments?.path === 'string') paths.set(c.id, c.arguments.path);
++  }
++  let used = 0;
++  let cut = false;
++  let results = 0;
++  const out = [...messages];
++  for (let i = out.length - 1; i >= 0; i--) {
++    const m = out[i];
++    if (!Array.isArray(m?.content) || !m.content.some((c) => c?.type === 'image')) continue;
++    const old = m.role === 'toolResult' && ++results > KEEP_PICTURE_RESULTS;
++    const content = m.content.map((c) => {
++      if (c?.type !== 'image') return c;
++      const size = String(c.data ?? '').length;
++      if (!old && used + size <= budget) { used += size; return c; }
++      cut = true;
++      const path = m.role === 'toolResult' ? paths.get(m.toolCallId) : undefined;
++      return { type: 'text', text: `[A picture${path ? ` (${path})` : ''} was left out of this request to keep it small. Read it again to see it.]` };
++    });
++    out[i] = { ...m, content };
++  }
++  return { messages: cut ? out : messages, kept: used };
++}
+ 
+ /**
+  * A model's context length as kept: a whole number of tokens from 32K to 10M, as the person gave it in Settings (the
+@@ -165,6 +218,7 @@
+   if (TIMED_OUT.test(text)) return `The model service didn't answer for ${WAIT_MINUTES} minutes, even after trying again. Check that the service is running and reachable, then try again.`;
+   if (PI_OVERFLOW.test(text)) return `${text} ${CONTEXT_HINT}`;
+   if (OVERFLOW.test(text)) return `The conversation is too long for the model. ${CONTEXT_HINT}`;
++  if (TOO_LARGE.test(text)) return 'The request is too large for the model service, even with older pictures left out. Send your message again to go on with fewer, or start a new conversation.';
+   return text;
+ }
+ 
+@@ -175,6 +229,7 @@
+ export function retryNotice(event) {
+   const said = String(event?.errorMessage ?? '').trim();
+   const again = `trying again (${event?.attempt ?? 1} of ${event?.maxAttempts ?? 1}).`;
++  if (TOO_LARGE.test(said)) return { sessionUpdate: 'notice', severity: 'warning', title: `The request was too large for the model service; ${again.replace(/\.$/, '')} with half of the older pictures left out.` };
+   if (TIMED_OUT.test(said)) return { sessionUpdate: 'notice', severity: 'warning', title: `The model service didn't answer for ${WAIT_MINUTES} minutes; ${again}` };
+   return { sessionUpdate: 'notice', severity: 'warning', title: `The model service failed; ${again}`, ...(said ? { description: said } : {}) };
+ }
+--- old/apps/desktop/src/pi-config.test.mjs
++++ new/apps/desktop/src/pi-config.test.mjs
+@@ -1,6 +1,6 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+-import { THINKING, contextLength, contextUsed, effortOption, failureText, modelEffort, modelOption, modelsJson, outOfBalance, providerOf, retryNotice, stopReason, toolCall, toolContent } from './pi-config.mjs';
++import { IMAGE_BUDGET, KEEP_PICTURE_RESULTS, THINKING, TOO_LARGE, contextLength, contextUsed, effortOption, failureText, fitImages, modelEffort, modelOption, modelsJson, outOfBalance, providerOf, retryNotice, stopReason, toolCall, toolContent } from './pi-config.mjs';
+ 
+ /** One of the person's own models, as the roster's harness gives it. */
+ const own = (id, over = {}) => ({ id, name: id.toUpperCase(), api: 'openai-completions', baseUrl: `https://${id}.test/v1`, keyEnv: `K_${id}`, model: `${id}-model`, levels: ['auto'], effort: 'auto', ...over });
+@@ -119,3 +119,56 @@
+     sessionUpdate: 'notice', severity: 'warning', title: 'The model service failed; trying again (1 of 2).', description: '503 Service Unavailable',
+   });
+ });
++
++test("each of the person's models reads pictures as Pi does (2000 px, 4.5 MB at most), and a request carries 32 MB of them", () => {
++  const [model] = modelsJson([own('a')]).providers[providerOf('a')].models;
++  assert.equal(model.inputLimits, undefined, 'Pi\'s own picture limits');
++  assert.equal(IMAGE_BUDGET, 32 * 1024 * 1024);
++});
++
++test("a request's pictures within its budget: the newest kept, the older ones a line naming their file", () => {
++  const pic = (n) => ({ type: 'image', mimeType: 'image/png', data: 'x'.repeat(n) });
++  const messages = [
++    { role: 'user', content: [{ type: 'text', text: 'look' }, pic(40)] },
++    { role: 'assistant', content: [{ type: 'toolCall', id: 't1', name: 'read', arguments: { path: '.film/look/00.03.png' } }] },
++    { role: 'toolResult', toolCallId: 't1', toolName: 'read', content: [{ type: 'text', text: 'Read image file [image/png]' }, pic(50)] },
++    { role: 'assistant', content: [{ type: 'toolCall', id: 't2', name: 'read', arguments: { path: '.film/look/00.07.png' } }] },
++    { role: 'toolResult', toolCallId: 't2', toolName: 'read', content: [pic(60)] },
++  ];
++  assert.deepEqual(fitImages(messages, 150), { messages, kept: 150 }, 'within it: the same messages');
++  assert.equal(fitImages(messages, 150).messages, messages);
++  const { messages: fitted, kept } = fitImages(messages, 120);
++  assert.equal(kept, 110);
++  assert.deepEqual(fitted[4].content, [pic(60)], 'the newest kept');
++  assert.deepEqual(fitted[2].content[1], pic(50));
++  assert.match(fitted[0].content[1].text, /^\[A picture was left out of this request/, 'the oldest left out');
++  const tighter = fitImages(messages, 100).messages;
++  assert.equal(tighter[2].content[1].text, '[A picture (.film/look/00.03.png) was left out of this request to keep it small. Read it again to see it.]');
++  assert.equal(messages[2].content[1].type, 'image', 'the conversation itself is left as it was');
++});
++
++test('a request refused as too large is told apart from other failures, and said in plain words', () => {
++  assert.ok(TOO_LARGE.test('413 <html><head><title>413 Request Entity Too Large</title></head></html>'));
++  assert.ok(TOO_LARGE.test('413 status code (no body)'));
++  assert.ok(TOO_LARGE.test('Payload Too Large'));
++  assert.ok(!TOO_LARGE.test('400 The prompt has 413 tokens too many'));
++  assert.match(failureText('413 <html>openresty</html>'), /too large for the model service, even with older pictures left out/);
++  assert.equal(retryNotice({ attempt: 1, maxAttempts: 1, errorMessage: '413 <html>openresty</html>' }).title,
++    'The request was too large for the model service; trying again (1 of 1) with half of the older pictures left out.');
++});
++
++test("pictures only in the latest five tool results that hold one; an older one's a line naming its file", () => {
++  assert.equal(KEEP_PICTURE_RESULTS, 5);
++  const pic = { type: 'image', mimeType: 'image/png', data: 'x' };
++  const messages = [{ role: 'user', content: [{ type: 'text', text: 'look' }, pic] }];
++  for (let n = 1; n <= 7; n++) {
++    messages.push({ role: 'assistant', content: [{ type: 'toolCall', id: `t${n}`, name: 'read', arguments: { path: `f${n}.png` } }] });
++    messages.push({ role: 'toolResult', toolCallId: `t${n}`, toolName: 'read', content: [{ type: 'text', text: 'Read image file [image/png]' }, pic] });
++  }
++  const { messages: fitted, kept } = fitImages(messages, Infinity);
++  const shown = fitted.filter((m) => m.role === 'toolResult').map((m) => m.content[1].type);
++  assert.deepEqual(shown, ['text', 'text', 'image', 'image', 'image', 'image', 'image'], 'the latest five keep theirs');
++  assert.equal(fitted[2].content[1].text, '[A picture (f1.png) was left out of this request to keep it small. Read it again to see it.]');
++  assert.equal(fitted[0].content[1].type, 'image', 'a picture the person attached is not a tool result');
++  assert.equal(kept, 6);
++});
+--- old/packages/openfilm/CHANGELOG.md
++++ new/packages/openfilm/CHANGELOG.md
+@@ -1,4 +1,14 @@
+ # openfilm
++
++## 0.2.4
++
++### Patch Changes
++
++- [#148](https://github.com/openfilm/openfilm/pull/148) [`0a90640`](https://github.com/openfilm/openfilm/commit/0a90640fa5412ab5501daeeb8f01e83691b9de76) Thanks [@PazChen](https://github.com/PazChen)! - The app's own agent (your own key) keeps a long conversation going when it looks at many frames. Pictures keep their full quality. A request carries the pictures of the agent's latest five reads, and at most 32 MB of them; an older one is left out of the request with a line naming its file, so the agent can read it again (the conversation keeps them). A model service that refuses a request as too large (HTTP 413, a proxy's page included) is tried again at once with half of the older pictures left out, and says so in the chat; before, every message after it failed the same way. Settings › Agents says that the agent's rules are the project's own AGENTS.md.
++
++- [#146](https://github.com/openfilm/openfilm/pull/146) [`29346ca`](https://github.com/openfilm/openfilm/commit/29346ca43b426a014faebafcebe3e8ce3a738faa) Thanks [@PazChen](https://github.com/PazChen)! - Sound played faster or slower is heard the moment the speed changes, and sounds natural. The browser plays it at that speed with its pitch kept, in the same mix, kept in step with the picture; nothing is made on the server first. 0.2.3 re-encoded the whole sound for each speed, which left long videos silent for seconds after a change and made voices sound hollow.
++
++  The viewer's playback button shows a speed gauge instead of the inspector's icon.
+ 
+ ## 0.2.3
+ 
+--- old/packages/openfilm/package.json
++++ new/packages/openfilm/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "openfilm",
+-  "version": "0.2.3",
++  "version": "0.2.4",
+   "description": "The open source AI video agent: films as web pages, the manual that teaches your coding agent to make them, the `openfilm` command, and Studio, the editor to change anything in them.",
+   "license": "MIT",
+   "homepage": "https://openfilm.dev",
+--- old/packages/openfilm/src/shared.d.mts
++++ new/packages/openfilm/src/shared.d.mts
+@@ -3,8 +3,6 @@
+ export interface MixClip { file: string; at: number; from: number; to?: number; volume: number; speed?: number; fade?: MixFade }
+ export declare function audioClips(root: string, entry: string, clips: Array<{ src: string; at?: number; from?: number; to?: number; volume?: number; speed?: number; fade?: readonly [number, number] }> | undefined, from?: number): MixClip[];
+ export declare function fadeFilter(fade: MixFade | undefined): string;
+-/** The atempo filter chain for a playback speed, the pitch kept (each stage takes 0.5–2); empty at 1. */
+-export declare function tempo(speed: number): string;
+ export declare function mix(clips: MixClip[], duration: number, file: string, codec?: string[]): Promise<void>;
+ /** A mix's inputs and filter graph: a file used by several clips is one input, split. */
+ export declare function mixGraph(clips: MixClip[], duration: number): { inputs: string[]; filter: string };
+--- old/packages/openfilm/src/shared.mjs
++++ new/packages/openfilm/src/shared.mjs
+@@ -227,7 +227,7 @@
+ }
+ 
+ /** atempo chain for a playback rate (pitch kept); each stage takes 0.5–2. */
+-export function tempo(speed) {
++function tempo(speed) {
+   const out = [];
+   let s = speed;
+   while (s > 2) { out.push('atempo=2'); s /= 2; }
+--- old/packages/openfilm/studio/server/derived.mjs
++++ new/packages/openfilm/studio/server/derived.mjs
+@@ -12,7 +12,6 @@
+ import { existsSync } from 'node:fs';
+ import { mkdir, readFile, rename, rm, stat } from 'node:fs/promises';
+ import { join } from 'node:path';
+-import { tempo } from '../../src/shared.mjs';
+ import { readable } from './files.mjs';
+ import { TOOL_DIR } from './projects.mjs';
+ import { writeAtomic } from './atomic.mjs';
+@@ -155,24 +154,18 @@
+ const COMPACT_BYTES = 16 << 20;
+ /** @type {Map<string, Promise<string | null>>} copies being made, by where they go */
+ const makingSound = new Map();
+-/** The speeds a sound is made at: a clip's (SPEED_MIN to SPEED_MAX) by the viewer's (0.25× to 2×), and some room. */
+-export const SOUND_SPEED = { min: 1 / 16, max: 16 };
+ 
+ /**
+  * The sound of a media file as the editor plays it, small: a compressed sound file of up to COMPACT_BYTES is its
+  * own; any other (a video, a WAV, a long recording) gets a copy of its sound in `.film/cache/audio/`, AAC in .m4a:
+- * the file's own AAC as it is, any other sound encoded at 128 kb/s, stereo at most. At another `speed` it is stretched
+- * to it with its pitch kept, by the same atempo filter exports use, so the editor plays it as the export has it (a
+- * sound sped up as a tape is would be heard higher). Made once per version of the file and speed; returns the path to
+- * play, or null when there is no sound in it. Exports mix from the files themselves.
+- * @param {string} root @param {string} rel @param {number} [speed]
+- */
+-export async function soundOf(root, rel, speed = 1) {
+-  if (!(speed >= SOUND_SPEED.min && speed <= SOUND_SPEED.max)) throw new MediaError('speed: from 1/16 to 16', 400);
+-  const at = Math.round(speed * 1e4) / 1e4;
+-  const { abs, key } = await source(root, rel);
+-  if (at === 1 && COMPACT.test(rel) && (await stat(abs)).size <= COMPACT_BYTES) return abs;
+-  const out = join(root, TOOL_DIR, 'cache', 'audio', at === 1 ? `${key}.m4a` : `${key}-x${at}.m4a`);
++ * the file's own AAC as it is, any other sound encoded at 128 kb/s, stereo at most. Made once per version of the
++ * file; returns the path to play, or null when there is no sound in it. Exports mix from the files themselves.
++ * @param {string} root @param {string} rel
++ */
++export async function soundOf(root, rel) {
++  const { abs, key } = await source(root, rel);
++  if (COMPACT.test(rel) && (await stat(abs)).size <= COMPACT_BYTES) return abs;
++  const out = join(root, TOOL_DIR, 'cache', 'audio', `${key}.m4a`);
+   if (existsSync(out)) return out;
+   let made = makingSound.get(out);
+   if (!made) {
+@@ -182,9 +175,7 @@
+       const stream = info.streams?.[0] ?? {};
+       const channels = Number(stream.channels) || 2;
+       /* AAC is what a browser decodes everywhere: kept as it is when it is that already (no loss, no time) */
+-      const codec = at === 1 && stream.codec_name === 'aac' && channels <= 2
+-        ? ['-c:a', 'copy']
+-        : [...(at === 1 ? [] : ['-af', tempo(at)]), '-c:a', 'aac', '-b:a', '128k', '-ac', String(Math.min(2, channels))];
++      const codec = stream.codec_name === 'aac' && channels <= 2 ? ['-c:a', 'copy'] : ['-c:a', 'aac', '-b:a', '128k', '-ac', String(Math.min(2, channels))];
+       await mkdir(join(root, TOOL_DIR, 'cache', 'audio'), { recursive: true });
+       const part = `${out}.part`;
+       try {
+--- old/packages/openfilm/studio/server/derived.test.mjs
++++ new/packages/openfilm/studio/server/derived.test.mjs
+@@ -125,29 +125,3 @@
+   assert.deepEqual(readdirSync(join(root, '.film', 'cache', 'audio')).sort(), made, 'asked again: the copy made');
+   await assert.rejects(soundOf(root, 'assets/none.mp4'), (e) => e instanceof MediaError && e.status === 404);
+ });
+-
+-/** A tone's frequency (Hz) and length (s), from its zero crossings. @param {string} file */
+-function toneOf(file) {
+-  const pcm = execFileSync('ffmpeg', ['-v', 'error', '-i', file, '-ac', '1', '-ar', '48000', '-f', 's16le', '-'], { maxBuffer: 1 << 28 });
+-  const samples = new Int16Array(pcm.buffer, pcm.byteOffset, Math.floor(pcm.length / 2));
+-  let ups = 0;
+-  for (let i = 1; i < samples.length; i++) if (samples[i - 1] < 0 && samples[i] >= 0) ups++;
+-  const seconds = samples.length / 48000;
+-  return { hz: ups / seconds, seconds };
+-}
+-
+-test('a sound played at another speed is stretched to it with its pitch kept, once per speed', { skip: !hasFfmpeg && 'no ffmpeg' }, async () => {
+-  execFileSync('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', 'sine=frequency=440:duration=6', '-b:a', '128k', join(root, 'assets', 'tone.mp3')]);
+-  const own = String(await soundOf(root, 'assets/tone.mp3'));
+-  assert.equal(own, join(root, 'assets', 'tone.mp3'), 'at 1× a small sound is played as it is');
+-  for (const speed of [1.5, 0.5, 4]) {
+-    const copy = String(await soundOf(root, 'assets/tone.mp3', speed));
+-    assert.match(copy, /-x[\d.]+\.m4a$/, `${speed}×: a copy of its own`);
+-    const tone = toneOf(copy);
+-    assert.ok(Math.abs(tone.hz - 440) < 440 * 0.03, `${speed}×: still 440 Hz, not ${Math.round(tone.hz)}`);
+-    assert.ok(Math.abs(tone.seconds - 6 / speed) < 0.1, `${speed}×: ${6 / speed} s long, not ${tone.seconds}`);
+-    assert.equal(String(await soundOf(root, 'assets/tone.mp3', speed)), copy, 'asked again: the copy made');
+-  }
+-  await assert.rejects(soundOf(root, 'assets/tone.mp3', 0), (e) => e instanceof MediaError && e.status === 400);
+-  await assert.rejects(soundOf(root, 'assets/tone.mp3', 32), (e) => e instanceof MediaError && e.status === 400);
+-});
+--- old/packages/openfilm/studio/server/pages.mjs
++++ new/packages/openfilm/studio/server/pages.mjs
+@@ -16,8 +16,7 @@
+  * Pages get the host flag (the film's clock, see src/host.mjs) before any of their scripts, as `look` and `render`
+  * give it, so a film draws here exactly as it renders. Everything may be read by the editor's origin (its sound mixer
+  * fetches the media), which frames the pages. A media file asked for with `?film-sound` is its sound,
+- * small (derived.mjs soundOf): what the mixer plays, never the whole of a video; 204 when it has none. With
+- * `&speed=…` it is stretched to that speed, its pitch kept.
++ * small (derived.mjs soundOf): what the mixer plays, never the whole of a video; 204 when it has none.
+  */
+ import { execFile } from 'node:child_process';
+ import { createHash, createHmac } from 'node:crypto';
+@@ -32,7 +31,7 @@
+ import { readyProxy } from './proxies.mjs';
+ import { madeCopy } from '../../src/seekable.mjs';
+ import { isPreviewKey, previewDir } from './preview-cache.mjs';
+-import { SOUND_SPEED, soundOf } from './derived.mjs';
++import { soundOf } from './derived.mjs';
+ 
+ const BRIDGE = readFileSync(new URL('./bridge.js', import.meta.url), 'utf8');
+ 
+@@ -179,10 +178,7 @@
+     if (!servable(entry.root, plain)) { res.writeHead(404, headers).end('not found'); return; }
+     if (url.searchParams.has('film-sound')) {
+       /* waited for while it is made (a few seconds for a long recording): the mixer plays the film without it meanwhile */
+-      /* `speed`: stretched to it, its pitch kept (the clip's speed by the viewer's) */
+-      const speed = Number(url.searchParams.get('speed') ?? 1);
+-      if (!(speed >= SOUND_SPEED.min && speed <= SOUND_SPEED.max)) { res.writeHead(400, headers).end('speed: from 1/16 to 16'); return; }
+-      const file = await soundOf(entry.root, plain.replace(/^\/+/, ''), speed).catch((/** @type {any} */ e) => (e?.status === 404 ? undefined : null));
++      const file = await soundOf(entry.root, plain.replace(/^\/+/, '')).catch((/** @type {any} */ e) => (e?.status === 404 ? undefined : null));
+       if (file === undefined) { res.writeHead(404, headers).end('not found'); return; }
+       if (!file) { res.writeHead(204, headers).end(); return; }
+       if (!folderFiles(dirname(file), { headers: policy() })(req, res, `/${basename(file)}`, url.searchParams)) res.writeHead(403, headers).end();
+--- old/packages/openfilm/studio/ui/src/components/PlaybackMenu.tsx
++++ new/packages/openfilm/studio/ui/src/components/PlaybackMenu.tsx
+@@ -1,6 +1,6 @@
+ import React from 'react';
+ import { createPortal } from 'react-dom';
+-import { Captions, Repeat, Settings2 } from 'lucide-react';
++import { Captions, Gauge, Repeat } from 'lucide-react';
+ import { useT } from '@/i18n';
+ import { useKeyHint } from '@/lib/keymap-store';
+ import { Tooltip } from './Tooltip';
+@@ -88,7 +88,7 @@
+         }}>
+         {loop ? <Repeat size={14} className="text-[var(--accent)]" aria-hidden /> : null}
+         {speed !== 1 ? <span className="text-[12px] leading-none tabular-nums">{speedText(speed)}</span> : null}
+-        {!loop && speed === 1 ? <Settings2 size={14} aria-hidden /> : null}
++        {!loop && speed === 1 ? <Gauge size={14} aria-hidden /> : null}
+       </button>
+     </Tooltip>
+     {anchor && createPortal(<div ref={panel} id={id} role="dialog" aria-label={t('viewer.playback')}
+--- old/packages/openfilm/studio/ui/src/components/settings/AgentsSection.tsx
++++ new/packages/openfilm/studio/ui/src/components/settings/AgentsSection.tsx
+@@ -476,6 +476,7 @@
+         </div>
+       ) : null}
+       <p className="text-[13px] leading-relaxed text-[var(--text-faint)]">{t('settings.agents.byokNote')}</p>
++      <p className="text-[13px] leading-relaxed text-[var(--text-faint)]">{t('settings.agents.byokRules')}</p>
+     </SettingsInset>
+   );
+ }
+--- old/packages/openfilm/studio/ui/src/editor/player.test.ts
++++ new/packages/openfilm/studio/ui/src/editor/player.test.ts
+@@ -1,6 +1,6 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+-import { anchorTime, EASE_STEP, easedLead, fadeSteps, JUMP, soundsDue, soundSpeed, stretchedSpan } from './player.ts';
++import { anchorTime, EASE_STEP, easedLead, fadeSteps, fileTime, JUMP, soundsDue, stretchRate } from './player.ts';
+ 
+ test('a sound\'s fades as ramps: where it is now, then each corner after it', () => {
+   /* 4 s long, 1 s in, 2 s out */
+@@ -40,16 +40,24 @@
+   assert.deepEqual(soundsDue([{ ...s(0, 4, 'e'), speed: 2 }], 2.5, 3, new Set(), null), []);
+ });
+ 
+-test('a sound at another speed is played from a copy stretched to it: where to start in it and for how long', () => {
+-  /* a clip at 2× of the file's seconds 10–20, at film second 4: 5 film seconds long */
++test('a sound heard at another speed is played by a media element at its rate, pitch kept; at 1× it is decoded', () => {
++  /* its clip's speed by the viewer's */
++  assert.equal(stretchRate(2, 1), 2);
++  assert.equal(stretchRate(2, 0.75), 1.5);
++  assert.equal(stretchRate(1, 0.25), 0.25);
++  assert.equal(stretchRate(1, 1 / 3), 0.3333);
++  /* at 1× (by any pair), the decoded sound plays */
++  assert.equal(stretchRate(1, 1), null);
++  assert.equal(stretchRate(2, 0.5), null);
++  /* within what a browser plays */
++  assert.equal(stretchRate(64, 2), 16);
++  assert.equal(stretchRate(0.1, 0.25), 1 / 16);
++});
++
++test('where in its file a sound is at a film second', () => {
++  /* a clip at 2× of the file's seconds 10–20, at film second 4 */
+   const s = { src: 'a.wav', at: 4, from: 10, to: 20, volume: 1, speed: 2 };
+-  assert.equal(soundSpeed(2, 1), 2);
+-  assert.equal(soundSpeed(2, 0.75), 1.5);
+-  assert.equal(soundSpeed(1, 1 / 3), 0.3333);
+-  /* from its start, the viewer at 1×: the 2× copy from 10 / 2, all 10 file seconds as 5 */
+-  assert.deepEqual(stretchedSpan(s, 4, 2), { offset: 5, duration: 5 });
+-  /* the film started 1 s into it, the viewer at 1.5× (the copy at 3×): file second 12, 8 file seconds left */
+-  assert.deepEqual(stretchedSpan(s, 5, 3), { offset: 4, duration: 8 / 3 });
+-  /* at 1× of a 1× clip it is the file itself */
+-  assert.deepEqual(stretchedSpan({ ...s, speed: 1, to: 15 }, 6, 1), { offset: 12, duration: 3 });
++  assert.equal(fileTime(s, 4), 10);
++  assert.equal(fileTime(s, 5), 12);
++  assert.equal(fileTime({ ...s, speed: 1 }, 6.5), 12.5);
+ });
+--- old/packages/openfilm/studio/ui/src/editor/player.ts
++++ new/packages/openfilm/studio/ui/src/editor/player.ts
+@@ -10,11 +10,12 @@
+  *
+  * `sounds` is the timeline's own list (src/timeline.mjs `__filmSounds`): each sound clip's sound and each video's own,
+  * already placed and cut to its clip, with its volume and speed. Each file's sound is fetched small (`?film-sound`, see
+- * studio/server/pages.mjs): a video's is a copy of its sound alone, never the whole video. A sound played faster or
+- * slower (its clip's speed by the viewer's) is fetched stretched to that speed with its pitch kept (`&speed=`, the
+- * atempo filter exports use) and played as it is: never sped up as a tape is, which would be heard higher. A sound not
+- * here yet (its copy still being made) is silent until it is, then joins where the film is. Sounds are started a few seconds ahead of
+- * the film, not all at once: a film of hundreds of sounds starts as quickly as one of a few.
++ * studio/server/pages.mjs): a video's is a copy of its sound alone, never the whole video. A sound heard at its own
++ * speed (its clip's speed by the viewer's is 1) is decoded and played sample-accurate. One heard faster or slower is
++ * played by the browser's own media element with its pitch kept (`preservesPitch`), in the same mix: another speed is
++ * heard at once, with nothing made for it, and its place is checked against the film as it plays. A sound not here yet
++ * (its copy still being made) is silent until it is, then joins where the film is. Sounds are started a few seconds
++ * ahead of the film, not all at once: a film of hundreds of sounds starts as quickly as one of a few.
+  *
+  * Every sound goes through one mix, metered (`levels`: the audio meters read it while the film plays, nothing reads it
+  * paused) before the person's volume. Solo (`setHeard`) leaves the clips of the other tracks out of what plays here
+@@ -29,6 +30,10 @@
+ const CHECK_MS = 250;
+ /** How long after now a sound can be started at the soonest (s): sooner, its start is cut. */
+ const LEAD = 0.03;
++/** A sound played by a media element further than this from where the film is (s) is put back in its place. */
++const DRIFT = 0.12;
++/** After a sound is put back in its place, how long it is left to settle before it is checked again (ms). */
++const SETTLE_MS = 1000;
+ 
+ /** `fade`: its fades in and out, film seconds, already fitted to its length (src/timeline.mjs). */
+ export type Sound = { src: string; at: number; from: number; to: number; volume: number; speed: number; clip?: string; fade?: [number, number] };
+@@ -84,25 +89,22 @@
+ /** A sound's length on the film (s). */
+ const lengthOf = (s: Sound) => (s.to - s.from) / s.speed;
+ 
+-/** The speed a sound's file is played at: its clip's by the viewer's, to 4 places (the copy made for it, see soundOf). */
+-export function soundSpeed(speed: number, rate: number): number {
+-  return Math.round(speed * rate * 1e4) / 1e4;
+-}
+-
+ /**
+- * Where to start in a copy of the sound stretched to `speed` (soundSpeed) and how long to play it (its own seconds),
+- * for the sound heard from film second `startFilm` to its end: the copy's second is `speed` of the file's.
++ * The rate a sound's media element plays its file at, its pitch kept: its clip's speed by the viewer's, within what a
++ * browser plays (1/16 to 16). Null when that is 1: the sound is decoded and played as it is.
+  */
+-export function stretchedSpan(s: Sound, startFilm: number, speed: number): { offset: number; duration: number } {
+-  const end = s.at + lengthOf(s);
+-  return {
+-    offset: (s.from + (startFilm - s.at) * s.speed) / speed,
+-    duration: ((end - startFilm) * s.speed) / speed,
+-  };
+-}
+-
+-/** A decoded sound's place: its file, at a speed. */
+-const bufferKey = (src: string, speed: number) => `${speed}|${src}`;
++export function stretchRate(speed: number, rate: number): number | null {
++  const v = Math.round(speed * rate * 1e4) / 1e4;
++  return v === 1 ? null : Math.max(1 / 16, Math.min(16, v));
++}
++
++/** Where in its file a sound is at film second `t` (s). */
++export function fileTime(s: Sound, t: number): number {
++  return s.from + (t - s.at) * s.speed;
++}
++
++/** A sound played by a media element: the element, what it goes through in the mix, and when it was last put back. */
++type Voice = { el: HTMLAudioElement; source: MediaElementAudioSourceNode; gain: GainNode; sound: Sound; timer: number; settled: number };
+ 
+ /** How far film time `t` is from a sound: 0 while it plays, else until it starts; one already past after all those. */
+ function awayFrom(s: Sound, t: number) {
+@@ -125,13 +127,14 @@
+ 
+ export class Player {
+   private ctx: AudioContext | null = null;
+-  /** each file's decoded sound at a speed (bufferKey), and the version of the file it was decoded from (undefined: not
+-      known then) */
++  /** each file's decoded sound, and the version of the file it was decoded from (undefined: not known then) */
+   private buffers = new Map<string, { version: number | undefined; buffer: Promise<AudioBuffer | null> }>();
+   private origin = '';
+   private versionOf: (src: string) => number | undefined = () => undefined;
+   private sounds: Sound[] = [];
+   private playingNodes: AudioScheduledSourceNode[] = [];
++  /** the sounds heard faster or slower, each played by a media element (see stretchRate) */
++  private voices: Voice[] = [];
+   /** where the film is while playing, on the page's clock (see Anchor) */
+   private line: Anchor = { t: 0, at: 0, rate: 1 };
+   /** the same line on the audio clock while the sound plays: film second `t` is heard at audio time `at` (s); null silent */
+@@ -181,32 +184,24 @@
+   }
+ 
+   /**
+-   * Fetches the sounds not decoded yet at the speed they play at now, or decoded from an older version; says whether
+-   * there were any. Those at no speed played now or at 1× are let go (a long sound decoded is tens of MB).
++   * Fetches the sounds not decoded yet, or decoded from an older version; says whether there were any. A clip at another
++   * speed is never decoded: a media element plays it.
+    */
+   private fetchSounds(): boolean {
+     if (!this.origin) return false;
+     const ctx = this.context();
+     let fetched = false;
+     const t = this.time();
+-    const kept = new Set(this.sounds.flatMap((s) => [bufferKey(s.src, soundSpeed(s.speed, this.rate)), bufferKey(s.src, soundSpeed(s.speed, 1))]));
+-    for (const key of [...this.buffers.keys()]) if (!kept.has(key)) this.buffers.delete(key);
+-    for (const s of [...this.sounds].sort((a, b) => awayFrom(a, t) - awayFrom(b, t))) {
++    for (const s of [...this.sounds].filter((x) => x.speed === 1).sort((a, b) => awayFrom(a, t) - awayFrom(b, t))) {
+       const version = this.versionOf(s.src);
+-      const speed = soundSpeed(s.speed, this.rate);
+-      const key = bufferKey(s.src, speed);
+-      const had = this.buffers.get(key);
++      const had = this.buffers.get(s.src);
+       /* a version not known on one side is taken as the same: the file was not seen to change */
+       if (had && (had.version === version || had.version === undefined || version === undefined)) {
+         had.version ??= version;
+         continue;
+       }
+-      const url = new URL(s.src, this.origin);
+-      url.searchParams.set('film-sound', '1');
+-      if (speed !== 1) url.searchParams.set('speed', String(speed));
+-      /* past the browser's cache, which keeps the old file under the same address */
+-      if (version !== undefined) url.searchParams.set('v', String(version));
+-      this.buffers.set(key, { version, buffer: this.slot(s.src)
++      const url = this.soundUrl(s.src);
++      this.buffers.set(s.src, { version, buffer: this.slot(s.src)
+         .then((done) => fetch(url)
+           /* 204: there is no sound in it */
+           .then((r) => (r.status === 204 ? null : r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
+@@ -216,6 +211,15 @@
+       fetched = true;
+     }
+     return fetched;
++  }
++
++  /** The address of a file's sound, small (`?film-sound`), past the browser's cache when the file was made again. */
++  private soundUrl(src: string): string {
++    const url = new URL(src, this.origin);
++    url.searchParams.set('film-sound', '1');
++    const version = this.versionOf(src);
++    if (version !== undefined) url.searchParams.set('v', String(version));
++    return url.href;
+   }
+ 
+   /** A turn to fetch `src`'s sound; resolves with what ends it. */
+@@ -315,13 +319,12 @@
+     if (this.master) this.master.gain.value = muted ? 0 : this.volume;
+   }
+ 
+-  /** Play faster or slower, the pitch kept (each sound at that speed is fetched); playing goes on from where it is. */
++  /** Play faster or slower, the pitch kept (see stretchRate); playing goes on from where it is, heard at once. */
+   setRate(rate: number) {
+     const t = this.time();
+     const next = Math.max(0.25, Math.min(2, rate));
+     if (next === this.rate) return;
+     this.rate = next;
+-    this.fetchSounds();
+     if (this.playing) this.restart(t);
+   }
+ 
+@@ -405,6 +408,7 @@
+         }
+       }
+       this.startDue();
++      this.keepVoices();
+     }, CHECK_MS);
+   }
+ 
+@@ -416,7 +420,8 @@
+     for (const i of soundsDue(this.sounds, now, now + AHEAD * this.rate, this.started, this.heard)) {
+       this.started.add(i);
+       const s = this.sounds[i];
+-      void this.buffers.get(bufferKey(s.src, soundSpeed(s.speed, this.rate)))?.buffer.then((buffer) => {
++      if (stretchRate(s.speed, this.rate) != null) { this.voice(s, heard); continue; }
++      void this.buffers.get(s.src)?.buffer.then((buffer) => {
+         if (!buffer || !this.playing || this.heardLine !== heard) return;
+         this.schedule(buffer, s, heard);
+       });
+@@ -435,24 +440,88 @@
+     const startFilm = Math.max(s.at, heard.t + Math.max(0, soonest - heard.at) * r);
+     if (startFilm >= end) return;
+     const when = Math.max(soonest, ctxAt(startFilm));
+-    /* the buffer is the sound stretched to this speed already: played as it is, its pitch is the file's */
+-    const span = stretchedSpan(s, startFilm, soundSpeed(s.speed, r));
+     const source = ctx.createBufferSource();
+     source.buffer = buffer;
+-    const gain = ctx.createGain();
+-    if (s.fade) {
+-      /* its fades as ramps on the audio clock, sample-accurate: from where it starts, each corner at its own moment */
+-      const [[, first], ...rest] = fadeSteps(startFilm - s.at, end - s.at, s.fade);
+-      gain.gain.setValueAtTime(s.volume * first, when);
+-      for (const [u, g] of rest) gain.gain.linearRampToValueAtTime(s.volume * g, Math.max(when, ctxAt(s.at + u)));
+-    } else gain.gain.value = s.volume;
++    const gain = this.fades(s, startFilm, when, ctxAt);
+     source.connect(gain).connect(this.mix ?? ctx.destination);
+-    source.start(when, span.offset, span.duration);
++    source.start(when, fileTime(s, startFilm), end - startFilm);
+     source.onended = () => {
+       const i = this.playingNodes.indexOf(source);
+       if (i >= 0) this.playingNodes.splice(i, 1);
+     };
+     this.playingNodes.push(source);
++  }
++
++  /** A sound's gain in the mix, its fades as ramps on the audio clock from `when` (film second `startFilm`) on. */
++  private fades(s: Sound, startFilm: number, when: number, ctxAt: (filmT: number) => number): GainNode {
++    const gain = this.context().createGain();
++    if (s.fade) {
++      /* sample-accurate: from where it starts, each corner at its own moment */
++      const [[, first], ...rest] = fadeSteps(startFilm - s.at, lengthOf(s), s.fade);
++      gain.gain.setValueAtTime(s.volume * first, when);
++      for (const [u, g] of rest) gain.gain.linearRampToValueAtTime(s.volume * g, Math.max(when, ctxAt(s.at + u)));
++    } else gain.gain.value = s.volume;
++    return gain;
++  }
++
++  /**
++   * One sound heard faster or slower: its file played by a media element at its rate, the pitch kept, through the mix.
++   * It is put where the film will be when it starts and started then; keepVoices keeps it there.
++   */
++  private voice(s: Sound, heard: { t: number; at: number }) {
++    const ctx = this.context();
++    const r = this.rate;
++    const ctxAt = (filmT: number) => heard.at + (filmT - heard.t) / r;
++    const end = s.at + lengthOf(s);
++    const soonest = ctx.currentTime + LEAD;
++    const startFilm = Math.max(s.at, heard.t + Math.max(0, soonest - heard.at) * r);
++    if (startFilm >= end) return;
++    const when = Math.max(soonest, ctxAt(startFilm));
++    const el = new Audio();
++    /* the film's origin is not the editor's: read across, so the mix hears it (its server says the editor may) */
++    el.crossOrigin = 'anonymous';
++    el.preload = 'auto';
++    el.preservesPitch = true;
++    el.src = this.soundUrl(s.src);
++    el.defaultPlaybackRate = el.playbackRate = stretchRate(s.speed, r) ?? 1;
++    el.currentTime = fileTime(s, startFilm);
++    const source = ctx.createMediaElementSource(el);
++    const gain = this.fades(s, startFilm, when, ctxAt);
++    source.connect(gain).connect(this.mix ?? ctx.destination);
++    const voice: Voice = { el, source, gain, sound: s, settled: 0, timer: 0 };
++    voice.timer = window.setTimeout(() => {
++      if (!this.voices.includes(voice)) return;
++      el.playbackRate = stretchRate(s.speed, this.rate) ?? 1;
++      void el.play().catch(() => {});
++    }, Math.max(0, (when - ctx.currentTime) * 1000));
++    this.voices.push(voice);
++  }
++
++  /** Each sound a media element plays, kept where the film is: put back when it drifts, let go when it has ended. */
++  private keepVoices() {
++    const heard = this.heardLine;
++    const ctx = this.ctx;
++    if (!heard || !ctx) return;
++    /* the film second the mix plays now */
++    const film = heard.t + (ctx.currentTime - heard.at) * this.rate;
++    const now = performance.now();
++    for (const v of [...this.voices]) {
++      const s = v.sound;
++      if (film >= s.at + lengthOf(s)) { this.dropVoice(v); continue; }
++      if (film < s.at || v.el.paused || v.el.seeking || v.el.readyState < 2 || now - v.settled < SETTLE_MS) continue;
++      const want = fileTime(s, film);
++      if (Math.abs(v.el.currentTime - want) > DRIFT) { v.el.currentTime = want; v.settled = now; }
++    }
++  }
++
++  private dropVoice(v: Voice) {
++    window.clearTimeout(v.timer);
++    v.el.pause();
++    v.el.removeAttribute('src');
++    v.el.load();
++    try { v.source.disconnect(); v.gain.disconnect(); } catch { /* already apart */ }
++    const i = this.voices.indexOf(v);
++    if (i >= 0) this.voices.splice(i, 1);
+   }
+ 
+   pause() {
+@@ -474,6 +543,7 @@
+   private stopNodes() {
+     for (const node of this.playingNodes) { try { node.onended = null; node.stop(); } catch { /* already stopped */ } }
+     this.playingNodes = [];
++    for (const v of [...this.voices]) this.dropVoice(v);
+     this.started.clear();
+   }
+ 
+--- old/packages/openfilm/studio/ui/src/i18n/en.ts
++++ new/packages/openfilm/studio/ui/src/i18n/en.ts
+@@ -1700,6 +1700,7 @@
+       keyPlaceholder: 'Paste your API key',
+       keyKept: 'Key ending in {last4} (leave empty to keep it)',
+       byokNote: 'Each model has to read pictures: the agent looks at its own frames. Your keys stay on this computer, and each goes only to its service.',
++      byokRules: 'Its rules are the project\'s own AGENTS.md (or CLAUDE.md), in the project\'s folder. One kept anywhere else, in a folder above or with the agent\'s settings, is not read.',
+       save: 'Check and save',
+       checkingKey: 'Checking…',
+       cancel: 'Cancel',
+--- old/packages/openfilm/studio/ui/src/i18n/es.ts
++++ new/packages/openfilm/studio/ui/src/i18n/es.ts
+@@ -1699,6 +1699,7 @@
+       keyPlaceholder: 'Pega tu clave de API',
+       keyKept: 'Clave terminada en {last4} (déjalo vacío para conservarla)',
+       byokNote: 'Cada modelo tiene que poder leer imágenes: el agente mira sus propios fotogramas. Tus claves se quedan en este equipo y cada una solo se envía a su servicio.',
++      byokRules: 'Sus reglas son el AGENTS.md (o CLAUDE.md) de la carpeta del proyecto. Uno guardado en otro sitio, en una carpeta superior o con los ajustes del agente, no se lee.',
+       save: 'Comprobar y guardar',
+       checkingKey: 'Comprobando…',
+       cancel: 'Cancelar',
+--- old/packages/openfilm/studio/ui/src/i18n/ja.ts
++++ new/packages/openfilm/studio/ui/src/i18n/ja.ts
+@@ -1699,6 +1699,7 @@
+       keyPlaceholder: 'API キーを貼り付け',
+       keyKept: '末尾が {last4} のキー（空欄のままにすると現在のキーを使います）',
+       byokNote: 'どのモデルも画像を読める必要があります。エージェントは自分で作ったフレームを確認するためです。キーはこのコンピューターに保存され、それぞれのサービス以外には送信されません。',
++      byokRules: '従うルールは、プロジェクトのフォルダにある AGENTS.md（または CLAUDE.md）だけです。上位のフォルダやエージェントの設定フォルダなど、ほかの場所にあるものは読まれません。',
+       save: '確認して保存',
+       checkingKey: '確認中…',
+       cancel: 'キャンセル',
+--- old/packages/openfilm/studio/ui/src/i18n/ko.ts
++++ new/packages/openfilm/studio/ui/src/i18n/ko.ts
+@@ -1698,6 +1698,7 @@
+       keyPlaceholder: 'API 키 붙여넣기',
+       keyKept: '{last4}(으)로 끝나는 키(유지하려면 비워 두세요)',
+       byokNote: '모든 모델이 이미지를 읽을 수 있어야 합니다. 에이전트가 직접 만든 프레임을 확인하기 때문입니다. 키는 이 컴퓨터에만 저장되며 각자의 서비스로만 전송됩니다.',
++      byokRules: '따르는 규칙은 프로젝트 폴더에 있는 AGENTS.md(또는 CLAUDE.md)뿐입니다. 상위 폴더나 에이전트 설정 폴더 등 다른 곳에 둔 파일은 읽지 않습니다.',
+       save: '확인 후 저장',
+       checkingKey: '확인 중…',
+       cancel: '취소',
+--- old/packages/openfilm/studio/ui/src/i18n/zh-CN.ts
++++ new/packages/openfilm/studio/ui/src/i18n/zh-CN.ts
+@@ -1700,6 +1700,7 @@
+       keyPlaceholder: '粘贴你的 API 密钥',
+       keyKept: '尾号为 {last4} 的密钥（留空则保留）',
+       byokNote: '每个模型都需要能看图：智能体会查看自己生成的画面。密钥只保存在这台电脑上，且只会发送给各自的服务。',
++      byokRules: '它遵循的规则只来自项目文件夹里的 AGENTS.md（或 CLAUDE.md）。放在别处的，比如上层文件夹或智能体自己的设置目录里，都不会被读取。',
+       save: '检查并保存',
+       checkingKey: '正在检查…',
+       cancel: '取消',
+--- old/packages/openfilm/studio/ui/src/lib/whats-new.ts
++++ new/packages/openfilm/studio/ui/src/lib/whats-new.ts
+@@ -16,6 +16,32 @@
+ export interface ReleaseNotes { version: string; date: string; notes: Record<Language, ReleaseNote[]> }
+ 
+ export const RELEASES: readonly ReleaseNotes[] = [
++  {
++    version: '0.2.4',
++    date: '2026-10-20',
++    notes: {
++      en: [
++        { kind: 'fixed', text: 'A new playback speed is heard the moment you pick it, and voices sound natural at any speed, even on long videos. The playback button shows a speed gauge, so it no longer looks like the inspector’s.' },
++        { kind: 'fixed', text: 'The app’s own agent (your own key) keeps a long conversation going when it looks at many frames: older pictures are left out of each request, and a request a service finds too large is tried again with fewer.' },
++      ],
++      'zh-CN': [
++        { kind: 'fixed', text: '换播放速度后立刻就有声音，任何速度下人声都自然，长视频也一样。播放按钮换成了速度表图标，不再和检查器的图标一样。' },
++        { kind: 'fixed', text: '内置智能体（用你自己的 key）看了很多画面后，长对话也能继续：每次请求会省略较早的图片，服务嫌请求太大时会带更少的图自动重试。' },
++      ],
++      ja: [
++        { kind: 'fixed', text: '再生速度を変えるとすぐに音が出て、どの速度でも声が自然に聞こえます。長い動画でも同じです。再生ボタンは速度計のアイコンになり、インスペクタのアイコンと区別できます。' },
++        { kind: 'fixed', text: 'アプリ内蔵のエージェント（自分のキー）がたくさんのフレームを見ても、長い会話を続けられます。古い画像は各リクエストから省かれ、大きすぎると断られたリクエストは画像を減らして再試行します。' },
++      ],
++      ko: [
++        { kind: 'fixed', text: '재생 속도를 바꾸면 바로 소리가 나고, 어떤 속도에서도 목소리가 자연스럽습니다. 긴 동영상도 마찬가지입니다. 재생 버튼은 속도계 아이콘이 되어 인스펙터 아이콘과 구별됩니다.' },
++        { kind: 'fixed', text: '앱 자체 에이전트(내 키)가 많은 프레임을 봐도 긴 대화를 이어 갈 수 있습니다. 오래된 그림은 요청에서 빠지고, 너무 크다고 거절된 요청은 그림을 줄여 다시 시도합니다.' },
++      ],
++      es: [
++        { kind: 'fixed', text: 'Una nueva velocidad de reproducción se oye en cuanto la eliges, y las voces suenan naturales a cualquier velocidad, también en vídeos largos. El botón de reproducción muestra un velocímetro y ya no se parece al del inspector.' },
++        { kind: 'fixed', text: 'El agente propio de la app (tu propia clave) sigue una conversación larga aunque mire muchos fotogramas: las imágenes antiguas se omiten de cada solicitud, y una solicitud que el servicio rechaza por grande se reintenta con menos.' },
++      ],
++    },
++  },
+   {
+     version: '0.2.3',
+     date: '2026-10-20',
+--- old/packages/shared/CHANGELOG.md
++++ new/packages/shared/CHANGELOG.md
+@@ -1,4 +1,6 @@
+ # @openfilm/shared
++
++## 0.2.4
+ 
+ ## 0.2.3
+ 
+--- old/packages/shared/package.json
++++ new/packages/shared/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "@openfilm/shared",
+-  "version": "0.2.3",
++  "version": "0.2.4",
+   "private": true,
+   "type": "module",
+   "license": "MIT",
