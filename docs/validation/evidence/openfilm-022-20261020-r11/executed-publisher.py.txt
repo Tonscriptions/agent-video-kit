@@ -1,0 +1,152 @@
+"""Publish the reviewed R11 research after V72 succeeds; no product tests rerun."""
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import time
+
+WORK = Path(__file__).resolve().parent
+SOURCE = WORK.parents[2]
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+REL = 'docs/validation/evidence/openfilm-022-20261020-r11'
+V72 = 'docs/validation/evidence/html-shutter-20261020-v72'
+PREVIOUS = SOURCE/'product/.runtime/html-shutter-20261020-v72/publication-r3/run.json'
+REMOTE = 'git@github.com:Tonscriptions/agent-video-kit.git'
+BLOCK_SHA = 'sha256:4a43d7aaa93a662d40eb5f6d90c7f8da5ec1835da21017d2ae3a0d15e383caac'
+
+
+def sha(path):
+    return 'sha256:'+hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def read(path):
+    return json.loads(path.read_bytes())
+
+
+def save(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2)+'\n', encoding='utf8', newline='\n')
+
+
+def git(*args):
+    return subprocess.run(['git', *args], cwd=MAIN, check=True, capture_output=True, timeout=240).stdout
+
+
+def changed():
+    return sorted(x.decode('utf8') for x in git('ls-files', '-m', '-o', '--exclude-standard', '-z').split(b'\0') if x)
+
+
+def frozen():
+    spec = importlib.util.spec_from_file_location('_r11_main_frozen', MAIN/'scripts/run_frozen_regression.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.frozen()
+
+
+def guard():
+    plan = read(WORK/'reviewed-inputs.json')
+    assert plan['source_root'] == str(SOURCE) and len(plan['files']) == 27
+    assert sha(WORK/'document-blocks.json') == BLOCK_SHA
+    for name, digest in plan['files'].items():
+        assert sha(SOURCE/name) == digest, name
+    return plan
+
+
+def main():
+    run = WORK/'publication-r2'
+    run.mkdir(exist_ok=False)
+    lock = os.open(run/'runner.lock', os.O_CREAT|os.O_EXCL|os.O_WRONLY)
+    os.write(lock, str(os.getpid()).encode());os.close(lock)
+    record = {'status':'waiting_v72','started_at_utc':datetime.now(timezone.utc).isoformat(),
+              'pid':os.getpid(),'force_push':False,'goal_complete':False,'calls':[]}
+
+    def command(label, args):
+        out, err = run/(label+'.stdout.log'), run/(label+'.stderr.log')
+        with out.open('wb') as stdout, err.open('wb') as stderr:
+            result = subprocess.run(list(map(str,args)), cwd=MAIN, stdout=stdout, stderr=stderr, timeout=240)
+        record['calls'].append({'label':label,'exit_code':result.returncode,
+                                'stdout_sha256':sha(out),'stderr_sha256':sha(err)})
+        save(run/'run.json',record)
+        assert result.returncode == 0, label+' failed; native logs retained'
+        return out.read_bytes()
+
+    try:
+        plan = guard();deadline=time.monotonic()+43200
+        while True:
+            try:
+                previous = read(PREVIOUS)
+            except (FileNotFoundError,json.JSONDecodeError):
+                previous = {'status':'not_terminal'}
+            assert previous['status'] != 'stopped_for_review', 'V72 publisher stopped; main preserved'
+            if previous['status'] == 'pushed':break
+            assert time.monotonic()<deadline, 'existing publication not terminal'
+            record['last_wait_at_utc']=datetime.now(timezone.utc).isoformat();save(run/'run.json',record);time.sleep(15)
+        guard()
+        assert git('branch','--show-current').strip()==b'main'
+        assert git('remote','get-url','origin').decode().strip()==REMOTE
+        assert git('rev-parse','HEAD').decode().strip()==previous['commit']
+        assert not changed() and not git('diff','--cached','--name-only')
+        assert git('ls-remote','--exit-code','origin','refs/heads/main').decode().split()[0]==previous['commit']
+        full=read(MAIN/V72/'full-r2.json')
+        assert full['status']=='passed' and full['terminal_ok'] and full['methods']==1614 and full['skipped']==0
+        assert full['frozen_equal'] and full['external_fixtures_equal'] and full['external_fixture_count']==8
+        research=read(SOURCE/REL/'run-r2/verification.json')
+        assert frozen()==full['frozen_before']==full['frozen_after']==research['frozen_after']
+        for name, expected in full['external_fixtures_after'].items():
+            path=MAIN/name;assert path.stat().st_size==expected['bytes'] and sha(path)==expected['sha256']
+        assert not (MAIN/REL).exists()
+        record['status']='copying_research_only';save(run/'run.json',record)
+        for name,digest in plan['files'].items():
+            target=MAIN/name;assert not target.exists(),name
+            target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(SOURCE/name,target);assert sha(target)==digest
+        future={REL+'/'+name for name in ('publication-copy-r1.json','executed-publisher.py.txt','release-r1.json','staged-r1.json')}
+        shutil.copyfile(Path(__file__),MAIN/REL/'executed-publisher.py.txt')
+        save(MAIN/REL/'publication-copy-r1.json',{'status':'copied_reviewed_research','source_root':str(SOURCE),
+             'source_files':plan['files'],'publisher_sha256':sha(Path(__file__)),'document_blocks_sha256':BLOCK_SHA,
+             'previous_product_commit':previous['commit'],'existing_full_regression_sha256':sha(MAIN/V72/'full-r2.json'),
+             'product_source_changed':False,'product_methods_added':0,'force_push':False})
+        blocks=read(WORK/'document-blocks.json');marker=blocks['marker']
+        for name,content in blocks['blocks'].items():
+            path=MAIN/name;text=path.read_text(encoding='utf8');start='<!-- '+marker+' -->';end='<!-- /'+marker+' -->'
+            assert start not in text and end not in text
+            first,rest=text.split('\n',1);path.write_text(first+'\n\n'+start+'\n'+content.rstrip()+'\n'+end+'\n'+rest,encoding='utf8',newline='\n')
+        attrs=MAIN/'.gitattributes';text=attrs.read_text(encoding='utf8')
+        assert '# R11 OpenFilm 0.2.2 source research' not in text
+        text+='\n# R11 OpenFilm 0.2.2 source research: preserve original bytes and failed observations.\n'
+        text+=REL+'/** -text -whitespace\nsources/upstream/openfilm-022-20261020-r11/** -text -whitespace\n'
+        attrs.write_text(text,encoding='utf8',newline='\n')
+        prefix=[sys.executable,'-E','-B','-X','utf8']
+        command('audit-research',[*prefix,MAIN/'scripts/audit_openfilm_r11.py','--output',MAIN/REL/'release-r1.json'])
+        assert frozen()==full['frozen_after']
+        allowed=set(plan['files'])|set(blocks['blocks'])|future|{'.gitattributes'}
+        modified=changed();assert set(modified)<=allowed,'unexpected main paths'
+        paths=run/'stage-paths.nul';paths.write_bytes(b''.join(n.encode('utf8')+b'\0' for n in modified))
+        command('stage-research',['git','add','-A','--pathspec-from-file='+str(paths),'--pathspec-file-nul'])
+        before=set(git('diff','--cached','--name-only','-z').split(b'\0'))-{b''}
+        command('verify-staged',[*prefix,MAIN/'scripts/verify_staged_release.py','--full',MAIN/V72/'full-r2.json','--output',MAIN/REL/'staged-r1.json'])
+        command('stage-receipt',['git','add','--',REL+'/staged-r1.json'])
+        after=set(git('diff','--cached','--name-only','-z').split(b'\0'))-{b''}
+        assert after==before|{(REL+'/staged-r1.json').encode('utf8')}
+        assert git('cat-file','blob',':'+REL+'/staged-r1.json')==(MAIN/REL/'staged-r1.json').read_bytes()
+        command('no-unstaged',['git','diff','--quiet']);command('check-whitespace',['git','diff','--cached','--check'])
+        assert frozen()==full['frozen_after'];record['status']='committing';save(run/'run.json',record)
+        command('commit',['git','-c','gc.auto=0','-c','maintenance.auto=false','commit','--quiet','-m','docs: review pinned OpenFilm 0.2.2 modules and creative workflows'])
+        head=git('rev-parse','HEAD').decode().strip()
+        remote=command('remote-after-hook',['git','ls-remote','--exit-code','origin','refs/heads/main']).decode().split()[0]
+        if remote!=head:
+            command('ordinary-push',['git','push','origin','main'])
+            remote=command('remote-after-push',['git','ls-remote','--exit-code','origin','refs/heads/main']).decode().split()[0]
+        assert remote==head and not changed()
+        record.update(status='pushed',commit=head,remote_main=remote,staged_files=len(after),product_methods_added=0)
+    except Exception as exc:
+        record.update(status='stopped_for_review',error=type(exc).__name__+': '+str(exc));raise
+    finally:
+        record['finished_at_utc']=datetime.now(timezone.utc).isoformat();save(run/'run.json',record)
+    print(json.dumps({key:record[key] for key in ('status','commit','force_push','product_methods_added')}))
+
+
+if __name__=='__main__':main()

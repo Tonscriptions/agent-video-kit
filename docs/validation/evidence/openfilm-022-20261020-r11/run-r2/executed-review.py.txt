@@ -1,0 +1,174 @@
+"""Offline review of two pinned OpenFilm archives; run only the rate unit test.
+
+The GitHub responses and ZIP are acquired separately for source research. This
+script never downloads, runs the upstream CLI, installs dependencies, or changes
+the product. Output paths must be fresh; historical observations stay intact.
+"""
+from __future__ import annotations
+
+import argparse
+from datetime import datetime, timezone
+import difflib
+import hashlib
+import json
+from pathlib import Path, PurePosixPath
+import shutil
+import subprocess
+import zipfile
+
+from run_frozen_regression import frozen
+
+ROOT = Path(__file__).resolve().parents[1]
+OLD = '71922644da5d6b67db2cc796d4e057f98999944f'
+NEW = '695f4a887a97258d45ffe5715eadf537b6d2579b'
+ARCHIVES = {
+    OLD: ('openfilm-openfilm-7192264', 'sha256:13e833529ea967824f1a587d6d9eee3892d0de05a0ab815f121ffa8405b9987f'),
+    NEW: ('openfilm-' + NEW, 'sha256:2786c4b06d90f112aba12c013ee7aaa3d8bf75f14b40d59e86e36f2a917c300e'),
+}
+SELECTED = (
+    'src/look.mjs', 'src/render.mjs', 'src/rate.mjs', 'src/problems.mjs',
+    'studio/server/exports.mjs', 'studio/server/preview-cache.mjs',
+    'studio/server/fcpxml.mjs', 'studio/server/nle.mjs',
+    'studio/server/diagnostics.mjs',
+)
+
+
+def sha(data):
+    return 'sha256:' + hashlib.sha256(data).hexdigest()
+
+
+def archive(path, commit):
+    files = {}
+    prefix, expected_sha = ARCHIVES[commit]
+    assert sha(path.read_bytes()) == expected_sha
+    with zipfile.ZipFile(path) as source:
+        assert sum(row.file_size for row in source.infolist()) < 128 * 1024 * 1024
+        for row in source.infolist():
+            if row.is_dir():
+                continue
+            name = PurePosixPath(row.filename)
+            assert name.parts[0] == prefix
+            assert not name.is_absolute() and '..' not in name.parts
+            assert (row.external_attr >> 16) & 0o170000 != 0o120000
+            relative = PurePosixPath(*name.parts[1:]).as_posix()
+            assert relative not in files
+            files[relative] = source.read(row)
+    return files
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--old-zip', type=Path, required=True)
+    parser.add_argument('--new-zip', type=Path, required=True)
+    parser.add_argument('--snapshot', type=Path, required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args()
+    output = args.output.resolve()
+    assert output.is_relative_to(ROOT / 'docs') and not output.exists()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    scratch = ROOT / 'product/.runtime/openfilm-r11-rate-probe' / output.parent.name
+    scratch.mkdir(parents=True, exist_ok=False)
+    before = frozen()
+    record = {
+        'status': 'running', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
+        'script_sha256': sha(Path(__file__).read_bytes()), 'old_commit': OLD,
+        'new_commit': NEW, 'frozen_before': before, 'network_calls': 0,
+        'upstream_cli_executed': False, 'upstream_browser_executed': False,
+        'dependencies_installed': False, 'new_model_inference': 0,
+        'virtualization': False, 'full_capcut_parity': False,
+    }
+    try:
+        old = archive(args.old_zip.resolve(strict=True), OLD)
+        new = archive(args.new_zip.resolve(strict=True), NEW)
+        snapshot = json.loads(args.snapshot.read_bytes())
+        assert snapshot['head'] == NEW and snapshot['prior_pin'] == OLD
+        record['community_snapshot'] = snapshot
+        record['archives'] = {
+            label: {'bytes': path.stat().st_size, 'sha256': sha(path.read_bytes())}
+            for label, path in [('old', args.old_zip), ('new', args.new_zip)]
+        }
+        added = sorted(new.keys() - old.keys())
+        deleted = sorted(old.keys() - new.keys())
+        modified = sorted(name for name in old.keys() & new.keys() if old[name] != new[name])
+        unchanged = sorted(name for name in old.keys() & new.keys() if old[name] == new[name])
+        record['tree'] = {'old_files': len(old), 'new_files': len(new),
+                          'unchanged_count': len(unchanged), 'added': added,
+                          'modified': modified, 'deleted': deleted}
+        manifest = {name: {'bytes': len(data), 'sha256': sha(data)} for name, data in sorted(new.items())}
+        (output.parent / 'new-tree.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf8')
+        diff = []
+        for name in added + modified + deleted:
+            try:
+                diff.extend(difflib.unified_diff(old.get(name, b'').decode('utf8').splitlines(True),
+                                               new.get(name, b'').decode('utf8').splitlines(True),
+                                               fromfile='old/' + name, tofile='new/' + name))
+            except UnicodeDecodeError:
+                diff.append('Binary changed ' + name + '\n')
+        (output.parent / 'source.diff').write_text(''.join(diff), encoding='utf8', newline='\n')
+        assert old['LICENSE'] == new['LICENSE']
+        record['license_unchanged_sha256'] = sha(new['LICENSE'])
+        record['selected_modules'] = {
+            name: {'old_sha256': sha(old['packages/openfilm/' + name]) if 'packages/openfilm/' + name in old else None,
+                   'new_sha256': sha(new['packages/openfilm/' + name]),
+                   'unchanged': old.get('packages/openfilm/' + name) == new['packages/openfilm/' + name]}
+            for name in SELECTED
+        }
+        record['unchanged_groups'] = {}
+        for prefix in ('packages/openfilm/skills/', 'packages/openfilm/studio/server/providers/'):
+            a = {name: sha(data) for name, data in old.items() if name.startswith(prefix)}
+            b = {name: sha(data) for name, data in new.items() if name.startswith(prefix)}
+            assert a == b
+            record['unchanged_groups'][prefix] = {'files': len(b), 'all_bytes_equal': True}
+        for name in ('rate.mjs', 'rate.test.mjs'):
+            data = new['packages/openfilm/src/' + name]
+            (scratch / name).write_bytes(data)
+            (output.parent / ('original-' + name + '.txt')).write_bytes(data)
+        probe = """import { exactRate, ffmpegRate } from './rate.mjs';
+const inputs = [23.976, 23.98, 29.97, 59.94, 119.88, 12.5, 1.99, 1.998];
+console.log(JSON.stringify(inputs.map(input => {
+  const rate = exactRate(input);
+  return { input, rate, ffmpeg: ffmpegRate(rate), changed: rate.fps !== input, delta: rate.fps - input };
+})));
+"""
+        (scratch / 'probe.mjs').write_text(probe, encoding='utf8', newline='\n')
+        (output.parent / 'executed-probe.mjs.txt').write_text(probe, encoding='utf8', newline='\n')
+        node = shutil.which('node')
+        assert node is not None
+        version = subprocess.run([node, '--version'], capture_output=True, check=True, timeout=15).stdout.decode().strip()
+        record['node'] = {'path': node, 'version': version, 'sha256': sha(Path(node).read_bytes())}
+        calls = []
+        for name in ('rate.test.mjs', 'probe.mjs'):
+            result = subprocess.run([node, '--disallow-code-generation-from-strings', name], cwd=scratch,
+                                    capture_output=True, timeout=30)
+            for stream in ('stdout', 'stderr'):
+                (output.parent / (name + '.' + stream + '.log')).write_bytes(getattr(result, stream))
+            calls.append({'entry': name, 'exit_code': result.returncode,
+                          'stdout_sha256': sha(result.stdout), 'stderr_sha256': sha(result.stderr)})
+            assert result.returncode == 0
+            if name == 'rate.test.mjs':
+                text = result.stdout.decode('utf8')
+                assert '# tests 1' in text and '# pass 1' in text and '# fail 0' in text
+            else:
+                observations = json.loads(result.stdout)
+        record['calls'] = calls
+        record['original_upstream_test_methods'] = 1
+        record['rate_observations'] = observations
+        assert observations[6]['rate']['num'] == 2000 and observations[6]['rate']['den'] == 1001
+        record['result_scope'] = 'one original pure rate test plus eight observations; no full upstream render, CLI, performance or product parity acceptance'
+        record['status'] = 'passed_research_only'
+    except BaseException as exc:
+        record.update(status='failed', error={'type': type(exc).__name__, 'message': str(exc)})
+        raise
+    finally:
+        after = frozen()
+        record.update(finished_at_utc=datetime.now(timezone.utc).isoformat(), frozen_after=after,
+                      frozen_equal=before == after)
+        output.write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+    assert record['frozen_equal']
+    print(json.dumps({'status': record['status'], 'old_files': len(old), 'new_files': len(new),
+                      'unchanged': len(unchanged), 'original_test_methods': 1,
+                      'observations': len(observations), 'frozen_equal': True}))
+
+
+if __name__ == '__main__':
+    main()

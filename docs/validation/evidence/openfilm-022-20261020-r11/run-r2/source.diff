@@ -1,0 +1,2437 @@
+--- old/apps/desktop/src/i18n/install-window.mjs
++++ new/apps/desktop/src/i18n/install-window.mjs
+@@ -0,0 +1,8 @@
++/** What the window of an update installed at launch says (update-launch.mjs), in each of Studio's languages. */
++export const INSTALL_WORDS = {
++  en: { title: 'Installing {name} {version}…', detail: '{name} opens again when it is done.' },
++  'zh-CN': { title: '正在安装 {name} {version}…', detail: '安装完成后 {name} 会自动打开。' },
++  ja: { title: '{name} {version} をインストールしています…', detail: '完了すると {name} が自動的に開きます。' },
++  ko: { title: '{name} {version} 설치 중…', detail: '설치가 끝나면 {name}이(가) 자동으로 열립니다.' },
++  es: { title: 'Instalando {name} {version}…', detail: '{name} se abrirá de nuevo cuando termine.' },
++};
+--- old/apps/desktop/src/installing.html
++++ new/apps/desktop/src/installing.html
+@@ -0,0 +1,36 @@
++<!doctype html>
++<html lang="en">
++<head>
++<meta charset="utf-8">
++<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
++<title>OpenFilm</title>
++<style>
++  :root { color-scheme: light dark; }
++  html, body { height: 100%; margin: 0; }
++  body { display: grid; place-items: center; background: #f2f2f2; color: #1f1f1f; font: 13px/1.5 -apple-system, system-ui, sans-serif; -webkit-app-region: drag; user-select: none; cursor: default; }
++  @media (prefers-color-scheme: dark) { body { background: #111; color: #dadada; } }
++  main { width: 100%; padding: 0 28px; box-sizing: border-box; }
++  h1 { font-size: 14px; font-weight: 600; margin: 0 0 4px; }
++  p { margin: 0 0 14px; opacity: .65; }
++  .bar { position: relative; height: 4px; border-radius: 2px; overflow: hidden; background: color-mix(in srgb, currentColor 12%, transparent); }
++  .bar::after { content: ''; position: absolute; inset: 0 auto 0 0; width: 35%; border-radius: 2px; background: #1a93fe; animation: slide 1.2s ease-in-out infinite; }
++  @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
++  @media (prefers-reduced-motion: reduce) { .bar::after { animation-duration: 3.6s; } }
++</style>
++</head>
++<body>
++<!-- A launch that installs the update quitting did not (update-launch.mjs): what it is doing, until the app restarts -->
++<main>
++  <h1 id="title"></h1>
++  <p id="detail"></p>
++  <div class="bar" role="progressbar" aria-busy="true"></div>
++</main>
++<script>
++  const words = new URLSearchParams(location.search);
++  document.documentElement.lang = words.get('lang') || 'en';
++  document.getElementById('title').textContent = words.get('title') || '';
++  document.getElementById('detail').textContent = words.get('detail') || '';
++  document.querySelector('.bar').setAttribute('aria-label', words.get('title') || '');
++</script>
++</body>
++</html>
+--- old/apps/desktop/src/update-launch.mjs
++++ new/apps/desktop/src/update-launch.mjs
+@@ -0,0 +1,129 @@
++/**
++ * An update that is ready, as the app's next launch sees it (macOS). Quitting installs it: Squirrel.Mac's ShipIt waits
++ * for the app to close, then swaps the app's files, which takes several seconds for an app this size. An app opened
++ * in those seconds stops the install (ShipIt gives up while the app runs), so a launch:
++ *
++ *   · while ShipIt installs: steps aside. It exits at once, and a small script opens the app again when ShipIt is done,
++ *     as the new version (stepAside).
++ *   · after an install that did not happen: installs it now, in a small window that says so, and opens as the new
++ *     version (updates.mjs `installAtLaunch`, readyToInstall).
++ *
++ * Which update is waiting is `update-pending.json` in the app's data folder, written when one is ready and removed
++ * once the app runs that version or newer. Reads no Electron module, so `node --test` can use it.
++ */
++import { execFileSync, spawn } from 'node:child_process';
++import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
++import { join, posix } from 'node:path';
++import { INSTALL_WORDS as WORDS } from './i18n/install-window.mjs';
++import { isNewer } from './update-controller.mjs';
++
++const PENDING = 'update-pending.json';
++/** what the script that opens the app again passes, so that launch never steps aside a second time */
++export const AFTER_INSTALL = '--after-install';
++/** how long the script waits for ShipIt before it opens the app anyway */
++export const HAND_OFF_SECONDS = 60;
++/** how long a launch that installs waits for the update to be ready again, before it opens as it is */
++export const LAUNCH_INSTALL_MS = 45_000;
++
++/** Remember the update that is ready, for the next launch. */
++export function writePendingUpdate(dir, version) {
++  try {
++    mkdirSync(dir, { recursive: true });
++    writeFileSync(join(dir, PENDING), `${JSON.stringify({ version })}\n`);
++  } catch { /* the next launch opens as it is */ }
++}
++
++export function clearPendingUpdate(dir) {
++  rmSync(join(dir, PENDING), { force: true });
++}
++
++/** The version waiting to be installed, if it is newer than this one; an older note is removed. */
++export function pendingUpdate(dir, current) {
++  let version = null;
++  try { version = JSON.parse(readFileSync(join(dir, PENDING), 'utf8')).version; } catch { return null; }
++  if (isNewer(version, current)) return version;
++  try { clearPendingUpdate(dir); } catch { /* read again next time */ }
++  return null;
++}
++
++/** ShipIt's process for this app, while it runs (launchd's job `<bundle id>.ShipIt`), or null. */
++export function installerPid(bundleId, run = (file, args) => execFileSync(file, args, { encoding: 'utf8', timeout: 2000, stdio: ['ignore', 'pipe', 'ignore'] })) {
++  try {
++    const pid = Number(/"PID" = (\d+);/.exec(run('/bin/launchctl', ['list', `${bundleId}.ShipIt`]))?.[1]);
++    return pid > 0 ? pid : null;
++  } catch { return null; }
++}
++
++/** The .app the running executable is in (…/OpenFilm.app/Contents/MacOS/OpenFilm). */
++export const appBundle = (execPath) => posix.resolve(posix.dirname(execPath), '..', '..');
++
++/* waits for ShipIt ($1) to finish, at most HAND_OFF_SECONDS, then opens the app ($2) */
++export const HAND_OFF_SCRIPT = [
++  'i=0',
++  `while ps -p "$1" >/dev/null 2>&1 && [ "$i" -lt ${HAND_OFF_SECONDS * 2} ]; do sleep 0.5; i=$((i+1)); done`,
++  `exec open "$2" --args ${AFTER_INSTALL}`,
++].join('\n');
++
++/**
++ * Step aside for an install under way: true when this launch should exit now (the script it started opens the app
++ * once ShipIt is done). Only a launch with an update waiting, while ShipIt runs, and not the one the script opened.
++ */
++export function stepAside({ dir, version, bundleId, execPath, argv, pidOf = installerPid, start = spawn }) {
++  if (argv.includes(AFTER_INSTALL) || !pendingUpdate(dir, version)) return false;
++  const pid = pidOf(bundleId);
++  if (!pid) return false;
++  try {
++    start('/bin/sh', ['-c', HAND_OFF_SCRIPT, 'openfilm-update', String(pid), appBundle(execPath)], { detached: true, stdio: 'ignore' }).unref();
++    return true;
++  } catch { return false; }
++}
++
++/**
++ * Get the waiting update ready again (a check finds it downloaded; Squirrel takes it), for a launch that installs it:
++ * true once it is ready, false when the check finds nothing newer, fails, or takes longer than `ms`.
++ * @param {{ controller: { check: () => Promise<any>, snapshot: () => { status: string } },
++ *           subscribe: (listener: (state: { status: string }) => void) => () => void, ms?: number }} options
++ */
++export function readyToInstall({ controller, subscribe, ms = LAUNCH_INSTALL_MS }) {
++  return new Promise((done) => {
++    let stop = () => {};
++    const timer = setTimeout(() => finish(false), ms);
++    function finish(ready) {
++      clearTimeout(timer);
++      stop();
++      done(ready);
++    }
++    const look = ({ status }) => {
++      if (status === 'ready') finish(true);
++      else if (status === 'current' || status === 'error') finish(false);
++    };
++    stop = subscribe(look);
++    look(controller.snapshot());
++    void controller.check().then(look, () => finish(false));
++  });
++}
++
++
++/**
++ * The install window's language: the one Studio was last shown in, else the system's as Studio picks it (its i18n
++ * `languageFor`): `zh-Hans-CN` and `zh` are Simplified Chinese, `es-MX` is Spanish.
++ */
++export function installLanguage(saved, system = []) {
++  if (saved && saved in WORDS) return saved;
++  for (const tag of system) {
++    const lower = String(tag).toLowerCase();
++    if (lower.startsWith('zh')) {
++      if (/^zh-(hant|tw|hk|mo)\b/.test(lower)) continue;
++      return 'zh-CN';
++    }
++    const base = lower.split('-')[0];
++    if (base in WORDS) return base;
++  }
++  return 'en';
++}
++
++export function installWords(language, { name, version }) {
++  const fill = (text) => text.replaceAll('{name}', name).replaceAll('{version}', version);
++  const words = WORDS[language] ?? WORDS.en;
++  return { lang: language in WORDS ? language : 'en', title: fill(words.title), detail: fill(words.detail) };
++}
+--- old/apps/desktop/src/update-launch.test.mjs
++++ new/apps/desktop/src/update-launch.test.mjs
+@@ -0,0 +1,132 @@
++import { test } from 'node:test';
++import assert from 'node:assert/strict';
++import { spawn } from 'node:child_process';
++import { EventEmitter } from 'node:events';
++import { chmodSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
++import { tmpdir } from 'node:os';
++import { join } from 'node:path';
++import { createUpdateController } from './update-controller.mjs';
++import {
++  AFTER_INSTALL, HAND_OFF_SCRIPT, appBundle, installLanguage, installWords, installerPid, pendingUpdate, readyToInstall,
++  stepAside, writePendingUpdate,
++} from './update-launch.mjs';
++
++const folder = () => mkdtempSync(join(tmpdir(), 'of-update-launch-'));
++
++test('the update noted as ready waits until the app runs it; then the note goes', () => {
++  const dir = folder();
++  assert.equal(pendingUpdate(dir, '0.2.0'), null);
++  writePendingUpdate(dir, '0.2.1');
++  assert.equal(pendingUpdate(dir, '0.2.0'), '0.2.1');
++  assert.equal(pendingUpdate(dir, '0.2.0'), '0.2.1');
++  assert.equal(pendingUpdate(dir, '0.2.1'), null);
++  assert.equal(existsSync(join(dir, 'update-pending.json')), false);
++  writeFileSync(join(dir, 'update-pending.json'), 'not json');
++  assert.equal(pendingUpdate(dir, '0.2.0'), null);
++});
++
++test('ShipIt runs while launchd lists a process for the app\'s job', () => {
++  const asked = [];
++  const listed = (out) => (file, args) => { asked.push([file, ...args]); return out; };
++  assert.equal(installerPid('dev.openfilm.desktop', listed('{\n\t"Label" = "dev.openfilm.desktop.ShipIt";\n\t"PID" = 4242;\n};\n')), 4242);
++  assert.deepEqual(asked[0], ['/bin/launchctl', 'list', 'dev.openfilm.desktop.ShipIt']);
++  assert.equal(installerPid('dev.openfilm.desktop', listed('{\n\t"LastExitStatus" = 0;\n};\n')), null);
++  assert.equal(installerPid('dev.openfilm.desktop', () => { throw new Error('no such job'); }), null);
++});
++
++test('a launch steps aside only while ShipIt installs the update it was quit for, and never twice', () => {
++  const dir = folder();
++  const started = [];
++  const start = (file, args, options) => { started.push({ file, args, options }); return { unref() {} }; };
++  const base = { dir, version: '0.2.0', bundleId: 'dev.openfilm.desktop', execPath: '/Applications/OpenFilm.app/Contents/MacOS/OpenFilm', argv: ['OpenFilm'], start };
++  /* nothing waiting */
++  assert.equal(stepAside({ ...base, pidOf: () => 4242 }), false);
++  writePendingUpdate(dir, '0.2.1');
++  /* waiting, and ShipIt not running: the launch installs it itself (readyToInstall) */
++  assert.equal(stepAside({ ...base, pidOf: () => null }), false);
++  /* the script's own launch, or the new version (ShipIt still finishing): it opens */
++  assert.equal(stepAside({ ...base, argv: ['OpenFilm', AFTER_INSTALL], pidOf: () => 4242 }), false);
++  assert.equal(stepAside({ ...base, version: '0.2.1', pidOf: () => 4242 }), false);
++  assert.equal(started.length, 0);
++  writePendingUpdate(dir, '0.2.1');
++  assert.equal(stepAside({ ...base, pidOf: () => 4242 }), true);
++  assert.equal(started.length, 1);
++  assert.equal(started[0].file, '/bin/sh');
++  assert.deepEqual(started[0].args.slice(3), ['4242', '/Applications/OpenFilm.app']);
++  assert.equal(started[0].options.detached, true);
++  assert.equal(appBundle('/Applications/OpenFilm Preview.app/Contents/MacOS/OpenFilm Preview'), '/Applications/OpenFilm Preview.app');
++});
++
++test('the script opens the app once ShipIt is gone, saying the install is over', { skip: process.platform === 'win32' }, async () => {
++  const dir = folder();
++  const said = join(dir, 'opened');
++  writeFileSync(join(dir, 'open'), `#!/bin/sh\necho "$@" > "${said}"\n`);
++  chmodSync(join(dir, 'open'), 0o755);
++  const installer = spawn('sleep', ['1']);
++  const env = { ...process.env, PATH: `${dir}:${process.env.PATH}` };
++  const script = spawn('/bin/sh', ['-c', HAND_OFF_SCRIPT, 'openfilm-update', String(installer.pid), '/Applications/OpenFilm.app'], { env });
++  await new Promise((resolve) => setTimeout(resolve, 300));
++  assert.equal(existsSync(said), false, 'not while ShipIt runs');
++  await new Promise((resolve) => script.on('exit', resolve));
++  assert.equal(readFileSync(said, 'utf8').trim(), `/Applications/OpenFilm.app --args ${AFTER_INSTALL}`);
++});
++
++function controllerFixture() {
++  const updater = new EventEmitter();
++  const nativeUpdater = new EventEmitter();
++  const listeners = new Set();
++  let checks = 0;
++  updater.checkForUpdates = async () => { checks++; updater.emit('checking-for-update'); };
++  const controller = createUpdateController({
++    updater, nativeUpdater, version: '0.2.0', onChange: (state) => { for (const l of listeners) l(state); },
++    prepareRestart: async () => ({ ok: true }), install: () => {},
++  });
++  const subscribe = (listener) => { listeners.add(listener); return () => listeners.delete(listener); };
++  return { controller, updater, nativeUpdater, subscribe, checks: () => checks, listeners };
++}
++
++test('a launch installs once the check finds the update downloaded and Squirrel has it again', async () => {
++  const f = controllerFixture();
++  const ready = readyToInstall({ controller: f.controller, subscribe: f.subscribe, ms: 2000 });
++  assert.equal(f.checks(), 1);
++  f.updater.emit('update-available', { version: '0.2.1' });
++  f.updater.emit('update-downloaded', { version: '0.2.1' });
++  f.nativeUpdater.emit('update-downloaded');
++  assert.equal(await ready, true);
++  assert.equal(f.listeners.size, 0);
++});
++
++test('a launch opens as it is when nothing newer is found, the check fails, or it takes too long', async () => {
++  const current = controllerFixture();
++  const none = readyToInstall({ controller: current.controller, subscribe: current.subscribe, ms: 2000 });
++  current.updater.emit('update-not-available');
++  assert.equal(await none, false);
++
++  const failing = controllerFixture();
++  const failed = readyToInstall({ controller: failing.controller, subscribe: failing.subscribe, ms: 2000 });
++  failing.updater.emit('error', Object.assign(new Error('offline'), { code: 'ENOTFOUND' }));
++  assert.equal(await failed, false);
++
++  const slow = controllerFixture();
++  const late = readyToInstall({ controller: slow.controller, subscribe: slow.subscribe, ms: 50 });
++  slow.updater.emit('update-available', { version: '0.2.2' });
++  slow.updater.emit('download-progress', { percent: 3 });
++  assert.equal(await late, false);
++  assert.equal(slow.listeners.size, 0);
++});
++
++test('the install window speaks the language Studio was last in, else the system\'s', () => {
++  assert.equal(installLanguage('ja', ['zh-Hans-CN']), 'ja');
++  assert.equal(installLanguage(null, ['zh-Hans-CN', 'en-US']), 'zh-CN');
++  assert.equal(installLanguage('fr', ['zh-TW', 'es-MX']), 'es');
++  assert.equal(installLanguage(null, ['de-DE']), 'en');
++  assert.deepEqual(installWords('zh-CN', { name: 'OpenFilm', version: '0.2.1' }), {
++    lang: 'zh-CN', title: '正在安装 OpenFilm 0.2.1…', detail: '安装完成后 OpenFilm 会自动打开。',
++  });
++  for (const language of ['en', 'zh-CN', 'ja', 'ko', 'es']) {
++    const words = installWords(language, { name: 'OpenFilm', version: '9.9.9' });
++    assert.match(words.title, /OpenFilm/);
++    assert.match(words.title, /9\.9\.9/);
++    assert.match(words.detail, /OpenFilm/);
++  }
++});
+--- old/packages/openfilm/src/rate.mjs
++++ new/packages/openfilm/src/rate.mjs
+@@ -0,0 +1,16 @@
++// @ts-check
++
++/**
++ * A frame rate as it really is. The NTSC rates 23.976, 29.97 and 59.94 (and 47.952, 119.88) are a whole rate slowed
++ * by 1000/1001: exactly 24000/1001, 30000/1001 and 60000/1001, so a render's frames, its encoder's rate and the
++ * file's rate tag match footage shot at them. Another rate is kept as it is, as num/1.
++ * @param {number} fps @returns {{ fps: number, num: number, den: number }}
++ */
++export function exactRate(fps) {
++  const whole = Math.round(fps);
++  const ntsc = whole > 0 && Math.abs(fps - whole) > 0.001 && Math.abs(fps - (whole * 1000) / 1001) < 0.01;
++  return ntsc ? { fps: (whole * 1000) / 1001, num: whole * 1000, den: 1001 } : { fps, num: fps, den: 1 };
++}
++
++/** The rate as ffmpeg takes it (`-r`, `-framerate`, a filter's expression), `times` over. @param {{ num: number, den: number }} rate @param {number} [times] */
++export const ffmpegRate = ({ num, den }, times = 1) => (den === 1 ? String(num * times) : `${num * times}/${den}`);
+--- old/packages/openfilm/src/rate.test.mjs
++++ new/packages/openfilm/src/rate.test.mjs
+@@ -0,0 +1,13 @@
++import { test } from 'node:test';
++import assert from 'node:assert/strict';
++import { exactRate, ffmpegRate } from './rate.mjs';
++
++test('the NTSC rates are their exact rates; another rate is kept as it is', () => {
++  for (const [fps, num] of [[23.976, 24000], [23.98, 24000], [29.97, 30000], [30000 / 1001, 30000], [47.952, 48000], [59.94, 60000], [119.88, 120000]]) {
++    assert.deepEqual(exactRate(fps), { fps: num / 1001, num, den: 1001 }, `${fps}`);
++    assert.equal(ffmpegRate(exactRate(fps)), `${num}/1001`);
++  }
++  for (const fps of [1, 12.5, 24, 25, 30, 60, 240]) assert.deepEqual(exactRate(fps), { fps, num: fps, den: 1 }, `${fps}`);
++  assert.equal(ffmpegRate(exactRate(29.97), 8), '240000/1001');
++  assert.equal(ffmpegRate(exactRate(12.5), 2), '25');
++});
+--- old/apps/desktop/CHANGELOG.md
++++ new/apps/desktop/CHANGELOG.md
+@@ -1,4 +1,23 @@
+ # @openfilm/desktop
++
++## 0.2.2
++
++### Patch Changes
++
++- [#110](https://github.com/openfilm/openfilm/pull/110) [`7d35283`](https://github.com/openfilm/openfilm/commit/7d352837b96754793d7c2e7c1d129656a29cfdba) Thanks [@PazChen](https://github.com/PazChen)! - Desktop: agents work for people who installed only the maker's app: Claude Code and OpenCode from inside their apps, and an Install button that runs the official installer for the others. The Cursor editor is never started in place of Cursor's agent.
++
++- [#97](https://github.com/openfilm/openfilm/pull/97) [`6dd91c4`](https://github.com/openfilm/openfilm/commit/6dd91c4f22fc36788b754f5423a39e11a217e4c2) Thanks [@taavie-z](https://github.com/taavie-z)! - Keep desktop agent names and installation links in one list so Chat and installation discovery stay consistent, preserving existing agent behavior.
++
++- [#106](https://github.com/openfilm/openfilm/pull/106) [`3582b88`](https://github.com/openfilm/openfilm/commit/3582b88e75099d0f9af9f927d5ae042826f5e88b) Thanks [@taavie-z](https://github.com/taavie-z)! - Keep Final Cut Pro subtitles white with a black outline and a soft shadow. Correct Basic Title font scaling so subtitle size stays proportional in low-resolution, 4K and portrait sequences.
++
++- [#100](https://github.com/openfilm/openfilm/pull/100) [`0a528f3`](https://github.com/openfilm/openfilm/commit/0a528f303dae5f6cb9de2d4d15bff971f3f36297) Thanks [@PazChen](https://github.com/PazChen)! - Desktop: when the app's own agent tries a model service again after waiting, the chat says so.
++
++- [#109](https://github.com/openfilm/openfilm/pull/109) [`5f8b70f`](https://github.com/openfilm/openfilm/commit/5f8b70f8a453dc10fe3c86dd103c420473051fab) Thanks [@PazChen](https://github.com/PazChen)! - On macOS, an update that is ready now installs when you quit even if you open OpenFilm again right away. Opened while the update is still being installed, OpenFilm waits for the install to finish and then opens as the new version. If an install did not happen, the next launch installs it in a small window that says so, then opens as the new version. The update notice says what happens when you quit.
++
++- [#109](https://github.com/openfilm/openfilm/pull/109) [`5f8b70f`](https://github.com/openfilm/openfilm/commit/5f8b70f8a453dc10fe3c86dd103c420473051fab) Thanks [@PazChen](https://github.com/PazChen)! - Desktop on Windows: agents start again. The variables read from the registry are expanded as Windows does (REG_EXPAND_SZ ones only) before they are handed on, so Codex finds `cmd.exe` through `ComSpec`.
++
++- Updated dependencies [[`7d35283`](https://github.com/openfilm/openfilm/commit/7d352837b96754793d7c2e7c1d129656a29cfdba), [`f771d05`](https://github.com/openfilm/openfilm/commit/f771d053d31ef28fd0c21ce1ca5e848a632b2954), [`3582b88`](https://github.com/openfilm/openfilm/commit/3582b88e75099d0f9af9f927d5ae042826f5e88b), [`7192264`](https://github.com/openfilm/openfilm/commit/71922644da5d6b67db2cc796d4e057f98999944f), [`bc1ae78`](https://github.com/openfilm/openfilm/commit/bc1ae787dda20a9a7fe3e5b6d3f9aba8863cc2fc), [`94ea4c8`](https://github.com/openfilm/openfilm/commit/94ea4c8237f933866e9ef5a7b41bdca4e64db4e2), [`5f8b70f`](https://github.com/openfilm/openfilm/commit/5f8b70f8a453dc10fe3c86dd103c420473051fab)]:
++  - openfilm@0.2.2
+ 
+ ## 0.2.1
+ 
+--- old/apps/desktop/package.json
++++ new/apps/desktop/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "@openfilm/desktop",
+-  "version": "0.2.1",
++  "version": "0.2.2",
+   "private": true,
+   "type": "module",
+   "productName": "OpenFilm",
+--- old/apps/desktop/shell/bridge.ts
++++ new/apps/desktop/shell/bridge.ts
+@@ -34,6 +34,7 @@
+   prefs: { get(): Promise<AppPrefs>; set(next: Partial<AppPrefs>): Promise<unknown>; onChange(listener: Listener<AppPrefs>): Stop };
+   saveLayout(layout: { chatOpen: boolean; chatWidth: number }): void;
+   setTheme(theme: Theme): void;
++  setLanguage(language: string): void;
+   onFullScreen(listener: Listener<boolean>): Stop;
+   onToggleChat(listener: Listener<void>): Stop;
+   onOpenSettings(listener: Listener<void>): Stop;
+@@ -127,6 +128,9 @@
+ /* the window behind the page, and the system's menus and dialogs, take the same theme */
+ native.setTheme(theme.get());
+ theme.on((next) => native.setTheme(next));
++/* and the app keeps the language, for the window it shows before the page (an update installed at launch) */
++native.setLanguage(language.get());
++language.on((next) => native.setLanguage(next));
+ 
+ /* ── the project Studio shows (its address, /projects/<id>) ── */
+ const project = signal<Project | null>(null);
+--- old/apps/desktop/src/agent-installation.mjs
++++ new/apps/desktop/src/agent-installation.mjs
+@@ -21,69 +21,128 @@
+   claude: { names: ['claude'] },
+   codex: { names: ['codex'] },
+   copilot: { names: ['copilot'] },
+-  /* Cursor's installer names it `agent`, and `cursor-agent` as before; a program called `agent` counts only when it is
+-     Cursor's (its own folder is cursor-agent), as other tools are called that too */
+-  cursor: { names: ['cursor-agent', 'agent'], ours: (file, name) => name === 'cursor-agent' || inCursorFolder(file) },
++  /* Cursor's installer names it `agent`, and `cursor-agent` as before; either counts only in Cursor's own folder
++     (notTheAgent), as other tools are called `agent` too. On Windows that folder is %LOCALAPPDATA%\cursor-agent */
++  cursor: { names: ['cursor-agent', 'agent'], dirs: (home, win) => (win ? [join(localAppData(home), 'cursor-agent')] : []) },
+   opencode: { names: ['opencode'], dirs: (home) => [join(home, '.opencode', 'bin')] },
+-  codebuddy: { names: ['codebuddy', 'cbc'] },
+-  qwen: { names: ['qwen'] },
++  /* CodeBuddy's own installer keeps it in %LOCALAPPDATA%\codebuddy\bin on Windows */
++  codebuddy: { names: ['codebuddy', 'cbc'], dirs: (home, win) => (win ? [join(localAppData(home), 'codebuddy', 'bin')] : []) },
++  /* Qwen Code's own installer keeps it in %LOCALAPPDATA%\qwen-code\bin on Windows */
++  qwen: { names: ['qwen'], dirs: (home, win) => (win ? [join(localAppData(home), 'qwen-code', 'bin')] : []) },
+   /* Kimi Code's own installer keeps it in ~/.kimi-code/bin; kimi-cli (uv) puts it in ~/.local/bin */
+   kimi: { names: ['kimi'], dirs: (home) => [join(home, '.kimi-code', 'bin')] },
+   /* MiniMax Code's own installer keeps it in ~/.minimax-code/bin */
+   minimax: { names: ['mcode'], dirs: (home) => [join(home, '.minimax-code', 'bin')] },
+ });
+ 
+-/** Whether a program is the one in Cursor's own folder (…/cursor-agent/…), followed through its link. */
++/** %LOCALAPPDATA% (Windows). */
++const localAppData = (home) => process.env.LOCALAPPDATA || join(home, 'AppData', 'Local');
++
++/**
++ * Whether a program is in Cursor's own folder (…/cursor-agent/…, or Homebrew's cursor-cli), followed through its link.
++ */
+ export function inCursorFolder(file) {
+   let real = file;
+   try { real = realpathSync(file); } catch { /* as it is */ }
+-  return /[\\/]cursor-agent[\\/]/i.test(real);
++  return /[\\/](?:cursor-agent|Caskroom[\\/]cursor-cli)[\\/]/i.test(real);
++}
++
++/**
++ * Where editors keep their own launchers, never an agent: VS Code, Cursor and the like keep their command (`code`,
++ * `cursor`) in resources/app/bin (inside the .app on a Mac). The Windows .cmd there runs resources/app/out/cli.js,
++ * which opens the editor with whatever it is given as files to open.
++ */
++const LAUNCHERS = [
++  /[\\/]resources[\\/]app[\\/]bin[\\/]/i,
++  /[\\/]app[\\/]out[\\/]cli\.js$/i,
++  /[\\/]Programs[\\/]cursor[\\/]/i,
++  /[\\/](?:Microsoft VS Code|Visual Studio Code)[^\\/]*[\\/]/i,
++];
++
++/**
++ * Why a program found or chosen for an agent is not the agent, or null: `app`, an editor's or a desktop app's own
++ * launcher (on Windows, a window program too); `not-cursor-agent`, one for Cursor outside Cursor's own folder.
++ * `chosen`: what the person chose, when `file` is what it runs.
++ * @returns {'app' | 'not-cursor-agent' | null}
++ */
++export function notTheAgent(id, file, { chosen = null, win = windows } = {}) {
++  const real = (p) => { try { return realpathSync(p); } catch { return p; } };
++  const paths = [file, real(file), ...(chosen ? [chosen, real(chosen)] : [])];
++  if (paths.some((p) => LAUNCHERS.some((re) => re.test(p)))) return 'app';
++  if (win && /\.exe$/i.test(file) && exeSubsystem(real(file)) === WINDOW_SUBSYSTEM) return 'app';
++  if (id === 'cursor' && !inCursorFolder(file)) return 'not-cursor-agent';
++  return null;
+ }
+ 
+ export function executableFile(path) {
+   try { accessSync(path, constants.X_OK); return statSync(path).isFile(); } catch { return false; }
+ }
+ 
+-/**
+- * Whether a file is a Windows program for the console, by its header and without starting it: a window program (a
+- * desktop app's own, as `app\Codex.exe` in the Codex Store app is) would open its window, and answers nothing.
+- */
+-export function consoleProgram(path) {
++/* a Windows program's subsystem: 3 is the console, 2 a window */
++const CONSOLE_SUBSYSTEM = 3;
++const WINDOW_SUBSYSTEM = 2;
++
++/** A Windows program's subsystem, read from its header without starting it; null when it is not one or can't be read. */
++function exeSubsystem(path) {
+   let fd;
+   try {
+     fd = openSync(path, 'r');
+     const head = Buffer.alloc(4096);
+     const read = readSync(fd, head, 0, head.length, 0);
+-    if (read < 64 || head.toString('latin1', 0, 2) !== 'MZ') return false;
++    if (read < 64 || head.toString('latin1', 0, 2) !== 'MZ') return null;
+     const pe = head.readUInt32LE(0x3c);
+-    /* the subsystem sits at the same place in 32- and 64-bit headers: 3 is the console, 2 a window */
+-    if (pe + 0x5e > read || head.toString('latin1', pe, pe + 4) !== 'PE\0\0') return false;
+-    return head.readUInt16LE(pe + 0x5c) === 3;
++    /* the subsystem sits at the same place in 32- and 64-bit headers */
++    if (pe + 0x5e > read || head.toString('latin1', pe, pe + 4) !== 'PE\0\0') return null;
++    return head.readUInt16LE(pe + 0x5c);
+   } catch {
+-    return false;
++    return null;
+   } finally {
+     if (fd !== undefined) closeSync(fd);
+   }
+ }
+ 
+ /**
+- * Claude Code as the Claude app keeps it: one folder per version under Application Support, newest first, the program
+- * either straight inside (`<version>/claude.app`) or one folder down (`<version>/<build>/claude.app`, newer apps).
+- */
+-export function claudeAppCli(home = homedir()) {
+-  const root = join(home, 'Library/Application Support/Claude/claude-code');
++ * Whether a file is a Windows program for the console, by its header and without starting it: a window program (a
++ * desktop app's own, as `app\Codex.exe` in the Codex Store app is) would open its window, and answers nothing.
++ */
++export function consoleProgram(path) {
++  return exeSubsystem(path) === CONSOLE_SUBSYSTEM;
++}
++
++/**
++ * Claude Code as the Claude app keeps it: one folder per version, newest first, the program either straight inside
++ * (`<version>/claude.app`) or one folder down (`<version>/<build>/claude.app`, newer apps). On a Mac under
++ * Application Support; on Windows `claude.exe` under %APPDATA%\Claude, or the same folder of the app from the
++ * Microsoft Store (its own copy of %APPDATA% under Packages\Claude_…): the newest of them.
++ */
++export function claudeAppCli(home = homedir(), { win = windows } = {}) {
++  const program = win ? 'claude.exe' : 'claude.app/Contents/MacOS/claude';
++  const usable = win ? existsFile : executableFile;
+   const inside = (dir) => {
+-    const direct = join(dir, 'claude.app/Contents/MacOS/claude');
+-    if (executableFile(direct)) return direct;
++    const direct = join(dir, program);
++    if (usable(direct)) return direct;
+     let builds = [];
+     try { builds = readdirSync(dir, { withFileTypes: true }).filter((d) => d.isDirectory() && d.name !== 'claude.app').map((d) => d.name); } catch { return null; }
+-    return builds.map((b) => join(dir, b, 'claude.app/Contents/MacOS/claude')).find(executableFile) ?? null;
++    return builds.map((b) => join(dir, b, program)).find(usable) ?? null;
+   };
+-  try {
+-    return readdirSync(root).filter((v) => /^\d+(\.\d+)*$/.test(v))
+-      .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
+-      .map((v) => inside(join(root, v))).find(Boolean) ?? null;
+-  } catch { return null; /* the Claude app has not downloaded Claude Code */ }
++  const found = [];
++  for (const root of claudeAppRoots(home, win)) {
++    let versions = [];
++    try { versions = readdirSync(root).filter((v) => /^\d+(\.\d+)*$/.test(v)); } catch { continue; /* the Claude app has not downloaded Claude Code */ }
++    for (const version of versions) found.push({ version, root });
++  }
++  return found.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }))
++    .map(({ version, root }) => inside(join(root, version))).find(Boolean) ?? null;
++}
++
++/** Where the Claude app keeps Claude Code's versions. */
++function claudeAppRoots(home, win) {
++  if (!win) return [join(home, 'Library/Application Support/Claude/claude-code')];
++  const appData = process.env.APPDATA || join(home, 'AppData', 'Roaming');
++  const packages = join(localAppData(home), 'Packages');
++  let store = [];
++  try { store = readdirSync(packages).filter((d) => /^Claude_/i.test(d)).map((d) => join(packages, d, 'LocalCache', 'Roaming', 'Claude', 'claude-code')); } catch { /* none */ }
++  return [join(appData, 'Claude', 'claude-code'), ...store];
+ }
+ 
+ /**
+@@ -104,11 +163,11 @@
+   return real.split(/[\\/]/).reverse().find((part) => /^\d+\.\d+\.\d+$/.test(part)) ?? null;
+ }
+ 
+-/** What versions of Codex said of themselves (`codex --version`), by program and its time: each asked once. */
+-const codexAsked = new Map();
+-
+-/** What a Codex program says its version is (`codex-cli 0.163.0`); null when it says nothing in two seconds. */
+-function askCodexVersion(/** @type {string} */ file) {
++/** What programs said of their version (`--version`), by program and its time: each asked once. */
++const versionsAsked = new Map();
++
++/** What a program says its version is (`codex-cli 0.163.0`, `opencode v2.0.24`); null when it says nothing in two seconds. */
++function askVersion(/** @type {string} */ file) {
+   /* a `.cmd` shim cannot be started without a shell; npm's says its version in its package.json anyway */
+   if (/\.(cmd|bat)$/i.test(file)) return null;
+   try {
+@@ -120,26 +179,49 @@
+ }
+ 
+ /**
+- * Which Codex a program is: npm's says it in its package.json (`@openai/codex`, or the platform package its program
+- * is in), Homebrew's folder is named for it (`Caskroom/codex/0.163.0/…`); a copy inside an app (Codex.app,
+- * ChatGPT.app, a Store app) says it when asked (`--version`), once. Null when it can't be told.
+- * @param {string} file @param {{ ask?: (file: string) => string | null }} [o]
+- */
+-export function codexVersion(file, { ask = askCodexVersion } = {}) {
++ * Which version a program is: npm's says it in its package.json (`ours`: the package's names), a folder can be named
++ * for it (Homebrew's `Caskroom/codex/0.163.0/…`), an app can keep it in a file beside it (`opencode-cli.version`);
++ * else it says when asked (`--version`), once. Null when it can't be told.
++ * @param {string} file @param {{ ours: (name: string) => boolean, ask: (file: string) => string | null }} o
++ */
++function programVersion(file, { ours, ask }) {
+   let real;
+   try { real = realpathSync(file); } catch { return null; }
+   for (let dir = dirname(real), up = 0; up < 6; dir = dirname(dir), up += 1) {
+     try {
+       const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+-      if (typeof pkg.name === 'string' && pkg.name.startsWith('@openai/codex') && typeof pkg.version === 'string') return pkg.version.replace(/-.*$/, '');
++      if (typeof pkg.name === 'string' && ours(pkg.name) && typeof pkg.version === 'string') return pkg.version.replace(/-.*$/, '');
+     } catch { /* not here */ }
+   }
+   const named = real.split(/[\\/]/).reverse().find((part) => /^\d+\.\d+\.\d+$/.test(part));
+   if (named) return named;
++  try {
++    const beside = readFileSync(`${real}.version`, 'utf8').trim();
++    if (/^\d+\.\d+\.\d+$/.test(beside)) return beside;
++  } catch { /* none */ }
+   let key;
+   try { key = `${real}\0${statSync(real).mtimeMs}`; } catch { return null; }
+-  if (!codexAsked.has(key)) codexAsked.set(key, ask(real));
+-  return codexAsked.get(key) ?? null;
++  if (!versionsAsked.has(key)) versionsAsked.set(key, ask(real));
++  return versionsAsked.get(key) ?? null;
++}
++
++/**
++ * Which Codex a program is: npm's says it in its package.json (`@openai/codex`, or the platform package its program
++ * is in), Homebrew's folder is named for it (`Caskroom/codex/0.163.0/…`); a copy inside an app (Codex.app,
++ * ChatGPT.app, a Store app) says it when asked (`--version`), once. Null when it can't be told.
++ * @param {string} file @param {{ ask?: (file: string) => string | null }} [o]
++ */
++export function codexVersion(file, { ask = askVersion } = {}) {
++  return programVersion(file, { ours: (name) => name.startsWith('@openai/codex'), ask });
++}
++
++/**
++ * Which OpenCode a program is: npm's package (`opencode-ai`, or its platform package), Homebrew's folder, the file
++ * OpenCode.app keeps beside its copy (`opencode-cli.version`), else what it says when asked.
++ * @param {string} file @param {{ ask?: (file: string) => string | null }} [o]
++ */
++export function opencodeVersion(file, { ask = askVersion } = {}) {
++  return programVersion(file, { ours: (name) => name === 'opencode-ai' || name.startsWith('opencode-'), ask });
+ }
+ 
+ /** Whether version `a` is later than `b` (dotted numbers); false when either is unknown. */
+@@ -223,12 +305,17 @@
+  * What a `.cmd` shim runs (Windows): the package's script or program, which can be started without a shell (a `.cmd`
+  * cannot be). Yarn's shim runs another shim, which is read in turn. Codex's script only starts its own program, so
+  * the program itself, for this machine's chip; when there is none, not the script (the chat starts Codex as a shell
+- * command, which a script is not): the shim it came from instead. Null when the shim says nothing that is there.
++ * command, which a script is not): the shim it came from instead. Null when the shim says nothing that is there, or
++ * runs a Node of the package's own.
+  */
+ export function cmdTarget(cmd, depth = 0) {
+   let text = '';
+   try { text = readFileSync(cmd, 'utf8'); } catch { return null; }
+-  const rels = [...new Set([...text.matchAll(SHIM_TARGET)].map((m) => m[1]))]
++  const named = [...new Set([...text.matchAll(SHIM_TARGET)].map((m) => m[1]))];
++  /* a package that runs on a Node of its own (Cursor's agent: its native parts are built for it), not one npm may put
++     beside the shim: the shim itself, which starts that Node */
++  if (named.some((rel) => /[\\/]node\.exe$/i.test(rel))) return null;
++  const rels = named
+     .filter((rel) => !/(?:^|[\\/])node\.exe$/i.test(rel))
+     .sort((a, b) => scriptFirst(a) - scriptFirst(b));
+   for (const rel of rels) {
+@@ -271,6 +358,14 @@
+   return applicationDirs.flatMap((dir) => ['Codex.app', 'ChatGPT.app'].flatMap((app) => CODEX_IN_APP.map((p) => join(dir, app, p)))).filter(executableFile);
+ }
+ 
++/* where OpenCode is inside OpenCode.app, its desktop app (macOS) */
++const OPENCODE_IN_APP = 'Contents/Resources/opencode-cli';
++
++/** The copies of OpenCode inside OpenCode.app in these folders. */
++function opencodeInApps(/** @type {string[]} */ applicationDirs) {
++  return applicationDirs.map((dir) => join(dir, 'OpenCode.app', OPENCODE_IN_APP)).filter(executableFile);
++}
++
+ /**
+  * The program the person chose for an agent, as it can be started: a `.cmd` shim's target, the `.cmd` beside a
+  * PowerShell shim (`.ps1`), the program inside a folder or an app chosen instead of it. Null when it is not there.
+@@ -280,7 +375,7 @@
+   let folder = false;
+   try { folder = statSync(path).isDirectory(); } catch { /* a file, or not there */ }
+   if (folder) {
+-    const inApp = /\.app$/i.test(path) ? [...CODEX_IN_APP, ...names.map((n) => `Contents/MacOS/${n}`)].map((p) => join(path, p)).find(executableFile) : null;
++    const inApp = /\.app$/i.test(path) ? [...CODEX_IN_APP, OPENCODE_IN_APP, ...names.map((n) => `Contents/MacOS/${n}`)].map((p) => join(path, p)).find(executableFile) : null;
+     return inApp ?? names.map((n) => findExecutable(n, [path, join(path, 'bin')], { PATH: '' }, { win })).find(Boolean) ?? null;
+   }
+   if (win) {
+@@ -296,59 +391,126 @@
+ 
+ /**
+  * The command line program, or the copy inside the maker's own desktop app (many people only ever installed the
+- * app): Codex ships inside Codex.app and ChatGPT.app; the Claude app keeps Claude Code under Application Support, one
+- * folder per version, the newest used. `chosen`: the program the person chose, first. `others`: programs found some
+- * other way (a Store app's own copy, agents.mjs), after the rest. `source` says which it is: chosen · path · app.
++ * app): Codex ships inside Codex.app and ChatGPT.app, OpenCode inside OpenCode.app; the Claude app keeps Claude Code
++ * in its own folder, one folder per version, the newest used. `chosen`: the program the person chose, first.
++ * `others`: programs found some other way (a Store app's own copy, agents.mjs), after the rest. `source` says which it
++ * is: chosen · path · app. An editor's or a desktop app's own launcher is never taken for the agent (notTheAgent).
+  */
+ export function detectAgentInstallation(id, { home = homedir(), env = process.env, pathDirs = HOME_BIN_CANDIDATES(home),
+-  applicationDirs = ['/Applications', join(home, 'Applications')], chosen = null, others = [], win = windows, codexVersionOf = codexVersion } = {}) {
++  applicationDirs = ['/Applications', join(home, 'Applications')], chosen = null, others = [], win = windows, codexVersionOf = codexVersion,
++  opencodeVersionOf = opencodeVersion } = {}) {
+   const program = AGENT_PROGRAMS[id] ?? { names: [id] };
+   const install = AGENT_DOWNLOADS[id] ?? null;
+   const picked = chosen ? chosenProgram(chosen, { names: program.names, win }) : null;
+-  if (picked) return { installed: true, cli: picked, source: 'chosen', install };
+-  const dirs = [...pathDirs, ...(program.dirs?.(home) ?? [])];
++  if (picked && !notTheAgent(id, picked, { chosen, win })) return { installed: true, cli: picked, source: 'chosen', install };
++  const dirs = [...pathDirs, ...(program.dirs?.(home, win) ?? [])];
+   let cli = null;
+   for (const name of program.names) {
+     if (cli) break;
+-    if (!program.ours) { cli = findExecutable(name, dirs, env, { win }); continue; }
+-    /* each folder in turn: another program by that name earlier on the PATH does not hide the agent's */
++    /* each folder in turn: a program by that name that is not the agent (an editor's launcher, another tool's
++       `agent`) does not hide the agent's own in a later folder */
+     for (const dir of unique([...pathIn(env).split(win ? ';' : delimiter), ...dirs], win)) {
+       const file = findExecutable(name, [dir], { PATH: '' }, { win });
+-      if (file && program.ours(file, name)) { cli = file; break; }
+-    }
+-  }
++      if (file && !notTheAgent(id, file, { win })) { cli = file; break; }
++    }
++  }
++  const usable = (file) => (win ? presentFile(file) : executableFile(file));
++  /* copies kept up to date by the maker's app (Codex: or a Store app), and how their version is told */
++  const copies = id === 'codex' ? [...codexInApps(applicationDirs), ...others.filter(usable)] : id === 'opencode' ? opencodeInApps(applicationDirs) : [];
++  const versionOf = id === 'opencode' ? opencodeVersionOf : codexVersionOf;
+   if (cli) {
+     /* Claude Code both on the PATH (an npm install that is never updated, say) and in the Claude app, which keeps its
+        own up to date: the later one, whose models are the current ones. One whose version can't be told stays. */
+-    const inApp = id === 'claude' ? claudeAppCli(home) : null;
++    const inApp = id === 'claude' ? claudeAppCli(home, { win }) : null;
+     if (inApp && laterVersion(claudeVersion(inApp), claudeVersion(cli))) return { installed: true, cli: inApp, source: 'app', install };
+-    /* Codex the same: one installed by npm long ago beside the copy in Codex.app, ChatGPT.app or a Store app, which
+-       keep theirs up to date. Its models are the ones its version is offered, so the later one is used */
+-    if (id === 'codex') {
+-      const copies = [...codexInApps(applicationDirs), ...others.filter((file) => (win ? presentFile(file) : executableFile(file)))];
+-      const mine = copies.length ? codexVersionOf(cli) : null;
+-      let newest = null;
+-      for (const copy of copies) {
+-        const version = codexVersionOf(copy);
+-        if (laterVersion(version, newest?.version ?? mine)) newest = { copy, version };
+-      }
+-      if (newest) return { installed: true, cli: newest.copy, source: 'app', install };
+-    }
++    /* Codex and OpenCode the same: one installed long ago beside the copy in their app (Codex: or a Store app), which
++       keeps its own up to date. Its models are the ones its version is offered, so the later one is used */
++    const mine = copies.length ? versionOf(cli) : null;
++    let newest = null;
++    for (const copy of copies) {
++      const version = versionOf(copy);
++      if (laterVersion(version, newest?.version ?? mine)) newest = { copy, version };
++    }
++    if (newest) return { installed: true, cli: newest.copy, source: 'app', install };
+     return { installed: true, cli, source: 'path', install };
+   }
+-  if (id === 'codex') cli = codexInApps(applicationDirs)[0] ?? null;
+-  if (!cli && id === 'claude') cli = claudeAppCli(home);
+-  if (!cli) cli = others.find((file) => (win ? presentFile(file) : executableFile(file))) ?? null;
++  cli = copies[0] ?? null;
++  if (!cli && id === 'claude') cli = claudeAppCli(home, { win });
++  if (!cli) cli = others.find(usable) ?? null;
+   return { installed: Boolean(cli), cli, source: cli ? 'app' : null, install };
+ }
+ 
+ /**
++ * The maker's desktop apps an agent's own program does not come with (an editor among them), by agent: their bundle on
++ * a Mac, and on Windows their folder (under %LOCALAPPDATA%\Programs, most of them); `name` is what the person knows
++ * them by. VS Code counts for GitHub Copilot only with its Copilot extension. Claude's: Claude Code comes once its
++ * Code tab is opened.
++ */
++const DESKTOP_APPS = {
++  claude: { name: 'Claude', mac: /^Claude\.app$/i, win: (local) => [join(local, 'AnthropicClaude'), ...folders(join(local, 'Packages'), /^Claude_/i)] },
++  copilot: { name: 'VS Code', mac: /^Visual Studio Code.*\.app$/i, win: (local) => folders(join(local, 'Programs'), /^Microsoft VS Code/i),
++    with: (home) => folders(join(home, '.vscode', 'extensions'), /^github\.copilot/i).length > 0 },
++  cursor: { name: 'Cursor', mac: /^Cursor\.app$/i, win: (local) => folders(join(local, 'Programs'), /^cursor$/i) },
++  codebuddy: { name: 'CodeBuddy', mac: /^CodeBuddy.*\.app$/i, win: (local) => folders(join(local, 'Programs'), /^CodeBuddy/i) },
++  kimi: { name: 'Kimi', mac: /^Kimi.*\.app$/i, win: (local) => folders(join(local, 'Programs'), /^Kimi/i) },
++  minimax: { name: 'MiniMax', mac: /^MiniMax.*\.app$/i, win: (local) => folders(join(local, 'Programs'), /^MiniMax/i) },
++};
++
++/** The folders in a folder whose names match. */
++function folders(dir, re) {
++  try { return readdirSync(dir, { withFileTypes: true }).filter((d) => d.isDirectory() && re.test(d.name)).map((d) => join(dir, d.name)); } catch { return []; }
++}
++
++/**
++ * The name of the maker's desktop app when it is installed (DESKTOP_APPS), or null: told from where it is, nothing
++ * started. For an agent whose own program is not found: the app is here, its command-line agent is not.
++ */
++export function desktopApp(id, { home = homedir(), applicationDirs = ['/Applications', join(home, 'Applications')], win = windows } = {}) {
++  const app = DESKTOP_APPS[id];
++  if (!app) return null;
++  const here = win
++    ? app.win(localAppData(home)).some((dir) => { try { return statSync(dir).isDirectory(); } catch { return false; } })
++    : applicationDirs.some((dir) => folders(dir, app.mac).length > 0);
++  return here && (!app.with || app.with(home)) ? app.name : null;
++}
++
++/**
++ * Each agent's official installer, as its maker's install page gives it, run in a terminal window the person sees
++ * once they agree to it: `sh` on a Mac (and Linux), `ps` in PowerShell on Windows. The others are installed from their
++ * install page (AGENT_DOWNLOADS).
++ */
++export const AGENT_INSTALLERS = Object.freeze({
++  /* cursor.com/docs/cli/installation */
++  cursor: { sh: 'curl https://cursor.com/install -fsS | bash', ps: "irm 'https://cursor.com/install?win32=true' | iex" },
++  /* docs.github.com/en/copilot/how-tos/set-up/install-copilot-cli */
++  copilot: { sh: 'curl -fsSL https://gh.io/copilot-install | bash', ps: 'winget install GitHub.Copilot' },
++  /* www.codebuddy.cn/docs/cli/installation */
++  codebuddy: { sh: 'curl -fsSL https://www.codebuddy.cn/cli/install.sh | bash', ps: 'irm https://www.codebuddy.cn/cli/install.ps1 | iex' },
++  /* github.com/QwenLM/qwen-code */
++  qwen: {
++    sh: 'curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash',
++    ps: 'irm https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.ps1 | iex',
++  },
++  /* www.kimi.com/code/docs/en/kimi-code-cli/guides/getting-started.html */
++  kimi: { sh: 'curl -fsSL https://code.kimi.com/kimi-code/install.sh | bash', ps: 'irm https://code.kimi.com/kimi-code/install.ps1 | iex' },
++  /* agent.minimax.io/docs/cli/quick-start */
++  minimax: { sh: 'curl -fsSL https://filecdn.minimax.chat/public/install.sh | bash', ps: 'irm https://filecdn.minimax.chat/public/install.ps1 | iex' },
++});
++
++/** The command that installs an agent on this system (AGENT_INSTALLERS), or null when it has none. */
++export function installCommand(id, { win = windows } = {}) {
++  const installer = AGENT_INSTALLERS[id];
++  return installer ? (win ? installer.ps : installer.sh) : null;
++}
++
++/**
+  * For a person whose agent is not found, what was looked at: every folder searched, and each file there with one of
+- * the agent's names (any suffix, a PowerShell shim too) with what it runs, if that can be told.
++ * the agent's names (any suffix, a PowerShell shim too) with what it runs, if that can be told, and why it is not the
++ * agent when it is not (`refused`, notTheAgent).
+  */
+ export function searchReport(id, { home = homedir(), env = process.env, pathDirs = HOME_BIN_CANDIDATES(home), win = windows } = {}) {
+   const program = AGENT_PROGRAMS[id] ?? { names: [id] };
+-  const searched = unique([...pathIn(env).split(win ? ';' : delimiter), ...pathDirs, ...(program.dirs?.(home) ?? [])], win);
++  const searched = unique([...pathIn(env).split(win ? ';' : delimiter), ...pathDirs, ...(program.dirs?.(home, win) ?? [])], win);
+   const files = [];
+   for (const dir of searched) {
+     for (const name of program.names) {
+@@ -356,7 +518,8 @@
+         const file = join(dir, name + suffix);
+         if (!presentFile(file)) continue;
+         const runs = isCmdScript(file) ? cmdTarget(file) : /\.ps1$/i.test(file) ? null : file;
+-        files.push({ file, runs, usable: win ? suffix !== '' && suffix !== '.ps1' : executableFile(file) });
++        const refused = runs ? notTheAgent(id, runs, { chosen: file, win }) : null;
++        files.push({ file, runs, usable: !refused && (win ? suffix !== '' && suffix !== '.ps1' : executableFile(file)), ...(refused ? { refused } : {}) });
+       }
+     }
+   }
+--- old/apps/desktop/src/agent-installation.test.mjs
++++ new/apps/desktop/src/agent-installation.test.mjs
+@@ -3,7 +3,7 @@
+ import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from 'node:fs';
+ import { tmpdir } from 'node:os';
+ import { join } from 'node:path';
+-import { chosenProgram, claudeAppCli, claudeVersion, cmdTarget, codexVersion, consoleProgram, detectAgentInstallation, findExecutable, laterVersion, searchReport, windowsBinDirs } from './agent-installation.mjs';
++import { AGENT_INSTALLERS, chosenProgram, claudeAppCli, claudeVersion, cmdTarget, codexVersion, consoleProgram, desktopApp, detectAgentInstallation, findExecutable, installCommand, laterVersion, notTheAgent, opencodeVersion, searchReport, windowsBinDirs } from './agent-installation.mjs';
+ 
+ test("an npm .cmd shim (Windows) runs its package's script: that is what gets started", () => {
+   const npm = mkdtempSync(join(tmpdir(), 'of-npm-'));
+@@ -19,11 +19,11 @@
+ test('Claude Code as the Claude app keeps it: straight in a version folder, or one build folder down; newest first', () => {
+   const home = mkdtempSync(join(tmpdir(), 'of-home-'));
+   const root = join(home, 'Library/Application Support/Claude/claude-code');
+-  assert.equal(claudeAppCli(home), null);
++  assert.equal(claudeAppCli(home, { win: false }), null);
+   const old = join(root, '2.1.9', 'claude.app/Contents/MacOS/claude');
+   const recent = join(root, '2.1.10', 'f2326db61802', 'claude.app/Contents/MacOS/claude');
+   for (const file of [old, recent]) { mkdirSync(join(file, '..'), { recursive: true }); writeFileSync(file, '', { mode: 0o755 }); }
+-  assert.equal(claudeAppCli(home), recent);
++  assert.equal(claudeAppCli(home, { win: false }), recent);
+ });
+ 
+ test("an agent is found by any of its names, and in its own installer's folder off the PATH (Kimi Code's ~/.kimi-code/bin)", () => {
+@@ -184,7 +184,8 @@
+   put(join(npm, 'qwen.cmd'), npmShim('node_modules\\@qwen-code\\qwen-code\\cli.js'));
+   put(join(npm, 'qwen.ps1'), '');
+   const report = searchReport('qwen', { home, env: { PATH: `${npm};${npm.toUpperCase()}` }, pathDirs: [join(home, 'other')], win: true });
+-  assert.deepEqual(report.searched, [npm, join(home, 'other')], 'each folder once, whatever its case');
++  const own = join(process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'), 'qwen-code', 'bin');
++  assert.deepEqual(report.searched, [npm, join(home, 'other'), own], 'each folder once, whatever its case, its own installer\'s last');
+   assert.deepEqual(report.files, [
+     { file: join(npm, 'qwen'), runs: join(npm, 'qwen'), usable: false },
+     { file: join(npm, 'qwen.cmd'), runs: script, usable: true },
+@@ -282,3 +283,164 @@
+   symlinkSync(real, join(bin, 'cursor-agent'));
+   assert.equal(detectAgentInstallation('cursor', { home, env: { PATH: '' }, pathDirs: [bin] }).cli, join(bin, 'cursor-agent'));
+ });
++
++/* the .cmd an editor keeps in resources\app\bin (Windows): it runs the editor with Node, its arguments files to open */
++const editorShim = (exe) => `@echo off\r\nsetlocal\r\nset ELECTRON_RUN_AS_NODE=1\r\n"%~dp0..\\..\\..\\${exe}" "%~dp0..\\out\\cli.js" %*\r\nendlocal\r\n`;
++
++test("an editor's own launcher is never taken for an agent: a .cmd running its out/cli.js, or anything in its resources/app/bin", () => {
++  const home = mkdtempSync(join(tmpdir(), 'of-home-'));
++  /* the Cursor editor on Windows, its launcher picked or found as Cursor's agent */
++  const root = join(home, 'AppData', 'Local', 'Programs', 'cursor');
++  const cli = put(join(root, 'resources', 'app', 'out', 'cli.js'));
++  const bin = join(root, 'resources', 'app', 'bin');
++  const cursorCmd = put(join(bin, 'cursor.cmd'), editorShim('Cursor.exe'));
++  assert.equal(chosenProgram(cursorCmd, { names: ['cursor-agent', 'agent'], win: true }), cli, 'what the shim runs: the editor');
++  assert.equal(notTheAgent('cursor', cli, { chosen: cursorCmd, win: true }), 'app');
++  assert.equal(detectAgentInstallation('cursor', { home, env: { PATH: '' }, pathDirs: [], applicationDirs: [], chosen: cursorCmd, win: true }).cli, null,
++    'a launcher chosen before is not used');
++  /* one named like the agent in an editor's bin folder is not it either */
++  put(join(bin, 'agent.cmd'), editorShim('Cursor.exe'));
++  assert.equal(detectAgentInstallation('cursor', { home, env: { PATH: bin }, pathDirs: [], applicationDirs: [], win: true }).cli, null);
++  /* VS Code's own `code` launcher on Windows, under Microsoft VS Code */
++  const code = put(join(home, 'AppData', 'Local', 'Programs', 'Microsoft VS Code', 'bin', 'copilot.cmd'), '@echo off\r\n');
++  assert.equal(notTheAgent('copilot', code, { win: true }), 'app');
++  /* a program of the agent's own is never refused */
++  const npm = join(home, 'npm');
++  const script = put(join(npm, 'node_modules', '@github', 'copilot', 'npm-loader.js'));
++  put(join(npm, 'copilot.cmd'), npmShim('node_modules\\@github\\copilot\\npm-loader.js'));
++  assert.equal(notTheAgent('copilot', script, { chosen: join(npm, 'copilot.cmd'), win: true }), null);
++});
++
++test("on a Mac an editor's launcher in its app, or linked from a bin folder, is skipped for the agent's own further on", () => {
++  if (process.platform === 'win32') return;
++  const home = mkdtempSync(join(tmpdir(), 'of-home-'));
++  const inApp = put(join(home, 'Applications', 'Visual Studio Code.app', 'Contents', 'Resources', 'app', 'bin', 'copilot'), '', 0o755);
++  const linked = join(home, 'linked');
++  mkdirSync(linked);
++  symlinkSync(inApp, join(linked, 'copilot'));
++  const mine = put(join(home, '.local', 'bin', 'copilot'), '', 0o755);
++  const opts = { home, env: { PATH: [join(inApp, '..'), linked].join(':') }, pathDirs: [join(home, '.local', 'bin')], applicationDirs: [] };
++  assert.equal(notTheAgent('copilot', join(linked, 'copilot')), 'app', 'followed through its link');
++  assert.equal(detectAgentInstallation('copilot', opts).cli, mine);
++  assert.equal(detectAgentInstallation('copilot', { ...opts, chosen: join(linked, 'copilot') }).cli, mine, 'chosen, and refused');
++});
++
++test('on Windows a window program (a desktop app) is never an agent; one whose header cannot be read still is', () => {
++  const dir = mkdtempSync(join(tmpdir(), 'of-pe-'));
++  const app = join(dir, 'app');
++  mkdirSync(app);
++  writeFileSync(join(app, 'kimi.exe'), peProgram(2));
++  assert.equal(notTheAgent('kimi', join(app, 'kimi.exe'), { win: true }), 'app');
++  const home = mkdtempSync(join(tmpdir(), 'of-home-'));
++  assert.equal(detectAgentInstallation('kimi', { home, env: { PATH: app }, pathDirs: [], applicationDirs: [], win: true }).cli, null);
++  const cli = join(dir, 'cli');
++  mkdirSync(cli);
++  writeFileSync(join(cli, 'kimi.exe'), peProgram(3));
++  assert.equal(detectAgentInstallation('kimi', { home, env: { PATH: `${app};${cli}` }, pathDirs: [], applicationDirs: [], win: true }).cli, join(cli, 'kimi.exe'));
++  /* a Store app's command cannot be read as a file: it is not refused for that */
++  writeFileSync(join(dir, 'codex.exe'), '');
++  assert.equal(notTheAgent('codex', join(dir, 'codex.exe'), { win: true }), null);
++});
++
++test("Cursor's agent counts only in its own folder (or Homebrew's cursor-cli), whatever it is called", () => {
++  if (process.platform === 'win32') return;
++  const home = mkdtempSync(join(tmpdir(), 'of-home-'));
++  const stray = put(join(home, 'bin', 'cursor-agent'), '', 0o755);
++  assert.equal(notTheAgent('cursor', stray), 'not-cursor-agent');
++  assert.equal(detectAgentInstallation('cursor', { home, env: { PATH: '' }, pathDirs: [join(home, 'bin')], applicationDirs: [] }).cli, null);
++  const brew = put(join(home, 'Caskroom', 'cursor-cli', '2026.10.16-e3cb207', 'dist-package', 'cursor-agent'), '', 0o755);
++  const links = join(home, 'brew-bin');
++  mkdirSync(links);
++  symlinkSync(brew, join(links, 'cursor-agent'));
++  assert.equal(detectAgentInstallation('cursor', { home, env: { PATH: '' }, pathDirs: [join(home, 'bin'), links], applicationDirs: [] }).cli, join(links, 'cursor-agent'));
++});
++
++test("Cursor's agent on Windows: found in %LOCALAPPDATA%\\cursor-agent, started by its own shim, which runs its own Node", () => {
++  if (process.platform === 'win32') return;
++  const home = mkdtempSync(join(tmpdir(), 'of-home-'));
++  const root = join(home, 'AppData', 'Local', 'cursor-agent');
++  put(join(root, 'versions', '2026.10.16-e3cb207', 'index.js'));
++  put(join(root, 'versions', '2026.10.16-e3cb207', 'node.exe'));
++  const shim = put(join(root, 'agent.cmd'), '@echo off\r\n"%~dp0versions\\2026.10.16-e3cb207\\node.exe" "%~dp0versions\\2026.10.16-e3cb207\\index.js" %*\r\n');
++  assert.equal(cmdTarget(shim), null, 'never its script with another Node');
++  assert.equal(detectAgentInstallation('cursor', { home, env: { PATH: '' }, pathDirs: [], applicationDirs: [], win: true }).cli, shim);
++});
++
++test('Claude Code in the Claude app on Windows: under %APPDATA%\\Claude, or the Store app\'s own copy of it; the newest', () => {
++  if (process.platform === 'win32') return;
++  const home = mkdtempSync(join(tmpdir(), 'of-home-'));
++  assert.equal(claudeAppCli(home, { win: true }), null);
++  const roaming = put(join(home, 'AppData', 'Roaming', 'Claude', 'claude-code', '2.1.290', 'claude.exe'));
++  assert.equal(claudeAppCli(home, { win: true }), roaming);
++  const store = put(join(home, 'AppData', 'Local', 'Packages', 'Claude_pzs8sxrjxfjjc', 'LocalCache', 'Roaming', 'Claude', 'claude-code', '2.1.300', 'b1', 'claude.exe'));
++  assert.equal(claudeAppCli(home, { win: true }), store);
++  assert.equal(claudeVersion(store), '2.1.300');
++  assert.deepEqual(detectAgentInstallation('claude', { home, env: { PATH: '' }, pathDirs: [], applicationDirs: [], win: true }).cli, store);
++});
++
++test("OpenCode inside OpenCode.app: used when it is the only one, or the later than the one on the PATH", () => {
++  if (process.platform === 'win32') return;
++  const home = mkdtempSync(join(tmpdir(), 'of-home-'));
++  const apps = join(home, 'Applications');
++  const inApp = put(join(apps, 'OpenCode.app', 'Contents', 'Resources', 'opencode-cli'), '', 0o755);
++  writeFileSync(`${inApp}.version`, '2.0.24\n');
++  assert.equal(opencodeVersion(inApp, { ask: () => assert.fail('read from the file beside it') }), '2.0.24');
++  const opts = { home, env: { PATH: '' }, pathDirs: [], applicationDirs: [apps] };
++  assert.deepEqual(detectAgentInstallation('opencode', opts), { installed: true, cli: inApp, source: 'app', install: 'https://opencode.ai/download' });
++  const bin = join(home, 'bin');
++  const onPath = put(join(bin, 'opencode'), '', 0o755);
++  const versions = (map) => (file) => map[file] ?? null;
++  assert.equal(detectAgentInstallation('opencode', { ...opts, pathDirs: [bin], opencodeVersionOf: versions({ [onPath]: '1.0.0', [inApp]: '2.0.24' }) }).cli, inApp);
++  assert.equal(detectAgentInstallation('opencode', { ...opts, pathDirs: [bin], opencodeVersionOf: versions({ [onPath]: '2.1.0', [inApp]: '2.0.24' }) }).cli, onPath);
++  assert.equal(chosenProgram(join(apps, 'OpenCode.app'), { names: ['opencode'] }), inApp, 'the app chosen: the OpenCode inside it');
++  /* npm's says it in its package.json */
++  const pkg = join(home, 'npm', 'node_modules', 'opencode-ai');
++  put(join(pkg, 'package.json'), JSON.stringify({ name: 'opencode-ai', version: '1.4.2' }));
++  assert.equal(opencodeVersion(put(join(pkg, 'bin', 'opencode'))), '1.4.2');
++});
++
++test("the maker's desktop app is told without its agent: by its bundle on a Mac, its folder on Windows; VS Code with Copilot only", () => {
++  const home = mkdtempSync(join(tmpdir(), 'of-home-'));
++  const apps = join(home, 'Applications');
++  const mac = { home, applicationDirs: [apps], win: false };
++  assert.equal(desktopApp('cursor', mac), null);
++  mkdirSync(join(apps, 'Cursor.app'), { recursive: true });
++  mkdirSync(join(apps, 'CodeBuddy CN.app'));
++  mkdirSync(join(apps, 'Visual Studio Code.app'));
++  assert.equal(desktopApp('cursor', mac), 'Cursor');
++  assert.equal(desktopApp('codebuddy', mac), 'CodeBuddy');
++  assert.equal(desktopApp('kimi', mac), null);
++  assert.equal(desktopApp('copilot', mac), null, 'VS Code without the Copilot extension');
++  mkdirSync(join(home, '.vscode', 'extensions', 'github.copilot-chat-0.30.0'), { recursive: true });
++  assert.equal(desktopApp('copilot', mac), 'VS Code');
++  assert.equal(desktopApp('qwen', mac), null, 'no desktop app');
++  if (process.platform === 'win32') return;
++  const win = { home, applicationDirs: [], win: true };
++  assert.equal(desktopApp('minimax', win), null);
++  mkdirSync(join(home, 'AppData', 'Local', 'Programs', 'MiniMax Agent'), { recursive: true });
++  assert.equal(desktopApp('minimax', win), 'MiniMax');
++  mkdirSync(join(home, 'AppData', 'Local', 'AnthropicClaude'), { recursive: true });
++  assert.equal(desktopApp('claude', win), 'Claude');
++});
++
++test("each official installer: the maker's command for this system, the others none", () => {
++  assert.equal(installCommand('cursor', { win: false }), 'curl https://cursor.com/install -fsS | bash');
++  assert.equal(installCommand('cursor', { win: true }), "irm 'https://cursor.com/install?win32=true' | iex");
++  assert.equal(installCommand('copilot', { win: true }), 'winget install GitHub.Copilot');
++  for (const id of ['codex', 'claude', 'opencode', 'byok']) assert.equal(installCommand(id, { win: false }), null, id);
++  for (const [id, { sh, ps }] of Object.entries(AGENT_INSTALLERS)) {
++    assert.match(sh, /^curl .*https:\/\/\S+.*\| bash$/, id);
++    assert.match(ps, /^(?:irm '?https:\/\/\S+'? \| iex|winget install \S+)$/, id);
++  }
++});
++
++test('the report says which file is not the agent, and why', () => {
++  const home = mkdtempSync(join(tmpdir(), 'of-home-'));
++  const bin = join(home, 'Programs', 'cursor', 'resources', 'app', 'bin');
++  put(join(home, 'Programs', 'cursor', 'resources', 'app', 'out', 'cli.js'));
++  put(join(bin, 'agent.cmd'), editorShim('Cursor.exe'));
++  const report = searchReport('cursor', { home, env: { PATH: bin }, pathDirs: [], win: true });
++  assert.equal(report.files.length, 1);
++  assert.equal(report.files[0].refused, 'app');
++  assert.equal(report.files[0].usable, false);
++});
+--- old/apps/desktop/src/agent-roster.mjs
++++ new/apps/desktop/src/agent-roster.mjs
+@@ -20,6 +20,8 @@
+  *
+  * One of the person's own agents not found where it is looked for can be pointed at (`locate`): the program they choose
+  * is tried (it has to answer `--version`) and used from then on, until they go back to finding it (`useAutomatic`).
++ * One with an official installer can be installed (`install`): it runs in a terminal window, and the agent is looked
++ * for again until it is there.
+  * `diagnose` says what was searched, for them to read or send with an issue.
+  *
+  * Each has a switch for whether the chat's menu shows it. Kept in the app's data folder: agents.json (the choices) and
+@@ -27,7 +29,9 @@
+  * the one key of a version before, is the key of the models set up then).
+  *
+  * State per agent: ready · off (disconnected here) · sign-in (its own sign-in is needed) · waiting (signing in, in
+- * Terminal) · missing (not installed; `install` says where from) · key (no key set up) · checking (not known yet).
++ * Terminal) · missing (not installed; `install` says where from, `installer` the command that installs it, `app` the
++ * maker's desktop app when only that is here, `installing` while its installer runs) · key (no key set up) · checking
++ * (not known yet).
+  *
+  * Reads no Electron module, so `node --test` can use it.
+  */
+@@ -184,9 +188,10 @@
+  *
+  * @param {{
+  *   dataDir: string,
+- *   localAgents: () => Promise<Array<{ id: string, cli: { path: string } | null, signedIn: boolean | null, account?: object | null, problem?: string, install: string | null, setupRequired: string | null }>>,
+- *   localAgent?: (id: string) => Promise<{ id: string, cli: { path: string } | null, signedIn: boolean | null, account?: object | null, problem?: string, install: string | null, setupRequired: string | null }>,
++ *   localAgents: () => Promise<Array<{ id: string, cli: { path: string } | null, signedIn: boolean | null, account?: object | null, problem?: string, install: string | null, setupRequired: string | null, app?: string | null, installer?: string | null }>>,
++ *   localAgent?: (id: string) => Promise<{ id: string, cli: { path: string } | null, signedIn: boolean | null, account?: object | null, problem?: string, install: string | null, setupRequired: string | null, app?: string | null, installer?: string | null }>,
+  *   openSignIn: (id: string) => Promise<{ ok: boolean, error?: string }>,
++ *   openInstaller?: (id: string) => Promise<{ ok: boolean, error?: string }>,
+  *   usePaths?: (paths: Record<string, string>) => void,
+  *   pickProgram?: (id: string, words?: { title?: string, button?: string }) => Promise<string | null>,
+  *   checkProgram?: (id: string, path: string) => Promise<{ ok: boolean, error?: string, code?: string }>,
+@@ -197,14 +202,15 @@
+  *   fetch?: typeof fetch,
+  *   signInWait?: { ms: number, pollMs: number },
+  * }} deps
+- * `localAgent(id)`: one agent as `localAgents` has it, asked alone while its sign-in is waited for (`signInWait`).
++ * `localAgent(id)`: one agent as `localAgents` has it, asked alone while its sign-in or its install is waited for
++ * (`signInWait`).
+  */
+ export function createRoster(deps) {
+   const { dataDir } = deps;
+   let choices = readChoices(dataDir);
+   deps.usePaths?.(choices.paths);
+-  /** what is happening now, beyond what is kept: a sign-in waited for, an error to show */
+-  const live = { waiting: {}, errors: {} };
++  /** what is happening now, beyond what is kept: a sign-in or an install waited for, an error to show */
++  const live = { waiting: {}, installing: {}, errors: {} };
+   let local = null;
+ 
+   /* each own model's key by its id; the one key of a version before is the key of the models set up then */
+@@ -230,7 +236,10 @@
+       const found = local?.find((a) => a.id === id);
+       if (!found) return { status: 'checking' };
+       const where = { path: found.cli?.path ?? null, chosen: choices.paths[id] ?? null };
+-      if (!found.cli) return { status: 'missing', install: found.install ?? null, setupRequired: found.setupRequired ?? null, ...where };
++      if (!found.cli) {
++        return { status: 'missing', install: found.install ?? null, setupRequired: found.setupRequired ?? null, app: found.app ?? null, installer: found.installer ?? null,
++          ...(live.installing[id] ? { installing: true } : {}), ...where };
++      }
+       if (choices.disconnected.includes(id)) return { status: 'off', ...where };
+       if (found.signedIn === false) return { status: live.waiting[id] ? 'waiting' : 'sign-in', ...where };
+       return { status: 'ready', ...where, ...(found.account ? { account: { ...found.account } } : {}), ...(found.problem ? { problem: found.problem } : {}) };
+@@ -270,19 +279,21 @@
+     changed();
+   }
+ 
+-  async function waitForSignIn(id) {
+-    live.waiting[id] = true;
++  /** Looked at again every few seconds until `done` says so, or for as long as a sign-in is waited for. */
++  async function waitFor(id, kind, done) {
++    live[kind][id] = true;
+     changed();
+     const wait = deps.signInWait ?? SIGN_IN_WAIT;
+     const until = Date.now() + wait.ms;
+-    while (Date.now() < until && live.waiting[id]) {
+-      await new Promise((done) => setTimeout(done, wait.pollMs));
++    while (Date.now() < until && live[kind][id]) {
++      await new Promise((resolve) => setTimeout(resolve, wait.pollMs));
+       await lookAgain(id);
+-      if (local?.find((a) => a.id === id)?.signedIn !== false) break;
++      if (done(local?.find((a) => a.id === id))) break;
+     }
+-    delete live.waiting[id];
++    delete live[kind][id];
+     changed();
+   }
++  const waitForSignIn = (id) => waitFor(id, 'waiting', (a) => a?.signedIn !== false);
+ 
+   return {
+     list,
+@@ -338,6 +349,19 @@
+       deps.usePaths?.(choices.paths);
+       save(choices);
+       await refresh();
++      return { ok: true };
++    },
++
++    /**
++     * Install one of the person's own agents with its official installer, in a terminal window (the person agreed to
++     * the command first), then look for it every few seconds until it is there.
++     */
++    async install(id) {
++      if (!isOwn(id) || !deps.openInstaller) return { ok: false, error: `No agent ${id}` };
++      delete live.errors[id];
++      const opened = await deps.openInstaller(id);
++      if (!opened.ok) { live.errors[id] = opened.error ?? 'Terminal did not open.'; changed(); return { ok: false, error: live.errors[id] }; }
++      void waitFor(id, 'installing', (a) => Boolean(a?.cli));
+       return { ok: true };
+     },
+ 
+--- old/apps/desktop/src/agent-roster.test.mjs
++++ new/apps/desktop/src/agent-roster.test.mjs
+@@ -274,3 +274,39 @@
+   await new Promise((done) => setTimeout(done, 120));
+   assert.equal(late.list().find((a) => a.id === 'cursor').status, 'sign-in');
+ });
++
++test("an agent found only as its maker's app: the app said, and its installer run in a terminal and waited for until it is there", async () => {
++  const dir = mkdtempSync(join(tmpdir(), 'of-roster-'));
++  const missing = { id: 'cursor', cli: null, signedIn: null, install: 'https://cursor.com/cli', setupRequired: null, app: 'Cursor', installer: 'curl https://cursor.com/install -fsS | bash' };
++  let installed = false;
++  const opened = [];
++  const r = roster(dir, undefined, {
++    localAgents: async () => [missing],
++    localAgent: async () => (installed ? { ...missing, cli: { path: '/bin/cursor-agent' }, signedIn: false, app: undefined, installer: undefined } : missing),
++    openInstaller: async (id) => { opened.push(id); return { ok: true }; },
++    signInWait: { ms: 2000, pollMs: 10 },
++  });
++  await r.refresh();
++  const before = r.list().find((a) => a.id === 'cursor');
++  assert.equal(before.status, 'missing');
++  assert.equal(before.app, 'Cursor');
++  assert.equal(before.installer, 'curl https://cursor.com/install -fsS | bash');
++  assert.deepEqual(await r.install('cursor'), { ok: true });
++  assert.deepEqual(opened, ['cursor']);
++  await new Promise((done) => setTimeout(done, 30));
++  assert.equal(r.list().find((a) => a.id === 'cursor').installing, true);
++  installed = true;
++  await new Promise((done) => setTimeout(done, 60));
++  const after = r.list().find((a) => a.id === 'cursor');
++  assert.equal(after.status, 'sign-in');
++  assert.equal(after.installing, undefined);
++  assert.deepEqual(await r.install('byok'), { ok: false, error: 'No agent byok' });
++
++  /* a terminal that did not open says why */
++  const failed = roster(mkdtempSync(join(tmpdir(), 'of-roster-')), undefined, {
++    localAgents: async () => [missing], openInstaller: async () => ({ ok: false, error: 'Terminal did not open.' }),
++  });
++  await failed.refresh();
++  assert.deepEqual(await failed.install('cursor'), { ok: false, error: 'Terminal did not open.' });
++  assert.equal(failed.list().find((a) => a.id === 'cursor').error, 'Terminal did not open.');
++});
+--- old/apps/desktop/src/agents.mjs
++++ new/apps/desktop/src/agents.mjs
+@@ -33,7 +33,7 @@
+ import { fileURLToPath } from 'node:url';
+ import * as acp from '@agentclientprotocol/sdk';
+ import { PATH_SEP, childEnvironment, lastPathSource, loginShellEnvironment, loginShellVariables, shellSubset } from './environment.mjs';
+-import { AGENT_PROGRAMS, HOME_BIN_CANDIDATES, chosenProgram, codexVersion, consoleProgram, detectAgentInstallation, laterVersion, searchReport } from './agent-installation.mjs';
++import { AGENT_PROGRAMS, HOME_BIN_CANDIDATES, chosenProgram, codexVersion, consoleProgram, desktopApp, detectAgentInstallation, installCommand, laterVersion, notTheAgent, searchReport } from './agent-installation.mjs';
+ import { logSwitches } from './agent-logs.mjs';
+ import { mergeConfig, sessionSkills } from './agent-skills.mjs';
+ import { nodeBinary } from './node-runtime.mjs';
+@@ -270,15 +270,24 @@
+   return { cmd: cliPath, args, env: {}, options: {} };
+ }
+ 
++/** Why a program is not the agent (notTheAgent), in words. */
++const NOT_THE_AGENT = Object.freeze({
++  app: 'This is an editor or a desktop app, not the agent\'s command-line program.',
++  'not-cursor-agent': 'This is not Cursor\'s command-line agent, which installs in a cursor-agent folder.',
++});
++
+ /**
+  * A program the person chose for an agent, tried: it has to start and answer `--version`. `{ ok, version }`, or why
+- * not: `code` 'not-a-program' (nothing there this computer can start) or 'did-not-start' (with what it said).
++ * not: `code` 'not-a-program' (nothing there this computer can start), 'app' or 'not-cursor-agent' (not the agent:
++ * an editor or a desktop app, never started) or 'did-not-start' (with what it said).
+  */
+ export async function checkAgentProgram(id, path) {
+   const spec = AGENTS[id];
+   if (!spec) return { ok: false, error: `No agent ${id}`, code: 'not-a-program' };
+   const cli = chosenProgram(path, { names: AGENT_PROGRAMS[id]?.names ?? [id] });
+   if (!cli) return { ok: false, error: 'That is not a program this computer can start.', code: 'not-a-program' };
++  const refused = notTheAgent(id, cli, { chosen: path });
++  if (refused) return { ok: false, error: NOT_THE_AGENT[refused], code: refused };
+   const how = starting(cli, ['--version']);
+   const r = await run(how.cmd, how.args, 20_000, { env: childEnvironment({ shell: await loginShellVariables(), extra: how.env }), options: how.options });
+   if (!r.ok) return { ok: false, error: r.out.trim().slice(0, 400), code: 'did-not-start' };
+@@ -325,7 +334,7 @@
+     ] : []),
+     '',
+     `Files named ${names.join(', ')}:`,
+-    ...(report.files.length ? report.files.map((f) => `  ${f.file}${f.runs && f.runs !== f.file ? ` -> ${f.runs}` : ''}${f.usable ? '' : ' (cannot be started)'}`) : ['  (none)']),
++    ...(report.files.length ? report.files.map((f) => `  ${f.file}${f.runs && f.runs !== f.file ? ` -> ${f.runs}` : ''}${f.refused ? ` (not the agent: ${f.refused})` : f.usable ? '' : ' (cannot be started)'}`) : ['  (none)']),
+     '',
+     `Folders searched (${report.searched.length}):`,
+     ...report.searched.map((d) => `  ${d}`),
+@@ -442,7 +451,11 @@
+  * folder a new window opens in).
+  */
+ export function signInScript(cliPath, args, { cwd } = {}) {
+-  const command = `${cwd ? `cd ${shq(cwd)} && ` : ''}${[cliPath, ...args].map(shq).join(' ')}`;
++  return terminalScript(`${cwd ? `cd ${shq(cwd)} && ` : ''}${[cliPath, ...args].map(shq).join(' ')}`);
++}
++
++/** The AppleScript that has Terminal run a command line, as it is, in a new window. */
++export function terminalScript(command) {
+   return `tell application "Terminal"\nactivate\ndo script "${command.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"\nend tell`;
+ }
+ 
+@@ -451,8 +464,30 @@
+  * PowerShell quotes): Windows sign-in. With a BOM, so Windows PowerShell reads a path with Chinese in it as UTF-8.
+  */
+ export function powerShellScript(title, cmd, args) {
+-  const q = (s) => `'${String(s).replace(/'/g, "''")}'`;
+-  return `\ufeff$Host.UI.RawUI.WindowTitle = ${q(title)}\r\n& ${[cmd, ...args].map(q).join(' ')}\r\n`;
++  return powerShellLine(title, `& ${[cmd, ...args].map(psq).join(' ')}`);
++}
++
++/** The same for a command line as it is (an installer's). */
++export function powerShellLine(title, line) {
++  return `\ufeff$Host.UI.RawUI.WindowTitle = ${psq(title)}\r\n${line}\r\n`;
++}
++const psq = (s) => `'${String(s).replace(/'/g, "''")}'`;
++
++/**
++ * A PowerShell window of its own running a script (a sign-in, an installer), left open so what it says can be read
++ * and answered.
++ */
++async function powerShellWindow(name, script, env) {
++  const dir = SIGN_IN_DIR();
++  mkdirSync(dir, { recursive: true });
++  const file = join(dir, name);
++  writeFileSync(file, script, 'utf8');
++  const powershell = join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
++  const child = spawn(powershell, ['-NoLogo', '-NoExit', '-ExecutionPolicy', 'Bypass', '-File', file], {
++    cwd: dir, detached: true, stdio: 'ignore', windowsHide: false, env,
++  });
++  await new Promise((done, fail) => { child.once('spawn', done); child.once('error', fail); });
++  child.unref();
+ }
+ 
+ /** The person's shell variables as this agent is given them (`fromShell`; all of them, for most). */
+@@ -526,16 +561,8 @@
+     how ??= /\.(?:cmd|bat)$/i.test(cli.path) ? { cmd: cli.path, args: spec.login, env: {} } : starting(cli.path, spec.login);
+     how = { ...how, env: { ...defaults, ...how.env } };
+     try {
+-      const dir = SIGN_IN_DIR();
+-      mkdirSync(dir, { recursive: true });
+-      const file = join(dir, `${id}.ps1`);
+-      writeFileSync(file, powerShellScript(`${spec.label} sign-in`, how.cmd, how.args), 'utf8');
+-      const powershell = join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
+-      const child = spawn(powershell, ['-NoLogo', '-NoExit', '-ExecutionPolicy', 'Bypass', '-File', file], {
+-        cwd: dir, detached: true, stdio: 'ignore', windowsHide: false, env: childEnvironment({ shell: agentShell(id, await loginShellVariables()), extra: how.env }),
+-      });
+-      await new Promise((done, fail) => { child.once('spawn', done); child.once('error', fail); });
+-      child.unref();
++      await powerShellWindow(`${id}.ps1`, powerShellScript(`${spec.label} sign-in`, how.cmd, how.args),
++        childEnvironment({ shell: agentShell(id, await loginShellVariables()), extra: how.env }));
+       return { ok: true };
+     } catch (e) { return { ok: false, error: e instanceof Error ? e.message : String(e) }; }
+   }
+@@ -550,8 +577,28 @@
+ }
+ 
+ /**
++ * Install an agent with its maker's official installer (installCommand), in a window the person sees: Terminal on a
++ * Mac, PowerShell on Windows. The person agreed to that exact command in Settings → Agents first. Whether it worked is
++ * learnt by looking for the agent again (agent-roster.mjs).
++ */
++export async function openAgentInstaller(id) {
++  const spec = AGENTS[id];
++  const command = spec ? installCommand(id) : null;
++  if (!command) return { ok: false, error: `${spec?.label ?? id} has no installer to run here.` };
++  if (windows) {
++    try {
++      await powerShellWindow(`${id}-install.ps1`, powerShellLine(`${spec.label} install`, command), childEnvironment({ shell: await loginShellVariables() }));
++      return { ok: true };
++    } catch (e) { return { ok: false, error: e instanceof Error ? e.message : String(e) }; }
++  }
++  const r = await run('/usr/bin/osascript', ['-e', terminalScript(command)], 15_000);
++  return r.ok ? { ok: true } : { ok: false, error: r.out.trim() || 'Terminal did not open.' };
++}
++
++/**
+  * The agents as they are on this machine, for the chat's picker. `setupRequired: 'code-tab'`: the Claude app is
+- * here but has not downloaded Claude Code yet (opening its Code tab does).
++ * here but has not downloaded Claude Code yet (opening its Code tab does). One not found: `app`, the maker's desktop
++ * app when it is here without the agent's program; `installer`, the official command that installs it, when it has one.
+  */
+ export async function listAgents() {
+   /* looked at as the person comes back from installing one: a PATH from a few seconds ago at most */
+@@ -577,7 +624,8 @@
+ async function agentOnComputer(id, pathDirs) {
+   const cli = resolveAgentCli(id, { pathDirs });
+   const { install } = detectAgentInstallation(id);
+-  const claudeApp = id === 'claude' && !cli && ['/Applications', join(homedir(), 'Applications')].some((dir) => existsSync(join(dir, 'Claude.app')));
++  const app = cli ? null : desktopApp(id);
++  const claudeApp = id === 'claude' && Boolean(app);
+   return {
+     id,
+     label: AGENTS[id].label,
+@@ -586,6 +634,7 @@
+     ...(cli ? ownSignIn(AGENTS[id], await agentStatus(id, cli.path)) : { signedIn: null, account: null }),
+     install,
+     setupRequired: claudeApp ? 'code-tab' : null,
++    ...(cli ? {} : { app: claudeApp ? null : app, installer: installCommand(id) }),
+   };
+ }
+ 
+--- old/apps/desktop/src/agents.test.mjs
++++ new/apps/desktop/src/agents.test.mjs
+@@ -1,6 +1,6 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+-import { AgentSession, CLIENT_CAPABILITIES, agentDefaults, closeEverySession, planProblem, probeFolder, CODEX_UTF8_CMD, agentShell, allowOption, codexDeveloperInstructions, codexLaunchEnv, distinctOptions, errorCause, legacyOptions, powerShellScript, readAgentStatus, setChosenPaths, signInScript, turnError, signInError, codexTooOld, AGENTS, ownSignIn, codexServiceError, codexRefusal, codexNotice, explainFailure, stderrReason } from './agents.mjs';
++import { AgentSession, CLIENT_CAPABILITIES, agentDefaults, closeEverySession, planProblem, probeFolder, CODEX_UTF8_CMD, agentShell, allowOption, codexDeveloperInstructions, codexLaunchEnv, distinctOptions, errorCause, legacyOptions, powerShellScript, powerShellLine, terminalScript, checkAgentProgram, readAgentStatus, setChosenPaths, signInScript, turnError, signInError, codexTooOld, AGENTS, ownSignIn, codexServiceError, codexRefusal, codexNotice, explainFailure, stderrReason } from './agents.mjs';
+ 
+ test('an agent that asks: yes for good where it offers that, else yes this once; nothing to say yes with is null', () => {
+   const options = [
+@@ -189,12 +189,13 @@
+ });
+ 
+ test('a signed-out Cursor is said to need its sign-in at once, without the session that would open its sign-in page', async () => {
+-  const { mkdtempSync, writeFileSync } = await import('node:fs');
++  const { mkdirSync, mkdtempSync, writeFileSync } = await import('node:fs');
+   const { tmpdir } = await import('node:os');
+   const { join } = await import('node:path');
+   const dir = mkdtempSync(join(tmpdir(), 'of-cursor-'));
+-  /* says it is signed out, and never answers over ACP (Cursor waits on its sign-in page there) */
+-  const program = join(dir, 'cursor-agent.mjs');
++  /* says it is signed out, and never answers over ACP (Cursor waits on its sign-in page there); in Cursor's own folder */
++  mkdirSync(join(dir, 'cursor-agent'));
++  const program = join(dir, 'cursor-agent', 'cursor-agent.mjs');
+   writeFileSync(program, "if (process.argv.includes('status')) console.log('Not logged in'); else setInterval(() => {}, 1000);\n");
+   setChosenPaths({ cursor: program });
+   const session = new AgentSession({ agent: 'cursor', cwd: dir });
+@@ -398,3 +399,26 @@
+   assert.equal(stderrReason('ok\nError: cannot read config.toml\n    at load (x.js:1:1)\ndone'), 'Error: cannot read config.toml');
+   assert.equal(stderrReason(''), '');
+ });
++
++test('an installer runs as its maker wrote it: in Terminal on a Mac, in a PowerShell window of its own on Windows', () => {
++  assert.equal(terminalScript('curl https://cursor.com/install -fsS | bash'),
++    'tell application "Terminal"\nactivate\ndo script "curl https://cursor.com/install -fsS | bash"\nend tell');
++  const lines = powerShellLine('Cursor install', "irm 'https://cursor.com/install?win32=true' | iex").slice(1).split('\r\n');
++  assert.deepEqual(lines.slice(0, 2), ["$Host.UI.RawUI.WindowTitle = 'Cursor install'", "irm 'https://cursor.com/install?win32=true' | iex"]);
++});
++
++test('a program chosen that is an editor, or not Cursor\'s own agent, is refused without being started', async () => {
++  if (process.platform === 'win32') return;
++  const { mkdtempSync, mkdirSync, writeFileSync } = await import('node:fs');
++  const { tmpdir } = await import('node:os');
++  const { join } = await import('node:path');
++  const home = mkdtempSync(join(tmpdir(), 'of-check-'));
++  /* it would leave a mark if it were started */
++  const exe = (file) => { mkdirSync(join(file, '..'), { recursive: true }); writeFileSync(file, `#!/bin/sh\ntouch "${file}.ran"\n`, { mode: 0o755 }); return file; };
++  const code = exe(join(home, 'Visual Studio Code.app', 'Contents', 'Resources', 'app', 'bin', 'copilot'));
++  assert.deepEqual(await checkAgentProgram('copilot', code), { ok: false, error: "This is an editor or a desktop app, not the agent's command-line program.", code: 'app' });
++  const stray = exe(join(home, 'bin', 'agent'));
++  assert.equal((await checkAgentProgram('cursor', stray)).code, 'not-cursor-agent');
++  const { existsSync } = await import('node:fs');
++  assert.equal(existsSync(`${code}.ran`) || existsSync(`${stray}.ran`), false);
++});
+--- old/apps/desktop/src/environment.mjs
++++ new/apps/desktop/src/environment.mjs
+@@ -135,12 +135,18 @@
+   });
+ }
+ 
+-/** `reg query <key>` output, read: each value's name and its text (REG_SZ and REG_EXPAND_SZ only). */
+-export function parseRegQuery(text) {
++/**
++ * `reg query <key>` output, read: each value's name and its text (REG_SZ and REG_EXPAND_SZ only). `expandable`, when
++ * given, gets the names of the REG_EXPAND_SZ ones: Windows expands those, never a REG_SZ.
++ * @param {string} text @param {Set<string>} [expandable]
++ */
++export function parseRegQuery(text, expandable) {
+   const values = {};
+   for (const line of String(text ?? '').split(/\r?\n/)) {
+     const m = /^\s{2,}(\S(?:.*?\S)?)\s{2,}(REG_SZ|REG_EXPAND_SZ)\s{2,}(.*)$/.exec(line);
+-    if (m) values[m[1]] = m[3].trim();
++    if (!m) continue;
++    values[m[1]] = m[3].trim();
++    if (m[2] === 'REG_EXPAND_SZ') expandable?.add(m[1]);
+   }
+   return values;
+ }
+@@ -151,16 +157,27 @@
+   return String(text ?? '').replace(/%([^%;]+)%/g, (all, name) => (typeof lower.get(name.toLowerCase()) === 'string' ? lower.get(name.toLowerCase()) : all));
+ }
+ 
+-const valueOf = (vars, name) => Object.entries(vars ?? {}).find(([k]) => k.toLowerCase() === name.toLowerCase())?.[1];
++/**
++ * Whether Windows expands a registry value: only a REG_EXPAND_SZ one, which `expandable` (from parseRegQuery) lists.
++ * Without a list, every value is taken as one.
++ * @param {Set<string> | undefined} expandable @param {string} name
++ */
++const expands = (expandable, name) => !expandable || expandable.has(name);
+ 
+ /**
+  * The PATH Windows gives a program started now: the system's, then the person's (as the registry has them, their
+- * variables expanded), then whatever else the app's own PATH has. Each folder once, whatever its case.
+- */
+-export function windowsFreshPath({ machine = {}, user = {}, source = process.env } = {}) {
++ * variables expanded when they are REG_EXPAND_SZ), then whatever else the app's own PATH has. Each folder once,
++ * whatever its case. `expand`: the REG_EXPAND_SZ names of each part (parseRegQuery).
++ */
++export function windowsFreshPath({ machine = {}, user = {}, source = process.env, expand = undefined } = {}) {
+   const vars = { ...source, ...machine, ...user };
+-  const dirs = [valueOf(machine, 'Path'), valueOf(user, 'Path'), pathOf(source)]
+-    .flatMap((p) => expandWindowsVars(p ?? '', vars).split(';'))
++  const pathIn = (values, expandable) => {
++    const name = Object.keys(values ?? {}).find((k) => k.toLowerCase() === 'path');
++    if (name === undefined) return '';
++    return expands(expandable, name) ? expandWindowsVars(values[name], vars) : values[name];
++  };
++  const dirs = [pathIn(machine, expand?.machine), pathIn(user, expand?.user), expandWindowsVars(pathOf(source), vars)]
++    .flatMap((p) => p.split(';'))
+     .map((d) => d.trim().replace(/^"(.*)"$/, '$1'))
+     .filter(Boolean);
+   const seen = new Map();
+@@ -174,7 +191,11 @@
+ function regQuery(key, timeoutMs) {
+   return new Promise((resolve) => {
+     const reg = join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'reg.exe');
+-    execFile(reg, ['query', key], { timeout: timeoutMs, encoding: 'utf8', windowsHide: true }, (error, stdout) => resolve(error ? null : parseRegQuery(stdout)));
++    execFile(reg, ['query', key], { timeout: timeoutMs, encoding: 'utf8', windowsHide: true }, (error, stdout) => {
++      if (error) return resolve(null);
++      const expandable = new Set();
++      resolve({ values: parseRegQuery(stdout, expandable), expandable });
++    });
+   });
+ }
+ 
+@@ -206,13 +227,31 @@
+   };
+ }
+ 
++/**
++ * The registry's variables as a program started now has them: the person's over the system's, each REG_EXPAND_SZ
++ * one's `%NAME%` expanded (ComSpec is stored as %SystemRoot%\system32\cmd.exe) and a REG_SZ one as it is, and PATH
++ * from windowsFreshPath in place of either Path. `expand`: the REG_EXPAND_SZ names of each part (parseRegQuery).
++ */
++export function registryVariables({ machine = {}, user = {}, source = process.env, expand = undefined } = {}) {
++  const raw = { ...machine, ...user };
++  const vars = { ...source, ...raw };
++  const env = {};
++  for (const [key, value] of Object.entries(raw)) {
++    if (key.toLowerCase() === 'path') continue;
++    const expandable = Object.hasOwn(user, key) ? expand?.user : expand?.machine;
++    env[key] = expands(expandable, key) ? expandWindowsVars(expandWindowsVars(value, vars), vars) : value;
++  }
++  env.PATH = windowsFreshPath({ machine, user, source, expand });
++  return env;
++}
++
+ /** The registry's environment (Windows): null when neither part of it could be read. */
+ async function readRegistry(source, timeoutMs) {
+   const [machine, user] = await Promise.all([regQuery(REG_MACHINE, timeoutMs), regQuery(REG_USER, timeoutMs)]);
+   if (!machine && !user) return null;
+   pathSource = 'registry';
+-  /* the person's own variables as they are now, over the system's */
+-  return shellVariables({ ...machine, ...user, PATH: windowsFreshPath({ machine: machine ?? {}, user: user ?? {}, source }) }, homedir());
++  const expand = { machine: machine?.expandable ?? new Set(), user: user?.expandable ?? new Set() };
++  return shellVariables(registryVariables({ machine: machine?.values ?? {}, user: user?.values ?? {}, source, expand }), homedir());
+ }
+ 
+ /** The login shell's variables (shellVariables): null when it gave no PATH (it failed, or took too long). */
+--- old/apps/desktop/src/environment.test.mjs
++++ new/apps/desktop/src/environment.test.mjs
+@@ -1,6 +1,11 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+-import { environmentCache, expandWindowsVars, parseRegQuery, shellSubset, shellVariables, windowsFreshPath } from './environment.mjs';
++import { spawnSync } from 'node:child_process';
++import { existsSync } from 'node:fs';
++import {
++  childEnvironment, environmentCache, expandWindowsVars, lastPathSource, loginShellVariables, parseRegQuery, registryVariables, shellSubset,
++  shellVariables, windowsFreshPath,
++} from './environment.mjs';
+ 
+ const PROFILE = ['C:', 'Users', 'someone'].join('\\');
+ 
+@@ -36,6 +41,50 @@
+     'C:\\Users\\someone\\AppData\\Local\\Microsoft\\WindowsApps', 'C:\\Users\\someone\\AppData\\Local\\nvm', 'C:\\nvm4w\\nodejs', 'C:\\Users\\someone\\AppData\\Roaming\\npm',
+     'C:\\Old\\stale',
+   ].join(';'));
++});
++
++test("the registry's variables are handed on expanded, so an agent finds cmd.exe through ComSpec", () => {
++  const machine = { ComSpec: '%SystemRoot%\\system32\\cmd.exe', SystemRoot: 'C:\\Windows', Path: '%SystemRoot%\\system32' };
++  const user = parseRegQuery(USER);
++  const env = registryVariables({ machine, user, source: { USERPROFILE: PROFILE } });
++  assert.equal(env.ComSpec, 'C:\\Windows\\system32\\cmd.exe');
++  assert.equal(env.TEMP, `${PROFILE}\\AppData\\Local\\Temp`);
++  assert.equal(env.Path, undefined, 'one PATH only');
++  assert.match(env.PATH, /^C:\\Windows\\system32;/);
++});
++
++test('only REG_EXPAND_SZ values are expanded, as Windows does: a REG_SZ one keeps its %VARIABLE% as it is', () => {
++  const machine = new Set();
++  const user = new Set();
++  const env = registryVariables({
++    machine: parseRegQuery([
++      '    ComSpec    REG_EXPAND_SZ    %SystemRoot%\\system32\\cmd.exe',
++      '    Literal    REG_SZ    %SystemRoot%\\kept',
++      '    Path    REG_SZ    %SystemRoot%\\system32;C:\\Tools',
++      '    SystemRoot    REG_SZ    C:\\Windows',
++    ].join('\r\n'), machine),
++    user: parseRegQuery(USER, user),
++    source: { USERPROFILE: PROFILE },
++    expand: { machine, user },
++  });
++  assert.deepEqual([...machine], ['ComSpec']);
++  assert.equal(env.ComSpec, 'C:\\Windows\\system32\\cmd.exe');
++  assert.equal(env.Literal, '%SystemRoot%\\kept');
++  assert.equal(env.TEMP, `${PROFILE}\\AppData\\Local\\Temp`);
++  assert.match(env.PATH, /^%SystemRoot%\\system32;C:\\Tools;C:\\Users\\someone\\AppData\\Local\\Microsoft\\WindowsApps;/);
++});
++
++test("on Windows, an agent given this machine's registry environment starts cmd.exe through ComSpec", { skip: process.platform !== 'win32' }, async () => {
++  const env = childEnvironment({ shell: await loginShellVariables({ maxAgeMs: 0 }) });
++  assert.equal(lastPathSource(), 'registry');
++  const comspec = Object.entries(env).filter(([k]) => k.toLowerCase() === 'comspec');
++  assert.equal(comspec.length, 1, 'one ComSpec');
++  assert.doesNotMatch(comspec[0][1], /%/);
++  assert.ok(existsSync(comspec[0][1]), comspec[0][1]);
++  /* what an agent does with it: Node runs a shell command through its own ComSpec */
++  const r = spawnSync(process.execPath, ['-e', "process.stdout.write(require('node:child_process').execSync('echo ok', { encoding: 'utf8' }))"], { env, encoding: 'utf8' });
++  assert.equal(r.status, 0, r.stderr);
++  assert.equal(r.stdout.trim(), 'ok');
+ });
+ 
+ test('the environment is read again once it is old, sooner when asked; a failed read keeps the last good one', async () => {
+--- old/apps/desktop/src/main.mjs
++++ new/apps/desktop/src/main.mjs
+@@ -26,10 +26,11 @@
+ import { readPreferences, registerChatIpc } from './chat-ipc.mjs';
+ import { registerSkillsIpc } from './skills-ipc.mjs';
+ import { createRoster } from './agent-roster.mjs';
+-import { checkAgentProgram, closeEverySession, diagnoseAgent, listAgents, localAgent, openAgentSignIn, setChosenPaths } from './agents.mjs';
++import { checkAgentProgram, closeEverySession, diagnoseAgent, listAgents, localAgent, openAgentInstaller, openAgentSignIn, setChosenPaths } from './agents.mjs';
+ import { agentUsage, forgetAgentUsage } from './agent-usage.mjs';
+ import { installOpenfilmCommand } from './openfilm-command.mjs';
+ import { startUpdates } from './updates.mjs';
++import { stepAside } from './update-launch.mjs';
+ import { ensureFfmpeg, ffmpegDir, ffmpegDownloadable, ffmpegIn, ffmpegOnPath } from './ffmpeg-runtime.mjs';
+ import { PATH_SEP } from './environment.mjs';
+ import { createTabs } from './tabs.mjs';
+@@ -53,6 +54,10 @@
+ 
+ if (!app.requestSingleInstanceLock()) {
+   app.quit();
++} else if (mac && app.isPackaged && stepAside({ dir: DATA, version: app.getVersion(), bundleId: IDENTITY.bundleId, execPath: process.execPath, argv: process.argv })) {
++  /* opened while the update quitting started is being installed: running now would stop it, so the new version opens
++     when it is done (update-launch.mjs) */
++  app.exit(0);
+ } else {
+   app.on('second-instance', () => focusWindow());
+   app.whenReady().then(start).catch((error) => {
+@@ -380,6 +385,36 @@
+ }
+ 
+ async function start() {
++  /* updates (updates.mjs): Restart waits while an agent's turn runs or Studio exports, either would be lost */
++  updates = startUpdates({
++    dataDir: DATA,
++    productName: PRODUCT_NAME,
++    getWindow: () => win,
++    onState: (next) => broadcast('desktop:update', next),
++    prepareRestart: async () => {
++      if (localAgents?.isBusy()) return { ok: false, error: 'agent-busy' };
++      /* Studio's quit-when-idle answers 409 while it exports; otherwise the window's Studio stays (studio-process.mjs
++         `stays`, 423), and is stopped in beforeInstall. No answer: no Studio, no export to lose. */
++      const res = studio && await fetch(`${studio.origin}/api/quit`, {
++        method: 'POST', headers: { 'x-studio-key': studio.key, 'content-type': 'application/json' },
++        body: JSON.stringify({ whenIdle: true }), signal: AbortSignal.timeout(3000),
++      }).catch(() => null);
++      return res?.status === 409 ? { ok: false, error: 'exporting' } : { ok: true };
++    },
++    /* what before-quit would do, done first (`quitting`), so the quit Squirrel starts is not held up or cancelled */
++    beforeInstall: async () => {
++      quitting = true;
++      localAgents?.closeAll();
++      closeEverySession();
++      for (const v of views.values()) v.webContents.on('will-prevent-unload', (event) => event.preventDefault());
++      await studio?.quit();
++      updates?.close();
++    },
++  });
++  /* an update quitting did not install is installed now, before anything else opens (update-launch.mjs) */
++  const launch = await updates.installAtLaunch({ language: state.language });
++  if (launch.installing) return;
++
+   const shellEnv = await loginShellEnvironment();
+   const env = childEnvironment({
+     shell: shellEnv,
+@@ -427,6 +462,7 @@
+     ...(windows ? { titleBarStyle: 'hidden', titleBarOverlay: overlayColours(theme), autoHideMenuBar: true, icon: here('../build/icon.png') } : {}),
+   });
+   if (state.maximized) win.maximize();
++  launch.dismiss();
+ 
+   win.on('resize', layout);
+   win.on('resized', saveState);
+@@ -437,6 +473,12 @@
+   win.on('closed', () => { win = null; views.clear(); pagePresentation = null; app.quit(); });
+ 
+   ipcMain.on('desktop:theme', (event, next) => { if (fromPage(event)) setTheme(next); });
++  /* the page's language, kept for what the app shows before a page is up (the update installed at launch) */
++  ipcMain.on('desktop:language', (event, next) => {
++    if (!fromPage(event) || typeof next !== 'string' || next === state.language) return;
++    state = { ...state, language: next.slice(0, 20) };
++    try { writeWindowState(DATA, state); } catch { /* kept until next time */ }
++  });
+   ipcMain.handle('desktop:hello', (event) => {
+     if (!fromPage(event)) throw new Error('not the window\'s page');
+     return { flavor: FLAVOR, version: app.getVersion(), ffmpeg: ffmpegFound, update: updates?.snapshot() ?? null, chatOpen: state.chatOpen, chatWidth: state.chatWidth, chatMin: CHAT_MIN, studioMin: STUDIO_MIN, fullScreen: Boolean(win?.isFullScreen()) };
+@@ -529,6 +571,8 @@
+     localAgents: listAgents,
+     localAgent,
+     openSignIn: openAgentSignIn,
++    /* an agent's official installer, in a terminal window, once the person agreed to it in Settings → Agents */
++    openInstaller: openAgentInstaller,
+     /* sessions closed on connecting and disconnecting: the next look at its usage is for whichever account is used now */
+     closeSessions: (id) => { forgetAgentUsage(id); localAgents?.closeAgent(id); },
+     seal,
+@@ -554,6 +598,7 @@
+   agentHandle('desktop:agents:usage', ({ id, fresh }) => agentUsage(String(id), { fresh: fresh === true }));
+   agentHandle('desktop:agents:locate', ({ id, words }) => roster.locate(String(id), words));
+   agentHandle('desktop:agents:automatic', ({ id }) => roster.useAutomatic(String(id)));
++  agentHandle('desktop:agents:install', ({ id }) => roster.install(String(id)));
+   agentHandle('desktop:agents:diagnose', ({ id }) => roster.diagnose(String(id)));
+   /* the app's part of Studio's diagnostic report (app-report.mjs): the agents as found now, each one's --version */
+   const appReport = () => gatherAppReport({ list: () => roster.refresh(), check: checkAgentProgram }, {
+@@ -587,32 +632,6 @@
+     return image && !image.isEmpty() ? image.toJPEG(88).toString('base64') : null;
+   });
+ 
+-  /* updates (updates.mjs): Restart waits while an agent's turn runs or Studio exports, either would be lost */
+-  updates = startUpdates({
+-    dataDir: DATA,
+-    productName: PRODUCT_NAME,
+-    getWindow: () => win,
+-    onState: (next) => broadcast('desktop:update', next),
+-    prepareRestart: async () => {
+-      if (localAgents?.isBusy()) return { ok: false, error: 'agent-busy' };
+-      /* Studio's quit-when-idle answers 409 while it exports; otherwise the window's Studio stays (studio-process.mjs
+-         `stays`, 423), and is stopped in beforeInstall. No answer: no Studio, no export to lose. */
+-      const res = studio && await fetch(`${studio.origin}/api/quit`, {
+-        method: 'POST', headers: { 'x-studio-key': studio.key, 'content-type': 'application/json' },
+-        body: JSON.stringify({ whenIdle: true }), signal: AbortSignal.timeout(3000),
+-      }).catch(() => null);
+-      return res?.status === 409 ? { ok: false, error: 'exporting' } : { ok: true };
+-    },
+-    /* what before-quit would do, done first (`quitting`), so the quit Squirrel starts is not held up or cancelled */
+-    beforeInstall: async () => {
+-      quitting = true;
+-      localAgents?.closeAll();
+-      closeEverySession();
+-      for (const v of views.values()) v.webContents.on('will-prevent-unload', (event) => event.preventDefault());
+-      await studio?.quit();
+-      updates?.close();
+-    },
+-  });
+   ipcMain.handle('desktop:update-restart', (event) => (fromPage(event) ? updates?.restart() : { ok: false }));
+   /* Settings → About: the state now, and a check that answers with the state it ends in (no dialog) */
+   ipcMain.handle('desktop:update-state', (event) => (fromPage(event) ? updates?.snapshot() ?? null : null));
+--- old/apps/desktop/src/preload.cjs
++++ new/apps/desktop/src/preload.cjs
+@@ -49,6 +49,7 @@
+     setShown: (id, shown) => ipcRenderer.invoke('desktop:agents:shown', { id, shown: shown === true }),
+     locate: (id, words) => ipcRenderer.invoke('desktop:agents:locate', { id, words }),
+     useAutomatic: (id) => ipcRenderer.invoke('desktop:agents:automatic', { id }),
++    install: (id) => ipcRenderer.invoke('desktop:agents:install', { id }),
+     diagnose: (id) => ipcRenderer.invoke('desktop:agents:diagnose', { id }),
+     report: () => ipcRenderer.invoke('desktop:agents:report'),
+     /* the whole diagnostic report on the clipboard (main.mjs): the chat's, by a turn that failed */
+@@ -119,6 +120,8 @@
+   saveLayout: (layout) => ipcRenderer.send('desktop:layout', { chatOpen: layout?.chatOpen === true, chatWidth: Number(layout?.chatWidth) }),
+   /* the page's theme, for the window behind it and the system's menus and dialogs */
+   setTheme: (theme) => ipcRenderer.send('desktop:theme', theme === 'dark' ? 'dark' : 'light'),
++  /* the page's language, for what the app shows before a page is up */
++  setLanguage: (language) => ipcRenderer.send('desktop:language', String(language)),
+   onFullScreen: on('desktop:full-screen'),
+   /* View → Chat in the app's menu */
+   onToggleChat: on('desktop:toggle-chat'),
+--- old/apps/desktop/src/update-menu.mjs
++++ new/apps/desktop/src/update-menu.mjs
+@@ -25,7 +25,7 @@
+         focusWindow();
+         const { response } = await say({
+           type: 'info', message: `${productName} ${next} is ready`,
+-          detail: 'Restart now to install it, or it installs the next time you quit.',
++          detail: 'Restart now to update, or it installs when you quit and opens as the new version next time.',
+           buttons: ['Restart', 'Later'], defaultId: 0, cancelId: 1,
+         });
+         if (response !== 0) return;
+--- old/apps/desktop/src/updates.mjs
++++ new/apps/desktop/src/updates.mjs
+@@ -3,16 +3,19 @@
+  * (scripts/release.mjs: the product's `desktop.updates`; a build with none never looks for updates), on the channel
+  * chosen here (update-channel.mjs), and downloads a new version in the background (update-controller.mjs says where
+  * it is; update-schedule.mjs when to look). Studio's top bar offers Restart once it is ready (shell/bridge.ts `update`), and the menu's "Check for Updates…" answers with a dialog
+- * (update-menu.mjs). Quitting installs it too: nothing is lost by not restarting now.
++ * (update-menu.mjs). Quitting installs it too: nothing is lost by not restarting now. On macOS the next launch makes
++ * sure of it (update-launch.mjs): it waits for an install under way, and installs one that did not happen.
+  *
+  * logs/updates.log has what happened, state and versions only: no URLs, no messages from the feed's host.
+  */
+-import { app, autoUpdater as nativeUpdater, dialog, powerMonitor } from 'electron';
++import { BrowserWindow, app, autoUpdater as nativeUpdater, dialog, nativeTheme, powerMonitor } from 'electron';
+ import electronUpdater from 'electron-updater';
+ import { existsSync } from 'node:fs';
+ import { appendFile } from 'node:fs/promises';
+ import { join } from 'node:path';
++import { fileURLToPath } from 'node:url';
+ import { createUpdateController } from './update-controller.mjs';
++import { clearPendingUpdate, installLanguage, installWords, pendingUpdate, readyToInstall, writePendingUpdate } from './update-launch.mjs';
+ import { UPDATE_CHANNELS, readUpdateChannel, useUpdateChannel, writeUpdateChannel } from './update-channel.mjs';
+ import { createManualUpdateCheck } from './update-menu.mjs';
+ import { scheduleUpdateChecks } from './update-schedule.mjs';
+@@ -34,6 +37,7 @@
+     const off = { status: 'off', version: app.getVersion(), channel: 'stable', availableVersion: null, progress: 0, checkedAt: null, error: null };
+     return {
+       packaged: false, snapshot: () => off, check: async () => off, restart: async () => ({ ok: false, error: 'not-ready' }), manualCheck: null,
++      installAtLaunch: async () => ({ installing: false, dismiss: () => {} }),
+       channel: () => 'stable', setChannel: () => {}, close: () => {},
+     };
+   }
+@@ -43,6 +47,8 @@
+ 
+   const logFile = join(dataDir, 'logs', 'updates.log');
+   let logged = '';
++  /** who else is told of each change (a launch that installs waits on it) */
++  const listeners = new Set();
+   const controller = createUpdateController({
+     updater: autoUpdater,
+     /* Squirrel.Mac's second step: only macOS has one */
+@@ -51,6 +57,9 @@
+     channel,
+     onChange: (state) => {
+       onState(state);
++      for (const listener of listeners) listener(state);
++      /* the next launch on macOS checks that quitting installed it (update-launch.mjs) */
++      if (state.status === 'ready' && state.availableVersion && process.platform === 'darwin') writePendingUpdate(dataDir, state.availableVersion);
+       /* a line when something changes, not one per percent downloaded */
+       const entry = { status: state.status, version: state.version, target: state.availableVersion, channel: state.channel, error: state.error };
+       const line = JSON.stringify(entry);
+@@ -95,6 +104,32 @@
+     manualCheck: createManualUpdateCheck({ controller, productName, showMessage, focusWindow: focus }),
+     channel: () => channel,
+     /**
++     * At launch, before the window (macOS): an update quitting should have installed and did not is installed now, in
++     * a small window that says so, and the app opens again as the new version (`installing`). Not ready again soon
++     * enough, the launch goes on as it is (its update downloads as usual): `dismiss` closes the window once the app's
++     * own is up, so the app never has no window and quits.
++     * @param {{ language?: string | null }} [options] the language Studio was last shown in
++     */
++    async installAtLaunch({ language = null } = {}) {
++      const nothing = { installing: false, dismiss: () => {} };
++      const version = process.platform === 'darwin' ? pendingUpdate(dataDir, app.getVersion()) : null;
++      if (!version) return nothing;
++      const words = installWords(installLanguage(language, app.getPreferredSystemLanguages()), { name: productName, version });
++      const shown = new BrowserWindow({
++        width: 380, height: 120, show: false, frame: false, resizable: false, maximizable: false, minimizable: false, fullscreenable: false,
++        title: productName, backgroundColor: nativeTheme.shouldUseDarkColors ? '#111111' : '#f2f2f2',
++        webPreferences: { sandbox: true, contextIsolation: true, nodeIntegration: false },
++      });
++      shown.once('ready-to-show', () => shown.show());
++      void shown.loadFile(fileURLToPath(new URL('./installing.html', import.meta.url)), { query: words });
++      const ready = await readyToInstall({ controller, subscribe: (listener) => { listeners.add(listener); return () => listeners.delete(listener); } });
++      if (ready && (await controller.restart()).ok) return { installing: true, dismiss: () => {} };
++      /* tried once: from here it is the usual update, and the next ready one is noted again */
++      try { clearPendingUpdate(dataDir); } catch { /* tried again next launch */ }
++      shown.hide();
++      return { installing: false, dismiss: () => { if (!shown.isDestroyed()) shown.destroy(); } };
++    },
++    /**
+      * Move to another channel and look there at once. Moving to stable never downgrades: a beta build stays until
+      * stable passes it, and one already downloaded still installs.
+      */
+--- old/apps/desktop/src/window-state.mjs
++++ new/apps/desktop/src/window-state.mjs
+@@ -1,6 +1,6 @@
+ /**
+  * What the window looked like when it was last closed: where it was, how wide the chat was, whether it was shown,
+- * which tabs were open.
++ * which tabs were open, which language its page was in.
+  * Kept in the app's data folder. Reads no Electron module, so `node --test` can use it.
+  */
+ import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+@@ -28,6 +28,8 @@
+     chatOpen: raw.chatOpen !== false,
+     /* the tabs as left (tabs.mjs reads them with care) */
+     tabs: raw.tabs && typeof raw.tabs === 'object' && Array.isArray(raw.tabs.tabs) ? { tabs: raw.tabs.tabs.slice(0, 50), active: Number(raw.tabs.active) || 0 } : null,
++    /* the language Studio was last shown in, for what the app shows before a page is up */
++    language: typeof raw.language === 'string' && raw.language.length <= 20 ? raw.language : null,
+   };
+ }
+ 
+--- old/apps/desktop/src/window-state.test.mjs
++++ new/apps/desktop/src/window-state.test.mjs
+@@ -7,12 +7,12 @@
+ 
+ test('a first launch has the defaults; a saved state comes back; odd values are made sensible', () => {
+   const dir = mkdtempSync(join(tmpdir(), 'of-window-'));
+-  assert.deepEqual(readWindowState(dir), { bounds: null, maximized: false, chatWidth: CHAT_DEFAULT, chatOpen: true, tabs: null });
++  assert.deepEqual(readWindowState(dir), { bounds: null, maximized: false, chatWidth: CHAT_DEFAULT, chatOpen: true, tabs: null, language: null });
+   const tabs = { tabs: [{ projectId: 'a', title: 'Launch' }, { projectId: null, title: '' }], active: 1 };
+-  writeWindowState(dir, { bounds: { x: 10, y: 20, width: 1400, height: 900 }, maximized: false, chatWidth: 500, chatOpen: false, tabs });
+-  assert.deepEqual(readWindowState(dir), { bounds: { x: 10, y: 20, width: 1400, height: 900 }, maximized: false, chatWidth: 500, chatOpen: false, tabs });
+-  writeFileSync(join(dir, 'window.json'), JSON.stringify({ bounds: { x: 0, y: 0, width: 10, height: 'tall' }, chatWidth: 12, tabs: 'many' }));
+-  assert.deepEqual(readWindowState(dir), { bounds: null, maximized: false, chatWidth: CHAT_MIN, chatOpen: true, tabs: null });
++  writeWindowState(dir, { bounds: { x: 10, y: 20, width: 1400, height: 900 }, maximized: false, chatWidth: 500, chatOpen: false, tabs, language: 'zh-CN' });
++  assert.deepEqual(readWindowState(dir), { bounds: { x: 10, y: 20, width: 1400, height: 900 }, maximized: false, chatWidth: 500, chatOpen: false, tabs, language: 'zh-CN' });
++  writeFileSync(join(dir, 'window.json'), JSON.stringify({ bounds: { x: 0, y: 0, width: 10, height: 'tall' }, chatWidth: 12, tabs: 'many', language: 7 }));
++  assert.deepEqual(readWindowState(dir), { bounds: null, maximized: false, chatWidth: CHAT_MIN, chatOpen: true, tabs: null, language: null });
+ });
+ 
+ test('a window off every display comes back centered, keeping its size', () => {
+--- old/packages/openfilm/CHANGELOG.md
++++ new/packages/openfilm/CHANGELOG.md
+@@ -1,4 +1,22 @@
+ # openfilm
++
++## 0.2.2
++
++### Patch Changes
++
++- [#110](https://github.com/openfilm/openfilm/pull/110) [`7d35283`](https://github.com/openfilm/openfilm/commit/7d352837b96754793d7c2e7c1d129656a29cfdba) Thanks [@PazChen](https://github.com/PazChen)! - Desktop: agents work for people who installed only the maker's app: Claude Code and OpenCode from inside their apps, and an Install button that runs the official installer for the others. The Cursor editor is never started in place of Cursor's agent.
++
++- [#98](https://github.com/openfilm/openfilm/pull/98) [`f771d05`](https://github.com/openfilm/openfilm/commit/f771d053d31ef28fd0c21ce1ca5e848a632b2954) Thanks [@cristinamadureira353-svg](https://github.com/cristinamadureira353-svg)! - Studio: an export can be named where it is asked for — a name field beside the folder it goes to, the project's name in it to begin with — instead of every file taking the project's name. A named export keeps the suffixes that tell the files of one export apart (` · 哔哩哔哩`, `(alpha)`, `stills`) and drops the ones that only describe the project (`1080p`, `0-9s`). A name left empty is the project's, as before, and an export that would take a name already there still gets ` 2` rather than being written over.
++
++- [#106](https://github.com/openfilm/openfilm/pull/106) [`3582b88`](https://github.com/openfilm/openfilm/commit/3582b88e75099d0f9af9f927d5ae042826f5e88b) Thanks [@taavie-z](https://github.com/taavie-z)! - Keep Final Cut Pro subtitles white with a black outline and a soft shadow. Correct Basic Title font scaling so subtitle size stays proportional in low-resolution, 4K and portrait sequences.
++
++- [#108](https://github.com/openfilm/openfilm/pull/108) [`7192264`](https://github.com/openfilm/openfilm/commit/71922644da5d6b67db2cc796d4e057f98999944f) Thanks [@taavie-z](https://github.com/taavie-z)! - Resize media contact-sheet thumbnails before embedding them, preventing "Invalid string length" on high-resolution, high-bit-depth clips. Single-frame output keeps its original resolution. A transparent WebM (VP9 or VP8) keeps its alpha in the sheet and in a single frame.
++
++- [#101](https://github.com/openfilm/openfilm/pull/101) [`bc1ae78`](https://github.com/openfilm/openfilm/commit/bc1ae787dda20a9a7fe3e5b6d3f9aba8863cc2fc) Thanks [@PazChen](https://github.com/PazChen)! - Render: when an encode fails on Windows, the error says why instead of a permission error from cleaning up.
++
++- [#107](https://github.com/openfilm/openfilm/pull/107) [`94ea4c8`](https://github.com/openfilm/openfilm/commit/94ea4c8237f933866e9ef5a7b41bdca4e64db4e2) Thanks [@taavie-z](https://github.com/taavie-z)! - Allow decimal frame rates such as 23.976, 29.97 and 59.94 in `openfilm render --fps`, keeping the existing range of 1 to 240. The NTSC rates render at their exact rates (24000/1001, 30000/1001, 60000/1001), as footage shot at them is.
++
++- [#109](https://github.com/openfilm/openfilm/pull/109) [`5f8b70f`](https://github.com/openfilm/openfilm/commit/5f8b70f8a453dc10fe3c86dd103c420473051fab) Thanks [@PazChen](https://github.com/PazChen)! - On macOS, an update that is ready now installs when you quit even if you open OpenFilm again right away. Opened while the update is still being installed, OpenFilm waits for the install to finish and then opens as the new version. If an install did not happen, the next launch installs it in a small window that says so, then opens as the new version. The update notice says what happens when you quit.
+ 
+ ## 0.2.1
+ 
+--- old/packages/openfilm/bin/openfilm.mjs
++++ new/packages/openfilm/bin/openfilm.mjs
+@@ -78,7 +78,7 @@
+   A project Studio has not shown yet is opened in Studio first.
+ 
+   --out <file>    another path; .webm or .mov with --alpha
+-  --fps <n>       frame rate (30)
++  --fps <n>       frame rate, including decimals such as 29.97 (30)
+   --4k            3840 px wide              --scale <n>     any device pixel ratio
+   --blur          motion blur (8 samples)   --samples <n>   --shutter <0..1>
+   --alpha         transparent background    --workers <n>   parallel browsers`,
+@@ -144,7 +144,7 @@
+ const num = (v) => (v == null ? undefined : Number(v));
+ const opts = { ...o, count: num(o.count), scale: num(o.scale), samples: num(o.samples), shutter: num(o.shutter), fps: num(o.fps), workers: num(o.workers) };
+ /* a number option out of its range is a wrong command (2), said before anything starts */
+-const RANGES = { count: [1, 200, true], fps: [1, 240, true], scale: [0.1, 8, false], samples: [1, 64, true], shutter: [0, 1, false], workers: [1, 64, true] };
++const RANGES = { count: [1, 200, true], fps: [1, 240, false], scale: [0.1, 8, false], samples: [1, 64, true], shutter: [0, 1, false], workers: [1, 64, true] };
+ for (const [name, [lo, hi, whole]] of Object.entries(RANGES)) {
+   const v = opts[name];
+   if (v === undefined || (Number.isFinite(v) && v >= lo && v <= hi && (!whole || Number.isInteger(v)))) continue;
+--- old/packages/openfilm/package.json
++++ new/packages/openfilm/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "openfilm",
+-  "version": "0.2.1",
++  "version": "0.2.2",
+   "description": "The open source AI video agent: films as web pages, the manual that teaches your coding agent to make them, the `openfilm` command, and Studio, the editor to change anything in them.",
+   "license": "MIT",
+   "homepage": "https://openfilm.dev",
+--- old/packages/openfilm/src/render.mjs
++++ new/packages/openfilm/src/render.mjs
+@@ -7,6 +7,7 @@
+ import { clipKind, FILM_FILE } from './film-doc.mjs';
+ import { broken, encoders, hardwareEncoder, hardwareOptions, proresOptions } from './encoders.mjs';
+ import { FilmPage, launch } from './host.mjs';
++import { exactRate, ffmpegRate } from './rate.mjs';
+ import { browserCopies, filmVideos } from './seekable.mjs';
+ import { ffmpeg, filmSound, fmt, kill, mix, open, outDir, parseTarget, shown, UsageError, write } from './shared.mjs';
+ 
+@@ -80,7 +81,9 @@
+   const meta = probe.film.meta;
+   await probe.film.close();
+ 
+-  const fps = Number(opts.fps ?? 30);
++  /* 29.97 is 30000/1001, as the footage shot at it is (rate.mjs) */
++  const rate = exactRate(Number(opts.fps ?? 30));
++  const fps = rate.fps;
+   /* a page without a duration has no end: it is rendered by a range */
+   const end = meta.duration ?? Infinity;
+   if (!range && meta.duration == null) { await probe.close(); throw new UsageError('this page has no duration, so it has no end: give a range to render, e.g. openfilm render 0-6'); }
+@@ -162,7 +165,7 @@
+       const stop = new AbortController();
+       const quit = () => stop.abort();
+       opts.signal?.addEventListener('abort', quit, { once: true });
+-      const runs = parts.map((p) => encode(p, { fps, samples, shutter, duration: end, format: f, onFrame: progress, still: alpha ? 'png' : 'jpeg', signal: stop.signal }));
++      const runs = parts.map((p) => encode(p, { fps, rate, samples, shutter, duration: end, format: f, onFrame: progress, still: alpha ? 'png' : 'jpeg', signal: stop.signal }));
+       try {
+         await unlessCancelled(Promise.all(runs));
+       } catch (e) {
+@@ -215,7 +218,7 @@
+     encoder,
+     lines: [
+       `→ ${shown(out)}`,
+-      `  ${total} frames · ${fmt(to - from)} at ${fps} fps · ${Math.round(meta.width * scale)}×${Math.round(meta.height * scale)}${samples > 1 ? ` · ${samples} samples/frame` : ''}${alpha ? ' · alpha' : ''} · ${workers} worker${workers > 1 ? 's' : ''} · ${encoder} · ${seconds.toFixed(1)} s`,
++      `  ${total} frames · ${fmt(to - from)} at ${Number(fps.toFixed(3))} fps · ${Math.round(meta.width * scale)}×${Math.round(meta.height * scale)}${samples > 1 ? ` · ${samples} samples/frame` : ''}${alpha ? ' · alpha' : ''} · ${workers} worker${workers > 1 ? 's' : ''} · ${encoder} · ${seconds.toFixed(1)} s`,
+       ...problems.map((p) => `✗ ${p.kind === 'request' ? 'request' : 'page'}: ${p.message}`),
+     ],
+   };
+@@ -264,10 +267,10 @@
+ }
+ 
+ /** Frames [a, b) of one page into one file; sub-frames are averaged by ffmpeg (tmix) and every n-th kept. */
+-async function encode({ film, a, b, file }, { fps, samples, shutter, duration, format, onFrame, still, signal }) {
+-  const blur = samples > 1 ? `tmix=frames=${samples},select='eq(mod(n\\,${samples})\\,${samples - 1})',setpts=N/(${fps}*TB),` : '';
+-  const enc = ffmpeg(['-f', 'image2pipe', '-framerate', String(fps * samples), '-c:v', still === 'png' ? 'png' : 'mjpeg', '-i', '-',
+-    '-vf', blur + format.pix, '-r', String(fps), ...format.video, file], { input: true });
++async function encode({ film, a, b, file }, { fps, rate, samples, shutter, duration, format, onFrame, still, signal }) {
++  const blur = samples > 1 ? `tmix=frames=${samples},select='eq(mod(n\\,${samples})\\,${samples - 1})',setpts=N/((${ffmpegRate(rate)})*TB),` : '';
++  const enc = ffmpeg(['-f', 'image2pipe', '-framerate', ffmpegRate(rate, samples), '-c:v', still === 'png' ? 'png' : 'mjpeg', '-i', '-',
++    '-vf', blur + format.pix, '-r', ffmpegRate(rate), ...format.video, file], { input: true });
+   /* a cancelled render stops its encoder at once: the frames ffmpeg still holds are thrown away, not encoded (a 4K
+      encode takes seconds to drain); the parts folder goes with it (see render's finally) */
+   const stop = () => kill(enc.proc);
+--- old/packages/openfilm/src/render.test.mjs
++++ new/packages/openfilm/src/render.test.mjs
+@@ -1,6 +1,6 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+-import { execFileSync, spawn } from 'node:child_process';
++import { execFileSync, spawn, spawnSync } from 'node:child_process';
+ import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+ import { getPriority, tmpdir, totalmem } from 'node:os';
+ import { join } from 'node:path';
+@@ -10,6 +10,46 @@
+ import { defaultWorkers, machine, outOfMemory, render } from './render.mjs';
+ 
+ const hasFfmpeg = (() => { try { execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' }); return true; } catch { return false; } })();
++
++test('the render command accepts decimal frame rates and still rejects invalid rates', () => {
++  const dir = mkdtempSync(join(tmpdir(), 'of-render-fps-options-'));
++  try {
++    const cli = fileURLToPath(new URL('../bin/openfilm.mjs', import.meta.url));
++    for (const fps of ['1', '23.976', '29.97', '59.94', String(30000 / 1001), '240']) {
++      const result = spawnSync(process.execPath, [cli, 'render', `--fps=${fps}`], { cwd: dir, encoding: 'utf8' });
++      assert.equal(result.status, 2, result.stderr);
++      assert.match(result.stderr, /is not in a project/, `--fps ${fps} passes option validation`);
++    }
++    for (const fps of ['0', '-1', '0.99', '240.1', 'NaN', 'Infinity']) {
++      const result = spawnSync(process.execPath, [cli, 'render', `--fps=${fps}`], { cwd: dir, encoding: 'utf8' });
++      assert.equal(result.status, 2, result.stderr);
++      assert.match(result.stderr, /--fps is a number from 1 to 240/, `--fps ${fps} is rejected`);
++    }
++  } finally {
++    rmSync(dir, { recursive: true, force: true });
++  }
++});
++
++test('the render command renders 29.97 as exactly 30000/1001, and keeps another decimal rate, through encoding, blur and parallel parts', { skip: !hasFfmpeg && 'no ffmpeg', timeout: 120_000 }, () => {
++  const dir = mkdtempSync(join(tmpdir(), 'of-render-fractional-'));
++  try {
++    writeFileSync(join(dir, 'p.html'), '<!doctype html><body style="margin:0"><script>window.film = { duration: 0.5, width: 320, height: 180, frame(t) { document.body.style.background = `hsl(${t * 360}, 80%, 50%)`; } };</script>');
++    writeFileSync(join(dir, 'film.html'), filmHtml({ stage: { w: 320, h: 180 }, tracks: [{ clips: [{ id: 'p', src: 'p.html', at: 0, time: [0, 0.5] }] }] }));
++    mkdirSync(join(dir, '.film'));
++    writeFileSync(join(dir, '.film', 'opened'), '');
++    const cli = fileURLToPath(new URL('../bin/openfilm.mjs', import.meta.url));
++    for (const [fps, rate, workers, samples] of [[29.97, '30000/1001', 1, 1], [30000 / 1001, '30000/1001', 2, 2], [12.5, '25/2', 1, 1]]) {
++      const out = join(dir, `${fps}.mp4`);
++      execFileSync(process.execPath, [cli, 'render', '--fps', String(fps), '--workers', String(workers), '--samples', String(samples), '--out', out], { cwd: dir, timeout: 60_000, stdio: 'pipe' });
++      const { streams: [video] } = JSON.parse(execFileSync('ffprobe', ['-v', 'error', '-count_frames', '-select_streams', 'v:0', '-show_entries', 'stream=r_frame_rate,avg_frame_rate,nb_read_frames', '-of', 'json', out], { encoding: 'utf8' }));
++      assert.equal(video.r_frame_rate, rate);
++      assert.equal(video.avg_frame_rate, rate);
++      assert.equal(Number(video.nb_read_frames), Math.round(0.5 * fps));
++    }
++  } finally {
++    rmSync(dir, { recursive: true, force: true });
++  }
++});
+ 
+ test('a render with no format of its own encodes on the graphics chip when it can: H.264 for an MP4, ProRes for a MOV', { skip: !hasFfmpeg && 'no ffmpeg', timeout: 120_000 }, async () => {
+   const dir = mkdtempSync(join(tmpdir(), 'of-render-chip-'));
+--- old/packages/openfilm/studio/server/nle.mjs
++++ new/packages/openfilm/studio/server/nle.mjs
+@@ -24,6 +24,7 @@
+ import { spawn } from 'node:child_process';
+ import { pathToFileURL } from 'node:url';
+ import { clipKind, pictureRect, soundRole } from '../../src/film-doc.mjs';
++import { exactRate } from '../../src/rate.mjs';
+ 
+ /**
+  * @typedef {import('../../src/film-doc.mjs').FilmBox} FilmBox
+@@ -73,7 +74,7 @@
+ /** 29.97 / 59.94 / 23.976 → ntsc (a whole timebase, the true rate ×1000/1001). @param {number} fps @returns {NleRate} */
+ export function nleRate(fps) {
+   const base = Math.max(1, Math.round(fps));
+-  const ntsc = Math.abs(fps - base) > 0.001 && Math.abs(fps - (base * 1000) / 1001) < 0.01;
++  const ntsc = exactRate(fps).den === 1001;
+   return ntsc ? { timebase: base, ntsc: true, fps: (base * 1000) / 1001 } : { timebase: base, ntsc: false, fps: base };
+ }
+ 
+--- old/packages/openfilm/studio/ui/src/components/settings/AgentsSection.tsx
++++ new/packages/openfilm/studio/ui/src/components/settings/AgentsSection.tsx
+@@ -10,8 +10,10 @@
+  * one does), else under "More agents", with where to get them when they are not installed. The person's own key is on a service of theirs, with a model that reads pictures (the agent looks at its own frames).
+  *
+  * One not found, or one disconnected, can be pointed at: Locate… opens the system's file dialog, the program chosen is
+- * tried and used from then on (Find automatically goes back). A connected one keeps the program it found. "Why isn't
+- * it found?" says what was searched, with a report to copy.
++ * tried and used from then on (Find automatically goes back); an editor or a desktop app is refused. A connected one
++ * keeps the program it found. "Why isn't it found?" says what was searched, with a report to copy. One not found that
++ * has an official installer is installed from here: Install shows the exact command, which runs in a terminal window
++ * once the person agrees; the row says when only the maker's desktop app is here.
+  *
+  * Under a connected agent: the skills and the MCP servers the person added to it themselves, each off in the app until
+  * let in (its maker's own are always on).
+@@ -112,6 +114,8 @@
+   const [error, setError] = React.useState<{ id: HostAgentId; text: string } | null>(null);
+   const [keyOpen, setKeyOpen] = React.useState(false);
+   const [diagnosis, setDiagnosis] = React.useState<{ id: HostAgentId; report: HostAgentDiagnosis | null; copied?: boolean } | null>(null);
++  /* the agent whose installer the person is asked about */
++  const [confirming, setConfirming] = React.useState<HostAgentId | null>(null);
+   if (!host) return null;
+ 
+   const act = (id: HostAgentId, run: () => Promise<{ ok?: boolean; error?: string } | unknown>) => {
+@@ -129,6 +133,8 @@
+     if (r.ok) setDiagnosis(null);
+     if (r.ok || (!r.error && !r.code)) return { ok: true };
+     if (r.code === 'not-a-program') return { ok: false, error: t('settings.agents.notAProgram') };
++    if (r.code === 'app') return { ok: false, error: t('settings.agents.notTheAgentApp').replaceAll('{name}', agent.name) };
++    if (r.code === 'not-cursor-agent') return { ok: false, error: t('settings.agents.notCursorAgent') };
+     if (r.code === 'did-not-start') return { ok: false, error: `${t('settings.agents.didNotStart')} ${r.error ?? ''}`.trim() };
+     return r;
+   });
+@@ -161,7 +167,10 @@
+       case 'off': return t('settings.agents.off');
+       case 'sign-in': return t('settings.agents.signedOut');
+       case 'waiting': return t('settings.agents.waiting');
+-      case 'missing': return agent.setupRequired === 'code-tab' ? t('settings.agents.claudeSetup') : t('settings.agents.missing');
++      case 'missing':
++        if (agent.setupRequired === 'code-tab') return t('settings.agents.claudeSetup');
++        if (agent.installing) return t('settings.agents.installing');
++        return agent.app ? t('settings.agents.appOnly').replace('{app}', agent.app).replaceAll('{name}', agent.name) : t('settings.agents.missing');
+       case 'key': return t('settings.agents.needsKey');
+       case 'unavailable': return t('settings.agents.unavailable');
+       case 'checking': return t('settings.agents.checking');
+@@ -204,7 +213,12 @@
+               {t('settings.agents.locate')}
+             </SettingsButton>
+           ) : null}
+-          {agent.install ? <SettingsLinkButton href={agent.install}><Download size={16} />{t('settings.agents.install')}</SettingsLinkButton> : null}
++          {/* its official installer, run once the person agrees to the command; else its install page */}
++          {agent.installer && host.install ? (
++            <SettingsButton disabled={working || agent.installing || confirming === agent.id} onClick={() => setConfirming(agent.id)}>
++              <Download size={16} />{t('settings.agents.install')}
++            </SettingsButton>
++          ) : agent.install ? <SettingsLinkButton href={agent.install}><Download size={16} />{t('settings.agents.install')}</SettingsLinkButton> : null}
+         </>
+       );
+     }
+@@ -242,6 +256,7 @@
+     const plan = usage[agent.id];
+     const meter = chosen && agent.status === 'ready' && PLAN_AGENTS.includes(agent.id) && Boolean(host.usage) && (plan === undefined || Boolean(plan?.windows.length));
+     const hint = diag?.report ? hintOf(diag.report) : null;
++    const asking = confirming === agent.id && agent.status === 'missing' && agent.installer && host.install ? agent.installer : null;
+     return (
+       <SettingsItem
+         key={agent.id}
+@@ -269,7 +284,7 @@
+           </>
+         )}
+       >
+-        {agent.status === 'waiting' || open || said || agent.chosen || lost || meter || (chosen && agent.status === 'ready' && (host.mcp || host.skills)) ? (
++        {agent.status === 'waiting' || open || said || agent.chosen || lost || meter || asking || (chosen && agent.status === 'ready' && (host.mcp || host.skills)) ? (
+           <div className="flex flex-col gap-1.5 pl-[34px]">
+             {meter ? (
+               <div className="flex flex-col gap-1.5" aria-label={t('settings.agents.usage')}>
+@@ -287,6 +302,16 @@
+                   <button type="button" onClick={() => act(agent.id, () => host.useAutomatic!(agent.id))} className="underline underline-offset-2 hover:text-[var(--text)]">{t('settings.agents.automatic')}</button>
+                 ) : null}
+               </p>
++            ) : null}
++            {asking ? (
++              <SettingsInset>
++                <p className="text-[14px] leading-relaxed text-[var(--text)]">{t('settings.agents.installConfirm').replace('{name}', agent.name)}</p>
++                <code className="block break-all rounded-[6px] bg-[var(--fill-tsp)] px-2.5 py-2 font-mono text-[12.5px] text-[var(--text)]">{asking}</code>
++                <div className="flex justify-end gap-1.5">
++                  <SettingsButton variant="quiet" onClick={() => setConfirming(null)}>{t('settings.agents.cancel')}</SettingsButton>
++                  <SettingsButton variant="primary" onClick={() => { setConfirming(null); act(agent.id, () => host.install!(agent.id)); }}>{t('settings.agents.installRun')}</SettingsButton>
++                </div>
++              </SettingsInset>
+             ) : null}
+             {lost && !diag ? (
+               <p className="text-[13.5px] leading-relaxed text-[var(--text-muted)]">
+--- old/packages/openfilm/studio/ui/src/i18n/en.ts
++++ new/packages/openfilm/studio/ui/src/i18n/en.ts
+@@ -51,7 +51,7 @@
+   /* the app's update, ready to install (Studio's top bar, in an app that has updates: lib/host.ts `update`) */
+   update: {
+     restart: 'Restart to update',
+-    ready: 'OpenFilm {version} is ready. Restart to install it, or it installs the next time you quit.',
++    ready: 'OpenFilm {version} is ready. Restart to update now, or it installs when you quit and opens as the new version next time.',
+     agentBusy: 'An agent is still working. Restart when it has finished.',
+     exporting: 'An export is running. Restart when it has finished.',
+     installFailed: 'OpenFilm {version} could not install. Quit OpenFilm and open it again to install it.',
+@@ -1580,6 +1580,12 @@
+       chosenAt: 'Using the program you chose: {path}',
+       automatic: 'Find it automatically',
+       notAProgram: 'That is not a program this computer can start. Choose the agent’s program itself (on Windows, the .exe or .cmd file).',
++      appOnly: 'The {app} app is installed, but connecting needs {name}’s command-line agent.',
++      installing: 'Installing in a terminal window… OpenFilm finds it once it’s done.',
++      installConfirm: 'OpenFilm opens a terminal window and runs {name}’s official installer:',
++      installRun: 'Run installer',
++      notTheAgentApp: 'This is an editor or a desktop app, not {name}’s command-line agent. Connecting needs {name}’s command-line agent.',
++      notCursorAgent: 'This is not Cursor’s command-line agent, which installs in a cursor-agent folder. Connecting needs Cursor’s command-line agent.',
+       didNotStart: 'It did not start from there:',
+       unreadable: 'It can’t read its own settings, so it can’t start. Fix what it names in its config file, or update it:',
+       whyMissing: 'Why isn’t it found?',
+--- old/packages/openfilm/studio/ui/src/i18n/es.ts
++++ new/packages/openfilm/studio/ui/src/i18n/es.ts
+@@ -50,7 +50,7 @@
+   /* the app's update, ready to install (Studio's top bar, in an app that has updates: lib/host.ts `update`) */
+   update: {
+     restart: 'Reiniciar para actualizar',
+-    ready: 'OpenFilm {version} está listo. Reinicia para instalarlo, o se instalará la próxima vez que salgas.',
++    ready: 'OpenFilm {version} está listo. Reinicia para actualizar ahora, o se instalará al salir y la próxima vez se abrirá la nueva versión.',
+     agentBusy: 'Un agente sigue trabajando. Reinicia cuando termine.',
+     exporting: 'Hay una exportación en curso. Reinicia cuando termine.',
+     installFailed: 'No se pudo instalar OpenFilm {version}. Sal de OpenFilm y vuelve a abrirlo para instalarlo.',
+@@ -1579,6 +1579,12 @@
+       chosenAt: 'Usando el programa que elegiste: {path}',
+       automatic: 'Detectarlo automáticamente',
+       notAProgram: 'Ese archivo no es un programa que este equipo pueda abrir. Elige el programa del agente (en Windows, el archivo .exe o .cmd).',
++      appOnly: 'La app {app} está instalada, pero para conectar hace falta el agente de línea de comandos de {name}.',
++      installing: 'Instalando en una ventana de terminal… OpenFilm lo encontrará al terminar.',
++      installConfirm: 'OpenFilm abre una ventana de terminal y ejecuta el instalador oficial de {name}:',
++      installRun: 'Ejecutar instalador',
++      notTheAgentApp: 'Esto es un editor o una app de escritorio, no el agente de línea de comandos de {name}. Para conectar hace falta el agente de línea de comandos de {name}.',
++      notCursorAgent: 'Esto no es el agente de línea de comandos de Cursor, que se instala en una carpeta cursor-agent. Para conectar hace falta el agente de línea de comandos de Cursor.',
+       didNotStart: 'No se pudo iniciar desde ahí:',
+       unreadable: 'No puede leer su propia configuración, así que no puede iniciarse. Corrige lo que indica en su archivo de configuración o actualízalo:',
+       whyMissing: '¿Por qué no se encuentra?',
+--- old/packages/openfilm/studio/ui/src/i18n/ja.ts
++++ new/packages/openfilm/studio/ui/src/i18n/ja.ts
+@@ -50,7 +50,7 @@
+   /* the app's update, ready to install (Studio's top bar, in an app that has updates: lib/host.ts `update`) */
+   update: {
+     restart: '再起動してアップデート',
+-    ready: 'OpenFilm {version} の準備ができました。今すぐ再起動してインストールするか、次に終了するときに自動でインストールされます。',
++    ready: 'OpenFilm {version} の準備ができました。今すぐ再起動して更新するか、終了時に自動でインストールされ、次に開くと新しいバージョンになります。',
+     agentBusy: 'エージェントがまだ作業中です。終わってから再起動してください。',
+     exporting: '書き出し中です。終わってから再起動してください。',
+     installFailed: 'OpenFilm {version} をインストールできませんでした。OpenFilm を終了してもう一度開くとインストールされます。',
+@@ -1579,6 +1579,12 @@
+       chosenAt: '選択したプログラムを使用中：{path}',
+       automatic: '自動検出に戻す',
+       notAProgram: 'このコンピュータで起動できるプログラムではありません。エージェントのプログラム自体を選んでください（Windows では .exe または .cmd ファイル）。',
++      appOnly: '{app} アプリはインストールされていますが、接続には {name} のコマンドラインエージェントが必要です。',
++      installing: 'ターミナルウィンドウでインストール中… 終わると OpenFilm が見つけます。',
++      installConfirm: 'OpenFilm はターミナルウィンドウを開き、{name} の公式インストーラーを実行します：',
++      installRun: 'インストーラーを実行',
++      notTheAgentApp: 'これはエディターかデスクトップアプリで、{name} のコマンドラインエージェントではありません。接続には {name} のコマンドラインエージェントが必要です。',
++      notCursorAgent: 'これは Cursor のコマンドラインエージェントではありません（cursor-agent フォルダーにインストールされます）。接続には Cursor のコマンドラインエージェントが必要です。',
+       didNotStart: 'ここからは起動できませんでした：',
+       unreadable: '自分の設定を読み込めないため起動できません。設定ファイルの該当箇所を直すか、更新してください：',
+       whyMissing: '見つからない理由は？',
+--- old/packages/openfilm/studio/ui/src/i18n/ko.ts
++++ new/packages/openfilm/studio/ui/src/i18n/ko.ts
+@@ -50,7 +50,7 @@
+   /* the app's update, ready to install (Studio's top bar, in an app that has updates: lib/host.ts `update`) */
+   update: {
+     restart: '재시작하여 업데이트',
+-    ready: 'OpenFilm {version} 준비가 끝났습니다. 지금 재시작하면 설치되고, 아니면 다음에 종료할 때 설치됩니다.',
++    ready: 'OpenFilm {version} 준비가 끝났습니다. 지금 재시작해 업데이트하거나, 종료할 때 자동으로 설치되어 다음에 열면 새 버전이 됩니다.',
+     agentBusy: '에이전트가 아직 작업 중입니다. 끝난 뒤 재시작하세요.',
+     exporting: '내보내는 중입니다. 끝난 뒤 재시작하세요.',
+     installFailed: 'OpenFilm {version}을(를) 설치하지 못했습니다. OpenFilm을 종료했다가 다시 열면 설치됩니다.',
+@@ -1578,6 +1578,12 @@
+       chosenAt: '선택한 프로그램 사용 중: {path}',
+       automatic: '자동 감지로 되돌리기',
+       notAProgram: '이 컴퓨터에서 실행할 수 있는 프로그램이 아닙니다. 에이전트 프로그램 자체를 선택하세요(Windows에서는 .exe 또는 .cmd 파일).',
++      appOnly: '{app} 앱은 설치되어 있지만, 연결하려면 {name}의 명령줄 에이전트가 필요합니다.',
++      installing: '터미널 창에서 설치하는 중… 끝나면 OpenFilm이 찾습니다.',
++      installConfirm: 'OpenFilm이 터미널 창을 열고 {name}의 공식 설치 프로그램을 실행합니다:',
++      installRun: '설치 프로그램 실행',
++      notTheAgentApp: '이것은 편집기나 데스크톱 앱이며, {name}의 명령줄 에이전트가 아닙니다. 연결하려면 {name}의 명령줄 에이전트가 필요합니다.',
++      notCursorAgent: '이것은 Cursor의 명령줄 에이전트가 아닙니다(cursor-agent 폴더에 설치됩니다). 연결하려면 Cursor의 명령줄 에이전트가 필요합니다.',
+       didNotStart: '여기서 실행하지 못했습니다:',
+       unreadable: '자체 설정을 읽지 못해 시작할 수 없습니다. 설정 파일에서 지적된 부분을 고치거나 업데이트하세요:',
+       whyMissing: '왜 찾지 못하나요?',
+--- old/packages/openfilm/studio/ui/src/i18n/zh-CN.ts
++++ new/packages/openfilm/studio/ui/src/i18n/zh-CN.ts
+@@ -51,7 +51,7 @@
+   /* the app's update, ready to install (Studio's top bar, in an app that has updates: lib/host.ts `update`) */
+   update: {
+     restart: '重启以更新',
+-    ready: 'OpenFilm {version} 已准备好。现在重启即可安装，或在下次退出时自动安装。',
++    ready: 'OpenFilm {version} 已准备好。现在重启即可更新；或者退出时自动安装，下次打开就是新版本。',
+     agentBusy: '智能体还在工作，等它完成后再重启。',
+     exporting: '正在导出，导出完成后再重启。',
+     installFailed: 'OpenFilm {version} 暂时无法安装。退出 OpenFilm 后重新打开即可安装。',
+@@ -1580,6 +1580,12 @@
+       chosenAt: '正在使用你选择的程序：{path}',
+       automatic: '改回自动检测',
+       notAProgram: '这不是这台电脑能启动的程序。请选择智能体程序本身（Windows 上是 .exe 或 .cmd 文件）。',
++      appOnly: '已安装 {app} 应用，但连接需要 {name} 的命令行智能体。',
++      installing: '正在终端窗口中安装… 装好后 OpenFilm 会找到它。',
++      installConfirm: 'OpenFilm 会打开一个终端窗口，运行 {name} 的官方安装命令：',
++      installRun: '运行安装',
++      notTheAgentApp: '这是编辑器或桌面应用，不是 {name} 的命令行智能体。连接需要 {name} 的命令行智能体。',
++      notCursorAgent: '这不是 Cursor 的命令行智能体（它安装在 cursor-agent 文件夹里）。连接需要 Cursor 的命令行智能体。',
+       didNotStart: '从这里启动失败：',
+       unreadable: '它读不了自己的设置，所以无法启动。请修改它的配置文件里提到的那一项，或更新它：',
+       whyMissing: '为什么检测不到？',
+--- old/packages/openfilm/studio/ui/src/lib/host.ts
++++ new/packages/openfilm/studio/ui/src/lib/host.ts
+@@ -80,7 +80,8 @@
+    * and returns a way to stop listening. One of the person's own agents, found or not, can be pointed at a program
+    * of the person's choosing (`locate`: the system's file dialog, with Studio's words; `{ ok: false }` and no error
+    * when cancelled) and set back to being found (`useAutomatic`); `diagnose` says what was searched (an older app
+-   * has none of these).
++   * has none of these). One not found that has an official installer (`HostAgent.installer`) can be installed:
++   * `install` runs it in a terminal window, once the person agreed to that command (an older app has none).
+    */
+   agents?: {
+     list: () => Promise<HostAgent[]>;
+@@ -89,7 +90,8 @@
+     /** Codex: what is left of its plan, as it says for the account signed in (null: it can't say; other agents, null) */
+     usage?: (id: HostAgentId, fresh?: boolean) => Promise<HostAgentUsage | null>;
+     setShown: (id: HostAgentId, shown: boolean) => Promise<unknown>;
+-    locate?: (id: HostAgentId, words?: { title?: string; button?: string }) => Promise<{ ok: boolean; error?: string; code?: 'not-a-program' | 'did-not-start' | string }>;
++    locate?: (id: HostAgentId, words?: { title?: string; button?: string }) => Promise<{ ok: boolean; error?: string; code?: 'not-a-program' | 'did-not-start' | 'app' | 'not-cursor-agent' | string }>;
++    install?: (id: HostAgentId) => Promise<{ ok: boolean; error?: string }>;
+     useAutomatic?: (id: HostAgentId) => Promise<unknown>;
+     diagnose?: (id: HostAgentId) => Promise<HostAgentDiagnosis | null>;
+     /** The app's part of Settings → Developer's diagnostic report: the app, and each agent's program, version and state, as text. */
+@@ -225,6 +227,11 @@
+   install?: string | null;
+   /** What installing it takes, when `install` is not a download: 'code-tab', Claude Code comes with the Claude app (its Code tab). */
+   setupRequired?: string | null;
++  /** Not installed: the maker's desktop app when only that is here (`Cursor`), and the official command that installs it. */
++  app?: string | null;
++  installer?: string | null;
++  /** Its installer is running in a terminal window: it is looked for again until it is there. */
++  installing?: boolean;
+   /** The program used (the person's own agents), and the one the person chose for it, if they did. */
+   path?: string | null;
+   chosen?: string | null;
+--- old/packages/openfilm/studio/ui/src/lib/whats-new.ts
++++ new/packages/openfilm/studio/ui/src/lib/whats-new.ts
+@@ -16,6 +16,52 @@
+ export interface ReleaseNotes { version: string; date: string; notes: Record<Language, ReleaseNote[]> }
+ 
+ export const RELEASES: readonly ReleaseNotes[] = [
++  {
++    version: '0.2.2',
++    date: '2026-10-19',
++    notes: {
++      en: [
++        { kind: 'new', text: 'An export can be named where you choose its folder.' },
++        { kind: 'new', text: 'Agents work when you installed only the maker’s app: Claude Code and OpenCode are found inside their apps, and Settings › Agents installs the others with their official installer.' },
++        { kind: 'improved', text: 'When the app’s own agent tries its model service again, the chat says so. Final Cut Pro subtitles keep their look and size.' },
++        { kind: 'fixed', text: 'On Windows, agents start again: 0.2.1 handed them the path of cmd.exe unexpanded. Connecting Cursor no longer opens the Cursor editor.' },
++        { kind: 'fixed', text: 'On a Mac, an update installs when you quit, even if you open OpenFilm again right away.' },
++        { kind: 'fixed', text: 'openfilm render takes frame rates like 29.97; 4K and transparent WebM footage get their contact sheets; a render that fails on Windows says why.' },
++      ],
++      'zh-CN': [
++        { kind: 'new', text: '导出时可以在选文件夹的地方给文件起名。' },
++        { kind: 'new', text: '只装了官方应用也能用智能体：Claude Code 和 OpenCode 能在它们的应用里找到，其他的在 设置 › 智能体 里用官方安装程序一键安装。' },
++        { kind: 'improved', text: '内置智能体重新请求模型服务时，对话里会提示。Final Cut Pro 字幕保持原来的样式和大小。' },
++        { kind: 'fixed', text: 'Windows 上智能体又能启动了：0.2.1 交给它们的 cmd.exe 路径没有展开。连接 Cursor 不会再打开 Cursor 编辑器。' },
++        { kind: 'fixed', text: 'Mac 上退出时会安装更新，即使你马上又打开 OpenFilm。' },
++        { kind: 'fixed', text: 'openfilm render 支持 29.97 这样的帧率；4K 和透明 WebM 视频也能生成缩略图；Windows 上渲染失败会说明原因。' },
++      ],
++      ja: [
++        { kind: 'new', text: '書き出しのファイル名を、フォルダを選ぶ場所で付けられます。' },
++        { kind: 'new', text: '公式アプリだけを入れていてもエージェントが使えます。Claude Code と OpenCode はそれぞれのアプリの中から見つけ、ほかは設定 › エージェントから公式インストーラーで入れられます。' },
++        { kind: 'improved', text: 'アプリ内蔵のエージェントがモデルサービスに再試行するとき、チャットに表示します。Final Cut Pro の字幕は見た目とサイズを保ちます。' },
++        { kind: 'fixed', text: 'Windows でエージェントが再び起動します。0.2.1 では cmd.exe のパスを展開せずに渡していました。Cursor に接続しても Cursor エディタは開きません。' },
++        { kind: 'fixed', text: 'Mac では終了時にアップデートがインストールされます。すぐに OpenFilm を開き直しても同じです。' },
++        { kind: 'fixed', text: 'openfilm render が 29.97 のようなフレームレートに対応。4K や透過 WebM の映像もコンタクトシートを作れます。Windows で失敗した書き出しは理由を表示します。' },
++      ],
++      ko: [
++        { kind: 'new', text: '내보낼 때 폴더를 고르는 곳에서 파일 이름을 정할 수 있습니다.' },
++        { kind: 'new', text: '공식 앱만 설치해도 에이전트를 쓸 수 있습니다. Claude Code와 OpenCode는 각 앱 안에서 찾고, 나머지는 설정 › 에이전트에서 공식 설치 프로그램으로 설치합니다.' },
++        { kind: 'improved', text: '앱 자체 에이전트가 모델 서비스를 다시 시도하면 채팅에 알려 줍니다. Final Cut Pro 자막은 모양과 크기를 유지합니다.' },
++        { kind: 'fixed', text: 'Windows에서 에이전트가 다시 시작됩니다. 0.2.1은 cmd.exe 경로를 펼치지 않고 넘겼습니다. Cursor를 연결해도 Cursor 편집기가 열리지 않습니다.' },
++        { kind: 'fixed', text: 'Mac에서는 종료할 때 업데이트가 설치됩니다. 바로 OpenFilm을 다시 열어도 마찬가지입니다.' },
++        { kind: 'fixed', text: 'openfilm render가 29.97 같은 프레임 레이트를 받습니다. 4K와 투명 WebM 영상도 콘택트 시트가 만들어지고, Windows에서 실패한 렌더는 이유를 알려 줍니다.' },
++      ],
++      es: [
++        { kind: 'new', text: 'Una exportación se puede nombrar donde eliges su carpeta.' },
++        { kind: 'new', text: 'Los agentes funcionan aunque solo tengas la app de su fabricante: Claude Code y OpenCode se encuentran dentro de sus apps, y Ajustes › Agentes instala los demás con su instalador oficial.' },
++        { kind: 'improved', text: 'Cuando el agente propio de la app reintenta su servicio de modelos, el chat lo dice. Los subtítulos de Final Cut Pro mantienen su aspecto y tamaño.' },
++        { kind: 'fixed', text: 'En Windows los agentes vuelven a arrancar: 0.2.1 les daba la ruta de cmd.exe sin expandir. Conectar Cursor ya no abre el editor Cursor.' },
++        { kind: 'fixed', text: 'En un Mac, una actualización se instala al salir, aunque vuelvas a abrir OpenFilm enseguida.' },
++        { kind: 'fixed', text: 'openfilm render acepta frecuencias como 29.97; el material 4K y los WebM transparentes tienen su hoja de contactos; un render que falla en Windows dice por qué.' },
++      ],
++    },
++  },
+   {
+     version: '0.2.1',
+     date: '2026-10-19',
+--- old/packages/shared/CHANGELOG.md
++++ new/packages/shared/CHANGELOG.md
+@@ -1,4 +1,6 @@
+ # @openfilm/shared
++
++## 0.2.2
+ 
+ ## 0.2.1
+ 
+--- old/packages/shared/package.json
++++ new/packages/shared/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "@openfilm/shared",
+-  "version": "0.2.1",
++  "version": "0.2.2",
+   "private": true,
+   "type": "module",
+   "license": "MIT",
+--- old/.changeset/desktop-agent-definitions.md
++++ new/.changeset/desktop-agent-definitions.md
+@@ -1,5 +0,0 @@
+----
+-"@openfilm/desktop": patch
+----
+-
+-Keep desktop agent names and installation links in one list so Chat and installation discovery stay consistent, preserving existing agent behavior.
+--- old/.changeset/export-file-name.md
++++ new/.changeset/export-file-name.md
+@@ -1,5 +0,0 @@
+----
+-"openfilm": patch
+----
+-
+-Studio: an export can be named where it is asked for — a name field beside the folder it goes to, the project's name in it to begin with — instead of every file taking the project's name. A named export keeps the suffixes that tell the files of one export apart (` · 哔哩哔哩`, `(alpha)`, `stills`) and drops the ones that only describe the project (`1080p`, `0-9s`). A name left empty is the project's, as before, and an export that would take a name already there still gets ` 2` rather than being written over.
+--- old/.changeset/fcp-subtitle-style.md
++++ new/.changeset/fcp-subtitle-style.md
+@@ -1,6 +0,0 @@
+----
+-"openfilm": patch
+-"@openfilm/desktop": patch
+----
+-
+-Keep Final Cut Pro subtitles white with a black outline and a soft shadow. Correct Basic Title font scaling so subtitle size stays proportional in low-resolution, 4K and portrait sequences.
+--- old/.changeset/look-media-thumbnails.md
++++ new/.changeset/look-media-thumbnails.md
+@@ -1,5 +0,0 @@
+----
+-"openfilm": patch
+----
+-
+-Resize media contact-sheet thumbnails before embedding them, preventing "Invalid string length" on high-resolution, high-bit-depth clips. Single-frame output keeps its original resolution. A transparent WebM (VP9 or VP8) keeps its alpha in the sheet and in a single frame.
+--- old/.changeset/pi-retry-notice.md
++++ new/.changeset/pi-retry-notice.md
+@@ -1,5 +0,0 @@
+----
+-'@openfilm/desktop': patch
+----
+-
+-Desktop: when the app's own agent tries a model service again after waiting, the chat says so.
+--- old/.changeset/render-cleanup-error.md
++++ new/.changeset/render-cleanup-error.md
+@@ -1,5 +0,0 @@
+----
+-'openfilm': patch
+----
+-
+-Render: when an encode fails on Windows, the error says why instead of a permission error from cleaning up.

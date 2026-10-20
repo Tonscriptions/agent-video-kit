@@ -1,0 +1,6 @@
+import { exactRate, ffmpegRate } from './rate.mjs';
+const inputs = [23.976, 23.98, 29.97, 59.94, 119.88, 12.5, 1.99, 1.998];
+console.log(JSON.stringify(inputs.map(input => {
+  const rate = exactRate(input);
+  return { input, rate, ffmpeg: ffmpegRate(rate), changed: rate.fps !== input, delta: rate.fps - input };
+})));
