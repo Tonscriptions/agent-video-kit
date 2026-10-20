@@ -518,3 +518,12 @@ docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md text
 
 # Preserve the byte-frozen V70 executed test module; allow its terminal blank line.
 product/tests/test_queue_reuse.py whitespace=-blank-at-eof,blank-at-eol,space-before-tab,cr-at-eol
+
+# V71 native contact sheets: preserve original native receipts and media bytes.
+docs/assets/contact-sheet-20261020-v71-native-r1/** -text -whitespace
+docs/assets/contact-sheet-20261020-v71-installed-r1/** -text -whitespace
+docs/assets/contact-sheet-20261020-v71-native-r2/** -text -whitespace
+docs/assets/contact-sheet-20261020-v71-installed-r2/** -text -whitespace
+docs/validation/evidence/contact-sheet-20261020-v71/** -text -whitespace
+docs/validation/透明视频多帧联系表与Alpha核验实测_2026-10-20.md text eol=lf
+docs/specs/透明视频多帧联系表与实际时间锚点契约_v0.1_2026-10-20.md text eol=lf

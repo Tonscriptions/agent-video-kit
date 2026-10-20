@@ -1,0 +1,70 @@
+{
+  "status": "failed",
+  "cases": [
+    {
+      "name": "normal",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "ffv1",
+            "codec_type": "video",
+            "width": 64,
+            "height": 48,
+            "pix_fmt": "bgra",
+            "color_space": "gbr",
+            "r_frame_rate": "4/1",
+            "avg_frame_rate": "4/1",
+            "time_base": "1/1000",
+            "start_time": "0.000000",
+            "tags": {}
+          }
+        ],
+        "format": {
+          "format_name": "matroska,webm",
+          "start_time": "0.000000",
+          "duration": "1.000000"
+        }
+      },
+      "frames": [
+        {
+          "requested_seconds": 0.0,
+          "relative_seconds": 0.0,
+          "source_pts_time_text": "0",
+          "source_pts_seconds_rational": "0",
+          "alpha_extrema": [
+            0,
+            255
+          ]
+        },
+        {
+          "requested_seconds": 0.26,
+          "relative_seconds": 0.5,
+          "source_pts_time_text": "0.5",
+          "source_pts_seconds_rational": "1/2",
+          "alpha_extrema": [
+            0,
+            255
+          ]
+        },
+        {
+          "requested_seconds": 0.75,
+          "relative_seconds": 0.75,
+          "source_pts_time_text": "0.75",
+          "source_pts_seconds_rational": "3/4",
+          "alpha_extrema": [
+            0,
+            255
+          ]
+        }
+      ]
+    }
+  ],
+  "virtualization": false,
+  "error": {
+    "type": "AppError",
+    "message": "无法在指定锚点提取有界帧"
+  }
+}

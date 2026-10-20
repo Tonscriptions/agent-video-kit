@@ -5,6 +5,15 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [native multi-frame contact sheets](../../docs/specs/透明视频多帧联系表与实际时间锚点契约_v0.1_2026-10-20.md),
+read the [measured native/installed checks](../../docs/validation/透明视频多帧联系表与Alpha核验实测_2026-10-20.md).
+Compare selected PNGs against independently decoded source frames, and compare
+each checker/light/dark/alpha panel using its actual PTS and pixel hashes.
+Keep request time, packet candidates and decoded time distinct. Preview is
+8-bit and sampled; static inspection does not accept HDR, natural skin,
+continuous motion, audio listening or full CapCut quality. Never promote
+`quality_accepted: false` based on contact-sheet generation alone.
+
 For face edits use the [face contract](../../docs/specs/离线人脸锚点与局部修饰契约_v0.1_2026-10-20.md)
 and [video checks and failures](../../docs/validation/离线人脸锚点与局部修饰实测_2026-10-20.md).
 Check neutral decoded RGBA, unchanged original alpha, pixels outside the

@@ -29,6 +29,14 @@ class BrowserProcessJob:
         self.api.TerminateJobObject.argtypes = [wintypes.HANDLE, wintypes.UINT]
         self.api.QueryInformationJobObject.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD, ctypes.c_void_p]
         self.api.CloseHandle.argtypes = [wintypes.HANDLE]
+        self.api.CreateToolhelp32Snapshot.argtypes = [wintypes.DWORD, wintypes.DWORD]
+        self.api.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
+        self.api.Thread32First.argtypes = [wintypes.HANDLE, ctypes.c_void_p]
+        self.api.Thread32Next.argtypes = [wintypes.HANDLE, ctypes.c_void_p]
+        self.api.OpenThread.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        self.api.OpenThread.restype = wintypes.HANDLE
+        self.api.ResumeThread.argtypes = [wintypes.HANDLE]
+        self.api.ResumeThread.restype = wintypes.DWORD
 
         class BASIC(ctypes.Structure):
             _fields_ = [('ProcessTime', ctypes.c_int64), ('JobTime', ctypes.c_int64),
@@ -56,6 +64,7 @@ class BrowserProcessJob:
             self._error('SetInformationJobObject')
         self.seen_pids: set[int] = set()
         self.processes: list[subprocess.Popen] = []
+        self.resumed_primary_threads: list[dict[str, int]] = []
         self.cancel_file = cancel_file
         self.deadline = time.monotonic() + timeout
         self.reason: str | None = None
@@ -84,19 +93,61 @@ class BrowserProcessJob:
             self.seen_pids.update(ids)
             return ids
 
+    def _resume_primary_thread(self, pid: int):
+        # Popen closes the original primary-thread handle. A suspended new
+        # process has one thread; recover its ID using documented Win32 APIs.
+        class THREADENTRY32(ctypes.Structure):
+            _fields_ = [('size', wintypes.DWORD), ('usage', wintypes.DWORD),
+                        ('tid', wintypes.DWORD), ('pid', wintypes.DWORD),
+                        ('base_priority', wintypes.LONG), ('delta_priority', wintypes.LONG),
+                        ('flags', wintypes.DWORD)]
+        snapshot = self.api.CreateToolhelp32Snapshot(0x00000004, 0)  # TH32CS_SNAPTHREAD
+        if snapshot in (None, ctypes.c_void_p(-1).value):
+            self._error('CreateToolhelp32Snapshot')
+        ids = []
+        try:
+            entry = THREADENTRY32(); entry.size = ctypes.sizeof(entry)
+            available = self.api.Thread32First(snapshot, ctypes.byref(entry))
+            while available:
+                if entry.pid == pid:
+                    ids.append(int(entry.tid))
+                entry.size = ctypes.sizeof(entry)
+                available = self.api.Thread32Next(snapshot, ctypes.byref(entry))
+        finally:
+            self.api.CloseHandle(snapshot)
+        if len(ids) != 1:
+            raise AppError('HTML_JOB_UNAVAILABLE', '挂起的新进程主线程不唯一；拒绝恢复', exit_code=10,
+                           cause=f'pid={pid}, threads={len(ids)}')
+        thread = self.api.OpenThread(0x0002, False, ids[0])  # THREAD_SUSPEND_RESUME
+        if not thread:
+            self._error('OpenThread')
+        try:
+            previous = self.api.ResumeThread(thread)
+            if previous != 1:
+                raise AppError('HTML_JOB_UNAVAILABLE', '无法从单次挂起恢复受控主线程', exit_code=10,
+                               cause=f'ResumeThread suspend_count={previous}, error={ctypes.get_last_error()}')
+            self.resumed_primary_threads.append({'pid': pid, 'thread_id': ids[0]})
+        finally:
+            self.api.CloseHandle(thread)
+
     def start(self, argv: list[str], *, cwd: Path, env: dict[str, str], **pipes) -> subprocess.Popen:
         self.check()
-        process = subprocess.Popen(argv, cwd=cwd, env=env, creationflags=subprocess.CREATE_NO_WINDOW, **pipes)
+        # CREATE_SUSPENDED prevents both early exit and uncontained descendants
+        # between CreateProcess and AssignProcessToJobObject.
+        process = subprocess.Popen(argv, cwd=cwd, env=env,
+                                   creationflags=subprocess.CREATE_NO_WINDOW | 0x00000004, **pipes)
         with self.mutex:
-            if not self.api.AssignProcessToJobObject(self.handle, wintypes.HANDLE(int(process._handle))):
-                process.kill()
-                process.wait(timeout=5)
-                self._error('AssignProcessToJobObject')
             self.processes.append(process)
             self.seen_pids.add(process.pid)
-            # A watchdog may have fired between Popen and assignment.
-            if self.reason:
-                self.api.TerminateJobObject(self.handle, 1)
+            try:
+                if not self.api.AssignProcessToJobObject(self.handle, wintypes.HANDLE(int(process._handle))):
+                    self._error('AssignProcessToJobObject')
+                self.check()  # cancellation while CreateProcess was in progress
+                self._resume_primary_thread(process.pid)
+            except BaseException:
+                process.kill()
+                process.wait(timeout=5)
+                raise
         self.check()
         return process
 
@@ -150,6 +201,8 @@ class BrowserProcessJob:
             time.sleep(0.05)
             active = self.pids()
         self.receipt = {'native_job': True, 'seen_pids': sorted(self.seen_pids),
+                        'start_policy': 'create_suspended_assign_job_resume_primary_thread',
+                        'resumed_primary_threads': list(self.resumed_primary_threads),
                         'active_before_final_cleanup': before, 'active_after_cleanup': active,
                         'all_children_reaped': not active, 'termination_reason': self.reason}
         self.api.CloseHandle(self.handle)

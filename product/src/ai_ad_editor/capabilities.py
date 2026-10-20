@@ -21,6 +21,21 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'contact_sheet': {
+                'status': 'implemented_with_limits', 'engine': 'agent-native-contact-sheet-v1',
+                'commands': ['media.contact-sheet'],
+                'features': ['explicit_or_packet_timestamp_source_anchors', 'actual_decoded_presentation_timestamps',
+                    'alpha_aware_vp8_vp9_decoder', 'bounded_scaled_rgba_frames',
+                    'checker_light_dark_alpha_views', 'source_tools_frame_and_panel_sha256',
+                    'owned_native_process_timeout_cancel_cleanup', 'new_directory_publication'],
+                'limits': ['32_frames_640x640_cells_8192_canvas_side_16million_canvas_pixels',
+                    '8bit_preview_not_source_precision_or_hdr_quality_measurement',
+                    'selected_frames_not_continuous_playback_or_audio_review',
+                    'automatic_count_is_upper_bound_on_unique_packet_candidates_verified_on_decode',
+                    'packet_demux_index_deadline_60seconds_not_a_decoded_quality_acceptance',
+                    'actual_frame_at_or_after_anchor_may_be_later_on_vfr_or_sparse_video',
+                    'no_browser_no_model_no_network', 'no_automatic_quality_acceptance'],
+            },
             'face_retouch': {
                 'status': 'implemented_with_limits', 'engine': 'openseeface-66-onnx-cpu-local-v1',
                 'commands': ['face.adapter.register','face.adapter.list','face.adapter.inspect','face.scan','face.retouch'],

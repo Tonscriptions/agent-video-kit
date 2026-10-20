@@ -1,0 +1,40 @@
+usage: ai-ad-editor media contact-sheet [-h] [--format {json,text}]
+                                        [--request-id REQUEST_ID]
+                                        [--idempotency-key IDEMPOTENCY_KEY]
+                                        [--dry-run] [--no-network]
+                                        [--progress {none,jsonl}]
+                                        --project PROJECT
+                                        (--asset-id ASSET_ID | --input INPUT)
+                                        --output OUTPUT
+                                        [--at-seconds AT_SECONDS]
+                                        [--count COUNT]
+                                        [--start-seconds START_SECONDS]
+                                        [--end-seconds END_SECONDS]
+                                        [--width WIDTH] [--height HEIGHT]
+                                        [--columns COLUMNS]
+                                        [--view {checker,light,dark,alpha}]
+                                        [--timeout TIMEOUT]
+                                        [--cancel-file CANCEL_FILE]
+
+options:
+  -h, --help            show this help message and exit
+  --format {json,text}  输出格式
+  --request-id REQUEST_ID
+  --idempotency-key IDEMPOTENCY_KEY
+  --dry-run
+  --no-network
+  --progress {none,jsonl}
+  --project PROJECT
+  --asset-id ASSET_ID
+  --input INPUT
+  --output OUTPUT       项目内全新输出目录
+  --at-seconds AT_SECONDS
+  --count COUNT
+  --start-seconds START_SECONDS
+  --end-seconds END_SECONDS
+  --width WIDTH
+  --height HEIGHT
+  --columns COLUMNS
+  --view {checker,light,dark,alpha}
+  --timeout TIMEOUT
+  --cancel-file CANCEL_FILE

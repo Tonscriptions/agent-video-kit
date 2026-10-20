@@ -5,6 +5,15 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For local multi-frame inspection use `media contact-sheet` with a new project-local
+output directory and explicit anchors or bounded automatic sampling. Read the
+[contact-sheet contract](../../docs/specs/透明视频多帧联系表与实际时间锚点契约_v0.1_2026-10-20.md)
+and [native/installed evidence](../../docs/validation/透明视频多帧联系表与Alpha核验实测_2026-10-20.md).
+Report actual decoded PTS separately from requested time. Explicit anchors select
+the first available frame at or after the request; automatic count is an upper
+bound. Inspect checker/light/dark/alpha panels and preserve the manifest. This
+read-only inspection does not accept natural quality or modify the timeline.
+
 For local face anchors and retouch read the
 [face contract](../../docs/specs/离线人脸锚点与局部修饰契约_v0.1_2026-10-20.md)
 and [real execution and limits](../../docs/validation/离线人脸锚点与局部修饰实测_2026-10-20.md).

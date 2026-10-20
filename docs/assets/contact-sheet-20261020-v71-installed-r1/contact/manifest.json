@@ -1,0 +1,497 @@
+{
+  "engine": "agent-native-contact-sheet-v1",
+  "plan": {
+    "engine": "agent-native-contact-sheet-v1",
+    "source": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\contact-sheet-20261020-v71\\installed-r1\\media\\project\\assets\\alpha_source-alpha.webm",
+      "sha256": "sha256:1d8e173090761d255dfdc9a5d76d9153cda6e9ead3034d044c057d109081f308"
+    },
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "vp9",
+          "codec_type": "video",
+          "width": 320,
+          "height": 180,
+          "sample_aspect_ratio": "1:1",
+          "pix_fmt": "yuv420p",
+          "r_frame_rate": "12/1",
+          "avg_frame_rate": "12/1",
+          "time_base": "1/1000",
+          "start_time": "0.000000",
+          "tags": {
+            "alpha_mode": "1"
+          }
+        }
+      ],
+      "format": {
+        "format_name": "matroska,webm",
+        "start_time": "0.000000",
+        "duration": "2.008000"
+      }
+    },
+    "probe_command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+      "-v",
+      "error",
+      "-protocol_whitelist",
+      "file,pipe",
+      "-select_streams",
+      "v:0",
+      "-show_entries",
+      "format=duration,format_name,start_time:stream=index,codec_name,codec_type,width,height,pix_fmt,time_base,start_time,duration,avg_frame_rate,r_frame_rate,sample_aspect_ratio,color_transfer,color_primaries,color_space:stream_tags=alpha_mode:stream_side_data=rotation",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\contact-sheet-20261020-v71\\installed-r1\\media\\project\\assets\\alpha_source-alpha.webm"
+    ],
+    "probe_stdout_sha256": "8e7d2b603be1b156087d0c37c9ce0112c2bd7787502b3d4a2438778bc0b28d46",
+    "tools": [
+      {
+        "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+      },
+      {
+        "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.exe",
+        "sha256": "sha256:70872c3ffbc43d0b2c570f9837f54d6e9a832f4ca25463e9735b6a3ec0621478"
+      }
+    ],
+    "times": [
+      0.0,
+      0.17,
+      0.75,
+      1.5
+    ],
+    "anchors": {
+      "mode": "explicit_times"
+    },
+    "origin_seconds": 0.0,
+    "container_start_seconds": 0.0,
+    "duration_seconds": 2.008,
+    "duration_basis": "matroska_segment_end_minus_video_start",
+    "decoder": "libvpx-vp9",
+    "width": 320,
+    "height": 180,
+    "columns": 2,
+    "views": [
+      "checker",
+      "light",
+      "dark",
+      "alpha"
+    ],
+    "resample": false,
+    "sheet_width": 2560,
+    "sheet_height": 444,
+    "selection": "first_decodable_frame_at_or_after_requested_source_timestamp",
+    "preview": "8bit_rgba_ffmpeg_resize_sar_and_auto_rotation; not a source precision or HDR quality measurement",
+    "network": "disabled",
+    "browser": false,
+    "model_forwards": 0
+  },
+  "frames": [
+    {
+      "index": 0,
+      "requested_seconds": 0.0,
+      "source_pts": 0,
+      "source_pts_time_text": "0",
+      "relative_seconds": 0.0,
+      "source_time_base": "1/1000",
+      "source_pts_seconds_rational": "0",
+      "width": 320,
+      "height": 180,
+      "path": "frame-000.png",
+      "png_sha256": "sha256:c96868da1582c122109fb17258883d8755b2132e0f98582decff285dca6e8f33",
+      "rgba_sha256": "sha256:c8fb57b94b8a770ee839ab6f30a921e0f713f7c6124d34f108ac4f36b11024f2",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_sha256": "sha256:1c68c5e3d1261abbedeeaf4290d122c4a868db69f9832b65de5ada21cac96954",
+      "log_sha256": "sha256:fecea80e2eb15a53f7057a4468ea3a47d6d51fbdb269d55eb5b276995f374fca",
+      "panels": [
+        {
+          "view": "checker",
+          "x": 0,
+          "y": 42,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:58876f425c692d51fd089f86aad7f51c523df01bdecb8e7655950a4c5bb069df"
+        },
+        {
+          "view": "light",
+          "x": 320,
+          "y": 42,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:c6974521567edaa0e3b02595bf66b893ff6d59eb4642bd9f324f57aaa9e80d30"
+        },
+        {
+          "view": "dark",
+          "x": 640,
+          "y": 42,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:96b30bbca618da5973a7e68adeb2f78090b485166d51fa9770a5269f80b0d958"
+        },
+        {
+          "view": "alpha",
+          "x": 960,
+          "y": 42,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:cd1d6b94c7cc140c00b6f30fb9ad556f640b89aa915b1a8e64b4e8e2f1d2f615"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "requested_seconds": 0.17,
+      "source_pts": 250,
+      "source_pts_time_text": "0.25",
+      "relative_seconds": 0.25,
+      "source_time_base": "1/1000",
+      "source_pts_seconds_rational": "1/4",
+      "width": 320,
+      "height": 180,
+      "path": "frame-001.png",
+      "png_sha256": "sha256:c20829a9e137d023b4f5aaa817fb22074b1381d335588726316fc84eac0d001d",
+      "rgba_sha256": "sha256:2b59486294c0a29e24ec52a7cb48968dd07ac45557cfa93e9c5dff180591c186",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_sha256": "sha256:c7037cc84d076c9292a5e633145f01abb2d42f4b2276e5af879bdcb5f7b69cdd",
+      "log_sha256": "sha256:2c07bd238f3e3786e5b1f3a52daf68ffd928bbbe61d80a209a4f27760fa21bdf",
+      "panels": [
+        {
+          "view": "checker",
+          "x": 1280,
+          "y": 42,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:e4d4bd3c108f860394c765981d06fa0940cbb289e3a7b9e872096b06316251f0"
+        },
+        {
+          "view": "light",
+          "x": 1600,
+          "y": 42,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:a231aaaacd6ca0ecfd778d3b34b5b4531015a2cd438f8c29d5ac1ca528edcbed"
+        },
+        {
+          "view": "dark",
+          "x": 1920,
+          "y": 42,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:0fc53536a3e1d7e9fffc9a86c225703dbf70883959f87214ab634e1d5fce4140"
+        },
+        {
+          "view": "alpha",
+          "x": 2240,
+          "y": 42,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:1a4d049faa994ebc99c47beabe41a757f17102ec512626ab2dc9bfd9e2cf79fa"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "requested_seconds": 0.75,
+      "source_pts": 750,
+      "source_pts_time_text": "0.75",
+      "relative_seconds": 0.75,
+      "source_time_base": "1/1000",
+      "source_pts_seconds_rational": "3/4",
+      "width": 320,
+      "height": 180,
+      "path": "frame-002.png",
+      "png_sha256": "sha256:2896e53e2f811c6416cf6b9d30e2cc7c95b4da6a3606c68d08a41a8cbb0f2dd0",
+      "rgba_sha256": "sha256:efc80ce230cdd683f7ada35eae1900bd21d005b07ae6028e9db213be49e07f78",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_sha256": "sha256:7ef325ae27f6a82592484dfe6443d4d918f68c371be13edb21bab98d26bd65cf",
+      "log_sha256": "sha256:509f17c6e423580756b0ada96cec60491614a3a343a5de39f3cb4832b08a2da5",
+      "panels": [
+        {
+          "view": "checker",
+          "x": 0,
+          "y": 264,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:dbd295d3b291e04d62b3697e176039fe72e941c6a48eaa128f33ebc168c73271"
+        },
+        {
+          "view": "light",
+          "x": 320,
+          "y": 264,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:4ad6b7e827776d51671edc269b69c25e425b075b07e033e8c1af6f427a7545a7"
+        },
+        {
+          "view": "dark",
+          "x": 640,
+          "y": 264,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:c9b4a9757379c494713551abf9cfb52c56f4a747c510625aca7b7171ed17c58b"
+        },
+        {
+          "view": "alpha",
+          "x": 960,
+          "y": 264,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:04172d2f967b4d86036b6a4f717208e2888316a24148a56d83c14354f14ba653"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "requested_seconds": 1.5,
+      "source_pts": 1500,
+      "source_pts_time_text": "1.5",
+      "relative_seconds": 1.5,
+      "source_time_base": "1/1000",
+      "source_pts_seconds_rational": "3/2",
+      "width": 320,
+      "height": 180,
+      "path": "frame-003.png",
+      "png_sha256": "sha256:3b3d5ba1fd6d4b9a8c066579878a8650ad0e06931bcd78ccc318f44def3bf623",
+      "rgba_sha256": "sha256:3d589be986aa6d0e7f64e66b1c995a0050ef9fe8482d6c595ca713bc74595ac0",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_sha256": "sha256:f62f6a663ad951c4d0fbef00ec2f6ca98683ba330295db58be8aea8b8a53e36c",
+      "log_sha256": "sha256:4ff4d108d6c65ef3b5d3a7cbbca8ed2ad4848e5252a1b4528a748aa93441a1f8",
+      "panels": [
+        {
+          "view": "checker",
+          "x": 1280,
+          "y": 264,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:d4d62835bc6a924a83fa5d2247be9c603dcf1410757ae0f3ca076af577e4f45e"
+        },
+        {
+          "view": "light",
+          "x": 1600,
+          "y": 264,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:ec1c51b785cf9b521383ee2f2e0bbe9f2e345e2b5231835f356b8f058929e65e"
+        },
+        {
+          "view": "dark",
+          "x": 1920,
+          "y": 264,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:06709ecb57497666e7dceecaa43679977d1cda3337b11f66136111f15eb86d7e"
+        },
+        {
+          "view": "alpha",
+          "x": 2240,
+          "y": 264,
+          "width": 320,
+          "height": 180,
+          "rgb_sha256": "sha256:3eeaf13715e14605600cf1480e31775c7629a53f55e91e763b5b81653162810e"
+        }
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-hide_banner",
+        "-nostdin",
+        "-loglevel",
+        "info",
+        "-copyts",
+        "-ss",
+        "-0.000001000",
+        "-protocol_whitelist",
+        "file,pipe",
+        "-c:v",
+        "libvpx-vp9",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\contact-sheet-20261020-v71\\installed-r1\\media\\project\\assets\\alpha_source-alpha.webm",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-vf",
+        "format=rgba,showinfo",
+        "-frames:v",
+        "1",
+        "-fps_mode",
+        "passthrough",
+        "-threads",
+        "1",
+        "-update",
+        "1",
+        "-y",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\contact-sheet-20261020-v71\\installed-r1\\media\\project\\validation\\.contact-a4s5ycho\\frame-000.png"
+      ],
+      "exit_code": 0,
+      "stderr": "frame-000.stderr.log"
+    },
+    {
+      "argv": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-hide_banner",
+        "-nostdin",
+        "-loglevel",
+        "info",
+        "-copyts",
+        "-ss",
+        "0.169999000",
+        "-protocol_whitelist",
+        "file,pipe",
+        "-c:v",
+        "libvpx-vp9",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\contact-sheet-20261020-v71\\installed-r1\\media\\project\\assets\\alpha_source-alpha.webm",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-vf",
+        "format=rgba,showinfo",
+        "-frames:v",
+        "1",
+        "-fps_mode",
+        "passthrough",
+        "-threads",
+        "1",
+        "-update",
+        "1",
+        "-y",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\contact-sheet-20261020-v71\\installed-r1\\media\\project\\validation\\.contact-a4s5ycho\\frame-001.png"
+      ],
+      "exit_code": 0,
+      "stderr": "frame-001.stderr.log"
+    },
+    {
+      "argv": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-hide_banner",
+        "-nostdin",
+        "-loglevel",
+        "info",
+        "-copyts",
+        "-ss",
+        "0.749999000",
+        "-protocol_whitelist",
+        "file,pipe",
+        "-c:v",
+        "libvpx-vp9",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\contact-sheet-20261020-v71\\installed-r1\\media\\project\\assets\\alpha_source-alpha.webm",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-vf",
+        "format=rgba,showinfo",
+        "-frames:v",
+        "1",
+        "-fps_mode",
+        "passthrough",
+        "-threads",
+        "1",
+        "-update",
+        "1",
+        "-y",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\contact-sheet-20261020-v71\\installed-r1\\media\\project\\validation\\.contact-a4s5ycho\\frame-002.png"
+      ],
+      "exit_code": 0,
+      "stderr": "frame-002.stderr.log"
+    },
+    {
+      "argv": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-hide_banner",
+        "-nostdin",
+        "-loglevel",
+        "info",
+        "-copyts",
+        "-ss",
+        "1.499999000",
+        "-protocol_whitelist",
+        "file,pipe",
+        "-c:v",
+        "libvpx-vp9",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\contact-sheet-20261020-v71\\installed-r1\\media\\project\\assets\\alpha_source-alpha.webm",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-vf",
+        "format=rgba,showinfo",
+        "-frames:v",
+        "1",
+        "-fps_mode",
+        "passthrough",
+        "-threads",
+        "1",
+        "-update",
+        "1",
+        "-y",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\openfilm-batch-dedupe\\product\\.runtime\\contact-sheet-20261020-v71\\installed-r1\\media\\project\\validation\\.contact-a4s5ycho\\frame-003.png"
+      ],
+      "exit_code": 0,
+      "stderr": "frame-003.stderr.log"
+    }
+  ],
+  "continuous_playback_reviewed": false,
+  "audio_listening_reviewed": false,
+  "quality_accepted": false,
+  "network": "disabled",
+  "annotation_font": {
+    "engine": "Pillow.ImageFont.load_default",
+    "family": [
+      "Aileron",
+      "Regular"
+    ],
+    "embedded_bytes_sha256": "sha256:69853909b940023570964e29cffe30da95aea8de3627736b5cd15ab30143169f",
+    "host_font_fallback": false
+  },
+  "contact": {
+    "path": "contact.png",
+    "width": 2560,
+    "height": 444,
+    "sha256": "sha256:e13cc4384782051af6f3a6e414a34237fda2d3ba702ed9979528e3f2bd44856c"
+  },
+  "process_cleanup": {
+    "native_job": true,
+    "seen_pids": [
+      2816,
+      4172,
+      8284,
+      26732,
+      30340,
+      30512,
+      33696,
+      34408
+    ],
+    "active_before_final_cleanup": [],
+    "active_after_cleanup": [],
+    "all_children_reaped": true,
+    "termination_reason": null
+  }
+}

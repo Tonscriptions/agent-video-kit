@@ -1,0 +1,36 @@
+test_actual_concat_container_is_not_trusted_as_single_media (test_contact_sheet.ContactSheetTests.test_actual_concat_container_is_not_trusted_as_single_media) ... FAIL
+test_cancel_after_real_native_process_start_reaps_owned_children (test_contact_sheet.ContactSheetTests.test_cancel_after_real_native_process_start_reaps_owned_children) ... ok
+test_canvas_limit_rejects_before_encoding (test_contact_sheet.ContactSheetTests.test_canvas_limit_rejects_before_encoding) ... ok
+test_changed_source_after_plan_is_rejected_before_frame_process (test_contact_sheet.ContactSheetTests.test_changed_source_after_plan_is_rejected_before_frame_process) ... ok
+test_cli_dry_run_no_author_mutation_and_actual_output_records_operation (test_contact_sheet.ContactSheetTests.test_cli_dry_run_no_author_mutation_and_actual_output_records_operation) ... ok
+test_cli_rejects_external_output_before_probe (test_contact_sheet.ContactSheetTests.test_cli_rejects_external_output_before_probe) ... ok
+test_encoded_frame_write_failure_leaves_no_partial_bundle (test_contact_sheet.ContactSheetTests.test_encoded_frame_write_failure_leaves_no_partial_bundle) ... ok
+test_existing_output_is_never_overwritten (test_contact_sheet.ContactSheetTests.test_existing_output_is_never_overwritten) ... ok
+test_explicit_order_and_duplicate_anchors_remain_explicit (test_contact_sheet.ContactSheetTests.test_explicit_order_and_duplicate_anchors_remain_explicit) ... ok
+test_four_panels_match_independent_integer_alpha_composition (test_contact_sheet.ContactSheetTests.test_four_panels_match_independent_integer_alpha_composition) ... ok
+test_frame_resizing_is_bounded_and_alpha_is_not_flattened (test_contact_sheet.ContactSheetTests.test_frame_resizing_is_bounded_and_alpha_is_not_flattened) ... ok
+test_invalid_numbers_ranges_and_views_reject_without_output (test_contact_sheet.ContactSheetTests.test_invalid_numbers_ranges_and_views_reject_without_output) ... ok
+test_large_timestamp_uses_integer_pts_and_rational_timebase (test_contact_sheet.ContactSheetTests.test_large_timestamp_uses_integer_pts_and_rational_timebase) ... ok
+test_non_grid_anchors_select_actual_later_source_frames (test_contact_sheet.ContactSheetTests.test_non_grid_anchors_select_actual_later_source_frames) ... ok
+test_nonzero_origin_even_sampling_uses_video_relative_range (test_contact_sheet.ContactSheetTests.test_nonzero_origin_even_sampling_uses_video_relative_range) ... ok
+test_precancel_cleans_without_frame_process (test_contact_sheet.ContactSheetTests.test_precancel_cleans_without_frame_process) ... ok
+test_sample_aspect_ratio_becomes_display_geometry (test_contact_sheet.ContactSheetTests.test_sample_aspect_ratio_becomes_display_geometry) ... ok
+test_static_png_has_one_frame_and_exact_rgba (test_contact_sheet.ContactSheetTests.test_static_png_has_one_frame_and_exact_rgba) ... ok
+test_vfr_anchors_record_actual_pts_without_assuming_cfr (test_contact_sheet.ContactSheetTests.test_vfr_anchors_record_actual_pts_without_assuming_cfr) ... ok
+
+======================================================================
+FAIL: test_actual_concat_container_is_not_trusted_as_single_media (test_contact_sheet.ContactSheetTests.test_actual_concat_container_is_not_trusted_as_single_media)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\openfilm-batch-dedupe\product\tests\test_contact_sheet.py", line 149, in test_actual_concat_container_is_not_trusted_as_single_media
+    self.assertEqual(caught.exception.code,'CONTACT_CONTAINER_UNSUPPORTED')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'CONTACT_PROBE_FAILED' != 'CONTACT_CONTAINER_UNSUPPORTED'
+- CONTACT_PROBE_FAILED
++ CONTACT_CONTAINER_UNSUPPORTED
+
+
+----------------------------------------------------------------------
+Ran 19 tests in 77.055s
+
+FAILED (failures=1)

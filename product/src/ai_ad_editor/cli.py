@@ -238,6 +238,22 @@ def build_parser() -> argparse.ArgumentParser:
     prepare.add_argument("--thumbnail", action="store_true")
     prepare.add_argument("--waveform", action="store_true")
     prepare.add_argument("--at-seconds", type=float, default=0.0)
+    contact = _leaf_common(ms.add_parser('contact-sheet', help='本地多时间锚点、透明与 Alpha 联系表'))
+    contact.add_argument('--project', required=True)
+    contact_source = contact.add_mutually_exclusive_group(required=True)
+    contact_source.add_argument('--asset-id', default=None)
+    contact_source.add_argument('--input', default=None)
+    contact.add_argument('--output', required=True, help='项目内全新输出目录')
+    contact.add_argument('--at-seconds', type=float, action='append', default=None)
+    contact.add_argument('--count', type=int, default=8)
+    contact.add_argument('--start-seconds', type=float, default=0)
+    contact.add_argument('--end-seconds', type=float, default=None)
+    contact.add_argument('--width', type=int, default=320)
+    contact.add_argument('--height', type=int, default=180)
+    contact.add_argument('--columns', type=int, default=2)
+    contact.add_argument('--view', choices=('checker','light','dark','alpha'), action='append', default=None)
+    contact.add_argument('--timeout', type=float, default=300)
+    contact.add_argument('--cancel-file', default=None)
     highlights = _leaf_common(ms.add_parser("highlights", help="本地启发式高光候选"))
     highlights.add_argument("--project", required=True)
     highlights.add_argument("--asset-id", default=None)
@@ -3112,6 +3128,45 @@ def command_media_understand(args: argparse.Namespace) -> dict[str, Any]:
     path = root / "validation" / f"understand_{asset_id or new_id('asset')}.json"
     atomic_write_json(path, analysis)
     return _envelope("media.understand", args, data={"analysis": str(path), "result": analysis})
+
+
+def command_media_contact_sheet(args: argparse.Namespace) -> dict[str, Any]:
+    from .contact_sheet import plan_contact_sheet, execute_contact_sheet, number
+    from .policy import resolve_local_path
+    root, project = load_project(args.project)
+    asset = asset_map(project).get(args.asset_id) if args.asset_id else None
+    if args.asset_id and asset is None:
+        raise argument_error('找不到联系表资产', '--asset-id')
+    source = resolve_local_path(root, asset['uri'] if asset else args.input, field='input')
+    output = resolve_local_path(root, args.output, field='output'); ensure_inside(root, output)
+    if output == root or output.exists():
+        raise argument_error('联系表输出必须为项目内新目录', '--output')
+    if not .1 <= number(args.timeout, 'timeout') <= 3600:
+        raise argument_error('联系表 timeout 为 0.1..3600 秒', '--timeout')
+    if any(parent.exists() and not parent.is_dir() for parent in output.parents):
+        raise argument_error('联系表父路径包含文件', '--output')
+    cancel = resolve_local_path(root, args.cancel_file, field='cancel_file') if args.cancel_file else None
+    if cancel is not None:
+        ensure_inside(root, cancel)
+        if cancel.is_relative_to(output):
+            raise argument_error('取消标记不能位于联系表输出中', '--cancel-file')
+    plan = plan_contact_sheet(source, times=args.at_seconds, count=args.count,
+        start=args.start_seconds, end=args.end_seconds, width=args.width, height=args.height,
+        columns=args.columns, views=args.view, cancel_file=cancel)
+    if args.dry_run:
+        return _envelope('media.contact-sheet', args, status='planned', data={'output':str(output), 'plan':plan})
+    operation_id = new_id('contact')
+    result = execute_contact_sheet(plan, output, timeout=args.timeout, cancel_file=cancel)
+    data = {'asset_id':args.asset_id, 'output':str(output), 'contact':str(output/'contact.png'),
+            'manifest':str(output/'manifest.json'), 'frames':len(result['frames']),
+            'manifest_sha256':'sha256:'+sha256_file(output/'manifest.json'), 'quality_accepted':False}
+    try:
+        _operation(root, operation_id, {'operation_id':operation_id, 'command':'media.contact-sheet',
+            'status':'succeeded', 'artifacts':data, 'source_sha256':plan['source']['sha256'], 'created_at':now_iso()})
+    except BaseException:
+        shutil.rmtree(output)
+        raise
+    return _envelope('media.contact-sheet', args, data=data, operation_id=operation_id)
 
 
 def command_media_prepare(args: argparse.Namespace) -> dict[str, Any]:
@@ -6764,6 +6819,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ("media", "reframe"): command_media_reframe,
     ("media", "understand"): command_media_understand,
     ("media", "prepare"): command_media_prepare,
+    ('media', 'contact-sheet'): command_media_contact_sheet,
     ("media", "highlights"): command_media_highlights,
     ("media", "beat-cut"): command_media_beat_cut,
     ("media", "multicam"): command_media_multicam,
