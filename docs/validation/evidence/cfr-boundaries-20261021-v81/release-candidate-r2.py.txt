@@ -1,0 +1,143 @@
+"""Bind V81 native and installed evidence, current documentation and historical failures."""
+from __future__ import annotations
+import argparse
+from datetime import datetime, timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+from urllib.parse import unquote
+from run_frozen_regression import frozen
+from sync_curve_clock_documents import BASE, CONTRACT, DOCUMENTS, REL, REPORT, ROOT, SKILLS
+
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+
+
+def sha(path):
+    return 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def read(path):
+    return json.loads(path.read_bytes())
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--final', action='store_true')
+    args = parser.parse_args()
+    output = args.output.resolve()
+    assert output.is_relative_to(BASE) and not output.exists()
+    current = frozen()
+    assert current == read(BASE / 'assembly-r1.json')['frozen_inputs'] and len(current) == 242
+    document_receipt = read(BASE / ('documents-final-r1.json' if args.final else 'documents-candidate-r1.json'))
+    assert document_receipt['frozen_inputs'] == current and document_receipt['frozen_equal']
+    for name, digest in document_receipt['documents'].items():
+        assert sha(ROOT / name) == digest, name
+    evidence = {}
+    for name, count in [('targeted-clock-r1.json', 14), ('targeted-hash-r1.json', 5), ('targeted-automation-r1.json', 110)]:
+        item = read(BASE / name)
+        assert item['terminal_ok'] and item['exit_code'] == 0 and item['methods'] == count and item['skipped'] == 0
+        assert item['frozen_before'] == item['frozen_after'] == current and item['frozen_equal']
+        assert sha((BASE / name).with_suffix('.log')) == item['log_sha256']
+        evidence[name] = sha(BASE / name)
+    values = {}
+    for name in ('native-r7', 'installed-r1', 'installed-r1/media', 'curves-native-r1', 'curves-installed-r1'):
+        path = BASE / name / 'verification.json'
+        item = read(path)
+        assert item['status'] == 'passed' and all(c['ok'] for c in item['checks'])
+        assert item['frozen_before'] == item['frozen_after'] == current and item['frozen_equal']
+        values[name] = item
+        evidence[name + '/verification.json'] = sha(path)
+    assert len(values['installed-r1']['resource_hashes']) == 157
+    assert values['installed-r1']['isolated_cli_calls'] == 37
+    assert values['native-r7']['cases'] == values['installed-r1/media']['cases']
+    assert values['curves-native-r1']['cases'] == values['curves-installed-r1']['cases']
+    assert values['native-r7']['cli_calls'] == 34 and len(values['native-r7']['checks']) == 53
+    assert all(x['max_rgb_error'] == 0 for x in values['native-r7']['cases'])
+    assert len(values['native-r7']['cases']) == len(values['curves-native-r1']['cases']) == 5
+    public = {}
+    for folder in (ROOT / 'docs/assets').glob('cfr-boundaries-20261021-v81-*'):
+        manifest = folder / 'files.json'
+        assert (folder / 'LICENSE.txt').is_file(), folder
+        if '-curves-' in folder.name:
+            receipt = 'curves-native-r1' if folder.name.endswith('curves-native-r1') else 'curves-installed-r1'
+            manifest = BASE / receipt / 'verification.json'
+            files = values[receipt]['public_files']
+        else:
+            assert manifest.is_file(), folder
+            files = read(manifest)
+        actual = {p.relative_to(folder).as_posix() for p in folder.rglob('*') if p.is_file() and p.name != 'files.json'}
+        assert actual == set(files), folder
+        for name, entry in files.items():
+            path = folder / name
+            assert path.stat().st_size == entry['bytes'] and sha(path) == entry['sha256'], path
+        public[folder.relative_to(ROOT).as_posix()] = {'files': len(files), 'manifest_sha256': sha(manifest)}
+    failures = {}
+    for iteration in range(1, 7):
+        path = BASE / f'native-r{iteration}/verification.json'
+        item = read(path)
+        assert item['status'] == 'failed' and item['frozen_equal']
+        failures[path.relative_to(ROOT).as_posix()] = sha(path)
+    old_path = ROOT / 'docs/validation/evidence/curve-points-20261021-v80/full-r1.json'
+    old = read(old_path)
+    assert old['status'] == 'failed' and old['methods'] == 1819 and old['skipped'] == 0 and old['frozen_equal']
+    assert 'MemoryError' in old_path.with_name('full-r1.source.log').read_text(encoding='utf8')
+    failures[old_path.relative_to(ROOT).as_posix()] = sha(old_path)
+    links = []
+    history = ('docs/specs/RGB曲线控制点动画契约_v0.1_2026-10-21.md',
+               'docs/validation/RGB曲线控制点动画离线实测_2026-10-21.md')
+    names = (*DOCUMENTS, CONTRACT, REPORT, *(f'skills/{s}/SKILL.md' for s in SKILLS), *history)
+    for name in names:
+        path = ROOT / name
+        text = path.read_text(encoding='utf8')
+        if name not in {CONTRACT, REPORT}:
+            label = 'V81-HISTORY' if name in history else 'V81-CURVE-CLOCK'
+            text = re.search(r'<!-- ' + label + r' -->(.*?)<!-- /' + label + r' -->', text, re.S).group(1)
+        for target in re.findall(r'\]\(([^)]+)\)', text):
+            if target.startswith('#') or re.match(r'^[A-Za-z][A-Za-z0-9+.-]*:', target):
+                continue
+            resolved = (path.parent / unquote(target.split('#')[0])).resolve()
+            assert resolved.is_relative_to(ROOT), (name, target)
+            relative = resolved.relative_to(ROOT)
+            assert resolved.is_file() or (MAIN / relative).is_file(), (name, target)
+            links.append({'document': name, 'target': relative.as_posix(), 'candidate_file': resolved.is_file()})
+    validator = Path('C:/Users/carzy/.codex/skills/.system/skill-creator/scripts/quick_validate.py')
+    assert validator.is_file()
+    skill_results = {}
+    for name in SKILLS:
+        result = subprocess.run([sys.executable, '-E', '-B', '-X', 'utf8', str(validator), str(ROOT / 'skills' / name)],
+                                cwd=ROOT, capture_output=True, timeout=60)
+        skill_results[name] = {'exit_code': result.returncode, 'stdout': result.stdout.decode('utf8'),
+                               'stderr': result.stderr.decode('utf8')}
+        assert result.returncode == 0, skill_results[name]
+    full = read(BASE / 'full-r1.json')
+    source = read(BASE / 'full-r1.source.json')
+    assert source['frozen_before'] == current
+    if args.final:
+        assert full['status'] == 'passed' and full['terminal_ok'] and full['methods'] == 1838 and full['skipped'] == 0
+        assert full['external_fixtures_equal'] and full['frozen_before'] == full['frozen_after'] == current
+    else:
+        assert full['status'] == 'running' and full['suite_launched']
+    assert current == frozen()
+    execution = output.with_suffix('.py.txt')
+    assert not execution.exists()
+    execution.write_bytes(Path(__file__).read_bytes())
+    result = {'status': 'passed-release-audit' if args.final else 'passed-candidate-audit',
+              'created_at_utc': datetime.now(timezone.utc).isoformat(), 'generator_sha256': sha(execution),
+              'frozen_inputs': current, 'frozen_equal': True, 'evidence': evidence, 'historical_failures': failures,
+              'public_media': public, 'local_links': links, 'skill_validator_sha256': sha(validator),
+              'skill_validation': skill_results, 'main_discovery_junctions_changed': False,
+              'full_status': full['status'], 'new_model_inference': 0,
+              'continuous_playback_reviewed': False, 'audio_reviewed': False,
+              'natural_quality_accepted': False, 'full_capcut_parity': False}
+    output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+    print(json.dumps({'status': result['status'], 'frozen': len(current), 'public_media_folders': len(public),
+                      'links': len(links), 'skills': len(skill_results), 'full_status': full['status']}))
+
+
+if __name__ == '__main__':
+    main()

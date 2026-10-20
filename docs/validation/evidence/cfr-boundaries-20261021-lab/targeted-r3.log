@@ -1,0 +1,65 @@
+test_VFR_source_in_keeps_covering_source_frame_and_native_holds (test_cfr_boundaries.CFRBoundaryTests.test_VFR_source_in_keeps_covering_source_frame_and_native_holds) ... FAIL
+test_fractional_presentation_surface_does_not_lose_its_last_visible_frame (test_cfr_boundaries.CFRBoundaryTests.test_fractional_presentation_surface_does_not_lose_its_last_visible_frame) ... ok
+test_fractional_source_in_keeps_requested_CFR_phase (test_cfr_boundaries.CFRBoundaryTests.test_fractional_source_in_keeps_requested_CFR_phase) ... FAIL
+test_fractional_source_in_with_constant_speed_uses_requested_origin (test_cfr_boundaries.CFRBoundaryTests.test_fractional_source_in_with_constant_speed_uses_requested_origin) ... FAIL
+test_genuinely_short_video_with_a_long_audio_tail_is_not_cloned (test_cfr_boundaries.CFRBoundaryTests.test_genuinely_short_video_with_a_long_audio_tail_is_not_cloned) ... ok
+test_moving_cfr_nut_same_rate_keeps_every_source_identity (test_cfr_boundaries.CFRBoundaryTests.test_moving_cfr_nut_same_rate_keeps_every_source_identity) ... ok
+test_moving_matroska_pts_are_preserved_across_different_fps (test_cfr_boundaries.CFRBoundaryTests.test_moving_matroska_pts_are_preserved_across_different_fps) ... ok
+test_old_project_can_reprobe_missing_timebase_without_changing_recipe (test_cfr_boundaries.CFRBoundaryTests.test_old_project_can_reprobe_missing_timebase_without_changing_recipe) ... ok
+test_one_tick_origin_does_not_round_to_zero_on_the_image_clock (test_cfr_boundaries.CFRBoundaryTests.test_one_tick_origin_does_not_round_to_zero_on_the_image_clock) ... ok
+test_reverse_and_constant_speed_use_the_same_exact_global_grid (test_cfr_boundaries.CFRBoundaryTests.test_reverse_and_constant_speed_use_the_same_exact_global_grid) ... ok
+test_single_tick_source_in_does_not_advance_a_whole_source_frame (test_cfr_boundaries.CFRBoundaryTests.test_single_tick_source_in_does_not_advance_a_whole_source_frame) ... FAIL
+test_variable_frame_rate_is_not_replaced_by_an_average_rate (test_cfr_boundaries.CFRBoundaryTests.test_variable_frame_rate_is_not_replaced_by_an_average_rate) ... ok
+
+======================================================================
+FAIL: test_VFR_source_in_keeps_covering_source_frame_and_native_holds (test_cfr_boundaries.CFRBoundaryTests.test_VFR_source_in_keeps_covering_source_frame_and_native_holds)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\cfr-boundary-lab-20261021\product\tests\test_cfr_boundaries.py", line 179, in test_VFR_source_in_keeps_covering_source_frame_and_native_holds
+    self.compare_requested_source(frames,colors,times,start=2970,source_in=10170,source_out=100170)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\cfr-boundary-lab-20261021\product\tests\test_cfr_boundaries.py", line 104, in compare_requested_source
+    self.assertEqual(frame,bytes(expected)*(W*H),(index,str(output_time),list(frame[:4]),expected))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"'8\xd3\xff'8\xd3\xff'8\xd3\xff'8\xd3\xff[5716 chars]\xff" != b'$6\xd6\xff$6\xd6\xff$6\xd6\xff$6\xd6\xff[5716 chars]\xff' : (1, '1001/30000', [39, 56, 211, 255], (36, 54, 214, 255))
+
+======================================================================
+FAIL: test_fractional_source_in_keeps_requested_CFR_phase (test_cfr_boundaries.CFRBoundaryTests.test_fractional_source_in_keeps_requested_CFR_phase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\cfr-boundary-lab-20261021\product\tests\test_cfr_boundaries.py", line 172, in test_fractional_source_in_keeps_requested_CFR_phase
+    self.compare_requested_source(frames,colors,times,start=2970,source_in=10170,source_out=100170)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\cfr-boundary-lab-20261021\product\tests\test_cfr_boundaries.py", line 104, in compare_requested_source
+    self.assertEqual(frame,bytes(expected)*(W*H),(index,str(output_time),list(frame[:4]),expected))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"'8\xd3\xff'8\xd3\xff'8\xd3\xff'8\xd3\xff[5716 chars]\xff" != b'$6\xd6\xff$6\xd6\xff$6\xd6\xff$6\xd6\xff[5716 chars]\xff' : (1, '1001/30000', [39, 56, 211, 255], (36, 54, 214, 255))
+
+======================================================================
+FAIL: test_fractional_source_in_with_constant_speed_uses_requested_origin (test_cfr_boundaries.CFRBoundaryTests.test_fractional_source_in_with_constant_speed_uses_requested_origin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\cfr-boundary-lab-20261021\product\tests\test_cfr_boundaries.py", line 185, in test_fractional_source_in_with_constant_speed_uses_requested_origin
+    self.compare_requested_source(frames,colors,times,start=1,source_in=10170,source_out=100170,speed=Fraction(3,2))
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\cfr-boundary-lab-20261021\product\tests\test_cfr_boundaries.py", line 104, in compare_requested_source
+    self.assertEqual(frame,bytes(expected)*(W*H),(index,str(output_time),list(frame[:4]),expected))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'6B\xc4\xff6B\xc4\xff6B\xc4\xff6B\xc4\xff6[5715 chars]\xff' != b'3@\xc7\xff3@\xc7\xff3@\xc7\xff3@\xc7\xff3[5715 chars]\xff' : (4, '1001/7500', [54, 66, 196, 255], (51, 64, 199, 255))
+
+======================================================================
+FAIL: test_single_tick_source_in_does_not_advance_a_whole_source_frame (test_cfr_boundaries.CFRBoundaryTests.test_single_tick_source_in_does_not_advance_a_whole_source_frame)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\cfr-boundary-lab-20261021\product\tests\test_cfr_boundaries.py", line 191, in test_single_tick_source_in_does_not_advance_a_whole_source_frame
+    self.compare_requested_source(frames,colors,times,start=9900,source_in=1,source_out=90001)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\cfr-boundary-lab-20261021\product\tests\test_cfr_boundaries.py", line 104, in compare_requested_source
+    self.assertEqual(frame,bytes(expected)*(W*H),(index,str(output_time),list(frame[:4]),expected))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'!4\xd9\xff!4\xd9\xff!4\xd9\xff!4\xd9\xff![5715 chars]\xff' != b'\x1e2\xdc\xff\x1e2\xdc\xff\x1e2\xdc\xff\x[7443 chars]\xff' : (4, '1001/7500', [33, 52, 217, 255], (30, 50, 220, 255))
+
+----------------------------------------------------------------------
+Ran 12 tests in 17.060s
+
+FAILED (failures=4)

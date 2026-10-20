@@ -1,0 +1,35 @@
+{
+  "operations": [
+    {
+      "op": "update_clip",
+      "clip_id": "foreground-clip",
+      "patch": {
+        "effects": [
+          {
+            "type": "curves",
+            "parameters": {
+              "all": "0/0 0.5/0.5 1/1"
+            },
+            "keyframes": [
+              {
+                "property": "all.1.y",
+                "keyframes": [
+                  {
+                    "at_tick": 0,
+                    "value": 0.2,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 180000,
+                    "value": 0.8,
+                    "interpolation": "linear"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

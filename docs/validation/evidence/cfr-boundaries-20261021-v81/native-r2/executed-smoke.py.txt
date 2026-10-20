@@ -1,0 +1,366 @@
+"""Native CLI frame identities, independent rational references, PCM and PTS."""
+from __future__ import annotations
+
+import argparse
+from bisect import bisect_right
+import copy
+from datetime import datetime, timezone
+from decimal import Decimal, localcontext
+from fractions import Fraction
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+import shutil
+import struct
+import subprocess
+import sys
+import wave
+
+from PIL import Image, ImageDraw
+from run_frozen_regression import frozen
+
+ROOT = Path(__file__).resolve().parents[1]
+TPS, W, H = 90000, 320, 180
+RATE = Fraction(30000, 1001)
+FRAME_BYTES = W * H * 4
+COUNT = math.ceil(Fraction(3, 2) * RATE)
+BACKGROUND = (0, 16, 32, 255)
+IRREGULAR_MS = [0, 33, 101, 188, 195, 441, 499, 800, 1002, 1221, 1600, 1800]
+DIGITS = ['111101101101111', '010110010010111', '111001111100111', '111001111001111',
+          '101101111001001', '111100111001111', '111100111101111', '111001001001001',
+          '111101111101111', '111101111001111']
+
+
+def sha(path):
+    return 'sha256:' + hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def raw_sha(data):
+    return 'sha256:' + hashlib.sha256(data).hexdigest()
+
+
+def write(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+
+
+def source_frame(index):
+    im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(im)
+    draw.rectangle((12, 12, W - 13, H - 13), fill=(30 + index * 3, 50 + index * 2, 220 - index * 3, 255))
+    x = 18 + index * 5 % 220
+    draw.rectangle((x, 52, x + 48, 107), fill=(250, 210, 40, 255))
+    draw.rectangle((20, 135, 145, 159), fill=(210, 35, 125, 128))
+    draw.rectangle((180, 135, 298, 159), fill=(35, 180, 220, 64))
+    for place, digit in enumerate(f'{index:02}'):
+        for bit, enabled in enumerate(DIGITS[int(digit)]):
+            if enabled == '1':
+                bx, by = 206 + place * 42 + bit % 3 * 10, 28 + bit // 3 * 10
+                draw.rectangle((bx, by, bx + 8, by + 8), fill=(255, 255, 255, 255))
+    return im
+
+
+def over_background(raw):
+    result = bytearray(FRAME_BYTES)
+    for offset in range(0, FRAME_BYTES, 4):
+        alpha = raw[offset + 3]
+        for channel in range(3):
+            result[offset + channel] = round((raw[offset + channel] * alpha + BACKGROUND[channel] * (255 - alpha)) / 255)
+        result[offset + 3] = 255
+    return bytes(result)
+
+
+def walk(rows):
+    for row in rows:
+        yield row
+        if isinstance(row.get('inputs'), list):
+            yield from walk(row['inputs'])
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('work', 'evidence', 'assets'):
+        parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--installed', type=Path)
+    args = parser.parse_args()
+    work, evidence, assets = (getattr(args, n).resolve() for n in ('work', 'evidence', 'assets'))
+    assert not any(p.exists() for p in (work, evidence, assets))
+    assert work.is_relative_to(ROOT / 'product/.runtime') and evidence.is_relative_to(ROOT / 'docs')
+    assert assets.is_relative_to(ROOT / 'docs/assets')
+    for p in (work, evidence, assets):
+        p.mkdir(parents=True)
+    (evidence / 'executed-smoke.py.txt').write_bytes(Path(__file__).read_bytes())
+    record = {'status': 'running', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
+              'generator_sha256': sha(__file__), 'frozen_before': frozen(), 'calls': [], 'checks': [], 'cases': [],
+              'native_windows': sys.platform == 'win32', 'network': False, 'virtualization': False,
+              'new_model_inference': 0, 'continuous_playback_reviewed': False, 'audio_reviewed': False,
+              'natural_quality_accepted': False, 'full_capcut_parity': False}
+
+    def save():
+        write(evidence / 'verification.json', record)
+
+    def check(name, ok, **details):
+        record['checks'].append({'name': name, 'ok': bool(ok), **details})
+        save()
+        assert ok, name
+
+    def run(label, command, *, data=None, cwd=ROOT, cli=False):
+        command = list(map(str, command))
+        env = dict(os.environ)
+        temp = ROOT / 'product/.runtime/temp'
+        temp.mkdir(parents=True, exist_ok=True)
+        env.update(TEMP=str(temp), TMP=str(temp), TMPDIR=str(temp), PYTHONDONTWRITEBYTECODE='1')
+        value = subprocess.run(command, input=data, capture_output=True, cwd=cwd, env=env, timeout=900)
+        (evidence / (label + '.stderr.log')).write_bytes(value.stderr)
+        if not label.startswith('decode-'):
+            (evidence / (label + '.stdout.log')).write_bytes(value.stdout)
+        record['calls'].append({'label': label, 'command': command, 'exit_code': value.returncode, 'cli': cli,
+                                'stdout_bytes': len(value.stdout), 'stdout_sha256': raw_sha(value.stdout),
+                                'stderr_sha256': raw_sha(value.stderr)})
+        save()
+        assert value.returncode == 0, label + ': ' + value.stderr[-1600:].decode('utf8', 'replace') + value.stdout[-900:].decode('utf8', 'replace')
+        return value.stdout
+
+    if args.installed:
+        prefix = [sys.executable, '-I', '-S', '-B', '-X', 'utf8', args.installed.resolve() / 'run.py']
+    else:
+        bootstrap = 'import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();from ai_ad_editor.cli import main;raise SystemExit(main())'
+        prefix = [sys.executable, '-E', '-B', '-X', 'utf8', '-c', bootstrap, ROOT / 'product/src']
+
+    def cli(label, *argv):
+        return json.loads(run(label, [*prefix, *argv], cli=True))
+
+    exe, probe = shutil.which('ffmpeg'), shutil.which('ffprobe')
+    assert exe and probe
+    record.update(ffmpeg_sha256=sha(exe), ffprobe_sha256=sha(probe), video_probes={})
+
+    def decode(label, path, audio=False):
+        options = ['-map', '0:a:0', '-f', 's16le', '-acodec', 'pcm_s16le'] if audio else ['-map', '0:v:0', '-f', 'rawvideo', '-pix_fmt', 'rgba']
+        return run('decode-' + label, [exe, '-v', 'error', '-i', path, *options, 'pipe:1'])
+
+    def lossless(label, project, plan, path):
+        command = plan['command']
+        inputs = command[1:command.index('-filter_complex')]
+        if '-progress' in inputs:
+            pos = inputs.index('-progress')
+            del inputs[pos:pos + 2]
+        run(label, [exe, *inputs, '-filter_complex', plan['filter_complex'], '-map', '[vout]', '-map', '[aout]',
+                    '-fps_mode', 'passthrough', '-c:v', 'ffv1', '-pix_fmt', 'bgra', '-c:a', 'pcm_s16le', path], cwd=project)
+
+    try:
+        source_images = [source_frame(i) for i in range(55)]
+        for i, frame in enumerate(source_images):
+            frame.save(assets / f'source-frame-{i:02}.png')
+        source_raw = [frame.tobytes() for frame in source_images]
+        composite = [over_background(frame) for frame in source_raw]
+        blank = bytes(BACKGROUND) * (W * H)
+        source_pts = {'plate': [Fraction(0)]}
+        for kind, count, irregular in [('cfr', 55, None), ('vfr', 12, IRREGULAR_MS)]:
+            path = assets / ('source-' + kind + '.nut')
+            command = [exe, '-hide_banner', '-v', 'error', '-filter_threads', '1', '-f', 'rawvideo',
+                       '-pixel_format', 'rgba', '-video_size', f'{W}x{H}', '-framerate', '25', '-i', 'pipe:0']
+            if irregular:
+                expression = str(irregular[-1])
+                for i in range(len(irregular) - 2, -1, -1):
+                    expression = f'if(eq(N,{i}),{irregular[i]},{expression})'
+                command += ['-vf', "settb=1/1000,setpts='" + expression + "'", '-fps_mode', 'passthrough', '-enc_time_base', 'filter']
+            run('source-' + kind, [*command, '-c:v', 'ffv1', '-pix_fmt', 'bgra', path], data=b''.join(source_raw[:count]))
+            result = json.loads(run('source-' + kind + '-pts', [probe, '-v', 'error', '-select_streams', 'v:0',
+                '-show_frames', '-show_streams', '-show_entries', 'frame=pts,duration:stream=time_base', '-of', 'json', path]))
+            tb = Fraction(result['streams'][0]['time_base'])
+            pts = [int(f['pts']) * tb for f in result['frames']]
+            expected = [Fraction(t, 1000) for t in irregular] if irregular else [Fraction(i, 25) for i in range(count)]
+            check('source-' + kind + '-actual-PTS', pts == expected, frames=len(pts), time_base=str(tb))
+            check('source-' + kind + '-lossless-RGBA', decode('source-' + kind, path) == b''.join(source_raw[:count]))
+            source_pts[kind] = pts
+            run('source-' + kind + '-preview', [exe, '-v', 'error', '-i', path, '-an', '-c:v', 'libx264',
+                '-crf', '18', '-pix_fmt', 'yuv420p', '-fps_mode', 'passthrough', '-movflags', '+faststart', assets / ('source-' + kind + '-preview.mp4')])
+        pcm = b''.join(struct.pack('<hh', round(5000 * math.sin(2 * math.pi * 333 * i / 48000)),
+                                  round(4000 * math.sin(2 * math.pi * 509 * i / 48000))) for i in range(72000))
+        with wave.open(str(assets / 'audio-original.wav'), 'wb') as output:
+            output.setnchannels(2)
+            output.setsampwidth(2)
+            output.setframerate(48000)
+            output.writeframes(pcm)
+        project = work / 'project'
+        cli('init', 'project', 'init', project)
+        rights = ['--license-spdx', 'CC0-1.0', '--license-url', 'local://v81-original/CC0-1.0',
+                  '--verification-status', 'verified', '--permitted-use', 'commercial_ad',
+                  '--creator', 'agent-video-kit', '--evidence', 'Original generated RGBA indexed geometry and stereo sine PCM; scripts/smoke_cfr_boundaries.py']
+        for aid, name in [('plate', 'source-frame-00.png'), ('cfr', 'source-cfr.nut'), ('vfr', 'source-vfr.nut'), ('sound', 'audio-original.wav')]:
+            cli('ingest-' + aid, 'media', 'ingest', '--project', project, '--input', assets / name, '--asset-id', aid,
+                '--source-url', 'local://v81-original/' + name, *rights)
+        p = json.loads((project / 'project.json').read_bytes())
+        p['settings']['canvas'] = {'width': W, 'height': H, 'background': '#001020'}
+        p['settings']['timebase'] = {'ticks_per_second': TPS, 'display_fps': {'num': 30000, 'den': 1001}}
+        write(project / 'project.json', p)
+        request = {'operations': [
+            {'op': 'append_clip', 'id': 'picture', 'asset_id': 'cfr', 'track_id': 'track_video_1',
+             'timeline_start_tick': 0, 'duration_tick': TPS, 'source_in_tick': 0, 'source_out_tick': TPS},
+            {'op': 'append_clip', 'id': 'soundtrack', 'asset_id': 'sound', 'track_id': 'track_audio_1',
+             'timeline_start_tick': 0, 'duration_tick': 135000, 'source_in_tick': 0, 'source_out_tick': 135000}]}
+        write(assets / 'timeline-request.json', request)
+        cli('compose', 'timeline', 'compose', '--project', project, '--input', assets / 'timeline-request.json')
+        baseline = json.loads((project / 'project.json').read_bytes())
+        capability = cli('capabilities', 'capabilities')['data']['capabilities']['render']['video_frame_clock']
+        check('machine-clock-and-unaccepted-combinations', capability['protocol'] == 'rational-local-video-clock-v1'
+              and not capability['short_ordinary_sources_padded'] and not capability['ordinary_input_VFR_normalized']
+              and 'VFR_reverse_temporal_duration_order_not_accepted' in capability['limits'])
+        specs = [
+            ('fractional-origin', 'plate', {'asset_id': 'plate', 'timeline_start_tick': 9900}, 'linear'),
+            ('fractional-source-cfr', 'cfr', {'timeline_start_tick': 2970, 'source_in_tick': 10170, 'source_out_tick': 100170}, 'linear'),
+            ('fractional-source-vfr', 'vfr', {'asset_id': 'vfr', 'timeline_start_tick': 2970, 'source_in_tick': 10170, 'source_out_tick': 100170}, 'linear'),
+            ('nonlinear-source', 'cfr', {'timeline_start_tick': 2970, 'duration_tick': round(math.log(3) * TPS),
+                'source_in_tick': 10170, 'source_out_tick': 100170,
+                'speed_curve': {'keyframes': [{'at_tick': 0, 'speed': .5, 'interpolation': 'linear'}, {'at_tick': TPS, 'speed': 1.5}]}}, 'nonlinear'),
+            ('window-last-frame', 'cfr', {'timeline_start_tick': 2970, 'duration_tick': 87300, 'source_out_tick': 180000,
+                'presentation_window': {'version': 1, 'authored_start_tick': 0, 'authored_duration_tick': 180000, 'offset_tick': 9900}}, 'window'),
+        ]
+        comparison_rows = []
+        fragment_project = fragment_actual = None
+        for name, source, patch, mode in specs:
+            write(project / 'project.json', copy.deepcopy(baseline))
+            request = {'operations': [{'op': 'update_clip', 'clip_id': 'picture', 'patch': patch}]}
+            write(assets / (name + '-request.json'), request)
+            cli(name + '-edit', 'timeline', 'compose', '--project', project, '--input', assets / (name + '-request.json'))
+            cli(name + '-validate', 'validate', '--project', project)
+            output = project / 'renders' / (name + '.mp4')
+            argv = ['render', '--project', project, '--output', output, '--profile', 'custom', '--width', W, '--height', H]
+            before = (project / 'project.json').read_bytes()
+            plan = cli(name + '-plan', *argv, '--dry-run')['data']['plan']
+            check(name + '-plan-read-only', before == (project / 'project.json').read_bytes())
+            result = cli(name + '-render', *argv)['data']
+            shutil.copyfile(output, assets / (name + '.mp4'))
+            shutil.copyfile(result['manifest'], evidence / (name + '-manifest.json'))
+            manifest = json.loads(Path(result['manifest']).read_bytes())
+            clocks = [row.get('video_frame_clock', row) for row in walk(manifest['inputs'])
+                      if 'video_frame_clock' in row or row.get('kind') == 'video-frame-clock']
+            check(name + '-actual-clock-metadata', bool(clocks) and all(c['protocol'] == capability['protocol'] for c in clocks), clocks=clocks)
+            loss = assets / (name + '-lossless.nut')
+            lossless(name + '-lossless', project, plan, loss)
+            actual = decode(name, loss)
+            audio = decode(name + '-pcm', loss, audio=True)
+            check(name + '-root-CFR-frame-count', len(actual) == COUNT * FRAME_BYTES, frames=len(actual) // FRAME_BYTES)
+            check(name + '-full-stereo-PCM', audio == pcm, sample_frames=len(audio) // 4, sha256=raw_sha(audio))
+            clip = next(c for track in json.loads((project / 'project.json').read_bytes())['sequences'][0]['tracks']
+                        for c in track['clips'] if c['id'] == 'picture')
+            origin = Fraction(clip['timeline_start_tick'], TPS)
+            span = Fraction(clip['duration_tick'], TPS)
+            if mode == 'nonlinear':
+                span = Fraction(str(math.log(3)))
+            ids, expected_frames = [], []
+            for i in range(COUNT):
+                now = Fraction(i) / RATE
+                index = -1
+                if origin <= now < origin + span:
+                    if mode == 'window':
+                        child_frame = math.floor((now - origin) * RATE) + math.floor(Fraction(9900, TPS) * RATE)
+                        source_time = Fraction(child_frame) / RATE
+                    elif mode == 'nonlinear':
+                        with localcontext() as context:
+                            context.prec = 50
+                            elapsed = Decimal((now - origin).numerator) / (now - origin).denominator
+                            source_time = Decimal(10170) / TPS + Decimal('.5') * (elapsed.exp() - 1)
+                            pts = [Decimal(t.numerator) / t.denominator for t in source_pts[source]]
+                            index = bisect_right(pts, source_time) - 1
+                    else:
+                        source_time = Fraction(clip['source_in_tick'], TPS) + now - origin
+                    if mode != 'nonlinear':
+                        index = 0 if source == 'plate' else bisect_right(source_pts[source], source_time) - 1
+                ids.append(index)
+                expected_frames.append(composite[index] if index >= 0 else blank)
+            expected_raw = b''.join(expected_frames)
+            rgb_error = max(abs(a - b) for i, (a, b) in enumerate(zip(actual, expected_raw)) if i % 4 != 3)
+            alpha_equal = actual[3::4] == expected_raw[3::4]
+            check(name + '-independent-source-identities-and-all-RGB', rgb_error <= 2, max_rgb_error=rgb_error, expected_source_indices=ids)
+            check(name + '-every-alpha-byte', alpha_equal)
+            timestamps = {}
+            for suffix, path in [('lossless', loss), ('mp4', assets / (name + '.mp4'))]:
+                measured = json.loads(run(name + '-' + suffix + '-pts', [probe, '-v', 'error', '-select_streams', 'v:0',
+                    '-show_frames', '-show_streams', '-show_entries', 'frame=pts:stream=time_base,nb_frames', '-of', 'json', path]))
+                tb = Fraction(measured['streams'][0]['time_base'])
+                times = [int(f['pts']) * tb for f in measured['frames']]
+                check(name + '-' + suffix + '-every-PTS', times == [Fraction(i) / RATE for i in range(COUNT)])
+                timestamps[suffix] = [str(t) for t in times]
+            record['video_probes'][name] = timestamps
+            actual_images = [Image.frombytes('RGBA', (W, H), actual[i * FRAME_BYTES:(i + 1) * FRAME_BYTES]).convert('RGB') for i in range(COUNT)]
+            delays = [(round(float(Fraction(i + 1) / RATE) * 100) - round(float(Fraction(i) / RATE) * 100)) * 10 for i in range(COUNT)]
+            actual_images[0].save(assets / (name + '.gif'), save_all=True, append_images=actual_images[1:], duration=delays, loop=0)
+            with Image.open(assets / (name + '.gif')) as gif:
+                durations = []
+                for i in range(gif.n_frames):
+                    gif.seek(i)
+                    durations.append(gif.info.get('duration', 0))
+                gif_info = {'frames': gif.n_frames, 'duration_ms': sum(durations), 'CFR_input_frames': COUNT}
+            check(name + '-GIF-time', gif_info['duration_ms'] == sum(delays), **gif_info)
+            visible = [i for i, v in enumerate(ids) if v >= 0]
+            selected = visible[-1]
+            page = Image.new('RGB', (2 * W, H + 24), '#101820')
+            page.paste(Image.frombytes('RGBA', (W, H), expected_frames[selected]).convert('RGB'), (0, 24))
+            page.paste(actual_images[selected], (W, 24))
+            ImageDraw.Draw(page).text((8, 5), f'{name} / frame {selected}: expected | actual', fill='white')
+            page.save(assets / (name + '-last-visible.png'))
+            comparison_rows.append(page)
+            record['cases'].append({'name': name, 'source': source, 'frames': COUNT, 'fps': str(RATE),
+                'expected_source_indices': ids, 'max_rgb_error': rgb_error, 'alpha_byte_equal': alpha_equal,
+                'PCM_byte_equal': audio == pcm, 'actual_decoded_sha256': raw_sha(actual),
+                'independent_reference_sha256': raw_sha(expected_raw), 'gif': gif_info, 'last_visible_frame': selected})
+            if mode == 'nonlinear':
+                fragment_project = json.loads((project / 'project.json').read_bytes())
+                fragment_actual = actual
+            save()
+        package = work / 'editable-project.zip'
+        cli('package', 'convert', 'export', '--project', project, '--output', package, '--target-format', 'package')
+        target = work / 'imported'
+        cli('import', 'convert', 'import', '--input', package, '--output', target)
+        replay_plan = cli('replay-plan', 'render', '--project', target, '--output', target / 'renders/replay.mp4',
+            '--profile', 'custom', '--width', W, '--height', H, '--dry-run')['data']['plan']
+        replay = work / 'package-replay.nut'
+        lossless('package-replay', target, replay_plan, replay)
+        check('package-independent-root-rebuilt-byte-equal', decode('package-replay', replay) == actual and decode('package-replay-pcm', replay, audio=True) == pcm)
+        write(project / 'project.json', fragment_project)
+        request = {'id': 'cfr-source-clock', 'version': 1, 'name': 'Editable requested-source clock',
+                   'sequence_id': 'seq_main', 'clip_ids': ['picture', 'soundtrack']}
+        write(assets / 'fragment-save.json', request)
+        library = work / 'library'
+        cli('fragment-save', 'fragment', 'save', '--project', project, '--library', library, '--input', assets / 'fragment-save.json')
+        destination = work / 'fragment-target'
+        cli('fragment-init', 'project', 'init', destination)
+        fresh = json.loads((destination / 'project.json').read_bytes())
+        fresh['settings'] = copy.deepcopy(fragment_project['settings'])
+        write(destination / 'project.json', fresh)
+        request = {'id': 'cfr-source-clock', 'version': 1, 'sequence_id': 'seq_main', 'track_id': 'track_video_1',
+                   'at_tick': 0, 'instance_id': 'new-clock'}
+        write(assets / 'fragment-apply.json', request)
+        cli('fragment-apply', 'fragment', 'apply', '--project', destination, '--library', library, '--input', assets / 'fragment-apply.json')
+        fragment_plan = cli('fragment-plan', 'render', '--project', destination, '--output', destination / 'renders/replay.mp4',
+            '--profile', 'custom', '--width', W, '--height', H, '--dry-run')['data']['plan']
+        fragment_replay = work / 'fragment-replay.nut'
+        lossless('fragment-replay', destination, fragment_plan, fragment_replay)
+        check('fragment-no-source-cache-byte-equal', decode('fragment-replay', fragment_replay) == fragment_actual
+              and decode('fragment-replay-pcm', fragment_replay, audio=True) == pcm)
+        strip = Image.new('RGB', (2 * W, (H + 24) * len(comparison_rows)))
+        for i, page in enumerate(comparison_rows):
+            strip.paste(page, (0, i * (H + 24)))
+        strip.save(assets / 'comparison.png')
+        record['source_pts'] = {k: [str(t) for t in v] for k, v in source_pts.items()}
+        record.update(status='passed', cli_calls=sum(c['cli'] for c in record['calls']))
+    except BaseException as error:
+        record.update(status='failed', error={'type': type(error).__name__, 'message': str(error)})
+        raise
+    finally:
+        (assets / 'LICENSE.txt').write_text('CC0-1.0: original indexed geometric RGBA frames, synthesized stereo sine PCM and rendered derivatives generated by scripts/smoke_cfr_boundaries.py. No third-party footage or model. MP4/GIF are viewing copies; numerical references use actual source PTS and lossless FFV1 NUT. Software licenses remain with their tools.\n', encoding='utf8')
+        record.update(finished_at_utc=datetime.now(timezone.utc).isoformat(), frozen_after=frozen())
+        record['cli_calls'] = sum(c['cli'] for c in record['calls'])
+        record['frozen_equal'] = record['frozen_before'] == record['frozen_after']
+        record['public_files'] = {p.relative_to(assets).as_posix(): {'bytes': p.stat().st_size, 'sha256': sha(p)}
+                                  for p in sorted(assets.rglob('*')) if p.is_file() and p.name != 'files.json'}
+        write(assets / 'files.json', record['public_files'])
+        save()
+    assert record['frozen_equal']
+    print(json.dumps({k: record[k] for k in ('status', 'cli_calls', 'frozen_equal')}))
+
+
+if __name__ == '__main__':
+    main()

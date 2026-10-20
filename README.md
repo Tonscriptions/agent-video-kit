@@ -1,5 +1,24 @@
 # Agent Video Kit
 
+<!-- V81-CURVE-CLOCK -->
+2026-10-21 **V81（RGB 曲线候选＋有理数视频时钟）**：完整原生回归1838项、4452.737秒、0跳过（本轮限定验收）。以 R14 /`1f9ef4e` 为基点，合并原未发布 V80 曲线功能与 CFR-01 修复；冻结242产品输入、8外部夹具。**V80 的1819项回归曾因 OCR 登记哈希读取 `MemoryError` 失败，未发布，不计作通过**。本轮将哈希读取改为复用最多64 KiB缓冲，预留失败退至8/1 KiB；未做操作系统OOM压测。
+
+|编号|实际核验|结果与边界|证据|
+|---|---|---|---|
+|V81-01|时间基／源剪入专项|14通过，0跳过；原始PTS、90 kHz作者tick与CFR格点共同有理数时钟，非整帧源剪入不重启相位|[时钟专项](docs/validation/evidence/cfr-boundaries-20261021-v81/targeted-clock-r1.json)|
+|V81-02|有界SHA读取|5通过，0跳过；短读、预留回退、I/O失败及完整摘要；不保证消除其他内存耗尽|[哈希专项](docs/validation/evidence/cfr-boundaries-20261021-v81/targeted-hash-r1.json)|
+|V81-03|既有参数／曲线自动化专项|110通过，0跳过；属于完整回归子集|[自动化专项](docs/validation/evidence/cfr-boundaries-20261021-v81/targeted-automation-r1.json)|
+|V81-04|真实CFR／VFR媒体|34 CLI／53检查、5组×45帧；独立RGB误差0、alpha与PCM相同、逐帧PTS相同，包与片段异根重建通过|[收据](docs/validation/evidence/cfr-boundaries-20261021-v81/native-r7/verification.json) · [原创CFR](docs/assets/cfr-boundaries-20261021-v81-native-r7/source-cfr-preview.mp4) · [原创VFR](docs/assets/cfr-boundaries-20261021-v81-native-r7/source-vfr-preview.mp4) · [窗口结果](docs/assets/cfr-boundaries-20261021-v81-native-r7/window-last-frame.mp4) · [GIF](docs/assets/cfr-boundaries-20261021-v81-native-r7/window-last-frame.gif)|
+|V81-05|离线安装|157资源／7现有wheels，37隔离CLI＋1模块来源探针；源码／wheel／安装目录字节相同，5组时钟输出同开发|[安装收据](docs/validation/evidence/cfr-boundaries-20261021-v81/installed-r1/verification.json)|
+|V81-06|合并源码的RGB控制点动画|开发32 CLI／44检查；另隔离32 CLI，5组输出一致；目录0.9.0／46项|[曲线实测](docs/validation/evidence/cfr-boundaries-20261021-v81/curves-native-r1/verification.json) · [隔离实测](docs/validation/evidence/cfr-boundaries-20261021-v81/curves-installed-r1/verification.json) · [实际GIF](docs/assets/cfr-boundaries-20261021-v81-curves-native-r1/independent-rgb.gif)|
+|V81-07|完整回归与历史失败|完整原生回归1838项、4452.737秒、0跳过（本轮限定验收）；专项、历史与研究不叠加|[当轮状态](docs/validation/evidence/cfr-boundaries-20261021-v81/full-r2.json) · [原V80失败](docs/validation/evidence/curve-points-20261021-v80/full-r1.json) · [契约](docs/specs/片段有理数时间基与CFR边界契约_v0.1_2026-10-21.md) · [完整记录](docs/validation/有理数视频时钟与曲线候选合并实测_2026-10-21.md)|
+|V81-08|旧测试断言修正与输入桥接|r1因旧图字符串断言失败而停止，未完整结束；单项原始失败／修正后真实渲染通过。只改1个测试文件，162运行时输入字节不变，媒体未重渲染；收据保留原输入快照|[中断记录](docs/validation/evidence/cfr-boundaries-20261021-v81/interrupted-full-r1.json) · [单项通过](docs/validation/evidence/cfr-boundaries-20261021-v81/oracle-case-after-r1.json) · [明确桥接](docs/validation/evidence/cfr-boundaries-20261021-v81/test-oracle-correction-r1.json)|
+
+作者时长1.5s的示例视频为30000/1001fps、45帧、视频／容器1.5015s，PCM1.5s；GIF1.5s为观看副本。仅做一张窗口末帧静态目检，未连续播放或听音；VFR倒放的帧持续顺序、源剪入叠加倒放、自然素材质量、HDR与完整剪映等价仍未验收。
+<!-- /V81-CURVE-CLOCK -->
+
+
+
 <!-- R14-CURRENT -->
 2026-10-21 **R14（OpenFilm 可拆模块与成本复核；源码研究）**：固定 `53156ac5` /0.2.4，与 R13 源码相同；本轮 API **1577 stars /155 forks**（04:31:50 Asia/Taipei），latest release 已为 v0.2.4。14 项复用清单区分已采用与剩余候选；V79 组件字段、V78 预览缓存及既有 HTML /字幕 /诊断不重复计费。新增候选为基础 NLE 规划 /交换与自建 Agent 宿主的图片上下文管理，后者不能直接裁减外部 Codex 历史。
 
@@ -13,6 +32,28 @@
 
 本轮研究不改变产品版本或完整剪映对标目标。运行时继续本地 CLI /FFmpeg /登记资源；OpenFilm 的云 provider、桌面 GUI 和剪映草稿路径不作为新的产品依赖。
 <!-- /R14-CURRENT -->
+
+<!-- V80-CURRENT -->
+2026-10-21 **V80（RGB 曲线控制点动画限定验收）**：补齐差异 #60 的固定拓扑曲线控制点时间动画。`curves/rgb_curves` 支持 `all/red/green/blue.<点号>.x/y`，六种时间插值、完整作者时钟、剪入剪出、倒放嵌套和区间调节层。逐通道整曲线命令保留独立 RGB，拒绝六位小数后交叉／重合的 8-bit x 采样格；共享递归预算与内容寻址缓存。效果目录 **0.9.0／46 项**；原数值引擎仍为 10 家族／34 通道，分色 HSL 25 通道另计。原V80的1819项完整回归因MemoryError失败，未独立发布；本段239输入为历史，当前状态以V81为准；相关专项 **110/110、191.855 秒、0 跳过**，属于全量子集。开发 **32 CLI／44 检查**，5 组×24 帧独立静态参考、原始透明度、PCM 与 PTS、包／片段重建；离线 **156 资源／7 wheels／35 隔离 CLI＋1 来源探针**，开发和安装解码一致；4 份相关 Skill 已更新；17 份发现联接待 main 核对。附加非线性变速／祖先倒放探针 2 组通过；分数帧率与非整帧起点探针暴露 **CFR-01：静态路径也缺末帧覆盖**，该场景未验收。未验收动态增删控制点、HDR／线性光、自然广告质量、连续播放审片、实时性能或完整剪映效果等价。
+
+[曲线动画契约](docs/specs/RGB曲线控制点动画契约_v0.1_2026-10-21.md) · [实测、原素材与失败记录](docs/validation/RGB曲线控制点动画离线实测_2026-10-21.md)
+
+| 编号 | 核验内容 | 实际结果与边界 | 证据 |
+|---|---|---|---|
+| V80-01 / #60 | 控制点动画 | 固定拓扑 1–256 点；all 与独立 RGB 的 x/y；master 继续是 curves 的 all 别名 | [收据](docs/validation/evidence/curve-points-20261021-v80/targeted-r3.json) |
+| V80-02 | 原生执行与拒绝 | 整通道更新、运行时门禁、交叉／同格拒绝、四项共享配额、缓存篡改拒绝 | [收据](docs/validation/evidence/curve-points-20261021-v80/targeted-r3.json) |
+| V80-03 | 真实 CLI 与时钟 | 32 CLI／44 检查；5×24 帧、独立参考、剪窗口／倒放嵌套／区间层、PCM／PTS | [收据](docs/validation/evidence/curve-points-20261021-v80/native-r2/verification.json) |
+| V80-04 | 离线安装 | 156 资源逐字节一致／7 wheels；35 隔离 CLI＋1 来源探针；5组解码一致 | [收据](docs/validation/evidence/curve-points-20261021-v80/installed-r1/verification.json) |
+| V80-05 | 完整回归 | 原V80的1819项完整回归因MemoryError失败，未独立发布；本段239输入为历史，当前状态以V81为准 | [收据](docs/validation/evidence/curve-points-20261021-v80/full-r1.json) |
+| V80-06 | 失败留证 | targeted-r1 的4夹具错误、r2 的窗口元数据预期错误、native-r1 的嵌套夹具缺序列名均保留 | [收据](docs/validation/evidence/curve-points-20261021-v80/targeted-r1.json) |
+| V80-07 / CFR-01 | 额外时钟诊断 | 8 额外 CLI；2组变速通过，1组45帧场景未通过：显示帧33缺图层覆盖，移除曲线仍复现 | [收据](docs/validation/evidence/curve-points-20261021-v80/clocks-native-r2/verification.json) |
+
+[原创输入 MP4](docs/assets/curve-points-20261021-v80-native-r2/source-preview.mp4) · [透明原 PNG](docs/assets/curve-points-20261021-v80-native-r2/foreground-original.png) · [原音频](docs/assets/curve-points-20261021-v80-native-r2/audio-original.wav)
+
+![RGB曲线动画：左原图，右实际输出](docs/assets/curve-points-20261021-v80-native-r2/all-with-red.gif)
+
+[独立 RGB 实际 MP4](docs/assets/curve-points-20261021-v80-native-r2/independent-rgb.mp4) · [5组静态对照](docs/assets/curve-points-20261021-v80-native-r2/comparison.png)
+<!-- /V80-CURRENT -->
 
 <!-- V79-CURRENT -->
 2026-10-21 **V79（HTML 组件字段与逐片段取值限定验收）**：落实 OpenFilm 接入契约 CP-01..06。新命令 `motion html-fields` 无浏览器返回稳定 ID、独立定义／取值、JSON Schema、类型／范围／单位／默认来源及图片选项；`html-render/controls/quality` 共用有类型的组件补丁、单项 null 与全量 reset。本地图片限定原源码登记闭包并检查实际 SHA 与 strict commercial_ad 权利；boolean 在每帧作者动画后执行，并恢复原页面属性。`--replace-clip-id` 仅更换指定片段资产引用，保留作者时间、变换、特效和其他片段。完整原生回归 **1796/1796、5798.792 秒、0 跳过，237 冻结输入＋8 外部夹具前后相同**；专项 **28/28、222.167 秒、0 跳过**，属于全量子集。开发 **28 成功 CLI＋3 明确拒绝／41 检查**；7 组×20 帧无损 RGBA、稳定 ID 改名保值、局部／全量复位、图片与逐帧显隐独立像素、包／片段重建、2 个实际队列输出均核验。离线 **155 资源／7 wheels／34 次隔离 CLI＋1 来源探针**；源码／平台 wheel／安装资源逐字节一致，开发与安装 7 组解码相同；17 Skills／326 本地引用及发现联接已核对。未验收自动字段发现、任意网页／完整 OpenFilm 时间线、自然广告质量、实时连续播放、HDR或完整剪映效果等价。

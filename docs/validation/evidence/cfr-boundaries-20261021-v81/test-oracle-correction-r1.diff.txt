@@ -1,0 +1,19 @@
+--- before/product/tests/test_cli.py
++++ after/product/tests/test_cli.py
+@@ -2740,9 +2740,13 @@
+             output = project / "renders" / "source-in-speed.mp4"
+             code, planned = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
+             self.assertEqual(code, 0, planned)
+-            graph = planned["data"]["plan"]["filter_complex"]
+-            self.assertIn("trim=start=0.500000:end=1.000000", graph)
+-            self.assertIn("PTS-STARTPTS", graph)
++            inputs = planned["data"]["plan"]["inputs"]
++            clock = next(item["video_frame_clock"] for item in inputs
++                         if item.get("asset_id") == asset_id and "video_frame_clock" in item)
++            self.assertEqual(clock["protocol"], "rational-local-video-clock-v1")
++            self.assertEqual(clock["source_clock_anchor"], "requested-author-source-in-tick")
++            self.assertEqual(clock["source_in_tick"], 45000)
++            self.assertTrue(clock["source_prefix_preserved_for_covering_frame"])
+             code, rendered = invoke("render", "--project", str(project), "--output", str(output))
+             self.assertEqual(code, 0, rendered)
+             self.assertAlmostEqual(probe_media(output)["duration_seconds"], 0.5, delta=0.12)

@@ -1,0 +1,284 @@
+"""Publish the complete reviewed V81 candidate after its existing frozen suite succeeds."""
+from __future__ import annotations
+import argparse
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import time
+from run_frozen_regression import frozen
+from sync_curve_clock_documents import BASE, CONTRACT, DOCUMENTS, REL, REPORT, ROOT, SKILLS
+from bind_curve_clock_evidence import FULL_NAME, CANDIDATE_AUDIT, current_inputs
+
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+BASE_COMMIT = '1f9ef4e0c37212424ec20962a725ccf78c596261'
+REMOTE = 'git@github.com:Tonscriptions/agent-video-kit.git'
+SCRIPTS = ('smoke_curve_automation', 'verify_curve_automation_install', 'probe_curve_automation_clocks',
+           'sync_curve_automation_documents', 'audit_curve_automation_release', 'publish_curve_automation',
+           'smoke_cfr_boundaries', 'verify_cfr_boundaries_install', 'sync_curve_clock_documents',
+           'audit_curve_clock_release', 'publish_curve_clock', 'bind_curve_clock_evidence', 'run_frozen_case')
+CORE = set(DOCUMENTS) | {'.gitattributes', CONTRACT, REPORT,
+    'docs/specs/RGB曲线控制点动画契约_v0.1_2026-10-21.md',
+    'docs/validation/RGB曲线控制点动画离线实测_2026-10-21.md'}
+CORE.update('product/src/ai_ad_editor/' + name + '.py' for name in
+            ('curve_automation', 'effect_automation', 'effects', 'render', 'validator', 'capabilities',
+             'clip_windows', 'utils', 'video_clock'))
+CORE.update('product/tests/' + name + '.py' for name in
+            ('test_curve_automation', 'test_effect_automation', 'test_spatial_automation', 'test_selective_hsl',
+             'test_cli', 'test_cfr_boundaries', 'test_bounded_hash'))
+CORE.update('skills/' + s + '/SKILL.md' for s in SKILLS)
+CORE.update('scripts/' + s + '.py' for s in SCRIPTS)
+PREFIXES = ('docs/validation/evidence/curve-points-20261021-v80/',
+            'docs/validation/evidence/cfr-boundaries-20261021-lab/', REL + '/',
+            'docs/assets/curve-points-20261021-v80-', 'docs/assets/cfr-boundaries-20261021-v81-')
+DYNAMIC = {REL + '/' + n for n in (FULL_NAME, FULL_NAME.replace('.json', '.log'),
+           FULL_NAME.replace('.json', '.source.json'), FULL_NAME.replace('.json', '.source.log'))}
+
+
+def sha(path):
+    value = hashlib.sha256()
+    with path.open('rb') as handle:
+        for part in iter(lambda: handle.read(65536), b''):
+            value.update(part)
+    return 'sha256:' + value.hexdigest()
+
+
+def read(path):
+    return json.loads(path.read_bytes())
+
+
+def save(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+
+
+def git(root, *args):
+    return subprocess.run(['git', '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', *args],
+                          cwd=root, capture_output=True, check=True).stdout
+
+
+def reviewed_files():
+    changed = {p.decode('utf8') for p in git(ROOT, 'diff', BASE_COMMIT, '--name-only', '-z').split(b'\0') if p}
+    changed.update(p.decode('utf8') for p in git(ROOT, 'ls-files', '--others', '--exclude-standard', '-z').split(b'\0') if p)
+    assert all(name in CORE or name.startswith(PREFIXES) for name in changed), sorted(
+        name for name in changed if name not in CORE and not name.startswith(PREFIXES))
+    changed -= DYNAMIC
+    for name in changed:
+        path = ROOT / name
+        assert path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(ROOT), name
+    return {name: sha(ROOT / name) for name in sorted(changed)}
+
+
+def main_preflight(paths):
+    assert git(MAIN, 'branch', '--show-current').decode().strip() == 'main'
+    assert git(MAIN, 'rev-parse', 'HEAD').decode().strip() == BASE_COMMIT
+    assert git(MAIN, 'remote', 'get-url', 'origin').decode().strip() == REMOTE
+    assert not git(MAIN, 'status', '--porcelain', '-z'), 'Main contains changes; preserve them for reviewed integration'
+    assert git(MAIN, 'ls-remote', 'origin', 'refs/heads/main').decode().split()[0] == BASE_COMMIT
+    tracked = {p.decode('utf8') for p in git(MAIN, 'ls-files', '-z').split(b'\0') if p}
+    for name in paths:
+        target = MAIN / name
+        assert target.resolve().is_relative_to(MAIN) and not target.is_symlink(), name
+        assert name in tracked or not target.exists(), 'Refuse untracked destination: ' + name
+    assert '<!-- R14-CURRENT -->' in (ROOT / 'README.md').read_text(encoding='utf8')
+    assert '<!-- R14-CURRENT -->' in (ROOT / 'docs/README.md').read_text(encoding='utf8')
+
+
+def staged_rows(expected):
+    """Compare the index stream in bounded chunks, including unchanged frozen inputs."""
+    process = subprocess.Popen(['git', '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', 'cat-file', '--batch'],
+                               cwd=MAIN, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    rows = []
+    try:
+        for name, digest in sorted(expected.items()):
+            assert '\n' not in name and '\r' not in name
+            process.stdin.write((':' + name + '\n').encode('utf8'))
+            process.stdin.flush()
+            header = process.stdout.readline().rstrip(b'\n').rsplit(b' ', 2)
+            assert len(header) == 3 and header[1] == b'blob', (name, header)
+            size = int(header[2]); path = MAIN / name
+            assert path.stat().st_size == size, name
+            remaining = size; value = hashlib.sha256()
+            with path.open('rb') as handle:
+                while remaining:
+                    chunk = process.stdout.read(min(65536, remaining))
+                    assert chunk and chunk == handle.read(len(chunk)), name
+                    remaining -= len(chunk); value.update(chunk)
+                assert not handle.read(1)
+            assert process.stdout.read(1) == b'\n'
+            assert 'sha256:' + value.hexdigest() == digest, name
+            rows.append({'path': name, 'bytes': size, 'sha256': digest, 'git_blob': header[0].decode()})
+        process.stdin.close()
+        assert process.wait(timeout=30) == 0
+    finally:
+        if process.poll() is None:
+            process.terminate(); process.wait(timeout=10)
+        for handle in (process.stdin, process.stdout, process.stderr):
+            if handle and not handle.closed:
+                handle.close()
+    return rows
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--work', type=Path, required=True)
+    parser.add_argument('--preflight-only', action='store_true')
+    parser.add_argument('--wait-seconds', type=int, default=10800)
+    args = parser.parse_args()
+    work = args.work.resolve()
+    assert work.is_relative_to(ROOT / 'product/.runtime') and not work.exists()
+    work.mkdir(parents=True)
+    state = {'status': 'preflight', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
+             'generator_sha256': sha(Path(__file__)), 'source': str(ROOT), 'main': str(MAIN),
+             'base_commit': BASE_COMMIT, 'force_push': False, 'calls': []}
+
+    def run(label, command, cwd=ROOT):
+        command = list(map(str, command)); out = work / (label + '.stdout.log'); err = work / (label + '.stderr.log')
+        assert not out.exists() and not err.exists()
+        with out.open('wb') as stdout, err.open('wb') as stderr:
+            result = subprocess.run(command, cwd=cwd, stdout=stdout, stderr=stderr, timeout=1800)
+        state['calls'].append({'label': label, 'command': command, 'exit_code': result.returncode,
+                               'stdout_sha256': sha(out), 'stderr_sha256': sha(err)})
+        save(work / 'run.json', state)
+        assert result.returncode == 0, label + '; original logs retained'
+
+    try:
+        assert ROOT != MAIN and ROOT.is_relative_to(MAIN / 'product/.runtime/worktrees')
+        assert git(ROOT, 'branch', '--show-current').decode().strip() == 'work/curve-clock-v81'
+        assert git(ROOT, 'rev-parse', 'HEAD').decode().strip() == BASE_COMMIT
+        current = current_inputs()
+        assert len(current) == 242
+        candidate = read(BASE / CANDIDATE_AUDIT)
+        assert candidate['status'] == 'passed-candidate-audit' and candidate['frozen_inputs'] == current
+        initial = reviewed_files()
+        main_preflight(set(initial) | DYNAMIC)
+        state.update(reviewed_before_wait=initial, frozen_inputs=current, status='passed-preflight')
+        save(work / 'run.json', state)
+        print(json.dumps({'status': state['status'], 'reviewed_files': len(initial), 'frozen_inputs': len(current)}), flush=True)
+        if args.preflight_only:
+            return
+        deadline = time.monotonic() + args.wait_seconds
+        while True:
+            full = read(BASE / FULL_NAME)
+            if full['status'] == 'passed':
+                break
+            assert full['status'] == 'running', 'Existing complete regression failed; no main files copied'
+            assert time.monotonic() < deadline, 'Existing regression pending; no main files copied'
+            state['status'] = 'waiting-for-existing-full-regression'
+            save(work / 'run.json', state)
+            time.sleep(15)
+        assert full['terminal_ok'] and full['exit_code'] == 0 and full['methods'] == 1838 and full['skipped'] == 0
+        assert full['frozen_equal'] and full['frozen_before'] == full['frozen_after'] == current == frozen()
+        assert full['external_fixture_count'] == 8 and full['external_fixtures_equal']
+        assert full['external_fixture_manifest_unchanged'] and full['verification_scripts_equal']
+        assert reviewed_files() == initial, 'Candidate changed while waiting'
+        if not (BASE / 'documents-final-r1.json').exists():
+            run('final-documents', [sys.executable, '-E', '-B', '-X', 'utf8', ROOT / 'scripts/sync_curve_clock_documents.py', '--final'])
+        final_doc = read(BASE / 'documents-final-r1.json')
+        assert final_doc['frozen_inputs'] == current and final_doc['frozen_equal']
+        assert all(sha(ROOT / n) == h for n, h in final_doc['documents'].items())
+        run('final-source-audit', [sys.executable, '-E', '-B', '-X', 'utf8', ROOT / 'scripts/audit_curve_clock_release.py',
+                                  '--final', '--output', BASE / 'release-final-r1.json'])
+        execution = BASE / 'executed-publisher-r1.py.txt'
+        assert not execution.exists(); execution.write_bytes(Path(__file__).read_bytes())
+        reviewed = reviewed_files()
+        for name, digest in initial.items():
+            assert name in final_doc['documents'] or reviewed[name] == digest, name
+        main_preflight(set(reviewed) | DYNAMIC)
+        spec = importlib.util.spec_from_file_location('v81_main_frozen', MAIN / 'scripts/run_frozen_regression.py')
+        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        main_before = module.frozen()
+        assert len(main_before) == 237
+        state.update(status='copying-reviewed-candidate', reviewed_final=reviewed, main_frozen_before=main_before)
+        save(work / 'run.json', state)
+        copied = dict(reviewed)
+        for name in DYNAMIC:
+            copied[name] = sha(ROOT / name)
+        for name, digest in copied.items():
+            target = MAIN / name; target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, target)
+            assert sha(target) == digest, name
+        assert module.frozen() == current
+        for name, row in full['external_fixtures_expected'].items():
+            assert (MAIN / name).stat().st_size == row['bytes'] and sha(MAIN / name) == row['sha256'], name
+        run('main-skills', [sys.executable, '-E', '-B', '-X', 'utf8', MAIN / 'scripts/audit_source_edit_skills.py',
+                            '--expected-count', '17', '--output', MAIN / REL / 'skills-r1.json'], cwd=MAIN)
+        skills = read(MAIN / REL / 'skills-r1.json')
+        mapping_path = MAIN / 'video-cut-install-manifest.json'; mapping = read(mapping_path)
+        previous = mapping['current_audit']; history = mapping.setdefault('audit_history', [])
+        if previous not in history:
+            history.append(previous)
+        for entry in mapping['skills']:
+            row = next(s for s in skills['results'] if s['skill'] == entry['name'])
+            old_hash = entry['skill_md_sha256']; new_hash = row['sha256'][7:]
+            if old_hash != new_hash:
+                entry.setdefault('skill_md_sha256_history', []).append(old_hash)
+                entry['previous_manifest_skill_md_sha256'] = old_hash
+            entry.update(skill_md_sha256=new_hash, validation=row['validator_stdout'], prefix_verified=True, registration_verified=True)
+            assert Path(entry['canonical_directory']).resolve() == (MAIN / 'skills' / entry['name']).resolve()
+        mapping['current_audit'] = {'date': '2026-10-21', 'skill_count': 17,
+            'local_links_checked': skills['local_links_checked'], 'record': REL + '/skills-r1.json',
+            'record_sha256': sha(MAIN / REL / 'skills-r1.json'), 'previous_hashes_preserved': True,
+            'semantics': 'V81 fixed-topology RGB curves, rational video and requested source clocks, bounded SHA; native and isolated RGBA PCM PTS, editable transfers; no VFR reverse, natural quality, HDR, realtime or full CapCut parity acceptance'}
+        save(mapping_path, mapping)
+        run('main-release-audit', [sys.executable, '-E', '-B', '-X', 'utf8', MAIN / 'scripts/audit_curve_clock_release.py',
+                                   '--final', '--output', MAIN / REL / 'release-main-r1.json'], cwd=MAIN)
+        proof = MAIN / REL / 'publication-copy-r1.json'
+        save(proof, {'status': 'passed-copy-and-main-audit', 'source': str(ROOT), 'base_commit': BASE_COMMIT,
+                     'copied_files': copied, 'frozen_inputs': current, 'frozen_equal': True,
+                     'full_regression_sha256': sha(MAIN / REL / FULL_NAME),
+                     'test_only_bridge_sha256': sha(MAIN / REL / 'test-oracle-correction-r1.json'),
+                     'external_fixture_count': 8, 'skill_count': 17, 'generator_sha256': sha(Path(__file__))})
+        final = dict(copied)
+        for name in ('video-cut-install-manifest.json', REL + '/skills-r1.json', REL + '/release-main-r1.json',
+                     REL + '/release-main-r1.py.txt', REL + '/publication-copy-r1.json'):
+            final[name] = sha(MAIN / name)
+        assert not (MAIN / REL / 'staged-r1.json').exists()
+        for offset in range(0, len(final), 40):
+            batch = sorted(final)[offset:offset + 40]
+            git(MAIN, 'add', '--', *batch)
+            git(MAIN, 'add', '--renormalize', '--', *batch)
+        staged = {p.decode('utf8') for p in git(MAIN, 'diff', '--cached', '--name-only', '-z').split(b'\0') if p}
+        assert staged == set(final), 'Unexpected staged files'
+        assert not git(MAIN, 'diff', '--name-only')
+        git(MAIN, 'diff', '--cached', '--check')
+        rows = staged_rows({**final, **current})
+        staged_proof = MAIN / REL / 'staged-r1.json'
+        save(staged_proof, {'status': 'passed', 'base_commit': BASE_COMMIT,
+                           'index_tree_before_this_receipt': git(MAIN, 'write-tree').decode().strip(),
+                           'changed_files': len(final), 'frozen_files': 242, 'compared_blobs': len(rows),
+                           'files': rows, 'all_staged_bytes_equal_workspace': True,
+                           'all_frozen_bytes_equal_staged': True, 'diff_check': 'passed',
+                           'regression_sha256': sha(MAIN / REL / FULL_NAME),
+                           'generator_sha256': sha(Path(__file__)), 'stream_buffer_bytes': 65536})
+        git(MAIN, 'add', '--', REL + '/staged-r1.json')
+        staged_rows({REL + '/staged-r1.json': sha(staged_proof)})
+        assert module.frozen() == current and not git(MAIN, 'diff', '--name-only')
+        git(MAIN, 'diff', '--cached', '--check')
+        state.update(status='passed-staged-byte-audit', staged_files=len(final) + 1)
+        save(work / 'run.json', state)
+        git(MAIN, 'commit', '--quiet', '-m', 'feat: preserve rational video clocks and animate RGB curve points')
+        commit = git(MAIN, 'rev-parse', 'HEAD').decode().strip()
+        assert git(MAIN, 'rev-parse', 'HEAD^').decode().strip() == BASE_COMMIT
+        state.update(status='committed-awaiting-ordinary-push', commit=commit)
+        save(work / 'run.json', state)
+        git(MAIN, 'push', 'origin', 'main')
+        remote = git(MAIN, 'ls-remote', 'origin', 'refs/heads/main').decode().split()[0]
+        assert remote == commit and not git(MAIN, 'status', '--porcelain', '-z') and module.frozen() == current
+        state.update(status='published', remote_main=remote, main_clean=True, full_methods=1838,
+                     full_seconds=full['suite_seconds'], skill_count=17,
+                     skill_local_links=skills['local_links_checked'])
+    except BaseException as error:
+        state.update(status='failed', error={'type': type(error).__name__, 'message': str(error)})
+        raise
+    finally:
+        state['updated_at_utc'] = datetime.now(timezone.utc).isoformat()
+        save(work / 'run.json', state)
+        print(json.dumps({k: state.get(k) for k in ('status', 'commit', 'remote_main', 'error')}, ensure_ascii=False), flush=True)
+
+
+if __name__ == '__main__':
+    main()

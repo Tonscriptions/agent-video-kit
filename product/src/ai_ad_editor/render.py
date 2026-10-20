@@ -15,6 +15,7 @@ from typing import Any, Callable
 
 from .animation import bezier_samples
 from .effect_automation import EffectAutomation, canonical as _runtime_effect_name
+from .video_clock import registered_time_base, working_clock, frame_interval
 from .audio_stretch import configuration as _audio_stretch_configuration, execute as _execute_audio_stretch, plan as _plan_audio_stretch
 from .audio_tempo import (CONTEXT_FRAMES as _audio_context_frames,
                          MAX_TERMINAL_CONTEXT_PCM_BYTES as _audio_terminal_context_budget,
@@ -1246,16 +1247,21 @@ def speed_curve_duration_seconds(clip: dict[str, Any], source_span_tick: int, tp
 
 
 
-def _speed_curve_setpts(segments: list[tuple[float, float, float, float]], timeline_start: float) -> str:
+def _speed_curve_setpts(segments: list[tuple[float, float, float, float]], timeline_start: float,
+                        *, source_expression: str = '((PTS-STARTPTS)*TB)',
+                        timeline_clock_ticks: int | None = None) -> str:
     """Use the same stable source integral as nested and authored clocks."""
     if not segments:
         return f'setpts=PTS-STARTPTS+{timeline_start:.12f}/TB'
     mapping = {'source_start': 0., 'source_end': segments[-1][1],
-               'timeline_start': timeline_start,
+               'timeline_start': timeline_start if timeline_clock_ticks is None else 0.,
                'timeline_duration': _speed_curve_elapsed_seconds(segments, segments[-1][1]),
                'speed': 1., 'reverse': False, 'segments': segments, 'curve_scale': 1.}
-    expression = _clock_expression([mapping], '((PTS-STARTPTS)*TB)', scratch_register=0)
-    return 'setpts=' + _expr_arg(f'({expression})/TB')
+    expression = _clock_expression([mapping], source_expression, scratch_register=0)
+    value = f'({expression})/TB'
+    if timeline_clock_ticks is not None:
+        value += f'+{timeline_clock_ticks}'
+    return 'setpts=' + _expr_arg(value)
 
 
 def _insert_audio_freeze(
@@ -1434,6 +1440,15 @@ def _effect_filters(
                 "message": message,
             })
 
+        if name in {'curves', 'curve', 'rgb_curves', 'rgb_curve', 'channel_curves'} and effect_tracks:
+            if automation is None:
+                raise AppError('EFFECT_AUTOMATION_CONTEXT_MISSING', '动态曲线需要共享根图实例与命令预算', exit_code=6)
+            duration = int(clip_value.get('duration_tick', 0))/tps
+            generated, evidence = automation.bind_curves(effect_value, clip_value, clip_start, clip_start+duration)
+            filters.extend(generated)
+            if automation_meta is not None:
+                automation_meta.append(evidence)
+            continue
         if name in {'selective_hsl', 'hsl_bands', 'eight_band_hsl'}:
             from .selective_hsl import compile_filter
             from .hsl_native import compile_native
@@ -3885,7 +3900,19 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 start, span = start_tick/tps, clip['duration_tick']/tps
                 if surface.get('video'):
                     label = f'window_picture{index}'
-                    filters.append(f'[{surface["video"]}]settb=AVTB,setpts=PTS+{start:.12f}/TB[{label}]')
+                    clock_filter, clock_metadata = working_clock(1/Fraction(fps_value), fps_value, tps)
+                    first_frame, end_frame = frame_interval(start_tick,clip['duration_tick'],tps,fps_value)
+                    clock_expression=f'PTS*TB+({start_tick}/{tps})'
+                    expected_frames=surface.get('video_frame_count')
+                    if isinstance(expected_frames,int) and not isinstance(expected_frames,bool) and expected_frames>0:
+                        clock_expression=f'if(gte(N,{expected_frames}),({start_tick+clip["duration_tick"]}/{tps}),{clock_expression})'
+                        clock_metadata['complete_surface_eof_guard']={'expected_frames':expected_frames,'author_end_tick':start_tick+clip['duration_tick']}
+                    filters.append(f'[{surface["video"]}]{clock_filter},setpts='+_expr_arg('('+clock_expression+')/TB')+','
+                                   f'fps={fps_value}:round=up:eof_action=pass,'
+                                   f'trim=start_pts={first_frame}:end_pts={end_frame}[{label}]')
+                    input_meta.append({'kind':'video-frame-clock','clip_id':clip['id'],
+                                       'surface':'presentation-window',**clock_metadata,
+                                       'output_frame_start':first_frame,'output_frame_end_exclusive':end_frame})
                     video_labels.append(label)
                     video_specs.append({'label':label,'position':"x=0:y=0",'track_id':track_id,
                         'track_order':int(track.get('order',0)),'layer_order':len(video_specs),
@@ -3980,7 +4007,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     mapped_speed_segments = _reverse_speed_curve_segments(speed_segments) if bool(clip.get("reverse")) else speed_segments
                     setpts = _speed_curve_setpts(mapped_speed_segments, start)
                 else:
-                    setpts = f"setpts=(PTS-STARTPTS)/{speed:.8f}+{start:.6f}/TB" if abs(speed - 1.0) > 1e-9 else f"setpts=PTS-STARTPTS+{start:.6f}/TB"
+                    origin = f'({int(clip.get("timeline_start_tick", 0))}/{tps})'
+                    setpts = f"setpts=(PTS-STARTPTS)/{speed:.8f}+{origin}/TB" if abs(speed - 1.0) > 1e-9 else f"setpts=PTS-STARTPTS+{origin}/TB"
                 transforms = _transform_exprs(clip, start, tps)
                 chain = [f"{video_input}trim=start={src_in:.6f}:end={src_out:.6f}"]
                 nested_maps = clip.get('_nested_time_maps')
@@ -4033,22 +4061,47 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                                      'fps': nominal_value, 'message': '嵌套非线性变速以登记帧率建立源显示时钟；VFR 原始时间戳等效未验收'})
                 if bool(clip.get("reverse")):
                     chain.append("reverse")
-                if nested_maps or inline_surface:
-                    # Complete child surfaces have a coarse display-frame TB.
-                    # Retiming before freeze must not round two source frames
-                    # onto the same timestamp and advance the selected picture.
-                    chain.append('settb=AVTB')
+                input_base, clock_source = registered_time_base(asset,uri,
+                    normalized_rate=nominal_value if nested_maps else fps_value if inline_surface else None)
+                clock_filter, clock_metadata = working_clock(input_base, fps_value, tps)
+                clock_metadata['input_time_base_source'] = clock_source
+                if not nested_maps and not inline_surface and not bool(clip.get('reverse')):
+                    # Keep the frame covering a fractional source in-point.
+                    # trim(start=...) followed by PTS-STARTPTS discards it
+                    # and restarts the clock at the next decoded frame.
+                    # Decode the prefix, anchor at the requested source tick,
+                    # and discard its output samples on the global CFR grid.
+                    clock_base = Fraction(clock_metadata['working_time_base'])
+                    source_origin = Fraction(int(clip.get('source_in_tick', 0)),tps)/clock_base
+                    source_end = Fraction(int(clip.get('source_out_tick', 1)),tps)/clock_base
+                    timeline_origin = Fraction(int(clip.get('timeline_start_tick', 0)),tps)/clock_base
+                    assert source_origin.denominator == source_end.denominator == timeline_origin.denominator == 1
+                    chain = [f'{video_input}{clock_filter},trim=end_pts={int(source_end)}']
+                    if speed_segments:
+                        setpts = _speed_curve_setpts(speed_segments, 0.,
+                            source_expression=f'((PTS-{int(source_origin)})*TB)',
+                            timeline_clock_ticks=int(timeline_origin))
+                    else:
+                        setpts = f'setpts=(PTS-{int(source_origin)})/{speed:.8f}+{int(timeline_origin)}'
+                    clock_metadata.update(source_clock_anchor='requested-author-source-in-tick',
+                        source_prefix_preserved_for_covering_frame=True,
+                        source_in_tick=int(clip.get('source_in_tick', 0)))
+                else:
+                    chain.append(clock_filter)
                 chain.append(setpts)
                 # A fractional segment boundary must not reset fps rounding
                 # to that segment's local phase. Leave start_time unset for
                 # composed clocks so every part uses the global frame grid.
-                chain.append(f'fps={fps_value}:round=up:eof_action=pass' if nested_maps else
-                             f"fps={fps_value}:start_time={start:.8f}:round=up:eof_action=pass")
-                if nested_maps:
-                    # Keep the global phase and exact half-open author window;
-                    # AVTB expression rounding must not reveal an early frame
-                    # or leak a held endpoint into a later timeline gap.
-                    chain.append(f'trim=start_pts={first_output_frame}:end_pts={end_output_frame}')
+                chain.append(f'fps={fps_value}:round=up:eof_action=pass')
+                if not nested_maps:
+                    exact_start = Fraction(int(clip.get('timeline_start_tick', 0)),tps)
+                    content_span = Fraction(str(curve_duration)) if curve_duration is not None else Fraction(source_span_tick,tps)/Fraction(f'{speed:.8f}')
+                    first_output_frame = math.ceil(exact_start*Fraction(fps_value))
+                    end_output_frame = math.ceil((exact_start+content_span)*Fraction(fps_value))
+                chain.append(f'trim=start_pts={first_output_frame}:end_pts={end_output_frame}')
+                clock_metadata.update(output_frame_start=first_output_frame,
+                    output_frame_end_exclusive=end_output_frame,output_interval='global-CFR-half-open',
+                    short_input_padded=False)
                 if alpha_decoder:
                     # Pin straight RGBA before blending. Negotiating a decoded
                     # yuva420p directly with an opaque YUV canvas would blend
@@ -4153,7 +4206,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                         start_frame = max(0,int(math.ceil(freeze_at/frame_duration-1e-8)))
                         first_clock = math.ceil(start/frame_duration-1e-8)*frame_duration
                         chain.append(f"loop=loop={hold_frames}:size=1:start={start_frame}")
-                        chain.append(f"setpts=N*{frame_duration:.12f}/TB+{first_clock:.8f}/TB")
+                        chain.append(f"setpts=N+{first_output_frame}")
                         if abs(hold_frames*frame_duration-freeze_extra) > 1e-6:
                             warnings.append({"code":"FREEZE_FRAME_QUANTIZED","clip_id":clip.get("id"),"message":"定格时长已量化到显示帧率","requested_seconds":freeze_extra,"actual_seconds":hold_frames*frame_duration})
                 # RGBA overlay caches the first secondary raster dimensions.
@@ -4242,6 +4295,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     "blend": clip.get("blend"),
                 })
                 input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "input": None if inline_surface else source_index, "kind": "video", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
+                input_meta[-1]['video_frame_clock'] = clock_metadata
                 if alpha_decoder:
                     input_meta[-1]['decoder'] = {'name': alpha_decoder, 'reason': 'webm-alpha-mode'}
                 if inline_surface:

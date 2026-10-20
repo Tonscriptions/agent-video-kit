@@ -258,7 +258,8 @@ def prepare(root, project, sequence, build_graph, *, stack=(), video_only=False)
             sound = None
         terminal = {'id': clip['id'], 'asset_id': aid, 'timeline_start_tick': clip['timeline_start_tick'],
             'duration_tick': clip['duration_tick'], 'source_in_tick': 0, 'source_out_tick': clip['duration_tick'],
-            '_presentation_surface': {'video': picture if track['kind'] != 'audio' else None, 'audio': sound},
+            '_presentation_surface': {'video': picture if track['kind'] != 'audio' else None, 'audio': sound,
+                'video_frame_count': max(1,end_frame-first_frame) if track['kind'] != 'audio' else 0},
             'audio': {k:v for k,v in (clip.get('audio') or {}).items() if k in {'role', 'ducking', 'duck_under_voice'}}}
         if blend is not None:
             terminal['blend'] = blend

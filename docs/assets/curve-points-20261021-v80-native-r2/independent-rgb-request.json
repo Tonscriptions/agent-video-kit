@@ -1,0 +1,50 @@
+{
+  "operations": [
+    {
+      "op": "update_clip",
+      "clip_id": "foreground-clip",
+      "patch": {
+        "effects": [
+          {
+            "type": "rgb_curves",
+            "parameters": {
+              "all": "0/0 0.5/0.5 1/1"
+            },
+            "keyframes": [
+              {
+                "property": "red.1.x",
+                "keyframes": [
+                  {
+                    "at_tick": 0,
+                    "value": 0.25,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 180000,
+                    "value": 0.65,
+                    "interpolation": "linear"
+                  }
+                ]
+              },
+              {
+                "property": "blue.1.y",
+                "keyframes": [
+                  {
+                    "at_tick": 0,
+                    "value": 0.8,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 180000,
+                    "value": 0.2,
+                    "interpolation": "linear"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

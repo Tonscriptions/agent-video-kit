@@ -1494,7 +1494,7 @@ print(json.dumps({
         self.assertIn("track_volume", manifest["capabilities"]["audio"]["features"])
         self.assertIn("offline_adapter_registry", manifest["capabilities"]["audio"]["features"])
         self.assertIn("unknown_audio_adapter_never_falls_back_to_mid_side", manifest["capabilities"]["audio"]["limits"])
-        self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.8.1")
+        self.assertEqual(manifest["capabilities"]["effects"]["catalog_version"], "0.9.0")
         self.assertIn("exposure", manifest["capabilities"]["effects"]["catalog_features"])
         self.assertIn("hsl", manifest["capabilities"]["effects"]["catalog_features"])
         self.assertIn("rgb_curves", manifest["capabilities"]["effects"]["catalog_features"])
@@ -1531,7 +1531,7 @@ print(json.dumps({
 
         code, catalog = invoke("effects", "list")
         self.assertEqual(code, 0, catalog)
-        self.assertEqual(catalog["data"]["catalog_version"], "0.8.1")
+        self.assertEqual(catalog["data"]["catalog_version"], "0.9.0")
         self.assertEqual(catalog["data"]["count"], 46)
         frame_interpolation = next(item for item in catalog["data"]["effects"] if item["id"] == "frame_interpolation")
         self.assertEqual(frame_interpolation["backend"], "ffmpeg:minterpolate")
@@ -2740,9 +2740,13 @@ print(json.dumps({
             output = project / "renders" / "source-in-speed.mp4"
             code, planned = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
             self.assertEqual(code, 0, planned)
-            graph = planned["data"]["plan"]["filter_complex"]
-            self.assertIn("trim=start=0.500000:end=1.000000", graph)
-            self.assertIn("PTS-STARTPTS", graph)
+            inputs = planned["data"]["plan"]["inputs"]
+            clock = next(item["video_frame_clock"] for item in inputs
+                         if item.get("asset_id") == asset_id and "video_frame_clock" in item)
+            self.assertEqual(clock["protocol"], "rational-local-video-clock-v1")
+            self.assertEqual(clock["source_clock_anchor"], "requested-author-source-in-tick")
+            self.assertEqual(clock["source_in_tick"], 45000)
+            self.assertTrue(clock["source_prefix_preserved_for_covering_frame"])
             code, rendered = invoke("render", "--project", str(project), "--output", str(output))
             self.assertEqual(code, 0, rendered)
             self.assertAlmostEqual(probe_media(output)["duration_seconds"], 0.5, delta=0.12)

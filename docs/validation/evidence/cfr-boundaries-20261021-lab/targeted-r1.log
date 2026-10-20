@@ -1,0 +1,25 @@
+test_fractional_presentation_surface_does_not_lose_its_last_visible_frame (test_cfr_boundaries.CFRBoundaryTests.test_fractional_presentation_surface_does_not_lose_its_last_visible_frame) ... FAIL
+test_genuinely_short_video_with_a_long_audio_tail_is_not_cloned (test_cfr_boundaries.CFRBoundaryTests.test_genuinely_short_video_with_a_long_audio_tail_is_not_cloned) ... ok
+test_moving_cfr_nut_same_rate_keeps_every_source_identity (test_cfr_boundaries.CFRBoundaryTests.test_moving_cfr_nut_same_rate_keeps_every_source_identity) ... ok
+test_moving_matroska_pts_are_preserved_across_different_fps (test_cfr_boundaries.CFRBoundaryTests.test_moving_matroska_pts_are_preserved_across_different_fps) ... ok
+test_old_project_can_reprobe_missing_timebase_without_changing_recipe (test_cfr_boundaries.CFRBoundaryTests.test_old_project_can_reprobe_missing_timebase_without_changing_recipe) ... ok
+test_one_tick_origin_does_not_round_to_zero_on_the_image_clock (test_cfr_boundaries.CFRBoundaryTests.test_one_tick_origin_does_not_round_to_zero_on_the_image_clock) ... ok
+test_reverse_and_constant_speed_use_the_same_exact_global_grid (test_cfr_boundaries.CFRBoundaryTests.test_reverse_and_constant_speed_use_the_same_exact_global_grid) ... ok
+test_variable_frame_rate_is_not_replaced_by_an_average_rate (test_cfr_boundaries.CFRBoundaryTests.test_variable_frame_rate_is_not_replaced_by_an_average_rate) ... ok
+
+======================================================================
+FAIL: test_fractional_presentation_surface_does_not_lose_its_last_visible_frame (test_cfr_boundaries.CFRBoundaryTests.test_fractional_presentation_surface_does_not_lose_its_last_visible_frame)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\cfr-boundary-lab-20261021\product\tests\test_cfr_boundaries.py", line 153, in test_fractional_presentation_surface_does_not_lose_its_last_visible_frame
+    self.compare(frames,[color],[Fraction(0)],start=2970,span=Fraction(97,100))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\cfr-boundary-lab-20261021\product\tests\test_cfr_boundaries.py", line 91, in compare
+    self.assertEqual(frame,bytes(expected)*(W*H),(i,str(display),list(frame[:4]),expected))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x00\x00\x00\xff\x00\x00\x00\xff\x00\x00\[9171 chars]\xff' != b' `\xc0\xff `\xc0\xff `\xc0\xff `\xc0\xff [5715 chars]\xff' : (30, '1001/1000', [0, 0, 0, 255], (32, 96, 192, 255))
+
+----------------------------------------------------------------------
+Ran 8 tests in 6.869s
+
+FAILED (failures=1)

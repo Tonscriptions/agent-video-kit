@@ -52,6 +52,8 @@ EFFECT_KEYFRAME_ALIASES: dict[str, set[str]] = {
 EFFECT_KEYFRAME_ALIASES.update({name: automation_parameter_names(name) for name in AUTOMATION_EFFECT_ALIASES})
 from .selective_hsl import ALIASES as HSL_ALIASES, SPECS as HSL_SPECS
 EFFECT_KEYFRAME_ALIASES.update({name: set(HSL_SPECS) for name in HSL_ALIASES})
+from .curve_automation import ALIASES as CURVE_ALIASES, parameter_names as curve_parameter_names
+EFFECT_KEYFRAME_ALIASES.update({name: curve_parameter_names(name) for name in CURVE_ALIASES})
 
 COLOR_METADATA_VALUES: dict[str, set[str]] = {
     "primaries": {"bt709", "bt2020", "smpte170m", "smpte432"},

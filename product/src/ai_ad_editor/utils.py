@@ -31,10 +31,35 @@ def new_id(prefix: str) -> str:
 
 
 def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
+    """Hash a local file with one reusable buffer and bounded allocation.
+
+    A full native regression observed MemoryError in allocating read(size).
+    Reserve before opening the file, then read into the same storage; failed
+    reservation cannot advance a stream or yield a partial digest.
+    """
+    if isinstance(chunk_size, bool) or not isinstance(chunk_size, int) or chunk_size <= 0:
+        raise ValueError('chunk_size must be a positive integer')
+    requested = min(chunk_size, 64 * 1024)
+    buffer = None
+    for budget in dict.fromkeys((requested, min(requested, 8192), min(requested, 1024))):
+        try:
+            buffer = bytearray(budget)
+            break
+        except MemoryError:
+            continue
+    if buffer is None:
+        raise AppError('FILE_HASH_MEMORY_EXHAUSTED', '无法为本地文件摘要保留有界读取缓冲区',
+                       exit_code=6, path=str(path))
+    view = memoryview(buffer)
     digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        while chunk := handle.read(chunk_size):
-            digest.update(chunk)
+    with path.open("rb", buffering=0) as handle:
+        while True:
+            count = handle.readinto(buffer)
+            if count == 0:
+                break
+            if not isinstance(count, int) or not 0 < count <= len(buffer):
+                raise OSError('Local file returned an invalid read count')
+            digest.update(view[:count])
     return digest.hexdigest()
 
 

@@ -1,0 +1,44 @@
+"""Preserve a one-file test correction without rerendering byte-identical runtime resources."""
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[5]
+sys.path.insert(0, str(ROOT / 'scripts'))
+from run_frozen_regression import frozen
+
+BASE = Path(__file__).parent
+TEST = 'product/tests/test_cli.py'
+read = lambda path: json.loads(path.read_bytes())
+sha = lambda path: 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()
+before = read(BASE / 'oracle-case-before-r1.json')
+after = read(BASE / 'oracle-case-after-r1.json')
+assert before['methods'] == after['methods'] == 1 and before['exit_code'] != 0 and after['terminal_ok']
+old, new = before['frozen_after'], after['frozen_after']
+assert old == before['frozen_before'] and new == after['frozen_before'] == frozen()
+assert len(old) == len(new) == 242 and set(old) == set(new)
+assert {n for n in old if old[n] != new[n]} == {TEST}
+snapshot = BASE / 'full-r1-original-test-cli.py.txt'
+assert sha(snapshot) == old[TEST] and sha(ROOT / TEST) == new[TEST]
+runtime = {n: new[n] for n in new if not n.startswith('product/tests/')}
+assert all(old[n] == h for n, h in runtime.items())
+diff = ''.join(difflib.unified_diff(snapshot.read_text(encoding='utf8').splitlines(True),
+                                 (ROOT / TEST).read_text(encoding='utf8').splitlines(True),
+                                 fromfile='before/' + TEST, tofile='after/' + TEST))
+diff_path = BASE / 'test-oracle-correction-r1.diff.txt'
+assert not diff_path.exists(); diff_path.write_text(diff, encoding='utf8', newline='\n')
+path = BASE / 'test-oracle-correction-r1.json'
+assert not path.exists()
+path.write_text(json.dumps({'status': 'passed-explicit-test-only-bridge', 'frozen_before': old,
+    'frozen_after': new, 'changed_files': [TEST], 'runtime_inputs': runtime,
+    'runtime_input_count': len(runtime), 'runtime_inputs_byte_equal': True,
+    'old_test_snapshot_sha256': sha(snapshot), 'reviewed_diff_sha256': sha(diff_path),
+    'case_before_sha256': sha(BASE / 'oracle-case-before-r1.json'),
+    'case_after_sha256': sha(BASE / 'oracle-case-after-r1.json'),
+    'generator_sha256': sha(Path(__file__)), 'media_rerendered': False,
+    'semantics': 'Only two obsolete graph-string assertions changed to public source-clock metadata checks; the existing real render and duration check remain. All runtime, schema, package and other test bytes are unchanged. Retained media receipts keep their original input snapshots; no claim that their test-input hash equals the corrected full run.'},
+    ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+print(json.dumps({'status': 'passed-explicit-test-only-bridge', 'changed_files': [TEST],
+                  'runtime_input_count': len(runtime), 'media_rerendered': False}))

@@ -1,0 +1,130 @@
+"""Bind V80 native pixels, isolated resources, failures, docs and frozen inputs."""
+from __future__ import annotations
+import argparse
+import ast
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+import urllib.parse
+from PIL import Image
+from run_frozen_regression import frozen
+from sync_curve_automation_documents import BASE,ROOT,REL,NATIVE,INSTALLED,CONTRACT,REPORT,DOCUMENTS,FOLLOWUPS,SKILLS,SCRIPTS
+
+
+def sha(path):return 'sha256:'+hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def read(path):return json.loads(Path(path).read_bytes())
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--candidate',action='store_true');args=parser.parse_args();output=args.output.resolve()
+    assert output.is_relative_to(BASE) and not output.exists()
+    current=frozen();focus=read(BASE/'targeted-r3.json')
+    assert focus['terminal_ok'] and focus['exit_code']==0 and focus['methods']==110 and focus['skipped']==0
+    assert current==focus['frozen_before']==focus['frozen_after'] and focus['frozen_equal'] and len(current)==239
+    assert sha(BASE/'targeted-r3.log')==focus['log_sha256']
+    values={}
+    for name,script in (('native-r2','smoke_curve_automation'),('installed-r1/media','smoke_curve_automation'),('installed-r1','verify_curve_automation_install')):
+        directory=BASE/name;v=read(directory/'verification.json');values[name]=v
+        assert v['status']=='passed' and v['frozen_equal'] and v['frozen_before']==v['frozen_after']==current
+        assert all(row['ok'] for row in v['checks'])
+        filename='executed-install.py.txt' if script.startswith('verify_') else 'executed-smoke.py.txt'
+        assert sha(directory/filename)==v['generator_sha256']==sha(ROOT/'scripts'/(script+'.py'))
+        assert not any(v[k] for k in ('network','virtualization','continuous_playback_reviewed','audio_reviewed','natural_quality_accepted','full_capcut_parity'))
+        assert v['new_model_inference']==0
+        for call in v['calls']:
+            assert call['exit_code']==0,call
+            for stream in ('stdout','stderr'):
+                path=directory/(call['label']+'.'+stream+'.log')
+                if path.exists():assert sha(path)==call[stream+'_sha256'],path
+                else:assert stream=='stdout' and call['label'].startswith(('oracle-','decode-')),path
+    dev=values['native-r2'];media=values['installed-r1/media'];install=values['installed-r1']
+    assert len(dev['cases'])==len(media['cases'])==5
+    for a,b in zip(dev['cases'],media['cases']):
+        assert a['actual_decoded_sha256']==b['actual_decoded_sha256'] and a['independent_reference_sha256']==b['independent_reference_sha256']
+        assert a['max_rgb_error']<=2 and b['max_rgb_error']<=2 and a['alpha_byte_equal'] and a['PCM_byte_equal']
+        assert a['frames']==24 and a['fps']==12
+    files,images=[],[]
+    for relative,v in ((NATIVE,dev),(INSTALLED,media)):
+        directory=ROOT/relative
+        assert set(v['public_files'])=={p.name for p in directory.iterdir() if p.is_file()}
+        for name,row in v['public_files'].items():
+            path=directory/name;assert path.stat().st_size==row['bytes'] and sha(path)==row['sha256'],path
+            files.append({'path':path.relative_to(ROOT).as_posix(),**row})
+            if path.suffix in {'.png','.gif'}:
+                with Image.open(path) as im:
+                    im.load();n=getattr(im,'n_frames',1)
+                    if path.suffix=='.gif':assert n==24
+                    images.append({'path':path.relative_to(ROOT).as_posix(),'size':list(im.size),'frames':n})
+        for name,probe in v['video_probes'].items():
+            times=[float(frame['pts_time']) for frame in probe['frames']]
+            assert len(times)==24 and all(abs(t-i/12)<.0011 for i,t in enumerate(times)),name
+    failures=[]
+    for name in ('targeted-r1','targeted-r2'):
+        v=read(BASE/(name+'.json'));assert v['exit_code']!=0 and not v['terminal_ok'] and v['frozen_equal']
+        assert sha(BASE/(name+'.log'))==v['log_sha256'];failures.append(name)
+    v=read(BASE/'native-r1/verification.json');assert v['status']=='failed' and v['frozen_equal']
+    assert sha(BASE/'native-r1/executed-smoke.py.txt')==v['generator_sha256'];failures.append('native-r1')
+    for name,row in read(BASE/'native-r1/partial-public-files.json').items():
+        path=ROOT/'docs/assets/curve-points-20261021-v80-native-r1'/name
+        assert sha(path)==row['sha256'] and path.stat().st_size==row['bytes']
+    v=read(BASE/'clocks-native-r1/verification.json');assert v['status']=='failed' and v['frozen_equal']
+    assert sha(BASE/'clocks-native-r1/executed-probe.py.txt')==v['script_sha256'];failures.append('clocks-native-r1/CFR-01')
+    baseline=read(BASE/'clocks-native-r1/static-coverage-baseline.json')
+    assert baseline['missing_visible_frames']==[33] and baseline['curve_filters_present'] is False and baseline['frames']==45
+    diagnostics=[]
+    for name in ('clocks-native-r2','clocks-installed-r2'):
+        v=read(BASE/name/'verification.json')
+        assert v['status']=='completed-with-known-CFR-01-gap' and v['accepted_cases']==2 and v['unaccepted_cases']==1
+        assert v['frozen_equal'] and v['frozen_before']==v['frozen_after']==current
+        assert sha(BASE/name/'executed-probe.py.txt')==v['script_sha256']==sha(ROOT/'scripts/probe_curve_automation_clocks.py')
+        assert len(v['cases'])==3 and all(x['ok'] and x['max_rgb_error']<=1 for x in v['cases'][:2])
+        gap=v['cases'][2];assert not gap['ok'] and gap['classification']=='known-CFR-01-unaccepted'
+        assert gap['inherited_static_coverage_gap'] and gap['missing_visible_frames']==[33] and gap['max_error_excluding_missing_frame']<=1
+        assert all(c['exit_code']==0 for c in v['calls'])
+        diagnostics.append(v)
+    assert [x['decoded_sha256'] for x in diagnostics[0]['cases']]==[x['decoded_sha256'] for x in diagnostics[1]['cases']]
+    assert diagnostics[0]['cases'][2]['static_baseline_sha256']==diagnostics[1]['cases'][2]['static_baseline_sha256']
+    static=read(BASE/'static-review-r1.json');assert static['review_mode']=='static-PNG-only'
+    assert not any(static[k] for k in ('continuous_playback_reviewed','audio_reviewed','natural_quality_accepted','full_capcut_parity'))
+    for row in static['files']:assert sha(ROOT/row['path'])==row['sha256']
+    skill_formats=[]
+    validator=Path('C:/Users/carzy/.codex/skills/.system/skill-creator/scripts/quick_validate.py')
+    for name in SKILLS:
+        result=subprocess.run([sys.executable,'-B','-X','utf8',validator,ROOT/'skills'/name],capture_output=True,timeout=30)
+        assert result.returncode==0,(name,result.stdout,result.stderr)
+        skill_formats.append({'skill':name,'sha256':sha(ROOT/'skills'/name/'SKILL.md'),'stdout':result.stdout.decode('utf8').strip()})
+    links=0
+    for path in [*(ROOT/n for n in DOCUMENTS+FOLLOWUPS),CONTRACT,REPORT,*(ROOT/'skills'/s/'SKILL.md' for s in SKILLS)]:
+        text=path.read_text(encoding='utf8')
+        if path not in (CONTRACT,REPORT):
+            marker='V80-CURVES' if path.name=='SKILL.md' else 'V80-FOLLOWUP' if path.relative_to(ROOT).as_posix() in FOLLOWUPS else 'V80-CURRENT'
+            m=re.search(r'<!-- '+marker+r' -->(.*?)<!-- /'+marker+r' -->',text,re.S);assert m,path;text=m[1]
+        for raw in re.findall(r'!?\[[^\]]*\]\((<[^>]+>|[^\s)]+)(?:\s+"[^\"]*")?\)',text):
+            target=raw.strip('<>').split('#',1)[0]
+            if not target or re.match(r'^[a-zA-Z][a-zA-Z0-9+.-]*:',target):continue
+            assert (path.parent/urllib.parse.unquote(target)).resolve().exists(),(path,target);links+=1
+    syntax=[]
+    for name in [*('scripts/'+s+'.py' for s in SCRIPTS),'product/src/ai_ad_editor/curve_automation.py','product/tests/test_curve_automation.py']:
+        path=ROOT/name;ast.parse(path.read_text(encoding='utf8'));syntax.append({'path':name,'sha256':sha(path)})
+    full=read(BASE/'full-r1.json')
+    if not args.candidate:
+        assert full['status']=='passed' and full['terminal_ok'] and full['methods']==1819 and full['skipped']==0
+        assert full['frozen_equal'] and full['frozen_before']==full['frozen_after']==current
+        assert full['external_fixtures_equal'] and full['external_fixture_count']==8 and full['external_fixture_manifest_unchanged'] and full['verification_scripts_equal']
+        assert read(BASE/'skills-r1.json')['skill_count']==17
+    record={'status':'passed-candidate-audit' if args.candidate else 'passed','finished_at_utc':datetime.now(timezone.utc).isoformat(),
+        'generator_sha256':sha(__file__),'source_frozen_equal':True,'frozen_inputs':current,'full_status':full['status'],
+        'syntax_parsed':syntax,'skill_formats':skill_formats,'local_links':links,'public_files':files,'images':images,
+        'failure_history_retained':failures,'successful_cli':dev['cli_calls'],'isolated_cli':install['isolated_cli_calls'],
+        'extra_clock_probe_accepted_cases':2,'extra_clock_probe_unaccepted_cases':1,'known_open_gaps':['CFR-01'],
+        'continuous_playback_reviewed':False,'audio_reviewed':False,'natural_quality_accepted':False,'full_capcut_parity':False}
+    output.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    print(json.dumps({k:record[k] for k in ('status','local_links','successful_cli','isolated_cli')}))
+
+
+if __name__=='__main__':main()

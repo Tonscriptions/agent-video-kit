@@ -1,0 +1,109 @@
+"""Copy verified V80 and clock-lab inputs onto the clean R14-based candidate."""
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+OLD = MAIN / 'product/.runtime/worktrees/curve-point-automation'
+LAB = MAIN / 'product/.runtime/cfr-boundary-lab-20261021'
+NEW = MAIN / 'product/.runtime/worktrees/curve-clock-v81'
+REL = 'docs/validation/evidence/cfr-boundaries-20261021-v81'
+
+
+def sha(path):
+    return 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def copy(source, name):
+    original = source / name
+    target = NEW / name
+    assert original.is_file() and not original.is_symlink()
+    assert target.resolve().is_relative_to(NEW)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(original, target)
+    assert sha(target) == sha(original)
+
+
+base = '1f9ef4e0c37212424ec20962a725ccf78c596261'
+git = lambda *args: subprocess.run(['git', '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', *args],
+                                  cwd=NEW, capture_output=True, check=True).stdout
+assert git('rev-parse', 'HEAD').decode().strip() == base
+assert not git('status', '--porcelain', '--untracked-files=no')
+proof = NEW / REL / 'assembly-r1.json'
+assert not proof.exists()
+foundation = json.loads((LAB / 'docs/validation/evidence/cfr-boundaries-20261021-lab/foundation.json').read_bytes())['files']
+old_frozen = load('old_frozen_assembly', OLD / 'scripts/run_frozen_regression.py').frozen()
+lab_frozen = load('lab_frozen_assembly', LAB / 'scripts/run_frozen_regression.py').frozen()
+assert old_frozen == foundation and len(foundation) == 239 and len(lab_frozen) == 242
+delta = {n: h for n, h in lab_frozen.items() if foundation.get(n) != h}
+assert set(delta) == {'product/src/ai_ad_editor/render.py', 'product/src/ai_ad_editor/clip_windows.py',
+                      'product/src/ai_ad_editor/capabilities.py', 'product/src/ai_ad_editor/utils.py',
+                      'product/src/ai_ad_editor/video_clock.py', 'product/tests/test_cfr_boundaries.py',
+                      'product/tests/test_bounded_hash.py'}
+sys.path.insert(0, str(OLD / 'scripts'))
+reviewed = load('old_publisher_assembly', OLD / 'scripts/publish_curve_automation.py').reviewed_files()
+for name, digest in reviewed.items():
+    assert sha(OLD / name) == digest
+    if name != '.gitattributes':
+        copy(OLD, name)
+for name in ('full-r1.json', 'full-r1.log', 'full-r1.source.json', 'full-r1.source.log'):
+    copy(OLD, 'docs/validation/evidence/curve-points-20261021-v80/' + name)
+failed = json.loads((OLD / 'docs/validation/evidence/curve-points-20261021-v80/full-r1.json').read_bytes())
+assert failed['status'] == 'failed' and failed['methods'] == 1819 and failed['frozen_equal']
+for name in ('README.md', 'docs/README.md'):
+    original = (MAIN / name).read_text(encoding='utf8')
+    block = re.search(r'<!-- R14-CURRENT -->.*?<!-- /R14-CURRENT -->', original, re.S).group()
+    target = NEW / name
+    text = target.read_text(encoding='utf8')
+    assert '<!-- R14-CURRENT -->' not in text
+    first, rest = text.split('\n', 1)
+    target.write_text(first + '\n\n' + block + '\n' + rest, encoding='utf8', newline='\n')
+for name in delta:
+    copy(LAB, name)
+fixture = json.loads((LAB / 'docs/validation/evidence/cfr-boundaries-20261021-lab/external-fixtures-r1.json').read_bytes())
+assert fixture['fixture_count'] == 8
+for row in fixture['fixtures']:
+    copy(LAB, row['path'])
+    assert sha(NEW / row['path']) == row['sha256']
+for name in ('smoke_cfr_boundaries.py', 'verify_cfr_boundaries_install.py'):
+    copy(LAB, 'scripts/' + name)
+contract = 'docs/specs/片段有理数时间基与CFR边界契约_v0.1_2026-10-21.md'
+copy(LAB, contract)
+attributes = NEW / '.gitattributes'
+assert 'openfilm-reuse-20261021-r14/** -text' in attributes.read_text(encoding='utf8')
+with attributes.open('a', encoding='utf8', newline='\n') as handle:
+    handle.write('\n# V80 candidate history and V81 keep execution, failures and media byte-exact.\n'
+                 'docs/validation/evidence/curve-points-20261021-v80/** -text -whitespace\n'
+                 'docs/validation/evidence/cfr-boundaries-20261021-*/** -text -whitespace\n'
+                 'docs/assets/curve-points-20261021-v80-*/** -text -whitespace\n'
+                 'docs/assets/cfr-boundaries-20261021-*/** -text -whitespace\n'
+                 'scripts/*curve_automation*.py -text\n'
+                 'scripts/*cfr_boundaries*.py -text\n'
+                 'scripts/*curve_clock*.py -text\n')
+current = load('new_frozen_assembly', NEW / 'scripts/run_frozen_regression.py').frozen()
+assert current == lab_frozen
+proof.parent.mkdir(parents=True, exist_ok=True)
+executed = proof.with_name('executed-assembly.py.txt')
+executed.write_bytes(Path(__file__).read_bytes())
+proof.write_text(json.dumps({'status': 'passed-input-assembly', 'created_at_utc': datetime.now(timezone.utc).isoformat(),
+    'base_commit': base, 'source_candidate': str(OLD), 'source_lab': str(LAB),
+    'reviewed_v80_files': reviewed, 'reviewed_lab_delta': delta, 'frozen_inputs': current,
+    'frozen_count': len(current), 'source_frozen_equal': True,
+    'V80_full_failed_not_published': True, 'R14_document_blocks_preserved': True,
+    'external_fixture_count': 8, 'script_sha256': sha(executed), 'full_capcut_parity': False,
+    'native_windows': True, 'network': False, 'virtualization': False},ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+print(json.dumps({'status':'passed-input-assembly','old_reviewed_files':len(reviewed),
+                  'core_delta':len(delta),'frozen_inputs':len(current),'root':str(NEW)},ensure_ascii=False))

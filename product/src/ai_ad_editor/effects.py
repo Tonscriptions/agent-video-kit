@@ -14,7 +14,7 @@ from .effect_automation import SPECS as AUTOMATION_SPECS
 from .selective_hsl import SPECS as HSL_SPECS, ENGINE as HSL_ENGINE
 
 
-EFFECT_CATALOG_VERSION = "0.8.1"
+EFFECT_CATALOG_VERSION = "0.9.0"
 
 
 def _parameter(
@@ -67,6 +67,11 @@ def _effect(
         item.update(keyframable=True, keyframe_parameters=list(HSL_SPECS), keyframe_engine=HSL_ENGINE)
         item.update(fallback_backends=['ffmpeg:geq'],backend_selection='verified-native-auto',
                     implementation_license='MIT (original C kernel)',implementation_license_file='NATIVE_HSL_LICENSE.txt')
+    if effect_id in {'curves', 'rgb_curves'}:
+        item.update(keyframable=True, keyframe_engine='native-curve-points-cfr-v1',
+                    keyframe_parameters=[f'{c}.<index>.{axis}' for c in (('all',) if effect_id == 'curves' else ('all', 'red', 'green', 'blue')) for axis in ('x', 'y')],
+                    keyframe_point_index={'minimum': 0, 'maximum': 255, 'topology': 'static-point-count'},
+                    keyframe_coordinate_range=[0, 1])
     return item
 
 
@@ -130,7 +135,7 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
     _effect("curves", backend="ffmpeg:curves", category="color", aliases=("curve",), parameters={
         "all": _parameter("string", "0/0 1/1", description="FFmpeg curves points, for example 0/0 0.5/0.4 1/1"),
         "master": _parameter("string", "", description="Alias for the all/master curve"),
-    }, limits=("curve_points_are_static", "point_string_is_whitelist_validated")),
+    }, limits=("fixed_point_count_1_to_256", "six_decimal_8bit_x_bins_must_increase", "master_is_all_alias_not_post_master", "point_string_is_whitelist_validated")),
     _effect("deband", backend="ffmpeg:deband", category="repair", aliases=("debanding",), parameters={
         "threshold": _parameter("number", 0.02, minimum=0.001, maximum=0.5),
         "range": _parameter("integer", 16, minimum=1, maximum=64),
@@ -209,11 +214,11 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
     _effect("noise", backend="ffmpeg:noise", category="stylize", aliases=("film_grain",), parameters={"amount": _parameter("integer", 8, minimum=1, maximum=100)}),
     _effect("posterize", backend="ffmpeg:lutrgb", category="stylize", aliases=("posterization",), parameters={"levels": _parameter("integer", 8, minimum=2, maximum=256)}),
     _effect("rgb_curves", backend="ffmpeg:curves", category="color", aliases=("rgb_curve", "channel_curves"), parameters={
-        "all": _parameter("string", "0/0 1/1", description="可选 master/all 曲线"),
+        "all": _parameter("string", "0/0 1/1", description="未独立声明的 RGB 通道继承该曲线；不是后置 master"),
         "red": _parameter("string", "", description="红色通道曲线"),
         "green": _parameter("string", "", description="绿色通道曲线"),
         "blue": _parameter("string", "", description="蓝色通道曲线"),
-    }, limits=("curve_points_are_static", "each_channel_is_whitelist_validated")),
+    }, limits=("fixed_point_count_1_to_256", "six_decimal_8bit_x_bins_must_increase", "animated_channel_forks_static_all_if_no_own_points", "each_channel_is_whitelist_validated")),
     _effect("selective_hsl", backend="ffmpeg:frei0r", category="color", aliases=("hsl_bands", "eight_band_hsl"),
             parameters={name: _parameter("number", spec[1], minimum=spec[2], maximum=spec[3]) for name, spec in HSL_SPECS.items()},
             limits=("eight_fixed_hue_centers_with_circular_triangular_partition", "weights_use_original_hue_simultaneously",

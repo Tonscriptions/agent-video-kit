@@ -140,6 +140,9 @@ def _finite_number(value: Any) -> bool:
 
 def validate(effect: dict[str, Any], *, duration_tick: int | None = None) -> list[dict[str, str]]:
     """Strict checks for the executable numeric color/spatial/keying channels."""
+    from .curve_automation import matches as is_curve, validate as validate_curve
+    if is_curve(effect.get('type', '')):
+        return validate_curve(effect, duration_tick=duration_tick)
     from .selective_hsl import matches as is_hsl, validate as validate_hsl
     if is_hsl(effect.get('type', '')):
         return validate_hsl(effect, duration_tick=duration_tick)
@@ -286,6 +289,10 @@ class EffectAutomation:
                         parameter_clock='continuous-author-parameters-at-display-CFR',
                         alpha_operation='multiply-original-coverage-once')
         return generated, metadata
+
+    def bind_curves(self, effect, clip, start, end):
+        from .curve_automation import bind
+        return bind(self, effect, clip, start, end)
 
     def _bind(self, effect, name, backend, specs, tracks, static_filter, clip, start, end,
               *, resource_context=None, curves=None, state_cost=1):

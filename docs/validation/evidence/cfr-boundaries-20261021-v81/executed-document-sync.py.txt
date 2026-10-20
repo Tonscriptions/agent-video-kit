@@ -1,0 +1,206 @@
+"""Document the combined, byte-frozen V81 candidate without inventing release results."""
+from __future__ import annotations
+import argparse
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+from run_frozen_regression import frozen
+
+ROOT = Path(__file__).resolve().parents[1]
+REL = 'docs/validation/evidence/cfr-boundaries-20261021-v81'
+BASE = ROOT / REL
+CONTRACT = 'docs/specs/片段有理数时间基与CFR边界契约_v0.1_2026-10-21.md'
+REPORT = 'docs/validation/有理数视频时钟与曲线候选合并实测_2026-10-21.md'
+DOCUMENTS = ('README.md', 'docs/README.md', 'docs/构建进度总表_2026-10-16.md',
+    'docs/产品需求与开发路线基线_2026-10-12.md', 'docs/specs/AgentCLI契约_v0.1_2026-10-13.md',
+    'docs/validation/README功能核验与实测演示_2026-10-16.md',
+    'docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md',
+    'docs/specs/本地效果目录与参数契约_v0.1_2026-10-14.md',
+    'docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md',
+    'docs/Concat与剪映功能差异矩阵_2026-10-12.md')
+SKILLS = ('video-cut-agent-editor', 'video-cut-timeline', 'video-cut-quality', 'video-cut-template-library')
+
+
+def read(name):
+    return json.loads((BASE / name).read_bytes())
+
+
+def sha(path):
+    return 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def inject(path, label, body, *, skill=False):
+    text = path.read_text(encoding='utf8')
+    text = re.sub(r'\n?<!-- ' + label + r' -->.*?<!-- /' + label + r' -->\n?', '\n', text, flags=re.S)
+    if skill:
+        end = text.index('\n---', 4) + 4
+        head, rest = text[:end], text[end:]
+    else:
+        head, rest = text.split('\n', 1)
+    path.write_text(head + '\n\n<!-- ' + label + ' -->\n' + body + '\n<!-- /' + label + ' -->\n' + rest,
+                    encoding='utf8', newline='\n')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--final', action='store_true', help='requires the complete successful frozen suite')
+    args = parser.parse_args()
+    current = frozen()
+    assert len(current) == 242 and current == read('assembly-r1.json')['frozen_inputs']
+    focus = []
+    for name, count in [('targeted-clock-r1.json', 14), ('targeted-hash-r1.json', 5), ('targeted-automation-r1.json', 110)]:
+        value = read(name)
+        assert value['methods'] == count and value['terminal_ok'] and value['exit_code'] == 0 and value['skipped'] == 0
+        assert value['frozen_before'] == value['frozen_after'] == current and value['frozen_equal']
+        focus.append(value)
+    native = read('native-r7/verification.json')
+    installed = read('installed-r1/verification.json')
+    installed_media = read('installed-r1/media/verification.json')
+    curves = read('curves-native-r1/verification.json')
+    installed_curves = read('curves-installed-r1/verification.json')
+    for value in (native, installed, installed_media, curves, installed_curves):
+        assert value['status'] == 'passed' and all(c['ok'] for c in value['checks'])
+        assert value['frozen_before'] == value['frozen_after'] == current and value['frozen_equal']
+    assert len(installed['resource_hashes']) == 157 and installed['isolated_cli_calls'] == 37
+    assert native['cli_calls'] == 34 and len(native['checks']) == 53 and len(native['cases']) == 5
+    assert all(c['max_rgb_error'] == 0 and c['alpha_byte_equal'] and c['PCM_byte_equal'] for c in native['cases'])
+    assert len(curves['cases']) == len(installed_curves['cases']) == 5
+    assert curves['cases'] == installed_curves['cases']
+    old = json.loads((ROOT / 'docs/validation/evidence/curve-points-20261021-v80/full-r1.json').read_bytes())
+    assert old['status'] == 'failed' and old['methods'] == 1819 and old['frozen_equal']
+    assert 'MemoryError' in (ROOT / 'docs/validation/evidence/curve-points-20261021-v80/full-r1.source.log').read_text(encoding='utf8')
+    full = read('full-r1.json')
+    status = '候选未发布，完整原生回归进行中'
+    if args.final:
+        assert full['status'] == 'passed' and full['terminal_ok'] and full['methods'] == 1838 and full['skipped'] == 0
+        assert full['frozen_before'] == full['frozen_after'] == current and full['frozen_equal'] and full['external_fixtures_equal']
+        status = f'完整原生回归1838项、{full["suite_seconds"]:.3f}秒、0跳过；等待本轮提交与远端核对'
+    else:
+        assert full['status'] == 'running' and full['suite_launched']
+    evidence = lambda p: f'{REL}/{p}'
+    native_assets = 'docs/assets/cfr-boundaries-20261021-v81-native-r7'
+    curve_assets = 'docs/assets/cfr-boundaries-20261021-v81-curves-native-r1'
+    summary = f'''2026-10-21 **V81（RGB 曲线候选＋有理数视频时钟）**：{status}。以 R14 /`1f9ef4e` 为基点，合并原未发布 V80 曲线功能与 CFR-01 修复；冻结242产品输入、8外部夹具。**V80 的1819项回归曾因 OCR 登记哈希读取 `MemoryError` 失败，未发布，不计作通过**。本轮将哈希读取改为复用最多64 KiB缓冲，预留失败退至8/1 KiB；未做操作系统OOM压测。
+
+|编号|实际核验|结果与边界|证据|
+|---|---|---|---|
+|V81-01|时间基／源剪入专项|14通过，0跳过；原始PTS、90 kHz作者tick与CFR格点共同有理数时钟，非整帧源剪入不重启相位|[时钟专项]({evidence('targeted-clock-r1.json')})|
+|V81-02|有界SHA读取|5通过，0跳过；短读、预留回退、I/O失败及完整摘要；不保证消除其他内存耗尽|[哈希专项]({evidence('targeted-hash-r1.json')})|
+|V81-03|既有参数／曲线自动化专项|110通过，0跳过；属于完整回归子集|[自动化专项]({evidence('targeted-automation-r1.json')})|
+|V81-04|真实CFR／VFR媒体|34 CLI／53检查、5组×45帧；独立RGB误差0、alpha与PCM相同、逐帧PTS相同，包与片段异根重建通过|[收据]({evidence('native-r7/verification.json')}) · [原创CFR]({native_assets}/source-cfr-preview.mp4) · [原创VFR]({native_assets}/source-vfr-preview.mp4) · [窗口结果]({native_assets}/window-last-frame.mp4) · [GIF]({native_assets}/window-last-frame.gif)|
+|V81-05|离线安装|157资源／7现有wheels，37隔离CLI＋1模块来源探针；源码／wheel／安装目录字节相同，5组时钟输出同开发|[安装收据]({evidence('installed-r1/verification.json')})|
+|V81-06|合并源码的RGB控制点动画|开发{curves['cli_calls']} CLI／{len(curves['checks'])}检查；另隔离{installed_curves['cli_calls']} CLI，5组输出一致；目录0.9.0／46项|[曲线实测]({evidence('curves-native-r1/verification.json')}) · [隔离实测]({evidence('curves-installed-r1/verification.json')}) · [实际GIF]({curve_assets}/independent-rgb.gif)|
+|V81-07|完整回归与历史失败|{status}；专项、历史与研究不叠加|[当轮状态]({evidence('full-r1.json')}) · [原V80失败](docs/validation/evidence/curve-points-20261021-v80/full-r1.json) · [契约]({CONTRACT}) · [完整记录]({REPORT})|
+
+作者时长1.5s的示例视频为30000/1001fps、45帧、视频／容器1.5015s，PCM1.5s；GIF1.5s为观看副本。仅做一张窗口末帧静态目检，未连续播放或听音；VFR倒放的帧持续顺序、源剪入叠加倒放、自然素材质量、HDR与完整剪映等价仍未验收。'''
+    for name in DOCUMENTS:
+        if name == 'README.md':
+            body = summary
+        else:
+            from urllib.parse import quote
+            import os
+            local_report = os.path.relpath(ROOT / REPORT, (ROOT / name).parent).replace('\\', '/')
+            local_contract = os.path.relpath(ROOT / CONTRACT, (ROOT / name).parent).replace('\\', '/')
+            body = (f'2026-10-21 **V81**：{status}。242冻结输入、8外部夹具；14时钟／5哈希／110自动化专项，'
+                    '5组真实时钟媒体、157资源离线隔离及合并曲线复测已通过。原V80全量失败、未发布，保留历史；'
+                    f'[当前限定结果、原视频/GIF及失败]({quote(local_report, safe="/.")})、'
+                    f'[时间与读取边界]({quote(local_contract, safe="/.")})。自然质量、VFR倒放、HDR和完整剪映等价未验收。')
+        inject(ROOT / name, 'V81-CURVE-CLOCK', body)
+    contract = '''# 片段有理数时间基与 CFR 边界契约 v0.1
+
+V81与未发布V80候选合并，当前发布状态以[实测记录](../validation/有理数视频时钟与曲线候选合并实测_2026-10-21.md)及根README为准。本契约修复CFR-01及请求源剪入相位，不宣称完整剪映等价。
+
+|编号|约束|
+|---|---|
+|VC-01|读取登记流的原生 `time_base`；缺失时只读本地重新探测。已由编译器归一化的表面使用实际CFR时间基。普通VFR输入保留原PTS，不以平均fps替代。|
+|VC-02|映射前的工作时钟分母为原生时间基分母、作者TPS、实际fps分子的公倍数，并取不超过2147483647的整数倍以降低非线性量化。三类原始格点精确表示；非线性映射仍有显式有限分辨率。不能表示时返回 `VIDEO_CLOCK_TIMEBASE_UNREPRESENTABLE`。|
+|VC-03|可见视频为全局半开格点 `[ceil(start*fps), ceil(end*fps))`；fps转换使用round=up／eof_action=pass。普通真短视频不补帧，末尾不泄漏到更长音轨。|
+|VC-04|普通正向媒体保留请求源入点之前的解码前缀，先映射原PTS减请求入点，再在全局CFR采样；不以首个被截出的解码帧重启作者相位。非线性速度积分同样以请求源入点为锚。代价是累计解码，未接受实时或长片性能。|
+|VC-05|公开 `trim_clip`／`split_clip` 创建展示窗口；`update_clip` 的白名单不支持直接写 `presentation_window`。窗口先编译完整作者图，再按作者CFR的ceil／ceil半开帧区间切出，重置局部PTS并移至目标作者tick。重相位时完整窗口的最后一帧可保持至窗口结束，真正短源不因此填充。裁切不会隐式缩短已指定的主序列时长，需显式 `set_sequence_duration`。|
+|VC-06|效果时钟与媒体时钟分开；RGB控制点在真实CFR显示时刻取值，固定拓扑和已有六种时间插值。音频保持既有48kHz样本路由，视频修复不得改变PCM。冻结、嵌套、窗口与区间调节层的通过只限相应证据。|
+|VC-07|原素材、真实MP4、lossless FFV1 BGRA/PCM NUT、GIF、每帧PTS、独立RGBA与完整PCM参考均保全。解码VFR必须显式 `-fps_mode passthrough`，避免工具自动补帧改变核验样本。媒体演示不代表新模型或自然质量验收。|
+|VC-08|文件SHA用预留并复用的最多64KiB字节缓冲和无缓冲 `readinto`；预留失败依次尝试8KiB、1KiB，全失败在打开文件前返回 `FILE_HASH_MEMORY_EXHAUSTED`。支持短读，I/O失败不返回部分摘要。不宣称解决全进程OOM；注入测试不是操作系统OOM实测。|
+
+原生FFmpeg倒放对VFR内容和持续时间的反向对应尚未实现验收；源剪入叠加倒放也未验收。嵌套仍有已记录的标称CFR表面路径；任意VFR嵌套、HDR、自然运动质量及完整剪映特效不借用本轮通过数。
+
+`capabilities.render.video_frame_clock` 输出协议 `rational-local-video-clock-v1`、时间格点、源锚点及未验收限制。实际渲染manifest记录输入／工作时间基、原生探测来源、输出帧区间与完整窗口EOF边界，作者工程不被重写。
+'''
+    (ROOT / CONTRACT).write_text(contract, encoding='utf8', newline='\n')
+    report = f'''# 有理数视频时钟与曲线候选合并实测
+
+2026-10-21：**{status}**。主线基点`1f9ef4e`；原V80未发布，合并为V81。242个产品输入冻结，schema SHA保持`8e1c8b9f7ef39caa4fd66828b7e02fd99338b1c30edf6732b8b3c7aeb83b5b17`。
+
+{summary.replace('](docs/', '](../').replace('](README.md', '](../../README.md')}
+
+## 真实输入与可复现结果
+
+原创输入由[本轮执行脚本](evidence/cfr-boundaries-20261021-v81/native-r7/executed-smoke.py.txt)生成：55张带编号的320×180 RGBA几何帧，alpha为0/64/128/255；CFR素材25fps，VFR原流仅12帧，原始PTS为0、33、101、188、195、441、499、800、1002、1221、1600、1800毫秒。双声道48kHz PCM各72000样本帧，333/509Hz正弦，均为合成测试素材，无模型推理。
+
+源入点0.113s、目标起点0.033s、静态片段起点0.11s；非线性速度从0.5到1.5，以50位Decimal `u=0.5*(exp(t)-1)`独立求逆。展示窗口从作者0.11s切至1.08s，完整作者时长2s，目标起点0.033s；独立参考按契约ceil/ceil选帧并在重相位末端保留完整窗口末帧。所有225帧逐像素比较、每帧PTS与各72000 PCM样本帧一致；编码MP4仅用于观看，RGB证据来自NUT。
+
+5组时钟开发／隔离输出的参考、源素材、PTS与解码结果一致；曲线5组也在同一242输入版本复测。离线安装仅用已有7个wheel，157个包资源与开发源码逐字节相同，没有新下载、虚拟化、GUI或模型执行。系统FFmpeg／ffprobe仍为本机原生工具。
+
+只抽查了`window-last-frame-last-visible.png`左右参考／实测第30帧；未连续播放或听音。CC0声明和逐文件SHA见每份媒体目录的`LICENSE.txt`／`files.json`；软件许可分别保留。
+
+## 保留的失败与限定
+
+|编号|原始记录|判断与处理|
+|---|---|---|
+|VF-01|[V80全量](evidence/curve-points-20261021-v80/full-r1.json)|1819方法运行6228.849秒，OCR登记SHA读取触发MemoryError，0跳过；发布门禁在复制前拒绝。不能记为成功发行。|
+|VF-02|[native-r1](evidence/cfr-boundaries-20261021-v81/native-r1/verification.json)|演示脚本使用了不支持的授权参数，已改为真实CLI参数；不是模型或产品画面失败。|
+|VF-03|[native-r2](evidence/cfr-boundaries-20261021-v81/native-r2/verification.json)|默认工具解码将12帧VFR补为50帧；改用passthrough保留真实帧与PTS。|
+|VF-04|[native-r3](evidence/cfr-boundaries-20261021-v81/native-r3/verification.json)|核验脚本误把未支持的canvas.background视为有效颜色，实际根画布是黑色；删除无效字段，用真实契约构建独立参考，RGB阈值仍为2。|
+|VF-05|[native-r4](evidence/cfr-boundaries-20261021-v81/native-r4/verification.json)|误通过update_clip写入内部window字段，字段被现有白名单忽略；改用公开trim操作并核对作者窗口。未在本轮声称所有未知patch字段均报错。|
+|VF-06|[native-r5](evidence/cfr-boundaries-20261021-v81/native-r5/verification.json)|主序列保留显式2秒，实际60帧；改用set_sequence_duration明确设为1.5秒，没有把60帧当45帧通过。|
+|VF-07|[native-r6](evidence/cfr-boundaries-20261021-v81/native-r6/verification.json)|独立参考误用floor开始帧；按已存在ceil/ceil作者CFR窗口契约修正，仍逐像素比较，r7误差0。|
+|VF-08|[lab历史](evidence/cfr-boundaries-20261021-lab/foundation.json)|保留此前末帧／源剪入失败及最终修复过程；其中241输入、缺显式RubberBand而跳过的运行均属历史，不计作本轮242输入通过。|
+
+不修改冻结源码即可复查以下命令；每次使用新的输出路径，禁止覆盖历史证据：
+
+```powershell
+C:/Python313/python.exe -E -B -X utf8 scripts/smoke_cfr_boundaries.py --work '<本项目/product/.runtime/新目录>' --evidence '<本项目/docs/validation/evidence/新目录>' --assets '<本项目/docs/assets/新目录>'
+```
+
+VFR倒放的持续时间次序、剪入叠加倒放、嵌套任意原始VFR语义、自然素材质量、HDR、长片和实时性能、完整特效与剪映等价均未验收。工作时间基有32-bit分母上限，非线性表达式有限精度；读取缓冲回退测试不构成操作系统OOM压测。
+'''
+    # The README's paths start at repository root; report links start at docs/validation.
+    report = report.replace('](../validation/', '](').replace('](../specs/', '](../specs/')
+    (ROOT / REPORT).write_text(report, encoding='utf8', newline='\n')
+    instruction = '''For fractional frame rates, cut-ins or moving presentation windows, read the
+[video clock contract](../../docs/specs/片段有理数时间基与CFR边界契约_v0.1_2026-10-21.md) and
+[combined evidence and retained failures](../../docs/validation/有理数视频时钟与曲线候选合并实测_2026-10-21.md).
+Keep requested source-in ticks and original VFR PTS; do not replace the source
+clock with its first decoded frame or average FPS. Use public trim/split to
+create presentation windows, and explicitly set master duration when needed.
+Window cuts sample complete author CFR output on ceil/ceil boundaries; their
+phase may retain the last complete frame to the author end. Ordinary short
+sources are not padded. Decode references with `-fps_mode passthrough` and
+check every frame identity, alpha, PCM and PTS. Respect the reported rational
+denominator limit and unaccepted VFR reverse/source-in-plus-reverse cases.
+Bounded SHA buffers do not establish OS OOM resilience or natural quality.'''
+    for name in SKILLS:
+        inject(ROOT / 'skills' / name / 'SKILL.md', 'V81-CURVE-CLOCK', instruction, skill=True)
+    for name in ('docs/specs/RGB曲线控制点动画契约_v0.1_2026-10-21.md',
+                 'docs/validation/RGB曲线控制点动画离线实测_2026-10-21.md'):
+        import os
+        target = os.path.relpath(ROOT / REPORT, (ROOT / name).parent).replace('\\', '/')
+        inject(ROOT / name, 'V81-HISTORY', '原V80为未发布历史候选；1819项全量因MemoryError失败。'
+               f'当前合并源码、重新实测与发布状态见[V81记录]({target})，不再以本页待运行描述认定发行。')
+    changed = (*DOCUMENTS, CONTRACT, REPORT, *(f'skills/{s}/SKILL.md' for s in SKILLS),
+               'docs/specs/RGB曲线控制点动画契约_v0.1_2026-10-21.md',
+               'docs/validation/RGB曲线控制点动画离线实测_2026-10-21.md')
+    assert frozen() == current
+    output = BASE / ('documents-final-r1.json' if args.final else 'documents-candidate-r1.json')
+    assert not output.exists()
+    output.write_text(json.dumps({'status': 'passed-document-sync', 'candidate': not args.final,
+        'generated_at_utc': datetime.now(timezone.utc).isoformat(), 'script_sha256': sha(Path(__file__)),
+        'frozen_inputs': current, 'frozen_equal': True, 'full_status': full['status'],
+        'documents': {name: sha(ROOT / name) for name in changed}, 'no_new_model_inference': True},
+        ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+    print(json.dumps({'status': 'passed-document-sync', 'documents': len(changed), 'full_status': full['status']}))
+
+
+if __name__ == '__main__':
+    main()
