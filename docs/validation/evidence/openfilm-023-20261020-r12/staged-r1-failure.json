@@ -1,0 +1,8 @@
+{
+  "status": "failed_before_blob_comparison",
+  "action": "scripts/verify_staged_release.py --full docs/validation/evidence/native-hsl-20261020-v77/full-r3.json --output product/.runtime/openfilm-r12-publish/staged-r1.json",
+  "observed_error": "CalledProcessError: git diff --cached --check exited 2",
+  "reason": "Original unified diff contains required blank context lines prefixed with a space; literal cache-key source fragment ends with a blank line. These were interpreted as whitespace defects before the R12 raw-evidence attributes were registered.",
+  "note": "Recorded from actual tool results; not a raw stderr capture. No staged-r1 success receipt was produced.",
+  "resolution": "Add bounded R12 evidence/source -text -whitespace rules, preserving original bytes; repeat the staged proof at a fresh path. Product source and original upstream test results are unchanged."
+}

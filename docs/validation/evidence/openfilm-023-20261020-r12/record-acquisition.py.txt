@@ -1,0 +1,62 @@
+"""Record the separately captured public GitHub responses, without new HTTP calls."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+CAPTURE = ROOT / 'product/.runtime/openfilm-r12-check'
+OUTPUT = Path(__file__).resolve().parent
+OLD = '695f4a887a97258d45ffe5715eadf537b6d2579b'
+NEW = '284f8bd3d6850ceaa773043e2ecb90e13640f547'
+
+def sha(data):
+    return 'sha256:' + hashlib.sha256(data).hexdigest()
+
+urls = {
+    'repository': 'https://api.github.com/repos/openfilm/openfilm',
+    'head': 'https://api.github.com/repos/openfilm/openfilm/commits/main',
+    'compare': f'https://api.github.com/repos/openfilm/openfilm/compare/{OLD}...{NEW}',
+}
+raw = {}
+data = {}
+for name, url in urls.items():
+    source = CAPTURE / (name + '.json')
+    value = source.read_bytes()
+    destination = OUTPUT / source.name
+    if destination.exists():
+        assert destination.read_bytes() == value
+    else:
+        destination.write_bytes(value)
+    data[name] = json.loads(value)
+    raw[source.name] = {
+        'url_requested': url, 'bytes': len(value), 'sha256': sha(value),
+        'local_capture_finished_at_utc': datetime.fromtimestamp(source.stat().st_mtime, timezone.utc).isoformat(),
+    }
+assert data['head']['sha'] == data['compare']['commits'][-1]['sha'] == NEW
+assert data['compare']['base_commit']['sha'] == OLD
+assert data['compare']['total_commits'] == len(data['compare']['commits']) == 29
+archive = ROOT / 'sources/upstream/openfilm-023-20261020-r12/repo.zip'
+contents = archive.read_bytes()
+assert sha(contents) == 'sha256:5ee1665981831493dd776d2f667da728e0521812c9748e946c99b442ed708e57'
+snapshot = {
+    'repository': data['repository']['full_name'], 'head': NEW, 'prior_pin': OLD,
+    'stars': data['repository']['stargazers_count'], 'forks': data['repository']['forks_count'],
+    'repository_observed_at_utc': raw['repository.json']['local_capture_finished_at_utc'],
+    'head_committed_at_utc': data['head']['commit']['committer']['date'],
+    'compare_commits_ahead': data['compare']['ahead_by'],
+}
+record = {
+    'status': 'captured_public_source_research', 'recorded_at_utc': datetime.now(timezone.utc).isoformat(),
+    'snapshot': snapshot, 'raw_files': raw,
+    'archive': {'url_requested': f'https://codeload.github.com/openfilm/openfilm/zip/{NEW}',
+                'path': archive.relative_to(ROOT).as_posix(), 'bytes': len(contents), 'sha256': sha(contents),
+                'local_capture_finished_at_utc': datetime.fromtimestamp(archive.stat().st_mtime, timezone.utc).isoformat()},
+    'provenance': 'Separate direct urllib source-research requests in this task. Observation times are retained local capture-file mtimes; HTTP response headers were not captured. This recorder performs no HTTP requests.',
+    'prior_recorder_failure': 'acquisition-r1/failure.json',
+}
+for name, value in [('acquisition.json', record), ('snapshot.json', snapshot)]:
+    path = OUTPUT / name
+    assert not path.exists()
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf8')
+print(json.dumps(snapshot, ensure_ascii=False))

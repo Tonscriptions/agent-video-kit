@@ -1,0 +1,53 @@
+// OpenFilm contributors, MIT; original contiguous cache-key fragment follows.
+import { createHash } from 'node:crypto';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { extname, join } from 'node:path';
+const FILM_FILE = 'film.html', TOOL_DIR = '.film';
+const VERSION = 1;
+/** Files whose change cannot change the picture. */
+const SOUNDS = new Set(['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.oga', '.opus', '.flac', '.aif', '.aiff', '.aifc', '.vtt', '.srt']);
+/** Most files of a project read for its fingerprint (a folder of thousands of frames is taken as a whole beyond that). */
+const MOST_FILES = 20_000;
+
+/** Where a project's preview renders are kept. @param {string} root */
+export const previewDir = (root) => join(root, TOOL_DIR, 'cache', 'preview');
+
+/** A render's name is 20 hex digits: anything else asked for is not one. @param {string} key */
+export const isPreviewKey = (key) => /^[0-9a-f]{20}$/.test(key);
+
+/**
+ * What the project's files are now, as far as a picture can tell: every file but its sounds and film.html, by path,
+ * size and time changed (dot folders, the tools' own, left out).
+ * @param {string} root
+ */
+export function projectPrint(root) {
+  const hash = createHash('sha1');
+  let seen = 0;
+  /** @param {string} dir @param {string} rel */
+  const walk = (dir, rel) => {
+    let names;
+    try { names = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    names.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    for (const d of names) {
+      if (d.name.startsWith('.') || seen > MOST_FILES) continue;
+      const path = rel ? `${rel}/${d.name}` : d.name;
+      if (d.isDirectory()) { walk(join(dir, d.name), path); continue; }
+      if (path === FILM_FILE || SOUNDS.has(extname(d.name).toLowerCase())) continue;
+      seen += 1;
+      try { const s = statSync(join(dir, d.name)); hash.update(`${path}\0${s.size}\0${Math.round(s.mtimeMs)}\n`); } catch { /* gone meanwhile */ }
+    }
+  };
+  walk(root, '');
+  return hash.digest('hex');
+}
+
+/**
+ * The name of a render of film seconds [a, b) at `fps` and `height` (its short side), for the project as it is now.
+ * @param {string} root @param {number} a @param {number} b @param {number} fps @param {number} height @param {string} [print]
+ */
+export function previewKey(root, a, b, fps, height, print = projectPrint(root)) {
+  let film = '';
+  try { film = readFileSync(join(root, FILM_FILE), 'utf8'); } catch { /* none: nothing renders */ }
+  return createHash('sha1').update(`${VERSION}\0${film}\0${print}\0${a}\0${b}\0${fps}\0${height}`).digest('hex').slice(0, 20);
+}
+

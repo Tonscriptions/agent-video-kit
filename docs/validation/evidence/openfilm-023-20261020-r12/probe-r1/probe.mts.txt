@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { mkdirSync, readFileSync, statSync, utimesSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { previewKey } from './cache-key-fragment.mjs';
+import { propsOf, withPropValue } from './component-props.ts';
+const root = join(process.cwd(), 'project');
+mkdirSync(root);
+writeFileSync(join(root, 'film.html'), '<iframe src="frame.svg"></iframe>');
+const path = join(root, 'frame.svg');
+const stamp = new Date('2026-10-20T00:00:00Z');
+const picture = color => `<svg xmlns="http://www.w3.org/2000/svg"><rect width="64" height="64" fill="${color}"/></svg>`;
+const hash = p => createHash('sha256').update(readFileSync(p)).digest('hex');
+writeFileSync(path, picture('#f00'));
+utimesSync(path, stamp, stamp);
+const before = { sha256: hash(path), bytes: statSync(path).size, mtimeMs: statSync(path).mtimeMs, key: previewKey(root, 0, 1, 30, 180) };
+writeFileSync(path, picture('#00f'));
+utimesSync(path, stamp, stamp);
+const after = { sha256: hash(path), bytes: statSync(path).size, mtimeMs: statSync(path).mtimeMs, key: previewKey(root, 0, 1, 30, 180) };
+assert.notEqual(before.sha256, after.sha256);
+assert.equal(before.bytes, after.bytes);
+assert.equal(before.mtimeMs, after.mtimeMs);
+assert.equal(before.key, after.key);
+assert.notEqual(after.key, previewKey(root, 0, 1, 30, 360));
+const imageProp = { name: 'Hero', type: 'image', at: '#hero', kind: 'img' } as const;
+const remote = withPropValue(undefined, imageProp, 'https://example.invalid/hero.png');
+assert.ok(JSON.stringify(remote).includes('https://example.invalid/hero.png'));
+const looseVar = propsOf({ attrs: { 'data-props': JSON.stringify([{ name: 'Color', type: 'var', var: '--' }]) } });
+assert.equal(looseVar.length, 1);
+const largeIndex = propsOf({ attrs: { 'data-props': JSON.stringify([{ name: 'Title', type: 'text', at: 'h1', n: 1e20 }]) } });
+assert.equal(largeIndex.length, 1);
+console.log(JSON.stringify({ cache: { before, after, changed_content_same_key: true },
+  component: { remote_url_formatted_without_fetch: remote, short_variable_name_accepted: looseVar,
+  large_match_index_accepted: largeIndex }, assertions: 8, rendered_frames: 0, network_calls: 0 }));

@@ -1,0 +1,8 @@
+{
+  "status": "failed_blob_identity_check",
+  "action": "scripts/verify_staged_release.py --full docs/validation/evidence/native-hsl-20261020-v77/full-r3.json --output product/.runtime/openfilm-r12-publish/staged-r2.json",
+  "observed_error": "AssertionError: docs/validation/evidence/openfilm-023-20261020-r12/acquisition-r1/failure.json",
+  "reason": "The JSON was initially staged under automatic text normalization. Registering -text after staging did not replace that cached normalized blob with the original CRLF workspace bytes.",
+  "note": "Recorded from the actual tool result; not a raw stderr capture. No staged-r2 success receipt was produced.",
+  "resolution": "Reindex the bounded R12 evidence directory with git add --renormalize under its byte-preserving attributes; do not change the historical file bytes. Repeat at a fresh output path."
+}

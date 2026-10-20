@@ -1,0 +1,160 @@
+TAP version 13
+# Subtest: a film.html reads as its value: the viewport its stage, each section a track, each element a clip
+ok 1 - a film.html reads as its value: the viewport its stage, each section a track, each element a clip
+  ---
+  duration_ms: 8.0772
+  ...
+# Subtest: written back, an unchanged film is the same text; a change rewrites only its own element
+ok 2 - written back, an unchanged film is the same text; a change rewrites only its own element
+  ---
+  duration_ms: 2.6264
+  ...
+# Subtest: a clip moved to another track takes its text along; a new track and a new stage are written
+ok 3 - a clip moved to another track takes its text along; a new track and a new stage are written
+  ---
+  duration_ms: 0.7413
+  ...
+# Subtest: a clip written without an id gets its name written, so it stays put
+ok 4 - a clip written without an id gets its name written, so it stays put
+  ---
+  duration_ms: 0.4668
+  ...
+# Subtest: a file's name may hold any character: src escapes only %, \# and ?, and reads back the same path
+ok 5 - a file's name may hold any character: src escapes only %, \# and ?, and reads back the same path
+  ---
+  duration_ms: 0.9883
+  ...
+# Subtest: a src written by hand: its escapes are read, a bare % is a %, an address is kept, a \# in a name is told
+ok 6 - a src written by hand: its escapes are read, a bare % is a %, an address is kept, a \# in a name is told
+  ---
+  duration_ms: 1.5537
+  ...
+# Subtest: a new film is a whole page; a box at 0, 0 is written as one
+ok 7 - a new film is a whole page; a box at 0, 0 is written as one
+  ---
+  duration_ms: 0.4209
+  ...
+# Subtest: the head, body and html tags may be left out, as in any page
+ok 8 - the head, body and html tags may be left out, as in any page
+  ---
+  duration_ms: 0.3028
+  ...
+# Subtest: every problem is said at once, at its line, with what to write instead
+ok 9 - every problem is said at once, at its line, with what to write instead
+  ---
+  duration_ms: 0.4918
+  ...
+# Subtest: what says nothing to the film is kept: a track's id, class or label, a sound's class
+ok 10 - what says nothing to the film is kept: a track's id, class or label, a sound's class
+  ---
+  duration_ms: 0.7813
+  ...
+# Subtest: an <audio> of a video file is that video's sound alone, its picture a clip of its own
+ok 11 - an <audio> of a video file is that video's sound alone, its picture a clip of its own
+  ---
+  duration_ms: 0.5706
+  ...
+# Subtest: a film runs no script, and holds nothing but tracks of clips
+ok 12 - a film runs no script, and holds nothing but tracks of clips
+  ---
+  duration_ms: 0.4281
+  ...
+# Subtest: what the value says wrong is said at the clip's line
+ok 13 - what the value says wrong is said at the clip's line
+  ---
+  duration_ms: 0.3707
+  ...
+# Subtest: media fragments: seconds, a start alone, clock times
+ok 14 - media fragments: seconds, a start alone, clock times
+  ---
+  duration_ms: 0.3518
+  ...
+# Subtest: a valid edit comes back with its fields in their written order
+ok 15 - a valid edit comes back with its fields in their written order
+  ---
+  duration_ms: 0.3345
+  ...
+# Subtest: a page has no sound and no speed: its clip takes neither, a video or a sound clip does
+ok 16 - a page has no sound and no speed: its clip takes neither, a video or a sound clip does
+  ---
+  duration_ms: 0.1994
+  ...
+# Subtest: a clip starts at 0 or later on the film
+ok 17 - a clip starts at 0 or later on the film
+  ---
+  duration_ms: 0.0984
+  ...
+# Subtest: ids: missing ones are named after their source, duplicates refused
+ok 18 - ids: missing ones are named after their source, duplicates refused
+  ---
+  duration_ms: 0.1279
+  ...
+# Subtest: the value has only stage and tracks
+ok 19 - the value has only stage and tracks
+  ---
+  duration_ms: 0.3849
+  ...
+# Subtest: a place (its box) is checked
+ok 20 - a place (its box) is checked
+  ---
+  duration_ms: 0.1535
+  ...
+# Subtest: clipSpan: trims, speed, stills and pages
+ok 21 - clipSpan: trims, speed, stills and pages
+  ---
+  duration_ms: 0.3792
+  ...
+# Subtest: pictureRect: a video or still is its box; a page is fitted whole inside its box, centered
+ok 22 - pictureRect: a video or still is its box; a page is fitted whole inside its box, centered
+  ---
+  duration_ms: 0.3113
+  ...
+# Subtest: fades: any clip takes them, as the overrides entry without at, read to the millisecond and written back alike
+ok 23 - fades: any clip takes them, as the overrides entry without at, read to the millisecond and written back alike
+  ---
+  duration_ms: 0.9343
+  ...
+# Subtest: fades are checked: seconds 0 or more, one entry of the clip's own, in + out within its length; element entries stay a page's
+ok 24 - fades are checked: seconds 0 or more, one entry of the clip's own, in + out within its length; element entries stay a page's
+  ---
+  duration_ms: 0.4516
+  ...
+# Subtest: fadeGain: a straight ramp in and out, fitted to the clip when longer than it
+ok 25 - fadeGain: a straight ramp in and out, fitted to the clip when longer than it
+  ---
+  duration_ms: 0.128
+  ...
+# Subtest: a page's size is the px it is laid out at: read from size="WxH", written back as it was, a page's alone
+ok 26 - a page's size is the px it is laid out at: read from size="WxH", written back as it was, a page's alone
+  ---
+  duration_ms: 0.8698
+  ...
+# Subtest: soundRole: the nearest folder named for a role decides, then the name, else a voice
+ok 27 - soundRole: the nearest folder named for a role decides, then the name, else a voice
+  ---
+  duration_ms: 0.6543
+  ...
+# Subtest: a clip named after its file has no dashes at its ends, however many there are
+ok 28 - a clip named after its file has no dashes at its ends, however many there are
+  ---
+  duration_ms: 0.5741
+  ...
+# Subtest: an override's style takes CSS properties in camelCase and custom properties as CSS names them
+ok 29 - an override's style takes CSS properties in camelCase and custom properties as CSS names them
+  ---
+  duration_ms: 0.3941
+  ...
+# Subtest: an attribute holding JSON (Studio's data-props) is written in single quotes, as overrides are, and read back as it was
+ok 30 - an attribute holding JSON (Studio's data-props) is written in single quotes, as overrides are, and read back as it was
+  ---
+  duration_ms: 0.3148
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 40.3249
