@@ -818,6 +818,11 @@ def build_parser() -> argparse.ArgumentParser:
     html_render.add_argument('--params')
     html_render.add_argument('--overrides', help='本地 CSS 变量、文字、已登记图片替换；null 恢复页面值')
     html_render.add_argument('--layout-check',choices=('off','strict'),help='strict 在编码前核验全帧布局/字体；省略继承配方，旧配方默认 off')
+    html_render.add_argument('--shutter-samples',type=int,help='每输出帧 1..16 次真实 HTML 绘制；省略继承配方，旧配方默认 1')
+    html_render.add_argument('--shutter-fraction',type=float,help='0..1 帧曝光宽度，默认 0.5；0 走单帧路径')
+    shutter_cuts=html_render.add_mutually_exclusive_group()
+    shutter_cuts.add_argument('--shutter-cut-tick',type=int,action='append',help='重复指定严格递增的源内部切点；采样不跨切点')
+    shutter_cuts.add_argument('--shutter-clear-cuts',action='store_true',help='明确清空继承的快门切点')
     html_render.add_argument('--apply', action='store_true')
     html_render.add_argument('--track-id')
     html_render.add_argument('--sequence-id')
@@ -4683,10 +4688,11 @@ def command_html_render(args: argparse.Namespace) -> dict[str, Any]:
             'html_motion': {'engine': html_motion.ENGINE, 'source_asset_id': plan['source_asset_id'],
                 'parameters': plan['parameters'], 'spec': plan['spec'], 'frame_count': plan['frame_count'],
                 'template_overrides': plan['template_overrides'], 'override_resources': plan['override_resources'],
-                'layout_check':plan['layout_check']}}
+                'layout_check':plan['layout_check'],'shutter':plan['shutter']['config']}}
         if layout_result is not None:
             asset['html_motion']['layout_evidence']={'report_sha256':'sha256:'+sha256_file(layout_path),
-                'frame_count':layout_result['frame_count'],'quality_passed':True,'all_frame_orders_equal':True}
+                'frame_count':layout_result['frame_count'],'quality_passed':True,'all_frame_orders_equal':True,
+                'sampling_scope':'actual_shutter_subframes' if plan['shutter']['enabled'] else 'output_frame_anchors'}
         record = _html_rights(asset, list(dict.fromkeys([plan['asset']['rights_ref'],*[r['rights_ref'] for r in plan['override_resources']]])))
         project['assets'].append(asset)
         ledger = load_ledger(root)

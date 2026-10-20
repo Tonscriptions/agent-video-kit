@@ -445,3 +445,15 @@ listening. Preserve the development slow/cropped-tail failures and recheck the
 current complete active interval and actual terminal source marker. Arbitrary
 or ultra-short input can still be insufficient and require zero padding; an
 interior amplitude pass and correct container length do not establish quality.
+
+Use the [HTML shutter contract](../../docs/specs/HTML子帧快门采样与预乘透明合成契约_v0.1_2026-10-20.md)
+for optional subframe redraws of an explicit HTML asset. Run `motion html-render`
+with `--shutter-samples 1..16`, `--shutter-fraction 0..1`, and sorted unique
+`--shutter-cut-tick` source anchors. A cut is in the HTML source tick clock, not
+a timeline clip clock; the output frame anchor selects its half-open segment.
+Recipes inherit through `--from-asset-id`; clear internal cuts explicitly with
+`--shutter-clear-cuts`. Package/fragment reuse retains these parameters.
+Keep the [measured clock and Alpha evidence](../../docs/validation/HTML子帧快门与透明混合实测_2026-10-20.md)
+separate from aesthetic acceptance. This does not infer scene changes or
+synthesize subframes from ordinary video; default or zero exposure keeps the
+existing CFR path.

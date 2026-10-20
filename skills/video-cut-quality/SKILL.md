@@ -532,3 +532,14 @@ Validate the estimated buffer rejection separately from media/quality runs.
 Preserve actual old,
 new and original audio, a decoded waveform preview, and the failed tail image
 in the numbered README row.
+
+For [HTML subframe shutter checks](../../docs/specs/HTML子帧快门采样与预乘透明合成契约_v0.1_2026-10-20.md),
+inspect intended rational times, actual binary64 times, explicit cut segments,
+all three fresh-context sample hashes and the original output CFR PTS. Compare
+whole decoded RGBA with an independent premultiplied integer reference; opaque
+checkerboard MP4s and quantized GIFs are previews. Strict DOM layout must inspect
+every actual shutter sample in two fresh orders. Preserve Canvas semantic-text
+unverified status. Confirm cancellation after a real encoded frame and owned
+process cleanup. The [actual failures and installation proof](../../docs/validation/HTML子帧快门与透明混合实测_2026-10-20.md)
+remain separate from natural-motion review, continuous playback and HDR/linear
+light quality. Never infer those outcomes from deterministic synthetic pixels.

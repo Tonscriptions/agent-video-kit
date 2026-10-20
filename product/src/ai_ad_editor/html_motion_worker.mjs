@@ -37,6 +37,9 @@ try {
   }
   const origin = 'http://agent-video-kit.invalid'; // synthetic route, no DNS/server/listening socket
   const spec = request.spec, params = request.params, frameCount = request.frame_count;
+  if(request.sampling_times != null && (!Array.isArray(request.sampling_times) ||
+      request.sampling_times.length !== frameCount || request.sampling_times.some(t=>!Number.isFinite(t)||t<0)))
+    throw problem('HTML_PROTOCOL_INVALID','Invalid explicit subframe times');
   browser = await chromium.launch({executablePath: request.chromium, headless:true, timeout:15000,
     args:['--disable-gpu', '--disable-background-networking', '--disable-component-update', '--disable-sync', '--log-file='+request.log_file,
       '--no-first-run', '--metrics-recording-only', '--no-proxy-server', '--host-resolver-rules=MAP * ~NOTFOUND',
@@ -114,7 +117,7 @@ try {
     finally {clearTimeout(timer);}
   }
   async function draw(host, index) {
-    const t = index*spec.fps.den/spec.fps.num;
+    const t = request.sampling_times?.[index] ?? index*spec.fps.den/spec.fps.num;
     const template = await limited(host.page.evaluate(async ({t, params, overrides, collect}) => {
       if(document.querySelector('iframe,frame,video,audio,object,embed'))throw new Error('Media/subframe tags are unsupported');
       window.__agentVideoTemplate.restore();

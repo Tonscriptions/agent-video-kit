@@ -424,3 +424,15 @@ For an offline audio adapter, register existing local artifacts with `audio adap
 7. Inspect the render manifest and probe the output before reporting success. If the renderer warns that keyframes, effects, transitions, or transforms are preserved but not executed, report that limitation. If a render is cancelled or fails, retain the returned `operation_id`; retry with `render --resume <operation_id>` only after the CLI accepts the unchanged project and asset fingerprints. This is a validated rebuild from the recorded plan, not a partial-frame checkpoint.
 
 Agent calls should consume the JSON envelope and exit code. Keep a project-relative change set in a file so the operation is reviewable and repeatable. Read [the CLI contract](../../docs/specs/AgentCLI契约_v0.1_2026-10-13.md), [the local AI adapter specification](../../docs/specs/本地AI适配器与字幕流水线规范_v0.1_2026-10-13.md), [the object tracking specification](../../docs/specs/本地对象跟踪与关键帧规范_v0.1_2026-10-13.md), [the visual tracking adapter contract](../../docs/specs/本地视觉模型适配器与对象跟踪协议契约_v0.1_2026-10-15.md), [the tracking bind contract](../../docs/specs/本地跟踪绑定与对象锚定契约_v0.1_2026-10-15.md), and [the P0 usage guide](../../docs/产品实现入口与P0使用说明_v0.1_2026-10-13.md) when a request needs exact fields or failure handling.
+
+For explicit local HTML motion, use the [subframe shutter contract](../../docs/specs/HTML子帧快门采样与预乘透明合成契约_v0.1_2026-10-20.md).
+`motion html-render --shutter-samples 4 --shutter-fraction 1` redraws each sample;
+default samples=1 and fraction=0 retain the original frame path. Declare each
+internal cut with `--shutter-cut-tick <source-tick>`; use `--shutter-clear-cuts`
+when explicitly replacing an inherited recipe. Samples are 1..16, fraction 0..1;
+strict layout includes every subframe and all redraw passes count toward the
+work budget. The saved recipe survives package and edited-fragment reuse.
+Read the [actual pixels and failures](../../docs/validation/HTML子帧快门与透明混合实测_2026-10-20.md).
+This is premultiplied encoded-sRGB 8-bit compositing. It does not add motion
+blur to arbitrary source footage or accept HDR, natural-motion quality, hidden
+Canvas text layout, undeclared scene cuts or complete CapCut parity.

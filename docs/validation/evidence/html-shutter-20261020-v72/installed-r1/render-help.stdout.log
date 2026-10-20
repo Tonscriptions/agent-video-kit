@@ -1,0 +1,53 @@
+usage: ai-ad-editor motion html-render [-h] [--format {json,text}]
+                                       [--request-id REQUEST_ID]
+                                       [--idempotency-key IDEMPOTENCY_KEY]
+                                       [--dry-run] [--no-network]
+                                       [--progress {none,jsonl}]
+                                       --project PROJECT
+                                       (--source-asset-id SOURCE_ASSET_ID |
+                                       --from-asset-id FROM_ASSET_ID)
+                                       --asset-id ASSET_ID [--params PARAMS]
+                                       [--overrides OVERRIDES]
+                                       [--layout-check {off,strict}]
+                                       [--shutter-samples SHUTTER_SAMPLES]
+                                       [--shutter-fraction SHUTTER_FRACTION]
+                                       [--shutter-cut-tick SHUTTER_CUT_TICK |
+                                       --shutter-clear-cuts] [--apply]
+                                       [--track-id TRACK_ID]
+                                       [--sequence-id SEQUENCE_ID]
+                                       [--timeline-start-tick TIMELINE_START_TICK]
+                                       [--expected-project-sha256 EXPECTED_PROJECT_SHA256]
+                                       [--timeout-seconds TIMEOUT_SECONDS]
+                                       [--cancel-file CANCEL_FILE]
+
+options:
+  -h, --help            show this help message and exit
+  --format {json,text}  输出格式
+  --request-id REQUEST_ID
+  --idempotency-key IDEMPOTENCY_KEY
+  --dry-run
+  --no-network
+  --progress {none,jsonl}
+  --project PROJECT
+  --source-asset-id SOURCE_ASSET_ID
+  --from-asset-id FROM_ASSET_ID
+  --asset-id ASSET_ID
+  --params PARAMS
+  --overrides OVERRIDES
+                        本地 CSS 变量、文字、已登记图片替换；null 恢复页面值
+  --layout-check {off,strict}
+                        strict 在编码前核验全帧布局/字体；省略继承配方，旧配方默认 off
+  --shutter-samples SHUTTER_SAMPLES
+                        每输出帧 1..16 次真实 HTML 绘制；省略继承配方，旧配方默认 1
+  --shutter-fraction SHUTTER_FRACTION
+                        0..1 帧曝光宽度，默认 0.5；0 走单帧路径
+  --shutter-cut-tick SHUTTER_CUT_TICK
+                        重复指定严格递增的源内部切点；采样不跨切点
+  --shutter-clear-cuts  明确清空继承的快门切点
+  --apply
+  --track-id TRACK_ID
+  --sequence-id SEQUENCE_ID
+  --timeline-start-tick TIMELINE_START_TICK
+  --expected-project-sha256 EXPECTED_PROJECT_SHA256
+  --timeout-seconds TIMEOUT_SECONDS
+  --cancel-file CANCEL_FILE

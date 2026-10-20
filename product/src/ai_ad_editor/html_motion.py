@@ -31,6 +31,7 @@ from .policy import resolve_local_path
 from .project import asset_map, find_sequence, find_track
 from .template import validate_variables
 from .utils import assert_id, load_json, new_id, now_iso, sha256_file, run_process
+from . import html_shutter
 
 ENGINE = 'agent-local-html-motion-v1'
 VERSION = '0.1.0'
@@ -317,6 +318,7 @@ def prepare_render(root,project,args):
     values={}
     saved_overrides=None
     saved_layout_check='off'
+    saved_shutter=None
     source_id=args.source_asset_id
     if args.from_asset_id:
         previous=assets.get(args.from_asset_id,{})
@@ -326,6 +328,7 @@ def prepare_render(root,project,args):
         source_id=recipe['source_asset_id'];values=copy.deepcopy(recipe['parameters'])
         saved_overrides=recipe.get('template_overrides')
         saved_layout_check=recipe.get('layout_check','off')
+        saved_shutter=recipe.get('shutter')
     source=inspect_source(root,project,source_id)
     if args.params:
         path=_local(root,args.params,'params')
@@ -360,13 +363,19 @@ def prepare_render(root,project,args):
             fail('HTML_TRACK_OVERLAP','动效入轨与已有片段重叠')
     elif args.track_id:
         fail('HTML_TRACK_INVALID','track_id 须与 apply 一起使用')
-    runtime=verify_runtime(root)
     layout_check=getattr(args,'layout_check',None) or saved_layout_check
     if layout_check not in {'off','strict'}:
         fail('HTML_LAYOUT_MODE_INVALID','layout_check 要求 off 或 strict')
+    shutter_config=html_shutter.configuration(saved_shutter,
+        samples=getattr(args,'shutter_samples',None),fraction=getattr(args,'shutter_fraction',None),
+        cut_ticks=getattr(args,'shutter_cut_tick',None),clear_cuts=getattr(args,'shutter_clear_cuts',False),
+        duration_tick=source['spec']['duration_tick'])
+    shutter=html_shutter.profile(source['spec'],source['frame_count'],shutter_config,layout_check=layout_check)
+    runtime=verify_runtime(root)
     source.update({'source_asset_id':source_id,'parameters':params,'runtime':runtime,'track':track,
                    'template_overrides':changes,'compiled_overrides':compiled,'override_resources':references,
                    'layout_check':layout_check,
+                    'shutter':shutter,'shutter_implementation':html_shutter.implementation() if shutter['enabled'] else None,
                    'project_sha256':project_fingerprint(project)})
     return source
 
@@ -376,6 +385,11 @@ def public_plan(plan):
         'engine':ENGINE,'toolchain':{k:plan['runtime'][k] for k in ('node_version','playwright_version','node_sha256')},
         'all_frames_checked_in_two_fresh_context_orders':True,'output':'ffv1-bgra-nut',
         'rights_status':'unverified','limits':['not_full_openfilm_timeline','no_embedded_media_iframes_or_webgl','not_hdr_or_capcut_parity']}
+
+
+def _shutter_schedule(plan):
+    if not plan.get('shutter',{}).get('enabled'):return None
+    return html_shutter.schedule(plan['spec'],plan['asset']['html_source']['ticks_per_second'],plan['shutter'])
 
 
 def inspect_controls(root,plan,report_path,*,frame_index=0,timeout=120,cancel_file=None):
@@ -452,6 +466,8 @@ def inspect_layout(root,plan,report_path,*,timeout=600,cancel_file=None):
             'plan':public_quality_plan(plan),'font_sources':catalogue,'frames':[],'issues':[],
             'scope':'all-CFR-frames-DOM-range-geometry-and-source-font-Unicode-mapping',
             'shaping_and_aesthetics_accepted':False,'validation_complete':False}
+    sampling=_shutter_schedule(plan);capture_count=len(sampling) if sampling else plan['frame_count']
+    if sampling:report['scope']='all-declared-shutter-subframes-DOM-range-geometry-and-source-font-Unicode-mapping'
     job=None;previews=root/'cache/html-quality'/report_path.stem;budget_bytes=0
     try:
         with tempfile.TemporaryDirectory(prefix='html-quality-') as folder,contextlib.ExitStack() as cleanup:
@@ -465,12 +481,13 @@ def inspect_layout(root,plan,report_path,*,timeout=600,cancel_file=None):
                 node=job.start([runtime['node'],str(Path(__file__).with_name('html_motion_worker.mjs'))],cwd=temp,env=env,
                     stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=stderr)
                 request={'task':'quality','root':str(bundle),'files':plan['files'],'spec':plan['spec'],'params':plan['parameters'],
-                    'overrides':plan['compiled_overrides'],'frame_count':plan['frame_count'],
+                    'overrides':plan['compiled_overrides'],'frame_count':capture_count,
+                    'sampling_times':[r['worker_time_seconds'] for r in sampling] if sampling else None,
                     'ticks_per_second':plan['asset']['html_source']['ticks_per_second'],
                     'playwright':runtime['playwright'],'chromium':runtime['chromium'],'log_file':str(temp/'chromium.log'),
                     'frame_timeout_ms':min(15000,int(timeout*1000))}
                 node.stdin.write(encoded(request).replace(b'\n',b'')+b'\n');node.stdin.flush()
-                limit=max(2*1024**2,plan['spec']['width']*plan['spec']['height']*6+200000)
+                limit=max(2*1024**2,plan['spec']['width']*plan['spec']['height']*6+200000,capture_count*512)
                 while True:
                     line=node.stdout.readline(limit+1);job.check()
                     if not line or len(line)>limit or not line.endswith(b'\n'):
@@ -480,16 +497,17 @@ def inspect_layout(root,plan,report_path,*,timeout=600,cancel_file=None):
                         report['worker']=item;raise AppError(item['code'],item['message'],exit_code=6)
                     if item.get('type')=='done':
                         report['worker']=item;receipt=item.get('cleanup',{})
-                        if not item.get('quality_only') or not item.get('all_frame_orders_equal') or len(report['frames'])!=plan['frame_count'] or item.get('frame_hashes')!=[f['sha256'] for f in report['frames']]:
+                        if not item.get('quality_only') or not item.get('all_frame_orders_equal') or len(report['frames'])!=capture_count or item.get('frame_hashes')!=[f['sha256'] for f in report['frames']]:
                             fail('HTML_PROTOCOL_INVALID','布局检查缺少全帧/独立重绘回执')
                         if receipt.get('pages_opened')!=2 or receipt.get('pages_closed')!=2 or not receipt.get('browser_closed') or receipt.get('denied_requests')!=0:
                             fail('HTML_PROTOCOL_INVALID','布局检查离线或关闭回执不完整')
                         break
                     index=len(report['frames'])
-                    if item.get('type')!='quality-frame' or item.get('index')!=index or index>=plan['frame_count']:
+                    if item.get('type')!='quality-frame' or item.get('index')!=index or index>=capture_count:
                         fail('HTML_PROTOCOL_INVALID','布局检查帧序不连续')
                     reviewed=review_frame(item['layout'],fonts)
                     frame={'index':index,'sha256':item['sha256'],'layout':reviewed}
+                    if sampling:frame['sampling']=sampling[index]
                     if item.get('png'):
                         png=base64.b64decode(item['png'],validate=True)
                         if png[:8]!=b'\x89PNG\r\n\x1a\n' or len(png)<24 or struct.unpack('>II',png[16:24])!=(plan['spec']['width'],plan['spec']['height']) or digest(png)!=item['sha256']:
@@ -529,9 +547,15 @@ def render_frames(root, plan, output, report_path, *, timeout, cancel_file=None)
     report={'engine':ENGINE,'report_version':VERSION,'created_at':now_iso(),'plan':public_plan(plan),'status':'started'}
     job=None
     published=False
+    sampling=_shutter_schedule(plan);capture_count=len(sampling) if sampling else plan['frame_count']
+    encoded_frames=[];accumulator=None
     from .utils import atomic_write_json
     try:
         with tempfile.TemporaryDirectory(prefix='html-motion-') as temp_name, contextlib.ExitStack() as cleanup:
+            if sampling:
+                from .artifact_locks import verification_scope
+                cleanup.enter_context(verification_scope())
+                html_shutter.verify_implementation(plan['shutter_implementation'])
             temp=Path(temp_name)
             bundle=temp/'source';bundle.mkdir()
             for name,content in plan['data'].items():
@@ -550,12 +574,13 @@ def render_frames(root, plan, output, report_path, *, timeout, cancel_file=None)
                 node=job.start([runtime['node'],str(worker)],cwd=temp,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=node_error)
                 request={'root':str(bundle),'files':plan['files'],'spec':spec,'params':plan['parameters'],
                          'overrides':plan['compiled_overrides'],
-                         'frame_count':plan['frame_count'],'ticks_per_second':plan['asset']['html_source']['ticks_per_second'],
+                         'frame_count':capture_count,'ticks_per_second':plan['asset']['html_source']['ticks_per_second'],
+                         'sampling_times':[r['worker_time_seconds'] for r in sampling] if sampling else None,
                          'playwright':runtime['playwright'],'chromium':runtime['chromium'],'log_file':str(temp/'chromium.log'),
                          'frame_timeout_ms':min(15000,int(timeout*1000))}
                 node.stdin.write(encoded(request).replace(b'\n',b'')+b'\n');node.stdin.flush()
                 frames=[]
-                limit=max(2*1024**2,spec['width']*spec['height']*6+200000)
+                limit=max(2*1024**2,spec['width']*spec['height']*6+200000,capture_count*512)
                 while True:
                     line=node.stdout.readline(limit+1)
                     job.check()
@@ -572,7 +597,7 @@ def render_frames(root, plan, output, report_path, *, timeout, cancel_file=None)
                         raise AppError(item['code'],item['message'],exit_code=6)
                     if item.get('type')=='done':
                         report['worker']=item
-                        if len(frames)!=plan['frame_count'] or item.get('frame_hashes')!=frames or not item.get('all_frame_orders_equal') or not item.get('cleanup',{}).get('browser_closed'):
+                        if len(frames)!=capture_count or len(encoded_frames)!=plan['frame_count'] or accumulator is not None or item.get('frame_hashes')!=frames or not item.get('all_frame_orders_equal') or not item.get('cleanup',{}).get('browser_closed'):
                             fail('HTML_PROTOCOL_INVALID','全帧或浏览器关闭回执不完整')
                         break
                     if item.get('type')!='frame' or item.get('index')!=len(frames):
@@ -580,7 +605,22 @@ def render_frames(root, plan, output, report_path, *, timeout, cancel_file=None)
                     png=base64.b64decode(item['png'],validate=True)
                     if png[:8]!=b'\x89PNG\r\n\x1a\n' or len(png)<24 or struct.unpack('>II',png[16:24])!=(spec['width'],spec['height']) or digest(png)!=item['sha256']:
                         fail('HTML_PROTOCOL_INVALID','PNG 尺寸或摘要不符')
-                    encoder.stdin.write(png);encoder.stdin.flush()
+                    if sampling:
+                        row=sampling[item['index']];samples=plan['shutter']['effective_samples']
+                        if row['sample_index']==0:accumulator=html_shutter.AlphaAccumulator((spec['width'],spec['height']),samples)
+                        accumulator.push(png);job.check()
+                        if row['sample_index']==samples-1:
+                            html_shutter.verify_implementation(plan['shutter_implementation'])
+                            combined,metrics=accumulator.finish();accumulator=None;job.check()
+                            encoder.stdin.write(combined);encoder.stdin.flush()
+                            encoded_frames.append({'output_frame':row['output_frame'],'png_sha256':digest(combined),
+                                'source_capture_start':item['index']-samples+1,'source_capture_count':samples,**metrics})
+                            report['progress']={'captured_subframes':item['index']+1,'encoded_output_frames':len(encoded_frames)}
+                            atomic_write_json(report_path,report)
+                    else:
+                        encoder.stdin.write(png);encoder.stdin.flush()
+                        encoded_frames.append({'output_frame':item['index'],'png_sha256':item['sha256'],
+                            'source_capture_start':item['index'],'source_capture_count':1})
                     frames.append(item['sha256'])
                     node.stdin.write(encoded({'ack':item['index']}).replace(b'\n',b'')+b'\n');node.stdin.flush()
                     if scratch.exists() and scratch.stat().st_size>512*1024**2:
@@ -590,6 +630,10 @@ def render_frames(root, plan, output, report_path, *, timeout, cancel_file=None)
                     fail('HTML_ENCODER_FAILED','本地 worker/编码器退出异常')
                 job.check()
             report['cleanup']=job.close()
+            report['shutter_evidence']={'profile':plan.get('shutter'),'captures':sampling,
+                'encoded_frames':encoded_frames,'source_capture_count':len(frames),
+                'all_subframes_checked_in_two_fresh_context_orders':True,
+                'quality_accepted':False,'continuous_playback_reviewed':False}
             report['stderr']={'node':(temp/'node.stderr.log').read_text(encoding='utf-8',errors='replace')[-4000:],
                               'ffmpeg':(temp/'ffmpeg.stderr.log').read_text(encoding='utf-8',errors='replace')[-4000:]}
             probe=probe_media(scratch)
