@@ -1,0 +1,214 @@
+"""Publish reviewed research documents after the already running V80 publisher.
+
+Only this research's files and three documentation blocks are staged. No core
+changes, reset, checkout, rebase, force push, service, VM, or browser operation.
+"""
+from __future__ import annotations
+
+import argparse
+import ast
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import time
+from urllib.parse import unquote
+
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+STAGE = MAIN / 'product/.runtime/openfilm-r14-review'
+PRIOR = MAIN / 'product/.runtime/worktrees/curve-point-automation/product/.runtime/curve-points-20261021-v80/publication-r1/run.json'
+REL = 'docs/validation/evidence/openfilm-reuse-20261021-r14/run-r1'
+REPORT = 'docs/OpenFilm可拆模块与现有内核降本清单_2026-10-21.md'
+REMOTE = 'git@github.com:Tonscriptions/agent-video-kit.git'
+
+
+def sha(path):
+    return 'sha256:' + hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def read(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def save(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+
+
+def git(*args):
+    return subprocess.run(['git', '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', *args],
+                          cwd=MAIN, capture_output=True, check=True).stdout
+
+
+def block(text, content):
+    assert '<!-- R14-CURRENT -->' not in text
+    first, rest = text.split('\n', 1)
+    return first + '\n\n<!-- R14-CURRENT -->\n' + content + '\n<!-- /R14-CURRENT -->\n' + rest
+
+
+def reviewed_files():
+    names = [REPORT, 'scripts/review_openfilm_r14.py', 'scripts/probe_openfilm_r14.mjs', 'scripts/publish_openfilm_r14.py']
+    names += [p.relative_to(STAGE).as_posix() for p in (STAGE / REL).rglob('*') if p.is_file()]
+    return {n: sha(STAGE / n) for n in sorted(names)}
+
+
+def audit(files):
+    review = read(STAGE / REL / 'verification.json')
+    assert review['status'] == 'passed_research_only' and review['source_files'] == 781
+    assert review['frozen_before'] == review['frozen_after'] and review['frozen_count'] == 237
+    assert review['original_tests']['summary'] == {'tests': 30, 'pass': 29, 'fail': 0, 'cancelled': 0, 'skipped': 1, 'todo': 0}
+    assert review['extracted_planner_tests']['summary'] == {'tests': 3, 'pass': 3, 'fail': 0, 'cancelled': 0, 'skipped': 0, 'todo': 0}
+    assert len(review['boundary_observations']['observations']) == 12
+    assert review['script_sha256'] == sha(STAGE / 'scripts/review_openfilm_r14.py')
+    assert (STAGE / 'scripts/review_openfilm_r14.py').read_bytes() == (STAGE / REL / 'executed-review.py.txt').read_bytes()
+    assert (STAGE / 'scripts/probe_openfilm_r14.mjs').read_bytes() == (STAGE / REL / 'executed-probe.mjs.txt').read_bytes()
+    for name in files:
+        p = STAGE / name
+        assert p.is_file() and not p.is_symlink()
+        assert not (MAIN / name).exists(), 'Refuse to overwrite ' + name
+        if name.endswith('.py'):
+            ast.parse(p.read_text(encoding='utf8'), filename=name)
+    links = []
+    for target in re.findall(r'\]\(([^)]+)\)', (STAGE / REPORT).read_text(encoding='utf8')):
+        if target.startswith(('https://', '#')):
+            continue
+        resolved = (MAIN / REPORT).parent / unquote(target.split('#')[0])
+        resolved = resolved.resolve()
+        assert resolved.is_relative_to(MAIN)
+        name = resolved.relative_to(MAIN).as_posix()
+        assert name in files or resolved.is_file(), name
+        links.append(name)
+    return {'status': 'passed-review-audit', 'files': len(files), 'local_links_checked': len(links),
+            'original_tests_passed': 29, 'original_tests_skipped': 1, 'extracted_tests_passed': 3,
+            'observations': 12, 'product_regression_rerun': False}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--work', type=Path, required=True)
+    parser.add_argument('--preflight-only', action='store_true')
+    parser.add_argument('--wait-seconds', type=int, default=10800)
+    parser.add_argument('--base-commit', help='Explicit unchanged main base after the prior publisher failed before copying')
+    args = parser.parse_args()
+    work = args.work.resolve()
+    assert work.is_relative_to(MAIN / 'product/.runtime') and not work.exists()
+    work.mkdir(parents=True)
+    state = {'status': 'preflight', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
+             'generator_sha256': sha(__file__), 'force_push': False, 'product_changes': False,
+             'prior_publication': str(PRIOR), 'calls': []}
+    try:
+        files = reviewed_files()
+        state.update(reviewed_files=files, audit=audit(files))
+        save(work / 'run.json', state)
+        if args.preflight_only:
+            state['status'] = 'passed-preflight'
+            return
+        if args.base_commit:
+            prior = read(PRIOR)
+            assert prior['status'] == 'failed' and not prior['calls'], 'Only a failure before the first copy is supported'
+            base = args.base_commit
+            expected_product = read(STAGE / REL / 'verification.json')['frozen_after']
+            state.update(prior_failed_before_copy=True, explicit_unchanged_base=base)
+        else:
+            deadline = time.monotonic() + args.wait_seconds
+            while True:
+                try:
+                    prior = read(PRIOR)
+                except (OSError, json.JSONDecodeError):
+                    prior = {}
+                status = prior.get('status')
+                if status == 'published':
+                    break
+                assert status != 'failed', 'Prior publisher failed; keep this reviewed research for safe manual integration'
+                assert time.monotonic() < deadline, 'Prior publisher still pending; no main writes performed'
+                state['status'] = 'waiting_for_existing_V80_publication'
+                save(work / 'run.json', state)
+                time.sleep(15)
+            base = prior['commit']
+            assert prior['remote_main'] == base and prior['main_clean']
+            expected_product = prior['frozen_inputs']
+        assert git('branch', '--show-current').decode().strip() == 'main'
+        assert git('remote', 'get-url', 'origin').decode().strip() == REMOTE
+        assert git('rev-parse', 'HEAD').decode().strip() == base
+        assert git('ls-remote', 'origin', 'refs/heads/main').decode().split()[0] == base
+        assert not git('status', '--porcelain', '--untracked-files=no')
+        assert not git('diff', '--cached', '--name-only')
+        assert reviewed_files() == files
+        state['audit'] = audit(files)
+        spec = importlib.util.spec_from_file_location('frozen_main', MAIN / 'scripts/run_frozen_regression.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        before = module.frozen()
+        assert before == expected_product
+        state.update(status='copying-reviewed-research', base_commit=base, product_frozen_before=before)
+        save(work / 'run.json', state)
+        for name, digest in files.items():
+            target = MAIN / name
+            assert target.resolve().is_relative_to(MAIN) and not target.exists()
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(STAGE / name, target)
+            assert sha(target) == digest
+
+        root_block = '''2026-10-21 **R14（OpenFilm 可拆模块与成本复核；源码研究）**：固定 `53156ac5` /0.2.4，与 R13 源码相同；本轮 API **1577 stars /155 forks**（04:31:50 Asia/Taipei），latest release 已为 v0.2.4。14 项复用清单区分已采用与剩余候选；V79 组件字段、V78 预览缓存及既有 HTML /字幕 /诊断不重复计费。新增候选为基础 NLE 规划 /交换与自建 Agent 宿主的图片上下文管理，后者不能直接裁减外部 Codex 历史。
+
+| 编号 | 本轮实际核验 | 结果与边界 | 证据 |
+|---|---|---|---|
+| R14-01 | 固定源码 /发行 /许可 | 781 文件 SHA；源码沿用已保全 ZIP，release 元数据更新；MIT 与第三方说明分别保存 | [收据](docs/validation/evidence/openfilm-reuse-20261021-r14/run-r1/verification.json) |
+| R14-02 | 上游原始与提取测试 | 原始 29 通过 /1 FCP DTD 跳过；另 3 个不改正文的规划测试通过。**合计32通过、1跳过**，不计入产品回归 | [原始 TAP](docs/validation/evidence/openfilm-reuse-20261021-r14/run-r1/original-tests.stdout.txt) |
+| R14-03 | 真实边界观察 | 12 组；变速 /旋转 /CSS /淡变 /HTML 为烘焙计划；非支持帧率会选最近值，HDR /目标 NLE 兼容未验收 | [原始观察](docs/validation/evidence/openfilm-reuse-20261021-r14/run-r1/boundary-observations.stdout.txt) |
+| R14-04 | 可拆依赖与成本 | nle 3 /FCPXML 5 个本地文件及 Node 内置模块；新基础适配器生产化8–15人日，条件式图片裁剪2–4人日；非实测节省 | [14项清单与限定预算](docs/OpenFilm可拆模块与现有内核降本清单_2026-10-21.md) |
+| R14-05 | 隔离与已有视觉证据 | 本轮237产品输入前后相同；0新产品功能 /模型 /Skill /成片；已有组件样例属于V79历史实测 | [原输入](docs/assets/html-components-20261021-v79-native-r2/original.mp4) · [实际编辑GIF](docs/assets/html-components-20261021-v79-native-r2/comparison.gif) |
+
+本轮研究不改变产品版本或完整剪映对标目标。运行时继续本地 CLI /FFmpeg /登记资源；OpenFilm 的云 provider、桌面 GUI 和剪映草稿路径不作为新的产品依赖。'''
+        index_block = '''2026-10-21 **R14 OpenFilm 复核**：[14项可拆模块、采用现状及限定成本](OpenFilm可拆模块与现有内核降本清单_2026-10-21.md)。固定0.2.4 /53156ac5，1577 stars /155 forks（04:31:50 Asia/Taipei）；原始29通过 /1 DTD跳过＋提取3通过，另12组观察，237产品输入未变。已采用能力不重复计费；新增NLE交换与自有Agent宿主上下文裁剪均有前提，不增加产品或模型验收。'''
+        decision_block = '''2026-10-21 **R14 当前复用状态**：[新清单与实际核验](OpenFilm可拆模块与现有内核降本清单_2026-10-21.md)。上游仍为0.2.4 /53156ac5；**组件字段CP-01..06已在V79实现，预览缓存已在V78实现**，后文旧候选描述仅为历史。新增重点为按需的基础NLE适配与自建Agent宿主的图片上下文管理；原始 /提取测试32通过、1 DTD跳过及12组观察分计，不增加产品能力验收。'''
+        changed = dict(files)
+        for name, content in [('README.md', root_block), ('docs/README.md', index_block),
+                              ('docs/OpenFilm当前复用决策_2026-10-18.md', decision_block)]:
+            path = MAIN / name
+            path.write_text(block(path.read_text(encoding='utf8'), content), encoding='utf8', newline='\n')
+            changed[name] = sha(path)
+        assert before == module.frozen(), 'Research must not change product inputs'
+        attributes = MAIN / '.gitattributes'
+        rule = 'docs/validation/evidence/openfilm-reuse-20261021-r14/** -text -whitespace'
+        if rule not in attributes.read_text(encoding='utf8').splitlines():
+            with attributes.open('a', encoding='utf8', newline='\n') as handle:
+                handle.write('\n# Preserve raw R14 evidence.\n' + rule + '\n')
+        changed['.gitattributes'] = sha(attributes)
+        proof = REL + '/publication-audit-r1.json'
+        save(MAIN / proof, {'status': 'passed-before-commit', 'base_commit': base,
+                           'research_input_sha256': sha(MAIN / REL / 'verification.json'),
+                           'reviewed_files': changed, 'audit': state['audit'],
+                           'product_frozen_equal': True, 'product_input_count': len(before),
+                           'ordinary_main_push_required': True})
+        changed[proof] = sha(MAIN / proof)
+        git('add', '--', *sorted(changed))
+        staged = {s.decode('utf8') for s in git('diff', '--cached', '--name-only', '-z').split(b'\0') if s}
+        assert staged == set(changed), 'Unexpected staged files'
+        for name, digest in changed.items():
+            assert 'sha256:' + hashlib.sha256(git('show', ':' + name)).hexdigest() == digest, name
+        git('diff', '--cached', '--check')
+        git('commit', '-m', 'docs: review reusable OpenFilm modules and integration costs')
+        commit = git('rev-parse', 'HEAD').decode().strip()
+        assert git('rev-parse', 'HEAD^').decode().strip() == base
+        assert not git('diff', base, '--name-only', '--', 'product', 'skills')
+        git('push', 'origin', 'main')
+        remote = git('ls-remote', 'origin', 'refs/heads/main').decode().split()[0]
+        assert remote == commit
+        assert before == module.frozen() and not git('status', '--porcelain', '--untracked-files=no')
+        state.update(status='published', commit=commit, remote_main=remote,
+                     product_frozen_equal=True, product_input_count=len(before), published_files=changed)
+    except BaseException as error:
+        state.update(status='failed', error=f'{type(error).__name__}: {error}')
+        raise
+    finally:
+        state['updated_at_utc'] = datetime.now(timezone.utc).isoformat()
+        save(work / 'run.json', state)
+        print(json.dumps({k: state.get(k) for k in ('status', 'commit', 'remote_main', 'error')}, ensure_ascii=False), flush=True)
+
+
+if __name__ == '__main__':
+    main()

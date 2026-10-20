@@ -1,0 +1,99 @@
+"""Finish R14 after preserving the failed initial Git-index normalization repair."""
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+
+ROOT = Path('E:/dev/sandbox/AI广告剪辑')
+REL = 'docs/validation/evidence/openfilm-reuse-20261021-r14/run-r1'
+BASE = 'd1ae0967628405126517c1fd840fbc5104e1d786'
+WORK = ROOT / 'product/.runtime/openfilm-r14-review/publication-final-r4'
+
+
+def sha(value):
+    return 'sha256:' + hashlib.sha256(value).hexdigest()
+
+
+def save(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+
+
+def git(*args):
+    return subprocess.run(['git', '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', *args],
+                          cwd=ROOT, capture_output=True, check=True).stdout
+
+
+assert not WORK.exists()
+WORK.mkdir(parents=True)
+state = {'status': 'verifying', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
+         'force_push': False, 'script_sha256': sha(Path(__file__).read_bytes())}
+try:
+    proof = ROOT / REL / 'publication-audit-r2.json'
+    expected = json.loads(proof.read_bytes())['reviewed_files']
+    expected[proof.relative_to(ROOT).as_posix()] = sha(proof.read_bytes())
+    staged = {p.decode('utf8') for p in git('diff', '--cached', '--name-only', '-z').split(b'\0') if p}
+    assert staged == set(expected) and not git('diff', '--name-only')
+    assert git('rev-parse', 'HEAD').decode().strip() == BASE
+    assert git('branch', '--show-current').decode().strip() == 'main'
+    assert git('remote', 'get-url', 'origin').decode().strip() == 'git@github.com:Tonscriptions/agent-video-kit.git'
+    assert git('ls-remote', 'origin', 'refs/heads/main').decode().split()[0] == BASE
+    for name, digest in expected.items():
+        assert sha((ROOT / name).read_bytes()) == digest, name
+    spec = importlib.util.spec_from_file_location('r14_final_frozen', ROOT / 'scripts/run_frozen_regression.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    frozen = module.frozen()
+    assert frozen == json.loads((ROOT / REL / 'verification.json').read_bytes())['frozen_after']
+    assert len(frozen) == 237
+    failed = ROOT / 'product/.runtime/openfilm-r14-review/publication-recovery-r3/run.json'
+    assert json.loads(failed.read_bytes())['status'] == 'failed'
+    saved = ROOT / REL / 'publication-failure-r3.json'
+    assert not saved.exists()
+    saved.write_bytes(failed.read_bytes())
+    expected[saved.relative_to(ROOT).as_posix()] = sha(saved.read_bytes())
+    expected[Path(__file__).relative_to(ROOT).as_posix()] = sha(Path(__file__).read_bytes())
+    git('add', '--', *sorted(expected))
+    raw_names = [REL + '/' + n for n in ('node-version.stdout.txt', 'source-tree.json', 'verification.json')]
+    git('add', '--renormalize', '--', *raw_names)
+    for name, digest in expected.items():
+        assert sha(git('show', ':' + name)) == digest, name
+    assert frozen == module.frozen()
+    final_proof = ROOT / REL / 'publication-audit-r3.json'
+    assert not final_proof.exists()
+    save(final_proof, {'status': 'passed-staged-raw-byte-audit', 'base_commit': BASE,
+                       'reviewed_files': expected, 'raw_index_entries_reloaded': raw_names,
+                       'failure_history': ['publication-failure-r1.json', 'publication-failure-r2.json',
+                                           'publication-failure-r3.json'],
+                       'original_evidence_bytes_changed': False, 'product_input_count': len(frozen),
+                       'product_frozen_equal': True, 'product_regression_rerun': False,
+                       'research_tests_passed': 32, 'research_tests_skipped': 1, 'observations': 12,
+                       'ordinary_main_push_required': True})
+    expected[final_proof.relative_to(ROOT).as_posix()] = sha(final_proof.read_bytes())
+    git('add', '--', final_proof.relative_to(ROOT).as_posix())
+    staged = {p.decode('utf8') for p in git('diff', '--cached', '--name-only', '-z').split(b'\0') if p}
+    assert staged == set(expected)
+    for name, digest in expected.items():
+        assert sha((ROOT / name).read_bytes()) == digest and sha(git('show', ':' + name)) == digest, name
+    git('diff', '--cached', '--check')
+    state.update(status='passed-staged-audit', staged_count=len(expected), product_input_count=len(frozen))
+    save(WORK / 'run.json', state)
+    git('commit', '-m', 'docs: review reusable OpenFilm modules and integration costs')
+    commit = git('rev-parse', 'HEAD').decode().strip()
+    assert git('rev-parse', 'HEAD^').decode().strip() == BASE
+    assert not git('diff', BASE, '--name-only', '--', 'product', 'skills')
+    state.update(status='committed-awaiting-ordinary-push', commit=commit)
+    save(WORK / 'run.json', state)
+    git('push', 'origin', 'main')
+    remote = git('ls-remote', 'origin', 'refs/heads/main').decode().split()[0]
+    assert remote == commit and frozen == module.frozen()
+    assert not git('status', '--porcelain', '--untracked-files=no')
+    state.update(status='published', remote_main=remote, product_frozen_equal=True)
+except BaseException as error:
+    state.update(status='failed', error=f'{type(error).__name__}: {error}')
+    raise
+finally:
+    state['updated_at_utc'] = datetime.now(timezone.utc).isoformat()
+    save(WORK / 'run.json', state)
+    print(json.dumps(state, ensure_ascii=False), flush=True)

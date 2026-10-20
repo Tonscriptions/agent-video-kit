@@ -1,5 +1,19 @@
 # Agent Video Kit
 
+<!-- R14-CURRENT -->
+2026-10-21 **R14（OpenFilm 可拆模块与成本复核；源码研究）**：固定 `53156ac5` /0.2.4，与 R13 源码相同；本轮 API **1577 stars /155 forks**（04:31:50 Asia/Taipei），latest release 已为 v0.2.4。14 项复用清单区分已采用与剩余候选；V79 组件字段、V78 预览缓存及既有 HTML /字幕 /诊断不重复计费。新增候选为基础 NLE 规划 /交换与自建 Agent 宿主的图片上下文管理，后者不能直接裁减外部 Codex 历史。
+
+| 编号 | 本轮实际核验 | 结果与边界 | 证据 |
+|---|---|---|---|
+| R14-01 | 固定源码 /发行 /许可 | 781 文件 SHA；源码沿用已保全 ZIP，release 元数据更新；MIT 与第三方说明分别保存 | [收据](docs/validation/evidence/openfilm-reuse-20261021-r14/run-r1/verification.json) |
+| R14-02 | 上游原始与提取测试 | 原始 29 通过 /1 FCP DTD 跳过；另 3 个不改正文的规划测试通过。**合计32通过、1跳过**，不计入产品回归 | [原始 TAP](docs/validation/evidence/openfilm-reuse-20261021-r14/run-r1/original-tests.stdout.txt) |
+| R14-03 | 真实边界观察 | 12 组；变速 /旋转 /CSS /淡变 /HTML 为烘焙计划；非支持帧率会选最近值，HDR /目标 NLE 兼容未验收 | [原始观察](docs/validation/evidence/openfilm-reuse-20261021-r14/run-r1/boundary-observations.stdout.txt) |
+| R14-04 | 可拆依赖与成本 | nle 3 /FCPXML 5 个本地文件及 Node 内置模块；新基础适配器生产化8–15人日，条件式图片裁剪2–4人日；非实测节省 | [14项清单与限定预算](docs/OpenFilm可拆模块与现有内核降本清单_2026-10-21.md) |
+| R14-05 | 隔离与已有视觉证据 | 本轮237产品输入前后相同；0新产品功能 /模型 /Skill /成片；已有组件样例属于V79历史实测 | [原输入](docs/assets/html-components-20261021-v79-native-r2/original.mp4) · [实际编辑GIF](docs/assets/html-components-20261021-v79-native-r2/comparison.gif) |
+
+本轮研究不改变产品版本或完整剪映对标目标。运行时继续本地 CLI /FFmpeg /登记资源；OpenFilm 的云 provider、桌面 GUI 和剪映草稿路径不作为新的产品依赖。
+<!-- /R14-CURRENT -->
+
 <!-- V79-CURRENT -->
 2026-10-21 **V79（HTML 组件字段与逐片段取值限定验收）**：落实 OpenFilm 接入契约 CP-01..06。新命令 `motion html-fields` 无浏览器返回稳定 ID、独立定义／取值、JSON Schema、类型／范围／单位／默认来源及图片选项；`html-render/controls/quality` 共用有类型的组件补丁、单项 null 与全量 reset。本地图片限定原源码登记闭包并检查实际 SHA 与 strict commercial_ad 权利；boolean 在每帧作者动画后执行，并恢复原页面属性。`--replace-clip-id` 仅更换指定片段资产引用，保留作者时间、变换、特效和其他片段。完整原生回归 **1796/1796、5798.792 秒、0 跳过，237 冻结输入＋8 外部夹具前后相同**；专项 **28/28、222.167 秒、0 跳过**，属于全量子集。开发 **28 成功 CLI＋3 明确拒绝／41 检查**；7 组×20 帧无损 RGBA、稳定 ID 改名保值、局部／全量复位、图片与逐帧显隐独立像素、包／片段重建、2 个实际队列输出均核验。离线 **155 资源／7 wheels／34 次隔离 CLI＋1 来源探针**；源码／平台 wheel／安装资源逐字节一致，开发与安装 7 组解码相同；17 Skills／326 本地引用及发现联接已核对。未验收自动字段发现、任意网页／完整 OpenFilm 时间线、自然广告质量、实时连续播放、HDR或完整剪映效果等价。
 

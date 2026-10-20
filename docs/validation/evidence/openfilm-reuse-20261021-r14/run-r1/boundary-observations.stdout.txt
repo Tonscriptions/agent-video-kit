@@ -1,0 +1,204 @@
+{
+  "status": "observed",
+  "observations": [
+    {
+      "id": "OF14-B01",
+      "value": [
+        {
+          "input": 48,
+          "selected": 50
+        },
+        {
+          "input": 90,
+          "selected": 60
+        },
+        {
+          "input": 120,
+          "selected": 60
+        }
+      ],
+      "implication": "Nearest-rate helper changes unsupported rates; a host adapter must reject or explicitly approve conversion."
+    },
+    {
+      "id": "OF14-B02",
+      "value": {
+        "start": 0,
+        "end": 0
+      },
+      "implication": "Subframe requests follow the upstream frame quantization; do not silently substitute for integer author ticks."
+    },
+    {
+      "id": "OF14-B03",
+      "value": {
+        "job": "link",
+        "sourceInFrames": 30,
+        "timelineRate": {
+          "timebase": 30,
+          "ntsc": false,
+          "fps": 30
+        },
+        "sourceFactsRate": 25
+      },
+      "implication": "Mixed-rate source/timebase semantics require actual target-editor open and re-render checks, not XML string assertions."
+    },
+    {
+      "id": "OF14-B04-speed",
+      "value": {
+        "job": "render",
+        "file": {
+          "id": "file-1",
+          "name": "shot.mov",
+          "path": "E:/review/media/shot.mov",
+          "job": {
+            "kind": "render",
+            "clip": "shot",
+            "frames": 60
+          },
+          "durationFrames": 60,
+          "video": {
+            "w": 320,
+            "h": 180,
+            "alpha": true,
+            "still": false
+          }
+        }
+      },
+      "implication": "A baked render job preserves an intended look only after execution; the original effect is not retained as editable NLE parameters."
+    },
+    {
+      "id": "OF14-B04-rotation",
+      "value": {
+        "job": "render",
+        "file": {
+          "id": "file-1",
+          "name": "shot.mov",
+          "path": "E:/review/media/shot.mov",
+          "job": {
+            "kind": "render",
+            "clip": "shot",
+            "frames": 60
+          },
+          "durationFrames": 60,
+          "video": {
+            "w": 320,
+            "h": 180,
+            "alpha": true,
+            "still": false
+          }
+        }
+      },
+      "implication": "A baked render job preserves an intended look only after execution; the original effect is not retained as editable NLE parameters."
+    },
+    {
+      "id": "OF14-B04-css-look",
+      "value": {
+        "job": "render",
+        "file": {
+          "id": "file-1",
+          "name": "shot.mov",
+          "path": "E:/review/media/shot.mov",
+          "job": {
+            "kind": "render",
+            "clip": "shot",
+            "frames": 60
+          },
+          "durationFrames": 60,
+          "video": {
+            "w": 320,
+            "h": 180,
+            "alpha": true,
+            "still": false
+          }
+        }
+      },
+      "implication": "A baked render job preserves an intended look only after execution; the original effect is not retained as editable NLE parameters."
+    },
+    {
+      "id": "OF14-B04-fade",
+      "value": {
+        "job": "render",
+        "file": {
+          "id": "file-1",
+          "name": "shot.mov",
+          "path": "E:/review/media/shot.mov",
+          "job": {
+            "kind": "render",
+            "clip": "shot",
+            "frames": 60
+          },
+          "durationFrames": 60,
+          "video": {
+            "w": 320,
+            "h": 180,
+            "alpha": true,
+            "still": false
+          }
+        }
+      },
+      "implication": "A baked render job preserves an intended look only after execution; the original effect is not retained as editable NLE parameters."
+    },
+    {
+      "id": "OF14-B04-html",
+      "value": {
+        "job": "render",
+        "file": {
+          "id": "file-1",
+          "name": "shot.mov",
+          "path": "E:/review/media/shot.mov",
+          "job": {
+            "kind": "render",
+            "clip": "shot",
+            "frames": 60
+          },
+          "durationFrames": 60,
+          "video": {
+            "w": 320,
+            "h": 180,
+            "alpha": true,
+            "still": false
+          }
+        }
+      },
+      "implication": "A baked render job preserves an intended look only after execution; the original effect is not retained as editable NLE parameters."
+    },
+    {
+      "id": "OF14-B05",
+      "value": {
+        "clipsRetained": 1,
+        "enabled": false
+      },
+      "implication": "Disabled clips can remain editable rather than being silently removed."
+    },
+    {
+      "id": "OF14-B06",
+      "value": {
+        "job": "link",
+        "effectPreserved": false
+      },
+      "implication": "Agent Project effects are outside this typed input contract. The adapter must classify or bake them; extra properties alone do not preserve effects."
+    },
+    {
+      "id": "OF14-B07",
+      "value": {
+        "rec709Hardcoded": true,
+        "fcpxmlBytes": 1183,
+        "xmemlBytes": 3069,
+        "fcpxmlFormat": "<format id=\"format-file-1\" frameDuration=\"1/25s\" width=\"320\" height=\"180\" colorSpace=\"1-1-1 (Rec. 709)\"/>",
+        "xmemlFileRate": "<file id=\"file-1\">\n              <name>source.mov</name>\n              <pathurl>file://localhost/E:/review/source.mov</pathurl>\n              <rate>\n                <timebase>30</timebase>\n                <ntsc>FALSE</ntsc>\n              </rate>"
+      },
+      "implication": "The serializer has no verified HDR/color-management parity. FCPXML and legacy xmeml are distinct formats."
+    },
+    {
+      "id": "OF14-B08",
+      "value": {
+        "keptImageBase64": 0,
+        "fullSerializedRequestBytes": 20341,
+        "originalUnchanged": true
+      },
+      "implication": "The image budget does not bound full request bytes, tokens, text, or retained conversation memory. Add independent host limits."
+    }
+  ],
+  "generatedProductMedia": false,
+  "downstreamEditorRun": false,
+  "actualModelOrNetworkCalls": 0
+}

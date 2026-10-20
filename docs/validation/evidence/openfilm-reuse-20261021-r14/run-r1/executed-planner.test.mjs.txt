@@ -1,0 +1,67 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { join } from 'node:path';
+import { allocateLanes, containMotion, fadeKeyframes, frameSpan, nleRate, planNleTimeline, xmemlDocument } from './packages/openfilm/studio/server/nle.mjs';
+import { fcpxmlDocument } from './packages/openfilm/studio/server/fcpxml.mjs';
+const scratch = new URL('./native-temp/', import.meta.url).pathname;
+test('the editor\'s timeline: frames rounded edge by edge, tracks spread, placement as Basic Motion', () => {
+  const rate = nleRate(29.97);
+  assert.deepEqual(rate, { timebase: 30, ntsc: true, fps: 30000 / 1001 });
+  assert.equal(nleRate(25).ntsc, false);
+  assert.equal(frameSpan(0, 1.2345, rate).end, frameSpan(1.2345, 3, rate).start, 'back to back: no gap');
+  assert.deepEqual(allocateLanes([{ start: 0, end: 10 }, { start: 5, end: 15 }, { start: 10, end: 20 }]), [0, 1, 0]);
+  assert.deepEqual(containMotion({ w: 1920, h: 1080 }, { w: 1920, h: 1080 }), { kind: 'none' });
+  assert.deepEqual(containMotion({ w: 960, h: 540 }, { w: 1920, h: 1080 }, { x: 480, y: 0, w: 960 }), { kind: 'motion', motion: { scale: 100, center: { h: 0, v: -0.25 } } });
+  /* a box of another shape: the picture is fitted inside it, centered */
+  assert.deepEqual(containMotion({ w: 100, h: 100 }, { w: 1920, h: 1080 }, { x: 760, y: 0, w: 400, h: 200 }), { kind: 'motion', motion: { scale: 200, center: { h: 0, v: -0.407407 } } });
+  assert.equal(containMotion({ w: 100, h: 100 }, { w: 1920, h: 1080 }, { x: 0, y: 0, r: 10 }).kind, 'bake');
+  assert.equal(containMotion({}, { w: 1920, h: 1080 }).kind, 'bake');
+});
+
+test('fades in the editor\'s timeline: a picture that fades is rendered; a sound that fades is its own part with level keyframes', () => {
+  const rate = nleRate(25);
+  assert.deepEqual(fadeKeyframes([0.5, 1], 100, 0.8, rate), [{ when: 0, value: 0 }, { when: 13, value: 0.8 }, { when: 75, value: 0.8 }, { when: 100, value: 0 }]);
+  assert.deepEqual(fadeKeyframes([0, 1], 50, 1, rate), [{ when: 0, value: 1 }, { when: 25, value: 1 }, { when: 50, value: 0 }]);
+  const facts = { w: 320, h: 180, duration: 10, hasVideo: true, hasAudio: true, channels: 2, sampleRate: 48000 };
+  const timeline = planNleTimeline({
+    stage: { w: 320, h: 180 }, duration: 4,
+    pictures: [{ id: 'shot', kind: 'video', src: 'a.mp4', path: '/p/a.mp4', at: 0, end: 4, from: 2, speed: 1, track: 0, hidden: false, faded: true, facts }],
+    sounds: [{ id: 'shot', src: 'a.mp4', path: '/p/a.mp4', at: 0, from: 2, to: 6, speed: 1, volume: 1, enabled: true, role: 'footage', picture: 'shot', facts, fade: [0.5, 0] }],
+  }, { title: 'T', fps: 25, audio: 'clips', media: 'copy', mediaDir: '/out/media' });
+  assert.equal(timeline.files.find((f) => f.id === timeline.video[0].clips[0].fileId)?.job.kind, 'render', 'the picture rendered, its fade in its alpha');
+  const sound = timeline.audio[0].clips[0];
+  assert.deepEqual(timeline.files.find((f) => f.id === sound.fileId)?.job, { kind: 'transcode', from: '/p/a.mp4', to: 'wav', segment: { from: 2, to: 6, speed: 1, seconds: 4 } });
+  assert.equal(sound.in, 0);
+  assert.deepEqual(sound.levels, [{ when: 0, value: 0 }, { when: 13, value: 1 }]);
+  assert.match(xmemlDocument(timeline), /<parameterid>level<\/parameterid>[\s\S]*<keyframe>\s*<when>0<\/when>\s*<value>0<\/value>\s*<\/keyframe>\s*<keyframe>\s*<when>13<\/when>/);
+});
+
+test('Final Cut Pro keeps source audio rows when an effect overlaps adjacent narration clips', () => {
+  const facts = { duration: 120, hasAudio: true, channels: 2, sampleRate: 48000 };
+  const sound = (id, track, at, to) => ({ id, track, at, from: 0, to, speed: 1, volume: 1, enabled: true,
+    role: 'voice', src: `${id}.wav`, path: join(scratch, `${id}.wav`), facts });
+  const film = { stage: { w: 320, h: 180 }, duration: 120, pictures: [], sounds: [
+    sound('story-01-1', 1, 0.4, 4.98), sound('story-01-2', 1, 5.5683, 5.82),
+    sound('game-sfx-1', 2, 5.4, 0.333), sound('adventure-music', 3, 0, 120),
+  ] };
+  const opts = { title: 'Source tracks', fps: 60, audio: 'clips', media: 'copy', mediaDir: scratch };
+  const timeline = planNleTimeline(film, { ...opts, audioTracks: 'source' });
+  assert.deepEqual(timeline.audio.map((t) => t.clips.map((c) => c.name)), [
+    ['story-01-1', 'story-01-2'], ['game-sfx-1'], ['adventure-music'],
+  ]);
+  assert.deepEqual(timeline.audio.map((t) => t.sourceTrack), [1, 2, 3]);
+  const xml = fcpxmlDocument(timeline);
+  assert.match(xml, /name="story-01-1" lane="-1"[^>]*role="OpenFilm A1"/);
+  assert.match(xml, /name="story-01-2" lane="-1"[^>]*role="OpenFilm A1"/);
+  assert.match(xml, /name="game-sfx-1" lane="-2"[^>]*role="OpenFilm A2"/);
+  assert.match(xml, /name="adventure-music" lane="-3"[^>]*role="OpenFilm A3"/);
+  assert.notDeepEqual(planNleTimeline(film, opts).audio.map((t) => t.clips.map((c) => c.name)), timeline.audio.map((t) => t.clips.map((c) => c.name)), 'other editors keep their existing role grouping');
+  const overlapping = planNleTimeline({ ...film, sounds: [...film.sounds, sound('overlapping-voice', 1, 1, 2)] }, { ...opts, audioTracks: 'source' });
+  assert.equal(overlapping.audio.length, 4, 'only an overlap within a source row needs another lane');
+  assert.deepEqual(overlapping.audio.map((t) => t.sourceTrack), [1, 1, 2, 3]);
+  assert.match(fcpxmlDocument(overlapping), /name="overlapping-voice"[^>]*role="OpenFilm A1"/);
+  const reversed = planNleTimeline({ ...film, sounds: [...film.sounds].reverse() }, { ...opts, audioTracks: 'source' });
+  assert.deepEqual(reversed.audio.map((t) => t.clips.map((c) => c.name)), timeline.audio.map((t) => t.clips.map((c) => c.name)));
+  const { track, ...untracked } = film.sounds[0];
+  assert.throws(() => planNleTimeline({ ...film, sounds: [untracked] }, { ...opts, audioTracks: 'source' }), /story-01-1 has no source track/);
+});
