@@ -1,0 +1,42 @@
+{
+  "status": "ready_for_staged_verification",
+  "checked_at_utc": "2026-10-20T06:49:09.202612+00:00",
+  "base_commit": "5c09628f9754f7442ad3a6cd85f80a25da8e2aad",
+  "reason": "Resume after Git-only whitespace failure. Original evidence and product bytes preserved.",
+  "original_failed_run": "docs/validation/evidence/lut-intensity-20261020-v73/publication-attempt-r2.json",
+  "original_failed_run_sha256": "sha256:c641fe70b65ef737cb2c4a0d6897ffa9e0d77a85be7316d74d1e77cf36c5f716",
+  "full_regression": "docs/validation/evidence/lut-intensity-20261020-v73/full-r1.json",
+  "full_sha256": "sha256:6be2c926fc9bb712e8826d9286953e9ebd5ef7960af84a9f468159014ec140c0",
+  "methods": 1644,
+  "skipped": 0,
+  "suite_seconds": 4143.088,
+  "frozen_input_count": 220,
+  "frozen_equal": true,
+  "external_fixture_count": 8,
+  "external_fixtures_equal": true,
+  "source_or_test_changes": 0,
+  "new_product_test_passes": 0,
+  "skill_count": 17,
+  "local_links_checked": 278,
+  "attributes_before_sha256": "sha256:b6f613fe5f76675adf883ae721ae63a2124b15b527fb8b36bd2e5dcc658601e2",
+  "attributes_after_sha256": "sha256:30059904cc54a9c4b9e704a70c5547473c32b12f256d743a3f4be07d72c14776",
+  "report_after_sha256": "sha256:15e4f274b13bba51f36b1f9ff341c6efe5352b2e012672606a37b7e48dbb301d",
+  "release_reaudit": "docs/validation/evidence/lut-intensity-20261020-v73/release-r2.json",
+  "release_reaudit_sha256": "sha256:35c945a5d90389c667c4a280a87af7c25768c70518946c4c8846f40da453847b",
+  "network_scope": "ordinary authorized Git main push only",
+  "force_push": false,
+  "intermediate_staged_check": {
+    "status": "failed-before-final-readd",
+    "observed_error": "staged bytes of baseline-r1.json differed from workspace after changing -text rules; existing index entries needed re-adding with the new attributes",
+    "product_source_changed": false,
+    "raw_evidence_rewritten": false
+  },
+  "formatting_recovery": {
+    "immutable_evidence": "git add --renormalize after applying -text rules; preserve original CRLF/progress spaces",
+    "authored_matrix": "normalize workspace line endings to LF, matching its existing text eol=lf rule and staged bytes",
+    "matrix_before_sha256": "sha256:bd8cc3c27b20468ad305ae6a3c95e278888dc84ce4e05ad951caf7c26e70691d",
+    "matrix_after_sha256": "sha256:16af6d2e8ad9cf4ebdb5e4eb6560ceb04d547bc521b82e2cfe9b75844e9bbf91",
+    "semantic_document_changes": false,
+    "product_or_test_changes": false
+  }
+}

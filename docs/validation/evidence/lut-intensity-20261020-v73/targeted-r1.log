@@ -1,0 +1,134 @@
+test_catalog_and_all_four_aliases_offer_only_intensity (test_lut_automation.LutAutomationContractTests.test_catalog_and_all_four_aliases_offer_only_intensity) ... ok
+test_command_corruption_is_preserved_and_rejected (test_lut_automation.LutAutomationContractTests.test_command_corruption_is_preserved_and_rejected) ... ok
+test_global_budget_shared_with_other_color_families (test_lut_automation.LutAutomationContractTests.test_global_budget_shared_with_other_color_families) ... ok
+test_invalid_channels_numbers_and_times_reject_instead_of_static_fallback (test_lut_automation.LutAutomationContractTests.test_invalid_channels_numbers_and_times_reject_instead_of_static_fallback) ... ok
+test_native_runtime_missing_rejects_without_cache (test_lut_automation.LutAutomationContractTests.test_native_runtime_missing_rejects_without_cache) ... ok
+test_resource_hashes_unique_targets_and_deterministic_replay (test_lut_automation.LutAutomationContractTests.test_resource_hashes_unique_targets_and_deterministic_replay) ... ok
+test_three_native_commands_per_changed_strength_are_budgeted (test_lut_automation.LutAutomationContractTests.test_three_native_commands_per_changed_strength_are_budgeted) ... ok
+test_interval_adjustment_has_local_clock_and_unaffected_outside_frames (test_lut_automation.LutAutomationIntegrationTests.test_interval_adjustment_has_local_clock_and_unaffected_outside_frames) ... FAIL
+test_nested_reverse_and_parent_own_lut_have_shared_unique_allocation (test_lut_automation.LutAutomationIntegrationTests.test_nested_reverse_and_parent_own_lut_have_shared_unique_allocation) ... FAIL
+test_package_roundtrip_keeps_editable_keyframes_and_native_output (test_lut_automation.LutAutomationIntegrationTests.test_package_roundtrip_keeps_editable_keyframes_and_native_output) ... FAIL
+test_queue_dependency_snapshot_binds_actual_lut_bytes (test_lut_automation.LutAutomationIntegrationTests.test_queue_dependency_snapshot_binds_actual_lut_bytes) ... ok
+test_real_cli_render_records_lut_source_and_per_frame_commands (test_lut_automation.LutAutomationIntegrationTests.test_real_cli_render_records_lut_source_and_per_frame_commands) ... ok
+test_text_layer_runs_dynamic_lut_on_raster_and_preserves_transparent_border (test_lut_automation.LutAutomationIntegrationTests.test_text_layer_runs_dynamic_lut_on_raster_and_preserves_transparent_border) ... FAIL
+test_trim_and_split_preserve_original_non_linear_author_animation (test_lut_automation.LutAutomationIntegrationTests.test_trim_and_split_preserve_original_non_linear_author_animation) ... ok
+test_3dl_native_format_executes_dynamic_strength_without_cube_materialization (test_lut_automation.LutAutomationNativeTests.test_3dl_native_format_executes_dynamic_strength_without_cube_materialization) ... ok
+test_all_six_easings_match_independent_arithmetic_at_every_frame (test_lut_automation.LutAutomationNativeTests.test_all_six_easings_match_independent_arithmetic_at_every_frame) ... ok
+test_hold_changes_on_exact_frame_and_fractional_fps_has_no_drift (test_lut_automation.LutAutomationNativeTests.test_hold_changes_on_exact_frame_and_fractional_fps_has_no_drift) ... ok
+test_linear_zero_static_default_does_not_disable_dynamic_mix_or_alpha (test_lut_automation.LutAutomationNativeTests.test_linear_zero_static_default_does_not_disable_dynamic_mix_or_alpha) ... ok
+test_neutral_lut_keeps_alpha_and_rgb_for_dynamic_strength (test_lut_automation.LutAutomationNativeTests.test_neutral_lut_keeps_alpha_and_rgb_for_dynamic_strength) ... FAIL
+test_nonzero_start_samples_local_author_clock (test_lut_automation.LutAutomationNativeTests.test_nonzero_start_samples_local_author_clock) ... FAIL
+test_reverse_ancestor_clock_samples_original_author_ticks (test_lut_automation.LutAutomationNativeTests.test_reverse_ancestor_clock_samples_original_author_ticks) ... FAIL
+test_two_identical_instances_can_be_chained_without_label_or_command_collision (test_lut_automation.LutAutomationNativeTests.test_two_identical_instances_can_be_chained_without_label_or_command_collision) ... FAIL
+test_changed_lut_bytes_invalidate_static_cache (test_lut_automation.LutStaticTests.test_changed_lut_bytes_invalidate_static_cache) ... ok
+test_corrupt_static_cache_is_preserved_and_rejected_by_renderer (test_lut_automation.LutStaticTests.test_corrupt_static_cache_is_preserved_and_rejected_by_renderer) ... ok
+test_derived_cache_is_versioned_and_strength_keys_do_not_round_collide (test_lut_automation.LutStaticTests.test_derived_cache_is_versioned_and_strength_keys_do_not_round_collide) ... ok
+test_neutral_cube_preserves_non_gray_rgb_at_all_static_strengths (test_lut_automation.LutStaticTests.test_neutral_cube_preserves_non_gray_rgb_at_all_static_strengths) ... ok
+
+======================================================================
+FAIL: test_interval_adjustment_has_local_clock_and_unaffected_outside_frames (test_lut_automation.LutAutomationIntegrationTests.test_interval_adjustment_has_local_clock_and_unaffected_outside_frames)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\lut-intensity-automation\product\tests\test_lut_automation.py", line 278, in test_interval_adjustment_has_local_clock_and_unaffected_outside_frames
+    self.assertEqual(frames[:2],before[:2]);self.assertEqual(frames[8:],before[8:])
+                                            ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [b'EO\x9f\xffEO\x9f\xffEO\x9f\xffEO\x9f\xffE[96292 chars]xff'] != [b' `\xc0\xff `\xc0\xff `\xc0\xff `\xc0\xff [10201 chars]xff']
+
+First differing element 0:
+b'EO\x9f\xffEO\x9f\xffEO\x9f\xffEO\x9f\xffE[5075 chars]\xff'
+b' `\xc0\xff `\xc0\xff `\xc0\xff `\xc0\xff [5075 chars]\xff'
+
+First list contains 15 additional elements.
+First extra element 2:
+b'j@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xffj@\x80\xff'
+
+Diff is 106384 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_nested_reverse_and_parent_own_lut_have_shared_unique_allocation (test_lut_automation.LutAutomationIntegrationTests.test_nested_reverse_and_parent_own_lut_have_shared_unique_allocation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\lut-intensity-automation\product\tests\test_lut_automation.py", line 270, in test_nested_reverse_and_parent_own_lut_have_shared_unique_allocation
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(f[:3],expected)),2)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 223 not less than or equal to 2
+
+======================================================================
+FAIL: test_package_roundtrip_keeps_editable_keyframes_and_native_output (test_lut_automation.LutAutomationIntegrationTests.test_package_roundtrip_keeps_editable_keyframes_and_native_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\lut-intensity-automation\product\tests\test_lut_automation.py", line 302, in test_package_roundtrip_keeps_editable_keyframes_and_native_output
+    self.assertEqual(self.pixels(imported)[0],before);self.root=original
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [b' `[5118 chars]', b' `\xc0\xff `\xc0\xff `\xc0\xff `\xc0\xff [46076 chars]xff'] != [b' `[5118 chars]', b'6V\xac\xff6V\xac\xff6V\xac\xff6V\xac\xff6[49660 chars]xff']
+
+First differing element 1:
+b' `\xc0\xff `\xc0\xff `\xc0\xff `\xc0\xff [5075 chars]\xff'
+b'6V\xac\xff6V\xac\xff6V\xac\xff6V\xac\xff6[5075 chars]\xff'
+
+Diff is 111230 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_text_layer_runs_dynamic_lut_on_raster_and_preserves_transparent_border (test_lut_automation.LutAutomationIntegrationTests.test_text_layer_runs_dynamic_lut_on_raster_and_preserves_transparent_border)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\lut-intensity-automation\product\tests\test_lut_automation.py", line 290, in test_text_layer_runs_dynamic_lut_on_raster_and_preserves_transparent_border
+    self.assertEqual(frames[0][:4],frames[-1][:4])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x00\x00\x00\xff' != b'f\x00\x00\xff'
+
+======================================================================
+FAIL: test_neutral_lut_keeps_alpha_and_rgb_for_dynamic_strength (test_lut_automation.LutAutomationNativeTests.test_neutral_lut_keeps_alpha_and_rgb_for_dynamic_strength)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\lut-intensity-automation\product\tests\test_lut_automation.py", line 204, in test_neutral_lut_keeps_alpha_and_rgb_for_dynamic_strength
+    self.assertEqual(self.native(self.bind()[0]),[PIXELS]*10)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [b' `[367 chars], b' _\xbf\x00<d\x8c\x1f\xb4Z(\x80\xd2\xc8\xbe[3307 chars]xff'] != [b' `[367 chars], b' `\xc0\x00<d\x8c\x1f\xb4Z(\x80\xd2\xc8\xbe[3307 chars]xff']
+
+First differing element 1:
+b' _\xbf\x00<d\x8c\x1f\xb4Z(\x80\xd2\xc8\xbe[322 chars]\xff'
+b' `\xc0\x00<d\x8c\x1f\xb4Z(\x80\xd2\xc8\xbe[322 chars]\xff'
+
+Diff is 5111 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_nonzero_start_samples_local_author_clock (test_lut_automation.LutAutomationNativeTests.test_nonzero_start_samples_local_author_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\lut-intensity-automation\product\tests\test_lut_automation.py", line 187, in test_nonzero_start_samples_local_author_clock
+    for i,frame in enumerate(self.native(chain,start=.2)):self.assert_mix(frame,i/10)
+                             ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\lut-intensity-automation\product\tests\test_lut_automation.py", line 65, in native
+    self.assertEqual(len(result.stdout),len(PIXELS)*count)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1536 != 1280
+
+======================================================================
+FAIL: test_reverse_ancestor_clock_samples_original_author_ticks (test_lut_automation.LutAutomationNativeTests.test_reverse_ancestor_clock_samples_original_author_ticks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\lut-intensity-automation\product\tests\test_lut_automation.py", line 195, in test_reverse_ancestor_clock_samples_original_author_ticks
+    for i,frame in enumerate(self.native(chain,start=.2)):self.assert_mix(frame,1-i/10)
+                             ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\lut-intensity-automation\product\tests\test_lut_automation.py", line 65, in native
+    self.assertEqual(len(result.stdout),len(PIXELS)*count)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1536 != 1280
+
+======================================================================
+FAIL: test_two_identical_instances_can_be_chained_without_label_or_command_collision (test_lut_automation.LutAutomationNativeTests.test_two_identical_instances_can_be_chained_without_label_or_command_collision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\lut-intensity-automation\product\tests\test_lut_automation.py", line 200, in test_two_identical_instances_can_be_chained_without_label_or_command_collision
+    for i,frame in enumerate(self.native(a+','+b)):self.assert_mix(frame,1-(1-i/10)**2)
+                                                   ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\lut-intensity-automation\product\tests\test_lut_automation.py", line 73, in assert_mix
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(frame,expected)),1)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 not less than or equal to 1
+
+----------------------------------------------------------------------
+Ran 26 tests in 67.643s
+
+FAILED (failures=8)

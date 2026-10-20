@@ -1,0 +1,69 @@
+{
+  "kind": "pre-change-native-baseline",
+  "network": false,
+  "virtualization": false,
+  "ffmpeg": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+  "ffmpeg_sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+  "cube_file_order": "red-fastest",
+  "input_rgba": [
+    32,
+    96,
+    192,
+    128
+  ],
+  "observations": [
+    {
+      "strength": 0.0,
+      "pixel_rgba": [
+        32,
+        96,
+        192,
+        128
+      ],
+      "neutral_preserved": true,
+      "chain": [],
+      "warnings": []
+    },
+    {
+      "strength": 0.5,
+      "pixel_rgba": [
+        112,
+        96,
+        112,
+        128
+      ],
+      "neutral_preserved": false,
+      "chain": [
+        "lut3d=file='E\\:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\worktrees\\\\lut-intensity-automation\\\\product\\\\.runtime\\\\lut-intensity-baseline\\\\cache\\\\luts\\\\8edd134d3dff0c400fb4efb05b314b51fe881c1a764f933645a96b14498999d3.cube':interp=tetrahedral"
+      ],
+      "warnings": [
+        {
+          "code": "RENDER_FEATURE_APPROXIMATE",
+          "clip_id": "baseline",
+          "feature": "lut_intensity",
+          "message": "已由本地 .cube identity 混合表执行静态 LUT 强度；逐帧强度仍使用静态值"
+        }
+      ]
+    },
+    {
+      "strength": 1.0,
+      "pixel_rgba": [
+        32,
+        96,
+        192,
+        128
+      ],
+      "neutral_preserved": true,
+      "chain": [
+        "lut3d=file='E\\:\\\\dev\\\\sandbox\\\\AI广告剪辑\\\\product\\\\.runtime\\\\worktrees\\\\lut-intensity-automation\\\\product\\\\.runtime\\\\lut-intensity-baseline\\\\neutral.cube':interp=tetrahedral"
+      ],
+      "warnings": []
+    }
+  ],
+  "neutral_half_strength_bug_reproduced": true,
+  "baseline_source_sha256": {
+    "lut_library.py": "369053660c4b1ba832b0d36ade89c095c83033e51c25dd87b43032037f1d6ccb",
+    "render.py": "3b3cd6d7963a179057ba36668515b8ee87e9e0a23914395dc5c7c13635e81bfe",
+    "effect_automation.py": "9537dfbfa6469009b13aeb01d846f5181161be81903324f2efd6461e91cdd3fa"
+  }
+}

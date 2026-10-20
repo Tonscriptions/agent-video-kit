@@ -1,0 +1,44 @@
+{
+  "operations": [
+    {
+      "op": "append_clip",
+      "track_id": "track_video_1",
+      "asset_id": "original",
+      "id": "graded",
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "duration_tick": 180000,
+      "effects": [
+        {
+          "type": "lut3d",
+          "parameters": {
+            "lut_id": "warm",
+            "intensity": 0
+          },
+          "keyframes": [
+            {
+              "property": "intensity",
+              "keyframes": [
+                {
+                  "at_tick": 0,
+                  "value": 0,
+                  "interpolation": "ease_in_out"
+                },
+                {
+                  "at_tick": 90000,
+                  "value": 1,
+                  "interpolation": "ease_in_out"
+                },
+                {
+                  "at_tick": 180000,
+                  "value": 0,
+                  "interpolation": "linear"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

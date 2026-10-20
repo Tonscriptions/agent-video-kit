@@ -34,7 +34,7 @@ inputs reject instead of guessing coordinates. Locked tracks cannot be edited.
 For numeric color effect animation, read the
 [color automation contract](../../docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md).
 Existing compose `update_clip.patch.effects` accepts effect keyframe tracks;
-catalog 0.5.0 lists the exact 19 channels of temperature, balance, nine-wheel,
+catalog 0.6.0 includes the original 19 channels of temperature, balance, nine-wheel,
 exposure and levels. Top-level effect keyframes take precedence over parameter
 keyframes. Preserve author ticks through windows, curves, reverse and compound
 holds. Independent text, groups and interval adjustments use the same bounded
@@ -46,6 +46,20 @@ cache by overwriting it. Kelvin keeps the existing shadow-RGB approximation.
 The [actual media, encoding diagnosis and installed replay](../../docs/validation/逐帧调色参数自动化实测_2026-10-19.md)
 compare independently authored parameters on the same pinned FFmpeg delivery
 boundary; they do not establish physical white balance or CapCut color science.
+
+For `lut3d` / `lut` / `cube` / `look`, add the twentieth numeric channel
+`intensity` with ordinary effect keyframes, using the
+[LUT strength contract](../../docs/specs/LUT强度关键帧契约_v0.1_2026-10-20.md).
+Dynamic strength mixes the original and native LUT result in 8-bit encoded
+RGB; alpha is preserved. Paths/IDs/interpolation enums stay static. Constant
+and nonlinear nested ancestors retain the effect's author clock; trimmed or
+split clips retain animation phase. Interval adjustments use their local clock
+and explicitly split the composed surface. Inspect LUT SHA, unique blend
+target and shared commands/budgets in the render manifest. Static partial
+CUBE strength uses versioned red-fastest identity tables; damaged old/new
+cache files are not overwritten. See the
+[real pixels, portable edits and failures](../../docs/validation/LUT强度关键帧与中性调色修复实测_2026-10-20.md).
+This does not accept HDR, linear-light mixing or all vendor LUT dialects.
 
 For relative retiming of the current complete visible output, read the
 [complete output retime contract](../../docs/specs/完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md).

@@ -5,6 +5,17 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+For portable animated looks, read the
+[LUT contract](../../docs/specs/LUT强度关键帧契约_v0.1_2026-10-20.md)
+and [package/fragment/replay evidence](../../docs/validation/LUT强度关键帧与中性调色修复实测_2026-10-20.md).
+Package export closes LUT dependencies across the graph, resolving registered
+IDs or project-local paths to hash-named package files while retaining editable
+strength keyframes. Recheck registered bytes before export; missing/changed
+resources must fail before opening the ZIP. Package does not carry derived
+commands/caches. Rebuild them after import, compare actual decoded frames, and
+retain rights dependencies. Queue reuse binds actual LUT bytes; matching an ID
+or filename does not establish matching content.
+
 For identical deliverables with different output names, read the
 [serial batch reuse contract](../../docs/specs/同批次相同渲染结果复用契约_v0.1_2026-10-20.md)
 and [actual reuse evidence](../../docs/validation/OpenFilm同批次结果复用实测_2026-10-20.md).

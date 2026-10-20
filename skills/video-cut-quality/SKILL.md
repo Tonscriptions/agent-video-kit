@@ -5,6 +5,17 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [LUT strength automation](../../docs/specs/LUT强度关键帧契约_v0.1_2026-10-20.md),
+read the [independent native pixel checks and failures](../../docs/validation/LUT强度关键帧与中性调色修复实测_2026-10-20.md).
+Check a non-gray neutral LUT at static strengths, every decoded frame against
+an independent RGB oracle, and exact alpha separately. CFR source timestamps
+must match the oracle; millisecond-rounded 12fps Matroska is not the same input
+clock as exact NUT. Compare lossless outputs; MP4 and GIF are review previews.
+Account for one-code rounding per 8-bit mix stage. Inspect actual source hashes,
+author-clock mapping, global native command budgets and corrupt-cache errors.
+Static frame inspection cannot accept natural footage, HDR, long-video
+performance, continuous motion/audio review or full CapCut color science.
+
 For [native multi-frame contact sheets](../../docs/specs/透明视频多帧联系表与实际时间锚点契约_v0.1_2026-10-20.md),
 read the [measured native/installed checks](../../docs/validation/透明视频多帧联系表与Alpha核验实测_2026-10-20.md).
 Compare selected PNGs against independently decoded source frames, and compare

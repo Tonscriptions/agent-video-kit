@@ -13,7 +13,7 @@ from typing import Any
 from .effect_automation import SPECS as AUTOMATION_SPECS
 
 
-EFFECT_CATALOG_VERSION = "0.5.0"
+EFFECT_CATALOG_VERSION = "0.6.0"
 
 
 def _parameter(
@@ -195,12 +195,12 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
         "cx": _parameter("number", 0.5, minimum=0.0, maximum=1.0),
         "cy": _parameter("number", 0.5, minimum=0.0, maximum=1.0),
     }),
-    _effect("lut3d", backend="ffmpeg:lut3d", category="color", aliases=("lut", "cube", "look"), parameters={
+    _effect("lut3d", backend="ffmpeg:lut3d+blend", category="color", aliases=("lut", "cube", "look"), parameters={
         "path": _parameter("path", ""),
         "lut_id": _parameter("string", "", description="项目内 lut register 生成的稳定资源 ID"),
         "interpolation": _parameter("enum", "tetrahedral", description="nearest, trilinear, tetrahedral, pyramid or prism"),
-        "intensity": _parameter("number", 1.0, minimum=0.0, maximum=1.0, description="静态 LUT 强度；.cube 使用 identity 混合表"),
-    }, limits=("path_or_registered_lut_id_must_be_project_local", "dynamic_intensity_uses_static_value", "non_cube_intensity_unsupported")),
+        "intensity": _parameter("number", 1.0, minimum=0.0, maximum=1.0, description="0..1 强度关键帧；动态为 8-bit 编码 RGB 像素混合并保持 alpha；静态部分强度为 CUBE 网格混合"),
+    }, limits=("path_or_registered_lut_id_must_be_project_local", "dynamic_mix_is_8bit_encoded_RGB_not_linear_light_or_HDR", "static_partial_strength_requires_complete_3D_cube")),
     _effect("noise", backend="ffmpeg:noise", category="stylize", aliases=("film_grain",), parameters={"amount": _parameter("integer", 8, minimum=1, maximum=100)}),
     _effect("posterize", backend="ffmpeg:lutrgb", category="stylize", aliases=("posterization",), parameters={"levels": _parameter("integer", 8, minimum=2, maximum=256)}),
     _effect("rgb_curves", backend="ffmpeg:curves", category="color", aliases=("rgb_curve", "channel_curves"), parameters={

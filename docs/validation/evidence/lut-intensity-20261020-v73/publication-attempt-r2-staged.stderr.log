@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\scripts\verify_staged_release.py", line 46, in <module>
+    parser=argparse.ArgumentParser();parser.add_argument('--full',type=Path,required=True);parser.add_argument('--output',type=Path,required=True);args=parser.parse_args();run(args.full.resolve(),args.output.resolve())
+                                                                                                                                                                            ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\verify_staged_release.py", line 23, in run
+    git('diff','--quiet');git('diff','--cached','--check')
+                          ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\verify_staged_release.py", line 9, in git
+    result=subprocess.run(['git',*arguments],cwd=ROOT,capture_output=True,check=True)
+  File "C:\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['git', 'diff', '--cached', '--check']' returned non-zero exit status 2.

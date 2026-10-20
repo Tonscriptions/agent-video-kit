@@ -1450,13 +1450,9 @@ def _effect_filters(
             # strengths are materialized as a deterministic project-local CUBE
             # so the regular FFmpeg lut3d filter remains single-input and can
             # still be used by subtitle, adjustment, and nested clip chains.
-            if intensity <= 1e-9:
-                if effect_tracks:
-                    warn_unsupported_tracks()
+            if not effect_tracks and intensity <= 1e-9:
                 continue
-            if intensity < 1.0 - 1e-9:
-                if effect_tracks:
-                    warn_unsupported_tracks()
+            if not effect_tracks and intensity < 1.0 - 1e-9:
                 if root is None:
                     warnings.append({"code": "LUT_INTENSITY_CONTEXT_MISSING", "clip_id": clip_id, "feature": "lut3d", "message": "LUT intensity 派生缓存需要项目根目录上下文，已跳过该效果"})
                     continue
@@ -1465,9 +1461,11 @@ def _effect_filters(
 
                     lut_path = prepare_lut_intensity(root, lut_path, intensity)
                 except AppError as exc:
+                    if exc.code in {'LUT_INTENSITY_CACHE_HASH_MISMATCH', 'LUT_SOURCE_CHANGED'}:
+                        raise
                     warnings.append({"code": "RENDER_FEATURE_UNSUPPORTED", "clip_id": clip_id, "feature": "lut_intensity", "message": str(exc)})
                     continue
-                warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "lut_intensity", "message": "已由本地 .cube identity 混合表执行静态 LUT 强度；逐帧强度仍使用静态值"})
+                warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip_id, "feature": "lut_intensity", "message": "静态强度由 red-fastest identity 混合 CUBE 执行；域外/非线性和舍入结果可能与像素混合不同"})
             interpolation = str(parameters.get("interpolation", parameters.get("interp", "tetrahedral"))).lower()
             if interpolation not in {"nearest", "trilinear", "tetrahedral", "pyramid", "prism"}:
                 warnings.append({"code": "LUT_INTERPOLATION_INVALID", "clip_id": clip_id, "feature": "lut3d", "message": f"LUT interpolation 无效，已回退 tetrahedral: {interpolation}"})
@@ -1846,8 +1844,12 @@ def _effect_filters(
             if automation is None:
                 raise AppError('EFFECT_AUTOMATION_CONTEXT_MISSING', '动态效果需要完整根图的实例与命令预算上下文', exit_code=6)
             duration = int(clip_value.get('duration_tick', 0))/tps
-            generated, evidence = automation.bind(effect_value, filters[-1], clip_value,
-                                                   clip_start, clip_start+duration)
+            if _runtime_effect_name(name) == 'lut3d':
+                generated, evidence = automation.bind_lut(effect_value, filters[-1], lut_path,
+                                                           clip_value, clip_start, clip_start+duration)
+            else:
+                generated, evidence = automation.bind(effect_value, filters[-1], clip_value,
+                                                       clip_start, clip_start+duration)
             filters[-1:] = generated
             if automation_meta is not None:
                 automation_meta.append(evidence)
@@ -2684,6 +2686,25 @@ def _flatten_sequence_tracks(
                 child_clip['_audio_scope_enabled'] = bool(track_audio_enabled)
                 source_handle = clip.get('_source_handle')
                 authored_start_tick = source_handle['authored_start_tick'] if source_handle else clip_start
+                # Effect tracks are separate from clip transform tracks. Even
+                # a constant-speed ancestor needs their original author clock;
+                # mapping only exact/nonlinear source handles restarts or
+                # reverses the picture without reversing its color animation.
+                if clock_maps:
+                    for authored_effect in child_clip.get('effects') or []:
+                        if not isinstance(authored_effect, dict):
+                            continue
+                        params = authored_effect.get('parameters')
+                        tracks = authored_effect.get('keyframes')
+                        if not isinstance(tracks, list) and isinstance(params, dict):
+                            tracks = params.get('keyframes')
+                        if isinstance(tracks, list):
+                            for effect_track in tracks:
+                                if isinstance(effect_track, dict) and isinstance(effect_track.get('keyframes'), list):
+                                    effect_track['_nested_clock'] = {
+                                        'maps': copy.deepcopy(clock_maps),
+                                        'authored_start': authored_start_tick/tps_local,
+                                        'keyframes': copy.deepcopy(effect_track['keyframes'])}
                 if source_handle and clock_maps:
                     child_clip['_nested_keyframe_clock'] = {'maps':copy.deepcopy(clock_maps),
                                                            'authored_start':authored_start_tick/tps_local}
@@ -4398,18 +4419,25 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 current = target
                 continue
             segment_labels: list[str] = []
+            # Each interval consumes its own copy of the composed surface.
+            # Reusing one consumed label can bind subsequent inputs to a
+            # similarly named input stream and bypass compositing/fps filters.
+            interval_inputs = [f'adjustment{adjustment_index}input{i}' for i in range(
+                1+int(adjustment_start > 1e-9)+int(adjustment_end < duration-1e-9))]
+            filters.append(f'[{current}]split={len(interval_inputs)}'+''.join(f'[{label}]' for label in interval_inputs))
+            interval_iter = iter(interval_inputs)
             if adjustment_start > 1e-9:
                 pre = f"adjustment{adjustment_index}pre"
-                filters.append(f"[{current}]trim=start=0:end={adjustment_start:.6f},setpts=PTS-STARTPTS,format=rgba[{pre}]")
+                filters.append(f"[{next(interval_iter)}]trim=start=0:end={adjustment_start:.6f},setpts=PTS-STARTPTS,format=rgba[{pre}]")
                 segment_labels.append(pre)
             mid_input = f"adjustment{adjustment_index}midin"
             mid = f"adjustment{adjustment_index}mid"
-            filters.append(f"[{current}]trim=start={adjustment_start:.6f}:end={adjustment_end:.6f},setpts=PTS-STARTPTS,format=rgba[{mid_input}]")
+            filters.append(f"[{next(interval_iter)}]trim=start={adjustment_start:.6f}:end={adjustment_end:.6f},setpts=PTS-STARTPTS,format=rgba[{mid_input}]")
             filters.append(f"[{mid_input}]" + ",".join(effect_filters) + f",format=rgba[{mid}]")
             segment_labels.append(mid)
             if adjustment_end < duration - 1e-9:
                 post = f"adjustment{adjustment_index}post"
-                filters.append(f"[{current}]trim=start={adjustment_end:.6f}:end={duration:.6f},setpts=PTS-STARTPTS,format=rgba[{post}]")
+                filters.append(f"[{next(interval_iter)}]trim=start={adjustment_end:.6f}:end={duration:.6f},setpts=PTS-STARTPTS,format=rgba[{post}]")
                 segment_labels.append(post)
             filters.append("".join(f"[{label}]" for label in segment_labels) + f"concat=n={len(segment_labels)}:v=1:a=0,format=rgba,setpts=PTS-STARTPTS[{target}]")
             current = target

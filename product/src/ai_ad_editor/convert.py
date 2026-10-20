@@ -179,6 +179,7 @@ def _export_project_package(root: Path, project: dict[str, Any], output: Path) -
     packaged_project, asset_files, failures = _package_asset_map(root, project)
     if failures:
         raise ValueError("项目包含缺失素材，无法生成可移植项目包")
+    lut_count = _package_luts(root, packaged_project, asset_files)
     output.parent.mkdir(parents=True, exist_ok=True)
     if output.exists() and output.is_dir():
         raise ValueError(f"项目包输出必须是文件: {output}")
@@ -225,6 +226,9 @@ def _export_project_package(root: Path, project: dict[str, Any], output: Path) -
         "warnings": [report_item("package-excluded-runtime", "Approximate", "project runtime", str(output), "renders/cache/operations/history 未打包")],
         "failures": [],
     }
+    if lut_count:
+        report['items'].append(report_item('lut-resources', 'Mapped', 'local paths / lut_id',
+            'assets/luts/', f'{lut_count} 个引用改写为包内内容寻址路径；关键帧及 LUT 原字节保留，缓存不打包'))
     report_bytes = _package_json_bytes(report)
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, allowZip64=True) as archive:
         _zip_write_bytes(archive, PROJECT_PACKAGE_MANIFEST, manifest_bytes)
@@ -234,6 +238,49 @@ def _export_project_package(root: Path, project: dict[str, Any], output: Path) -
     report_path = output.with_suffix(output.suffix + ".conversion-report.json")
     atomic_write_json(report_path, report)
     return {"output": str(output), "report": str(report_path), "report_data": report, "manifest": manifest}
+
+
+def _package_luts(root: Path, project: dict[str, Any], files: dict[str, Path]) -> int:
+    """Close local LUT dependencies wherever an effect occurs in the graph.
+
+    Registered IDs are resolved now and materialized as portable paths, like
+    fragment export. Missing/outside resources fail before opening the ZIP;
+    a successful import must not silently lose an unregistered local look.
+    """
+    from .lut_library import resolve_lut_path
+    from .policy import resolve_local_path
+    count = 0
+    def visit(value):
+        nonlocal count
+        if isinstance(value, list):
+            for item in value: visit(item)
+        elif isinstance(value, dict):
+            if str(value.get('type', '')).lower().replace('-', '_') in {'lut3d','lut','cube','look'}:
+                parameters = value.get('parameters') if isinstance(value.get('parameters'), dict) else value
+                lut_id = parameters.get('lut_id')
+                if lut_id:
+                    found = resolve_lut_path(root, str(lut_id))
+                    if found is None:
+                        raise ValueError(f'LUT 登记不存在，无法生成可移植项目包: {lut_id}')
+                    path = found[0].resolve()
+                    if not path.is_file() or 'sha256:'+sha256_file(path) != found[1].get('sha256'):
+                        raise ValueError('登记 LUT 的原字节摘要不匹配，无法生成可移植项目包')
+                else:
+                    raw = parameters.get('path', parameters.get('file', parameters.get('lut')))
+                    if not raw:
+                        raise ValueError('LUT 缺少本地路径，无法生成可移植项目包')
+                    path = resolve_local_path(root, raw, field='package.lut').resolve()
+                if not path.is_relative_to(root.resolve()) or not path.is_file():
+                    raise ValueError('LUT 必须是项目内实际文件，无法生成可移植项目包')
+                digest = sha256_file(path)
+                relative = f'assets/luts/{digest}{path.suffix.lower()}'
+                files[relative] = path
+                for key in ('path','file','lut','lut_id'): parameters.pop(key, None)
+                parameters['path'] = relative
+                count += 1
+            for item in list(value.values()): visit(item)
+    visit(project)
+    return count
 
 
 def sha256_file_bytes(data: bytes) -> str:

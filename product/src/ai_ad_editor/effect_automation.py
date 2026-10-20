@@ -49,6 +49,9 @@ SPECS = {
         'output_black': (('output_black', 'romin'), 0., 0., 1., ('romin', 'gomin', 'bomin')),
         'output_white': (('output_white', 'romax'), 1., 0., 1., ('romax', 'gomax', 'bomax')),
     },
+    'lut3d': {
+        'intensity': (('intensity',), 1., 0., 1., ('c0_opacity', 'c1_opacity', 'c2_opacity')),
+    },
 }
 ALIASES = {
     alias: canonical for canonical, aliases in {
@@ -57,10 +60,12 @@ ALIASES = {
         'color_wheel': ('color_wheel', 'three_way_color', 'three_way_wheel'),
         'exposure': ('exposure',),
         'color_levels': ('color_levels', 'levels', 'colorlevels'),
+        'lut3d': ('lut3d', 'lut', 'cube', 'look'),
     }.items() for alias in aliases
 }
 BACKENDS = {name: ('exposure' if name == 'exposure' else
-                   'colorlevels' if name == 'color_levels' else 'colorbalance') for name in SPECS}
+                   'colorlevels' if name == 'color_levels' else
+                   'blend' if name == 'lut3d' else 'colorbalance') for name in SPECS}
 MAX_SAMPLES = 2_000_000
 MAX_COMMANDS = 200_000
 MAX_BYTES = 16*1024*1024
@@ -177,7 +182,7 @@ class EffectAutomation:
         self.root, self.rate, self.tps = root, Fraction(fps), tps
         self.targets = self.samples = self.commands = self.bytes = 0
 
-    def bind(self, effect, static_filter, clip, start, end):
+    def bind(self, effect, static_filter, clip, start, end, *, resource_context=None):
         name = canonical(effect['type'])
         findings = validate(effect)
         if findings:
@@ -201,6 +206,8 @@ class EffectAutomation:
         identity = {'protocol': 'native-color-command-cfr-v1', 'effect': effect,
                     'static_filter': static_filter, 'clock': clip.get('_nested_keyframe_clock'),
                     'start': start, 'end': end, 'fps': str(self.rate), 'serial': self.targets}
+        if resource_context is not None:
+            identity['resource_context'] = resource_context
         token = hashlib.sha256(json.dumps(identity, sort_keys=True, ensure_ascii=False).encode('utf-8')).hexdigest()[:16]
         target = f'avk_ea_{self.targets}_{token}'
         curves = {prop: Curve(track, clip, start, self.tps) for prop, track in tracks.items()}
@@ -257,7 +264,33 @@ class EffectAutomation:
                     'effect_start_seconds': start, 'effect_end_seconds': end,
                     'native_value_serialization': 'six-decimals-matches-static-filter-options'}
         named = static_filter.replace(backend+'=', backend+'@'+target+'=', 1)
+        if resource_context is not None:
+            metadata['resource_context'] = resource_context
         return ['sendcmd=filename='+_quoted(relative), named], metadata
+
+    def bind_lut(self, effect, lut_filter, lut_path, clip, start, end):
+        """Mix ungraded/graded RGB on the author clock, keeping alpha exact.
+
+        A connected multi-chain fragment fits every existing effect-chain
+        caller. All labels derive from the shared allocator's unique target;
+        the source is split after conversion, so both blend inputs have the
+        same format, frames and PTS, including transparent pixels.
+        """
+        path = Path(lut_path).resolve()
+        resource = {'kind': 'lut-pixel-mix-v1',
+                    'lut_sha256': 'sha256:'+sha256_file(path),
+                    'lut_uri': path.relative_to(self.root.resolve()).as_posix(),
+                    'format': 'gbrap', 'rgb_mix': 'w*graded+(1-w)*original',
+                    'alpha': 'unchanged', 'interpolation': lut_filter.rsplit(':interp=', 1)[-1],
+                    'precision': '8-bit-encoded-RGB'}
+        generated, metadata = self.bind(effect,
+            'blend=c0_opacity=1:c1_opacity=1:c2_opacity=1:c3_opacity=1:shortest=1',
+            clip, start, end, resource_context=resource)
+        target = metadata['target']
+        dry, wet, graded = (target+'_'+suffix for suffix in ('dry', 'wet', 'graded'))
+        fragment = (f'format=gbrap,{generated[0]},split=2[{dry}][{wet}];'
+                    f'[{wet}]{lut_filter}[{graded}];[{graded}][{dry}]{generated[1]}')
+        return [fragment], metadata
 
     def summary(self):
         return {'kind': 'effect-automation-budget', 'recursive_shared': True,
