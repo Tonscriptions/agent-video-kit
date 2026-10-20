@@ -1,0 +1,40 @@
+test_actual_wheel_byte_change_is_detected (test_offline_install.OfflineInstallationTests.test_actual_wheel_byte_change_is_detected) ... ok
+test_cleanup_guard_refuses_unowned_directory (test_offline_install.OfflineInstallationTests.test_cleanup_guard_refuses_unowned_directory) ... ok
+test_existing_target_is_preserved (test_offline_install.OfflineInstallationTests.test_existing_target_is_preserved) ... ok
+test_extra_file_and_case_collisions_rejected (test_offline_install.OfflineInstallationTests.test_extra_file_and_case_collisions_rejected) ... ok
+test_failed_owned_process_rolls_back_staging (test_offline_install.OfflineInstallationTests.test_failed_owned_process_rolls_back_staging) ... ok
+test_font_text_profile_and_legacy_core_have_separate_exact_inventories (test_offline_install.OfflineInstallationTests.test_font_text_profile_and_legacy_core_have_separate_exact_inventories) ... ok
+test_font_text_profile_requires_the_seventh_pinned_pillow_wheel (test_offline_install.OfflineInstallationTests.test_font_text_profile_requires_the_seventh_pinned_pillow_wheel) ... ok
+test_native_bundle_dry_run_creates_no_target_or_staging (test_offline_install.OfflineInstallationTests.test_native_bundle_dry_run_creates_no_target_or_staging) ... ok
+test_native_mapped_network_drive_is_rejected_before_probe (test_offline_install.OfflineInstallationTests.test_native_mapped_network_drive_is_rejected_before_probe) ... ok
+test_native_wheel_for_another_platform_or_python_is_rejected_before_install (test_offline_install.OfflineInstallationTests.test_native_wheel_for_another_platform_or_python_is_rejected_before_install) ... ok
+test_network_paths_rejected_before_any_filesystem_probe (test_offline_install.OfflineInstallationTests.test_network_paths_rejected_before_any_filesystem_probe) ... ok
+test_platform_mismatch_fails_before_any_files_created (test_offline_install.OfflineInstallationTests.test_platform_mismatch_fails_before_any_files_created) ... ok
+test_pre_cancel_creates_no_installation (test_offline_install.OfflineInstallationTests.test_pre_cancel_creates_no_installation) ... ok
+test_product_requiring_pillow_cannot_claim_legacy_core_profile (test_offline_install.OfflineInstallationTests.test_product_requiring_pillow_cannot_claim_legacy_core_profile) ... ok
+test_python_independent_native_windows_wheel_passes_dry_run (test_offline_install.OfflineInstallationTests.test_python_independent_native_windows_wheel_passes_dry_run) ... ERROR
+test_real_owned_process_cancel_is_reaped (test_offline_install.OfflineInstallationTests.test_real_owned_process_cancel_is_reaped) ... ok
+test_real_owned_process_timeout_is_reaped (test_offline_install.OfflineInstallationTests.test_real_owned_process_timeout_is_reaped) ... ok
+test_reparse_ancestor_rejected_before_entering_descendants (test_offline_install.OfflineInstallationTests.test_reparse_ancestor_rejected_before_entering_descendants) ... ok
+test_requirements_cannot_add_index_or_unhashed_requirements (test_offline_install.OfflineInstallationTests.test_requirements_cannot_add_index_or_unhashed_requirements) ... ok
+test_unsafe_relative_paths_rejected (test_offline_install.OfflineInstallationTests.test_unsafe_relative_paths_rejected) ... ok
+test_wheel_name_mismatch_rejected_before_pip (test_offline_install.OfflineInstallationTests.test_wheel_name_mismatch_rejected_before_pip) ... ok
+test_wrong_manifest_digest_rejects (test_offline_install.OfflineInstallationTests.test_wrong_manifest_digest_rejects) ... ok
+
+======================================================================
+ERROR: test_python_independent_native_windows_wheel_passes_dry_run (test_offline_install.OfflineInstallationTests.test_python_independent_native_windows_wheel_passes_dry_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\native-selective-hsl\product\tests\test_offline_install.py", line 57, in test_python_independent_native_windows_wheel_passes_dry_run
+    result=installer.install(self.bundle,self.target,self.digest,dry_run=True)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\native-selective-hsl\product\offline\install.py", line 170, in install
+    manifest=validate_bundle(bundle,expected_manifest);bundle=Path(bundle).resolve()
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\native-selective-hsl\product\offline\install.py", line 129, in validate_bundle
+    if not set(wheel_info.get_all('Tag',[])) & {'py3-none-any','cp313-cp313-win_amd64'}:raise InstallError('WHEEL_INVALID','Unsupported wheel ABI')
+                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+offline_installer.InstallError: Unsupported wheel ABI
+
+----------------------------------------------------------------------
+Ran 22 tests in 1.347s
+
+FAILED (errors=1)

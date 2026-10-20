@@ -1,5 +1,47 @@
 # Agent Video Kit
 
+<!-- V77-CURRENT -->
+2026-10-20 **V77（八色 HSL 原生提速与离线发行限定验收）**：catalog **0.8.1／46 项**；本地 C11 frei0r 像素内核＋有界作者表达式 DAG，保留原八色 HSL、25 表达式通道和作者模型；既有 **10 类／34 命令通道**不增计。默认校验摘要后选原生模块，可显式 native／expression；完整性错误拒绝。完整原生回归 **1746/1746、2940.352 秒、0 跳过、233 冻结输入＋8 外部夹具前后相同**；本轮新增 19 内核＋2 安装方法，原 HSL 29 和安装 22 专项均为全量子集。最终专项 **19/19（4.806s）、29/29（42.425s）、22/22（2.993s）**，均无跳过。原生 **24 CLI／50 检查**，四组各 24 帧，独立 colorsys＋source-over RGB 最大差均 **1/255**；Alpha、每组完整 **96,000 帧立体声 PCM**、全部 PTS 和包重建分别核验。离线 **153 资源／7 wheels／27 隔离 CLI＋1 来源探针／13 检查**，源／平台 wheel／安装逐字节一致，安装成片与开发解码和内核元数据一致；17 Skills／310 本地引用与发现联接均核对。**1080p 最终滤镜探针 52.97–67.43fps（60 帧×3，null 输出，最多 3 后台线程＋调用线程）；完整 CLI 静态八色 11.35–13.18fps、强度动画 11.54–12.20fps，未达 30fps。**完整 CLI 包含校验、解码、合成、H.264/AAC 编码和清单，且并发回归；不能把滤镜吞吐当实时预览。保留构建／夹具失败、安装器标签缺口、漏打包 HTML 脚本及两次停止全量。未连续审片／听审；自然质量、HDR、交互预览和完整剪映等价未验收。
+
+[原生契约](docs/specs/八色HSL原生像素内核与表达式DAG契约_v0.1_2026-10-20.md) · [实测与失败](docs/validation/八色HSL原生提速与离线发行实测_2026-10-20.md) · [最终回归](docs/validation/evidence/native-hsl-20261020-v77/full-r3.json)
+
+| 编号 | 功能性核验／实测 | 实际结果 | 证据 |
+|---|---|---|---|
+| V77-01 | 原生内核与程序 | 19/19；RGBA／geq 对照、六插值、非线性时钟、奇数步幅、并发、惰性分支、非法程序与完整性 | [记录](docs/validation/evidence/native-hsl-20261020-v77/native-targeted-r4.json) |
+| V77-02 | 既有作者模型 | 29/29；保留八色定义、窗口／反转、区间、预算、工程包／片段和中性旁路 | [记录](docs/validation/evidence/native-hsl-20261020-v77/hsl-targeted-r4.json) |
+| V77-03 | 真实 CLI 四组色彩 | 24 CLI／50 检查；每组24帧，独立 RGB 最大差1、Alpha／完整PCM／PTS分别核验 | [记录](docs/validation/evidence/native-hsl-20261020-v77/native-r3/verification.json) |
+| V77-04 | 平台 wheel 与离线 | 153资源／7wheels，py3-none-win_amd64；27隔离CLI＋1来源探针／13检查，安装成片相同 | [记录](docs/validation/evidence/native-hsl-20261020-v77/installed-r3/verification.json) |
+| V77-05 | 安装平台限制 | 22/22；接受无 CPython C ABI 的 Windows x64，仍拒绝 ARM／Linux／win32／错误 Python ABI | [记录](docs/validation/evidence/native-hsl-20261020-v77/offline-targeted-r3.json) |
+| V77-06 | 1080p 滤镜吞吐 | 52.97–67.43fps；各60帧×3；filter_threads=1，C内核另有最多3后台线程＋调用线程 | [记录](docs/validation/evidence/native-hsl-20261020-v77/fastpath-r5.json) |
+| V77-07 | 完整 CLI 速度 | 静态八色 11.35–13.18fps；强度动画 11.54–12.20fps；均未达30fps | [记录](docs/validation/evidence/native-hsl-20261020-v77/cli-r2/verification.json) |
+| V77-08 | 完整回归 | 1746/1746；2940.352秒；0跳过；233输入＋8夹具 | [记录](docs/validation/evidence/native-hsl-20261020-v77/full-r3.json) |
+| V77-09 | 历史拒绝与修复 | 安装器拒绝新平台标签；修复后仍检查平台边界；失败收据保留 | [记录](docs/validation/evidence/native-hsl-20261020-v77/installed-r1/verification.json) |
+| V77-10 | 打包遗漏与修正 | 实际安装152项，补回既有openfilm_text_bounds.mjs；核验器兼容wheel标准purelib布局 | [记录](docs/validation/evidence/native-hsl-20261020-v77/installed-r2/verification.json) |
+| V77-11 | 中止的全量 | full-r1、full-r2均停止自有unittest树并保留失败终态，不纳入通过计数 | [记录](docs/validation/evidence/native-hsl-20261020-v77/full-r2-stop.json) |
+| V77-12 | 静态目检边界 | 只静看最终开发／安装两张PNG；未连续播放、听审或验收自然质量 | [记录](docs/validation/evidence/native-hsl-20261020-v77/static-review-r1.json) |
+| V77-13 | 完整 CLI 有界诊断 | 另1次带cProfile的实际渲染；FFmpeg指纹及子进程等待可见，不把受扰动计时当fps基准 | [记录](docs/validation/evidence/native-hsl-20261020-v77/profile-r1/verification.json) |
+
+四组输入为自制 CC0 静态色带／透明区、棋盘和合成双声道声音，非自然实拍。[前景 PNG](docs/assets/native-hsl-20261020-v77-native-r3/foreground-original.png) · [棋盘 PNG](docs/assets/native-hsl-20261020-v77-native-r3/background-original.png) · [原始 WAV](docs/assets/native-hsl-20261020-v77-native-r3/audio-original.wav) · [原输入视频预览](docs/assets/native-hsl-20261020-v77-native-r3/source-preview.mp4)。
+
+[红橙色相 MP4](docs/assets/native-hsl-20261020-v77-native-r3/red-orange.mp4) · [精确 FFV1／PCM](docs/assets/native-hsl-20261020-v77-native-r3/red-orange-lossless.mkv)
+
+![红橙色相（实际原生 CLI 成片 GIF，有损预览）](docs/assets/native-hsl-20261020-v77-native-r3/red-orange.gif)
+
+[蓝色饱和度 MP4](docs/assets/native-hsl-20261020-v77-native-r3/blue-saturation.mp4) · [精确 FFV1／PCM](docs/assets/native-hsl-20261020-v77-native-r3/blue-saturation-lossless.mkv)
+
+![蓝色饱和度（实际原生 CLI 成片 GIF，有损预览）](docs/assets/native-hsl-20261020-v77-native-r3/blue-saturation.gif)
+
+[洋红明度 MP4](docs/assets/native-hsl-20261020-v77-native-r3/magenta-lightness.mp4) · [精确 FFV1／PCM](docs/assets/native-hsl-20261020-v77-native-r3/magenta-lightness-lossless.mkv)
+
+![洋红明度（实际原生 CLI 成片 GIF，有损预览）](docs/assets/native-hsl-20261020-v77-native-r3/magenta-lightness.gif)
+
+[八色强度 MP4](docs/assets/native-hsl-20261020-v77-native-r3/grade-intensity.mp4) · [精确 FFV1／PCM](docs/assets/native-hsl-20261020-v77-native-r3/grade-intensity-lossless.mkv)
+
+![八色强度（实际原生 CLI 成片 GIF，有损预览）](docs/assets/native-hsl-20261020-v77-native-r3/grade-intensity.gif)
+
+完整 1080p CLI 的移动测试图与实际成片（均为合成测试素材）：[原视频](docs/assets/native-hsl-20261020-v77-cli-r2/source-testsrc2.mp4) · [无 HSL 对照](docs/assets/native-hsl-20261020-v77-cli-r2/control.mp4) · [静态八色](docs/assets/native-hsl-20261020-v77-cli-r2/eight-band.mp4) · [强度动画](docs/assets/native-hsl-20261020-v77-cli-r2/animated-intensity.mp4)。
+<!-- /V77-CURRENT -->
+
 <!-- V76-CURRENT -->
 2026-10-20 **V76（八色分区 HSL 限定功能验收）**：catalog **0.8.0／46 项**；新增八色各 H/S/L＋最终 RGB 强度 **25 个表达式通道**，原生命令仍为 **10 类／34 通道**。按原始色相相邻权重同时分区，灰阶与输入 Alpha 保留；作者时钟、六插值、拆分／反转、区间、工程包／片段重建均核验。修复片段／区间效果超大整数校验，静态中性／零强度旁路不消耗执行配额。完整原生回归 **1725/1725、2092.459 秒、0 跳过、225 冻结输入＋8 外部夹具前后相同**；29 新方法为全量子集。专项 **29/29、17.722 秒、0 跳过**。开发 **24 CLI／50 检查**，四组各 24 帧，独立 colorsys＋source-over 参照的 RGB 最大差均 **1/255**，输出 Alpha、每组完整 **96,000 帧立体声 PCM** 和每帧 PTS 分别检查。离线 **147 资源／7 wheels／27 隔离 CLI＋1 模块来源探针／12 安装检查**，开发／安装全部解码摘要、参数／内核元数据和 PTS 一致；17 Skills／302 本地引用，发行联接与正文均核对。**1080p 单滤镜线程、各 3 帧探针：单色区／八色约 21.040／26.856 秒/帧，未达 30fps；性能仍是明确缺口。**保留首轮 1 failure／2 errors 和参照修正；仅静看最终两张 PNG，未连续审片／听审。本轮为 8 位编码 RGB 算法验收；自然质量、实时预览、线性光／HDR及完整剪映等价未验收。
 

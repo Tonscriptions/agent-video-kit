@@ -41,6 +41,34 @@ class OfflineInstallationTests(unittest.TestCase):
     def save(self):
         (self.bundle/'manifest.json').write_text(json.dumps(self.manifest),encoding='utf-8');self.digest=installer.sha(self.bundle/'manifest.json')
 
+    def replace_product_tag(self, tag):
+        previous=self.bundle/self.manifest['wheels'][0]['path']
+        path='wheels/ai_ad_editor-0.1-'+tag+'.whl'
+        with zipfile.ZipFile(self.bundle/path,'w') as archive:
+            archive.writestr('ai_ad_editor-0.1.dist-info/METADATA','Metadata-Version: 2.1\nName: ai-ad-editor\nVersion: 0.1\n')
+            archive.writestr('ai_ad_editor-0.1.dist-info/WHEEL','Wheel-Version: 1.0\nTag: '+tag+'\n')
+        if previous!=self.bundle/path:previous.unlink()
+        self.manifest['wheels'][0]['path']=path
+        (self.bundle/'requirements.lock').write_bytes(''.join('./'+x['path']+' --hash='+installer.sha(self.bundle/x['path'])+'\n' for x in self.manifest['wheels']).encode())
+        self.reinventory()
+
+    def test_python_independent_native_windows_wheel_passes_dry_run(self):
+        self.replace_product_tag('py3-none-win_amd64')
+        result=installer.install(self.bundle,self.target,self.digest,dry_run=True)
+        self.assertEqual(result['status'],'planned')
+        self.assertFalse(self.target.exists())
+        self.assertEqual(list(self.folder.glob('.agent-video-kit-install-*')),[])
+
+    def test_native_wheel_for_another_platform_or_python_is_rejected_before_install(self):
+        for tag in ('py3-none-win_arm64','py3-none-manylinux2014_x86_64','cp312-cp312-win_amd64','py3-none-win32'):
+            with self.subTest(tag=tag):
+                self.replace_product_tag(tag)
+                with self.assertRaises(installer.InstallError) as caught:
+                    installer.install(self.bundle,self.target,self.digest,dry_run=True)
+                self.assertEqual(caught.exception.code,'WHEEL_INVALID')
+                self.assertFalse(self.target.exists())
+                self.assertEqual(list(self.folder.glob('.agent-video-kit-install-*')),[])
+
     def test_native_bundle_dry_run_creates_no_target_or_staging(self):
         result=installer.install(self.bundle,self.target,self.digest,dry_run=True)
         self.assertEqual(result['status'],'planned');self.assertFalse(self.target.exists())

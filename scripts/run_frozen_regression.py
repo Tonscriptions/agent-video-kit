@@ -12,6 +12,8 @@ def sha(path):
 def frozen():
     paths = [*(ROOT/'product/src').rglob('*.py'), *(ROOT/'product/tests').rglob('*.py'),
              *(ROOT/'product/src').rglob('*.mjs'), ROOT/'product/pyproject.toml',
+             *(ROOT/'product/src').rglob('*.c'), *(ROOT/'product/src').rglob('*.dll'),
+             *([ROOT/'product/setup.py'] if (ROOT/'product/setup.py').is_file() else []),
              ROOT/'docs/specs/agent-project.schema.json', *(ROOT/'product/src').rglob('*.json'),
              *(ROOT/'product/src').rglob('*LICENSE*.txt'), *(ROOT/'product/src').rglob('*NOTICE*.txt'), *(ROOT/'product/offline').glob('*.py')]
     return {p.relative_to(ROOT).as_posix(): sha(p) for p in sorted(paths)}

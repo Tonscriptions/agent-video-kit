@@ -1,0 +1,42 @@
+test_all_six_easings_match_actual_expression_backend (test_hsl_native.NativeHSLTests.test_all_six_easings_match_actual_expression_backend) ... ok
+test_binary_tampering_rejects_auto_without_silent_fallback (test_hsl_native.NativeHSLTests.test_binary_tampering_rejects_auto_without_silent_fallback) ... ok
+test_content_addressed_library_matches_source_and_only_one_binary_ships (test_hsl_native.NativeHSLTests.test_content_addressed_library_matches_source_and_only_one_binary_ships) ... ok
+test_default_executes_verified_native_backend_and_hash_named_module (test_hsl_native.NativeHSLTests.test_default_executes_verified_native_backend_and_hash_named_module) ... ok
+test_explicit_expression_skips_native_loading_and_invalid_mode_rejects (test_hsl_native.NativeHSLTests.test_explicit_expression_skips_native_loading_and_invalid_mode_rejects) ... ok
+test_invalid_dimensions_reject_before_allocation (test_hsl_native.NativeHSLTests.test_invalid_dimensions_reject_before_allocation) ... ok
+test_invalid_or_absent_program_is_identity_without_unsafe_memory_access (test_hsl_native.NativeHSLTests.test_invalid_or_absent_program_is_identity_without_unsafe_memory_access) ... ok
+test_lazy_branch_does_not_evaluate_inactive_division_by_zero (test_hsl_native.NativeHSLTests.test_lazy_branch_does_not_evaluate_inactive_division_by_zero) ... ok
+test_manifest_path_or_malformed_value_rejects_structurally (test_hsl_native.NativeHSLTests.test_manifest_path_or_malformed_value_rejects_structurally) ... ok
+test_missing_local_filter_auto_falls_back_and_explicit_native_rejects (test_hsl_native.NativeHSLTests.test_missing_local_filter_auto_falls_back_and_explicit_native_rejects) ... ok
+test_missing_module_auto_falls_back_and_explicit_native_rejects (test_hsl_native.NativeHSLTests.test_missing_module_auto_falls_back_and_explicit_native_rejects) ... ok
+test_native_validator_rejects_corrupt_layout_indices_opcodes_and_hex (test_hsl_native.NativeHSLTests.test_native_validator_rejects_corrupt_layout_indices_opcodes_and_hex) ... FAIL
+test_native_validator_rejects_nonfinite_constant (test_hsl_native.NativeHSLTests.test_native_validator_rejects_nonfinite_constant) ... ok
+test_nonlinear_reverse_ancestor_DAG_matches_actual_expression_backend (test_hsl_native.NativeHSLTests.test_nonlinear_reverse_ancestor_DAG_matches_actual_expression_backend) ... ok
+test_odd_dimensions_stride_and_parallel_chunk_tail_match_independent_HLS (test_hsl_native.NativeHSLTests.test_odd_dimensions_stride_and_parallel_chunk_tail_match_independent_HLS) ... ok
+test_parallel_instances_and_repeated_clock_reset_have_no_shared_pixel_state (test_hsl_native.NativeHSLTests.test_parallel_instances_and_repeated_clock_reset_have_no_shared_pixel_state) ... ok
+test_program_count_size_and_depth_are_bounded (test_hsl_native.NativeHSLTests.test_program_count_size_and_depth_are_bounded) ... FAIL
+test_program_rejects_code_and_unsupported_AST (test_hsl_native.NativeHSLTests.test_program_rejects_code_and_unsupported_AST) ... ok
+test_source_tampering_rejects (test_hsl_native.NativeHSLTests.test_source_tampering_rejects) ... ok
+
+======================================================================
+FAIL: test_native_validator_rejects_corrupt_layout_indices_opcodes_and_hex (test_hsl_native.NativeHSLTests.test_native_validator_rejects_corrupt_layout_indices_opcodes_and_hex)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\native-selective-hsl\product\tests\test_hsl_native.py", line 142, in test_native_validator_rejects_corrupt_layout_indices_opcodes_and_hex
+    for text in bad:self.assertEqual(lib.avk_hsl_validate_program(text),0)
+                    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0
+
+======================================================================
+FAIL: test_program_count_size_and_depth_are_bounded (test_hsl_native.NativeHSLTests.test_program_count_size_and_depth_are_bounded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\native-selective-hsl\product\tests\test_hsl_native.py", line 132, in test_program_count_size_and_depth_are_bounded
+    with self.assertRaises(AppError):hsl_program.compile_program(['1']*25)
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+----------------------------------------------------------------------
+Ran 19 tests in 3.736s
+
+FAILED (failures=2)

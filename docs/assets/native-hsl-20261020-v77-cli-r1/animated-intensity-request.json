@@ -1,0 +1,48 @@
+{
+  "operations": [
+    {
+      "op": "update_clip",
+      "clip_id": "picture",
+      "patch": {
+        "effects": [
+          {
+            "type": "selective_hsl",
+            "parameters": {
+              "red_hue": 35,
+              "orange_saturation": 0.3,
+              "yellow_lightness": -0.2,
+              "green_hue": 30,
+              "cyan_saturation": -0.4,
+              "blue_hue": -25,
+              "purple_lightness": 0.2,
+              "magenta_saturation": 0.2,
+              "intensity": 0.7
+            },
+            "keyframes": [
+              {
+                "property": "intensity",
+                "keyframes": [
+                  {
+                    "at_tick": 0,
+                    "value": 0,
+                    "interpolation": "ease_in_out"
+                  },
+                  {
+                    "at_tick": 90000,
+                    "value": 1,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 180000,
+                    "value": 0,
+                    "interpolation": "linear"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

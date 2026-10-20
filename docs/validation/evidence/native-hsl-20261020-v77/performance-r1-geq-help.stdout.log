@@ -1,0 +1,36 @@
+Filter geq
+  Apply generic equation to each pixel.
+    slice threading supported
+    Inputs:
+       #0: default (video)
+    Outputs:
+       #0: default (video)
+geq AVOptions:
+   lum_expr          <string>     ..FV....... set luminance expression
+   lum               <string>     ..FV....... set luminance expression
+   cb_expr           <string>     ..FV....... set chroma blue expression
+   cb                <string>     ..FV....... set chroma blue expression
+   cr_expr           <string>     ..FV....... set chroma red expression
+   cr                <string>     ..FV....... set chroma red expression
+   alpha_expr        <string>     ..FV....... set alpha expression
+   a                 <string>     ..FV....... set alpha expression
+   red_expr          <string>     ..FV....... set red expression
+   r                 <string>     ..FV....... set red expression
+   green_expr        <string>     ..FV....... set green expression
+   g                 <string>     ..FV....... set green expression
+   blue_expr         <string>     ..FV....... set blue expression
+   b                 <string>     ..FV....... set blue expression
+   interpolation     <int>        ..FV....... set interpolation method (from 0 to 1) (default bilinear)
+     nearest         0            ..FV....... nearest interpolation
+     n               0            ..FV....... nearest interpolation
+     bilinear        1            ..FV....... bilinear interpolation
+     b               1            ..FV....... bilinear interpolation
+   i                 <int>        ..FV....... set interpolation method (from 0 to 1) (default bilinear)
+     nearest         0            ..FV....... nearest interpolation
+     n               0            ..FV....... nearest interpolation
+     bilinear        1            ..FV....... bilinear interpolation
+     b               1            ..FV....... bilinear interpolation
+
+This filter has support for timeline through the 'enable' option.
+
+Exiting with exit code 0

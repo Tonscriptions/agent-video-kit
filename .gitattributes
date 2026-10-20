@@ -578,3 +578,15 @@ docs/assets/selective-hsl-20261020-v76-*/** -text -whitespace
 scripts/*selective_hsl*.py -text
 docs/specs/八色分区HSL与关键帧契约_v0.1_2026-10-20.md text eol=lf
 docs/validation/八色分区HSL与离线发行实测_2026-10-20.md text eol=lf
+
+# V77 preserves native DLL/C source, executed build snapshots, failures and media.
+docs/validation/evidence/native-hsl-20261020-v77/** -text -whitespace
+docs/assets/native-hsl-20261020-v77-*/** -text -whitespace
+product/src/ai_ad_editor/native_hsl.c -text
+product/src/ai_ad_editor/avk_hsl_*.dll -text
+product/src/ai_ad_editor/native_hsl_manifest.json -text
+product/src/ai_ad_editor/NATIVE_HSL_LICENSE.txt -text
+product/setup.py -text
+scripts/*native_hsl*.py -text
+docs/specs/八色HSL原生像素内核与表达式DAG契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/八色HSL原生提速与离线发行实测_2026-10-20.md text eol=lf

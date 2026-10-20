@@ -126,7 +126,7 @@ def validate_bundle(bundle,expected_manifest):
             names.add(normalized)
             if normalized=='ai-ad-editor' and profile=='core-v1' and any(re.match(r'(?i)^pillow\b',r) for r in info.get_all('Requires-Dist',[])):
                 raise InstallError('WHEEL_SET_INVALID','Product declares Pillow; font-text-v1 profile is required')
-            if not set(wheel_info.get_all('Tag',[])) & {'py3-none-any','cp313-cp313-win_amd64'}:raise InstallError('WHEEL_INVALID','Unsupported wheel ABI')
+            if not set(wheel_info.get_all('Tag',[])) & {'py3-none-any','py3-none-win_amd64','cp313-cp313-win_amd64'}:raise InstallError('WHEEL_INVALID','Unsupported wheel ABI')
         requirements.append('./'+name+' --hash='+inventory[name]['sha256'])
     if names!=expected_names:raise InstallError('WHEEL_SET_INVALID','Unexpected wheel set for declared runtime profile')
     if (bundle/'requirements.lock').read_bytes()!=('\n'.join(requirements)+'\n').encode():raise InstallError('REQUIREMENTS_INVALID','Lock differs from hashed wheel inventory')

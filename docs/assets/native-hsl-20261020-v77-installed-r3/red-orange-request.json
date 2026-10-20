@@ -1,0 +1,38 @@
+{
+  "operations": [
+    {
+      "op": "update_clip",
+      "clip_id": "foreground-clip",
+      "patch": {
+        "effects": [
+          {
+            "type": "selective_hsl",
+            "parameters": {},
+            "keyframes": [
+              {
+                "property": "red_hue",
+                "keyframes": [
+                  {
+                    "at_tick": 0,
+                    "value": 0,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 90000,
+                    "value": 60,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 180000,
+                    "value": 0,
+                    "interpolation": "linear"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

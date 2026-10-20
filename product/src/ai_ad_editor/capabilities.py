@@ -434,7 +434,12 @@ def build_capability_manifest() -> dict[str, Any]:
                 "effect_keyframe_contract": "brightness_contrast_saturation_hue_hsl_gamma_vignette_use_local_eq_eval_frame_and_hue_frame_expressions",
                 "selective_hsl": {
                     "status": "implemented_with_limits", "engine": "encoded-rgb-eight-band-hsl-v1",
-                    "backend": "ffmpeg:geq", "numeric_channels": 25,
+                    "backend": "ffmpeg:frei0r", "fallback_backends": ["ffmpeg:geq"], "numeric_channels": 25,
+                    "native_pixel_kernel": {"program_format":"AVKHSL01", "policy":"verified-native-auto",
+                        "distribution":"bundled_Windows_amd64_hash_named_DLL_with_C_source_and_MIT_notice",
+                        "runtime_compilation":False,"program_depth_limit":128,"program_bytes_limit":32256,
+                        "parallel_policy":"up_to_three_shared_Windows_background_workers_plus_the_calling_thread",
+                        "selection_env":"AI_AD_EDITOR_HSL_BACKEND=auto|native|expression"},
                     "bands_degrees": {"red": 0, "orange": 30, "yellow": 60, "green": 120,
                                       "cyan": 180, "blue": 240, "purple": 270, "magenta": 300},
                     "features": ["independent_hue_saturation_lightness_per_band", "animated_final_RGB_intensity",

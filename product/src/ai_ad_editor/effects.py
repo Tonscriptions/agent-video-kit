@@ -14,7 +14,7 @@ from .effect_automation import SPECS as AUTOMATION_SPECS
 from .selective_hsl import SPECS as HSL_SPECS, ENGINE as HSL_ENGINE
 
 
-EFFECT_CATALOG_VERSION = "0.8.0"
+EFFECT_CATALOG_VERSION = "0.8.1"
 
 
 def _parameter(
@@ -65,6 +65,8 @@ def _effect(
                                'recursive_command_and_sampling_budgets'])
     if effect_id == 'selective_hsl':
         item.update(keyframable=True, keyframe_parameters=list(HSL_SPECS), keyframe_engine=HSL_ENGINE)
+        item.update(fallback_backends=['ffmpeg:geq'],backend_selection='verified-native-auto',
+                    implementation_license='MIT (original C kernel)',implementation_license_file='NATIVE_HSL_LICENSE.txt')
     return item
 
 
@@ -212,7 +214,7 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
         "green": _parameter("string", "", description="绿色通道曲线"),
         "blue": _parameter("string", "", description="蓝色通道曲线"),
     }, limits=("curve_points_are_static", "each_channel_is_whitelist_validated")),
-    _effect("selective_hsl", backend="ffmpeg:geq", category="color", aliases=("hsl_bands", "eight_band_hsl"),
+    _effect("selective_hsl", backend="ffmpeg:frei0r", category="color", aliases=("hsl_bands", "eight_band_hsl"),
             parameters={name: _parameter("number", spec[1], minimum=spec[2], maximum=spec[3]) for name, spec in HSL_SPECS.items()},
             limits=("eight_fixed_hue_centers_with_circular_triangular_partition", "weights_use_original_hue_simultaneously",
                     "encoded_RGB_8bit_HSL_not_linear_light_HDR_or_vendor_look_equivalence", "achromatic_pixels_and_input_alpha_unchanged",

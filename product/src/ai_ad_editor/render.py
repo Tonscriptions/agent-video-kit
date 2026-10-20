@@ -1436,7 +1436,9 @@ def _effect_filters(
 
         if name in {'selective_hsl', 'hsl_bands', 'eight_band_hsl'}:
             from .selective_hsl import compile_filter
+            from .hsl_native import compile_native
             kernel, evidence = compile_filter(effect_value, expression)
+            kernel, evidence = compile_native(effect_value, expression, kernel, evidence)
             if automation is None:
                 raise AppError('SELECTIVE_HSL_CONTEXT_MISSING', '分色 HSL 需要根渲染图配额上下文', exit_code=6)
             duration = int(clip_value.get('duration_tick', 0))/tps

@@ -5,7 +5,23 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+<!-- V77-NATIVE-HSL -->
+For catalog 0.8.1 selective HSL, read the
+[native kernel and bounded DAG contract](../../docs/specs/八色HSL原生像素内核与表达式DAG契约_v0.1_2026-10-20.md)
+and [native/installed outputs, full CLI timing and retained failures](../../docs/validation/八色HSL原生提速与离线发行实测_2026-10-20.md).
+`AI_AD_EDITOR_HSL_BACKEND=auto|native|expression` defaults to a verified bundled
+Windows amd64 frei0r DLL. Auto falls back for an absent platform module or
+missing FFmpeg filter; integrity errors reject. Explicit native requires it.
+Retain original author tracks on transfer; rebuild the immutable DAG at the
+destination. Its 25 channels remain separate from the 34 command channels.
+Check backend, program and DLL/source hashes, decoded pixels, alpha, PCM and
+PTS. Native processing uses up to three shared background workers plus the
+caller. Separate null-output filter throughput from complete CLI encoding
+and interactive-preview acceptance. Older V76 geq timings below are historical.
+<!-- /V77-NATIVE-HSL -->
+
 <!-- V76-HSL -->
+Historical V76 implementation and evidence (superseded execution backend):
 For selective HSL review, read the
 [encoded-RGB HSL contract](../../docs/specs/八色分区HSL与关键帧契约_v0.1_2026-10-20.md)
 and [independent colorsys evidence and performance gap](../../docs/validation/八色分区HSL与离线发行实测_2026-10-20.md).
