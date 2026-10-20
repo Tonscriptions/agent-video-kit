@@ -5,6 +5,19 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+For projects with animated spatial/keying effects, read the
+[editable effect contract](../../docs/specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md)
+and [package, clip-group and isolated installation checks](../../docs/validation/空间滤镜与抠像关键帧实测_2026-10-20.md).
+Keep original parameters, tracks, author ticks and interpolation data. Derived
+command caches are rebuilt under the target project and actual FFmpeg gate;
+they are not portable author data. Reject malformed or unavailable dynamic
+channels before applying project changes. Check catalog 0.7.0 and the
+`numeric_effect_automation` capability rather than inferring support from a
+filter name or a previous installed build. Static and dynamic RGB key effects
+retain key-stage input coverage through an explicit 8-bit alpha product.
+The target rebuilds root-unique alpha compositors within their separate
+1,024-node budget; cached filter labels are not author data.
+
 For projects with retimed external blending, read the
 [editable blend-clock contract](../../docs/specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md)
 and [package, fragment and installed checks](../../docs/validation/外部混合动画变速与静音修复实测_2026-10-20.md).

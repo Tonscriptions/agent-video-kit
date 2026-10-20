@@ -26,6 +26,28 @@ from .utils import atomic_write_text, run_process, sha256_file
 
 # canonical property: (accepted aliases, default, lower, upper, native options)
 SPECS = {
+    'blur': {
+        # Set both axes explicitly: sigmaV=-1 is resolved when the native
+        # filter initializes and must not leave a stale vertical radius.
+        'radius': (('radius', 'sigma'), 4., 0., 128., ('sigma', 'sigmaV')),
+    },
+    'color_contrast': {
+        **{channel: ((channel, option), 0., -1., 1., (option,))
+           for channel, option in (('red', 'rc'), ('green', 'gm'), ('blue', 'by'))},
+        **{channel: ((channel, option), 0., 0., 1., (option,))
+           for channel, option in (('red_weight', 'rcw'), ('green_weight', 'gmw'),
+                                   ('blue_weight', 'byw'), ('preserve_luma', 'pl'))},
+    },
+    'lens_correction': {
+        'k1': (('k1',), 0., -1., 1., ('k1',)),
+        'k2': (('k2',), 0., -1., 1., ('k2',)),
+        'cx': (('cx',), .5, 0., 1., ('cx',)),
+        'cy': (('cy',), .5, 0., 1., ('cy',)),
+    },
+    'chroma_key': {
+        'similarity': (('similarity',), .1, .00001, 1., ('similarity',)),
+        'blend': (('blend',), 0., 0., 1., ('blend',)),
+    },
     'color_temperature': {
         'kelvin': (('kelvin',), 6500., 1000., 40000., ('rs', 'gs', 'bs')),
     },
@@ -55,6 +77,10 @@ SPECS = {
 }
 ALIASES = {
     alias: canonical for canonical, aliases in {
+        'blur': ('blur', 'gaussian_blur', 'gblur'),
+        'color_contrast': ('color_contrast', 'colorcontrast'),
+        'lens_correction': ('lens_correction', 'lenscorrection'),
+        'chroma_key': ('chroma_key', 'chromakey', 'green_screen'),
         'color_temperature': ('color_temperature', 'temperature', 'warmth'),
         'color_balance': ('color_balance', 'colorbalance'),
         'color_wheel': ('color_wheel', 'three_way_color', 'three_way_wheel'),
@@ -63,9 +89,13 @@ ALIASES = {
         'lut3d': ('lut3d', 'lut', 'cube', 'look'),
     }.items() for alias in aliases
 }
-BACKENDS = {name: ('exposure' if name == 'exposure' else
-                   'colorlevels' if name == 'color_levels' else
-                   'blend' if name == 'lut3d' else 'colorbalance') for name in SPECS}
+BACKENDS = {
+    'blur': 'gblur', 'color_contrast': 'colorcontrast',
+    'lens_correction': 'lenscorrection', 'chroma_key': 'colorkey',
+    'color_temperature': 'colorbalance', 'color_balance': 'colorbalance',
+    'color_wheel': 'colorbalance', 'exposure': 'exposure',
+    'color_levels': 'colorlevels', 'lut3d': 'blend',
+}
 MAX_SAMPLES = 2_000_000
 MAX_COMMANDS = 200_000
 MAX_BYTES = 16*1024*1024
@@ -99,8 +129,17 @@ def normalized_tracks(effect: dict[str, Any]) -> list[dict[str, Any]]:
     return result
 
 
+def _finite_number(value: Any) -> bool:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return math.isfinite(value)
+    except OverflowError:
+        return False
+
+
 def validate(effect: dict[str, Any], *, duration_tick: int | None = None) -> list[dict[str, str]]:
-    """Additional strict checks for newly executable dynamic color channels."""
+    """Strict checks for the executable numeric color/spatial/keying channels."""
     name = canonical(effect.get('type', ''))
     tracks = normalized_tracks(effect)
     if name is None or not tracks or effect.get('enabled', True) is False:
@@ -135,7 +174,7 @@ def validate(effect: dict[str, Any], *, duration_tick: int | None = None) -> lis
                 fail('EFFECT_AUTOMATION_TIME_INVALID', 'tick 必须为严格递增且位于完整作者区间内的非负整数', location+'.at_tick')
             if isinstance(at, int): previous = at
             value = point.get('value')
-            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not lower <= value <= upper:
+            if not _finite_number(value) or not lower <= value <= upper:
                 fail('EFFECT_AUTOMATION_VALUE_INVALID', f'数值必须位于 {lower:g}..{upper:g}', location+'.value')
             interpolation = point.get('interpolation')
             if interpolation not in {'hold', 'linear', 'ease_in', 'ease_out', 'ease_in_out', 'bezier'}:
@@ -143,7 +182,7 @@ def validate(effect: dict[str, Any], *, duration_tick: int | None = None) -> lis
             if interpolation == 'bezier':
                 controls = point.get('control_points')
                 if (not isinstance(controls, list) or len(controls) not in (2, 4) or
-                    any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) for v in controls) or
+                    any(not _finite_number(v) for v in controls) or
                     (len(controls) == 4 and not (0 <= controls[0] <= 1 and 0 <= controls[2] <= 1))):
                     fail('EFFECT_AUTOMATION_BEZIER_INVALID', 'Bezier 需要合法的 2/4 个有限控制点', location+'.control_points')
     return errors
@@ -181,6 +220,15 @@ class EffectAutomation:
     def __init__(self, root: Path, fps: str, tps: int):
         self.root, self.rate, self.tps = root, Fraction(fps), tps
         self.targets = self.samples = self.commands = self.bytes = 0
+        self.alpha_compositors = 0
+
+    def reserve_key_alpha(self):
+        """Allocate a deterministic root-wide static/dynamic coverage node."""
+        if self.alpha_compositors >= MAX_TARGETS:
+            raise AppError('EFFECT_AUTOMATION_BUDGET', '抠像覆盖合成超出根渲染图实例配额', exit_code=2)
+        target = f'avk_key_alpha_{self.alpha_compositors}'
+        self.alpha_compositors += 1
+        return target
 
     def bind(self, effect, static_filter, clip, start, end, *, resource_context=None):
         name = canonical(effect['type'])
@@ -315,6 +363,7 @@ class EffectAutomation:
     def summary(self):
         return {'kind': 'effect-automation-budget', 'recursive_shared': True,
                 'targets': self.targets, 'state_samples': self.samples, 'commands': self.commands,
-                'command_bytes': self.bytes,
+                'command_bytes': self.bytes, 'key_alpha_compositors': self.alpha_compositors,
                 'limits': {'targets': MAX_TARGETS, 'state_samples': MAX_SAMPLES,
-                           'commands': MAX_COMMANDS, 'command_bytes': MAX_BYTES}}
+                           'commands': MAX_COMMANDS, 'command_bytes': MAX_BYTES,
+                           'key_alpha_compositors': MAX_TARGETS}}

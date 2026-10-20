@@ -1364,6 +1364,24 @@ def _effect_keyframe_expr(
     )
 
 
+def _key_with_input_alpha(native_filter: str, target: str) -> str:
+    """The native key replaces alpha. Combine its matte with stage input alpha.
+
+    Branches have the same frame clock; RGB comes directly from the key stage.
+    Labels are allocated by the root compiler, including static key effects.
+    """
+    if not native_filter.startswith(('colorkey=', 'colorkey@')):
+        raise AppError('EFFECT_AUTOMATION_FILTER_INVALID', '抠像覆盖只能包装固定 colorkey 映射', exit_code=6)
+    source,key,original,colors,matte,coverage,combined=(target+'_'+name for name in
+        ('source','key','original','colors','matte','coverage','combined'))
+    return (f'format=rgba,split=2[{source}][{key}];'
+            f'[{source}]alphaextract[{original}];'
+            f'[{key}]{native_filter},split=2[{colors}][{matte}];'
+            f'[{matte}]alphaextract[{coverage}];'
+            f"[{original}][{coverage}]blend=all_expr='floor(A*B/255+0.5)':shortest=1[{combined}];"
+            f'[{colors}][{combined}]alphamerge')
+
+
 def _effect_filters(
     effects: Any,
     warnings: list[dict[str, Any]],
@@ -1378,7 +1396,7 @@ def _effect_filters(
 ) -> list[str]:
     filters: list[str] = []
     clip_value = clip if isinstance(clip, dict) else {}
-    for effect in effects or []:
+    for effect_index, effect in enumerate(effects or []):
         if isinstance(effect, dict) and effect.get("enabled", True) is False:
             continue
         if isinstance(effect, str):
@@ -1478,7 +1496,8 @@ def _effect_filters(
         elif name == "sepia":
             filters.append("colorchannelmixer=.393:.769:.189:0:.349:.686:.168:0:.272:.534:.131")
         elif name in {"blur", "gaussian_blur", "gblur"}:
-            filters.append(f"gblur=sigma={max(0.1, _num(parameters.get('radius', parameters.get('sigma', 4)), 4)):.4f}")
+            radius = max(0.0, min(128.0, _num(parameters.get('radius', parameters.get('sigma', 4)), 4)))
+            filters.append(f"gblur=sigma={radius:.6f}:sigmaV={radius:.6f}")
         elif name in {"avgblur", "average_blur"}:
             if effect_tracks:
                 warn_unsupported_tracks()
@@ -1827,7 +1846,7 @@ def _effect_filters(
             filters.append(f"drawbox=x=iw*{x:.6f}:y=ih*{y:.6f}:w=iw*{width:.6f}:h=ih*{height:.6f}:color={_quoted(color)}:t={thickness}")
         elif name in {"chroma_key", "chromakey", "green_screen"}:
             color = str(parameters.get("color", "0x00ff00"))
-            similarity = max(0.0, min(1.0, _num(parameters.get("similarity", 0.1), 0.1)))
+            similarity = max(0.00001, min(1.0, _num(parameters.get("similarity", 0.1), 0.1)))
             blend = max(0.0, min(1.0, _num(parameters.get("blend", 0), 0)))
             filters.append(f"colorkey={_quoted(color)}:{similarity:.6f}:{blend:.6f}")
         elif name in {"flip", "horizontal_flip", "hflip"}:
@@ -1853,6 +1872,19 @@ def _effect_filters(
             filters[-1:] = generated
             if automation_meta is not None:
                 automation_meta.append(evidence)
+        if name in {'chroma_key', 'chromakey', 'green_screen'}:
+            if automation is not None:
+                alpha_target = automation.reserve_key_alpha()
+            else:
+                # Internal standalone static callers have no recursive root.
+                # Product render paths always supply the shared compiler.
+                identity = f'{clip_id}|{clip_start}|{effect_index}|{filters[-1]}'
+                alpha_target = 'avk_key_local_'+hashlib.sha256(identity.encode('utf8')).hexdigest()[:16]
+            filters[-1] = _key_with_input_alpha(filters[-1], alpha_target)
+            if automation_meta is not None:
+                automation_meta.append({'kind':'colorkey-alpha-coverage', 'clip_id':clip_id,
+                    'target':alpha_target, 'operation':'round(input_alpha_at_key_stage*native_key_coverage/255)',
+                    'precision':'8-bit', 'input_coverage_preserved':True})
     return filters
 
 

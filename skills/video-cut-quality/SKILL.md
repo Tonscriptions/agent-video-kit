@@ -5,6 +5,19 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [spatial/keying parameter animation](../../docs/specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md),
+read the [native static-frame oracles, retained failures and installed checks](../../docs/validation/空间滤镜与抠像关键帧实测_2026-10-20.md).
+Compare every displayed frame against explicitly evaluated static native options
+at the same author time. Blur and geometry can change alpha. RGB color keying
+must multiply native key coverage by the alpha entering that key stage, with
+8-bit rounding. Test clear, partial and opaque input, static and dynamic keys,
+and stacked instances; native colorkey alone overwrites input alpha. Inspect
+`colorkey-alpha-coverage` and the independent root compositor budget.
+Use a separate source-over reference and lossless media for pixel assertions.
+Verify original PCM and encoded PTS independently. Native algorithm agreement,
+synthetic images and static contact sheets do not accept natural keying quality,
+despill, HDR, continuous playback or full CapCut parity.
+
 For [retimed external blend animation](../../docs/specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md),
 read the [independent RGB, alpha, PCM and native installation checks](../../docs/validation/外部混合动画变速与静音修复实测_2026-10-20.md).
 Compare every displayed frame with independently mapped author parameters and

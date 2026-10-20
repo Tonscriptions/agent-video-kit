@@ -1,0 +1,40 @@
+{
+  "operations": [
+    {
+      "op": "update_clip",
+      "clip_id": "foreground-clip",
+      "patch": {
+        "effects": [
+          {
+            "type": "color_contrast",
+            "parameters": {
+              "green": 0.3,
+              "blue": -0.4,
+              "red_weight": 0.7,
+              "green_weight": 0.5,
+              "blue_weight": 0.9,
+              "preserve_luma": 0.4
+            },
+            "keyframes": [
+              {
+                "property": "red",
+                "keyframes": [
+                  {
+                    "at_tick": 0,
+                    "value": -0.8,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 180000,
+                    "value": 0.8,
+                    "interpolation": "linear"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

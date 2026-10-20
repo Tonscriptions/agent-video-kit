@@ -22,6 +22,19 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+For animated `blur`, `lens_correction`, `chroma_key` and `color_contrast`, read the
+[14-channel contract](../../docs/specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md)
+and [actual frame, clock and transfer checks](../../docs/validation/空间滤镜与抠像关键帧实测_2026-10-20.md).
+Use effect-local author ticks and six supported interpolation modes. Radius
+sets both Gaussian axes; similarity must be at least 0.00001. Keep the key color,
+planes, lens sampling and fill tokens static. Static and dynamic RGB keys
+multiply key-stage input alpha by native key coverage with 8-bit rounding.
+They share a separate 1,024-node root budget and unique compositor labels.
+Saved effects remain editable
+through trim/split, relative retiming, packages and clip groups. Confirm the
+installed runtime's actual commands before encoding; do not silently substitute
+static parameters when a declared numeric channel cannot execute.
+
 For external blend-opacity retiming, read the
 [independent clock contract](../../docs/specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md)
 and [actual pixels, audio and transfer evidence](../../docs/validation/外部混合动画变速与静音修复实测_2026-10-20.md).
@@ -45,7 +58,7 @@ inputs reject instead of guessing coordinates. Locked tracks cannot be edited.
 For numeric color effect animation, read the
 [color automation contract](../../docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md).
 Existing compose `update_clip.patch.effects` accepts effect keyframe tracks;
-catalog 0.6.0 includes the original 19 channels of temperature, balance, nine-wheel,
+catalog 0.7.0 retains the original 19 channels of temperature, balance, nine-wheel,
 exposure and levels. Top-level effect keyframes take precedence over parameter
 keyframes. Preserve author ticks through windows, curves, reverse and compound
 holds. Independent text, groups and interval adjustments use the same bounded
@@ -58,7 +71,7 @@ The [actual media, encoding diagnosis and installed replay](../../docs/validatio
 compare independently authored parameters on the same pinned FFmpeg delivery
 boundary; they do not establish physical white balance or CapCut color science.
 
-For `lut3d` / `lut` / `cube` / `look`, add the twentieth numeric channel
+For `lut3d` / `lut` / `cube` / `look`, use the numeric channel
 `intensity` with ordinary effect keyframes, using the
 [LUT strength contract](../../docs/specs/LUT强度关键帧契约_v0.1_2026-10-20.md).
 Dynamic strength mixes the original and native LUT result in 8-bit encoded

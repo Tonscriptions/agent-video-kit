@@ -1,0 +1,37 @@
+{
+  "operations": [
+    {
+      "op": "update_clip",
+      "clip_id": "foreground-clip",
+      "patch": {
+        "effects": [
+          {
+            "type": "lens_correction",
+            "parameters": {
+              "k2": 0.08,
+              "cx": 0.5,
+              "cy": 0.5
+            },
+            "keyframes": [
+              {
+                "property": "k1",
+                "keyframes": [
+                  {
+                    "at_tick": 0,
+                    "value": -0.45,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 180000,
+                    "value": 0.45,
+                    "interpolation": "linear"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

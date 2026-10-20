@@ -1,0 +1,38 @@
+{
+  "operations": [
+    {
+      "op": "update_clip",
+      "clip_id": "foreground-clip",
+      "patch": {
+        "effects": [
+          {
+            "type": "blur",
+            "parameters": {},
+            "keyframes": [
+              {
+                "property": "radius",
+                "keyframes": [
+                  {
+                    "at_tick": 0,
+                    "value": 0,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 90000,
+                    "value": 12,
+                    "interpolation": "linear"
+                  },
+                  {
+                    "at_tick": 180000,
+                    "value": 0,
+                    "interpolation": "linear"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

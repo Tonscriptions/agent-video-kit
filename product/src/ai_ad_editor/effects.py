@@ -13,7 +13,7 @@ from typing import Any
 from .effect_automation import SPECS as AUTOMATION_SPECS
 
 
-EFFECT_CATALOG_VERSION = "0.6.0"
+EFFECT_CATALOG_VERSION = "0.7.0"
 
 
 def _parameter(
@@ -71,7 +71,7 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
         "size_y": _parameter("number", 2.0, minimum=0.0, maximum=1024.0),
         "planes": _parameter("integer", 15, minimum=0, maximum=15),
     }),
-    _effect("blur", backend="ffmpeg:gblur", category="blur", aliases=("gaussian_blur", "gblur"), parameters={"radius": _parameter("number", 4.0, minimum=0.1, maximum=128.0)}),
+    _effect("blur", backend="ffmpeg:gblur", category="blur", aliases=("gaussian_blur", "gblur"), parameters={"radius": _parameter("number", 4.0, minimum=0.0, maximum=128.0)}, limits=("radius_sets_both_sigma_and_sigmaV", "blur_filters_RGB_and_alpha_planes")),
     _effect("box_blur", backend="ffmpeg:boxblur", category="blur", aliases=("boxblur",), parameters={
         "radius": _parameter("number", 4.0, minimum=1.0, maximum=128.0),
         "power": _parameter("number", 1.0, minimum=1.0, maximum=4.0),
@@ -79,9 +79,9 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
     _effect("brightness", backend="ffmpeg:eq", category="color", aliases=("lightness",), keyframable=True, parameters={"amount": _parameter("number", 0.0, minimum=-1.0, maximum=1.0)}),
     _effect("chroma_key", backend="ffmpeg:colorkey", category="keying", aliases=("chromakey", "green_screen"), parameters={
         "color": _parameter("color", "0x00ff00"),
-        "similarity": _parameter("number", 0.1, minimum=0.0, maximum=1.0),
+        "similarity": _parameter("number", 0.1, minimum=0.00001, maximum=1.0),
         "blend": _parameter("number", 0.0, minimum=0.0, maximum=1.0),
-    }),
+    }, limits=("native_RGB_distance_key_coverage_multiplies_input_alpha", "not_semantic_matting_or_despill")),
     _effect("color_balance", backend="ffmpeg:colorbalance", category="color", aliases=("colorbalance",), parameters={
         "red": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
         "green": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
@@ -93,9 +93,9 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
         "saturation": _parameter("number", 1.0, minimum=0.0, maximum=4.0),
     }),
     _effect("color_contrast", backend="ffmpeg:colorcontrast", category="color", aliases=("colorcontrast",), parameters={
-        "red": _parameter("number", 1.0, minimum=-1.0, maximum=1.0),
-        "green": _parameter("number", 1.0, minimum=-1.0, maximum=1.0),
-        "blue": _parameter("number", 1.0, minimum=-1.0, maximum=1.0),
+        "red": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
+        "green": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
+        "blue": _parameter("number", 0.0, minimum=-1.0, maximum=1.0),
         "red_weight": _parameter("number", 0.0, minimum=0.0, maximum=1.0),
         "green_weight": _parameter("number", 0.0, minimum=0.0, maximum=1.0),
         "blue_weight": _parameter("number", 0.0, minimum=0.0, maximum=1.0),

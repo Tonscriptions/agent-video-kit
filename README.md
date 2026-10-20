@@ -1,5 +1,44 @@
 # Agent Video Kit
 
+<!-- V75-CURRENT -->
+2026-10-20 **V75（空间／抠像效果关键帧限定验收）**：catalog **0.7.0**，45 项效果不增计；新增高斯模糊、颜色对比、镜头畸变、RGB 抠像 **4 类／14 数值通道**，累计 **10 类／34 原生命令通道**。支持作者时钟、六插值、窗口／拆分、完整输出反转、工程包／片段跨项目重建和递归预算。修复超大整数校验异常、静态及动态抠像覆盖原有 Alpha、颜色对比目录默认值；模糊零半径为精确中性。完整原生回归 **1696/1696、2120.997 秒、0 跳过、223 冻结输入＋8 外部夹具前后相同**；29 新方法为全量子集。专项 **29/29、16.696 秒、0 跳过**。开发 **24 CLI／36 检查**，四组各 24 帧，独立静态原生选项＋source-over 参照的全 RGB 最大差均 **0**，输出 Alpha 与每组完整 **96,000 帧立体声 PCM** 精确。离线 **146 资源／7 wheels／27 隔离 CLI＋1 模块来源探针／12 安装检查**，开发／安装全部解码摘要、作者参数、抠像覆盖元数据及每帧 PTS 一致；17 Skills／294 本地引用，发行联接与正文均核对。保留全部失败和已停止的 full-r1；只静看最终开发／安装两张联系图，未连续审片或听审。gblur 会处理 Alpha，colorkey 的 RGB 距离覆盖乘以该阶段输入 Alpha，镜头采用原生采样；自然绿幕／去溢色、线性光／HDR、长片性能和完整剪映等价未验收。
+
+[契约](docs/specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md) · [实测与失败](docs/validation/空间滤镜与抠像关键帧实测_2026-10-20.md) · [当前回归](docs/validation/evidence/spatial-automation-20261020-v75/full-r2.json)
+
+| 编号 | 功能性核验／实测 | 实际结果 | 证据 |
+|---|---|---|---|
+| V75-01 | 旧版本基线 | 5fcff32f 的四类动态曲线均未生成控制，10 个相同输入帧的输出仍恒定；222 旧输入不变 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/baseline-r1.json) |
+| V75-02 | 作者与原生命令 | 29/29；14 通道、六插值、分数帧率、实例、边界、缓存、预算、窗口、反转、包／片段、静态／动态 Alpha 和独立预算 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/targeted-r5.json) |
+| V75-03 | 模糊聚焦 | 24 帧；两轴半径动画；独立 RGB 最大差 0；Alpha／完整 PCM 一致 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/native-r3/verification.json) |
+| V75-04 | 镜头畸变 | 24 帧；k1 动画；独立 RGB 最大差 0；Alpha／PCM 一致 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/native-r3/verification.json) |
+| V75-05 | RGB 绿幕 | 24 帧；similarity 动画；独立 RGB 最大差 0；透明输入保持不可见，覆盖乘积与 PCM 一致 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/native-r3/verification.json) |
+| V75-06 | 颜色对比 | 24 帧；系数与静态权重实际生效；独立 RGB 最大差 0 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/native-r3/verification.json) |
+| V75-07 | 原生离线安装 | 146 资源逐字节相同，7 wheels；27 隔离 CLI＋1 来源探针／12 检查；四组成片一致 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/installed-r2/verification.json) |
+| V75-08 | 完整回归 | 1696/1696；2120.997 秒；0 跳过；223 输入＋8 夹具 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/full-r2.json) |
+| V75-09 | 检查与审片范围 | 自动检查全部 PTS／PCM，静看开发／安装 PNG；未连续播放、听审或验收自然素材 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/static-review-r2.json) |
+| V75-10 | 错误与参照修正 | 24 方法首轮含 5 条失败／4 条子测试错误；真实整数溢出已修复，零权重／解析 Bezier 参照修正 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/targeted-r1.log) |
+| V75-11 | 抠像原覆盖保护 | 修复前 27 方法中 2 项 Alpha 回归失败；修复后静态／动态／多实例均核验，不把原生覆盖写入当作正确语义 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/targeted-r3-alpha-before-fix.json) |
+| V75-12 | 保留未完成全量 | full-r1 为修改前主动停止，终态失败且无方法计数；不纳入通过统计 | [记录](docs/validation/evidence/spatial-automation-20261020-v75/full-r1-stop.json) |
+
+[原始前景 PNG](docs/assets/spatial-automation-20261020-v75-native-r3/foreground-original.png) · [原始棋盘 PNG](docs/assets/spatial-automation-20261020-v75-native-r3/background-original.png) · [原始双声道 WAV](docs/assets/spatial-automation-20261020-v75-native-r3/audio-original.wav) · [静态输入视频预览](docs/assets/spatial-automation-20261020-v75-native-r3/source-preview.mp4)。
+
+[模糊聚焦 MP4](docs/assets/spatial-automation-20261020-v75-native-r3/blur-focus.mp4) · [FFV1／PCM 精确参照](docs/assets/spatial-automation-20261020-v75-native-r3/blur-focus-lossless.mkv)
+
+![模糊聚焦（实际成片 GIF，有损预览）](docs/assets/spatial-automation-20261020-v75-native-r3/blur-focus.gif)
+
+[镜头畸变 MP4](docs/assets/spatial-automation-20261020-v75-native-r3/lens-ramp.mp4) · [FFV1／PCM 精确参照](docs/assets/spatial-automation-20261020-v75-native-r3/lens-ramp-lossless.mkv)
+
+![镜头畸变（实际成片 GIF，有损预览）](docs/assets/spatial-automation-20261020-v75-native-r3/lens-ramp.gif)
+
+[RGB 抠像 MP4](docs/assets/spatial-automation-20261020-v75-native-r3/key-ramp.mp4) · [FFV1／PCM 精确参照](docs/assets/spatial-automation-20261020-v75-native-r3/key-ramp-lossless.mkv)
+
+![RGB 抠像（实际成片 GIF，有损预览）](docs/assets/spatial-automation-20261020-v75-native-r3/key-ramp.gif)
+
+[颜色对比 MP4](docs/assets/spatial-automation-20261020-v75-native-r3/contrast-ramp.mp4) · [FFV1／PCM 精确参照](docs/assets/spatial-automation-20261020-v75-native-r3/contrast-ramp-lossless.mkv)
+
+![颜色对比（实际成片 GIF，有损预览）](docs/assets/spatial-automation-20261020-v75-native-r3/contrast-ramp.gif)
+<!-- /V75-CURRENT -->
+
 <!-- V74-CURRENT -->
 2026-10-20 **V74（外部混合动画变速限定验收）**：完整输出相对变速现在保留可编辑 `blend.opacity_animation`，支持恒速、既有有界速度曲线、倒放、定格、重复操作和输出窗口；混合仍在原背景上执行，alpha 只乘一次。修复默认 u8 静音进入 tempo 后的 −256 PCM 偏移。完整原生回归 **1667/1667、2517.215 秒、0 跳过、222 冻结输入＋8 外部夹具前后相同**；23 个新增方法是其子集。专项 **23/23、9.975 秒、0 跳过**；原生 **24 CLI/30 检查**，三组各 30 帧独立 RGB 对照最大误差 **0/1/1 个 8 位码值**，输出 alpha 和每组完整 144,000 帧立体声 PCM 精确。离线 **146 资源/7 wheels/27 隔离 CLI＋1 模块来源探针/11 安装检查**；开发/安装解码摘要、作者模型和每帧 PTS 一致。17 Skills / 286 本地引用，发现联接与正文已核对。保留测试输入、旧栅格参考、音频成片失败及中止的 full-r1；静看两张对照 PNG，未连续审片或听审。连续参数与隔离祖先已栅格化帧序有明确边界；HDR、线性光、自然素材、长片性能、全部剪映混合效果与完整等价均未验收。
 

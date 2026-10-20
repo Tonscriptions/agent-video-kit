@@ -5,6 +5,18 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For animated blur, lens distortion, RGB color keying and color contrast, read the
+[spatial/keying contract](../../docs/specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md)
+and [native/installed pixel verification](../../docs/validation/空间滤镜与抠像关键帧实测_2026-10-20.md).
+Catalog 0.7.0 exposes 14 additional channels, 34 native numeric channels across
+10 families. Apply ordinary effect tracks with compose `update_clip`.
+Blur radius drives both axes and can change alpha. Key color, plane selection
+and sampling enums stay static. Color keying uses RGB distance; it does not
+perform semantic matting or despill. Static and dynamic key coverage multiply
+the alpha entering that key stage; inspect `colorkey-alpha-coverage` metadata
+and the separate 1,024-node root budget. Check original author ticks, native command
+support, decoded pixels and full PCM separately from natural visual quality.
+
 For retiming animated external blends, read the
 [blend-clock contract](../../docs/specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md)
 and [native/installed verification](../../docs/validation/外部混合动画变速与静音修复实测_2026-10-20.md).
@@ -85,7 +97,7 @@ natural-scene accuracy or full CapCut equivalence.
 
 For animated color parameters, read the
 [numeric automation contract](../../docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md).
-Use catalog 0.6.0 `effects list/inspect` and existing compose `update_clip`
+Use catalog 0.7.0 `effects list/inspect` and existing compose `update_clip`
 effects: 19 numeric channels of temperature, balance, three-way wheel,
 exposure and levels execute on actual CFR samples. Retain complete author
 graphs in package transfers; the target rebuilds content-addressed command
@@ -101,7 +113,7 @@ boundary; this does not accept HDR, physical white balance or CapCut parity.
 For animated LUT strength, follow the
 [LUT contract](../../docs/specs/LUT强度关键帧契约_v0.1_2026-10-20.md)
 and [native/installed evidence](../../docs/validation/LUT强度关键帧与中性调色修复实测_2026-10-20.md).
-`intensity` is the twentieth numeric channel; all four LUT aliases accept its
+`intensity` is retained from catalog 0.6.0; all four LUT aliases accept its
 0..1 author-tick keyframes and six interpolation types. Dynamic mixing uses
 local lut3d plus independently addressed blend RGB opacity commands, preserving
 alpha. Check the source LUT hash, CFR sampling and recursive budget. Static

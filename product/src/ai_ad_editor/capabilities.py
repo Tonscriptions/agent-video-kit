@@ -16,6 +16,8 @@ def build_capability_manifest() -> dict[str, Any]:
     """
     local_effects = effect_catalog()
     local_effect_ids = [item["id"] for item in local_effects["effects"]]
+    numeric_effects = [item for item in local_effects['effects'] if 'keyframe_engine' in item]
+    numeric_color_effects = [item for item in numeric_effects if item['category'] == 'color']
     return {
         "manifest_version": "0.1.0",
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
@@ -430,10 +432,30 @@ def build_capability_manifest() -> dict[str, Any]:
                 "catalog_contract": "effects.list_and_effects.inspect_return_local_ffmpeg_backend_parameter_limits_and_keyframe_contract",
                 "unknown_effect_policy": "RENDER_FEATURE_UNSUPPORTED",
                 "effect_keyframe_contract": "brightness_contrast_saturation_hue_hsl_gamma_vignette_use_local_eq_eval_frame_and_hue_frame_expressions",
+                "numeric_effect_automation": {
+                    "status": "implemented_with_limits", "engine": "native-color-command-cfr-v1",
+                    "effects": [item['id'] for item in numeric_effects],
+                    "numeric_channels": sum(len(item['keyframe_parameters']) for item in numeric_effects),
+                    "clock": "complete_author_output_sampled_on_actual_CFR_grid",
+                    "features": ["blur_both_axes", "lens_k1_k2_center", "colorkey_similarity_blend",
+                                 "input_alpha_times_RGB_key_coverage", "root_unique_static_and_dynamic_key_alpha_compositors",
+                                 "colorcontrast_seven_numeric_channels", "recursive_unique_targets",
+                                 "native_runtime_option_gate", "content_addressed_command_files",
+                                 "editable_project_package_fragment_rebuild", "shared_recursive_budgets"],
+                    "limits": ["color_tokens_enums_and_plane_selection_remain_static",
+                               "1024_additional_key_alpha_compositors_per_recursive_root",
+                               "blur_filters_RGB_and_alpha_planes",
+                               "colorkey_uses_RGB_distance_not_semantic_matting_or_despill",
+                               "lens_correction_uses_native_sampling_and_fill",
+                               "six_decimal_native_values", "Bezier_overshoot_clamped",
+                               "2000000_state_samples_200000_commands_16MiB_1024_targets_per_recursive_root",
+                               "not_HDR_or_full_CapCut_effect_equivalence"],
+                },
                 "numeric_color_automation": {
                     "status": "implemented_with_limits", "engine": "native-color-command-cfr-v1",
-                    "effects": ["color_temperature", "color_balance", "color_wheel", "exposure", "color_levels"],
-                    "numeric_channels": 19, "clock": "complete_author_output_sampled_on_actual_CFR_grid",
+                    "effects": [item['id'] for item in numeric_color_effects],
+                    "numeric_channels": sum(len(item['keyframe_parameters']) for item in numeric_color_effects),
+                    "clock": "complete_author_output_sampled_on_actual_CFR_grid",
                     "features": ["recursive_unique_targets", "native_runtime_option_gate", "content_addressed_command_files",
                                  "editable_project_and_package_rebuild", "independent_text_group_and_interval_adjustments"],
                     "limits": ["numeric_channels_only", "six_decimal_native_values", "Bezier_overshoot_clamped",
