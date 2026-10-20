@@ -1,0 +1,73 @@
+test_recursive_budget_native_capability_unique_targets_and_cache_corruption (test_blend_retime.NativeOpacityCommandTests.test_recursive_budget_native_capability_unique_targets_and_cache_corruption) ... ok
+test_six_easings_execute_alpha_only_at_fractional_cfr (test_blend_retime.NativeOpacityCommandTests.test_six_easings_execute_alpha_only_at_fractional_cfr) ... ok
+test_normal_multiply_screen_match_independent_opaque_background_formula (test_blend_retime.NativeOpacityIntegrationTests.test_normal_multiply_screen_match_independent_opaque_background_formula) ... ok
+test_real_cli_dry_run_atomic_failure_and_package_rebuild (test_blend_retime.NativeOpacityIntegrationTests.test_real_cli_dry_run_atomic_failure_and_package_rebuild) ... ok
+test_reverse_and_freeze_resume_at_declared_author_curve (test_blend_retime.NativeOpacityIntegrationTests.test_reverse_and_freeze_resume_at_declared_author_curve) ... ok
+test_schema_semantic_validation_and_external_loss_reporting (test_blend_retime.NativeOpacityIntegrationTests.test_schema_semantic_validation_and_external_loss_reporting) ... FAIL
+test_trim_and_split_preserve_saved_clock_phase (test_blend_retime.NativeOpacityIntegrationTests.test_trim_and_split_preserve_saved_clock_phase) ... ERROR
+test_constant_reverse_and_nonlinear_inverse_have_independent_formula (test_blend_retime.OpacityClockContractTests.test_constant_reverse_and_nonlinear_inverse_have_independent_formula) ... ok
+test_freeze_repeats_preceding_display_anchor_then_resumes (test_blend_retime.OpacityClockContractTests.test_freeze_repeats_preceding_display_anchor_then_resumes) ... ok
+test_invalid_easing_control_points_and_bounded_sizes_reject (test_blend_retime.OpacityClockContractTests.test_invalid_easing_control_points_and_bounded_sizes_reject) ... ok
+test_invalid_points_order_nonfinite_values_and_boolean_reject (test_blend_retime.OpacityClockContractTests.test_invalid_points_order_nonfinite_values_and_boolean_reject) ... ok
+test_invalid_relative_maps_reject_with_structured_error (test_blend_retime.OpacityClockContractTests.test_invalid_relative_maps_reject_with_structured_error) ... ok
+test_repeated_maps_window_offsets_and_ancestor_inverse_clock (test_blend_retime.OpacityClockContractTests.test_repeated_maps_window_offsets_and_ancestor_inverse_clock) ... ok
+test_unknown_fields_versions_and_noninteger_ticks_reject (test_blend_retime.OpacityClockContractTests.test_unknown_fields_versions_and_noninteger_ticks_reject) ... ok
+test_clock_depth_overflow_is_atomic (test_blend_retime.OpacityRetimePlannerTests.test_clock_depth_overflow_is_atomic) ... ok
+test_repeated_retime_prepends_model_and_new_top_keys_override (test_blend_retime.OpacityRetimePlannerTests.test_repeated_retime_prepends_model_and_new_top_keys_override) ... ok
+test_retime_detaches_only_external_blend_and_retains_author_graph (test_blend_retime.OpacityRetimePlannerTests.test_retime_detaches_only_external_blend_and_retains_author_graph) ... ok
+test_trimmed_author_window_and_linked_intersection_share_host_domain (test_blend_retime.OpacityRetimePlannerTests.test_trimmed_author_window_and_linked_intersection_share_host_domain) ... ERROR
+
+======================================================================
+ERROR: test_trim_and_split_preserve_saved_clock_phase (test_blend_retime.NativeOpacityIntegrationTests.test_trim_and_split_preserve_saved_clock_phase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\tests\test_blend_retime.py", line 251, in test_trim_and_split_preserve_saved_clock_phase
+    split,_=apply_operation(p,self.seq['id'],{'op':'split_clip','clip_id':'foreground','at_tick':1500})
+            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\src\ai_ad_editor\clip_windows.py", line 133, in apply_operation
+    fail('split_clip 的 at_tick 必须位于片段内部', 'at_tick')
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\src\ai_ad_editor\clip_windows.py", line 22, in fail
+    raise AppError(code, message, exit_code=2, path=path)
+ai_ad_editor.errors.AppError: split_clip 的 at_tick 必须位于片段内部
+
+======================================================================
+ERROR: test_trimmed_author_window_and_linked_intersection_share_host_domain (test_blend_retime.OpacityRetimePlannerTests.test_trimmed_author_window_and_linked_intersection_share_host_domain)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\tests\test_blend_retime.py", line 128, in test_trimmed_author_window_and_linked_intersection_share_host_domain
+    out,_=build_edit_plan(p,'seq',request())
+          ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\src\ai_ad_editor\edit_planner.py", line 429, in build_edit_plan
+    return build_retime_plan(project, sequence_id, request)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\src\ai_ad_editor\retime_edits.py", line 198, in build_retime_plan
+    candidate,step = _one(candidate,sequence_id,cid,query,main_selection=ids if main else set())
+                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\src\ai_ad_editor\retime_edits.py", line 147, in _one
+    wrapped, report = _wrap(draft,lane,clip,host,transform,cid=body_id,first=first,last=last)
+                      ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\src\ai_ad_editor\retime_edits.py", line 58, in _wrap
+    blend = retimed_blend(original, host, transform, draft.project['settings'])
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\src\ai_ad_editor\blend_automation.py", line 164, in retimed_blend
+    OpacityClock(animation, settings)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\src\ai_ad_editor\blend_automation.py", line 64, in __init__
+    fail('混合动画关键帧须递增且位于完整作者区间内')
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\src\ai_ad_editor\blend_automation.py", line 26, in fail
+    raise AppError('BLEND_AUTOMATION_INVALID', message, exit_code=2)
+ai_ad_editor.errors.AppError: 混合动画关键帧须递增且位于完整作者区间内
+
+======================================================================
+FAIL: test_schema_semantic_validation_and_external_loss_reporting (test_blend_retime.NativeOpacityIntegrationTests.test_schema_semantic_validation_and_external_loss_reporting)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\retime-blend-clock\product\tests\test_blend_retime.py", line 262, in test_schema_semantic_validation_and_external_loss_reporting
+    self.assertEqual(code,0,result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'convert.export', 'request_id': 'req_20261020080109_23a58fe2', 'operation_id': None, 'status': 'failed', 'data': {'output': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\retime-blend-clock\\product\\.runtime\\temp\\blend-integration-7gs30omp\\external.otio', 'report': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\retime-blend-clock\\product\\.runtime\\temp\\blend-integration-7gs30omp\\external.otio.conversion-report.json', 'report_data': {'report_version': '0.1.0', 'direction': 'export', 'source_format': 'agent-project/0.1.0', 'target_format': 'opentimelineio-json', 'created_at': '2026-10-20T08:01:09.835558Z', 'items': [{'capability': 'project-model', 'status': 'Mapped', 'source': 'Agent Project JSON', 'target': 'OpenTimelineIO JSON', 'detail': '使用标准 Stack/Track/Gap/Clip 节点；完整本地片段保存在 ai_ad_editor metadata'}, {'capability': 'timeline-editing', 'status': 'Unsupported', 'source': 'blend.opacity_animation', 'target': None, 'detail': '外部格式不执行本地命名音频路由、关联/同步锁/主轨跟随、真实源句柄转场或文件字幕时钟偏移；metadata 保存不代表外部编辑等效'}, {'capability': 'timeline-editing', 'status': 'Unsupported', 'source': 'clip.presentation_window', 'target': None, 'detail': '外部格式不执行本地命名音频路由、关联/同步锁/主轨跟随、真实源句柄转场或文件字幕时钟偏移；metadata 保存不代表外部编辑等效'}, {'capability': 'sequence-canvas', 'status': 'Unsupported', 'source': 'foreground_author_sequence', 'target': None, 'detail': '额外序列及其独立画布未导出；完整图请使用 agent-json 或 package'}, {'capability': 'media-reference', 'status': 'Failed', 'source': 'None', 'target': 'foreground', 'detail': '片段没有可导出的本地资产或受支持的文字生成器'}], 'warnings': [{'capability': 'timeline-editing', 'status': 'Unsupported', 'source': 'blend.opacity_animation', 'target': None, 'detail': '外部格式不执行本地命名音频路由、关联/同步锁/主轨跟随、真实源句柄转场或文件字幕时钟偏移；metadata 保存不代表外部编辑等效'}, {'capability': 'timeline-editing', 'status': 'Unsupported', 'source': 'clip.presentation_window', 'target': None, 'detail': '外部格式不执行本地命名音频路由、关联/同步锁/主轨跟随、真实源句柄转场或文件字幕时钟偏移；metadata 保存不代表外部编辑等效'}, {'capability': 'sequence-canvas', 'status': 'Unsupported', 'source': 'foreground_author_sequence', 'target': None, 'detail': '额外序列及其独立画布未导出；完整图请使用 agent-json 或 package'}], 'failures': [{'capability': 'media-reference', 'status': 'Failed', 'source': 'None', 'target': 'foreground', 'detail': '片段没有可导出的本地资产或受支持的文字生成器'}]}}, 'artifacts': [], 'warnings': [{'capability': 'timeline-editing', 'status': 'Unsupported', 'source': 'blend.opacity_animation', 'target': None, 'detail': '外部格式不执行本地命名音频路由、关联/同步锁/主轨跟随、真实源句柄转场或文件字幕时钟偏移；metadata 保存不代表外部编辑等效'}, {'capability': 'timeline-editing', 'status': 'Unsupported', 'source': 'clip.presentation_window', 'target': None, 'detail': '外部格式不执行本地命名音频路由、关联/同步锁/主轨跟随、真实源句柄转场或文件字幕时钟偏移；metadata 保存不代表外部编辑等效'}, {'capability': 'sequence-canvas', 'status': 'Unsupported', 'source': 'foreground_author_sequence', 'target': None, 'detail': '额外序列及其独立画布未导出；完整图请使用 agent-json 或 package'}], 'errors': [{'capability': 'media-reference', 'status': 'Failed', 'source': 'None', 'target': 'foreground', 'detail': '片段没有可导出的本地资产或受支持的文字生成器'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-20T08:01:09.839139Z', 'finished_at': '2026-10-20T08:01:09.839150Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 18 tests in 12.376s
+
+FAILED (failures=1, errors=2)

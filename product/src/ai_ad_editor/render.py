@@ -1285,7 +1285,7 @@ def _insert_audio_freeze(
         f"apad=whole_len={content_samples},atrim=end_sample={content_samples},asetpts=N/SR/TB[{base}]"
     )
     filters.append(
-        f"anullsrc=r={sample_rate}:cl=stereo,atrim=end_sample={hold_samples},asetpts=N/SR/TB[{silence}]"
+        f"anullsrc=r={sample_rate}:cl=stereo,atrim=end_sample={hold_samples},aformat=sample_fmts=fltp:sample_rates={sample_rate}:channel_layouts=stereo,asetpts=N/SR/TB[{silence}]"
     )
     if at_samples == 0:
         parts = [silence, base]
@@ -3154,6 +3154,7 @@ def _composite_visual_layers(
     final_specs: list[dict[str, Any]], base: str, filters: list[str], warnings: list[dict[str, Any]],
     *, width: int, height: int, fps_value: str, duration: float, tps: int,
     prefix: str = '', preserve_alpha: bool = False,
+    automation: EffectAutomation | None = None, automation_meta: list[dict[str, Any]] | None = None,
 ) -> str:
     """Source-over or blend positioned layers on a single canvas."""
     current = base
@@ -3161,6 +3162,18 @@ def _composite_visual_layers(
         target = f"{prefix}vo{pos}"
         blend = spec.get("blend") if isinstance(spec.get("blend"), dict) else {}
         blend_mode = str(blend.get("mode", "normal")).lower().replace("-", "_")
+        from .blend_automation import track_for as _blend_track
+        saved_animation = blend.get('opacity_animation') if _blend_track(spec) is None else None
+        native_opacity = None
+        if saved_animation is not None:
+            if automation is None:
+                raise AppError('BLEND_AUTOMATION_COMPILER_MISSING', '混合动画需要共享根图编译器', exit_code=6)
+            native_opacity, evidence = automation.bind_blend(saved_animation,
+                {'id': spec.get('clip_id'), 'timeline_start_tick': round(float(spec.get('start', 0))*tps),
+                 '_nested_keyframe_clock': spec.get('clock')},
+                float(spec.get('start', 0)), float(spec.get('start', 0))+float(spec.get('duration', 0)))
+            if automation_meta is not None:
+                automation_meta.append(evidence)
         if blend_mode in {"normal", "source_over", ""}:
             opacity = _clamp(blend.get("opacity", 1.0), 0.0, 1.0, 1.0)
             blend_opacity_expr = _keyframe_expr(
@@ -3168,7 +3181,10 @@ def _composite_visual_layers(
                 opacity, float(spec.get("start", 0.0)), tps, time_variable="T",
             )
             source_label = spec['label']
-            if blend_opacity_expr != "1.00000000":
+            if native_opacity is not None:
+                source_label = f"{prefix}normalopacity{pos}"
+                filters.append(f"[{spec['label']}]format=rgba,{','.join(native_opacity)}[{source_label}]")
+            elif blend_opacity_expr != "1.00000000":
                 source_label = f"{prefix}normalopacity{pos}"
                 alpha_expr = f"alpha(X,Y)*clip(({blend_opacity_expr}),0,1)"
                 filters.append(f"[{spec['label']}]format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)},format=rgba[{source_label}]")
@@ -3207,7 +3223,10 @@ def _composite_visual_layers(
                 isinstance(item, dict) and str(item.get("property", "")) in {"blend.opacity", "blend_opacity"}
                 for item in spec.get("keyframes", [])
             )
-            if dynamic_blend_opacity:
+            if native_opacity is not None:
+                filters.append(f"[{blend_layer}]format=rgba,{','.join(native_opacity)}[{blend_layer}o]")
+                blend_layer = f"{blend_layer}o"
+            elif dynamic_blend_opacity:
                 alpha_expr = f"alpha(X,Y)*clip(({blend_opacity_expr}),0,1)"
                 filters.append(f"[{blend_layer}]format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a={_expr_arg(alpha_expr)},format=rgba[{blend_layer}o]")
                 blend_layer = f"{blend_layer}o"
@@ -3350,7 +3369,8 @@ def _build_compositing_tree(
         base = prefix+'base'
         canvas(base, alpha=True, raster=source_canvas)
         composite = _composite_visual_layers(group_specs, base, filters, warnings, width=source_canvas['width'], height=source_canvas['height'],
-                                             fps_value=fps_value, duration=duration, tps=tps, prefix=prefix, preserve_alpha=True)
+                                             fps_value=fps_value, duration=duration, tps=tps, prefix=prefix, preserve_alpha=True,
+                                             automation=automation, automation_meta=input_meta)
         clip = group['clip']
         start = int(clip['timeline_start_tick'])/tps
         end = start+int(clip['duration_tick'])/tps
@@ -3421,7 +3441,8 @@ def _build_compositing_tree(
     root_specs.sort(key=lambda item: (int(item.get('track_order', 0)), float(item.get('start', 0.0)), int(item.get('layer_order', 0))))
     canvas('base', alpha=transparent_canvas)
     return _composite_visual_layers(root_specs, 'base', filters, warnings, width=width, height=height,
-                                    fps_value=fps_value, duration=duration, tps=tps, preserve_alpha=transparent_canvas)
+                                    fps_value=fps_value, duration=duration, tps=tps, preserve_alpha=transparent_canvas,
+                                    automation=automation, automation_meta=input_meta)
 
 
 def _audio_processing_filters(
@@ -4453,7 +4474,9 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         filters.append(f'[{audio_root}]aresample=48000,apad=whole_len={audio_target_samples},'
                        f'atrim=end_sample={audio_target_samples},asetpts=N/SR/TB[aout]')
     else:
-        filters.append(f'anullsrc=r=48000:cl=stereo,atrim=end_sample={audio_target_samples}[aout]')
+        # atempo on native u8 silence can round 128 to 127 (-256 in s16).
+        # Keep generated empty buses floating point before any ancestor tempo.
+        filters.append(f'anullsrc=r=48000:cl=stereo,atrim=end_sample={audio_target_samples},aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[aout]')
     if root_effect_runtime and _effect_runtime.targets:
         input_meta.append(_effect_runtime.summary())
     return inputs, ";".join(filters), input_meta, warnings

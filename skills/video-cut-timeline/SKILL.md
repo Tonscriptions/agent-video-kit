@@ -22,6 +22,17 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+For external blend-opacity retiming, read the
+[independent clock contract](../../docs/specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md)
+and [actual pixels, audio and transfer evidence](../../docs/validation/外部混合动画变速与静音修复实测_2026-10-20.md).
+Relative speed, curve, reverse and freeze keep original opacity points in
+`blend.opacity_animation`; maps run from the current complete output to the
+original author ticks. At most 4096 points, 16 maps and 1 MiB are allowed.
+Trims keep author phase. To replace the curve, author top-level `blend.opacity`
+or `blend_opacity` keys; the next retime starts a fresh model from those keys.
+Keep blending outside the child picture graph and apply original alpha once.
+Direct tracking/transition endpoint restrictions still apply.
+
 For reviewed text-box camera focus, follow the [OCR anchor contract](../../docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md).
 `ocr anchors --report <registered-report> --clip-id <id> --query <exact-text>
 --frame-index <source-index> --apply --dry-run` plans editable
@@ -69,8 +80,9 @@ Speed/curve/reverse/freeze runs after original windows, animation and buses.
 Main durations ripple; intersecting links share the complete host clock.
 Continuous unlinked BGM defaults to unchanged-speed ripple; explicit
 `sync_content: retime` warps its intersecting body. Review the editable child
-sequences and before/body/after spans. Animated external blend, tracking and
-direct transition endpoints reject. Root markers and bus points stay absolute.
+sequences and before/body/after spans. External blend animation uses the
+independent clock above; tracking and direct transition endpoints reject.
+Root markers and bus points stay absolute.
 Nested native audio preserves hold knots and merges adjacent equal tempos;
 its terminal source end differs from the legacy constant file path's head
 selection. Keep natural quality separate from the

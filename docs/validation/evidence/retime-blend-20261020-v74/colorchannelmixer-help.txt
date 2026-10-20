@@ -1,0 +1,37 @@
+Filter colorchannelmixer
+  Adjust colors by mixing color channels.
+    slice threading supported
+    Inputs:
+       #0: default (video)
+    Outputs:
+       #0: default (video)
+colorchannelmixer AVOptions:
+   rr                <double>     ..FV.....T. set the red gain for the red channel (from -2 to 2) (default 1)
+   rg                <double>     ..FV.....T. set the green gain for the red channel (from -2 to 2) (default 0)
+   rb                <double>     ..FV.....T. set the blue gain for the red channel (from -2 to 2) (default 0)
+   ra                <double>     ..FV.....T. set the alpha gain for the red channel (from -2 to 2) (default 0)
+   gr                <double>     ..FV.....T. set the red gain for the green channel (from -2 to 2) (default 0)
+   gg                <double>     ..FV.....T. set the green gain for the green channel (from -2 to 2) (default 1)
+   gb                <double>     ..FV.....T. set the blue gain for the green channel (from -2 to 2) (default 0)
+   ga                <double>     ..FV.....T. set the alpha gain for the green channel (from -2 to 2) (default 0)
+   br                <double>     ..FV.....T. set the red gain for the blue channel (from -2 to 2) (default 0)
+   bg                <double>     ..FV.....T. set the green gain for the blue channel (from -2 to 2) (default 0)
+   bb                <double>     ..FV.....T. set the blue gain for the blue channel (from -2 to 2) (default 1)
+   ba                <double>     ..FV.....T. set the alpha gain for the blue channel (from -2 to 2) (default 0)
+   ar                <double>     ..FV.....T. set the red gain for the alpha channel (from -2 to 2) (default 0)
+   ag                <double>     ..FV.....T. set the green gain for the alpha channel (from -2 to 2) (default 0)
+   ab                <double>     ..FV.....T. set the blue gain for the alpha channel (from -2 to 2) (default 0)
+   aa                <double>     ..FV.....T. set the alpha gain for the alpha channel (from -2 to 2) (default 1)
+   pc                <int>        ..FV.....T. set the preserve color mode (from 0 to 6) (default none)
+     none            0            ..FV.....T. disabled
+     lum             1            ..FV.....T. luminance
+     max             2            ..FV.....T. max
+     avg             3            ..FV.....T. average
+     sum             4            ..FV.....T. sum
+     nrm             5            ..FV.....T. norm
+     pwr             6            ..FV.....T. power
+   pa                <double>     ..FV.....T. set the preserve color amount (from 0 to 1) (default 0)
+
+This filter has support for timeline through the 'enable' option.
+
+Exiting with exit code 0

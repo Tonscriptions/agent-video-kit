@@ -5,6 +5,17 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+For retiming animated external blends, read the
+[blend-clock contract](../../docs/specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md)
+and [native/installed verification](../../docs/validation/外部混合动画变速与静音修复实测_2026-10-20.md).
+Existing `timeline edit` retime and compose `retime_clip` retain the external
+blend as editable `blend.opacity_animation`, outside the child picture graph.
+Keep its author points and relative maps through trims and transfers. New top
+level blend-opacity keys override the saved curve. Inspect actual alpha-only
+commands, recursive budgets, decoded pixels and background PCM. An isolated
+ancestor transforms rasterized child frames; it does not continuously resample
+the child's already rendered opacity. Full CapCut parity remains unaccepted.
+
 For local multi-frame inspection use `media contact-sheet` with a new project-local
 output directory and explicit anchors or bounded automatic sampling. Read the
 [contact-sheet contract](../../docs/specs/透明视频多帧联系表与实际时间锚点契约_v0.1_2026-10-20.md)
@@ -109,8 +120,9 @@ child sequences. Main clips ripple; linked intersections share the host clock.
 Background music defaults to unchanged-speed ripple, with explicit
 `sync_content: retime` for common retiming. Review all partial spans, absolute
 markers, root bus points and the dry-run hash. Existing absolute source setters
-retain their meaning. Animated blend and direct tracking/transition endpoints
-reject. Native tempo timing does not prove natural quality; see the
+retain their meaning. Direct tracking/transition endpoints reject. External
+blend animation uses the independent clock contract above. Native tempo timing
+does not prove natural quality; see the
 [actual outputs and failed references](../../docs/validation/完整作者输出变速与磁吸联动实测_2026-10-19.md).
 
 For persistent main-track magnet editing, read the

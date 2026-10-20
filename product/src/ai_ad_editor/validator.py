@@ -1045,6 +1045,12 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                         allowed_modes = {"normal", "source_over", "addition", "addition128", "and", "average", "burn", "darken", "difference", "divide", "dodge", "exclusion", "freeze", "glow", "hardlight", "hard_mix", "lighten", "multiply", "negation", "or", "phoenix", "pinlight", "reflect", "screen", "softlight", "subtract", "vivid", "xor"}
                         if mode not in allowed_modes:
                             error("BLEND_MODE_UNSUPPORTED", "blend.mode 不是本地 FFmpeg 支持的模式", f"{cp}.blend.mode")
+                        if 'opacity_animation' in blend:
+                            from .blend_automation import OpacityClock
+                            try:
+                                OpacityClock(blend['opacity_animation'], project['settings'])
+                            except AppError as exc:
+                                error(exc.code, exc.message, f'{cp}.blend.opacity_animation')
                         if "opacity" in blend:
                             try:
                                 opacity = float(blend["opacity"])

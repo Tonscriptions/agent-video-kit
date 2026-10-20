@@ -1,0 +1,54 @@
+{
+  "network": false,
+  "virtualization": false,
+  "new_model_inference": 0,
+  "generator_sha256": "sha256:8da7ef86ab2873b35e0579bee1182e256e921df2a2599655737a332766b2cc1e",
+  "ffmpeg_sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+  "cases": [
+    {
+      "name": "native-u8",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-f",
+        "lavfi",
+        "-i",
+        "anullsrc=r=48000:cl=stereo,atrim=duration=2,areverse,atempo=2,aformat=sample_fmts=fltp,apad=whole_len=48000,atrim=end_sample=48000",
+        "-f",
+        "s16le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "samples_per_channel": 48000,
+      "minimum": -256,
+      "maximum": -256,
+      "nonzero_samples": 96000,
+      "decoded_sha256": "sha256:5c6f3a19fa750daa3ec98b010b9c33a8383cf75bf05ccead7c5d04a636c923e6",
+      "stderr": ""
+    },
+    {
+      "name": "explicit-float",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-f",
+        "lavfi",
+        "-i",
+        "anullsrc=r=48000:cl=stereo,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo,atrim=duration=2,areverse,atempo=2,aformat=sample_fmts=fltp,apad=whole_len=48000,atrim=end_sample=48000",
+        "-f",
+        "s16le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "samples_per_channel": 48000,
+      "minimum": 0,
+      "maximum": 0,
+      "nonzero_samples": 0,
+      "decoded_sha256": "sha256:ea0787f65f73b0013d03b359490e3125211b28ad5c1502ffb1544c0ded4192f5",
+      "stderr": ""
+    }
+  ],
+  "baseline_offset_reproduced": true
+}

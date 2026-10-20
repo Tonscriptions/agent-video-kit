@@ -5,6 +5,16 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+For [retimed external blend animation](../../docs/specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md),
+read the [independent RGB, alpha, PCM and native installation checks](../../docs/validation/外部混合动画变速与静音修复实测_2026-10-20.md).
+Compare every displayed frame with independently mapped author parameters and
+source frame identities. Check alpha separately and compare the full background
+PCM when retiming a silent layer. Generated silence must reach tempo filters
+as floating point; native u8 silence can introduce a fixed offset. Isolated
+ancestor retimes use the already rasterized child frame order. Preserve all
+failed references and original thresholds. Static PNG inspection and synthetic
+arithmetic cannot accept continuous playback, listening or natural quality.
+
 For [LUT strength automation](../../docs/specs/LUT强度关键帧契约_v0.1_2026-10-20.md),
 read the [independent native pixel checks and failures](../../docs/validation/LUT强度关键帧与中性调色修复实测_2026-10-20.md).
 Check a non-gray neutral LUT at static strengths, every decoded frame against

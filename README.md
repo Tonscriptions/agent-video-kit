@@ -1,5 +1,32 @@
 # Agent Video Kit
 
+<!-- V74-CURRENT -->
+2026-10-20 **V74（外部混合动画变速限定验收）**：完整输出相对变速现在保留可编辑 `blend.opacity_animation`，支持恒速、既有有界速度曲线、倒放、定格、重复操作和输出窗口；混合仍在原背景上执行，alpha 只乘一次。修复默认 u8 静音进入 tempo 后的 −256 PCM 偏移。完整原生回归 **1667/1667、2517.215 秒、0 跳过、222 冻结输入＋8 外部夹具前后相同**；23 个新增方法是其子集。专项 **23/23、9.975 秒、0 跳过**；原生 **24 CLI/30 检查**，三组各 30 帧独立 RGB 对照最大误差 **0/1/1 个 8 位码值**，输出 alpha 和每组完整 144,000 帧立体声 PCM 精确。离线 **146 资源/7 wheels/27 隔离 CLI＋1 模块来源探针/11 安装检查**；开发/安装解码摘要、作者模型和每帧 PTS 一致。17 Skills / 286 本地引用，发现联接与正文已核对。保留测试输入、旧栅格参考、音频成片失败及中止的 full-r1；静看两张对照 PNG，未连续审片或听审。连续参数与隔离祖先已栅格化帧序有明确边界；HDR、线性光、自然素材、长片性能、全部剪映混合效果与完整等价均未验收。
+
+[契约](docs/specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md) · [实测与失败](docs/validation/外部混合动画变速与静音修复实测_2026-10-20.md) · [当前完整回归](docs/validation/evidence/retime-blend-20261020-v74/full-r2.json)
+
+| 编号 | 本轮功能核验/真实执行（2026-10-20） | 结果与边界 | 证据 |
+|---|---|---|---|
+| V74-01 | 旧程序基线 | 2e3fa5ff 的有效混合曲线相对变速确实被拒；220 已发行输入前后不变 | [记录](docs/validation/evidence/retime-blend-20261020-v74/baseline-r1.json) |
+| V74-02 | 作者模型与原生参数 | 23/23；六类插值、分数帧率、重复映射、窗口、关联、预算、缓存、事务、迁移 | [记录](docs/validation/evidence/retime-blend-20261020-v74/targeted-r7.json) |
+| V74-03 | 正常叠加 + 2x | 30 帧；全像素独立 RGB 最大差 0；alpha/完整背景 PCM 一致 | [记录](docs/validation/evidence/retime-blend-20261020-v74/native-r3/verification.json) |
+| V74-04 | 滤色 + 2x 倒放 + 定格 | 30 帧；全像素 RGB 最大差 1；定格前后作者参数、alpha/PCM 一致 | [记录](docs/validation/evidence/retime-blend-20261020-v74/native-r3/verification.json) |
+| V74-05 | 正片叠底 + 1→3 曲线速度 | 30 帧；独立积分逆函数和混合算术最大差 1；alpha/PCM 一致 | [记录](docs/validation/evidence/retime-blend-20261020-v74/native-r3/verification.json) |
+| V74-06 | 静音偏移修复 | 本机 FFmpeg 默认 u8 静音 96,000 样本非零，显式浮点后全部为零；保留修复前成片 | [记录](docs/validation/evidence/retime-blend-20261020-v74/silent-audio-baseline-r2.json) |
+| V74-07 | 离线安装真实 CLI | 146 资源逐字节相同，7 wheels；27 隔离 CLI＋1 来源探针；三组解码/PTS 与开发相同 | [记录](docs/validation/evidence/retime-blend-20261020-v74/installed-r2/verification.json) |
+| V74-08 | 完整回归 | 1667/1667；2517.215 秒；0 跳过；222 输入＋8 夹具 | [记录](docs/validation/evidence/retime-blend-20261020-v74/full-r2.json) |
+| V74-09 | 声音与视觉审查边界 | 全量 PCM 与编码 PTS 自动检查；仅静看两张 PNG，未连续播放/听审/自然质量验收 | [记录](docs/validation/evidence/retime-blend-20261020-v74/static-review-r1.json) |
+| V74-10 | 工程互换与 Skill | 原生包/片段保留可编辑模型；OTIO/MLT 标为 Unsupported；17 Skills / 286 本地引用，发现联接与正文已核对。 | [记录](docs/validation/evidence/retime-blend-20261020-v74/targeted-r7.json) |
+
+[原始前景 MP4](docs/assets/retime-blend-20261020-v74-native-r3/source-preview.mp4) · [原 RGBA 视频](docs/assets/retime-blend-20261020-v74-native-r3/foreground-original.nut) · [原 PCM](docs/assets/retime-blend-20261020-v74-native-r3/audio-original.wav) · [倒放定格成片](docs/assets/retime-blend-20261020-v74-native-r3/screen-reverse-hold.mp4) · [安装后成片](docs/assets/retime-blend-20261020-v74-installed-r2/screen-reverse-hold.mp4) · [CC0 来源](docs/assets/retime-blend-20261020-v74-LICENSE.txt)
+
+![正常叠加变速的原始前景与实际合成](docs/assets/retime-blend-20261020-v74-native-r3/normal-fast.gif)
+
+![倒放加定格的滤色原生输出](docs/assets/retime-blend-20261020-v74-native-r3/screen-reverse-hold.gif)
+
+![正片叠底曲线速度的原生输出](docs/assets/retime-blend-20261020-v74-native-r3/multiply-curve.gif)
+<!-- /V74-CURRENT -->
+
 <!-- V73-CURRENT -->
 2026-10-20 **V73（LUT 强度关键帧限定验收）**：catalog **0.6.0** 新增 `lut3d.intensity`，共 6 类/20 个数值通道；四别名、六种插值、作者时钟及共享预算。修复中性 CUBE 静态半强度红蓝索引、常速祖先效果时钟、区间调节层输入分流及项目包 LUT 依赖。完整原生回归 **1644/1644、4143.088 秒、0 跳过、220 冻结输入＋8 外部夹具前后相同**；30 个新方法为其子集。专项 **30/30、16.595 秒、0 跳过**；原生 **8 CLI/9 检查**，24 帧逐帧独立 RGB 对照最大误差 1/255、alpha 全字节一致。**145 资源/7 wheels/11 隔离 CLI＋1 模块来源/12 安装检查**，开发/安装完整解码摘要与每帧 PTS 相同。**17 Skills/278 本地引用**。另各 **7 CLI/2 组解析时钟核验**，线性速度曲线 22 帧、外套 2x 倒放 11 帧，与独立积分逆函数的 RGB 误差≤1；不并入方法数。保留所有旧专项与演示失败；静看对照 PNG，未连续审片或听审。8-bit 编码 RGB 混合；HDR、线性光、全部厂商 LUT 方言、自然调色质量和完整剪映等价未验收。 [契约、实际输入输出与失败记录](docs/validation/LUT强度关键帧与中性调色修复实测_2026-10-20.md)。
 

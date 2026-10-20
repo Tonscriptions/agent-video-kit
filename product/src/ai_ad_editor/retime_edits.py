@@ -9,6 +9,7 @@ from .edit_planner import (_error, _identifier, _plan_changes, _rides, _host,
 from .range_edits import RangeDraft, start, end
 from .retime_transform import Transform
 from .sequence_canvas import sequence_canvas
+from .blend_automation import retimed_blend
 
 ENGINE = 'agent-complete-output-retime-v1'
 MAX_CLIPS = 20000
@@ -48,14 +49,13 @@ def _guard(draft, track, clip):
     if any(isinstance(clip.get(key), dict) and clip[key].get('type') not in FADES
            for key in ('transition_in','transition_out')):
         _error('EDIT_RETIME_TRANSITION_UNSUPPORTED', '完整输出变速需先移除旧跨片段转场或选择其完整上级组')
-    if any(k.get('property') in ('blend.opacity','blend_opacity') for k in clip.get('keyframes', [])):
-        _error('EDIT_RETIME_BLEND_CLOCK_UNSUPPORTED', '外部 blend-opacity 动画需要独立的合成时钟；未线性化或丢弃')
 
 
 def _wrap(draft, track, clip, host, transform, *, cid, first, last):
     """Complete the original clip before sharing the host's output clock."""
     _guard(draft, track, clip)
     original = copy.deepcopy(clip)
+    blend = retimed_blend(original, host, transform, draft.project['settings'])
     original.pop('blend', None)
     original.pop('link_id', None)
     inner_id = draft.fresh(cid+'_author')
@@ -70,9 +70,11 @@ def _wrap(draft, track, clip, host, transform, *, cid, first, last):
     parent = {'id':cid,'sequence_id':sid,'timeline_start_tick':start(host),
               'duration_tick':transform.output,'source_in_tick':start(host),'source_out_tick':end(host),
               **copy.deepcopy(transform.value)}
-    for key in ('link_id','rights_dependencies','blend'):
+    for key in ('link_id','rights_dependencies'):
         if key in clip:
             parent[key] = copy.deepcopy(clip[key])
+    if blend is not None:
+        parent['blend'] = blend
     audio = clip.get('audio', {})
     role = {k:copy.deepcopy(v) for k,v in audio.items() if k in ('role','ducking','duck_under_voice')}
     if role:
@@ -85,7 +87,7 @@ def _wrap(draft, track, clip, host, transform, *, cid, first, last):
     return parent, {'original_clip_id':clip['id'],'clip_id':cid,'sequence_id':sid,'author_clip_id':inner_id,
                     'original_range_tick':[first,last], 'output_range_tick':[start(parent),end(parent)],
                     'host_original_range_tick':[start(host),end(host)],'source_author_preserved':True,
-                    'external_blend_retained':copy.deepcopy(clip.get('blend'))}
+                    'external_blend_retained':copy.deepcopy(blend)}
 
 
 def _one(project, sequence_id, cid, query, *, main_selection):
@@ -203,5 +205,5 @@ def build_retime_plan(project, sequence_id, request):
         'steps':steps,'changes':_plan_changes(sequence,target),
         'created_sequences':[copy.deepcopy(s) for s in candidate['sequences'] if s['id'] not in {q['id'] for q in project['sequences']}],
         'warnings':[],'limits':['relative-complete-visible-output-not-absolute-source-speed',
-            'markers-and-root-automation-retain-absolute-clock','animated-external-blend-clock-not-yet-supported',
+            'markers-and-root-automation-retain-absolute-clock','continuous-author-blend-parameters-at-display-CFR',
             'existing-tracking-transition-and-nonlinear-lane-boundaries-retained']}

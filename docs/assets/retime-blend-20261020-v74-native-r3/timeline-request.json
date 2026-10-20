@@ -1,0 +1,61 @@
+{
+  "operations": [
+    {
+      "op": "add_track",
+      "track_id": "blend-layer",
+      "kind": "video",
+      "order": 10
+    },
+    {
+      "op": "append_clip",
+      "id": "background-clip",
+      "asset_id": "background",
+      "track_id": "track_video_1",
+      "timeline_start_tick": 0,
+      "duration_tick": 270000,
+      "source_in_tick": 0,
+      "source_out_tick": 270000
+    },
+    {
+      "op": "append_clip",
+      "id": "foreground-clip",
+      "asset_id": "foreground",
+      "track_id": "blend-layer",
+      "timeline_start_tick": 45000,
+      "duration_tick": 180000,
+      "source_in_tick": 0,
+      "source_out_tick": 180000,
+      "blend": {
+        "mode": "normal",
+        "opacity": 0.25
+      },
+      "keyframes": [
+        {
+          "property": "blend.opacity",
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "value": 0.1,
+              "interpolation": "linear"
+            },
+            {
+              "at_tick": 180000,
+              "value": 0.9,
+              "interpolation": "linear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "op": "append_clip",
+      "id": "audio-clip",
+      "asset_id": "sound",
+      "track_id": "track_audio_1",
+      "timeline_start_tick": 0,
+      "duration_tick": 270000,
+      "source_in_tick": 0,
+      "source_out_tick": 270000
+    }
+  ]
+}

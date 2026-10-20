@@ -1561,7 +1561,12 @@
           }
         },
         "blend": {
-          "type": "object"
+          "type": "object",
+          "properties": {
+            "opacity_animation": {
+              "$ref": "#/$defs/blendOpacityAnimation"
+            }
+          }
         },
         "mask": {
           "$ref": "#/$defs/mask"
@@ -2233,6 +2238,297 @@
         },
         "composite_domain": {
           "const": "premultiplied_encoded_srgb_8bit"
+        }
+      }
+    },
+    "blendOpacityAnimation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "author_duration_tick",
+        "keyframes",
+        "clock_maps"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "const": 1
+        },
+        "author_duration_tick": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "keyframes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "at_tick",
+              "value"
+            ],
+            "properties": {
+              "at_tick": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "interpolation": {
+                "enum": [
+                  "hold",
+                  "linear",
+                  "ease_in",
+                  "ease_out",
+                  "ease_in_out",
+                  "bezier"
+                ]
+              },
+              "control_points": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "oneOf": [
+                  {
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  {
+                    "minItems": 4,
+                    "maxItems": 4
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "clock_maps": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "input_duration_tick",
+              "transform",
+              "offset_tick"
+            ],
+            "properties": {
+              "input_duration_tick": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "transform": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                  "speed": {
+                    "type": "number",
+                    "minimum": 0.01
+                  },
+                  "reverse": {
+                    "type": "boolean"
+                  },
+                  "speed_curve": {
+                    "oneOf": [
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "at_tick",
+                            "speed"
+                          ],
+                          "properties": {
+                            "at_tick": {
+                              "$ref": "#/$defs/nonNegativeInteger"
+                            },
+                            "speed": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "interpolation": {
+                              "type": "string",
+                              "enum": [
+                                "hold",
+                                "linear",
+                                "ease_in",
+                                "ease_out",
+                                "ease_in_out",
+                                "bezier"
+                              ]
+                            },
+                            "control_points": {
+                              "oneOf": [
+                                {
+                                  "type": "array",
+                                  "minItems": 2,
+                                  "maxItems": 2,
+                                  "items": {
+                                    "type": "number"
+                                  }
+                                },
+                                {
+                                  "type": "array",
+                                  "minItems": 4,
+                                  "maxItems": 4,
+                                  "items": {
+                                    "type": "number"
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          "allOf": [
+                            {
+                              "if": {
+                                "required": [
+                                  "interpolation"
+                                ],
+                                "properties": {
+                                  "interpolation": {
+                                    "const": "bezier"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "required": [
+                                  "control_points"
+                                ]
+                              }
+                            }
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "keyframes"
+                        ],
+                        "properties": {
+                          "keyframes": {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "at_tick",
+                                "speed"
+                              ],
+                              "properties": {
+                                "at_tick": {
+                                  "$ref": "#/$defs/nonNegativeInteger"
+                                },
+                                "speed": {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                "interpolation": {
+                                  "type": "string",
+                                  "enum": [
+                                    "hold",
+                                    "linear",
+                                    "ease_in",
+                                    "ease_out",
+                                    "ease_in_out",
+                                    "bezier"
+                                  ]
+                                },
+                                "control_points": {
+                                  "oneOf": [
+                                    {
+                                      "type": "array",
+                                      "minItems": 2,
+                                      "maxItems": 2,
+                                      "items": {
+                                        "type": "number"
+                                      }
+                                    },
+                                    {
+                                      "type": "array",
+                                      "minItems": 4,
+                                      "maxItems": 4,
+                                      "items": {
+                                        "type": "number"
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "allOf": [
+                                {
+                                  "if": {
+                                    "required": [
+                                      "interpolation"
+                                    ],
+                                    "properties": {
+                                      "interpolation": {
+                                        "const": "bezier"
+                                      }
+                                    }
+                                  },
+                                  "then": {
+                                    "required": [
+                                      "control_points"
+                                    ]
+                                  }
+                                }
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "freeze": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "duration_tick"
+                    ],
+                    "properties": {
+                      "at_tick": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "duration_tick": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "audio_mode": {
+                        "enum": [
+                          "silence",
+                          "continue"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "offset_tick": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            }
+          }
         }
       }
     }

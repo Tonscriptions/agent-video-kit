@@ -175,9 +175,9 @@ class CompleteOutputRetimeTests(unittest.TestCase):
         p=state();root(p)['source_transitions']=[{'id':'cut','from_clip_id':'a','to_clip_id':'b'}]
         self.rejects(p,request(),'EDIT_RANGE_TRANSITION_UNSUPPORTED')
 
-    def test_animated_external_blend_and_old_cross_transition_reject(self):
+    def test_malformed_external_blend_and_old_cross_transition_reject(self):
         p=state();at(p,'b')['keyframes']=[{'property':'blend.opacity','keyframes':[]}]
-        self.rejects(p,request(),'EDIT_RETIME_BLEND_CLOCK_UNSUPPORTED')
+        self.rejects(p,request(),'BLEND_AUTOMATION_INVALID')
         p=state();at(p,'b')['transition_in']={'type':'slideleft'}
         self.rejects(p,request(),'EDIT_RETIME_TRANSITION_UNSUPPORTED')
 

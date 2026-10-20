@@ -190,14 +190,34 @@ class EffectAutomation:
         specs = SPECS[name]
         names = {alias: prop for prop, spec in specs.items() for alias in spec[0]}
         tracks = {names[track['property']]: track for track in normalized_tracks(effect)}
+        return self._bind(effect, name, BACKENDS[name], specs, tracks, static_filter,
+                          clip, start, end, resource_context=resource_context)
+
+    def bind_blend(self, animation, clip, start, end):
+        from .blend_automation import OpacityCurve
+        curve = OpacityCurve(animation, clip, start, self.tps, self.rate)
+        tracks = {'opacity': {'property': 'opacity', 'keyframes': animation['keyframes']}}
+        effect = {'type': 'layer-blend-opacity', 'animation': animation}
+        generated, metadata = self._bind(effect, 'layer-blend-opacity', 'colorchannelmixer',
+            {'opacity': (('opacity',), 1., 0., 1., ('aa',))}, tracks,
+            'colorchannelmixer=aa=1', clip, start, end,
+            curves={'opacity': curve}, state_cost=1+len(animation['clock_maps']),
+            resource_context={'kind': 'external-layer-opacity-v1', 'animation': animation})
+        metadata.update(kind='blend-opacity-automation',
+                        clock_stages=len(animation['clock_maps']),
+                        parameter_clock='continuous-author-parameters-at-display-CFR',
+                        alpha_operation='multiply-original-coverage-once')
+        return generated, metadata
+
+    def _bind(self, effect, name, backend, specs, tracks, static_filter, clip, start, end,
+              *, resource_context=None, curves=None, state_cost=1):
         first = max(0, math.ceil(start*float(self.rate)-1e-9))
         stop = max(first, math.ceil(end*float(self.rate)-1e-9))
-        samples = max(1, stop-first)*len(tracks)
+        samples = max(1, stop-first)*len(tracks)*state_cost
         if self.samples+samples > MAX_SAMPLES or self.targets >= MAX_TARGETS:
             raise AppError('EFFECT_AUTOMATION_BUDGET', '动态效果超出根渲染图状态采样或实例配额', exit_code=2)
         executable = Path(ffmpeg_path()).resolve()
         fingerprint = file_fingerprint(executable)
-        backend = BACKENDS[name]
         if not static_filter.startswith(backend+'='):
             raise AppError('EFFECT_AUTOMATION_FILTER_INVALID', '动态滤镜必须来自对应的本地固定映射', exit_code=6)
         required = {option for prop in tracks for option in specs[prop][4]}
@@ -210,7 +230,7 @@ class EffectAutomation:
             identity['resource_context'] = resource_context
         token = hashlib.sha256(json.dumps(identity, sort_keys=True, ensure_ascii=False).encode('utf-8')).hexdigest()[:16]
         target = f'avk_ea_{self.targets}_{token}'
-        curves = {prop: Curve(track, clip, start, self.tps) for prop, track in tracks.items()}
+        curves = curves if curves is not None else {prop: Curve(track, clip, start, self.tps) for prop, track in tracks.items()}
         lines, previous, clamps = [], {}, 0
         command_count = 0
         for offset, frame in enumerate(range(first, max(first+1, stop))):

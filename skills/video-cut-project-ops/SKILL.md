@@ -5,6 +5,16 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+For projects with retimed external blending, read the
+[editable blend-clock contract](../../docs/specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md)
+and [package, fragment and installed checks](../../docs/validation/外部混合动画变速与静音修复实测_2026-10-20.md).
+Native JSON, packages and clip groups retain `blend.opacity_animation` as
+self-contained author data. It contains no temporary sequence references or
+compiled command paths. Rebuild command caches on the target and compare
+decoded output. OTIO/MLT report this clock as Unsupported; retained metadata
+does not make an external editor execute it. Keep original rights and
+transaction boundaries when applying retime or replacing top-level keys.
+
 For portable animated looks, read the
 [LUT contract](../../docs/specs/LUT强度关键帧契约_v0.1_2026-10-20.md)
 and [package/fragment/replay evidence](../../docs/validation/LUT强度关键帧与中性调色修复实测_2026-10-20.md).

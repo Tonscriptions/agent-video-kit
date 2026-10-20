@@ -175,6 +175,9 @@ def _content(clip):
 def interchange_features(project):
     """Native authoring semantics that external formats do not implement."""
     features = []
+    if any(isinstance(c.get('blend'), dict) and 'opacity_animation' in c['blend']
+           for s in project['sequences'] for t in s['tracks'] for c in t['clips']):
+        features.append('blend.opacity_animation')
     if any(c.get('presentation_window') is not None for s in project['sequences'] for t in s['tracks'] for c in t['clips']):
         features.append('clip.presentation_window')
     if any(s.get('source_transitions') for s in project['sequences']):
