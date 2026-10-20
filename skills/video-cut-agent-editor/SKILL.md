@@ -5,6 +5,17 @@ description: "Drive the local Agent-first advertising video editor CLI for proje
 
 # Video Cut Agent Editor
 
+<!-- V76-HSL -->
+For eight-band selective HSL, read the
+[HSL author contract](../../docs/specs/八色分区HSL与关键帧契约_v0.1_2026-10-20.md)
+and [native/installed evidence and CPU limits](../../docs/validation/八色分区HSL与离线发行实测_2026-10-20.md).
+Use catalog 0.8.0 `selective_hsl` for 24 band controls plus final intensity.
+Its 25 expression channels are discovered separately from the existing 34
+native-command channels. Selection uses original hue, preserves gray and
+input alpha, and operates on encoded 8-bit RGB. Native geq is very slow at
+1080p in the retained single-thread probe; do not promise real-time previews.
+<!-- /V76-HSL -->
+
 For animated blur, lens distortion, RGB color keying and color contrast, read the
 [spatial/keying contract](../../docs/specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md)
 and [native/installed pixel verification](../../docs/validation/空间滤镜与抠像关键帧实测_2026-10-20.md).

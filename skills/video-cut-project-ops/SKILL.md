@@ -5,6 +5,17 @@ description: Operate local Agent Projects with snapshots, migration, relinking, 
 
 # Project Operations
 
+<!-- V76-HSL -->
+For projects with selective HSL, read the
+[editable eight-band HSL contract](../../docs/specs/八色分区HSL与关键帧契约_v0.1_2026-10-20.md)
+and [package and isolated installation checks](../../docs/validation/八色分区HSL与离线发行实测_2026-10-20.md).
+Transfer original parameters and author tracks, then rebuild derived geq
+expressions in the destination. Discover `effects.selective_hsl` and catalog
+0.8.0; its 25 expression channels are distinct from native command targets.
+Verify source/wheel/installed bytes and actual alpha, PCM and PTS. Preserved
+kernel metadata is evidence, not portable author state or real-time support.
+<!-- /V76-HSL -->
+
 For projects with animated spatial/keying effects, read the
 [editable effect contract](../../docs/specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md)
 and [package, clip-group and isolated installation checks](../../docs/validation/空间滤镜与抠像关键帧实测_2026-10-20.md).

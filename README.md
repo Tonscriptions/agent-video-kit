@@ -1,5 +1,44 @@
 # Agent Video Kit
 
+<!-- V76-CURRENT -->
+2026-10-20 **V76（八色分区 HSL 限定功能验收）**：catalog **0.8.0／46 项**；新增八色各 H/S/L＋最终 RGB 强度 **25 个表达式通道**，原生命令仍为 **10 类／34 通道**。按原始色相相邻权重同时分区，灰阶与输入 Alpha 保留；作者时钟、六插值、拆分／反转、区间、工程包／片段重建均核验。修复片段／区间效果超大整数校验，静态中性／零强度旁路不消耗执行配额。完整原生回归 **1725/1725、2092.459 秒、0 跳过、225 冻结输入＋8 外部夹具前后相同**；29 新方法为全量子集。专项 **29/29、17.722 秒、0 跳过**。开发 **24 CLI／50 检查**，四组各 24 帧，独立 colorsys＋source-over 参照的 RGB 最大差均 **1/255**，输出 Alpha、每组完整 **96,000 帧立体声 PCM** 和每帧 PTS 分别检查。离线 **147 资源／7 wheels／27 隔离 CLI＋1 模块来源探针／12 安装检查**，开发／安装全部解码摘要、参数／内核元数据和 PTS 一致；17 Skills／302 本地引用，发行联接与正文均核对。**1080p 单滤镜线程、各 3 帧探针：单色区／八色约 21.040／26.856 秒/帧，未达 30fps；性能仍是明确缺口。**保留首轮 1 failure／2 errors 和参照修正；仅静看最终两张 PNG，未连续审片／听审。本轮为 8 位编码 RGB 算法验收；自然质量、实时预览、线性光／HDR及完整剪映等价未验收。
+
+[契约](docs/specs/八色分区HSL与关键帧契约_v0.1_2026-10-20.md) · [实测与失败](docs/validation/八色分区HSL与离线发行实测_2026-10-20.md) · [当前回归](docs/validation/evidence/selective-hsl-20261020-v76/full-r1.json)
+
+| 编号 | 功能性核验／实测 | 实际结果 | 证据 |
+|---|---|---|---|
+| V76-01 | 旧版本缺口 | ea232b9 未发现八色效果、没有生成滤镜；六帧解码与输入相同，223 旧输入不变 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/baseline-r1.json) |
+| V76-02 | 25 通道与作者时钟 | 29/29；正负值、六插值、灰阶、Alpha、线程、实例、共享预算、旁路、包／片段、拆分／反转／区间 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/targeted-r4.json) |
+| V76-03 | 红橙色相 | 24 帧动画；独立全 RGB 最大差 1；Alpha／完整 PCM／PTS 分别检查 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/native-r2/verification.json) |
+| V76-04 | 蓝色饱和度 | 24 帧；蓝色去饱和＋静态青色明度；RGB 最大差 1，灰阶中性 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/native-r2/verification.json) |
+| V76-05 | 洋红明度 | 24 帧；明度动画＋静态紫色色相；RGB 最大差 1 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/native-r2/verification.json) |
+| V76-06 | 八色强度动画 | 24 帧；最终编码 RGB 强度混合；RGB 最大差 1，工程包解码逐字节重建 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/native-r2/verification.json) |
+| V76-07 | 原生离线安装 | 147 资源逐字节一致、7 wheels；27 隔离 CLI＋1 来源探针／12 检查，四组解码相同 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/installed-r1/verification.json) |
+| V76-08 | 完整回归 | 1725/1725；2092.459 秒；0 跳过；225 输入＋8 夹具 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/full-r1.json) |
+| V76-09 | 静态审查范围 | 查看开发／安装 PNG；未连续播放、听审或验收自然素材 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/static-review-r1.json) |
+| V76-10 | 首轮失败与参照修正 | 24 方法含 1 failure／2 errors；真实整数溢出修复，发现读取路径和 ease_in_out 参照修正 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/targeted-r1.log) |
+| V76-11 | 中间检查边界 | 26 方法阶段的区间测试覆盖不足已纠正；最终 29 方法直接要求实际区间结构化错误 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/targeted-r2.json) |
+| V76-12 | 1080p 性能缺口 | 单线程单色区／八色 21.040／26.856 秒/帧；3 帧、各一次、含启动且并发回归，不能实时预览 | [记录](docs/validation/evidence/selective-hsl-20261020-v76/performance-r1.json) |
+
+原输入是自制 CC0 静态色带／透明区域和双声道正弦，**不是自然实拍视频**。[前景 PNG](docs/assets/selective-hsl-20261020-v76-native-r2/foreground-original.png) · [棋盘 PNG](docs/assets/selective-hsl-20261020-v76-native-r2/background-original.png) · [双声道 WAV](docs/assets/selective-hsl-20261020-v76-native-r2/audio-original.wav) · [静态输入视频预览](docs/assets/selective-hsl-20261020-v76-native-r2/source-preview.mp4)。
+
+[红橙色相 MP4](docs/assets/selective-hsl-20261020-v76-native-r2/red-orange.mp4) · [FFV1／PCM 精确参照](docs/assets/selective-hsl-20261020-v76-native-r2/red-orange-lossless.mkv)
+
+![红橙色相（真实 CLI 成片 GIF，有损预览）](docs/assets/selective-hsl-20261020-v76-native-r2/red-orange.gif)
+
+[蓝色饱和度 MP4](docs/assets/selective-hsl-20261020-v76-native-r2/blue-saturation.mp4) · [FFV1／PCM 精确参照](docs/assets/selective-hsl-20261020-v76-native-r2/blue-saturation-lossless.mkv)
+
+![蓝色饱和度（真实 CLI 成片 GIF，有损预览）](docs/assets/selective-hsl-20261020-v76-native-r2/blue-saturation.gif)
+
+[洋红明度 MP4](docs/assets/selective-hsl-20261020-v76-native-r2/magenta-lightness.mp4) · [FFV1／PCM 精确参照](docs/assets/selective-hsl-20261020-v76-native-r2/magenta-lightness-lossless.mkv)
+
+![洋红明度（真实 CLI 成片 GIF，有损预览）](docs/assets/selective-hsl-20261020-v76-native-r2/magenta-lightness.gif)
+
+[八色强度 MP4](docs/assets/selective-hsl-20261020-v76-native-r2/grade-intensity.mp4) · [FFV1／PCM 精确参照](docs/assets/selective-hsl-20261020-v76-native-r2/grade-intensity-lossless.mkv)
+
+![八色强度（真实 CLI 成片 GIF，有损预览）](docs/assets/selective-hsl-20261020-v76-native-r2/grade-intensity.gif)
+<!-- /V76-CURRENT -->
+
 <!-- V75-CURRENT -->
 2026-10-20 **V75（空间／抠像效果关键帧限定验收）**：catalog **0.7.0**，45 项效果不增计；新增高斯模糊、颜色对比、镜头畸变、RGB 抠像 **4 类／14 数值通道**，累计 **10 类／34 原生命令通道**。支持作者时钟、六插值、窗口／拆分、完整输出反转、工程包／片段跨项目重建和递归预算。修复超大整数校验异常、静态及动态抠像覆盖原有 Alpha、颜色对比目录默认值；模糊零半径为精确中性。完整原生回归 **1696/1696、2120.997 秒、0 跳过、223 冻结输入＋8 外部夹具前后相同**；29 新方法为全量子集。专项 **29/29、16.696 秒、0 跳过**。开发 **24 CLI／36 检查**，四组各 24 帧，独立静态原生选项＋source-over 参照的全 RGB 最大差均 **0**，输出 Alpha 与每组完整 **96,000 帧立体声 PCM** 精确。离线 **146 资源／7 wheels／27 隔离 CLI＋1 模块来源探针／12 安装检查**，开发／安装全部解码摘要、作者参数、抠像覆盖元数据及每帧 PTS 一致；17 Skills／294 本地引用，发行联接与正文均核对。保留全部失败和已停止的 full-r1；只静看最终开发／安装两张联系图，未连续审片或听审。gblur 会处理 Alpha，colorkey 的 RGB 距离覆盖乘以该阶段输入 Alpha，镜头采用原生采样；自然绿幕／去溢色、线性光／HDR、长片性能和完整剪映等价未验收。
 
@@ -963,7 +1002,7 @@ python -m ai_ad_editor subtitle align --project <项目> --asset-id speech --ada
 
 原有自动字幕入口继续提供 `subtitle transcribe`：可选择显式本地 Transformers 模型目录或 FFmpeg `whisper.cpp` 模型文件，生成项目内 SRT；使用 `--apply` 时会在源素材已有 Rights Ledger 记录的前提下登记派生字幕资产、创建独立字幕轨道片段、快照、校验和操作记录。模型不会自动下载，FFmpeg Whisper 只有在本机构建暴露 `whisper` 滤镜时才运行，具体边界见 [`docs/specs/本地AI适配器与字幕流水线规范_v0.1_2026-10-13.md`](docs/specs/本地AI适配器与字幕流水线规范_v0.1_2026-10-13.md)。
 
-当前渲染器覆盖多轨时间线、裁切/滑移/涟漪编辑、静态和 cubic Bezier 关键帧、12 项本地关键帧运镜预设（`motion list/inspect/apply`，含别名和参数边界）、本地模板或已登记视觉 runner 对象跟踪（v1 单目标与 v2 多目标 `object_id` 选择）、目标画幅的 `media reframe` 动态裁切、将选定跟踪结果绑定到独立文字/贴纸/效果片段的 `media track-bind`、`media smart-cut` 静音与字幕短语裁切计划、`media beat-cut` 本地能量节拍卡点混剪计划、`media multicam` 本地多机位音频偏移估计与固定/显式机位切换计划、`audio extract` 本地第一条音频流无损 WAV 派生资产与 audio 轨道应用、`audio separate` 本地 mid/side center/side stem 派生与选定 stem 轨道应用、`media stabilize` 基于本地 `vidstabdetect`/`vidstabtransform` 的两遍防抖派生资产、倒放与反向速度曲线段反射、任意位置视频定格、默认同点音频静音插入、常用 FFmpeg xfade 转场（含连续片段的显式 `auto_handle`）、独立文字轨道与视频轨道按 `track.order` 统一层级排序、图层锚点定位、文字片段的缩放/旋转/透明度关键帧、遮罩、混合、fade/dissolve 透明层转场和 slide/wipe 空间转场、纯文字画布与本地透明层旋转、字幕动画与高级 drawtext 样式、字体 advance width 换行和源文本逐字时间匹配、固定点数路径/多边形遮罩、line/cubic 曲线控制点关键帧、动态 feather、blend、动态 crop、序列级全局和局部区间调节层、项目内 LUT3D（`.cube/.3dl/.csp/.dat`）及可审计的 `lut register/list/inspect` 资产库、`.cube` 静态 `intensity` identity 混合缓存、效果参数逐帧关键帧、通过 `effects list/inspect` 可发现的 45 项本地 FFmpeg 效果目录（含 HSL、RGB 曲线、三向色轮、曝光、色阶、曲线、降噪、时域混合、镜头校正、框线、去闪烁和本地 `minterpolate` 光流补帧）、音频轨道的 mute/solo/volume/pan/role 控制、片段音量/声像自动化、降噪/压缩/均衡/响度/旁白闪避、多画布输出、10-bit 像素格式、WebM `yuva420p` 透明画布、显式本地 HDR tone map、FFmpeg 内置 flite ASCII/英文离线 TTS、色彩元数据、确定性本地素材 token/字幕侧车搜索、SHA-256 精确重复组、stat 签名增量刷新、可选 FFmpeg `ahash-v1` 感知候选、项目内 JSON 渲染队列、无 GUI 的 waveform/vectorscope/histogram 色彩审查图、固定质量 golden 清单和 JSONL 进度/取消/安全恢复。
+当前渲染器覆盖多轨时间线、裁切/滑移/涟漪编辑、静态和 cubic Bezier 关键帧、12 项本地关键帧运镜预设（`motion list/inspect/apply`，含别名和参数边界）、本地模板或已登记视觉 runner 对象跟踪（v1 单目标与 v2 多目标 `object_id` 选择）、目标画幅的 `media reframe` 动态裁切、将选定跟踪结果绑定到独立文字/贴纸/效果片段的 `media track-bind`、`media smart-cut` 静音与字幕短语裁切计划、`media beat-cut` 本地能量节拍卡点混剪计划、`media multicam` 本地多机位音频偏移估计与固定/显式机位切换计划、`audio extract` 本地第一条音频流无损 WAV 派生资产与 audio 轨道应用、`audio separate` 本地 mid/side center/side stem 派生与选定 stem 轨道应用、`media stabilize` 基于本地 `vidstabdetect`/`vidstabtransform` 的两遍防抖派生资产、倒放与反向速度曲线段反射、任意位置视频定格、默认同点音频静音插入、常用 FFmpeg xfade 转场（含连续片段的显式 `auto_handle`）、独立文字轨道与视频轨道按 `track.order` 统一层级排序、图层锚点定位、文字片段的缩放/旋转/透明度关键帧、遮罩、混合、fade/dissolve 透明层转场和 slide/wipe 空间转场、纯文字画布与本地透明层旋转、字幕动画与高级 drawtext 样式、字体 advance width 换行和源文本逐字时间匹配、固定点数路径/多边形遮罩、line/cubic 曲线控制点关键帧、动态 feather、blend、动态 crop、序列级全局和局部区间调节层、项目内 LUT3D（`.cube/.3dl/.csp/.dat`）及可审计的 `lut register/list/inspect` 资产库、`.cube` 静态 `intensity` identity 混合缓存、效果参数逐帧关键帧、通过 `effects list/inspect` 可发现的 46 项本地 FFmpeg 效果目录（含 HSL、RGB 曲线、三向色轮、曝光、色阶、曲线、降噪、时域混合、镜头校正、框线、去闪烁和本地 `minterpolate` 光流补帧）、音频轨道的 mute/solo/volume/pan/role 控制、片段音量/声像自动化、降噪/压缩/均衡/响度/旁白闪避、多画布输出、10-bit 像素格式、WebM `yuva420p` 透明画布、显式本地 HDR tone map、FFmpeg 内置 flite ASCII/英文离线 TTS、色彩元数据、确定性本地素材 token/字幕侧车搜索、SHA-256 精确重复组、stat 签名增量刷新、可选 FFmpeg `ahash-v1` 感知候选、项目内 JSON 渲染队列、无 GUI 的 waveform/vectorscope/histogram 色彩审查图、固定质量 golden 清单和 JSONL 进度/取消/安全恢复。
 
 `media stabilize` 会把稳定化视频登记为项目派生资产并继承父素材权利；它不自动修改时间线，执行前应先 dry-run，执行后检查防抖报告和质量门禁。参数、快照、两遍 FFmpeg 流程和质量边界见 [`docs/specs/本地视频防抖与稳定化派生素材契约_v0.1_2026-10-15.md`](docs/specs/本地视频防抖与稳定化派生素材契约_v0.1_2026-10-15.md)。
 

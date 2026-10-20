@@ -16,7 +16,7 @@ def build_capability_manifest() -> dict[str, Any]:
     """
     local_effects = effect_catalog()
     local_effect_ids = [item["id"] for item in local_effects["effects"]]
-    numeric_effects = [item for item in local_effects['effects'] if 'keyframe_engine' in item]
+    numeric_effects = [item for item in local_effects['effects'] if item.get('keyframe_engine') == 'native-color-command-cfr-v1']
     numeric_color_effects = [item for item in numeric_effects if item['category'] == 'color']
     return {
         "manifest_version": "0.1.0",
@@ -432,6 +432,17 @@ def build_capability_manifest() -> dict[str, Any]:
                 "catalog_contract": "effects.list_and_effects.inspect_return_local_ffmpeg_backend_parameter_limits_and_keyframe_contract",
                 "unknown_effect_policy": "RENDER_FEATURE_UNSUPPORTED",
                 "effect_keyframe_contract": "brightness_contrast_saturation_hue_hsl_gamma_vignette_use_local_eq_eval_frame_and_hue_frame_expressions",
+                "selective_hsl": {
+                    "status": "implemented_with_limits", "engine": "encoded-rgb-eight-band-hsl-v1",
+                    "backend": "ffmpeg:geq", "numeric_channels": 25,
+                    "bands_degrees": {"red": 0, "orange": 30, "yellow": 60, "green": 120,
+                                      "cyan": 180, "blue": 240, "purple": 270, "magenta": 300},
+                    "features": ["independent_hue_saturation_lightness_per_band", "animated_final_RGB_intensity",
+                                 "original_hue_circular_triangular_weights", "author_clock_expressions_at_actual_frame_PTS",
+                                 "preserve_achromatic_pixels_and_exact_input_alpha", "editable_package_and_fragment_transfer"],
+                    "limits": ["encoded_RGB_8bit", "64KiB_single_kernel_16MiB_root_expression_bytes",
+                               "shared_1024_effect_instances_and_2000000_state_samples", "no_vendor_algorithm_or_full_CapCut_parity_acceptance"],
+                },
                 "numeric_effect_automation": {
                     "status": "implemented_with_limits", "engine": "native-color-command-cfr-v1",
                     "effects": [item['id'] for item in numeric_effects],

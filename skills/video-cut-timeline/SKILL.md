@@ -22,6 +22,18 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+<!-- V76-HSL -->
+For eight-band HSL tracks, read the
+[25-channel HSL contract](../../docs/specs/八色分区HSL与关键帧契约_v0.1_2026-10-20.md)
+and [clock, transfer and pixel checks](../../docs/validation/八色分区HSL与离线发行实测_2026-10-20.md).
+Use `selective_hsl` with flat `<band>_hue`, `_saturation`, `_lightness`
+parameters and ordinary author tracks; intensity mixes the final RGB result.
+Keep original ticks through trims and transfers. This expression backend
+shares 1,024 executed instances and two million state samples with native
+commands; static neutral or zero-intensity bypass consumes none. Each kernel
+is capped at 64 KiB, with 16 MiB across the root graph. Unknown channels reject.
+<!-- /V76-HSL -->
+
 For animated `blur`, `lens_correction`, `chroma_key` and `color_contrast`, read the
 [14-channel contract](../../docs/specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md)
 and [actual frame, clock and transfer checks](../../docs/validation/空间滤镜与抠像关键帧实测_2026-10-20.md).

@@ -11,9 +11,10 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 from .effect_automation import SPECS as AUTOMATION_SPECS
+from .selective_hsl import SPECS as HSL_SPECS, ENGINE as HSL_ENGINE
 
 
-EFFECT_CATALOG_VERSION = "0.7.0"
+EFFECT_CATALOG_VERSION = "0.8.0"
 
 
 def _parameter(
@@ -62,6 +63,8 @@ def _effect(
         item['limits'].extend(['numeric_channels_only_bool_and_enum_stay_static',
                                'complete_author_clock_at_CFR_samples',
                                'recursive_command_and_sampling_budgets'])
+    if effect_id == 'selective_hsl':
+        item.update(keyframable=True, keyframe_parameters=list(HSL_SPECS), keyframe_engine=HSL_ENGINE)
     return item
 
 
@@ -209,6 +212,11 @@ _EFFECTS: tuple[dict[str, Any], ...] = (
         "green": _parameter("string", "", description="绿色通道曲线"),
         "blue": _parameter("string", "", description="蓝色通道曲线"),
     }, limits=("curve_points_are_static", "each_channel_is_whitelist_validated")),
+    _effect("selective_hsl", backend="ffmpeg:geq", category="color", aliases=("hsl_bands", "eight_band_hsl"),
+            parameters={name: _parameter("number", spec[1], minimum=spec[2], maximum=spec[3]) for name, spec in HSL_SPECS.items()},
+            limits=("eight_fixed_hue_centers_with_circular_triangular_partition", "weights_use_original_hue_simultaneously",
+                    "encoded_RGB_8bit_HSL_not_linear_light_HDR_or_vendor_look_equivalence", "achromatic_pixels_and_input_alpha_unchanged",
+                    "64KiB_per_kernel_16MiB_recursive_expression_budget", "shared_recursive_instances_and_state_samples")),
     _effect("sepia", backend="ffmpeg:colorchannelmixer", category="stylize"),
     _effect("sharpen", backend="ffmpeg:unsharp", category="detail", aliases=("unsharp",), parameters={"amount": _parameter("number", 1.0, minimum=0.0, maximum=10.0)}),
     _effect("smartblur", backend="ffmpeg:smartblur", category="blur", parameters={

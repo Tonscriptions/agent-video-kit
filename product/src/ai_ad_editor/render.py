@@ -1434,7 +1434,18 @@ def _effect_filters(
                 "message": message,
             })
 
-        if name in {"lut", "lut3d", "cube", "look"}:
+        if name in {'selective_hsl', 'hsl_bands', 'eight_band_hsl'}:
+            from .selective_hsl import compile_filter
+            kernel, evidence = compile_filter(effect_value, expression)
+            if automation is None:
+                raise AppError('SELECTIVE_HSL_CONTEXT_MISSING', '分色 HSL 需要根渲染图配额上下文', exit_code=6)
+            duration = int(clip_value.get('duration_tick', 0))/tps
+            automation.reserve_hsl(evidence, clip_value, clip_start, clip_start+duration)
+            if kernel:
+                filters.append(kernel)
+            if automation_meta is not None:
+                automation_meta.append(evidence)
+        elif name in {"lut", "lut3d", "cube", "look"}:
             raw_lut_path = parameters.get("path", parameters.get("file", parameters.get("lut")))
             lut_id = parameters.get("lut_id")
             if lut_id is not None and str(lut_id).strip():

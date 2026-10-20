@@ -15,7 +15,8 @@ from .source_transitions import analyze as analyze_source_transitions
 from .audio_routing import plan as plan_audio_routing
 from .effect_automation import (ALIASES as AUTOMATION_EFFECT_ALIASES,
                                 parameter_names as automation_parameter_names,
-                                validate as validate_effect_automation)
+                                validate as validate_effect_automation,
+                                _finite_number as finite_effect_number)
 
 from .policy import reference_kind, resolve_local_path
 from .project import asset_map
@@ -49,6 +50,8 @@ EFFECT_KEYFRAME_ALIASES: dict[str, set[str]] = {
     "vignette": {"angle", "value"},
 }
 EFFECT_KEYFRAME_ALIASES.update({name: automation_parameter_names(name) for name in AUTOMATION_EFFECT_ALIASES})
+from .selective_hsl import ALIASES as HSL_ALIASES, SPECS as HSL_SPECS
+EFFECT_KEYFRAME_ALIASES.update({name: set(HSL_SPECS) for name in HSL_ALIASES})
 
 COLOR_METADATA_VALUES: dict[str, set[str]] = {
     "primaries": {"bt709", "bt2020", "smpte170m", "smpte432"},
@@ -320,7 +323,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                             value = keyframe_value.get("value")
                             try:
                                 numeric_value = float(value)
-                            except (TypeError, ValueError):
+                            except (TypeError, ValueError, OverflowError):
                                 numeric_value = math.nan
                             if isinstance(value, bool) or not math.isfinite(numeric_value):
                                 error("EFFECT_KEYFRAME_VALUE_INVALID", "序列调节关键帧 value 必须是有限数字", f"{keyframe_path}.value")
@@ -759,14 +762,14 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                         error("INTERPOLATION_INVALID", "效果关键帧插值类型无效", f"{keyframe_path}.interpolation")
                                     if interpolation == "bezier":
                                         controls = keyframe_value.get("control_points")
-                                        if not isinstance(controls, list) or len(controls) not in {2, 4} or any(isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) for value in controls):
+                                        if not isinstance(controls, list) or len(controls) not in {2, 4} or any(not finite_effect_number(value) for value in controls):
                                             error("BEZIER_CONTROL_POINTS_INVALID", "效果 Bezier 控制点必须是 2 或 4 个有限数字", f"{keyframe_path}.control_points")
                                         elif len(controls) == 4 and not (0.0 <= controls[0] <= 1.0 and 0.0 <= controls[2] <= 1.0):
                                             error("BEZIER_CONTROL_POINT_RANGE", "效果 Bezier 控制点 x 必须位于 0 到 1", f"{keyframe_path}.control_points")
                                     value = keyframe_value.get("value")
                                     try:
                                         numeric_value = float(value)
-                                    except (TypeError, ValueError):
+                                    except (TypeError, ValueError, OverflowError):
                                         numeric_value = math.nan
                                     if isinstance(value, bool) or not math.isfinite(numeric_value):
                                         error("EFFECT_KEYFRAME_VALUE_INVALID", "效果关键帧 value 必须是有限数字", f"{keyframe_path}.value")

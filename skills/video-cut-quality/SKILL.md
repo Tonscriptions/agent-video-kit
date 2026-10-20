@@ -5,6 +5,18 @@ description: Review local encoded masks, explicit selected/clear checkpoints, co
 
 # Local Quality
 
+<!-- V76-HSL -->
+For selective HSL review, read the
+[encoded-RGB HSL contract](../../docs/specs/八色分区HSL与关键帧契约_v0.1_2026-10-20.md)
+and [independent colorsys evidence and performance gap](../../docs/validation/八色分区HSL与离线发行实测_2026-10-20.md).
+Check original-hue band weights, gray preservation, exact key-stage input
+alpha, kernel hashes, author time and independently decoded RGB/PCM/PTS.
+The synthetic four-case RGB maximum is 1/255; it does not establish natural
+color quality or proprietary parity. The 1080p single-thread probe needs
+21-27 seconds per frame and fails real-time targets. Static PNG review does
+not establish continuous playback, listening, HDR or skin-tone acceptance.
+<!-- /V76-HSL -->
+
 For [spatial/keying parameter animation](../../docs/specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md),
 read the [native static-frame oracles, retained failures and installed checks](../../docs/validation/空间滤镜与抠像关键帧实测_2026-10-20.md).
 Compare every displayed frame against explicitly evaluated static native options

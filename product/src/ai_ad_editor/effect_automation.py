@@ -140,14 +140,22 @@ def _finite_number(value: Any) -> bool:
 
 def validate(effect: dict[str, Any], *, duration_tick: int | None = None) -> list[dict[str, str]]:
     """Strict checks for the executable numeric color/spatial/keying channels."""
+    from .selective_hsl import matches as is_hsl, validate as validate_hsl
+    if is_hsl(effect.get('type', '')):
+        return validate_hsl(effect, duration_tick=duration_tick)
     name = canonical(effect.get('type', ''))
     tracks = normalized_tracks(effect)
     if name is None or not tracks or effect.get('enabled', True) is False:
         return []
+    return validate_tracks(tracks, SPECS[name], duration_tick=duration_tick)
+
+
+def validate_tracks(tracks, specs, *, duration_tick=None):
+    """Shared strict numeric authoring contract for both local execution engines."""
     errors = []
     def fail(code, message, suffix):
         errors.append({'code': code, 'message': message, 'suffix': suffix})
-    names = {alias: prop for prop, spec in SPECS[name].items() for alias in spec[0]}
+    names = {alias: prop for prop, spec in specs.items() for alias in spec[0]}
     seen = set()
     for index, track in enumerate(tracks):
         suffix = f'.keyframes[{index}]'
@@ -163,7 +171,7 @@ def validate(effect: dict[str, Any], *, duration_tick: int | None = None) -> lis
             fail('EFFECT_AUTOMATION_KEYFRAMES_INVALID', '动态通道需要非空关键帧数组', suffix)
             continue
         previous = -1
-        lower, upper = SPECS[name][prop][2:4]
+        lower, upper = specs[prop][2:4]
         for at_index, point in enumerate(points):
             location = suffix+f'.keyframes[{at_index}]'
             if not isinstance(point, dict):
@@ -221,6 +229,28 @@ class EffectAutomation:
         self.root, self.rate, self.tps = root, Fraction(fps), tps
         self.targets = self.samples = self.commands = self.bytes = 0
         self.alpha_compositors = 0
+        self.hsl_instances = self.hsl_expression_bytes = 0
+
+    def reserve_hsl(self, metadata, clip, start, end):
+        frames = max(0, math.ceil(end*float(self.rate)-1e-9)-max(0, math.ceil(start*float(self.rate)-1e-9)))
+        if metadata['bypass']:
+            metadata.update(instance=None, sampled_frames=frames, state_samples=0, fps=str(self.rate),
+                            ticks_per_second=self.tps, clip_id=clip.get('id'),
+                            author_clock=clip.get('_nested_keyframe_clock'),
+                            effect_start_seconds=start, effect_end_seconds=end)
+            return
+        samples = max(1, frames)*max(1, len(metadata['animated_parameters']))
+        size = metadata['kernel_bytes']
+        if (self.targets+self.hsl_instances >= MAX_TARGETS or self.samples+samples > MAX_SAMPLES or
+                self.hsl_expression_bytes+size > MAX_BYTES):
+            raise AppError('SELECTIVE_HSL_BUDGET', '分色 HSL 超过共享实例、状态样本或表达式配额', exit_code=2)
+        metadata.update(instance=self.hsl_instances, sampled_frames=frames, state_samples=samples,
+                        fps=str(self.rate), ticks_per_second=self.tps, clip_id=clip.get('id'),
+                        author_clock=clip.get('_nested_keyframe_clock'),
+                        effect_start_seconds=start, effect_end_seconds=end)
+        self.hsl_instances += 1
+        self.samples += samples
+        self.hsl_expression_bytes += size
 
     def reserve_key_alpha(self):
         """Allocate a deterministic root-wide static/dynamic coverage node."""
@@ -262,7 +292,7 @@ class EffectAutomation:
         first = max(0, math.ceil(start*float(self.rate)-1e-9))
         stop = max(first, math.ceil(end*float(self.rate)-1e-9))
         samples = max(1, stop-first)*len(tracks)*state_cost
-        if self.samples+samples > MAX_SAMPLES or self.targets >= MAX_TARGETS:
+        if self.samples+samples > MAX_SAMPLES or self.targets+self.hsl_instances >= MAX_TARGETS:
             raise AppError('EFFECT_AUTOMATION_BUDGET', '动态效果超出根渲染图状态采样或实例配额', exit_code=2)
         executable = Path(ffmpeg_path()).resolve()
         fingerprint = file_fingerprint(executable)
@@ -364,6 +394,8 @@ class EffectAutomation:
         return {'kind': 'effect-automation-budget', 'recursive_shared': True,
                 'targets': self.targets, 'state_samples': self.samples, 'commands': self.commands,
                 'command_bytes': self.bytes, 'key_alpha_compositors': self.alpha_compositors,
+                'selective_hsl_instances': self.hsl_instances, 'selective_hsl_expression_bytes': self.hsl_expression_bytes,
+                'effect_instances_total': self.targets+self.hsl_instances,
                 'limits': {'targets': MAX_TARGETS, 'state_samples': MAX_SAMPLES,
                            'commands': MAX_COMMANDS, 'command_bytes': MAX_BYTES,
-                           'key_alpha_compositors': MAX_TARGETS}}
+                           'key_alpha_compositors': MAX_TARGETS, 'selective_hsl_expression_bytes': MAX_BYTES}}

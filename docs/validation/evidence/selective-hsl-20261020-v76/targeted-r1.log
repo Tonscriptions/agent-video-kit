@@ -1,0 +1,67 @@
+test_all_aliases_prefixes_and_parameter_tracks_execute (test_selective_hsl.SelectiveContractTests.test_all_aliases_prefixes_and_parameter_tracks_execute) ... ok
+test_bad_tracks_duplicate_channels_ticks_and_controls_reject (test_selective_hsl.SelectiveContractTests.test_bad_tracks_duplicate_channels_ticks_and_controls_reject) ... ok
+test_discovery_separates_real_hsl_kernel_from_native_command_channels (test_selective_hsl.SelectiveContractTests.test_discovery_separates_real_hsl_kernel_from_native_command_channels) ... ERROR
+test_hsl_instances_also_consume_native_command_instance_budget (test_selective_hsl.SelectiveContractTests.test_hsl_instances_also_consume_native_command_instance_budget) ... ok
+test_metadata_records_algorithm_and_actual_frame_budget (test_selective_hsl.SelectiveContractTests.test_metadata_records_algorithm_and_actual_frame_budget) ... ok
+test_single_expression_and_shared_recursive_limits_reject (test_selective_hsl.SelectiveContractTests.test_single_expression_and_shared_recursive_limits_reject) ... ok
+test_static_unknown_nonfinite_boolean_and_outside_values_reject (test_selective_hsl.SelectiveContractTests.test_static_unknown_nonfinite_boolean_and_outside_values_reject) ... ok
+test_top_level_precedence_disabled_and_zero_intensity_bypass (test_selective_hsl.SelectiveContractTests.test_top_level_precedence_disabled_and_zero_intensity_bypass) ... ok
+test_complete_output_reverse_retimes_hsl_and_keeps_editability (test_selective_hsl.SelectiveIntegrationTests.test_complete_output_reverse_retimes_hsl_and_keeps_editability) ... ok
+test_fragment_transfers_band_keys_across_projects (test_selective_hsl.SelectiveIntegrationTests.test_fragment_transfers_band_keys_across_projects) ... ok
+test_interval_adjustment_only_changes_selected_frames (test_selective_hsl.SelectiveIntegrationTests.test_interval_adjustment_only_changes_selected_frames) ... ok
+test_invalid_static_and_dynamic_compose_reject_atomically (test_selective_hsl.SelectiveIntegrationTests.test_invalid_static_and_dynamic_compose_reject_atomically) ... ERROR
+test_package_keeps_authored_bands_and_decoded_result (test_selective_hsl.SelectiveIntegrationTests.test_package_keeps_authored_bands_and_decoded_result) ... ok
+test_real_CLI_render_manifest_records_effect_and_author_clock (test_selective_hsl.SelectiveIntegrationTests.test_real_CLI_render_manifest_records_effect_and_author_clock) ... ok
+test_trim_and_split_preserve_complete_author_hsl_phase (test_selective_hsl.SelectiveIntegrationTests.test_trim_and_split_preserve_complete_author_hsl_phase) ... ok
+test_achromatic_pixels_and_alpha_remain_exact_under_all_adjustments (test_selective_hsl.SelectiveNativeTests.test_achromatic_pixels_and_alpha_remain_exact_under_all_adjustments) ... ok
+test_all_twenty_five_channels_match_independent_HLS_reference (test_selective_hsl.SelectiveNativeTests.test_all_twenty_five_channels_match_independent_HLS_reference) ... ok
+test_bezier_overshoot_is_bounded_before_color_math (test_selective_hsl.SelectiveNativeTests.test_bezier_overshoot_is_bounded_before_color_math) ... ok
+test_each_pure_center_selects_only_its_band (test_selective_hsl.SelectiveNativeTests.test_each_pure_center_selects_only_its_band) ... ok
+test_fractional_rate_nonzero_placement_and_frame_time (test_selective_hsl.SelectiveNativeTests.test_fractional_rate_nonzero_placement_and_frame_time) ... ok
+test_multiple_threads_and_repeated_instances_have_no_expression_state_leak (test_selective_hsl.SelectiveNativeTests.test_multiple_threads_and_repeated_instances_have_no_expression_state_leak) ... ok
+test_neutral_animated_kernel_is_exact_identity_including_hidden_RGB (test_selective_hsl.SelectiveNativeTests.test_neutral_animated_kernel_is_exact_identity_including_hidden_RGB) ... ok
+test_six_easings_are_applied_on_display_samples (test_selective_hsl.SelectiveNativeTests.test_six_easings_are_applied_on_display_samples) ... FAIL
+test_static_mixed_controls_match_reference_for_random_hidden_colors (test_selective_hsl.SelectiveNativeTests.test_static_mixed_controls_match_reference_for_random_hidden_colors) ... ok
+
+======================================================================
+ERROR: test_discovery_separates_real_hsl_kernel_from_native_command_channels (test_selective_hsl.SelectiveContractTests.test_discovery_separates_real_hsl_kernel_from_native_command_channels)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\selective-hsl\product\tests\test_selective_hsl.py", line 106, in test_discovery_separates_real_hsl_kernel_from_native_command_channels
+    manifest=build_capability_manifest()['effects'];self.assertEqual(manifest['selective_hsl']['numeric_channels'],25)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'effects'
+
+======================================================================
+ERROR: test_invalid_static_and_dynamic_compose_reject_atomically (test_selective_hsl.SelectiveIntegrationTests.test_invalid_static_and_dynamic_compose_reject_atomically)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\selective-hsl\product\tests\test_selective_hsl.py", line 257, in test_invalid_static_and_dynamic_compose_reject_atomically
+    code,result=invoke('timeline','compose','--project',self.root,'--input',request)
+                ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\selective-hsl\product\tests\test_magnetic_reorder.py", line 53, in invoke
+    code = main(list(map(str, args)))
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\selective-hsl\product\src\ai_ad_editor\cli.py", line 6939, in main
+    result = handler(args)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\selective-hsl\product\src\ai_ad_editor\cli.py", line 5450, in command_timeline_compose
+    validation = validate_project(root, working, strict_rights=False)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\selective-hsl\product\src\ai_ad_editor\validator.py", line 770, in validate_project
+    numeric_value = float(value)
+OverflowError: int too large to convert to float
+
+======================================================================
+FAIL: test_six_easings_are_applied_on_display_samples (test_selective_hsl.SelectiveNativeTests.test_six_easings_are_applied_on_display_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\selective-hsl\product\tests\test_selective_hsl.py", line 205, in test_six_easings_are_applied_on_display_samples
+    for i,frame in enumerate(frames):self.compare(frame,oracle_frame(FRAME,{'red_hue':60*function(i/6)}))
+                                     ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\selective-hsl\product\tests\test_selective_hsl.py", line 98, in compare
+    self.assertLessEqual(max(abs(a-b) for a,b in zip(actual,expected)),1)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 3 not less than or equal to 1
+
+----------------------------------------------------------------------
+Ran 24 tests in 10.365s
+
+FAILED (failures=1, errors=2)
