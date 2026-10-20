@@ -1,5 +1,30 @@
 # Agent Video Kit
 
+<!-- V79-CURRENT -->
+2026-10-21 **V79（HTML 组件字段与逐片段取值限定验收）**：落实 OpenFilm 接入契约 CP-01..06。新命令 `motion html-fields` 无浏览器返回稳定 ID、独立定义／取值、JSON Schema、类型／范围／单位／默认来源及图片选项；`html-render/controls/quality` 共用有类型的组件补丁、单项 null 与全量 reset。本地图片限定原源码登记闭包并检查实际 SHA 与 strict commercial_ad 权利；boolean 在每帧作者动画后执行，并恢复原页面属性。`--replace-clip-id` 仅更换指定片段资产引用，保留作者时间、变换、特效和其他片段。完整原生回归 **1796/1796、5798.792 秒、0 跳过，237 冻结输入＋8 外部夹具前后相同**；专项 **28/28、222.167 秒、0 跳过**，属于全量子集。开发 **28 成功 CLI＋3 明确拒绝／41 检查**；7 组×20 帧无损 RGBA、稳定 ID 改名保值、局部／全量复位、图片与逐帧显隐独立像素、包／片段重建、2 个实际队列输出均核验。离线 **155 资源／7 wheels／34 次隔离 CLI＋1 来源探针**；源码／平台 wheel／安装资源逐字节一致，开发与安装 7 组解码相同；17 Skills／326 本地引用及发现联接已核对。未验收自动字段发现、任意网页／完整 OpenFilm 时间线、自然广告质量、实时连续播放、HDR或完整剪映效果等价。
+
+[组件契约](docs/specs/HTML组件字段与逐片段取值契约_v0.1_2026-10-21.md) · [实测与失败边界](docs/validation/HTML组件字段与逐片段参数离线实测_2026-10-21.md)
+
+| 编号 | 核验内容 | 实际结果与边界 | 证据 |
+|---|---|---|---|
+| V79-01 / CP-01,02 | 字段与机器发现 | 稳定 ID 改名保值、独立定义／逐资产值；四类型、JSON Schema、范围／单位／默认／选项；无需 GUI | [收据](docs/validation/evidence/html-components-20261021-v79/targeted-r3.json) |
+| V79-02 / CP-03,04 | 预算与本地图片 | 128 项／64 KiB 合并预算、512 字符 selector、n≤1024；闭包、SHA、权利，非法值在浏览器前拒绝 | [收据](docs/validation/evidence/html-components-20261021-v79/targeted-r3.json) |
+| V79-03 / CP-05 | 显隐与复位 | 原来显／隐／display:none／visibility:hidden、动画帧、空文字、0／false、单项／全量 reset、3 子帧快门 | [收据](docs/validation/evidence/html-components-20261021-v79/targeted-r3.json) |
+| V79-04 / CP-06 | 真实 CLI 与复用 | 28 成功＋3 拒绝／41 检查；7×20 RGBA 帧，包／片段重建和2次队列渲染 | [收据](docs/validation/evidence/html-components-20261021-v79/native-r2/verification.json) |
+| V79-05 | 离线安装 | 155 资源／7 wheels；34 隔离 CLI／12 检查＋1 来源探针；7组像素及源包与开发相同 | [收据](docs/validation/evidence/html-components-20261021-v79/installed-r1/verification.json) |
+| V79-06 | 完整回归 | 完整原生回归 **1796/1796、5798.792 秒、0 跳过，237 冻结输入＋8 外部夹具前后相同** | [收据](docs/validation/evidence/html-components-20261021-v79/full-r1.json) |
+| V79-07 | 失败留证与审片边界 | 专项 r1/r2、演示 r1、Skill YAML 格式拦截原始记录保留；修正4份 Skill 后重验；仅静态 PNG 目检，无连续播放／听审／新模型推理 | [收据](docs/validation/evidence/html-components-20261021-v79/skill-format-r1/verification.json) |
+
+
+原创输入 → 字段编辑 → 组件复位（复位保留普通 CTA 覆盖）：
+
+![20帧实际组件编辑与复位 GIF](docs/assets/html-components-20261021-v79-native-r2/comparison.gif)
+
+[原视频](docs/assets/html-components-20261021-v79-native-r2/original.mp4) · [编辑后](docs/assets/html-components-20261021-v79-native-r2/edited.mp4) · [复位视频](docs/assets/html-components-20261021-v79-native-r2/restored.mp4) · [原始 HTML／资源清单](docs/assets/html-components-20261021-v79-native-r2/template/manifest.json) · [原图](docs/assets/html-components-20261021-v79-native-r2/template/product-original.png) · [替换图](docs/assets/html-components-20261021-v79-native-r2/template/product-blue.png) · [逐文件摘要](docs/assets/html-components-20261021-v79-native-r2/files.json)
+
+384×216、10 fps、2 秒、20 帧；GIF 为三列并排。MP4/GIF 仅观看副本，像素判定来自无损 RGBA／FFV1 NUT。输入、字体与脚本原创 CC0，不含音轨。
+<!-- /V79-CURRENT -->
+
 <!-- R13-CURRENT -->
 2026-10-21 **R13（OpenFilm 0.2.4 固定源码复用检查；产品保持 V78）**：固定 `53156ac5818d8bad3f2c356043b376b3eebd95ba`；1546 stars/154 forks（00:31:16 Asia/Taipei）。对照 0.2.3，781 文件中756不变、25修改、0新增/删除；7份原始纯函数测试 **65/65，0跳过**，不与既有产品回归累计。发现新版撤掉服务端按速度预编码，改用浏览器保调播放；该路径不作为纯 CLI 音频内核。新增可借鉴的 `fitImages` 图片上下文裁剪，组件字段及基础NLE交换仍为优先候选；已有HTML、字幕、模板与V78内容缓存保持现有实现。[完整编号清单、源码与限定人日](docs/OpenFilm_0.2.4复用复核与成本更新_2026-10-21.md)。
 

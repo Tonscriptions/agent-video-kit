@@ -1,0 +1,97 @@
+{
+  "entry": "index.html",
+  "width": 384,
+  "height": 216,
+  "fps": {
+    "num": 10,
+    "den": 1
+  },
+  "duration_tick": 180000,
+  "files": [
+    "index.html",
+    "style.css",
+    "scene.mjs"
+  ],
+  "variables": [],
+  "component_fields": [
+    {
+      "id": "headline",
+      "name": "广告标题",
+      "type": "text",
+      "at": "#title",
+      "schema": {
+        "maxLength": 24
+      }
+    },
+    {
+      "id": "badge",
+      "name": "展示标签",
+      "type": "boolean",
+      "at": "#badge"
+    },
+    {
+      "id": "moving",
+      "name": "展示动效",
+      "type": "boolean",
+      "at": "#moving"
+    },
+    {
+      "id": "bar",
+      "name": "进度长度",
+      "type": "var",
+      "var": "--bar-size",
+      "unit": "px",
+      "schema": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 120
+      }
+    },
+    {
+      "id": "brand",
+      "name": "品牌颜色",
+      "type": "var",
+      "var": "--brand",
+      "schema": {
+        "enum": [
+          "#fb923c",
+          "#38bdf8"
+        ]
+      }
+    },
+    {
+      "id": "product",
+      "name": "产品图片",
+      "type": "image",
+      "kind": "img",
+      "at": "#product",
+      "default": {
+        "asset_id": "product-original"
+      },
+      "schema": {
+        "enum": [
+          {
+            "asset_id": "product-original"
+          },
+          {
+            "asset_id": "product-blue"
+          }
+        ]
+      }
+    }
+  ],
+  "resources": [
+    {
+      "path": "font.ttf",
+      "asset_id": "font"
+    },
+    {
+      "path": "product.png",
+      "asset_id": "product-original"
+    },
+    {
+      "path": "product-blue.png",
+      "asset_id": "product-blue"
+    }
+  ]
+}

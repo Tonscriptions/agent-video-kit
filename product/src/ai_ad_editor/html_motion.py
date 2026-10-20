@@ -147,7 +147,7 @@ def verify_runtime(root):
 
 
 def validate_spec(value, ticks_per_second):
-    if not isinstance(value, dict) or set(value)-{'entry','width','height','fps','duration_tick','variables','files','resources'}:
+    if not isinstance(value, dict) or set(value)-{'entry','width','height','fps','duration_tick','variables','files','resources','component_fields'}:
         fail('HTML_MANIFEST_INVALID', '清单字段不受支持')
     spec = {k:copy.deepcopy(value.get(k)) for k in ('entry','width','height','fps','duration_tick','variables')}
     spec['entry'] = _relative(spec['entry'])
@@ -244,7 +244,23 @@ def build_source(root, project, manifest_path):
         references.append({'path':relative,'asset_id':asset['id'],'sha256':asset['sha256']})
     if spec['entry'] not in data:
         fail('HTML_RESOURCE_INVALID','入口未列入 files')
-    return pack_source(spec, data, ticks, references)
+    content, plan = pack_source(spec, data, ticks, references)
+    if 'component_fields' in value:
+        from .html_components import validate_fields, check_images
+        # Component-bearing manifests require the same duplicate-key rejection
+        # as component patches, while the original source manifest budget is 1 MiB.
+        def unique(pairs):
+            out = {}
+            for key, child in pairs:
+                if key in out:
+                    fail('HTML_COMPONENT_INVALID', '清单含重复 JSON 字段', key)
+                out[key] = child
+            return out
+        value = json.loads(path.read_text(encoding='utf-8-sig'), object_pairs_hook=unique)
+        fields = validate_fields(value['component_fields'])
+        check_images(root, project, {'asset': {'html_source': {'resources': references}}}, fields, {}, strict=False)
+        plan['component_fields'] = fields
+    return content, plan
 
 
 def pack_source(spec, data, ticks, references):
@@ -320,6 +336,7 @@ def prepare_render(root,project,args):
     saved_layout_check='off'
     saved_shutter=None
     source_id=args.source_asset_id
+    recipe={}
     if args.from_asset_id:
         previous=assets.get(args.from_asset_id,{})
         recipe=previous.get('html_motion')
@@ -341,7 +358,12 @@ def prepare_render(root,project,args):
     params=parameters(source['spec'],values)
     from .html_template import merge_overrides, read_patch, attach_resources
     changes=merge_overrides(saved_overrides,read_patch(root,getattr(args,'overrides',None)))
-    compiled,references=attach_resources(root,project,source,changes)
+    from .html_components import configure, compile_overrides
+    fields, component_values, components_enabled=configure(root,source,recipe,args)
+    if components_enabled:
+        compiled,references=compile_overrides(root,project,source,changes,fields,component_values)
+    else:
+        compiled,references=attach_resources(root,project,source,changes)
     assert_id(args.asset_id,'asset_id')
     if args.asset_id in assets:
         fail('HTML_ASSET_EXISTS','输出资产 ID 已存在，须使用新版本 ID')
@@ -351,7 +373,19 @@ def prepare_render(root,project,args):
     if args.expected_project_sha256 and args.expected_project_sha256!=project_fingerprint(project):
         fail('EDIT_PROJECT_CHANGED','项目已偏离已规划摘要')
     track=None
-    if args.apply:
+    replacement_clip=None
+    replace_id=getattr(args,'replace_clip_id',None)
+    if replace_id:
+        if args.apply or not args.from_asset_id:
+            fail('HTML_TRACK_INVALID','替换片段须使用 from-asset-id 且不能与 apply 同用')
+        seq=find_sequence(project,args.sequence_id)
+        found=[(t,c) for t in seq['tracks'] for c in t['clips'] if c['id']==replace_id and (not args.track_id or t['id']==args.track_id)]
+        if len(found)!=1:
+            fail('HTML_TRACK_INVALID','替换要求明确存在的唯一片段')
+        track,replacement_clip=found[0]
+        if track.get('kind')!='video' or track.get('locked') or replacement_clip.get('asset_id')!=args.from_asset_id:
+            fail('HTML_TRACK_INVALID','替换要求未锁定视频轨且片段引用 from-asset-id')
+    elif args.apply:
         if not args.track_id:
             fail('HTML_TRACK_INVALID','入轨须指定 track_id')
         seq=find_sequence(project,args.sequence_id)
@@ -377,6 +411,10 @@ def prepare_render(root,project,args):
                    'layout_check':layout_check,
                     'shutter':shutter,'shutter_implementation':html_shutter.implementation() if shutter['enabled'] else None,
                    'project_sha256':project_fingerprint(project)})
+    if components_enabled:
+        source.update(component_fields=fields,component_values=component_values)
+    if replacement_clip is not None:
+        source['replacement_clip']=replacement_clip
     return source
 
 
@@ -400,6 +438,8 @@ def inspect_controls(root,plan,report_path,*,frame_index=0,timeout=120,cancel_fi
             'source_asset_id':plan['source_asset_id'],'source_sha256':plan['asset']['sha256'],
             'frame_index':frame_index,'parameters':plan['parameters'],'template_overrides':plan['template_overrides'],
             'override_resources':plan['override_resources'],'project_sha256':plan['project_sha256']}
+    if 'component_fields' in plan:
+        report.update(component_fields=plan['component_fields'],component_values=plan['component_values'])
     job=None
     try:
         with tempfile.TemporaryDirectory(prefix='html-controls-') as folder, contextlib.ExitStack() as cleanup:

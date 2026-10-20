@@ -1,0 +1,850 @@
+{
+  "engine": "agent-local-html-motion-v1",
+  "report_version": "0.1.0",
+  "created_at": "2026-10-20T17:20:50.999692Z",
+  "plan": {
+    "spec": {
+      "entry": "index.html",
+      "width": 384,
+      "height": 216,
+      "fps": {
+        "den": 1,
+        "num": 10
+      },
+      "duration_tick": 180000,
+      "variables": []
+    },
+    "frame_count": 20,
+    "files": [
+      {
+        "bytes": 3188,
+        "path": "font.ttf",
+        "sha256": "sha256:e956bbd4573f1267daced5d59f7847dc8571782ef1f9dd35e695308e9e63663f"
+      },
+      {
+        "bytes": 316,
+        "path": "index.html",
+        "sha256": "sha256:fc82005876464ebe1285697bbb04848f72fbdb9605855ffcfa410bdf77fd1ded"
+      },
+      {
+        "bytes": 352,
+        "path": "product-blue.png",
+        "sha256": "sha256:fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2"
+      },
+      {
+        "bytes": 350,
+        "path": "product.png",
+        "sha256": "sha256:6a0f4b4aaa18e829af50d7e46dcc7935d074ea6521fea98ecd26e4ed008afea4"
+      },
+      {
+        "bytes": 288,
+        "path": "scene.mjs",
+        "sha256": "sha256:8a1c12cf42cd585217882d9ee20f3f7c8b9d0eca81c62f331efb5e9b8248a866"
+      },
+      {
+        "bytes": 817,
+        "path": "style.css",
+        "sha256": "sha256:7865f2221eb7d4826c14ded591420121a483cdb0a4bff4f2caac5a02e8d30696"
+      },
+      {
+        "path": "__template_images/fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2.png",
+        "bytes": 352,
+        "sha256": "sha256:fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2"
+      }
+    ],
+    "source_asset_id": "source",
+    "parameters": {},
+    "template_overrides": {
+      "variables": {
+        "--bar-size": "80px"
+      },
+      "texts": [
+        {
+          "at": "#cta",
+          "value": "CTA 2"
+        }
+      ],
+      "images": []
+    },
+    "compiled_overrides": [
+      {
+        "at": ":root",
+        "style": {
+          "--bar-size": "80px",
+          "--brand": "#38bdf8"
+        }
+      },
+      {
+        "at": "#cta",
+        "text": "CTA 2"
+      },
+      {
+        "at": "#product",
+        "style": {
+          "content": "url(\"/__template_images/fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2.png\")"
+        },
+        "_image_kind": "img"
+      },
+      {
+        "at": "#badge",
+        "_visible": true
+      },
+      {
+        "at": "#moving",
+        "_visible": true
+      }
+    ],
+    "override_resources": [
+      {
+        "asset_id": "product-blue",
+        "sha256": "sha256:fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2",
+        "rights_ref": "product-blue",
+        "path": "__template_images/fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2.png"
+      }
+    ],
+    "layout_check": "strict",
+    "shutter": {
+      "config": {
+        "version": 1,
+        "samples": 1,
+        "fraction": 0.5,
+        "cut_ticks": [],
+        "sampling_phase": "midpoint_centered",
+        "composite_domain": "premultiplied_encoded_srgb_8bit"
+      },
+      "enabled": false,
+      "effective_samples": 1,
+      "output_frames": 20,
+      "capture_count": 20,
+      "render_passes": 3,
+      "layout_passes": 2,
+      "work_pixels": 8294400,
+      "budget_applied": false,
+      "internal_cuts": "explicit_anchors_only_no_automatic_scene_detection",
+      "working_storage": "one_RGBA_capture_and_four_int32_accumulation_planes_plus_native_temporaries; not a process RAM cap"
+    },
+    "shutter_implementation": null,
+    "project_sha256": "sha256:9471fef7d9f2a05ff9077b5de8b0dd533a156c4fa65e34cebf86e13a156f3026",
+    "component_fields": [
+      {
+        "id": "headline",
+        "name": "广告标题",
+        "type": "text",
+        "at": "#title",
+        "schema": {
+          "maxLength": 24
+        }
+      },
+      {
+        "id": "badge",
+        "name": "展示标签",
+        "type": "boolean",
+        "at": "#badge"
+      },
+      {
+        "id": "moving",
+        "name": "展示动效",
+        "type": "boolean",
+        "at": "#moving"
+      },
+      {
+        "id": "bar",
+        "name": "进度长度",
+        "type": "var",
+        "var": "--bar-size",
+        "unit": "px",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 120
+        }
+      },
+      {
+        "id": "brand",
+        "name": "品牌颜色",
+        "type": "var",
+        "var": "--brand",
+        "schema": {
+          "enum": [
+            "#fb923c",
+            "#38bdf8"
+          ]
+        }
+      },
+      {
+        "id": "product",
+        "name": "产品图片",
+        "type": "image",
+        "kind": "img",
+        "at": "#product",
+        "default": {
+          "asset_id": "product-original"
+        },
+        "schema": {
+          "enum": [
+            {
+              "asset_id": "product-original"
+            },
+            {
+              "asset_id": "product-blue"
+            }
+          ]
+        }
+      }
+    ],
+    "component_values": [
+      {
+        "field_id": "badge",
+        "value": true
+      },
+      {
+        "field_id": "brand",
+        "value": "#38bdf8"
+      },
+      {
+        "field_id": "moving",
+        "value": true
+      },
+      {
+        "field_id": "product",
+        "value": {
+          "asset_id": "product-blue"
+        }
+      }
+    ],
+    "engine": "agent-local-html-motion-v1",
+    "toolchain": {
+      "node_version": "v22.14.0",
+      "playwright_version": "1.62.1",
+      "node_sha256": "sha256:33b1bc1a8aca11fd5a4f2699e51019c63c0af30cf437701d07af69be7706771b"
+    },
+    "all_frames_checked_in_two_fresh_context_orders": true,
+    "output": "ffv1-bgra-nut",
+    "rights_status": "unverified",
+    "limits": [
+      "not_full_openfilm_timeline",
+      "no_embedded_media_iframes_or_webgl",
+      "not_hdr_or_capcut_parity"
+    ]
+  },
+  "status": "succeeded",
+  "worker_started": true,
+  "running_job_pids": [
+    31260,
+    24164,
+    29612,
+    34100,
+    26380,
+    37748,
+    34584,
+    29948
+  ],
+  "worker": {
+    "type": "done",
+    "frame_hashes": [
+      "sha256:9430ce7e8014aa42a16324709dcd410cf4b253405736d55ae252d5521282647b",
+      "sha256:c4c7d1108ed4c8d9d1043cdad380909bbccc3593e8483463980cf23bca96e40d",
+      "sha256:0674c8123ff570a4da78300de2dc666bfa12dc427b00723fcf341f37e100e16d",
+      "sha256:ca3f6d0b4b425b1ea26bb71ee55e24de63274d4efa4daa826ac6cb8983763279",
+      "sha256:bf3265cc2760179227f171b566b5299572dd0ac2257bd238645e01881516d7be",
+      "sha256:c10f6defa4b1444c2fd6f6b6dc36398be86e163a9c7d59e726e905caee4ea37e",
+      "sha256:d8ef55ffdb3262b5d3b5b4814c562276939a55b562a973ed775322024ce3cdd5",
+      "sha256:ceed6b1856071d4711af2aba8f8b69265fd5bc1c1b4d236083bbabb14e4a3aaa",
+      "sha256:00f450b47f3e043a6ac9bee9d86b916386bd802b6a4e766873a66d126302d914",
+      "sha256:adf2d4c9e470dfdf82e1655bb814ef8f5425f4482b4d4a4aa39d5e122c8f75a7",
+      "sha256:3cb8fa39a89af8e8278a24160d1cf7eb5f45f017e1788fcc6f66b1568497b00e",
+      "sha256:b7bf09a59a93fad6130cc97b1f46a5490bad2c1a624c068621b532bccdf00d84",
+      "sha256:3ebfa3a58441742ecfef1ed20671fa4dc9ae8853e3e22db81154f8be9bed0d63",
+      "sha256:e4912b6807571d9130c82ffc0831c022a9cf6e45affa1663859080132031847c",
+      "sha256:36097561d3937559ec886d69d4b11d5a508cc264d7915f6a68fdf3207824f310",
+      "sha256:b7ff36c8b43366154946ed45b21fe75222d7cdbd744059013746873bd6fb25e9",
+      "sha256:466e7bbd0a4adfe5165792e5873136c75f0cd10b72d650f2927f6df266863378",
+      "sha256:e6ad373f090028bf4cab3a0abad791b089e4483596b0b47f16cab9f9006de121",
+      "sha256:8d943f3dede86b332e85f178b951ef48dc4f9bd6d565504a7a580907f20c601c",
+      "sha256:dc5143cc53557a619bdf3a975082b0549c666c31540c79efe716493a86b4056e"
+    ],
+    "verification": [
+      {
+        "name": "reverse",
+        "frames": [
+          {
+            "index": 19,
+            "sha256": "sha256:dc5143cc53557a619bdf3a975082b0549c666c31540c79efe716493a86b4056e"
+          },
+          {
+            "index": 18,
+            "sha256": "sha256:8d943f3dede86b332e85f178b951ef48dc4f9bd6d565504a7a580907f20c601c"
+          },
+          {
+            "index": 17,
+            "sha256": "sha256:e6ad373f090028bf4cab3a0abad791b089e4483596b0b47f16cab9f9006de121"
+          },
+          {
+            "index": 16,
+            "sha256": "sha256:466e7bbd0a4adfe5165792e5873136c75f0cd10b72d650f2927f6df266863378"
+          },
+          {
+            "index": 15,
+            "sha256": "sha256:b7ff36c8b43366154946ed45b21fe75222d7cdbd744059013746873bd6fb25e9"
+          },
+          {
+            "index": 14,
+            "sha256": "sha256:36097561d3937559ec886d69d4b11d5a508cc264d7915f6a68fdf3207824f310"
+          },
+          {
+            "index": 13,
+            "sha256": "sha256:e4912b6807571d9130c82ffc0831c022a9cf6e45affa1663859080132031847c"
+          },
+          {
+            "index": 12,
+            "sha256": "sha256:3ebfa3a58441742ecfef1ed20671fa4dc9ae8853e3e22db81154f8be9bed0d63"
+          },
+          {
+            "index": 11,
+            "sha256": "sha256:b7bf09a59a93fad6130cc97b1f46a5490bad2c1a624c068621b532bccdf00d84"
+          },
+          {
+            "index": 10,
+            "sha256": "sha256:3cb8fa39a89af8e8278a24160d1cf7eb5f45f017e1788fcc6f66b1568497b00e"
+          },
+          {
+            "index": 9,
+            "sha256": "sha256:adf2d4c9e470dfdf82e1655bb814ef8f5425f4482b4d4a4aa39d5e122c8f75a7"
+          },
+          {
+            "index": 8,
+            "sha256": "sha256:00f450b47f3e043a6ac9bee9d86b916386bd802b6a4e766873a66d126302d914"
+          },
+          {
+            "index": 7,
+            "sha256": "sha256:ceed6b1856071d4711af2aba8f8b69265fd5bc1c1b4d236083bbabb14e4a3aaa"
+          },
+          {
+            "index": 6,
+            "sha256": "sha256:d8ef55ffdb3262b5d3b5b4814c562276939a55b562a973ed775322024ce3cdd5"
+          },
+          {
+            "index": 5,
+            "sha256": "sha256:c10f6defa4b1444c2fd6f6b6dc36398be86e163a9c7d59e726e905caee4ea37e"
+          },
+          {
+            "index": 4,
+            "sha256": "sha256:bf3265cc2760179227f171b566b5299572dd0ac2257bd238645e01881516d7be"
+          },
+          {
+            "index": 3,
+            "sha256": "sha256:ca3f6d0b4b425b1ea26bb71ee55e24de63274d4efa4daa826ac6cb8983763279"
+          },
+          {
+            "index": 2,
+            "sha256": "sha256:0674c8123ff570a4da78300de2dc666bfa12dc427b00723fcf341f37e100e16d"
+          },
+          {
+            "index": 1,
+            "sha256": "sha256:c4c7d1108ed4c8d9d1043cdad380909bbccc3593e8483463980cf23bca96e40d"
+          },
+          {
+            "index": 0,
+            "sha256": "sha256:9430ce7e8014aa42a16324709dcd410cf4b253405736d55ae252d5521282647b"
+          }
+        ]
+      },
+      {
+        "name": "odd_then_reverse_even",
+        "frames": [
+          {
+            "index": 1,
+            "sha256": "sha256:c4c7d1108ed4c8d9d1043cdad380909bbccc3593e8483463980cf23bca96e40d"
+          },
+          {
+            "index": 3,
+            "sha256": "sha256:ca3f6d0b4b425b1ea26bb71ee55e24de63274d4efa4daa826ac6cb8983763279"
+          },
+          {
+            "index": 5,
+            "sha256": "sha256:c10f6defa4b1444c2fd6f6b6dc36398be86e163a9c7d59e726e905caee4ea37e"
+          },
+          {
+            "index": 7,
+            "sha256": "sha256:ceed6b1856071d4711af2aba8f8b69265fd5bc1c1b4d236083bbabb14e4a3aaa"
+          },
+          {
+            "index": 9,
+            "sha256": "sha256:adf2d4c9e470dfdf82e1655bb814ef8f5425f4482b4d4a4aa39d5e122c8f75a7"
+          },
+          {
+            "index": 11,
+            "sha256": "sha256:b7bf09a59a93fad6130cc97b1f46a5490bad2c1a624c068621b532bccdf00d84"
+          },
+          {
+            "index": 13,
+            "sha256": "sha256:e4912b6807571d9130c82ffc0831c022a9cf6e45affa1663859080132031847c"
+          },
+          {
+            "index": 15,
+            "sha256": "sha256:b7ff36c8b43366154946ed45b21fe75222d7cdbd744059013746873bd6fb25e9"
+          },
+          {
+            "index": 17,
+            "sha256": "sha256:e6ad373f090028bf4cab3a0abad791b089e4483596b0b47f16cab9f9006de121"
+          },
+          {
+            "index": 19,
+            "sha256": "sha256:dc5143cc53557a619bdf3a975082b0549c666c31540c79efe716493a86b4056e"
+          },
+          {
+            "index": 18,
+            "sha256": "sha256:8d943f3dede86b332e85f178b951ef48dc4f9bd6d565504a7a580907f20c601c"
+          },
+          {
+            "index": 16,
+            "sha256": "sha256:466e7bbd0a4adfe5165792e5873136c75f0cd10b72d650f2927f6df266863378"
+          },
+          {
+            "index": 14,
+            "sha256": "sha256:36097561d3937559ec886d69d4b11d5a508cc264d7915f6a68fdf3207824f310"
+          },
+          {
+            "index": 12,
+            "sha256": "sha256:3ebfa3a58441742ecfef1ed20671fa4dc9ae8853e3e22db81154f8be9bed0d63"
+          },
+          {
+            "index": 10,
+            "sha256": "sha256:3cb8fa39a89af8e8278a24160d1cf7eb5f45f017e1788fcc6f66b1568497b00e"
+          },
+          {
+            "index": 8,
+            "sha256": "sha256:00f450b47f3e043a6ac9bee9d86b916386bd802b6a4e766873a66d126302d914"
+          },
+          {
+            "index": 6,
+            "sha256": "sha256:d8ef55ffdb3262b5d3b5b4814c562276939a55b562a973ed775322024ce3cdd5"
+          },
+          {
+            "index": 4,
+            "sha256": "sha256:bf3265cc2760179227f171b566b5299572dd0ac2257bd238645e01881516d7be"
+          },
+          {
+            "index": 2,
+            "sha256": "sha256:0674c8123ff570a4da78300de2dc666bfa12dc427b00723fcf341f37e100e16d"
+          },
+          {
+            "index": 0,
+            "sha256": "sha256:9430ce7e8014aa42a16324709dcd410cf4b253405736d55ae252d5521282647b"
+          }
+        ]
+      }
+    ],
+    "browser_version": "149.0.7827.55",
+    "all_frame_orders_equal": true,
+    "template_controls": {
+      "vars": [
+        {
+          "name": "--bar-size",
+          "value": "96px",
+          "label": "Bar size",
+          "field": {
+            "kind": "number",
+            "value": 96,
+            "unit": "px"
+          },
+          "font": false
+        },
+        {
+          "name": "--brand",
+          "value": "#fb923c",
+          "label": "Brand",
+          "field": {
+            "kind": "color",
+            "value": "#fb923c"
+          },
+          "font": false
+        },
+        {
+          "name": "--outline",
+          "value": "#cbd5e1",
+          "label": "Outline",
+          "field": {
+            "kind": "color",
+            "value": "#cbd5e1"
+          },
+          "font": false
+        }
+      ],
+      "texts": [
+        {
+          "at": "#title",
+          "label": "EDIT VIDEO",
+          "value": "EDIT VIDEO"
+        },
+        {
+          "at": "#cta",
+          "label": "CTA",
+          "value": "CTA"
+        }
+      ],
+      "images": [
+        {
+          "at": "#product",
+          "kind": "img",
+          "label": "product",
+          "src": "local://html-source/product.png"
+        }
+      ],
+      "scope": "visible-DOM-direct-text-single-image-and-root-CSS-at-sampled-frame"
+    },
+    "template_applied": {
+      "entries": 5,
+      "matches": 5,
+      "every_target_found": true
+    },
+    "effective_template_controls": {
+      "vars": [
+        {
+          "name": "--bar-size",
+          "value": "80px",
+          "label": "Bar size",
+          "field": {
+            "kind": "number",
+            "value": 80,
+            "unit": "px"
+          },
+          "font": false
+        },
+        {
+          "name": "--brand",
+          "value": "#38bdf8",
+          "label": "Brand",
+          "field": {
+            "kind": "color",
+            "value": "#38bdf8"
+          },
+          "font": false
+        },
+        {
+          "name": "--outline",
+          "value": "#cbd5e1",
+          "label": "Outline",
+          "field": {
+            "kind": "color",
+            "value": "#cbd5e1"
+          },
+          "font": false
+        }
+      ],
+      "texts": [
+        {
+          "at": "#title",
+          "label": "EDIT VIDEO",
+          "value": "EDIT VIDEO"
+        },
+        {
+          "at": "#cta",
+          "label": "CTA 2",
+          "value": "CTA 2"
+        }
+      ],
+      "images": [
+        {
+          "at": "#product",
+          "kind": "img",
+          "label": "product",
+          "src": "local://html-source/__template_images/fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2.png"
+        }
+      ],
+      "scope": "visible-DOM-direct-text-single-image-and-root-CSS-at-sampled-frame"
+    },
+    "cleanup": {
+      "pages_opened": 3,
+      "pages_closed": 3,
+      "local_requests": 78,
+      "denied_requests": 0,
+      "browser_closed": true
+    }
+  },
+  "cleanup": {
+    "native_job": true,
+    "seen_pids": [
+      24164,
+      26380,
+      29612,
+      29948,
+      31260,
+      34100,
+      34584,
+      36936,
+      37748,
+      38292
+    ],
+    "start_policy": "create_suspended_assign_job_resume_primary_thread",
+    "resumed_primary_threads": [
+      {
+        "pid": 31260,
+        "thread_id": 15764
+      },
+      {
+        "pid": 37748,
+        "thread_id": 23480
+      }
+    ],
+    "active_before_final_cleanup": [],
+    "active_after_cleanup": [],
+    "all_children_reaped": true,
+    "termination_reason": null
+  },
+  "shutter_evidence": {
+    "profile": {
+      "config": {
+        "version": 1,
+        "samples": 1,
+        "fraction": 0.5,
+        "cut_ticks": [],
+        "sampling_phase": "midpoint_centered",
+        "composite_domain": "premultiplied_encoded_srgb_8bit"
+      },
+      "enabled": false,
+      "effective_samples": 1,
+      "output_frames": 20,
+      "capture_count": 20,
+      "render_passes": 3,
+      "layout_passes": 2,
+      "work_pixels": 8294400,
+      "budget_applied": false,
+      "internal_cuts": "explicit_anchors_only_no_automatic_scene_detection",
+      "working_storage": "one_RGBA_capture_and_four_int32_accumulation_planes_plus_native_temporaries; not a process RAM cap"
+    },
+    "captures": null,
+    "encoded_frames": [
+      {
+        "output_frame": 0,
+        "png_sha256": "sha256:9430ce7e8014aa42a16324709dcd410cf4b253405736d55ae252d5521282647b",
+        "source_capture_start": 0,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 1,
+        "png_sha256": "sha256:c4c7d1108ed4c8d9d1043cdad380909bbccc3593e8483463980cf23bca96e40d",
+        "source_capture_start": 1,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 2,
+        "png_sha256": "sha256:0674c8123ff570a4da78300de2dc666bfa12dc427b00723fcf341f37e100e16d",
+        "source_capture_start": 2,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 3,
+        "png_sha256": "sha256:ca3f6d0b4b425b1ea26bb71ee55e24de63274d4efa4daa826ac6cb8983763279",
+        "source_capture_start": 3,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 4,
+        "png_sha256": "sha256:bf3265cc2760179227f171b566b5299572dd0ac2257bd238645e01881516d7be",
+        "source_capture_start": 4,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 5,
+        "png_sha256": "sha256:c10f6defa4b1444c2fd6f6b6dc36398be86e163a9c7d59e726e905caee4ea37e",
+        "source_capture_start": 5,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 6,
+        "png_sha256": "sha256:d8ef55ffdb3262b5d3b5b4814c562276939a55b562a973ed775322024ce3cdd5",
+        "source_capture_start": 6,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 7,
+        "png_sha256": "sha256:ceed6b1856071d4711af2aba8f8b69265fd5bc1c1b4d236083bbabb14e4a3aaa",
+        "source_capture_start": 7,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 8,
+        "png_sha256": "sha256:00f450b47f3e043a6ac9bee9d86b916386bd802b6a4e766873a66d126302d914",
+        "source_capture_start": 8,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 9,
+        "png_sha256": "sha256:adf2d4c9e470dfdf82e1655bb814ef8f5425f4482b4d4a4aa39d5e122c8f75a7",
+        "source_capture_start": 9,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 10,
+        "png_sha256": "sha256:3cb8fa39a89af8e8278a24160d1cf7eb5f45f017e1788fcc6f66b1568497b00e",
+        "source_capture_start": 10,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 11,
+        "png_sha256": "sha256:b7bf09a59a93fad6130cc97b1f46a5490bad2c1a624c068621b532bccdf00d84",
+        "source_capture_start": 11,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 12,
+        "png_sha256": "sha256:3ebfa3a58441742ecfef1ed20671fa4dc9ae8853e3e22db81154f8be9bed0d63",
+        "source_capture_start": 12,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 13,
+        "png_sha256": "sha256:e4912b6807571d9130c82ffc0831c022a9cf6e45affa1663859080132031847c",
+        "source_capture_start": 13,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 14,
+        "png_sha256": "sha256:36097561d3937559ec886d69d4b11d5a508cc264d7915f6a68fdf3207824f310",
+        "source_capture_start": 14,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 15,
+        "png_sha256": "sha256:b7ff36c8b43366154946ed45b21fe75222d7cdbd744059013746873bd6fb25e9",
+        "source_capture_start": 15,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 16,
+        "png_sha256": "sha256:466e7bbd0a4adfe5165792e5873136c75f0cd10b72d650f2927f6df266863378",
+        "source_capture_start": 16,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 17,
+        "png_sha256": "sha256:e6ad373f090028bf4cab3a0abad791b089e4483596b0b47f16cab9f9006de121",
+        "source_capture_start": 17,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 18,
+        "png_sha256": "sha256:8d943f3dede86b332e85f178b951ef48dc4f9bd6d565504a7a580907f20c601c",
+        "source_capture_start": 18,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 19,
+        "png_sha256": "sha256:dc5143cc53557a619bdf3a975082b0549c666c31540c79efe716493a86b4056e",
+        "source_capture_start": 19,
+        "source_capture_count": 1
+      }
+    ],
+    "source_capture_count": 20,
+    "all_subframes_checked_in_two_fresh_context_orders": true,
+    "quality_accepted": false,
+    "continuous_playback_reviewed": false
+  },
+  "stderr": {
+    "node": "",
+    "ffmpeg": ""
+  },
+  "encoded_clock": {
+    "time_base": "1/81920",
+    "timestamps": [
+      0,
+      8192,
+      16384,
+      24576,
+      32768,
+      40960,
+      49152,
+      57344,
+      65536,
+      73728,
+      81920,
+      90112,
+      98304,
+      106496,
+      114688,
+      122880,
+      131072,
+      139264,
+      147456,
+      155648
+    ],
+    "all_frames_exact": true,
+    "frame_count": 20
+  },
+  "output_sha256": "sha256:54d4fad274767e8f5b9fe17ff6354f452445ce2ad1f8af8eb975375da566353f",
+  "probe": {
+    "duration_seconds": 2.0,
+    "duration_tick": 180000,
+    "format": "nut",
+    "format_long_name": "NUT",
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "ffv1",
+        "codec_long_name": "FFmpeg video codec #1",
+        "codec_type": "video",
+        "codec_tag_string": "FFV1",
+        "codec_tag": "0x31564646",
+        "width": 384,
+        "height": 216,
+        "coded_width": 384,
+        "coded_height": 216,
+        "has_b_frames": 0,
+        "pix_fmt": "bgra",
+        "level": -99,
+        "r_frame_rate": "10/1",
+        "avg_frame_rate": "10/1",
+        "time_base": "1/81920",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bits_per_raw_sample": "8",
+        "extradata_size": 42,
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "encoder": "Lavc62.28.100 ffv1"
+        }
+      }
+    ],
+    "video": {
+      "codec": "ffv1",
+      "width": 384,
+      "height": 216,
+      "pix_fmt": "bgra",
+      "fps": "10/1",
+      "color_space": null,
+      "duration_seconds": 2.0,
+      "start_time_seconds": 0.0,
+      "frame_count": 20
+    },
+    "audio": {
+      "codec": null,
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    },
+    "container_duration_seconds": 1.9,
+    "duration_basis": "verified_exact_cfr_frames"
+  }
+}

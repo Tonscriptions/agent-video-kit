@@ -790,6 +790,14 @@ def build_parser() -> argparse.ArgumentParser:
     html_inspect = _leaf_common(motion_sub.add_parser('html-inspect', help='校验并查看动效源码清单'))
     html_inspect.add_argument('--project', required=True)
     html_inspect.add_argument('--source-asset-id', required=True)
+    html_fields = _leaf_common(motion_sub.add_parser('html-fields', help='发现组件字段、稳定 ID、当前取值及可写 JSON Schema；不执行浏览器'))
+    html_fields.add_argument('--project', required=True)
+    fields_source = html_fields.add_mutually_exclusive_group(required=True)
+    fields_source.add_argument('--source-asset-id')
+    fields_source.add_argument('--from-asset-id')
+    html_fields.add_argument('--component-fields')
+    html_fields.add_argument('--component-values')
+    html_fields.add_argument('--reset-components', action='store_true')
     html_controls = _leaf_common(motion_sub.add_parser('html-controls', help='在两个新上下文实际检查一帧的 CSS、文字和图片控件'))
     html_controls.add_argument('--project', required=True)
     controls_source=html_controls.add_mutually_exclusive_group(required=True)
@@ -823,13 +831,19 @@ def build_parser() -> argparse.ArgumentParser:
     shutter_cuts=html_render.add_mutually_exclusive_group()
     shutter_cuts.add_argument('--shutter-cut-tick',type=int,action='append',help='重复指定严格递增的源内部切点；采样不跨切点')
     shutter_cuts.add_argument('--shutter-clear-cuts',action='store_true',help='明确清空继承的快门切点')
-    html_render.add_argument('--apply', action='store_true')
+    html_apply = html_render.add_mutually_exclusive_group()
+    html_apply.add_argument('--apply', action='store_true')
+    html_apply.add_argument('--replace-clip-id', help='仅替换指定片段的 from-asset-id 引用，保留作者剪口与处理')
     html_render.add_argument('--track-id')
     html_render.add_argument('--sequence-id')
     html_render.add_argument('--timeline-start-tick', type=int, default=0)
     html_render.add_argument('--expected-project-sha256')
     html_render.add_argument('--timeout-seconds', type=float, default=600)
     html_render.add_argument('--cancel-file')
+    for parser_with_components in (html_controls, html_quality, html_render):
+        parser_with_components.add_argument('--component-fields', help='完整替换组件定义快照；保留相同稳定 ID 的值')
+        parser_with_components.add_argument('--component-values', help='本地 JSON：稳定字段 ID 到有类型值；null 重置')
+        parser_with_components.add_argument('--reset-components', action='store_true', help='先清空组件取值；保留普通模板覆盖')
 
     timeline = subs.add_parser("timeline", help="时间线编排")
     ts = timeline.add_subparsers(dest="action", required=True)
@@ -4605,6 +4619,8 @@ def command_html_source(args: argparse.Namespace) -> dict[str, Any]:
         'source': {'source_url': output.relative_to(root).as_posix(), 'retrieved_at': now_iso(), 'original_name': output.name},
         'html_source': {'engine': html_motion.ENGINE, 'version': html_motion.VERSION,
             'ticks_per_second': project['settings']['timebase']['ticks_per_second'], 'resources': plan['resources']}}
+    if 'component_fields' in plan:
+        asset['html_source']['component_fields'] = plan['component_fields']
     parents = list(dict.fromkeys(asset_map(project)[r['asset_id']]['rights_ref'] for r in plan['resources']))
     record = _html_rights(asset, parents, creator=args.creator, license_spdx=args.license_spdx)
     if args.dry_run:
@@ -4639,6 +4655,24 @@ def command_html_inspect(args: argparse.Namespace) -> dict[str, Any]:
     source = html_motion.inspect_source(root, project, args.source_asset_id)
     source.pop('data')
     return _envelope('motion.html-inspect', args, data=source)
+
+
+def command_html_fields(args: argparse.Namespace) -> dict[str, Any]:
+    from .html_components import configure, discover
+    from .html_template import merge_overrides
+    root, project = load_project(args.project)
+    previous = {}
+    source_id = args.source_asset_id
+    if args.from_asset_id:
+        previous = asset_map(project).get(args.from_asset_id, {}).get('html_motion', {})
+        if not previous:
+            raise AppError('HTML_RECIPE_MISSING', '已有输出没有可重建源码配方', exit_code=2)
+        source_id = previous['source_asset_id']
+    source = html_motion.inspect_source(root, project, source_id)
+    fields, values, _ = configure(root, source, previous, args)
+    result = discover(root, project, source, fields, values, merge_overrides(previous.get('template_overrides')))
+    result['source_asset_id'] = source_id
+    return _envelope('motion.html-fields', args, data=result)
 
 
 def command_html_controls(args: argparse.Namespace) -> dict[str, Any]:
@@ -4710,6 +4744,8 @@ def command_html_render(args: argparse.Namespace) -> dict[str, Any]:
                 'parameters': plan['parameters'], 'spec': plan['spec'], 'frame_count': plan['frame_count'],
                 'template_overrides': plan['template_overrides'], 'override_resources': plan['override_resources'],
                 'layout_check':plan['layout_check'],'shutter':plan['shutter']['config']}}
+        if 'component_fields' in plan:
+            asset['html_motion'].update(component_fields=plan['component_fields'], component_values=plan['component_values'])
         if layout_result is not None:
             asset['html_motion']['layout_evidence']={'report_sha256':'sha256:'+sha256_file(layout_path),
                 'frame_count':layout_result['frame_count'],'quality_passed':True,'all_frame_orders_equal':True,
@@ -4719,7 +4755,10 @@ def command_html_render(args: argparse.Namespace) -> dict[str, Any]:
         ledger = load_ledger(root)
         add_record(ledger, record)
         clip = None
-        if plan['track'] is not None:
+        if plan.get('replacement_clip') is not None:
+            clip = plan['replacement_clip']
+            clip['asset_id'] = asset['id']
+        elif plan['track'] is not None:
             clip = {'id': new_id('clip_html'), 'asset_id': asset['id'], 'timeline_start_tick': args.timeline_start_tick,
                 'duration_tick': plan['spec']['duration_tick'], 'source_in_tick': 0, 'source_out_tick': plan['spec']['duration_tick']}
             plan['track']['clips'].append(clip)
@@ -6836,6 +6875,7 @@ _READ_ONLY_PROJECT_COMMANDS = {
     ("motion", "list"),
     ("motion", "inspect"),
     ('motion', 'html-inspect'),
+    ('motion', 'html-fields'),
     ('motion', 'html-controls'),
     ('motion', 'html-quality'),
 }
@@ -6915,6 +6955,7 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ('motion', 'html-source'): command_html_source,
     ('motion', 'stroke-source'): command_html_source,
     ('motion', 'html-inspect'): command_html_inspect,
+    ('motion', 'html-fields'): command_html_fields,
     ('motion', 'html-controls'): command_html_controls,
     ('motion', 'html-quality'): command_html_quality,
     ('motion', 'html-render'): command_html_render,

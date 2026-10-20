@@ -1,0 +1,862 @@
+{
+  "engine": "agent-local-html-motion-v1",
+  "report_version": "0.1.0",
+  "created_at": "2026-10-20T17:20:14.023596Z",
+  "plan": {
+    "spec": {
+      "entry": "index.html",
+      "width": 384,
+      "height": 216,
+      "fps": {
+        "den": 1,
+        "num": 10
+      },
+      "duration_tick": 180000,
+      "variables": []
+    },
+    "frame_count": 20,
+    "files": [
+      {
+        "bytes": 3188,
+        "path": "font.ttf",
+        "sha256": "sha256:e956bbd4573f1267daced5d59f7847dc8571782ef1f9dd35e695308e9e63663f"
+      },
+      {
+        "bytes": 316,
+        "path": "index.html",
+        "sha256": "sha256:fc82005876464ebe1285697bbb04848f72fbdb9605855ffcfa410bdf77fd1ded"
+      },
+      {
+        "bytes": 352,
+        "path": "product-blue.png",
+        "sha256": "sha256:fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2"
+      },
+      {
+        "bytes": 350,
+        "path": "product.png",
+        "sha256": "sha256:6a0f4b4aaa18e829af50d7e46dcc7935d074ea6521fea98ecd26e4ed008afea4"
+      },
+      {
+        "bytes": 288,
+        "path": "scene.mjs",
+        "sha256": "sha256:8a1c12cf42cd585217882d9ee20f3f7c8b9d0eca81c62f331efb5e9b8248a866"
+      },
+      {
+        "bytes": 817,
+        "path": "style.css",
+        "sha256": "sha256:7865f2221eb7d4826c14ded591420121a483cdb0a4bff4f2caac5a02e8d30696"
+      },
+      {
+        "path": "__template_images/fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2.png",
+        "bytes": 352,
+        "sha256": "sha256:fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2"
+      }
+    ],
+    "source_asset_id": "source",
+    "parameters": {},
+    "template_overrides": {
+      "variables": {
+        "--bar-size": "80px"
+      },
+      "texts": [
+        {
+          "at": "#cta",
+          "value": "CTA 2"
+        }
+      ],
+      "images": []
+    },
+    "compiled_overrides": [
+      {
+        "at": ":root",
+        "style": {
+          "--bar-size": "48px",
+          "--brand": "#38bdf8"
+        }
+      },
+      {
+        "at": "#cta",
+        "text": "CTA 2"
+      },
+      {
+        "at": "#title",
+        "text": "VIDEO 2"
+      },
+      {
+        "at": "#product",
+        "style": {
+          "content": "url(\"/__template_images/fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2.png\")"
+        },
+        "_image_kind": "img"
+      },
+      {
+        "at": "#badge",
+        "_visible": true
+      },
+      {
+        "at": "#moving",
+        "_visible": true
+      }
+    ],
+    "override_resources": [
+      {
+        "asset_id": "product-blue",
+        "sha256": "sha256:fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2",
+        "rights_ref": "product-blue",
+        "path": "__template_images/fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2.png"
+      }
+    ],
+    "layout_check": "strict",
+    "shutter": {
+      "config": {
+        "version": 1,
+        "samples": 1,
+        "fraction": 0.5,
+        "cut_ticks": [],
+        "sampling_phase": "midpoint_centered",
+        "composite_domain": "premultiplied_encoded_srgb_8bit"
+      },
+      "enabled": false,
+      "effective_samples": 1,
+      "output_frames": 20,
+      "capture_count": 20,
+      "render_passes": 3,
+      "layout_passes": 2,
+      "work_pixels": 8294400,
+      "budget_applied": false,
+      "internal_cuts": "explicit_anchors_only_no_automatic_scene_detection",
+      "working_storage": "one_RGBA_capture_and_four_int32_accumulation_planes_plus_native_temporaries; not a process RAM cap"
+    },
+    "shutter_implementation": null,
+    "project_sha256": "sha256:c2cfcfb3a899750488b003c92cb6c8cd7b615778e13c7743316e1573adb8a445",
+    "component_fields": [
+      {
+        "id": "headline",
+        "name": "广告标题",
+        "type": "text",
+        "at": "#title",
+        "schema": {
+          "maxLength": 24
+        }
+      },
+      {
+        "id": "badge",
+        "name": "展示标签",
+        "type": "boolean",
+        "at": "#badge"
+      },
+      {
+        "id": "moving",
+        "name": "展示动效",
+        "type": "boolean",
+        "at": "#moving"
+      },
+      {
+        "id": "bar",
+        "name": "进度长度",
+        "type": "var",
+        "var": "--bar-size",
+        "unit": "px",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 120
+        }
+      },
+      {
+        "id": "brand",
+        "name": "品牌颜色",
+        "type": "var",
+        "var": "--brand",
+        "schema": {
+          "enum": [
+            "#fb923c",
+            "#38bdf8"
+          ]
+        }
+      },
+      {
+        "id": "product",
+        "name": "产品图片",
+        "type": "image",
+        "kind": "img",
+        "at": "#product",
+        "default": {
+          "asset_id": "product-original"
+        },
+        "schema": {
+          "enum": [
+            {
+              "asset_id": "product-original"
+            },
+            {
+              "asset_id": "product-blue"
+            }
+          ]
+        }
+      }
+    ],
+    "component_values": [
+      {
+        "field_id": "badge",
+        "value": true
+      },
+      {
+        "field_id": "bar",
+        "value": 48
+      },
+      {
+        "field_id": "brand",
+        "value": "#38bdf8"
+      },
+      {
+        "field_id": "headline",
+        "value": "VIDEO 2"
+      },
+      {
+        "field_id": "moving",
+        "value": true
+      },
+      {
+        "field_id": "product",
+        "value": {
+          "asset_id": "product-blue"
+        }
+      }
+    ],
+    "engine": "agent-local-html-motion-v1",
+    "toolchain": {
+      "node_version": "v22.14.0",
+      "playwright_version": "1.62.1",
+      "node_sha256": "sha256:33b1bc1a8aca11fd5a4f2699e51019c63c0af30cf437701d07af69be7706771b"
+    },
+    "all_frames_checked_in_two_fresh_context_orders": true,
+    "output": "ffv1-bgra-nut",
+    "rights_status": "unverified",
+    "limits": [
+      "not_full_openfilm_timeline",
+      "no_embedded_media_iframes_or_webgl",
+      "not_hdr_or_capcut_parity"
+    ]
+  },
+  "status": "succeeded",
+  "worker_started": true,
+  "running_job_pids": [
+    27828,
+    39664,
+    37540,
+    25816,
+    23484,
+    13880,
+    30308,
+    16612
+  ],
+  "worker": {
+    "type": "done",
+    "frame_hashes": [
+      "sha256:3457f345468caabb1efce0606b30a3822c91c9dac24776c2102de441661b7a8e",
+      "sha256:527a4beae9f883fd5c26a169a5b017ddac72b6e7c507871e3618d73c00ba2c40",
+      "sha256:d6d7932d95d5ffc2961b256a554085dc31bfb761b1d8b28ff5e534adf2f83a14",
+      "sha256:7dc7eae0cda3d2df05d57ce34b5c498dc1369ef56af1058cfb18f8dfe0b8df37",
+      "sha256:e6e4b59bf28c97f65314280a879b1f4f002467113fb215c279a175040fb2cdb5",
+      "sha256:b6b8151399eaec1c4a54e6ebbd851977333a4c913c21beaeca296b7db6ff7e27",
+      "sha256:0d001dbb67a91218dedac9d190e07da53e87ada2bc4334dadb535e79f9577a79",
+      "sha256:61f5ee411de8a042c07fafa9bcdbe89d05752be96e00a017ae26101823d5540f",
+      "sha256:0aa0b3055a8b0ef3f7ca1fade2f4534df73c247dc7a96c149131d255d92b6ef3",
+      "sha256:89c31bf061988cfca5f0dd86e071f583bb478d0115eb5e4bbcc59ae7b8abf705",
+      "sha256:877569054399ce186a69a349b8b6721959b4c576fafe5222a666c81a5a25a88c",
+      "sha256:324ce0282a3360d7e4ed24f7ec0eb3248fa99c977587c5645fa88b31046faf84",
+      "sha256:097ff7731aef658775bcfba74c5f9a2a57d8b3bc7bc7d5b792d6a6dd5af5edf5",
+      "sha256:322db1bcde4aff3ec39db582014d9013759f3cde9e61e9b5d338fc22edb44ac5",
+      "sha256:8d2949c4cb6e8e1e48300761b2cf608fbeb468479d88098616d5f3dc09fc1970",
+      "sha256:67f94d8a537904764b56087ecdd083374644d1d0fadd1864ea524fc9971d6f35",
+      "sha256:d64ed4d259b0ed23f98486249ac3747da06c3a17ff0ef17650040cf436a20d2f",
+      "sha256:4cc9f4f80932fe6f43757975d001e8c937b5f2950e671ce1d873b970c989077a",
+      "sha256:3c8c8b8c575e7db1808840f267d7c508f9b7e236864310f0308413d56d874a86",
+      "sha256:66d5d673ef81a81bf7e9b6eb182bbe1f92cca264a3a551780af9157925af3e53"
+    ],
+    "verification": [
+      {
+        "name": "reverse",
+        "frames": [
+          {
+            "index": 19,
+            "sha256": "sha256:66d5d673ef81a81bf7e9b6eb182bbe1f92cca264a3a551780af9157925af3e53"
+          },
+          {
+            "index": 18,
+            "sha256": "sha256:3c8c8b8c575e7db1808840f267d7c508f9b7e236864310f0308413d56d874a86"
+          },
+          {
+            "index": 17,
+            "sha256": "sha256:4cc9f4f80932fe6f43757975d001e8c937b5f2950e671ce1d873b970c989077a"
+          },
+          {
+            "index": 16,
+            "sha256": "sha256:d64ed4d259b0ed23f98486249ac3747da06c3a17ff0ef17650040cf436a20d2f"
+          },
+          {
+            "index": 15,
+            "sha256": "sha256:67f94d8a537904764b56087ecdd083374644d1d0fadd1864ea524fc9971d6f35"
+          },
+          {
+            "index": 14,
+            "sha256": "sha256:8d2949c4cb6e8e1e48300761b2cf608fbeb468479d88098616d5f3dc09fc1970"
+          },
+          {
+            "index": 13,
+            "sha256": "sha256:322db1bcde4aff3ec39db582014d9013759f3cde9e61e9b5d338fc22edb44ac5"
+          },
+          {
+            "index": 12,
+            "sha256": "sha256:097ff7731aef658775bcfba74c5f9a2a57d8b3bc7bc7d5b792d6a6dd5af5edf5"
+          },
+          {
+            "index": 11,
+            "sha256": "sha256:324ce0282a3360d7e4ed24f7ec0eb3248fa99c977587c5645fa88b31046faf84"
+          },
+          {
+            "index": 10,
+            "sha256": "sha256:877569054399ce186a69a349b8b6721959b4c576fafe5222a666c81a5a25a88c"
+          },
+          {
+            "index": 9,
+            "sha256": "sha256:89c31bf061988cfca5f0dd86e071f583bb478d0115eb5e4bbcc59ae7b8abf705"
+          },
+          {
+            "index": 8,
+            "sha256": "sha256:0aa0b3055a8b0ef3f7ca1fade2f4534df73c247dc7a96c149131d255d92b6ef3"
+          },
+          {
+            "index": 7,
+            "sha256": "sha256:61f5ee411de8a042c07fafa9bcdbe89d05752be96e00a017ae26101823d5540f"
+          },
+          {
+            "index": 6,
+            "sha256": "sha256:0d001dbb67a91218dedac9d190e07da53e87ada2bc4334dadb535e79f9577a79"
+          },
+          {
+            "index": 5,
+            "sha256": "sha256:b6b8151399eaec1c4a54e6ebbd851977333a4c913c21beaeca296b7db6ff7e27"
+          },
+          {
+            "index": 4,
+            "sha256": "sha256:e6e4b59bf28c97f65314280a879b1f4f002467113fb215c279a175040fb2cdb5"
+          },
+          {
+            "index": 3,
+            "sha256": "sha256:7dc7eae0cda3d2df05d57ce34b5c498dc1369ef56af1058cfb18f8dfe0b8df37"
+          },
+          {
+            "index": 2,
+            "sha256": "sha256:d6d7932d95d5ffc2961b256a554085dc31bfb761b1d8b28ff5e534adf2f83a14"
+          },
+          {
+            "index": 1,
+            "sha256": "sha256:527a4beae9f883fd5c26a169a5b017ddac72b6e7c507871e3618d73c00ba2c40"
+          },
+          {
+            "index": 0,
+            "sha256": "sha256:3457f345468caabb1efce0606b30a3822c91c9dac24776c2102de441661b7a8e"
+          }
+        ]
+      },
+      {
+        "name": "odd_then_reverse_even",
+        "frames": [
+          {
+            "index": 1,
+            "sha256": "sha256:527a4beae9f883fd5c26a169a5b017ddac72b6e7c507871e3618d73c00ba2c40"
+          },
+          {
+            "index": 3,
+            "sha256": "sha256:7dc7eae0cda3d2df05d57ce34b5c498dc1369ef56af1058cfb18f8dfe0b8df37"
+          },
+          {
+            "index": 5,
+            "sha256": "sha256:b6b8151399eaec1c4a54e6ebbd851977333a4c913c21beaeca296b7db6ff7e27"
+          },
+          {
+            "index": 7,
+            "sha256": "sha256:61f5ee411de8a042c07fafa9bcdbe89d05752be96e00a017ae26101823d5540f"
+          },
+          {
+            "index": 9,
+            "sha256": "sha256:89c31bf061988cfca5f0dd86e071f583bb478d0115eb5e4bbcc59ae7b8abf705"
+          },
+          {
+            "index": 11,
+            "sha256": "sha256:324ce0282a3360d7e4ed24f7ec0eb3248fa99c977587c5645fa88b31046faf84"
+          },
+          {
+            "index": 13,
+            "sha256": "sha256:322db1bcde4aff3ec39db582014d9013759f3cde9e61e9b5d338fc22edb44ac5"
+          },
+          {
+            "index": 15,
+            "sha256": "sha256:67f94d8a537904764b56087ecdd083374644d1d0fadd1864ea524fc9971d6f35"
+          },
+          {
+            "index": 17,
+            "sha256": "sha256:4cc9f4f80932fe6f43757975d001e8c937b5f2950e671ce1d873b970c989077a"
+          },
+          {
+            "index": 19,
+            "sha256": "sha256:66d5d673ef81a81bf7e9b6eb182bbe1f92cca264a3a551780af9157925af3e53"
+          },
+          {
+            "index": 18,
+            "sha256": "sha256:3c8c8b8c575e7db1808840f267d7c508f9b7e236864310f0308413d56d874a86"
+          },
+          {
+            "index": 16,
+            "sha256": "sha256:d64ed4d259b0ed23f98486249ac3747da06c3a17ff0ef17650040cf436a20d2f"
+          },
+          {
+            "index": 14,
+            "sha256": "sha256:8d2949c4cb6e8e1e48300761b2cf608fbeb468479d88098616d5f3dc09fc1970"
+          },
+          {
+            "index": 12,
+            "sha256": "sha256:097ff7731aef658775bcfba74c5f9a2a57d8b3bc7bc7d5b792d6a6dd5af5edf5"
+          },
+          {
+            "index": 10,
+            "sha256": "sha256:877569054399ce186a69a349b8b6721959b4c576fafe5222a666c81a5a25a88c"
+          },
+          {
+            "index": 8,
+            "sha256": "sha256:0aa0b3055a8b0ef3f7ca1fade2f4534df73c247dc7a96c149131d255d92b6ef3"
+          },
+          {
+            "index": 6,
+            "sha256": "sha256:0d001dbb67a91218dedac9d190e07da53e87ada2bc4334dadb535e79f9577a79"
+          },
+          {
+            "index": 4,
+            "sha256": "sha256:e6e4b59bf28c97f65314280a879b1f4f002467113fb215c279a175040fb2cdb5"
+          },
+          {
+            "index": 2,
+            "sha256": "sha256:d6d7932d95d5ffc2961b256a554085dc31bfb761b1d8b28ff5e534adf2f83a14"
+          },
+          {
+            "index": 0,
+            "sha256": "sha256:3457f345468caabb1efce0606b30a3822c91c9dac24776c2102de441661b7a8e"
+          }
+        ]
+      }
+    ],
+    "browser_version": "149.0.7827.55",
+    "all_frame_orders_equal": true,
+    "template_controls": {
+      "vars": [
+        {
+          "name": "--bar-size",
+          "value": "96px",
+          "label": "Bar size",
+          "field": {
+            "kind": "number",
+            "value": 96,
+            "unit": "px"
+          },
+          "font": false
+        },
+        {
+          "name": "--brand",
+          "value": "#fb923c",
+          "label": "Brand",
+          "field": {
+            "kind": "color",
+            "value": "#fb923c"
+          },
+          "font": false
+        },
+        {
+          "name": "--outline",
+          "value": "#cbd5e1",
+          "label": "Outline",
+          "field": {
+            "kind": "color",
+            "value": "#cbd5e1"
+          },
+          "font": false
+        }
+      ],
+      "texts": [
+        {
+          "at": "#title",
+          "label": "EDIT VIDEO",
+          "value": "EDIT VIDEO"
+        },
+        {
+          "at": "#cta",
+          "label": "CTA",
+          "value": "CTA"
+        }
+      ],
+      "images": [
+        {
+          "at": "#product",
+          "kind": "img",
+          "label": "product",
+          "src": "local://html-source/product.png"
+        }
+      ],
+      "scope": "visible-DOM-direct-text-single-image-and-root-CSS-at-sampled-frame"
+    },
+    "template_applied": {
+      "entries": 6,
+      "matches": 6,
+      "every_target_found": true
+    },
+    "effective_template_controls": {
+      "vars": [
+        {
+          "name": "--bar-size",
+          "value": "48px",
+          "label": "Bar size",
+          "field": {
+            "kind": "number",
+            "value": 48,
+            "unit": "px"
+          },
+          "font": false
+        },
+        {
+          "name": "--brand",
+          "value": "#38bdf8",
+          "label": "Brand",
+          "field": {
+            "kind": "color",
+            "value": "#38bdf8"
+          },
+          "font": false
+        },
+        {
+          "name": "--outline",
+          "value": "#cbd5e1",
+          "label": "Outline",
+          "field": {
+            "kind": "color",
+            "value": "#cbd5e1"
+          },
+          "font": false
+        }
+      ],
+      "texts": [
+        {
+          "at": "#title",
+          "label": "VIDEO 2",
+          "value": "VIDEO 2"
+        },
+        {
+          "at": "#cta",
+          "label": "CTA 2",
+          "value": "CTA 2"
+        }
+      ],
+      "images": [
+        {
+          "at": "#product",
+          "kind": "img",
+          "label": "product",
+          "src": "local://html-source/__template_images/fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2.png"
+        }
+      ],
+      "scope": "visible-DOM-direct-text-single-image-and-root-CSS-at-sampled-frame"
+    },
+    "cleanup": {
+      "pages_opened": 3,
+      "pages_closed": 3,
+      "local_requests": 78,
+      "denied_requests": 0,
+      "browser_closed": true
+    }
+  },
+  "cleanup": {
+    "native_job": true,
+    "seen_pids": [
+      13880,
+      16612,
+      23484,
+      25816,
+      25844,
+      27828,
+      30308,
+      37076,
+      37540,
+      39664
+    ],
+    "start_policy": "create_suspended_assign_job_resume_primary_thread",
+    "resumed_primary_threads": [
+      {
+        "pid": 27828,
+        "thread_id": 32272
+      },
+      {
+        "pid": 13880,
+        "thread_id": 15552
+      }
+    ],
+    "active_before_final_cleanup": [],
+    "active_after_cleanup": [],
+    "all_children_reaped": true,
+    "termination_reason": null
+  },
+  "shutter_evidence": {
+    "profile": {
+      "config": {
+        "version": 1,
+        "samples": 1,
+        "fraction": 0.5,
+        "cut_ticks": [],
+        "sampling_phase": "midpoint_centered",
+        "composite_domain": "premultiplied_encoded_srgb_8bit"
+      },
+      "enabled": false,
+      "effective_samples": 1,
+      "output_frames": 20,
+      "capture_count": 20,
+      "render_passes": 3,
+      "layout_passes": 2,
+      "work_pixels": 8294400,
+      "budget_applied": false,
+      "internal_cuts": "explicit_anchors_only_no_automatic_scene_detection",
+      "working_storage": "one_RGBA_capture_and_four_int32_accumulation_planes_plus_native_temporaries; not a process RAM cap"
+    },
+    "captures": null,
+    "encoded_frames": [
+      {
+        "output_frame": 0,
+        "png_sha256": "sha256:3457f345468caabb1efce0606b30a3822c91c9dac24776c2102de441661b7a8e",
+        "source_capture_start": 0,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 1,
+        "png_sha256": "sha256:527a4beae9f883fd5c26a169a5b017ddac72b6e7c507871e3618d73c00ba2c40",
+        "source_capture_start": 1,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 2,
+        "png_sha256": "sha256:d6d7932d95d5ffc2961b256a554085dc31bfb761b1d8b28ff5e534adf2f83a14",
+        "source_capture_start": 2,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 3,
+        "png_sha256": "sha256:7dc7eae0cda3d2df05d57ce34b5c498dc1369ef56af1058cfb18f8dfe0b8df37",
+        "source_capture_start": 3,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 4,
+        "png_sha256": "sha256:e6e4b59bf28c97f65314280a879b1f4f002467113fb215c279a175040fb2cdb5",
+        "source_capture_start": 4,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 5,
+        "png_sha256": "sha256:b6b8151399eaec1c4a54e6ebbd851977333a4c913c21beaeca296b7db6ff7e27",
+        "source_capture_start": 5,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 6,
+        "png_sha256": "sha256:0d001dbb67a91218dedac9d190e07da53e87ada2bc4334dadb535e79f9577a79",
+        "source_capture_start": 6,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 7,
+        "png_sha256": "sha256:61f5ee411de8a042c07fafa9bcdbe89d05752be96e00a017ae26101823d5540f",
+        "source_capture_start": 7,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 8,
+        "png_sha256": "sha256:0aa0b3055a8b0ef3f7ca1fade2f4534df73c247dc7a96c149131d255d92b6ef3",
+        "source_capture_start": 8,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 9,
+        "png_sha256": "sha256:89c31bf061988cfca5f0dd86e071f583bb478d0115eb5e4bbcc59ae7b8abf705",
+        "source_capture_start": 9,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 10,
+        "png_sha256": "sha256:877569054399ce186a69a349b8b6721959b4c576fafe5222a666c81a5a25a88c",
+        "source_capture_start": 10,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 11,
+        "png_sha256": "sha256:324ce0282a3360d7e4ed24f7ec0eb3248fa99c977587c5645fa88b31046faf84",
+        "source_capture_start": 11,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 12,
+        "png_sha256": "sha256:097ff7731aef658775bcfba74c5f9a2a57d8b3bc7bc7d5b792d6a6dd5af5edf5",
+        "source_capture_start": 12,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 13,
+        "png_sha256": "sha256:322db1bcde4aff3ec39db582014d9013759f3cde9e61e9b5d338fc22edb44ac5",
+        "source_capture_start": 13,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 14,
+        "png_sha256": "sha256:8d2949c4cb6e8e1e48300761b2cf608fbeb468479d88098616d5f3dc09fc1970",
+        "source_capture_start": 14,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 15,
+        "png_sha256": "sha256:67f94d8a537904764b56087ecdd083374644d1d0fadd1864ea524fc9971d6f35",
+        "source_capture_start": 15,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 16,
+        "png_sha256": "sha256:d64ed4d259b0ed23f98486249ac3747da06c3a17ff0ef17650040cf436a20d2f",
+        "source_capture_start": 16,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 17,
+        "png_sha256": "sha256:4cc9f4f80932fe6f43757975d001e8c937b5f2950e671ce1d873b970c989077a",
+        "source_capture_start": 17,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 18,
+        "png_sha256": "sha256:3c8c8b8c575e7db1808840f267d7c508f9b7e236864310f0308413d56d874a86",
+        "source_capture_start": 18,
+        "source_capture_count": 1
+      },
+      {
+        "output_frame": 19,
+        "png_sha256": "sha256:66d5d673ef81a81bf7e9b6eb182bbe1f92cca264a3a551780af9157925af3e53",
+        "source_capture_start": 19,
+        "source_capture_count": 1
+      }
+    ],
+    "source_capture_count": 20,
+    "all_subframes_checked_in_two_fresh_context_orders": true,
+    "quality_accepted": false,
+    "continuous_playback_reviewed": false
+  },
+  "stderr": {
+    "node": "",
+    "ffmpeg": ""
+  },
+  "encoded_clock": {
+    "time_base": "1/81920",
+    "timestamps": [
+      0,
+      8192,
+      16384,
+      24576,
+      32768,
+      40960,
+      49152,
+      57344,
+      65536,
+      73728,
+      81920,
+      90112,
+      98304,
+      106496,
+      114688,
+      122880,
+      131072,
+      139264,
+      147456,
+      155648
+    ],
+    "all_frames_exact": true,
+    "frame_count": 20
+  },
+  "output_sha256": "sha256:233d25820100d6f2514267f1c4074db43eeb0fca3308f7dad4fa3bcb0f28a0b8",
+  "probe": {
+    "duration_seconds": 2.0,
+    "duration_tick": 180000,
+    "format": "nut",
+    "format_long_name": "NUT",
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "ffv1",
+        "codec_long_name": "FFmpeg video codec #1",
+        "codec_type": "video",
+        "codec_tag_string": "FFV1",
+        "codec_tag": "0x31564646",
+        "width": 384,
+        "height": 216,
+        "coded_width": 384,
+        "coded_height": 216,
+        "has_b_frames": 0,
+        "pix_fmt": "bgra",
+        "level": -99,
+        "r_frame_rate": "10/1",
+        "avg_frame_rate": "10/1",
+        "time_base": "1/81920",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "bits_per_raw_sample": "8",
+        "extradata_size": 42,
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "encoder": "Lavc62.28.100 ffv1"
+        }
+      }
+    ],
+    "video": {
+      "codec": "ffv1",
+      "width": 384,
+      "height": 216,
+      "pix_fmt": "bgra",
+      "fps": "10/1",
+      "color_space": null,
+      "duration_seconds": 2.0,
+      "start_time_seconds": 0.0,
+      "frame_count": 20
+    },
+    "audio": {
+      "codec": null,
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "start_time_seconds": 0.0
+    },
+    "container_duration_seconds": 1.9,
+    "duration_basis": "verified_exact_cfr_frames"
+  }
+}

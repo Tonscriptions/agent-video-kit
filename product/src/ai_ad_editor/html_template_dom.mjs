@@ -4,6 +4,7 @@
 // template-controls.ts (MIT). Copyright (c) 2026 OpenFilm contributors; see OPENFILM_LICENSE.txt.
 export const TEMPLATE_DOM = String.raw`
 const state = {win: window, touched: new Map(), found: []};
+const visibility = new Map();
 const issue = (code, message) => {throw Object.assign(new Error(code+': '+message), {code});};
 const budget = (value, limit, label) => {
   if(value > limit) issue('HTML_CONTROL_BUDGET', label); return value;
@@ -79,6 +80,7 @@ function collect() {
 }
 async function apply(list) {
   const known = rootNames(); let total = 0;
+  const visibleTargets = [];
   for(const item of list) {
     let nodes;
     try {nodes = [...document.querySelectorAll(item.at)];}
@@ -89,6 +91,10 @@ async function apply(list) {
     for(const key of Object.keys(item.style || {}))
       if(key.startsWith('--') && !known.has(key)) issue('HTML_OVERRIDE_VARIABLE_MISSING', key);
     for(const el of nodes) {
+      if(item._visible != null) {
+        if(typeof item._visible !== 'boolean') issue('HTML_COMPONENT_INVALID', 'Visibility needs a boolean');
+        visibleTargets.push({el, value:item._visible});
+      }
       if(item.text != null && ![...el.children].every(c => c.localName === 'br') &&
           ![...el.childNodes].some(n => n.nodeType === 3 && n.data.trim()))
         issue('HTML_OVERRIDE_TEXT_UNSUPPORTED', item.at);
@@ -102,6 +108,19 @@ async function apply(list) {
     const image = new Image(); image.src = src; await image.decode();
   }));
   override(state, list);
+  for(const {el, value} of visibleTargets) {
+    if(!el.isConnected) issue('HTML_COMPONENT_TARGET_CHANGED', 'A text override removed a visibility target');
+    if(!visibility.has(el)) visibility.set(el, {
+      hidden:el.getAttribute('hidden'),
+      display:[el.style.getPropertyValue('display'),el.style.getPropertyPriority('display')],
+      visibility:[el.style.getPropertyValue('visibility'),el.style.getPropertyPriority('visibility')]
+    });
+    if(value) {
+      el.removeAttribute('hidden');
+      el.style.setProperty('visibility','visible','important');
+      if(getComputedStyle(el).display === 'none') el.style.setProperty('display','revert','important');
+    } else el.style.setProperty('visibility','hidden','important');
+  }
   await document.fonts.ready;
   // CSS content/background replacements are awaited by screenshot and a pair
   // of animation frames; source <img> decoding has its own explicit failure.
@@ -110,5 +129,17 @@ async function apply(list) {
   }));
   return {entries: list.length, matches: total, every_target_found: state.found.every(Boolean)};
 }
-window.__agentVideoTemplate = {collect, apply, restore: () => restore(state)};
+function restoreAll() {
+  for(const [el, saved] of visibility) {
+    if(saved.hidden === null) el.removeAttribute('hidden');
+    else el.setAttribute('hidden',saved.hidden);
+    for(const key of ['display','visibility']) {
+      const [value,priority] = saved[key];
+      if(value) el.style.setProperty(key,value,priority); else el.style.removeProperty(key);
+    }
+  }
+  visibility.clear();
+  restore(state);
+}
+window.__agentVideoTemplate = {collect, apply, restore: restoreAll};
 `;

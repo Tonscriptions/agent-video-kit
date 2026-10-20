@@ -1,0 +1,154 @@
+"""Synchronize bounded V79 component acceptance from actual native receipts."""
+from __future__ import annotations
+import argparse
+import json
+import os
+from pathlib import Path
+import re
+
+ROOT = Path(__file__).resolve().parents[1]
+REL = 'docs/validation/evidence/html-components-20261021-v79'
+BASE = ROOT/REL
+NATIVE = 'docs/assets/html-components-20261021-v79-native-r2'
+INSTALLED = 'docs/assets/html-components-20261021-v79-installed-r1'
+CONTRACT = ROOT/'docs/specs/HTML组件字段与逐片段取值契约_v0.1_2026-10-21.md'
+REPORT = ROOT/'docs/validation/HTML组件字段与逐片段参数离线实测_2026-10-21.md'
+DOCUMENTS = ('README.md', 'docs/README.md', 'docs/构建进度总表_2026-10-16.md',
+    'docs/产品需求与开发路线基线_2026-10-12.md', 'docs/specs/AgentCLI契约_v0.1_2026-10-13.md',
+    'docs/validation/README功能核验与实测演示_2026-10-16.md', 'docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md')
+FOLLOWUPS = ('docs/OpenFilm_0.2.3增量复用与开发成本评估_2026-10-20.md',
+    'docs/OpenFilm_0.2.4复用复核与成本更新_2026-10-21.md',
+    'docs/specs/OpenFilm组件参数与预览缓存接入边界_v0.1_2026-10-20.md')
+SKILLS = ('video-cut-agent-editor', 'video-cut-template-library', 'video-cut-timeline', 'video-cut-quality')
+SCRIPTS = ('smoke_html_components', 'verify_html_components_install', 'sync_html_components_documents',
+    'audit_html_components_release', 'publish_html_components')
+
+
+def read(path): return json.loads(Path(path).read_bytes())
+def write(path, text): path.write_text(text, encoding='utf8', newline='\n')
+def link(path, label, target): return f'[{label}]({os.path.relpath(target, path.parent).replace(chr(92), "/")})'
+
+
+def block(path, marker, body):
+    text = path.read_text(encoding='utf8')
+    section = f'<!-- {marker} -->\n{body.rstrip()}\n<!-- /{marker} -->'
+    pattern = r'<!-- '+re.escape(marker)+r' -->.*?<!-- /'+re.escape(marker)+r' -->'
+    if path.name == 'SKILL.md':
+        # Keep marked documentation out of the YAML header, including repair of
+        # the first candidate whose generic heading insertion used the first ---.
+        text = re.sub(pattern, '', text, count=1, flags=re.S)
+        text = re.sub(r'\A---\n(?:[ \t]*\n)+', '---\n', text)
+        header = re.match(r'\A---\n.*?\n---(?:\n|$)', text, re.S)
+        assert header, path
+        text = header[0].rstrip()+'\n\n'+section+'\n\n'+text[header.end():].lstrip('\n')
+    elif re.search(pattern, text, re.S):
+        text = re.sub(pattern, lambda _: section, text, count=1, flags=re.S)
+    else:
+        title, rest = text.split('\n', 1); text = title+'\n\n'+section+'\n'+rest
+    write(path, text)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--candidate', action='store_true'); args = parser.parse_args()
+    focus = read(BASE/'targeted-r3.json'); dev = read(BASE/'native-r2/verification.json')
+    install = read(BASE/'installed-r1/verification.json'); media = read(BASE/'installed-r1/media/verification.json')
+    current = focus['frozen_after']
+    assert focus['terminal_ok'] and focus['methods'] == 28 and focus['skipped'] == 0 and len(current) == 237
+    for value in (focus, dev, install, media):
+        assert value['frozen_equal'] and value['frozen_before'] == value['frozen_after'] == current
+    for value in (dev, install, media):
+        assert value['status'] == 'passed' and all(row['ok'] for row in value['checks'])
+    assert dev['decoded_case_hashes'] == media['decoded_case_hashes']
+    if args.candidate:
+        full_text = '全量回归仍在执行；候选未完成 main 发行验收'
+        skills_text = '4 份相关 Skill 已更新；17 份 Skill 的发现联接待 main 核对'
+    else:
+        full = read(BASE/'full-r1.json'); audit = read(BASE/'skills-r1.json')
+        assert full['terminal_ok'] and full['status'] == 'passed' and full['methods'] == 1796 and full['skipped'] == 0
+        assert full['frozen_before'] == full['frozen_after'] == current and full['frozen_equal'] and full['external_fixtures_equal']
+        full_text = f'完整原生回归 **{full["methods"]}/{full["methods"]}、{full["suite_seconds"]:.3f} 秒、0 跳过，237 冻结输入＋8 外部夹具前后相同**'
+        skills_text = f'{audit["skill_count"]} Skills／{audit["local_links_checked"]} 本地引用及发现联接已核对'
+    summary = ('2026-10-21 **V79（HTML 组件字段与逐片段取值限定验收）**：落实 OpenFilm 接入契约 CP-01..06。'
+        '新命令 `motion html-fields` 无浏览器返回稳定 ID、独立定义／取值、JSON Schema、类型／范围／单位／默认来源及图片选项；'
+        '`html-render/controls/quality` 共用有类型的组件补丁、单项 null 与全量 reset。'
+        '本地图片限定原源码登记闭包并检查实际 SHA 与 strict commercial_ad 权利；boolean 在每帧作者动画后执行，并恢复原页面属性。'
+        '`--replace-clip-id` 仅更换指定片段资产引用，保留作者时间、变换、特效和其他片段。'
+        f'{full_text}；专项 **28/28、{focus["suite_seconds"]:.3f} 秒、0 跳过**，属于全量子集。'
+        f'开发 **{dev["successful_cli"]} 成功 CLI＋{dev["rejected_cli"]} 明确拒绝／{len(dev["checks"])} 检查**；'
+        '7 组×20 帧无损 RGBA、稳定 ID 改名保值、局部／全量复位、图片与逐帧显隐独立像素、包／片段重建、2 个实际队列输出均核验。'
+        f'离线 **{len(install["resource_hashes"])} 资源／7 wheels／{install["isolated_cli_calls"]} 次隔离 CLI＋1 来源探针**；'
+        f'源码／平台 wheel／安装资源逐字节一致，开发与安装 7 组解码相同；{skills_text}。'
+        '未验收自动字段发现、任意网页／完整 OpenFilm 时间线、自然广告质量、实时连续播放、HDR或完整剪映效果等价。')
+
+    rows = [
+        ('V79-01 / CP-01,02', '字段与机器发现', '稳定 ID 改名保值、独立定义／逐资产值；四类型、JSON Schema、范围／单位／默认／选项；无需 GUI', 'targeted-r3.json'),
+        ('V79-02 / CP-03,04', '预算与本地图片', '128 项／64 KiB 合并预算、512 字符 selector、n≤1024；闭包、SHA、权利，非法值在浏览器前拒绝', 'targeted-r3.json'),
+        ('V79-03 / CP-05', '显隐与复位', '原来显／隐／display:none／visibility:hidden、动画帧、空文字、0／false、单项／全量 reset、3 子帧快门', 'targeted-r3.json'),
+        ('V79-04 / CP-06', '真实 CLI 与复用', f'{dev["successful_cli"]} 成功＋{dev["rejected_cli"]} 拒绝／{len(dev["checks"])} 检查；7×20 RGBA 帧，包／片段重建和2次队列渲染', 'native-r2/verification.json'),
+        ('V79-05', '离线安装', f'155 资源／7 wheels；{install["isolated_cli_calls"]} 隔离 CLI／{len(install["checks"])} 检查＋1 来源探针；7组像素及源包与开发相同', 'installed-r1/verification.json'),
+        ('V79-06', '完整回归', full_text, 'full-r1.json'),
+        ('V79-07', '失败留证与审片边界', '专项 r1/r2、演示 r1、Skill YAML 格式拦截原始记录保留；修正4份 Skill 后重验；仅静态 PNG 目检，无连续播放／听审／新模型推理', 'skill-format-r1/verification.json'),
+    ]
+
+    def table(path):
+        text = '| 编号 | 核验内容 | 实际结果与边界 | 证据 |\n|---|---|---|---|\n'
+        for num, label, result, receipt in rows:
+            text += f'| {num} | {label} | {result} | {link(path, "收据", BASE/receipt)} |\n'
+        return text
+
+    def demo(path):
+        body = '原创输入 → 字段编辑 → 组件复位（复位保留普通 CTA 覆盖）：\n\n'
+        body += '!'+link(path, '20帧实际组件编辑与复位 GIF', ROOT/NATIVE/'comparison.gif')+'\n\n'
+        body += ' · '.join(link(path, label, ROOT/NATIVE/name) for label, name in (
+            ('原视频', 'original.mp4'), ('编辑后', 'edited.mp4'), ('复位视频', 'restored.mp4'),
+            ('原始 HTML／资源清单', 'template/manifest.json'), ('原图', 'template/product-original.png'),
+            ('替换图', 'template/product-blue.png'), ('逐文件摘要', 'files.json')))
+        body += '\n\n384×216、10 fps、2 秒、20 帧；GIF 为三列并排。MP4/GIF 仅观看副本，像素判定来自无损 RGBA／FFV1 NUT。输入、字体与脚本原创 CC0，不含音轨。\n'
+        return body
+
+    for name in DOCUMENTS:
+        path = ROOT/name
+        body = summary+'\n\n'+link(path, '组件契约', CONTRACT)+' · '+link(path, '实测与失败边界', REPORT)
+        if name == 'README.md': body += '\n\n'+table(path)+'\n\n'+demo(path)
+        block(path, 'V79-CURRENT', body)
+    for name in FOLLOWUPS:
+        path = ROOT/name
+        block(path, 'V79-FOLLOWUP', 'R13 后续 V79：CP-01..06 已有本地 CLI 限定实现；'+full_text+'。'
+            '采用组件字段的设计思路，新增稳定 ID、严格类型／闭包／权利／预算校验，未复制整套 Studio 或宽松输入规则。'
+            +link(path, '最终契约', CONTRACT)+' · '+link(path, '实际执行和验收边界', REPORT)+'。'
+            '本页此前的“待实现”与估算保留为当时研究状态；不重复计费已实现的字幕、覆盖、布局、子帧和预览。开放 NLE 适配与上下文图片裁剪仍独立待办。')
+    if not REPORT.exists(): write(REPORT, '# HTML 组件字段与逐片段参数离线实测\n')
+    body = summary+'\n\n'+table(REPORT)+'\n\n'+demo(REPORT)
+    body += '\n\n字段由作者清单声明，不是模型自动识别页面。字段与取值保存在工程元数据，原 HTML 与源码 ZIP 字节不变；包／片段仍可重新编辑，资产 ID 的默认值／选项／实际值跟随资源闭包映射。单片段替换仅改变 asset_id。继承值与改名输出完全相同；全量组件复位与未应用组件的基线全部 RGBA 相同，普通 CTA／变量覆盖仍保留。\n'
+    body += '\n专项 r1（25 方法，1 failure/10 errors）为演示 helper 重名及 Schema 夹具缺 probe；r2（25 方法，3 failures）包含 policy 对对象 engine 做集合查询的实际错误、hidden="until-found" 背景绘制的错误预期、手写夹具未设置序列时长。修正后 r3 为28方法全部通过，并加入真实片段资源映射、三子帧与 policy 回归；旧方法数不累加。实片 r1 严格字体检查拒绝缺字 O 与系统回退；为原创网格字体增加原创字形后用新目录复测，没有放宽字体门槛或像素阈值。\n'
+    body += '\n可见性 false 保留布局；true 只恢复目标自身 hidden/display/visibility，不能显示仍被祖先隐藏或裁切的内容。重置后恢复页面逐帧状态。类型更换或删除已设值字段需要明确补丁；图片添加到闭包须重新登记源码。普通模板覆盖保持兼容；组件图片执行更严格的事前权利门槛。\n'
+    body += '\n首轮发布已复制候选文件，但17 Skill 注册核验拦下错误的 YAML：新标记段落被插在首个 --- 后，落入 frontmatter。保留4份原始坏文档、当时同步/发布脚本和 stderr；修正为在完整 YAML 头之后插入，再单独验证4份格式与main的17份联接/本地引用。恢复只覆盖首轮已复制且摘要未变的本轮文件，不回滚其他文件。产品代码与237个全量冻结输入未改，复用本次1796项终态收据。\n'
+    body += '\n该实现只借鉴固定 OpenFilm component-props／template-controls 的字段设计，新 Python 协议和宿主显隐逻辑由本项目实现；现有6个 MIT 模块及许可未变。R13 的65个上游纯函数测试是研究记录，不加到本轮1796项产品回归。未取得同条件从零／复用工时对照，不能量化总工程成本节省比例。\n'
+    body += '\n复现使用 `scripts/smoke_html_components.py --work <新的product/.runtime目录> --evidence <新的docs目录> --assets <新的docs/assets目录> --html-runtime <已有本地JSON>`；安装验证使用 `scripts/verify_html_components_install.py`，另传已有 wheelhouse 和开发收据。完整回归使用绑定8个夹具的 wrapper，禁止运行中修改冻结输入。所有脚本拒绝覆盖旧结果。原生 Windows，无 Docker／WSL／虚拟环境；原生浏览器 worker 按 Job 回收，本轮不打开交互 tab。\n'
+    block(REPORT, 'V79-DETAIL', body)
+    contract = CONTRACT.read_text(encoding='utf8')
+    contract = re.sub(r'状态：[^\n]+', '状态：V79 候选实现，等待完整发行验收。' if args.candidate else '状态：V79 已按下列限定契约验收；不表示完整剪映等价。', contract, count=1)
+    write(CONTRACT, contract)
+    common = ('For declared editable HTML fields, read the\n'
+        '[component contract](../../docs/specs/HTML组件字段与逐片段取值契约_v0.1_2026-10-21.md) and\n'
+        '[native/isolated pixels, transfers, media and failures](../../docs/validation/HTML组件字段与逐片段参数离线实测_2026-10-21.md).\n'
+        '`motion html-fields --source-asset-id S` or `--from-asset-id A` returns typed\n'
+        'JSON Schema without drawing. Keep stable field IDs across display-name edits.\n'
+        'Pass local `--component-values` to html-render/controls/quality; null resets one\n'
+        'field, `--reset-components` clears component values then applies this patch.\n'
+        'Empty text, zero and false remain explicit values. Definitions and per-output\n'
+        'values are separate snapshots; preserve both on package/fragment transfer.\n'
+        'Images use `{ "asset_id": "registered_image" }` from the original source\n'
+        'closure with SHA and strict rights checks. No arbitrary image paths or URLs.\n'
+        'Boolean overrides run after each author frame; reset restores page animation.\n'
+        'The 128-change/64-KiB budget includes ordinary and component overrides.\n'
+        '`html-render --from-asset-id A --replace-clip-id C` changes only the matching\n'
+        'unlocked clip asset reference, preserving author timing and processing.\n'
+        'Render new immutable versions. Validate actual pixels and cleanup; this does\n'
+        'not accept arbitrary web pages, natural quality or full CapCut parity.')
+    for skill in SKILLS: block(ROOT/'skills'/skill/'SKILL.md', 'V79-COMPONENTS', common)
+    print(json.dumps({'status': 'candidate-synchronized' if args.candidate else 'synchronized', 'documents': 12, 'skills_updated': len(SKILLS)}))
+
+
+if __name__ == '__main__': main()

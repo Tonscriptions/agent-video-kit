@@ -3,6 +3,26 @@ name: video-cut-template-library
 description: Build and apply local advertising templates, or save and reuse edited clip groups across projects, with media indexing, rights and variable validation, and batch rendering.
 ---
 
+<!-- V79-COMPONENTS -->
+For declared editable HTML fields, read the
+[component contract](../../docs/specs/HTML组件字段与逐片段取值契约_v0.1_2026-10-21.md) and
+[native/isolated pixels, transfers, media and failures](../../docs/validation/HTML组件字段与逐片段参数离线实测_2026-10-21.md).
+`motion html-fields --source-asset-id S` or `--from-asset-id A` returns typed
+JSON Schema without drawing. Keep stable field IDs across display-name edits.
+Pass local `--component-values` to html-render/controls/quality; null resets one
+field, `--reset-components` clears component values then applies this patch.
+Empty text, zero and false remain explicit values. Definitions and per-output
+values are separate snapshots; preserve both on package/fragment transfer.
+Images use `{ "asset_id": "registered_image" }` from the original source
+closure with SHA and strict rights checks. No arbitrary image paths or URLs.
+Boolean overrides run after each author frame; reset restores page animation.
+The 128-change/64-KiB budget includes ordinary and component overrides.
+`html-render --from-asset-id A --replace-clip-id C` changes only the matching
+unlocked clip asset reference, preserving author timing and processing.
+Render new immutable versions. Validate actual pixels and cleanup; this does
+not accept arbitrary web pages, natural quality or full CapCut parity.
+<!-- /V79-COMPONENTS -->
+
 An explicit vector title can start with `motion stroke-source`, followed by
 the existing offline `motion html-render` pipeline. Read the
 [stroke contract](../../docs/specs/离线逐笔描线动效契约_v0.1_2026-10-18.md)

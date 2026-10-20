@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\scripts\audit_source_edit_skills.py", line 63, in <module>
+    run(args.output.resolve(),args.expected_count)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\scripts\audit_source_edit_skills.py", line 31, in run
+    assert process.returncode == 0, (folder, process.stdout, process.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (WindowsPath('E:/dev/sandbox/AI广告剪辑/skills/video-cut-agent-editor'), b'Invalid YAML in frontmatter: mapping values are not allowed here\r\n  in "<unicode string>", line 12, column 25:\r\n    Images use `{ "asset_id": "registered_image" }` from the ... \r\n                            ^\r\n', b'')

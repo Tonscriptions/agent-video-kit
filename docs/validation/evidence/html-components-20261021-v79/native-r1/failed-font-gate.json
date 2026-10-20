@@ -1,0 +1,2316 @@
+{
+  "engine": "agent-local-html-motion-v1",
+  "report_version": "0.1.0",
+  "created_at": "2026-10-20T17:10:29.747771Z",
+  "status": "failed",
+  "quality_only": true,
+  "plan": {
+    "spec": {
+      "entry": "index.html",
+      "width": 384,
+      "height": 216,
+      "fps": {
+        "den": 1,
+        "num": 10
+      },
+      "duration_tick": 180000,
+      "variables": []
+    },
+    "frame_count": 20,
+    "files": [
+      {
+        "bytes": 2976,
+        "path": "font.ttf",
+        "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1"
+      },
+      {
+        "bytes": 316,
+        "path": "index.html",
+        "sha256": "sha256:fc82005876464ebe1285697bbb04848f72fbdb9605855ffcfa410bdf77fd1ded"
+      },
+      {
+        "bytes": 352,
+        "path": "product-blue.png",
+        "sha256": "sha256:fceb139f67c6d03c46f10d3db9f5c0ff205097cfcf1d662bfccf95347b700cb2"
+      },
+      {
+        "bytes": 350,
+        "path": "product.png",
+        "sha256": "sha256:6a0f4b4aaa18e829af50d7e46dcc7935d074ea6521fea98ecd26e4ed008afea4"
+      },
+      {
+        "bytes": 288,
+        "path": "scene.mjs",
+        "sha256": "sha256:8a1c12cf42cd585217882d9ee20f3f7c8b9d0eca81c62f331efb5e9b8248a866"
+      },
+      {
+        "bytes": 817,
+        "path": "style.css",
+        "sha256": "sha256:7865f2221eb7d4826c14ded591420121a483cdb0a4bff4f2caac5a02e8d30696"
+      },
+      {
+        "path": "__template_images/6a0f4b4aaa18e829af50d7e46dcc7935d074ea6521fea98ecd26e4ed008afea4.png",
+        "bytes": 350,
+        "sha256": "sha256:6a0f4b4aaa18e829af50d7e46dcc7935d074ea6521fea98ecd26e4ed008afea4"
+      }
+    ],
+    "source_asset_id": "source",
+    "parameters": {},
+    "template_overrides": {
+      "variables": {
+        "--bar-size": "80px"
+      },
+      "texts": [
+        {
+          "at": "#cta",
+          "value": "CTA 2"
+        }
+      ],
+      "images": []
+    },
+    "compiled_overrides": [
+      {
+        "at": ":root",
+        "style": {
+          "--bar-size": "80px"
+        }
+      },
+      {
+        "at": "#cta",
+        "text": "CTA 2"
+      },
+      {
+        "at": "#product",
+        "style": {
+          "content": "url(\"/__template_images/6a0f4b4aaa18e829af50d7e46dcc7935d074ea6521fea98ecd26e4ed008afea4.png\")"
+        },
+        "_image_kind": "img"
+      }
+    ],
+    "override_resources": [
+      {
+        "asset_id": "product-original",
+        "sha256": "sha256:6a0f4b4aaa18e829af50d7e46dcc7935d074ea6521fea98ecd26e4ed008afea4",
+        "rights_ref": "product-original",
+        "path": "__template_images/6a0f4b4aaa18e829af50d7e46dcc7935d074ea6521fea98ecd26e4ed008afea4.png"
+      }
+    ],
+    "layout_check": "strict",
+    "shutter": {
+      "config": {
+        "version": 1,
+        "samples": 1,
+        "fraction": 0.5,
+        "cut_ticks": [],
+        "sampling_phase": "midpoint_centered",
+        "composite_domain": "premultiplied_encoded_srgb_8bit"
+      },
+      "enabled": false,
+      "effective_samples": 1,
+      "output_frames": 20,
+      "capture_count": 20,
+      "render_passes": 3,
+      "layout_passes": 2,
+      "work_pixels": 8294400,
+      "budget_applied": false,
+      "internal_cuts": "explicit_anchors_only_no_automatic_scene_detection",
+      "working_storage": "one_RGBA_capture_and_four_int32_accumulation_planes_plus_native_temporaries; not a process RAM cap"
+    },
+    "shutter_implementation": null,
+    "project_sha256": "sha256:e62b940cc5c7efee26f34618db9da5440396eb5fd652a6b53e184b52f102bc28",
+    "component_fields": [
+      {
+        "id": "headline",
+        "name": "广告标题",
+        "type": "text",
+        "at": "#title",
+        "schema": {
+          "maxLength": 24
+        }
+      },
+      {
+        "id": "badge",
+        "name": "展示标签",
+        "type": "boolean",
+        "at": "#badge"
+      },
+      {
+        "id": "moving",
+        "name": "展示动效",
+        "type": "boolean",
+        "at": "#moving"
+      },
+      {
+        "id": "bar",
+        "name": "进度长度",
+        "type": "var",
+        "var": "--bar-size",
+        "unit": "px",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 120
+        }
+      },
+      {
+        "id": "brand",
+        "name": "品牌颜色",
+        "type": "var",
+        "var": "--brand",
+        "schema": {
+          "enum": [
+            "#fb923c",
+            "#38bdf8"
+          ]
+        }
+      },
+      {
+        "id": "product",
+        "name": "产品图片",
+        "type": "image",
+        "kind": "img",
+        "at": "#product",
+        "default": {
+          "asset_id": "product-original"
+        },
+        "schema": {
+          "enum": [
+            {
+              "asset_id": "product-original"
+            },
+            {
+              "asset_id": "product-blue"
+            }
+          ]
+        }
+      }
+    ],
+    "component_values": [],
+    "engine": "agent-local-html-motion-v1",
+    "toolchain": {
+      "node_version": "v22.14.0",
+      "playwright_version": "1.62.1",
+      "node_sha256": "sha256:33b1bc1a8aca11fd5a4f2699e51019c63c0af30cf437701d07af69be7706771b"
+    },
+    "all_frames_checked_in_two_fresh_context_orders": false,
+    "output": null,
+    "rights_status": "unverified",
+    "limits": [
+      "not_full_openfilm_timeline",
+      "no_embedded_media_iframes_or_webgl",
+      "not_hdr_or_capcut_parity"
+    ],
+    "quality_only": true,
+    "all_frames_checked_in_primary_and_fresh_reverse": true
+  },
+  "font_sources": [
+    {
+      "path": "font.ttf",
+      "sha256": "sha256:b84d77e031a3b16f0a17c7d8174d800c26b399f62004d62554f36cf98e7e14c1",
+      "bytes": 2976,
+      "status": "mapped",
+      "postscript_name": "AgentGridCC0-Regular",
+      "family": "Agent Grid CC0",
+      "cmap_format": 4,
+      "decoded_table_bytes": 2794,
+      "mapping_units": 8
+    }
+  ],
+  "frames": [
+    {
+      "index": 0,
+      "sha256": "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT VIDEO",
+            "painted_text": "EDIT VIDEO",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 79,
+                "right": 185.59375,
+                "bottom": 105
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 9
+              },
+              {
+                "familyName": "Microsoft YaHei",
+                "postScriptName": "MicrosoftYaHei",
+                "isCustomFont": false,
+                "glyphCount": 1
+              }
+            ],
+            "mapping_checked": false,
+            "missing_codepoints": [
+              "U+004F"
+            ]
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": [
+          {
+            "code": "FONT_SOURCE_UNVERIFIED",
+            "at": "#title",
+            "text_node": 0,
+            "postscript_names": [
+              "MicrosoftYaHei"
+            ]
+          },
+          {
+            "code": "FONT_GLYPH_MISSING",
+            "at": "#title",
+            "text_node": 0,
+            "codepoints": [
+              "U+004F"
+            ]
+          }
+        ]
+      },
+      "preview": "cache/html-quality/html-quality-gate_20261020171029_32277189/frame-000000.png"
+    },
+    {
+      "index": 1,
+      "sha256": "sha256:01a2d3b5a38971f0f51e7e77b9c45353415899c48798abb44040961e4eee693a",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT VIDEO",
+            "painted_text": "EDIT VIDEO",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 79,
+                "right": 185.59375,
+                "bottom": 105
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 9
+              },
+              {
+                "familyName": "Microsoft YaHei",
+                "postScriptName": "MicrosoftYaHei",
+                "isCustomFont": false,
+                "glyphCount": 1
+              }
+            ],
+            "mapping_checked": false,
+            "missing_codepoints": [
+              "U+004F"
+            ]
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": [
+          {
+            "code": "FONT_SOURCE_UNVERIFIED",
+            "at": "#title",
+            "text_node": 0,
+            "postscript_names": [
+              "MicrosoftYaHei"
+            ]
+          },
+          {
+            "code": "FONT_GLYPH_MISSING",
+            "at": "#title",
+            "text_node": 0,
+            "codepoints": [
+              "U+004F"
+            ]
+          }
+        ]
+      },
+      "preview": "cache/html-quality/html-quality-gate_20261020171029_32277189/frame-000001.png"
+    },
+    {
+      "index": 2,
+      "sha256": "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT VIDEO",
+            "painted_text": "EDIT VIDEO",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 79,
+                "right": 185.59375,
+                "bottom": 105
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 9
+              },
+              {
+                "familyName": "Microsoft YaHei",
+                "postScriptName": "MicrosoftYaHei",
+                "isCustomFont": false,
+                "glyphCount": 1
+              }
+            ],
+            "mapping_checked": false,
+            "missing_codepoints": [
+              "U+004F"
+            ]
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": [
+          {
+            "code": "FONT_SOURCE_UNVERIFIED",
+            "at": "#title",
+            "text_node": 0,
+            "postscript_names": [
+              "MicrosoftYaHei"
+            ]
+          },
+          {
+            "code": "FONT_GLYPH_MISSING",
+            "at": "#title",
+            "text_node": 0,
+            "codepoints": [
+              "U+004F"
+            ]
+          }
+        ]
+      },
+      "preview": "cache/html-quality/html-quality-gate_20261020171029_32277189/frame-000002.png"
+    },
+    {
+      "index": 3,
+      "sha256": "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT VIDEO",
+            "painted_text": "EDIT VIDEO",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 79,
+                "right": 185.59375,
+                "bottom": 105
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 9
+              },
+              {
+                "familyName": "Microsoft YaHei",
+                "postScriptName": "MicrosoftYaHei",
+                "isCustomFont": false,
+                "glyphCount": 1
+              }
+            ],
+            "mapping_checked": false,
+            "missing_codepoints": [
+              "U+004F"
+            ]
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": [
+          {
+            "code": "FONT_SOURCE_UNVERIFIED",
+            "at": "#title",
+            "text_node": 0,
+            "postscript_names": [
+              "MicrosoftYaHei"
+            ]
+          },
+          {
+            "code": "FONT_GLYPH_MISSING",
+            "at": "#title",
+            "text_node": 0,
+            "codepoints": [
+              "U+004F"
+            ]
+          }
+        ]
+      },
+      "preview": "cache/html-quality/html-quality-gate_20261020171029_32277189/frame-000003.png"
+    },
+    {
+      "index": 4,
+      "sha256": "sha256:af0bd6c3aba26ea590516df3bf95d048d413d832d870650137d8c8abe5ad95e2",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT VIDEO",
+            "painted_text": "EDIT VIDEO",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 79,
+                "right": 185.59375,
+                "bottom": 105
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 9
+              },
+              {
+                "familyName": "Microsoft YaHei",
+                "postScriptName": "MicrosoftYaHei",
+                "isCustomFont": false,
+                "glyphCount": 1
+              }
+            ],
+            "mapping_checked": false,
+            "missing_codepoints": [
+              "U+004F"
+            ]
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": [
+          {
+            "code": "FONT_SOURCE_UNVERIFIED",
+            "at": "#title",
+            "text_node": 0,
+            "postscript_names": [
+              "MicrosoftYaHei"
+            ]
+          },
+          {
+            "code": "FONT_GLYPH_MISSING",
+            "at": "#title",
+            "text_node": 0,
+            "codepoints": [
+              "U+004F"
+            ]
+          }
+        ]
+      },
+      "preview": "cache/html-quality/html-quality-gate_20261020171029_32277189/frame-000004.png"
+    },
+    {
+      "index": 5,
+      "sha256": "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT VIDEO",
+            "painted_text": "EDIT VIDEO",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 79,
+                "right": 185.59375,
+                "bottom": 105
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 9
+              },
+              {
+                "familyName": "Microsoft YaHei",
+                "postScriptName": "MicrosoftYaHei",
+                "isCustomFont": false,
+                "glyphCount": 1
+              }
+            ],
+            "mapping_checked": false,
+            "missing_codepoints": [
+              "U+004F"
+            ]
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": [
+          {
+            "code": "FONT_SOURCE_UNVERIFIED",
+            "at": "#title",
+            "text_node": 0,
+            "postscript_names": [
+              "MicrosoftYaHei"
+            ]
+          },
+          {
+            "code": "FONT_GLYPH_MISSING",
+            "at": "#title",
+            "text_node": 0,
+            "codepoints": [
+              "U+004F"
+            ]
+          }
+        ]
+      },
+      "preview": "cache/html-quality/html-quality-gate_20261020171029_32277189/frame-000005.png"
+    },
+    {
+      "index": 6,
+      "sha256": "sha256:6d36be262403de427a0da0fbfc76f9060e9e116cc6aac5093bc61d99d2a454a9",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT VIDEO",
+            "painted_text": "EDIT VIDEO",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 79,
+                "right": 185.59375,
+                "bottom": 105
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 9
+              },
+              {
+                "familyName": "Microsoft YaHei",
+                "postScriptName": "MicrosoftYaHei",
+                "isCustomFont": false,
+                "glyphCount": 1
+              }
+            ],
+            "mapping_checked": false,
+            "missing_codepoints": [
+              "U+004F"
+            ]
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": [
+          {
+            "code": "FONT_SOURCE_UNVERIFIED",
+            "at": "#title",
+            "text_node": 0,
+            "postscript_names": [
+              "MicrosoftYaHei"
+            ]
+          },
+          {
+            "code": "FONT_GLYPH_MISSING",
+            "at": "#title",
+            "text_node": 0,
+            "codepoints": [
+              "U+004F"
+            ]
+          }
+        ]
+      },
+      "preview": "cache/html-quality/html-quality-gate_20261020171029_32277189/frame-000006.png"
+    },
+    {
+      "index": 7,
+      "sha256": "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT VIDEO",
+            "painted_text": "EDIT VIDEO",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 79,
+                "right": 185.59375,
+                "bottom": 105
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 9
+              },
+              {
+                "familyName": "Microsoft YaHei",
+                "postScriptName": "MicrosoftYaHei",
+                "isCustomFont": false,
+                "glyphCount": 1
+              }
+            ],
+            "mapping_checked": false,
+            "missing_codepoints": [
+              "U+004F"
+            ]
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": [
+          {
+            "code": "FONT_SOURCE_UNVERIFIED",
+            "at": "#title",
+            "text_node": 0,
+            "postscript_names": [
+              "MicrosoftYaHei"
+            ]
+          },
+          {
+            "code": "FONT_GLYPH_MISSING",
+            "at": "#title",
+            "text_node": 0,
+            "codepoints": [
+              "U+004F"
+            ]
+          }
+        ]
+      },
+      "preview": "cache/html-quality/html-quality-gate_20261020171029_32277189/frame-000007.png"
+    },
+    {
+      "index": 8,
+      "sha256": "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT VIDEO",
+            "painted_text": "EDIT VIDEO",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 79,
+                "right": 185.59375,
+                "bottom": 105
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 9
+              },
+              {
+                "familyName": "Microsoft YaHei",
+                "postScriptName": "MicrosoftYaHei",
+                "isCustomFont": false,
+                "glyphCount": 1
+              }
+            ],
+            "mapping_checked": false,
+            "missing_codepoints": [
+              "U+004F"
+            ]
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": [
+          {
+            "code": "FONT_SOURCE_UNVERIFIED",
+            "at": "#title",
+            "text_node": 0,
+            "postscript_names": [
+              "MicrosoftYaHei"
+            ]
+          },
+          {
+            "code": "FONT_GLYPH_MISSING",
+            "at": "#title",
+            "text_node": 0,
+            "codepoints": [
+              "U+004F"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "index": 9,
+      "sha256": "sha256:0d7068fedb466df2bfe75d959c319b38d3f7738cf57c3bb99b9e8cda5b276ef7",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT VIDEO",
+            "painted_text": "EDIT VIDEO",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 79,
+                "right": 185.59375,
+                "bottom": 105
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 9
+              },
+              {
+                "familyName": "Microsoft YaHei",
+                "postScriptName": "MicrosoftYaHei",
+                "isCustomFont": false,
+                "glyphCount": 1
+              }
+            ],
+            "mapping_checked": false,
+            "missing_codepoints": [
+              "U+004F"
+            ]
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": [
+          {
+            "code": "FONT_SOURCE_UNVERIFIED",
+            "at": "#title",
+            "text_node": 0,
+            "postscript_names": [
+              "MicrosoftYaHei"
+            ]
+          },
+          {
+            "code": "FONT_GLYPH_MISSING",
+            "at": "#title",
+            "text_node": 0,
+            "codepoints": [
+              "U+004F"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "index": 10,
+      "sha256": "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT 2",
+            "painted_text": "EDIT 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 72,
+                "right": 117.609375,
+                "bottom": 98
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 6
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": []
+      }
+    },
+    {
+      "index": 11,
+      "sha256": "sha256:507f38ad04b83f27d88c72e92b00be9e0f13c30b4f6e43e98cde78dcad37ca2a",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT 2",
+            "painted_text": "EDIT 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 72,
+                "right": 117.609375,
+                "bottom": 98
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 6
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": []
+      }
+    },
+    {
+      "index": 12,
+      "sha256": "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT 2",
+            "painted_text": "EDIT 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 72,
+                "right": 117.609375,
+                "bottom": 98
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 6
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": []
+      }
+    },
+    {
+      "index": 13,
+      "sha256": "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT 2",
+            "painted_text": "EDIT 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 72,
+                "right": 117.609375,
+                "bottom": 98
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 6
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": []
+      }
+    },
+    {
+      "index": 14,
+      "sha256": "sha256:72f736830f6c70fd19da2bb9b30b4d2e2d63d6cc094c042a66ae776b875ccec0",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT 2",
+            "painted_text": "EDIT 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 72,
+                "right": 117.609375,
+                "bottom": 98
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 6
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": []
+      }
+    },
+    {
+      "index": 15,
+      "sha256": "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT 2",
+            "painted_text": "EDIT 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 72,
+                "right": 117.609375,
+                "bottom": 98
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 6
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": []
+      }
+    },
+    {
+      "index": 16,
+      "sha256": "sha256:0d795e460e589c750f82e1660477f0e49236f2277b33a76c2110c0cbec14b6b0",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT 2",
+            "painted_text": "EDIT 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 72,
+                "right": 117.609375,
+                "bottom": 98
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 6
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": []
+      }
+    },
+    {
+      "index": 17,
+      "sha256": "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT 2",
+            "painted_text": "EDIT 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 72,
+                "right": 117.609375,
+                "bottom": 98
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 6
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": []
+      }
+    },
+    {
+      "index": 18,
+      "sha256": "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT 2",
+            "painted_text": "EDIT 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 72,
+                "right": 117.609375,
+                "bottom": 98
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 6
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": []
+      }
+    },
+    {
+      "index": 19,
+      "sha256": "sha256:e1c790fd32bad02246ec5dc52c9ebb83e46dca26726f86422576039b61baa07a",
+      "layout": {
+        "rows": [
+          {
+            "at": "#title",
+            "text": "EDIT 2",
+            "painted_text": "EDIT 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 72,
+                "right": 117.609375,
+                "bottom": 98
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "26px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 6
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          },
+          {
+            "at": "#cta",
+            "text": "CTA 2",
+            "painted_text": "CTA 2",
+            "text_node": 0,
+            "rects": [
+              {
+                "left": 24,
+                "top": 142,
+                "right": 84,
+                "bottom": 162
+              }
+            ],
+            "font_family": "AgentGrid",
+            "font_size": "20px",
+            "font_weight": "400",
+            "font_style": "normal",
+            "problems": [],
+            "platform_fonts": [
+              {
+                "familyName": "Agent Grid CC0",
+                "postScriptName": "AgentGridCC0-Regular",
+                "isCustomFont": true,
+                "glyphCount": 5
+              }
+            ],
+            "mapping_checked": true,
+            "missing_codepoints": []
+          }
+        ],
+        "unsupported": [],
+        "face_sources": [
+          {
+            "family": "AgentGrid",
+            "urls": [
+              "local://html-source/font.ttf"
+            ]
+          }
+        ],
+        "upstream_partial_clipping": [],
+        "tolerance_css_pixels": 0.5,
+        "issues": []
+      }
+    }
+  ],
+  "issues": [
+    {
+      "frame": 0,
+      "code": "FONT_SOURCE_UNVERIFIED",
+      "at": "#title",
+      "text_node": 0,
+      "postscript_names": [
+        "MicrosoftYaHei"
+      ]
+    },
+    {
+      "frame": 0,
+      "code": "FONT_GLYPH_MISSING",
+      "at": "#title",
+      "text_node": 0,
+      "codepoints": [
+        "U+004F"
+      ]
+    },
+    {
+      "frame": 1,
+      "code": "FONT_SOURCE_UNVERIFIED",
+      "at": "#title",
+      "text_node": 0,
+      "postscript_names": [
+        "MicrosoftYaHei"
+      ]
+    },
+    {
+      "frame": 1,
+      "code": "FONT_GLYPH_MISSING",
+      "at": "#title",
+      "text_node": 0,
+      "codepoints": [
+        "U+004F"
+      ]
+    },
+    {
+      "frame": 2,
+      "code": "FONT_SOURCE_UNVERIFIED",
+      "at": "#title",
+      "text_node": 0,
+      "postscript_names": [
+        "MicrosoftYaHei"
+      ]
+    },
+    {
+      "frame": 2,
+      "code": "FONT_GLYPH_MISSING",
+      "at": "#title",
+      "text_node": 0,
+      "codepoints": [
+        "U+004F"
+      ]
+    },
+    {
+      "frame": 3,
+      "code": "FONT_SOURCE_UNVERIFIED",
+      "at": "#title",
+      "text_node": 0,
+      "postscript_names": [
+        "MicrosoftYaHei"
+      ]
+    },
+    {
+      "frame": 3,
+      "code": "FONT_GLYPH_MISSING",
+      "at": "#title",
+      "text_node": 0,
+      "codepoints": [
+        "U+004F"
+      ]
+    },
+    {
+      "frame": 4,
+      "code": "FONT_SOURCE_UNVERIFIED",
+      "at": "#title",
+      "text_node": 0,
+      "postscript_names": [
+        "MicrosoftYaHei"
+      ]
+    },
+    {
+      "frame": 4,
+      "code": "FONT_GLYPH_MISSING",
+      "at": "#title",
+      "text_node": 0,
+      "codepoints": [
+        "U+004F"
+      ]
+    },
+    {
+      "frame": 5,
+      "code": "FONT_SOURCE_UNVERIFIED",
+      "at": "#title",
+      "text_node": 0,
+      "postscript_names": [
+        "MicrosoftYaHei"
+      ]
+    },
+    {
+      "frame": 5,
+      "code": "FONT_GLYPH_MISSING",
+      "at": "#title",
+      "text_node": 0,
+      "codepoints": [
+        "U+004F"
+      ]
+    },
+    {
+      "frame": 6,
+      "code": "FONT_SOURCE_UNVERIFIED",
+      "at": "#title",
+      "text_node": 0,
+      "postscript_names": [
+        "MicrosoftYaHei"
+      ]
+    },
+    {
+      "frame": 6,
+      "code": "FONT_GLYPH_MISSING",
+      "at": "#title",
+      "text_node": 0,
+      "codepoints": [
+        "U+004F"
+      ]
+    },
+    {
+      "frame": 7,
+      "code": "FONT_SOURCE_UNVERIFIED",
+      "at": "#title",
+      "text_node": 0,
+      "postscript_names": [
+        "MicrosoftYaHei"
+      ]
+    },
+    {
+      "frame": 7,
+      "code": "FONT_GLYPH_MISSING",
+      "at": "#title",
+      "text_node": 0,
+      "codepoints": [
+        "U+004F"
+      ]
+    },
+    {
+      "frame": 8,
+      "code": "FONT_SOURCE_UNVERIFIED",
+      "at": "#title",
+      "text_node": 0,
+      "postscript_names": [
+        "MicrosoftYaHei"
+      ]
+    },
+    {
+      "frame": 8,
+      "code": "FONT_GLYPH_MISSING",
+      "at": "#title",
+      "text_node": 0,
+      "codepoints": [
+        "U+004F"
+      ]
+    },
+    {
+      "frame": 9,
+      "code": "FONT_SOURCE_UNVERIFIED",
+      "at": "#title",
+      "text_node": 0,
+      "postscript_names": [
+        "MicrosoftYaHei"
+      ]
+    },
+    {
+      "frame": 9,
+      "code": "FONT_GLYPH_MISSING",
+      "at": "#title",
+      "text_node": 0,
+      "codepoints": [
+        "U+004F"
+      ]
+    }
+  ],
+  "scope": "all-CFR-frames-DOM-range-geometry-and-source-font-Unicode-mapping",
+  "shaping_and_aesthetics_accepted": false,
+  "validation_complete": true,
+  "worker": {
+    "type": "done",
+    "quality_only": true,
+    "frame_hashes": [
+      "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "sha256:01a2d3b5a38971f0f51e7e77b9c45353415899c48798abb44040961e4eee693a",
+      "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "sha256:af0bd6c3aba26ea590516df3bf95d048d413d832d870650137d8c8abe5ad95e2",
+      "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "sha256:6d36be262403de427a0da0fbfc76f9060e9e116cc6aac5093bc61d99d2a454a9",
+      "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "sha256:d7382324de251c8e819d565fec669c94e68828820dcd177b595eaab5f8142b76",
+      "sha256:0d7068fedb466df2bfe75d959c319b38d3f7738cf57c3bb99b9e8cda5b276ef7",
+      "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "sha256:507f38ad04b83f27d88c72e92b00be9e0f13c30b4f6e43e98cde78dcad37ca2a",
+      "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "sha256:72f736830f6c70fd19da2bb9b30b4d2e2d63d6cc094c042a66ae776b875ccec0",
+      "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "sha256:0d795e460e589c750f82e1660477f0e49236f2277b33a76c2110c0cbec14b6b0",
+      "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "sha256:703d5d08ab66a7025d10807c35f031b9a2088f79d2015cb7f16671d57f983569",
+      "sha256:e1c790fd32bad02246ec5dc52c9ebb83e46dca26726f86422576039b61baa07a"
+    ],
+    "diagnostic_hashes": [
+      "sha256:431ffb12694f88893018a612e257484ebef46bed86d5eb5759a7e2ffd17b18a1",
+      "sha256:431ffb12694f88893018a612e257484ebef46bed86d5eb5759a7e2ffd17b18a1",
+      "sha256:431ffb12694f88893018a612e257484ebef46bed86d5eb5759a7e2ffd17b18a1",
+      "sha256:431ffb12694f88893018a612e257484ebef46bed86d5eb5759a7e2ffd17b18a1",
+      "sha256:431ffb12694f88893018a612e257484ebef46bed86d5eb5759a7e2ffd17b18a1",
+      "sha256:431ffb12694f88893018a612e257484ebef46bed86d5eb5759a7e2ffd17b18a1",
+      "sha256:431ffb12694f88893018a612e257484ebef46bed86d5eb5759a7e2ffd17b18a1",
+      "sha256:431ffb12694f88893018a612e257484ebef46bed86d5eb5759a7e2ffd17b18a1",
+      "sha256:431ffb12694f88893018a612e257484ebef46bed86d5eb5759a7e2ffd17b18a1",
+      "sha256:431ffb12694f88893018a612e257484ebef46bed86d5eb5759a7e2ffd17b18a1",
+      "sha256:f622a7ffc0ee7a6f5c52e4ca97ce55a9ad5b53e69783794cd78dacbc438e615a",
+      "sha256:f622a7ffc0ee7a6f5c52e4ca97ce55a9ad5b53e69783794cd78dacbc438e615a",
+      "sha256:f622a7ffc0ee7a6f5c52e4ca97ce55a9ad5b53e69783794cd78dacbc438e615a",
+      "sha256:f622a7ffc0ee7a6f5c52e4ca97ce55a9ad5b53e69783794cd78dacbc438e615a",
+      "sha256:f622a7ffc0ee7a6f5c52e4ca97ce55a9ad5b53e69783794cd78dacbc438e615a",
+      "sha256:f622a7ffc0ee7a6f5c52e4ca97ce55a9ad5b53e69783794cd78dacbc438e615a",
+      "sha256:f622a7ffc0ee7a6f5c52e4ca97ce55a9ad5b53e69783794cd78dacbc438e615a",
+      "sha256:f622a7ffc0ee7a6f5c52e4ca97ce55a9ad5b53e69783794cd78dacbc438e615a",
+      "sha256:f622a7ffc0ee7a6f5c52e4ca97ce55a9ad5b53e69783794cd78dacbc438e615a",
+      "sha256:f622a7ffc0ee7a6f5c52e4ca97ce55a9ad5b53e69783794cd78dacbc438e615a"
+    ],
+    "all_frame_orders_equal": true,
+    "browser_version": "149.0.7827.55",
+    "preview_count": 8,
+    "cleanup": {
+      "pages_opened": 2,
+      "pages_closed": 2,
+      "local_requests": 52,
+      "denied_requests": 0,
+      "browser_closed": true
+    }
+  },
+  "cleanup": {
+    "native_job": true,
+    "seen_pids": [
+      5484,
+      8740,
+      25632,
+      29064,
+      32144,
+      33868,
+      34832
+    ],
+    "start_policy": "create_suspended_assign_job_resume_primary_thread",
+    "resumed_primary_threads": [
+      {
+        "pid": 25632,
+        "thread_id": 38624
+      }
+    ],
+    "active_before_final_cleanup": [],
+    "active_after_cleanup": [],
+    "all_children_reaped": true,
+    "termination_reason": null
+  },
+  "quality_passed": false,
+  "all_frame_orders_equal": true,
+  "frame_count": 20,
+  "text_ranges_checked": 40,
+  "issue_count": 20,
+  "error": {
+    "code": "HTML_QUALITY_FAILED",
+    "message": "文字布局或字体存在问题/未核验项；详情见保留报告",
+    "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\component-fields\\product\\.runtime\\html-components-20261021-v79\\native-r1\\project\\validation\\html-quality-gate_20261020171029_32277189.json",
+    "retryable": false
+  }
+}

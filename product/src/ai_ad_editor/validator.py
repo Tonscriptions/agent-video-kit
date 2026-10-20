@@ -101,6 +101,12 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
     schema_errors, schema_warnings, schema_engine = _schema_report(project)
     errors.extend(schema_errors)
     warnings.extend(schema_warnings)
+    if not schema_errors:
+        from .html_components import validate_project_metadata
+        try:
+            validate_project_metadata(project)
+        except AppError as exc:
+            errors.append(exc.as_dict())
 
     def error(code: str, message: str, path: str) -> None:
         errors.append({"code": code, "message": message, "path": path, "retryable": False})

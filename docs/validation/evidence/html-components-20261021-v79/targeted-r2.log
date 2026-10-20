@@ -1,0 +1,67 @@
+test_boolean_default_means_original_page_not_forced_show (test_html_components.ComponentContractTests.test_boolean_default_means_original_page_not_forced_show) ... ok
+test_definition_and_saved_value_budgets_include_all_entries (test_html_components.ComponentContractTests.test_definition_and_saved_value_budgets_include_all_entries) ... ok
+test_duplicate_ids_names_and_same_type_targets_reject (test_html_components.ComponentContractTests.test_duplicate_ids_names_and_same_type_targets_reject) ... ok
+test_effective_budget_combines_ordinary_overrides_and_visibility (test_html_components.ComponentContractTests.test_effective_budget_combines_ordinary_overrides_and_visibility) ... ok
+test_empty_text_zero_and_false_are_explicit_values (test_html_components.ComponentContractTests.test_empty_text_zero_and_false_are_explicit_values) ... ok
+test_no_unknown_duplicate_or_null_saved_values (test_html_components.ComponentContractTests.test_no_unknown_duplicate_or_null_saved_values) ... ok
+test_only_asset_id_object_is_a_component_image_value (test_html_components.ComponentContractTests.test_only_asset_id_object_is_a_component_image_value) ... ok
+test_packaged_schema_and_semantics_reject_ambiguous_component_recipes (test_html_components.ComponentContractTests.test_packaged_schema_and_semantics_reject_ambiguous_component_recipes) ... ok
+test_patch_unknown_and_duplicate_json_keys_reject (test_html_components.ComponentContractTests.test_patch_unknown_and_duplicate_json_keys_reject) ... ok
+test_rename_keeps_value_and_removed_field_requires_explicit_reset (test_html_components.ComponentContractTests.test_rename_keeps_value_and_removed_field_requires_explicit_reset) ... ok
+test_selector_and_one_based_match_budget (test_html_components.ComponentContractTests.test_selector_and_one_based_match_budget) ... ok
+test_source_discovery_needs_no_runtime_and_preserves_original_html_zip (test_html_components.ComponentContractTests.test_source_discovery_needs_no_runtime_and_preserves_original_html_zip) ... ok
+test_stable_id_display_name_and_distinct_property_kinds (test_html_components.ComponentContractTests.test_stable_id_display_name_and_distinct_property_kinds) ... ok
+test_typed_number_range_enum_and_css_units (test_html_components.ComponentContractTests.test_typed_number_range_enum_and_css_units) ... ok
+test_variable_name_schema_and_units_reject_unsafe_extensions (test_html_components.ComponentContractTests.test_variable_name_schema_and_units_reject_unsafe_extensions) ... ok
+test_all_reset_restores_original_animation_and_source_bytes (test_html_components.ComponentNativeTests.test_all_reset_restores_original_animation_and_source_bytes) ... ok
+test_empty_text_numeric_units_and_two_image_kinds_actual_output (test_html_components.ComponentNativeTests.test_empty_text_numeric_units_and_two_image_kinds_actual_output) ... FAIL
+test_explicit_true_false_and_original_hidden_visibility_pixels_all_frames (test_html_components.ComponentNativeTests.test_explicit_true_false_and_original_hidden_visibility_pixels_all_frames) ... FAIL
+test_image_rights_and_changed_source_bytes_reject_before_browser (test_html_components.ComponentNativeTests.test_image_rights_and_changed_source_bytes_reject_before_browser) ... ok
+test_invalid_component_selector_fails_without_partial_project (test_html_components.ComponentNativeTests.test_invalid_component_selector_fails_without_partial_project) ... ok
+test_locked_clip_and_wrong_prior_asset_reject_without_drawing (test_html_components.ComponentNativeTests.test_locked_clip_and_wrong_prior_asset_reject_without_drawing) ... ok
+test_native_package_rebuild_keeps_editable_definitions_values_and_pixels (test_html_components.ComponentNativeTests.test_native_package_rebuild_keeps_editable_definitions_values_and_pixels) ... ok
+test_partial_reset_keeps_ordinary_overrides_and_other_component_values (test_html_components.ComponentNativeTests.test_partial_reset_keeps_ordinary_overrides_and_other_component_values) ... ok
+test_renamed_definition_rebuild_keeps_value_and_machine_schema (test_html_components.ComponentNativeTests.test_renamed_definition_rebuild_keeps_value_and_machine_schema) ... ok
+test_single_clip_replacement_preserves_author_timing_processing_and_other_clip (test_html_components.ComponentNativeTests.test_single_clip_replacement_preserves_author_timing_processing_and_other_clip) ... FAIL
+
+======================================================================
+FAIL: test_empty_text_numeric_units_and_two_image_kinds_actual_output (test_html_components.ComponentNativeTests.test_empty_text_numeric_units_and_two_image_kinds_actual_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\component-fields\product\tests\test_html_components.py", line 279, in test_empty_text_numeric_units_and_two_image_kinds_actual_output
+    self.assertEqual(code, 0, audit)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 9 != 0 : {'ok': False, 'command': 'policy.audit', 'request_id': 'req_20261020170112_4db9121b', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'INTERNAL_INPUT_ERROR', 'message': "unhashable type: 'dict'", 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-20T17:01:12.074589Z', 'finished_at': '2026-10-20T17:01:12.074595Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_explicit_true_false_and_original_hidden_visibility_pixels_all_frames (test_html_components.ComponentNativeTests.test_explicit_true_false_and_original_hidden_visibility_pixels_all_frames)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\component-fields\product\tests\test_html_components.py", line 237, in test_explicit_true_false_and_original_hidden_visibility_pixels_all_frames
+    self.assertEqual(self.pixel(base, i, x), (0, 0, 0, 0))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (0, 255, 0, 255) != (0, 0, 0, 0)
+
+First differing element 1:
+255
+0
+
+- (0, 255, 0, 255)
++ (0, 0, 0, 0)
+
+======================================================================
+FAIL: test_single_clip_replacement_preserves_author_timing_processing_and_other_clip (test_html_components.ComponentNativeTests.test_single_clip_replacement_preserves_author_timing_processing_and_other_clip)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\component-fields\product\tests\test_html_components.py", line 335, in test_single_clip_replacement_preserves_author_timing_processing_and_other_clip
+    self.render('replacement', {'headline': 'NEW'}, 'base', '--replace-clip-id', 'selected')
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\component-fields\product\tests\test_html_components.py", line 214, in render
+    self.assertEqual(code, 0, result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'motion.html-render', 'request_id': 'req_20261020170217_8da5333a', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'HTML_APPLY_INVALID', 'message': '动效写入后项目校验失败', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\component-fields\\product\\.runtime\\temp\\html-component-native-m6yn6e2l\\project\\validation\\html-motion-op_20261020170214_f01e6d5f.json', 'retryable': False, 'cause': '{"ok": false, "errors": [{"code": "CLIP_OUTSIDE_SEQUENCE", "message": "片段超出序列时长", "path": "sequences[0].tracks[0].clips[0]", "retryable": false}, {"code": "CLIP_OUTSIDE_SEQUENCE", "message": "片段超出序列时长", "path": "sequences[0].tracks[0].clips[1]", "retryable": false}], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "base", "rights_ref": "base", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "base", "rights_ref": "base", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "replacement", "rights_ref": "replacement", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "replacement", "rights_ref": "replacement", "record_version": 1, "context": "project_asset"}], "rights": {"ok": true, "target": "commercial_ad", "checked": 5, "required_records": 5, "failures": [], "warnings": [{"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "source", "rights_ref": "source", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "base", "rights_ref": "base", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "base", "rights_ref": "base", "record_version": 1, "context": "project_asset"}, {"status": "unverified", "code": "RIGHTS_STATUS_BLOCKED", "message": "状态 unverified 不允许发布", "asset_id": "replacement", "rights_ref": "replacement", "record_version": 1, "context": "project_asset"}, {"code": "RIGHTS_USE_NOT_PERMITTED", "message": "记录未允许目标用途: commercial_ad", "asset_id": "replacement", "rights_ref": "replacement", "record_version": 1, "context": "project_asset"}], "disposition_decisions": [], "effective_disposition_decisions": []}, "schema_engine": "jsonschema", "asset_count": 5, "sequence_count": 1}'}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-20T17:02:17.393629Z', 'finished_at': '2026-10-20T17:02:17.393639Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 25 tests in 94.370s
+
+FAILED (failures=3)
