@@ -1,0 +1,37 @@
+{
+  "status": "passed_diagnostic_artifact_review_only",
+  "checked_at_utc": "2026-10-20T03:56:58.068538+00:00",
+  "local_links": 9,
+  "frozen_inputs": 219,
+  "frozen_equal": true,
+  "new_product_test_methods": 0,
+  "new_full_acceptance": 0,
+  "continuous_profile": false,
+  "storage_benchmark": false,
+  "samples": [
+    {
+      "label": "v71",
+      "pid": 23224,
+      "top_function": "_atomic_write_bytes",
+      "source_line": "os.fsync(handle.fileno())"
+    },
+    {
+      "label": "v72",
+      "pid": 23268,
+      "top_function": "open",
+      "source_line": "return io.open(self, mode, buffering, encoding, errors, newline)"
+    }
+  ],
+  "artifact_hashes": {
+    "disk-observation-r1.json": "sha256:b6574ca49ae5f8424874ec01549da05ae7364d418d97d9b7f397ba75c6d9eccd",
+    "receipt.json": "sha256:a59aab926cefded76609f8e19df8dbfe92fbdb8f9d8e2569e1d2e10328911af1",
+    "tool-acquisition.json": "sha256:35a16fc43147c34e17297238e79aab76372cf4df000d3aab32835cde6b269ed0",
+    "tool-github-release.json": "sha256:23a213eb7e70fb7524e2c4f54ad436c1cce116be20fb29f542191b9f11bc1fc8",
+    "tool-pypi-release.json": "sha256:309959c53bbc3f751b68f2aad7ee5d2f23dabcf8c645c02dd18675a19de1e5a2",
+    "v71.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "v71.stdout.json": "sha256:2dbda2468a3374586af0284442c2ce81af1807dfc9c95aaaa749a793a64cbeca",
+    "v72.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "v72.stdout.json": "sha256:5ab4c80371dd63e9290313566a163358e02215a59110678f66c6fb26eb5ff3a2"
+  },
+  "document_sha256": "sha256:bbbc4878f5725fdf4e3547db9b69bcc7c4a604b568c6d8c946739c195dacaecd"
+}

@@ -1,0 +1,164 @@
+"""Publish D01 documentation after the existing R11 release, without rerunning tests."""
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+from urllib.parse import unquote
+
+WORK = Path(__file__).resolve().parent
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+SOURCE = MAIN/'product/.runtime/worktrees/html-shutter-sampling'
+REL = 'docs/validation/evidence/native-wait-20261020-d01'
+DOC = 'docs/validation/原生回归文件等待取样记录_2026-10-20.md'
+FULL = 'docs/validation/evidence/html-shutter-20261020-v72/full-r2.json'
+PREVIOUS = SOURCE/'product/.runtime/openfilm-r11-publication/publication-r2/run.json'
+REMOTE = 'git@github.com:Tonscriptions/agent-video-kit.git'
+BLOCK_SHA = 'sha256:532667ccc862308624808210f23de3bf9cf6f9b033011d8ccad3bcb3171cb2d0'
+
+
+def read(path):
+    return json.loads(path.read_bytes())
+
+
+def sha(path):
+    return 'sha256:'+hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def save(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2)+'\n', encoding='utf8', newline='\n')
+
+
+def git(*args):
+    return subprocess.run(['git', *args], cwd=MAIN, check=True, capture_output=True, timeout=240).stdout
+
+
+def changed():
+    return {x.decode('utf8') for x in git('ls-files', '-m', '-o', '--exclude-standard', '-z').split(b'\0') if x}
+
+
+def frozen():
+    spec = importlib.util.spec_from_file_location('_d01_main_frozen', MAIN/'scripts/run_frozen_regression.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.frozen()
+
+
+def guard():
+    plan = read(WORK/'reviewed-inputs.json')
+    assert plan['source_root'] == str(SOURCE) and len(plan['files']) == 11
+    assert sha(WORK/'document-blocks.json') == BLOCK_SHA
+    for name, digest in plan['files'].items():
+        assert (MAIN/name).resolve().is_relative_to(MAIN.resolve())
+        assert sha(SOURCE/name) == digest, name
+    return plan
+
+
+def main():
+    plan = guard()
+    if sys.argv[1:] == ['--preflight']:
+        print(json.dumps({'status':'passed_input_preflight_only', 'reviewed_files':11,
+                          'publisher_sha256':sha(Path(__file__)), 'main_touched':False}))
+        return
+    assert sys.argv[1:] == ['--run']
+    previous = read(PREVIOUS)
+    assert previous['status'] == 'pushed', 'R11 must finish before D01 publication'
+    run = WORK/'publication-r1'
+    run.mkdir(exist_ok=False)
+    record = {'status':'checking_predecessor','started_at_utc':datetime.now(timezone.utc).isoformat(),
+              'pid':os.getpid(),'calls':[],'force_push':False,'new_product_methods':0,'goal_complete':False}
+
+    def command(label, args):
+        out, err = run/(label+'.stdout.log'), run/(label+'.stderr.log')
+        with out.open('wb') as stdout, err.open('wb') as stderr:
+            result = subprocess.run(list(map(str,args)), cwd=MAIN, stdout=stdout, stderr=stderr, timeout=240)
+        record['calls'].append({'label':label,'exit_code':result.returncode,
+                                'stdout_sha256':sha(out),'stderr_sha256':sha(err)})
+        save(run/'run.json', record)
+        assert result.returncode == 0, label+' failed; logs retained'
+        return out.read_bytes()
+
+    try:
+        assert git('branch','--show-current').strip() == b'main'
+        assert git('remote','get-url','origin').decode().strip() == REMOTE
+        assert git('rev-parse','HEAD').decode().strip() == previous['commit']
+        assert not changed() and not git('diff','--cached','--name-only')
+        assert git('ls-remote','--exit-code','origin','refs/heads/main').decode().split()[0] == previous['commit']
+        full = read(MAIN/FULL)
+        assert full['status'] == 'passed' and full['terminal_ok'] and full['methods'] == 1614 and full['skipped'] == 0
+        assert full['frozen_equal'] and full['external_fixtures_equal'] and full['external_fixture_count'] == 8
+        diagnostic = read(SOURCE/REL/'receipt.json')
+        assert frozen() == full['frozen_before'] == full['frozen_after'] == diagnostic['frozen_after']
+        for name, value in full['external_fixtures_after'].items():
+            assert (MAIN/name).stat().st_size == value['bytes'] and sha(MAIN/name) == value['sha256']
+        assert not (MAIN/REL).exists()
+        record['status'] = 'copying_documentation_only';save(run/'run.json', record)
+        for name, digest in plan['files'].items():
+            target = MAIN/name
+            assert not target.exists(), name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(SOURCE/name, target)
+            assert sha(target) == digest
+        shutil.copyfile(Path(__file__), MAIN/REL/'executed-publisher.py.txt')
+        save(MAIN/REL/'publication-copy-r1.json', {'status':'copied_reviewed_diagnostic_documents',
+             'source_root':str(SOURCE),'source_files':plan['files'],'publisher_sha256':sha(Path(__file__)),
+             'document_blocks_sha256':BLOCK_SHA,'previous_commit':previous['commit'],
+             'product_source_changed':False,'new_product_methods':0,'new_quality_acceptance':0})
+        blocks = read(WORK/'document-blocks.json')
+        for name, content in blocks['blocks'].items():
+            path = MAIN/name;text = path.read_text(encoding='utf8')
+            start, end = '<!-- '+blocks['marker']+' -->', '<!-- /'+blocks['marker']+' -->'
+            anchor = blocks['insert_after']
+            assert text.count(anchor) == 1 and start not in text and end not in text
+            text = text.replace(anchor, anchor+'\n\n'+start+'\n'+content.rstrip()+'\n'+end, 1)
+            path.write_text(text, encoding='utf8', newline='\n')
+        attrs = MAIN/'.gitattributes';text = attrs.read_text(encoding='utf8')
+        assert '# D01 native wait diagnostic evidence' not in text
+        attrs.write_text(text+'\n# D01 native wait diagnostic evidence: preserve sampled bytes.\n'+REL+'/** -text -whitespace\n', encoding='utf8', newline='\n')
+        links = []
+        for name, content in [(DOC,(MAIN/DOC).read_text(encoding='utf8')), *blocks['blocks'].items()]:
+            for target in re.findall(r'\]\(([^)]+)\)', content):
+                if '://' in target:
+                    continue
+                assert (MAIN/name).parent.joinpath(unquote(target.split('#')[0])).resolve().is_file(), target
+                links.append({'document':name,'target':target})
+        assert len(links) == 12 and frozen() == full['frozen_after']
+        save(MAIN/REL/'release-r1.json', {'status':'passed_documentation_review_only',
+             'checked_at_utc':datetime.now(timezone.utc).isoformat(),'reviewed_files':11,'local_links':links,
+             'frozen_inputs':219,'frozen_equal':True,'new_product_methods':0,'new_quality_acceptance':0})
+        future = {REL+'/'+x for x in ('executed-publisher.py.txt','publication-copy-r1.json','release-r1.json','staged-r1.json')}
+        allowed = set(plan['files']) | set(blocks['blocks']) | future | {'.gitattributes'}
+        modified = changed();assert modified <= allowed, 'unexpected main changes'
+        paths = run/'stage-paths.nul';paths.write_bytes(b''.join(n.encode('utf8')+b'\0' for n in sorted(modified)))
+        command('stage-documents',['git','add','-A','--pathspec-from-file='+str(paths),'--pathspec-file-nul'])
+        command('verify-staged',[sys.executable,'-E','-B','-X','utf8',MAIN/'scripts/verify_staged_release.py',
+                                 '--full',MAIN/FULL,'--output',MAIN/REL/'staged-r1.json'])
+        command('stage-receipt',['git','add','--',REL+'/staged-r1.json'])
+        assert git('cat-file','blob',':'+REL+'/staged-r1.json') == (MAIN/REL/'staged-r1.json').read_bytes()
+        staged = {n.decode('utf8') for n in git('diff','--cached','--name-only','-z').split(b'\0') if n}
+        assert staged == modified | {REL+'/staged-r1.json'}
+        command('no-unstaged',['git','diff','--quiet']);command('check-whitespace',['git','diff','--cached','--check'])
+        assert frozen() == full['frozen_after'];record['status']='committing';save(run/'run.json', record)
+        command('commit',['git','-c','gc.auto=0','-c','maintenance.auto=false','commit','--quiet',
+                          '-m','docs: preserve native regression wait samples and their limits'])
+        head = git('rev-parse','HEAD').decode().strip()
+        remote = command('remote-after-hook',['git','ls-remote','--exit-code','origin','refs/heads/main']).decode().split()[0]
+        if remote != head:
+            command('ordinary-push',['git','push','origin','main'])
+            remote = command('remote-after-push',['git','ls-remote','--exit-code','origin','refs/heads/main']).decode().split()[0]
+        assert remote == head and not changed() and frozen() == full['frozen_after']
+        record.update(status='pushed',commit=head,remote_main=remote,staged_files=len(staged))
+    except Exception as exc:
+        record.update(status='stopped_for_review',error=type(exc).__name__+': '+str(exc));raise
+    finally:
+        record['finished_at_utc']=datetime.now(timezone.utc).isoformat();save(run/'run.json', record)
+    print(json.dumps({'status':record['status'],'commit':record['commit'],'new_product_methods':0,'force_push':False}))
+
+
+if __name__ == '__main__':
+    main()
