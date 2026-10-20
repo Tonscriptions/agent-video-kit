@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import sys,json;from pathlib import Path;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();from ai_ad_editor.project import load_project;from ai_ad_editor.render import build_filter_graph,_execute_audio_stretch;root,p=load_project(sys.argv[1]);a,g,m,w=build_filter_graph(root,p,p["sequences"][0]);tmp=Path(sys.argv[2]);tmp.mkdir(parents=True,exist_ok=True);[(item.update(stretch_probe=_execute_audio_stretch(root,item["audio_stretch"],tmp))) for item in m if item.get("audio_stretch")];print(json.dumps({"inputs":a,"graph":g,"metadata":m}))
+                                                                                                                                                                                                                                                                                                                                                                                          ~~~~~~~~^^^
+IndexError: list index out of range

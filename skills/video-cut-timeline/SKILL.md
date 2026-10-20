@@ -22,6 +22,23 @@ whole operation. Preserve those dependency fields during later edits.
 
 # Timeline Composition
 
+<!-- V78-TIMELINE-PREVIEW -->
+For author timeline frames/ranges read the
+[preview and content-cache contract](../../docs/specs/时间线帧区间预览与内容缓存契约_v0.1_2026-10-20.md)
+and [native/isolated checks, media and retained failures](../../docs/validation/时间线帧区间预览与离线发行实测_2026-10-20.md).
+Use `preview frame --frame N` or `preview range --start-frame S --end-frame E`
+with `--project`; ranges are half-open output display frames. Compile the full
+author graph before trimming; compare lossless BGRA/float-PCM NUT with the
+complete graph. MP4/GIF are lossy opaque viewing copies. Transparent reference
+requires transparent author output. Export with `--output <new project dir>`
+to retain a result beyond `preview cache-prune`; omitted output is evictable.
+Cache hits verify complete source/runtime/output content and do not execute
+a new graph, encoder or model. Corruption rejects; explicit prune rebuilds.
+`--dry-run`, project-local cancel markers, bounded space admission and current
+asset-reference protection apply. Software preview decodes cumulatively from
+author start. It does not accept realtime playback, natural quality or delivery.
+<!-- /V78-TIMELINE-PREVIEW -->
+
 <!-- V77-NATIVE-HSL -->
 For catalog 0.8.1 selective HSL, read the
 [native kernel and bounded DAG contract](../../docs/specs/八色HSL原生像素内核与表达式DAG契约_v0.1_2026-10-20.md)

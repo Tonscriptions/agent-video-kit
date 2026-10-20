@@ -1,0 +1,49 @@
+test_bounds_types_even_height_and_working_budget_reject_before_writes (test_timeline_preview.PreviewContractTests.test_bounds_types_even_height_and_working_budget_reject_before_writes) ... ok
+test_dry_run_does_not_compile_or_make_cache (test_timeline_preview.PreviewContractTests.test_dry_run_does_not_compile_or_make_cache) ... ok
+test_half_open_ntsc_partial_last_frame_has_exact_sample_endpoint (test_timeline_preview.PreviewContractTests.test_half_open_ntsc_partial_last_frame_has_exact_sample_endpoint) ... ok
+test_junction_cache_never_prunes_external_files (test_timeline_preview.PreviewContractTests.test_junction_cache_never_prunes_external_files) ... ok
+test_preexisting_cancel_prevents_compilation_and_publication (test_timeline_preview.PreviewContractTests.test_preexisting_cancel_prevents_compilation_and_publication) ... ok
+test_same_size_and_restored_mtime_source_and_runtime_change_identity (test_timeline_preview.PreviewContractTests.test_same_size_and_restored_mtime_source_and_runtime_change_identity) ... ok
+test_scale_after_composite_preserves_aspect_without_upscaling (test_timeline_preview.PreviewContractTests.test_scale_after_composite_preserves_aspect_without_upscaling) ... ok
+test_stochastic_strings_and_external_subtitle_disable_cache (test_timeline_preview.PreviewContractTests.test_stochastic_strings_and_external_subtitle_disable_cache) ... ok
+test_cache_hit_runs_no_graph_probe_encoder_and_keeps_author_bytes (test_timeline_preview.PreviewPixelTests.test_cache_hit_runs_no_graph_probe_encoder_and_keeps_author_bytes) ... ok
+test_cancel_after_compile_removes_staging_and_output (test_timeline_preview.PreviewPixelTests.test_cancel_after_compile_removes_staging_and_output) ... ok
+test_cli_frame_range_cache_and_prune_are_discoverable (test_timeline_preview.PreviewPixelTests.test_cli_frame_range_cache_and_prune_are_discoverable) ... ok
+test_frame_png_is_actual_animated_author_frame_not_source_thumbnail (test_timeline_preview.PreviewPixelTests.test_frame_png_is_actual_animated_author_frame_not_source_thumbnail) ... FAIL
+test_nested_reverse_and_interval_effects_keep_full_author_clock (test_timeline_preview.PreviewPixelTests.test_nested_reverse_and_interval_effects_keep_full_author_clock) ... ok
+test_new_output_export_survives_cache_pruning (test_timeline_preview.PreviewPixelTests.test_new_output_export_survives_cache_pruning) ... ok
+test_ntsc_partial_last_frame_matches_full_float_pcm (test_timeline_preview.PreviewPixelTests.test_ntsc_partial_last_frame_matches_full_float_pcm) ... FAIL
+test_range_pixels_and_every_pcm_sample_match_full_graph (test_timeline_preview.PreviewPixelTests.test_range_pixels_and_every_pcm_sample_match_full_graph) ... FAIL
+test_receipt_and_artifact_corruption_reject_without_overwrite (test_timeline_preview.PreviewPixelTests.test_receipt_and_artifact_corruption_reject_without_overwrite) ... ok
+
+======================================================================
+FAIL: test_frame_png_is_actual_animated_author_frame_not_source_thumbnail (test_timeline_preview.PreviewPixelTests.test_frame_png_is_actual_animated_author_frame_not_source_thumbnail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 181, in test_frame_png_is_actual_animated_author_frame_not_source_thumbnail
+    self.assertEqual(Image.open(result['path']).convert('RGBA').tobytes(),video[5*64*64*4:6*64*64*4])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x01\x00\x01\xff\x01\x00\x01\xff\x01\x00\x02[43110 chars]\xff' != b'\x00\x00\x00\xff\x00\x00\x01\xff\x00\x00\x01[43248 chars]\xff'
+
+======================================================================
+FAIL: test_ntsc_partial_last_frame_matches_full_float_pcm (test_timeline_preview.PreviewPixelTests.test_ntsc_partial_last_frame_matches_full_float_pcm)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 223, in test_ntsc_partial_last_frame_matches_full_float_pcm
+    self.assertEqual(self.decode(result['master']),video[29*64*64*4:30*64*64*4])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x01\x00\x01\xff\x01\x00\x02\xff\x01\x00\x02[39965 chars]\xff' != b'\x00\x00\x00\xff\x00\x00\x01\xff\x01\x00\x01[40158 chars]\xff'
+
+======================================================================
+FAIL: test_range_pixels_and_every_pcm_sample_match_full_graph (test_timeline_preview.PreviewPixelTests.test_range_pixels_and_every_pcm_sample_match_full_graph)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 174, in test_range_pixels_and_every_pcm_sample_match_full_graph
+    self.assertEqual(self.decode(result['master']),video[2*64*64*4:6*64*64*4])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x01\x00\x01\xff\x01\x00\x01\xff\x01\x00\x02[181551 chars]\xff' != b'\x00\x00\x00\xff\x00\x00\x00\xff\x00\x00\x01[182272 chars]\xff'
+
+----------------------------------------------------------------------
+Ran 17 tests in 16.268s
+
+FAILED (failures=3)

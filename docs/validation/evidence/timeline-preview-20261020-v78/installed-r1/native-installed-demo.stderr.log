@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\scripts\smoke_timeline_preview.py", line 158, in <module>
+    print(json.dumps({k:record[k] for k in ('status','cli_calls','frozen_equal')}))
+                        ^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\scripts\smoke_timeline_preview.py", line 131, in main
+    # A one-frame NTSC interval is shorter than one 8 fps GIF step.
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\scripts\smoke_timeline_preview.py", line 66, in ff
+    def ff(label,*argv):return run(label,[exe,'-hide_banner','-y','-v','error','-filter_complex_threads','1',*argv])
+                               ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\scripts\smoke_timeline_preview.py", line 56, in run
+    assert result.returncode==0,(label,result.stderr[-2000:],result.stdout[-2000:]);return result.stdout
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('ntsc-gif', b'[out#0/gif @ 000001c02e42e4c0] Error writing trailer: Invalid argument\r\n', b'')

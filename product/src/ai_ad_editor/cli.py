@@ -916,6 +916,27 @@ def build_parser() -> argparse.ArgumentParser:
     rights_apply.add_argument("--project", required=True)
     rights_apply.add_argument("--decision-id", required=True)
 
+    preview = subs.add_parser('preview', help='工程时间线帧/区间预览与内容缓存')
+    preview_actions = preview.add_subparsers(dest='action', required=True)
+    for action in ('frame', 'range'):
+        item = _leaf_common(preview_actions.add_parser(action))
+        item.add_argument('--project', required=True)
+        item.add_argument('--sequence-id', default=None)
+        if action == 'frame':
+            item.add_argument('--frame', type=int, required=True, help='从 0 开始的输出显示帧号')
+        else:
+            item.add_argument('--start-frame', type=int, default=0)
+            item.add_argument('--end-frame', type=int, required=True, help='不包含此输出帧')
+        item.add_argument('--height', type=int, default=360, help='合成后缩小的最大高度，不放大')
+        item.add_argument('--budget-mib', type=int, default=512)
+        item.add_argument('--output', default=None, help='可选项目内新目录；省略返回缓存路径')
+        item.add_argument('--cancel-file', default=None)
+    preview_list = _leaf_common(preview_actions.add_parser('cache-list'))
+    preview_list.add_argument('--project', required=True)
+    preview_prune = _leaf_common(preview_actions.add_parser('cache-prune'))
+    preview_prune.add_argument('--project', required=True)
+    preview_prune.add_argument('--keep-mib', type=int, default=0)
+
     render = _leaf_common(subs.add_parser("render", help="本地 FFmpeg 渲染"))
     render.add_argument("--project", required=True)
     render.add_argument("--sequence-id", default=None)
@@ -5747,6 +5768,42 @@ def _load_render_resume(root: Path, project: dict[str, Any], sequence: dict[str,
     return record
 
 
+def command_preview(args: argparse.Namespace) -> dict[str, Any]:
+    from . import preview
+    from .policy import require_local_reference, resolve_local_path
+    root, project = load_project(args.project)
+    if args.action == 'cache-list':
+        return _envelope('preview.cache-list', args, data=preview.cache_list(root))
+    if args.action == 'cache-prune':
+        return _envelope('preview.cache-prune', args, status='planned' if args.dry_run else 'succeeded',
+            data=preview.cache_prune(root, keep_bytes=args.keep_mib*1024*1024, dry_run=args.dry_run))
+    sequence = find_sequence(project, args.sequence_id)
+    report = validate_project(root, project, strict_rights=False, target='commercial_ad')
+    if not report['ok']:
+        raise AppError('PROJECT_INVALID', '项目验证失败，拒绝预览', exit_code=2, cause=json.dumps(report,ensure_ascii=False))
+    first = args.frame if args.action == 'frame' else args.start_frame
+    last = first+1 if args.action == 'frame' else args.end_frame
+    request = preview.plan(project, sequence, start_frame=first, end_frame=last,
+        height=args.height, mode=args.action, budget_mib=args.budget_mib)
+    output = None
+    if args.output:
+        require_local_reference(args.output, field='preview.output')
+        raw = Path(args.output).expanduser()
+        output = preview.plain(root, raw if raw.is_absolute() else root/raw)
+    marker = resolve_local_path(root,args.cancel_file,field='preview.cancel') if args.cancel_file else None
+    if marker:
+        ensure_inside(root,marker)
+        if marker.is_relative_to(preview.cache_root(root)) or (output and marker.is_relative_to(output)):
+            raise argument_error('取消标记不能位于预览输出或缓存中', '--cancel-file')
+    result = preview.preview_project(root,project,sequence,request=request,output=output,cancel_file=marker,dry_run=args.dry_run)
+    operation_id = new_id('preview')
+    if not args.dry_run:
+        _operation(root,operation_id,{'operation_id':operation_id,'command':'preview.'+args.action,
+            'status':'succeeded','result':result,'created_at':now_iso()})
+    return _envelope('preview.'+args.action,args,status='planned' if args.dry_run else 'succeeded',
+        data=result,operation_id=operation_id,warnings=report.get('warnings',[])+result.get('warnings',[]))
+
+
 def command_render(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     sequence = find_sequence(project, args.sequence_id)
@@ -6795,6 +6852,10 @@ def _project_operation_lock(args: argparse.Namespace):
 
 
 COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, Any]]] = {
+    ('preview','frame'): command_preview,
+    ('preview','range'): command_preview,
+    ('preview','cache-list'): command_preview,
+    ('preview','cache-prune'): command_preview,
     ('diagnostics', 'list'): command_diagnostics,
     ('diagnostics', 'show'): command_diagnostics,
     ('diagnostics', 'export'): command_diagnostics,

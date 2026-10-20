@@ -1,0 +1,161 @@
+"""Real CLI previews, complete graph references, decoded pixels/PCM and replay."""
+from __future__ import annotations
+import argparse
+import copy
+from datetime import datetime, timezone
+from fractions import Fraction
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+import shutil
+import struct
+import subprocess
+import sys
+import time
+import wave
+from PIL import Image
+from run_frozen_regression import frozen
+
+ROOT=Path(__file__).resolve().parents[1]
+W,H,FPS,TPS=256,144,12,90000
+
+
+def sha(path):return 'sha256:'+hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def rawsha(data):return 'sha256:'+hashlib.sha256(data).hexdigest()
+def write(path,value):path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    for name in ('work','evidence','assets'):parser.add_argument('--'+name,type=Path,required=True)
+    parser.add_argument('--installed',type=Path)
+    args=parser.parse_args();work=args.work.resolve();evidence=args.evidence.resolve();assets=args.assets.resolve()
+    assert work.is_relative_to(ROOT/'product/.runtime') and evidence.is_relative_to(ROOT/'docs') and assets.is_relative_to(ROOT/'docs/assets')
+    assert not any(p.exists() for p in (work,evidence,assets))
+    for p in (work,evidence,assets):p.mkdir(parents=True)
+    (evidence/'executed-smoke.py.txt').write_bytes(Path(__file__).read_bytes())
+    record={'status':'running','started_at_utc':datetime.now(timezone.utc).isoformat(),'generator_sha256':sha(__file__),
+        'frozen_before':frozen(),'calls':[],'checks':[],'cases':[],'network':False,'virtualization':False,
+        'new_model_inference':0,'continuous_playback_reviewed':False,'audio_reviewed':False,
+        'natural_quality_accepted':False,'full_capcut_parity':False}
+    def save():write(evidence/'verification.json',record)
+    def check(name,ok,**details):
+        record['checks'].append({'name':name,'ok':bool(ok),**details});save();assert ok,name
+    def run(label,command,*,cwd=ROOT,is_cli=False):
+        env=dict(os.environ);env.update(PYTHONDONTWRITEBYTECODE='1',AI_AD_EDITOR_RUNTIME_DIR=str(ROOT/'product/.runtime'),
+            TEMP=str(ROOT/'product/.runtime/temp'),TMP=str(ROOT/'product/.runtime/temp'),
+            FREI0R_PATH=str(site/'ai_ad_editor'))
+        start=time.monotonic();command=list(map(str,command))
+        result=subprocess.run(command,cwd=cwd,env=env,capture_output=True,timeout=900)
+        (evidence/(label+'.stderr.log')).write_bytes(result.stderr)
+        if not label.startswith('decode-'):(evidence/(label+'.stdout.log')).write_bytes(result.stdout)
+        record['calls'].append({'label':label,'command':command,'exit_code':result.returncode,'wall_seconds':time.monotonic()-start,
+            'stdout_sha256':rawsha(result.stdout),'stderr_sha256':rawsha(result.stderr),'cli':is_cli});save()
+        assert result.returncode==0,(label,result.stderr[-2000:],result.stdout[-2000:]);return result.stdout
+    if args.installed:
+        installed=args.installed.resolve();site=installed/'site'
+        prefix=[sys.executable,'-I','-S','-B','-X','utf8',installed/'run.py']
+    else:
+        site=ROOT/'product/src'
+        bootstrap='import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.cli import main;raise SystemExit(main())'
+        prefix=[sys.executable,'-E','-B','-X','utf8','-c',bootstrap,site]
+    def cli(label,*argv):return json.loads(run(label,[*prefix,*argv],is_cli=True))
+    exe=shutil.which('ffmpeg');assert exe
+    def ff(label,*argv):return run(label,[exe,'-hide_banner','-y','-v','error','-filter_complex_threads','1',*argv])
+    def decode(label,path,*,audio=False,scale=None):
+        tail=['-vn','-f','f32le','-c:a','pcm_f32le'] if audio else ['-an',*(['-vf',f'scale={scale[0]}:{scale[1]}:flags=lanczos'] if scale else []),'-f','rawvideo','-pix_fmt','rgba']
+        return ff('decode-'+label,'-i',path,*tail,'pipe:1')
+    try:
+        # Extra source handles keep the authored 2 s range inside the probed
+        # NUT duration, whose last packet PTS is not its final frame end.
+        pcm=b''.join(struct.pack('<hh',round(2500*math.sin(2*math.pi*733*i/48000)),round(1900*math.sin(2*math.pi*419*i/48000))) for i in range(105600))
+        with wave.open(str(assets/'audio-original.wav'),'wb') as stream:stream.setnchannels(2);stream.setsampwidth(2);stream.setframerate(48000);stream.writeframes(pcm)
+        rgba=bytes(v for y in range(H) for x in range(W) for v in ((x*5)%256,(y*7)%256,(x+y)%256,(0,64,128,192,255)[(x//16+y//16)%5]))
+        Image.frombytes('RGBA',(W,H),rgba).save(assets/'alpha-original.png')
+        ff('make-original','-f','lavfi','-i',f'testsrc2=size={W}x{H}:rate={FPS}:duration=2.2',
+            '-i',assets/'audio-original.wav','-c:v','ffv1','-pix_fmt','bgra','-c:a','pcm_f32le','-shortest',assets/'moving-original.nut')
+        ff('original-review','-i',assets/'moving-original.nut','-c:v','libx264','-preset','medium','-crf','18','-pix_fmt','yuv420p','-c:a','aac',assets/'moving-original.mp4')
+        project=work/'project';cli('init','project','init',project)
+        rights=['--license-spdx','CC0-1.0','--license-url','local://v78-original/CC0-1.0','--verification-status','verified',
+            '--permitted-use','commercial_ad','--creator','agent-video-kit','--evidence','Original synthetic test pattern, RGBA blocks and stereo sine PCM generated by smoke_timeline_preview.py']
+        for aid,name in [('moving','moving-original.nut'),('alpha','alpha-original.png'),('sound','audio-original.wav')]:
+            cli('ingest-'+aid,'media','ingest','--project',project,'--input',assets/name,'--asset-id',aid,'--source-url','local://v78-original/'+name,*rights)
+        p=json.loads((project/'project.json').read_bytes());p['settings']['canvas'].update(width=W,height=H)
+        p['settings']['timebase']['display_fps']={'num':FPS,'den':1};write(project/'project.json',p)
+        operations={'operations':[{'op':'append_clip','id':'picture','asset_id':'moving','track_id':'track_video_1',
+            'timeline_start_tick':0,'duration_tick':2*TPS,'source_in_tick':0,'source_out_tick':2*TPS},
+            {'op':'append_clip','id':'sound_clip','asset_id':'sound','track_id':'track_audio_1',
+            'timeline_start_tick':0,'duration_tick':2*TPS,'source_in_tick':0,'source_out_tick':2*TPS}]}
+        write(assets/'timeline-request.json',operations);cli('compose','timeline','compose','--project',project,'--input',assets/'timeline-request.json')
+        baseline=json.loads((project/'project.json').read_bytes())
+        cases=[('motion',3,15,H),('scaled',3,15,72),('alpha',3,15,H),('ntsc',29,30,H)]
+        for name,first,last,height in cases:
+            p=copy.deepcopy(baseline);sequence=p['sequences'][0];clip=sequence['tracks'][0]['clips'][0]
+            clip['effects']=[{'type':'selective_hsl','keyframes':[{'property':'red_hue','keyframes':[
+                {'at_tick':0,'value':0,'interpolation':'linear'},{'at_tick':2*TPS,'value':90,'interpolation':'linear'}]}]}]
+            if name=='alpha':
+                clip['asset_id']='alpha';p['settings']['output']={'container':'webm','video':{'codec':'libvpx-vp9','crf':0,'pixel_format':'yuva420p'},'audio':{'codec':'libopus','bitrate':'192k'}}
+            if name=='ntsc':
+                p['settings']['timebase']['display_fps']={'num':30000,'den':1001};sequence['duration_tick']=90001
+                for track in sequence['tracks']:
+                    for item in track['clips']:item['duration_tick']=item['source_out_tick']=90001
+                clip['effects'][0]['keyframes'][0]['keyframes'][1]['at_tick']=90001
+            write(project/'project.json',p);cli(name+'-validate','validate','--project',project)
+            before=(project/'project.json').read_bytes()
+            graph_code='import sys,json;from pathlib import Path;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();from ai_ad_editor.project import load_project;from ai_ad_editor.render import build_filter_graph;root,p=load_project(sys.argv[1]);a,g,m,w=build_filter_graph(root,p,p["sequences"][0]);print(json.dumps({"inputs":a,"graph":g}))'
+            graph=json.loads(run(name+'-full-graph',[sys.executable,'-I','-S','-B','-X','utf8','-c',graph_code,site,project]) if args.installed else run(name+'-full-graph',[sys.executable,'-E','-B','-X','utf8','-c',graph_code,site,project]))
+            script=work/(name+'.ffgraph');script.write_text(graph['graph'],encoding='utf8',newline='\n')
+            full=work/(name+'-full.nut')
+            ff(name+'-full-reference',*graph['inputs'],'-/filter_complex',script,'-map','[vout]','-map','[aout]',
+                '-c:v','ffv1','-pix_fmt','bgra','-c:a','pcm_f32le',full)
+            full_video=decode(name+'-full',full,scale=(W//2,H//2) if name=='scaled' else None)
+            full_audio=decode(name+'-full-audio',full,audio=True)
+            dry=cli(name+'-dry','preview','range','--project',project,'--start-frame',first,'--end-frame',last,'--height',height,'--dry-run')['data']
+            result=cli(name+'-range','preview','range','--project',project,'--start-frame',first,'--end-frame',last,'--height',height,'--output',project/'previews'/name)['data']
+            cached=cli(name+'-hit','preview','range','--project',project,'--start-frame',first,'--end-frame',last,'--height',height)['data']
+            frame=cli(name+'-frame','preview','frame','--project',project,'--frame',first,'--height',height,'--output',project/'previews'/(name+'-frame'))['data']
+            request=result['request'];size=request['width']*request['height']*4
+            video=decode(name+'-preview',result['master']);audio=decode(name+'-preview-audio',result['master'],audio=True)
+            expected=full_video[first*size:last*size]
+            first_sample,last_sample=request['audio_start_sample_48000'],request['audio_end_sample_48000']
+            check(name+'-complete-reference-pixels',video==expected,actual=rawsha(video),reference=rawsha(expected))
+            check(name+'-complete-reference-pcm',audio==full_audio[first_sample*8:last_sample*8],samples=len(audio)//8)
+            check(name+'-frame-reference',Image.open(frame['path']).convert('RGBA').tobytes()==full_video[first*size:(first+1)*size])
+            check(name+'-cache-hit',not result['cache_hit'] and cached['cache_hit'] and cached['cache_key']==result['cache_key'])
+            check(name+'-dry-and-author-preserved',dry['status']=='planned' and (project/'project.json').read_bytes()==before)
+            if name=='alpha':check('nontrivial-author-alpha',len(set(video[3::4]))>2,levels=len(set(video[3::4])))
+            shutil.copyfile(result['path'],assets/(name+'-preview.mp4'));shutil.copyfile(result['master'],assets/(name+'-reference.nut'))
+            shutil.copyfile(frame['path'],assets/(name+'-frame.png'))
+            # A one-frame NTSC interval is shorter than one 8 fps GIF step.
+            # Publish its PNG and MP4 rather than inventing a longer animation.
+            if last-first>1:
+                ff(name+'-gif','-i',result['path'],'-vf','fps=8,scale=384:-1:flags=lanczos,split[a][b];[a]palettegen[p];[b][p]paletteuse','-loop','0',assets/(name+'-preview.gif'))
+            record['cases'].append({'name':name,'frames':last-first,'width':request['width'],'height':request['height'],
+                'fps':request['fps'],'pixels_sha256':rawsha(video),'pcm_sha256':rawsha(audio),
+                'pcm_samples':len(audio)//8,'alpha_levels':len(set(video[3::4])),'verified_clock':result['verified_clock'],
+                'cold_seconds':result['wall_seconds'],'hit_seconds':cached['wall_seconds']});save()
+        package=assets/'editable-project.zip';cli('package','convert','export','--project',project,'--output',package,'--target-format','package')
+        imported=work/'imported';cli('import','convert','import','--input',package,'--output',imported)
+        replay=cli('replay','preview','range','--project',imported,'--start-frame','29','--end-frame','30','--height',H)['data']
+        check('package-replay-pixels',decode('replay',replay['master'])==video)
+        check('package-replay-pcm',decode('replay-audio',replay['master'],audio=True)==audio)
+        cli('cache-list','preview','cache-list','--project',project)
+        cli('prune-plan','preview','cache-prune','--project',project,'--dry-run')
+        cli('prune','preview','cache-prune','--project',project)
+        listing=cli('cache-empty','preview','cache-list','--project',project)['data']
+        check('cache-pruned-exports-preserved',listing['entries']==[] and (project/'previews/ntsc/master.nut').is_file())
+        (assets/'SOURCE.txt').write_text('CC0-1.0. All inputs are synthetic patterns and PCM created by scripts/smoke_timeline_preview.py. No downloaded media, model inference or external service. PNG/FFV1 preserve graph RGBA; MP4/GIF are lossy opaque review media. Pixel/PCM/PTS checks are separate from continuous visual playback and listening.\n',encoding='utf8',newline='\n')
+        record.update(status='passed',cli_calls=sum(x['cli'] for x in record['calls']),
+            public_files={p.name:{'bytes':p.stat().st_size,'sha256':sha(p)} for p in sorted(assets.iterdir()) if p.is_file()})
+    except BaseException as exc:
+        record.update(status='failed',error={'type':type(exc).__name__,'message':str(exc)});raise
+    finally:
+        record.update(finished_at_utc=datetime.now(timezone.utc).isoformat(),frozen_after=frozen())
+        record['frozen_equal']=record['frozen_before']==record['frozen_after'];save()
+    assert record['frozen_equal']
+    print(json.dumps({k:record[k] for k in ('status','cli_calls','frozen_equal')}))
+
+
+if __name__=='__main__':main()

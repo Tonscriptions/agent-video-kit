@@ -1,5 +1,44 @@
 # Agent Video Kit
 
+<!-- V78-CURRENT -->
+2026-10-20 **V78（时间线帧/区间预览与内容缓存限定验收）**：新增 `preview frame/range/cache-list/cache-prune`，完整作者图合成后按输出帧截取；RGBA PNG、FFV1 BGRA＋float32 PCM NUT、H.264/AAC MP4；有理数显示帧率、末帧音频端点与全部 PTS 核验。持久缓存以实际源/派生/运行时 SHA 验证，不能沿用上游路径＋大小＋mtime 命中；新目录导出、取消、损坏拒绝、配额及工程引用保护。完整原生回归 **1768/1768、2772.065 秒、0 跳过、235 冻结输入＋8 外部夹具前后相同**；22 新方法为全量子集，专项 **22/22、48.755 秒、0 跳过**。开发 **32 次 CLI／24 项检查**，四组共37帧；移动 HSL、缩小、实际透明作者输出及 NTSC 不完整末帧，全部 RGBA／每个 PCM 样本与独立完整图参考逐字节一致，包重放一致。离线 **154 资源／7 wheels／35 次隔离 CLI＋1 来源探针／11 项检查**，源码／平台 wheel／安装资源逐字节相同，安装解码结果与开发一致；17 Skills／318 本地引用与发现联接已核对。另作跨转场及本地R3伸缩两组上下文探针：开发/同一隔离安装各22次CLI／15检查，24帧与完整PCM及包重放一致，独立于主四组计数。LUT三种字段再以开发/隔离入口各12次CLI验证同大小/mtime替换失效与新像素；不与上述次数混合。保留早期探测字段、像素转换和演示夹具失败。软件预览从作者起点累计解码，命中仍需内容校验；未验收实时播放、连续审片／听审、自然质量、HDR或完整剪映等价。
+
+[CLI与缓存契约](docs/specs/时间线帧区间预览与内容缓存契约_v0.1_2026-10-20.md) · [实测、失败与时延边界](docs/validation/时间线帧区间预览与离线发行实测_2026-10-20.md) · [完整回归](docs/validation/evidence/timeline-preview-20261020-v78/full-r2.json)
+
+| 编号 | 功能性核验／实测 | 实际结果与边界 | 证据 |
+|---|---|---|---|
+| V78-01 | 帧与区间语义 | 22/22；48.755s；全图RGBA／完整PCM、透明、NTSC末端、调整区间与嵌套倒放 | [记录](docs/validation/evidence/timeline-preview-20261020-v78/targeted-r7.json) |
+| V78-02 | 缓存与故障 | 同大小/mtime素材及三种LUT别名内容失效；命中不编图/探测/编码；损坏拒绝；取消、复制失败、引用保护与Windows junction | [记录](docs/validation/evidence/timeline-preview-20261020-v78/targeted-r7.json) |
+| V78-03 | 实际开发CLI | 32 CLI／24 检查；四组37帧，RGBA和每个PCM样本与完整图一致，包重放一致 | [记录](docs/validation/evidence/timeline-preview-20261020-v78/native-r6/verification.json) |
+| V78-04 | 离线平台发行 | 154资源／7wheels；35 隔离CLI＋1来源探针／11 检查；开发/安装解码相同 | [记录](docs/validation/evidence/timeline-preview-20261020-v78/installed-r3/verification.json) |
+| V78-05 | 完整原生回归 | 1768/1768；2772.065s；235输入＋8夹具；0跳过 | [记录](docs/validation/evidence/timeline-preview-20261020-v78/full-r2.json) |
+| V78-06 | 早期产品核验失败 | r1：2失败/7错误；r2：3像素失败；修正探测字段、字符串噪声旁路与BGRA/scale转换，阈值未放宽 | [记录](docs/validation/evidence/timeline-preview-20261020-v78/targeted-r1.json) |
+| V78-07 | 实际演示夹具失败 | 源尾端/原生插件路径/NTSC关键帧/极短GIF四类失败均保留；未改产品通过阈值 | [记录](docs/validation/evidence/timeline-preview-20261020-v78/native-r4/verification.json) |
+| V78-08 | 安装演示失败 | 首次安装资源已正确，单帧NTSC转8fps GIF输出0帧；修正演示为PNG和MP4，原失败保留 | [记录](docs/validation/evidence/timeline-preview-20261020-v78/installed-r1/verification.json) |
+| V78-09 | 静态审查边界 | 只静看最终开发/安装PNG；完整播放、声音、自然质量、HDR与实时延迟未验收 | [记录](docs/validation/evidence/timeline-preview-20261020-v78/static-review-r2.json) |
+| V78-10 | 跨转场/真实音频衍生任务 | 开发与隔离安装各22 CLI／15检查；两组各12帧，跨剪切点与R3 0.5倍速，完整参考RGBA/PCM及包重放一致 | [记录](docs/validation/evidence/timeline-preview-20261020-v78/contexts-native-r3/verification.json) |
+| V78-11 | LUT兼容别名失效修复 | 额外测试先复现lut入口旧命中再修复；path/file/lut三字段实际新像素与完整参考相同；旧全量停止并保留 | [记录](docs/validation/evidence/timeline-preview-20261020-v78/targeted-r6.json) |
+| V78-12 | LUT别名实际CLI | 开发/隔离入口各12次CLI；三字段内容替换后拒绝旧命中，像素变化且新内容可重复命中 | [记录](docs/validation/evidence/timeline-preview-20261020-v78/lut-native-r1/verification.json) |
+
+自制 CC0 合成移动图、RGBA 图和立体声声音；[原视频](docs/assets/timeline-preview-20261020-v78-r6/moving-original.mp4) · [原无损视频](docs/assets/timeline-preview-20261020-v78-r6/moving-original.nut) · [原透明PNG](docs/assets/timeline-preview-20261020-v78-r6/alpha-original.png) · [原WAV](docs/assets/timeline-preview-20261020-v78-r6/audio-original.wav)。
+
+[动画时间线区间 MP4](docs/assets/timeline-preview-20261020-v78-r6/motion-preview.mp4) · [无损RGBA/PCM](docs/assets/timeline-preview-20261020-v78-r6/motion-reference.nut)
+
+![动画时间线区间 GIF（有损不透明预览）](docs/assets/timeline-preview-20261020-v78-r6/motion-preview.gif)
+
+[合成后缩小 MP4](docs/assets/timeline-preview-20261020-v78-r6/scaled-preview.mp4) · [无损RGBA/PCM](docs/assets/timeline-preview-20261020-v78-r6/scaled-reference.nut)
+
+![合成后缩小 GIF（有损不透明预览）](docs/assets/timeline-preview-20261020-v78-r6/scaled-preview.gif)
+
+[透明作者图的观看副本 MP4](docs/assets/timeline-preview-20261020-v78-r6/alpha-preview.mp4) · [无损RGBA/PCM](docs/assets/timeline-preview-20261020-v78-r6/alpha-reference.nut)
+
+![透明作者图的观看副本 GIF（有损不透明预览）](docs/assets/timeline-preview-20261020-v78-r6/alpha-preview.gif)
+
+[NTSC末帧 PNG](docs/assets/timeline-preview-20261020-v78-r6/ntsc-frame.png) · [NTSC单帧 MP4](docs/assets/timeline-preview-20261020-v78-r6/ntsc-preview.mp4) · [可编辑工程包](docs/assets/timeline-preview-20261020-v78-r6/editable-project.zip)。单帧不足8fps GIF一步，未人为延长动画。
+
+上下文探针：[跨转场 MP4](docs/assets/timeline-preview-20261020-v78-contexts-r3/transition-preview.mp4) · [R3伸缩区间 MP4](docs/assets/timeline-preview-20261020-v78-contexts-r3/rubberband-preview.mp4) · [隔离安装探针](docs/validation/evidence/timeline-preview-20261020-v78/contexts-installed-r2/verification.json)。
+<!-- /V78-CURRENT -->
+
 <!-- R12-CURRENT -->
 2026-10-20 **R12（OpenFilm 0.2.3 源码复核，产品仍为 V77）**：固定 `284f8bd3d6850ceaa773043e2ecb90e13640f547`；社区快照 **1524 stars/153 forks，22:12:10 Asia/Taipei**。757→781 文件中 **616 不变、27 新增、138 修改、3 删除**。本轮为源码研究，完整 [复用清单、成本和接入边界](docs/OpenFilm_0.2.3增量复用与开发成本评估_2026-10-20.md) 已更新；没有新增产品 CLI/成片验收或再次累计 V77 的 1746 项历史回归。
 

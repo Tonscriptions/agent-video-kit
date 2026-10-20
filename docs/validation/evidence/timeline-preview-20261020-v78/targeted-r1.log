@@ -1,0 +1,150 @@
+test_bounds_types_even_height_and_working_budget_reject_before_writes (test_timeline_preview.PreviewContractTests.test_bounds_types_even_height_and_working_budget_reject_before_writes) ... ok
+test_dry_run_does_not_compile_or_make_cache (test_timeline_preview.PreviewContractTests.test_dry_run_does_not_compile_or_make_cache) ... ok
+test_half_open_ntsc_partial_last_frame_has_exact_sample_endpoint (test_timeline_preview.PreviewContractTests.test_half_open_ntsc_partial_last_frame_has_exact_sample_endpoint) ... ok
+test_junction_cache_never_prunes_external_files (test_timeline_preview.PreviewContractTests.test_junction_cache_never_prunes_external_files) ... ok
+test_preexisting_cancel_prevents_compilation_and_publication (test_timeline_preview.PreviewContractTests.test_preexisting_cancel_prevents_compilation_and_publication) ... ok
+test_same_size_and_restored_mtime_source_and_runtime_change_identity (test_timeline_preview.PreviewContractTests.test_same_size_and_restored_mtime_source_and_runtime_change_identity) ... ok
+test_scale_after_composite_preserves_aspect_without_upscaling (test_timeline_preview.PreviewContractTests.test_scale_after_composite_preserves_aspect_without_upscaling) ... ok
+test_stochastic_strings_and_external_subtitle_disable_cache (test_timeline_preview.PreviewContractTests.test_stochastic_strings_and_external_subtitle_disable_cache) ... FAIL
+test_cache_hit_runs_no_graph_probe_encoder_and_keeps_author_bytes (test_timeline_preview.PreviewPixelTests.test_cache_hit_runs_no_graph_probe_encoder_and_keeps_author_bytes) ... ERROR
+test_cancel_after_compile_removes_staging_and_output (test_timeline_preview.PreviewPixelTests.test_cancel_after_compile_removes_staging_and_output) ... ok
+test_cli_frame_range_cache_and_prune_are_discoverable (test_timeline_preview.PreviewPixelTests.test_cli_frame_range_cache_and_prune_are_discoverable) ... FAIL
+test_frame_png_is_actual_animated_author_frame_not_source_thumbnail (test_timeline_preview.PreviewPixelTests.test_frame_png_is_actual_animated_author_frame_not_source_thumbnail) ... ERROR
+test_nested_reverse_and_interval_effects_keep_full_author_clock (test_timeline_preview.PreviewPixelTests.test_nested_reverse_and_interval_effects_keep_full_author_clock) ... ERROR
+test_new_output_export_survives_cache_pruning (test_timeline_preview.PreviewPixelTests.test_new_output_export_survives_cache_pruning) ... ERROR
+test_ntsc_partial_last_frame_matches_full_float_pcm (test_timeline_preview.PreviewPixelTests.test_ntsc_partial_last_frame_matches_full_float_pcm) ... ERROR
+test_range_pixels_and_every_pcm_sample_match_full_graph (test_timeline_preview.PreviewPixelTests.test_range_pixels_and_every_pcm_sample_match_full_graph) ... ERROR
+test_receipt_and_artifact_corruption_reject_without_overwrite (test_timeline_preview.PreviewPixelTests.test_receipt_and_artifact_corruption_reject_without_overwrite) ... ERROR
+
+======================================================================
+ERROR: test_cache_hit_runs_no_graph_probe_encoder_and_keeps_author_bytes (test_timeline_preview.PreviewPixelTests.test_cache_hit_runs_no_graph_probe_encoder_and_keeps_author_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 185, in test_cache_hit_runs_no_graph_probe_encoder_and_keeps_author_bytes
+    before=project_file(self.root).read_bytes();first=self.execute(3,4,'frame')
+                                                      ~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 60, in execute
+    return preview.preview_project(self.root,self.project,self.sequence,request=self.request(start,end,mode),**kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\src\ai_ad_editor\preview.py", line 376, in preview_project
+    raise fail('PREVIEW_OUTPUT_INVALID', '预览输出尺寸不匹配', temporary/file)
+ai_ad_editor.errors.AppError: 预览输出尺寸不匹配
+
+======================================================================
+ERROR: test_frame_png_is_actual_animated_author_frame_not_source_thumbnail (test_timeline_preview.PreviewPixelTests.test_frame_png_is_actual_animated_author_frame_not_source_thumbnail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 180, in test_frame_png_is_actual_animated_author_frame_not_source_thumbnail
+    video,_=self.reference();result=self.execute(5,6,'frame')
+                                    ~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 60, in execute
+    return preview.preview_project(self.root,self.project,self.sequence,request=self.request(start,end,mode),**kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\src\ai_ad_editor\preview.py", line 376, in preview_project
+    raise fail('PREVIEW_OUTPUT_INVALID', '预览输出尺寸不匹配', temporary/file)
+ai_ad_editor.errors.AppError: 预览输出尺寸不匹配
+
+======================================================================
+ERROR: test_nested_reverse_and_interval_effects_keep_full_author_clock (test_timeline_preview.PreviewPixelTests.test_nested_reverse_and_interval_effects_keep_full_author_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 232, in test_nested_reverse_and_interval_effects_keep_full_author_clock
+    video,audio=self.reference();result=self.execute(2,5)
+                                        ~~~~~~~~~~~~^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 60, in execute
+    return preview.preview_project(self.root,self.project,self.sequence,request=self.request(start,end,mode),**kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\src\ai_ad_editor\preview.py", line 376, in preview_project
+    raise fail('PREVIEW_OUTPUT_INVALID', '预览输出尺寸不匹配', temporary/file)
+ai_ad_editor.errors.AppError: 预览输出尺寸不匹配
+
+======================================================================
+ERROR: test_new_output_export_survives_cache_pruning (test_timeline_preview.PreviewPixelTests.test_new_output_export_survives_cache_pruning)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 193, in test_new_output_export_survives_cache_pruning
+    result=self.execute(2,4,output=target)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 60, in execute
+    return preview.preview_project(self.root,self.project,self.sequence,request=self.request(start,end,mode),**kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\src\ai_ad_editor\preview.py", line 376, in preview_project
+    raise fail('PREVIEW_OUTPUT_INVALID', '预览输出尺寸不匹配', temporary/file)
+ai_ad_editor.errors.AppError: 预览输出尺寸不匹配
+
+======================================================================
+ERROR: test_ntsc_partial_last_frame_matches_full_float_pcm (test_timeline_preview.PreviewPixelTests.test_ntsc_partial_last_frame_matches_full_float_pcm)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 222, in test_ntsc_partial_last_frame_matches_full_float_pcm
+    video,audio=self.reference();result=self.execute(29,30)
+                                        ~~~~~~~~~~~~^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 60, in execute
+    return preview.preview_project(self.root,self.project,self.sequence,request=self.request(start,end,mode),**kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\src\ai_ad_editor\preview.py", line 376, in preview_project
+    raise fail('PREVIEW_OUTPUT_INVALID', '预览输出尺寸不匹配', temporary/file)
+ai_ad_editor.errors.AppError: 预览输出尺寸不匹配
+
+======================================================================
+ERROR: test_range_pixels_and_every_pcm_sample_match_full_graph (test_timeline_preview.PreviewPixelTests.test_range_pixels_and_every_pcm_sample_match_full_graph)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 173, in test_range_pixels_and_every_pcm_sample_match_full_graph
+    video,audio=self.reference();result=self.execute(2,6)
+                                        ~~~~~~~~~~~~^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 60, in execute
+    return preview.preview_project(self.root,self.project,self.sequence,request=self.request(start,end,mode),**kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\src\ai_ad_editor\preview.py", line 376, in preview_project
+    raise fail('PREVIEW_OUTPUT_INVALID', '预览输出尺寸不匹配', temporary/file)
+ai_ad_editor.errors.AppError: 预览输出尺寸不匹配
+
+======================================================================
+ERROR: test_receipt_and_artifact_corruption_reject_without_overwrite (test_timeline_preview.PreviewPixelTests.test_receipt_and_artifact_corruption_reject_without_overwrite)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 201, in test_receipt_and_artifact_corruption_reject_without_overwrite
+    result=self.execute(0,1,'frame');path=Path(result['path']);manifest=Path(result['manifest'])
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 60, in execute
+    return preview.preview_project(self.root,self.project,self.sequence,request=self.request(start,end,mode),**kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\src\ai_ad_editor\preview.py", line 376, in preview_project
+    raise fail('PREVIEW_OUTPUT_INVALID', '预览输出尺寸不匹配', temporary/file)
+ai_ad_editor.errors.AppError: 预览输出尺寸不匹配
+
+======================================================================
+FAIL: test_stochastic_strings_and_external_subtitle_disable_cache (test_timeline_preview.PreviewContractTests.test_stochastic_strings_and_external_subtitle_disable_cache)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 113, in test_stochastic_strings_and_external_subtitle_disable_cache
+    self.assertTrue(preview._cacheable({'effects':['film-grain']},['nut']))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [] is not true
+
+======================================================================
+FAIL: test_cli_frame_range_cache_and_prune_are_discoverable (test_timeline_preview.PreviewPixelTests.test_cli_frame_range_cache_and_prune_are_discoverable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\timeline-preview\product\tests\test_timeline_preview.py", line 239, in test_cli_frame_range_cache_and_prune_are_discoverable
+    self.assertEqual(code,0,result);self.assertTrue(Path(result['data']['path']).is_file())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 6 != 0 : {'ok': False, 'command': 'preview.frame', 'request_id': 'req_20261020144530_60e24dd4', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'PREVIEW_OUTPUT_INVALID', 'message': '预览输出尺寸不匹配', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\worktrees\\timeline-preview\\product\\.runtime\\preview-test-0vxqzle3\\project\\cache\\timeline-previews\\.tmp-preview_20261020144529_1703bc61\\frame.png', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-20T14:45:30.369272Z', 'finished_at': '2026-10-20T14:45:30.369285Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 17 tests in 14.173s
+
+FAILED (failures=2, errors=7)

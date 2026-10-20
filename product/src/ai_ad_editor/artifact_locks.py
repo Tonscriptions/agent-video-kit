@@ -107,6 +107,15 @@ def artifact_entry(path: Path, role: str) -> dict:
     return _entry(path, role)
 
 
+def verification_entries():
+    """Return immutable identities observed under the current native read locks."""
+    current = _CURRENT.get()
+    if current is None:
+        return []
+    return [{'path': path, 'bytes': item['identity'][2], 'sha256': item['sha256']}
+            for path, item in sorted(current.entries.items())]
+
+
 def verification_summary():
     current = _CURRENT.get()
     return current.summary() if current is not None and current.entries else None

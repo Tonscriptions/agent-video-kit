@@ -23,6 +23,19 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'timeline_preview': {
+                'status':'implemented_with_limits', 'engine':'agent-timeline-preview-v1',
+                'commands':['preview.frame','preview.range','preview.cache-list','preview.cache-prune'],
+                'features':['full_author_graph_before_output_frame_trim','rational_display_frame_and_pcm_sample_ranges',
+                    'rgba_png_frame','lossless_bgra_ffv1_float_pcm_reference','mp4_review_delivery',
+                    'actual_content_and_runtime_hashes','verified_persistent_cache','new_directory_export',
+                    'project_lock_cancel_atomic_publication','bounded_space_admission_and_cache_pruning'],
+                'limits':['software_offline_preview_no_playback_gui','cumulative_decode_from_author_start',
+                    'maximum_3600_frames_and_conservative_working_space_budget','maximum_256_cache_entries',
+                    'external_subtitle_font_fallback_stochastic_and_open_container_dependencies_bypass_reuse',
+                    'mp4_is_lossy_and_opaque_lossless_reference_retains_alpha_and_pcm',
+                    'sha_verification_cost_applies_on_cache_hits','no_automatic_natural_quality_or_realtime_acceptance'],
+            },
             'contact_sheet': {
                 'status': 'implemented_with_limits', 'engine': 'agent-native-contact-sheet-v1',
                 'commands': ['media.contact-sheet'],
