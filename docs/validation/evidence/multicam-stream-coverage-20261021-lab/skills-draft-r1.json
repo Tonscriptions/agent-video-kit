@@ -1,0 +1,50 @@
+{
+  "status": "passed-four-unregistered-drafts",
+  "registered": false,
+  "new_block_marker": "MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021",
+  "skills": {
+    "video-cut-agent-editor": {
+      "path": "skills/video-cut-agent-editor/SKILL.md",
+      "sha256": "sha256:9312a39d6cfba4db16b83cd29cb90d38c370d20be8a117f381234e68ce17925a",
+      "parent_sha256": "sha256:d450305cdd2623d27c5521c0c4a00a1033b4075b78d333963f26d74a4c61ef8c",
+      "parent_snapshot": "docs/validation/evidence/multicam-stream-coverage-20261021-lab/skill-parent-snapshots-r1/video-cut-agent-editor.md",
+      "new_block": "<!-- MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->\nFor multicam_source_coverage 0.3.0, use actual native-video coverage, independently of the longer container/audio duration. Review native bounds before authoring camera switches.\nNative coverage uses first PTS, last PTS plus known duration, native time_base and the renderer's demux-origin rounding; retain the exact rational boundaries from the report. Container duration alone cannot establish video coverage.\nDefault shortfall policy rejects. Explicit trim leaves gaps at original reference positions; stretch clamps to the real first native frame, changes event timing and must retain its warning. Completely disjoint coverage rejects under every policy.\nDry-run reads existing verified native indices without writing caches, reports, snapshots or authored files. A hit reports zero source-frame probes but still reads hashes. Corrupt indices or changed source SHA reject; do not silently repair them or convert integrity errors into successful audio-only analysis.\nRead the [native coverage contract](../../docs/specs/多机位原生帧覆盖与只读索引契约_实验_v0.1_2026-10-21.md) and [fresh native/isolated evidence](../../docs/validation/多机位原生视频覆盖独立实验_2026-10-21.md).\nThe base seven-wheel installer does not ship NumPy. This experiment explicitly copies the existing local NumPy 2.4.2 distribution with RECORD hashes and licenses; it is not automatic dependency installation.\nUnknown-EOF audio-analysis controls include simulated video state. Nonzero audio stream origin, clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    },
+    "video-cut-timeline": {
+      "path": "skills/video-cut-timeline/SKILL.md",
+      "sha256": "sha256:6ec4b679d72461a8eac0f5aebfcae3165d669715d030ef2a935935866bfe4d04",
+      "parent_sha256": "sha256:fee040fa7ec6dd18f77cae066534883cf9f47a785b837e08b130e836e9e097ec",
+      "parent_snapshot": "docs/validation/evidence/multicam-stream-coverage-20261021-lab/skill-parent-snapshots-r1/video-cut-timeline.md",
+      "new_block": "<!-- MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->\nKeep reference events at their original positions: source_time = reference_time + relative_delay_seconds. Trim intersects actual first/last native-video intervals, retains unity speed and preserves leading/trailing gaps.\nNative coverage uses first PTS, last PTS plus known duration, native time_base and the renderer's demux-origin rounding; retain the exact rational boundaries from the report. Container duration alone cannot establish video coverage.\nDefault shortfall policy rejects. Explicit trim leaves gaps at original reference positions; stretch clamps to the real first native frame, changes event timing and must retain its warning. Completely disjoint coverage rejects under every policy.\nDry-run reads existing verified native indices without writing caches, reports, snapshots or authored files. A hit reports zero source-frame probes but still reads hashes. Corrupt indices or changed source SHA reject; do not silently repair them or convert integrity errors into successful audio-only analysis.\nRead the [native coverage contract](../../docs/specs/多机位原生帧覆盖与只读索引契约_实验_v0.1_2026-10-21.md) and [fresh native/isolated evidence](../../docs/validation/多机位原生视频覆盖独立实验_2026-10-21.md).\nThe base seven-wheel installer does not ship NumPy. This experiment explicitly copies the existing local NumPy 2.4.2 distribution with RECORD hashes and licenses; it is not automatic dependency installation.\nUnknown-EOF audio-analysis controls include simulated video state. Nonzero audio stream origin, clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    },
+    "video-cut-quality": {
+      "path": "skills/video-cut-quality/SKILL.md",
+      "sha256": "sha256:d2fe205e4339307bbc93443bb6c476781e3507aacc3204985e19913aac88e4f5",
+      "parent_sha256": "sha256:0cfb0c5f2a4118b86e4aa5e5a5603b80e077ed1054ce7280f3099d1741be27ae",
+      "parent_snapshot": "docs/validation/evidence/multicam-stream-coverage-20261021-lab/skill-parent-snapshots-r1/video-cut-quality.md",
+      "new_block": "<!-- MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->\nInspect full lossless RGBA and explicit master PCM, native first/last PTS plus duration, both output gaps and encoded PTS. Identity patches and MP4-derived GIFs establish separate bounded checks.\nNative coverage uses first PTS, last PTS plus known duration, native time_base and the renderer's demux-origin rounding; retain the exact rational boundaries from the report. Container duration alone cannot establish video coverage.\nDefault shortfall policy rejects. Explicit trim leaves gaps at original reference positions; stretch clamps to the real first native frame, changes event timing and must retain its warning. Completely disjoint coverage rejects under every policy.\nDry-run reads existing verified native indices without writing caches, reports, snapshots or authored files. A hit reports zero source-frame probes but still reads hashes. Corrupt indices or changed source SHA reject; do not silently repair them or convert integrity errors into successful audio-only analysis.\nRead the [native coverage contract](../../docs/specs/多机位原生帧覆盖与只读索引契约_实验_v0.1_2026-10-21.md) and [fresh native/isolated evidence](../../docs/validation/多机位原生视频覆盖独立实验_2026-10-21.md).\nThe base seven-wheel installer does not ship NumPy. This experiment explicitly copies the existing local NumPy 2.4.2 distribution with RECORD hashes and licenses; it is not automatic dependency installation.\nUnknown-EOF audio-analysis controls include simulated video state. Nonzero audio stream origin, clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    },
+    "video-cut-video-understand": {
+      "path": "skills/video-cut-video-understand/SKILL.md",
+      "sha256": "sha256:521daf829df84bb3f1d3e90a71db3486f62188fdc91050510d2fdf873bb1d892",
+      "parent_sha256": "sha256:45172746dc82c3da80d3907aa1407511020245c696bcdd6f29549f35440ea458",
+      "parent_snapshot": "docs/validation/evidence/multicam-stream-coverage-20261021-lab/skill-parent-snapshots-r1/video-cut-video-understand.md",
+      "new_block": "<!-- MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->\nAudio-offset analysis and native-video coverage are separate. Audio-only analysis may return valid delays with unknown video-coverage diagnostics; authoring a switch to that camera must refuse unknown coverage.\nNative coverage uses first PTS, last PTS plus known duration, native time_base and the renderer's demux-origin rounding; retain the exact rational boundaries from the report. Container duration alone cannot establish video coverage.\nDefault shortfall policy rejects. Explicit trim leaves gaps at original reference positions; stretch clamps to the real first native frame, changes event timing and must retain its warning. Completely disjoint coverage rejects under every policy.\nDry-run reads existing verified native indices without writing caches, reports, snapshots or authored files. A hit reports zero source-frame probes but still reads hashes. Corrupt indices or changed source SHA reject; do not silently repair them or convert integrity errors into successful audio-only analysis.\nRead the [native coverage contract](../../docs/specs/多机位原生帧覆盖与只读索引契约_实验_v0.1_2026-10-21.md) and [fresh native/isolated evidence](../../docs/validation/多机位原生视频覆盖独立实验_2026-10-21.md).\nThe base seven-wheel installer does not ship NumPy. This experiment explicitly copies the existing local NumPy 2.4.2 distribution with RECORD hashes and licenses; it is not automatic dependency installation.\nUnknown-EOF audio-analysis controls include simulated video state. Nonzero audio stream origin, clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    }
+  },
+  "skill_count": 4,
+  "generator_sha256": "sha256:291c3abe982d8623b4a87aca35fd55fba2fbb957ddfe7288d02e7f1dd9773ea1",
+  "parent_merge_policy": "Insert only this new block into actual published V86 parents; do not replace their full bodies with these earlier snapshots."
+}

@@ -1,0 +1,16 @@
+test_unknown_video_eof_still_returns_audio_only_sync_diagnostics (test_multicam_stream_coverage.NativeMulticamStreamCoverageTests.test_unknown_video_eof_still_returns_audio_only_sync_diagnostics) ... FAIL
+test_unknown_video_eof_still_refuses_requested_switch_without_writes (test_multicam_stream_coverage.NativeMulticamStreamCoverageTests.test_unknown_video_eof_still_refuses_requested_switch_without_writes) ... ok
+
+======================================================================
+FAIL: test_unknown_video_eof_still_returns_audio_only_sync_diagnostics (test_multicam_stream_coverage.NativeMulticamStreamCoverageTests.test_unknown_video_eof_still_returns_audio_only_sync_diagnostics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-stream-coverage-lab-20261021\product\tests\test_multicam_stream_coverage.py", line 275, in test_unknown_video_eof_still_returns_audio_only_sync_diagnostics
+    self.assertEqual(code, 0, result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'media.multicam', 'request_id': 'req_20261021051729_c53ff506', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'MULTICAM_VIDEO_COVERAGE_UNKNOWN', 'message': 'unknown last display duration', 'path': None, 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-21T05:17:29.396640Z', 'finished_at': '2026-10-21T05:17:29.396647Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.355s
+
+FAILED (failures=1)

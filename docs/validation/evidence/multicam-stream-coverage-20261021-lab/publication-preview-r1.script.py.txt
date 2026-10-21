@@ -1,0 +1,76 @@
+"""Review a private future document layout; this never runs a suite or a publisher."""
+import difflib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+from smoke_multicam_stream_coverage import sha
+
+ROOT=Path(__file__).resolve().parents[1]
+MAIN=Path('E:/dev/sandbox/AI广告剪辑')
+REL='docs/validation/evidence/multicam-stream-coverage-20261021-lab'
+WORK=ROOT/'product/.runtime/multicam-stream-coverage-20261021/publication-document-review-r1'
+
+
+def main():
+    assert not WORK.exists();WORK.mkdir(parents=True)
+    path=ROOT/'scripts/publish_multicam_stream_coverage.py'
+    spec=importlib.util.spec_from_file_location('prospective_native_stream_publisher',path)
+    publisher=importlib.util.module_from_spec(spec);spec.loader.exec_module(publisher)
+    preview=WORK/'prospective-unpublished'
+    names={*publisher.LATEST_DOCS,'.gitattributes',publisher.HISTORICAL_REPORT,publisher.HISTORICAL_CONTRACT}
+    names|={'skills/'+name+'/SKILL.md' for name in publisher.SKILLS}
+    originals={}
+    for name in sorted(names):
+        source=ROOT/name if name in (publisher.HISTORICAL_REPORT,publisher.HISTORICAL_CONTRACT) else MAIN/name
+        destination=preview/name;destination.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,destination)
+        originals[name]={'path':str(source),'sha256':sha(source)}
+    # Function-render arguments only. No full-r1.json or simulated suite receipt is written.
+    placeholders={'methods':2019,'suite_seconds':0.0,'skipped':0,'terminal_ok':True}
+    changed=publisher.documents(preview,placeholders)
+    links=[];validators=[];diffs={}
+    for name in sorted(changed-{'.gitattributes'}):
+        target=preview/name;text=target.read_text('utf8');scope=text
+        if name in publisher.LATEST_DOCS or name.startswith('skills/'):
+            scope=text.split('<!-- '+publisher.MARKER+' -->')[1].split('<!-- /'+publisher.MARKER+' -->')[0]
+        references=re.findall(r'!?\[[^\]]*\]\(([^)\n]+)\)',scope)
+        assert '\\' not in '\n'.join(references),name
+        for token in references:
+            reference=token.strip('<>').split('#',1)[0]
+            if not reference or re.match(r'^[a-zA-Z][\w+.-]*:',reference):continue
+            absolute=(target.parent/reference).resolve();assert absolute.is_relative_to(preview),(name,token)
+            relative=absolute.relative_to(preview).as_posix();pending=relative==REL+'/full-r1.json'
+            actual=next((p for p in (preview/relative,ROOT/relative,MAIN/relative) if p.exists()),None)
+            assert actual is not None or pending,(name,token)
+            links.append({'document':name,'target':relative,'exists':actual is not None,'pending_complete_receipt':pending})
+        if name.startswith('skills/'):
+            before=Path(originals[name]['path']).read_text('utf8')
+            assert not [line for line in difflib.ndiff(before.splitlines(),text.splitlines()) if line.startswith('- ') and line[2:].strip()]
+            assert text.count('<!-- '+publisher.MARKER+' -->')==1
+            assert 'This is an unregistered candidate; complete regression and main integration remain pending.' not in scope
+            difference=WORK/(Path(name).parent.name+'.patch')
+            difference.write_text(''.join(difflib.unified_diff(before.splitlines(True),text.splitlines(True),
+                fromfile='current-main-parent/'+name,tofile='prospective-unpublished/'+name)),encoding='utf8',newline='\n')
+            diffs[name]={'path':str(difference),'sha256':sha(difference),'no_prior_nonblank_lines_removed':True}
+            command=[sys.executable,'-E','-B','-X','utf8','C:/Users/carzy/.codex/skills/.system/skill-creator/scripts/quick_validate.py',target.parent]
+            result=subprocess.run(list(map(str,command)),cwd=ROOT,capture_output=True,timeout=60)
+            validators.append({'command':list(map(str,command)),'exit_code':result.returncode,'stdout':result.stdout.decode('utf8','replace')})
+            assert result.returncode==0,result.stderr.decode('utf8','replace')
+    for row in originals.values():assert sha(row['path'])==row['sha256']
+    record={'status':'passed-prospective-document-and-skill-review','actual_complete_suite_run':False,
+        'actual_publisher_run':False,'main_modified':False,'skills_registered_or_updated':False,
+        'render_only_placeholders':placeholders,'no_simulated_full_receipt_written':True,
+        'preview_root':str(preview),'publisher_sha256':sha(path),'current_main_inputs':originals,
+        'links':links,'skill_validators':validators,'skill_deltas':diffs,
+        'generated_preview_files':{name:sha(preview/name) for name in sorted(changed)},'review_script_sha256':sha(__file__),
+        'limits':'Future prose rendering only against actual V84 document/Skill parents. V85/V86 guidance will exist at actual publication; merge only the V87 delta into those parents. Actual full 2019, published V86 and all 17 registered Skill audits remain mandatory.'}
+    (ROOT/REL/'publication-preview-r1.script.py.txt').write_bytes(Path(__file__).read_bytes())
+    output=ROOT/REL/'publication-preview-r1.json';assert not output.exists()
+    output.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    print(json.dumps({'status':record['status'],'links':len(links),'skill_validators':len(validators),'main_modified':False}))
+
+
+if __name__=='__main__':main()

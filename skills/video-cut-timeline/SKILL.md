@@ -3,6 +3,20 @@ name: video-cut-timeline
 description: Compose an Agent Project timeline with local clips, tracks, transitions, keyframes, masks, speed curves, nested sequences, captions, and audio automation.
 ---
 
+<!-- V87-MULTICAM-NATIVE-STREAM-COVERAGE -->
+<!-- MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->
+Keep reference events at their original positions: source_time = reference_time + relative_delay_seconds. Trim intersects actual first/last native-video intervals, retains unity speed and preserves leading/trailing gaps.
+Native coverage uses first PTS, last PTS plus known duration, native time_base and the renderer's demux-origin rounding; retain the exact rational boundaries from the report. Container duration alone cannot establish video coverage.
+Default shortfall policy rejects. Explicit trim leaves gaps at original reference positions; stretch clamps to the real first native frame, changes event timing and must retain its warning. Completely disjoint coverage rejects under every policy.
+Dry-run reads existing verified native indices without writing caches, reports, snapshots or authored files. A hit reports zero source-frame probes but still reads hashes. Corrupt indices or changed source SHA reject; do not silently repair them or convert integrity errors into successful audio-only analysis.
+Read the [native coverage contract](../../docs/specs/多机位原生帧覆盖与只读索引契约_v0.1_2026-10-21.md) and [fresh native/isolated evidence](../../docs/validation/多机位原生视频覆盖实测_2026-10-21.md).
+The base seven-wheel installer does not ship NumPy. This experiment explicitly copies the existing local NumPy 2.4.2 distribution with RECORD hashes and licenses; it is not automatic dependency installation.
+Unknown-EOF audio-analysis controls include simulated video state. Nonzero audio stream origin, clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.
+
+<!-- /MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->
+<!-- /V87-MULTICAM-NATIVE-STREAM-COVERAGE -->
+
+
 <!-- V86-MULTICAM-SOURCE-COVERAGE -->
 <!-- MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->
 Review original requested intervals and actual covered intervals separately; trim preserves unity speed and places clips at their original reference event positions.

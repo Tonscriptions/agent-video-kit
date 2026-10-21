@@ -1,5 +1,41 @@
 # Agent Video Kit
 
+<!-- V87-MULTICAM-NATIVE-STREAM-COVERAGE -->
+### V87 多机位原生视频覆盖
+
+V87 多机位原生视频覆盖已完成 2019 方法、3210.232 秒、0 跳过的完整回归；258 个冻结输入、8 个已提交外部夹具及 15 份验证脚本前后相同。视频覆盖取原生首/末帧区间，独立于较长音轨和容器时长；原速剪辑保留真实缺口。
+
+| 编号 | 核验 | 实际结果与边界 | 证据 |
+|---|---|---|---|
+| V87-01 | 完整回归 | 2019 方法 /3210.232 秒 /0 跳过；258 输入、8 夹具、15 验证脚本。 | [记录](docs/validation/evidence/multicam-stream-coverage-20261021-lab/full-r1.json) |
+| V87-02 | 相关回归 | 104 个不同方法：24 本轮＋22 父多机位＋16 空选区＋32 嵌套时钟＋10 CLI；属于完整套件子集，旧 102 不累计。 | [记录](docs/validation/evidence/multicam-stream-coverage-20261021-lab/related-r2.json) |
+| V87-03 | 真实视频边界 | 两组视频实际范围 [0,.32) 与 [1,1.32)，音轨/容器均 2 秒；33 原生 CLI＋25 其他命令、54 检查。 | [记录](docs/validation/evidence/multicam-stream-coverage-20261021-lab/native-r1/verification.json) |
+| V87-04 | 完整无损 RGBA/PCM | 每组 50 帧、11,520,000 RGBA 字节与 768,000 float32 PCM 字节 /每声道 96,000 样本独立一致。主音轨须显式创作。 | [记录](docs/validation/evidence/multicam-stream-coverage-20261021-lab/native-r1/verification.json) |
+| V87-05 | MP4/GIF 与静态目检 | trim/stretch 均 50 帧、PTS=n/25；trim 身份色块最大误差 1，非编码整帧一致。源 GIF 8 帧/320 ms，输出 GIF 2000 ms，黑帧会合并。 | [记录](docs/validation/evidence/multicam-stream-coverage-20261021-lab/static-review-r1.json) |
+| V87-06 | 只读索引与损坏拒绝 | 命中经 SHA 核验的既有原生索引时 0 次源帧探针，仍读 SHA。损坏索引拒绝保留，工程/报告/快照/缓存不被自动修复。 | [记录](docs/validation/evidence/multicam-stream-coverage-20261021-lab/installed-r1/media/verification.json) |
+| V87-07 | 当前源码的新隔离安装 | 161 资源源码/包/安装相同；36 CLI＋1 次 14 模块来源探针、14 安装检查＋54 媒体检查。7 wheels 不含 NumPy，实验只读复制既有 2.4.2 的 933 个 RECORD 文件及许可。 | [记录](docs/validation/evidence/multicam-stream-coverage-20261021-lab/installed-r1/verification.json) |
+| V87-08 | 仅音频及未知 EOF | 有效音频分析可返回偏移与 unknown 视频诊断，生成该机位切换时拒绝；未知视频状态采用模拟，音频真实生成。完整性错误仍拒绝。 | [记录](docs/validation/evidence/multicam-stream-coverage-20261021-lab/audio-only-after-r1.json) |
+| V87-09 | 保留失败与生成器修复 | 真实修复前 8 方法有 7 方法/9 断言失败；另保留子测试错误、仅音频过度拒绝、汇总清单名及生成器数字替换失误。修复未冒称旧结果重跑。 | [记录](docs/validation/evidence/multicam-stream-coverage-20261021-lab/audit-r1.json) |
+| V87-10 | 契约与范围 | 4 Skill 只合并本轮增量，17 份再审。自然/HDR/长片/RSS/漂移/非零音频流起点/连续播放听审及完整剪映功能效果仍待验收。 | [记录](docs/specs/多机位原生帧覆盖与只读索引契约_v0.1_2026-10-21.md) |
+
+原创参考（CC0 七段数字矩形及确定性音频，无外部字体/图片）：
+
+![V87 参考](docs/assets/multicam-stream-coverage-20261021-lab/native-r1/source-reference.gif)
+
+尾部视频在 .32 秒结束，原速保留后续背景（实际 MP4 解码 GIF）：
+
+![V87 尾部缺口](docs/assets/multicam-stream-coverage-20261021-lab/native-r1/tail-trim.gif)
+
+视频在 1 秒开始、1.32 秒结束，原速保留两端背景：
+
+![V87 延迟视频](docs/assets/multicam-stream-coverage-20261021-lab/native-r1/leading-trim.gif)
+
+[尾部原片 MKV](docs/assets/multicam-stream-coverage-20261021-lab/native-r1/source-tail.mkv) · [延迟原片 MKV](docs/assets/multicam-stream-coverage-20261021-lab/native-r1/source-leading.mkv) · [尾部原速 MP4](docs/assets/multicam-stream-coverage-20261021-lab/native-r1/tail-trim.mp4) · [延迟原速 MP4](docs/assets/multicam-stream-coverage-20261021-lab/native-r1/leading-trim.mp4) · [显式拉伸 MP4](docs/assets/multicam-stream-coverage-20261021-lab/native-r1/leading-stretch.mp4) · [拉伸 GIF](docs/assets/multicam-stream-coverage-20261021-lab/native-r1/leading-stretch.gif) · [全部资产 SHA](docs/validation/evidence/multicam-stream-coverage-20261021-lab/media-manifest-r1.json)。原片保存真实 PTS 与 2 秒音轨；源 GIF 只展示 8 解码帧，没有伪造前后空白。GIF 不含音频，未作连续播放/听审；编码 MP4/AAC 不声明完整 RGBA/PCM 字节一致。
+
+[完整实测](docs/validation/多机位原生视频覆盖实测_2026-10-21.md)。方法子集、原生命令、安装检查分开报告，不累计为额外完整方法或剪映等价。
+<!-- /V87-MULTICAM-NATIVE-STREAM-COVERAGE -->
+
+
 <!-- V86-MULTICAM-SOURCE-COVERAGE -->
 ### V86 多机位源覆盖与原速事件同步
 

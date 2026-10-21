@@ -1,0 +1,219 @@
+--- parent/product/src/ai_ad_editor/capabilities.py
++++ candidate/product/src/ai_ad_editor/capabilities.py
+@@ -393,13 +393,17 @@
+                 "tracking_contract": "local_template_matching_emits_confidence_and_transform_keyframes",
+                 "multicam_source_coverage": {
+                     "status": "implemented_with_limits",
+-                    "version": "0.2.0",
++                    "version": "0.3.0",
++                    "coverage_clock": "native-video-first-last-intervals-v1",
++                    "coverage_evidence": "source_sha256_native_pts_duration_time_base_and_demux_origin",
++                    "dry_run_cache_contract": "read_verified_indexes_or_probe_without_cache_writes",
++                    "unknown_video_coverage_contract": "return_audio_only_sync_with_diagnostics_but_refuse_camera_switch_authoring",
+                     "source_shortfall_default": "reject",
+                     "source_shortfall_choices": ["reject", "trim", "stretch"],
+                     "trim_contract": "intersect_camera_coverage_in_reference_clock_preserve_unity_speed_and_timeline_gaps",
+                     "stretch_contract": "explicit_clamp_or_slow_changes_event_sync_and_emits_warning",
+                     "apply_contract": "reject_locked_tracks_and_sub_tick_segments_preserve_authored_duration_and_requested_output_window",
+-                    "limits": ["offset_only_no_clock_drift_estimation", "duration_is_container_evidence_not_per_stream_video_eof", "offset_estimate_uses_bounded_50hz_audio_envelope", "timeline_placement_is_quantized_to_project_ticks", "no_automatic_audio_track_or_semantic_camera_director", "natural_multicam_quality_unaccepted"],
++                    "limits": ["offset_only_no_clock_drift_estimation", "unknown_final_native_frame_duration_rejects", "full_source_index_probe_on_cache_miss", "offset_estimate_uses_bounded_50hz_audio_envelope", "nonzero_audio_stream_origin_not_accepted", "legacy_function_input_without_native_coverage_warns_container_only", "timeline_placement_is_quantized_to_project_ticks", "no_automatic_audio_track_or_semantic_camera_director", "natural_multicam_quality_unaccepted"],
+                 },
+                 "mask_tracking": {
+                     "status": "implemented_with_limits",
+--- parent/product/src/ai_ad_editor/cli.py
++++ candidate/product/src/ai_ad_editor/cli.py
+@@ -3704,6 +3704,7 @@
+         sample_rate=args.sample_rate,
+         analysis_seconds=args.analysis_seconds,
+         max_offset_seconds=args.max_offset_seconds,
++        project_root=root,
+     )
+     segments, switch_warnings = build_switch_segments(
+         sync,
+--- parent/product/src/ai_ad_editor/multicam.py
++++ candidate/product/src/ai_ad_editor/multicam.py
+@@ -10,6 +10,7 @@
+ 
+ import math
+ import subprocess
++from fractions import Fraction
+ from pathlib import Path
+ from typing import Any
+ 
+@@ -18,7 +19,7 @@
+ from .utils import new_id, sha256_file
+ 
+ 
+-MULTICAM_SYNC_VERSION = "0.2.0"
++MULTICAM_SYNC_VERSION = "0.3.0"
+ FEATURE_RATE_HZ = 50
+ 
+ 
+@@ -40,7 +41,40 @@
+     return np
+ 
+ 
+-def _extract_envelope(path: Path, *, sample_rate: int, max_seconds: float) -> tuple[Any, dict[str, Any]]:
++def _video_coverage(path: Path, digest: str, *, project_root: Path | None = None) -> dict[str, Any]:
++    """Use the renderer's native display clock, without populating a dry-run cache."""
++    from .reverse_video_clock import _nearest, probe_frames
++    if project_root is None:
++        pts, durations, stream, format_info = probe_frames(path)
++        index = {'status': 'direct-probe', 'source_index_decode_calls': 1}
++        if f"sha256:{sha256_file(path)}" != digest:
++            raise AppError('MULTICAM_SOURCE_CHANGED', '多机位视频分析期间源文件发生变化', exit_code=6, path=str(path))
++    else:
++        from .native_video_index import IndexContext
++        pts, durations, stream, format_info, index = IndexContext(project_root, persist=False).acquire(path, digest, probe_frames)
++    if not pts or len(pts) != len(durations) or durations[-1] <= 0:
++        raise AppError('MULTICAM_VIDEO_COVERAGE_UNKNOWN', '多机位视频末帧没有可验证的显示时长', exit_code=2, path=str(path))
++    try:
++        native = Fraction(stream['time_base'])
++        origin_text = format_info.get('start_time', '0')
++        origin = _nearest(Fraction('0' if origin_text in (None, '', 'N/A') else origin_text) / native)
++        first = (pts[0] - origin) * native
++        final = (pts[-1] + durations[-1] - origin) * native
++        left = max(Fraction(0), first)
++        if native <= 0 or final <= left:
++            raise ValueError('No positive native video range after the demux origin')
++    except (KeyError, TypeError, ValueError, ZeroDivisionError) as exc:
++        raise AppError('MULTICAM_VIDEO_COVERAGE_UNKNOWN', '多机位视频时间基或覆盖区间无效', exit_code=2, path=str(path), cause=str(exc)) from exc
++    return {'protocol': 'native-video-first-last-intervals-v1', 'status': 'known',
++        'start_seconds': float(left), 'end_seconds': float(final),
++        'start_seconds_rational': str(left), 'end_seconds_rational': str(final),
++        'native_time_base': str(native), 'demux_origin_native_pts': origin,
++        'first_native_pts': pts[0], 'last_native_pts': pts[-1], 'last_duration_native': durations[-1],
++        'frame_count': len(pts), 'source_sha256': digest, 'native_index': index,
++        'internal_display_intervals': 'hold_to_next_pts_as_renderer', 'cache_writes': False}
++
++
++def _extract_envelope(path: Path, *, sample_rate: int, max_seconds: float, project_root: Path | None = None) -> tuple[Any, dict[str, Any]]:
+     """Decode a bounded local audio prefix and return a normalized envelope."""
+     np = _numpy()
+     if sample_rate < 1000 or sample_rate > 96_000:
+@@ -48,6 +82,7 @@
+     if max_seconds <= 0 or max_seconds > 600:
+         raise argument_error("analysis_seconds 必须位于 0..600", "analysis_seconds")
+     probe = probe_media(path)
++    digest = f"sha256:{sha256_file(path)}"
+     audio = probe.get("audio") if isinstance(probe.get("audio"), dict) else {}
+     if not audio.get("codec"):
+         raise AppError("MULTICAM_AUDIO_MISSING", f"机位素材没有音频流: {path}", exit_code=2, path=str(path))
+@@ -90,10 +125,22 @@
+     if not math.isfinite(scale) or scale <= 1e-7:
+         raise AppError("MULTICAM_AUDIO_SIGNAL_FLAT", f"机位音频没有足够可对齐的变化: {path}", exit_code=2, path=str(path))
+     envelope = envelope / scale
++    try:
++        coverage = _video_coverage(path, digest, project_root=project_root)
++    except AppError as exc:
++        if exc.code != 'MULTICAM_VIDEO_COVERAGE_UNKNOWN':
++            raise
++        # Audio-only analysis is still useful; authoring requires known bounds below.
++        # Integrity failures never enter this branch or become successful fallbacks.
++        coverage = {'protocol': 'native-video-first-last-intervals-v1', 'status': 'unknown',
++            'error': {'code': exc.code, 'message': str(exc)}, 'cache_writes': False}
++    if f"sha256:{sha256_file(path)}" != digest:
++        raise AppError('MULTICAM_SOURCE_CHANGED', '多机位音视频分析期间源文件发生变化', exit_code=6, path=str(path))
+     return envelope.astype(np.float32), {
+         "path": str(path),
+-        "sha256": f"sha256:{sha256_file(path)}",
++        "sha256": digest,
+         "duration_seconds": round(float(probe.get("duration_seconds", 0.0)), 6),
++        "video_coverage": coverage,
+         "sample_rate": sample_rate,
+         "feature_rate_hz": FEATURE_RATE_HZ,
+         "feature_count": int(envelope.size),
+@@ -163,6 +210,7 @@
+     sample_rate: int = 8000,
+     analysis_seconds: float = 120.0,
+     max_offset_seconds: float = 30.0,
++    project_root: Path | None = None,
+ ) -> dict[str, Any]:
+     """Analyze a set of local project assets and return auditable offsets."""
+     if len(sources) < 2:
+@@ -184,14 +232,14 @@
+     if reference_id not in seen:
+         raise argument_error("reference_asset_id 必须属于 source_asset_id", "reference_asset_id")
+     reference_item = next(item for item in normalized if item["asset_id"] == reference_id)
+-    reference_feature, reference_evidence = _extract_envelope(reference_item["path"], sample_rate=sample_rate, max_seconds=analysis_seconds)
++    reference_feature, reference_evidence = _extract_envelope(reference_item["path"], sample_rate=sample_rate, max_seconds=analysis_seconds, project_root=project_root)
+     offsets: list[dict[str, Any]] = []
+     for item in normalized:
+         if item["asset_id"] == reference_id:
+             evidence = {**reference_evidence, "asset_id": reference_id}
+             offsets.append({"asset_id": reference_id, "reference_asset_id": reference_id, "relative_delay_seconds": 0.0, "correction_seconds": 0.0, "lag_frames": 0, "score": 1.0, "overlap_seconds": round(reference_feature.size / FEATURE_RATE_HZ, 6), "status": "reference", "evidence": evidence})
+             continue
+-        candidate_feature, candidate_evidence = _extract_envelope(item["path"], sample_rate=sample_rate, max_seconds=analysis_seconds)
++        candidate_feature, candidate_evidence = _extract_envelope(item["path"], sample_rate=sample_rate, max_seconds=analysis_seconds, project_root=project_root)
+         alignment = estimate_audio_offset(reference_feature, candidate_feature, max_offset_seconds=max_offset_seconds)
+         offsets.append({"asset_id": item["asset_id"], "reference_asset_id": reference_id, **alignment, "evidence": {**candidate_evidence, "asset_id": item["asset_id"]}})
+     return {
+@@ -210,6 +258,9 @@
+         "warnings": [
+             {"code": "MULTICAM_LOW_CONFIDENCE", "message": f"机位 {item['asset_id']} 音频偏移相关性较低，请复核波形或拍板点", "asset_id": item["asset_id"], "score": item.get("score")}
+             for item in offsets if item.get("status") == "low_confidence"
++        ] + [
++            {'code': 'MULTICAM_VIDEO_COVERAGE_UNKNOWN', 'message': f"机位 {item['asset_id']} 的视频覆盖未知；保留音频同步分析，不能生成该机位切换段", 'asset_id': item['asset_id']}
++            for item in offsets if item['evidence']['video_coverage'].get('status') == 'unknown'
+         ],
+     }
+ 
+@@ -276,13 +327,30 @@
+             raise argument_error("switch_plan 的切换段不能重叠", f"switch_plan[{index}]")
+         alignment = offsets[asset_id]
+         relative_delay = _finite(alignment.get("relative_delay_seconds"), 0.0)
+-        source_duration = _finite(alignment.get("evidence", {}).get("duration_seconds"), 0.0)
++        evidence = alignment.get("evidence", {})
++        native_coverage = evidence.get('video_coverage')
++        if native_coverage is None:
++            if sync.get('sync_version') not in (None, '', '0.1.0', '0.2.0'):
++                raise AppError('MULTICAM_VIDEO_COVERAGE_UNKNOWN', f'机位 {asset_id} 缺少原生视频覆盖证据', exit_code=2)
++            source_left = 0.0
++            source_duration = _finite(evidence.get('duration_seconds'), 0.0)
++            warnings.append({'code': 'MULTICAM_LEGACY_CONTAINER_COVERAGE', 'message': f'机位 {asset_id} 为旧同步结果，只具备容器覆盖证据', 'asset_id': asset_id})
++        else:
++            try:
++                if isinstance(native_coverage['start_seconds'], bool) or isinstance(native_coverage['end_seconds'], bool):
++                    raise ValueError('boolean video bounds are invalid')
++                source_left = float(native_coverage['start_seconds'])
++                source_duration = float(native_coverage['end_seconds'])
++                if not math.isfinite(source_left) or not math.isfinite(source_duration) or source_left < 0 or source_duration <= source_left:
++                    raise ValueError('invalid video bounds')
++            except (KeyError, TypeError, ValueError, OverflowError) as exc:
++                raise AppError('MULTICAM_VIDEO_COVERAGE_UNKNOWN', f'机位 {asset_id} 原生视频覆盖证据无效', exit_code=2) from exc
+         requested_left, requested_right = left, right
+-        covered_left = max(left, -relative_delay)
++        covered_left = max(left, source_left - relative_delay)
+         covered_right = min(right, source_duration - relative_delay)
+         if covered_right <= covered_left:
+             raise AppError("MULTICAM_SOURCE_RANGE_EMPTY", f"机位 {asset_id} 无法覆盖切换段", exit_code=2, path=f"switch_plan[{index}]")
+-        shortfall = left + relative_delay < -1e-9 or right + relative_delay > source_duration + 1e-9
++        shortfall = left + relative_delay < source_left - 1e-9 or right + relative_delay > source_duration + 1e-9
+         coverage = "complete"
+         if shortfall and source_shortfall == "reject":
+             raise AppError("MULTICAM_SOURCE_SHORTFALL", f"机位 {asset_id} 未完整覆盖切换段；请缩小选区，或显式选择 --source-shortfall trim|stretch", exit_code=2, path=f"switch_plan[{index}]")
+@@ -296,10 +364,10 @@
+             coverage = "stretched"
+             warnings.append({"code": "MULTICAM_SOURCE_CLOCK_CHANGED", "message": f"机位 {asset_id} 显式填充缺失覆盖；钳制或慢放将改变与参考机位的事件同步", "asset_id": asset_id})
+         source_start = left + relative_delay
+-        if source_start < -1e-9:
+-            warnings.append({"code": "MULTICAM_SOURCE_CLAMPED", "message": f"机位 {asset_id} 的源起点早于 0，已钳制", "asset_id": asset_id, "seconds": round(source_start, 6)})
+-            source_start = 0.0
+-        source_start = max(0.0, source_start)
++        if source_start < source_left - 1e-9:
++            warnings.append({"code": "MULTICAM_SOURCE_CLAMPED", "message": f"机位 {asset_id} 的源起点早于视频覆盖起点，已钳制", "asset_id": asset_id, "seconds": round(source_start, 6), 'video_start_seconds': source_left})
++            source_start = source_left
++        source_start = max(source_left, source_start)
+         available = max(0.0, source_duration - source_start)
+         requested = right - left
+         if available <= 0:
+@@ -313,6 +381,9 @@
+             "camera_asset_id": asset_id,
+             "source_shortfall": source_shortfall,
+             "source_coverage": coverage,
++            "coverage_basis": 'native-video-first-last-intervals-v1' if native_coverage is not None else 'legacy-container-duration',
++            "video_coverage_start_seconds": source_left,
++            "video_coverage_end_seconds": source_duration,
+             "requested_start_seconds": round(requested_left, 6),
+             "requested_end_seconds": round(requested_right, 6),
+             "start_seconds": round(left, 6),

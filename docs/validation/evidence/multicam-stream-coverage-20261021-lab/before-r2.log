@@ -1,0 +1,118 @@
+test_complete_native_range_is_an_unchanged_unity_speed_control (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_complete_native_range_is_an_unchanged_unity_speed_control) ... ok
+test_default_rejects_audio_prefix_before_first_video_interval (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_default_rejects_audio_prefix_before_first_video_interval) ... FAIL
+test_default_rejects_audio_tail_after_last_video_interval (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_default_rejects_audio_tail_after_last_video_interval) ... FAIL
+test_trim_keeps_the_actual_video_end_without_slowing (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_trim_keeps_the_actual_video_end_without_slowing) ... FAIL
+test_trim_preserves_both_native_video_edges_and_original_reference_position (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_trim_preserves_both_native_video_edges_and_original_reference_position) ... FAIL
+test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists) ... 
+  test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists) (policy='reject') ... FAIL
+  test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists) (policy='trim') ... FAIL
+  test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists) (policy='stretch') ... FAIL
+test_real_container_with_long_audio_refuses_default_full_window_without_writes (test_multicam_stream_coverage.NativeMulticamStreamCoverageTests.test_real_container_with_long_audio_refuses_default_full_window_without_writes) ... FAIL
+test_real_trim_reports_actual_video_end_instead_of_two_second_container (test_multicam_stream_coverage.NativeMulticamStreamCoverageTests.test_real_trim_reports_actual_video_end_instead_of_two_second_container) ... FAIL
+
+======================================================================
+FAIL: test_default_rejects_audio_prefix_before_first_video_interval (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_default_rejects_audio_prefix_before_first_video_interval)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-stream-coverage-lab-20261021\product\tests\test_multicam_stream_coverage.py", line 43, in test_default_rejects_audio_prefix_before_first_video_interval
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_default_rejects_audio_tail_after_last_video_interval (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_default_rejects_audio_tail_after_last_video_interval)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-stream-coverage-lab-20261021\product\tests\test_multicam_stream_coverage.py", line 34, in test_default_rejects_audio_tail_after_last_video_interval
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_trim_keeps_the_actual_video_end_without_slowing (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_trim_keeps_the_actual_video_end_without_slowing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-stream-coverage-lab-20261021\product\tests\test_multicam_stream_coverage.py", line 40, in test_trim_keeps_the_actual_video_end_without_slowing
+    self.assertEqual((rows[0]['source_out_seconds'], rows[0]['duration_seconds'], rows[0]['speed']), (.32, .32, 1.))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (2.0, 2.0, 1.0) != (0.32, 0.32, 1.0)
+
+First differing element 0:
+2.0
+0.32
+
+- (2.0, 2.0, 1.0)
++ (0.32, 0.32, 1.0)
+
+======================================================================
+FAIL: test_trim_preserves_both_native_video_edges_and_original_reference_position (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_trim_preserves_both_native_video_edges_and_original_reference_position)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-stream-coverage-lab-20261021\product\tests\test_multicam_stream_coverage.py", line 50, in test_trim_preserves_both_native_video_edges_and_original_reference_position
+    self.assertEqual((row['timeline_start_seconds'], row['duration_seconds']), (1., .32))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (0.0, 2.0) != (1.0, 0.32)
+
+First differing element 0:
+0.0
+1.0
+
+- (0.0, 2.0)
++ (1.0, 0.32)
+
+======================================================================
+FAIL: test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists) (policy='reject')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-stream-coverage-lab-20261021\product\tests\test_multicam_stream_coverage.py", line 56, in test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists) (policy='trim')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-stream-coverage-lab-20261021\product\tests\test_multicam_stream_coverage.py", line 56, in test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists (test_multicam_stream_coverage.MulticamStreamCoverageTests.test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists) (policy='stretch')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-stream-coverage-lab-20261021\product\tests\test_multicam_stream_coverage.py", line 56, in test_wholly_empty_video_range_refuses_all_policies_even_though_audio_exists
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_real_container_with_long_audio_refuses_default_full_window_without_writes (test_multicam_stream_coverage.NativeMulticamStreamCoverageTests.test_real_container_with_long_audio_refuses_default_full_window_without_writes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-stream-coverage-lab-20261021\product\tests\test_multicam_stream_coverage.py", line 118, in test_real_container_with_long_audio_refuses_default_full_window_without_writes
+    self.assertEqual(code, 2, result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : {'ok': True, 'command': 'media.multicam', 'request_id': 'req_20261021045503_ea68b20b', 'operation_id': None, 'status': 'planned', 'data': {'report': None, 'plan': {'multicam_version': '0.2.0', 'project_id': 'proj_20261021045501_ae60b3a4', 'sequence_id': 'seq_main', 'track_id': 'track_video_1', 'run_id': 'multicam_20261021045502_69b085ee', 'sync': {'sync_version': '0.2.0', 'engine': 'ffmpeg-local-audio-envelope-xcorr-v1', 'network': 'disabled', 'reference_asset_id': 'asset_20261021045501_77fdc6a7', 'parameters': {'sample_rate': 8000, 'feature_rate_hz': 50, 'analysis_seconds': 2.0, 'max_offset_seconds': 0.4}, 'sources': [{'asset_id': 'asset_20261021045501_77fdc6a7', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-stream-coverage-lab-20261021\\product\\.runtime\\temp\\tmpbwz2fy_l\\project\\assets\\asset_20261021045501_77fdc6a7_reference.mkv'}, {'asset_id': 'asset_20261021045502_98eafcba', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-stream-coverage-lab-20261021\\product\\.runtime\\temp\\tmpbwz2fy_l\\project\\assets\\asset_20261021045502_98eafcba_camera.mkv'}], 'offsets': [{'asset_id': 'asset_20261021045501_77fdc6a7', 'reference_asset_id': 'asset_20261021045501_77fdc6a7', 'relative_delay_seconds': 0.0, 'correction_seconds': 0.0, 'lag_frames': 0, 'score': 1.0, 'overlap_seconds': 2.0, 'status': 'reference', 'evidence': {'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-stream-coverage-lab-20261021\\product\\.runtime\\temp\\tmpbwz2fy_l\\project\\assets\\asset_20261021045501_77fdc6a7_reference.mkv', 'sha256': 'sha256:238e4ac0c7f5a3d201eace724fb37b5d0662ad193ac86469271987cc7c95a337', 'duration_seconds': 2.0, 'sample_rate': 8000, 'feature_rate_hz': 50, 'feature_count': 100, 'asset_id': 'asset_20261021045501_77fdc6a7'}}, {'asset_id': 'asset_20261021045502_98eafcba', 'reference_asset_id': 'asset_20261021045501_77fdc6a7', 'relative_delay_seconds': 0.0, 'correction_seconds': -0.0, 'lag_frames': 0, 'score': 1.0, 'overlap_seconds': 2.0, 'status': 'ok', 'evidence': {'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-stream-coverage-lab-20261021\\product\\.runtime\\temp\\tmpbwz2fy_l\\project\\assets\\asset_20261021045502_98eafcba_camera.mkv', 'sha256': 'sha256:9ece4281935ffcf58480c879c77233c4c0aac478b8171360937aeba18c266189', 'duration_seconds': 2.0, 'sample_rate': 8000, 'feature_rate_hz': 50, 'feature_count': 100, 'asset_id': 'asset_20261021045502_98eafcba'}}], 'warnings': []}, 'parameters': {'start_seconds': 0.0, 'end_seconds': 2.0, 'timeline_start_seconds': 0.0, 'source_shortfall': 'reject', 'output_window_end_seconds': 2.0, 'switch_seconds': None, 'switch_plan': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-stream-coverage-lab-20261021\\product\\.runtime\\temp\\tmpbwz2fy_l\\project\\camera-plan.json', 'apply': True, 'replace_track': False}, 'segments': [{'index': 0, 'camera_asset_id': 'asset_20261021045502_98eafcba', 'source_shortfall': 'reject', 'source_coverage': 'complete', 'requested_start_seconds': 0.0, 'requested_end_seconds': 2.0, 'start_seconds': 0.0, 'end_seconds': 2.0, 'timeline_start_seconds': 0.0, 'duration_seconds': 2.0, 'source_in_seconds': 0.0, 'source_out_seconds': 2.0, 'speed': 1.0, 'id': 'multicam0_20261021045503_f5b95375', 'timeline_start_tick': 0, 'duration_tick': 180000, 'source_in_tick': 0, 'source_out_tick': 180000}], 'warnings': [], 'changed': True}, 'applied': False}, 'artifacts': [], 'warnings': [], 'errors': [], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-21T04:55:03.336262Z', 'finished_at': '2026-10-21T04:55:03.336269Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_real_trim_reports_actual_video_end_instead_of_two_second_container (test_multicam_stream_coverage.NativeMulticamStreamCoverageTests.test_real_trim_reports_actual_video_end_instead_of_two_second_container)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-stream-coverage-lab-20261021\product\tests\test_multicam_stream_coverage.py", line 128, in test_real_trim_reports_actual_video_end_instead_of_two_second_container
+    self.assertEqual((row['source_out_seconds'], row['duration_seconds'], row['speed']), (.32, .32, 1.))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (2.0, 2.0, 1.0) != (0.32, 0.32, 1.0)
+
+First differing element 0:
+2.0
+0.32
+
+- (2.0, 2.0, 1.0)
++ (0.32, 0.32, 1.0)
+
+----------------------------------------------------------------------
+Ran 8 tests in 3.885s
+
+FAILED (failures=9)

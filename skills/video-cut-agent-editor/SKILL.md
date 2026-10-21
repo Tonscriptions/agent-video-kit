@@ -3,6 +3,20 @@ name: video-cut-agent-editor
 description: "Drive the local Agent-first advertising video editor CLI for project setup, timeline composition, edited clip-group reuse, local TTS, templates, validation, rights checks, conversion, and FFmpeg rendering."
 ---
 
+<!-- V87-MULTICAM-NATIVE-STREAM-COVERAGE -->
+<!-- MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->
+For multicam_source_coverage 0.3.0, use actual native-video coverage, independently of the longer container/audio duration. Review native bounds before authoring camera switches.
+Native coverage uses first PTS, last PTS plus known duration, native time_base and the renderer's demux-origin rounding; retain the exact rational boundaries from the report. Container duration alone cannot establish video coverage.
+Default shortfall policy rejects. Explicit trim leaves gaps at original reference positions; stretch clamps to the real first native frame, changes event timing and must retain its warning. Completely disjoint coverage rejects under every policy.
+Dry-run reads existing verified native indices without writing caches, reports, snapshots or authored files. A hit reports zero source-frame probes but still reads hashes. Corrupt indices or changed source SHA reject; do not silently repair them or convert integrity errors into successful audio-only analysis.
+Read the [native coverage contract](../../docs/specs/多机位原生帧覆盖与只读索引契约_v0.1_2026-10-21.md) and [fresh native/isolated evidence](../../docs/validation/多机位原生视频覆盖实测_2026-10-21.md).
+The base seven-wheel installer does not ship NumPy. This experiment explicitly copies the existing local NumPy 2.4.2 distribution with RECORD hashes and licenses; it is not automatic dependency installation.
+Unknown-EOF audio-analysis controls include simulated video state. Nonzero audio stream origin, clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.
+
+<!-- /MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->
+<!-- /V87-MULTICAM-NATIVE-STREAM-COVERAGE -->
+
+
 <!-- V86-MULTICAM-SOURCE-COVERAGE -->
 <!-- MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->
 Use the advertised source_shortfall policy when building media multicam plans; preserve the requested master duration and explicit audio tracks.

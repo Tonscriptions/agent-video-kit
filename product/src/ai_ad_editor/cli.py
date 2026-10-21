@@ -3704,6 +3704,7 @@ def command_media_multicam(args: argparse.Namespace) -> dict[str, Any]:
         sample_rate=args.sample_rate,
         analysis_seconds=args.analysis_seconds,
         max_offset_seconds=args.max_offset_seconds,
+        project_root=root,
     )
     segments, switch_warnings = build_switch_segments(
         sync,

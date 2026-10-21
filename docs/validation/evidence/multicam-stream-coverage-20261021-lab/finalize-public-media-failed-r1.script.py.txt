@@ -1,0 +1,199 @@
+"""Audit fresh native/isolated media, preserve prior documents, and document bounded results."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+from urllib.parse import unquote
+from PIL import Image
+from run_frozen_regression import frozen
+from smoke_multicam_stream_coverage import sha, write
+
+ROOT = Path(__file__).resolve().parents[1]
+REL = 'docs/validation/evidence/multicam-stream-coverage-20261021-lab'
+ASSETS = 'docs/assets/multicam-stream-coverage-20261021-lab'
+REPORT = 'docs/validation/多机位原生视频覆盖独立实验_2026-10-21.md'
+CONTRACT = 'docs/specs/多机位原生帧覆盖与只读索引契约_实验_v0.1_2026-10-21.md'
+
+
+def read(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def main():
+    base = ROOT/REL
+    output = base/'audit-r1.json'
+    assert not output.exists()
+    current = frozen()
+    own_sha = sha(__file__)
+    previous = read(base/'foundation-r1.json')['source_inputs']
+    assert len(previous)==257 and len(current)==258
+    assert set(current)-set(previous)=={'product/tests/test_multicam_stream_coverage.py'}
+    modified = {'product/src/ai_ad_editor/'+name+'.py' for name in ('multicam','cli','capabilities')}
+    assert {n for n in previous if previous[n]!=current[n]}==modified
+    development = read(base/'development-audit-r1.json')
+    assert development['frozen_inputs']==current and development['current_related_methods']==104
+    related = read(base/'related-r2.json')
+    assert related['status']=='passed-related-regressions' and related['terminal_ok'] and related['exit_code']==0
+    assert related['methods']==related['distinct_methods']==104 and related['skipped']==0
+    assert len(related['method_ids'])==len(set(related['method_ids']))==104
+    assert related['frozen_before']==related['frozen_after']==current and related['frozen_equal']
+    assert related['fixtures_unchanged'] and related['fixture_manifest_unchanged'] and related['scripts_unchanged']
+    assert sha(base/'related-r2.log')==related['log_sha256']
+    assert sha(base/'external-fixtures-r1.json')==related['fixture_manifest_sha256']
+    assert len(related['fixture_inputs'])==8
+    for name,digest in related['fixture_inputs'].items():assert sha(ROOT/name)==digest
+    for name,digest in related['script_hashes'].items():assert sha(ROOT/'scripts'/name)==digest
+    native = read(base/'native-r1/verification.json')
+    install = read(base/'installed-r1/verification.json')
+    installed = read(base/'installed-r1/media/verification.json')
+    for row in (native,install,installed):
+        assert row['status']=='passed' and row['frozen_before']==row['frozen_after']==current and row['frozen_equal']
+        assert all(c['ok'] for c in row['checks'])
+    for row in (native,installed):
+        assert row['cli_calls']==33 and row['native_commands']==25 and len(row['checks'])==54
+        assert row['cases']==native['cases'] and set(row['cases'])=={'tail','leading'}
+        assert len(row['GIF'])==7
+        for name,gif in row['GIF'].items():
+            assert gif['duration_ms']==(320 if name in {'source-tail','source-leading'} else 2000)
+            assert gif['actual_mp4_decode']==name.endswith(('-trim','-stretch'))
+    assert install['isolated_cli_calls']==36 and install['module_origin_probes']==1 and len(install['checks'])==14
+    assert len(install['resource_hashes'])==161
+    assert len(install['optional_numpy_addon']['files'])==933
+    assert install['optional_numpy_addon']['version']=='2.4.2'
+    assert install['optional_numpy_addon']['base_seven_wheel_bundle_contains_numpy'] is False
+    for name,digest in install['resource_hashes'].items():assert sha(ROOT/'product/src/ai_ad_editor'/name)==digest
+    origins = next(c['origins'] for c in install['checks'] if c['name']=='all-module-origins-under-installed-site')
+    assert len(origins)==14
+    drafts = read(base/'skills-draft-r1.json')
+    assert drafts['status']=='passed-four-unregistered-drafts' and drafts['skill_count']==4 and not drafts['registered']
+    for row in drafts['skills'].values():
+        assert sha(ROOT/row['path'])==row['sha256'] and sha(ROOT/row['parent_snapshot'])==row['parent_sha256']
+        assert row['validator_exit_code']==0 and not row['registered']
+    assets = {}
+    for result in (native,installed):
+        for name,row in result['media'].items():
+            path = ROOT/name
+            assert path.is_relative_to(ROOT/ASSETS) and sha(path)==row['sha256'] and path.stat().st_size==row['bytes']
+            assert name not in assets
+            assets[name]=row
+    native_names = {p.name for p in (ROOT/ASSETS/'native-r1').iterdir() if p.is_file()}
+    installed_names = {p.name for p in (ROOT/ASSETS/'installed-r1').iterdir() if p.is_file()}
+    assert native_names==installed_names and len(assets)==2*len(native_names)
+    static = {'kind':'static-contact-sheet-review-only','reviewed_at_utc':datetime.now(timezone.utc).isoformat(),
+        'reviewer':'Codex local image inspection','continuous_playback_reviewed':False,'audio_listened':False,'sheets':{}}
+    for case,indices in (('tail',[0,3,7,8,15,25,40,49]),('leading',[0,24,25,28,32,33,45,49])):
+        first=ROOT/ASSETS/'native-r1'/(case+'-boundaries.png')
+        second=ROOT/ASSETS/'installed-r1'/first.name
+        with Image.open(first) as a,Image.open(second) as b:
+            assert a.size==b.size==(1280,400) and a.convert('RGBA').tobytes()==b.convert('RGBA').tobytes()
+        static['sheets'][case]={'native_path':first.relative_to(ROOT).as_posix(),'native_sha256':sha(first),
+            'installed_path':second.relative_to(ROOT).as_posix(),'installed_sha256':sha(second),
+            'displayed_output_frame_indices':indices,'native_and_installed_pixels_equal':True,
+            'observed':'tail frames 0/3/7 show source IDs 00/03/07; 8 onward black' if case=='tail' else
+                'frames 0/24 black; 25/28/32 show source IDs 25/28/32; 33 onward black'}
+    write(base/'static-review-r1.json',static)
+    write(base/'media-manifest-r1.json',{'status':'passed','generator_sha256':own_sha,'assets':assets,
+        'asset_count':len(assets),'GIF_count':sum(n.endswith('.gif') for n in assets),
+        'original_generated_CC0_media':True,'new_media_for_current_runtime':True,'v86_media_reused':False,
+        'no_external_font_or_image':True,'native_verification_sha256':sha(base/'native-r1/verification.json'),
+        'isolated_verification_sha256':sha(base/'installed-r1/verification.json'),
+        'isolated_media_verification_sha256':sha(base/'installed-r1/media/verification.json')})
+    snapshots=base/'before-public-media-documents-r1'
+    snapshots.mkdir()
+    preserved={}
+    for name,digest in development['documents'].items():
+        path=ROOT/name
+        assert sha(path)==digest
+        target=snapshots/path.name
+        target.write_bytes(path.read_bytes())
+        preserved[name]={'snapshot':target.relative_to(ROOT).as_posix(),'sha256':digest}
+    # The laboratory README deliberately describes only this unpublished candidate.
+    # Published README changes remain gated on the complete regression and actual V86 parent.
+    summary=f'''状态：**独立候选，未合入 main、未推送、未注册 Skill**。当前 258 输入的相关回归 104 方法、{related['suite_seconds']:.3f} 秒、0 跳过；实际原生与新离线安装媒体均通过。完整 2019 方法仅为未来预计数量，尚未启动，须先绑定真实发布的 V86 父版。这里不是完整剪映验收。
+
+| 编号 | 实际执行 | 结果与边界 | 证据 |
+|---|---|---|---|
+| SV-01 | 父输入与当前代码 | 257 父输入；只修改 multicam/cli/capabilities，并新增 24 方法；当前 258 输入 | [创建记录]({REL}/foundation-r1.json) |
+| SV-02 | 修复前/后同断言 | 原 8 方法：修复前 1 控制通过、7 方法失败，共 9 断言；修复后 8/8 通过 | [修复前]({REL}/before-r2.json)、[修复后]({REL}/after-r1.json) |
+| SV-03 | 当前相关回归 | 104 个不同方法；24 本实验＋22 父多机位＋16 空选区＋32 嵌套时钟＋10 既有 CLI。完整套件子集，旧 102 不累计 | [当前收据]({REL}/related-r2.json) |
+| SV-04 | 当前原生真实媒体 | 33 CLI＋25 其他命令、54 检查；两组完整 50 帧 RGBA 各 11,520,000 字节、显式 PCM 各 768,000 字节独立一致 | [原生收据]({REL}/native-r1/verification.json) |
+| SV-05 | 新离线隔离安装 | 161 资源源码/包/安装同字节，36 CLI＋1 次 14 模块来源探针；14 安装检查，媒体另有相同 54 检查 | [安装收据]({REL}/installed-r1/verification.json) |
+| SV-06 | 缓存与只读 | 真实 dry-run 缓存命中、0 源帧探针；损坏索引明确拒绝，工程/报告/快照不变。仍读取 SHA，不能称 0 I/O | [实际媒体检查]({REL}/installed-r1/media/verification.json) |
+| SV-07 | 原片/观看副本/GIF | 两组各有原生和隔离安装输出；源 GIF 只呈现 8 解码帧 320 ms，实际 PTS 及 2 秒音轨保存在原 MKV；输出 GIF 来自实际 MP4 解码、2000 ms | [媒体 SHA 清单]({REL}/media-manifest-r1.json) |
+| SV-08 | 目检及 Skill | 两张边界图静态目检、安装图像素相同；4 个 Skill 增量仅本实验验证，未注册，发布时只合并增量到实际父版 | [静态记录]({REL}/static-review-r1.json)、[草稿]({REL}/skills-draft-r1.json) |
+| SV-09 | 未完成 | 完整套件、生产合入/17 Skills 总审计与发布未完成；自然多机位/HDR/长片/RSS/漂移/非零音频流起点/播放听审及完整剪映效果未验收 | [独立审计]({REL}/audit-r1.json) |
+'''
+    (ROOT/'README.md').write_text('# 多机位原生视频覆盖实验\n\n'+summary+f'''
+原生样例：尾部视频仅 `[0,0.32)` 秒，后续 42 帧保留背景；延迟视频仅 `[1,1.32)` 秒，前 25/后 17 帧保留背景。主音轨均显式保持 2 秒。默认策略拒绝覆盖不足；trim 保持原速与参考事件位置，显式 stretch 的速度为 0.16，保留事件同步变化警告。
+
+| 场景 | 原片 | 原速实际输出 | 显式拉伸实际输出 |
+|---|---|---|---|
+| 尾部无视频 | [MKV]({ASSETS}/native-r1/source-tail.mkv) · [源 GIF]({ASSETS}/native-r1/source-tail.gif) | [MP4]({ASSETS}/native-r1/tail-trim.mp4) · [GIF]({ASSETS}/native-r1/tail-trim.gif) | [MP4]({ASSETS}/native-r1/tail-stretch.mp4) · [GIF]({ASSETS}/native-r1/tail-stretch.gif) |
+| 延迟视频 | [MKV]({ASSETS}/native-r1/source-leading.mkv) · [源 GIF]({ASSETS}/native-r1/source-leading.gif) | [MP4]({ASSETS}/native-r1/leading-trim.mp4) · [GIF]({ASSETS}/native-r1/leading-trim.gif) | [MP4]({ASSETS}/native-r1/leading-stretch.mp4) · [GIF]({ASSETS}/native-r1/leading-stretch.gif) |
+
+![尾部原速输出]({ASSETS}/native-r1/tail-trim.gif)
+
+![延迟原速输出]({ASSETS}/native-r1/leading-trim.gif)
+
+完整字节一致仅指无损 RGBA 和显式 PCM；编码 MP4 的全部 PTS 为 n/25，身份色块最大误差为 1，没有声明编码整帧或 AAC 字节一致。GIF 会合并相同黑帧，帧数不是 MP4 帧数。
+
+原素材为本项目原创 CC0 色卡、七段数字矩形及确定性音频，不使用外部字体/图片。基础 7 wheel 不含 NumPy；隔离实验从既有本地 NumPy 2.4.2 只读复制 933 个经 RECORD 核对的文件及许可，不能视为产品安装器已解决 NumPy 发行。
+
+[详细实测]({REPORT}) · [实验契约]({CONTRACT})。
+''',encoding='utf-8',newline='\n')
+    report=(ROOT/REPORT).read_text('utf-8')
+    report=report.replace('| SV-07 | 尚未完成的交付 | 没有本候选的公开 MP4/GIF、隔离安装或完整回归；没有新增 Skill 或已发布功能。须等待父候选发布，再完成本候选接入 |',
+        '| SV-07 | 专项时尚未完成的交付（历史） | 当时没有本候选媒体/安装或 Skill；现已补齐实际媒体、隔离安装及未注册草稿，完整回归和发布仍待父版 |')
+    report=report.replace('这里没有制作有损观看副本，不能声称 MP4/AAC 完整字节一致。',
+        '该原专项阶段没有制作有损观看副本；本次新媒体已补 MP4/GIF。编码 MP4/AAC 不声明完整字节一致。')
+    report=report.replace('测试临时素材在各测试自有目录内生成和回收，尚无本候选的可公开媒体资产清单。',
+        '专项临时素材在各测试自有目录内生成和回收；本次另行生成真实公开样例，并记录原生/安装输出的全部 SHA。')
+    # Adapt the common evidence table's repository-root links for docs/validation.
+    report_summary=summary.replace(']('+REL+'/','](evidence/multicam-stream-coverage-20261021-lab/')
+    report=report[:report.index('\n')]+'\n\n<!-- STREAM-PUBLIC-MEDIA-R1 -->\n'+report_summary+'<!-- /STREAM-PUBLIC-MEDIA-R1 -->\n'+report[report.index('\n'):]
+    report+='\n[公开原片、实际 MP4/GIF 与版本边界](../../README.md) · [原生完整收据](evidence/multicam-stream-coverage-20261021-lab/native-r1/verification.json) · [新隔离安装](evidence/multicam-stream-coverage-20261021-lab/installed-r1/verification.json)。\n\n新公开延迟样例使用参考第 25..32 帧本身，并保留 PTS 1..1.28 秒，因此事件身份与参考一致。此前单元测试把第 0..7 帧延迟，只用于覆盖时钟检查，两者不是同一公开样例。七段数字完全由矩形原创绘制，不依赖外部字体。两组编码输出均为 50 帧，PTS=n/25，身份色块最大误差 1；编码整帧和 AAC 不作字节一致声明。原速 GIF 可能合并黑帧，尾部为 9 帧、延迟为 10 帧，总时长均为 2000 ms。源 GIF 只有 8 解码帧、320 ms，没有人为加入与原片 PTS 不同的前后空白。\n\n基础 7 wheel 不含 NumPy；本实验显式从既有本地 NumPy 2.4.2 复制 933 个 RECORD 核对文件（含许可），不是产品安装器已新增 NumPy 支持。静态目检不等于连续播放或听审。\n'
+    (ROOT/REPORT).write_text(report,encoding='utf-8',newline='\n')
+    contract=(ROOT/CONTRACT).read_text('utf-8').replace('当前相邻 104 通过；完整回归、实际公开媒体、隔离安装及 Skill 接入未完成',
+        '当前相邻 104 通过；新原生 33 CLI/54 检查、隔离 36 CLI/14 安装＋54 媒体检查通过；4 草稿未注册，完整回归/发布未完成')
+    contract+='\n当前实际原片、MP4/GIF、逐资产 SHA、安装依赖例外和静态目检范围见[实验 README](../../README.md)及[独立审计](../validation/evidence/multicam-stream-coverage-20261021-lab/audit-r1.json)。完整回归必须等待真实已发布 V86 父版，预计 2019 方法只是计划数量。\n'
+    (ROOT/CONTRACT).write_text(contract,encoding='utf-8',newline='\n')
+    assert frozen()==current and sha(__file__)==own_sha
+    document_names=('README.md',REPORT,CONTRACT)
+    record={'status':'passed-standalone-audit','at_utc':datetime.now(timezone.utc).isoformat(),
+        'frozen_inputs':current,'source_parent_inputs':previous,'modified_runtime_inputs':sorted(modified),
+        'added_inputs':['product/tests/test_multicam_stream_coverage.py'],'targeted_methods':104,'distinct_methods':104,
+        'related_sha256':sha(base/'related-r2.json'),'related_seconds':related['suite_seconds'],
+        'documents':{name:sha(ROOT/name) for name in document_names},'historical_document_snapshots':preserved,
+        'media':assets,'asset_count':len(assets),'GIF_count':sum(name.endswith('.gif') for name in assets),
+        'media_manifest_sha256':sha(base/'media-manifest-r1.json'),'static_review_sha256':sha(base/'static-review-r1.json'),
+        'native_cli_calls':33,'native_other_commands':25,'native_checks':54,
+        'isolated_cli_calls':36,'isolated_origin_processes':1,'isolated_origin_modules':14,'isolated_installer_checks':14,
+        'isolated_media_checks':54,'runtime_resource_count':161,'numpy_addon_files':933,
+        'base_installer_numpy_included':False,'parent_media_reused':False,
+        'native_verification_sha256':sha(base/'native-r1/verification.json'),
+        'isolated_verification_sha256':sha(base/'installed-r1/verification.json'),
+        'skill_draft_sha256':sha(base/'skills-draft-r1.json'),'unregistered_skill_deltas':4,
+        'native_windows':True,'virtualization':False,'network':False,'full_suite_started':False,
+        'expected_future_full_methods':2019,'expected_future_parent_full_methods':1995,
+        'main_integrated':False,'skills_registered':False,'continuous_playback_reviewed':False,
+        'audio_reviewed':False,'full_capcut_parity':False,'generator_sha256':own_sha}
+    write(output,record)
+    links=[]
+    for name in document_names:
+        path=ROOT/name
+        for match in re.finditer(r'!?\[[^\]]*\]\(([^)]+)\)',path.read_text('utf-8')):
+            target=unquote(match.group(1).strip('<>').split('#',1)[0])
+            if not target or re.match(r'[a-zA-Z][a-zA-Z0-9+.-]*:',target):continue
+            resolved=(path.parent/target).resolve()
+            assert resolved.is_relative_to(ROOT) and resolved.exists(),(name,target)
+            links.append({'document':name,'target':resolved.relative_to(ROOT).as_posix()})
+    record['local_links']=links
+    write(output,record)
+    (base/'finalize-public-media-r1.script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'status':record['status'],'assets':len(assets),'GIFs':record['GIF_count'],
+        'local_links':len(links),'frozen_inputs':len(current),'full_suite_started':False},ensure_ascii=False))
+
+
+if __name__=='__main__':
+    main()

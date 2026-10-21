@@ -1,0 +1,165 @@
+"""Prepare the 2019-method gate; it cannot launch before the real V86 publication."""
+import ast
+import json
+from pathlib import Path
+import re
+from run_frozen_regression import frozen
+from smoke_multicam_stream_coverage import sha, write
+
+ROOT = Path(__file__).resolve().parents[1]
+REL = ROOT/'docs/validation/evidence/multicam-stream-coverage-20261021-lab'
+DONOR = ROOT.parent/'multicam-source-range-lab-20261021'
+TARGET = ROOT/'scripts/run_multicam_stream_after_parent.py'
+
+SOURCE_GATE = '''def source_gate():
+    current=frozen();base=ROOT/REL
+    audit=read(base/'audit-r1.json')
+    assert audit['status']=='passed-standalone-audit' and audit['targeted_methods']==104
+    assert current==audit['frozen_inputs'] and len(current)==258
+    for name,digest in audit['documents'].items():assert sha(ROOT/name)==digest
+    for name,row in audit['media'].items():assert sha(ROOT/name)==row['sha256']
+    assert len(audit['media'])==38 and audit['GIF_count']==14
+    for key,name in (('media_manifest_sha256','media-manifest-r1.json'),('static_review_sha256','static-review-r1.json'),
+                     ('native_verification_sha256','native-r1/verification.json'),
+                     ('isolated_verification_sha256','installed-r1/verification.json'),
+                     ('skill_draft_sha256','skills-draft-r1.json')):
+        assert sha(base/name)==audit[key]
+    related=read(base/'related-r2.json')
+    assert related['status']=='passed-related-regressions' and related['terminal_ok'] and related['exit_code']==0
+    assert related['methods']==related['distinct_methods']==104 and related['skipped']==0
+    assert len(related['method_ids'])==len(set(related['method_ids']))==104
+    assert related['frozen_before']==related['frozen_after']==current and related['frozen_equal']
+    assert related['fixtures_unchanged'] and related['fixture_manifest_unchanged'] and related['scripts_unchanged']
+    assert sha(base/'related-r2.json')==audit['related_sha256']
+    assert sha(base/'related-r2.log')==related['log_sha256']
+    assert sha(base/'foundation-r1.json')==related['fixture_manifest_sha256']
+    for name,digest in related['script_hashes'].items():assert sha(ROOT/'scripts'/name)==digest
+    for name,digest in related['fixture_inputs'].items():assert sha(ROOT/name)==digest
+    installation=read(base/'installed-r1/verification.json')
+    assert installation['status']=='passed' and installation['isolated_cli_calls']==36 and installation['module_origin_probes']==1
+    assert installation['frozen_before']==installation['frozen_after']==current
+    assert len(installation['checks'])==14 and all(row['ok'] for row in installation['checks'])
+    assert len(installation['resource_hashes'])==161 and len(installation['optional_numpy_addon']['files'])==933
+    for name,digest in installation['resource_hashes'].items():assert sha(ROOT/'product/src/ai_ad_editor'/name)==digest
+    for name in ('native-r1/verification.json','installed-r1/media/verification.json'):
+        item=read(base/name)
+        assert item['status']=='passed' and item['cli_calls']==33 and item['native_commands']==25
+        assert len(item['checks'])==54 and all(row['ok'] for row in item['checks'])
+        assert item['frozen_before']==item['frozen_after']==current
+    drafts=read(base/'skills-draft-r1.json')
+    assert drafts['status']=='passed-four-unregistered-drafts' and drafts['skill_count']==4 and not drafts['registered']
+    for row in drafts['skills'].values():
+        assert sha(ROOT/row['path'])==row['sha256'] and row['validator_exit_code']==0 and not row['registered']
+        assert sha(ROOT/row['parent_snapshot'])==row['parent_sha256']
+    previous=read(base/'foundation-r1.json')['source_inputs']
+    assert previous==audit['source_parent_inputs'] and len(previous)==257
+    assert set(current)-set(previous)==ADDED
+    assert {name for name in previous if previous[name]!=current[name]}==MODIFIED
+    fixture=read(base/'external-fixtures-r1.json')
+    assert fixture['status']=='passed' and fixture['fixture_count']==8
+    for row in fixture['fixtures']:assert sha(ROOT/row['path'])==row['sha256']
+    return current,previous,{name:sha(ROOT/'scripts'/name) for name in SCRIPTS}
+'''
+
+DOCS_STATUS = '''def docs_status(message):
+    base=ROOT/REL;snapshot=base/'before-full-documents-r1.json'
+    if not snapshot.exists():
+        audit=read(base/'audit-r1.json');directory=base/'before-full-documents-r1';directory.mkdir();rows={}
+        for name,digest in audit['documents'].items():
+            source=ROOT/name;assert sha(source)==digest;target=directory/source.name
+            target.write_bytes(source.read_bytes());rows[name]={'sha256':digest,'snapshot':target.relative_to(ROOT).as_posix()}
+        save(snapshot,{'status':'preserved','documents':rows,'audit_sha256':sha(base/'audit-r1.json')})
+    marker='MULTICAM-STREAM-FULL-R1'
+    for name in ('README.md',REPORT,CONTRACT):
+        path=ROOT/name;value=path.read_text('utf8')
+        value=value.replace('完整 2019 方法仅为未来预计数量，尚未启动，须先绑定真实发布的 V86 父版。',
+            '完整回归状态见文首；须绑定真实发布的 V86 父版。')
+        value=value.replace('完整回归必须等待真实已发布 V86 父版，预计 2019 方法只是计划数量。',
+            '完整回归须绑定真实已发布 V86 父版；执行状态见文首。')
+        block='<!-- '+marker+' -->\\n'+message+'\\n以下 SV 表保留媒体专项阶段的实际记录；完整回归以本段状态为准。\\n<!-- /'+marker+' -->'
+        pattern=re.escape('<!-- '+marker+' -->')+'.*?'+re.escape('<!-- /'+marker+' -->')
+        if re.search(pattern,value,re.S):value=re.sub(pattern,lambda _:block,value,flags=re.S)
+        else:
+            at=value.index('\\n');value=value[:at]+'\\n\\n'+block+'\\n'+value[at:]
+        path.write_text(value.rstrip()+'\\n',encoding='utf8',newline='\\n')
+'''
+
+
+def replace_function(source,name,replacement):
+    node=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name==name)
+    lines=source.splitlines(keepends=True)
+    return ''.join(lines[:node.lineno-1])+replacement+'\n'+''.join(lines[node.end_lineno:])
+
+
+def main():
+    assert not TARGET.exists()
+    current=frozen();audit=json.loads((REL/'audit-r1.json').read_bytes())
+    assert audit['status']=='passed-standalone-audit' and current==audit['frozen_inputs'] and len(current)==258
+    fixture_source=DONOR/'docs/validation/evidence/multicam-source-range-20261021-lab/external-fixtures-r1.json'
+    fixture_target=REL/'external-fixtures-r1.json'
+    fixture=json.loads(fixture_source.read_bytes())
+    foundation=json.loads((REL/'foundation-r1.json').read_bytes())
+    assert fixture['status']=='passed' and fixture['fixture_count']==8
+    assert {r['path']:r['sha256'] for r in fixture['fixtures']}=={r['path']:r['sha256'] for r in foundation['external_fixtures']}
+    for row in fixture['fixtures']:
+        path=ROOT/row['path'];assert sha(path)==row['sha256'] and path.stat().st_size==row['bytes']
+    if fixture_target.exists():
+        assert fixture_target.read_bytes()==fixture_source.read_bytes()
+    else:
+        fixture_target.write_bytes(fixture_source.read_bytes())
+    copy_receipt=REL/('external-fixture-copy-r2.json' if (REL/'external-fixture-copy-r1.json').exists() else 'external-fixture-copy-r1.json')
+    assert not copy_receipt.exists()
+    write(copy_receipt,{'status':'passed','source':str(fixture_source),'source_sha256':sha(fixture_source),
+        'target_sha256':sha(fixture_target),'same_eight_committed_fixtures':True,'new_download':False,'generator_sha256':sha(__file__)})
+    donor=DONOR/'scripts/run_multicam_after_empty.py'
+    original=donor.read_text('utf-8');source=original
+    for before,after in (('1995','NEXT_COMPLETE_COUNT'),('1973','1995'),('257','258'),('256','257')):
+        source=re.sub(r'(?<!\w)'+before+r'(?!\w)',lambda _:after,source)
+    source=source.replace('NEXT_COMPLETE_COUNT','2019')
+    replacements={
+        'Bind a published nested-clock baseline and run one frozen complete empty-window suite.':'Bind an actually published multicam baseline and run one frozen complete native-stream suite.',
+        "UPSTREAM = MAIN / 'product/.runtime/native-empty-window-lab-20261021'":"UPSTREAM = MAIN / 'product/.runtime/multicam-source-range-lab-20261021'",
+        "REL = 'docs/validation/evidence/multicam-source-range-20261021-lab'":"REL = 'docs/validation/evidence/multicam-stream-coverage-20261021-lab'",
+        "UPSTREAM_REL = 'docs/validation/evidence/native-empty-window-20261021-lab'":"UPSTREAM_REL = 'docs/validation/evidence/multicam-source-range-20261021-lab'",
+        'docs/validation/多机位源覆盖与原速同步独立实验_2026-10-21.md':'docs/validation/多机位原生视频覆盖独立实验_2026-10-21.md',
+        'docs/specs/多机位源覆盖与显式缺口策略_实验_v0.1_2026-10-21.md':'docs/specs/多机位原生帧覆盖与只读索引契约_实验_v0.1_2026-10-21.md',
+        'test_multicam_source_range.py':'test_multicam_stream_coverage.py',
+        'passed-source-preflight-awaiting-published-empty':'passed-source-preflight-awaiting-published-multicam',
+        'published_empty_commit':'published_multicam_commit','published-empty-alignment-r1.json':'published-multicam-alignment-r1.json',
+        'nested_index_published_freeze':'multicam_published_freeze','已绑定嵌套时钟发布提交':'已绑定多机位源覆盖发布提交',
+    }
+    for before,after in replacements.items():
+        assert before in source,before
+        source=source.replace(before,after)
+    scripts=('run_multicam_stream_after_parent.py','run_frozen_regression.py','run_with_regression_fixtures.py',
+        'materialize_regression_fixtures.py','run_stream_related_regressions_r2.py','run_stream_related_regressions.py',
+        'prepare_stream_audio_related.py','run_stream_audio_controls.py','smoke_multicam_stream_coverage.py',
+        'verify_multicam_stream_coverage_install.py','finalize_multicam_stream_lab.py','prepare_stream_full_gate.py',
+        'prepare_stream_skills.py','prepare_stream_smoke.py','prepare_stream_install_verifier.py')
+    source=rewrite_assignment(source,'SCRIPTS',repr(scripts))
+    source=replace_function(source,'source_gate',SOURCE_GATE)
+    source=replace_function(source,'docs_status',DOCS_STATUS)
+    unchanged={}
+    for name in ('read','sha','save','git'):
+        a=next(n for n in ast.parse(original).body if isinstance(n,ast.FunctionDef) and n.name==name)
+        b=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name==name)
+        unchanged[name]=ast.dump(a,include_attributes=False)==ast.dump(b,include_attributes=False)
+    assert all(unchanged.values()) and frozen()==current
+    TARGET.write_text(source,encoding='utf-8',newline='\n')
+    write(REL/'full-gate-preparation-r1.json',{'status':'prepared-not-launched','generator_sha256':sha(__file__),
+        'donor_sha256':sha(donor),'launcher_sha256':sha(TARGET),'unchanged_helper_AST':unchanged,
+        'pinned_script_count':len(scripts),'expected_future_full_methods':2019,'required_published_parent_methods':1995,
+        'frozen_inputs':current,'fixture_manifest_sha256':sha(fixture_target),'main_integrated':False,
+        'preserved_generation_failure_sha256':sha(REL/'full-gate-preparation-failed-r1.json'),
+        'requires':'actual published V86 commit, matching clean main and SSH remote; never preview or placeholder receipts'})
+    print(json.dumps({'status':'prepared-not-launched','pinned_scripts':len(scripts),'expected_methods':2019}))
+
+
+def rewrite_assignment(source,name,expression):
+    node=next(n for n in ast.parse(source).body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id==name for t in n.targets))
+    lines=source.splitlines(keepends=True)
+    return ''.join(lines[:node.lineno-1])+name+' = '+expression+'\n'+''.join(lines[node.end_lineno:])
+
+
+if __name__=='__main__':
+    main()

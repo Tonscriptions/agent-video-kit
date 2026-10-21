@@ -1,0 +1,182 @@
+"""Prepare a reviewed V87 publisher; source preflight is never release authorization evidence."""
+import ast
+import json
+from pathlib import Path
+from run_frozen_regression import frozen
+from smoke_multicam_stream_coverage import sha, write
+
+ROOT=Path(__file__).resolve().parents[1]
+DONOR=ROOT.parent/'multicam-source-range-lab-20261021'
+REL='docs/validation/evidence/multicam-stream-coverage-20261021-lab'
+TARGET=ROOT/'scripts/publish_multicam_stream_coverage.py'
+
+DOCUMENTS=r'''def documents(root,full):
+    seconds=full['suite_seconds']
+    assert full['methods']==2019 and full['skipped']==0 and full['terminal_ok']
+    message=(f'V87 多机位原生视频覆盖已完成 {full["methods"]} 方法、{seconds:.3f} 秒、0 跳过的完整回归；'
+        '258 个冻结输入、8 个已提交外部夹具及 15 份验证脚本前后相同。'
+        '视频覆盖取原生首/末帧区间，独立于较长音轨和容器时长；原速剪辑保留真实缺口。')
+    def link(document,target):return os.path.relpath(root/target,(root/document).parent).replace('\\','/')
+    rows=[
+        ('V87-01','完整回归',f'{full["methods"]} 方法 /{seconds:.3f} 秒 /0 跳过；258 输入、8 夹具、15 验证脚本。',REL+'/full-r1.json'),
+        ('V87-02','相关回归','104 个不同方法：24 本轮＋22 父多机位＋16 空选区＋32 嵌套时钟＋10 CLI；属于完整套件子集，旧 102 不累计。',REL+'/related-r2.json'),
+        ('V87-03','真实视频边界','两组视频实际范围 [0,.32) 与 [1,1.32)，音轨/容器均 2 秒；33 原生 CLI＋25 其他命令、54 检查。',REL+'/native-r1/verification.json'),
+        ('V87-04','完整无损 RGBA/PCM','每组 50 帧、11,520,000 RGBA 字节与 768,000 float32 PCM 字节 /每声道 96,000 样本独立一致。主音轨须显式创作。',REL+'/native-r1/verification.json'),
+        ('V87-05','MP4/GIF 与静态目检','trim/stretch 均 50 帧、PTS=n/25；trim 身份色块最大误差 1，非编码整帧一致。源 GIF 8 帧/320 ms，输出 GIF 2000 ms，黑帧会合并。',REL+'/static-review-r1.json'),
+        ('V87-06','只读索引与损坏拒绝','命中经 SHA 核验的既有原生索引时 0 次源帧探针，仍读 SHA。损坏索引拒绝保留，工程/报告/快照/缓存不被自动修复。',REL+'/installed-r1/media/verification.json'),
+        ('V87-07','当前源码的新隔离安装','161 资源源码/包/安装相同；36 CLI＋1 次 14 模块来源探针、14 安装检查＋54 媒体检查。7 wheels 不含 NumPy，实验只读复制既有 2.4.2 的 933 个 RECORD 文件及许可。',REL+'/installed-r1/verification.json'),
+        ('V87-08','仅音频及未知 EOF','有效音频分析可返回偏移与 unknown 视频诊断，生成该机位切换时拒绝；未知视频状态采用模拟，音频真实生成。完整性错误仍拒绝。',REL+'/audio-only-after-r1.json'),
+        ('V87-09','保留失败与生成器修复','真实修复前 8 方法有 7 方法/9 断言失败；另保留子测试错误、仅音频过度拒绝、汇总清单名及生成器数字替换失误。修复未冒称旧结果重跑。',REL+'/audit-r1.json'),
+        ('V87-10','契约与范围','4 Skill 只合并本轮增量，17 份再审。自然/HDR/长片/RSS/漂移/非零音频流起点/连续播放听审及完整剪映功能效果仍待验收。',CONTRACT),
+    ]
+    for document in LATEST_DOCS:
+        table='| 编号 | 核验 | 实际结果与边界 | 证据 |\n|---|---|---|---|\n'
+        table+='\n'.join('| '+i+' | '+title+' | '+result+' | [记录]('+link(document,target)+') |' for i,title,result,target in rows)
+        gallery=''
+        if document=='README.md':
+            gallery=('\n\n原创参考（CC0 七段数字矩形及确定性音频，无外部字体/图片）：\n\n'
+                '![V87 参考]('+ASSETS+'/native-r1/source-reference.gif)\n\n'
+                '尾部视频在 .32 秒结束，原速保留后续背景（实际 MP4 解码 GIF）：\n\n'
+                '![V87 尾部缺口]('+ASSETS+'/native-r1/tail-trim.gif)\n\n'
+                '视频在 1 秒开始、1.32 秒结束，原速保留两端背景：\n\n'
+                '![V87 延迟视频]('+ASSETS+'/native-r1/leading-trim.gif)\n\n'
+                '[尾部原片 MKV]('+ASSETS+'/native-r1/source-tail.mkv) · '
+                '[延迟原片 MKV]('+ASSETS+'/native-r1/source-leading.mkv) · '
+                '[尾部原速 MP4]('+ASSETS+'/native-r1/tail-trim.mp4) · '
+                '[延迟原速 MP4]('+ASSETS+'/native-r1/leading-trim.mp4) · '
+                '[显式拉伸 MP4]('+ASSETS+'/native-r1/leading-stretch.mp4) · '
+                '[拉伸 GIF]('+ASSETS+'/native-r1/leading-stretch.gif) · '
+                '[全部资产 SHA]('+REL+'/media-manifest-r1.json)。'
+                '原片保存真实 PTS 与 2 秒音轨；源 GIF 只展示 8 解码帧，没有伪造前后空白。'
+                'GIF 不含音频，未作连续播放/听审；编码 MP4/AAC 不声明完整 RGBA/PCM 字节一致。')
+        block(root/document,'### V87 多机位原生视频覆盖\n\n'+message+'\n\n'+table+gallery+
+            '\n\n[完整实测]('+link(document,REPORT)+')。方法子集、原生命令、安装检查分开报告，不累计为额外完整方法或剪映等价。')
+    report='# 多机位原生视频覆盖实测（V87，2026-10-21）\n\n'+message+'\n\n'
+    report+='| 编号 | 核验 | 实际结果与边界 | 证据 |\n|---|---|---|---|\n'
+    report+='\n'.join('| '+i+' | '+title+' | '+result+' | [记录]('+link(REPORT,target)+') |' for i,title,result,target in rows)
+    report+='\n\n'+'''视频覆盖不能由更长的音轨推断。使用原生首帧 PTS、末帧 PTS＋已知 duration、time_base、demux origin，保留精确有理数；原点舍入与渲染器一致。参考 r 对应源 r＋relative_delay_seconds。trim 按真实边界取交集、保持原速和参考事件位置；尾部为 8 彩帧＋42 背景帧，延迟为 25 背景＋8 彩帧＋17 背景。公开视频延迟样例使用参考第 25..32 帧本身，与参考事件身份一致。此前单元测试将第 0..7 帧延迟，仅验证覆盖范围，不能混写为同一素材。
+
+默认 reject 拒绝覆盖不足。显式 stretch speed=.16，会填满作者区间并改变事件位置，保留 MULTICAM_SOURCE_CLOCK_CHANGED 警告；从真实首帧钳制。完全不相交、未知 EOF、畸形边界、锁定应用目标和亚 tick 段均拒绝。视频轨不自动提取声音，显式主音轨保持完整 2 秒；请求窗口及较长作者时长保留。
+
+只读原生索引缺失时可探测但不写缓存，命中时报告 0 源帧探针，仍读取实际源及运行时 SHA；不能称为零 I/O、零成本或零解码。损坏索引拒绝保留，变更源 SHA 拒绝，不转换为成功音频分析。真实音频配合模拟未知视频状态验证了仅音频分析返回有效偏移和明确诊断；它没有验收一个真实未知末帧封装的完整观看副本。旧函数 0.1/0.2 输入只有容器时长时发警告；新 CLI 0.3 不静默降级。
+
+本候选媒体和隔离安装均以当前 258 输入重新生成，不复用 V86 旧媒体。原生 33 CLI＋25 其他命令/54 检查；隔离 36 CLI＋1 来源进程/14 模块，另有 14 安装及 54 媒体检查。161 运行时资源源码、wheel、安装同字节。基础 7 wheels 仍不含 NumPy；实验只读复制既有 NumPy 2.4.2 的 933 个经 RECORD 核对文件及许可，未下载、未全局安装，不能写成产品安装器已新增 NumPy 发行支持。
+
+38 资产、14 GIF 来自原生/隔离两次真实生成。源 GIF 为 8 帧/320 ms；两组 trim GIF 分别合并为 9/10 帧、2000 ms。每个实际 MP4 为 50 帧且 PTS=n/25，trim 身份色块最大误差 1。完整无损 RGBA/PCM 与编码观看副本分开验收；编码整帧及 AAC 没有字节一致声明。两张 1280×400 边界图做过静态目检，安装图像素一致；没有连续播放或听审。
+
+保留原 8 方法 7 方法/9 断言失败、第一次子测试异常字段失误、仅音频过度拒绝；104 当前相关方法覆盖修正后 24＋22＋16＋32＋10，旧 102 是历史结果不累计。汇总器第一次因夹具清单名错误在写文档前失败；完整套件生成器第一次因未限制数字替换范围触及 SHA256 字面量，被 AST 一致性检查阻止，在生成启动器前失败。原脚本与原因均保留，产品源码和媒体没有因这些生成器修复改变。
+
+非零视频封装原点和分数时钟有时间算术控制；不能外推为非零音频流起点验收。自然多机位、密集切换、设备漂移、HDR、长片吞吐、总 RSS、连续播放和听审均未验收；没有完成完整剪映功能或效果等价。原生 Windows，无 Docker、WSL、虚拟环境、远程模型或在线依赖安装。
+'''
+    for title,target in (('历史实验及失败',HISTORICAL_REPORT),('契约',CONTRACT),
+        ('汇总器原失败',REL+'/finalize-public-media-failed-r1.json'),('启动器生成原失败',REL+'/full-gate-preparation-failed-r1.json'),
+        ('尾部原片',ASSETS+'/native-r1/source-tail.mkv'),('延迟原片',ASSETS+'/native-r1/source-leading.mkv'),
+        ('尾部实际 MP4',ASSETS+'/native-r1/tail-trim.mp4'),('延迟实际 MP4',ASSETS+'/native-r1/leading-trim.mp4')):
+        report+='\n['+title+']('+link(REPORT,target)+')\n'
+    report+='\n![实际延迟原速 GIF]('+link(REPORT,ASSETS+'/native-r1/leading-trim.gif')+')\n'
+    report+='\n复现脚本：scripts/smoke_multicam_stream_coverage.py、scripts/verify_multicam_stream_coverage_install.py；精确源码、命令、日志及 SHA 在对应证据目录。\n'
+    write(root/REPORT,report)
+    constraints='\n'.join(line for line in (root/HISTORICAL_CONTRACT).read_text('utf8').splitlines() if line.startswith('|'))
+    assert constraints.count('| SV-C')==12
+    constraints=constraints.replace('完整回归/发布未完成','完整回归通过；本次接入生产，发布状态见实测')
+    write(root/CONTRACT,'# 多机位原生帧覆盖与只读索引契约（v0.1 限定验收，2026-10-21）\n\n'+message+'\n\n'+constraints+
+        '\n\n[实际原生/安装、原片/GIF 和保留失败](../validation/'+Path(REPORT).name+')。未知状态模拟、音频起点/漂移、长片与自然效果边界仍有效。')
+    drafts=read(ROOT/REL/'skills-draft-r1.json');assert set(drafts['skills'])==set(SKILLS)
+    for name,row in drafts['skills'].items():
+        guidance=row['new_block'].replace(HISTORICAL_CONTRACT,CONTRACT).replace(HISTORICAL_REPORT,REPORT)
+        pending='This is an unregistered candidate; complete regression and main integration remain pending.'
+        assert guidance.count(pending)==1;guidance=guidance.replace(pending,'')
+        assert 'unregistered candidate' not in guidance and 'remain pending' not in guidance
+        block(root/'skills'/name/'SKILL.md',guidance)
+    attributes=(root/'.gitattributes').read_text('utf8')
+    paths=[REL+'/** -text -whitespace',ASSETS+'/** -text -whitespace']
+    paths += [f'product/src/ai_ad_editor/{name}.py -text whitespace=cr-at-eol' for name in MODULES]
+    paths += [f'product/tests/{name}.py -text whitespace=cr-at-eol' for name in TESTS]
+    paths += [f'scripts/{name}.py -text whitespace=cr-at-eol' for name in SCRIPTS]
+    write(root/'.gitattributes',attributes+'\n# V87 exact tested native-stream coverage bytes.\n'+'\n'.join(paths))
+    return {*LATEST_DOCS,REPORT,CONTRACT,'.gitattributes',*('skills/'+name+'/SKILL.md' for name in SKILLS)}
+'''
+
+
+def function(source,name):
+    node=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name==name)
+    return '\n'.join(source.splitlines()[node.lineno-1:node.end_lineno])
+
+
+def replace_function(source,name,body):
+    node=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name==name)
+    lines=source.splitlines(keepends=True)
+    return ''.join(lines[:node.lineno-1])+body+'\n'+''.join(lines[node.end_lineno:])
+
+
+def assign(source,name,value):
+    node=next(n for n in ast.parse(source).body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id==name for t in n.targets))
+    lines=source.splitlines(keepends=True)
+    return ''.join(lines[:node.lineno-1])+name+'='+repr(value)+'\n'+''.join(lines[node.end_lineno:])
+
+
+def main():
+    assert not TARGET.exists()
+    current=frozen();audit=json.loads((ROOT/REL/'audit-r1.json').read_bytes())
+    assert audit['status']=='passed-standalone-audit' and current==audit['frozen_inputs'] and len(current)==258
+    original=(DONOR/'scripts/publish_multicam_source_range.py').read_text('utf8')
+    source=original
+    constants={'REL':REL,'ASSETS':'docs/assets/multicam-stream-coverage-20261021-lab',
+        'REPORT':'docs/validation/多机位原生视频覆盖实测_2026-10-21.md',
+        'CONTRACT':'docs/specs/多机位原生帧覆盖与只读索引契约_v0.1_2026-10-21.md',
+        'HISTORICAL_REPORT':'docs/validation/多机位原生视频覆盖独立实验_2026-10-21.md',
+        'HISTORICAL_CONTRACT':'docs/specs/多机位原生帧覆盖与只读索引契约_实验_v0.1_2026-10-21.md',
+        'MARKER':'V87-MULTICAM-NATIVE-STREAM-COVERAGE','ADDED':{'product/tests/test_multicam_stream_coverage.py'},
+        'TESTS':('test_multicam_stream_coverage',),
+        'SCRIPTS':('run_multicam_stream_after_parent','run_frozen_regression','run_with_regression_fixtures',
+            'materialize_regression_fixtures','run_stream_related_regressions_r2','run_stream_related_regressions',
+            'run_stream_audio_controls','prepare_stream_audio_related','prepare_stream_related','prepare_stream_coverage_lab',
+            'audit_stream_development','smoke_multicam_stream_coverage','verify_multicam_stream_coverage_install',
+            'finalize_multicam_stream_lab','prepare_stream_skills','prepare_stream_full_gate','prepare_stream_smoke',
+            'prepare_stream_install_verifier','native_index_release_tools','prepare_stream_publication','publish_multicam_stream_coverage')}
+    for name,value in constants.items():source=assign(source,name,value)
+    launcher=(ROOT/'scripts/run_multicam_stream_after_parent.py').read_text('utf8')
+    audit_function=function(launcher,'source_gate').replace('def source_gate():','def source_audit():')
+    doc_line="    for name,digest in audit['documents'].items():assert sha(ROOT/name)==digest\n"
+    assert audit_function.count(doc_line)==1;audit_function=audit_function.replace(doc_line,'')
+    last="    return current,previous,{name:sha(ROOT/'scripts'/name) for name in SCRIPTS}"
+    assert audit_function.count(last)==1;audit_function=audit_function.replace(last,'    return current')
+    source=replace_function(source,'source_audit',audit_function)
+    complete=function(original,'complete_gate')
+    for before,after in (
+        ('multicam-source-range-20261021/full-after-empty-r1','multicam-stream-coverage-20261021/full-after-multicam-r1'),
+        ('published-empty-alignment-r1.json','published-multicam-alignment-r1.json'),
+        ("full['methods']==1995","full['methods']==2019"),
+        ("len(state['verification_scripts'])==10","len(state['verification_scripts'])==15"),
+        ("len(alignment['upstream_inputs'])==256","len(alignment['upstream_inputs'])==257"),
+        ('audit-r2.json','audit-r1.json')):
+        assert before in complete,before;complete=complete.replace(before,after)
+    source=replace_function(source,'complete_gate',complete)
+    source=replace_function(source,'documents',DOCUMENTS)
+    new_main=function(original,'main')
+    for before,after in (("'full_methods':1995","'full_methods':2019"),("'targeted_methods':80","'targeted_methods':104"),
+        ("'frozen_files':257","'frozen_files':258"),('full_methods=1995','full_methods=2019'),
+        ('fix: preserve multicamera event sync with explicit source coverage policies','fix: use native video intervals for multicamera coverage'),
+        ('V86 multicamera source coverage with explicit reject/trim/stretch; offset only, no drift or full CapCut parity acceptance',
+         'V87 native video intervals and readonly verified frame indices; audio-only unknown-coverage diagnostics; offset only, no drift or full CapCut parity acceptance')):
+        assert before in new_main,before;new_main=new_main.replace(before,after)
+    assert 'sha(Path(__file__))' in new_main and 'sha(__file__)' not in new_main
+    source=replace_function(source,'main',new_main)
+    unchanged={name:ast.dump(ast.parse(function(original,name)),include_attributes=False)==
+        ast.dump(ast.parse(function(source,name)),include_attributes=False) for name in ('read','write','save','block','source_files')}
+    assert all(unchanged.values())
+    helper=ROOT/'scripts/native_index_release_tools.py'
+    assert not helper.exists();helper.write_bytes((DONOR/'scripts/native_index_release_tools.py').read_bytes())
+    assert frozen()==current
+    TARGET.write_text(source,encoding='utf8',newline='\n')
+    write(ROOT/REL/'publication-preparation-r1.json',{'status':'prepared-awaiting-source-preflight-and-actual-complete-suite',
+        'generator_sha256':sha(__file__),'donor_sha256':sha(DONOR/'scripts/publish_multicam_source_range.py'),
+        'publisher_sha256':sha(TARGET),'shared_release_helper_sha256':sha(helper),'unchanged_helper_AST':unchanged,
+        'expected_full_methods':2019,'current_targeted_methods':104,'frozen_inputs':current,
+        'preserves_Path_for_shared_sha':True,'only_skill_delta_merged_into_actual_parents':True,
+        'force_push':False,'main_integrated':False,'skills_registered':False,
+        'no_complete_suite_or_publication_claimed':True})
+    print(json.dumps({'status':'prepared-awaiting-source-preflight-and-actual-complete-suite','publisher_sha256':sha(TARGET)}))
+
+
+if __name__=='__main__':main()

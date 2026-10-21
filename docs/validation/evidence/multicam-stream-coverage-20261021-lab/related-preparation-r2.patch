@@ -1,0 +1,50 @@
+--- run_stream_related_regressions.py
++++ run_stream_related_regressions_r2.py
+@@ -32,13 +32,13 @@
+     for name in ('rubberband', 'html-runtime'):
+         parser.add_argument('--' + name, type=Path, required=True)
+     args = parser.parse_args()
+-    output = REL / 'related-r1.json'
++    output = REL / 'related-r2.json'
+     assert not output.exists() and not output.with_suffix('.log').exists()
+     read = lambda path: json.loads(Path(path).read_bytes())
+     before = frozen()
+-    expected = read(REL / 'after-r2.json')
++    expected = read(REL / 'audio-only-after-r1.json')
+     foundation = read(REL / 'foundation-r1.json')
+-    assert expected['terminal_ok'] and expected['methods'] == 22 and expected['frozen_equal']
++    assert expected['terminal_ok'] and expected['methods'] == 2 and expected['frozen_equal']
+     assert before == expected['frozen_before'] == expected['frozen_after'] and len(before) == 258
+     previous = foundation['source_inputs']
+     assert len(previous) == 257 and set(before) - set(previous) == {'product/tests/test_multicam_stream_coverage.py'}
+@@ -67,9 +67,9 @@
+     env = dict(os.environ, TEMP=str(temporary), TMP=str(temporary), TMPDIR=str(temporary),
+         PYTHONDONTWRITEBYTECODE='1', PYTHONPATH=str(ROOT / 'product/src'),
+         AI_AD_EDITOR_TEST_RUBBERBAND=str(binary), AI_AD_EDITOR_TEST_HTML_RUNTIME=str(html))
+-    scripts = {name: sha(ROOT / 'scripts' / name) for name in ('run_stream_related_regressions.py',
+-        'run_frozen_regression.py', 'materialize_regression_fixtures.py', 'prepare_stream_related.py')}
+-    record = {'status': 'running', 'expected_methods': 102, 'selected_test_names': names, 'command': command,
++    scripts = {name: sha(ROOT / 'scripts' / name) for name in ('run_stream_related_regressions_r2.py',
++        'run_frozen_regression.py', 'materialize_regression_fixtures.py', 'prepare_stream_audio_related.py', 'run_stream_audio_controls.py', 'run_stream_related_regressions.py')}
++    record = {'status': 'running', 'expected_methods': 104, 'selected_test_names': names, 'command': command,
+         'frozen_before': before, 'fixture_inputs': fixture_inputs, 'fixture_manifest_sha256': sha(REL / 'foundation-r1.json'),
+         'script_hashes': scripts, 'native_windows': sys.platform == 'win32', 'virtualization': False, 'network': False,
+         'rubberband_sha256': sha(binary), 'html_runtime_sha256': sha(html), 'started_at_utc': datetime.now(timezone.utc).isoformat()}
+@@ -80,7 +80,7 @@
+     text = output.with_suffix('.log').read_text('utf8')
+     match = re.search(r'Ran (\d+) tests? in ([\d.]+)s', text)
+     ids = re.findall(r'^test_\w+ \(([^)\r\n]+)\)', text, flags=re.M)
+-    ok = result.returncode == 0 and bool(re.search(r'\bOK\s*$', text)) and match is not None and int(match[1]) == 102
++    ok = result.returncode == 0 and bool(re.search(r'\bOK\s*$', text)) and match is not None and int(match[1]) == 104
+     record.update(status='passed-related-regressions' if ok else 'failed', terminal_ok=ok, exit_code=result.returncode,
+         methods=int(match[1]) if match else None, suite_seconds=float(match[2]) if match else None,
+         skipped=text.count(' ... skipped'), method_ids=ids, distinct_methods=len(set(ids)),
+@@ -91,7 +91,7 @@
+     record['scripts_unchanged'] = all(sha(ROOT / 'scripts' / name) == digest for name, digest in scripts.items())
+     write(output, record)
+     print(json.dumps({key: record[key] for key in ('status', 'methods', 'distinct_methods', 'suite_seconds', 'frozen_equal')}))
+-    assert ok and len(ids) == len(set(ids)) == 102 and record['skipped'] == 0
++    assert ok and len(ids) == len(set(ids)) == 104 and record['skipped'] == 0
+     assert record['frozen_equal'] and record['fixtures_unchanged'] and record['fixture_manifest_unchanged'] and record['scripts_unchanged']
+ 
+ 

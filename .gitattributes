@@ -754,3 +754,32 @@ scripts/run_multicam_compatibility.py -text whitespace=cr-at-eol
 scripts/native_index_release_tools.py -text whitespace=cr-at-eol
 scripts/prepare_multicam_publication.py -text whitespace=cr-at-eol
 scripts/publish_multicam_source_range.py -text whitespace=cr-at-eol
+
+# V87 exact tested native-stream coverage bytes.
+docs/validation/evidence/multicam-stream-coverage-20261021-lab/** -text -whitespace
+docs/assets/multicam-stream-coverage-20261021-lab/** -text -whitespace
+product/src/ai_ad_editor/multicam.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/cli.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/tests/test_multicam_stream_coverage.py -text whitespace=cr-at-eol
+scripts/run_multicam_stream_after_parent.py -text whitespace=cr-at-eol
+scripts/run_frozen_regression.py -text whitespace=cr-at-eol
+scripts/run_with_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/materialize_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/run_stream_related_regressions_r2.py -text whitespace=cr-at-eol
+scripts/run_stream_related_regressions.py -text whitespace=cr-at-eol
+scripts/run_stream_audio_controls.py -text whitespace=cr-at-eol
+scripts/prepare_stream_audio_related.py -text whitespace=cr-at-eol
+scripts/prepare_stream_related.py -text whitespace=cr-at-eol
+scripts/prepare_stream_coverage_lab.py -text whitespace=cr-at-eol
+scripts/audit_stream_development.py -text whitespace=cr-at-eol
+scripts/smoke_multicam_stream_coverage.py -text whitespace=cr-at-eol
+scripts/verify_multicam_stream_coverage_install.py -text whitespace=cr-at-eol
+scripts/finalize_multicam_stream_lab.py -text whitespace=cr-at-eol
+scripts/prepare_stream_skills.py -text whitespace=cr-at-eol
+scripts/prepare_stream_full_gate.py -text whitespace=cr-at-eol
+scripts/prepare_stream_smoke.py -text whitespace=cr-at-eol
+scripts/prepare_stream_install_verifier.py -text whitespace=cr-at-eol
+scripts/native_index_release_tools.py -text whitespace=cr-at-eol
+scripts/prepare_stream_publication.py -text whitespace=cr-at-eol
+scripts/publish_multicam_stream_coverage.py -text whitespace=cr-at-eol
