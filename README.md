@@ -1,5 +1,26 @@
 # Agent Video Kit
 
+<!-- V82-REVERSE-CHUNKS -->
+2026-10-21 **V82（原生倒放区间＋顺序无损分块）**：完整原生回归 **1888 项、4198.414 秒、0 跳过**，249 产品输入与 8 外部夹具保持一致（本轮限定验收）。普通叶视频保留 VFR 持帧时长及小数源区间；超出共享帧栅格估算时自动生成 FFV1 缓存。缓存命中仍建立源帧索引，256 MiB 是帧栅格估算，128 GiB 保守磁盘预约也限制可处理时长；不代表长片或进程峰值已验收。
+
+| 编号 | 当轮核验 | 结果与边界 | 证据 |
+|---|---|---|---|
+| V82-01 | 倒放区间、原生分块、渲染/预览与清理 | 50 项通过、0 跳过；含 H.264 GOP/B 帧、10-bit 低位、VP9 alpha、8 方向组合、事务/取消/篡改拒绝和引用保护。249 输入逐字节映射到发布候选 | [专项](docs/validation/evidence/vfr-reverse-chunks-20261021-v82/integration-r3.json) · [基线映射](docs/validation/evidence/vfr-reverse-chunks-20261021-v82/published-base-alignment-r1.json) |
+| V82-02 | 相邻功能 | 嵌套 63、时钟 14、预览 22 项通过，0 跳过；与 50 专项合为 149 个不同方法，属于完整回归子集 | [嵌套](docs/validation/evidence/vfr-reverse-chunks-20261021-v82/nested-r1.json) · [时钟](docs/validation/evidence/vfr-reverse-chunks-20261021-v82/clock-r1.json) · [预览](docs/validation/evidence/vfr-reverse-chunks-20261021-v82/preview-r1.json) |
+| V82-03 | 公开 CLI 与 4K 原生媒体 | 13 CLI /22 原生命令 /16 检查；选中 8 帧、0.32 秒，默认 4×2 帧块；原生全部 RGBA 哈希相同，128×72 无损预览整帧误差 0；4K 编码 PTS/身份、缓存复用、清理重建通过 | [收据](docs/validation/evidence/vfr-reverse-chunks-20261021-v82/native-r4/verification.json) · [原视频](docs/assets/vfr-reverse-chunks-20261021-v82/native-r4/source-review.mp4) · [实际输出](docs/assets/vfr-reverse-chunks-20261021-v82/native-r4/reverse-review.mp4) |
+| V82-04 | 离线隔离安装 | 159 资源 /7 现有 wheels，16 隔离 CLI＋1 模块来源探针；8 个模块均来自安装目录；同一 4K 样例输出与开发一致 | [安装收据](docs/validation/evidence/vfr-reverse-chunks-20261021-v82/installed-r1/verification.json) |
+| V82-05 | 完整回归 r2 | 完整原生回归 **1888 项、4198.414 秒、0 跳过**，249 产品输入与 8 外部夹具保持一致（本轮限定验收）；r1 因既有图字符串断言失败，保留失败收据 | [完整收据](docs/validation/evidence/vfr-reverse-chunks-20261021-v82/full-r2.json) · [失败 r1](docs/validation/evidence/vfr-reverse-chunks-20261021-v82/full-r1.json) |
+| V82-06 | 保留失败与未验收 | 初始 FFmpeg 参数、镜像开关、格式边界夹具及二次有损编码色差断言失败均保留；未验收长片吞吐/总 RSS、HDR、自然质量、倒放音频或一般嵌套 VFR；剪映整体等价仍未达成 | [实测报告](docs/validation/原生分块倒放与离线缓存实测_2026-10-21.md) · [契约](docs/specs/原生分块倒放缓存契约_v0.1_2026-10-21.md) |
+| V82-07 | 既有组合测试断言修正 | 同源码 1 项复现旧断言失败；仅改 1 个测试文件，248 其他输入（含全部运行时代码）不变；改查 1.25 倍速和公开倒放帧时钟元数据后，真实渲染通过；不追加到 149 专项计数 | [差异与指纹](docs/validation/evidence/vfr-reverse-test-oracle-20261021-r1/bridge-r1.json) · [实际修改](docs/validation/evidence/vfr-reverse-test-oracle-20261021-r1/test-only.patch) · [修正后](docs/validation/evidence/vfr-reverse-test-oracle-20261021-r1/after-r1.json) |
+| V82-08 | 发布前暂存检查与恢复 | 保留 CRLF/脚本 EOF 检查失败；4 份历史 CC0 原字节保留，脚本只修整结尾且 AST 不变；249 产品输入不变 | [恢复审查](docs/validation/原生倒放缓存发布前字节审查修复_2026-10-21.md) |
+
+| 原输入的实际编码预览（选中前 8 帧） | 实际倒放成片的编码预览 |
+|---|---|
+| ![原创 4K 素材](docs/assets/vfr-reverse-chunks-20261021-v82/native-r4/source.gif) | ![真实倒放结果](docs/assets/vfr-reverse-chunks-20261021-v82/native-r4/reverse.gif) |
+
+以上 GIF 均由实际 MP4 解码生成，8 帧 /320 ms；公开素材是脚本生成的 CC0 几何画面。二次有损编码的背景 RGB 最大观察误差为 4，与原生平面/无损预览的零误差分开记录；已查看 8 帧静态总览，未连续播放或听音。
+<!-- /V82-REVERSE-CHUNKS -->
+
 <!-- V81-CURVE-CLOCK -->
 2026-10-21 **V81（RGB 曲线候选＋有理数视频时钟）**：完整原生回归1838项、4452.737秒、0跳过（本轮限定验收）。以 R14 /`1f9ef4e` 为基点，合并原未发布 V80 曲线功能与 CFR-01 修复；冻结242产品输入、8外部夹具。**V80 的1819项回归曾因 OCR 登记哈希读取 `MemoryError` 失败，未发布，不计作通过**。本轮将哈希读取改为复用最多64 KiB缓冲，预留失败退至8/1 KiB；未做操作系统OOM压测。
 

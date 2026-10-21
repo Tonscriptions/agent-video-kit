@@ -1,0 +1,53 @@
+{
+  "calls": [
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI\u5e7f\u544a\u526a\u8f91\\product\\.runtime\\worktrees\\reverse-chunks-v82-release\\docs\\assets\\vfr-reverse-chunks-20261021-v82\\native-r3\\source-4k.nut",
+        "-an",
+        "-vf",
+        "format=bgra,scale=128:72:flags=lanczos,format=rgba",
+        "-frames:v",
+        "8",
+        "-fps_mode",
+        "passthrough",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "rgba",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI\u5e7f\u544a\u526a\u8f91\\product\\.runtime\\worktrees\\reverse-chunks-v82-release\\product\\.runtime\\reverse-chunks-20261021-v82\\native-r3\\project\\cache\\timeline-previews\\cb3af048cca3c9e2d04bcf0b73354123404b66cfb28179fb0fb1dd382151af14\\master.nut",
+        "-map",
+        "0:v:0",
+        "-fps_mode",
+        "passthrough",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "rgba",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ],
+  "expected_bytes": 294912,
+  "actual_bytes": 294912,
+  "max_RGBA_error": 0,
+  "different_bytes": 0,
+  "expected_sha256": "sha256:67b44a81791bf97d4d2045043022065f273e225013182aa672cb0522ec4239b9",
+  "actual_sha256": "sha256:67b44a81791bf97d4d2045043022065f273e225013182aa672cb0522ec4239b9"
+}

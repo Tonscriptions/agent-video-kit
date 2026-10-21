@@ -1,0 +1,94 @@
+test_reverse_fractional_CFR_cut_in_keeps_partial_end_intervals (test_reverse_video_clock.ReverseVideoClockTests.test_reverse_fractional_CFR_cut_in_keeps_partial_end_intervals) ... FAIL
+test_reverse_fractional_VFR_cut_in_and_speed_keep_original_time (test_reverse_video_clock.ReverseVideoClockTests.test_reverse_fractional_VFR_cut_in_and_speed_keep_original_time) ... FAIL
+test_reverse_preserves_each_VFR_frame_interval_duration (test_reverse_video_clock.ReverseVideoClockTests.test_reverse_preserves_each_VFR_frame_interval_duration) ... FAIL
+
+======================================================================
+FAIL: test_reverse_fractional_CFR_cut_in_keeps_partial_end_intervals (test_reverse_video_clock.ReverseVideoClockTests.test_reverse_fractional_CFR_cut_in_keeps_partial_end_intervals)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\vfr-reverse-lab-20261021\product\tests\test_reverse_video_clock.py", line 42, in test_reverse_fractional_CFR_cut_in_keeps_partial_end_intervals
+    self.assert_reverse(source_in=10170, source_out=100170)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\vfr-reverse-lab-20261021\product\tests\test_reverse_video_clock.py", line 36, in assert_reverse
+    self.assertEqual(wrong, [], f'wrong output frames={wrong}; independent source indices={identities}')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [2, 8, 14, 20, 26] != []
+
+First list contains 5 additional elements.
+First extra element 0:
+2
+
+- [2, 8, 14, 20, 26]
++ [] : wrong output frames=[2, 8, 14, 20, 26]; independent source indices=[-1, 27, 26, 26, 25, 24, 23, 22, 21, 21, 20, 19, 18, 17, 16, 16, 15, 14, 13, 12, 11, 11, 10, 9, 8, 7, 6, 6, 5, 4, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+
+======================================================================
+FAIL: test_reverse_fractional_VFR_cut_in_and_speed_keep_original_time (test_reverse_video_clock.ReverseVideoClockTests.test_reverse_fractional_VFR_cut_in_and_speed_keep_original_time)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\vfr-reverse-lab-20261021\product\tests\test_reverse_video_clock.py", line 45, in test_reverse_fractional_VFR_cut_in_and_speed_keep_original_time
+    self.assert_reverse(vfr=[0, 33, 101, 188, 195, 441, 499, 800, 1002, 1221, 1600, 1800],
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        source_in=10170, source_out=100170, speed=Fraction(3, 2))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\vfr-reverse-lab-20261021\product\tests\test_reverse_video_clock.py", line 36, in assert_reverse
+    self.assertEqual(wrong, [], f'wrong output frames={wrong}; independent source indices={identities}')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [2, 3, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20] != []
+
+First list contains 13 additional elements.
+First extra element 0:
+2
+
+- [2, 3, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20]
++ [] : wrong output frames=[2, 3, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20]; independent source indices=[-1, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 5, 4, 4, 4, 4, 4, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+
+======================================================================
+FAIL: test_reverse_preserves_each_VFR_frame_interval_duration (test_reverse_video_clock.ReverseVideoClockTests.test_reverse_preserves_each_VFR_frame_interval_duration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\vfr-reverse-lab-20261021\product\tests\test_reverse_video_clock.py", line 39, in test_reverse_preserves_each_VFR_frame_interval_duration
+    self.assert_reverse(vfr=[0, 33, 101, 188, 195, 441, 499, 800, 1002, 1221, 1600, 1800])
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\vfr-reverse-lab-20261021\product\tests\test_reverse_video_clock.py", line 36, in assert_reverse
+    self.assertEqual(wrong, [], f'wrong output frames={wrong}; independent source indices={identities}')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1[57 chars], 29] != []
+
+First list contains 28 additional elements.
+First extra element 0:
+2
+
++ []
+- [2,
+-  3,
+-  4,
+-  5,
+-  6,
+-  7,
+-  8,
+-  9,
+-  10,
+-  11,
+-  12,
+-  13,
+-  14,
+-  15,
+-  16,
+-  17,
+-  18,
+-  19,
+-  20,
+-  21,
+-  22,
+-  23,
+-  24,
+-  25,
+-  26,
+-  27,
+-  28,
+-  29] : wrong output frames=[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]; independent source indices=[-1, 7, 7, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 1, 1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+
+----------------------------------------------------------------------
+Ran 3 tests in 6.877s
+
+FAILED (failures=3)

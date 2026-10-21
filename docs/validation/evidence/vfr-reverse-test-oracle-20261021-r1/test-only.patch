@@ -1,0 +1,26 @@
+--- before/product/tests/test_cli.py
++++ after/product/tests/test_cli.py
+@@ -4313,7 +4313,22 @@
+             output = project / "renders" / "advanced.mp4"
+             code, planned = invoke("render", "--project", str(project), "--output", str(output), "--dry-run")
+             self.assertEqual(code, 0, planned)
+-            self.assertIn("setpts=(PTS-STARTPTS)/1.25000000", planned["data"]["plan"]["filter_complex"])
++            self.assertIn("/1.25000000", planned["data"]["plan"]["filter_complex"])
++
++            def frame_clocks(value):
++                if isinstance(value, dict):
++                    if "video_frame_clock" in value:
++                        yield value["video_frame_clock"]
++                    for child in value.values():
++                        yield from frame_clocks(child)
++                elif isinstance(value, list):
++                    for child in value:
++                        yield from frame_clocks(child)
++
++            self.assertTrue(any(
++                clock.get("source_clock_anchor") == "reversed-native-source-intervals"
++                for clock in frame_clocks(planned["data"]["plan"])
++            ))
+             code, rendered = invoke("render", "--project", str(project), "--output", str(output))
+             self.assertEqual(code, 0, rendered)
+             self.assertTrue(output.exists())

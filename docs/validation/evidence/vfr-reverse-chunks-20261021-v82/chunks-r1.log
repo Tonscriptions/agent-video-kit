@@ -1,0 +1,175 @@
+test_10bit_native_planes_keep_nonzero_low_bits (test_reverse_cache.ReverseChunkTests.test_10bit_native_planes_keep_nonzero_low_bits) ... ERROR
+test_H264_B_frame_keyframe_preroll_matches_actual_decoded_source (test_reverse_cache.ReverseChunkTests.test_H264_B_frame_keyframe_preroll_matches_actual_decoded_source) ... ERROR
+test_active_native_worker_cancel_terminates_its_own_process (test_reverse_cache.ReverseChunkTests.test_active_native_worker_cancel_terminates_its_own_process) ... ok
+test_cancellation_before_start_does_not_create_cache (test_reverse_cache.ReverseChunkTests.test_cancellation_before_start_does_not_create_cache) ... ok
+test_cancellation_between_chunks_rolls_back_staging (test_reverse_cache.ReverseChunkTests.test_cancellation_between_chunks_rolls_back_staging) ... FAIL
+test_changed_source_rejects_before_any_worker (test_reverse_cache.ReverseChunkTests.test_changed_source_rejects_before_any_worker) ... ok
+test_corrupt_cache_rejects_and_preserves_modified_bytes (test_reverse_cache.ReverseChunkTests.test_corrupt_cache_rejects_and_preserves_modified_bytes) ... ERROR
+test_insufficient_disk_rejects_before_any_worker (test_reverse_cache.ReverseChunkTests.test_insufficient_disk_rejects_before_any_worker) ... ok
+test_invalid_plan_output_cannot_escape_project_cache (test_reverse_cache.ReverseChunkTests.test_invalid_plan_output_cannot_escape_project_cache) ... ok
+test_native_CFR_reverse_chunks_keep_every_selected_pixel (test_reverse_cache.ReverseChunkTests.test_native_CFR_reverse_chunks_keep_every_selected_pixel) ... ERROR
+test_native_VFR_chunks_keep_frames_without_average_fps_resampling (test_reverse_cache.ReverseChunkTests.test_native_VFR_chunks_keep_frames_without_average_fps_resampling) ... ERROR
+test_native_VP9_alpha_decoder_preserves_all_alpha_bytes (test_reverse_cache.ReverseChunkTests.test_native_VP9_alpha_decoder_preserves_all_alpha_bytes) ... ERROR
+test_nonzero_demux_origin_seeks_and_trims_native_absolute_PTS (test_reverse_cache.ReverseChunkTests.test_nonzero_demux_origin_seeks_and_trims_native_absolute_PTS) ... ERROR
+test_plan_is_read_only_and_preserves_original_interval_clock_separately (test_reverse_cache.ReverseChunkTests.test_plan_is_read_only_and_preserves_original_interval_clock_separately) ... ok
+test_ready_cache_hit_does_not_encode_or_decode_original_source (test_reverse_cache.ReverseChunkTests.test_ready_cache_hit_does_not_encode_or_decode_original_source) ... ERROR
+
+======================================================================
+ERROR: test_10bit_native_planes_keep_nonzero_low_bits (test_reverse_cache.ReverseChunkTests.test_10bit_native_planes_keep_nonzero_low_bits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 86, in test_10bit_native_planes_keep_nonzero_low_bits
+    job=self.job(path);self.execute(job)
+                       ~~~~~~~~~~~~^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 35, in execute
+    return cache.execute(self.root,job,self.root/'renders/.tmp/reverse-test',**kw)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 213, in execute
+    _capture(command,cwd=work,cancel_file=cancel_file,watched=path,byte_limit=limit)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 75, in _capture
+    raise AppError('REVERSE_CACHE_PROCESS_FAILED','分块倒放原生进程失败',exit_code=6,
+        cause=bytes(tails[1]).decode('utf8','replace')[-4000:])
+ai_ad_editor.errors.AppError: 分块倒放原生进程失败
+
+======================================================================
+ERROR: test_H264_B_frame_keyframe_preroll_matches_actual_decoded_source (test_reverse_cache.ReverseChunkTests.test_H264_B_frame_keyframe_preroll_matches_actual_decoded_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 77, in test_H264_B_frame_keyframe_preroll_matches_actual_decoded_source
+    job=self.job(path);self.execute(job)
+                       ~~~~~~~~~~~~^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 35, in execute
+    return cache.execute(self.root,job,self.root/'renders/.tmp/reverse-test',**kw)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 213, in execute
+    _capture(command,cwd=work,cancel_file=cancel_file,watched=path,byte_limit=limit)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 75, in _capture
+    raise AppError('REVERSE_CACHE_PROCESS_FAILED','分块倒放原生进程失败',exit_code=6,
+        cause=bytes(tails[1]).decode('utf8','replace')[-4000:])
+ai_ad_editor.errors.AppError: 分块倒放原生进程失败
+
+======================================================================
+ERROR: test_corrupt_cache_rejects_and_preserves_modified_bytes (test_reverse_cache.ReverseChunkTests.test_corrupt_cache_rejects_and_preserves_modified_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 111, in test_corrupt_cache_rejects_and_preserves_modified_bytes
+    source,_,_=self.source();job=self.job(source);self.execute(job)
+                                                  ~~~~~~~~~~~~^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 35, in execute
+    return cache.execute(self.root,job,self.root/'renders/.tmp/reverse-test',**kw)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 213, in execute
+    _capture(command,cwd=work,cancel_file=cancel_file,watched=path,byte_limit=limit)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 75, in _capture
+    raise AppError('REVERSE_CACHE_PROCESS_FAILED','分块倒放原生进程失败',exit_code=6,
+        cause=bytes(tails[1]).decode('utf8','replace')[-4000:])
+ai_ad_editor.errors.AppError: 分块倒放原生进程失败
+
+======================================================================
+ERROR: test_native_CFR_reverse_chunks_keep_every_selected_pixel (test_reverse_cache.ReverseChunkTests.test_native_CFR_reverse_chunks_keep_every_selected_pixel)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 51, in test_native_CFR_reverse_chunks_keep_every_selected_pixel
+    result=self.execute(job)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 35, in execute
+    return cache.execute(self.root,job,self.root/'renders/.tmp/reverse-test',**kw)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 213, in execute
+    _capture(command,cwd=work,cancel_file=cancel_file,watched=path,byte_limit=limit)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 75, in _capture
+    raise AppError('REVERSE_CACHE_PROCESS_FAILED','分块倒放原生进程失败',exit_code=6,
+        cause=bytes(tails[1]).decode('utf8','replace')[-4000:])
+ai_ad_editor.errors.AppError: 分块倒放原生进程失败
+
+======================================================================
+ERROR: test_native_VFR_chunks_keep_frames_without_average_fps_resampling (test_reverse_cache.ReverseChunkTests.test_native_VFR_chunks_keep_frames_without_average_fps_resampling)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 58, in test_native_VFR_chunks_keep_frames_without_average_fps_resampling
+    job=self.job(path,chunk_frames=2);result=self.execute(job)
+                                             ~~~~~~~~~~~~^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 35, in execute
+    return cache.execute(self.root,job,self.root/'renders/.tmp/reverse-test',**kw)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 213, in execute
+    _capture(command,cwd=work,cancel_file=cancel_file,watched=path,byte_limit=limit)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 75, in _capture
+    raise AppError('REVERSE_CACHE_PROCESS_FAILED','分块倒放原生进程失败',exit_code=6,
+        cause=bytes(tails[1]).decode('utf8','replace')[-4000:])
+ai_ad_editor.errors.AppError: 分块倒放原生进程失败
+
+======================================================================
+ERROR: test_native_VP9_alpha_decoder_preserves_all_alpha_bytes (test_reverse_cache.ReverseChunkTests.test_native_VP9_alpha_decoder_preserves_all_alpha_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 96, in test_native_VP9_alpha_decoder_preserves_all_alpha_bytes
+    job=self.job(path,decoder='libvpx-vp9');self.execute(job)
+                                            ~~~~~~~~~~~~^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 35, in execute
+    return cache.execute(self.root,job,self.root/'renders/.tmp/reverse-test',**kw)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 213, in execute
+    _capture(command,cwd=work,cancel_file=cancel_file,watched=path,byte_limit=limit)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 75, in _capture
+    raise AppError('REVERSE_CACHE_PROCESS_FAILED','分块倒放原生进程失败',exit_code=6,
+        cause=bytes(tails[1]).decode('utf8','replace')[-4000:])
+ai_ad_editor.errors.AppError: 分块倒放原生进程失败
+
+======================================================================
+ERROR: test_nonzero_demux_origin_seeks_and_trims_native_absolute_PTS (test_reverse_cache.ReverseChunkTests.test_nonzero_demux_origin_seeks_and_trims_native_absolute_PTS)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 67, in test_nonzero_demux_origin_seeks_and_trims_native_absolute_PTS
+    job=self.job(path);self.execute(job)
+                       ~~~~~~~~~~~~^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 35, in execute
+    return cache.execute(self.root,job,self.root/'renders/.tmp/reverse-test',**kw)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 213, in execute
+    _capture(command,cwd=work,cancel_file=cancel_file,watched=path,byte_limit=limit)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 75, in _capture
+    raise AppError('REVERSE_CACHE_PROCESS_FAILED','分块倒放原生进程失败',exit_code=6,
+        cause=bytes(tails[1]).decode('utf8','replace')[-4000:])
+ai_ad_editor.errors.AppError: 分块倒放原生进程失败
+
+======================================================================
+ERROR: test_ready_cache_hit_does_not_encode_or_decode_original_source (test_reverse_cache.ReverseChunkTests.test_ready_cache_hit_does_not_encode_or_decode_original_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 101, in test_ready_cache_hit_does_not_encode_or_decode_original_source
+    source,_,_=self.source();job=self.job(source);self.execute(job)
+                                                  ~~~~~~~~~~~~^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 35, in execute
+    return cache.execute(self.root,job,self.root/'renders/.tmp/reverse-test',**kw)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 213, in execute
+    _capture(command,cwd=work,cancel_file=cancel_file,watched=path,byte_limit=limit)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\src\ai_ad_editor\reverse_cache.py", line 75, in _capture
+    raise AppError('REVERSE_CACHE_PROCESS_FAILED','分块倒放原生进程失败',exit_code=6,
+        cause=bytes(tails[1]).decode('utf8','replace')[-4000:])
+ai_ad_editor.errors.AppError: 分块倒放原生进程失败
+
+======================================================================
+FAIL: test_cancellation_between_chunks_rolls_back_staging (test_reverse_cache.ReverseChunkTests.test_cancellation_between_chunks_rolls_back_staging)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\worktrees\reverse-chunks-v82\product\tests\test_reverse_cache.py", line 153, in test_cancellation_between_chunks_rolls_back_staging
+    self.assertEqual(caught.exception.code,'CANCELLED')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'REVERSE_CACHE_PROCESS_FAILED' != 'CANCELLED'
+- REVERSE_CACHE_PROCESS_FAILED
++ CANCELLED
+
+
+----------------------------------------------------------------------
+Ran 15 tests in 70.836s
+
+FAILED (failures=1, errors=8)

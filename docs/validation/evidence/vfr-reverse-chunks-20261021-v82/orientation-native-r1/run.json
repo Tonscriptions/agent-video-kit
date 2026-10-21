@@ -1,0 +1,60 @@
+[
+  {
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-v",
+      "error",
+      "-f",
+      "lavfi",
+      "-i",
+      "testsrc=size=32x18:rate=25",
+      "-frames:v",
+      "3",
+      "-c:v",
+      "libx264",
+      "-pix_fmt",
+      "yuv420p",
+      "E:\\dev\\sandbox\\AI\u5e7f\u544a\u526a\u8f91\\product\\.runtime\\worktrees\\reverse-chunks-v82\\docs\\validation\\evidence\\vfr-reverse-chunks-20261021-v82\\orientation-native-r1\\source.mp4"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-v",
+      "error",
+      "-display_rotation:v:0",
+      "90",
+      "-i",
+      "E:\\dev\\sandbox\\AI\u5e7f\u544a\u526a\u8f91\\product\\.runtime\\worktrees\\reverse-chunks-v82\\docs\\validation\\evidence\\vfr-reverse-chunks-20261021-v82\\orientation-native-r1\\source.mp4",
+      "-c",
+      "copy",
+      "E:\\dev\\sandbox\\AI\u5e7f\u544a\u526a\u8f91\\product\\.runtime\\worktrees\\reverse-chunks-v82\\docs\\validation\\evidence\\vfr-reverse-chunks-20261021-v82\\orientation-native-r1\\rotation.mp4"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_frames",
+      "-show_streams",
+      "-show_format",
+      "-show_entries",
+      "frame=best_effort_timestamp,duration,width,height,pix_fmt:frame_side_data=:stream=time_base,width,height,pix_fmt:stream_side_data=rotation,displaymatrix:format=start_time",
+      "-of",
+      "compact=p=1:nk=0",
+      "E:\\dev\\sandbox\\AI\u5e7f\u544a\u526a\u8f91\\product\\.runtime\\worktrees\\reverse-chunks-v82\\docs\\validation\\evidence\\vfr-reverse-chunks-20261021-v82\\orientation-native-r1\\rotation.mp4"
+    ],
+    "exit_code": 0,
+    "stdout": "frame|best_effort_timestamp=0|duration=512|width=32|height=18|pix_fmt=yuv420p|\r\nframe|best_effort_timestamp=512|duration=512|width=32|height=18|pix_fmt=yuv420p|\r\nframe|best_effort_timestamp=1024|duration=512|width=32|height=18|pix_fmt=yuv420p|\r\nstream|width=32|height=18|pix_fmt=yuv420p|time_base=1/12800|disposition:default=1|disposition:dub=0|disposition:original=0|disposition:comment=0|disposition:lyrics=0|disposition:karaoke=0|disposition:forced=0|disposition:hearing_impaired=0|disposition:visual_impaired=0|disposition:clean_effects=0|disposition:attached_pic=0|disposition:timed_thumbnails=0|disposition:non_diegetic=0|disposition:captions=0|disposition:descriptions=0|disposition:metadata=0|disposition:dependent=0|disposition:still_image=0|disposition:multilayer=0|tag:language=und|tag:handler_name=VideoHandler|tag:encoder=Lavc62.28.100 libx264|side_datum/display_matrix:displaymatrix=\\n00000000:            0      -65536           0\\n00000001:        65536           0           0\\n00000002:            0           0  1073741824\\n|side_datum/display_matrix:rotation=90\r\nformat|start_time=0.000000|tag:major_brand=isom|tag:minor_version=512|tag:compatible_brands=isomiso2avc1mp41|tag:encoder=Lavf62.12.100\r\n",
+    "stderr": ""
+  }
+]

@@ -632,3 +632,29 @@ docs/assets/cfr-boundaries-20261021-*/** -text -whitespace
 scripts/*curve_automation*.py -text
 scripts/*cfr_boundaries*.py -text
 scripts/*curve_clock*.py -text
+
+# V82 reverse evidence preserves exact native bytes.
+docs/validation/evidence/vfr-reverse-20261021-lab/** -text -whitespace
+docs/validation/evidence/vfr-reverse-chunks-20261021-v82/** -text -whitespace
+scripts/seed_reverse_chunks.py -text whitespace=cr-at-eol
+scripts/probe_reverse_chunks.py -text whitespace=cr-at-eol
+scripts/probe_reverse_orientation.py -text whitespace=cr-at-eol
+scripts/smoke_reverse_chunks.py -text whitespace=cr-at-eol
+scripts/smoke_reverse_video_clock.py -text whitespace=cr-at-eol
+scripts/verify_reverse_video_clock_install.py -text whitespace=cr-at-eol
+scripts/record_reverse_prototype.py -text whitespace=cr-at-eol
+scripts/prepare_reverse_release.py -text whitespace=cr-at-eol
+scripts/verify_reverse_chunks_install.py -text whitespace=cr-at-eol
+scripts/finalize_reverse_chunks.py -text whitespace=cr-at-eol
+
+# V82 reverse evidence preserves exact native bytes.
+docs/validation/evidence/vfr-reverse-test-oracle-20261021-r1/** -text -whitespace
+scripts/record_reverse_test_bridge.py -text whitespace=cr-at-eol
+
+# V82 retained historical CRLF license bytes.
+docs/assets/vfr-reverse-20261021-lab/installed-r1/LICENSE.txt whitespace=cr-at-eol
+docs/assets/vfr-reverse-20261021-lab/native-r1/LICENSE.txt whitespace=cr-at-eol
+docs/assets/vfr-reverse-20261021-lab/native-r2/LICENSE.txt whitespace=cr-at-eol
+docs/assets/vfr-reverse-20261021-lab/native-r3/LICENSE.txt whitespace=cr-at-eol
+docs/validation/evidence/vfr-reverse-chunks-release-20261021-r1/** -text -whitespace
+scripts/recover_reverse_chunks_release.py -text whitespace=cr-at-eol

@@ -1,0 +1,34 @@
+{
+  "operations": [
+    {
+      "op": "update_clip",
+      "clip_id": "picture",
+      "patch": {
+        "asset_id": "vfr",
+        "source_in_tick": 10170,
+        "source_out_tick": 100170,
+        "timeline_start_tick": 2970,
+        "duration_tick": 98875,
+        "speed": 1.0,
+        "reverse": true,
+        "speed_curve": {
+          "keyframes": [
+            {
+              "at_tick": 0,
+              "speed": 0.5
+            },
+            {
+              "at_tick": 90000,
+              "speed": 1.5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "op": "set_sequence_duration",
+      "duration_tick": 135000,
+      "trim": true
+    }
+  ]
+}

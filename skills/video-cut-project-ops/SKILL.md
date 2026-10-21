@@ -3,6 +3,18 @@ name: video-cut-project-ops
 description: Operate local Agent Projects with snapshots, migration, relinking, persistent render queues, cancellation, and deterministic replay.
 ---
 
+<!-- V82-REVERSE-CHUNKS -->
+For ordinary native-video reverse, read the [V82 chunk/clock contract](../../docs/specs/原生分块倒放缓存契约_v0.1_2026-10-21.md)
+and [actual native/isolated evidence](../../docs/validation/原生分块倒放与离线缓存实测_2026-10-21.md). Preserve original VFR display intervals
+and fractional source bounds. Normal `render`/`preview` automatically prepare FFV1 native-format
+chunks when the shared selected-frame estimate exceeds 256 MiB. Cache 25 Hz is a frame
+counter; source intervals are reapplied. Chunk decode counters exclude the full-source
+index probe that still runs on cache hits. Raster estimates are not process RSS guarantees.
+Use `cache list --project P` and `cache prune --project P --key KEY --dry-run` for derived reverse files.
+Current project references are protected. Keep corrupt entries for diagnosis until explicit cleanup;
+source/runtime/path changes require rebuilding. Transfer author recipes; derived cache paths are not portable.
+<!-- /V82-REVERSE-CHUNKS -->
+
 # Project Operations
 
 <!-- V78-TIMELINE-PREVIEW -->

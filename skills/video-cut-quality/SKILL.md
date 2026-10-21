@@ -3,6 +3,19 @@ name: video-cut-quality
 description: Review local encoded masks, explicit selected/clear checkpoints, color scopes, render manifests, and quality evidence for Agent video delivery.
 ---
 
+<!-- V82-REVERSE-CHUNKS -->
+For ordinary native-video reverse, read the [V82 chunk/clock contract](../../docs/specs/原生分块倒放缓存契约_v0.1_2026-10-21.md)
+and [actual native/isolated evidence](../../docs/validation/原生分块倒放与离线缓存实测_2026-10-21.md). Preserve original VFR display intervals
+and fractional source bounds. Normal `render`/`preview` automatically prepare FFV1 native-format
+chunks when the shared selected-frame estimate exceeds 256 MiB. Cache 25 Hz is a frame
+counter; source intervals are reapplied. Chunk decode counters exclude the full-source
+index probe that still runs on cache hits. Raster estimates are not process RSS guarantees.
+Compare every lossless reference frame and encoded PTS; preserve native alpha/bit-plane evidence.
+The 4K fixture selects eight frames (0.32 s). Encoded MP4/GIF is lossy; its observed RGB error
+is separate from zero-error native planes and lossless previews. It establishes no long-clip, HDR,
+natural-footage, reverse-audio or general nested-VFR acceptance.
+<!-- /V82-REVERSE-CHUNKS -->
+
 <!-- V81-CURVE-CLOCK -->
 For fractional frame rates, cut-ins or moving presentation windows, read the
 [video clock contract](../../docs/specs/片段有理数时间基与CFR边界契约_v0.1_2026-10-21.md) and
@@ -14,7 +27,7 @@ Window cuts sample complete author CFR output on ceil/ceil boundaries; their
 phase may retain the last complete frame to the author end. Ordinary short
 sources are not padded. Decode references with `-fps_mode passthrough` and
 check every frame identity, alpha, PCM and PTS. Respect the reported rational
-denominator limit and unaccepted VFR reverse/source-in-plus-reverse cases.
+denominator limit. Ordinary native reverse follows V82; general nested VFR remains unaccepted.
 Bounded SHA buffers do not establish OS OOM resilience or natural quality.
 <!-- /V81-CURVE-CLOCK -->
 
@@ -24,7 +37,7 @@ Bounded SHA buffers do not establish OS OOM resilience or natural quality.
 
 
 <!-- V80-CURVES -->
-RGB curves now accept fixed-topology point animation: `all.1.y`, `red.1.x`, `green.1.y`, `blue.1.y` using normal numeric effect keyframes. Inspect the 0.9.0 local catalog first. Keep the original point strings and author keyframes in the project; never persist or edit generated sendcmd files. `curves.master` remains an alias for all, not a post-master curve. Explicit RGB or an animated RGB channel forks the static all curve; other channels inherit animated all. Six-decimal x positions must occupy strictly increasing 8-bit bins; do not sort or drop points to force rendering. Point count is fixed (1–256); temporal easing is separate from native natural-cubic color interpolation. Known CFR-01: fractional FPS with non-frame-aligned clip boundaries can lose trailing coverage even without curves; verify actual visibility and do not claim that scenario accepted or silently snap author time. Use complete author clocks for trims, reverse/nesting and interval layers; respect shared command/sample/byte/target quotas. Check actual frame RGB/alpha, PCM/PTS and package/fragment rebuilds. Do not claim HDR, natural quality, real-time preview or CapCut algorithm equivalence.
+RGB curves now accept fixed-topology point animation: `all.1.y`, `red.1.x`, `green.1.y`, `blue.1.y` using normal numeric effect keyframes. Inspect the 0.9.0 local catalog first. Keep the original point strings and author keyframes in the project; never persist or edit generated sendcmd files. `curves.master` remains an alias for all, not a post-master curve. Explicit RGB or an animated RGB channel forks the static all curve; other channels inherit animated all. Six-decimal x positions must occupy strictly increasing 8-bit bins; do not sort or drop points to force rendering. Point count is fixed (1–256); temporal easing is separate from native natural-cubic color interpolation. CFR-01 is covered by the V81 rational-clock contract; preserve author ticks and verify actual display boundaries. Use complete author clocks for trims, reverse/nesting and interval layers; respect shared command/sample/byte/target quotas. Check actual frame RGB/alpha, PCM/PTS and package/fragment rebuilds. Do not claim HDR, natural quality, real-time preview or CapCut algorithm equivalence.
 
 [RGB point contract](../../docs/specs/RGB曲线控制点动画契约_v0.1_2026-10-21.md) · [native/isolated validation and failures](../../docs/validation/RGB曲线控制点动画离线实测_2026-10-21.md)
 <!-- /V80-CURVES -->

@@ -2852,18 +2852,20 @@ def _flatten_sequence_tracks(
                     source_out = int(child_clip.get("source_out_tick", source_in + max(1, int(child_clip.get("duration_tick", 1)))))
                     source_span = max(1, source_out - source_in)
                     clip_span = max(1, clip_end - clip_start)
-                    left_ratio = max(0.0, min(1.0, (overlap_start - clip_start) / clip_span))
-                    right_ratio = max(left_ratio, min(1.0, (overlap_end - clip_start) / clip_span))
-                    # The chronological source subrange is trimmed first;
-                    # the leaf's reverse flag then presents that range in
-                    # reverse order. Using source_out as the anchor here
-                    # would select frames beyond a partially clipped nested
-                    # window.
-                    child_clip["source_in_tick"] = source_in + int(round(source_span * left_ratio))
-                    child_clip["source_out_tick"] = max(
-                        child_clip["source_in_tick"] + 1,
-                        source_in + int(round(source_span * right_ratio)),
-                    )
+                    left_ratio = max(Fraction(0), min(Fraction(1), Fraction(overlap_start - clip_start, clip_span)))
+                    right_ratio = max(left_ratio, min(Fraction(1), Fraction(overlap_end - clip_start, clip_span)))
+                    # Select the original leaf's displayed source interval
+                    # before applying its parent's direction. A reversed
+                    # leaf starts at source_out, including any source gap.
+                    # Cropping it from source_in instead selects other frames.
+                    if bool(clip.get('reverse')):
+                        source_left = source_out - round(source_span * right_ratio)
+                        source_right = source_out - round(source_span * left_ratio)
+                    else:
+                        source_left = source_in + round(source_span * left_ratio)
+                        source_right = source_in + round(source_span * right_ratio)
+                    child_clip["source_in_tick"] = source_left
+                    child_clip["source_out_tick"] = max(source_left + 1, source_right)
                     if reverse_time:
                         child_clip["reverse"] = not bool(child_clip.get("reverse"))
                 if groups is not None:
@@ -3980,6 +3982,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
             kind = asset.get("kind", "video")
             if kind in {"video", "image"} and track.get("kind") == "video":
                 alpha_decoder = None
+                reverse_cache_job = None
                 if inline_surface:
                     video_input = '['+surface_labels[asset['id']].pop(0)+']'
                 elif kind == "image":
@@ -4065,7 +4068,44 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     normalized_rate=nominal_value if nested_maps else fps_value if inline_surface else None)
                 clock_filter, clock_metadata = working_clock(input_base, fps_value, tps)
                 clock_metadata['input_time_base_source'] = clock_source
-                if not nested_maps and not inline_surface and not bool(clip.get('reverse')):
+                if not nested_maps and not inline_surface and bool(clip.get('reverse')) and kind == 'video':
+                    from .reverse_video_clock import reverse_intervals, reserve_buffer
+                    first_source, end_source, reverse_clock, reverse_metadata = reverse_intervals(
+                        uri, int(clip.get('source_in_tick', 0)), int(clip.get('source_out_tick', 1)),
+                        tps, clock_metadata['working_time_base'], expected_time_base=input_base,decoder=alpha_decoder)
+                    use_cache=False
+                    try:
+                        reserve_buffer(_effect_runtime, reverse_metadata, clip.get('id'))
+                    except AppError as error:
+                        if error.code!='REVERSE_VIDEO_BUFFER_BUDGET_EXCEEDED':raise
+                        use_cache=True
+                        from .reverse_cache import plan as reverse_cache_plan, input_orientation
+                        reverse_cache_job=reverse_cache_plan(root,uri,asset['sha256'],reverse_metadata,decoder=alpha_decoder)
+                        orientation=input_orientation(reverse_metadata)
+                        assert inputs[-2]=='-i'
+                        inputs[-1]=reverse_cache_job['output']
+                        if alpha_decoder:
+                            assert inputs[-4]=='-c:v';inputs[-3]='ffv1'
+                            inputs[-2:-2]=orientation
+                        else:
+                            inputs[-2:-2]=['-c:v','ffv1',*orientation]
+                        reverse_metadata.update(frame_buffer_strategy='native-sequential-lossless-reverse-cache',
+                            cache_storage_clock='25Hz-frame-index-only-original-intervals-reapplied',
+                            planned_chunk_count=len(reverse_cache_job['recipe']['ranges']))
+                    clock_base = Fraction(clock_metadata['working_time_base'])
+                    timeline_origin = Fraction(int(clip.get('timeline_start_tick', 0)),tps)/clock_base
+                    assert timeline_origin.denominator == 1
+                    chain = ([f'{video_input}{clock_filter}'] if use_cache else
+                             [f'{video_input}trim=start_frame={first_source}:end_frame={end_source}','reverse',clock_filter])
+                    if speed_segments:
+                        setpts = _speed_curve_setpts(speed_segments, 0.,
+                            source_expression=f'(({reverse_clock})*TB)',
+                            timeline_clock_ticks=int(timeline_origin))
+                    else:
+                        setpts = 'setpts=' + _expr_arg(f'({reverse_clock})/{speed:.8f}+{int(timeline_origin)}')
+                    clock_metadata.update(source_clock_anchor='reversed-native-source-intervals',
+                        source_prefix_preserved_for_covering_frame=True, reverse_frame_intervals=reverse_metadata)
+                elif not nested_maps and not inline_surface and not bool(clip.get('reverse')):
                     # Keep the frame covering a fractional source in-point.
                     # trim(start=...) followed by PTS-STARTPTS discards it
                     # and restarts the clock at the next decoded frame.
@@ -4296,8 +4336,10 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 })
                 input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "input": None if inline_surface else source_index, "kind": "video", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
                 input_meta[-1]['video_frame_clock'] = clock_metadata
+                if reverse_cache_job:
+                    input_meta[-1]['reverse_cache']=reverse_cache_job
                 if alpha_decoder:
-                    input_meta[-1]['decoder'] = {'name': alpha_decoder, 'reason': 'webm-alpha-mode'}
+                    input_meta[-1]['decoder'] = {'name': 'ffv1' if reverse_cache_job else alpha_decoder, 'reason': 'lossless-reverse-cache' if reverse_cache_job else 'webm-alpha-mode'}
                 if inline_surface:
                     input_meta[-1]['inline_sequence_id'] = inline_surface['sequence_id']
                 if subtitle:
@@ -4749,6 +4791,8 @@ def render_project(
         if cancel_file is not None and cancel_file.exists():
             raise AppError("CANCELLED", "任务在启动前已被取消", exit_code=8, path=str(cancel_file), retryable=False)
         plan['acceleration'] = acceleration.evidence
+        from .reverse_cache import materialize as materialize_reverse, verify_materialized as verify_reverse
+        reverse_jobs=materialize_reverse(root,input_meta,temp_dir,cancel_file=cancel_file)
         acceleration.prepare(inputs, input_meta, effective_project, temp_dir, _output_color_args(effective_project['settings']))
         def check_acceleration_inputs():
             if render_fingerprints(project, sequence, effective_project['settings'], root) != fingerprints:
@@ -4776,6 +4820,9 @@ def render_project(
             check_acceleration_inputs()
             acceleration.evidence.update(status='verified_pending_publish', quality=quality, output_probe=inspected)
             acceleration.save()
+        if reverse_jobs:
+            verify_reverse(root,reverse_jobs,cancel_file=cancel_file)
+            check_acceleration_inputs()
         try:
             os.replace(temp_output, output)
         except OSError as exc:

@@ -1,0 +1,365 @@
+"""Bind V82 evidence, maintain docs and publish only after the frozen suite passes."""
+from __future__ import annotations
+import argparse
+from datetime import datetime,timezone
+import importlib.util
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+import time
+from PIL import Image
+from run_frozen_regression import frozen
+from publish_curve_clock import sha,git,read,save,staged_rows
+
+ROOT=Path(__file__).resolve().parents[1]
+MAIN=Path('E:/dev/sandbox/AI广告剪辑')
+BASE_COMMIT='5c77f58149252df1f1bbbdf0c7bd652b3b6235cd'
+REL='docs/validation/evidence/vfr-reverse-chunks-20261021-v82'
+HISTORY='docs/validation/evidence/vfr-reverse-20261021-lab'
+ASSETS='docs/assets/vfr-reverse-chunks-20261021-v82'
+REPORT='docs/validation/原生分块倒放与离线缓存实测_2026-10-21.md'
+CONTRACT='docs/specs/原生分块倒放缓存契约_v0.1_2026-10-21.md'
+SKILLS=('video-cut-agent-editor','video-cut-timeline','video-cut-quality','video-cut-project-ops')
+SCRIPTS=('seed_reverse_chunks','probe_reverse_chunks','probe_reverse_orientation','smoke_reverse_chunks',
+    'smoke_reverse_video_clock','verify_reverse_video_clock_install','record_reverse_prototype',
+    'prepare_reverse_release','verify_reverse_chunks_install','finalize_reverse_chunks')
+HISTORICAL_DOCS=('docs/specs/原生倒放帧区间与缓冲配额契约_原型_2026-10-21.md',
+    'docs/validation/原生VFR倒放帧区间原型实测_2026-10-21.md')
+DOCUMENTS={'README.md','docs/README.md',REPORT,CONTRACT,*HISTORICAL_DOCS,
+    *('skills/'+name+'/SKILL.md' for name in SKILLS)}
+CORE=DOCUMENTS|{'.gitattributes',*('scripts/'+name+'.py' for name in SCRIPTS),
+    *('product/src/ai_ad_editor/'+name+'.py' for name in ('cli','render','preview','capabilities','reverse_video_clock','reverse_cache')),
+    *('product/tests/'+name+'.py' for name in ('test_reverse_video_clock','test_reverse_video_budget','test_reverse_cache','test_reverse_cache_render','test_reverse_cache_ops'))}
+PREFIXES=(REL+'/',HISTORY+'/',ASSETS+'/','docs/assets/vfr-reverse-20261021-lab/')
+DYNAMIC={REL+'/'+name for name in ('full-r1.json','full-r1.source.json','full-r1.source.log','full-r1.log')}
+
+def utc():return datetime.now(timezone.utc).isoformat()
+
+def text(path,value):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(value.rstrip()+'\n',encoding='utf8',newline='\n')
+
+def block(path,value,marker):
+    value=f'<!-- {marker} -->\n{value.rstrip()}\n<!-- /{marker} -->'
+    current=path.read_text(encoding='utf8')
+    if '<!-- '+marker+' -->' in current:
+        current=re.sub(re.escape('<!-- '+marker+' -->')+'.*?'+re.escape('<!-- /'+marker+' -->'),lambda _:value,current,flags=re.S)
+    else:
+        end=current.index('\n---',3)+4 if current.startswith('---\n') else current.index('\n')
+        current=current[:end]+'\n\n'+value+'\n\n'+current[end:].lstrip('\n')
+    text(path,current)
+
+def inputs():
+    current=frozen();assert len(current)==249
+    return current
+
+def documents(final=False):
+    current=inputs();base=ROOT/REL
+    native=read(base/'native-r4/verification.json');installed=read(base/'installed-r1/verification.json')
+    full=read(base/'full-r1.json');assert native['status']=='succeeded' and installed['status']=='passed'
+    assert native['frozen_before']==native['frozen_after']==installed['frozen_before']==installed['frozen_after']==current
+    if final:
+        assert full['status']=='passed' and full['methods']==1888 and full['skipped']==0 and full['frozen_equal']
+        full_text=f"完整原生回归 **1888 项、{full['suite_seconds']:.3f} 秒、0 跳过**，249 产品输入与 8 外部夹具保持一致（本轮限定验收）"
+    else:
+        assert full['status']=='running'
+        full_text='完整原生回归正在运行；预计 1888 项，尚未标记通过或发布'
+    for name in SKILLS:
+        destination=ROOT/'skills'/name/'SKILL.md'
+        if not destination.exists():destination.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(MAIN/'skills'/name/'SKILL.md',destination)
+        shared=(f'For ordinary native-video reverse, read the [V82 chunk/clock contract](../../{CONTRACT})\n'
+            f'and [actual native/isolated evidence](../../{REPORT}). Preserve original VFR display intervals\n'
+            'and fractional source bounds. Normal `render`/`preview` automatically prepare FFV1 native-format\n'
+            'chunks when the shared selected-frame estimate exceeds 256 MiB. Cache 25 Hz is a frame\n'
+            'counter; source intervals are reapplied. Chunk decode counters exclude the full-source\n'
+            'index probe that still runs on cache hits. Raster estimates are not process RSS guarantees.\n')
+        if name=='video-cut-project-ops':
+            shared+='Use `cache list --project P` and `cache prune --project P --key KEY --dry-run` for derived reverse files.\nCurrent project references are protected. Keep corrupt entries for diagnosis until explicit cleanup;\nsource/runtime/path changes require rebuilding. Transfer author recipes; derived cache paths are not portable.\n'
+        elif name=='video-cut-quality':
+            shared+='Compare every lossless reference frame and encoded PTS; preserve native alpha/bit-plane evidence.\nThe 4K fixture selects eight frames (0.32 s). Encoded MP4/GIF is lossy; its observed RGB error\nis separate from zero-error native planes and lossless previews. It establishes no long-clip, HDR,\nnatural-footage, reverse-audio or general nested-VFR acceptance.\n'
+        else:
+            shared+='Inspect cache plans and final revalidation in render manifests. The conservative 128 GiB disk\nreservation can reject about 20 s of 4K/25 Hz even for compressible content; see the contract.\nGeneral nested VFR, long-duration performance, reverse audio, natural/HDR quality and full CapCut parity remain unaccepted.\n'
+        block(destination,shared,'V82-REVERSE-CHUNKS')
+        value=destination.read_text(encoding='utf8')
+        value=value.replace('denominator limit and unaccepted VFR reverse/source-in-plus-reverse cases.',
+            'denominator limit. Ordinary native reverse follows V82; general nested VFR remains unaccepted.')
+        value=value.replace('Known CFR-01: fractional FPS with non-frame-aligned clip boundaries can lose trailing coverage even without curves; verify actual visibility and do not claim that scenario accepted or silently snap author time.',
+            'CFR-01 is covered by the V81 rational-clock contract; preserve author ticks and verify actual display boundaries.')
+        text(destination,value)
+    index=ROOT/'docs/README.md'
+    if not index.exists():shutil.copyfile(MAIN/'docs/README.md',index)
+    block(index,f'2026-10-21 V82 原生倒放区间、分块缓存与显式清理：{full_text}。\n\n'
+        '[契约](specs/'+Path(CONTRACT).name+') · [实测与失败记录](validation/'+Path(REPORT).name+') · '
+        '[实际输出 GIF](assets/vfr-reverse-chunks-20261021-v82/native-r4/reverse.gif)。','V82-REVERSE-CHUNKS')
+    table=f'''| 编号 | 当轮核验 | 结果与边界 | 证据 |
+|---|---|---|---|
+| V82-01 | 倒放区间、原生分块、渲染/预览与清理 | 50 项通过、0 跳过；含 H.264 GOP/B 帧、10-bit 低位、VP9 alpha、8 方向组合、事务/取消/篡改拒绝和引用保护。249 输入逐字节映射到发布候选 | [专项]({REL}/integration-r3.json) · [基线映射]({REL}/published-base-alignment-r1.json) |
+| V82-02 | 相邻功能 | 嵌套 63、时钟 14、预览 22 项通过，0 跳过；与 50 专项合为 149 个不同方法，属于完整回归子集 | [嵌套]({REL}/nested-r1.json) · [时钟]({REL}/clock-r1.json) · [预览]({REL}/preview-r1.json) |
+| V82-03 | 公开 CLI 与 4K 原生媒体 | 13 CLI /22 原生命令 /16 检查；选中 8 帧、0.32 秒，默认 4×2 帧块；原生全部 RGBA 哈希相同，128×72 无损预览整帧误差 0；4K 编码 PTS/身份、缓存复用、清理重建通过 | [收据]({REL}/native-r4/verification.json) · [原视频]({ASSETS}/native-r4/source-review.mp4) · [实际输出]({ASSETS}/native-r4/reverse-review.mp4) |
+| V82-04 | 离线隔离安装 | 159 资源 /7 现有 wheels，16 隔离 CLI＋1 模块来源探针；8 个模块均来自安装目录；同一 4K 样例输出与开发一致 | [安装收据]({REL}/installed-r1/verification.json) |
+| V82-05 | 完整回归 | {full_text} | [完整收据]({REL}/full-r1.json) |
+| V82-06 | 保留失败与未验收 | 初始 FFmpeg 参数、镜像开关、格式边界夹具及二次有损编码色差断言失败均保留；未验收长片吞吐/总 RSS、HDR、自然质量、倒放音频或一般嵌套 VFR；剪映整体等价仍未达成 | [实测报告]({REPORT}) · [契约]({CONTRACT}) |'''
+    block(ROOT/'README.md',f'''2026-10-21 **V82（原生倒放区间＋顺序无损分块）**：{full_text}。普通叶视频保留 VFR 持帧时长及小数源区间；超出共享帧栅格估算时自动生成 FFV1 缓存。缓存命中仍建立源帧索引，256 MiB 是帧栅格估算，128 GiB 保守磁盘预约也限制可处理时长；不代表长片或进程峰值已验收。
+
+{table}
+
+| 原输入的实际编码预览（选中前 8 帧） | 实际倒放成片的编码预览 |
+|---|---|
+| ![原创 4K 素材]({ASSETS}/native-r4/source.gif) | ![真实倒放结果]({ASSETS}/native-r4/reverse.gif) |
+
+以上 GIF 均由实际 MP4 解码生成，8 帧 /320 ms；公开素材是脚本生成的 CC0 几何画面。二次有损编码的背景 RGB 最大观察误差为 4，与原生平面/无损预览的零误差分开记录；已查看 8 帧静态总览，未连续播放或听音。''','V82-REVERSE-CHUNKS')
+    report=f'''# 原生分块倒放与离线缓存实测（2026-10-21）
+
+{full_text}。本次从已发布 V81 /`5c77f58` 建立独立候选，新增 2 个模块、5 个测试文件，修改 CLI、渲染、预览和能力清单，冻结 249 产品输入。
+
+## 功能核验
+
+{table.replace(']('+REL+'/','](evidence/vfr-reverse-chunks-20261021-v82/').replace(']('+ASSETS+'/','](../assets/vfr-reverse-chunks-20261021-v82/').replace(']('+REPORT+')',']('+Path(REPORT).name+')').replace(']('+CONTRACT+')','](../specs/'+Path(CONTRACT).name+')')}
+
+50 项专项在先前原生候选路径执行；[映射收据](evidence/vfr-reverse-chunks-20261021-v82/published-base-alignment-r1.json)逐字节验证其 249 产品输入与发布候选相同，基线只变更 4 个既有文件并增加 7 个输入。63/14/22 项和真实 4K/安装核验在发布候选执行。上述 149 方法不与完整回归重复相加。
+
+## 原始媒体与实际输出
+
+原始 FFV1/NUT 为 3840×2160、25 fps、9 帧；本次请求 `[0,0.32)`，倒放选中前 8 帧。第 9 帧提供合法的格式时长边界，没有篡改导入媒体登记时长。默认估算把 8 帧分成 4 个块，每块 2 帧。
+
+原生缓存解码逐帧 SHA-256 与独立 Pillow 生成的 RGBA 像素哈希倒序一致。独立直接缩小的正向源帧再倒序，与实际完整作者图的 128×72 无损预览全部 294,912 字节相同，最大 RGBA 误差 0。4K MP4 的全部 8 个 PTS 为 `0,1/25,...,7/25`；二次有损预览按独立源色的最近身份判定顺序 `[7,6,5,4,3,2,1,0]`，背景最大观察 RGB 误差 4。
+
+无损预览共同 SHA-256 为 `{native['preview_reference']['actual_sha256']}`。重建测试实际删除所选缓存，再由公开预览命令恢复；原生缓存文件摘要保持一致。16 检查的 13 次 CLI 调用属于 22 个原生命令的一部分，不重复相加。隔离安装的 16 次 CLI 包含 13 次样例调用和 3 次发现命令，另有 1 次模块来源进程。
+
+[原创源 MP4](../assets/vfr-reverse-chunks-20261021-v82/native-r4/source-review.mp4) · [实际输出 MP4](../assets/vfr-reverse-chunks-20261021-v82/native-r4/reverse-review.mp4) · [原始 4K NUT](../assets/vfr-reverse-chunks-20261021-v82/native-r4/source-4k.nut) · [实际输出 GIF](../assets/vfr-reverse-chunks-20261021-v82/native-r4/reverse.gif) · [真实输出 8 帧总览](../assets/vfr-reverse-chunks-20261021-v82/native-r4/reverse-order.png)。
+
+GIF 从实际编码 MP4 解码后生成，8 帧、25 fps、320 ms；使用 Pillow 量化，不能用来判断无损色彩保真。实际核验是编码前后数据、PTS 与独立像素参考；仅抽帧静态目检，未连续播放、未听音、无新模型推理。素材是原创几何图形，CC0 归属与生成器见 [rights.json](../assets/vfr-reverse-chunks-20261021-v82/native-r4/rights.json)。
+
+## 失败记录
+
+1. [chunks-r1](evidence/vfr-reverse-chunks-20261021-v82/chunks-r1.json)：15 方法中 1 FAIL/8 ERROR；FFmpeg 不接受固定 `-r` 搭配 passthrough。旧代码和实际命令保留；改为缓存专用固定编号时钟后 15/15 通过，未把 25 Hz 当成原 VFR 时间。
+2. [integration-r1](evidence/vfr-reverse-chunks-20261021-v82/integration-r1.json)：36 方法、8 个方向子例失败，镜像布尔开关错误传入位置值；同时发现 FFmpeg 8 的显示矩阵字段命名空间。修正夹具、真实输入参数与字段解析后，8 方向与直接读取结果逐帧相同；36 项及后续 50 项均保留各自指纹。
+3. [native-r1](evidence/vfr-reverse-chunks-20261021-v82/native-r1/verification.json)：8 帧 NUT 的格式时长止于末帧 PTS，源区间超过登记边界而被正确拒绝。之后生成 9 帧源并选择前 8 帧，保持真实格式边界。native-r2 的缓存检查通过；其中 GIF 是原始像素的预期演示，不能当成成片实录。
+4. [native-r3](evidence/vfr-reverse-chunks-20261021-v82/native-r3/verification.json)：二次有损编码误差 4，超过先设阈值 3。保留原失败；[独立诊断](evidence/vfr-reverse-chunks-20261021-v82/native-r3/delivery-oracle-diagnosis-r1.json)确认无损整帧参考误差 0。最终 native-r4 增加独立整帧字节比较，编码身份检查与观察色差分别记录。
+
+更早的 VFR 原型反例见[历史记录](原生VFR倒放帧区间原型实测_2026-10-21.md)，属于不同冻结版本；不追加为本轮通过数。
+
+## 限制与复现
+
+分块估算不是总 RSS；未测长片延迟或真实峰值内存。128 GiB 的双份 16 字节/像素保守预约可在约 20 秒的 4K/25 fps 选区触达上限；实际很可压缩的画面也可能被先拒绝。缓存命中仍解码建立完整源帧索引；回执中的 `new_source_decodes=0` 仅针对缓存准备，不代表整个渲染流程。10-bit/alpha 的中间平面保真也不代表最终 HDR 或自然素材质量已验收。
+
+开发复现使用 `scripts/smoke_reverse_chunks.py --work <项目内运行目录> --evidence <docs内新目录> --assets <docs/assets内新目录>`。隔离复现使用 `scripts/verify_reverse_chunks_install.py` 与现有本地 wheelhouse。每次要求新输出路径，保留失败，不下载依赖；所有运行均为原生 Windows，未使用 Docker、WSL、虚拟环境或网络请求。详细 CLI、预算和不支持条件见[契约](../specs/{Path(CONTRACT).name})。
+'''
+    text(ROOT/REPORT,report)
+    for name in HISTORICAL_DOCS:
+        block(ROOT/name,'本文保留旧原型的证据与限制；本轮候选与对应源码见[分块倒放实测]('
+            +('../validation/' if '/specs/' in name else '')+Path(REPORT).name+')。不同源码指纹的计数不合并。','V82-HISTORICAL-BOUNDARY')
+    attributes=(ROOT/'.gitattributes').read_text(encoding='utf8')
+    if '# V82 reverse evidence' not in attributes:
+        text(ROOT/'.gitattributes',attributes+'\n# V82 reverse evidence preserves exact native bytes.\n'
+            +HISTORY+'/** -text -whitespace\n'+REL+'/** -text -whitespace\n'
+            +'\n'.join('scripts/'+name+'.py -text whitespace=cr-at-eol' for name in SCRIPTS)+'\n')
+    receipt=base/('documents-final-r1.json' if final else 'documents-r1.json');assert not receipt.exists()
+    save(receipt,{'status':'passed','final':final,'frozen_inputs':current,'frozen_equal':current==inputs(),
+        'documents':{name:sha(ROOT/name) for name in sorted(DOCUMENTS)},'gallery_from_actual_encoded_media':True,
+        'continuous_playback_reviewed':False,'audio_reviewed':False,'full_status':full['status']})
+
+def audit(output,final=False):
+    assert not output.exists();current=inputs();base=ROOT/REL;methods=set();checks=[]
+    for name,count in (('integration-r3',50),('nested-r1',63),('clock-r1',14),('preview-r1',22)):
+        receipt=read(base/(name+'.json'))
+        assert receipt['exit_code']==0 and receipt['terminal_ok'] and receipt['methods']==count and receipt['skipped']==0
+        assert receipt['frozen_before']==receipt['frozen_after']==current
+        identities=set(re.findall(r'^test\S+ \(([^)]+)\) \.\.\.',(base/(name+'.log')).read_text(encoding='utf8'),flags=re.M))
+        assert len(identities)==count and not methods&identities,(name,len(identities))
+        methods|=identities
+    assert len(methods)==149
+    alignment=read(base/'published-base-alignment-r1.json')
+    assert alignment['status']=='passed' and alignment['source_inputs']==alignment['target_inputs']==current
+    assert alignment['git_base']==BASE_COMMIT and len(alignment['published_base_inputs'])==242
+    native=read(base/'native-r4/verification.json');install=read(base/'installed-r1/verification.json')
+    media=read(base/'installed-r1/media/verification.json');media_files={}
+    assert install['status']=='passed' and install['isolated_cli_calls']==16 and install['module_origin_probes']==1
+    assert install['frozen_before']==install['frozen_after']==current and all(c['ok'] for c in install['checks'])
+    for result in (native,media):
+        assert result['status']=='succeeded' and result['cli_calls']==13 and len(result['calls'])==22 and len(result['checks'])==16
+        assert all(c['ok'] for c in result['checks']) and all(c['exit_code']==0 for c in result['calls'])
+        assert result['frozen_before']==result['frozen_after']==current
+        assert len(result['source_frame_hashes'])==9 and result['cache_frame_hashes']==result['source_frame_hashes'][:8][::-1]
+        assert result['preview_reference']['bytes']==294912 and result['preview_reference']['max_RGBA_error']==0
+        assert result['preview_reference']['expected_sha256']==result['preview_reference']['actual_sha256']
+        assert not result['long_duration_latency_accepted'] and not result['natural_quality_accepted']
+        assert not result['HDR_accepted'] and not result['full_capcut_parity']
+        for name,row in result['media'].items():
+            path=ROOT/name;assert path.is_file() and path.stat().st_size==row['bytes'] and sha(path)==row['sha256'],name
+            media_files[name]=row
+    assert native['source_frame_hashes']==media['source_frame_hashes'] and native['cache_frame_hashes']==media['cache_frame_hashes']
+    resources={p.name:sha(p) for p in (ROOT/'product/src/ai_ad_editor').iterdir()
+        if p.is_file() and p.suffix in {'.py','.mjs','.json','.txt','.c','.dll'}}
+    assert len(resources)==159 and resources==install['resource_hashes']
+    gifs={}
+    for folder in ('native-r4','installed-r1'):
+        for name in ('source.gif','reverse.gif'):
+            path=ROOT/ASSETS/folder/name
+            with Image.open(path) as image:
+                durations=[]
+                for n in range(image.n_frames):image.seek(n);durations.append(image.info['duration'])
+                assert len(durations)==8 and durations==[40]*8
+            gifs[path.relative_to(ROOT).as_posix()]={'frames':8,'duration_ms':320,'fps':25,'sha256':sha(path)}
+    local=[]
+    for name in sorted(DOCUMENTS):
+        path=ROOT/name;value=path.read_text(encoding='utf8')
+        if name not in {REPORT,CONTRACT}:
+            marker='V82-HISTORICAL-BOUNDARY' if name in HISTORICAL_DOCS else 'V82-REVERSE-CHUNKS'
+            value=re.search(re.escape('<!-- '+marker+' -->')+'(.*?)'+re.escape('<!-- /'+marker+' -->'),value,re.S).group(1)
+        for token in re.findall(r'!?\[[^\]]*\]\(([^)\n]+)\)',value):
+            target=token.strip('<>').split('#',1)[0]
+            if not target or re.match(r'^[a-zA-Z][\w+.-]*:',target):continue
+            resolved=(path.parent/target).resolve();assert resolved.is_relative_to(ROOT),token
+            relative=resolved.relative_to(ROOT)
+            assert resolved.exists() or (MAIN/relative).exists(),(name,token)
+            local.append({'document':name,'target':relative.as_posix()})
+    validator=Path('C:/Users/carzy/.codex/skills/.system/skill-creator/scripts/quick_validate.py')
+    for name in SKILLS:
+        result=subprocess.run([sys.executable,'-E','-B','-X','utf8',str(validator),str(ROOT/'skills'/name)],capture_output=True,timeout=60)
+        checks.append({'skill':name,'exit_code':result.returncode,'stdout':result.stdout.decode('utf8','replace'),
+            'stderr':result.stderr.decode('utf8','replace')});assert result.returncode==0,name
+    full=read(base/'full-r1.json');source=read(base/'full-r1.source.json')
+    assert source['frozen_before']==current and full['status'] in {'running','passed'}
+    if final:
+        assert full['status']=='passed' and full['methods']==1888 and full['skipped']==0 and full['terminal_ok']
+        assert full['frozen_before']==full['frozen_after']==current and source['frozen_after']==current
+        assert full['external_fixture_count']==8 and full['external_fixtures_equal']
+        assert full['external_fixture_manifest_unchanged'] and full['verification_scripts_equal']
+    assert inputs()==current
+    save(output,{'status':'passed-final-audit' if final else 'passed-candidate-audit','final':final,
+        'frozen_inputs':current,'frozen_equal':True,'distinct_targeted_methods':sorted(methods),
+        'targeted_methods':149,'full_status':full['status'],'full_methods':full.get('methods'),
+        'resources':resources,'media':media_files,'GIF':gifs,'local_links':local,'skills':checks,
+        'documents':{name:sha(ROOT/name) for name in sorted(DOCUMENTS)},
+        'continuous_playback_reviewed':False,'audio_reviewed':False,'natural_quality_accepted':False,
+        'HDR_accepted':False,'full_capcut_parity':False})
+
+def reviewed():
+    names=set(CORE)
+    for prefix in PREFIXES:
+        names.update(p.relative_to(ROOT).as_posix() for p in (ROOT/prefix).rglob('*') if p.is_file())
+    names-=DYNAMIC
+    for name in names:
+        path=ROOT/name;assert path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(ROOT),name
+    return {name:sha(ROOT/name) for name in sorted(names)}
+
+def main_preflight(paths):
+    assert git(MAIN,'branch','--show-current').decode().strip()=='main'
+    assert git(MAIN,'rev-parse','HEAD').decode().strip()==BASE_COMMIT
+    assert git(MAIN,'remote','get-url','origin').decode().strip()=='git@github.com:Tonscriptions/agent-video-kit.git'
+    assert not git(MAIN,'status','--porcelain','-z'),'Main has changes; preserve them for reviewed integration'
+    tracked={name.decode('utf8') for name in git(MAIN,'ls-files','-z').split(b'\0') if name}
+    for name in paths:
+        target=MAIN/name;assert target.resolve().is_relative_to(MAIN) and not target.is_symlink()
+        assert name in tracked or not target.exists(),'Refuse existing untracked destination: '+name
+
+def publish(work,wait_seconds,preflight_only=False):
+    assert not work.exists() and work.is_relative_to(ROOT/'product/.runtime');work.mkdir(parents=True)
+    state={'status':'checking','started_at_utc':utc(),'calls':[],'base_commit':BASE_COMMIT}
+    def checkpoint():state['updated_at_utc']=utc();save(work/'run.json',state)
+    def run(label,command,cwd=ROOT):
+        command=list(map(str,command));result=subprocess.run(command,cwd=cwd,capture_output=True,timeout=1200)
+        for stream in ('stdout','stderr'):(work/(label+'.'+stream+'.log')).write_bytes(getattr(result,stream))
+        state['calls'].append({'label':label,'command':command,'exit_code':result.returncode});checkpoint()
+        assert result.returncode==0,label+'; original logs retained'
+    try:
+        current=inputs();candidate=read(ROOT/REL/'release-candidate-r1.json')
+        assert candidate['status']=='passed-candidate-audit' and candidate['frozen_inputs']==current
+        initial=reviewed();main_preflight(set(initial)|DYNAMIC)
+        state.update(status='passed-preflight',reviewed_before_wait=initial,frozen_inputs=current);checkpoint()
+        if preflight_only:return
+        deadline=time.monotonic()+wait_seconds
+        while True:
+            full=read(ROOT/REL/'full-r1.json')
+            if full['status']=='passed':break
+            assert full['status']=='running','Frozen complete regression failed; no main files copied'
+            assert time.monotonic()<deadline,'Regression still pending; no main files copied'
+            state['status']='waiting-for-existing-full-regression';checkpoint();time.sleep(15)
+        assert reviewed()==initial,'Reviewed candidate changed while waiting'
+        documents(final=True);audit(ROOT/REL/'release-final-r1.json',final=True)
+        final=reviewed()
+        for name,digest in initial.items():assert name in DOCUMENTS or final[name]==digest,name
+        for name in DYNAMIC:
+            path=ROOT/name
+            if path.exists():final[name]=sha(path)
+        main_preflight(final)
+        spec=importlib.util.spec_from_file_location('v82_main_freeze',MAIN/'scripts/run_frozen_regression.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        before=module.frozen();assert before==read(ROOT/REL/'published-base-alignment-r1.json')['published_base_inputs']
+        state.update(status='copying-reviewed-candidate',reviewed_final=final,main_frozen_before=before);checkpoint()
+        for name,digest in final.items():
+            target=MAIN/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/name,target)
+            assert sha(target)==digest,name
+        assert module.frozen()==current
+        for name,row in full['external_fixtures_expected'].items():
+            assert (MAIN/name).stat().st_size==row['bytes'] and sha(MAIN/name)==row['sha256'],name
+        run('main-skills',[sys.executable,'-E','-B','-X','utf8',MAIN/'scripts/audit_source_edit_skills.py',
+            '--expected-count','17','--output',MAIN/REL/'skills-r1.json'],cwd=MAIN)
+        skills=read(MAIN/REL/'skills-r1.json');mapping_path=MAIN/'video-cut-install-manifest.json';mapping=read(mapping_path)
+        previous=mapping['current_audit'];history=mapping.setdefault('audit_history',[])
+        if previous not in history:history.append(previous)
+        for entry in mapping['skills']:
+            row=next(item for item in skills['results'] if item['skill']==entry['name']);old=entry['skill_md_sha256'];new=row['sha256'][7:]
+            if old!=new:
+                entry.setdefault('skill_md_sha256_history',[]).append(old);entry['previous_manifest_skill_md_sha256']=old
+            entry.update(skill_md_sha256=new,validation=row['validator_stdout'],prefix_verified=True,registration_verified=True)
+            assert Path(entry['canonical_directory']).resolve()==(MAIN/'skills'/entry['name']).resolve()
+        mapping['current_audit']={'date':'2026-10-21','skill_count':17,'local_links_checked':skills['local_links_checked'],
+            'record':REL+'/skills-r1.json','record_sha256':sha(MAIN/REL/'skills-r1.json'),'previous_hashes_preserved':True,
+            'semantics':'V82 native reverse intervals and sequential lossless chunks; 4K eight-frame proof; no long-clip latency/RSS, HDR, natural quality, nested VFR or full CapCut parity acceptance'}
+        save(mapping_path,mapping)
+        run('main-audit',[sys.executable,'-E','-B','-X','utf8',MAIN/'scripts/finalize_reverse_chunks.py',
+            '--audit-only','--final','--output',MAIN/REL/'release-main-r1.json'],cwd=MAIN)
+        save(MAIN/REL/'publication-copy-r1.json',{'status':'passed-copy-and-main-audit','source':str(ROOT),
+            'base_commit':BASE_COMMIT,'copied_files':final,'frozen_inputs':current,'frozen_equal':True,
+            'full_regression_sha256':sha(MAIN/REL/'full-r1.json'),'generator_sha256':sha(Path(__file__))})
+        changed={p.decode('utf8') for p in git(MAIN,'diff','--name-only','-z').split(b'\0') if p}
+        changed.update(p.decode('utf8') for p in git(MAIN,'ls-files','--others','--exclude-standard','-z').split(b'\0') if p)
+        allowed=set(final)|{'video-cut-install-manifest.json',REL+'/skills-r1.json',REL+'/release-main-r1.json',REL+'/publication-copy-r1.json'}
+        assert changed<=allowed,sorted(changed-allowed)
+        paths=work/'stage-paths.nul';paths.write_bytes(b'\0'.join(name.encode('utf8') for name in sorted(changed))+b'\0')
+        git(MAIN,'add','--pathspec-from-file='+str(paths),'--pathspec-file-nul')
+        git(MAIN,'add','--renormalize','--pathspec-from-file='+str(paths),'--pathspec-file-nul')
+        staged={p.decode('utf8') for p in git(MAIN,'diff','--cached','--name-only','-z').split(b'\0') if p}
+        assert staged==changed and not git(MAIN,'diff','--name-only')
+        git(MAIN,'diff','--cached','--check')
+        expected={name:sha(MAIN/name) for name in changed};rows=staged_rows({**expected,**current})
+        staged_proof=MAIN/REL/'staged-r1.json'
+        save(staged_proof,{'status':'passed','base_commit':BASE_COMMIT,'index_tree_before_this_receipt':git(MAIN,'write-tree').decode().strip(),
+            'changed_files':len(changed),'frozen_files':249,'compared_blobs':len(rows),'files':rows,
+            'all_staged_bytes_equal_workspace':True,'all_frozen_bytes_equal_staged':True,'diff_check':'passed','stream_buffer_bytes':65536,
+            'regression_sha256':sha(MAIN/REL/'full-r1.json'),'generator_sha256':sha(Path(__file__))})
+        git(MAIN,'add','--',REL+'/staged-r1.json');staged_rows({REL+'/staged-r1.json':sha(staged_proof)})
+        assert module.frozen()==current and not git(MAIN,'diff','--name-only')
+        git(MAIN,'diff','--cached','--check');state.update(status='passed-staged-byte-audit',staged_files=len(changed)+1);checkpoint()
+        git(MAIN,'commit','--quiet','-m','feat: preserve native reverse intervals with lossless frame chunks')
+        commit=git(MAIN,'rev-parse','HEAD').decode().strip();assert git(MAIN,'rev-parse','HEAD^').decode().strip()==BASE_COMMIT
+        state.update(status='committed-awaiting-ordinary-push',commit=commit);checkpoint()
+        git(MAIN,'push','origin','main');remote=git(MAIN,'ls-remote','origin','refs/heads/main').decode().split()[0]
+        assert remote==commit and not git(MAIN,'status','--porcelain','-z') and module.frozen()==current
+        state.update(status='published',remote_main=remote,main_clean=True,full_methods=1888,full_seconds=full['suite_seconds'])
+    except BaseException as error:state.update(status='failed',error={'type':type(error).__name__,'message':str(error)});raise
+    finally:checkpoint();print(json.dumps({k:state.get(k) for k in ('status','commit','remote_main','error')},ensure_ascii=False),flush=True)
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--prepare',action='store_true');parser.add_argument('--audit-only',action='store_true')
+    parser.add_argument('--final',action='store_true');parser.add_argument('--output',type=Path)
+    parser.add_argument('--publish',action='store_true');parser.add_argument('--preflight-only',action='store_true')
+    parser.add_argument('--work',type=Path);parser.add_argument('--wait-seconds',type=int,default=10800)
+    args=parser.parse_args();assert sum((args.prepare,args.audit_only,args.publish))==1
+    if args.prepare:
+        documents(final=args.final);audit(ROOT/REL/'release-candidate-r1.json',final=args.final)
+        print(json.dumps({'status':'passed-candidate-audit','frozen_inputs':249,'targeted_methods':149,'full_status':read(ROOT/REL/'full-r1.json')['status']}))
+    elif args.audit_only:
+        assert args.output and args.output.resolve().is_relative_to(ROOT/'docs');audit(args.output.resolve(),final=args.final)
+        print(json.dumps({'status':'passed-final-audit' if args.final else 'passed-candidate-audit'}))
+    else:
+        assert args.work;publish(args.work.resolve(),args.wait_seconds,args.preflight_only)
+
+if __name__=='__main__':main()
+
