@@ -1,0 +1,56 @@
+{
+  "status": "passed-four-unregistered-drafts",
+  "registered": false,
+  "new_block_marker": "NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021",
+  "skills": {
+    "video-cut-agent-editor": {
+      "path": "skills/video-cut-agent-editor/SKILL.md",
+      "sha256": "sha256:964870c46d7384fc2a628e325c1f0138f4e181030fbe54c2565e73d654a285d2",
+      "parent_sha256": "sha256:c074e980d9be34709fe1cf7e07bfaf2fb2ee2dd4407bd9e0653e3827c701b889",
+      "parent_snapshot": "docs/validation/evidence/audio-source-origin-20261021-lab/skill-parent-snapshots-r1/video-cut-agent-editor.md",
+      "new_block": "<!-- NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->\nWhen media.source_audio_clock advertises demux-relative-first-audio-pts-v1, retain source-leading silence before selecting, reversing or retiming audio. Keep the master audio track explicit.\nThe native PCM acceptance uses demux-relative input timestamps with aresample first_pts=0 before source selection. Async clock-drift correction is disabled. Zero-origin audio and equal nonzero container/audio origins must not gain false silence.\nRead the [source audio clock contract](../../docs/specs/原生音频起点与作者采样时钟_实验_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生音频起点与同步独立实验_2026-10-21.md).\nThe real two-case sample covers container origins 0/5 seconds and audio starts 1/6 seconds, each a one-second relative gap. Source-normalized audio and offset-applied camera cuts are checked separately. R3 input/output frame and silence controls do not establish listening, pitch or stereo-phase quality.\nCompressed-codec priming, negative timestamps/edit lists, internal timestamp discontinuities, device drift, natural recordings, long-form/RSS, continuous playback and listening still need acceptance.\nSeven base offline wheels do not include NumPy; isolated evidence uses an explicit readonly RECORD/license-verified copy of existing local NumPy 2.4.2. Do not treat that copy as automatic dependency installation.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    },
+    "video-cut-timeline": {
+      "path": "skills/video-cut-timeline/SKILL.md",
+      "sha256": "sha256:1bdf0999b140dc2ad613dc55662c795e44165c0d67c38cf914d3d0bfeb99a230",
+      "parent_sha256": "sha256:0524b8b1d4023e542340a50cd1027fa75c6c22c757fc2212a732ed3dd02c0720",
+      "parent_snapshot": "docs/validation/evidence/audio-source-origin-20261021-lab/skill-parent-snapshots-r1/video-cut-timeline.md",
+      "new_block": "<!-- NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->\nUse one source clock for scalar, reverse, speed-curve, nested and offline R3 source windows. A positive audio PTS relative to the container origin is a real source gap, not an instruction to move the content earlier.\nThe native PCM acceptance uses demux-relative input timestamps with aresample first_pts=0 before source selection. Async clock-drift correction is disabled. Zero-origin audio and equal nonzero container/audio origins must not gain false silence.\nRead the [source audio clock contract](../../docs/specs/原生音频起点与作者采样时钟_实验_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生音频起点与同步独立实验_2026-10-21.md).\nThe real two-case sample covers container origins 0/5 seconds and audio starts 1/6 seconds, each a one-second relative gap. Source-normalized audio and offset-applied camera cuts are checked separately. R3 input/output frame and silence controls do not establish listening, pitch or stereo-phase quality.\nCompressed-codec priming, negative timestamps/edit lists, internal timestamp discontinuities, device drift, natural recordings, long-form/RSS, continuous playback and listening still need acceptance.\nSeven base offline wheels do not include NumPy; isolated evidence uses an explicit readonly RECORD/license-verified copy of existing local NumPy 2.4.2. Do not treat that copy as automatic dependency installation.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    },
+    "video-cut-quality": {
+      "path": "skills/video-cut-quality/SKILL.md",
+      "sha256": "sha256:3353587f5a2a54e5c4d0c57319ad615465dbcc5f2d8de5a63d7b9e0dd59f7a34",
+      "parent_sha256": "sha256:c1e447dff0eb0c8fafe5e95e5b8448a1c460c9b6b73c4e79c92f249db785abf1",
+      "parent_snapshot": "docs/validation/evidence/audio-source-origin-20261021-lab/skill-parent-snapshots-r1/video-cut-quality.md",
+      "new_block": "<!-- NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->\nCompare the complete lossless PCM to independent leading silence plus original samples, and compare full lossless RGBA separately. MP4/AAC padding, encoded identity patches and GIFs have distinct checks and do not establish exact encoded PCM/RGBA equality.\nThe native PCM acceptance uses demux-relative input timestamps with aresample first_pts=0 before source selection. Async clock-drift correction is disabled. Zero-origin audio and equal nonzero container/audio origins must not gain false silence.\nRead the [source audio clock contract](../../docs/specs/原生音频起点与作者采样时钟_实验_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生音频起点与同步独立实验_2026-10-21.md).\nThe real two-case sample covers container origins 0/5 seconds and audio starts 1/6 seconds, each a one-second relative gap. Source-normalized audio and offset-applied camera cuts are checked separately. R3 input/output frame and silence controls do not establish listening, pitch or stereo-phase quality.\nCompressed-codec priming, negative timestamps/edit lists, internal timestamp discontinuities, device drift, natural recordings, long-form/RSS, continuous playback and listening still need acceptance.\nSeven base offline wheels do not include NumPy; isolated evidence uses an explicit readonly RECORD/license-verified copy of existing local NumPy 2.4.2. Do not treat that copy as automatic dependency installation.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    },
+    "video-cut-video-understand": {
+      "path": "skills/video-cut-video-understand/SKILL.md",
+      "sha256": "sha256:740ac03d7297c13e4bbc8fbe79877159e5d7ccadec91fd56baad142e934509ae",
+      "parent_sha256": "sha256:e253b38bb70db97654417320870ad2927912da909119324c7573878adef3efa2",
+      "parent_snapshot": "docs/validation/evidence/audio-source-origin-20261021-lab/skill-parent-snapshots-r1/video-cut-video-understand.md",
+      "new_block": "<!-- NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->\nFor multicam 0.4.0, source_time = reference_time + relative_delay_seconds includes the native audio start. The score uses overlap Pearson correlation without the unmatched first-difference boundary; it is not a probability, drift estimate or semantic shot decision.\nThe native PCM acceptance uses demux-relative input timestamps with aresample first_pts=0 before source selection. Async clock-drift correction is disabled. Zero-origin audio and equal nonzero container/audio origins must not gain false silence.\nRead the [source audio clock contract](../../docs/specs/原生音频起点与作者采样时钟_实验_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生音频起点与同步独立实验_2026-10-21.md).\nThe real two-case sample covers container origins 0/5 seconds and audio starts 1/6 seconds, each a one-second relative gap. Source-normalized audio and offset-applied camera cuts are checked separately. R3 input/output frame and silence controls do not establish listening, pitch or stereo-phase quality.\nCompressed-codec priming, negative timestamps/edit lists, internal timestamp discontinuities, device drift, natural recordings, long-form/RSS, continuous playback and listening still need acceptance.\nSeven base offline wheels do not include NumPy; isolated evidence uses an explicit readonly RECORD/license-verified copy of existing local NumPy 2.4.2. Do not treat that copy as automatic dependency installation.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    }
+  },
+  "published_snapshot_parent_commit": "2b0e96a4eae0db0f76cc9605e35a52c8b6760778",
+  "future_parent_refresh": {
+    "before": "Unknown-EOF audio-analysis controls include simulated video state. Nonzero audio stream origin, clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.",
+    "after": "Unknown-EOF audio-analysis controls include simulated video state. Native PCM source-leading gaps and nonzero container origins use the separately advertised source_audio_clock contract. Compressed priming/edit lists, clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.",
+    "require_each_actual_V87_parent": true
+  },
+  "merge_policy": "Only insert new block and the exact reviewed refresh into actual published V87 parents; do not replace full bodies with these V86 snapshots.",
+  "skill_count": 4,
+  "generator_sha256": "sha256:a6a8d2f334062aee803c9e57f64f9ce846252f60f8a6bb6c48dcc6a4b5687f60"
+}

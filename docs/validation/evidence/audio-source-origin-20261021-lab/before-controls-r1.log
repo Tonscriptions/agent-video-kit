@@ -1,0 +1,99 @@
+test_R3_receives_all_source_clock_samples_including_the_native_gap (test_audio_source_origin.AudioSourceOriginTests.test_R3_receives_all_source_clock_samples_including_the_native_gap) ... ERROR
+test_R3_wholly_leading_source_window_remains_silence (test_audio_source_origin.AudioSourceOriginTests.test_R3_wholly_leading_source_window_remains_silence) ... FAIL
+test_audio_offset_includes_the_native_delayed_stream_start (test_audio_source_origin.AudioSourceOriginTests.test_audio_offset_includes_the_native_delayed_stream_start) ... FAIL
+test_complete_explicit_audio_preserves_leading_silence_and_every_PCM_sample (test_audio_source_origin.AudioSourceOriginTests.test_complete_explicit_audio_preserves_leading_silence_and_every_PCM_sample) ... FAIL
+test_delayed_audio_uses_relative_gap_after_nonzero_container_origin (test_audio_source_origin.AudioSourceOriginTests.test_delayed_audio_uses_relative_gap_after_nonzero_container_origin) ... FAIL
+test_equal_nonzero_audio_and_container_origins_add_no_false_silence (test_audio_source_origin.AudioSourceOriginTests.test_equal_nonzero_audio_and_container_origins_add_no_false_silence) ... ok
+test_identity_speed_curve_uses_the_same_native_audio_origin (test_audio_source_origin.AudioSourceOriginTests.test_identity_speed_curve_uses_the_same_native_audio_origin) ... FAIL
+test_nested_identity_audio_uses_the_same_native_audio_origin (test_audio_source_origin.AudioSourceOriginTests.test_nested_identity_audio_uses_the_same_native_audio_origin) ... FAIL
+test_reverse_reverses_the_source_gap_with_the_content (test_audio_source_origin.AudioSourceOriginTests.test_reverse_reverses_the_source_gap_with_the_content) ... ok
+test_window_crossing_native_start_preserves_partial_leading_gap (test_audio_source_origin.AudioSourceOriginTests.test_window_crossing_native_start_preserves_partial_leading_gap) ... FAIL
+test_window_wholly_before_first_native_audio_is_silent (test_audio_source_origin.AudioSourceOriginTests.test_window_wholly_before_first_native_audio_is_silent) ... ok
+test_zero_origin_audio_remains_sample_exact (test_audio_source_origin.AudioSourceOriginTests.test_zero_origin_audio_remains_sample_exact) ... ok
+
+======================================================================
+ERROR: test_R3_receives_all_source_clock_samples_including_the_native_gap (test_audio_source_origin.AudioSourceOriginTests.test_R3_receives_all_source_clock_samples_including_the_native_gap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-source-origin-lab-20261021\product\tests\test_audio_source_origin.py", line 141, in test_R3_receives_all_source_clock_samples_including_the_native_gap
+    result=self.r3(0.,3.)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-source-origin-lab-20261021\product\tests\test_audio_source_origin.py", line 138, in r3
+    return execute(self.root,job,scratch)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-source-origin-lab-20261021\product\src\ai_ad_editor\audio_stretch.py", line 234, in execute
+    raise AppError('AUDIO_STRETCH_SOURCE_LENGTH_MISMATCH', '音频实际范围不足或声道与计划不符；不以补零替代输入', exit_code=6)
+ai_ad_editor.errors.AppError: 音频实际范围不足或声道与计划不符；不以补零替代输入
+
+======================================================================
+FAIL: test_R3_wholly_leading_source_window_remains_silence (test_audio_source_origin.AudioSourceOriginTests.test_R3_wholly_leading_source_window_remains_silence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-source-origin-lab-20261021\product\tests\test_audio_source_origin.py", line 148, in test_R3_wholly_leading_source_window_remains_silence
+    self.assertEqual(result['input_pcm']['nonzero_samples'],[0,0])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [28800, 28800] != [0, 0]
+
+First differing element 0:
+28800
+0
+
+- [28800, 28800]
++ [0, 0]
+
+======================================================================
+FAIL: test_audio_offset_includes_the_native_delayed_stream_start (test_audio_source_origin.AudioSourceOriginTests.test_audio_offset_includes_the_native_delayed_stream_start)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-source-origin-lab-20261021\product\tests\test_audio_source_origin.py", line 86, in test_audio_offset_includes_the_native_delayed_stream_start
+    self.assertAlmostEqual(row['relative_delay_seconds'],1.,delta=.021)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0.0 != 1.0 within 0.021 delta (1.0 difference)
+
+======================================================================
+FAIL: test_complete_explicit_audio_preserves_leading_silence_and_every_PCM_sample (test_audio_source_origin.AudioSourceOriginTests.test_complete_explicit_audio_preserves_leading_silence_and_every_PCM_sample)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-source-origin-lab-20261021\product\tests\test_audio_source_origin.py", line 91, in test_complete_explicit_audio_preserves_leading_silence_and_every_PCM_sample
+    self.assertEqual(actual,self.expected.tobytes())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x0[24 chars]0\x00M2\x10=\x07x3=\x05\xf7\x8f=;\xa1\xb2=\x86[3709406 chars]\x00' != b'\x0[24 chars]0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\[3709406 chars]\xbc'
+
+======================================================================
+FAIL: test_delayed_audio_uses_relative_gap_after_nonzero_container_origin (test_audio_source_origin.AudioSourceOriginTests.test_delayed_audio_uses_relative_gap_after_nonzero_container_origin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-source-origin-lab-20261021\product\tests\test_audio_source_origin.py", line 115, in test_delayed_audio_uses_relative_gap_after_nonzero_container_origin
+    self.assertEqual(actual,self.expected.tobytes())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x0[24 chars]0\x00M2\x10=\x07x3=\x05\xf7\x8f=;\xa1\xb2=\x86[3709406 chars]\x00' != b'\x0[24 chars]0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\[3709406 chars]\xbc'
+
+======================================================================
+FAIL: test_identity_speed_curve_uses_the_same_native_audio_origin (test_audio_source_origin.AudioSourceOriginTests.test_identity_speed_curve_uses_the_same_native_audio_origin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-source-origin-lab-20261021\product\tests\test_audio_source_origin.py", line 119, in test_identity_speed_curve_uses_the_same_native_audio_origin
+    self.assertEqual(actual,self.expected.tobytes())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x0[24 chars]0\x00M2\x10=\x07x3=\x05\xf7\x8f=;\xa1\xb2=\x86[3709406 chars]\x00' != b'\x0[24 chars]0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\[3709406 chars]\xbc'
+
+======================================================================
+FAIL: test_nested_identity_audio_uses_the_same_native_audio_origin (test_audio_source_origin.AudioSourceOriginTests.test_nested_identity_audio_uses_the_same_native_audio_origin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-source-origin-lab-20261021\product\tests\test_audio_source_origin.py", line 123, in test_nested_identity_audio_uses_the_same_native_audio_origin
+    self.assertEqual(actual,self.expected.tobytes())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x0[24 chars]0\x00M2\x10=\x07x3=\x05\xf7\x8f=;\xa1\xb2=\x86[3709406 chars]\x00' != b'\x0[24 chars]0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\[3709406 chars]\xbc'
+
+======================================================================
+FAIL: test_window_crossing_native_start_preserves_partial_leading_gap (test_audio_source_origin.AudioSourceOriginTests.test_window_crossing_native_start_preserves_partial_leading_gap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-source-origin-lab-20261021\product\tests\test_audio_source_origin.py", line 99, in test_window_crossing_native_start_preserves_partial_leading_gap
+    self.assertEqual(actual,self.expected[RATE//2:5*RATE//2].tobytes())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x0[24 chars]0\x00M2\x10=\x07x3=\x05\xf7\x8f=;\xa1\xb2=\x86[2401018 chars]\x00' != b'\x0[24 chars]0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\[2401018 chars]xde<'
+
+----------------------------------------------------------------------
+Ran 12 tests in 14.337s
+
+FAILED (failures=7, errors=1)

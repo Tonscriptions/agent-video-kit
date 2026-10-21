@@ -3,6 +3,19 @@ name: video-cut-timeline
 description: Compose an Agent Project timeline with local clips, tracks, transitions, keyframes, masks, speed curves, nested sequences, captions, and audio automation.
 ---
 
+<!-- V88-NATIVE-AUDIO-SOURCE-ORIGIN -->
+<!-- NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->
+Use one source clock for scalar, reverse, speed-curve, nested and offline R3 source windows. A positive audio PTS relative to the container origin is a real source gap, not an instruction to move the content earlier.
+The native PCM acceptance uses demux-relative input timestamps with aresample first_pts=0 before source selection. Async clock-drift correction is disabled. Zero-origin audio and equal nonzero container/audio origins must not gain false silence.
+Read the [source audio clock contract](../../docs/specs/原生音频起点与作者采样时钟_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生音频起点与同步实测_2026-10-21.md).
+The real two-case sample covers container origins 0/5 seconds and audio starts 1/6 seconds, each a one-second relative gap. Source-normalized audio and offset-applied camera cuts are checked separately. R3 input/output frame and silence controls do not establish listening, pitch or stereo-phase quality.
+Compressed-codec priming, negative timestamps/edit lists, internal timestamp discontinuities, device drift, natural recordings, long-form/RSS, continuous playback and listening still need acceptance.
+Seven base offline wheels do not include NumPy; isolated evidence uses an explicit readonly RECORD/license-verified copy of existing local NumPy 2.4.2. Do not treat that copy as automatic dependency installation.
+
+<!-- /NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->
+<!-- /V88-NATIVE-AUDIO-SOURCE-ORIGIN -->
+
+
 <!-- V87-MULTICAM-NATIVE-STREAM-COVERAGE -->
 <!-- MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->
 Keep reference events at their original positions: source_time = reference_time + relative_delay_seconds. Trim intersects actual first/last native-video intervals, retains unity speed and preserves leading/trailing gaps.
@@ -11,7 +24,7 @@ Default shortfall policy rejects. Explicit trim leaves gaps at original referenc
 Dry-run reads existing verified native indices without writing caches, reports, snapshots or authored files. A hit reports zero source-frame probes but still reads hashes. Corrupt indices or changed source SHA reject; do not silently repair them or convert integrity errors into successful audio-only analysis.
 Read the [native coverage contract](../../docs/specs/多机位原生帧覆盖与只读索引契约_v0.1_2026-10-21.md) and [fresh native/isolated evidence](../../docs/validation/多机位原生视频覆盖实测_2026-10-21.md).
 The base seven-wheel installer does not ship NumPy. This experiment explicitly copies the existing local NumPy 2.4.2 distribution with RECORD hashes and licenses; it is not automatic dependency installation.
-Unknown-EOF audio-analysis controls include simulated video state. Nonzero audio stream origin, clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.
+Unknown-EOF audio-analysis controls include simulated video state. Native PCM source-leading gaps and nonzero container origins use the separately advertised source_audio_clock contract. Compressed priming/edit lists, clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.
 
 <!-- /MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->
 <!-- /V87-MULTICAM-NATIVE-STREAM-COVERAGE -->

@@ -19,7 +19,7 @@ from .media import ffmpeg_path, probe_media
 from .utils import new_id, sha256_file
 
 
-MULTICAM_SYNC_VERSION = "0.3.0"
+MULTICAM_SYNC_VERSION = "0.4.0"
 FEATURE_RATE_HZ = 50
 
 
@@ -90,7 +90,8 @@ def _extract_envelope(path: Path, *, sample_rate: int, max_seconds: float, proje
         completed = subprocess.run(
             [
                 ffmpeg_path(), "-hide_banner", "-loglevel", "error", "-t", f"{max_seconds:.3f}",
-                "-i", str(path), "-vn", "-ac", "1", "-ar", str(sample_rate), "-f", "s16le", "-",
+                "-i", str(path), "-vn", "-af", f"aresample={sample_rate}:first_pts=0",
+                "-ac", "1", "-ar", str(sample_rate), "-f", "s16le", "-",
             ],
             capture_output=True,
             timeout=max(60.0, max_seconds * 4.0),
@@ -141,6 +142,8 @@ def _extract_envelope(path: Path, *, sample_rate: int, max_seconds: float, proje
         "sha256": digest,
         "duration_seconds": round(float(probe.get("duration_seconds", 0.0)), 6),
         "video_coverage": coverage,
+        "audio_source_clock": "demux-relative-first-audio-pts-v1",
+        "audio_origin_filter": f"aresample={sample_rate}:first_pts=0",
         "sample_rate": sample_rate,
         "feature_rate_hz": FEATURE_RATE_HZ,
         "feature_count": int(envelope.size),
@@ -166,30 +169,42 @@ def estimate_audio_offset(reference: Any, candidate: Any, *, max_offset_seconds:
         raise argument_error("多机位音频特征不能为空", "sources")
     max_offset = max(0.0, min(float(max_offset_seconds), 300.0))
     max_lag = int(round(max_offset * FEATURE_RATE_HZ))
+    # Leading source silence changes each whole-prefix mean and variance. Rank
+    # and report Pearson correlation on the actual common event window, rather
+    # than letting a different prefix dilute confidence or bias the chosen lag.
+    reference = np.asarray(reference, dtype=np.float64)
+    candidate = np.asarray(candidate, dtype=np.float64)
     correlation = np.correlate(reference, candidate, mode="full")
     lags = np.arange(-int(candidate.size) + 1, int(reference.size), dtype=np.int64)
     mask = np.abs(lags) <= max_lag
     if not bool(np.any(mask)):
         raise argument_error("max_offset_seconds 没有有效搜索范围", "max_offset_seconds")
     masked_indices = np.flatnonzero(mask)
+    def prefix(values):
+        return np.concatenate((np.zeros(1,dtype=np.float64),np.cumsum(values,dtype=np.float64)))
+    ref_sum,ref_square=prefix(reference),prefix(reference*reference)
+    candidate_sum,candidate_square=prefix(candidate),prefix(candidate*candidate)
+    ranked=[]
+    for index in masked_indices:
+        index=int(index);lag=int(lags[index]);left=max(0,lag);right=max(0,-lag)
+        count=min(int(reference.size)-left,int(candidate.size)-right)
+        if count<FEATURE_RATE_HZ:
+            continue
+        # Features are first differences. At the first common sample, one
+        # source may have real preceding silence while the other has no prior
+        # sample. That artificial boundary has no comparable history.
+        cross=float(correlation[index]-reference[left]*candidate[right])
+        left+=1;right+=1;scoring_count=count-1
+        a=float(ref_sum[left+scoring_count]-ref_sum[left]);b=float(candidate_sum[right+scoring_count]-candidate_sum[right])
+        aa=max(0.,float(ref_square[left+scoring_count]-ref_square[left])-a*a/scoring_count)
+        bb=max(0.,float(candidate_square[right+scoring_count]-candidate_square[right])-b*b/scoring_count)
+        denominator=math.sqrt(aa*bb)
+        score=float((cross-a*b/scoring_count)/denominator) if denominator>1e-9 else 0.
+        ranked.append((max(-1.,min(1.,score)),count,-abs(lag),lag))
     # Reject tiny overlaps, which can create a falsely perfect edge match.
-    valid_indices = [
-        int(index)
-        for index in masked_indices
-        if min(int(reference.size), int(candidate.size)) - abs(int(lags[index])) >= FEATURE_RATE_HZ
-    ]
-    if not valid_indices:
+    if not ranked:
         raise AppError("MULTICAM_OVERLAP_TOO_SHORT", "多机位音频重叠不足以估计偏移", exit_code=2, path="sources")
-    best_index = max(valid_indices, key=lambda index: float(correlation[index]))
-    lag = int(lags[best_index])
-    ref_slice, candidate_slice = _overlap(reference, candidate, lag)
-    overlap_count = min(int(ref_slice.size), int(candidate_slice.size))
-    if overlap_count < FEATURE_RATE_HZ:
-        raise AppError("MULTICAM_OVERLAP_TOO_SHORT", "多机位音频重叠不足以估计偏移", exit_code=2, path="sources")
-    ref_slice = ref_slice[:overlap_count]
-    candidate_slice = candidate_slice[:overlap_count]
-    denominator = math.sqrt(float(np.sum(ref_slice * ref_slice)) * float(np.sum(candidate_slice * candidate_slice)))
-    score = float(correlation[best_index] / denominator) if denominator > 1e-9 else 0.0
+    score,overlap_count,_,lag=max(ranked)
     # A positive delay means the candidate's matching event occurs later than
     # the reference.  The correction applied to a timeline is its negative.
     delay_seconds = -lag / FEATURE_RATE_HZ
@@ -199,6 +214,7 @@ def estimate_audio_offset(reference: Any, candidate: Any, *, max_offset_seconds:
         "lag_frames": lag,
         "score": round(max(-1.0, min(1.0, score)), 6),
         "overlap_seconds": round(overlap_count / FEATURE_RATE_HZ, 6),
+        "score_contract": "overlap_pearson_excluding_first_difference_boundary_v1",
         "status": "ok" if score >= 0.35 else "low_confidence",
     }
 

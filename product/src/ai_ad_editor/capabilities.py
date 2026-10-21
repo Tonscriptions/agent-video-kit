@@ -393,7 +393,7 @@ def build_capability_manifest() -> dict[str, Any]:
                 "tracking_contract": "local_template_matching_emits_confidence_and_transform_keyframes",
                 "multicam_source_coverage": {
                     "status": "implemented_with_limits",
-                    "version": "0.3.0",
+                    "version": "0.4.0",
                     "coverage_clock": "native-video-first-last-intervals-v1",
                     "coverage_evidence": "source_sha256_native_pts_duration_time_base_and_demux_origin",
                     "dry_run_cache_contract": "read_verified_indexes_or_probe_without_cache_writes",
@@ -403,7 +403,17 @@ def build_capability_manifest() -> dict[str, Any]:
                     "trim_contract": "intersect_camera_coverage_in_reference_clock_preserve_unity_speed_and_timeline_gaps",
                     "stretch_contract": "explicit_clamp_or_slow_changes_event_sync_and_emits_warning",
                     "apply_contract": "reject_locked_tracks_and_sub_tick_segments_preserve_authored_duration_and_requested_output_window",
-                    "limits": ["offset_only_no_clock_drift_estimation", "unknown_final_native_frame_duration_rejects", "full_source_index_probe_on_cache_miss", "offset_estimate_uses_bounded_50hz_audio_envelope", "nonzero_audio_stream_origin_not_accepted", "legacy_function_input_without_native_coverage_warns_container_only", "timeline_placement_is_quantized_to_project_ticks", "no_automatic_audio_track_or_semantic_camera_director", "natural_multicam_quality_unaccepted"],
+                    "audio_source_clock": "demux-relative-first-audio-pts-v1",
+                    "limits": ["offset_only_no_clock_drift_estimation", "unknown_final_native_frame_duration_rejects", "full_source_index_probe_on_cache_miss", "offset_estimate_uses_bounded_50hz_audio_envelope", "native_audio_start_uses_first_pts_zero_without_async", "discontinuous_audio_timestamp_quality_unaccepted", "legacy_function_input_without_native_coverage_warns_container_only", "timeline_placement_is_quantized_to_project_ticks", "no_automatic_audio_track_or_semantic_camera_director", "natural_multicam_quality_unaccepted"],
+                },
+                "source_audio_clock": {
+                    "status": "implemented_with_limits",
+                    "protocol": "demux-relative-first-audio-pts-v1",
+                    "normalization": "aresample_first_pts_zero_before_source_selection",
+                    "leading_source_gap": "silence_samples",
+                    "paths": ["scalar_reverse", "speed_curve", "nested_audio", "offline_R3_source_decode", "multicam_audio_envelope"],
+                    "async_clock_drift_correction": False,
+                    "limits": ["native_PCM_origin_controls_only", "compressed_codec_priming_and_discontinuities_unaccepted", "no_clock_drift_estimation", "natural_HDR_long_RSS_listening_and_full_CapCut_parity_unaccepted"],
                 },
                 "mask_tracking": {
                     "status": "implemented_with_limits",

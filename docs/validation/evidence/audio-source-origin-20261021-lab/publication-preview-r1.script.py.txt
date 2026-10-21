@@ -1,0 +1,99 @@
+"""Render future publication documents privately; never create a full-suite receipt."""
+from datetime import datetime, timezone
+import importlib.util
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+from urllib.parse import unquote
+from run_frozen_regression import frozen
+from finalize_audio_origin_lab import sha
+
+ROOT=Path(__file__).resolve().parents[1]
+MAIN=Path('E:/dev/sandbox/AI广告剪辑')
+DONOR=ROOT.parent/'multicam-stream-coverage-lab-20261021'
+REL=ROOT/'docs/validation/evidence/audio-source-origin-20261021-lab'
+
+
+def load(path,name):
+    spec=importlib.util.spec_from_file_location(name,path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
+
+def main():
+    output=REL/'publication-preview-r1.json';assert not output.exists()
+    root=ROOT/'product/.runtime/audio-source-origin-20261021/publication-preview-r1'
+    assert not root.exists();root.mkdir(parents=True)
+    current=frozen();assert len(current)==259
+    parent=load(DONOR/'scripts/publish_multicam_stream_coverage.py','preview_stream_publisher')
+    candidate=load(ROOT/'scripts/publish_audio_source_origin.py','preview_audio_publisher')
+    assert parent.LATEST_DOCS==candidate.LATEST_DOCS and parent.SKILLS==candidate.SKILLS
+    main_commit=subprocess.check_output(['git','-c','gc.auto=0','-c','maintenance.auto=false','rev-parse','HEAD'],cwd=MAIN,timeout=60).decode().strip()
+    draft=json.loads((REL/'skills-draft-r1.json').read_bytes())
+    assert main_commit==draft['published_snapshot_parent_commit']
+    initial={}
+    for name in (*candidate.LATEST_DOCS,'.gitattributes',*('skills/'+s+'/SKILL.md' for s in candidate.SKILLS)):
+        source=MAIN/name;target=root/name;target.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copyfile(source,target);initial[name]=sha(source)
+    for module,source_root in ((parent,DONOR),(candidate,ROOT)):
+        for name in (module.HISTORICAL_REPORT,module.HISTORICAL_CONTRACT):
+            target=root/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source_root/name,target)
+    # These arguments exercise document rendering only, with explicit future placeholders.
+    # Neither is written as a regression result, nor passed to an integration/push operation.
+    parent.documents(root,{'methods':2019,'skipped':0,'terminal_ok':True,'suite_seconds':0.0})
+    actual_parent_bodies={s:(root/'skills'/s/'SKILL.md').read_text('utf8') for s in candidate.SKILLS}
+    changed=candidate.documents(root,{'methods':2031,'skipped':0,'terminal_ok':True,'suite_seconds':0.0})
+    validators=[];preserved={}
+    validator=Path('C:/Users/carzy/.codex/skills/.system/skill-creator/scripts/quick_validate.py')
+    refresh=draft['future_parent_refresh']
+    for name,row in draft['skills'].items():
+        original=actual_parent_bodies[name];assert original.count(refresh['before'])==1
+        body=original.replace(refresh['before'],refresh['after'])
+        guidance=row['new_block'].replace(candidate.HISTORICAL_CONTRACT,candidate.CONTRACT).replace(candidate.HISTORICAL_REPORT,candidate.REPORT)
+        pending='This is an unregistered candidate; complete regression and main integration remain pending.'
+        assert guidance.count(pending)==1;guidance=guidance.replace(pending,'')
+        block='<!-- '+candidate.MARKER+' -->\n'+guidance.rstrip()+'\n<!-- /'+candidate.MARKER+' -->'
+        position=body.index('\n---',3)+4 if body.startswith('---\n') else body.index('\n')
+        expected=(body[:position]+'\n\n'+block+'\n'+body[position:]).rstrip()+'\n'
+        target=root/'skills'/name/'SKILL.md';assert target.read_text('utf8')==expected
+        preserved[name]={'rendered_parent_sha256':'sha256:'+__import__('hashlib').sha256(original.encode()).hexdigest(),
+            'only_reviewed_clause_and_new_block':True,'result_sha256':sha(target)}
+        command=[sys.executable,'-E','-B','-X','utf8',str(validator),str(target.parent)]
+        result=subprocess.run(command,cwd=ROOT,capture_output=True,timeout=60)
+        assert result.returncode==0,result.stdout.decode('utf8','replace')+result.stderr.decode('utf8','replace')
+        validators.append({'skill':name,'exit_code':result.returncode,'stdout':result.stdout.decode('utf8','replace')})
+    links=[];planned={candidate.REL+'/full-r1.json'}
+    for name in sorted(changed-{'.gitattributes'}):
+        path=root/name;text=path.read_text('utf8')
+        if name in candidate.LATEST_DOCS or name.startswith('skills/'):
+            text=text.split('<!-- '+candidate.MARKER+' -->',1)[1].split('<!-- /'+candidate.MARKER+' -->',1)[0]
+        for token in re.findall(r'!?\[[^\]]*\]\(([^)\n]+)\)',text):
+            target=unquote(token.strip('<>').split('#',1)[0])
+            if not target or re.match(r'^[a-zA-Z][\w+.-]*:',target):continue
+            resolved=(path.parent/target).resolve();assert resolved.is_relative_to(root)
+            relative=resolved.relative_to(root).as_posix()
+            found=next((folder/relative for folder in (root,ROOT,DONOR,MAIN) if (folder/relative).exists()),None)
+            assert found is not None or relative in planned,(name,target,relative)
+            links.append({'document':name,'target':relative,'exists':found is not None,
+                'future_full_receipt_only':relative in planned and found is None})
+    assert frozen()==current
+    assert all(sha(MAIN/name)==digest for name,digest in initial.items())
+    assert not (ROOT/candidate.REL/'full-r1.json').exists() and not (root/candidate.REL/'full-r1.json').exists()
+    record={'status':'passed-prospective-document-and-delta-review','at_utc':datetime.now(timezone.utc).isoformat(),
+        'scope':'Only document rendering and validator behavior; no complete suite, integration, registration, commit or push.',
+        'future_full_placeholders':{'parent_methods':2019,'candidate_methods':2031,'suite_seconds':0.0,'terminal_ok_argument':True},
+        'uses_future_placeholders':True,'full_receipt_written':False,'main_changed':False,'skills_registered':False,
+        'snapshot_parent_commit':main_commit,'rendered_documents':{n:sha(root/n) for n in sorted(changed)},
+        'local_links':links,'skill_validators':validators,'parent_guidance_preserved':preserved,
+        'frozen_inputs':current,'publisher_sha256':sha(ROOT/'scripts/publish_audio_source_origin.py'),
+        'generator_sha256':sha(__file__)}
+    output.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    (REL/'publication-preview-r1.script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'status':record['status'],'document_links':len(links),'skill_validators':len(validators),
+        'full_receipt_written':False,'main_changed':False,'uses_future_placeholders':True}))
+
+
+if __name__=='__main__':main()

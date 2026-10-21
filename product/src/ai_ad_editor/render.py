@@ -4460,7 +4460,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                                                                channels=max(1,int((asset.get('probe',{}).get('audio') or {}).get('channels',2))))
                     split_labels = [f"asplit{index}_{part_index}" for part_index in range(len(audio_parts))]
                     filters.append(
-                        f"{audio_input}aresample=48000,aformat=sample_fmts=flt,atrim=start_sample={source_start_sample}:end_sample={source_end_sample},asetpts=N/SR/TB,"
+                        f"{audio_input}aresample=48000:first_pts=0,aformat=sample_fmts=flt,atrim=start_sample={source_start_sample}:end_sample={source_end_sample},asetpts=N/SR/TB,"
                         f"asplit={len(split_labels)}" + "".join(f"[{label}]" for label in split_labels)
                     )
                     part_labels: list[str] = []
@@ -4490,7 +4490,11 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     audio_chain = [f"[{speed_label}]aresample=48000", "asetpts=N/SR/TB"]
                     warnings.append({"code": "RENDER_FEATURE_APPROXIMATE", "clip_id": clip.get("id"), "feature": "audio_speed_curve_piecewise", "message": "音频速度曲线按带选区内上下文的短段 atempo 近似，末段按真实伸缩末端选取；累计采样锚点对齐，局部时序、段间相位、瞬态、极短选区与听感仍须独立核验；输出不足仍可能补静音"})
                 else:
-                    audio_chain = [f"{audio_input}atrim=start={src_in:.6f}:end={src_out:.6f}", "asetpts=PTS-STARTPTS", "aresample=48000"]
+                    # FFmpeg input PTS are demux-relative. Preserve any source-leading
+                    # gap before selecting the author window or reversing/retiming it.
+                    # first_pts normalizes the beginning only; async drift correction
+                    # is deliberately not enabled.
+                    audio_chain = [f"{audio_input}aresample=48000:first_pts=0,atrim=start={src_in:.6f}:end={src_out:.6f}", "asetpts=PTS-STARTPTS", "aresample=48000"]
                     if bool(clip.get("reverse")):
                         audio_chain.append("areverse")
                     if abs(speed - 1.0) > 1e-9:

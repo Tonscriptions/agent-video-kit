@@ -1,0 +1,111 @@
+"""Preserve the actual published baseline and live/future work without claiming release."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+ROOT = Path(__file__).resolve().parents[1]
+STREAM = MAIN/'product/.runtime/multicam-stream-coverage-lab-20261021'
+
+
+def read(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def sha(path):
+    with Path(path).open('rb') as stream:
+        return 'sha256:'+hashlib.file_digest(stream,'sha256').hexdigest()
+
+
+def git(*args):
+    return subprocess.check_output(['git','-c','gc.auto=0','-c','maintenance.auto=false',*args],cwd=MAIN,timeout=120).decode().strip()
+
+
+def main():
+    path=MAIN/'product/.runtime/agent-video-kit-progress-20261021.json'
+    backup=path.with_name('agent-video-kit-progress-20261021.before-v86-publish-and-audio-origin.json')
+    assert not backup.exists()
+    value=read(path)
+    publication=MAIN/'product/.runtime/multicam-source-range-lab-20261021/product/.runtime/multicam-source-range-20261021/publication-r1/run.json'
+    published=read(publication)
+    assert published['status']=='published' and published['full_methods']==1995
+    commit=git('rev-parse','HEAD')
+    assert commit==published['commit']==git('ls-remote','origin','refs/heads/main').split()[0]
+    assert git('branch','--show-current')=='main' and not git('status','--porcelain')
+    base=MAIN/'docs/validation/evidence/multicam-source-range-20261021-lab'
+    full=read(base/'full-r1.json');release=read(base/'release-main-r1.json')
+    stage=read(base/'staged-release-r1.json');skills=read(base/'skills-release-r1.json')
+    assert full['status']=='passed' and full['methods']==1995 and full['skipped']==0
+    state_path=STREAM/'product/.runtime/multicam-stream-coverage-20261021/full-after-multicam-r1/run.json'
+    state=read(state_path)
+    command="Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { $_.CommandLine -like '*multicam-stream-coverage-lab-20261021*' -or $_.CommandLine -like '*run_multicam_stream_after_parent.py*' } | Select-Object ProcessId,ParentProcessId,CreationDate,CommandLine | ConvertTo-Json -Compress"
+    processes=json.loads(subprocess.check_output(['powershell','-NoProfile','-Command',command],cwd=MAIN,timeout=60).decode('utf8-sig') or '[]')
+    if isinstance(processes,dict):processes=[processes]
+    log=STREAM/'docs/validation/evidence/multicam-stream-coverage-20261021-lab/full-r1.source.log'
+    text=log.read_text('utf8',errors='replace') if log.exists() else ''
+    audio=ROOT/'docs/validation/evidence/audio-source-origin-20261021-lab'
+    audit=read(audio/'audit-r1.json');related=read(audio/'related-r1.json')
+    assert audit['status']=='passed-standalone-audit' and audit['targeted_methods']==226
+    value.update(updated_at_utc=datetime.now(timezone.utc).isoformat(),goal_status='active',
+        native_windows_only=True,docker_wsl_virtualization_used=False,browser_tool_tabs_opened_this_turn=0,
+        previous_progress_snapshot=str(backup))
+    value['main']={
+        'branch':'main','commit':commit,'remote_main':commit,'clean':True,'version':'V86',
+        'full_methods':1995,'suite_seconds':full['suite_seconds'],'skipped':0,'frozen_inputs':257,
+        'full_receipt':str(base/'full-r1.json'),'publication_record':str(publication),
+        'readme_and_numbered_actual_media_updated':True,'verified_document_links':len(release['local_links']),
+        'staged_blob_comparisons':stage['compared_blobs'],'skills':skills['skill_count'],
+        'skill_links':skills['local_links_checked']}
+    prior=value['multicam_source_range_lab']
+    prior.update(status='published',full_state=str(publication),main_integrated=True,published=True,
+        full_suite_started=True,suite_tool_handle=None,owned_process_identities=[],
+        publisher_executed_beyond_preflight=True,published_commit=commit,full_methods=1995,
+        full_seconds=full['suite_seconds'],previous_running_processes_are_historical=True)
+    for key in ('last_observed_ok','last_observed_failure_lines'):
+        prior.pop(key,None)
+    stream=value['multicam_stream_coverage_lab']
+    stream.update(status=state['status'],full_suite_started=state['suite_launched'],main_integrated=False,
+        published=False,full_state=str(state_path),suite_tool_handle=None,
+        tool_handle_lost_during_context_compaction=True,owned_process_identities=processes,
+        expected_full_methods=2019,published_parent_commit=commit,pinned_verification_scripts=15,
+        last_observed_ok=len(re.findall(r'^test_.* \.\.\. ok$',text,re.M)),
+        last_observed_failure_lines=re.findall(r'^(?:FAIL|ERROR):.*$',text,re.M))
+    value['audio_source_origin_lab']={
+        'root':str(ROOT),'status':audit['status'],'frozen_inputs':259,'parent_frozen_inputs':258,
+        'new_test_methods':12,'related_methods':226,'related_seconds':related['suite_seconds'],
+        'related_receipt':str(audio/'related-r1.json'),'audit':str(audio/'audit-r1.json'),
+        'native_cli_calls':23,'other_native_commands':32,'native_checks':39,
+        'isolated_cli_calls':26,'module_origin_probes':1,'module_origins':14,
+        'installation_checks':15,'isolated_media_checks':39,'runtime_resources':161,
+        'assets':42,'gifs':14,'local_links':len(audit['local_links']),
+        'optional_numpy_copied_files':933,'optional_numpy_is_not_in_base_bundle':True,
+        'unregistered_skill_drafts':4,'skill_snapshot_parent_commit':commit,
+        'full_suite_started':False,'main_integrated':False,'published':False,
+        'expected_future_full_methods':2031,'expected_parent_complete_methods':2019,
+        'full_capcut_parity':False,'audio_listened':False,'continuous_playback_reviewed':False,
+        'report':str(ROOT/'docs/validation/原生音频起点与同步独立实验_2026-10-21.md'),
+        'contract':str(ROOT/'docs/specs/原生音频起点与作者采样时钟_实验_v0.1_2026-10-21.md'),
+        'limits':['Native PCM timestamp gaps accepted only for stated synthetic controls; no async drift correction.',
+                  'Compressed priming/edit lists, negative/discontinuous timestamps, natural/HDR/long-form/RSS and listening are unaccepted.',
+                  'AAC padding is recorded separately; no exact encoded PCM or full encoded RGBA claim.',
+                  'V88 full gate/publisher not prepared at this checkpoint.']}
+    value['next_steps']=[
+        'Main V86 is actually published at '+commit+' with1995/0skip; V85 is historical. Do not run its publisher again.',
+        'Keep live V87 core258,fixtures8 and15 pinned scripts unchanged. Inspect current process identity/creation time and state; do not duplicate a suite after losing the tool handle.',
+        'After actual V87 terminal2019/0skip, run its prepared publisher with a new publication-r1 work path, ordinary push and all17 Skills/staged-byte checks.',
+        'V88 core259 has226 distinct related controls, fresh native+isolated media42assets14GIF, and4 unregistered deltas based on actual V86 snapshots. Standalone audit passed.',
+        'Prepare V88 complete2031 gate bound to actual published V87/2019; source preflight can run beforehand. Rebase only new Skill blocks and exact reviewed parent clause onto actual V87 parents.',
+        'Keep README numbered actual checks, original/MP4/GIF and failures/limits current at publication; full CapCut parity remains unaccepted.',
+        'OpenFilm R14 review is already published. Remaining optional fitImages2-4persondays/new basic NLE8-15persondays are conditional planning, not measured savings.',
+        'All writes E, native Windows only, no Docker/WSL/VM/venv. No browser tabs opened; do not close user-owned tabs/processes.']
+    backup.write_bytes(path.read_bytes())
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    print(json.dumps({'main':commit,'main_full':1995,'v87_status':state['status'],
+        'v87_owned_python':len(processes),'v87_observed_ok':stream['last_observed_ok'],
+        'v88_related':226,'v88_unregistered_skills':4,'checkpoint':str(path)},ensure_ascii=False))
+
+
+if __name__=='__main__':main()

@@ -126,6 +126,7 @@ def plan(root: Path, engine: dict, asset: dict, source: Path, start: float, end:
            'source_frames': source_frames, 'target_frames': target_frames,
            'channels': channels, 'sample_rate': RATE, 'time_map': anchors,
            'source_context': context,
+           'source_audio_clock': 'demux-relative-first-audio-pts-v1',
            'reverse_after_stretch': bool(reverse), 'implementation_sha256': implementation,
            'ffmpeg': artifact_entry(Path(ffmpeg_path()).resolve(), 'audio-stretch-ffmpeg')}
     key = hashlib.sha256(json.dumps(job, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
@@ -224,7 +225,7 @@ def execute(root: Path, job: dict, temp_dir: Path, *, cancel_file: Path | None =
             atomic_write_text(mapping, mapping_text)
             decode=[job['ffmpeg']['path'], '-hide_banner', '-loglevel', 'error', '-y',
                     '-i', job['source'], '-map', '0:a:0', '-vn', '-af',
-                    f"aresample={RATE},atrim=start_sample={context['decode_start_sample']}:end_sample={context['decode_end_sample']},asetpts=N/SR/TB",
+                    f"aresample={RATE}:first_pts=0,atrim=start_sample={context['decode_start_sample']}:end_sample={context['decode_end_sample']},asetpts=N/SR/TB",
                     '-c:a', 'pcm_f32le', str(source)]
             decoded=run_process(decode, timeout=3600, cwd=root, cancel_file=cancel_file)
             if decoded.returncode != 0:

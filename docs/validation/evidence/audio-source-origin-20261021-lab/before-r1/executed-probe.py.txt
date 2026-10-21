@@ -1,0 +1,120 @@
+"""Observe real audio-start PTS, renderer PCM and multicam delays without changing the core."""
+import argparse
+from datetime import datetime,timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import numpy as np
+
+ROOT=Path(__file__).resolve().parents[1]
+sys.path[:0]=[str(ROOT/'product/src'),str(ROOT/'product/tests')]
+from run_frozen_regression import frozen
+from ai_ad_editor.media import ffmpeg_path,ffprobe_path
+from ai_ad_editor.multicam import synchronize_multicam_sources
+from ai_ad_editor.project import create_project,load_project,save_project
+from ai_ad_editor.render import build_filter_graph
+from test_magnetic_reorder import invoke
+
+
+def sha(path):
+    with Path(path).open('rb') as stream:return 'sha256:'+hashlib.file_digest(stream,'sha256').hexdigest()
+
+
+def write(path,value):
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--work',type=Path,required=True);parser.add_argument('--evidence',type=Path,required=True)
+    args=parser.parse_args();work=args.work.resolve();evidence=args.evidence.resolve()
+    assert not work.exists() and not evidence.exists()
+    assert work.is_relative_to(ROOT/'product/.runtime') and evidence.is_relative_to(ROOT/'docs/validation/evidence')
+    work.mkdir(parents=True);evidence.mkdir(parents=True)
+    record={'status':'running-observation','started_at_utc':datetime.now(timezone.utc).isoformat(),
+        'frozen_before':frozen(),'calls':[],'observations':{},'native_windows':True,'virtualization':False,'network':False}
+    (evidence/'executed-probe.py.txt').write_bytes(Path(__file__).read_bytes())
+    snapshot=evidence/'inputs';snapshot.mkdir()
+    for name in ('multicam','media','render','audio_stretch'):
+        source=ROOT/'product/src/ai_ad_editor'/(name+'.py');(snapshot/(name+'.py.txt')).write_bytes(source.read_bytes())
+    def save():write(evidence/'observations.json',record)
+    def run(label,arguments,data=None):
+        command=list(map(str,arguments));env=dict(os.environ)
+        env.update(TEMP=str(work),TMP=str(work),TMPDIR=str(work),PYTHONDONTWRITEBYTECODE='1')
+        result=subprocess.run(command,input=data,cwd=ROOT,env=env,capture_output=True,timeout=180)
+        (evidence/(label+'.stderr.log')).write_bytes(result.stderr)
+        record['calls'].append({'label':label,'command':command,'exit_code':result.returncode,
+            'stdout_bytes':len(result.stdout),'stdout_sha256':'sha256:'+hashlib.sha256(result.stdout).hexdigest(),
+            'stderr_sha256':sha(evidence/(label+'.stderr.log'))});save()
+        assert result.returncode==0,result.stderr[-2000:].decode('utf8','replace')
+        return result.stdout
+    try:
+        rate=48000;count=3*rate;t=np.arange(count,dtype=np.float64)/rate
+        rng=np.random.default_rng(62731);gain=rng.uniform(.08,.7,150)[np.arange(count)//960]
+        pcm=np.stack((np.sin(2*np.pi*433*t)*gain,np.sin(2*np.pi*739*t)*gain*.73),axis=1).astype('<f4')
+        camera_pcm=pcm[:2*rate];expected=np.concatenate((np.zeros((rate,2),dtype='<f4'),camera_pcm)).tobytes()
+        frames=[bytes((30+i,50+i*2,220-i,255))*(32*18) for i in range(75)]
+        video=b''.join(frames);camera_video=bytes((200,0,0,255))*(32*18)*25+b''.join(frames[:50])
+        (work/'reference.rgba').write_bytes(video);(work/'camera.rgba').write_bytes(camera_video)
+        (work/'reference.f32').write_bytes(pcm.tobytes());(work/'camera.f32').write_bytes(camera_pcm.tobytes())
+        sources={}
+        for name in ('reference','camera'):
+            path=work/(name+'.mkv')
+            command=[ffmpeg_path(),'-hide_banner','-v','error','-f','rawvideo','-pixel_format','rgba','-video_size','32x18',
+                '-framerate','25','-i',work/(name+'.rgba'),'-f','f32le','-ar',rate,'-ac','2','-i',work/(name+'.f32')]
+            if name=='camera':command+=['-filter_complex','[1:a]asetpts=PTS+1/TB[a]','-map','0:v:0','-map','[a]']
+            command+=['-c:v','ffv1','-pix_fmt','bgra','-c:a','pcm_f32le',path]
+            run('make-'+name,command);sources[name]=path
+            probe=json.loads(run('probe-'+name,[ffprobe_path(),'-v','error','-select_streams','a:0','-show_frames','-show_streams',
+                '-show_format','-show_entries','frame=pts,nb_samples:stream=start_pts,start_time,time_base:format=start_time,duration','-of','json',path]))
+            write(evidence/(name+'-native-audio.json'),probe)
+            record['observations'][name+'_native_first_pts']={'first_pts':probe['frames'][0]['pts'],
+                'stream_time_base':probe['streams'][0]['time_base'],'format_start_time':probe['format']['start_time'],
+                'duration':probe['format']['duration'],'source_sha256':sha(path)}
+        base=[ffmpeg_path(),'-hide_banner','-v','error','-i',sources['camera'],'-vn','-map','0:a:0']
+        direct=run('plain-PCM',[*base,'-ar',rate,'-ac','2','-f','f32le','pipe:1'])
+        normalized=run('first-PTS-PCM',[*base,'-af','aresample=48000:first_pts=0','-ac','2','-f','f32le','pipe:1'])
+        record['observations']['standalone_decode']={'plain_bytes':len(direct),'plain_equals_source_PCM':direct==camera_pcm.tobytes(),
+            'first_pts_bytes':len(normalized),'first_pts_matches_independent_silence_and_PCM':normalized==expected,
+            'first_pts_changes_internal_PCM':normalized[rate*8:]!=camera_pcm.tobytes(),
+            'filter':'aresample=48000:first_pts=0; async option not enabled'}
+        sync=synchronize_multicam_sources([{'asset_id':name,'path':path} for name,path in sources.items()],
+            reference_asset_id='reference',analysis_seconds=3,max_offset_seconds=1.5)
+        write(evidence/'actual-sync.json',sync)
+        actual=next(o for o in sync['offsets'] if o['asset_id']=='camera')
+        record['observations']['multicam']={'expected_delay_seconds':1,'actual_delay_seconds':actual['relative_delay_seconds'],
+            'score':actual['score'],'event_delay_preserved':abs(actual['relative_delay_seconds']-1)<.021}
+        project_root=work/'project';create_project(project_root)
+        code,value=invoke('media','ingest','--project',project_root,'--input',sources['camera']);assert code==0,value
+        project=load_project(project_root)[1];seq=project['sequences'][0]
+        project['settings']['canvas']={'width':32,'height':18,'background':'#000000'}
+        project['settings']['timebase']={'ticks_per_second':90000,'display_fps':{'num':25,'den':1}}
+        seq['duration_tick']=270000
+        seq['tracks']=[{'id':'audio','type':'audio','name':'explicit-camera-audio','clips':[{'id':'camera-audio',
+            'asset_id':value['data']['asset']['id'],'source_in_tick':0,'source_out_tick':270000,
+            'timeline_start_tick':0,'duration_tick':270000}]}]
+        save_project(project_root,project)
+        inputs,graph,metadata,warnings=build_filter_graph(project_root,project,seq)
+        (evidence/'actual-filter-graph.txt').write_text(graph,encoding='utf8',newline='\n')
+        output=run('actual-render-PCM',[ffmpeg_path(),'-hide_banner','-v','error','-filter_complex_threads','1',*inputs,
+            '-filter_complex',graph,'-map','[aout]','-f','f32le','-ac','2','pipe:1','-map','[vout]','-f','null','NUL'])
+        record['observations']['renderer']={'actual_bytes':len(output),'expected_bytes':len(expected),
+            'complete_PCM_preserves_original_audio_start':output==expected,
+            'leading_silence_preserved':output[:rate*8]==bytes(rate*8),
+            'content_matches_after_one_second':output[rate*8:]==camera_pcm.tobytes(),
+            'warnings':warnings}
+        record.update(status='completed-observation',generator_sha256=sha(__file__),
+            full_suite_started=False,main_integrated=False,full_capcut_parity=False)
+    except BaseException as error:
+        record.update(status='failed-observation',error={'type':type(error).__name__,'message':str(error)});raise
+    finally:
+        record.update(finished_at_utc=datetime.now(timezone.utc).isoformat(),frozen_after=frozen())
+        record['frozen_equal']=record['frozen_before']==record['frozen_after'];save()
+    assert record['frozen_equal']
+    print(json.dumps({'status':record['status'],'observations':record['observations'],'frozen_equal':record['frozen_equal']},ensure_ascii=False))
+
+
+if __name__=='__main__':main()

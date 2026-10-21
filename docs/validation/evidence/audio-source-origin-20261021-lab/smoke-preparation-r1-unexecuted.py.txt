@@ -1,0 +1,252 @@
+"""Actual local CLI camera coverage, complete lossless frames/PCM, MP4 and GIF."""
+from __future__ import annotations
+import argparse
+from array import array
+from datetime import datetime, timezone
+from fractions import Fraction
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+import random
+import shutil
+import subprocess
+import sys
+import time
+from PIL import Image, ImageDraw
+from run_frozen_regression import frozen
+
+ROOT = Path(__file__).resolve().parents[1]
+W, H, TPS = 320, 180, 90000
+
+
+def sha(path):
+    with Path(path).open('rb') as stream:
+        return 'sha256:' + hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def write(path, value):
+    Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+
+
+def draw_counter(draw, number, x, y, scale=4):
+    # Original seven-segment rectangle drawings; no font or external image.
+    active = ('abcdef', 'bc', 'abdeg', 'abcdg', 'bcfg', 'acdfg', 'acdefg', 'abc', 'abcdefg', 'abcdfg')
+    shapes = {'a': (1,0,5,1), 'b': (5,1,6,5), 'c': (5,6,6,10), 'd': (1,10,5,11),
+        'e': (0,6,1,10), 'f': (0,1,1,5), 'g': (1,5,5,6)}
+    for place, digit in enumerate(f'{number:02d}'):
+        for segment in active[int(digit)]:
+            left, top, right, bottom = shapes[segment]
+            dx = x + place * 8 * scale
+            draw.rectangle((dx + left*scale, y + top*scale, dx + right*scale-1, y + bottom*scale-1), fill=(235,245,255,255))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('work', 'evidence', 'assets'):
+        parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--installed', type=Path)
+    args = parser.parse_args()
+    work, evidence, assets = (getattr(args, name).resolve() for name in ('work', 'evidence', 'assets'))
+    assert work.is_relative_to(ROOT / 'product/.runtime')
+    assert evidence.is_relative_to(ROOT / 'docs/validation') and assets.is_relative_to(ROOT / 'docs/assets')
+    assert not any(path.exists() for path in (work, evidence, assets))
+    for path in (work, evidence, assets):
+        path.mkdir(parents=True)
+    (evidence / 'executed-smoke.py.txt').write_bytes(Path(__file__).read_bytes())
+    record = {'status': 'running', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
+        'native_windows': sys.platform == 'win32', 'virtualization': False, 'network': False,
+        'frozen_before': frozen(), 'calls': [], 'checks': [], 'media': {},
+        'continuous_playback_reviewed': False, 'audio_listened': False, 'full_capcut_parity': False}
+    def save(): write(evidence / 'verification.json', record)
+    def check(name, condition, **details):
+        record['checks'].append({'name': name, 'ok': bool(condition), **details})
+        save()
+        assert condition, name
+    temp = ROOT / 'product/.runtime/temp'
+    temp.mkdir(parents=True, exist_ok=True)
+    env = dict(os.environ, TEMP=str(temp), TMP=str(temp), TMPDIR=str(temp), PYTHONDONTWRITEBYTECODE='1')
+    bootstrap = ('import sys;sys.path.insert(0,sys.argv.pop(1));'
+        'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+        'from ai_ad_editor.cli import main;raise SystemExit(main())')
+    prefix = ([sys.executable, '-I', '-S', '-B', '-X', 'utf8', args.installed.resolve() / 'run.py'] if args.installed else
+              [sys.executable, '-E', '-B', '-X', 'utf8', '-c', bootstrap, ROOT / 'product/src'])
+    prefix = list(map(str, prefix))
+    def run(label, command, data=None, expected=0, binary=False, cli=False):
+        command = list(map(str, command))
+        started = time.monotonic()
+        result = subprocess.run(command, input=data, capture_output=True, cwd=ROOT, env=env, timeout=600)
+        (evidence / (label + '.stderr.log')).write_bytes(result.stderr)
+        digest = 'sha256:' + hashlib.sha256(result.stdout).hexdigest()
+        if binary:
+            write(evidence / (label + '.stdout-summary.json'), {'bytes': len(result.stdout), 'sha256': digest})
+        else:
+            (evidence / (label + '.stdout.log')).write_bytes(result.stdout)
+        record['calls'].append({'label': label, 'command': command, 'exit_code': result.returncode,
+            'expected_exit_code': expected, 'wall_seconds': time.monotonic() - started,
+            'stdout_sha256': digest, 'cli': cli})
+        save()
+        assert result.returncode == expected, label + ': ' + (result.stderr + result.stdout)[-1600:].decode('utf8', 'replace')
+        return result.stdout
+    def cli(label, *argv, expected=0):
+        return json.loads(run(label, [*prefix, *argv], expected=expected, cli=True))
+    exe, probe = shutil.which('ffmpeg'), shutil.which('ffprobe')
+    assert exe and probe
+    record.update(ffmpeg={'path': exe, 'sha256': sha(exe)}, ffprobe={'path': probe, 'sha256': sha(probe)})
+    def video(label, path):
+        return run(label, [exe, '-v', 'error', '-i', path, '-map', '0:v:0', '-an', '-fps_mode', 'passthrough',
+            '-f', 'rawvideo', '-pix_fmt', 'rgba', 'pipe:1'], binary=True)
+    def audio(label, path):
+        return run(label, [exe, '-v', 'error', '-i', path, '-map', '0:a:0', '-vn', '-ar', '48000', '-ac', '2',
+            '-f', 'f32le', '-c:a', 'pcm_f32le', 'pipe:1'], binary=True)
+    def gif(path, raw):
+        size = W * H * 4
+        assert len(raw) % size == 0
+        frames = [Image.frombytes('RGBA', (W, H), raw[index:index + size]).convert('RGB') for index in range(0, len(raw), size)]
+        frames[0].save(path, save_all=True, append_images=frames[1:], duration=40, loop=0, disposal=2, optimize=False)
+        with Image.open(path) as image:
+            total = 0
+            for index in range(image.n_frames):
+                image.seek(index)
+                total += image.info.get('duration', 0)
+            return {'frames': image.n_frames, 'duration_ms': total, 'actual_mp4_decode': path.stem in {'native-output','offset-output','native-synced','offset-synced'}}
+    try:
+        audit=json.loads((ROOT/'docs/validation/evidence/audio-source-origin-20261021-lab/development-audit-r1.json').read_bytes())
+        assert record['frozen_before']==audit['frozen_inputs'] and len(record['frozen_before'])==259
+        own_sha=sha(__file__);size=W*H*4;rate=48000
+        cards=[]
+        for index in range(75):
+            frame=Image.new('RGBA',(W,H),(30+index,50+2*index,220-index,255));draw=ImageDraw.Draw(frame)
+            draw.rectangle((14,24,W-14,H-24),fill=(10,18,30,255));draw_counter(draw,index,100,47,7)
+            cards.append(frame.tobytes())
+        prefix_frame=Image.new('RGBA',(W,H),(200,0,0,255));draw_counter(ImageDraw.Draw(prefix_frame),99,100,47,7)
+        raw=b''.join(cards);camera_raw=prefix_frame.tobytes()*25+b''.join(cards[:50])
+        t=np.arange(3*rate,dtype=np.float64)/rate;rng=np.random.default_rng(62731)
+        gain=rng.uniform(.08,.7,150)[np.arange(3*rate)//960]
+        pcm=np.stack((np.sin(2*np.pi*433*t)*gain,np.sin(2*np.pi*739*t)*gain*.73),axis=1).astype('<f4')
+        camera_pcm=pcm[:2*rate];expected=np.concatenate((np.zeros((rate,2),dtype='<f4'),camera_pcm)).tobytes()
+        for name,data in (('reference.rgba',raw),('camera.rgba',camera_raw),('reference.f32',pcm.tobytes()),('camera.f32',camera_pcm.tobytes())):
+            (work/name).write_bytes(data)
+        reference=assets/'source-reference.mkv';native=assets/'source-native.mkv';offset=assets/'source-offset.mkv'
+        for name,path in (('reference',reference),('camera',native)):
+            command=[exe,'-hide_banner','-v','error','-f','rawvideo','-pixel_format','rgba','-video_size',f'{W}x{H}',
+                '-framerate','25','-i',work/(name+'.rgba'),'-f','f32le','-ar',rate,'-ac','2','-i',work/(name+'.f32')]
+            if name=='camera':command+=['-filter_complex','[1:a]asetpts=PTS+1/TB[a]','-map','0:v:0','-map','[a]']
+            command+=['-c:v','ffv1','-pix_fmt','bgra','-c:a','pcm_f32le',path];run('make-'+name,command)
+        run('make-offset',[exe,'-v','error','-i',native,'-map','0','-c','copy','-output_ts_offset','5',offset])
+        discovery=cli('capabilities','capabilities')['data']['capabilities']['media']
+        check('audio-source-clock-discoverable',discovery['source_audio_clock']['protocol']=='demux-relative-first-audio-pts-v1'
+            and discovery['source_audio_clock']['async_clock_drift_correction'] is False
+            and discovery['multicam_source_coverage']['version']=='0.4.0')
+        check('reference-source-complete-PCM',audio('reference-PCM',reference)==pcm.tobytes())
+        record['GIF']={'source-reference':gif(assets/'source-reference.gif',raw)};record['cases']={}
+        for case,source,origin in (('native',native,0),('offset',offset,5)):
+            measured=json.loads(run(case+'-source-native-audio-PTS',[probe,'-v','error','-select_streams','a:0','-show_frames',
+                '-show_streams','-show_format','-show_entries','frame=pts,nb_samples:stream=time_base,start_pts,start_time:format=start_time,duration','-of','json',source]))
+            write(evidence/(case+'-source-audio-PTS.json'),measured)
+            native_first=Fraction(int(measured['frames'][0]['pts']))*Fraction(measured['streams'][0]['time_base'])
+            demux=Fraction(measured['format']['start_time'])
+            check(case+'-real-audio-origin',demux==origin and native_first-demux==1,
+                native_first_seconds=str(native_first),format_origin=str(demux),raw_container_duration=measured['format']['duration'])
+            check(case+'-source-PCM-contains-only-original-two-seconds',audio(case+'-source-PCM',source)==camera_pcm.tobytes())
+            normalized=run(case+'-normalized-source-PCM',[exe,'-v','error','-i',source,'-map','0:a:0','-vn','-af',
+                'aresample=48000:first_pts=0','-ac','2','-f','f32le','pipe:1'],binary=True)
+            check(case+'-independent-first-PTS-PCM',normalized==expected,bytes=len(expected),samples_per_channel=144000)
+            check(case+'-source-native-picture',video(case+'-source-picture',source)==camera_raw,frames=75)
+            record['GIF']['source-'+case]=gif(assets/('source-'+case+'.gif'),camera_raw)
+            project=work/('project-'+case);cli(case+'-init','project','init',project)
+            for asset_id,path in (('reference',reference),('camera',source)):
+                cli(case+'-ingest-'+asset_id,'media','ingest','--project',project,'--input',path,'--asset-id',asset_id,
+                    '--source-url','local://audio-native-origin/original','--license-spdx','CC0-1.0',
+                    '--license-url','local://audio-native-origin/CC0-1.0','--verification-status','verified',
+                    '--permitted-use','commercial_ad','--creator','agent-video-kit',
+                    '--evidence','Original seven-segment rectangles and deterministic stereo. No font, stock, model or remote media.')
+            p=json.loads((project/'project.json').read_bytes());p['settings']['canvas']={'width':W,'height':H,'background':'#000000'}
+            p['settings']['timebase']={'ticks_per_second':TPS,'display_fps':{'num':25,'den':1}};write(project/'project.json',p)
+            request=project/'initial.json';write(request,{'operations':[
+                {'op':'append_clip','track_id':'track_video_1','id':'camera_picture','asset_id':'camera',
+                 'timeline_start_tick':0,'source_in_tick':0,'source_out_tick':270000,'duration_tick':270000},
+                {'op':'append_clip','track_id':'track_audio_1','id':'master_audio','asset_id':'camera',
+                 'timeline_start_tick':0,'source_in_tick':0,'source_out_tick':270000,'duration_tick':270000},
+                {'op':'set_sequence_duration','sequence_id':'seq_main','duration_tick':270000,'trim':False}]})
+            cli(case+'-compose-initial','timeline','compose','--project',project,'--input',request)
+            plan=project/'switch.json';write(plan,[{'camera_asset_id':'camera','start_seconds':0.,'end_seconds':3.}])
+            common=('media','multicam','--project',project,'--source-asset-id','reference','--source-asset-id','camera',
+                '--reference-asset-id','reference','--sample-rate','8000','--analysis-seconds','3','--max-offset-seconds','1.5',
+                '--switch-plan',plan,'--start-seconds','0','--end-seconds','3','--track-id','track_video_1',
+                '--source-shortfall','trim','--output',project/'validation/sync.json')
+            def files():return {p.relative_to(project).as_posix():sha(p) for p in project.rglob('*') if p.is_file()}
+            before=files();dry=cli(case+'-sync-dry',*common,'--dry-run')['data']['plan']
+            check(case+'-sync-dry-does-not-write',files()==before)
+            alignment=next(row for row in dry['sync']['offsets'] if row['asset_id']=='camera')
+            segment=dry['segments'][0]
+            check(case+'-source-clock-offset-and-confidence',alignment['relative_delay_seconds']==1 and alignment['score']>.95
+                and alignment['score_contract']=='overlap_pearson_excluding_first_difference_boundary_v1',delay=alignment['relative_delay_seconds'],score=alignment['score'])
+            check(case+'-trim-keeps-original-reference-event-range',segment['source_in_seconds']==1 and segment['source_out_seconds']==3
+                and segment['timeline_start_seconds']==0 and segment['duration_seconds']==2 and segment['speed']==1)
+            mode_results={}
+            for mode in ('output','synced'):
+                if mode=='synced':
+                    cli(case+'-sync-apply',*common,'--apply','--replace-track')
+                    update=project/'reference-master.json';write(update,{'operations':[{'op':'update_clip','clip_id':'master_audio','patch':{'asset_id':'reference'}}]})
+                    cli(case+'-reference-master','timeline','compose','--project',project,'--input',update)
+                preview=cli(case+'-'+mode+'-preview','preview','range','--project',project,'--start-frame','0','--end-frame','75','--height',H)['data']
+                master=Path(preview['master']);shutil.copy2(master,assets/(case+'-'+mode+'-lossless.nut'))
+                wanted_picture=camera_raw if mode=='output' else b''.join(cards[:50])+bytes((0,0,0,255))*(W*H)*25
+                wanted_audio=expected if mode=='output' else pcm.tobytes()
+                decoded_picture=video(case+'-'+mode+'-lossless-picture',master);decoded_audio=audio(case+'-'+mode+'-lossless-PCM',master)
+                check(case+'-'+mode+'-complete-independent-RGBA',decoded_picture==wanted_picture,frames=75,bytes=len(wanted_picture))
+                check(case+'-'+mode+'-complete-independent-PCM',decoded_audio==wanted_audio,bytes=len(wanted_audio),samples_per_channel=144000)
+                if mode=='output':
+                    sound=np.frombuffer(decoded_audio,dtype='<f4').reshape(-1,2)
+                    wave=Image.new('RGBA',(W,160),(10,18,30,255));draw=ImageDraw.Draw(wave)
+                    for channel in range(2):
+                        middle=45+channel*70
+                        for x in range(W):
+                            chunk=sound[x*len(sound)//W:(x+1)*len(sound)//W,channel]
+                            amplitude=float(np.max(np.abs(chunk))) if chunk.size else 0.
+                            draw.line((x,middle-int(amplitude*40),x,middle+int(amplitude*40)),fill=(45,220,170,255),width=1)
+                    for second in range(4):
+                        x=min(W-16,round(second*W/3));draw.line((x,0,x,159),fill=(80,90,110,255));draw_counter(draw,second,x,0,1)
+                    wave.save(assets/(case+'-decoded-PCM.png'))
+                    check(case+'-exact-leading-second-is-silent',not np.any(sound[:rate]))
+                output=project/'renders'/(case+'-'+mode+'.mp4')
+                rendered=cli(case+'-'+mode+'-render','render','--project',project,'--output',output,'--profile','custom',
+                    '--width',W,'--height',H,'--crf','0','--pixel-format','yuv444p')['data']
+                shutil.copy2(output,assets/output.name);shutil.copy2(Path(rendered['manifest']),evidence/(case+'-'+mode+'-manifest.json'))
+                encoded=video(case+'-'+mode+'-encoded-picture',output)
+                check(case+'-'+mode+'-encoded-frame-count',len(encoded)==75*size,frames=75)
+                pts=json.loads(run(case+'-'+mode+'-encoded-PTS',[probe,'-v','error','-select_streams','v:0','-show_frames','-show_streams',
+                    '-show_entries','frame=pts,duration:stream=time_base','-of','json',output]))
+                tb=Fraction(pts['streams'][0]['time_base'])
+                check(case+'-'+mode+'-all-encoded-PTS',[int(f['pts'])*tb for f in pts['frames']]==[Fraction(i,25) for i in range(75)])
+                maximum=max(abs(encoded[i*size+c]-wanted_picture[i*size+c]) for i in range(75) for c in range(3))
+                check(case+'-'+mode+'-encoded-identity-patches',maximum<=2,maximum_error=maximum,full_encoded_RGBA_equal_claimed=False)
+                record['GIF'][case+'-'+mode]=gif(assets/(case+'-'+mode+'.gif'),encoded)
+                lossy=audio(case+'-'+mode+'-AAC-PCM',output)
+                mode_results[mode]={'lossless_frames':75,'RGBA_bytes':len(wanted_picture),'PCM_bytes':len(wanted_audio),
+                    'samples_per_channel':144000,'encoded_patch_max_error':maximum,'decoded_AAC_samples_per_channel':len(lossy)//8,
+                    'AAC_exact_PCM_equality_claimed':False,'GIF_duration_ms':record['GIF'][case+'-'+mode]['duration_ms']}
+            record['cases'][case]={'native_audio_first_seconds':str(native_first),'format_origin_seconds':str(demux),
+                'relative_audio_first_seconds':1,'sync_delay_seconds':alignment['relative_delay_seconds'],'sync_score':alignment['score'],
+                'sync_reference_video_gap_frames':25,'modes':mode_results}
+        write(assets/'source-origin.json',{'license':'CC0-1.0','creator':'agent-video-kit','original_generated_media':True,
+            'font_or_external_image_used':False,'generator_sha256':own_sha,'video_frames':75,'fps':25,
+            'audio_sample_rate':48000,'channels':2,'actual_audio_leading_gap_seconds':1,'demux_origin_cases_seconds':[0,5],
+            'GIF_note':'Actual MP4 decode for outputs; raw original picture frames for sources. GIF has no audio.',
+            'AAC_note':'Lossless PCM is byte-checked; AAC decode is recorded without exact sample equality or listening acceptance.'})
+        check('same-producer-source-unchanged',sha(__file__)==own_sha)
+        record['media']={p.relative_to(ROOT).as_posix():{'sha256':sha(p),'bytes':p.stat().st_size} for p in sorted(assets.iterdir()) if p.is_file()}
+        record.update(status='passed',installed=bool(args.installed),script_sha256=own_sha)
+    except BaseException as error:
+        record.update(status='failed',error={'type':type(error).__name__,'message':str(error)});raise
+    finally:
+        record.update(finished_at_utc=datetime.now(timezone.utc).isoformat(),frozen_after=frozen())
+        record['frozen_equal']=record['frozen_before']==record['frozen_after']
+        record['cli_calls']=sum(bool(row['cli']) for row in record['calls']);record['native_commands']=sum(not row['cli'] for row in record['calls'])
+        save();print(json.dumps({k:record.get(k) for k in ('status','cli_calls','native_commands','frozen_equal','error')},ensure_ascii=False),flush=True)
+    assert record['frozen_equal']
+
+
+if __name__=='__main__':main()
