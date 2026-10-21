@@ -1,0 +1,149 @@
+test_direct_forward_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_forward_audio_tail_without_video_is_empty) ... ERROR
+test_direct_forward_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_forward_before_delayed_video_is_empty) ... ERROR
+test_direct_reverse_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_audio_tail_without_video_is_empty) ... ERROR
+test_direct_reverse_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_before_delayed_video_is_empty) ... ERROR
+test_nested_forward_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_audio_tail_without_video_is_empty) ... ERROR
+test_nested_forward_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_before_delayed_video_is_empty) ... ERROR
+test_nested_reverse_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_audio_tail_without_video_is_empty) ... ERROR
+test_nested_reverse_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_before_delayed_video_is_empty) ... ERROR
+
+======================================================================
+ERROR: test_direct_forward_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_forward_audio_tail_without_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 65, in test_direct_forward_audio_tail_without_video_is_empty
+    self.empty_window()
+    ~~~~~~~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 59, in empty_window
+    expected, _, _ = self.render(reference, reference['sequences'][0])
+                     ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4570, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_direct_forward_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_forward_before_delayed_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 77, in test_direct_forward_before_delayed_video_is_empty
+    self.empty_window(prefix=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 59, in empty_window
+    expected, _, _ = self.render(reference, reference['sequences'][0])
+                     ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4570, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_direct_reverse_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_audio_tail_without_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 68, in test_direct_reverse_audio_tail_without_video_is_empty
+    self.empty_window(reverse=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 59, in empty_window
+    expected, _, _ = self.render(reference, reference['sequences'][0])
+                     ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4570, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_direct_reverse_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_before_delayed_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 80, in test_direct_reverse_before_delayed_video_is_empty
+    self.empty_window(prefix=True, reverse=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 59, in empty_window
+    expected, _, _ = self.render(reference, reference['sequences'][0])
+                     ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4570, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_nested_forward_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_audio_tail_without_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 71, in test_nested_forward_audio_tail_without_video_is_empty
+    self.empty_window(nested=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 59, in empty_window
+    expected, _, _ = self.render(reference, reference['sequences'][0])
+                     ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4570, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_nested_forward_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_before_delayed_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 83, in test_nested_forward_before_delayed_video_is_empty
+    self.empty_window(prefix=True, nested=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 59, in empty_window
+    expected, _, _ = self.render(reference, reference['sequences'][0])
+                     ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4570, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_nested_reverse_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_audio_tail_without_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 74, in test_nested_reverse_audio_tail_without_video_is_empty
+    self.empty_window(nested=True, reverse=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 59, in empty_window
+    expected, _, _ = self.render(reference, reference['sequences'][0])
+                     ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4570, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_nested_reverse_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_before_delayed_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 86, in test_nested_reverse_before_delayed_video_is_empty
+    self.empty_window(prefix=True, nested=True, reverse=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 59, in empty_window
+    expected, _, _ = self.render(reference, reference['sequences'][0])
+                     ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4570, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+----------------------------------------------------------------------
+Ran 8 tests in 3.940s
+
+FAILED (errors=8)

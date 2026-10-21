@@ -1,0 +1,220 @@
+"""Public CLI proof of native empty video selections with retained audible PCM."""
+from __future__ import annotations
+import argparse
+from datetime import datetime,timezone
+from fractions import Fraction
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import time
+from PIL import Image,ImageDraw
+from run_frozen_regression import frozen
+
+ROOT=Path(__file__).resolve().parents[1]
+W,H,TPS=320,180,90000
+RATE=Fraction(30000,1001)
+
+
+def sha(path):
+    with Path(path).open('rb') as stream:
+        return 'sha256:'+hashlib.file_digest(stream,'sha256').hexdigest()
+
+
+def write(path,value):
+    Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+
+
+def walk(value):
+    if isinstance(value,dict):
+        yield value
+        for child in value.values():yield from walk(child)
+    elif isinstance(value,list):
+        for child in value:yield from walk(child)
+
+
+def indexes(value):
+    rows={json.dumps(v,sort_keys=True):v for v in walk(value)
+          if v.get('protocol')=='native-video-frame-index-v1' and 'source_index_decode_calls' in v}
+    return list(rows.values())
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    for name in ('work','evidence','assets'):parser.add_argument('--'+name,type=Path,required=True)
+    parser.add_argument('--installed',type=Path)
+    args=parser.parse_args()
+    work,evidence,assets=(getattr(args,n).resolve() for n in ('work','evidence','assets'))
+    assert work.is_relative_to(ROOT/'product/.runtime')
+    assert evidence.is_relative_to(ROOT/'docs/validation') and assets.is_relative_to(ROOT/'docs/assets')
+    assert not any(p.exists() for p in (work,evidence,assets))
+    for path in (work,evidence,assets):path.mkdir(parents=True)
+    (evidence/'executed-smoke.py.txt').write_bytes(Path(__file__).read_bytes())
+    record={'status':'running','started_at_utc':datetime.now(timezone.utc).isoformat(),
+        'native_windows':sys.platform=='win32','virtualization':False,'network':False,
+        'frozen_before':frozen(),'calls':[],'checks':[],'cases':{},
+        'continuous_playback_reviewed':False,'audio_listened':False,'full_capcut_parity':False}
+    def save():write(evidence/'verification.json',record)
+    def check(name,condition,**details):
+        record['checks'].append({'name':name,'ok':bool(condition),**details});save()
+        assert condition,name
+    env=dict(os.environ)
+    temp=ROOT/'product/.runtime/temp';temp.mkdir(parents=True,exist_ok=True)
+    env.update(TEMP=str(temp),TMP=str(temp),TMPDIR=str(temp),PYTHONDONTWRITEBYTECODE='1')
+    bootstrap=('import sys;sys.path.insert(0,sys.argv.pop(1));'
+        'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+        'from ai_ad_editor.cli import main;raise SystemExit(main())')
+    prefix=([sys.executable,'-I','-S','-B','-X','utf8',args.installed.resolve()/'run.py'] if args.installed else
+        [sys.executable,'-E','-B','-X','utf8','-c',bootstrap,ROOT/'product/src'])
+    prefix=list(map(str,prefix))
+    def run(label,command,data=None,expected=0,binary=False):
+        command=list(map(str,command));started=time.monotonic()
+        result=subprocess.run(command,input=data,capture_output=True,cwd=ROOT,env=env,timeout=600)
+        (evidence/(label+'.stderr.log')).write_bytes(result.stderr)
+        digest='sha256:'+hashlib.sha256(result.stdout).hexdigest()
+        if binary:write(evidence/(label+'.stdout-summary.json'),{'bytes':len(result.stdout),'sha256':digest})
+        else:(evidence/(label+'.stdout.log')).write_bytes(result.stdout)
+        record['calls'].append({'label':label,'command':command,'exit_code':result.returncode,
+            'expected_exit_code':expected,'wall_seconds':time.monotonic()-started,'stdout_sha256':digest})
+        save();assert result.returncode==expected,label+': '+(result.stderr+result.stdout)[-1600:].decode('utf8','replace')
+        return result.stdout
+    def cli(label,*argv,expected=0):return json.loads(run(label,[*prefix,*argv],expected=expected))
+    exe,probe=shutil.which('ffmpeg'),shutil.which('ffprobe');assert exe and probe
+    record.update(ffmpeg={'path':exe,'sha256':sha(exe)},ffprobe={'path':probe,'sha256':sha(probe)})
+    def video(label,path):return run(label,[exe,'-v','error','-i',path,'-map','0:v:0','-an',
+        '-fps_mode','passthrough','-f','rawvideo','-pix_fmt','rgba','pipe:1'],binary=True)
+    def audio(label,path):return run(label,[exe,'-v','error','-i',path,'-map','0:a:0','-vn',
+        '-ar','48000','-ac','2','-f','f32le','-c:a','pcm_f32le','pipe:1'],binary=True)
+    def gif(path,images,delays):
+        images[0].save(path,save_all=True,append_images=images[1:],duration=delays,loop=0,disposal=2,optimize=False)
+        with Image.open(path) as image:
+            total=0
+            for n in range(image.n_frames):image.seek(n);total+=image.info.get('duration',0)
+            return {'frames':image.n_frames,'duration_ms':total,'timing':'10 ms GIF grid; identical frames coalesce'}
+    def author(project):
+        value=json.loads((project/'project.json').read_bytes())
+        return {'project':'sha256:'+hashlib.sha256(json.dumps({k:value[k] for k in ('assets','settings','sequences')},
+            sort_keys=True,ensure_ascii=False).encode('utf8')).hexdigest(),'rights':sha(project/'rights-ledger.json')}
+    try:
+        cards=[]
+        for n in range(8):
+            image=Image.new('RGBA',(W,H),(30+n*20,55+n*9,220-n*16,255));draw=ImageDraw.Draw(image)
+            draw.rectangle((14,24,306,112),fill=(12,18,29,255))
+            draw.text((24,36),'ORIGINAL LOCAL VIDEO / AUDIBLE 2 s',fill='white')
+            draw.text((24,63),f'FRAME {n:02d} / NATIVE PTS {n*40} ms',fill='white')
+            draw.text((24,89),'VIDEO ENDS AT 320 ms',fill='white');cards.append(image)
+        raw=b''.join(image.tobytes() for image in cards)
+        source=assets/'source-audio-tail.mkv'
+        run('source-encode',[exe,'-v','error','-n','-f','rawvideo','-pixel_format','rgba','-video_size',f'{W}x{H}',
+            '-framerate','25','-i','pipe:0','-f','lavfi','-i',
+            'aevalsrc=0.2*sin(2*PI*440*t)|0.17*sin(2*PI*731*t):s=48000:d=2',
+            '-map','0:v:0','-map','1:a:0','-c:v','ffv1','-pix_fmt','bgra','-c:a','pcm_f32le',source],raw)
+        delayed=assets/'source-delayed-video.mkv'
+        run('source-delay',[exe,'-v','error','-n','-i',source,'-filter_complex','[0:v]setpts=PTS+1/TB[v]',
+            '-map','[v]','-map','0:a:0','-fps_mode','passthrough','-enc_time_base','filter',
+            '-c:v','ffv1','-pix_fmt','bgra','-c:a','pcm_f32le',delayed])
+        for label,path,origin in (('tail',source,0),('prefix',delayed,1)):
+            check(label+'-all-original-RGBA',video(label+'-decode-source',path)==raw)
+            value=json.loads(run(label+'-probe-source',[probe,'-v','error','-select_streams','v:0','-show_frames',
+                '-show_streams','-show_format','-show_entries','frame=pts,duration:stream=time_base:format=start_time,duration','-of','json',path]))
+            points=[int(f['pts'])*Fraction(value['streams'][0]['time_base']) for f in value['frames']]
+            check(label+'-native-video-PTS-and-longer-audio',points==[Fraction(origin)+Fraction(n,25) for n in range(8)]
+                and Fraction(value['format']['start_time'])==0 and Fraction(value['format']['duration'])==2)
+            run(label+'-source-view',[exe,'-v','error','-n','-i',path,'-fps_mode','passthrough',
+                '-c:v','libx264','-crf','12','-pix_fmt','yuv444p','-c:a','aac',assets/(label+'-source-review.mp4')])
+        record['source_gif']=gif(assets/'source-cards.gif',cards,[40]*8)
+        underlay=Image.new('RGBA',(W,H),(12,210,75,255));draw=ImageDraw.Draw(underlay)
+        draw.rectangle((15,30,305,126),fill=(10,44,30,255));draw.text((25,43),'ACTUAL UNDERLYING IMAGE LAYER',fill='white')
+        draw.text((25,69),'NO SELECTED VIDEO DISPLAY FRAMES',fill='white');draw.text((25,95),'EXPLICIT AUDIO TRACK IS RETAINED',fill='white')
+        background=assets/'underlying-layer.png';underlay.save(background)
+        for label,nested,reverse,is_prefix in (('direct-reverse-tail',False,True,False),('nested-forward-prefix',True,False,True)):
+            project=work/label;chosen=delayed if is_prefix else source
+            cli(label+'-init','project','init',project)
+            for asset_id,path in (('source',chosen),('background',background)):
+                cli(label+'-ingest-'+asset_id,'media','ingest','--project',project,'--input',path,'--asset-id',asset_id,
+                    '--source-url','local://native-empty-window/original','--license-spdx','CC0-1.0',
+                    '--license-url','local://native-empty-window/CC0-1.0','--verification-status','verified',
+                    '--permitted-use','commercial_ad','--creator','agent-video-kit','--evidence','Original generated frame cards, image and synthesized stereo tones')
+            p=json.loads((project/'project.json').read_bytes());p['settings']['canvas']={'width':W,'height':H,'background':'#000000'}
+            p['settings']['timebase']={'ticks_per_second':TPS,'display_fps':{'num':RATE.numerator,'den':RATE.denominator}}
+            write(project/'project.json',p)
+            left=0 if is_prefix else TPS
+            common={'timeline_start_tick':9900,'duration_tick':45000,'source_in_tick':left,'source_out_tick':left+45000,'reverse':reverse}
+            ops=[{'op':'update_track','track_id':'track_video_1','patch':{'order':1}},
+                 {'op':'add_track','id':'underlay','kind':'video','order':0},
+                 {'op':'append_clip','track_id':'underlay','id':'underlay_clip','asset_id':'background',
+                  'timeline_start_tick':0,'duration_tick':135000,'source_in_tick':0,'source_out_tick':135000}]
+            if nested:
+                ops.append({'op':'add_sequence','id':'child','duration_tick':180000})
+                for kind in ('video','audio'):
+                    ops.append({'op':'append_clip','sequence_id':'child','track_id':'child_'+kind+'_1','id':'leaf_'+kind,
+                        'asset_id':'source','timeline_start_tick':0,'duration_tick':180000,'source_in_tick':0,'source_out_tick':180000})
+                ops.append({'op':'append_sequence_clip','track_id':'track_video_1','id':'parent','nested_sequence_id':'child',
+                    **common,'speed_curve':{'keyframes':[{'at_tick':0,'speed':1.},{'at_tick':45000,'speed':1.}]}})
+            else:
+                for kind in ('video','audio'):ops.append({'op':'append_clip','track_id':'track_'+kind+'_1','id':'leaf_'+kind,'asset_id':'source',**common})
+            ops.append({'op':'set_sequence_duration','sequence_id':'seq_main','duration_tick':135000,'trim':False})
+            request=assets/(label+'-request.json');write(request,{'operations':ops})
+            cli(label+'-compose','timeline','compose','--project',project,'--input',request)
+            cli(label+'-validate','validate','--project',project);before=author(project)
+            output=project/'renders'/('result.mp4')
+            result=cli(label+'-render','render','--project',project,'--output',output,'--profile','custom',
+                '--width',W,'--height',H,'--crf','0','--pixel-format','yuv444p')['data']
+            manifest=json.loads(Path(result['manifest']).read_bytes());write(evidence/(label+'-render-manifest.json'),manifest)
+            empty=[v for v in walk(manifest['inputs']) if v.get('empty_native_video_interval')]
+            check(label+'-explicit-empty-selection',bool(empty) and all(v['selected_frame_count']==0 for v in empty))
+            selected=indexes(manifest['inputs']);check(label+'-verified-source-index-built',len(selected)==1 and selected[0]['source_index_decode_calls']==1)
+            second=cli(label+'-render-hit','render','--project',project,'--output',project/'renders/repeated.mp4',
+                '--profile','custom','--width',W,'--height',H,'--crf','0','--pixel-format','yuv444p')['data']
+            second_manifest=json.loads(Path(second['manifest']).read_bytes());write(evidence/(label+'-render-hit-manifest.json'),second_manifest)
+            hits=indexes(second_manifest['inputs']);check(label+'-verified-index-hit-skips-probe',len(hits)==1 and hits[0]['source_index_decode_calls']==0)
+            preview=cli(label+'-preview','preview','range','--project',project,'--start-frame',0,'--end-frame',45,'--height',H)['data']
+            master=video(label+'-decode-preview-video',preview['master'])
+            check(label+'-all-lossless-RGBA-frames',master==underlay.tobytes()*45,bytes=len(master),max_RGBA_error=0)
+            source_pcm=audio(label+'-decode-source-audio',chosen);sample=0 if is_prefix else 48000
+            core=source_pcm[sample*8:(sample+24000)*8];assert len(core)==24000*8
+            if reverse:core=b''.join(core[i:i+8] for i in range(len(core)-8,-1,-8))
+            expected_pcm=bytes(5280*8)+core+bytes((72000-5280-24000)*8)
+            actual_pcm=audio(label+'-decode-preview-audio',preview['master'])
+            check(label+'-all-independent-stereo-float-PCM-samples',actual_pcm==expected_pcm,bytes=len(actual_pcm),samples_per_channel=72000)
+            shutil.copyfile(output,assets/(label+'.mp4'));check(label+'-published-MP4-is-actual-output',sha(output)==sha(assets/(label+'.mp4')))
+            timing=json.loads(run(label+'-encoded-PTS',[probe,'-v','error','-select_streams','v:0','-show_frames','-show_streams',
+                '-show_entries','frame=pts:stream=time_base','-of','json',output]))
+            pts=[int(f['pts'])*Fraction(timing['streams'][0]['time_base']) for f in timing['frames']]
+            check(label+'-all-encoded-output-PTS',pts==[Fraction(n)/RATE for n in range(45)])
+            encoded=video(label+'-decode-actual-output',output);check(label+'-encoded-frame-count',len(encoded)==45*W*H*4)
+            images=[Image.frombytes('RGBA',(W,H),encoded[n*W*H*4:(n+1)*W*H*4]) for n in range(45)]
+            animation=gif(assets/(label+'.gif'),images,[10*(round((n+1)*1000/float(RATE)/10)-round(n*1000/float(RATE)/10)) for n in range(45)])
+            images[0].save(assets/(label+'-actual-frame.png'));write(assets/(label+'-editable-project.json'),json.loads((project/'project.json').read_bytes()))
+            check(label+'-author-and-rights-unchanged',author(project)==before)
+            record['cases'][label]={'frames':45,'fps':str(RATE),'authored_duration_seconds':'3/2',
+                'preview_RGBA_bytes':len(master),'preview_RGBA_sha256':'sha256:'+hashlib.sha256(master).hexdigest(),
+                'preview_PCM_bytes':len(actual_pcm),'preview_PCM_sha256':'sha256:'+hashlib.sha256(actual_pcm).hexdigest(),
+                'encoded_full_frame_pixel_equality_claimed':False,'gif':animation,'author_hashes':before};save()
+        index_file=Path(selected[0]['files']['pts']['path']);original=index_file.read_bytes()
+        damaged=bytes([original[0]^1])+original[1:]
+        (evidence/'corruption-original-pts.i64le').write_bytes(original);(evidence/'corruption-damaged-pts.i64le').write_bytes(damaged)
+        index_file.write_bytes(damaged);rejected=project/'renders/rejected.mp4'
+        try:
+            refusal=cli('corrupt-index-empty-window-rejected','render','--project',project,'--output',rejected,expected=6)
+            check('corrupt-index-is-not-treated-as-legitimate-empty-window',refusal['errors'][0]['code']=='NATIVE_INDEX_CORRUPT' and not rejected.exists())
+        finally:index_file.write_bytes(original)
+        write(assets/'rights.json',{'license':'CC0-1.0','creator':'agent-video-kit','generator':'scripts/smoke_native_empty_window.py',
+            'source_streams':'Eight original 25 Hz native frames; 2 s independently synthesized stereo PCM. Delayed video starts at 1 s.',
+            'source_gif_note':'Only the original eight display frames, 320 ms; use MKV for delayed start and audio tail.',
+            'files':{p.name:sha(p) for p in assets.iterdir() if p.is_file()}})
+        record.update(status='passed',cli_calls=sum(v['command'][:len(prefix)]==prefix for v in record['calls']),
+            native_commands=sum(v['command'][:len(prefix)]!=prefix for v in record['calls']),
+            assets={p.relative_to(ROOT).as_posix():sha(p) for p in assets.iterdir() if p.is_file()})
+    except BaseException as caught:
+        record.update(status='failed',error={'type':type(caught).__name__,'message':str(caught)});raise
+    finally:
+        record.update(finished_at_utc=datetime.now(timezone.utc).isoformat(),frozen_after=frozen())
+        record['frozen_equal']=record['frozen_before']==record['frozen_after'];save()
+        print(json.dumps({k:record.get(k) for k in ('status','cli_calls','native_commands','frozen_equal','error')}),flush=True)
+
+
+if __name__=='__main__':main()

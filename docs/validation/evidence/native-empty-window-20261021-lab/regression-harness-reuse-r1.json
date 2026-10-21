@@ -1,0 +1,38 @@
+{
+  "parent": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\nested-native-clock-lab-20261021\\scripts\\run_nested_native_regressions.py",
+  "parent_sha256": "sha256:eedcd1460b8b31d3789d61f3578ce21aa6f356a392a3f62c1be3b71b6b83d4b8",
+  "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\native-empty-window-lab-20261021\\scripts\\run_empty_native_regressions.py",
+  "output_sha256": "sha256:be7b56b9964a0a6355bfeed85bc50de681cf971992e4c04a1eb83d2c13aab58c",
+  "replacements": [
+    [
+      "nested-native-clock-20261021-lab",
+      "native-empty-window-20261021-lab"
+    ],
+    [
+      "('nested', 'test_nested*.py', 105)]",
+      "('nested', 'test_nested*.py', 105),\n            ('empty', 'test_native_empty_window.py', 16)]"
+    ],
+    [
+      "run_nested_native_regressions.py",
+      "run_empty_native_regressions.py"
+    ],
+    [
+      "final-native-clock-r1.json",
+      "after-r3.json"
+    ],
+    [
+      "len(before) == 255",
+      "len(before) == 256"
+    ],
+    [
+      "native['methods'] == 32",
+      "native['methods'] == 16"
+    ],
+    [
+      "277",
+      "293"
+    ]
+  ],
+  "fixture_manifest_sha256": "sha256:6d5faa920f7d261549f644a313ae99a884dc44d0d7bb50006e7781f9e50d4edc",
+  "status": "adapted-reviewed-serial-harness-not-yet-executed"
+}

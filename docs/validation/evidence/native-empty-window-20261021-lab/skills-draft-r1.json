@@ -1,0 +1,50 @@
+{
+  "status": "passed-four-unregistered-drafts",
+  "skills": {
+    "video-cut-agent-editor": {
+      "path": "skills/video-cut-agent-editor/SKILL.md",
+      "sha256": "sha256:8434d65ed63e3a3b5017b0e0e9adab3a30272dc3d6a468ad88df061f49a65cc5",
+      "parent_sha256": "sha256:a0e6e80f593f3f0f15dfc83b0d16f81a0d692a24386fe15e9bc496661fe45705",
+      "parent_snapshot": "docs/validation/evidence/native-empty-window-20261021-lab/skills-parent-r1/video-cut-agent-editor/SKILL.md",
+      "new_block": "A valid source selection wholly before native video begins or after its known EOF can have no video frames. Preserve the authored window and underlying layers. Author audio explicitly on an audio track; video placement alone does not extract sound.\nRead the [experimental empty-window contract](../../docs/specs/原生视频空区间契约_实验_v0.1_2026-10-21.md) and [actual independent evidence](../../docs/validation/空视频选区与显式音频保留独立实验_2026-10-21.md).\nThis is an unregistered laboratory draft; the 256-input candidate has not completed its full suite or been published. Zero selected-frame raster budget is not zero decoding or process RSS.",
+      "new_block_marker": "NATIVE-EMPTY-WINDOW-LAB-20261021",
+      "validator_stdout": "Skill is valid!",
+      "registered": false,
+      "future_integration": "Apply only this new block onto the then-current main Skill; never replace the complete body with this draft."
+    },
+    "video-cut-timeline": {
+      "path": "skills/video-cut-timeline/SKILL.md",
+      "sha256": "sha256:0294539808e35d7b471755311e0efacab1da9ccdb535491b7f37176a253e9993",
+      "parent_sha256": "sha256:c94e4879361a7861837453764ee3bc98b176fdbff21a15354cff31678708aa8b",
+      "parent_snapshot": "docs/validation/evidence/native-empty-window-20261021-lab/skills-parent-r1/video-cut-timeline/SKILL.md",
+      "new_block": "For native leaves, preserve original PTS and the actual last-frame duration. Empty ranges use equal frame bounds and null display-clock endpoints; do not clone frames or substitute opaque black. Virtual inline surfaces retain their child CFR contract.\nRead the [experimental empty-window contract](../../docs/specs/原生视频空区间契约_实验_v0.1_2026-10-21.md) and [actual independent evidence](../../docs/validation/空视频选区与显式音频保留独立实验_2026-10-21.md).\nThis is an unregistered laboratory draft; the 256-input candidate has not completed its full suite or been published. Zero selected-frame raster budget is not zero decoding or process RSS.",
+      "new_block_marker": "NATIVE-EMPTY-WINDOW-LAB-20261021",
+      "validator_stdout": "Skill is valid!",
+      "registered": false,
+      "future_integration": "Apply only this new block onto the then-current main Skill; never replace the complete body with this draft."
+    },
+    "video-cut-quality": {
+      "path": "skills/video-cut-quality/SKILL.md",
+      "sha256": "sha256:9359c9de4bf3f920003a5d48c0a2781c27059a504c12566f12fb0fda6d235f3a",
+      "parent_sha256": "sha256:cc58b556aacb631788110bcc428b2bb640abfd51e47c9aabdc0580aec0bed48a",
+      "parent_snapshot": "docs/validation/evidence/native-empty-window-20261021-lab/skills-parent-r1/video-cut-quality/SKILL.md",
+      "new_block": "Review every lossless RGBA frame and the complete independently selected stereo float PCM. The two actual 45-frame outputs coalesce to a one-frame 1500 ms GIF; this is a viewing artifact and carries no sound. Separate decoded preview equality from MP4/AAC quality.\nRead the [experimental empty-window contract](../../docs/specs/原生视频空区间契约_实验_v0.1_2026-10-21.md) and [actual independent evidence](../../docs/validation/空视频选区与显式音频保留独立实验_2026-10-21.md).\nThis is an unregistered laboratory draft; the 256-input candidate has not completed its full suite or been published. Zero selected-frame raster budget is not zero decoding or process RSS.",
+      "new_block_marker": "NATIVE-EMPTY-WINDOW-LAB-20261021",
+      "validator_stdout": "Skill is valid!",
+      "registered": false,
+      "future_integration": "Apply only this new block onto the then-current main Skill; never replace the complete body with this draft."
+    },
+    "video-cut-project-ops": {
+      "path": "skills/video-cut-project-ops/SKILL.md",
+      "sha256": "sha256:e2caea0dea192e7082b6264c818c3ccc57ebcd8b6571ef3a0b838497907636ca",
+      "parent_sha256": "sha256:3d765c16268af220c1bf78e5e2c899ce0a709a5d4d9c699e765513f06cdbb327",
+      "parent_snapshot": "docs/validation/evidence/native-empty-window-20261021-lab/skills-parent-r1/video-cut-project-ops/SKILL.md",
+      "new_block": "Retain verified source/runtime/index boundaries even when zero frames are selected. NATIVE_INDEX_CORRUPT/exit 6 must still block output. Unknown final native duration remains an error; explicit cache cleanup and authored-reference protection continue to apply.\nRead the [experimental empty-window contract](../../docs/specs/原生视频空区间契约_实验_v0.1_2026-10-21.md) and [actual independent evidence](../../docs/validation/空视频选区与显式音频保留独立实验_2026-10-21.md).\nThis is an unregistered laboratory draft; the 256-input candidate has not completed its full suite or been published. Zero selected-frame raster budget is not zero decoding or process RSS.",
+      "new_block_marker": "NATIVE-EMPTY-WINDOW-LAB-20261021",
+      "validator_stdout": "Skill is valid!",
+      "registered": false,
+      "future_integration": "Apply only this new block onto the then-current main Skill; never replace the complete body with this draft."
+    }
+  },
+  "registration_changed": false
+}

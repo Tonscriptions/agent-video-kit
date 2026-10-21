@@ -1,0 +1,55 @@
+{
+  "operations": [
+    {
+      "op": "update_track",
+      "track_id": "track_video_1",
+      "patch": {
+        "order": 1
+      }
+    },
+    {
+      "op": "add_track",
+      "id": "underlay",
+      "kind": "video",
+      "order": 0
+    },
+    {
+      "op": "append_clip",
+      "track_id": "underlay",
+      "id": "underlay_clip",
+      "asset_id": "background",
+      "timeline_start_tick": 0,
+      "duration_tick": 135000,
+      "source_in_tick": 0,
+      "source_out_tick": 135000
+    },
+    {
+      "op": "append_clip",
+      "track_id": "track_video_1",
+      "id": "leaf_video",
+      "asset_id": "source",
+      "timeline_start_tick": 9900,
+      "duration_tick": 45000,
+      "source_in_tick": 90000,
+      "source_out_tick": 135000,
+      "reverse": true
+    },
+    {
+      "op": "append_clip",
+      "track_id": "track_audio_1",
+      "id": "leaf_audio",
+      "asset_id": "source",
+      "timeline_start_tick": 9900,
+      "duration_tick": 45000,
+      "source_in_tick": 90000,
+      "source_out_tick": 135000,
+      "reverse": true
+    },
+    {
+      "op": "set_sequence_duration",
+      "sequence_id": "seq_main",
+      "duration_tick": 135000,
+      "trim": false
+    }
+  ]
+}

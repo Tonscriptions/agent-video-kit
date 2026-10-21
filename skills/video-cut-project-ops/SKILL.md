@@ -3,6 +3,13 @@ name: video-cut-project-ops
 description: Operate local Agent Projects with snapshots, migration, relinking, persistent render queues, cancellation, and deterministic replay.
 ---
 
+<!-- V85-NATIVE-EMPTY-WINDOW -->
+Retain verified source/runtime/index boundaries even when zero frames are selected. NATIVE_INDEX_CORRUPT/exit 6 must still block output. Unknown final native duration remains an error; explicit cache cleanup and authored-reference protection continue to apply.
+Read the [empty-window contract](../../docs/specs/原生视频空区间契约_v0.1_2026-10-21.md) and [actual independent evidence](../../docs/validation/原生空视频选区与显式音频保留实测_2026-10-21.md).
+Zero selected-frame raster budget is not zero decoding or process RSS.
+<!-- /V85-NATIVE-EMPTY-WINDOW -->
+
+
 <!-- V84-NESTED-NATIVE-CLOCK -->
 When capabilities expose `nested_native_video_clock`, registered native video leaves preserve original PTS/duration through composed author clocks.
 Use existing authored clips, source ticks, speed curves and reverse fields. Preserve native frame holds and real video EOF.
@@ -11,7 +18,7 @@ Keep native-video-index and reverse-video files as verified derived caches. Tran
 Read the [native nested-clock contract](../../docs/specs/嵌套原生VFR时钟契约_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/嵌套原生VFR时钟与多层速度曲线实测_2026-10-21.md).
 Verified index hits skip full-source frame scans only; source/runtime hashes and final decode/encode remain. Existing expression, memory and disk limits apply.
 The 32 new native interval oracles are part of 277 related methods. These proofs do not establish full CapCut parity, natural/HDR quality, audio quality, long-duration latency or total RSS.
-Wholly empty native-video selections remain outside this release acceptance. Preserve explicit compiler refusals and do not silently pad them.
+Wholly empty native-video selections follow the validated empty-interval contract; preserve the original window and explicit audio track. Unknown EOF and corrupt indexes still reject.
 <!-- /V84-NESTED-NATIVE-CLOCK -->
 
 

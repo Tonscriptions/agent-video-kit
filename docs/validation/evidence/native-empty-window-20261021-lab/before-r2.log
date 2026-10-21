@@ -1,0 +1,230 @@
+test_direct_forward_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_forward_audio_tail_without_video_is_empty) ... ok
+test_direct_forward_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_forward_before_delayed_video_is_empty) ... ok
+test_direct_reverse_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_audio_tail_without_video_is_empty) ... ERROR
+test_direct_reverse_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_before_delayed_video_is_empty) ... ERROR
+test_nested_forward_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_audio_tail_without_video_is_empty) ... ERROR
+test_nested_forward_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_before_delayed_video_is_empty) ... ERROR
+test_nested_reverse_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_audio_tail_without_video_is_empty) ... ERROR
+test_nested_reverse_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_before_delayed_video_is_empty) ... ERROR
+
+======================================================================
+ERROR: test_direct_reverse_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_audio_tail_without_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 238, in reverse_intervals
+    raise ValueError('native source frame has no positive requested interval')
+ValueError: native source frame has no positive requested interval
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 77, in test_direct_reverse_audio_tail_without_video_is_empty
+    self.empty_window(reverse=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 70, in empty_window
+    actual, _, _ = self.render(project, root)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4128, in build_filter_graph
+    first_source, end_source, reverse_clock, reverse_metadata = reverse_intervals(
+                                                                ~~~~~~~~~~~~~~~~~^
+        uri, int(clip.get('source_in_tick', 0)), int(clip.get('source_out_tick', 1)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, clock_metadata['working_time_base'], expected_time_base=input_base,decoder=alpha_decoder,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        index_context=_frame_index_context,source_sha256=asset['sha256'])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 293, in reverse_intervals
+    raise AppError('REVERSE_VIDEO_CLOCK_INVALID', '无法建立原生倒放帧区间时钟', exit_code=3,
+                   path=str(path), cause=str(error)) from error
+ai_ad_editor.errors.AppError: 无法建立原生倒放帧区间时钟
+
+======================================================================
+ERROR: test_direct_reverse_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_before_delayed_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 220, in reverse_intervals
+    pts,durations,stream,format_info,native,origin,first_time,final_time,first,end,index_metadata=_native_range(
+                                                                                                  ~~~~~~~~~~~~~^
+        path,source_in_tick,source_out_tick,tps,expected_time_base,cancel_file=cancel_file,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        decoder=decoder,index_context=index_context,source_sha256=source_sha256)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 183, in _native_range
+    if end<=first:raise ValueError('requested source window contains no displayed frame')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: requested source window contains no displayed frame
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 89, in test_direct_reverse_before_delayed_video_is_empty
+    self.empty_window(prefix=True, reverse=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 70, in empty_window
+    actual, _, _ = self.render(project, root)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4128, in build_filter_graph
+    first_source, end_source, reverse_clock, reverse_metadata = reverse_intervals(
+                                                                ~~~~~~~~~~~~~~~~~^
+        uri, int(clip.get('source_in_tick', 0)), int(clip.get('source_out_tick', 1)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps, clock_metadata['working_time_base'], expected_time_base=input_base,decoder=alpha_decoder,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        index_context=_frame_index_context,source_sha256=asset['sha256'])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 293, in reverse_intervals
+    raise AppError('REVERSE_VIDEO_CLOCK_INVALID', '无法建立原生倒放帧区间时钟', exit_code=3,
+                   path=str(path), cause=str(error)) from error
+ai_ad_editor.errors.AppError: 无法建立原生倒放帧区间时钟
+
+======================================================================
+ERROR: test_nested_forward_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_audio_tail_without_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 200, in forward_intervals
+    if eof<=first_time:raise ValueError('native forward interval is empty')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: native forward interval is empty
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 80, in test_nested_forward_audio_tail_without_video_is_empty
+    self.empty_window(nested=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 70, in empty_window
+    actual, _, _ = self.render(project, root)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4060, in build_filter_graph
+    first,end,source_clock,sampling_metadata=forward_intervals(uri,
+                                             ~~~~~~~~~~~~~~~~~^^^^^
+        int(clip.get('source_in_tick',0)),int(clip.get('source_out_tick',1)),tps,**common)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 212, in forward_intervals
+    raise AppError('NESTED_NATIVE_CLOCK_INVALID','无法建立原生正放帧区间时钟',exit_code=3,
+                   path=str(path),cause=str(caught)) from caught
+ai_ad_editor.errors.AppError: 无法建立原生正放帧区间时钟
+
+======================================================================
+ERROR: test_nested_forward_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_before_delayed_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 191, in forward_intervals
+    pts,durations,stream,_,native,origin,left,right,first,end,index_metadata=_native_range(
+                                                                             ~~~~~~~~~~~~~^
+        path,source_in_tick,source_out_tick,tps,expected_time_base,cancel_file=cancel_file,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        decoder=decoder,index_context=index_context,source_sha256=source_sha256)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 183, in _native_range
+    if end<=first:raise ValueError('requested source window contains no displayed frame')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: requested source window contains no displayed frame
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 92, in test_nested_forward_before_delayed_video_is_empty
+    self.empty_window(prefix=True, nested=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 70, in empty_window
+    actual, _, _ = self.render(project, root)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4060, in build_filter_graph
+    first,end,source_clock,sampling_metadata=forward_intervals(uri,
+                                             ~~~~~~~~~~~~~~~~~^^^^^
+        int(clip.get('source_in_tick',0)),int(clip.get('source_out_tick',1)),tps,**common)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 212, in forward_intervals
+    raise AppError('NESTED_NATIVE_CLOCK_INVALID','无法建立原生正放帧区间时钟',exit_code=3,
+                   path=str(path),cause=str(caught)) from caught
+ai_ad_editor.errors.AppError: 无法建立原生正放帧区间时钟
+
+======================================================================
+ERROR: test_nested_reverse_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_audio_tail_without_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 238, in reverse_intervals
+    raise ValueError('native source frame has no positive requested interval')
+ValueError: native source frame has no positive requested interval
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 83, in test_nested_reverse_audio_tail_without_video_is_empty
+    self.empty_window(nested=True, reverse=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 70, in empty_window
+    actual, _, _ = self.render(project, root)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4053, in build_filter_graph
+    _,_,native_reverse,sampling_metadata=reverse_intervals(uri,
+                                         ~~~~~~~~~~~~~~~~~^^^^^
+        int(clip.get('source_in_tick',0)),int(clip.get('source_out_tick',1)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps,native_clock['working_time_base'],**common)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 293, in reverse_intervals
+    raise AppError('REVERSE_VIDEO_CLOCK_INVALID', '无法建立原生倒放帧区间时钟', exit_code=3,
+                   path=str(path), cause=str(error)) from error
+ai_ad_editor.errors.AppError: 无法建立原生倒放帧区间时钟
+
+======================================================================
+ERROR: test_nested_reverse_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_before_delayed_video_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 220, in reverse_intervals
+    pts,durations,stream,format_info,native,origin,first_time,final_time,first,end,index_metadata=_native_range(
+                                                                                                  ~~~~~~~~~~~~~^
+        path,source_in_tick,source_out_tick,tps,expected_time_base,cancel_file=cancel_file,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        decoder=decoder,index_context=index_context,source_sha256=source_sha256)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 183, in _native_range
+    if end<=first:raise ValueError('requested source window contains no displayed frame')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: requested source window contains no displayed frame
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 95, in test_nested_reverse_before_delayed_video_is_empty
+    self.empty_window(prefix=True, nested=True, reverse=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 70, in empty_window
+    actual, _, _ = self.render(project, root)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_cfr_boundaries.py", line 70, in render
+    inputs,graph,metadata,warnings=build_filter_graph(self.root,p,seq)
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\render.py", line 4053, in build_filter_graph
+    _,_,native_reverse,sampling_metadata=reverse_intervals(uri,
+                                         ~~~~~~~~~~~~~~~~~^^^^^
+        int(clip.get('source_in_tick',0)),int(clip.get('source_out_tick',1)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        tps,native_clock['working_time_base'],**common)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\src\ai_ad_editor\reverse_video_clock.py", line 293, in reverse_intervals
+    raise AppError('REVERSE_VIDEO_CLOCK_INVALID', '无法建立原生倒放帧区间时钟', exit_code=3,
+                   path=str(path), cause=str(error)) from error
+ai_ad_editor.errors.AppError: 无法建立原生倒放帧区间时钟
+
+----------------------------------------------------------------------
+Ran 8 tests in 15.593s
+
+FAILED (errors=6)

@@ -1,0 +1,83 @@
+{
+  "operations": [
+    {
+      "op": "update_track",
+      "track_id": "track_video_1",
+      "patch": {
+        "order": 1
+      }
+    },
+    {
+      "op": "add_track",
+      "id": "underlay",
+      "kind": "video",
+      "order": 0
+    },
+    {
+      "op": "append_clip",
+      "track_id": "underlay",
+      "id": "underlay_clip",
+      "asset_id": "background",
+      "timeline_start_tick": 0,
+      "duration_tick": 135000,
+      "source_in_tick": 0,
+      "source_out_tick": 135000
+    },
+    {
+      "op": "add_sequence",
+      "id": "child",
+      "duration_tick": 180000
+    },
+    {
+      "op": "append_clip",
+      "sequence_id": "child",
+      "track_id": "child_video_1",
+      "id": "leaf_video",
+      "asset_id": "source",
+      "timeline_start_tick": 0,
+      "duration_tick": 180000,
+      "source_in_tick": 0,
+      "source_out_tick": 180000
+    },
+    {
+      "op": "append_clip",
+      "sequence_id": "child",
+      "track_id": "child_audio_1",
+      "id": "leaf_audio",
+      "asset_id": "source",
+      "timeline_start_tick": 0,
+      "duration_tick": 180000,
+      "source_in_tick": 0,
+      "source_out_tick": 180000
+    },
+    {
+      "op": "append_sequence_clip",
+      "track_id": "track_video_1",
+      "id": "parent",
+      "nested_sequence_id": "child",
+      "timeline_start_tick": 9900,
+      "duration_tick": 45000,
+      "source_in_tick": 0,
+      "source_out_tick": 45000,
+      "reverse": false,
+      "speed_curve": {
+        "keyframes": [
+          {
+            "at_tick": 0,
+            "speed": 1.0
+          },
+          {
+            "at_tick": 45000,
+            "speed": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "op": "set_sequence_duration",
+      "sequence_id": "seq_main",
+      "duration_tick": 135000,
+      "trim": false
+    }
+  ]
+}

@@ -1,0 +1,287 @@
+"""Publish frozen empty-window bytes only after the exact complete suite."""
+from __future__ import annotations
+import argparse
+from datetime import datetime,timezone
+import importlib.util
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+from native_index_release_tools import MAIN,sha,git,staged_rows
+from run_frozen_regression import frozen
+
+ROOT=Path(__file__).resolve().parents[1]
+REL='docs/validation/evidence/native-empty-window-20261021-lab'
+ASSETS='docs/assets/native-empty-window-20261021-lab'
+REPORT='docs/validation/原生空视频选区与显式音频保留实测_2026-10-21.md'
+CONTRACT='docs/specs/原生视频空区间契约_v0.1_2026-10-21.md'
+HISTORICAL_REPORT='docs/validation/空视频选区与显式音频保留独立实验_2026-10-21.md'
+HISTORICAL_CONTRACT='docs/specs/原生视频空区间契约_实验_v0.1_2026-10-21.md'
+MARKER='V85-NATIVE-EMPTY-WINDOW'
+SKILLS=('video-cut-agent-editor','video-cut-timeline','video-cut-quality','video-cut-project-ops')
+MODULES=('reverse_video_clock',)
+TESTS=('test_native_empty_window',)
+SCRIPTS=('run_empty_native_after_nested','run_frozen_regression','run_with_regression_fixtures',
+    'materialize_regression_fixtures','run_empty_native_regressions','smoke_native_empty_window',
+    'verify_native_empty_install','finalize_native_empty_lab','native_index_release_tools','publish_native_empty_window',
+    'run_empty_native_after_nested_r2','refresh_empty_parent_contract','run_empty_parent_contract_controls',
+    'audit_empty_parent_contract_refresh','prepare_empty_verification_r2','publish_native_empty_window_r2')
+LATEST_DOCS=('README.md','docs/README.md','docs/产品需求与开发路线基线_2026-10-12.md','docs/构建进度总表_2026-10-16.md',
+    'docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md','docs/Concat与剪映功能差异矩阵_2026-10-12.md')
+
+
+def read(path):return json.loads(Path(path).read_bytes())
+
+
+def write(path,value):
+    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(value.rstrip()+'\n',encoding='utf8',newline='\n')
+
+
+def save(path,value):write(path,json.dumps(value,ensure_ascii=False,indent=2))
+
+
+def block(path,value):
+    path=Path(path);text=path.read_text('utf8')
+    replacement=f'<!-- {MARKER} -->\n{value.rstrip()}\n<!-- /{MARKER} -->'
+    pattern=re.escape('<!-- '+MARKER+' -->')+'.*?'+re.escape('<!-- /'+MARKER+' -->')
+    if re.search(pattern,text,re.S):text=re.sub(pattern,lambda _:replacement,text,flags=re.S)
+    else:
+        position=text.index('\n---',3)+4 if text.startswith('---\n') else text.index('\n')
+        text=text[:position]+'\n\n'+replacement+'\n'+text[position:]
+    write(path,text)
+
+
+def source_files():
+    names={f'product/src/ai_ad_editor/{name}.py' for name in MODULES}
+    names|={f'product/tests/{name}.py' for name in TESTS}
+    names|={f'scripts/{name}.py' for name in SCRIPTS}|{HISTORICAL_REPORT,HISTORICAL_CONTRACT}
+    for prefix in (REL,ASSETS):
+        names.update(path.relative_to(ROOT).as_posix() for path in (ROOT/prefix).rglob('*') if path.is_file())
+    for name in names:
+        path=ROOT/name;assert path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(ROOT),name
+    return {name:sha(ROOT/name) for name in sorted(names)}
+
+
+def source_audit():
+    current=frozen();assert len(current)==256
+    audit=read(ROOT/REL/'audit-r2.json')
+    assert audit['status']=='passed-standalone-audit' and audit['frozen_inputs']==current
+    assert audit['targeted_methods']==293 and audit['source_wheel_installed_resources']==161
+    refresh=read(ROOT/REL/'parent-contract-refresh-r1.json');original=refresh['frozen_before']
+    assert refresh['frozen_after']==current and not refresh['runtime_inputs_changed']
+    assert audit['original_runtime_frozen_inputs']==original and audit['runtime_resources_unchanged']
+    controls=read(ROOT/REL/'parent-contract-controls-r1.json')
+    assert controls['terminal_ok'] and controls['methods']==4 and controls['skipped']==0
+    assert controls['frozen_before']==controls['frozen_after']==current
+    assert sha(ROOT/REL/'parent-contract-controls-r1.json')==audit['current_existing_cli_controls_sha256']
+    for name,row in audit['media'].items():assert sha(ROOT/name)==row['sha256']
+    installation=read(ROOT/REL/'installed-r1/verification.json')
+    assert installation['status']=='passed' and installation['isolated_cli_calls']==20
+    assert installation['frozen_before']==installation['frozen_after']==original
+    for name,digest in installation['resource_hashes'].items():assert sha(ROOT/'product/src/ai_ad_editor'/name)==digest
+    related=read(ROOT/REL/'related-r2.json')
+    assert related['status']=='passed-related-regressions' and related['distinct_methods']==293
+    assert related['frozen_before']==related['frozen_after']==original
+    assert len(related['method_ids'])==len(set(related['method_ids']))==293
+    for label,count in (('index',37),('reverse',50),('sequence',63),('preview',22),('nested',105),('empty',16)):
+        path=ROOT/REL/(label+'-final-r2.json');item=read(path)
+        assert sha(path)==related['families'][label]['evidence_sha256']
+        assert item['terminal_ok'] and item['methods']==count and item['skipped']==0
+        assert item['frozen_before']==item['frozen_after']==original
+        assert item['external_fixture_count']==8 and item['external_fixtures_equal']
+        assert item['verification_scripts_equal'] and item['external_fixture_manifest_unchanged']
+    for name,digest in related['script_hashes'].items():assert sha(ROOT/'scripts'/name)==digest
+    native=read(ROOT/REL/'native-r2/verification.json')
+    assert native['status']=='passed' and native['cli_calls']==17 and native['native_commands']==18
+    assert len(native['checks'])==23 and all(row['ok'] for row in native['checks'])
+    assert native['frozen_before']==native['frozen_after']==original
+    drafts=read(ROOT/REL/'skills-draft-r1.json')
+    assert drafts['status']=='passed-four-unregistered-drafts' and set(drafts['skills'])==set(SKILLS)
+    assert sha(ROOT/REL/'skills-draft-r1.json')==audit['skill_draft_sha256']
+    for row in drafts['skills'].values():
+        assert sha(ROOT/row['path'])==row['sha256'] and sha(ROOT/row['parent_snapshot'])==row['parent_sha256']
+        assert row['registered'] is False
+    return current
+
+
+def complete_gate(current):
+    state=read(ROOT/'product/.runtime/native-empty-window-20261021/full-after-nested-r1/run.json')
+    assert state['status']=='passed-complete-suite-awaiting-reviewed-integration'
+    full=read(ROOT/REL/'full-r1.json');alignment=read(ROOT/REL/'published-nested-alignment-r1.json')
+    assert full['status']=='passed' and full['terminal_ok'] and full['methods']==1973 and full['skipped']==0
+    assert full['frozen_before']==full['frozen_after']==current
+    assert full['external_fixture_count']==8 and full['external_fixtures_equal'] and full['verification_scripts_equal']
+    assert full['external_fixture_manifest_unchanged'] and state['full_sha256']==sha(ROOT/REL/'full-r1.json')
+    for name,digest in state['verification_scripts'].items():assert sha(ROOT/'scripts'/name)==digest
+    assert alignment['status']=='passed' and alignment['candidate_inputs']==current
+    assert len(alignment['upstream_inputs'])==255 and alignment['remote_main']==alignment['published_commit']
+    snapshots=read(ROOT/REL/'before-full-documents-r1.json');audit=read(ROOT/REL/'audit-r2.json')
+    for name,row in snapshots['documents'].items():assert sha(ROOT/row['snapshot'])==row['sha256']==audit['documents'][name]
+    return full,alignment
+
+
+def documents(root,full):
+    assert full['terminal_ok'] and full['methods']==1973
+    message=f"完整原生回归 **1973 项、{full['suite_seconds']:.3f} 秒、0 跳过**；256 产品输入与 8 外部夹具不变（本轮限定验收）"
+    message+='。293 项专项、媒体与隔离安装保留运行时完全相同的原执行；仅继承父版测试断言后新跑 4 项旧 CLI 控制，未将历史记录标为重跑'
+    table=f'''| 编号 | 实际功能核验 | 结果与边界 | 证据 |
+|---|---|---|---|
+| V85-01 | 有效空视频选区 | 新增 16 项；首帧前或实际视频 EOF 后，普通倒放、嵌套正/倒放保留下层画面，未知末帧 duration 仍拒绝。原 8 项复现由 2 通过/6 错误修复为同一断言 8 项通过 | [16 项]({REL}/after-r3.json) · [修复前]({REL}/before-r2.json) · [相同断言修复后]({REL}/after-r1.json) |
+| V85-02 | 相邻回归 | 原执行 37＋50＋63＋22＋105＋16＝293 个不同方法、0 跳过；继承父版测试断言后另新跑 4 项既有 CLI 控制，运行时资源不变，16 项包含于 293 与完整回归，不累加历史结果 | [相邻回归]({REL}/related-r2.json) |
+| V85-03 | 公开 CLI 与逐帧输出 | 17 CLI＋18 原生命令，23 检查；两段 320×180 成片各 45 帧/30000÷1001 fps，无损预览 RGBA 各 10,368,000 字节与独立下层 PNG 全帧相同 | [实测]({REL}/native-r2/verification.json) · [原始尾段源]({ASSETS}/native-r2/source-audio-tail.mkv) · [原始延迟源]({ASSETS}/native-r2/source-delayed-video.mkv) |
+| V85-04 | 显式音频轨 | 单位变速六组专项及两段公开 CLI 无损预览保留实际声音；每段完整 72,000 每声道/立体声 float PCM、576,000 字节，与独立源解码、裁切、采样对倒序及放置参考一致 | [音频专项]({REL}/after-r3.json) · [原生实测]({REL}/native-r2/verification.json) |
+| V85-05 | 索引与离线发行 | 161 资源源码/wheel/site 一致、7 现有依赖 wheels；20 隔离 CLI＋1 来源进程/11 模块。索引首次扫描 1 次、命中 0 次；故意破坏索引 exit 6 且不产生成片 | [隔离安装]({REL}/installed-r1/verification.json) · [明确拒绝]({REL}/native-r2/corrupt-index-empty-window-rejected.stdout.log) |
+| V85-06 | 完整回归与发布基线 | {message}；绑定已发布 V84 的 255 输入，唯一运行时修改为原生帧区间选择模块，另加测试 | [完整收据]({REL}/full-r1.json) · [发布基线]({REL}/published-nested-alignment-r1.json) |
+| V85-07 | 保留失败 | 最初空参考项目、漏建音频轨、缺失外部夹具和重复 ID 的请求均保留；缺夹具时套件未启动，补齐准确 8 个已提交文件后完成 293 项 | [历史实测]({HISTORICAL_REPORT}) · [夹具恢复]({REL}/fixture-recovery-r1.json) |
+| V85-08 | 尚未验收 | 零选中帧预算不等于零解码或进程 RSS；源图仍可解码前缀。一般嵌套效果、自然/HDR、非单位变速声音品质、长片延迟与完整剪映功能/效果等价未验收 | [契约与边界]({CONTRACT}) |'''
+    gallery=f'''| 原始八帧内容 | 实际普通倒放空尾段 | 实际嵌套正放空前段 |
+|---|---|---|
+| ![原始帧]({ASSETS}/native-r2/source-cards.gif) | ![实际尾段]({ASSETS}/native-r2/direct-reverse-tail.gif) | ![实际前段]({ASSETS}/native-r2/nested-forward-prefix.gif) |
+
+输入 GIF 为原始 8 帧/320 ms；MKV 保留完整 2 秒声音与真实视频起止时钟。两个输出 GIF 从实际 MP4 的全部 45 帧解码，因下层图像相同而合为 1 帧/1500 ms；实际视频为 30000/1001 fps，作者总时长 1.5 秒，最后视频显示边界可至 1.5015 秒。GIF 为无声 10 ms 时间网格观看副本。
+
+[实际倒放 MP4]({ASSETS}/native-r2/direct-reverse-tail.mp4) · [实际嵌套正放 MP4]({ASSETS}/native-r2/nested-forward-prefix.mp4) · [静态抽帧记录]({REL}/frame-review-r1.json)。已查看两个实际抽帧，未连续播放、未听音；完整 PCM 相等为无损预览检查，不代表 MP4/AAC 逐字节音频相等。'''
+    block(root/'README.md','2026-10-21 **V85（合法空视频选区与显式音频保留）**：'+message+'。素材选区完全不含视频显示帧时保留下层画面及已编排音频；源/索引错误仍明确拒绝。\n\n'+table+'\n\n'+gallery)
+    for name in LATEST_DOCS[1:]:
+        report_link=os.path.relpath(root/REPORT,(root/name).parent).replace('\\','/')
+        contract_link=os.path.relpath(root/CONTRACT,(root/name).parent).replace('\\','/')
+        block(root/name,'2026-10-21 V85：'+message+'。293 个不同专项方法、真实 CLI、完整无损画面/PCM 与离线隔离分别记录；补齐 V84 已知的完全空视频选区拒绝缺口。完整剪映目标仍未验收。\n\n[实测与原视频/GIF]('+report_link+') · [空区间契约]('+contract_link+')')
+    report='# 原生空视频选区与显式音频保留实测（2026-10-21）\n\n'+message+'。\n\n'+table+'\n\n'+gallery+'''
+
+原创源为 8 帧 25 Hz FFV1/BGRA，视频范围 [0,0.32) 秒，两个实际正弦声道共 2 秒；延迟变体将视频 PTS 平移 1 秒，声音仍始于 0。分别选取 [1,1.5) 与 [0,0.5) 秒时，源范围有效但不含视频帧。现在返回显式空视频范围，保留下层图像，不补黑或克隆尾帧；显示时钟端点为 null，倒放栅格预算为零。未知末帧 duration、损坏索引或探测失败仍拒绝。
+
+视频轨不隐式提取声音，需显式音频轨。专项及公开 CLI 以真实根级/子级音频轨验证；参考独立解码源 PCM 后截取 24,000 个每声道采样，倒放按立体声采样对倒序，再放置到作者起点 0.11 秒并保持总长 72,000。完整无损预览 RGBA/PCM 与独立参考相同；MP4/AAC 和 GIF 是有损观看副本，不据此宣称有损输出逐字节相同。
+
+仅修改 `reverse_video_clock.py` 并新增 16 方法测试。293 专项为 1973 完整回归子集。零选中帧不等于无解码，图仍可读取源前缀；索引计数也不含 SHA 文件读取及最终编解码。原 128 GiB 倒放磁盘预约、一般嵌套/自然/HDR、非单位变速声音、长片吞吐和总 RSS 的限制继续有效，完整剪映功能与效果等价尚未实现或验收。
+
+执行脚本为 `scripts/smoke_native_empty_window.py`、`scripts/verify_native_empty_install.py`。所有素材均本地原创生成，CC0 权利记录与源摘要随资产保留。原生 Windows 执行，无 Docker、WSL、容器、虚拟环境、网络依赖下载或模型推理。原失败、冻结源码、执行脚本及文档快照均保留。
+'''
+    report=report.replace(']('+REL+'/','](evidence/native-empty-window-20261021-lab/').replace(']('+ASSETS+'/','](../assets/native-empty-window-20261021-lab/')
+    report=report.replace(']('+CONTRACT+')','](../specs/'+Path(CONTRACT).name+')').replace(']('+HISTORICAL_REPORT+')',']('+Path(HISTORICAL_REPORT).name+')')
+    write(root/REPORT,report)
+    lines=(root/HISTORICAL_CONTRACT).read_text('utf8').splitlines()
+    constraints='\n'.join('| EW-10 | 冻结与交付 | 256 输入、293 专项、1973 完整回归、8 外部夹具及 161 资源隔离发行字节绑定；逐项限定验收。 |' if line.startswith('| EW-10 |') else line for line in lines if line.startswith('|'))
+    assert constraints.count('| EW-')==11
+    write(root/CONTRACT,'# 原生视频空区间契约（v0.1 限定验收，2026-10-21）\n\n'+message+'。\n\n'+constraints+'\n\n[真实原生/隔离实测、原视频/GIF 与保留失败](../validation/'+Path(REPORT).name+')。')
+    drafts=read(ROOT/REL/'skills-draft-r1.json')
+    for name,row in drafts['skills'].items():
+        path=root/'skills'/name/'SKILL.md';body=path.read_text('utf8')
+        old='Wholly empty native-video selections remain outside this release acceptance. Preserve explicit compiler refusals and do not silently pad them.'
+        assert body.count(old)==1,name
+        body=body.replace(old,'Wholly empty native-video selections follow the validated empty-interval contract; preserve the original window and explicit audio track. Unknown EOF and corrupt indexes still reject.')
+        write(path,body)
+        guidance=row['new_block'].replace(HISTORICAL_CONTRACT,CONTRACT).replace(HISTORICAL_REPORT,REPORT)
+        guidance=guidance.replace('experimental empty-window contract','empty-window contract')
+        guidance=guidance.replace('This is an unregistered laboratory draft; the 256-input candidate has not completed its full suite or been published. ','')
+        assert 'unregistered laboratory draft' not in guidance and 'not completed' not in guidance
+        block(path,guidance)
+    attributes=(root/'.gitattributes').read_text('utf8')
+    paths=[REL+'/** -text -whitespace',ASSETS+'/** -text -whitespace']
+    paths += [f'product/src/ai_ad_editor/{name}.py -text whitespace=cr-at-eol' for name in MODULES]
+    paths += [f'product/tests/{name}.py -text whitespace=cr-at-eol' for name in TESTS]
+    paths += [f'scripts/{name}.py -text whitespace=cr-at-eol' for name in SCRIPTS]
+    write(root/'.gitattributes',attributes+'\n# V85 exact tested empty-window bytes.\n'+'\n'.join(paths))
+    return {*LATEST_DOCS,REPORT,CONTRACT,'.gitattributes',*('skills/'+name+'/SKILL.md' for name in SKILLS)}
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--work',type=Path,required=True);parser.add_argument('--preflight-only',action='store_true')
+    args=parser.parse_args();work=args.work.resolve()
+    assert work.is_relative_to(ROOT/'product/.runtime') and not work.exists();work.mkdir(parents=True)
+    state={'status':'checking-source','started_at_utc':datetime.now(timezone.utc).isoformat(),'calls':[],'force_push':False}
+    def checkpoint():save(work/'run.json',state)
+    try:
+        current=source_audit();reviewed=source_files()
+        state.update(status='passed-source-preflight-awaiting-full',frozen_inputs=current,source_files=reviewed);checkpoint()
+        if args.preflight_only:return
+        full,alignment=complete_gate(current);base=alignment['published_commit']
+        assert git(MAIN,'branch','--show-current').decode().strip()=='main'
+        assert git(MAIN,'rev-parse','HEAD').decode().strip()==base
+        assert git(MAIN,'remote','get-url','origin').decode().strip()=='git@github.com:Tonscriptions/agent-video-kit.git'
+        assert git(MAIN,'ls-remote','origin','refs/heads/main').decode().split()[0]==base
+        assert not git(MAIN,'status','--porcelain','-z'),'Preserve unexpected main changes; no implicit integration'
+        spec=importlib.util.spec_from_file_location('nested_native_main_freeze',MAIN/'scripts/run_frozen_regression.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        assert module.frozen()==alignment['upstream_inputs']
+        tracked={p.decode('utf8') for p in git(MAIN,'ls-files','-z').split(b'\0') if p}
+        generated={REPORT,CONTRACT,REL+'/skills-release-r1.json',REL+'/release-main-r1.json',REL+'/publication-copy-r1.json',REL+'/staged-release-r1.json'}
+        for name in set(reviewed)|generated:
+            path=MAIN/name;assert path.resolve().is_relative_to(MAIN) and not path.is_symlink()
+            assert name in tracked or not path.exists(),'Existing untracked destination: '+name
+        assert source_files()==reviewed and frozen()==current
+        state.update(status='copying-reviewed-source',base_commit=base);checkpoint()
+        for name,digest in reviewed.items():
+            target=MAIN/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/name,target)
+            assert sha(target)==digest,name
+        assert module.frozen()==current
+        modified_docs=documents(MAIN,full)
+        command=[sys.executable,'-E','-B','-X','utf8',str(MAIN/'scripts/audit_source_edit_skills.py'),
+            '--expected-count','17','--output',str(MAIN/REL/'skills-release-r1.json')]
+        result=subprocess.run(command,cwd=MAIN,capture_output=True,timeout=600)
+        (work/'main-skills.stdout.log').write_bytes(result.stdout);(work/'main-skills.stderr.log').write_bytes(result.stderr)
+        state['calls'].append({'command':command,'exit_code':result.returncode});checkpoint();assert result.returncode==0
+        skills=read(MAIN/REL/'skills-release-r1.json');mapping_path=MAIN/'video-cut-install-manifest.json';mapping=read(mapping_path)
+        mapping.setdefault('audit_history',[]).append(mapping['current_audit'])
+        for entry in mapping['skills']:
+            row=next(item for item in skills['results'] if item['skill']==entry['name'])
+            old,new=entry['skill_md_sha256'],row['sha256'][7:]
+            if old!=new:
+                entry.setdefault('skill_md_sha256_history',[]).append(old);entry['previous_manifest_skill_md_sha256']=old
+            entry.update(skill_md_sha256=new,validation=row['validator_stdout'],prefix_verified=True,registration_verified=True)
+            assert Path(entry['canonical_directory']).resolve()==(MAIN/'skills'/entry['name']).resolve()
+        mapping['current_audit']={'date':'2026-10-21','skill_count':17,'local_links_checked':skills['local_links_checked'],
+            'record':REL+'/skills-release-r1.json','record_sha256':sha(MAIN/REL/'skills-release-r1.json'),
+            'previous_hashes_preserved':True,'semantics':'V85 valid empty video windows with explicit audio and verified indexes; no general or full CapCut parity acceptance'}
+        save(mapping_path,mapping)
+        links=[]
+        for name in sorted(modified_docs-{'.gitattributes'}):
+            path=MAIN/name;text=path.read_text('utf8')
+            if name in LATEST_DOCS or name.startswith('skills/'):text=text.split('<!-- '+MARKER+' -->')[1].split('<!-- /'+MARKER+' -->')[0]
+            for token in re.findall(r'!?\[[^\]]*\]\(([^)\n]+)\)',text):
+                target=token.strip('<>').split('#',1)[0]
+                if not target or re.match(r'^[a-zA-Z][\w+.-]*:',target):continue
+                resolved=(path.parent/target).resolve();assert resolved.is_relative_to(MAIN) and resolved.exists(),(name,token)
+                links.append({'document':name,'target':resolved.relative_to(MAIN).as_posix()})
+        for name,digest in current.items():assert sha(MAIN/name)==digest
+        for name,row in full['external_fixtures_expected'].items():assert sha(MAIN/name)==row['sha256']
+        save(MAIN/REL/'release-main-r1.json',{'status':'passed-main-byte-and-document-audit','base_commit':base,
+            'frozen_inputs':current,'full_methods':1973,'full_skipped':0,'full_sha256':sha(MAIN/REL/'full-r1.json'),
+            'targeted_methods':293,'resources':161,'skills':17,'local_links':links,
+            'documents':{name:sha(MAIN/name) for name in sorted(modified_docs)},'generator_sha256':sha(Path(__file__))})
+        save(MAIN/REL/'publication-copy-r1.json',{'status':'passed-reviewed-copy','source':str(ROOT),
+            'copied_files':reviewed,'frozen_inputs':current,'base_commit':base})
+        changed={p.decode('utf8') for p in git(MAIN,'diff','--name-only','-z').split(b'\0') if p}
+        changed.update(p.decode('utf8') for p in git(MAIN,'ls-files','--others','--exclude-standard','-z').split(b'\0') if p)
+        allowed=set(reviewed)|modified_docs|generated|{'video-cut-install-manifest.json'}
+        assert changed<=allowed,sorted(changed-allowed)
+        stage=work/'stage-paths.nul';stage.write_bytes(b'\0'.join(name.encode('utf8') for name in sorted(changed))+b'\0')
+        git(MAIN,'add','--pathspec-from-file='+str(stage),'--pathspec-file-nul')
+        git(MAIN,'add','--renormalize','--pathspec-from-file='+str(stage),'--pathspec-file-nul')
+        assert not git(MAIN,'diff','--name-only')
+        assert {p.decode('utf8') for p in git(MAIN,'diff','--cached','--name-only','-z').split(b'\0') if p}==changed
+        git(MAIN,'diff','--cached','--check');rows=staged_rows({**{name:sha(MAIN/name) for name in changed},**current})
+        receipt=REL+'/staged-release-r1.json'
+        save(MAIN/receipt,{'status':'passed','frozen_files':256,'compared_blobs':len(rows),'files':rows,
+            'all_staged_bytes_equal_workspace':True,'all_frozen_bytes_equal_staged':True,
+            'stream_buffer_bytes':65536,'full_sha256':sha(MAIN/REL/'full-r1.json'),'base_commit':base})
+        git(MAIN,'add','--',receipt);staged_rows({receipt:sha(MAIN/receipt)})
+        assert module.frozen()==current and not git(MAIN,'diff','--name-only')
+        git(MAIN,'diff','--cached','--check');state.update(status='passed-staged-audit');checkpoint()
+        git(MAIN,'commit','--quiet','-m','fix: retain underlying layers and explicit audio for empty video windows')
+        commit=git(MAIN,'rev-parse','HEAD').decode().strip();assert git(MAIN,'rev-parse','HEAD^').decode().strip()==base
+        state.update(status='committed-awaiting-ordinary-push',commit=commit);checkpoint()
+        git(MAIN,'push','origin','main');remote=git(MAIN,'ls-remote','origin','refs/heads/main').decode().split()[0]
+        assert remote==commit and not git(MAIN,'status','--porcelain','-z') and module.frozen()==current
+        state.update(status='published',remote_main=remote,main_clean=True,full_methods=1973)
+    except BaseException as caught:
+        state.update(status='failed',error={'type':type(caught).__name__,'message':str(caught)});raise
+    finally:
+        checkpoint();print(json.dumps({k:state.get(k) for k in ('status','commit','remote_main','error')},ensure_ascii=False),flush=True)
+
+
+if __name__=='__main__':main()

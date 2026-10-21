@@ -1,0 +1,105 @@
+test_direct_forward_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_forward_audio_tail_without_video_is_empty) ... ok
+test_direct_forward_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_forward_before_delayed_video_is_empty) ... ok
+test_direct_reverse_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_audio_tail_without_video_is_empty) ... ok
+test_direct_reverse_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_before_delayed_video_is_empty) ... ok
+test_direct_reverse_empty_prefix_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_empty_prefix_preserves_all_audio_samples) ... FAIL
+test_direct_reverse_empty_tail_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_empty_tail_preserves_all_audio_samples) ... FAIL
+test_nested_forward_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_audio_tail_without_video_is_empty) ... ok
+test_nested_forward_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_before_delayed_video_is_empty) ... ok
+test_nested_forward_empty_prefix_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_empty_prefix_preserves_all_audio_samples) ... FAIL
+test_nested_forward_empty_tail_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_empty_tail_preserves_all_audio_samples) ... FAIL
+test_nested_reverse_audio_tail_without_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_audio_tail_without_video_is_empty) ... ok
+test_nested_reverse_before_delayed_video_is_empty (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_before_delayed_video_is_empty) ... ok
+test_nested_reverse_empty_prefix_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_empty_prefix_preserves_all_audio_samples) ... FAIL
+test_nested_reverse_empty_tail_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_empty_tail_preserves_all_audio_samples) ... FAIL
+test_unknown_final_duration_cannot_be_treated_as_empty_forward (test_native_empty_window.NativeEmptyWindowTests.test_unknown_final_duration_cannot_be_treated_as_empty_forward) ... ok
+test_unknown_final_duration_cannot_be_treated_as_empty_reverse (test_native_empty_window.NativeEmptyWindowTests.test_unknown_final_duration_cannot_be_treated_as_empty_reverse) ... ok
+
+======================================================================
+FAIL: test_direct_reverse_empty_prefix_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_empty_prefix_preserves_all_audio_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 127, in test_direct_reverse_empty_prefix_preserves_all_audio_samples
+    self.empty_window(prefix=True,reverse=True,audible=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 96, in empty_window
+    self.assertEqual(actual_audio,expected_audio,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'The empty video selection must retain its complete, independently decoded stereo PCM selection.')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x0[168958 chars]x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0[2134989 chars]\x00' != b'\x0[168958 chars]x00\x80<\xbc\x00\x00\x85<\x00@\xbc\xbc\x00\x80[1948944 chars]\x00' : The empty video selection must retain its complete, independently decoded stereo PCM selection.
+
+======================================================================
+FAIL: test_direct_reverse_empty_tail_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_direct_reverse_empty_tail_preserves_all_audio_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 124, in test_direct_reverse_empty_tail_preserves_all_audio_samples
+    self.empty_window(reverse=True,audible=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 96, in empty_window
+    self.assertEqual(actual_audio,expected_audio,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'The empty video selection must retain its complete, independently decoded stereo PCM selection.')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x0[168952 chars]0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\[2134995 chars]\x00' != b'\x0[168952 chars]0\x005\xa0<\xbc#\x0e\x85<#P\xbc\xbcQr\x04=%\xd[1892132 chars]\x00' : The empty video selection must retain its complete, independently decoded stereo PCM selection.
+
+======================================================================
+FAIL: test_nested_forward_empty_prefix_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_empty_prefix_preserves_all_audio_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 133, in test_nested_forward_empty_prefix_preserves_all_audio_samples
+    self.empty_window(prefix=True,nested=True,audible=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 96, in empty_window
+    self.assertEqual(actual_audio,expected_audio,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'The empty video selection must retain its complete, independently decoded stereo PCM selection.')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x0[168990 chars]x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0[2134957 chars]\x00' != b'\x0[168990 chars]x00\x80<<\x00\x00\x85<\x00@\xbc<\x00\x80\x04=\[1948912 chars]\x00' : The empty video selection must retain its complete, independently decoded stereo PCM selection.
+
+======================================================================
+FAIL: test_nested_forward_empty_tail_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_nested_forward_empty_tail_preserves_all_audio_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 130, in test_nested_forward_empty_tail_preserves_all_audio_samples
+    self.empty_window(nested=True,audible=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 96, in empty_window
+    self.assertEqual(actual_audio,expected_audio,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'The empty video selection must retain its complete, independently decoded stereo PCM selection.')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x0[168952 chars]0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\[2134995 chars]\x00' != b'\x0[168952 chars]0\x00f"b(\x91\xe4]\xa85\xa0<<#\x0e\x85<#P\xbc<[1892132 chars]\x00' : The empty video selection must retain its complete, independently decoded stereo PCM selection.
+
+======================================================================
+FAIL: test_nested_reverse_empty_prefix_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_empty_prefix_preserves_all_audio_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 139, in test_nested_reverse_empty_prefix_preserves_all_audio_samples
+    self.empty_window(prefix=True,nested=True,reverse=True,audible=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 96, in empty_window
+    self.assertEqual(actual_audio,expected_audio,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'The empty video selection must retain its complete, independently decoded stereo PCM selection.')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x0[168958 chars]x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0[2134989 chars]\x00' != b'\x0[168958 chars]x00\x80<\xbc\x00\x00\x85<\x00@\xbc\xbc\x00\x80[1948944 chars]\x00' : The empty video selection must retain its complete, independently decoded stereo PCM selection.
+
+======================================================================
+FAIL: test_nested_reverse_empty_tail_preserves_all_audio_samples (test_native_empty_window.NativeEmptyWindowTests.test_nested_reverse_empty_tail_preserves_all_audio_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 136, in test_nested_reverse_empty_tail_preserves_all_audio_samples
+    self.empty_window(nested=True,reverse=True,audible=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\native-empty-window-lab-20261021\product\tests\test_native_empty_window.py", line 96, in empty_window
+    self.assertEqual(actual_audio,expected_audio,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'The empty video selection must retain its complete, independently decoded stereo PCM selection.')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x0[168952 chars]0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\[2134995 chars]\x00' != b'\x0[168952 chars]0\x005\xa0<\xbc#\x0e\x85<#P\xbc\xbcQr\x04=%\xd[1892132 chars]\x00' : The empty video selection must retain its complete, independently decoded stereo PCM selection.
+
+----------------------------------------------------------------------
+Ran 16 tests in 42.099s
+
+FAILED (failures=6)

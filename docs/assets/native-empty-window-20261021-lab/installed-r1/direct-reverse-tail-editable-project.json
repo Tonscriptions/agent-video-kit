@@ -1,0 +1,496 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "id": "proj_20261021022907_7d7d180e",
+    "name": "direct-reverse-tail",
+    "created_at": "2026-10-21T02:29:07.948268Z",
+    "updated_at": "2026-10-21T02:29:18.100863Z",
+    "creator": "ai-ad-editor",
+    "source_revision": "local"
+  },
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 30000,
+        "den": 1001
+      }
+    },
+    "canvas": {
+      "width": 320,
+      "height": 180,
+      "background": "#000000"
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "source",
+      "kind": "video",
+      "uri": "assets/source_source-audio-tail.mkv",
+      "sha256": "sha256:68749de64e002f5d167033d0d0193d91a54a9444634c7f43af9f43643870d305",
+      "probe": {
+        "duration_seconds": 2.0,
+        "duration_tick": 180000,
+        "format": "matroska,webm",
+        "format_long_name": "Matroska / WebM",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "ffv1",
+            "codec_long_name": "FFmpeg video codec #1",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 180,
+            "has_b_frames": 0,
+            "pix_fmt": "bgra",
+            "level": -99,
+            "color_range": "pc",
+            "color_space": "gbr",
+            "field_order": "progressive",
+            "r_frame_rate": "25/1",
+            "avg_frame_rate": "25/1",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bits_per_raw_sample": "8",
+            "extradata_size": 42,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 ffv1",
+              "DURATION": "00:00:00.320000000"
+            }
+          },
+          {
+            "index": 1,
+            "codec_name": "pcm_f32le",
+            "codec_long_name": "PCM 32-bit floating point little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "sample_fmt": "flt",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 32,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bit_rate": "3072000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 pcm_f32le",
+              "DURATION": "00:00:02.000000000"
+            }
+          }
+        ],
+        "video": {
+          "codec": "ffv1",
+          "width": 320,
+          "height": 180,
+          "pix_fmt": "bgra",
+          "fps": "25/1",
+          "color_space": "gbr",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_f32le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "source",
+      "source": {
+        "source_url": "local://native-empty-window/original",
+        "retrieved_at": "2026-10-21T02:29:09.188136Z",
+        "original_name": "source-audio-tail.mkv"
+      }
+    },
+    {
+      "id": "background",
+      "kind": "image",
+      "uri": "assets/background_underlying-layer.png",
+      "sha256": "sha256:59d6431485364b0d08d3bd67b7aaeb6510d243d49c1f96a1a25d07e43b78a16e",
+      "probe": {
+        "duration_seconds": 0.0,
+        "duration_tick": 0,
+        "format": "png_pipe",
+        "format_long_name": "piped png sequence",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "png",
+            "codec_long_name": "PNG (Portable Network Graphics) image",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 180,
+            "has_b_frames": 0,
+            "pix_fmt": "rgba",
+            "level": -99,
+            "color_range": "pc",
+            "color_space": "gbr",
+            "r_frame_rate": "25/1",
+            "avg_frame_rate": "25/1",
+            "time_base": "1/25",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            }
+          }
+        ],
+        "video": {
+          "codec": "png",
+          "width": 320,
+          "height": 180,
+          "pix_fmt": "rgba",
+          "fps": "25/1",
+          "color_space": "gbr",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "background",
+      "source": {
+        "source_url": "local://native-empty-window/original",
+        "retrieved_at": "2026-10-21T02:29:10.411603Z",
+        "original_name": "underlying-layer.png"
+      }
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq_main",
+      "name": "Main",
+      "duration_tick": 135000,
+      "tracks": [
+        {
+          "id": "track_video_1",
+          "kind": "video",
+          "order": 1,
+          "muted": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "leaf_video",
+              "timeline_start_tick": 9900,
+              "duration_tick": 45000,
+              "source_in_tick": 90000,
+              "source_out_tick": 135000,
+              "asset_id": "source",
+              "reverse": true
+            }
+          ]
+        },
+        {
+          "id": "track_audio_1",
+          "kind": "audio",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "leaf_audio",
+              "timeline_start_tick": 9900,
+              "duration_tick": 45000,
+              "source_in_tick": 90000,
+              "source_out_tick": 135000,
+              "asset_id": "source",
+              "reverse": true
+            }
+          ]
+        },
+        {
+          "id": "underlay",
+          "kind": "video",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "underlay_clip",
+              "timeline_start_tick": 0,
+              "duration_tick": 135000,
+              "source_in_tick": 0,
+              "source_out_tick": 135000,
+              "asset_id": "background"
+            }
+          ]
+        }
+      ],
+      "markers": []
+    }
+  ],
+  "templates": [],
+  "outputs": [
+    {
+      "id": "output_20261021022915_3c031163",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\native-empty-window-lab-20261021\\product\\.runtime\\native-empty-window-20261021\\installed-r1\\media\\direct-reverse-tail\\renders\\result.mp4",
+      "container": "mp4",
+      "profile": "custom",
+      "canvas": {
+        "width": 320,
+        "height": 180,
+        "background": "#000000"
+      },
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      },
+      "target_platform": "generic"
+    },
+    {
+      "id": "output_20261021022918_2ed2066e",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\native-empty-window-lab-20261021\\product\\.runtime\\native-empty-window-20261021\\installed-r1\\media\\direct-reverse-tail\\renders\\repeated.mp4",
+      "container": "mp4",
+      "profile": "custom",
+      "canvas": {
+        "width": 320,
+        "height": 180,
+        "background": "#000000"
+      },
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 0,
+        "pixel_format": "yuv444p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      },
+      "target_platform": "generic"
+    }
+  ],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "model_versions": [],
+    "input_hashes": [],
+    "change_log": [
+      {
+        "operation_id": "op_20261021022909_6ecf6bf8",
+        "command": "media.ingest",
+        "asset_id": "source",
+        "at": "2026-10-21T02:29:09.188591Z"
+      },
+      {
+        "operation_id": "op_20261021022910_db92362d",
+        "command": "media.ingest",
+        "asset_id": "background",
+        "at": "2026-10-21T02:29:10.412030Z"
+      },
+      {
+        "operation_id": "op_20261021022911_4fecdf94",
+        "command": "timeline.compose",
+        "input": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\native-empty-window-lab-20261021\\docs\\assets\\native-empty-window-20261021-lab\\installed-r1\\direct-reverse-tail-request.json",
+        "at": "2026-10-21T02:29:11.846498Z",
+        "changes": [
+          {
+            "op": "update_track",
+            "track_id": "track_video_1",
+            "track": {
+              "id": "track_video_1",
+              "kind": "video",
+              "order": 1,
+              "muted": false,
+              "locked": false,
+              "clips": [
+                {
+                  "id": "leaf_video",
+                  "timeline_start_tick": 9900,
+                  "duration_tick": 45000,
+                  "source_in_tick": 90000,
+                  "source_out_tick": 135000,
+                  "asset_id": "source",
+                  "reverse": true
+                }
+              ]
+            }
+          },
+          {
+            "op": "add_track",
+            "sequence_id": "seq_main",
+            "track": {
+              "id": "underlay",
+              "kind": "video",
+              "order": 0,
+              "muted": false,
+              "locked": false,
+              "clips": [
+                {
+                  "id": "underlay_clip",
+                  "timeline_start_tick": 0,
+                  "duration_tick": 135000,
+                  "source_in_tick": 0,
+                  "source_out_tick": 135000,
+                  "asset_id": "background"
+                }
+              ]
+            }
+          },
+          {
+            "op": "append_clip",
+            "track_id": "underlay",
+            "clip": {
+              "id": "underlay_clip",
+              "timeline_start_tick": 0,
+              "duration_tick": 135000,
+              "source_in_tick": 0,
+              "source_out_tick": 135000,
+              "asset_id": "background"
+            }
+          },
+          {
+            "op": "append_clip",
+            "track_id": "track_video_1",
+            "clip": {
+              "id": "leaf_video",
+              "timeline_start_tick": 9900,
+              "duration_tick": 45000,
+              "source_in_tick": 90000,
+              "source_out_tick": 135000,
+              "asset_id": "source",
+              "reverse": true
+            }
+          },
+          {
+            "op": "append_clip",
+            "track_id": "track_audio_1",
+            "clip": {
+              "id": "leaf_audio",
+              "timeline_start_tick": 9900,
+              "duration_tick": 45000,
+              "source_in_tick": 90000,
+              "source_out_tick": 135000,
+              "asset_id": "source",
+              "reverse": true
+            }
+          },
+          {
+            "op": "set_sequence_duration",
+            "sequence_id": "seq_main",
+            "duration_tick": 135000
+          }
+        ],
+        "before_snapshot_id": "snap_20261021022911_7fad107e"
+      },
+      {
+        "command": "render",
+        "at": "2026-10-21T02:29:15.711201Z",
+        "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\native-empty-window-lab-20261021\\product\\.runtime\\native-empty-window-20261021\\installed-r1\\media\\direct-reverse-tail\\renders\\result.mp4",
+        "manifest": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\native-empty-window-lab-20261021\\product\\.runtime\\native-empty-window-20261021\\installed-r1\\media\\direct-reverse-tail\\renders\\result.mp4.manifest.json"
+      },
+      {
+        "command": "render",
+        "at": "2026-10-21T02:29:18.100851Z",
+        "output": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\native-empty-window-lab-20261021\\product\\.runtime\\native-empty-window-20261021\\installed-r1\\media\\direct-reverse-tail\\renders\\repeated.mp4",
+        "manifest": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\native-empty-window-lab-20261021\\product\\.runtime\\native-empty-window-20261021\\installed-r1\\media\\direct-reverse-tail\\renders\\repeated.mp4.manifest.json"
+      }
+    ]
+  }
+}

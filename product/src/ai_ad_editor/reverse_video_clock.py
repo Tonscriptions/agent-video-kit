@@ -180,7 +180,12 @@ def _native_range(path,source_in_tick,source_out_tick,tps,expected_time_base,*,
     if first_time<0 or final_time<=first_time:raise ValueError('invalid requested source interval')
     first=max(0,bisect_right(pts,first_time/native+origin)-1)
     end=bisect_left(pts,final_time/native+origin)
-    if end<=first:raise ValueError('requested source window contains no displayed frame')
+    # A valid media container can have audio before its first video frame or
+    # after its actual video EOF. Keep that selection empty instead of cloning
+    # an unrelated frame. An unknown final duration remains an error.
+    if end>first and first==len(pts)-1:
+        if durations[first]<=0:raise ValueError('final decoded frame has no known native duration')
+        if first_time>=(pts[first]+durations[first]-origin)*native:first=end
     return pts,durations,stream,format_info,native,origin,first_time,final_time,first,end,index_metadata
 
 
@@ -191,21 +196,29 @@ def forward_intervals(path,source_in_tick,source_out_tick,tps,*,expected_time_ba
         pts,durations,stream,_,native,origin,left,right,first,end,index_metadata=_native_range(
             path,source_in_tick,source_out_tick,tps,expected_time_base,cancel_file=cancel_file,
             decoder=decoder,index_context=index_context,source_sha256=source_sha256)
-        first_time=max(left,(pts[first]-origin)*native)
-        if end<len(pts):last_end=(pts[end]-origin)*native
+        if first==end:
+            first_time=eof=None
+            expression='PTS*TB'  # No frame reaches this clock expression.
         else:
-            if durations[end-1]<=0:raise ValueError('last selected frame has no native duration')
-            last_end=(pts[end-1]+durations[end-1]-origin)*native
-        eof=min(right,last_end)
-        if eof<=first_time:raise ValueError('native forward interval is empty')
-        rational=lambda value:f'({value.numerator}/{value.denominator})'
-        expression=(f'if(eq(N,0),{rational(first_time)},'
-                    f'if(gte(N,{end-first}),{rational(eof)},PTS*TB))')
+            first_time=max(left,(pts[first]-origin)*native)
+            if end<len(pts):last_end=(pts[end]-origin)*native
+            else:
+                if durations[end-1]<=0:raise ValueError('last selected frame has no native duration')
+                last_end=(pts[end-1]+durations[end-1]-origin)*native
+            eof=min(right,last_end)
+            if eof<=first_time:raise ValueError('native forward interval is empty')
+            rational=lambda value:f'({value.numerator}/{value.denominator})'
+            expression=(f'if(eq(N,0),{rational(first_time)},'
+                        f'if(gte(N,{end-first}),{rational(eof)},PTS*TB))')
         metadata={'protocol':'covering-native-source-half-open-v1','source_frame_start':first,
             'source_frame_end_exclusive':end,'selected_frame_count':end-first,
             'native_time_base':str(native),'demux_origin_native_pts':origin,
-            'first_source_seconds':str(first_time),'eof_source_seconds':str(eof),
+            'first_source_seconds':None if first_time is None else str(first_time),
+            'eof_source_seconds':None if eof is None else str(eof),
             'original_frame_intervals_preserved':True}
+        if first==end:metadata.update(empty_native_video_interval=True,
+            empty_reason='before-first-native-frame' if end==0 else 'after-final-native-frame',
+            source_in_tick=source_in_tick,source_out_tick=source_out_tick)
         if index_metadata is not None:metadata['native_frame_index']=index_metadata
         return first,end,expression,metadata
     except (ValueError,KeyError,TypeError,ZeroDivisionError,OverflowError) as caught:
@@ -240,10 +253,14 @@ def reverse_intervals(path, source_in_tick, source_out_tick, tps, working_time_b
             if value.denominator != 1:
                 raise ValueError('reverse interval is not representable on working clock')
             values.append(int(value))
-        eof = (final_time-max(first_time, (pts[first]-origin)*native))/grid
-        if eof.denominator != 1 or eof <= values[-1]:
-            raise ValueError('reverse EOF does not follow the final displayed frame')
-        expression = f'if(gte(N,{len(values)}),{int(eof)},{_lookup(values)})'
+        if first==end:
+            eof=None
+            expression='0'  # trim selects no frames; reverse has no raster buffer.
+        else:
+            eof = (final_time-max(first_time, (pts[first]-origin)*native))/grid
+            if eof.denominator != 1 or eof <= values[-1]:
+                raise ValueError('reverse EOF does not follow the final displayed frame')
+            expression = f'if(gte(N,{len(values)}),{int(eof)},{_lookup(values)})'
         if len(expression.encode('ascii')) > MAX_EXPRESSION_BYTES:
             raise ValueError('reverse frame expression exceeds bounded size')
         index_digest = hashlib.sha256()
@@ -272,12 +289,13 @@ def reverse_intervals(path, source_in_tick, source_out_tick, tps, working_time_b
             'native_time_base': str(native), 'demux_format_start_time': origin_text,
             'demux_origin_native_pts': origin, 'working_time_base': str(grid),
             'source_in_tick': source_in_tick, 'source_out_tick': source_out_tick,
-            'first_reverse_clock_tick': values[0], 'reverse_eof_clock_tick': int(eof),
+            'first_reverse_clock_tick':values[0] if values else None,
+            'reverse_eof_clock_tick':None if eof is None else int(eof),
             'frame_index_sha256': 'sha256:'+index_hash,
             'expression_sha256': 'sha256:'+hashlib.sha256(expression.encode('ascii')).hexdigest(),
             'expression_bytes': len(expression), 'lookup_depth_bound': len(values).bit_length()+1,
             'input_VFR_normalized': False, 'frame_limit': MAX_FRAMES,
-            'frame_buffer_strategy': 'native-FFmpeg-entire-selected-clip',
+            'frame_buffer_strategy':'native-FFmpeg-entire-selected-clip' if values else 'no-selected-native-video-frames',
             'estimated_rgba8_selected_frame_bytes': (end-first)*width*height*4,
             'estimated_decoded_frame_buffer_bytes': (end-first)*width*height*DECODED_BYTES_PER_PIXEL_BOUND,
             'decoded_bytes_per_pixel_bound': DECODED_BYTES_PER_PIXEL_BOUND,
@@ -287,6 +305,8 @@ def reverse_intervals(path, source_in_tick, source_out_tick, tps, working_time_b
             'source_decoder':decoder,
             'reverse_chunk_ranges':chunks,
             'long_clip_memory_and_latency_accepted': False}
+        if first==end:metadata.update(empty_native_video_interval=True,
+            empty_reason='before-first-native-frame' if end==0 else 'after-final-native-frame')
         if index_metadata is not None:metadata['native_frame_index']=index_metadata
         return first, end, expression, metadata
     except (ValueError, KeyError, ZeroDivisionError, OverflowError) as error:

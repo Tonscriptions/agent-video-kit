@@ -1,0 +1,28 @@
+--- product/tests/test_cli.py@prior
++++ product/tests/test_cli.py@upstream-refresh
+@@ -3329,7 +3329,24 @@
+             self.assertEqual(code, 0, rendered)
+             self.assertTrue(output.exists())
+             self.assertFalse(any(item.get("feature") == "nested_sequence_speed_curve_piecewise" for item in rendered["data"]["warnings"]))
+-            self.assertTrue(any(item.get('code') == 'NESTED_SOURCE_CFR_NORMALIZED' for item in rendered['data']['warnings']))
++            self.assertFalse(any(item.get('code') == 'NESTED_SOURCE_CFR_NORMALIZED' for item in rendered['data']['warnings']))
++            manifest = json.loads(Path(rendered['data']['manifest']).read_text(encoding='utf-8'))
++
++            def native_clocks(value):
++                if isinstance(value, dict):
++                    if 'video_frame_clock' in value:
++                        yield value['video_frame_clock']
++                    for child in value.values():
++                        yield from native_clocks(child)
++                elif isinstance(value, list):
++                    for child in value:
++                        yield from native_clocks(child)
++
++            clocks = [clock for clock in native_clocks(manifest)
++                      if clock.get('source_clock_anchor') == 'original-native-intervals-before-nested-author-map']
++            self.assertEqual(len(clocks), 2)
++            self.assertTrue(all(clock['native_source_intervals']['protocol'] == 'covering-native-source-half-open-v1'
++                                for clock in clocks))
+ 
+     def test_nested_sequence_reverse_preserves_temporal_order(self) -> None:
+         project = {
