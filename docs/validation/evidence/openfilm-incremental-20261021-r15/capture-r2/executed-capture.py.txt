@@ -1,0 +1,78 @@
+"""Read-only official upstream delta capture; no upstream installation or runtime providers."""
+from datetime import datetime, timezone
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import urllib.request
+import time
+
+ROOT = Path(__file__).resolve().parent
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--revision', required=True, choices=('r2',))
+args = parser.parse_args()
+OUT = ROOT / ('docs/validation/evidence/openfilm-incremental-20261021-r15/capture-' + args.revision)
+BASE = '53156ac5818d8bad3f2c356043b376b3eebd95ba'
+API = 'https://api.github.com/repos/openfilm/openfilm'
+assert not OUT.exists()
+OUT.mkdir(parents=True)
+(OUT/'executed-capture.py.txt').write_bytes(Path(__file__).read_bytes())
+record = {'started_at_utc':datetime.now(timezone.utc).isoformat(),'status':'running',
+    'previous_review_commit':BASE,'requests':[],'interactive_browser_tabs_opened':0,
+    'upstream_installation':False,'models_or_providers_invoked':False,'native_windows':True,
+    'virtualization':False,'script_sha256':'sha256:'+hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+
+def save():
+    (OUT/'verification.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+
+def fetch(url, name, *, as_json=True):
+    req = urllib.request.Request(url, headers={'Accept':'application/vnd.github+json','User-Agent':'agent-video-kit-readonly-review'})
+    for attempt in range(1,4):
+        try:
+            with urllib.request.urlopen(req, timeout=35) as response:
+                data = response.read()
+                row = {'url':url,'status':response.status,'http_date':response.headers.get('Date'),
+                    'bytes':len(data),'path':name,'sha256':'sha256:'+hashlib.sha256(data).hexdigest(),
+                    'received_at_utc':datetime.now(timezone.utc).isoformat(),'attempt':attempt}
+            break
+        except Exception as error:
+            record.setdefault('failed_attempts',[]).append({'url':url,'attempt':attempt,'error':repr(error),
+                'received_at_utc':datetime.now(timezone.utc).isoformat()});save()
+            if attempt==3: raise
+            time.sleep(2)
+    target = OUT/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+    record['requests'].append(row);save()
+    return json.loads(data) if as_json else data
+
+save()
+try:
+    repo = fetch(API, 'repository.json')
+    head = fetch(API+'/commits/'+repo['default_branch'], 'head.json')
+    release = fetch(API+'/releases/latest', 'latest-release.json')
+    commit = head['sha']
+    delta = fetch(API+'/compare/'+BASE+'...'+commit, 'compare.json')
+    files = delta.get('files',[])
+    record.update(head_commit=commit,stars=repo['stargazers_count'],forks=repo['forks_count'],
+        release=release['tag_name'],release_published_at=release['published_at'],
+        total_commits=delta.get('total_commits'),changed_files=len(files),
+        complete_file_list=len(files)<300,changes=[{key:row.get(key) for key in
+            ('filename','status','additions','deletions','changes','previous_filename')} for row in files])
+    # Capture only reusable module/test deltas, plus current license/metadata.
+    suffixes = ('/nle.mjs','/fcpxml.mjs','/pi-config.mjs','/preview-cache.mjs','/subtitle-segments.mjs',
+        '/component-props.ts','/template-controls.ts','/exports.mjs','/diagnostics.mjs',
+        '/film-clip-edits.ts','/timeline-edit.ts','/film-doc.mjs','/host.mjs','/look.mjs',
+        '/encoders.mjs','/problems.mjs','/pi-config.test.mjs','/nle.test.mjs','/fcpxml.test.mjs',
+        '/preview-cache.test.mjs','/exports.test.mjs')
+    selected = sorted({row['filename'] for row in files if row['status']!='removed' and
+        (row['filename'].endswith(suffixes) or row['filename'].startswith('skills/'))} |
+        {'LICENSE','THIRD_PARTY_NOTICES.md','TRADEMARK.md','packages/openfilm/package.json'})
+    record['selected_files']=selected;save()
+    for name in selected:
+        fetch('https://raw.githubusercontent.com/openfilm/openfilm/'+commit+'/'+name,'source/'+name,as_json=False)
+    record.update(status='captured',finished_at_utc=datetime.now(timezone.utc).isoformat())
+except Exception as error:
+    record.update(status='failed',error=repr(error),finished_at_utc=datetime.now(timezone.utc).isoformat())
+    save();raise
+save()
+print(json.dumps({key:record[key] for key in ('status','head_commit','stars','forks','release','total_commits',
+    'changed_files','complete_file_list','selected_files')},ensure_ascii=False))

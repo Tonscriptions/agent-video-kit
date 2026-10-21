@@ -1,0 +1,63 @@
+"""Preserve original HTTP/evidence bytes through Git's text filters, then publish R15."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+ROOT=Path(__file__).resolve().parent
+MAIN=Path('E:/dev/sandbox/AI广告剪辑')
+REL=Path('docs/validation/evidence/openfilm-incremental-20261021-r15')
+OLD=ROOT/'publication-r1'
+WORK=ROOT/'publication-r2';assert not WORK.exists();WORK.mkdir()
+read=lambda p:json.loads(Path(p).read_bytes())
+old=read(OLD/'run.json');assert old['status']=='failed-preserved-for-review' and 'AssertionError' in old['error']
+paths={Path(x.decode('utf8')) for x in (OLD/'paths.nul').read_bytes().split(b'\0') if x}
+record={'status':'preflight','parent_commit':old['parent_commit'],'started_at_utc':datetime.now(timezone.utc).isoformat(),
+    'previous_attempt':str(OLD/'run.json'),'reason':'R15 original receipt CRLF bytes must survive Git text normalization.',
+    'calls':[],'product_code_changed':False,'force_push':False}
+def sha(path):return 'sha256:'+hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def save():(WORK/'run.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+def git(*args):
+    command=['git','-c','gc.auto=0','-c','maintenance.auto=false',*map(str,args)]
+    result=subprocess.run(command,cwd=MAIN,capture_output=True,timeout=1200,creationflags=subprocess.CREATE_NO_WINDOW)
+    record['calls'].append({'command':command,'exit_code':result.returncode,'stderr':result.stderr.decode('utf8','replace')[-1500:]});save()
+    if result.returncode:raise RuntimeError(record['calls'][-1]['stderr'])
+    return result.stdout
+def core():
+    return {p.relative_to(MAIN).as_posix():sha(p) for folder in ('product/src','product/tests')
+        for p in (MAIN/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.suffix in ('.py','.mjs','.json','.ttf')}
+save()
+try:
+    assert git('rev-parse','HEAD').decode().strip()==old['parent_commit']
+    assert core()==old['core_before']
+    staged={Path(x.decode('utf8')) for x in git('diff','--cached','--name-only','-z').split(b'\0') if x}
+    assert staged==paths
+    attributes=MAIN/REL/'.gitattributes';assert not attributes.exists()
+    attributes.write_text('# Preserve original API bodies, HTTP headers and execution receipts byte for byte.\n* -text\n',encoding='utf8',newline='\n')
+    failure=MAIN/REL/'publication-attempt-r1.json';assert not failure.exists();failure.write_bytes((OLD/'run.json').read_bytes())
+    script=MAIN/REL/'executed-publication-repair.py.txt';assert not script.exists();script.write_bytes(Path(__file__).read_bytes())
+    paths.update((attributes.relative_to(MAIN),failure.relative_to(MAIN),script.relative_to(MAIN)))
+    for name in paths:
+        if (ROOT/name).is_file(): assert (ROOT/name).read_bytes()==(MAIN/name).read_bytes(),name
+    listing=WORK/'paths.nul';listing.write_bytes(b''.join(p.as_posix().encode('utf8')+b'\0' for p in sorted(paths)))
+    git('add','--pathspec-from-file='+str(listing),'--pathspec-file-nul')
+    staged={Path(x.decode('utf8')) for x in git('diff','--cached','--name-only','-z').split(b'\0') if x}
+    assert staged==paths
+    record['staged_files']={}
+    for name in sorted(paths):
+        blob=git('show',':'+name.as_posix());assert blob==(MAIN/name).read_bytes(),name
+        record['staged_files'][name.as_posix()]='sha256:'+hashlib.sha256(blob).hexdigest()
+    assert core()==old['core_before']
+    record.update(status='staged-verified',staged_blob_comparisons=len(paths));save()
+    git('commit','-m','docs: review latest OpenFilm delta and remaining reuse costs')
+    record.update(status='committed',commit=git('rev-parse','HEAD').decode().strip());save()
+    git('push','origin','main')
+    remote=git('ls-remote','--heads','origin','main').decode().split()[0]
+    assert remote==record['commit'] and core()==old['core_before']
+    assert not git('status','--porcelain','--untracked-files=normal')
+    record.update(status='published',remote_commit=remote,main_clean=True,
+        product_inputs_unchanged=True,finished_at_utc=datetime.now(timezone.utc).isoformat());save()
+    print(json.dumps({k:record[k] for k in ('status','commit','main_clean','staged_blob_comparisons')},ensure_ascii=False))
+except BaseException as error:
+    record.update(status='failed-preserved-for-review',error=repr(error));save();raise

@@ -1,0 +1,509 @@
+.changeset/calm-toolbars-wait.md
+@@ -0,0 +1,5 @@
++---
++"openfilm": patch
++---
++
++Keep selection action bars behind Export and other dialogs, so clip actions cannot be pressed through the export window.
+
+.changeset/double-click-opens-once.md
+@@ -0,0 +1,5 @@
++---
++"openfilm": patch
++---
++
++Projects: double-clicking a folder opens the folder only. Before, its second click opened whichever project had just appeared under the pointer.
+
+.changeset/new-project-in-folder.md
+@@ -0,0 +1,5 @@
++---
++"openfilm": patch
++---
++
++Projects: a folder has its own "New project", and the project it makes is in that folder. Before, a project could only be made at the top level and then moved into a folder.
+
+packages/openfilm/studio/selection-toolbar.test.mjs
+@@ -0,0 +1,123 @@
++import { test } from 'node:test';
++import assert from 'node:assert/strict';
++import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
++import { tmpdir } from 'node:os';
++import { join } from 'node:path';
++import { chromium } from 'playwright-core';
++import { filmHtml } from '../src/film-doc.mjs';
++import { openProject } from './server/projects.mjs';
++import { startStudio } from './server/server.mjs';
++
++test('export covers the selection toolbar, keeps its menus usable, and leaves the range intact', { timeout: 60_000 }, async () => {
++  const scratch = await mkdtemp(join(tmpdir(), 'of-selection-dialog-'));
++  const names = ['HOME', 'SHARED_HOME', 'LIBRARY', 'SAVED', 'EXPORTS'];
++  const saved = new Map(names.map((name) => [`OPENFILM_${name}`, process.env[`OPENFILM_${name}`]]));
++  for (const name of names) process.env[`OPENFILM_${name}`] = join(scratch, name.toLowerCase());
++  let studio, browser;
++  try {
++    const root = join(process.env.OPENFILM_LIBRARY, 'Selection');
++    await mkdir(join(root, 'assets'), { recursive: true });
++    await writeFile(join(root, 'assets', 'card.svg'), '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><rect width="320" height="180" fill="#486b8e"/></svg>');
++    await writeFile(join(root, 'film.html'), filmHtml({
++      stage: { w: 320, h: 180 }, tracks: [{ clips: [{ id: 'card', src: 'assets/card.svg', time: [0, 4] }] }],
++    }));
++    const project = await openProject(root);
++    studio = await startStudio({ port: 0, openBrowser: () => {} });
++    browser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader'] });
++    const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, locale: 'en-US', reducedMotion: 'reduce' });
++    await page.goto(`${studio.origin}/projects/${project.id}?key=${studio.key}`);
++    const clip = page.locator('[data-block-id]').first();
++    await clip.waitFor({ state: 'visible' });
++    await clip.click({ position: { x: 20, y: 10 } });
++    const toolbar = page.locator('[data-selection-toolbar]');
++    const more = toolbar.locator('[data-tool="more"]');
++    await more.hover();
++    await page.getByRole('tooltip').waitFor({ state: 'visible' });
++    await more.click();
++    const menu = page.getByRole('menu').first();
++    await menu.waitFor({ state: 'visible' });
++    const barBox = await toolbar.boundingBox(), menuBox = await menu.boundingBox();
++    assert.ok(barBox && menuBox);
++    const overlap = {
++      left: Math.max(barBox.x, menuBox.x), top: Math.max(barBox.y, menuBox.y),
++      right: Math.min(barBox.x + barBox.width, menuBox.x + menuBox.width),
++      bottom: Math.min(barBox.y + barBox.height, menuBox.y + menuBox.height),
++    };
++    assert.ok(overlap.left < overlap.right && overlap.top < overlap.bottom);
++    assert.equal(await menu.evaluate((el, point) => el.contains(document.elementFromPoint(point.x, point.y)), {
++      x: (overlap.left + overlap.right) / 2, y: (overlap.top + overlap.bottom) / 2,
++    }), true, 'the clip menu covers the toolbar where they overlap');
++    await menu.getByRole('menuitem', { name: /^Copy attributes/ }).click();
++    await page.getByText(/^Attributes copied:/).waitFor({ state: 'visible' });
++
++    await page.locator('[data-film-select]').click();
++    await toolbar.locator('[data-tool="mask"]').waitFor({ state: 'visible' });
++    await toolbar.locator('[data-tool="more"]').click();
++    await menu.waitFor({ state: 'visible' });
++    await page.keyboard.press('Escape');
++    await clip.click({ position: { x: 20, y: 10 } });
++    const ruler = await page.locator('[data-timeline] [role="slider"]').first().boundingBox();
++    assert.ok(ruler);
++    await page.keyboard.down('Shift');
++    await page.mouse.move(ruler.x + 80, ruler.y + ruler.height / 2);
++    await page.mouse.down();
++    await page.mouse.move(ruler.x + 300, ruler.y + ruler.height / 2, { steps: 5 });
++    await page.mouse.up();
++    await page.keyboard.up('Shift');
++    await clip.click({ position: { x: 20, y: 10 } });
++    await toolbar.waitFor({ state: 'visible' });
++    const hit = async () => {
++      const box = await toolbar.boundingBox();
++      assert.ok(box, 'the selected range keeps its toolbar');
++      return page.evaluate(({ x, y }) => {
++        const element = document.elementFromPoint(x, y);
++        return { toolbar: Boolean(element?.closest('[data-selection-toolbar]')), tag: element?.tagName, label: element?.getAttribute('aria-label') };
++      }, { x: box.x + box.width / 2, y: box.y + box.height / 2 });
++    };
++    assert.equal((await hit()).toolbar, true, 'the toolbar is reachable before opening export');
++
++    await page.getByRole('button', { name: 'Export', exact: true }).click();
++    const dialog = page.getByRole('dialog', { name: 'Export', exact: true });
++    await dialog.waitFor({ state: 'visible' });
++    const coveredHit = await hit();
++    // Capture one real pointer click without running whichever action is beneath it.
++    await page.evaluate(() => {
++      document.addEventListener('click', (event) => {
++        window.toolbarReceivedClick = Boolean(event.target.closest('[data-selection-toolbar]'));
++        event.preventDefault();
++        event.stopImmediatePropagation();
++      }, { capture: true, once: true });
++    });
++    const coveredBox = await toolbar.boundingBox();
++    assert.ok(coveredBox);
++    await page.mouse.click(coveredBox.x + coveredBox.width / 2, coveredBox.y + coveredBox.height / 2);
++    const toolbarReceivedClick = await page.evaluate(() => window.toolbarReceivedClick);
++
++    // A dialog-layer fix must also leave its body-portaled MenuSelect above the dialog.
++    const fps = dialog.getByRole('button', { name: 'Frame rate', exact: true });
++    await fps.click();
++    const list = page.getByRole('listbox', { name: 'Frame rate', exact: true });
++    await list.waitFor({ state: 'visible' });
++    const choice = list.getByRole('option', { selected: false }).first();
++    const picked = await choice.textContent();
++    await choice.click();
++    await list.waitFor({ state: 'hidden' });
++    assert.equal(await fps.textContent(), picked, 'a frame rate can still be picked with the pointer');
++
++    await dialog.getByRole('button', { name: 'Close', exact: true }).click();
++    await dialog.waitFor({ state: 'hidden' });
++    await toolbar.waitFor({ state: 'visible' });
++    await toolbar.locator('[data-tool="clear-range"]').waitFor({ state: 'visible' });
++    assert.equal((await hit()).toolbar, true, 'the retained range toolbar is reachable again');
++    assert.equal(coveredHit.toolbar, false, `export must cover the toolbar; hit ${JSON.stringify(coveredHit)}`);
++    assert.equal(toolbarReceivedClick, false, 'a click over the covered toolbar reaches the dialog');
++  } finally {
++    await browser?.close();
++    await studio?.close();
++    for (const [name, value] of saved) {
++      if (value === undefined) delete process.env[name];
++      else process.env[name] = value;
++    }
++    await rm(scratch, { recursive: true, force: true });
++  }
++});
+
+packages/openfilm/studio/ui/src/components/ProjectsLibrary.tsx
+@@ -20,7 +20,7 @@ import { createPortal } from 'react-dom';
+ import { Loader2 } from 'lucide-react';
+ import { api, ApiError, LIBRARY_EVENT } from '@/api';
+ import { useT } from '@/i18n';
+-import { folderApi, folderCounts, folderTrail, type ProjectFolder } from '@/lib/project-folders';
++import { folderApi, folderCounts, folderTrail, newProjectIn, type ProjectFolder } from '@/lib/project-folders';
+ import { stillThere } from '@/lib/project-delete';
+ import { studioHost } from '@/lib/host';
+ import { SourceError, sourcesApi } from '@/lib/project-sources';
+@@ -307,11 +307,11 @@ export function ProjectsPopover({
+     if (wasOpen.current) latestClose.current();
+   }, [currentProjectId]);
+ 
+-  /** A new project, named as Studio names it (Untitled, Untitled 2…), opened at once: it is renamed later. */
+-  async function newProject() {
++  /** A new project in `folderId` (null: the top level), named as Studio names it (Untitled, Untitled 2…), opened at once: it is renamed later. */
++  async function newProject(folderId: string | null) {
+     setBusy('creating');
+     try {
+-      const project = await api.newProject(t('project.untitled'));
++      const project = await newProjectIn(folderId, { create: () => api.newProject(t('project.untitled')), move: folderApi.move });
+       go(project.id, 'creating');
+     } catch {
+       setBusy(null);
+@@ -436,7 +436,7 @@ export function ProjectsPopover({
+               heading={<LauncherSwitch view={view} onView={showView} />}
+               projects={lib.projects}
+               creating={busy !== null}
+-              onNewProject={() => void newProject()}
++              onNewProject={(folderId) => void newProject(folderId)}
+               onOpenFolder={() => void openFolder()}
+               onGetFromGitHub={() => setGithub({})}
+               onLocate={(project) => void locate(project)}
+
+packages/openfilm/studio/ui/src/components/ProjectsView.tsx
+@@ -14,8 +14,8 @@ import { ExamplesSection } from './ProjectSources';
+ import { useLanguage, useT, type Language } from '@/i18n';
+ import { limitTitleWidth, TITLE_MAX_WIDTH } from '@/lib/title';
+ import { api, type Project } from '@/api';
+-import { folderCounts, folderPosters, folderTrail, parentOf, visibleProjects, type LibrarySort, type ProjectFolder } from '@/lib/project-folders';
+-import { posterRetryDelay, posterTry } from '@/lib/projects-page';
++import { folderCounts, folderPosters, folderTrail, listStarts, parentOf, visibleProjects, type LibrarySort, type ProjectFolder } from '@/lib/project-folders';
++import { opensOnClick, posterRetryDelay, posterTry } from '@/lib/projects-page';
+ import { ContextMenu } from './ContextMenu';
+ import { ProjectMenu } from './ProjectMenu';
+ import { ProjectCoverContext } from './ProjectCover';
+@@ -55,8 +55,8 @@ export function ProjectsView({
+   projects: LibraryProject[];
+   /** A project is being created or opened; "New project" does not take a second click meanwhile. */
+   creating?: boolean;
+-  /** "New project": made at once, named as Studio names it (Untitled, Untitled 2…), and opened. */
+-  onNewProject: () => void;
++  /** "New project": made at once in the folder looked at (null: the top level), named as Studio names it (Untitled, Untitled 2…), and opened. */
++  onNewProject: (folderId: string | null) => void;
+   /** "Open folder…": a folder anywhere, opened as a project (the app's own dialog, else Studio's folder browser). */
+   onOpenFolder: () => void;
+   /** "Get from GitHub…": a repository or a folder in one, copied into the library and opened. */
+@@ -123,6 +123,9 @@ export function ProjectsView({
+   const counts = React.useMemo(() => folderCounts(projects, folders), [projects, folders]);
+   const posters = React.useMemo(() => folderPosters(projects, folders), [projects, folders]);
+ 
++  /** A card's open: on a click, a key press or its menu, not on the second click of a double-click (lib/projects-page). */
++  const opening = (run: () => void) => (event?: { detail: number }) => { if (!event || opensOnClick(event)) run(); };
++
+   async function newFolder() {
+     const created = await onCreateFolder(t('projects.untitledFolder'), folderId);
+     if (created) setRenamingFolderId(created.id);
+@@ -134,7 +137,7 @@ export function ProjectsView({
+       count: counts[folder.id] ?? 0,
+       posters: posters[folder.id] ?? [],
+       renaming: renamingFolderId === folder.id,
+-      onOpen: () => setFolderId(folder.id),
++      onOpen: opening(() => setFolderId(folder.id)),
+       onStartRename: () => setRenamingFolderId(folder.id),
+       onCommitRename: (name: string) => {
+         setRenamingFolderId(null);
+@@ -217,7 +220,7 @@ export function ProjectsView({
+       selected: selectedIds.has(project.id),
+       renaming: renamingId === project.id,
+       onToggleSelect: () => toggleSelected(project.id),
+-      onOpen: () => onOpen(project),
++      onOpen: opening(() => onOpen(project)),
+       onStartRename: () => { if (!selecting) setRenamingId(project.id); },
+       onCommitRename: (name: string) => {
+         setRenamingId((current) => (current === project.id ? null : current));
+@@ -233,7 +236,8 @@ export function ProjectsView({
+     };
+   }
+ 
+-  const showNew = folderId === null && !query.trim();
++  const starts = listStarts({ folderId, query });
++  const showNew = starts.newProject;
+ 
+   return (
+     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+@@ -304,22 +308,22 @@ export function ProjectsView({
+         <div className="w-full flex-1 px-6 pb-6">
+           {visible.length === 0 && !showNew && !(showFolders && levelFolders.length > 0) ? (
+             <div className="flex min-h-[42vh] items-center justify-center text-[14px] text-[var(--text-muted)]">
+-              {folderId && !query.trim() ? t('projects.folderEmpty') : t('library.noMatches')}
++              {t('library.noMatches')}
+             </div>
+           ) : view === 'cards' ? (
+             <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4">
+-              {showNew ? <NewProjectCard creating={creating} onNewProject={onNewProject} onOpenFolder={onOpenFolder} onGetFromGitHub={onGetFromGitHub} /> : null}
++              {showNew ? <NewProjectCard creating={creating} onNewProject={() => onNewProject(folderId)} {...(folderId === null ? { onOpenFolder, onGetFromGitHub } : {})} /> : null}
+               {showFolders ? levelFolders.map((folder) => <FolderCard key={`folder:${folder.id}`} {...folderProps(folder)} />) : null}
+               {visible.map((project) => <ProjectCard key={project.id} {...itemProps(project)} />)}
+             </div>
+           ) : (
+             <div className="flex flex-col divide-y divide-[var(--border)]">
+-              {showNew ? <NewProjectListRow creating={creating} onNewProject={onNewProject} onOpenFolder={onOpenFolder} onGetFromGitHub={onGetFromGitHub} /> : null}
++              {showNew ? <NewProjectListRow creating={creating} onNewProject={() => onNewProject(folderId)} {...(folderId === null ? { onOpenFolder, onGetFromGitHub } : {})} /> : null}
+               {showFolders ? levelFolders.map((folder) => <FolderListRow key={`folder:${folder.id}`} {...folderProps(folder)} />) : null}
+               {visible.map((project) => <ProjectListRow key={project.id} {...itemProps(project)} />)}
+             </div>
+           )}
+-          {showNew && onOpenExample ? (
++          {starts.examples && onOpenExample ? (
+             <ExamplesSection examples={examples} collapsed={examplesCollapsed} onToggle={() => onToggleExamples?.()} onOpen={onOpenExample} view={view} />
+           ) : null}
+         </div>
+@@ -395,7 +399,7 @@ interface ItemProps {
+   selected: boolean;
+   renaming: boolean;
+   onToggleSelect: () => void;
+-  onOpen: () => void;
++  onOpen: (event?: { detail: number }) => void;
+   onStartRename: () => void;
+   onCommitRename: (name: string) => void;
+   onCancelRename: () => void;
+@@ -462,7 +466,7 @@ function ProjectCardTitle({
+   stored: string;
+   renaming: boolean;
+   size: 'card' | 'list';
+-  onOpen: () => void;
++  onOpen: (event?: { detail: number }) => void;
+   onCommit: (title: string) => void;
+   onCancel: () => void;
+ }) {
+@@ -544,8 +548,9 @@ function ProjectCardTitle({
+ type NewProjectProps = {
+   creating: boolean;
+   onNewProject: () => void;
+-  onOpenFolder: () => void;
+-  onGetFromGitHub: () => void;
++  /* starting from a film that exists: at the top level only (what they make is not filed in a folder) */
++  onOpenFolder?: () => void;
++  onGetFromGitHub?: () => void;
+ };
+ 
+ /** The grid's first cell: start a new project, card-sized, so "new ones start here" reads at a glance. */
+@@ -567,7 +572,7 @@ function NewProjectCard({ creating, onNewProject, onOpenFolder, onGetFromGitHub
+       </button>
+       {/* where the other cards have their name: starting from a film that exists */}
+       <div className="mt-2 flex">
+-        <ImportMenu creating={creating} onOpenFolder={onOpenFolder} onGetFromGitHub={onGetFromGitHub} className="-ml-1.5 h-7 px-1.5 text-[12.5px]" />
++        {onOpenFolder && onGetFromGitHub ? <ImportMenu creating={creating} onOpenFolder={onOpenFolder} onGetFromGitHub={onGetFromGitHub} className="-ml-1.5 h-7 px-1.5 text-[12.5px]" /> : null}
+       </div>
+     </article>
+   );
+@@ -600,13 +605,13 @@ function NewProjectListRow({ creating, onNewProject, onOpenFolder, onGetFromGitH
+           {t('projects.newProject')}
+         </button>
+       </div>
+-      <ImportMenu creating={creating} onOpenFolder={onOpenFolder} onGetFromGitHub={onGetFromGitHub} className="h-8 px-2.5 text-[12.5px]" />
++      {onOpenFolder && onGetFromGitHub ? <ImportMenu creating={creating} onOpenFolder={onOpenFolder} onGetFromGitHub={onGetFromGitHub} className="h-8 px-2.5 text-[12.5px]" /> : null}
+     </article>
+   );
+ }
+ 
+ /** "Import from ⌄": the ways to start from a film that exists, a folder on this computer or a repository on GitHub. */
+-function ImportMenu({ creating, onOpenFolder, onGetFromGitHub, className }: Omit<NewProjectProps, 'onNewProject'> & { className: string }) {
++function ImportMenu({ creating, onOpenFolder, onGetFromGitHub, className }: Required<Omit<NewProjectProps, 'onNewProject'>> & { className: string }) {
+   const t = useT();
+   const [anchor, setAnchor] = React.useState<{ x: number; y: number; top: number } | null>(null);
+   const button = React.useRef<HTMLButtonElement>(null);
+@@ -870,7 +875,7 @@ interface FolderItemProps {
+   /** its newest projects, up to four, with their covers when they have one */
+   posters: { id: string; poster?: string }[];
+   renaming: boolean;
+-  onOpen: () => void;
++  onOpen: (event?: { detail: number }) => void;
+   onStartRename: () => void;
+   onCommitRename: (name: string) => void;
+   onCancelRename: () => void;
+
+packages/openfilm/studio/ui/src/components/SelectionToolbar.tsx
+@@ -111,8 +111,8 @@ export function SelectionToolbar({
+       onClick={stop}
+       onDoubleClick={stop}
+       onContextMenu={(e) => { e.stopPropagation(); e.preventDefault(); }}
+-      /* above the panes and the picture, under the menus (z-10060) and the dialogs (z-10050) */
+-      className="fixed z-[10040] flex h-[28px] items-center gap-px rounded-[8px] border border-[var(--border)] bg-[var(--surface)] px-[2px] shadow-[var(--shadow-lg)]"
++      /* above the workspace, below menus and dialogs (starting at z-110) */
++      className="fixed z-[100] flex h-[28px] items-center gap-px rounded-[8px] border border-[var(--border)] bg-[var(--surface)] px-[2px] shadow-[var(--shadow-lg)]"
+       style={{
+         left: pos?.left ?? 0,
+         top: pos?.top ?? 0,
+
+packages/openfilm/studio/ui/src/i18n/en.ts
+@@ -197,7 +197,6 @@ export const en = {
+     setAsCover: 'Set as project cover',
+     coverSet: 'Cover set',
+     coverFailed: 'Couldn’t use that as the cover.',
+-    folderEmpty: 'This folder is empty',
+     creating: 'Creating project',
+     opening: 'Opening project',
+     missing: 'Folder not found',
+
+packages/openfilm/studio/ui/src/i18n/es.ts
+@@ -196,7 +196,6 @@ export const es: Words = {
+     setAsCover: 'Usar como portada del proyecto',
+     coverSet: 'Portada establecida',
+     coverFailed: 'No se pudo usar como portada.',
+-    folderEmpty: 'Esta carpeta está vacía',
+     creating: 'Creando proyecto',
+     opening: 'Abriendo proyecto',
+     missing: 'Carpeta no encontrada',
+
+packages/openfilm/studio/ui/src/i18n/ja.ts
+@@ -196,7 +196,6 @@ export const ja: Words = {
+     setAsCover: 'プロジェクトのカバーにする',
+     coverSet: 'カバーを設定しました',
+     coverFailed: 'カバーにできませんでした。',
+-    folderEmpty: 'このフォルダーは空です',
+     creating: 'プロジェクトを作成中',
+     opening: 'プロジェクトを開いています',
+     missing: 'フォルダーが見つかりません',
+
+packages/openfilm/studio/ui/src/i18n/ko.ts
+@@ -196,7 +196,6 @@ export const ko: Words = {
+     setAsCover: '프로젝트 커버로 설정',
+     coverSet: '커버를 설정했습니다',
+     coverFailed: '커버로 사용할 수 없습니다.',
+-    folderEmpty: '이 폴더는 비어 있습니다',
+     creating: '프로젝트 만드는 중',
+     opening: '프로젝트 여는 중',
+     missing: '폴더를 찾을 수 없음',
+
+packages/openfilm/studio/ui/src/i18n/zh-CN.ts
+@@ -197,7 +197,6 @@ export const zhCN: Words = {
+     setAsCover: '设为项目封面',
+     coverSet: '已设为封面',
+     coverFailed: '无法用它做封面。',
+-    folderEmpty: '此文件夹为空',
+     creating: '正在创建项目',
+     opening: '正在打开项目',
+     missing: '找不到文件夹',
+
+packages/openfilm/studio/ui/src/lib/project-folders.test.ts
+@@ -1,6 +1,6 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+-import { folderCounts, folderPosters, folderTrail, parentOf, visibleProjects, type ListedProject } from './project-folders.ts';
++import { folderCounts, folderPosters, folderTrail, listStarts, newProjectIn, parentOf, visibleProjects, type ListedProject } from './project-folders.ts';
+ 
+ const folders = [{ id: 'f', name: 'Ads', createdAt: 1 }];
+ const projects: ListedProject[] = [
+@@ -56,3 +56,29 @@ test('folders in folders: the trail to one, and a folder counts what its folders
+   assert.deepEqual(folderCounts(inside, tree), { acme: 1, clients: 2 });
+   assert.deepEqual(folderPosters(inside, tree).clients?.map((c) => c.id), ['b', 'a']);
+ });
++
++test('"New project" starts the list at the top level and inside a folder; the examples at the top level only', () => {
++  assert.deepEqual(listStarts({ folderId: null, query: '' }), { newProject: true, examples: true });
++  assert.deepEqual(listStarts({ folderId: 'f', query: '' }), { newProject: true, examples: false });
++  /* a search shows its results only */
++  assert.deepEqual(listStarts({ folderId: null, query: 'ad ' }), { newProject: false, examples: false });
++  assert.deepEqual(listStarts({ folderId: 'f', query: ' ' }), { newProject: true, examples: false });
++});
++
++test('a project made inside a folder is filed in it before it opens; at the top level it is not filed', async () => {
++  const calls: string[] = [];
++  const create = async () => { calls.push('create'); return { id: 'n' }; };
++  const move = async (id: string, folderId: string | null) => { calls.push(`move ${id} ${folderId}`); return {}; };
++  assert.deepEqual(await newProjectIn('f', { create, move }), { id: 'n' });
++  assert.deepEqual(calls, ['create', 'move n f']);
++  calls.length = 0;
++  await newProjectIn(null, { create, move });
++  assert.deepEqual(calls, ['create']);
++});
++
++test('a project that cannot be filed is still made (it stays at the top level); one that cannot be made throws', async () => {
++  const create = async () => ({ id: 'n' });
++  const move = async () => { throw new Error('no such folder'); };
++  assert.deepEqual(await newProjectIn('gone', { create, move }), { id: 'n' });
++  await assert.rejects(newProjectIn('f', { create: async () => { throw new Error('disk full'); }, move }), /disk full/);
++});
+
+packages/openfilm/studio/ui/src/lib/project-folders.ts
+@@ -45,6 +45,28 @@ export const folderApi = {
+   moveFolder: (id: string, parentId: string | null) => call<{ folder: ProjectFolder }>(`folders/${encodeURIComponent(id)}`, 'PATCH', { parentId }).then((r) => r.folder),
+ };
+ 
++/**
++ * What the list starts with: "New project" wherever projects are listed, the top level or a folder (not over a
++ * search's results); the examples at the top level only.
++ */
++export function listStarts({ folderId, query }: { folderId: string | null; query: string }): { newProject: boolean; examples: boolean } {
++  const listing = !query.trim();
++  return { newProject: listing, examples: listing && folderId === null };
++}
++
++/**
++ * A new project inside `folderId` (null: the top level): made, then filed there before it opens. One that cannot be
++ * filed (its folder went meanwhile) is still made, at the top level.
++ */
++export async function newProjectIn<P extends { id: string }>(
++  folderId: string | null,
++  { create, move }: { create: () => Promise<P>; move: (projectId: string, folderId: string | null) => Promise<unknown> },
++): Promise<P> {
++  const project = await create();
++  if (folderId) await move(project.id, folderId).catch(() => {});
++  return project;
++}
++
+ /**
+  * The projects to show, sorted. Like a file system: the top level shows the projects in no folder, a folder its own.
+  * A search looks everywhere (a person searching wants "where is that film", not to guess its folder first).
+
+packages/openfilm/studio/ui/src/lib/projects-page.test.ts
+@@ -1,6 +1,6 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+-import { posterRetryDelay, posterTry, within } from './projects-page.ts';
++import { opensOnClick, posterRetryDelay, posterTry, within } from './projects-page.ts';
+ 
+ test('a list that never comes fails in its own time; one that comes or fails is passed on as it is', async () => {
+   assert.equal(await within(Promise.resolve(3), 50), 3);
+@@ -16,3 +16,12 @@ test('a poster still being drawn is asked for again, less often each time, then
+   assert.equal(posterTry('/api/projects/a/poster', 2), '/api/projects/a/poster?try=2');
+   assert.equal(posterTry('/api/projects/a/poster?cover=5', 1), '/api/projects/a/poster?cover=5&try=1');
+ });
++
++test('a card opens on a click or a key press, not on the second click of a double-click', () => {
++  /* a key press (Enter, Space) is a click of detail 0 */
++  assert.equal(opensOnClick({ detail: 0 }), true);
++  assert.equal(opensOnClick({ detail: 1 }), true);
++  /* the first click already opened a folder; what is under the pointer now was not aimed at */
++  assert.equal(opensOnClick({ detail: 2 }), false);
++  assert.equal(opensOnClick({ detail: 3 }), false);
++});
+
+packages/openfilm/studio/ui/src/lib/projects-page.ts
+@@ -29,3 +29,12 @@ export function posterRetryDelay(tried: number): number | null {
+ export function posterTry(url: string, n: number): string {
+   return n ? `${url}${url.includes('?') ? '&' : '?'}try=${n}` : url;
+ }
++
++/**
++ * Whether a click on a card opens it: not the second click of a double-click (`detail` 2 or more). The first click
++ * opened something already, a folder say, and what stands under the pointer now was not aimed at. A key press (Enter,
++ * Space: `detail` 0) opens.
++ */
++export function opensOnClick(event: { detail: number }): boolean {
++  return event.detail < 2;
++}

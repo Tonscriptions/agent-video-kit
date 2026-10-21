@@ -1,0 +1,54 @@
+"""Refresh only the owned staged receipts under their new byte-preserving attributes."""
+from datetime import datetime,timezone
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+ROOT=Path(__file__).resolve().parent;MAIN=Path('E:/dev/sandbox/AI广告剪辑')
+REL=Path('docs/validation/evidence/openfilm-incremental-20261021-r15')
+WORK=ROOT/'publication-r3';assert not WORK.exists();WORK.mkdir()
+read=lambda p:json.loads(Path(p).read_bytes())
+sha=lambda p:'sha256:'+hashlib.sha256(Path(p).read_bytes()).hexdigest()
+base=read(ROOT/'publication-r1/run.json');failed=read(ROOT/'publication-r2/run.json')
+assert failed['status']=='failed-preserved-for-review'
+paths={Path(x.decode('utf8')) for x in (ROOT/'publication-r2/paths.nul').read_bytes().split(b'\0') if x}
+record={'status':'preflight','parent_commit':base['parent_commit'],'calls':[],'force_push':False,
+    'reason':'Force refresh owned index entries after adding scoped -text; retain both failed precommit receipts.'}
+def save():(WORK/'run.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+def git(*args):
+    command=['git','-c','gc.auto=0','-c','maintenance.auto=false',*map(str,args)]
+    r=subprocess.run(command,cwd=MAIN,capture_output=True,timeout=1200,creationflags=subprocess.CREATE_NO_WINDOW)
+    record['calls'].append({'command':command,'exit_code':r.returncode,'stderr':r.stderr.decode('utf8','replace')[-1500:]});save()
+    assert r.returncode==0,record['calls'][-1]['stderr']
+    return r.stdout
+def core():
+    return {p.relative_to(MAIN).as_posix():sha(p) for folder in ('product/src','product/tests')
+        for p in (MAIN/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.suffix in ('.py','.mjs','.json','.ttf')}
+save()
+try:
+    assert git('rev-parse','HEAD').decode().strip()==base['parent_commit']
+    assert core()==base['core_before']
+    assert {Path(x.decode('utf8')) for x in git('diff','--cached','--name-only','-z').split(b'\0') if x}==paths
+    for name,data in (('publication-attempt-r2.json',(ROOT/'publication-r2/run.json').read_bytes()),
+        ('executed-publication-complete.py.txt',Path(__file__).read_bytes())):
+        target=MAIN/REL/name;assert not target.exists();target.write_bytes(data);paths.add(target.relative_to(MAIN))
+    listing=WORK/'paths.nul';listing.write_bytes(b''.join(p.as_posix().encode('utf8')+b'\0' for p in sorted(paths)))
+    git('add','--pathspec-from-file='+str(listing),'--pathspec-file-nul')
+    git('add','--renormalize','--pathspec-from-file='+str(listing),'--pathspec-file-nul')
+    assert {Path(x.decode('utf8')) for x in git('diff','--cached','--name-only','-z').split(b'\0') if x}==paths
+    compared={}
+    for name in sorted(paths):
+        blob=git('show',':'+name.as_posix());assert blob==(MAIN/name).read_bytes(),name
+        compared[name.as_posix()]='sha256:'+hashlib.sha256(blob).hexdigest()
+    record.update(status='staged-verified',staged_blob_comparisons=len(compared),staged_files=compared);save()
+    git('commit','-m','docs: review latest OpenFilm delta and remaining reuse costs')
+    record.update(status='committed',commit=git('rev-parse','HEAD').decode().strip());save()
+    git('push','origin','main')
+    remote=git('ls-remote','--heads','origin','main').decode().split()[0]
+    assert remote==record['commit'] and core()==base['core_before']
+    assert not git('status','--porcelain','--untracked-files=normal')
+    record.update(status='published',main_clean=True,remote_commit=remote,product_inputs_unchanged=True,
+        finished_at_utc=datetime.now(timezone.utc).isoformat());save()
+    print(json.dumps({k:record[k] for k in ('status','commit','staged_blob_comparisons','main_clean')},ensure_ascii=False))
+except BaseException as error:
+    record.update(status='failed-preserved-for-review',error=repr(error));save();raise

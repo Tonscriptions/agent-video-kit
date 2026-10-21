@@ -1,0 +1,64 @@
+"""Audit already captured official API deltas; never install or execute upstream code."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+
+ROOT=Path(__file__).resolve().parent
+MAIN=Path('E:/dev/sandbox/AI广告剪辑')
+REL=ROOT/'docs/validation/evidence/openfilm-incremental-20261021-r15'
+OUT=REL/'review-r1.json'
+assert not OUT.exists()
+def sha(path): return 'sha256:'+hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def read(path): return json.loads(Path(path).read_bytes())
+def core():
+    paths=sorted([p for folder in ('product/src','product/tests') for p in (MAIN/folder).rglob('*')
+        if p.is_file() and '__pycache__' not in p.parts and p.suffix in ('.py','.mjs','.json','.ttf')])
+    return {p.relative_to(MAIN).as_posix():sha(p) for p in paths}
+before=core()
+captured=read(REL/'capture-r3/verification.json')
+checked=[]
+for name in ('repository.json','head.json','latest-release.json','compare.json'):
+    row=next(row for row in captured['requests'] if row['path']==name)
+    assert row['status']==200 and sha(REL/'capture-r3'/name)==row['sha256']
+    checked.append({'path':'capture-r3/'+name,'sha256':row['sha256'],'http_date':row['http_date']})
+repo=read(REL/'capture-r3/repository.json');head=read(REL/'capture-r3/head.json')
+delta=read(REL/'capture-r3/compare.json');release=read(REL/'capture-r3/latest-release.json')
+assert head['sha']=='419da5dc483267b07e4f32d73c993fe5f8ee04d1'
+assert delta['base_commit']['sha']=='53156ac5818d8bad3f2c356043b376b3eebd95ba'
+assert delta['total_commits']==3 and len(delta['files'])==16 and len(delta['files'])<300
+files=[row['filename'] for row in delta['files']]
+assert all(name.startswith(('.changeset/','packages/openfilm/studio/ui/')) or
+    name=='packages/openfilm/studio/selection-toolbar.test.mjs' for name in files)
+assert 'LICENSE' not in files and 'THIRD_PARTY_NOTICES.md' not in files and 'TRADEMARK.md' not in files
+candidates=('packages/openfilm/src/film-doc.mjs','packages/openfilm/src/host.mjs',
+    'packages/openfilm/src/look.mjs','packages/openfilm/src/encoders.mjs','packages/openfilm/src/problems.mjs',
+    'packages/openfilm/studio/server/subtitle-segments.mjs','packages/openfilm/studio/server/preview-cache.mjs',
+    'packages/openfilm/studio/server/nle.mjs','packages/openfilm/studio/server/fcpxml.mjs',
+    'packages/openfilm/studio/server/exports.mjs','packages/openfilm/studio/server/diagnostics.mjs',
+    'apps/desktop/src/pi-config.mjs','packages/openfilm/studio/ui/src/lib/component-props.ts',
+    'packages/openfilm/studio/ui/src/lib/template-controls.ts')
+assert not (set(candidates)&set(files))
+patches='\n\n'.join(row['filename']+'\n'+row.get('patch','[no patch]') for row in delta['files'])
+(REL/'changed-files-and-patches.txt').write_text(patches+'\n',encoding='utf8')
+historical=MAIN/'docs/validation/evidence/openfilm-reuse-20261021-r14/run-r1/verification.json'
+assert historical.is_file()
+after=core();assert before==after
+record={'status':'passed-incremental-source-review','finished_at_utc':datetime.now(timezone.utc).isoformat(),
+    'scope':'Official upstream changes since R14; no new module integration, upstream tests, render, model or installed-product claim.',
+    'previous_commit':delta['base_commit']['sha'],'current_commit':head['sha'],
+    'stars':repo['stargazers_count'],'forks':repo['forks_count'],'latest_release':release['tag_name'],
+    'commits':3,'changed_files':16,'complete_file_list':True,'unchanged_reuse_candidates':list(candidates),
+    'api_receipts':checked,'all_changed_paths':files,'core_inputs_before':before,'core_inputs_after':after,
+    'product_source_unchanged':True,'historical_tests_not_reexecuted':{'r14_receipt':str(historical),
+        'sha256':sha(historical),'original_passed':29,'original_skipped':1,'extracted_planner_passed':3},
+    'new_upstream_tests_run':0,'new_product_tests_run':0,'new_render_or_GIF':False,
+    'new_code_copied_into_product':False,'license_files_changed_since_R14':False,
+    'failed_capture_receipts':['capture-r1/verification.json','capture-r2/verification.json','capture-r3/verification.json'],
+    'capture_limit':'API requests in capture-r3 succeeded and were verified; subsequent raw-source LICENSE request reset. Failed receipts preserved. No new license verification claimed.',
+    'native_windows':True,'virtualization':False,'interactive_browser_tabs_opened':0,
+    'script_sha256':sha(Path(__file__)),'patches_sha256':sha(REL/'changed-files-and-patches.txt')}
+OUT.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+(REL/'executed-finalize.py.txt').write_bytes(Path(__file__).read_bytes())
+print(json.dumps({k:record[k] for k in ('status','current_commit','stars','commits','changed_files',
+    'product_source_unchanged','new_upstream_tests_run')},ensure_ascii=False))

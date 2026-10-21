@@ -1,5 +1,18 @@
 # Agent Video Kit
 
+<!-- OPENFILM-R15-INCREMENTAL -->
+### R15 OpenFilm 新提交增量复核（研究）
+
+官方 API 固定 `419da5dc483267b07e4f32d73c993fe5f8ee04d1`：相对 R14 新增3提交/16文件，全部为 Studio 交互、测试和 changeset。采集时1,702 stars/165 forks，发行版仍v0.2.4；14个既定复用核心无变更。已有适配继续复用，不将它们重复计为新功能或节省工时。
+
+| 编号 | 检查 | 结果与边界 | 证据 |
+|---|---|---|---|
+| R15-01 | 官方增量与来源 | 4份官方API响应SHA；3提交/16文件，文件表完整；产品输入前后相同。 | [收据](docs/validation/evidence/openfilm-incremental-20261021-r15/review-r1.json) |
+| R15-02 | 当前复用决策 | HTML/字幕/字段/缓存/诊断已有适配；新GUI修复不移植。交换模块8–15人日、自有宿主图片预算2–4人日均为有前提的规划估计。 | [更新报告](docs/OpenFilm新增提交与复用结论更新_2026-10-21.md) |
+| R15-03 | 实测和失败边界 | 本轮未新增上游测试、产品功能、模型或成片/GIF；R14的29通过/1跳过+另3项保留为历史。HTTP/raw下载重置如实留证，不声称重新校验许可原文。 | [既有完整清单](docs/OpenFilm可拆模块与现有内核降本清单_2026-10-21.md) |
+
+<!-- /OPENFILM-R15-INCREMENTAL -->
+
 <!-- V89-OFFLINE-MEDIA-PROFILE -->
 ### V89 八轮离线媒体运行时
 

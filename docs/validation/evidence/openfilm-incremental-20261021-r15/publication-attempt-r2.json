@@ -1,0 +1,168 @@
+{
+  "status": "failed-preserved-for-review",
+  "parent_commit": "1a477faeb89dcf5b4b32bc467f9ca7e46c273f17",
+  "started_at_utc": "2026-10-21T11:01:17.437830+00:00",
+  "previous_attempt": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-incremental-review-20261021-r15\\publication-r1\\run.json",
+  "reason": "R15 original receipt CRLF bytes must survive Git text normalization.",
+  "calls": [
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "diff",
+        "--cached",
+        "--name-only",
+        "-z"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "add",
+        "--pathspec-from-file=E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\openfilm-incremental-review-20261021-r15\\publication-r2\\paths.nul",
+        "--pathspec-file-nul"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "diff",
+        "--cached",
+        "--name-only",
+        "-z"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "show",
+        ":docs/OpenFilm新增提交与复用结论更新_2026-10-21.md"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "show",
+        ":docs/validation/evidence/openfilm-incremental-20261021-r15/.gitattributes"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "show",
+        ":docs/validation/evidence/openfilm-incremental-20261021-r15/capture-r1/compare.json"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "show",
+        ":docs/validation/evidence/openfilm-incremental-20261021-r15/capture-r1/head.json"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "show",
+        ":docs/validation/evidence/openfilm-incremental-20261021-r15/capture-r1/latest-release.json"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "show",
+        ":docs/validation/evidence/openfilm-incremental-20261021-r15/capture-r1/repository.json"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "show",
+        ":docs/validation/evidence/openfilm-incremental-20261021-r15/capture-r1/verification.json"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ],
+  "product_code_changed": false,
+  "force_push": false,
+  "staged_files": {
+    "docs/OpenFilm新增提交与复用结论更新_2026-10-21.md": "sha256:d7393620a6cbbf924649ffe9ec69601bb1558d3195105891ac28006ba38fe6b8",
+    "docs/validation/evidence/openfilm-incremental-20261021-r15/.gitattributes": "sha256:0616cd128fb7e84ace8809b7a2cf5cd5745c7a2cfbdcc79785b1502385444239",
+    "docs/validation/evidence/openfilm-incremental-20261021-r15/capture-r1/compare.json": "sha256:4a7e10cc839d7a766c86ad5cd27e608a0fccdf02cd38a4a760f902b1d062c3cd",
+    "docs/validation/evidence/openfilm-incremental-20261021-r15/capture-r1/head.json": "sha256:071317e88d5f87d24521cc7f991fde6bfc4a2624f4a85f8dbdc1d94878ae98b8",
+    "docs/validation/evidence/openfilm-incremental-20261021-r15/capture-r1/latest-release.json": "sha256:a7c4153aa73af7d160fb44df001e493743f0a4b57d51581889080f6c987bfb38",
+    "docs/validation/evidence/openfilm-incremental-20261021-r15/capture-r1/repository.json": "sha256:5808aa6fc30a01ebab2e87f9e35b4789926015a1fe710323c00a172fd5ec977c"
+  },
+  "error": "AssertionError(WindowsPath('docs/validation/evidence/openfilm-incremental-20261021-r15/capture-r1/verification.json'))"
+}

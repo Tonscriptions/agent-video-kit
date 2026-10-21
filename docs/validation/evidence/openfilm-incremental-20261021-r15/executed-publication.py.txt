@@ -1,0 +1,107 @@
+"""Publish only R15 research docs after the existing V89 release chain closes."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+
+ROOT=Path(__file__).resolve().parent
+MAIN=Path('E:/dev/sandbox/AI广告剪辑')
+REL=Path('docs/validation/evidence/openfilm-incremental-20261021-r15')
+WORK=ROOT/'publication-r1'
+assert not WORK.exists();WORK.mkdir()
+record={'status':'preflight','started_at_utc':datetime.now(timezone.utc).isoformat(),'calls':[],
+    'product_code_changed':False,'new_tests_claimed':False,'force_push':False,'script_sha256':None}
+def sha(path): return 'sha256:'+hashlib.sha256(Path(path).read_bytes()).hexdigest()
+record['script_sha256']=sha(__file__)
+def read(path): return json.loads(Path(path).read_bytes())
+def save():
+    (WORK/'run.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+def git(*args):
+    command=['git','-c','gc.auto=0','-c','maintenance.auto=false',*map(str,args)]
+    result=subprocess.run(command,cwd=MAIN,capture_output=True,timeout=1200,creationflags=subprocess.CREATE_NO_WINDOW)
+    record['calls'].append({'command':command,'exit_code':result.returncode,
+        'stdout_sha256':'sha256:'+hashlib.sha256(result.stdout).hexdigest(),
+        'stderr':result.stderr.decode('utf8','replace')[-2000:]});save()
+    if result.returncode: raise RuntimeError(record['calls'][-1]['stderr'])
+    return result.stdout
+def core():
+    return {p.relative_to(MAIN).as_posix():sha(p) for folder in ('product/src','product/tests')
+        for p in (MAIN/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.suffix in ('.py','.mjs','.json','.ttf')}
+save()
+try:
+    chain=read(MAIN/'product/.runtime/release-chain-v88-v89-20261021/run.json')
+    assert chain['status']=='published-V88-and-V89-with-actual-complete-receipts'
+    publication=read(chain['media_publication']);assert publication['status']=='published'
+    parent=publication['commit'];assert git('branch','--show-current').decode().strip()=='main'
+    assert git('rev-parse','HEAD').decode().strip()==parent
+    assert not git('status','--porcelain','--untracked-files=normal')
+    assert not git('diff','--cached','--name-only')
+    assert git('remote','get-url','origin').decode().strip()=='git@github.com:Tonscriptions/agent-video-kit.git'
+    review=read(ROOT/REL/'review-r1.json');assert review['status']=='passed-incremental-source-review'
+    before=core();record.update(parent_commit=parent,core_before=before)
+    (ROOT/REL/'executed-publication.py.txt').write_bytes(Path(__file__).read_bytes())
+    document=Path('docs/OpenFilm新增提交与复用结论更新_2026-10-21.md')
+    files=[document,*sorted(p.relative_to(ROOT) for p in (ROOT/REL).rglob('*') if p.is_file())]
+    assert not any((MAIN/name).exists() for name in files)
+    for name in files:
+        target=MAIN/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/name,target)
+    readme=MAIN/'README.md';text=readme.read_text('utf8')
+    marker='<!-- OPENFILM-R15-INCREMENTAL -->';assert marker not in text
+    block='''<!-- OPENFILM-R15-INCREMENTAL -->
+### R15 OpenFilm 新提交增量复核（研究）
+
+官方 API 固定 `419da5dc483267b07e4f32d73c993fe5f8ee04d1`：相对 R14 新增3提交/16文件，全部为 Studio 交互、测试和 changeset。采集时1,702 stars/165 forks，发行版仍v0.2.4；14个既定复用核心无变更。已有适配继续复用，不将它们重复计为新功能或节省工时。
+
+| 编号 | 检查 | 结果与边界 | 证据 |
+|---|---|---|---|
+| R15-01 | 官方增量与来源 | 4份官方API响应SHA；3提交/16文件，文件表完整；产品输入前后相同。 | [收据](docs/validation/evidence/openfilm-incremental-20261021-r15/review-r1.json) |
+| R15-02 | 当前复用决策 | HTML/字幕/字段/缓存/诊断已有适配；新GUI修复不移植。交换模块8–15人日、自有宿主图片预算2–4人日均为有前提的规划估计。 | [更新报告](docs/OpenFilm新增提交与复用结论更新_2026-10-21.md) |
+| R15-03 | 实测和失败边界 | 本轮未新增上游测试、产品功能、模型或成片/GIF；R14的29通过/1跳过+另3项保留为历史。HTTP/raw下载重置如实留证，不声称重新校验许可原文。 | [既有完整清单](docs/OpenFilm可拆模块与现有内核降本清单_2026-10-21.md) |
+
+<!-- /OPENFILM-R15-INCREMENTAL -->
+
+'''
+    first,remaining=text.split('\n',1)
+    readme.write_text(first+'\n\n'+block+remaining.lstrip('\n'),encoding='utf8',newline='\n')
+    files.append(Path('README.md'))
+    links=[]
+    for name in (document,Path('README.md')):
+        for match in re.finditer(r'!?\[[^\]]*\]\(([^\s)]+)(?:\s+[^)]*)?\)',(MAIN/name).read_text('utf8')):
+            target=match.group(1).strip('<>')
+            if re.match(r'^[A-Za-z][A-Za-z0-9+.-]*:',target) or target.startswith('#'):continue
+            target=target.split('#',1)[0]
+            if not target:continue
+            resolved=(MAIN/name).parent/target
+            assert resolved.exists(),(str(name),target)
+            links.append({'source':name.as_posix(),'target':target})
+    assert core()==before
+    static=MAIN/REL/'publication-preflight-r1.json'
+    static.write_text(json.dumps({'status':'passed-documentation-preflight','parent_commit':parent,
+        'product_inputs_unchanged':True,'checked_local_links':links,'new_product_tests':0,
+        'scope':'Research-only update. No product/full-suite reexecution.'},ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+    files.append(static.relative_to(MAIN))
+    pathlist=WORK/'paths.nul';pathlist.write_bytes(b''.join(p.as_posix().encode('utf8')+b'\0' for p in files))
+    git('add','--pathspec-from-file='+str(pathlist),'--pathspec-file-nul')
+    staged={x.decode('utf8') for x in git('diff','--cached','--name-only','-z').split(b'\0') if x}
+    assert staged=={p.as_posix() for p in files}
+    staged_hashes={}
+    for name in files:
+        blob=git('show',':'+name.as_posix());expected=(MAIN/name).read_bytes()
+        assert blob==expected,name
+        staged_hashes[name.as_posix()]='sha256:'+hashlib.sha256(blob).hexdigest()
+    record.update(status='staged-verified',staged_files=staged_hashes,local_links=len(links));save()
+    git('commit','-m','docs: review latest OpenFilm delta and remaining reuse costs')
+    record.update(status='committed',commit=git('rev-parse','HEAD').decode().strip());save()
+    git('push','origin','main')
+    remote=git('ls-remote','--heads','origin','main').decode().split()[0]
+    assert remote==record['commit'] and core()==before
+    assert not git('status','--porcelain','--untracked-files=normal')
+    record.update(status='published',remote_commit=remote,main_clean=True,core_after=core(),
+        finished_at_utc=datetime.now(timezone.utc).isoformat());save()
+    print(json.dumps({k:record[k] for k in ('status','commit','main_clean','local_links')},ensure_ascii=False))
+except BaseException as error:
+    record.update(status='failed-preserved-for-review',error=repr(error));save();raise
