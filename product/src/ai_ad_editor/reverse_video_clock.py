@@ -164,33 +164,63 @@ def _lookup(values, first=0, end=None):
     return f'if(lt(N,{middle}),{_lookup(values,first,middle)},{_lookup(values,middle,end)})'
 
 
-def reverse_intervals(path, source_in_tick, source_out_tick, tps, working_time_base,
-                      *, expected_time_base, cancel_file=None, decoder=None,
-                      index_context=None, source_sha256=None):
+def _native_range(path,source_in_tick,source_out_tick,tps,expected_time_base,*,
+                  cancel_file=None,decoder=None,index_context=None,source_sha256=None):
     index_metadata=None
     if index_context is None:
         pts, durations, stream, format_info = probe_frames(path, cancel_file=cancel_file, decoder=decoder)
     else:
         pts,durations,stream,format_info,index_metadata=index_context.acquire(
             path,source_sha256,probe_frames,decoder=decoder)
+    native=Fraction(stream['time_base'])
+    if native!=Fraction(expected_time_base):raise ValueError('registered and native video time bases differ')
+    origin_text=format_info.get('start_time','0')
+    origin=_nearest(Fraction('0' if origin_text in (None,'','N/A') else origin_text)/native)
+    first_time,final_time=Fraction(source_in_tick,tps),Fraction(source_out_tick,tps)
+    if first_time<0 or final_time<=first_time:raise ValueError('invalid requested source interval')
+    first=max(0,bisect_right(pts,first_time/native+origin)-1)
+    end=bisect_left(pts,final_time/native+origin)
+    if end<=first:raise ValueError('requested source window contains no displayed frame')
+    return pts,durations,stream,format_info,native,origin,first_time,final_time,first,end,index_metadata
+
+
+def forward_intervals(path,source_in_tick,source_out_tick,tps,*,expected_time_base,
+                      cancel_file=None,decoder=None,index_context=None,source_sha256=None):
+    """Keep covering native frames and map actual EOF without a CFR prefilter."""
     try:
-        native = Fraction(stream['time_base'])
-        if native != Fraction(expected_time_base):
-            raise ValueError('registered and native video time bases differ')
-        origin_text = format_info.get('start_time', '0')
-        if origin_text == 'N/A':
-            origin_text = '0'
-        # Native ffmpeg input timestamps subtract the demux origin rescaled to
-        # the selected stream's integer time base; do not reset at video PTS[0].
-        origin = _nearest(Fraction(origin_text)/native)
-        first_time = Fraction(source_in_tick, tps)
-        final_time = Fraction(source_out_tick, tps)
-        if first_time < 0 or final_time <= first_time:
-            raise ValueError('invalid requested source interval')
-        first = max(0, bisect_right(pts, first_time/native+origin)-1)
-        end = bisect_left(pts, final_time/native+origin)
-        if end <= first:
-            raise ValueError('requested source window contains no displayed frame')
+        pts,durations,stream,_,native,origin,left,right,first,end,index_metadata=_native_range(
+            path,source_in_tick,source_out_tick,tps,expected_time_base,cancel_file=cancel_file,
+            decoder=decoder,index_context=index_context,source_sha256=source_sha256)
+        first_time=max(left,(pts[first]-origin)*native)
+        if end<len(pts):last_end=(pts[end]-origin)*native
+        else:
+            if durations[end-1]<=0:raise ValueError('last selected frame has no native duration')
+            last_end=(pts[end-1]+durations[end-1]-origin)*native
+        eof=min(right,last_end)
+        if eof<=first_time:raise ValueError('native forward interval is empty')
+        rational=lambda value:f'({value.numerator}/{value.denominator})'
+        expression=(f'if(eq(N,0),{rational(first_time)},'
+                    f'if(gte(N,{end-first}),{rational(eof)},PTS*TB))')
+        metadata={'protocol':'covering-native-source-half-open-v1','source_frame_start':first,
+            'source_frame_end_exclusive':end,'selected_frame_count':end-first,
+            'native_time_base':str(native),'demux_origin_native_pts':origin,
+            'first_source_seconds':str(first_time),'eof_source_seconds':str(eof),
+            'original_frame_intervals_preserved':True}
+        if index_metadata is not None:metadata['native_frame_index']=index_metadata
+        return first,end,expression,metadata
+    except (ValueError,KeyError,TypeError,ZeroDivisionError,OverflowError) as caught:
+        raise AppError('NESTED_NATIVE_CLOCK_INVALID','无法建立原生正放帧区间时钟',exit_code=3,
+                       path=str(path),cause=str(caught)) from caught
+
+
+def reverse_intervals(path, source_in_tick, source_out_tick, tps, working_time_base,
+                      *, expected_time_base, cancel_file=None, decoder=None,
+                      index_context=None, source_sha256=None):
+    try:
+        pts,durations,stream,format_info,native,origin,first_time,final_time,first,end,index_metadata=_native_range(
+            path,source_in_tick,source_out_tick,tps,expected_time_base,cancel_file=cancel_file,
+            decoder=decoder,index_context=index_context,source_sha256=source_sha256)
+        origin_text=format_info.get('start_time','0')
         width, height = int(stream['width']), int(stream['height'])
         if min(width, height) < 1:
             raise ValueError('invalid native decoded raster dimensions')

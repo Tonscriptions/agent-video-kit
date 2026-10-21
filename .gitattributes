@@ -679,3 +679,31 @@ scripts/finalize_native_index_lab.py -text whitespace=cr-at-eol
 scripts/run_native_index_after_v82.py -text whitespace=cr-at-eol
 scripts/native_index_release_tools.py -text whitespace=cr-at-eol
 scripts/publish_native_frame_index.py -text whitespace=cr-at-eol
+
+# V84 exact tested native nested-clock bytes.
+docs/validation/evidence/nested-native-clock-20261021-lab/** -text -whitespace
+docs/assets/nested-native-clock-20261021-lab/** -text -whitespace
+product/src/ai_ad_editor/render.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/reverse_video_clock.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/tests/test_nested_native_clock.py -text whitespace=cr-at-eol
+product/tests/test_cli.py -text whitespace=cr-at-eol
+scripts/run_nested_native_after_index.py -text whitespace=cr-at-eol
+scripts/run_with_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/run_frozen_regression.py -text whitespace=cr-at-eol
+scripts/materialize_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/run_nested_native_regressions.py -text whitespace=cr-at-eol
+scripts/smoke_nested_native_clock.py -text whitespace=cr-at-eol
+scripts/verify_nested_native_clock_install.py -text whitespace=cr-at-eol
+scripts/finalize_nested_native_clock_lab.py -text whitespace=cr-at-eol
+scripts/prepare_nested_native_skills.py -text whitespace=cr-at-eol
+scripts/native_index_release_tools.py -text whitespace=cr-at-eol
+scripts/publish_nested_native_clock.py -text whitespace=cr-at-eol
+scripts/run_nested_native_after_index_r2.py -text whitespace=cr-at-eol
+scripts/run_nested_native_regressions_r2.py -text whitespace=cr-at-eol
+scripts/run_nested_contract_controls.py -text whitespace=cr-at-eol
+scripts/prepare_nested_contract_refresh.py -text whitespace=cr-at-eol
+scripts/prepare_nested_verification_r2.py -text whitespace=cr-at-eol
+scripts/audit_nested_contract_refresh.py -text whitespace=cr-at-eol
+scripts/prepare_nested_publication_r2.py -text whitespace=cr-at-eol
+scripts/publish_nested_native_clock_r2.py -text whitespace=cr-at-eol

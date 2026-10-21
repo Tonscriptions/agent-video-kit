@@ -1,0 +1,139 @@
+"""Back up and restore only the exact owned bytes of the failed pre-commit V84 copy."""
+from __future__ import annotations
+
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import types
+
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+REL = 'docs/validation/evidence/nested-native-clock-20261021-lab'
+WORK = ROOT / 'product/.runtime/nested-native-clock-20261021/publication-main-recovery-r1'
+FAILED = ROOT / 'product/.runtime/nested-native-clock-20261021/publication-r1/run.json'
+
+
+def sha(path):
+    with Path(path).open('rb') as stream:
+        return 'sha256:' + hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def git(*args):
+    return subprocess.check_output(['git', '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', *args], cwd=MAIN, timeout=180)
+
+
+def read(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def main():
+    assert not WORK.exists()
+    WORK.mkdir(parents=True)
+    failed = read(FAILED)
+    assert failed['status'] == 'failed' and failed['error'] == {'type': 'AttributeError', 'message': "'str' object has no attribute 'open'"}
+    assert not failed.get('commit') and not failed.get('force_push')
+    base = failed['base_commit']
+    assert git('branch', '--show-current').decode().strip() == 'main'
+    assert git('rev-parse', 'HEAD').decode().strip() == base
+    assert git('remote', 'get-url', 'origin').decode().strip() == 'git@github.com:Tonscriptions/agent-video-kit.git'
+    assert git('ls-remote', 'origin', 'refs/heads/main').decode().split()[0] == base
+    assert not git('diff', '--cached', '--name-only', '-z'), 'Preserve any unexpected staged work.'
+    script_path = ROOT / 'scripts/publish_nested_native_clock_r2.py'
+    assert sha(script_path) == failed['source_files']['scripts/publish_nested_native_clock_r2.py']
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    publisher = types.ModuleType('failed_nested_publisher_for_exact_preview')
+    publisher.__file__ = str(script_path)
+    exec(compile(script_path.read_text('utf8'), str(script_path), 'exec'), publisher.__dict__)
+    current = publisher.source_audit()
+    full, alignment = publisher.complete_gate(current)
+    assert alignment['published_commit'] == base
+    for name, digest in failed['source_files'].items():
+        assert sha(MAIN / name) == digest, 'Source-copy destination changed: ' + name
+    preview = WORK / 'exact-first-attempt-preview'
+    for name in {*publisher.LATEST_DOCS, '.gitattributes', *('skills/' + skill + '/SKILL.md' for skill in publisher.SKILLS)}:
+        target = preview / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(git('show', base + ':' + name))
+    for name in (publisher.HISTORICAL_REPORT, publisher.HISTORICAL_CONTRACT):
+        target = preview / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / name, target)
+    documents = publisher.documents(preview, full)
+    for name in documents:
+        assert sha(MAIN / name) == sha(preview / name), 'Generated document changed: ' + name
+    skills_path = MAIN / REL / 'skills-release-r1.json'
+    skills = read(skills_path)
+    assert len(skills['results']) == 17 and failed['calls'][0]['exit_code'] == 0
+    mapping = json.loads(git('show', base + ':video-cut-install-manifest.json'))
+    mapping.setdefault('audit_history', []).append(mapping['current_audit'])
+    for entry in mapping['skills']:
+        row = next(item for item in skills['results'] if item['skill'] == entry['name'])
+        assert sha(MAIN / 'skills' / entry['name'] / 'SKILL.md') == row['sha256']
+        old, new = entry['skill_md_sha256'], row['sha256'][7:]
+        if old != new:
+            entry.setdefault('skill_md_sha256_history', []).append(old)
+            entry['previous_manifest_skill_md_sha256'] = old
+        entry.update(skill_md_sha256=new, validation=row['validator_stdout'], prefix_verified=True, registration_verified=True)
+        assert Path(entry['canonical_directory']).resolve() == (MAIN / 'skills' / entry['name']).resolve()
+    mapping['current_audit'] = {'date': '2026-10-21', 'skill_count': 17, 'local_links_checked': skills['local_links_checked'],
+        'record': REL + '/skills-release-r1.json', 'record_sha256': sha(skills_path), 'previous_hashes_preserved': True,
+        'semantics': 'V84 native leaf clocks through composed author speed maps; no general or full CapCut parity acceptance'}
+    expected_mapping = json.dumps(mapping, ensure_ascii=False, indent=2).rstrip() + '\n'
+    assert (MAIN / 'video-cut-install-manifest.json').read_bytes() == expected_mapping.encode('utf8')
+    changed = {name.decode('utf8') for name in git('diff', '--name-only', '-z').split(b'\0') if name}
+    changed |= {name.decode('utf8') for name in git('ls-files', '--others', '--exclude-standard', '-z').split(b'\0') if name}
+    allowed = set(failed['source_files']) | documents | {'video-cut-install-manifest.json', REL + '/skills-release-r1.json'}
+    assert changed <= allowed, sorted(changed - allowed)
+    tracked = {name.decode('utf8') for name in git('ls-files', '-z').split(b'\0') if name}
+    backups = {}
+    for name in sorted(changed):
+        source = MAIN / name
+        assert source.is_file() and not source.is_symlink() and source.resolve().is_relative_to(MAIN), name
+        target = WORK / 'preserved-owned-main-bytes' / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+        digest = sha(source)
+        assert sha(target) == digest
+        backups[name] = {'sha256': digest, 'backup': str(target), 'tracked_at_base': name in tracked}
+    before = {'status': 'verified-exact-owned-changes-and-backed-up', 'base_commit': base,
+        'failed_publication_sha256': sha(FAILED), 'actual_full_methods': full['methods'], 'frozen_inputs': current,
+        'changed_files': backups, 'unrelated_files_reverted_or_deleted': False,
+        'main_commit_unchanged': True, 'staged_work_absent': True, 'generator_sha256': sha(__file__)}
+    (WORK / 'before-restore.json').write_text(json.dumps(before, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+    for name, row in backups.items():
+        target = MAIN / name
+        assert target.resolve().is_relative_to(MAIN) and sha(target) == row['sha256']
+        if row['tracked_at_base']:
+            target.write_bytes(git('show', base + ':' + name))
+        else:
+            target.unlink()  # Only an exact owned file, already preserved above; never remove a directory.
+    assert not git('status', '--porcelain', '-z')
+    spec = importlib.util.spec_from_file_location('restored_main_freeze', MAIN / 'scripts/run_frozen_regression.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    assert module.frozen() == alignment['upstream_inputs']
+    record = {'status': 'restored-exact-clean-base-after-owned-backup', 'at_utc': datetime.now(timezone.utc).isoformat(),
+        'base_commit': base, 'failed_publication': str(FAILED), 'failed_publication_sha256': sha(FAILED),
+        'backed_up_files': len(backups), 'private_backup_record': str(WORK / 'before-restore.json'),
+        'all_prior_bytes_preserved': True, 'unrelated_files_reverted_or_deleted': False,
+        'recursive_delete_used': False, 'force_push_used': False, 'main_clean': True,
+        'restored_frozen_inputs': alignment['upstream_inputs'], 'full_candidate_inputs_unchanged': current,
+        'next_action': 'Fix Path input at the publisher call site; fresh reviewed publication-r2 must repeat every actual gate.',
+        'generator_sha256': sha(__file__)}
+    public = ROOT / REL / 'publication-owned-recovery-r1.json'
+    assert not public.exists()
+    public.write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+    shutil.copyfile(__file__, ROOT / REL / 'publication-owned-recovery-r1.script.py.txt')
+    shutil.copyfile(FAILED, ROOT / REL / 'publication-failed-r1.json')
+    shutil.copyfile(script_path, ROOT / REL / 'publication-failed-r1.script.py.txt')
+    print(json.dumps({key: record[key] for key in ('status', 'base_commit', 'backed_up_files', 'main_clean')}, ensure_ascii=False))
+
+
+if __name__ == '__main__':
+    main()

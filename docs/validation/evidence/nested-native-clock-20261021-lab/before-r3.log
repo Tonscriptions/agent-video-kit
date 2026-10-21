@@ -1,0 +1,32 @@
+test_direct_VFR_short_hold_control_keeps_covering_native_frame (test_nested_native_clock.NestedNativeClockTests.test_direct_VFR_short_hold_control_keeps_covering_native_frame) ... ok
+test_double_reverse_retains_original_VFR_hold_boundaries (test_nested_native_clock.NestedNativeClockTests.test_double_reverse_retains_original_VFR_hold_boundaries) ... ok
+test_leaf_reverse_retains_original_VFR_hold_boundaries (test_nested_native_clock.NestedNativeClockTests.test_leaf_reverse_retains_original_VFR_hold_boundaries) ... ok
+test_nested_CFR_control_matches_native_intervals (test_nested_native_clock.NestedNativeClockTests.test_nested_CFR_control_matches_native_intervals) ... ok
+test_nested_forward_retains_original_VFR_hold_boundaries (test_nested_native_clock.NestedNativeClockTests.test_nested_forward_retains_original_VFR_hold_boundaries) ... ok
+test_parent_curve_preserves_short_native_VFR_hold (test_nested_native_clock.NestedNativeClockTests.test_parent_curve_preserves_short_native_VFR_hold) ... FAIL
+test_parent_reverse_retains_original_VFR_hold_boundaries (test_nested_native_clock.NestedNativeClockTests.test_parent_reverse_retains_original_VFR_hold_boundaries) ... ok
+test_short_VFR_hold_is_visible_at_exact_parent_inpoint (test_nested_native_clock.NestedNativeClockTests.test_short_VFR_hold_is_visible_at_exact_parent_inpoint) ... ok
+
+======================================================================
+FAIL: test_parent_curve_preserves_short_native_VFR_hold (test_nested_native_clock.NestedNativeClockTests.test_parent_curve_preserves_short_native_VFR_hold)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\nested-native-clock-lab-20261021\product\tests\test_nested_native_clock.py", line 76, in test_parent_curve_preserves_short_native_VFR_hold
+    self.check(start=0,source_in=17100,speed=Fraction(1),curve=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\nested-native-clock-lab-20261021\product\tests\test_nested_native_clock.py", line 53, in check
+    self.assertEqual(wrong,[],f'actual identities={actual_ids}; independent native identities={identities}')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [0, 8, 25] != []
+
+First list contains 3 additional elements.
+First extra element 0:
+0
+
+- [0, 8, 25]
++ [] : actual identities=[2, 4, 4, 4, 4, 4, 4, 4, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]; independent native identities=[3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+
+----------------------------------------------------------------------
+Ran 8 tests in 32.666s
+
+FAILED (failures=1)

@@ -3,6 +3,18 @@ name: video-cut-quality
 description: Review local encoded masks, explicit selected/clear checkpoints, color scopes, render manifests, and quality evidence for Agent video delivery.
 ---
 
+<!-- V84-NESTED-NATIVE-CLOCK -->
+When capabilities expose `nested_native_video_clock`, registered native video leaves preserve original PTS/duration through composed author clocks.
+Use existing authored clips, source ticks, speed curves and reverse fields. Preserve native frame holds and real video EOF.
+Virtual inline surfaces retain child CFR; general nested VFR effect combinations still need separate acceptance.
+Compare every lossless reference frame and encoded PTS, including leading/trailing gaps. Identical repeated index descriptors are metadata aliases; preserve differing statuses and counts when reviewing source-index scans.
+Read the [native nested-clock contract](../../docs/specs/嵌套原生VFR时钟契约_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/嵌套原生VFR时钟与多层速度曲线实测_2026-10-21.md).
+Verified index hits skip full-source frame scans only; source/runtime hashes and final decode/encode remain. Existing expression, memory and disk limits apply.
+The 32 new native interval oracles are part of 277 related methods. These proofs do not establish full CapCut parity, natural/HDR quality, audio quality, long-duration latency or total RSS.
+Wholly empty native-video selections remain outside this release acceptance. Preserve explicit compiler refusals and do not silently pad them.
+<!-- /V84-NESTED-NATIVE-CLOCK -->
+
+
 <!-- V83-NATIVE-INDEX -->
 When capabilities advertise `native_video_frame_index`, ordinary native reverse reuses verified source PTS/duration arrays.
 `source_index_decode_calls=0` skips full-source frame scans; source/runtime SHA reads, audio, final video decoding and encoding still apply.

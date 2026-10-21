@@ -3,6 +3,18 @@ name: video-cut-timeline
 description: Compose an Agent Project timeline with local clips, tracks, transitions, keyframes, masks, speed curves, nested sequences, captions, and audio automation.
 ---
 
+<!-- V84-NESTED-NATIVE-CLOCK -->
+When capabilities expose `nested_native_video_clock`, registered native video leaves preserve original PTS/duration through composed author clocks.
+Use existing authored clips, source ticks, speed curves and reverse fields. Preserve native frame holds and real video EOF.
+Virtual inline surfaces retain child CFR; general nested VFR effect combinations still need separate acceptance.
+Keep each reverse on its authored container and speed curves in their original source domain. Preserve cut-ins inside native frame holds and explicit authored duration.
+Read the [native nested-clock contract](../../docs/specs/嵌套原生VFR时钟契约_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/嵌套原生VFR时钟与多层速度曲线实测_2026-10-21.md).
+Verified index hits skip full-source frame scans only; source/runtime hashes and final decode/encode remain. Existing expression, memory and disk limits apply.
+The 32 new native interval oracles are part of 277 related methods. These proofs do not establish full CapCut parity, natural/HDR quality, audio quality, long-duration latency or total RSS.
+Wholly empty native-video selections remain outside this release acceptance. Preserve explicit compiler refusals and do not silently pad them.
+<!-- /V84-NESTED-NATIVE-CLOCK -->
+
+
 <!-- V83-NATIVE-INDEX -->
 When capabilities advertise `native_video_frame_index`, ordinary native reverse reuses verified source PTS/duration arrays.
 `source_index_decode_calls=0` skips full-source frame scans; source/runtime SHA reads, audio, final video decoding and encoding still apply.
@@ -443,7 +455,8 @@ Nested variable-speed clips retain an analytic source-clock composition for
 video and authored keyframes; read the [nested clock contract](../../docs/specs/嵌套序列解析时间映射契约_v0.1_2026-10-16.md).
 Keep each reverse attached to its own container, and keep leaf curves in their
 original source domain after trimming. Render manifests record the composed
-maps and explicit source CFR normalization. Audio still uses atempo windows
+maps and the selected source-clock policy. With nested_native_video_clock, native video leaves
+retain original PTS/duration; virtual inline surfaces retain their child CFR contract. Audio still uses atempo windows
 with integrated 48 kHz boundaries, so retain its phase/continuous-tempo warning.
 Use the [speed easing contract](../../docs/specs/速度曲线Easing与Bezier契约_v0.1_2026-10-16.md)
 for ease_in/out/in_out and two/four-value Bezier handles. Keep the authored

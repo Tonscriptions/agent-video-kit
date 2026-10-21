@@ -1,5 +1,30 @@
 # Agent Video Kit
 
+<!-- V84-NESTED-NATIVE-CLOCK -->
+2026-10-21 **V84（嵌套原生 VFR 与多层速度曲线）**：完整原生回归 **1957 项、4856.958 秒、0 跳过**；255 产品输入与 8 外部夹具不变（本轮限定验收）。原生视频叶片保留原始 PTS/duration 后再进入作者时间映射，避免平均 CFR 预采样丢失短保持帧。
+
+| 编号 | 实际功能核验 | 结果与边界 | 证据 |
+|---|---|---|---|
+| V84-01 | 嵌套原生 VFR 与多层曲线 | 新增 32 项：7 ms 帧保持区间内裁切、非零封装原点、真实 EOF、父/叶多重倒放、双层非线性曲线及 30000/1001 网格；采用独立 Decimal/Fraction 参考 | [独立原生参考](docs/validation/evidence/nested-native-clock-20261021-lab/final-native-clock-r1.json) |
+| V84-02 | 相邻回归 | r2 为 37＋50＋63＋22＋105＝277 个不同方法、0 跳过；另有 4 项既有 CLI 时钟控制，新 32 包含在嵌套 105 中 | [相关回归](docs/validation/evidence/nested-native-clock-20261021-lab/related-r2.json) |
+| V84-03 | 公开 CLI 与真实输出 | 16 次 CLI 属于 26 条执行命令；22 检查。两段各 45 帧，完整无损 RGBA 各 10,368,000 字节，全部编码 PTS/帧身份正确；编码标识色块最大误差观察为 1，未声称编码全帧像素相等 | [实测](docs/validation/evidence/nested-native-clock-20261021-lab/native-r4/verification.json) · [原输入](docs/assets/nested-native-clock-20261021-lab/native-r4/source-native-vfr.nut) |
+| V84-04 | 离线隔离发行 | 161 资源源码/wheel/site 字节一致、7 现有依赖 wheels；19 隔离 CLI＋1 来源进程/11 模块，同样逐帧参考通过；执行绑定原始冻结版本，之后仅测试断言改变，161 运行时资源完全相同，未重复安装 | [安装](docs/validation/evidence/nested-native-clock-20261021-lab/installed-r1/verification.json) |
+| V84-05 | 完整回归与发布基线 | 完整原生回归 **1957 项、4856.958 秒、0 跳过**；255 产品输入与 8 外部夹具不变（本轮限定验收）；绑定已发布 V83，保留原 254 输入差异与全部专项证据 | [完整收据](docs/validation/evidence/nested-native-clock-20261021-lab/full-r2.json) · [发布基线](docs/validation/evidence/nested-native-clock-20261021-lab/published-index-alignment-r2.json) |
+| V84-06 | 索引与缓冲 | 原生叶片正/倒放复用 PTS/duration 索引；首次扫描 1 次、命中 0 次，精确重复的描述别名只去重完全一致行；虚拟合成表面保留子级 CFR 契约 | [契约](docs/specs/嵌套原生VFR时钟契约_v0.1_2026-10-21.md) |
+| V84-07 | 历史失败 | 修复前 8 项中 1 项丢失短帧保持区间；中间重构、早期脚本及完整 r1 的 1957 项/3263.817 秒/1 失败均保留；退休旧 CFR 警告断言后增加双叶原生协议检查，4 控制通过，再执行完整 r2，未放松逐帧参考 | [实验与失败记录](docs/validation/嵌套原生VFR时钟独立实验_2026-10-21.md) |
+| V84-08 | 尚未验收 | 有效选区完全落在视频首帧前或 EOF 后仍有已知拒绝缺口，另有独立候选；一般嵌套效果/VFR、自然/HDR、声音质量、长片延迟、总 RSS 及完整剪映等价未验收 | [限定边界](docs/specs/嵌套原生VFR时钟契约_v0.1_2026-10-21.md) |
+| V84-09 | 发布脚本失败与恢复 | 首次发布在提交前因哈希调用传入字符串而停止；437 个已核验本轮文件先完整备份，再恢复精确干净 V83；调用处改传 Path 后重新执行全部发布门禁，不改动完整回归输入 | [原失败](docs/validation/evidence/nested-native-clock-20261021-lab/publication-failed-r1.json) · [恢复](docs/validation/evidence/nested-native-clock-20261021-lab/publication-owned-recovery-r1.json) · [修复](docs/validation/evidence/nested-native-clock-20261021-lab/publication-path-fix-r1.json) |
+
+| 原输入帧卡 | 实际短保持区间正放 | 实际曲线倒放 |
+|---|---|---|
+| ![原输入](docs/assets/nested-native-clock-20261021-lab/native-r4/source.gif) | ![实际正放](docs/assets/nested-native-clock-20261021-lab/native-r4/forward-short-hold.gif) | ![实际倒放](docs/assets/nested-native-clock-20261021-lab/native-r4/reverse-ramp.gif) |
+
+源 GIF 为原创帧卡的 12 帧/1840 ms 观看副本；精确 7 ms 区间以原始 NUT 为准。两个输出 GIF 从实际 MP4 解码，分别合并为 7/9 帧、1500 ms；实际视频各 45 帧/30000÷1001 fps。已查看两张逐帧总览，未连续播放、未听音，无模型推理。
+
+[实际正放 MP4](docs/assets/nested-native-clock-20261021-lab/native-r4/forward-short-hold.mp4) · [实际倒放 MP4](docs/assets/nested-native-clock-20261021-lab/native-r4/reverse-ramp.mp4) · [静态目检](docs/validation/evidence/nested-native-clock-20261021-lab/frame-review-r2.json)。
+<!-- /V84-NESTED-NATIVE-CLOCK -->
+
+
 <!-- V83-NATIVE-INDEX -->
 2026-10-21 **V83（持久原生帧索引与倒放复用）**：完整原生回归 **1925 项、3063.161 秒、0 跳过**；254 产品输入与 8 外部夹具不变（本轮限定验收）。普通原生倒放复用验证后的源时间索引，重复渲染不再全源扫描帧；保留 V82 帧区间、像素缓存与磁盘预约限制。
 

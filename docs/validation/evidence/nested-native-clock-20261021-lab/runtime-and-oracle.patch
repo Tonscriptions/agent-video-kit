@@ -1,0 +1,485 @@
+--- a/product/src/ai_ad_editor/capabilities.py
++++ b/product/src/ai_ad_editor/capabilities.py
+@@ -23,6 +23,18 @@
+         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
+         "ffmpeg": {"version": ffmpeg_version()},
+         "capabilities": {
++            'nested_native_video_clock': {
++                'status':'implemented_with_limits','protocol':'covering-native-source-half-open-v1',
++                'scope':'registered_native_video_leaves_with_composed_author_time_maps',
++                'features':['original_VFR_display_intervals','fractional_covering_source_frames',
++                    'composed_nonlinear_author_clocks','native_reverse_interval_duration_order',
++                    'real_native_EOF_and_demux_origin','shared_verified_native_frame_index',
++                    'existing_bounded_reverse_chunk_fallback'],
++                'limits':['virtual_inline_surfaces_keep_child_CFR_contract',
++                    'general_nested_VFR_effect_combinations_require_separate_acceptance',
++                    'native_frame_index_reverse_expression_memory_and_disk_budgets_apply',
++                    'no_long_duration_peak_RSS_natural_HDR_audio_or_full_capcut_parity_acceptance'],
++            },
+             'native_video_frame_index': {
+                 'status':'implemented_with_limits','protocol':'native-video-frame-index-v1',
+                 'commands':['render','preview.range','preview.frame','cache.list','cache.prune'],
+@@ -30,7 +42,7 @@
+                 'features':['native_int64_pts_and_durations','source_runtime_decoder_pinned',
+                     'readonly_miss_planning','source_frame_probe_skipped_on_verified_hits',
+                     'single_graph_index_reuse','post_render_file_revalidation','explicit_safe_pruning'],
+-                'limits':['ordinary_native_reverse_only','maximum_1000000_frames_per_source',
++                'limits':['ordinary_reverse_and_flattened_native_nested_video_only','maximum_1000000_frames_per_source',
+                     'maximum_256_entries_per_project','full_source_and_runtime_hash_io_on_hits',
+                     'source_index_decode_counter_excludes_audio_pixel_decode_and_output_encoding',
+                     'no_long_duration_latency_peak_RSS_HDR_or_full_capcut_parity_acceptance'],
+@@ -38,7 +50,7 @@
+             'reverse_video_cache': {
+                 'status':'implemented_with_limits','protocol':'native-lossless-reverse-chunks-v1',
+                 'commands':['cache.list','cache.prune'],
+-                'activation':'ordinary_native_video_reverse_over_shared_selected_frame_budget',
++                'activation':'native_video_leaf_reverse_over_shared_selected_frame_budget',
+                 'features':['sequential_bounded_native_frame_chunks','FFV1_native_pixel_format',
+                     'original_reverse_interval_clock_reapplied','keyframe_preroll_and_absolute_PTS_trim',
+                     'orthogonal_source_rotation_and_flip','source_runtime_and_cache_byte_pinning',
+@@ -46,7 +58,7 @@
+                     'explicit_prune_with_current_project_reference_protection'],
+                 'frame_raster_estimate_budget_bytes':268435456,'disk_reservation_limit_bytes':137438953472,
+                 'limits':['budget_is_not_process_RSS','long_duration_latency_not_accepted',
+-                    'nested_VFR_reverse_not_accepted','reverse_audio_not_included',
++                    'general_nested_VFR_surface_resampling_not_accepted','reverse_audio_not_included',
+                     'natural_and_HDR_quality_not_accepted','cache_inventory_is_not_content_validation'],
+             },
+             'timeline_preview': {
+@@ -444,7 +456,7 @@
+                 },
+                 "status": "implemented",
+                 "features": ["multi_track", "append", "update", "remove", "split", "ripple_insert", "ripple_delete", "slip", "slide", "speed", "speed_curve", "speed_curve_reverse_reflection", "speed_curve_easing", "speed_curve_bezier_handles", "bounded_speed_clock_compilation", "reverse", "freeze_frame", "crop", "crop_position_keyframes", "crop_size_keyframes", "transform_anchor", "motion_preset_keyframes", "motion_preset_apply", "nested_sequences", "independent_sequence_pixel_canvas", "sequence_canvas_update", "selected_sequence_native_output", "single_pass_native_sequence_projection", "explicit_sequence_area_sampling", "fractional_crop_cell_area", "premultiplied_sequence_area_alpha", "sequence_projection_working_quota", "sequence_sampling_output_override", "isolated_sequence_compositing", "sequence_parent_canvas_transform", "sequence_parent_canvas_crop_mask", "sequence_parent_opacity_after_overlap", "sequence_group_track_z_order", "alpha_preserving_isolated_blend", "sequence_group_fade", "nested_reverse", "nested_reverse_parent_bezier_keyframes", "nested_parent_keyframe_layers", "nested_analytic_video_clock", "nested_covering_source_frame_intervals", "nested_subframe_source_trim", "nested_mapped_video_eof", "nested_global_half_open_output_frames", "nested_authored_keyframe_clock", "nested_integrated_audio_windows", "markers"],
+-                "limits": ["dynamic_crop_uses_fixed_canvas_inverse_sampling", "dynamic_crop_inverse_sampler_is_cpu_geq", "nested_reverse_static_clips_preserve_temporal_order", "nested_video_nonlinear_mapping_normalizes_source_display_clock_to_registered_cfr", "speed_easing_compilation_has_250_microsecond_source_clock_bound_and_1024_segment_limit", "speed_bezier_requires_finite_handles_normalized_x_and_positive_interior_speed", "source_speed_endpoint_floor_remains_0_01", "deep_animated_clock_expressions_have_explicit_4mib_limit", "nested_freeze_hold_quantization_is_explicit", "sequence_canvas_fps_color_and_sar_are_project_shared", "sequence_inverse_sampler_working_raster_is_componentwise_max_source_parent", "bilinear_default_retained_explicit_area_has_source_axis_box_kernel", "area_general_rotation_is_not_exact_rotated_pixel_polygon_ewa_or_lanczos", "projection_quota_excludes_leaf_decoder_encoder_threads_and_concurrent_jobs_rss", "leaf_minification_linear_light_hdr_and_natural_quality_unaccepted", "sequence_spatial_order_is_child_composite_crop_transform_opacity_effects_mask_fade", "group_crop_and_affine_are_cpu_inverse_sampling", "isolated_compositing_is_8bit_encoded_rgb_not_linear_light_or_hdr_acceptance", "group_slide_wipe_transitions_are_not_accepted", "nested_audio_tempo_windows_are_limited_to_16384_and_at_least_one_48khz_sample", "audio_speed_curve_uses_piecewise_atempo_and_can_have_segment_boundaries"],
++                "limits": ["dynamic_crop_uses_fixed_canvas_inverse_sampling", "dynamic_crop_inverse_sampler_is_cpu_geq", "nested_reverse_static_clips_preserve_temporal_order", "native_nested_leaf_intervals_preserved_virtual_surfaces_keep_child_cfr", "speed_easing_compilation_has_250_microsecond_source_clock_bound_and_1024_segment_limit", "speed_bezier_requires_finite_handles_normalized_x_and_positive_interior_speed", "source_speed_endpoint_floor_remains_0_01", "deep_animated_clock_expressions_have_explicit_4mib_limit", "nested_freeze_hold_quantization_is_explicit", "sequence_canvas_fps_color_and_sar_are_project_shared", "sequence_inverse_sampler_working_raster_is_componentwise_max_source_parent", "bilinear_default_retained_explicit_area_has_source_axis_box_kernel", "area_general_rotation_is_not_exact_rotated_pixel_polygon_ewa_or_lanczos", "projection_quota_excludes_leaf_decoder_encoder_threads_and_concurrent_jobs_rss", "leaf_minification_linear_light_hdr_and_natural_quality_unaccepted", "sequence_spatial_order_is_child_composite_crop_transform_opacity_effects_mask_fade", "group_crop_and_affine_are_cpu_inverse_sampling", "isolated_compositing_is_8bit_encoded_rgb_not_linear_light_or_hdr_acceptance", "group_slide_wipe_transitions_are_not_accepted", "nested_audio_tempo_windows_are_limited_to_16384_and_at_least_one_48khz_sample", "audio_speed_curve_uses_piecewise_atempo_and_can_have_segment_boundaries"],
+             },
+             "motion": {
+                 "status": "implemented",
+@@ -582,8 +594,8 @@
+                     "ordinary_input_VFR_normalized": False,
+                     "native_denominator_limit": 2147483647,
+                     "limits": ["finite_nonlinear_retime_resolution", "unrepresentable_grid_rejected",
+-                        "cumulative_decode_before_source_in", "nested_sources_use_registered_nominal_CFR",
+-                        "nested_VFR_reverse_temporal_duration_order_not_accepted",
++                        "cumulative_decode_before_source_in", "virtual_inline_surfaces_keep_child_CFR",
++                        "general_nested_VFR_effect_combinations_require_separate_acceptance",
+                         "source_index_and_balanced_expression_budgets"],
+                     "ordinary_reverse": "original_native_frame_intervals_mirrored_with_fractional_source_bounds",
+                 },
+--- a/product/src/ai_ad_editor/render.py
++++ b/product/src/ai_ad_editor/render.py
+@@ -3756,6 +3756,26 @@
+                        'child_input_count':len(root_inputs),'mixing':'float-sum-normalize-disabled',
+                        'automatic_limiter':False,'has_audible_inputs':root_bus is not None})
+     return root_bus
++
++
++def _native_reverse_chain(root,uri,asset,metadata,decoder,inputs,video_input,clock_filter,runtime,clip_id):
++    from .reverse_video_clock import reserve_buffer
++    try:
++        reserve_buffer(runtime,metadata,clip_id)
++        return [f'{video_input}trim=start_frame={metadata["source_frame_start"]}:end_frame={metadata["source_frame_end_exclusive"]}',
++                'reverse',clock_filter],None
++    except AppError as caught:
++        if caught.code!='REVERSE_VIDEO_BUFFER_BUDGET_EXCEEDED':raise
++    from .reverse_cache import plan,input_orientation
++    job=plan(root,uri,asset['sha256'],metadata,decoder=decoder)
++    assert inputs[-2]=='-i';inputs[-1]=job['output']
++    orientation=input_orientation(metadata)
++    if decoder:
++        assert inputs[-4]=='-c:v';inputs[-3]='ffv1';inputs[-2:-2]=orientation
++    else:inputs[-2:-2]=['-c:v','ffv1',*orientation]
++    metadata.update(frame_buffer_strategy='native-sequential-lossless-reverse-cache',
++        cache_storage_clock='25Hz-frame-index-only-original-intervals-reapplied',planned_chunk_count=len(job['recipe']['ranges']))
++    return [f'{video_input}{clock_filter}'],job
+ 
+ 
+ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, Any], *, _video_only: bool = False,
+@@ -4021,7 +4041,33 @@
+                 transforms = _transform_exprs(clip, start, tps)
+                 chain = [f"{video_input}trim=start={src_in:.6f}:end={src_out:.6f}"]
+                 nested_maps = clip.get('_nested_time_maps')
+-                if isinstance(nested_maps, list) and nested_maps:
++                native_nested = bool(nested_maps) and not inline_surface and kind=='video'
++                if native_nested:
++                    from .reverse_video_clock import reverse_intervals,forward_intervals
++                    nominal_value=None
++                    nested_input_base,nested_clock_source=registered_time_base(asset,uri)
++                    native_filter,native_clock=working_clock(nested_input_base,fps_value,tps)
++                    common=dict(expected_time_base=nested_input_base,decoder=alpha_decoder,
++                        index_context=_frame_index_context,source_sha256=asset['sha256'])
++                    if bool(clip.get('reverse')):
++                        _,_,native_reverse,sampling_metadata=reverse_intervals(uri,
++                            int(clip.get('source_in_tick',0)),int(clip.get('source_out_tick',1)),
++                            tps,native_clock['working_time_base'],**common)
++                        chain,reverse_cache_job=_native_reverse_chain(root,uri,asset,sampling_metadata,
++                            alpha_decoder,inputs,video_input,native_filter,_effect_runtime,clip.get('id'))
++                        source_clock=f'({int(clip.get("source_out_tick",1))}/{tps})-(({native_reverse})*TB)'
++                    else:
++                        first,end,source_clock,sampling_metadata=forward_intervals(uri,
++                            int(clip.get('source_in_tick',0)),int(clip.get('source_out_tick',1)),tps,**common)
++                        chain=[f'{video_input}trim=start_frame={first}:end_frame={end}',native_filter]
++                    setpts='setpts='+_expr_arg(f'({_clock_expression(nested_maps,source_clock,scratch_register=0)})/TB')
++                    curve_duration=int(clip.get('duration_tick',1))/tps
++                    output_rate=Fraction(fps_value)
++                    first_output_frame=math.ceil(Fraction(int(clip.get('timeline_start_tick',0)),tps)*output_rate)
++                    end_output_frame=math.ceil(Fraction(int(clip.get('timeline_start_tick',0))+int(clip.get('duration_tick',1)),tps)*output_rate)
++                    sampling_metadata.update(output_frame_start=first_output_frame,output_frame_end_exclusive=end_output_frame,
++                        output_interval='authored-half-open-on-global-cfr-grid')
++                elif isinstance(nested_maps, list) and nested_maps:
+                     source_probe = asset.get('probe', {}).get('video', {})
+                     try:
+                         nominal_fps = Fraction(str(source_probe.get('fps') or fps_value))
+@@ -4068,42 +4114,26 @@
+                     }
+                     warnings.append({'code': 'NESTED_SOURCE_CFR_NORMALIZED', 'clip_id': clip.get('id'),
+                                      'fps': nominal_value, 'message': '嵌套非线性变速以登记帧率建立源显示时钟；VFR 原始时间戳等效未验收'})
+-                if bool(clip.get("reverse")):
++                if bool(clip.get("reverse")) and not native_nested:
+                     chain.append("reverse")
+                 input_base, clock_source = registered_time_base(asset,uri,
+                     normalized_rate=nominal_value if nested_maps else fps_value if inline_surface else None)
+                 clock_filter, clock_metadata = working_clock(input_base, fps_value, tps)
+                 clock_metadata['input_time_base_source'] = clock_source
++                if native_nested:
++                    clock_metadata.update(source_clock_anchor='original-native-intervals-before-nested-author-map',
++                                          native_source_intervals=sampling_metadata)
+                 if not nested_maps and not inline_surface and bool(clip.get('reverse')) and kind == 'video':
+                     from .reverse_video_clock import reverse_intervals, reserve_buffer
+                     first_source, end_source, reverse_clock, reverse_metadata = reverse_intervals(
+                         uri, int(clip.get('source_in_tick', 0)), int(clip.get('source_out_tick', 1)),
+                         tps, clock_metadata['working_time_base'], expected_time_base=input_base,decoder=alpha_decoder,
+                         index_context=_frame_index_context,source_sha256=asset['sha256'])
+-                    use_cache=False
+-                    try:
+-                        reserve_buffer(_effect_runtime, reverse_metadata, clip.get('id'))
+-                    except AppError as error:
+-                        if error.code!='REVERSE_VIDEO_BUFFER_BUDGET_EXCEEDED':raise
+-                        use_cache=True
+-                        from .reverse_cache import plan as reverse_cache_plan, input_orientation
+-                        reverse_cache_job=reverse_cache_plan(root,uri,asset['sha256'],reverse_metadata,decoder=alpha_decoder)
+-                        orientation=input_orientation(reverse_metadata)
+-                        assert inputs[-2]=='-i'
+-                        inputs[-1]=reverse_cache_job['output']
+-                        if alpha_decoder:
+-                            assert inputs[-4]=='-c:v';inputs[-3]='ffv1'
+-                            inputs[-2:-2]=orientation
+-                        else:
+-                            inputs[-2:-2]=['-c:v','ffv1',*orientation]
+-                        reverse_metadata.update(frame_buffer_strategy='native-sequential-lossless-reverse-cache',
+-                            cache_storage_clock='25Hz-frame-index-only-original-intervals-reapplied',
+-                            planned_chunk_count=len(reverse_cache_job['recipe']['ranges']))
++                    chain,reverse_cache_job=_native_reverse_chain(root,uri,asset,reverse_metadata,
++                        alpha_decoder,inputs,video_input,clock_filter,_effect_runtime,clip.get('id'))
+                     clock_base = Fraction(clock_metadata['working_time_base'])
+                     timeline_origin = Fraction(int(clip.get('timeline_start_tick', 0)),tps)/clock_base
+                     assert timeline_origin.denominator == 1
+-                    chain = ([f'{video_input}{clock_filter}'] if use_cache else
+-                             [f'{video_input}trim=start_frame={first_source}:end_frame={end_source}','reverse',clock_filter])
+                     if speed_segments:
+                         setpts = _speed_curve_setpts(speed_segments, 0.,
+                             source_expression=f'(({reverse_clock})*TB)',
+@@ -4133,7 +4163,7 @@
+                     clock_metadata.update(source_clock_anchor='requested-author-source-in-tick',
+                         source_prefix_preserved_for_covering_frame=True,
+                         source_in_tick=int(clip.get('source_in_tick', 0)))
+-                else:
++                elif not native_nested:
+                     chain.append(clock_filter)
+                 chain.append(setpts)
+                 # A fractional segment boundary must not reset fps rounding
+--- a/product/src/ai_ad_editor/reverse_video_clock.py
++++ b/product/src/ai_ad_editor/reverse_video_clock.py
+@@ -164,33 +164,63 @@
+     return f'if(lt(N,{middle}),{_lookup(values,first,middle)},{_lookup(values,middle,end)})'
+ 
+ 
+-def reverse_intervals(path, source_in_tick, source_out_tick, tps, working_time_base,
+-                      *, expected_time_base, cancel_file=None, decoder=None,
+-                      index_context=None, source_sha256=None):
++def _native_range(path,source_in_tick,source_out_tick,tps,expected_time_base,*,
++                  cancel_file=None,decoder=None,index_context=None,source_sha256=None):
+     index_metadata=None
+     if index_context is None:
+         pts, durations, stream, format_info = probe_frames(path, cancel_file=cancel_file, decoder=decoder)
+     else:
+         pts,durations,stream,format_info,index_metadata=index_context.acquire(
+             path,source_sha256,probe_frames,decoder=decoder)
++    native=Fraction(stream['time_base'])
++    if native!=Fraction(expected_time_base):raise ValueError('registered and native video time bases differ')
++    origin_text=format_info.get('start_time','0')
++    origin=_nearest(Fraction('0' if origin_text in (None,'','N/A') else origin_text)/native)
++    first_time,final_time=Fraction(source_in_tick,tps),Fraction(source_out_tick,tps)
++    if first_time<0 or final_time<=first_time:raise ValueError('invalid requested source interval')
++    first=max(0,bisect_right(pts,first_time/native+origin)-1)
++    end=bisect_left(pts,final_time/native+origin)
++    if end<=first:raise ValueError('requested source window contains no displayed frame')
++    return pts,durations,stream,format_info,native,origin,first_time,final_time,first,end,index_metadata
++
++
++def forward_intervals(path,source_in_tick,source_out_tick,tps,*,expected_time_base,
++                      cancel_file=None,decoder=None,index_context=None,source_sha256=None):
++    """Keep covering native frames and map actual EOF without a CFR prefilter."""
+     try:
+-        native = Fraction(stream['time_base'])
+-        if native != Fraction(expected_time_base):
+-            raise ValueError('registered and native video time bases differ')
+-        origin_text = format_info.get('start_time', '0')
+-        if origin_text == 'N/A':
+-            origin_text = '0'
+-        # Native ffmpeg input timestamps subtract the demux origin rescaled to
+-        # the selected stream's integer time base; do not reset at video PTS[0].
+-        origin = _nearest(Fraction(origin_text)/native)
+-        first_time = Fraction(source_in_tick, tps)
+-        final_time = Fraction(source_out_tick, tps)
+-        if first_time < 0 or final_time <= first_time:
+-            raise ValueError('invalid requested source interval')
+-        first = max(0, bisect_right(pts, first_time/native+origin)-1)
+-        end = bisect_left(pts, final_time/native+origin)
+-        if end <= first:
+-            raise ValueError('requested source window contains no displayed frame')
++        pts,durations,stream,_,native,origin,left,right,first,end,index_metadata=_native_range(
++            path,source_in_tick,source_out_tick,tps,expected_time_base,cancel_file=cancel_file,
++            decoder=decoder,index_context=index_context,source_sha256=source_sha256)
++        first_time=max(left,(pts[first]-origin)*native)
++        if end<len(pts):last_end=(pts[end]-origin)*native
++        else:
++            if durations[end-1]<=0:raise ValueError('last selected frame has no native duration')
++            last_end=(pts[end-1]+durations[end-1]-origin)*native
++        eof=min(right,last_end)
++        if eof<=first_time:raise ValueError('native forward interval is empty')
++        rational=lambda value:f'({value.numerator}/{value.denominator})'
++        expression=(f'if(eq(N,0),{rational(first_time)},'
++                    f'if(gte(N,{end-first}),{rational(eof)},PTS*TB))')
++        metadata={'protocol':'covering-native-source-half-open-v1','source_frame_start':first,
++            'source_frame_end_exclusive':end,'selected_frame_count':end-first,
++            'native_time_base':str(native),'demux_origin_native_pts':origin,
++            'first_source_seconds':str(first_time),'eof_source_seconds':str(eof),
++            'original_frame_intervals_preserved':True}
++        if index_metadata is not None:metadata['native_frame_index']=index_metadata
++        return first,end,expression,metadata
++    except (ValueError,KeyError,TypeError,ZeroDivisionError,OverflowError) as caught:
++        raise AppError('NESTED_NATIVE_CLOCK_INVALID','无法建立原生正放帧区间时钟',exit_code=3,
++                       path=str(path),cause=str(caught)) from caught
++
++
++def reverse_intervals(path, source_in_tick, source_out_tick, tps, working_time_base,
++                      *, expected_time_base, cancel_file=None, decoder=None,
++                      index_context=None, source_sha256=None):
++    try:
++        pts,durations,stream,format_info,native,origin,first_time,final_time,first,end,index_metadata=_native_range(
++            path,source_in_tick,source_out_tick,tps,expected_time_base,cancel_file=cancel_file,
++            decoder=decoder,index_context=index_context,source_sha256=source_sha256)
++        origin_text=format_info.get('start_time','0')
+         width, height = int(stream['width']), int(stream['height'])
+         if min(width, height) < 1:
+             raise ValueError('invalid native decoded raster dimensions')
+--- /dev/null
++++ b/product/tests/test_nested_native_clock.py
+@@ -0,0 +1,206 @@
++"""Independent native interval oracle for ordinary flattened nested video."""
++from bisect import bisect_left,bisect_right
++import copy
++from fractions import Fraction
++from decimal import Decimal,localcontext
++import unittest
++
++from ai_ad_editor.project import save_project
++import test_cfr_boundaries as helpers
++
++
++class NestedNativeClockTests(unittest.TestCase):
++    setUp=helpers.CFRBoundaryTests.setUp
++    run_native=helpers.CFRBoundaryTests.run_native
++    source=helpers.CFRBoundaryTests.source
++    project=helpers.CFRBoundaryTests.project
++    render=helpers.CFRBoundaryTests.render
++
++    def check(self,*,leaf_reverse=False,parent_reverse=False,vfr=True,speed=Fraction(3,2),
++              start=9900,source_in=10170,curve=False,ramp=False,offset=None,short_source=False,deep=False,outer_reverse=False):
++        points=[0,33,101,188,195,441,499,800,1002,1221,1600,1800] if vfr else None
++        if short_source:points=points[:8]
++        source,colors,times=self.source(count=len(points) if points else 55,vfr=points,
++            container='mkv' if short_source else 'nut',audio_tail=short_source)
++        if offset is not None:
++            from ai_ad_editor.media import ffmpeg_path
++            transformed=self.work/'offset.nut'
++            self.run_native([ffmpeg_path(),'-v','error','-i',source,'-output_ts_offset',offset,
++                '-fps_mode','passthrough','-enc_time_base','filter','-c:v','ffv1','-pix_fmt','bgra',transformed])
++            source=transformed
++        p,root,leaf=self.project(source,start=0,duration=117000,source_out=117000,
++                                 patch={'reverse':leaf_reverse})
++        child=copy.deepcopy(root);child['id']='child'
++        for track in child['tracks']:track['id']='child_'+track['id']
++        child_leaf=child['tracks'][0]['clips'][0];child_leaf['id']='leaf'
++        source_out=source_in+90000
++        duration=int(Fraction(source_out-source_in)/speed)
++        if ramp:
++            with localcontext() as ctx:
++                ctx.prec=60
++                integral=Decimal(3).ln()
++                duration=int((integral*90000).to_integral_value())
++        root['tracks'][0]['clips']=[{'id':'parent','sequence_id':'child',
++            'timeline_start_tick':start,'duration_tick':duration,
++            'source_in_tick':source_in,'source_out_tick':source_out,
++            'speed':float(speed),'reverse':parent_reverse}]
++        if curve or ramp:
++            root['tracks'][0]['clips'][0]['speed_curve']={'keyframes':[
++                {'at_tick':0,'speed':.5 if ramp else float(speed)},
++                {'at_tick':90000,'speed':1.5 if ramp else float(speed)}]}
++        p['sequences'].append(child)
++        if deep:
++            middle=copy.deepcopy(root);middle['id']='middle'
++            for track in middle['tracks']:
++                track['id']='middle_'+track['id']
++                for clip in track['clips']:clip['id']='middle_'+clip['id']
++            with localcontext() as ctx:
++                ctx.prec=60
++                outer_duration=int((Decimal('2.4')*(Decimal(5)/3).ln()*90000).to_integral_value())
++            root['tracks'][0]['clips']=[{'id':'outer','sequence_id':'middle',
++                'timeline_start_tick':2970,'duration_tick':outer_duration,
++                'source_in_tick':7200,'source_out_tick':115200,'reverse':outer_reverse,
++                'speed_curve':{'keyframes':[{'at_tick':0,'speed':.75},
++                    {'at_tick':108000,'speed':1.25}]}}]
++            p['sequences'].append(middle)
++        save_project(self.root,p)
++        actual,metadata,_=self.render(p,root)
++        expected=[];identities=[];rate=Fraction(30000,1001)
++        for frame in range(len(actual)):
++            now=Fraction(frame)/rate;selected=-1
++            outer_visible=True
++            if deep:
++                outer_visible=Fraction(2970,90000)<=now<Fraction(2970+outer_duration,90000)
++                if outer_visible:
++                    with localcontext() as ctx:
++                        ctx.prec=60
++                        ratio=(now-Fraction(2970,90000))/Fraction(outer_duration,90000)
++                        progress=Decimal(ratio.numerator)/Decimal(ratio.denominator)
++                        if outer_reverse:progress=1-progress
++                        distance=Decimal('1.8')*(((Decimal(5)/3).ln()*progress).exp()-1)
++                    now=Fraction(7200,90000)+Fraction(distance)
++            if outer_visible and Fraction(start,90000)<=now<Fraction(start+duration,90000):
++                elapsed=(now-Fraction(start,90000))*speed
++                if ramp:
++                    with localcontext() as ctx:
++                        ctx.prec=60
++                        ratio=(now-Fraction(start,90000))/Fraction(duration,90000)
++                        progress=Decimal(ratio.numerator)/Decimal(ratio.denominator)
++                        if parent_reverse:progress=1-progress
++                        local=Decimal('.5')*((Decimal(3).ln()*progress).exp()-1)
++                        elapsed=Fraction(local)
++                child_time=Fraction(source_out,90000)-elapsed if parent_reverse else Fraction(source_in,90000)+elapsed
++                if ramp and parent_reverse:child_time=Fraction(source_in,90000)+elapsed
++                source_time=Fraction(117000,90000)-child_time if leaf_reverse else child_time
++                backwards=leaf_reverse^parent_reverse^(deep and outer_reverse)
++                selected=(bisect_left(times,source_time) if backwards else bisect_right(times,source_time))-1
++                selected=max(0,selected)
++                native_end=times[-1]+Fraction(1,25)
++                if (source_time>native_end if backwards else source_time>=native_end):selected=-1
++            identities.append(selected)
++            color=colors[selected] if selected>=0 else (0,0,0,255)
++            expected.append(bytes(color)*(helpers.W*helpers.H))
++        actual_ids=[colors.index(tuple(frame[:4])) if tuple(frame[:4]) in colors else -1 for frame in actual]
++        wrong=[i for i,(got,wanted) in enumerate(zip(actual,expected)) if got!=wanted]
++        self.assertEqual(wrong,[],f'actual identities={actual_ids}; independent native identities={identities}')
++
++    def test_nested_forward_retains_original_VFR_hold_boundaries(self):self.check()
++
++    def test_parent_reverse_retains_original_VFR_hold_boundaries(self):self.check(parent_reverse=True)
++
++    def test_leaf_reverse_retains_original_VFR_hold_boundaries(self):self.check(leaf_reverse=True)
++
++    def test_double_reverse_retains_original_VFR_hold_boundaries(self):self.check(leaf_reverse=True,parent_reverse=True)
++
++    def test_nested_CFR_control_matches_native_intervals(self):self.check(vfr=False)
++
++    def test_short_VFR_hold_is_visible_at_exact_parent_inpoint(self):
++        self.check(start=0,source_in=17100,speed=Fraction(1))
++
++    def test_direct_VFR_short_hold_control_keeps_covering_native_frame(self):
++        points=[0,33,101,188,195,441,499,800,1002,1221,1600,1800]
++        source,colors,_=self.source(count=len(points),vfr=points)
++        p,s,_=self.project(source,start=0,source_in=17100,source_out=107100)
++        actual,_,_=self.render(p,s)
++        self.assertEqual(actual[0],bytes(colors[3])*(helpers.W*helpers.H))
++
++    def test_parent_curve_preserves_short_native_VFR_hold(self):
++        self.check(start=0,source_in=17100,speed=Fraction(1),curve=True)
++
++
++    def test_parent_constant_curve_reverse_preserves_native_intervals(self):
++        self.check(parent_reverse=True,curve=True)
++
++    def test_parent_constant_curve_with_leaf_reverse_preserves_native_intervals(self):
++        self.check(leaf_reverse=True,curve=True)
++
++    def test_parent_constant_curve_double_reverse_preserves_native_intervals(self):
++        self.check(leaf_reverse=True,parent_reverse=True,curve=True)
++
++    def test_parent_nonlinear_curve_preserves_native_VFR_intervals(self):
++        self.check(start=0,source_in=17100,ramp=True)
++
++    def test_parent_nonlinear_curve_reverse_preserves_native_VFR_intervals(self):
++        self.check(parent_reverse=True,ramp=True)
++
++    def test_parent_nonlinear_curve_leaf_reverse_preserves_native_VFR_intervals(self):
++        self.check(leaf_reverse=True,ramp=True)
++
++    def test_parent_nonlinear_curve_double_reverse_preserves_native_VFR_intervals(self):
++        self.check(leaf_reverse=True,parent_reverse=True,ramp=True)
++
++    def test_parent_nonlinear_curve_CFR_control(self):
++        self.check(vfr=False,ramp=True)
++
++
++    def test_nested_forward_curve_nonzero_demux_origin(self):
++        self.check(curve=True,offset='5.117123')
++
++    def test_nested_parent_reverse_curve_nonzero_demux_origin(self):
++        self.check(parent_reverse=True,curve=True,offset='5.117123')
++
++    def test_nested_leaf_reverse_curve_nonzero_demux_origin(self):
++        self.check(leaf_reverse=True,curve=True,offset='5.117123')
++
++    def test_nested_double_reverse_curve_nonzero_demux_origin(self):
++        self.check(leaf_reverse=True,parent_reverse=True,curve=True,offset='5.117123')
++
++    def test_nested_forward_curve_short_video_keeps_real_EOF(self):
++        self.check(curve=True,short_source=True)
++
++    def test_nested_parent_reverse_curve_short_video_keeps_real_EOF(self):
++        self.check(parent_reverse=True,curve=True,short_source=True)
++
++    def test_nested_leaf_reverse_curve_short_video_keeps_real_EOF(self):
++        self.check(leaf_reverse=True,curve=True,short_source=True)
++
++    def test_nested_double_reverse_curve_short_video_keeps_real_EOF(self):
++        self.check(leaf_reverse=True,parent_reverse=True,curve=True,short_source=True)
++
++    def test_nested_nonlinear_forward_curve_short_video_keeps_real_EOF(self):
++        self.check(ramp=True,short_source=True)
++
++    def test_nested_nonlinear_reverse_curve_short_video_keeps_real_EOF(self):
++        self.check(parent_reverse=True,ramp=True,short_source=True)
++
++
++    def test_two_nonlinear_ancestors_preserve_native_VFR_intervals(self):
++        self.check(ramp=True,deep=True)
++
++    def test_two_nonlinear_ancestors_outer_reverse_preserves_native_VFR_intervals(self):
++        self.check(ramp=True,deep=True,outer_reverse=True)
++
++    def test_two_nonlinear_ancestors_both_reverse_preserve_native_VFR_intervals(self):
++        self.check(ramp=True,parent_reverse=True,deep=True,outer_reverse=True)
++
++    def test_two_nonlinear_ancestors_leaf_reverse_preserves_native_VFR_intervals(self):
++        self.check(ramp=True,leaf_reverse=True,deep=True)
++
++    def test_two_nonlinear_ancestors_triple_reverse_preserves_native_VFR_intervals(self):
++        self.check(ramp=True,leaf_reverse=True,parent_reverse=True,deep=True,outer_reverse=True)
++
++    def test_two_nonlinear_ancestors_CFR_control(self):
++        self.check(ramp=True,vfr=False,deep=True)
++
++
++if __name__=='__main__':unittest.main()

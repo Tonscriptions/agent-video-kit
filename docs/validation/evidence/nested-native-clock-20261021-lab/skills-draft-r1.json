@@ -1,0 +1,97 @@
+{
+  "status": "passed-four-unregistered-skill-drafts",
+  "skill_count": 4,
+  "main_modified": false,
+  "registration_changed": false,
+  "validator_sha256": "sha256:6068513d924ed3559e186dfcdead7439129828dcf402167fd925c06dffbf2806",
+  "generator_sha256": "sha256:8cdd110002bc8b761382594c1a1d45b36a377c1c6db0488e91723abce63fe8fe",
+  "new_block_marker": "NATIVE-NESTED-CLOCK-LAB-20261021",
+  "scope": "Draft structure and new-block links; unchanged parent references retain their main audit and require the full 17-Skill audit before publication.",
+  "V83_index_probe_guidance_correction_included": true,
+  "results": [
+    {
+      "skill": "video-cut-agent-editor",
+      "draft_sha256": "sha256:80690525311cd8067b7f2d1071195a70e363ba6b7e89d7c8c90527c6adba08c9",
+      "main_parent_sha256": "sha256:5d3fd232a93e69a4a4792a973edbc5ee94955a84c3f2f91f10a876459dd20bca",
+      "main_parent_snapshot": "docs/validation/evidence/nested-native-clock-20261021-lab/skills-parent-r1/video-cut-agent-editor.md",
+      "new_block": "When capabilities expose `nested_native_video_clock`, registered native video leaves preserve original PTS/duration through composed author clocks.\nUse existing authored clips, source ticks, speed curves and reverse fields. Preserve native frame holds and real video EOF.\nVirtual inline surfaces retain child CFR; general nested VFR effect combinations still need separate acceptance.\nKeep the editable parent/child author graph and original source ranges. Report the advertised native-leaf scope when explaining the render plan.\nRead the [native nested-clock contract](../../docs/specs/嵌套原生VFR时钟契约_实验_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/嵌套原生VFR时钟独立实验_2026-10-21.md).\nVerified index hits skip full-source frame scans only; source/runtime hashes and final decode/encode remain. Existing expression, memory and disk limits apply.\nThe 32 new native interval oracles are part of 277 related methods. These proofs do not establish full CapCut parity, natural/HDR quality, audio quality, long-duration latency or total RSS.",
+      "planned_replacements": [
+        {
+          "old": "index probe that still runs on cache hits. Raster estimates are not process RSS guarantees.",
+          "new": "index probe. When capabilities expose native_video_frame_index, verified index hits skip that probe;\nsource/runtime SHA reads remain. Raster estimates are not process RSS guarantees."
+        }
+      ],
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!",
+      "new_block_local_links": [
+        "docs/specs/嵌套原生VFR时钟契约_实验_v0.1_2026-10-21.md",
+        "docs/validation/嵌套原生VFR时钟独立实验_2026-10-21.md"
+      ],
+      "registered_path_still_main": true
+    },
+    {
+      "skill": "video-cut-timeline",
+      "draft_sha256": "sha256:c72199d6490f625d0ec56ebe8d54c40bd6e1bbb86a2c2f28438d30409a23666b",
+      "main_parent_sha256": "sha256:d82816852e82926fa9ec490f6ccbe13b36575cce068ed2076551c4a424608423",
+      "main_parent_snapshot": "docs/validation/evidence/nested-native-clock-20261021-lab/skills-parent-r1/video-cut-timeline.md",
+      "new_block": "When capabilities expose `nested_native_video_clock`, registered native video leaves preserve original PTS/duration through composed author clocks.\nUse existing authored clips, source ticks, speed curves and reverse fields. Preserve native frame holds and real video EOF.\nVirtual inline surfaces retain child CFR; general nested VFR effect combinations still need separate acceptance.\nKeep each reverse on its authored container and speed curves in their original source domain. Preserve cut-ins inside native frame holds and explicit authored duration.\nRead the [native nested-clock contract](../../docs/specs/嵌套原生VFR时钟契约_实验_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/嵌套原生VFR时钟独立实验_2026-10-21.md).\nVerified index hits skip full-source frame scans only; source/runtime hashes and final decode/encode remain. Existing expression, memory and disk limits apply.\nThe 32 new native interval oracles are part of 277 related methods. These proofs do not establish full CapCut parity, natural/HDR quality, audio quality, long-duration latency or total RSS.",
+      "planned_replacements": [
+        {
+          "old": "index probe that still runs on cache hits. Raster estimates are not process RSS guarantees.",
+          "new": "index probe. When capabilities expose native_video_frame_index, verified index hits skip that probe;\nsource/runtime SHA reads remain. Raster estimates are not process RSS guarantees."
+        },
+        {
+          "old": "maps and explicit source CFR normalization. Audio still uses atempo windows",
+          "new": "maps and the selected source-clock policy. With nested_native_video_clock, native video leaves\nretain original PTS/duration; virtual inline surfaces retain their child CFR contract. Audio still uses atempo windows"
+        }
+      ],
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!",
+      "new_block_local_links": [
+        "docs/specs/嵌套原生VFR时钟契约_实验_v0.1_2026-10-21.md",
+        "docs/validation/嵌套原生VFR时钟独立实验_2026-10-21.md"
+      ],
+      "registered_path_still_main": true
+    },
+    {
+      "skill": "video-cut-quality",
+      "draft_sha256": "sha256:1265a725e5b03214edddf3ee8a30cee047806903512f04936a78cd7e73ee3f69",
+      "main_parent_sha256": "sha256:abc459f108c6e824b08d7fa6a44761bbca52f7d4f1c07a2e7869f74935635a6e",
+      "main_parent_snapshot": "docs/validation/evidence/nested-native-clock-20261021-lab/skills-parent-r1/video-cut-quality.md",
+      "new_block": "When capabilities expose `nested_native_video_clock`, registered native video leaves preserve original PTS/duration through composed author clocks.\nUse existing authored clips, source ticks, speed curves and reverse fields. Preserve native frame holds and real video EOF.\nVirtual inline surfaces retain child CFR; general nested VFR effect combinations still need separate acceptance.\nCompare every lossless reference frame and encoded PTS, including leading/trailing gaps. Identical repeated index descriptors are metadata aliases; preserve differing statuses and counts when reviewing source-index scans.\nRead the [native nested-clock contract](../../docs/specs/嵌套原生VFR时钟契约_实验_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/嵌套原生VFR时钟独立实验_2026-10-21.md).\nVerified index hits skip full-source frame scans only; source/runtime hashes and final decode/encode remain. Existing expression, memory and disk limits apply.\nThe 32 new native interval oracles are part of 277 related methods. These proofs do not establish full CapCut parity, natural/HDR quality, audio quality, long-duration latency or total RSS.",
+      "planned_replacements": [
+        {
+          "old": "index probe that still runs on cache hits. Raster estimates are not process RSS guarantees.",
+          "new": "index probe. When capabilities expose native_video_frame_index, verified index hits skip that probe;\nsource/runtime SHA reads remain. Raster estimates are not process RSS guarantees."
+        }
+      ],
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!",
+      "new_block_local_links": [
+        "docs/specs/嵌套原生VFR时钟契约_实验_v0.1_2026-10-21.md",
+        "docs/validation/嵌套原生VFR时钟独立实验_2026-10-21.md"
+      ],
+      "registered_path_still_main": true
+    },
+    {
+      "skill": "video-cut-project-ops",
+      "draft_sha256": "sha256:291efec6d2e4d41a0318918e52400608089ec6fbd1a64028faf95d686a29c953",
+      "main_parent_sha256": "sha256:ff745d5cd96fb114ac277e4019c79c1d37035bb5efd7f48f9addbc3d0f814072",
+      "main_parent_snapshot": "docs/validation/evidence/nested-native-clock-20261021-lab/skills-parent-r1/video-cut-project-ops.md",
+      "new_block": "When capabilities expose `nested_native_video_clock`, registered native video leaves preserve original PTS/duration through composed author clocks.\nUse existing authored clips, source ticks, speed curves and reverse fields. Preserve native frame holds and real video EOF.\nVirtual inline surfaces retain child CFR; general nested VFR effect combinations still need separate acceptance.\nKeep native-video-index and reverse-video files as verified derived caches. Transfer author recipes; use public cache list/prune operations and preserve current authored-reference protection.\nRead the [native nested-clock contract](../../docs/specs/嵌套原生VFR时钟契约_实验_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/嵌套原生VFR时钟独立实验_2026-10-21.md).\nVerified index hits skip full-source frame scans only; source/runtime hashes and final decode/encode remain. Existing expression, memory and disk limits apply.\nThe 32 new native interval oracles are part of 277 related methods. These proofs do not establish full CapCut parity, natural/HDR quality, audio quality, long-duration latency or total RSS.",
+      "planned_replacements": [
+        {
+          "old": "index probe that still runs on cache hits. Raster estimates are not process RSS guarantees.",
+          "new": "index probe. When capabilities expose native_video_frame_index, verified index hits skip that probe;\nsource/runtime SHA reads remain. Raster estimates are not process RSS guarantees."
+        }
+      ],
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!",
+      "new_block_local_links": [
+        "docs/specs/嵌套原生VFR时钟契约_实验_v0.1_2026-10-21.md",
+        "docs/validation/嵌套原生VFR时钟独立实验_2026-10-21.md"
+      ],
+      "registered_path_still_main": true
+    }
+  ]
+}

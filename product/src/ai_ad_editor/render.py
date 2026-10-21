@@ -3758,6 +3758,26 @@ def _build_audio_bus_tree(
     return root_bus
 
 
+def _native_reverse_chain(root,uri,asset,metadata,decoder,inputs,video_input,clock_filter,runtime,clip_id):
+    from .reverse_video_clock import reserve_buffer
+    try:
+        reserve_buffer(runtime,metadata,clip_id)
+        return [f'{video_input}trim=start_frame={metadata["source_frame_start"]}:end_frame={metadata["source_frame_end_exclusive"]}',
+                'reverse',clock_filter],None
+    except AppError as caught:
+        if caught.code!='REVERSE_VIDEO_BUFFER_BUDGET_EXCEEDED':raise
+    from .reverse_cache import plan,input_orientation
+    job=plan(root,uri,asset['sha256'],metadata,decoder=decoder)
+    assert inputs[-2]=='-i';inputs[-1]=job['output']
+    orientation=input_orientation(metadata)
+    if decoder:
+        assert inputs[-4]=='-c:v';inputs[-3]='ffv1';inputs[-2:-2]=orientation
+    else:inputs[-2:-2]=['-c:v','ffv1',*orientation]
+    metadata.update(frame_buffer_strategy='native-sequential-lossless-reverse-cache',
+        cache_storage_clock='25Hz-frame-index-only-original-intervals-reapplied',planned_chunk_count=len(job['recipe']['ranges']))
+    return [f'{video_input}{clock_filter}'],job
+
+
 def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, Any], *, _video_only: bool = False,
                        _inline_stack: tuple[str, ...] = (), _allow_audio_only: bool = False,
                        _effect_runtime: EffectAutomation | None = None,
@@ -4021,7 +4041,33 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 transforms = _transform_exprs(clip, start, tps)
                 chain = [f"{video_input}trim=start={src_in:.6f}:end={src_out:.6f}"]
                 nested_maps = clip.get('_nested_time_maps')
-                if isinstance(nested_maps, list) and nested_maps:
+                native_nested = bool(nested_maps) and not inline_surface and kind=='video'
+                if native_nested:
+                    from .reverse_video_clock import reverse_intervals,forward_intervals
+                    nominal_value=None
+                    nested_input_base,nested_clock_source=registered_time_base(asset,uri)
+                    native_filter,native_clock=working_clock(nested_input_base,fps_value,tps)
+                    common=dict(expected_time_base=nested_input_base,decoder=alpha_decoder,
+                        index_context=_frame_index_context,source_sha256=asset['sha256'])
+                    if bool(clip.get('reverse')):
+                        _,_,native_reverse,sampling_metadata=reverse_intervals(uri,
+                            int(clip.get('source_in_tick',0)),int(clip.get('source_out_tick',1)),
+                            tps,native_clock['working_time_base'],**common)
+                        chain,reverse_cache_job=_native_reverse_chain(root,uri,asset,sampling_metadata,
+                            alpha_decoder,inputs,video_input,native_filter,_effect_runtime,clip.get('id'))
+                        source_clock=f'({int(clip.get("source_out_tick",1))}/{tps})-(({native_reverse})*TB)'
+                    else:
+                        first,end,source_clock,sampling_metadata=forward_intervals(uri,
+                            int(clip.get('source_in_tick',0)),int(clip.get('source_out_tick',1)),tps,**common)
+                        chain=[f'{video_input}trim=start_frame={first}:end_frame={end}',native_filter]
+                    setpts='setpts='+_expr_arg(f'({_clock_expression(nested_maps,source_clock,scratch_register=0)})/TB')
+                    curve_duration=int(clip.get('duration_tick',1))/tps
+                    output_rate=Fraction(fps_value)
+                    first_output_frame=math.ceil(Fraction(int(clip.get('timeline_start_tick',0)),tps)*output_rate)
+                    end_output_frame=math.ceil(Fraction(int(clip.get('timeline_start_tick',0))+int(clip.get('duration_tick',1)),tps)*output_rate)
+                    sampling_metadata.update(output_frame_start=first_output_frame,output_frame_end_exclusive=end_output_frame,
+                        output_interval='authored-half-open-on-global-cfr-grid')
+                elif isinstance(nested_maps, list) and nested_maps:
                     source_probe = asset.get('probe', {}).get('video', {})
                     try:
                         nominal_fps = Fraction(str(source_probe.get('fps') or fps_value))
@@ -4068,42 +4114,26 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     }
                     warnings.append({'code': 'NESTED_SOURCE_CFR_NORMALIZED', 'clip_id': clip.get('id'),
                                      'fps': nominal_value, 'message': '嵌套非线性变速以登记帧率建立源显示时钟；VFR 原始时间戳等效未验收'})
-                if bool(clip.get("reverse")):
+                if bool(clip.get("reverse")) and not native_nested:
                     chain.append("reverse")
                 input_base, clock_source = registered_time_base(asset,uri,
                     normalized_rate=nominal_value if nested_maps else fps_value if inline_surface else None)
                 clock_filter, clock_metadata = working_clock(input_base, fps_value, tps)
                 clock_metadata['input_time_base_source'] = clock_source
+                if native_nested:
+                    clock_metadata.update(source_clock_anchor='original-native-intervals-before-nested-author-map',
+                                          native_source_intervals=sampling_metadata)
                 if not nested_maps and not inline_surface and bool(clip.get('reverse')) and kind == 'video':
                     from .reverse_video_clock import reverse_intervals, reserve_buffer
                     first_source, end_source, reverse_clock, reverse_metadata = reverse_intervals(
                         uri, int(clip.get('source_in_tick', 0)), int(clip.get('source_out_tick', 1)),
                         tps, clock_metadata['working_time_base'], expected_time_base=input_base,decoder=alpha_decoder,
                         index_context=_frame_index_context,source_sha256=asset['sha256'])
-                    use_cache=False
-                    try:
-                        reserve_buffer(_effect_runtime, reverse_metadata, clip.get('id'))
-                    except AppError as error:
-                        if error.code!='REVERSE_VIDEO_BUFFER_BUDGET_EXCEEDED':raise
-                        use_cache=True
-                        from .reverse_cache import plan as reverse_cache_plan, input_orientation
-                        reverse_cache_job=reverse_cache_plan(root,uri,asset['sha256'],reverse_metadata,decoder=alpha_decoder)
-                        orientation=input_orientation(reverse_metadata)
-                        assert inputs[-2]=='-i'
-                        inputs[-1]=reverse_cache_job['output']
-                        if alpha_decoder:
-                            assert inputs[-4]=='-c:v';inputs[-3]='ffv1'
-                            inputs[-2:-2]=orientation
-                        else:
-                            inputs[-2:-2]=['-c:v','ffv1',*orientation]
-                        reverse_metadata.update(frame_buffer_strategy='native-sequential-lossless-reverse-cache',
-                            cache_storage_clock='25Hz-frame-index-only-original-intervals-reapplied',
-                            planned_chunk_count=len(reverse_cache_job['recipe']['ranges']))
+                    chain,reverse_cache_job=_native_reverse_chain(root,uri,asset,reverse_metadata,
+                        alpha_decoder,inputs,video_input,clock_filter,_effect_runtime,clip.get('id'))
                     clock_base = Fraction(clock_metadata['working_time_base'])
                     timeline_origin = Fraction(int(clip.get('timeline_start_tick', 0)),tps)/clock_base
                     assert timeline_origin.denominator == 1
-                    chain = ([f'{video_input}{clock_filter}'] if use_cache else
-                             [f'{video_input}trim=start_frame={first_source}:end_frame={end_source}','reverse',clock_filter])
                     if speed_segments:
                         setpts = _speed_curve_setpts(speed_segments, 0.,
                             source_expression=f'(({reverse_clock})*TB)',
@@ -4133,7 +4163,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     clock_metadata.update(source_clock_anchor='requested-author-source-in-tick',
                         source_prefix_preserved_for_covering_frame=True,
                         source_in_tick=int(clip.get('source_in_tick', 0)))
-                else:
+                elif not native_nested:
                     chain.append(clock_filter)
                 chain.append(setpts)
                 # A fractional segment boundary must not reset fps rounding

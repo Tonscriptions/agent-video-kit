@@ -1,0 +1,50 @@
+{
+  "operations": [
+    {
+      "op": "add_sequence",
+      "id": "child",
+      "duration_tick": 117000
+    },
+    {
+      "op": "append_clip",
+      "sequence_id": "child",
+      "track_id": "child_video_1",
+      "id": "leaf",
+      "asset_id": "source",
+      "timeline_start_tick": 0,
+      "duration_tick": 117000,
+      "source_in_tick": 0,
+      "source_out_tick": 117000
+    },
+    {
+      "op": "append_sequence_clip",
+      "sequence_id": "seq_main",
+      "track_id": "track_video_1",
+      "nested_sequence_id": "child",
+      "id": "parent",
+      "timeline_start_tick": 0,
+      "duration_tick": 90000,
+      "source_in_tick": 17100,
+      "source_out_tick": 107100,
+      "reverse": false,
+      "speed_curve": {
+        "keyframes": [
+          {
+            "at_tick": 0,
+            "speed": 1.0
+          },
+          {
+            "at_tick": 90000,
+            "speed": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "op": "set_sequence_duration",
+      "sequence_id": "seq_main",
+      "duration_tick": 135000,
+      "trim": false
+    }
+  ]
+}

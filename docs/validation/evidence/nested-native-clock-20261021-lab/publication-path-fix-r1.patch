@@ -1,0 +1,21 @@
+--- before/publish_nested_native_clock_r2.py
++++ after/publish_nested_native_clock_r2.py
+@@ -134,7 +134,8 @@
+ | V84-05 | 完整回归与发布基线 | {message}；绑定已发布 V83，保留原 254 输入差异与全部专项证据 | [完整收据]({REL}/full-r2.json) · [发布基线]({REL}/published-index-alignment-r2.json) |
+ | V84-06 | 索引与缓冲 | 原生叶片正/倒放复用 PTS/duration 索引；首次扫描 1 次、命中 0 次，精确重复的描述别名只去重完全一致行；虚拟合成表面保留子级 CFR 契约 | [契约]({CONTRACT}) |
+ | V84-07 | 历史失败 | 修复前 8 项中 1 项丢失短帧保持区间；中间重构、早期脚本及完整 r1 的 1957 项/3263.817 秒/1 失败均保留；退休旧 CFR 警告断言后增加双叶原生协议检查，4 控制通过，再执行完整 r2，未放松逐帧参考 | [实验与失败记录]({HISTORICAL_REPORT}) |
+-| V84-08 | 尚未验收 | 有效选区完全落在视频首帧前或 EOF 后仍有已知拒绝缺口，另有独立候选；一般嵌套效果/VFR、自然/HDR、声音质量、长片延迟、总 RSS 及完整剪映等价未验收 | [限定边界]({CONTRACT}) |'''
++| V84-08 | 尚未验收 | 有效选区完全落在视频首帧前或 EOF 后仍有已知拒绝缺口，另有独立候选；一般嵌套效果/VFR、自然/HDR、声音质量、长片延迟、总 RSS 及完整剪映等价未验收 | [限定边界]({CONTRACT}) |
++| V84-09 | 发布脚本失败与恢复 | 首次发布在提交前因哈希调用传入字符串而停止；437 个已核验本轮文件先完整备份，再恢复精确干净 V83；调用处改传 Path 后重新执行全部发布门禁，不改动完整回归输入 | [原失败]({REL}/publication-failed-r1.json) · [恢复]({REL}/publication-owned-recovery-r1.json) · [修复]({REL}/publication-path-fix-r1.json) |'''
+     gallery=f'''| 原输入帧卡 | 实际短保持区间正放 | 实际曲线倒放 |
+ |---|---|---|
+ | ![原输入]({ASSETS}/native-r4/source.gif) | ![实际正放]({ASSETS}/native-r4/forward-short-hold.gif) | ![实际倒放]({ASSETS}/native-r4/reverse-ramp.gif) |
+@@ -251,7 +252,7 @@
+         save(MAIN/REL/'release-main-r1.json',{'status':'passed-main-byte-and-document-audit','base_commit':base,
+             'frozen_inputs':current,'full_methods':1957,'full_skipped':0,'full_sha256':sha(MAIN/REL/'full-r2.json'),
+             'targeted_methods':277,'resources':161,'skills':17,'local_links':links,
+-            'documents':{name:sha(MAIN/name) for name in sorted(modified_docs)},'generator_sha256':sha(__file__)})
++            'documents':{name:sha(MAIN/name) for name in sorted(modified_docs)},'generator_sha256':sha(Path(__file__))})
+         save(MAIN/REL/'publication-copy-r1.json',{'status':'passed-reviewed-copy','source':str(ROOT),
+             'copied_files':reviewed,'frozen_inputs':current,'base_commit':base})
+         changed={p.decode('utf8') for p in git(MAIN,'diff','--name-only','-z').split(b'\0') if p}
