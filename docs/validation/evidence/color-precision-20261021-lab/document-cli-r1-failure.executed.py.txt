@@ -1,0 +1,153 @@
+"""Document the actual float CLI epoch, retaining old reports and failed oracles."""
+from datetime import datetime,timezone
+import json,re,shutil
+from pathlib import Path
+from run_frozen_regression import frozen,sha
+
+ROOT=Path(__file__).resolve().parents[1]
+REL=ROOT/'docs/validation/evidence/color-precision-20261021-lab'
+REPORT=ROOT/'docs/validation/浮点表面合成与高精度边界独立实测_2026-10-22.md'
+CONTRACT=ROOT/'docs/specs/浮点表面合成与高精度边界_实验_v0.1_2026-10-22.md'
+GUIDE=ROOT/'docs/Agent浮点帧包CLI使用与验收边界_2026-10-22.md'
+
+def read(p):return json.loads(p.read_bytes())
+def save(p,v):p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+def write(p,t):p.write_text(t.rstrip()+'\n',encoding='utf8',newline='\n')
+
+def main():
+    output=REL/'document-cli-r1.json';backup=REL/'before-cli-docs-r1';assert not output.exists() and not backup.exists()
+    before=frozen();lineage=read(REL/'parent-rebase-r1.json');assert before==lineage['frozen_after'] and len(before)==282
+    kernel=read(REL/'kernel-r11.json');media=read(REL/'surface-cli-media-r1/verification.json')
+    assert kernel['methods']==86 and kernel['status'].startswith('passed') and media['status'].startswith('passed-subprocess')
+    backup.mkdir();saved=[]
+    for p in (REPORT,CONTRACT):
+        destination=backup/p.name;shutil.copyfile(p,destination);saved.append({'path':p.relative_to(ROOT).as_posix(),'saved':destination.relative_to(ROOT).as_posix(),'sha256':sha(destination)})
+    save(backup/'manifest.json',{'reason':'Retain actual 59-method historical docs before 86-method CLI and published-parent update','documents':saved})
+    snapshot=REL/'implementation-r3';assert not snapshot.exists();snapshot.mkdir()
+    paths=sorted(set(lineage['new_product_inputs'])|{'product/src/ai_ad_editor/cli.py','product/src/ai_ad_editor/capabilities.py'})
+    assert len(paths)==17
+    rows=[]
+    for name in paths:
+        target=snapshot/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/name,target)
+        assert sha(target)==before[name];rows.append({'path':name,'snapshot':target.relative_to(ROOT).as_posix(),'sha256':sha(target)})
+    save(snapshot/'manifest.json',{'status':'exact-current-source-snapshots','files':rows,'frozen_inputs':before})
+    save(REL/'current-epoch-r3.json',{'status':'current-282-input-171-resource-epoch','at_utc':datetime.now(timezone.utc).isoformat(),
+        'frozen_inputs':before,'source_snapshot_manifest_sha256':sha(snapshot/'manifest.json'),
+        'parent_rebase_receipt_sha256':sha(REL/'parent-rebase-r1.json'),'published_parent':lineage['published_parent_commit'],
+        'kernel_before_queue_rebase_sha256':sha(REL/'kernel-r11.json'),'kernel_methods':86,
+        'kernel_after_only_queue_changes':[row['path'] for row in lineage['copied']],
+        'kernel_float_modules_and_tests_unchanged':True,'current_CLI_media_receipt_sha256':sha(REL/'surface-cli-media-r1/verification.json'),
+        'complete_suite_status':'running, actual terminal receipt required','published':False,'timeline_integrated':False})
+    paragraphs=REPORT.read_text('utf8').split('\n\n')
+    paragraphs[1]='当前父版是已发布 V91 `18f5dc76`：2148 方法 /4714.461 秒 /0跳过。实验建立时复制了队列修复前的267输入，现已从实际发布版逐字节迁移两个队列文件，并保留迁移前快照。[父版迁移收据](evidence/color-precision-20261021-lab/parent-rebase-r1.json)。原2145回归4失败仍按历史保留。'
+    paragraphs[2]='当前八份核心模块、七份新增测试，282冻结输入、171包内资源。专项 r11 **86方法 /131.691302秒 /0失败 /0错误 /0跳过**，67份原生执行记录与另48份实际进程内CLI记录分别保留；不包含内部所有ffprobe/摘要检查。随后仅迁入两个队列文件，浮点实现和对应测试未变。**2234项完整原生回归已启动，尚未取得通过终态。** [专项](evidence/color-precision-20261021-lab/kernel-r11.json)、[当前纪元](evidence/color-precision-20261021-lab/current-epoch-r3.json)、[17份精确源码](evidence/color-precision-20261021-lab/implementation-r3/manifest.json)、[完整约束](../specs/浮点表面合成与高精度边界_实验_v0.1_2026-10-22.md)。'
+    report='\n\n'.join(paragraphs).replace('| CPF-21 | 当前RGB/YUV/几何/合成专项 |','| CPF-21 | 历史r8 RGB/YUV/几何/合成专项 |')
+    start=report.index('下一步需要在实际发布父版上接入解码、')
+    end=report.index('\n\n',start)
+    report=report[:start]+'下一步接入默认时间线/预览/缓存及全操作精度策略，保留作者工程与原生时钟。RGB与YCbCr原生源、相对D65色域/传递函数和独立CLI帧包已有明确实现；PQ/HLG、ICC、物理白匹配、HDR交付、自然素材与长片性能仍未验收。发行与完整回归须看实际终态，不能由专项或格式名推断。'+report[end:]
+    extra='''
+| CPF-25 | 相对D65 RGB信号转换 | bt709/display-p3/bt2020三组原色；linear/srgb/bt709-oetf/gamma22/gamma24。独立已发表XYZ矩阵和标量传递函数；12项色彩测试；保留负数及超1值、alpha独立。不是ICC、PQ/HLG或HDR验收。[r10](evidence/color-precision-20261021-lab/kernel-r10.json) |
+| CPF-26 | 两项实际参考值失败 | r9的71项有2失败，参考值未计入每次公开Float32边界的舍入；保留旧断言与输入。改为最近可表示Float32及逐阶段独立参考，生产实现未改，不将累计误差误报算法错误。[失败r9](evidence/color-precision-20261021-lab/kernel-r9.json)、[旧输入](evidence/color-precision-20261021-lab/before-color-oracle-r1/manifest.json) |
+| CPF-27 | `surface export / inspect`实际进程内CLI | 15项帧包测试覆盖RGB/YUV、VFR原始PTS、半开源帧选区、linear和仿射、预算/取消/源变更/路径/损坏、dry-run/只读。r11共86项，进程内CLI与原生命令分开记数。[r11](evidence/color-precision-20261021-lab/kernel-r11.json) |
+| CPF-28 | 真实子进程CLI与线性光实片 | 15次CLI、12条脚本级原生命令、另1次核心图进程；34检查、18资产。四包为20/20/20/5帧，源帧索引/PTS/时长逐项相同；所有线性RGB与独立公式比对，三个完整仿射帧逐样本比对。[真实CLI媒体](evidence/color-precision-20261021-lab/surface-cli-media-r1/verification.json) |
+| CPF-29 | 真实线性合成回写 | 原始/仿射两段均20帧、10fps、2秒；全部浮点合成RGB和16-bit回写码值检查（量化最多1码），逐PTS、总时长及GIF逐100ms。MP4/GIF是独立核心管线编码副本，`surface`自身只导出帧包，不冒充时间线渲染。 |
+| CPF-30 | 当前新媒体实际目检 | 已用view_image查看一张六帧图；固定仿射角度、缩放和透明棋盘符合预期，小尺寸样例未见明显黑边。未连续播放/试听，不代表自然素材、4K性能或HDR验收。[已查看](evidence/color-precision-20261021-lab/surface-cli-review-r1/reviewed.json) |
+| CPF-31 | 对齐已发布V91及完整回归 | 只迁移queue_reuse.py及其测试，其他公共差异只有cli/capabilities；新增15输入。完整2234项正在执行，未宣称通过、合入或推送。[迁移](evidence/color-precision-20261021-lab/parent-rebase-r1.json) |
+'''
+    table_end=report.index('\n\n',report.index('| CPF-24 |'))
+    report=report[:table_end]+extra.rstrip()+report[table_end:]
+    report+='''
+
+当前CLI四份可重读帧包：[原始RGB](../assets/color-precision-20261021-lab/surface-cli-media-r1/bundles/foreground/bundle.json)、[线性仿射](../assets/color-precision-20261021-lab/surface-cli-media-r1/bundles/affine/bundle.json)、[YCbCr](../assets/color-precision-20261021-lab/surface-cli-media-r1/bundles/background/bundle.json)、[源帧3..8](../assets/color-precision-20261021-lab/surface-cli-media-r1/bundles/selected/bundle.json)。相邻文件保存实际Float32像素和int64时钟。读取清单不等于重新核验原片或签名认证。
+
+实际线性管线：[原始合成MP4](../assets/color-precision-20261021-lab/surface-cli-media-r1/original.mp4)、[仿射MP4](../assets/color-precision-20261021-lab/surface-cli-media-r1/affine.mp4)、[16-bit无损](../assets/color-precision-20261021-lab/surface-cli-media-r1/affine-linear-composite-16bit.mkv)。[Agent CLI命令与限制](../Agent浮点帧包CLI使用与验收边界_2026-10-22.md)。
+
+![真实CLI帧包经独立线性光核心合成的实际MP4/GIF](../assets/color-precision-20261021-lab/surface-cli-media-r1/affine.gif)
+
+![当前两段实际MP4抽帧；不代表连续播放](../assets/color-precision-20261021-lab/surface-cli-review-r1/actual-MP4-frames-0-9-19.png)
+'''
+    write(REPORT,report)
+    contract=CONTRACT.read_text('utf8')
+    contract=contract.replace('当前实现独立 Float32 合成、几何、原生 RGB/灰度与明确 YCbCr 读取核心，尚未接入编辑器时间线、CLI、预览、缓存或离线发行。','当前实现Float32合成、几何、原生RGB/灰度/YCbCr读取、相对D65信号转换及Agent可调用的`surface export/inspect`帧包。默认编辑器时间线、预览和缓存尚未接入；独立发行门禁另验。')
+    contract=contract.replace('公共表面为 planar `gbrapf32le`，RGB 为 straight alpha 表示；','合成图表面为planar `gbrapf32le`，NumPy/帧包为interleaved RGBA Float32 little endian，均为straight alpha；')
+    contract=contract.replace('| 未实现/未验收 |','| 相对D65原色/传递函数与线性光独立媒体已实现；绝对显示、PQ/HLG/HDR仍未验收 |')
+    contract=contract.replace('当前独立实验尚未进入发布门禁','V91实际发布父版已对齐；完整2234已启动，隔离安装/文档/Skills/推送须取得各自终态')
+    contract=contract.replace('当前仅源RGB数值，scan为调用方声明，','原生读取与相对D65信号转换分层；scan仍为调用方声明，')
+    more='''
+| FPC-29 | 原色限定bt709/display-p3/bt2020、共同D65；传递函数需明确为linear/srgb/bt709-oetf/gamma22/gamma24，不能自动把标签解释为物理亮度 | 12项独立矩阵/传递函数测试及实际线性光媒体已通过；相对白=1，不做ICC或色适应 |
+| FPC-30 | RGB负数/超1保留；公开阶段为Float32，参考值应逐阶段计入舍入；alpha独立逐位相同 | r9两项参考断言失败及原版本保留；生产实现不变，r10/11实际通过 |
+| FPC-31 | `surface export`只读取已登记本地video/image及SHA；明确源/工作信号、原生RGB或显式YCbCr参数，不支持格式不能静默回落8-bit | 真实进程内及子进程CLI通过；alpha straight/premultiplied由调用方声明 |
+| FPC-32 | 三文件协议：`frames.rgba-f32le`、`clock.i64le`、`bundle.json`；clock每行源帧索引/原始PTS/原始时长，半开帧选区不重排或CFR化 | RGB/YUV VFR专项和20/5帧实际CLI包验证；选择较后窗口仍可能解码此前前缀 |
+| FPC-33 | 仅工程内新目录；原子提交、取消/失败回收所属进程线程和临时包；交付前核验源/工具/实现；保持project和rights字节 | 预算、取消、输入变更、已有目录与目录联接等专项通过；数值依赖只固定入口/关键pyd/DLL，不声称整个NumPy全包 |
+| FPC-34 | 像素/时钟/有界清单估算≤2GiB，额外64MiB磁盘余量；清单≤128KiB、表面≤16777216像素和单维≤16384 | 超限应在像素解码前拒绝；估算不是峰值RSS或4K60保证 |
+| FPC-35 | `surface inspect`只读校验三文件布局、大小/SHA及原生时钟，不宣称原片或依赖重新核验，不是外部签名认证 | 损坏像素/时钟、重新摘要但非法索引、只读作者数据等专项通过；`original_inputs_revalidated=false` |
+| FPC-36 | `surface export --dry-run`不得创建帧索引、解码或帧包；输出完整计划和明确未知权威信息 | 实际CLI及禁止probe/decode的独立门禁通过 |
+| FPC-37 | 发布前新建八轮离线安装，所有171资源source/wheel/site相等；NumPy原始931文件和许可相等；实际CLI、专项及完整回归分别记数 | 以独立安装收据终态为准，不能借宿主site-packages替代 |
+| FPC-38 | 帧包是数据接口；普通render/preview、效果/字幕/转场/嵌套尚未采用这些表面。独立MP4/GIF不能称整个编辑器高精度或剪映等价 | capabilities/CLI/报告须一直明确该边界 |
+'''
+    point=contract.index('\n\n算法参考：')
+    contract=contract[:point]+more.rstrip()+contract[point:]
+    contract+='\n色彩独立参考：[W3C CSS Color 4固定版本](https://www.w3.org/TR/2026/CRD-css-color-4-20261020/)，使用公开原色/XYZ矩阵与传递函数构建独立参考；浮点舍入遵循每个公开阶段。BT.709仅指已发表相机OETF/逆，不冒称BT.1886显示EOTF。\n'
+    write(CONTRACT,contract)
+    write(GUIDE,'''# Agent原生浮点帧包CLI
+
+本页描述已实现的`agent-native-clock-float32-bundle-v1`数据接口。普通时间线render、preview和缓存尚未采用该核心。精度能力与发布状态见[规格](specs/浮点表面合成与高精度边界_实验_v0.1_2026-10-22.md)及[实际测试、原片和GIF](validation/浮点表面合成与高精度边界独立实测_2026-10-22.md)。
+
+在已安装的原生Python/FFmpeg环境调用CLI。示例中`ai-ad-editor`可替换为离线安装目录的`python -I -S -B run.py`；不创建虚拟环境、不下载依赖。
+
+```powershell
+ai-ad-editor project init E:/video-project
+ai-ad-editor media ingest --project E:/video-project --input E:/media/original.mkv --asset-id source
+ai-ad-editor surface export --project E:/video-project --asset-id source --output renders/float-source --source-primaries bt709 --source-transfer bt709-oetf --working-primaries bt709 --working-transfer linear --dry-run
+ai-ad-editor surface export --project E:/video-project --asset-id source --output renders/float-source --source-primaries bt709 --source-transfer bt709-oetf --working-primaries bt709 --working-transfer linear
+ai-ad-editor surface inspect --project E:/video-project --input renders/float-source
+```
+
+原生YCbCr视频须再提供`--pixel-family yuv --yuv-matrix bt709 --yuv-range full --chroma-location center --scan progressive`。这里的矩阵/量程/色度位置和逐行参数都是调用方明确声明，命令不会证明文件实际是逐行扫描或自动检测正确色彩。原生RGB使用默认`--pixel-family rgb`，不能附带YUV参数。alpha表示通过`--alpha-association straight|premultiplied`明确。
+
+| 参数 | 语义与边界 |
+|---|---|
+| `--source-primaries / --working-primaries` | bt709 / display-p3 / bt2020，共同相对D65白；工作默认bt709 |
+| `--source-transfer / --working-transfer` | linear / srgb / bt709-oetf / gamma22 / gamma24；源参数必填，工作默认linear |
+| `--start-frame / --stop-frame` | 源帧索引半开区间；stop省略为全源末尾，保持原始PTS，选择后部仍需解码前缀 |
+| `--transform-json` | 工程内本地JSON：width、height、inverse（2×3逆仿射）；像素中心为整数，双线性预乘重采样，外部透明 |
+| `--max-output-mib` | 1..2048，包含像素/时钟/清单的估算，再要求64MiB空余；不是RSS预算 |
+| `--cancel-file` | 工程内取消标记；清理本命令所属临时产物和进程，不删除既有原片/输出 |
+| `--dry-run` | 只生成计划，不建立帧索引或执行像素解码，源SHA仍会读取 |
+
+输出目录必须是工程内尚不存在的新路径。三份产物由SHA绑定：
+
+| 文件 | Agent读取方法 |
+|---|---|
+| `bundle.json` | 布局、尺寸、源SHA、源选区、原始time_base、依赖/转换/预算说明；最大128KiB |
+| `frames.rgba-f32le` | little-endian Float32，frames×height×width×4，交错straight RGBA；RGB可负或超1，alpha独立0..1 |
+| `clock.i64le` | little-endian int64，frames×3；列为原始源帧索引、PTS、原始duration，使用清单time_base |
+
+```python
+import json
+from pathlib import Path
+import numpy as np
+p = Path('E:/video-project/renders/float-source')
+m = json.loads((p/'bundle.json').read_bytes())
+rgba = np.memmap(p/'frames.rgba-f32le', dtype='<f4', mode='r', shape=(m['frames'], m['height'], m['width'], 4))
+clock = np.memmap(p/'clock.i64le', dtype='<i8', mode='r', shape=(m['frames'], 3))
+```
+
+先调用`surface inspect`核对派生字节与时钟；它不重新读取原片/实现或提供签名认证，明确返回`original_inputs_revalidated=false`。需要新的源核验时重新导出到新目录。导出保留作者工程和rights-ledger字节，操作日志单独记录。
+
+不自动旋转、不输出音频、不做CFR重采样或编码影片。相对D65变换不做ICC、色适应、物理白/亮度匹配、PQ/HLG、色域映射或HDR元数据。独立媒体脚本用线性帧包合成，再施加明确输出传递函数和16-bit量化，才生成浏览MP4/GIF；这些编码步骤属于独立核心管线。
+''')
+    links=[]
+    for doc in (REPORT,CONTRACT,GUIDE):
+        for target in re.findall(r'!?\[[^\]]*\]\(([^)]+)\)',doc.read_text('utf8')):
+            if target.startswith(('https:','http:','#')):continue
+            p=(doc.parent/target.split('#',1)[0]).resolve();assert p.exists(),(doc,target)
+            links.append({'document':doc.relative_to(ROOT).as_posix(),'target':p.relative_to(ROOT).as_posix()})
+    assert frozen()==before
+    save(output,{'status':'passed-current-CLI-docs-not-published','script_sha256':sha(Path(__file__)),
+        'documents':{p.relative_to(ROOT).as_posix():sha(p) for p in (REPORT,CONTRACT,GUIDE)},'local_links':links,
+        'frozen_equal':True,'snapshot_files':len(rows),'full_suite_passed':False,'published':False})
+    output.with_suffix('.executed.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'status':'passed-current-CLI-docs-not-published','links':len(links),'snapshots':len(rows)}))
+
+if __name__=='__main__':main()

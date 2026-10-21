@@ -1,0 +1,640 @@
+{
+  "status": "observed-installed-native-filter-negotiation",
+  "started_at_utc": "2026-10-21T14:31:42.701425+00:00",
+  "ffmpeg": {
+    "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+  },
+  "script_sha256": "sha256:2b771a63ad9dc1fde8637423775c00a05677ddc5fa41983ad21e1dc0fcf4b2f1",
+  "cases": {
+    "geq": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-filter_complex",
+        "[0:v]geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:6810cdfbb8d76d809092e69de3ccc3c9b0de1a6f6f92e4de51693504369761f3",
+      "stderr_sha256": "sha256:9134caf7b0cae14dc0c791c5d63ae8f93c65f3eff20edda3304766ba25536fa6",
+      "auto_inserted_scales": [],
+      "actual_first_pixel_GBRA": [
+        0.23456789553165436,
+        0.3456789255142212,
+        0.12345679104328156,
+        0.45678913593292236
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "premultiply": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-filter_complex",
+        "[0:v]premultiply=inplace=1[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:5ef7c6daa5428211f503400fbbbb9f81b888dd893344b5a272b41447eb8e1187",
+      "stderr_sha256": "sha256:95ce0566b0dc92f6afbd74b91c9988e470f1c9146aa9d596530b2dbff265d0c3",
+      "auto_inserted_scales": [],
+      "actual_first_pixel_GBRA": [
+        0.10714806616306305,
+        0.15790237486362457,
+        0.05639372020959854,
+        0.45678913593292236
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "scale": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-filter_complex",
+        "[0:v]scale=32:16[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:6810cdfbb8d76d809092e69de3ccc3c9b0de1a6f6f92e4de51693504369761f3",
+      "stderr_sha256": "sha256:92e033e683615672388c8a48857cfd6d5e4024060390cac393133776d47fa75a",
+      "auto_inserted_scales": [
+        "[Parsed_scale_0 @ 0000016b71a9a100] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004"
+      ],
+      "actual_first_pixel_GBRA": [
+        0.23456789553165436,
+        0.3456789255142212,
+        0.12345679104328156,
+        0.45678913593292236
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "rotate_identity": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-filter_complex",
+        "[0:v]rotate=angle=0:c=none[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:39299f1a38ef305f85a2842fbbeb72ee27c6cf24997b2844918a368eef4330d0",
+      "stderr_sha256": "sha256:694767774b8d7b1d6be481d5e80ab8545095bcb2821a47f4f703a8b023578db7",
+      "auto_inserted_scales": [
+        "[Parsed_rotate_0 @ 0000014ede601c40] auto-inserting filter 'auto_scale_0' between the filter 'graph 0 input from stream 0:0' and the filter 'Parsed_rotate_0'",
+        "[format @ 0000014edfecc600] auto-inserting filter 'auto_scale_1' between the filter 'Parsed_rotate_0' and the filter 'format'",
+        "[auto_scale_0 @ 0000014edfeca1c0] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:yuva444p16le csp:unknown range:unknown sar:1/1 flags:0x00000004",
+        "[auto_scale_1 @ 0000014edfecc700] w:32 h:16 fmt:yuva444p16le csp:unknown range:unknown sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004"
+      ],
+      "actual_first_pixel_GBRA": [
+        0.23454642295837402,
+        0.3457236588001251,
+        0.12349126487970352,
+        0.4567940831184387
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "blend_average": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.987654321:g=0.876543219:b=0.765432198:a=0.654321987",
+        "-filter_complex",
+        "[0:v][1:v]blend=all_expr=(A+B)/2[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:012c5181d94b5f7c21ab252db3cf035149cbff1bb1fc8883b904dc8c977de422",
+      "stderr_sha256": "sha256:cc60e3ca841e6a3286045a817cc93c781704dc30793c9697ae43d94cab8efa50",
+      "auto_inserted_scales": [],
+      "actual_first_pixel_GBRA": [
+        0.5555555820465088,
+        0.5555555820465088,
+        0.5555555820465088,
+        0.5555555820465088
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "maskedmerge": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.987654321:g=0.876543219:b=0.765432198:a=0.654321987",
+        "-filter_complex",
+        "[0:v]split=2[a][m];[a][1:v][m]maskedmerge[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:ff40af80084c4eaf06d1c28bee77674ae584199fe2400be54c0489b777206ff1",
+      "stderr_sha256": "sha256:74d328bfb4b4ceba8f6135f8fe52c49c2cd9eb6ffd077f2e8f00b39400c4a54e",
+      "auto_inserted_scales": [],
+      "actual_first_pixel_GBRA": [
+        0.38515472412109375,
+        0.4907788038253784,
+        0.2301478385925293,
+        0.5470199584960938
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "overlay_auto": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.987654321:g=0.876543219:b=0.765432198:a=0.654321987",
+        "-filter_complex",
+        "[0:v][1:v]overlay=x=0:y=0:format=auto[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:fcdc6a8ddfb5e4a7262b323f24bfcfc874dd243f296109ec50c12c85f6b3b6b0",
+      "stderr_sha256": "sha256:15366b56e5249db50df59b307e1640fee3de96b1aa9702a8f0952534fc875b5e",
+      "auto_inserted_scales": [
+        "[Parsed_overlay_0 @ 000001e9384b64c0] auto-inserting filter 'auto_scale_0' between the filter 'graph 0 input from stream 0:0' and the filter 'Parsed_overlay_0'",
+        "[Parsed_overlay_0 @ 000001e9384b64c0] auto-inserting filter 'auto_scale_1' between the filter 'graph 0 input from stream 1:0' and the filter 'Parsed_overlay_0'",
+        "[format @ 000001e9384b65c0] auto-inserting filter 'auto_scale_2' between the filter 'Parsed_overlay_0' and the filter 'format'",
+        "[auto_scale_0 @ 000001e9384b7080] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:yuva444p10le csp:unknown range:unknown sar:1/1 flags:0x00000004",
+        "[auto_scale_1 @ 000001e9384b7180] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:yuva444p10le csp:unknown range:unknown sar:1/1 flags:0x00000004",
+        "[auto_scale_2 @ 000001e9384b63c0] w:32 h:16 fmt:yuva444p10le csp:unknown range:unknown sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004"
+      ],
+      "actual_first_pixel_GBRA": [
+        0.5640039443969727,
+        0.5600823760032654,
+        0.5655909180641174,
+        0.8115358352661133
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "alphaextract": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-filter_complex",
+        "[0:v]alphaextract,format=gbrapf32le[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:6b5517497a6aceed253fc8868fa15f33c67cd9c446bb58e5a59b77678c5f634c",
+      "stderr_sha256": "sha256:cb43d963158b5673ac8d63135a3a3d5adb188eff79f48c207fb153c48efb6788",
+      "auto_inserted_scales": [
+        "[Parsed_format_1 @ 0000021e1a0416c0] auto-inserting filter 'auto_scale_0' between the filter 'Parsed_alphaextract_0' and the filter 'Parsed_format_1'",
+        "[auto_scale_0 @ 0000021e1a058d00] w:32 h:16 fmt:grayf32le csp:unknown range:unknown sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004",
+        "[auto_scale_0 @ 0000021e1a058d00] w:32 h:16 fmt:grayf32le csp:unknown range:unknown sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004",
+        "[auto_scale_0 @ 0000021e1a058d00] w:32 h:16 fmt:grayf32le csp:unknown range:unknown sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004",
+        "[auto_scale_0 @ 0000021e1a058d00] w:32 h:16 fmt:grayf32le csp:gbr range:pc sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004"
+      ],
+      "actual_first_pixel_GBRA": [
+        0.4591287076473236,
+        0.4591287076473236,
+        0.4591287076473236,
+        1.0
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "alphamerge": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-filter_complex",
+        "[0:v]split=2[c][a];[a]alphaextract[mask];[c][mask]alphamerge[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:2910e28df65f6ea82a6d90829c6315b2f10823b83278375649aa730e26290096",
+      "stderr_sha256": "sha256:46dc9488710fefb1132aa2a63124f97c9efa5c5f007052dec8f23b5f410ef232",
+      "auto_inserted_scales": [
+        "[Parsed_alphamerge_2 @ 000001ee4922af40] auto-inserting filter 'auto_scale_0' between the filter 'Parsed_split_0' and the filter 'Parsed_alphamerge_2'",
+        "[format @ 000001ee49231140] auto-inserting filter 'auto_scale_1' between the filter 'Parsed_alphamerge_2' and the filter 'format'",
+        "[Parsed_alphamerge_2 @ 000001ee4922af40] auto-inserting filter 'auto_scale_0' between the filter 'Parsed_alphaextract_1' and the filter 'Parsed_alphamerge_2'",
+        "[auto_scale_0 @ 000001ee49231240] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:argb csp:gbr range:pc sar:1/1 flags:0x00000004",
+        "[auto_scale_0 @ 000001ee49231580] w:32 h:16 fmt:grayf32le csp:unknown range:unknown sar:1/1 -> w:32 h:16 fmt:gray csp:unknown range:pc sar:1/1 flags:0x00000004",
+        "[auto_scale_1 @ 000001ee49231340] w:32 h:16 fmt:argb csp:gbr range:pc sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004",
+        "[auto_scale_0 @ 000001ee49231580] w:32 h:16 fmt:grayf32le csp:unknown range:unknown sar:1/1 -> w:32 h:16 fmt:gray csp:unknown range:pc sar:1/1 flags:0x00000004",
+        "[auto_scale_0 @ 000001ee49231580] w:32 h:16 fmt:grayf32le csp:unknown range:unknown sar:1/1 -> w:32 h:16 fmt:gray csp:unknown range:pc sar:1/1 flags:0x00000004",
+        "[auto_scale_0 @ 000001ee49231580] w:32 h:16 fmt:grayf32le csp:gbr range:pc sar:1/1 -> w:32 h:16 fmt:gray csp:unknown range:pc sar:1/1 flags:0x00000004"
+      ],
+      "actual_first_pixel_GBRA": [
+        0.23436331748962402,
+        0.34378576278686523,
+        0.1250019073486328,
+        0.45490196347236633
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "xfade": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.987654321:g=0.876543219:b=0.765432198:a=0.654321987",
+        "-filter_complex",
+        "[0:v][1:v]xfade=transition=fade:duration=1:offset=0[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:c23b61a8232ebc8a56f3c3cdf36309b4ef33b979438a7862625b156653b0d21a",
+      "stderr_sha256": "sha256:dd5dcde5c73720423130bf22817a7e0ab8ec8e8479cafe1ecf890507c4a39f91",
+      "auto_inserted_scales": [
+        "[Parsed_xfade_0 @ 0000023c8b8172c0] auto-inserting filter 'auto_scale_0' between the filter 'graph 0 input from stream 0:0' and the filter 'Parsed_xfade_0'",
+        "[Parsed_xfade_0 @ 0000023c8b8172c0] auto-inserting filter 'auto_scale_1' between the filter 'graph 0 input from stream 1:0' and the filter 'Parsed_xfade_0'",
+        "[format @ 0000023c8b817c40] auto-inserting filter 'auto_scale_2' between the filter 'Parsed_xfade_0' and the filter 'format'",
+        "[auto_scale_0 @ 0000023c8b8173c0] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:gbrap16le csp:gbr range:pc sar:1/1 flags:0x00000004",
+        "[auto_scale_1 @ 0000023c8b817d40] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:gbrap16le csp:gbr range:pc sar:1/1 flags:0x00000004",
+        "[auto_scale_2 @ 0000023c8b817e40] w:32 h:16 fmt:gbrap16le csp:gbr range:pc sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004"
+      ],
+      "actual_first_pixel_GBRA": [
+        0.23453116416931152,
+        0.3457541763782501,
+        0.12352178245782852,
+        0.4567940831184387
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "curves_identity": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-filter_complex",
+        "[0:v]curves=all=0/0\\ 1/1[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:c23b61a8232ebc8a56f3c3cdf36309b4ef33b979438a7862625b156653b0d21a",
+      "stderr_sha256": "sha256:0bf3193ab59a26449a726eba4ccf7d9fd44281c48bc7a02732b47015571ce0bc",
+      "auto_inserted_scales": [
+        "[Parsed_curves_0 @ 000002249e071c40] auto-inserting filter 'auto_scale_0' between the filter 'graph 0 input from stream 0:0' and the filter 'Parsed_curves_0'",
+        "[format @ 000002249fa4c380] auto-inserting filter 'auto_scale_1' between the filter 'Parsed_curves_0' and the filter 'format'",
+        "[auto_scale_0 @ 000002249fa4a2c0] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:rgba64le csp:gbr range:pc sar:1/1 flags:0x00000004",
+        "[Parsed_curves_0 @ 000002249e071c40] #0 points: (0.000000;0.000000) (1.000000;1.000000)#1 points: (0.000000;0.000000) (1.000000;1.000000)#2 points: (0.000000;0.000000) (1.000000;1.000000)w:32 h:16 fmt:rgba64le csp:gbr range:pc sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004"
+      ],
+      "actual_first_pixel_GBRA": [
+        0.23453116416931152,
+        0.3457541763782501,
+        0.12352178245782852,
+        0.4567940831184387
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "lutrgb_identity": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-filter_complex",
+        "[0:v]lutrgb=r=val:g=val:b=val:a=val[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:c23b61a8232ebc8a56f3c3cdf36309b4ef33b979438a7862625b156653b0d21a",
+      "stderr_sha256": "sha256:fa61fb6adf1f1f2ad79e31582ebc00249dc64a0ea723d6ac4c5b492dd54457ed",
+      "auto_inserted_scales": [
+        "[Parsed_lutrgb_0 @ 000001f44acc1c40] auto-inserting filter 'auto_scale_0' between the filter 'graph 0 input from stream 0:0' and the filter 'Parsed_lutrgb_0'",
+        "[format @ 000001f44af78a80] auto-inserting filter 'auto_scale_1' between the filter 'Parsed_lutrgb_0' and the filter 'format'",
+        "[auto_scale_0 @ 000001f44af7a2c0] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:rgba64le csp:gbr range:pc sar:1/1 flags:0x00000004",
+        "[auto_scale_1 @ 000001f44af78b80] w:32 h:16 fmt:rgba64le csp:gbr range:pc sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004"
+      ],
+      "actual_first_pixel_GBRA": [
+        0.23453116416931152,
+        0.3457541763782501,
+        0.12352178245782852,
+        0.4567940831184387
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "gblur_identity": {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-hide_banner",
+        "-v",
+        "verbose",
+        "-filter_complex_threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123",
+        "-filter_complex",
+        "[0:v]gblur=sigma=0[v]",
+        "-map",
+        "[v]",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 8192,
+      "stdout_sha256": "sha256:6810cdfbb8d76d809092e69de3ccc3c9b0de1a6f6f92e4de51693504369761f3",
+      "stderr_sha256": "sha256:d21f6eea1e05984d364ee76d762f2a0632821c197901dfd32cb9dc7e0bb2cc0b",
+      "auto_inserted_scales": [],
+      "actual_first_pixel_GBRA": [
+        0.23456789553165436,
+        0.3456789255142212,
+        0.12345679104328156,
+        0.45678913593292236
+      ],
+      "finite": true,
+      "unique_per_plane": [
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "native_windows": true,
+  "virtualization": false,
+  "network": false,
+  "product_integration": false,
+  "HDR_accepted": false,
+  "full_capcut_parity": false,
+  "finished_at_utc": "2026-10-21T14:31:44.203390+00:00"
+}

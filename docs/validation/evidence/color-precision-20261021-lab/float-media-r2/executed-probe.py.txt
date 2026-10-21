@@ -1,0 +1,153 @@
+"""Actual local float compositing/media; independent from the editor CLI graph."""
+import argparse
+from datetime import datetime, timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import time
+import numpy as np
+from PIL import Image, ImageDraw
+from run_frozen_regression import frozen, sha
+
+ROOT=Path(__file__).resolve().parents[1]
+REL=ROOT/'docs/validation/evidence/color-precision-20261021-lab'
+ASSETS=ROOT/'docs/assets/color-precision-20261021-lab'
+WIDTH,HEIGHT,FRAMES,FPS=1024,64,4,4
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--revision',required=True);args=parser.parse_args()
+    evidence=REL/('float-media-'+args.revision);assets=ASSETS/('float-media-'+args.revision)
+    assert not evidence.exists() and not assets.exists()
+    evidence.mkdir(parents=True);assets.mkdir(parents=True)
+    before=frozen();assert len(before)==269
+    original=json.loads((REL/'before-r5/verification.json').read_bytes())
+    record={'status':'running','started_at_utc':datetime.now(timezone.utc).isoformat(),
+        'script_sha256':sha(Path(__file__)),'frozen_before':before,'calls':[],'checks':[],'cases':{},
+        'native_windows':True,'virtualization':False,'network':False,'editor_integrated':False,
+        'HDR_accepted':False,'natural_quality_accepted':False,'full_capcut_parity':False,
+        'rights':'Original exhaustive neutral ramps, CC0-1.0. No external imagery, fonts or models.'}
+    def save():
+        (evidence/'verification.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    def check(name,condition,**details):
+        record['checks'].append({'name':name,'ok':bool(condition),**details});save();assert condition,name
+    executable=shutil.which('ffmpeg');probe=shutil.which('ffprobe');assert executable and probe
+    record.update(ffmpeg={'path':executable,'sha256':sha(Path(executable))},ffprobe={'path':probe,'sha256':sha(Path(probe))})
+    env=dict(os.environ,TEMP=str(ROOT/'product/.runtime/temp'),TMP=str(ROOT/'product/.runtime/temp'),
+        TMPDIR=str(ROOT/'product/.runtime/temp'),PYTHONDONTWRITEBYTECODE='1')
+    def run(label,command,*,binary=False):
+        command=list(map(str,command));start=time.monotonic()
+        result=subprocess.run(command,cwd=ROOT,env=env,capture_output=True,timeout=180,creationflags=subprocess.CREATE_NO_WINDOW)
+        (evidence/(label+'.stderr.log')).write_bytes(result.stderr)
+        if not binary:(evidence/(label+'.stdout.log')).write_bytes(result.stdout)
+        record['calls'].append({'label':label,'command':command,'exit_code':result.returncode,
+            'wall_seconds':time.monotonic()-start,'stdout_bytes':len(result.stdout),
+            'stdout_sha256':'sha256:'+hashlib.sha256(result.stdout).hexdigest(),
+            'stderr_sha256':'sha256:'+hashlib.sha256(result.stderr).hexdigest()});save()
+        assert result.returncode==0,(label,result.stderr[-4000:].decode('utf8','replace'))
+        return result.stdout,result.stderr.decode('utf8','replace')
+    sys.path.insert(0,str(ROOT/'product/src'))
+    from ai_ad_editor.runtime import configure_local_runtime
+    configure_local_runtime()
+    from ai_ad_editor.float_raster import FloatRasterGraph
+    try:
+        for bits in (10,16):
+            name=str(bits)+'bit';pixel_format='gbrp10le' if bits==10 else 'gbrp16le'
+            old=original['cases'][name];source=ROOT/old['source'];assert sha(source)==old['source_sha256']
+            expected=np.fromfile(ASSETS/'before-r5'/(name+'-original.'+pixel_format),dtype='<u2').reshape(FRAMES,3,HEIGHT,WIDTH)
+            rgb,unused=run(name+'-original-native-float-decode',[executable,'-v','error','-i',source,'-map','0:v:0',
+                '-an','-fps_mode','passthrough','-vf','zscale=rangein=full:range=full:dither=none,format=gbrpf32le',
+                '-f','rawvideo','pipe:1'],binary=True)
+            # These originals have no alpha. Add the known opaque plane by
+            # copying native float planes, avoiding a second swscale boundary.
+            rgb=np.frombuffer(rgb,dtype='<f4').reshape(FRAMES,3,HEIGHT,WIDTH)
+            decoded=np.concatenate((rgb,np.ones((FRAMES,1,HEIGHT,WIDTH),dtype='<f4')),axis=1)
+            raw=decoded.tobytes()
+            check(name+'-original-float-has-all-levels-and-opaque-alpha',np.unique(decoded[0,0]).size==(1<<bits)
+                and np.isfinite(decoded).all() and np.all(decoded[:,3]==1))
+            front=assets/(name+'-original.gbrapf32le');front.write_bytes(raw)
+            background=np.zeros_like(decoded);background[:,3]=1
+            back=assets/(name+'-background.gbrapf32le');back.write_bytes(background.tobytes())
+            graph=FloatRasterGraph();masked=graph.mask('1:v','1');target=graph.source_over('0:v',masked)
+            (evidence/(name+'.ffgraph.txt')).write_text(graph.graph(),encoding='utf8',newline='\n')
+            command=[executable,'-v','verbose','-filter_complex_threads','1']
+            for path in (back,front):command+=['-f','rawvideo','-pixel_format','gbrapf32le','-video_size',f'{WIDTH}x{HEIGHT}',
+                '-framerate',FPS,'-i',path]
+            result,stderr=run(name+'-actual-float-masked-composite',[*command,'-filter_complex',graph.graph(),'-map','['+target+']',
+                '-fps_mode','passthrough','-pix_fmt','gbrapf32le','-f','rawvideo','pipe:1'],binary=True)
+            check(name+'-all-float-samples-identical-to-original-native-float-decode',result==raw,
+                float_samples_compared=decoded.size,sha256='sha256:'+hashlib.sha256(result).hexdigest())
+            conversions=[s for s in stderr.splitlines() if 'auto-inserting filter' in s]
+            check(name+'-no-automatic-conversion-in-composition',not conversions,automatic_conversions=conversions)
+            master=assets/(name+'-float-master.gbrapf32le');master.write_bytes(result)
+            export_rgb=assets/(name+'-export.gbrpf32le')
+            export_rgb.write_bytes(np.frombuffer(result,dtype='<f4').reshape(FRAMES,4,HEIGHT,WIDTH)[:,:3].tobytes())
+            lossless=assets/(name+'-float-master.mkv')
+            run(name+'-integer-lossless-export',[executable,'-v','error','-f','rawvideo','-pixel_format','gbrpf32le',
+                '-video_size',f'{WIDTH}x{HEIGHT}','-framerate',FPS,'-i',export_rgb,
+                '-vf','zscale=rangein=full:range=full:dither=none,format='+pixel_format,'-c:v','ffv1','-level','3',
+                '-pix_fmt',pixel_format,'-color_range','pc','-colorspace','rgb','-color_primaries','bt709','-color_trc','bt709',lossless])
+            result,unused=run(name+'-integer-lossless-native-decode',[executable,'-v','error','-i',lossless,'-map','0:v:0',
+                '-an','-fps_mode','passthrough','-pix_fmt',pixel_format,'-f','rawvideo','pipe:1'],binary=True)
+            actual=np.frombuffer(result,dtype='<u2').reshape(expected.shape)
+            difference=np.abs(expected.astype(np.int32)-actual.astype(np.int32))
+            metrics={'maximum_code_error':int(difference.max()),'mean_code_error':float(difference.mean()),
+                'mismatched_samples':int(np.count_nonzero(difference)),'samples_compared':int(expected.size),
+                'input_unique_first_frame_green':int(np.unique(expected[0,0]).size),
+                'output_unique_first_frame_green':int(np.unique(actual[0,0]).size)}
+            check(name+'-integer-export-within-one-original-code',metrics['maximum_code_error']<=1,**metrics)
+            check(name+'-integer-export-more-than-8-bit-precision',metrics['output_unique_first_frame_green']>256)
+            browser=assets/(name+'-float-composite.mp4')
+            run(name+'-browser-10bit-export',[executable,'-v','error','-f','rawvideo','-pixel_format','gbrpf32le',
+                '-video_size',f'{WIDTH}x{HEIGHT}','-framerate',FPS,'-i',export_rgb,'-c:v','libx264','-crf','0',
+                '-pix_fmt','yuv444p10le',browser])
+            diagnostic=np.clip(difference[0,0].astype(np.float64)/((1<<bits)-1)*255*64,0,255).astype(np.uint8)
+            old_bytes,unused=run(name+'-old-graph-native-decode',[executable,'-v','error','-i',ROOT/old['graph_master'],
+                '-map','0:v:0','-an','-fps_mode','passthrough','-pix_fmt',pixel_format,'-f','rawvideo','pipe:1'],binary=True)
+            old_array=np.frombuffer(old_bytes,dtype='<u2').reshape(expected.shape)
+            old_diff=np.abs(expected[0,0].astype(np.int32)-old_array[0,0].astype(np.int32))
+            old_diagnostic=np.clip(old_diff.astype(np.float64)/((1<<bits)-1)*255*64,0,255).astype(np.uint8)
+            picture=Image.new('RGB',(WIDTH,HEIGHT*4+80),(16,21,31));draw=ImageDraw.Draw(picture)
+            views=[('0: original (8-bit display only)',np.rint(expected[0,0]/((1<<bits)-1)*255).astype(np.uint8)),
+                ('1: float kernel output (8-bit display only)',np.rint(actual[0,0]/((1<<bits)-1)*255).astype(np.uint8)),
+                ('2: old graph absolute code error, gain x64',old_diagnostic),
+                ('3: float kernel absolute code error, gain x64',diagnostic)]
+            for row,(label,array) in enumerate(views):
+                top=row*(HEIGHT+20);draw.text((4,top+3),label,fill=(240,245,250));picture.paste(Image.fromarray(array).convert('RGB'),(0,top+20))
+            picture.save(assets/(name+'-comparison.png'))
+            gif=assets/(name+'-actual-output.gif')
+            run(name+'-actual-output-GIF',[executable,'-v','error','-i',browser,'-vf',
+                'split[a][b];[a]palettegen[p];[b][p]paletteuse',gif])
+            with Image.open(gif) as image:
+                durations=[]
+                for index in range(image.n_frames):image.seek(index);durations.append(image.info.get('duration',0))
+                check(name+'-GIF-four-actual-decoded-frames',image.n_frames==FRAMES and durations==[250]*FRAMES,
+                    frames=image.n_frames,frame_durations_ms=durations)
+            for role,path in [('lossless',lossless),('browser',browser)]:
+                value,unused=run(name+'-'+role+'-ffprobe',[probe,'-v','error','-count_frames','-show_streams','-show_format',
+                    '-of','json',path]);value=json.loads(value);stream=next(s for s in value['streams'] if s['codec_type']=='video')
+                check(name+'-'+role+'-four-native-frames',int(stream['nb_read_frames'])==FRAMES
+                    and int(stream['width'])==WIDTH and int(stream['height'])==HEIGHT)
+            record['cases'][name]={'original':old['source'],'original_sha256':sha(source),'metrics':metrics,
+                'decode_boundary':'native-zscale-integer-RGB-to-float-RGB; exact opaque-alpha-plane-copy',
+                'export_boundary':'exact-opaque-RGB-plane-copy then native-zscale-float-RGB-to-integer-RGB',
+                'float_graph':graph.metadata(),'lossless':lossless.relative_to(ROOT).as_posix(),
+                'browser':browser.relative_to(ROOT).as_posix(),'GIF':gif.relative_to(ROOT).as_posix(),
+                'old_graph_metrics':old['graph_metrics']};save()
+        record.update(status='passed-independent-float-media-not-editor-integration',native_commands=len(record['calls']))
+    except BaseException as error:record.update(status='failed-preserved',error=repr(error));raise
+    finally:
+        record.update(frozen_after=frozen(),finished_at_utc=datetime.now(timezone.utc).isoformat())
+        record['source_unchanged']=record['frozen_before']==record['frozen_after']
+        record['assets']={p.relative_to(ROOT).as_posix():{'bytes':p.stat().st_size,'sha256':sha(p)}
+            for p in sorted(assets.rglob('*')) if p.is_file()};save()
+        (evidence/'executed-probe.py.txt').write_bytes(Path(__file__).read_bytes())
+    assert record['source_unchanged']
+    print(json.dumps({'status':record['status'],'native_commands':record['native_commands'],
+        'cases':{k:v['metrics'] for k,v in record['cases'].items()}},ensure_ascii=False))
+
+if __name__=='__main__':main()

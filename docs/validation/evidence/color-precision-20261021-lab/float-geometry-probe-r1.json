@@ -1,0 +1,62 @@
+{
+  "native_windows": true,
+  "virtualization": false,
+  "cases": [
+    {
+      "filter": "null",
+      "exit_code": 0,
+      "output_bytes": 8192,
+      "stderr_sha256": "sha256:1d955c59c218ccf98b9c418dc04d67789f4e1938dde086507e9d2a865723cb35",
+      "output_sha256": "sha256:fee418184088d5c9d6a138b89652508a5771a9eb6f36a2ecb7fe031dda5b9974",
+      "samples": 2048,
+      "exactly_on_16bit_grid_fraction": 0.00244140625,
+      "maximum_distance_from_16bit_grid": 0.5,
+      "max_copy_error": 0.0
+    },
+    {
+      "filter": "scale=64:32:flags=bilinear",
+      "exit_code": 0,
+      "output_bytes": 32768,
+      "stderr_sha256": "sha256:ef5823683682c1860cc13f7b6c52544194c4476b48eeb1ffc44242adeee4da9e",
+      "output_sha256": "sha256:8bd91fba8e2677126719d32465750b371b224759e5a23970fc78188078ce9d84",
+      "samples": 8192,
+      "exactly_on_16bit_grid_fraction": 0.9964599609375,
+      "maximum_distance_from_16bit_grid": 0.00390625,
+      "max_copy_error": null
+    },
+    {
+      "filter": "pad=64:32:16:8:color=black@0",
+      "exit_code": 0,
+      "output_bytes": 32768,
+      "stderr_sha256": "sha256:b6b4474a9522a9d6b8b04ec6ae1989e681fd48ee4601d7780c02a61c5a2d61fd",
+      "output_sha256": "sha256:96bf81a1dd28fb14a320e2b5abf7a662271fe65a3f416d47ad52a594f1e0a34d",
+      "samples": 8192,
+      "exactly_on_16bit_grid_fraction": 0.998046875,
+      "maximum_distance_from_16bit_grid": 0.00390625,
+      "max_copy_error": null
+    },
+    {
+      "filter": "rotate=0.123:fillcolor=black@0:ow=64:oh=32",
+      "exit_code": 0,
+      "output_bytes": 32768,
+      "stderr_sha256": "sha256:a54b29dca64060f3e0a84e0119601c3d0562cad2c341129b7cf38b3f3eff942b",
+      "output_sha256": "sha256:de6f28ba4945dc760d078c32d4af0672b6c70c7cc921ea9c05fd4365684833fa",
+      "samples": 8192,
+      "exactly_on_16bit_grid_fraction": 0.8231201171875,
+      "maximum_distance_from_16bit_grid": 0.00390625,
+      "max_copy_error": null
+    },
+    {
+      "filter": "perspective=x0=0:y0=0:x1=W:y1=0:x2=0:y2=H:x3=W:y3=H",
+      "exit_code": 0,
+      "output_bytes": 8192,
+      "stderr_sha256": "sha256:7e4bf34530ca0e0425a988a8723fceb10e87353e78ebbce7d86858cd5f5d7e83",
+      "output_sha256": "sha256:99fbe6d45e2797ece15362024b8e1b2416c4dcb4b2e87c723143f3a23d673b8d",
+      "samples": 2048,
+      "exactly_on_16bit_grid_fraction": 0.99658203125,
+      "maximum_distance_from_16bit_grid": 0.000244140625,
+      "max_copy_error": 0.0035161972045898438
+    }
+  ],
+  "source_sha256": "sha256:fee418184088d5c9d6a138b89652508a5771a9eb6f36a2ecb7fe031dda5b9974"
+}

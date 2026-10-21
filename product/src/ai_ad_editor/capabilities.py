@@ -23,6 +23,22 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'native_float_surface_bundle': {
+                'status':'implemented_with_limits','protocol':'agent-native-clock-float32-bundle-v1',
+                'commands':['surface.export','surface.inspect'],
+                'features':['registered_local_RGB_gray_YCbCr_sources','owned_straight_RGBA_Float32',
+                    'original_int64_frame_index_PTS_duration','explicit_D65_relative_colour_signals',
+                    'BT709_DisplayP3_BT2020_linear_gamut_matrix','explicit_source_transfer_interpretation',
+                    'bounded_static_affine_sampling','independent_alpha','selected_native_frame_window',
+                    'source_tool_implementation_SHA256','atomic_bounded_bundle','readonly_pixel_clock_hash_verification'],
+                'limits':['intermediate_bundle_is_not_an_encoded_movie','not_yet_timeline_render_preview_or_cache_backend',
+                    'YCbCr_requires_matrix_range_siting_and_caller_progressive_declaration',
+                    'BT709_camera_inverse_OETF_differs_from_display_gamma','relative_D65_only_no_absolute_nits_ICC_or_HDR',
+                    'native_prefix_decode_before_selected_window','maximum_2GiB_bundle_not_peak_RSS_acceptance',
+                    'point_bilinear_affine_without_severe_minification_antialiasing_acceptance',
+                    'inspect_verifies_derived_bytes_without_revalidating_original_inputs',
+                    'no_audio_export_natural_HDR_long_file_or_full_CapCut_parity_acceptance'],
+            },
             'nested_native_video_clock': {
                 'status':'implemented_with_limits','protocol':'covering-native-source-half-open-v1',
                 'scope':'registered_native_video_leaves_with_composed_author_time_maps',

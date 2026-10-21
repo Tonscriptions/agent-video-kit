@@ -1,0 +1,60 @@
+ffmpeg version 8.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers
+  built with gcc 15.2.0 (Rev11, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-cairo --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-liboapv --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libsvtjpegxs --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper
+  libavutil      60. 26.100 / 60. 26.100
+  libavcodec     62. 28.100 / 62. 28.100
+  libavformat    62. 12.100 / 62. 12.100
+  libavdevice    62.  3.100 / 62.  3.100
+  libavfilter    11. 14.100 / 11. 14.100
+  libswscale      9.  5.100 /  9.  5.100
+  libswresample   6.  3.100 /  6.  3.100
+Input #0, matroska,webm, from 'E:\dev\sandbox\AI广告剪辑\product\.runtime\color-precision-lab-20261021\docs\assets\color-precision-20261021-lab\native-source-media-r1\background-16bit.mkv':
+  Metadata:
+    ENCODER         : Lavf62.12.100
+  Duration: 00:00:02.00, start: 0.000000, bitrate: 461 kb/s
+  Stream #0:0: Video: ffv1, 1 reference frame, yuv444p16le(pc, bt709, progressive), 160x96, 10 fps, 10 tbr, 1k tbn
+    Metadata:
+      ENCODER         : Lavc62.28.100 ffv1
+      DURATION        : 00:00:02.000000000
+[out#0/rawvideo @ 00000243409efb40] Adding streams from explicit maps...
+[vost#0:0/rawvideo @ 00000243409f6740] Created video stream from input stream 0:0
+Stream mapping:
+  Stream #0:0 -> #0:0 (ffv1 (native) -> rawvideo (native))
+[vost#0:0/rawvideo @ 00000243409f6740] Starting thread...
+[vf#0:0 @ 0000024340a74580] Starting thread...
+[vist#0:0/ffv1 @ 0000024340a72e00] [dec:ffv1 @ 00000243409ffbc0] Starting thread...
+[in#0/matroska,webm @ 00000243409e8640] Starting thread...
+Press [q] to stop, [?] for help
+[graph -1 input from stream 0:0 @ 000002434121dbc0] w:160 h:96 pixfmt:yuv444p16le tb:1/1000 fr:10/1 sar:0/1 csp:bt709 range:pc alpha:unspecified
+Output #0, rawvideo, to 'pipe:1':
+  Metadata:
+    encoder         : Lavf62.12.100
+  Stream #0:0: Video: rawvideo, 1 reference frame (Y3[0][16] / 0x10003359), yuv444p16le(pc, bt709, progressive), 160x96, q=2-31, 7372 kb/s, 10 fps, 10 tbn
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+      DURATION        : 00:00:02.000000000
+[out#0/rawvideo @ 00000243409efb40] Starting thread...
+[in#0/matroska,webm @ 00000243409e8640] EOF while reading input
+[in#0/matroska,webm @ 00000243409e8640] Terminating thread with return code 0 (success)
+[vist#0:0/ffv1 @ 0000024340a72e00] [dec:ffv1 @ 00000243409ffbc0] Decoder thread received EOF packet
+[vist#0:0/ffv1 @ 0000024340a72e00] [dec:ffv1 @ 00000243409ffbc0] Decoder returned EOF, finishing
+[vf#0:0 @ 0000024340a74580] Filtergraph returned EOF, finishing
+[vf#0:0 @ 0000024340a74580] All consumers returned EOF
+[vost#0:0/rawvideo @ 00000243409f6740] [enc:rawvideo @ 00000243409a9040] Encoder thread received EOF
+[vost#0:0/rawvideo @ 00000243409f6740] Terminating thread with return code 0 (success)
+[vf#0:0 @ 0000024340a74580] Terminating thread with return code 0 (success)
+[vist#0:0/ffv1 @ 0000024340a72e00] [dec:ffv1 @ 00000243409ffbc0] Terminating thread with return code 0 (success)
+[out#0/rawvideo @ 00000243409efb40] All streams finished
+[out#0/rawvideo @ 00000243409efb40] Terminating thread with return code 0 (success)
+[AVIOContext @ 000002434121a040] Statistics: 1843200 bytes written, 0 seeks, 60 writeouts
+[out#0/rawvideo @ 00000243409efb40] Output file #0 (pipe:1):
+[out#0/rawvideo @ 00000243409efb40]   Output stream #0:0 (video): 20 frames encoded; 20 packets muxed (1843200 bytes); 
+[out#0/rawvideo @ 00000243409efb40]   Total: 20 packets (1843200 bytes) muxed
+[out#0/rawvideo @ 00000243409efb40] video:1800KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.000000%
+frame=   20 fps=0.0 q=-0.0 Lsize=    1800KiB time=00:00:02.00 bitrate=7372.8kbits/s speed= 149x elapsed=0:00:00.01    
+[in#0/matroska,webm @ 00000243409e8640] Input file #0 (E:\dev\sandbox\AI广告剪辑\product\.runtime\color-precision-lab-20261021\docs\assets\color-precision-20261021-lab\native-source-media-r1\background-16bit.mkv):
+[in#0/matroska,webm @ 00000243409e8640]   Input stream #0:0 (video): 20 packets read (114482 bytes); 20 frames decoded; 0 decode errors; 
+[in#0/matroska,webm @ 00000243409e8640]   Total: 20 packets (114482 bytes) demuxed
+[AVIOContext @ 00000243409e9880] Statistics: 115450 bytes read, 0 seeks
+
+Exiting with exit code 0

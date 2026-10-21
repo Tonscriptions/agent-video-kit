@@ -1,0 +1,58 @@
+[
+  {
+    "filter": "zscale=rangein=full:range=full:dither=none,format=gbrp16le",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-v",
+      "verbose",
+      "-f",
+      "rawvideo",
+      "-pixel_format",
+      "gbrpf32le",
+      "-video_size",
+      "1024x64",
+      "-framerate",
+      "4",
+      "-i",
+      "product\\.runtime\\color-precision-lab-20261021\\product\\.runtime\\temp\\float-rgb-probe-r2.gbrpf32le",
+      "-vf",
+      "zscale=rangein=full:range=full:dither=none,format=gbrp16le",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "unique": 65536,
+    "maximum_code_error": 0,
+    "all_codes_equal": true,
+    "output_sha256": "sha256:917c3247d017463030d37462b7cdb5460a442a6b03622d3c6ed32d2a44b23488"
+  },
+  {
+    "filter": "format=gbrp16le",
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-v",
+      "verbose",
+      "-f",
+      "rawvideo",
+      "-pixel_format",
+      "gbrpf32le",
+      "-video_size",
+      "1024x64",
+      "-framerate",
+      "4",
+      "-i",
+      "product\\.runtime\\color-precision-lab-20261021\\product\\.runtime\\temp\\float-rgb-probe-r2.gbrpf32le",
+      "-vf",
+      "format=gbrp16le",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "exit_code": 0,
+    "unique": 56282,
+    "maximum_code_error": 4,
+    "all_codes_equal": false,
+    "output_sha256": "sha256:cadd13171576decab4d4f69348e07da8b17c81a58f0c39e9a6aec0a658ee6871"
+  }
+]

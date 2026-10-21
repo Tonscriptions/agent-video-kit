@@ -1,0 +1,59 @@
+"""Retain the actual native YUV range negotiation failure and controls."""
+from datetime import datetime,timezone
+import argparse
+import hashlib,json
+from pathlib import Path
+import shutil,subprocess
+import numpy as np
+
+ROOT=Path(__file__).resolve().parents[1]
+def sha(data):return 'sha256:'+hashlib.sha256(data).hexdigest()
+def main():
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--revision',required=True);args=parser.parse_args()
+    REL=ROOT/'docs/validation/evidence/color-precision-20261021-lab'/('yuv-range-probe-'+args.revision)
+    ASSETS=ROOT/'docs/assets/color-precision-20261021-lab'/('yuv-range-probe-'+args.revision)
+    assert not REL.exists() and not ASSETS.exists();REL.mkdir(parents=True);ASSETS.mkdir(parents=True)
+    record={'status':'running','started_at_utc':datetime.now(timezone.utc).isoformat(),'calls':[],
+        'source_script_sha256':sha(Path(__file__).read_bytes()),'native_windows':True,'virtualization':False,'network':False,
+        'rights':'Original exhaustive 16-bit neutral YCbCr ramps. CC0-1.0.','editor_integrated':False,'HDR_accepted':False}
+    ffmpeg=shutil.which('ffmpeg');ffprobe=shutil.which('ffprobe');assert ffmpeg and ffprobe
+    def save():(REL/'verification.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+    def run(label,command):
+        p=subprocess.run(list(map(str,command)),capture_output=True,timeout=120,creationflags=subprocess.CREATE_NO_WINDOW)
+        (REL/(label+'.stderr.log')).write_bytes(p.stderr)
+        record['calls'].append({'label':label,'command':list(map(str,command)),'exit_code':p.returncode,
+            'stderr_sha256':sha(p.stderr),'stdout_sha256':sha(p.stdout),'stdout_bytes':len(p.stdout),
+            'auto_conversions':[s for s in p.stderr.decode('utf8','replace').splitlines() if 'auto_' in s or 'range:' in s]});save()
+        assert p.returncode==0,p.stderr[-2500:].decode('utf8','replace');return p.stdout
+    y=np.arange(65536,dtype='<u2').reshape(64,1024);c=np.full_like(y,32768)
+    native=np.stack((y,c,c));raw=ASSETS/'original.yuv444p16le';raw.write_bytes(native.tobytes()*2)
+    record['original_raw_sha256']=sha(raw.read_bytes());record['cases']={};save()
+    try:
+        for input_range in ('unspecified','pc','complete'):
+            source=ASSETS/(input_range+'-input.nut')
+            run(input_range+'-encode',[ffmpeg,'-v','verbose','-f','rawvideo','-pixel_format','yuv444p16le','-video_size','1024x64','-framerate','8',
+                *([] if input_range=='unspecified' else ['-color_range','pc']),
+                *(['-colorspace','bt709','-color_primaries','bt709','-color_trc','bt709'] if input_range=='complete' else []),
+                '-i',raw,'-vf',"setpts='(N*3/8+5)/TB'",'-fps_mode','passthrough',
+                '-c:v','ffv1','-level','3','-color_range','pc','-colorspace','bt709','-color_primaries','bt709','-color_trc','bt709',source])
+            info=run(input_range+'-probe',[ffprobe,'-v','error','-show_streams','-show_format','-of','json',source])
+            (REL/(input_range+'-probe.json')).write_bytes(info)
+            for output_range in ('unspecified','pc','tv'):
+                label=input_range+'-to-'+output_range
+                data=run(label,[ffmpeg,'-v','verbose','-noautorotate','-i',source,'-map','0:v:0','-an','-sn','-dn',
+                    '-frames:v','2','-fps_mode','passthrough','-pix_fmt','yuv444p16le',
+                    *([] if output_range=='unspecified' else ['-color_range',output_range]),'-f','rawvideo','pipe:1'])
+                p=ASSETS/(label+'.yuv444p16le');p.write_bytes(data)
+                actual=np.frombuffer(data,'<u2').reshape(2,3,64,1024);expected=np.repeat(native[None],2,0)
+                delta=np.abs(actual.astype(np.int64)-expected.astype(np.int64))
+                record['cases'][label]={'all_original_codes_equal':data==expected.tobytes(),
+                    'maximum_code_error':int(delta.max()),'mean_code_error':float(delta.mean()),
+                    'first_frame_Y_unique':np.unique(actual[0,0]).size,'first_frame_Y_min':int(actual[0,0].min()),
+                    'first_frame_Y_max':int(actual[0,0].max()),'decoded_path':p.relative_to(ROOT).as_posix(),'sha256':sha(data)};save()
+        record['status']='completed-native-range-controls-not-editor-integration'
+    except BaseException as exc:record.update(status='failed-preserved',exception=repr(exc));raise
+    finally:
+        record['assets']=[{'path':p.relative_to(ROOT).as_posix(),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())} for p in ASSETS.iterdir() if p.is_file()]
+        record['finished_at_utc']=datetime.now(timezone.utc).isoformat();save();(REL/'executed.script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'status':record['status'],'cases':record['cases']}))
+if __name__=='__main__':main()

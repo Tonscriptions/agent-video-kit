@@ -1,0 +1,34 @@
+"""Build and check an unpublished documentation/17-Skill overlay."""
+from datetime import datetime,timezone
+import json,re
+from pathlib import Path
+from float_release_docs import ROOT,MAIN,REL,LATEST_DOCS,documents,skills,local_links
+from run_frozen_regression import frozen,sha
+
+def main():
+    destination=ROOT/'product/.runtime/color-precision-20261021/release-preview-r3'
+    output=ROOT/REL/'release-preview-r3.json'
+    assert not destination.exists() and not output.exists();destination.mkdir(parents=True)
+    before=frozen();assert len(before)==282
+    documents(destination);names=skills(destination)
+    paths=[*LATEST_DOCS,*('skills/'+name+'/SKILL.md' for name in names)]
+    links=local_links(destination,paths)
+    # Research already completed: preserve both blocks exactly, including media.
+    original=(MAIN/'README.md').read_text('utf8');new=(destination/'README.md').read_text('utf8')
+    markers=('OPENFILM','R14','R15')
+    preserved=[]
+    for match in re.finditer(r'<!-- ([^\n]+) -->[\s\S]*?<!-- /\1 -->',original):
+        if any(token in match[1].upper() for token in markers):
+            assert match[0] in new;preserved.append(match[1])
+    assert len(preserved)>=2
+    assert frozen()==before
+    record={'status':'passed-unpublished-document-and-17-Skill-preview','at_utc':datetime.now(timezone.utc).isoformat(),
+        'generator_sha256':sha(Path(__file__)),'document_generator_sha256':sha(Path(__file__).with_name('float_release_docs.py')),
+        'preview_root':str(destination),'documents':{name:sha(destination/name) for name in paths},
+        'local_links':links,'OpenFilm_preserved_blocks':preserved,'frozen_equal':True,
+        'main_integrated':False,'registered_Skills_changed':False,'full_suite_passed':False,'published':False}
+    output.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    output.with_suffix('.executed.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'status':record['status'],'documents':len(paths),'links':len(links),'OpenFilm_blocks':len(preserved)}))
+
+if __name__=='__main__':main()

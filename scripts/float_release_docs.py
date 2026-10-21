@@ -1,0 +1,119 @@
+"""Prepare V92 documentation/Skills overlays using actual independent receipts."""
+from pathlib import Path
+import json,re,shutil
+from urllib.parse import unquote
+from run_frozen_regression import sha
+
+ROOT=Path(__file__).resolve().parents[1]
+MAIN=Path('E:/dev/sandbox/AI广告剪辑')
+REL='docs/validation/evidence/color-precision-20261021-lab'
+ASSETS='docs/assets/color-precision-20261021-lab'
+REPORT='docs/validation/浮点表面合成与高精度边界独立实测_2026-10-22.md'
+CONTRACT='docs/specs/浮点表面合成与高精度边界_实验_v0.1_2026-10-22.md'
+GUIDE='docs/Agent浮点帧包CLI使用与验收边界_2026-10-22.md'
+MARKER='V92-NATIVE-FLOAT-SURFACE'
+LATEST_DOCS=('README.md','docs/README.md','docs/产品需求与开发路线基线_2026-10-12.md','docs/构建进度总表_2026-10-16.md',
+    'docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md','docs/Concat与剪映功能差异矩阵_2026-10-12.md',
+    'docs/specs/AgentCLI契约_v0.1_2026-10-13.md')
+SKILLS=('video-cut-agent-editor','video-cut-timeline','video-cut-project-ops','video-cut-quality')
+
+def write(p,t):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(t.rstrip()+'\n',encoding='utf8',newline='\n')
+def block(p,t):
+    original=p.read_text('utf8');replacement='<!-- '+MARKER+' -->\n'+t.rstrip()+'\n<!-- /'+MARKER+' -->'
+    pattern=re.escape('<!-- '+MARKER+' -->')+'.*?'+re.escape('<!-- /'+MARKER+' -->')
+    if re.search(pattern,original,re.S):original=re.sub(pattern,lambda _:replacement,original,flags=re.S)
+    else:
+        first,body=original.split('\n',1);original=first+'\n\n'+replacement+'\n'+body
+    write(p,original)
+
+def link_paths(t,name):
+    prefix='../'*(len(Path(name).parts)-1)
+    return re.sub(r'(!?\[[^\]]*\]\()docs/',lambda m:m[1]+prefix+'docs/',t)
+
+def actual_full(full):
+    if full is None:return '完整2234项原生回归正在运行，尚未通过；当前为待发布文档预览。'
+    assert full['status']=='passed' and full['terminal_ok'] and full['methods']==2234 and full['skipped']==0
+    assert full['frozen_before']==full['frozen_after'] and len(full['frozen_before'])==282
+    return '完整原生回归 **2234方法 /'+format(full['suite_seconds'],'.3f')+'秒 /0跳过**；282产品输入、8外部夹具、17启动时脚本及9依赖文件保持相同。'
+
+def documents(destination,full=None):
+    destination=Path(destination).resolve();assert destination.is_relative_to(ROOT/'product/.runtime') or destination==MAIN
+    if destination==MAIN:assert full is not None
+    installed=json.loads((ROOT/REL/'installed-r1/verification.json').read_bytes())
+    assert installed['status'].startswith('passed-fresh-eight-wheel') and installed['isolated_methods']['methods']==117
+    status=actual_full(full)
+    readme=f'''### V92 Agent原生浮点帧包与线性光核心
+
+{status} `surface export / inspect`提供原始帧时钟与Float32像素数据。默认时间线render、preview和缓存尚未采用该核心；完整剪映等价、ICC/PQ/HLG/HDR和自然素材验收仍未完成。
+
+| 编号 | 功能性核验 | 实际执行内容与限制 | 证据 |
+|---|---|---|---|
+| V92-01 | Float32合成与alpha | 28个可分离、4个非分离混合模式；蒙版/opacity只改覆盖率；16-bit码格逻辑运算单独声明。r11浮点专项86项通过，非完整门禁 | [规格]({CONTRACT}) · [r11]({REL}/kernel-r11.json) |
+| V92-02 | 10/16-bit原实现对照 | 相同原创原片的旧CLI全幅蒙版只保留220灰阶；独立浮点链分别保留1024/65536灰阶且全样本0码误差。原不透明直通/crop对照约保留10-bit，不把所有旧渲染称8-bit | [原片/原始before]({REL}/before-r5/verification.json) · [独立核心after]({REL}/float-media-r2/verification.json) |
+| V92-03 | 原生RGB/YUV与源时钟 | 8–16位整数、Float16/32 RGB/灰度；显式矩阵/量程/六种色度位置的YCbCr；源PTS/时长/VFR保留。仅支持公布格式，逐行由调用方声明 | [报告]({REPORT}) |
+| V92-04 | 信号转换与仿射 | 相对D65三原色族、五传递函数；线性光合成；预乘域双线性/点采样，透明外部。独立已发表XYZ/标量/全帧参考；不做物理白/绝对亮度、ICC或HDR | [当前17份源码]({REL}/implementation-r3/manifest.json) |
+| V92-05 | Agent CLI帧包 | `surface export/inspect`，Float32 RGBA、int64原始时钟、有界JSON；源选区、静态逆仿射、预算/取消/新目录原子提交；只读inspect不重新核验源 | [命令与读取方式]({GUIDE}) |
+| V92-06 | 真实子进程CLI媒体 | 15次CLI、12条脚本级原生命令、另1次核心图进程；34检查、18资产。四包20/20/20/5帧，所有RGB和源时钟按独立参考核对 | [真实调用及SHA]({REL}/surface-cli-media-r1/verification.json) |
+| V92-07 | 原视频/MP4/GIF | 两段实际线性管线输出各20帧/10fps/2秒；全部16-bit回写≤1码，逐PTS和GIF逐100ms。影片由独立核心管线生成，surface命令本身不编码电影 | [原生RGB原片]({ASSETS}/native-source-media-r1/foreground-16bit.mkv) · [原生YUV原片]({ASSETS}/native-source-media-r1/background-16bit.mkv) · [实际仿射MP4]({ASSETS}/surface-cli-media-r1/affine.mp4) · [16-bit无损]({ASSETS}/surface-cli-media-r1/affine-linear-composite-16bit.mkv) |
+| V92-08 | 实际抽帧目检 | view_image查看原始/仿射两段0/9/19，共6小尺寸帧；角度、缩放、透明棋盘符合预期，未见明显黑边。未连续播放/试听，不作自然素材结论 | [已查看记录]({REL}/surface-cli-review-r1/reviewed.json) |
+| V92-09 | 全新离线安装 | 8轮；171资源source/wheel/site相等，NumPy931原文件及许可相同；117项/288.585s/0跳过，213运行模块均在安装site；18次子进程CLI；四包像素/时钟及合成RGBA与开发版一致 | [新安装收据]({REL}/installed-r1/verification.json) · [安装版新媒体]({REL}/surface-cli-media-installed-r1/verification.json) |
+| V92-10 | 真实失败与修复边界 | FFmpeg自动预乘、原片错误色彩标签、r9两项Float32参考舍入断言及文档收据层级错误均留证；后两项不改生产算法，不用通过数替代质量 | [失败/控制/源码纪元]({REPORT}) |
+| V92-11 | 已发布父版与完整门禁 | V91 18f5dc76 /2148已发布；只迁入两个队列修复文件，再执行完整2234；历史专项与当轮完整/安装分别计数 | [迁移]({REL}/parent-rebase-r1.json) |
+| V92-12 | OpenFilm复用降本 | 已适配HTML/看帧/字幕/模板字段/缓存/编码器/诊断；保留14候选取舍。当前新增浮点核心是本项目实现，OpenFilm不补齐离线算法或HDR质量 | [R14成本与拆取清单](docs/OpenFilm可拆模块与现有内核降本清单_2026-10-21.md) · [R15增量复核](docs/OpenFilm新增提交与复用结论更新_2026-10-21.md) |
+
+![真实CLI帧包经独立线性核心合成的输出，非默认时间线after]({ASSETS}/surface-cli-media-r1/affine.gif)
+
+![两段实际MP4的0/9/19帧，未作连续播放验收]({ASSETS}/surface-cli-review-r1/actual-MP4-frames-0-9-19.png)
+'''
+    small=f'''V92新增Agent原生浮点帧包CLI和独立线性光核心。{status}
+
+| 编号 | 已执行 | 当前边界 |
+|---|---|---|
+| F32-01 | 八模块/七测试，86项专项；三原色/五传递函数、原生RGB/YUV/alpha及VFR时钟、仿射、32混合模式 | 相对D65；未做ICC/PQ/HLG/HDR、自然素材或全剪映等价 |
+| F32-02 | 真实CLI15次、34检查；20/20/20/5帧包；两段20帧/10fps/2s MP4/GIF与16-bit回写 | surface为中间数据，电影由独立核心脚本编码 |
+| F32-03 | 新八轮离线安装117项/0跳过，171资源与931 NumPy文件相同，213模块来源核验 | 安装版实际帧包和合成RGBA与开发版相同；默认时间线/预览/缓存未采用浮点核心 |
+
+[规格]({CONTRACT}) · [实际测试/原片/GIF/失败]({REPORT}) · [Agent命令]({GUIDE}) · [安装证据]({REL}/installed-r1/verification.json)。OpenFilm R14/R15复用结论保留，不重复计工或计测试。'''
+    for name in LATEST_DOCS:
+        target=destination/name
+        if destination!=MAIN:
+            target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(MAIN/name,target)
+        block(target,link_paths(readme if name=='README.md' else small,name))
+    if full is not None:
+        full_link=f'\n\n完整回归：[2234方法实际终态]({REL}/full-r1.json) · [额外冻结门禁]({REL}/complete-gate-r1.json)。'
+        for name in LATEST_DOCS:
+            p=destination/name;t=p.read_text('utf8');ending='<!-- /'+MARKER+' -->'
+            t=t.replace(ending,link_paths(full_link,name)+'\n'+ending,1);write(p,t)
+
+def skills(destination):
+    destination=Path(destination).resolve();assert destination.is_relative_to(ROOT/'product/.runtime') or destination==MAIN
+    names=sorted(p.name for p in (MAIN/'skills').glob('video-cut-*') if (p/'SKILL.md').is_file());assert len(names)==17
+    for name in names:
+        if destination!=MAIN:shutil.copytree(MAIN/'skills'/name,destination/'skills'/name)
+    text='''Use advertised native_float_surface_bundle / agent-native-clock-float32-bundle-v1 for explicit local Float32 frame data.
+`surface export --project P --asset-id A --output renders/NEW --source-primaries bt709 --source-transfer bt709-oetf --working-primaries bt709 --working-transfer linear --dry-run` plans without pixel decode/index creation. Run without --dry-run only into a new owned directory.
+For native YCbCr, supply --pixel-family yuv plus matrix/range/chroma-location and --scan progressive. These are caller declarations, not automatic colour/scan verification. Unsupported native formats reject; do not route them silently through 8-bit conversion.
+Respect source SHA, explicit alpha association, optional source-frame half-open selection, original PTS/time_base, inverse-affine JSON, cancellation, 2GiB output estimate and 64MiB disk headroom. The estimate is not peak RSS or real-time performance.
+Read frames.rgba-f32le as interleaved straight RGBA and clock.i64le as original source-index/PTS/duration triples. `surface inspect` verifies derived layout/content/clock only; original_inputs_revalidated=false. Do not treat editable SHA metadata as an external signature.
+Relative D65 primaries/transfer conversion preserves independent alpha and finite negative/over-one RGB. It does not establish ICC, chromatic adaptation, physical white/nits, PQ/HLG/HDR or natural quality acceptance. A late selected source window may still decode earlier frames.
+This is a public intermediate-data interface. Default render/preview/cache and general timeline effects have not adopted this surface backend. Independent core MP4/GIF exports must be labelled accordingly.
+Read the [float surface contract](../../docs/specs/浮点表面合成与高精度边界_实验_v0.1_2026-10-22.md), [actual independent/native/installed evidence](../../docs/validation/浮点表面合成与高精度边界独立实测_2026-10-22.md), and [CLI/readback guide](../../docs/Agent浮点帧包CLI使用与验收边界_2026-10-22.md).'''
+    for name in SKILLS:
+        p=destination/'skills'/name/'SKILL.md';original=p.read_text('utf8')
+        assert original.startswith('---\n');end=original.index('\n---',4)+4
+        replacement='\n\n<!-- '+MARKER+' -->\n'+text+'\n<!-- /'+MARKER+' -->'
+        write(p,original[:end]+replacement+original[end:])
+    return names
+
+def local_links(destination,paths):
+    destination=Path(destination).resolve();rows=[]
+    for name in paths:
+        p=destination/name
+        for link in re.findall(r'!?\[[^\]]*\]\(([^)]+)\)',p.read_text('utf8')):
+            if link.startswith(('https:','http:','app:','codex:','#')):continue
+            relative=(p.parent/unquote(link.split('#',1)[0].strip('<>'))).resolve().relative_to(destination)
+            candidates=[destination/relative,ROOT/relative,MAIN/relative]
+            resolved=next((q for q in candidates if q.exists()),None)
+            assert resolved is not None,(name,link)
+            rows.append({'document':name,'target':relative.as_posix(),'checked_at':str(resolved)})
+    return rows

@@ -1,0 +1,57 @@
+ffmpeg version 8.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers
+  built with gcc 15.2.0 (Rev11, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-cairo --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-liboapv --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libsvtjpegxs --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper
+  libavutil      60. 26.100 / 60. 26.100
+  libavcodec     62. 28.100 / 62. 28.100
+  libavformat    62. 12.100 / 62. 12.100
+  libavdevice    62.  3.100 / 62.  3.100
+  libavfilter    11. 14.100 / 11. 14.100
+  libswscale      9.  5.100 /  9.  5.100
+  libswresample   6.  3.100 /  6.  3.100
+[in#0/rawvideo @ 000001766a28a400] Estimating duration from bitrate, this may be inaccurate
+Input #0, rawvideo, from 'E:\dev\sandbox\AI广告剪辑\product\.runtime\color-precision-lab-20261021\docs\assets\color-precision-20261021-lab\native-source-media-r1\foreground.gbrap16le':
+  Duration: 00:00:02.00, start: 0.000000, bitrate: 9830 kb/s
+  Stream #0:0: Video: rawvideo, 1 reference frame (G4[0][16] / 0x10003447), gbrap16le, 160x96, 9830 kb/s, 10 tbr, 10 tbn
+[out#0/matroska @ 000001766a2b5d40] No explicit maps, mapping streams automatically...
+[vost#0:0/ffv1 @ 000001766a2b7080] Created video stream from input stream 0:0
+Stream mapping:
+  Stream #0:0 -> #0:0 (rawvideo (native) -> ffv1 (native))
+[vost#0:0/ffv1 @ 000001766a2b7080] Starting thread...
+[vf#0:0 @ 000001766a2bef80] Starting thread...
+[vist#0:0/rawvideo @ 000001766a2884c0] [dec:rawvideo @ 000001766a2bf840] Starting thread...
+[in#0/rawvideo @ 000001766a2899c0] Starting thread...
+Press [q] to stop, [?] for help
+[graph -1 input from stream 0:0 @ 000001766a33fec0] w:160 h:96 pixfmt:gbrap16le tb:1/10 fr:10/1 sar:0/1 csp:unknown range:unknown alpha:unspecified
+[graph -1 input from stream 0:0 @ 000001766a33fec0] video frame properties congruent with link at pts_time: 0
+[ffv1 @ 000001766a2b88c0] high bits_per_raw_sample, forcing range coder
+Output #0, matroska, to 'E:\dev\sandbox\AI广告剪辑\product\.runtime\color-precision-lab-20261021\docs\assets\color-precision-20261021-lab\native-source-media-r1\foreground-16bit.mkv':
+  Metadata:
+    encoder         : Lavf62.12.100
+  Stream #0:0: Video: ffv1, 1 reference frame (FFV1 / 0x31564646), gbrap16le(pc, gbr/unknown/unknown, progressive), 160x96, q=2-31, 200 kb/s, 10 fps, 1k tbn
+    Metadata:
+      encoder         : Lavc62.28.100 ffv1
+[out#0/matroska @ 000001766a2b5d40] Starting thread...
+[in#0/rawvideo @ 000001766a2899c0] EOF while reading input
+[in#0/rawvideo @ 000001766a2899c0] Terminating thread with return code 0 (success)
+[vist#0:0/rawvideo @ 000001766a2884c0] [dec:rawvideo @ 000001766a2bf840] Decoder thread received EOF packet
+[vist#0:0/rawvideo @ 000001766a2884c0] [dec:rawvideo @ 000001766a2bf840] Decoder returned EOF, finishing
+[vist#0:0/rawvideo @ 000001766a2884c0] [dec:rawvideo @ 000001766a2bf840] Terminating thread with return code 0 (success)
+[vf#0:0 @ 000001766a2bef80] Filtergraph returned EOF, finishing
+[vf#0:0 @ 000001766a2bef80] All consumers returned EOF
+[vf#0:0 @ 000001766a2bef80] Terminating thread with return code 0 (success)
+[vost#0:0/ffv1 @ 000001766a2b7080] [enc:ffv1 @ 000001766a248c80] Encoder thread received EOF
+[vost#0:0/ffv1 @ 000001766a2b7080] Terminating thread with return code 0 (success)
+[out#0/matroska @ 000001766a2b5d40] All streams finished
+[out#0/matroska @ 000001766a2b5d40] Terminating thread with return code 0 (success)
+[AVIOContext @ 000001766a3019c0] Statistics: 47864 bytes written, 0 seeks, 1 writeouts
+[out#0/matroska @ 000001766a2b5d40] Output file #0 (E:\dev\sandbox\AI广告剪辑\product\.runtime\color-precision-lab-20261021\docs\assets\color-precision-20261021-lab\native-source-media-r1\foreground-16bit.mkv):
+[out#0/matroska @ 000001766a2b5d40]   Output stream #0:0 (video): 20 frames encoded; 20 packets muxed (46905 bytes); 
+[out#0/matroska @ 000001766a2b5d40]   Total: 20 packets (46905 bytes) muxed
+[out#0/matroska @ 000001766a2b5d40] video:46KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 2.044558%
+frame=   20 fps=0.0 q=-0.0 Lsize=      47KiB time=00:00:02.00 bitrate= 191.5kbits/s speed= 136x elapsed=0:00:00.01    
+[in#0/rawvideo @ 000001766a2899c0] Input file #0 (E:\dev\sandbox\AI广告剪辑\product\.runtime\color-precision-lab-20261021\docs\assets\color-precision-20261021-lab\native-source-media-r1\foreground.gbrap16le):
+[in#0/rawvideo @ 000001766a2899c0]   Input stream #0:0 (video): 20 packets read (2457600 bytes); 20 frames decoded; 0 decode errors; 
+[in#0/rawvideo @ 000001766a2899c0]   Total: 20 packets (2457600 bytes) demuxed
+[AVIOContext @ 000001766a28aac0] Statistics: 2457600 bytes read, 0 seeks
+
+Exiting with exit code 0

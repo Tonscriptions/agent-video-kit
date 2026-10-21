@@ -1,0 +1,470 @@
+{
+  "status": "completed-native-range-controls-not-editor-integration",
+  "started_at_utc": "2026-10-21T20:16:17.579274+00:00",
+  "calls": [
+    {
+      "label": "unspecified-encode",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "verbose",
+        "-f",
+        "rawvideo",
+        "-pixel_format",
+        "yuv444p16le",
+        "-video_size",
+        "1024x64",
+        "-framerate",
+        "8",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\original.yuv444p16le",
+        "-vf",
+        "setpts='(N*3/8+5)/TB'",
+        "-fps_mode",
+        "passthrough",
+        "-c:v",
+        "ffv1",
+        "-level",
+        "3",
+        "-color_range",
+        "pc",
+        "-colorspace",
+        "bt709",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\unspecified-input.nut"
+      ],
+      "exit_code": 0,
+      "stderr_sha256": "sha256:d8394bbf2287e6800f82881a40d63055abbb1381922a3bb3087b3d50743a7f8c",
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "auto_conversions": [
+        "[graph -1 input from stream 0:0 @ 00000292857cefc0] w:1024 h:64 pixfmt:yuv444p16le tb:1/8 fr:8/1 sar:0/1 csp:unknown range:unknown alpha:unspecified",
+        "[auto_scale_0 @ 00000292857d0b80] w:iw h:ih flags:'' interl:0",
+        "[format @ 00000292857d0940] auto-inserting filter 'auto_scale_0' between the filter 'Parsed_setpts_0' and the filter 'format'",
+        "[auto_scale_0 @ 00000292857d0b80] w:1024 h:64 fmt:yuv444p16le csp:unknown range:unknown sar:0/1 -> w:1024 h:64 fmt:yuv444p16le csp:bt709 range:pc sar:0/1 flags:0x00000004",
+        "[auto_scale_0 @ 00000292857d0b80] [framesync @ 00000292857d4890] Selected 1/8 time base",
+        "[auto_scale_0 @ 00000292857d0b80] [framesync @ 00000292857d4890] Sync level 1",
+        "[auto_scale_0 @ 00000292857d0b80] [framesync @ 00000292857d4890] Sync level 0"
+      ]
+    },
+    {
+      "label": "unspecified-probe",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-show_streams",
+        "-show_format",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\unspecified-input.nut"
+      ],
+      "exit_code": 0,
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "sha256:00e190e63bb2bd83b1273146188057d0d533f9cab1f30e10ebb1421f9ba96411",
+      "stdout_bytes": 2136,
+      "auto_conversions": []
+    },
+    {
+      "label": "unspecified-to-unspecified",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "verbose",
+        "-noautorotate",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\unspecified-input.nut",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-frames:v",
+        "2",
+        "-fps_mode",
+        "passthrough",
+        "-pix_fmt",
+        "yuv444p16le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stderr_sha256": "sha256:1ba07137bc4a865fd0e149a0d8d66159bf0fd5be967e07ec90f6a4061e702b9e",
+      "stdout_sha256": "sha256:7308f49c31b0d03bf3302626237bcc6c30381eccc13768c5b2e7a9ae8729e629",
+      "stdout_bytes": 786432,
+      "auto_conversions": [
+        "[graph -1 input from stream 0:0 @ 000002295b2a4180] w:1024 h:64 pixfmt:yuv444p16le tb:1/65536 fr:8/1 sar:0/1 csp:unknown range:unknown alpha:unspecified"
+      ]
+    },
+    {
+      "label": "unspecified-to-pc",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "verbose",
+        "-noautorotate",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\unspecified-input.nut",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-frames:v",
+        "2",
+        "-fps_mode",
+        "passthrough",
+        "-pix_fmt",
+        "yuv444p16le",
+        "-color_range",
+        "pc",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stderr_sha256": "sha256:fad2de9920447d3774fa6d81f2fe7784dbefb3b7b27ac911d1dc1f2227b99903",
+      "stdout_sha256": "sha256:30607d77517e98dba43c5c2a803d592326e1ed090327f58589fc83aaf6022639",
+      "stdout_bytes": 786432,
+      "auto_conversions": [
+        "[graph -1 input from stream 0:0 @ 00000163a8726d00] w:1024 h:64 pixfmt:yuv444p16le tb:1/65536 fr:8/1 sar:0/1 csp:unknown range:unknown alpha:unspecified",
+        "[auto_scale_0 @ 00000163a8727180] w:iw h:ih flags:'' interl:0",
+        "[format @ 00000163a8727080] auto-inserting filter 'auto_scale_0' between the filter 'Parsed_null_0' and the filter 'format'",
+        "[auto_scale_0 @ 00000163a8727180] w:1024 h:64 fmt:yuv444p16le csp:unknown range:unknown sar:0/1 -> w:1024 h:64 fmt:yuv444p16le csp:unknown range:pc sar:0/1 flags:0x00000004",
+        "[auto_scale_0 @ 00000163a8727180] [framesync @ 00000163a8727290] Selected 1/65536 time base",
+        "[auto_scale_0 @ 00000163a8727180] [framesync @ 00000163a8727290] Sync level 1",
+        "[auto_scale_0 @ 00000163a8727180] [framesync @ 00000163a8727290] Sync level 0"
+      ]
+    },
+    {
+      "label": "unspecified-to-tv",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "verbose",
+        "-noautorotate",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\unspecified-input.nut",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-frames:v",
+        "2",
+        "-fps_mode",
+        "passthrough",
+        "-pix_fmt",
+        "yuv444p16le",
+        "-color_range",
+        "tv",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stderr_sha256": "sha256:25f47e199f27978a0c0f20ceae256aa95477f04adfc57d4b419c45b78a849704",
+      "stdout_sha256": "sha256:7308f49c31b0d03bf3302626237bcc6c30381eccc13768c5b2e7a9ae8729e629",
+      "stdout_bytes": 786432,
+      "auto_conversions": [
+        "[graph -1 input from stream 0:0 @ 000002ad8c9b7940] w:1024 h:64 pixfmt:yuv444p16le tb:1/65536 fr:8/1 sar:0/1 csp:unknown range:unknown alpha:unspecified"
+      ]
+    },
+    {
+      "label": "pc-encode",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "verbose",
+        "-f",
+        "rawvideo",
+        "-pixel_format",
+        "yuv444p16le",
+        "-video_size",
+        "1024x64",
+        "-framerate",
+        "8",
+        "-color_range",
+        "pc",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\original.yuv444p16le",
+        "-vf",
+        "setpts='(N*3/8+5)/TB'",
+        "-fps_mode",
+        "passthrough",
+        "-c:v",
+        "ffv1",
+        "-level",
+        "3",
+        "-color_range",
+        "pc",
+        "-colorspace",
+        "bt709",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\pc-input.nut"
+      ],
+      "exit_code": 0,
+      "stderr_sha256": "sha256:a5c44892ea2c80f9106e3df1887a8ba0616eee39b07cba805ccd35808c2c867e",
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "auto_conversions": [
+        "[graph -1 input from stream 0:0 @ 000001d160390380] w:1024 h:64 pixfmt:yuv444p16le tb:1/8 fr:8/1 sar:0/1 csp:unknown range:pc alpha:unspecified",
+        "[auto_scale_0 @ 000001d160390b80] w:iw h:ih flags:'' interl:0",
+        "[format @ 000001d160390900] auto-inserting filter 'auto_scale_0' between the filter 'Parsed_setpts_0' and the filter 'format'",
+        "[auto_scale_0 @ 000001d160390b80] w:1024 h:64 fmt:yuv444p16le csp:unknown range:pc sar:0/1 -> w:1024 h:64 fmt:yuv444p16le csp:bt709 range:pc sar:0/1 flags:0x00000004",
+        "[auto_scale_0 @ 000001d160390b80] [framesync @ 000001d160394850] Selected 1/8 time base",
+        "[auto_scale_0 @ 000001d160390b80] [framesync @ 000001d160394850] Sync level 1",
+        "[auto_scale_0 @ 000001d160390b80] [framesync @ 000001d160394850] Sync level 0"
+      ]
+    },
+    {
+      "label": "pc-probe",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-show_streams",
+        "-show_format",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\pc-input.nut"
+      ],
+      "exit_code": 0,
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "sha256:f397bcf4f1a7d687bae3733314bd22098e621cdf4e6079f028f22fdb1f9883a6",
+      "stdout_bytes": 2127,
+      "auto_conversions": []
+    },
+    {
+      "label": "pc-to-unspecified",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "verbose",
+        "-noautorotate",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\pc-input.nut",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-frames:v",
+        "2",
+        "-fps_mode",
+        "passthrough",
+        "-pix_fmt",
+        "yuv444p16le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stderr_sha256": "sha256:611a479a12d6f9a5aa98d027fed6fdcc9a8c8167e9af3244f5366a4bbbffc530",
+      "stdout_sha256": "sha256:20fa5a41ea430873a9db3a71c4253092f6b046981b88df162b93362b9f84a9c1",
+      "stdout_bytes": 786432,
+      "auto_conversions": [
+        "[graph -1 input from stream 0:0 @ 000001ffb69564c0] w:1024 h:64 pixfmt:yuv444p16le tb:1/65536 fr:8/1 sar:0/1 csp:unknown range:unknown alpha:unspecified"
+      ]
+    },
+    {
+      "label": "pc-to-pc",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "verbose",
+        "-noautorotate",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\pc-input.nut",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-frames:v",
+        "2",
+        "-fps_mode",
+        "passthrough",
+        "-pix_fmt",
+        "yuv444p16le",
+        "-color_range",
+        "pc",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stderr_sha256": "sha256:f8091e6e3f2d2ffa4523adb60e041942aacc03f5fdd6db38ec999bcd3ff87cea",
+      "stdout_sha256": "sha256:9faef4bb753b8d18c7c970036314fdf8d4d9d15b49a4857c6d2619b7aa471302",
+      "stdout_bytes": 786432,
+      "auto_conversions": [
+        "[graph -1 input from stream 0:0 @ 0000019e85966940] w:1024 h:64 pixfmt:yuv444p16le tb:1/65536 fr:8/1 sar:0/1 csp:unknown range:unknown alpha:unspecified",
+        "[auto_scale_0 @ 0000019e85966ec0] w:iw h:ih flags:'' interl:0",
+        "[format @ 0000019e85966d80] auto-inserting filter 'auto_scale_0' between the filter 'Parsed_null_0' and the filter 'format'",
+        "[auto_scale_0 @ 0000019e85966ec0] w:1024 h:64 fmt:yuv444p16le csp:unknown range:unknown sar:0/1 -> w:1024 h:64 fmt:yuv444p16le csp:unknown range:pc sar:0/1 flags:0x00000004",
+        "[auto_scale_0 @ 0000019e85966ec0] [framesync @ 0000019e8645dbd0] Selected 1/65536 time base",
+        "[auto_scale_0 @ 0000019e85966ec0] [framesync @ 0000019e8645dbd0] Sync level 1",
+        "[auto_scale_0 @ 0000019e85966ec0] [framesync @ 0000019e8645dbd0] Sync level 0"
+      ]
+    },
+    {
+      "label": "pc-to-tv",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "verbose",
+        "-noautorotate",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\yuv-range-probe-r1\\pc-input.nut",
+        "-map",
+        "0:v:0",
+        "-an",
+        "-sn",
+        "-dn",
+        "-frames:v",
+        "2",
+        "-fps_mode",
+        "passthrough",
+        "-pix_fmt",
+        "yuv444p16le",
+        "-color_range",
+        "tv",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stderr_sha256": "sha256:1de917941a58b56e2c9d870809018c5d5391d37f7186a422ed82675858f60868",
+      "stdout_sha256": "sha256:20fa5a41ea430873a9db3a71c4253092f6b046981b88df162b93362b9f84a9c1",
+      "stdout_bytes": 786432,
+      "auto_conversions": [
+        "[graph -1 input from stream 0:0 @ 00000228edda69c0] w:1024 h:64 pixfmt:yuv444p16le tb:1/65536 fr:8/1 sar:0/1 csp:unknown range:unknown alpha:unspecified"
+      ]
+    }
+  ],
+  "source_script_sha256": "sha256:8bc4fa157f7f5365afecd18430e1e2bc828613021fe1bdb6c919a235ebeb4a6a",
+  "native_windows": true,
+  "virtualization": false,
+  "network": false,
+  "rights": "Original exhaustive 16-bit neutral YCbCr ramps. CC0-1.0.",
+  "editor_integrated": false,
+  "HDR_accepted": false,
+  "original_raw_sha256": "sha256:65edf89b70c3a2e255e778b62f83bbc7e84968d98774c80e57e36caab006edca",
+  "cases": {
+    "unspecified-to-unspecified": {
+      "all_original_codes_equal": false,
+      "maximum_code_error": 5378,
+      "mean_code_error": 804.4582316080729,
+      "first_frame_Y_unique": 49651,
+      "first_frame_Y_min": 0,
+      "first_frame_Y_max": 65535,
+      "decoded_path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/unspecified-to-unspecified.yuv444p16le",
+      "sha256": "sha256:7308f49c31b0d03bf3302626237bcc6c30381eccc13768c5b2e7a9ae8729e629"
+    },
+    "unspecified-to-pc": {
+      "all_original_codes_equal": false,
+      "maximum_code_error": 9976,
+      "mean_code_error": 1492.168472290039,
+      "first_frame_Y_unique": 42274,
+      "first_frame_Y_min": 0,
+      "first_frame_Y_max": 65535,
+      "decoded_path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/unspecified-to-pc.yuv444p16le",
+      "sha256": "sha256:30607d77517e98dba43c5c2a803d592326e1ed090327f58589fc83aaf6022639"
+    },
+    "unspecified-to-tv": {
+      "all_original_codes_equal": false,
+      "maximum_code_error": 5378,
+      "mean_code_error": 804.4582316080729,
+      "first_frame_Y_unique": 49651,
+      "first_frame_Y_min": 0,
+      "first_frame_Y_max": 65535,
+      "decoded_path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/unspecified-to-tv.yuv444p16le",
+      "sha256": "sha256:7308f49c31b0d03bf3302626237bcc6c30381eccc13768c5b2e7a9ae8729e629"
+    },
+    "pc-to-unspecified": {
+      "all_original_codes_equal": false,
+      "maximum_code_error": 256,
+      "mean_code_error": 43.11261494954427,
+      "first_frame_Y_unique": 56065,
+      "first_frame_Y_min": 0,
+      "first_frame_Y_max": 65535,
+      "decoded_path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/pc-to-unspecified.yuv444p16le",
+      "sha256": "sha256:20fa5a41ea430873a9db3a71c4253092f6b046981b88df162b93362b9f84a9c1"
+    },
+    "pc-to-pc": {
+      "all_original_codes_equal": false,
+      "maximum_code_error": 5610,
+      "mean_code_error": 828.3890991210938,
+      "first_frame_Y_unique": 47963,
+      "first_frame_Y_min": 0,
+      "first_frame_Y_max": 65535,
+      "decoded_path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/pc-to-pc.yuv444p16le",
+      "sha256": "sha256:9faef4bb753b8d18c7c970036314fdf8d4d9d15b49a4857c6d2619b7aa471302"
+    },
+    "pc-to-tv": {
+      "all_original_codes_equal": false,
+      "maximum_code_error": 256,
+      "mean_code_error": 43.11261494954427,
+      "first_frame_Y_unique": 56065,
+      "first_frame_Y_min": 0,
+      "first_frame_Y_max": 65535,
+      "decoded_path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/pc-to-tv.yuv444p16le",
+      "sha256": "sha256:20fa5a41ea430873a9db3a71c4253092f6b046981b88df162b93362b9f84a9c1"
+    }
+  },
+  "assets": [
+    {
+      "path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/original.yuv444p16le",
+      "bytes": 786432,
+      "sha256": "sha256:65edf89b70c3a2e255e778b62f83bbc7e84968d98774c80e57e36caab006edca"
+    },
+    {
+      "path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/pc-input.nut",
+      "bytes": 22370,
+      "sha256": "sha256:3a85f7d88b3ddb2ffc1e55c1143b98b45cafec996c7355eb90ed8ad4828784c1"
+    },
+    {
+      "path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/pc-to-pc.yuv444p16le",
+      "bytes": 786432,
+      "sha256": "sha256:9faef4bb753b8d18c7c970036314fdf8d4d9d15b49a4857c6d2619b7aa471302"
+    },
+    {
+      "path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/pc-to-tv.yuv444p16le",
+      "bytes": 786432,
+      "sha256": "sha256:20fa5a41ea430873a9db3a71c4253092f6b046981b88df162b93362b9f84a9c1"
+    },
+    {
+      "path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/pc-to-unspecified.yuv444p16le",
+      "bytes": 786432,
+      "sha256": "sha256:20fa5a41ea430873a9db3a71c4253092f6b046981b88df162b93362b9f84a9c1"
+    },
+    {
+      "path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/unspecified-input.nut",
+      "bytes": 25138,
+      "sha256": "sha256:99981c24911ca6e582a1beb929504fb32db539ef62eeb118402777cb2dc81eff"
+    },
+    {
+      "path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/unspecified-to-pc.yuv444p16le",
+      "bytes": 786432,
+      "sha256": "sha256:30607d77517e98dba43c5c2a803d592326e1ed090327f58589fc83aaf6022639"
+    },
+    {
+      "path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/unspecified-to-tv.yuv444p16le",
+      "bytes": 786432,
+      "sha256": "sha256:7308f49c31b0d03bf3302626237bcc6c30381eccc13768c5b2e7a9ae8729e629"
+    },
+    {
+      "path": "docs/assets/color-precision-20261021-lab/yuv-range-probe-r1/unspecified-to-unspecified.yuv444p16le",
+      "bytes": 786432,
+      "sha256": "sha256:7308f49c31b0d03bf3302626237bcc6c30381eccc13768c5b2e7a9ae8729e629"
+    }
+  ],
+  "finished_at_utc": "2026-10-21T20:16:18.607327+00:00"
+}

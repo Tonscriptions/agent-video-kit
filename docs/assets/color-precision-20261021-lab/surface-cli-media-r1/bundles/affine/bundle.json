@@ -1,0 +1,335 @@
+{
+  "protocol": "agent-native-clock-float32-bundle-v1",
+  "created_at_utc": "2026-10-21T21:04:39.683340+00:00",
+  "recipe": {
+    "protocol": "agent-native-clock-float32-bundle-v1",
+    "asset_id": "foreground",
+    "source": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\product\\.runtime\\color-precision-20261021\\surface-cli-media-r1\\project\\assets\\foreground_foreground-16bit.mkv",
+    "source_sha256": "sha256:e8a8f7348013d87bd4ddb6d21b6debd4d040347d5f0e95095356235601719464",
+    "source_signal": {
+      "primaries": "bt709",
+      "transfer": "bt709-oetf"
+    },
+    "working_signal": {
+      "primaries": "bt709",
+      "transfer": "linear"
+    },
+    "pixel_family": "rgb",
+    "YCbCr": null,
+    "scan": null,
+    "alpha_association": "straight",
+    "start_frame": 0,
+    "stop_frame_exclusive": null,
+    "geometry": {
+      "width": 160,
+      "height": 96,
+      "inverse": [
+        [
+          1.1414269574972837,
+          0.22187092485644744,
+          -26.823834064632383
+        ],
+        [
+          -0.22187092485644744,
+          1.1414269574972837,
+          15.454593541740685
+        ]
+      ]
+    },
+    "max_output_bytes": 2147483648
+  },
+  "recipe_sha256": "sha256:7f15a2d654f756f8786ddd610299fbf10a001127044c6d662ac0bcce33043b18",
+  "source_asset_id": "foreground",
+  "source_sha256": "sha256:e8a8f7348013d87bd4ddb6d21b6debd4d040347d5f0e95095356235601719464",
+  "frames": 20,
+  "width": 160,
+  "height": 96,
+  "pixel_format": "interleaved-straight-RGBA-f32le",
+  "native_time_base": "1/1000",
+  "clock_columns": [
+    "source_frame_index",
+    "original_pts",
+    "original_duration"
+  ],
+  "selected_source_frame_start": 0,
+  "selected_source_frame_end_exclusive": 20,
+  "source_frame_count": 20,
+  "all_source_frames_exported": true,
+  "all_selected_frames_exported": true,
+  "files": {
+    "pixels": {
+      "name": "frames.rgba-f32le",
+      "bytes": 4915200,
+      "sha256": "sha256:f33d8ae011c6845e4b6fec5da5c3e5b900b0b31958170d3ea885df9d985a7378"
+    },
+    "clock": {
+      "name": "clock.i64le",
+      "bytes": 480,
+      "sha256": "sha256:881c77a4c33bb2be21bb1952417762567d1822f3637d4fddb0a1765cbbb4774a"
+    }
+  },
+  "source_reader": {
+    "protocol": "native-RGB-float32-frame-source-v1",
+    "source": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\product\\.runtime\\color-precision-20261021\\surface-cli-media-r1\\project\\assets\\foreground_foreground-16bit.mkv",
+    "source_sha256": "sha256:e8a8f7348013d87bd4ddb6d21b6debd4d040347d5f0e95095356235601719464",
+    "native_frame_clock": true,
+    "network": false,
+    "autorotation": false,
+    "CFR_normalization": false,
+    "colour_transform": "none;native-RGB/gray-values-only",
+    "editor_integrated": false,
+    "HDR_accepted": false,
+    "native_index": {
+      "protocol": "native-video-frame-index-v1",
+      "key": "f7fd25ca81f6151181e11cab485919c83733ab2e88d049a76a0a28204c663b64",
+      "status": "memory-reuse",
+      "source_index_decode_calls": 0,
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\product\\.runtime\\color-precision-20261021\\surface-cli-media-r1\\project\\cache\\native-video-index\\f7fd25ca81f6151181e11cab485919c83733ab2e88d049a76a0a28204c663b64",
+      "frames": 20,
+      "byte_validation": false
+    },
+    "native_stream": {
+      "width": "160",
+      "height": "96",
+      "sample_aspect_ratio": "N/A",
+      "pix_fmt": "gbrap16le",
+      "color_range": "pc",
+      "color_space": "gbr",
+      "color_transfer": "unknown",
+      "color_primaries": "unknown",
+      "chroma_location": "unspecified",
+      "time_base": "1/1000"
+    },
+    "format_info": {
+      "start_time": "0.000000"
+    },
+    "source_frame_count": 20,
+    "requested_prefix_frame_count": 20,
+    "native_time_base": "1/1000",
+    "alpha_association": "straight",
+    "source_has_alpha": true,
+    "frame_bytes": 122880,
+    "command": [
+      "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+      "-nostdin",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-protocol_whitelist",
+      "file,pipe",
+      "-noautorotate",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\product\\.runtime\\color-precision-20261021\\surface-cli-media-r1\\project\\assets\\foreground_foreground-16bit.mkv",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-sn",
+      "-dn",
+      "-frames:v",
+      "20",
+      "-fps_mode",
+      "passthrough",
+      "-pix_fmt",
+      "gbrap16le",
+      "-f",
+      "rawvideo",
+      "pipe:1"
+    ],
+    "artifacts": {
+      "source": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\product\\.runtime\\color-precision-20261021\\surface-cli-media-r1\\project\\assets\\foreground_foreground-16bit.mkv",
+        "role": "float-video-source",
+        "bytes": 47864,
+        "sha256": "sha256:e8a8f7348013d87bd4ddb6d21b6debd4d040347d5f0e95095356235601719464"
+      },
+      "ffmpeg": {
+        "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "role": "float-video-source",
+        "bytes": 223360000,
+        "sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+      },
+      "ffprobe": {
+        "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.exe",
+        "role": "float-video-source",
+        "bytes": 223153664,
+        "sha256": "sha256:70872c3ffbc43d0b2c570f9837f54d6e9a832f4ca25463e9735b6a3ec0621478"
+      },
+      "implementation": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\product\\src\\ai_ad_editor\\float_video_source.py",
+        "role": "float-video-source",
+        "bytes": 9879,
+        "sha256": "sha256:79685d1bbe3298b1334b80d429bba0fb6e8c8c57230428f1e08eb9afc56b510a"
+      },
+      "pixels_implementation": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\product\\src\\ai_ad_editor\\float_pixels.py",
+        "role": "float-video-source",
+        "bytes": 7700,
+        "sha256": "sha256:863991d7c7e88db619b72e268321fe182baca8d4e8f63d8c5166a945928e127f"
+      }
+    },
+    "bounded_stdout_chunks": 4,
+    "chunk_bytes": 65536,
+    "bounded_stderr_chunks": 2,
+    "decoded_frames": 20,
+    "pixel_boundary": {
+      "protocol": "native-RGB-gray-to-straight-float32-v1",
+      "native_pixel_format": "gbrap16le",
+      "frame_bytes": 122880,
+      "component_bits": 16,
+      "storage_bits": 16,
+      "native_floating": false,
+      "native_alpha_association": "straight",
+      "source_has_alpha": true,
+      "output": "straight-float32-RGBA",
+      "colour_transform": "none;source-numeric-values-only",
+      "estimated_working_bytes": 495616,
+      "estimated_bytes_are_peak_RSS": false,
+      "hidden_straight_RGB": "retained;premultiplied-zero-alpha-canonicalized",
+      "HDR_accepted": false,
+      "editor_integrated": false
+    },
+    "requested_prefix_complete": true,
+    "all_source_frames_decoded": true,
+    "closed": true
+  },
+  "source_reader_process": {
+    "exit_code": 0,
+    "owned_threads_terminated": true
+  },
+  "colour_boundary": {
+    "protocol": "explicit-D65-relative-RGB-float32-v1",
+    "source_signal": {
+      "primaries": "bt709",
+      "transfer": "bt709-oetf"
+    },
+    "target_signal": {
+      "primaries": "bt709",
+      "transfer": "linear"
+    },
+    "linear_gamut_matrix": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "white": "D65;relative-white=1;physical-white-matching-is-caller-contract",
+    "alpha": "bit-exact-independent-straight-coverage",
+    "RGB_clipping": "none",
+    "gamut_mapping": "none",
+    "negative_extension": "signed mathematical extension;not-HDR-acceptance",
+    "bt709_interpretation": "published rounded camera OETF/inverse;not-BT1886-display-EOTF",
+    "same_signal_byte_exact": false,
+    "chromatic_adaptation": false,
+    "absolute_nits_managed": false,
+    "estimated_working_bytes": 6393856,
+    "estimated_bytes_are_peak_RSS": false,
+    "HDR_accepted": false,
+    "editor_integrated": false
+  },
+  "geometry_boundary": {
+    "protocol": "float32-premultiplied-affine-sampling-v1",
+    "surface": "straight-float32-RGBA",
+    "interpolation": "bilinear",
+    "filtering_alpha": "premultiplied-RGB-and-alpha",
+    "outside": "transparent-black",
+    "pixel_centres": "integer",
+    "input_size": [
+      160,
+      96
+    ],
+    "output_size": [
+      160,
+      96
+    ],
+    "inverse": [
+      [
+        1.1414269574972837,
+        0.22187092485644744,
+        -26.823834064632383
+      ],
+      [
+        -0.22187092485644744,
+        1.1414269574972837,
+        15.454593541740685
+      ]
+    ],
+    "tile_pixels": 15360,
+    "estimated_working_bytes": 6393856,
+    "working_bytes_limit": 805306368,
+    "estimated_bytes_are_peak_RSS": false,
+    "colour_space": "caller-supplied-common-space",
+    "HDR_accepted": false,
+    "editor_integrated": false,
+    "severe_minification_antialiasing_accepted": false
+  },
+  "implementation_artifacts": {
+    "float_bundle": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\product\\src\\ai_ad_editor\\float_bundle.py",
+      "role": "float-bundle-implementation",
+      "bytes": 16354,
+      "sha256": "sha256:0ec2eff233424eef1a1ae9c8a60aa271d808abee77b4a17e5a5ffaac28a2d0c3"
+    },
+    "float_color_signal": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\product\\src\\ai_ad_editor\\float_color_signal.py",
+      "role": "float-bundle-implementation",
+      "bytes": 6848,
+      "sha256": "sha256:b0c07f905c67db85478fc34d5e1b1614a13361bf64ce34f5838512de875d8be1"
+    },
+    "float_geometry": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\product\\src\\ai_ad_editor\\float_geometry.py",
+      "role": "float-bundle-implementation",
+      "bytes": 6804,
+      "sha256": "sha256:57f9af0406663a27e31b35e3463076acf24d3833de5fce98102b6f0b73a9d51a"
+    },
+    "numpy_init": {
+      "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\numpy\\__init__.py",
+      "role": "float-bundle-implementation",
+      "bytes": 27212,
+      "sha256": "sha256:b16a4f347c6583c878e1973a208564e01686b79cc70911ad0157e05d8eecda37"
+    },
+    "numpy_native_0": {
+      "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\numpy\\_core\\_multiarray_umath.cp313-win_amd64.pyd",
+      "role": "float-bundle-implementation",
+      "bytes": 3709440,
+      "sha256": "sha256:a072e5eddbee33b2f73aaf698222d8db2e43e5dcc0146d0a3011de4daebf3600"
+    },
+    "numpy_dll_0": {
+      "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\numpy.libs\\libscipy_openblas64_-74a408729250596b0973e69fdd954eea.dll",
+      "role": "float-bundle-implementation",
+      "bytes": 20404736,
+      "sha256": "sha256:74a408729250596b0973e69fdd954eea07a70ff527a1dbaccf9ae21247b80377"
+    },
+    "numpy_dll_1": {
+      "path": "C:\\Users\\carzy\\AppData\\Roaming\\Python\\Python313\\site-packages\\numpy.libs\\msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll",
+      "role": "float-bundle-implementation",
+      "bytes": 575056,
+      "sha256": "sha256:a4c2229bdc2a2a630acdc095b4d86008e5c3e3bc7773174354f3da4f5beb9cde"
+    }
+  },
+  "numpy_version": "2.4.2",
+  "numpy_whole_package_inventory": false,
+  "working_white": "relative D65;physical white matching must be supplied by caller",
+  "alpha": "independent-straight;not-a-transfer-component",
+  "encoded_movie": false,
+  "audio_exported": false,
+  "timeline_renderer_integrated": false,
+  "HDR_accepted": false,
+  "native_windows": true,
+  "network": false,
+  "budget": {
+    "required_bytes_estimate": 5046752,
+    "limit_bytes": 2147483648,
+    "peak_RSS_accepted": false
+  }
+}

@@ -1,5 +1,20 @@
 # AI广告剪辑文档中心
 
+<!-- V92-NATIVE-FLOAT-SURFACE -->
+V92新增Agent原生浮点帧包CLI和独立线性光核心。完整原生回归 **2234方法 /7549.898秒 /0跳过**；282产品输入、8外部夹具、17启动时脚本及9依赖文件保持相同。
+
+| 编号 | 已执行 | 当前边界 |
+|---|---|---|
+| F32-01 | 八模块/七测试，86项专项；三原色/五传递函数、原生RGB/YUV/alpha及VFR时钟、仿射、32混合模式 | 相对D65；未做ICC/PQ/HLG/HDR、自然素材或全剪映等价 |
+| F32-02 | 真实CLI15次、34检查；20/20/20/5帧包；两段20帧/10fps/2s MP4/GIF与16-bit回写 | surface为中间数据，电影由独立核心脚本编码 |
+| F32-03 | 新八轮离线安装117项/0跳过，171资源与931 NumPy文件相同，213模块来源核验 | 安装版实际帧包和合成RGBA与开发版相同；默认时间线/预览/缓存未采用浮点核心 |
+
+[规格](../docs/specs/浮点表面合成与高精度边界_实验_v0.1_2026-10-22.md) · [实际测试/原片/GIF/失败](../docs/validation/浮点表面合成与高精度边界独立实测_2026-10-22.md) · [Agent命令](../docs/Agent浮点帧包CLI使用与验收边界_2026-10-22.md) · [安装证据](../docs/validation/evidence/color-precision-20261021-lab/installed-r1/verification.json)。OpenFilm R14/R15复用结论保留，不重复计工或计测试。
+
+
+完整回归：[2234方法实际终态](../docs/validation/evidence/color-precision-20261021-lab/full-r1.json) · [额外冻结门禁](../docs/validation/evidence/color-precision-20261021-lab/complete-gate-r1.json)。
+<!-- /V92-NATIVE-FLOAT-SURFACE -->
+
 <!-- V91-NATIVE-AUDIO-INTERVAL-CLOCK -->
 ### V91 源音频内部缺口、重叠与派生缓存
 

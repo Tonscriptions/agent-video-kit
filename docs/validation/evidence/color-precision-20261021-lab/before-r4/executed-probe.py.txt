@@ -1,0 +1,156 @@
+"""Measure real ten/sixteen-bit sample loss through the unchanged product graph and CLI."""
+import argparse
+from datetime import datetime,timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import time
+import numpy as np
+from PIL import Image,ImageDraw
+from run_frozen_regression import frozen,sha
+
+ROOT=Path(__file__).resolve().parents[1]
+WIDTH,HEIGHT,FRAMES,FPS,TPS=1024,64,4,4,90000
+
+def write(path,value):
+    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+
+def originals(bits):
+    maximum=(1<<bits)-1
+    grid=np.arange(WIDTH*HEIGHT,dtype=np.uint32).reshape(HEIGHT,WIDTH)
+    rows=[]
+    for index in range(FRAMES):
+        gray=((grid+index*257)%(maximum+1)).astype('<u2')
+        rows.append(np.stack((gray,gray,gray)))
+    return np.stack(rows)
+
+def metrics(expected,actual):
+    difference=np.abs(expected.astype(np.int32)-actual.astype(np.int32))
+    return {'all_samples_equal':bool(np.array_equal(expected,actual)),'maximum_code_error':int(difference.max()),
+        'mean_code_error':float(difference.mean()),'mismatched_samples':int(np.count_nonzero(difference)),
+        'samples_compared':int(expected.size),'input_unique_first_frame_green':int(np.unique(expected[0,0]).size),
+        'output_unique_first_frame_green':int(np.unique(actual[0,0]).size)}
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--revision',required=True);args=parser.parse_args()
+    evidence=ROOT/'docs/validation/evidence/color-precision-20261021-lab'/('before-'+args.revision)
+    assets=ROOT/'docs/assets/color-precision-20261021-lab'/('before-'+args.revision)
+    work=ROOT/'product/.runtime/color-precision-20261021'/('before-'+args.revision)
+    assert not any(p.exists() for p in (evidence,assets,work))
+    for p in (evidence,assets,work):p.mkdir(parents=True)
+    before=frozen();assert len(before)==267
+    record={'status':'running','started_at_utc':datetime.now(timezone.utc).isoformat(),'frozen_before':before,
+        'script_sha256':sha(Path(__file__)),'calls':[],'cases':{},'checks':[],
+        'native_windows':True,'virtualization':False,'network':False,'new_product_features':False,
+        'natural_quality_accepted':False,'HDR_accepted':False,'full_capcut_parity':False,
+        'rights':'Original exhaustive neutral ramps; CC0-1.0. No external image, font or model.'}
+    def save():write(evidence/'verification.json',record)
+    def check(name,condition,**details):
+        record['checks'].append({'name':name,'ok':bool(condition),**details});save();assert condition,name
+    env=dict(os.environ,TEMP=str(ROOT/'product/.runtime/temp'),TMP=str(ROOT/'product/.runtime/temp'),TMPDIR=str(ROOT/'product/.runtime/temp'),PYTHONDONTWRITEBYTECODE='1')
+    executable=shutil.which('ffmpeg');probe=shutil.which('ffprobe');assert executable and probe
+    record.update(ffmpeg={'path':executable,'sha256':sha(Path(executable))},ffprobe={'path':probe,'sha256':sha(Path(probe))})
+    bootstrap='import sys;sys.path.insert(0,sys.argv.pop(1));from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();from ai_ad_editor.cli import main;raise SystemExit(main())'
+    prefix=[sys.executable,'-E','-B','-X','utf8','-c',bootstrap,str(ROOT/'product/src')]
+    def run(label,command,*,cli=False,binary=False):
+        command=list(map(str,command));start=time.monotonic()
+        result=subprocess.run(command,cwd=ROOT,env=env,capture_output=True,timeout=180,creationflags=subprocess.CREATE_NO_WINDOW)
+        (evidence/(label+'.stderr.log')).write_bytes(result.stderr)
+        if not binary:(evidence/(label+'.stdout.log')).write_bytes(result.stdout)
+        record['calls'].append({'label':label,'command':command,'exit_code':result.returncode,'cli':cli,
+            'wall_seconds':time.monotonic()-start,'stdout_bytes':len(result.stdout),
+            'stdout_sha256':'sha256:'+hashlib.sha256(result.stdout).hexdigest()});save()
+        assert result.returncode==0,(label,(result.stdout+result.stderr)[-2500:].decode('utf8','replace'))
+        return result.stdout
+    def cli(label,*arguments):return json.loads(run(label,[*prefix,*arguments],cli=True))
+    sys.path.insert(0,str(ROOT/'product/src'))
+    from ai_ad_editor.runtime import configure_local_runtime
+    configure_local_runtime()
+    from ai_ad_editor.render import build_filter_graph
+    try:
+        for bits in (10,16):
+            name=str(bits)+'bit';pixel_format='gbrp10le' if bits==10 else 'gbrp16le'
+            expected=originals(bits);raw=assets/(name+'-original.'+pixel_format);raw.write_bytes(expected.tobytes())
+            source=assets/(name+'-original.mkv')
+            run(name+'-generate',[executable,'-v','error','-f','rawvideo','-pixel_format',pixel_format,
+                '-video_size',f'{WIDTH}x{HEIGHT}','-framerate',FPS,'-i',raw,'-c:v','ffv1','-level','3','-pix_fmt',pixel_format,
+                '-color_range','pc','-colorspace','rgb','-color_primaries','bt709','-color_trc','bt709',source])
+            original=run(name+'-original-decoded',[executable,'-v','error','-i',source,'-map','0:v:0','-an','-fps_mode','passthrough',
+                '-pix_fmt',pixel_format,'-f','rawvideo','pipe:1'],binary=True)
+            check(name+'-original-exhaustive-native-codes',original==expected.tobytes(),unique_gray_codes=int(np.unique(expected[0,0]).size))
+            project=work/name;cli(name+'-init','project','init',project)
+            cli(name+'-ingest','media','ingest','--project',project,'--input',source,'--asset-id','ramp',
+                '--source-url','local://color-precision/CC0','--license-spdx','CC0-1.0','--license-url','local://color-precision/CC0',
+                '--verification-status','verified','--permitted-use','commercial_ad','--creator','agent-video-kit',
+                '--evidence','Original exhaustive neutral ramp; generator, native codes, decode and SHA retained.')
+            data=json.loads((project/'project.json').read_bytes())
+            data['settings']['canvas'].update(width=WIDTH,height=HEIGHT,fps=FPS)
+            data['settings']['timebase']={'ticks_per_second':TPS,'display_fps':{'num':FPS,'den':1}}
+            data['settings']['output']={'container':'mp4','video':{'codec':'libx264','crf':0,'pixel_format':'yuv444p10le'},'audio':{'codec':'aac'}}
+            write(project/'project.json',data)
+            request=project/'compose.json';write(request,{'operations':[
+                {'op':'append_clip','track_id':'track_video_1','id':'picture','asset_id':'ramp','timeline_start_tick':0,
+                 'source_in_tick':0,'source_out_tick':TPS,'duration_tick':TPS,
+                 'crop':{'x':0,'y':0,'width':WIDTH,'height':HEIGHT,'fit':'stretch'}},
+                {'op':'set_sequence_duration','sequence_id':'seq_main','duration_tick':TPS,'trim':False}]})
+            cli(name+'-compose','timeline','compose','--project',project,'--input',request)
+            data=json.loads((project/'project.json').read_bytes());sequence=next(s for s in data['sequences'] if s['id']=='seq_main')
+            inputs,graph,metadata,warnings=build_filter_graph(project,data,sequence)
+            (evidence/(name+'-before.ffgraph.txt')).write_text(graph,encoding='utf8',newline='\n')
+            write(evidence/(name+'-before-graph-metadata.json'),{'inputs':metadata,'warnings':warnings,'input_arguments':inputs})
+            master=assets/(name+'-before-master.nut')
+            run(name+'-actual-before-graph-master',[executable,'-v','error','-filter_complex_threads','1',*inputs,
+                '-filter_complex',graph,'-map','[vout]','-map','[aout]','-fps_mode','passthrough','-c:v','ffv1','-level','3',
+                '-pix_fmt',pixel_format,'-c:a','pcm_f32le',master])
+            result=run(name+'-before-master-decoded',[executable,'-v','error','-i',master,'-map','0:v:0','-an','-fps_mode','passthrough',
+                '-pix_fmt',pixel_format,'-f','rawvideo','pipe:1'],binary=True)
+            check(name+'-master-covers-all-source-samples',len(result)==expected.nbytes)
+            actual=np.frombuffer(result,dtype='<u2').reshape(expected.shape)
+            measured=metrics(expected,actual)
+            check(name+'-real-before-precision-loss-observed',not measured['all_samples_equal'] and measured['maximum_code_error']>1
+                and measured['output_unique_first_frame_green']<measured['input_unique_first_frame_green'],**measured)
+            output=project/'renders'/(name+'-before.mp4')
+            response=cli(name+'-actual-render','render','--project',project,'--output',output,'--profile','custom',
+                         '--width',WIDTH,'--height',HEIGHT,'--crf','0','--pixel-format','yuv444p10le')['data']
+            shutil.copyfile(output,assets/output.name);shutil.copyfile(response['manifest'],evidence/(name+'-before-render-manifest.json'))
+            target=assets/(name+'-direct-reference.mp4')
+            run(name+'-independent-direct-ten-bit-reference',[executable,'-v','error','-i',source,'-map','0:v:0','-an',
+                '-c:v','libx264','-preset','medium','-crf','0','-pix_fmt','yuv444p10le',target])
+            decoded=[]
+            for suffix,path in (('actual',output),('reference',target)):
+                value=run(name+'-ten-bit-'+suffix,[executable,'-v','error','-i',path,'-map','0:v:0','-an','-fps_mode','passthrough',
+                    '-pix_fmt','yuv444p10le','-f','rawvideo','pipe:1'],binary=True)
+                decoded.append(np.frombuffer(value,dtype='<u2').reshape(FRAMES,3,HEIGHT,WIDTH))
+            encoded_metrics=metrics(decoded[1],decoded[0])
+            check(name+'-lossless-ten-bit-encode-retains-graph-loss',not encoded_metrics['all_samples_equal'],**encoded_metrics)
+            record['cases'][name]={'source':str(source.relative_to(ROOT)),'source_sha256':sha(source),'pixel_format':pixel_format,
+                'width':WIDTH,'height':HEIGHT,'fps':FPS,'frames':FRAMES,'graph_master':str(master.relative_to(ROOT)),
+                'graph_master_sha256':sha(master),'graph_metrics':measured,'CLI_yuv444p10_metrics':encoded_metrics,
+                'CLI_output':str((assets/output.name).relative_to(ROOT)),'CLI_output_sha256':sha(assets/output.name),
+                'direct_reference':str(target.relative_to(ROOT)),'direct_reference_sha256':sha(target)}
+            difference=np.abs(expected[0,0].astype(np.int32)-actual[0,0].astype(np.int32))
+            original_view=np.rint(expected[0,0]/((1<<bits)-1)*255).astype(np.uint8)
+            actual_view=np.rint(actual[0,0]/((1<<bits)-1)*255).astype(np.uint8)
+            diagnostic=np.clip(difference.astype(np.float64)/((1<<bits)-1)*255*64,0,255).astype(np.uint8)
+            picture=Image.new('RGB',(WIDTH,HEIGHT*3+60),(16,21,31));draw=ImageDraw.Draw(picture)
+            for row,(label,array) in enumerate((('0: original codes (displayed at 8 bit)',original_view),
+                ('1: actual unchanged graph (displayed at 8 bit)',actual_view),('2: absolute code error, display gain x64',diagnostic))):
+                top=row*(HEIGHT+20);draw.text((4,top+3),label,fill=(240,245,250));picture.paste(Image.fromarray(array).convert('RGB'),(0,top+20))
+            picture.save(assets/(name+'-before-diagnostic.png'));save()
+        record.update(status='verified-before-precision-loss-with-unchanged-product',
+            cli_calls=sum(c['cli'] for c in record['calls']),other_native_commands=sum(not c['cli'] for c in record['calls']))
+    except BaseException as error:record.update(status='failed-preserved',error=repr(error));raise
+    finally:
+        record.update(frozen_after=frozen(),finished_at_utc=datetime.now(timezone.utc).isoformat())
+        record['source_unchanged']=record['frozen_before']==record['frozen_after'];save()
+        (evidence/'executed-probe.py.txt').write_bytes(Path(__file__).read_bytes())
+    assert record['source_unchanged']
+    print(json.dumps({'status':record['status'],'cli_calls':record['cli_calls'],'other_native_commands':record['other_native_commands'],
+        'cases':{k:v['graph_metrics'] for k,v in record['cases'].items()}},ensure_ascii=False))
+
+if __name__=='__main__':main()

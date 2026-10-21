@@ -1,0 +1,59 @@
+[Parsed_nullsrc_0 @ 000002249fa0af00] size:32x16 rate:1/1 duration:1.000000 sar:1/1
+Input #0, lavfi, from 'nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123':
+  Duration: N/A, start: 0.000000, bitrate: N/A
+  Stream #0:0: Video: wrapped_avframe, 1 reference frame, gbrapf32le, 32x16 [SAR 1:1 DAR 2:1], 1 fps, 1 tbr, 1 tbn
+[out#0/rawvideo @ 000002249fa3a140] Adding streams from explicit maps...
+[out#0/rawvideo @ 000002249fa3a140] Creating output stream from an explicitly mapped complex filtergraph 0, output [v]
+[vost#0:0/rawvideo @ 000002249fa3f500] Created video stream from complex filtergraph 0:[curves:default]
+[vost#0:0/rawvideo @ 000002249fa3f500] 
+[fc#0 @ 000002249fa08540] Binding input with label '0:v' to input stream 0:0
+Stream mapping:
+  Stream #0:0 (wrapped_avframe) -> curves:default
+  curves:default -> Stream #0:0 (rawvideo)
+[vost#0:0/rawvideo @ 000002249fa3f500] Starting thread...
+[fc#0 @ 000002249fa08540] Starting thread...
+[vist#0:0/wrapped_avframe @ 000002249fa35d80] [dec:wrapped_avframe @ 000002249fa2d740] Starting thread...
+[in#0/lavfi @ 000002249fa09bc0] Starting thread...
+Press [q] to stop, [?] for help
+[in#0/lavfi @ 000002249fa09bc0] EOF while reading input
+[in#0/lavfi @ 000002249fa09bc0] Terminating thread with return code 0 (success)
+[vist#0:0/wrapped_avframe @ 000002249fa35d80] [dec:wrapped_avframe @ 000002249fa2d740] Decoder thread received EOF packet
+[vist#0:0/wrapped_avframe @ 000002249fa35d80] [dec:wrapped_avframe @ 000002249fa2d740] Decoder returned EOF, finishing
+[graph 0 input from stream 0:0 @ 000002249fa317c0] w:32 h:16 pixfmt:gbrapf32le tb:1/1 fr:1/1 sar:1/1 csp:gbr range:unknown alpha:unspecified
+[vist#0:0/wrapped_avframe @ 000002249fa35d80] [dec:wrapped_avframe @ 000002249fa2d740] Terminating thread with return code 0 (success)
+[auto_scale_0 @ 000002249fa4a2c0] w:iw h:ih flags:'' interl:0
+[Parsed_curves_0 @ 000002249e071c40] auto-inserting filter 'auto_scale_0' between the filter 'graph 0 input from stream 0:0' and the filter 'Parsed_curves_0'
+[auto_scale_1 @ 000002249fa5fa80] w:iw h:ih flags:'' interl:0
+[format @ 000002249fa4c380] auto-inserting filter 'auto_scale_1' between the filter 'Parsed_curves_0' and the filter 'format'
+[auto_scale_0 @ 000002249fa4a2c0] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:rgba64le csp:gbr range:pc sar:1/1 flags:0x00000004
+[auto_scale_0 @ 000002249fa4a2c0] [framesync @ 000002249fa48a90] Selected 1/1 time base
+[auto_scale_0 @ 000002249fa4a2c0] [framesync @ 000002249fa48a90] Sync level 1
+[Parsed_curves_0 @ 000002249e071c40] #0 points: (0.000000;0.000000) (1.000000;1.000000)#1 points: (0.000000;0.000000) (1.000000;1.000000)#2 points: (0.000000;0.000000) (1.000000;1.000000)w:32 h:16 fmt:rgba64le csp:gbr range:pc sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004
+[auto_scale_1 @ 000002249fa5fa80] [framesync @ 000002249fa5fbd0] Selected 1/1 time base
+[auto_scale_1 @ 000002249fa5fa80] [framesync @ 000002249fa5fbd0] Sync level 1
+Output #0, rawvideo, to 'pipe:1':
+  Metadata:
+    encoder         : Lavf62.12.100
+  Stream #0:0: Video: rawvideo, 1 reference frame (G4[0][33] / 0x21003447), gbrapf32le(gbr/unknown/unknown, progressive), 32x16 [SAR 1:1 DAR 2:1], q=2-31, 65 kb/s, 1 fps, 1 tbn
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+[out#0/rawvideo @ 000002249fa3a140] Starting thread...
+[auto_scale_0 @ 000002249fa4a2c0] [framesync @ 000002249fa48a90] Sync level 0
+[auto_scale_1 @ 000002249fa5fa80] [framesync @ 000002249fa5fbd0] Sync level 0
+[fc#0 @ 000002249fa08540] All consumers returned EOF
+[vost#0:0/rawvideo @ 000002249fa3f500] [enc:rawvideo @ 000002249fa3afc0] Encoder thread received EOF
+[vost#0:0/rawvideo @ 000002249fa3f500] Terminating thread with return code 0 (success)
+[fc#0 @ 000002249fa08540] Terminating thread with return code 0 (success)
+[out#0/rawvideo @ 000002249fa3a140] All streams finished
+[out#0/rawvideo @ 000002249fa3a140] Terminating thread with return code 0 (success)
+[AVIOContext @ 000002249fa47d80] Statistics: 8192 bytes written, 0 seeks, 1 writeouts
+[out#0/rawvideo @ 000002249fa3a140] Output file #0 (pipe:1):
+[out#0/rawvideo @ 000002249fa3a140]   Output stream #0:0 (video): 1 frames encoded; 1 packets muxed (8192 bytes); 
+[out#0/rawvideo @ 000002249fa3a140]   Total: 1 packets (8192 bytes) muxed
+[out#0/rawvideo @ 000002249fa3a140] video:8KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.000000%
+frame=    1 fps=0.0 q=-0.0 Lsize=       8KiB time=00:00:01.00 bitrate=  65.5kbits/s speed= 343x elapsed=0:00:00.00    
+[in#0/lavfi @ 000002249fa09bc0] Input file #0 (nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123):
+[in#0/lavfi @ 000002249fa09bc0]   Input stream #0:0 (video): 1 packets read (424 bytes); 1 frames decoded; 0 decode errors; 
+[in#0/lavfi @ 000002249fa09bc0]   Total: 1 packets (424 bytes) demuxed
+
+Exiting with exit code 0

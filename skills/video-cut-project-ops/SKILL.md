@@ -3,6 +3,17 @@ name: video-cut-project-ops
 description: Operate local Agent Projects with snapshots, migration, relinking, persistent render queues, cancellation, and deterministic replay.
 ---
 
+<!-- V92-NATIVE-FLOAT-SURFACE -->
+Use advertised native_float_surface_bundle / agent-native-clock-float32-bundle-v1 for explicit local Float32 frame data.
+`surface export --project P --asset-id A --output renders/NEW --source-primaries bt709 --source-transfer bt709-oetf --working-primaries bt709 --working-transfer linear --dry-run` plans without pixel decode/index creation. Run without --dry-run only into a new owned directory.
+For native YCbCr, supply --pixel-family yuv plus matrix/range/chroma-location and --scan progressive. These are caller declarations, not automatic colour/scan verification. Unsupported native formats reject; do not route them silently through 8-bit conversion.
+Respect source SHA, explicit alpha association, optional source-frame half-open selection, original PTS/time_base, inverse-affine JSON, cancellation, 2GiB output estimate and 64MiB disk headroom. The estimate is not peak RSS or real-time performance.
+Read frames.rgba-f32le as interleaved straight RGBA and clock.i64le as original source-index/PTS/duration triples. `surface inspect` verifies derived layout/content/clock only; original_inputs_revalidated=false. Do not treat editable SHA metadata as an external signature.
+Relative D65 primaries/transfer conversion preserves independent alpha and finite negative/over-one RGB. It does not establish ICC, chromatic adaptation, physical white/nits, PQ/HLG/HDR or natural quality acceptance. A late selected source window may still decode earlier frames.
+This is a public intermediate-data interface. Default render/preview/cache and general timeline effects have not adopted this surface backend. Independent core MP4/GIF exports must be labelled accordingly.
+Read the [float surface contract](../../docs/specs/浮点表面合成与高精度边界_实验_v0.1_2026-10-22.md), [actual independent/native/installed evidence](../../docs/validation/浮点表面合成与高精度边界独立实测_2026-10-22.md), and [CLI/readback guide](../../docs/Agent浮点帧包CLI使用与验收边界_2026-10-22.md).
+<!-- /V92-NATIVE-FLOAT-SURFACE -->
+
 <!-- V85-NATIVE-EMPTY-WINDOW -->
 Retain verified source/runtime/index boundaries even when zero frames are selected. NATIVE_INDEX_CORRUPT/exit 6 must still block output. Unknown final native duration remains an error; explicit cache cleanup and authored-reference protection continue to apply.
 Read the [empty-window contract](../../docs/specs/原生视频空区间契约_v0.1_2026-10-21.md) and [actual independent evidence](../../docs/validation/原生空视频选区与显式音频保留实测_2026-10-21.md).

@@ -1,0 +1,55 @@
+{
+  "inputs": [
+    {
+      "kind": "sequence-projection-budget",
+      "method": "bilinear",
+      "max_working_bytes": 1073741824,
+      "nodes": [],
+      "estimated_working_bytes": 0,
+      "scope": "reachable-sequence-projection-instances-only-not-process-rss",
+      "time_disjoint_instances_charged": true,
+      "unused_sequences_charged": false
+    },
+    {
+      "asset_id": "ramp",
+      "clip_id": "picture",
+      "input": 0,
+      "kind": "video",
+      "source_in_tick": 0,
+      "source_out_tick": 90000,
+      "video_frame_clock": {
+        "protocol": "rational-local-video-clock-v1",
+        "input_time_base": "1/1000",
+        "working_time_base": "1/2147400000",
+        "fps": "4",
+        "ticks_per_second": 90000,
+        "input_pts_and_author_offsets_exact": true,
+        "nonlinear_retime_resolution_seconds": "1/2147400000",
+        "input_VFR_normalized": false,
+        "native_denominator_limit": 2147483647,
+        "input_time_base_source": "registered-native-stream",
+        "source_clock_anchor": "requested-author-source-in-tick",
+        "source_prefix_preserved_for_covering_frame": true,
+        "source_in_tick": 0,
+        "output_frame_start": 0,
+        "output_frame_end_exclusive": 4,
+        "output_interval": "global-CFR-half-open",
+        "short_input_padded": false
+      }
+    },
+    {
+      "kind": "sequence-audio-root",
+      "sample_rate": 48000,
+      "output_samples": 48000,
+      "child_input_count": 0,
+      "mixing": "float-sum-normalize-disabled",
+      "automatic_limiter": false,
+      "has_audible_inputs": false
+    }
+  ],
+  "warnings": [],
+  "input_arguments": [
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\product\\.runtime\\color-precision-20261021\\before-r5\\16bit\\assets\\ramp_16bit-original.mkv"
+  ]
+}

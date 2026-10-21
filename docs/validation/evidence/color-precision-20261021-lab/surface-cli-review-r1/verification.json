@@ -1,0 +1,73 @@
+{
+  "status": "prepared-not-viewed",
+  "viewed": false,
+  "started_at_utc": "2026-10-21T21:09:52.144583+00:00",
+  "script_sha256": "sha256:1fcfd1affecfd2dfd1995e0ee3d838a02f80ad64876bc74f2712ae4fa5dc2aa6",
+  "calls": [
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\surface-cli-media-r1\\original.mp4",
+        "-vf",
+        "select=eq(n\\,0)+eq(n\\,9)+eq(n\\,19)",
+        "-pix_fmt",
+        "rgb24",
+        "-fps_mode",
+        "passthrough",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "sha256:a75230a92ae01345d3c19505ba69ef31c2421bda5f9c5d7fe77a85d88cbe70ca"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\surface-cli-media-r1\\affine.mp4",
+        "-vf",
+        "select=eq(n\\,0)+eq(n\\,9)+eq(n\\,19)",
+        "-pix_fmt",
+        "rgb24",
+        "-fps_mode",
+        "passthrough",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "sha256:036022494e54d12ba6698d6ddacbcd4189377085ac8e545cbe183706f1f3750a"
+    }
+  ],
+  "inputs": {
+    "docs/assets/color-precision-20261021-lab/surface-cli-media-r1/original.mp4": "sha256:d5829732d24e47b477c0fc6f4fd5d8f05fdd2f13d86f0403439209949417ee06",
+    "docs/assets/color-precision-20261021-lab/surface-cli-media-r1/affine.mp4": "sha256:07695d4e229eef72b2f3e2781f67ea512bdfcf727814327cc60fb5746fb09a87"
+  },
+  "frames": [
+    0,
+    9,
+    19
+  ],
+  "continuous_playback_reviewed": false,
+  "audio_present": false,
+  "HDR_accepted": false,
+  "natural_quality_accepted": false,
+  "virtualization": false,
+  "network": false,
+  "ffmpeg": {
+    "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+  },
+  "output": {
+    "path": "docs/assets/color-precision-20261021-lab/surface-cli-review-r1/actual-MP4-frames-0-9-19.png",
+    "bytes": 120606,
+    "sha256": "sha256:5668b4780b0c48def749ecf922f760bb38e470981a4fc2a0b5e31cea2839a267"
+  },
+  "finished_at_utc": "2026-10-21T21:09:53.352932+00:00"
+}

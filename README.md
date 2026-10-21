@@ -1,5 +1,33 @@
 # Agent Video Kit
 
+<!-- V92-NATIVE-FLOAT-SURFACE -->
+### V92 Agent原生浮点帧包与线性光核心
+
+完整原生回归 **2234方法 /7549.898秒 /0跳过**；282产品输入、8外部夹具、17启动时脚本及9依赖文件保持相同。 `surface export / inspect`提供原始帧时钟与Float32像素数据。默认时间线render、preview和缓存尚未采用该核心；完整剪映等价、ICC/PQ/HLG/HDR和自然素材验收仍未完成。
+
+| 编号 | 功能性核验 | 实际执行内容与限制 | 证据 |
+|---|---|---|---|
+| V92-01 | Float32合成与alpha | 28个可分离、4个非分离混合模式；蒙版/opacity只改覆盖率；16-bit码格逻辑运算单独声明。r11浮点专项86项通过，非完整门禁 | [规格](docs/specs/浮点表面合成与高精度边界_实验_v0.1_2026-10-22.md) · [r11](docs/validation/evidence/color-precision-20261021-lab/kernel-r11.json) |
+| V92-02 | 10/16-bit原实现对照 | 相同原创原片的旧CLI全幅蒙版只保留220灰阶；独立浮点链分别保留1024/65536灰阶且全样本0码误差。原不透明直通/crop对照约保留10-bit，不把所有旧渲染称8-bit | [原片/原始before](docs/validation/evidence/color-precision-20261021-lab/before-r5/verification.json) · [独立核心after](docs/validation/evidence/color-precision-20261021-lab/float-media-r2/verification.json) |
+| V92-03 | 原生RGB/YUV与源时钟 | 8–16位整数、Float16/32 RGB/灰度；显式矩阵/量程/六种色度位置的YCbCr；源PTS/时长/VFR保留。仅支持公布格式，逐行由调用方声明 | [报告](docs/validation/浮点表面合成与高精度边界独立实测_2026-10-22.md) |
+| V92-04 | 信号转换与仿射 | 相对D65三原色族、五传递函数；线性光合成；预乘域双线性/点采样，透明外部。独立已发表XYZ/标量/全帧参考；不做物理白/绝对亮度、ICC或HDR | [当前17份源码](docs/validation/evidence/color-precision-20261021-lab/implementation-r3/manifest.json) |
+| V92-05 | Agent CLI帧包 | `surface export/inspect`，Float32 RGBA、int64原始时钟、有界JSON；源选区、静态逆仿射、预算/取消/新目录原子提交；只读inspect不重新核验源 | [命令与读取方式](docs/Agent浮点帧包CLI使用与验收边界_2026-10-22.md) |
+| V92-06 | 真实子进程CLI媒体 | 15次CLI、12条脚本级原生命令、另1次核心图进程；34检查、18资产。四包20/20/20/5帧，所有RGB和源时钟按独立参考核对 | [真实调用及SHA](docs/validation/evidence/color-precision-20261021-lab/surface-cli-media-r1/verification.json) |
+| V92-07 | 原视频/MP4/GIF | 两段实际线性管线输出各20帧/10fps/2秒；全部16-bit回写≤1码，逐PTS和GIF逐100ms。影片由独立核心管线生成，surface命令本身不编码电影 | [原生RGB原片](docs/assets/color-precision-20261021-lab/native-source-media-r1/foreground-16bit.mkv) · [原生YUV原片](docs/assets/color-precision-20261021-lab/native-source-media-r1/background-16bit.mkv) · [实际仿射MP4](docs/assets/color-precision-20261021-lab/surface-cli-media-r1/affine.mp4) · [16-bit无损](docs/assets/color-precision-20261021-lab/surface-cli-media-r1/affine-linear-composite-16bit.mkv) |
+| V92-08 | 实际抽帧目检 | view_image查看原始/仿射两段0/9/19，共6小尺寸帧；角度、缩放、透明棋盘符合预期，未见明显黑边。未连续播放/试听，不作自然素材结论 | [已查看记录](docs/validation/evidence/color-precision-20261021-lab/surface-cli-review-r1/reviewed.json) |
+| V92-09 | 全新离线安装 | 8轮；171资源source/wheel/site相等，NumPy931原文件及许可相同；117项/288.585s/0跳过，213运行模块均在安装site；18次子进程CLI；四包像素/时钟及合成RGBA与开发版一致 | [新安装收据](docs/validation/evidence/color-precision-20261021-lab/installed-r1/verification.json) · [安装版新媒体](docs/validation/evidence/color-precision-20261021-lab/surface-cli-media-installed-r1/verification.json) |
+| V92-10 | 真实失败与修复边界 | FFmpeg自动预乘、原片错误色彩标签、r9两项Float32参考舍入断言及文档收据层级错误均留证；后两项不改生产算法，不用通过数替代质量 | [失败/控制/源码纪元](docs/validation/浮点表面合成与高精度边界独立实测_2026-10-22.md) |
+| V92-11 | 已发布父版与完整门禁 | V91 18f5dc76 /2148已发布；只迁入两个队列修复文件，再执行完整2234；历史专项与当轮完整/安装分别计数 | [迁移](docs/validation/evidence/color-precision-20261021-lab/parent-rebase-r1.json) |
+| V92-12 | OpenFilm复用降本 | 已适配HTML/看帧/字幕/模板字段/缓存/编码器/诊断；保留14候选取舍。当前新增浮点核心是本项目实现，OpenFilm不补齐离线算法或HDR质量 | [R14成本与拆取清单](docs/OpenFilm可拆模块与现有内核降本清单_2026-10-21.md) · [R15增量复核](docs/OpenFilm新增提交与复用结论更新_2026-10-21.md) |
+
+![真实CLI帧包经独立线性核心合成的输出，非默认时间线after](docs/assets/color-precision-20261021-lab/surface-cli-media-r1/affine.gif)
+
+![两段实际MP4的0/9/19帧，未作连续播放验收](docs/assets/color-precision-20261021-lab/surface-cli-review-r1/actual-MP4-frames-0-9-19.png)
+
+
+完整回归：[2234方法实际终态](docs/validation/evidence/color-precision-20261021-lab/full-r1.json) · [额外冻结门禁](docs/validation/evidence/color-precision-20261021-lab/complete-gate-r1.json)。
+<!-- /V92-NATIVE-FLOAT-SURFACE -->
+
 <!-- V91-NATIVE-AUDIO-INTERVAL-CLOCK -->
 ### V91 源音频内部缺口、重叠与派生缓存
 

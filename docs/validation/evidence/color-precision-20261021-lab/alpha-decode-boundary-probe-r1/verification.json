@@ -1,0 +1,121 @@
+{
+  "native_windows": true,
+  "virtualization": false,
+  "network": false,
+  "editor_integrated": false,
+  "HDR_accepted": false,
+  "width": 1024,
+  "height": 64,
+  "frames": 1,
+  "rights": "CC0 original generated exhaustive alpha and RGB integer permutations",
+  "calls": [
+    {
+      "label": "encode",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-f",
+        "rawvideo",
+        "-pixel_format",
+        "gbrap16le",
+        "-video_size",
+        "1024x64",
+        "-framerate",
+        "1",
+        "-i",
+        "product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\alpha-decode-boundary-probe-r1\\original.gbrap16le",
+        "-c:v",
+        "ffv1",
+        "-level",
+        "3",
+        "product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\alpha-decode-boundary-probe-r1\\original.mkv"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_bytes": 0
+    },
+    {
+      "label": "direct-native",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "verbose",
+        "-i",
+        "product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\alpha-decode-boundary-probe-r1\\original.mkv",
+        "-vf",
+        "null",
+        "-pix_fmt",
+        "gbrap16le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "sha256:004104bcbc56e3a449abbb9ea57813c70a58614ab73cf343cc756a0a313487a1",
+      "output_bytes": 524288,
+      "maximum_error": 0.0,
+      "unique_first_plane": 65536,
+      "all_equal": true,
+      "auto_filters": []
+    },
+    {
+      "label": "alpha-native",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "verbose",
+        "-i",
+        "product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\alpha-decode-boundary-probe-r1\\original.mkv",
+        "-vf",
+        "alphaextract,format=gray16le",
+        "-pix_fmt",
+        "gray16le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "sha256:68e419472d25e0b85e9917ccf692fd58245c5e95e9a46f07d1df81d2e9da246b",
+      "output_bytes": 131072,
+      "maximum_error": 0.0,
+      "unique_first_plane": 65536,
+      "all_equal": true,
+      "auto_filters": []
+    },
+    {
+      "label": "RGB-float",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "verbose",
+        "-i",
+        "product\\.runtime\\color-precision-lab-20261021\\docs\\assets\\color-precision-20261021-lab\\alpha-decode-boundary-probe-r1\\original.mkv",
+        "-vf",
+        "zscale=rangein=full:range=full:dither=none,format=gbrpf32le",
+        "-pix_fmt",
+        "gbrpf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "sha256:5f7dbe488114acb5f7605f7f43370641ed820829d607fdd676ada680e4ead467",
+      "output_bytes": 786432,
+      "maximum_error": 0.9754076660610238,
+      "unique_first_plane": 65484,
+      "all_equal": false,
+      "auto_filters": []
+    }
+  ],
+  "assets": {
+    "docs/assets/color-precision-20261021-lab/alpha-decode-boundary-probe-r1/original.gbrap16le": {
+      "bytes": 524288,
+      "sha256": "sha256:004104bcbc56e3a449abbb9ea57813c70a58614ab73cf343cc756a0a313487a1"
+    },
+    "docs/assets/color-precision-20261021-lab/alpha-decode-boundary-probe-r1/original.mkv": {
+      "bytes": 22389,
+      "sha256": "sha256:a0f189f01f1fa72c48d2ead672e324833e9144c614acf124676437a35f24ebd2"
+    }
+  }
+}

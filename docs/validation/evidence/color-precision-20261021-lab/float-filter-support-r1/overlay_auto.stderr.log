@@ -1,0 +1,84 @@
+[Parsed_nullsrc_0 @ 000001e938454d40] size:32x16 rate:1/1 duration:1.000000 sar:1/1
+Input #0, lavfi, from 'nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123':
+  Duration: N/A, start: 0.000000, bitrate: N/A
+  Stream #0:0: Video: wrapped_avframe, 1 reference frame, gbrapf32le, 32x16 [SAR 1:1 DAR 2:1], 1 fps, 1 tbr, 1 tbn
+[Parsed_nullsrc_0 @ 000001e936b21dc0] size:32x16 rate:1/1 duration:1.000000 sar:1/1
+Input #1, lavfi, from 'nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.987654321:g=0.876543219:b=0.765432198:a=0.654321987':
+  Duration: N/A, start: 0.000000, bitrate: N/A
+  Stream #1:0: Video: wrapped_avframe, 1 reference frame, gbrapf32le, 32x16 [SAR 1:1 DAR 2:1], 1 fps, 1 tbr, 1 tbn
+[out#0/rawvideo @ 000001e9384a06c0] Adding streams from explicit maps...
+[out#0/rawvideo @ 000001e9384a06c0] Creating output stream from an explicitly mapped complex filtergraph 0, output [v]
+[vost#0:0/rawvideo @ 000001e9384aa640] Created video stream from complex filtergraph 0:[overlay:default]
+[vost#0:0/rawvideo @ 000001e9384aa640] 
+[fc#0 @ 000001e9384488c0] Binding input with label '0:v' to input stream 0:0
+[fc#0 @ 000001e9384488c0] Binding input with label '1:v' to input stream 1:0
+Stream mapping:
+  Stream #0:0 (wrapped_avframe) -> overlay
+  Stream #1:0 (wrapped_avframe) -> overlay
+  overlay:default -> Stream #0:0 (rawvideo)
+[vost#0:0/rawvideo @ 000001e9384aa640] Starting thread...
+[fc#0 @ 000001e9384488c0] Starting thread...
+[vist#0:0/wrapped_avframe @ 000001e9384768c0] [dec:wrapped_avframe @ 000001e938497f80] Starting thread...
+[vist#1:0/wrapped_avframe @ 000001e9384a5a00] [dec:wrapped_avframe @ 000001e938497300] Starting thread...
+[in#0/lavfi @ 000001e93844af80] Starting thread...
+[in#1/lavfi @ 000001e9384703c0] Starting thread...
+Press [q] to stop, [?] for help
+[in#0/lavfi @ 000001e93844af80] EOF while reading input
+[in#0/lavfi @ 000001e93844af80] Terminating thread with return code 0 (success)
+[vist#0:0/wrapped_avframe @ 000001e9384768c0] [dec:wrapped_avframe @ 000001e938497f80] Decoder thread received EOF packet
+[vist#0:0/wrapped_avframe @ 000001e9384768c0] [dec:wrapped_avframe @ 000001e938497f80] Decoder returned EOF, finishing
+[in#1/lavfi @ 000001e9384703c0] EOF while reading input
+[in#1/lavfi @ 000001e9384703c0] Terminating thread with return code 0 (success)
+[vist#0:0/wrapped_avframe @ 000001e9384768c0] [dec:wrapped_avframe @ 000001e938497f80] Terminating thread with return code 0 (success)
+[vist#1:0/wrapped_avframe @ 000001e9384a5a00] [dec:wrapped_avframe @ 000001e938497300] Decoder thread received EOF packet
+[vist#1:0/wrapped_avframe @ 000001e9384a5a00] [dec:wrapped_avframe @ 000001e938497300] Decoder returned EOF, finishing
+[graph 0 input from stream 0:0 @ 000001e9384b6e40] w:32 h:16 pixfmt:gbrapf32le tb:1/1 fr:1/1 sar:1/1 csp:gbr range:unknown alpha:unspecified
+[vist#1:0/wrapped_avframe @ 000001e9384a5a00] [dec:wrapped_avframe @ 000001e938497300] Terminating thread with return code 0 (success)
+[graph 0 input from stream 1:0 @ 000001e9384b6800] w:32 h:16 pixfmt:gbrapf32le tb:1/1 fr:1/1 sar:1/1 csp:gbr range:unknown alpha:unspecified
+[auto_scale_0 @ 000001e9384b7080] w:iw h:ih flags:'' interl:0
+[Parsed_overlay_0 @ 000001e9384b64c0] auto-inserting filter 'auto_scale_0' between the filter 'graph 0 input from stream 0:0' and the filter 'Parsed_overlay_0'
+[auto_scale_1 @ 000001e9384b7180] w:iw h:ih flags:'' interl:0
+[Parsed_overlay_0 @ 000001e9384b64c0] auto-inserting filter 'auto_scale_1' between the filter 'graph 0 input from stream 1:0' and the filter 'Parsed_overlay_0'
+[auto_scale_2 @ 000001e9384b63c0] w:iw h:ih flags:'' interl:0
+[format @ 000001e9384b65c0] auto-inserting filter 'auto_scale_2' between the filter 'Parsed_overlay_0' and the filter 'format'
+[auto_scale_0 @ 000001e9384b7080] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:yuva444p10le csp:unknown range:unknown sar:1/1 flags:0x00000004
+[auto_scale_0 @ 000001e9384b7080] [framesync @ 000001e9384b7810] Selected 1/1 time base
+[auto_scale_0 @ 000001e9384b7080] [framesync @ 000001e9384b7810] Sync level 1
+[auto_scale_1 @ 000001e9384b7180] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 -> w:32 h:16 fmt:yuva444p10le csp:unknown range:unknown sar:1/1 flags:0x00000004
+[auto_scale_1 @ 000001e9384b7180] [framesync @ 000001e9384cdfd0] Selected 1/1 time base
+[auto_scale_1 @ 000001e9384b7180] [framesync @ 000001e9384cdfd0] Sync level 1
+[Parsed_overlay_0 @ 000001e9384b64c0] main w:32 h:16 fmt:yuva444p10le overlay w:32 h:16 fmt:yuva444p10le
+[Parsed_overlay_0 @ 000001e9384b64c0] [framesync @ 000001e9384a03a8] Selected 1/1 time base
+[Parsed_overlay_0 @ 000001e9384b64c0] [framesync @ 000001e9384a03a8] Sync level 2
+[auto_scale_2 @ 000001e9384b63c0] w:32 h:16 fmt:yuva444p10le csp:unknown range:unknown sar:1/1 -> w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:1/1 flags:0x00000004
+[auto_scale_2 @ 000001e9384b63c0] [framesync @ 000001e9384d4c10] Selected 1/1 time base
+[auto_scale_2 @ 000001e9384b63c0] [framesync @ 000001e9384d4c10] Sync level 1
+Output #0, rawvideo, to 'pipe:1':
+  Metadata:
+    encoder         : Lavf62.12.100
+  Stream #0:0: Video: rawvideo, 1 reference frame (G4[0][33] / 0x21003447), gbrapf32le(gbr/unknown/unknown, progressive), 32x16 [SAR 1:1 DAR 2:1], q=2-31, 65 kb/s, 1 fps, 1 tbn
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+[out#0/rawvideo @ 000001e9384a06c0] Starting thread...
+[auto_scale_0 @ 000001e9384b7080] [framesync @ 000001e9384b7810] Sync level 0
+[Parsed_overlay_0 @ 000001e9384b64c0] [framesync @ 000001e9384a03a8] Sync level 1
+[fc#0 @ 000001e9384488c0] All consumers returned EOF
+[vost#0:0/rawvideo @ 000001e9384aa640] [enc:rawvideo @ 000001e93847ca40] Encoder thread received EOF
+[vost#0:0/rawvideo @ 000001e9384aa640] Terminating thread with return code 0 (success)
+[fc#0 @ 000001e9384488c0] Terminating thread with return code 0 (success)
+[out#0/rawvideo @ 000001e9384a06c0] All streams finished
+[out#0/rawvideo @ 000001e9384a06c0] Terminating thread with return code 0 (success)
+[AVIOContext @ 000001e9384b31c0] Statistics: 8192 bytes written, 0 seeks, 1 writeouts
+[out#0/rawvideo @ 000001e9384a06c0] Output file #0 (pipe:1):
+[out#0/rawvideo @ 000001e9384a06c0]   Output stream #0:0 (video): 1 frames encoded; 1 packets muxed (8192 bytes); 
+[out#0/rawvideo @ 000001e9384a06c0]   Total: 1 packets (8192 bytes) muxed
+[out#0/rawvideo @ 000001e9384a06c0] video:8KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.000000%
+frame=    1 fps=0.0 q=-0.0 Lsize=       8KiB time=00:00:01.00 bitrate=  65.5kbits/s speed= 530x elapsed=0:00:00.00    
+[in#0/lavfi @ 000001e93844af80] Input file #0 (nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.123456789:g=0.234567891:b=0.345678912:a=0.456789123):
+[in#0/lavfi @ 000001e93844af80]   Input stream #0:0 (video): 1 packets read (424 bytes); 1 frames decoded; 0 decode errors; 
+[in#0/lavfi @ 000001e93844af80]   Total: 1 packets (424 bytes) demuxed
+[in#1/lavfi @ 000001e9384703c0] Input file #1 (nullsrc=s=32x16:r=1:d=1,format=gbrapf32le,geq=r=0.987654321:g=0.876543219:b=0.765432198:a=0.654321987):
+[in#1/lavfi @ 000001e9384703c0]   Input stream #1:0 (video): 1 packets read (424 bytes); 1 frames decoded; 0 decode errors; 
+[in#1/lavfi @ 000001e9384703c0]   Total: 1 packets (424 bytes) demuxed
+
+Exiting with exit code 0

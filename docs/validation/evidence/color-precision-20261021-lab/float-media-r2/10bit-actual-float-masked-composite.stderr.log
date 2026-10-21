@@ -1,0 +1,82 @@
+ffmpeg version 8.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers
+  built with gcc 15.2.0 (Rev11, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-cairo --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-liboapv --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libsvtjpegxs --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper
+  libavutil      60. 26.100 / 60. 26.100
+  libavcodec     62. 28.100 / 62. 28.100
+  libavformat    62. 12.100 / 62. 12.100
+  libavdevice    62.  3.100 / 62.  3.100
+  libavfilter    11. 14.100 / 11. 14.100
+  libswscale      9.  5.100 /  9.  5.100
+  libswresample   6.  3.100 /  6.  3.100
+[in#0/rawvideo @ 000001c56af33000] Estimating duration from bitrate, this may be inaccurate
+Input #0, rawvideo, from 'E:\dev\sandbox\AI广告剪辑\product\.runtime\color-precision-lab-20261021\docs\assets\color-precision-20261021-lab\float-media-r2\10bit-background.gbrapf32le':
+  Duration: 00:00:01.00, start: 0.000000, bitrate: 33554 kb/s
+  Stream #0:0: Video: rawvideo, 1 reference frame (G4[0][33] / 0x21003447), gbrapf32le, 1024x64, 33554 kb/s, 4 fps, 4 tbr, 4 tbn
+[in#1/rawvideo @ 000001c56af30f80] Estimating duration from bitrate, this may be inaccurate
+Input #1, rawvideo, from 'E:\dev\sandbox\AI广告剪辑\product\.runtime\color-precision-lab-20261021\docs\assets\color-precision-20261021-lab\float-media-r2\10bit-original.gbrapf32le':
+  Duration: 00:00:01.00, start: 0.000000, bitrate: 33554 kb/s
+  Stream #1:0: Video: rawvideo, 1 reference frame (G4[0][33] / 0x21003447), gbrapf32le, 1024x64, 33554 kb/s, 4 fps, 4 tbr, 4 tbn
+[out#0/rawvideo @ 000001c56af2a100] Adding streams from explicit maps...
+[out#0/rawvideo @ 000001c56af2a100] Creating output stream from an explicitly mapped complex filtergraph 0, output [avkf_7_over]
+[vost#0:0/rawvideo @ 000001c56af31700] Created video stream from complex filtergraph 0:[unpremultiply:default]
+[vost#0:0/rawvideo @ 000001c56af31700] 
+[fc#0 @ 000001c56af2b9c0] Binding input with label '1:v' to input stream 1:0
+[fc#0 @ 000001c56af2b9c0] Binding input with label '0:v' to input stream 0:0
+Stream mapping:
+  Stream #0:0 (rawvideo) -> format:default
+  Stream #1:0 (rawvideo) -> format:default
+  unpremultiply:default -> Stream #0:0 (rawvideo)
+[vost#0:0/rawvideo @ 000001c56af31700] Starting thread...
+[fc#0 @ 000001c56af2b9c0] Starting thread...
+[vist#1:0/rawvideo @ 000001c56af2ab00] [dec:rawvideo @ 000001c56af5de00] Starting thread...
+[vist#0:0/rawvideo @ 000001c56af297c0] [dec:rawvideo @ 000001c56af5ea80] Starting thread...
+[in#0/rawvideo @ 000001c56af32e80] Starting thread...
+[in#1/rawvideo @ 000001c56af2ff00] Starting thread...
+Press [q] to stop, [?] for help
+[in#1/rawvideo @ 000001c56af2ff00] EOF while reading input
+[in#1/rawvideo @ 000001c56af2ff00] Terminating thread with return code 0 (success)
+[vist#1:0/rawvideo @ 000001c56af2ab00] [dec:rawvideo @ 000001c56af5de00] Decoder thread received EOF packet
+[in#0/rawvideo @ 000001c56af32e80] EOF while reading input
+[vist#1:0/rawvideo @ 000001c56af2ab00] [dec:rawvideo @ 000001c56af5de00] Decoder returned EOF, finishing
+[in#0/rawvideo @ 000001c56af32e80] Terminating thread with return code 0 (success)
+[graph 0 input from stream 1:0 @ 000001c56b3a3e40] w:1024 h:64 pixfmt:gbrapf32le tb:1/4 fr:4/1 sar:0/1 csp:unknown range:unknown alpha:unspecified
+[graph 0 input from stream 0:0 @ 000001c56b3a3c40] w:1024 h:64 pixfmt:gbrapf32le tb:1/4 fr:4/1 sar:0/1 csp:unknown range:unknown alpha:unspecified
+[Parsed_maskedmerge_10 @ 000001c56b3a3a00] [framesync @ 000001c56b3a3f90] Selected 1/4 time base
+[Parsed_maskedmerge_10 @ 000001c56b3a3a00] [framesync @ 000001c56b3a3f90] Sync level 1
+[graph 0 input from stream 1:0 @ 000001c56b3a3e40] video frame properties congruent with link at pts_time: 0
+[graph 0 input from stream 0:0 @ 000001c56b3a3c40] video frame properties congruent with link at pts_time: 0
+Output #0, rawvideo, to 'pipe:1':
+  Metadata:
+    encoder         : Lavf62.12.100
+  Stream #0:0: Video: rawvideo, 1 reference frame (G4[0][33] / 0x21003447), gbrapf32le(gbr/unknown/unknown, progressive), 1024x64, q=2-31, 33554 kb/s, 4 fps, 4 tbn
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+[out#0/rawvideo @ 000001c56af2a100] Starting thread...
+[vist#0:0/rawvideo @ 000001c56af297c0] [dec:rawvideo @ 000001c56af5ea80] Decoder thread received EOF packet
+[vist#0:0/rawvideo @ 000001c56af297c0] [dec:rawvideo @ 000001c56af5ea80] Decoder returned EOF, finishing
+[vist#1:0/rawvideo @ 000001c56af2ab00] [dec:rawvideo @ 000001c56af5de00] Terminating thread with return code 0 (success)
+[vist#0:0/rawvideo @ 000001c56af297c0] [dec:rawvideo @ 000001c56af5ea80] Terminating thread with return code 0 (success)
+[Parsed_maskedmerge_10 @ 000001c56b3a3a00] [framesync @ 000001c56b3a3f90] Sync level 0
+[fc#0 @ 000001c56af2b9c0] Filtergraph returned EOF, finishing
+[fc#0 @ 000001c56af2b9c0] All consumers returned EOF
+[vost#0:0/rawvideo @ 000001c56af31700] [enc:rawvideo @ 000001c56af34880] Encoder thread received EOF
+[vost#0:0/rawvideo @ 000001c56af31700] Terminating thread with return code 0 (success)
+[fc#0 @ 000001c56af2b9c0] Terminating thread with return code 0 (success)
+[out#0/rawvideo @ 000001c56af2a100] All streams finished
+[out#0/rawvideo @ 000001c56af2a100] Terminating thread with return code 0 (success)
+[AVIOContext @ 000001c56af32000] Statistics: 4194304 bytes written, 0 seeks, 128 writeouts
+[out#0/rawvideo @ 000001c56af2a100] Output file #0 (pipe:1):
+[out#0/rawvideo @ 000001c56af2a100]   Output stream #0:0 (video): 4 frames encoded; 4 packets muxed (4194304 bytes); 
+[out#0/rawvideo @ 000001c56af2a100]   Total: 4 packets (4194304 bytes) muxed
+[out#0/rawvideo @ 000001c56af2a100] video:4096KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.000000%
+frame=    4 fps=0.0 q=-0.0 Lsize=    4096KiB time=00:00:01.00 bitrate=33554.4kbits/s speed= 9.1x elapsed=0:00:00.10    
+[in#0/rawvideo @ 000001c56af32e80] Input file #0 (E:\dev\sandbox\AI广告剪辑\product\.runtime\color-precision-lab-20261021\docs\assets\color-precision-20261021-lab\float-media-r2\10bit-background.gbrapf32le):
+[in#0/rawvideo @ 000001c56af32e80]   Input stream #0:0 (video): 4 packets read (4194304 bytes); 4 frames decoded; 0 decode errors; 
+[in#0/rawvideo @ 000001c56af32e80]   Total: 4 packets (4194304 bytes) demuxed
+[AVIOContext @ 000001c56af33500] Statistics: 4194304 bytes read, 0 seeks
+[in#1/rawvideo @ 000001c56af2ff00] Input file #1 (E:\dev\sandbox\AI广告剪辑\product\.runtime\color-precision-lab-20261021\docs\assets\color-precision-20261021-lab\float-media-r2\10bit-original.gbrapf32le):
+[in#1/rawvideo @ 000001c56af2ff00]   Input stream #1:0 (video): 4 packets read (4194304 bytes); 4 frames decoded; 0 decode errors; 
+[in#1/rawvideo @ 000001c56af2ff00]   Total: 4 packets (4194304 bytes) demuxed
+[AVIOContext @ 000001c56af29ac0] Statistics: 4194304 bytes read, 0 seeks
+
+Exiting with exit code 0

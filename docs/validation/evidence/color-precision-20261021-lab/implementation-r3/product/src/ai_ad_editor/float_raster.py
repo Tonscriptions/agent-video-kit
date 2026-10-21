@@ -1,0 +1,165 @@
+"""Float32, straight-alpha surface operations compiled into local FFmpeg graphs.
+
+The editor must supply matched frame grids and a common colour space. This
+module performs no transfer-function conversion, decoding, I/O or inference.
+Porter-Duff/W3C mathematics is expressed using native float geq/blend/merge;
+8-bit overlay, alphaextract and alphamerge are deliberately absent.
+"""
+from __future__ import annotations
+from dataclasses import dataclass,field
+import re
+from .errors import AppError
+
+PROTOCOL='float32-straight-surface-compositing-v1'
+FORMAT='gbrapf32le'
+MAX_GRAPH_BYTES=1024*1024
+MAX_OPERATIONS=256
+MAX_EXPRESSION_BYTES=32768
+_LABEL=re.compile(r'(?:[A-Za-z_][A-Za-z_0-9]{0,95}|[0-9]+:v(?::[0-9]+)?)\Z')
+
+# A is the backdrop channel, B is the source channel. These display-referred
+# modes assume normalized channels; normal source-over also retains HDR values.
+_SOFT_D='if(lte(A,0.25),((16*A-12)*A+4)*A,sqrt(max(0,A)))'
+_BURN='if(eq(A,1),1,if(eq(B,0),0,1-min(1,(1-A)/B)))'
+_DODGE='if(eq(A,0),0,if(eq(B,1),1,min(1,A/(1-B))))'
+_QUANT_A='floor(clip(A,0,1)*65535+0.5)'
+_QUANT_B='floor(clip(B,0,1)*65535+0.5)'
+SEPARABLE={
+ 'normal':'B', 'multiply':'A*B', 'screen':'A+B-A*B', 'overlay':'if(lte(A,0.5),2*A*B,1-2*(1-A)*(1-B))',
+ 'darken':'min(A,B)', 'lighten':'max(A,B)', 'burn':_BURN, 'dodge':_DODGE,
+ 'hardlight':'if(lte(B,0.5),2*A*B,1-2*(1-A)*(1-B))',
+ 'softlight':f'if(lte(B,0.5),A-(1-2*B)*A*(1-A),A+(2*B-1)*(({_SOFT_D})-A))',
+ 'difference':'abs(A-B)', 'exclusion':'A+B-2*A*B', 'addition':'min(1,A+B)',
+ 'addition128':'clip(A+B-0.5,0,1)', 'average':'(A+B)/2', 'subtract':'max(0,A-B)',
+ 'divide':'if(eq(B,0),1,min(1,A/B))', 'negation':'1-abs(1-A-B)',
+ 'phoenix':'min(A,B)-max(A,B)+1',
+ 'pinlight':'if(lte(B,0.5),min(A,2*B),max(A,2*B-1))',
+ 'reflect':'if(eq(B,1),1,min(1,A*A/(1-B)))',
+ 'glow':'if(eq(A,1),1,min(1,B*B/(1-A)))',
+ 'freeze':'if(eq(B,0),0,max(0,1-(1-A)*(1-A)/B))',
+ 'vivid':'if(lte(B,0.5),if(eq(B,0),0,max(0,1-(1-A)/(2*B))),if(eq(B,1),1,min(1,A/(2*(1-B)))))',
+ 'hard_mix':'if(lt(A+B,1),0,1)',
+ 'and':f'bitand({_QUANT_A},{_QUANT_B})/65535',
+ 'or':f'bitor({_QUANT_A},{_QUANT_B})/65535',
+ 'xor':f'(({_QUANT_A})+({_QUANT_B})-2*bitand({_QUANT_A},{_QUANT_B}))/65535',
+}
+NONSEPARABLE={'hue','saturation','color','luminosity'}
+ALIASES={'source_over':'normal','source-over':'normal','':'normal','hard-light':'hardlight',
+ 'soft-light':'softlight','color-burn':'burn','color-dodge':'dodge','hardmix':'hard_mix','vividlight':'vivid'}
+
+def mode_name(value):
+    if not isinstance(value,str):raise AppError('FLOAT_RASTER_MODE_INVALID','浮点混合模式必须是字符串',exit_code=2)
+    value=ALIASES.get(value.lower(),value.lower())
+    if value not in SEPARABLE and value not in NONSEPARABLE:
+        raise AppError('FLOAT_RASTER_MODE_INVALID','未知浮点混合模式',exit_code=2)
+    return value
+
+def _label(value):
+    if not isinstance(value,str) or not _LABEL.fullmatch(value):
+        raise AppError('FLOAT_RASTER_LABEL_INVALID','浮点表面标签无效',exit_code=2)
+    return value
+
+def _expression(value):
+    if not isinstance(value,str) or not value or len(value.encode('utf8'))>MAX_EXPRESSION_BYTES or any(c in value for c in "'\\[]:=\r\n"):
+        raise AppError('FLOAT_RASTER_EXPRESSION_INVALID','浮点表达式无效或超出预算',exit_code=2)
+    return "'"+value+"'"
+
+def _nonseparable_expressions(mode):
+    # A side-by-side surface exposes all six RGB components to geq. Registers
+    # hold the seed triple, target saturation/luminance and clipping extrema.
+    cb=[f'{c}(X,Y)' for c in ('r','g','b')]
+    cs=[f'{c}(X+W/2,Y)' for c in ('r','g','b')]
+    lum=lambda c:f'(0.3*({c[0]})+0.59*({c[1]})+0.11*({c[2]}))'
+    sat=lambda c:f'(max(max({c[0]},{c[1]}),{c[2]})-min(min({c[0]},{c[1]}),{c[2]}))'
+    seed=cs if mode in {'hue','color'} else cb
+    luminance=lum(cs if mode=='luminosity' else cb)
+    setup=''.join(f'st({i},{v});' for i,v in enumerate(seed))+'st(4,'+luminance+');'
+    if mode in {'hue','saturation'}:
+        setup+='st(3,'+sat(cb if mode=='hue' else cs)+');st(5,min(min(ld(0),ld(1)),ld(2)));st(6,max(max(ld(0),ld(1)),ld(2)));'
+        setup+=''.join(f'st({i},if(gt(ld(6),ld(5)),(ld({i})-ld(5))*ld(3)/(ld(6)-ld(5)),0));' for i in range(3))
+    setup+='st(7,ld(4)-(0.3*ld(0)+0.59*ld(1)+0.11*ld(2)));'
+    setup+=''.join(f'st({i},ld({i})+ld(7));' for i in range(3))
+    setup+='st(5,min(min(ld(0),ld(1)),ld(2)));'
+    setup+=''.join(f'st({i},if(lt(ld(5),0),ld(4)+(ld({i})-ld(4))*ld(4)/(ld(4)-ld(5)),ld({i})));' for i in range(3))
+    setup+='st(6,max(max(ld(0),ld(1)),ld(2)));'
+    setup+=''.join(f'st({i},if(gt(ld(6),1),ld(4)+(ld({i})-ld(4))*(1-ld(4))/(ld(6)-ld(4)),ld({i})));' for i in range(3))
+    return [setup+f'ld({i})' for i in range(3)]
+
+@dataclass
+class FloatRasterGraph:
+    """Append bounded fragments; every public surface is straight float RGBA."""
+    prefix:str='avkf'
+    filters:list[str]=field(default_factory=list)
+    _counter:int=0
+    _operations:int=0
+
+    def __post_init__(self):
+        _label(self.prefix)
+        if ':' in self.prefix:raise AppError('FLOAT_RASTER_LABEL_INVALID','输出命名空间不能是输入流标签',exit_code=2)
+
+    def _new(self,role):
+        self._counter+=1
+        if self._counter>MAX_OPERATIONS*16:raise AppError('FLOAT_RASTER_BUDGET','浮点表面数量超出预算',exit_code=2)
+        return _label(f'{self.prefix}_{self._counter}_{role}')
+
+    def _emit(self,text):
+        if len(text.encode('utf8'))+sum(len(v.encode('utf8'))+1 for v in self.filters)>MAX_GRAPH_BYTES:
+            raise AppError('FLOAT_RASTER_BUDGET','浮点滤镜图超过1MiB预算',exit_code=2)
+        self.filters.append(text)
+
+    def _operation(self):
+        self._operations+=1
+        if self._operations>MAX_OPERATIONS:raise AppError('FLOAT_RASTER_BUDGET','浮点操作次数超出预算',exit_code=2)
+
+    def prepare(self,source):
+        self._operation();source=_label(source);target=self._new('straight')
+        self._emit(f'[{source}]format={FORMAT}[{target}]');return target
+
+    def mask(self,source,coverage):
+        self._operation();source=_label(source);coverage=_expression(coverage);target=self._new('masked')
+        self._emit(f"[{source}]format={FORMAT},geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='alpha(X,Y)*clip(({coverage[1:-1]}),0,1)':interpolation=nearest[{target}]")
+        return target
+
+    def source_over(self,backdrop,source,*,opacity='1'):
+        self._operation();backdrop=_label(backdrop);source=_label(source);opacity=_expression(opacity)
+        bottom=self._new('bottom');top=self._new('top');mask=self._new('mask');opaque=self._new('opaque')
+        premul=self._new('premul');target=self._new('over')
+        # maskedmerge combines numeric planes. Keep all its input alpha-mode
+        # tags equal, otherwise FFmpeg 8.1 inserts dynamic premultiplication
+        # and squares the RGB coverage mask. Retagging changes metadata only;
+        # the backdrop RGB values remain premultiplied throughout this merge.
+        self._emit(f'[{backdrop}]format={FORMAT},premultiply=inplace=1,setparams=alpha_mode=straight[{bottom}]')
+        self._emit(f"[{source}]format={FORMAT},geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='clip(alpha(X,Y)*({opacity[1:-1]}),0,1)':interpolation=nearest,split=2[{top}][{mask}]")
+        self._emit(f"[{top}]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a=1:interpolation=nearest[{opaque}]")
+        self._emit(f"[{mask}]geq=r='alpha(X,Y)':g='alpha(X,Y)':b='alpha(X,Y)':a='alpha(X,Y)':interpolation=nearest[{mask}v]")
+        self._emit(f'[{bottom}][{opaque}][{mask}v]maskedmerge=planes=15[{premul}]')
+        self._emit(f'[{premul}]setparams=alpha_mode=premultiplied,unpremultiply=inplace=1[{target}]');return target
+
+    def blend(self,backdrop,source,*,mode='normal',opacity='1'):
+        mode=mode_name(mode)
+        if mode=='normal':return self.source_over(backdrop,source,opacity=opacity)
+        self._operation();backdrop=_label(backdrop);source=_label(source)
+        bgmath=self._new('bgmath');bgmask=self._new('bgmask');bgover=self._new('bgover')
+        fgmath=self._new('fgmath');fgplain=self._new('fgplain');result=self._new('blend');mask=self._new('ab')
+        isolated=self._new('isolated')
+        self._emit(f'[{backdrop}]format={FORMAT},split=3[{bgmath}][{bgmask}][{bgover}]')
+        self._emit(f'[{source}]format={FORMAT},split=2[{fgmath}][{fgplain}]')
+        if mode in NONSEPARABLE:
+            joined=self._new('pair');expressions=_nonseparable_expressions(mode)
+            self._emit(f'[{bgmath}][{fgmath}]hstack=inputs=2:shortest=1[{joined}]')
+            self._emit(f'[{joined}]geq=r={_expression(expressions[0])}:g={_expression(expressions[1])}:b={_expression(expressions[2])}:a=1:interpolation=nearest,crop=w=iw/2:h=ih:x=0:y=0[{result}]')
+        else:
+            self._emit(f'[{bgmath}][{fgmath}]blend=all_expr={_expression(SEPARABLE[mode])}:shortest=1[{result}]')
+        self._emit(f"[{bgmask}]geq=r='alpha(X,Y)':g='alpha(X,Y)':b='alpha(X,Y)':a=0:interpolation=nearest[{mask}]")
+        self._emit(f'[{fgplain}][{result}][{mask}]maskedmerge=planes=7[{isolated}]')
+        return self.source_over(bgover,isolated,opacity=opacity)
+
+    def graph(self):return ';'.join(self.filters)
+
+    def metadata(self):
+        return {'protocol':PROTOCOL,'surface_format':FORMAT,'alpha_representation':'straight-at-public-boundaries',
+            'source_over':'float-premultiplied-intermediate','operations':self._operations,'graph_bytes':len(self.graph().encode('utf8')),
+            'surface_time_grid':'caller-must-supply-matched-CFR-and-complete-coverage',
+            'colour_space':'caller-supplied-common-space-no-transfer-conversion',
+            'separable_modes':sorted(SEPARABLE),'nonseparable_modes':sorted(NONSEPARABLE),
+            'bitwise_mode_intrinsic_grid_bits':16,'HDR_acceptance':False,'editor_integrated':False}

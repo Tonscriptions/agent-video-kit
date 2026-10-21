@@ -990,6 +990,31 @@ def build_parser() -> argparse.ArgumentParser:
     render.add_argument('--hardware-decoder', choices=('auto', 'd3d11va', 'cuda'), default=None)
     render.add_argument('--hardware-probe-mib', type=int, default=None, help='四帧像素工作量预算 1..1024 MiB，不是全部显存上限')
 
+    surface = subs.add_parser('surface', help='原生帧时钟与浮点像素包，供Agent后续编辑')
+    surface_sub=surface.add_subparsers(dest='action',required=True)
+    surface_export=_leaf_common(surface_sub.add_parser('export',help='从已登记源提取浮点帧，保留原PTS/alpha'))
+    surface_export.add_argument('--project',required=True)
+    surface_export.add_argument('--asset-id',required=True)
+    surface_export.add_argument('--output',required=True,help='工程内新目录，包含Float32像素、int64帧时钟与JSON清单')
+    surface_export.add_argument('--source-primaries',required=True,choices=('bt709','display-p3','bt2020'))
+    surface_export.add_argument('--source-transfer',required=True,choices=('linear','srgb','bt709-oetf','gamma22','gamma24'))
+    surface_export.add_argument('--working-primaries',default='bt709',choices=('bt709','display-p3','bt2020'))
+    surface_export.add_argument('--working-transfer',default='linear',choices=('linear','srgb','bt709-oetf','gamma22','gamma24'))
+    surface_export.add_argument('--pixel-family',default='rgb',choices=('rgb','yuv'))
+    surface_export.add_argument('--yuv-matrix',choices=('bt709','bt470bg','smpte170m','bt2020nc'))
+    surface_export.add_argument('--yuv-range',choices=('full','limited'))
+    surface_export.add_argument('--chroma-location',choices=('left','center','topleft','top','bottomleft','bottom'))
+    surface_export.add_argument('--scan',choices=('progressive',),help='YCbCr须明确声明逐行采样语义')
+    surface_export.add_argument('--alpha-association',default='straight',choices=('straight','premultiplied'))
+    surface_export.add_argument('--start-frame',type=int,default=0)
+    surface_export.add_argument('--stop-frame',type=int,help='原生源帧的半开区间末帧；不是输出CFR帧号')
+    surface_export.add_argument('--transform-json',help='本地JSON：width/height/inverse(2×3逆仿射)')
+    surface_export.add_argument('--max-output-mib',type=int,default=2048,help='1..2048 MiB浮点像素/时钟/清单预算，不是峰值RSS')
+    surface_export.add_argument('--cancel-file')
+    surface_inspect=_leaf_common(surface_sub.add_parser('inspect',help='只读核验浮点包的像素与原生时钟字节'))
+    surface_inspect.add_argument('--project',required=True)
+    surface_inspect.add_argument('--input',required=True)
+
     queue = subs.add_parser("queue", help="项目内持久化渲染队列")
     queue_sub = queue.add_subparsers(dest="action", required=True)
     queue_enqueue = _leaf_common(queue_sub.add_parser("enqueue", help="写入一个或多个本地渲染作业"))
@@ -5894,6 +5919,31 @@ def command_preview(args: argparse.Namespace) -> dict[str, Any]:
         data=result,operation_id=operation_id,warnings=report.get('warnings',[])+result.get('warnings',[]))
 
 
+def command_surface(args: argparse.Namespace) -> dict[str, Any]:
+    from . import float_bundle
+    from .float_color_signal import ColorSignal
+    from .float_yuv import YUVSpec
+    root,project=load_project(args.project)
+    if args.action=='inspect':
+        return _envelope('surface.inspect',args,data=float_bundle.inspect_bundle(root,args.input))
+    geometry=_load_changes(args.transform_json) if args.transform_json else None
+    supplied=any(value is not None for value in (args.yuv_matrix,args.yuv_range,args.chroma_location))
+    spec=YUVSpec(args.yuv_matrix,args.yuv_range,args.chroma_location) if supplied else None
+    plan=float_bundle.prepare(root,project,args.asset_id,args.output,
+        source_signal=ColorSignal(args.source_primaries,args.source_transfer),
+        target_signal=ColorSignal(args.working_primaries,args.working_transfer),pixel_family=args.pixel_family,
+        yuv_spec=spec,scan=args.scan,alpha_association=args.alpha_association,start_frame=args.start_frame,
+        stop_frame=args.stop_frame,geometry=geometry,max_output_bytes=args.max_output_mib*1024**2)
+    if args.dry_run:return _envelope('surface.export',args,status='planned',data=plan)
+    operation_id=new_id('surface')
+    result=float_bundle.export_bundle(root,plan,cancel_file=args.cancel_file,
+        progress=lambda done,total:_progress(args,operation_id,'progress','surface.export',done/total*100,'提取并转换原生浮点帧'))
+    _operation(root,operation_id,{'operation_id':operation_id,'command':'surface.export','status':'succeeded',
+        'created_at':now_iso(),'asset_id':args.asset_id,'output':result['output'],'manifest':result['manifest'],
+        'manifest_sha256':result['manifest_sha256'],'recipe_sha256':result['recipe_sha256']})
+    return _envelope('surface.export',args,data=result,operation_id=operation_id)
+
+
 def command_render(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     sequence = find_sequence(project, args.sequence_id)
@@ -6907,6 +6957,7 @@ def command_diagnostics(args):
 
 
 _READ_ONLY_PROJECT_COMMANDS = {
+    ('surface','inspect'),
     ('diagnostics', 'list'), ('diagnostics', 'show'), ('diagnostics', 'export'),
     ("project", "inspect"),
     ("operation", "inspect"),
@@ -6944,6 +6995,8 @@ def _project_operation_lock(args: argparse.Namespace):
 
 
 COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, Any]]] = {
+    ('surface','export'):command_surface,
+    ('surface','inspect'):command_surface,
     ('cache','list'):command_cache,
     ('cache','prune'):command_cache,
     ('preview','frame'): command_preview,
