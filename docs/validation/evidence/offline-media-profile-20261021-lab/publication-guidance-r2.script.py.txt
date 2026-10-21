@@ -1,0 +1,88 @@
+"""Remove two obsolete generic install instructions without editing frozen code."""
+import ast
+from datetime import datetime, timezone
+import json
+from pathlib import Path
+
+from native_index_release_tools import sha
+from run_frozen_regression import frozen
+
+ROOT = Path(__file__).resolve().parents[1]
+REL = ROOT / 'docs/validation/evidence/offline-media-profile-20261021-lab'
+REFRESH = {
+    'video-cut-agent-editor': {
+        'before': 'For font/text rendering use a `font-text-v1` bundle with seven pinned wheels,\nincluding Pillow; the historical six-wheel `core-v1` bundle lacks that dependency.',
+        'after': 'For the current product use the eight-wheel `media-analysis-v1` bundle with\nPillow and NumPy. The seven-wheel `font-text-v1` and six-wheel `core-v1` profiles\nreproduce dependency-compatible historical products only.'},
+    'video-cut-quality': {
+        'before': 'Font/text installers use the seven-wheel `font-text-v1` profile with Pillow;\nverify actual font ingestion under the isolated launcher, not host imports.',
+        'after': 'Current font/text installations use the eight-wheel `media-analysis-v1` profile\nwith Pillow and NumPy. Use seven-wheel `font-text-v1` only for matching historical\nproducts; verify actual font ingestion under the isolated launcher, not host imports.'}}
+
+
+def main():
+    output = REL / 'publication-guidance-r2.json'
+    archive = REL / 'publication-guidance-r2'
+    assert not output.exists() and not archive.exists()
+    current = frozen()
+    assert len(current) == 260
+    publisher = ROOT / 'scripts/publish_offline_media_profile.py'
+    generator = ROOT / 'scripts/prepare_media_publication.py'
+    prior = json.loads((REL / 'publication-preparation-r1.json').read_bytes())
+    assert sha(publisher) == prior['publisher_sha256']
+    assert sha(generator) == prior['generator_sha256']
+    sources = {publisher: publisher.read_text('utf8'), generator: generator.read_text('utf8')}
+    needle = "    drafts=read(ROOT/REL/'skills-draft-r1.json');assert set(drafts['skills'])==set(SKILLS);refresh=drafts['future_parent_refresh']"
+    edit = "        assert refresh['after'] not in body;write(parent,body.replace(refresh['before'],refresh['after']))"
+    replacement = "        assert refresh['after'] not in body;body=body.replace(refresh['before'],refresh['after'])\n"
+    replacement += "        if name in install_refresh:\n"
+    replacement += "            clause=install_refresh[name];assert body.count(clause['before'])==1,(name,'Historical generic install guidance missing or duplicated')\n"
+    replacement += "            assert clause['after'] not in body;body=body.replace(clause['before'],clause['after'])\n"
+    replacement += "        write(parent,body)"
+    old_scope = '四Skill只合并新块和精确父版条款更新，17份总审。'
+    new_scope = '四Skill只合并新块与精确条款，并更新两份通用安装指引；17份总审。'
+    revised = {}
+    for path, source in sources.items():
+        assert source.count(needle) == source.count(edit) == source.count(old_scope) == 1
+        text = source.replace(needle, '    install_refresh=' + repr(REFRESH) + '\n' + needle)
+        text = text.replace(edit, replacement).replace(old_scope, new_scope)
+        compile(text, str(path), 'exec')
+        revised[path] = text
+    tree = ast.parse(revised[generator])
+    documents = next(node.value for node in tree.body if isinstance(node, ast.Assign)
+                     and any(isinstance(target, ast.Name) and target.id == 'DOCUMENTS' for target in node.targets))
+    expected = ast.parse(ast.literal_eval(documents)).body[0]
+    actual = next(node for node in ast.parse(revised[publisher]).body
+                  if isinstance(node, ast.FunctionDef) and node.name == 'documents')
+    assert ast.dump(expected, include_attributes=False) == ast.dump(actual, include_attributes=False)
+    archive.mkdir()
+    previous = {}
+    for path, source in sources.items():
+        target = archive / (path.name + '.before.txt')
+        target.write_bytes(path.read_bytes())
+        previous[path.relative_to(ROOT).as_posix()] = {'sha256': sha(target), 'preserved': target.relative_to(ROOT).as_posix()}
+        path.write_text(revised[path], encoding='utf8', newline='\n')
+    assert frozen() == current
+    record = {
+        'status': 'prepared-reviewed-install-guidance-refresh',
+        'at_utc': datetime.now(timezone.utc).isoformat(), 'revision': 'r2',
+        'reason': 'Two generic Skill paragraphs still recommended seven wheels for the current product.',
+        'install_guidance_refresh': REFRESH, 'previous_sources': previous,
+        'publisher_sha256': sha(publisher), 'publisher_generator_sha256': sha(generator),
+        'publisher_generator_documents_AST_matches': True, 'frozen_inputs_unchanged': current,
+        'product_or_media_algorithms_changed': False, 'main_changed': False,
+        'prior_preflight_and_preview_retained': True, 'new_preflight_and_preview_required': True,
+        'generator_sha256': sha(Path(__file__))}
+    output.write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+    (REL / 'publication-guidance-r2.script.py.txt').write_bytes(Path(__file__).read_bytes())
+    revised_preparation = {**prior, 'revision': 'r2', 'supersedes': 'publication-preparation-r1.json',
+                           'publisher_sha256': sha(publisher), 'generator_sha256': sha(generator),
+                           'install_guidance_refresh_record': output.relative_to(ROOT).as_posix(),
+                           'install_guidance_refresh_sha256': sha(output)}
+    target = REL / 'publication-preparation-r2.json'
+    assert not target.exists()
+    target.write_text(json.dumps(revised_preparation, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+    print(json.dumps({'status': record['status'], 'exact_additional_skill_clauses': len(REFRESH),
+                      'frozen_inputs_unchanged': len(current), 'main_changed': False}))
+
+
+if __name__ == '__main__':
+    main()

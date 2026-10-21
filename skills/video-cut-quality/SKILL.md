@@ -3,6 +3,18 @@ name: video-cut-quality
 description: Review local encoded masks, explicit selected/clear checkpoints, color scopes, render manifests, and quality evidence for Agent video delivery.
 ---
 
+<!-- V89-OFFLINE-MEDIA-PROFILE -->
+<!-- OFFLINE-MEDIA-PROFILE-LAB-20261021 -->
+Check eight local module origins, both NumPy .pyd origins, dot/solve/FFT execution and preserved license files. The pinned2.4.2 evidence compares931 original wheel files except pip-rewritten RECORD; do not replace these checks with host import success.
+Read the [offline media profile contract](../../docs/specs/离线媒体运行时与NumPy交付_v0.1_2026-10-21.md) and [fresh native/installed evidence](../../docs/validation/八轮离线媒体运行时实测_2026-10-21.md).
+The official pinned NumPy2.4.2 cp313 Windows x64 wheel and original notices are verified locally. The fresh eight-wheel install does not copy host NumPy and does not create a virtual environment, download at runtime or change global site-packages. Existing native Python/pip and FFmpeg are prerequisites.
+Older core-v1/font-text-v1 bundles remain accepted only for products whose declared dependencies fit those profiles. Current products declaring NumPy require media-analysis-v1. Missing or changed sources must fail before building the product wheel.
+This acceptance covers the stated pinned platform and synthetic media. A general dependency resolver, other ABIs, full model distribution, natural/HDR/long-form/RSS/playback/listening and complete CapCut parity are separate acceptance work.
+
+<!-- /OFFLINE-MEDIA-PROFILE-LAB-20261021 -->
+<!-- /V89-OFFLINE-MEDIA-PROFILE -->
+
+
 <!-- V88-NATIVE-AUDIO-SOURCE-ORIGIN -->
 <!-- NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->
 Compare the complete lossless PCM to independent leading silence plus original samples, and compare full lossless RGBA separately. MP4/AAC padding, encoded identity patches and GIFs have distinct checks and do not establish exact encoded PCM/RGBA equality.
@@ -10,7 +22,7 @@ The native PCM acceptance uses demux-relative input timestamps with aresample fi
 Read the [source audio clock contract](../../docs/specs/原生音频起点与作者采样时钟_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生音频起点与同步实测_2026-10-21.md).
 The real two-case sample covers container origins 0/5 seconds and audio starts 1/6 seconds, each a one-second relative gap. Source-normalized audio and offset-applied camera cuts are checked separately. R3 input/output frame and silence controls do not establish listening, pitch or stereo-phase quality.
 Compressed-codec priming, negative timestamps/edit lists, internal timestamp discontinuities, device drift, natural recordings, long-form/RSS, continuous playback and listening still need acceptance.
-Seven base offline wheels do not include NumPy; isolated evidence uses an explicit readonly RECORD/license-verified copy of existing local NumPy 2.4.2. Do not treat that copy as automatic dependency installation.
+The current media-analysis-v1 profile ships eight pinned offline wheels, including NumPy 2.4.2. Earlier font-text-v1 experiments used an explicit local NumPy copy; those historical receipts do not establish the current profile. Verify the current bundle manifest, native-operation audit and module origins before use.
 
 <!-- /NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->
 <!-- /V88-NATIVE-AUDIO-SOURCE-ORIGIN -->
@@ -337,8 +349,9 @@ checks alone do not establish Schema acceptance. Inspect the declared
 [release validation evidence](../../docs/validation/离线发行与随包Schema实测_2026-10-18.md)
 for independent source frame/PCM checks, actual rollback cases and the
 separate static/playback/listening boundaries.
-Font/text installers use the seven-wheel `font-text-v1` profile with Pillow;
-verify actual font ingestion under the isolated launcher, not host imports.
+Current font/text installations use the eight-wheel `media-analysis-v1` profile
+with Pillow and NumPy. Use seven-wheel `font-text-v1` only for matching historical
+products; verify actual font ingestion under the isolated launcher, not host imports.
 
 For [HTML text layout and font coverage](../../docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md),
 review every CFR frame and the independent reverse redraw. Separate partial

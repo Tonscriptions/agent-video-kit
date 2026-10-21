@@ -1,0 +1,139 @@
+"""Bind completed candidate checks; keep future full-suite/publication pending."""
+from datetime import datetime, timezone
+import json
+from pathlib import Path
+import re
+import shutil
+
+from native_index_release_tools import sha
+from run_frozen_regression import frozen
+from run_offline_media_after_parent import dependency_inputs
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+REL = ROOT / 'docs/validation/evidence/offline-media-profile-20261021-lab'
+
+
+def read(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def save(path, value):
+    Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n',
+                          encoding='utf8', newline='\n')
+
+
+def main():
+    output = REL / 'readiness-r1.json'
+    assert not output.exists()
+    current = frozen()
+    assert len(current) == 260
+    preparation = read(REL / 'publication-preparation-r1.json')
+    full_preflight_path = ROOT / 'product/.runtime/offline-media-profile-20261021/full-source-preflight-r1/run.json'
+    pub_preflight_path = ROOT / 'product/.runtime/offline-media-profile-20261021/publication-source-preflight-r1/run.json'
+    full_preflight, pub_preflight = read(full_preflight_path), read(pub_preflight_path)
+    default_path = REL / 'default-profile-r1/verification.json'
+    preview_path = REL / 'publication-preview-r1.json'
+    default, preview = read(default_path), read(preview_path)
+    assert full_preflight['status'] == 'passed-source-preflight-awaiting-published-audio'
+    assert not full_preflight['suite_launched'] and full_preflight['frozen_inputs'] == current
+    assert pub_preflight['status'] == 'passed-source-preflight-awaiting-full'
+    assert pub_preflight['frozen_inputs'] == preparation['frozen_inputs'] == current
+    scripts = full_preflight['verification_scripts']
+    assert len(scripts) == 15
+    assert all(sha(ROOT / 'scripts' / name) == digest for name, digest in scripts.items())
+    dependencies = dependency_inputs()
+    assert len(dependencies) == 9 and dependencies == full_preflight['dependency_artifact_inputs']
+    publisher = ROOT / 'scripts/publish_offline_media_profile.py'
+    assert sha(publisher) == preparation['publisher_sha256']
+    assert preview['publisher_inputs'][str(publisher)] == sha(publisher)
+    assert default['status'] == 'passed-default-wheelhouse-offline-bootstrap'
+    assert len(default['checks']) == 8 and all(row['ok'] for row in default['checks'])
+    assert preview['status'] == 'passed-prospective-document-and-delta-review'
+    assert preview['uses_future_placeholders'] and not preview['full_receipt_written']
+    assert not preview['main_changed'] and not preview['skills_registered']
+    assert len(preview['local_links']) == 122 and len(preview['skill_validators']) == 4
+    assert all(row['exit_code'] == 0 for row in preview['skill_validators'])
+    assert not (REL / 'full-r1.json').exists()
+    assert not (REL / 'full-dependencies-r1.json').exists()
+    paths = [full_preflight_path, pub_preflight_path, default_path, preview_path,
+             REL / 'audit-r1.json', REL / 'full-gate-preparation-r1.json',
+             REL / 'publication-preparation-r1.json', publisher,
+             ROOT / 'scripts/review_media_profile_publication.py']
+    now = datetime.now(timezone.utc).isoformat()
+    record = {
+        'status': 'ready-awaiting-actual-published-audio-parent-and-complete-suite',
+        'at_utc': now, 'complete_gate_prepared': True, 'publisher_prepared': True,
+        'source_preflights_passed': True, 'default_bootstrap_actually_passed': True,
+        'default_bootstrap_checks': 8, 'default_bootstrap_commands': 3,
+        'prospective_links': 122, 'prospective_skill_validators': 4,
+        'prospective_review_uses_future_placeholders': True,
+        'expected_future_complete_methods': 2043, 'required_actual_published_parent_methods': 2031,
+        'complete_suite_launched': False, 'full_receipt_written': False,
+        'main_integrated': False, 'published': False, 'skills_registered': False,
+        'frozen_inputs': current, 'verification_scripts': scripts,
+        'dependency_artifact_inputs': dependencies,
+        'bound_evidence': {path.relative_to(ROOT).as_posix(): sha(path) for path in paths},
+        'limits': ['Full native source suite remains pending; standalone and default-install checks are separate.',
+                   'Main V87 still uses the historical seven-wheel profile until actual publication.',
+                   'No full CapCut equivalence, natural/HDR/long/RSS/playback/listening acceptance.'],
+        'generator_sha256': sha(Path(__file__))}
+    save(output, record)
+    (REL / 'readiness-r1.script.py.txt').write_bytes(Path(__file__).read_bytes())
+
+    progress_path = MAIN / 'product/.runtime/agent-video-kit-progress-20261021.json'
+    backup = progress_path.with_name('agent-video-kit-progress-20261021.before-v89-gates-default-bootstrap.json')
+    assert not backup.exists()
+    progress = read(progress_path)
+    shutil.copyfile(progress_path, backup)
+    progress['previous_progress_snapshot'] = str(backup)
+    progress['updated_at_utc'] = now
+    progress['goal_status'] = 'active'
+    progress['previous_goal_turn_classification'] = progress.get('current_goal_turn_classification')
+    progress['current_goal_turn_classification'] = 'PROGRESS: V89 source gates, actual default offline bootstrap and private publication delta review; no new full/publication receipt.'
+    candidate = progress['offline_media_profile_lab']
+    candidate.update(
+        status=record['status'], complete_gate_prepared=True, publisher_prepared=True,
+        readiness_record=str(output), complete_source_preflight=str(full_preflight_path),
+        publication_source_preflight=str(pub_preflight_path),
+        pinned_complete_verification_scripts=15, dependency_artifact_files=9,
+        default_bootstrap_record=str(default_path), default_bootstrap_checks=8,
+        default_bootstrap_commands=3, prospective_review=str(preview_path),
+        prospective_document_links=122, prospective_skill_validators=4,
+        prospective_review_is_not_complete_acceptance=True,
+        publisher_sha256=sha(publisher), approved_publication_scripts=19,
+        full_suite_started=False, main_integrated=False, published=False)
+    audio = progress['audio_source_origin_lab']
+    audio_root = ROOT.parent / 'audio-source-origin-lab-20261021'
+    state = read(audio_root / 'product/.runtime/audio-source-origin-20261021/full-after-stream-r1/run.json')
+    audio['status'] = state['status']
+    log = audio_root / 'docs/validation/evidence/audio-source-origin-20261021-lab/full-r1.source.log'
+    text = log.read_text('utf8', errors='replace')
+    audio['last_observed_ok'] = len(re.findall(r'\.\.\. ok\s*$', text, re.M))
+    audio['last_observed_failure_lines'] = len(re.findall(r'^(?:FAIL|ERROR):', text, re.M))
+    audio['observation_at_utc'] = now
+    audio['observation_is_not_terminal_acceptance'] = True
+    if 'verification_scripts' in state:
+        audio['pinned_scripts_unchanged_at_checkpoint'] = all(
+            sha(audio_root / 'scripts' / name) == digest
+            for name, digest in state['verification_scripts'].items())
+        assert audio['pinned_scripts_unchanged_at_checkpoint']
+    progress['next_steps'] = [
+        'Keep V88 live suite 27274 and its259 frozen inputs/18 pinned scripts unchanged; do not duplicate after a timeout.',
+        'Only after actual terminal2031/0skip, publish V88 with prepared publisher and a fresh publication-r1 path, ordinary commit/push,17 Skill/staged audits.',
+        'V89 gate/source preflights, actual default8-check bootstrap and private122-link/four-Skill delta review now passed; readiness-r1 binds evidence. Future placeholders are not full receipts.',
+        'After actual V88 publication, launch prepared V89 full2043 once at full-after-audio-r1 with actual upstream publication; freeze260 inputs,8 fixtures,15 scripts,9 source dependencies.',
+        'Publish V89 only after actual terminal2043/0skip and dependency freeze; include nine source files and exact four-Skill deltas, all17-Skill/staged audit; normal push only.',
+        'Do not repeat passed related260/media/default checks absent a new change or unresolved concern. Main remains actually published V87 until V88 integration.',
+        'README must keep numbered actual checks, originals/MP4/GIF, historical failures and limits; OpenFilm R14 already published, no repeat discovery.',
+        'Original full CapCut feature/effect goal remains active; natural/model/HDR/long/RSS/playback/listening and full parity are not accepted. Native Windows/E writes only; no Docker/WSL/VM/venv or unused browser tabs.'
+    ]
+    save(progress_path, progress)
+    print(json.dumps({'status': record['status'], 'default_checks': 8,
+                      'prospective_links': 122, 'skill_validators': 4,
+                      'V88_observed_ok_not_terminal': audio['last_observed_ok'],
+                      'full_receipt_written': False, 'main_changed': False}))
+
+
+if __name__ == '__main__':
+    main()

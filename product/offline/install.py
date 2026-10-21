@@ -19,6 +19,12 @@ import zipfile
 from email.parser import BytesParser
 
 MAX_BYTES=64*1024**2
+CORE_WHEELS={'ai-ad-editor','jsonschema','attrs','jsonschema-specifications','referencing','rpds-py'}
+RUNTIME_PROFILES={
+    'core-v1':CORE_WHEELS,
+    'font-text-v1':CORE_WHEELS|{'pillow'},
+    'media-analysis-v1':CORE_WHEELS|{'pillow','numpy'},
+}
 
 
 class InstallError(Exception):
@@ -103,9 +109,8 @@ def validate_bundle(bundle,expected_manifest):
     if actual!=set(inventory)|{'manifest.json'}:raise InstallError('BUNDLE_INVENTORY_MISMATCH','Extra or missing bundle files')
     wheels=manifest['wheels'];names=set();requirements=[]
     profile=manifest.get('runtime_profile','core-v1')
-    if profile not in {'core-v1','font-text-v1'}:raise InstallError('WHEEL_SET_INVALID','Unknown offline runtime profile')
-    expected_names={'ai-ad-editor','jsonschema','attrs','jsonschema-specifications','referencing','rpds-py'}
-    if profile=='font-text-v1':expected_names.add('pillow')
+    if profile not in RUNTIME_PROFILES:raise InstallError('WHEEL_SET_INVALID','Unknown offline runtime profile')
+    expected_names=RUNTIME_PROFILES[profile]
     if len(wheels)!=len(expected_names):raise InstallError('WHEEL_SET_INVALID','Pinned wheel count differs from declared runtime profile')
     for row in wheels:
         name=safe_name(row['path'])
@@ -126,6 +131,8 @@ def validate_bundle(bundle,expected_manifest):
             names.add(normalized)
             if normalized=='ai-ad-editor' and profile=='core-v1' and any(re.match(r'(?i)^pillow\b',r) for r in info.get_all('Requires-Dist',[])):
                 raise InstallError('WHEEL_SET_INVALID','Product declares Pillow; font-text-v1 profile is required')
+            if normalized=='ai-ad-editor' and profile!='media-analysis-v1' and any(re.match(r'(?i)^numpy\b',r) for r in info.get_all('Requires-Dist',[])):
+                raise InstallError('WHEEL_SET_INVALID','Product declares NumPy; media-analysis-v1 profile is required')
             if not set(wheel_info.get_all('Tag',[])) & {'py3-none-any','py3-none-win_amd64','cp313-cp313-win_amd64'}:raise InstallError('WHEEL_INVALID','Unsupported wheel ABI')
         requirements.append('./'+name+' --hash='+inventory[name]['sha256'])
     if names!=expected_names:raise InstallError('WHEEL_SET_INVALID','Unexpected wheel set for declared runtime profile')
@@ -188,17 +195,30 @@ def install(bundle,target,expected_manifest,*,dry_run=False,cancel_file=None,tim
         run_owned(command,cwd=staging,env=env,log=staging/'install.log',cancel_file=cancel_file,deadline=deadline)
         # Fresh-process audit forbids a core module falling through to host site.
         modules=[('ai_ad_editor','ai-ad-editor'),('jsonschema','jsonschema'),('attrs','attrs'),('jsonschema_specifications','jsonschema-specifications'),('referencing','referencing'),('rpds','rpds-py')]
-        if manifest.get('runtime_profile')=='font-text-v1':modules.append(('PIL','pillow'))
+        if manifest.get('runtime_profile') in {'font-text-v1','media-analysis-v1'}:modules.append(('PIL','pillow'))
+        if manifest.get('runtime_profile')=='media-analysis-v1':modules.append(('numpy','numpy'))
         audit='MODULES='+repr(modules)+'\n'+"""import sys,json,pathlib,importlib,importlib.metadata
 site=pathlib.Path(sys.argv[1]).resolve();sys.path[:]=[str(site),*[p for p in sys.path if not {'site-packages','dist-packages'} & set(pathlib.Path(p).parts)]];items={}
 for module,dist in MODULES:
  m=importlib.import_module(module);p=pathlib.Path(m.__file__).resolve();assert p.is_relative_to(site),(module,str(p));items[dist]={'version':importlib.metadata.version(dist),'path':str(p.relative_to(site))}
 from ai_ad_editor.schema_contract import probe
 check=probe();assert check['ok'],check
-print(json.dumps({'modules':items,'schema':{k:v for k,v in check.items() if k!='path'}}))
+native=None
+if 'numpy' in items:
+ import numpy as np
+ vector=np.arange(10,dtype=np.float64);dot=float(vector@vector);assert dot==285.0,dot
+ solution=np.linalg.solve(np.array([[3.,1.],[1.,2.]]),np.array([9.,8.]));assert float(np.max(np.abs(solution-np.array([2.,3.]))))<=1e-12,solution
+ spectrum=np.fft.rfft(np.array([1.,0.,0.,0.]));assert np.array_equal(spectrum,np.ones(3,dtype=np.complex128)),spectrum
+ extensions={}
+ for module in ('numpy._core._multiarray_umath','numpy.linalg._umath_linalg'):
+  extension=pathlib.Path(importlib.import_module(module).__file__).resolve();assert extension.is_relative_to(site) and extension.suffix.lower()=='.pyd',(module,str(extension));extensions[module]=str(extension.relative_to(site))
+ native={'dot':dot,'solve':solution.tolist(),'fft_impulse_real':spectrum.real.tolist(),'fft_impulse_imag':spectrum.imag.tolist(),'extensions':extensions}
+print(json.dumps({'modules':items,'schema':{k:v for k,v in check.items() if k!='path'},'numpy_native':native}))
 """
         run_owned([sys.executable,'-I','-S','-B','-X','utf8','-c',audit,str(staging/'site')],cwd=staging,env=env,log=staging/'dependency-audit.json',cancel_file=cancel_file,deadline=deadline)
         audit_result=json.loads((staging/'dependency-audit.json').read_bytes())
+        if manifest.get('runtime_profile')=='media-analysis-v1' and not audit_result.get('numpy_native'):
+            raise InstallError('INSTALL_NATIVE_AUDIT_MISSING','Native NumPy audit is required for media-analysis-v1')
         if audit_result['schema']['sha256']!=manifest['schema_sha256']:raise InstallError('INSTALL_SCHEMA_MISMATCH','Installed contract differs from release')
         actual={k:v['version'] for k,v in audit_result['modules'].items()}
         if actual!={x['name']:x['version'] for x in manifest['wheels']}:raise InstallError('INSTALL_VERSION_MISMATCH','Installed versions differ from release')

@@ -3,6 +3,18 @@ name: video-cut-agent-editor
 description: "Drive the local Agent-first advertising video editor CLI for project setup, timeline composition, edited clip-group reuse, local TTS, templates, validation, rights checks, conversion, and FFmpeg rendering."
 ---
 
+<!-- V89-OFFLINE-MEDIA-PROFILE -->
+<!-- OFFLINE-MEDIA-PROFILE-LAB-20261021 -->
+Use the complete media-analysis-v1 eight-wheel bundle for the current product. Run its copied native installer with the separately reviewed manifest SHA; launch the installed CLI with native Python -I -S -B and run.py.
+Read the [offline media profile contract](../../docs/specs/离线媒体运行时与NumPy交付_v0.1_2026-10-21.md) and [fresh native/installed evidence](../../docs/validation/八轮离线媒体运行时实测_2026-10-21.md).
+The official pinned NumPy2.4.2 cp313 Windows x64 wheel and original notices are verified locally. The fresh eight-wheel install does not copy host NumPy and does not create a virtual environment, download at runtime or change global site-packages. Existing native Python/pip and FFmpeg are prerequisites.
+Older core-v1/font-text-v1 bundles remain accepted only for products whose declared dependencies fit those profiles. Current products declaring NumPy require media-analysis-v1. Missing or changed sources must fail before building the product wheel.
+This acceptance covers the stated pinned platform and synthetic media. A general dependency resolver, other ABIs, full model distribution, natural/HDR/long-form/RSS/playback/listening and complete CapCut parity are separate acceptance work.
+
+<!-- /OFFLINE-MEDIA-PROFILE-LAB-20261021 -->
+<!-- /V89-OFFLINE-MEDIA-PROFILE -->
+
+
 <!-- V88-NATIVE-AUDIO-SOURCE-ORIGIN -->
 <!-- NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->
 When media.source_audio_clock advertises demux-relative-first-audio-pts-v1, retain source-leading silence before selecting, reversing or retiming audio. Keep the master audio track explicit.
@@ -10,7 +22,7 @@ The native PCM acceptance uses demux-relative input timestamps with aresample fi
 Read the [source audio clock contract](../../docs/specs/原生音频起点与作者采样时钟_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生音频起点与同步实测_2026-10-21.md).
 The real two-case sample covers container origins 0/5 seconds and audio starts 1/6 seconds, each a one-second relative gap. Source-normalized audio and offset-applied camera cuts are checked separately. R3 input/output frame and silence controls do not establish listening, pitch or stereo-phase quality.
 Compressed-codec priming, negative timestamps/edit lists, internal timestamp discontinuities, device drift, natural recordings, long-form/RSS, continuous playback and listening still need acceptance.
-Seven base offline wheels do not include NumPy; isolated evidence uses an explicit readonly RECORD/license-verified copy of existing local NumPy 2.4.2. Do not treat that copy as automatic dependency installation.
+The current media-analysis-v1 profile ships eight pinned offline wheels, including NumPy 2.4.2. Earlier font-text-v1 experiments used an explicit local NumPy copy; those historical receipts do not establish the current profile. Verify the current bundle manifest, native-operation audit and module origins before use.
 
 <!-- /NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->
 <!-- /V88-NATIVE-AUDIO-SOURCE-ORIGIN -->
@@ -359,8 +371,9 @@ For a detached native installation, read the
 [offline release contract](../../docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md).
 Use the reviewed manifest hash and a new target with the bundled installer;
 the generated launcher uses the installed dependency site and local caches.
-For font/text rendering use a `font-text-v1` bundle with seven pinned wheels,
-including Pillow; the historical six-wheel `core-v1` bundle lacks that dependency.
+For the current product use the eight-wheel `media-analysis-v1` bundle with
+Pillow and NumPy. The seven-wheel `font-text-v1` and six-wheel `core-v1` profiles
+reproduce dependency-compatible historical products only.
 `schema show/export` supplies the exact contract. Missing schema/executor or
 invalid `project.created_at` is an error. See the
 [actual install/edit/package checks](../../docs/validation/离线发行与随包Schema实测_2026-10-18.md)

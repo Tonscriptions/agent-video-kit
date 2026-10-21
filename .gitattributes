@@ -813,3 +813,31 @@ scripts/prepare_audio_origin_full_gate.py -text whitespace=cr-at-eol
 scripts/native_index_release_tools.py -text whitespace=cr-at-eol
 scripts/prepare_audio_origin_publication.py -text whitespace=cr-at-eol
 scripts/publish_audio_source_origin.py -text whitespace=cr-at-eol
+
+# V89 exact tested offline media runtime and distributable wheels.
+docs/validation/evidence/offline-media-profile-20261021-lab/** -text -whitespace
+docs/assets/offline-media-profile-20261021-lab/** -text -whitespace
+sources/python-runtime/cp313-win_amd64-media/** -text -whitespace
+product/offline/build.py -text whitespace=cr-at-eol
+product/offline/install.py -text whitespace=cr-at-eol
+product/pyproject.toml -text whitespace=cr-at-eol
+product/tests/test_offline_media_profile.py -text whitespace=cr-at-eol
+scripts/run_offline_media_after_parent.py -text whitespace=cr-at-eol
+scripts/run_frozen_regression.py -text whitespace=cr-at-eol
+scripts/run_with_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/materialize_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/prepare_offline_media_lab.py -text whitespace=cr-at-eol
+scripts/prepare_media_wheelhouse.py -text whitespace=cr-at-eol
+scripts/audit_media_profile_development.py -text whitespace=cr-at-eol
+scripts/prepare_media_install_verifier.py -text whitespace=cr-at-eol
+scripts/smoke_audio_source_origin.py -text whitespace=cr-at-eol
+scripts/verify_media_profile_install.py -text whitespace=cr-at-eol
+scripts/finalize_media_profile_lab.py -text whitespace=cr-at-eol
+scripts/run_media_profile_related.py -text whitespace=cr-at-eol
+scripts/prepare_media_profile_skills.py -text whitespace=cr-at-eol
+scripts/finalize_media_profile_audit.py -text whitespace=cr-at-eol
+scripts/prepare_media_full_gate.py -text whitespace=cr-at-eol
+scripts/native_index_release_tools.py -text whitespace=cr-at-eol
+scripts/prepare_media_publication.py -text whitespace=cr-at-eol
+scripts/publish_offline_media_profile.py -text whitespace=cr-at-eol
+scripts/smoke_default_media_profile.py -text whitespace=cr-at-eol

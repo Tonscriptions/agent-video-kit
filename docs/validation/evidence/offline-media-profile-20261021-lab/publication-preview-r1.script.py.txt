@@ -1,0 +1,141 @@
+"""Privately review future release text without making a full-suite receipt."""
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+from urllib.parse import unquote
+
+from native_index_release_tools import sha
+from run_frozen_regression import frozen
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+DONOR = ROOT.parent / 'audio-source-origin-lab-20261021'
+REL = ROOT / 'docs/validation/evidence/offline-media-profile-20261021-lab'
+
+
+def load(path, name):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def main():
+    output = REL / 'publication-preview-r1.json'
+    root = ROOT / 'product/.runtime/offline-media-profile-20261021/publication-preview-r1'
+    assert not output.exists() and not root.exists()
+    current = frozen()
+    assert len(current) == 260
+    parent_path = DONOR / 'scripts/publish_audio_source_origin.py'
+    candidate_path = ROOT / 'scripts/publish_offline_media_profile.py'
+    publishers = {str(path): sha(path) for path in (parent_path, candidate_path)}
+    parent = load(parent_path, 'preview_audio_publisher')
+    candidate = load(candidate_path, 'preview_media_publisher')
+    assert parent.LATEST_DOCS == candidate.LATEST_DOCS
+    assert parent.SKILLS == candidate.SKILLS
+    commit = subprocess.check_output(
+        ['git', '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', 'rev-parse', 'HEAD'],
+        cwd=MAIN, timeout=60).decode().strip()
+    draft = json.loads((REL / 'skills-draft-r1.json').read_bytes())
+    assert commit == draft['published_snapshot_parent_commit']
+    root.mkdir(parents=True)
+    initial = {}
+    for name in (*candidate.LATEST_DOCS, '.gitattributes',
+                 *('skills/' + name + '/SKILL.md' for name in candidate.SKILLS)):
+        source, target = MAIN / name, root / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+        initial[name] = sha(source)
+    for module, source_root in ((parent, DONOR), (candidate, ROOT)):
+        for name in (module.HISTORICAL_REPORT, module.HISTORICAL_CONTRACT):
+            target = root / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source_root / name, target)
+
+    # Future arguments exercise text rendering only. They are never saved as tests.
+    parent.documents(root, {'methods': 2031, 'skipped': 0,
+                            'terminal_ok': True, 'suite_seconds': 0.0})
+    parent_bodies = {name: (root / 'skills' / name / 'SKILL.md').read_text('utf8')
+                     for name in candidate.SKILLS}
+    changed = candidate.documents(root, {'methods': 2043, 'skipped': 0,
+                                        'terminal_ok': True, 'suite_seconds': 0.0})
+    validator = Path('C:/Users/carzy/.codex/skills/.system/skill-creator/scripts/quick_validate.py')
+    refresh = draft['future_parent_refresh']
+    validators, preserved = [], {}
+    for name, row in draft['skills'].items():
+        original = parent_bodies[name]
+        assert original.count(refresh['before']) == 1
+        body = original.replace(refresh['before'], refresh['after'])
+        guidance = row['new_block'].replace(candidate.HISTORICAL_CONTRACT, candidate.CONTRACT)
+        guidance = guidance.replace(candidate.HISTORICAL_REPORT, candidate.REPORT)
+        pending = 'This is an unregistered candidate; complete regression and main integration remain pending.'
+        assert guidance.count(pending) == 1
+        guidance = guidance.replace(pending, '')
+        block = '<!-- ' + candidate.MARKER + ' -->\n' + guidance.rstrip()
+        block += '\n<!-- /' + candidate.MARKER + ' -->'
+        position = body.index('\n---', 3) + 4 if body.startswith('---\n') else body.index('\n')
+        expected = (body[:position] + '\n\n' + block + '\n' + body[position:]).rstrip() + '\n'
+        target = root / 'skills' / name / 'SKILL.md'
+        assert target.read_text('utf8') == expected
+        preserved[name] = {
+            'rendered_parent_sha256': 'sha256:' + hashlib.sha256(original.encode()).hexdigest(),
+            'only_reviewed_clause_and_new_block': True, 'result_sha256': sha(target)}
+        result = subprocess.run(
+            [sys.executable, '-E', '-B', '-X', 'utf8', str(validator), str(target.parent)],
+            cwd=ROOT, capture_output=True, timeout=60)
+        assert result.returncode == 0, result.stdout.decode('utf8', 'replace') + result.stderr.decode('utf8', 'replace')
+        validators.append({'skill': name, 'exit_code': result.returncode,
+                           'stdout': result.stdout.decode('utf8', 'replace')})
+
+    links = []
+    planned = {candidate.REL + '/full-r1.json', candidate.REL + '/full-dependencies-r1.json'}
+    for name in sorted(changed - {'.gitattributes'}):
+        path = root / name
+        text = path.read_text('utf8')
+        if name in candidate.LATEST_DOCS or name.startswith('skills/'):
+            text = text.split('<!-- ' + candidate.MARKER + ' -->', 1)[1]
+            text = text.split('<!-- /' + candidate.MARKER + ' -->', 1)[0]
+        for token in re.findall(r'!?\[[^\]]*\]\(([^)\n]+)\)', text):
+            target = unquote(token.strip('<>').split('#', 1)[0])
+            if not target or re.match(r'^[a-zA-Z][\w+.-]*:', target):
+                continue
+            resolved = (path.parent / target).resolve()
+            assert resolved.is_relative_to(root)
+            relative = resolved.relative_to(root).as_posix()
+            found = next((folder / relative for folder in (root, ROOT, DONOR, MAIN)
+                          if (folder / relative).exists()), None)
+            assert found is not None or relative in planned, (name, target, relative)
+            links.append({'document': name, 'target': relative, 'exists': found is not None,
+                          'future_full_receipt_only': relative in planned and found is None})
+    assert frozen() == current
+    assert all(sha(MAIN / name) == digest for name, digest in initial.items())
+    assert all(sha(Path(path)) == digest for path, digest in publishers.items())
+    for name in planned:
+        assert not (ROOT / name).exists() and not (root / name).exists()
+    record = {
+        'status': 'passed-prospective-document-and-delta-review',
+        'at_utc': datetime.now(timezone.utc).isoformat(),
+        'scope': 'Document rendering and validators only; no complete suite, integration, registration, commit or push.',
+        'future_full_placeholders': {'parent_methods': 2031, 'candidate_methods': 2043,
+                                     'suite_seconds': 0.0, 'terminal_ok_argument': True},
+        'uses_future_placeholders': True, 'full_receipt_written': False,
+        'main_changed': False, 'skills_registered': False, 'snapshot_parent_commit': commit,
+        'rendered_documents': {name: sha(root / name) for name in sorted(changed)},
+        'local_links': links, 'skill_validators': validators,
+        'parent_guidance_preserved': preserved, 'frozen_inputs': current,
+        'publisher_inputs': publishers, 'generator_sha256': sha(Path(__file__))}
+    output.write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+    (REL / 'publication-preview-r1.script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'status': record['status'], 'document_links': len(links),
+                      'skill_validators': len(validators), 'uses_future_placeholders': True,
+                      'full_receipt_written': False, 'main_changed': False}))
+
+
+if __name__ == '__main__':
+    main()

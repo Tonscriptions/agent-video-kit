@@ -3,6 +3,18 @@ name: video-cut-timeline
 description: Compose an Agent Project timeline with local clips, tracks, transitions, keyframes, masks, speed curves, nested sequences, captions, and audio automation.
 ---
 
+<!-- V89-OFFLINE-MEDIA-PROFILE -->
+<!-- OFFLINE-MEDIA-PROFILE-LAB-20261021 -->
+The media profile includes NumPy needed by source analysis and editing paths. Keep authored audio/video clocks and explicit master audio unchanged; installing a dependency is not a new timing or effect-quality acceptance.
+Read the [offline media profile contract](../../docs/specs/离线媒体运行时与NumPy交付_v0.1_2026-10-21.md) and [fresh native/installed evidence](../../docs/validation/八轮离线媒体运行时实测_2026-10-21.md).
+The official pinned NumPy2.4.2 cp313 Windows x64 wheel and original notices are verified locally. The fresh eight-wheel install does not copy host NumPy and does not create a virtual environment, download at runtime or change global site-packages. Existing native Python/pip and FFmpeg are prerequisites.
+Older core-v1/font-text-v1 bundles remain accepted only for products whose declared dependencies fit those profiles. Current products declaring NumPy require media-analysis-v1. Missing or changed sources must fail before building the product wheel.
+This acceptance covers the stated pinned platform and synthetic media. A general dependency resolver, other ABIs, full model distribution, natural/HDR/long-form/RSS/playback/listening and complete CapCut parity are separate acceptance work.
+
+<!-- /OFFLINE-MEDIA-PROFILE-LAB-20261021 -->
+<!-- /V89-OFFLINE-MEDIA-PROFILE -->
+
+
 <!-- V88-NATIVE-AUDIO-SOURCE-ORIGIN -->
 <!-- NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->
 Use one source clock for scalar, reverse, speed-curve, nested and offline R3 source windows. A positive audio PTS relative to the container origin is a real source gap, not an instruction to move the content earlier.
@@ -10,7 +22,7 @@ The native PCM acceptance uses demux-relative input timestamps with aresample fi
 Read the [source audio clock contract](../../docs/specs/原生音频起点与作者采样时钟_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生音频起点与同步实测_2026-10-21.md).
 The real two-case sample covers container origins 0/5 seconds and audio starts 1/6 seconds, each a one-second relative gap. Source-normalized audio and offset-applied camera cuts are checked separately. R3 input/output frame and silence controls do not establish listening, pitch or stereo-phase quality.
 Compressed-codec priming, negative timestamps/edit lists, internal timestamp discontinuities, device drift, natural recordings, long-form/RSS, continuous playback and listening still need acceptance.
-Seven base offline wheels do not include NumPy; isolated evidence uses an explicit readonly RECORD/license-verified copy of existing local NumPy 2.4.2. Do not treat that copy as automatic dependency installation.
+The current media-analysis-v1 profile ships eight pinned offline wheels, including NumPy 2.4.2. Earlier font-text-v1 experiments used an explicit local NumPy copy; those historical receipts do not establish the current profile. Verify the current bundle manifest, native-operation audit and module origins before use.
 
 <!-- /NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->
 <!-- /V88-NATIVE-AUDIO-SOURCE-ORIGIN -->

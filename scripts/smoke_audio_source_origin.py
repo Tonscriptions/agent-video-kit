@@ -113,8 +113,8 @@ def main():
             return {'frames': image.n_frames, 'duration_ms': total, 'actual_mp4_decode': path.stem in {'native-output','offset-output','native-synced','offset-synced'}}
     try:
         import numpy as np
-        audit=json.loads((ROOT/'docs/validation/evidence/audio-source-origin-20261021-lab/development-audit-r1.json').read_bytes())
-        assert record['frozen_before']==audit['frozen_inputs'] and len(record['frozen_before'])==259
+        audit=json.loads((ROOT/'docs/validation/evidence/offline-media-profile-20261021-lab/development-audit-r1.json').read_bytes())
+        assert record['frozen_before']==audit['frozen_inputs'] and len(record['frozen_before'])==260
         own_sha=sha(__file__);size=W*H*4;rate=48000
         cards=[]
         for index in range(75):
