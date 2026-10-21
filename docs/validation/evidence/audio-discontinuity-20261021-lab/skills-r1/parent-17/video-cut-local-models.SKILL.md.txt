@@ -1,0 +1,427 @@
+---
+name: video-cut-local-models
+description: Run registered offline face landmarks, local retouch, OCR, speech, transcription, separation, tracking, matting, segmentation and video repair with existing local models and native Python.
+---
+
+# Local Models
+
+For face anchors and local retouch, follow the
+[face contract](../../docs/specs/离线人脸锚点与局部修饰契约_v0.1_2026-10-20.md)
+and [actual video evidence](../../docs/validation/离线人脸锚点与局部修饰实测_2026-10-20.md).
+Register the two existing OpenSeeFace ONNX files and native Python using
+`face adapter register`. Inspect the hashes, then scan every source frame with
+explicit frame/face limits and cut points. Select `--all-detected` or track IDs
+for `face retouch`; all four controls default to zero. Missing faces and cuts
+clear adjacent geometric associations. Scores are raw heatmaps, not calibrated
+probabilities or identity. Replaying an asset's complete recipe uses the same
+source SHA without model forwards. Keep source/model rights and the 8-bit SDR,
+CFR and CPU limits. This path never invokes MediaPipe, cameras or UDP.
+
+For opt-in VACE overlap conditioning, read the
+[context contract](../../docs/specs/VACE前窗生成上下文与连续输出契约_v0.1_2026-10-20.md)
+and [actual execution status](../../docs/validation/VACE前窗生成上下文实测_2026-10-20.md).
+Use `--temporal-context previous` only with positive window overlap. It reuses
+actual emitted generated pixels for the same global frames and scene; new
+unknown pixels remain erased. Plan an extra `width*height*4*window_overlap`
+owned-array budget. Re-register the adapter: `vace_context.py` belongs to its
+implementation closure. Check controller/model conditioning traces before
+accepting the asset. Keep all sampling and device budgets explicit; a resource
+rejection is not a successful forward or a quality result.
+
+Shared native video pipelines now expose optional
+[bounded failure diagnostics](../../docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md).
+Register fresh adapters when implementation hashes change. Preserve each role's
+natural observed exit separately from cleanup termination, including Windows raw,
+unsigned and hex values. Multiple failed roles and the last progress stage are
+clues, not a causal root. Keep cancellation/timeout codes, explicit sampling and
+the original quality gate. Missing/failed diagnostics must not cause an automatic
+model rerun, parameter reduction or scan of unrelated processes or global logs.
+The [real native evidence](../../docs/validation/本地模型管道诊断与回收前留证实测_2026-10-20.md)
+separates controlled invalid-model failure from actual inference and old crashes.
+
+For a larger video canvas, use the [local outpainting contract](../../docs/specs/本地视频扩图与原画面保护契约_v0.1_2026-10-19.md):
+`media outpaint --project <root> --asset-id <video> --adapter-id <lama-or-vace>
+--derived-asset-id <new> --width <pixels> --height <pixels> --dry-run`.
+Optional integer offsets place the complete normalized source inside the larger
+canvas; the generated outer mask shares its decoded frames and PTS. No external
+mask or grow/feather is accepted. Register a fresh adapter after implementation
+bytes change. LaMa fills per frame; VACE uses the supplied verbatim prompt and
+joint windows. Keep explicit model/array/CUDA budgets and original-audio policy.
+Save the editable recipe and independently check every original RGBA sample,
+generated alpha, PTS and PCM. Rate new-region structure, seams and time stability
+separately; exact protected pixels do not accept generated background quality.
+
+VACE selects safetensors `pread` for its six fixed weight files inside each
+isolated component load, then restores the dependency aliases. Require all three
+component read reports. Unsupported native APIs or missing/wrong reports fail
+closed; never patch shared Python dependencies or retry with mmap. Preserve a
+native loader crash separately from CUDA admission, model output and quality.
+
+For visible text use the [local OCR contract](../../docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md).
+Register `ocr adapter register` with an existing native Python, PP-OCRv4
+detector/recognizer ONNX directory and local evidence. CPU ORT/OpenCV/NumPy
+must already be available; this path never installs or downloads them.
+Inspect the registration, then `ocr scan --asset-id <id> --adapter-id <id>
+--output validation/<new>.json --start-frame 0 --end-frame <exclusive>
+--step-frames 8 --dry-run`. Run explicitly to obtain original source frames,
+PTS, raw text, polygons and confidence. Changed implementation/model bytes
+require a fresh adapter ID. Keep OCR review and separate source/model rights;
+sampled text is neither all privacy findings nor automatic UI action recovery.
+Use the exact-frame `ocr anchors` path for a reviewed unique text target.
+
+For boundary-model selection, follow the [predeclared comparison contract](../../docs/specs/字词边界模型对照核验契约_v0.1_2026-10-18.md)
+and [actual three-model results](../../docs/validation/开源字词边界模型对照实测_2026-10-18.md).
+Qwen's raw English block errors were 220/161 ms against the unchanged 66.6667 ms
+gate, and Chinese had one zero-length unit and six adjacent overlaps. Qwen and
+the supplied-text Whisper-DTW path remain research runners. Use the registered
+CTC engine with its existing review requirement; no new default engine was
+accepted. Preserve raw predictions and original script. Upstream timestamp
+interpolation, a valid ordering or a model-card benchmark cannot establish
+acoustic quality. AMI word times were themselves generated by forced alignment;
+do not label them independent manual word-boundary truth based on archive names.
+The native research overlay uses explicit local wheels; runtime never installs
+packages or downloads models.
+
+For supplied text that needs acoustic word/character times, use the
+[offline CTC alignment contract](../../docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md).
+Register `asr adapter register --engine transformers-wav2vec2-ctc-local-v1`
+with an existing complete standard Wav2Vec2 CTC safetensors bundle, native
+Torch/Transformers Python, explicit CPU/CUDA and local rights evidence.
+Runtime rejects pickle weights and custom code; it never installs or downloads.
+Then use `subtitle align --project <root> --asset-id <audio-or-video>
+--adapter-id <ctc> --transcript <local.txt-or.srt>
+--output assets/subtitles/<new>.json --dry-run`.
+Choose `--case upper|lower|preserve` and `--granularity character|whitespace`
+explicitly. SRT windows are authored source intervals. OOV letters or Chinese
+characters fail; never silently convert traditional/simplified text or delete
+unknown letters. Keep original codepoint indices and the ignored punctuation
+ledger. Default 30-second windows use real convolution stride/receptive fields,
+overlap context and explicit final zero padding, not uniform character timing.
+Optional `--apply --track-id <subtitle> --font-asset-id <font>` creates existing
+word-highlight clips; each applied cue supports at most 128 timed ranges.
+Use explicit SRT pieces for larger displays. Max 1800 seconds/16384 codepoints/
+8192 tokens, 512 MiB emissions and 64 million traceback cells are admission
+limits, not total RAM/VRAM promises. `--timeout` and `--cancel-file` fail without
+half-registered outputs and retain cache diagnostics. Replay returns the
+historical result, not a fresh model check. JSON/SRT/copied original text all
+retain source/transcript/model rights. Keep `ALIGNMENT_REVIEW_REQUIRED`:
+forced text can be wrong, and posterior confidence is not calibrated accuracy.
+Review the [real evidence and failed quality gates](../../docs/validation/离线CTC字词强制对齐实测_2026-10-18.md)
+separately from mock protocol tests, speech recognition, diarization or singing.
+The measured English word-block boundary error reached 258.1875 ms and failed
+the declared 66.6667 ms gate. Successful inference/highlighting does not accept
+that precision. The base font/text release includes Pillow, while native Torch,
+Transformers and registered weights remain explicit external local inputs.
+
+The [FGT candidate contract](../../docs/specs/开源时序修复候选核验契约_v0.1_2026-10-18.md)
+and [measured evaluation](../../docs/validation/开源FGT时序修复候选实测_2026-10-18.md)
+describe a separate native research runner, not a registered `media inpaint`
+engine. Author weights use explicit local SHA checks and weights-only loading.
+One two-surface synthetic sequence passed its declared gate; the existing
+natural shot still has visible residue and texture patches. Never infer
+natural acceptance, automatic shadow/reflection selection or commercial
+clearance from that gate. V44 only imported ROSE; the later
+[V59 loading evidence](../../docs/validation/ROSE本地模型获取与离线预检_2026-10-19.md)
+is a historical zero-forward snapshot. The subsequent
+[V59 real inference](../../docs/validation/ROSE本地对象移除与原始全画面输出实测_2026-10-19.md)
+runs the author T5/ROSE/VAE on two unchanged 32-frame, 50-step cases.
+The controlled gate failed; natural quality and global GPU
+admission remain unaccepted.
+Raw full-frame results and selected-region composites are separate;
+outside-region preservation comes from explicit composition. No ROSE
+production adapter is registered. Research acquisition is an explicit
+development operation, never a runtime or Skill download.
+ProPainter's noncommercial terms and missing
+FuseFormer licensing must not be replaced by a wrapper's permissive license.
+
+For an existing encoded selection with missed or unwanted regions, use
+`media mask-edit --project <path> --asset-id <mask> --edits <local.json>
+--derived-asset-id <new-mask> --dry-run` under the
+[mask editing contract](../../docs/specs/本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md).
+The plan binds the input SHA, dimensions, channel and CFR grid. Rectangle,
+ellipse, polygon and capsule brush support ordered add/subtract/intersect/
+replace, explicit keyframes and cut resets. Inspect the raw selection with
+`quality mask` before passing the new asset to `media inpaint`; growth is a
+separate later operation. This standard-library/FFmpeg path runs no model.
+The output is a white RGB mask with edited alpha, not a source-color cutout.
+Reuse a packaged saved plan with `--edits-from-asset <edited-mask>` and the
+same bound original mask. New geometry requires a new JSON plan/version.
+Saved operations and sparse checkpoint success do not prove object identity,
+complete limbs, temporal stability or natural repair quality.
+
+The [coherent reference experiment](../../docs/specs/空间与时序一致参考选择研究契约_v0.1_2026-10-18.md)
+is research only; its [measured quality gate failed](../../docs/validation/空间与时序一致参考选择实测_2026-10-18.md).
+Do not expose it as a production `media inpaint` adapter or silently replace
+LaMa/VACE. The separate `scripts/run_coherent_reference_fixture.py` accepts only
+bounded local NPZ arrays and writes into a new project `.runtime` directory;
+it reads no truth array, registers no model or rights asset, and runs no model.
+Use the published original synthetic fixture and explicit scene-cut/min-donor
+options for research reproduction. Cancellation/timeout work at checkpoints,
+not as hard deadlines inside native calls. Previous repairs are costs, never
+new donor observations; unresolved motion groups abstain.
+
+<!-- V60-CUDA -->
+Follow the [V60 device contract](../../docs/specs/VACE物理显卡准入与分阶段资源检查契约_v0.1_2026-10-19.md) and
+[measured failures and later GPU delivery](../../docs/validation/VACE物理显卡准入与真实交付实测_2026-10-19.md).
+VACE maps logical CUDA 0 to its full GPU UUID and admits against the
+smaller physical/Torch free count. Before each admission it synchronizes
+this worker and releases its unused allocator cache, preserving active
+allocation counts; it removes text offload hooks after encoding. Text
+requires its GPU budget plus 768 MiB; video weights/embeddings are checked
+before transfer; every nonempty window requires 768 MiB free. These are
+observations, not reservations or activation/OOM guarantees. Current CPU
+regression, native 128 MiB active allocation/cache release, package/CLI
+and installed CUDA admission checks passed. A later unchanged-scene retry on
+archived V65 inputs delivered eight frames with two 30-step joint windows;
+alpha, outside RGBA, every PTS and PCM matched. Its 25.171 dB failed the
+predeclared 30 dB gate and visible dark patches remain. This verifies that
+measured delivery, without accepting natural quality or guaranteeing no OOM.
+Never stop unrelated jobs, lower quality or switch to CPU/cloud
+to conceal a rejection. Re-register with a new adapter ID; retain old
+receipts and never edit old hashes. Other engines keep existing policies.
+<!-- /V60-CUDA -->
+
+The [V63 unchanged-model retry](../../docs/validation/VACE共享显存真实重试与准入拒绝_2026-10-19.md)
+was rejected before text weights: physical free 3718 MiB versus 7936 MiB
+required, despite larger Torch free. It produced no new repaired video or
+model forward. Preserve the original envelope/cause and distinguish this real
+resource rejection from CPU protocol tests and historical model outputs.
+
+For prompted joint video editing, read the [VACE contract](../../docs/specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md).
+Register an existing complete Wan2.1-VACE-1.3B Diffusers safetensors bundle with
+`media adapter register --engine diffusers-wan-vace-local-v1 --device cuda`,
+native Python and local evidence. Explicit text weight budgets default to
+`--text-gpu-budget-mib 7168 --text-cpu-budget-mib 8192`; the encoder is released
+before video generation. This path uses BF16 with declared FP32 stability
+modules and FP32 VAE, without runtime installation or model downloads.
+
+Use `media inpaint --asset-id <video> --mask-asset-id <mask> --adapter-id <id>
+--derived-asset-id <new-id> --prompt <description-of-result> --window-frames 17
+--window-overlap 4 --inference-steps 30 --dry-run`. Preserve prompt text;
+token overflow fails without truncation or expansion. Seeds, negative prompt,
+guidance, conditioning and prompt token budget are explicit. Repeated
+`--scene-cut-frame` uses zero-based frames after source range/CFR conversion.
+For controlled sampling, `--flow-shift` accepts finite 0.1..32 (default 3);
+`--model-input-scale` accepts 1/2/4 (default 1). Scaling follows the base ROI
+limit/padding from `--model-max-edge`, then returns to the original output canvas.
+Inspect the scaled owned-array budget and actual window input shapes. This
+budget excludes Torch/model/VRAM and cannot guarantee freedom from CUDA OOM.
+Larger inputs or more steps require evidence for the chosen footage. LaMa
+rejects both options.
+
+Both repair engines accept `--repair-blend harmonic` for explicit spatial
+boundary color correction; `direct` remains the default. Read the
+[harmonic contract](../../docs/specs/本地修复区域色差融合契约_v0.1_2026-10-16.md)
+when using it. Optional `--blend-max-iterations` (1..10000, default 2000) and
+`--blend-tolerance` (0..0.01 excluding 0, default 1e-6) require harmonic.
+Dry-run cannot know decoded selection size: execution checks the actual
+selection budget before each model call. Empty frames bypass weights; a full
+canvas selection has no fixed boundary and fails. Nonconvergence also fails,
+without silent fallback. Inspect the `blend` report and keep
+`REPAIR_HARMONIZE_REVIEW_REQUIRED`; spatial correction does not reconstruct
+object geometry or temporal consistency. Re-register adapters whose bound
+implementation hashes changed instead of editing their saved digests.
+
+Joint windows and overlap blending do not establish global video attention
+or consistent identity. Tail padding is cropped before delivery.
+
+The worker erases selected RGB to 127 before/after resizing. Original alpha and
+RGB outside the expanded mask remain exact. Model digest reuse is scoped to
+native read handles that deny writes/deletion; each new command verifies again.
+Review texture, object traces, window seams and natural motion; keep
+`VACE_MODEL_REVIEW_REQUIRED`. Use the same audio/application/rights pipeline
+as LaMa below. Array limits exclude model, Torch and total process RAM/VRAM;
+real hardware, quality and commercial rights require independent evidence.
+
+For object removal or local region repair, read the
+[LaMa contract](../../docs/specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md).
+Register `media adapter register --engine torchscript-lama-local-v1` using an
+existing TorchScript `.pt`, native Python, local evidence and explicit CPU/CUDA.
+Inspect before `media inpaint --asset-id <source-video> --mask-asset-id
+<registered-image-or-video> --adapter-id <id> --derived-asset-id <new-id>
+--dry-run`. White/high alpha selects repair; use `--mask-channel luma` for
+an opaque black/white mask. SAM2 binary MOV outputs can supply the alpha mask.
+
+Mask time starts at its own display origin plus `--mask-start-seconds`; it
+must cover the rounded output duration. Default geometry mismatch is rejected;
+`--mask-resize nearest` allows explicit matching-aspect scaling. Review this
+clock when source range, frame rate, crop or size has changed. `--mask-grow`,
+`--mask-feather`, `--context-pixels` and `--model-max-edge` control region and
+context. Empty frames bypass the model. Repair preserves original alpha and
+RGB outside the expanded region. ROI resizing and padding are reported.
+
+Formal execution produces a lossless MOV with audio, hashes and source/mask/model
+rights dependencies. Apply with video and explicit audio tracks as below.
+Preserve `INPAINT_MODEL_REVIEW_REQUIRED`: LaMa runs framewise and can invent
+texture, leave traces or flicker. It does not establish temporal reconstruction
+or text-prompt generative fill. Compare against independent truth where available.
+
+For a person plus held product, or other selected video objects, read the
+[SAM2 prompt contract](../../docs/specs/本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md).
+Register `media adapter register --engine transformers-sam2-video-local-v1`
+with an existing complete video safetensors directory, native Python, evidence
+and explicit `--device cpu|cuda`. Inspect before execution. Run `media matting
+--asset-id <video> --adapter-id <id> --derived-asset-id <new-id> --prompts
+<local-json> --dry-run`; points/boxes use normalized output coordinates and
+zero-based frames after range/CFR conversion. Choose multiple positive points
+or a box when a face click selects only the face. Negative points exclude areas.
+
+Optional repeated `--object-id` selects objects for union. Later-frame prompts
+correct future output; `reset` starts a new scene and requires fresh prompts
+for active objects. Inspect the canonical prompt hash, device and reset count. Review object extent
+at prompt/reset boundaries: the same points can select a smaller part on another
+frame. Add a bounding box when scope is ambiguous and inspect the new result.
+Before repair, run `quality mask --project <path> --asset-id <mask-id>
+--expectations <local-json> --report validation/mask-review.json` using the
+[mask review contract](../../docs/specs/本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md).
+Keep selected object IDs explicit: a nearby preserved person's legs are not
+automatically target residue. Place positive checks on target extremities and
+negative checks on preserved objects, then compare the encoded result after
+prompt correction. A positive model prompt does not guarantee its pixel passes
+the final binary mask. Later prompts affect that frame and future output only;
+record failed checks and inspect extent beyond the checkpoints. Mask growth can
+cover missed edges and encroach on preserved objects; review the effective
+repair mask separately. `quality mask` measures the supplied raw asset.
+Default binary masks differ from `--mask-mode probability`: sigmoid logits
+are segmentation confidence, not physical transparency or reconstructed hair.
+Both modes keep source RGB and multiply existing alpha. The 512 MiB session
+tensor limit excludes model/process memory. No runtime download or device fallback.
+MOV, audio application, rights and transparent delivery follow the RVM pipeline.
+
+For human video cutouts, read the [native RVM contract](../../docs/specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md).
+Register `media adapter register --engine rvm-onnx-cpu-matting-v1` with
+an existing self-contained FP32 `.onnx`, native `--executable <Python.exe>`
+and local `--evidence`. numpy/onnx/onnxruntime must already exist in that Python.
+Registration records six artifact hashes, CPU threads and an optional
+`--downsample-ratio`; it never loads or downloads weights. Inspect integrity,
+ingest the video and use `media matting --asset-id <source> --adapter-id <id>
+--derived-asset-id <new-id> --max-edge 1280 --dry-run`. The default output is
+`assets/derived/<new-id>.mov`, lossless QTRLE/ARGB with soft straight alpha.
+The worker recycles four states per frame and multiplies existing input alpha.
+Encoded RGBA must decode to the exact worker byte hash before registration.
+
+Optional `--apply --track-id <video-track>` applies the cutout; add
+`--audio-track-id <audio-track>` to hear preserved audio in the timeline.
+Without that flag audio remains embedded in the MOV and is not auto-mixed.
+Use higher video track order for foreground and lower order for a background.
+Range, rational `--fps`, `--max-edge`, `--max-frames`, timeout and cancellation
+are explicit; CFR resampling and partial final-frame extension are reported.
+HDR must first be explicitly tone mapped. Keep `MATTING_MODEL_REVIEW_REQUIRED`:
+this human model can lose held objects, edges and initial-frame detail; it is
+not general-object segmentation. Model/source rights both gate publication.
+Weights and native Python remain external to project packages.
+
+For model-backed vocal/accompaniment separation, read the [native HDemucs contract](../../docs/specs/本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md).
+Register `audio adapter register --engine torchaudio-hdemucs-local-v1` with
+an existing compatible `.pt/.pth` state dictionary, `--executable <Python.exe>`,
+local `--evidence`, and explicit `--device cpu` or `cuda`. Torch/TorchAudio/numpy
+must already exist in that Python. Inspect integrity, then use `audio separate
+--asset-id <source> --adapter-id <id> --vocals-asset-id <new-id>
+--accompaniment-asset-id <new-id> --dry-run`. Optional `--apply --track-id
+<audio-track> --stem vocals|accompaniment` selects one output for the timeline.
+The model runs at 44.1 kHz stereo; segmented overlap/add preserves all samples.
+Accompaniment is input minus predicted vocals. Float WAV peaks can exceed 1;
+retain the model-review warning and check leakage, seams and listening quality.
+Both stem rights depend on source and model. The legacy `demucs-local-v1`
+metadata engine is separate and remains unavailable for inference.
+
+For native object detection and tracking, read the [YOLO contract](../../docs/specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md).
+Register `media adapter register --engine yolov10-onnx-cpu-tracking-v1`
+with an existing self-contained COCO-80 YOLOv10 ONNX, native Python `.exe`
+and local `--evidence`. The Python must already contain numpy/Pillow/onnx/
+onnxruntime. Explicit CPU settings, model/Python/evidence/implementation hashes
+and class filters belong to the registration; there is no install or GPU fallback.
+Inspect the adapter, then use `media track --adapter-id <id> --roi 0,0,1,1
+--all-objects` to review IDs before selecting `--object-id` for editing.
+Native tracking uses motion/IoU association without appearance ReID. Preserve
+missing-observation, resampled-clock and identity-review warnings. Applying
+requires `--asset-id` and retains model rights on the target clip. Registration
+metadata is restored/packaged; external weights and Python remain explicit inputs.
+
+For labels on an edited source clip, pass `--source-track-id` and
+`--source-clip-id` to `media track-bind`. The saved source-clock observations
+are projected through crop, layer transforms, mirror and source-time changes
+again at render time; inference is not rerun. Read the [canvas binding contract](../../docs/specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md).
+Plaintext/OTIO/MLT export bakes this relationship and must report the loss.
+
+For an existing selected SAM2/RVM or authored encoded video mask, use
+`media track`, `media track-bind` or `media reframe` with `--asset-id <source>`
+and `--mask-asset-id <mask>`, without ROI/adapter/object-ID options. Read the
+[mask tracking contract](../../docs/specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md).
+Use alpha by default, explicit `--mask-channel luma` for opaque black/white.
+`--mask-source-start-seconds` maps mask frame zero to source display seconds;
+review range coverage, matching display aspect, decoded-storage budget and
+declared cuts in dry-run. Optional `--mask-expectations` gates selected/clear
+checks before applying. Empty selections and crossed cuts fail explicitly;
+retain failed reports. Confidence 1 means nonempty, not model confidence.
+Use source-clip references for persistent canvas binding and retain both
+source/mask rights dependencies, including the mask's model parent. Bbox
+motion follows segmentation errors; it does not add pose or occlusion recovery.
+
+Models are inputs, never dependencies that the CLI fetches. Put a model in a
+project or approved local model directory, record its version, SHA-256 and
+license in the project provenance/Rights Ledger, then pass the absolute path.
+
+For reproducible Whisper transcription, read the [registered ASR contract](../../docs/specs/本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md).
+Register an existing complete safetensors model, native Python and local evidence
+with `asr adapter register --device cpu --threads 4 --dry-run`. Register formally
+after reviewing the plan; use `asr adapter inspect` to check integrity. An isolated
+Python must already contain Torch/Transformers; registration does not install them.
+CUDA is an explicit registration choice and has no automatic CPU fallback.
+
+```powershell
+python -X utf8 -m ai_ad_editor media understand --project .\work\demo `
+  --input .\media\clip.mp4 --transcribe --adapter-id whisper_local
+python -X utf8 -m ai_ad_editor subtitle transcribe --project .\work\demo `
+  --asset-id source_audio --adapter-id whisper_local --language zh `
+  --output assets\subtitles\speech.srt --track-id captions --apply --dry-run
+```
+
+Registered inference verifies model/Python/evidence hashes, blocks Python network
+calls and preserves long-form input. Keep the segment timing and review warning;
+this is not word alignment or diarization. Generated subtitle rights depend on
+both source and registered model. The legacy `--model-path` gate remains available
+but does not acquire the registered worker's integrity/isolation guarantees.
+Use `subtitle evaluate` against an independent transcript for CER evidence;
+default normalization preserves simplified/traditional script differences.
+
+For the baseline English voice, use the native FFmpeg `flite` adapter:
+
+```powershell
+python -X utf8 -m ai_ad_editor tts synthesize --project .\work\demo `
+  --text "Local voice only" --output assets\tts\voice.wav
+```
+
+For Chinese speech, use the dedicated `soulx-podcast-local-v1` integration.
+Read the [SoulX contract](../../docs/specs/本地SoulX中文配音与声线登记契约_v0.1_2026-10-15.md)
+before registration. `tts adapter register` requires an existing native Python
+`.exe`, source/package/model directories, the pinned local speech tokenizer,
+and a local evidence file. It hashes full BF16 model components and inference
+sources; it never installs packages or downloads weights. Use `--dry-run` first.
+
+Ingest the authorized single-speaker reference as an audio asset, then register
+it with `tts voice register --voice-id <id> --asset-id <id> --prompt-input
+<exact-UTF8-transcript> --evidence <local-source-and-authorization-file>`.
+Preserve the transcript verbatim. Licensing a code repository does not grant
+commercial rights to weights, reference voices, text or generated speech.
+
+```powershell
+python -X utf8 -m ai_ad_editor tts adapter inspect --project .\work\demo --adapter-id soulx_local
+python -X utf8 -m ai_ad_editor tts voice inspect --project .\work\demo --voice-id narrator
+python -X utf8 -m ai_ad_editor tts synthesize --project .\work\demo `
+  --adapter-id soulx_local --voice-id narrator --text '让创作更加简单。' `
+  --asset-id narration_01 --output assets\tts\narration_01.wav `
+  --channels 1 --apply --track-id track_audio_1 --dry-run
+```
+
+Review both integrity checks before running without `--dry-run`. This engine
+requires CUDA/full BF16 weights and uses isolated native Python. It blocks Python
+network calls and overrides the tokenizer downloader with the registered file.
+There is no CPU/GGUF/online fallback. Retain natural duration and the
+`TTS_REVIEW_REQUIRED` warning; check pronunciation, truncation and voice identity.
+Every generated WAV becomes an audio asset with model/voice/source rights
+dependencies. New outputs default to `unverified/internal` and cannot publish.
+Registries live in `extensions.local_tts` and follow project snapshots/restore.
+
+If a local model is missing, report a structured degraded result. Do not
+replace it with a hosted service or an automatic package/model download.

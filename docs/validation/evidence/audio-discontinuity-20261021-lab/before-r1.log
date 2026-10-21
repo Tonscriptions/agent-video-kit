@@ -1,0 +1,172 @@
+test_alternating_gap_and_overlap_preserve_the_complete_clock (test_audio_discontinuity.AudioDiscontinuityTests.test_alternating_gap_and_overlap_preserve_the_complete_clock) ... FAIL
+test_coarse_quantized_continuous_source_keeps_every_sample (test_audio_discontinuity.AudioDiscontinuityTests.test_coarse_quantized_continuous_source_keeps_every_sample) ... ok
+test_exact_continuous_source_keeps_every_sample (test_audio_discontinuity.AudioDiscontinuityTests.test_exact_continuous_source_keeps_every_sample) ... ok
+test_exact_native_timebase_keeps_a_one_sample_gap (test_audio_discontinuity.AudioDiscontinuityTests.test_exact_native_timebase_keeps_a_one_sample_gap) ... FAIL
+test_identity_curve_uses_the_same_internal_clock (test_audio_discontinuity.AudioDiscontinuityTests.test_identity_curve_uses_the_same_internal_clock) ... FAIL
+test_internal_gap_keeps_every_native_sample_at_its_author_time (test_audio_discontinuity.AudioDiscontinuityTests.test_internal_gap_keeps_every_native_sample_at_its_author_time) ... FAIL
+test_monotonic_PTS_overlap_uses_later_decoded_frame_samples (test_audio_discontinuity.AudioDiscontinuityTests.test_monotonic_PTS_overlap_uses_later_decoded_frame_samples) ... FAIL
+test_nested_audio_uses_the_same_internal_clock (test_audio_discontinuity.AudioDiscontinuityTests.test_nested_audio_uses_the_same_internal_clock) ... FAIL
+test_reverse_moves_the_internal_gap_with_the_content (test_audio_discontinuity.AudioDiscontinuityTests.test_reverse_moves_the_internal_gap_with_the_content) ... FAIL
+test_reverse_preserves_the_authored_window_after_native_audio_EOF (test_audio_discontinuity.AudioDiscontinuityTests.test_reverse_preserves_the_authored_window_after_native_audio_EOF) ... FAIL
+test_window_after_internal_gap_uses_presentation_time (test_audio_discontinuity.AudioDiscontinuityTests.test_window_after_internal_gap_uses_presentation_time) ... FAIL
+test_window_crossing_internal_gap_keeps_both_edges (test_audio_discontinuity.AudioDiscontinuityTests.test_window_crossing_internal_gap_keeps_both_edges) ... FAIL
+test_window_wholly_inside_internal_gap_is_silent (test_audio_discontinuity.AudioDiscontinuityTests.test_window_wholly_inside_internal_gap_is_silent) ... FAIL
+
+======================================================================
+FAIL: test_alternating_gap_and_overlap_preserve_the_complete_clock (test_audio_discontinuity.AudioDiscontinuityTests.test_alternating_gap_and_overlap_preserve_the_complete_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 126, in test_alternating_gap_and_overlap_preserve_the_complete_clock
+    def test_alternating_gap_and_overlap_preserve_the_complete_clock(self):self.compare('mixed')
+                                                                           ~~~~~~~~~~~~^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 115, in compare
+    self.assertEqual(actual.tobytes(),expected.tobytes(),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f'{name}: wrong source clock; max error {float(np.max(np.abs(actual.astype(float)-expected)))}')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\x[52038 chars]xbe\x86].>*e\x83\xbex\xbe+>\x1e\r\x80\xbe\x0fX[474216 chars]\x00' != b'{\x[52038 chars]xbe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0[476547 chars]\x00' : mixed: wrong source clock; max error 0.49699482321739197
+
+======================================================================
+FAIL: test_exact_native_timebase_keeps_a_one_sample_gap (test_audio_discontinuity.AudioDiscontinuityTests.test_exact_native_timebase_keeps_a_one_sample_gap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 127, in test_exact_native_timebase_keeps_a_one_sample_gap
+    def test_exact_native_timebase_keeps_a_one_sample_gap(self):self.compare('one-sample-gap')
+                                                                ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 115, in compare
+    self.assertEqual(actual.tobytes(),expected.tobytes(),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f'{name}: wrong source clock; max error {float(np.max(np.abs(actual.astype(float)-expected)))}')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\x[52038 chars]xbe\x86].>*e\x83\xbex\xbe+>\x1e\r\x80\xbe\x0fX[474216 chars]\x00' != b'{\x[52038 chars]xbe\x00\x00\x00\x00\x00\x00\x00\x00\x86].>*e\x[474216 chars]\x00' : one-sample-gap: wrong source clock; max error 0.42935192584991455
+
+======================================================================
+FAIL: test_identity_curve_uses_the_same_internal_clock (test_audio_discontinuity.AudioDiscontinuityTests.test_identity_curve_uses_the_same_internal_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 124, in test_identity_curve_uses_the_same_internal_clock
+    def test_identity_curve_uses_the_same_internal_clock(self):self.compare('gap',curve=True)
+                                                               ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 115, in compare
+    self.assertEqual(actual.tobytes(),expected.tobytes(),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f'{name}: wrong source clock; max error {float(np.max(np.abs(actual.astype(float)-expected)))}')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\x[52038 chars]xbe\x86].>*e\x83\xbex\xbe+>\x1e\r\x80\xbe\x0fX[474216 chars]\x00' != b'{\x[52038 chars]xbe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0[474216 chars]\x00' : gap: wrong source clock; max error 0.49699482321739197
+
+======================================================================
+FAIL: test_internal_gap_keeps_every_native_sample_at_its_author_time (test_audio_discontinuity.AudioDiscontinuityTests.test_internal_gap_keeps_every_native_sample_at_its_author_time)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 118, in test_internal_gap_keeps_every_native_sample_at_its_author_time
+    def test_internal_gap_keeps_every_native_sample_at_its_author_time(self):self.compare('gap')
+                                                                             ~~~~~~~~~~~~^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 115, in compare
+    self.assertEqual(actual.tobytes(),expected.tobytes(),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f'{name}: wrong source clock; max error {float(np.max(np.abs(actual.astype(float)-expected)))}')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\x[52038 chars]xbe\x86].>*e\x83\xbex\xbe+>\x1e\r\x80\xbe\x0fX[474216 chars]\x00' != b'{\x[52038 chars]xbe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0[474216 chars]\x00' : gap: wrong source clock; max error 0.49699482321739197
+
+======================================================================
+FAIL: test_monotonic_PTS_overlap_uses_later_decoded_frame_samples (test_audio_discontinuity.AudioDiscontinuityTests.test_monotonic_PTS_overlap_uses_later_decoded_frame_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 125, in test_monotonic_PTS_overlap_uses_later_decoded_frame_samples
+    def test_monotonic_PTS_overlap_uses_later_decoded_frame_samples(self):self.compare('overlap')
+                                                                          ~~~~~~~~~~~~^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 115, in compare
+    self.assertEqual(actual.tobytes(),expected.tobytes(),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f'{name}: wrong source clock; max error {float(np.max(np.abs(actual.astype(float)-expected)))}')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\x[98814 chars]be&\xab\xb1>\x8f\xabP\xbeX\'\xb3>z\x0fO\xbe\x0[427440 chars]\x00' != b'{\x[98814 chars]be&\x8e\xc0>\x1dm\xa4\xbe\x94\xc6\xbf>\xfb\x86[429771 chars]\x00' : overlap: wrong source clock; max error 0.49699482321739197
+
+======================================================================
+FAIL: test_nested_audio_uses_the_same_internal_clock (test_audio_discontinuity.AudioDiscontinuityTests.test_nested_audio_uses_the_same_internal_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 123, in test_nested_audio_uses_the_same_internal_clock
+    def test_nested_audio_uses_the_same_internal_clock(self):self.compare('gap',nested=True)
+                                                             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 115, in compare
+    self.assertEqual(actual.tobytes(),expected.tobytes(),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f'{name}: wrong source clock; max error {float(np.max(np.abs(actual.astype(float)-expected)))}')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'{\x[52038 chars]xbe\x86].>*e\x83\xbex\xbe+>\x1e\r\x80\xbe\x0fX[474216 chars]\x00' != b'{\x[52038 chars]xbe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0[474216 chars]\x00' : gap: wrong source clock; max error 0.49699482321739197
+
+======================================================================
+FAIL: test_reverse_moves_the_internal_gap_with_the_content (test_audio_discontinuity.AudioDiscontinuityTests.test_reverse_moves_the_internal_gap_with_the_content)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 122, in test_reverse_moves_the_internal_gap_with_the_content
+    def test_reverse_moves_the_internal_gap_with_the_content(self):self.compare('gap',right=.25,reverse=True)
+                                                                   ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 115, in compare
+    self.assertEqual(actual.tobytes(),expected.tobytes(),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f'{name}: wrong source clock; max error {float(np.max(np.abs(actual.astype(float)-expected)))}')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x1[167055 chars]3\xbe3\xe3#>\r\x07\x82\xbe\xe8\xec&>R"\x85\xbe[128799 chars]\x00' != b'\x1[167055 chars]3\xbe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\[128799 chars]\xbe' : gap: wrong source clock; max error 0.30199965834617615
+
+======================================================================
+FAIL: test_reverse_preserves_the_authored_window_after_native_audio_EOF (test_audio_discontinuity.AudioDiscontinuityTests.test_reverse_preserves_the_authored_window_after_native_audio_EOF)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 130, in test_reverse_preserves_the_authored_window_after_native_audio_EOF
+    def test_reverse_preserves_the_authored_window_after_native_audio_EOF(self):self.compare('continuous',reverse=True)
+                                                                                ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 115, in compare
+    self.assertEqual(actual.tobytes(),expected.tobytes(),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f'{name}: wrong source clock; max error {float(np.max(np.abs(actual.astype(float)-expected)))}')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x1cX\xbf>\x04\xd4\xdb\xbe\xcbT\xc1>Ki\xdc\[526260 chars]\x00' != b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0[526260 chars]\xbe' : continuous: wrong source clock; max error 0.49699482321739197
+
+======================================================================
+FAIL: test_window_after_internal_gap_uses_presentation_time (test_audio_discontinuity.AudioDiscontinuityTests.test_window_after_internal_gap_uses_presentation_time)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 121, in test_window_after_internal_gap_uses_presentation_time
+    def test_window_after_internal_gap_uses_presentation_time(self):self.compare('gap',left=.11,right=.18)
+                                                                    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 115, in compare
+    self.assertEqual(actual.tobytes(),expected.tobytes(),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f'{name}: wrong source clock; max error {float(np.max(np.abs(actual.astype(float)-expected)))}')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\xbfe\x82>\n\x82b\xbee\xdb\x80>\xe4\x8dd\[80421 chars]\xbe' != b'I\xafs>\xa7U=\xbe(Nx>\xbfSA\xbe\xac\xf1|>[74957 chars]\xbe' : gap: wrong source clock; max error 0.20756103098392487
+
+======================================================================
+FAIL: test_window_crossing_internal_gap_keeps_both_edges (test_audio_discontinuity.AudioDiscontinuityTests.test_window_crossing_internal_gap_keeps_both_edges)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 120, in test_window_crossing_internal_gap_keeps_both_edges
+    def test_window_crossing_internal_gap_keeps_both_edges(self):self.compare('gap',left=.035,right=.115)
+                                                                 ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 115, in compare
+    self.assertEqual(actual.tobytes(),expected.tobytes(),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f'{name}: wrong source clock; max error {float(np.max(np.abs(actual.astype(float)-expected)))}')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'\x9[15571 chars]xbe\x86].>*e\x83\xbex\xbe+>\x1e\r\x80\xbe\x0fX[68373 chars]\xbe' != b'\x9[15571 chars]xbe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0[92177 chars]\xbe' : gap: wrong source clock; max error 0.3669998049736023
+
+======================================================================
+FAIL: test_window_wholly_inside_internal_gap_is_silent (test_audio_discontinuity.AudioDiscontinuityTests.test_window_wholly_inside_internal_gap_is_silent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 119, in test_window_wholly_inside_internal_gap_is_silent
+    def test_window_wholly_inside_internal_gap_is_silent(self):self.compare('gap',left=.06,right=.09)
+                                                               ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\audio-discontinuity-lab-20261021\product\tests\test_audio_discontinuity.py", line 115, in compare
+    self.assertEqual(actual.tobytes(),expected.tobytes(),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f'{name}: wrong source clock; max error {float(np.max(np.abs(actual.astype(float)-expected)))}')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'I\xafs>\xa7U=\xbe(Nx>\xbfSA\xbe\xac\xf1|>[31202 chars]\xbe' != b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\[46035 chars]\x00' : gap: wrong source clock; max error 0.3539956212043762
+
+----------------------------------------------------------------------
+Ran 13 tests in 16.141s
+
+FAILED (failures=11)

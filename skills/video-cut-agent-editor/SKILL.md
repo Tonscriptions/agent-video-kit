@@ -669,3 +669,37 @@ Read the [actual pixels and failures](../../docs/validation/HTML子帧快门与�
 This is premultiplied encoded-sRGB 8-bit compositing. It does not add motion
 blur to arbitrary source footage or accept HDR, natural-motion quality, hidden
 Canvas text layout, undeclared scene cuts or complete CapCut parity.
+
+
+### Native source audio intervals
+
+Discover `native_audio_source_clock` with `capabilities` before using this path.
+The protocol is `native-decoded-audio-interval-clock-v1`. It keeps the original
+asset ID, URI, source SHA and authored ranges. Native decoded PTS/sample counts
+place hard gaps as silence and let later decoded frames overwrite overlaps.
+Continuous sources retain their original input; discontinuous sources use a
+hash-bound derived native-rate float PCM cache. Soft async drift compensation
+stays disabled. Coarse PTS has per-measurement rounding uncertainty; its already
+lost subtick clock jumps cannot be reconstructed. Exact native sample timebases
+retain a real one-sample gap.
+
+Apply this source clock before scalar/reverse/curve/nested selection, offline R3
+input and multicam envelopes. R3 may use audio EOF silence within verified native
+video coverage, and must reject invented handles beyond actual source coverage.
+Preserve structured clock/cache errors; do not silently retry with a legacy clock.
+
+Use `cache list --project PROJECT --kind native-audio-clock` and explicit
+`cache prune --project PROJECT --kind native-audio-clock`. Inventory is not byte
+integrity validation. Registered source assets protect matching cache entries;
+do not delete protected files manually or present a cache hit as new inference.
+The frame/index/PCM/directory bounds do not prove peak RSS or long-file latency.
+
+See [source clock contract](../../docs/specs/源音频内部时钟与硬缺口缓存_v0.1_2026-10-21.md)
+and [actual source/MP4/GIF and failure evidence](../../docs/validation/源音频硬缺口与重叠缓存实测_2026-10-21.md).
+Synthetic sample equality does not establish natural listening, arbitrary codec
+changes, HDR, long-form reliability or full CapCut parity.
+
+Require capability/protocol discovery before requesting this cache kind. Keep an explicit source master audio track; source interval normalization does not infer device drift or editorial camera choices.
+
+
+A continuous source clock cache intentionally keeps an empty `audio.pcm` because the original media remains the audio input. Queue reuse binds that derived file's zero byte size and empty SHA; it must reject later changes or truncation of nonempty artifacts. Authored sources, tools and committed outputs must still be nonempty. Do not delete the empty placeholder or disable dependency verification to make a queue succeed.

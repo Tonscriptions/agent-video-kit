@@ -350,6 +350,8 @@ def preview_project(root, project, sequence, *, request, output=None, cancel_fil
         for obj in metadata:
             if job := obj.get('audio_stretch'):
                 job['execution'] = _execute_audio_stretch(root, job, temporary, cancel_file=cancel_file)
+        from .native_audio_clock import verify_materialized as verify_audio_clocks
+        verify_audio_clocks(root,metadata,cancel_file=cancel_file)
         cancel(cancel_file)
         actual_formats = [str(probe_media(resolve_local_path(root, asset['uri'], field='preview.asset')).get('format',''))
                           for asset in project.get('assets',[]) if asset.get('kind') in {'image','audio','video'}]
@@ -414,6 +416,7 @@ def preview_project(root, project, sequence, *, request, output=None, cancel_fil
         if reverse_jobs:verify_reverse(root,reverse_jobs,cancel_file=cancel_file)
         from .native_video_index import verify_materialized as verify_native_indexes
         verify_native_indexes(root,metadata,cancel_file=cancel_file)
+        verify_audio_clocks(root,metadata,cancel_file=cancel_file)
         clock = _verify_clock(temporary/name, request, cancel_file)
         files = {name:artifact_digest(temporary/name, cancel_file) for name in names}
         receipt = {'engine':ENGINE, 'base_signature':signature, 'identity':before, 'request':request,

@@ -1,0 +1,287 @@
+---
+name: video-cut-project-ops
+description: Operate local Agent Projects with snapshots, migration, relinking, persistent render queues, cancellation, and deterministic replay.
+---
+
+<!-- V85-NATIVE-EMPTY-WINDOW -->
+Retain verified source/runtime/index boundaries even when zero frames are selected. NATIVE_INDEX_CORRUPT/exit 6 must still block output. Unknown final native duration remains an error; explicit cache cleanup and authored-reference protection continue to apply.
+Read the [empty-window contract](../../docs/specs/原生视频空区间契约_v0.1_2026-10-21.md) and [actual independent evidence](../../docs/validation/原生空视频选区与显式音频保留实测_2026-10-21.md).
+Zero selected-frame raster budget is not zero decoding or process RSS.
+<!-- /V85-NATIVE-EMPTY-WINDOW -->
+
+
+<!-- V84-NESTED-NATIVE-CLOCK -->
+When capabilities expose `nested_native_video_clock`, registered native video leaves preserve original PTS/duration through composed author clocks.
+Use existing authored clips, source ticks, speed curves and reverse fields. Preserve native frame holds and real video EOF.
+Virtual inline surfaces retain child CFR; general nested VFR effect combinations still need separate acceptance.
+Keep native-video-index and reverse-video files as verified derived caches. Transfer author recipes; use public cache list/prune operations and preserve current authored-reference protection.
+Read the [native nested-clock contract](../../docs/specs/嵌套原生VFR时钟契约_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/嵌套原生VFR时钟与多层速度曲线实测_2026-10-21.md).
+Verified index hits skip full-source frame scans only; source/runtime hashes and final decode/encode remain. Existing expression, memory and disk limits apply.
+The 32 new native interval oracles are part of 277 related methods. These proofs do not establish full CapCut parity, natural/HDR quality, audio quality, long-duration latency or total RSS.
+Wholly empty native-video selections follow the validated empty-interval contract; preserve the original window and explicit audio track. Unknown EOF and corrupt indexes still reject.
+<!-- /V84-NESTED-NATIVE-CLOCK -->
+
+
+<!-- V83-NATIVE-INDEX -->
+When capabilities advertise `native_video_frame_index`, ordinary native reverse reuses verified source PTS/duration arrays.
+`source_index_decode_calls=0` skips full-source frame scans; source/runtime SHA reads, audio, final video decoding and encoding still apply.
+Use `cache list --project P --kind native-video-index` before explicit `cache prune --project P --kind native-video-index --key KEY --dry-run`.
+Current authored references are protected; keep corrupt indexes for diagnosis until explicit cleanup. Do not edit derived arrays.
+Read the [index contract](../../docs/specs/原生帧索引缓存契约_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生帧索引缓存与倒放复用实测_2026-10-21.md).
+The 256-entry limit, V82 disk reservation and unaccepted long-duration, peak RSS, natural/HDR quality, nested VFR and full CapCut parity limits still apply.
+<!-- /V83-NATIVE-INDEX -->
+
+
+<!-- V82-REVERSE-CHUNKS -->
+For ordinary native-video reverse, read the [V82 chunk/clock contract](../../docs/specs/原生分块倒放缓存契约_v0.1_2026-10-21.md)
+and [actual native/isolated evidence](../../docs/validation/原生分块倒放与离线缓存实测_2026-10-21.md). Preserve original VFR display intervals
+and fractional source bounds. Normal `render`/`preview` automatically prepare FFV1 native-format
+chunks when the shared selected-frame estimate exceeds 256 MiB. Cache 25 Hz is a frame
+counter; source intervals are reapplied. Chunk decode counters exclude the full-source
+index probe. When capabilities expose native_video_frame_index, verified index hits skip that probe;
+source/runtime SHA reads remain. Raster estimates are not process RSS guarantees.
+Use `cache list --project P` and `cache prune --project P --key KEY --dry-run` for derived reverse files.
+Current project references are protected. Keep corrupt entries for diagnosis until explicit cleanup;
+source/runtime/path changes require rebuilding. Transfer author recipes; derived cache paths are not portable.
+<!-- /V82-REVERSE-CHUNKS -->
+
+# Project Operations
+
+<!-- V78-TIMELINE-PREVIEW -->
+For author timeline frames/ranges read the
+[preview and content-cache contract](../../docs/specs/时间线帧区间预览与内容缓存契约_v0.1_2026-10-20.md)
+and [native/isolated checks, media and retained failures](../../docs/validation/时间线帧区间预览与离线发行实测_2026-10-20.md).
+Use `preview frame --frame N` or `preview range --start-frame S --end-frame E`
+with `--project`; ranges are half-open output display frames. Compile the full
+author graph before trimming; compare lossless BGRA/float-PCM NUT with the
+complete graph. MP4/GIF are lossy opaque viewing copies. Transparent reference
+requires transparent author output. Export with `--output <new project dir>`
+to retain a result beyond `preview cache-prune`; omitted output is evictable.
+Cache hits verify complete source/runtime/output content and do not execute
+a new graph, encoder or model. Corruption rejects; explicit prune rebuilds.
+`--dry-run`, project-local cancel markers, bounded space admission and current
+asset-reference protection apply. Software preview decodes cumulatively from
+author start. It does not accept realtime playback, natural quality or delivery.
+<!-- /V78-TIMELINE-PREVIEW -->
+
+<!-- V77-NATIVE-HSL -->
+For catalog 0.8.1 selective HSL, read the
+[native kernel and bounded DAG contract](../../docs/specs/八色HSL原生像素内核与表达式DAG契约_v0.1_2026-10-20.md)
+and [native/installed outputs, full CLI timing and retained failures](../../docs/validation/八色HSL原生提速与离线发行实测_2026-10-20.md).
+`AI_AD_EDITOR_HSL_BACKEND=auto|native|expression` defaults to a verified bundled
+Windows amd64 frei0r DLL. Auto falls back for an absent platform module or
+missing FFmpeg filter; integrity errors reject. Explicit native requires it.
+Retain original author tracks on transfer; rebuild the immutable DAG at the
+destination. Its 25 channels remain separate from the 34 command channels.
+Check backend, program and DLL/source hashes, decoded pixels, alpha, PCM and
+PTS. Native processing uses up to three shared background workers plus the
+caller. Separate null-output filter throughput from complete CLI encoding
+and interactive-preview acceptance. Older V76 geq timings below are historical.
+<!-- /V77-NATIVE-HSL -->
+
+<!-- V76-HSL -->
+Historical V76 implementation and evidence (superseded execution backend):
+For projects with selective HSL, read the
+[editable eight-band HSL contract](../../docs/specs/八色分区HSL与关键帧契约_v0.1_2026-10-20.md)
+and [package and isolated installation checks](../../docs/validation/八色分区HSL与离线发行实测_2026-10-20.md).
+Transfer original parameters and author tracks, then rebuild derived geq
+expressions in the destination. Discover `effects.selective_hsl` and catalog
+0.8.0; its 25 expression channels are distinct from native command targets.
+Verify source/wheel/installed bytes and actual alpha, PCM and PTS. Preserved
+kernel metadata is evidence, not portable author state or real-time support.
+<!-- /V76-HSL -->
+
+For projects with animated spatial/keying effects, read the
+[editable effect contract](../../docs/specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md)
+and [package, clip-group and isolated installation checks](../../docs/validation/空间滤镜与抠像关键帧实测_2026-10-20.md).
+Keep original parameters, tracks, author ticks and interpolation data. Derived
+command caches are rebuilt under the target project and actual FFmpeg gate;
+they are not portable author data. Reject malformed or unavailable dynamic
+channels before applying project changes. Check catalog 0.7.0 and the
+`numeric_effect_automation` capability rather than inferring support from a
+filter name or a previous installed build. Static and dynamic RGB key effects
+retain key-stage input coverage through an explicit 8-bit alpha product.
+The target rebuilds root-unique alpha compositors within their separate
+1,024-node budget; cached filter labels are not author data.
+
+For projects with retimed external blending, read the
+[editable blend-clock contract](../../docs/specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md)
+and [package, fragment and installed checks](../../docs/validation/外部混合动画变速与静音修复实测_2026-10-20.md).
+Native JSON, packages and clip groups retain `blend.opacity_animation` as
+self-contained author data. It contains no temporary sequence references or
+compiled command paths. Rebuild command caches on the target and compare
+decoded output. OTIO/MLT report this clock as Unsupported; retained metadata
+does not make an external editor execute it. Keep original rights and
+transaction boundaries when applying retime or replacing top-level keys.
+
+For portable animated looks, read the
+[LUT contract](../../docs/specs/LUT强度关键帧契约_v0.1_2026-10-20.md)
+and [package/fragment/replay evidence](../../docs/validation/LUT强度关键帧与中性调色修复实测_2026-10-20.md).
+Package export closes LUT dependencies across the graph, resolving registered
+IDs or project-local paths to hash-named package files while retaining editable
+strength keyframes. Recheck registered bytes before export; missing/changed
+resources must fail before opening the ZIP. Package does not carry derived
+commands/caches. Rebuild them after import, compare actual decoded frames, and
+retain rights dependencies. Queue reuse binds actual LUT bytes; matching an ID
+or filename does not establish matching content.
+
+For identical deliverables with different output names, read the
+[serial batch reuse contract](../../docs/specs/同批次相同渲染结果复用契约_v0.1_2026-10-20.md)
+and [actual reuse evidence](../../docs/validation/OpenFilm同批次结果复用实测_2026-10-20.md).
+Use `queue run --reuse-identical` only with one worker and new targets.
+The index lasts for this invocation; each target repeats rights and structural
+checks. Inspect `reuse_summary`, the content snapshot and source operation.
+Copied output does not execute a new encoder or hardware probe. Unsupported
+dependency configurations reject; ordinary queue rendering remains available.
+
+For failed native RVM/SAM2/LaMa/VACE jobs, use the
+[pipeline diagnostic contract](../../docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md).
+Keep the original error/operation ID and optional `diagnostics` reference.
+`diagnostics list --project <root> --operation-id <op>` finds retained records;
+`diagnostics show --project <root> --diagnostic-id <id>
+--expected-manifest-sha256 <sha>` checks their files. Logs require `--include-logs`.
+Export only to an explicitly requested new ZIP in an existing plain directory.
+Read commands do not create snapshots or prune history; retention runs on writes.
+An unavailable/expired attachment does not invalidate the original business error.
+See the [native failure and installation evidence](../../docs/validation/本地模型管道诊断与回收前留证实测_2026-10-20.md)
+for actual scope; neither a simulated exit nor a parser error is a Torch crash.
+
+For optional GPU queues/resume, follow the [hardware policy](../../docs/specs/硬件编解码探测与显式回退契约_v0.1_2026-10-19.md).
+Queue fields are `hardware_encode`, `hardware_decode`, `hardware_encoder`,
+`hardware_decoder`, `hardware_probe_mib` and explicit `video_bitrate`.
+Resume retains the original fingerprinted settings and reruns availability probes;
+never reuse a previous machine/driver's success. Failed/cancelled command reports
+remain under `renders/diagnostics`, outside authoring-metadata rollback.
+
+For [compound freeze projects](../../docs/specs/复合片段定格与完整音画时钟契约_v0.1_2026-10-18.md),
+package the authored child sequences, media and fonts. Render-only virtual
+surfaces are graph pads, not generated files or rights entries. Verify native
+package restoration and an actual isolated installed CLI render against the
+development bytes, as scoped in the
+[installation and rebuild evidence](../../docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md).
+The shared estimated quota charges complete child and frozen surfaces;
+loop/reverse buffers and total process RSS still require separate acceptance.
+
+For installing outside the source checkout, use the new-target, hash-bound
+wheel-only installer described by the
+[offline release contract](../../docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md).
+Keep existing installations intact; cancellation/failure cleans only owned
+staging. The generated launcher isolates host/user dependency sites, and
+`schema export` writes a new file. Consult the
+[real installation and project-package round trip](../../docs/validation/离线发行与随包Schema实测_2026-10-18.md)
+for current platform and external-tool limits.
+
+The [source edit actions](../../docs/specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md)
+share timeline snapshots, canonical plan hashes, idempotency and batch rollback.
+Reusing a key must not slip the source twice. A failure in any linked member
+or later batch step retains original project bytes. Review source and native
+retiming changes before applying; these actions preserve asset rights records.
+
+The [range edit actions](../../docs/specs/范围编辑插入覆盖与滚滑剪口契约_v0.1_2026-10-18.md)
+share the existing timeline transaction, snapshot and idempotency path.
+Preview is read-only; bind `base_project_sha256` when applying, and replay the
+same accepted request/key even though its original digest is now stale.
+`compose` can batch a range `linked_edit` with later commands; a late error
+must retain the exact original project. Review new/removed IDs and detached
+transition declarations in the full plan. A completed range edit does not
+authorize new source downloads or publication of unverified assets.
+
+For the [fragment library](../../docs/specs/可复用片段组库与跨项目插入契约_v0.1_2026-10-18.md),
+save versions under a local library; apply uses the project lock, a
+before-fragment-apply snapshot, metadata transaction and normal idempotency.
+Bind a reviewed plan with `--expected-project-sha256` and
+`--expected-fragment-sha256`. A new instance owns fresh resource and ID
+namespaces. Ordinary handler failures remove copied resources; process death
+can leave unreferenced files after metadata recovery. Preserve and inspect
+those files before cleanup. A library version does not overwrite an earlier
+version or automatically propagate source-rights changes to existing copies.
+
+For [source-handle transitions](../../docs/specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md),
+`timeline transition` uses the existing project lock, metadata transaction and
+`before-source-transition` snapshot. Its `project_sha256` binds the optional
+expected hash; replay the same idempotency request without reapplying it.
+Remove the declaration to restore source ranges; no clip restoration journal
+is needed. Native JSON/package preserve it; external formats report
+`sequence.source_transitions` as Unsupported and strict export rejects.
+For [transitioned nested sources](../../docs/specs/嵌套转场合成与作者时钟契约_v0.1_2026-10-18.md),
+keep author declarations and references in snapshots/native packages. Internal
+video surfaces exist only in the detached render graph; do not register,
+relink, package or add rights entries for synthetic surface IDs. Original
+media and model dependencies still gate publication. Child warnings propagate
+with `inline_sequence_path`. Queue render/dry-run use the existing sampling
+quota plus recursive surface/projection charges and preserve explicit
+`SEQUENCE_INLINE_BUDGET_EXCEEDED` errors. This is not a total RAM guarantee.
+
+For [linked edits](../../docs/specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md),
+dry-run is read-only. Formal `timeline edit` makes a before-timeline-edit
+snapshot and records its plan in the existing metadata transaction. Supply
+the plan's `base_project_sha256` through `--expected-project-sha256` to reject
+stale authorship; reuse an idempotency key only for the same request. A replay
+returns the original result even after its accepted edit changed the project.
+`compose` can batch `linked_edit`; invalid intermediate models and late failures
+roll back. Native JSON/package preserve editing flags, sync locks, links and
+cue offsets. OTIO/Kdenlive/plain drafts report these semantics as Unsupported;
+metadata retention does not establish execution in another editor.
+
+Use the project lifecycle and queue as local files:
+
+```powershell
+python -X utf8 -m ai_ad_editor project snapshot --project .\work\demo --label before-release
+python -X utf8 -m ai_ad_editor queue enqueue --project .\work\demo --input .\queue\variants.json
+python -X utf8 -m ai_ad_editor queue run --project .\work\demo --continue-on-error --progress jsonl
+python -X utf8 -m ai_ad_editor queue list --project .\work\demo
+```
+
+Snapshots, operations, queue state and reports stay in the project. Mutating
+CLI commands serialize their complete project read-modify-write phase with
+`operations/project-write.lock`; a competing process receives the structured
+`PROJECT_WRITE_LOCKED` error and should retry. `queue cancel` stays responsive
+while a render holds that lock: it atomically writes the job's `.cancel` marker,
+returns `acknowledged=true, confirmed=false`, and the runner later confirms the
+terminal state. Retry a failed or cancelled job explicitly after inspecting its
+report. Never start a daemon, database, container, remote worker or cloud
+artifact service.
+
+Queue jobs selecting an [independent sequence canvas](../../docs/specs/独立序列画布与父级投影契约_v0.1_2026-10-17.md)
+default to that sequence's effective width/height. A per-job profile or explicit
+dimensions override only the selected root; authored child canvases remain.
+Preserve canvas in snapshots and native project/package exchange; external
+formats report unsupported child rasters instead of implying full nested parity.
+
+Queue fields `sequence_sampling: area` and `sequence_memory_mib: 1024` are
+per-job overrides, matching render/quality flags in the [sampling contract](../../docs/specs/序列面积采样与工作栅格预算契约_v0.1_2026-10-17.md).
+They do not edit author settings. Cancelled render resume retains effective
+sampling and quota; explicit replacement settings must match its fingerprint.
+Projection budget rejection also applies to dry-run; the estimate excludes
+decoders, encoders, other effects, threads and simultaneous jobs.
+
+
+### Native source audio intervals
+
+Discover `native_audio_source_clock` with `capabilities` before using this path.
+The protocol is `native-decoded-audio-interval-clock-v1`. It keeps the original
+asset ID, URI, source SHA and authored ranges. Native decoded PTS/sample counts
+place hard gaps as silence and let later decoded frames overwrite overlaps.
+Continuous sources retain their original input; discontinuous sources use a
+hash-bound derived native-rate float PCM cache. Soft async drift compensation
+stays disabled. Coarse PTS has per-measurement rounding uncertainty; its already
+lost subtick clock jumps cannot be reconstructed. Exact native sample timebases
+retain a real one-sample gap.
+
+Apply this source clock before scalar/reverse/curve/nested selection, offline R3
+input and multicam envelopes. R3 may use audio EOF silence within verified native
+video coverage, and must reject invented handles beyond actual source coverage.
+Preserve structured clock/cache errors; do not silently retry with a legacy clock.
+
+Use `cache list --project PROJECT --kind native-audio-clock` and explicit
+`cache prune --project PROJECT --kind native-audio-clock`. Inventory is not byte
+integrity validation. Registered source assets protect matching cache entries;
+do not delete protected files manually or present a cache hit as new inference.
+The frame/index/PCM/directory bounds do not prove peak RSS or long-file latency.
+
+See [source clock contract](../../docs/specs/源音频内部时钟与硬缺口缓存_实验_v0.1_2026-10-21.md)
+and [actual source/MP4/GIF and failure evidence](../../docs/validation/源音频硬缺口与重叠缓存独立实验_2026-10-21.md).
+Synthetic sample equality does not establish natural listening, arbitrary codec
+changes, HDR, long-form reliability or full CapCut parity.
+
+Before pruning, inspect protected_source_reference and protected_reference_keys. Source SHA protection covers assets still registered in the author project. Cancellation must clean only owned staging; preserve corrupt or failed media as evidence.

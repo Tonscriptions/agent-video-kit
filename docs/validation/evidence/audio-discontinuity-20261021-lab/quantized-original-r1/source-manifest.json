@@ -1,0 +1,49 @@
+{
+  "status": "prepared-original-quantized-AAC-control",
+  "command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-v",
+    "error",
+    "-copyts",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-continuous.m4a",
+    "-map",
+    "0:a:0",
+    "-c:a",
+    "copy",
+    "-avoid_negative_ts",
+    "disabled",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\quantized-original-r1\\aac-quantized-continuous.mkv"
+  ],
+  "row": {
+    "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\quantized-original-r1\\aac-quantized-continuous.mkv",
+    "sha256": "sha256:7c1dccba17ce722d61f2c9465ff2cabd4f99e72bb8285eba69e8241c415dcae1",
+    "rate": 48000,
+    "channels": 2,
+    "kind": "AAC-actual-decoded-PCM-and-frame-PTS",
+    "authored_packet_gap_samples": 0,
+    "authored_packet_overlap_samples": 0,
+    "native_probe": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\validation\\evidence\\audio-discontinuity-20261021-lab\\quantized-original-r1\\native-frames.json",
+      "sha256": "sha256:43170b0061c6a9064abaee6c008d11d37850931eb05e5b1c8f6782986d1a1097"
+    },
+    "actual_decoded_PCM": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\quantized-original-r1\\actual-decoded.f32",
+      "sha256": "sha256:f7ce1e7d6da4942a3597b2847a65500ce3a922d7124a737fe4a126011d1f1628"
+    }
+  },
+  "source": {
+    "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\quantized-original-r1\\aac-quantized-continuous.mkv",
+    "sha256": "sha256:7c1dccba17ce722d61f2c9465ff2cabd4f99e72bb8285eba69e8241c415dcae1"
+  },
+  "native_probe": {
+    "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\validation\\evidence\\audio-discontinuity-20261021-lab\\quantized-original-r1\\native-frames.json",
+    "sha256": "sha256:43170b0061c6a9064abaee6c008d11d37850931eb05e5b1c8f6782986d1a1097"
+  },
+  "actual_decoded_PCM": {
+    "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\quantized-original-r1\\actual-decoded.f32",
+    "sha256": "sha256:f7ce1e7d6da4942a3597b2847a65500ce3a922d7124a737fe4a126011d1f1628"
+  },
+  "script_sha256": "sha256:5369e1ced811132c83d2795a58d157b67b50ea2914f74d11776424b45e6be5b5",
+  "rights": "Original CC0 source; codec priming and final padding kept from actual decode."
+}

@@ -1,0 +1,840 @@
+{
+  "status": "passed-extra-original-native-frame-sample-counts",
+  "started_at_utc": "2026-10-21T12:41:15.820848+00:00",
+  "commands": [
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-copyts",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\original-r1\\mixed.nut",
+        "-map",
+        "0",
+        "-c",
+        "copy",
+        "-output_ts_offset",
+        "5",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\nonzero-origin-mixed.nut"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-f",
+        "lavfi",
+        "-i",
+        "color=c=0x203040:size=32x18:rate=25:duration=0.4",
+        "-f",
+        "f32le",
+        "-ar",
+        "48000",
+        "-ac",
+        "2",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\delayed-mixed.source.f32",
+        "-af",
+        "asetnsamples=n=480:p=0,asetpts='N+2400+if(gte(N,2400),2400,0)-if(gte(N,4800),240,0)'",
+        "-map",
+        "0:v:0",
+        "-map",
+        "1:a:0",
+        "-c:v",
+        "ffv1",
+        "-pix_fmt",
+        "bgra",
+        "-c:a",
+        "pcm_f32le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\delayed-mixed.nut"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-f",
+        "lavfi",
+        "-i",
+        "color=c=0x203040:size=32x18:rate=25:duration=0.4",
+        "-f",
+        "f32le",
+        "-ar",
+        "8000",
+        "-ac",
+        "1",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\low-rate-mixed.source.f32",
+        "-af",
+        "asetnsamples=n=80:p=0,asetpts='N+0+if(gte(N,400),400,0)-if(gte(N,800),40,0)'",
+        "-map",
+        "0:v:0",
+        "-map",
+        "1:a:0",
+        "-c:v",
+        "ffv1",
+        "-pix_fmt",
+        "bgra",
+        "-c:a",
+        "pcm_f32le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\low-rate-mixed.nut"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-f",
+        "lavfi",
+        "-i",
+        "color=c=0x203040:size=32x18:rate=25:duration=0.4",
+        "-f",
+        "f32le",
+        "-ar",
+        "44100",
+        "-ac",
+        "2",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\fractional-rate-mixed.source.f32",
+        "-af",
+        "asetnsamples=n=441:p=0,asetpts='N+0+if(gte(N,2205),2205,0)-if(gte(N,4410),220,0)'",
+        "-map",
+        "0:v:0",
+        "-map",
+        "1:a:0",
+        "-c:v",
+        "ffv1",
+        "-pix_fmt",
+        "bgra",
+        "-c:a",
+        "pcm_f32le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\fractional-rate-mixed.nut"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-f",
+        "f32le",
+        "-ar",
+        "48000",
+        "-ac",
+        "2",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-encoding-input.f32",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "192k",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-continuous.m4a"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-copyts",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-continuous.m4a",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "copy",
+        "-bsf:a",
+        "setts=pts='PTS+if(gte(N,10),4800/48000/TB,0)-if(gte(N,20),0/48000/TB,0)':dts='DTS+if(gte(N,10),4800/48000/TB,0)-if(gte(N,20),0/48000/TB,0)'",
+        "-avoid_negative_ts",
+        "disabled",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap.mkv"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-copyts",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-continuous.m4a",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "copy",
+        "-bsf:a",
+        "setts=pts='PTS+if(gte(N,10),0/48000/TB,0)-if(gte(N,20),240/48000/TB,0)':dts='DTS+if(gte(N,10),0/48000/TB,0)-if(gte(N,20),240/48000/TB,0)'",
+        "-avoid_negative_ts",
+        "disabled",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-overlap.mkv"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-copyts",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-continuous.m4a",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "copy",
+        "-bsf:a",
+        "setts=pts='PTS+if(gte(N,10),4800/48000/TB,0)-if(gte(N,20),240/48000/TB,0)':dts='DTS+if(gte(N,10),4800/48000/TB,0)-if(gte(N,20),240/48000/TB,0)'",
+        "-avoid_negative_ts",
+        "disabled",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap-overlap.mkv"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-select_streams",
+        "a:0",
+        "-show_frames",
+        "-show_streams",
+        "-show_format",
+        "-show_entries",
+        "frame=pts,nb_samples,sample_rate,channels,channel_layout:stream=time_base,sample_rate,channels,channel_layout:format=start_time,duration",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\nonzero-origin-mixed.nut"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 3384,
+      "stdout_sha256": "sha256:af92337dd4baae23a740334b4ef86581ef92b1a9e24eada1e5232ef7ea5bca7a"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\nonzero-origin-mixed.nut",
+        "-map",
+        "0:a:0",
+        "-vn",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\nonzero-origin-mixed.actual-decoded.f32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-select_streams",
+        "a:0",
+        "-show_frames",
+        "-show_streams",
+        "-show_format",
+        "-show_entries",
+        "frame=pts,nb_samples,sample_rate,channels,channel_layout:stream=time_base,sample_rate,channels,channel_layout:format=start_time,duration",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\delayed-mixed.nut"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 3352,
+      "stdout_sha256": "sha256:ea5477f303cb8f999e0e04c2ef49d484726c72179fc4c60949be354f16bf9c3e"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\delayed-mixed.nut",
+        "-map",
+        "0:a:0",
+        "-vn",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\delayed-mixed.actual-decoded.f32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-select_streams",
+        "a:0",
+        "-show_frames",
+        "-show_streams",
+        "-show_format",
+        "-show_entries",
+        "frame=pts,nb_samples,sample_rate,channels,channel_layout:stream=time_base,sample_rate,channels,channel_layout:format=start_time,duration",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\low-rate-mixed.nut"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 3311,
+      "stdout_sha256": "sha256:4a1ced7471c9480719ccf8879b7d69088c6c2dc7de039244f0a0796b298e8e12"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\low-rate-mixed.nut",
+        "-map",
+        "0:a:0",
+        "-vn",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\low-rate-mixed.actual-decoded.f32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-select_streams",
+        "a:0",
+        "-show_frames",
+        "-show_streams",
+        "-show_format",
+        "-show_entries",
+        "frame=pts,nb_samples,sample_rate,channels,channel_layout:stream=time_base,sample_rate,channels,channel_layout:format=start_time,duration",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\fractional-rate-mixed.nut"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 3340,
+      "stdout_sha256": "sha256:1cfb72fbbe43a6f855c6598ae53c6cf3e86df92598e3806ac4e1de49fecbab11"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\fractional-rate-mixed.nut",
+        "-map",
+        "0:a:0",
+        "-vn",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\fractional-rate-mixed.actual-decoded.f32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-select_streams",
+        "a:0",
+        "-show_frames",
+        "-show_streams",
+        "-show_format",
+        "-show_entries",
+        "frame=pts,nb_samples,sample_rate,channels,channel_layout:stream=time_base,sample_rate,channels,channel_layout:format=start_time,duration",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-continuous.m4a"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 8462,
+      "stdout_sha256": "sha256:051bea917f6501e44db11c5c3840fa248701064fcf2fe92e115642fe0e753b20"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-continuous.m4a",
+        "-map",
+        "0:a:0",
+        "-vn",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-continuous.actual-decoded.f32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-select_streams",
+        "a:0",
+        "-show_frames",
+        "-show_streams",
+        "-show_format",
+        "-show_entries",
+        "frame=pts,nb_samples,sample_rate,channels,channel_layout:stream=time_base,sample_rate,channels,channel_layout:format=start_time,duration",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap.mkv"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 8543,
+      "stdout_sha256": "sha256:56b47701c6bfa08e8add5425c47ed1c8c7f6e3fd7bc1f8ac5c8783387782fe5e"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap.mkv",
+        "-map",
+        "0:a:0",
+        "-vn",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap.actual-decoded.f32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-select_streams",
+        "a:0",
+        "-show_frames",
+        "-show_streams",
+        "-show_format",
+        "-show_entries",
+        "frame=pts,nb_samples,sample_rate,channels,channel_layout:stream=time_base,sample_rate,channels,channel_layout:format=start_time,duration",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-overlap.mkv"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 8539,
+      "stdout_sha256": "sha256:4d5956e01a451186d21d202baebef5fd42526bbbeca5d6302fdaea86e14d00f8"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-overlap.mkv",
+        "-map",
+        "0:a:0",
+        "-vn",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-overlap.actual-decoded.f32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.EXE",
+        "-v",
+        "error",
+        "-select_streams",
+        "a:0",
+        "-show_frames",
+        "-show_streams",
+        "-show_format",
+        "-show_entries",
+        "frame=pts,nb_samples,sample_rate,channels,channel_layout:stream=time_base,sample_rate,channels,channel_layout:format=start_time,duration",
+        "-of",
+        "json",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap-overlap.mkv"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 8543,
+      "stdout_sha256": "sha256:7074253aa71832677c54a9d71c362f8e96cb7308a77273e3c7e36e62d0222669"
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap-overlap.mkv",
+        "-map",
+        "0:a:0",
+        "-vn",
+        "-c:a",
+        "pcm_f32le",
+        "-f",
+        "f32le",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap-overlap.actual-decoded.f32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "script_sha256": "sha256:3d73326bcda4c5837f605ff6e26935d0294f00d5db988a91948c75537cc09bb8",
+  "cases": {
+    "nonzero-origin-mixed": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\nonzero-origin-mixed.nut",
+      "rate": 48000,
+      "channels": 2,
+      "known_container_origin_seconds": "5",
+      "kind": "lossless-native-PCM",
+      "gap_samples": 2400,
+      "overlap_samples": 240,
+      "sha256": "sha256:af4919920f34c3a6f4dc381902724e4bd1c50fd565825a4308c19300c23f6dba",
+      "bytes": 78702,
+      "native_probe": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\validation\\evidence\\audio-discontinuity-20261021-lab\\extra-original-r1\\nonzero-origin-mixed.native-frames.json",
+        "sha256": "sha256:af92337dd4baae23a740334b4ef86581ef92b1a9e24eada1e5232ef7ea5bca7a"
+      },
+      "actual_decoded_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\nonzero-origin-mixed.actual-decoded.f32",
+        "sha256": "sha256:8c38dd1c972612b90de38238e4149d3960615eef3a6e1fb5a6068244f331504c",
+        "samples_per_channel": 9600
+      },
+      "native_frames": 20,
+      "time_base": "1/48000",
+      "format": {
+        "start_time": "5.000000",
+        "duration": "5.360000",
+        "tags": {
+          "encoder": "Lavf62.12.100"
+        }
+      }
+    },
+    "delayed-mixed": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\delayed-mixed.nut",
+      "rate": 48000,
+      "channels": 2,
+      "packet_samples": 480,
+      "gap_samples": 2400,
+      "overlap_samples": 240,
+      "leading_samples": 2400,
+      "kind": "lossless-native-PCM",
+      "original_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\delayed-mixed.source.f32",
+        "sha256": "sha256:8c38dd1c972612b90de38238e4149d3960615eef3a6e1fb5a6068244f331504c"
+      },
+      "author_placed_native_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\delayed-mixed.author-placed-native.f32",
+        "sha256": "sha256:12aa5cdac4f1dfa83cdc695907a9f09f7d42b73120e14b7edb18abbc2da4d9bb"
+      },
+      "sha256": "sha256:2c8acecce3617add4a6f47b047583879cdf6507bc1b09967f32fc35bbabe793a",
+      "bytes": 78698,
+      "native_probe": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\validation\\evidence\\audio-discontinuity-20261021-lab\\extra-original-r1\\delayed-mixed.native-frames.json",
+        "sha256": "sha256:ea5477f303cb8f999e0e04c2ef49d484726c72179fc4c60949be354f16bf9c3e"
+      },
+      "actual_decoded_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\delayed-mixed.actual-decoded.f32",
+        "sha256": "sha256:8c38dd1c972612b90de38238e4149d3960615eef3a6e1fb5a6068244f331504c",
+        "samples_per_channel": 9600
+      },
+      "native_frames": 20,
+      "time_base": "1/48000",
+      "format": {
+        "start_time": "0.000000",
+        "duration": "0.360000",
+        "tags": {
+          "encoder": "Lavf62.12.100"
+        }
+      }
+    },
+    "low-rate-mixed": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\low-rate-mixed.nut",
+      "rate": 8000,
+      "channels": 1,
+      "packet_samples": 80,
+      "gap_samples": 400,
+      "overlap_samples": 40,
+      "leading_samples": 0,
+      "kind": "lossless-native-PCM",
+      "original_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\low-rate-mixed.source.f32",
+        "sha256": "sha256:af8edaa6271f593a5e564d19d5e65b0e6cd505505abb77f7829d37dfc1589e54"
+      },
+      "author_placed_native_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\low-rate-mixed.author-placed-native.f32",
+        "sha256": "sha256:0eed5c94a15c6c03a2ba4101c322775084400b32a72c1f4d46a5da61d9f8472e"
+      },
+      "sha256": "sha256:7f94bbbac0d51a597ce893700b07499fc304c184a2c523c0fbb1587069442bf7",
+      "bytes": 8240,
+      "native_probe": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\validation\\evidence\\audio-discontinuity-20261021-lab\\extra-original-r1\\low-rate-mixed.native-frames.json",
+        "sha256": "sha256:4a1ced7471c9480719ccf8879b7d69088c6c2dc7de039244f0a0796b298e8e12"
+      },
+      "actual_decoded_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\low-rate-mixed.actual-decoded.f32",
+        "sha256": "sha256:af8edaa6271f593a5e564d19d5e65b0e6cd505505abb77f7829d37dfc1589e54",
+        "samples_per_channel": 1600
+      },
+      "native_frames": 20,
+      "time_base": "1/8000",
+      "format": {
+        "start_time": "0.000000",
+        "duration": "0.360000",
+        "tags": {
+          "encoder": "Lavf62.12.100"
+        }
+      }
+    },
+    "fractional-rate-mixed": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\fractional-rate-mixed.nut",
+      "rate": 44100,
+      "channels": 2,
+      "packet_samples": 441,
+      "gap_samples": 2205,
+      "overlap_samples": 220,
+      "leading_samples": 0,
+      "kind": "lossless-native-PCM",
+      "original_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\fractional-rate-mixed.source.f32",
+        "sha256": "sha256:b5d373b38fbad176a5e4e5e8603d03ee659053c8fc9a488f8b79d0b41232a945"
+      },
+      "author_placed_native_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\fractional-rate-mixed.author-placed-native.f32",
+        "sha256": "sha256:80a60a71d0f492c264e3170098522f1fbd706832e59b4df97a55af417ea396cb"
+      },
+      "sha256": "sha256:b6397ecf76d10f51b83d0c55073c4322a20c745061af7ae5f2b8cf11c6be7c30",
+      "bytes": 72452,
+      "native_probe": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\validation\\evidence\\audio-discontinuity-20261021-lab\\extra-original-r1\\fractional-rate-mixed.native-frames.json",
+        "sha256": "sha256:1cfb72fbbe43a6f855c6598ae53c6cf3e86df92598e3806ac4e1de49fecbab11"
+      },
+      "actual_decoded_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\fractional-rate-mixed.actual-decoded.f32",
+        "sha256": "sha256:b5d373b38fbad176a5e4e5e8603d03ee659053c8fc9a488f8b79d0b41232a945",
+        "samples_per_channel": 8820
+      },
+      "native_frames": 20,
+      "time_base": "1/44100",
+      "format": {
+        "start_time": "0.000000",
+        "duration": "0.360000",
+        "tags": {
+          "encoder": "Lavf62.12.100"
+        }
+      }
+    },
+    "aac-continuous": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-continuous.m4a",
+      "rate": 48000,
+      "channels": 2,
+      "kind": "AAC-actual-decoded-PCM-and-frame-PTS",
+      "sha256": "sha256:d0e7b9ffb8d6cdefcffc9edc074e4aa877eccf9d1e5eb49f6fd654a7dfacf19c",
+      "bytes": 26492,
+      "native_probe": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\validation\\evidence\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-continuous.native-frames.json",
+        "sha256": "sha256:051bea917f6501e44db11c5c3840fa248701064fcf2fe92e115642fe0e753b20"
+      },
+      "actual_decoded_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-continuous.actual-decoded.f32",
+        "sha256": "sha256:58ed377eef711f9974f0ebd7e5af84df44de7b7d1028dea177188a731446e575",
+        "samples_per_channel": 48128
+      },
+      "native_frames": 47,
+      "time_base": "1/48000",
+      "format": {
+        "start_time": "0.000000",
+        "duration": "1.000000",
+        "tags": {
+          "major_brand": "M4A ",
+          "minor_version": "512",
+          "compatible_brands": "M4A isomiso2",
+          "encoder": "Lavf62.12.100"
+        }
+      }
+    },
+    "aac-gap": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap.mkv",
+      "rate": 48000,
+      "channels": 2,
+      "kind": "AAC-actual-decoded-PCM-and-frame-PTS",
+      "authored_packet_gap_samples": 4800,
+      "authored_packet_overlap_samples": 0,
+      "container_quantization_explicit": true,
+      "sha256": "sha256:69eaa7939dafe85c2738a87070f4d3c87bb4ff5f4d7d8b5e2d71db3e724fe27e",
+      "bytes": 26443,
+      "native_probe": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\validation\\evidence\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap.native-frames.json",
+        "sha256": "sha256:56b47701c6bfa08e8add5425c47ed1c8c7f6e3fd7bc1f8ac5c8783387782fe5e"
+      },
+      "actual_decoded_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap.actual-decoded.f32",
+        "sha256": "sha256:f7ce1e7d6da4942a3597b2847a65500ce3a922d7124a737fe4a126011d1f1628",
+        "samples_per_channel": 49152
+      },
+      "native_frames": 48,
+      "time_base": "1/1000",
+      "format": {
+        "start_time": "-0.021000",
+        "duration": "1.100000",
+        "tags": {
+          "COMPATIBLE_BRANDS": "M4A isomiso2",
+          "MAJOR_BRAND": "M4A ",
+          "MINOR_VERSION": "512",
+          "ENCODER": "Lavf62.12.100"
+        }
+      }
+    },
+    "aac-overlap": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-overlap.mkv",
+      "rate": 48000,
+      "channels": 2,
+      "kind": "AAC-actual-decoded-PCM-and-frame-PTS",
+      "authored_packet_gap_samples": 0,
+      "authored_packet_overlap_samples": 240,
+      "container_quantization_explicit": true,
+      "sha256": "sha256:5b8d0a8c8d1c58fec82c7335a9890acffdd131b166f57f2525a23f81693c018e",
+      "bytes": 26443,
+      "native_probe": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\validation\\evidence\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-overlap.native-frames.json",
+        "sha256": "sha256:4d5956e01a451186d21d202baebef5fd42526bbbeca5d6302fdaea86e14d00f8"
+      },
+      "actual_decoded_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-overlap.actual-decoded.f32",
+        "sha256": "sha256:f7ce1e7d6da4942a3597b2847a65500ce3a922d7124a737fe4a126011d1f1628",
+        "samples_per_channel": 49152
+      },
+      "native_frames": 48,
+      "time_base": "1/1000",
+      "format": {
+        "start_time": "-0.021000",
+        "duration": "0.995000",
+        "tags": {
+          "COMPATIBLE_BRANDS": "M4A isomiso2",
+          "MAJOR_BRAND": "M4A ",
+          "MINOR_VERSION": "512",
+          "ENCODER": "Lavf62.12.100"
+        }
+      }
+    },
+    "aac-gap-overlap": {
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap-overlap.mkv",
+      "rate": 48000,
+      "channels": 2,
+      "kind": "AAC-actual-decoded-PCM-and-frame-PTS",
+      "authored_packet_gap_samples": 4800,
+      "authored_packet_overlap_samples": 240,
+      "container_quantization_explicit": true,
+      "sha256": "sha256:281cd40f2984e1f6d377817b8c10c0ea651aea2ded78fd7a7adad6f3e3839590",
+      "bytes": 26443,
+      "native_probe": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\validation\\evidence\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap-overlap.native-frames.json",
+        "sha256": "sha256:7074253aa71832677c54a9d71c362f8e96cb7308a77273e3c7e36e62d0222669"
+      },
+      "actual_decoded_PCM": {
+        "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\extra-original-r1\\aac-gap-overlap.actual-decoded.f32",
+        "sha256": "sha256:f7ce1e7d6da4942a3597b2847a65500ce3a922d7124a737fe4a126011d1f1628",
+        "samples_per_channel": 49152
+      },
+      "native_frames": 48,
+      "time_base": "1/1000",
+      "format": {
+        "start_time": "-0.021000",
+        "duration": "1.095000",
+        "tags": {
+          "COMPATIBLE_BRANDS": "M4A isomiso2",
+          "MAJOR_BRAND": "M4A ",
+          "MINOR_VERSION": "512",
+          "ENCODER": "Lavf62.12.100"
+        }
+      }
+    }
+  },
+  "native_windows": true,
+  "virtualization": false,
+  "network": false,
+  "rights": "Original deterministic PCM and flat video, CC0-1.0; AAC samples compared to actual decoding, never pre-encode PCM.",
+  "finished_at_utc": "2026-10-21T12:41:18.325453+00:00"
+}

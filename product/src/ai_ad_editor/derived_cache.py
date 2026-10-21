@@ -50,7 +50,7 @@ def inventory(root,*,kind,file_names,protocol,maximum_entries,prefix):
             'bytes':sum(item['bytes'] for item in entries),'max_entries':maximum_entries}
 
 
-def prune(root,*,kind,file_names,protocol,maximum_entries,prefix,keep_bytes=0,dry_run=False,key=None):
+def prune(root,*,kind,file_names,protocol,maximum_entries,prefix,keep_bytes=0,dry_run=False,key=None,protect_keys=()):
     """Caller holds the project write lock; unlink known files without recursion."""
     if type(keep_bytes) is not int or keep_bytes<0 or (key is not None and
         (not isinstance(key,str) or not re.fullmatch('[0-9a-f]{64}',key) or keep_bytes)):
@@ -60,7 +60,9 @@ def prune(root,*,kind,file_names,protocol,maximum_entries,prefix,keep_bytes=0,dr
     from .preview import _paths_from_objects
     from .project import project_file
     from .utils import load_json
-    base=owned(root,root/'cache'/kind,prefix);protected=set()
+    base=owned(root,root/'cache'/kind,prefix);protected=set(protect_keys)
+    if any(not isinstance(value,str) or not re.fullmatch('[0-9a-f]{64}',value) for value in protected):
+        raise fail(prefix,'ARGUMENT_INVALID','受保护派生缓存key必须为SHA-256十六进制')
     for path in _paths_from_objects(root,load_json(project_file(root))):
         if path.is_relative_to(base) and (parts:=path.relative_to(base).parts):protected.add(parts[0])
     remaining=listing['bytes'];removed=[]

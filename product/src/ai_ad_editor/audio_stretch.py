@@ -126,7 +126,8 @@ def plan(root: Path, engine: dict, asset: dict, source: Path, start: float, end:
            'source_frames': source_frames, 'target_frames': target_frames,
            'channels': channels, 'sample_rate': RATE, 'time_map': anchors,
            'source_context': context,
-           'source_audio_clock': 'demux-relative-first-audio-pts-v1',
+           'source_audio_clock': 'native-decoded-audio-interval-clock-v1',
+           'native_audio_clock_implementation':artifact_entry(Path(__file__).with_name('native_audio_clock.py'),'audio-clock-implementation'),
            'reverse_after_stretch': bool(reverse), 'implementation_sha256': implementation,
            'ffmpeg': artifact_entry(Path(ffmpeg_path()).resolve(), 'audio-stretch-ffmpeg')}
     key = hashlib.sha256(json.dumps(job, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
@@ -201,10 +202,40 @@ def _canonical_pcm(source: Path, destination: Path, pcm: dict, *, start_frame=0,
             dst.write(raw);remaining-=len(raw)
 
 
+def _decode_clocked_source(root,job,context,destination,cancel_file):
+    from .native_audio_clock import normalized_input,verify_materialized
+    from .media import probe_media
+    with normalized_input(root,Path(job['source']),job['source_sha256'],persist=True,cancel_file=cancel_file) as clock:
+        filters=[f'aresample={RATE}:osf=flt:first_pts=0']
+        bound={'policy':'native-decoded-audio-end','padding_samples':0}
+        native_end=round(Fraction(clock['stats']['logical_frames']*RATE,clock['stats']['native_sample_rate']))
+        if context['decode_end_sample']>native_end:
+            # A shorter audio stream may leave genuine silence inside a video
+            # asset. Verify its video display end, rather than trusting an asset's
+            # stored container duration or inventing source handles past EOF.
+            actual=probe_media(Path(job['source']));author_end=native_end
+            if actual.get('video',{}).get('codec'):
+                from .multicam import _video_coverage
+                coverage=_video_coverage(Path(job['source']),job['source_sha256'],project_root=root)
+                author_end=max(author_end,math.floor(Fraction(coverage['end_seconds_rational'])*RATE))
+                bound.update(policy='verified-native-audio-and-video-display-end',video_coverage=coverage)
+            if context['decode_end_sample']>author_end:
+                raise AppError('AUDIO_STRETCH_SOURCE_LENGTH_MISMATCH','作者音频范围超出实际源覆盖；未以补零伪造上下文',exit_code=6)
+            bound.update(padding_samples=context['decode_end_sample']-native_end,verified_source_end_sample_48000=author_end)
+            filters.append(f"apad=whole_len={context['decode_end_sample']}")
+        filters.extend([f"atrim=start_sample={context['decode_start_sample']}:end_sample={context['decode_end_sample']}",'asetpts=N/SR/TB'])
+        command=[job['ffmpeg']['path'],'-hide_banner','-loglevel','error','-y',*clock['input_args'],
+            '-map','0:a:0','-vn','-af',','.join(filters),'-c:a','pcm_f32le',str(destination)]
+        verify_materialized(root,[{'native_audio_clock':clock}],cancel_file=cancel_file)
+        result=run_process(command,timeout=3600,cwd=root,cancel_file=cancel_file)
+        verify_materialized(root,[{'native_audio_clock':clock}],cancel_file=cancel_file)
+        return result,command,clock,bound
+
+
 def execute(root: Path, job: dict, temp_dir: Path, *, cancel_file: Path | None = None) -> dict:
     """Study/process once per whole clip, and preserve immutable derived bytes."""
     with verification_scope():
-        for expected in [*job['engine']['artifacts'], job['ffmpeg'],
+        for expected in [*job['engine']['artifacts'], job['ffmpeg'],job['native_audio_clock_implementation'],
                          {'path': job['source'], 'sha256': job['source_sha256']}]:
             actual = artifact_entry(Path(expected['path']), 'audio-stretch-execution')
             if actual['sha256'] != expected['sha256']:
@@ -223,11 +254,7 @@ def execute(root: Path, job: dict, temp_dir: Path, *, cancel_file: Path | None =
                 engine_anchors=[]
             mapping_text=''.join(f'{a} {b}\n' for a,b in engine_anchors)
             atomic_write_text(mapping, mapping_text)
-            decode=[job['ffmpeg']['path'], '-hide_banner', '-loglevel', 'error', '-y',
-                    '-i', job['source'], '-map', '0:a:0', '-vn', '-af',
-                    f"aresample={RATE}:first_pts=0,atrim=start_sample={context['decode_start_sample']}:end_sample={context['decode_end_sample']},asetpts=N/SR/TB",
-                    '-c:a', 'pcm_f32le', str(source)]
-            decoded=run_process(decode, timeout=3600, cwd=root, cancel_file=cancel_file)
+            decoded,decode,native_clock,source_bound=_decode_clocked_source(root,job,context,source,cancel_file)
             if decoded.returncode != 0:
                 raise AppError('AUDIO_STRETCH_DECODE_FAILED', '本地伸缩音频解码失败', exit_code=6, cause=decoded.stderr[-6000:])
             before=inspect_pcm(source)
@@ -275,5 +302,6 @@ def execute(root: Path, job: dict, temp_dir: Path, *, cancel_file: Path | None =
                     'decode_stderr':decoded.stderr,'engine_stderr':processed.stderr,
                     'input_pcm':before,'engine_raw_output_pcm':raw_output,'output_pcm':after,'canonicalization':'float32-pcm-bytes-preserved-no-wall-time-metadata','time_map_utf8':mapping_text,
                     'source_context':context,'context_input_pcm':context_input,
+                    'native_audio_clock':native_clock,'source_clock_bound':source_bound,
                     'engine_time_map':engine_anchors,'time_map_sha256':'sha256:'+hashlib.sha256(mapping_text.encode('ascii')).hexdigest(),
                     'output_artifact':pinned,'pitch_and_listening_accepted':False,'stereo_phase_accepted':False}

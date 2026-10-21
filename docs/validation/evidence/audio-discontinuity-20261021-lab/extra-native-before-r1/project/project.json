@@ -1,0 +1,87 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "id": "proj_20261021124634_94c33ba8",
+    "name": "project",
+    "created_at": "2026-10-21T12:46:34.175695Z",
+    "updated_at": "2026-10-21T12:46:34.175695Z",
+    "creator": "ai-ad-editor",
+    "source_revision": "local"
+  },
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 30,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 1080,
+      "height": 1920,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "assets": [],
+  "sequences": [
+    {
+      "id": "seq_main",
+      "name": "Main",
+      "duration_tick": 1,
+      "tracks": [
+        {
+          "id": "track_video_1",
+          "kind": "video",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": []
+        },
+        {
+          "id": "track_audio_1",
+          "kind": "audio",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": []
+        }
+      ],
+      "markers": []
+    }
+  ],
+  "templates": [],
+  "outputs": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "model_versions": [],
+    "input_hashes": [],
+    "change_log": []
+  }
+}

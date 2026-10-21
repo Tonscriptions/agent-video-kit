@@ -1,0 +1,163 @@
+"""Read-only source/evidence gate for the native source-audio clock experiment."""
+from __future__ import annotations
+import importlib.util
+import json
+from pathlib import Path
+import re
+import subprocess
+from run_frozen_regression import frozen, sha
+from run_audio_clock_related import BOOTSTRAP, GROUPS
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+REL = ROOT/'docs/validation/evidence/audio-discontinuity-20261021-lab'
+ASSETS = ROOT/'docs/assets/audio-discontinuity-20261021-lab'
+PARENT = MAIN/'product/.runtime/multicam-affine-clock-lab-20261021'
+PARENT_COMMIT = '7545d747dffd196434e9591d57d4702850faa94d'
+REPORT = 'docs/validation/源音频硬缺口与重叠缓存独立实验_2026-10-21.md'
+CONTRACT = 'docs/specs/源音频内部时钟与硬缺口缓存_实验_v0.1_2026-10-21.md'
+MODIFIED = {'product/src/ai_ad_editor/'+n+'.py' for n in
+            ('audio_stretch', 'capabilities', 'cli', 'derived_cache', 'multicam', 'preview', 'render')}
+ADDED = {'product/src/ai_ad_editor/native_audio_clock.py',
+         'product/tests/test_audio_discontinuity.py', 'product/tests/test_native_audio_clock.py',
+         'product/tests/test_audio_discontinuity_paths.py'}
+SCRIPTS = ('run_audio_clock_after_parent.py', 'audio_clock_release_common.py',
+ 'run_frozen_regression.py', 'run_with_regression_fixtures.py', 'materialize_regression_fixtures.py',
+ 'prepare_audio_discontinuity_lab.py', 'run_audio_clock_tests.py', 'run_audio_clock_related.py',
+ 'prepare_audio_clock_fixtures.py', 'prepare_audio_clock_extra_sources.py', 'probe_audio_extra_native.py',
+ 'smoke_audio_discontinuity.py', 'verify_audio_clock_install.py', 'document_audio_clock_lab.py',
+ 'prepare_audio_clock_skills.py', 'inventory_audio_clock_media.py')
+
+def read(path):
+    return json.loads(Path(path).read_bytes())
+
+def save(path, value):
+    path = Path(path); path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2)+'\n', encoding='utf8', newline='\n')
+
+def verify(root, values):
+    for name, digest in values.items():
+        assert sha(Path(root)/name) == digest, name
+
+def git(*args):
+    result = subprocess.run(['git', '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', *map(str,args)],
+        cwd=MAIN, capture_output=True, timeout=1200, creationflags=subprocess.CREATE_NO_WINDOW)
+    assert result.returncode == 0, result.stderr.decode('utf8', 'replace')[-1200:]
+    return result.stdout
+
+def links(source, text, roots):
+    result = []
+    for target in re.findall(r'!?\[[^\]]*\]\(([^)\n]+)\)', text):
+        target = target.strip('<>').split('#', 1)[0]
+        if not target or re.match(r'^[A-Za-z][\w+.-]*:', target):
+            continue
+        resolved = (MAIN/source).parent.joinpath(target).resolve()
+        assert resolved.is_relative_to(MAIN), (source, target)
+        relative = resolved.relative_to(MAIN)
+        selected = next((root/relative for root in roots if (root/relative).exists()), None)
+        assert selected is not None and selected.is_file(), (source, target)
+        result.append({'source': source, 'target': relative.as_posix(), 'sha256': sha(selected)})
+    return result
+
+def source_gate(check_main=True):
+    current = frozen(); assert len(current) == 267
+    foundation = read(REL/'foundation-r1.json'); previous = foundation['source_inputs']
+    assert len(previous) == 263 and set(current)-set(previous) == ADDED
+    assert {name for name in previous if current[name] != previous[name]} == MODIFIED
+    parent_full = PARENT/'docs/validation/evidence/multicam-affine-clock-20261021-lab/full-r1.json'
+    parent_pub = PARENT/'product/.runtime/multicam-affine-clock-20261021/publication-r1/run.json'
+    full = read(parent_full); publication = read(parent_pub)
+    assert publication['status'] == 'published' and publication['commit'] == publication['remote_main'] == PARENT_COMMIT
+    assert publication['main_clean'] and publication['full_methods'] == 2084
+    assert full['status'] == 'passed' and full['terminal_ok'] and full['methods'] == 2084 and full['skipped'] == 0
+    assert full['frozen_before'] == full['frozen_after'] == previous
+    assert full['verification_scripts_equal'] and full['external_fixtures_equal']
+    assert full['external_fixture_manifest_unchanged'] and full['external_fixture_count'] == 8
+    if check_main:
+        assert git('branch', '--show-current').decode().strip() == 'main'
+        assert git('rev-parse', 'HEAD').decode().strip() == PARENT_COMMIT
+        assert git('remote', 'get-url', 'origin').decode().strip() == 'git@github.com:Tonscriptions/agent-video-kit.git'
+        assert git('ls-remote', '--heads', 'origin', 'main').decode().split()[0] == PARENT_COMMIT
+        assert not git('status', '--porcelain', '-z'), 'Preserve unexpected main changes'
+        spec = importlib.util.spec_from_file_location('audio_clock_published_parent', MAIN/'scripts/run_frozen_regression.py')
+        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        assert module.frozen() == previous
+    epoch = read(REL/'current-epoch-r1.json')
+    assert epoch['frozen_inputs'] == len(current) and epoch['current_native_frozen'] == current
+    for name, expected in (('kernel-r2.json', 48), ('paths-r2.json', 12), ('compatibility-r2.json', 147),
+                            ('discovery-r1.json', 1), ('surfaces-r1.json', 152)):
+        item = read(REL/name); result = item['result']
+        assert item['status'] == 'passed' and item['exit_code'] == 0 and item['source_unchanged']
+        assert result['terminal_success'] and result['methods'] == result['discovered_methods'] == expected
+        assert result['skipped'] == result['errors'] == result['failures'] == 0
+        assert item['frozen_before'] == item['frozen_after'] and sha((REL/name).with_suffix('.log')) == item['log_sha256']
+        assert item['script_sha256'] == sha((REL/name).with_suffix('.script.py.txt'))
+        assert item['modules'] == GROUPS[item['group']] and item['command'][6] == BOOTSTRAP
+        differences = sorted(p for p in current if current[p] != item['frozen_before'][p])
+        if name in epoch['related_records']:
+            assert differences == epoch['related_records'][name]['changed_since_this_suite'] == [
+                'product/src/ai_ad_editor/capabilities.py', 'product/tests/test_native_audio_clock.py']
+        else:
+            assert not differences
+    before = read(REL/'before-r1.json')
+    assert before['failures'] == 11 and before['errors'] == before['skipped'] == 0 and before['methods'] == 13
+    extra = read(REL/'extra-native-after-r1/verification.json')
+    assert extra['status'] == 'passed' and len(extra['cases']) == 9
+    assert extra['frozen_before'] == extra['frozen_after']
+    extra_epoch = sorted(p for p in current if current[p] != extra['frozen_before'][p])
+    assert extra_epoch == ['product/src/ai_ad_editor/capabilities.py', 'product/tests/test_native_audio_clock.py']
+    assert extra['script_sha256'] == sha(ROOT/'scripts/probe_audio_extra_native.py')
+    native = read(REL/'native-r1/verification.json'); installed = read(REL/'installed-r1/verification.json')
+    fresh = read(REL/'installed-r1/media/verification.json')
+    for item in (native, fresh):
+        assert item['status'] == 'passed' and item['frozen_before'] == item['frozen_after'] == current
+        assert item['generator_sha256'] == sha(ROOT/'scripts/smoke_audio_discontinuity.py')
+        assert all(row['ok'] for row in item['checks']) and not item['full_capcut_parity']
+    assert native['cli_calls'] == 32 and native['other_native_commands'] == 22 and len(native['checks']) == 37
+    assert installed['status'] == 'passed' and installed['frozen_before'] == installed['frozen_after'] == current
+    assert installed['generator_sha256'] == sha(ROOT/'scripts/verify_audio_clock_install.py')
+    assert installed['bundle']['wheels'] == 8 and len(installed['resource_hashes']) == 163
+    assert installed['isolated_cli_calls'] == 27 and installed['module_origin_probes'] == 1
+    isolated = installed['isolated_methods']; assert isolated['methods'] == 61 and isolated['skipped'] == 0
+    assert len(isolated['runtime_origins']) == 191 and all(row['ok'] for row in installed['checks'])
+    for name in ('forward', 'reverse', 'R3'):
+        for key in ('master_PCM_sha256', 'master_RGBA_sha256', 'frames', 'samples_per_channel'):
+            assert native['cases'][name][key] == fresh['cases'][name][key]
+    media = read(REL/'media-manifest-r1.json')
+    assert media['status'] == 'passed-actual-media-inventory' and media['asset_count'] == 57 and media['GIF_count'] == 8
+    assert media['script_sha256'] == sha(ROOT/'scripts/inventory_audio_clock_media.py')
+    assert len(media['commands']) == 31 and all(row['exit_code'] == 0 for row in media['commands'])
+    for name, row in media['assets'].items():
+        assert sha(ROOT/name) == row['sha256'], name
+    drafts = read(REL/'skills-r1/verification.json')
+    assert drafts['parent_count'] == 17 and drafts['draft_count'] == 4 and not drafts['registration_changed']
+    assert drafts['published_parent'] == PARENT_COMMIT and drafts['script_sha256'] == sha(ROOT/'scripts/prepare_audio_clock_skills.py')
+    link_rows = []
+    for name, parent_sha in drafts['parents'].items():
+        canonical = MAIN/'skills'/name/'SKILL.md'; assert sha(canonical) == parent_sha
+        row = drafts['drafts'].get(name)
+        if row:
+            path = Path(row['path']); assert sha(path) == row['sha256'] and row['exit_code'] == 0
+        else:
+            path = canonical
+        link_rows += links(canonical.relative_to(MAIN).as_posix(), path.read_text('utf8'), (ROOT, MAIN))
+    for name in (REPORT, CONTRACT):
+        link_rows += links(name, (ROOT/name).read_text('utf8'), (ROOT, MAIN))
+    dependencies = foundation['dependency_artifact_inputs']; assert len(dependencies) == 9; verify(ROOT, dependencies)
+    fixtures = {row['path']: row['sha256'] for row in foundation['external_fixtures']}
+    assert len(fixtures) == 8; verify(ROOT, fixtures)
+    # Bind historical failures, raw logs, executed scripts and source snapshots too.
+    evidence = {p.relative_to(REL).as_posix(): sha(p) for p in sorted(REL.rglob('*')) if p.is_file()
+                and not p.relative_to(REL).as_posix().startswith(('audit-', 'full-', 'external-fixtures-', 'before-full-'))}
+    return {'status': 'passed-source-and-evidence-preflight', 'frozen_inputs': current,
+        'published_parent_inputs': previous, 'published_parent_commit': PARENT_COMMIT,
+        'parent_full_methods': 2084, 'parent_full_sha256': sha(parent_full),
+        'parent_publication_sha256': sha(parent_pub), 'modified_inputs': sorted(MODIFIED), 'added_inputs': sorted(ADDED),
+        'verification_scripts': {name: sha(ROOT/'scripts'/name) for name in SCRIPTS},
+        'fixture_inputs': fixtures, 'dependency_artifact_inputs': dependencies, 'bound_evidence': evidence,
+        'media_inputs': {name: row['sha256'] for name,row in media['assets'].items()},
+        'documents': {name: sha(ROOT/name) for name in (REPORT, CONTRACT)}, 'local_links': link_rows,
+        'canonical_skill_parents': drafts['parents'], 'skill_drafts': {name: row['sha256'] for name,row in drafts['drafts'].items()},
+        'extra_native_historical_epoch_differences': extra_epoch,
+        'full_suite_launched': False, 'source_full_suite_uses_host_native_runtime': True,
+        'isolated_eight_wheel_checks_separate': True, 'full_capcut_parity': False}

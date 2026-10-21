@@ -1,0 +1,365 @@
+"""Decoded native audio intervals, hard gaps and overlaps; no soft clock resampling."""
+from __future__ import annotations
+from array import array
+from collections import deque
+from contextlib import contextmanager
+from fractions import Fraction
+import hashlib
+from itertools import islice
+import json
+import os
+from pathlib import Path
+import queue
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+from .artifact_locks import artifact_entry,verification_scope
+from .errors import AppError
+from .media import ffmpeg_path,ffprobe_path
+from .utils import sha256_file
+
+PROTOCOL='native-decoded-audio-interval-clock-v1'
+KIND='native-audio-clock'
+MAX_FRAMES=2_000_000
+MAX_INDEX_BYTES=64*1024**2
+MAX_PCM_BYTES=8*1024**3
+MAX_FRAME_BYTES=512*1024
+MAX_METADATA_BYTES=128*1024
+MAX_CACHE_ENTRIES=256
+FILES=('frames.i64le','audio.pcm','index.json')
+
+def error(suffix,message,**details):return AppError('NATIVE_AUDIO_'+suffix,message,exit_code=6,diagnostics=details or None)
+def canonical(value):return json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False).encode('utf8')
+def digest(path):return 'sha256:'+sha256_file(Path(path))
+def cancel(marker):
+    if marker is not None and marker.exists():raise AppError('CANCELLED','原生音频时钟处理已取消',exit_code=8,path=str(marker))
+def owned(root,path):
+    from .derived_cache import owned as check
+    return check(root,Path(path),'NATIVE_AUDIO')
+
+class _Pipe:
+    """Bound both pipe buffers and the stderr tail while supporting cancellation."""
+    def __init__(self,command,marker):
+        cancel(marker);self.marker=marker;self.deadline=time.monotonic()+3600
+        self.queue=queue.Queue(maxsize=4);self.stop=threading.Event();self.buffer=bytearray();self.eof=False
+        self.tail=deque(maxlen=2)
+        self.process=subprocess.Popen(list(map(str,command)),stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+            creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+        def output():
+            try:
+                while not self.stop.is_set():
+                    block=self.process.stdout.read(65536)
+                    while not self.stop.is_set():
+                        try:self.queue.put(block,timeout=.2);break
+                        except queue.Full:pass
+                    if not block:break
+            except BaseException as exc:
+                while not self.stop.is_set():
+                    try:self.queue.put(exc,timeout=.2);break
+                    except queue.Full:pass
+        def stderr():
+            while block:=self.process.stderr.read(65536):self.tail.append(block)
+        self.threads=[threading.Thread(target=output,daemon=True),threading.Thread(target=stderr,daemon=True)]
+        for thread in self.threads:thread.start()
+    def _more(self):
+        while True:
+            cancel(self.marker)
+            if time.monotonic()>self.deadline:raise error('PROCESS_TIMEOUT','原生音频子进程超时')
+            try:block=self.queue.get(timeout=.2);break
+            except queue.Empty:continue
+        if isinstance(block,BaseException):raise error('PIPE_FAILED','原生音频输出读取失败',cause=repr(block))
+        if block:self.buffer.extend(block)
+        else:self.eof=True
+    def read(self,count):
+        while len(self.buffer)<count and not self.eof:self._more()
+        result=bytes(self.buffer[:count]);del self.buffer[:count];return result
+    def line(self):
+        while (end:=self.buffer.find(b'\n'))<0 and not self.eof:
+            if len(self.buffer)>4096:raise error('INDEX_INVALID','音频帧索引单行超过预算')
+            self._more()
+        if end<0:end=len(self.buffer)
+        if end>4096:raise error('INDEX_INVALID','音频帧索引单行超过预算')
+        if not self.buffer:return None
+        result=bytes(self.buffer[:end]);del self.buffer[:end+1];return result.strip()
+    def finish(self):
+        code=self.process.wait(timeout=10)
+        self.threads[1].join(timeout=5)
+        if code:raise error('DECODE_FAILED','原生音频程序执行失败',exit_code=code,stderr=b''.join(self.tail).decode('utf8','replace')[-6000:])
+    def close(self):
+        self.stop.set()
+        if self.process.poll() is None:
+            self.process.terminate()
+            try:self.process.wait(timeout=10)
+            except subprocess.TimeoutExpired:self.process.kill();self.process.wait(timeout=10)
+        for thread in self.threads:thread.join(timeout=5)
+        for stream in (self.process.stdout,self.process.stderr):
+            if stream is not None:stream.close()
+
+def recipe(source,source_sha256):
+    source=Path(source).resolve(strict=True)
+    if not re.fullmatch(r'sha256:[0-9a-f]{64}',source_sha256):raise error('HASH_INVALID','音频源必须绑定真实SHA-256')
+    with verification_scope():
+        artifacts={name:artifact_entry(Path(path).resolve(), 'native-audio-clock') for name,path in
+            (('source',source),('ffmpeg',ffmpeg_path()),('ffprobe',ffprobe_path()),('implementation',__file__))}
+    if artifacts['source']['sha256']!=source_sha256:raise error('INPUT_CHANGED','源音频与资产SHA不一致')
+    return {'protocol':PROTOCOL,'artifacts':artifacts,'format':'native-rate-native-layout-f32le',
+        'quantization':'continuous-when-expected-start-within-half-native-timebase-tick',
+        'overlap':'later-decoded-frame-overwrites-earlier-samples','soft_async_resampling':False,
+        'max_frames':MAX_FRAMES,'max_index_bytes':MAX_INDEX_BYTES,'max_pcm_bytes':MAX_PCM_BYTES,
+        'max_frame_bytes':MAX_FRAME_BYTES}
+
+def verify_recipe(value,marker=None):
+    with verification_scope():
+        for row in value['artifacts'].values():
+            cancel(marker)
+            if artifact_entry(Path(row['path']),'native-audio-clock-boundary')['sha256']!=row['sha256']:
+                raise error('INPUT_CHANGED','音频时钟源或原生程序发生变化',path=row['path'])
+
+def _stream_info(value):
+    if type(value) is not dict:raise error('INDEX_INVALID','音频流索引无效')
+    try:
+        rate=int(value['sample_rate']);channels=int(value['channels']);tb=Fraction(value['time_base'])
+        origin=Fraction(value.get('origin','0'));layout=value.get('channel_layout','') or ''
+    except (ValueError,TypeError,KeyError,ZeroDivisionError) as exc:raise error('INDEX_INVALID','音频流时基或采样率无效',cause=str(exc)) from exc
+    if not 1<=rate<=384000 or not 1<=channels<=32 or tb<=0 or tb>1 or not isinstance(layout,str) or len(layout)>128 or not re.fullmatch(r'[A-Za-z0-9_.()+| -]*',layout):
+        raise error('INDEX_INVALID','音频流参数超出支持范围')
+    return rate,channels,tb,origin,layout
+
+def _positions(rows,info,*,verify_positions=False):
+    rate,channels,tb,origin,layout=_stream_info(info)
+    if not rows:raise error('INDEX_EMPTY','源没有可验证的解码音频帧')
+    if len(rows)%3 or len(rows)//3>MAX_FRAMES or len(rows)*8>MAX_INDEX_BYTES:
+        raise error('INDEX_BUDGET','音频帧索引超过预算或包含不完整记录')
+    tolerance=tb*rate/2;expected=None;logical=0;gaps=overlaps=gap_samples=overlap_samples=0;events=[]
+    for i in range(0,len(rows),3):
+        pts,count,stored=rows[i:i+3]
+        if count<=0 or count*channels*4>MAX_FRAME_BYTES:raise error('INDEX_INVALID','音频帧样本数无效或超过预算')
+        presentation=(pts*tb-origin)*rate
+        if expected is None:position=round(presentation)
+        elif abs(presentation-expected)<=tolerance:position=expected
+        else:
+            position=round(presentation);delta=position-expected
+            if delta>0:gaps+=1;gap_samples+=delta
+            elif delta<0:overlaps+=1;overlap_samples-=delta
+            if len(events)<256:events.append({'frame':i//3,'expected_sample':expected,'mapped_sample':position,'delta_samples':delta})
+        if verify_positions and stored!=position:raise error('INDEX_INVALID','音频索引样本位置与原生PTS不一致')
+        rows[i+2]=position;expected=position+count;logical=max(logical,expected,0)
+    if logical*channels*4>MAX_PCM_BYTES:raise error('DISK_BUDGET','归一音频超过8GiB预算',logical_frames=logical,channels=channels)
+    return {'logical_frames':logical,'native_sample_rate':rate,'channels':channels,'channel_layout':layout,
+        'native_time_base':str(tb),'demux_origin':str(origin),'frame_count':len(rows)//3,
+        'decoded_frames':sum(rows[1::3]),'gap_count':gaps,'overlap_count':overlaps,
+        'leading_gap_samples':max(0,rows[2]),'negative_first_sample':min(0,rows[2]),
+        'gap_samples':gap_samples,'overlap_samples':overlap_samples,'events':events,
+        'events_truncated':gaps+overlaps>len(events),'normalization_needed':bool(gaps or overlaps or not logical),
+        'quantization_tolerance_samples_rational':str(tolerance),'soft_async_resampling':False}
+
+def probe(value,marker=None):
+    source=value['artifacts']['source']['path'];exe=value['artifacts']['ffprobe']['path']
+    command=[exe,'-v','error','-select_streams','a:0','-show_streams','-show_format','-show_entries',
+        'stream=sample_rate,channels,channel_layout,time_base:format=start_time','-of','json',source]
+    pipe=_Pipe(command,marker)
+    try:
+        data=pipe.read(MAX_METADATA_BYTES+1)
+        if len(data)>MAX_METADATA_BYTES:raise error('INDEX_BUDGET','音频流元数据超过预算')
+        pipe.finish();metadata=json.loads(data)
+    finally:pipe.close()
+    streams=metadata.get('streams') or []
+    if len(streams)!=1:raise error('STREAM_MISSING','源没有唯一的首音频流')
+    info=dict(streams[0]);origin=(metadata.get('format') or {}).get('start_time','0')
+    info['origin']='0' if origin in ('','N/A',None) else str(origin)
+    rate,channels,_,_,_=_stream_info(info)
+    rows=array('q')
+    command=[exe,'-v','error','-select_streams','a:0','-show_frames','-show_entries',
+        'frame=pts,nb_samples,channels,sample_rate,channel_layout','-of','compact=p=0:nk=0',source]
+    pipe=_Pipe(command,marker)
+    try:
+        while (line:=pipe.line()) is not None:
+            if not line:continue
+            try:fields=dict(token.split('=',1) for token in line.decode('ascii').split('|') if '=' in token)
+            except UnicodeError as exc:raise error('INDEX_INVALID','音频帧索引包含无效文本') from exc
+            if 'pts' not in fields and 'nb_samples' not in fields:continue
+            try:
+                pts=int(fields['pts']);count=int(fields['nb_samples'])
+                if 'channels' in fields and int(fields['channels'])!=channels:raise ValueError('channel count changed')
+                if 'sample_rate' in fields and int(fields['sample_rate'])!=rate:raise ValueError('sample rate changed')
+                if info.get('channel_layout') and fields.get('channel_layout') and fields['channel_layout']!=info['channel_layout']:
+                    raise ValueError('channel layout changed')
+                rows.extend((pts,count,0))
+            except (ValueError,KeyError,OverflowError) as exc:raise error('INDEX_INVALID','音频帧缺少有效PTS/样本数或格式改变',cause=str(exc)) from exc
+            if len(rows)//3>MAX_FRAMES or len(rows)*8>MAX_INDEX_BYTES:raise error('INDEX_BUDGET','音频帧索引超过预算')
+        pipe.finish()
+    finally:pipe.close()
+    if not rows:raise error('INDEX_EMPTY','源没有可验证的解码音频帧')
+    stats=_positions(rows,info);verify_recipe(value,marker)
+    return rows,info,stats
+
+def _decode(value,rows,stats,path,marker):
+    rate=stats['native_sample_rate'];channels=stats['channels'];stride=channels*4
+    command=[value['artifacts']['ffmpeg']['path'],'-v','error','-i',value['artifacts']['source']['path'],
+        '-map','0:a:0','-vn','-sn','-dn','-ar',str(rate),'-ac',str(channels),'-c:a','pcm_f32le','-f','f32le','pipe:1']
+    pipe=_Pipe(command,marker);checksum=hashlib.sha256()
+    try:
+        with path.open('xb') as target:
+            target.truncate(stats['logical_frames']*stride)
+            for i in range(0,len(rows),3):
+                cancel(marker);count,position=rows[i+1:i+3];data=pipe.read(count*stride)
+                if len(data)!=count*stride:raise error('SAMPLE_COUNT_MISMATCH','实际解码PCM短于原生帧索引',frame=i//3)
+                checksum.update(data)
+                if position+count>0:
+                    first=max(0,-position);target.seek(max(0,position)*stride);target.write(data[first*stride:])
+            if pipe.read(1):raise error('SAMPLE_COUNT_MISMATCH','实际解码PCM长于原生帧索引')
+        pipe.finish()
+    finally:pipe.close()
+    return 'sha256:'+checksum.hexdigest()
+
+def _descriptor(directory,key,value,record,*,status,decodes):
+    stats=record['stats'];normalized=stats['normalization_needed']
+    args=['-i',value['artifacts']['source']['path']]
+    if normalized:
+        if not stats['logical_frames']:
+            args=['-f','lavfi','-i',f"anullsrc=r={stats['native_sample_rate']}:cl={stats['channel_layout'] or ('mono' if stats['channels']==1 else 'stereo')}"]
+        else:
+            args=['-f','f32le','-ar',str(stats['native_sample_rate']),'-ac',str(stats['channels'])]
+            if stats['channel_layout']:args+=['-channel_layout',stats['channel_layout']]
+            args+=['-i',str(directory/'audio.pcm')]
+    return {'protocol':PROTOCOL,'kind':KIND,'key':key,'status':status,'source_index_decode_calls':decodes,
+        'recipe':value,'index_path':str(directory/'index.json'),'metadata_sha256':digest(directory/'index.json'),
+        'pcm_path':str(directory/'audio.pcm') if normalized else None,'input_args':args,'materialized':True,
+        'stats':stats,'files':record['files']}
+
+def _load(root,directory,key,value):
+    from .derived_cache import entry
+    details=entry(root,directory,file_names=FILES,prefix='NATIVE_AUDIO')
+    if not details['complete_file_set']:raise error('CACHE_INCOMPLETE','源音频时钟缓存文件不完整')
+    path=directory/'index.json'
+    if path.stat().st_size>MAX_METADATA_BYTES:raise error('INDEX_BUDGET','音频缓存元数据超过预算')
+    try:record=json.loads(path.read_bytes())
+    except (ValueError,UnicodeError) as exc:raise error('CACHE_INVALID','音频缓存JSON无效') from exc
+    if not isinstance(record,dict) or record.get('protocol')!=PROTOCOL or record.get('key')!=key or record.get('recipe')!=value:
+        raise error('CACHE_INVALID','音频缓存协议或输入身份不一致')
+    if (not isinstance(record.get('stream'),dict) or not isinstance(record.get('stats'),dict)
+            or not isinstance(record.get('files'),dict) or set(record['files'])!={'frames.i64le','audio.pcm'}):
+        raise error('CACHE_INVALID','音频缓存缺少有效流、统计或文件身份')
+    for name in ('frames.i64le','audio.pcm'):
+        meta=record['files'][name];artifact=directory/name
+        bound=MAX_INDEX_BYTES if name=='frames.i64le' else MAX_PCM_BYTES
+        if (not isinstance(meta,dict) or type(meta.get('bytes')) is not int or not 0<=meta['bytes']<=bound
+                or not isinstance(meta.get('sha256'),str) or not re.fullmatch('sha256:[0-9a-f]{64}',meta['sha256'])):
+            raise error('CACHE_INVALID','音频缓存文件尺寸或摘要无效',path=str(artifact))
+        if artifact.stat().st_size!=meta['bytes'] or digest(artifact)!=meta['sha256']:
+            raise error('CACHE_HASH_MISMATCH','音频时钟缓存字节改变',path=str(artifact))
+    size=(directory/'frames.i64le').stat().st_size
+    if size%24 or size>MAX_INDEX_BYTES or size//24>MAX_FRAMES:raise error('INDEX_INVALID','音频二进制帧索引尺寸无效')
+    rows=array('q')
+    with (directory/'frames.i64le').open('rb') as source:rows.fromfile(source,size//8)
+    stats=_positions(rows,record['stream'],verify_positions=True)
+    if stats!=record['stats']:raise error('INDEX_INVALID','音频时钟统计与完整帧索引不一致')
+    expected=stats['logical_frames']*stats['channels']*4 if stats['normalization_needed'] else 0
+    if (directory/'audio.pcm').stat().st_size!=expected:raise error('CACHE_INVALID','归一PCM尺寸与时钟不一致')
+    verify_recipe(value)
+    return _descriptor(directory,key,value,record,status='verified-cache-hit',decodes=0)
+
+def acquire(root,source,source_sha256,*,persist=False,cancel_file=None):
+    if sys.byteorder!='little':raise error('PLATFORM_UNSUPPORTED','原生音频索引需要小端平台')
+    root=Path(root).resolve();cancel(cancel_file);value=recipe(source,source_sha256)
+    key=hashlib.sha256(canonical(value)).hexdigest();base=owned(root,root/'cache'/KIND);directory=owned(root,base/key)
+    if directory.exists():return _load(root,directory,key,value)
+    rows,info,stats=probe(value,cancel_file)
+    if not persist:
+        return {'protocol':PROTOCOL,'kind':KIND,'key':key,'status':'unmaterialized-index','materialized':False,
+            'source_index_decode_calls':1,'recipe':value,'stats':stats,'input_args':['-i',str(Path(source).resolve())]}
+    if base.exists() and len(list(islice(base.iterdir(),MAX_CACHE_ENTRIES)))>=MAX_CACHE_ENTRIES:
+        raise error('ENTRY_BUDGET','原生音频时钟缓存超过条目预算')
+    required=stats['logical_frames']*stats['channels']*4 if stats['normalization_needed'] else 0
+    if shutil.disk_usage(root).free<required+len(rows)*8+64*1024**2:raise error('DISK_BUDGET','源音频时钟缓存磁盘余量不足')
+    base.mkdir(parents=True,exist_ok=True)
+    work=owned(root,Path(tempfile.mkdtemp(prefix='.audio-clock-',dir=root/'cache')))
+    try:
+        with (work/'frames.i64le').open('xb') as target:rows.tofile(target)
+        decoded_sha=None
+        if stats['normalization_needed']:decoded_sha=_decode(value,rows,stats,work/'audio.pcm',cancel_file)
+        else:(work/'audio.pcm').touch(exist_ok=False)
+        verify_recipe(value,cancel_file);cancel(cancel_file)
+        record={'protocol':PROTOCOL,'key':key,'recipe':value,'stream':info,'stats':stats,'decoded_pcm_sha256':decoded_sha,
+            'files':{name:{'bytes':(work/name).stat().st_size,'sha256':digest(work/name)} for name in ('frames.i64le','audio.pcm')}}
+        data=canonical(record)+b'\n'
+        if len(data)>MAX_METADATA_BYTES:raise error('INDEX_BUDGET','原生音频缓存元数据超过预算')
+        (work/'index.json').write_bytes(data)
+        try:work.rename(directory)
+        except FileExistsError:return _load(root,directory,key,value)
+        return _descriptor(directory,key,value,record,status='created',decodes=1)
+    finally:
+        if work.exists():
+            for name in FILES:
+                path=owned(root,work/name)
+                if path.is_file():path.unlink()
+            work.rmdir()
+
+class AudioClockContext:
+    def __init__(self,root,*,persist=False,cancel_file=None):
+        self.root=Path(root).resolve();self.persist=persist;self.cancel_file=cancel_file;self.memo={}
+    def acquire(self,source,source_sha256):
+        if not self.persist:
+            return {'protocol':PROTOCOL,'kind':KIND,'status':'deferred-to-execution','materialized':False,
+                'source_index_decode_calls':0,'input_args':['-i',str(source)]}
+        key=(str(Path(source).resolve()),source_sha256)
+        if key not in self.memo:self.memo[key]=acquire(self.root,source,source_sha256,persist=True,cancel_file=self.cancel_file)
+        return self.memo[key]
+
+@contextmanager
+def normalized_input(root,source,source_sha256,*,persist=False,cancel_file=None):
+    source=Path(source).resolve();root=Path(root).resolve() if root is not None else source.parent
+    item=acquire(root,source,source_sha256,persist=persist,cancel_file=cancel_file)
+    if item['materialized'] or not item['stats']['normalization_needed']:
+        yield item;return
+    parent=root.parent
+    with tempfile.TemporaryDirectory(prefix='.audio-clock-transient-',dir=parent) as scratch:
+        transient=Path(scratch).resolve()
+        if transient.parent!=parent.resolve():raise error('PATH_INVALID','临时音频缓存路径无效')
+        materialized=acquire(transient,source,source_sha256,persist=True,cancel_file=cancel_file)
+        materialized.update(ephemeral=True,retained_after_analysis=False)
+        yield materialized
+
+def verify_materialized(root,metadata,*,cancel_file=None):
+    for row in metadata:
+        item=row.get('native_audio_clock')
+        if not item or not item.get('materialized'):continue
+        path=owned(Path(root).resolve(),Path(item['index_path']))
+        if digest(path)!=item['metadata_sha256']:raise error('CACHE_HASH_MISMATCH','执行边界的音频时钟元数据改变')
+        cancel(cancel_file);verify_recipe(item['recipe'],cancel_file)
+        for name,expected in item['files'].items():
+            artifact=owned(Path(root).resolve(),path.parent/name)
+            if artifact.stat().st_size!=expected['bytes'] or digest(artifact)!=expected['sha256']:
+                raise error('CACHE_HASH_MISMATCH','执行边界的音频时钟缓存改变',path=str(artifact))
+
+def cache_list(root):
+    from .derived_cache import inventory
+    from .project import load_project
+    listing=inventory(root,kind=KIND,file_names=FILES,protocol=PROTOCOL,maximum_entries=MAX_CACHE_ENTRIES,prefix='NATIVE_AUDIO')
+    _,project=load_project(root)
+    referenced={a.get('sha256') for a in project.get('assets',[]) if isinstance(a.get('sha256'),str)}
+    for item in listing['entries']:
+        path=owned(root,Path(item['path'])/'index.json')
+        item.update(source_sha256=None,protected_source_reference=False,metadata_status='missing')
+        if not path.is_file():continue
+        if path.stat().st_size>MAX_METADATA_BYTES:
+            item['metadata_status']='over-budget';continue
+        try:
+            value=json.loads(path.read_bytes());source=value['recipe']['artifacts']['source']['sha256']
+            if value['protocol']!=PROTOCOL or value['key']!=item['key'] or not re.fullmatch('sha256:[0-9a-f]{64}',source):raise ValueError('identity')
+        except (ValueError,UnicodeError,KeyError,TypeError):
+            item['metadata_status']='invalid';continue
+        item.update(source_sha256=source,protected_source_reference=source in referenced,metadata_status='identity-readable-content-unchecked')
+    listing['protection']='all-assets-still-registered-in-the-author-project-by-source-SHA256'
+    return listing
+
+def cache_prune(root,*,keep_bytes=0,dry_run=False,key=None):
+    from .derived_cache import prune
+    listing=cache_list(root)
+    protected={item['key'] for item in listing['entries'] if item['protected_source_reference']}
+    return prune(root,kind=KIND,file_names=FILES,protocol=PROTOCOL,maximum_entries=MAX_CACHE_ENTRIES,prefix='NATIVE_AUDIO',
+        keep_bytes=keep_bytes,dry_run=dry_run,key=key,protect_keys=protected)

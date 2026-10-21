@@ -136,6 +136,12 @@ class SnapshotTests(SnapshotFixture, unittest.TestCase):
             self.snapshot()
         self.assertEqual(caught.exception.code, 'QUEUE_REUSE_INPUT_UNREADABLE')
 
+    def test_empty_authored_source_is_still_rejected(self):
+        self.source.write_bytes(b'')
+        with self.assertRaises(AppError) as caught:
+            self.snapshot()
+        self.assertEqual(caught.exception.code, 'QUEUE_REUSE_INPUT_EMPTY')
+
     def test_declared_format_cannot_hide_actual_multifile_dependency(self):
         with patch.object(reuse, '_probe_input_format', return_value='hls'):
             with self.assertRaises(AppError) as caught:
@@ -303,6 +309,39 @@ class CopyTests(SnapshotFixture, unittest.TestCase):
         self.assertEqual(load_json(self.manifest)['reuse']['derived_files'], entry['derived_files'])
         self.assertEqual(entry['derived_files'][0]['sha256'], sha256_file(cache))
         cache.write_bytes(b'changed-derived-lut!')
+        with self.assertRaises(AppError) as caught:
+            self.session.clone(entry, self.before, self.project, self.sequence,
+                               self.project['settings'], self.target)
+        self.assertEqual(caught.exception.code, 'QUEUE_REUSE_DERIVED_CHANGED')
+        self.assert_no_partial()
+
+    def test_empty_derived_artifact_is_bound_and_later_changes_reject_reuse(self):
+        empty = self.root / 'cache/native-audio-clock/continuous/audio.pcm'
+        empty.parent.mkdir(parents=True)
+        empty.write_bytes(b'')
+        entry = self.session.capture(self.before, self.result, 'leader')
+        self.assertEqual(entry['derived_files'], [{
+            'path': str(empty.resolve()), 'sha256': reuse.hashlib.sha256(b'').hexdigest(), 'bytes': 0}])
+        result = self.session.clone(entry, self.before, self.project, self.sequence,
+                                    self.project['settings'], self.target)
+        self.assertEqual(self.target.read_bytes(), self.leader.read_bytes())
+        manifest = load_json(Path(result['manifest']))
+        self.assertEqual(manifest['reuse']['source_derived_files'], entry['derived_files'])
+        self.target.unlink()
+        self.target.with_suffix('.mp4.manifest.json').unlink()
+        empty.write_bytes(b'corrupted-from-empty')
+        with self.assertRaises(AppError) as caught:
+            self.session.clone(entry, self.before, self.project, self.sequence,
+                               self.project['settings'], self.target)
+        self.assertEqual(caught.exception.code, 'QUEUE_REUSE_DERIVED_CHANGED')
+        self.assert_no_partial()
+
+    def test_truncated_derived_artifact_is_rejected_as_changed(self):
+        artifact = self.root / 'cache/native-audio-clock/discontinuous/audio.pcm'
+        artifact.parent.mkdir(parents=True)
+        artifact.write_bytes(b'original-derived-pcm')
+        entry = self.session.capture(self.before, self.result, 'leader')
+        artifact.write_bytes(b'')
         with self.assertRaises(AppError) as caught:
             self.session.clone(entry, self.before, self.project, self.sequence,
                                self.project['settings'], self.target)

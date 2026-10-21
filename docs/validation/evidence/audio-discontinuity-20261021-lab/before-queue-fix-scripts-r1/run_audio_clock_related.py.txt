@@ -1,0 +1,67 @@
+"""Run an explicitly named native audio-clock group and preserve terminal receipts."""
+import argparse
+from datetime import datetime,timezone
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+from run_frozen_regression import sha,frozen
+
+ROOT=Path(__file__).resolve().parents[1]
+REL=ROOT/'docs/validation/evidence/audio-discontinuity-20261021-lab'
+GROUPS={
+    'discovery':['test_native_audio_clock.NativeAudioCacheTests.test_agent_discovery_agrees_with_the_executed_multicam_and_R3_clock'],
+    'kernel':['test_audio_discontinuity','test_native_audio_clock'],
+    'paths':['test_audio_discontinuity_paths'],
+    'surfaces':['test_audio_unity','test_audio_routing','test_audio_buses','test_timeline_preview',
+        'test_reverse_cache_ops','test_native_video_index_ops','test_native_video_index_render','test_nested_native_clock'],
+    'compatibility':['test_audio_resample_precision','test_audio_source_origin','test_audio_stretch',
+        'test_audio_source_context','test_audio_channel_modes','test_audio_tempo_context',
+        'test_multicam_affine_clock','test_multicam_source_range','test_multicam_stream_coverage'],
+}
+BOOTSTRAP='''
+import json,pathlib,sys,time,unittest
+sys.path[:0]=[sys.argv[1],sys.argv[2]]
+from ai_ad_editor.runtime import configure_local_runtime
+configure_local_runtime()
+suite=unittest.defaultTestLoader.loadTestsFromNames(json.loads(sys.argv[3]))
+expected=suite.countTestCases();started=time.monotonic()
+result=unittest.TextTestRunner(verbosity=2).run(suite)
+value={'methods':result.testsRun,'discovered_methods':expected,'suite_seconds':time.monotonic()-started,
+    'failures':len(result.failures),'errors':len(result.errors),'skipped':len(result.skipped),
+    'unexpected_successes':len(result.unexpectedSuccesses),'expected_failures':len(result.expectedFailures),
+    'terminal_success':result.wasSuccessful()}
+pathlib.Path(sys.argv[4]).write_text(json.dumps(value,indent=2)+'\\n',encoding='utf8')
+raise SystemExit(0 if result.wasSuccessful() and not result.skipped else 1)
+'''
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--group',choices=GROUPS,required=True)
+    parser.add_argument('--revision',required=True);args=parser.parse_args()
+    path=REL/(args.group+'-'+args.revision+'.json');log=path.with_suffix('.log');child=path.with_suffix('.child.json')
+    assert not any(p.exists() for p in (path,log,child))
+    current=frozen();manifest=REL/'original-r1/source-manifest.json'
+    binary=ROOT.parent/'rubberband-offline-probe-20261017/native/rubberband-4.0.0-gpl-executable-windows/rubberband.exe'
+    assert binary.is_file()
+    command=[sys.executable,'-E','-B','-X','utf8','-c',BOOTSTRAP,str(ROOT/'product/src'),str(ROOT/'product/tests'),json.dumps(GROUPS[args.group]),str(child)]
+    temp=str(ROOT/'product/.runtime/temp')
+    env=dict(os.environ,TEMP=temp,TMP=temp,TMPDIR=temp,PYTHONDONTWRITEBYTECODE='1',AI_AD_EDITOR_AUDIO_CLOCK_FIXTURES=str(manifest),AI_AD_EDITOR_TEST_RUBBERBAND=str(binary))
+    record={'status':'running','started_at_utc':datetime.now(timezone.utc).isoformat(),'pid':os.getpid(),
+        'group':args.group,'modules':GROUPS[args.group],'command':command,'frozen_before':current,
+        'script_sha256':sha(Path(__file__)),'fixture_manifest_sha256':sha(manifest),
+        'rubberband_sha256':sha(binary),'native_windows':True,'virtualization':False,'network':False}
+    def save():path.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    save();path.with_suffix('.script.py.txt').write_bytes(Path(__file__).read_bytes())
+    with log.open('xb') as stream:
+        process=subprocess.run(command,cwd=ROOT,env=env,stdout=stream,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+    result=json.loads(child.read_bytes()) if child.exists() else {}
+    record.update(exit_code=process.returncode,result=result,frozen_after=frozen(),log_sha256=sha(log),
+        fixture_manifest_unchanged=sha(manifest)==record['fixture_manifest_sha256'],finished_at_utc=datetime.now(timezone.utc).isoformat())
+    record['source_unchanged']=record['frozen_before']==record['frozen_after']
+    record['status']='passed' if (process.returncode==0 and result.get('terminal_success') and result.get('methods')==result.get('discovered_methods')
+        and not result.get('skipped') and record['source_unchanged'] and record['fixture_manifest_unchanged']) else 'failed'
+    save();print(json.dumps({'status':record['status'],'group':args.group,'frozen_inputs':len(current),**result}))
+    return 0 if record['status']=='passed' else 1
+
+if __name__=='__main__':raise SystemExit(main())

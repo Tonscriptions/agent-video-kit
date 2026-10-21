@@ -19,7 +19,7 @@ from .media import ffmpeg_path, probe_media
 from .utils import new_id, sha256_file
 
 
-MULTICAM_SYNC_VERSION = "0.5.0"
+MULTICAM_SYNC_VERSION = "0.6.0"
 FEATURE_RATE_HZ = 50
 
 
@@ -87,17 +87,19 @@ def _extract_envelope(path: Path, *, sample_rate: int, max_seconds: float, proje
     if not audio.get("codec"):
         raise AppError("MULTICAM_AUDIO_MISSING", f"机位素材没有音频流: {path}", exit_code=2, path=str(path))
     try:
-        completed = subprocess.run(
-            [
-                ffmpeg_path(), "-hide_banner", "-loglevel", "error", "-t", f"{max_seconds:.3f}",
-                "-i", str(path), "-vn", "-af", f"aresample={sample_rate}:first_pts=0",
-                "-ac", "1", "-ar", str(sample_rate), "-f", "s16le", "-",
-            ],
-            capture_output=True,
-            timeout=max(60.0, max_seconds * 4.0),
-            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-            check=False,
-        )
+        from .native_audio_clock import normalized_input
+        with normalized_input(project_root,path,digest,persist=False) as native_clock:
+            completed = subprocess.run(
+                [
+                    ffmpeg_path(), "-hide_banner", "-loglevel", "error", "-t", f"{max_seconds:.3f}",
+                    *native_clock['input_args'], "-vn", "-af", f"aresample={sample_rate}:first_pts=0",
+                    "-ac", "1", "-ar", str(sample_rate), "-f", "s16le", "-",
+                ],
+                capture_output=True,
+                timeout=max(60.0, max_seconds * 4.0),
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+                check=False,
+            )
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise AppError("MULTICAM_AUDIO_EXTRACT_FAILED", f"多机位音频抽取失败: {path}", exit_code=6, retryable=True, path=str(path), cause=str(exc)) from exc
     if completed.returncode != 0 or not completed.stdout:
@@ -142,7 +144,8 @@ def _extract_envelope(path: Path, *, sample_rate: int, max_seconds: float, proje
         "sha256": digest,
         "duration_seconds": round(float(probe.get("duration_seconds", 0.0)), 6),
         "video_coverage": coverage,
-        "audio_source_clock": "demux-relative-first-audio-pts-v1",
+        "audio_source_clock": "native-decoded-audio-interval-clock-v1",
+        "native_audio_clock": {key:value for key,value in native_clock.items() if key not in {'input_args','pcm_path','index_path'}},
         "audio_origin_filter": f"aresample={sample_rate}:first_pts=0",
         "sample_rate": sample_rate,
         "feature_rate_hz": FEATURE_RATE_HZ,

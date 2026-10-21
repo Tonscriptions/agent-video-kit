@@ -55,7 +55,7 @@ def canonical(value: Any) -> bytes:
         raise _error('QUEUE_REUSE_SNAPSHOT_INVALID', '复用快照必须是有限值的 JSON') from exc
 
 
-def file_entry(path: Path, marker: Path | None = None) -> dict:
+def file_entry(path: Path, marker: Path | None = None, *, allow_empty: bool = False) -> dict:
     path = path.resolve()
     digest, size = hashlib.sha256(), 0
     try:
@@ -68,7 +68,7 @@ def file_entry(path: Path, marker: Path | None = None) -> dict:
                 digest.update(chunk)
                 size += len(chunk)
         _cancel(marker)
-        if not size:
+        if not size and not allow_empty:
             raise _error('QUEUE_REUSE_INPUT_EMPTY', '复用依赖不得为空', path)
         return {'path': str(path), 'sha256': digest.hexdigest(), 'bytes': size}
     except OSError as exc:
@@ -185,12 +185,16 @@ def cache_inventory(root: Path, marker: Path | None = None) -> list[dict]:
     paths = sorted(p for p in directory.rglob('*') if p.is_file()) if directory.is_dir() else []
     if len(paths) > MAX_FILES:
         raise _error('QUEUE_REUSE_BUDGET', '复用派生缓存文件数超过 4096')
-    return [file_entry(ensure_inside(root, p), marker) for p in paths]
+    # A successful renderer may bind empty derived artifacts, e.g. a continuous
+    # native audio index deliberately has no replacement PCM. Their empty SHA
+    # and size still form part of the immutable cache inventory. Authored media,
+    # runtime executables and committed outputs retain the nonempty gate.
+    return [file_entry(ensure_inside(root, p), marker, allow_empty=True) for p in paths]
 
 
 def check_entries(entries: list[dict], marker: Path | None = None, *, code='QUEUE_REUSE_DERIVED_CHANGED') -> None:
     for expected in entries:
-        if file_entry(Path(expected['path']), marker) != expected:
+        if file_entry(Path(expected['path']), marker, allow_empty=True) != expected:
             raise _error(code, '已绑定文件的实际字节已变化', expected['path'])
 
 

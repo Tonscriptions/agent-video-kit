@@ -3782,10 +3782,14 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                        _inline_stack: tuple[str, ...] = (), _allow_audio_only: bool = False,
                        _effect_runtime: EffectAutomation | None = None,
                        _frame_index_context=None, _persist_video_index: bool = False,
+                       _audio_clock_context=None,
                        _cancel_file: Path | None = None) -> tuple[list[str], str, list[dict[str, Any]], list[dict[str, Any]]]:
     if _frame_index_context is None:
         from .native_video_index import IndexContext
         _frame_index_context=IndexContext(root,persist=_persist_video_index,cancel_file=_cancel_file)
+    if _audio_clock_context is None:
+        from .native_audio_clock import AudioClockContext
+        _audio_clock_context=AudioClockContext(root,persist=_persist_video_index,cancel_file=_cancel_file)
     root_effect_runtime = _effect_runtime is None
     if _effect_runtime is None:
         base = project['settings']['timebase']
@@ -3793,7 +3797,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
         _effect_runtime = EffectAutomation(root, str(Fraction(fps['num'], fps['den'])), int(base['ticks_per_second']))
     def child_builder(*args, **kwargs):
         return build_filter_graph(*args, **kwargs, _effect_runtime=_effect_runtime,
-                                  _frame_index_context=_frame_index_context)
+                                  _frame_index_context=_frame_index_context,
+                                  _audio_clock_context=_audio_clock_context)
     if any(c.get('tracking_binding') for s in project.get('sequences',[]) for t in s.get('tracks',[]) for c in t.get('clips',[])):
         from .bindings import compile_project_bindings,validate_project_bindings
         findings = validate_project_bindings(project,root)
@@ -4394,10 +4399,13 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     warnings.append({"code": "AUDIO_STREAM_MISSING", "clip_id": clip.get("id"), "message": "音频轨道引用的素材没有音频流，已跳过"})
                     continue
                 inline_audio = asset.get('_inline_audio')
+                audio_clock = None
+                audio_input_start = len(inputs)
                 if inline_audio:
                     audio_input = '['+audio_surface_labels[asset['id']].pop(0)+']'
                 else:
-                    inputs.extend(["-i", str(uri)])
+                    audio_clock = _audio_clock_context.acquire(uri,asset['sha256'])
+                    inputs.extend(audio_clock['input_args'])
                     physical_index += 1
                     audio_input = f'[{source_index}:a]'
                 src_in = _sec(int(clip.get("source_in_tick", 0)), tps)
@@ -4431,7 +4439,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     target_duration = curve_duration if curve_duration is not None else (src_out-src_in)/speed
                     audio_stretch_job = _plan_audio_stretch(root, local_audio_engine, asset, uri, src_in, src_out,
                                                             audio_parts, target_duration, bool(clip.get('reverse')))
-                    inputs[-1] = audio_stretch_job['output']
+                    inputs[audio_input_start:] = ['-i',audio_stretch_job['output']]
                     audio_chain = [f'{audio_input}anull']
                     if bool(clip.get('reverse')):
                         audio_chain.append('areverse')
@@ -4460,7 +4468,7 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                                                                channels=max(1,int((asset.get('probe',{}).get('audio') or {}).get('channels',2))))
                     split_labels = [f"asplit{index}_{part_index}" for part_index in range(len(audio_parts))]
                     filters.append(
-                        f"{audio_input}aresample=48000:first_pts=0,aformat=sample_fmts=flt,atrim=start_sample={source_start_sample}:end_sample={source_end_sample},asetpts=N/SR/TB,"
+                        f"{audio_input}aresample=48000:first_pts=0,aformat=sample_fmts=flt,apad=whole_len={source_end_sample},atrim=start_sample={source_start_sample}:end_sample={source_end_sample},asetpts=N/SR/TB,"
                         f"asplit={len(split_labels)}" + "".join(f"[{label}]" for label in split_labels)
                     )
                     part_labels: list[str] = []
@@ -4497,7 +4505,10 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     # Resample in float before selecting source samples. Negotiating
                     # an integer first stage would requantize low-rate PCM before
                     # the later floating-point mix, even with lossless output.
-                    audio_chain = [f"{audio_input}aresample=48000:osf=flt:first_pts=0,atrim=start={src_in:.6f}:end={src_out:.6f}", "asetpts=PTS-STARTPTS", "aresample=48000"]
+                    # Pad within the authored source window before reversal. Padding
+                    # the reversed result would move source EOF silence to the end.
+                    source_end_sample = max(1,round(src_out*48000))
+                    audio_chain = [f"{audio_input}aresample=48000:osf=flt:first_pts=0,apad=whole_len={source_end_sample},atrim=start={src_in:.6f}:end={src_out:.6f}", "asetpts=PTS-STARTPTS", "aresample=48000"]
                     if bool(clip.get("reverse")):
                         audio_chain.append("areverse")
                     if abs(speed - 1.0) > 1e-9:
@@ -4553,6 +4564,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                 input_meta.append({"asset_id": asset["id"], "clip_id": clip.get("id"), "track_id": track_id, "input": None if inline_audio else source_index, "kind": "audio", "source_in_tick": int(clip.get("source_in_tick", 0)), "source_out_tick": int(clip.get("source_out_tick", 0))})
                 input_meta[-1].update(timeline_start_sample=audio_start_sample,duration_samples=audio_samples,
                                       sample_rate=48000,group_id=clip.get('_composite_group'))
+                if audio_clock is not None:
+                    input_meta[-1]['native_audio_clock'] = audio_clock
                 if audio_stretch_job:
                     input_meta[-1]['audio_stretch'] = audio_stretch_job
                 if audio_context_plan is not None:
@@ -4845,6 +4858,8 @@ def render_project(
         for item in input_meta:
             if job := item.get('audio_stretch'):
                 job['execution'] = _execute_audio_stretch(root, job, temp_dir, cancel_file=cancel_file)
+        from .native_audio_clock import verify_materialized as verify_audio_clocks
+        verify_audio_clocks(root,input_meta,cancel_file=cancel_file)
         if acceleration.enabled:
             result, execution_args, graph_transport = acceleration.execute(args, graph,
                 lambda command, current_graph: _execution_filter_graph(root, command, current_graph, write=True),
@@ -4870,6 +4885,7 @@ def render_project(
             check_acceleration_inputs()
         from .native_video_index import verify_materialized as verify_native_indexes
         verify_native_indexes(root,input_meta,cancel_file=cancel_file)
+        verify_audio_clocks(root,input_meta,cancel_file=cancel_file)
         try:
             os.replace(temp_output, output)
         except OSError as exc:

@@ -1,0 +1,170 @@
+{
+  "status": "validated-original-native-clock",
+  "source": {
+    "path": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\native-r1\\original.nut",
+    "sha256": "sha256:065097818a79a286d5206797447b6ec2092ada82fa24f14ae415f0eee870c4ec"
+  },
+  "frames": 130,
+  "fps": 25,
+  "rate": 48000,
+  "channels": 2,
+  "decoded_order_samples_per_channel": 192000,
+  "selected_frames": 120,
+  "selected_samples_per_channel": 230400,
+  "native_audio_frames": {
+    "frames": [
+      {
+        "pts": 0,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 9600,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 19200,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 28800,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 38400,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 72000,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 81600,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 91200,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 100800,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 110400,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 115200,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 124800,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 134400,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 144000,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 153600,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 163200,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 172800,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 182400,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 192000,
+        "nb_samples": 9600
+      },
+      {
+        "pts": 201600,
+        "nb_samples": 9600
+      }
+    ],
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "time_base": "1/48000",
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "encoder": "Lavc62.28.100 pcm_f32le"
+        }
+      }
+    ]
+  },
+  "generated_RGBA_sha256": "sha256:dbcf9181b5872ee62d3f80e209986515f1e2fbbd72cbecc15a1d304a09f45dd2",
+  "generated_float_PCM_sha256": "sha256:624ce0b3d5c1a56c4bb3fde11ecf5f095d4882b14e7ee6b6cd5a18a0b25f093b",
+  "generation_command": [
+    "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "-v",
+    "error",
+    "-f",
+    "rawvideo",
+    "-pixel_format",
+    "rgba",
+    "-video_size",
+    "192x108",
+    "-framerate",
+    "25",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\product\\.runtime\\audio-discontinuity-20261021\\native-r1\\original.rgba",
+    "-f",
+    "f32le",
+    "-ar",
+    "48000",
+    "-ac",
+    "2",
+    "-i",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\product\\.runtime\\audio-discontinuity-20261021\\native-r1\\original.f32",
+    "-af",
+    "asetnsamples=n=9600:p=0,asetpts='N+if(gte(N,48000),24000,0)-if(gte(N,96000),4800,0)'",
+    "-map",
+    "0:v:0",
+    "-map",
+    "1:a:0",
+    "-c:v",
+    "ffv1",
+    "-level",
+    "3",
+    "-pix_fmt",
+    "bgra",
+    "-c:a",
+    "pcm_f32le",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\audio-discontinuity-lab-20261021\\docs\\assets\\audio-discontinuity-20261021-lab\\native-r1\\original.nut"
+  ],
+  "rights": "Original CC0 PCM and font-free geometric frame counters."
+}
