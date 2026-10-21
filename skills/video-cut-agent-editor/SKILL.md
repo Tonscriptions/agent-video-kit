@@ -3,6 +3,19 @@ name: video-cut-agent-editor
 description: "Drive the local Agent-first advertising video editor CLI for project setup, timeline composition, edited clip-group reuse, local TTS, templates, validation, rights checks, conversion, and FFmpeg rendering."
 ---
 
+<!-- V86-MULTICAM-SOURCE-COVERAGE -->
+<!-- MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->
+Use the advertised source_shortfall policy when building media multicam plans; preserve the requested master duration and explicit audio tracks.
+When multicam_source_coverage is advertised, coverage shortfall defaults to reject. Explicit --source-shortfall trim intersects source coverage and leaves gaps; stretch clamps or slows and warns that event sync changes.
+Completely disjoint coverage, locked apply targets and sub-tick segments reject. Dry-run performs audio analysis but writes no report or authored project.
+Read the [coverage contract](../../docs/specs/多机位源覆盖与显式缺口策略_v0.1_2026-10-21.md) and [real native/isolated evidence](../../docs/validation/多机位源覆盖与原速同步实测_2026-10-21.md).
+NumPy is an explicit local dependency; the base seven-wheel bundle does not contain it. The isolated experiment copies the existing 2.4.2 distribution, without runtime installation or download.
+Container duration does not establish per-stream video EOF. Offset confidence, tick rounding and natural multicamera quality require separate review.
+
+<!-- /MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->
+<!-- /V86-MULTICAM-SOURCE-COVERAGE -->
+
+
 <!-- V85-NATIVE-EMPTY-WINDOW -->
 A valid source selection wholly before native video begins or after its known EOF can have no video frames. Preserve the authored window and underlying layers. Author audio explicitly on an audio track; video placement alone does not extract sound.
 Read the [empty-window contract](../../docs/specs/原生视频空区间契约_v0.1_2026-10-21.md) and [actual independent evidence](../../docs/validation/原生空视频选区与显式音频保留实测_2026-10-21.md).

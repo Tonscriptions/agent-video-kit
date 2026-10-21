@@ -1,5 +1,39 @@
 # Agent Video Kit
 
+<!-- V86-MULTICAM-SOURCE-COVERAGE -->
+### V86 多机位源覆盖与原速事件同步
+
+V86 多机位源覆盖策略已完成 1995 方法、3072.832 秒、0 跳过的完整回归；257 个冻结输入、8 个已提交外部夹具及 10 份验证脚本前后相同。默认拒绝源覆盖不足，显式 trim 保持原速并保留参考事件位置和缺口；stretch 明示事件时钟改变。
+
+| 编号 | 核验 | 实际结果及边界 | 证据 |
+|---|---|---|---|
+| V86-01 | 完整回归 | 当轮 1995 方法 /3072.832 秒 /0 跳过，冻结 257 输入、8 夹具及 10 验证脚本。 | [记录](docs/validation/evidence/multicam-source-range-20261021-lab/full-r1.json) |
+| V86-02 | 关联回归 | 当轮候选 80 个不同方法：22 多机位＋16 空选区＋32 嵌套时钟＋10 既有 CLI；为完整回归子集。 | [记录](docs/validation/evidence/multicam-source-range-20261021-lab/related-r1.json) |
+| V86-03 | 真实原生 CLI | 15 次 CLI＋11 条其他原生命令，23 检查；2 秒 /25 fps /50 帧原创参考，短机位 .4..1.84 秒。 | [记录](docs/validation/evidence/multicam-source-range-20261021-lab/native-r1/verification.json) |
+| V86-04 | 完整无损帧和显式主音轨 | 50 帧、11,520,000 RGBA 字节及 768,000 PCM 字节 /每声道 96,000 采样与独立生成参考完全相同；两端缺口均核验。 | [记录](docs/validation/evidence/multicam-source-range-20261021-lab/native-r1/verification.json) |
+| V86-05 | 编码输出与静态目检 | trim/stretch 各 50 帧、全部 PTS=n/25；trim 帧身份色块实测最大误差 1。联系表已静态查看；未连续播放或听审。 | [记录](docs/validation/evidence/multicam-source-range-20261021-lab/frame-review-r1.json) |
+| V86-06 | 隔离发行与 NumPy 边界 | 161 资源、7 基础 wheels；另将现有 NumPy 2.4.2 的 933 个 RECORD 文件复制至隔离 E 盘 site。18 次隔离 CLI＋1 次来源探针 /14 模块、12 安装检查。基础包未新增 NumPy。 | [记录](docs/validation/evidence/multicam-source-range-20261021-lab/installed-r1/verification.json) |
+| V86-07 | 失败、变基与未重跑声明 | 初次 22 方法 4 FAIL /3 ERROR、数组加载修复及单数 test 解析失误保留。后续仅继承未打包的父 test_cli.py；原媒体/隔离结果保留原冻结图，161 运行时资源相同，未冒称重跑。 | [记录](docs/validation/evidence/multicam-source-range-20261021-lab/audit-r2.json) |
+| V86-08 | 契约、Skills 与局限 | 4 份 Skill 只追加本轮指导，全部 17 份再审。单偏移、容器时长边界；设备漂移、每流真实 EOF、自然/HDR/长片/RSS/听审及完整剪映等价未验收。 | [记录](docs/specs/多机位源覆盖与显式缺口策略_v0.1_2026-10-21.md) |
+
+原创参考（50 帧 /2000 ms，色卡与确定性音频；非自然机位素材）：
+
+![V86 原创参考](docs/assets/multicam-source-range-20261021-lab/native-r1/source-reference.gif)
+
+实际 trim 输出（GIF 合并为 38 帧 /2000 ms；前后缺口显示背景）：
+
+![V86 原速留空](docs/assets/multicam-source-range-20261021-lab/native-r1/trim.gif)
+
+实际 stretch 输出（GIF 合并为 36 帧 /2000 ms；作为改变同步的显式对照）：
+
+![V86 显式拉伸对照](docs/assets/multicam-source-range-20261021-lab/native-r1/stretch.gif)
+
+[参考原视频](docs/assets/multicam-source-range-20261021-lab/native-r1/source-reference.mkv) · [短机位原视频](docs/assets/multicam-source-range-20261021-lab/native-r1/source-camera.mkv) · [实际 trim MP4](docs/assets/multicam-source-range-20261021-lab/native-r1/trim.mp4) · [实际 stretch MP4](docs/assets/multicam-source-range-20261021-lab/native-r1/stretch.mp4) · [源摘要和 CC0 记录](docs/assets/multicam-source-range-20261021-lab/native-r1/source-origin.json)。GIF 仅为实际 MP4 的观看副本，不含音频；有损 MP4 不宣称完整 RGBA/PCM 字节相同。
+
+[完整实测](docs/validation/多机位源覆盖与原速同步实测_2026-10-21.md)。80 项与原生/隔离检查分别报告，不累计成额外完整方法或剪映等价。
+<!-- /V86-MULTICAM-SOURCE-COVERAGE -->
+
+
 <!-- V85-NATIVE-EMPTY-WINDOW -->
 2026-10-21 **V85（合法空视频选区与显式音频保留）**：完整原生回归 **1973 项、3623.367 秒、0 跳过**；256 产品输入与 8 外部夹具不变（本轮限定验收）。293 项专项、媒体与隔离安装保留运行时完全相同的原执行；仅继承父版测试断言后新跑 4 项旧 CLI 控制，未将历史记录标为重跑。素材选区完全不含视频显示帧时保留下层画面及已编排音频；源/索引错误仍明确拒绝。
 

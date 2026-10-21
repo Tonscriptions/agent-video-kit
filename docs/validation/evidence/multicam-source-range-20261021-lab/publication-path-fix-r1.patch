@@ -1,0 +1,11 @@
+--- before/publish_multicam_source_range.py
++++ after/publish_multicam_source_range.py
+@@ -271,7 +271,7 @@
+         save(MAIN/REL/'release-main-r1.json',{'status':'passed-main-byte-and-document-audit','base_commit':base,
+             'frozen_inputs':current,'full_methods':1995,'full_skipped':0,'full_sha256':sha(MAIN/REL/'full-r1.json'),
+             'targeted_methods':80,'resources':161,'skills':17,'local_links':links,
+-            'documents':{name:sha(MAIN/name) for name in sorted(modified_docs)},'generator_sha256':sha(__file__)})
++            'documents':{name:sha(MAIN/name) for name in sorted(modified_docs)},'generator_sha256':sha(Path(__file__))})
+         save(MAIN/REL/'publication-copy-r1.json',{'status':'passed-reviewed-copy','source':str(ROOT),
+             'copied_files':reviewed,'frozen_inputs':current,'base_commit':base})
+         changed={p.decode('utf8') for p in git(MAIN,'diff','--name-only','-z').split(b'\0') if p}

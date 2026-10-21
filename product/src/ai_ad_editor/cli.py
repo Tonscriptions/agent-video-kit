@@ -296,6 +296,7 @@ def build_parser() -> argparse.ArgumentParser:
     multicam.add_argument("--start-seconds", type=float, default=0.0)
     multicam.add_argument("--end-seconds", type=float, default=None)
     multicam.add_argument("--timeline-start-seconds", type=float, default=0.0)
+    multicam.add_argument("--source-shortfall", choices=("reject", "trim", "stretch"), default="reject", help="机位覆盖不足：默认拒绝；trim 保留原速同步区间并留空；stretch 显式改变同步关系以填满")
     multicam.add_argument("--sample-rate", type=int, default=8000, help="本地同步 PCM 采样率")
     multicam.add_argument("--analysis-seconds", type=float, default=120.0, help="每个机位最多分析的前缀秒数")
     multicam.add_argument("--max-offset-seconds", type=float, default=30.0, help="互相关搜索的最大相对偏移")
@@ -3658,6 +3659,12 @@ def command_media_multicam(args: argparse.Namespace) -> dict[str, Any]:
         raise argument_error("timeline_start_seconds 不能为负数", "timeline_start_seconds")
     if args.apply and not args.track_id:
         raise argument_error("--apply 必须提供 --track-id", "track_id")
+    if args.apply:
+        target_track = find_track(sequence, args.track_id, None)
+        if str(target_track.get("kind")) != "video":
+            raise argument_error("多机位切换目标轨道必须是 video 轨道", "track_id")
+        if target_track.get("locked", False):
+            raise AppError("TRACK_LOCKED", "多机位切换目标轨道已锁定", exit_code=2, path="track_id")
     assets = asset_map(project)
     sources: list[dict[str, Any]] = []
     for asset_id in args.source_asset_id:
@@ -3674,7 +3681,13 @@ def command_media_multicam(args: argparse.Namespace) -> dict[str, Any]:
     if args.switch_plan:
         switch_path = Path(args.switch_plan).expanduser().resolve()
         ensure_inside(root, switch_path)
-        raw = load_json(switch_path)
+        try:
+            with switch_path.open('r', encoding='utf-8-sig') as stream:
+                raw = json.load(stream)
+        except FileNotFoundError as exc:
+            raise AppError('FILE_NOT_FOUND', f'文件不存在: {switch_path}', exit_code=3, path=str(switch_path)) from exc
+        except (json.JSONDecodeError, UnicodeError) as exc:
+            raise AppError('JSON_INVALID', f'JSON 无法解析: {switch_path}: {exc}', exit_code=2, path=str(switch_path)) from exc
         if isinstance(raw, dict):
             raw = raw.get("segments")
         if not isinstance(raw, list):
@@ -3699,14 +3712,20 @@ def command_media_multicam(args: argparse.Namespace) -> dict[str, Any]:
         start_seconds=args.start_seconds,
         end_seconds=args.end_seconds,
         timeline_start_seconds=args.timeline_start_seconds,
+        source_shortfall=args.source_shortfall,
     )
     tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND))
     for index, item in enumerate(segments):
         item["id"] = new_multicam_clip_id(index)
         item["timeline_start_tick"] = int(round(float(item["timeline_start_seconds"]) * tps))
-        item["duration_tick"] = max(1, int(round(float(item["duration_seconds"]) * tps)))
+        item["duration_tick"] = int(round(float(item["duration_seconds"]) * tps))
         item["source_in_tick"] = max(0, int(round(float(item["source_in_seconds"]) * tps)))
-        item["source_out_tick"] = max(item["source_in_tick"] + 1, int(round(float(item["source_out_seconds"]) * tps)))
+        item["source_out_tick"] = int(round(float(item["source_out_seconds"]) * tps))
+        if item["duration_tick"] <= 0 or item["source_out_tick"] <= item["source_in_tick"]:
+            raise AppError("MULTICAM_SEGMENT_TOO_SHORT", "多机位切换段小于项目时间基精度", exit_code=2, path=f"switch_plan[{index}]")
+    reference = next(row for row in sync["offsets"] if row["asset_id"] == sync["reference_asset_id"])
+    window_end = float(args.end_seconds) if args.end_seconds is not None else float(reference["evidence"]["duration_seconds"])
+    output_end = float(args.timeline_start_seconds) + window_end - float(args.start_seconds)
     plan = {
         "multicam_version": MULTICAM_SYNC_VERSION,
         "project_id": project.get("project", {}).get("id"),
@@ -3718,6 +3737,8 @@ def command_media_multicam(args: argparse.Namespace) -> dict[str, Any]:
             "start_seconds": round(float(args.start_seconds), 6),
             "end_seconds": args.end_seconds,
             "timeline_start_seconds": round(float(args.timeline_start_seconds), 6),
+            "source_shortfall": args.source_shortfall,
+            "output_window_end_seconds": round(output_end, 6),
             "switch_seconds": args.switch_seconds,
             "switch_plan": str(args.switch_plan) if args.switch_plan else None,
             "apply": bool(args.apply),
@@ -3741,9 +3762,6 @@ def command_media_multicam(args: argparse.Namespace) -> dict[str, Any]:
         return _envelope("media.multicam", args, status="planned", data={"report": str(report_path), "plan": plan, "applied": False}, warnings=warnings)
     if not segments:
         raise AppError("MULTICAM_SWITCH_PLAN_REQUIRED", "--apply 需要 switch_seconds 或非空 switch_plan", exit_code=2, path="switch_plan")
-    target_track = find_track(sequence, args.track_id, None)
-    if str(target_track.get("kind")) != "video":
-        raise argument_error("多机位切换目标轨道必须是 video 轨道", "track_id")
     existing_clips = list(target_track.get("clips", []))
     if not args.replace_track:
         for generated in segments:
@@ -3771,7 +3789,9 @@ def command_media_multicam(args: argparse.Namespace) -> dict[str, Any]:
             clip["speed"] = float(item["speed"])
         target_track.setdefault("clips", []).append(clip)
         generated_clips.append(clip)
+    authored_duration = int(sequence.get("duration_tick", 1))
     _recompute_sequence_duration(sequence)
+    sequence["duration_tick"] = max(sequence["duration_tick"], authored_duration, int(round(output_end * tps)))
     validation = validate_project(root, project, strict_rights=False)
     if not validation["ok"]:
         raise AppError("MULTICAM_APPLY_INVALID", "多机位切换应用后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))

@@ -1,0 +1,103 @@
+"""Render a private prospective publication against current parents without touching main."""
+from __future__ import annotations
+
+import difflib
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+REL = 'docs/validation/evidence/multicam-source-range-20261021-lab'
+WORK = ROOT / 'product/.runtime/multicam-source-range-20261021/publication-document-review-r1'
+
+
+def sha(path):
+    with Path(path).open('rb') as stream:
+        return 'sha256:' + hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def main():
+    assert not WORK.exists()
+    WORK.mkdir(parents=True)
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    path = ROOT / 'scripts/publish_multicam_source_range.py'
+    spec = importlib.util.spec_from_file_location('prospective_multicam_publisher', path)
+    publisher = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(publisher)
+    preview = WORK / 'prospective-unpublished'
+    names = {*publisher.LATEST_DOCS, '.gitattributes', publisher.HISTORICAL_REPORT, publisher.HISTORICAL_CONTRACT}
+    names |= {'skills/' + name + '/SKILL.md' for name in publisher.SKILLS}
+    original = {}
+    for name in sorted(names):
+        source = ROOT / name if name in (publisher.HISTORICAL_REPORT, publisher.HISTORICAL_CONTRACT) else MAIN / name
+        destination = preview / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, destination)
+        original[name] = {'path': str(source), 'sha256': sha(source)}
+    # These are explicit planning placeholders, never a complete-suite receipt.
+    changed = publisher.documents(preview, {'methods': 1995, 'suite_seconds': 0.0})
+    links = []
+    validators = []
+    diffs = {}
+    for name in sorted(changed - {'.gitattributes'}):
+        target = preview / name
+        text = target.read_text('utf8')
+        scope = text
+        if name in publisher.LATEST_DOCS or name.startswith('skills/'):
+            scope = text.split('<!-- ' + publisher.MARKER + ' -->')[1].split('<!-- /' + publisher.MARKER + ' -->')[0]
+        assert '\\' not in '\n'.join(re.findall(r'!?\[[^\]]*\]\(([^)\n]+)\)', scope)), name
+        for token in re.findall(r'!?\[[^\]]*\]\(([^)\n]+)\)', scope):
+            reference = token.strip('<>').split('#', 1)[0]
+            if not reference or re.match(r'^[a-zA-Z][\w+.-]*:', reference):
+                continue
+            absolute = (target.parent / reference).resolve()
+            assert absolute.is_relative_to(preview), (name, token)
+            relative = absolute.relative_to(preview).as_posix()
+            future = relative == REL + '/full-r1.json'
+            resolved = next((candidate for candidate in (preview / relative, ROOT / relative, MAIN / relative) if candidate.exists()), None)
+            assert resolved is not None or future, (name, token)
+            links.append({'document': name, 'target': relative, 'exists': resolved is not None, 'pending_complete_receipt': future})
+        if name.startswith('skills/'):
+            before = Path(original[name]['path']).read_text('utf8')
+            delta = list(difflib.ndiff(before.splitlines(), text.splitlines()))
+            assert not [line for line in delta if line.startswith('- ') and line[2:].strip()], name
+            assert text.count('<!-- ' + publisher.MARKER + ' -->') == 1
+            assert 'This is an unregistered candidate; complete regression and main integration remain pending.' not in scope
+            diff = ''.join(difflib.unified_diff(before.splitlines(True), text.splitlines(True), fromfile='current-parent/' + name, tofile='prospective/' + name))
+            difference = WORK / (Path(name).parent.name + '.patch')
+            difference.write_text(diff, encoding='utf8', newline='\n')
+            diffs[name] = {'path': str(difference), 'sha256': sha(difference), 'no_prior_nonblank_lines_removed': True}
+            command = [sys.executable, '-E', '-B', '-X', 'utf8', 'C:/Users/carzy/.codex/skills/.system/skill-creator/scripts/quick_validate.py', str(target.parent)]
+            result = subprocess.run(command, capture_output=True, cwd=ROOT, timeout=60)
+            validators.append({'command': command, 'exit_code': result.returncode, 'stdout': result.stdout.decode('utf8', 'replace'), 'stderr': result.stderr.decode('utf8', 'replace')})
+            assert result.returncode == 0, name
+    for row in original.values():
+        assert sha(row['path']) == row['sha256']
+    record = {
+        'status': 'passed-prospective-document-and-skill-review',
+        'actual_complete_suite_run': False, 'actual_publisher_run': False,
+        'main_modified': False, 'skills_registered_or_updated': False,
+        'placeholder_methods': 1995, 'placeholder_suite_seconds': 0,
+        'preview_root': str(preview), 'publisher_sha256': sha(path),
+        'current_parent_inputs': original, 'links': links, 'skill_validators': validators, 'skill_deltas': diffs,
+        'generated_preview_files': {name: sha(preview / name) for name in sorted(changed)},
+        'review_script_sha256': sha(__file__),
+        'limits': 'Private future-layout preview only. All full-suite prose uses explicit placeholders, not observed execution. Actual integration reuses then-current V85 parents and repeats all seventeen Skill audits.'
+    }
+    snapshot = ROOT / REL / 'publication-preview-r1.script.py.txt'
+    shutil.copyfile(__file__, snapshot)
+    destination = ROOT / REL / 'publication-preview-r1.json'
+    assert not destination.exists()
+    destination.write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+    print(json.dumps({'status': record['status'], 'links': len(links), 'skill_validators': len(validators), 'main_modified': False}, ensure_ascii=False))
+
+
+if __name__ == '__main__':
+    main()

@@ -18,7 +18,7 @@ from .media import ffmpeg_path, probe_media
 from .utils import new_id, sha256_file
 
 
-MULTICAM_SYNC_VERSION = "0.1.0"
+MULTICAM_SYNC_VERSION = "0.2.0"
 FEATURE_RATE_HZ = 50
 
 
@@ -222,8 +222,11 @@ def build_switch_segments(
     start_seconds: float = 0.0,
     end_seconds: float | None = None,
     timeline_start_seconds: float = 0.0,
+    source_shortfall: str = "reject",
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Build source-bounded angle clips from a fixed cadence or explicit plan."""
+    if source_shortfall not in {"reject", "trim", "stretch"}:
+        raise argument_error("source_shortfall 必须为 reject、trim 或 stretch", "source_shortfall")
     offsets = {str(item.get("asset_id")): item for item in sync.get("offsets", []) if isinstance(item, dict)}
     sources = [str(item.get("asset_id")) for item in sync.get("sources", []) if isinstance(item, dict)]
     if not sources:
@@ -269,15 +272,34 @@ def build_switch_segments(
             raise argument_error("切换段引用了未知 camera_asset_id", f"switch_plan[{index}].camera_asset_id")
         if left < start - 1e-6 or right > end + 1e-6 or right <= left:
             raise argument_error("切换段必须位于 start_seconds/end_seconds 范围内且时长为正", f"switch_plan[{index}]")
-        if segments and left < float(segments[-1]["end_seconds"]) - 1e-6:
+        if index and left < cursor - 1e-6:
             raise argument_error("switch_plan 的切换段不能重叠", f"switch_plan[{index}]")
         alignment = offsets[asset_id]
         relative_delay = _finite(alignment.get("relative_delay_seconds"), 0.0)
         source_duration = _finite(alignment.get("evidence", {}).get("duration_seconds"), 0.0)
+        requested_left, requested_right = left, right
+        covered_left = max(left, -relative_delay)
+        covered_right = min(right, source_duration - relative_delay)
+        if covered_right <= covered_left:
+            raise AppError("MULTICAM_SOURCE_RANGE_EMPTY", f"机位 {asset_id} 无法覆盖切换段", exit_code=2, path=f"switch_plan[{index}]")
+        shortfall = left + relative_delay < -1e-9 or right + relative_delay > source_duration + 1e-9
+        coverage = "complete"
+        if shortfall and source_shortfall == "reject":
+            raise AppError("MULTICAM_SOURCE_SHORTFALL", f"机位 {asset_id} 未完整覆盖切换段；请缩小选区，或显式选择 --source-shortfall trim|stretch", exit_code=2, path=f"switch_plan[{index}]")
+        if shortfall and source_shortfall == "trim":
+            left, right = covered_left, covered_right
+            coverage = "trimmed"
+            warnings.append({"code": "MULTICAM_SOURCE_TRIMMED", "message": f"机位 {asset_id} 仅保留有覆盖的原速同步区间，缺失部分留空", "asset_id": asset_id,
+                             "requested_start_seconds": round(requested_left, 6), "requested_end_seconds": round(requested_right, 6),
+                             "covered_start_seconds": round(left, 6), "covered_end_seconds": round(right, 6)})
+        elif shortfall:
+            coverage = "stretched"
+            warnings.append({"code": "MULTICAM_SOURCE_CLOCK_CHANGED", "message": f"机位 {asset_id} 显式填充缺失覆盖；钳制或慢放将改变与参考机位的事件同步", "asset_id": asset_id})
         source_start = left + relative_delay
-        if source_start < 0:
+        if source_start < -1e-9:
             warnings.append({"code": "MULTICAM_SOURCE_CLAMPED", "message": f"机位 {asset_id} 的源起点早于 0，已钳制", "asset_id": asset_id, "seconds": round(source_start, 6)})
             source_start = 0.0
+        source_start = max(0.0, source_start)
         available = max(0.0, source_duration - source_start)
         requested = right - left
         if available <= 0:
@@ -289,6 +311,10 @@ def build_switch_segments(
         segments.append({
             "index": index,
             "camera_asset_id": asset_id,
+            "source_shortfall": source_shortfall,
+            "source_coverage": coverage,
+            "requested_start_seconds": round(requested_left, 6),
+            "requested_end_seconds": round(requested_right, 6),
             "start_seconds": round(left, 6),
             "end_seconds": round(right, 6),
             "timeline_start_seconds": round(timeline_start_seconds + left - start, 6),
@@ -297,9 +323,9 @@ def build_switch_segments(
             "source_out_seconds": round(source_start + source_span, 6),
             "speed": round(speed, 6),
         })
-        cursor = right
-    if segments and float(segments[-1]["end_seconds"]) < end - 1e-6:
-        warnings.append({"code": "MULTICAM_SWITCH_GAP", "message": "切换计划没有覆盖完整分析区间", "start_seconds": segments[-1]["end_seconds"], "end_seconds": round(end, 6)})
+        cursor = requested_right
+    if segments and cursor < end - 1e-6:
+        warnings.append({"code": "MULTICAM_SWITCH_GAP", "message": "切换计划没有覆盖完整分析区间", "start_seconds": round(cursor, 6), "end_seconds": round(end, 6)})
     return segments, warnings
 
 

@@ -1,0 +1,49 @@
+{
+  "status": "passed-four-unregistered-drafts",
+  "registered": false,
+  "new_block_marker": "MULTICAM-SOURCE-COVERAGE-LAB-20261021",
+  "skills": {
+    "video-cut-agent-editor": {
+      "path": "skills/video-cut-agent-editor/SKILL.md",
+      "sha256": "sha256:f1d95e032d2dcfb53016c154a5603808c6f01f8d220f307e3a3f0ad177ffc779",
+      "parent_sha256": "sha256:a0e6e80f593f3f0f15dfc83b0d16f81a0d692a24386fe15e9bc496661fe45705",
+      "parent_snapshot": "docs/validation/evidence/multicam-source-range-20261021-lab/skill-parent-snapshots-r1/video-cut-agent-editor.md",
+      "new_block": "<!-- MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->\nUse the advertised source_shortfall policy when building media multicam plans; preserve the requested master duration and explicit audio tracks.\nWhen multicam_source_coverage is advertised, coverage shortfall defaults to reject. Explicit --source-shortfall trim intersects source coverage and leaves gaps; stretch clamps or slows and warns that event sync changes.\nCompletely disjoint coverage, locked apply targets and sub-tick segments reject. Dry-run performs audio analysis but writes no report or authored project.\nRead the [coverage contract](../../docs/specs/多机位源覆盖与显式缺口策略_实验_v0.1_2026-10-21.md) and [real native/isolated evidence](../../docs/validation/多机位源覆盖与原速同步独立实验_2026-10-21.md).\nNumPy is an explicit local dependency; the base seven-wheel bundle does not contain it. The isolated experiment copies the existing 2.4.2 distribution, without runtime installation or download.\nContainer duration does not establish per-stream video EOF. Offset confidence, tick rounding and natural multicamera quality require separate review.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    },
+    "video-cut-timeline": {
+      "path": "skills/video-cut-timeline/SKILL.md",
+      "sha256": "sha256:3d70d72987540301a5748f6274cdf4326707c325b072e18de6d827dea32c51e2",
+      "parent_sha256": "sha256:c94e4879361a7861837453764ee3bc98b176fdbff21a15354cff31678708aa8b",
+      "parent_snapshot": "docs/validation/evidence/multicam-source-range-20261021-lab/skill-parent-snapshots-r1/video-cut-timeline.md",
+      "new_block": "<!-- MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->\nReview original requested intervals and actual covered intervals separately; trim preserves unity speed and places clips at their original reference event positions.\nWhen multicam_source_coverage is advertised, coverage shortfall defaults to reject. Explicit --source-shortfall trim intersects source coverage and leaves gaps; stretch clamps or slows and warns that event sync changes.\nCompletely disjoint coverage, locked apply targets and sub-tick segments reject. Dry-run performs audio analysis but writes no report or authored project.\nRead the [coverage contract](../../docs/specs/多机位源覆盖与显式缺口策略_实验_v0.1_2026-10-21.md) and [real native/isolated evidence](../../docs/validation/多机位源覆盖与原速同步独立实验_2026-10-21.md).\nNumPy is an explicit local dependency; the base seven-wheel bundle does not contain it. The isolated experiment copies the existing 2.4.2 distribution, without runtime installation or download.\nContainer duration does not establish per-stream video EOF. Offset confidence, tick rounding and natural multicamera quality require separate review.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    },
+    "video-cut-quality": {
+      "path": "skills/video-cut-quality/SKILL.md",
+      "sha256": "sha256:66c76113d2539e665e942afeb0e6fab51e2103456e58652cfa14a48f1369c958",
+      "parent_sha256": "sha256:cc58b556aacb631788110bcc428b2bb640abfd51e47c9aabdc0580aec0bed48a",
+      "parent_snapshot": "docs/validation/evidence/multicam-source-range-20261021-lab/skill-parent-snapshots-r1/video-cut-quality.md",
+      "new_block": "<!-- MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->\nCompare complete lossless event frames, both timeline gaps, explicit master PCM and output PTS. Encoded identity patches and GIFs have separate acceptance limits.\nWhen multicam_source_coverage is advertised, coverage shortfall defaults to reject. Explicit --source-shortfall trim intersects source coverage and leaves gaps; stretch clamps or slows and warns that event sync changes.\nCompletely disjoint coverage, locked apply targets and sub-tick segments reject. Dry-run performs audio analysis but writes no report or authored project.\nRead the [coverage contract](../../docs/specs/多机位源覆盖与显式缺口策略_实验_v0.1_2026-10-21.md) and [real native/isolated evidence](../../docs/validation/多机位源覆盖与原速同步独立实验_2026-10-21.md).\nNumPy is an explicit local dependency; the base seven-wheel bundle does not contain it. The isolated experiment copies the existing 2.4.2 distribution, without runtime installation or download.\nContainer duration does not establish per-stream video EOF. Offset confidence, tick rounding and natural multicamera quality require separate review.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    },
+    "video-cut-video-understand": {
+      "path": "skills/video-cut-video-understand/SKILL.md",
+      "sha256": "sha256:496955ecb3011dac4dd56bf5f336e01d84e21c315b0b02658a1fa5418092bf86",
+      "parent_sha256": "sha256:45172746dc82c3da80d3907aa1407511020245c696bcdd6f29549f35440ea458",
+      "parent_snapshot": "docs/validation/evidence/multicam-source-range-20261021-lab/skill-parent-snapshots-r1/video-cut-video-understand.md",
+      "new_block": "<!-- MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->\nInterpret relative_delay_seconds as source_time = reference_time + delay. The 50 Hz envelope estimates one offset; it does not estimate clock drift or choose semantic shots.\nWhen multicam_source_coverage is advertised, coverage shortfall defaults to reject. Explicit --source-shortfall trim intersects source coverage and leaves gaps; stretch clamps or slows and warns that event sync changes.\nCompletely disjoint coverage, locked apply targets and sub-tick segments reject. Dry-run performs audio analysis but writes no report or authored project.\nRead the [coverage contract](../../docs/specs/多机位源覆盖与显式缺口策略_实验_v0.1_2026-10-21.md) and [real native/isolated evidence](../../docs/validation/多机位源覆盖与原速同步独立实验_2026-10-21.md).\nNumPy is an explicit local dependency; the base seven-wheel bundle does not contain it. The isolated experiment copies the existing 2.4.2 distribution, without runtime installation or download.\nContainer duration does not establish per-stream video EOF. Offset confidence, tick rounding and natural multicamera quality require separate review.\nThis is an unregistered candidate; complete regression and main integration remain pending.\n<!-- /MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->",
+      "registered": false,
+      "validator_exit_code": 0,
+      "validator_stdout": "Skill is valid!\r\n"
+    }
+  },
+  "skill_count": 4,
+  "generator_sha256": "sha256:e630a0549da915a0cbc3a8a36a7e90211e5de874f12fde8b33e4bde136ea033a"
+}

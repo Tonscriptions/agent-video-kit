@@ -3,6 +3,19 @@ name: video-cut-video-understand
 description: Understand local video and audio with native FFmpeg analysis, explicitly registered offline OCR or ASR, frame evidence, silence, scene and beat candidates.
 ---
 
+<!-- V86-MULTICAM-SOURCE-COVERAGE -->
+<!-- MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->
+Interpret relative_delay_seconds as source_time = reference_time + delay. The 50 Hz envelope estimates one offset; it does not estimate clock drift or choose semantic shots.
+When multicam_source_coverage is advertised, coverage shortfall defaults to reject. Explicit --source-shortfall trim intersects source coverage and leaves gaps; stretch clamps or slows and warns that event sync changes.
+Completely disjoint coverage, locked apply targets and sub-tick segments reject. Dry-run performs audio analysis but writes no report or authored project.
+Read the [coverage contract](../../docs/specs/多机位源覆盖与显式缺口策略_v0.1_2026-10-21.md) and [real native/isolated evidence](../../docs/validation/多机位源覆盖与原速同步实测_2026-10-21.md).
+NumPy is an explicit local dependency; the base seven-wheel bundle does not contain it. The isolated experiment copies the existing 2.4.2 distribution, without runtime installation or download.
+Container duration does not establish per-stream video EOF. Offset confidence, tick rounding and natural multicamera quality require separate review.
+
+<!-- /MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->
+<!-- /V86-MULTICAM-SOURCE-COVERAGE -->
+
+
 # Local Video Understanding
 
 For visible words use the [OCR scan contract](../../docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md):

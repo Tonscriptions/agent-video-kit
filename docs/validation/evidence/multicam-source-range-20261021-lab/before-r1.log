@@ -1,0 +1,26 @@
+test_default_refuses_a_camera_that_begins_after_the_requested_event (test_multicam_source_range.MulticamCoverageTests.test_default_refuses_a_camera_that_begins_after_the_requested_event) ... FAIL
+test_default_refuses_a_camera_that_ends_before_the_requested_event (test_multicam_source_range.MulticamCoverageTests.test_default_refuses_a_camera_that_ends_before_the_requested_event) ... FAIL
+test_fully_covered_source_keeps_the_original_event_mapping (test_multicam_source_range.MulticamCoverageTests.test_fully_covered_source_keeps_the_original_event_mapping) ... ok
+
+======================================================================
+FAIL: test_default_refuses_a_camera_that_begins_after_the_requested_event (test_multicam_source_range.MulticamCoverageTests.test_default_refuses_a_camera_that_begins_after_the_requested_event)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-source-range-lab-20261021\product\tests\test_multicam_source_range.py", line 20, in test_default_refuses_a_camera_that_begins_after_the_requested_event
+    with self.assertRaises(AppError):self.plan(-.4,2.,0.,1.)
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_default_refuses_a_camera_that_ends_before_the_requested_event (test_multicam_source_range.MulticamCoverageTests.test_default_refuses_a_camera_that_ends_before_the_requested_event)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-source-range-lab-20261021\product\tests\test_multicam_source_range.py", line 23, in test_default_refuses_a_camera_that_ends_before_the_requested_event
+    with self.assertRaises(AppError):self.plan(.2,1.,.5,1.2)
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (failures=2)

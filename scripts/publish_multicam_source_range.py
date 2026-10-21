@@ -1,0 +1,306 @@
+"""Publish frozen multicamera source-coverage bytes after the exact complete suite."""
+from __future__ import annotations
+import argparse
+from datetime import datetime,timezone
+import importlib.util
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+from native_index_release_tools import MAIN,sha,git,staged_rows
+from run_frozen_regression import frozen
+
+ROOT=Path(__file__).resolve().parents[1]
+MODIFIED={'product/src/ai_ad_editor/'+name+'.py' for name in ('multicam','cli','capabilities')}
+ADDED={'product/tests/test_multicam_source_range.py'}
+REL='docs/validation/evidence/multicam-source-range-20261021-lab'
+ASSETS='docs/assets/multicam-source-range-20261021-lab'
+REPORT='docs/validation/多机位源覆盖与原速同步实测_2026-10-21.md'
+CONTRACT='docs/specs/多机位源覆盖与显式缺口策略_v0.1_2026-10-21.md'
+HISTORICAL_REPORT='docs/validation/多机位源覆盖与原速同步独立实验_2026-10-21.md'
+HISTORICAL_CONTRACT='docs/specs/多机位源覆盖与显式缺口策略_实验_v0.1_2026-10-21.md'
+MARKER='V86-MULTICAM-SOURCE-COVERAGE'
+SKILLS=('video-cut-agent-editor', 'video-cut-timeline', 'video-cut-quality', 'video-cut-video-understand')
+MODULES=('multicam', 'cli', 'capabilities')
+TESTS=('test_multicam_source_range',)
+SCRIPTS=('run_multicam_after_empty', 'run_frozen_regression', 'run_with_regression_fixtures', 'materialize_regression_fixtures', 'run_multicam_related_regressions', 'smoke_multicam_source_range', 'verify_multicam_source_range_install', 'audit_multicam_related_lab', 'refresh_multicam_parent_contract', 'prepare_multicam_full_gate', 'finalize_multicam_source_range_lab', 'prepare_multicam_isolated_verifier', 'prepare_multicam_skills', 'run_multicam_compatibility', 'native_index_release_tools', 'prepare_multicam_publication', 'publish_multicam_source_range')
+LATEST_DOCS=('README.md','docs/README.md','docs/产品需求与开发路线基线_2026-10-12.md','docs/构建进度总表_2026-10-16.md',
+    'docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md','docs/Concat与剪映功能差异矩阵_2026-10-12.md')
+
+
+def read(path):return json.loads(Path(path).read_bytes())
+
+
+def write(path,value):
+    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(value.rstrip()+'\n',encoding='utf8',newline='\n')
+
+
+def save(path,value):write(path,json.dumps(value,ensure_ascii=False,indent=2))
+
+
+def block(path,value):
+    path=Path(path);text=path.read_text('utf8')
+    replacement=f'<!-- {MARKER} -->\n{value.rstrip()}\n<!-- /{MARKER} -->'
+    pattern=re.escape('<!-- '+MARKER+' -->')+'.*?'+re.escape('<!-- /'+MARKER+' -->')
+    if re.search(pattern,text,re.S):text=re.sub(pattern,lambda _:replacement,text,flags=re.S)
+    else:
+        position=text.index('\n---',3)+4 if text.startswith('---\n') else text.index('\n')
+        text=text[:position]+'\n\n'+replacement+'\n'+text[position:]
+    write(path,text)
+
+
+def source_files():
+    names={f'product/src/ai_ad_editor/{name}.py' for name in MODULES}
+    names|={f'product/tests/{name}.py' for name in TESTS}
+    names|={f'scripts/{name}.py' for name in SCRIPTS}|{HISTORICAL_REPORT,HISTORICAL_CONTRACT}
+    for prefix in (REL,ASSETS):
+        names.update(path.relative_to(ROOT).as_posix() for path in (ROOT/prefix).rglob('*') if path.is_file())
+    for name in names:
+        path=ROOT/name;assert path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(ROOT),name
+    return {name:sha(ROOT/name) for name in sorted(names)}
+
+
+def source_audit():
+    current = frozen()
+    base = ROOT / REL
+    audit = read(base / 'audit-r2.json')
+    assert audit['status'] == 'passed-standalone-audit' and audit['targeted_methods'] == 80
+    assert current == audit['frozen_inputs'] and len(current) == 257
+    refresh = read(base / 'parent-contract-refresh-r1.json')
+    original = refresh['frozen_before']
+    assert current == refresh['frozen_after'] and not refresh['runtime_inputs_changed']
+    assert original == audit['original_runtime_frozen_inputs'] and audit['runtime_resources_unchanged']
+    for name, row in audit['media'].items(): assert sha(ROOT / name) == row['sha256']
+    related = read(base / 'related-r1.json')
+    assert related['status'] == 'passed-related-regressions' and related['terminal_ok']
+    assert related['methods'] == related['distinct_methods'] == 80 and related['skipped'] == 0
+    assert len(related['method_ids']) == len(set(related['method_ids'])) == 80
+    assert related['frozen_before'] == related['frozen_after'] == current
+    assert related['fixtures_unchanged'] and related['fixture_manifest_unchanged'] and related['scripts_unchanged']
+    assert sha(base / 'related-r1.json') == audit['related_sha256']
+    assert sha(base / 'related-r1.log') == related['log_sha256']
+    for name, digest in related['script_hashes'].items(): assert sha(ROOT / 'scripts' / name) == digest
+    installation = read(base / 'installed-r1/verification.json')
+    assert installation['status'] == 'passed' and installation['isolated_cli_calls'] == 18 and installation['module_origin_probes'] == 1
+    assert installation['frozen_before'] == installation['frozen_after'] == original
+    assert len(installation['resource_hashes']) == 161 and len(installation['optional_numpy_addon']['files']) == 933
+    for name, digest in installation['resource_hashes'].items(): assert sha(ROOT / 'product/src/ai_ad_editor' / name) == digest
+    for name in ('native-r1/verification.json', 'installed-r1/media/verification.json'):
+        item = read(base / name)
+        assert item['status'] == 'passed' and item['cli_calls'] == 15 and item['native_commands'] == 11
+        assert len(item['checks']) == 23 and all(row['ok'] for row in item['checks'])
+        assert item['frozen_before'] == item['frozen_after'] == original
+    drafts = read(base / 'skills-draft-r1.json')
+    assert drafts['status'] == 'passed-four-unregistered-drafts' and drafts['skill_count'] == 4 and not drafts['registered']
+    for row in drafts['skills'].values():
+        assert sha(ROOT / row['path']) == row['sha256'] and row['validator_exit_code'] == 0
+        assert sha(ROOT / row['parent_snapshot']) == row['parent_sha256'] and not row['registered']
+    previous = read(base / 'foundation-r2.json')['source_inputs']
+    assert len(previous) == 256 and set(current) - set(previous) == ADDED
+    assert {name for name in previous if previous[name] != current[name]} == MODIFIED
+    fixture = read(base / 'external-fixtures-r1.json')
+    assert fixture['status'] == 'passed' and fixture['fixture_count'] == 8
+    for row in fixture['fixtures']: assert sha(ROOT / row['path']) == row['sha256']
+    return current
+
+
+def complete_gate(current):
+    state=read(ROOT/'product/.runtime/multicam-source-range-20261021/full-after-empty-r1/run.json')
+    assert state['status']=='passed-complete-suite-awaiting-reviewed-integration'
+    full=read(ROOT/REL/'full-r1.json');alignment=read(ROOT/REL/'published-empty-alignment-r1.json')
+    assert full['status']=='passed' and full['terminal_ok'] and full['methods']==1995 and full['skipped']==0
+    assert full['frozen_before']==full['frozen_after']==current
+    assert full['external_fixture_count']==8 and full['external_fixtures_equal'] and full['verification_scripts_equal']
+    assert full['external_fixture_manifest_unchanged'] and state['full_sha256']==sha(ROOT/REL/'full-r1.json')
+    assert len(state['verification_scripts'])==10
+    for name,digest in state['verification_scripts'].items():assert sha(ROOT/'scripts'/name)==digest
+    assert alignment['status']=='passed' and alignment['candidate_inputs']==current
+    assert len(alignment['upstream_inputs'])==256 and alignment['remote_main']==alignment['published_commit']
+    snapshots=read(ROOT/REL/'before-full-documents-r1.json');audit=read(ROOT/REL/'audit-r2.json')
+    for name,row in snapshots['documents'].items():assert sha(ROOT/row['snapshot'])==row['sha256']==audit['documents'][name]
+    return full,alignment
+
+
+def documents(root,full):
+    seconds=full['suite_seconds']
+    message=(f'V86 多机位源覆盖策略已完成 {full["methods"]} 方法、{seconds:.3f} 秒、0 跳过的完整回归；'
+        '257 个冻结输入、8 个已提交外部夹具及 10 份验证脚本前后相同。'
+        '默认拒绝源覆盖不足，显式 trim 保持原速并保留参考事件位置和缺口；stretch 明示事件时钟改变。')
+    def link(document,target):
+        return os.path.relpath(root/target,(root/document).parent).replace('\\','/')
+    rows=[
+        ('V86-01','完整回归',f'当轮 {full["methods"]} 方法 /{seconds:.3f} 秒 /0 跳过，冻结 257 输入、8 夹具及 10 验证脚本。',REL+'/full-r1.json'),
+        ('V86-02','关联回归','当轮候选 80 个不同方法：22 多机位＋16 空选区＋32 嵌套时钟＋10 既有 CLI；为完整回归子集。',REL+'/related-r1.json'),
+        ('V86-03','真实原生 CLI','15 次 CLI＋11 条其他原生命令，23 检查；2 秒 /25 fps /50 帧原创参考，短机位 .4..1.84 秒。',REL+'/native-r1/verification.json'),
+        ('V86-04','完整无损帧和显式主音轨','50 帧、11,520,000 RGBA 字节及 768,000 PCM 字节 /每声道 96,000 采样与独立生成参考完全相同；两端缺口均核验。',REL+'/native-r1/verification.json'),
+        ('V86-05','编码输出与静态目检','trim/stretch 各 50 帧、全部 PTS=n/25；trim 帧身份色块实测最大误差 1。联系表已静态查看；未连续播放或听审。',REL+'/frame-review-r1.json'),
+        ('V86-06','隔离发行与 NumPy 边界','161 资源、7 基础 wheels；另将现有 NumPy 2.4.2 的 933 个 RECORD 文件复制至隔离 E 盘 site。18 次隔离 CLI＋1 次来源探针 /14 模块、12 安装检查。基础包未新增 NumPy。',REL+'/installed-r1/verification.json'),
+        ('V86-07','失败、变基与未重跑声明','初次 22 方法 4 FAIL /3 ERROR、数组加载修复及单数 test 解析失误保留。后续仅继承未打包的父 test_cli.py；原媒体/隔离结果保留原冻结图，161 运行时资源相同，未冒称重跑。',REL+'/audit-r2.json'),
+        ('V86-08','契约、Skills 与局限','4 份 Skill 只追加本轮指导，全部 17 份再审。单偏移、容器时长边界；设备漂移、每流真实 EOF、自然/HDR/长片/RSS/听审及完整剪映等价未验收。',CONTRACT),
+    ]
+    for document in LATEST_DOCS:
+        table='| 编号 | 核验 | 实际结果及边界 | 证据 |\n|---|---|---|---|\n'
+        table+='\n'.join('| '+identifier+' | '+title+' | '+result+' | [记录]('+link(document,target)+') |' for identifier,title,result,target in rows)
+        gallery=''
+        if document=='README.md':
+            gallery=('\n\n原创参考（50 帧 /2000 ms，色卡与确定性音频；非自然机位素材）：\n\n'
+                '![V86 原创参考]('+ASSETS+'/native-r1/source-reference.gif)\n\n'
+                '实际 trim 输出（GIF 合并为 38 帧 /2000 ms；前后缺口显示背景）：\n\n'
+                '![V86 原速留空]('+ASSETS+'/native-r1/trim.gif)\n\n'
+                '实际 stretch 输出（GIF 合并为 36 帧 /2000 ms；作为改变同步的显式对照）：\n\n'
+                '![V86 显式拉伸对照]('+ASSETS+'/native-r1/stretch.gif)\n\n'
+                '[参考原视频]('+ASSETS+'/native-r1/source-reference.mkv) · '
+                '[短机位原视频]('+ASSETS+'/native-r1/source-camera.mkv) · '
+                '[实际 trim MP4]('+ASSETS+'/native-r1/trim.mp4) · '
+                '[实际 stretch MP4]('+ASSETS+'/native-r1/stretch.mp4) · '
+                '[源摘要和 CC0 记录]('+ASSETS+'/native-r1/source-origin.json)。'
+                'GIF 仅为实际 MP4 的观看副本，不含音频；有损 MP4 不宣称完整 RGBA/PCM 字节相同。')
+        block(root/document,'### V86 多机位源覆盖与原速事件同步\n\n'+message+'\n\n'+table+gallery+
+            '\n\n[完整实测]('+link(document,REPORT)+')。80 项与原生/隔离检查分别报告，不累计成额外完整方法或剪映等价。')
+    report='# 多机位源覆盖与原速同步实测（V86，2026-10-21）\n\n'+message+'\n\n'
+    report+='| 编号 | 核验 | 实际结果及边界 | 证据 |\n|---|---|---|---|\n'
+    report+='\n'.join('| '+identifier+' | '+title+' | '+result+' | [记录]('+link(REPORT,target)+') |' for identifier,title,result,target in rows)
+    report+='\n\n'+'''相对偏移沿用 50 Hz 有界音频包络匹配；参考时刻 r 对应源时刻 r＋relative_delay_seconds。本例偏移 -0.4 秒，参考视频有 50 帧，短机位取 .4..1.84 秒共 36 帧。trim 的作者时间线保留 2 秒：前 10 帧背景、原参考 10..45 帧、后 4 帧背景。完整无损 RGBA 与独立生成的原色卡逐字节比较；显式主音轨的完整立体声 float32 PCM 与生成参考比较，不以是否存在音频流代替采样验收。
+
+视频轨不会自动提取机位音频，调用者须明确选择并创作主音轨。数组和 {segments:[...]} 计划均可用；原请求顺序/重叠、锁轨、dry-run 无作者/报告/快照写入、亚 tick 拒绝和保留原较长作者时长分别检查。完全不相交的区间三种策略均拒绝。显式 stretch 在本例 speed=.72，填满缺口而改变事件位置；保留 MULTICAM_SOURCE_CLOCK_CHANGED 警告，不能称为原速同步。
+
+原 22 方法、兼容性 1 方法以及媒体/安装记录是原实际执行。父版更新只改变未打包的 test_cli.py，当前 257 输入上的 80 方法已重新执行；原媒体/隔离结果仍标记原冻结图，161 运行时资源逐字节相同。随后完整 1995 方法以当前 257 输入执行；80 方法是其子集。兼容性 r1 的 unittest 本身通过，但外层解析器漏认单数 test；该外层失败保留，r2 才是有效接收记录。新增测试最初暴露数组加载错误及测试自身错误字段预期，原失败和源码同样保留。
+
+隔离实验从现有本地 NumPy 2.4.2 的 RECORD 复制 933 个包、numpy.libs 和 metadata 文件，核对原 RECORD 哈希并保留许可；跳过外部 Scripts 和 pycache。所有写入在 E 盘，C 盘源仅只读，没有下载或全局安装。7 wheels 基础离线包并不包含 NumPy；本次不把实验性附加拷贝写成产品安装器的新功能。来源探针包含 NumPy 原生扩展，14 模块均从隔离 site 加载。
+
+只接受原创 320×180、25 fps、2 秒生成素材的限定功能结果。偏移置信度、设备时钟漂移、非零 A/V 原点、自然多机位、每流真实 EOF、HDR、密集切换、长片吞吐、总 RSS、连续播放和听审仍待独立验收；没有完成完整剪映功能或效果等价。容器时长不能替代视频流的真实覆盖终点。
+
+22 个资产、8 个 GIF 包含原生与隔离两组实际素材。联系表做过静态目检；没有伪称连续播放、听审或模型推理。所有素材为本地生成，CC0 与 SHA 随源记录保留。原生 Windows 执行，无 Docker、WSL、容器或虚拟环境。
+'''
+    report+='\n[原始实验与保留失败]('+link(REPORT,HISTORICAL_REPORT)+') · [契约]('+link(REPORT,CONTRACT)+')\n\n'
+    report+='[原创参考]('+link(REPORT,ASSETS+'/native-r1/source-reference.mkv')+') · '
+    report+='[实际 trim MP4]('+link(REPORT,ASSETS+'/native-r1/trim.mp4')+') · '
+    report+='[实际 stretch MP4]('+link(REPORT,ASSETS+'/native-r1/stretch.mp4')+')\n\n'
+    report+='![实际 trim GIF]('+link(REPORT,ASSETS+'/native-r1/trim.gif')+')\n\n'
+    report+='复现脚本：scripts/smoke_multicam_source_range.py、scripts/verify_multicam_source_range_install.py；固定源码、命令、原始日志、失败与 SHA 见对应证据目录。\n'
+    write(root/REPORT,report)
+    lines=(root/HISTORICAL_CONTRACT).read_text('utf8').splitlines()
+    constraints='\n'.join(line for line in lines if line.startswith('|'))
+    assert constraints.count('| MC-C')==12
+    write(root/CONTRACT,'# 多机位源覆盖与显式缺口策略（v0.1 限定验收，2026-10-21）\n\n'+message+'\n\n'+constraints+
+        '\n\n[真实原生/隔离实测、原视频/GIF 与保留失败](../validation/'+Path(REPORT).name+')。')
+    drafts=read(ROOT/REL/'skills-draft-r1.json')
+    assert set(drafts['skills'])==set(SKILLS)
+    for name,row in drafts['skills'].items():
+        path=root/'skills'/name/'SKILL.md'
+        guidance=row['new_block'].replace(HISTORICAL_CONTRACT,CONTRACT).replace(HISTORICAL_REPORT,REPORT)
+        pending='This is an unregistered candidate; complete regression and main integration remain pending.'
+        assert guidance.count(pending)==1
+        guidance=guidance.replace(pending,'')
+        assert 'unregistered candidate' not in guidance and 'remain pending' not in guidance
+        block(path,guidance)
+    attributes=(root/'.gitattributes').read_text('utf8')
+    paths=[REL+'/** -text -whitespace',ASSETS+'/** -text -whitespace']
+    paths += [f'product/src/ai_ad_editor/{name}.py -text whitespace=cr-at-eol' for name in MODULES]
+    paths += [f'product/tests/{name}.py -text whitespace=cr-at-eol' for name in TESTS]
+    paths += [f'scripts/{name}.py -text whitespace=cr-at-eol' for name in SCRIPTS]
+    write(root/'.gitattributes',attributes+'\n# V86 exact tested multicamera source-coverage bytes.\n'+'\n'.join(paths))
+    return {*LATEST_DOCS,REPORT,CONTRACT,'.gitattributes',*('skills/'+name+'/SKILL.md' for name in SKILLS)}
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--work',type=Path,required=True);parser.add_argument('--preflight-only',action='store_true')
+    args=parser.parse_args();work=args.work.resolve()
+    assert work.is_relative_to(ROOT/'product/.runtime') and not work.exists();work.mkdir(parents=True)
+    state={'status':'checking-source','started_at_utc':datetime.now(timezone.utc).isoformat(),'calls':[],'force_push':False}
+    def checkpoint():save(work/'run.json',state)
+    try:
+        current=source_audit();reviewed=source_files()
+        state.update(status='passed-source-preflight-awaiting-full',frozen_inputs=current,source_files=reviewed);checkpoint()
+        if args.preflight_only:return
+        full,alignment=complete_gate(current);base=alignment['published_commit']
+        assert git(MAIN,'branch','--show-current').decode().strip()=='main'
+        assert git(MAIN,'rev-parse','HEAD').decode().strip()==base
+        assert git(MAIN,'remote','get-url','origin').decode().strip()=='git@github.com:Tonscriptions/agent-video-kit.git'
+        assert git(MAIN,'ls-remote','origin','refs/heads/main').decode().split()[0]==base
+        assert not git(MAIN,'status','--porcelain','-z'),'Preserve unexpected main changes; no implicit integration'
+        spec=importlib.util.spec_from_file_location('nested_native_main_freeze',MAIN/'scripts/run_frozen_regression.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        assert module.frozen()==alignment['upstream_inputs']
+        tracked={p.decode('utf8') for p in git(MAIN,'ls-files','-z').split(b'\0') if p}
+        generated={REPORT,CONTRACT,REL+'/skills-release-r1.json',REL+'/release-main-r1.json',REL+'/publication-copy-r1.json',REL+'/staged-release-r1.json'}
+        for name in set(reviewed)|generated:
+            path=MAIN/name;assert path.resolve().is_relative_to(MAIN) and not path.is_symlink()
+            assert name in tracked or not path.exists(),'Existing untracked destination: '+name
+        assert source_files()==reviewed and frozen()==current
+        state.update(status='copying-reviewed-source',base_commit=base);checkpoint()
+        for name,digest in reviewed.items():
+            target=MAIN/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/name,target)
+            assert sha(target)==digest,name
+        assert module.frozen()==current
+        modified_docs=documents(MAIN,full)
+        command=[sys.executable,'-E','-B','-X','utf8',str(MAIN/'scripts/audit_source_edit_skills.py'),
+            '--expected-count','17','--output',str(MAIN/REL/'skills-release-r1.json')]
+        result=subprocess.run(command,cwd=MAIN,capture_output=True,timeout=600)
+        (work/'main-skills.stdout.log').write_bytes(result.stdout);(work/'main-skills.stderr.log').write_bytes(result.stderr)
+        state['calls'].append({'command':command,'exit_code':result.returncode});checkpoint();assert result.returncode==0
+        skills=read(MAIN/REL/'skills-release-r1.json');mapping_path=MAIN/'video-cut-install-manifest.json';mapping=read(mapping_path)
+        mapping.setdefault('audit_history',[]).append(mapping['current_audit'])
+        for entry in mapping['skills']:
+            row=next(item for item in skills['results'] if item['skill']==entry['name'])
+            old,new=entry['skill_md_sha256'],row['sha256'][7:]
+            if old!=new:
+                entry.setdefault('skill_md_sha256_history',[]).append(old);entry['previous_manifest_skill_md_sha256']=old
+            entry.update(skill_md_sha256=new,validation=row['validator_stdout'],prefix_verified=True,registration_verified=True)
+            assert Path(entry['canonical_directory']).resolve()==(MAIN/'skills'/entry['name']).resolve()
+        mapping['current_audit']={'date':'2026-10-21','skill_count':17,'local_links_checked':skills['local_links_checked'],
+            'record':REL+'/skills-release-r1.json','record_sha256':sha(MAIN/REL/'skills-release-r1.json'),
+            'previous_hashes_preserved':True,'semantics':'V86 multicamera source coverage with explicit reject/trim/stretch; offset only, no drift or full CapCut parity acceptance'}
+        save(mapping_path,mapping)
+        links=[]
+        for name in sorted(modified_docs-{'.gitattributes'}):
+            path=MAIN/name;text=path.read_text('utf8')
+            if name in LATEST_DOCS or name.startswith('skills/'):text=text.split('<!-- '+MARKER+' -->')[1].split('<!-- /'+MARKER+' -->')[0]
+            for token in re.findall(r'!?\[[^\]]*\]\(([^)\n]+)\)',text):
+                target=token.strip('<>').split('#',1)[0]
+                if not target or re.match(r'^[a-zA-Z][\w+.-]*:',target):continue
+                resolved=(path.parent/target).resolve();assert resolved.is_relative_to(MAIN) and resolved.exists(),(name,token)
+                links.append({'document':name,'target':resolved.relative_to(MAIN).as_posix()})
+        for name,digest in current.items():assert sha(MAIN/name)==digest
+        for name,row in full['external_fixtures_expected'].items():assert sha(MAIN/name)==row['sha256']
+        save(MAIN/REL/'release-main-r1.json',{'status':'passed-main-byte-and-document-audit','base_commit':base,
+            'frozen_inputs':current,'full_methods':1995,'full_skipped':0,'full_sha256':sha(MAIN/REL/'full-r1.json'),
+            'targeted_methods':80,'resources':161,'skills':17,'local_links':links,
+            'documents':{name:sha(MAIN/name) for name in sorted(modified_docs)},'generator_sha256':sha(Path(__file__))})
+        save(MAIN/REL/'publication-copy-r1.json',{'status':'passed-reviewed-copy','source':str(ROOT),
+            'copied_files':reviewed,'frozen_inputs':current,'base_commit':base})
+        changed={p.decode('utf8') for p in git(MAIN,'diff','--name-only','-z').split(b'\0') if p}
+        changed.update(p.decode('utf8') for p in git(MAIN,'ls-files','--others','--exclude-standard','-z').split(b'\0') if p)
+        allowed=set(reviewed)|modified_docs|generated|{'video-cut-install-manifest.json'}
+        assert changed<=allowed,sorted(changed-allowed)
+        stage=work/'stage-paths.nul';stage.write_bytes(b'\0'.join(name.encode('utf8') for name in sorted(changed))+b'\0')
+        git(MAIN,'add','--pathspec-from-file='+str(stage),'--pathspec-file-nul')
+        git(MAIN,'add','--renormalize','--pathspec-from-file='+str(stage),'--pathspec-file-nul')
+        assert not git(MAIN,'diff','--name-only')
+        assert {p.decode('utf8') for p in git(MAIN,'diff','--cached','--name-only','-z').split(b'\0') if p}==changed
+        git(MAIN,'diff','--cached','--check');rows=staged_rows({**{name:sha(MAIN/name) for name in changed},**current})
+        receipt=REL+'/staged-release-r1.json'
+        save(MAIN/receipt,{'status':'passed','frozen_files':257,'compared_blobs':len(rows),'files':rows,
+            'all_staged_bytes_equal_workspace':True,'all_frozen_bytes_equal_staged':True,
+            'stream_buffer_bytes':65536,'full_sha256':sha(MAIN/REL/'full-r1.json'),'base_commit':base})
+        git(MAIN,'add','--',receipt);staged_rows({receipt:sha(MAIN/receipt)})
+        assert module.frozen()==current and not git(MAIN,'diff','--name-only')
+        git(MAIN,'diff','--cached','--check');state.update(status='passed-staged-audit');checkpoint()
+        git(MAIN,'commit','--quiet','-m','fix: preserve multicamera event sync with explicit source coverage policies')
+        commit=git(MAIN,'rev-parse','HEAD').decode().strip();assert git(MAIN,'rev-parse','HEAD^').decode().strip()==base
+        state.update(status='committed-awaiting-ordinary-push',commit=commit);checkpoint()
+        git(MAIN,'push','origin','main');remote=git(MAIN,'ls-remote','origin','refs/heads/main').decode().split()[0]
+        assert remote==commit and not git(MAIN,'status','--porcelain','-z') and module.frozen()==current
+        state.update(status='published',remote_main=remote,main_clean=True,full_methods=1995)
+    except BaseException as caught:
+        state.update(status='failed',error={'type':type(caught).__name__,'message':str(caught)});raise
+    finally:
+        checkpoint();print(json.dumps({k:state.get(k) for k in ('status','commit','remote_main','error')},ensure_ascii=False),flush=True)
+
+
+if __name__=='__main__':main()

@@ -391,6 +391,16 @@ def build_capability_manifest() -> dict[str, Any]:
                 "status": "implemented",
                 "features": ["probe", "local_ingest", "image_loop", "proxy", "thumbnail", "waveform", "scene_change", "silence", "beat_anchors", "heuristic_highlights", "highlight_rough_cut_apply", "beat_cut_timeline", "multicam_audio_sync", "multicam_switch_plan", "relink_by_hash", "relink_by_unique_name", "local_template_tracking", "local_visual_model_tracking_adapter", "local_multi_object_tracking", "native_yolov10_onnx_cpu", "native_motion_association", "tracking_clip_model_rights_dependencies", "visual_adapter_registry", "local_tracking_bind_to_visual_clip", "local_auto_reframe", "smart_cut_silence", "smart_cut_transcript_phrases", "smart_cut_linked_audio", "stabilize_vidstab_two_pass"],
                 "tracking_contract": "local_template_matching_emits_confidence_and_transform_keyframes",
+                "multicam_source_coverage": {
+                    "status": "implemented_with_limits",
+                    "version": "0.2.0",
+                    "source_shortfall_default": "reject",
+                    "source_shortfall_choices": ["reject", "trim", "stretch"],
+                    "trim_contract": "intersect_camera_coverage_in_reference_clock_preserve_unity_speed_and_timeline_gaps",
+                    "stretch_contract": "explicit_clamp_or_slow_changes_event_sync_and_emits_warning",
+                    "apply_contract": "reject_locked_tracks_and_sub_tick_segments_preserve_authored_duration_and_requested_output_window",
+                    "limits": ["offset_only_no_clock_drift_estimation", "duration_is_container_evidence_not_per_stream_video_eof", "offset_estimate_uses_bounded_50hz_audio_envelope", "timeline_placement_is_quantized_to_project_ticks", "no_automatic_audio_track_or_semantic_camera_director", "natural_multicam_quality_unaccepted"],
+                },
                 "mask_tracking": {
                     "status": "implemented_with_limits",
                     "engine": "local-mask-bbox-tracking-v1",

@@ -3,6 +3,19 @@ name: video-cut-timeline
 description: Compose an Agent Project timeline with local clips, tracks, transitions, keyframes, masks, speed curves, nested sequences, captions, and audio automation.
 ---
 
+<!-- V86-MULTICAM-SOURCE-COVERAGE -->
+<!-- MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->
+Review original requested intervals and actual covered intervals separately; trim preserves unity speed and places clips at their original reference event positions.
+When multicam_source_coverage is advertised, coverage shortfall defaults to reject. Explicit --source-shortfall trim intersects source coverage and leaves gaps; stretch clamps or slows and warns that event sync changes.
+Completely disjoint coverage, locked apply targets and sub-tick segments reject. Dry-run performs audio analysis but writes no report or authored project.
+Read the [coverage contract](../../docs/specs/多机位源覆盖与显式缺口策略_v0.1_2026-10-21.md) and [real native/isolated evidence](../../docs/validation/多机位源覆盖与原速同步实测_2026-10-21.md).
+NumPy is an explicit local dependency; the base seven-wheel bundle does not contain it. The isolated experiment copies the existing 2.4.2 distribution, without runtime installation or download.
+Container duration does not establish per-stream video EOF. Offset confidence, tick rounding and natural multicamera quality require separate review.
+
+<!-- /MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->
+<!-- /V86-MULTICAM-SOURCE-COVERAGE -->
+
+
 <!-- V85-NATIVE-EMPTY-WINDOW -->
 For native leaves, preserve original PTS and the actual last-frame duration. Empty ranges use equal frame bounds and null display-clock endpoints; do not clone frames or substitute opaque black. Virtual inline surfaces retain their child CFR contract.
 Read the [empty-window contract](../../docs/specs/原生视频空区间契约_v0.1_2026-10-21.md) and [actual independent evidence](../../docs/validation/原生空视频选区与显式音频保留实测_2026-10-21.md).

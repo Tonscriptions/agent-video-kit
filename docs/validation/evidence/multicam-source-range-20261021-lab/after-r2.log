@@ -1,0 +1,90 @@
+test_default_refuses_a_camera_that_begins_after_the_requested_event (test_multicam_source_range.MulticamCoverageTests.test_default_refuses_a_camera_that_begins_after_the_requested_event) ... ok
+test_default_refuses_a_camera_that_ends_before_the_requested_event (test_multicam_source_range.MulticamCoverageTests.test_default_refuses_a_camera_that_ends_before_the_requested_event) ... ok
+test_disjoint_prefix_is_refused_by_every_policy (test_multicam_source_range.MulticamCoverageTests.test_disjoint_prefix_is_refused_by_every_policy) ... ok
+test_disjoint_tail_is_refused_by_every_policy (test_multicam_source_range.MulticamCoverageTests.test_disjoint_tail_is_refused_by_every_policy) ... ok
+test_explicit_stretch_retains_the_legacy_tail_fill_only_by_request (test_multicam_source_range.MulticamCoverageTests.test_explicit_stretch_retains_the_legacy_tail_fill_only_by_request) ... ok
+test_explicit_stretch_warns_even_when_prefix_clamping_keeps_speed_one (test_multicam_source_range.MulticamCoverageTests.test_explicit_stretch_warns_even_when_prefix_clamping_keeps_speed_one) ... ok
+test_float_boundary_noise_does_not_create_a_false_shortfall (test_multicam_source_range.MulticamCoverageTests.test_float_boundary_noise_does_not_create_a_false_shortfall) ... ok
+test_fully_covered_source_keeps_the_original_event_mapping (test_multicam_source_range.MulticamCoverageTests.test_fully_covered_source_keeps_the_original_event_mapping) ... ok
+test_source_sync_report_is_not_mutated_by_success_or_refusal (test_multicam_source_range.MulticamCoverageTests.test_source_sync_report_is_not_mutated_by_success_or_refusal) ... ok
+test_trim_both_edges_keeps_the_complete_short_camera_at_unity (test_multicam_source_range.MulticamCoverageTests.test_trim_both_edges_keeps_the_complete_short_camera_at_unity) ... ok
+test_trim_does_not_hide_overlapping_requested_events (test_multicam_source_range.MulticamCoverageTests.test_trim_does_not_hide_overlapping_requested_events) ... ok
+test_trim_leading_gap_moves_the_clip_without_changing_speed (test_multicam_source_range.MulticamCoverageTests.test_trim_leading_gap_moves_the_clip_without_changing_speed) ... ok
+test_trim_places_intersection_relative_to_nonzero_requested_start (test_multicam_source_range.MulticamCoverageTests.test_trim_places_intersection_relative_to_nonzero_requested_start) ... ok
+test_trim_trailing_gap_retains_reference_event_position (test_multicam_source_range.MulticamCoverageTests.test_trim_trailing_gap_retains_reference_event_position) ... ok
+test_unknown_shortfall_policy_is_rejected (test_multicam_source_range.MulticamCoverageTests.test_unknown_shortfall_policy_is_rejected) ... ok
+test_default_native_refusal_preserves_project_and_does_not_write_report_or_snapshot (test_multicam_source_range.NativeMulticamCoverageTests.test_default_native_refusal_preserves_project_and_does_not_write_report_or_snapshot) ... ERROR
+test_explicit_native_stretch_warns_and_visibly_replaces_the_first_gap (test_multicam_source_range.NativeMulticamCoverageTests.test_explicit_native_stretch_warns_and_visibly_replaces_the_first_gap) ... FAIL
+test_locked_target_refuses_before_audio_analysis_even_in_apply_dry_run (test_multicam_source_range.NativeMulticamCoverageTests.test_locked_target_refuses_before_audio_analysis_even_in_apply_dry_run) ... ERROR
+test_native_trim_preserves_every_event_frame_both_gaps_and_explicit_master_pcm (test_multicam_source_range.NativeMulticamCoverageTests.test_native_trim_preserves_every_event_frame_both_gaps_and_explicit_master_pcm) ... FAIL
+test_sub_tick_segment_refuses_instead_of_inventing_a_one_tick_clip (test_multicam_source_range.NativeMulticamCoverageTests.test_sub_tick_segment_refuses_instead_of_inventing_a_one_tick_clip) ... ERROR
+test_trim_dry_run_reports_original_bounds_and_performs_no_write (test_multicam_source_range.NativeMulticamCoverageTests.test_trim_dry_run_reports_original_bounds_and_performs_no_write) ... FAIL
+test_trim_preserves_an_existing_longer_authored_sequence (test_multicam_source_range.NativeMulticamCoverageTests.test_trim_preserves_an_existing_longer_authored_sequence) ... FAIL
+
+======================================================================
+ERROR: test_default_native_refusal_preserves_project_and_does_not_write_report_or_snapshot (test_multicam_source_range.NativeMulticamCoverageTests.test_default_native_refusal_preserves_project_and_does_not_write_report_or_snapshot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-source-range-lab-20261021\product\tests\test_multicam_source_range.py", line 166, in test_default_native_refusal_preserves_project_and_does_not_write_report_or_snapshot
+    self.assertEqual(result['error']['code'],'MULTICAM_SOURCE_SHORTFALL')
+                     ~~~~~~^^^^^^^^^
+KeyError: 'error'
+
+======================================================================
+ERROR: test_locked_target_refuses_before_audio_analysis_even_in_apply_dry_run (test_multicam_source_range.NativeMulticamCoverageTests.test_locked_target_refuses_before_audio_analysis_even_in_apply_dry_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-source-range-lab-20261021\product\tests\test_multicam_source_range.py", line 205, in test_locked_target_refuses_before_audio_analysis_even_in_apply_dry_run
+    self.assertEqual(result['error']['code'],'TRACK_LOCKED')
+                     ~~~~~~^^^^^^^^^
+KeyError: 'error'
+
+======================================================================
+ERROR: test_sub_tick_segment_refuses_instead_of_inventing_a_one_tick_clip (test_multicam_source_range.NativeMulticamCoverageTests.test_sub_tick_segment_refuses_instead_of_inventing_a_one_tick_clip)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-source-range-lab-20261021\product\tests\test_multicam_source_range.py", line 231, in test_sub_tick_segment_refuses_instead_of_inventing_a_one_tick_clip
+    self.assertEqual(result['error']['code'],'MULTICAM_SEGMENT_TOO_SHORT')
+                     ~~~~~~^^^^^^^^^
+KeyError: 'error'
+
+======================================================================
+FAIL: test_explicit_native_stretch_warns_and_visibly_replaces_the_first_gap (test_multicam_source_range.NativeMulticamCoverageTests.test_explicit_native_stretch_warns_and_visibly_replaces_the_first_gap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-source-range-lab-20261021\product\tests\test_multicam_source_range.py", line 211, in test_explicit_native_stretch_warns_and_visibly_replaces_the_first_gap
+    self.assertEqual(code,0,result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'media.multicam', 'request_id': 'req_20261021033022_3da51831', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'JSON_OBJECT_REQUIRED', 'message': '顶层 JSON 必须是对象', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-source-range-lab-20261021\\product\\.runtime\\temp\\tmpa3p_e0tm\\project\\candidate-plan.json', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-21T03:30:22.546735Z', 'finished_at': '2026-10-21T03:30:22.546748Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_native_trim_preserves_every_event_frame_both_gaps_and_explicit_master_pcm (test_multicam_source_range.NativeMulticamCoverageTests.test_native_trim_preserves_every_event_frame_both_gaps_and_explicit_master_pcm)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-source-range-lab-20261021\product\tests\test_multicam_source_range.py", line 174, in test_native_trim_preserves_every_event_frame_both_gaps_and_explicit_master_pcm
+    self.assertEqual(code,0,result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'media.multicam', 'request_id': 'req_20261021033026_dd6fcaf4', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'JSON_OBJECT_REQUIRED', 'message': '顶层 JSON 必须是对象', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-source-range-lab-20261021\\product\\.runtime\\temp\\tmp1gdkvghp\\project\\candidate-plan.json', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-21T03:30:26.229846Z', 'finished_at': '2026-10-21T03:30:26.229859Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_trim_dry_run_reports_original_bounds_and_performs_no_write (test_multicam_source_range.NativeMulticamCoverageTests.test_trim_dry_run_reports_original_bounds_and_performs_no_write)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-source-range-lab-20261021\product\tests\test_multicam_source_range.py", line 192, in test_trim_dry_run_reports_original_bounds_and_performs_no_write
+    self.assertEqual(code,0,result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'media.multicam', 'request_id': 'req_20261021033031_d88e4ad4', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'JSON_OBJECT_REQUIRED', 'message': '顶层 JSON 必须是对象', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-source-range-lab-20261021\\product\\.runtime\\temp\\tmpu71y_21g\\project\\candidate-plan.json', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-21T03:30:31.102321Z', 'finished_at': '2026-10-21T03:30:31.102329Z', 'network': 'disabled'}}
+
+======================================================================
+FAIL: test_trim_preserves_an_existing_longer_authored_sequence (test_multicam_source_range.NativeMulticamCoverageTests.test_trim_preserves_an_existing_longer_authored_sequence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-source-range-lab-20261021\product\tests\test_multicam_source_range.py", line 222, in test_trim_preserves_an_existing_longer_authored_sequence
+    self.assertEqual(code,0,result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {'ok': False, 'command': 'media.multicam', 'request_id': 'req_20261021033033_76062065', 'operation_id': None, 'status': 'failed', 'data': {}, 'artifacts': [], 'warnings': [], 'errors': [{'code': 'JSON_OBJECT_REQUIRED', 'message': '顶层 JSON 必须是对象', 'path': 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-source-range-lab-20261021\\product\\.runtime\\temp\\tmp16gepdxz\\project\\candidate-plan.json', 'retryable': False}], 'provenance': {'cli_version': '0.1.0', 'schema_version': '0.1.0', 'engine_version': 'ffmpeg-local', 'started_at': '2026-10-21T03:30:33.941545Z', 'finished_at': '2026-10-21T03:30:33.941553Z', 'network': 'disabled'}}
+
+----------------------------------------------------------------------
+Ran 22 tests in 14.619s
+
+FAILED (failures=4, errors=3)

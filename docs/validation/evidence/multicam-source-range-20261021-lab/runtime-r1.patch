@@ -1,0 +1,191 @@
+--- product/src/ai_ad_editor/capabilities.py@parent
++++ product/src/ai_ad_editor/capabilities.py@candidate
+@@ -391,6 +391,16 @@
+                 "status": "implemented",
+                 "features": ["probe", "local_ingest", "image_loop", "proxy", "thumbnail", "waveform", "scene_change", "silence", "beat_anchors", "heuristic_highlights", "highlight_rough_cut_apply", "beat_cut_timeline", "multicam_audio_sync", "multicam_switch_plan", "relink_by_hash", "relink_by_unique_name", "local_template_tracking", "local_visual_model_tracking_adapter", "local_multi_object_tracking", "native_yolov10_onnx_cpu", "native_motion_association", "tracking_clip_model_rights_dependencies", "visual_adapter_registry", "local_tracking_bind_to_visual_clip", "local_auto_reframe", "smart_cut_silence", "smart_cut_transcript_phrases", "smart_cut_linked_audio", "stabilize_vidstab_two_pass"],
+                 "tracking_contract": "local_template_matching_emits_confidence_and_transform_keyframes",
++                "multicam_source_coverage": {
++                    "status": "implemented_with_limits",
++                    "version": "0.2.0",
++                    "source_shortfall_default": "reject",
++                    "source_shortfall_choices": ["reject", "trim", "stretch"],
++                    "trim_contract": "intersect_camera_coverage_in_reference_clock_preserve_unity_speed_and_timeline_gaps",
++                    "stretch_contract": "explicit_clamp_or_slow_changes_event_sync_and_emits_warning",
++                    "apply_contract": "reject_locked_tracks_and_sub_tick_segments_preserve_authored_duration_and_requested_output_window",
++                    "limits": ["offset_only_no_clock_drift_estimation", "duration_is_container_evidence_not_per_stream_video_eof", "offset_estimate_uses_bounded_50hz_audio_envelope", "timeline_placement_is_quantized_to_project_ticks", "no_automatic_audio_track_or_semantic_camera_director", "natural_multicam_quality_unaccepted"],
++                },
+                 "mask_tracking": {
+                     "status": "implemented_with_limits",
+                     "engine": "local-mask-bbox-tracking-v1",
+--- product/src/ai_ad_editor/cli.py@parent
++++ product/src/ai_ad_editor/cli.py@candidate
+@@ -296,6 +296,7 @@
+     multicam.add_argument("--start-seconds", type=float, default=0.0)
+     multicam.add_argument("--end-seconds", type=float, default=None)
+     multicam.add_argument("--timeline-start-seconds", type=float, default=0.0)
++    multicam.add_argument("--source-shortfall", choices=("reject", "trim", "stretch"), default="reject", help="机位覆盖不足：默认拒绝；trim 保留原速同步区间并留空；stretch 显式改变同步关系以填满")
+     multicam.add_argument("--sample-rate", type=int, default=8000, help="本地同步 PCM 采样率")
+     multicam.add_argument("--analysis-seconds", type=float, default=120.0, help="每个机位最多分析的前缀秒数")
+     multicam.add_argument("--max-offset-seconds", type=float, default=30.0, help="互相关搜索的最大相对偏移")
+@@ -3658,6 +3659,12 @@
+         raise argument_error("timeline_start_seconds 不能为负数", "timeline_start_seconds")
+     if args.apply and not args.track_id:
+         raise argument_error("--apply 必须提供 --track-id", "track_id")
++    if args.apply:
++        target_track = find_track(sequence, args.track_id, None)
++        if str(target_track.get("kind")) != "video":
++            raise argument_error("多机位切换目标轨道必须是 video 轨道", "track_id")
++        if target_track.get("locked", False):
++            raise AppError("TRACK_LOCKED", "多机位切换目标轨道已锁定", exit_code=2, path="track_id")
+     assets = asset_map(project)
+     sources: list[dict[str, Any]] = []
+     for asset_id in args.source_asset_id:
+@@ -3674,7 +3681,13 @@
+     if args.switch_plan:
+         switch_path = Path(args.switch_plan).expanduser().resolve()
+         ensure_inside(root, switch_path)
+-        raw = load_json(switch_path)
++        try:
++            with switch_path.open('r', encoding='utf-8-sig') as stream:
++                raw = json.load(stream)
++        except FileNotFoundError as exc:
++            raise AppError('FILE_NOT_FOUND', f'文件不存在: {switch_path}', exit_code=3, path=str(switch_path)) from exc
++        except (json.JSONDecodeError, UnicodeError) as exc:
++            raise AppError('JSON_INVALID', f'JSON 无法解析: {switch_path}: {exc}', exit_code=2, path=str(switch_path)) from exc
+         if isinstance(raw, dict):
+             raw = raw.get("segments")
+         if not isinstance(raw, list):
+@@ -3699,14 +3712,20 @@
+         start_seconds=args.start_seconds,
+         end_seconds=args.end_seconds,
+         timeline_start_seconds=args.timeline_start_seconds,
++        source_shortfall=args.source_shortfall,
+     )
+     tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND))
+     for index, item in enumerate(segments):
+         item["id"] = new_multicam_clip_id(index)
+         item["timeline_start_tick"] = int(round(float(item["timeline_start_seconds"]) * tps))
+-        item["duration_tick"] = max(1, int(round(float(item["duration_seconds"]) * tps)))
++        item["duration_tick"] = int(round(float(item["duration_seconds"]) * tps))
+         item["source_in_tick"] = max(0, int(round(float(item["source_in_seconds"]) * tps)))
+-        item["source_out_tick"] = max(item["source_in_tick"] + 1, int(round(float(item["source_out_seconds"]) * tps)))
++        item["source_out_tick"] = int(round(float(item["source_out_seconds"]) * tps))
++        if item["duration_tick"] <= 0 or item["source_out_tick"] <= item["source_in_tick"]:
++            raise AppError("MULTICAM_SEGMENT_TOO_SHORT", "多机位切换段小于项目时间基精度", exit_code=2, path=f"switch_plan[{index}]")
++    reference = next(row for row in sync["offsets"] if row["asset_id"] == sync["reference_asset_id"])
++    window_end = float(args.end_seconds) if args.end_seconds is not None else float(reference["evidence"]["duration_seconds"])
++    output_end = float(args.timeline_start_seconds) + window_end - float(args.start_seconds)
+     plan = {
+         "multicam_version": MULTICAM_SYNC_VERSION,
+         "project_id": project.get("project", {}).get("id"),
+@@ -3718,6 +3737,8 @@
+             "start_seconds": round(float(args.start_seconds), 6),
+             "end_seconds": args.end_seconds,
+             "timeline_start_seconds": round(float(args.timeline_start_seconds), 6),
++            "source_shortfall": args.source_shortfall,
++            "output_window_end_seconds": round(output_end, 6),
+             "switch_seconds": args.switch_seconds,
+             "switch_plan": str(args.switch_plan) if args.switch_plan else None,
+             "apply": bool(args.apply),
+@@ -3741,9 +3762,6 @@
+         return _envelope("media.multicam", args, status="planned", data={"report": str(report_path), "plan": plan, "applied": False}, warnings=warnings)
+     if not segments:
+         raise AppError("MULTICAM_SWITCH_PLAN_REQUIRED", "--apply 需要 switch_seconds 或非空 switch_plan", exit_code=2, path="switch_plan")
+-    target_track = find_track(sequence, args.track_id, None)
+-    if str(target_track.get("kind")) != "video":
+-        raise argument_error("多机位切换目标轨道必须是 video 轨道", "track_id")
+     existing_clips = list(target_track.get("clips", []))
+     if not args.replace_track:
+         for generated in segments:
+@@ -3771,7 +3789,9 @@
+             clip["speed"] = float(item["speed"])
+         target_track.setdefault("clips", []).append(clip)
+         generated_clips.append(clip)
++    authored_duration = int(sequence.get("duration_tick", 1))
+     _recompute_sequence_duration(sequence)
++    sequence["duration_tick"] = max(sequence["duration_tick"], authored_duration, int(round(output_end * tps)))
+     validation = validate_project(root, project, strict_rights=False)
+     if not validation["ok"]:
+         raise AppError("MULTICAM_APPLY_INVALID", "多机位切换应用后项目校验失败", exit_code=2, cause=json.dumps(validation, ensure_ascii=False))
+--- product/src/ai_ad_editor/multicam.py@parent
++++ product/src/ai_ad_editor/multicam.py@candidate
+@@ -18,7 +18,7 @@
+ from .utils import new_id, sha256_file
+ 
+ 
+-MULTICAM_SYNC_VERSION = "0.1.0"
++MULTICAM_SYNC_VERSION = "0.2.0"
+ FEATURE_RATE_HZ = 50
+ 
+ 
+@@ -222,8 +222,11 @@
+     start_seconds: float = 0.0,
+     end_seconds: float | None = None,
+     timeline_start_seconds: float = 0.0,
++    source_shortfall: str = "reject",
+ ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+     """Build source-bounded angle clips from a fixed cadence or explicit plan."""
++    if source_shortfall not in {"reject", "trim", "stretch"}:
++        raise argument_error("source_shortfall 必须为 reject、trim 或 stretch", "source_shortfall")
+     offsets = {str(item.get("asset_id")): item for item in sync.get("offsets", []) if isinstance(item, dict)}
+     sources = [str(item.get("asset_id")) for item in sync.get("sources", []) if isinstance(item, dict)]
+     if not sources:
+@@ -269,15 +272,34 @@
+             raise argument_error("切换段引用了未知 camera_asset_id", f"switch_plan[{index}].camera_asset_id")
+         if left < start - 1e-6 or right > end + 1e-6 or right <= left:
+             raise argument_error("切换段必须位于 start_seconds/end_seconds 范围内且时长为正", f"switch_plan[{index}]")
+-        if segments and left < float(segments[-1]["end_seconds"]) - 1e-6:
++        if index and left < cursor - 1e-6:
+             raise argument_error("switch_plan 的切换段不能重叠", f"switch_plan[{index}]")
+         alignment = offsets[asset_id]
+         relative_delay = _finite(alignment.get("relative_delay_seconds"), 0.0)
+         source_duration = _finite(alignment.get("evidence", {}).get("duration_seconds"), 0.0)
++        requested_left, requested_right = left, right
++        covered_left = max(left, -relative_delay)
++        covered_right = min(right, source_duration - relative_delay)
++        if covered_right <= covered_left:
++            raise AppError("MULTICAM_SOURCE_RANGE_EMPTY", f"机位 {asset_id} 无法覆盖切换段", exit_code=2, path=f"switch_plan[{index}]")
++        shortfall = left + relative_delay < -1e-9 or right + relative_delay > source_duration + 1e-9
++        coverage = "complete"
++        if shortfall and source_shortfall == "reject":
++            raise AppError("MULTICAM_SOURCE_SHORTFALL", f"机位 {asset_id} 未完整覆盖切换段；请缩小选区，或显式选择 --source-shortfall trim|stretch", exit_code=2, path=f"switch_plan[{index}]")
++        if shortfall and source_shortfall == "trim":
++            left, right = covered_left, covered_right
++            coverage = "trimmed"
++            warnings.append({"code": "MULTICAM_SOURCE_TRIMMED", "message": f"机位 {asset_id} 仅保留有覆盖的原速同步区间，缺失部分留空", "asset_id": asset_id,
++                             "requested_start_seconds": round(requested_left, 6), "requested_end_seconds": round(requested_right, 6),
++                             "covered_start_seconds": round(left, 6), "covered_end_seconds": round(right, 6)})
++        elif shortfall:
++            coverage = "stretched"
++            warnings.append({"code": "MULTICAM_SOURCE_CLOCK_CHANGED", "message": f"机位 {asset_id} 显式填充缺失覆盖；钳制或慢放将改变与参考机位的事件同步", "asset_id": asset_id})
+         source_start = left + relative_delay
+-        if source_start < 0:
++        if source_start < -1e-9:
+             warnings.append({"code": "MULTICAM_SOURCE_CLAMPED", "message": f"机位 {asset_id} 的源起点早于 0，已钳制", "asset_id": asset_id, "seconds": round(source_start, 6)})
+             source_start = 0.0
++        source_start = max(0.0, source_start)
+         available = max(0.0, source_duration - source_start)
+         requested = right - left
+         if available <= 0:
+@@ -289,6 +311,10 @@
+         segments.append({
+             "index": index,
+             "camera_asset_id": asset_id,
++            "source_shortfall": source_shortfall,
++            "source_coverage": coverage,
++            "requested_start_seconds": round(requested_left, 6),
++            "requested_end_seconds": round(requested_right, 6),
+             "start_seconds": round(left, 6),
+             "end_seconds": round(right, 6),
+             "timeline_start_seconds": round(timeline_start_seconds + left - start, 6),
+@@ -297,9 +323,9 @@
+             "source_out_seconds": round(source_start + source_span, 6),
+             "speed": round(speed, 6),
+         })
+-        cursor = right
+-    if segments and float(segments[-1]["end_seconds"]) < end - 1e-6:
+-        warnings.append({"code": "MULTICAM_SWITCH_GAP", "message": "切换计划没有覆盖完整分析区间", "start_seconds": segments[-1]["end_seconds"], "end_seconds": round(end, 6)})
++        cursor = requested_right
++    if segments and cursor < end - 1e-6:
++        warnings.append({"code": "MULTICAM_SWITCH_GAP", "message": "切换计划没有覆盖完整分析区间", "start_seconds": round(cursor, 6), "end_seconds": round(end, 6)})
+     return segments, warnings

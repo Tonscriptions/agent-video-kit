@@ -1,0 +1,113 @@
+"""Review the prospective V84/V85/V86 document and Skill chain in an E-drive directory."""
+from __future__ import annotations
+
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+REL = 'docs/validation/evidence/multicam-source-range-20261021-lab'
+WORK = ROOT / 'product/.runtime/multicam-source-range-20261021/release-chain-document-review-r2'
+CHAIN = (
+    ('nested-native-clock-lab-20261021', 'publish_nested_native_clock_r2.py', 1957),
+    ('native-empty-window-lab-20261021', 'publish_native_empty_window_r2.py', 1973),
+    ('multicam-source-range-lab-20261021', 'publish_multicam_source_range.py', 1995),
+)
+
+
+def sha(path):
+    with Path(path).open('rb') as stream:
+        return 'sha256:' + hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def main():
+    assert not WORK.exists()
+    preview = WORK / 'prospective-unpublished'
+    preview.mkdir(parents=True)
+    modules = []
+    for index, (name, script, methods) in enumerate(CHAIN):
+        root = MAIN / 'product/.runtime' / name
+        sys.path.insert(0, str(root / 'scripts'))
+        path = root / 'scripts' / script
+        spec = importlib.util.spec_from_file_location('release_preview_' + str(index), path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        modules.append((module, methods))
+    latest = set(modules[0][0].LATEST_DOCS)
+    assert all(set(module.LATEST_DOCS) == latest for module, _ in modules)
+    initial = {*latest, '.gitattributes'}
+    initial |= {path.relative_to(MAIN).as_posix() for path in (MAIN / 'skills').glob('*/SKILL.md')}
+    assert len(initial - latest - {'.gitattributes'}) == 17
+    parents = {}
+    for name in sorted(initial):
+        target = preview / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(MAIN / name, target)
+        parents[name] = sha(MAIN / name)
+    links = []
+    stages = []
+    for module, methods in modules:
+        for name in (module.HISTORICAL_REPORT, module.HISTORICAL_CONTRACT):
+            target = preview / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(module.ROOT / name, target)
+        before = {name: sha(preview / 'skills' / name / 'SKILL.md') for name in module.SKILLS}
+        # Prospective prose only; zero seconds is not an observed complete-suite result.
+        changed = module.documents(preview, {'methods': methods, 'suite_seconds': 0.0, 'terminal_ok': True})
+        for name in sorted(changed - {'.gitattributes'}):
+            path = preview / name
+            text = path.read_text('utf8')
+            if name in module.LATEST_DOCS or name.startswith('skills/'):
+                text = text.split('<!-- ' + module.MARKER + ' -->')[1].split('<!-- /' + module.MARKER + ' -->')[0]
+            for token in re.findall(r'!?\[[^\]]*\]\(([^)\n]+)\)', text):
+                reference = token.strip('<>').split('#', 1)[0]
+                if not reference or re.match(r'^[a-zA-Z][\w+.-]*:', reference):
+                    continue
+                assert '\\' not in reference, (name, token)
+                resolved = (path.parent / reference).resolve()
+                assert resolved.is_relative_to(preview), (name, token)
+                relative = resolved.relative_to(preview).as_posix()
+                options = [preview / relative, MAIN / relative] + [candidate.ROOT / relative for candidate, _ in modules]
+                future = bool(re.search(r'/full-r\d+\.json$', relative))
+                assert any(option.exists() for option in options) or future, (name, token)
+                links.append({'stage': module.MARKER, 'document': name, 'target': relative, 'pending_full_receipt': future})
+        after = {name: sha(preview / 'skills' / name / 'SKILL.md') for name in module.SKILLS}
+        assert all(before[name] != after[name] for name in before)
+        stages.append({'marker': module.MARKER, 'publisher_sha256': sha(module.__file__), 'expected_future_methods': methods,
+            'placeholder_seconds': 0, 'skill_parents': before, 'skill_results': after})
+    validators = []
+    for path in sorted((preview / 'skills').glob('*/SKILL.md')):
+        command = [sys.executable, '-E', '-B', '-X', 'utf8', 'C:/Users/carzy/.codex/skills/.system/skill-creator/scripts/quick_validate.py', str(path.parent)]
+        result = subprocess.run(command, cwd=ROOT, capture_output=True, timeout=60)
+        validators.append({'skill': path.parent.name, 'command': command, 'exit_code': result.returncode,
+            'stdout': result.stdout.decode('utf8', 'replace'), 'stderr': result.stderr.decode('utf8', 'replace')})
+        assert result.returncode == 0, path.parent.name
+    old = 'Wholly empty native-video selections remain outside this release acceptance. Preserve explicit compiler refusals and do not silently pad them.'
+    for name in modules[1][0].SKILLS:
+        assert old not in (preview / 'skills' / name / 'SKILL.md').read_text('utf8'), name
+    for name, digest in parents.items():
+        assert sha(MAIN / name) == digest
+    record = {
+        'status': 'passed-prospective-three-release-document-chain',
+        'main_modified': False, 'actual_full_suite_run': False, 'actual_publication_run': False,
+        'skills_registered_or_updated': False, 'preview_root': str(preview),
+        'initial_main_parents': parents, 'stages': stages, 'links': links, 'skill_validators': validators,
+        'retired_empty_interval_refusal_removed': True, 'script_sha256': sha(__file__),
+        'limits': 'Private future-layout review with expected method counts and zero-second placeholders. It neither publishes nor changes any running-suite input. Actual publishers repeat complete gates, then-current parents and all seventeen Skill audits.'
+    }
+    destination = ROOT / REL / 'release-chain-preview-r2.json'
+    assert not destination.exists()
+    destination.write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+    shutil.copyfile(__file__, ROOT / REL / 'release-chain-preview-r2.script.py.txt')
+    print(json.dumps({'status': record['status'], 'stages': len(stages), 'local_links': len(links), 'skills': len(validators), 'main_modified': False}, ensure_ascii=False))
+
+
+if __name__ == '__main__':
+    main()
