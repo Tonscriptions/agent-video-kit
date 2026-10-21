@@ -1,0 +1,94 @@
+"""Run distinct clock, source-coverage, author-clock and CLI regression methods."""
+import ast
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+
+from run_frozen_regression import frozen, sha
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+REL = ROOT / 'docs/validation/evidence/multicam-affine-clock-20261021-lab'
+
+
+def methods(name):
+    tree = ast.parse((ROOT / 'product/tests' / (name + '.py')).read_text('utf8'))
+    return [name + '.' + cls.name + '.' + method.name for cls in tree.body if isinstance(cls, ast.ClassDef)
+            for method in cls.body if isinstance(method, ast.FunctionDef) and method.name.startswith('test_')]
+
+
+def read(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def main():
+    output = REL / 'related-r1.json'
+    log = REL / 'related-r1.log'
+    names_path = REL / 'related-r1-methods.json'
+    assert not any(path.exists() for path in (output, log, names_path))
+    previous_path = MAIN / 'docs/validation/evidence/multicam-stream-coverage-20261021-lab/related-r2.json'
+    previous = read(previous_path)
+    assert previous['status'] == 'passed-related-regressions' and len(previous['method_ids']) == 104
+    ids = sorted(set(previous['method_ids']) | set(methods('test_audio_source_origin')) | set(methods('test_multicam_affine_clock')))
+    assert len(ids) == 141 and len(methods('test_multicam_affine_clock')) == 25
+    names_path.write_text(json.dumps(ids, indent=2) + '\n', encoding='utf8', newline='\n')
+    current = frozen()
+    assert len(current) == 262
+    foundation = read(REL / 'foundation-r1.json')
+    expected_fixtures = {row['path']: row['sha256'] for row in foundation['external_fixtures']}
+    dependencies = foundation['dependency_artifact_inputs']
+    for name, digest in {**expected_fixtures, **dependencies}.items():
+        assert sha(ROOT / name) == digest
+    pins = {name: sha(ROOT / 'scripts' / name) for name in ('run_multicam_affine_related.py', 'run_frozen_regression.py')}
+    bootstrap = ('import sys,json,unittest;sys.path[:0]=[sys.argv.pop(1),sys.argv.pop(1)];'
+        'names=json.load(open(sys.argv.pop(1),encoding="utf8"));'
+        'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+        'sys.argv=[sys.argv[0],"-v",*names];unittest.main(module=None)')
+    command = [sys.executable, '-E', '-B', '-X', 'utf8', '-c', bootstrap,
+               str(ROOT / 'product/src'), str(ROOT / 'product/tests'), str(names_path)]
+    env = dict(os.environ)
+    temporary = str(ROOT / 'product/.runtime/temp')
+    env.update(TEMP=temporary, TMP=temporary, TMPDIR=temporary, PYTHONDONTWRITEBYTECODE='1',
+               PYTHONPATH=str(ROOT / 'product/src'),
+               AI_AD_EDITOR_TEST_HTML_RUNTIME=str(MAIN / 'product/.runtime/html-motion-runtime-20261018-e2.json'),
+               AI_AD_EDITOR_TEST_RUBBERBAND=str(MAIN / 'product/.runtime/rubberband-offline-probe-20261017/native/rubberband-4.0.0-gpl-executable-windows/rubberband.exe'))
+    record = {'status': 'running-related-regressions', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
+              'method_ids': ids, 'expected_methods': len(ids), 'frozen_before': current,
+              'script_hashes': pins, 'fixture_inputs': expected_fixtures, 'dependency_inputs': dependencies,
+              'method_list_sha256': sha(names_path), 'source_method_list_sha256': sha(previous_path),
+              'command': command, 'native_windows': True, 'virtualization': False}
+    def save():
+        output.write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf8', newline='\n')
+    save()
+    (REL / 'related-r1.script.py.txt').write_bytes(Path(__file__).read_bytes())
+    started = time.monotonic()
+    with log.open('xb') as stream:
+        result = subprocess.run(command, cwd=ROOT, env=env, stdout=stream, stderr=subprocess.STDOUT,
+                                creationflags=subprocess.CREATE_NO_WINDOW)
+    text = log.read_text('utf8')
+    match = re.search(r'Ran (\d+) tests in ([\d.]+)s', text)
+    record.update(exit_code=result.returncode, methods=int(match[1]) if match else None,
+        suite_seconds=float(match[2]) if match else None, terminal_ok=bool(re.search(r'\bOK\s*$', text)),
+        skipped=len(re.findall(r'\.\.\. skipped ', text)), log_sha256=sha(log), frozen_after=frozen(),
+        fixture_inputs_after={name: sha(ROOT / name) for name in expected_fixtures},
+        dependency_inputs_after={name: sha(ROOT / name) for name in dependencies},
+        scripts_after={name: sha(ROOT / 'scripts' / name) for name in pins},
+        wall_seconds=time.monotonic() - started, finished_at_utc=datetime.now(timezone.utc).isoformat())
+    record['status'] = 'passed-related-regressions' if (
+        result.returncode == 0 and record['terminal_ok'] and record['methods'] == 141 and record['skipped'] == 0
+        and record['frozen_after'] == current and record['fixture_inputs_after'] == expected_fixtures
+        and record['dependency_inputs_after'] == dependencies and record['scripts_after'] == pins
+        and sha(names_path) == record['method_list_sha256']) else 'failed-related-regressions'
+    record['distinct_methods'] = len(ids)
+    save()
+    print(json.dumps({key: record[key] for key in ('status', 'methods', 'distinct_methods', 'suite_seconds', 'skipped')}, ensure_ascii=False))
+    return 0 if record['status'] == 'passed-related-regressions' else 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

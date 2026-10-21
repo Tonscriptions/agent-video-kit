@@ -300,6 +300,11 @@ def build_parser() -> argparse.ArgumentParser:
     multicam.add_argument("--sample-rate", type=int, default=8000, help="本地同步 PCM 采样率")
     multicam.add_argument("--analysis-seconds", type=float, default=120.0, help="每个机位最多分析的前缀秒数")
     multicam.add_argument("--max-offset-seconds", type=float, default=30.0, help="互相关搜索的最大相对偏移")
+    multicam.add_argument("--clock-model", choices=("offset", "affine"), default="offset", help="固定偏移或显式估计设备时钟漂移")
+    multicam.add_argument("--max-drift-ppm", type=float, default=5000.0, help="仿射机位时钟的最大绝对速率漂移，最高20000ppm")
+    multicam.add_argument("--drift-window-seconds", type=float, default=12.0, help="漂移校准窗口4..60秒")
+    multicam.add_argument("--drift-anchors", type=int, default=9, help="漂移校准窗口数3..31")
+    multicam.add_argument("--allow-clock-extrapolation", action="store_true", help="显式允许在已观察的校准范围外外推机位时钟，保留警告")
     multicam.add_argument("--output", default=None, help="项目内多机位同步报告路径")
     multicam.add_argument("--apply", action="store_true", help="创建快照并把切换计划写入目标视频轨道")
     multicam.add_argument("--replace-track", action="store_true", help="应用前清空目标视频轨道已有片段")
@@ -3704,6 +3709,10 @@ def command_media_multicam(args: argparse.Namespace) -> dict[str, Any]:
         sample_rate=args.sample_rate,
         analysis_seconds=args.analysis_seconds,
         max_offset_seconds=args.max_offset_seconds,
+        clock_model=getattr(args, "clock_model", "offset"),
+        max_drift_ppm=getattr(args, "max_drift_ppm", 5000.0),
+        drift_window_seconds=getattr(args, "drift_window_seconds", 12.0),
+        drift_anchors=getattr(args, "drift_anchors", 9),
         project_root=root,
     )
     segments, switch_warnings = build_switch_segments(
@@ -3714,6 +3723,7 @@ def command_media_multicam(args: argparse.Namespace) -> dict[str, Any]:
         end_seconds=args.end_seconds,
         timeline_start_seconds=args.timeline_start_seconds,
         source_shortfall=args.source_shortfall,
+        allow_clock_extrapolation=getattr(args, "allow_clock_extrapolation", False),
     )
     tps = int(project.get("settings", {}).get("timebase", {}).get("ticks_per_second", TICKS_PER_SECOND))
     for index, item in enumerate(segments):
@@ -3739,6 +3749,7 @@ def command_media_multicam(args: argparse.Namespace) -> dict[str, Any]:
             "end_seconds": args.end_seconds,
             "timeline_start_seconds": round(float(args.timeline_start_seconds), 6),
             "source_shortfall": args.source_shortfall,
+            "allow_clock_extrapolation": bool(getattr(args, "allow_clock_extrapolation", False)),
             "output_window_end_seconds": round(output_end, 6),
             "switch_seconds": args.switch_seconds,
             "switch_plan": str(args.switch_plan) if args.switch_plan else None,

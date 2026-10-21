@@ -1,0 +1,85 @@
+test_44k_stereo_reverse_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_44k_stereo_reverse_keeps_float_precision) ... FAIL
+test_44k_stereo_selected_window_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_44k_stereo_selected_window_keeps_float_precision) ... FAIL
+test_8k_mono_complete_stream_keeps_fractional_resampler_samples (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_complete_stream_keeps_fractional_resampler_samples) ... FAIL
+test_8k_mono_nested_window_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_nested_window_keeps_float_precision) ... FAIL
+test_8k_mono_reverse_keeps_float_precision_and_sample_order (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_reverse_keeps_float_precision_and_sample_order) ... FAIL
+test_8k_mono_selected_window_uses_whole_stream_float_samples (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_selected_window_uses_whole_stream_float_samples) ... FAIL
+test_identity_curve_remains_consistent_with_float_reference (test_audio_resample_precision.AudioResamplePrecisionTests.test_identity_curve_remains_consistent_with_float_reference) ... ok
+test_native_48k_float_control_stays_sample_exact (test_audio_resample_precision.AudioResamplePrecisionTests.test_native_48k_float_control_stays_sample_exact) ... ok
+
+======================================================================
+FAIL: test_44k_stereo_reverse_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_44k_stereo_reverse_keeps_float_precision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 131, in test_44k_stereo_reverse_keeps_float_precision
+    self.compare('stereo44k', reverse=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 112, in compare
+    self.assertLessEqual(maximum, 6e-8, f'{name}: max error={maximum}, RMS={rms}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1.52587890625e-05 not less than or equal to 6e-08 : stereo44k: max error=1.52587890625e-05, RMS=8.780494358022616e-06
+
+======================================================================
+FAIL: test_44k_stereo_selected_window_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_44k_stereo_selected_window_keeps_float_precision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 128, in test_44k_stereo_selected_window_keeps_float_precision
+    self.compare('stereo44k')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 112, in compare
+    self.assertLessEqual(maximum, 6e-8, f'{name}: max error={maximum}, RMS={rms}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1.52587890625e-05 not less than or equal to 6e-08 : stereo44k: max error=1.52587890625e-05, RMS=8.780494358022616e-06
+
+======================================================================
+FAIL: test_8k_mono_complete_stream_keeps_fractional_resampler_samples (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_complete_stream_keeps_fractional_resampler_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 116, in test_8k_mono_complete_stream_keeps_fractional_resampler_samples
+    self.compare('mono8k', selected=False)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 112, in compare
+    self.assertLessEqual(maximum, 6e-8, f'{name}: max error={maximum}, RMS={rms}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1.0818243026733398e-05 not less than or equal to 6e-08 : mono8k: max error=1.0818243026733398e-05, RMS=5.681326926491245e-06
+
+======================================================================
+FAIL: test_8k_mono_nested_window_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_nested_window_keeps_float_precision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 125, in test_8k_mono_nested_window_keeps_float_precision
+    self.compare('mono8k', nested=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 112, in compare
+    self.assertLessEqual(maximum, 6e-8, f'{name}: max error={maximum}, RMS={rms}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1.0818243026733398e-05 not less than or equal to 6e-08 : mono8k: max error=1.0818243026733398e-05, RMS=5.66851500490359e-06
+
+======================================================================
+FAIL: test_8k_mono_reverse_keeps_float_precision_and_sample_order (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_reverse_keeps_float_precision_and_sample_order)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 122, in test_8k_mono_reverse_keeps_float_precision_and_sample_order
+    self.compare('mono8k', reverse=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 112, in compare
+    self.assertLessEqual(maximum, 6e-8, f'{name}: max error={maximum}, RMS={rms}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1.0818243026733398e-05 not less than or equal to 6e-08 : mono8k: max error=1.0818243026733398e-05, RMS=5.66851500490359e-06
+
+======================================================================
+FAIL: test_8k_mono_selected_window_uses_whole_stream_float_samples (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_selected_window_uses_whole_stream_float_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 119, in test_8k_mono_selected_window_uses_whole_stream_float_samples
+    self.compare('mono8k')
+    ~~~~~~~~~~~~^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 112, in compare
+    self.assertLessEqual(maximum, 6e-8, f'{name}: max error={maximum}, RMS={rms}')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1.0818243026733398e-05 not less than or equal to 6e-08 : mono8k: max error=1.0818243026733398e-05, RMS=5.66851500490359e-06
+
+----------------------------------------------------------------------
+Ran 8 tests in 7.229s
+
+FAILED (failures=6)

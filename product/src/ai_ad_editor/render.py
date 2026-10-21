@@ -4494,7 +4494,10 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     # gap before selecting the author window or reversing/retiming it.
                     # first_pts normalizes the beginning only; async drift correction
                     # is deliberately not enabled.
-                    audio_chain = [f"{audio_input}aresample=48000:first_pts=0,atrim=start={src_in:.6f}:end={src_out:.6f}", "asetpts=PTS-STARTPTS", "aresample=48000"]
+                    # Resample in float before selecting source samples. Negotiating
+                    # an integer first stage would requantize low-rate PCM before
+                    # the later floating-point mix, even with lossless output.
+                    audio_chain = [f"{audio_input}aresample=48000:osf=flt:first_pts=0,atrim=start={src_in:.6f}:end={src_out:.6f}", "asetpts=PTS-STARTPTS", "aresample=48000"]
                     if bool(clip.get("reverse")):
                         audio_chain.append("areverse")
                     if abs(speed - 1.0) > 1e-9:

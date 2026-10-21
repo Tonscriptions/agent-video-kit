@@ -1,0 +1,91 @@
+"""Publish affine clock and float PCM only after the actual complete2084 receipt."""
+from __future__ import annotations
+import argparse
+from datetime import datetime,timezone
+import importlib.util
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+from native_index_release_tools import MAIN,sha,git,staged_rows
+from run_frozen_regression import frozen
+from multicam_affine_release_docs import (ROOT,REL,ASSETS,REPORT,CONTRACT,HISTORICAL_REPORT,HISTORICAL_CONTRACT,
+    MARKER,SKILLS,LATEST_DOCS,documents,write)
+MODIFIED={'product/src/ai_ad_editor/'+name+'.py' for name in ('cli','multicam','capabilities','render')}
+ADDED={'product/src/ai_ad_editor/multicam_clock.py','product/tests/test_multicam_affine_clock.py','product/tests/test_audio_resample_precision.py'}
+SCRIPTS=('run_multicam_affine_after_parent','run_frozen_regression','run_with_regression_fixtures',
+ 'materialize_regression_fixtures','prepare_multicam_affine_lab','smoke_multicam_affine_clock',
+ 'run_multicam_affine_related','run_audio_precision_regression','diagnose_multicam_affine_pcm',
+ 'prepare_multicam_affine_install','verify_multicam_affine_install','complete_multicam_affine_install',
+ 'finalize_multicam_affine_media','prepare_multicam_affine_skills','native_index_release_tools',
+ 'multicam_affine_release_docs','prepare_multicam_affine_publication','publish_multicam_affine_clock',
+ 'preview_multicam_affine_publication')
+
+def read(path):return json.loads(Path(path).read_bytes())
+def save(path,value):write(path,json.dumps(value,ensure_ascii=False,indent=2))
+def verify(root,values):
+    for name,digest in values.items():assert sha(root/name)==digest,name
+
+def source_audit():
+    current=frozen();base=ROOT/REL;audit=read(base/'audit-r1.json')
+    assert audit['status']=='passed-source-and-evidence-preflight' and current==audit['frozen_inputs'] and len(current)==263
+    assert len(audit['verification_scripts'])==14 and len(audit['fixture_inputs'])==8 and len(audit['dependency_artifact_inputs'])==9
+    verify(ROOT/'scripts',audit['verification_scripts']);verify(ROOT,audit['fixture_inputs']);verify(ROOT,audit['dependency_artifact_inputs'])
+    verify(base,audit['bound_evidence'])
+    assert set(current)-set(audit['published_parent_inputs'])==ADDED
+    assert {name for name in audit['published_parent_inputs'] if current[name]!=audit['published_parent_inputs'][name]}==MODIFIED
+    for name,digest in audit['documents'].items():
+        assert sha(base/'before-full-documents-r1'/Path(name).name)==digest
+    media=read(base/'media-manifest-r1.json')
+    assert media['status']=='passed-media-inventory' and media['asset_count']==33 and media['GIF_count']==9
+    for name,row in media['assets'].items():assert sha(ROOT/name)==row['sha256']
+    related=read(base/'related-r3.json')
+    assert related['status']=='passed-related-regressions' and related['methods']==related['distinct_methods']==157 and related['skipped']==0
+    assert related['frozen_before']==related['frozen_after']==current
+    assert sha(base/'related-r3.log')==related['log_sha256']
+    isolated=read(base/'installed-postflight-r3/verification.json')
+    assert isolated['status']=='passed-isolated-postflight' and isolated['isolated_methods']==41 and isolated['isolated_skipped']==0
+    assert isolated['frozen_before']==isolated['frozen_after']==current
+    for name in ('native-r3/verification.json','installed-r1/media/verification.json'):
+        item=read(base/name);assert item['status']=='passed' and len(item['checks'])==52 and all(row['ok'] for row in item['checks'])
+        assert item['frozen_before']==item['frozen_after']==current
+    drafts=read(base/'skills-draft-r1.json')
+    assert drafts['status']=='passed-four-unregistered-drafts' and drafts['canonical_skill_count']==17 and not drafts['registered']
+    for name,row in drafts['skills'].items():
+        assert sha(ROOT/row['path'])==row['sha256'] and row['validator_exit_code']==0
+        assert sha(MAIN/'skills'/name/'SKILL.md')==row['parent_sha256']
+    return current
+
+def source_files():
+    names=MODIFIED|ADDED|{HISTORICAL_REPORT,HISTORICAL_CONTRACT}
+    names|={'scripts/'+name+'.py' for name in SCRIPTS}
+    names.add('scripts/multicam_affine_publication_prefix.py.txt')
+    state=read(ROOT/'product/.runtime/multicam-affine-clock-20261021/full-after-media-r1/run.json')
+    for prefix in (REL,ASSETS):
+        for path in (ROOT/prefix).rglob('*'):
+            if not path.is_file():continue
+            name=path.relative_to(ROOT).as_posix()
+            if state['status']=='running-complete-native-suite' and name.startswith(REL+'/full-'):continue
+            names.add(name)
+    for name in names:
+        path=ROOT/name;assert path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(ROOT),name
+        assert path.stat().st_size<100000000,name
+    return {name:sha(ROOT/name) for name in sorted(names)}
+
+def complete_gate(current):
+    base=ROOT/REL;audit=read(base/'audit-r1.json')
+    state=read(ROOT/'product/.runtime/multicam-affine-clock-20261021/full-after-media-r1/run.json')
+    assert state['status']=='passed-complete-suite-awaiting-reviewed-integration' and state['methods']==2084
+    full=read(base/'full-r1.json')
+    assert full['status']=='passed' and full['terminal_ok'] and full['methods']==2084 and full['skipped']==0
+    assert full['frozen_before']==full['frozen_after']==current
+    assert full['external_fixture_count']==8 and full['external_fixtures_equal'] and full['external_fixture_manifest_unchanged']
+    assert full['verification_scripts_equal'] and state['full_sha256']==sha(base/'full-r1.json')
+    extra=read(base/'full-dependencies-r1.json');assert extra['status']=='passed-extra-frozen-inputs'
+    assert extra['scripts']==audit['verification_scripts'] and extra['fixtures']==audit['fixture_inputs']
+    assert extra['dependencies']==audit['dependency_artifact_inputs'] and extra['full_sha256']==sha(base/'full-r1.json')
+    verify(ROOT/'scripts',audit['verification_scripts']);verify(ROOT,audit['fixture_inputs']);verify(ROOT,audit['dependency_artifact_inputs'])
+    assert read(base/'audit-r1.json')==audit
+    return full,{'published_commit':audit['main_documentation_commit'],'upstream_inputs':audit['published_parent_inputs']}

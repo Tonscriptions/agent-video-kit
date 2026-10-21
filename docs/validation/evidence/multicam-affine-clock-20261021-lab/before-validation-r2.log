@@ -1,0 +1,176 @@
+test_clock_outside_explicit_drift_budget_is_rejected (test_multicam_affine_clock.AffineClockFitTests.test_clock_outside_explicit_drift_budget_is_rejected) ... ok
+test_flat_or_too_short_signals_do_not_fall_back_to_offset (test_multicam_affine_clock.AffineClockFitTests.test_flat_or_too_short_signals_do_not_fall_back_to_offset) ... ok
+test_gain_and_constant_envelope_bias_do_not_change_the_clock (test_multicam_affine_clock.AffineClockFitTests.test_gain_and_constant_envelope_bias_do_not_change_the_clock) ... ok
+test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) ... ok
+test_inverse_reconstructs_reference_seconds (test_multicam_affine_clock.AffineClockFitTests.test_inverse_reconstructs_reference_seconds) ... ok
+test_negative_drift_and_negative_offset_have_correct_direction (test_multicam_affine_clock.AffineClockFitTests.test_negative_drift_and_negative_offset_have_correct_direction) ... ok
+test_one_corrupt_interval_is_rejected_without_moving_clean_events (test_multicam_affine_clock.AffineClockFitTests.test_one_corrupt_interval_is_rejected_without_moving_clean_events) ... ok
+test_periodic_ambiguous_audio_cannot_be_applied_as_calibration (test_multicam_affine_clock.AffineClockFitTests.test_periodic_ambiguous_audio_cannot_be_applied_as_calibration) ... ok
+test_piecewise_clock_does_not_pass_as_a_single_affine_clock (test_multicam_affine_clock.AffineClockFitTests.test_piecewise_clock_does_not_pass_as_a_single_affine_clock) ... ok
+test_positive_thousand_ppm_preserves_start_middle_and_end_events (test_multicam_affine_clock.AffineClockFitTests.test_positive_thousand_ppm_preserves_start_middle_and_end_events) ... ok
+test_repeated_fit_is_deterministic_and_does_not_mutate_features (test_multicam_affine_clock.AffineClockFitTests.test_repeated_fit_is_deterministic_and_does_not_mutate_features) ... ok
+test_small_hundred_ppm_is_observed_over_ten_minutes (test_multicam_affine_clock.AffineClockFitTests.test_small_hundred_ppm_is_observed_over_ten_minutes) ... ok
+test_zero_drift_does_not_invent_rate_correction (test_multicam_affine_clock.AffineClockFitTests.test_zero_drift_does_not_invent_rate_correction) ... ok
+test_calibration_for_another_source_or_reference_is_rejected (test_multicam_affine_clock.AffineClockPlanTests.test_calibration_for_another_source_or_reference_is_rejected) ... ok
+test_default_refuses_the_uncovered_calibrated_source_tail (test_multicam_affine_clock.AffineClockPlanTests.test_default_refuses_the_uncovered_calibrated_source_tail) ... ok
+test_explicit_extrapolation_keeps_rate_and_records_warning (test_multicam_affine_clock.AffineClockPlanTests.test_explicit_extrapolation_keeps_rate_and_records_warning) ... ok
+test_explicit_stretch_still_warns_that_event_sync_is_changed (test_multicam_affine_clock.AffineClockPlanTests.test_explicit_stretch_still_warns_that_event_sync_is_changed) ... ok
+test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest (test_multicam_affine_clock.AffineClockPlanTests.test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest) ... ok
+test_legacy_constant_offset_control_still_maps_the_same_source (test_multicam_affine_clock.AffineClockPlanTests.test_legacy_constant_offset_control_still_maps_the_same_source) ... ok
+test_modified_clock_coefficient_is_not_silently_accepted (test_multicam_affine_clock.AffineClockPlanTests.test_modified_clock_coefficient_is_not_silently_accepted) ... ok
+test_negative_drift_is_not_misreported_as_missing_source (test_multicam_affine_clock.AffineClockPlanTests.test_negative_drift_is_not_misreported_as_missing_source) ... ok
+test_planning_keeps_original_report_unchanged (test_multicam_affine_clock.AffineClockPlanTests.test_planning_keeps_original_report_unchanged) ... ok
+test_positive_rate_changes_both_source_endpoints_and_clip_speed (test_multicam_affine_clock.AffineClockPlanTests.test_positive_rate_changes_both_source_endpoints_and_clip_speed) ... ok
+test_trim_uses_inverse_native_bounds_and_retains_calibrated_rate (test_multicam_affine_clock.AffineClockPlanTests.test_trim_uses_inverse_native_bounds_and_retains_calibrated_rate) ... ok
+test_unobserved_extrapolation_requires_explicit_choice (test_multicam_affine_clock.AffineClockPlanTests.test_unobserved_extrapolation_requires_explicit_choice) ... ok
+test_declared_drift_must_agree_with_the_actual_rate (test_multicam_affine_clock.ClockModelBindingTests.test_declared_drift_must_agree_with_the_actual_rate) ... FAIL
+test_equal_malformed_digest_strings_are_not_source_evidence (test_multicam_affine_clock.ClockModelBindingTests.test_equal_malformed_digest_strings_are_not_source_evidence) ... 
+  test_equal_malformed_digest_strings_are_not_source_evidence (test_multicam_affine_clock.ClockModelBindingTests.test_equal_malformed_digest_strings_are_not_source_evidence) (value='camera') ... FAIL
+  test_equal_malformed_digest_strings_are_not_source_evidence (test_multicam_affine_clock.ClockModelBindingTests.test_equal_malformed_digest_strings_are_not_source_evidence) (value='sha256:short') ... FAIL
+  test_equal_malformed_digest_strings_are_not_source_evidence (test_multicam_affine_clock.ClockModelBindingTests.test_equal_malformed_digest_strings_are_not_source_evidence) (value='sha512:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa') ... FAIL
+test_inverse_offset_disagreement_remains_a_rejection_control (test_multicam_affine_clock.ClockModelBindingTests.test_inverse_offset_disagreement_remains_a_rejection_control) ... ok
+test_legacy_zero_time_projection_must_agree_with_model_offset (test_multicam_affine_clock.ClockModelBindingTests.test_legacy_zero_time_projection_must_agree_with_model_offset) ... FAIL
+test_missing_null_or_empty_source_identity_cannot_match_itself (test_multicam_affine_clock.ClockModelBindingTests.test_missing_null_or_empty_source_identity_cannot_match_itself) ... 
+  test_missing_null_or_empty_source_identity_cannot_match_itself (test_multicam_affine_clock.ClockModelBindingTests.test_missing_null_or_empty_source_identity_cannot_match_itself) (value=None) ... FAIL
+  test_missing_null_or_empty_source_identity_cannot_match_itself (test_multicam_affine_clock.ClockModelBindingTests.test_missing_null_or_empty_source_identity_cannot_match_itself) (value='') ... FAIL
+  test_missing_null_or_empty_source_identity_cannot_match_itself (test_multicam_affine_clock.ClockModelBindingTests.test_missing_null_or_empty_source_identity_cannot_match_itself) (value='absent') ... FAIL
+test_missing_reference_digest_cannot_match_an_unbound_reference (test_multicam_affine_clock.ClockModelBindingTests.test_missing_reference_digest_cannot_match_an_unbound_reference) ... FAIL
+test_observed_range_cannot_extend_beyond_the_reference_media (test_multicam_affine_clock.ClockModelBindingTests.test_observed_range_cannot_extend_beyond_the_reference_media) ... FAIL
+test_observed_source_range_cannot_exceed_source_media_duration (test_multicam_affine_clock.ClockModelBindingTests.test_observed_source_range_cannot_exceed_source_media_duration) ... FAIL
+
+======================================================================
+FAIL: test_declared_drift_must_agree_with_the_actual_rate (test_multicam_affine_clock.ClockModelBindingTests.test_declared_drift_must_agree_with_the_actual_rate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 267, in test_declared_drift_must_agree_with_the_actual_rate
+    self.refused(self.mutate(lambda sync, model: model.update(drift_ppm=42.)))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 240, in refused
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_equal_malformed_digest_strings_are_not_source_evidence (test_multicam_affine_clock.ClockModelBindingTests.test_equal_malformed_digest_strings_are_not_source_evidence) (value='camera')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 259, in test_equal_malformed_digest_strings_are_not_source_evidence
+    self.refused(self.mutate(change))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 240, in refused
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_equal_malformed_digest_strings_are_not_source_evidence (test_multicam_affine_clock.ClockModelBindingTests.test_equal_malformed_digest_strings_are_not_source_evidence) (value='sha256:short')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 259, in test_equal_malformed_digest_strings_are_not_source_evidence
+    self.refused(self.mutate(change))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 240, in refused
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_equal_malformed_digest_strings_are_not_source_evidence (test_multicam_affine_clock.ClockModelBindingTests.test_equal_malformed_digest_strings_are_not_source_evidence) (value='sha512:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 259, in test_equal_malformed_digest_strings_are_not_source_evidence
+    self.refused(self.mutate(change))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 240, in refused
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_legacy_zero_time_projection_must_agree_with_model_offset (test_multicam_affine_clock.ClockModelBindingTests.test_legacy_zero_time_projection_must_agree_with_model_offset)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 271, in test_legacy_zero_time_projection_must_agree_with_model_offset
+    self.refused(sync)
+    ~~~~~~~~~~~~^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 240, in refused
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_missing_null_or_empty_source_identity_cannot_match_itself (test_multicam_affine_clock.ClockModelBindingTests.test_missing_null_or_empty_source_identity_cannot_match_itself) (value=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 252, in test_missing_null_or_empty_source_identity_cannot_match_itself
+    self.refused(self.mutate(change))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 240, in refused
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_missing_null_or_empty_source_identity_cannot_match_itself (test_multicam_affine_clock.ClockModelBindingTests.test_missing_null_or_empty_source_identity_cannot_match_itself) (value='')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 252, in test_missing_null_or_empty_source_identity_cannot_match_itself
+    self.refused(self.mutate(change))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 240, in refused
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_missing_null_or_empty_source_identity_cannot_match_itself (test_multicam_affine_clock.ClockModelBindingTests.test_missing_null_or_empty_source_identity_cannot_match_itself) (value='absent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 252, in test_missing_null_or_empty_source_identity_cannot_match_itself
+    self.refused(self.mutate(change))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 240, in refused
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_missing_reference_digest_cannot_match_an_unbound_reference (test_multicam_affine_clock.ClockModelBindingTests.test_missing_reference_digest_cannot_match_an_unbound_reference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 264, in test_missing_reference_digest_cannot_match_an_unbound_reference
+    self.refused(self.mutate(change))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 240, in refused
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_observed_range_cannot_extend_beyond_the_reference_media (test_multicam_affine_clock.ClockModelBindingTests.test_observed_range_cannot_extend_beyond_the_reference_media)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 274, in test_observed_range_cannot_extend_beyond_the_reference_media
+    self.refused(self.mutate(lambda sync, model: model['valid_reference_range'].update(end_seconds=301.)))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 240, in refused
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_observed_source_range_cannot_exceed_source_media_duration (test_multicam_affine_clock.ClockModelBindingTests.test_observed_source_range_cannot_exceed_source_media_duration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 278, in test_observed_source_range_cannot_exceed_source_media_duration
+    self.refused(sync)
+    ~~~~~~~~~~~~^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 240, in refused
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+----------------------------------------------------------------------
+Ran 33 tests in 0.386s
+
+FAILED (failures=11)

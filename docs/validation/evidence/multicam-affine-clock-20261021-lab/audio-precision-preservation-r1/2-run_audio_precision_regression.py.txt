@@ -1,0 +1,52 @@
+"""Record a real native resampling regression before/after, without overwriting evidence."""
+import argparse
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+from run_frozen_regression import frozen, sha
+
+ROOT = Path(__file__).resolve().parents[1]
+REL = ROOT / 'docs/validation/evidence/multicam-affine-clock-20261021-lab'
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--phase', required=True, choices=('before', 'after'))
+    args = parser.parse_args()
+    output = REL / ('audio-precision-' + args.phase + '-r1.json')
+    log = output.with_suffix('.log')
+    assert not output.exists() and not log.exists()
+    source = frozen(); assert len(source) == 263
+    bootstrap = ('import sys,unittest;sys.path[:0]=[sys.argv.pop(1),sys.argv.pop(1)];'
+        'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+        'sys.argv=[sys.argv[0],"-v","test_audio_resample_precision"];unittest.main(module=None)')
+    command = [sys.executable,'-E','-B','-X','utf8','-c',bootstrap,str(ROOT/'product/src'),str(ROOT/'product/tests')]
+    temporary = str(ROOT/'product/.runtime/temp')
+    env = dict(os.environ,TEMP=temporary,TMP=temporary,TMPDIR=temporary,PYTHONDONTWRITEBYTECODE='1')
+    record = {'status':'running','phase':args.phase,'started_at_utc':datetime.now(timezone.utc).isoformat(),
+        'command':command,'frozen_before':source,'script_sha256':sha(Path(__file__)),
+        'native_windows':True,'virtualization':False,'network':False,'expected_methods':8}
+    def save(): output.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    save(); output.with_suffix('.script.py.txt').write_bytes(Path(__file__).read_bytes())
+    started = time.monotonic()
+    with log.open('xb') as stream:
+        result = subprocess.run(command,cwd=ROOT,env=env,stdout=stream,stderr=subprocess.STDOUT,
+            creationflags=subprocess.CREATE_NO_WINDOW)
+    text = log.read_text('utf8'); match = re.search(r'Ran (\d+) tests in ([\d.]+)s',text)
+    record.update(exit_code=result.returncode,methods=int(match[1]) if match else None,
+        suite_seconds=float(match[2]) if match else None,failures=len(re.findall(r'^FAIL:',text,re.M)),
+        errors=len(re.findall(r'^ERROR:',text,re.M)),skipped=len(re.findall(r'\.\.\. skipped ',text)),
+        terminal_ok=bool(re.search(r'\bOK\s*$',text)),frozen_after=frozen(),log_sha256=sha(log),
+        finished_at_utc=datetime.now(timezone.utc).isoformat(),wall_seconds=time.monotonic()-started)
+    record['source_unchanged'] = record['frozen_after'] == source
+    record['status'] = 'passed' if (record['terminal_ok'] and result.returncode==0 and record['methods']==8
+        and record['skipped']==0 and record['source_unchanged']) else 'failed'
+    save()
+    print(json.dumps({key:record[key] for key in ('status','phase','methods','suite_seconds','failures','errors','skipped')},ensure_ascii=False))
+    return 0 if (args.phase=='before' and record['source_unchanged'] and record['methods']==8) or record['status']=='passed' else 1
+
+if __name__ == '__main__': raise SystemExit(main())

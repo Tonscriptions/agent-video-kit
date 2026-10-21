@@ -1,0 +1,558 @@
+test_clock_outside_explicit_drift_budget_is_rejected (test_multicam_affine_clock.AffineClockFitTests.test_clock_outside_explicit_drift_budget_is_rejected) ... ERROR
+test_flat_or_too_short_signals_do_not_fall_back_to_offset (test_multicam_affine_clock.AffineClockFitTests.test_flat_or_too_short_signals_do_not_fall_back_to_offset) ... 
+  test_flat_or_too_short_signals_do_not_fall_back_to_offset (test_multicam_affine_clock.AffineClockFitTests.test_flat_or_too_short_signals_do_not_fall_back_to_offset) (size=15000) ... ERROR
+  test_flat_or_too_short_signals_do_not_fall_back_to_offset (test_multicam_affine_clock.AffineClockFitTests.test_flat_or_too_short_signals_do_not_fall_back_to_offset) (size=300) ... ERROR
+test_gain_and_constant_envelope_bias_do_not_change_the_clock (test_multicam_affine_clock.AffineClockFitTests.test_gain_and_constant_envelope_bias_do_not_change_the_clock) ... ERROR
+test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) ... 
+  test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'max_drift_ppm': nan}) ... ERROR
+  test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'max_drift_ppm': True}) ... ERROR
+  test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'max_drift_ppm': 20001.0}) ... ERROR
+  test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'window_seconds': 0.0}) ... ERROR
+  test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'window_seconds': inf}) ... ERROR
+  test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'anchor_count': 2}) ... ERROR
+  test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'anchor_count': 3.5}) ... ERROR
+test_inverse_reconstructs_reference_seconds (test_multicam_affine_clock.AffineClockFitTests.test_inverse_reconstructs_reference_seconds) ... ERROR
+test_negative_drift_and_negative_offset_have_correct_direction (test_multicam_affine_clock.AffineClockFitTests.test_negative_drift_and_negative_offset_have_correct_direction) ... ERROR
+test_one_corrupt_interval_is_rejected_without_moving_clean_events (test_multicam_affine_clock.AffineClockFitTests.test_one_corrupt_interval_is_rejected_without_moving_clean_events) ... ERROR
+test_periodic_ambiguous_audio_cannot_be_applied_as_calibration (test_multicam_affine_clock.AffineClockFitTests.test_periodic_ambiguous_audio_cannot_be_applied_as_calibration) ... ERROR
+test_piecewise_clock_does_not_pass_as_a_single_affine_clock (test_multicam_affine_clock.AffineClockFitTests.test_piecewise_clock_does_not_pass_as_a_single_affine_clock) ... ERROR
+test_positive_thousand_ppm_preserves_start_middle_and_end_events (test_multicam_affine_clock.AffineClockFitTests.test_positive_thousand_ppm_preserves_start_middle_and_end_events) ... ERROR
+test_repeated_fit_is_deterministic_and_does_not_mutate_features (test_multicam_affine_clock.AffineClockFitTests.test_repeated_fit_is_deterministic_and_does_not_mutate_features) ... ERROR
+test_small_hundred_ppm_is_observed_over_ten_minutes (test_multicam_affine_clock.AffineClockFitTests.test_small_hundred_ppm_is_observed_over_ten_minutes) ... ERROR
+test_zero_drift_does_not_invent_rate_correction (test_multicam_affine_clock.AffineClockFitTests.test_zero_drift_does_not_invent_rate_correction) ... ERROR
+test_calibration_for_another_source_or_reference_is_rejected (test_multicam_affine_clock.AffineClockPlanTests.test_calibration_for_another_source_or_reference_is_rejected) ... 
+  test_calibration_for_another_source_or_reference_is_rejected (test_multicam_affine_clock.AffineClockPlanTests.test_calibration_for_another_source_or_reference_is_rejected) (key='source_asset_id') ... FAIL
+  test_calibration_for_another_source_or_reference_is_rejected (test_multicam_affine_clock.AffineClockPlanTests.test_calibration_for_another_source_or_reference_is_rejected) (key='reference_asset_id') ... FAIL
+  test_calibration_for_another_source_or_reference_is_rejected (test_multicam_affine_clock.AffineClockPlanTests.test_calibration_for_another_source_or_reference_is_rejected) (key='source_sha256') ... FAIL
+  test_calibration_for_another_source_or_reference_is_rejected (test_multicam_affine_clock.AffineClockPlanTests.test_calibration_for_another_source_or_reference_is_rejected) (key='reference_sha256') ... FAIL
+test_default_refuses_the_uncovered_calibrated_source_tail (test_multicam_affine_clock.AffineClockPlanTests.test_default_refuses_the_uncovered_calibrated_source_tail) ... FAIL
+test_explicit_extrapolation_keeps_rate_and_records_warning (test_multicam_affine_clock.AffineClockPlanTests.test_explicit_extrapolation_keeps_rate_and_records_warning) ... ERROR
+test_explicit_stretch_still_warns_that_event_sync_is_changed (test_multicam_affine_clock.AffineClockPlanTests.test_explicit_stretch_still_warns_that_event_sync_is_changed) ... ok
+test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest (test_multicam_affine_clock.AffineClockPlanTests.test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest) ... 
+  test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest (test_multicam_affine_clock.AffineClockPlanTests.test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest) (value=True) ... FAIL
+  test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest (test_multicam_affine_clock.AffineClockPlanTests.test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest) (value=0.0) ... FAIL
+  test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest (test_multicam_affine_clock.AffineClockPlanTests.test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest) (value=-1.0) ... FAIL
+  test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest (test_multicam_affine_clock.AffineClockPlanTests.test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest) (value=inf) ... FAIL
+test_legacy_constant_offset_control_still_maps_the_same_source (test_multicam_affine_clock.AffineClockPlanTests.test_legacy_constant_offset_control_still_maps_the_same_source) ... ok
+test_modified_clock_coefficient_is_not_silently_accepted (test_multicam_affine_clock.AffineClockPlanTests.test_modified_clock_coefficient_is_not_silently_accepted) ... FAIL
+test_negative_drift_is_not_misreported_as_missing_source (test_multicam_affine_clock.AffineClockPlanTests.test_negative_drift_is_not_misreported_as_missing_source) ... FAIL
+test_planning_keeps_original_report_unchanged (test_multicam_affine_clock.AffineClockPlanTests.test_planning_keeps_original_report_unchanged) ... ok
+test_positive_rate_changes_both_source_endpoints_and_clip_speed (test_multicam_affine_clock.AffineClockPlanTests.test_positive_rate_changes_both_source_endpoints_and_clip_speed) ... FAIL
+test_trim_uses_inverse_native_bounds_and_retains_calibrated_rate (test_multicam_affine_clock.AffineClockPlanTests.test_trim_uses_inverse_native_bounds_and_retains_calibrated_rate) ... FAIL
+test_unobserved_extrapolation_requires_explicit_choice (test_multicam_affine_clock.AffineClockPlanTests.test_unobserved_extrapolation_requires_explicit_choice) ... FAIL
+
+======================================================================
+ERROR: test_clock_outside_explicit_drift_budget_is_rejected (test_multicam_affine_clock.AffineClockFitTests.test_clock_outside_explicit_drift_budget_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 122, in test_clock_outside_explicit_drift_budget_is_rejected
+    estimate(left, right, max_drift_ppm=5000.)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_flat_or_too_short_signals_do_not_fall_back_to_offset (test_multicam_affine_clock.AffineClockFitTests.test_flat_or_too_short_signals_do_not_fall_back_to_offset) (size=15000)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 117, in test_flat_or_too_short_signals_do_not_fall_back_to_offset
+    estimate(left, right)
+    ~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_flat_or_too_short_signals_do_not_fall_back_to_offset (test_multicam_affine_clock.AffineClockFitTests.test_flat_or_too_short_signals_do_not_fall_back_to_offset) (size=300)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 117, in test_flat_or_too_short_signals_do_not_fall_back_to_offset
+    estimate(left, right)
+    ~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_gain_and_constant_envelope_bias_do_not_change_the_clock (test_multicam_affine_clock.AffineClockFitTests.test_gain_and_constant_envelope_bias_do_not_change_the_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 96, in test_gain_and_constant_envelope_bias_do_not_change_the_clock
+    self.fit(1.001, gain=3.7, bias=.8)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 72, in fit
+    model = estimate(reference, candidate)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'max_drift_ppm': nan})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 138, in test_invalid_finite_and_window_budgets_are_rejected
+    estimate(left, right, **options)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'max_drift_ppm': True})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 138, in test_invalid_finite_and_window_budgets_are_rejected
+    estimate(left, right, **options)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'max_drift_ppm': 20001.0})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 138, in test_invalid_finite_and_window_budgets_are_rejected
+    estimate(left, right, **options)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'window_seconds': 0.0})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 138, in test_invalid_finite_and_window_budgets_are_rejected
+    estimate(left, right, **options)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'window_seconds': inf})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 138, in test_invalid_finite_and_window_budgets_are_rejected
+    estimate(left, right, **options)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'anchor_count': 2})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 138, in test_invalid_finite_and_window_budgets_are_rejected
+    estimate(left, right, **options)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_invalid_finite_and_window_budgets_are_rejected (test_multicam_affine_clock.AffineClockFitTests.test_invalid_finite_and_window_budgets_are_rejected) (options={'anchor_count': 3.5})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 138, in test_invalid_finite_and_window_budgets_are_rejected
+    estimate(left, right, **options)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_inverse_reconstructs_reference_seconds (test_multicam_affine_clock.AffineClockFitTests.test_inverse_reconstructs_reference_seconds)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 103, in test_inverse_reconstructs_reference_seconds
+    model = self.fit(1.001)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 72, in fit
+    model = estimate(reference, candidate)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_negative_drift_and_negative_offset_have_correct_direction (test_multicam_affine_clock.AffineClockFitTests.test_negative_drift_and_negative_offset_have_correct_direction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 87, in test_negative_drift_and_negative_offset_have_correct_direction
+    self.fit(.9982, -.34)
+    ~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 72, in fit
+    model = estimate(reference, candidate)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_one_corrupt_interval_is_rejected_without_moving_clean_events (test_multicam_affine_clock.AffineClockFitTests.test_one_corrupt_interval_is_rejected_without_moving_clean_events)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 99, in test_one_corrupt_interval_is_rejected_without_moving_clean_events
+    model = self.fit(1.001, bad_window=True)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 72, in fit
+    model = estimate(reference, candidate)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_periodic_ambiguous_audio_cannot_be_applied_as_calibration (test_multicam_affine_clock.AffineClockFitTests.test_periodic_ambiguous_audio_cannot_be_applied_as_calibration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 112, in test_periodic_ambiguous_audio_cannot_be_applied_as_calibration
+    estimate(values, values.copy())
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_piecewise_clock_does_not_pass_as_a_single_affine_clock (test_multicam_affine_clock.AffineClockFitTests.test_piecewise_clock_does_not_pass_as_a_single_affine_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 130, in test_piecewise_clock_does_not_pass_as_a_single_affine_clock
+    estimate(left, candidate)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_positive_thousand_ppm_preserves_start_middle_and_end_events (test_multicam_affine_clock.AffineClockFitTests.test_positive_thousand_ppm_preserves_start_middle_and_end_events)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 84, in test_positive_thousand_ppm_preserves_start_middle_and_end_events
+    self.fit(1.001)
+    ~~~~~~~~^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 72, in fit
+    model = estimate(reference, candidate)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_repeated_fit_is_deterministic_and_does_not_mutate_features (test_multicam_affine_clock.AffineClockFitTests.test_repeated_fit_is_deterministic_and_does_not_mutate_features)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 143, in test_repeated_fit_is_deterministic_and_does_not_mutate_features
+    self.assertEqual(estimate(left, right), estimate(left, right))
+                     ~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_small_hundred_ppm_is_observed_over_ten_minutes (test_multicam_affine_clock.AffineClockFitTests.test_small_hundred_ppm_is_observed_over_ten_minutes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 90, in test_small_hundred_ppm_is_observed_over_ten_minutes
+    self.fit(1.0001, .08, seconds=600.)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 72, in fit
+    model = estimate(reference, candidate)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_zero_drift_does_not_invent_rate_correction (test_multicam_affine_clock.AffineClockFitTests.test_zero_drift_does_not_invent_rate_correction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 93, in test_zero_drift_does_not_invent_rate_correction
+    self.fit(1., .6)
+    ~~~~~~~~^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 72, in fit
+    model = estimate(reference, candidate)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 31, in estimate
+    module = importlib.import_module('ai_ad_editor.multicam_clock')
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ai_ad_editor.multicam_clock'
+
+======================================================================
+ERROR: test_explicit_extrapolation_keeps_rate_and_records_warning (test_multicam_affine_clock.AffineClockPlanTests.test_explicit_extrapolation_keeps_rate_and_records_warning)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 183, in test_explicit_extrapolation_keeps_rate_and_records_warning
+    rows, warnings = segments(report(valid=(0., 90.)), allow_clock_extrapolation=True)
+                     ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 64, in segments
+    return build_switch_segments(report() if sync is None else sync,
+        start_seconds=0., end_seconds=300.,
+        switch_plan=[{'start_seconds': left, 'end_seconds': right, 'camera_asset_id': 'camera'}], **options)
+TypeError: build_switch_segments() got an unexpected keyword argument 'allow_clock_extrapolation'
+
+======================================================================
+FAIL: test_calibration_for_another_source_or_reference_is_rejected (test_multicam_affine_clock.AffineClockPlanTests.test_calibration_for_another_source_or_reference_is_rejected) (key='source_asset_id')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 200, in test_calibration_for_another_source_or_reference_is_rejected
+    with self.subTest(key=key), self.assertRaises(AppError):
+                                ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_calibration_for_another_source_or_reference_is_rejected (test_multicam_affine_clock.AffineClockPlanTests.test_calibration_for_another_source_or_reference_is_rejected) (key='reference_asset_id')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 200, in test_calibration_for_another_source_or_reference_is_rejected
+    with self.subTest(key=key), self.assertRaises(AppError):
+                                ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_calibration_for_another_source_or_reference_is_rejected (test_multicam_affine_clock.AffineClockPlanTests.test_calibration_for_another_source_or_reference_is_rejected) (key='source_sha256')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 200, in test_calibration_for_another_source_or_reference_is_rejected
+    with self.subTest(key=key), self.assertRaises(AppError):
+                                ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_calibration_for_another_source_or_reference_is_rejected (test_multicam_affine_clock.AffineClockPlanTests.test_calibration_for_another_source_or_reference_is_rejected) (key='reference_sha256')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 200, in test_calibration_for_another_source_or_reference_is_rejected
+    with self.subTest(key=key), self.assertRaises(AppError):
+                                ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_default_refuses_the_uncovered_calibrated_source_tail (test_multicam_affine_clock.AffineClockPlanTests.test_default_refuses_the_uncovered_calibrated_source_tail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 167, in test_default_refuses_the_uncovered_calibrated_source_tail
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest (test_multicam_affine_clock.AffineClockPlanTests.test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest) (value=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 211, in test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest
+    with self.subTest(value=value), self.assertRaises(AppError):
+                                    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest (test_multicam_affine_clock.AffineClockPlanTests.test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest) (value=0.0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 211, in test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest
+    with self.subTest(value=value), self.assertRaises(AppError):
+                                    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest (test_multicam_affine_clock.AffineClockPlanTests.test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest) (value=-1.0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 211, in test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest
+    with self.subTest(value=value), self.assertRaises(AppError):
+                                    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest (test_multicam_affine_clock.AffineClockPlanTests.test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest) (value=inf)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 211, in test_invalid_rate_and_inverse_are_rejected_even_with_matching_digest
+    with self.subTest(value=value), self.assertRaises(AppError):
+                                    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_modified_clock_coefficient_is_not_silently_accepted (test_multicam_affine_clock.AffineClockPlanTests.test_modified_clock_coefficient_is_not_silently_accepted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 190, in test_modified_clock_coefficient_is_not_silently_accepted
+    with self.assertRaises(AppError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+======================================================================
+FAIL: test_negative_drift_is_not_misreported_as_missing_source (test_multicam_affine_clock.AffineClockPlanTests.test_negative_drift_is_not_misreported_as_missing_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 156, in test_negative_drift_is_not_misreported_as_missing_source
+    self.assertEqual(rows[0]['speed'], .99)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1.0 != 0.99
+
+======================================================================
+FAIL: test_positive_rate_changes_both_source_endpoints_and_clip_speed (test_multicam_affine_clock.AffineClockPlanTests.test_positive_rate_changes_both_source_endpoints_and_clip_speed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 151, in test_positive_rate_changes_both_source_endpoints_and_clip_speed
+    self.assertEqual((rows[0]['source_in_seconds'], rows[0]['source_out_seconds']), (101.2, 111.3))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (100.2, 110.2) != (101.2, 111.3)
+
+First differing element 0:
+100.2
+101.2
+
+- (100.2, 110.2)
+?    ^      ^ ^
+
++ (101.2, 111.3)
+?    ^      ^ ^
+
+
+======================================================================
+FAIL: test_trim_uses_inverse_native_bounds_and_retains_calibrated_rate (test_multicam_affine_clock.AffineClockPlanTests.test_trim_uses_inverse_native_bounds_and_retains_calibrated_rate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 163, in test_trim_uses_inverse_native_bounds_and_retains_calibrated_rate
+    self.assertEqual((row['timeline_start_seconds'], row['duration_seconds']), (7., 7.))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7.02, 7.07) != (7.0, 7.0)
+
+First differing element 0:
+7.02
+7.0
+
+- (7.02, 7.07)
+?     -     -
+
++ (7.0, 7.0)
+
+======================================================================
+FAIL: test_unobserved_extrapolation_requires_explicit_choice (test_multicam_affine_clock.AffineClockPlanTests.test_unobserved_extrapolation_requires_explicit_choice)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_multicam_affine_clock.py", line 178, in test_unobserved_extrapolation_requires_explicit_choice
+    with self.assertRaises(AppError) as caught:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: AppError not raised
+
+----------------------------------------------------------------------
+Ran 25 tests in 0.102s
+
+FAILED (failures=14, errors=21)

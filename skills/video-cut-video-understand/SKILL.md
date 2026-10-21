@@ -3,6 +3,16 @@ name: video-cut-video-understand
 description: Understand local video and audio with native FFmpeg analysis, explicitly registered offline OCR or ASR, frame evidence, silence, scene and beat candidates.
 ---
 
+<!-- V90-MULTICAM-AFFINE-CLOCK -->
+When capabilities advertise media.multicam_clock / multicam-affine-clock-v1, use media multicam --clock-model affine explicitly for bounded device clock-rate calibration. Default offset stays constant-delay mode.
+Inspect source = offset_seconds + source_per_reference * reference, matched anchors, ambiguity, residuals, observed interval and asset SHA bindings. Do not fabricate a successful model or fall back silently after rejected calibration.
+Use --dry-run first when applying a switch plan. Keep source rates and inverse coverage; trim leaves real gaps, stretch changes sync and warns. Observed-interval extrapolation requires --allow-clock-extrapolation and retains its warning. Author master audio explicitly.
+The analysis prefix is bounded to 600 seconds, with 3–31 anchors, 4–60 second windows and at most 20000 ppm (default 5000). It does not implement nonlinear/discontinuous drift or acoustic-room quality acceptance.
+Read the [affine clock contract](../../docs/specs/多机位仿射时钟与漂移校准_v0.1_2026-10-21.md) and [independent native/isolated report](../../docs/validation/多机位仿射时钟与浮点音频实测_2026-10-21.md).
+Scalar render source normalization is floating point before author selection; do not introduce intermediate s16 quantization. Preserve native leading gaps and keep async resampling drift correction disabled.
+The 590-second synthetic event interval and three short output windows are not complete long-form, natural/HDR/RSS, listening or full CapCut parity acceptance. Native frame-coverage identity is not identical event counters at differing camera sample phases.
+<!-- /V90-MULTICAM-AFFINE-CLOCK -->
+
 <!-- V89-OFFLINE-MEDIA-PROFILE -->
 <!-- OFFLINE-MEDIA-PROFILE-LAB-20261021 -->
 Multicam analysis can use NumPy from the actual offline bundle. Development-time source acquisition, offline build/install, model registration and media inference are separate steps; analysis must not download missing dependencies or model weights.
@@ -21,7 +31,7 @@ For multicam 0.4.0, source_time = reference_time + relative_delay_seconds includ
 The native PCM acceptance uses demux-relative input timestamps with aresample first_pts=0 before source selection. Async clock-drift correction is disabled. Zero-origin audio and equal nonzero container/audio origins must not gain false silence.
 Read the [source audio clock contract](../../docs/specs/原生音频起点与作者采样时钟_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生音频起点与同步实测_2026-10-21.md).
 The real two-case sample covers container origins 0/5 seconds and audio starts 1/6 seconds, each a one-second relative gap. Source-normalized audio and offset-applied camera cuts are checked separately. R3 input/output frame and silence controls do not establish listening, pitch or stereo-phase quality.
-Compressed-codec priming, negative timestamps/edit lists, internal timestamp discontinuities, device drift, natural recordings, long-form/RSS, continuous playback and listening still need acceptance.
+Compressed-codec priming, negative timestamps/edit lists, internal timestamp discontinuities, nonlinear/discontinuous device drift, natural recordings, long-form/RSS, continuous playback and listening still need acceptance.
 The current media-analysis-v1 profile ships eight pinned offline wheels, including NumPy 2.4.2. Earlier font-text-v1 experiments used an explicit local NumPy copy; those historical receipts do not establish the current profile. Verify the current bundle manifest, native-operation audit and module origins before use.
 
 <!-- /NATIVE-AUDIO-SOURCE-ORIGIN-LAB-20261021 -->
@@ -36,7 +46,7 @@ Default shortfall policy rejects. Explicit trim leaves gaps at original referenc
 Dry-run reads existing verified native indices without writing caches, reports, snapshots or authored files. A hit reports zero source-frame probes but still reads hashes. Corrupt indices or changed source SHA reject; do not silently repair them or convert integrity errors into successful audio-only analysis.
 Read the [native coverage contract](../../docs/specs/多机位原生帧覆盖与只读索引契约_v0.1_2026-10-21.md) and [fresh native/isolated evidence](../../docs/validation/多机位原生视频覆盖实测_2026-10-21.md).
 The base seven-wheel installer does not ship NumPy. This experiment explicitly copies the existing local NumPy 2.4.2 distribution with RECORD hashes and licenses; it is not automatic dependency installation.
-Unknown-EOF audio-analysis controls include simulated video state. Native PCM source-leading gaps and nonzero container origins use the separately advertised source_audio_clock contract. Compressed priming/edit lists, clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.
+Unknown-EOF audio-analysis controls include simulated video state. Native PCM source-leading gaps and nonzero container origins use the separately advertised source_audio_clock contract. Compressed priming/edit lists, nonlinear/discontinuous clock drift, natural multicamera quality, HDR, long-form/RSS, continuous playback and listening remain separate acceptance work.
 
 <!-- /MULTICAM-NATIVE-STREAM-COVERAGE-LAB-20261021 -->
 <!-- /V87-MULTICAM-NATIVE-STREAM-COVERAGE -->
@@ -44,7 +54,7 @@ Unknown-EOF audio-analysis controls include simulated video state. Native PCM so
 
 <!-- V86-MULTICAM-SOURCE-COVERAGE -->
 <!-- MULTICAM-SOURCE-COVERAGE-LAB-20261021 -->
-Interpret relative_delay_seconds as source_time = reference_time + delay. The 50 Hz envelope estimates one offset; it does not estimate clock drift or choose semantic shots.
+Interpret relative_delay_seconds as source_time = reference_time + delay. The default offset mode estimates one constant delay. Explicit advertised affine mode estimates a bounded clock rate; neither mode chooses semantic shots.
 When multicam_source_coverage is advertised, coverage shortfall defaults to reject. Explicit --source-shortfall trim intersects source coverage and leaves gaps; stretch clamps or slows and warns that event sync changes.
 Completely disjoint coverage, locked apply targets and sub-tick segments reject. Dry-run performs audio analysis but writes no report or authored project.
 Read the [coverage contract](../../docs/specs/多机位源覆盖与显式缺口策略_v0.1_2026-10-21.md) and [real native/isolated evidence](../../docs/validation/多机位源覆盖与原速同步实测_2026-10-21.md).

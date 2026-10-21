@@ -1,0 +1,125 @@
+test_44k_stereo_reverse_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_44k_stereo_reverse_keeps_float_precision) ... ERROR
+test_44k_stereo_selected_window_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_44k_stereo_selected_window_keeps_float_precision) ... ERROR
+test_8k_mono_complete_stream_keeps_fractional_resampler_samples (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_complete_stream_keeps_fractional_resampler_samples) ... ERROR
+test_8k_mono_nested_window_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_nested_window_keeps_float_precision) ... ERROR
+test_8k_mono_reverse_keeps_float_precision_and_sample_order (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_reverse_keeps_float_precision_and_sample_order) ... ERROR
+test_8k_mono_selected_window_uses_whole_stream_float_samples (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_selected_window_uses_whole_stream_float_samples) ... ERROR
+test_identity_curve_remains_consistent_with_float_reference (test_audio_resample_precision.AudioResamplePrecisionTests.test_identity_curve_remains_consistent_with_float_reference) ... ERROR
+test_native_48k_float_control_stays_sample_exact (test_audio_resample_precision.AudioResamplePrecisionTests.test_native_48k_float_control_stays_sample_exact) ... ERROR
+
+======================================================================
+ERROR: test_44k_stereo_reverse_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_44k_stereo_reverse_keeps_float_precision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 122, in test_44k_stereo_reverse_keeps_float_precision
+    self.compare('stereo44k', reverse=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 90, in compare
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\src\ai_ad_editor\render.py", line 4574, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_44k_stereo_selected_window_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_44k_stereo_selected_window_keeps_float_precision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 119, in test_44k_stereo_selected_window_keeps_float_precision
+    self.compare('stereo44k')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 90, in compare
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\src\ai_ad_editor\render.py", line 4574, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_8k_mono_complete_stream_keeps_fractional_resampler_samples (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_complete_stream_keeps_fractional_resampler_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 107, in test_8k_mono_complete_stream_keeps_fractional_resampler_samples
+    self.compare('mono8k', selected=False)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 90, in compare
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\src\ai_ad_editor\render.py", line 4574, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_8k_mono_nested_window_keeps_float_precision (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_nested_window_keeps_float_precision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 116, in test_8k_mono_nested_window_keeps_float_precision
+    self.compare('mono8k', nested=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 90, in compare
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\src\ai_ad_editor\render.py", line 4574, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_8k_mono_reverse_keeps_float_precision_and_sample_order (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_reverse_keeps_float_precision_and_sample_order)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 113, in test_8k_mono_reverse_keeps_float_precision_and_sample_order
+    self.compare('mono8k', reverse=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 90, in compare
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\src\ai_ad_editor\render.py", line 4574, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_8k_mono_selected_window_uses_whole_stream_float_samples (test_audio_resample_precision.AudioResamplePrecisionTests.test_8k_mono_selected_window_uses_whole_stream_float_samples)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 110, in test_8k_mono_selected_window_uses_whole_stream_float_samples
+    self.compare('mono8k')
+    ~~~~~~~~~~~~^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 90, in compare
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\src\ai_ad_editor\render.py", line 4574, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_identity_curve_remains_consistent_with_float_reference (test_audio_resample_precision.AudioResamplePrecisionTests.test_identity_curve_remains_consistent_with_float_reference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 125, in test_identity_curve_remains_consistent_with_float_reference
+    self.compare('mono8k', selected=False, curve=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 90, in compare
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\src\ai_ad_editor\render.py", line 4574, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+ERROR: test_native_48k_float_control_stays_sample_exact (test_audio_resample_precision.AudioResamplePrecisionTests.test_native_48k_float_control_stays_sample_exact)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 128, in test_native_48k_float_control_stays_sample_exact
+    self.compare('float48k')
+    ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\tests\test_audio_resample_precision.py", line 90, in compare
+    inputs, graph, _, _ = build_filter_graph(self.root, project, sequence)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\multicam-affine-clock-lab-20261021\product\src\ai_ad_editor\render.py", line 4574, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+----------------------------------------------------------------------
+Ran 8 tests in 4.775s
+
+FAILED (errors=8)

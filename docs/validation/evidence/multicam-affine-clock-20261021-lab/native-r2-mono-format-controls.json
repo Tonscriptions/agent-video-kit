@@ -1,0 +1,69 @@
+{
+  "status": "measured-mono-resample-format-controls",
+  "variants": [
+    {
+      "format": "s16",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-affine-clock-lab-20261021\\docs\\assets\\multicam-affine-clock-20261021-lab\\native-r2\\source-reference.mkv",
+        "-filter_complex",
+        "[0:a]aresample=48000:first_pts=0:osf=s16:ochl=mono,aformat=sample_fmts=s16:sample_rates=48000:channel_layouts=mono,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo,asplit=3[x0][x1][x2];[x0]atrim=start_sample=0:end_sample=192000,asetpts=PTS-STARTPTS[a0];[x1]atrim=start_sample=14160000:end_sample=14352000,asetpts=PTS-STARTPTS[a1];[x2]atrim=start_sample=28128000:end_sample=28320000,asetpts=PTS-STARTPTS[a2];[a0][a1][a2]concat=n=3:v=0:a=1[a]",
+        "-map",
+        "[a]",
+        "-f",
+        "f32le",
+        "pipe:1"
+      ],
+      "exact_equal": true,
+      "maximum_delta": 0.0,
+      "unequal_samples": 0,
+      "sha256": "sha256:ee4e887b6114ae92eea04d38ad26ae98fe75a95d69cb33c177a45ecee5e279ca"
+    },
+    {
+      "format": "flt",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-affine-clock-lab-20261021\\docs\\assets\\multicam-affine-clock-20261021-lab\\native-r2\\source-reference.mkv",
+        "-filter_complex",
+        "[0:a]aresample=48000:first_pts=0:osf=flt:ochl=mono,aformat=sample_fmts=flt:sample_rates=48000:channel_layouts=mono,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo,asplit=3[x0][x1][x2];[x0]atrim=start_sample=0:end_sample=192000,asetpts=PTS-STARTPTS[a0];[x1]atrim=start_sample=14160000:end_sample=14352000,asetpts=PTS-STARTPTS[a1];[x2]atrim=start_sample=28128000:end_sample=28320000,asetpts=PTS-STARTPTS[a2];[a0][a1][a2]concat=n=3:v=0:a=1[a]",
+        "-map",
+        "[a]",
+        "-f",
+        "f32le",
+        "pipe:1"
+      ],
+      "exact_equal": false,
+      "maximum_delta": 1.0818243026733398e-05,
+      "unequal_samples": 959244,
+      "sha256": "sha256:56c53f65ff9f477e8e26ab49864d580606af0a03f3632deaf5e9f4d7bd55ba12"
+    },
+    {
+      "format": "dbl",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\multicam-affine-clock-lab-20261021\\docs\\assets\\multicam-affine-clock-20261021-lab\\native-r2\\source-reference.mkv",
+        "-filter_complex",
+        "[0:a]aresample=48000:first_pts=0:osf=dbl:ochl=mono,aformat=sample_fmts=dbl:sample_rates=48000:channel_layouts=mono,aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo,asplit=3[x0][x1][x2];[x0]atrim=start_sample=0:end_sample=192000,asetpts=PTS-STARTPTS[a0];[x1]atrim=start_sample=14160000:end_sample=14352000,asetpts=PTS-STARTPTS[a1];[x2]atrim=start_sample=28128000:end_sample=28320000,asetpts=PTS-STARTPTS[a2];[a0][a1][a2]concat=n=3:v=0:a=1[a]",
+        "-map",
+        "[a]",
+        "-f",
+        "f32le",
+        "pipe:1"
+      ],
+      "exact_equal": false,
+      "maximum_delta": 1.0818243026733398e-05,
+      "unequal_samples": 999202,
+      "sha256": "sha256:ae02bcf173296468b67bffb3604f2bd0d8574f8af6ad2369d4679ff0d3998305"
+    }
+  ],
+  "product_changed": false
+}

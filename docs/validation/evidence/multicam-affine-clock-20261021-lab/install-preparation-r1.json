@@ -1,0 +1,60 @@
+{
+  "status": "prepared",
+  "parent_script": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\offline-media-profile-lab-20261021\\scripts\\verify_media_profile_install.py",
+  "parent_sha256": "sha256:f034d2566b28e2039deb153bc9290b1ec159412e813d53c04742687f52ef5bb3",
+  "output": "scripts/verify_multicam_affine_install.py",
+  "output_sha256": "sha256:d59074a7d478634a9ace8e368b242abe349676bbf6dfbfde5606c3bee2a939ee",
+  "exact_changes": [
+    {
+      "before": "\"\"\"Eight-wheel offline runtime, native NumPy and fresh audio-origin media proof.\"\"\"",
+      "after": "\"\"\"Eight-wheel isolated affine clock, float PCM and fresh camera-switch media proof.\"\"\"",
+      "occurrences": 1
+    },
+    {
+      "before": "check('all-161-source-wheel-installed-resources-byte-equal',source==shipped==actual and len(source)==161,",
+      "after": "check('all-162-source-wheel-installed-resources-byte-equal',source==shipped==actual and len(source)==162,",
+      "occurrences": 1
+    },
+    {
+      "before": "'PIL.Image','ai_ad_editor.multicam','numpy'",
+      "after": "'PIL.Image','ai_ad_editor.multicam','ai_ad_editor.multicam_clock','numpy'",
+      "occurrences": 1
+    },
+    {
+      "before": "run('installed-audio-source-origin',[sys.executable,'-E','-B','-X','utf8',ROOT/'scripts/smoke_audio_source_origin.py',",
+      "after": "run('installed-multicam-affine',[sys.executable,'-E','-B','-X','utf8',ROOT/'scripts/smoke_multicam_affine_clock.py',",
+      "occurrences": 1
+    },
+    {
+      "before": "'--work',work/'media','--evidence',evidence/'media','--assets',args.assets.resolve(),'--installed',installed])",
+      "after": "'--work',work/'media','--evidence',evidence/'media','--assets',args.assets.resolve(),'--installed',installed,\n            '--reuse-sources',args.development.resolve().with_name('source-manifest.json')])",
+      "occurrences": 1
+    },
+    {
+      "before": "'both-installed-audio-origin-cases-match-independent-RGBA-and-PCM'",
+      "after": "'both-installed-affine-cases-match-independent-frame-and-PCM-oracles'",
+      "occurrences": 1
+    },
+    {
+      "before": "coverage['version']=='0.4.0'",
+      "after": "coverage['version']=='0.5.0'",
+      "occurrences": 1
+    },
+    {
+      "before": "set(media['cases'])=={'native','offset'}",
+      "after": "set(media['cases'])=={'positive','small-negative'}",
+      "occurrences": 1
+    },
+    {
+      "before": "record['fresh_media']={'source_coverage_version':'0.4.0','reused_parent_media':False,",
+      "after": "record['fresh_media']={'source_coverage_version':'0.5.0','reused_parent_media':False,'reused_original_source_inputs':True,",
+      "occurrences": 1
+    },
+    {
+      "before": "record.update(status='passed',isolated_cli_calls=media['cli_calls']+3,module_origin_probes=1,",
+      "after": "clock=capabilities['data']['capabilities']['multicam_clock']\n        check('isolated-affine-clock-discovery',clock['protocol']=='multicam-affine-clock-v1')\n        unit_bootstrap=('import sys,unittest;sys.path[:0]=[sys.argv.pop(1),sys.argv.pop(1)];'\n            'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'\n            'sys.argv=[sys.argv[0],\"-v\",\"test_multicam_affine_clock\",\"test_audio_resample_precision\"];'\n            'unittest.main(module=None)')\n        unit_output=run('isolated-41-affine-and-PCM-methods',[sys.executable,'-I','-S','-B','-X','utf8','-c',\n            unit_bootstrap,installed/'site',ROOT/'product/tests'])\n        unit_log=(evidence/'isolated-41-affine-and-PCM-methods.stderr.log').read_text('utf8')\n        import re\n        match=re.search(r'Ran (\\d+) tests in ([\\d.]+)s',unit_log)\n        check('isolated-41-methods-terminal-OK',match is not None and int(match[1])==41\n            and re.search(r'\\bOK\\s*$',unit_log) is not None and '... skipped ' not in unit_log)\n        record['isolated_methods']={'methods':41,'suite_seconds':float(match[2]),'skipped':0,\n            'log_sha256':sha(evidence/'isolated-41-affine-and-PCM-methods.stderr.log')}\n        record.update(status='passed',isolated_cli_calls=media['cli_calls']+3,module_origin_probes=1,",
+      "occurrences": 1
+    }
+  ],
+  "installed_executed": false
+}

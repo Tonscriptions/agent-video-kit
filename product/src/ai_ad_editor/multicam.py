@@ -19,7 +19,7 @@ from .media import ffmpeg_path, probe_media
 from .utils import new_id, sha256_file
 
 
-MULTICAM_SYNC_VERSION = "0.4.0"
+MULTICAM_SYNC_VERSION = "0.5.0"
 FEATURE_RATE_HZ = 50
 
 
@@ -226,11 +226,21 @@ def synchronize_multicam_sources(
     sample_rate: int = 8000,
     analysis_seconds: float = 120.0,
     max_offset_seconds: float = 30.0,
+    clock_model: str = "offset",
+    max_drift_ppm: float = 5000.0,
+    drift_window_seconds: float = 12.0,
+    drift_anchors: int = 9,
     project_root: Path | None = None,
 ) -> dict[str, Any]:
     """Analyze a set of local project assets and return auditable offsets."""
     if len(sources) < 2:
         raise argument_error("多机位同步至少需要两个源素材", "source_asset_id")
+    if clock_model not in {"offset", "affine"}:
+        raise argument_error("clock_model 必须为 offset 或 affine", "clock_model")
+    if clock_model == "affine":
+        from .multicam_clock import validate_affine_options
+        validate_affine_options(max_offset_seconds=max_offset_seconds, max_drift_ppm=max_drift_ppm,
+                                window_seconds=drift_window_seconds, anchor_count=drift_anchors)
     normalized: list[dict[str, Any]] = []
     seen: set[str] = set()
     for index, item in enumerate(sources):
@@ -256,11 +266,26 @@ def synchronize_multicam_sources(
             offsets.append({"asset_id": reference_id, "reference_asset_id": reference_id, "relative_delay_seconds": 0.0, "correction_seconds": 0.0, "lag_frames": 0, "score": 1.0, "overlap_seconds": round(reference_feature.size / FEATURE_RATE_HZ, 6), "status": "reference", "evidence": evidence})
             continue
         candidate_feature, candidate_evidence = _extract_envelope(item["path"], sample_rate=sample_rate, max_seconds=analysis_seconds, project_root=project_root)
-        alignment = estimate_audio_offset(reference_feature, candidate_feature, max_offset_seconds=max_offset_seconds)
+        if clock_model == "affine":
+            from .multicam_clock import estimate_affine_clock, seal_clock
+            model = estimate_affine_clock(reference_feature, candidate_feature,
+                max_offset_seconds=max_offset_seconds, max_drift_ppm=max_drift_ppm,
+                window_seconds=drift_window_seconds, anchor_count=drift_anchors)
+            model = seal_clock({**model, "source_asset_id": item["asset_id"], "reference_asset_id": reference_id,
+                                "source_sha256": candidate_evidence["sha256"], "reference_sha256": reference_evidence["sha256"]})
+            delay = model["offset_seconds"]
+            bounds = model["valid_reference_range"]
+            alignment = {"relative_delay_seconds": delay, "correction_seconds": round(-delay, 9),
+                "lag_frames": int(round(-delay * FEATURE_RATE_HZ)),
+                "score": min(row["score"] for row in model["anchors"] if row["accepted"]),
+                "overlap_seconds": round(bounds["end_seconds"] - bounds["start_seconds"], 9),
+                "score_contract": "affine-window-pearson-v1", "status": "ok", "clock_model": model}
+        else:
+            alignment = estimate_audio_offset(reference_feature, candidate_feature, max_offset_seconds=max_offset_seconds)
         offsets.append({"asset_id": item["asset_id"], "reference_asset_id": reference_id, **alignment, "evidence": {**candidate_evidence, "asset_id": item["asset_id"]}})
     return {
         "sync_version": MULTICAM_SYNC_VERSION,
-        "engine": "ffmpeg-local-audio-envelope-xcorr-v1",
+        "engine": "ffmpeg-local-audio-envelope-affine-v1" if clock_model == "affine" else "ffmpeg-local-audio-envelope-xcorr-v1",
         "network": "disabled",
         "reference_asset_id": reference_id,
         "parameters": {
@@ -268,6 +293,10 @@ def synchronize_multicam_sources(
             "feature_rate_hz": FEATURE_RATE_HZ,
             "analysis_seconds": round(float(analysis_seconds), 6),
             "max_offset_seconds": round(float(max_offset_seconds), 6),
+            "clock_model": clock_model,
+            "max_drift_ppm": max_drift_ppm,
+            "drift_window_seconds": drift_window_seconds,
+            "drift_anchors": drift_anchors,
         },
         "sources": [{"asset_id": item["asset_id"], "path": str(item["path"])} for item in normalized],
         "offsets": offsets,
@@ -290,10 +319,13 @@ def build_switch_segments(
     end_seconds: float | None = None,
     timeline_start_seconds: float = 0.0,
     source_shortfall: str = "reject",
+    allow_clock_extrapolation: bool = False,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Build source-bounded angle clips from a fixed cadence or explicit plan."""
     if source_shortfall not in {"reject", "trim", "stretch"}:
         raise argument_error("source_shortfall 必须为 reject、trim 或 stretch", "source_shortfall")
+    if not isinstance(allow_clock_extrapolation, bool):
+        raise argument_error("allow_clock_extrapolation 必须为 bool", "allow_clock_extrapolation")
     offsets = {str(item.get("asset_id")): item for item in sync.get("offsets", []) if isinstance(item, dict)}
     sources = [str(item.get("asset_id")) for item in sync.get("sources", []) if isinstance(item, dict)]
     if not sources:
@@ -343,6 +375,11 @@ def build_switch_segments(
             raise argument_error("switch_plan 的切换段不能重叠", f"switch_plan[{index}]")
         alignment = offsets[asset_id]
         relative_delay = _finite(alignment.get("relative_delay_seconds"), 0.0)
+        from .multicam_clock import clock_for_alignment
+        clock = clock_for_alignment(sync, alignment, asset_id)
+        clock_rate = 1.0
+        if clock is not None:
+            clock_rate, relative_delay, observed_start, observed_end = clock
         evidence = alignment.get("evidence", {})
         native_coverage = evidence.get('video_coverage')
         if native_coverage is None:
@@ -362,24 +399,32 @@ def build_switch_segments(
             except (KeyError, TypeError, ValueError, OverflowError) as exc:
                 raise AppError('MULTICAM_VIDEO_COVERAGE_UNKNOWN', f'机位 {asset_id} 原生视频覆盖证据无效', exit_code=2) from exc
         requested_left, requested_right = left, right
-        covered_left = max(left, source_left - relative_delay)
-        covered_right = min(right, source_duration - relative_delay)
+        covered_left = max(left, (source_left - relative_delay) / clock_rate)
+        covered_right = min(right, (source_duration - relative_delay) / clock_rate)
         if covered_right <= covered_left:
             raise AppError("MULTICAM_SOURCE_RANGE_EMPTY", f"机位 {asset_id} 无法覆盖切换段", exit_code=2, path=f"switch_plan[{index}]")
-        shortfall = left + relative_delay < source_left - 1e-9 or right + relative_delay > source_duration + 1e-9
+        shortfall = left * clock_rate + relative_delay < source_left - 1e-9 or right * clock_rate + relative_delay > source_duration + 1e-9
         coverage = "complete"
         if shortfall and source_shortfall == "reject":
             raise AppError("MULTICAM_SOURCE_SHORTFALL", f"机位 {asset_id} 未完整覆盖切换段；请缩小选区，或显式选择 --source-shortfall trim|stretch", exit_code=2, path=f"switch_plan[{index}]")
         if shortfall and source_shortfall == "trim":
             left, right = covered_left, covered_right
             coverage = "trimmed"
-            warnings.append({"code": "MULTICAM_SOURCE_TRIMMED", "message": f"机位 {asset_id} 仅保留有覆盖的原速同步区间，缺失部分留空", "asset_id": asset_id,
+            warnings.append({"code": "MULTICAM_SOURCE_TRIMMED", "message": f"机位 {asset_id} 仅保留有覆盖的校准同步区间，缺失部分留空", "asset_id": asset_id,
                              "requested_start_seconds": round(requested_left, 6), "requested_end_seconds": round(requested_right, 6),
                              "covered_start_seconds": round(left, 6), "covered_end_seconds": round(right, 6)})
         elif shortfall:
             coverage = "stretched"
             warnings.append({"code": "MULTICAM_SOURCE_CLOCK_CHANGED", "message": f"机位 {asset_id} 显式填充缺失覆盖；钳制或慢放将改变与参考机位的事件同步", "asset_id": asset_id})
-        source_start = left + relative_delay
+        if clock is not None and (left < observed_start - 1e-9 or right > observed_end + 1e-9):
+            if not allow_clock_extrapolation:
+                raise AppError("MULTICAM_CLOCK_EXTRAPOLATION", "切换段超出被观察的时钟校准范围；扩展分析范围或显式允许外推", exit_code=2, path=f"switch_plan[{index}]")
+            warnings.append({"code": "MULTICAM_CLOCK_EXTRAPOLATION", "asset_id": asset_id,
+                "message": "显式允许在观测范围外外推机位时钟，需独立核验事件同步",
+                "observed_start_seconds": observed_start, "observed_end_seconds": observed_end,
+                "requested_start_seconds": left, "requested_end_seconds": right,
+                "before_seconds": max(0., observed_start - left), "after_seconds": max(0., right - observed_end)})
+        source_start = left * clock_rate + relative_delay
         if source_start < source_left - 1e-9:
             warnings.append({"code": "MULTICAM_SOURCE_CLAMPED", "message": f"机位 {asset_id} 的源起点早于视频覆盖起点，已钳制", "asset_id": asset_id, "seconds": round(source_start, 6), 'video_start_seconds': source_left})
             source_start = source_left
@@ -388,9 +433,9 @@ def build_switch_segments(
         requested = right - left
         if available <= 0:
             raise AppError("MULTICAM_SOURCE_RANGE_EMPTY", f"机位 {asset_id} 无法覆盖切换段", exit_code=2, path=f"switch_plan[{index}]")
-        source_span = min(requested, available)
+        source_span = min(requested * clock_rate, available)
         speed = source_span / requested
-        if speed < 0.999999:
+        if speed < clock_rate * 0.999999:
             warnings.append({"code": "MULTICAM_SOURCE_SLOWED", "message": f"机位 {asset_id} 可用源范围不足，使用 speed={speed:.6f} 填满切换段", "asset_id": asset_id, "speed": round(speed, 6)})
         segments.append({
             "index": index,
@@ -408,7 +453,10 @@ def build_switch_segments(
             "duration_seconds": round(requested, 6),
             "source_in_seconds": round(source_start, 6),
             "source_out_seconds": round(source_start + source_span, 6),
-            "speed": round(speed, 6),
+            "speed": round(speed, 12),
+            "source_clock": "affine" if clock is not None else "offset",
+            "source_per_reference": clock_rate,
+            "clock_calibration_sha256": alignment["clock_model"]["calibration_sha256"] if clock is not None else None,
         })
         cursor = requested_right
     if segments and cursor < end - 1e-6:

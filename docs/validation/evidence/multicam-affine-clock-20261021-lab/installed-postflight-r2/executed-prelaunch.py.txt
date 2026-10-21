@@ -1,0 +1,76 @@
+"""Complete isolated checks after a verifier-only capability-path error; retain its failure."""
+from datetime import datetime,timezone
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+from run_frozen_regression import frozen,sha
+ROOT=Path(__file__).resolve().parents[1]
+REL=ROOT/'docs/validation/evidence/multicam-affine-clock-20261021-lab'
+BASE=REL/'installed-r1'
+OUT=REL/'installed-postflight-r2';assert not OUT.exists();OUT.mkdir()
+read=lambda p:json.loads(Path(p).read_bytes())
+old=read(BASE/'verification.json')
+assert old['status']=='failed' and 'multicam_clock' in old['error']
+current=frozen();assert len(current)==263 and current==old['frozen_before']==old['frozen_after']
+record={'status':'running','started_at_utc':datetime.now(timezone.utc).isoformat(),
+    'previous_wrapper_status':old['status'],'previous_wrapper_error':old['error'],
+    'previous_wrapper_receipt_sha256':sha(BASE/'verification.json'),'frozen_before':current,
+    'new_installation_performed':False,'reused_actual_fresh_installation':True,'media_reexecuted':False,
+    'checks':[],'calls':[],'script_sha256':sha(__file__),'corrected_verifier_sha256':sha(ROOT/'scripts/verify_multicam_affine_install.py'),
+    'native_windows':True,'virtualization':False,'network':False}
+def save():(OUT/'verification.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+def check(name,ok,**details):
+    record['checks'].append({'name':name,'ok':bool(ok),**details});save();assert ok,name
+def run(label,args):
+    temporary=str(ROOT/'product/.runtime/temp')
+    env=dict(os.environ,TEMP=temporary,TMP=temporary,TMPDIR=temporary,PYTHONDONTWRITEBYTECODE='1')
+    command=list(map(str,args));result=subprocess.run(command,cwd=ROOT,env=env,capture_output=True,
+        timeout=1200,creationflags=subprocess.CREATE_NO_WINDOW)
+    for name in ('stdout','stderr'):(OUT/(label+'.'+name+'.log')).write_bytes(getattr(result,name))
+    record['calls'].append({'label':label,'command':command,'exit_code':result.returncode,
+        'stdout_sha256':sha(OUT/(label+'.stdout.log')),'stderr_sha256':sha(OUT/(label+'.stderr.log'))});save()
+    assert result.returncode==0,result.stderr.decode('utf8','replace')[-1600:]
+    return result.stdout
+save();(OUT/'executed-postflight.py.txt').write_bytes(Path(__file__).read_bytes())
+try:
+    media=read(BASE/'media/verification.json');native=read(REL/'native-r3/verification.json')
+    check('all-20-completed-install-controls-passed',len(old['checks'])==20 and all(row['ok'] for row in old['checks']))
+    check('fresh-isolated-media-52-controls-passed',media['status']=='passed' and len(media['checks'])==52
+        and all(row['ok'] for row in media['checks']) and media['frozen_before']==media['frozen_after']==current)
+    check('fresh-isolated-media-matches-development',native['cases']==media['cases'])
+    for name,digest in old['resource_hashes'].items():assert sha(ROOT/'product/src/ai_ad_editor'/name)==digest
+    installed=ROOT/'product/.runtime/multicam-affine-clock-20261021/installed-r1/installed'
+    check('all-162-installed-resource-bytes-current',len(old['resource_hashes'])==162 and all(
+        sha(installed/'site/ai_ad_editor'/name)==digest for name,digest in old['resource_hashes'].items()))
+    caps=json.loads(run('isolated-capabilities',[sys.executable,'-I','-S','-B','-X','utf8',installed/'run.py','capabilities']))
+    clock=caps['data']['capabilities']['media']['multicam_clock']
+    check('correct-nested-affine-discovery',clock['protocol']=='multicam-affine-clock-v1')
+    names=['ai_ad_editor.cli','ai_ad_editor.render','ai_ad_editor.multicam','ai_ad_editor.multicam_clock','numpy','numpy._core._multiarray_umath']
+    bootstrap=('import sys,json,importlib;sys.path.insert(0,sys.argv[1]);'
+        'print(json.dumps({n:importlib.import_module(n).__file__ for n in json.loads(sys.argv[2])}))')
+    origins=json.loads(run('isolated-current-origins',[sys.executable,'-I','-S','-B','-X','utf8','-c',bootstrap,
+        installed/'site',json.dumps(names)]))
+    check('current-origins-all-under-fresh-site',all(Path(p).resolve().is_relative_to(installed/'site') for p in origins.values()),origins=origins)
+    unit=('import sys,unittest;sys.path[:0]=[sys.argv.pop(1),sys.argv.pop(1)];'
+        'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+        'sys.argv=[sys.argv[0],"-v","test_multicam_affine_clock","test_audio_resample_precision"];unittest.main(module=None)')
+    run('isolated-41-methods',[sys.executable,'-I','-S','-B','-X','utf8','-c',unit,installed/'site',ROOT/'product/tests'])
+    text=(OUT/'isolated-41-methods.stderr.log').read_text('utf8');match=re.search(r'Ran (\d+) tests in ([\d.]+)s',text)
+    check('41-isolated-methods-terminal-OK',match is not None and int(match[1])==41 and
+        bool(re.search(r'\bOK\s*$',text)) and '... skipped ' not in text)
+    record.update(isolated_methods=41,isolated_suite_seconds=float(match[2]),isolated_skipped=0,
+        fresh_media_sha256=sha(BASE/'media/verification.json'),media_cli_calls=media['cli_calls'],
+        prior_isolated_discovery_cli_calls=3,current_isolated_discovery_cli_calls=1,
+        reused_original_module_origin_probes=1,new_module_origin_probes=1,
+        isolated_cli_calls_total=media['cli_calls']+4)
+    check('frozen-core-still-equal',frozen()==current)
+    record.update(status='passed-isolated-postflight',frozen_after=frozen(),full_capcut_parity=False,
+        continuous_playback_reviewed=False,audio_listened=False)
+except BaseException as error:
+    record.update(status='failed-preserved-for-review',error=repr(error),frozen_after=frozen());raise
+finally:
+    record['finished_at_utc']=datetime.now(timezone.utc).isoformat();save()
+print(json.dumps({k:record[k] for k in ('status','isolated_methods','isolated_suite_seconds','isolated_cli_calls_total')},ensure_ascii=False))
