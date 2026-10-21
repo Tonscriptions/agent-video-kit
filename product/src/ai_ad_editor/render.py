@@ -3760,14 +3760,20 @@ def _build_audio_bus_tree(
 
 def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, Any], *, _video_only: bool = False,
                        _inline_stack: tuple[str, ...] = (), _allow_audio_only: bool = False,
-                       _effect_runtime: EffectAutomation | None = None) -> tuple[list[str], str, list[dict[str, Any]], list[dict[str, Any]]]:
+                       _effect_runtime: EffectAutomation | None = None,
+                       _frame_index_context=None, _persist_video_index: bool = False,
+                       _cancel_file: Path | None = None) -> tuple[list[str], str, list[dict[str, Any]], list[dict[str, Any]]]:
+    if _frame_index_context is None:
+        from .native_video_index import IndexContext
+        _frame_index_context=IndexContext(root,persist=_persist_video_index,cancel_file=_cancel_file)
     root_effect_runtime = _effect_runtime is None
     if _effect_runtime is None:
         base = project['settings']['timebase']
         fps = base['display_fps']
         _effect_runtime = EffectAutomation(root, str(Fraction(fps['num'], fps['den'])), int(base['ticks_per_second']))
     def child_builder(*args, **kwargs):
-        return build_filter_graph(*args, **kwargs, _effect_runtime=_effect_runtime)
+        return build_filter_graph(*args, **kwargs, _effect_runtime=_effect_runtime,
+                                  _frame_index_context=_frame_index_context)
     if any(c.get('tracking_binding') for s in project.get('sequences',[]) for t in s.get('tracks',[]) for c in t.get('clips',[])):
         from .bindings import compile_project_bindings,validate_project_bindings
         findings = validate_project_bindings(project,root)
@@ -4072,7 +4078,8 @@ def build_filter_graph(root: Path, project: dict[str, Any], sequence: dict[str, 
                     from .reverse_video_clock import reverse_intervals, reserve_buffer
                     first_source, end_source, reverse_clock, reverse_metadata = reverse_intervals(
                         uri, int(clip.get('source_in_tick', 0)), int(clip.get('source_out_tick', 1)),
-                        tps, clock_metadata['working_time_base'], expected_time_base=input_base,decoder=alpha_decoder)
+                        tps, clock_metadata['working_time_base'], expected_time_base=input_base,decoder=alpha_decoder,
+                        index_context=_frame_index_context,source_sha256=asset['sha256'])
                     use_cache=False
                     try:
                         reserve_buffer(_effect_runtime, reverse_metadata, clip.get('id'))
@@ -4672,7 +4679,8 @@ def render_project(
         effective_project['sequences'] = [render_sequence if s.get('id') == sequence.get('id') else s for s in project['sequences']]
     encoder = output_settings(effective_project["settings"])
     validate_output_alignment(sequence_canvas(effective_project, render_sequence), str(encoder['video']['pixel_format']))
-    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, render_sequence)
+    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, render_sequence,
+        _persist_video_index=not dry_run,_cancel_file=cancel_file)
     fingerprints = render_fingerprints(project, sequence, effective_project["settings"], root)
     output.parent.mkdir(parents=True, exist_ok=True)
     operation_id = new_id("render")
@@ -4823,6 +4831,8 @@ def render_project(
         if reverse_jobs:
             verify_reverse(root,reverse_jobs,cancel_file=cancel_file)
             check_acceleration_inputs()
+        from .native_video_index import verify_materialized as verify_native_indexes
+        verify_native_indexes(root,input_meta,cancel_file=cancel_file)
         try:
             os.replace(temp_output, output)
         except OSError as exc:

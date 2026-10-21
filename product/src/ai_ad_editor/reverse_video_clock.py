@@ -165,8 +165,14 @@ def _lookup(values, first=0, end=None):
 
 
 def reverse_intervals(path, source_in_tick, source_out_tick, tps, working_time_base,
-                      *, expected_time_base, cancel_file=None, decoder=None):
-    pts, durations, stream, format_info = probe_frames(path, cancel_file=cancel_file, decoder=decoder)
+                      *, expected_time_base, cancel_file=None, decoder=None,
+                      index_context=None, source_sha256=None):
+    index_metadata=None
+    if index_context is None:
+        pts, durations, stream, format_info = probe_frames(path, cancel_file=cancel_file, decoder=decoder)
+    else:
+        pts,durations,stream,format_info,index_metadata=index_context.acquire(
+            path,source_sha256,probe_frames,decoder=decoder)
     try:
         native = Fraction(stream['time_base'])
         if native != Fraction(expected_time_base):
@@ -251,6 +257,7 @@ def reverse_intervals(path, source_in_tick, source_out_tick, tps, working_time_b
             'source_decoder':decoder,
             'reverse_chunk_ranges':chunks,
             'long_clip_memory_and_latency_accepted': False}
+        if index_metadata is not None:metadata['native_frame_index']=index_metadata
         return first, end, expression, metadata
     except (ValueError, KeyError, ZeroDivisionError, OverflowError) as error:
         raise AppError('REVERSE_VIDEO_CLOCK_INVALID', '无法建立原生倒放帧区间时钟', exit_code=3,

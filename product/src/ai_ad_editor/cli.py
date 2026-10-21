@@ -956,7 +956,7 @@ def build_parser() -> argparse.ArgumentParser:
     for action in ('list','prune'):
         item=_leaf_common(cache_actions.add_parser(action))
         item.add_argument('--project',required=True)
-        item.add_argument('--kind',choices=['reverse-video'],default='reverse-video')
+        item.add_argument('--kind',choices=['reverse-video','native-video-index'],default='reverse-video')
         if action=='prune':
             item.add_argument('--keep-mib',type=int,default=0)
             item.add_argument('--key',default=None,help='仅清理指定缓存；不能同时设置保留配额')
@@ -5818,10 +5818,11 @@ def _load_render_resume(root: Path, project: dict[str, Any], sequence: dict[str,
 
 
 def command_cache(args: argparse.Namespace) -> dict[str, Any]:
-    from . import reverse_cache
+    from . import reverse_cache,native_video_index
     root,_=load_project(args.project)
-    data=(reverse_cache.cache_list(root) if args.action=='list' else
-        reverse_cache.cache_prune(root,keep_bytes=args.keep_mib*1024*1024,dry_run=args.dry_run,key=args.key))
+    cache=native_video_index if args.kind=='native-video-index' else reverse_cache
+    data=(cache.cache_list(root) if args.action=='list' else
+        cache.cache_prune(root,keep_bytes=args.keep_mib*1024*1024,dry_run=args.dry_run,key=args.key))
     return _envelope('cache.'+args.action,args,status='planned' if args.dry_run else 'succeeded',data=data)
 
 

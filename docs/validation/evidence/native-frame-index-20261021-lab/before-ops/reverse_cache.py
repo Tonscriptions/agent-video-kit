@@ -1,0 +1,371 @@
+"""Lossless native reverse chunks with immutable, verified project-local caching.
+
+Cache PTS are frame counters, not source time. The renderer must apply the
+original reversed display-interval clock after reading these native frames.
+"""
+from __future__ import annotations
+from datetime import datetime, timezone
+from fractions import Fraction
+import hashlib
+from itertools import islice
+import json
+import math
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import tempfile
+import threading
+import time
+
+from .artifact_locks import artifact_entry, verification_scope
+from .errors import AppError
+from .media import ffmpeg_path, ffprobe_path
+from .policy import resolve_local_path
+from .utils import atomic_write_text, sha256_file
+
+PROTOCOL='native-lossless-reverse-chunks-v1'
+STORAGE_RATE=25
+MAX_RESERVATION_BYTES=128*1024**3
+MAX_RECEIPT_BYTES=64*1024**2
+DISK_HEADROOM=64*1024**2
+MAX_CAPTURE=64*1024
+MAX_CACHE_ENTRIES=4096
+
+def _error(code,message,**details):
+    return AppError(code,message,exit_code=6,diagnostics=details or None)
+
+def _canonical(value):
+    return json.dumps(value,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode('utf8')
+
+def _cancel(marker):
+    if marker is not None and marker.exists():
+        raise AppError('CANCELLED','分块倒放已取消',exit_code=8,path=str(marker))
+
+def _owned(root,path):
+    """Check unresolved owned paths before resolve could hide a junction."""
+    root=root.resolve();path=Path(os.path.abspath(path))
+    if not path.is_relative_to(root):
+        raise _error('REVERSE_CACHE_PATH_INVALID','倒放缓存路径必须位于当前工程内',path=str(path))
+    current=root
+    for part in path.relative_to(root).parts:
+        current/=part
+        if current.is_symlink() or getattr(current,'is_junction',lambda:False)():
+            raise _error('REVERSE_CACHE_PATH_INVALID','倒放缓存路径不能包含符号链接或目录联接',path=str(current))
+    return path
+
+def _inventory_entry(root,directory):
+    directory=_owned(root,directory)
+    if not re.fullmatch('[0-9a-f]{64}',directory.name) or not directory.is_dir():
+        raise _error('REVERSE_CACHE_LAYOUT_INVALID','倒放缓存包含未知目录条目',path=str(directory))
+    files=list(islice(directory.iterdir(),4))
+    if len(files)>2 or any(p.name not in {'frames.nut','receipt.json'} for p in files):
+        raise _error('REVERSE_CACHE_LAYOUT_INVALID','倒放缓存包含非派生文件，拒绝清理',path=str(directory))
+    for path in files:
+        _owned(root,path)
+        if not path.is_file():raise _error('REVERSE_CACHE_LAYOUT_INVALID','倒放缓存包含目录或特殊文件',path=str(path))
+    return {'key':directory.name,'path':str(directory),'bytes':sum(p.stat().st_size for p in files),
+        'mtime_ns':directory.stat().st_mtime_ns,'complete_file_set':{p.name for p in files}=={'frames.nut','receipt.json'},
+        'media_integrity_checked':False}
+
+def cache_list(root):
+    """Inventory owned derived files; this is not a media integrity verdict."""
+    base=_owned(root,root/'cache/reverse-video')
+    directories=sorted(islice(base.iterdir(),MAX_CACHE_ENTRIES+1)) if base.exists() else []
+    if len(directories)>MAX_CACHE_ENTRIES:
+        raise _error('REVERSE_CACHE_ENTRY_BUDGET','倒放缓存条目超过目录预算')
+    entries=[_inventory_entry(root,directory) for directory in directories]
+    return {'protocol':PROTOCOL,'entries':entries,'bytes':sum(x['bytes'] for x in entries),'max_entries':MAX_CACHE_ENTRIES}
+
+def cache_prune(root,*,keep_bytes=0,dry_run=False,key=None):
+    """Remove only known derived files under the caller's project write lock."""
+    if type(keep_bytes) is not int or keep_bytes<0 or (key is not None and
+        (not isinstance(key,str) or not re.fullmatch('[0-9a-f]{64}',key) or keep_bytes)):
+        raise _error('REVERSE_CACHE_ARGUMENT_INVALID','保留配额必须非负；指定 key 时配额必须为 0')
+    inventory=cache_list(root)
+    # A user can ingest a generated cache as an authored source. Preserve all
+    # current project references, including nested path-bearing objects.
+    from .preview import _paths_from_objects
+    from .project import project_file
+    from .utils import load_json
+    base=_owned(root,root/'cache/reverse-video');protected=set()
+    for path in _paths_from_objects(root,load_json(project_file(root))):
+        if path.is_relative_to(base) and (parts:=path.relative_to(base).parts):protected.add(parts[0])
+    remaining=inventory['bytes'];removed=[]
+    for item in sorted(inventory['entries'],key=lambda value:(value['mtime_ns'],value['key'])):
+        if keep_bytes and remaining<=keep_bytes:break
+        if item['key'] in protected or (key is not None and item['key']!=key):continue
+        directory=_owned(root,Path(item['path']))
+        # Recheck the complete layout before unlinking exactly two owned file
+        # names. Never recursively delete an unreviewed directory tree.
+        fresh=_inventory_entry(root,directory)
+        if not dry_run:
+            try:
+                for name in ('frames.nut','receipt.json'):
+                    path=_owned(root,directory/name)
+                    if path.exists():path.unlink()
+                directory.rmdir()
+            except OSError as error:
+                raise AppError('REVERSE_CACHE_PRUNE_FAILED','无法完整清理倒放缓存',exit_code=6,path=str(directory),cause=str(error)) from error
+        remaining-=fresh['bytes'];removed.append(item['key'])
+    return {'protocol':PROTOCOL,'removed':removed,'before_bytes':inventory['bytes'],'remaining_bytes':remaining,
+        'protected_reference_keys':sorted(protected),'dry_run':dry_run,'selected_key':key}
+
+def input_orientation(metadata):
+    """Reapply the original orthogonal display matrix after coded-frame caching."""
+    fmt=metadata['native_video_format'];matrix=fmt.get('displaymatrix')
+    if matrix:
+        rows=str(matrix).replace('\\n','\n').strip().splitlines()
+        try:
+            values=[int(v) for row in rows for v in row.split(':',1)[1].split()]
+            if len(values)!=9:raise ValueError('display matrix shape')
+            a,b,_,c,d,*_=values
+            if (values[2] or values[5] or values[6] or values[7] or values[8]!=1<<30 or
+                any(v not in (-65536,0,65536) for v in (a,b,c,d)) or
+                a*a+b*b!=65536**2 or c*c+d*d!=65536**2 or a*c+b*d):
+                raise ValueError('non-orthogonal or translated source display matrix')
+            flip=a*d-b*c<0
+            if flip:a,c=-a,-c
+            # The display setter maps its angle to this first column.
+            # Flip options are switches, not value options.
+            angle=round(math.degrees(math.atan2(c,a)))
+            return ['-display_rotation:v:0',str(angle),*(['-display_hflip:v:0'] if flip else [])]
+        except (IndexError,ValueError) as error:
+            raise AppError('REVERSE_CACHE_ORIENTATION_UNSUPPORTED','倒放缓存尚不接受此源显示矩阵',exit_code=6,cause=str(error)) from error
+    rotation=fmt.get('rotation',fmt.get('tag:rotate'))
+    if rotation is not None:
+        value=float(rotation)
+        if not math.isfinite(value):raise _error('REVERSE_CACHE_ORIENTATION_UNSUPPORTED','源旋转值无效')
+        return ['-display_rotation:v:0',str(value)]
+    return []
+
+def _capture(command, *, cwd, cancel_file=None, timeout=3600, watched=None, byte_limit=None):
+    """Bound native process pipes, monitor cancellation and output disk growth."""
+    _cancel(cancel_file)
+    process=None;readers=[];tails=[bytearray(),bytearray()]
+    try:
+        process=subprocess.Popen(list(map(str,command)),cwd=cwd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+            creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+        def drain(stream,tail):
+            while data:=stream.read(4096):
+                tail.extend(data)
+                if len(tail)>MAX_CAPTURE:del tail[:-MAX_CAPTURE]
+        for stream,tail in zip((process.stdout,process.stderr),tails):
+            reader=threading.Thread(target=drain,args=(stream,tail),daemon=True,name='reverse-chunk-pipe')
+            reader.start();readers.append(reader)
+        started=time.monotonic()
+        while process.poll() is None:
+            _cancel(cancel_file)
+            if time.monotonic()-started>timeout:
+                raise _error('REVERSE_CACHE_TIMEOUT','原生分块倒放超时')
+            if watched is not None:
+                size=watched.stat().st_size if watched.exists() else 0
+                if byte_limit is not None and size>byte_limit:
+                    raise _error('REVERSE_CACHE_OUTPUT_BUDGET','分块倒放输出超过字节配额',bytes=size,budget_bytes=byte_limit)
+                if shutil.disk_usage(watched.parent).free<DISK_HEADROOM:
+                    raise _error('REVERSE_CACHE_DISK_SPACE','分块倒放期间磁盘余量不足')
+            try:process.wait(timeout=.1)
+            except subprocess.TimeoutExpired:pass
+        for reader in readers:reader.join(timeout=5)
+        _cancel(cancel_file)
+        if any(reader.is_alive() for reader in readers):
+            raise _error('REVERSE_CACHE_PIPE_TIMEOUT','分块倒放管道未正常关闭')
+        if process.returncode:
+            raise AppError('REVERSE_CACHE_PROCESS_FAILED','分块倒放原生进程失败',exit_code=6,
+                cause=bytes(tails[1]).decode('utf8','replace')[-4000:])
+        if watched is not None and byte_limit is not None and watched.stat().st_size>byte_limit:
+            raise _error('REVERSE_CACHE_OUTPUT_BUDGET','分块倒放输出超过字节配额')
+        return bytes(tails[0])
+    except OSError as error:
+        raise AppError('REVERSE_CACHE_IO_FAILED','分块倒放无法访问原生程序或文件',exit_code=6,cause=str(error)) from error
+    finally:
+        if process is not None:
+            if process.poll() is None:
+                process.terminate()
+                try:process.wait(timeout=5)
+                except subprocess.TimeoutExpired:process.kill();process.wait(timeout=5)
+            for reader in readers:reader.join(timeout=5)
+            if process.stdout:process.stdout.close()
+            if process.stderr:process.stderr.close()
+
+def plan(root:Path,source:Path,source_sha256:str,metadata:dict,*,decoder=None):
+    """Plan only; do not create cache directories, encode or download anything."""
+    source=resolve_local_path(root,str(source.resolve()),field='reverse.source')
+    ranges=metadata.get('reverse_chunk_ranges')
+    if not ranges:
+        raise _error('REVERSE_CACHE_FRAME_BUDGET','单帧无法放入原生倒放分块配额')
+    fmt=metadata['native_video_format']
+    pixel_format=str(fmt.get('pix_fmt',''))
+    if not re.fullmatch(r'[a-z0-9_]+',pixel_format):
+        raise _error('REVERSE_CACHE_FORMAT_INVALID','缺少明确的原生像素格式')
+    frame_bytes=int(fmt['width'])*int(fmt['height'])*metadata['decoded_bytes_per_pixel_bound']
+    frames=metadata['selected_frame_count']
+    if sum(r['frames'] for r in ranges)!=frames or len(ranges)>65536:
+        raise _error('REVERSE_CACHE_RANGE_INVALID','原生倒放分块范围不完整')
+    reservation=2*frame_bytes*frames+len(ranges)*1024**2+16*1024**2
+    if reservation>MAX_RESERVATION_BYTES:
+        raise _error('REVERSE_CACHE_DISK_BUDGET','倒放缓存保守磁盘估算超过配额',reservation_bytes=reservation,budget_bytes=MAX_RESERVATION_BYTES)
+    with verification_scope():
+        artifacts={name:artifact_entry(path,role) for name,path,role in [
+            ('ffmpeg',Path(ffmpeg_path()).resolve(),'reverse-ffmpeg'),
+            ('ffprobe',Path(ffprobe_path()).resolve(),'reverse-ffprobe'),
+            ('source',source,'reverse-source'),
+            ('implementation',Path(__file__),'reverse-cache-implementation'),
+            ('clock_implementation',Path(__file__).with_name('reverse_video_clock.py'),'reverse-clock-implementation')]}
+    if artifacts['source']['sha256']!=source_sha256:
+        raise _error('REVERSE_CACHE_INPUT_CHANGED','倒放素材字节与登记值不符')
+    recipe={'protocol':PROTOCOL,'source':str(source),'artifacts':artifacts,
+        'source_frame_start':metadata['source_frame_start'],
+        'source_frame_end_exclusive':metadata['source_frame_end_exclusive'],
+        'frames':frames,'format':fmt,'decoder':decoder,'ranges':ranges,
+        'native_frame_index_sha256':metadata['frame_index_sha256'],
+        'storage_rate':STORAGE_RATE,'cache_pts_are_original_source_pts':False,
+        'source_working_clock_applied_by_renderer':True,
+        'estimated_chunk_frame_bytes':max(r['frames'] for r in ranges)*frame_bytes,
+        'estimated_disk_reservation_bytes':reservation}
+    key=hashlib.sha256(_canonical(recipe)).hexdigest()
+    directory=root.resolve()/'cache/reverse-video'/key
+    return {'recipe':recipe,'key':key,'output':str(directory/'frames.nut'),
+            'receipt':str(directory/'receipt.json')}
+
+def _paths(root,job):
+    key=job.get('key','')
+    if not isinstance(key,str) or not re.fullmatch('[0-9a-f]{64}',key):
+        raise _error('REVERSE_CACHE_PLAN_INVALID','倒放缓存 key 无效')
+    if hashlib.sha256(_canonical(job['recipe'])).hexdigest()!=key or job['recipe'].get('protocol')!=PROTOCOL:
+        raise _error('REVERSE_CACHE_PLAN_INVALID','倒放缓存计划字节不一致')
+    directory=root.resolve()/'cache/reverse-video'/key
+    if Path(job['output'])!=directory/'frames.nut' or Path(job['receipt'])!=directory/'receipt.json':
+        raise _error('REVERSE_CACHE_PLAN_INVALID','倒放缓存路径不匹配')
+    _owned(root,directory);_owned(root,directory/'frames.nut');_owned(root,directory/'receipt.json')
+    return directory,directory/'frames.nut',directory/'receipt.json'
+
+def _verify_inputs(recipe):
+    # A fresh scope for every boundary; do not carry a previous verification
+    # memo across native processing, cache hits or the final publication.
+    with verification_scope():
+        for expected in recipe['artifacts'].values():
+            if artifact_entry(Path(expected['path']),'reverse-verification')['sha256']!=expected['sha256']:
+                raise _error('REVERSE_CACHE_INPUT_CHANGED','倒放输入或程序在规划后变化',path=expected['path'])
+
+def _inspect(path,recipe,cancel_file):
+    command=[recipe['artifacts']['ffprobe']['path'],'-v','error','-protocol_whitelist','file,pipe',
+        '-select_streams','v:0','-count_packets','-show_streams','-show_entries',
+        'stream=codec_name,width,height,pix_fmt,nb_read_packets,time_base,r_frame_rate:stream_tags=:stream_disposition=:stream_side_data=',
+        '-of','json',str(path)]
+    value=json.loads(_capture(command,cwd=path.parent,cancel_file=cancel_file))
+    streams=value.get('streams',[])
+    if len(streams)!=1:
+        raise _error('REVERSE_CACHE_OUTPUT_INVALID','倒放缓存需要一个原生视频流')
+    stream=streams[0];fmt=recipe['format']
+    if (stream.get('codec_name')!='ffv1' or int(stream.get('nb_read_packets',-1))!=recipe['frames'] or
+        any(str(stream.get(k))!=str(fmt[k]) for k in ('width','height','pix_fmt')) or
+        Fraction(stream.get('r_frame_rate','0'))!=STORAGE_RATE):
+        raise _error('REVERSE_CACHE_OUTPUT_INVALID','倒放缓存帧数或无损格式不符合计划',stream=stream)
+    return stream
+
+def execute(root:Path,job:dict,temp_dir:Path,*,cancel_file=None,_require_ready=False):
+    """Build one chunk at a time, then remux; preserve original decoded format.
+
+    The caller holds the project write lock. A ready directory is immutable;
+    corrupt entries reject and require explicit removal rather than overwrite.
+    """
+    _cancel(cancel_file);directory,output,receipt=_paths(root,job);recipe=job['recipe']
+    _verify_inputs(recipe)
+    if _require_ready and not directory.exists():
+        raise _error('REVERSE_CACHE_CORRUPT','倒放后复核时缓存被移除')
+    if directory.exists():
+        if not receipt.is_file() or not output.is_file() or receipt.stat().st_size>MAX_RECEIPT_BYTES:
+            raise _error('REVERSE_CACHE_CORRUPT','倒放缓存缺失或元数据超限')
+        try:previous=json.loads(receipt.read_bytes())
+        except (ValueError,UnicodeError) as error:
+            raise AppError('REVERSE_CACHE_CORRUPT','倒放缓存清单不是有效 JSON',exit_code=6,path=str(receipt),cause=str(error)) from error
+        if not isinstance(previous,dict):raise _error('REVERSE_CACHE_CORRUPT','倒放缓存清单必须为对象')
+        if (previous.get('recipe')!=recipe or previous.get('output_sha256')!='sha256:'+sha256_file(output) or
+            previous.get('output_bytes')!=output.stat().st_size):
+            raise _error('REVERSE_CACHE_CORRUPT','倒放缓存字节或输入计划不一致')
+        stream=_inspect(output,recipe,cancel_file)
+        _verify_inputs(recipe)
+        return {'status':'cache-hit','key':job['key'],'output_sha256':previous['output_sha256'],
+            'stream':stream,'new_encodings':0,'new_source_decodes':0,'cache_byte_validation':True}
+    reservation=recipe['estimated_disk_reservation_bytes']
+    if shutil.disk_usage(root).free<reservation+DISK_HEADROOM:
+        raise _error('REVERSE_CACHE_DISK_SPACE','倒放缓存磁盘余量不足',required_bytes=reservation+DISK_HEADROOM)
+    temp_dir.mkdir(parents=True,exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='reverse-chunks-',dir=temp_dir) as scratch:
+        work=Path(scratch);chunks=[];samples=[];encoded_bytes=0
+        executable=recipe['artifacts']['ffmpeg']['path'];fmt=recipe['format']
+        color=[]
+        for field,flag in [('color_range','-color_range'),('color_space','-colorspace'),
+                           ('color_transfer','-color_trc'),('color_primaries','-color_primaries'),
+                           ('chroma_location','-chroma_sample_location')]:
+            value=fmt.get(field)
+            if value not in (None,'unknown','unspecified','reserved','N/A'):color.extend([flag,str(value)])
+        for index,part in enumerate(recipe['ranges']):
+            _cancel(cancel_file);path=work/f'chunk-{index:06}.nut'
+            command=[executable,'-hide_banner','-nostdin','-v','error','-n','-copyts','-noautorotate',
+                '-threads','1','-filter_threads','1','-protocol_whitelist','file,pipe']
+            if part['source_start_frame']>0 and Fraction(part['seek_seconds'])>0:
+                command.extend(['-noaccurate_seek','-ss',part['seek_seconds']])
+            if recipe['decoder']:command.extend(['-c:v',recipe['decoder']])
+            command.extend(['-i',recipe['source'],'-map','0:v:0','-an','-vf',
+                f"trim=start_pts={part['native_start_pts']}:end_pts={part['native_end_pts']},reverse,settb=1/{STORAGE_RATE},setpts=N",
+                '-fps_mode','cfr','-enc_time_base','filter','-r',str(STORAGE_RATE),'-frames:v',str(part['frames']),
+                '-c:v','ffv1','-threads','1','-pix_fmt','+'+fmt['pix_fmt'],
+                '-map_metadata','-1','-fflags','+bitexact',*color,str(path)])
+            limit=part['frames']*int(fmt['width'])*int(fmt['height'])*16+8*1024**2
+            _capture(command,cwd=work,cancel_file=cancel_file,watched=path,byte_limit=limit)
+            part_recipe={**recipe,'frames':part['frames']}
+            stream=_inspect(path,part_recipe,cancel_file)
+            entry={'name':path.name,'frames':part['frames'],'bytes':path.stat().st_size,
+                   'sha256':'sha256:'+sha256_file(path),'native_range':part,'stream':stream}
+            chunks.append(entry);encoded_bytes+=entry['bytes']
+            if index in (0,len(recipe['ranges'])-1):samples.append(command)
+        listing=work/'chunks.ffconcat'
+        text='ffconcat version 1.0\n'
+        for part in chunks:
+            cents=part['frames']*4
+            text+=f"file '{part['name']}'\nduration {cents//100}.{cents%100:02}\n"
+        atomic_write_text(listing,text)
+        staged=work/'ready';staged.mkdir();joined=staged/'frames.nut'
+        command=[executable,'-hide_banner','-nostdin','-v','error','-n','-protocol_whitelist','file,pipe',
+            '-f','concat','-safe','1','-i',str(listing),'-map','0:v:0','-an','-c:v','copy',
+            '-map_metadata','-1','-fflags','+bitexact',str(joined)]
+        _capture(command,cwd=work,cancel_file=cancel_file,watched=joined,
+                 byte_limit=encoded_bytes+16*1024**2)
+        stream=_inspect(joined,recipe,cancel_file);_verify_inputs(recipe);_cancel(cancel_file)
+        value={'protocol':PROTOCOL,'key':job['key'],'recipe':recipe,'chunks':chunks,
+            'output_sha256':'sha256:'+sha256_file(joined),'output_bytes':joined.stat().st_size,
+            'stream':stream,'concat_utf8_sha256':'sha256:'+hashlib.sha256(text.encode('utf8')).hexdigest(),
+            'command_samples':samples,'concat_command':command,'native_encode_calls':len(chunks),
+            'completed_at_utc':datetime.now(timezone.utc).isoformat(),
+            'natural_quality_accepted':False,'long_clip_latency_accepted':False}
+        encoded=json.dumps(value,ensure_ascii=False,indent=2).encode('utf8')
+        if len(encoded)>MAX_RECEIPT_BYTES:
+            raise _error('REVERSE_CACHE_RECEIPT_BUDGET','倒放缓存清单超过字节配额')
+        (staged/'receipt.json').write_bytes(encoded+b'\n')
+        directory.parent.mkdir(parents=True,exist_ok=True)
+        if directory.exists():raise _error('REVERSE_CACHE_CONFLICT','同一倒放缓存已由其他任务写入，保留已有目录')
+        os.replace(staged,directory)
+        return {'status':'built','key':job['key'],'output_sha256':value['output_sha256'],
+            'output_bytes':value['output_bytes'],'stream':stream,'new_encodings':len(chunks),
+            'new_source_decodes':len(chunks),'command_samples':samples,'concat_command':command,
+            'chunk_frames':[part['frames'] for part in chunks],
+            'peak_estimated_selected_reverse_frame_bytes':recipe['estimated_chunk_frame_bytes'],
+            'budget_is_process_rss':False}
+
+def _job_items(metadata):
+    for item in metadata:
+        if isinstance(item.get('reverse_cache'),dict):yield item
+        if isinstance(item.get('inputs'),list):yield from _job_items(item['inputs'])
+
+def materialize(root,metadata,temp_dir,*,cancel_file=None):
+    jobs=[]
+    for item in _job_items(metadata):
+        job=item['reverse_cache'];job['execution']=execute(root,job,temp_dir,cancel_file=cancel_file);jobs.append(job)
+    return jobs
+
+def verify_materialized(root,jobs,*,cancel_file=None):
+    for job in jobs:
+        job['post_render_verification']=execute(root,job,root/'renders/.tmp',cancel_file=cancel_file,_require_ready=True)

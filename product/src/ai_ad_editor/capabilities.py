@@ -23,6 +23,18 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'native_video_frame_index': {
+                'status':'implemented_with_limits','protocol':'native-video-frame-index-v1',
+                'commands':['render','preview.range','preview.frame','cache.list','cache.prune'],
+                'cache_kind':'native-video-index',
+                'features':['native_int64_pts_and_durations','source_runtime_decoder_pinned',
+                    'readonly_miss_planning','source_frame_probe_skipped_on_verified_hits',
+                    'single_graph_index_reuse','post_render_file_revalidation','explicit_safe_pruning'],
+                'limits':['ordinary_native_reverse_only','maximum_1000000_frames_per_source',
+                    'maximum_256_entries_per_project','full_source_and_runtime_hash_io_on_hits',
+                    'source_index_decode_counter_excludes_audio_pixel_decode_and_output_encoding',
+                    'no_long_duration_latency_peak_RSS_HDR_or_full_capcut_parity_acceptance'],
+            },
             'reverse_video_cache': {
                 'status':'implemented_with_limits','protocol':'native-lossless-reverse-chunks-v1',
                 'commands':['cache.list','cache.prune'],

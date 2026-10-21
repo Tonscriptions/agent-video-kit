@@ -3,13 +3,24 @@ name: video-cut-agent-editor
 description: "Drive the local Agent-first advertising video editor CLI for project setup, timeline composition, edited clip-group reuse, local TTS, templates, validation, rights checks, conversion, and FFmpeg rendering."
 ---
 
+<!-- V83-NATIVE-INDEX -->
+When capabilities advertise `native_video_frame_index`, ordinary native reverse reuses verified source PTS/duration arrays.
+`source_index_decode_calls=0` skips full-source frame scans; source/runtime SHA reads, audio, final video decoding and encoding still apply.
+Use `cache list --project P --kind native-video-index` before explicit `cache prune --project P --kind native-video-index --key KEY --dry-run`.
+Current authored references are protected; keep corrupt indexes for diagnosis until explicit cleanup. Do not edit derived arrays.
+Read the [index contract](../../docs/specs/原生帧索引缓存契约_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生帧索引缓存与倒放复用实测_2026-10-21.md).
+The 256-entry limit, V82 disk reservation and unaccepted long-duration, peak RSS, natural/HDR quality, nested VFR and full CapCut parity limits still apply.
+<!-- /V83-NATIVE-INDEX -->
+
+
 <!-- V82-REVERSE-CHUNKS -->
 For ordinary native-video reverse, read the [V82 chunk/clock contract](../../docs/specs/原生分块倒放缓存契约_v0.1_2026-10-21.md)
 and [actual native/isolated evidence](../../docs/validation/原生分块倒放与离线缓存实测_2026-10-21.md). Preserve original VFR display intervals
 and fractional source bounds. Normal `render`/`preview` automatically prepare FFV1 native-format
 chunks when the shared selected-frame estimate exceeds 256 MiB. Cache 25 Hz is a frame
 counter; source intervals are reapplied. Chunk decode counters exclude the full-source
-index probe that still runs on cache hits. Raster estimates are not process RSS guarantees.
+index probe. When capabilities expose native_video_frame_index, verified index hits skip that probe;
+source/runtime SHA reads remain. Raster estimates are not process RSS guarantees.
 Inspect cache plans and final revalidation in render manifests. The conservative 128 GiB disk
 reservation can reject about 20 s of 4K/25 Hz even for compressible content; see the contract.
 General nested VFR, long-duration performance, reverse audio, natural/HDR quality and full CapCut parity remain unaccepted.

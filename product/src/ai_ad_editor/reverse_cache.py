@@ -55,62 +55,20 @@ def _owned(root,path):
             raise _error('REVERSE_CACHE_PATH_INVALID','倒放缓存路径不能包含符号链接或目录联接',path=str(current))
     return path
 
-def _inventory_entry(root,directory):
-    directory=_owned(root,directory)
-    if not re.fullmatch('[0-9a-f]{64}',directory.name) or not directory.is_dir():
-        raise _error('REVERSE_CACHE_LAYOUT_INVALID','倒放缓存包含未知目录条目',path=str(directory))
-    files=list(islice(directory.iterdir(),4))
-    if len(files)>2 or any(p.name not in {'frames.nut','receipt.json'} for p in files):
-        raise _error('REVERSE_CACHE_LAYOUT_INVALID','倒放缓存包含非派生文件，拒绝清理',path=str(directory))
-    for path in files:
-        _owned(root,path)
-        if not path.is_file():raise _error('REVERSE_CACHE_LAYOUT_INVALID','倒放缓存包含目录或特殊文件',path=str(path))
-    return {'key':directory.name,'path':str(directory),'bytes':sum(p.stat().st_size for p in files),
-        'mtime_ns':directory.stat().st_mtime_ns,'complete_file_set':{p.name for p in files}=={'frames.nut','receipt.json'},
-        'media_integrity_checked':False}
+def _cache_options():
+    return dict(kind='reverse-video',file_names=('frames.nut','receipt.json'),
+                protocol=PROTOCOL,maximum_entries=MAX_CACHE_ENTRIES,prefix='REVERSE_CACHE')
+
 
 def cache_list(root):
-    """Inventory owned derived files; this is not a media integrity verdict."""
-    base=_owned(root,root/'cache/reverse-video')
-    directories=sorted(islice(base.iterdir(),MAX_CACHE_ENTRIES+1)) if base.exists() else []
-    if len(directories)>MAX_CACHE_ENTRIES:
-        raise _error('REVERSE_CACHE_ENTRY_BUDGET','倒放缓存条目超过目录预算')
-    entries=[_inventory_entry(root,directory) for directory in directories]
-    return {'protocol':PROTOCOL,'entries':entries,'bytes':sum(x['bytes'] for x in entries),'max_entries':MAX_CACHE_ENTRIES}
+    from .derived_cache import inventory
+    return inventory(root,**_cache_options())
+
 
 def cache_prune(root,*,keep_bytes=0,dry_run=False,key=None):
-    """Remove only known derived files under the caller's project write lock."""
-    if type(keep_bytes) is not int or keep_bytes<0 or (key is not None and
-        (not isinstance(key,str) or not re.fullmatch('[0-9a-f]{64}',key) or keep_bytes)):
-        raise _error('REVERSE_CACHE_ARGUMENT_INVALID','保留配额必须非负；指定 key 时配额必须为 0')
-    inventory=cache_list(root)
-    # A user can ingest a generated cache as an authored source. Preserve all
-    # current project references, including nested path-bearing objects.
-    from .preview import _paths_from_objects
-    from .project import project_file
-    from .utils import load_json
-    base=_owned(root,root/'cache/reverse-video');protected=set()
-    for path in _paths_from_objects(root,load_json(project_file(root))):
-        if path.is_relative_to(base) and (parts:=path.relative_to(base).parts):protected.add(parts[0])
-    remaining=inventory['bytes'];removed=[]
-    for item in sorted(inventory['entries'],key=lambda value:(value['mtime_ns'],value['key'])):
-        if keep_bytes and remaining<=keep_bytes:break
-        if item['key'] in protected or (key is not None and item['key']!=key):continue
-        directory=_owned(root,Path(item['path']))
-        # Recheck the complete layout before unlinking exactly two owned file
-        # names. Never recursively delete an unreviewed directory tree.
-        fresh=_inventory_entry(root,directory)
-        if not dry_run:
-            try:
-                for name in ('frames.nut','receipt.json'):
-                    path=_owned(root,directory/name)
-                    if path.exists():path.unlink()
-                directory.rmdir()
-            except OSError as error:
-                raise AppError('REVERSE_CACHE_PRUNE_FAILED','无法完整清理倒放缓存',exit_code=6,path=str(directory),cause=str(error)) from error
-        remaining-=fresh['bytes'];removed.append(item['key'])
-    return {'protocol':PROTOCOL,'removed':removed,'before_bytes':inventory['bytes'],'remaining_bytes':remaining,
-        'protected_reference_keys':sorted(protected),'dry_run':dry_run,'selected_key':key}
+    from .derived_cache import prune
+    return prune(root,**_cache_options(),keep_bytes=keep_bytes,dry_run=dry_run,key=key)
+
 
 def input_orientation(metadata):
     """Reapply the original orthogonal display matrix after coded-frame caching."""

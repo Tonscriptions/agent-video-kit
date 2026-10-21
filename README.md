@@ -1,5 +1,27 @@
 # Agent Video Kit
 
+<!-- V83-NATIVE-INDEX -->
+2026-10-21 **V83（持久原生帧索引与倒放复用）**：完整原生回归 **1925 项、3063.161 秒、0 跳过**；254 产品输入与 8 外部夹具不变（本轮限定验收）。普通原生倒放复用验证后的源时间索引，重复渲染不再全源扫描帧；保留 V82 帧区间、像素缓存与磁盘预约限制。
+
+| 编号 | 实际功能核验 | 结果与边界 | 证据 |
+|---|---|---|---|
+| V83-01 | 原生 PTS/duration 索引与实际执行 | 37 项；真实二次渲染不再扫描源帧，VFR 小数源区间独立全帧参考、取消、篡改/删除拒绝和只读规划通过 | [索引专项](docs/validation/evidence/native-frame-index-20261021-lab/integration-r2.json) |
+| V83-02 | 既有倒放、嵌套和预览 | 50＋63＋22 项；与 37 项合为 172 不同方法，均 0 跳过；13 清理方法包含在 50 项内 | [倒放](docs/validation/evidence/native-frame-index-20261021-lab/reverse-r1.json) · [嵌套](docs/validation/evidence/native-frame-index-20261021-lab/nested-r1.json) · [预览](docs/validation/evidence/native-frame-index-20261021-lab/preview-r1.json) |
+| V83-03 | 公开 CLI /真实 4K | 17 CLI 属于 26 原生命令；24 检查。9 帧源选 8 帧/0.32 秒，原生 RGBA 哈希与独立无损整帧参考一致；首次索引扫描 1 次、命中 0 次，删除后数组重建一致 | [实测](docs/validation/evidence/native-frame-index-20261021-lab/native-r1/verification.json) · [源视频](docs/assets/native-frame-index-20261021-lab/native-r1/source-review.mp4) · [实际输出](docs/assets/native-frame-index-20261021-lab/native-r1/reverse-review.mp4) |
+| V83-04 | 离线隔离发行 | 161 资源源码/wheel/site 字节一致、7 现有 wheels；20 隔离 CLI＋1 来源进程，10 模块位于安装目录，同一 4K 输出哈希一致 | [安装](docs/validation/evidence/native-frame-index-20261021-lab/installed-r1/verification.json) |
+| V83-05 | 完整回归与发布基线 | 完整原生回归 **1925 项、3063.161 秒、0 跳过**；254 产品输入与 8 外部夹具不变（本轮限定验收）；绑定 V82 已发布提交，全部专项为完整回归子集 | [完整收据](docs/validation/evidence/native-frame-index-20261021-lab/full-r1.json) · [基线差异](docs/validation/evidence/native-frame-index-20261021-lab/published-v82-alignment-r1.json) |
+| V83-06 | 显式索引清理 | `cache list/prune --kind native-video-index`；256 目录、固定三文件、当前作者引用保护、未知文件与目录联接拒绝；盘点不认证内容完整性 | [契约](docs/specs/原生帧索引缓存契约_v0.1_2026-10-21.md) |
+| V83-07 | 历史保留 | 早期 14/24 方法、审计脚本链接门槛失败、排队状态写入冲突及修正均保留，按各自源码区分；完整套件在首次排队失败时未启动 | [独立实验记录](docs/validation/原生帧索引缓存独立实验_2026-10-21.md) · [排队失败](docs/validation/evidence/native-frame-index-20261021-lab/queue-r1-state-write-failure.json) · [原生重试复现](docs/validation/evidence/native-frame-index-20261021-lab/state-write-retry-native-r2.json) |
+| V83-08 | 尚未验收 | 命中仍读取源/程序 SHA；音频、最终视频解码/编码不包含在源索引扫描计数内。未验收长片延迟/总 RSS、自然/HDR 质量、一般嵌套 VFR或完整剪映等价 | [完整限制](docs/specs/原生帧索引缓存契约_v0.1_2026-10-21.md) |
+
+| 原输入的实际编码预览 | 实际倒放成片的编码预览 |
+|---|---|
+| ![原创源](docs/assets/native-frame-index-20261021-lab/native-r1/source.gif) | ![实际输出](docs/assets/native-frame-index-20261021-lab/native-r1/reverse.gif) |
+
+GIF 均由实际 MP4 解码生成，8 帧/320 ms；源是原创 CC0 几何画面。已查看 8 帧静态总览，未连续播放、未听音，无新模型推理。二次有损编码观察误差与原生平面/无损预览的零误差分别记录。
+<!-- /V83-NATIVE-INDEX -->
+
+
 <!-- V82-REVERSE-CHUNKS -->
 2026-10-21 **V82（原生倒放区间＋顺序无损分块）**：完整原生回归 **1888 项、4198.414 秒、0 跳过**，249 产品输入与 8 外部夹具保持一致（本轮限定验收）。普通叶视频保留 VFR 持帧时长及小数源区间；超出共享帧栅格估算时自动生成 FFV1 缓存。缓存命中仍建立源帧索引，256 MiB 是帧栅格估算，128 GiB 保守磁盘预约也限制可处理时长；不代表长片或进程峰值已验收。
 

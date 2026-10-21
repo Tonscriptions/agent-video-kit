@@ -3,13 +3,24 @@ name: video-cut-quality
 description: Review local encoded masks, explicit selected/clear checkpoints, color scopes, render manifests, and quality evidence for Agent video delivery.
 ---
 
+<!-- V83-NATIVE-INDEX -->
+When capabilities advertise `native_video_frame_index`, ordinary native reverse reuses verified source PTS/duration arrays.
+`source_index_decode_calls=0` skips full-source frame scans; source/runtime SHA reads, audio, final video decoding and encoding still apply.
+Use `cache list --project P --kind native-video-index` before explicit `cache prune --project P --kind native-video-index --key KEY --dry-run`.
+Current authored references are protected; keep corrupt indexes for diagnosis until explicit cleanup. Do not edit derived arrays.
+Read the [index contract](../../docs/specs/原生帧索引缓存契约_v0.1_2026-10-21.md) and [actual native/isolated evidence](../../docs/validation/原生帧索引缓存与倒放复用实测_2026-10-21.md).
+The 256-entry limit, V82 disk reservation and unaccepted long-duration, peak RSS, natural/HDR quality, nested VFR and full CapCut parity limits still apply.
+<!-- /V83-NATIVE-INDEX -->
+
+
 <!-- V82-REVERSE-CHUNKS -->
 For ordinary native-video reverse, read the [V82 chunk/clock contract](../../docs/specs/原生分块倒放缓存契约_v0.1_2026-10-21.md)
 and [actual native/isolated evidence](../../docs/validation/原生分块倒放与离线缓存实测_2026-10-21.md). Preserve original VFR display intervals
 and fractional source bounds. Normal `render`/`preview` automatically prepare FFV1 native-format
 chunks when the shared selected-frame estimate exceeds 256 MiB. Cache 25 Hz is a frame
 counter; source intervals are reapplied. Chunk decode counters exclude the full-source
-index probe that still runs on cache hits. Raster estimates are not process RSS guarantees.
+index probe. When capabilities expose native_video_frame_index, verified index hits skip that probe;
+source/runtime SHA reads remain. Raster estimates are not process RSS guarantees.
 Compare every lossless reference frame and encoded PTS; preserve native alpha/bit-plane evidence.
 The 4K fixture selects eight frames (0.32 s). Encoded MP4/GIF is lossy; its observed RGB error
 is separate from zero-error native planes and lossless previews. It establishes no long-clip, HDR,

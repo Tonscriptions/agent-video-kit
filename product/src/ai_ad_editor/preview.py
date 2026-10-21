@@ -343,7 +343,8 @@ def preview_project(root, project, sequence, *, request, output=None, cancel_fil
     temporary.mkdir()
     try:
         effective = copy.deepcopy(project)
-        inputs, graph, metadata, warnings = build_filter_graph(root, effective, sequence)
+        inputs, graph, metadata, warnings = build_filter_graph(root, effective, sequence,
+            _persist_video_index=True,_cancel_file=cancel_file)
         from .reverse_cache import materialize as materialize_reverse, verify_materialized as verify_reverse
         reverse_jobs=materialize_reverse(root,metadata,temporary,cancel_file=cancel_file)
         for obj in metadata:
@@ -411,6 +412,8 @@ def preview_project(root, project, sequence, *, request, output=None, cancel_fil
             if entry(Path(expected['path']), cancel_file) != expected:
                 raise fail('PREVIEW_INPUT_CHANGED', '预览期间派生依赖发生变化')
         if reverse_jobs:verify_reverse(root,reverse_jobs,cancel_file=cancel_file)
+        from .native_video_index import verify_materialized as verify_native_indexes
+        verify_native_indexes(root,metadata,cancel_file=cancel_file)
         clock = _verify_clock(temporary/name, request, cancel_file)
         files = {name:artifact_digest(temporary/name, cancel_file) for name in names}
         receipt = {'engine':ENGINE, 'base_signature':signature, 'identity':before, 'request':request,
