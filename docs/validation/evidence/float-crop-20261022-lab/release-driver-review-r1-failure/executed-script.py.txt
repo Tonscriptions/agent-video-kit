@@ -1,0 +1,39 @@
+"""Count actual discovered methods; validate sequential release gates statically."""
+import ast
+import hashlib
+import json
+from pathlib import Path
+import sys
+import unittest
+
+ROOT=Path(__file__).resolve().parents[1]
+REL=ROOT/'docs/validation/evidence/float-crop-20261022-lab'
+sys.path[:0]=[str(ROOT/'product/src'),str(ROOT/'scripts')]
+from ai_ad_editor.runtime import configure_local_runtime
+from run_frozen_regression import frozen
+configure_local_runtime()
+inputs=frozen();assert len(inputs)==306
+count=unittest.defaultTestLoader.discover(str(ROOT/'product/tests')).countTestCases()
+assert count==2418,count
+path=REL/'discovery-r1.json';assert not path.exists()
+path.write_text(json.dumps({'status':'discovered-only-not-executed','methods_discovered':count,
+    'methods_passed_by_this_discovery':0,'frozen_inputs':inputs,'full_suite_launched':False},ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+scripts={}
+for name in ('run_float_crop_complete.py','publish_float_crop.py','release_float_crop_after_complete.py','finish_float_crop_chain.py'):
+    source=(ROOT/'scripts'/name).read_text('utf8');ast.parse(source)
+    scripts[name]='sha256:'+hashlib.sha256((ROOT/'scripts'/name).read_bytes()).hexdigest()
+full=(ROOT/'scripts/run_float_crop_complete.py').read_text('utf8')
+assert "PARENT=ROOT.parent/'float-mask-lab-20261022'" in full
+assert "published-V99-full2390-installed295" in full
+assert "parent_full['methods']==2390" in full and "full['methods']==2418" in full
+assert "len(before)==306" in full and "['parent_frozen_inputs'])==304" in full
+assert "native['methods']==123" in full and "installed['isolated_methods']['methods']==323" in full
+assert full.index("git('ls-remote'")<full.index("suite_launched=True")
+publisher=(ROOT/'scripts/publish_float_crop.py').read_text('utf8')
+assert "len(changed)==5" in publisher and "path.stat().st_size < 95*1024**2" in publisher
+assert "'native_methods':123" in publisher
+assert 'force_push' in publisher and 'audit_skills' in publisher
+path=REL/'release-driver-review-r1.json';assert not path.exists()
+path.write_text(json.dumps({'status':'passed-static-parse-and-parent-gate-review','scripts':scripts,
+    'actual_discovery':count,'full_suite_claimed_passed':False,'main_mutated':False},ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+print(json.dumps({'discovered':count,'passed_by_discovery':0,'reviewed_scripts':len(scripts)}))

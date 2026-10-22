@@ -23,6 +23,20 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'timeline_native_float_crop': {
+                'status':'implemented_with_limits', 'protocol':'author-clock-float32-crop-projection-v1',
+                'selection':'settings.pixel_pipeline.engine=float32-native-v1',
+                'commands':['render','preview.range','preview.frame'],
+                'features':['pixel_and_normalized_units','fit_fill_stretch','static_and_animated_xy_width_height',
+                    'clip_and_crop_local_keyframes','six_author_interpolations','original_author_clock',
+                    'leaf_static_and_position_only_ties_even_rounding','continuous_compound_crop',
+                    'single_pass_crop_fit_TRS','fill_overscan_retained_until_final_canvas',
+                    'premultiplied_alpha_sampling','parent_canvas_mask_after_crop_projection',
+                    'bounded_tiles_and_cancellation'],
+                'limits':['nearest_or_bilinear_not_area_or_lanczos','transparent_fit_bars',
+                    'not_legacy_integer_filter_byte_equivalence',
+                    'workspace_estimate_not_total_RSS','no_natural_HDR_or_full_CapCut_parity_acceptance'],
+            },
             'timeline_native_float_mask': {
                 'status':'implemented_with_limits', 'protocol':'author-clock-float32-alpha-mask-v1',
                 'selection':'settings.pixel_pipeline.engine=float32-native-v1',

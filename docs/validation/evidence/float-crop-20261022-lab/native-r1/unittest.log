@@ -1,0 +1,68 @@
+test_all_fits_match_independent_alpha_weighted_pixels (test_float_crop.FloatCropTests.test_all_fits_match_independent_alpha_weighted_pixels) ... ok
+test_alpha_weighting_excludes_hidden_RGB_and_avoids_dark_edge (test_float_crop.FloatCropTests.test_alpha_weighting_excludes_hidden_RGB_and_avoids_dark_edge) ... ok
+test_animated_width_height_all_six_author_interpolations (test_float_crop.FloatCropTests.test_animated_width_height_all_six_author_interpolations) ... ok
+test_arbitrary_position_anchor_scale_rotation_are_single_pass (test_float_crop.FloatCropTests.test_arbitrary_position_anchor_scale_rotation_are_single_pass) ... ok
+test_budget_rejects_before_output_allocation (test_float_crop.FloatCropTests.test_budget_rejects_before_output_allocation) ... ok
+test_compiled_plan_is_detached_from_authored_mutation (test_float_crop.FloatCropTests.test_compiled_plan_is_detached_from_authored_mutation) ... ok
+test_crop_mask_exposure_and_lower_layer_combine_in_parent_space (test_float_crop.FloatCropTests.test_crop_mask_exposure_and_lower_layer_combine_in_parent_space) ... ok
+test_fill_rotation_reveals_texture_outside_resting_parent_view (test_float_crop.FloatCropTests.test_fill_rotation_reveals_texture_outside_resting_parent_view) ... ok
+test_fit_bars_are_transparent_and_preserve_lower_track (test_float_crop.FloatCropTests.test_fit_bars_are_transparent_and_preserve_lower_track) ... ok
+test_identity_retains_all_65536_RGB_levels_and_readonly_input (test_float_crop.FloatCropTests.test_identity_retains_all_65536_RGB_levels_and_readonly_input) ... ok
+test_invalid_duplicate_tracks_and_easing_reject (test_float_crop.FloatCropTests.test_invalid_duplicate_tracks_and_easing_reject) ... ok
+test_invalid_transform_clock_size_and_budget_parameters_reject (test_float_crop.FloatCropTests.test_invalid_transform_clock_size_and_budget_parameters_reject) ... ok
+test_late_invalid_values_preserve_input (test_float_crop.FloatCropTests.test_late_invalid_values_preserve_input) ... ok
+test_local_exact_name_override_and_width_alias_priority (test_float_crop.FloatCropTests.test_local_exact_name_override_and_width_alias_priority) ... ok
+test_mid_projection_cancellation_never_mutates_source (test_float_crop.FloatCropTests.test_mid_projection_cancellation_never_mutates_source) ... ok
+test_nested_reverse_child_clock_and_parent_crop_remain_distinct (test_float_crop.FloatCropTests.test_nested_reverse_child_clock_and_parent_crop_remain_distinct) ... ok
+test_nested_static_crop_retains_fractional_source_units (test_float_crop.FloatCropTests.test_nested_static_crop_retains_fractional_source_units) ... ok
+test_noncontiguous_wrong_type_and_empty_surfaces_reject (test_float_crop.FloatCropTests.test_noncontiguous_wrong_type_and_empty_surfaces_reject) ... ok
+test_one_pixel_source_and_nearest_are_explicit (test_float_crop.FloatCropTests.test_one_pixel_source_and_nearest_are_explicit) ... ok
+test_orphan_crop_tracks_unknown_fields_and_area_interpolation_reject (test_float_crop.FloatCropTests.test_orphan_crop_tracks_unknown_fields_and_area_interpolation_reject) ... ok
+test_presentation_window_uses_original_crop_and_transform_clock (test_float_crop.FloatCropTests.test_presentation_window_uses_original_crop_and_transform_clock) ... ok
+test_real_standard_render_preview_PNG16_share_animated_crop (test_float_crop.FloatCropTests.test_real_standard_render_preview_PNG16_share_animated_crop) ... ok
+test_size_overshoot_clamps_then_origin_stays_inside_source (test_float_crop.FloatCropTests.test_size_overshoot_clamps_then_origin_stays_inside_source) ... ok
+test_static_and_position_only_rounding_match_actual_native_crop (test_float_crop.FloatCropTests.test_static_and_position_only_rounding_match_actual_native_crop) ... FAIL
+test_tiles_are_bit_identical (test_float_crop.FloatCropTests.test_tiles_are_bit_identical) ... ok
+test_tiny_alpha_negative_and_extended_RGB_survive_without_quantization (test_float_crop.FloatCropTests.test_tiny_alpha_negative_and_extended_RGB_survive_without_quantization) ... ok
+test_units_short_dimensions_and_mode_alias_are_equivalent (test_float_crop.FloatCropTests.test_units_short_dimensions_and_mode_alias_are_equivalent) ... ok
+test_unknown_conflicting_boolean_and_nonfinite_crop_fields_reject (test_float_crop.FloatCropTests.test_unknown_conflicting_boolean_and_nonfinite_crop_fields_reject) ... ok
+
+======================================================================
+FAIL: test_static_and_position_only_rounding_match_actual_native_crop (test_float_crop.FloatCropTests.test_static_and_position_only_rounding_match_actual_native_crop)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-crop-lab-20261022\product\tests\test_float_crop.py", line 113, in test_static_and_position_only_rounding_match_actual_native_crop
+    np.testing.assert_array_equal(actual,expected)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\carzy\AppData\Roaming\Python\Python313\site-packages\numpy\testing\_private\utils.py", line 1121, in assert_array_equal
+    assert_array_compare(operator.__eq__, actual, desired, err_msg=err_msg,
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         verbose=verbose, header='Arrays are not equal',
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         strict=strict)
+                         ^^^^^^^^^^^^^^
+  File "C:\Users\carzy\AppData\Roaming\Python\Python313\site-packages\numpy\testing\_private\utils.py", line 983, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Arrays are not equal
+
+Mismatched elements: 48 / 64 (75%)
+First 5 mismatches are at indices:
+ [0, 0, 0]: -0.20000000298023224 (ACTUAL), -0.11999999731779099 (DESIRED)
+ [0, 0, 2]: 0.625 (ACTUAL), 0.125 (DESIRED)
+ [0, 0, 3]: 0.190476194024086 (ACTUAL), 0.2380952388048172 (DESIRED)
+ [0, 1, 0]: -0.11999999731779099 (ACTUAL), -0.03999999910593033 (DESIRED)
+ [0, 1, 2]: 0.125 (ACTUAL), 0.375 (DESIRED)
+Max absolute difference among violations: 0.5
+Max relative difference among violations: 4.
+ ACTUAL: array([[[-0.2     ,  0.36    ,  0.625   ,  0.190476],
+        [-0.12    ,  0.36    ,  0.125   ,  0.238095],
+        [-0.04    ,  0.36    ,  0.375   ,  0.285714],...
+ DESIRED: array([[[-0.12    ,  0.36    ,  0.125   ,  0.238095],
+        [-0.04    ,  0.36    ,  0.375   ,  0.285714],
+        [ 0.04    ,  0.36    ,  0.625   ,  0.333333],...
+
+----------------------------------------------------------------------
+Ran 28 tests in 32.223s
+
+FAILED (failures=1)

@@ -17,6 +17,7 @@ from .float_color_signal import ColorSignal,convert_rgba
 from .float_composite import composite_rgba
 from .float_geometry import resample_rgba
 from .float_mask import compile_mask, apply_mask
+from .float_crop import compile_crop, project_crop
 from .float_exposure import compile_effects,apply_exposure
 from .float_raster import mode_name
 from .sequence_canvas import sequence_canvas
@@ -109,7 +110,7 @@ class FloatTimeline:
         self.sequences={s['id']:s for s in self.project['sequences']};self.sequence_id=sequence_id
         if len(self.sequences)!=len(self.project['sequences']):raise error('SEQUENCE','序列ID重复')
         if sequence_id not in self.sequences:raise error('SEQUENCE','目标作者序列不存在')
-        self.assets={a['id']:a for a in self.project['assets']};self.maps={};self.effect_plans={};self.mask_plans={};self.clip_count=0
+        self.assets={a['id']:a for a in self.project['assets']};self.maps={};self.effect_plans={};self.mask_plans={};self.crop_plans={};self.clip_count=0
         if len(self.assets)!=len(self.project['assets']):raise error('SOURCE','资产ID重复')
         self._validate(sequence_id,());sequence=self.sequences[sequence_id]
         self.frame_count=math.ceil(Fraction(int(sequence['duration_tick']),self.tps)*self.fps)
@@ -137,7 +138,7 @@ class FloatTimeline:
                 path=sequence_id+'/'+str(clip['id'])
                 if clip['id'] in ids:raise error('SEQUENCE','轨道内片段ID重复',clip=path)
                 ids.add(clip['id'])
-                for field in ('transition_in','transition_out','crop','generator','subtitle','tracking_binding'):
+                for field in ('transition_in','transition_out','generator','subtitle','tracking_binding'):
                     if clip.get(field):raise error('UNSUPPORTED','该作者操作尚未连接浮点宿主，不进行旧路径回落',clip=path,operation=field)
                 self.effect_plans[path]=compile_effects(clip.get('effects',[]))
                 if self.effect_plans[path] and self.working.transfer!='linear':raise error('SIGNAL','浮点曝光要求线性光工作域',clip=path)
@@ -149,7 +150,8 @@ class FloatTimeline:
                     raise error('FREEZE','冻结区间无效',clip=path)
                 mode_name((clip.get('blend') or {}).get('mode','normal'))
                 self.mask_plans[path]=compile_mask(clip)
-                allowed=TRANSFORM_PROPERTIES|(self.mask_plans[path].properties if self.mask_plans[path] else set())
+                self.crop_plans[path]=compile_crop(clip)
+                allowed=TRANSFORM_PROPERTIES|(self.mask_plans[path].properties if self.mask_plans[path] else set())|(self.crop_plans[path].properties if self.crop_plans[path] else set())
                 properties=[frame.get('property') for frame in clip.get('keyframes',[])]
                 if any(p not in allowed for p in properties) or len(set(properties))!=len(properties):raise error('UNSUPPORTED','关键帧属性尚未接入或重复',clip=path)
                 if (clip.get('transform') or {}).get('opacity_keyframes'):raise error('UNSUPPORTED','独立透明度轨道尚未接入',clip=path)
@@ -203,6 +205,13 @@ class FloatTimeline:
         ay=value(('transform.anchor.y','anchor.y','anchor_y'),anchor.get('y',transform.get('anchor_y',.5)))
         if not all(math.isfinite(v) for v in (scale,angle,opacity,px,py,ax,ay)) or scale<=0 or not 0<=opacity<=1:raise error('GEOMETRY','变换包含无效值')
         height,width=surface.shape[:2];cw,ch=canvas['width'],canvas['height']
+        if self.crop_plans[path] is not None:
+            result,crop_metadata=project_crop(surface,self.crop_plans[path],tick,(cw,ch),scale=scale,rotation=angle,
+                position=(px,py),anchor=(ax,ay),max_working_bytes=self.max_working_bytes,cancel=self.poll)
+            mask_metadata=None
+            if self.mask_plans[path] is not None:
+                result,mask_metadata=apply_mask(result,self.mask_plans[path],tick,max_working_bytes=self.max_working_bytes,cancel=self.poll)
+            return result,opacity,crop_metadata['inverse'],mask_metadata,crop_metadata
         zoom=min(cw/width,ch/height)*scale;c,s=math.cos(math.radians(angle))/zoom,math.sin(math.radians(angle))/zoom
         anchor_x,anchor_y=width*ax-.5,height*ay-.5;dest_x,dest_y=cw*px-.5,ch*py-.5
         inverse=[[c,s,anchor_x-c*dest_x-s*dest_y],[-s,c,anchor_y+s*dest_x-c*dest_y]]
@@ -210,7 +219,7 @@ class FloatTimeline:
         if self.mask_plans[path] is not None:
             surface,mask_metadata=apply_mask(surface,self.mask_plans[path],tick,max_working_bytes=self.max_working_bytes,cancel=self.poll)
         result,_=resample_rgba(surface,(cw,ch),inverse,max_working_bytes=self.max_working_bytes,cancel=self.poll)
-        return result,opacity,inverse,mask_metadata
+        return result,opacity,inverse,mask_metadata,None
 
     def _sequence(self,sequence_id,at,rows,*,root=False,depth=0,left_limit=False):
         self.poll();sequence=self.sequences[sequence_id];canvas=sequence_canvas(self.project,sequence);w,h=canvas['width'],canvas['height']
@@ -246,11 +255,11 @@ class FloatTimeline:
                 effect_metadata=None
                 if self.effect_plans[path]:
                     source,effect_metadata=apply_exposure(source,self.effect_plans[path],max_working_bytes=self.max_working_bytes,cancel=self.poll)
-                layer,opacity,inverse,mask_metadata=self._project(clip,source,canvas,tick,path)
+                layer,opacity,inverse,mask_metadata,crop_metadata=self._project(clip,source,canvas,tick,path)
                 blend=clip.get('blend') or {};opacity*=keyframe_value(clip,('blend.opacity','blend_opacity'),float(blend.get('opacity',1)),float(tick))
                 result,_=composite_rgba(result,layer,mode=blend.get('mode','normal'),opacity=opacity,max_working_bytes=self.max_working_bytes,cancel=self.poll)
                 rows.append({'clip':path,'source_time':str(source_time),'native_frame_index':frame_index,'right_edge':right,
-                    'author_animation_tick':str(tick),'inverse_affine':inverse,'opacity':opacity,'effects':effect_metadata,'mask':mask_metadata})
+                    'author_animation_tick':str(tick),'inverse_affine':inverse,'opacity':opacity,'effects':effect_metadata,'mask':mask_metadata,'crop':crop_metadata})
         return result
 
     def render_frame(self,index):
