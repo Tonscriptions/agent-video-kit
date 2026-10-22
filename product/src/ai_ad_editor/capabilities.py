@@ -23,6 +23,21 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'timeline_native_float_lut': {
+                'status':'implemented_with_limits','protocol':'explicit-signal-float32-cube-lut-v1',
+                'selection':'settings.pixel_pipeline.engine=float32-native-v1',
+                'commands':['render','preview.range','preview.frame'],
+                'features':['project_local_path_or_registered_sha256','immutable_red_fastest_cube',
+                    'nearest_trilinear_tetrahedral_pyramid_prism','explicit_input_output_RGB_signals',
+                    'linear_working_domain_intensity_mix','six_author_intensity_interpolations',
+                    'original_author_windows_and_nested_clock','ordered_exposure_lut_chain',
+                    'source_alpha_bits_preserved','bounded_tiles_and_cancellation'],
+                'limits':['complete_3D_CUBE_only_2_to_256','explicit_table_and_workspace_admission',
+                    'domain_normalization_then_boundary_clamp','native_strict_pyramid_axis_ties',
+                    'no_1D_shaper_3dl_csp_dat_or_runtime_format_guessing',
+                    'no_HDR_ICC_nits_gamut_mapping_or_natural_quality_acceptance',
+                    'workspace_estimate_not_total_RSS','full_CapCut_parity_unaccepted'],
+            },
             'timeline_native_float_crop': {
                 'status':'implemented_with_limits', 'protocol':'author-clock-float32-crop-projection-v1',
                 'selection':'settings.pixel_pipeline.engine=float32-native-v1',

@@ -1,0 +1,90 @@
+{
+  "status": "observations-and-failures-preserved-not-additional-passed-methods",
+  "native_r1": {
+    "methods": 159,
+    "seconds": 377.2864011000056,
+    "failures": 2,
+    "errors": 0,
+    "cause": [
+      "LUT grid coordinates used wider temporaries and selected a different native pyramid face at a rounded grid tie.",
+      "The test compared the whole author JSON even though save_project intentionally updates its modified timestamp."
+    ],
+    "correction": "Product now rounds normalized grid coordinates in Float32. Author settings/sequences/assets are compared exactly; timestamp mutation is not treated as a product change."
+  },
+  "native_r2": {
+    "methods": 160,
+    "seconds": 441.0660616000023,
+    "failures": 0,
+    "errors": 1,
+    "cause": "Test referenced key instead of the public cache_key field.",
+    "correction": "Use the actual public cache_key; rerun source and installed suites."
+  },
+  "native_binary_observation": {
+    "cases": 20,
+    "widths": [
+      29,
+      32
+    ],
+    "interpolations": [
+      "nearest",
+      "trilinear",
+      "tetrahedral",
+      "pyramid",
+      "prism"
+    ],
+    "default_29_tetrahedral_max_error": 1.4314032793045044,
+    "default_29_tetrahedral_alpha_error": 0.48477840423583984,
+    "interpretation": "Observed only for this installed binary and fixture. Scalar native results retain alpha; default aligned width32 and scalar width29 are separately accepted in native-r3. The product uses independent NumPy interpolation.",
+    "ffmpeg_path_checked_after_observation": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+    "ffmpeg_sha256_checked_after_observation": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+    "historical_tool_digest_was_bound_before_observation": false
+  },
+  "raw_analysis_files": {
+    "29-nearest-False.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "29-nearest-False.stdout.bin": "sha256:49fafa61fb66cd8b6db68dfcda9c03f546112014ac190936aa13bf0cd737e753",
+    "29-nearest-True.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "29-nearest-True.stdout.bin": "sha256:49fafa61fb66cd8b6db68dfcda9c03f546112014ac190936aa13bf0cd737e753",
+    "29-prism-False.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "29-prism-False.stdout.bin": "sha256:edd5e0951ceaa9c543a063378c00b8d25a061de5a4d2fa89dd6c2793c0a283de",
+    "29-prism-True.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "29-prism-True.stdout.bin": "sha256:edd5e0951ceaa9c543a063378c00b8d25a061de5a4d2fa89dd6c2793c0a283de",
+    "29-pyramid-False.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "29-pyramid-False.stdout.bin": "sha256:308d5468f5f55438bc5a97c2a7a47e3032a6d85ee639371e5dd0b0de64cef45d",
+    "29-pyramid-True.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "29-pyramid-True.stdout.bin": "sha256:308d5468f5f55438bc5a97c2a7a47e3032a6d85ee639371e5dd0b0de64cef45d",
+    "29-tetrahedral-False.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "29-tetrahedral-False.stdout.bin": "sha256:8afb5a3c763d3fd8bdd77c64dd66a68e7e8fc040079a025a41c84d2b0ee4c13c",
+    "29-tetrahedral-True.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "29-tetrahedral-True.stdout.bin": "sha256:e1964659c8b6a40285f35f67a05f59645d35a7faa694768cf36ca7910911ce5f",
+    "29-trilinear-False.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "29-trilinear-False.stdout.bin": "sha256:2c4fe217d035f01965170166f275ffdd8c158fd731d94392b7517b132d2a760a",
+    "29-trilinear-True.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "29-trilinear-True.stdout.bin": "sha256:2c4fe217d035f01965170166f275ffdd8c158fd731d94392b7517b132d2a760a",
+    "32-nearest-False.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "32-nearest-False.stdout.bin": "sha256:dbb4eb042819149d7518d25962c5dbd7f3606d67e53695104f69048542625d15",
+    "32-nearest-True.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "32-nearest-True.stdout.bin": "sha256:dbb4eb042819149d7518d25962c5dbd7f3606d67e53695104f69048542625d15",
+    "32-prism-False.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "32-prism-False.stdout.bin": "sha256:457c303810877428ef3767a9f0a0461522d08fd8ca115b57f99ac412d5b09eca",
+    "32-prism-True.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "32-prism-True.stdout.bin": "sha256:457c303810877428ef3767a9f0a0461522d08fd8ca115b57f99ac412d5b09eca",
+    "32-pyramid-False.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "32-pyramid-False.stdout.bin": "sha256:2061fd7776ee4e74a7699d98c146bd5614ddec062720ce48fe00c17132cf63bc",
+    "32-pyramid-True.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "32-pyramid-True.stdout.bin": "sha256:2061fd7776ee4e74a7699d98c146bd5614ddec062720ce48fe00c17132cf63bc",
+    "32-tetrahedral-False.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "32-tetrahedral-False.stdout.bin": "sha256:fac644e9f0149ff9650ce65507d9c8b388f065579f30ebe337776bf94ad63ab7",
+    "32-tetrahedral-True.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "32-tetrahedral-True.stdout.bin": "sha256:0a90b3c8f1cef49d8442880d981ebb73166f7da426d5be374d3f1d5a4e7b8b01",
+    "32-trilinear-False.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "32-trilinear-False.stdout.bin": "sha256:d0a0595f184cb36e541188279394209bdbd3a78c61d84b9e86221904066685ae",
+    "32-trilinear-True.stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "32-trilinear-True.stdout.bin": "sha256:d0a0595f184cb36e541188279394209bdbd3a78c61d84b9e86221904066685ae",
+    "executed-analysis.py.txt": "sha256:394e0f21faf9347b792ae55587bcbe9a36c4296ead9624e9ce9d4f94ca745954",
+    "verification.json": "sha256:29b2c8d6fa09cf45203d6336fc6fa22bcbb562b99e0143efb6768f0177b6bf56"
+  },
+  "tolerance_increased_to_hide_failures": false,
+  "network": false,
+  "virtualization": false,
+  "full_capcut_parity": false
+}

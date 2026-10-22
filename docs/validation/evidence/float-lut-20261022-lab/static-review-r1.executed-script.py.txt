@@ -1,0 +1,69 @@
+"""Record actual static review and preserve failed/native observations."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import sys
+
+ROOT = Path(__file__).resolve().parents[3]
+REL = ROOT/'docs/validation/evidence/float-lut-20261022-lab'
+WORK = ROOT/'product/.runtime/float-lut-20261022'
+sys.path.insert(0,str(ROOT/'product/src'))
+from ai_ad_editor.runtime import configure_local_runtime
+from ai_ad_editor.media import ffmpeg_path
+from PIL import Image
+configure_local_runtime()
+
+
+def sha(path):return 'sha256:'+hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def save(path,value):
+    assert not path.exists()
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+
+
+assets = ROOT/'docs/assets/float-lut-20261022-r1'
+with Image.open(assets/'comparison.gif') as gif:
+    durations = []
+    for i in range(gif.n_frames):gif.seek(i);durations.append(gif.info.get('duration'))
+    assert gif.n_frames==14 and durations==[100]*14
+with Image.open(assets/'contact.png') as contact:assert contact.size==(640,624)
+save(REL/'static-review-r1.json',{'status':'passed-static-contact-and-GIF-clock-review',
+    'at_utc':datetime.now(timezone.utc).isoformat(),'viewed_with':'tools.view_image',
+    'contact_sha256':sha(assets/'contact.png'),'GIF_sha256':sha(assets/'comparison.gif'),
+    'GIF_frames':14,'GIF_duration_ms':durations,'viewed_panels':6,'author_indices':[3,10,16],
+    'observed':'Left original/right actual CLI preview. Nearest shows intentional grid steps; later panels show grading and the source moving marker. No unexpected full-frame blank or missing alpha composite at these selected panels.',
+    'all_five_modes_visually_accepted':False,'all_five_modes_numerically_checked':True,
+    'continuous_playback_review':False,'listening_review':False,'natural_quality_accepted':False,
+    'HDR_accepted':False,'full_capcut_parity':False})
+
+analysis = WORK/'native-analysis-r1'; destination = REL/'native-analysis-r1'
+assert not destination.exists();destination.mkdir()
+for path in analysis.iterdir():
+    name = 'executed-analysis.py.txt' if path.name=='analyze.py' else path.name
+    shutil.copyfile(path,destination/name)
+rows = json.loads((destination/'verification.json').read_bytes())['rows']
+assert len(rows)==20 and all(row['exit_code']==0 for row in rows)
+first = json.loads((REL/'native-r1/verification.json').read_bytes())
+second = json.loads((REL/'native-r2/verification.json').read_bytes())
+assert (first['methods'],first['failures'],first['errors'])==(159,2,0)
+assert (second['methods'],second['failures'],second['errors'])==(160,0,1)
+save(REL/'failure-analysis-r1.json',{'status':'observations-and-failures-preserved-not-additional-passed-methods',
+    'native_r1':{'methods':159,'seconds':first['seconds'],'failures':2,'errors':0,
+        'cause':['LUT grid coordinates used wider temporaries and selected a different native pyramid face at a rounded grid tie.',
+            'The test compared the whole author JSON even though save_project intentionally updates its modified timestamp.'],
+        'correction':'Product now rounds normalized grid coordinates in Float32. Author settings/sequences/assets are compared exactly; timestamp mutation is not treated as a product change.'},
+    'native_r2':{'methods':160,'seconds':second['seconds'],'failures':0,'errors':1,
+        'cause':'Test referenced key instead of the public cache_key field.',
+        'correction':'Use the actual public cache_key; rerun source and installed suites.'},
+    'native_binary_observation':{'cases':20,'widths':[29,32],'interpolations':list(dict.fromkeys(r['method'] for r in rows)),
+        'default_29_tetrahedral_max_error':next(r['max_error'] for r in rows if r['width']==29 and r['method']=='tetrahedral' and not r['cpuflags_zero']),
+        'default_29_tetrahedral_alpha_error':next(r['alpha_max_error'] for r in rows if r['width']==29 and r['method']=='tetrahedral' and not r['cpuflags_zero']),
+        'interpretation':'Observed only for this installed binary and fixture. Scalar native results retain alpha; default aligned width32 and scalar width29 are separately accepted in native-r3. The product uses independent NumPy interpolation.',
+        'ffmpeg_path_checked_after_observation':str(ffmpeg_path()),'ffmpeg_sha256_checked_after_observation':sha(ffmpeg_path()),
+        'historical_tool_digest_was_bound_before_observation':False},
+    'raw_analysis_files':{p.name:sha(p) for p in destination.iterdir() if p.is_file()},
+    'tolerance_increased_to_hide_failures':False,'network':False,'virtualization':False,'full_capcut_parity':False})
+print(json.dumps({'static_panels':6,'GIF_frames':14,'native_diagnostic_calls':20,'failed_suites_preserved':2}))

@@ -1,0 +1,60 @@
+"""Actual discovery and static review; neither executes the full suite."""
+import ast
+from datetime import datetime, timezone
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[3]
+REL = ROOT/'docs/validation/evidence/float-lut-20261022-lab'
+sys.path.insert(0,str(ROOT/'scripts'))
+from run_frozen_regression import frozen, sha
+
+inputs = frozen();assert len(inputs)==309
+foundation = json.loads((REL/'foundation-r1.json').read_bytes())
+changed = [n for n in inputs if foundation['parent_frozen_inputs'].get(n)!=inputs[n]]
+assert len(changed)==6 and len(foundation['parent_frozen_inputs'])==306
+bootstrap = ('import sys,unittest;sys.path.insert(0,sys.argv[1]);'
+    'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+    'print(unittest.defaultTestLoader.discover(sys.argv[2]).countTestCases())')
+command = [sys.executable,'-E','-B','-X','utf8','-c',bootstrap,str(ROOT/'product/src'),str(ROOT/'product/tests')]
+result = subprocess.run(command,cwd=ROOT,capture_output=True,check=True,creationflags=subprocess.CREATE_NO_WINDOW)
+assert result.stdout.decode('utf8').strip()=='2455'
+def save(name,value):
+    path = REL/name;assert not path.exists()
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+save('discovery-r1.json',{'status':'actual-discovery-only-not-a-passed-suite','at_utc':datetime.now(timezone.utc).isoformat(),
+    'command':command,'exit_code':result.returncode,'methods_discovered':2455,'methods_passed_by_discovery':0,
+    'stdout':result.stdout.decode('utf8'),'stderr':result.stderr.decode('utf8'),'frozen_inputs':inputs,
+    'new_methods':37,'changed_product_paths':changed,'full_suite_started':False,'full_capcut_parity':False})
+
+checks = {}
+for name in ('run_float_lut_complete','publish_float_lut','release_float_lut_after_complete','finish_float_lut_chain'):
+    path = ROOT/'scripts'/(name+'.py');source = path.read_text('utf8');tree = ast.parse(source)
+    checks[name] = {'sha256':sha(path),'syntax':True}
+    assert not any(x in source for x in ('git push --force','git(MAIN, \'push\', \'--force\'','git(MAIN, \'push\', \'-f\''))
+    if name=='run_float_lut_complete':
+        for text in ("published-V100-full2418-installed323","parent_full['methods']==2418",
+            "parent_full['frozen_before']==parent_full['frozen_after']==parent_inputs",
+            "input_map(MAIN,'crop_published_parent')==parent_inputs","assert len(before)==309",
+            "full['methods']==2455","full['external_fixtures_equal']","verify(ROOT,scripts)","native['methods']==160"):
+            assert text in source,text
+    elif name=='publish_float_lut':
+        for text in ('len(changed)==6',"full['methods']==2455", "len(installed['resource_hashes'])==185",
+            "installed['isolated_methods']['methods']==360", "git(MAIN, 'ls-remote', 'origin', 'refs/heads/main')",
+            "helper.staged_rows(all_files)", "skill_receipt", "'--expected-count', '17'",
+            'path.stat().st_size < 95*1024**2', "git(MAIN, 'push', 'origin', 'main')"):
+            assert text in source,text
+    elif name=='release_float_lut_after_complete':
+        assert 'published-V101-full2455-installed360' in source
+        assert "owner['full_receipt_sha256']==sha(REL/'full-r1.json')" in source
+    elif name=='finish_float_lut_chain':
+        assert "'--preflight-only'" in source and "spawn('run_float_lut_complete'" in source
+save('release-driver-review-r1.json',{'status':'passed-static-owner-gate-and-syntax-review',
+    'checks':checks,'parent_required_full':2418,'candidate_required_full':2455,'installed_required_methods':360,
+    'product_inputs':309,'scripts_at_review':{p.name:sha(p) for p in (ROOT/'scripts').glob('*.py')},
+    'full_suite_executed_by_review':False,'push_executed_by_review':False,'main_mutated':False})
+(REL/'discovery-and-review-r1.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+print(json.dumps({'discovered':2455,'passed_by_discovery':0,'static_owner_scripts':len(checks),'changed_product_paths':len(changed)}))

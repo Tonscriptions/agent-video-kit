@@ -18,7 +18,7 @@ from .float_composite import composite_rgba
 from .float_geometry import resample_rgba
 from .float_mask import compile_mask, apply_mask
 from .float_crop import compile_crop, project_crop
-from .float_exposure import compile_effects,apply_exposure
+from .float_effect_chain import EffectCompiler
 from .float_raster import mode_name
 from .sequence_canvas import sequence_canvas
 from .speed_curves import compile_curve
@@ -96,7 +96,7 @@ class TimedSurfaceSource:
 
 class FloatTimeline:
     def __init__(self,project,sequence_id,sources,*,working_signal,background_signal=ColorSignal('bt709','srgb'),cancel=None,
-                 max_working_bytes=768*1024*1024):
+                 max_working_bytes=768*1024*1024,resource_root=None):
         if not isinstance(working_signal,ColorSignal) or not isinstance(background_signal,ColorSignal):raise error('SIGNAL','工作与背景RGB信号须明确')
         if cancel is not None and not callable(cancel):raise error('ARGUMENT','取消回调无效')
         self.project=copy.deepcopy(project);self.sources=dict(sources);self.working=working_signal;self.background_signal=background_signal
@@ -104,6 +104,8 @@ class FloatTimeline:
             raise error('BUDGET','浮点投影/合成的单次工作区配额须在1字节到768MiB')
         self.max_working_bytes=max_working_bytes
         self.poll=cancel if cancel is not None else lambda:None;self.poll()
+        self.effects=EffectCompiler(resource_root=resource_root,working_signal=self.working,
+            max_working_bytes=self.max_working_bytes,cancel=self.poll)
         self.settings=self.project['settings'];base=self.settings['timebase'];fps=base['display_fps']
         self.tps=integer(base['ticks_per_second'],1);self.fps=Fraction(integer(fps['num'],1),integer(fps['den'],1))
         if self.tps<1 or self.fps<=0 or self.fps>1000:raise error('CLOCK','作者时间基或帧率无效')
@@ -140,8 +142,8 @@ class FloatTimeline:
                 ids.add(clip['id'])
                 for field in ('transition_in','transition_out','generator','subtitle','tracking_binding'):
                     if clip.get(field):raise error('UNSUPPORTED','该作者操作尚未连接浮点宿主，不进行旧路径回落',clip=path,operation=field)
-                self.effect_plans[path]=compile_effects(clip.get('effects',[]))
-                if self.effect_plans[path] and self.working.transfer!='linear':raise error('SIGNAL','浮点曝光要求线性光工作域',clip=path)
+                self.effect_plans[path]=self.effects.compile(clip.get('effects',[]))
+                if self.effect_plans[path] and self.working.transfer!='linear':raise error('SIGNAL','浮点效果链要求线性光工作域',clip=path)
                 integer(clip['timeline_start_tick']);integer(clip['duration_tick'],1);integer(clip['source_in_tick']);integer(clip['source_out_tick'],1)
                 if clip['source_out_tick']<=clip['source_in_tick']:
                     raise error('CLOCK','作者片段范围无效',clip=path)
@@ -254,7 +256,7 @@ class FloatTimeline:
                 if len(rows)>=MAX_LAYERS_PER_FRAME:raise error('BUDGET','同帧片段数超过128')
                 effect_metadata=None
                 if self.effect_plans[path]:
-                    source,effect_metadata=apply_exposure(source,self.effect_plans[path],max_working_bytes=self.max_working_bytes,cancel=self.poll)
+                    source,effect_metadata=self.effects.apply(source,self.effect_plans[path],tick)
                 layer,opacity,inverse,mask_metadata,crop_metadata=self._project(clip,source,canvas,tick,path)
                 blend=clip.get('blend') or {};opacity*=keyframe_value(clip,('blend.opacity','blend_opacity'),float(blend.get('opacity',1)),float(tick))
                 result,_=composite_rgba(result,layer,mode=blend.get('mode','normal'),opacity=opacity,max_working_bytes=self.max_working_bytes,cancel=self.poll)
@@ -269,3 +271,4 @@ class FloatTimeline:
 
     def verify_sources(self):
         for source in self.sources.values():self.poll();source.verify()
+        self.effects.verify(self.effect_plans.values())

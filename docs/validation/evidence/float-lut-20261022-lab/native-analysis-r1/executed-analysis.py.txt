@@ -1,0 +1,31 @@
+import hashlib,json,subprocess,sys
+from pathlib import Path
+import numpy as np
+ROOT=Path(__file__).resolve().parents[4]
+sys.path[:0]=[str(ROOT/'product/src'),str(ROOT/'product/tests')]
+from ai_ad_editor.runtime import configure_local_runtime
+configure_local_runtime()
+from test_float_lut import FloatLUTTests,effect,write_cube,INTERPOLATIONS
+from ai_ad_editor.media import ffmpeg_path
+case=FloatLUTTests('runTest');case.setUp()
+rows=[]
+try:
+ rng=np.random.default_rng(81)
+ write_cube(case.root/'look.cube',4,transform=lambda *v:rng.uniform(-.3,1.5,3))
+ for width in (29,32):
+  a=rng.uniform(-.2,1.2,(3,width,4)).astype(np.float32);a[...,3]=rng.uniform(0,1,(3,width))
+  a.reshape(-1,4)[:8,:3]=[[.2,.2,.4],[.2,.4,.2],[.4,.2,.2],[0,0,0],[1,1,1],[.5,.5,.5],[1/3,2/3,.5],[.5,.5,.25]]
+  planar=np.moveaxis(a[...,[1,2,0,3]],2,0).astype('<f4').tobytes()
+  for method in INTERPOLATIONS:
+   actual=case.apply(a,effect(interpolation=method))[0]
+   for cpu in ([],['-cpuflags','0']):
+    command=[ffmpeg_path(),'-nostdin','-v','error',*cpu,'-filter_threads','1','-f','rawvideo','-pixel_format','gbrapf32le','-video_size',f'{width}x3','-i','pipe:0','-vf',f'lut3d=file=look.cube:interp={method}','-frames:v','1','-pix_fmt','gbrapf32le','-f','rawvideo','pipe:1']
+    result=subprocess.run(command,input=planar,capture_output=True,cwd=case.root,timeout=30)
+    (Path(__file__).parent/f'{width}-{method}-{bool(cpu)}.stdout.bin').write_bytes(result.stdout)
+    (Path(__file__).parent/f'{width}-{method}-{bool(cpu)}.stderr.log').write_bytes(result.stderr)
+    desired=np.moveaxis(np.frombuffer(result.stdout,'<f4').reshape(4,3,width)[[2,0,1,3]],0,-1)
+    diff=np.abs(actual-desired)
+    rows.append(dict(width=width,method=method,cpuflags_zero=bool(cpu),exit_code=result.returncode,command=list(map(str,command)),max_error=float(diff.max()),mismatches=np.argwhere(diff>8e-7).tolist(),alpha_max_error=float(diff[...,3].max())))
+finally:case.doCleanups()
+(Path(__file__).parent/'verification.json').write_text(json.dumps(dict(status='observed-not-acceptance',rows=rows),indent=2)+'\n',encoding='utf8')
+print(json.dumps([{k:v for k,v in r.items() if k not in ('command','mismatches')} for r in rows]))

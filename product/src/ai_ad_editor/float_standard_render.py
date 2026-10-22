@@ -242,7 +242,7 @@ class FloatRenderContext:
             self.metadata['source_receipts'][asset_id] = source.metadata
         self.timeline = FloatTimeline(self.project, self.sequence['id'], self.sources,
             working_signal=self.config['working'], background_signal=self.config['background'], cancel=self.poll,
-            max_working_bytes=self.config['projection_working_bytes_limit'])
+            max_working_bytes=self.config['projection_working_bytes_limit'],resource_root=self.root)
         self.metadata.update(projection_working_bytes_limit=self.config['projection_working_bytes_limit'],
                              projection_budget_scope='each float projection/composite/delivery call; not total process RSS')
         self.metadata['timeline'] = self.timeline.metadata
