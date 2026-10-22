@@ -1,5 +1,34 @@
 # Agent Video Kit
 
+<!-- V93-AUTHOR-CLOCK-FLOAT-HOST -->
+### V93 作者时钟 Float32 帧宿主与只读缓存源
+
+完整原生回归 **2280方法 /13313.967秒 /0跳过**；288产品输入和8外部夹具保持相同。 新增库层 CPU 合成、作者时钟求值和本地帧包读取。默认 `render/preview`、音频、缓存和全部效果仍待迁移；当前不是剪映全功能等价结果。
+
+| 编号 | 功能性核验 | 实际执行与边界 | 证据 |
+|---|---|---|---|
+| V93-01 | CPU 合成 | 32 模式、独立 alpha、Float64 分块计算与 Float32 表面；33 次实际 FFmpeg 交叉核验，65,536 灰阶、隐藏 RGB、Decimal、取消/预算检查 | [14项原始核验](docs/validation/evidence/float-timeline-20261022-lab/composite-r1.json) |
+| V93-02 | 作者时间线 | VFR、超 2⁵³ PTS、有理数常速、倒放左右极限、冻结、窗口、曲线闭式积分、动画、源局部蒙版、嵌套透明组；当前库层 46 项/0 跳过 | [46项](docs/validation/evidence/float-timeline-20261022-lab/host-r3.json) · [边界](docs/specs/作者时钟浮点帧宿主与缓存源边界_v0.1_2026-10-22.md) |
+| V93-03 | 缓存源 | 只读 mmap 及独立帧副本，配方/原片 SHA、原始帧号、显式容器起点，open/正常 close 复核，自有句柄关闭；部分包覆盖不能证明整片 EOF | [源与宿主报告](docs/validation/作者时钟浮点帧宿主与真实媒体独立实测_2026-10-22.md) |
+| V93-04 | 失败留证 | 首轮 39 项中 1 项参考公式遗漏 Float32 输入舍入；修正参考式后 39 项通过。真实媒体首轮被 schema 拒绝缺 interpolation，补齐样例后通过 | [参考失败](docs/validation/evidence/float-timeline-20261022-lab/host-r1.json) · [schema失败](docs/validation/evidence/float-timeline-20261022-lab/media-r1/verification.json) |
+| V93-05 | 真实原片与完整像素 | 两段原创 16 位视频，经原始时钟选帧、倒放/冻结、旋转/位移/圆形蒙版/opacity，全部 20 帧 RGBA 与独立参考相同，最大差 0 | [56项检查/14原生调用](docs/validation/evidence/float-timeline-20261022-lab/media-r2/verification.json) |
+| V93-06 | 真实电影/GIF | 原始组合与编辑结果各 20帧/10FPS/2秒；无损 RGB16 每个通道字节相同，MP4/GIF 全部 PTS 和 100ms duration 核验；电影由独立脚本编码 | [原始前景](docs/assets/float-timeline-20261022-lab/media-r2/inputs/foreground-16bit.mkv) · [原始背景](docs/assets/float-timeline-20261022-lab/media-r2/inputs/background-16bit.mkv) · [original MP4](docs/assets/float-timeline-20261022-lab/media-r2/original.mp4) · [timeline MP4](docs/assets/float-timeline-20261022-lab/media-r2/timeline.mp4) |
+| V93-07 | 目检范围 | 实际查看两段 MP4 各第 0/9/19 帧，共 6 张；未连续播放、未听审，未验收自然素材或 HDR | [查看收据](docs/validation/evidence/float-timeline-20261022-lab/media-r2/visual-reviewed.json) |
+| V93-08 | 独立安装 | 新 8 轮安装，163项/457.535秒/0跳过；174 资源、931 NumPy 文件一致；216 测试模块来源核验 | [安装终态](docs/validation/evidence/float-timeline-20261022-lab/installed-r1/verification.json) |
+| V93-09 | 安装版真实媒体 | `-I -S` 重做 20 帧和 14 原生调用；145 模块来自新安装目录，Float32 输出与开发版逐字节一致。宿主新增公开 CLI 仍为 0 | [实际安装版媒体](docs/validation/evidence/float-timeline-20261022-lab/media-installed-r1/verification.json) |
+| V93-10 | 剩余产品化 | 统一精度策略、流式视频编码/原生音频、render/preview/cache/队列/版权门禁、全部效果/转场/字幕/跟踪、ICC/PQ/HLG/HDR、抗混叠和自然素材质量仍待完成 | [契约 FTH-17/18](docs/specs/作者时钟浮点帧宿主与缓存源边界_v0.1_2026-10-22.md) |
+| V93-11 | 发布字节核验恢复 | 原完整 2280 项与安装 163 项结果保持不变；保留 CRLF 规范化失败，逐字节核验后普通提交，不新增功能测试计数 | [恢复说明](docs/validation/浮点宿主发布字节核验恢复_2026-10-22.md) |
+
+原始组合：
+
+![原始组合，实际 MP4 转 GIF](docs/assets/float-timeline-20261022-lab/media-r2/original.gif)
+
+作者编辑：
+
+![倒放冻结和作者变换，实际 MP4 转 GIF](docs/assets/float-timeline-20261022-lab/media-r2/timeline.gif)
+
+<!-- /V93-AUTHOR-CLOCK-FLOAT-HOST -->
+
 <!-- V92-NATIVE-FLOAT-SURFACE -->
 ### V92 Agent原生浮点帧包与线性光核心
 

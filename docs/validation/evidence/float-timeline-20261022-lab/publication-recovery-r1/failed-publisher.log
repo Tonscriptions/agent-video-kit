@@ -1,0 +1,11 @@
+{"status": "failed-preserved", "commit": null, "remote_main": null, "error": {"type": "AssertionError", "message": "video-cut-install-manifest.json"}}
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-timeline-lab-20261022\scripts\publish_float_timeline.py", line 119, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-timeline-lab-20261022\scripts\publish_float_timeline.py", line 107, in main
+    rows=staged_rows({**{n:sha(MAIN/n) for n in changed},**current});receipt=REL+'/staged-release-r2.json'
+  File "E:\dev\sandbox\AI广告剪辑\scripts\native_index_release_tools.py", line 31, in staged_rows
+    assert path.stat().st_size == size, name
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: video-cut-install-manifest.json

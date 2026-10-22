@@ -1,0 +1,37 @@
+"""Freeze and retain the actual authored timeline and CPU compositor tests."""
+from datetime import datetime,timezone
+import argparse,json,os,subprocess,sys
+from pathlib import Path
+from run_frozen_regression import frozen,sha
+ROOT=Path(__file__).resolve().parents[1]
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--revision',required=True);args=parser.parse_args()
+    base=ROOT/'docs/validation/evidence/float-timeline-20261022-lab';output=base/('host-'+args.revision+'.json');child=output.with_suffix('.child.json');log=output.with_suffix('.log')
+    assert not any(p.exists() for p in (output,child,log));before=frozen();assert len(before)==288
+    record={'status':'running','started_at_utc':datetime.now(timezone.utc).isoformat(),'frozen_before':before,'generator_sha256':sha(Path(__file__)),
+        'native_windows':True,'virtualization':False,'network':False,'ordinary_timeline_integrated':False,'published':False}
+    def save():output.write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    save()
+    bootstrap=('import sys,unittest,json,pathlib,time;sys.path[:0]=[sys.argv[1],sys.argv[2]];'
+        'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+        'import test_float_composite as c,test_float_timeline as t,test_float_bundle_source as b;'
+        'suite=unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromModule(m) for m in (c,t,b));start=time.monotonic();'
+        'r=unittest.TextTestRunner(verbosity=2).run(suite);'
+        'v={"methods":r.testsRun,"seconds":time.monotonic()-start,"failures":len(r.failures),"errors":len(r.errors),"skipped":len(r.skipped),"successful":r.wasSuccessful(),"native_calls":c.NATIVE_CALLS};'
+        'pathlib.Path(sys.argv[3]).write_text(json.dumps(v,indent=2)+"\\n",encoding="utf8");'
+        'raise SystemExit(0 if r.wasSuccessful() and not r.skipped else 1)')
+    command=list(map(str,[sys.executable,'-E','-B','-X','utf8','-c',bootstrap,ROOT/'product/src',ROOT/'product/tests',child]));record['command']=command;save()
+    env=dict(os.environ,TEMP=str(ROOT/'product/.runtime/temp'),TMP=str(ROOT/'product/.runtime/temp'));(ROOT/'product/.runtime/temp').mkdir(parents=True,exist_ok=True)
+    try:
+        with log.open('xb') as stream:result=subprocess.run(command,cwd=ROOT,env=env,stdout=stream,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+        record.update(exit_code=result.returncode,result=json.loads(child.read_bytes()),log_sha256=sha(log))
+        assert result.returncode==0 and record['result']['successful'] and record['result']['skipped']==0
+        assert frozen()==before
+        record['status']='passed-author-clock-host-and-CPU-compositor-library'
+    except BaseException as exc:record.update(status='failed-preserved',error=repr(exc));raise
+    finally:
+        record.update(finished_at_utc=datetime.now(timezone.utc).isoformat(),frozen_after=frozen());save();output.with_suffix('.executed.py.txt').write_bytes(Path(__file__).read_bytes())
+        print(json.dumps({k:record.get(k) for k in ('status','exit_code','error')}),flush=True)
+
+if __name__=='__main__':main()

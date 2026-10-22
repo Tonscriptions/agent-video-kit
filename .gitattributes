@@ -853,3 +853,11 @@ docs/assets/audio-discontinuity-20261021-lab/** -text -whitespace
 # V92 immutable original/failed/native Float32 media and receipts.
 docs/validation/evidence/color-precision-20261021-lab/** -text -whitespace
 docs/assets/color-precision-20261021-lab/** -text -whitespace
+
+# V93 immutable host native/failed/media evidence.
+docs/validation/evidence/float-timeline-20261022-lab/** -text -whitespace
+docs/assets/float-timeline-20261022-lab/** -text -whitespace
+
+# V93 publication recovery preserves the reviewed CRLF manifest.
+video-cut-install-manifest.json -text whitespace=cr-at-eol
+scripts/recover_float_timeline_publication.py -text
