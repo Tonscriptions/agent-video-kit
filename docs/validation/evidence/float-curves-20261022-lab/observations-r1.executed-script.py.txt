@@ -1,0 +1,76 @@
+"""Record already-viewed static panels, original failures and actual discovery."""
+from datetime import datetime,timezone
+import hashlib
+import json
+from pathlib import Path
+import sys
+import unittest
+
+from PIL import Image
+
+ROOT = Path(__file__).resolve().parents[3]
+sys.path[:0] = [str(ROOT/'scripts'),str(ROOT/'product/src')]
+from run_frozen_regression import frozen,sha
+from ai_ad_editor.runtime import configure_local_runtime
+
+REL = ROOT/'docs/validation/evidence/float-curves-20261022-lab'
+ASSETS = ROOT/'docs/assets/float-curves-20261022-r2'
+
+
+def save(path,value):
+    assert not path.exists()
+    path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+
+
+def read(path):return json.loads(path.read_bytes())
+
+
+def main():
+    before = frozen();assert len(before)==311
+    media = read(REL/'media-r2/verification.json')
+    assert media['status']=='passed-public-CLI-floating-curves-and-native-float-previews'
+    assert media['frozen_before']==media['frozen_after']==before
+    with Image.open(ASSETS/'comparison.gif') as gif:
+        durations = []
+        for i in range(gif.n_frames):gif.seek(i);durations.append(gif.info['duration'])
+    assert durations==[100]*14
+    save(REL/'static-review-r1.json',{'status':'passed-static-contact-and-GIF-clock-review',
+        'at_utc':datetime.now(timezone.utc).isoformat(),'viewed_with':'tools.view_image',
+        'contact_sha256':sha(ASSETS/'contact.png'),'GIF_sha256':sha(ASSETS/'comparison.gif'),
+        'GIF_frames':14,'GIF_duration_ms':durations,'viewed_panels':6,'author_indices':[3,10,16],
+        'observed':'Left original/right actual CLI preview. At these selected frames the moving marker remains visible, the graded panels have the expected colour/contrast differences, and no unexpected blank frame or missing background composite is visible.',
+        'all_five_scenarios_visually_accepted':False,'all_five_scenarios_numerically_checked':True,
+        'continuous_playback_review':False,'listening_review':False,'natural_quality_accepted':False,
+        'HDR_accepted':False,'full_capcut_parity':False})
+    rows = {}
+    for label in ('native-r1','native-r2','native-r3','media-r1','media-r2'):
+        p = REL/label/'verification.json';d = read(p)
+        rows[label] = {'sha256':sha(p),'status':d['status'],'methods':d.get('methods'),
+            'seconds':d.get('seconds'),'failures':d.get('failures'),'errors':d.get('errors'),
+            'skipped':d.get('skipped'),'frozen_equal':d['frozen_before']==d['frozen_after'],
+            'script_calls':len(d.get('calls',[])),'checks':len(d.get('checks',[]))}
+    assert rows['native-r1']['failures']==3 and rows['native-r2']['failures']==1
+    assert rows['native-r3']['methods']==200 and rows['native-r3']['status']=='passed'
+    save(REL/'failure-analysis-r1.json',{'status':'preserved-original-failures-and-accepted-corrections','receipts':rows,
+        'native_r1':['old sampled Bezier produces .49999943 at symmetric midpoint; replaced by direct cubic/48-step inversion',
+            'invalid continuous-versus-quantized uniform two-code oracle; separated independent continuous mathematics from native integer-grid modelling',
+            'nested reverse endpoint intentionally uses nextafter(160,-inf), not exact 160; corrected fixture'],
+        'native_r2':'one-stage integer rounding error can be amplified by post-master; independently check each stage within one code and require actual combined output byte-equal to two real native stages',
+        'media_r1':'author fixture omitted required interpolation on final keys; public CLI correctly rejected it; generator now explicitly writes linear without changing product validation',
+        'native_pchip_two_point_outside_domain_difference':'native extends the line; this product explicitly extends constant endpoint values',
+        'native_diagnostic_maximum_RGB16_codes':max(r['continuous_vs_integer_native_diagnostic_codes'] for r in read(REL/'native-r3/verification.json')['native_curve_records']),
+        'diagnostic_is_not_a_pass_tolerance':True,'pixel_tolerance_not_widened':True,
+        'new_native_test_methods':40,'accepted_related_native_methods':200,'full_capcut_parity':False})
+    configure_local_runtime()
+    suite = unittest.defaultTestLoader.discover(str(ROOT/'product/tests'))
+    assert suite.countTestCases()==2495
+    save(REL/'discovery-r1.json',{'status':'discovered-not-executed','methods_discovered':suite.countTestCases(),
+        'methods_run':0,'full_suite_passed':False,'frozen_inputs':before,'frozen_equal':before==frozen(),
+        'generator_sha256':sha(Path(__file__))})
+    (REL/'observations-r1.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'static_panels':6,'GIF_frames':14,'discovered_not_run':2495,'failed_revisions_preserved':3,
+        'source_methods':200,'RGB_max_error':media['curves_oracle']['maximum_linear_absolute_error']}))
+
+
+if __name__=='__main__':main()

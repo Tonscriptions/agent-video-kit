@@ -1,0 +1,65 @@
+"""Ordered local Float32 exposure/LUT effects on the original author clock."""
+from .errors import AppError
+from .float_exposure import Exposure, compile_effects as compile_exposure, apply_exposure
+from .float_lut import LUTPlan, compile_lut, apply_lut, verify_dependencies, MAX_WORKING_BYTES
+from .float_curves import CurvePlan, compile_curves, apply_curves, ALIASES as CURVE_ALIASES
+
+PROTOCOL = 'ordered-author-clock-float32-effect-chain-v1'
+
+
+class EffectCompiler:
+    def __init__(self, *, resource_root, working_signal, max_working_bytes=MAX_WORKING_BYTES, cancel=None):
+        self.root,self.working,self.budget,self.cancel = resource_root,working_signal,max_working_bytes,cancel
+        self.cubes = {}
+
+    def compile(self, effects):
+        if not isinstance(effects,list) or len(effects)>128:
+            raise AppError('FLOAT_EFFECT_CHAIN_ARGUMENT','效果链须为最多128项数组',exit_code=2)
+        result = []
+        for effect in effects:
+            if not isinstance(effect,dict) or type(effect.get('enabled',True)) is not bool:
+                raise AppError('FLOAT_EFFECT_CHAIN_ARGUMENT','效果声明或enabled无效',exit_code=2)
+            if not effect.get('enabled',True): continue
+            name = str(effect.get('type','')).strip().lower().replace('-','_')
+            if name=='exposure':
+                result.extend(compile_exposure([effect]))
+            elif name in ('lut3d','lut','cube','look'):
+                result.append(compile_lut(effect,resource_root=self.root,cache=self.cubes,
+                    max_working_bytes=self.budget,cancel=self.cancel))
+            elif name in CURVE_ALIASES:
+                result.append(compile_curves(effect))
+            else:
+                raise AppError('FLOAT_TIMELINE_UNSUPPORTED','该效果尚未连接浮点时间线',exit_code=2)
+        return tuple(result)
+
+    def verify(self, plans):
+        seen = set()
+        for chain in plans:
+            for plan in chain:
+                if isinstance(plan,LUTPlan):
+                    for dependency in plan.dependencies:
+                        if dependency not in seen:
+                            verify_dependencies((dependency,),cancel=self.cancel); seen.add(dependency)
+
+    def apply(self, surface, plans, tick):
+        retained = sum(len(cube.payload) for cube in self.cubes.values())
+        if all(isinstance(plan,Exposure) for plan in plans):
+            return apply_exposure(surface,plans,max_working_bytes=self.budget-retained,cancel=self.cancel)
+        rows = []
+        value = surface
+        for index,plan in enumerate(plans):
+            if isinstance(plan,Exposure):
+                value,metadata = apply_exposure(value,(plan,),max_working_bytes=self.budget-retained,cancel=self.cancel)
+                rows.append({'index':index,'type':'exposure',**metadata})
+            elif isinstance(plan,LUTPlan):
+                value,metadata = apply_lut(value,plan,tick,working_signal=self.working,retained_table_bytes=retained,
+                    max_working_bytes=self.budget,cancel=self.cancel)
+                rows.append({'index':index,'type':'lut3d',**metadata})
+            elif isinstance(plan,CurvePlan):
+                value,metadata = apply_curves(value,plan,tick,working_signal=self.working,retained_table_bytes=retained,
+                    max_working_bytes=self.budget,cancel=self.cancel)
+                rows.append({'index':index,'type':'rgb_curves',**metadata})
+            else:
+                raise AppError('FLOAT_EFFECT_CHAIN_ARGUMENT','效果链含未编译计划',exit_code=2)
+        return value,{'protocol':PROTOCOL,'ordered_effects':rows,'author_tick':str(tick),
+            'alpha':'input-bits-preserved','integer_intermediate':False,'HDR_accepted':False}

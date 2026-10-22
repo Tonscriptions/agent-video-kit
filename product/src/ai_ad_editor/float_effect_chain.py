@@ -2,6 +2,7 @@
 from .errors import AppError
 from .float_exposure import Exposure, compile_effects as compile_exposure, apply_exposure
 from .float_lut import LUTPlan, compile_lut, apply_lut, verify_dependencies, MAX_WORKING_BYTES
+from .float_curves import CurvePlan, compile_curves, apply_curves, ALIASES as CURVE_ALIASES
 
 PROTOCOL = 'ordered-author-clock-float32-effect-chain-v1'
 
@@ -25,6 +26,8 @@ class EffectCompiler:
             elif name in ('lut3d','lut','cube','look'):
                 result.append(compile_lut(effect,resource_root=self.root,cache=self.cubes,
                     max_working_bytes=self.budget,cancel=self.cancel))
+            elif name in CURVE_ALIASES:
+                result.append(compile_curves(effect))
             else:
                 raise AppError('FLOAT_TIMELINE_UNSUPPORTED','该效果尚未连接浮点时间线',exit_code=2)
         return tuple(result)
@@ -52,6 +55,10 @@ class EffectCompiler:
                 value,metadata = apply_lut(value,plan,tick,working_signal=self.working,retained_table_bytes=retained,
                     max_working_bytes=self.budget,cancel=self.cancel)
                 rows.append({'index':index,'type':'lut3d',**metadata})
+            elif isinstance(plan,CurvePlan):
+                value,metadata = apply_curves(value,plan,tick,working_signal=self.working,retained_table_bytes=retained,
+                    max_working_bytes=self.budget,cancel=self.cancel)
+                rows.append({'index':index,'type':'rgb_curves',**metadata})
             else:
                 raise AppError('FLOAT_EFFECT_CHAIN_ARGUMENT','效果链含未编译计划',exit_code=2)
         return value,{'protocol':PROTOCOL,'ordered_effects':rows,'author_tick':str(tick),

@@ -23,6 +23,20 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'timeline_native_float_curves': {
+                'status':'implemented_with_limits','protocol':'explicit-signal-continuous-float32-rgb-curves-v1',
+                'selection':'settings.pixel_pipeline.engine=float32-native-v1',
+                'commands':['render','preview.range','preview.frame'],
+                'features':['continuous_natural_cubic_and_monotone_pchip','all_inheritance_and_independent_RGB',
+                    'explicit_post_master_after_channels','explicit_input_output_RGB_signals',
+                    'linear_working_intensity_mix','six_author_control_point_and_intensity_easings',
+                    'original_author_windows_nested_reverse_clocks','ordered_exposure_LUT_curves_chain',
+                    'alpha_bits_preserved','bounded_tiles_and_cancellation'],
+                'limits':['fixed_topology_1_to_256_points_per_curve','strict_increasing_binary64_x_at_each_author_sample',
+                    'curve_output_clamps_zero_one_and_constant_endpoints','no_integer_curve_grid_or_fallback',
+                    'no_dynamic_point_insert_delete','workspace_estimate_not_total_RSS',
+                    'no_HDR_ICC_nits_gamut_mapping_or_natural_quality_acceptance','full_CapCut_parity_unaccepted'],
+            },
             'timeline_native_float_lut': {
                 'status':'implemented_with_limits','protocol':'explicit-signal-float32-cube-lut-v1',
                 'selection':'settings.pixel_pipeline.engine=float32-native-v1',

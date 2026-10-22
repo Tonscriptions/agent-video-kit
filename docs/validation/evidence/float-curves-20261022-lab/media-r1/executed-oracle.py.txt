@@ -1,0 +1,104 @@
+"""Original CC0 author curves and an independent dense/Hermite pixel oracle.
+
+No product colour, spline, effect, clock or easing helper is imported.
+"""
+import numpy as np
+
+METHODS = ('natural','pchip','channels','post_master','bezier')
+
+
+def effects(method):
+    signal = {'primaries':'bt709','transfer':'bt709-oetf'}
+    p = {'input_signal':signal,'output_signal':dict(signal),'all':'0/0 .25/.16 .65/.78 1/1',
+        'interpolation':'pchip' if method in ('pchip','bezier') else 'natural','intensity':.2}
+    intensity = {'at_tick':0,'value':.2,'interpolation':'ease_in_out'}
+    if method=='bezier': intensity.update(interpolation='bezier',control_points=[.2,.05,.8,.95])
+    tracks = [{'property':'intensity','keyframes':[intensity,{'at_tick':36000,'value':.85}]},
+        {'property':'all.1.y','keyframes':[{'at_tick':0,'value':.16,'interpolation':'ease_in'},{'at_tick':36000,'value':.32}]}]
+    if method in ('channels','post_master','bezier'):
+        p.update(red='0/.04 .4/.35 1/.96',green='0/.02 .5/.6 1/.98')
+        tracks.append({'property':'red.1.x','keyframes':[{'at_tick':0,'value':.4,'interpolation':'ease_out'},{'at_tick':36000,'value':.6}]})
+    if method in ('post_master','bezier'):
+        p['post_master'] = '0/.01 .5/.58 1/.99'
+        tracks.append({'property':'post_master.1.y','keyframes':[{'at_tick':0,'value':.58,'interpolation':'ease_in_out'},{'at_tick':36000,'value':.43}]})
+    curve = {'type':'rgb_curves','parameters':p,'keyframes':tracks}
+    exposure = {'type':'exposure','parameters':{'amount':.4,'black':.005}}
+    return [exposure,curve] if method in ('natural','channels','bezier') else [curve,exposure]
+
+
+def spline(points, values, mode):
+    x,y = np.asarray(points,np.float64).T; n = len(x)
+    h = np.diff(x); delta = np.diff(y)/h
+    if mode=='natural':
+        matrix = np.zeros((n,n));rhs = np.zeros(n);matrix[0,0] = matrix[-1,-1] = 1
+        for i in range(1,n-1):
+            matrix[i,i-1:i+2] = [h[i-1],2*(h[i-1]+h[i]),h[i]]
+            rhs[i] = 6*(delta[i]-delta[i-1])
+        second = np.linalg.solve(matrix,rhs)
+    else:
+        slopes = np.zeros(n)
+        if n==2: slopes[:] = delta[0]
+        else:
+            for i in range(1,n-1):
+                if delta[i-1]*delta[i]>0:
+                    slopes[i] = 3*(h[i]+h[i-1])/((2*h[i]+h[i-1])/delta[i-1]+(h[i]+2*h[i-1])/delta[i])
+            for j,a,b in ((0,0,1),(-1,-1,-2)):
+                m = ((2*h[a]+h[b])*delta[a]-h[a]*delta[b])/(h[a]+h[b])
+                slopes[j] = 0 if m*delta[a]<=0 else np.sign(m)*min(abs(m),3*abs(delta[a])) if delta[a]*delta[b]<0 else m
+    q = np.clip(values,x[0],x[-1]);j = np.clip(np.searchsorted(x,q,side='right')-1,0,n-2)
+    u = (q-x[j])/h[j]
+    if mode=='natural':
+        a,b = 1-u,u
+        out = a*y[j]+b*y[j+1]+((a**3-a)*second[j]+(b**3-b)*second[j+1])*h[j]**2/6
+    else:
+        out = (2*u**3-3*u*u+1)*y[j]+(u**3-2*u*u+u)*h[j]*slopes[j]+(-2*u**3+3*u*u)*y[j+1]+(u**3-u*u)*h[j]*slopes[j+1]
+    return np.clip(out,0,1)
+
+
+def decode(rgb):
+    a = np.abs(rgb)
+    return np.where(a<.081,rgb/4.5,np.sign(rgb)*((a+.099)/1.099)**(1/.45)).astype(np.float32)
+
+
+def encode(rgb):
+    a = np.abs(rgb)
+    return np.where(a<.018,rgb*4.5,np.sign(rgb)*(1.099*a**.45-.099)).astype(np.float32)
+
+
+def expected_rgb(planes, indices):
+    results = [];h,w = planes.shape[2:]
+    encoded_background = (np.array([16,32,64],np.float64)/255).astype(np.float32).astype(np.float64)
+    background = np.where(encoded_background<=.04045,encoded_background/12.92,((encoded_background+.055)/1.055)**2.4).astype(np.float32).astype(np.float64)
+    black = np.float32(.005);white = np.float32(2.**(-float(np.float32(.4))));gain = np.float32(1/float(abs(np.float32(white-black))))
+    def expose(rgb):return ((rgb-black)*gain).astype(np.float32)
+    for index in indices:
+        phase = METHODS[index//4];p = (index%4)/4
+        eased = 2*p*p if p<.5 else 1-(-2*p+2)**2/2
+        if phase=='bezier':
+            # Independent polynomial roots select the real parameter for x(p).
+            roots = np.roots([-.8,1.2,.6,-p])
+            u = next(float(v.real) for v in roots if abs(v.imag)<1e-10 and -1e-12<=v.real<=1+1e-12)
+            strength = .2+.65*(.15*(1-u)**2*u+2.85*(1-u)*u*u+u**3)
+        else: strength = .2+.65*eased
+        values = np.moveaxis(planes[index,[2,0,1]],0,-1).astype(np.float32)/np.float32(65535)
+        linear = decode(values.astype(np.float64))
+        before = expose(linear) if phase in ('natural','channels','bezier') else linear
+        encoded = encode(before.astype(np.float64))
+        all_points = [(0,0),(.25,.16+.16*p*p),(.65,.78),(1,1)]
+        mode = 'pchip' if phase in ('pchip','bezier') else 'natural'
+        mapped = np.empty_like(encoded)
+        for c in range(3):
+            points = all_points
+            if phase in ('channels','post_master','bezier'):
+                if c==0: points = [(0,.04),(.4+.2*(2*p-p*p),.35),(1,.96)]
+                elif c==1: points = [(0,.02),(.5,.6),(1,.98)]
+            out = spline(points,encoded[...,c].astype(np.float64),mode)
+            if phase in ('post_master','bezier'):
+                out = spline([(0,.01),(.5,.58-.15*eased),(1,.99)],out,mode)
+            mapped[...,c] = out.astype(np.float32)
+        graded = decode(mapped.astype(np.float64))
+        mixed = (before.astype(np.float64)*(1-strength)+graded.astype(np.float64)*strength).astype(np.float32)
+        if phase not in ('natural','channels','bezier'):mixed = expose(mixed)
+        alpha = (planes[index,3].astype(np.float32)/np.float32(65535)).astype(np.float64)[...,None]
+        results.append((mixed.astype(np.float64)*alpha+background*(1-alpha)).astype(np.float32))
+    return np.stack(results)

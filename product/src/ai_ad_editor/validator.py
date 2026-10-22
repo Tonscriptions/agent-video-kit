@@ -15,7 +15,7 @@ from .source_transitions import analyze as analyze_source_transitions
 from .audio_routing import plan as plan_audio_routing
 from .effect_automation import (ALIASES as AUTOMATION_EFFECT_ALIASES,
                                 parameter_names as automation_parameter_names,
-                                validate as validate_effect_automation,
+                                validate as validate_legacy_effect_automation,
                                 _finite_number as finite_effect_number)
 
 from .policy import reference_kind, resolve_local_path
@@ -100,6 +100,22 @@ def _int(value: Any, default: int = 0) -> int:
 def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool = False, target: str = "commercial_ad", rights_ledger: dict[str, Any] | None = None) -> dict[str, Any]:
     errors: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
+    native_settings = project.get('settings')
+    native_pipeline = native_settings.get('pixel_pipeline') if isinstance(native_settings,dict) else None
+    native_curves = isinstance(native_pipeline,dict) and native_pipeline.get('engine')=='float32-native-v1'
+
+    def validate_effect_automation(effect, *, duration_tick=None):
+        name = str(effect.get('type','')).strip().lower().replace('-','_')
+        if native_curves and name in CURVE_ALIASES:
+            from .float_curves import validate_curves
+            return validate_curves(effect,duration_tick=duration_tick)
+        return validate_legacy_effect_automation(effect,duration_tick=duration_tick)
+
+    def effect_properties(name):
+        if native_curves and name in CURVE_ALIASES:
+            from .float_curves import PARAMETER_NAMES
+            return PARAMETER_NAMES
+        return EFFECT_KEYFRAME_ALIASES.get(name)
     schema_errors, schema_warnings, schema_engine = _schema_report(project)
     errors.extend(schema_errors)
     warnings.extend(schema_warnings)
@@ -303,7 +319,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                     raw_tracks = effect_value.get("keyframes")
                     if not isinstance(raw_tracks, list):
                         raw_tracks = parameters.get("keyframes") if isinstance(parameters.get("keyframes"), list) else []
-                    supported_properties = EFFECT_KEYFRAME_ALIASES.get(effect_type)
+                    supported_properties = effect_properties(effect_type)
                     for track_index, track_value in enumerate(raw_tracks):
                         track_path = f"{effect_path}.keyframes[{track_index}]"
                         if not isinstance(track_value, dict):
@@ -744,7 +760,7 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
                                 raw_effect_tracks = parameters.get("keyframes") if isinstance(parameters.get("keyframes"), list) else []
                             if not raw_effect_tracks:
                                 continue
-                            supported_properties = EFFECT_KEYFRAME_ALIASES.get(effect_type)
+                            supported_properties = effect_properties(effect_type)
                             for track_index, track_value in enumerate(raw_effect_tracks):
                                 track_path = f"{effect_path}.keyframes[{track_index}]"
                                 if not isinstance(track_value, dict):

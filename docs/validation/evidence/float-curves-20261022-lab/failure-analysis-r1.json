@@ -1,0 +1,79 @@
+{
+  "status": "preserved-original-failures-and-accepted-corrections",
+  "receipts": {
+    "native-r1": {
+      "sha256": "sha256:1a2f0b5126b37c9c791a478e8b477d5dc2787e63d4951d50a634d2e9a9a63f9c",
+      "status": "failed-preserved",
+      "methods": 40,
+      "seconds": 44.009484000001976,
+      "failures": 3,
+      "errors": 0,
+      "skipped": 0,
+      "frozen_equal": true,
+      "script_calls": 10,
+      "checks": 0
+    },
+    "native-r2": {
+      "sha256": "sha256:5551b4b93a167c06f6a15b9c442e9628937e9054503faf863ef6b1e6e2ad2be2",
+      "status": "failed-preserved",
+      "methods": 200,
+      "seconds": 513.699647399997,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "frozen_equal": true,
+      "script_calls": 124,
+      "checks": 0
+    },
+    "native-r3": {
+      "sha256": "sha256:3e9b30b58994b5555040fb20311846ab239b86176b90fee57824be2831266723",
+      "status": "passed",
+      "methods": 200,
+      "seconds": 451.765905500004,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "frozen_equal": true,
+      "script_calls": 130,
+      "checks": 0
+    },
+    "media-r1": {
+      "sha256": "sha256:aaffcc233dc7c3cbc68f5f95b8a92ef1871ba070e60818f71a663c83344f6f3d",
+      "status": "failed-preserved",
+      "methods": null,
+      "seconds": null,
+      "failures": null,
+      "errors": null,
+      "skipped": null,
+      "frozen_equal": true,
+      "script_calls": 4,
+      "checks": 3
+    },
+    "media-r2": {
+      "sha256": "sha256:f408ccaf5e8662e6b104853baebc202f4273c7bd26a57cc6420130500422e30f",
+      "status": "passed-public-CLI-floating-curves-and-native-float-previews",
+      "methods": null,
+      "seconds": null,
+      "failures": null,
+      "errors": null,
+      "skipped": null,
+      "frozen_equal": true,
+      "script_calls": 20,
+      "checks": 29
+    }
+  },
+  "native_r1": [
+    "old sampled Bezier produces .49999943 at symmetric midpoint; replaced by direct cubic/48-step inversion",
+    "invalid continuous-versus-quantized uniform two-code oracle; separated independent continuous mathematics from native integer-grid modelling",
+    "nested reverse endpoint intentionally uses nextafter(160,-inf), not exact 160; corrected fixture"
+  ],
+  "native_r2": "one-stage integer rounding error can be amplified by post-master; independently check each stage within one code and require actual combined output byte-equal to two real native stages",
+  "media_r1": "author fixture omitted required interpolation on final keys; public CLI correctly rejected it; generator now explicitly writes linear without changing product validation",
+  "native_pchip_two_point_outside_domain_difference": "native extends the line; this product explicitly extends constant endpoint values",
+  "native_diagnostic_maximum_RGB16_codes": 7378.648178577423,
+  "diagnostic_is_not_a_pass_tolerance": true,
+  "pixel_tolerance_not_widened": true,
+  "new_native_test_methods": 40,
+  "accepted_related_native_methods": 200,
+  "full_capcut_parity": false
+}

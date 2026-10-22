@@ -1,5 +1,31 @@
 # AI广告剪辑文档中心
 
+<!-- V102-CONTINUOUS-FLOAT-RGB-CURVES -->
+### V102 连续浮点RGB曲线与作者控制点
+
+显式 `float32-native-v1` 工程的正式render和预览共用连续RGB曲线。空间natural/PCHIP、独立通道、后置总曲线与作者控制点关键帧直接浮点求值，无整数曲线表。默认后端迁移、其余浮点算子及完整剪映功能仍未完成。
+
+| 编号 | 功能性核验 | 实际内容与范围 | 证据 |
+|---|---|---|---|
+| FC102-01 | 共同内核 | 新增float_curves及40项测试，父LUT候选309→311输入、5条产品路径改变；正式render、区间预览与PNG16共用有序效果链 | [接口契约](../docs/specs/连续浮点RGB曲线与后置总曲线契约_v0.1_2026-10-22.md) |
+| FC102-02 | 连续曲线 | natural三对角求解、PCHIP保形插值；独立稠密矩阵与Hermite基函数对照。1..256固定点、常量端点延伸、曲线输出夹0..1；不是8/16位网格 | [实际200项相关回归](../docs/validation/evidence/float-curves-20261022-lab/native-r3/verification.json) |
+| FC102-03 | RGB与总曲线 | all仅给未独立声明通道提供默认；旧master别名指all；post_master为独立后置总曲线；动态通道从静态all分叉后独立 | [控制点与顺序断言](../docs/validation/evidence/float-curves-20261022-lab/native-r3/unittest.log) |
+| FC102-04 | 作者时钟 | all/R/G/B/post_master的点x/y和强度，六种时间插值；Bezier直接求值，四控制值用48次求根；保留超2^53有理tick偏移、作者窗口和嵌套倒放左极限 | [实际执行源码](../docs/validation/evidence/float-curves-20261022-lab/native-r3/verification.json) |
+| FC102-05 | 浮点与信号 | 65536级灰阶与相邻Float32保留；明确输入/输出信号，转回线性工作RGB后混强度；alpha位型与隐藏RGB单独核验；强度0逐位复制 | [精度/信号断言](../docs/validation/evidence/float-curves-20261022-lab/native-r3/unittest.log) |
+| FC102-06 | 原生对照边界 | natural/PCHIP的真实RGB16单阶段及后置总曲线；分别建模原生格起点、截断和两次量化，每阶段独立误差≤1码；合并原生结果与真实两阶段逐字节相同。连续结果另对照数学基准 | [原生命令/I/O/4组记录](../docs/validation/evidence/float-curves-20261022-lab/native-r3/verification.json) |
+| FC102-07 | 有序效果与预算 | 曝光/曲线、LUT/曲线顺序、禁用项、只读输入、分块逐位相同；晚块非法值、取消和工作区拒绝保留输入；预算含保留LUT，不是进程总RSS | [实际断言](../docs/validation/evidence/float-curves-20261022-lab/native-r3/unittest.log) |
+| FC102-08 | 公开CLI | 20脚本调用/29检查；2次正式render、3次preview；原创320×180、10fps、2秒各20帧，5段覆盖空间插值、点x/y、后置总曲线、Bezier强度及效果顺序 | [原始命令与输出](../docs/validation/evidence/float-curves-20261022-lab/media-r2/verification.json) |
+| FC102-09 | 独立全选区参考 | 作者帧3..16共2,419,200个线性RGB值，最大绝对误差7.45058059692e-09；正式96000及选区67200双声道PCM采样帧相同；PNG16与选区对应作者帧误差≤1码 | [独立执行参考](../docs/validation/evidence/float-curves-20261022-lab/media-r2/executed-oracle.py.txt) |
+| FC102-10 | 原视频/GIF | 原创RGB16图形、alpha与正弦音频，CC0；GIF左原片、右真实CLI预览，14×100ms；静看3/10/16共6幅画面，不代替连续播放或试听 | [原片](../docs/assets/float-curves-20261022-r2/original-range.mp4) · [实际预览](../docs/assets/float-curves-20261022-r2/range.mp4) · [Float32](../docs/assets/float-curves-20261022-r2/range.master.nut) · [PNG16](../docs/assets/float-curves-20261022-r2/frame.png) · [查看记录](../docs/validation/evidence/float-curves-20261022-lab/static-review-r1.json) |
+| FC102-11 | 离线安装 | **400项 /873.416秒 /0跳过**；186份source/wheel/site资源、8个固定离线wheel、NumPy931文件及原许可一致；安装版实际CLI音画、Float32及PNG16与源码版一致。 | [安装收据](../docs/validation/evidence/float-curves-20261022-lab/installed-r1/verification.json) · [作者工程](../docs/assets/float-curves-20261022-r2/author-project.json) · [权利账](../docs/assets/float-curves-20261022-r2/rights-ledger.json) · [CC0](../docs/assets/float-curves-20261022-r2/LICENSE.txt) |
+| FC102-12 | 完整回归 | **2495项 /6957.906秒 /0跳过**；311产品输入、8外部夹具和9依赖不变。 200源码、400安装与完整套件分别记录，覆盖重叠不累计成完成率 | [本轮报告](../docs/validation/连续浮点RGB曲线与作者控制点实测_2026-10-22.md) |
+| FC102-13 | 保留失败与未验收 | 源码r1实际40项3失败、r2实际200项1失败；真实样例r1因末关键帧缺少公开入口必填插值被拒绝。自然素材、动态增删点、HDR/ICC、实时/长片RSS和完整剪映等价尚未验收 | [失败与精度边界](../docs/validation/evidence/float-curves-20261022-lab/failure-analysis-r1.json) |
+
+![原片与真实CLI连续RGB曲线预览](../docs/assets/float-curves-20261022-r2/comparison.gif)
+
+<!-- /V102-CONTINUOUS-FLOAT-RGB-CURVES -->
+
+
 <!-- V101-FLOAT-LOCAL-LUT -->
 ### V101 浮点本地LUT与有序调色链
 
