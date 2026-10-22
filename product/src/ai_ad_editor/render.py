@@ -9,6 +9,7 @@ import re
 import threading
 import subprocess
 import time
+from contextlib import ExitStack
 from fractions import Fraction
 from pathlib import Path
 from typing import Any, Callable
@@ -4716,6 +4717,14 @@ def render_project(
     progress_callback: Callable[[str, str, float | None, str], None] | None = None,
     resume_of: str | None = None,
 ) -> dict[str, Any]:
+    with ExitStack() as runtime:
+        return _render_project(root, project, sequence, output, dry_run=dry_run,
+            render_settings=render_settings, profile=profile, cancel_file=cancel_file,
+            progress_callback=progress_callback, resume_of=resume_of, _runtime=runtime)
+
+
+def _render_project(root, project, sequence, output, *, dry_run=False, render_settings=None,
+                    profile=None, cancel_file=None, progress_callback=None, resume_of=None, _runtime):
     effective_project = dict(project)
     effective_project['settings'] = copy.deepcopy(render_settings if render_settings is not None else project['settings'])
     if render_settings is None:
@@ -4729,14 +4738,23 @@ def render_project(
         effective_project['sequences'] = [render_sequence if s.get('id') == sequence.get('id') else s for s in project['sequences']]
     encoder = output_settings(effective_project["settings"])
     validate_output_alignment(sequence_canvas(effective_project, render_sequence), str(encoder['video']['pixel_format']))
-    inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, render_sequence,
-        _persist_video_index=not dry_run,_cancel_file=cancel_file)
+    float_renderer = None
+    if effective_project['settings'].get('pixel_pipeline') is not None:
+        from .float_standard_render import FloatRenderContext
+        float_renderer = _runtime.enter_context(FloatRenderContext(root, effective_project, render_sequence,
+            encoder, dry_run=dry_run, cancel_file=cancel_file))
+        inputs, graph, input_meta, warnings = float_renderer.graph()
+    else:
+        inputs, graph, input_meta, warnings = build_filter_graph(root, effective_project, render_sequence,
+            _persist_video_index=not dry_run,_cancel_file=cancel_file)
     fingerprints = render_fingerprints(project, sequence, effective_project["settings"], root)
-    output.parent.mkdir(parents=True, exist_ok=True)
+    if not dry_run:
+        output.parent.mkdir(parents=True, exist_ok=True)
     operation_id = new_id("render")
     acceleration = AccelerationSession(root, effective_project['settings'], encoder, operation_id, cancel_file)
     temp_dir = root / "renders" / ".tmp" / operation_id
-    temp_dir.mkdir(parents=True, exist_ok=True)
+    if not dry_run:
+        temp_dir.mkdir(parents=True, exist_ok=True)
     temp_output = temp_dir / output.name
     progress_file = temp_dir / "ffmpeg-progress.log"
     container = encoder["container"]
@@ -4745,8 +4763,10 @@ def render_project(
     lossless_vp9 = (video_encoder['codec'] == 'libvpx-vp9' and
                     video_encoder['crf'] == 0 and not video_encoder.get('bitrate'))
     delivery: dict[str, Any] = {}
-    video_output = 'vout'
-    if video_encoder['pixel_format'] in ALPHA_OUTPUT_PIXEL_FORMATS:
+    video_output = 'float_vout' if float_renderer is not None else 'vout'
+    if float_renderer is not None:
+        delivery['pixel_pipeline'] = float_renderer.metadata
+    if float_renderer is None and video_encoder['pixel_format'] in ALPHA_OUTPUT_PIXEL_FORMATS:
         # swscale's combined RGBA -> YUVA conversion can round alpha levels
         # 128..254 upwards. Keep the original byte plane outside color math.
         graph += (';[vout]format=rgba,split=2[delivery_rgb][delivery_a]'
@@ -4775,9 +4795,10 @@ def render_project(
         graph = tag_output_frames(graph, video_output, effective_project['settings'])
     args = [
         ffmpeg_path(), "-hide_banner", "-y", "-loglevel", "error",
+        *(['-nostdin', '-filter_complex_threads', '1'] if float_renderer is not None else []),
         "-progress", str(progress_file),
         *inputs, "-filter_complex", graph, "-map", f"[{video_output}]", "-map", "[aout]",
-        "-t", f"{float(encoded_end):.9f}",
+        *([] if float_renderer is not None else ["-t", f"{float(encoded_end):.9f}"]),
         "-c:v", str(video_encoder["codec"]),
     ]
     if str(video_encoder.get("codec")) in {"libx264", "libx265"}:
@@ -4794,6 +4815,8 @@ def render_project(
         args.extend(['-auto-alt-ref', '0'])
     args.extend(["-pix_fmt", str(video_encoder.get("pixel_format", "yuv420p"))])
     args.extend(_output_color_args(effective_project["settings"]))
+    if float_renderer is not None:
+        args.extend(['-chroma_sample_location', 'left'])
     args.extend(["-c:a", str(audio_encoder["codec"])])
     if not str(audio_encoder.get("codec", '')).startswith('pcm_'):
         args.extend(["-b:a", str(audio_encoder.get("bitrate", "192k"))])
@@ -4864,6 +4887,8 @@ def render_project(
             result, execution_args, graph_transport = acceleration.execute(args, graph,
                 lambda command, current_graph: _execution_filter_graph(root, command, current_graph, write=True),
                 check_acceleration_inputs)
+        elif float_renderer is not None:
+            result = float_renderer.run(execution_args)
         else:
             result = run_process(execution_args, timeout=3600, cwd=root, cancel_file=cancel_file)
         if result.returncode != 0:
@@ -4886,10 +4911,9 @@ def render_project(
         from .native_video_index import verify_materialized as verify_native_indexes
         verify_native_indexes(root,input_meta,cancel_file=cancel_file)
         verify_audio_clocks(root,input_meta,cancel_file=cancel_file)
-        try:
-            os.replace(temp_output, output)
-        except OSError as exc:
-            raise AppError('RENDER_PUBLISH_FAILED', '无法原子发布成片', exit_code=6, path=str(output), cause=str(exc)) from exc
+        if float_renderer is not None:
+            float_renderer.finish_sources()
+            check_acceleration_inputs()
         if acceleration.enabled:
             acceleration.evidence['status'] = 'verified'
             acceleration.save()
@@ -4899,7 +4923,7 @@ def render_project(
             "project_id": project["project"]["id"],
             "sequence_id": sequence["id"],
             "output": str(output),
-            "sha256": sha256_file(output),
+            "sha256": sha256_file(temp_output),
             "probe": inspected,
             "command": execution_args,
             "filter_graph_transport": graph_transport,
@@ -4915,7 +4939,14 @@ def render_project(
             "resume_of": resume_of,
         }
         manifest_path = output.with_suffix(output.suffix + ".manifest.json")
-        atomic_write_json(manifest_path, manifest)
+        if float_renderer is not None:
+            float_renderer.publish(temp_output, output, manifest, operation_id)
+        else:
+            try:
+                os.replace(temp_output, output)
+            except OSError as exc:
+                raise AppError('RENDER_PUBLISH_FAILED', '无法原子发布成片', exit_code=6, path=str(output), cause=str(exc)) from exc
+            atomic_write_json(manifest_path, manifest)
         if progress_callback:
             progress_callback(operation_id, "artifact_written", 100.0, "渲染产物和 manifest 已写入")
             progress_callback(operation_id, "completed", 100.0, "渲染完成")

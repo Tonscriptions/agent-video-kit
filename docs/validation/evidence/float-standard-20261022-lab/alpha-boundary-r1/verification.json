@@ -1,0 +1,83 @@
+{
+  "status": "measured-all-256-alpha-codes",
+  "cases": [
+    {
+      "id": "unit65535",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-v",
+        "error",
+        "-threads",
+        "1",
+        "-filter_threads",
+        "1",
+        "-f",
+        "rawvideo",
+        "-pixel_format",
+        "gbrap16le",
+        "-video_size",
+        "256x2",
+        "-i",
+        "pipe:0",
+        "-vf",
+        "alphaextract,format=gray",
+        "-frames:v",
+        "1",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "input_sha256": "sha256:ebfc88ca427ba209bde541f7700c4b7ea2762b2eeca02dca002a273bd6fd86cd",
+      "output_sha256": "sha256:110009dcee21620b166f3abfecb5eff7a873be729d1c2d53822e7acc5f34eb9b",
+      "maximum_code_error": 0,
+      "wrong_components": 0
+    },
+    {
+      "id": "code8-left-shift8",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-v",
+        "error",
+        "-threads",
+        "1",
+        "-filter_threads",
+        "1",
+        "-f",
+        "rawvideo",
+        "-pixel_format",
+        "gbrap16le",
+        "-video_size",
+        "256x2",
+        "-i",
+        "pipe:0",
+        "-vf",
+        "alphaextract,format=gray",
+        "-frames:v",
+        "1",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "input_sha256": "sha256:e788aec888f1fa0d5ed85f485947e8f1bffdd0b35544c1bc1df736d3bba52d2f",
+      "output_sha256": "sha256:70510f64babeef5a088c0cb3c60de593ca142318957985b57a31999f0edc319b",
+      "maximum_code_error": 1,
+      "wrong_components": 384
+    }
+  ],
+  "actual_native_commands": 2,
+  "ffmpeg": {
+    "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+    "sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+  },
+  "script_sha256": "sha256:816587ae91139b9ec8303b254ee848641d67b25d241da84b93a0b23b8f4613b5",
+  "movie_encoded": false,
+  "browser": false,
+  "network": false,
+  "virtualization": false
+}

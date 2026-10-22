@@ -92,10 +92,14 @@ class TimedSurfaceSource:
         if self.verify_callback is not None:self.verify_callback()
 
 class FloatTimeline:
-    def __init__(self,project,sequence_id,sources,*,working_signal,background_signal=ColorSignal('bt709','srgb'),cancel=None):
+    def __init__(self,project,sequence_id,sources,*,working_signal,background_signal=ColorSignal('bt709','srgb'),cancel=None,
+                 max_working_bytes=768*1024*1024):
         if not isinstance(working_signal,ColorSignal) or not isinstance(background_signal,ColorSignal):raise error('SIGNAL','工作与背景RGB信号须明确')
         if cancel is not None and not callable(cancel):raise error('ARGUMENT','取消回调无效')
         self.project=copy.deepcopy(project);self.sources=dict(sources);self.working=working_signal;self.background_signal=background_signal
+        if type(max_working_bytes) is not int or not 1<=max_working_bytes<=768*1024*1024:
+            raise error('BUDGET','浮点投影/合成的单次工作区配额须在1字节到768MiB')
+        self.max_working_bytes=max_working_bytes
         self.poll=cancel if cancel is not None else lambda:None;self.poll()
         self.settings=self.project['settings'];base=self.settings['timebase'];fps=base['display_fps']
         self.tps=integer(base['ticks_per_second'],1);self.fps=Fraction(integer(fps['num'],1),integer(fps['den'],1))
@@ -227,7 +231,7 @@ class FloatTimeline:
         mask=self._mask(clip,surface.shape,tick)
         if mask is not None:
             surface=surface.copy();surface[...,3]*=mask
-        result,_=resample_rgba(surface,(cw,ch),inverse,cancel=self.poll)
+        result,_=resample_rgba(surface,(cw,ch),inverse,max_working_bytes=self.max_working_bytes,cancel=self.poll)
         return result,opacity,inverse
 
     def _sequence(self,sequence_id,at,rows,*,root=False,depth=0,left_limit=False):
@@ -239,7 +243,7 @@ class FloatTimeline:
             if not re.fullmatch('#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?',text):raise error('BACKGROUND','背景当前要求明确RGB/RGBA十六进制')
             channels=[int(text[i:i+2],16)/255 for i in range(1,len(text),2)]
             if len(channels)==3:channels.append(1.)
-            colour,_=convert_rgba(np.array([[channels]],np.float32),self.background_signal,self.working,cancel=self.poll)
+            colour,_=convert_rgba(np.array([[channels]],np.float32),self.background_signal,self.working,max_working_bytes=self.max_working_bytes,cancel=self.poll)
             result[:]=colour[0,0]
         duration=Fraction(int(sequence['duration_tick']),self.tps)
         if not ((0<at<=duration) if left_limit else (0<=at<duration)):return result
@@ -263,7 +267,7 @@ class FloatTimeline:
                 if len(rows)>=MAX_LAYERS_PER_FRAME:raise error('BUDGET','同帧片段数超过128')
                 layer,opacity,inverse=self._project(clip,source,canvas,tick)
                 blend=clip.get('blend') or {};opacity*=keyframe_value(clip,('blend.opacity','blend_opacity'),float(blend.get('opacity',1)),float(tick))
-                result,_=composite_rgba(result,layer,mode=blend.get('mode','normal'),opacity=opacity,cancel=self.poll)
+                result,_=composite_rgba(result,layer,mode=blend.get('mode','normal'),opacity=opacity,max_working_bytes=self.max_working_bytes,cancel=self.poll)
                 rows.append({'clip':path,'source_time':str(source_time),'native_frame_index':frame_index,'right_edge':right,
                     'author_animation_tick':str(tick),'inverse_affine':inverse,'opacity':opacity})
         return result

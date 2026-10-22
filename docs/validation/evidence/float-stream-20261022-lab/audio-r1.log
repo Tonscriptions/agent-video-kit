@@ -1,0 +1,81 @@
+test_audio_volume_automation_is_retained_after_visual_keyframes_are_pruned (test_float_audio_graph.FloatAudioGraphTests.test_audio_volume_automation_is_retained_after_visual_keyframes_are_pruned) ... FAIL
+test_cancel_and_unconnected_source_transitions_reject_without_real_video_decode (test_float_audio_graph.FloatAudioGraphTests.test_cancel_and_unconnected_source_transitions_reject_without_real_video_decode) ... ok
+test_empty_and_muted_audio_keep_exact_authored_sample_count (test_float_audio_graph.FloatAudioGraphTests.test_empty_and_muted_audio_keep_exact_authored_sample_count) ... ok
+test_freeze_inserts_exact_authored_silence_and_preserves_source_clock (test_float_audio_graph.FloatAudioGraphTests.test_freeze_inserts_exact_authored_silence_and_preserves_source_clock) ... ok
+test_half_open_source_trim_and_timeline_silence_match_every_sample (test_float_audio_graph.FloatAudioGraphTests.test_half_open_source_trim_and_timeline_silence_match_every_sample) ... ok
+test_native_stereo_source_is_exact_and_missing_visual_is_never_opened (test_float_audio_graph.FloatAudioGraphTests.test_native_stereo_source_is_exact_and_missing_visual_is_never_opened) ... ok
+test_nested_video_container_retains_complete_child_audio_and_window (test_float_audio_graph.FloatAudioGraphTests.test_nested_video_container_retains_complete_child_audio_and_window) ... ERROR
+test_reverse_preserves_channel_pairs_and_every_original_sample (test_float_audio_graph.FloatAudioGraphTests.test_reverse_preserves_channel_pairs_and_every_original_sample) ... ok
+
+======================================================================
+ERROR: test_nested_video_container_retains_complete_child_audio_and_window (test_float_audio_graph.FloatAudioGraphTests.test_nested_video_container_retains_complete_child_audio_and_window)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_audio_graph.py", line 59, in test_nested_video_container_retains_complete_child_audio_and_window
+    result,_=self.render();self.assertEqual(result,self.samples[9600:33600].tobytes())
+             ~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_audio_graph.py", line 35, in render
+    p=self.p if project is None else project;before=copy.deepcopy(p);plan=prepare(self.root,p,'seq_main');self.assertEqual(p,before)
+                                                                          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_audio_graph.py", line 37, in prepare
+    inputs,graph,metadata,warnings=build_filter_graph(root,detached,sequence,_allow_audio_only=True,
+                                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        _persist_video_index=persist_clock,_cancel_file=marker)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\render.py", line 3810, in build_filter_graph
+    project, sequence, window_inputs, window_filters, window_meta = _prepare_clip_windows(
+                                                                    ~~~~~~~~~~~~~~~~~~~~~^
+        root, project, sequence, child_builder, stack=_inline_stack, video_only=_video_only)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\clip_windows.py", line 235, in prepare
+    child_inputs, graph, child_meta, warnings = build_graph(root, child_project, child,
+                                                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        _allow_audio_only=(track['kind'] == 'audio'), _inline_stack=(*stack, sequence['id']))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\render.py", line 3799, in child_builder
+    return build_filter_graph(*args, **kwargs, _effect_runtime=_effect_runtime,
+                              _frame_index_context=_frame_index_context,
+                              _audio_clock_context=_audio_clock_context)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\render.py", line 4590, in build_filter_graph
+    raise AppError("VIDEO_TRACK_EMPTY", "没有可渲染的视频片段或独立文字轨道", exit_code=2, path="sequences[].tracks")
+ai_ad_editor.errors.AppError: 没有可渲染的视频片段或独立文字轨道
+
+======================================================================
+FAIL: test_audio_volume_automation_is_retained_after_visual_keyframes_are_pruned (test_float_audio_graph.FloatAudioGraphTests.test_audio_volume_automation_is_retained_after_visual_keyframes_are_pruned)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_audio_graph.py", line 64, in test_audio_volume_automation_is_retained_after_visual_keyframes_are_pruned
+    result,_=self.render();actual=np.frombuffer(result,'<f4').reshape(-1,2);np.testing.assert_allclose(actual,self.samples*10**(-6/20),atol=3e-8,rtol=0)
+                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\carzy\AppData\Roaming\Python\Python313\site-packages\numpy\testing\_private\utils.py", line 1768, in assert_allclose
+    assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         verbose=verbose, header=header, equal_nan=equal_nan,
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         strict=strict)
+                         ^^^^^^^^^^^^^^
+  File "C:\Users\carzy\AppData\Roaming\Python\Python313\site-packages\numpy\testing\_private\utils.py", line 983, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Not equal to tolerance rtol=0, atol=3e-08
+
+Mismatched elements: 95996 / 96000 (100%)
+First 5 mismatches are at indices:
+ [0, 1]: 0.17000000178813934 (ACTUAL), 0.08520182222127914 (DESIRED)
+ [1, 0]: 0.009081315249204636 (ACTUAL), 0.004551439080387354 (DESIRED)
+ [1, 1]: 0.16944225132465363 (ACTUAL), 0.08492229133844376 (DESIRED)
+ [2, 0]: 0.018143897876143456 (ACTUAL), 0.00909348949790001 (DESIRED)
+ [2, 1]: 0.16777266561985016 (ACTUAL), 0.08408551663160324 (DESIRED)
+Max absolute difference among violations: 0.09976256
+Max relative difference among violations: 0.99526256
+ ACTUAL: array([[ 0.      ,  0.17    ],
+       [ 0.009081,  0.169442],
+       [ 0.018144,  0.167773],...
+ DESIRED: array([[ 0.      ,  0.085202],
+       [ 0.004551,  0.084922],
+       [ 0.009093,  0.084086],...
+
+----------------------------------------------------------------------
+Ran 8 tests in 57.077s
+
+FAILED (failures=1, errors=1)

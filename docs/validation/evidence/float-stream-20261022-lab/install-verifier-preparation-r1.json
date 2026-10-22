@@ -1,0 +1,41 @@
+{
+  "parent_source": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\float-timeline-lab-20261022\\scripts\\verify_float_timeline_install.py",
+  "parent_sha256": "sha256:c8af4faa2d57a9fb564a6b43425a31e35e8f3171eddde5101d41053bf2c049d2",
+  "target": "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\float-stream-lab-20261022\\scripts\\verify_float_stream_install.py",
+  "target_sha256": "sha256:f6ee0896fd58e86cd05908162c3ba1d736ee0fc1f81520ac85d878fd916c852a",
+  "replacements": [
+    [
+      "float-timeline-20261022-lab",
+      "float-stream-20261022-lab"
+    ],
+    [
+      "float-timeline-20261022/installed-r1",
+      "float-stream-20261022/installed-r1"
+    ],
+    [
+      "174",
+      "176"
+    ],
+    [
+      "288",
+      "292"
+    ],
+    [
+      "163",
+      "182"
+    ],
+    [
+      "smoke_float_timeline_media.py",
+      "smoke_float_stream_media.py"
+    ],
+    [
+      "'test_float_bundle_source']",
+      "'test_float_bundle_source','test_float_audio_graph','test_float_stream']"
+    ],
+    [
+      "m['status'].startswith('passed-real-media-') and m['isolated_python'] and m['actual_subprocesses']==14 and m['actual_CLI_processes']==0",
+      "m['status']=='passed-real-bounded-FFV1-and-independent-authored-PCM' and m['isolated_python'] and m['actual_encoder_processes']==2 and m['actual_new_CLI_processes']==0"
+    ]
+  ],
+  "executed": false
+}

@@ -6,6 +6,7 @@ project write lock. A cache hit verifies content; it never denotes inference.
 from __future__ import annotations
 
 import copy
+from contextlib import ExitStack
 from fractions import Fraction
 import hashlib
 import json
@@ -102,10 +103,15 @@ def plan(project, sequence, *, start_frame, end_frame, height=360, mode='range',
     first_sample = math.ceil(Fraction(start_frame * 48000, 1) / fps)
     last_sample = min(math.ceil(Fraction(end_frame * 48000, 1) / fps), math.ceil(duration * 48000))
     # Conservative space admission includes master, delivery and staging.
-    estimate = 2 * ((end_frame-start_frame)*width*out_height*4 + max(0, last_sample-first_sample)*8) + 1024*1024
+    reference = {}
+    if project['settings'].get('pixel_pipeline') is not None:
+        from .float_preview import reference_plan
+        reference = reference_plan(project, mode)
+    bytes_per_pixel = reference.get('reference_bytes_per_pixel', 4)
+    estimate = 2 * ((end_frame-start_frame)*width*out_height*bytes_per_pixel + max(0, last_sample-first_sample)*8) + 1024*1024
     if end_frame-start_frame > 3600 or estimate > budget_mib*1024*1024:
         raise fail('PREVIEW_BUDGET', '区间超过 3600 帧或保守工作空间预算；缩短区间或降低高度')
-    return {'engine': ENGINE, 'mode': mode, 'sequence_id': sequence['id'],
+    return {'engine': ENGINE, 'mode': mode, 'sequence_id': sequence['id'], **reference,
             'start_frame': start_frame, 'end_frame': end_frame, 'frames': end_frame-start_frame,
             'fps': dict(fps_value), 'author_start_seconds': str(Fraction(start_frame, 1)/fps),
             'author_end_seconds': str(min(Fraction(end_frame, 1)/fps, duration)),
@@ -144,6 +150,9 @@ def identity(root, project, sequence, request, marker):
         if path.is_file():
             paths.add(path)
     runtime = _runtime_paths()
+    if project['settings'].get('pixel_pipeline') is not None:
+        from .float_preview import runtime_paths
+        runtime.update(runtime_paths())
     runtime.update(p for p in Path(__file__).resolve().parent.iterdir() if p.is_file() and p.suffix in {'.c', '.dll'})
     if len(paths | runtime) > MAX_FILES:
         raise fail('PREVIEW_BUDGET', '预览依赖超过 4096 个文件')
@@ -291,8 +300,19 @@ def _copy_result(root, directory, receipt, output, marker):
 
 @verification_scope()
 def preview_project(root, project, sequence, *, request, output=None, cancel_file=None, dry_run=False):
+    with ExitStack() as contexts:
+        return _preview_project(root, project, sequence, request=request, output=output,
+            cancel_file=cancel_file, dry_run=dry_run, contexts=contexts)
+
+
+def _preview_project(root, project, sequence, *, request, output, cancel_file, dry_run, contexts):
     started = time.monotonic()
     cancel(cancel_file)
+    if project['settings'].get('pixel_pipeline') is not None:
+        from .float_preview import reference_plan
+        reference = reference_plan(project, request.get('mode'))
+        if any(request.get(k) != v for k, v in reference.items()):
+            raise fail('PREVIEW_ARGUMENT_INVALID', '浮点预览请求必须使用匹配作者信号及精度的plan结果')
     base = cache_root(root)
     if output is not None:
         output = plain(root, output)
@@ -343,8 +363,14 @@ def preview_project(root, project, sequence, *, request, output=None, cancel_fil
     temporary.mkdir()
     try:
         effective = copy.deepcopy(project)
-        inputs, graph, metadata, warnings = build_filter_graph(root, effective, sequence,
-            _persist_video_index=True,_cancel_file=cancel_file)
+        float_preview = None
+        if effective['settings'].get('pixel_pipeline') is not None:
+            from .float_preview import FloatPreviewContext
+            float_preview = contexts.enter_context(FloatPreviewContext(root, effective, sequence, request, cancel_file=cancel_file))
+            inputs, graph, metadata, warnings = float_preview.graph()
+        else:
+            inputs, graph, metadata, warnings = build_filter_graph(root, effective, sequence,
+                _persist_video_index=True,_cancel_file=cancel_file)
         from .reverse_cache import materialize as materialize_reverse, verify_materialized as verify_reverse
         reverse_jobs=materialize_reverse(root,metadata,temporary,cancel_file=cancel_file)
         for obj in metadata:
@@ -376,24 +402,33 @@ def preview_project(root, project, sequence, *, request, output=None, cancel_fil
         canvas = sequence_canvas(project, sequence)
         if (request['width'],request['height']) != (canvas['width'],canvas['height']):
             raster += f",scale={request['width']}:{request['height']}:flags=lanczos,format=bgra"
-        graph += f";[vout]trim=start_frame={s}:end_frame={e},setpts=PTS-STARTPTS,{raster}[preview_v]"
-        if request['mode'] == 'frame':
+        if float_preview is not None:
+            command, name = float_preview.command(inputs, graph, temporary)
+        elif request['mode'] == 'frame':
+            graph += f";[vout]trim=start_frame={s}:end_frame={e},setpts=PTS-STARTPTS,{raster}[preview_v]"
             graph += ';[aout]anullsink'
             name = 'frame.png'
             output_args = ['-map','[preview_v]','-frames:v','1','-c:v','png','-pix_fmt','rgba','-update','1',str(temporary/name)]
         else:
+            graph += f";[vout]trim=start_frame={s}:end_frame={e},setpts=PTS-STARTPTS,{raster}[preview_v]"
             graph += f";[aout]atrim=start_sample={request['audio_start_sample_48000']}:end_sample={request['audio_end_sample_48000']},asetpts=N/SR/TB[preview_a]"
             name = 'master.nut'
             output_args = ['-map','[preview_v]','-map','[preview_a]','-c:v','ffv1','-level','3','-pix_fmt','bgra','-c:a','pcm_f32le','-f','nut',str(temporary/name)]
-        command = [ffmpeg_path(),'-hide_banner','-y','-loglevel','error',*inputs,'-filter_complex',graph,*output_args]
+        if float_preview is None:
+            command = [ffmpeg_path(),'-hide_banner','-y','-loglevel','error',*inputs,'-filter_complex',graph,*output_args]
         command, transport = _execution_filter_graph(root, command, graph, write=True)
-        result = run_process(command, cwd=root, timeout=3600, cancel_file=cancel_file)
-        if result.returncode:
-            raise AppError('PREVIEW_RENDER_FAILED', '时间线预览失败', exit_code=6, cause=result.stderr[-6000:])
+        if float_preview is not None:
+            float_preview.run(command)
+        else:
+            result = run_process(command, cwd=root, timeout=3600, cancel_file=cancel_file)
+            if result.returncode:
+                raise AppError('PREVIEW_RENDER_FAILED', '时间线预览失败', exit_code=6, cause=result.stderr[-6000:])
         names = [name]
         if request['mode'] == 'range':
             delivery_command = [ffmpeg_path(),'-hide_banner','-y','-loglevel','error','-i',str(temporary/name),
                 '-c:v','libx264','-preset','ultrafast','-crf','23','-pix_fmt','yuv420p','-c:a','aac','-b:a','128k','-movflags','+faststart',str(temporary/'preview.mp4')]
+            if float_preview is not None:
+                delivery_command = float_preview.delivery_command(temporary)
             result = run_process(delivery_command, cwd=root, timeout=3600, cancel_file=cancel_file)
             if result.returncode:
                 raise AppError('PREVIEW_ENCODE_FAILED', 'MP4 预览编码失败', exit_code=6, cause=result.stderr[-6000:])
@@ -417,6 +452,8 @@ def preview_project(root, project, sequence, *, request, output=None, cancel_fil
         from .native_video_index import verify_materialized as verify_native_indexes
         verify_native_indexes(root,metadata,cancel_file=cancel_file)
         verify_audio_clocks(root,metadata,cancel_file=cancel_file)
+        if float_preview is not None:
+            float_preview.finish_sources()
         clock = _verify_clock(temporary/name, request, cancel_file)
         files = {name:artifact_digest(temporary/name, cancel_file) for name in names}
         receipt = {'engine':ENGINE, 'base_signature':signature, 'identity':before, 'request':request,
@@ -425,6 +462,8 @@ def preview_project(root, project, sequence, *, request, output=None, cancel_fil
                    'filter_graph_transport':transport, 'inputs':metadata, 'warnings':warnings,
                    'verified_clock':clock,
                    'quality_accepted':False, 'model_inference_proven_by_preview':False}
+        if float_preview is not None:
+            receipt['pixel_pipeline'] = float_preview.metadata
         key = digest(receipt)
         receipt['key'] = key
         if len(canonical(receipt)) > 8*1024*1024:
@@ -452,6 +491,7 @@ def preview_project(root, project, sequence, *, request, output=None, cancel_fil
 def _result(directory, receipt, hit, started):
     name = 'frame.png' if receipt['request']['mode'] == 'frame' else 'preview.mp4'
     return {'status':'succeeded', 'engine':ENGINE, 'cache_hit':hit, 'cache_key':receipt['key'],
+            **({'pixel_pipeline':receipt['pixel_pipeline']} if 'pixel_pipeline' in receipt else {}),
             'cacheable':receipt['cacheable'], 'cache_bypass_reasons':receipt['cache_bypass_reasons'],
             'path':str(directory/name), 'manifest':str(directory/'preview.json'),
             'master':str(directory/'master.nut') if name == 'preview.mp4' else None,
@@ -480,7 +520,7 @@ def _verify_clock(path, request, marker):
         for i, value in enumerate(video):
             if abs(int(value['best_effort_timestamp'])*tb-Fraction(i,1)/fps) > tb:
                 raise fail('PREVIEW_OUTPUT_INVALID', '实际解码视频 PTS 不匹配', path)
-        audio_tb = Fraction(next(v['time_base'] for v in payload['streams'] if v['codec_type'] == 'audio'))
+        audio_tb = Fraction(next(v['time_base'] for v in payload['streams'] if v['codec_type'] == 'audio')) if audio else None
         offset = 0
         for value in audio:
             if abs(int(value['best_effort_timestamp'])*audio_tb-Fraction(offset,48000)) > audio_tb:

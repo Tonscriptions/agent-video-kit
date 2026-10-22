@@ -1,0 +1,54 @@
+"""Retain native alpha-mode controls against independent linear-black luma."""
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'product/src'))
+from ai_ad_editor.runtime import configure_local_runtime
+from ai_ad_editor.media import ffmpeg_path
+
+
+def main():
+    configure_local_runtime()
+    work = ROOT/'product/.runtime/float-preview-20261022/black-r1'; work.mkdir(parents=True, exist_ok=False)
+    calls = []
+    def call(name, args, payload=None):
+        command = [ffmpeg_path(), '-nostdin', '-v', 'verbose', '-filter_complex_threads', '1', *map(str, args)]
+        value = subprocess.run(command, input=payload, cwd=ROOT, capture_output=True, timeout=60, creationflags=subprocess.CREATE_NO_WINDOW)
+        (work/(name+'.stderr.log')).write_bytes(value.stderr)
+        calls.append({'name': name, 'command': command, 'exit_code': value.returncode,
+                      'stdout_bytes': len(value.stdout), 'stdout_sha256': hashlib.sha256(value.stdout).hexdigest(),
+                      'stderr': value.stderr.decode('utf8', 'replace')[-10000:]})
+        assert value.returncode == 0, (name, value.stderr[-3000:])
+        return value.stdout
+    planes = np.ones((4, 16, 32), '<f4'); planes[:3] = .2; planes[3] = .25
+    source = work/'linear.nut'
+    call('source', ['-f', 'rawvideo', '-pixel_format', 'gbrapf32le', '-video_size', '32x16', '-framerate', '10',
+        '-color_range', 'pc', '-colorspace', 'rgb', '-color_primaries', 'bt709', '-color_trc', 'linear', '-i', 'pipe:0',
+        '-c:v', 'rawvideo', '-pix_fmt', 'gbrapf32le', '-f', 'nut', source], planes.tobytes())
+    suffix = ('format=gbrpf32le,zscale=primariesin=709:transferin=linear:matrixin=gbr:rangein=full:'
+        'primaries=709:transfer=709:matrix=709:range=limited:chromal=left:dither=none,format=yuv420p')
+    variants = {'original_premultiply': 'premultiply=inplace=1,',
+                'premultiply_retag_straight': 'premultiply=inplace=1,setparams=alpha_mode=straight,',
+                'premultiply_retag_premultiplied': 'premultiply=inplace=1,setparams=alpha_mode=premultiplied,',
+                'explicit_linear_black_opaque_alpha': "geq=r='r(X,Y)*alpha(X,Y)':g='g(X,Y)*alpha(X,Y)':b='b(X,Y)*alpha(X,Y)':a=1:interpolation=nearest,setparams=alpha_mode=straight,"}
+    expected = 16+219*(1.099*(.2*.25)**.45-.099)
+    actual = {}
+    for name, prefix in variants.items():
+        raw = call(name, ['-i', source, '-vf', prefix+suffix, '-an', '-f', 'rawvideo', '-pix_fmt', 'yuv420p', 'pipe:1'])
+        actual[name] = {'center_Y': raw[8*32+16], 'expected_continuous_Y': expected, 'absolute_error': abs(raw[8*32+16]-expected)}
+    result = {'status': 'passed-independent-control', 'cases': actual, 'calls': calls,
+        'selected': 'explicit_linear_black_opaque_alpha', 'network': False, 'virtualization': False,
+        'generator_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+    assert actual[result['selected']]['absolute_error'] <= .51
+    receipt = ROOT/'docs/validation/evidence/float-preview-20261022-lab/black-r1.json'
+    receipt.write_text(json.dumps(result, ensure_ascii=False, indent=2)+'\n', encoding='utf8', newline='\n')
+    print(json.dumps({'status': result['status'], 'cases': actual}))
+
+
+if __name__ == '__main__':
+    main()

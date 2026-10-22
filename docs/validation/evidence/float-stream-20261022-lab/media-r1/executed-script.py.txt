@@ -1,0 +1,160 @@
+"""Stream real 16-bit originals plus authored stereo sound; retain demos/proofs."""
+from datetime import datetime,timezone
+from fractions import Fraction
+import argparse,copy,hashlib,json,math,os,shutil,subprocess,sys
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1];sys.path.append(str(ROOT/'scripts'))
+INSTALLED=None
+if '--installed' in sys.argv:
+    INSTALLED=Path(sys.argv[sys.argv.index('--installed')+1]).resolve();assert sys.flags.isolated and sys.flags.no_site
+    sys.path.insert(0,str(INSTALLED/'site'))
+else:sys.path.insert(0,str(ROOT/'product/src'))
+import numpy as np
+from PIL import Image,ImageDraw
+from run_frozen_regression import frozen,sha
+from ai_ad_editor.runtime import configure_local_runtime
+configure_local_runtime()
+from ai_ad_editor.float_audio_graph import prepare
+from ai_ad_editor.float_bundle_source import BundleSurfaceSource
+from ai_ad_editor.float_color_signal import ColorSignal
+from ai_ad_editor.float_stream import render_ffv1
+from ai_ad_editor.float_timeline import FloatTimeline
+from ai_ad_editor.media import ffmpeg_path,ffprobe_path
+from ai_ad_editor.schema_contract import make_validator
+
+def write(path,value):path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(value,ensure_ascii=False,indent=2,allow_nan=False)+'\n',encoding='utf8')
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--revision',required=True);parser.add_argument('--source-root',type=Path)
+    parser.add_argument('--installed');parser.add_argument('--reference',type=Path);args=parser.parse_args()
+    sibling=ROOT.parent/'float-timeline-lab-20261022';source_root=args.source_root.resolve() if args.source_root else (sibling if (sibling/'docs/assets/float-timeline-20261022-lab').is_dir() else ROOT)
+    source=source_root/'docs/assets/float-timeline-20261022-lab/media-r2';parent_receipt=source_root/'docs/validation/evidence/float-timeline-20261022-lab/media-r2/verification.json'
+    out=ROOT/'docs/assets/float-stream-20261022-lab'/('media-'+args.revision);evidence=ROOT/'docs/validation/evidence/float-stream-20261022-lab'/('media-'+args.revision)
+    work=ROOT/'product/.runtime/float-stream-20261022'/('media-'+args.revision)
+    assert not any(p.exists() for p in (out,evidence,work));out.mkdir(parents=True);evidence.mkdir(parents=True);work.mkdir(parents=True)
+    before=frozen();assert len(before)==292;calls=[];checks=[];launches=[];encoders=[]
+    def audit(event,arguments):
+        if event=='subprocess.Popen':
+            executable,command,cwd,_=arguments
+            if Path(str(executable)).name.lower() in ('ffmpeg.exe','ffprobe.exe'):
+                launches.append({'executable':str(executable),'command':list(map(str,command)),'cwd':str(cwd) if cwd is not None else None})
+    sys.addaudithook(audit)
+    record={'status':'running','started_at_utc':datetime.now(timezone.utc).isoformat(),'script_sha256':sha(Path(__file__)),'frozen_before':before,
+        'source_root':str(source_root),'native_script_calls':calls,'all_native_subprocess_launches':launches,'encoder_receipts':encoders,
+        'checks':checks,'native_windows':True,'virtualization':False,'network':False,'published':False,'actual_new_CLI_processes':0,
+        'default_render_preview_queue_integrated':False,'natural_media_accepted':False,'HDR_accepted':False,
+        'source_material':'SHA-copied procedural V93 RGB/YUV16 originals/bundles plus newly authored stereo PCM; originals CC0'}
+    def save():write(evidence/'verification.json',record)
+    def check(name,ok,**details):checks.append(dict(name=name,passed=bool(ok),**details));save();assert ok,name
+    def native(command):
+        command=list(map(str,command));p=subprocess.run(command,cwd=ROOT,capture_output=True,timeout=180,creationflags=subprocess.CREATE_NO_WINDOW)
+        calls.append({'command':command,'exit_code':p.returncode,'stdout_bytes':len(p.stdout),'stdout_sha256':'sha256:'+hashlib.sha256(p.stdout).hexdigest(),
+            'stderr_sha256':'sha256:'+hashlib.sha256(p.stderr).hexdigest()});(evidence/('native-%02d.stderr.txt'%len(calls))).write_bytes(p.stderr);save()
+        assert p.returncode==0,p.stderr.decode('utf8','replace')[-3000:];return p.stdout
+    save()
+    try:
+        previous=json.loads(parent_receipt.read_bytes());check('actual prior independently checked frame reference passed',previous['status'].startswith('passed') and previous['maximum_full_frame_reference_error']==0,
+            receipt_sha256=sha(parent_receipt),not_a_new_independent_reference_implementation=True)
+        p=json.loads((source/'project.json').read_bytes());copied={}
+        for name in ('background','foreground'):
+            original=source/'inputs'/(name+'-16bit.mkv');target=out/'inputs'/original.name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(original,target);assert sha(original)==sha(target)
+            asset=next(a for a in p['assets'] if a['id']==name);asset['uri']=target.relative_to(ROOT).as_posix();assert asset['sha256']==sha(target)
+            for original in sorted((source/'bundles'/name).iterdir()):
+                target=out/'bundles'/name/original.name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(original,target);assert sha(original)==sha(target);copied[target.relative_to(ROOT).as_posix()]=sha(target)
+        reference=out/'reference-timeline.rgba-f32le';shutil.copyfile(source/'timeline.rgba-f32le',reference);assert sha(reference)==sha(source/'timeline.rgba-f32le')
+        check('two originals, six bundle files and historical pixel reference copied exactly',len(copied)==6,reference_sha256=sha(reference))
+        t=np.arange(96000,dtype=np.float64)/48000;samples=np.stack((.15*np.sin(2*np.pi*(220*t+60*t*t)),.12*np.cos(2*np.pi*(367*t+40*t*t))),1).astype('<f4')
+        raw=work/'original-audio.f32';raw.write_bytes(samples.tobytes());wav=out/'original-audio.wav'
+        native([ffmpeg_path(),'-nostdin','-v','error','-f','f32le','-ar','48000','-ac','2','-i',raw,'-c:a','pcm_f32le',wav])
+        p['assets'].append({'id':'sound','kind':'audio','uri':wav.relative_to(ROOT).as_posix(),'sha256':sha(wav),'rights_ref':'rights_generated_sound',
+            'probe':{'duration_tick':2000,'duration_seconds':2,'audio':{'codec':'pcm_f32le','sample_rate':48000,'channels':2,'channel_layout':'stereo'}}})
+        sound={'id':'sound','asset_id':'sound','timeline_start_tick':0,'duration_tick':2000,'source_in_tick':0,'source_out_tick':1600,
+            'reverse':True,'freeze':{'at_tick':500,'duration_tick':400}}
+        p['sequences'][0]['tracks'].append({'id':'sound','kind':'audio','order':2,'clips':[sound]})
+        make_validator().validate(p);write(out/'project.json',p);check('combined author project passes real packaged schema',True)
+        baseline=copy.deepcopy(p);front=baseline['sequences'][0]['tracks'][1]['clips'][0]
+        for key in ('reverse','freeze','mask','transform','keyframes'):front.pop(key,None)
+        front['source_out_tick']=2000;baseline['sequences'][0]['tracks'][2]['clips'][0].update(source_out_tick=2000)
+        for key in ('reverse','freeze'):baseline['sequences'][0]['tracks'][2]['clips'][0].pop(key,None)
+        make_validator().validate(baseline);write(out/'original-project.json',baseline)
+        expected_reference=np.memmap(reference,dtype='<f4',mode='r',shape=(20,96,160,4));regression_hashes={}
+        try:
+            for name,project in (('original',baseline),('timeline',p)):
+                assets={a['id']:a for a in project['assets']};authored=copy.deepcopy(project)
+                with BundleSurfaceSource(ROOT,out/'bundles/background',assets['background']) as background,BundleSurfaceSource(ROOT,out/'bundles/foreground',assets['foreground']) as foreground:
+                    host=FloatTimeline(project,'seq_main',{'background':background,'foreground':foreground},working_signal=ColorSignal('bt709','linear'))
+                    audio=prepare(ROOT,project,'seq_main');path=out/(name+'-16bit.mkv')
+                    receipt=render_ffv1(ROOT,host,path,output_signal=ColorSignal('bt709','bt709-oetf'),audio_plan=audio,range_policy='clip')
+                    encoders.append(receipt);check(name+' actual bounded native encoder completed',receipt['frames']==20 and receipt['audio_samples_48000']==96000 and receipt['owned_threads_closed'],
+                        owned_pid=receipt['owned_process_pid'],maximum_queued_chunks=receipt['maximum_queued_chunks'],clipped_RGB_components=receipt['clipped_RGB_components'])
+                    actual=native([ffmpeg_path(),'-nostdin','-v','error','-i',path,'-map','0:v:0','-an','-pix_fmt','gbrap16le','-f','rawvideo','pipe:1'])
+                    decoded=np.frombuffer(actual,'<u2').reshape(20,4,96,160);maximum=0
+                    for index in range(20):
+                        value=expected_reference[index] if name=='timeline' else foreground.fetch(index)
+                        # Match the public Float32 delivery signal boundary, then
+                        # independently quantize exact integer GBR(A) planes.
+                        rgb=value[...,:3].astype(np.float64);encoded=np.where(rgb<.018,rgb*4.5,1.099*np.maximum(rgb,0)**.45-.099).astype(np.float32)
+                        rgba=np.concatenate((encoded,value[...,3:4]),2);quant=np.rint(np.clip(rgba.astype(np.float64),0,1)*65535).astype('<u2')
+                        expected=np.moveaxis(quant[:,:,[1,2,0,3]],2,0);delta=int(np.max(np.abs(decoded[index].astype(np.int32)-expected.astype(np.int32))));maximum=max(maximum,delta)
+                    check(name+' all20 encoded frames equal prior checked reference at every 16-bit component',maximum==0,maximum_code_error=maximum,components_compared=int(decoded.size))
+                    pcm=native([ffmpeg_path(),'-nostdin','-v','error','-i',path,'-map','0:a:0','-vn','-c:a','pcm_f32le','-f','f32le','pipe:1'])
+                    if name=='timeline':
+                        reverse=samples[:76800][::-1];expected_pcm=np.concatenate((reverse[:24000],np.zeros((19200,2),'<f4'),reverse[24000:]))
+                    else:expected_pcm=samples
+                    check(name+' every authored stereo PCM sample exact',pcm==expected_pcm.tobytes(),sample_frames=96000,maximum_sample_error=0)
+                    regression_hashes[name]={'raw16_sha256':'sha256:'+hashlib.sha256(actual).hexdigest(),'pcm_sha256':'sha256:'+hashlib.sha256(pcm).hexdigest()}
+                check(name+' original input mmap handles closed and author IR unchanged',background.closed and foreground.closed and project==authored)
+                preview=out/(name+'.mp4')
+                native([ffmpeg_path(),'-nostdin','-v','error','-i',path,'-vf','scale=in_range=pc:out_range=tv:out_color_matrix=bt709,format=yuv420p',
+                    '-c:v','libx264','-preset','medium','-crf','17','-c:a','aac','-b:a','160k','-color_range','tv','-colorspace','bt709',
+                    '-color_primaries','bt709','-color_trc','bt709','-movflags','+faststart',preview])
+                rgb=native([ffmpeg_path(),'-nostdin','-v','error','-i',preview,'-map','0:v:0','-an','-pix_fmt','rgb24','-f','rawvideo','pipe:1'])
+                check(name+' MP4 has exactly20 actual preview frames',len(rgb)==20*160*96*3)
+                images=[Image.fromarray(np.frombuffer(rgb,'u1').reshape(20,96,160,3)[i].copy()) for i in range(20)]
+                images[0].save(out/(name+'.gif'),save_all=True,append_images=images[1:],duration=100,loop=0,optimize=False,disposal=2)
+                with Image.open(out/(name+'.gif')) as gif:
+                    durations=[]
+                    for index in range(gif.n_frames):gif.seek(index);durations.append(gif.info.get('duration'))
+                    check(name+' GIF comes from actual MP4 frames with exact duration',gif.n_frames==20 and durations==[100]*20)
+                if name=='timeline':
+                    sheet=Image.new('RGB',(3*320,2*220),'#16191f');draw=ImageDraw.Draw(sheet)
+                    for row in range(2):
+                        for col,index in enumerate((0,9,19)):
+                            if row==0:picture=images[index]
+                            else:
+                                audio_picture=Image.new('RGB',(320,180),'#1c2833');ap=ImageDraw.Draw(audio_picture);segment=expected_pcm[max(0,index*4800):min(96000,(index+1)*4800),0]
+                                for x in range(320):
+                                    value=segment[min(len(segment)-1,x*len(segment)//320)] if len(segment) else 0
+                                    ap.line((x,90,x,90-int(value*400)),fill='#62d9b6')
+                                picture=audio_picture
+                            sheet.paste(picture.resize((320,180)),(col*320,row*220));draw.text((col*320+8,row*220+186),f'actual frame {index}' if row==0 else f'actual PCM at {index/10:.1f}s',fill='white')
+                    sheet.save(out/'actual-frames-and-PCM.png')
+        finally:expected_reference._mmap.close()
+        for path in sorted(out.rglob('*')):
+            if path.suffix.lower() not in {'.mkv','.mp4','.wav'}:continue
+            rawprobe=native([ffprobe_path(),'-v','error','-show_streams','-show_format','-show_frames','-of','json',path]);probe=json.loads(rawprobe)
+            write(evidence/'probes'/(path.name+'.json'),probe)
+            if path.suffix.lower()=='.mp4':
+                frames=[f for f in probe['frames'] if f['media_type']=='video'];pts=[Fraction(f['best_effort_timestamp_time']) for f in frames]
+                check(path.name+' every actual MP4 PTS matches 10FPS author clock',len(pts)==20 and pts==[Fraction(i,10) for i in range(20)])
+        record['regression_payload_hashes']=regression_hashes
+        if args.reference:
+            original=json.loads(args.reference.resolve().read_bytes());check('installed real encoded pixels and PCM match development',regression_hashes==original['regression_payload_hashes'],reference_receipt_sha256=sha(args.reference.resolve()))
+        origins={name:str(Path(module.__file__).resolve()) for name,module in sys.modules.items() if getattr(module,'__file__',None) and
+            (name=='ai_ad_editor' or name.startswith('ai_ad_editor.') or name=='numpy' or name.startswith('numpy.') or name=='PIL' or name.startswith('PIL.'))}
+        record.update(isolated_python=bool(sys.flags.isolated and sys.flags.no_site),runtime_origins=origins)
+        if INSTALLED is not None:check('all actual runtime origins from isolated installed site',all(Path(path).is_relative_to(INSTALLED/'site') for path in origins.values()),origins=len(origins))
+        write(out/'origin-and-rights.json',{'source':'procedural fixed V93 originals/bundles; newly authored stereo sine/chirp PCM','license':'CC0-1.0',
+            'parent_receipt_sha256':sha(parent_receipt),'parent_reference_sha256':sha(reference),'script_sha256':sha(Path(__file__)),
+            'MP4_AAC_is_lossy':True,'GIF_is_palette_preview':True,'heard_audio':False,'continuous_playback_reviewed':False})
+        record['assets']={path.relative_to(ROOT).as_posix():{'bytes':path.stat().st_size,'sha256':sha(path)} for path in sorted(out.rglob('*')) if path.is_file()}
+        check('all292 product inputs unchanged',before==frozen());record.update(status='passed-real-bounded-FFV1-and-independent-authored-PCM',
+            actual_native_launches=len(launches),actual_native_script_calls=len(calls),actual_encoder_processes=len(encoders),
+            actual_author_frames_each=20,actual_PCM_sample_frames_each=96000,all_reference_pixel_maximum_code_error=0,
+            continuous_playback_reviewed=False,audio_listened=False)
+    except BaseException as exc:record.update(status='failed-preserved',error=repr(exc));raise
+    finally:
+        record.update(finished_at_utc=datetime.now(timezone.utc).isoformat(),frozen_after=frozen());save()
+        (evidence/'executed-script.py.txt').write_bytes(Path(__file__).read_bytes());print(json.dumps({k:record.get(k) for k in ('status','error','actual_native_launches','actual_encoder_processes')}),flush=True)
+
+if __name__=='__main__':main()

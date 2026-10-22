@@ -222,6 +222,14 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
             acceleration_configuration(settings_value.get('acceleration'))
         except AppError as exc:
             error(exc.code, exc.message, exc.path or 'settings.acceleration')
+        if settings_value.get('pixel_pipeline') is not None:
+            from .float_standard_render import configuration as float_configuration
+            from .render import output_settings
+            try:
+                float_configuration(settings_value['pixel_pipeline'], settings_value, output_settings(settings_value))
+            except (AppError, KeyError, TypeError, ValueError) as exc:
+                error(getattr(exc, 'code', 'FLOAT_RENDER_CONFIG'), getattr(exc, 'message', str(exc)),
+                      getattr(exc, 'path', None) or 'settings.pixel_pipeline')
         if 'sequence_sampling' in settings_value:
             from .sequence_sampling import configuration as sequence_sampling_configuration
             try:

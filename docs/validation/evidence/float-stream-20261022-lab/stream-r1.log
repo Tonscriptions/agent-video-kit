@@ -1,0 +1,121 @@
+test_audio_plan_for_a_different_project_is_rejected (test_float_stream.FloatStreamTests.test_audio_plan_for_a_different_project_is_rejected) ... ok
+test_changed_original_rejects_before_output_replace_and_reaps_threads (test_float_stream.FloatStreamTests.test_changed_original_rejects_before_output_replace_and_reaps_threads) ... FAIL
+test_explicit_clip_policy_and_atomic_existing_output_protection (test_float_stream.FloatStreamTests.test_explicit_clip_policy_and_atomic_existing_output_protection) ... ERROR
+test_fractional_author_end_keeps_ceil_video_and_exact_independent_audio_end (test_float_stream.FloatStreamTests.test_fractional_author_end_keeps_ceil_video_and_exact_independent_audio_end) ... ERROR
+test_native_blocked_stdin_cancel_reaps_owned_child_and_threads (test_float_stream.FloatStreamTests.test_native_blocked_stdin_cancel_reaps_owned_child_and_threads) ... ok
+test_native_blocked_stdin_timeout_reaps_owned_child_and_threads (test_float_stream.FloatStreamTests.test_native_blocked_stdin_timeout_reaps_owned_child_and_threads) ... ok
+test_real_combined_video_reverse_freeze_audio_matches_every_stereo_sample (test_float_stream.FloatStreamTests.test_real_combined_video_reverse_freeze_audio_matches_every_stereo_sample) ... ERROR
+test_real_lossless_all_65536_codes_survive_without_eight_bit_boundary (test_float_stream.FloatStreamTests.test_real_lossless_all_65536_codes_survive_without_eight_bit_boundary) ... ERROR
+test_straight_alpha_independent_sixteen_bit_output_and_hidden_zero_canonicalization (test_float_stream.FloatStreamTests.test_straight_alpha_independent_sixteen_bit_output_and_hidden_zero_canonicalization) ... ERROR
+
+======================================================================
+ERROR: test_explicit_clip_policy_and_atomic_existing_output_protection (test_float_stream.FloatStreamTests.test_explicit_clip_policy_and_atomic_existing_output_protection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_stream.py", line 94, in test_explicit_clip_policy_and_atomic_existing_output_protection
+    path,r=self.encode(p,source,overwrite=True,range_policy='clip');self.assertEqual(r['clipped_RGB_components'],64)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_stream.py", line 53, in encode
+    result=render_ffv1(self.root,timeline,self.root/name,output_signal=LINEAR,audio_plan=plan,**options)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 188, in render_ffv1
+    pipe.finish();verify_inputs()
+    ~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 92, in finish
+    self.check(allow_exit=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 75, in check
+    raise error('ENCODE','编码器在作者帧写入完成前退出' if not allow_exit else '编码器执行失败',exit_code=code,stderr=self.stderr())
+ai_ad_editor.errors.AppError: 编码器执行失败
+
+======================================================================
+ERROR: test_fractional_author_end_keeps_ceil_video_and_exact_independent_audio_end (test_float_stream.FloatStreamTests.test_fractional_author_end_keeps_ceil_video_and_exact_independent_audio_end)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_stream.py", line 81, in test_fractional_author_end_keeps_ceil_video_and_exact_independent_audio_end
+    p,source,_,samples=self.fixture(duration=112501,with_audio=True);path,r=self.encode(p,source,audio=True)
+                                                                            ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_stream.py", line 53, in encode
+    result=render_ffv1(self.root,timeline,self.root/name,output_signal=LINEAR,audio_plan=plan,**options)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 188, in render_ffv1
+    pipe.finish();verify_inputs()
+    ~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 92, in finish
+    self.check(allow_exit=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 75, in check
+    raise error('ENCODE','编码器在作者帧写入完成前退出' if not allow_exit else '编码器执行失败',exit_code=code,stderr=self.stderr())
+ai_ad_editor.errors.AppError: 编码器执行失败
+
+======================================================================
+ERROR: test_real_combined_video_reverse_freeze_audio_matches_every_stereo_sample (test_float_stream.FloatStreamTests.test_real_combined_video_reverse_freeze_audio_matches_every_stereo_sample)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_stream.py", line 75, in test_real_combined_video_reverse_freeze_audio_matches_every_stereo_sample
+    path,r=self.encode(p,source,audio=True);actual=self.native([ffmpeg_path(),'-nostdin','-v','error','-i',path,'-map','0:a:0','-vn','-c:a','pcm_f32le','-f','f32le','pipe:1'])
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_stream.py", line 53, in encode
+    result=render_ffv1(self.root,timeline,self.root/name,output_signal=LINEAR,audio_plan=plan,**options)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 188, in render_ffv1
+    pipe.finish();verify_inputs()
+    ~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 92, in finish
+    self.check(allow_exit=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 75, in check
+    raise error('ENCODE','编码器在作者帧写入完成前退出' if not allow_exit else '编码器执行失败',exit_code=code,stderr=self.stderr())
+ai_ad_editor.errors.AppError: 编码器执行失败
+
+======================================================================
+ERROR: test_real_lossless_all_65536_codes_survive_without_eight_bit_boundary (test_float_stream.FloatStreamTests.test_real_lossless_all_65536_codes_survive_without_eight_bit_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_stream.py", line 62, in test_real_lossless_all_65536_codes_survive_without_eight_bit_boundary
+    p,source,_,_=self.fixture(rgba);path,receipt=self.encode(p,source);actual=np.frombuffer(self.picture(path),'<u2').reshape(4,256,256)
+                                                 ~~~~~~~~~~~^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_stream.py", line 53, in encode
+    result=render_ffv1(self.root,timeline,self.root/name,output_signal=LINEAR,audio_plan=plan,**options)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 188, in render_ffv1
+    pipe.finish();verify_inputs()
+    ~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 92, in finish
+    self.check(allow_exit=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 75, in check
+    raise error('ENCODE','编码器在作者帧写入完成前退出' if not allow_exit else '编码器执行失败',exit_code=code,stderr=self.stderr())
+ai_ad_editor.errors.AppError: 编码器执行失败
+
+======================================================================
+ERROR: test_straight_alpha_independent_sixteen_bit_output_and_hidden_zero_canonicalization (test_float_stream.FloatStreamTests.test_straight_alpha_independent_sixteen_bit_output_and_hidden_zero_canonicalization)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_stream.py", line 68, in test_straight_alpha_independent_sixteen_bit_output_and_hidden_zero_canonicalization
+    p,source,_,_=self.fixture(rgba);path,_=self.encode(p,source);actual=np.frombuffer(self.picture(path),'<u2').reshape(4,4,8)
+                                           ~~~~~~~~~~~^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_stream.py", line 53, in encode
+    result=render_ffv1(self.root,timeline,self.root/name,output_signal=LINEAR,audio_plan=plan,**options)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 188, in render_ffv1
+    pipe.finish();verify_inputs()
+    ~~~~~~~~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 92, in finish
+    self.check(allow_exit=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\src\ai_ad_editor\float_stream.py", line 75, in check
+    raise error('ENCODE','编码器在作者帧写入完成前退出' if not allow_exit else '编码器执行失败',exit_code=code,stderr=self.stderr())
+ai_ad_editor.errors.AppError: 编码器执行失败
+
+======================================================================
+FAIL: test_changed_original_rejects_before_output_replace_and_reaps_threads (test_float_stream.FloatStreamTests.test_changed_original_rejects_before_output_replace_and_reaps_threads)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-stream-lab-20261022\product\tests\test_float_stream.py", line 103, in test_changed_original_rejects_before_output_replace_and_reaps_threads
+    self.assertEqual(caught.exception.code,'TEST_SOURCE_CHANGED');self.assertEqual(target.read_bytes(),b'keep output')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'FLOAT_STREAM_ENCODE' != 'TEST_SOURCE_CHANGED'
+- FLOAT_STREAM_ENCODE
++ TEST_SOURCE_CHANGED
+
+
+----------------------------------------------------------------------
+Ran 9 tests in 27.388s
+
+FAILED (failures=1, errors=5)

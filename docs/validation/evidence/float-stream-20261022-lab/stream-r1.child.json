@@ -1,0 +1,59 @@
+{
+  "methods": 9,
+  "seconds": 27.388677399998414,
+  "failures": 1,
+  "errors": 5,
+  "skipped": 0,
+  "successful": false,
+  "script_native_calls": [
+    {
+      "test": "test_float_stream.FloatStreamTests.test_fractional_author_end_keeps_ceil_video_and_exact_independent_audio_end",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-nostdin",
+        "-v",
+        "error",
+        "-f",
+        "f32le",
+        "-ar",
+        "48000",
+        "-ac",
+        "2",
+        "-i",
+        "E:\\dev\\sandbox\\AI\u5e7f\u544a\u526a\u8f91\\product\\.runtime\\float-stream-lab-20261022\\product\\.runtime\\temp\\float-stream-ul87yjeo\\audio.f32",
+        "-c:a",
+        "pcm_f32le",
+        "E:\\dev\\sandbox\\AI\u5e7f\u544a\u526a\u8f91\\product\\.runtime\\float-stream-lab-20261022\\product\\.runtime\\temp\\float-stream-ul87yjeo\\audio.wav"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "test": "test_float_stream.FloatStreamTests.test_real_combined_video_reverse_freeze_audio_matches_every_stereo_sample",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-nostdin",
+        "-v",
+        "error",
+        "-f",
+        "f32le",
+        "-ar",
+        "48000",
+        "-ac",
+        "2",
+        "-i",
+        "E:\\dev\\sandbox\\AI\u5e7f\u544a\u526a\u8f91\\product\\.runtime\\float-stream-lab-20261022\\product\\.runtime\\temp\\float-stream-2so13vtv\\audio.f32",
+        "-c:a",
+        "pcm_f32le",
+        "E:\\dev\\sandbox\\AI\u5e7f\u544a\u526a\u8f91\\product\\.runtime\\float-stream-lab-20261022\\product\\.runtime\\temp\\float-stream-2so13vtv\\audio.wav"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 0,
+      "stdout_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    }
+  ],
+  "actual_encoder_receipts": []
+}

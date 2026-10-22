@@ -1,0 +1,113 @@
+{
+  "status": "passed",
+  "checks": {
+    "float32_nut_bit_exact_including_negative_and_over_one": true,
+    "png16_independent_alpha_bit_exact": true
+  },
+  "commands": [
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-nostdin",
+        "-hide_banner",
+        "-v",
+        "error",
+        "-f",
+        "rawvideo",
+        "-pixel_format",
+        "gbrapf32le",
+        "-video_size",
+        "8x8",
+        "-framerate",
+        "30000/1001",
+        "-i",
+        "pipe:0",
+        "-c:v",
+        "rawvideo",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "nut",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\float-preview-lab-20261022\\product\\.runtime\\float-preview-20261022\\formats-r1\\master.nut"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-nostdin",
+        "-hide_banner",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\float-preview-lab-20261022\\product\\.runtime\\float-preview-20261022\\formats-r1\\master.nut",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "gbrapf32le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 3072,
+      "stdout_sha256": "eb909f215effb7fa8500aec5544940b568d2e302a311ae630877afce48f3fd38",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-nostdin",
+        "-hide_banner",
+        "-v",
+        "error",
+        "-f",
+        "rawvideo",
+        "-pixel_format",
+        "rgba64le",
+        "-video_size",
+        "8x8",
+        "-framerate",
+        "1",
+        "-i",
+        "pipe:0",
+        "-frames:v",
+        "1",
+        "-c:v",
+        "png",
+        "-pix_fmt",
+        "rgba64be",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\float-preview-lab-20261022\\product\\.runtime\\float-preview-20261022\\formats-r1\\frame.png"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-nostdin",
+        "-hide_banner",
+        "-v",
+        "error",
+        "-i",
+        "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\float-preview-lab-20261022\\product\\.runtime\\float-preview-20261022\\formats-r1\\frame.png",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "rgba64le",
+        "pipe:1"
+      ],
+      "exit_code": 0,
+      "stdout_bytes": 512,
+      "stdout_sha256": "3ed01507538a3aae4d3be0a48803b219eeb9f1a781eb4d8a680548328bc968c8",
+      "stderr": ""
+    }
+  ],
+  "native_windows": true,
+  "virtualization": false,
+  "network": false,
+  "generator_sha256": "d2711b1e128733176608c0a4195a3b0197d7220215089871130bbe67a0cb30e3"
+}

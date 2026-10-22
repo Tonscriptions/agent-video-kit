@@ -1,0 +1,278 @@
+"""Real RGB16/VFR/offset and H.264 B-frame window seeks, without float bundles."""
+from fractions import Fraction
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
+import unittest
+import numpy as np
+
+from ai_ad_editor.errors import AppError
+from ai_ad_editor.float_color_signal import ColorSignal
+from ai_ad_editor.float_native_source import NativeSurfaceSource
+from ai_ad_editor.float_yuv import YUVSpec
+from ai_ad_editor.media import ffmpeg_path
+from ai_ad_editor.native_video_index import IndexContext
+
+SIGNAL = ColorSignal('bt709', 'linear')
+NATIVE_CALLS = []
+SOURCE_RECEIPTS = []
+
+
+def digest(path):
+    return 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def native(command, label):
+    result = subprocess.run(command, capture_output=True, timeout=120,
+                            creationflags=subprocess.CREATE_NO_WINDOW)
+    NATIVE_CALLS.append({'label': label, 'command': command, 'exit_code': result.returncode,
+        'stderr_sha256': 'sha256:' + hashlib.sha256(result.stderr).hexdigest()})
+    if result.returncode:
+        raise RuntimeError(result.stderr.decode('utf8', 'replace'))
+    return result.stdout
+
+
+class NativeWindowSourceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        base = Path(__file__).resolve().parents[1] / '.runtime/temp'
+        base.mkdir(parents=True, exist_ok=True)
+        cls.temp = tempfile.TemporaryDirectory(prefix='native-window-source-', dir=base)
+        cls.root = Path(cls.temp.name)
+        rng = np.random.default_rng(20261022)
+        cls.codes = rng.integers(0, 65536, (8, 4, 16, 32), dtype=np.uint16)
+        # Include transparent and full-coverage pixels independently of RGB.
+        cls.codes[:, 3, 0, :16] = 0
+        cls.codes[:, 3, 0, 16:] = 65535
+        raw = cls.root / 'original.gbrap16le'
+        raw.write_bytes(cls.codes.astype('<u2').tobytes())
+        cls.original = cls.root / 'original.nut'
+        cls.points = (0, 1, 3, 5, 8, 11, 15, 20)
+        expression = '20'
+        for n in range(6, -1, -1):
+            expression = f'if(eq(N,{n}),{cls.points[n]},{expression})'
+        native([ffmpeg_path(), '-v', 'error', '-f', 'rawvideo', '-pixel_format', 'gbrap16le',
+            '-video_size', '32x16', '-framerate', '8', '-i', str(raw), '-vf',
+            f"setpts='(({expression})/8+5)/TB'", '-fps_mode', 'passthrough',
+            '-c:v', 'ffv1', '-level', '3', str(cls.original)], 'original-RGBA16-alpha-VFR-origin5')
+        cls.long = cls.root / 'long-bframes.mp4'
+        native([ffmpeg_path(), '-v', 'error', '-f', 'lavfi', '-i', 'testsrc=s=64x32:r=24:d=5',
+            '-vf', 'format=yuv444p', '-c:v', 'libx264', '-g', '24', '-keyint_min', '24',
+            '-sc_threshold', '0', '-bf', '3', '-pix_fmt', 'yuv444p', str(cls.long)], '120frames-long-GOP-Bframes')
+        decoded = native([ffmpeg_path(), '-v', 'error', '-i', str(cls.long), '-map', '0:v:0',
+            '-an', '-sn', '-dn', '-fps_mode', 'passthrough', '-pix_fmt', '+yuv444p',
+            '-f', 'rawvideo', 'pipe:1'], 'independent-full-decode-Bframes-reference')
+        cls.yuv = np.frombuffer(decoded, dtype=np.uint8).reshape(120, 3, 32, 64).copy()
+        cls.interlaced = cls.root / 'interlaced.mkv'
+        native([ffmpeg_path(), '-v', 'error', '-f', 'lavfi', '-i', 'testsrc2=s=32x16:r=8:d=1',
+            '-vf', 'tinterlace=mode=interleave_top', '-c:v', 'mpeg2video', '-flags', '+ilme+ildct',
+            '-top', '1', str(cls.interlaced)], 'known-interlaced-source-control')
+        cls.image = cls.root / 'still.png'
+        native([ffmpeg_path(), '-v', 'error', '-f', 'lavfi', '-i', 'color=red:s=16x16',
+            '-frames:v', '1', str(cls.image)], 'real-static-RGB-image')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.temp.cleanup()
+
+    def asset(self, path=None, kind='video'):
+        path = path or self.original
+        return {'id': 'local-native', 'kind': kind, 'uri': str(path), 'sha256': digest(path)}
+
+    def source(self, **kwargs):
+        return NativeSurfaceSource(self.root, self.asset(), source_signal=SIGNAL,
+                                   working_signal=SIGNAL, **kwargs)
+
+    def record(self, source):
+        self.assertTrue(source.closed)
+        self.assertEqual(source.guard.entries, {})
+        self.assertEqual(source.cache, [])
+        self.assertTrue(all(row['all_owned_threads_exited'] for row in source.metadata.get('recent_windows', [])))
+        SOURCE_RECEIPTS.append({'test': self.id(), **json.loads(json.dumps(source.metadata))})
+
+    def assert_rgb(self, source, index):
+        value, actual_index = source.sample(Fraction(self.points[index], 8))
+        self.assertEqual(actual_index, index)
+        expected = np.moveaxis(self.codes[index, [2, 0, 1, 3]], 0, -1)
+        np.testing.assert_array_equal(np.rint(value.astype(np.float64) * 65535).astype(np.uint16), expected)
+        return value
+
+    def test_native_RGBA16_VFR_nonzero_origin_random_order_and_every_component(self):
+        with self.source(window_frames=2) as source:
+            for index in (7, 0, 5, 3, 6, 1, 4, 2):
+                self.assert_rgb(source, index)
+            self.assertEqual(source.origin, 5)
+            self.assertEqual([p * source.time_base for p in source.pts],
+                             [Fraction(5) + Fraction(p, 8) for p in self.points])
+            self.assertTrue(source.metadata['native_frame_clock'])
+            self.assertFalse(source.metadata['CFR_normalization'])
+            self.assertFalse(source.metadata['whole_movie_pixel_cache'])
+            self.assertLessEqual(source.metadata['maximum_cached_float_bytes'], 2 * 32 * 16 * 16)
+            self.assertTrue(any(row['seek_seconds'] for row in source.metadata['recent_windows']))
+        self.record(source)
+
+    def test_cache_values_are_owned_and_pixel_budget_reduces_window_size(self):
+        with self.source(window_frames=200, cache_bytes=32 * 16 * 16 * 2) as source:
+            first = self.assert_rgb(source, 0)
+            first[:] = -123
+            self.assert_rgb(source, 0)
+            self.assertEqual(source.window_size, 2)
+            self.assertEqual(source.metadata['decoded_windows'], 1)
+            self.assertEqual(source.metadata['cache_hits'], 1)
+        self.record(source)
+
+    def test_VFR_holds_right_edges_and_native_last_duration_remain_exact(self):
+        with self.source(window_frames=1) as source:
+            value, index = source.sample(Fraction(3, 8), right_edge=True)
+            self.assertEqual(index, 1)
+            self.assertEqual(value.tobytes(), self.assert_rgb(source, 1).tobytes())
+            self.assertEqual(source.sample(Fraction(3, 8) - Fraction(1, 100000))[1], 1)
+            self.assertEqual(source.sample(Fraction(-1, 100))[1], None)
+            end = (source.pts[-1] + source.durations[-1]) * source.time_base - source.origin
+            self.assertEqual(source.sample(end), (None, None))
+            self.assertEqual(source.sample(end, right_edge=True)[1], 7)
+        self.record(source)
+
+    def test_Bframes_far_keyframe_seeks_match_independent_full_native_decode(self):
+        spec = YUVSpec('bt709', 'limited', 'left')
+        with NativeSurfaceSource(self.root, self.asset(self.long), source_signal=SIGNAL,
+                working_signal=SIGNAL, yuv_spec=spec, scan='progressive', window_frames=3) as source:
+            for index in (119, 0, 91, 26, 77, 48, 23, 24):
+                actual, number = source.sample(Fraction(index, 24))
+                self.assertEqual(number, index)
+                y, cb, cr = self.yuv[index].astype(np.float64)
+                y = (y - 16) / 219
+                cb = (cb - 128) / 224
+                cr = (cr - 128) / 224
+                r = y + 1.5748 * cr
+                b = y + 1.8556 * cb
+                g = (y - .2126 * r - .0722 * b) / .7152
+                expected = np.stack((r, g, b, np.ones_like(y)), axis=-1).astype(np.float32)
+                np.testing.assert_allclose(actual, expected, rtol=0, atol=1.2e-7)
+            self.assertGreater(source.metadata['key_probe']['keyframes'], 1)
+            self.assertTrue(any(row['seek_seconds'] for row in source.metadata['recent_windows']))
+            self.assertLessEqual(source.metadata['maximum_cached_float_bytes'], 3 * 64 * 32 * 16)
+            self.assertFalse(source.metadata['reverse_complexity_guaranteed_linear'])
+        self.record(source)
+
+    def test_original_file_cannot_be_temporarily_modified_or_deleted_while_open(self):
+        path = self.root / 'locked-original.nut'
+        shutil.copyfile(self.original, path)
+        source = NativeSurfaceSource(self.root, self.asset(path), source_signal=SIGNAL, working_signal=SIGNAL)
+        with source:
+            self.assert_rgb(source, 2)
+            with self.assertRaises(OSError):
+                with path.open('ab') as stream:
+                    stream.write(b'mutate-then-restore')
+            with self.assertRaises(OSError):
+                path.unlink()
+            source.verify()
+        with path.open('ab') as stream:
+            stream.write(b'allowed-after-owned-read-lock-closed')
+        path.unlink()
+        self.record(source)
+
+    def test_source_instances_own_independent_locks_and_close_order(self):
+        one = self.source(window_frames=1)
+        two = self.source(window_frames=1)
+        try:
+            one.close()
+            self.assert_rgb(two, 5)
+            with self.assertRaises(OSError):
+                with self.original.open('ab') as stream:
+                    stream.write(b'not-allowed')
+        finally:
+            one.close()
+            two.close()
+        self.record(one)
+        self.record(two)
+
+    def test_native_index_files_remain_locked_until_provider_closes(self):
+        with self.source(persist_index=True, window_frames=1) as source:
+            self.assert_rgb(source, 6)
+            paths = [Path(row['path']) for row in source.metadata['native_index']['files'].values()]
+            self.assertEqual(len(paths), 3)
+            for path in paths:
+                with self.assertRaises(OSError):
+                    with path.open('r+b') as stream:
+                        stream.write(b'corrupt')
+        for path in paths:
+            with path.open('r+b') as stream:
+                stream.seek(0)
+        self.record(source)
+
+    def test_shared_index_context_reuses_clock_without_full_pixel_cache(self):
+        context = IndexContext(self.root, persist=False)
+        with self.source(index_context=context, window_frames=1) as one:
+            a = self.assert_rgb(one, 7)
+        with self.source(index_context=context, window_frames=1) as two:
+            b = self.assert_rgb(two, 7)
+            self.assertEqual(two.metadata['native_index']['status'], 'memory-reuse')
+            self.assertEqual(a.tobytes(), b.tobytes())
+        self.record(one)
+        self.record(two)
+
+    def test_source_hash_mismatch_fails_open_and_releases_read_lock(self):
+        path = self.root / 'bad-sha-original.nut'
+        shutil.copyfile(self.original, path)
+        asset = self.asset(path)
+        asset['sha256'] = 'sha256:' + '0' * 64
+        with self.assertRaises(AppError) as caught:
+            NativeSurfaceSource(self.root, asset, source_signal=SIGNAL, working_signal=SIGNAL)
+        self.assertEqual(caught.exception.code, 'FLOAT_NATIVE_SOURCE_INPUT_CHANGED')
+        path.unlink()
+
+    def test_known_interlaced_source_is_rejected_instead_of_silent_progressive_pixels(self):
+        with self.assertRaises(AppError) as caught:
+            NativeSurfaceSource(self.root, self.asset(self.interlaced), source_signal=SIGNAL,
+                working_signal=SIGNAL, yuv_spec=YUVSpec('bt709', 'limited', 'left'), scan='progressive')
+        self.assertEqual(caught.exception.code, 'FLOAT_NATIVE_SOURCE_SCAN')
+
+    def test_cancellation_between_windows_keeps_cache_and_closes_owned_read_locks(self):
+        marker = self.root / 'source.cancel'
+        source = None
+        try:
+            with self.assertRaises(AppError) as caught:
+                with self.source(window_frames=1, cancel_file=marker) as source:
+                    self.assert_rgb(source, 0)
+                    marker.write_text('cancel', encoding='utf8')
+                    source.sample(Fraction(20, 8))
+            self.assertEqual(caught.exception.code, 'CANCELLED')
+            self.record(source)
+        finally:
+            marker.unlink(missing_ok=True)
+
+    def test_static_image_uses_explicit_unknown_origin_and_owned_repeated_surface(self):
+        with NativeSurfaceSource(self.root, self.asset(self.image, 'image'), source_signal=SIGNAL,
+                working_signal=SIGNAL, demux_origin=0, window_frames=1) as source:
+            one, i = source.sample(0)
+            two, j = source.sample(1000)
+            self.assertEqual((i, j), (0, 0))
+            self.assertEqual(one.tobytes(), two.tobytes())
+            self.assertFalse(np.shares_memory(one, two))
+        self.record(source)
+
+    def test_unsupported_signal_scan_and_budget_are_explicit_and_input_is_released(self):
+        cases = ({'window_frames': True}, {'window_frames': 257}, {'cache_bytes': 1},
+                 {'alpha_association': 'auto'}, {'timeout': float('nan')}, {'decoder': '-i'},
+                 {'demux_origin': 0})
+        for kwargs in cases:
+            with self.subTest(kwargs=kwargs), self.assertRaises(AppError):
+                self.source(**kwargs)
+        with self.assertRaises(AppError):
+            NativeSurfaceSource(self.root, self.asset(self.long), source_signal=SIGNAL, working_signal=SIGNAL)
+        with self.assertRaises(AppError):
+            NativeSurfaceSource(self.root, self.asset(self.long), source_signal=SIGNAL,
+                working_signal=SIGNAL, yuv_spec=YUVSpec('bt709', 'limited', 'left'))
+
+    def test_closed_provider_rejects_sampling_and_verification_without_restart(self):
+        source = self.source(window_frames=1)
+        source.close()
+        for call in (lambda: source.sample(0), source.verify, source.__enter__):
+            with self.assertRaises(AppError) as caught:
+                call()
+            self.assertEqual(caught.exception.code, 'FLOAT_NATIVE_SOURCE_CLOSED')
+        self.record(source)

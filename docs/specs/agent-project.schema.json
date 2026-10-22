@@ -521,6 +521,16 @@
               }
             }
           }
+        },
+        "pixel_pipeline": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/nativeFloatPipeline"
+            }
+          ]
         }
       }
     },
@@ -3005,6 +3015,227 @@
                 }
               }
             ]
+          }
+        }
+      }
+    },
+    "nativeFloatPipeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine",
+        "working_signal",
+        "output_signal",
+        "sources"
+      ],
+      "properties": {
+        "engine": {
+          "const": "float32-native-v1"
+        },
+        "working_signal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "primaries",
+            "transfer"
+          ],
+          "properties": {
+            "primaries": {
+              "enum": [
+                "bt709",
+                "display-p3",
+                "bt2020"
+              ]
+            },
+            "transfer": {
+              "enum": [
+                "linear",
+                "srgb",
+                "bt709-oetf",
+                "gamma22",
+                "gamma24"
+              ]
+            }
+          }
+        },
+        "output_signal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "primaries",
+            "transfer"
+          ],
+          "properties": {
+            "primaries": {
+              "enum": [
+                "bt709",
+                "display-p3",
+                "bt2020"
+              ]
+            },
+            "transfer": {
+              "enum": [
+                "linear",
+                "srgb",
+                "bt709-oetf",
+                "gamma22",
+                "gamma24"
+              ]
+            }
+          }
+        },
+        "background_signal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "primaries",
+            "transfer"
+          ],
+          "properties": {
+            "primaries": {
+              "enum": [
+                "bt709",
+                "display-p3",
+                "bt2020"
+              ]
+            },
+            "transfer": {
+              "enum": [
+                "linear",
+                "srgb",
+                "bt709-oetf",
+                "gamma22",
+                "gamma24"
+              ]
+            }
+          }
+        },
+        "range_policy": {
+          "enum": [
+            "reject",
+            "clip"
+          ]
+        },
+        "window_frames": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "max_source_cache_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8589934592
+        },
+        "max_open_sources": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "native_timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600
+        },
+        "sources": {
+          "type": "object",
+          "maxProperties": 4096,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source_signal",
+              "display_geometry"
+            ],
+            "properties": {
+              "source_signal": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "primaries",
+                  "transfer"
+                ],
+                "properties": {
+                  "primaries": {
+                    "enum": [
+                      "bt709",
+                      "display-p3",
+                      "bt2020"
+                    ]
+                  },
+                  "transfer": {
+                    "enum": [
+                      "linear",
+                      "srgb",
+                      "bt709-oetf",
+                      "gamma22",
+                      "gamma24"
+                    ]
+                  }
+                }
+              },
+              "display_geometry": {
+                "const": "square-unrotated"
+              },
+              "alpha_association": {
+                "enum": [
+                  "straight",
+                  "premultiplied"
+                ]
+              },
+              "scan": {
+                "const": "progressive"
+              },
+              "decoder": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_]{1,64}$"
+              },
+              "demux_origin": {
+                "oneOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^-?[0-9]+(?:/[1-9][0-9]*)?$"
+                  }
+                ]
+              },
+              "yuv_spec": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "matrix",
+                  "range",
+                  "chroma_location"
+                ],
+                "properties": {
+                  "matrix": {
+                    "enum": [
+                      "bt709",
+                      "smpte170m",
+                      "bt470bg",
+                      "bt2020nc"
+                    ]
+                  },
+                  "range": {
+                    "enum": [
+                      "limited",
+                      "full"
+                    ]
+                  },
+                  "chroma_location": {
+                    "enum": [
+                      "left",
+                      "center",
+                      "topleft",
+                      "top",
+                      "bottomleft",
+                      "bottom"
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }

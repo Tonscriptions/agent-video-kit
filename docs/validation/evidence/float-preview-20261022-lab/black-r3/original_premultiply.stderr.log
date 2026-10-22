@@ -1,0 +1,64 @@
+ffmpeg version 8.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers
+  built with gcc 15.2.0 (Rev11, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-cairo --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-liboapv --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libsvtjpegxs --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper
+  libavutil      60. 26.100 / 60. 26.100
+  libavcodec     62. 28.100 / 62. 28.100
+  libavformat    62. 12.100 / 62. 12.100
+  libavdevice    62.  3.100 / 62.  3.100
+  libavfilter    11. 14.100 / 11. 14.100
+  libswscale      9.  5.100 /  9.  5.100
+  libswresample   6.  3.100 /  6.  3.100
+Input #0, nut, from 'E:\dev\sandbox\AI广告剪辑\product\.runtime\float-preview-lab-20261022\product\.runtime\float-preview-20261022\black-r3\linear.nut':
+  Metadata:
+    encoder         : Lavf62.12.100
+  Duration: 00:00:00.00, start: 0.000000, bitrate: N/A
+  Stream #0:0: Video: rawvideo, 1 reference frame (G4[0][33] / 0x21003447), gbrapf32le, 32x16, 10 tbr, 81920 tbn
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+[out#0/rawvideo @ 000001b55aa70900] No explicit maps, mapping streams automatically...
+[vost#0:0/rawvideo @ 000001b55aa73ac0] Created video stream from input stream 0:0
+Stream mapping:
+  Stream #0:0 -> #0:0 (rawvideo (native) -> rawvideo (native))
+[vost#0:0/rawvideo @ 000001b55aa73ac0] Starting thread...
+[vf#0:0 @ 000001b55aa756c0] Starting thread...
+[vist#0:0/rawvideo @ 000001b55aa69140] [dec:rawvideo @ 000001b55aa761c0] Starting thread...
+[in#0/nut @ 000001b55aa68b80] Starting thread...
+[in#0/nut @ 000001b55aa68b80] EOF while reading input
+[in#0/nut @ 000001b55aa68b80] Terminating thread with return code 0 (success)
+[vist#0:0/rawvideo @ 000001b55aa69140] [dec:rawvideo @ 000001b55aa761c0] Decoder thread received EOF packet
+[vist#0:0/rawvideo @ 000001b55aa69140] [dec:rawvideo @ 000001b55aa761c0] Decoder returned EOF, finishing
+[vist#0:0/rawvideo @ 000001b55aa69140] [dec:rawvideo @ 000001b55aa761c0] Terminating thread with return code 0 (success)
+[graph -1 input from stream 0:0 @ 000001b55aa89c80] w:32 h:16 pixfmt:gbrapf32le tb:1/81920 fr:10/1 sar:0/1 csp:unknown range:unknown alpha:unspecified
+[auto_scale_0 @ 000001b55aa9b500] w:iw h:ih flags:'' interl:0
+[Parsed_format_1 @ 000001b55aa93780] auto-inserting filter 'auto_scale_0' between the filter 'Parsed_premultiply_0' and the filter 'Parsed_format_1'
+[auto_scale_0 @ 000001b55aa9b500] w:32 h:16 fmt:gbrapf32le csp:gbr range:unknown sar:0/1 -> w:32 h:16 fmt:gbrpf32le csp:gbr range:unknown sar:0/1 flags:0x00000004
+[auto_scale_0 @ 000001b55aa9b500] [framesync @ 000001b55aa9b610] Selected 1/81920 time base
+[auto_scale_0 @ 000001b55aa9b500] [framesync @ 000001b55aa9b610] Sync level 1
+[graph -1 input from stream 0:0 @ 000001b55aa89c80] video frame properties congruent with link at pts_time: 0
+Output #0, rawvideo, to 'pipe:1':
+  Metadata:
+    encoder         : Lavf62.12.100
+  Stream #0:0: Video: rawvideo, 1 reference frame (I420 / 0x30323449), yuv420p(tv, bt709, progressive, left), 32x16, q=2-31, 61 kb/s, 10 fps, 10 tbn
+    Metadata:
+      encoder         : Lavc62.28.100 rawvideo
+[out#0/rawvideo @ 000001b55aa70900] Starting thread...
+[auto_scale_0 @ 000001b55aa9b500] [framesync @ 000001b55aa9b610] Sync level 0
+[vf#0:0 @ 000001b55aa756c0] Filtergraph returned EOF, finishing
+[vf#0:0 @ 000001b55aa756c0] All consumers returned EOF
+[vost#0:0/rawvideo @ 000001b55aa73ac0] [enc:rawvideo @ 000001b55aa29440] Encoder thread received EOF
+[vost#0:0/rawvideo @ 000001b55aa73ac0] Terminating thread with return code 0 (success)
+[out#0/rawvideo @ 000001b55aa70900] All streams finished
+[out#0/rawvideo @ 000001b55aa70900] Terminating thread with return code 0 (success)
+[vf#0:0 @ 000001b55aa756c0] Terminating thread with return code 0 (success)
+[AVIOContext @ 000001b55aa808c0] Statistics: 768 bytes written, 0 seeks, 1 writeouts
+[out#0/rawvideo @ 000001b55aa70900] Output file #0 (pipe:1):
+[out#0/rawvideo @ 000001b55aa70900]   Output stream #0:0 (video): 1 frames encoded; 1 packets muxed (768 bytes); 
+[out#0/rawvideo @ 000001b55aa70900]   Total: 1 packets (768 bytes) muxed
+[out#0/rawvideo @ 000001b55aa70900] video:1KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.000000%
+frame=    1 fps=0.0 q=-0.0 Lsize=       1KiB time=00:00:00.10 bitrate=  61.4kbits/s speed=  11x elapsed=0:00:00.00    
+[in#0/nut @ 000001b55aa68b80] Input file #0 (E:\dev\sandbox\AI广告剪辑\product\.runtime\float-preview-lab-20261022\product\.runtime\float-preview-20261022\black-r3\linear.nut):
+[in#0/nut @ 000001b55aa68b80]   Input stream #0:0 (video): 1 packets read (8192 bytes); 1 frames decoded; 0 decode errors; 
+[in#0/nut @ 000001b55aa68b80]   Total: 1 packets (8192 bytes) demuxed
+[AVIOContext @ 000001b55aa69dc0] Statistics: 8487 bytes read, 0 seeks
+
+Exiting with exit code 0

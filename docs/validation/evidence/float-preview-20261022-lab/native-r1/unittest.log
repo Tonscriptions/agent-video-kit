@@ -1,0 +1,42 @@
+test_actual_failed_encoder_preserves_no_partial_cache_or_export (test_float_preview.FloatPreviewTests.test_actual_failed_encoder_preserves_no_partial_cache_or_export) ... ok
+test_actual_mid_frame_cancellation_keeps_no_cache_or_export_and_closes_threads (test_float_preview.FloatPreviewTests.test_actual_mid_frame_cancellation_keeps_no_cache_or_export_and_closes_threads) ... ok
+test_alpha16_png_and_float32_range_keep_every_original_alpha_code (test_float_preview.FloatPreviewTests.test_alpha16_png_and_float32_range_keep_every_original_alpha_code) ... ok
+test_corrupt_reference_rejects_until_explicit_prune_without_overwrite (test_float_preview.FloatPreviewTests.test_corrupt_reference_rejects_until_explicit_prune_without_overwrite) ... ok
+test_dry_run_keeps_entire_project_tree_and_never_opens_provider (test_float_preview.FloatPreviewTests.test_dry_run_keeps_entire_project_tree_and_never_opens_provider) ... ok
+test_equal_size_restored_mtime_numerical_runtime_change_invalidates_cache (test_float_preview.FloatPreviewTests.test_equal_size_restored_mtime_numerical_runtime_change_invalidates_cache) ... ok
+test_existing_export_is_preserved_before_any_float_provider_starts (test_float_preview.FloatPreviewTests.test_existing_export_is_preserved_before_any_float_provider_starts) ... ok
+test_exported_float_reference_survives_explicit_cache_pruning (test_float_preview.FloatPreviewTests.test_exported_float_reference_survives_explicit_cache_pruning) ... ok
+test_nested_native_vfr_reverse_window_keeps_original_interval_oracle (test_float_preview.FloatPreviewTests.test_nested_native_vfr_reverse_window_keeps_original_interval_oracle) ... ok
+test_png_uses_declared_transfer_while_mp4_composites_over_linear_black (test_float_preview.FloatPreviewTests.test_png_uses_declared_transfer_while_mp4_composites_over_linear_black) ... FAIL
+test_public_cli_png_preserves_all_65536_independent_gray_levels (test_float_preview.FloatPreviewTests.test_public_cli_png_preserves_all_65536_independent_gray_levels) ... ok
+test_range_keeps_every_pcm_sample_and_partial_author_end (test_float_preview.FloatPreviewTests.test_range_keeps_every_pcm_sample_and_partial_author_end) ... ok
+test_reference_retains_composite_changes_smaller_than_one_rgb16_step (test_float_preview.FloatPreviewTests.test_reference_retains_composite_changes_smaller_than_one_rgb16_step) ... ok
+test_resize_is_independent_linear_premultiplied_average_after_composite (test_float_preview.FloatPreviewTests.test_resize_is_independent_linear_premultiplied_average_after_composite) ... ok
+test_selected_sequence_canvas_does_not_rewrite_global_author_canvas (test_float_preview.FloatPreviewTests.test_selected_sequence_canvas_does_not_rewrite_global_author_canvas) ... FAIL
+test_space_admission_accounts_for_float_reference_instead_of_bgra8 (test_float_preview.FloatPreviewTests.test_space_admission_accounts_for_float_reference_instead_of_bgra8) ... ok
+test_unported_operator_rejects_without_legacy_fallback_and_cleans_sources (test_float_preview.FloatPreviewTests.test_unported_operator_rejects_without_legacy_fallback_and_cleans_sources) ... ok
+test_verified_cache_hit_starts_no_graph_probe_encoder_or_provider (test_float_preview.FloatPreviewTests.test_verified_cache_hit_starts_no_graph_probe_encoder_or_provider) ... ok
+
+======================================================================
+FAIL: test_png_uses_declared_transfer_while_mp4_composites_over_linear_black (test_float_preview.FloatPreviewTests.test_png_uses_declared_transfer_while_mp4_composites_over_linear_black)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-preview-lab-20261022\product\tests\test_float_preview.py", line 266, in test_png_uses_declared_transfer_while_mp4_composites_over_linear_black
+    self.assertLessEqual(abs(int(luma[8*32+16])-(16+219*encoded)), 2)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: np.float64(22.16642380655348) not less than or equal to 2
+
+======================================================================
+FAIL: test_selected_sequence_canvas_does_not_rewrite_global_author_canvas (test_float_preview.FloatPreviewTests.test_selected_sequence_canvas_does_not_rewrite_global_author_canvas)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-preview-lab-20261022\product\tests\test_float_preview.py", line 275, in test_selected_sequence_canvas_does_not_rewrite_global_author_canvas
+    self.assertEqual(self.p, before); self.assertTrue(result['pixel_pipeline']['providers_closed_before_publish'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: {'sch[168 chars]:05.542271Z', 'creator': 'ai-ad-editor', 'sour[3036 chars] []}} != {'sch[168 chars]:05.535548Z', 'creator': 'ai-ad-editor', 'sour[3036 chars] []}}
+Diff is 7589 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 18 tests in 215.043s
+
+FAILED (failures=2)

@@ -1,0 +1,16 @@
+{
+  "status": "passed-preserved-failed-native-r1-and-scoped-r2-repair",
+  "at_utc": "2026-10-22T00:07:59.192968+00:00",
+  "failed_receipt_sha256": "sha256:4aa6779040e1c3a2e9f1954c83b604e1c7265838281154ac5168eaf477a43813",
+  "passed_receipt_sha256": "sha256:5295d40614ca902774259321a017370e0d87b1c7698c0f70de4941b454692d98",
+  "changed_inputs": [
+    "product/src/ai_ad_editor/float_native_source.py",
+    "product/tests/test_float_native_source.py"
+  ],
+  "all_292_parent_inputs_unchanged": true,
+  "cause": "The RGB16 fixture had only its initial keyframe; its extra assertion incorrectly required a positive seek.",
+  "repair": "Use explicit FFV1 -g 1 in the fixture; retain all pixel/clock and positive-seek assertions. Provider close uses nested finally to release its locks even on pipe cleanup failure.",
+  "pixel_oracle_or_tolerance_relaxed": false,
+  "first_failure_snapshot": "native-r1-implementation",
+  "generator_sha256": "sha256:2ba8db3e762f1f4b89434c9787d8dd116850ddfcfd29a2a3b4d975e5c15da3b5"
+}

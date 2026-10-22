@@ -1,0 +1,223 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "id": "float_timeline_media",
+    "name": "Float32 authored timeline real media",
+    "created_at": "2026-10-21T22:02:22.060208Z",
+    "updated_at": "2026-10-21T22:02:22.060208Z",
+    "creator": "ai-ad-editor",
+    "source_revision": "local"
+  },
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 1000,
+      "display_fps": {
+        "num": 10,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 160,
+      "height": 96,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      },
+      "background": "#000000"
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "background",
+      "kind": "video",
+      "uri": "docs/assets/float-render-20261022-lab/media-r1/inputs/background-16bit.mkv",
+      "sha256": "sha256:1a1dafabaefff71357ee46b8155a22408726c20ce055a60ddcb4b9552c86d95b",
+      "probe": {
+        "width": 160,
+        "height": 96,
+        "duration_tick": 2000
+      },
+      "rights_ref": "rights_generated_background"
+    },
+    {
+      "id": "foreground",
+      "kind": "video",
+      "uri": "docs/assets/float-render-20261022-lab/media-r1/inputs/foreground-16bit.mkv",
+      "sha256": "sha256:e8a8f7348013d87bd4ddb6d21b6debd4d040347d5f0e95095356235601719464",
+      "probe": {
+        "width": 160,
+        "height": 96,
+        "duration_tick": 2000
+      },
+      "rights_ref": "rights_generated_foreground"
+    },
+    {
+      "id": "sound",
+      "kind": "audio",
+      "uri": "docs/assets/float-render-20261022-lab/media-r1/original-audio.wav",
+      "sha256": "sha256:9694fef2d239d69fbc28b70160e5e98045cbfdcd23e60e14ac30b1877c622d75",
+      "rights_ref": "rights_generated_sound",
+      "probe": {
+        "duration_tick": 2000,
+        "duration_seconds": 2,
+        "audio": {
+          "codec": "pcm_f32le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "channel_layout": "stereo"
+        }
+      }
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq_main",
+      "name": "Main",
+      "duration_tick": 2000,
+      "tracks": [
+        {
+          "id": "background",
+          "kind": "video",
+          "order": 0,
+          "clips": [
+            {
+              "timeline_start_tick": 0,
+              "duration_tick": 2000,
+              "source_in_tick": 0,
+              "source_out_tick": 2000,
+              "id": "background",
+              "asset_id": "background"
+            }
+          ]
+        },
+        {
+          "id": "foreground",
+          "kind": "video",
+          "order": 1,
+          "clips": [
+            {
+              "timeline_start_tick": 0,
+              "duration_tick": 2000,
+              "source_in_tick": 0,
+              "source_out_tick": 1600,
+              "id": "foreground",
+              "asset_id": "foreground",
+              "reverse": true,
+              "freeze": {
+                "at_tick": 500,
+                "duration_tick": 400
+              },
+              "mask": {
+                "type": "circle",
+                "radius": 0.42
+              },
+              "transform": {
+                "scale": 0.84
+              },
+              "keyframes": [
+                {
+                  "property": "rotation",
+                  "keyframes": [
+                    {
+                      "at_tick": 0,
+                      "value": -8,
+                      "interpolation": "linear"
+                    },
+                    {
+                      "at_tick": 2000,
+                      "value": 8,
+                      "interpolation": "linear"
+                    }
+                  ]
+                },
+                {
+                  "property": "position.x",
+                  "keyframes": [
+                    {
+                      "at_tick": 0,
+                      "value": 0.4,
+                      "interpolation": "linear"
+                    },
+                    {
+                      "at_tick": 2000,
+                      "value": 0.6,
+                      "interpolation": "linear"
+                    }
+                  ]
+                },
+                {
+                  "property": "opacity",
+                  "keyframes": [
+                    {
+                      "at_tick": 0,
+                      "value": 0.25,
+                      "interpolation": "linear"
+                    },
+                    {
+                      "at_tick": 2000,
+                      "value": 0.85,
+                      "interpolation": "linear"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sound",
+          "kind": "audio",
+          "order": 2,
+          "clips": [
+            {
+              "id": "sound",
+              "asset_id": "sound",
+              "timeline_start_tick": 0,
+              "duration_tick": 2000,
+              "source_in_tick": 0,
+              "source_out_tick": 1600,
+              "reverse": true,
+              "freeze": {
+                "at_tick": 500,
+                "duration_tick": 400
+              }
+            }
+          ]
+        }
+      ],
+      "markers": []
+    }
+  ],
+  "templates": [],
+  "outputs": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "model_versions": [],
+    "input_hashes": [],
+    "change_log": []
+  }
+}

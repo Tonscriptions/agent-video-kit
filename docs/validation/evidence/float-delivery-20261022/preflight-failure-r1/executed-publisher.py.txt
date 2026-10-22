@@ -1,0 +1,321 @@
+"""Publish the cumulative 300-input product after actual full2355 and install260."""
+import argparse
+from datetime import datetime, timezone
+import importlib.util
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+
+import float_delivery_bundle as bundle
+import float_delivery_docs as docs
+
+ROOT, MAIN, REL, WORK = bundle.ROOT, bundle.MAIN, bundle.REL, bundle.WORK
+sha, read, save = bundle.sha, bundle.read, bundle.save
+spec = importlib.util.spec_from_file_location('delivery_bounded_index', MAIN/'scripts/native_index_release_tools.py')
+helper = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(helper)
+git = helper.git
+
+
+def source_gate(complete):
+    prepared = bundle.audit()
+    current = prepared['frozen_inputs']
+    owner = read(WORK/'complete-r1/run.json')
+    bundle.verify(ROOT, owner['frozen_inputs'])
+    bundle.verify(ROOT, owner['verification_scripts'])
+    bundle.verify(ROOT, owner['dependency_artifact_inputs'])
+    for component, metadata in zip(bundle.COMPONENTS, prepared['components'], strict=True):
+        root = ROOT.parent/component[1]
+        ev = root/'docs/validation/evidence'/component[3]
+        source_name = 'media-r4' if component[0] in {'V94', 'V96'} else 'media-r1'
+        for name in (source_name, 'media-installed-r1'):
+            media = read(ev/name/'verification.json')
+            gate = read(ROOT/metadata['gate'])
+            assert media['status'].startswith('passed')
+            assert media['frozen_before'] == media['frozen_after'] == gate['source_inputs']
+            assert all(c.get('ok', c.get('passed', False)) for c in media['checks'])
+            for path, row in media['assets'].items():
+                assert sha(root/path) == row['sha256'] and (root/path).stat().st_size == row['bytes']
+    installed = read(ROOT/'docs/validation/evidence/float-preview-20261022-lab/installed-r1/verification.json')
+    assert installed['status'] == 'passed-fresh-eight-wheel-180-resources-real-previews-and-260-methods'
+    assert installed['frozen_before'] == installed['frozen_after'] == current
+    assert installed['isolated_methods']['methods'] == 260 and installed['isolated_methods']['skipped'] == 0
+    assert len(installed['resource_hashes']) == 180 and len(installed['isolated_methods']['origins']) == 248
+    source = read(ROOT/'docs/validation/evidence/float-preview-20261022-lab/media-r1/verification.json')
+    replay = read(ROOT/'docs/validation/evidence/float-preview-20261022-lab/media-installed-r1/verification.json')
+    assert source['actual_public_render_CLI_processes'] == replay['actual_public_render_CLI_processes'] == 2
+    assert source['actual_public_preview_CLI_processes'] == replay['actual_public_preview_CLI_processes'] == 3
+    for name in source['decoded']:
+        for key in ('native_yuv10_sha256', 'PCM_sha256'):
+            assert source['decoded'][name][key] == replay['decoded'][name][key]
+    for key in ('Float32_sha256', 'PCM_sha256', 'PNG16_sha256'):
+        assert source['preview_decoded'][key] == replay['preview_decoded'][key]
+    precision = read(ROOT/'docs/validation/evidence/float-preview-20261022-lab/black-precision-review-r1.json')
+    assert precision['source_status'] == 'failed' and not precision['exact_MP4_quantizer_accepted']
+    assert precision['source_receipt_sha256'] == sha(ROOT/'docs/validation/evidence/float-preview-20261022-lab/black-r3.json')
+    review = read(ROOT/'docs/validation/evidence/float-preview-20261022-lab/static-review-r1.json')
+    assert review['viewed_image_panels'] == 6 and review['GIF_frames'] == 14
+    for name, digest in review['files'].items():
+        assert sha(ROOT/'docs/assets/float-preview-20261022-r1'/name) == digest
+    audit = {'status': 'passed-cumulative-source-install-media-preflight', 'frozen_inputs': current,
+        'published_parent_inputs': prepared['published_parent_inputs'],
+        'published_parent_commit': prepared['published_parent_commit'],
+        'changed_product_paths': prepared['changed_product_paths'], 'components': prepared['components'],
+        'source_methods': 57, 'installed_methods': 260, 'installed_resources': 180,
+        'startup_frozen_scripts': len(owner['verification_scripts']), 'complete_terminal_checked': False,
+        'prepared_receipt_sha256': sha(ROOT/REL/'prepared-r1.json')}
+    full = None
+    if complete:
+        full = read(ROOT/REL/'full-r1.json')
+        assert owner['status'] == 'passed-complete-native-suite-not-published' and owner['methods'] == 2355
+        assert owner['full_receipt_sha256'] == sha(ROOT/REL/'full-r1.json')
+        assert full['status'] == 'passed' and full['terminal_ok'] and full['methods'] == 2355 and full['skipped'] == 0
+        assert full['frozen_before'] == full['frozen_after'] == current and full['external_fixture_count'] == 8
+        assert full['external_fixtures_equal'] and full['external_fixture_manifest_unchanged'] and full['verification_scripts_equal']
+        bundle.verify(ROOT, owner['bound_evidence'])
+        binding = read(ROOT/REL/'parent-binding-r1.json')
+        assert binding['status'] == 'passed-published-V93-R16-and-tested292-lineage'
+        assert binding['published_parent_commit'] == prepared['published_parent_commit']
+        assert binding['published_parent_frozen'] == prepared['published_parent_inputs']
+        predecessor = read(ROOT/REL/'tested-predecessor-full-r1.json')
+        assert predecessor['status'] == 'passed' and predecessor['terminal_ok'] and predecessor['methods'] == 2299 and predecessor['skipped'] == 0
+        assert sha(ROOT/REL/'tested-predecessor-full-r1.json') == binding['tested_predecessor_full_sha256']
+        audit.update(status='passed-cumulative-native-full2355-installed260-media-gates',
+            complete_terminal_checked=True, full_receipt_sha256=sha(ROOT/REL/'full-r1.json'),
+            actual_predecessor_methods=2299, intermediate_full_suites_claimed_passed=False)
+    return audit, full
+
+
+def publication_files(audit):
+    rows = {}
+
+    def add(root, name):
+        name = Path(name).as_posix()
+        path = root/name
+        assert path.resolve().is_relative_to(root) and not path.is_symlink() and path.stat().st_size < 95*1024**2, name
+        digest = sha(path)
+        if name in rows:
+            assert rows[name][1] == digest, ('Conflicting component artifact', name)
+        rows[name] = (path, digest)
+
+    for component in bundle.COMPONENTS:
+        root = ROOT.parent/component[1]
+        for prefix in ('docs/validation/evidence/'+component[3],):
+            for path in (root/prefix).rglob('*'):
+                if path.is_file():
+                    add(root, path.relative_to(root))
+        for folder in (root/'docs/assets').glob(component[10]):
+            for path in folder.rglob('*'):
+                if path.is_file():
+                    add(root, path.relative_to(root))
+        for path in (root/'scripts').glob('*.py'):
+            add(root, path.relative_to(root))
+        add(root, component[8])
+        add(root, component[9])
+    for path in (ROOT/REL).rglob('*'):
+        if path.is_file():
+            add(ROOT, path.relative_to(ROOT))
+    for name in [*audit['changed_product_paths'], docs.REPORT, docs.CONTRACT]:
+        add(ROOT, name)
+    return rows
+
+
+def attributes(text, rows, current):
+    assert '# V97 cumulative Float32 delivery.' not in text
+    lines = [text.rstrip(), '', '# V97 cumulative Float32 delivery.']
+    for component in bundle.COMPONENTS:
+        lines.append('docs/validation/evidence/'+component[3]+'/** -text -whitespace')
+        lines.append('docs/assets/'+component[10]+'/** -text -whitespace')
+    lines.append(REL+'/** -text -whitespace')
+    for name in sorted(set(current) | {n for n in rows if n.startswith('scripts/')}):
+        lines.append(name+' -text whitespace=cr-at-eol')
+    return '\n'.join(lines)+'\n'
+
+
+def preflight(work):
+    audit, _ = source_gate(False)
+    rows = publication_files(audit)
+    stage = work/'native-staging'
+    stage.mkdir()
+    git(stage, 'init', '--quiet', '--initial-branch=main')
+    git(stage, 'config', 'core.longpaths', 'true')
+    attrs = attributes((MAIN/'.gitattributes').read_text('utf8'), rows, audit['frozen_inputs'])
+    baseline = {}
+    for name, digest in audit['published_parent_inputs'].items():
+        assert sha(MAIN/name) == digest
+        target = stage/name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(MAIN/name, target)
+        baseline[name] = digest
+    for name in docs.LATEST_DOCS:
+        target = stage/name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(MAIN/name, target)
+        baseline[name] = sha(target)
+    docs.write(stage/'.gitattributes', attrs)
+    baseline['.gitattributes'] = sha(stage/'.gitattributes')
+    pathspec = work/'baseline-paths.nul'
+    pathspec.write_bytes(b'\0'.join(n.encode('utf8') for n in sorted(baseline))+b'\0')
+    git(stage, 'add', '--force', '--pathspec-from-file='+str(pathspec), '--pathspec-file-nul')
+    helper.MAIN = stage
+    helper.staged_rows(baseline)
+    git(stage, '-c', 'user.name=Agent Video Kit Preflight', '-c', 'user.email=codex-preflight@localhost',
+        'commit', '--quiet', '-m', 'private exact published288 baseline')
+    parent = git(stage, 'rev-parse', 'HEAD').decode().strip()
+    expected = {}
+    for name, (source, digest) in rows.items():
+        target = stage/name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+        expected[name] = digest
+    for name, digest in audit['frozen_inputs'].items():
+        target = stage/name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT/name, target)
+        expected[name] = digest
+    names = docs.documents(stage)
+    docs.write(stage/'.gitattributes', attrs)
+    expected.update({n: sha(stage/n) for n in [*names, '.gitattributes']})
+    pathspec = work/'staging-paths.nul'
+    pathspec.write_bytes(b'\0'.join(n.encode('utf8') for n in sorted(expected))+b'\0')
+    git(stage, 'add', '--force', '--pathspec-from-file='+str(pathspec), '--pathspec-file-nul')
+    compared = helper.staged_rows(expected)
+    git(stage, 'diff', '--cached', '--check')
+    links = docs.links(stage, names)
+    helper.MAIN = MAIN
+    receipt = {'status': 'passed-private-cumulative-staging-and-document-preflight', 'main_mutated': False,
+        'source_audit': audit, 'private_parent_baseline_commit': parent, 'parent_product_blobs': 288,
+        'frozen_files': 300, 'compared_blobs': len(compared), 'verified_links': len(links),
+        'documents': names, 'generator_sha256': sha(Path(__file__)), 'documentation_generator_sha256': sha(Path(docs.__file__)),
+        'work': str(work), 'all_staged_bytes_equal_workspace': True}
+    save(ROOT/REL/'staging-preflight-r1.json', receipt)
+    return receipt
+
+
+def publish(work):
+    state = {'status': 'checking-complete-cumulative-gates', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
+        'force_push': False, 'main_integrated': False, 'generator_sha256': sha(Path(__file__))}
+
+    def checkpoint():
+        state['updated_at_utc'] = datetime.now(timezone.utc).isoformat()
+        save(work/'run.json', state)
+
+    checkpoint()
+    try:
+        audit, full = source_gate(True)
+        preflight_receipt = read(ROOT/REL/'staging-preflight-r1.json')
+        assert preflight_receipt['status'] == 'passed-private-cumulative-staging-and-document-preflight'
+        assert preflight_receipt['generator_sha256'] == sha(Path(__file__))
+        assert preflight_receipt['documentation_generator_sha256'] == sha(Path(docs.__file__))
+        parent, current = audit['published_parent_commit'], audit['frozen_inputs']
+        assert git(MAIN, 'branch', '--show-current').decode().strip() == 'main'
+        assert git(MAIN, 'remote', 'get-url', 'origin').decode().strip() == 'git@github.com:Tonscriptions/agent-video-kit.git'
+        assert git(MAIN, 'rev-parse', 'HEAD').decode().strip() == parent
+        assert git(MAIN, 'ls-remote', 'origin', 'refs/heads/main').decode().split()[0] == parent
+        assert not git(MAIN, 'status', '--porcelain', '-z'), 'Preserve unexpected main edits'
+        main_inputs = bundle.load(MAIN/'scripts/run_frozen_regression.py', 'delivery_published_inputs')
+        assert main_inputs.frozen() == audit['published_parent_inputs']
+        rows = publication_files(audit)
+        tracked = {n.decode('utf8') for n in git(MAIN, 'ls-files', '-z').split(b'\0') if n}
+        for name, (source, digest) in rows.items():
+            target = MAIN/name
+            assert target.resolve().is_relative_to(MAIN) and not target.is_symlink()
+            assert name in tracked or not target.exists(), ('Unexpected untracked destination', name)
+            assert sha(source) == digest
+        state.update(status='copying-reviewed-cumulative-source', base_commit=parent,
+            source_files={n:v[1] for n,v in rows.items()}, source_audit=audit)
+        checkpoint()
+        for name, (source, digest) in rows.items():
+            target = MAIN/name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, target)
+            assert sha(target) == digest
+        assert main_inputs.frozen() == current
+        names = docs.documents(MAIN, full, published=True)
+        docs.write(MAIN/'.gitattributes', attributes((MAIN/'.gitattributes').read_text('utf8'), rows, current))
+        state.update(status='auditing-copied-cumulative-source', main_integrated=True)
+        checkpoint()
+        skill_receipt = REL+'/skills-release-r1.json'
+        command = [sys.executable, '-E', '-B', '-X', 'utf8', str(MAIN/'scripts/audit_source_edit_skills.py'),
+            '--expected-count', '17', '--output', str(MAIN/skill_receipt)]
+        result = subprocess.run(command, cwd=MAIN, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
+        (work/'skills.stdout.log').write_bytes(result.stdout)
+        (work/'skills.stderr.log').write_bytes(result.stderr)
+        assert result.returncode == 0
+        skills = read(MAIN/skill_receipt)
+        mapping = read(MAIN/'video-cut-install-manifest.json')
+        assert len(mapping['skills']) == len(skills['results']) == 17
+        mapping.setdefault('audit_history', []).append(mapping['current_audit'])
+        for entry in mapping['skills']:
+            row = next(v for v in skills['results'] if v['skill'] == entry['name'])
+            assert 'sha256:'+entry['skill_md_sha256'] == row['sha256'] == sha(MAIN/'skills'/entry['name']/'SKILL.md')
+            entry.update(validation=row['validator_stdout'], prefix_verified=True, registration_verified=True)
+        mapping['current_audit'] = {'date': '2026-10-22', 'skill_count': 17, 'record': skill_receipt,
+            'record_sha256': sha(MAIN/skill_receipt), 'local_links_checked': skills['local_links_checked'],
+            'previous_hashes_preserved': True, 'semantics': 'V94-V97 cumulative native float render/preview/cache; actual final full2355 and installed260; intermediate full2320/2337 not executed; default migration/all operators/natural/HDR/full parity unfinished'}
+        save(MAIN/'video-cut-install-manifest.json', mapping)
+        link_names = [*names, *('skills/'+e['name']+'/SKILL.md' for e in mapping['skills'])]
+        links = docs.links(MAIN, link_names)
+        receipt = REL+'/release-main-r1.json'
+        save(MAIN/receipt, {'status': 'passed-final300-full2355-install260-and-17-skills', 'base_commit': parent,
+            'frozen_inputs': current, 'full_methods': 2355, 'full_seconds': full['suite_seconds'], 'full_skipped': 0,
+            'installed_methods': 260, 'installed_resources': 180, 'skills': 17, 'verified_links': len(links),
+            'full_sha256': sha(MAIN/REL/'full-r1.json'), 'documents': {n:sha(MAIN/n) for n in names},
+            'intermediate_full_suites_claimed_passed': False, 'default_backend_migrated': False, 'full_capcut_parity': False})
+        allowed = set(rows) | set(names) | {'.gitattributes', 'video-cut-install-manifest.json', skill_receipt, receipt}
+        changed = {n.decode('utf8') for n in git(MAIN, 'diff', '--name-only', '-z').split(b'\0') if n}
+        changed |= {n.decode('utf8') for n in git(MAIN, 'ls-files', '--others', '--exclude-standard', '-z').split(b'\0') if n}
+        assert changed <= allowed, sorted(changed-allowed)
+        expected_names = set(rows) | set(names) | {'.gitattributes', 'video-cut-install-manifest.json', skill_receipt, receipt}
+        pathspec = work/'staging-paths.nul'
+        pathspec.write_bytes(b'\0'.join(n.encode('utf8') for n in sorted(expected_names))+b'\0')
+        git(MAIN, 'add', '--force', '--pathspec-from-file='+str(pathspec), '--pathspec-file-nul')
+        git(MAIN, 'add', '--renormalize', '--pathspec-from-file='+str(pathspec), '--pathspec-file-nul')
+        compared = helper.staged_rows({**{n:sha(MAIN/n) for n in expected_names}, **current})
+        assert not git(MAIN, 'diff', '--name-only')
+        git(MAIN, 'diff', '--cached', '--check')
+        stage_receipt = REL+'/staged-release-r1.json'
+        save(MAIN/stage_receipt, {'status': 'passed', 'frozen_files': 300, 'compared_blobs': len(compared),
+            'files': compared, 'all_staged_bytes_equal_workspace': True, 'base_commit': parent,
+            'full_sha256': sha(MAIN/REL/'full-r1.json'), 'stream_buffer_bytes': 65536})
+        git(MAIN, 'add', '--force', '--', stage_receipt)
+        helper.staged_rows({stage_receipt:sha(MAIN/stage_receipt)})
+        git(MAIN, 'diff', '--cached', '--check')
+        assert main_inputs.frozen() == current and not git(MAIN, 'diff', '--name-only')
+        git(MAIN, 'commit', '--quiet', '-m', 'feat: deliver native Float32 render previews and verified content cache')
+        commit = git(MAIN, 'rev-parse', 'HEAD').decode().strip()
+        assert git(MAIN, 'rev-parse', 'HEAD^').decode().strip() == parent
+        state.update(status='committed-awaiting-ordinary-push', commit=commit, compared_blobs=len(compared)+1,
+            verified_links=len(links))
+        checkpoint()
+        git(MAIN, 'push', 'origin', 'main')
+        remote = git(MAIN, 'ls-remote', 'origin', 'refs/heads/main').decode().split()[0]
+        assert remote == commit and not git(MAIN, 'status', '--porcelain', '-z') and main_inputs.frozen() == current
+        state.update(status='published', remote_main=remote, main_clean=True, full_methods=2355, installed_methods=260)
+    except BaseException as exc:
+        state.update(status='failed-preserved', error=repr(exc))
+        raise
+    finally:
+        checkpoint()
+        print(json.dumps({k: state.get(k) for k in ('status', 'commit', 'remote_main', 'error')}, ensure_ascii=False), flush=True)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--work', type=Path, required=True)
+    parser.add_argument('--preflight-only', action='store_true')
+    args = parser.parse_args()
+    work = args.work.resolve()
+    assert work.is_relative_to(WORK) and not work.exists()
+    work.mkdir(parents=True)
+    if args.preflight_only:
+        try:
+            result = preflight(work)
+            print(json.dumps({k:result[k] for k in ('status', 'compared_blobs', 'verified_links')}), flush=True)
+        except BaseException as exc:
+            save(work/'failure.json', {'status':'failed-preserved', 'error':repr(exc), 'generator_sha256':sha(Path(__file__))})
+            raise
+    else:
+        publish(work)

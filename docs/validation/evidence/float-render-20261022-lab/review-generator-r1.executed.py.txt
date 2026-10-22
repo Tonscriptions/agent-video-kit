@@ -1,0 +1,43 @@
+"""Retain the actual still-image review and failed-fixture repair boundaries."""
+from datetime import datetime, timezone
+import json
+from pathlib import Path
+from run_frozen_regression import frozen, sha
+ROOT = Path(__file__).resolve().parents[1]
+REL = ROOT / 'docs/validation/evidence/float-render-20261022-lab'
+
+
+def main():
+    review = REL / 'static-review-r1.json'
+    repair = REL / 'native-r1-repair-audit.json'
+    assert not review.exists() and not repair.exists()
+    failed = json.loads((REL / 'native-r1.json').read_bytes())
+    passed = json.loads((REL / 'native-r2.json').read_bytes())
+    changed = {name for name in passed['frozen_before'] if failed['frozen_before'][name] != passed['frozen_before'][name]}
+    assert changed == {'product/src/ai_ad_editor/float_native_source.py', 'product/tests/test_float_native_source.py'}
+    assert failed['result']['methods'] == passed['result']['methods'] == 21
+    assert failed['result']['failures'] == 1 and failed['result']['errors'] == 0 and passed['result']['successful']
+    now = datetime.now(timezone.utc).isoformat()
+    value = {'status': 'reviewed-actual-still-frames-and-PCM-only', 'at_utc': now,
+        'image': 'docs/assets/float-render-20261022-lab/media-r1/actual-frames-and-PCM.png',
+        'image_sha256': sha(ROOT / 'docs/assets/float-render-20261022-lab/media-r1/actual-frames-and-PCM.png'),
+        'actual_MP4_frame_indices': [0, 9, 19], 'PCM_window_seconds': [0, .9, 1.9],
+        'observations': 'Actual frames show a moving/rotating checker circle over gradients; PCM windows show stereo test-signal diagnostics.',
+        'continuous_playback_reviewed': False, 'audio_listened': False,
+        'natural_advertising_quality_accepted': False, 'HDR_accepted': False,
+        'generator_sha256': sha(Path(__file__))}
+    review.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf8')
+    value = {'status': 'passed-preserved-failed-native-r1-and-scoped-r2-repair', 'at_utc': now,
+        'failed_receipt_sha256': sha(REL / 'native-r1.json'), 'passed_receipt_sha256': sha(REL / 'native-r2.json'),
+        'changed_inputs': sorted(changed), 'all_292_parent_inputs_unchanged': all(frozen()[k] == v for k, v in json.loads((REL / 'foundation-r1.json').read_bytes())['parent_frozen_inputs'].items()),
+        'cause': 'The RGB16 fixture had only its initial keyframe; its extra assertion incorrectly required a positive seek.',
+        'repair': 'Use explicit FFV1 -g 1 in the fixture; retain all pixel/clock and positive-seek assertions. Provider close uses nested finally to release its locks even on pipe cleanup failure.',
+        'pixel_oracle_or_tolerance_relaxed': False, 'first_failure_snapshot': 'native-r1-implementation',
+        'generator_sha256': sha(Path(__file__))}
+    repair.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf8')
+    assert value['all_292_parent_inputs_unchanged']
+    print(json.dumps({'review': 'actual-stills-only', 'repair': 'failed-fixture-retained'}))
+
+
+if __name__ == '__main__':
+    main()
