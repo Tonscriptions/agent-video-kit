@@ -1,0 +1,78 @@
+test_all_65536_alpha_levels_and_extended_hidden_RGB_keep_float_precision (test_float_mask.FloatMaskTests.test_all_65536_alpha_levels_and_extended_hidden_RGB_keep_float_precision) ... ok
+test_all_basic_shapes_and_inversion_match_independent_integer_centres (test_float_mask.FloatMaskTests.test_all_basic_shapes_and_inversion_match_independent_integer_centres) ... ok
+test_all_six_easings_use_original_author_ticks (test_float_mask.FloatMaskTests.test_all_six_easings_use_original_author_ticks) ... 
+  test_all_six_easings_use_original_author_ticks (test_float_mask.FloatMaskTests.test_all_six_easings_use_original_author_ticks) (mode='bezier', tick=50) ... FAIL
+test_animated_invert_and_zero_feather_preserve_source_alpha (test_float_mask.FloatMaskTests.test_animated_invert_and_zero_feather_preserve_source_alpha) ... ok
+test_animated_segment_control_aliases_change_real_shape (test_float_mask.FloatMaskTests.test_animated_segment_control_aliases_change_real_shape) ... ok
+test_animation_feather_is_inner_distance_not_static_blur (test_float_mask.FloatMaskTests.test_animation_feather_is_inner_distance_not_static_blur) ... ok
+test_bad_surface_late_alpha_and_working_budget_preserve_input (test_float_mask.FloatMaskTests.test_bad_surface_late_alpha_and_working_budget_preserve_input) ... ok
+test_box_border_matches_native_alpha16_with_derived_integer_error_bound (test_float_mask.FloatMaskTests.test_box_border_matches_native_alpha16_with_derived_integer_error_bound) ... ok
+test_compiled_plan_is_detached_from_author_mutation (test_float_mask.FloatMaskTests.test_compiled_plan_is_detached_from_author_mutation) ... ok
+test_concave_and_self_intersecting_polygon_match_scalar_even_odd_fill (test_float_mask.FloatMaskTests.test_concave_and_self_intersecting_polygon_match_scalar_even_odd_fill) ... ok
+test_cubic_path_matches_explicit_bernstein_sample_geometry (test_float_mask.FloatMaskTests.test_cubic_path_matches_explicit_bernstein_sample_geometry) ... ok
+test_degenerate_animated_path_rejects_without_fabricating_coverage (test_float_mask.FloatMaskTests.test_degenerate_animated_path_rejects_without_fabricating_coverage) ... ok
+test_mid_blur_cancellation_keeps_input_and_emits_no_partial_result (test_float_mask.FloatMaskTests.test_mid_blur_cancellation_keeps_input_and_emits_no_partial_result) ... ok
+test_nested_mask_uses_child_author_clock_before_parent_transform (test_float_mask.FloatMaskTests.test_nested_mask_uses_child_author_clock_before_parent_transform) ... ok
+test_point_bracket_alias_and_mask_local_override_clip_track (test_float_mask.FloatMaskTests.test_point_bracket_alias_and_mask_local_override_clip_track) ... ok
+test_polygon_dynamic_feather_matches_independent_segment_distance (test_float_mask.FloatMaskTests.test_polygon_dynamic_feather_matches_independent_segment_distance) ... ok
+test_presentation_window_does_not_restart_mask_local_keys (test_float_mask.FloatMaskTests.test_presentation_window_does_not_restart_mask_local_keys) ... ok
+test_real_standard_render_preview_PNG16_and_source_alpha_share_masks (test_float_mask.FloatMaskTests.test_real_standard_render_preview_PNG16_and_source_alpha_share_masks) ... ERROR
+test_shape_path_and_keyframe_errors_reject_without_silent_truncation (test_float_mask.FloatMaskTests.test_shape_path_and_keyframe_errors_reject_without_silent_truncation) ... ok
+test_static_blur_is_tile_partition_invariant_and_keeps_small_alpha (test_float_mask.FloatMaskTests.test_static_blur_is_tile_partition_invariant_and_keeps_small_alpha) ... ok
+test_static_feather_blurs_existing_alpha_after_mask_and_keeps_RGB (test_float_mask.FloatMaskTests.test_static_feather_blurs_existing_alpha_after_mask_and_keeps_RGB) ... ok
+
+======================================================================
+ERROR: test_real_standard_render_preview_PNG16_and_source_alpha_share_masks (test_float_mask.FloatMaskTests.test_real_standard_render_preview_PNG16_and_source_alpha_share_masks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-mask-lab-20261022\product\tests\test_float_mask.py", line 278, in test_real_standard_render_preview_PNG16_and_source_alpha_share_masks
+    result=case.execute(end=2);actual=case.reference(result)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-mask-lab-20261022\product\tests\test_float_preview.py", line 47, in execute
+    result = preview.preview_project(self.root, self.p, self.s, request=request, **kwargs)
+  File "C:\Python313\Lib\contextlib.py", line 85, in inner
+    return func(*args, **kwds)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-mask-lab-20261022\product\src\ai_ad_editor\preview.py", line 304, in preview_project
+    return _preview_project(root, project, sequence, request=request, output=output,
+        cancel_file=cancel_file, dry_run=dry_run, contexts=contexts)
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-mask-lab-20261022\product\src\ai_ad_editor\preview.py", line 421, in _preview_project
+    float_preview.run(command)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-mask-lab-20261022\product\src\ai_ad_editor\float_preview.py", line 167, in run
+    raise error('ALPHA', '不透明作者输出不能在预览中静默丢弃alpha')
+ai_ad_editor.errors.AppError: 不透明作者输出不能在预览中静默丢弃alpha
+
+======================================================================
+FAIL: test_all_six_easings_use_original_author_ticks (test_float_mask.FloatMaskTests.test_all_six_easings_use_original_author_ticks) (mode='bezier', tick=50)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-mask-lab-20261022\product\tests\test_float_mask.py", line 181, in test_all_six_easings_use_original_author_ticks
+    np.testing.assert_array_equal(out[8,:,3],expected)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\carzy\AppData\Roaming\Python\Python313\site-packages\numpy\testing\_private\utils.py", line 1121, in assert_array_equal
+    assert_array_compare(operator.__eq__, actual, desired, err_msg=err_msg,
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         verbose=verbose, header='Arrays are not equal',
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         strict=strict)
+                         ^^^^^^^^^^^^^^
+  File "C:\Users\carzy\AppData\Roaming\Python\Python313\site-packages\numpy\testing\_private\utils.py", line 983, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Arrays are not equal
+
+Mismatched elements: 1 / 128 (0.781%)
+Mismatch at index:
+ [64]: 0.0 (ACTUAL), True (DESIRED)
+Max absolute difference among violations: 1.
+Max relative difference among violations: 1.
+ ACTUAL: array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,...
+ DESIRED: array([False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,...
+
+----------------------------------------------------------------------
+Ran 21 tests in 4.545s
+
+FAILED (failures=1, errors=1)

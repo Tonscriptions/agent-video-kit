@@ -23,6 +23,19 @@ def build_capability_manifest() -> dict[str, Any]:
         "engine": {"id": ENGINE_ID, "version": VERSION, "runtime": "python+ffmpeg-local", "network": "disabled"},
         "ffmpeg": {"version": ffmpeg_version()},
         "capabilities": {
+            'timeline_native_float_mask': {
+                'status':'implemented_with_limits', 'protocol':'author-clock-float32-alpha-mask-v1',
+                'selection':'settings.pixel_pipeline.engine=float32-native-v1',
+                'commands':['render','preview.range','preview.frame'],
+                'features':['rectangle_circle_ellipse','even_odd_polygon','sampled_line_and_cubic_path',
+                    'clip_and_mask_local_keyframes','original_author_clock','invert','source_alpha_preserved',
+                    'static_alpha_only_symmetric_box2','animated_inner_distance_feather',
+                    'straight_RGB_bits_preserved_before_affine','bounded_tiles_and_cancellation'],
+                'limits':['32_path_candidate_points_8_segments','cubic_is_sampled_polyline_not_analytic',
+                    'ellipse_distance_is_normalized_radial_approximation',
+                    'static_and_animated_feather_have_distinct_authored_semantics',
+                    'workspace_estimate_not_total_RSS','no_natural_HDR_or_full_CapCut_parity_acceptance'],
+            },
             'standard_native_float_render': {
                 'status': 'implemented_with_limits', 'protocol': 'standard-render-native-float32-v1',
                 'selection': 'settings.pixel_pipeline.engine=float32-native-v1',

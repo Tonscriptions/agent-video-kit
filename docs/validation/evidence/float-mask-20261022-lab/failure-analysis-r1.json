@@ -1,0 +1,11 @@
+{
+  "status": "failures-preserved-with-explicit-corrections",
+  "product_implementation_changed_after_first_native_run": false,
+  "native_r1": "21 methods: 1 failure at ideal analytic Bezier border vs established serialized LUT, 1 error because transparent preview fixture used opaque output. Corrected non-integer border fixture and explicit alpha-capable output; original receipts remain.",
+  "native_r2": "95 methods: 1 failure. Ideal scalar Y formula differs from real native 10bit encoded spatial edges by 2.12397 codes. Replaced that approximation with independent RGB16 pre-encoder payload SHA and independent native encoding all-YUV-byte equality; no tolerance increase.",
+  "media_r1": "Public schema gate rejected missing required interpolation in authored local keyframes. Added explicit linear interpolation.",
+  "media_r2": "Independent reference incorrectly decoded default sRGB hex background as camera BT709 OETF. Corrected reference to declared background signal; original receipt and helper remain.",
+  "media_r3": "Passed on previous test-source revision; not reused as current-source acceptance.",
+  "media_r4": "Fresh real CLI media at final current product/test revision. No prior failure receipt overwritten.",
+  "preparation_r1": "Attempted absent parent fixture-manifest path; failed before copy. Corrected to immutable parent foundation fixture list and copied 322 files with exact SHA."
+}

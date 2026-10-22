@@ -16,6 +16,7 @@ from .errors import AppError
 from .float_color_signal import ColorSignal,convert_rgba
 from .float_composite import composite_rgba
 from .float_geometry import resample_rgba
+from .float_mask import compile_mask, apply_mask
 from .float_exposure import compile_effects,apply_exposure
 from .float_raster import mode_name
 from .sequence_canvas import sequence_canvas
@@ -108,7 +109,7 @@ class FloatTimeline:
         self.sequences={s['id']:s for s in self.project['sequences']};self.sequence_id=sequence_id
         if len(self.sequences)!=len(self.project['sequences']):raise error('SEQUENCE','序列ID重复')
         if sequence_id not in self.sequences:raise error('SEQUENCE','目标作者序列不存在')
-        self.assets={a['id']:a for a in self.project['assets']};self.maps={};self.effect_plans={};self.clip_count=0
+        self.assets={a['id']:a for a in self.project['assets']};self.maps={};self.effect_plans={};self.mask_plans={};self.clip_count=0
         if len(self.assets)!=len(self.project['assets']):raise error('SOURCE','资产ID重复')
         self._validate(sequence_id,());sequence=self.sequences[sequence_id]
         self.frame_count=math.ceil(Fraction(int(sequence['duration_tick']),self.tps)*self.fps)
@@ -147,10 +148,8 @@ class FloatTimeline:
                 if freeze_duration>=authored or freeze_at>authored-freeze_duration:
                     raise error('FREEZE','冻结区间无效',clip=path)
                 mode_name((clip.get('blend') or {}).get('mode','normal'))
-                mask=clip.get('mask') or {}
-                if mask.get('type','rectangle') not in ('rectangle','circle','ellipse','none','off') or mask.get('feather',0) or mask.get('keyframes'):
-                    raise error('UNSUPPORTED','该蒙版类型、羽化或蒙版本地关键帧尚未接入',clip=path)
-                allowed=TRANSFORM_PROPERTIES|MASK_PROPERTIES.get(mask.get('type','rectangle'),set())
+                self.mask_plans[path]=compile_mask(clip)
+                allowed=TRANSFORM_PROPERTIES|(self.mask_plans[path].properties if self.mask_plans[path] else set())
                 properties=[frame.get('property') for frame in clip.get('keyframes',[])]
                 if any(p not in allowed for p in properties) or len(set(properties))!=len(properties):raise error('UNSUPPORTED','关键帧属性尚未接入或重复',clip=path)
                 if (clip.get('transform') or {}).get('opacity_keyframes'):raise error('UNSUPPORTED','独立透明度轨道尚未接入',clip=path)
@@ -194,31 +193,7 @@ class FloatTimeline:
         if left_limit:animation_tick=math.nextafter(float(animation_tick),-math.inf)
         return result,animation_tick,right_edge
 
-    def _mask(self,clip,shape,tick):
-        mask=clip.get('mask') or {};kind=mask.get('type','rectangle')
-        if not mask or kind in ('none','off'):return None
-        height,width=shape[:2];y,x=np.indices((height,width),dtype=np.float64)
-        def value(names,default):
-            result=keyframe_value(clip,names,float(default),float(tick))
-            if not math.isfinite(result) or not 0<=result<=1:raise error('MASK','蒙版参数须为0到1的有限数字')
-            return result
-        if kind=='rectangle':
-            left=value(('mask.x','mask.position.x'),mask.get('x',0))*width;top=value(('mask.y','mask.position.y'),mask.get('y',0))*height
-            right=left+value(('mask.width','mask.w'),mask.get('width',mask.get('w',1)))*width
-            bottom=top+value(('mask.height','mask.h'),mask.get('height',mask.get('h',1)))*height
-            result=(x>=left)&(x<=min(width,right))&(y>=top)&(y<=min(height,bottom))
-        else:
-            cx=value(('mask.cx','mask.center_x'),mask.get('cx',mask.get('center_x',.5)))*width
-            cy=value(('mask.cy','mask.center_y'),mask.get('cy',mask.get('center_y',.5)))*height
-            if kind=='circle':rx=ry=value(('mask.radius',),mask.get('radius',.5))*min(width,height)
-            else:
-                rx=value(('mask.rx','mask.radius_x'),mask.get('rx',mask.get('radius_x',.5)))*width
-                ry=value(('mask.ry','mask.radius_y'),mask.get('ry',mask.get('radius_y',.5)))*height
-            result=((x-cx)**2/max(rx*rx,1e-300)+(y-cy)**2/max(ry*ry,1e-300))<=1
-        if mask.get('invert'):result=~result
-        return result.astype(np.float32)
-
-    def _project(self,clip,surface,canvas,tick):
+    def _project(self,clip,surface,canvas,tick,path):
         transform=clip.get('transform') or {};position=transform.get('position') or {};anchor=transform.get('anchor') or {}
         def value(names,default):return keyframe_value(clip,names,float(default),float(tick))
         scale=value(('transform.scale','scale'),transform.get('scale',1));angle=value(('transform.rotation','rotation'),transform.get('rotation',0))
@@ -231,11 +206,11 @@ class FloatTimeline:
         zoom=min(cw/width,ch/height)*scale;c,s=math.cos(math.radians(angle))/zoom,math.sin(math.radians(angle))/zoom
         anchor_x,anchor_y=width*ax-.5,height*ay-.5;dest_x,dest_y=cw*px-.5,ch*py-.5
         inverse=[[c,s,anchor_x-c*dest_x-s*dest_y],[-s,c,anchor_y+s*dest_x-c*dest_y]]
-        mask=self._mask(clip,surface.shape,tick)
-        if mask is not None:
-            surface=surface.copy();surface[...,3]*=mask
+        mask_metadata=None
+        if self.mask_plans[path] is not None:
+            surface,mask_metadata=apply_mask(surface,self.mask_plans[path],tick,max_working_bytes=self.max_working_bytes,cancel=self.poll)
         result,_=resample_rgba(surface,(cw,ch),inverse,max_working_bytes=self.max_working_bytes,cancel=self.poll)
-        return result,opacity,inverse
+        return result,opacity,inverse,mask_metadata
 
     def _sequence(self,sequence_id,at,rows,*,root=False,depth=0,left_limit=False):
         self.poll();sequence=self.sequences[sequence_id];canvas=sequence_canvas(self.project,sequence);w,h=canvas['width'],canvas['height']
@@ -271,11 +246,11 @@ class FloatTimeline:
                 effect_metadata=None
                 if self.effect_plans[path]:
                     source,effect_metadata=apply_exposure(source,self.effect_plans[path],max_working_bytes=self.max_working_bytes,cancel=self.poll)
-                layer,opacity,inverse=self._project(clip,source,canvas,tick)
+                layer,opacity,inverse,mask_metadata=self._project(clip,source,canvas,tick,path)
                 blend=clip.get('blend') or {};opacity*=keyframe_value(clip,('blend.opacity','blend_opacity'),float(blend.get('opacity',1)),float(tick))
                 result,_=composite_rgba(result,layer,mode=blend.get('mode','normal'),opacity=opacity,max_working_bytes=self.max_working_bytes,cancel=self.poll)
                 rows.append({'clip':path,'source_time':str(source_time),'native_frame_index':frame_index,'right_edge':right,
-                    'author_animation_tick':str(tick),'inverse_affine':inverse,'opacity':opacity,'effects':effect_metadata})
+                    'author_animation_tick':str(tick),'inverse_affine':inverse,'opacity':opacity,'effects':effect_metadata,'mask':mask_metadata})
         return result
 
     def render_frame(self,index):
