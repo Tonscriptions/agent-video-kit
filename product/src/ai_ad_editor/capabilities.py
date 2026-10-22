@@ -120,6 +120,17 @@ def build_capability_manifest() -> dict[str, Any]:
                     'mp4_is_lossy_and_opaque_lossless_reference_retains_alpha_and_pcm',
                     'sha_verification_cost_applies_on_cache_hits','no_automatic_natural_quality_or_realtime_acceptance'],
             },
+            'timeline_native_float_exposure': {
+                'status': 'implemented_with_limits', 'protocol': 'linear-float32-native-coefficient-exposure-v1',
+                'selection': 'settings.pixel_pipeline.engine=float32-native-v1',
+                'author_effect': 'exposure', 'parameters': {'amount': [-3, 3], 'black': [-1, 1]},
+                'features': ['linear_RGB_before_mask_and_affine', 'nested_group_after_child_composition',
+                    'standard_render_and_preview_shared_host', 'straight_alpha_bits_preserved',
+                    'finite_negative_over_one_RGB_no_integer_edge', 'ordered_static_chains_and_disabled_effects'],
+                'limits': ['static_exposure_only', 'native_binary32_coefficients',
+                    'singular_white_equals_black_gain_1024', 'absolute_white_black_difference_for_positive_gain',
+                    'final_delivery_range_policy_still_applies', 'no_automatic_HDR_natural_quality_or_CapCut_parity'],
+            },
             'timeline_native_float_preview': {
                 'status': 'implemented_with_limits', 'protocol': 'agent-native-float32-timeline-preview-v1',
                 'selection': 'settings.pixel_pipeline.engine=float32-native-v1',

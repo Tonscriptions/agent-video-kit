@@ -1,0 +1,171 @@
+"""Project actual exposure evidence into numbered README and product documents."""
+import argparse
+import json
+from pathlib import Path
+import re
+from urllib.parse import unquote
+
+from run_frozen_regression import frozen, sha
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = ROOT.parents[2]
+PARENT = ROOT.parent/'float-preview-lab-20261022'
+REL = 'docs/validation/evidence/float-exposure-20261022-lab'
+ASSETS = 'docs/assets/float-exposure-20261022-r1'
+REPORT = 'docs/validation/线性浮点曝光共同宿主与真实CLI实测_2026-10-22.md'
+CONTRACT = 'docs/specs/线性浮点曝光接入契约_v0.1_2026-10-22.md'
+MARKER = 'V98-LINEAR-FLOAT-EXPOSURE'
+LATEST_DOCS = ('README.md','docs/README.md','docs/产品需求与开发路线基线_2026-10-12.md',
+    'docs/构建进度总表_2026-10-16.md','docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md',
+    'docs/Concat与剪映功能差异矩阵_2026-10-12.md','docs/specs/AgentCLI契约_v0.1_2026-10-13.md')
+
+
+def read(path):
+    return json.loads(path.read_bytes())
+
+
+def write(path,text):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(text.rstrip()+'\n',encoding='utf8',newline='\n')
+
+
+def current():
+    inputs=frozen();assert len(inputs)==302
+    native=read(ROOT/REL/'native-r2/verification.json')
+    media=read(ROOT/REL/'media-r1/verification.json')
+    assert native['status']=='passed' and native['methods']==74 and native['skipped']==0
+    assert native['frozen_before']==native['frozen_after']==inputs
+    assert media['status']=='passed-public-CLI-linear-exposure-and-native-float-previews'
+    assert media['frozen_before']==media['frozen_after']==inputs
+    assert len(media['calls'])==20 and len(media['checks'])==29 and all(c['ok'] for c in media['checks'])
+    assert media['actual_public_render_CLI_processes']==2 and media['actual_public_preview_CLI_processes']==3
+    assert media['exposure_oracle']['RGB_values']==2419200 and media['exposure_oracle']['maximum_linear_absolute_error']==0
+    for name,row in media['assets'].items():assert sha(ROOT/name)==row['sha256']
+    installed=read(ROOT/REL/'installed-r1/verification.json')
+    if installed['status'].startswith('passed-'):
+        assert installed['status']=='passed-fresh-eight-wheel-181-resources-real-previews-and-274-methods'
+        assert installed['isolated_methods']['methods']==274 and installed['isolated_methods']['skipped']==0
+        assert installed['frozen_before']==installed['frozen_after']==inputs
+        im=read(ROOT/REL/'media-installed-r1/verification.json')
+        assert im['status']==media['status'] and im['isolated']
+        for key in ['Float32_sha256','PCM_sha256','PNG16_sha256']:
+            assert im['preview_decoded'][key]==media['preview_decoded'][key]
+    return inputs,native,media,installed
+
+
+def section(full=None,published=False):
+    inputs,native,media,installed=current()
+    accepted=installed['status'].startswith('passed-')
+    itext=(f"**274 方法 /{installed['isolated_methods']['suite_seconds']} 秒 /0 跳过**；181 资源 source/wheel/site 相同，8 个固定离线 wheel、NumPy 931 文件及原许可相同；安装版真实音画/Float32/PNG16 SHA 与源码版相同。" if accepted else
+        '**运行中，不计通过**；目标274方法、181资源，另行重跑真实公开CLI原片/曝光/预览。')
+    if full:
+        assert full['status']=='passed' and full['methods']==2369 and full['skipped']==0 and full['terminal_ok']
+        assert full['frozen_before']==full['frozen_after']==inputs
+        ftext=f"**2369 方法 /{full['suite_seconds']} 秒 /0 跳过**；302产品输入、8外部夹具和9依赖一致。"
+    else:
+        ftext='**尚未通过，不计通过**；预计2369项，须等实际V97累计2355项通过并发布后再执行。'
+    title='V98 线性 Float32 曝光共同宿主' if published else 'V98 候选：线性 Float32 曝光共同宿主（未发布）'
+    return f'''<!-- {MARKER} -->
+### {title}
+
+显式 `settings.pixel_pipeline.engine=float32-native-v1` 工程现在可在共同 FloatTimeline 中执行静态 `exposure`，正式 `render` 与 `preview` 复用同一实现。相关源码回归74项中14项为新增曝光测试，其余60项为既有预览、正式渲染与宿主回归；不将测试数量作为剪映等价证明。
+
+| 编号 | 功能性核验 | 实际结果与边界 | 证据 |
+|---|---|---|---|
+| FE98-01 | 曝光接入 | 线性straight RGB、蒙版/仿射前；嵌套组在子序列合成后执行；启用的未接入效果仍明确拒绝 | [接口契约]({CONTRACT}) |
+| FE98-02 | 65,536级与alpha | +1EV全部65,536灰阶保留；相邻Float32、负值/超一值、隐藏RGB及alpha原位位型、负零身份运算；不引入整数中间层 | [实际源码断言]({REL}/native-r2/unittest.log) |
+| FE98-03 | 原生交叉对照 | 12组真实FFmpeg Float32输入/输出，含分数EV、黑位、接近零分母、黑位大于白位和精确相等；Decimal验证声明的Float32运算边界 | [73次相关套件原生调用]({REL}/native-r2/verification.json) |
+| FE98-04 | 顺序与资源 | 静态链按序执行，禁用项跳过；分块、工作区准入、中途取消、晚块非法alpha/NaN/Inf与溢出均明确失败，输入字节保留 | [74项相关回归]({REL}/native-r2/verification.json) |
+| FE98-05 | 真实公开CLI | 20个脚本级调用、29项检查；2次正式render、3次preview；320×180/10fps/2秒各20帧，完整PCM各96000双声道采样帧相同 | [原始命令/检查]({REL}/media-r1/verification.json) |
+| FE98-06 | 独立曝光像素基准 | 帧3..16共14帧，2,419,200个实际线性RGB值与独立源16位解码/逆OETF/曝光计算一致，最大误差0；单帧PNG16与区间帧11独立OETF对照通过 | [真实媒体生成器]({REL}/media-r1/executed-script.py.txt) |
+| FE98-07 | 原视频/GIF | 下方GIF左原片、右本次真实CLI曝光预览；14×100ms。查看作者帧3/10/16共6幅图，未连续播放、试听或测自然素材/HDR | [原片MP4]({ASSETS}/original-range.mp4) · [实际预览MP4]({ASSETS}/range.mp4) · [Float32母参考]({ASSETS}/range.master.nut) · [PNG16]({ASSETS}/frame.png) · [查看记录]({REL}/static-review-r1.json) |
+| FE98-08 | 素材与可复现 | 程序生成RGB16图形与双声道正弦波，CC0；保留原生输入、作者工程、权利账和全部产物SHA | [原生原片]({ASSETS}/original.native.mkv) · [作者工程]({ASSETS}/author-project.json) · [权利账]({ASSETS}/rights-ledger.json) · [CC0声明]({ASSETS}/LICENSE.txt) |
+| FE98-09 | 离线安装 | {itext} | [安装收据]({REL}/installed-r1/verification.json) |
+| FE98-10 | 全套产品回归 | {ftext} | [当前报告]({REPORT}) |
+| FE98-11 | 保留失败与修正 | 首轮14方法中2个边界子例失败：错误地保留白位减黑位的符号。修正为绝对差后74项相关回归通过，原输入/输出和执行源码均保留 | [首轮失败]({REL}/native-r1/verification.json) · [修正说明]({REL}/native-r1-correction.json) |
+| FE98-12 | 未验收边界 | 仅静态曝光；默认后端迁移、其余浮点算子、自然素材质量、ICC/PQ/HLG/HDR、长片并发总RSS及完整剪映功能仍待完成；MP4观看副本不作理想量化验收 | [功能/验收边界]({CONTRACT}) |
+
+![原片与真实CLI线性Float32曝光预览]({ASSETS}/comparison.gif)
+
+<!-- /{MARKER} -->
+'''
+
+
+def relink(text,name):
+    prefix='../'*(len(Path(name).parts)-1)
+    return re.sub(r'(!?\[[^\]]*\]\()docs/',lambda m:m[1]+prefix+'docs/',text)
+
+
+def report(full=None,published=False):
+    return '''# 线性浮点曝光共同宿主与真实CLI实测
+
+本次限定交付为现有显式Float32时间线上的静态曝光。新增`float_exposure.py`与14项曝光测试；修改共同宿主、能力发现和既有预览的未支持效果夹具。父候选300输入，本候选302输入，5个产品路径有差异；父版本完整回归和实际发布须独立确认，不能据已有源码/安装测试推断全套产品通过。
+
+曝光量范围−3..3 EV，黑位−1..1。实现使用NumPy分块浮点运算；不复制FFmpeg实现代码或在运行时请求网络。参数语义与边界参照[FFmpeg官方实现说明](https://ffmpeg.org/doxygen/trunk/vf__exposure_8c_source.html)，并以本机FFmpeg 8.1真实Float32调用独立交叉核验。系数和每步运算按声明的binary32边界处理，允许约定的数值误差，不宣称跨编译器逐位相同。
+
+首轮原始7组公式观察没有覆盖分母符号；后续12组交叉测试检出2处符号不符，原失败未改写。修正的是产品系数计算，没有降低断言容差或删去失败用例。相关74项通过是一次实际执行，不把首轮14项、74项、安装目标274项或全套目标2369项累计成不同功能数量。
+
+''' + relink(section(full,published),REPORT)
+
+
+def contract():
+    return '''# 线性浮点曝光接入契约 v0.1
+
+作者工程显式选择`settings.pixel_pipeline.engine=float32-native-v1`；`working_signal.transfer`须为`linear`。曝光为片段`effects`数组中的静态项：
+
+```json
+{"type":"exposure","parameters":{"amount":1,"black":0.003}}
+```
+
+`amount`/别名`exposure`范围−3..3 EV；`black`范围−1..1。值须有限，布尔、未知参数、动态通道、冲突别名、参数重复置于顶层和parameters均拒绝。遗留平铺参数可读；禁用效果不执行。每片段最多128项静态效果，不支持的启用效果返回`FLOAT_TIMELINE_UNSUPPORTED`。
+
+参数先转换binary32；`white=Float32(2^(-amount))`，`d=abs(Float32(white-black))`，`gain=Float32(1/d)`。当d精确为零时gain=1024。每个RGB先执行Float32减黑位，再执行Float32乘增益；黑位大于白位仍使用正增益。alpha在曝光核中逐位保留；RGB可为有限负数或大于1，不做裁剪或整数编码。作者输出范围策略在后续共同交付阶段执行。Float32白位与原生exp2f在不同运行库上可能有舍入差异，必须保留原生交叉对照及具体误差边界，不能宣称任意平台逐位相同。
+
+曝光位于素材解码/工作信号转换之后，局部蒙版和仿射之前；嵌套片段在子序列合成之后应用。效果链按作者顺序执行；正式render、区间预览与单帧预览共享FloatTimeline，持久缓存按作者/素材/运行时内容SHA失效。
+
+输入为连续H×W×4 Float32，RGB须有限，alpha须在0..1。核上限16,777,216像素、单边16,384、单块262,144像素，默认65,536；默认及最大估算工作区768MiB。估算包含输入/输出/中间块预算，既非全进程RSS测量，也不承诺共同宿主可运行所有该尺寸。取消和错误不改写调用者输入；已分配的部分输出由本次调用持有。共同宿主、源解码和最终编码的其他预算继续适用。
+
+本实现仅静态曝光。没有迁移默认后端，没有接通全部效果/转场/字幕/裁剪/羽化或HDR；没有据合成图案、测试通过数、标签或观看副本接受自然素材质量、剪映风格一致性、实时预览或完整产品等价。MP4观看副本继承已披露的去alpha原生转换精度边界，Float32母参考和PNG16独立验收。
+'''
+
+
+def documents(target,full=None,published=False):
+    names=list(LATEST_DOCS)+[REPORT,CONTRACT]
+    block=section(full,published)
+    for name in LATEST_DOCS:
+        text=(MAIN/name).read_text('utf8')
+        text=re.sub(r'\n?<!-- '+MARKER+r' -->.*?<!-- /'+MARKER+r' -->\n?','\n',text,flags=re.S)
+        pos=text.find('\n')+1
+        write(target/name,text[:pos]+'\n'+relink(block,name)+'\n'+text[pos:])
+    write(target/REPORT,report(full,published));write(target/CONTRACT,contract())
+    return names
+
+
+def links(target,names):
+    found=[]
+    for name in names:
+        for value in re.findall(r'!?\[[^\]]*\]\(([^\s)]+)(?:\s+[^)]*)?\)',(target/name).read_text('utf8')):
+            path=unquote(value.strip('<>').split('#')[0])
+            if not path or re.match(r'^[a-zA-Z][a-zA-Z0-9+.-]*:',path):continue
+            assert any((base/name).parent.joinpath(path).resolve().is_file() for base in [target,ROOT,MAIN,PARENT]),(name,path)
+            found.append([name,path])
+    return found
+
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--revision',required=True);args=parser.parse_args()
+    assert re.fullmatch(r'r\d+',args.revision)
+    target=ROOT/'product/.runtime/float-exposure-20261022'/('readme-preview-'+args.revision)
+    assert not target.exists();target.mkdir(parents=True)
+    names=documents(target);checked=links(target,names)
+    write(ROOT/REPORT,report());write(ROOT/CONTRACT,contract())
+    inputs,_,_,installed=current()
+    receipt=ROOT/REL/('readme-preview-'+args.revision+'.json');assert not receipt.exists()
+    write(receipt,json.dumps({'status':'passed-local-document-links','documents':{n:sha(target/n) for n in names},
+        'document_count':len(names),'links':len(checked),'installed_status':installed['status'],
+        'frozen_input_count':len(inputs),'main_mutated':False,'full_suite_claimed_passed':False,
+        'preview_root':str(target),'generator_sha256':sha(Path(__file__))},ensure_ascii=False,indent=2))
+    print(json.dumps({'documents':len(names),'links':len(checked),'installed_status':installed['status'],'full_suite_claimed_passed':False},ensure_ascii=False))
+
+
+if __name__=='__main__':main()

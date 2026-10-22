@@ -1,0 +1,15 @@
+{
+  "status": "corrected-before-native-r2",
+  "original": "native-r1/verification.json",
+  "original_failures": 2,
+  "original_methods": 14,
+  "original_frozen_equal": true,
+  "observed_difference": "black greater than white must retain a positive reciprocal magnitude; the previous signed denominator inverted RGB",
+  "correction": "absolute value of binary32 white-minus-black before reciprocal; unchanged singular gain 1024",
+  "primary_source": "https://ffmpeg.org/doxygen/trunk/vf__exposure_8c_source.html",
+  "primary_source_retrieved": true,
+  "source_code_copied": false,
+  "independent_implementation": true,
+  "next_verification": "native-r2 with related render/preview/timeline tests",
+  "accepted": false
+}

@@ -1,0 +1,91 @@
+test_all_65536_codes_and_alpha_bits_preserved_without_integer_edge (test_float_exposure.FloatExposureTests.test_all_65536_codes_and_alpha_bits_preserved_without_integer_edge) ... ok
+test_argument_aliases_and_malformed_effects_reject (test_float_exposure.FloatExposureTests.test_argument_aliases_and_malformed_effects_reject) ... ok
+test_budget_and_tampered_plan_reject_before_output (test_float_exposure.FloatExposureTests.test_budget_and_tampered_plan_reject_before_output) ... ok
+test_chain_order_and_disabled_unported_effect (test_float_exposure.FloatExposureTests.test_chain_order_and_disabled_unported_effect) ... ok
+test_decimal_oracle_after_declared_binary32_coefficients (test_float_exposure.FloatExposureTests.test_decimal_oracle_after_declared_binary32_coefficients) ... ok
+test_extended_RGB_hidden_RGB_and_adjacent_float32_values (test_float_exposure.FloatExposureTests.test_extended_RGB_hidden_RGB_and_adjacent_float32_values) ... ok
+test_identity_is_owned_and_bit_exact_including_negative_zero (test_float_exposure.FloatExposureTests.test_identity_is_owned_and_bit_exact_including_negative_zero) ... ok
+test_invalid_surface_late_tile_and_alpha_fail_without_input_mutation (test_float_exposure.FloatExposureTests.test_invalid_surface_late_tile_and_alpha_fail_without_input_mutation) ... ok
+test_mid_tile_cancel_and_overflow_leave_source_intact (test_float_exposure.FloatExposureTests.test_mid_tile_cancel_and_overflow_leave_source_intact) ... ok
+test_native_FFmpeg_float_oracle_including_singular_and_negative_gain (test_float_exposure.FloatExposureTests.test_native_FFmpeg_float_oracle_including_singular_and_negative_gain) ... 
+  test_native_FFmpeg_float_oracle_including_singular_and_negative_gain (test_float_exposure.FloatExposureTests.test_native_FFmpeg_float_oracle_including_singular_and_negative_gain) (amount=3, black=1) ... FAIL
+  test_native_FFmpeg_float_oracle_including_singular_and_negative_gain (test_float_exposure.FloatExposureTests.test_native_FFmpeg_float_oracle_including_singular_and_negative_gain) (amount=1, black=0.5000001) ... FAIL
+test_nested_group_exposure_applies_after_child_composition (test_float_exposure.FloatExposureTests.test_nested_group_exposure_applies_after_child_composition) ... ok
+test_nonlinear_working_signal_and_dynamic_channels_reject (test_float_exposure.FloatExposureTests.test_nonlinear_working_signal_and_dynamic_channels_reject) ... ok
+test_real_standard_render_and_preview_share_exposure_and_PNG16 (test_float_exposure.FloatExposureTests.test_real_standard_render_and_preview_share_exposure_and_PNG16) ... ok
+test_timeline_source_exposure_precedes_mask_affine_and_alpha_composition (test_float_exposure.FloatExposureTests.test_timeline_source_exposure_precedes_mask_affine_and_alpha_composition) ... ok
+
+======================================================================
+FAIL: test_native_FFmpeg_float_oracle_including_singular_and_negative_gain (test_float_exposure.FloatExposureTests.test_native_FFmpeg_float_oracle_including_singular_and_negative_gain) (amount=3, black=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-exposure-lab-20261022\product\tests\test_float_exposure.py", line 79, in test_native_FFmpeg_float_oracle_including_singular_and_negative_gain
+    np.testing.assert_allclose(actual[:,:,:3],expected[:,:,:3],rtol=3e-7,atol=3e-8)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\carzy\AppData\Roaming\Python\Python313\site-packages\numpy\testing\_private\utils.py", line 1768, in assert_allclose
+    assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         verbose=verbose, header=header, equal_nan=equal_nan,
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         strict=strict)
+                         ^^^^^^^^^^^^^^
+  File "C:\Users\carzy\AppData\Roaming\Python\Python313\site-packages\numpy\testing\_private\utils.py", line 983, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Not equal to tolerance rtol=3e-07, atol=3e-08
+
+Mismatched elements: 3072 / 3072 (100%)
+First 5 mismatches are at indices:
+ [0, 0, 0]: 1.3714287281036377 (ACTUAL), -1.3714287281036377 (DESIRED)
+ [0, 0, 1]: 1.3714287281036377 (ACTUAL), -1.3714287281036377 (DESIRED)
+ [0, 0, 2]: 1.3714287281036377 (ACTUAL), -1.3714287281036377 (DESIRED)
+ [0, 1, 0]: 1.3698647022247314 (ACTUAL), -1.3698647022247314 (DESIRED)
+ [0, 1, 1]: 1.3698647022247314 (ACTUAL), -1.3698647022247314 (DESIRED)
+Max absolute difference among violations: 2.7428575
+Max relative difference among violations: 2.
+ ACTUAL: array([[[ 1.371429,  1.371429,  1.371429],
+        [ 1.369865,  1.369865,  1.369865],
+        [ 1.368301,  1.368301,  1.368301],...
+ DESIRED: array([[[-1.371429, -1.371429, -1.371429],
+        [-1.369865, -1.369865, -1.369865],
+        [-1.368301, -1.368301, -1.368301],...
+
+======================================================================
+FAIL: test_native_FFmpeg_float_oracle_including_singular_and_negative_gain (test_float_exposure.FloatExposureTests.test_native_FFmpeg_float_oracle_including_singular_and_negative_gain) (amount=1, black=0.5000001)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-exposure-lab-20261022\product\tests\test_float_exposure.py", line 79, in test_native_FFmpeg_float_oracle_including_singular_and_negative_gain
+    np.testing.assert_allclose(actual[:,:,:3],expected[:,:,:3],rtol=3e-7,atol=3e-8)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\carzy\AppData\Roaming\Python\Python313\site-packages\numpy\testing\_private\utils.py", line 1768, in assert_allclose
+    assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         verbose=verbose, header=header, equal_nan=equal_nan,
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         strict=strict)
+                         ^^^^^^^^^^^^^^
+  File "C:\Users\carzy\AppData\Roaming\Python\Python313\site-packages\numpy\testing\_private\utils.py", line 983, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Not equal to tolerance rtol=3e-07, atol=3e-08
+
+Mismatched elements: 3072 / 3072 (100%)
+First 5 mismatches are at indices:
+ [0, 0, 0]: 5872026.5 (ACTUAL), -5872026.5 (DESIRED)
+ [0, 0, 1]: 5872026.5 (ACTUAL), -5872026.5 (DESIRED)
+ [0, 0, 2]: 5872026.5 (ACTUAL), -5872026.5 (DESIRED)
+ [0, 1, 0]: 5860546.5 (ACTUAL), -5860546.5 (DESIRED)
+ [0, 1, 1]: 5860546.5 (ACTUAL), -5860546.5 (DESIRED)
+Max absolute difference among violations: 1.1744053e+07
+Max relative difference among violations: 2.
+ ACTUAL: array([[[ 5.872026e+06,  5.872026e+06,  5.872026e+06],
+        [ 5.860546e+06,  5.860546e+06,  5.860546e+06],
+        [ 5.849066e+06,  5.849066e+06,  5.849066e+06],...
+ DESIRED: array([[[-5.872026e+06, -5.872026e+06, -5.872026e+06],
+        [-5.860546e+06, -5.860546e+06, -5.860546e+06],
+        [-5.849066e+06, -5.849066e+06, -5.849066e+06],...
+
+----------------------------------------------------------------------
+Ran 14 tests in 28.084s
+
+FAILED (failures=2)

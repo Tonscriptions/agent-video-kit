@@ -16,6 +16,7 @@ from .errors import AppError
 from .float_color_signal import ColorSignal,convert_rgba
 from .float_composite import composite_rgba
 from .float_geometry import resample_rgba
+from .float_exposure import compile_effects,apply_exposure
 from .float_raster import mode_name
 from .sequence_canvas import sequence_canvas
 from .speed_curves import compile_curve
@@ -107,7 +108,7 @@ class FloatTimeline:
         self.sequences={s['id']:s for s in self.project['sequences']};self.sequence_id=sequence_id
         if len(self.sequences)!=len(self.project['sequences']):raise error('SEQUENCE','序列ID重复')
         if sequence_id not in self.sequences:raise error('SEQUENCE','目标作者序列不存在')
-        self.assets={a['id']:a for a in self.project['assets']};self.maps={};self.clip_count=0
+        self.assets={a['id']:a for a in self.project['assets']};self.maps={};self.effect_plans={};self.clip_count=0
         if len(self.assets)!=len(self.project['assets']):raise error('SOURCE','资产ID重复')
         self._validate(sequence_id,());sequence=self.sequences[sequence_id]
         self.frame_count=math.ceil(Fraction(int(sequence['duration_tick']),self.tps)*self.fps)
@@ -135,8 +136,10 @@ class FloatTimeline:
                 path=sequence_id+'/'+str(clip['id'])
                 if clip['id'] in ids:raise error('SEQUENCE','轨道内片段ID重复',clip=path)
                 ids.add(clip['id'])
-                for field in ('effects','transition_in','transition_out','crop','generator','subtitle','tracking_binding'):
+                for field in ('transition_in','transition_out','crop','generator','subtitle','tracking_binding'):
                     if clip.get(field):raise error('UNSUPPORTED','该作者操作尚未连接浮点宿主，不进行旧路径回落',clip=path,operation=field)
+                self.effect_plans[path]=compile_effects(clip.get('effects',[]))
+                if self.effect_plans[path] and self.working.transfer!='linear':raise error('SIGNAL','浮点曝光要求线性光工作域',clip=path)
                 integer(clip['timeline_start_tick']);integer(clip['duration_tick'],1);integer(clip['source_in_tick']);integer(clip['source_out_tick'],1)
                 if clip['source_out_tick']<=clip['source_in_tick']:
                     raise error('CLOCK','作者片段范围无效',clip=path)
@@ -265,11 +268,14 @@ class FloatTimeline:
                     if source is None:
                         rows.append({'clip':path,'source_time':str(source_time),'empty_native_coverage':True});continue
                 if len(rows)>=MAX_LAYERS_PER_FRAME:raise error('BUDGET','同帧片段数超过128')
+                effect_metadata=None
+                if self.effect_plans[path]:
+                    source,effect_metadata=apply_exposure(source,self.effect_plans[path],max_working_bytes=self.max_working_bytes,cancel=self.poll)
                 layer,opacity,inverse=self._project(clip,source,canvas,tick)
                 blend=clip.get('blend') or {};opacity*=keyframe_value(clip,('blend.opacity','blend_opacity'),float(blend.get('opacity',1)),float(tick))
                 result,_=composite_rgba(result,layer,mode=blend.get('mode','normal'),opacity=opacity,max_working_bytes=self.max_working_bytes,cancel=self.poll)
                 rows.append({'clip':path,'source_time':str(source_time),'native_frame_index':frame_index,'right_edge':right,
-                    'author_animation_tick':str(tick),'inverse_affine':inverse,'opacity':opacity})
+                    'author_animation_tick':str(tick),'inverse_affine':inverse,'opacity':opacity,'effects':effect_metadata})
         return result
 
     def render_frame(self,index):
