@@ -1,0 +1,150 @@
+"""Pinned read-only upstream review; never installs or runs the upstream CLI."""
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+from pathlib import Path, PurePosixPath
+import urllib.request
+import zipfile
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+HEAD = 'af5756a88d362bdcd71dc870a0e02590420e6944'
+BASE = '419da5dc483267b07e4f32d73c993fe5f8ee04d1'
+OUT = ROOT / 'docs/validation/evidence/openfilm-reuse-20261022-r16/capture-r1'
+CANDIDATES = (
+    'packages/openfilm/src/film-doc.mjs',
+    'packages/openfilm/src/host.mjs',
+    'packages/openfilm/src/look.mjs',
+    'packages/openfilm/studio/server/subtitle-segments.mjs',
+    'packages/openfilm/studio/ui/src/lib/film-clip-edits.ts',
+    'packages/openfilm/studio/ui/src/lib/timeline-edit.ts',
+    'packages/openfilm/studio/ui/src/lib/component-props.ts',
+    'packages/openfilm/studio/ui/src/lib/template-controls.ts',
+    'packages/openfilm/studio/server/preview-cache.mjs',
+    'packages/openfilm/src/encoders.mjs',
+    'packages/openfilm/src/problems.mjs',
+    'packages/openfilm/studio/server/diagnostics.mjs',
+    'packages/openfilm/studio/server/nle.mjs',
+    'packages/openfilm/studio/server/fcpxml.mjs',
+    'apps/desktop/src/pi-config.mjs',
+    'packages/openfilm/studio/server/exports.mjs',
+)
+
+
+def sha(raw):
+    return 'sha256:' + hashlib.sha256(raw).hexdigest()
+
+
+def save(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf8')
+
+
+def freeze():
+    spec = importlib.util.spec_from_file_location('main_freeze', MAIN / 'scripts/run_frozen_regression.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.frozen()
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=False)
+    (OUT / 'executed-capture.py.txt').write_bytes(Path(__file__).read_bytes())
+    record = {'status': 'running', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
+              'requests': [], 'frozen_before': freeze(), 'upstream_cli_executed': False,
+              'browser_tabs_opened': 0, 'virtualization': False, 'new_media': 0,
+              'new_product_tests': 0, 'product_code_adopted': False}
+    save(OUT / 'verification.json', record)
+    try:
+        replies = {}
+        urls = {
+            'repository': 'https://api.github.com/repos/openfilm/openfilm',
+            'head': 'https://api.github.com/repos/openfilm/openfilm/commits/main',
+            'release': 'https://api.github.com/repos/openfilm/openfilm/releases/latest',
+            'compare': f'https://api.github.com/repos/openfilm/openfilm/compare/{BASE}...{HEAD}',
+            'archive': f'https://codeload.github.com/openfilm/openfilm/zip/{HEAD}',
+        }
+        for key, url in urls.items():
+            req = urllib.request.Request(url, headers={'User-Agent': 'agent-video-kit-source-review',
+                                                      'Accept': 'application/vnd.github+json'})
+            started = datetime.now(timezone.utc).isoformat()
+            cap = (48 if key == 'archive' else 8) << 20
+            with urllib.request.urlopen(req, timeout=45) as response:
+                raw = response.read(cap + 1)
+                meta = {'url': url, 'final_url': response.url, 'status': response.status,
+                        'http_date': response.headers.get('Date'), 'etag': response.headers.get('ETag')}
+            assert len(raw) <= cap, 'Bounded response limit'
+            meta.update(started_at_utc=started, finished_at_utc=datetime.now(timezone.utc).isoformat(),
+                        bytes=len(raw), sha256=sha(raw), key=key)
+            record['requests'].append(meta)
+            if key == 'archive':
+                archive = ROOT / 'sources/upstream/openfilm-025-20261022-r16/repo.zip'
+                archive.parent.mkdir(parents=True, exist_ok=True)
+                archive.write_bytes(raw)
+            else:
+                (OUT / (key + '.json')).write_bytes(raw)
+                replies[key] = json.loads(raw)
+            save(OUT / 'verification.json', record)
+        assert replies['head']['sha'] == HEAD, 'Upstream changed: do not silently audit another revision'
+        assert replies['release']['tag_name'] == 'v0.2.5'
+        compare = replies['compare']
+        assert compare['status'] == 'ahead' and len(compare['files']) < 300
+        assert compare['head_commit']['sha'] == HEAD
+        files = {}
+        tree = ROOT / 'product/.runtime/openfilm-r16-source'
+        assert not tree.exists()
+        with zipfile.ZipFile(archive) as z:
+            assert sum(x.file_size for x in z.infolist()) < (96 << 20)
+            for entry in z.infolist():
+                if entry.is_dir():
+                    continue
+                p = PurePosixPath(entry.filename)
+                assert not p.is_absolute() and '..' not in p.parts
+                assert p.parts[0] == 'openfilm-' + HEAD
+                assert (entry.external_attr >> 16) & 0o170000 != 0o120000
+                name = PurePosixPath(*p.parts[1:]).as_posix()
+                assert name not in files
+                data = z.read(entry)
+                files[name] = data
+                target = tree / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(data)
+        before_archive = MAIN / 'sources/upstream/openfilm-024-20261021-r13/repo.zip'
+        assert sha(before_archive.read_bytes()) == 'sha256:c106830d98d75080f2aba64ad41cb7d95bee606a48c0cd4d913bf3166cbdb192'
+        with zipfile.ZipFile(before_archive) as z:
+            old = {'/'.join(x.filename.split('/')[1:]): z.read(x) for x in z.infolist() if not x.is_dir()}
+        changed = [name for name in sorted(set(files) | set(old)) if files.get(name) != old.get(name)]
+        save(OUT / 'source-tree.json', {n: {'sha256': sha(d), 'bytes': len(d)} for n, d in sorted(files.items())})
+        save(OUT / 'local-archive-difference-from-r14.json', changed)
+        for name in ('LICENSE', 'THIRD_PARTY_NOTICES.md', 'TRADEMARK.md'):
+            (OUT / (name + '.txt')).write_bytes(files[name])
+        record.update(status='passed-pinned-source-capture', fixed_head=HEAD, compare_base=BASE,
+                      stars=replies['repository']['stargazers_count'], forks=replies['repository']['forks_count'],
+                      release=replies['release']['tag_name'], release_published_at=replies['release']['published_at'],
+                      commits_since_r15=compare['total_commits'], files_since_r15=len(compare['files']),
+                      source_files=len(files), archive_sha256=sha(archive.read_bytes()),
+                      archive_bytes=archive.stat().st_size,
+                      changed_since_r14=changed,
+                      candidates={n: {'exists': n in files, 'changed_since_r14': files.get(n) != old.get(n),
+                                       'changed_since_r15': any(x['filename'] == n for x in compare['files']),
+                                       'lines': len(files[n].splitlines()) if n in files else None,
+                                       'sha256': sha(files[n]) if n in files else None} for n in CANDIDATES},
+                      license_unchanged_from_r14=files['LICENSE'] == old['LICENSE'],
+                      frozen_after=freeze(), finished_at_utc=datetime.now(timezone.utc).isoformat())
+        assert record['frozen_before'] == record['frozen_after'], 'Main changed concurrently: preserve and rerun isolated audit'
+        (OUT / 'changed-files-and-patches.txt').write_text('\n\n'.join(
+            x['filename'] + '\n' + x.get('patch', '[No inline patch; read pinned local source]')
+            for x in compare['files']), encoding='utf8')
+        save(OUT / 'verification.json', record)
+        print(json.dumps({k: record[k] for k in ('status', 'fixed_head', 'stars', 'forks', 'release',
+                                                'commits_since_r15', 'files_since_r15', 'source_files')}, ensure_ascii=False))
+        print(json.dumps([x['filename'] for x in compare['files']], ensure_ascii=False))
+    except BaseException as e:
+        record.update(status='failed', error=repr(e), frozen_after=freeze())
+        save(OUT / 'verification.json', record)
+        raise
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,192 @@
+TAP version 13
+# Subtest: a build whose checksum is not the pinned one is not kept
+ok 1 - a build whose checksum is not the pinned one is not kept
+  ---
+  duration_ms: 18.8919
+  ...
+# Subtest: no build for a platform says so
+ok 2 - no build for a platform says so
+  ---
+  duration_ms: 0.652
+  ...
+# Subtest: a download that fails is tried again, three times in all
+ok 3 - a download that fails is tried again, three times in all
+  ---
+  duration_ms: 2.1785
+  ...
+# Subtest: a download that stops coming is stopped and tried again
+ok 4 - a download that stops coming is stopped and tried again
+  ---
+  duration_ms: 183.2173
+  ...
+# Subtest: the installer's copy has FFmpeg's license and where its source is
+ok 5 - the installer's copy has FFmpeg's license and where its source is
+  ---
+  duration_ms: 4.4044
+  ...
+# Subtest: a program comes out of a zip as it went in
+ok 6 - a program comes out of a zip as it went in
+  ---
+  duration_ms: 18.3959
+  ...
+# Subtest: each of the person's models is a provider of its own in Pi's models.json: its address, its key's variable, its model
+ok 7 - each of the person's models is a provider of its own in Pi's models.json: its address, its key's variable, its model
+  ---
+  duration_ms: 1.4856
+  ...
+# Subtest: a model's context length is its window in Pi, and a quarter of it its answers, never more than 32K
+ok 8 - a model's context length is its window in Pi, and a quarter of it its answers, never more than 32K
+  ---
+  duration_ms: 0.7289
+  ...
+# Subtest: the chat's menu reads the person's models by their names, each picked by its id
+ok 9 - the chat's menu reads the person's models by their names, each picked by its id
+  ---
+  duration_ms: 0.3458
+  ...
+# Subtest: what Pi does reads in the chat as Codex's did: a command's kind and title, a file's path, the result's text and pictures
+ok 10 - what Pi does reads in the chat as Codex's did: a command's kind and title, a file's path, the result's text and pictures
+  ---
+  duration_ms: 1.0518
+  ...
+# Subtest: no balance left, as each service says it, is one outcome with the service's own page; a rate limit or another error is not
+ok 11 - no balance left, as each service says it, is one outcome with the service's own page; a rate limit or another error is not
+  ---
+  duration_ms: 1.1839
+  ...
+# Subtest: a model given levels is its service twice: as itself (no reasoning setting) and thinking, told only those levels
+ok 12 - a model given levels is its service twice: as itself (no reasoning setting) and thinking, told only those levels
+  ---
+  duration_ms: 0.3806
+  ...
+# Subtest: the effort option: for a model offering more than one, its levels named
+ok 13 - the effort option: for a model offering more than one, its levels named
+  ---
+  duration_ms: 0.1468
+  ...
+# Subtest: why a turn failed, in plain words: a service that sent nothing in time, a conversation too long for the model; else as Pi said it
+ok 14 - why a turn failed, in plain words: a service that sent nothing in time, a conversation too long for the model; else as Pi said it
+  ---
+  duration_ms: 0.2581
+  ...
+# Subtest: a model service tried again, as a notice: one that sent nothing in time in plain words, else with what Pi said
+ok 15 - a model service tried again, as a notice: one that sent nothing in time in plain words, else with what Pi said
+  ---
+  duration_ms: 0.3271
+  ...
+# Subtest: each of the person's models reads pictures as Pi does (2000 px, 4.5 MB at most), and a request carries 32 MB of them
+ok 16 - each of the person's models reads pictures as Pi does (2000 px, 4.5 MB at most), and a request carries 32 MB of them
+  ---
+  duration_ms: 0.5368
+  ...
+# Subtest: a request's pictures within its budget: the newest kept, the older ones a line naming their file
+ok 17 - a request's pictures within its budget: the newest kept, the older ones a line naming their file
+  ---
+  duration_ms: 2.0527
+  ...
+# Subtest: a request refused as too large is told apart from other failures, and said in plain words
+ok 18 - a request refused as too large is told apart from other failures, and said in plain words
+  ---
+  duration_ms: 0.2891
+  ...
+# Subtest: pictures only in the latest five tool results that hold one; an older one's a line naming its file
+ok 19 - pictures only in the latest five tool results that hold one; an older one's a line naming its file
+  ---
+  duration_ms: 0.3145
+  ...
+# Subtest: a problem is kept as a line, tidied: the home folder as ~, no keys, tokens or email addresses
+ok 20 - a problem is kept as a line, tidied: the home folder as ~, no keys, tokens or email addresses
+  ---
+  duration_ms: 5.4636
+  ...
+# Subtest: one with nothing to say is not kept; one that cannot be written does not throw
+ok 21 - one with nothing to say is not kept; one that cannot be written does not throw
+  ---
+  duration_ms: 80.7964
+  ...
+# Subtest: kept: the last two weeks, at most KEEP_MAX; a broken line is left out
+ok 22 - kept: the last two weeks, at most KEEP_MAX; a broken line is left out
+  ---
+  duration_ms: 251.8085
+  ...
+# Subtest: read in the order they happened, whichever process wrote one first
+ok 23 - read in the order they happened, whichever process wrote one first
+  ---
+  duration_ms: 2.0505
+  ...
+# Subtest: the report's lines: the last week's, the last few, each when, what about and what it said; none without any
+ok 24 - the report's lines: the last week's, the last few, each when, what about and what it said; none without any
+  ---
+  duration_ms: 27.6263
+  ...
+# (node:30456) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node.EXE --trace-warnings ...` to show where the warning was created)
+# Subtest: a turn's log goes in as how it went, without what was said unless asked
+ok 25 - a turn's log goes in as how it went, without what was said unless asked
+  ---
+  duration_ms: 1.3945
+  ...
+# Subtest: the diagnostic file: the report, the problems, the logs, the failed turns, and Codex's own log around its problem
+ok 26 - the diagnostic file: the report, the problems, the logs, the failed turns, and Codex's own log around its problem
+  ---
+  duration_ms: 547.341
+  ...
+# Subtest: continuous main-track pictures occupy the primary storyline instead of connecting to a gap
+ok 27 - continuous main-track pictures occupy the primary storyline instead of connecting to a gap
+  ---
+  duration_ms: 1.9661
+  ...
+# Subtest: FCPXML keeps exact NTSC times, source trims, layering, transforms and separate sound without duplicate audio
+ok 28 - FCPXML keeps exact NTSC times, source trims, layering, transforms and separate sound without duplicate audio
+  ---
+  duration_ms: 0.7368
+  ...
+# Subtest: only real empty intervals become primary gaps, with overlays anchored in source time
+ok 29 - only real empty intervals become primary gaps, with overlays anchored in source time
+  ---
+  duration_ms: 0.4295
+  ...
+# Subtest: FCPXML also writes integer-rate, audio-only timelines with a full-length primary storyline
+ok 30 - FCPXML also writes integer-rate, audio-only timelines with a full-length primary storyline
+  ---
+  duration_ms: 0.359
+  ...
+# Subtest: mixed stems keep Voice and Footage in separate dialogue subroles
+ok 31 - mixed stems keep Voice and Footage in separate dialogue subroles
+  ---
+  duration_ms: 0.8158
+  ...
+# Subtest: FCPXML includes editable subtitle titles above pictures, clipped to the sequence, with escaped multiline text
+ok 32 - FCPXML includes editable subtitle titles above pictures, clipped to the sequence, with escaped multiline text
+  ---
+  duration_ms: 0.8195
+  ...
+# Subtest: subtitle titles keep their relative size and white outlined text across sequence resolutions
+ok 33 - subtitle titles keep their relative size and white outlined text across sequence resolutions
+  ---
+  duration_ms: 1.4236
+  ...
+# Subtest: subtitle titles on an audio-only timeline omit empty cues and end at the next subtitle
+ok 34 - subtitle titles on an audio-only timeline omit empty cues and end at the next subtitle
+  ---
+  duration_ms: 0.2743
+  ...
+# Subtest: invalid plans fail instead of silently attaching a connection to an unrelated primary clip
+ok 35 - invalid plans fail instead of silently attaching a connection to an unrelated primary clip
+  ---
+  duration_ms: 0.7697
+  ...
+# Subtest: FCPXML validates against Final Cut Pro’s installed 1.10 DTD
+ok 36 - FCPXML validates against Final Cut Pro’s installed 1.10 DTD # SKIP Final Cut Pro DTD not installed
+  ---
+  duration_ms: 0.3036
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 1599.5677

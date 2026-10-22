@@ -1,0 +1,153 @@
+{
+  "status": "passed-scoped-source-observations",
+  "observations": [
+    {
+      "id": "color-output-options",
+      "evidence": {
+        "software": {
+          "video": [
+            "-c:v",
+            "prores_ks",
+            "-profile:v",
+            "4444",
+            "-vendor",
+            "apl0",
+            "-colorspace",
+            "bt709",
+            "-color_primaries",
+            "bt709",
+            "-color_trc",
+            "bt709",
+            "-color_range",
+            "tv"
+          ],
+          "pix": "scale=out_color_matrix=bt709:out_range=tv,format=yuva444p10le,setparams=colorspace=bt709:color_primaries=bt709:color_trc=bt709"
+        },
+        "apple": {
+          "video": [
+            "-c:v",
+            "prores_videotoolbox",
+            "-profile:v",
+            "4444",
+            "-colorspace",
+            "bt709",
+            "-color_primaries",
+            "bt709",
+            "-color_trc",
+            "bt709",
+            "-color_range",
+            "tv"
+          ],
+          "pix": "format=bgra,setparams=colorspace=bt709:color_primaries=bt709:color_trc=bt709"
+        },
+        "scope": "Options only; no pixel, Apple encoder or HDR acceptance"
+      }
+    },
+    {
+      "id": "mono-and-stereo-plans",
+      "evidence": {
+        "mono": {
+          "inputs": [
+            "-t",
+            "1",
+            "-vn",
+            "-i",
+            "voice.wav"
+          ],
+          "filter": "[0:a]asetpts=PTS-STARTPTS,volume=1,adelay=0:all=1,pan=stereo|c0=c0|c1=c0,aresample=48000,aformat=channel_layouts=stereo[a0];[a0]amix=inputs=1:normalize=0:dropout_transition=0,apad=whole_dur=1,atrim=0:1[out]"
+        },
+        "stereo": {
+          "inputs": [
+            "-t",
+            "1",
+            "-vn",
+            "-i",
+            "stereo.wav"
+          ],
+          "filter": "[0:a]asetpts=PTS-STARTPTS,volume=1,adelay=0:all=1,aresample=48000,aformat=channel_layouts=stereo[a0];[a0]amix=inputs=1:normalize=0:dropout_transition=0,apad=whole_dur=1,atrim=0:1[out]"
+        },
+        "scope": "Graph strings only; no PCM decode or listening"
+      }
+    },
+    {
+      "id": "duplicate-audio-inputs",
+      "evidence": {
+        "inputs": [
+          "-vn",
+          "-i",
+          "same.wav"
+        ],
+        "filter": "[0:a]asplit=2[s0][s1];[s0]atrim=end=1,asetpts=PTS-STARTPTS,volume=1,adelay=0:all=1,pan=stereo|c0=c0|c1=c0,aresample=48000,aformat=channel_layouts=stereo[a0];[s1]atrim=start=2:end=3,asetpts=PTS-STARTPTS,volume=0.5,adelay=1000:all=1,pan=stereo|c0=c0|c1=c0,aresample=48000,aformat=channel_layouts=stereo[a1];[a0][a1]amix=inputs=2:normalize=0:dropout_transition=0,apad=whole_dur=2,atrim=0:2[out]"
+      }
+    },
+    {
+      "id": "pool-global-capacity",
+      "evidence": {
+        "started": 4,
+        "maximumSimultaneousMocks": 4,
+        "closed": 4,
+        "conclusion": "No independent global capacity cap; each caller must reserve a bounded budget",
+        "mockOnly": true
+      }
+    },
+    {
+      "id": "nle-png-alpha-native-paths",
+      "evidence": {
+        "files": [
+          {
+            "id": "file-1",
+            "name": "a.mov",
+            "path": "C:\\output\\media\\a.mov",
+            "job": {
+              "kind": "transcode",
+              "from": "C:\\inputs\\a.webm",
+              "to": "png"
+            },
+            "durationFrames": 30,
+            "video": {
+              "w": 160,
+              "h": 96,
+              "alpha": true,
+              "still": false,
+              "fps": 25
+            }
+          }
+        ],
+        "scope": "Planning only; no MOV encoded or target NLE opened"
+      }
+    },
+    {
+      "id": "nle-rate-and-short-span",
+      "evidence": {
+        "requested": [
+          48,
+          90,
+          120
+        ],
+        "chosen": [
+          50,
+          60,
+          60
+        ],
+        "tinySpan": {
+          "start": 0,
+          "end": 0
+        }
+      }
+    },
+    {
+      "id": "proxy-content-identity",
+      "evidence": {
+        "declaration": "const copyBase = (/** @type {string} */ file, /** @type {string} */ root, /** @type {import('node:fs').Stats} */ stat) =>\n  join(root, '.film', 'cache', 'seek', hash(Buffer.from(`${VERSION}\\0${file}\\0${stat.size}\\0${stat.mtimeMs}`)));",
+        "first": "C:\\project\\.film\\cache\\seek\\cddce01ba1e8",
+        "second": "C:\\project\\.film\\cache\\seek\\cddce01ba1e8",
+        "changedContentSameMetadata": true,
+        "scope": "Original pure cache-key declaration evaluated; no actual cached proxy reused"
+      }
+    }
+  ],
+  "browserTabsOpened": 0,
+  "actualBrowsersStarted": 0,
+  "nativeMediaCommands": 0,
+  "productFeatureAccepted": false
+}

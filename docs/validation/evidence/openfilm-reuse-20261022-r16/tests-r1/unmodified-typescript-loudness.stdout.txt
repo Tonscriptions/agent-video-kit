@@ -1,0 +1,42 @@
+TAP version 13
+# (node:33780) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node.EXE --trace-warnings ...` to show where the warning was created)
+# Subtest: a clip 6 dB too quiet gets twice the gain; one too loud less
+ok 1 - a clip 6 dB too quiet gets twice the gain; one too loud less
+  ---
+  duration_ms: 1.6388
+  ...
+# Subtest: a clip 13 dB too quiet, as a voice recorded on a phone often is, reaches the target
+ok 2 - a clip 13 dB too quiet, as a voice recorded on a phone often is, reaches the target
+  ---
+  duration_ms: 0.1511
+  ...
+# Subtest: past 500% the clip gets the most it can, and says the loudness it reaches
+ok 3 - past 500% the clip gets the most it can, and says the loudness it reaches
+  ---
+  duration_ms: 0.1975
+  ...
+# Subtest: the volume slider in dB: 0 dB as is, +6 dB twice, the bottom silent, the top 500%
+ok 4 - the volume slider in dB: 0 dB as is, +6 dB twice, the bottom silent, the top 500%
+  ---
+  duration_ms: 0.2377
+  ...
+# Subtest: silence has no loudness to bring anywhere
+ok 5 - silence has no loudness to bring anywhere
+  ---
+  duration_ms: 0.1926
+  ...
+# Subtest: what is measured is the part of the file the clip plays, speed included
+ok 6 - what is measured is the part of the file the clip plays, speed included
+  ---
+  duration_ms: 0.1647
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 150.6997
