@@ -1,5 +1,25 @@
 # Agent Video Kit
 
+<!-- R17-OPENFILM-REUSE-RECOVERY -->
+### R17 OpenFilm 复用清单与导出恢复增量（研究）
+
+固定 main `cf6cd6fa`，release 仍为 v0.2.5；API 快照 2,032 stars /197 forks。HTML 动效、字幕和模板字段已有适配；新增优先候选是有限重试、浏览器池及 SHA 代理去重。本轮没有新增产品功能或成片。
+
+| 编号 | 功能性检查 | 实际结果与边界 | 证据 |
+|---|---|---|---|
+| R17-01 | 固定源码与差异 | 790 文件逐 SHA，相对 R16 增 1 提交/10 文件；根 MIT 未变 | [固定收据](docs/validation/evidence/openfilm-reuse-20261022-r17/capture-r1/verification.json) |
+| R17-02 | 原始上游测试 | 5 通过/1 失败/0 跳过；Node 22.14 缺少 import.meta.main，保留失败，不登记全部通过 | [原始 TAP](docs/validation/evidence/openfilm-reuse-20261022-r17/tests-r1/unmodified-openfilm-command.stdout.txt) |
+| R17-03 | 有限重试与取消 | 原 worker、假 renderer，单次/池共 20 组通过；非真实浏览器故障、性能或清理验收 | [观察](docs/validation/evidence/openfilm-reuse-20261022-r17/tests-r1/pinned-worker-probe.stdout.txt) |
+| R17-04 | Windows Node 入口 | 同一 CommonJS 2 组原生对照，旧包装 main=false、新预加载 main=true；未启动真实 Agent/Electron | [最终核对](docs/validation/evidence/openfilm-reuse-20261022-r17/tests-r3/verification.json) |
+| R17-05 | 拆用工量与历史媒体 | 重试适配 1–3、池 3–6、去重 3–5 人日，存在共享工程；均为估计。无新增 GIF，V79 为历史实测 | [编号模块/预算/失败](docs/OpenFilm当前复用建议与导出恢复增量_2026-10-22.md) · [V79 原片](docs/assets/html-components-20261021-v79-native-r2/original.mp4) · [V79 GIF](docs/assets/html-components-20261021-v79-native-r2/comparison.gif) |
+| R17-06 | 产品与执行隔离 | 研究时 311 产品输入不变；私有旧路径和可选文档连接重置失败保留；不累计产品回归或剪映等价完成率 | [输入/失败核对](docs/validation/evidence/openfilm-reuse-20261022-r17/tests-r3/verification.json) |
+
+
+本次为基于已发布 V102 的独立研究更新，产品 311 输入保持不变；V103 的 2,537 项完整回归出现 1 失败、1 错误，后续候选未发布。旧等待发布流程的失败已保留，不计为本轮产品功能通过。[发布恢复依据](docs/validation/evidence/openfilm-reuse-20261022-r17/publication-recovery-r2/basis.json)。
+
+<!-- /R17-OPENFILM-REUSE-RECOVERY -->
+
+
 <!-- V102-CONTINUOUS-FLOAT-RGB-CURVES -->
 ### V102 连续浮点RGB曲线与作者控制点
 

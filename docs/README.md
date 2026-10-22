@@ -1,5 +1,12 @@
 # AI广告剪辑文档中心
 
+<!-- R17-OPENFILM-REUSE-RECOVERY -->
+OpenFilm 当前 13 类拆用建议、有限重试观察、Node 原始失败和工量见 [R17 复核](OpenFilm当前复用建议与导出恢复增量_2026-10-22.md)。本轮为研究，不新增产品/模型/媒体验收。
+
+本次为基于已发布 V102 的独立研究更新，产品 311 输入保持不变；V103 的 2,537 项完整回归出现 1 失败、1 错误，后续候选未发布。旧等待发布流程的失败已保留，不计为本轮产品功能通过。[发布恢复依据](validation/evidence/openfilm-reuse-20261022-r17/publication-recovery-r2/basis.json)。
+
+<!-- /R17-OPENFILM-REUSE-RECOVERY -->
+
 <!-- V102-CONTINUOUS-FLOAT-RGB-CURVES -->
 ### V102 连续浮点RGB曲线与作者控制点
 

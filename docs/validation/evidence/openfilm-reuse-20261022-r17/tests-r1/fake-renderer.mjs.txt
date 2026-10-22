@@ -1,0 +1,20 @@
+let attempts=0;
+export async function render(args, opts) {
+  const scenario=process.env.OPENFILM_AUDIT_SCENARIO;
+  attempts++;
+  process.send?.({type:'audit-attempt',attempt:attempts,scenario});
+  if(scenario==='success') return {attempts};
+  if(scenario==='cancelled') {
+    await new Promise(resolve=>{if(opts.signal.aborted)resolve();else opts.signal.addEventListener('abort',resolve,{once:true});});
+    throw new Error('Target page, context or browser has been closed');
+  }
+  if(scenario==='browser_once' && attempts===1) throw new Error('Target page, context or browser has been closed');
+  if(scenario==='buffers_once' && attempts===1) throw new Error('page.goto: net::ERR_NO_BUFFER_SPACE at http://127.0.0.1:123/film.html');
+  if(scenario==='browser_always') throw new Error('Target crashed');
+  if(scenario==='missing_file') throw new Error('window.film with a frame() function did not appear within 10 s; failed to load: net::ERR_FILE_NOT_FOUND lib.js');
+  if(scenario==='page_error') throw new Error('frame(1.2) threw: x is not defined');
+  if(scenario==='busy_loop') throw new Error('frame(1.2) did not finish within 60 s (the page is still running code: a loop that never ends?)');
+  if(scenario==='encoder') throw new Error('ffmpeg: Unknown encoder');
+  if(scenario==='non_error') throw 'Target crashed';
+  return {attempts};
+}

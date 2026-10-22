@@ -1,0 +1,649 @@
+{
+  "status": "passed-pinned-worker-with-fake-renderer",
+  "observations": [
+    {
+      "mode": "single",
+      "scenario": "success",
+      "terminal": {
+        "type": "done",
+        "result": {
+          "attempts": 1
+        }
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "success"
+        },
+        {
+          "type": "done",
+          "result": {
+            "attempts": 1
+          }
+        }
+      ]
+    },
+    {
+      "mode": "single",
+      "scenario": "browser_once",
+      "terminal": {
+        "type": "done",
+        "result": {
+          "attempts": 2
+        }
+      },
+      "attempts": [
+        1,
+        2
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 1,
+      "stderr": "openfilm: Target page, context or browser has been closed: drawn again in a new browser\n",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "browser_once"
+        },
+        {
+          "type": "audit-attempt",
+          "attempt": 2,
+          "scenario": "browser_once"
+        },
+        {
+          "type": "done",
+          "result": {
+            "attempts": 2
+          }
+        }
+      ]
+    },
+    {
+      "mode": "single",
+      "scenario": "buffers_once",
+      "terminal": {
+        "type": "done",
+        "result": {
+          "attempts": 2
+        }
+      },
+      "attempts": [
+        1,
+        2
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 1,
+      "stderr": "openfilm: page.goto: net::ERR_NO_BUFFER_SPACE at http://127.0.0.1:123/film.html: drawn again in a new browser\n",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "buffers_once"
+        },
+        {
+          "type": "audit-attempt",
+          "attempt": 2,
+          "scenario": "buffers_once"
+        },
+        {
+          "type": "done",
+          "result": {
+            "attempts": 2
+          }
+        }
+      ]
+    },
+    {
+      "mode": "single",
+      "scenario": "browser_always",
+      "terminal": {
+        "type": "failed",
+        "error": "Target crashed"
+      },
+      "attempts": [
+        1,
+        2
+      ],
+      "exit": {
+        "code": 1,
+        "signal": null
+      },
+      "retry_messages": 1,
+      "stderr": "openfilm: Target crashed: drawn again in a new browser\n",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "browser_always"
+        },
+        {
+          "type": "audit-attempt",
+          "attempt": 2,
+          "scenario": "browser_always"
+        },
+        {
+          "type": "failed",
+          "error": "Target crashed"
+        }
+      ]
+    },
+    {
+      "mode": "single",
+      "scenario": "missing_file",
+      "terminal": {
+        "type": "failed",
+        "error": "window.film with a frame() function did not appear within 10 s; failed to load: net::ERR_FILE_NOT_FOUND lib.js"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 1,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "missing_file"
+        },
+        {
+          "type": "failed",
+          "error": "window.film with a frame() function did not appear within 10 s; failed to load: net::ERR_FILE_NOT_FOUND lib.js"
+        }
+      ]
+    },
+    {
+      "mode": "single",
+      "scenario": "page_error",
+      "terminal": {
+        "type": "failed",
+        "error": "frame(1.2) threw: x is not defined"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 1,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "page_error"
+        },
+        {
+          "type": "failed",
+          "error": "frame(1.2) threw: x is not defined"
+        }
+      ]
+    },
+    {
+      "mode": "single",
+      "scenario": "busy_loop",
+      "terminal": {
+        "type": "failed",
+        "error": "frame(1.2) did not finish within 60 s (the page is still running code: a loop that never ends?)"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 1,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "busy_loop"
+        },
+        {
+          "type": "failed",
+          "error": "frame(1.2) did not finish within 60 s (the page is still running code: a loop that never ends?)"
+        }
+      ]
+    },
+    {
+      "mode": "single",
+      "scenario": "encoder",
+      "terminal": {
+        "type": "failed",
+        "error": "ffmpeg: Unknown encoder"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 1,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "encoder"
+        },
+        {
+          "type": "failed",
+          "error": "ffmpeg: Unknown encoder"
+        }
+      ]
+    },
+    {
+      "mode": "single",
+      "scenario": "non_error",
+      "terminal": {
+        "type": "failed",
+        "error": "Target crashed"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 1,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "non_error"
+        },
+        {
+          "type": "failed",
+          "error": "Target crashed"
+        }
+      ]
+    },
+    {
+      "mode": "single",
+      "scenario": "cancelled",
+      "terminal": {
+        "type": "failed",
+        "error": "Target page, context or browser has been closed"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 1,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "cancelled"
+        },
+        {
+          "type": "failed",
+          "error": "Target page, context or browser has been closed"
+        }
+      ]
+    },
+    {
+      "mode": "pool",
+      "scenario": "success",
+      "terminal": {
+        "type": "done",
+        "id": "audit",
+        "result": {
+          "attempts": 1
+        }
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "success"
+        },
+        {
+          "type": "done",
+          "id": "audit",
+          "result": {
+            "attempts": 1
+          }
+        }
+      ]
+    },
+    {
+      "mode": "pool",
+      "scenario": "browser_once",
+      "terminal": {
+        "type": "done",
+        "id": "audit",
+        "result": {
+          "attempts": 2
+        }
+      },
+      "attempts": [
+        1,
+        2
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 1,
+      "stderr": "openfilm: Target page, context or browser has been closed: drawn again in new browsers\n",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "browser_once"
+        },
+        {
+          "type": "audit-attempt",
+          "attempt": 2,
+          "scenario": "browser_once"
+        },
+        {
+          "type": "done",
+          "id": "audit",
+          "result": {
+            "attempts": 2
+          }
+        }
+      ]
+    },
+    {
+      "mode": "pool",
+      "scenario": "buffers_once",
+      "terminal": {
+        "type": "done",
+        "id": "audit",
+        "result": {
+          "attempts": 2
+        }
+      },
+      "attempts": [
+        1,
+        2
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 1,
+      "stderr": "openfilm: page.goto: net::ERR_NO_BUFFER_SPACE at http://127.0.0.1:123/film.html: drawn again in new browsers\n",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "buffers_once"
+        },
+        {
+          "type": "audit-attempt",
+          "attempt": 2,
+          "scenario": "buffers_once"
+        },
+        {
+          "type": "done",
+          "id": "audit",
+          "result": {
+            "attempts": 2
+          }
+        }
+      ]
+    },
+    {
+      "mode": "pool",
+      "scenario": "browser_always",
+      "terminal": {
+        "type": "failed",
+        "id": "audit",
+        "error": "Target crashed"
+      },
+      "attempts": [
+        1,
+        2
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 1,
+      "stderr": "openfilm: Target crashed: drawn again in new browsers\n",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "browser_always"
+        },
+        {
+          "type": "audit-attempt",
+          "attempt": 2,
+          "scenario": "browser_always"
+        },
+        {
+          "type": "failed",
+          "id": "audit",
+          "error": "Target crashed"
+        }
+      ]
+    },
+    {
+      "mode": "pool",
+      "scenario": "missing_file",
+      "terminal": {
+        "type": "failed",
+        "id": "audit",
+        "error": "window.film with a frame() function did not appear within 10 s; failed to load: net::ERR_FILE_NOT_FOUND lib.js"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "missing_file"
+        },
+        {
+          "type": "failed",
+          "id": "audit",
+          "error": "window.film with a frame() function did not appear within 10 s; failed to load: net::ERR_FILE_NOT_FOUND lib.js"
+        }
+      ]
+    },
+    {
+      "mode": "pool",
+      "scenario": "page_error",
+      "terminal": {
+        "type": "failed",
+        "id": "audit",
+        "error": "frame(1.2) threw: x is not defined"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "page_error"
+        },
+        {
+          "type": "failed",
+          "id": "audit",
+          "error": "frame(1.2) threw: x is not defined"
+        }
+      ]
+    },
+    {
+      "mode": "pool",
+      "scenario": "busy_loop",
+      "terminal": {
+        "type": "failed",
+        "id": "audit",
+        "error": "frame(1.2) did not finish within 60 s (the page is still running code: a loop that never ends?)"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "busy_loop"
+        },
+        {
+          "type": "failed",
+          "id": "audit",
+          "error": "frame(1.2) did not finish within 60 s (the page is still running code: a loop that never ends?)"
+        }
+      ]
+    },
+    {
+      "mode": "pool",
+      "scenario": "encoder",
+      "terminal": {
+        "type": "failed",
+        "id": "audit",
+        "error": "ffmpeg: Unknown encoder"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "encoder"
+        },
+        {
+          "type": "failed",
+          "id": "audit",
+          "error": "ffmpeg: Unknown encoder"
+        }
+      ]
+    },
+    {
+      "mode": "pool",
+      "scenario": "non_error",
+      "terminal": {
+        "type": "failed",
+        "id": "audit",
+        "error": "Target crashed"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "non_error"
+        },
+        {
+          "type": "failed",
+          "id": "audit",
+          "error": "Target crashed"
+        }
+      ]
+    },
+    {
+      "mode": "pool",
+      "scenario": "cancelled",
+      "terminal": {
+        "type": "failed",
+        "id": "audit",
+        "error": "Target page, context or browser has been closed"
+      },
+      "attempts": [
+        1
+      ],
+      "exit": {
+        "code": 0,
+        "signal": null
+      },
+      "retry_messages": 0,
+      "stderr": "",
+      "messages": [
+        {
+          "type": "audit-attempt",
+          "attempt": 1,
+          "scenario": "cancelled"
+        },
+        {
+          "type": "failed",
+          "id": "audit",
+          "error": "Target page, context or browser has been closed"
+        }
+      ]
+    }
+  ],
+  "upstream_worker_body_modified": false,
+  "actual_browser_launched": false,
+  "actual_render_executed": false,
+  "worker_bytes": 4399
+}

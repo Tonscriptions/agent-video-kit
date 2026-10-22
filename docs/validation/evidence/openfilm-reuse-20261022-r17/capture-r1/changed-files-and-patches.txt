@@ -1,0 +1,234 @@
+.changeset/agent-main-module.md
+@@ -0,0 +1,5 @@
++---
++"@openfilm/desktop": patch
++---
++
++Windows: DeepSeek Harness installed with npm starts in the chat. The app's own Node now starts an agent's program as the main module, as Node would, so a program that runs only when it is the main one (DeepSeek Harness's `dsh`) no longer exits at once without a word.
+
+.changeset/export-redraw.md
+@@ -0,0 +1,5 @@
++---
++"openfilm": patch
++---
++
++Exports: a video whose browser crashed or stopped answering is drawn once more in a new one, as an editing project's pages already were. A page or a file the browser could not load for want of the system's network buffers (`net::ERR_NO_BUFFER_SPACE`, seen on Windows) is drawn again too, instead of failing the export.
+
+apps/desktop/src/agents.mjs
+@@ -30,7 +30,7 @@ import { arch, homedir, release, tmpdir } from 'node:os';
+ import { createRequire } from 'node:module';
+ import { dirname, isAbsolute, join, win32 } from 'node:path';
+ import { Readable, Writable } from 'node:stream';
+-import { fileURLToPath } from 'node:url';
++import { fileURLToPath, pathToFileURL } from 'node:url';
+ import * as acp from '@agentclientprotocol/sdk';
+ import { PATH_SEP, childEnvironment, lastPathSource, loginShellEnvironment, loginShellVariables, shellSubset } from './environment.mjs';
+ import { AGENT_PROGRAMS, HOME_BIN_CANDIDATES, chosenProgram, codexAppCopies, codexVersion, desktopApp, detectAgentInstallation, installCommand, laterVersion, notTheAgent, searchReport } from './agent-installation.mjs';
+@@ -250,13 +250,15 @@ const winArg = (a) => (/^[\w.:\\/=+@-]+$/.test(a) ? a : `"${String(a).replace(/"
+ 
+ /** The app's own Node running a script, through as-node.mjs: what the script starts does not run Electron as Node. */
+ const AS_NODE = fileURLToPath(new URL('./as-node.mjs', import.meta.url));
++/** The words before a script that start it on the app's own Node: as-node.mjs first, the script as the main module. */
++const asNode = (/** @type {string} */ script) => ['--import', pathToFileURL(AS_NODE).href, script];
+ 
+ /**
+  * How to start a program found for an agent: itself, a script with the app's own Node (an npm install on Windows), or
+  * a `.cmd` shim whose target could not be told, through cmd.exe. `options` go to spawn.
+  */
+ function starting(cliPath, args) {
+-  if (/\.(?:c|m)?js$/i.test(cliPath)) return { cmd: nodeBinary(), args: [AS_NODE, cliPath, ...args], env: { ELECTRON_RUN_AS_NODE: '1' }, options: {} };
++  if (/\.(?:c|m)?js$/i.test(cliPath)) return { cmd: nodeBinary(), args: [...asNode(cliPath), ...args], env: { ELECTRON_RUN_AS_NODE: '1' }, options: {} };
+   if (windows && /\.(?:cmd|bat)$/i.test(cliPath)) {
+     return { cmd: process.env.ComSpec || 'cmd.exe', args: ['/d', '/s', '/c', `"${[cliPath, ...args].map(winArg).join(' ')}"`], env: {}, options: { windowsVerbatimArguments: true } };
+   }
+@@ -659,7 +661,7 @@ function adapterLaunch(id, cliPath) {
+   const node = nodeRuntime();
+   return {
+     cmd: node.command,
+-    args: [...(node.env.ELECTRON_RUN_AS_NODE ? [AS_NODE] : []), adapterScript(spec.adapter)],
++    args: node.env.ELECTRON_RUN_AS_NODE ? asNode(adapterScript(spec.adapter)) : [adapterScript(spec.adapter)],
+     env: { ...node.env, ...spec.env(cliPath) },
+   };
+ }
+@@ -1086,7 +1088,7 @@ export class AgentSession {
+     const script = harness ? fileURLToPath(new URL('./pi-agent.mjs', import.meta.url)) : native ? null : adapterScript(this.spec.adapter);
+     this.child = native
+       ? spawn(native.cmd, native.args, { ...native.options, cwd: this.opts.cwd, env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true })
+-      : spawn(node.command, [...(node.env.ELECTRON_RUN_AS_NODE ? [AS_NODE] : []), script], { cwd: this.opts.cwd, env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
++      : spawn(node.command, node.env.ELECTRON_RUN_AS_NODE ? asNode(script) : [script], { cwd: this.opts.cwd, env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
+     this.child.stderr.on('data', (d) => { this.stderr = (this.stderr + String(d)).slice(-16_000); });
+     LIVE.add(this);
+     this.child.once('exit', (code) => { LIVE.delete(this); this.exited = { code }; this.opts.onExit?.({ code, stderr: this.stderr }); });
+@@ -1181,7 +1183,7 @@ export class AgentSession {
+     this.opened = {
+       program: harness ? 'pi' : cli.path,
+       /* the command line the agent's process was started with: its own program, or the app's Node running its adapter (or Pi) */
+-      command: native ? [native.cmd, ...native.args] : [node.command, ...(node.env.ELECTRON_RUN_AS_NODE ? [AS_NODE] : []), script],
++      command: native ? [native.cmd, ...native.args] : [node.command, ...(node.env.ELECTRON_RUN_AS_NODE ? asNode(script) : [script])],
+       adapter: this.spec.adapter ?? null,
+       env: Object.fromEntries(Object.entries(extra).map(([k, v]) => [k, secret.has(k) || /KEY|TOKEN|SECRET|PASSWORD/i.test(k) ? '(hidden)' : k === 'OPENFILM_PI' ? JSON.parse(v) : v])),
+       ...(env.CODEX_CONFIG ? { codexConfig: JSON.parse(env.CODEX_CONFIG) } : {}),
+
+apps/desktop/src/agents.test.mjs
+@@ -465,3 +465,13 @@ test('a program chosen that is an editor, or not Cursor\'s own agent, is refused
+   const { existsSync } = await import('node:fs');
+   assert.equal(existsSync(`${code}.ran`) || existsSync(`${stray}.ran`), false);
+ });
++
++test("a script the app's own Node starts runs as the main module, without ELECTRON_RUN_AS_NODE (an npm install on Windows)", async () => {
++  const { mkdtempSync, writeFileSync } = await import('node:fs');
++  const { tmpdir } = await import('node:os');
++  const { join } = await import('node:path');
++  /* as DeepSeek Harness's bin.js does: it runs only when it is the main module, else it exits saying nothing */
++  const bin = join(mkdtempSync(join(tmpdir(), 'of-main-')), 'bin.mjs');
++  writeFileSync(bin, "if (import.meta.main) console.log(`0.2.1 ${process.env.ELECTRON_RUN_AS_NODE ?? 'clean'} ${process.argv.slice(2).join(' ')}`);\n");
++  assert.deepEqual(await checkAgentProgram('deepseek', bin), { ok: true, path: bin, version: '0.2.1 clean --version' });
++});
+
+apps/desktop/src/as-node.mjs
+@@ -1,20 +1,17 @@
+ /**
+  * How the app runs a Node program of its own (an agent's adapter, the app's own agent) on Electron as Node: this file
+- * first, then the program. ELECTRON_RUN_AS_NODE is what made Electron a Node; it is taken out of the environment before
+- * the program starts, so what the program starts (the person's agent, and every command that agent runs) does not
+- * have it. An Electron app the agent runs, or its tests, would start as Node too.
++ * first, through `--import`, then the program as the main module, as Node would start it (a program that runs only
++ * when it is the main one, `import.meta.main` or `require.main === module`, runs). ELECTRON_RUN_AS_NODE is what made
++ * Electron a Node; it is taken out of the environment before the program starts, so what the program starts (the
++ * person's agent, and every command that agent runs) does not have it. An Electron app the agent runs, or its tests,
++ * would start as Node too.
+  *
+  * On Windows, what the program starts opens no console window (hidden-windows.mjs).
+  *
+- *   electron as-node.mjs <program> [args…]
++ *   electron --import <this file's URL> <program> [args…]
+  */
+ import childProcess from 'node:child_process';
+-import { pathToFileURL } from 'node:url';
+ import { hideChildWindows } from './hidden-windows.mjs';
+ 
+ delete process.env.ELECTRON_RUN_AS_NODE;
+ if (process.platform === 'win32') hideChildWindows(childProcess);
+-const program = process.argv[2];
+-/* the program sees itself as the script it is: argv[1] is its path, its own arguments follow */
+-process.argv.splice(1, 1);
+-await import(pathToFileURL(program).href);
+
+apps/desktop/src/openfilm-command.test.mjs
+@@ -4,7 +4,6 @@ import { execFileSync } from 'node:child_process';
+ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+ import { tmpdir } from 'node:os';
+ import { join } from 'node:path';
+-import { fileURLToPath } from 'node:url';
+ import { commandScript, commandScriptWindows } from './openfilm-command.mjs';
+ 
+ test("the openfilm command alone has the app's ffmpeg first and its browser; the agent's PATH is left as it is", () => {
+@@ -16,13 +15,13 @@ test("the openfilm command alone has the app's ffmpeg first and its browser; the
+   assert.match(cmd, /setlocal\r\nset "PLAYWRIGHT_BROWSERS_PATH=C:\\pw"\r\nset "PATH=C:\\app\\ffmpeg;%PATH%"\r\n/);
+ });
+ 
+-test('a script run through as-node.mjs sees itself as the script, with its arguments, and no ELECTRON_RUN_AS_NODE', () => {
++test('a script run after as-node.mjs is the main module, with its arguments, and no ELECTRON_RUN_AS_NODE', () => {
+   const dir = mkdtempSync(join(tmpdir(), 'openfilm-as-node-'));
+   try {
+     const script = join(dir, 'show.mjs');
+-    writeFileSync(script, "console.log(JSON.stringify({ argv: process.argv.slice(1), runAsNode: process.env.ELECTRON_RUN_AS_NODE ?? null }));\n");
+-    const asNode = fileURLToPath(new URL('./as-node.mjs', import.meta.url));
+-    const out = JSON.parse(execFileSync(process.execPath, [asNode, script, '--flag', 'x'], { env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' }, encoding: 'utf8' }));
+-    assert.deepEqual(out, { argv: [script, '--flag', 'x'], runAsNode: null });
++    writeFileSync(script, "console.log(JSON.stringify({ main: import.meta.main, argv: process.argv.slice(1), runAsNode: process.env.ELECTRON_RUN_AS_NODE ?? null }));\n");
++    const asNode = new URL('./as-node.mjs', import.meta.url).href;
++    const out = JSON.parse(execFileSync(process.execPath, ['--import', asNode, script, '--flag', 'x'], { env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' }, encoding: 'utf8' }));
++    assert.deepEqual(out, { main: true, argv: [script, '--flag', 'x'], runAsNode: null });
+   } finally { rmSync(dir, { recursive: true, force: true }); }
+ });
+
+packages/openfilm/src/browser-pool.mjs
+@@ -74,8 +74,12 @@ export class BrowserPool {
+   }
+ }
+ 
+-/** What a browser that crashed, or a tab that stopped answering, says: drawn again in new browsers, it may work. */
+-const BROWSER_FAILED = /browser drawing the page closed|target (page, context or browser has been )?closed|target crashed|page crashed|browser has been closed|browser (has )?disconnected|did not finish within|did not come within/i;
++/**
++ * What a browser that crashed, or a tab that stopped answering, says: drawn again in new browsers, it may work. Also a
++ * page or a file the browser could not load from Studio for want of the system's network buffers (Windows: a moment's
++ * shortage, not the page's fault).
++ */
++const BROWSER_FAILED = /browser drawing the page closed|target (page, context or browser has been )?closed|target crashed|page crashed|browser has been closed|browser (has )?disconnected|did not finish within|did not come within|net::ERR_NO_BUFFER_SPACE/i;
+ 
+ /**
+  * Whether a render that failed is worth drawing again in new browsers: its browser crashed or stopped answering. A
+
+packages/openfilm/src/browser-pool.test.mjs
+@@ -70,6 +70,9 @@ test('a render is drawn again in new browsers only when its browser failed it',
+   assert.ok(browserFailed(new Error('the browser drawing the page closed (it crashed, or the system ended it)')));
+   assert.ok(browserFailed(new Error('frame(1.2) did not finish within 60 s')));
+   assert.ok(browserFailed(new Error('the picture did not come within 30 s')));
++  assert.ok(browserFailed(new Error('page.goto: net::ERR_NO_BUFFER_SPACE at http://127.0.0.1:59165/film.html')));
++  assert.ok(browserFailed(new Error('window.film with a frame() function did not appear within 10 s; failed to load: net::ERR_NO_BUFFER_SPACE __film/overrides.mjs')));
++  assert.ok(!browserFailed(new Error('window.film with a frame() function did not appear within 10 s; failed to load: net::ERR_FILE_NOT_FOUND lib.js')), 'a missing file would be missing again');
+   assert.ok(!browserFailed(new Error('frame(1.2) did not finish within 60 s (the page is still running code: a loop that never ends?)')), 'a loop in the page would loop again');
+   assert.ok(!browserFailed(new Error('frame(1.2) threw: x is not defined')));
+   assert.ok(!browserFailed(new Error('ffmpeg: Unknown encoder')));
+
+packages/openfilm/studio/server/exports.test.mjs
+@@ -222,6 +222,23 @@ test('a renderer that dies fails its export with the reason, and exports go on',
+   assert.equal((await ended(exports, again)).status, 'done');
+ });
+ 
++test('a video whose browser is ended partway, as a crash would end it, is drawn again and done', { ...ffmpeg, skip: ffmpeg.skip || (process.platform === 'win32' && 'no pgrep') }, async () => {
++  const exports = createExports();
++  const job = exports.start(project('Browser crash'), { kind: 'video' });
++  await until(exports, job.id, (j) => j.status === 'running' && j.out);
++  /** @type {number[]} */
++  let browsers = [];
++  for (let i = 0; i < 400 && !browsers.length; i++) {
++    const [worker] = spawnSync('pgrep', ['-P', String(process.pid), '-f', 'render-worker'], { encoding: 'utf8' }).stdout.trim().split('\n').filter(Boolean).map(Number);
++    if (worker) browsers = spawnSync('pgrep', ['-P', String(worker), '-f', 'chrom'], { encoding: 'utf8' }).stdout.trim().split('\n').filter(Boolean).map(Number);
++    if (!browsers.length) await new Promise((r) => setTimeout(r, 25));
++  }
++  assert.ok(browsers.length, 'the film draws in a browser of the render process');
++  for (const pid of browsers) process.kill(pid, 'SIGKILL');
++  const done = await ended(exports, job);
++  assert.equal(done.status, 'done', done.error);
++});
++
+ test('a cancelled export stops and leaves no file, and a bad ask is refused before it is queued', ffmpeg, async () => {
+   /** @type {any[]} */
+   const seen = [];
+
+packages/openfilm/studio/server/render-worker.mjs
+@@ -5,7 +5,7 @@
+  * and Studio keeps serving.
+  *
+  * Told `{ args, opts }` once: one render, then it exits; says `progress`, then `done` (render's result) or `failed`;
+- * `cancel` stops it.
++ * `cancel` stops it. A render whose browser crashed or stopped answering is drawn once more in a new one.
+  *
+  * Started with `--pool` (an editing project's pages): told `{ type: 'render', id, args, opts }` for each render, at
+  * any time, `{ type: 'cancel', id }` to stop one and `{ type: 'close' }` when no more come; says `progress`, `done`
+@@ -65,10 +65,19 @@ if (process.argv.includes('--pool')) {
+     const abort = new AbortController();
+     process.on('message', (/** @type {{ type?: string }} */ m) => { if (m?.type === 'cancel') abort.abort(); });
+     try {
+-      const result = await render(args, {
+-        ...opts, signal: abort.signal,
+-        onProgress: (/** @type {number} */ done, /** @type {number} */ total) => { process.send?.({ type: 'progress', done, total }); },
+-      });
++      let result;
++      for (let tries = 1; ; tries++) {
++        try {
++          result = await render(args, {
++            ...opts, signal: abort.signal,
++            onProgress: (/** @type {number} */ done, /** @type {number} */ total) => { process.send?.({ type: 'progress', done, total }); },
++          });
++          break;
++        } catch (e) {
++          if (tries > 1 || abort.signal.aborted || !browserFailed(e)) throw e;
++          process.stderr.write(`openfilm: ${e instanceof Error ? e.message.split('\n')[0] : e}: drawn again in a new browser\n`);
++        }
++      }
+       await say({ type: 'done', result });
+       process.exit(0);
+     } catch (e) {
