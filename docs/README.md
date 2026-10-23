@@ -6,8 +6,9 @@
 
 | 阅读目标 / Goal | Document |
 |---|---|
+| 本机正式安装、17 个新名称与实际 Skill 调用 / Installed app and new Skill namespace | [Local installation](local/INSTALLATION.md) |
 | 安装、结构、命令、渲染路径、故障与恢复 / Install and operate | [USAGE](releases/v0.1.0-alpha.1/USAGE.md) |
-| 17 个 Skill 的输入输出和组合 / Skill routing | [SKILLS](releases/v0.1.0-alpha.1/SKILLS.md) |
+| 发行时的 17 个旧名 Skill / Original release Skill names | [SKILLS](releases/v0.1.0-alpha.1/SKILLS.md) |
 | 原视频、输出、GIF、响应与复现 / Complete examples | [CASES](releases/v0.1.0-alpha.1/CASES.md) |
 | 范围、验收、风险与下一阶段 / Release scope and gates | [RELEASE](releases/v0.1.0-alpha.1/RELEASE.md) |
 | 许可与依赖 / Notices | [THIRD_PARTY](releases/v0.1.0-alpha.1/THIRD_PARTY.md) |

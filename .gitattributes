@@ -1323,3 +1323,13 @@ skills/video-cut-quality/** -text whitespace=cr-at-eol
 README.en.md text eol=lf
 docs/releases/v0.1.0-alpha.1/*.md text eol=lf
 docs/demo/index.html text eol=lf
+# Preserve reviewed installer/Skill/evidence bytes on Windows.
+skills/agent-ffmpeg-local-*/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+skills/agent-ffmpeg-local-*/references/upstream/** -text -whitespace
+scripts/install_agent_ffmpeg_local.py -text
+scripts/build_agent_ffmpeg_local_skills.py -text
+scripts/verify_agent_ffmpeg_local.py -text
+register-agent-ffmpeg-local-skills.ps1 -text
+agent-ffmpeg-local-install-manifest.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/evidence/local-install-20261024-r1/** -text -whitespace
+docs/assets/local-install-20261024-r1/** -text -whitespace

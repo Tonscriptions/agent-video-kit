@@ -2,7 +2,7 @@
 
 **面向 Agent 的本地视频编辑 CLI。** 用可编辑 JSON 时间线、固定能力契约和真实渲染证据，让 Agent 完成广告剪辑、模板变体、关键帧运镜与视频自动化。
 
-[English](README.en.md) · [下载首版](https://github.com/Tonscriptions/agent-video-kit/releases/tag/v0.1.0-alpha.1) · [文档入口](docs/README.md) · [使用手册](docs/releases/v0.1.0-alpha.1/USAGE.md) · [Skill 详情](docs/releases/v0.1.0-alpha.1/SKILLS.md) · [完整案例](docs/releases/v0.1.0-alpha.1/CASES.md)
+[English](README.en.md) · [下载首版](https://github.com/Tonscriptions/agent-video-kit/releases/tag/v0.1.0-alpha.1) · [文档入口](docs/README.md) · [使用手册](docs/releases/v0.1.0-alpha.1/USAGE.md) · [Skill 详情](docs/local/INSTALLATION.md) · [完整案例](docs/releases/v0.1.0-alpha.1/CASES.md)
 
 **当前发布：`v0.1.0-alpha.1`，Windows 本地 CLI 预览版。** 首版范围已收口为“离线安装、结构化编辑、预览/渲染、核验与交付”的闭环。完整剪映功能、素材生态及自然画质/听感等价仍属于后续目标。[发布判定与未关闭需求](docs/releases/v0.1.0-alpha.1/RELEASE.md)。
 
@@ -14,7 +14,7 @@
 
 ```mermaid
 flowchart LR
-  A[Agent + video-cut Skills] --> B[CLI / JSON responses]
+  A[Agent + agent-ffmpeg-local Skills] --> B[CLI / JSON responses]
   B --> C[Agent Project + Rights Ledger]
   C --> D[Validate / plan / preview]
   D --> E[FFmpeg graph or explicit Float32]
@@ -44,6 +44,20 @@ Agent 通过 Skill 把创意转换成编辑计划，读取 `capabilities` 和 `s
 | F12 | 项目包、JSON、OTIO、MLT/明文草稿交换 | `convert import/export` | 目标格式支持程度不同；保留 Exact/Approximate/Unsupported/Failed 损失报告 |
 
 精确参数以随包 `capabilities`、`schema show`、`COMMAND --help` 为准。[架构和完整使用逻辑](docs/releases/v0.1.0-alpha.1/USAGE.md)。明文草稿适配器只处理已有合法本地 JSON；不运行剪映，不读取私有在线资源，不保证全部字段或编辑效果无损往返。
+
+## 本机已安装并加载 Skills（2026-10-24）
+
+程序已从校验后的首版 ZIP 正式安装到 `E:/dev/sandbox/AI广告剪辑/local/agent-ffmpeg/v0.1.0-alpha.1/installed/`。17 个本地 Skill 已按最新要求注册为 **`$agent-ffmpeg-local-xxx`**，下一条消息可调用主入口 **`$agent-ffmpeg-local-editor`**。
+
+```powershell
+$avk = 'E:/dev/sandbox/AI广告剪辑/skills/agent-ffmpeg-local-editor/scripts/run.ps1'
+& $avk doctor
+& $avk capabilities
+```
+
+Skill 启动器核对发行版本、安装回执和启动文件摘要，以 `-I -S` 调用安装包。当前原生 Python 和 FFmpeg 已可用；安装目录为 81.8 MB，临时文件也在 E 盘。[安装位置、17 个入口与复现](docs/local/INSTALLATION.md) · [本地发行 ZIP](docs/releases/v0.1.0-alpha.1/artifacts/agent-video-kit-v0.1.0-alpha.1-cp313-win_amd64.zip)。
+
+本轮正式安装重新完成 28 次案例命令，并经 Skill 入口完成 8 次命令，含实际渲染、中文空格路径与预期拒绝。[安装版原输入](docs/assets/local-install-20261024-r1/input.mp4) · [新成片](docs/assets/local-install-20261024-r1/field.mp4) · [新 GIF](docs/assets/local-install-20261024-r1/field.gif) · [模板变体](docs/assets/local-install-20261024-r1/variant.gif) · [原始响应与核验](docs/validation/evidence/local-install-20261024-r1/skills/verification.json)。具体范围见 R10–R12。
 
 ## 安装
 
@@ -97,33 +111,33 @@ CLI 默认输出 JSON，Agent 应同时检查进程退出码、`ok`、`status`�
 
 素材是本仓库生成的虚构产品图和合成音，不是新增模型推理。C03 为带日期的既有实测，不计作本轮新执行。GIF 不含声音；自动解码、静态目检、连续播放、人工听审分别记录，不能互相替代。[所有案例步骤、权利、哈希与复现](docs/releases/v0.1.0-alpha.1/CASES.md)。
 
-## 17 个 Agent Skills
+## 17 个本地发行版 Agent Skills
 
 | # | Skill | 作用 |
 |---|---|---|
-| 1 | `$video-cut-agent-editor` | 总入口：计划、项目创建与交付 |
-| 2 | `$video-cut-timeline` | 时间线、关键帧、运镜、转场、嵌套 |
-| 3 | `$video-cut-quality` | 像素、蒙版、Scope、渲染证据核验 |
-| 4 | `$video-cut-project-ops` | 快照、恢复、重链和队列 |
-| 5 | `$video-cut-local-policy` | 本地运行规则与远程引用审计 |
-| 6 | `$video-cut-rights-ledger` | 素材、字体、模型和模板权利台账 |
-| 7 | `$video-cut-local-models` | 显式登记已有离线模型 |
-| 8 | `$video-cut-video-understand` | 镜头、静音、帧证据与转写 |
-| 9 | `$video-cut-template-library` | 模板变量、素材索引、片段组复用 |
-| 10 | `$video-cut-long-to-short` | 口播/课程长视频转短片 |
-| 11 | `$video-cut-screen-demo` | 录屏锚点、缩放与产品演示 |
-| 12 | `$video-cut-reference-remake` | 参考片结构复刻并替换原创素材 |
-| 13 | `$video-cut-ffmpeg` | 通用本地音视频处理 |
-| 14 | `$video-cut-video-edit` | 修剪、拼接、压缩等工具流程 |
-| 15 | `$video-cut-ad-creative` | 广告创意、文案和变体规划 |
-| 16 | `$video-cut-video-content-strategist` | 内容定位与脚本策略 |
-| 17 | `$video-cut-campaign-analytics` | 基于提供数据的投放分析 |
+| 1 | `$agent-ffmpeg-local-editor` | 总入口：计划、项目创建与交付 |
+| 2 | `$agent-ffmpeg-local-timeline` | 时间线、关键帧、运镜、转场、嵌套 |
+| 3 | `$agent-ffmpeg-local-quality` | 像素、蒙版、Scope、渲染证据核验 |
+| 4 | `$agent-ffmpeg-local-project-ops` | 快照、恢复、重链和队列 |
+| 5 | `$agent-ffmpeg-local-local-policy` | 本地运行规则与远程引用审计 |
+| 6 | `$agent-ffmpeg-local-rights-ledger` | 素材、字体、模型和模板权利台账 |
+| 7 | `$agent-ffmpeg-local-local-models` | 显式登记已有离线模型 |
+| 8 | `$agent-ffmpeg-local-video-understand` | 镜头、静音、帧证据与转写 |
+| 9 | `$agent-ffmpeg-local-template-library` | 模板变量、素材索引、片段组复用 |
+| 10 | `$agent-ffmpeg-local-long-to-short` | 口播/课程长视频转短片 |
+| 11 | `$agent-ffmpeg-local-screen-demo` | 录屏锚点、缩放与产品演示 |
+| 12 | `$agent-ffmpeg-local-reference-remake` | 参考片结构复刻并替换原创素材 |
+| 13 | `$agent-ffmpeg-local-ffmpeg` | 通用本地音视频处理 |
+| 14 | `$agent-ffmpeg-local-video-edit` | 修剪、拼接、压缩等工具流程 |
+| 15 | `$agent-ffmpeg-local-ad-creative` | 广告创意、文案和变体规划 |
+| 16 | `$agent-ffmpeg-local-video-content-strategist` | 内容定位与脚本策略 |
+| 17 | `$agent-ffmpeg-local-campaign-analytics` | 基于提供数据的投放分析 |
 
 ```powershell
-.\register-video-cut-skills.ps1
+.\register-agent-ffmpeg-local-skills.ps1
 ```
 
-脚本会为当前检出创建 Windows 目录联接，默认接入当前用户的 Codex Skills 目录；同名无关目录不会覆盖。Skill 包是任务指导，不包含商业模型、素材订阅或 Agent 宿主。[逐项输入输出、依赖、安装与组合示例](docs/releases/v0.1.0-alpha.1/SKILLS.md)。
+先安装本地发行包，再运行注册脚本。脚本为当前检出创建 Windows 目录联接；同名无关目录不会覆盖。Skill 正文和资源在 E 盘，Codex 发现目录仅保存联接；下一条消息可发现新名称。旧 `video-cut-` 入口与已发布附件保留，新命名空间随当前 `main` 提供。Skill 是任务指导，不包含额外模型或素材订阅。[新 Skill 详情与安装](docs/local/INSTALLATION.md) · [发行时的旧名目录](docs/releases/v0.1.0-alpha.1/SKILLS.md)。
 
 ## 功能核验与发布证据
 
@@ -138,6 +152,10 @@ CLI 默认输出 JSON，Agent 应同时检查进程退出码、`ok`、`status`�
 | R07 | Skill 与链接 | 17 个入口格式核验、发布文档本地链接核验 | [门禁结果](docs/validation/evidence/release-v0.1.0-alpha.1-r2/release-verification.json)；格式验证不等于 Agent 决策质量 |
 | R08 | 留存失败 | 首轮案例输出路径错误 | [失败记录](docs/validation/evidence/release-v0.1.0-alpha.1-r1/failure.json)；脚本已改绝对项目内路径后重跑 |
 | R09 | 远端发布与下载回验 | **GitHub 预发布成功，6 个附件逐个下载 SHA-256 一致** | [发布与下载记录](docs/validation/evidence/release-v0.1.0-alpha.1-r2/publication.json) · [实际安装回执](docs/validation/evidence/release-v0.1.0-alpha.1-r2/installation-receipt.json)；2026-10-24 本地时间 |
+
+| R10 | 本机 E 盘正式安装 | **固定 ZIP 校验通过，8 个 wheels 原生离线安装** | [安装回执](docs/validation/evidence/local-install-20261024-r1/installation/installation.json)；2026-10-24，1,430 文件 / 81,845,972 字节；未创建虚拟环境 |
+| R11 | 新命名空间与真实 Skill 调用 | **17 个 Skill 注册/格式通过；8 次入口命令，7 成功 + 1 预期拒绝** | [Skill 核验](docs/validation/evidence/local-install-20261024-r1/skills/verification.json)；从 Codex 联接调用实际安装版，中文空格路径渲染，输出与直接运行 SHA-256 一致；未验收全部 Agent 决策质量 |
+| R12 | 正式安装版新案例 | **28 次命令，27 成功 + 1 预期拒绝；广告/模板两个成片与项目包往返** | [案例记录](docs/validation/evidence/local-install-20261024-r1/cases/verification.json) · [GIF](docs/assets/local-install-20261024-r1/field.gif) · [抽帧目检](docs/validation/evidence/local-install-20261024-r1/review.json)；0 新模型推理，未连续播放/人工听审；不累计旧回归数 |
 
 
 ## 已知限制与后续开发

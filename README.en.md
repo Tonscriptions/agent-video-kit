@@ -2,7 +2,7 @@
 
 **A local video editing CLI for Agents.** Editable JSON timelines, explicit capability contracts and real render evidence for advertising edits, template variants, keyframes and video automation.
 
-[简体中文](README.md) · [Download](https://github.com/Tonscriptions/agent-video-kit/releases/tag/v0.1.0-alpha.1) · [Documentation](docs/README.md) · [Manual](docs/releases/v0.1.0-alpha.1/USAGE.md) · [Skills](docs/releases/v0.1.0-alpha.1/SKILLS.md) · [Complete cases](docs/releases/v0.1.0-alpha.1/CASES.md)
+[简体中文](README.md) · [Download](https://github.com/Tonscriptions/agent-video-kit/releases/tag/v0.1.0-alpha.1) · [Documentation](docs/README.md) · [Manual](docs/releases/v0.1.0-alpha.1/USAGE.md) · [Skills](docs/local/INSTALLATION.md) · [Complete cases](docs/releases/v0.1.0-alpha.1/CASES.md)
 
 **Release: `v0.1.0-alpha.1` — a native Windows CLI preview.** This milestone closes offline installation, structured editing, previews, rendering, checks and delivery. Full CapCut feature coverage, its asset ecosystem and perceptual equivalence remain future goals. [Release decision and open requirements](docs/releases/v0.1.0-alpha.1/RELEASE.md).
 
@@ -14,7 +14,7 @@ This is the local case documentation page replaying actual CLI logs. The product
 
 ```mermaid
 flowchart LR
-  A[Agent + video-cut Skills] --> B[CLI / JSON responses]
+  A[Agent + agent-ffmpeg-local Skills] --> B[CLI / JSON responses]
   B --> C[Agent Project + Rights Ledger]
   C --> D[Validate / plan / preview]
   D --> E[FFmpeg graph or explicit Float32]
@@ -44,6 +44,20 @@ An Agent uses Skills to turn a brief into an edit plan, reads `capabilities` and
 | F12 | Project packages, JSON, OTIO, MLT/plain draft exchange | `convert import/export` | Format-specific Exact/Approximate/Unsupported/Failed reports |
 
 Use bundled `capabilities`, `schema show` and `COMMAND --help` for the exact supported contract. Plain draft adapters operate on existing authorized local JSON, do not run CapCut, and do not promise lossless compatibility with every proprietary effect. [Detailed manual](docs/releases/v0.1.0-alpha.1/USAGE.md).
+
+## Installed local package and Skills (2026-10-24)
+
+The verified release ZIP is installed at `E:/dev/sandbox/AI广告剪辑/local/agent-ffmpeg/v0.1.0-alpha.1/installed/`. All 17 local Skills are registered with the requested **`$agent-ffmpeg-local-xxx`** prefix. Invoke **`$agent-ffmpeg-local-editor`** on the next turn.
+
+```powershell
+$avk = 'E:/dev/sandbox/AI广告剪辑/skills/agent-ffmpeg-local-editor/scripts/run.ps1'
+& $avk doctor
+& $avk capabilities
+```
+
+The launcher checks the release pin, receipt and launcher digest, then runs the installed app with `-I -S`. Existing native Python/FFmpeg are available. Installed files occupy 81.8 MB; temporary files stay on E:. [Paths, all Skills and reproduction](docs/local/INSTALLATION.md) · [Local release ZIP](docs/releases/v0.1.0-alpha.1/artifacts/agent-video-kit-v0.1.0-alpha.1-cp313-win_amd64.zip).
+
+This fresh installation completed 28 case commands and eight commands through the Skill launcher, including actual rendering, Chinese/space path forwarding and expected refusal. [Fresh input](docs/assets/local-install-20261024-r1/input.mp4) · [Output](docs/assets/local-install-20261024-r1/field.mp4) · [GIF](docs/assets/local-install-20261024-r1/field.gif) · [Template variant](docs/assets/local-install-20261024-r1/variant.gif) · [Launcher receipt](docs/validation/evidence/local-install-20261024-r1/skills/verification.json). See R10–R12 for scope.
 
 ## Installation
 
@@ -97,33 +111,33 @@ Agents must inspect the process exit code plus JSON `ok`, `status`, `errors`, `w
 
 These new assets are locally generated graphics and synthetic audio, with zero new model inferences. C03 is dated historical evidence. GIFs carry no sound; automated decoding, static review, continuous playback and human listening are reported separately. [Provenance, hashes, inputs and reproduction](docs/releases/v0.1.0-alpha.1/CASES.md).
 
-## 17 Agent Skills
+## 17 installed-release Agent Skills
 
 | # | Skill | Purpose |
 |---|---|---|
-| 1 | `$video-cut-agent-editor` | Route editing work, initialize projects and deliver outputs |
-| 2 | `$video-cut-timeline` | Author timelines, keyframes, camera moves, transitions and nesting |
-| 3 | `$video-cut-quality` | Review pixels, masks, scopes and render evidence |
-| 4 | `$video-cut-project-ops` | Manage snapshots, recovery, relinking and render queues |
-| 5 | `$video-cut-local-policy` | Audit local-only execution and remote references |
-| 6 | `$video-cut-rights-ledger` | Record and check media, font, model and template rights |
-| 7 | `$video-cut-local-models` | Register and run existing offline model adapters |
-| 8 | `$video-cut-video-understand` | Analyze scenes, silence, frame evidence and transcripts |
-| 9 | `$video-cut-template-library` | Apply templates, index assets and reuse edited clip groups |
-| 10 | `$video-cut-long-to-short` | Turn talks or lessons into reviewed short clips |
-| 11 | `$video-cut-screen-demo` | Edit screen demos with action anchors and zooms |
-| 12 | `$video-cut-reference-remake` | Rebuild reference pacing and layout using replacement assets |
-| 13 | `$video-cut-ffmpeg` | Perform general local FFmpeg media operations |
-| 14 | `$video-cut-video-edit` | Trim, concatenate, resize and compress local media |
-| 15 | `$video-cut-ad-creative` | Plan ad copy, hooks and creative variants |
-| 16 | `$video-cut-video-content-strategist` | Plan content direction, scripts and channel strategy |
-| 17 | `$video-cut-campaign-analytics` | Analyze supplied campaign data |
+| 1 | `$agent-ffmpeg-local-editor` | Route editing work, initialize projects and deliver outputs |
+| 2 | `$agent-ffmpeg-local-timeline` | Author timelines, keyframes, camera moves, transitions and nesting |
+| 3 | `$agent-ffmpeg-local-quality` | Review pixels, masks, scopes and render evidence |
+| 4 | `$agent-ffmpeg-local-project-ops` | Manage snapshots, recovery, relinking and render queues |
+| 5 | `$agent-ffmpeg-local-local-policy` | Audit local-only execution and remote references |
+| 6 | `$agent-ffmpeg-local-rights-ledger` | Record and check media, font, model and template rights |
+| 7 | `$agent-ffmpeg-local-local-models` | Register and run existing offline model adapters |
+| 8 | `$agent-ffmpeg-local-video-understand` | Analyze scenes, silence, frame evidence and transcripts |
+| 9 | `$agent-ffmpeg-local-template-library` | Apply templates, index assets and reuse edited clip groups |
+| 10 | `$agent-ffmpeg-local-long-to-short` | Turn talks or lessons into reviewed short clips |
+| 11 | `$agent-ffmpeg-local-screen-demo` | Edit screen demos with action anchors and zooms |
+| 12 | `$agent-ffmpeg-local-reference-remake` | Rebuild reference pacing and layout using replacement assets |
+| 13 | `$agent-ffmpeg-local-ffmpeg` | Perform general local FFmpeg media operations |
+| 14 | `$agent-ffmpeg-local-video-edit` | Trim, concatenate, resize and compress local media |
+| 15 | `$agent-ffmpeg-local-ad-creative` | Plan ad copy, hooks and creative variants |
+| 16 | `$agent-ffmpeg-local-video-content-strategist` | Plan content direction, scripts and channel strategy |
+| 17 | `$agent-ffmpeg-local-campaign-analytics` | Analyze supplied campaign data |
 
 ```powershell
-.\register-video-cut-skills.ps1
+.\register-agent-ffmpeg-local-skills.ps1
 ```
 
-Registration creates Windows junctions from the current checkout to the user's Codex Skills directory and preserves conflicting unrelated entries. Skills provide task guidance; the bundle does not install an Agent host, subscription assets or commercial models. [Inputs, outputs, dependencies and routing](docs/releases/v0.1.0-alpha.1/SKILLS.md).
+Install the local release before registration. Windows junctions expose Skill sources on E: to Codex while preserving unrelated conflicts. New names become discoverable on the next turn. Legacy `video-cut-` entries and published ZIP assets remain unchanged; the new namespace ships with this main-branch update. Skills provide guidance without extra models or subscription assets. [Current Skill details and setup](docs/local/INSTALLATION.md) · [Original release-name catalog](docs/releases/v0.1.0-alpha.1/SKILLS.md).
 
 ## Verification
 
@@ -138,6 +152,10 @@ Registration creates Windows junctions from the current checkout to the user's C
 | R07 | Skills and links | All 17 entry formats and release-document local links checked | [Gate](docs/validation/evidence/release-v0.1.0-alpha.1-r2/release-verification.json); format validation is not behavioral quality proof |
 | R08 | Preserved failed first case run | Incorrect relative output path in the case driver | [Failure](docs/validation/evidence/release-v0.1.0-alpha.1-r1/failure.json); corrected to an absolute in-project path before rerunning |
 | R09 | Public release and download verification | **GitHub prerelease published; all six downloaded assets match local SHA-256** | [Publication receipt](docs/validation/evidence/release-v0.1.0-alpha.1-r2/publication.json) · [Actual native installation receipt](docs/validation/evidence/release-v0.1.0-alpha.1-r2/installation-receipt.json); 2026-10-24 local date |
+| R10 | Permanent local installation on E: | **Pinned ZIP verified; eight native offline wheels installed** | [Installation receipt](docs/validation/evidence/local-install-20261024-r1/installation/installation.json); 2026-10-24, 1,430 files / 81,845,972 bytes, no virtual environment |
+| R11 | New namespace and actual Skill execution | **17 Skills registered/validated; eight launcher commands: seven successes, one expected refusal** | [Skill receipt](docs/validation/evidence/local-install-20261024-r1/skills/verification.json); Codex junction calls the installed release, Chinese/space path render is byte-identical to direct execution; not a full Agent behavior benchmark |
+| R12 | Fresh installed-case reproduction | **28 commands: 27 successes, one expected refusal; ad/template renders and project-package round trip** | [Case receipt](docs/validation/evidence/local-install-20261024-r1/cases/verification.json) · [GIF](docs/assets/local-install-20261024-r1/field.gif) · [Static review](docs/validation/evidence/local-install-20261024-r1/review.json); zero new inference, no continuous playback or human listening; separate from historical suite counts |
+
 
 ## Limitations and next milestones
 
@@ -147,7 +165,7 @@ Next priorities are renderer capability consistency, natural-media playback and 
 
 ## Documentation, contributions and licensing
 
-- [Manual](docs/releases/v0.1.0-alpha.1/USAGE.md), [Skills](docs/releases/v0.1.0-alpha.1/SKILLS.md), [cases](docs/releases/v0.1.0-alpha.1/CASES.md), [release notes](docs/releases/v0.1.0-alpha.1/RELEASE.md), and [all documentation](docs/README.md). Release-specific guides are bilingual; older research/specifications are primarily Chinese.
+- [Manual](docs/releases/v0.1.0-alpha.1/USAGE.md), [Skills](docs/local/INSTALLATION.md), [cases](docs/releases/v0.1.0-alpha.1/CASES.md), [release notes](docs/releases/v0.1.0-alpha.1/RELEASE.md), and [all documentation](docs/README.md). Release-specific guides are bilingual; older research/specifications are primarily Chinese.
 - [Product baseline](docs/产品需求与开发路线基线_2026-10-12.md), [system architecture](docs/architecture/系统边界与模块契约_v0.1_2026-10-13.md), and [machine-readable schema](docs/specs/agent-project.schema.json).
 - [Complete historical numbered verification log](docs/releases/v0.1.0-alpha.1/history/README.zh.pre-release.md) and [historical index](docs/releases/v0.1.0-alpha.1/history/docs-index.pre-release.md). Dated counts are retained rather than added together.
 - Original code/documentation is [MIT licensed](LICENSE). Vendored projects, Skills, models, fonts and media retain their separate terms. [Third-party notices](docs/releases/v0.1.0-alpha.1/THIRD_PARTY.md). The Rights Ledger records evidence and gates work; it does not automatically establish legal clearance.
